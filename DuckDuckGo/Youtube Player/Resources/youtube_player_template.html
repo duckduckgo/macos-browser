@@ -1,13 +1,20 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>...</title>
+        <title>Duck Player - </title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <style>
             :root {
-                --video-width: 80vw;
-                --video-height: calc(var(--video-width) * 0.5625);
+                --aspect-ratio: calc(9/16);
                 --toolbar-height: 56px;
+
+                /* Set video to take up 80vw width */
+                --video-width: 80vw;
+
+                /* Calculate video height based on aspect ratio, but never exceed 80vh
+                 * for the video height, for example when using short, wide screens.
+                 */
+                --video-height: min(calc(var(--video-width) * var(--aspect-ratio)), 80vh);
             }
 
             @media screen and (max-width: 1080px) {
@@ -85,6 +92,7 @@
             iframe, #player {
                 width: var(--video-width);
                 height: var(--video-height);
+                max-width: 3840px;
             }
 
             #player {
@@ -101,10 +109,15 @@
             }
 
             .content-hover {
-                padding: 1px;
+                --content-padding: 1px;
+                padding: var(--content-padding);
                 width: var(--video-width);
-                margin-left: calc(((100vw - var(--video-width))/2) - 1px);
-                margin-top: calc((100vh - (var(--video-height) + var(--toolbar-height)))/2);
+
+                /* Set margin left to be half of the remaining vw - video width */
+                margin-left: calc( ( ( 100vw - var(--video-width) ) / 2 ) - var(--content-padding));
+
+                /* Set margin-top to be half of the remaaining vh - video and toolbar height, but never less than 0px. */
+                margin-top: max(0px, calc((100vh - (var(--video-height) + var(--toolbar-height)))/2));
                 position: absolute;
             }
 
@@ -114,7 +127,6 @@
             }
 
             .content-body {
-                /*backdrop-filter: blur(32px);*/
                 border-radius: 0px 0px 12px 12px;
                 transition: all 0.5s linear;
                 opacity: 1;
@@ -164,7 +176,6 @@
             }
 
             .logo .info-icon:hover path {
-                /*.logo .tooltip-close:hover path {*/
                 fill: rgba(255,255,255,0.8);
             }
 
@@ -202,14 +213,6 @@
             .logo .info-tooltip.visible {
                 display: block;
             }
-
-            /*.logo .tooltip-close {
-                position: absolute;
-                right: 8px;
-                top: 50%;
-                margin-top: -8px;
-                cursor: pointer;
-            }*/
 
             .menu {
                 float: right;
@@ -278,166 +281,10 @@
                 height: 14px;
             }
 
-            /*.background-gradient {
-                position: absolute;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                height: 56%;
-            }
-
-            .background-fade {
-                position: absolute;
-                left: 0;
-                right: 0;
-                top: 0;
-                bottom: 0;
-                background: linear-gradient(0deg, rgba(0,0,0,0), #101011 30%);
-            }*/
-
-            /* --- --- CUSTOM FORM SWITCH FROM DUCKDUCKGO.COM --- --- */
-
-            /*.frm__switch {
-                align-self: center;
-                display: flex;
-            }
-
-            .frm__switch + .frm__label {
-                max-width: 75%;
-            }
-
-            .frm__switch .frm__switch__label.btn {
-                width: 28px;
-                height: 12px;
-                padding: 2px;
-                border-radius: 8px;
-                position: relative;
-                background-color: lightgray;
-                border: none;
-                transition: background-color 150ms linear;
-                margin-left: auto;
-                cursor: pointer;
-            }
-
-            .frm__switch .frm__switch__label.btn:hover {
-                opacity: 0.9;
-            }
-
-            .frm__switch .frm__switch__label.btn .frm__switch-on,
-            .frm__switch .frm__switch__label.btn .frm__switch-off {
-                display: none;
-            }
-
-            .frm__switch .frm__switch__label.btn::after {
-                content: "";
-                width: 12px;
-                height: 12px;
-                background: white;
-                border-radius: 6px;
-                position: absolute;
-                top: 2px;
-                left: 2px;
-                transition: left 100ms ease-in;
-            }
-
-            .frm__switch.is-checked .frm__switch__label.btn  {
-                background-color: #3969EF;
-                border-color: #3969EF;
-                transition: background-color 150ms linear;
-            }
-
-            .frm__switch.is-checked .frm__switch__label.btn::after {
-                left: 18px;
-                transition: left 100ms ease-in;
-            }
-
-            .frm__switch__inp {
-                border: 0;
-                clip: rect(0 0 0 0);
-                height: 1px;
-                margin: -1px;
-                overflow: hidden;
-                padding: 0;
-                position: absolute;
-                width: 1px;
-            }*/
         </style>
     </head>
     <body>
-        <!--<div class="background-gradient">
-            <svg width="100%" height="100%" viewBox="0 0 100% 100%" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <g opacity="0.8" filter="url(#filter0_f_996_188407)">
-                <rect x="-11.0701" y="464.244" width="409.297" height="388.632" rx="43.9961" fill="#5132A9"/>
-                </g>
-                <g opacity="0.8" filter="url(#filter1_f_996_188407)">
-                <rect x="630.207" y="623.563" width="485.29" height="277.975" rx="43.9961" fill="#FF7E20"/>
-                </g>
-                <g opacity="0.8" filter="url(#filter2_f_996_188407)">
-                <rect x="609.542" y="577.567" width="455.293" height="293.307" rx="43.9961" fill="#E46F4F"/>
-                </g>
-                <g opacity="0.8" filter="url(#filter3_f_996_188407)">
-                <rect x="788.859" y="577.567" width="197.316" height="217.981" rx="43.9961" fill="#ECE6FF"/>
-                </g>
-                <g opacity="0.8" filter="url(#filter4_f_996_188407)">
-                <rect width="209.981" height="245.978" rx="43.9961" transform="matrix(-1 0 0 1 129.584 672.893)" fill="#EB876C"/>
-                </g>
-                <g opacity="0.8" filter="url(#filter5_f_996_188407)">
-                <rect x="514.217" y="444.246" width="429.962" height="382.633" rx="43.9961" fill="#E46F4F"/>
-                </g>
-                <g opacity="0.8" filter="url(#filter6_f_996_188407)">
-                <rect x="780.86" y="478.91" width="250.645" height="316.639" rx="43.9961" fill="#5132A9"/>
-                </g>
-                <g opacity="0.6" filter="url(#filter7_f_996_188407)">
-                <rect x="850.188" y="795.548" width="187.983" height="260.644" rx="43.9961" fill="#C94A14"/>
-                </g>
-                <defs>
-                <filter id="filter0_f_996_188407" x="-277.713" y="197.601" width="942.583" height="921.919" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-                <feFlood flood-opacity="0" result="BackgroundImageFix"/>
-                <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
-                <feGaussianBlur stdDeviation="133.322" result="effect1_foregroundBlur_996_188407"/>
-                </filter>
-                <filter id="filter1_f_996_188407" x="363.564" y="356.92" width="1018.58" height="811.262" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-                <feFlood flood-opacity="0" result="BackgroundImageFix"/>
-                <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
-                <feGaussianBlur stdDeviation="133.322" result="effect1_foregroundBlur_996_188407"/>
-                </filter>
-                <filter id="filter2_f_996_188407" x="342.899" y="310.924" width="988.579" height="826.594" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-                <feFlood flood-opacity="0" result="BackgroundImageFix"/>
-                <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
-                <feGaussianBlur stdDeviation="133.322" result="effect1_foregroundBlur_996_188407"/>
-                </filter>
-                <filter id="filter3_f_996_188407" x="522.216" y="310.924" width="730.602" height="751.267" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-                <feFlood flood-opacity="0" result="BackgroundImageFix"/>
-                <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
-                <feGaussianBlur stdDeviation="133.322" result="effect1_foregroundBlur_996_188407"/>
-                </filter>
-                <filter id="filter4_f_996_188407" x="-347.04" y="406.25" width="743.268" height="779.265" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-                <feFlood flood-opacity="0" result="BackgroundImageFix"/>
-                <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
-                <feGaussianBlur stdDeviation="133.322" result="effect1_foregroundBlur_996_188407"/>
-                </filter>
-                <filter id="filter5_f_996_188407" x="247.574" y="177.603" width="963.248" height="915.919" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-                <feFlood flood-opacity="0" result="BackgroundImageFix"/>
-                <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
-                <feGaussianBlur stdDeviation="133.322" result="effect1_foregroundBlur_996_188407"/>
-                </filter>
-                <filter id="filter6_f_996_188407" x="514.217" y="212.267" width="783.931" height="849.925" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-                <feFlood flood-opacity="0" result="BackgroundImageFix"/>
-                <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
-                <feGaussianBlur stdDeviation="133.322" result="effect1_foregroundBlur_996_188407"/>
-                </filter>
-                <filter id="filter7_f_996_188407" x="656.871" y="602.232" width="574.616" height="647.276" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-                <feFlood flood-opacity="0" result="BackgroundImageFix"/>
-                <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
-                <feGaussianBlur stdDeviation="96.6581" result="effect1_foregroundBlur_996_188407"/>
-                </filter>
-                </defs>
-                </svg>
-        </div>
-        <div class="background-fade"></div>-->
-
         <div class="bg"></div>
-
         <div class="content-hover">
             <div class="content">
                 <div id="player">
@@ -476,9 +323,6 @@
                                 </svg>
                                 <div class="info-tooltip">
                                     Duck Player protects your viewing activity from advertiser profiling and from influencing YouTube's recommendation algorithm.
-                                    <!--<svg class="tooltip-close" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M11.4419 5.44194C11.686 5.19786 11.686 4.80214 11.4419 4.55806C11.1979 4.31398 10.8021 4.31398 10.5581 4.55806L8 7.11612L5.44194 4.55806C5.19786 4.31398 4.80214 4.31398 4.55806 4.55806C4.31398 4.80214 4.31398 5.19786 4.55806 5.44194L7.11612 8L4.55806 10.5581C4.31398 10.8021 4.31398 11.1979 4.55806 11.4419C4.80214 11.686 5.19786 11.686 5.44194 11.4419L8 8.88388L10.5581 11.4419C10.8021 11.686 11.1979 11.686 11.4419 11.4419C11.686 11.1979 11.686 10.8021 11.4419 10.5581L8.88388 8L11.4419 5.44194Z" fill="white" fill-opacity="0.8"/>
-                                    </svg>-->
                                 </div>
                             </div>
 
@@ -487,13 +331,6 @@
                             <div class="setting-container">
                                 <form class="setting">
                                     <div class="settings-toggle-container">
-                                        <!--<div class="frm__switch  frm-input">
-                                            <input id="setting" class="frm__switch__inp" type="checkbox" />
-                                            <label class="frm__switch__label  btn" for="setting">
-                                                <span class="frm__switch-on">On</span>
-                                                <span class="frm__switch-off">Off</span>
-                                            </label>
-                                        </div>-->
                                         <input id="setting" class="frm__switch__inp" type="checkbox" />
                                     </div>
                                     <div class="settings-label">Always open YouTube videos in Duck Player</div>
@@ -558,7 +395,7 @@
                         VideoPlayer.showVideoError('Malformed video id');
                     }
 
-                    VideoPlayer.setVideoTitle();
+                    VideoPlayer.setTabTitle();
                 },
 
                 /**
@@ -568,6 +405,10 @@
                     VideoPlayer.playerContainer().innerHTML = `<div class="player-error"><b>ERROR:</b> ${errorMessage}</div>`;
                 },
 
+                /**
+                 * Get the video title from the video iframe.
+                 * @returns {string|false}
+                 */
                 getVideoTitle: () => {
                     let iframe = VideoPlayer.iframe();
 
@@ -577,7 +418,6 @@
                         if (iframeTitle === 'YouTube') {
                             return false;
                         }
-                        console.log('ift', iframeTitle);
 
                         return iframeTitle.replace(/ - YouTube$/g,'');
                     }
@@ -585,7 +425,11 @@
                     return false;
                 },
 
-                setVideoTitle: () => {
+                /**
+                 * Sets the tab title to the title of the video
+                 */
+                setTabTitle: () => {
+                    // Poll YT for title. Simplest approach.
                     let interval = setInterval(() => {
                         let videoTitle = VideoPlayer.getVideoTitle();
 
@@ -593,7 +437,13 @@
                             document.querySelector('title').innerText = 'Duck Player - ' + videoTitle;
                             clearInterval(interval);
                         }
-                    }, 4);
+                    });
+
+                    // Escape hatch, if title not gotten after 3s, set title to Duck Player.
+                    setTimeout(() => {
+                        document.querySelector('title').innerText = 'Duck Player';
+                        clearInterval(interval);
+                    }, 3000);
                 }
             };
 
@@ -661,6 +511,11 @@
                     return false;
                 },
 
+                /**
+                 * Remove all invalid characters from video id
+                 * @param {string} untrusted
+                 * @returns {string}
+                 */
                 sanitizeVideoId: (untrusted) => {
                     return untrusted.replace(/[^a-zA-Z0-9-_]/g, '');
                 },
@@ -708,6 +563,7 @@
                 checkbox: () => {
                     return document.querySelector('#setting');
                 },
+
                 /**
                  * Returns the settings label
                  * @returns {HTMLElement}
@@ -715,6 +571,7 @@
                 label: () => {
                     return document.querySelector('.settings-label');
                 },
+
                 /**
                  * Returns the settings label
                  * @returns {HTMLElement}
@@ -722,6 +579,7 @@
                 container: () => {
                     return document.querySelector('.setting-container');
                 },
+
                 /**
                  * Returns the container of the checkbox
                  * @returns {HTMLElement}
@@ -741,6 +599,10 @@
                     //Setting.updateCheckboxToggle(value);
                 },
 
+                /**
+                 * Returns whether checkbox isChecked
+                 * @returns {boolean}
+                 */
                 isChecked: () => {
                     return Setting.checkbox().checked;
                 },
@@ -748,6 +610,10 @@
                 isVisible: null,
                 hasSetInitialState: false,
 
+                /**
+                 * Sets the state of the setting immediately
+                 * @param {boolean} value
+                 */
                 setState: (value) => {
                     Setting.toggleAnimatable(false);
                     Setting.toggleVisibility(!value);
@@ -779,15 +645,28 @@
                     }
                 },
 
+                /**
+                 * Toggle visibility of the entire settings container
+                 * @param {booleane} visible
+                 */
                 toggleVisibility: (visible) => {
                     Setting.container().classList[!visible ? 'add' : 'remove']('hidden');
                     Setting.isVisible = visible;
                 },
 
+                /**
+                 * Toggles whether the settings container should be animatable. It should only be so in anticipation
+                 * of user action (clicking the checkbox)
+                 * @param {boolean} animatable
+                 */
                 toggleAnimatable: (animatable) => {
                     Setting.container().classList[animatable ? 'add' : 'remove']('animatable');
                 },
 
+                /**
+                 * A nice touch to slightly highlight the settings button while the
+                 * settings container is animating/sliding in behind it.
+                 */
                 higlightSettingsButton: () => {
                     let openSettingsClasses = document.querySelector('.open-settings').classList;
 
@@ -798,7 +677,6 @@
                     }, 300 + 100) // match .animatable css
 
                 },
-
 
                 /**
                  * Updates the checkbox toggle with correct classes based on 'checked'
@@ -865,33 +743,34 @@
             const Tooltip = {
                 visible: false,
 
+                /**
+                 * Returns the (i)-icon
+                 * @returns {HTMLElement}
+                 */
                 icon: () => {
                     return document.querySelector('.info-icon');
                 },
 
-                close: () => {
-                    return document.querySelector('.tooltip-close');
-                },
-
+                /**
+                 * Returns the tooltip
+                 * @returns {HTMLElement}
+                 */
                 tooltip: () => {
                     return document.querySelector('.info-tooltip');
                 },
 
-                /*init: () => {
-                    Tooltip.icon().addEventListener('click', () => {
-                        Tooltip.toggle(true);
-                    });
-
-                    Tooltip.close().addEventListener('click', () => {
-                        Tooltip.toggle(false);
-                    });
-                },*/
-
+                /**
+                 * Toggles visibility of tooltip
+                 * @param {boolean} show
+                 */
                 toggle: (show) => {
                     Tooltip.tooltip().classList[show ? 'add' : 'remove' ]('visible');
                     Tooltip.visible = show;
                 },
 
+                /**
+                 * Sets up the tooltip to show/hide based on icon hover
+                 */
                 init: () => {
                     Tooltip.icon().addEventListener('mouseenter', () => {
                         Tooltip.toggle(true);
@@ -945,7 +824,7 @@
                 },
 
                 /**
-                 *
+                 * Watch for inactivity and toggle toolbar accordingly
                  */
                 handleFadeState: (e) => {
                     if (MouseMove.timer) {
@@ -971,6 +850,10 @@
                     return document.querySelector('.content-body');
                 },
 
+                /**
+                 * Return the background element
+                 * @returns {HTMLElement}
+                 */
                 bg: () => {
                     return document.querySelector('.bg');
                 },
@@ -1009,29 +892,6 @@
                         MouseMove.isFaded = isFaded;
                     }, MouseMove.fadeTransitionTime);
                 },
-            };
-
-            // TEMPORARY: May not need to get used
-            const Iframe = {
-                init: () => {
-                    let iframe = document.querySelector('#video-player');
-
-                    let observer = new iframe.contentWindow.MutationObserver(() => {
-                        let links = iframe.contentDocument.querySelectorAll('a');
-                        console.log('iframe changed DOM mutator', links);
-                    });
-
-                    observer.observe(iframe.contentDocument.querySelector('body'), {
-                        subtree: true,
-                        childList: true,
-                        attributeFilter: ['src']
-                    });
-
-                    setInterval(() => {
-                        let links = iframe.contentDocument.querySelectorAll('a');
-                        console.log('iframe changed interval', links);
-                    }, 500);
-                }
             };
 
             /**
