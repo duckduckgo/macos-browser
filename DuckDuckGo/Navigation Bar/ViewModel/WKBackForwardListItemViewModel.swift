@@ -75,7 +75,7 @@ final class WKBackForwardListItemViewModel {
         }
 
         if backForwardListItem.url?.isPrivatePlayer == true {
-            return NSImage(named: "PrivatePlayer")
+            return .privatePlayer
         }
 
         if let url = backForwardListItem.url,
