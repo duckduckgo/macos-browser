@@ -114,7 +114,9 @@ extension Pixel.Event {
              .passwordManagerLockScreenTimeoutSelected15Minutes,
              .passwordManagerLockScreenTimeoutSelected30Minutes,
              .passwordManagerLockScreenTimeoutSelected1Hour,
-             .ampBlockingRulesCompilationFailed:
+             .ampBlockingRulesCompilationFailed,
+             .adClickAttributionDetected,
+             .adClickAttributionActive:
             
             return nil
         }

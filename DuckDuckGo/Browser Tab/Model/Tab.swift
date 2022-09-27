@@ -149,6 +149,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
          sessionStateData: Data? = nil,
          interactionStateData: Data? = nil,
          parentTab: Tab? = nil,
+         attributionState: AdClickAttributionLogic.State? = nil,
          shouldLoadInBackground: Bool = false,
          canBeClosedWithBack: Bool = false,
          lastSelectedAt: Date? = nil,
@@ -180,6 +181,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
         super.init()
 
+        initAttributionLogic(state: attributionState ?? parentTab?.adClickAttributionLogic.state)
         setupWebView(shouldLoadInBackground: shouldLoadInBackground)
 
         NotificationCenter.default.addObserver(self,
@@ -440,13 +442,18 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
         if enabled {
             do {
-                try userContentController.enableContentRuleList(withIdentifier: ContentBlockerRulesLists.Constants.clickToLoadRulesListName)
+                try userContentController.enableGlobalContentRuleList(withIdentifier: ContentBlockerRulesLists.Constants.clickToLoadRulesListName)
             } catch {
                 assertionFailure("Missing FB List")
                 return false
             }
         } else {
-            userContentController.disableContentRuleList(withIdentifier: ContentBlockerRulesLists.Constants.clickToLoadRulesListName)
+            do {
+                try userContentController.disableGlobalContentRuleList(withIdentifier: ContentBlockerRulesLists.Constants.clickToLoadRulesListName)
+            } catch {
+                assertionFailure("FB List was not enabled")
+                return false
+            }
         }
         self.fbBlockingEnabled = enabled
 
@@ -475,6 +482,24 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                          contentBlockingManager: ContentBlocking.shared.contentBlockingManager,
                          tld: TLD())
     }()
+    
+    // MARK: - Ad Click Attribution
+    
+    private let adClickAttributionDetection = ContentBlocking.shared.makeAdClickAttributionDetection()
+    let adClickAttributionLogic = ContentBlocking.shared.makeAdClickAttributionLogic()
+    
+    public var currentAttributionState: AdClickAttributionLogic.State? {
+        adClickAttributionLogic.state
+    }
+    
+    private func initAttributionLogic(state: AdClickAttributionLogic.State?) {
+        adClickAttributionLogic.delegate = self
+        adClickAttributionDetection.delegate = adClickAttributionLogic
+        
+        if let state = state {
+            adClickAttributionLogic.applyInheritedAttribution(state: state)
+        }
+    }
 
     @MainActor
     private func reloadIfNeeded(shouldLoadInBackground: Bool = false) async {
@@ -765,6 +790,8 @@ extension Tab: UserContentControllerDelegate {
 
         findInPageScript = userScripts.findInPageScript
         attachFindInPage()
+        
+        adClickAttributionLogic.onRulesChanged(latestRules: ContentBlocking.shared.contentBlockingManager.currentRules)
     }
 
 }
@@ -862,12 +889,13 @@ extension Tab: ContentBlockerRulesUserScriptDelegate {
     
     func contentBlockerRulesUserScript(_ script: ContentBlockerRulesUserScript, detectedTracker tracker: DetectedRequest) {
         trackerInfo?.add(detectedTracker: tracker)
+        adClickAttributionLogic.onRequestDetected(request: tracker)
         guard let url = URL(string: tracker.pageUrl) else { return }
         historyCoordinating.addDetectedTracker(tracker, onURL: url)
     }
 
-    func contentBlockerRulesUserScript(_ script: ContentBlockerRulesUserScript, detectedThirdPartyRequest tracker: DetectedRequest) {
-        // no-op for now
+    func contentBlockerRulesUserScript(_ script: ContentBlockerRulesUserScript, detectedThirdPartyRequest request: DetectedRequest) {
+        trackerInfo?.add(detectedThirdPartyRequest: request)
     }
     
 }
@@ -927,6 +955,44 @@ extension Tab: SurrogatesUserScriptDelegate {
         guard let url = webView.url else { return }
         historyCoordinating.addDetectedTracker(tracker, onURL: url)
     }
+}
+
+extension Tab: AdClickAttributionLogicDelegate {
+    
+    func attributionLogic(_ logic: AdClickAttributionLogic,
+                          didRequestRuleApplication rules: ContentBlockerRulesManager.Rules?,
+                          forVendor vendor: String?) {
+        let contentBlockerRulesScript = userContentController.contentBlockingAssets?.userScripts.contentBlockerRulesScript
+        let attributedTempListName = AdClickAttributionRulesProvider.Constants.attributedTempRuleListName
+        
+        guard ContentBlocking.shared.privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .contentBlocking)
+         else {
+            userContentController.removeLocalContentRuleList(withIdentifier: attributedTempListName)
+            contentBlockerRulesScript?.currentAdClickAttributionVendor = nil
+            contentBlockerRulesScript?.supplementaryTrackerData = []
+            return
+        }
+        
+        contentBlockerRulesScript?.currentAdClickAttributionVendor = vendor
+        if let rules = rules {
+            
+            let globalListName = DefaultContentBlockerRulesListsSource.Constants.trackerDataSetRulesListName
+            let globalAttributionListName = AdClickAttributionRulesSplitter.blockingAttributionRuleListName(forListNamed: globalListName)
+            
+            if vendor != nil {
+                userContentController.installLocalContentRuleList(rules.rulesList, identifier: attributedTempListName)
+                try? userContentController.disableGlobalContentRuleList(withIdentifier: globalAttributionListName)
+            } else {
+                userContentController.removeLocalContentRuleList(withIdentifier: attributedTempListName)
+                try? userContentController.enableGlobalContentRuleList(withIdentifier: globalAttributionListName)
+            }
+            
+            contentBlockerRulesScript?.supplementaryTrackerData = [rules.trackerData]
+        } else {
+            contentBlockerRulesScript?.supplementaryTrackerData = []
+        }
+    }
+
 }
 
 extension Tab: EmailManagerRequestDelegate { }
@@ -1068,6 +1134,10 @@ extension Tab: WKNavigationDelegate {
 
         if navigationAction.isTargetingMainFrame, navigationAction.request.mainDocumentURL?.host != lastUpgradedURL?.host {
             lastUpgradedURL = nil
+        }
+        
+        if navigationAction.isTargetingMainFrame, navigationAction.navigationType == .backForward {
+            adClickAttributionLogic.onBackForwardNavigation(mainFrameURL: webView.url)
         }
         
         if navigationAction.isTargetingMainFrame, navigationAction.navigationType != .backForward {
@@ -1223,6 +1293,8 @@ extension Tab: WKNavigationDelegate {
     func webView(_ webView: WKWebView,
                  decidePolicyFor navigationResponse: WKNavigationResponse) async -> WKNavigationResponsePolicy {
         userEnteredUrl = false // subsequent requests will be navigations
+        
+        let isSuccessfulResponse = (navigationResponse.response as? HTTPURLResponse)?.validateStatusCode(statusCode: 200..<300) == nil
 
         if !navigationResponse.canShowMIMEType || navigationResponse.shouldDownload {
             if navigationResponse.isForMainFrame {
@@ -1233,13 +1305,18 @@ extension Tab: WKNavigationDelegate {
                 currentDownload = navigationResponse.response.url
             }
 
-            let isSuccessfulResponse = (navigationResponse.response as? HTTPURLResponse)?.validateStatusCode(statusCode: 200..<300) == nil
             if isSuccessfulResponse {
                 // register the navigationResponse for legacy _WKDownload to be called back on the Tab
                 // further download will be passed to webView:navigationResponse:didBecomeDownload:
                 return .download(navigationResponse, using: webView)
             }
         }
+        
+        if navigationResponse.isForMainFrame && isSuccessfulResponse {
+            adClickAttributionDetection.on2XXResponse(url: webView.url)
+        }
+        
+        await adClickAttributionLogic.onProvisionalNavigation()
 
         return .allow
     }
@@ -1255,6 +1332,8 @@ extension Tab: WKNavigationDelegate {
         linkProtection.cancelOngoingExtraction()
         linkProtection.setMainFrameUrl(webView.url)
         referrerTrimming.onBeginNavigation(to: webView.url)
+        adClickAttributionDetection.onStartNavigation(url: webView.url)
+        
     }
 
     @MainActor
@@ -1265,6 +1344,8 @@ extension Tab: WKNavigationDelegate {
         if isAMPProtectionExtracting { isAMPProtectionExtracting = false }
         linkProtection.setMainFrameUrl(nil)
         referrerTrimming.onFinishNavigation()
+        adClickAttributionDetection.onDidFinishNavigation(url: webView.url)
+        adClickAttributionLogic.onDidFinishNavigation(host: webView.url?.host)
     }
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
@@ -1276,6 +1357,7 @@ extension Tab: WKNavigationDelegate {
         invalidateSessionStateData()
         linkProtection.setMainFrameUrl(nil)
         referrerTrimming.onFailedNavigation()
+        adClickAttributionDetection.onDidFailNavigation()
         webViewDidFailNavigationPublisher.send()
     }
 
@@ -1292,6 +1374,7 @@ extension Tab: WKNavigationDelegate {
         isBeingRedirected = false
         linkProtection.setMainFrameUrl(nil)
         referrerTrimming.onFailedNavigation()
+        adClickAttributionDetection.onDidFailNavigation()
         webViewDidFailNavigationPublisher.send()
     }
 
@@ -1345,6 +1428,10 @@ extension Tab: WKNavigationDelegate {
                  withError error: Error) {
         guard frame.isMainFrame else { return }
         self.mainFrameLoadState = .finished
+    }
+    
+    func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
+        Pixel.fire(.debug(event: .webKitDidTerminate))
     }
 
 }
