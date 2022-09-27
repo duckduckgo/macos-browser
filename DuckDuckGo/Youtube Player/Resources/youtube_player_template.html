@@ -412,8 +412,8 @@
                 getVideoTitle: () => {
                     let iframe = VideoPlayer.iframe();
 
-                    if (iframe && iframe.contentDocument && iframe.contentDocument.querySelector('title') && iframe.contentDocument.querySelector('title').innerText) {
-                        let iframeTitle = iframe.contentDocument.querySelector('title').innerText;
+                    if (iframe && iframe.contentDocument && iframe.contentDocument.querySelector('title') && iframe.contentDocument.querySelector('title').textContent) {
+                        let iframeTitle = iframe.contentDocument.querySelector('title').textContent;
 
                         if (iframeTitle === 'YouTube') {
                             return false;
@@ -429,20 +429,25 @@
                  * Sets the tab title to the title of the video
                  */
                 setTabTitle: () => {
+                    let hasSetTitle = false;
+
                     // Poll YT for title. Simplest approach.
                     let interval = setInterval(() => {
                         let videoTitle = VideoPlayer.getVideoTitle();
 
                         if (videoTitle !== false) {
-                            document.querySelector('title').innerText = 'Duck Player - ' + videoTitle;
+                            document.querySelector('title').textContent = 'Duck Player - ' + videoTitle;
                             clearInterval(interval);
+                            hasSetTitle = true;
                         }
                     });
 
                     // Escape hatch, if title not gotten after 3s, set title to Duck Player.
                     setTimeout(() => {
-                        document.querySelector('title').innerText = 'Duck Player';
-                        clearInterval(interval);
+                        if (!hasSetTitle) {
+                            document.querySelector('title').textContent = 'Duck Player';
+                            clearInterval(interval);
+                        }
                     }, 3000);
                 }
             };
