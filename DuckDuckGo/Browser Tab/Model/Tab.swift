@@ -1429,6 +1429,10 @@ extension Tab: WKNavigationDelegate {
         guard frame.isMainFrame else { return }
         self.mainFrameLoadState = .finished
     }
+    
+    func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
+        Pixel.fire(.debug(event: .webKitDidTerminate))
+    }
 
 }
 // universal download event handlers for Legacy _WKDownload and modern WKDownload
