@@ -599,7 +599,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         case .url(let value):
             return value
         case .privatePlayer(let videoID):
-            return .privatePlayer(videoID)
+            return webView.url ?? .privatePlayer(videoID)
         case .homePage:
             return .homePage
         default:
