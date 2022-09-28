@@ -807,6 +807,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         }
 
         if url?.isPrivatePlayerScheme == true {
+            youtubePlayerScript?.isEnabled = true
             PrivacySecurityPreferences.shared.$privateYoutubePlayerEnabled
                 .sink { [weak self] value in
                     guard let self = self else {
@@ -817,6 +818,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                 }
                 .store(in: &youtubePlayerCancellables)
         } else {
+            youtubePlayerScript?.isEnabled = false
             youtubePlayerCancellables.removeAll()
         }
     }
