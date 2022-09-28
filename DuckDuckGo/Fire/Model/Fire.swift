@@ -550,7 +550,7 @@ fileprivate extension Tab {
     // Returns true if the tab should be closed because it remained empty after burning
     func fireAction(for domains: Set<String>) -> FireAction {
         // If currently visited website belongs to one of domains, burn
-        if let host = content.url?.host, domains.contains(host) {
+        if let host = webView.url?.host, domains.contains(host) {
             return .burn
         }
 
