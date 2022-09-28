@@ -43,6 +43,13 @@ struct PrivatePlayer {
         return nil
     }
 
+    static func overrideTabContentForChildTabIfNeeded(for tab: Tab) -> Tab.TabContent? {
+        if tab.content == .none, case .privatePlayer(let parentVideoID) = tab.parentTab?.content, let url = tab.webView.url, url.isYoutubeVideo == true, url.youtubeVideoID == parentVideoID {
+            return .url(url)
+        }
+        return nil
+    }
+
     static func title(for page: HomePage.Models.RecentlyVisitedPageModel) -> String? {
         guard page.url.isPrivatePlayer, let actualTitle = page.actualTitle, actualTitle.starts(with: Self.websiteTitlePrefix) else {
             return nil
@@ -51,7 +58,7 @@ struct PrivatePlayer {
     }
 
     static func decidePolicy(for navigationAction: WKNavigationAction, in tab: Tab) -> WKNavigationActionPolicy? {
-        guard PrivacySecurityPreferences.shared.privateYoutubePlayerEnabled != false else {
+        guard !Self.isDisabled else {
             return nil
         }
 

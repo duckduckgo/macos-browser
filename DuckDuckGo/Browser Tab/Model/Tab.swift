@@ -59,25 +59,17 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         static func contentFromURL(_ url: URL?) -> TabContent {
             if url == .homePage {
                 return .homePage
-            }
-
-            if url == .welcome {
+            } else if url == .welcome {
                 return .onboarding
-            }
-
-            if url == .preferences {
+            } else if url == .preferences {
                 return .anyPreferencePane
-            }
-
-            if let preferencePane = url.flatMap(PreferencePaneIdentifier.init(url:)) {
+            } else if let preferencePane = url.flatMap(PreferencePaneIdentifier.init(url:)) {
                 return .preferences(pane: preferencePane)
-            }
-
-            if let privatePlayerContent = PrivatePlayer.tabContent(for: url) {
+            } else if let privatePlayerContent = PrivatePlayer.tabContent(for: url) {
                 return privatePlayerContent
+            } else {
+                return .url(url ?? .blankPage)
             }
-
-            return .url(url ?? .blankPage)
         }
 
         static var displayableTabTypes: [TabContent] {
@@ -293,10 +285,8 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
         lastUpgradedURL = nil
 
-        if case .privatePlayer(let parentVideoID) = parentTab?.content, let url = webView.url, url.isYoutubeVideo == true, url.youtubeVideoID == parentVideoID {
-            if self.content == .none {
-                self.content = .url(url)
-            }
+        if let newContent = PrivatePlayer.overrideTabContentForChildTabIfNeeded(for: self) {
+            self.content = newContent
             return
         }
 
