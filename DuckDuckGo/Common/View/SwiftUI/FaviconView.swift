@@ -34,10 +34,11 @@ struct FaviconView: View {
     }
 
     func refreshImage() {
-        if !PrivatePlayer.isDisabled, domain == PrivatePlayer.commonName {
-            image = .privatePlayer
+        if let privatePlayerImage = PrivatePlayer.image(for: self) {
+            image = privatePlayerImage
             return
         }
+
         let image = faviconManagement.getCachedFavicon(for: domain, sizeCategory: .medium)?.image
         if image?.size.isSmaller(than: CGSize(width: 16, height: 16)) == false {
             self.image = image
