@@ -480,6 +480,9 @@
                                         </menuItem>
                                         <menuItem title="Reopen All Windows from Last Session" enabled="NO" id="C6V-uF-uX8">
                                             <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="reopenAllWindowsFromLastSession:" target="Ady-hI-5gd" id="oMb-VL-XMO"/>
+                                            </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="eoz-XM-HpQ"/>
                                     </items>
@@ -729,6 +732,19 @@ CQ
                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                         <connections>
                                                             <action selector="showCredentialsSavedPopover:" target="Ady-hI-5gd" id="f2c-5P-iB5"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                </items>
+                                            </menu>
+                                        </menuItem>
+                                        <menuItem title="Configuration" id="Vu8-iE-7RS">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <menu key="submenu" title="Configuration" id="z0p-D5-iYh">
+                                                <items>
+                                                    <menuItem title="Fetch configuration now" id="ZB2-SK-OqK" userLabel="Fetch configuration now">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="fetchConfigurationNow:" target="Ady-hI-5gd" id="31i-Lv-4r5"/>
                                                         </connections>
                                                     </menuItem>
                                                 </items>
