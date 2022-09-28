@@ -26,9 +26,17 @@ extension EmailUrls {
         static let emailGenerateTokenPage = "https://duckduckgo.com/email/new-address"
         static let emailAuthenticationHosts = ["quack.duckduckgo.com", "quackdev.duckduckgo.com"]
     }
+    
+    private struct DevUrl {
+        static let emailProtectionLink = "https://quackdev.duckduckgo.com/email"
+    }
 
     var emailProtectionLink: URL {
+        #if DEBUG
+        return URL(string: DevUrl.emailProtectionLink)!
+        #else
         return URL(string: Url.emailProtectionLink)!
+        #endif
     }
 
     func shouldAuthenticateWithEmailCredentials(url: URL) -> Bool {

@@ -45,7 +45,11 @@ struct MacWaitlistAPIRequest: MacWaitlistRequest {
         if let endpoint = endpoint {
             self.endpoint = endpoint
         } else {
+            #if DEBUG || REVIEW
+            self.endpoint = URL.redeemMacWaitlistInviteCode(endpoint: .developmentEndpoint)
+            #else
             self.endpoint = URL.redeemMacWaitlistInviteCode(endpoint: .productionEndpoint)
+            #endif
         }
     }
     
