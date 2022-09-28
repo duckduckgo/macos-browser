@@ -520,6 +520,7 @@ final class NavigationBarViewController: NSViewController {
         menu.addItem(withTitle: title, action: #selector(toggleAutofillPanelPinning), keyEquivalent: "")
         
         passwordManagementButton.menu = menu
+        passwordManagementButton.toolTip = UserText.autofillShortcutTooltip
         
         let url = tabCollectionViewModel.selectedTabViewModel?.tab.content.url
 
@@ -553,6 +554,7 @@ final class NavigationBarViewController: NSViewController {
         menu.addItem(withTitle: title, action: #selector(toggleDownloadsPanelPinning(_:)), keyEquivalent: "")
         
         downloadsButton.menu = menu
+        downloadsButton.toolTip = UserText.downloadsShortcutTooltip
         
         if LocalPinningManager.shared.isPinned(.downloads) {
             downloadsButton.isHidden = false
@@ -613,6 +615,7 @@ final class NavigationBarViewController: NSViewController {
         menu.addItem(withTitle: title, action: #selector(toggleBookmarksPanelPinning(_:)), keyEquivalent: "")
         
         bookmarkListButton.menu = menu
+        bookmarkListButton.toolTip = UserText.bookmarksShortcutTooltip
         
         if LocalPinningManager.shared.isPinned(.bookmarks) {
             bookmarkListButton.isHidden = false

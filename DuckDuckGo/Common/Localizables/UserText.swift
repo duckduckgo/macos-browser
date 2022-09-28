@@ -548,4 +548,10 @@ struct UserText {
     
     static let showDownloadsShortcut = NSLocalizedString("pinning.show-downloads-shortcut", value: "Show Downloads Shortcut", comment: "Menu item for showing the downloads shortcut")
     static let hideDownloadsShortcut = NSLocalizedString("pinning.hide-downloads-shortcut", value: "Hide Downloads Shortcut", comment: "Menu item for hiding the downloads shortcut")
+    
+    // MARK: - Tooltips
+    
+    static let autofillShortcutTooltip = NSLocalizedString("tooltip.autofill.shortcut", value: "Autofill", comment: "Tooltip for the autofill shortcut")
+    static let bookmarksShortcutTooltip = NSLocalizedString("tooltip.bookmarks.shortcut", value: "Bookmarks", comment: "Tooltip for the bookmarks shortcut")
+    static let downloadsShortcutTooltip = NSLocalizedString("tooltip.downloads.shortcut", value: "Downloads", comment: "Tooltip for the downloads shortcut")
 }
