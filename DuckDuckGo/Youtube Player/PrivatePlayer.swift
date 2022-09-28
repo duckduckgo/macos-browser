@@ -30,6 +30,13 @@ struct PrivatePlayer {
         PrivacySecurityPreferences.shared.privateYoutubePlayerEnabled == false
     }
 
+    static func image(for faviconView: FaviconView) -> NSImage? {
+        guard !Self.isDisabled, faviconView.domain == Self.commonName else {
+            return nil
+        }
+        return .privatePlayer
+    }
+
     static func tabContent(for url: URL?) -> Tab.TabContent? {
         guard !Self.isDisabled, let url = url, let videoID = url.youtubeVideoID else {
             return nil
