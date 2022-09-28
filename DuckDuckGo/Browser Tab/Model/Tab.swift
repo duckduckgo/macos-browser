@@ -73,7 +73,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                 return .preferences(pane: preferencePane)
             }
 
-            if let videoID = url?.youtubeVideoID {
+            if let videoID = url?.youtubeVideoID, PrivacySecurityPreferences.shared.privateYoutubePlayerEnabled != false {
                 let shouldAlwaysOpenPrivatePlayer = url?.isYoutubeVideo == true && PrivacySecurityPreferences.shared.privateYoutubePlayerEnabled == true
                 if url?.isPrivatePlayerScheme == true || url?.isPrivatePlayer == true || shouldAlwaysOpenPrivatePlayer {
                     return .privatePlayer(videoID: videoID)

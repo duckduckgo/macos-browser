@@ -27,6 +27,10 @@ struct PrivatePlayer {
     static let shared = PrivatePlayer()
 
     static func decidePolicy(for navigationAction: WKNavigationAction, in tab: Tab) -> WKNavigationActionPolicy? {
+        guard PrivacySecurityPreferences.shared.privateYoutubePlayerEnabled != false else {
+            return nil
+        }
+
         if navigationAction.request.url?.path == YoutubePlayerNavigationHandler.htmlTemplatePath {
             // don't allow loading Private Player HTML directly
             return .cancel
