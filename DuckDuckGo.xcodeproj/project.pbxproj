@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 52;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -373,7 +373,6 @@
 		85B7184A27677C2D00B4277F /* Onboarding.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 85B7184927677C2D00B4277F /* Onboarding.storyboard */; };
 		85B7184C27677C6500B4277F /* OnboardingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85B7184B27677C6500B4277F /* OnboardingViewController.swift */; };
 		85B7184E27677CBB00B4277F /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85B7184D27677CBB00B4277F /* RootView.swift */; };
-		85B8757F28B903D900D39E04 /* Configuration.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 85B8757E28B903D900D39E04 /* Configuration.xcconfig */; };
 		85C48CCC278D808F00D3263E /* NSAttributedStringExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85C48CCB278D808F00D3263E /* NSAttributedStringExtension.swift */; };
 		85C48CD127908C1000D3263E /* BrowserImportMoreInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85C48CD027908C1000D3263E /* BrowserImportMoreInfoViewController.swift */; };
 		85C5991B27D10CF000E605B2 /* FireAnimationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85C5991A27D10CF000E605B2 /* FireAnimationView.swift */; };
@@ -4301,7 +4300,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				85B8757F28B903D900D39E04 /* Configuration.xcconfig in Resources */,
 				4B02198C25E05FAC00ED7DEA /* Fireproofing.storyboard in Resources */,
 				AA80EC73256C46A2007083E7 /* Suggestion.storyboard in Resources */,
 				AA693E5E2696E5B90007BB78 /* CrashReports.storyboard in Resources */,
@@ -4396,6 +4394,7 @@
 /* Begin PBXShellScriptBuildPhase section */
 		3705272528992C8A000C06A2 /* Check Embedded Config URLs */ = {
 			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
 			files = (
 			);
@@ -4414,6 +4413,7 @@
 		};
 		AA8EDF2824925E940071C2E8 /* Swift Lint */ = {
 			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
 			files = (
 			);
