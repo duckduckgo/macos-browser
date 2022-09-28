@@ -165,6 +165,9 @@ extension Pixel {
         case passwordManagerLockScreenTimeoutSelected1Hour
         
         case ampBlockingRulesCompilationFailed
+        
+        case adClickAttributionDetected
+        case adClickAttributionActive
 
         case debug(event: Debug, error: Error? = nil)
 
@@ -216,6 +219,19 @@ extension Pixel {
             case emailAutofillKeychainError
 
             case bookmarksStoreRootFolderMigrationFailed
+            
+            case adAttributionCompilationFailedForAttributedRulesList
+            case adAttributionGlobalAttributedRulesDoNotExist
+            case adAttributionDetectionHeuristicsDidNotMatchDomain
+            case adAttributionLogicUnexpectedStateOnRulesCompiled
+            case adAttributionLogicUnexpectedStateOnInheritedAttribution
+            case adAttributionLogicUnexpectedStateOnRulesCompilationFailed
+            case adAttributionDetectionInvalidDomainInParameter
+            case adAttributionLogicRequestingAttributionTimedOut
+            case adAttributionLogicWrongVendorOnSuccessfulCompilation
+            case adAttributionLogicWrongVendorOnFailedCompilation
+            
+            case webKitDidTerminate
         }
 
     }
@@ -374,6 +390,12 @@ extension Pixel.Event {
             
         case .ampBlockingRulesCompilationFailed:
             return "m_mac_amp_rules_compilation_failed"
+            
+        case .adClickAttributionDetected:
+            return "m_mac_ad_click_detected"
+            
+        case .adClickAttributionActive:
+            return "m_mac_ad_click_active"
         }
     }
 }
@@ -472,6 +494,30 @@ extension Pixel.Event.Debug {
             
         case .bookmarksStoreRootFolderMigrationFailed:
             return "bookmarks_store_root_folder_migration_failed"
+            
+        case .adAttributionCompilationFailedForAttributedRulesList:
+            return "ad_attribution_compilation_failed_for_attributed_rules_list"
+        case .adAttributionGlobalAttributedRulesDoNotExist:
+            return "ad_attribution_global_attributed_rules_do_not_exist"
+        case .adAttributionDetectionHeuristicsDidNotMatchDomain:
+            return "ad_attribution_detection_heuristics_did_not_match_domain"
+        case .adAttributionLogicUnexpectedStateOnRulesCompiled:
+            return "ad_attribution_logic_unexpected_state_on_rules_compiled"
+        case .adAttributionLogicUnexpectedStateOnInheritedAttribution:
+            return "ad_attribution_logic_unexpected_state_on_inherited_attribution"
+        case .adAttributionLogicUnexpectedStateOnRulesCompilationFailed:
+            return "ad_attribution_logic_unexpected_state_on_rules_compilation_failed"
+        case .adAttributionDetectionInvalidDomainInParameter:
+            return "ad_attribution_detection_invalid_domain_in_parameter"
+        case .adAttributionLogicRequestingAttributionTimedOut:
+            return "ad_attribution_logic_requesting_attribution_timed_out"
+        case .adAttributionLogicWrongVendorOnSuccessfulCompilation:
+            return "ad_attribution_logic_wrong_vendor_on_successful_compilation"
+        case .adAttributionLogicWrongVendorOnFailedCompilation:
+            return "ad_attribution_logic_wrong_vendor_on_failed_compilation"
+            
+        case .webKitDidTerminate:
+            return "webkit_did_terminate"
         }
     }
 }

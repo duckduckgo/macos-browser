@@ -25,10 +25,10 @@ import BrowserServicesKit
 class ContentBlockingUpdatingTests: XCTestCase {
     let preferences = PrivacySecurityPreferences.shared
     let rulesManager = ContentBlockerRulesManagerMock()
-    var updating: ContentBlockingUpdating!
+    var updating: UserContentUpdating!
 
     override func setUp() {
-        updating = ContentBlockingUpdating(contentBlockerRulesManager: rulesManager, privacySecurityPreferences: preferences)
+        updating = UserContentUpdating(contentBlockerRulesManager: rulesManager, privacySecurityPreferences: preferences)
     }
 
     override static func setUp() {
@@ -63,12 +63,12 @@ class ContentBlockingUpdatingTests: XCTestCase {
         let c = updating.userContentBlockingAssets.sink { assets in
             switch (ruleList1, ruleList2) {
             case (.none, _):
-                ruleList1 = assets.contentRuleLists["test"]
+                ruleList1 = assets.rules(withName: "test")
             case (.some, .none):
-                ruleList2 = assets.contentRuleLists["test"]
+                ruleList2 = assets.rules(withName: "test")
             case (.some(let list1), .some(let list2)):
                 XCTAssertFalse(list1 == list2)
-                XCTAssertFalse(assets.contentRuleLists["test"] === list2)
+                XCTAssertFalse(assets.rules(withName: "test") === list2)
                 e.fulfill()
             }
         }
@@ -84,17 +84,13 @@ class ContentBlockingUpdatingTests: XCTestCase {
     func testWhenGPCEnabledChangesThenUserScriptsAreRebuild() {
         let e = expectation(description: "should rebuild user scripts")
         var ruleList: WKContentRuleList!
-        var userScripts: UserScripts!
         let c = updating.userContentBlockingAssets.sink { assets in
-            if ruleList == nil && userScripts == nil {
-                ruleList = assets.contentRuleLists["test"]
-                userScripts = assets.userScripts
+            if ruleList == nil {
+                ruleList = assets.rules(withName: "test")
             } else {
                 // ruleList should not be recompiled
-                XCTAssertTrue(assets.contentRuleLists["test"] === ruleList)
+                XCTAssertTrue(assets.rules(withName: "test") === ruleList)
                 XCTAssertTrue(assets.isValid)
-                // userScripts should be rebuilt
-                XCTAssertFalse(assets.userScripts === userScripts)
 
                 e.fulfill()
             }
@@ -113,7 +109,7 @@ class ContentBlockingUpdatingTests: XCTestCase {
         let update2 = Self.testUpdate()
         var update1received = false
         let e = expectation(description: "2 updates received")
-        let c = updating.userContentBlockingAssets.map { $0.completionTokens }.sink { tokens in
+        let c = updating.userContentBlockingAssets.map { $0.rulesUpdate.completionTokens }.sink { tokens in
             if !update1received {
                 XCTAssertEqual(tokens, update1.completionTokens)
                 update1received = true
@@ -170,9 +166,14 @@ class ContentBlockingUpdatingTests: XCTestCase {
 
 }
 
-extension UserContentController.ContentBlockingAssets {
+extension UserContentUpdating.NewContent {
+    
+    func rules(withName name: String) -> WKContentRuleList? {
+        rulesUpdate.rules.first(where: { $0.name == name})?.rulesList
+    }
+    
     var isValid: Bool {
-        return self.contentRuleLists["test"] != nil && self.userScripts.userScripts.isEmpty == false
+        return rules(withName: "test") != nil
     }
 }
 
