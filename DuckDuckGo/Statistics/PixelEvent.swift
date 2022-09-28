@@ -230,6 +230,8 @@ extension Pixel {
             case adAttributionLogicRequestingAttributionTimedOut
             case adAttributionLogicWrongVendorOnSuccessfulCompilation
             case adAttributionLogicWrongVendorOnFailedCompilation
+            
+            case webKitDidTerminate
         }
 
     }
@@ -513,6 +515,9 @@ extension Pixel.Event.Debug {
             return "ad_attribution_logic_wrong_vendor_on_successful_compilation"
         case .adAttributionLogicWrongVendorOnFailedCompilation:
             return "ad_attribution_logic_wrong_vendor_on_failed_compilation"
+            
+        case .webKitDidTerminate:
+            return "webkit_did_terminate"
         }
     }
 }
