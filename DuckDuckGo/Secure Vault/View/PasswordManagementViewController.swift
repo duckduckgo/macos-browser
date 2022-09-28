@@ -153,6 +153,9 @@ final class PasswordManagementViewController: NSViewController {
         emptyStateTitle.attributedStringValue = NSAttributedString.make(emptyStateTitle.stringValue, lineHeight: 1.14, kern: -0.23)
         emptyStateMessage.attributedStringValue = NSAttributedString.make(emptyStateMessage.stringValue, lineHeight: 1.05, kern: -0.08)
 
+        addVaultItemButton.toolTip = UserText.addItemTooltip
+        moreButton.toolTip = UserText.moreOptionsTooltip
+        
         addVaultItemButton.sendAction(on: .leftMouseDown)
         moreButton.sendAction(on: .leftMouseDown)
 
