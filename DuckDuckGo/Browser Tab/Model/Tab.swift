@@ -16,6 +16,8 @@
 //  limitations under the License.
 //
 
+// swiftlint:disable file_length
+
 import Cocoa
 import WebKit
 import os
@@ -42,7 +44,7 @@ protocol TabDelegate: FileDownloadManagerDelegate, ContentOverlayUserScriptDeleg
     func tab(_ tab: Tab, promptUserForCookieConsent result: @escaping (Bool) -> Void)
 }
 
-// swiftlint:disable file_length
+// swiftlint:disable:next type_body_length
 final class Tab: NSObject, Identifiable, ObservableObject {
 
     enum TabContent: Equatable {
