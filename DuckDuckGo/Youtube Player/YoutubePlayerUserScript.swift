@@ -36,6 +36,8 @@ final class YoutubePlayerUserScript: NSObject, StaticUserScript {
     static var script: WKUserScript = YoutubePlayerUserScript.makeWKUserScript()
     var messageNames: [String] { MessageNames.allCases.map(\.rawValue) }
 
+    var isEnabled: Bool = false
+
     func setAlwaysOpenInPrivatePlayer(_ enabled: Bool, inWebView webView: WKWebView) {
         let value = enabled ? "true" : "false"
         let js = "window.postMessage({ alwaysOpenSetting: \(value) });"
@@ -43,7 +45,10 @@ final class YoutubePlayerUserScript: NSObject, StaticUserScript {
     }
 
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-        
+        guard isEnabled else {
+            return
+        }
+
         guard let messageType = MessageNames(rawValue: message.name) else {
             assertionFailure("YoutubePlayerUserScript: unexpected message name \(message.name)")
             return

@@ -170,8 +170,12 @@ final class RecentlyVisitedSiteModel: ObservableObject {
         guard let domain = originalURL.host?.droppingWwwPrefix() else {
             return nil
         }
-        
-        self.domain = domain
+
+        if !PrivatePlayer.isDisabled, originalURL.isPrivatePlayer {
+            self.domain = PrivatePlayer.commonName
+        } else {
+            self.domain = domain
+        }
         
         var components = URLComponents()
         components.scheme = originalURL.scheme
@@ -220,6 +224,10 @@ final class RecentlyVisitedSiteModel: ObservableObject {
                 } else {
                     urlsToRemove.append($0.url)
                 }
+
+            } else if !PrivatePlayer.isDisabled, let displayTitle = PrivatePlayer.title(for: $0) {
+
+                $0.displayTitle = displayTitle
 
             } else if !showTitlesForPagesSetting {
 

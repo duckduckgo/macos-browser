@@ -24,9 +24,44 @@ extension NSImage {
 }
 
 struct PrivatePlayer {
-    static let shared = PrivatePlayer()
+    static let commonName = UserText.privatePlayer
+
+    static var isDisabled: Bool {
+        PrivacySecurityPreferences.shared.privateYoutubePlayerEnabled == false
+    }
+
+    static func tabContent(for url: URL?) -> Tab.TabContent? {
+        guard !Self.isDisabled, let url = url, let videoID = url.youtubeVideoID else {
+            return nil
+        }
+
+        let shouldAlwaysOpenPrivatePlayer = url.isYoutubeVideo && PrivacySecurityPreferences.shared.privateYoutubePlayerEnabled == true
+
+        if url.isPrivatePlayerScheme || url.isPrivatePlayer || shouldAlwaysOpenPrivatePlayer {
+            return .privatePlayer(videoID: videoID)
+        }
+        return nil
+    }
+
+    static func overrideTabContentForChildTabIfNeeded(for tab: Tab) -> Tab.TabContent? {
+        if tab.content == .none, case .privatePlayer(let parentVideoID) = tab.parentTab?.content, let url = tab.webView.url, url.isYoutubeVideo == true, url.youtubeVideoID == parentVideoID {
+            return .url(url)
+        }
+        return nil
+    }
+
+    static func title(for page: HomePage.Models.RecentlyVisitedPageModel) -> String? {
+        guard page.url.isPrivatePlayer, let actualTitle = page.actualTitle, actualTitle.starts(with: Self.websiteTitlePrefix) else {
+            return nil
+        }
+        return actualTitle.dropping(prefix: Self.websiteTitlePrefix)
+    }
 
     static func decidePolicy(for navigationAction: WKNavigationAction, in tab: Tab) -> WKNavigationActionPolicy? {
+        guard !Self.isDisabled else {
+            return nil
+        }
+
         if navigationAction.request.url?.path == YoutubePlayerNavigationHandler.htmlTemplatePath {
             // don't allow loading Private Player HTML directly
             return .cancel
@@ -57,4 +92,8 @@ struct PrivatePlayer {
         }
         return nil
     }
+
+    // MARK: - Private
+
+    private static let websiteTitlePrefix = "\(Self.commonName) - "
 }

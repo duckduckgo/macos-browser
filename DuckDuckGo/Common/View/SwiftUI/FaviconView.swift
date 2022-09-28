@@ -34,6 +34,10 @@ struct FaviconView: View {
     }
 
     func refreshImage() {
+        if !PrivatePlayer.isDisabled, domain == PrivatePlayer.commonName {
+            image = .privatePlayer
+            return
+        }
         let image = faviconManagement.getCachedFavicon(for: domain, sizeCategory: .medium)?.image
         if image?.size.isSmaller(than: CGSize(width: 16, height: 16)) == false {
             self.image = image

@@ -59,28 +59,17 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         static func contentFromURL(_ url: URL?) -> TabContent {
             if url == .homePage {
                 return .homePage
-            }
-
-            if url == .welcome {
+            } else if url == .welcome {
                 return .onboarding
-            }
-
-            if url == .preferences {
+            } else if url == .preferences {
                 return .anyPreferencePane
-            }
-
-            if let preferencePane = url.flatMap(PreferencePaneIdentifier.init(url:)) {
+            } else if let preferencePane = url.flatMap(PreferencePaneIdentifier.init(url:)) {
                 return .preferences(pane: preferencePane)
+            } else if let privatePlayerContent = PrivatePlayer.tabContent(for: url) {
+                return privatePlayerContent
+            } else {
+                return .url(url ?? .blankPage)
             }
-
-            if let videoID = url?.youtubeVideoID {
-                let shouldAlwaysOpenPrivatePlayer = url?.isYoutubeVideo == true && PrivacySecurityPreferences.shared.privateYoutubePlayerEnabled == true
-                if url?.isPrivatePlayerScheme == true || url?.isPrivatePlayer == true || shouldAlwaysOpenPrivatePlayer {
-                    return .privatePlayer(videoID: videoID)
-                }
-            }
-
-            return .url(url ?? .blankPage)
         }
 
         static var displayableTabTypes: [TabContent] {
@@ -296,10 +285,8 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
         lastUpgradedURL = nil
 
-        if case .privatePlayer(let parentVideoID) = parentTab?.content, let url = webView.url, url.isYoutubeVideo == true, url.youtubeVideoID == parentVideoID {
-            if self.content == .none {
-                self.content = .url(url)
-            }
+        if let newContent = PrivatePlayer.overrideTabContentForChildTabIfNeeded(for: self) {
+            self.content = newContent
             return
         }
 
@@ -599,7 +586,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         case .url(let value):
             return value
         case .privatePlayer(let videoID):
-            return webView.url ?? .privatePlayer(videoID)
+            return .privatePlayer(videoID)
         case .homePage:
             return .homePage
         default:
@@ -615,7 +602,9 @@ final class Tab: NSObject, Identifiable, ObservableObject {
               // don‘t reload when already loaded
               webView.url != url,
               webView.url != content.url
-        else { return false }
+        else {
+            return false
+        }
 
         if case .privatePlayer(let videoID) = content, webView.url == .youtubeNoCookie(videoID) || webView.url == .youtube(videoID) {
             return false
@@ -818,6 +807,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         }
 
         if url?.isPrivatePlayerScheme == true {
+            youtubePlayerScript?.isEnabled = true
             PrivacySecurityPreferences.shared.$privateYoutubePlayerEnabled
                 .sink { [weak self] value in
                     guard let self = self else {
@@ -828,6 +818,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                 }
                 .store(in: &youtubePlayerCancellables)
         } else {
+            youtubePlayerScript?.isEnabled = false
             youtubePlayerCancellables.removeAll()
         }
     }
