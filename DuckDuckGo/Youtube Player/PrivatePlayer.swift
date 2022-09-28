@@ -104,3 +104,80 @@ struct PrivatePlayer {
 
     private static let websiteTitlePrefix = "\(Self.commonName) - "
 }
+
+extension URL {
+    static func privatePlayer(_ videoID: String) -> URL {
+        "\(PrivatePlayerSchemeHandler.scheme):\(videoID)".url!
+    }
+
+    static func youtubeNoCookie(_ videoID: String) -> URL {
+        "https://\(YoutubePlayerNavigationHandler.privatePlayerHost)/embed/\(videoID)?wmode=transparent&iv_load_policy=3&autoplay=1&html5=1&showinfo=0&rel=0&modestbranding=1&playsinline=0".url!
+    }
+
+    static func youtube(_ videoID: String) -> URL {
+        "https://www.youtube.com/watch?v=\(videoID)".url!
+    }
+
+    var isPrivatePlayerScheme: Bool {
+        scheme == PrivatePlayerSchemeHandler.scheme
+    }
+
+    var isPrivatePlayer: Bool {
+        host == YoutubePlayerNavigationHandler.privatePlayerHost
+    }
+
+    /// Returns true only if the video represents a playlist itself, i.e. doesn't have `index` query parameter
+    var isYoutubePlaylist: Bool {
+        guard isYoutubeWatch, let components = URLComponents(url: self, resolvingAgainstBaseURL: false) else {
+            return false
+        }
+
+        let isPlaylistURL = components.queryItems?.contains(where: { $0.name == "list" }) == true &&
+        components.queryItems?.contains(where: { $0.name == "index" }) == false
+
+        return isPlaylistURL
+    }
+
+    var isYoutubeVideo: Bool {
+        isYoutubeWatch && !isYoutubePlaylist
+    }
+
+    var isYoutubeVideoRecommendation: Bool {
+        guard isYoutubeVideo,
+              let components = URLComponents(url: self, resolvingAgainstBaseURL: false),
+              let featureQueryParameter = components.queryItems?.first(where: { $0.name == "feature" })?.value
+        else {
+            return false
+        }
+
+        let recommendationFeatures = [ "emb_rel_end", "emb_rel_pause" ]
+
+        return recommendationFeatures.contains(featureQueryParameter)
+    }
+
+    private var isYoutubeWatch: Bool {
+        host?.droppingWwwPrefix() == "youtube.com" && path == "/watch"
+    }
+
+    var youtubeVideoID: String? {
+        let unsafeID: String? = {
+            if isPrivatePlayerScheme {
+                return absoluteString.split(separator: ":").last.flatMap(String.init)
+            }
+
+            if isPrivatePlayer {
+                return lastPathComponent
+            }
+
+            guard isYoutubeVideo, let components = URLComponents(url: self, resolvingAgainstBaseURL: false) else {
+                return nil
+            }
+            return components.queryItems?.first(where: { $0.name == "v" })?.value
+        }()
+        return unsafeID?.removingCharacters(in: .youtubeVideoIDNotAllowed)
+    }
+}
+
+private extension CharacterSet {
+    static let youtubeVideoIDNotAllowed = CharacterSet(charactersIn: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_").inverted
+}
