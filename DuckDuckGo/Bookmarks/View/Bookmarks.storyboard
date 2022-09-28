@@ -942,6 +942,9 @@ Gw
                         <outlet property="emptyState" destination="ziZ-XM-tSu" id="n1i-7d-W48"/>
                         <outlet property="emptyStateMessage" destination="1Te-SN-ek2" id="7Lu-g0-VVP"/>
                         <outlet property="emptyStateTitle" destination="1ce-Da-33o" id="n3W-I6-rcZ"/>
+                        <outlet property="manageBookmarksButton" destination="pTk-xE-OqR" id="pLF-oe-MAe"/>
+                        <outlet property="newBookmarkButton" destination="qBa-rT-8sF" id="trj-Hh-c8f"/>
+                        <outlet property="newFolderButton" destination="xMD-lr-ArK" id="UBg-Zh-fNd"/>
                         <outlet property="outlineView" destination="66p-cd-DbA" id="Shg-RA-vKK"/>
                     </connections>
                 </viewController>
