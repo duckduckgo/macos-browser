@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Duck Player - </title>
+        <title>Duck Player</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <style>
             :root {
@@ -406,18 +406,51 @@
                 },
 
                 /**
+                 * Run callback when the video player iframe has loaded
+                 * @param {Function} callback
+                 */
+                onIframeLoaded: (callback) => {
+                    let iframe = VideoPlayer.iframe();
+
+                    iframe.addEventListener('load', callback);
+                },
+
+                /**
+                 * Fires whenever the video player iframe <title> changes (the video doesn't have the <title> set to
+                 * the video title until after the video has loaded...)
+                 * @param {Function} callback(title)
+                 *
+                 */
+                onIframeTitleChange: (callback) => {
+                    let iframe = VideoPlayer.iframe();
+
+                    if (iframe && iframe.contentWindow && iframe.contentDocument) {
+                        let title = iframe.contentDocument.querySelector('title');
+
+                        if (title) {
+                            let observer = new iframe.contentWindow.WebKitMutationObserver(function(mutations) {
+                                mutations.forEach(function(mutation) {
+                                    console.log('changed', mutation.target.textContent);
+                                    callback(mutation.target.textContent);
+                                });
+                            });
+
+                            observer.observe(title, { subtree: true, characterData: true, childList: true });
+                        }
+                    }
+                },
+
+                /**
                  * Get the video title from the video iframe.
                  * @returns {string|false}
                  */
-                getVideoTitle: () => {
-                    let iframe = VideoPlayer.iframe();
-
-                    if (iframe && iframe.contentDocument && iframe.contentDocument.querySelector('title') && iframe.contentDocument.querySelector('title').textContent) {
-                        let iframeTitle = iframe.contentDocument.querySelector('title').textContent;
-
+                getValidVideoTitle: (iframeTitle) => {
+                    if (iframeTitle && !VideoPlayer.hasGottenValidVideoTitle) {
                         if (iframeTitle === 'YouTube') {
                             return false;
                         }
+
+                        VideoPlayer.hasGottenValidVideoTitle = true;
 
                         return iframeTitle.replace(/ - YouTube$/g,'');
                     }
@@ -426,29 +459,23 @@
                 },
 
                 /**
-                 * Sets the tab title to the title of the video
+                 * Only set the title once, no subsequent sets are allowed once a valid title has been found.
+                 */
+                hasGottenValidVideoTitle: false,
+
+                /**
+                 * Sets the tab title to the title of the video once the video title has loaded.
                  */
                 setTabTitle: () => {
-                    let hasSetTitle = false;
+                    VideoPlayer.onIframeLoaded(() => {
+                        VideoPlayer.onIframeTitleChange((title) => {
+                            let validTitle = VideoPlayer.getValidVideoTitle(title);
 
-                    // Poll YT for title. Simplest approach.
-                    let interval = setInterval(() => {
-                        let videoTitle = VideoPlayer.getVideoTitle();
-
-                        if (videoTitle !== false) {
-                            document.querySelector('title').textContent = 'Duck Player - ' + videoTitle;
-                            clearInterval(interval);
-                            hasSetTitle = true;
-                        }
+                            if (validTitle) {
+                                document.title = 'Duck Player - ' + validTitle;
+                            }
+                        });
                     });
-
-                    // Escape hatch, if title not gotten after 3s, set title to Duck Player.
-                    setTimeout(() => {
-                        if (!hasSetTitle) {
-                            document.querySelector('title').textContent = 'Duck Player';
-                            clearInterval(interval);
-                        }
-                    }, 3000);
                 }
             };
 

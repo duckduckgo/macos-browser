@@ -92,9 +92,23 @@ function enable() {
                 padding: 6px 4px;
             }
 
-            .ddg-overlay:hover .ddg-play-text-container {
+            .ddg-overlay:not([data-size="fixed small"]):hover .ddg-play-text-container {
                 width: 91px;
                 opacity: 1;
+            }
+
+            .ddg-overlay[data-size^="video-player"].hidden {
+                display: none;
+            }
+
+            .ddg-overlay[data-size="video-player"] {
+                top: 0px;
+                left: 0px;
+            }
+
+            .ddg-overlay[data-size="video-player-with-title"] {
+                top: 40px;
+                left: 10px;
             }
 
             .ddg-overlay[data-size="title"] {
@@ -107,7 +121,7 @@ function enable() {
                 width: 90px;
             }
 
-            .ddg-overlay[data-size="fixed"] {
+            .ddg-overlay[data-size^="fixed"] {
                 position: absolute;
                 top: 0;
                 left: 0;
@@ -348,6 +362,8 @@ function enable() {
                     'display:block;'
                 );
 
+                overlay.setAttribute('data-size', 'fixed ' + IconOverlay.getThumbnailSize(videoElement));
+
                 overlay.querySelector('a').setAttribute('href', Util.getPrivatePlayerURL(videoElement.getAttribute('href')));
             }
         },
@@ -405,31 +421,10 @@ function enable() {
             let appendOverlayToThumbnail = (videoElement) => {
                 if (videoElement) {
 
-                    let getThumbnailSize = (videoElement) => {
-                        let imagesByArea = {};
-                        let images = Array.from(videoElement.querySelectorAll('img')).forEach(image => {
-                            imagesByArea[(image.offsetWidth * image.offsetHeight)] = image;
-                        });
-
-                        let largestImage = Math.max.apply(this, Object.keys(imagesByArea));
-
-                        let getSizeType = (width, height) => {
-                            if (width < 200 && height < 100) {
-                                return 'small';
-                            } else if (width < 300 && height < 175) {
-                                return 'medium';
-                            } else {
-                                return 'large';
-                            }
-                        }
-
-                        return getSizeType(imagesByArea[largestImage].offsetWidth, imagesByArea[largestImage].offsetHeight);
-                    }
-
                     Util.appendElement(
                         videoElement,
                         IconOverlay.create(
-                            getThumbnailSize(videoElement), videoElement.getAttribute('href')
+                            IconOverlay.getThumbnailSize(videoElement), videoElement.getAttribute('href')
                         )
                     );
 
@@ -445,6 +440,27 @@ function enable() {
             } else {
                 return false;
             }
+        },
+
+        getThumbnailSize: (videoElement) => {
+            let imagesByArea = {};
+            let images = Array.from(videoElement.querySelectorAll('img')).forEach(image => {
+                imagesByArea[(image.offsetWidth * image.offsetHeight)] = image;
+            });
+
+            let largestImage = Math.max.apply(this, Object.keys(imagesByArea));
+
+            let getSizeType = (width, height) => {
+                if (width < (123 + 10)) { // match CSS: width of expanded overlay + twice the left margin.
+                    return 'small';
+                } else if (width < 300 && height < 175) {
+                    return 'medium';
+                } else {
+                    return 'large';
+                }
+            }
+
+            return getSizeType(imagesByArea[largestImage].offsetWidth, imagesByArea[largestImage].offsetHeight);
         }
     };
 
@@ -506,6 +522,65 @@ function enable() {
             VideoThumbnail.findAll().forEach(VideoThumbnail.bindEvents);
         }
     };
+
+    const VideoPlayerIcon = {
+        hasAddedVideoPlayerIcon: false,
+
+        init: () => {
+            let onVideoPage = document.location.pathname === '/watch';
+            let  = false;
+
+            if (onVideoPage) {
+                let videoPlayer = document.querySelector('#player:not(.has-ddg-overlay)');
+
+                if (videoPlayer) {
+                    console.log('add vpi');
+
+                    Util.appendElement(
+                        videoPlayer,
+                        IconOverlay.create('video-player', window.location.pathname + window.location.search, 'hidden')
+                    );
+
+                    console.log('addClass', videoPlayer);
+                    videoPlayer.classList.add('has-ddg-overlay');
+                    VideoPlayerIcon.hasAddedVideoPlayerIcon = true;
+                }
+
+                if (VideoPlayerIcon.hasAddedVideoPlayerIcon) {
+
+                    let hasTitle = !document.querySelector('#player .ytp-hide-info-bar');
+                    let isAds = document.querySelector('#player .ad-showing');
+
+                    let vpiClasses = document.querySelector('.ddg-overlay[data-size^="video-player"]').classList;
+
+                    if (isAds) {
+                        if (!vpiClasses.contains('hidden')) {
+                            console.log('isAds, hide');
+                            vpiClasses.add('hidden');
+                        }
+                    } else {
+                        if (vpiClasses.contains('hidden')) {
+                            console.log('is not ads, show after 50ms');
+
+                            setTimeout(() => {
+                                if (!document.querySelector('#player .ad-showing') && vpiClasses.contains('hidden')) {
+                                    vpiClasses.remove('hidden');
+                                }
+                            }, 50);
+                        }
+                    }
+
+                    /*if (hasTitle) {
+                        console.log('they just hid the infobar, move the icon');
+                        document.querySelector('.ddg-overlay[data-size="video-player"]').setAttribute('data-size', 'video-player-with-title');
+                    } else {
+                        console.log('infobar not hidden anymore, show icon');
+                        document.querySelector('.ddg-overlay[data-size="video-player-with-title"]').setAttribute('data-size', 'video-player');
+                    }*/
+                }
+            }
+        }
+    }
 
     const Preview = {
         previewContainer: false,
@@ -714,15 +789,17 @@ function enable() {
                 CSS.init();
                 IconOverlay.appendHoverOverlay();
                 VideoThumbnail.bindEventsToAll();
+                VideoPlayerIcon.init();
             });
 
             Site.onDOMChanged(() => {
                 if (OverlaySettings.enabled.thumbnails) {
                     VideoThumbnail.bindEventsToAll();
                     Preview.init();
+                    VideoPlayerIcon.init();
                 }
 
-                VideoPlayerOverlay.watchForVideoBeingAdded();
+                //VideoPlayerOverlay.watchForVideoBeingAdded();
             });
         }
     }
