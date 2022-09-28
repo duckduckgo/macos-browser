@@ -43,7 +43,10 @@ final class YoutubePlayerUserScript: NSObject, StaticUserScript {
     }
 
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-        
+        guard message.isComingFromPrivatePlayer else {
+            return
+        }
+
         guard let messageType = MessageNames(rawValue: message.name) else {
             assertionFailure("YoutubePlayerUserScript: unexpected message name \(message.name)")
             return
@@ -74,6 +77,17 @@ final class YoutubePlayerUserScript: NSObject, StaticUserScript {
             webView.evaluateJavaScript(js, in: nil, in: WKContentWorld.defaultClient)
         } else {
             webView.evaluateJavaScript(js)
+        }
+    }
+}
+
+fileprivate extension WKScriptMessage {
+
+    var isComingFromPrivatePlayer: Bool {
+        if #available(macOS 12.0, *) {
+            return webView?.url?.isPrivatePlayer == true
+        } else {
+            return webView?.url?.isPrivatePlayerScheme == true
         }
     }
 }
