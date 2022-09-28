@@ -178,6 +178,6 @@ extension URL {
     }
 }
 
-private extension CharacterSet {
+extension CharacterSet {
     static let youtubeVideoIDNotAllowed = CharacterSet(charactersIn: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_").inverted
 }
