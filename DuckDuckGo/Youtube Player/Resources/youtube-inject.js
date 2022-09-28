@@ -799,7 +799,7 @@ function enable() {
                     VideoPlayerIcon.init();
                 }
 
-                //VideoPlayerOverlay.watchForVideoBeingAdded();
+                VideoPlayerOverlay.watchForVideoBeingAdded();
             });
         }
     }
