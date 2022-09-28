@@ -586,7 +586,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         case .url(let value):
             return value
         case .privatePlayer(let videoID):
-            return webView.url ?? .privatePlayer(videoID)
+            return .privatePlayer(videoID)
         case .homePage:
             return .homePage
         default:
@@ -602,7 +602,9 @@ final class Tab: NSObject, Identifiable, ObservableObject {
               // don‘t reload when already loaded
               webView.url != url,
               webView.url != content.url
-        else { return false }
+        else {
+            return false
+        }
 
         if case .privatePlayer(let videoID) = content, webView.url == .youtubeNoCookie(videoID) || webView.url == .youtube(videoID) {
             return false
