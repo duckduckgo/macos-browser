@@ -70,6 +70,7 @@ final class ConfigurationManager {
                 self.lastRefreshCheckTime = Date()
                 self.refreshIfNeeded()
             })
+        refreshNow()
     }
 
     func log() {
