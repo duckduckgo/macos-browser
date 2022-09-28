@@ -24,7 +24,18 @@ extension NSImage {
 }
 
 struct PrivatePlayer {
-    static let shared = PrivatePlayer()
+    static let commonName = UserText.privatePlayer
+
+    static var isDisabled: Bool {
+        PrivacySecurityPreferences.shared.privateYoutubePlayerEnabled == false
+    }
+
+    static func title(for page: HomePage.Models.RecentlyVisitedPageModel) -> String? {
+        guard page.url.isPrivatePlayer, let actualTitle = page.actualTitle, actualTitle.starts(with: Self.websiteTitlePrefix) else {
+            return nil
+        }
+        return actualTitle.dropping(prefix: Self.websiteTitlePrefix)
+    }
 
     static func decidePolicy(for navigationAction: WKNavigationAction, in tab: Tab) -> WKNavigationActionPolicy? {
         guard PrivacySecurityPreferences.shared.privateYoutubePlayerEnabled != false else {
@@ -61,4 +72,8 @@ struct PrivatePlayer {
         }
         return nil
     }
+
+    // MARK: - Private
+
+    private static let websiteTitlePrefix = "\(Self.commonName) - "
 }
