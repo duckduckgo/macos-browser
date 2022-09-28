@@ -30,6 +30,19 @@ struct PrivatePlayer {
         PrivacySecurityPreferences.shared.privateYoutubePlayerEnabled == false
     }
 
+    static func tabContent(for url: URL?) -> Tab.TabContent? {
+        guard !Self.isDisabled, let url = url, let videoID = url.youtubeVideoID else {
+            return nil
+        }
+
+        let shouldAlwaysOpenPrivatePlayer = url.isYoutubeVideo && PrivacySecurityPreferences.shared.privateYoutubePlayerEnabled == true
+
+        if url.isPrivatePlayerScheme || url.isPrivatePlayer || shouldAlwaysOpenPrivatePlayer {
+            return .privatePlayer(videoID: videoID)
+        }
+        return nil
+    }
+
     static func title(for page: HomePage.Models.RecentlyVisitedPageModel) -> String? {
         guard page.url.isPrivatePlayer, let actualTitle = page.actualTitle, actualTitle.starts(with: Self.websiteTitlePrefix) else {
             return nil
