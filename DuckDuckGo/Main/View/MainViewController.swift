@@ -234,6 +234,8 @@ final class MainViewController: NSViewController {
     }
 
     private func resizeNavigationBarForHomePage(_ homePage: Bool, animated: Bool) {
+        return
+        
         NSAnimationContext.runAnimationGroup { context in
             context.duration = 0.1
 

@@ -255,6 +255,30 @@ final class TabBarViewItem: NSCollectionViewItem {
         }
     }
 
+    private lazy var borderLayer: CALayer = {
+        let layer = CALayer()
+        layer.borderWidth = 1
+        layer.borderColor = NSColor.red.cgColor
+        layer.maskedCorners = [.layerMaxXMaxYCorner, .layerMinXMaxYCorner]
+        layer.cornerRadius = 7
+        layer.mask = borderMaskLayer
+        return layer
+    }()
+    
+    private lazy var borderMaskLayer: CALayer = {
+        let layer = CALayer()
+        layer.backgroundColor = NSColor.white.cgColor
+        return layer
+    }()
+    
+    override func viewWillLayout() {
+        super.viewWillLayout()
+        
+        borderLayer.frame = self.view.bounds
+        
+        borderMaskLayer.frame = CGRect(x: 0, y: 1, width: borderLayer.bounds.width, height: borderLayer.bounds.height - 1)
+    }
+    
     private func setupView() {
         mouseOverView.delegate = self
         mouseClickView.delegate = self
@@ -263,8 +287,11 @@ final class TabBarViewItem: NSCollectionViewItem {
         view.layer?.cornerRadius = 7
         view.layer?.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
         view.layer?.masksToBounds = true
+    
+        view.layer?.addSublayer(borderLayer)
     }
-
+    
+    
     private func clearSubscriptions() {
         cancellables.removeAll()
     }
@@ -284,6 +311,12 @@ final class TabBarViewItem: NSCollectionViewItem {
 
         faviconWrapperViewCenterConstraint.priority = titleTextField.isHidden ? .defaultHigh : .defaultLow
         faviconWrapperViewLeadingConstraint.priority = titleTextField.isHidden ? .defaultLow : .defaultHigh
+        
+        if isSelected {
+            borderLayer.isHidden = false
+        } else {
+            borderLayer.isHidden = true
+        }
     }
 
     private var usedPermissions = Permissions() {

@@ -54,6 +54,8 @@ final class TabBarViewController: NSViewController {
     private var selectionIndexCancellable: AnyCancellable?
     private var cancellables = Set<AnyCancellable>()
 
+    @IBOutlet weak var shadowView: TabShadowView!
+    
     required init?(coder: NSCoder) {
         fatalError("TabBarViewController: Bad initializer")
     }
@@ -83,8 +85,15 @@ final class TabBarViewController: NSViewController {
         subscribeToSelectionIndex()
         setupFireButton()
         setupPinnedTabsView()
+        setupShadowView()
     }
 
+    private func setupShadowView() {
+//        shadowView.wantsLayer = true
+//        shadowView.layer?.borderWidth = 1
+//        shadowView.layer?.borderColor = NSColor.blue.cgColor
+    }
+    
     override func viewWillAppear() {
         super.viewWillAppear()
 
