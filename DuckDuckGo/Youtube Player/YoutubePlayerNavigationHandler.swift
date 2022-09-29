@@ -30,23 +30,18 @@ struct YoutubePlayerNavigationHandler {
     }
 
     func makePrivatePlayerRequest(from originalRequest: URLRequest) -> URLRequest {
-       
-        let videoID: String
-        if let query = originalRequest.url?.absoluteString.split(separator: ":").last,
-           let components = URLComponents(string: "?\(query)"),
-           let urlVideoID = components.queryItems?.first(where: { $0.value == nil })?.name {
-
-            videoID = urlVideoID.removingCharacters(in: .youtubeVideoIDNotAllowed)
-        } else {
+        guard let query = originalRequest.url?.absoluteString.split(separator: ":").last,
+              let (youtubeVideoID, timestamp) = originalRequest.url?.youtubeVideoParams
+        else {
             assertionFailure("Request should have ID")
-            videoID = ""
+            return originalRequest
         }
 
-        return makePrivatePlayerRequest(for: videoID)
+        return makePrivatePlayerRequest(for: youtubeVideoID, timestamp: timestamp)
     }
 
-    func makePrivatePlayerRequest(for videoID: String) -> URLRequest {
-        var request = URLRequest(url: .youtubeNoCookie(videoID))
+    func makePrivatePlayerRequest(for videoID: String, timestamp: String?) -> URLRequest {
+        var request = URLRequest(url: .youtubeNoCookie(videoID, timestamp: timestamp))
         request.addValue("http://localhost/", forHTTPHeaderField: "Referer")
         request.httpMethod = "GET"
 

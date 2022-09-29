@@ -50,7 +50,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     enum TabContent: Equatable {
         case homePage
         case url(URL)
-        case privatePlayer(videoID: String)
+        case privatePlayer(videoID: String, timestamp: String?)
         case preferences(pane: PreferencePaneIdentifier?)
         case bookmarks
         case onboarding
@@ -121,8 +121,8 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             switch self {
             case .url(let url):
                 return url
-            case .privatePlayer(let videoID):
-                return .privatePlayer(videoID)
+            case .privatePlayer(let videoID, let timestamp):
+                return .privatePlayer(videoID, timestamp: timestamp)
             default:
                 return nil
             }
@@ -296,8 +296,8 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         case (.preferences(pane: .some), .preferences(pane: nil)):
             // prevent clearing currently selected pane (for state persistence purposes)
             break
-        case (.privatePlayer(let oldVideoID), .privatePlayer(let videoID)) where oldVideoID == videoID:
-            if case .privatePlayer(let parentVideoID) = parentTab?.content, parentVideoID == videoID {
+        case (.privatePlayer(let oldVideoID, _), .privatePlayer(let videoID, _)) where oldVideoID == videoID:
+            if case .privatePlayer(let parentVideoID, _) = parentTab?.content, parentVideoID == videoID {
                 self.content = .url(.youtube(videoID))
             } else if let url = webView.url, url.isYoutubeVideo == true {
                 self.content = .url(url)
@@ -587,8 +587,8 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         switch content {
         case .url(let value):
             return value
-        case .privatePlayer(let videoID):
-            return .privatePlayer(videoID)
+        case .privatePlayer(let videoID, let timestamp):
+            return .privatePlayer(videoID, timestamp: timestamp)
         case .homePage:
             return .homePage
         default:
@@ -608,7 +608,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             return false
         }
 
-        if case .privatePlayer(let videoID) = content, webView.url == .youtubeNoCookie(videoID) || webView.url == .youtube(videoID) {
+        if case .privatePlayer(let videoID, let timestamp) = content, webView.url == .youtubeNoCookie(videoID, timestamp: timestamp) || webView.url == .youtube(videoID, timestamp: timestamp) {
             return false
         }
 

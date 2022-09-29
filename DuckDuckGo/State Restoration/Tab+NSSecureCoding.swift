@@ -24,6 +24,7 @@ extension Tab: NSSecureCoding {
     private enum NSSecureCodingKeys {
         static let url = "url"
         static let videoID = "videoID"
+        static let videoTimestamp = "videoTimestamp"
         static let title = "title"
         static let sessionStateData = "ssdata" // Used for session restoration on macOS 10.15 – 11
         static let interactionStateData = "interactionStateData" // Used for session restoration on macOS 12+
@@ -40,12 +41,13 @@ extension Tab: NSSecureCoding {
     convenience init?(coder decoder: NSCoder) {
         let url: URL? = decoder.decodeIfPresent(at: NSSecureCodingKeys.url)
         let videoID: String? = decoder.decodeIfPresent(at: NSSecureCodingKeys.videoID)
+        let videoTimestamp: String? = decoder.decodeIfPresent(at: NSSecureCodingKeys.videoTimestamp)
         let preferencePane = decoder.decodeIfPresent(at: NSSecureCodingKeys.preferencePane)
             .flatMap(PreferencePaneIdentifier.init(rawValue:))
 
         guard let tabTypeRawValue: Int = decoder.decodeIfPresent(at: NSSecureCodingKeys.tabType),
               let tabType = TabContent.ContentType(rawValue: tabTypeRawValue),
-              let content = TabContent(type: tabType, url: url, videoID: videoID, preferencePane: preferencePane)
+              let content = TabContent(type: tabType, url: url, videoID: videoID, timestamp: videoTimestamp, preferencePane: preferencePane)
         else { return nil }
 
         let visitedDomains = decoder.decodeObject(of: [NSArray.self, NSString.self], forKey: NSSecureCodingKeys.visitedDomains) as? [String] ?? []
@@ -101,7 +103,7 @@ private extension Tab.TabContent {
         case privatePlayer = 5
     }
 
-    init?(type: ContentType, url: URL?, videoID: String?, preferencePane: PreferencePaneIdentifier?) {
+    init?(type: ContentType, url: URL?, videoID: String?, timestamp: String?, preferencePane: PreferencePaneIdentifier?) {
         switch type {
         case .homePage:
             self = .homePage
@@ -116,7 +118,7 @@ private extension Tab.TabContent {
             self = .onboarding
         case .privatePlayer:
             guard let videoID = videoID else { return nil }
-            self = .privatePlayer(videoID: videoID)
+            self = .privatePlayer(videoID: videoID, timestamp: timestamp)
         }
     }
 
@@ -143,7 +145,7 @@ private extension Tab.TabContent {
 
     var videoID: String? {
         switch self {
-        case let .privatePlayer(videoID):
+        case let .privatePlayer(videoID, _):
             return videoID
         default:
             return nil
