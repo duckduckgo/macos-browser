@@ -801,6 +801,8 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     private var youtubePlayerCancellables: Set<AnyCancellable> = []
 
     func setUpYoutubeScriptsIfNeeded() {
+        youtubePlayerCancellables.removeAll()
+
         if webView.url?.host?.droppingWwwPrefix() == "youtube.com" && PrivacySecurityPreferences.shared.privateYoutubePlayerEnabled != false {
             youtubeOverlayScript?.setEnabled(true, in: webView)
         } else {
@@ -820,7 +822,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                 .store(in: &youtubePlayerCancellables)
         } else {
             youtubePlayerScript?.isEnabled = false
-            youtubePlayerCancellables.removeAll()
         }
     }
     
@@ -881,6 +882,7 @@ extension Tab: UserContentControllerDelegate {
         userScripts.autoconsentUserScript?.delegate = self
         youtubeOverlayScript = userScripts.youtubeOverlayScript
         youtubePlayerScript = userScripts.youtubePlayerUserScript
+        setUpYoutubeScriptsIfNeeded()
 
         findInPageScript = userScripts.findInPageScript
         attachFindInPage()
