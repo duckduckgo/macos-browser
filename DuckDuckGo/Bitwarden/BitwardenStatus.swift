@@ -18,7 +18,7 @@
 
 import Foundation
 
-enum BitwardenStatus {
+enum BitwardenStatus: Equatable {
 
     case unlocked(email: String)
     case locked(email: String)

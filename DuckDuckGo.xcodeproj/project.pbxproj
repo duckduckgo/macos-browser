@@ -111,6 +111,9 @@
 		4B0511E1262CAA8600F6079C /* NSOpenPanelExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0511DF262CAA8600F6079C /* NSOpenPanelExtensions.swift */; };
 		4B0511E2262CAA8600F6079C /* NSViewControllerExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0511E0262CAA8600F6079C /* NSViewControllerExtension.swift */; };
 		4B0511E7262CAB3700F6079C /* UserDefaultsWrapperUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0511E6262CAB3700F6079C /* UserDefaultsWrapperUtilities.swift */; };
+		4B10F24D28E53A52000FDA55 /* BitwardenInstallationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B10F24A28E53A52000FDA55 /* BitwardenInstallationService.swift */; };
+		4B10F24E28E53A52000FDA55 /* ConnectBitwardenViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B10F24C28E53A52000FDA55 /* ConnectBitwardenViewController.swift */; };
+		4B10F25028E53C75000FDA55 /* ConnectBitwardenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B10F24F28E53C75000FDA55 /* ConnectBitwardenView.swift */; };
 		4B11060525903E570039B979 /* CoreDataEncryptionTesting.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 4B11060325903E570039B979 /* CoreDataEncryptionTesting.xcdatamodeld */; };
 		4B11060A25903EAC0039B979 /* CoreDataEncryptionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B11060925903EAC0039B979 /* CoreDataEncryptionTests.swift */; };
 		4B117F7D276C0CB5002F3D8C /* LocalStatisticsStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B117F7C276C0CB5002F3D8C /* LocalStatisticsStoreTests.swift */; };
@@ -931,6 +934,9 @@
 		4B0511DF262CAA8600F6079C /* NSOpenPanelExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSOpenPanelExtensions.swift; sourceTree = "<group>"; };
 		4B0511E0262CAA8600F6079C /* NSViewControllerExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSViewControllerExtension.swift; sourceTree = "<group>"; };
 		4B0511E6262CAB3700F6079C /* UserDefaultsWrapperUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsWrapperUtilities.swift; sourceTree = "<group>"; };
+		4B10F24A28E53A52000FDA55 /* BitwardenInstallationService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BitwardenInstallationService.swift; sourceTree = "<group>"; };
+		4B10F24C28E53A52000FDA55 /* ConnectBitwardenViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConnectBitwardenViewController.swift; sourceTree = "<group>"; };
+		4B10F24F28E53C75000FDA55 /* ConnectBitwardenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectBitwardenView.swift; sourceTree = "<group>"; };
 		4B11060425903E570039B979 /* CoreDataEncryptionTesting.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CoreDataEncryptionTesting.xcdatamodel; sourceTree = "<group>"; };
 		4B11060925903EAC0039B979 /* CoreDataEncryptionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataEncryptionTests.swift; sourceTree = "<group>"; };
 		4B117F7C276C0CB5002F3D8C /* LocalStatisticsStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalStatisticsStoreTests.swift; sourceTree = "<group>"; };
@@ -1694,6 +1700,8 @@
 		1D02633728E0F405005CBB41 /* Bitwarden */ = {
 			isa = PBXGroup;
 			children = (
+				4B10F24928E53A52000FDA55 /* Model */,
+				4B10F24B28E53A52000FDA55 /* View */,
 				1D02633828E0FA86005CBB41 /* BitwardenManager.swift */,
 				1D02633A28E0FAAD005CBB41 /* BitwardenStatus.swift */,
 				1D02633C28E0FC0D005CBB41 /* BitwardenCredential.swift */,
@@ -1949,6 +1957,22 @@
 				378205F7283BC6A600D1D4AA /* StartupPreferencesTests.swift */,
 			);
 			path = Preferences;
+			sourceTree = "<group>";
+		};
+		4B10F24928E53A52000FDA55 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				4B10F24A28E53A52000FDA55 /* BitwardenInstallationService.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		4B10F24B28E53A52000FDA55 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				4B10F24C28E53A52000FDA55 /* ConnectBitwardenViewController.swift */,
+			);
+			path = View;
 			sourceTree = "<group>";
 		};
 		4B1AD89E25FC27E200261379 /* Integration Tests */ = {
@@ -2257,6 +2281,7 @@
 			isa = PBXGroup;
 			children = (
 				4B98D28528DBA376003C2B6F /* ConnectBitwardenViewController.swift */,
+				4B10F24F28E53C75000FDA55 /* ConnectBitwardenView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -4586,6 +4611,7 @@
 				85AC3AF725D5DBFD00C7D2AA /* DataExtension.swift in Sources */,
 				B6A924D42664BBBB001A28CA /* WKWebViewDownloadDelegate.swift in Sources */,
 				AA9B7C8526A199B60008D425 /* ServerTrustViewModel.swift in Sources */,
+				4B10F25028E53C75000FDA55 /* ConnectBitwardenView.swift in Sources */,
 				85480FCF25D1AA22009424E3 /* ConfigurationStoring.swift in Sources */,
 				AA3D531B27A2F57E00074EC1 /* Feedback.swift in Sources */,
 				4BB99D0626FE1979001E4761 /* RequestFilePermissionViewController.swift in Sources */,
@@ -4624,6 +4650,8 @@
 				4B98D28628DBA376003C2B6F /* ConnectBitwardenViewController.swift in Sources */,
 				856C98A6256EB59600A22F1F /* MenuItemSelectors.swift in Sources */,
 				B6B1E87E26D5DA0E0062C350 /* DownloadsPopover.swift in Sources */,
+				4B10F24E28E53A52000FDA55 /* ConnectBitwardenViewController.swift in Sources */,
+				4B10F24D28E53A52000FDA55 /* BitwardenInstallationService.swift in Sources */,
 				4B9292A026670D2A00AD2C21 /* SpacerNode.swift in Sources */,
 				B6E61EE8263ACE16004E11AB /* UTType.swift in Sources */,
 				4BE6547F271FCD4D008D1D63 /* PasswordManagementCreditCardModel.swift in Sources */,

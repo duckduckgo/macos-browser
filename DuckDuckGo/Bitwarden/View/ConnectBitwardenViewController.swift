@@ -17,7 +17,39 @@
 //
 
 import Foundation
+import SwiftUI
 
 final class ConnectBitwardenViewController: NSViewController {
+    
+    private let viewSize = CGSize(width: 550, height: 300)
+
+    private lazy var connectBitwardenView: NSHostingView<ConnectBitwardenView> = {
+        return NSHostingView(rootView: ConnectBitwardenView())
+    }()
+    
+    public override func loadView() {
+        view = NSView(frame: NSRect(origin: CGPoint.zero, size: viewSize))
+    }
+    
+    public override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        view.addSubview(connectBitwardenView)
+
+        setupConstraints()
+    }
+
+    private func setupConstraints() {
+        connectBitwardenView.translatesAutoresizingMaskIntoConstraints = false
+        
+        NSLayoutConstraint.activate([
+            connectBitwardenView.heightAnchor.constraint(equalToConstant: viewSize.height),
+            connectBitwardenView.widthAnchor.constraint(equalToConstant: viewSize.width),
+            connectBitwardenView.topAnchor.constraint(equalTo: view.topAnchor),
+            connectBitwardenView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            connectBitwardenView.leftAnchor.constraint(equalTo: view.leftAnchor),
+            connectBitwardenView.rightAnchor.constraint(equalTo: view.rightAnchor)
+        ])
+    }
     
 }

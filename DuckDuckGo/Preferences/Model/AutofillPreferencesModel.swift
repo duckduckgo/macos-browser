@@ -53,6 +53,12 @@ final class AutofillPreferencesModel: ObservableObject {
     @Published private(set) var passwordManager: PasswordManager {
         didSet {
             persistor.passwordManager = passwordManager
+            
+            if passwordManager == .bitwarden, BitwardenManager.shared.status == .disabled {
+                presentBitwardenSetupFlow()
+            } else {
+                print("Don't present setup flow")
+            }
         }
     }
 
@@ -115,8 +121,27 @@ final class AutofillPreferencesModel: ObservableObject {
         askToSaveAddresses = persistor.askToSaveAddresses
         askToSavePaymentMethods = persistor.askToSavePaymentMethods
         passwordManager = persistor.passwordManager
+        
+        if persistor.passwordManager == .bitwarden, BitwardenManager.shared.status == .disabled {
+            self.persistor.passwordManager = .duckduckgo
+        }
     }
 
     private var persistor: AutofillPreferencesPersistor
     private var userAuthenticator: UserAuthenticating
+    
+    // MARK: - Password Manager
+    
+    func presentBitwardenSetupFlow() {
+        let connectBitwardenViewController = ConnectBitwardenViewController(nibName: nil, bundle: nil).wrappedInWindowController()
+
+        guard let connectBitwardenWindow = connectBitwardenViewController.window,
+              let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController
+        else {
+            assertionFailure("Privacy Preferences: Failed to present ConnectBitwardenViewController")
+            return
+        }
+
+        parentWindowController.window?.beginSheet(connectBitwardenWindow)
+    }
 }

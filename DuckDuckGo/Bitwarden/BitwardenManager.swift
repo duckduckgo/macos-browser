@@ -33,7 +33,7 @@ final class BitwardenManager: BitwardenManagement {
 
     static let shared = BitwardenManager()
 
-    @Published private(set) var status: BitwardenStatus = .unlocked(email: "test@duck.com")
+    @Published private(set) var status: BitwardenStatus = .disabled
     var statusPublisher: Published<BitwardenStatus>.Publisher { $status }
 
     func retrieveCredentials(for url: URL, completion: @escaping ([BitwardenCredential], BitwardenError?) -> Void) {
