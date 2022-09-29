@@ -50,9 +50,19 @@ struct PrivatePlayer {
         return nil
     }
 
+    static func isChildOfPrivatePlayerTabWithYoutubeVideo(_ tab: Tab) -> Bool {
+        if case .privatePlayer(let parentVideoID) = tab.parentTab?.content, let url = tab.webView.url, url.isYoutubeVideo == true, url.youtubeVideoID == parentVideoID {
+            return true
+        }
+        return false
+    }
+
     static func overrideTabContentForChildTabIfNeeded(for tab: Tab) -> Tab.TabContent? {
-        if tab.content == .none, case .privatePlayer(let parentVideoID) = tab.parentTab?.content, let url = tab.webView.url, url.isYoutubeVideo == true, url.youtubeVideoID == parentVideoID {
-            return .url(url)
+        if Self.isChildOfPrivatePlayerTabWithYoutubeVideo(tab) {
+            if tab.content == .none, let url = tab.webView.url {
+                return .url(url)
+            }
+            return tab.content
         }
         return nil
     }
