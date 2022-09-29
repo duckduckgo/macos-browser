@@ -38,20 +38,20 @@ struct PrivatePlayer {
     }
 
     static func tabContent(for url: URL?) -> Tab.TabContent? {
-        guard !Self.isDisabled, let url = url, let videoID = url.youtubeVideoID else {
+        guard !Self.isDisabled, let url = url, let (videoID, timestamp) = url.youtubeVideoParams else {
             return nil
         }
 
         let shouldAlwaysOpenPrivatePlayer = url.isYoutubeVideo && PrivacySecurityPreferences.shared.privateYoutubePlayerEnabled == true
 
         if url.isPrivatePlayerScheme || url.isPrivatePlayer || shouldAlwaysOpenPrivatePlayer {
-            return .privatePlayer(videoID: videoID)
+            return .privatePlayer(videoID: videoID, timestamp: timestamp)
         }
         return nil
     }
 
     static func isChildOfPrivatePlayerTabWithYoutubeVideo(_ tab: Tab) -> Bool {
-        if case .privatePlayer(let parentVideoID) = tab.parentTab?.content, let url = tab.webView.url, url.isYoutubeVideo == true, url.youtubeVideoID == parentVideoID {
+        if case .privatePlayer(let parentVideoID, _) = tab.parentTab?.content, let url = tab.webView.url, url.isYoutubeVideo == true, url.youtubeVideoID == parentVideoID {
             return true
         }
         return false
@@ -99,11 +99,11 @@ struct PrivatePlayer {
             return nil
         }
 
-        if case .privatePlayer(let parentVideoID) = tab.parentTab?.content, parentVideoID == videoID {
+        if case .privatePlayer(let parentVideoID, _) = tab.parentTab?.content, parentVideoID == videoID {
             return nil
         }
 
-        guard case .privatePlayer(let currentVideoID) = tab.content, currentVideoID == videoID, tab.webView.url?.isPrivatePlayer == true else {
+        guard case .privatePlayer(let currentVideoID, _) = tab.content, currentVideoID == videoID, tab.webView.url?.isPrivatePlayer == true else {
             tab.webView.load(.privatePlayer(videoID))
             return .cancel
         }
@@ -116,16 +116,22 @@ struct PrivatePlayer {
 }
 
 extension URL {
-    static func privatePlayer(_ videoID: String) -> URL {
-        "\(PrivatePlayerSchemeHandler.scheme):\(videoID)".url!
+    static func privatePlayer(_ videoID: String, timestamp: String? = nil) -> URL {
+        let url = "\(PrivatePlayerSchemeHandler.scheme):\(videoID)".url!
+        if let timestamp = timestamp {
+            return url.appending(percentEncodedQueryItem: .init(name: "t", value: timestamp))
+        }
+        return url
     }
 
-    static func youtubeNoCookie(_ videoID: String) -> URL {
-        "https://\(YoutubePlayerNavigationHandler.privatePlayerHost)/embed/\(videoID)?wmode=transparent&iv_load_policy=3&autoplay=1&html5=1&showinfo=0&rel=0&modestbranding=1&playsinline=0".url!
+    static func youtubeNoCookie(_ videoID: String, timestamp: String? = nil) -> URL {
+        let url = "https://\(YoutubePlayerNavigationHandler.privatePlayerHost)/embed/\(videoID)?wmode=transparent&iv_load_policy=3&autoplay=1&html5=1&showinfo=0&rel=0&modestbranding=1&playsinline=0".url!
+        return url.addingTimestamp(timestamp)
     }
 
-    static func youtube(_ videoID: String) -> URL {
-        "https://www.youtube.com/watch?v=\(videoID)".url!
+    static func youtube(_ videoID: String, timestamp: String? = nil) -> URL {
+        let url = "https://www.youtube.com/watch?v=\(videoID)".url!
+        return url.addingTimestamp(timestamp)
     }
 
     var isPrivatePlayerScheme: Bool {
@@ -170,21 +176,45 @@ extension URL {
     }
 
     var youtubeVideoID: String? {
-        let unsafeID: String? = {
-            if isPrivatePlayerScheme {
-                return absoluteString.split(separator: ":").last.flatMap(String.init)
-            }
+        youtubeVideoParams?.timestamp
+    }
 
-            if isPrivatePlayer {
-                return lastPathComponent
-            }
-
-            guard isYoutubeVideo, let components = URLComponents(url: self, resolvingAgainstBaseURL: false) else {
+    var youtubeVideoParams: (videoID: String, timestamp: String?)? {
+        if isPrivatePlayerScheme {
+#warning("Remove this once Private Player URLs get fixed on the JS side")
+            let fixedAbsoluteString = absoluteString.replacingOccurrences(of: "&", with: "?")
+            guard let components = URLComponents(string: fixedAbsoluteString) else {
                 return nil
             }
-            return components.queryItems?.first(where: { $0.name == "v" })?.value
-        }()
-        return unsafeID?.removingCharacters(in: .youtubeVideoIDNotAllowed)
+            let unsafeVideoID = components.path
+            let timestamp = components.queryItems?.first(where: { $0.name == "t" })?.value
+            return (unsafeVideoID.removingCharacters(in: .youtubeVideoIDNotAllowed), timestamp)
+        }
+
+        if isPrivatePlayer {
+            let unsafeVideoID = lastPathComponent
+            let timestamp = getParameter(named: "t")
+            return (unsafeVideoID.removingCharacters(in: .youtubeVideoIDNotAllowed), timestamp)
+        }
+
+        guard isYoutubeVideo,
+              let components = URLComponents(url: self, resolvingAgainstBaseURL: false),
+              let unsafeVideoID = components.queryItems?.first(where: { $0.name == "v" })?.value
+        else {
+            return nil
+        }
+
+        let timestamp = components.queryItems?.first(where: { $0.name == "t" })?.value
+        return (unsafeVideoID.removingCharacters(in: .youtubeVideoIDNotAllowed), timestamp)
+    }
+
+    // MARK: - Private
+
+    private func addingTimestamp(_ timestamp: String?) -> URL {
+        guard let timestamp = timestamp else {
+            return self
+        }
+        return appendingParameter(name: "t", value: timestamp)
     }
 }
 
