@@ -78,7 +78,7 @@ extension HomePage.Models {
         init(open: @escaping (Bookmark, OpenTarget) -> Void,
              removeFavorite: @escaping (Bookmark) -> Void,
              deleteBookmark: @escaping (Bookmark) -> Void,
-             addEdit:  @escaping (Bookmark?) -> Void) {
+             addEdit: @escaping (Bookmark?) -> Void) {
 
             self.showAllFavorites = Self.showAllFavoritesSetting
             self.open = open
