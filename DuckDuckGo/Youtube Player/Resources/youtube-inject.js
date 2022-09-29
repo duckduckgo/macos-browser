@@ -102,13 +102,18 @@ function enable() {
             }
 
             .ddg-overlay[data-size="video-player"] {
-                top: 0px;
-                left: 0px;
+                top: 5px;
+                left: 5px;
             }
 
             .ddg-overlay[data-size="video-player-with-title"] {
                 top: 40px;
                 left: 10px;
+            }
+
+            .ddg-overlay[data-size="video-player-with-paid-content"] {
+                top: 65px;
+                left: 11px;
             }
 
             .ddg-overlay[data-size="title"] {
@@ -549,6 +554,7 @@ function enable() {
                 if (VideoPlayerIcon.hasAddedVideoPlayerIcon) {
 
                     let hasTitle = !document.querySelector('#player .ytp-hide-info-bar');
+                    let hasPaidContent = document.querySelector('.ytp-paid-content-overlay-link').offsetWidth > 0;
                     let isAds = document.querySelector('#player .ad-showing');
 
                     let vpiClasses = document.querySelector('.ddg-overlay[data-size^="video-player"]').classList;
@@ -567,6 +573,18 @@ function enable() {
                                     vpiClasses.remove('hidden');
                                 }
                             }, 50);
+                        }
+                    }
+
+                    if (hasPaidContent) {
+                        console.log('they just showed paid content, update position');
+                        if (document.querySelector('.ddg-overlay[data-size="video-player"]')) {
+                            document.querySelector('.ddg-overlay[data-size="video-player"]').setAttribute('data-size', 'video-player-with-paid-content');
+                        }
+                    } else {
+                        console.log('they just hid paid content, update position');
+                        if (document.querySelector('.ddg-overlay[data-size="video-player-with-paid-content"]')) {
+                            document.querySelector('.ddg-overlay[data-size="video-player-with-paid-content"]').setAttribute('data-size', 'video-player');
                         }
                     }
 
