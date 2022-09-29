@@ -797,10 +797,12 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     func setUpYoutubeScriptsIfNeeded() {
         youtubePlayerCancellables.removeAll()
 
-        if webView.url?.host?.droppingWwwPrefix() == "youtube.com" && PrivatePlayer.mode != .disabled {
-            youtubeOverlayScript?.setEnabled(true, in: webView)
-        } else {
-            youtubeOverlayScript?.setEnabled(false, in: webView)
+        if webView.url?.host?.droppingWwwPrefix() == "youtube.com" {
+            let userValues = YoutubeOverlayUserScript.UserValues(
+                    privatePlayerEnabled: PrivacySecurityPreferences.shared.privateYoutubePlayerEnabled,
+                    overlayInteracted: PrivacySecurityPreferences.shared.youtubeOverlayInteracted
+            );
+            youtubeOverlayScript?.initWithInitialValues(userValues: userValues, in: self.webView)
         }
 
         if url?.isPrivatePlayerScheme == true {

@@ -21,25 +21,70 @@ import BrowserServicesKit
 import WebKit
 
 final class YoutubeOverlayUserScript: NSObject, StaticUserScript {
-    static var injectionTime: WKUserScriptInjectionTime { .atDocumentStart }
-    static var forMainFrameOnly: Bool { false }
-    static var source: String = YoutubeOverlayUserScript.loadJS("youtube-inject", from: .main)
-    static var script: WKUserScript = YoutubeOverlayUserScript.makeWKUserScript()
-    var messageNames: [String] { [""] }
-    private(set) var isEnabled = false
 
-    func setEnabled(_ isEnabled: Bool, in webView: WKWebView) {
-        if self.isEnabled != isEnabled {
-            let message = isEnabled ? "enable()" : "disable()"
-            evaluateJSCall(call: message, webView: webView)
-            self.isEnabled = isEnabled
+    enum MessageNames: String, CaseIterable {
+        case setInteracted
+        case setAlwaysOpenSettingTo
+    }
+
+    static var injectionTime: WKUserScriptInjectionTime { .atDocumentStart }
+    static var forMainFrameOnly: Bool { true }
+    static var source: String = YoutubeOverlayUserScript.loadJS("youtube-inject-bundle", from: .main)
+    static var script: WKUserScript = YoutubeOverlayUserScript.makeWKUserScript()
+    var messageNames: [String] { MessageNames.allCases.map(\.rawValue) }
+
+    // Values that the Frontend can use to determine the current state.
+    public struct UserValues: Codable {
+        let privatePlayerEnabled: Bool?;
+        let overlayInteracted: Bool;
+    }
+
+    func initWithInitialValues(userValues: UserValues, in webView: WKWebView) {
+        guard let json = try? JSONEncoder().encode(userValues), let jsonString = String(data: json, encoding: .utf8) else {
+            assertionFailure("YoutubeOverlayUserScript: could not convert UserValues into JSON")
+            return
+        }
+        if userValues.privatePlayerEnabled == false {
+            evaluateJSCall(call: "disable(\(jsonString))", webView: webView)
+        } else {
+            evaluateJSCall(call: "enable(\(jsonString))", webView: webView)
         }
     }
-    
+
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-        print("Message \(message)")
+        guard let messageType = MessageNames(rawValue: message.name) else {
+            assertionFailure("YoutubeOverlayUserScript: unexpected message name \(message.name)")
+            return
+        }
+
+        switch messageType {
+        case .setInteracted:
+            handleSetInteracted(message: message)
+        case .setAlwaysOpenSettingTo:
+            handleAlwaysOpenSettings(message: message)
+        }
     }
-    
+
+    private func handleSetInteracted(message: WKScriptMessage) {
+        guard let interacted = message.body as? Bool else {
+            assertionFailure("YoutubeOverlayUserScript: expected Bool")
+            return
+        }
+
+        print("Interacted: \(interacted)")
+        PrivacySecurityPreferences.shared.youtubeOverlayInteracted = interacted
+    }
+
+    private func handleAlwaysOpenSettings(message: WKScriptMessage) {
+        guard let alwaysOpenOnPrivatePlayer = message.body as? Bool else {
+            assertionFailure("YoutubePlayerUserScript: expected Bool")
+            return
+        }
+
+        print("Always open \(alwaysOpenOnPrivatePlayer)")
+        PrivacySecurityPreferences.shared.privateYoutubePlayerEnabled = alwaysOpenOnPrivatePlayer
+    }
+
     func evaluateJSCall(call: String, webView: WKWebView) {
         evaluate(js: call, inWebView: webView)
     }

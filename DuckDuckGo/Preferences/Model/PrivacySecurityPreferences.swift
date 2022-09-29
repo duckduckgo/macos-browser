@@ -49,4 +49,11 @@ final class PrivacySecurityPreferences {
             udWrapper.wrappedValue = privatePlayerMode.boolValue
         }
     }
+
+    var youtubeOverlayInteracted: Bool = UserDefaultsWrapper(key: .youtubeOverlayInteracted, defaultValue: false).wrappedValue {
+        didSet {
+            var udWrapper = UserDefaultsWrapper(key: .youtubeOverlayInteracted, defaultValue: false)
+            udWrapper.wrappedValue = youtubeOverlayInteracted
+        }
+    }
 }

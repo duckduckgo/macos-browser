@@ -1,5 +1,5 @@
-
-function enable() {
+window.enable = function enable(args) {
+    console.log("enable", args);
     const Icons = {
         dax: `
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -533,7 +533,7 @@ function enable() {
 
         init: () => {
             let onVideoPage = document.location.pathname === '/watch';
-            let  = false;
+            // let  = false;
 
             if (onVideoPage) {
                 let videoPlayer = document.querySelector('#player:not(.has-ddg-overlay)');
@@ -853,6 +853,6 @@ function enable() {
 
 }
 
-function disable() {
-    console.log("I'm injected, but disabled =D")
+window.disable = function disable(args) {
+    console.log("I'm injected, but disabled", args);
 }

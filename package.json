@@ -3,13 +3,16 @@
   "version": "1.0.0",
   "scripts": {
     "test": "echo 'no test required'",
-    "rebuild-autoconsent": "rollup -c"
+    "rebuild-autoconsent": "rollup -c",
+    "build-yt": "esbuild --loader:.css=text --loader:.svg=text --bundle DuckDuckGo/Youtube\\ Player/Resources/youtube-inject.js --outfile=DuckDuckGo/Youtube\\ Player/Resources/youtube-inject-bundle.js",
+    "build-yt:watch": "npm run build-yt -- --watch"
   },
   "devDependencies": {
     "@rollup/plugin-json": "^4.1.0",
     "@rollup/plugin-node-resolve": "^13.0.6",
     "rollup": "^2.61.0",
-    "rollup-plugin-terser": "^7.0.2"
+    "rollup-plugin-terser": "^7.0.2",
+    "esbuild": "^0.15.9"
   },
   "dependencies": {
     "@duckduckgo/autoconsent": "2.2.0"

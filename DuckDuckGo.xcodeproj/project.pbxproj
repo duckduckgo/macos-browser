@@ -458,6 +458,7 @@
 		AA61C0D02722159B00E6B681 /* FireInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA61C0CF2722159B00E6B681 /* FireInfoViewController.swift */; };
 		AA61C0D22727F59B00E6B681 /* ArrayExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA61C0D12727F59B00E6B681 /* ArrayExtension.swift */; };
 		AA63745424C9BF9A00AB2AC4 /* SuggestionContainerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA63745324C9BF9A00AB2AC4 /* SuggestionContainerTests.swift */; };
+		AA64777D28E63B1F006C9AF2 /* youtube-inject-bundle.js in Resources */ = {isa = PBXBuildFile; fileRef = AA64777C28E63B1F006C9AF2 /* youtube-inject-bundle.js */; };
 		AA652CB125DD825B009059CC /* LocalBookmarkStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA652CB025DD825B009059CC /* LocalBookmarkStoreTests.swift */; };
 		AA652CCE25DD9071009059CC /* BookmarkListTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA652CCD25DD9071009059CC /* BookmarkListTests.swift */; };
 		AA652CD325DDA6E9009059CC /* LocalBookmarkManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA652CD225DDA6E9009059CC /* LocalBookmarkManagerTests.swift */; };
@@ -1294,6 +1295,7 @@
 		AA61C0CF2722159B00E6B681 /* FireInfoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FireInfoViewController.swift; sourceTree = "<group>"; };
 		AA61C0D12727F59B00E6B681 /* ArrayExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArrayExtension.swift; sourceTree = "<group>"; };
 		AA63745324C9BF9A00AB2AC4 /* SuggestionContainerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionContainerTests.swift; sourceTree = "<group>"; };
+		AA64777C28E63B1F006C9AF2 /* youtube-inject-bundle.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "youtube-inject-bundle.js"; sourceTree = "<group>"; };
 		AA652CB025DD825B009059CC /* LocalBookmarkStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalBookmarkStoreTests.swift; sourceTree = "<group>"; };
 		AA652CCD25DD9071009059CC /* BookmarkListTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkListTests.swift; sourceTree = "<group>"; };
 		AA652CD225DDA6E9009059CC /* LocalBookmarkManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalBookmarkManagerTests.swift; sourceTree = "<group>"; };
@@ -1766,6 +1768,7 @@
 			children = (
 				31F28C5528C8EEDB00119F70 /* youtube_player_template.html */,
 				31F28C5628C8EEDB00119F70 /* youtube-inject.js */,
+				AA64777C28E63B1F006C9AF2 /* youtube-inject-bundle.js */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -4384,6 +4387,7 @@
 				EA4617F0273A28A700F110A2 /* fb-tds.json in Resources */,
 				AAE8B102258A41C000E81239 /* TabPreview.storyboard in Resources */,
 				AA68C3D72490F821001B8783 /* README.md in Resources */,
+				AA64777D28E63B1F006C9AF2 /* youtube-inject-bundle.js in Resources */,
 				AA585D86248FD31400E9A3E2 /* Assets.xcassets in Resources */,
 				85589E8D27BBBB870038AD11 /* NavigationBar.storyboard in Resources */,
 				AAE246F6270A3D3000BEEAEE /* FirePopoverCollectionViewHeader.xib in Resources */,
