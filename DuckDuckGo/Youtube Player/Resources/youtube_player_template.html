@@ -348,7 +348,7 @@
                                     <div class="settings-toggle-container">
                                         <input id="setting" type="checkbox" />
                                     </div>
-                                    <div class="settings-label">Always open YouTube videos in Duck Player</div>
+                                    <label for="setting" class="settings-label">Always open YouTube videos in Duck Player</label>
                                 </form>
                             </div>
                             <a href="about:preferences/privatePlayer" target="_blank" class="settings-button open-settings" rel="noopener">
@@ -393,14 +393,18 @@
                  * @returns {string}
                  */
                 videoEmbedURL: (videoId, timestamp) => {
-                    return 'https://www.youtube-nocookie.com/embed/'+
-                        videoId +
-                        '?iv_load_policy=1' + // show video annotations
-                        '&autoplay=1' + // autoplays the video as soon as it loads
-                        '&rel=0' + // shows related videos from the same channel as the video. wholly turning of related videos has been deprecated
-                        '&modestbranding=1' + // disables showing the YouTube logo in the video control bar
-                        (timestamp ? '&start=' + timestamp : '')
-                    ; // if timestamp supplied, start video at specific point
+                    const url = new URL(`/embed/${videoId}`, "https://www.youtube-nocookie.com")
+
+                    url.searchParams.set('iv_load_policy', '1'); // show video annotations
+                    url.searchParams.set('autoplay', '1'); // autoplays the video as soon as it loads
+                    url.searchParams.set('rel', '0'); // shows related videos from the same channel as the video
+                    url.searchParams.set('modestbranding', '1'); // disables showing the YouTube logo in the video control bar
+
+                    if (timestamp) {
+                        url.searchParams.set('start', timestamp); // if timestamp supplied, start video at specific point
+                    }
+
+                    return url.href;
                 },
                 /**
                  * Sets up the video player:
@@ -430,7 +434,9 @@
                  * Show an error instead of the video player iframe
                  */
                 showVideoError: (errorMessage) => {
-                    VideoPlayer.playerContainer().innerHTML = `<div class="player-error"><b>ERROR:</b> ${errorMessage}</div>`;
+                    VideoPlayer.playerContainer().innerHTML = `<div class="player-error"><b>ERROR:</b> <span class="player-error-message"></span></div>`;
+
+                    document.querySelector('.player-error-message').textContent = errorMessage;
                 },
 
                 /**
@@ -692,14 +698,6 @@
                  * Returns the settings label
                  * @returns {HTMLElement}
                  */
-                label: () => {
-                    return document.querySelector('.settings-label');
-                },
-
-                /**
-                 * Returns the settings label
-                 * @returns {HTMLElement}
-                 */
                 container: () => {
                     return document.querySelector('.setting-container');
                 },
@@ -751,9 +749,9 @@
                                 // is the quickest way of fixing that issue.
                                 setTimeout(() => {
                                     Comms.sendToNative('setAlwaysOpenSettingTo', checked);
-                                }, 300);
+                                }, 300); // Should match slide in CSS time
                             }
-                        }, 800); // Wait to prevent mis-clicks
+                        }, 800); // Wait a bit to allow for user mis-clicks
                     }
                 },
 
@@ -798,12 +796,6 @@
                     let checkbox = Setting.checkbox();
 
                     checkbox.addEventListener('change', () => {
-                        Setting.updateAndSend(checkbox.checked);
-                    });
-
-                    // TODO: remove and convert to <label>
-                    Setting.label().addEventListener('click', () => {
-                        checkbox.checked = !checkbox.checked;
                         Setting.updateAndSend(checkbox.checked);
                     });
                 }
