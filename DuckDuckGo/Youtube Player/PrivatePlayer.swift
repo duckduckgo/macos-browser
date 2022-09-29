@@ -118,10 +118,7 @@ struct PrivatePlayer {
 extension URL {
     static func privatePlayer(_ videoID: String, timestamp: String? = nil) -> URL {
         let url = "\(PrivatePlayerSchemeHandler.scheme):\(videoID)".url!
-        if let timestamp = timestamp {
-            return url.appending(percentEncodedQueryItem: .init(name: "t", value: timestamp))
-        }
-        return url
+        return url.addingTimestamp(timestamp)
     }
 
     static func youtubeNoCookie(_ videoID: String, timestamp: String? = nil) -> URL {
@@ -211,7 +208,10 @@ extension URL {
     // MARK: - Private
 
     private func addingTimestamp(_ timestamp: String?) -> URL {
-        guard let timestamp = timestamp else {
+        guard let timestamp = timestamp,
+              let regex = try? NSRegularExpression.init(pattern: "(\\d+[smhd])+"),
+              timestamp.matches(regex)
+        else {
             return self
         }
         return appendingParameter(name: "t", value: timestamp)
