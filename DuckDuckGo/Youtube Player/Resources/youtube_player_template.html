@@ -623,18 +623,41 @@
                 },
 
                 /**
-                 * Returns timestamp as number
+                 * Sanitizes and converts timestamp to an integer of seconds,
+                 * input may be in the format 1h30m20s (each unit optional)
+                 * (iframe only takes seconds as parameter...)
                  * @param {string} untrusted
                  * @returns {(number|false)}
                  */
                 sanitizeTimestamp: (untrusted) => {
-                    let sanitized = parseInt(untrusted);
+                    let sanitized = untrusted.replace(/[^0-9hms]/g, '');
 
-                    if (isNaN(sanitized)) {
-                        return false;
+                    let units = {
+                        'h': 3600,
+                        'm': 60,
+                        's': 1,
                     }
 
-                    return sanitized;
+                    let parts = sanitized.split(/(\d+[hms]{1})/);
+                    let totalSeconds = 0;
+
+                    parts.forEach(part => {
+                        if (part !== '') {
+                            for (unit in units) {
+                                let multiplicator = units[unit];
+
+                                if (part.includes(unit)) {
+                                    totalSeconds += (parseInt(part) * multiplicator);
+                                }
+                            }
+                        }
+                    });
+
+                    if (totalSeconds > 0) {
+                        return totalSeconds;
+                    }
+
+                    return false;
                 },
 
                 /**
