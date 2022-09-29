@@ -173,7 +173,7 @@ extension URL {
     }
 
     var youtubeVideoID: String? {
-        youtubeVideoParams?.timestamp
+        youtubeVideoParams?.videoID
     }
 
     var youtubeVideoParams: (videoID: String, timestamp: String?)? {
