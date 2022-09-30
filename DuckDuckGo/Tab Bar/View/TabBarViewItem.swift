@@ -261,11 +261,31 @@ final class TabBarViewItem: NSCollectionViewItem {
         layer.borderColor = NSColor.red.cgColor
         layer.maskedCorners = [.layerMaxXMaxYCorner, .layerMinXMaxYCorner]
         layer.cornerRadius = 7
-        layer.mask = borderMaskLayer
+        layer.mask = layerMask
+        return layer
+    }()
+        
+    private lazy var layerMask: CALayer = {
+        let layer = CALayer()
+        layer.addSublayer(leftPixelMask)
+        layer.addSublayer(rightPixelMask)
+        layer.addSublayer(topContentLineMask)
         return layer
     }()
     
-    private lazy var borderMaskLayer: CALayer = {
+    private lazy var leftPixelMask: CALayer = {
+        let layer = CALayer()
+        layer.backgroundColor = NSColor.white.cgColor
+        return layer
+    }()
+    
+    private lazy var rightPixelMask: CALayer = {
+        let layer = CALayer()
+        layer.backgroundColor = NSColor.white.cgColor
+        return layer
+    }()
+    
+    private lazy var topContentLineMask: CALayer = {
         let layer = CALayer()
         layer.backgroundColor = NSColor.white.cgColor
         return layer
@@ -275,8 +295,9 @@ final class TabBarViewItem: NSCollectionViewItem {
         super.viewWillLayout()
         
         borderLayer.frame = self.view.bounds
-        
-        borderMaskLayer.frame = CGRect(x: 0, y: 1, width: borderLayer.bounds.width, height: borderLayer.bounds.height - 1)
+        leftPixelMask.frame = CGRect(x: 0, y: 0, width: 1, height: 1)
+        rightPixelMask.frame = CGRect(x: borderLayer.bounds.width - 1, y: 0, width: 1, height: 1)
+        topContentLineMask.frame = CGRect(x: 0, y: 1, width: borderLayer.bounds.width, height: borderLayer.bounds.height - 1)
     }
     
     private func setupView() {
@@ -290,7 +311,6 @@ final class TabBarViewItem: NSCollectionViewItem {
     
         view.layer?.addSublayer(borderLayer)
     }
-    
     
     private func clearSubscriptions() {
         cancellables.removeAll()
