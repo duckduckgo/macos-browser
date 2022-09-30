@@ -24,6 +24,8 @@ extension NSImage {
 }
 
 struct PrivatePlayer {
+    static let privatePlayerHost = "www.youtube-nocookie.com"
+    static let privatePlayerScheme = "privateplayer"
     static let commonName = UserText.privatePlayer
 
     static var isDisabled: Bool {
@@ -154,12 +156,12 @@ extension PrivatePlayer {
 
 extension URL {
     static func privatePlayer(_ videoID: String, timestamp: String? = nil) -> URL {
-        let url = "\(PrivatePlayerSchemeHandler.scheme):\(videoID)".url!
+        let url = "\(PrivatePlayer.privatePlayerScheme):\(videoID)".url!
         return url.addingTimestamp(timestamp)
     }
 
     static func youtubeNoCookie(_ videoID: String, timestamp: String? = nil) -> URL {
-        let url = "https://\(YoutubePlayerNavigationHandler.privatePlayerHost)/embed/\(videoID)?wmode=transparent&iv_load_policy=3&autoplay=1&html5=1&showinfo=0&rel=0&modestbranding=1&playsinline=0".url!
+        let url = "https://\(PrivatePlayer.privatePlayerHost)/embed/\(videoID)".url!
         return url.addingTimestamp(timestamp)
     }
 
@@ -169,11 +171,11 @@ extension URL {
     }
 
     var isPrivatePlayerScheme: Bool {
-        scheme == PrivatePlayerSchemeHandler.scheme
+        scheme == PrivatePlayer.privatePlayerScheme
     }
 
     var isPrivatePlayer: Bool {
-        host == YoutubePlayerNavigationHandler.privatePlayerHost
+        host == PrivatePlayer.privatePlayerHost && pathComponents.count == 3 && pathComponents[safe: 1] == "embed"
     }
 
     /// Returns true only if the video represents a playlist itself, i.e. doesn't have `index` query parameter
@@ -183,6 +185,7 @@ extension URL {
         }
 
         let isPlaylistURL = components.queryItems?.contains(where: { $0.name == "list" }) == true &&
+        components.queryItems?.contains(where: { $0.name == "v" }) == true &&
         components.queryItems?.contains(where: { $0.name == "index" }) == false
 
         return isPlaylistURL

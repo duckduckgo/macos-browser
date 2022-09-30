@@ -20,7 +20,6 @@ import Foundation
 import WebKit
 
 final class PrivatePlayerSchemeHandler: NSObject, WKURLSchemeHandler {
-    static let scheme = "privateplayer"
 
     func webView(_ webView: WKWebView, start urlSchemeTask: WKURLSchemeTask) {
 
