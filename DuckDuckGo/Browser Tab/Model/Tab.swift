@@ -568,7 +568,13 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                 didRestore = restoreSessionStateDataIfNeeded()
             }
 
-            if !didRestore {
+            if content.isPrivatePlayer {
+                let url = contentURL
+                if webView.canGoBack {
+                    _ = webView.goBack()
+                }
+                webView.load(url)
+            } else if !didRestore {
                 if url.isFileURL {
                     _ = webView.loadFileURL(url, allowingReadAccessTo: URL(fileURLWithPath: "/"))
                 } else {
