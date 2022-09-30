@@ -480,7 +480,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     lazy var referrerTrimming: ReferrerTrimming = {
         ReferrerTrimming(privacyManager: ContentBlocking.shared.privacyConfigurationManager,
                          contentBlockingManager: ContentBlocking.shared.contentBlockingManager,
-                         tld: TLD())
+                         tld: ContentBlocking.shared.tld)
     }()
     
     // MARK: - Ad Click Attribution
