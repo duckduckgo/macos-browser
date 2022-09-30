@@ -296,11 +296,9 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         case (.preferences(pane: .some), .preferences(pane: nil)):
             // prevent clearing currently selected pane (for state persistence purposes)
             break
-        case (.privatePlayer(let oldVideoID, _), .privatePlayer(let videoID, _)) where oldVideoID == videoID:
-            if case .privatePlayer(let parentVideoID, _) = parentTab?.content, parentVideoID == videoID {
-                self.content = .url(.youtube(videoID))
-            } else if let url = webView.url, url.isYoutubeVideo == true {
-                self.content = .url(url)
+        case (.privatePlayer(let oldVideoID, _), .privatePlayer(let videoID, let timestamp)) where oldVideoID == videoID:
+            if let newContent = PrivatePlayer.overrideTabContent(forOpeningYouTubeVideo: videoID, at: timestamp, fromPrivatePlayerTab: self) {
+                self.content = newContent
             }
         default:
             if self.content != content {

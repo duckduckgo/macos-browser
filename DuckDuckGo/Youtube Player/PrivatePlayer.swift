@@ -51,7 +51,7 @@ struct PrivatePlayer {
     }
 
     static func isChildOfPrivatePlayerTabWithYoutubeVideo(_ tab: Tab) -> Bool {
-        if case .privatePlayer(let parentVideoID, _) = tab.parentTab?.content, let url = tab.webView.url, url.isYoutubeVideo == true, url.youtubeVideoID == parentVideoID {
+        if !tab.content.isPrivatePlayer, case .privatePlayer(let parentVideoID, _) = tab.parentTab?.content, let url = tab.webView.url, url.isYoutubeVideo == true, url.youtubeVideoID == parentVideoID {
             return true
         }
         return false
@@ -63,6 +63,19 @@ struct PrivatePlayer {
                 return .url(url)
             }
             return tab.content
+        }
+        return nil
+    }
+
+    static func overrideTabContent(forOpeningYouTubeVideo videoID: String, at timestamp: String?, fromPrivatePlayerTab tab: Tab) -> Tab.TabContent? {
+        if case .privatePlayer(let parentVideoID, _) = tab.parentTab?.content,
+           parentVideoID == videoID,
+           tab.webView.url != .youtubeNoCookie(videoID, timestamp: timestamp) {
+
+            return .url(.youtube(videoID))
+
+        } else if let url = tab.webView.url, url.isYoutubeVideo == true {
+            return .url(url)
         }
         return nil
     }
