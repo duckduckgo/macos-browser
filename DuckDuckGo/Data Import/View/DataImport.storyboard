@@ -1683,8 +1683,8 @@ Gw
                                 </textFieldCell>
                             </textField>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="E8r-SL-GMt">
-                                <rect key="frame" x="13" y="-5" width="180" height="32"/>
-                                <buttonCell key="cell" type="push" title="Select Safari Directory…" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Tu7-Uq-DiB">
+                                <rect key="frame" x="13" y="-5" width="162" height="32"/>
+                                <buttonCell key="cell" type="push" title="Select Safari Folder…" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Tu7-Uq-DiB">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
