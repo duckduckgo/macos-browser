@@ -258,7 +258,7 @@ final class TabBarViewItem: NSCollectionViewItem {
     private lazy var borderLayer: CALayer = {
         let layer = CALayer()
         layer.borderWidth = 1
-        layer.borderColor = NSColor.red.cgColor
+        layer.opacity = TabShadowConfig.alpha
         layer.maskedCorners = [.layerMaxXMaxYCorner, .layerMinXMaxYCorner]
         layer.cornerRadius = 7
         layer.mask = layerMask
@@ -300,6 +300,12 @@ final class TabBarViewItem: NSCollectionViewItem {
         topContentLineMask.frame = CGRect(x: 0, y: 1, width: borderLayer.bounds.width, height: borderLayer.bounds.height - 1)
     }
     
+    private func updateBorderLayerColor() {
+        NSAppearance.withAppAppearance {
+            borderLayer.borderColor = NSColor(named: TabShadowConfig.colorName)?.cgColor
+        }
+    }
+    
     private func setupView() {
         mouseOverView.delegate = self
         mouseClickView.delegate = self
@@ -308,7 +314,6 @@ final class TabBarViewItem: NSCollectionViewItem {
         view.layer?.cornerRadius = 7
         view.layer?.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
         view.layer?.masksToBounds = true
-    
         view.layer?.addSublayer(borderLayer)
     }
     
@@ -331,6 +336,8 @@ final class TabBarViewItem: NSCollectionViewItem {
 
         faviconWrapperViewCenterConstraint.priority = titleTextField.isHidden ? .defaultHigh : .defaultLow
         faviconWrapperViewLeadingConstraint.priority = titleTextField.isHidden ? .defaultLow : .defaultHigh
+        
+        updateBorderLayerColor()
         
         if isSelected {
             borderLayer.isHidden = false

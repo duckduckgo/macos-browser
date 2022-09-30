@@ -22,7 +22,7 @@ final class TabShadowView: NSView {
     private lazy var shadowLine: NSView = {
         let view = NSView(frame: .zero)
         view.wantsLayer = true
-        view.layer?.backgroundColor = NSColor.red.cgColor
+        view.alphaValue = CGFloat(TabShadowConfig.alpha)
         return view
     }()
 
@@ -34,6 +34,10 @@ final class TabShadowView: NSView {
     override func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
     }
+        
+    override func updateLayer() {
+        super.updateLayer()
+    }
     
     private func setupSubviews() {
         addSubview(shadowLine)
@@ -41,8 +45,8 @@ final class TabShadowView: NSView {
     
     override func layout() {
         super.layout()
-        
+        shadowLine.wantsLayer = true
+        shadowLine.layer?.backgroundColor = NSColor(named: TabShadowConfig.colorName)?.cgColor
         shadowLine.frame = CGRect(x: 0, y: 2, width: frame.width, height: 1)
     }
-    
 }
