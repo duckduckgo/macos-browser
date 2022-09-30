@@ -24,8 +24,6 @@ final class PrivatePlayerSchemeHandler: NSObject, WKURLSchemeHandler {
 
     func webView(_ webView: WKWebView, start urlSchemeTask: WKURLSchemeTask) {
 
-        print("Scheme Start")
-
         let youtubeHandler = YoutubePlayerNavigationHandler()
         let html = youtubeHandler.makeHTMLFromTemplate()
 
@@ -48,7 +46,5 @@ final class PrivatePlayerSchemeHandler: NSObject, WKURLSchemeHandler {
 
     }
     
-    func webView(_ webView: WKWebView, stop urlSchemeTask: WKURLSchemeTask) {
-        print("Scheme Stop")
-    }
+    func webView(_ webView: WKWebView, stop urlSchemeTask: WKURLSchemeTask) {}
 }
