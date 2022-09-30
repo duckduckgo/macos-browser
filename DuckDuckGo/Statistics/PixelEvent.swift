@@ -341,7 +341,7 @@ extension Pixel.Event {
             return "m_mac_waitlist_lock_screen_dismissed"
 
         case .debug(event: let event, error: _):
-            return "m_mac_debug_\(event)"
+            return "m_mac_debug_\(event.name)"
 
         case .onboardingStartPressed:
             return "m_mac_onboarding_start_pressed"
