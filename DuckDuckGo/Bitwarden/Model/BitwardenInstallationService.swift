@@ -29,6 +29,7 @@ final class LocalBitwardenInstallationManager: BitwardenInstallationManager {
     private let bitwardenBundleID = "com.bitwarden.desktop"
 
     var isBitwardenInstalled: Bool {
+        // TODO: This installation check is bad, it will return true even when the Bitwarden DMG is mounted.
         return NSWorkspace.shared.absolutePathForApplication(withBundleIdentifier: bitwardenBundleID) != nil
     }
     

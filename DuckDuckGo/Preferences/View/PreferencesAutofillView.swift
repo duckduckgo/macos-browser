@@ -87,11 +87,37 @@ extension Preferences {
                     .offset(x: Const.autoLockPickerHorizontalOffset)
                     .padding(.bottom, 6)
 
-                    Text(UserText.autofillPasswordManagerBitwardenDisclaimer)
-                        .font(Const.Fonts.preferencePaneCaption)
-                        .foregroundColor(Color("GreyTextColor"))
-                        .fixMultilineScrollableText()
-                        .offset(x: Const.autoLockWarningOffset)
+                    switch model.passwordManager {
+                    case .duckduckgo:
+                        Text(UserText.autofillPasswordManagerBitwardenDisclaimer)
+                            .font(Const.Fonts.preferencePaneCaption)
+                            .foregroundColor(Color("GreyTextColor"))
+                            .fixMultilineScrollableText()
+                            .offset(x: Const.autoLockWarningOffset)
+                    case .bitwarden:
+                        switch BitwardenManager.shared.status {
+                        case .unlocked(let email):
+                            BitwardenStatusView(iconType: .success,
+                                                title: email,
+                                                buttonValue: .init(title: "Open Bitwarden", action: { print("Unlocked action") }))
+                                .offset(x: Preferences.Const.autoLockWarningOffset)
+                        case .locked:
+                            BitwardenStatusView(iconType: .warning,
+                                                title: "Unlock Bitwarden",
+                                                buttonValue: .init(title: "Open Bitwarden", action: { print("Unlocked action") }))
+                                .offset(x: Preferences.Const.autoLockWarningOffset)
+                        case .disabled:
+                            BitwardenStatusView(iconType: .error,
+                                                title: "Unable to find or connect to Bitwarden",
+                                                buttonValue: .init(title: "Open Bitwarden", action: { print("Unlocked action") }))
+                                .offset(x: Preferences.Const.autoLockWarningOffset)
+                        case .error:
+                            BitwardenStatusView(iconType: .error,
+                                                title: "Unable to find or connect to Bitwarden",
+                                                buttonValue: nil)
+                                .offset(x: Preferences.Const.autoLockWarningOffset)
+                        }
+                    }
                 }
                 
                 // Ask to Save:
@@ -160,4 +186,51 @@ extension Preferences {
             }
         }
     }
+}
+
+private struct BitwardenStatusView: View {
+    
+    struct ButtonValue {
+        let title: String
+        let action: () -> Void
+    }
+    
+    enum IconType {
+        case success
+        case warning
+        case error
+        
+        fileprivate var imageName: String {
+            switch self {
+            case .success: return "Error"
+            case .warning: return "Warning"
+            case .error: return "Error"
+            }
+        }
+    }
+    
+    let iconType: IconType
+    let title: String
+    let buttonValue: ButtonValue?
+    
+    var body: some View {
+        
+        HStack {
+            HStack {
+                Image(iconType.imageName)
+                Text(title)
+            }
+            .padding([.leading, .trailing], 6)
+            .padding([.top, .bottom], 3)
+            .background(Color.black.opacity(0.04))
+            .border(Color.black.opacity(0.08))
+            .cornerRadius(5)
+            
+            if let buttonValue = buttonValue {
+                Button(buttonValue.title, action: buttonValue.action)
+            }
+        }
+        
+    }
+    
 }

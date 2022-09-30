@@ -19,39 +19,31 @@
 import Foundation
 import SwiftUI
 
-private enum ConnectBitwardenStatus {
-    case disclaimer
-}
-
 struct ConnectBitwardenView: View {
     
+    @EnvironmentObject var viewModel: ConnectBitwardenViewModel
+    
     var body: some View {
-        Group {
-            VStack {
-                BitwardenTitleView()
-                
+        VStack {
+            BitwardenTitleView()
+                .padding(.bottom, 10)
+            
+            switch viewModel.viewState {
+            case .disclaimer:
                 ConnectToBitwardenDisclaimerView()
+            case .lookingForBitwarden:
+                BitwardenInstallationDetectionView(bitwardenDetected: false)
+            case .bitwardenFound:
+                BitwardenInstallationDetectionView(bitwardenDetected: true)
+            default:
+                Text("\(viewModel.viewState.hashValue)")
             }
         }
         .padding(20)
         
         Spacer()
-        Divider()
         
-        HStack {
-            Spacer()
-            
-            Button("Cancel") {
-                print("Cancel")
-            }
-            .buttonStyle(BorderedButtonStyle())
-            
-            Button("Next") {
-                print("Next")
-            }
-        }
-        .padding([.trailing, .bottom], 16)
-        .padding([.top], 10)
+        ButtonsView()
     }
     
 }
@@ -66,7 +58,7 @@ struct BitwardenTitleView: View {
                 .frame(width: 32, height: 32)
             
             Text("Connect to Bitwarden")
-                .font(.title)
+                .font(.system(size: 18, weight: .semibold))
             
             Spacer()
         }
@@ -75,23 +67,113 @@ struct BitwardenTitleView: View {
     
 }
 
-struct ConnectToBitwardenDisclaimerView: View {
+private struct ConnectToBitwardenDisclaimerView: View {
     
     var body: some View {
-        VStack {
+        VStack(alignment: .leading, spacing: 10) {
             Text("We’ll walk you through connecting to Bitwarden, so you can use it in DuckDuckGo.")
             
             Text("Privacy")
-                .font(.title)
+                .font(.system(size: 13, weight: .bold))
+                .padding(.top, 10)
+            
+            HStack {
+                Image("BitwardenLock")
+                Text("All communication between Bitwarden and DuckDuckGo is encrypted and the data never leaves your device.")
+            }
+            
+            HStack {
+                Image("BitwardenClock")
+                Text("Bitwarden will have access to your browsing history.")
+            }
         }
     }
     
 }
 
-// Commented out because it's too hard for Xcode to display a SwiftUI preview
-//
-//struct ConnectBitwardenView_Previews: PreviewProvider {
-//    static var previews: some View {
-//        ConnectBitwardenView()
-//    }
-//}
+private struct BitwardenInstallationDetectionView: View {
+    
+    let bitwardenDetected: Bool
+    
+    var body: some View {
+
+        VStack(alignment: .leading) {
+            Text("Install Bitwarden")
+                .font(.system(size: 13, weight: .bold))
+                .padding(.top, 10)
+            
+            Button(action: {
+                print("Opening Mac App Store")
+            }, label: {
+                Image("MacAppStoreButton")
+            })
+            .buttonStyle(PlainButtonStyle())
+            .frame(width: 156, height: 40)
+            
+            if bitwardenDetected {
+                Text("Bitwarden found!")
+            } else {
+                HStack {
+                    ActivityIndicator(isAnimating: .constant(true), style: .spinning)
+                    
+                    Text("Looking for Bitwarden app...")
+                }
+            }
+        }
+
+    }
+    
+}
+
+private struct ButtonsView: View {
+    
+    @EnvironmentObject var viewModel: ConnectBitwardenViewModel
+    
+    var body: some View {
+        
+        Divider()
+        
+        HStack {
+            Spacer()
+            
+            Button("Cancel") {
+                viewModel.process(action: .cancel)
+            }
+            
+            if #available(macOS 11.0, *) {
+                Button("Next") {
+                    viewModel.process(action: .confirm)
+                }
+                .keyboardShortcut(.defaultAction)
+                .disabled(!viewModel.viewState.canContinue)
+            } else {
+                Button("Next") {
+                    viewModel.process(action: .confirm)
+                }
+                .disabled(!viewModel.viewState.canContinue)
+            }
+        }
+        .padding([.trailing, .bottom], 16)
+        .padding([.top], 10)
+        
+    }
+    
+}
+
+struct ActivityIndicator: NSViewRepresentable {
+    
+    @Binding var isAnimating: Bool
+
+    let style: NSProgressIndicator.Style
+
+    func makeNSView(context: NSViewRepresentableContext<ActivityIndicator>) -> NSProgressIndicator {
+        let progressIndicator = NSProgressIndicator()
+        progressIndicator.style = self.style
+        return progressIndicator
+    }
+
+    func updateNSView(_ nsView: NSProgressIndicator, context: NSViewRepresentableContext<ActivityIndicator>) {
+        isAnimating ? nsView.startAnimation(nil) : nsView.stopAnimation(nil)
+    }
+    
+}

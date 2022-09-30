@@ -22,10 +22,7 @@ import SwiftUI
 final class ConnectBitwardenViewController: NSViewController {
     
     private let viewSize = CGSize(width: 550, height: 300)
-
-    private lazy var connectBitwardenView: NSHostingView<ConnectBitwardenView> = {
-        return NSHostingView(rootView: ConnectBitwardenView())
-    }()
+    private let viewModel = ConnectBitwardenViewModel(bitwardenInstallationService: LocalBitwardenInstallationManager())
     
     public override func loadView() {
         view = NSView(frame: NSRect(origin: CGPoint.zero, size: viewSize))
@@ -33,23 +30,30 @@ final class ConnectBitwardenViewController: NSViewController {
     
     public override func viewDidLoad() {
         super.viewDidLoad()
+        viewModel.delegate = self
         
-        view.addSubview(connectBitwardenView)
-
-        setupConstraints()
-    }
-
-    private func setupConstraints() {
-        connectBitwardenView.translatesAutoresizingMaskIntoConstraints = false
+        let connectBitwardenView = ConnectBitwardenView() .environmentObject(self.viewModel)
+        let hostingView = NSHostingView(rootView: connectBitwardenView)
+        hostingView.translatesAutoresizingMaskIntoConstraints = false
+        
+        view.addSubview(hostingView)
         
         NSLayoutConstraint.activate([
-            connectBitwardenView.heightAnchor.constraint(equalToConstant: viewSize.height),
-            connectBitwardenView.widthAnchor.constraint(equalToConstant: viewSize.width),
-            connectBitwardenView.topAnchor.constraint(equalTo: view.topAnchor),
-            connectBitwardenView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-            connectBitwardenView.leftAnchor.constraint(equalTo: view.leftAnchor),
-            connectBitwardenView.rightAnchor.constraint(equalTo: view.rightAnchor)
+            hostingView.heightAnchor.constraint(equalToConstant: viewSize.height),
+            hostingView.widthAnchor.constraint(equalToConstant: viewSize.width),
+            hostingView.topAnchor.constraint(equalTo: view.topAnchor),
+            hostingView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            hostingView.leftAnchor.constraint(equalTo: view.leftAnchor),
+            hostingView.rightAnchor.constraint(equalTo: view.rightAnchor)
         ])
+    }
+    
+}
+
+extension ConnectBitwardenViewController: ConnectBitwardenViewModelDelegate {
+    
+    func connectBitwardenViewModelDismissedView(_ viewModel: ConnectBitwardenViewModel) {
+        dismiss()
     }
     
 }
