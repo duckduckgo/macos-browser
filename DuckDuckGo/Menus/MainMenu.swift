@@ -69,6 +69,9 @@ final class MainMenu: NSMenu {
     @IBOutlet weak var favoriteThisPageMenuItem: NSMenuItem?
     
     @IBOutlet weak var toggleBookmarksBarMenuItem: NSMenuItem?
+    @IBOutlet weak var toggleAutofillShortcutMenuItem: NSMenuItem?
+    @IBOutlet weak var toggleBookmarksShortcutMenuItem: NSMenuItem?
+    @IBOutlet weak var toggleDownloadsShortcutMenuItem: NSMenuItem?
 
     // MARK: - Debug
     @IBOutlet weak var debugMenuItem: NSMenuItem? {
@@ -106,6 +109,7 @@ final class MainMenu: NSMenu {
         shareMenuItem.submenu = sharingMenu
 
         updateBookmarksBarMenuItem()
+        updateShortcutMenuItems()
     }
 
     private func setup() {
@@ -235,6 +239,12 @@ final class MainMenu: NSMenu {
         let title = PersistentAppInterfaceSettings.shared.showBookmarksBar ? UserText.hideBookmarksBar : UserText.showBookmarksBar
         toggleBookmarksBarMenuItem?.title = title
         bookmarksMenuToggleBookmarksBarMenuItem?.title = title
+    }
+    
+    private func updateShortcutMenuItems() {
+        toggleAutofillShortcutMenuItem?.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .autofill)
+        toggleBookmarksShortcutMenuItem?.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .bookmarks)
+        toggleDownloadsShortcutMenuItem?.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .downloads)
     }
 
 }
