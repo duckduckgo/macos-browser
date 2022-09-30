@@ -198,15 +198,9 @@ final class TabViewModel {
             return
         }
 
-        guard tab.content.isUrl, let url = tabURL else {
+        guard tab.content.isUrl, !tab.content.isPrivatePlayer, let url = tabURL else {
             addressBarString = ""
             passiveAddressBarString = ""
-            return
-        }
-
-        if case .privatePlayer = tab.content {
-            addressBarString = ""
-            passiveAddressBarString = "Private Player"
             return
         }
 
