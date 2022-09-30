@@ -89,6 +89,13 @@ final class PrivatePlayerURLExtensionTests: XCTestCase {
         XCTAssertEqual(paramsWithTimestamp?.timestamp, "23s")
     }
 
+    func testYoutubeVideoID() {
+        XCTAssertEqual(URL.youtube("abcdef12345", timestamp: nil).youtubeVideoID, "abcdef12345")
+        XCTAssertEqual(URL.youtube("abcd<br>ef12345", timestamp: nil).youtubeVideoID, "abcdbref12345")
+
+        XCTAssertNil("https://duck.com".url?.youtubeVideoID)
+    }
+
     func testPrivatePlayerURLTimestampValidation() {
         XCTAssertEqual(URL.privatePlayer("abcdef12345", timestamp: nil).absoluteString, "privateplayer:abcdef12345")
         XCTAssertEqual(URL.privatePlayer("abcdef12345", timestamp: "23s").absoluteString, "privateplayer:abcdef12345?t=23s")
