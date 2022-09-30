@@ -50,36 +50,6 @@ struct PrivatePlayer {
         return nil
     }
 
-    static func isChildOfPrivatePlayerTabWithYoutubeVideo(_ tab: Tab) -> Bool {
-        if !tab.content.isPrivatePlayer, case .privatePlayer(let parentVideoID, _) = tab.parentTab?.content, let url = tab.webView.url, url.isYoutubeVideo == true, url.youtubeVideoID == parentVideoID {
-            return true
-        }
-        return false
-    }
-
-    static func overrideTabContentForChildTabIfNeeded(for tab: Tab) -> Tab.TabContent? {
-        if Self.isChildOfPrivatePlayerTabWithYoutubeVideo(tab) {
-            if tab.content == .none, let url = tab.webView.url {
-                return .url(url)
-            }
-            return tab.content
-        }
-        return nil
-    }
-
-    static func overrideTabContent(forOpeningYouTubeVideo videoID: String, at timestamp: String?, fromPrivatePlayerTab tab: Tab) -> Tab.TabContent? {
-        if case .privatePlayer(let parentVideoID, _) = tab.parentTab?.content,
-           parentVideoID == videoID,
-           tab.webView.url != .youtubeNoCookie(videoID, timestamp: timestamp) {
-
-            return .url(.youtube(videoID))
-
-        } else if let url = tab.webView.url, url.isYoutubeVideo == true {
-            return .url(url)
-        }
-        return nil
-    }
-
     static func title(for page: HomePage.Models.RecentlyVisitedPageModel) -> String? {
         guard page.url.isPrivatePlayer, let actualTitle = page.actualTitle, actualTitle.starts(with: Self.websiteTitlePrefix) else {
             return nil
@@ -126,6 +96,60 @@ struct PrivatePlayer {
     // MARK: - Private
 
     private static let websiteTitlePrefix = "\(Self.commonName) - "
+}
+
+// MARK: - Tab Content updating
+
+extension PrivatePlayer {
+
+    static func updateContent(_ content: Tab.TabContent, for tab: Tab) -> Tab.TabContent? {
+        let newContent: Tab.TabContent? = {
+            if let content = Self.overrideTabContentForChildTabIfNeeded(for: tab) {
+                return content
+            }
+            if case .privatePlayer(let oldVideoID, _) = tab.content,
+               case .privatePlayer(let videoID, let timestamp) = content,
+               oldVideoID == videoID {
+
+                return Self.overrideTabContent(forOpeningYoutubeVideo: videoID, at: timestamp, fromPrivatePlayerTab: tab)
+            }
+            return nil
+        }()
+        if tab.content != newContent {
+            return newContent
+        }
+        return nil
+    }
+
+    private static func overrideTabContentForChildTabIfNeeded(for tab: Tab) -> Tab.TabContent? {
+        if Self.isChildOfPrivatePlayerTabWithYoutubeVideo(tab) {
+            if tab.content == .none, let url = tab.webView.url {
+                return .url(url)
+            }
+            return tab.content
+        }
+        return nil
+    }
+
+    private static func isChildOfPrivatePlayerTabWithYoutubeVideo(_ tab: Tab) -> Bool {
+        if !tab.content.isPrivatePlayer, case .privatePlayer(let parentVideoID, _) = tab.parentTab?.content, let url = tab.webView.url, url.isYoutubeVideo == true, url.youtubeVideoID == parentVideoID {
+            return true
+        }
+        return false
+    }
+
+    private static func overrideTabContent(forOpeningYoutubeVideo videoID: String, at timestamp: String?, fromPrivatePlayerTab tab: Tab) -> Tab.TabContent? {
+        if case .privatePlayer(let parentVideoID, _) = tab.parentTab?.content,
+           parentVideoID == videoID,
+           tab.webView.url != .youtubeNoCookie(videoID, timestamp: timestamp) {
+
+            return .url(.youtube(videoID))
+
+        } else if let url = tab.webView.url, url.isYoutubeVideo == true {
+            return .url(url)
+        }
+        return nil
+    }
 }
 
 extension URL {

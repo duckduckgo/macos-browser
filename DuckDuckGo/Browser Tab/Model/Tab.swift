@@ -285,10 +285,8 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
         lastUpgradedURL = nil
 
-        if let newContent = PrivatePlayer.overrideTabContentForChildTabIfNeeded(for: self) {
-            if self.content != newContent {
-                self.content = newContent
-            }
+        if let newContent = PrivatePlayer.updateContent(content, for: self) {
+            self.content = newContent
             return
         }
 
@@ -296,10 +294,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         case (.preferences(pane: .some), .preferences(pane: nil)):
             // prevent clearing currently selected pane (for state persistence purposes)
             break
-        case (.privatePlayer(let oldVideoID, _), .privatePlayer(let videoID, let timestamp)) where oldVideoID == videoID:
-            if let newContent = PrivatePlayer.overrideTabContent(forOpeningYouTubeVideo: videoID, at: timestamp, fromPrivatePlayerTab: self) {
-                self.content = newContent
-            }
         default:
             if self.content != content {
                 self.content = content
