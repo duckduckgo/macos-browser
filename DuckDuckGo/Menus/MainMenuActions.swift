@@ -318,6 +318,18 @@ extension MainViewController {
     @IBAction func toggleBookmarksBar(_ sender: Any) {
         PersistentAppInterfaceSettings.shared.showBookmarksBar.toggle()
     }
+    
+    @IBAction func toggleAutofillShortcut(_ sender: Any) {
+        LocalPinningManager.shared.togglePinning(for: .autofill)
+    }
+    
+    @IBAction func toggleBookmarksShortcut(_ sender: Any) {
+        LocalPinningManager.shared.togglePinning(for: .bookmarks)
+    }
+    
+    @IBAction func toggleDownloadsShortcut(_ sender: Any) {
+        LocalPinningManager.shared.togglePinning(for: .downloads)
+    }
 
     // MARK: - History
 

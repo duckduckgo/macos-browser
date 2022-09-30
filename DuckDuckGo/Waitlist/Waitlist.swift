@@ -46,9 +46,10 @@ struct Waitlist {
         if !alreadyHasLockScreen {
             viewController.beginSheet(lockScreenWindow)
             Pixel.fire(.waitlistPresentedLockScreen)
+            return true
         }
         
-        return true
+        return false
     }
     
 }
