@@ -1,0 +1,206 @@
+/* -- THUMBNAIL OVERLAY -- */
+.ddg-overlay {
+    position: absolute;
+    margin-top: 5px;
+    margin-left: 5px;
+    z-index: 1000;
+    height: 32px;
+
+    background: rgba(0, 0, 0, 0.6);
+    box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.25), 0px 4px 8px rgba(0, 0, 0, 0.1), inset 0px 0px 0px 1px rgba(0, 0, 0, 0.18);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    border-radius: 6px;
+
+    transition: 0.15s linear background;
+}
+
+.ddg-overlay a.ddg-play-privately {
+    color: white;
+    text-decoration: none;
+    font-style: normal;
+    font-weight: 600;
+    font-size: 12px;
+}
+
+.ddg-overlay .ddg-dax,
+.ddg-overlay .ddg-play-icon {
+    display: inline-block;
+
+}
+
+.ddg-overlay .ddg-dax {
+    float: left;
+    padding: 4px 4px;
+    width: 24px;
+    height: 24px;
+}
+
+.ddg-overlay .ddg-play-text-container {
+    width: 0px;
+    overflow: hidden;
+    float: left;
+    opacity: 0;
+    transition: all 0.15s linear;
+}
+
+.ddg-overlay .ddg-play-text {
+    line-height: 14px;
+    margin-top: 10px;
+    width: 200px;
+}
+
+.ddg-overlay .ddg-play-icon {
+    float: right;
+    width: 24px;
+    height: 20px;
+    padding: 6px 4px;
+}
+
+.ddg-overlay:not([data-size="fixed small"]):hover .ddg-play-text-container {
+    width: 91px;
+    opacity: 1;
+}
+
+.ddg-overlay[data-size^="video-player"].hidden {
+    display: none;
+}
+
+.ddg-overlay[data-size="video-player"] {
+    top: 5px;
+    left: 5px;
+}
+
+.ddg-overlay[data-size="video-player-with-title"] {
+    top: 40px;
+    left: 10px;
+}
+
+.ddg-overlay[data-size="video-player-with-paid-content"] {
+    top: 65px;
+    left: 11px;
+}
+
+.ddg-overlay[data-size="title"] {
+    position: relative;
+    margin: 0;
+    float: right;
+}
+
+.ddg-overlay[data-size="title"] .ddg-play-text-container {
+    width: 90px;
+}
+
+.ddg-overlay[data-size^="fixed"] {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: none;
+    z-index: 10;
+}
+
+#preview .ddg-overlay {
+    transition: transform 160ms ease-out 200ms;
+    /*TODO: scale needs to equal 1/--ytd-video-preview-initial-scale*/
+    transform: scale(1.15) translate(5px, 4px);
+}
+
+#preview ytd-video-preview[active] .ddg-overlay {
+    transform:scale(1) translate(0px, 0px);
+}
+
+/* -- VIDEO PLAYER OVERLAY */
+.ddg-video-player-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    color: white;
+    text-align: center;
+    z-index: 10000;
+}
+
+.ddg-vpo-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    color: white;
+    text-align: center;
+    background: black;
+}
+
+.ddg-vpo-bg:after {
+    content: " ";
+    position: absolute;
+    display: block;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,1); /* this gets overriden if the background image can be found */
+    color: white;
+    text-align: center;
+}
+
+.ddg-video-player-overlay[data-thumb-loaded="true"] .ddg-vpo-bg:after {
+    background: rgba(0,0,0,0.5);
+}
+
+.ddg-vpo-content {
+    position: relative;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 496px;
+    left: 50%;
+}
+
+.ddg-vpo-eyeball {
+    margin-bottom: 18px;
+}
+
+.ddg-vpo-title {
+    font-size: 22px;
+    line-height: 26px;
+    letter-spacing: -0.26px;
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 8px;
+}
+
+.ddg-vpo-text {
+    font-size: 13px;
+    line-height: 16px;
+    text-align: center;
+    letter-spacing: -0.08px;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 30px;
+}
+
+.ddg-vpo-cancel {
+    padding: 6px 16px;
+    width: 101px;
+    background: rgba(255, 255, 255, 0.25);
+    box-shadow: 0px 0px 0px 0.5px rgba(0, 0, 0, 0.1), 0px 0px 1px rgba(0, 0, 0, 0.05), 0px 1px 1px rgba(0, 0, 0, 0.2), inset 0px 0.5px 0px rgba(255, 255, 255, 0.2), inset 0px 1px 0px rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    display: inline-block;
+    font-size: 16px;
+    margin-right: 10px;
+    cursor: pointer;
+}
+
+.ddg-vpo-open {
+    display: inline-block;
+    width: 98px;
+    padding: 6px 16px;
+    background: linear-gradient(180deg, #4266D8 0%, #224CD2 100%);
+    border: 0.5px solid rgba(40, 145, 255, 0.05);
+    box-shadow: 0px 0px 1px rgba(40, 145, 255, 0.05), 0px 1px 1px rgba(40, 145, 255, 0.1);
+    border-radius: 8px;
+    font-size: 16px;
+    color: white;
+    text-decoration: none;
+}

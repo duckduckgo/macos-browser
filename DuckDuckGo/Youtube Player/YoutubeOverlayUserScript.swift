@@ -66,11 +66,11 @@ final class YoutubeOverlayUserScript: NSObject, StaticUserScript {
     }
 
     private func handleSetInteracted(message: WKScriptMessage) {
-        guard let interacted = message.body as? Bool else {
-            assertionFailure("YoutubeOverlayUserScript: expected Bool")
-            return
-        }
-
+//        guard let interacted = message.body as? Bool else {
+//            assertionFailure("YoutubeOverlayUserScript: expected Bool")
+//            return
+//        }
+        let interacted = true;
         print("Interacted: \(interacted)")
         PrivacySecurityPreferences.shared.youtubeOverlayInteracted = interacted
     }

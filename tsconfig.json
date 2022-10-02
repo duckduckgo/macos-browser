@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "target": "es2021",
+    "moduleResolution": "node",
+    "lib": ["ES2021", "DOM", "DOM.Iterable"],
+    "alwaysStrict": true,
+    "allowJs": true,
+    "checkJs": true,
+    "noEmit": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "declaration": true,
+    "strict": true,
+    "noImplicitAny": false,
+    "strictNullChecks": true,
+    "maxNodeModuleJsDepth": 0
+  },
+  "files": [
+    "DuckDuckGo/Youtube Player/Resources/youtube-inject.js",
+    "DuckDuckGo/Youtube Player/Resources/types.d.ts",
+  ],
+  "exclude": [
+  ]
+}

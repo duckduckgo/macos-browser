@@ -410,6 +410,11 @@
 		9833913327AAAEEE00DAF119 /* EmbeddedTrackerDataTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9833913227AAAEEE00DAF119 /* EmbeddedTrackerDataTests.swift */; };
 		983DFB2528B67036006B7E34 /* UserContentUpdating.swift in Sources */ = {isa = PBXBuildFile; fileRef = 983DFB2428B67036006B7E34 /* UserContentUpdating.swift */; };
 		98EB5D1027516A4800681FE6 /* AppPrivacyConfigurationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98EB5D0F27516A4800681FE6 /* AppPrivacyConfigurationTests.swift */; };
+		A1DA58F291B80C7CBCA72F38 /* video-player-overlay.js in Sources */ = {isa = PBXBuildFile; fileRef = A1DA50C92AB4FA34CC8E2057 /* video-player-overlay.js */; };
+		A1DA59CABE940CC97EC2D745 /* dax.svg in Resources */ = {isa = PBXBuildFile; fileRef = A1DA5B29B6303E0D28DCC081 /* dax.svg */; };
+		A1DA5BCE12487550E0BE6AE2 /* util.js in Sources */ = {isa = PBXBuildFile; fileRef = A1DA5BFA399D7C74E2F6011F /* util.js */; };
+		A1DA5CAF5B8C279BF1C1D170 /* types.d.ts in Resources */ = {isa = PBXBuildFile; fileRef = A1DA50ACE8D3BB7E20D40728 /* types.d.ts */; };
+		A1DA5E920D57EA07AA0B02E5 /* eyeball.svg in Resources */ = {isa = PBXBuildFile; fileRef = A1DA5A1DB801DD366E4D3F6B /* eyeball.svg */; };
 		AA06B6B72672AF8100F541C5 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = AA06B6B62672AF8100F541C5 /* Sparkle */; };
 		AA0877B826D5160D00B05660 /* SafariVersionReaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0877B726D5160D00B05660 /* SafariVersionReaderTests.swift */; };
 		AA0877BA26D5161D00B05660 /* WebKitVersionProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0877B926D5161D00B05660 /* WebKitVersionProviderTests.swift */; };
@@ -1243,6 +1248,11 @@
 		9833913227AAAEEE00DAF119 /* EmbeddedTrackerDataTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmbeddedTrackerDataTests.swift; sourceTree = "<group>"; };
 		983DFB2428B67036006B7E34 /* UserContentUpdating.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserContentUpdating.swift; sourceTree = "<group>"; };
 		98EB5D0F27516A4800681FE6 /* AppPrivacyConfigurationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppPrivacyConfigurationTests.swift; sourceTree = "<group>"; };
+		A1DA50ACE8D3BB7E20D40728 /* types.d.ts */ = {isa = PBXFileReference; lastKnownFileType = file.ts; path = types.d.ts; sourceTree = "<group>"; };
+		A1DA50C92AB4FA34CC8E2057 /* video-player-overlay.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = "video-player-overlay.js"; path = "src/video-player-overlay.js"; sourceTree = "<group>"; };
+		A1DA5A1DB801DD366E4D3F6B /* eyeball.svg */ = {isa = PBXFileReference; lastKnownFileType = file.svg; name = eyeball.svg; path = assets/eyeball.svg; sourceTree = "<group>"; };
+		A1DA5B29B6303E0D28DCC081 /* dax.svg */ = {isa = PBXFileReference; lastKnownFileType = file.svg; name = dax.svg; path = assets/dax.svg; sourceTree = "<group>"; };
+		A1DA5BFA399D7C74E2F6011F /* util.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = util.js; path = src/util.js; sourceTree = "<group>"; };
 		AA0877B726D5160D00B05660 /* SafariVersionReaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariVersionReaderTests.swift; sourceTree = "<group>"; };
 		AA0877B926D5161D00B05660 /* WebKitVersionProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebKitVersionProviderTests.swift; sourceTree = "<group>"; };
 		AA0F3DB6261A566C0077F2D9 /* SuggestionLoadingMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionLoadingMock.swift; sourceTree = "<group>"; };
@@ -1769,6 +1779,11 @@
 				31F28C5528C8EEDB00119F70 /* youtube_player_template.html */,
 				31F28C5628C8EEDB00119F70 /* youtube-inject.js */,
 				AA64777C28E63B1F006C9AF2 /* youtube-inject-bundle.js */,
+				A1DA5B29B6303E0D28DCC081 /* dax.svg */,
+				A1DA5A1DB801DD366E4D3F6B /* eyeball.svg */,
+				A1DA50C92AB4FA34CC8E2057 /* video-player-overlay.js */,
+				A1DA5BFA399D7C74E2F6011F /* util.js */,
+				A1DA50ACE8D3BB7E20D40728 /* types.d.ts */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -4441,6 +4456,9 @@
 				EAA29AEA278D2E43007070CF /* ProximaNova-Reg-webfont.woff2 in Resources */,
 				EAFAD6CA2728BD1200F9DF00 /* clickToLoad.js in Resources */,
 				336D5B18262D8D3C0052E0C9 /* findinpage.js in Resources */,
+				A1DA59CABE940CC97EC2D745 /* dax.svg in Resources */,
+				A1DA5E920D57EA07AA0B02E5 /* eyeball.svg in Resources */,
+				A1DA5CAF5B8C279BF1C1D170 /* types.d.ts in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5064,6 +5082,8 @@
 				4BE53374286E39F10019DBFD /* ChromiumKeychainPrompt.swift in Sources */,
 				B6553692268440D700085A79 /* WKProcessPool+GeolocationProvider.swift in Sources */,
 				AA5C1DD1285A154E0089850C /* RecentlyClosedMenu.swift in Sources */,
+				A1DA58F291B80C7CBCA72F38 /* video-player-overlay.js in Sources */,
+				A1DA5BCE12487550E0BE6AE2 /* util.js in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
