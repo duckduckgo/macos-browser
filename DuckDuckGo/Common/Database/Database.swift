@@ -48,24 +48,10 @@ final class Database {
         } catch {
             fatalError("Failed to register encryption value transformers")
         }
-        
-        let errorHandler = EventMapping<CoreDataDatabase.Error>(mapping: { event, error, _, _ in
-            switch event {
-            case .dbInitializationError:
-                if let error = error {
-                    Pixel.fire(.debug(event: .dbInitializationError, error: error))
-                    // Give Pixel a chance to be sent, but not too long
-                    Thread.sleep(forTimeInterval: 1)
-                    fatalError("Could not load DB: \(error.localizedDescription)")
-                }
-            }
-        })
 
         return CoreDataDatabase(name: Constants.databaseName,
-                                url: URL.sandboxApplicationSupportURL,
-                                model: NSManagedObjectModel.mergedModel(from: [.main])!,
-                                errorHandler: errorHandler,
-                                log: .disabled)
+                                containerLocation: URL.sandboxApplicationSupportURL,
+                                model: NSManagedObjectModel.mergedModel(from: [.main])!)
     }
 }
 
