@@ -36,7 +36,7 @@ final class YoutubeOverlayUserScript: NSObject, StaticUserScript {
 
     // Values that the Frontend can use to determine the current state.
     public struct UserValues: Codable {
-        let privatePlayerEnabled: Bool?;
+        let privatePlayerMode: PrivatePlayerMode;
         let overlayInteracted: Bool;
     }
 
@@ -45,7 +45,7 @@ final class YoutubeOverlayUserScript: NSObject, StaticUserScript {
             assertionFailure("YoutubeOverlayUserScript: could not convert UserValues into JSON")
             return
         }
-        if userValues.privatePlayerEnabled == false {
+        if userValues.privatePlayerMode == .disabled {
             print("❌ disable")
             evaluateJSCall(call: "disable(\(jsonString))", webView: webView)
         } else {
@@ -74,7 +74,7 @@ final class YoutubeOverlayUserScript: NSObject, StaticUserScript {
             return
         }
         PrivacySecurityPreferences.shared.youtubeOverlayInteracted = userValues.overlayInteracted;
-        PrivacySecurityPreferences.shared.privateYoutubePlayerEnabled = userValues.privatePlayerEnabled;
+        PrivacySecurityPreferences.shared.privatePlayerMode = userValues.privatePlayerMode;
     }
 
     private func handleAlwaysOpenSettings(message: WKScriptMessage) {
@@ -84,7 +84,7 @@ final class YoutubeOverlayUserScript: NSObject, StaticUserScript {
         }
 
         print("Always open \(alwaysOpenOnPrivatePlayer)")
-        PrivacySecurityPreferences.shared.privateYoutubePlayerEnabled = alwaysOpenOnPrivatePlayer
+        PrivacySecurityPreferences.shared.privatePlayerMode = .enabled
     }
 
     func evaluateJSCall(call: String, webView: WKWebView) {

@@ -24,7 +24,7 @@ const defaultComms = macOSCommunications;
 
 /**
  * @typedef UserValues - A way to communicate some user state
- * @property {boolean|null|undefined} [privatePlayerEnabled] - optional, and one of 3 values: true/false/(null/undefined)
+ * @property {{enabled: {}} | {alwaysAsk:{}} | {disabled:{}}} privatePlayerMode - one of 3 values: 'enabled:{}', 'alwaysAsk:{}', 'disabled:{}'
  * @property {boolean} overlayInteracted - always a boolean
  *
  * @param {UserValues} userValues - user values are state-based things that can update

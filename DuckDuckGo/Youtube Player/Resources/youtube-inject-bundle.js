@@ -353,9 +353,10 @@
           const remember = ddgElement.querySelector('input[name="ddg-remember"]');
           if (!remember)
             throw new Error("cannot find our input");
-          let privatePlayerEnabled = null;
+          let privatePlayerEnabled = { alwaysAsk: {} };
+          ;
           if (remember.checked) {
-            privatePlayerEnabled = false;
+            privatePlayerEnabled = { disabled: {} };
           } else {
           }
           this.userChoice(privatePlayerEnabled).catch((e2) => console.error("could not set userChoice for opt-out", e2));
@@ -368,9 +369,9 @@
           const remember = ddgElement.querySelector('input[name="ddg-remember"]');
           if (!remember)
             throw new Error("cannot find our input");
-          let privatePlayerEnabled = null;
+          let privatePlayerEnabled = { alwaysAsk: {} };
           if (remember.checked) {
-            privatePlayerEnabled = true;
+            privatePlayerEnabled = { enabled: {} };
           } else {
           }
           this.userChoice(privatePlayerEnabled).then(() => this.environment.setHref(href)).catch((e2) => console.error("error setting user choice", e2));
@@ -414,9 +415,9 @@
       if (!this.lastVideoId || this.lastVideoId && this.lastVideoId !== videoId) {
         this.lastVideoId = videoId;
         console.log("\u{1F4F9} video shown", videoId, userValues);
-        if (userValues.privatePlayerEnabled === true) {
-        } else if (userValues.privatePlayerEnabled === false) {
-        } else {
+        if ("enabled" in userValues.privatePlayerMode) {
+        } else if ("disabled" in userValues.privatePlayerMode) {
+        } else if ("alwaysAsk" in userValues.privatePlayerMode) {
           this.create(userValues, videoId);
         }
       }
@@ -464,8 +465,8 @@
         }
       });
     }
-    userChoice(privatePlayerEnabled) {
-      return this.comms.setInteracted(privatePlayerEnabled).then(() => {
+    userChoice(privatePlayerMode) {
+      return this.comms.setInteracted(privatePlayerMode).then(() => {
         console.log("interacted flag set, now cleanup");
         return this.cleanup();
       }).catch((e) => console.error("could not set interacted after user opt out", e));
@@ -478,9 +479,9 @@
 
   // DuckDuckGo/Youtube Player/Resources/src/comms.js
   var macOSCommunications = {
-    setInteracted(privatePlayerEnabled) {
+    setInteracted(privatePlayerMode) {
       const payload = {
-        privatePlayerEnabled,
+        privatePlayerMode,
         overlayInteracted: true
       };
       console.log("\u{1F4E4} [outgoing]", payload);

@@ -18,7 +18,7 @@ export class VideoPlayerOverlay {
     /**
      * @param {import("../youtube-inject").UserValues} userValues
      * @param {{getHref(): string, getLargeThumbnailSrc(videoId: string): string, setHref(href: string): void}} environment
-     * @param {{setInteracted: (enabled: null|undefined|boolean) => Promise<any>}} comms
+     * @param {{setInteracted: (enabled: import("../youtube-inject.js").UserValues['privatePlayerMode']) => Promise<any>}} comms
      */
     constructor(userValues, environment, comms) {
         this.userValues = userValues;
@@ -90,11 +90,11 @@ export class VideoPlayerOverlay {
                  * value such as 'null' or 'undefined' is used to represent this in JS. In
                  * the swift side, it's an `Optional<Bool>`
                  *
-                 * @type {import("../youtube-inject.js").UserValues['privatePlayerEnabled']}
+                 * @type {import("../youtube-inject.js").UserValues['privatePlayerMode']}
                  */
-                let privatePlayerEnabled = null;
+                let privatePlayerEnabled = { alwaysAsk: {} };;
                 if (remember.checked) {
-                    privatePlayerEnabled = false
+                    privatePlayerEnabled = { disabled: {} };
                 } else {
                     // do nothing. The checkbox was off meaning we don't want to save any choice
                 }
@@ -117,11 +117,11 @@ export class VideoPlayerOverlay {
                  * value such as 'null' or 'undefined' is used to represent this in JS. In
                  * the swift side, it's an `Optional<Bool>`
                  *
-                 * @type {import("../youtube-inject.js").UserValues['privatePlayerEnabled']}
+                 * @type {import("../youtube-inject.js").UserValues['privatePlayerMode']}
                  */
-                let privatePlayerEnabled = null;
+                let privatePlayerEnabled = {alwaysAsk: {}};
                 if (remember.checked) {
-                    privatePlayerEnabled = true
+                    privatePlayerEnabled = {enabled: {}}
                 } else {
                     // do nothing. The checkbox was off meaning we don't want to save any choice
                 }
@@ -181,11 +181,11 @@ export class VideoPlayerOverlay {
         if (!this.lastVideoId || this.lastVideoId && this.lastVideoId !== videoId) {
             this.lastVideoId = videoId;
             console.log("📹 video shown", videoId, userValues);
-            if (userValues.privatePlayerEnabled === true) {
+            if ('enabled' in userValues.privatePlayerMode) {
                 // console.log("userValues.privatePlayerEnabled === true", "should not get here...")
-            } else if (userValues.privatePlayerEnabled === false) {
+            } else if ('disabled' in userValues.privatePlayerMode) {
                 // console.log("userValues.privatePlayerEnabled === false")
-            } else {
+            } else if ('alwaysAsk' in userValues.privatePlayerMode) {
                 this.create(userValues, videoId)
             }
         }
@@ -259,11 +259,11 @@ export class VideoPlayerOverlay {
 
     /**
      * Record the users choice
-     * @param {boolean|null|undefined} [privatePlayerEnabled]
+     * @param {import("../youtube-inject.js").UserValues['privatePlayerMode']} privatePlayerMode
      * @returns {Promise<any>}
      */
-    userChoice(privatePlayerEnabled) {
-        return this.comms.setInteracted(privatePlayerEnabled)
+    userChoice(privatePlayerMode) {
+        return this.comms.setInteracted(privatePlayerMode)
             .then(() => {
                 console.log("interacted flag set, now cleanup");
                 return this.cleanup();

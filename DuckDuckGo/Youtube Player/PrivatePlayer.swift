@@ -23,7 +23,7 @@ extension NSImage {
     static let privatePlayer: NSImage = #imageLiteral(resourceName: "PrivatePlayer")
 }
 
-enum PrivatePlayerMode: Equatable {
+enum PrivatePlayerMode: Equatable, Codable {
     case enabled, alwaysAsk, disabled
 
     init(_ privatePlayerMode: Bool?) {

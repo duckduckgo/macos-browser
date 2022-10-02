@@ -1,13 +1,13 @@
 export const macOSCommunications = {
     /**
      * Inform the native layer that an interaction occurred
-     * @param {boolean|null|undefined} [privatePlayerEnabled]
+     * @param {import("../youtube-inject.js").UserValues["privatePlayerMode"]} privatePlayerMode
      * @returns {Promise<never>|Promise<unknown | void>}
      */
-    setInteracted(privatePlayerEnabled) {
+    setInteracted(privatePlayerMode) {
         /** @type {import('../youtube-inject.js').UserValues} */
         const payload = {
-            privatePlayerEnabled,
+            privatePlayerMode,
             overlayInteracted: true
         }
         console.log("📤 [outgoing]", payload);

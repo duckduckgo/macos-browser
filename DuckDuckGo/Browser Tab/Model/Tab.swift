@@ -799,7 +799,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
         if webView.url?.host?.droppingWwwPrefix() == "youtube.com" {
             let userValues = YoutubeOverlayUserScript.UserValues(
-                    privatePlayerEnabled: PrivacySecurityPreferences.shared.privateYoutubePlayerEnabled,
+                    privatePlayerMode: PrivacySecurityPreferences.shared.privatePlayerMode,
                     overlayInteracted: PrivacySecurityPreferences.shared.youtubeOverlayInteracted
             );
             youtubeOverlayScript?.initWithInitialValues(userValues: userValues, in: self.webView)
