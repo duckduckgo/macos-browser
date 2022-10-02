@@ -45,10 +45,11 @@ export const Util = {
         return 'privateplayer:' + videoId;
     },
     /**
+     * @param {string} href
      * @returns {string | null}
      */
-    getYoutubeVideoId() {
-        const url = new URL(window.location.href);
+    getYoutubeVideoId(href) {
+        const url = new URL(href);
         const videoId = url.searchParams.get("v");
 
         if (!videoId) return null;
@@ -145,4 +146,21 @@ export const Util = {
             canceled = true;
         }
     },
+    execCleanups(cleanups) {
+        if (Array.isArray(cleanups) && cleanups.length > 0) {
+            console.log("cleaning up %d items", cleanups.length);
+        }
+        for (let cleanup of cleanups) {
+            if (typeof cleanup.fn === "function") {
+                try {
+                    cleanup.fn();
+                    console.log("🧹 cleanup '%s' was successfully", cleanup.name)
+                } catch (e) {
+                    console.error(`cleanup ${cleanup.name} threw`, e)
+                }
+            } else {
+                throw new Error("invalid cleanup")
+            }
+        }
+    }
 }

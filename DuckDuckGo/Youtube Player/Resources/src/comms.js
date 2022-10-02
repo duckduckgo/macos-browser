@@ -1,4 +1,4 @@
-export const Comms = {
+export const macOSCommunications = {
     /**
      * Inform the native layer that an interaction occurred
      * @param {boolean|null|undefined} [privatePlayerEnabled]

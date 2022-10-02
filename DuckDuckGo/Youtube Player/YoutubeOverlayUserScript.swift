@@ -46,8 +46,10 @@ final class YoutubeOverlayUserScript: NSObject, StaticUserScript {
             return
         }
         if userValues.privatePlayerEnabled == false {
+            print("❌ disable")
             evaluateJSCall(call: "disable(\(jsonString))", webView: webView)
         } else {
+            print("✅ enable")
             evaluateJSCall(call: "enable(\(jsonString))", webView: webView)
         }
     }

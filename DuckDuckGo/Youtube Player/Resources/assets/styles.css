@@ -1,5 +1,6 @@
 /* -- THUMBNAIL OVERLAY -- */
 .ddg-overlay {
+    font-family: system, -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
     position: absolute;
     margin-top: 5px;
     margin-left: 5px;
@@ -58,7 +59,7 @@
 }
 
 .ddg-overlay:not([data-size="fixed small"]):hover .ddg-play-text-container {
-    width: 91px;
+    width: 100px;
     opacity: 1;
 }
 
@@ -111,14 +112,24 @@
 
 /* -- VIDEO PLAYER OVERLAY */
 .ddg-video-player-overlay {
+    font-family: system, -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 16px;
+    text-align: center;
+
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
     color: white;
-    text-align: center;
     z-index: 10000;
+}
+
+.ddg-eyeball svg {
+    width: 60px;
+    height: 60px;
 }
 
 .ddg-vpo-bg {
@@ -148,7 +159,7 @@
 }
 
 .ddg-video-player-overlay[data-thumb-loaded="true"] .ddg-vpo-bg:after {
-    background: rgba(0,0,0,0.5);
+    background: rgba(0,0,0,0.75);
 }
 
 .ddg-vpo-content {
@@ -165,42 +176,71 @@
 
 .ddg-vpo-title {
     font-size: 22px;
+    font-weight: 400;
     line-height: 26px;
-    letter-spacing: -0.26px;
-    color: rgba(255, 255, 255, 0.9);
-    margin-bottom: 8px;
+    margin-top: 25px;
 }
 
 .ddg-vpo-text {
+    margin-top: 16px;
+}
+
+.ddg-vpo-text b {
+    font-weight: 600;
+}
+
+.ddg-vpo-buttons {
+    margin-top: 25px;
+}
+.ddg-vpo-buttons > * {
+    display: inline-block;
+    margin: 0;
+    padding: 0;
+}
+
+.ddg-vpo-button {
+    color: white;
+    padding: 9px 16px;
     font-size: 13px;
-    line-height: 16px;
-    text-align: center;
-    letter-spacing: -0.08px;
-    color: rgba(255, 255, 255, 0.8);
-    margin-bottom: 30px;
+    border-radius: 8px;
+    font-weight: 600;
+    display: inline-block;
+    text-decoration: none;
+}
+
+.ddg-vpo-button + .ddg-vpo-button {
+    margin-left: 10px;
 }
 
 .ddg-vpo-cancel {
-    padding: 6px 16px;
-    width: 101px;
-    background: rgba(255, 255, 255, 0.25);
+    background: #585b58;
+    border: 0.5px solid rgba(40, 145, 255, 0.05);
     box-shadow: 0px 0px 0px 0.5px rgba(0, 0, 0, 0.1), 0px 0px 1px rgba(0, 0, 0, 0.05), 0px 1px 1px rgba(0, 0, 0, 0.2), inset 0px 0.5px 0px rgba(255, 255, 255, 0.2), inset 0px 1px 0px rgba(255, 255, 255, 0.05);
-    border-radius: 8px;
-    display: inline-block;
-    font-size: 16px;
-    margin-right: 10px;
-    cursor: pointer;
 }
 
 .ddg-vpo-open {
-    display: inline-block;
-    width: 98px;
-    padding: 6px 16px;
-    background: linear-gradient(180deg, #4266D8 0%, #224CD2 100%);
+    background: #3969EF;
     border: 0.5px solid rgba(40, 145, 255, 0.05);
-    box-shadow: 0px 0px 1px rgba(40, 145, 255, 0.05), 0px 1px 1px rgba(40, 145, 255, 0.1);
-    border-radius: 8px;
-    font-size: 16px;
-    color: white;
-    text-decoration: none;
+    box-shadow: 0px 0px 0px 0.5px rgba(0, 0, 0, 0.1), 0px 0px 1px rgba(0, 0, 0, 0.05), 0px 1px 1px rgba(0, 0, 0, 0.2), inset 0px 0.5px 0px rgba(255, 255, 255, 0.2), inset 0px 1px 0px rgba(255, 255, 255, 0.05);
+}
+
+.ddg-vpo-open:hover {
+    background: #1d51e2;
+}
+.ddg-vpo-cancel:hover {
+    cursor: pointer;
+    background: #2f2f2f;
+}
+
+.ddg-vpo-remember {
+}
+.ddg-vpo-remember label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 25px;
+    cursor: pointer;
+}
+.ddg-vpo-remember input {
+    margin-right: 6px;
 }

@@ -1,19 +1,41 @@
 // @ts-nocheck
 import css from "./assets/styles.css";
 import {VideoPlayerOverlay} from "./src/video-player-overlay";
-import {VideoPlayerIcon} from "./src/video-player-icon.js";
 import {IconOverlay} from "./src/icon-overlay.js";
 import {Util} from "./src/util.js";
+import {macOSCommunications} from "./src/comms";
 
 console.log("script load", window.location.href);
+
+const defaultEnvironment = {
+    getHref() {
+        return window.location.href
+    },
+    getLargeThumbnailSrc(videoId) {
+        const url = new URL(`/vi/${videoId}/maxresdefault.jpg`, 'https://i.ytimg.com');
+        return url.href
+    },
+    setHref(href) {
+        window.location.href = href;
+    }
+}
+
+const defaultComms = macOSCommunications;
 
 /**
  * @typedef UserValues - A way to communicate some user state
  * @property {boolean|null|undefined} [privatePlayerEnabled] - optional, and one of 3 values: true/false/(null/undefined)
  * @property {boolean} overlayInteracted - always a boolean
+ *
+ * @param {UserValues} userValues - user values are state-based things that can update
+ * @param {defaultEnvironment} [environment] - methods to read environment-sensitive things like the current URL etc
+ * @param {macOSCommunications } [comms] - methods to communicate with a native backend
  */
-window.enable = function enable(args) {
-    console.log("👴 reading user prefs", args);
+window.enable = function enable(userValues, environment = defaultEnvironment, comms = defaultComms) {
+    console.log("👴 reading user prefs", userValues);
+    console.log("👴 environment", environment);
+
+    const videoPlayerOverlay = new VideoPlayerOverlay(userValues, environment, comms);
     const CSS = {
         styles: css,
         /**
@@ -211,8 +233,6 @@ window.enable = function enable(args) {
                 // VideoPlayerIcon.init(args);
             });
 
-            console.log('🔍 waiting for video');
-
             Site.onDOMChanged(() => {
                 if (OverlaySettings.enabled.thumbnails) {
                     VideoThumbnail.bindEventsToAll();
@@ -220,7 +240,7 @@ window.enable = function enable(args) {
                 }
 
                 // VideoPlayerIcon.init(args);
-                VideoPlayerOverlay.watchForVideoBeingAdded(args);
+                videoPlayerOverlay.watchForVideoBeingAdded(userValues);
             });
         }
     }

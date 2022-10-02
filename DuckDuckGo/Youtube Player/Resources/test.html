@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        .container {
+            width: 800px;
+            height: 600px;
+            background: blue;
+        }
+        .html5-video-player {
+            position: relative;
+        }
+        body {
+            max-width: 100%;
+        }
+        .tools {
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+<div class="tools">
+    <button type="button" onclick="randomSrc()">Set a random src on image</button>
+</div>
+<main></main>
+<template id="inner">
+    <div class="container">
+        <div id="player">
+            <div class="html5-video-player">
+                <video width="800px" height="600px"></video>
+            </div>
+        </div>
+    </div>
+</template>
+<script src="youtube-inject-bundle.js"></script>
+<script>
+
+    let href = "https://example.com/watch?v=123";
+    function randomSrc() {
+        const url = new URL("/watch", "https://example.com");
+        const random = Math.floor(Math.random() * 100);
+        url.searchParams.set('v', String(random));
+        href = url.href;
+        document.querySelector('main video').src = random;
+    }
+
+    const mockEnv = {
+        getHref() {
+            return href;
+        },
+        getLargeThumbnailSrc(videoId) {
+            return "https://images.unsplash.com/photo-1600357077527-930ccbaf7773?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2368&q=80"
+        },
+        setHref(href) {
+            console.log("would set href here...", href);
+        }
+    }
+
+    const mockComms = {
+        setInteracted(values) {
+            console.log("mockComms.setInteracted() called with", values);
+            return Promise.resolve(null);
+        }
+    }
+
+    enable({
+        overlayInteracted: false,
+        privatePlayerEnabled: null,
+    }, mockEnv, mockComms);
+
+    setTimeout(() => {
+        document.querySelector('main').innerHTML = document.querySelector('template[id="inner"]').innerHTML;
+    }, 500);
+</script>
+</body>
+</html>
