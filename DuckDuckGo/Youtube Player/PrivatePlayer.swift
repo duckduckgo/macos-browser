@@ -23,13 +23,39 @@ extension NSImage {
     static let privatePlayer: NSImage = #imageLiteral(resourceName: "PrivatePlayer")
 }
 
+enum PrivatePlayerMode: Equatable {
+    case enabled, alwaysAsk, disabled
+
+    init(_ privatePlayerMode: Bool?) {
+        switch privatePlayerMode {
+        case true:
+            self = .enabled
+        case false:
+            self = .disabled
+        default:
+            self = .alwaysAsk
+        }
+    }
+
+    var boolValue: Bool? {
+        switch self {
+        case .enabled:
+            return true
+        case .alwaysAsk:
+            return nil
+        case .disabled:
+            return false
+        }
+    }
+}
+
 enum PrivatePlayer {
     static let privatePlayerHost = "www.youtube-nocookie.com"
     static let privatePlayerScheme = "privateplayer"
     static let commonName = UserText.privatePlayer
 
     static var isDisabled: Bool {
-        PrivacySecurityPreferences.shared.privateYoutubePlayerEnabled == false
+        PrivacySecurityPreferences.shared.privatePlayerMode == .disabled
     }
 
     static func image(for faviconView: FaviconView) -> NSImage? {
@@ -44,7 +70,7 @@ enum PrivatePlayer {
             return nil
         }
 
-        let shouldAlwaysOpenPrivatePlayer = url.isYoutubeVideo && PrivacySecurityPreferences.shared.privateYoutubePlayerEnabled == true
+        let shouldAlwaysOpenPrivatePlayer = url.isYoutubeVideo && PrivacySecurityPreferences.shared.privatePlayerMode == .enabled
 
         if url.isPrivatePlayerScheme || url.isPrivatePlayer || shouldAlwaysOpenPrivatePlayer {
             return .privatePlayer(videoID: videoID, timestamp: timestamp)
@@ -77,7 +103,7 @@ enum PrivatePlayer {
             return nil
         }
 
-        let alwaysOpenInPrivatePlayer = PrivacySecurityPreferences.shared.privateYoutubePlayerEnabled == true
+        let alwaysOpenInPrivatePlayer = PrivacySecurityPreferences.shared.privatePlayerMode == .enabled
         let didSelectRecommendationFromPrivatePlayer = tab.content.isPrivatePlayer && navigationAction.request.url?.isYoutubeVideoRecommendation == true
 
         guard alwaysOpenInPrivatePlayer || didSelectRecommendationFromPrivatePlayer, let videoID = navigationAction.request.url?.youtubeVideoID else {

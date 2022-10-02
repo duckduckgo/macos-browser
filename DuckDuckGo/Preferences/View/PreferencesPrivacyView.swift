@@ -23,7 +23,7 @@ extension Preferences {
     struct PrivacyView: View {
         @ObservedObject var model: PrivacyPreferencesModel
 
-        var privatePlayerModeBinding: Binding<PrivacyPreferencesModel.PrivatePlayerMode> {
+        var privatePlayerModeBinding: Binding<PrivatePlayerMode> {
             .init {
                 model.privatePlayerMode
             } set: { newValue in

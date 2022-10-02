@@ -21,32 +21,6 @@ import Combine
 
 final class PrivacyPreferencesModel: ObservableObject {
 
-    enum PrivatePlayerMode {
-        case enabled, alwaysAsk, disabled
-
-        init(_ privateYoutubePlayerEnabled: Bool?) {
-            switch privateYoutubePlayerEnabled {
-            case true:
-                self = .enabled
-            case false:
-                self = .disabled
-            default:
-                self = .alwaysAsk
-            }
-        }
-
-        var boolValue: Bool? {
-            switch self {
-            case .enabled:
-                return true
-            case .alwaysAsk:
-                return nil
-            case .disabled:
-                return false
-            }
-        }
-    }
-
     @Published
     var isLoginDetectionEnabled: Bool {
         didSet {
@@ -57,7 +31,7 @@ final class PrivacyPreferencesModel: ObservableObject {
     @Published
     var privatePlayerMode: PrivatePlayerMode {
         didSet {
-            privacySecurityPreferences.privateYoutubePlayerEnabled = privatePlayerMode.boolValue
+            privacySecurityPreferences.privatePlayerMode = privatePlayerMode
         }
     }
 
@@ -94,12 +68,11 @@ final class PrivacyPreferencesModel: ObservableObject {
     init(privacySecurityPreferences: PrivacySecurityPreferences = .shared) {
         self.privacySecurityPreferences = privacySecurityPreferences
         isLoginDetectionEnabled = privacySecurityPreferences.loginDetectionEnabled
-        privatePlayerMode = .init(privacySecurityPreferences.privateYoutubePlayerEnabled)
+        privatePlayerMode = privacySecurityPreferences.privatePlayerMode
         isGPCEnabled = privacySecurityPreferences.gpcEnabled
         isAutoconsentEnabled = privacySecurityPreferences.autoconsentEnabled ?? false
 
-        privacySecurityPreferences.$privateYoutubePlayerEnabled
-            .map(PrivatePlayerMode.init)
+        privacySecurityPreferences.$privatePlayerMode
             .removeDuplicates()
             .assign(to: \.privatePlayerMode, onWeaklyHeld: self)
             .store(in: &cancellables)

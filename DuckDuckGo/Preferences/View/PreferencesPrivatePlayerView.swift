@@ -23,7 +23,7 @@ extension Preferences {
     struct PrivatePlayerView: View {
         @ObservedObject var model: PrivatePlayerPreferencesModel
 
-        var privatePlayerModeBinding: Binding<PrivatePlayerPreferencesModel.PrivatePlayerMode> {
+        var privatePlayerModeBinding: Binding<PrivatePlayerMode> {
             .init {
                 model.privatePlayerMode
             } set: { newValue in
@@ -41,15 +41,15 @@ extension Preferences {
                     Picker(selection: privatePlayerModeBinding, content: {
                         Text(UserText.privatePlayerAlwaysOpenInPlayer)
                             .padding(.bottom, 4)
-                            .tag(PrivatePlayerPreferencesModel.PrivatePlayerMode.enabled)
+                            .tag(PrivatePlayerMode.enabled)
 
                         Text(UserText.privatePlayerShowPlayerButtons)
                             .padding(.bottom, 4)
-                            .tag(PrivatePlayerPreferencesModel.PrivatePlayerMode.alwaysAsk)
+                            .tag(PrivatePlayerMode.alwaysAsk)
 
                         Text(UserText.privatePlayerOff)
                             .padding(.bottom, 4)
-                            .tag(PrivatePlayerPreferencesModel.PrivatePlayerMode.disabled)
+                            .tag(PrivatePlayerMode.disabled)
 
                     }, label: {})
                     .pickerStyle(.radioGroup)
