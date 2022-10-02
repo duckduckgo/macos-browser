@@ -8,9 +8,9 @@ import {Util} from "./src/util.js";
 console.log("script load", window.location.href);
 
 /**
- * @typedef UserValues
- * @property {boolean} [privatePlayerEnabled]
- * @property {boolean} overlayInteracted
+ * @typedef UserValues - A way to communicate some user state
+ * @property {boolean|null|undefined} [privatePlayerEnabled] - optional, and one of 3 values: true/false/(null/undefined)
+ * @property {boolean} overlayInteracted - always a boolean
  */
 window.enable = function enable(args) {
     console.log("👴 reading user prefs", args);

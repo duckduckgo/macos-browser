@@ -1,5 +1,6 @@
 import eyeball from "../assets/eyeball.svg";
 import {Util} from "./util.js";
+import {Comms} from "./comms";
 
 export const VideoPlayerOverlay = {
 
@@ -12,7 +13,7 @@ export const VideoPlayerOverlay = {
     overlay: (videoId) => {
         let videoURL = Util.getPrivatePlayerURL(videoId);
         let overlayElement = document.createElement('div');
-        overlayElement.setAttribute('class', VideoPlayerOverlay.CLASS_OVERLAY);
+        overlayElement.classList.add(VideoPlayerOverlay.CLASS_OVERLAY);
         overlayElement.innerHTML = `
             <div class="ddg-vpo-bg"></div>
             <div class="ddg-vpo-content">
@@ -28,6 +29,9 @@ export const VideoPlayerOverlay = {
                 <div class="ddg-vpo-buttons">
                     <button class="ddg-vpo-cancel" type="button">No Thanks</button>
                     <a class="ddg-vpo-open" href="${videoURL}">Try it now</a>
+                </div>
+                <div>
+                    <label><input type="checkbox" name="ddg-remember"> Remember</label>
                 </div>
             </div>
             `;
@@ -45,12 +49,31 @@ export const VideoPlayerOverlay = {
     /**
      * Sets up buttons being clickable, right now just the cancel button
      */
-    setupButtonsInsideOverlay: () => {
-        const cancel = document.querySelector('.ddg-vpo-cancel');
+    setupButtonsInsideOverlay: (ddgElement) => {
+        const cancel = ddgElement.querySelector('.ddg-vpo-cancel');
         if (!cancel) return console.warn("Could not access .ddg-vpo-cancel");
         const handler = (e) => {
             if (e.isTrusted) {
-                VideoPlayerOverlay.userOptOut();
+                const remember = ddgElement.querySelector('input[name="ddg-remember"]');
+                if (!remember) throw new Error('cannot find our input');
+                /**
+                 * If the checkbox was checked, this cancellation should also **disable** the player
+                 * (by sending 'false' for `privatePlayerEnabled`)
+                 *
+                 * But, if the checkbox was not checked, then we don't set the player to
+                 * enabled or disabled, but rather it remains 'undecided'. A non-boolean
+                 * value such as 'null' or 'undefined' is used to represent this in JS. In
+                 * the swift side, it's an `Optional<Bool>`
+                 *
+                 * @type {import("../youtube-inject.js").UserValues['privatePlayerEnabled']}
+                 */
+                let privatePlayerEnabled = null;
+                if (remember.checked) {
+                    privatePlayerEnabled = false
+                } else {
+                    // do nothing. The checkbox was off meaning we don't want to save any choice
+                }
+                VideoPlayerOverlay.userOptOut(privatePlayerEnabled);
             }
         };
         cancel.addEventListener("click", handler);
@@ -77,8 +100,8 @@ export const VideoPlayerOverlay = {
 
         if (player && playerVideo && containerElement) {
             VideoPlayerOverlay.callPauseUntilPaused(playerVideo);
-            VideoPlayerOverlay.appendOverlay(containerElement, videoId);
-            VideoPlayerOverlay.setupButtonsInsideOverlay();
+            const ddgElement = VideoPlayerOverlay.appendOverlayToPage(containerElement, videoId);
+            VideoPlayerOverlay.setupButtonsInsideOverlay(ddgElement);
         }
     },
 
@@ -112,11 +135,15 @@ export const VideoPlayerOverlay = {
     /**
      * @param {Element} targetElement
      * @param {string} videoId
+     * @return {HTMLElement}
      */
-    appendOverlay(targetElement, videoId) {
+    appendOverlayToPage(targetElement, videoId) {
         const overlayElement = VideoPlayerOverlay.overlay(videoId);
         targetElement.appendChild(overlayElement)
 
+        /**
+         * Remove the element
+         */
         VideoPlayerOverlay.cleanups.push({
             name: 'remove .ddg-video-player-overlay',
             fn: () => {
@@ -128,6 +155,8 @@ export const VideoPlayerOverlay = {
                 }
             },
         })
+
+        return overlayElement;
     },
 
     /**
@@ -171,10 +200,11 @@ export const VideoPlayerOverlay = {
 
     /**
      * Hide the video player overview
+     * @param {boolean|null|undefined} [privatePlayerEnabled]
      */
-    userOptOut: () => {
+    userOptOut: (privatePlayerEnabled) => {
         VideoPlayerOverlay.cleanup();
-        Util.setInteracted()
+        Comms.setInteracted(privatePlayerEnabled)
             .then(() => console.log("interacted flag set"))
             .catch(e => console.error("could not set interacted after user opt out", e))
     },

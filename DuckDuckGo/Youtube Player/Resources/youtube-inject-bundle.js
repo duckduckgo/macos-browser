@@ -96,9 +96,18 @@
       return () => {
         canceled = true;
       };
-    },
-    setInteracted() {
-      let resp = window.webkit?.messageHandlers?.setInteracted?.postMessage({});
+    }
+  };
+
+  // DuckDuckGo/Youtube Player/Resources/src/comms.js
+  var Comms = {
+    setInteracted(privatePlayerEnabled) {
+      const payload = {
+        privatePlayerEnabled,
+        overlayInteracted: true
+      };
+      console.log("\u{1F4E4} [outgoing]", payload);
+      let resp = window.webkit?.messageHandlers?.setInteracted?.postMessage(payload);
       if (resp instanceof Promise) {
         return resp.catch((e) => console.error("could not call setInteracted", e));
       }
@@ -112,7 +121,7 @@
     overlay: (videoId) => {
       let videoURL = Util.getPrivatePlayerURL(videoId);
       let overlayElement = document.createElement("div");
-      overlayElement.setAttribute("class", VideoPlayerOverlay.CLASS_OVERLAY);
+      overlayElement.classList.add(VideoPlayerOverlay.CLASS_OVERLAY);
       overlayElement.innerHTML = `
             <div class="ddg-vpo-bg"></div>
             <div class="ddg-vpo-content">
@@ -129,6 +138,9 @@
                     <button class="ddg-vpo-cancel" type="button">No Thanks</button>
                     <a class="ddg-vpo-open" href="${videoURL}">Try it now</a>
                 </div>
+                <div>
+                    <label><input type="checkbox" name="ddg-remember"> Remember</label>
+                </div>
             </div>
             `;
       VideoPlayerOverlay.appendThumbnail(overlayElement, videoId);
@@ -142,13 +154,21 @@
         fn: cleanup
       });
     },
-    setupButtonsInsideOverlay: () => {
-      const cancel = document.querySelector(".ddg-vpo-cancel");
+    setupButtonsInsideOverlay: (ddgElement) => {
+      const cancel = ddgElement.querySelector(".ddg-vpo-cancel");
       if (!cancel)
         return console.warn("Could not access .ddg-vpo-cancel");
       const handler = (e) => {
         if (e.isTrusted) {
-          VideoPlayerOverlay.userOptOut();
+          const remember = ddgElement.querySelector('input[name="ddg-remember"]');
+          if (!remember)
+            throw new Error("cannot find our input");
+          let privatePlayerEnabled = null;
+          if (remember.checked) {
+            privatePlayerEnabled = false;
+          } else {
+          }
+          VideoPlayerOverlay.userOptOut(privatePlayerEnabled);
         }
       };
       cancel.addEventListener("click", handler);
@@ -165,8 +185,8 @@
       let player = document.querySelector("#player"), playerVideo = document.querySelector("#player video"), containerElement = document.querySelector("#player .html5-video-player");
       if (player && playerVideo && containerElement) {
         VideoPlayerOverlay.callPauseUntilPaused(playerVideo);
-        VideoPlayerOverlay.appendOverlay(containerElement, videoId);
-        VideoPlayerOverlay.setupButtonsInsideOverlay();
+        const ddgElement = VideoPlayerOverlay.appendOverlayToPage(containerElement, videoId);
+        VideoPlayerOverlay.setupButtonsInsideOverlay(ddgElement);
       }
     },
     watchForVideoBeingAdded: (userValues) => {
@@ -187,7 +207,7 @@
       }
     },
     lastVideoId: null,
-    appendOverlay(targetElement, videoId) {
+    appendOverlayToPage(targetElement, videoId) {
       const overlayElement = VideoPlayerOverlay.overlay(videoId);
       targetElement.appendChild(overlayElement);
       VideoPlayerOverlay.cleanups.push({
@@ -201,6 +221,7 @@
           }
         }
       });
+      return overlayElement;
     },
     callPauseUntilPaused: (videoElement) => {
       console.count("\u23F8 callPauseUntilPaused...");
@@ -229,9 +250,9 @@
         }
       });
     },
-    userOptOut: () => {
+    userOptOut: (privatePlayerEnabled) => {
       VideoPlayerOverlay.cleanup();
-      Util.setInteracted().then(() => console.log("interacted flag set")).catch((e) => console.error("could not set interacted after user opt out", e));
+      Comms.setInteracted(privatePlayerEnabled).then(() => console.log("interacted flag set")).catch((e) => console.error("could not set interacted after user opt out", e));
     },
     cleanups: [],
     cleanup() {

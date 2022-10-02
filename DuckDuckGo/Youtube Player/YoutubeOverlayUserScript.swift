@@ -19,6 +19,7 @@
 import Foundation
 import BrowserServicesKit
 import WebKit
+import os
 
 final class YoutubeOverlayUserScript: NSObject, StaticUserScript {
 
@@ -66,13 +67,12 @@ final class YoutubeOverlayUserScript: NSObject, StaticUserScript {
     }
 
     private func handleSetInteracted(message: WKScriptMessage) {
-//        guard let interacted = message.body as? Bool else {
-//            assertionFailure("YoutubeOverlayUserScript: expected Bool")
-//            return
-//        }
-        let interacted = true;
-        print("Interacted: \(interacted)")
-        PrivacySecurityPreferences.shared.youtubeOverlayInteracted = interacted
+        guard let userValues: UserValues = decode(from: message.body) else {
+            assertionFailure("YoutubeOverlayUserScript: expected JSON representation of UserValues")
+            return
+        }
+        PrivacySecurityPreferences.shared.youtubeOverlayInteracted = userValues.overlayInteracted;
+        PrivacySecurityPreferences.shared.privateYoutubePlayerEnabled = userValues.privatePlayerEnabled;
     }
 
     private func handleAlwaysOpenSettings(message: WKScriptMessage) {
@@ -95,5 +95,15 @@ final class YoutubeOverlayUserScript: NSObject, StaticUserScript {
         } else {
             webView.evaluateJavaScript(js)
         }
+    }
+}
+
+func decode<Input: Any, Target: Decodable>(from input: Input) -> Target? {
+    do {
+        let json = try JSONSerialization.data(withJSONObject: input)
+        return try JSONDecoder().decode(Target.self, from: json)
+    } catch {
+        os_log(.error, "Error decoding message body: %{public}@", error.localizedDescription)
+        return nil
     }
 }

@@ -145,15 +145,4 @@ export const Util = {
             canceled = true;
         }
     },
-    /**
-     *
-     */
-    setInteracted() {
-        // @ts-ignore
-        let resp = window.webkit?.messageHandlers?.setInteracted?.postMessage({});
-        if (resp instanceof Promise) {
-            return resp.catch(e => console.error("could not call setInteracted", e));
-        }
-        return Promise.reject(resp)
-    }
 }
