@@ -34,10 +34,10 @@ final class Database {
             return makeDatabase(keyStore: keyStoreMock)
         }
 #endif
-        return makeDatabase()
+        return makeDatabase(keyStore: EncryptionKeyStore(generator: EncryptionKeyGenerator()))
     }()
 
-    static func makeDatabase(keyStore: EncryptionKeyStoring = EncryptionKeyStore(generator: EncryptionKeyGenerator())) -> CoreDataDatabase {
+    static func makeDatabase(keyStore: EncryptionKeyStoring) -> CoreDataDatabase {
         do {
             try EncryptedValueTransformer<NSImage>.registerTransformer(keyStore: keyStore)
             try EncryptedValueTransformer<NSString>.registerTransformer(keyStore: keyStore)
@@ -48,11 +48,23 @@ final class Database {
         } catch {
             fatalError("Failed to register encryption value transformers")
         }
+        
+        let errorHandler = EventMapping<CoreDataDatabase.Error>(mapping: { event, error, _, _ in
+            switch event {
+            case .dbInitializationError:
+                if let error = error {
+                    Pixel.fire(.debug(event: .dbInitializationError, error: error))
+                    // Give Pixel a chance to be sent, but not too long
+                    Thread.sleep(forTimeInterval: 1)
+                    fatalError("Could not load DB: \(error.localizedDescription)")
+                }
+            }
+        })
 
         return CoreDataDatabase(name: Constants.databaseName,
                                 url: URL.sandboxApplicationSupportURL,
                                 model: NSManagedObjectModel.mergedModel(from: [.main])!,
-                                errorEvents: nil,
+                                errorHandler: errorHandler,
                                 log: .disabled)
     }
 }
