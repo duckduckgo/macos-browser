@@ -230,7 +230,6 @@ window.enable = function enable(userValues, environment = defaultEnvironment, co
                 CSS.init();
                 IconOverlay.appendHoverOverlay();
                 VideoThumbnail.bindEventsToAll();
-                // VideoPlayerIcon.init(args);
             });
 
             Site.onDOMChanged(() => {
@@ -239,7 +238,6 @@ window.enable = function enable(userValues, environment = defaultEnvironment, co
                     Preview.init();
                 }
 
-                // VideoPlayerIcon.init(args);
                 videoPlayerOverlay.watchForVideoBeingAdded(userValues);
             });
         }
