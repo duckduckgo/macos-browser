@@ -285,10 +285,8 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
         lastUpgradedURL = nil
 
-        if let newContent = PrivatePlayer.overrideTabContentForChildTabIfNeeded(for: self) {
-            if self.content != newContent {
-                self.content = newContent
-            }
+        if let newContent = PrivatePlayer.updateContent(content, for: self) {
+            self.content = newContent
             return
         }
 
@@ -296,12 +294,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         case (.preferences(pane: .some), .preferences(pane: nil)):
             // prevent clearing currently selected pane (for state persistence purposes)
             break
-        case (.privatePlayer(let oldVideoID, _), .privatePlayer(let videoID, _)) where oldVideoID == videoID:
-            if case .privatePlayer(let parentVideoID, _) = parentTab?.content, parentVideoID == videoID {
-                self.content = .url(.youtube(videoID))
-            } else if let url = webView.url, url.isYoutubeVideo == true {
-                self.content = .url(url)
-            }
         default:
             if self.content != content {
                 self.content = content
@@ -570,7 +562,9 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
             if content.isPrivatePlayer {
                 let url = contentURL
-                webView.goBack()
+                if webView.canGoBack {
+                    _ = webView.goBack()
+                }
                 webView.load(url)
             } else if !didRestore {
                 if url.isFileURL {
@@ -801,7 +795,9 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     private var youtubePlayerCancellables: Set<AnyCancellable> = []
 
     func setUpYoutubeScriptsIfNeeded() {
-        if webView.url?.host?.droppingWwwPrefix() == "youtube.com" && PrivacySecurityPreferences.shared.privateYoutubePlayerEnabled != false {
+        youtubePlayerCancellables.removeAll()
+
+        if webView.url?.host?.droppingWwwPrefix() == "youtube.com" && !PrivatePlayer.isDisabled {
             youtubeOverlayScript?.setEnabled(true, in: webView)
         } else {
             youtubeOverlayScript?.setEnabled(false, in: webView)
@@ -809,18 +805,17 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
         if url?.isPrivatePlayerScheme == true {
             youtubePlayerScript?.isEnabled = true
-            PrivacySecurityPreferences.shared.$privateYoutubePlayerEnabled
-                .sink { [weak self] value in
+            PrivacySecurityPreferences.shared.$privatePlayerMode
+                .map { $0 == .enabled }
+                .sink { [weak self] shouldAlwaysOpenPrivatePlayer in
                     guard let self = self else {
                         return
                     }
-                    let isEnabled = value == true
-                    self.youtubePlayerScript?.setAlwaysOpenInPrivatePlayer(isEnabled, inWebView: self.webView)
+                    self.youtubePlayerScript?.setAlwaysOpenInPrivatePlayer(shouldAlwaysOpenPrivatePlayer, inWebView: self.webView)
                 }
                 .store(in: &youtubePlayerCancellables)
         } else {
             youtubePlayerScript?.isEnabled = false
-            youtubePlayerCancellables.removeAll()
         }
     }
     
@@ -881,6 +876,7 @@ extension Tab: UserContentControllerDelegate {
         userScripts.autoconsentUserScript?.delegate = self
         youtubeOverlayScript = userScripts.youtubeOverlayScript
         youtubePlayerScript = userScripts.youtubePlayerUserScript
+        setUpYoutubeScriptsIfNeeded()
 
         findInPageScript = userScripts.findInPageScript
         attachFindInPage()

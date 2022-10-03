@@ -21,45 +21,18 @@ import Combine
 
 final class PrivatePlayerPreferencesModel: ObservableObject {
 
-    enum PrivatePlayerMode {
-        case enabled, alwaysAsk, disabled
-
-        init(_ privateYoutubePlayerEnabled: Bool?) {
-            switch privateYoutubePlayerEnabled {
-            case true:
-                self = .enabled
-            case false:
-                self = .disabled
-            default:
-                self = .alwaysAsk
-            }
-        }
-
-        var boolValue: Bool? {
-            switch self {
-            case .enabled:
-                return true
-            case .alwaysAsk:
-                return nil
-            case .disabled:
-                return false
-            }
-        }
-    }
-
     @Published
     var privatePlayerMode: PrivatePlayerMode {
         didSet {
-            privacySecurityPreferences.privateYoutubePlayerEnabled = privatePlayerMode.boolValue
+            privacySecurityPreferences.privatePlayerMode = privatePlayerMode
         }
     }
 
     init(privacySecurityPreferences: PrivacySecurityPreferences = .shared) {
         self.privacySecurityPreferences = privacySecurityPreferences
-        privatePlayerMode = .init(privacySecurityPreferences.privateYoutubePlayerEnabled)
+        privatePlayerMode = privacySecurityPreferences.privatePlayerMode
 
-        privacySecurityPreferences.$privateYoutubePlayerEnabled
-            .map(PrivatePlayerMode.init)
+        privacySecurityPreferences.$privatePlayerMode
             .removeDuplicates()
             .assign(to: \.privatePlayerMode, onWeaklyHeld: self)
             .store(in: &cancellables)

@@ -67,7 +67,7 @@ final class YoutubePlayerUserScript: NSObject, StaticUserScript {
         }
         
         print("Always open \(alwaysOpenOnPrivatePlayer)")
-        PrivacySecurityPreferences.shared.privateYoutubePlayerEnabled = alwaysOpenOnPrivatePlayer
+        PrivacySecurityPreferences.shared.privatePlayerMode = .init(alwaysOpenOnPrivatePlayer)
     }
     
     func evaluateJSCall(call: String, webView: WKWebView) {

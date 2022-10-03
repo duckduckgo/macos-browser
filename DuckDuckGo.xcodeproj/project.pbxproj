@@ -57,7 +57,8 @@
 		37534CA8281198CD002621E7 /* AdjacentItemEnumerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37534CA62811988E002621E7 /* AdjacentItemEnumerator.swift */; };
 		376705AF27EB488600DD8D76 /* RoundedSelectionRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0511B3262CAA5A00F6079C /* RoundedSelectionRowView.swift */; };
 		376705B327EC7D4F00DD8D76 /* TextButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376705B227EC7D4F00DD8D76 /* TextButton.swift */; };
-		3767190028E58513003A2A15 /* PrivatePlayerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376718FF28E58513003A2A15 /* PrivatePlayerTests.swift */; };
+		3767190028E58513003A2A15 /* PrivatePlayerURLExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376718FF28E58513003A2A15 /* PrivatePlayerURLExtensionTests.swift */; };
+		3767190328E724D8003A2A15 /* PrivatePlayerURLExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3767190128E724B2003A2A15 /* PrivatePlayerURLExtension.swift */; };
 		376C4DB928A1A48A00CC0F5B /* FirePopoverViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376C4DB828A1A48A00CC0F5B /* FirePopoverViewModelTests.swift */; };
 		3776582D27F71652009A6B35 /* WebsiteBreakageReportTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3776582C27F71652009A6B35 /* WebsiteBreakageReportTests.swift */; };
 		3776582F27F82E62009A6B35 /* AutofillPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3776582E27F82E62009A6B35 /* AutofillPreferences.swift */; };
@@ -885,7 +886,8 @@
 		37534CA42811987D002621E7 /* AdjacentItemEnumeratorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdjacentItemEnumeratorTests.swift; sourceTree = "<group>"; };
 		37534CA62811988E002621E7 /* AdjacentItemEnumerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdjacentItemEnumerator.swift; sourceTree = "<group>"; };
 		376705B227EC7D4F00DD8D76 /* TextButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextButton.swift; sourceTree = "<group>"; };
-		376718FF28E58513003A2A15 /* PrivatePlayerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivatePlayerTests.swift; sourceTree = "<group>"; };
+		376718FF28E58513003A2A15 /* PrivatePlayerURLExtensionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivatePlayerURLExtensionTests.swift; sourceTree = "<group>"; };
+		3767190128E724B2003A2A15 /* PrivatePlayerURLExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivatePlayerURLExtension.swift; sourceTree = "<group>"; };
 		376C4DB828A1A48A00CC0F5B /* FirePopoverViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirePopoverViewModelTests.swift; sourceTree = "<group>"; };
 		3776582C27F71652009A6B35 /* WebsiteBreakageReportTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebsiteBreakageReportTests.swift; sourceTree = "<group>"; };
 		3776582E27F82E62009A6B35 /* AutofillPreferences.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AutofillPreferences.swift; sourceTree = "<group>"; };
@@ -1757,6 +1759,7 @@
 				31F28C5B28C8EEE100119F70 /* UI */,
 				31F28C5428C8EED100119F70 /* Resources */,
 				37F19A6928E2F2D000740DC6 /* PrivatePlayer.swift */,
+				3767190128E724B2003A2A15 /* PrivatePlayerURLExtension.swift */,
 				31F28C5228C8EECA00119F70 /* PrivatePlayerSchemeHandler.swift */,
 				315AA06F28CA5CC800200030 /* YoutubePlayerNavigationHandler.swift */,
 				31F28C4E28C8EEC500119F70 /* YoutubeOverlayUserScript.swift */,
@@ -1834,7 +1837,7 @@
 		376718FE28E58504003A2A15 /* Youtube Player */ = {
 			isa = PBXGroup;
 			children = (
-				376718FF28E58513003A2A15 /* PrivatePlayerTests.swift */,
+				376718FF28E58513003A2A15 /* PrivatePlayerURLExtensionTests.swift */,
 			);
 			path = "Youtube Player";
 			sourceTree = "<group>";
@@ -4567,6 +4570,7 @@
 				B693955326F04BEC0015B914 /* WindowDraggingView.swift in Sources */,
 				4B1E6EED27AB5E5100F51793 /* SecureVaultSorting.swift in Sources */,
 				37CD54CE27F2FDD100F1F7B9 /* PreferencesSidebarModel.swift in Sources */,
+				3767190328E724D8003A2A15 /* PrivatePlayerURLExtension.swift in Sources */,
 				B61EF3F1266F922200B4D78F /* WKProcessPool+DownloadDelegate.swift in Sources */,
 				B6106BAD26A7BF390013B453 /* PermissionState.swift in Sources */,
 				85707F2E276A394C00DC0649 /* ViewExtensions.swift in Sources */,
@@ -5219,7 +5223,7 @@
 				B610F2EB27AA8E4500FCEBE9 /* ContentBlockingUpdatingTests.swift in Sources */,
 				4B0511E7262CAB3700F6079C /* UserDefaultsWrapperUtilities.swift in Sources */,
 				4BA1A6F6258C4F9600F6F690 /* EncryptionMocks.swift in Sources */,
-				3767190028E58513003A2A15 /* PrivatePlayerTests.swift in Sources */,
+				3767190028E58513003A2A15 /* PrivatePlayerURLExtensionTests.swift in Sources */,
 				B6B3E0962654DACD0040E0A2 /* UTTypeTests.swift in Sources */,
 				4B2975992828285900187C4E /* FirefoxKeyReaderTests.swift in Sources */,
 				4B02199D25E063DE00ED7DEA /* FireproofingURLExtensionsTests.swift in Sources */,

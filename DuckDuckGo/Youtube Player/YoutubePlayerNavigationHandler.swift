@@ -19,7 +19,6 @@
 import Foundation
 
 struct YoutubePlayerNavigationHandler {
-    static let privatePlayerHost = "www.youtube-nocookie.com"
 
     static var htmlTemplatePath: String {
         guard let file = Bundle.main.path(forResource: Self.htmlTemplateFileName, ofType: "html") else {

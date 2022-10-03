@@ -35,8 +35,8 @@ extension WKWebViewConfiguration {
         }
         preferences.isFraudulentWebsiteWarningEnabled = false
         
-        if urlSchemeHandler(forURLScheme: PrivatePlayerSchemeHandler.scheme) == nil {
-            setURLSchemeHandler(PrivatePlayerSchemeHandler(), forURLScheme: PrivatePlayerSchemeHandler.scheme)
+        if urlSchemeHandler(forURLScheme: PrivatePlayer.privatePlayerScheme) == nil {
+            setURLSchemeHandler(PrivatePlayerSchemeHandler(), forURLScheme: PrivatePlayer.privatePlayerScheme)
         }
 
         self.userContentController = UserContentController()
