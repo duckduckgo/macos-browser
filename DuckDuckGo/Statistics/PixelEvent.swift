@@ -97,9 +97,6 @@ extension Pixel {
                                      result: result)
         }
 
-        case fireproof(kind: FireproofKind, repetition: Repetition = .init(key: "fireproof"), suggested: FireproofingSuggested)
-        case fireproofSuggested(repetition: Repetition = .init(key: "fireproof-suggested"))
-
         case manageBookmarks(repetition: Repetition = .init(key: "manage-bookmarks"), source: AccessPoint)
         case bookmarksList(repetition: Repetition = .init(key: "bookmarks-list"), source: AccessPoint)
         case manageLogins(repetition: Repetition = .init(key: "manage-logins"), source: AccessPoint)
@@ -249,12 +246,6 @@ extension Pixel.Event {
 
         case .compileRulesWait(onboardingShown: let onboardingShown, waitTime: let waitTime, result: let result):
             return "m_mac_cbr-wait_\(onboardingShown)_\(waitTime)_\(result)"
-
-        case .fireproof(kind: let kind, repetition: let repetition, suggested: let suggested):
-            return "m_mac_fireproof_\(kind)_\(repetition)_\(suggested)"
-
-        case .fireproofSuggested(repetition: let repetition):
-            return "m_mac_fireproof-suggested_\(repetition)"
 
         case .manageBookmarks(repetition: let repetition, source: let source):
             return "m_mac_manage-bookmarks_\(repetition)_\(source)"

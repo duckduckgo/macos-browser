@@ -734,7 +734,6 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
             return
         }
 
-        Pixel.fire(.fireproof(kind: .init(url: url), suggested: .manual))
         FireproofDomains.shared.add(domain: host)
     }
 

@@ -618,10 +618,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
               let host = url.host
         else { return }
 
-        let added = FireproofDomains.shared.toggle(domain: host)
-        if added {
-            Pixel.fire(.fireproof(kind: .init(url: url), suggested: .manual))
-        }
+        _ = FireproofDomains.shared.toggle(domain: host)
     }
 
     private var superviewObserver: NSKeyValueObservation?
