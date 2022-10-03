@@ -29,9 +29,7 @@ struct YoutubePlayerNavigationHandler {
     }
 
     func makePrivatePlayerRequest(from originalRequest: URLRequest) -> URLRequest {
-        guard let query = originalRequest.url?.absoluteString.split(separator: ":").last,
-              let (youtubeVideoID, timestamp) = originalRequest.url?.youtubeVideoParams
-        else {
+        guard let (youtubeVideoID, timestamp) = originalRequest.url?.youtubeVideoParams else {
             assertionFailure("Request should have ID")
             return originalRequest
         }

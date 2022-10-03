@@ -26,11 +26,15 @@ final class PrivatePlayerSchemeHandler: NSObject, WKURLSchemeHandler {
         let youtubeHandler = YoutubePlayerNavigationHandler()
         let html = youtubeHandler.makeHTMLFromTemplate()
 
+        guard let requestURL = webView.url ?? urlSchemeTask.request.url else {
+            assertionFailure("No URL for Private Player scheme handler")
+            return
+        }
+
         if #available(macOS 12.0, *) {
-            let newRequest = youtubeHandler.makePrivatePlayerRequest(from: urlSchemeTask.request)
+            let newRequest = youtubeHandler.makePrivatePlayerRequest(from: URLRequest(url: requestURL))
             webView.loadSimulatedRequest(newRequest, responseHTML: html)
         } else {
-            guard let requestURL = urlSchemeTask.request.url else { return }
             guard let data = html.data(using: .utf8) else { return }
 
             let response = URLResponse(url: requestURL,
