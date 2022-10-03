@@ -119,8 +119,6 @@ extension Pixel {
                                          hasHistoryEntry: characteristics.hasHistoryEntry ? .hasHistoryEntry : .noHistoryEntry)
         }
 
-        case refresh(source: RefreshAccessPoint)
-
         case importedLogins(repetition: Repetition = .init(key: "imported-logins"), source: DataImportSource)
         case exportedLogins(repetition: Repetition = .init(key: "exported-logins"))
         case importedBookmarks(repetition: Repetition = .init(key: "imported-bookmarks"), source: DataImportSource)
@@ -256,9 +254,6 @@ extension Pixel.Event {
 
         case .suggestionsDisplayed(hasBookmark: let hasBookmark, hasFavorite: let hasFavorite, hasHistoryEntry: let hasHistoryEntry):
             return "m_mac_suggestions-displayed_\(hasBookmark)_\(hasFavorite)_\(hasHistoryEntry)"
-
-        case .refresh(source: let source):
-            return "m_mac_refresh_\(source)"
 
         case .importedLogins(repetition: let repetition, source: let source):
             return "m_mac_imported-logins_\(repetition)_\(source)"

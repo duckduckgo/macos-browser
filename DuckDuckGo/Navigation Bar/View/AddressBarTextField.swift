@@ -275,7 +275,6 @@ final class AddressBarTextField: NSTextField {
         }
 
         if selectedTabViewModel.tab.content.url == url {
-            Pixel.fire(.refresh(source: .reloadURL))
             selectedTabViewModel.reload()
         } else {
             Pixel.fire(.navigation(kind: .init(url: url), source: suggestion != nil ? .suggestion : .addressBar))

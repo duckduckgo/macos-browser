@@ -318,40 +318,6 @@ extension Pixel.Event {
         case noHistoryEntry = "no-history-entry"
     }
 
-    enum RefreshAccessPoint: String, CustomStringConvertible {
-        var description: String { rawValue }
-
-        case hotKey = "source-cmd-r"
-        case button = "source-button"
-        case mainMenu = "source-menu"
-        case reloadURL = "source-url"
-
-        init(sender: Any, default: RefreshAccessPoint, mainMenuCheck: (NSMenu?) -> Bool = { $0 is MainMenu }) {
-            switch sender {
-            case let menuItem as NSMenuItem:
-                if mainMenuCheck(menuItem.topMenu) {
-                    if let event = NSApp.currentEvent,
-                       case .keyDown = event.type,
-                       event.characters == menuItem.keyEquivalent {
-
-                        self = .hotKey
-                    } else {
-                        self = .mainMenu
-                    }
-                } else {
-                    self = `default`
-                }
-
-            case is NSButton:
-                self = .button
-
-            default:
-                assertionFailure("RefreshAccessPoint: Unexpected type of sender: \(type(of: sender))")
-                self = `default`
-            }
-        }
-    }
-
     enum DataImportAction: String, CustomStringConvertible {
         var description: String { rawValue }
 

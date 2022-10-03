@@ -257,7 +257,6 @@ extension MainViewController {
             return
         }
 
-        Pixel.fire(.refresh(source: .init(sender: sender, default: .mainMenu)))
         selectedTabViewModel.reload()
     }
 
