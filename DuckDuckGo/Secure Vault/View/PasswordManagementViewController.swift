@@ -913,8 +913,6 @@ extension PasswordManagementViewController: NSTextViewDelegate {
         if let link = link as? URL, let pane = PreferencePaneIdentifier(url: link) {
             WindowControllersManager.shared.showPreferencesTab(withSelectedPane: pane)
             self.dismiss()
-
-            Pixel.fire(.passwordManagerLockScreenPreferencesButtonPressed)
         }
 
         return true

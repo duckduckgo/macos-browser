@@ -52,16 +52,6 @@ enum AutofillAutoLockThreshold: String, CaseIterable {
         case .oneHour: return 60 * 60
         }
     }
-
-    var pixelEvent: Pixel.Event {
-        switch self {
-        case .oneMinute: return .passwordManagerLockScreenTimeoutSelected1Minute
-        case .fiveMinutes: return .passwordManagerLockScreenTimeoutSelected5Minutes
-        case .fifteenMinutes: return .passwordManagerLockScreenTimeoutSelected15Minutes
-        case .thirtyMinutes: return .passwordManagerLockScreenTimeoutSelected30Minutes
-        case .oneHour: return .passwordManagerLockScreenTimeoutSelected1Hour
-        }
-    }
 }
 
 extension NSNotification.Name {

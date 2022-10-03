@@ -104,13 +104,6 @@ extension Pixel.Event {
              .waitlistDismissedLockScreen,
              .autoconsentOptOutFailed,
              .autoconsentSelfTestFailed,
-             .passwordManagerLockScreenDisabled,
-             .passwordManagerLockScreenPreferencesButtonPressed,
-             .passwordManagerLockScreenTimeoutSelected1Minute,
-             .passwordManagerLockScreenTimeoutSelected5Minutes,
-             .passwordManagerLockScreenTimeoutSelected15Minutes,
-             .passwordManagerLockScreenTimeoutSelected30Minutes,
-             .passwordManagerLockScreenTimeoutSelected1Hour,
              .ampBlockingRulesCompilationFailed,
              .adClickAttributionDetected,
              .adClickAttributionActive:

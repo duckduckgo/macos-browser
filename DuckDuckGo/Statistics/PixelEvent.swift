@@ -153,14 +153,6 @@ extension Pixel {
         case autoconsentOptOutFailed
         case autoconsentSelfTestFailed
         
-        case passwordManagerLockScreenPreferencesButtonPressed
-        case passwordManagerLockScreenDisabled
-        case passwordManagerLockScreenTimeoutSelected1Minute
-        case passwordManagerLockScreenTimeoutSelected5Minutes
-        case passwordManagerLockScreenTimeoutSelected15Minutes
-        case passwordManagerLockScreenTimeoutSelected30Minutes
-        case passwordManagerLockScreenTimeoutSelected1Hour
-        
         case ampBlockingRulesCompilationFailed
         
         case adClickAttributionDetected
@@ -357,27 +349,6 @@ extension Pixel.Event {
 
         case .autoconsentSelfTestFailed:
             return "m_mac_autoconsent_selftest_failed"
-            
-        case .passwordManagerLockScreenPreferencesButtonPressed:
-            return "m_mac_password_mananger_lock_screen_preferences_button_pressed"
-            
-        case .passwordManagerLockScreenDisabled:
-            return "m_mac_password_mananger_lock_screen_disabled"
-            
-        case .passwordManagerLockScreenTimeoutSelected1Minute:
-            return "m_mac_password_mananger_lock_screen_timeout_selected_1_minute"
-
-        case .passwordManagerLockScreenTimeoutSelected5Minutes:
-            return "m_mac_password_mananger_lock_screen_timeout_selected_5_minutes"
-            
-        case .passwordManagerLockScreenTimeoutSelected15Minutes:
-            return "m_mac_password_mananger_lock_screen_timeout_selected_15_minutes"
-            
-        case .passwordManagerLockScreenTimeoutSelected30Minutes:
-            return "m_mac_password_mananger_lock_screen_timeout_selected_30_minutes"
-            
-        case .passwordManagerLockScreenTimeoutSelected1Hour:
-            return "m_mac_password_mananger_lock_screen_timeout_selected_1_hour"
             
         case .ampBlockingRulesCompilationFailed:
             return "m_mac_amp_rules_compilation_failed"
