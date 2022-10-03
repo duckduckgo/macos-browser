@@ -68,7 +68,6 @@ extension Pixel.Event {
         case .appLaunch,
              .launchTiming,
              .appUsage,
-             .browserMadeDefault,
              .burn,
              .crash,
              .brokenSiteReport,
