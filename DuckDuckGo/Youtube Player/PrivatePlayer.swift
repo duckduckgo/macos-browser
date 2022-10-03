@@ -132,9 +132,6 @@ extension PrivatePlayer {
 
     static func updateContent(_ content: Tab.TabContent, for tab: Tab) -> Tab.TabContent? {
         let newContent: Tab.TabContent? = {
-            if let content = Self.overrideTabContentForChildTabIfNeeded(for: tab) {
-                return content
-            }
             if case .privatePlayer(let oldVideoID, _) = tab.content,
                case .privatePlayer(let videoID, let timestamp) = content,
                oldVideoID == videoID {
@@ -147,23 +144,6 @@ extension PrivatePlayer {
             return newContent
         }
         return nil
-    }
-
-    private static func overrideTabContentForChildTabIfNeeded(for tab: Tab) -> Tab.TabContent? {
-        if Self.isChildOfPrivatePlayerTabWithYoutubeVideo(tab) {
-            if tab.content == .none, let url = tab.webView.url {
-                return .url(url)
-            }
-            return tab.content
-        }
-        return nil
-    }
-
-    private static func isChildOfPrivatePlayerTabWithYoutubeVideo(_ tab: Tab) -> Bool {
-        if !tab.content.isPrivatePlayer, case .privatePlayer(let parentVideoID, _) = tab.parentTab?.content, let url = tab.webView.url, url.isYoutubeVideo == true, url.youtubeVideoID == parentVideoID {
-            return true
-        }
-        return false
     }
 
     private static func overrideTabContent(forOpeningYoutubeVideo videoID: String, at timestamp: String?, fromPrivatePlayerTab tab: Tab) -> Tab.TabContent? {
