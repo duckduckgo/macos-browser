@@ -724,7 +724,6 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
     private func bookmarkTab(with url: URL, title: String) {
         if !bookmarkManager.isUrlBookmarked(url: url) {
             bookmarkManager.makeBookmark(for: url, title: title, isFavorite: false)
-            Pixel.fire(.bookmark(fireproofed: .init(url: url), source: .tabMenu))
         }
     }
 

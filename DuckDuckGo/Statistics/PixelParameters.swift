@@ -74,8 +74,6 @@ extension Pixel.Event {
              .crash,
              .brokenSiteReport,
              .compileRulesWait,
-             .bookmark,
-             .favorite,
              .navigation,
              .serp,
              .importedLogins,

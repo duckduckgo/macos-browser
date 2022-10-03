@@ -873,8 +873,6 @@ final class AddressBarButtonsViewController: NSViewController {
                                                     isFavorite: setFavorite)
         updateBookmarkButtonImage(isUrlBookmarked: bookmark != nil)
 
-        Pixel.fire(.bookmark(isFavorite: setFavorite, fireproofed: .init(url: url), source: accessPoint))
-
         return bookmark
     }
 

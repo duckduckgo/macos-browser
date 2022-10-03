@@ -97,16 +97,6 @@ extension Pixel {
                                      result: result)
         }
 
-        case bookmark(fireproofed: IsBookmarkFireproofed, repetition: Repetition = .init(key: "bookmark"), source: AccessPoint)
-        case favorite(fireproofed: IsBookmarkFireproofed, repetition: Repetition = .init(key: "favorite"), source: AccessPoint)
-
-        static func bookmark(isFavorite: Bool, fireproofed: IsBookmarkFireproofed, source: AccessPoint) -> Event {
-            if isFavorite {
-                return .favorite(fireproofed: fireproofed, source: source)
-            }
-            return .bookmark(fireproofed: fireproofed, source: source)
-        }
-
         case navigation(kind: NavigationKind, source: NavigationAccessPoint)
 
         case serp
@@ -208,6 +198,7 @@ extension Pixel.Event {
         switch self {
         case .appLaunch(isDefault: let isDefault, launch: let launch):
             return "ml_mac_app-launch_\(isDefault)_\(launch)"
+
         case .launchTiming:
             return "ml_mac_launch-timing"
 
@@ -231,12 +222,6 @@ extension Pixel.Event {
 
         case .compileRulesWait(onboardingShown: let onboardingShown, waitTime: let waitTime, result: let result):
             return "m_mac_cbr-wait_\(onboardingShown)_\(waitTime)_\(result)"
-
-        case .bookmark(fireproofed: let fireproofed, repetition: let repetition, source: let source):
-            return "m_mac_bookmark_\(fireproofed)_\(repetition)_\(source)"
-
-        case .favorite(fireproofed: let fireproofed, repetition: let repetition, source: let source):
-            return "m_mac_favorite_\(fireproofed)_\(repetition)_\(source)"
 
         case .navigation(kind: let kind, source: let source):
             return "m_mac_navigation_\(kind)_\(source)"
