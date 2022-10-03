@@ -430,6 +430,10 @@ final class NavigationBarViewController: NSViewController {
         let forwardButtonMenu = NSMenu()
         forwardButtonMenu.delegate = goForwardButtonMenuDelegate
         goForwardButton.menu = forwardButtonMenu
+        
+        goBackButton.toolTip = UserText.navigateBackTooltip
+        goForwardButton.toolTip = UserText.navigateForwardTooltip
+        refreshButton.toolTip = UserText.refreshPageTooltip
     }
 
     private func subscribeToSelectedTabViewModel() {
