@@ -639,6 +639,10 @@ extension MainViewController {
         tabCollectionViewModel.pinnedTabsManager?.tabCollection.removeAll()
     }
 
+    @IBAction func resetPrivatePlayerOverlayInteractions(_ sender: Any?) {
+        PrivacySecurityPreferences.shared.youtubeOverlayInteracted = false
+    }
+
     @IBAction func showSaveCredentialsPopover(_ sender: Any?) {
         #if DEBUG || REVIEW
         NotificationCenter.default.post(name: .ShowSaveCredentialsPopover, object: nil)

@@ -731,6 +731,12 @@ CQ
                                                             <action selector="resetPinnedTabs:" target="Ady-hI-5gd" id="4iv-wI-8wp"/>
                                                         </connections>
                                                     </menuItem>
+                                                    <menuItem title="Reset Youtube Overlay Interactions" id="tTd-ZO-0Zx">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="resetPrivatePlayerOverlayInteractions:" target="Ady-hI-5gd" id="Tr1-yK-ayF"/>
+                                                        </connections>
+                                                    </menuItem>
                                                 </items>
                                             </menu>
                                         </menuItem>
