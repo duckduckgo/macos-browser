@@ -190,7 +190,7 @@ extension AppDelegate: AppUsageActivityMonitorDelegate {
     }
 
     func activeUsageTimeHasReachedThreshold(avgTabCount: Double) {
-        Pixel.fire(.appActiveUsage(avgTabs: .init(avgTabs: avgTabCount)))
+        // This is a no-op.
     }
 
 }

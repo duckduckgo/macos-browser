@@ -27,7 +27,6 @@ extension Pixel {
         case launchTiming
 
         case appUsage
-        case appActiveUsage(isDefault: IsDefaultBrowser = .init(), avgTabs: AverageTabsCount)
 
         case browserMadeDefault
 
@@ -202,9 +201,6 @@ extension Pixel.Event {
 
         case .appUsage:
             return "m_mac_usage"
-
-        case .appActiveUsage(isDefault: let isDefault, avgTabs: let avgTabs):
-            return "m_mac_active-usage_\(isDefault)_\(avgTabs)"
 
         case .browserMadeDefault:
             return "m_mac_made-default-browser"
