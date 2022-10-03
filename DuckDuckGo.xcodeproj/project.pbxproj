@@ -18,6 +18,7 @@
 		14D9B8FB24F7E089000D4D13 /* AddressBarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14D9B8F924F7E089000D4D13 /* AddressBarViewController.swift */; };
 		1D02633328D898E1005CBB41 /* OpenSSL in Frameworks */ = {isa = PBXBuildFile; productRef = 1D02633228D898E1005CBB41 /* OpenSSL */; };
 		1D02633628D8A9A9005CBB41 /* OpenSSLWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 1D02633528D8A9A9005CBB41 /* OpenSSLWrapper.m */; };
+		1D02634128EB0083005CBB41 /* BitwardenError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D02634028EB0083005CBB41 /* BitwardenError.swift */; };
 		3106AD76287F000600159FE5 /* CookieConsentUserPermissionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3106AD75287F000600159FE5 /* CookieConsentUserPermissionViewController.swift */; };
 		313AEDA1287CAD1D00E1E8F4 /* CookieConsentUserPermissionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 313AEDA0287CAD1D00E1E8F4 /* CookieConsentUserPermissionView.swift */; };
 		3171D6B82889849F0068632A /* CookieManagedNotificationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3171D6B72889849F0068632A /* CookieManagedNotificationView.swift */; };
@@ -836,6 +837,7 @@
 		14D9B8F924F7E089000D4D13 /* AddressBarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressBarViewController.swift; sourceTree = "<group>"; };
 		1D02633428D8A9A9005CBB41 /* OpenSSLWrapper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OpenSSLWrapper.h; sourceTree = "<group>"; };
 		1D02633528D8A9A9005CBB41 /* OpenSSLWrapper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OpenSSLWrapper.m; sourceTree = "<group>"; };
+		1D02634028EB0083005CBB41 /* BitwardenError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BitwardenError.swift; sourceTree = "<group>"; };
 		3106AD75287F000600159FE5 /* CookieConsentUserPermissionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieConsentUserPermissionViewController.swift; sourceTree = "<group>"; };
 		313AEDA0287CAD1D00E1E8F4 /* CookieConsentUserPermissionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieConsentUserPermissionView.swift; sourceTree = "<group>"; };
 		3171D6B72889849F0068632A /* CookieManagedNotificationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieManagedNotificationView.swift; sourceTree = "<group>"; };
@@ -3087,6 +3089,7 @@
 			children = (
 				AA7191CB28B3DF9400333866 /* BitwardenManager.swift */,
 				AA7191CD28B3DFC900333866 /* BitwardenState.swift */,
+				1D02634028EB0083005CBB41 /* BitwardenError.swift */,
 				AA19E71828BE1FFB00C6093C /* BitwardenCommunicator.swift */,
 				AA19E71A28BF818B00C6093C /* BitwardenMessage.swift */,
 				1D02633428D8A9A9005CBB41 /* OpenSSLWrapper.h */,
@@ -4696,6 +4699,7 @@
 				856C98DF257014BD00A22F1F /* FileDownloadManager.swift in Sources */,
 				4BB99CFF26FE191E001E4761 /* BookmarkImport.swift in Sources */,
 				B68503A7279141CD00893A05 /* KeySetDictionary.swift in Sources */,
+				1D02634128EB0083005CBB41 /* BitwardenError.swift in Sources */,
 				85480FBB25D181CB009424E3 /* ConfigurationDownloading.swift in Sources */,
 				AAEEC6A927088ADB008445F7 /* FireCoordinator.swift in Sources */,
 				B655369B268442EE00085A79 /* GeolocationProvider.swift in Sources */,

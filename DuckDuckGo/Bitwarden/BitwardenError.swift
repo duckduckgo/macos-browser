@@ -1,5 +1,5 @@
 //
-//  BitwardenState.swift
+//  BitwardenError.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -18,11 +18,9 @@
 
 import Foundation
 
-enum BitwardenStatus {
+enum BitwardenError: Error {
 
-    case disabled
-    case locked
-    case unlocked
-    case error(error: BitwardenError)
+    case handshakeFailed
+    case decryptionOfSharedKeyFailed
 
 }

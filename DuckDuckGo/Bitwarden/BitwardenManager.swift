@@ -31,7 +31,7 @@ final class BitwardenManager {
 
     static let shared = BitwardenManager()
 
-    //TODO get and subscribe to the setting for password manager
+    //TODO: adjust the init based on internal setting of password manager and subscribe for dynamic change
 
     var state: BitwardenStatus = .disabled
 
@@ -49,7 +49,6 @@ final class BitwardenManager {
         communicator.enabled = true
     }
 
-
     private var connectionAttemptTimer: Timer?
 
     // Disables communicator (kills the proxy process)
@@ -64,7 +63,7 @@ final class BitwardenManager {
         }
     }
 
-    private func disableAndScheduleNextAttempt() {
+    private func cancelConnectionAndScheduleNextAttempt() {
         // Kill the proxy process and schedule the next attempt
         communicator.enabled = false
         scheduleConnectionAttempt()
@@ -79,7 +78,7 @@ final class BitwardenManager {
             return
         case "disconnected":
             // Bitwarden application isn't running || User didn't approve DuckDuckGo browser integration
-            disableAndScheduleNextAttempt()
+            cancelConnectionAndScheduleNextAttempt()
         default:
             assertionFailure("Unknown command")
         }
@@ -87,13 +86,18 @@ final class BitwardenManager {
 
     private func handleHandshakeResponce(encryptedSharedKey: String, status: String) {
         guard status == "success" else {
-            disableAndScheduleNextAttempt()
+            state = .error(error: .handshakeFailed)
+            cancelConnectionAndScheduleNextAttempt()
             return
         }
 
-        self.sharedKey = openSSLWrapper.decryptSharedKey(encryptedSharedKey)
+        guard openSSLWrapper.decryptSharedKey(encryptedSharedKey) else {
+            state = .error(error: .decryptionOfSharedKeyFailed)
+            cancelConnectionAndScheduleNextAttempt()
+            return
+        }
 
-        //TODO Send status message
+        sendStatus()
     }
 
     private func sendHandshake() {
@@ -111,10 +115,11 @@ final class BitwardenManager {
     }
 
     private func sendStatus() {
-        guard let messageData = BitwardenMessage.makeStatusMessage().data else {
+        guard let messageData = BitwardenMessage.makeStatusMessage(openSSLWrapper: openSSLWrapper)?.data else {
             assertionFailure("Making the status message failed")
             return
         }
+
         communicator.send(messageData: messageData)
     }
     

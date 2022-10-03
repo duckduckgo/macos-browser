@@ -25,12 +25,13 @@ struct BitwardenMessage: Codable {
     let version: Int?
     let payload: Payload?
     let command: String?
-    let encryptedCommand: EncryptedCommand?
+    let encryptedCommand: String? // encoded with symmetric key + base64 encoded string
 
     struct Payload: Codable {
 
         let error: String?
         let publicKey: String? // base64 encoded
+        let applicationName: String?
         let status: String?
         let sharedKey: String? // base64 encoded
 
@@ -77,7 +78,7 @@ struct BitwardenMessage: Codable {
          version: Int? = nil,
          command: String? = nil,
          payload: BitwardenMessage.Payload? = nil,
-         encryptedCommand: EncryptedCommand? = nil) {
+         encryptedCommand: String? = nil) {
         self.messageId = messageId
         self.version = version
         self.command = command
@@ -111,6 +112,7 @@ struct BitwardenMessage: Codable {
     static func makeHandshakeMessage(with publicKey: String) -> BitwardenMessage {
         let payload = Payload(error: nil,
                               publicKey: publicKey,
+                              applicationName: Bundle.main.displayName,
                               status: nil,
                               sharedKey: nil)
         return BitwardenMessage(messageId: generateMessageId(),
@@ -119,11 +121,18 @@ struct BitwardenMessage: Codable {
                                 payload: payload)
     }
 
-    static func makeStatusMessage() -> BitwardenMessage {
-        let encryptedCommand = EncryptedCommand(command: "bw-status", payload: nil)
+    static func makeStatusMessage(openSSLWrapper: OpenSSLWrapper) -> BitwardenMessage? {
+        let command = EncryptedCommand(command: "bw-status", payload: nil)
+        guard let commandData = try? JSONEncoder().encode(command) else {
+            assertionFailure("JSON encoding failed")
+            return nil
+        }
+        let encryptedData = openSSLWrapper.encryptData(commandData)
+        let encryptedDataSerialized = "2.\(encryptedData.iv.base64EncodedString())|\(encryptedData.data.base64EncodedString())|\(encryptedData.hmac.base64EncodedString())"
+
         return BitwardenMessage(messageId: generateMessageId(),
                                 version: version,
-                                encryptedCommand: encryptedCommand)
+                                encryptedCommand: encryptedDataSerialized)
     }
 
     static func generateMessageId() -> String {
