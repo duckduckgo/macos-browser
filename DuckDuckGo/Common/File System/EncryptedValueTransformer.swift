@@ -18,12 +18,14 @@
 
 import Foundation
 import CryptoKit
+import os.log
 
 final class EncryptedValueTransformer<T: NSSecureCoding & NSObject>: ValueTransformer {
 
     private let encryptionKey: SymmetricKey
 
     init(encryptionKey: SymmetricKey) {
+        os_log("DEBUG: Value transformer for type '%{public}s' created with encryption key of size %{public}d", type: .error, String(describing: T.self), encryptionKey.bitCount)
         self.encryptionKey = encryptionKey
     }
 
@@ -49,6 +51,8 @@ final class EncryptedValueTransformer<T: NSSecureCoding & NSObject>: ValueTransf
                 archivedData = try NSKeyedArchiver.archivedData(withRootObject: castValue, requiringSecureCoding: true)
             } catch {
                 assertionFailure("Could not archive value \(castValue): \(error)")
+                os_log("DEBUG: Error! Failed to transform value, with error: %{public}s", type: .error, error.localizedDescription)
+
                 return nil
             }
         }
@@ -59,13 +63,20 @@ final class EncryptedValueTransformer<T: NSSecureCoding & NSObject>: ValueTransf
     override func reverseTransformedValue(_ value: Any?) -> Any? {
         guard let data = value as? Data,
               let decryptedData = try? DataEncryption.decrypt(data: data, key: encryptionKey) else { return nil }
-
+        
         // if T is Data
         if let data = decryptedData as? T {
             return data
         }
 
-        return try? NSKeyedUnarchiver.unarchivedObject(ofClass: T.self, from: decryptedData as Data)
+        if let unarchivedObject = try? NSKeyedUnarchiver.unarchivedObject(ofClass: T.self, from: decryptedData as Data) {
+            os_log("VALUETRANSFORMER: Value transformer for %{public}s successfully reverse transformed data of length %{public}d", type: .error, String(describing: T.self), decryptedData.count)
+            return unarchivedObject
+        }
+        
+        os_log("DEBUG: Value transformer for %{public}s failed to reverse transform data", type: .error, String(describing: T.self))
+        
+        return nil
     }
 
     // The transformer name is calculated based on the generic class parameter.
@@ -80,6 +91,8 @@ final class EncryptedValueTransformer<T: NSSecureCoding & NSObject>: ValueTransf
         let transformer = EncryptedValueTransformer<T>(encryptionKey: key)
 
         ValueTransformer.setValueTransformer(transformer, forName: transformerName)
+        
+        os_log("DEBUG: Value transformer registered for type '%{public}s'", type: .error, String(describing: T.self))
     }
 
 }

@@ -99,13 +99,15 @@ final class LocalBookmarkStore: BookmarkStore {
                                                  #keyPath(BookmarkManagedObject.parentFolder),
                                                  #keyPath(BookmarkManagedObject.isFolder))
             
-            let results = try? context.fetch(fetchRequest)
+            let results = (try? context.fetch(fetchRequest)) ?? []
 
-            guard (results?.count ?? 0) <= 1 else {
+            os_log("DEBUG: Caching top level folder, with result count: %{public}d", type: .error, results.count)
+            
+            guard results.count == 1 else {
                 fatalError("There shouldn't be an orphaned folder")
             }
             
-            guard let folder = results?.first else {
+            guard let folder = results.first else {
                 fatalError("Top level folder missing")
             }
             
