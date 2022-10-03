@@ -111,14 +111,6 @@ extension Pixel {
 
         case serp
 
-        case suggestionsDisplayed(hasBookmark: HasBookmark, hasFavorite: HasFavorite, hasHistoryEntry: HasHistoryEntry)
-
-        static func suggestionsDisplayed(_ characteristics: SuggestionListChacteristics) -> Event {
-            return .suggestionsDisplayed(hasBookmark: characteristics.hasBookmark ? .hasBookmark : .noBookmarks,
-                                         hasFavorite: characteristics.hasFavorite ? .hasFavorite : .noFavorites,
-                                         hasHistoryEntry: characteristics.hasHistoryEntry ? .hasHistoryEntry : .noHistoryEntry)
-        }
-
         case importedLogins(repetition: Repetition = .init(key: "imported-logins"), source: DataImportSource)
         case exportedLogins(repetition: Repetition = .init(key: "exported-logins"))
         case importedBookmarks(repetition: Repetition = .init(key: "imported-bookmarks"), source: DataImportSource)
@@ -251,9 +243,6 @@ extension Pixel.Event {
             
         case .serp:
             return "m_mac_navigation_search"
-
-        case .suggestionsDisplayed(hasBookmark: let hasBookmark, hasFavorite: let hasFavorite, hasHistoryEntry: let hasHistoryEntry):
-            return "m_mac_suggestions-displayed_\(hasBookmark)_\(hasFavorite)_\(hasHistoryEntry)"
 
         case .importedLogins(repetition: let repetition, source: let source):
             return "m_mac_imported-logins_\(repetition)_\(source)"

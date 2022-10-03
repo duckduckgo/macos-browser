@@ -95,7 +95,6 @@ final class AddressBarTextField: NSTextField {
                 guard let self = self else { return }
                 if self.suggestionContainerViewModel?.suggestionContainer.result?.count ?? 0 > 0 {
                     self.showSuggestionWindow()
-                    Pixel.fire(.suggestionsDisplayed(self.suggestionsContainLocalItems()))
                 }
             }
     }

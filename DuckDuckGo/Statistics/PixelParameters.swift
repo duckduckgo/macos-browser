@@ -78,7 +78,6 @@ extension Pixel.Event {
              .favorite,
              .navigation,
              .serp,
-             .suggestionsDisplayed,
              .importedLogins,
              .exportedLogins,
              .importedBookmarks,
