@@ -24,8 +24,8 @@ import os
 final class YoutubeOverlayUserScript: NSObject, StaticUserScript {
 
     enum MessageNames: String, CaseIterable {
-        case setInteracted
-        case setAlwaysOpenSettingTo
+        case setUserValues
+        case readUserValues
     }
 
     static var injectionTime: WKUserScriptInjectionTime { .atDocumentStart }
@@ -55,26 +55,19 @@ final class YoutubeOverlayUserScript: NSObject, StaticUserScript {
     }
 
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-        guard let messageType = MessageNames(rawValue: message.name) else {
-            assertionFailure("YoutubeOverlayUserScript: unexpected message name \(message.name)")
-            return
-        }
-
-        switch messageType {
-        case .setInteracted:
-            handleSetInteracted(message: message)
-        case .setAlwaysOpenSettingTo:
-            handleAlwaysOpenSettings(message: message)
-        }
+        // TODO: Are we supporting 10.x?
     }
 
-    private func handleSetInteracted(message: WKScriptMessage) {
+    private func handleSetUserValues(message: WKScriptMessage, _ replyHandler: @escaping (Any?, String?) -> Void) {
         guard let userValues: UserValues = decode(from: message.body) else {
             assertionFailure("YoutubeOverlayUserScript: expected JSON representation of UserValues")
             return
         }
+
         PrivacySecurityPreferences.shared.youtubeOverlayInteracted = userValues.overlayInteracted;
         PrivacySecurityPreferences.shared.privatePlayerMode = userValues.privatePlayerMode;
+
+        replyHandler(encodeUserValues(), nil)
     }
 
     private func handleAlwaysOpenSettings(message: WKScriptMessage) {
@@ -87,6 +80,22 @@ final class YoutubeOverlayUserScript: NSObject, StaticUserScript {
         PrivacySecurityPreferences.shared.privatePlayerMode = .enabled
     }
 
+    private func handleReadUserValues(message: WKScriptMessage, _ replyHandler: @escaping (Any?, String?) -> Void) {
+        replyHandler(encodeUserValues(), nil)
+    }
+
+    func encodeUserValues() -> String? {
+        let uv = UserValues(
+                privatePlayerMode: PrivacySecurityPreferences.shared.privatePlayerMode,
+                overlayInteracted: PrivacySecurityPreferences.shared.youtubeOverlayInteracted
+        );
+        guard let json = try? JSONEncoder().encode(uv), let jsonString = String(data: json, encoding: .utf8) else {
+            assertionFailure("YoutubeOverlayUserScript: could not convert UserValues into JSON")
+            return ""
+        }
+        return jsonString
+    }
+
     func evaluateJSCall(call: String, webView: WKWebView) {
         evaluate(js: call, inWebView: webView)
     }
@@ -96,6 +105,26 @@ final class YoutubeOverlayUserScript: NSObject, StaticUserScript {
             webView.evaluateJavaScript(js, in: nil, in: WKContentWorld.defaultClient)
         } else {
             webView.evaluateJavaScript(js)
+        }
+    }
+}
+
+@available(iOS 14, *)
+@available(macOS 11, *)
+extension YoutubeOverlayUserScript: WKScriptMessageHandlerWithReply {
+    func userContentController(_ userContentController: WKUserContentController,
+                               didReceive message: WKScriptMessage,
+                               replyHandler: @escaping (Any?, String?) -> Void) {
+        guard let messageType = MessageNames(rawValue: message.name) else {
+            assertionFailure("YoutubeOverlayUserScript: unexpected message name \(message.name)")
+            return
+        }
+
+        switch messageType {
+        case .setUserValues:
+            handleSetUserValues(message: message, replyHandler)
+        case .readUserValues:
+            handleReadUserValues(message: message, replyHandler)
         }
     }
 }

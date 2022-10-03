@@ -18,7 +18,7 @@ export class VideoPlayerOverlay {
     /**
      * @param {import("../youtube-inject").UserValues} userValues
      * @param {{getHref(): string, getLargeThumbnailSrc(videoId: string): string, setHref(href: string): void}} environment
-     * @param {{setInteracted: (enabled: import("../youtube-inject.js").UserValues['privatePlayerMode']) => Promise<any>}} comms
+     * @param {import("./comms.js").macOSCommunications} comms
      */
     constructor(userValues, environment, comms) {
         this.userValues = userValues;
@@ -72,7 +72,7 @@ export class VideoPlayerOverlay {
     /**
      * Sets up buttons being clickable, right now just the cancel button
      */
-    setupButtonsInsideOverlay(ddgElement) {
+    setupButtonsInsideOverlay(ddgElement, videoId) {
         const cancelElement = ddgElement.querySelector('.ddg-vpo-cancel');
         const watchInPlayer = ddgElement.querySelector('.ddg-vpo-open');
         if (!cancelElement) return console.warn("Could not access .ddg-vpo-cancel");
@@ -92,14 +92,15 @@ export class VideoPlayerOverlay {
                  *
                  * @type {import("../youtube-inject.js").UserValues['privatePlayerMode']}
                  */
-                let privatePlayerEnabled = { alwaysAsk: {} };;
                 if (remember.checked) {
-                    privatePlayerEnabled = { disabled: {} };
+                    this.userChoice({ alwaysAsk: {} })
+                        .then(values => this.userValues = values)
+                        .then(() => this.watchForVideoBeingAdded({ ignoreCache: true }))
+                        .catch(e => console.error("could not set userChoice for opt-out", e ))
                 } else {
-                    // do nothing. The checkbox was off meaning we don't want to save any choice
+                    this.removeOverlays();
+                    this.addSmallDaxOverlay(videoId)
                 }
-                this.userChoice(privatePlayerEnabled)
-                    .catch(e => console.error("could not set userChoice for opt-out", e ))
             }
         };
         const watchInPlayerHandler = (e) => {
@@ -155,7 +156,7 @@ export class VideoPlayerOverlay {
             console.log("🚧 showing full overlay")
             this.callPauseUntilPaused(playerVideo);
             const ddgElement = this.appendOverlayToPage(containerElement, videoId);
-            this.setupButtonsInsideOverlay(ddgElement);
+            this.setupButtonsInsideOverlay(ddgElement, videoId);
         }
     }
 
@@ -171,22 +172,31 @@ export class VideoPlayerOverlay {
     }
 
     /**
-     * @param {import("../youtube-inject.js").UserValues} userValues
+     * @param {{ignoreCache?: boolean}} [opts]
      */
-    watchForVideoBeingAdded(userValues) {
+    watchForVideoBeingAdded(opts = {}) {
         const href = this.environment.getHref();
         const videoId = Util.getYoutubeVideoId(href);
         if (!videoId) {
+            console.log("no video id");
             return;
         }
-        if (!this.lastVideoId || this.lastVideoId && this.lastVideoId !== videoId) {
+
+        const conditions = [
+            opts.ignoreCache,
+            !this.lastVideoId,
+            this.lastVideoId && this.lastVideoId !== videoId
+        ]
+
+        if (conditions.some(Boolean)) {
+            const userValues = this.userValues;
             this.lastVideoId = videoId;
             console.log("📹 video shown", videoId, userValues);
 
             /**
-             * Cleanup first, don't allow any lingering state
+             * always remove first, don't allow any lingering state
              */
-            this.cleanup();
+            this.removeOverlays();
 
             /**
              * When enabled, always show the small dax icon
@@ -276,21 +286,24 @@ export class VideoPlayerOverlay {
     /**
      * Record the users choice
      * @param {import("../youtube-inject.js").UserValues['privatePlayerMode']} privatePlayerMode
-     * @returns {Promise<any>}
+     * @returns {Promise<import("../youtube-inject").UserValues>}
      */
     userChoice(privatePlayerMode) {
-        return this.comms.setInteracted(privatePlayerMode)
-            .then(() => {
+        return this.comms.setUserValues(privatePlayerMode)
+            .then((userValues) => {
                 console.log("interacted flag set, now cleanup");
-                return this.cleanup();
+                return userValues;
             })
             .catch(e => console.error("could not set interacted after user opt out", e))
     }
     /**
      * Remove elements, event listeners etc
      */
-    cleanup() {
+    removeOverlays() {
         Util.execCleanups(this.cleanups);
         this.cleanups = [];
+        if (this.videoPlayerIcon) {
+            this.videoPlayerIcon.cleanup();
+        }
     }
 }

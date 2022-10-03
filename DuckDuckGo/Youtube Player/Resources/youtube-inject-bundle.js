@@ -341,7 +341,7 @@
         fn: cleanup
       });
     }
-    setupButtonsInsideOverlay(ddgElement) {
+    setupButtonsInsideOverlay(ddgElement, videoId) {
       const cancelElement = ddgElement.querySelector(".ddg-vpo-cancel");
       const watchInPlayer = ddgElement.querySelector(".ddg-vpo-open");
       if (!cancelElement)
@@ -353,13 +353,12 @@
           const remember = ddgElement.querySelector('input[name="ddg-remember"]');
           if (!remember)
             throw new Error("cannot find our input");
-          let privatePlayerEnabled = { alwaysAsk: {} };
-          ;
           if (remember.checked) {
-            privatePlayerEnabled = { disabled: {} };
+            this.userChoice({ alwaysAsk: {} }).then((values) => this.userValues = values).then(() => this.watchForVideoBeingAdded({ ignoreCache: true })).catch((e2) => console.error("could not set userChoice for opt-out", e2));
           } else {
+            this.removeOverlays();
+            this.addSmallDaxOverlay(videoId);
           }
-          this.userChoice(privatePlayerEnabled).catch((e2) => console.error("could not set userChoice for opt-out", e2));
         }
       };
       const watchInPlayerHandler = (e) => {
@@ -394,7 +393,7 @@
         console.log("\u{1F6A7} showing full overlay");
         this.callPauseUntilPaused(playerVideo);
         const ddgElement = this.appendOverlayToPage(containerElement, videoId);
-        this.setupButtonsInsideOverlay(ddgElement);
+        this.setupButtonsInsideOverlay(ddgElement, videoId);
       }
     }
     addSmallDaxOverlay(videoId) {
@@ -404,16 +403,23 @@
       }
       this.videoPlayerIcon.init(videoId);
     }
-    watchForVideoBeingAdded(userValues) {
+    watchForVideoBeingAdded(opts = {}) {
       const href = this.environment.getHref();
       const videoId = Util.getYoutubeVideoId(href);
       if (!videoId) {
+        console.log("no video id");
         return;
       }
-      if (!this.lastVideoId || this.lastVideoId && this.lastVideoId !== videoId) {
+      const conditions = [
+        opts.ignoreCache,
+        !this.lastVideoId,
+        this.lastVideoId && this.lastVideoId !== videoId
+      ];
+      if (conditions.some(Boolean)) {
+        const userValues = this.userValues;
         this.lastVideoId = videoId;
         console.log("\u{1F4F9} video shown", videoId, userValues);
-        this.cleanup();
+        this.removeOverlays();
         if ("enabled" in userValues.privatePlayerMode) {
           this.addSmallDaxOverlay(videoId);
         }
@@ -473,28 +479,38 @@
       });
     }
     userChoice(privatePlayerMode) {
-      return this.comms.setInteracted(privatePlayerMode).then(() => {
+      return this.comms.setUserValues(privatePlayerMode).then((userValues) => {
         console.log("interacted flag set, now cleanup");
-        return this.cleanup();
+        return userValues;
       }).catch((e) => console.error("could not set interacted after user opt out", e));
     }
-    cleanup() {
+    removeOverlays() {
       Util.execCleanups(this.cleanups);
       this.cleanups = [];
+      if (this.videoPlayerIcon) {
+        this.videoPlayerIcon.cleanup();
+      }
     }
   };
 
   // DuckDuckGo/Youtube Player/Resources/src/comms.js
   var macOSCommunications = {
-    setInteracted(privatePlayerMode) {
+    setUserValues(privatePlayerMode) {
       const payload = {
         privatePlayerMode,
         overlayInteracted: true
       };
       console.log("\u{1F4E4} [outgoing]", payload);
-      let resp = window.webkit?.messageHandlers?.setInteracted?.postMessage(payload);
+      let resp = window.webkit?.messageHandlers?.setUserValues?.postMessage(payload);
       if (resp instanceof Promise) {
-        return resp.catch((e) => console.error("could not call setInteracted", e));
+        return resp.then((x) => JSON.parse(x)).catch((e) => console.error("could not call setInteracted", e));
+      }
+      return Promise.reject(resp);
+    },
+    readUserValues() {
+      let resp = window.webkit?.messageHandlers?.readUserValues?.postMessage({});
+      if (resp instanceof Promise) {
+        return resp.then((x) => JSON.parse(x)).catch((e) => console.error("could not call readUserValues", e));
       }
       return Promise.reject(resp);
     }
@@ -515,7 +531,10 @@
     }
   };
   var defaultComms = macOSCommunications;
-  window.enable = function enable(userValues, environment = defaultEnvironment, comms = defaultComms) {
+  defaultComms.readUserValues().then((userValues) => {
+    enable(userValues, defaultEnvironment, defaultComms);
+  }).catch((e) => console.error("could not read userValues", e));
+  function enable(userValues, environment = defaultEnvironment, comms = defaultComms) {
     console.log("\u{1F474} reading user prefs", userValues);
     console.log("\u{1F474} environment", environment);
     const videoPlayerOverlay = new VideoPlayerOverlay(userValues, environment, comms);
@@ -624,11 +643,13 @@
     };
     const Site = {
       onDOMLoaded: (callback) => {
-        callback();
+        window.addEventListener("DOMContentLoaded", () => {
+          callback();
+        });
       },
       onDOMChanged: (callback) => {
         let observer = new MutationObserver(callback);
-        observer.observe(document.querySelector("body"), {
+        observer.observe(document, {
           subtree: true,
           childList: true,
           attributeFilter: ["src"]
@@ -639,19 +660,16 @@
           CSS.init();
           IconOverlay.appendHoverOverlay();
           VideoThumbnail.bindEventsToAll();
-        });
-        Site.onDOMChanged(() => {
-          if (OverlaySettings.enabled.thumbnails) {
-            VideoThumbnail.bindEventsToAll();
-            Preview.init();
-          }
-          videoPlayerOverlay.watchForVideoBeingAdded(userValues);
+          Site.onDOMChanged(() => {
+            if (OverlaySettings.enabled.thumbnails) {
+              VideoThumbnail.bindEventsToAll();
+              Preview.init();
+            }
+            videoPlayerOverlay.watchForVideoBeingAdded(userValues);
+          });
         });
       }
     };
     Site.init();
-  };
-  window.disable = function disable(args) {
-    console.log("I'm injected, but disabled", args);
-  };
+  }
 })();

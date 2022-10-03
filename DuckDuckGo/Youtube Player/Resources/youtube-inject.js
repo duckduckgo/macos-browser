@@ -22,6 +22,10 @@ const defaultEnvironment = {
 
 const defaultComms = macOSCommunications;
 
+defaultComms.readUserValues().then((userValues) => {
+    enable(userValues, defaultEnvironment, defaultComms);
+}).catch(e => console.error("could not read userValues", e))
+
 /**
  * @typedef UserValues - A way to communicate some user state
  * @property {{enabled: {}} | {alwaysAsk:{}} | {disabled:{}}} privatePlayerMode - one of 3 values: 'enabled:{}', 'alwaysAsk:{}', 'disabled:{}'
@@ -31,7 +35,7 @@ const defaultComms = macOSCommunications;
  * @param {defaultEnvironment} [environment] - methods to read environment-sensitive things like the current URL etc
  * @param {macOSCommunications } [comms] - methods to communicate with a native backend
  */
-window.enable = function enable(userValues, environment = defaultEnvironment, comms = defaultComms) {
+function enable(userValues, environment = defaultEnvironment, comms = defaultComms) {
     console.log("👴 reading user prefs", userValues);
     console.log("👴 environment", environment);
 
@@ -213,12 +217,14 @@ window.enable = function enable(userValues, environment = defaultEnvironment, co
 
     const Site = {
         onDOMLoaded: (callback) => {
-            callback();
+            window.addEventListener('DOMContentLoaded', () => {
+                callback();
+            })
         },
 
         onDOMChanged: (callback) => {
             let observer = new MutationObserver(callback);
-            observer.observe(document.querySelector('body'), {
+            observer.observe(document, {
                 subtree: true,
                 childList: true,
                 attributeFilter: ['src']
@@ -230,16 +236,17 @@ window.enable = function enable(userValues, environment = defaultEnvironment, co
                 CSS.init();
                 IconOverlay.appendHoverOverlay();
                 VideoThumbnail.bindEventsToAll();
+
+                Site.onDOMChanged(() => {
+                    if (OverlaySettings.enabled.thumbnails) {
+                        VideoThumbnail.bindEventsToAll();
+                        Preview.init();
+                    }
+
+                    videoPlayerOverlay.watchForVideoBeingAdded(userValues);
+                });
             });
 
-            Site.onDOMChanged(() => {
-                if (OverlaySettings.enabled.thumbnails) {
-                    VideoThumbnail.bindEventsToAll();
-                    Preview.init();
-                }
-
-                videoPlayerOverlay.watchForVideoBeingAdded(userValues);
-            });
         }
     }
 
@@ -271,9 +278,4 @@ window.enable = function enable(userValues, environment = defaultEnvironment, co
             }
         }
     }*/
-
-}
-
-window.disable = function disable(args) {
-    console.log("I'm injected, but disabled", args);
 }

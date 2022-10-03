@@ -4,7 +4,7 @@ export const macOSCommunications = {
      * @param {import("../youtube-inject.js").UserValues["privatePlayerMode"]} privatePlayerMode
      * @returns {Promise<never>|Promise<unknown | void>}
      */
-    setInteracted(privatePlayerMode) {
+    setUserValues(privatePlayerMode) {
         /** @type {import('../youtube-inject.js').UserValues} */
         const payload = {
             privatePlayerMode,
@@ -12,9 +12,21 @@ export const macOSCommunications = {
         }
         console.log("📤 [outgoing]", payload);
         // @ts-ignore
-        let resp = window.webkit?.messageHandlers?.setInteracted?.postMessage(payload);
+        let resp = window.webkit?.messageHandlers?.setUserValues?.postMessage(payload);
         if (resp instanceof Promise) {
-            return resp.catch(e => console.error("could not call setInteracted", e));
+            return resp
+                .then(x => JSON.parse(x))
+                .catch(e => console.error("could not call setInteracted", e));
+        }
+        return Promise.reject(resp)
+    },
+    readUserValues() {
+        // @ts-ignore
+        let resp = window.webkit?.messageHandlers?.readUserValues?.postMessage({});
+        if (resp instanceof Promise) {
+            return resp
+                .then(x => JSON.parse(x))
+                .catch(e => console.error("could not call readUserValues", e));
         }
         return Promise.reject(resp)
     }
