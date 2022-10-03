@@ -387,24 +387,22 @@
         }
       });
     }
-    create(userValues, videoId) {
-      console.log("\u{1F91E}\u{1F91E}\u{1F91E}\u{1F91E}calling create.....");
-      this.cleanup();
+    addLargeOverlay(userValues, videoId) {
+      console.log("\u{1F91E}adding large overlay.....");
       let player = document.querySelector("#player"), playerVideo = document.querySelector("#player video"), containerElement = document.querySelector("#player .html5-video-player");
       if (player && playerVideo && containerElement) {
-        if (!userValues.overlayInteracted) {
-          console.log("\u{1F6A7} showing full overlay");
-          this.callPauseUntilPaused(playerVideo);
-          const ddgElement = this.appendOverlayToPage(containerElement, videoId);
-          this.setupButtonsInsideOverlay(ddgElement);
-        } else {
-          console.log("\u{1F986} showing small dax overlay on video", videoId);
-          if (!this.videoPlayerIcon) {
-            this.videoPlayerIcon = new VideoPlayerIcon();
-          }
-          this.videoPlayerIcon.init(videoId);
-        }
+        console.log("\u{1F6A7} showing full overlay");
+        this.callPauseUntilPaused(playerVideo);
+        const ddgElement = this.appendOverlayToPage(containerElement, videoId);
+        this.setupButtonsInsideOverlay(ddgElement);
       }
+    }
+    addSmallDaxOverlay(videoId) {
+      console.log("\u{1F986} showing small dax overlay on video", videoId);
+      if (!this.videoPlayerIcon) {
+        this.videoPlayerIcon = new VideoPlayerIcon();
+      }
+      this.videoPlayerIcon.init(videoId);
     }
     watchForVideoBeingAdded(userValues) {
       const href = this.environment.getHref();
@@ -415,10 +413,19 @@
       if (!this.lastVideoId || this.lastVideoId && this.lastVideoId !== videoId) {
         this.lastVideoId = videoId;
         console.log("\u{1F4F9} video shown", videoId, userValues);
+        this.cleanup();
         if ("enabled" in userValues.privatePlayerMode) {
-        } else if ("disabled" in userValues.privatePlayerMode) {
-        } else if ("alwaysAsk" in userValues.privatePlayerMode) {
-          this.create(userValues, videoId);
+          this.addSmallDaxOverlay(videoId);
+        }
+        if ("alwaysAsk" in userValues.privatePlayerMode) {
+          if (!userValues.overlayInteracted) {
+            this.addLargeOverlay(userValues, videoId);
+          } else {
+            this.addSmallDaxOverlay(videoId);
+          }
+        }
+        if ("disabled" in userValues.privatePlayerMode) {
+          console.log("do nothing");
         }
       }
     }

@@ -145,30 +145,31 @@ export class VideoPlayerOverlay {
      * @param {import("../youtube-inject.js").UserValues} userValues
      * @param {string} videoId
      */
-    create(userValues, videoId) {
-        console.log("🤞🤞🤞🤞calling create.....")
-
-        this.cleanup();
-
+    addLargeOverlay(userValues, videoId) {
+        console.log("🤞adding large overlay.....")
         let player = document.querySelector('#player'),
             playerVideo = document.querySelector('#player video'),
             containerElement = document.querySelector('#player .html5-video-player')
 
         if (player && playerVideo && containerElement) {
-            if (!userValues.overlayInteracted) {
-                console.log("🚧 showing full overlay")
-                this.callPauseUntilPaused(playerVideo);
-                const ddgElement = this.appendOverlayToPage(containerElement, videoId);
-                this.setupButtonsInsideOverlay(ddgElement);
-            } else {
-                console.log("🦆 showing small dax overlay on video", videoId)
-                if (!this.videoPlayerIcon) {
-                    this.videoPlayerIcon = new VideoPlayerIcon();
-                }
-                this.videoPlayerIcon.init(videoId);
-            }
+            console.log("🚧 showing full overlay")
+            this.callPauseUntilPaused(playerVideo);
+            const ddgElement = this.appendOverlayToPage(containerElement, videoId);
+            this.setupButtonsInsideOverlay(ddgElement);
         }
     }
+
+    /**
+     * @param {string} videoId
+     */
+    addSmallDaxOverlay(videoId) {
+        console.log("🦆 showing small dax overlay on video", videoId)
+        if (!this.videoPlayerIcon) {
+            this.videoPlayerIcon = new VideoPlayerIcon();
+        }
+        this.videoPlayerIcon.init(videoId);
+    }
+
     /**
      * @param {import("../youtube-inject.js").UserValues} userValues
      */
@@ -181,12 +182,27 @@ export class VideoPlayerOverlay {
         if (!this.lastVideoId || this.lastVideoId && this.lastVideoId !== videoId) {
             this.lastVideoId = videoId;
             console.log("📹 video shown", videoId, userValues);
+
+            /**
+             * Cleanup first, don't allow any lingering state
+             */
+            this.cleanup();
+
+            /**
+             * When enabled, always show the small dax icon
+             */
             if ('enabled' in userValues.privatePlayerMode) {
-                // console.log("userValues.privatePlayerEnabled === true", "should not get here...")
-            } else if ('disabled' in userValues.privatePlayerMode) {
-                // console.log("userValues.privatePlayerEnabled === false")
-            } else if ('alwaysAsk' in userValues.privatePlayerMode) {
-                this.create(userValues, videoId)
+                this.addSmallDaxOverlay(videoId)
+            }
+            if ('alwaysAsk' in userValues.privatePlayerMode) {
+                if (!userValues.overlayInteracted) {
+                    this.addLargeOverlay(userValues, videoId)
+                } else {
+                    this.addSmallDaxOverlay(videoId)
+                }
+            }
+            if ('disabled' in userValues.privatePlayerMode) {
+                console.log("do nothing");
             }
         }
     }
