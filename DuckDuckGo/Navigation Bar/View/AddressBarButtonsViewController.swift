@@ -183,6 +183,8 @@ final class AddressBarButtonsViewController: NSViewController {
         subscribeToEffectiveAppearance()
         subscribeToIsMouseOverAnimationVisible()
         updateBookmarkButtonVisibility()
+        
+        privacyEntryPointButton.toolTip = UserText.privacyDashboardTooltip
     }
 
     override func viewWillAppear() {
