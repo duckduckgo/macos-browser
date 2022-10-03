@@ -407,7 +407,6 @@
       const href = this.environment.getHref();
       const videoId = Util.getYoutubeVideoId(href);
       if (!videoId) {
-        console.log("no video id");
         return;
       }
       const conditions = [

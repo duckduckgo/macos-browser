@@ -82,13 +82,11 @@ export class VideoPlayerOverlay {
                 const remember = ddgElement.querySelector('input[name="ddg-remember"]');
                 if (!remember) throw new Error('cannot find our input');
                 /**
-                 * If the checkbox was checked, this cancellation should also **disable** the player
-                 * (by sending 'false' for `privatePlayerEnabled`)
+                 * If the checkbox was checked we send the 'interacted' flag to the backend
+                 * so that the next video can just see the Dax icon instead of the full overlay
                  *
-                 * But, if the checkbox was not checked, then we don't set the player to
-                 * enabled or disabled, but rather it remains 'undecided'. A non-boolean
-                 * value such as 'null' or 'undefined' is used to represent this in JS. In
-                 * the swift side, it's an `Optional<Bool>`
+                 * But, if the checkbox was **not** checked, then we don't update any backend state
+                 * and instead we just swap the main overlay for Dax
                  *
                  * @type {import("../youtube-inject.js").UserValues['privatePlayerMode']}
                  */
@@ -113,10 +111,8 @@ export class VideoPlayerOverlay {
                  * If the checkbox was checked, this action means that we want to 'always'
                  * use the private player
                  *
-                 * But, if the checkbox was not checked, then we don't set the player to
-                 * enabled or disabled, but rather it remains 'undecided'. A non-boolean
-                 * value such as 'null' or 'undefined' is used to represent this in JS. In
-                 * the swift side, it's an `Optional<Bool>`
+                 * But, if the checkbox was not checked, then we want to keep the state
+                 * as 'alwaysAsk'
                  *
                  * @type {import("../youtube-inject.js").UserValues['privatePlayerMode']}
                  */
@@ -178,7 +174,6 @@ export class VideoPlayerOverlay {
         const href = this.environment.getHref();
         const videoId = Util.getYoutubeVideoId(href);
         if (!videoId) {
-            console.log("no video id");
             return;
         }
 
