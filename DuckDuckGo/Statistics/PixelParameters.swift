@@ -85,8 +85,6 @@ extension Pixel.Event {
              .navigation,
              .serp,
              .suggestionsDisplayed,
-             .sharingMenu,
-             .moreMenu,
              .refresh,
              .importedLogins,
              .exportedLogins,

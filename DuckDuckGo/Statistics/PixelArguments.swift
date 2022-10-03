@@ -318,43 +318,6 @@ extension Pixel.Event {
         case noHistoryEntry = "no-history-entry"
     }
 
-    enum SharingResult: String, CustomStringConvertible {
-        var description: String { rawValue }
-
-        case success
-        case failure
-        case cancelled
-    }
-
-    enum MoreResult: String, CustomStringConvertible {
-        var description: String { rawValue }
-
-        case newTab = "new-tab"
-        case cancelled = "cancelled"
-        case newWindow = "new-window"
-        case feedback = "feedback"
-        case bookmarksList = "bookmarks-list"
-        case bookmarksMenuBookmarkThisPage = "bookmarks-bookmark-this-page"
-        case bookmarksMenuShowToolbarPanel = "bookmarks-show-toolbar-panel"
-        case bookmarksMenuShowBookmarksBar = "bookmarks-show-bookmarks-bar"
-        case bookmarksMenuHideBookmarksBar = "bookmarks-hide-bookmarks-bar"
-        case bookmarksMenuImportBookmarks = "bookmarks-import-bookmarks"
-        case loginsMenu = "logins-menu"
-        case loginsMenuAllItems = "logins-menu-all-items"
-        case loginsMenuLogins = "logins-menu-logins"
-        case loginsMenuIdentities = "logins-menu-identities"
-        case loginsMenuCreditCards = "logins-menu-credit-cards"
-        case loginsMenuNotes = "logins-menu-notes"
-        case emailProtection = "email-protection"
-        case emailProtectionCreateAddress = "email-protection-create"
-        case emailProtectionOff = "email-protection-off"
-        case fireproof = "fireproof"
-        case preferences = "preferences"
-        case downloads = "downloads"
-        case findInPage = "find-in-page"
-        case print = "print"
-    }
-
     enum RefreshAccessPoint: String, CustomStringConvertible {
         var description: String { rawValue }
 

@@ -72,6 +72,7 @@ extension Pixel {
             case lessThan40s = "40"
             case more = "more"
         }
+
         case compileRulesWait(onboardingShown: OnboardingShown, waitTime: CompileRulesWaitTime, result: WaitResult)
         static func compileRulesWait(onboardingShown: Bool, waitTime interval: TimeInterval, result: WaitResult) -> Event {
             let waitTime: CompileRulesWaitTime
@@ -125,10 +126,6 @@ extension Pixel {
                                          hasFavorite: characteristics.hasFavorite ? .hasFavorite : .noFavorites,
                                          hasHistoryEntry: characteristics.hasHistoryEntry ? .hasHistoryEntry : .noHistoryEntry)
         }
-
-        case sharingMenu(repetition: Repetition = .init(key: "sharing"), result: SharingResult)
-
-        case moreMenu(repetition: Repetition = .init(key: "more"), result: MoreResult)
 
         case refresh(source: RefreshAccessPoint)
 
@@ -300,12 +297,6 @@ extension Pixel.Event {
 
         case .suggestionsDisplayed(hasBookmark: let hasBookmark, hasFavorite: let hasFavorite, hasHistoryEntry: let hasHistoryEntry):
             return "m_mac_suggestions-displayed_\(hasBookmark)_\(hasFavorite)_\(hasHistoryEntry)"
-
-        case .sharingMenu(repetition: let repetition, result: let result):
-            return "m_mac_share_\(repetition)_\(result)"
-
-        case .moreMenu(repetition: let repetition, result: let result):
-            return "m_mac_more-menu_\(repetition)_\(result)"
 
         case .refresh(source: let source):
             return "m_mac_refresh_\(source)"
