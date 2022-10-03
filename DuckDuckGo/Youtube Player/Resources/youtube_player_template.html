@@ -420,13 +420,13 @@
                  * Tries loading the video if there's a valid video id, otherwise shows error message.
                  */
                 loadVideoById: () => {
-                    let videoId = Comms.getSanitizedVideoId();
+                    let validVideoId = Comms.getValidVideoId();
                     let timestamp = Comms.getSanitizedTimestamp();
 
-                    if (videoId) {
-                        VideoPlayer.iframe().setAttribute('src', VideoPlayer.videoEmbedURL(videoId, timestamp));
+                    if (validVideoId) {
+                        VideoPlayer.iframe().setAttribute('src', VideoPlayer.videoEmbedURL(validVideoId, timestamp));
                     } else {
-                        VideoPlayer.showVideoError('Malformed video id');
+                        VideoPlayer.showVideoError('Invalid video id');
                     }
                 },
 
@@ -576,7 +576,7 @@
                  * @returns {(string|false)}
                  */
                 validateVideoId: (input) => {
-                    if (/^[a-zA-Z0-9-_]*$/g.test(input)) {
+                    if (/^[a-zA-Z0-9-_]+$/g.test(input)) {
                         return input;
                     }
                     return false;
@@ -586,14 +586,8 @@
                  * Returns a sanitized video id if there is a valid one.
                  * @returns {(string|false)}
                  */
-                getSanitizedVideoId: () => {
-                    let validVideoId = Comms.validateVideoId(Comms.getVideoIdFromLocation());
-
-                    if (validVideoId) {
-                        return Comms.sanitizeVideoId(validVideoId);
-                    }
-
-                    return false;
+                getValidVideoId: () => {
+                    return Comms.validateVideoId(Comms.getVideoIdFromLocation());
                 },
 
                 /**
@@ -611,15 +605,6 @@
                         return false;
                     }
                     return false;
-                },
-
-                /**
-                 * Remove all invalid characters from video id
-                 * @param {string} untrusted
-                 * @returns {string}
-                 */
-                sanitizeVideoId: (untrusted) => {
-                    return untrusted.replace(/[^a-zA-Z0-9-_]/g, '');
                 },
 
                 /**
@@ -840,7 +825,15 @@
                  * @returns {string}
                  */
                 getVideoLinkURL: (videoId, timestamp) => {
-                    return 'https://www.youtube.com/watch?v=' + videoId + (timestamp ? '&t=' + timestamp + 's' : '');
+                    const url = new URL('/watch', 'https://www.youtube.com');
+
+                    url.searchParams.set('v', videoId);
+
+                    if (timestamp) {
+                        url.searchParams.set('t', timestamp + 's');
+                    }
+
+                    return url.href;
                 },
 
                 /**
@@ -848,11 +841,11 @@
                  * video link url
                  */
                 init: () => {
-                    let videoId = Comms.getSanitizedVideoId();
+                    let validVideoId = Comms.getValidVideoId();
                     let timestamp = Comms.getSanitizedTimestamp();
 
-                    if (videoId) {
-                        PlayOnYouTube.button().setAttribute('href', PlayOnYouTube.getVideoLinkURL(videoId, timestamp));
+                    if (validVideoId) {
+                        PlayOnYouTube.button().setAttribute('href', PlayOnYouTube.getVideoLinkURL(validVideoId, timestamp));
                     }
                 }
             };
