@@ -803,7 +803,9 @@ extension TabBarViewController: NSCollectionViewDataSource {
         if let footer = view as? TabBarFooter {
             footer.addButton?.target = self
             footer.addButton?.action = #selector(addButtonAction(_:))
+            footer.toolTip = UserText.newTabTooltip
         }
+
         return view
     }
 
