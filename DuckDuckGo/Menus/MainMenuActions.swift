@@ -131,7 +131,6 @@ extension AppDelegate {
     @IBAction func showManageBookmarks(_ sender: Any?) {
         let tabCollection = TabCollection(tabs: [Tab(content: .bookmarks)])
         let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection)
-        Pixel.fire(.manageBookmarks(source: .mainMenu))
         WindowsManager.openNewWindow(with: tabCollectionViewModel)
     }
 
@@ -470,7 +469,6 @@ extension MainViewController {
 
     @IBAction func showManageBookmarks(_ sender: Any?) {
         browserTabViewController.openNewTab(with: .bookmarks, selected: true)
-        Pixel.fire(.manageBookmarks(source: .mainMenu))
     }
 
     // MARK: - Window
