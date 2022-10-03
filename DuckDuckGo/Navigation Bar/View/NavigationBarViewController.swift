@@ -148,6 +148,8 @@ final class NavigationBarViewController: NSViewController {
         bookmarkListButton.sendAction(on: .leftMouseDown)
         downloadsButton.sendAction(on: .leftMouseDown)
         
+        optionsButton.toolTip = UserText.applicationMenuTooltip
+        
         #if DEBUG || REVIEW
         addDebugNotificationListeners()
         #endif
