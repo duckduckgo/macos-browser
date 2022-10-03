@@ -574,4 +574,6 @@ struct UserText {
     static let applicationMenuTooltip = NSLocalizedString("tooltip.application-menu.show", value: "Open application menu", comment: "Tooltip for the Application Menu button")
     
     static let privacyDashboardTooltip = NSLocalizedString("tooltip.privacy-dashboard.show", value: "Show the Privacy Dashboard and manage site settings", comment: "Tooltip for the Privacy Dashboard button")
+    static let addBookmarkTooltip = NSLocalizedString("tooltip.bookmark.add", value: "Bookmark this page", comment: "Tooltip for the Add Bookmark button")
+    static let editBookmarkTooltip = NSLocalizedString("tooltip.bookmark.edit", value: "Edit bookmark", comment: "Tooltip for the Edit Bookmark button")
 }
