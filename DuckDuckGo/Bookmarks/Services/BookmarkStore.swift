@@ -153,6 +153,7 @@ final class LocalBookmarkStore: BookmarkStore {
 
                 mainQueueCompletion(bookmarks: entities, error: nil)
             } catch let error {
+                os_log("DEBUG: Failed to load all bookmarks, with error: %{public}s", type: .error, error.localizedDescription)
                 completion(nil, error)
             }
         }
@@ -201,6 +202,8 @@ final class LocalBookmarkStore: BookmarkStore {
             do {
                 try self.context.save()
             } catch {
+                os_log("DEBUG: Failed to save bookmark, with error: %{public}s", type: .error, error.localizedDescription)
+
                 assertionFailure("LocalBookmarkStore: Saving of context failed")
                 DispatchQueue.main.async { completion(true, error) }
                 return
@@ -231,6 +234,8 @@ final class LocalBookmarkStore: BookmarkStore {
             do {
                 try self.context.save()
             } catch {
+                os_log("DEBUG: Failed to remove bookmark (count = %{public}d), with error: %{public}s", type: .error, identifiers.count, error.localizedDescription)
+
                 assertionFailure("LocalBookmarkStore: Saving of context failed")
                 DispatchQueue.main.async { completion(true, error) }
             }
@@ -258,6 +263,8 @@ final class LocalBookmarkStore: BookmarkStore {
             do {
                 try self.context.save()
             } catch {
+                os_log("DEBUG: Failed to update bookmark, with error: %{public}s", type: .error, error.localizedDescription)
+                
                 assertionFailure("LocalBookmarkStore: Saving of context failed")
             }
         }
@@ -282,6 +289,8 @@ final class LocalBookmarkStore: BookmarkStore {
             do {
                 try self.context.save()
             } catch {
+                os_log("DEBUG: Failed to update folder, with error: %{public}s", type: .error, error.localizedDescription)
+                
                 assertionFailure("LocalBookmarkStore: Saving of context failed")
             }
         }
@@ -323,6 +332,8 @@ final class LocalBookmarkStore: BookmarkStore {
             do {
                 try self.context.save()
             } catch {
+                os_log("DEBUG: Failed to add object, with error: %{public}s", type: .error, error.localizedDescription)
+                
                 assertionFailure("\(#file): Saving of context failed: \(error)")
                 DispatchQueue.main.async { completion(error) }
                 return
@@ -358,6 +369,8 @@ final class LocalBookmarkStore: BookmarkStore {
             do {
                 try self.context.save()
             } catch {
+                os_log("DEBUG: Failed to update object, with error: %{public}s", type: .error, error.localizedDescription)
+                
                 assertionFailure("\(#file): Saving of context failed")
                 DispatchQueue.main.async { completion(error) }
                 return
@@ -404,6 +417,8 @@ final class LocalBookmarkStore: BookmarkStore {
                 if !AppDelegate.isRunningTests {
                     assertionFailure("LocalBookmarkStore: Saving of context failed")
                 }
+                
+                os_log("DEBUG: Failed to save folder, with error: %{public}s", type: .error, error.localizedDescription)
 
                 DispatchQueue.main.async { completion(true, error) }
                 return
@@ -511,6 +526,8 @@ final class LocalBookmarkStore: BookmarkStore {
             do {
                 try self.context.save()
             } catch {
+                os_log("DEBUG: Failed to move object, with error: %{public}s", type: .error, error.localizedDescription)
+                
                 assertionFailure("\(#file): Saving of context failed")
                 DispatchQueue.main.async { completion(error) }
                 return
@@ -714,6 +731,8 @@ final class LocalBookmarkStore: BookmarkStore {
                 
                 if let existingRootFolder = try self.context.fetch(rootFolderFetchRequest).first,
                    let rootFolderParent = existingRootFolder.parentFolder {
+                    os_log("DEBUG: Removing root folder that has been moved, and relocating its child entities", type: .error)
+                    
                     existingRootFolder.children?.forEach { child in
                         if let bookmarkEntity = child as? BookmarkManagedObject {
                             bookmarkEntity.parentFolder = rootFolderParent
@@ -730,13 +749,18 @@ final class LocalBookmarkStore: BookmarkStore {
                 
                 var existingTopLevelEntities = try self.context.fetch(topLevelEntitiesFetchRequest)
                 
+                os_log("DEBUG: Got top level entities, count = %{public}d", type: .error, existingTopLevelEntities.count)
+                
                 let existingTopLevelFolderIndex = existingTopLevelEntities.firstIndex { entity in
                     entity.id == .rootBookmarkFolderUUID
                 }
                 
                 // Check if there's only one top level folder, and it's the root folder:
                 if existingTopLevelFolderIndex != nil, existingTopLevelEntities.count == 1 {
+                    os_log("DEBUG: Got single existing top level folder with UUID %{public}s, no migration needed!", type: .error, existingTopLevelEntities.first?.id?.uuidString ?? "UNKNOWN")
                     return
+                } else {
+                    os_log("DEBUG: No single top level folder found, proceeding to repair bookmark structure", type: .error)
                 }
 
                 // 2. Get or create the top level folder:
@@ -744,21 +768,25 @@ final class LocalBookmarkStore: BookmarkStore {
                 let topLevelFolder: BookmarkManagedObject
                 
                 if let existingTopLevelFolderIndex = existingTopLevelFolderIndex {
+                    os_log("DEBUG: Found existing top level folder", type: .error)
+
                     topLevelFolder = existingTopLevelEntities[existingTopLevelFolderIndex]
                     existingTopLevelEntities.remove(at: existingTopLevelFolderIndex)
                 } else {
+                    os_log("DEBUG: Creating new top level folder", type: .error)
+
                     let managedObject = NSEntityDescription.insertNewObject(forEntityName: BookmarkManagedObject.className(), into: self.context)
-                    
+
                     guard let newTopLevelFolder = managedObject as? BookmarkManagedObject else {
                         assertionFailure("LocalBookmarkStore: Failed to migrate top level entities")
                         return
                     }
-                    
+
                     newTopLevelFolder.id = .rootBookmarkFolderUUID
                     newTopLevelFolder.titleEncrypted = "Root Bookmarks Folder" as NSString
                     newTopLevelFolder.isFolder = true
                     newTopLevelFolder.dateAdded = NSDate.now
-                    
+
                     topLevelFolder = newTopLevelFolder
                 }
                 
@@ -769,7 +797,26 @@ final class LocalBookmarkStore: BookmarkStore {
                 // 4. Save the migration:
                 
                 try context.save()
+                
+                os_log("DEBUG: Top level folder was saved successfully - migration complete!", type: .error)
             } catch {
+                os_log("DEBUG: Failed to perform root folder migration, with error: %{public}s", type: .error, error.localizedDescription)
+                
+                let nsError = error as NSError
+
+                guard let validationErrors = nsError.userInfo["NSDetailedErrors"] as? [NSError] else {
+                    os_log("DEBUG: Could not get detailed errors", type: .error)
+                    return
+                }
+                
+                for error in validationErrors {
+                    if let managedObject = error.userInfo["NSValidationErrorObject"] as? BookmarkManagedObject {
+                        os_log("DEBUG: Validation error for bookmark with id %{public}s: %{public}s", type: .error, managedObject.id?.uuidString ?? "UNKNOWN", error.localizedDescription)
+                    } else {
+                        os_log("DEBUG: Validation error: %{public}s", type: .error, error.localizedDescription)
+                    }
+                }
+                
                 Pixel.fire(.debug(event: .bookmarksStoreRootFolderMigrationFailed, error: error))
             }
         }
