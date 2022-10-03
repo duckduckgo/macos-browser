@@ -174,7 +174,6 @@ extension AppDelegate {
                 let exporter = CSVLoginExporter(secureVault: vault!)
                 do {
                     try exporter.exportVaultLogins(to: selectedURL)
-                    Pixel.fire(.exportedLogins())
                 } catch {
                     NSAlert.exportLoginsFailed()
                         .beginSheetModal(for: window, completionHandler: nil)
@@ -198,7 +197,6 @@ extension AppDelegate {
             let exporter = BookmarksExporter(list: list)
             do {
                 try exporter.exportBookmarksTo(url: selectedURL)
-                Pixel.fire(.exportedBookmarks())
             } catch {
                 NSAlert.exportBookmarksFailed()
                     .beginSheetModal(for: window, completionHandler: nil)

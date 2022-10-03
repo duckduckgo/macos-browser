@@ -102,9 +102,7 @@ extension Pixel {
         case serp
 
         case importedLogins(repetition: Repetition = .init(key: "imported-logins"), source: DataImportSource)
-        case exportedLogins(repetition: Repetition = .init(key: "exported-logins"))
         case importedBookmarks(repetition: Repetition = .init(key: "imported-bookmarks"), source: DataImportSource)
-        case exportedBookmarks(repetition: Repetition = .init(key: "exported-bookmarks"))
         
         case dataImportFailed(action: DataImportAction, source: DataImportSource)
 
@@ -114,7 +112,7 @@ extension Pixel {
         case waitlistFirstLaunch
         case waitlistPresentedLockScreen
         case waitlistDismissedLockScreen
-        
+
         case autoconsentOptOutFailed
         case autoconsentSelfTestFailed
         
@@ -122,7 +120,7 @@ extension Pixel {
         
         case adClickAttributionDetected
         case adClickAttributionActive
-
+        
         case debug(event: Debug, error: Error? = nil)
 
         enum Debug {
@@ -232,14 +230,8 @@ extension Pixel.Event {
         case .importedLogins(repetition: let repetition, source: let source):
             return "m_mac_imported-logins_\(repetition)_\(source)"
 
-        case .exportedLogins(repetition: let repetition):
-            return "m_mac_exported-logins_\(repetition)"
-
         case .importedBookmarks(repetition: let repetition, source: let source):
             return "m_mac_imported-bookmarks_\(repetition)_\(source)"
-
-        case .exportedBookmarks(repetition: let repetition):
-            return "m_mac_exported-bookmarks_\(repetition)"
             
         case .dataImportFailed(action: let action, source: let source):
             return "m_mac_data-import-failed_\(action)_\(source)"
