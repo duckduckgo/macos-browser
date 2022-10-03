@@ -142,13 +142,6 @@ extension Pixel {
         case waitlistFirstLaunch
         case waitlistPresentedLockScreen
         case waitlistDismissedLockScreen
-
-        case onboardingStartPressed
-        case onboardingImportPressed
-        case onboardingImportSkipped
-        case onboardingSetDefaultPressed
-        case onboardingSetDefaultSkipped
-        case onboardingTypingSkipped
         
         case autoconsentOptOutFailed
         case autoconsentSelfTestFailed
@@ -325,24 +318,6 @@ extension Pixel.Event {
 
         case .debug(event: let event, error: _):
             return "m_mac_debug_\(event.name)"
-
-        case .onboardingStartPressed:
-            return "m_mac_onboarding_start_pressed"
-
-        case .onboardingImportPressed:
-            return "m_mac_onboarding_import_pressed"
-
-        case .onboardingImportSkipped:
-            return "m_mac_onboarding_import_skipped"
-
-        case .onboardingSetDefaultPressed:
-            return "m_mac_onboarding_setdefault_pressed"
-
-        case .onboardingSetDefaultSkipped:
-            return "m_mac_onboarding_setdefault_skipped"
-
-        case .onboardingTypingSkipped:
-            return "m_mac_onboarding_setdefault_skipped"
 
         case .autoconsentOptOutFailed:
             return "m_mac_autoconsent_optout_failed"
