@@ -599,7 +599,7 @@
                         let timeParameter = parameters.get('t');
 
                         if (timeParameter) {
-                            return Comms.sanitizeTimestamp(timeParameter);
+                            return Comms.getTimestampInSeconds(timeParameter);
                         }
 
                         return false;
@@ -614,16 +614,14 @@
                  * @param {string} untrusted
                  * @returns {(number|false)}
                  */
-                sanitizeTimestamp: (untrusted) => {
-                    let sanitized = untrusted.replace(/[^0-9hms]/g, '');
-
+                getTimestampInSeconds: (timestamp) => {
                     let units = {
                         'h': 3600,
                         'm': 60,
                         's': 1,
                     }
 
-                    let parts = sanitized.split(/(\d+[hms]{1})/);
+                    let parts = timestamp.split(/(\d+[hms])/);
                     let totalSeconds = 0;
 
                     parts.forEach(part => {
@@ -765,7 +763,7 @@
 
                 /**
                  * Toggle visibility of the entire settings container
-                 * @param {booleane} visible
+                 * @param {boolean} visible
                  */
                 toggleVisibility: (visible) => {
                     Setting.container().classList[!visible ? 'add' : 'remove']('hidden');
