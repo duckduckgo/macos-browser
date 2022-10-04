@@ -26,7 +26,7 @@ export const IconOverlay = {
         overlayElement.setAttribute('class', 'ddg-overlay' + (extraClass ? ' ' + extraClass : ''));
         overlayElement.setAttribute('data-size', size);
         overlayElement.innerHTML = `
-                <a class="ddg-play-privately" href="${videoURL}">
+                <a class="ddg-play-privately" href="#">
                     <div class="ddg-dax">
                         ${dax}
                     </div>
@@ -36,6 +36,8 @@ export const IconOverlay = {
                         </div>
                     </div>
                 </a>`;
+
+        overlayElement.querySelector('a.ddg-play-privately')?.setAttribute('href', videoURL);
 
         return overlayElement;
     },
