@@ -602,9 +602,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             return false
         }
 
-        if case .privatePlayer(let videoID, let timestamp) = content,
-           webView.url == .youtubeNoCookie(videoID, timestamp: timestamp)
-            || (webView.url == .youtube(videoID, timestamp: timestamp) && PrivacySecurityPreferences.shared.privatePlayerMode != .enabled) {
+        if PrivatePlayer.shouldSkipLoadingURL(for: self) {
             return false
         }
 

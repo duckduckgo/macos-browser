@@ -85,6 +85,16 @@ enum PrivatePlayer {
         return actualTitle.dropping(prefix: Self.websiteTitlePrefix)
     }
 
+    static func shouldSkipLoadingURL(for tab: Tab) -> Bool {
+        guard case .privatePlayer(let videoID, let timestamp) = tab.content,
+           tab.webView.url == .youtubeNoCookie(videoID, timestamp: timestamp)
+            || (tab.webView.url == .youtube(videoID, timestamp: timestamp) && PrivacySecurityPreferences.shared.privatePlayerMode != .enabled)
+        else {
+            return false
+        }
+        return true
+    }
+
     static func decidePolicy(for navigationAction: WKNavigationAction, in tab: Tab) -> WKNavigationActionPolicy? {
         guard !Self.isDisabled else {
             return nil
