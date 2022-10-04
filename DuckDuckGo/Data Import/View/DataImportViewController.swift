@@ -377,13 +377,6 @@ final class DataImportViewController: NSViewController {
                     self.viewState.interactionState = .completedImport(summary)
                 }
 
-                if case .completed = summary.loginsResult {
-                    self.fireImportLoginsPixelForSelectedImportSource()
-                }
-                if summary.bookmarksResult != nil {
-                    self.fireImportBookmarksPixelForSelectedImportSource()
-                }
-
                 NotificationCenter.default.post(name: .dataImportComplete, object: nil)
             case .failure(let error):
                 switch error.errorType {
@@ -422,32 +415,6 @@ final class DataImportViewController: NSViewController {
 
             let alert = NSAlert.importFailedAlert(source: viewState.selectedImportSource, linkDelegate: self)
             alert.beginSheetModal(for: window, completionHandler: nil)
-        }
-    }
-
-    private func fireImportLoginsPixelForSelectedImportSource() {
-        switch self.viewState.selectedImportSource {
-        case .brave: Pixel.fire(.importedLogins(source: .brave))
-        case .chrome: Pixel.fire(.importedLogins(source: .chrome))
-        case .csv: Pixel.fire(.importedLogins(source: .csv))
-        case .lastPass: Pixel.fire(.importedLogins(source: .lastPass))
-        case .onePassword: Pixel.fire(.importedLogins(source: .onePassword))
-        case .edge: Pixel.fire(.importedLogins(source: .edge))
-        case .firefox: Pixel.fire(.importedLogins(source: .firefox))
-        case .safari: Pixel.fire(.importedLogins(source: .safari))
-        case .bookmarksHTML: assertionFailure("Attempted to fire invalid logins import pixel")
-        }
-    }
-
-    private func fireImportBookmarksPixelForSelectedImportSource() {
-        switch self.viewState.selectedImportSource {
-        case .brave: Pixel.fire(.importedBookmarks(source: .brave))
-        case .chrome: Pixel.fire(.importedBookmarks(source: .chrome))
-        case .csv, .lastPass, .onePassword: assertionFailure("Attempted to fire invalid bookmark import pixel")
-        case .edge: Pixel.fire(.importedBookmarks(source: .edge))
-        case .firefox: Pixel.fire(.importedBookmarks(source: .firefox))
-        case .safari: Pixel.fire(.importedBookmarks(source: .safari))
-        case .bookmarksHTML: Pixel.fire(.importedBookmarks(source: .bookmarksHTML))
         }
     }
 

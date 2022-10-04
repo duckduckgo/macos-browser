@@ -73,8 +73,6 @@ extension Pixel.Event {
              .brokenSiteReport,
              .compileRulesWait,
              .serp,
-             .importedLogins,
-             .importedBookmarks,
              .dataImportFailed,
              .formAutofilled,
              .autofillItemSaved,

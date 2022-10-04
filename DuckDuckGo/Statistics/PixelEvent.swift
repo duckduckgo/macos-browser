@@ -95,9 +95,6 @@ extension Pixel {
         }
 
         case serp
-
-        case importedLogins(repetition: Repetition = .init(key: "imported-logins"), source: DataImportSource)
-        case importedBookmarks(repetition: Repetition = .init(key: "imported-bookmarks"), source: DataImportSource)
         
         case dataImportFailed(action: DataImportAction, source: DataImportSource)
 
@@ -213,12 +210,6 @@ extension Pixel.Event {
         case .serp:
             return "m_mac_navigation_search"
 
-        case .importedLogins(repetition: let repetition, source: let source):
-            return "m_mac_imported-logins_\(repetition)_\(source)"
-
-        case .importedBookmarks(repetition: let repetition, source: let source):
-            return "m_mac_imported-bookmarks_\(repetition)_\(source)"
-            
         case .dataImportFailed(action: let action, source: let source):
             return "m_mac_data-import-failed_\(action)_\(source)"
 
