@@ -524,6 +524,17 @@
         return resp.then((x) => JSON.parse(x)).catch((e) => console.error("could not call readUserValues", e));
       }
       return Promise.reject(resp);
+    },
+    onUserValuesNotification(cb) {
+      window.addEventListener("message", (evt) => {
+        if (!evt.isTrusted)
+          return;
+        if (evt.origin !== "https://www.youtube.com")
+          return;
+        if (!evt.data?.userValuesNotification)
+          return;
+        cb(evt.data.userValuesNotification);
+      });
     }
   };
 
@@ -549,6 +560,11 @@
     console.log("\u{1F474} reading user prefs", userValues);
     console.log("\u{1F474} environment", environment);
     const videoPlayerOverlay = new VideoPlayerOverlay(userValues, environment, comms);
+    defaultComms.onUserValuesNotification((userValues2) => {
+      console.log("got new values after zero", userValues2);
+      videoPlayerOverlay.userValues = userValues2;
+      videoPlayerOverlay.watchForVideoBeingAdded({ ignoreCache: true });
+    });
     const CSS = {
       styles: styles_default,
       init: () => {

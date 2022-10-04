@@ -40,8 +40,12 @@ defaultComms.readUserValues().then((userValues) => {
 function enable(userValues, environment = defaultEnvironment, comms = defaultComms) {
     console.log("👴 reading user prefs", userValues);
     console.log("👴 environment", environment);
-
     const videoPlayerOverlay = new VideoPlayerOverlay(userValues, environment, comms);
+    defaultComms.onUserValuesNotification((userValues) => {
+        console.log("got new values after zero", userValues)
+        videoPlayerOverlay.userValues = userValues;
+        videoPlayerOverlay.watchForVideoBeingAdded({ignoreCache: true});
+    })
     const CSS = {
         styles: css,
         /**

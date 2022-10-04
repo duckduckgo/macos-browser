@@ -40,18 +40,18 @@ final class YoutubeOverlayUserScript: NSObject, StaticUserScript {
         let overlayInteracted: Bool;
     }
 
-    func initWithInitialValues(userValues: UserValues, in webView: WKWebView) {
-        guard let json = try? JSONEncoder().encode(userValues), let jsonString = String(data: json, encoding: .utf8) else {
+    struct UserValuesNotification: Encodable {
+        let userValuesNotification: UserValues;
+    }
+
+    func userValuesUpdated(userValues: UserValues, inWebView webView: WKWebView) {
+        let message = UserValuesNotification(userValuesNotification: userValues);
+        guard let json = try? JSONEncoder().encode(message), let jsonString = String(data: json, encoding: .utf8) else {
             assertionFailure("YoutubeOverlayUserScript: could not convert UserValues into JSON")
             return
         }
-        if userValues.privatePlayerMode == .disabled {
-//            print("❌ disable")
-//            evaluateJSCall(call: "disable(\(jsonString))", webView: webView)
-        } else {
-//            print("✅ enable")
-//            evaluateJSCall(call: "enable(\(jsonString))", webView: webView)
-        }
+        let js = "window.postMessage(\(jsonString));"
+        evaluate(js: js, inWebView: webView)
     }
 
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {

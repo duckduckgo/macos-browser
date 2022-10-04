@@ -798,11 +798,19 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         youtubePlayerCancellables.removeAll()
 
         if webView.url?.host?.droppingWwwPrefix() == "youtube.com" {
-            let userValues = YoutubeOverlayUserScript.UserValues(
-                    privatePlayerMode: PrivacySecurityPreferences.shared.privatePlayerMode,
-                    overlayInteracted: PrivacySecurityPreferences.shared.youtubeOverlayInteracted
-            );
-            youtubeOverlayScript?.initWithInitialValues(userValues: userValues, in: self.webView)
+            PrivacySecurityPreferences.shared.$privatePlayerMode
+                .dropFirst()
+                .removeDuplicates()
+                .sink { [weak self] playerMode in
+                    guard let self = self else {
+                        return
+                    }
+                    let userValues = YoutubeOverlayUserScript.UserValues(
+                            privatePlayerMode: playerMode,
+                            overlayInteracted: PrivacySecurityPreferences.shared.youtubeOverlayInteracted
+                    );
+                    self.youtubeOverlayScript?.userValuesUpdated(userValues: userValues, inWebView: self.webView)
+                }.store(in: &youtubePlayerCancellables)
         }
 
         if url?.isPrivatePlayerScheme == true {

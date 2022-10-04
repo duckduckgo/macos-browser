@@ -24,5 +24,13 @@ export const macOSCommunications = {
                 .catch(e => console.error("could not call readUserValues", e));
         }
         return Promise.reject(resp)
+    },
+    onUserValuesNotification(cb) {
+        window.addEventListener("message", (evt) => {
+            if (!evt.isTrusted) return;
+            if (evt.origin !== "https://www.youtube.com") return;
+            if (!evt.data?.userValuesNotification) return;
+            cb(evt.data.userValuesNotification);
+        })
     }
 }
