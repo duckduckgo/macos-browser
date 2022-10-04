@@ -47,6 +47,6 @@ final class TabShadowView: NSView {
         super.layout()
         shadowLine.wantsLayer = true
         shadowLine.layer?.backgroundColor = NSColor(named: TabShadowConfig.colorName)?.cgColor
-        shadowLine.frame = CGRect(x: 0, y: 2, width: frame.width, height: 1)
+        shadowLine.frame = CGRect(x: 0, y: 2, width: frame.width, height: TabShadowConfig.dividerSize)
     }
 }

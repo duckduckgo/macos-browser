@@ -85,15 +85,8 @@ final class TabBarViewController: NSViewController {
         subscribeToSelectionIndex()
         setupFireButton()
         setupPinnedTabsView()
-        setupShadowView()
     }
 
-    private func setupShadowView() {
-//        shadowView.wantsLayer = true
-//        shadowView.layer?.borderWidth = 1
-//        shadowView.layer?.borderColor = NSColor.blue.cgColor
-    }
-    
     override func viewWillAppear() {
         super.viewWillAppear()
 

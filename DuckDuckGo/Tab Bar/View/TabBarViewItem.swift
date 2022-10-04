@@ -257,7 +257,7 @@ final class TabBarViewItem: NSCollectionViewItem {
 
     private lazy var borderLayer: CALayer = {
         let layer = CALayer()
-        layer.borderWidth = 1
+        layer.borderWidth = TabShadowConfig.dividerSize
         layer.opacity = TabShadowConfig.alpha
         layer.maskedCorners = [.layerMaxXMaxYCorner, .layerMinXMaxYCorner]
         layer.cornerRadius = 7
@@ -295,9 +295,9 @@ final class TabBarViewItem: NSCollectionViewItem {
         super.viewWillLayout()
         
         borderLayer.frame = self.view.bounds
-        leftPixelMask.frame = CGRect(x: 0, y: 0, width: 1, height: 1)
-        rightPixelMask.frame = CGRect(x: borderLayer.bounds.width - 1, y: 0, width: 1, height: 1)
-        topContentLineMask.frame = CGRect(x: 0, y: 1, width: borderLayer.bounds.width, height: borderLayer.bounds.height - 1)
+        leftPixelMask.frame = CGRect(x: 0, y: 0, width: TabShadowConfig.dividerSize, height: TabShadowConfig.dividerSize)
+        rightPixelMask.frame = CGRect(x: borderLayer.bounds.width - TabShadowConfig.dividerSize, y: 0, width: TabShadowConfig.dividerSize, height: TabShadowConfig.dividerSize)
+        topContentLineMask.frame = CGRect(x: 0, y: TabShadowConfig.dividerSize, width: borderLayer.bounds.width, height: borderLayer.bounds.height - TabShadowConfig.dividerSize)
     }
     
     private func updateBorderLayerColor() {

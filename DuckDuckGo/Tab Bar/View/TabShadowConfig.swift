@@ -21,4 +21,5 @@ import Foundation
 enum TabShadowConfig {
     static let alpha: Float = 1
     static let colorName: String = "TabShadowLine"
+    static let dividerSize: CGFloat = 1
 }
