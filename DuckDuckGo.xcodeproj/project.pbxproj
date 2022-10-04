@@ -756,7 +756,6 @@
 		B6C0B23926E742610031CB7F /* FileDownloadError.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C0B23826E742610031CB7F /* FileDownloadError.swift */; };
 		B6C0B23C26E87D900031CB7F /* NSAlert+ActiveDownloadsTermination.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C0B23B26E87D900031CB7F /* NSAlert+ActiveDownloadsTermination.swift */; };
 		B6C0B23E26E8BF1F0031CB7F /* DownloadListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C0B23D26E8BF1F0031CB7F /* DownloadListViewModel.swift */; };
-		B6C0B24426E9CB080031CB7F /* RunLoopExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C0B24326E9CB080031CB7F /* RunLoopExtension.swift */; };
 		B6C0B24626E9CB190031CB7F /* RunLoopExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C0B24526E9CB190031CB7F /* RunLoopExtensionTests.swift */; };
 		B6C2C9EF276081AB005B7F0A /* DeallocationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C2C9EE276081AB005B7F0A /* DeallocationTests.swift */; };
 		B6C2C9F62760B659005B7F0A /* TestDataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = B6C2C9F42760B659005B7F0A /* TestDataModel.xcdatamodeld */; };
@@ -1592,7 +1591,6 @@
 		B6C0B23826E742610031CB7F /* FileDownloadError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileDownloadError.swift; sourceTree = "<group>"; };
 		B6C0B23B26E87D900031CB7F /* NSAlert+ActiveDownloadsTermination.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSAlert+ActiveDownloadsTermination.swift"; sourceTree = "<group>"; };
 		B6C0B23D26E8BF1F0031CB7F /* DownloadListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadListViewModel.swift; sourceTree = "<group>"; };
-		B6C0B24326E9CB080031CB7F /* RunLoopExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RunLoopExtension.swift; sourceTree = "<group>"; };
 		B6C0B24526E9CB190031CB7F /* RunLoopExtensionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RunLoopExtensionTests.swift; sourceTree = "<group>"; };
 		B6C2C9EE276081AB005B7F0A /* DeallocationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeallocationTests.swift; sourceTree = "<group>"; };
 		B6C2C9F52760B659005B7F0A /* Permissions.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Permissions.xcdatamodel; sourceTree = "<group>"; };
@@ -3665,7 +3663,6 @@
 				AAFCB37E25E545D400859DD4 /* PublisherExtension.swift */,
 				B684592625C93C0500DC17B6 /* Publishers.NestedObjectChanges.swift */,
 				B6AAAC3D26048F690029438D /* RandomAccessCollectionExtension.swift */,
-				B6C0B24326E9CB080031CB7F /* RunLoopExtension.swift */,
 				4BB88B4925B7B690006F6B06 /* SequenceExtensions.swift */,
 				B65783E625F8AAFB00D8DB33 /* String+Punycode.swift */,
 				AA8EDF2624923EC70071C2E8 /* StringExtension.swift */,
@@ -4728,7 +4725,6 @@
 				4B9292CE2667123700AD2C21 /* BrowserTabSelectionDelegate.swift in Sources */,
 				4B1E6EEE27AB5E5100F51793 /* PasswordManagementListSection.swift in Sources */,
 				AA222CB92760F74E00321475 /* FaviconReferenceCache.swift in Sources */,
-				B6C0B24426E9CB080031CB7F /* RunLoopExtension.swift in Sources */,
 				4B9292A126670D2A00AD2C21 /* BookmarkTreeController.swift in Sources */,
 				4B29759728281F0900187C4E /* FirefoxEncryptionKeyReader.swift in Sources */,
 				4B9292D02667123700AD2C21 /* BookmarkManagementSplitViewController.swift in Sources */,
@@ -6254,7 +6250,7 @@
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
 				kind = exactVersion;
-				version = 31.0.0;
+				version = 32.0.0;
 			};
 		};
 		AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
