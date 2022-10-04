@@ -68,8 +68,8 @@
 }
 
 .ddg-overlay[data-size="video-player"] {
-    top: 5px;
-    left: 5px;
+    bottom: 145px;
+    right: 20px;
 }
 
 .ddg-overlay[data-size="video-player-with-title"] {
