@@ -40,22 +40,26 @@
       }
       return "privateplayer:" + privatePlayerURL;
     },
-    getYoutubeVideoId(href) {
+    getYoutubeVideoIdForCurrentPlayer(href) {
       const url = new URL(href);
       const videoId = url.searchParams.get("v");
-      if (!videoId)
-        return null;
-      const matchingElement = document.querySelector("#player video");
       if (!url.pathname.startsWith("/watch")) {
         return null;
       }
-      if (!matchingElement) {
+      if (!videoId) {
         return null;
       }
-      if (/^[a-zA-Z0-9-_]*$/g.test(videoId)) {
-        return videoId;
+      if (!/^[a-zA-Z0-9-_]*$/g.test(videoId)) {
+        return null;
       }
-      return null;
+      const playerElement = document.querySelector("#player");
+      if (!playerElement) {
+        return null;
+      }
+      if (playerElement.classList.contains("skeleton")) {
+        return null;
+      }
+      return videoId;
     },
     appendImageAsBackground(parent, targetSelector, imageUrl) {
       let canceled = false;
@@ -259,55 +263,20 @@
     constructor() {
       __publicField(this, "cleanups", []);
     }
-    init(videoId) {
+    init(containerElement, videoId) {
       this.cleanup();
-      let videoPlayer = document.querySelector("#player");
-      if (!videoPlayer)
-        return console.warn("cannot continue without video player");
-      console.log("add vpi");
       const iconElement = IconOverlay.create("video-player", videoId, "hidden");
-      Util.appendElement(videoPlayer, iconElement);
-      console.log("addClass", videoPlayer);
-      videoPlayer.classList.add("has-ddg-overlay");
+      if (!containerElement) {
+        console.error("missing container element");
+      }
+      Util.appendElement(containerElement, iconElement);
+      iconElement.classList.remove("hidden");
       this.cleanups.push({
-        name: "removing dax icon",
+        name: "removing dax \u{1F425} icon overlay",
         fn() {
-          videoPlayer?.removeChild(iconElement);
-          videoPlayer?.classList.remove("has-ddg-overlay");
+          containerElement?.removeChild(iconElement);
         }
       });
-      let hasTitle = !document.querySelector("#player .ytp-hide-info-bar");
-      let hasPaidContentElement = document.querySelector(".ytp-paid-content-overlay-link");
-      let hasPaidContent = hasPaidContentElement && hasPaidContentElement.offsetWidth > 0;
-      let isAds = document.querySelector("#player .ad-showing");
-      let vpiClasses = document.querySelector('.ddg-overlay[data-size^="video-player"]').classList;
-      if (isAds) {
-        console.log("isAds, maybe hide?");
-        if (!vpiClasses.contains("hidden")) {
-          console.log("isAds, hide");
-          vpiClasses.add("hidden");
-        }
-      } else {
-        if (vpiClasses.contains("hidden")) {
-          console.log("is not ads, show after 50ms");
-          setTimeout(() => {
-            if (!document.querySelector("#player .ad-showing") && vpiClasses.contains("hidden")) {
-              vpiClasses.remove("hidden");
-            }
-          }, 50);
-        }
-      }
-      if (hasPaidContent) {
-        console.log("they just showed paid content, update position");
-        if (document.querySelector('.ddg-overlay[data-size="video-player"]')) {
-          document.querySelector('.ddg-overlay[data-size="video-player"]')?.setAttribute("data-size", "video-player-with-paid-content");
-        }
-      } else {
-        console.log("they just hid paid content, update position");
-        if (document.querySelector('.ddg-overlay[data-size="video-player-with-paid-content"]')) {
-          document.querySelector('.ddg-overlay[data-size="video-player-with-paid-content"]')?.setAttribute("data-size", "video-player");
-        }
-      }
     }
     cleanup() {
       Util.execCleanups(this.cleanups);
@@ -421,14 +390,19 @@
     }
     addSmallDaxOverlay(videoId) {
       console.log("\u{1F986} showing small dax overlay on video", videoId);
+      let containerElement = document.querySelector("#player .html5-video-player");
+      if (!containerElement) {
+        console.error("no container element");
+        return;
+      }
       if (!this.videoPlayerIcon) {
         this.videoPlayerIcon = new VideoPlayerIcon();
       }
-      this.videoPlayerIcon.init(videoId);
+      this.videoPlayerIcon.init(containerElement, videoId);
     }
     watchForVideoBeingAdded(opts = {}) {
       const href = this.environment.getHref();
-      const videoId = Util.getYoutubeVideoId(href);
+      const videoId = Util.getYoutubeVideoIdForCurrentPlayer(href);
       if (!videoId) {
         return;
       }
@@ -626,7 +600,7 @@
       getPreviewVideoLink: () => {
         let linkSelector = 'a[href^="/watch?v="]';
         let previewVideo = document.querySelector("#preview " + linkSelector + " video");
-        return previewVideo.closest(linkSelector);
+        return previewVideo?.closest(linkSelector);
       },
       appendIfNotAppended: () => {
         if (!OverlaySettings.enabled.thumbnails) {

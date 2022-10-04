@@ -1,6 +1,17 @@
 import {Util} from "./util";
 import dax from "../assets/dax.svg";
 
+// class Debug extends HTMLElement {
+//     disconnectedCallback() {
+//         console.error("disconnectedCallback")
+//     }
+// }
+// customElements.define("yt-debug", Debug);
+
+// usage: <yt-debug></yt-debug>
+// place in any DOM that the page removes, and you'll get a nice stack
+// tract showing which JS call lead up to it
+
 export const IconOverlay = {
     /**
      * Special class used for the overlay hover. For hovering, we use a

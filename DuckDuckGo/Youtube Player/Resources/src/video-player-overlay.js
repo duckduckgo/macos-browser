@@ -161,10 +161,15 @@ export class VideoPlayerOverlay {
      */
     addSmallDaxOverlay(videoId) {
         console.log("🦆 showing small dax overlay on video", videoId)
+        let containerElement = document.querySelector('#player .html5-video-player')
+        if (!containerElement) {
+            console.error("no container element");
+            return;
+        }
         if (!this.videoPlayerIcon) {
             this.videoPlayerIcon = new VideoPlayerIcon();
         }
-        this.videoPlayerIcon.init(videoId);
+        this.videoPlayerIcon.init(containerElement, videoId);
     }
 
     /**
@@ -172,7 +177,7 @@ export class VideoPlayerOverlay {
      */
     watchForVideoBeingAdded(opts = {}) {
         const href = this.environment.getHref();
-        const videoId = Util.getYoutubeVideoId(href);
+        const videoId = Util.getYoutubeVideoIdForCurrentPlayer(href);
         if (!videoId) {
             return;
         }

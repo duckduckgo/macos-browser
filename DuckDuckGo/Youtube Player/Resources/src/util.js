@@ -50,30 +50,39 @@ export const Util = {
      * @param {string} href
      * @returns {string | null}
      */
-    getYoutubeVideoId(href) {
+    getYoutubeVideoIdForCurrentPlayer(href) {
         const url = new URL(href);
         const videoId = url.searchParams.get("v");
 
-        if (!videoId) return null;
-
-        const matchingElement = document.querySelector('#player video');
-
         if (!url.pathname.startsWith("/watch")) {
-            // console.log("not on /watch page");
+            // console.log("📎 not on /watch page");
             return null;
         }
 
-        if (!matchingElement) {
-            // console.log("video not found")
+        if (!videoId) {
+            // console.log("📎 missing v param")
+            return null;
+        }
+
+        // ensure youtube video id is good
+        if (!/^[a-zA-Z0-9-_]*$/g.test(videoId)) {
+            // console.log("📎 invalid youtube video id")
             return null
         }
 
-        // finally, ensure youtube video id is good
-        if (/^[a-zA-Z0-9-_]*$/g.test(videoId)) {
-            return videoId
+        const playerElement = document.querySelector('#player');
+
+        if (!playerElement) {
+            // console.log("📎 video not found")
+            return null
         }
 
-        return null;
+        if (playerElement.classList.contains('skeleton')) {
+            // console.log("📎 #player element had .skeleton classname")
+            return null;
+        }
+
+        return videoId;
     },
     /**
      * Try to load an image first. If the status code is 2xx, then continue
