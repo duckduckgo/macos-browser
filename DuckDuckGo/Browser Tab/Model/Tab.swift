@@ -1411,10 +1411,6 @@ extension Tab: WKNavigationDelegate {
         self.mainFrameLoadState = .finished
 
         StatisticsLoader.shared.refreshRetentionAtb(isSearch: request.url?.isDuckDuckGoSearch == true)
-
-        if [.initial, .dailyFirst].contains(Pixel.Event.Repetition(key: "app_usage")) {
-            Pixel.fire(.appUsage)
-        }
     }
 
     @objc(_webView:didFailProvisionalLoadWithRequest:inFrame:withError:)
