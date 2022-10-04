@@ -54,19 +54,19 @@ enum PrivatePlayer {
     static let privatePlayerScheme = "privateplayer"
     static let commonName = UserText.privatePlayer
 
-    static var isDisabled: Bool {
-        PrivacySecurityPreferences.shared.privatePlayerMode == .disabled
+    static var mode: PrivatePlayerMode {
+        PrivacySecurityPreferences.shared.privatePlayerMode
     }
 
     static func image(for faviconView: FaviconView) -> NSImage? {
-        guard !Self.isDisabled, faviconView.domain == Self.commonName else {
+        guard Self.mode != .disabled, faviconView.domain == Self.commonName else {
             return nil
         }
         return .privatePlayer
     }
 
     static func tabContent(for url: URL?) -> Tab.TabContent? {
-        guard !Self.isDisabled, let url = url, let (videoID, timestamp) = url.youtubeVideoParams else {
+        guard Self.mode != .disabled, let url = url, let (videoID, timestamp) = url.youtubeVideoParams else {
             return nil
         }
 
@@ -96,7 +96,7 @@ enum PrivatePlayer {
     }
 
     static func decidePolicy(for navigationAction: WKNavigationAction, in tab: Tab) -> WKNavigationActionPolicy? {
-        guard !Self.isDisabled else {
+        guard Self.mode != .disabled else {
             return nil
         }
 
