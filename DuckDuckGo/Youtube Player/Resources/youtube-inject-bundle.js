@@ -33,8 +33,17 @@
       to.appendChild(element);
     },
     getPrivatePlayerURL: (relativePath) => {
-      let videoId = relativePath.replace("/watch?v=", "");
-      return "privateplayer:" + videoId;
+      let url = new URL(relativePath, window.location.origin);
+      let validVideoId = /^[a-zA-Z0-9-_]+$/g;
+      let validTimestamp = /^[0-9hms]+$/g;
+      let privatePlayerURL = "";
+      if (validVideoId.test(url?.searchParams.get("v"))) {
+        privatePlayerURL = url.searchParams.get("v");
+      }
+      if (validTimestamp.test(url?.searchParams.get("t"))) {
+        privatePlayerURL += "&t=" + url.searchParams.get("t");
+      }
+      return "privateplayer:" + privatePlayerURL;
     },
     getYoutubeVideoId(href) {
       const url = new URL(href);
@@ -238,6 +247,14 @@
         }
       };
       return getSizeType(imagesByArea[largestImage].offsetWidth, imagesByArea[largestImage].offsetHeight);
+    },
+    removeAll: () => {
+      document.querySelectorAll(IconOverlay.OVERLAY_CLASS).forEach((element) => {
+        element.remove();
+      });
+      document.querySelectorAll(".ddg-has-overlay").forEach((element) => {
+        element.classList.remove("ddg-has-overlay");
+      });
     }
   };
 

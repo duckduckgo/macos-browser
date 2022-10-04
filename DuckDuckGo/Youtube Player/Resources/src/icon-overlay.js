@@ -190,5 +190,15 @@ export const IconOverlay = {
         }
 
         return getSizeType(imagesByArea[largestImage].offsetWidth, imagesByArea[largestImage].offsetHeight);
+    },
+
+    removeAll: () => {
+        document.querySelectorAll(IconOverlay.OVERLAY_CLASS).forEach(element => {
+            element.remove();
+        });
+
+        document.querySelectorAll('.ddg-has-overlay').forEach(element => {
+            element.classList.remove('ddg-has-overlay');
+        });
     }
 };

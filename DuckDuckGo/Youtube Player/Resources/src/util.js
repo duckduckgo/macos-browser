@@ -40,9 +40,22 @@ export const Util = {
      * @param {string} relativePath - for now, it's expected to always be something like /watch?v=VIDEO_ID, there is no validation yet.
      */
     getPrivatePlayerURL: (relativePath) => {
-        let videoId = relativePath.replace('/watch?v=', '');
+        let url = new URL(relativePath, window.location.origin);
 
-        return 'privateplayer:' + videoId;
+        let validVideoId = /^[a-zA-Z0-9-_]+$/g;
+        let validTimestamp = /^[0-9hms]+$/g
+
+        let privatePlayerURL = '';
+
+        if (validVideoId.test(url?.searchParams.get('v'))) {
+            privatePlayerURL = url.searchParams.get('v');
+        }
+
+        if (validTimestamp.test(url?.searchParams.get('t'))) {
+            privatePlayerURL += '&t=' + url.searchParams.get('t');
+        }
+
+        return 'privateplayer:' + privatePlayerURL;
     },
     /**
      * @param {string} href
