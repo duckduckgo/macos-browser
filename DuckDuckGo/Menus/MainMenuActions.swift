@@ -122,7 +122,6 @@ extension AppDelegate {
             assertionFailure("Unexpected type of menuItem.representedObject: \(type(of: menuItem.representedObject))")
             return
         }
-        Pixel.fire(.navigation(kind: .bookmark(isFavorite: bookmark.isFavorite), source: .mainMenu))
 
         let tab = Tab(content: .url(bookmark.url))
         WindowsManager.openNewWindow(with: tab)
@@ -438,8 +437,6 @@ extension MainViewController {
         guard let bookmark = menuItem.representedObject as? Bookmark else {
             return
         }
-
-        Pixel.fire(.navigation(kind: .bookmark(isFavorite: bookmark.isFavorite), source: .mainMenu))
 
         if NSApplication.shared.isCommandPressed && NSApplication.shared.isShiftPressed {
             WindowsManager.openNewWindow(with: bookmark.url)

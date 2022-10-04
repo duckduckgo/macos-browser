@@ -248,53 +248,12 @@ extension Pixel.Event {
 
     }
 
-    enum NavigationKind: String, CustomStringConvertible {
-        var description: String { rawValue }
-
-        case search
-        case url
-        case bookmark
-        case favorite
-
-        static func bookmark(isFavorite: Bool) -> NavigationKind {
-            if isFavorite {
-                return .favorite
-            }
-            return .bookmark
-        }
-
-        init(url: URL?, bookmarkManager: BookmarkManager = LocalBookmarkManager.shared) {
-            guard let url = url,
-                  !url.isDuckDuckGoSearch else {
-                self = .search
-                return
-            }
-            guard let bookmark = bookmarkManager.getBookmark(for: url) else {
-                self = .url
-                return
-            }
-            self = .bookmark(isFavorite: bookmark.isFavorite)
-        }
-
-    }
-
     enum FormAutofillKind: String, CustomStringConvertible {
         var description: String { rawValue }
 
         case password
         case card
         case identity
-    }
-
-    enum NavigationAccessPoint: String, CustomStringConvertible {
-        var description: String { rawValue }
-
-        case mainMenu = "source-menu"
-        case addressBar = "source-address-bar"
-        case suggestion = "source-suggestion"
-        case newTab = "source-new-tab"
-        case listInterface = "source-list-interface"
-        case managementInterface = "source-management-interface"
     }
 
     enum HasBookmark: String, CustomStringConvertible {

@@ -152,7 +152,6 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
             } else {
                 WindowControllersManager.shared.show(url: bookmark.url, newTab: true)
             }
-            Pixel.fire(.navigation(kind: .bookmark(isFavorite: bookmark.isFavorite), source: .managementInterface))
         } else if let folder = entity as? BookmarkFolder {
             resetSelections()
             delegate?.bookmarkManagementDetailViewControllerDidSelectFolder(folder)

@@ -276,7 +276,6 @@ final class AddressBarTextField: NSTextField {
         if selectedTabViewModel.tab.content.url == url {
             selectedTabViewModel.reload()
         } else {
-            Pixel.fire(.navigation(kind: .init(url: url), source: suggestion != nil ? .suggestion : .addressBar))
             selectedTabViewModel.tab.update(url: url)
         }
 
@@ -306,7 +305,6 @@ final class AddressBarTextField: NSTextField {
             return
         }
 
-        Pixel.fire(.navigation(kind: .init(url: url), source: suggestion != nil ? .suggestion : .addressBar))
         let tab = Tab(content: .url(url), shouldLoadInBackground: true)
         tabCollectionViewModel.append(tab: tab, selected: selected)
     }

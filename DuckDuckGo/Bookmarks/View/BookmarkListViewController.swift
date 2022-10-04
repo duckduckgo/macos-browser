@@ -142,7 +142,6 @@ final class BookmarkListViewController: NSViewController {
            let bookmark = node.representedObject as? Bookmark {
             WindowControllersManager.shared.open(bookmark: bookmark)
             delegate?.popoverShouldClose(self)
-            Pixel.fire(.navigation(kind: .bookmark(isFavorite: bookmark.isFavorite), source: .listInterface))
         } else {
             if outlineView.isItemExpanded(item) {
                 outlineView.animator().collapseItem(item)

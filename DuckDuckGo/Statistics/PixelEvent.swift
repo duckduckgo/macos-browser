@@ -94,8 +94,6 @@ extension Pixel {
                                      result: result)
         }
 
-        case navigation(kind: NavigationKind, source: NavigationAccessPoint)
-
         case serp
 
         case importedLogins(repetition: Repetition = .init(key: "imported-logins"), source: DataImportSource)
@@ -211,9 +209,6 @@ extension Pixel.Event {
 
         case .compileRulesWait(onboardingShown: let onboardingShown, waitTime: let waitTime, result: let result):
             return "m_mac_cbr-wait_\(onboardingShown)_\(waitTime)_\(result)"
-
-        case .navigation(kind: let kind, source: let source):
-            return "m_mac_navigation_\(kind)_\(source)"
             
         case .serp:
             return "m_mac_navigation_search"
