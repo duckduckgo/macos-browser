@@ -1,4 +1,4 @@
-import {Util} from "./util";
+import {appendElement, execCleanups} from "./util";
 import {IconOverlay} from "./icon-overlay";
 
 export class VideoPlayerIcon {
@@ -9,32 +9,16 @@ export class VideoPlayerIcon {
      * This will only get called once everytime a new video is loaded.
      *
      * @param {Element} containerElement
-     * @param {string} videoId
+     * @param {import("./util").VideoParams} params
      */
-    init(containerElement, videoId) {
+    init(containerElement, params) {
 
         if (!containerElement) {
             console.error("missing container element");
             return;
         }
 
-        // if (isShowingAd(containerElement)) {
-        //     const o = new MutationObserver(mutation => {
-        //         if (!isShowingAd(containerElement)) {
-        //             console.log('appendOverlay');
-        //             this.appendOverlay(containerElement, videoId)
-        //         }
-        //     })
-        //     o.observe(containerElement, { attributes: true, attributeFilter: ['class'] })
-        //     this.cleanups.push({
-        //         name: "removing listened for ads closing",
-        //         fn() {
-        //             o.disconnect();
-        //         }
-        //     })
-        // } else {
-        // }
-        this.appendOverlay(containerElement, videoId);
+        this.appendOverlay(containerElement, params);
 
         // let hasTitle = !document.querySelector('#player .ytp-hide-info-bar');
         // let hasPaidContentElement = document.querySelector('.ytp-paid-content-overlay-link');
@@ -86,13 +70,13 @@ export class VideoPlayerIcon {
 
     /**
      * @param {Element} containerElement
-     * @param {string} videoId
+     * @param {import("./util").VideoParams} params
      */
-    appendOverlay(containerElement, videoId) {
+    appendOverlay(containerElement, params) {
         this.cleanup();
-        const href = Util.getPrivatePlayerURLForId(videoId);
+        const href = params.toPrivatePlayerUrl();
         const iconElement = IconOverlay.create('video-player', href, 'hidden');
-        Util.appendElement(containerElement, iconElement);
+        appendElement(containerElement, iconElement);
         iconElement.classList.remove('hidden')
         this.cleanups.push({
             name: "removing dax 🐥 icon overlay",
@@ -106,16 +90,7 @@ export class VideoPlayerIcon {
      * Remove elements, event listeners etc
      */
     cleanup() {
-        Util.execCleanups(this.cleanups);
+        execCleanups(this.cleanups);
         this.cleanups = [];
     }
-}
-
-function isShowingAd(containerElement) {
-    return containerElement.classList.contains('ytp-hide-controls')
-        || containerElement.classList.contains('ad-showing')
-}
-
-function subscribeToPlayerState() {
-
 }

@@ -1,8 +1,7 @@
-// @ts-nocheck
 import css from "./assets/styles.css";
 import {VideoPlayerOverlay} from "./src/video-player-overlay";
 import {IconOverlay} from "./src/icon-overlay.js";
-import {Util} from "./src/util.js";
+import {addTrustedEventListener, appendElement, VideoParams} from "./src/util.js";
 import {macOSCommunications} from "./src/comms";
 
 console.log("script load", window.location.href);
@@ -22,6 +21,9 @@ const defaultEnvironment = {
 
 const defaultComms = macOSCommunications;
 
+/**
+ * Entry point. Until this returns with initial user values, we cannot continue.
+ */
 defaultComms.readUserValues().then((userValues) => {
     enable(userValues, defaultEnvironment, defaultComms);
 }).catch(e => console.error("could not read userValues", e))
@@ -48,7 +50,7 @@ function enable(userValues, environment = defaultEnvironment, comms = defaultCom
         init: () => {
             let style = document.createElement("style");
             style.innerText = CSS.styles;
-            Util.appendElement(document.head, style);
+            appendElement(document.head, style);
         }
     }
 
@@ -122,11 +124,11 @@ function enable(userValues, environment = defaultEnvironment, comms = defaultCom
          */
         bindEvents: (video) => {
             if (video) {
-                Util.addTrustedEventListener(video, 'mouseover', () => {
+                addTrustedEventListener(video, 'mouseover', () => {
                     IconOverlay.moveHoverOverlayToVideoElement(video);
                 });
 
-                Util.addTrustedEventListener(video, 'mouseout', IconOverlay.hideHoverOverlay);
+                addTrustedEventListener(video, 'mouseout', IconOverlay.hideHoverOverlay);
 
                 video.classList.add('has-ddg-overlay');
             }
@@ -145,7 +147,7 @@ function enable(userValues, environment = defaultEnvironment, comms = defaultCom
 
         /**
          * Get the video hover preview link
-         * @returns {HTMLElement}
+         * @returns {HTMLElement | null | undefined}
          */
         getPreviewVideoLink: () => {
             let linkSelector = 'a[href^="/watch?v="]';
@@ -156,11 +158,11 @@ function enable(userValues, environment = defaultEnvironment, comms = defaultCom
 
         /**
          * Append icon overlay to the video hover preview unless it's already been appended
-         * @returns {(HTMLElement|false)}
+         * @returns {HTMLElement|boolean}
          */
         appendIfNotAppended: () => {
             if (!OverlaySettings.enabled.thumbnails) {
-                return;
+                return false
             }
 
             let previewVideo = Preview.getPreviewVideoLink();
@@ -177,10 +179,13 @@ function enable(userValues, environment = defaultEnvironment, comms = defaultCom
          */
         update: () => {
             let updateOverlayVideoId = (element) => {
-                let overlay = element && element.querySelector('.ddg-overlay');
-
-                if (overlay) {
-                    overlay.querySelector('a.ddg-play-privately').setAttribute('href', Util.getPrivatePlayerURL(element.getAttribute('href')));
+                let overlay = element?.querySelector('.ddg-overlay');
+                const href = element?.getAttribute("href");
+                if (href) {
+                    const privateUrl = VideoParams.fromPathname(href)?.toPrivatePlayerUrl();
+                    if (overlay && privateUrl) {
+                        overlay.querySelector('a.ddg-play-privately')?.setAttribute('href', privateUrl);
+                    }
                 }
             }
 
@@ -194,10 +199,13 @@ function enable(userValues, environment = defaultEnvironment, comms = defaultCom
          * be able to make the preview link clickable.
          */
         fixLinkClick: () => {
-            let previewLink = Preview.getPreviewVideoLink().querySelector('a.ddg-play-privately');
-
-            Util.addTrustedEventListener(previewLink, 'click', () => {
-                window.location = previewLink.getAttribute('href');
+            let previewLink = Preview.getPreviewVideoLink()?.querySelector('a.ddg-play-privately');
+            if (!previewLink) return;
+            addTrustedEventListener(previewLink, 'click', () => {
+                const href = previewLink?.getAttribute('href');
+                if (href) {
+                    environment.setHref(href);
+                }
             });
         },
 
@@ -243,7 +251,7 @@ function enable(userValues, environment = defaultEnvironment, comms = defaultCom
                         Preview.init();
                     }
 
-                    videoPlayerOverlay.watchForVideoBeingAdded(userValues);
+                    videoPlayerOverlay.watchForVideoBeingAdded();
                 });
 
                 window.addEventListener('resize', () => {

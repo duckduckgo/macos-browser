@@ -1,5 +1,5 @@
 import dax from "../assets/dax.svg";
-import {Util} from "./util.js";
+import {appendImageAsBackground, execCleanups, VideoParams} from "./util.js";
 import {VideoPlayerIcon} from "./video-player-icon";
 
 export class VideoPlayerOverlay {
@@ -28,10 +28,11 @@ export class VideoPlayerOverlay {
 
     /**
      * Creates the video player overlay and returns the element
+     * @param {import("./util").VideoParams} params
      * @returns {HTMLElement}
      */
-    overlay(videoId) {
-        const href = Util.getPrivatePlayerURLForId(videoId);
+    overlay(params) {
+        const href = params.toPrivatePlayerUrl()
         let overlayElement = document.createElement('div');
         overlayElement.classList.add(this.CLASS_OVERLAY);
         overlayElement.innerHTML = `
@@ -58,22 +59,29 @@ export class VideoPlayerOverlay {
             </div>
             `;
         overlayElement.querySelector('.ddg-vpo-open')?.setAttribute("href", href)
-        this.appendThumbnail(overlayElement, videoId);
+        this.appendThumbnail(overlayElement, params.id);
         return overlayElement;
     }
+
+    /**
+     * @param {HTMLElement} overlayElement
+     * @param {string} videoId
+     */
     appendThumbnail(overlayElement, videoId) {
         // @ts-ignore
         const imageUrl = this.environment.getLargeThumbnailSrc(videoId);
-        const cleanup = Util.appendImageAsBackground(overlayElement, '.ddg-vpo-bg', imageUrl);
+        const cleanup = appendImageAsBackground(overlayElement, '.ddg-vpo-bg', imageUrl);
         this.cleanups.push({
             name: 'teardown from images added',
             fn: cleanup,
         })
     }
+
     /**
-     * Sets up buttons being clickable, right now just the cancel button
+     * @param {HTMLElement} ddgElement
+     * @param {import("./util").VideoParams} params
      */
-    setupButtonsInsideOverlay(ddgElement, videoId) {
+    setupButtonsInsideOverlay(ddgElement, params) {
         const cancelElement = ddgElement.querySelector('.ddg-vpo-cancel');
         const watchInPlayer = ddgElement.querySelector('.ddg-vpo-open');
         if (!cancelElement) return console.warn("Could not access .ddg-vpo-cancel");
@@ -81,7 +89,7 @@ export class VideoPlayerOverlay {
         const optOutHandler = (e) => {
             if (e.isTrusted) {
                 const remember = ddgElement.querySelector('input[name="ddg-remember"]');
-                if (!remember) throw new Error('cannot find our input');
+                if (!(remember instanceof HTMLInputElement)) throw new Error('cannot find our input');
                 /**
                  * If the checkbox was checked we send the 'interacted' flag to the backend
                  * so that the next video can just see the Dax icon instead of the full overlay
@@ -100,7 +108,7 @@ export class VideoPlayerOverlay {
                         .catch(e => console.error("could not set userChoice for opt-out", e ))
                 } else {
                     this.removeOverlays();
-                    this.addSmallDaxOverlay(videoId)
+                    this.addSmallDaxOverlay(params)
                 }
             }
         };
@@ -109,7 +117,7 @@ export class VideoPlayerOverlay {
                 e.preventDefault();
                 const href = e.target.href;
                 const remember = ddgElement.querySelector('input[name="ddg-remember"]');
-                if (!remember) throw new Error('cannot find our input');
+                if (!(remember instanceof HTMLInputElement)) throw new Error('cannot find our input');
                 /**
                  * If the checkbox was checked, this action means that we want to 'always'
                  * use the private player
@@ -146,9 +154,9 @@ export class VideoPlayerOverlay {
     /**
      * Set up the overlay
      * @param {import("../youtube-inject.js").UserValues} userValues
-     * @param {string} videoId
+     * @param {import("./util").VideoParams} params
      */
-    addLargeOverlay(userValues, videoId) {
+    addLargeOverlay(userValues, params) {
         console.log("🤞adding large overlay.....")
         let player = document.querySelector('#player'),
             playerVideo = document.querySelector('#player video'),
@@ -157,16 +165,16 @@ export class VideoPlayerOverlay {
         if (player && playerVideo && containerElement) {
             console.log("🚧 showing full overlay")
             this.callPauseUntilPaused(playerVideo);
-            const ddgElement = this.appendOverlayToPage(containerElement, videoId);
-            this.setupButtonsInsideOverlay(ddgElement, videoId);
+            const ddgElement = this.appendOverlayToPage(containerElement, params);
+            this.setupButtonsInsideOverlay(ddgElement, params);
         }
     }
 
     /**
-     * @param {string} videoId
+     * @param {import("./util").VideoParams} params
      */
-    addSmallDaxOverlay(videoId) {
-        console.log("🦆 showing small dax overlay on video", videoId)
+    addSmallDaxOverlay(params) {
+        console.log("🦆 showing small dax overlay on video", params.id)
         let containerElement = document.querySelector('#player .html5-video-player')
         if (!containerElement) {
             console.error("no container element");
@@ -175,29 +183,52 @@ export class VideoPlayerOverlay {
         if (!this.videoPlayerIcon) {
             this.videoPlayerIcon = new VideoPlayerIcon();
         }
-        this.videoPlayerIcon.init(containerElement, videoId);
+        this.videoPlayerIcon.init(containerElement, params);
     }
 
     /**
      * @param {{ignoreCache?: boolean}} [opts]
      */
     watchForVideoBeingAdded(opts = {}) {
-        const href = this.environment.getHref();
-        const videoId = Util.getYoutubeVideoIdForCurrentPlayer(href);
-        if (!videoId) {
+        const url = new URL(this.environment.getHref());
+
+        if (!url.pathname.startsWith("/watch")) {
+            // console.log("📎 not on /watch page");
+            return null;
+        }
+
+        const params = VideoParams.fromHref(url.href);
+
+        if (!params) {
             return;
         }
 
         const conditions = [
             opts.ignoreCache,
             !this.lastVideoId,
-            this.lastVideoId && this.lastVideoId !== videoId
+            this.lastVideoId && this.lastVideoId !== params.id
         ]
 
         if (conditions.some(Boolean)) {
+            const playerElement = document.querySelector('#player');
+
+            if (!playerElement) {
+                // console.log("📎 video not found")
+                return null
+            }
+
+            if (playerElement.classList.contains('skeleton')) {
+                // console.log("📎 #player element had .skeleton classname")
+                return null;
+            }
+
+            /**
+             * If we get here, it's a valid situation
+             * @type {*}
+             */
             const userValues = this.userValues;
-            this.lastVideoId = videoId;
-            console.log("📹 video shown", videoId, userValues);
+            this.lastVideoId = params.id;
+            console.log("📹 video shown", params.id, userValues);
 
             /**
              * always remove first, don't allow any lingering state
@@ -208,13 +239,13 @@ export class VideoPlayerOverlay {
              * When enabled, always show the small dax icon
              */
             if ('enabled' in userValues.privatePlayerMode) {
-                this.addSmallDaxOverlay(videoId)
+                this.addSmallDaxOverlay(params)
             }
             if ('alwaysAsk' in userValues.privatePlayerMode) {
                 if (!userValues.overlayInteracted) {
-                    this.addLargeOverlay(userValues, videoId)
+                    this.addLargeOverlay(userValues, params)
                 } else {
-                    this.addSmallDaxOverlay(videoId)
+                    this.addSmallDaxOverlay(params)
                 }
             }
             if ('disabled' in userValues.privatePlayerMode) {
@@ -225,11 +256,11 @@ export class VideoPlayerOverlay {
 
     /**
      * @param {Element} targetElement
-     * @param {string} videoId
+     * @param {import("./util").VideoParams} params
      * @return {HTMLElement}
      */
-    appendOverlayToPage(targetElement, videoId) {
-        const overlayElement = this.overlay(videoId);
+    appendOverlayToPage(targetElement, params) {
+        const overlayElement = this.overlay(params);
         targetElement.appendChild(overlayElement)
 
         /**
@@ -306,7 +337,7 @@ export class VideoPlayerOverlay {
      * Remove elements, event listeners etc
      */
     removeOverlays() {
-        Util.execCleanups(this.cleanups);
+        execCleanups(this.cleanups);
         this.cleanups = [];
         if (this.videoPlayerIcon) {
             this.videoPlayerIcon.cleanup();

@@ -1,4 +1,4 @@
-import {Util} from "./util";
+import {addTrustedEventListener, appendElement, VideoParams} from "./util";
 import dax from "../assets/dax.svg";
 
 // class Debug extends HTMLElement {
@@ -91,7 +91,10 @@ export const IconOverlay = {
             const href = videoElement.getAttribute('href');
 
             if (href) {
-                overlay.querySelector('a')?.setAttribute('href', Util.getPrivatePlayerURL(href));
+                const privateUrl = VideoParams.fromPathname(href)?.toPrivatePlayerUrl();
+                if (overlay && privateUrl) {
+                    overlay.querySelector('a')?.setAttribute('href', privateUrl);
+                }
             }
 
             IconOverlay.hoverOverlayVisible = true;
@@ -146,10 +149,10 @@ export const IconOverlay = {
      */
     appendHoverOverlay: () => {
         let el = IconOverlay.create('fixed', '', IconOverlay.HOVER_CLASS);
-        Util.appendElement(document.body, el);
+        appendElement(document.body, el);
 
         // Hide it if user clicks anywhere on the page but in the icon overlay itself
-        Util.addTrustedEventListener(document.body, 'mouseup', (event) => {
+        addTrustedEventListener(document.body, 'mouseup', (event) => {
             IconOverlay.hideHoverOverlay(event);
         });
     },
@@ -162,12 +165,12 @@ export const IconOverlay = {
     appendToVideo: (videoElement) => {
         let appendOverlayToThumbnail = (videoElement) => {
             if (videoElement) {
-                const searchParams = new URLSearchParams(videoElement.search);
-                const href = Util.getPrivatePlayerURLFromSearchParams(searchParams);
+                const privateUrl = VideoParams.fromHref(videoElement.href)?.toPrivatePlayerUrl();
                 const thumbSize = IconOverlay.getThumbnailSize(videoElement);
-
-                Util.appendElement(videoElement, IconOverlay.create(thumbSize, href));
-                videoElement.classList.add('has-dgg-overlay');
+                if (privateUrl) {
+                    appendElement(videoElement, IconOverlay.create(thumbSize, privateUrl));
+                    videoElement.classList.add('has-dgg-overlay');
+                }
             }
         };
 
@@ -176,14 +179,15 @@ export const IconOverlay = {
         if (!videoElementAlreadyHasOverlay) {
             appendOverlayToThumbnail(videoElement);
             return true;
-        } else {
-            return false;
         }
+
+        return false;
     },
 
     getThumbnailSize: (videoElement) => {
         let imagesByArea = {};
-        let images = Array.from(videoElement.querySelectorAll('img')).forEach(image => {
+
+        Array.from(videoElement.querySelectorAll('img')).forEach(image => {
             imagesByArea[(image.offsetWidth * image.offsetHeight)] = image;
         });
 

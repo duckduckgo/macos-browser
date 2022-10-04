@@ -1,193 +1,198 @@
-export const Util = {
+/**
+ * Add an event listener to an element that is only executed if it actually comes from a user action
+ * @param {Element} element - to attach event to
+ * @param {string} event
+ * @param {function} callback
+ */
+export function addTrustedEventListener(element, event, callback) {
+    element.addEventListener(event, (e) => {
+        if (e.isTrusted) {
+            callback(e);
+        }
+    });
+}
+
+/**
+ * Appends an element. This may change if we go with Shadow DOM approach
+ * @param {Element} to - which element to append to
+ * @param {Element} element - to be appended
+ */
+export function appendElement(to, element) {
+    to.appendChild(element);
+}
+
+/**
+ * Try to load an image first. If the status code is 2xx, then continue
+ * to load
+ * @param {HTMLElement} parent
+ * @param {string} targetSelector
+ * @param {string} imageUrl
+ */
+export function appendImageAsBackground(parent, targetSelector, imageUrl) {
+    let canceled = false;
+
     /**
-     * Add an event listener to an element that is only executed if it actually comes from a user action
-     * @param {Element} element - to attach event to
-     * @param {string} event
-     * @param {function} callback
+     * Make a HEAD request to see what the status of this image is, without
+     * having to fully download it.
+     *
+     * This is needed because YouTube returns a 404 + valid image file when there's no
+     * thumbnail and you can't tell the difference through the 'onload' event alone
      */
-    addTrustedEventListener: (element, event, callback) => {
-        element.addEventListener(event, (e) => {
-            if (e.isTrusted) {
-                callback(e);
+    fetch(imageUrl, { method: "HEAD" }).then(x => {
+        const status = String(x.status);
+        if (canceled) return console.warn("not adding image, cancelled");
+        if (status.startsWith('2')) {
+            if (!canceled) {
+                append();
+            } else {
+                console.warn("ignoring cancelled load")
             }
-        });
-    },
+        } else {
+            console.error('❌ status code did not start with a 2')
+            markError();
+        }
+    }).catch(x => {
+        console.error("e from fetch")
+    })
 
     /**
-     * Appends an element. This may change if we go with Shadow DOM approach
-     * @param {Element} to - which element to append to
-     * @param {Element} element - to be appended
+     * If loading fails, mark the parent with data-attributes
      */
-    appendElement: (to, element) => {
-        to.appendChild(element);
-    },
+    function markError() {
+        parent.dataset.thumbLoaded = String(false);
+        parent.dataset.error = String(true);
+    }
 
     /**
-     * NATIVE NOTE: Returns the URL we use for telling the MacOS app to open the private player
-     * @param {string} relativePath - for now, it's expected to always be something like /watch?v=VIDEO_ID
+     * If loading succeeds, try to append the image
      */
-    getPrivatePlayerURL: (relativePath) => {
-        let url = new URL(relativePath, window.location.origin);
-        return Util.getPrivatePlayerURLFromSearchParams(url.searchParams)
-    },
+    function append() {
+        const targetElement = parent.querySelector(targetSelector);
+        if (!(targetElement instanceof HTMLElement)) return console.warn("could not find child with selector", targetSelector, "from", parent)
+        parent.dataset.thumbLoaded = String(true);
+        parent.dataset.thumbSrc = imageUrl;
+        let img = new Image();
+        img.src = imageUrl;
+        img.onload = function(arg) {
+            if (canceled) return console.warn("not adding image, cancelled");
+            targetElement.style.backgroundImage = `url(${imageUrl})`;
+            targetElement.style.backgroundSize = `cover`;
+        }
+        img.onerror = function(arg) {
+            if (canceled) return console.warn("not calling markError, cancelled");
+            markError();
+            const targetElement = parent.querySelector(targetSelector);
+            if (!(targetElement instanceof HTMLElement)) return;
+            targetElement.style.backgroundImage = ``;
+        }
+    }
 
     /**
-     * Convenience for creating a private player URL for a video ID
-     * @param {string} videoId
+     * Return a clean-up function to prevent any overlapping work
      */
-    getPrivatePlayerURLForId: (videoId) => {
-        const searchParams = new URLSearchParams();
-        searchParams.set('v', videoId);
-        return Util.getPrivatePlayerURLFromSearchParams(searchParams);
-    },
+    return () => {
+        canceled = true;
+    }
+}
+
+/**
+ * @param cleanups
+ */
+export function execCleanups(cleanups) {
+    if (Array.isArray(cleanups) && cleanups.length > 0) {
+        console.log("cleaning up %d items", cleanups.length);
+    }
+    for (let cleanup of cleanups) {
+        if (typeof cleanup.fn === "function") {
+            try {
+                cleanup.fn();
+                console.log("🧹 cleanup '%s' was successfully", cleanup.name)
+            } catch (e) {
+                console.error(`cleanup ${cleanup.name} threw`, e)
+            }
+        } else {
+            throw new Error("invalid cleanup")
+        }
+    }
+}
+
+/**
+ * A container for valid/parsed video params.
+ *
+ * If you have an instance of `VideoParams`, then you can trust that it's valid and you can always
+ * produce a PrivatePlayer link from it
+ *
+ * The purpose is to co-locate all processing of search params/pathnames for easier security auditing/testing
+ *
+ * @example
+ *
+ * ```
+ * const privateUrl = VideoParams.fromHref("https://example.com/foo/bar?v=123&t=21")?.toPrivatePlayerUrl()
+ *       ^^^^ <- this is now null, or a string if it was valid
+ * ```
+ */
+export class VideoParams {
     /**
-     * @param searchParams
+     * @param {string} id - the YouTube video ID
+     * @param {string|null|undefined} time - an optional time
+     */
+    constructor(id, time) {
+        this.id = id;
+        this.time = time;
+    }
+
+    static validVideoId = /^[a-zA-Z0-9-_]+$/;
+    static validTimestamp = /^[0-9hms]+$/;
+
+    /**
      * @returns {string}
      */
-    getPrivatePlayerURLFromSearchParams(searchParams) {
-        let validVideoId = /^[a-zA-Z0-9-_]+$/g;
-        let validTimestamp = /^[0-9hms]+$/g
-
-        let privatePlayerURL = '';
-        let vParam = searchParams.get('v');
-        let tParam = searchParams.get('t');
-
-        if (vParam && validVideoId.test(vParam)) {
-            privatePlayerURL = vParam;
+    toPrivatePlayerUrl() {
+        let privatePlayerURL = this.id;
+        if (this.time) {
+            privatePlayerURL += '&t=' + this.time;
         }
-
-        if (tParam && validTimestamp.test(tParam)) {
-            privatePlayerURL += '&t=' + tParam;
-        }
-
         return 'privateplayer:' + privatePlayerURL;
-    },
+    }
+
     /**
-     * @param {string} href
-     * @returns {string | null}
+     * Convert a relative pathname into a
+     * @param pathname
+     * @returns {VideoParams|null}
      */
-    getYoutubeVideoIdForCurrentPlayer(href) {
+    static fromPathname(pathname) {
+        let url = new URL(pathname, window.location.origin);
+        return VideoParams.fromHref(url.href)
+    }
+
+    /**
+     * Convert a href into valid video params. Those can then be converted into a private player
+     * link when needed
+     *
+     * @param href
+     * @returns {VideoParams|null}
+     */
+    static fromHref(href) {
         const url = new URL(href);
-        const videoId = url.searchParams.get("v");
+        const vParam = url.searchParams.get("v");
+        const tParam = url.searchParams.get("t");
 
-        if (!url.pathname.startsWith("/watch")) {
-            // console.log("📎 not on /watch page");
-            return null;
-        }
-
-        if (!videoId) {
-            // console.log("📎 missing v param")
-            return null;
-        }
+        let id = null;
+        let time = null;
 
         // ensure youtube video id is good
-        if (!/^[a-zA-Z0-9-_]*$/g.test(videoId)) {
-            // console.log("📎 invalid youtube video id")
-            return null
-        }
-
-        const playerElement = document.querySelector('#player');
-
-        if (!playerElement) {
-            // console.log("📎 video not found")
-            return null
-        }
-
-        if (playerElement.classList.contains('skeleton')) {
-            // console.log("📎 #player element had .skeleton classname")
+        if (vParam && VideoParams.validVideoId.test(vParam)) {
+            id = vParam
+        } else {
+            // if the video ID is invalid, we cannot produce an instance of VideoParams
             return null;
         }
 
-        return videoId;
-    },
-    /**
-     * Try to load an image first. If the status code is 2xx, then continue
-     * to load
-     * @param {HTMLElement} parent
-     * @param {string} targetSelector
-     * @param {string} imageUrl
-     */
-    appendImageAsBackground(parent, targetSelector, imageUrl) {
-        let canceled = false;
-
-        /**
-         * Make a HEAD request to see what the status of this image is, without
-         * having to fully download it.
-         *
-         * This is needed because YouTube returns a 404 + valid image file when there's no
-         * thumbnail and you can't tell the difference through the 'onload' event alone
-         */
-        fetch(imageUrl, { method: "HEAD" }).then(x => {
-            const status = String(x.status);
-            if (canceled) return console.warn("not adding image, cancelled");
-            if (status.startsWith('2')) {
-                if (!canceled) {
-                    append();
-                } else {
-                    console.warn("ignoring cancelled load")
-                }
-            } else {
-                console.error('❌ status code did not start with a 2')
-                markError();
-            }
-        }).catch(x => {
-            console.error("e from fetch")
-        })
-
-        /**
-         * If loading fails, mark the parent with data-attributes
-         */
-        function markError() {
-            parent.dataset.thumbLoaded = String(false);
-            parent.dataset.error = String(true);
+        // ensure timestamp is good, if set
+        if (tParam && VideoParams.validTimestamp.test(tParam)) {
+            time = tParam
         }
 
-        /**
-         * If loading succeeds, try to append the image
-         */
-        function append() {
-            const targetElement = parent.querySelector(targetSelector);
-            if (!(targetElement instanceof HTMLElement)) return console.warn("could not find child with selector", targetSelector, "from", parent)
-            parent.dataset.thumbLoaded = String(true);
-            parent.dataset.thumbSrc = imageUrl;
-            let img = new Image();
-            img.src = imageUrl;
-            img.onload = function(arg) {
-                if (canceled) return console.warn("not adding image, cancelled");
-                targetElement.style.backgroundImage = `url(${imageUrl})`;
-                targetElement.style.backgroundSize = `cover`;
-            }
-            img.onerror = function(arg) {
-                if (canceled) return console.warn("not calling markError, cancelled");
-                markError();
-                const targetElement = parent.querySelector(targetSelector);
-                if (!(targetElement instanceof HTMLElement)) return;
-                targetElement.style.backgroundImage = ``;
-            }
-        }
-
-        /**
-         * Return a clean-up function to prevent any overlapping work
-         */
-        return () => {
-            canceled = true;
-        }
-    },
-    execCleanups(cleanups) {
-        if (Array.isArray(cleanups) && cleanups.length > 0) {
-            console.log("cleaning up %d items", cleanups.length);
-        }
-        for (let cleanup of cleanups) {
-            if (typeof cleanup.fn === "function") {
-                try {
-                    cleanup.fn();
-                    console.log("🧹 cleanup '%s' was successfully", cleanup.name)
-                } catch (e) {
-                    console.error(`cleanup ${cleanup.name} threw`, e)
-                }
-            } else {
-                throw new Error("invalid cleanup")
-            }
-        }
+        return new VideoParams(id, time)
     }
 }
