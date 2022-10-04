@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1663413419716,
+    "version": 1664910317711,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -173,6 +173,268 @@
             },
             "exceptions": [],
             "state": "disabled"
+        },
+        "elementHiding": {
+            "exceptions": [],
+            "settings": {
+                "rules": [
+                    {
+                        "selector": "[id*='gpt-']",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": "[class*='gpt-']",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": "[id*='taboola-']",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": ".adHolder",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": "[class*='ad_unit']",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": ".ad-leaderboard",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": "[class*='bannerAd']",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": ".ad-container",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": ".adcontainer",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": ".ad-slot",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": ".ad-wrapper",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": "[data-adunitpath]",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": "[data-unit]",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": "[data-targeting]",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": "[data-ad-placeholder]",
+                        "type": "closest-empty"
+                    },
+                    {
+                        "selector": ".bordeaux-slot",
+                        "type": "closest-empty"
+                    }
+                ],
+                "adLabelStrings": [
+                    "advertisement",
+                    "advertising",
+                    "ad feedback",
+                    "sponsored",
+                    "reklama"
+                ],
+                "domains": [
+                    {
+                        "domain": "bbc.com",
+                        "rules": [
+                            {
+                                "selector": ".dotcom-ad",
+                                "type": "closest-empty"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "bleacherreport.com",
+                        "rules": [
+                            {
+                                "selector": ".br-ad-wrapper",
+                                "type": "closest-empty"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "cyclingtips.com",
+                        "rules": [
+                            {
+                                "selector": "[data-block-name='ads']",
+                                "type": "closest-empty"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "eonline.com",
+                        "rules": [
+                            {
+                                "selector": "[class*='mps-']",
+                                "type": "closest-empty"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "fortune.com",
+                        "rules": [
+                            {
+                                "selector": "[id*='Leaderboard']",
+                                "type": "closest-empty"
+                            },
+                            {
+                                "selector": "[id*='RightRailFlex']",
+                                "type": "closest-empty"
+                            },
+                            {
+                                "selector": "[id*='InStream']",
+                                "type": "closest-empty"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "indy100.com",
+                        "rules": [
+                            {
+                                "selector": "[id*='thirdparty']",
+                                "type": "hide-empty"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "latimes.com",
+                        "rules": [
+                            {
+                                "selector": ".google-dfp-ad-wrapper",
+                                "type": "closest-empty"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "marketwatch.com",
+                        "rules": [
+                            {
+                                "selector": ".j-ad",
+                                "type": "closest-empty"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "qz.com",
+                        "rules": [
+                            {
+                                "selector": "#marquee-ad",
+                                "type": "closest-empty"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "si.com",
+                        "rules": [
+                            {
+                                "selector": ".m-ad",
+                                "type": "closest-empty"
+                            },
+                            {
+                                "selector": ".m-header-ad",
+                                "type": "closest-empty"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "snopes.com",
+                        "rules": [
+                            {
+                                "selector": ".proper-dynamic-insertion",
+                                "type": "closest-empty"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "wsj.com",
+                        "rules": [
+                            {
+                                "selector": "[class*='adWrapper']",
+                                "type": "closest-empty"
+                            },
+                            {
+                                "selector": "[id*='cx-']",
+                                "type": "closest-empty"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "yahoo.com",
+                        "rules": [
+                            {
+                                "selector": ".darla",
+                                "type": "closest-empty"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "gazeta.pl",
+                        "rules": [
+                            {
+                                "selector": "[class*='DFP-']",
+                                "type": "hide-empty"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "nfl.com",
+                        "rules": [
+                            {
+                                "selector": "[class*='adv-block']",
+                                "type": "closest-empty"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "usatoday.com",
+                        "rules": [
+                            {
+                                "selector": "[aria-label='advertisement']",
+                                "type": "closest-empty"
+                            },
+                            {
+                                "selector": ".gnt_tb",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": ".gnt_flp",
+                                "type": "hide-empty"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "washingtontimes.com",
+                        "rules": [
+                            {
+                                "selector": ".connatixcontainer",
+                                "type": "hide"
+                            },
+                            {
+                                "selector": "[id*='cxense-']",
+                                "type": "closest-empty"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "state": "enabled"
         },
         "fingerprintingAudio": {
             "state": "disabled",
@@ -407,6 +669,17 @@
                             }
                         ]
                     },
+                    "ads-twitter.com": {
+                        "rules": [
+                            {
+                                "rule": "static.ads-twitter.com/uwt.js",
+                                "domains": [
+                                    "hentaihaven.xxx"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/452"
+                            }
+                        ]
+                    },
                     "adsafeprotected.com": {
                         "rules": [
                             {
@@ -432,6 +705,17 @@
                             }
                         ]
                     },
+                    "ahacdn.me": {
+                        "rules": [
+                            {
+                                "rule": "ahacdn.me",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/447"
+                            }
+                        ]
+                    },
                     "aldi-digital.co.uk": {
                         "rules": [
                             {
@@ -448,9 +732,9 @@
                             {
                                 "rule": "alicdn.com",
                                 "domains": [
-                                    "aliexpress.com"
+                                    "aliexpress.us"
                                 ],
-                                "reason": "Page content renders as text without images."
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/460"
                             }
                         ]
                     },
@@ -564,6 +848,17 @@
                             }
                         ]
                     },
+                    "cloudfront.net": {
+                        "rules": [
+                            {
+                                "rule": "d3oxtup47gylpj.cloudfront.net/theme/onlyfans/spa/chunk-vendors.js",
+                                "domains": [
+                                    "onlyfans.com"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/440"
+                            }
+                        ]
+                    },
                     "computerworld.com": {
                         "rules": [
                             {
@@ -612,6 +907,17 @@
                                     "wsj.com"
                                 ],
                                 "reason": "Opinion section article elements do not render. Note that Firefox Enhanced Tracking Protection may prevent mitigation from succeeding on Firefox."
+                            }
+                        ]
+                    },
+                    "daumcdn.net": {
+                        "rules": [
+                            {
+                                "rule": "daumcdn.net",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/444"
                             }
                         ]
                     },
@@ -680,6 +986,17 @@
                             }
                         ]
                     },
+                    "edgekey.net": {
+                        "rules": [
+                            {
+                                "rule": "scene7.com.edgekey.net/s7viewersdk/3.11/MixedMediaViewer/js/s7sdk/utils/Utils.js",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/356"
+                            }
+                        ]
+                    },
                     "facebook.net": {
                         "rules": [
                             {
@@ -715,6 +1032,24 @@
                             }
                         ]
                     },
+                    "geetest.com": {
+                        "rules": [
+                            {
+                                "rule": "api.geetest.com",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/462"
+                            },
+                            {
+                                "rule": "static.geetest.com",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/462"
+                            }
+                        ]
+                    },
                     "gemius.pl": {
                         "rules": [
                             {
@@ -737,6 +1072,24 @@
                                     "wp.pl"
                                 ],
                                 "reason": "Adwall appears which reappears when dismissed. The adwall prevents interaction with the page."
+                            }
+                        ]
+                    },
+                    "getshogun.com": {
+                        "rules": [
+                            {
+                                "rule": "cdn.getshogun.com",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/450"
+                            },
+                            {
+                                "rule": "lib.getshogun.com",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/450"
                             }
                         ]
                     },
@@ -860,6 +1213,17 @@
                             }
                         ]
                     },
+                    "listrakbi.com": {
+                        "rules": [
+                            {
+                                "rule": "cdn.listrakbi.com/scripts/script.js",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/457"
+                            }
+                        ]
+                    },
                     "liveperson.net": {
                         "rules": [
                             {
@@ -924,6 +1288,17 @@
                                     "aternos.org"
                                 ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/328"
+                            }
+                        ]
+                    },
+                    "onlyfans.com": {
+                        "rules": [
+                            {
+                                "rule": "static.onlyfans.com",
+                                "domains": [
+                                    "onlyfans.com"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/440"
                             }
                         ]
                     },
@@ -1121,8 +1496,26 @@
                             }
                         ]
                     },
+                    "rncdn7.com": {
+                        "rules": [
+                            {
+                                "rule": "rncdn7.com",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/436"
+                            }
+                        ]
+                    },
                     "scene7.com": {
                         "rules": [
+                            {
+                                "rule": "scene7.com/is/image/",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/356"
+                            },
                             {
                                 "rule": "scene7.com/s7viewersdk/3.11/MixedMediaViewer/js/s7sdk/utils/Utils.js",
                                 "domains": [
@@ -1171,6 +1564,17 @@
                             }
                         ]
                     },
+                    "shopeemobile.com": {
+                        "rules": [
+                            {
+                                "rule": "deo.shopeemobile.com/shopee",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/442"
+                            }
+                        ]
+                    },
                     "sky.com": {
                         "rules": [
                             {
@@ -1190,6 +1594,17 @@
                                     "spiegel.de"
                                 ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/344"
+                            }
+                        ]
+                    },
+                    "strpst.com": {
+                        "rules": [
+                            {
+                                "rule": "strpst.com",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/438"
                             }
                         ]
                     },
@@ -1237,11 +1652,25 @@
                     "yandex.ru": {
                         "rules": [
                             {
-                                "rule": "yandex.ru",
+                                "rule": "frontend.vh.yandex.ru/player/",
                                 "domains": [
-                                    "tvrain.ru"
+                                    "<all>"
                                 ],
-                                "reason": "Adwall renders over video and video does not play."
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/366"
+                            },
+                            {
+                                "rule": "strm.yandex.ru/get/",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/366"
+                            },
+                            {
+                                "rule": "strm.yandex.ru/vh-special-converted/vod-content/",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/366"
                             }
                         ]
                     },
