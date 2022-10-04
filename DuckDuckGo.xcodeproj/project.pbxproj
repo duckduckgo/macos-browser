@@ -35,9 +35,6 @@
 		31F28C5328C8EECA00119F70 /* PrivatePlayerSchemeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31F28C5228C8EECA00119F70 /* PrivatePlayerSchemeHandler.swift */; };
 		31F28C5828C8EEDB00119F70 /* youtube_player_template.html in Resources */ = {isa = PBXBuildFile; fileRef = 31F28C5528C8EEDB00119F70 /* youtube_player_template.html */; };
 		31F28C5928C8EEDB00119F70 /* youtube-inject.js in Resources */ = {isa = PBXBuildFile; fileRef = 31F28C5628C8EEDB00119F70 /* youtube-inject.js */; };
-		31F28C5A28C8EEDB00119F70 /* private-player-inject.js in Resources */ = {isa = PBXBuildFile; fileRef = 31F28C5728C8EEDB00119F70 /* private-player-inject.js */; };
-		31F28C5E28C8EEE700119F70 /* PrivateYoutubeDiscoveryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31F28C5C28C8EEE700119F70 /* PrivateYoutubeDiscoveryView.swift */; };
-		31F28C5F28C8EEE700119F70 /* PrivateYoutubePopoverManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31F28C5D28C8EEE700119F70 /* PrivateYoutubePopoverManager.swift */; };
 		31F7F2A6288AD2CA001C0D64 /* NavigationBarBadgeAnimationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31F7F2A5288AD2CA001C0D64 /* NavigationBarBadgeAnimationView.swift */; };
 		336D5B18262D8D3C0052E0C9 /* findinpage.js in Resources */ = {isa = PBXBuildFile; fileRef = 336D5AEF262D8D3C0052E0C9 /* findinpage.js */; };
 		339A6B5826A044BA00E3DAE8 /* duckduckgo-privacy-dashboard in Resources */ = {isa = PBXBuildFile; fileRef = 339A6B5726A044BA00E3DAE8 /* duckduckgo-privacy-dashboard */; };
@@ -864,9 +861,6 @@
 		31F28C5228C8EECA00119F70 /* PrivatePlayerSchemeHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrivatePlayerSchemeHandler.swift; sourceTree = "<group>"; };
 		31F28C5528C8EEDB00119F70 /* youtube_player_template.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = youtube_player_template.html; sourceTree = "<group>"; };
 		31F28C5628C8EEDB00119F70 /* youtube-inject.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "youtube-inject.js"; sourceTree = "<group>"; };
-		31F28C5728C8EEDB00119F70 /* private-player-inject.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "private-player-inject.js"; sourceTree = "<group>"; };
-		31F28C5C28C8EEE700119F70 /* PrivateYoutubeDiscoveryView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrivateYoutubeDiscoveryView.swift; sourceTree = "<group>"; };
-		31F28C5D28C8EEE700119F70 /* PrivateYoutubePopoverManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrivateYoutubePopoverManager.swift; sourceTree = "<group>"; };
 		31F7F2A5288AD2CA001C0D64 /* NavigationBarBadgeAnimationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationBarBadgeAnimationView.swift; sourceTree = "<group>"; };
 		336B39E22726B4B700C417D3 /* LocalUnprotectedDomains.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalUnprotectedDomains.swift; sourceTree = "<group>"; };
 		336D5AEF262D8D3C0052E0C9 /* findinpage.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = findinpage.js; sourceTree = "<group>"; };
@@ -1756,7 +1750,6 @@
 		31F28C4B28C8EE9000119F70 /* Youtube Player */ = {
 			isa = PBXGroup;
 			children = (
-				31F28C5B28C8EEE100119F70 /* UI */,
 				31F28C5428C8EED100119F70 /* Resources */,
 				37F19A6928E2F2D000740DC6 /* PrivatePlayer.swift */,
 				3767190128E724B2003A2A15 /* PrivatePlayerURLExtension.swift */,
@@ -1771,20 +1764,10 @@
 		31F28C5428C8EED100119F70 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				31F28C5728C8EEDB00119F70 /* private-player-inject.js */,
 				31F28C5528C8EEDB00119F70 /* youtube_player_template.html */,
 				31F28C5628C8EEDB00119F70 /* youtube-inject.js */,
 			);
 			path = Resources;
-			sourceTree = "<group>";
-		};
-		31F28C5B28C8EEE100119F70 /* UI */ = {
-			isa = PBXGroup;
-			children = (
-				31F28C5C28C8EEE700119F70 /* PrivateYoutubeDiscoveryView.swift */,
-				31F28C5D28C8EEE700119F70 /* PrivateYoutubePopoverManager.swift */,
-			);
-			path = UI;
 			sourceTree = "<group>";
 		};
 		31F7F2A4288AD299001C0D64 /* BadgeAnimations */ = {
@@ -4445,7 +4428,6 @@
 				AA34397B2754D55100B241FA /* trackers-3.json in Resources */,
 				026ADE1426C3010C002518EE /* macos-config.json in Resources */,
 				4B677432255DBEB800025BD8 /* httpsMobileV2BloomSpec.json in Resources */,
-				31F28C5A28C8EEDB00119F70 /* private-player-inject.js in Resources */,
 				AA2CB12D2587BB5600AA6FBE /* TabBarFooter.xib in Resources */,
 				AA80EC67256C4691007083E7 /* BrowserTab.storyboard in Resources */,
 				AAE246F42709EF3B00BEEAEE /* FirePopoverCollectionViewItem.xib in Resources */,
@@ -4882,7 +4864,6 @@
 				4BA1A6B8258B081600F6F690 /* EncryptionKeyStoring.swift in Sources */,
 				B65783E725F8AAFB00D8DB33 /* String+Punycode.swift in Sources */,
 				B657841A25FA484B00D8DB33 /* NSException+Catch.m in Sources */,
-				31F28C5F28C8EEE700119F70 /* PrivateYoutubePopoverManager.swift in Sources */,
 				B684592F25C93FBF00DC17B6 /* AppStateRestorationManager.swift in Sources */,
 				EA0BA3A9272217E6002A0B6C /* ClickToLoadUserScript.swift in Sources */,
 				AAA892EA250A4CEF005B37B2 /* WindowControllersManager.swift in Sources */,
@@ -5038,7 +5019,6 @@
 				B6A9E45B261460350067D1B9 /* APIHeaders.swift in Sources */,
 				85625996269C953C00EE44BC /* PasswordManagementViewController.swift in Sources */,
 				4BB99D0226FE191E001E4761 /* ImportedBookmarks.swift in Sources */,
-				31F28C5E28C8EEE700119F70 /* PrivateYoutubeDiscoveryView.swift in Sources */,
 				AA6EF9B3250785D5004754E6 /* NSMenuExtension.swift in Sources */,
 				AA7412B524D1536B00D22FE0 /* MainWindowController.swift in Sources */,
 				AA9FF95924A1ECF20039E328 /* Tab.swift in Sources */,
