@@ -173,6 +173,7 @@ extension Pixel {
 
         enum Debug {
 
+            case dbContainerInitializationError
             case dbInitializationError
             case dbSaveExcludedHTTPSDomainsError
             case dbSaveBloomFilterError
@@ -405,6 +406,8 @@ extension Pixel.Event.Debug {
     var name: String {
         switch self {
         
+        case .dbContainerInitializationError:
+            return "database_container_error"
         case .dbInitializationError:
             return "dbie"
         case .dbSaveExcludedHTTPSDomainsError:
