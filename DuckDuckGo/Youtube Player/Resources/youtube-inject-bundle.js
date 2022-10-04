@@ -22,13 +22,6 @@
         }
       });
     },
-    getClosest: function(elem, selector) {
-      for (; elem && elem !== document; elem = elem.parentNode) {
-        if (elem.matches(selector))
-          return elem;
-      }
-      return null;
-    },
     appendElement: (to, element) => {
       to.appendChild(element);
     },
@@ -631,7 +624,7 @@
       getPreviewVideoLink: () => {
         let linkSelector = 'a[href^="/watch?v="]';
         let previewVideo = document.querySelector("#preview " + linkSelector + " video");
-        return Util.getClosest(previewVideo, linkSelector);
+        return previewVideo.closest(linkSelector);
       },
       appendIfNotAppended: () => {
         if (!OverlaySettings.enabled.thumbnails) {

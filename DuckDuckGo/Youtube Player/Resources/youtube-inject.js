@@ -151,7 +151,7 @@ function enable(userValues, environment = defaultEnvironment, comms = defaultCom
             let linkSelector = 'a[href^="/watch?v="]';
             let previewVideo = document.querySelector('#preview '+linkSelector+' video');
 
-            return Util.getClosest(previewVideo, linkSelector);
+            return previewVideo.closest(linkSelector);
         },
 
         /**

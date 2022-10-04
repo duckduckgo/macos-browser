@@ -14,19 +14,6 @@ export const Util = {
     },
 
     /**
-     * Same as $(elem).parents(selector)
-     * @param {HTMLElement} elem
-     * @param {string} selector
-     */
-    getClosest: function (elem, selector) {
-        // @ts-ignore
-        for ( ; elem && elem !== document; elem = elem.parentNode ) {
-            if ( elem.matches( selector ) ) return elem;
-        }
-        return null;
-    },
-
-    /**
      * Appends an element. This may change if we go with Shadow DOM approach
      * @param {Element} to - which element to append to
      * @param {Element} element - to be appended
