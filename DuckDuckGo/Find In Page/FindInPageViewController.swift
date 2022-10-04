@@ -34,6 +34,7 @@ final class FindInPageViewController: NSViewController {
 
     @Published var model: FindInPageModel? 
 
+    @IBOutlet weak var closeButton: NSButton!
     @IBOutlet weak var textField: NSTextField!
     @IBOutlet weak var focusRingView: FocusRingView!
     @IBOutlet weak var statusField: NSTextField!
@@ -49,6 +50,10 @@ final class FindInPageViewController: NSViewController {
         listenForTextFieldResponderNotifications()
         subscribeToModelChanges()
         updateFieldStates()
+        
+        closeButton.toolTip = UserText.findInPageCloseTooltip
+        nextButton.toolTip = UserText.findInPageNextTooltip
+        previousButton.toolTip = UserText.findInPagePreviousTooltip
     }
 
     @IBAction func findInPageNext(_ sender: Any?) {

@@ -160,7 +160,9 @@ private struct UsernameView: View {
                             model.copy(model.username)
                         } label: {
                             Image("Copy")
-                        }.buttonStyle(PlainButtonStyle())
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                        .tooltip(UserText.copyPasswordTooltip)
                     }
 
                     Spacer()
@@ -212,6 +214,7 @@ private struct PasswordView: View {
                         Image("SecureEyeToggle")
                     }
                     .buttonStyle(PlainButtonStyle())
+                    .tooltip(isPasswordVisible ? UserText.hidePasswordTooltip : UserText.showPasswordTooltip)
                     .padding(.trailing, 10)
 
                 }
@@ -232,7 +235,9 @@ private struct PasswordView: View {
                             isPasswordVisible = !isPasswordVisible
                         } label: {
                             Image("SecureEyeToggle")
-                        }.buttonStyle(PlainButtonStyle())
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                        .tooltip(isPasswordVisible ? UserText.hidePasswordTooltip : UserText.showPasswordTooltip)
                     }
 
                     if isHovering {
@@ -240,7 +245,9 @@ private struct PasswordView: View {
                             model.copy(model.password)
                         } label: {
                             Image("Copy")
-                        }.buttonStyle(PlainButtonStyle())
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                        .tooltip(UserText.copyPasswordTooltip)
                     }
 
                     Spacer()
