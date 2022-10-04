@@ -16,8 +16,8 @@
     "maxNodeModuleJsDepth": 0
   },
   "files": [
-    "DuckDuckGo/Youtube Player/Resources/youtube-inject.js",
-    "DuckDuckGo/Youtube Player/Resources/types.d.ts",
+    "youtube-inject.js",
+    "types.d.ts",
   ],
   "exclude": [
   ]

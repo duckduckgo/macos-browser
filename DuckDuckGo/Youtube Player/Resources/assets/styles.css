@@ -70,6 +70,20 @@
 .ddg-overlay[data-size="video-player"] {
     bottom: 145px;
     right: 20px;
+    opacity: 1;
+    transition: opacity .2s;
+}
+
+.html5-video-player.playing-mode.ytp-autohide .ddg-overlay[data-size="video-player"] {
+    opacity: 0;
+}
+
+.html5-video-player.ad-showing .ddg-overlay[data-size="video-player"] {
+    display: none;
+}
+
+.html5-video-player.ytp-hide-controls .ddg-overlay[data-size="video-player"] {
+    display: none;
 }
 
 .ddg-overlay[data-size="video-player-with-title"] {

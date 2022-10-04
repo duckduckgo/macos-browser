@@ -31,7 +31,7 @@ export class VideoPlayerOverlay {
      * @returns {HTMLElement}
      */
     overlay(videoId) {
-        let videoURL = Util.getPrivatePlayerURL(videoId);
+        const href = Util.getPrivatePlayerURLForId(videoId);
         let overlayElement = document.createElement('div');
         overlayElement.classList.add(this.CLASS_OVERLAY);
         overlayElement.innerHTML = `
@@ -48,7 +48,7 @@ export class VideoPlayerOverlay {
                 </div>
                 <div class="ddg-vpo-buttons">
                     <button class="ddg-vpo-button ddg-vpo-cancel" type="button">No Thanks</button>
-                    <a class="ddg-vpo-button ddg-vpo-open" href="${videoURL}">Watch in Duck Player</a>
+                    <a class="ddg-vpo-button ddg-vpo-open" href="#">Watch in Duck Player</a>
                 </div>
                 <div class="ddg-vpo-remember">
                     <label for="remember">
@@ -57,6 +57,7 @@ export class VideoPlayerOverlay {
                 </div>
             </div>
             `;
+        overlayElement.querySelector('.ddg-vpo-open')?.setAttribute("href", href)
         this.appendThumbnail(overlayElement, videoId);
         return overlayElement;
     }
@@ -88,10 +89,12 @@ export class VideoPlayerOverlay {
                  * But, if the checkbox was **not** checked, then we don't update any backend state
                  * and instead we just swap the main overlay for Dax
                  *
-                 * @type {import("../youtube-inject.js").UserValues['privatePlayerMode']}
                  */
                 if (remember.checked) {
-                    this.userChoice({ alwaysAsk: {} })
+                    this.userChoice({
+                        privatePlayerMode: { alwaysAsk: {} },
+                        overlayInteracted: true
+                    })
                         .then(values => this.userValues = values)
                         .then(() => this.watchForVideoBeingAdded({ ignoreCache: true }))
                         .catch(e => console.error("could not set userChoice for opt-out", e ))
@@ -116,13 +119,16 @@ export class VideoPlayerOverlay {
                  *
                  * @type {import("../youtube-inject.js").UserValues['privatePlayerMode']}
                  */
-                let privatePlayerEnabled = {alwaysAsk: {}};
+                let privatePlayerMode = { alwaysAsk: {} };
                 if (remember.checked) {
-                    privatePlayerEnabled = {enabled: {}}
+                    privatePlayerMode = { enabled: {} }
                 } else {
                     // do nothing. The checkbox was off meaning we don't want to save any choice
                 }
-                this.userChoice(privatePlayerEnabled)
+                this.userChoice({
+                    overlayInteracted: false,
+                    privatePlayerMode,
+                })
                     .then(() => this.environment.setHref(href))
                     .catch(e => console.error("error setting user choice", e))
             }
@@ -285,11 +291,11 @@ export class VideoPlayerOverlay {
 
     /**
      * Record the users choice
-     * @param {import("../youtube-inject.js").UserValues['privatePlayerMode']} privatePlayerMode
+     * @param {import("../youtube-inject.js").UserValues} userValues
      * @returns {Promise<import("../youtube-inject").UserValues>}
      */
-    userChoice(privatePlayerMode) {
-        return this.comms.setUserValues(privatePlayerMode)
+    userChoice(userValues) {
+        return this.comms.setUserValues(userValues)
             .then((userValues) => {
                 console.log("interacted flag set, now cleanup");
                 return userValues;

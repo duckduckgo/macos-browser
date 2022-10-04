@@ -1,0 +1,15 @@
+{
+  "name": "@duckduckgo/youtube",
+  "version": "1.0.0",
+  "private": true,
+  "devDependencies": {
+    "esbuild": "^0.15.9",
+    "typescript": "^4.8.4"
+  },
+  "scripts": {
+    "build": "esbuild --loader:.css=text --loader:.svg=text --bundle youtube-inject.js --outfile=youtube-inject-bundle.js",
+    "build:watch": "npm run build -- --watch",
+    "tsc": "tsc",
+    "tsc:watch": "npm run tsc -- --watch"
+  }
+}

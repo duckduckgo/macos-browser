@@ -33,7 +33,6 @@ export const IconOverlay = {
      */
     create: (size, href, extraClass) => {
         let overlayElement = document.createElement('div');
-        let videoURL = Util.getPrivatePlayerURL(href);
 
         overlayElement.setAttribute('class', 'ddg-overlay' + (extraClass ? ' ' + extraClass : ''));
         overlayElement.setAttribute('data-size', size);
@@ -49,7 +48,7 @@ export const IconOverlay = {
                     </div>
                 </a>`;
 
-        overlayElement.querySelector('a.ddg-play-privately')?.setAttribute('href', videoURL);
+        overlayElement.querySelector('a.ddg-play-privately')?.setAttribute('href', href);
 
         return overlayElement;
     },
@@ -163,14 +162,11 @@ export const IconOverlay = {
     appendToVideo: (videoElement) => {
         let appendOverlayToThumbnail = (videoElement) => {
             if (videoElement) {
+                const searchParams = new URLSearchParams(videoElement.search);
+                const href = Util.getPrivatePlayerURLFromSearchParams(searchParams);
+                const thumbSize = IconOverlay.getThumbnailSize(videoElement);
 
-                Util.appendElement(
-                    videoElement,
-                    IconOverlay.create(
-                        IconOverlay.getThumbnailSize(videoElement), videoElement.getAttribute('href')
-                    )
-                );
-
+                Util.appendElement(videoElement, IconOverlay.create(thumbSize, href));
                 videoElement.classList.add('has-dgg-overlay');
             }
         };

@@ -24,17 +24,33 @@ export const Util = {
 
     /**
      * NATIVE NOTE: Returns the URL we use for telling the MacOS app to open the private player
-     * @param {string} relativePath - for now, it's expected to always be something like /watch?v=VIDEO_ID, there is no validation yet.
+     * @param {string} relativePath - for now, it's expected to always be something like /watch?v=VIDEO_ID
      */
     getPrivatePlayerURL: (relativePath) => {
         let url = new URL(relativePath, window.location.origin);
+        return Util.getPrivatePlayerURLFromSearchParams(url.searchParams)
+    },
 
+    /**
+     * Convenience for creating a private player URL for a video ID
+     * @param {string} videoId
+     */
+    getPrivatePlayerURLForId: (videoId) => {
+        const searchParams = new URLSearchParams();
+        searchParams.set('v', videoId);
+        return Util.getPrivatePlayerURLFromSearchParams(searchParams);
+    },
+    /**
+     * @param searchParams
+     * @returns {string}
+     */
+    getPrivatePlayerURLFromSearchParams(searchParams) {
         let validVideoId = /^[a-zA-Z0-9-_]+$/g;
         let validTimestamp = /^[0-9hms]+$/g
 
         let privatePlayerURL = '';
-        let vParam = url.searchParams.get('v');
-        let tParam = url.searchParams.get('t');
+        let vParam = searchParams.get('v');
+        let tParam = searchParams.get('t');
 
         if (vParam && validVideoId.test(vParam)) {
             privatePlayerURL = vParam;
