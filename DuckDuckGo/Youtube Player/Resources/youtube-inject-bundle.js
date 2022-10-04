@@ -127,6 +127,8 @@
   var IconOverlay = {
     HOVER_CLASS: "ddg-overlay-hover",
     OVERLAY_CLASS: "ddg-overlay",
+    currentVideoElement: false,
+    hoverOverlayVisible: false,
     create: (size, href, extraClass) => {
       let overlayElement = document.createElement("div");
       let videoURL = Util.getPrivatePlayerURL(href);
@@ -169,6 +171,13 @@
         if (href) {
           overlay.querySelector("a")?.setAttribute("href", Util.getPrivatePlayerURL(href));
         }
+        IconOverlay.hoverOverlayVisible = true;
+        IconOverlay.currentVideoElement = videoElement;
+      }
+    },
+    repositionHoverOverlay: () => {
+      if (IconOverlay.currentVideoElement && IconOverlay.hoverOverlayVisible) {
+        IconOverlay.moveHoverOverlayToVideoElement(IconOverlay.currentVideoElement);
       }
     },
     hideHoverOverlay: (event, force) => {
@@ -179,6 +188,7 @@
           return;
         }
         IconOverlay.hideOverlay(overlay);
+        IconOverlay.hoverOverlayVisible = false;
       }
     },
     hideOverlay: (overlay) => {
@@ -665,6 +675,9 @@
               Preview.init();
             }
             videoPlayerOverlay.watchForVideoBeingAdded(userValues);
+          });
+          window.addEventListener("resize", () => {
+            IconOverlay.repositionHoverOverlay();
           });
         });
       }

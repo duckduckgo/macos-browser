@@ -245,8 +245,11 @@ function enable(userValues, environment = defaultEnvironment, comms = defaultCom
 
                     videoPlayerOverlay.watchForVideoBeingAdded(userValues);
                 });
-            });
 
+                window.addEventListener('resize', () => {
+                    IconOverlay.repositionHoverOverlay();
+                })
+            });
         }
     }
 

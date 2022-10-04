@@ -9,6 +9,9 @@ export const IconOverlay = {
     HOVER_CLASS: 'ddg-overlay-hover',
     OVERLAY_CLASS: 'ddg-overlay',
 
+    currentVideoElement: false,
+    hoverOverlayVisible: false,
+
     /**
      * Creates an Icon Overlay.
      * @param {string} size - currently kind-of unused
@@ -73,9 +76,23 @@ export const IconOverlay = {
             overlay.setAttribute('data-size', 'fixed ' + IconOverlay.getThumbnailSize(videoElement));
 
             const href = videoElement.getAttribute('href');
+
             if (href) {
                 overlay.querySelector('a')?.setAttribute('href', Util.getPrivatePlayerURL(href));
             }
+
+            IconOverlay.hoverOverlayVisible = true;
+            IconOverlay.currentVideoElement = videoElement;
+        }
+    },
+
+    /**
+     * Reposition the hover overlay on top of the current video element (in case
+     * of window resize if the hover overlay is visible)
+     */
+    repositionHoverOverlay: () => {
+        if (IconOverlay.currentVideoElement && IconOverlay.hoverOverlayVisible) {
+            IconOverlay.moveHoverOverlayToVideoElement(IconOverlay.currentVideoElement)
         }
     },
 
@@ -95,6 +112,7 @@ export const IconOverlay = {
             }
 
             IconOverlay.hideOverlay(overlay);
+            IconOverlay.hoverOverlayVisible = false;
         }
 
     },
