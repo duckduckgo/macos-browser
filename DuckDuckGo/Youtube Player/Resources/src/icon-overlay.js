@@ -9,7 +9,8 @@ export const IconOverlay = {
     HOVER_CLASS: 'ddg-overlay-hover',
     OVERLAY_CLASS: 'ddg-overlay',
 
-    currentVideoElement: false,
+    /** @type {HTMLElement | null} */
+    currentVideoElement: null,
     hoverOverlayVisible: false,
 
     /**

@@ -30,11 +30,13 @@
       let validVideoId = /^[a-zA-Z0-9-_]+$/g;
       let validTimestamp = /^[0-9hms]+$/g;
       let privatePlayerURL = "";
-      if (validVideoId.test(url?.searchParams.get("v"))) {
-        privatePlayerURL = url.searchParams.get("v");
+      let vParam = url.searchParams.get("v");
+      let tParam = url.searchParams.get("t");
+      if (vParam && validVideoId.test(vParam)) {
+        privatePlayerURL = vParam;
       }
-      if (validTimestamp.test(url?.searchParams.get("t"))) {
-        privatePlayerURL += "&t=" + url.searchParams.get("t");
+      if (tParam && validTimestamp.test(tParam)) {
+        privatePlayerURL += "&t=" + tParam;
       }
       return "privateplayer:" + privatePlayerURL;
     },
@@ -129,7 +131,7 @@
   var IconOverlay = {
     HOVER_CLASS: "ddg-overlay-hover",
     OVERLAY_CLASS: "ddg-overlay",
-    currentVideoElement: false,
+    currentVideoElement: null,
     hoverOverlayVisible: false,
     create: (size, href, extraClass) => {
       let overlayElement = document.createElement("div");

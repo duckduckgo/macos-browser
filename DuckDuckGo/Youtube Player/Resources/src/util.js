@@ -33,13 +33,15 @@ export const Util = {
         let validTimestamp = /^[0-9hms]+$/g
 
         let privatePlayerURL = '';
+        let vParam = url.searchParams.get('v');
+        let tParam = url.searchParams.get('t');
 
-        if (validVideoId.test(url?.searchParams.get('v'))) {
-            privatePlayerURL = url.searchParams.get('v');
+        if (vParam && validVideoId.test(vParam)) {
+            privatePlayerURL = vParam;
         }
 
-        if (validTimestamp.test(url?.searchParams.get('t'))) {
-            privatePlayerURL += '&t=' + url.searchParams.get('t');
+        if (tParam && validTimestamp.test(tParam)) {
+            privatePlayerURL += '&t=' + tParam;
         }
 
         return 'privateplayer:' + privatePlayerURL;
