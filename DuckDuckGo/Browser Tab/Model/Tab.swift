@@ -441,6 +441,10 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         }
 
         shouldStoreNextVisit = false
+
+        if privatePlayer.goBackSkippingLastItemIfNeeded(for: webView) {
+            return
+        }
         webView.goBack()
     }
 

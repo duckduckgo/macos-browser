@@ -134,6 +134,25 @@ final class PrivatePlayer {
         return true
     }
 
+    func goBackSkippingLastItemIfNeeded(for webView: WKWebView) -> Bool {
+        guard mode == .enabled, webView.url?.isPrivatePlayer == true else {
+            return false
+        }
+
+        let backList = webView.backForwardList.backList
+
+        guard let backURL = webView.backForwardList.backItem?.url,
+           backURL.isYoutubeVideo,
+           backURL.youtubeVideoID == webView.url?.youtubeVideoID,
+           let penultimateBackItem = backList[safe: backList.count - 2]
+        else {
+            return false
+        }
+
+        webView.go(to: penultimateBackItem)
+        return true
+    }
+
     func decidePolicy(for navigationAction: WKNavigationAction, in tab: Tab) -> WKNavigationActionPolicy? {
         guard mode != .disabled else {
             return nil
