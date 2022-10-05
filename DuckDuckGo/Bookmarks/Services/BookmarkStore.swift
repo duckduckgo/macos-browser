@@ -59,6 +59,7 @@ protocol BookmarkStore {
 
 }
 
+// swiftlint:disable:next type_body_length
 final class LocalBookmarkStore: BookmarkStore {
     
     enum Constants {
@@ -751,10 +752,23 @@ final class LocalBookmarkStore: BookmarkStore {
                 
                 var existingTopLevelEntities = try self.context.fetch(topLevelEntitiesFetchRequest)
                 
-                os_log("DEBUG: Got top level entities, count = %{public}d", type: .error, existingTopLevelEntities.count)
+                os_log("DEBUG: Got %{public}d top level entities. Checking their state now...", type: .error, existingTopLevelEntities.count)
+                
+                for entity in existingTopLevelEntities where entity.titleEncrypted == nil {
+                    os_log("DEBUG: Error! Found top level entity without a title. is folder = %{public}s, has URL = %{public}s",
+                           type: .error,
+                           String(entity.isFolder),
+                           (entity.urlEncrypted as? String) == nil ? "false" : "true")
+                }
+                
+                os_log("DEBUG: Done checking top level entity state")
                 
                 let existingTopLevelFolderIndex = existingTopLevelEntities.firstIndex { entity in
                     entity.id == .rootBookmarkFolderUUID
+                }
+                
+                if existingTopLevelFolderIndex != nil {
+                    os_log("DEBUG: Found the expected top level folder ID in the array of top level entities", type: .error)
                 }
                 
                 // Check if there's only one top level folder, and it's the root folder:
