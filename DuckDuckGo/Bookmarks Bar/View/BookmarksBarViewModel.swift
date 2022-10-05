@@ -391,7 +391,7 @@ extension BookmarksBarViewModel: NSCollectionViewDelegate, NSCollectionViewDataS
             collectionView.animator().moveItem(at: existingIndexPath, to: IndexPath(item: index, section: 0))
             existingItemDraggingIndexPath = nil
             
-            bookmarkManager.move(objectUUIDs: [entityUUID], toIndex: index, withinParentFolder: .root) { error in
+            bookmarkManager.move(objectUUIDs: [entityUUID], toIndex: newIndexPath.item, withinParentFolder: .root) { error in
                 if error != nil {
                     self.delegate?.bookmarksBarViewModelReloadedData()
                 }
