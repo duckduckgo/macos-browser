@@ -225,7 +225,7 @@ final class RecentlyVisitedSiteModel: ObservableObject {
                     urlsToRemove.append($0.url)
                 }
 
-            } else if PrivatePlayer.shared.mode != .disabled, let displayTitle = PrivatePlayer.title(for: $0) {
+            } else if let displayTitle = PrivatePlayer.shared.title(for: $0) {
 
                 $0.displayTitle = displayTitle
 
