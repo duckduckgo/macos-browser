@@ -162,7 +162,7 @@ private struct UsernameView: View {
                             Image("Copy")
                         }
                         .buttonStyle(PlainButtonStyle())
-                        .tooltip(UserText.copyPasswordTooltip)
+                        .tooltip(UserText.copyUsernameTooltip)
                     }
 
                     Spacer()
