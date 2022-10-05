@@ -148,8 +148,8 @@ final class PrivatePlayer {
 
 extension PrivatePlayer {
 
-    static func title(for page: HomePage.Models.RecentlyVisitedPageModel) -> String? {
-        guard page.url.isPrivatePlayer, let actualTitle = page.actualTitle, actualTitle.starts(with: Self.websiteTitlePrefix) else {
+    func title(for page: HomePage.Models.RecentlyVisitedPageModel) -> String? {
+        guard mode != .disabled, page.url.isPrivatePlayer, let actualTitle = page.actualTitle, actualTitle.starts(with: Self.websiteTitlePrefix) else {
             return nil
         }
         return actualTitle.dropping(prefix: Self.websiteTitlePrefix)
