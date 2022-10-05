@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import Combine
 import WebKit
 
 extension NSImage {
@@ -49,28 +50,37 @@ enum PrivatePlayerMode: Equatable {
     }
 }
 
-enum PrivatePlayer {
+final class PrivatePlayer {
     static let privatePlayerHost = "www.youtube-nocookie.com"
     static let privatePlayerScheme = "privateplayer"
     static let commonName = UserText.privatePlayer
 
-    static var mode: PrivatePlayerMode {
-        PrivacySecurityPreferences.shared.privatePlayerMode
+    static let shared = PrivatePlayer()
+
+    @Published var mode: PrivatePlayerMode
+
+    init(preferences: PrivatePlayerPreferences = .shared) {
+        self.preferences = preferences
+        mode = preferences.privatePlayerMode
+
+        modeCancellable = preferences.$privatePlayerMode
+            .removeDuplicates()
+            .assign(to: \.mode, onWeaklyHeld: self)
     }
 
-    static func image(for faviconView: FaviconView) -> NSImage? {
-        guard Self.mode != .disabled, faviconView.domain == Self.commonName else {
+    func image(for faviconView: FaviconView) -> NSImage? {
+        guard mode != .disabled, faviconView.domain == Self.commonName else {
             return nil
         }
         return .privatePlayer
     }
 
-    static func tabContent(for url: URL?) -> Tab.TabContent? {
-        guard Self.mode != .disabled, let url = url, let (videoID, timestamp) = url.youtubeVideoParams else {
+    func tabContent(for url: URL?) -> Tab.TabContent? {
+        guard mode != .disabled, let url = url, let (videoID, timestamp) = url.youtubeVideoParams else {
             return nil
         }
 
-        let shouldAlwaysOpenPrivatePlayer = url.isYoutubeVideo && PrivacySecurityPreferences.shared.privatePlayerMode == .enabled
+        let shouldAlwaysOpenPrivatePlayer = url.isYoutubeVideo && mode == .enabled
 
         if url.isPrivatePlayerScheme || url.isPrivatePlayer || shouldAlwaysOpenPrivatePlayer {
             return .privatePlayer(videoID: videoID, timestamp: timestamp)
@@ -78,25 +88,18 @@ enum PrivatePlayer {
         return nil
     }
 
-    static func title(for page: HomePage.Models.RecentlyVisitedPageModel) -> String? {
-        guard page.url.isPrivatePlayer, let actualTitle = page.actualTitle, actualTitle.starts(with: Self.websiteTitlePrefix) else {
-            return nil
-        }
-        return actualTitle.dropping(prefix: Self.websiteTitlePrefix)
-    }
-
-    static func shouldSkipLoadingURL(for tab: Tab) -> Bool {
+    func shouldSkipLoadingURL(for tab: Tab) -> Bool {
         guard case .privatePlayer(let videoID, let timestamp) = tab.content,
            tab.webView.url == .youtubeNoCookie(videoID, timestamp: timestamp)
-            || (tab.webView.url == .youtube(videoID, timestamp: timestamp) && PrivacySecurityPreferences.shared.privatePlayerMode != .enabled)
+            || (tab.webView.url == .youtube(videoID, timestamp: timestamp) && mode != .enabled)
         else {
             return false
         }
         return true
     }
 
-    static func decidePolicy(for navigationAction: WKNavigationAction, in tab: Tab) -> WKNavigationActionPolicy? {
-        guard Self.mode != .disabled else {
+    func decidePolicy(for navigationAction: WKNavigationAction, in tab: Tab) -> WKNavigationActionPolicy? {
+        guard mode != .disabled else {
             return nil
         }
 
@@ -113,7 +116,7 @@ enum PrivatePlayer {
             return nil
         }
 
-        let alwaysOpenInPrivatePlayer = PrivacySecurityPreferences.shared.privatePlayerMode == .enabled
+        let alwaysOpenInPrivatePlayer = mode == .enabled
         let didSelectRecommendationFromPrivatePlayer = tab.content.isPrivatePlayer && navigationAction.request.url?.isYoutubeVideoRecommendation == true
 
         guard alwaysOpenInPrivatePlayer || didSelectRecommendationFromPrivatePlayer, let videoID = navigationAction.request.url?.youtubeVideoID else {
@@ -133,20 +136,34 @@ enum PrivatePlayer {
 
     // MARK: - Private
 
-    private static let websiteTitlePrefix = "\(Self.commonName) - "
+    private static let websiteTitlePrefix = "\(commonName) - "
+    private let preferences: PrivatePlayerPreferences
+    private var modeCancellable: AnyCancellable?
+}
+
+// MARK: - Privacy Feed
+
+extension PrivatePlayer {
+
+    static func title(for page: HomePage.Models.RecentlyVisitedPageModel) -> String? {
+        guard page.url.isPrivatePlayer, let actualTitle = page.actualTitle, actualTitle.starts(with: Self.websiteTitlePrefix) else {
+            return nil
+        }
+        return actualTitle.dropping(prefix: Self.websiteTitlePrefix)
+    }
 }
 
 // MARK: - Tab Content updating
 
 extension PrivatePlayer {
 
-    static func updateContent(_ content: Tab.TabContent, for tab: Tab) -> Tab.TabContent? {
+    func updateContent(_ content: Tab.TabContent, for tab: Tab) -> Tab.TabContent? {
         let newContent: Tab.TabContent? = {
             if case .privatePlayer(let oldVideoID, _) = tab.content,
                case .privatePlayer(let videoID, let timestamp) = content,
                oldVideoID == videoID {
 
-                return Self.overrideTabContent(forOpeningYoutubeVideo: videoID, at: timestamp, fromPrivatePlayerTab: tab)
+                return overrideTabContent(forOpeningYoutubeVideo: videoID, at: timestamp, fromPrivatePlayerTab: tab)
             }
             return nil
         }()
@@ -156,7 +173,7 @@ extension PrivatePlayer {
         return nil
     }
 
-    private static func overrideTabContent(forOpeningYoutubeVideo videoID: String, at timestamp: String?, fromPrivatePlayerTab tab: Tab) -> Tab.TabContent? {
+    private func overrideTabContent(forOpeningYoutubeVideo videoID: String, at timestamp: String?, fromPrivatePlayerTab tab: Tab) -> Tab.TabContent? {
         if case .privatePlayer(let parentVideoID, _) = tab.parentTab?.content,
            parentVideoID == videoID,
            tab.webView.url != .youtubeNoCookie(videoID, timestamp: timestamp) {

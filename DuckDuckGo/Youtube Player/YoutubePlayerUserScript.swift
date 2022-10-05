@@ -38,6 +38,10 @@ final class YoutubePlayerUserScript: NSObject, StaticUserScript {
 
     var isEnabled: Bool = false
 
+    init(preferences: PrivatePlayerPreferences = .shared) {
+        privatePlayerPreferences = preferences
+    }
+
     func setAlwaysOpenInPrivatePlayer(_ enabled: Bool, inWebView webView: WKWebView) {
         let value = enabled ? "true" : "false"
         let js = "window.postMessage({ alwaysOpenSetting: \(value) });"
@@ -67,7 +71,7 @@ final class YoutubePlayerUserScript: NSObject, StaticUserScript {
         }
         
         print("Always open \(alwaysOpenOnPrivatePlayer)")
-        PrivacySecurityPreferences.shared.privatePlayerMode = .init(alwaysOpenOnPrivatePlayer)
+        privatePlayerPreferences.privatePlayerMode = .init(alwaysOpenOnPrivatePlayer)
     }
     
     func evaluateJSCall(call: String, webView: WKWebView) {
@@ -81,4 +85,6 @@ final class YoutubePlayerUserScript: NSObject, StaticUserScript {
             webView.evaluateJavaScript(js)
         }
     }
+
+    private let privatePlayerPreferences: PrivatePlayerPreferences
 }
