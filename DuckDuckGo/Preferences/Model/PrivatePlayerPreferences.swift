@@ -47,7 +47,11 @@ final class PrivatePlayerPreferences: ObservableObject {
         }
     }
 
-    var youtubeOverlayInteracted: Bool
+    var youtubeOverlayInteracted: Bool {
+        didSet {
+            persistor.youtubeOverlayInteracted = youtubeOverlayInteracted
+        }
+    }
 
     init(persistor: PrivatePlayerPreferencesPersistor = PrivatePlayerPreferencesUserDefaultsPersistor()) {
         self.persistor = persistor
