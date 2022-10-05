@@ -12,6 +12,21 @@ export function addTrustedEventListener(element, event, callback) {
     });
 }
 
+export function onDOMLoaded(callback) {
+    window.addEventListener('DOMContentLoaded', () => {
+        callback();
+    });
+};
+
+export function onDOMChanged(callback) {
+    let observer = new MutationObserver(callback);
+    observer.observe(document, {
+        subtree: true,
+        childList: true,
+        attributeFilter: ['src']
+    });
+};
+
 /**
  * Appends an element. This may change if we go with Shadow DOM approach
  * @param {Element} to - which element to append to

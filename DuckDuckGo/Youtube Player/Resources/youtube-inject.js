@@ -1,7 +1,7 @@
 import css from "./assets/styles.css";
 import {VideoPlayerOverlay} from "./src/video-player-overlay";
 import {IconOverlay} from "./src/icon-overlay.js";
-import {addTrustedEventListener, appendElement, VideoParams} from "./src/util.js";
+import {onDOMLoaded, onDOMChanged, addTrustedEventListener, appendElement, VideoParams} from "./src/util.js";
 import {macOSCommunications} from "./src/comms";
 
 console.log("script load", window.location.href);
@@ -45,7 +45,15 @@ function enable(userValues, environment = defaultEnvironment, comms = defaultCom
         console.log("got new values after zero", userValues)
         videoPlayerOverlay.userValues = userValues;
         videoPlayerOverlay.watchForVideoBeingAdded({ignoreCache: true});
-    })
+
+        if (userValues.privatePlayerMode.disabled || userValues.privatePlayerMode.enabled) {
+            AllIconOverlays.disable();
+        }
+
+        if (userValues.privatePlayerMode.alwaysAsk) {
+            AllIconOverlays.enable();
+        }
+    });
     const CSS = {
         styles: css,
         /**
@@ -57,35 +65,6 @@ function enable(userValues, environment = defaultEnvironment, comms = defaultCom
             appendElement(document.head, style);
         }
     }
-
-    const OverlaySettings = {
-        enabled: {
-            thumbnails: true,
-            video: true,
-        },
-
-        enableThumbnails: () => {
-            IconOverlay.appendHoverOverlay();
-            VideoThumbnail.bindEventsToAll();
-
-            OverlaySettings.enabled.thumbnails = true;
-        },
-
-        disableThumbnails: () => {
-            let overlays = document.querySelectorAll('.' + IconOverlay.OVERLAY_CLASS);
-            console.log('overlays', overlays);
-
-            overlays.forEach(overlay => {
-                overlay.remove();
-            });
-
-            OverlaySettings.enabled.thumbnails = false;
-        },
-
-        disableVideo: () => {
-            OverlaySettings.enabled.video = false;
-        }
-    };
 
     const VideoThumbnail = {
         /**
@@ -165,10 +144,6 @@ function enable(userValues, environment = defaultEnvironment, comms = defaultCom
          * @returns {HTMLElement|boolean}
          */
         appendIfNotAppended: () => {
-            if (!OverlaySettings.enabled.thumbnails) {
-                return false
-            }
-
             let previewVideo = Preview.getPreviewVideoLink();
 
             if (previewVideo) {
@@ -227,30 +202,22 @@ function enable(userValues, environment = defaultEnvironment, comms = defaultCom
         }
     };
 
-    const Site = {
-        onDOMLoaded: (callback) => {
-            window.addEventListener('DOMContentLoaded', () => {
-                callback();
-            })
-        },
+    const AllIconOverlays = {
+        enabled: false,
+        hasBeenEnabled: false,
 
-        onDOMChanged: (callback) => {
-            let observer = new MutationObserver(callback);
-            observer.observe(document, {
-                subtree: true,
-                childList: true,
-                attributeFilter: ['src']
+        enableOnDOMLoaded: () => {
+            onDOMLoaded(() => {
+                AllIconOverlays.enable();
             });
         },
 
-        init: () => {
-            Site.onDOMLoaded(() => {
+        enable: () => {
+            if (!AllIconOverlays.hasBeenEnabled) {
                 CSS.init();
-                IconOverlay.appendHoverOverlay();
-                VideoThumbnail.bindEventsToAll();
 
-                Site.onDOMChanged(() => {
-                    if (OverlaySettings.enabled.thumbnails) {
+                onDOMChanged(() => {
+                    if (AllIconOverlays.enabled) {
                         VideoThumbnail.bindEventsToAll();
                         Preview.init();
                     }
@@ -260,37 +227,25 @@ function enable(userValues, environment = defaultEnvironment, comms = defaultCom
 
                 window.addEventListener('resize', () => {
                     IconOverlay.repositionHoverOverlay();
-                })
-            });
+                });
+            }
+
+            IconOverlay.appendHoverOverlay();
+            VideoThumbnail.bindEventsToAll();
+
+            AllIconOverlays.enabled = true;
+            AllIconOverlays.hasBeenEnabled = true;
+
+        },
+
+        disable: () => {
+            AllIconOverlays.enabled = false;
+            IconOverlay.removeAll();
         }
+    };
+
+    // Enable icon overlays on page load if not explicitly disabled
+    if (!userValues.privatePlayerMode.disabled) {
+        AllIconOverlays.enableOnDOMLoaded();
     }
-
-    Site.init();
-
-    // TODO: Remove if we're not going to do this. Doesn't look like it anymore.
-    /*let appendOverlayToVideoPageTitle = () => {
-        let onVideoPage = document.location.pathname === '/watch';
-
-        let findVideoTitleElement = () => {
-            let titles = Array.from(document.querySelectorAll('h1:not(.has-ddg-overlay)'));
-
-            for (let i in titles) {
-                let text = titles[i].innerText.trim();
-                if (text !== '' && document.title.includes(text)) {
-                    return titles[i];
-                }
-            }
-
-            return false;
-        }
-
-        if (onVideoPage) {
-            let videoTitleElement = findVideoTitleElement();
-
-            if (videoTitleElement) {
-                videoTitleElement.appendChild(overlay('title', '#'));
-                videoTitleElement.classList.add('has-ddg-overlay');
-            }
-        }
-    }*/
 }

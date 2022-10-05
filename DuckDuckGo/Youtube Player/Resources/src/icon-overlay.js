@@ -43,7 +43,7 @@ export const IconOverlay = {
                     </div>
                     <div class="ddg-play-text-container">
                         <div class="ddg-play-text">
-                            Watch Privately
+                            Duck Player
                         </div>
                     </div>
                 </a>`;
@@ -207,7 +207,7 @@ export const IconOverlay = {
     },
 
     removeAll: () => {
-        document.querySelectorAll(IconOverlay.OVERLAY_CLASS).forEach(element => {
+        document.querySelectorAll('.' + IconOverlay.OVERLAY_CLASS).forEach(element => {
             element.remove();
         });
 

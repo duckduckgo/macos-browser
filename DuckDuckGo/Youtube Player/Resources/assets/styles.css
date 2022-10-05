@@ -59,7 +59,7 @@
 }
 
 .ddg-overlay:not([data-size="fixed small"]):hover .ddg-play-text-container {
-    width: 100px;
+    width: 80px;
     opacity: 1;
 }
 
