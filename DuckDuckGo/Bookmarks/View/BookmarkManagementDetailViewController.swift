@@ -349,6 +349,10 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
                    validateDrop info: NSDraggingInfo,
                    proposedRow row: Int,
                    proposedDropOperation dropOperation: NSTableView.DropOperation) -> NSDragOperation {
+        if selectionState == .favorites {
+            // Favourite reordering is not currently supported. This is being worked on in a future update.
+            return .none
+        }
         
         if let proposedDestination = fetchEntity(at: row), proposedDestination.isFolder {
             if let bookmarks = PasteboardBookmark.pasteboardBookmarks(with: info.draggingPasteboard) {
