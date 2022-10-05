@@ -457,11 +457,7 @@ final class LocalBookmarkStore: BookmarkStore {
         return canMoveObject
     }
     
-    // swiftlint:disable:next function_body_length
-    func move(objectUUIDs: [UUID],
-              toIndex index: Int?,
-              withinParentFolder type: ParentFolderType,
-              completion: @escaping (Error?) -> Void) {
+    func move(objectUUIDs: [UUID], toIndex index: Int?, withinParentFolder type: ParentFolderType, completion: @escaping (Error?) -> Void) {
         context.perform { [weak self] in
             guard let self = self else {
                 assertionFailure("Couldn't get strong self")
@@ -471,8 +467,7 @@ final class LocalBookmarkStore: BookmarkStore {
 
             let bookmarksFetchRequest = BaseBookmarkEntity.entities(with: objectUUIDs)
 
-            guard let bookmarkManagedObjects = try? self.context.fetch(bookmarksFetchRequest),
-                  let rootFolder = self.rootLevelFolder else {
+            guard let bookmarkManagedObjects = try? self.context.fetch(bookmarksFetchRequest), let rootFolder = self.rootLevelFolder else {
                 assertionFailure("\(#file): Failed to get BookmarkManagedObject from the context")
                 completion(nil)
                 return
@@ -493,29 +488,7 @@ final class LocalBookmarkStore: BookmarkStore {
             }
             
             if let index = index, index < newParentFolder.mutableChildren.count {
-                var currentInsertionIndex = max(index, 0)
-                
-                for bookmarkManagedObject in bookmarkManagedObjects {
-                    let movingObjectWithinSameFolder = bookmarkManagedObject.parentFolder?.id == newParentFolder.id
-                    
-                    var adjustedInsertionIndex = currentInsertionIndex
-                    
-                    if movingObjectWithinSameFolder, currentInsertionIndex > newParentFolder.mutableChildren.index(of: bookmarkManagedObject) {
-                        adjustedInsertionIndex -= 1
-                    }
-                    
-                    bookmarkManagedObject.parentFolder = nil
-                    
-                    // Removing the bookmark from its current parent may have removed it from the collection it is about to be added to, so re-check
-                    // the bounds before inserting.
-                    if adjustedInsertionIndex < newParentFolder.mutableChildren.count {
-                        newParentFolder.mutableChildren.insert(bookmarkManagedObject, at: adjustedInsertionIndex)
-                    } else {
-                        newParentFolder.mutableChildren.add(bookmarkManagedObject)
-                    }
-
-                    currentInsertionIndex += 1
-                }
+                self.move(entities: bookmarkManagedObjects, to: index, within: newParentFolder)
             } else {
                 for bookmarkManagedObject in bookmarkManagedObjects {
                     bookmarkManagedObject.parentFolder = nil
@@ -533,6 +506,32 @@ final class LocalBookmarkStore: BookmarkStore {
             }
 
             DispatchQueue.main.async { completion(nil) }
+        }
+    }
+    
+    private func move(entities bookmarkManagedObjects: [BookmarkManagedObject], to index: Int, within newParentFolder: BookmarkManagedObject) {
+        var currentInsertionIndex = max(index, 0)
+        
+        for bookmarkManagedObject in bookmarkManagedObjects {
+            let movingObjectWithinSameFolder = bookmarkManagedObject.parentFolder?.id == newParentFolder.id
+            
+            var adjustedInsertionIndex = currentInsertionIndex
+            
+            if movingObjectWithinSameFolder, currentInsertionIndex > newParentFolder.mutableChildren.index(of: bookmarkManagedObject) {
+                adjustedInsertionIndex -= 1
+            }
+            
+            bookmarkManagedObject.parentFolder = nil
+            
+            // Removing the bookmark from its current parent may have removed it from the collection it is about to be added to, so re-check
+            // the bounds before adding it back.
+            if adjustedInsertionIndex < newParentFolder.mutableChildren.count {
+                newParentFolder.mutableChildren.insert(bookmarkManagedObject, at: adjustedInsertionIndex)
+            } else {
+                newParentFolder.mutableChildren.add(bookmarkManagedObject)
+            }
+
+            currentInsertionIndex += 1
         }
     }
 
