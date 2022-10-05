@@ -94,7 +94,7 @@ function enable(userValues, environment = defaultEnvironment, comms = defaultCom
                 return linksInVideoPreview.indexOf(item) === -1;
             }
 
-            return Array.from(document.querySelectorAll('a:not(.has-ddg-overlay,.ddg-play-privately)'))
+            return Array.from(document.querySelectorAll('a[href^="/watch?v="]'))
                 .filter(linksToVideos)
                 .filter(linksWithoutSubLinks)
                 .filter(linksNotInVideoPreview)
@@ -112,8 +112,6 @@ function enable(userValues, environment = defaultEnvironment, comms = defaultCom
                 });
 
                 addTrustedEventListener(video, 'mouseout', IconOverlay.hideHoverOverlay);
-
-                video.classList.add('has-ddg-overlay');
             }
         },
 
@@ -245,7 +243,7 @@ function enable(userValues, environment = defaultEnvironment, comms = defaultCom
     };
 
     // Enable icon overlays on page load if not explicitly disabled
-    if (!userValues.privatePlayerMode.disabled) {
+    if (userValues.privatePlayerMode.alwaysAsk && userValues.overlayInteracted) {
         AllIconOverlays.enableOnDOMLoaded();
     }
 }

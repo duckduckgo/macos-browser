@@ -608,7 +608,7 @@
           let linksInVideoPreview = Array.from(document.querySelectorAll("#preview a"));
           return linksInVideoPreview.indexOf(item) === -1;
         };
-        return Array.from(document.querySelectorAll("a:not(.has-ddg-overlay,.ddg-play-privately)")).filter(linksToVideos).filter(linksWithoutSubLinks).filter(linksNotInVideoPreview).filter(linksWithImages);
+        return Array.from(document.querySelectorAll('a[href^="/watch?v="]')).filter(linksToVideos).filter(linksWithoutSubLinks).filter(linksNotInVideoPreview).filter(linksWithImages);
       },
       bindEvents: (video) => {
         if (video) {
@@ -616,7 +616,6 @@
             IconOverlay.moveHoverOverlayToVideoElement(video);
           });
           addTrustedEventListener(video, "mouseout", IconOverlay.hideHoverOverlay);
-          video.classList.add("has-ddg-overlay");
         }
       },
       bindEventsToAll: () => {
@@ -703,7 +702,7 @@
         IconOverlay.removeAll();
       }
     };
-    if (!userValues.privatePlayerMode.disabled) {
+    if (userValues.privatePlayerMode.alwaysAsk && userValues.overlayInteracted) {
       AllIconOverlays.enableOnDOMLoaded();
     }
   }
