@@ -171,7 +171,7 @@ final class RecentlyVisitedSiteModel: ObservableObject {
             return nil
         }
 
-        if PrivatePlayer.mode != .disabled, originalURL.isPrivatePlayer {
+        if PrivatePlayer.shared.mode != .disabled, originalURL.isPrivatePlayer {
             self.domain = PrivatePlayer.commonName
         } else {
             self.domain = domain
@@ -225,7 +225,7 @@ final class RecentlyVisitedSiteModel: ObservableObject {
                     urlsToRemove.append($0.url)
                 }
 
-            } else if PrivatePlayer.mode != .disabled, let displayTitle = PrivatePlayer.title(for: $0) {
+            } else if PrivatePlayer.shared.mode != .disabled, let displayTitle = PrivatePlayer.title(for: $0) {
 
                 $0.displayTitle = displayTitle
 

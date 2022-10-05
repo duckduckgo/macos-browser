@@ -102,7 +102,7 @@
 		37D23789288009CF00BCE03B /* TabCollectionViewModelTests+PinnedTabs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D23788288009CF00BCE03B /* TabCollectionViewModelTests+PinnedTabs.swift */; };
 		37D2771527E870D4003365FD /* PreferencesAppearanceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D2771427E870D4003365FD /* PreferencesAppearanceView.swift */; };
 		37F19A6528E1B3FB00740DC6 /* PreferencesPrivatePlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F19A6428E1B3FB00740DC6 /* PreferencesPrivatePlayerView.swift */; };
-		37F19A6728E1B43200740DC6 /* PrivatePlayerPreferencesModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F19A6628E1B43200740DC6 /* PrivatePlayerPreferencesModel.swift */; };
+		37F19A6728E1B43200740DC6 /* PrivatePlayerPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F19A6628E1B43200740DC6 /* PrivatePlayerPreferences.swift */; };
 		37F19A6A28E2F2D000740DC6 /* PrivatePlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F19A6928E2F2D000740DC6 /* PrivatePlayer.swift */; };
 		4B0135CE2729F1AA00D54834 /* NSPasteboardExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0135CD2729F1AA00D54834 /* NSPasteboardExtension.swift */; };
 		4B02198925E05FAC00ED7DEA /* FireproofingURLExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B02197F25E05FAC00ED7DEA /* FireproofingURLExtensions.swift */; };
@@ -934,7 +934,7 @@
 		37D23788288009CF00BCE03B /* TabCollectionViewModelTests+PinnedTabs.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "TabCollectionViewModelTests+PinnedTabs.swift"; sourceTree = "<group>"; };
 		37D2771427E870D4003365FD /* PreferencesAppearanceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesAppearanceView.swift; sourceTree = "<group>"; };
 		37F19A6428E1B3FB00740DC6 /* PreferencesPrivatePlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesPrivatePlayerView.swift; sourceTree = "<group>"; };
-		37F19A6628E1B43200740DC6 /* PrivatePlayerPreferencesModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivatePlayerPreferencesModel.swift; sourceTree = "<group>"; };
+		37F19A6628E1B43200740DC6 /* PrivatePlayerPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivatePlayerPreferences.swift; sourceTree = "<group>"; };
 		37F19A6928E2F2D000740DC6 /* PrivatePlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivatePlayer.swift; sourceTree = "<group>"; };
 		4B0135CD2729F1AA00D54834 /* NSPasteboardExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSPasteboardExtension.swift; sourceTree = "<group>"; };
 		4B02197F25E05FAC00ED7DEA /* FireproofingURLExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FireproofingURLExtensions.swift; sourceTree = "<group>"; };
@@ -1888,7 +1888,7 @@
 				37CD54C727F2FDD100F1F7B9 /* AppearancePreferences.swift */,
 				37CD54C127F2FDD100F1F7B9 /* PrivacyPreferencesModel.swift */,
 				4B0511A6262CAA5A00F6079C /* PrivacySecurityPreferences.swift */,
-				37F19A6628E1B43200740DC6 /* PrivatePlayerPreferencesModel.swift */,
+				37F19A6628E1B43200740DC6 /* PrivatePlayerPreferences.swift */,
 				37CD54C227F2FDD100F1F7B9 /* AutofillPreferencesModel.swift */,
 				3776582E27F82E62009A6B35 /* AutofillPreferences.swift */,
 				37CD54C327F2FDD100F1F7B9 /* DownloadsPreferences.swift */,
@@ -4958,7 +4958,7 @@
 				B6BBF17427475B15004F850E /* PopupBlockedPopover.swift in Sources */,
 				8589063A267BCD8E00D23B0D /* SaveCredentialsPopover.swift in Sources */,
 				4B379C1527BD91E3008A968E /* QuartzIdleStateProvider.swift in Sources */,
-				37F19A6728E1B43200740DC6 /* PrivatePlayerPreferencesModel.swift in Sources */,
+				37F19A6728E1B43200740DC6 /* PrivatePlayerPreferences.swift in Sources */,
 				B6C0B22E26E61CE70031CB7F /* DownloadViewModel.swift in Sources */,
 				373A1AA8283ED1B900586521 /* BookmarkHTMLReader.swift in Sources */,
 				B68458B825C7E8B200DC17B6 /* Tab+NSSecureCoding.swift in Sources */,

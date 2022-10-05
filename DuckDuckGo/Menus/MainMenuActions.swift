@@ -640,7 +640,7 @@ extension MainViewController {
     }
 
     @IBAction func resetPrivatePlayerOverlayInteractions(_ sender: Any?) {
-        PrivacySecurityPreferences.shared.youtubeOverlayInteracted = false
+        PrivatePlayerPreferences.shared.youtubeOverlayInteracted = false
     }
 
     @IBAction func showSaveCredentialsPopover(_ sender: Any?) {

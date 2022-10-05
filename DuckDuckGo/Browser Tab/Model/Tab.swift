@@ -65,7 +65,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                 return .anyPreferencePane
             } else if let preferencePane = url.flatMap(PreferencePaneIdentifier.init(url:)) {
                 return .preferences(pane: preferencePane)
-            } else if let privatePlayerContent = PrivatePlayer.tabContent(for: url) {
+            } else if let privatePlayerContent = PrivatePlayer.shared.tabContent(for: url) {
                 return privatePlayerContent
             } else {
                 return .url(url ?? .blankPage)
@@ -155,6 +155,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     }
     private let cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter?
     private let pinnedTabsManager: PinnedTabsManager
+    private let privatePlayer: PrivatePlayer
 
     init(content: TabContent,
          faviconManagement: FaviconManagement = FaviconManager.shared,
@@ -162,6 +163,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
          webViewConfiguration: WKWebViewConfiguration? = nil,
          historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
          pinnedTabsManager: PinnedTabsManager = WindowControllersManager.shared.pinnedTabsManager,
+         privatePlayer: PrivatePlayer = .shared,
          cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter? = ContentBlockingAssetsCompilationTimeReporter.shared,
          localHistory: Set<String> = Set<String>(),
          title: String? = nil,
@@ -181,6 +183,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         self.faviconManagement = faviconManagement
         self.historyCoordinating = historyCoordinating
         self.pinnedTabsManager = pinnedTabsManager
+        self.privatePlayer = privatePlayer
         self.cbaTimeReporter = cbaTimeReporter
         self.localHistory = localHistory
         self.title = title
@@ -285,7 +288,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
         lastUpgradedURL = nil
 
-        if let newContent = PrivatePlayer.updateContent(content, for: self) {
+        if let newContent = privatePlayer.updateContent(content, for: self) {
             self.content = newContent
             return
         }
@@ -602,7 +605,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             return false
         }
 
-        if PrivatePlayer.shouldSkipLoadingURL(for: self) {
+        if privatePlayer.shouldSkipLoadingURL(for: self) {
             return false
         }
 
@@ -798,24 +801,24 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         youtubePlayerCancellables.removeAll()
 
         if webView.url?.host?.droppingWwwPrefix() == "youtube.com" {
-            PrivacySecurityPreferences.shared.$privatePlayerMode
+            privatePlayer.$mode
                 .dropFirst()
-                .removeDuplicates()
                 .sink { [weak self] playerMode in
                     guard let self = self else {
                         return
                     }
                     let userValues = YoutubeOverlayUserScript.UserValues(
                             privatePlayerMode: playerMode,
-                            overlayInteracted: PrivacySecurityPreferences.shared.youtubeOverlayInteracted
+                            overlayInteracted: self.privatePlayer.overlayInteracted
                     );
                     self.youtubeOverlayScript?.userValuesUpdated(userValues: userValues, inWebView: self.webView)
-                }.store(in: &youtubePlayerCancellables)
+                }
+                .store(in: &youtubePlayerCancellables)
         }
 
         if url?.isPrivatePlayerScheme == true {
             youtubePlayerScript?.isEnabled = true
-            PrivacySecurityPreferences.shared.$privatePlayerMode
+            privatePlayer.$mode
                 .map { $0 == .enabled }
                 .sink { [weak self] shouldAlwaysOpenPrivatePlayer in
                     guard let self = self else {
@@ -1189,7 +1192,7 @@ extension Tab: WKNavigationDelegate {
     func webView(_ webView: WKWebView,
                  decidePolicyFor navigationAction: WKNavigationAction) async -> WKNavigationActionPolicy {
                 
-        if let policy = PrivatePlayer.decidePolicy(for: navigationAction, in: self) {
+        if let policy = privatePlayer.decidePolicy(for: navigationAction, in: self) {
             return policy
         }
 
