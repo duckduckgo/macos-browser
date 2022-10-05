@@ -58,6 +58,9 @@ final class PrivatePlayer {
     static let shared = PrivatePlayer()
 
     @Published var mode: PrivatePlayerMode
+    var overlayInteracted: Bool {
+        preferences.youtubeOverlayInteracted
+    }
 
     init(preferences: PrivatePlayerPreferences = .shared) {
         self.preferences = preferences

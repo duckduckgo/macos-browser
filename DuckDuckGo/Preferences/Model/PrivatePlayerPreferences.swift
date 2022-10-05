@@ -21,6 +21,7 @@ import Combine
 
 protocol PrivatePlayerPreferencesPersistor {
     var privatePlayerMode: PrivatePlayerMode { get set }
+    var youtubeOverlayInteracted: Bool { get set }
 }
 
 struct PrivatePlayerPreferencesUserDefaultsPersistor: PrivatePlayerPreferencesPersistor {
@@ -30,6 +31,9 @@ struct PrivatePlayerPreferencesUserDefaultsPersistor: PrivatePlayerPreferencesPe
             udWrapper.wrappedValue = privatePlayerMode.boolValue
         }
     }
+
+    @UserDefaultsWrapper(key: .youtubeOverlayInteracted, defaultValue: false)
+    var youtubeOverlayInteracted: Bool
 }
 
 final class PrivatePlayerPreferences: ObservableObject {
@@ -43,9 +47,12 @@ final class PrivatePlayerPreferences: ObservableObject {
         }
     }
 
+    var youtubeOverlayInteracted: Bool
+
     init(persistor: PrivatePlayerPreferencesPersistor = PrivatePlayerPreferencesUserDefaultsPersistor()) {
         self.persistor = persistor
         privatePlayerMode = persistor.privatePlayerMode
+        youtubeOverlayInteracted = persistor.youtubeOverlayInteracted
     }
 
     private var persistor: PrivatePlayerPreferencesPersistor

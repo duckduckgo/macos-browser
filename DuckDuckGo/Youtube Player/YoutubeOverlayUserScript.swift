@@ -34,18 +34,22 @@ final class YoutubeOverlayUserScript: NSObject, StaticUserScript {
     static var script: WKUserScript = YoutubeOverlayUserScript.makeWKUserScript()
     var messageNames: [String] { MessageNames.allCases.map(\.rawValue) }
 
+    init(preferences: PrivatePlayerPreferences = .shared) {
+        privatePlayerPreferences = preferences
+    }
+
     // Values that the Frontend can use to determine the current state.
     public struct UserValues: Codable {
-        let privatePlayerMode: PrivatePlayerMode;
-        let overlayInteracted: Bool;
+        let privatePlayerMode: PrivatePlayerMode
+        let overlayInteracted: Bool
     }
 
     struct UserValuesNotification: Encodable {
-        let userValuesNotification: UserValues;
+        let userValuesNotification: UserValues
     }
 
     func userValuesUpdated(userValues: UserValues, inWebView webView: WKWebView) {
-        let message = UserValuesNotification(userValuesNotification: userValues);
+        let message = UserValuesNotification(userValuesNotification: userValues)
         guard let json = try? JSONEncoder().encode(message), let jsonString = String(data: json, encoding: .utf8) else {
             assertionFailure("YoutubeOverlayUserScript: could not convert UserValues into JSON")
             return
@@ -64,8 +68,8 @@ final class YoutubeOverlayUserScript: NSObject, StaticUserScript {
             return
         }
 
-        PrivacySecurityPreferences.shared.youtubeOverlayInteracted = userValues.overlayInteracted;
-        PrivacySecurityPreferences.shared.privatePlayerMode = userValues.privatePlayerMode;
+        privatePlayerPreferences.youtubeOverlayInteracted = userValues.overlayInteracted
+        privatePlayerPreferences.privatePlayerMode = userValues.privatePlayerMode
 
         replyHandler(encodeUserValues(), nil)
     }
@@ -77,7 +81,7 @@ final class YoutubeOverlayUserScript: NSObject, StaticUserScript {
         }
 
         print("Always open \(alwaysOpenOnPrivatePlayer)")
-        PrivacySecurityPreferences.shared.privatePlayerMode = .enabled
+        privatePlayerPreferences.privatePlayerMode = .enabled
     }
 
     private func handleReadUserValues(message: WKScriptMessage, _ replyHandler: @escaping (Any?, String?) -> Void) {
@@ -86,9 +90,9 @@ final class YoutubeOverlayUserScript: NSObject, StaticUserScript {
 
     func encodeUserValues() -> String? {
         let uv = UserValues(
-                privatePlayerMode: PrivacySecurityPreferences.shared.privatePlayerMode,
-                overlayInteracted: PrivacySecurityPreferences.shared.youtubeOverlayInteracted
-        );
+                privatePlayerMode: privatePlayerPreferences.privatePlayerMode,
+                overlayInteracted: privatePlayerPreferences.youtubeOverlayInteracted
+        )
         guard let json = try? JSONEncoder().encode(uv), let jsonString = String(data: json, encoding: .utf8) else {
             assertionFailure("YoutubeOverlayUserScript: could not convert UserValues into JSON")
             return ""
@@ -107,6 +111,8 @@ final class YoutubeOverlayUserScript: NSObject, StaticUserScript {
             webView.evaluateJavaScript(js)
         }
     }
+
+    private let privatePlayerPreferences: PrivatePlayerPreferences
 }
 
 @available(iOS 14, *)
