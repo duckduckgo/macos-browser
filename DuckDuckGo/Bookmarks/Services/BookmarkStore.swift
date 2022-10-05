@@ -726,7 +726,7 @@ final class LocalBookmarkStore: BookmarkStore {
             
             let topLevelEntitiesFetchRequest = Bookmark.topLevelEntitiesFetchRequest()
             topLevelEntitiesFetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(BookmarkManagedObject.dateAdded), ascending: true)]
-            topLevelEntitiesFetchRequest.returnsObjectsAsFaults = true
+            topLevelEntitiesFetchRequest.returnsObjectsAsFaults = false
             
             do {
                 // 0. Up front, check if a root folder exists but has been moved deeper into the hierarchy, and remove it if so:
@@ -811,9 +811,14 @@ final class LocalBookmarkStore: BookmarkStore {
                     return
                 }
                 
+                os_log("DEBUG: Encountered %{public}d validation errors", type: .error, validationErrors.count)
+                
                 for error in validationErrors {
                     if let managedObject = error.userInfo["NSValidationErrorObject"] as? BookmarkManagedObject {
-                        os_log("DEBUG: Validation error for bookmark with id %{public}s: %{public}s", type: .error, managedObject.id?.uuidString ?? "UNKNOWN", error.localizedDescription)
+                        os_log("DEBUG: Validation error for bookmark with id %{public}s': %{public}s",
+                               type: .error,
+                               managedObject.id?.uuidString ?? "UNKNOWN",
+                               error.localizedDescription)
                     } else {
                         os_log("DEBUG: Validation error: %{public}s", type: .error, error.localizedDescription)
                     }
