@@ -174,6 +174,7 @@ extension Pixel {
 
         enum Debug {
 
+            case dbContainerInitializationError
             case dbInitializationError
             case dbSaveExcludedHTTPSDomainsError
             case dbSaveBloomFilterError
@@ -345,7 +346,7 @@ extension Pixel.Event {
             return "m_mac_waitlist_lock_screen_dismissed"
 
         case .debug(event: let event, error: _):
-            return "m_mac_debug_\(event)"
+            return "m_mac_debug_\(event.name)"
 
         case .onboardingStartPressed:
             return "m_mac_onboarding_start_pressed"
@@ -409,6 +410,8 @@ extension Pixel.Event.Debug {
     var name: String {
         switch self {
         
+        case .dbContainerInitializationError:
+            return "database_container_error"
         case .dbInitializationError:
             return "dbie"
         case .dbSaveExcludedHTTPSDomainsError:
