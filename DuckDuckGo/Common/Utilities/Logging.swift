@@ -112,7 +112,7 @@ struct Logging {
     fileprivate static let bookmarksLoggingEnabled = false
     fileprivate static let bookmarksLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Bookmarks")
     
-    fileprivate static let attributionLoggingEnabled = true
+    fileprivate static let attributionLoggingEnabled = false
     fileprivate static let attributionLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Ad Attribution")
 
 }

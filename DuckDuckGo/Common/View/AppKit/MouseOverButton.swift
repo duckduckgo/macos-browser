@@ -22,11 +22,18 @@ internal class MouseOverButton: NSButton {
 
     let backgroundLayer = CALayer()
 
+    @IBInspectable var backgroundColor: NSColor? {
+        didSet {
+            updateLayer()
+        }
+    }
+    
     @IBInspectable var mouseOverColor: NSColor? {
         didSet {
             updateLayer()
         }
     }
+
     @IBInspectable var mouseDownColor: NSColor? {
         didSet {
             updateLayer()
@@ -38,11 +45,13 @@ internal class MouseOverButton: NSButton {
             updateTintColor()
         }
     }
+
     @IBInspectable var mouseOverTintColor: NSColor? {
         didSet {
             updateTintColor()
         }
     }
+
     @IBInspectable var mouseDownTintColor: NSColor? {
         didSet {
             updateTintColor()
@@ -162,7 +171,7 @@ internal class MouseOverButton: NSButton {
                     context.duration = 0.0
                     backgroundLayer.backgroundColor = mouseOverColor?.cgColor ?? NSColor.clear.cgColor
                 } else {
-                    backgroundLayer.backgroundColor = NSColor.clear.cgColor
+                    backgroundLayer.backgroundColor = backgroundColor?.cgColor ?? NSColor.clear.cgColor
                 }
             }
         }
