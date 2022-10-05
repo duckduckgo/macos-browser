@@ -165,9 +165,9 @@ export class VideoParams {
     toPrivatePlayerUrl() {
         let privatePlayerURL = this.id;
         if (this.time) {
-            privatePlayerURL += '&t=' + this.time;
+            privatePlayerURL += '?t=' + this.time;
         }
-        return 'privateplayer:' + privatePlayerURL;
+        return 'privateplayer://' + privatePlayerURL;
     }
 
     /**
