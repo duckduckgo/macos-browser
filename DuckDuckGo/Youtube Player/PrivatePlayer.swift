@@ -117,6 +117,23 @@ final class PrivatePlayer {
         return true
     }
 
+    func goBackAndLoadURLIfNeeded(for tab: Tab) -> Bool {
+        guard tab.content.isPrivatePlayer,
+              tab.webView.url?.isPrivatePlayer == true,
+              tab.content.url?.youtubeVideoID == tab.webView.url?.youtubeVideoID,
+              let url = tab.content.url
+        else {
+            return false
+        }
+
+        if tab.webView.canGoBack {
+            _ = tab.webView.goBack()
+        }
+        tab.webView.load(url)
+
+        return true
+    }
+
     func decidePolicy(for navigationAction: WKNavigationAction, in tab: Tab) -> WKNavigationActionPolicy? {
         guard mode != .disabled else {
             return nil
