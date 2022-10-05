@@ -259,7 +259,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
         
         // Update the order of the bookmarks:
         
-        let moveBookmarksError = await bookmarkStore.move(objectUUID: bookmark3.id, toIndex: 0)
+        let moveBookmarksError = await bookmarkStore.move(objectUUIDs: [bookmark3.id], toIndex: 0, withinParentFolder: .parent(folder.id))
         XCTAssertNil(moveBookmarksError)
         
         // Check the new bookmarks order:
