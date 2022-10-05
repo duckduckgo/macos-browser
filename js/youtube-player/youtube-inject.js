@@ -38,8 +38,6 @@ defaultComms.readUserValues().then((userValues) => {
  * @param {macOSCommunications } [comms] - methods to communicate with a native backend
  */
 function enable(userValues, environment = defaultEnvironment, comms = defaultComms) {
-    console.log("👴 reading user prefs", userValues);
-    console.log("👴 environment", environment);
     const videoPlayerOverlay = new VideoPlayerOverlay(userValues, environment, comms);
     defaultComms.onUserValuesNotification((userValues) => {
         console.log("got new values after zero", userValues)
@@ -243,7 +241,7 @@ function enable(userValues, environment = defaultEnvironment, comms = defaultCom
     };
 
     // Enable icon overlays on page load if not explicitly disabled
-    if (userValues.privatePlayerMode.alwaysAsk) {
+    if ('alwaysAsk' in userValues.privatePlayerMode) {
         AllIconOverlays.enableOnDOMLoaded();
     }
 }

@@ -1,16 +1,6 @@
 import {addTrustedEventListener, appendElement, VideoParams} from "./util";
 import dax from "../assets/dax.svg";
-
-// class Debug extends HTMLElement {
-//     disconnectedCallback() {
-//         console.error("disconnectedCallback")
-//     }
-// }
-// customElements.define("yt-debug", Debug);
-
-// usage: <yt-debug></yt-debug>
-// place in any DOM that the page removes, and you'll get a nice stack
-// tract showing which JS call lead up to it
+import {i18n} from "./text.js";
 
 export const IconOverlay = {
     /**
@@ -43,7 +33,7 @@ export const IconOverlay = {
                     </div>
                     <div class="ddg-play-text-container">
                         <div class="ddg-play-text">
-                            Duck Player
+                            ${i18n.t("playText")}
                         </div>
                     </div>
                 </a>`;

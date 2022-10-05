@@ -1,6 +1,7 @@
 import dax from "../assets/dax.svg";
 import {appendImageAsBackground, execCleanups, VideoParams} from "./util.js";
 import {VideoPlayerIcon} from "./video-player-icon";
+import {i18n} from "./text.js";
 
 export class VideoPlayerOverlay {
 
@@ -42,18 +43,18 @@ export class VideoPlayerOverlay {
                     ${dax}
                 </div>
                 <div class="ddg-vpo-title">
-                    Tired of watching creepy ads on YouTube? 
+                    ${i18n.t("videoOverlayTitle")} 
                 </div>
                 <div class="ddg-vpo-text">
-                    <b>DuckPlayer</b> protects your viewing activity from advertiser profiling and from inluencing YouTube’s recommendation algorithm.
+                    ${i18n.t("videoOverlaySubtitle")}
                 </div>
                 <div class="ddg-vpo-buttons">
-                    <button class="ddg-vpo-button ddg-vpo-cancel" type="button">No Thanks</button>
-                    <a class="ddg-vpo-button ddg-vpo-open" href="#">Watch in Duck Player</a>
+                    <button class="ddg-vpo-button ddg-vpo-cancel" type="button">${i18n.t("videoButtonOptOut")}</button>
+                    <a class="ddg-vpo-button ddg-vpo-open" href="#">${i18n.t("videoButtonOpen")}</a>
                 </div>
                 <div class="ddg-vpo-remember">
                     <label for="remember">
-                        <input id="remember" type="checkbox" name="ddg-remember"> Remember my choice (can be changed in settings)
+                        <input id="remember" type="checkbox" name="ddg-remember"> ${i18n.t("rememberLabel")}
                     </label>
                 </div>
             </div>
