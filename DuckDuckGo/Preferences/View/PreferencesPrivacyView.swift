@@ -23,14 +23,6 @@ extension Preferences {
     struct PrivacyView: View {
         @ObservedObject var model: PrivacyPreferencesModel
 
-        var privatePlayerModeBinding: Binding<PrivatePlayerMode> {
-            .init {
-                model.privatePlayerMode
-            } set: { newValue in
-                model.privatePlayerMode = newValue
-            }
-        }
-
         var body: some View {
             VStack(alignment: .leading, spacing: 0) {
                 Text(UserText.privacy)
