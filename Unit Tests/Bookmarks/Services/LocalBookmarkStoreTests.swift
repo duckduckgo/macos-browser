@@ -426,46 +426,19 @@ final class LocalBookmarkStoreTests: XCTestCase {
     }
     
     func testWhenMovingBookmarkToRootFolder_AndIndexIsValid_ThenBookmarkIsMoved() async {
-        let container = CoreData.bookmarkContainer()
-        let context = container.viewContext
-        let bookmarkStore = LocalBookmarkStore(context: context)
-        
-        let initialParentFolder = BookmarkFolder(id: UUID(), title: "Parent")
-        let bookmark1 = Bookmark(id: UUID(), url: URL(string: "https://example1.com")!, title: "Example 1", isFavorite: false)
-        let bookmark2 = Bookmark(id: UUID(), url: URL(string: "https://example2.com")!, title: "Example 2", isFavorite: false)
-        let bookmark3 = Bookmark(id: UUID(), url: URL(string: "https://example3.com")!, title: "Example 3", isFavorite: false)
-        
-        // Save the initial bookmarks state:
-        
-        _ = await bookmarkStore.save(folder: initialParentFolder, parent: nil)
-        _ = await bookmarkStore.save(bookmark: bookmark1, parent: initialParentFolder, index: nil)
-        _ = await bookmarkStore.save(bookmark: bookmark2, parent: initialParentFolder, index: nil)
-        _ = await bookmarkStore.save(bookmark: bookmark3, parent: initialParentFolder, index: nil)
-
-        // Fetch persisted bookmarks back from the store:
-        
-        guard case let .success(initialTopLevelEntities) = await bookmarkStore.loadAll(type: .topLevelEntities),
-              let initialParentFolder = initialTopLevelEntities.first as? BookmarkFolder else {
-            XCTFail("Couldn't load top level entities")
+        guard let testState = await createInitialEntityMovementTestState() else {
+            XCTFail("Failed to configure test state")
             return
         }
         
-        XCTAssertEqual(initialParentFolder.children.count, 3)
-        
-        // Verify initial order of saved bookmarks:
-        
-        let initialBookmarkUUIDs = [bookmark1.id, bookmark2.id, bookmark3.id]
-        let initialFetchedBookmarkUUIDs = initialParentFolder.children.map(\.id)
-        XCTAssertEqual(initialBookmarkUUIDs, initialFetchedBookmarkUUIDs)
-        
         // Update the order of the bookmarks:
         
-        let moveBookmarksError = await bookmarkStore.move(objectUUIDs: [bookmark3.id], toIndex: 0, withinParentFolder: .root)
+        let moveBookmarksError = await testState.bookmarkStore.move(objectUUIDs: [testState.bookmark3.id], toIndex: 0, withinParentFolder: .root)
         XCTAssertNil(moveBookmarksError)
         
         // Check the new bookmarks order:
         
-        guard case let .success(updatedTopLevelEntities) = await bookmarkStore.loadAll(type: .topLevelEntities) else {
+        guard case let .success(updatedTopLevelEntities) = await testState.bookmarkStore.loadAll(type: .topLevelEntities) else {
             XCTFail("Couldn't load top level entities")
             return
         }
@@ -473,14 +446,14 @@ final class LocalBookmarkStoreTests: XCTestCase {
         XCTAssertEqual(updatedTopLevelEntities.count, 2)
         
         let topLevelEntityIDs = updatedTopLevelEntities.map(\.id)
-        XCTAssertEqual(topLevelEntityIDs, [bookmark3.id, initialParentFolder.id])
+        XCTAssertEqual(topLevelEntityIDs, [testState.bookmark3.id, testState.initialParentFolder.id])
         
-        guard let folder = updatedTopLevelEntities.first(where: { $0.id == initialParentFolder.id }) as? BookmarkFolder else {
+        guard let folder = updatedTopLevelEntities.first(where: { $0.id == testState.initialParentFolder.id }) as? BookmarkFolder else {
             XCTFail("Couldn't find expected folder")
             return
         }
         
-        let expectedBookmarkUUIDs = [bookmark1.id, bookmark2.id]
+        let expectedBookmarkUUIDs = [testState.bookmark1.id, testState.bookmark2.id]
         let updatedFetchedBookmarkUUIDs = folder.children.map(\.id)
         XCTAssertEqual(expectedBookmarkUUIDs, updatedFetchedBookmarkUUIDs)
     }
