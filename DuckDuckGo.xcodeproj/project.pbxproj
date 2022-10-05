@@ -39,6 +39,8 @@
 		339A6B5826A044BA00E3DAE8 /* duckduckgo-privacy-dashboard in Resources */ = {isa = PBXBuildFile; fileRef = 339A6B5726A044BA00E3DAE8 /* duckduckgo-privacy-dashboard */; };
 		37054FC92873301700033B6F /* PinnedTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37054FC82873301700033B6F /* PinnedTabView.swift */; };
 		37054FCE2876472D00033B6F /* WebViewSnapshotView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37054FCD2876472D00033B6F /* WebViewSnapshotView.swift */; };
+		3714B1E728EDB7FA0056C57A /* PrivatePlayerPreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3714B1E628EDB7FA0056C57A /* PrivatePlayerPreferencesTests.swift */; };
+		3714B1E928EDBAAB0056C57A /* PrivatePlayerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3714B1E828EDBAAB0056C57A /* PrivatePlayerTests.swift */; };
 		371C0A2927E33EDC0070591F /* FeedbackPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371C0A2827E33EDC0070591F /* FeedbackPresenter.swift */; };
 		371E141927E92E42009E3B5B /* MultilineScrollableTextFix.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371E141827E92E42009E3B5B /* MultilineScrollableTextFix.swift */; };
 		373A1AA8283ED1B900586521 /* BookmarkHTMLReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373A1AA7283ED1B900586521 /* BookmarkHTMLReader.swift */; };
@@ -866,6 +868,8 @@
 		339A6B5726A044BA00E3DAE8 /* duckduckgo-privacy-dashboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "duckduckgo-privacy-dashboard"; path = "Submodules/duckduckgo-privacy-dashboard"; sourceTree = SOURCE_ROOT; };
 		37054FC82873301700033B6F /* PinnedTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PinnedTabView.swift; sourceTree = "<group>"; };
 		37054FCD2876472D00033B6F /* WebViewSnapshotView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewSnapshotView.swift; sourceTree = "<group>"; };
+		3714B1E628EDB7FA0056C57A /* PrivatePlayerPreferencesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivatePlayerPreferencesTests.swift; sourceTree = "<group>"; };
+		3714B1E828EDBAAB0056C57A /* PrivatePlayerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivatePlayerTests.swift; sourceTree = "<group>"; };
 		371C0A2827E33EDC0070591F /* FeedbackPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackPresenter.swift; sourceTree = "<group>"; };
 		371E141827E92E42009E3B5B /* MultilineScrollableTextFix.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultilineScrollableTextFix.swift; sourceTree = "<group>"; };
 		373A1AA7283ED1B900586521 /* BookmarkHTMLReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkHTMLReader.swift; sourceTree = "<group>"; };
@@ -1820,6 +1824,7 @@
 		376718FE28E58504003A2A15 /* Youtube Player */ = {
 			isa = PBXGroup;
 			children = (
+				3714B1E828EDBAAB0056C57A /* PrivatePlayerTests.swift */,
 				376718FF28E58513003A2A15 /* PrivatePlayerURLExtensionTests.swift */,
 			);
 			path = "Youtube Player";
@@ -1984,6 +1989,7 @@
 				3776583027F8325B009A6B35 /* AutofillPreferencesTests.swift */,
 				37CD54BC27F2ECAE00F1F7B9 /* AutofillPreferencesModelTests.swift */,
 				378205F7283BC6A600D1D4AA /* StartupPreferencesTests.swift */,
+				3714B1E628EDB7FA0056C57A /* PrivatePlayerPreferencesTests.swift */,
 			);
 			path = Preferences;
 			sourceTree = "<group>";
@@ -5096,6 +5102,7 @@
 				4B59024C26B38BB800489384 /* ChromiumLoginReaderTests.swift in Sources */,
 				AAC9C01724CAFBDC00AD1325 /* TabCollectionTests.swift in Sources */,
 				378205F8283BC6A600D1D4AA /* StartupPreferencesTests.swift in Sources */,
+				3714B1E928EDBAAB0056C57A /* PrivatePlayerTests.swift in Sources */,
 				B67C6C3D2654B897006C872E /* WebViewExtensionTests.swift in Sources */,
 				4BA1A6DE258C100A00F6F690 /* FileStoreTests.swift in Sources */,
 				AAC9C01C24CB594C00AD1325 /* TabViewModelTests.swift in Sources */,
@@ -5192,6 +5199,7 @@
 				4BA1A6E6258C270800F6F690 /* EncryptionKeyGeneratorTests.swift in Sources */,
 				B6106BB326A7F4AA0013B453 /* GeolocationServiceMock.swift in Sources */,
 				4B8AC93D26B49BE600879451 /* FirefoxLoginReaderTests.swift in Sources */,
+				3714B1E728EDB7FA0056C57A /* PrivatePlayerPreferencesTests.swift in Sources */,
 				4BBF09232830812900EE1418 /* FileSystemDSL.swift in Sources */,
 				4B723E0526B0003E00E14D75 /* DataImportMocks.swift in Sources */,
 				4B70C00227B0793D000386ED /* CrashReportTests.swift in Sources */,

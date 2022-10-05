@@ -20,7 +20,7 @@ import Foundation
 
 extension URL {
     static func privatePlayer(_ videoID: String, timestamp: String? = nil) -> URL {
-        let url = "\(PrivatePlayer.privatePlayerScheme):\(videoID)".url!
+        let url = "\(PrivatePlayer.privatePlayerScheme)://\(videoID)".url!
         return url.addingTimestamp(timestamp)
     }
 
@@ -84,10 +84,9 @@ extension URL {
         if isPrivatePlayerScheme {
 #warning("Remove this once Private Player URLs get fixed on the JS side")
             let fixedAbsoluteString = absoluteString.replacingOccurrences(of: "&", with: "?")
-            guard let components = URLComponents(string: fixedAbsoluteString) else {
+            guard let components = URLComponents(string: fixedAbsoluteString), let unsafeVideoID = components.host else {
                 return nil
             }
-            let unsafeVideoID = components.path
             let timestamp = components.queryItems?.first(where: { $0.name == "t" })?.value
             return (unsafeVideoID.removingCharacters(in: .youtubeVideoIDNotAllowed), timestamp)
         }
