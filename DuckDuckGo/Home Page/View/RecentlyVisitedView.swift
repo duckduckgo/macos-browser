@@ -121,10 +121,16 @@ struct RecentlyVisitedSite: View {
 
                 VStack(alignment: .leading, spacing: 6) {
 
-                    HyperLink(site.domain, textColor: Color("HomeFeedItemTitleColor")) {
-                        model.open(site)
+                    if site.isRealDomain {
+                        HyperLink(site.domain, textColor: Color("HomeFeedItemTitleColor")) {
+                            model.open(site)
+                        }
+                        .font(.system(size: 15, weight: .semibold, design: .default))
+                    } else {
+                        Text(site.domain)
+                            .foregroundColor(Color("HomeFeedItemTitleColor"))
+                            .font(.system(size: 15, weight: .semibold, design: .default))
                     }
-                    .font(.system(size: 15, weight: .semibold, design: .default))
 
                     SiteTrackerSummary(site: site)
                         .padding(.bottom, 6)

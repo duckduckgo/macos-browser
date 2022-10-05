@@ -167,7 +167,7 @@ export class VideoParams {
         if (this.time) {
             privatePlayerURL += '?t=' + this.time;
         }
-        return 'privateplayer://' + privatePlayerURL;
+        return 'duck://player/' + privatePlayerURL;
     }
 
     /**

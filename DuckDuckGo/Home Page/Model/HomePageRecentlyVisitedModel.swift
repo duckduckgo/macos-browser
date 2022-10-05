@@ -153,6 +153,7 @@ final class RecentlyVisitedSiteModel: ObservableObject {
     
     private let baseURL: URL?
 
+    @Published var isRealDomain: Bool = true
     @Published var isFavorite: Bool
     @Published var isFireproof: Bool
     @Published var blockedEntities = [String]()
@@ -171,8 +172,9 @@ final class RecentlyVisitedSiteModel: ObservableObject {
             return nil
         }
 
-        if PrivatePlayer.shared.mode != .disabled, originalURL.isPrivatePlayer {
-            self.domain = PrivatePlayer.commonName
+        if let privatePlayer = PrivatePlayer.shared.domainForRecentlyVisitedSite(with: originalURL) {
+            self.domain = privatePlayer
+            isRealDomain = false
         } else {
             self.domain = domain
         }

@@ -566,11 +566,7 @@
                      * In MacOS 12+, the video id is what's after "/embed/" in 'pathname' because of the
                      * top level being youtube-nocookie.com/embed/123?... <- /embed/123 is the 'pathname'
                      */
-                    if (window.location.protocol === 'privateplayer:') {
-                        return window.location.hostname;
-                    } else {
-                        return window.location.pathname.replace('/embed/', '');
-                    }
+                    return window.location.pathname.replace('/embed/', '').replace('/', '');
                 },
 
                 /**

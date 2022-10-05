@@ -115,7 +115,7 @@
       if (this.time) {
         privatePlayerURL += "?t=" + this.time;
       }
-      return "privateplayer://" + privatePlayerURL;
+      return "duck://player/" + privatePlayerURL;
     }
     static fromPathname(pathname) {
       let url = new URL(pathname, window.location.origin);

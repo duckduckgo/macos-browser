@@ -52,7 +52,7 @@ enum PrivatePlayerMode: Equatable, Codable {
 
 final class PrivatePlayer {
     static let privatePlayerHost = "www.youtube-nocookie.com"
-    static let privatePlayerScheme = "privateplayer"
+    static let privatePlayerScheme = "duck"
     static let commonName = UserText.privatePlayer
 
     static let shared = PrivatePlayer()
@@ -76,6 +76,22 @@ final class PrivatePlayer {
             return nil
         }
         return .privatePlayer
+    }
+
+    func domainForRecentlyVisitedSite(with url: URL) -> String? {
+        guard mode != .disabled else {
+            return nil
+        }
+
+        let isPrivatePlayerSite: Bool = {
+            if #available(macOS 12.0, *) {
+                return url.isPrivatePlayer
+            } else {
+                return url.isPrivatePlayerScheme
+            }
+        }()
+
+        return isPrivatePlayerSite ? PrivatePlayer.commonName : nil
     }
 
     func tabContent(for url: URL?) -> Tab.TabContent? {
@@ -149,8 +165,16 @@ final class PrivatePlayer {
 extension PrivatePlayer {
 
     func title(for page: HomePage.Models.RecentlyVisitedPageModel) -> String? {
-        guard mode != .disabled, page.url.isPrivatePlayer, let actualTitle = page.actualTitle, actualTitle.starts(with: Self.websiteTitlePrefix) else {
+        guard mode != .disabled else {
             return nil
+        }
+
+        guard page.url.isPrivatePlayer || page.url.isPrivatePlayerScheme else {
+            return nil
+        }
+
+        guard let actualTitle = page.actualTitle, actualTitle.starts(with: Self.websiteTitlePrefix) else {
+            return page.url.youtubeVideoID
         }
         return actualTitle.dropping(prefix: Self.websiteTitlePrefix)
     }
