@@ -29,13 +29,6 @@ final class PrivacyPreferencesModel: ObservableObject {
     }
 
     @Published
-    var privatePlayerMode: PrivatePlayerMode {
-        didSet {
-            privacySecurityPreferences.privatePlayerMode = privatePlayerMode
-        }
-    }
-
-    @Published
     var isGPCEnabled: Bool {
         didSet {
             privacySecurityPreferences.gpcEnabled = isGPCEnabled
@@ -68,14 +61,8 @@ final class PrivacyPreferencesModel: ObservableObject {
     init(privacySecurityPreferences: PrivacySecurityPreferences = .shared) {
         self.privacySecurityPreferences = privacySecurityPreferences
         isLoginDetectionEnabled = privacySecurityPreferences.loginDetectionEnabled
-        privatePlayerMode = privacySecurityPreferences.privatePlayerMode
         isGPCEnabled = privacySecurityPreferences.gpcEnabled
         isAutoconsentEnabled = privacySecurityPreferences.autoconsentEnabled ?? false
-
-        privacySecurityPreferences.$privatePlayerMode
-            .removeDuplicates()
-            .assign(to: \.privatePlayerMode, onWeaklyHeld: self)
-            .store(in: &cancellables)
 
         privacySecurityPreferences.$gpcEnabled
             .removeDuplicates()

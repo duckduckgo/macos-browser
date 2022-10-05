@@ -41,19 +41,4 @@ final class PrivacySecurityPreferences {
     // - false: Disabled by the user
     @UserDefaultsWrapper(key: .autoconsentEnabled, defaultValue: nil)
     public var autoconsentEnabled: Bool?
-
-    @Published
-    var privatePlayerMode: PrivatePlayerMode = .init(UserDefaultsWrapper(key: .privatePlayerMode, defaultValue: nil).wrappedValue) {
-        didSet {
-            var udWrapper = UserDefaultsWrapper(key: .privatePlayerMode, defaultValue: Bool?.none)
-            udWrapper.wrappedValue = privatePlayerMode.boolValue
-        }
-    }
-
-    var youtubeOverlayInteracted: Bool = UserDefaultsWrapper(key: .youtubeOverlayInteracted, defaultValue: false).wrappedValue {
-        didSet {
-            var udWrapper = UserDefaultsWrapper(key: .youtubeOverlayInteracted, defaultValue: false)
-            udWrapper.wrappedValue = youtubeOverlayInteracted
-        }
-    }
 }

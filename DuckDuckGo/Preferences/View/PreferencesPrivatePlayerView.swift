@@ -21,7 +21,7 @@ import SwiftUI
 extension Preferences {
 
     struct PrivatePlayerView: View {
-        @ObservedObject var model: PrivatePlayerPreferencesModel
+        @ObservedObject var model: PrivatePlayerPreferences
 
         var privatePlayerModeBinding: Binding<PrivatePlayerMode> {
             .init {
