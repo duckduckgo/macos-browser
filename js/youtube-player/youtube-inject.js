@@ -243,7 +243,7 @@ function enable(userValues, environment = defaultEnvironment, comms = defaultCom
     };
 
     // Enable icon overlays on page load if not explicitly disabled
-    if (userValues.privatePlayerMode.alwaysAsk && userValues.overlayInteracted) {
+    if (userValues.privatePlayerMode.alwaysAsk) {
         AllIconOverlays.enableOnDOMLoaded();
     }
 }

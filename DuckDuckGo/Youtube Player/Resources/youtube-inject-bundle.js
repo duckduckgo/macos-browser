@@ -262,9 +262,6 @@
       document.querySelectorAll("." + IconOverlay.OVERLAY_CLASS).forEach((element) => {
         element.remove();
       });
-      document.querySelectorAll(".ddg-has-overlay").forEach((element) => {
-        element.classList.remove("ddg-has-overlay");
-      });
     }
   };
 
@@ -702,7 +699,7 @@
         IconOverlay.removeAll();
       }
     };
-    if (userValues.privatePlayerMode.alwaysAsk && userValues.overlayInteracted) {
+    if (userValues.privatePlayerMode.alwaysAsk) {
       AllIconOverlays.enableOnDOMLoaded();
     }
   }

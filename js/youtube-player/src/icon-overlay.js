@@ -210,9 +210,5 @@ export const IconOverlay = {
         document.querySelectorAll('.' + IconOverlay.OVERLAY_CLASS).forEach(element => {
             element.remove();
         });
-
-        document.querySelectorAll('.ddg-has-overlay').forEach(element => {
-            element.classList.remove('ddg-has-overlay');
-        });
     }
 };
