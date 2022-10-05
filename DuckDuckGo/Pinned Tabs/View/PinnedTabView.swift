@@ -16,11 +16,13 @@
 //  limitations under the License.
 //
 
+
 import SwiftUI
 
 struct PinnedTabView: View {
     enum Const {
         static let dimension: CGFloat = 32
+        static let cornerRadius: CGFloat = 6
     }
 
     @ObservedObject var model: Tab
@@ -33,26 +35,32 @@ struct PinnedTabView: View {
     var showsHover: Bool
 
     var body: some View {
-        Button {
-            if !isSelected {
-                collectionModel.selectedItem = model
+        ZStack {
+            Button {
+                if !isSelected {
+                    collectionModel.selectedItem = model
+                }
+            } label: {
+                PinnedTabInnerView(
+                    foregroundColor: foregroundColor,
+                    drawSeparator: !collectionModel.itemsWithoutSeparator.contains(model)
+                )
+                .environmentObject(model)
             }
-        } label: {
-            PinnedTabInnerView(
-                foregroundColor: foregroundColor,
-                drawSeparator: !collectionModel.itemsWithoutSeparator.contains(model)
-            )
-            .environmentObject(model)
-        }
-        .buttonStyle(TouchDownButtonStyle())
-        .cornerRadius(6, corners: [.topLeft, .topRight])
-        .contextMenu { contextMenu }
-        .onHover { isHovered in
-            guard controlActiveState == .key else {
-                return
+            .buttonStyle(TouchDownButtonStyle())
+
+            .cornerRadius(Const.cornerRadius, corners: [.topLeft, .topRight])
+
+            .contextMenu { contextMenu }
+            .onHover { isHovered in
+                guard controlActiveState == .key else {
+                    return
+                }
+                self.isHovered = isHovered
+                collectionModel.hoveredItem = isHovered ? model : nil
             }
-            self.isHovered = isHovered
-            collectionModel.hoveredItem = isHovered ? model : nil
+            
+            BorderView(isSelected: isSelected, cornerRadius: Const.cornerRadius, size: TabShadowConfig.dividerSize)
         }
     }
 
@@ -84,6 +92,39 @@ struct PinnedTabView: View {
             Button(UserText.removeFireproofing, action: { collectionModel.removeFireproofing(model) })
         } else {
             Button(UserText.fireproofSite, action: { collectionModel.fireproof(model) })
+        }
+    }
+}
+
+private struct BorderView: View {
+    let isSelected: Bool
+    let cornerRadius: CGFloat
+    let size: CGFloat
+    
+    private var borderColor: Color {
+        isSelected ? Color(TabShadowConfig.colorName) : .clear
+    }
+    
+    private var bottomLineColor: Color {
+        isSelected ? Color("InterfaceBackgroundColor") : Color(TabShadowConfig.colorName)
+    }
+    
+    var body: some View {
+        ZStack {
+            CustomRoundedCornersShape(inset: 0, tl: cornerRadius, tr: cornerRadius, bl: 0, br: 0)
+                .strokeBorder(borderColor, lineWidth: size)
+            
+            VStack {
+                Spacer()
+                HStack {
+                    Spacer().frame(width: 1, height: size, alignment: .leading)
+                    Rectangle()
+                        .fill(bottomLineColor)
+                        .frame(height: size, alignment: .leading)
+                    
+                    Spacer().frame(width: 1, height: size, alignment: .trailing)
+                }
+            }
         }
     }
 }

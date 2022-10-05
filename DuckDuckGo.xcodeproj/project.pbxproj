@@ -30,6 +30,7 @@
 		31B7C84F288008E00049841F /* CookieConsent.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 31B7C84E288008E00049841F /* CookieConsent.storyboard */; };
 		31B7C85128800A5D0049841F /* CookieConsentPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31B7C85028800A5D0049841F /* CookieConsentPopover.swift */; };
 		31B9226C288054D5001F55B7 /* CookieConsentPopoverManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31B9226B288054D5001F55B7 /* CookieConsentPopoverManager.swift */; };
+		31C3CE0228EDC1E70002C24A /* CustomRoundedCornersShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31C3CE0128EDC1E70002C24A /* CustomRoundedCornersShape.swift */; };
 		31CF3432288B0B1B0087244B /* NavigationBarBadgeAnimator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CF3431288B0B1B0087244B /* NavigationBarBadgeAnimator.swift */; };
 		31F7F2A6288AD2CA001C0D64 /* NavigationBarBadgeAnimationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31F7F2A5288AD2CA001C0D64 /* NavigationBarBadgeAnimationView.swift */; };
 		336D5B18262D8D3C0052E0C9 /* findinpage.js in Resources */ = {isa = PBXBuildFile; fileRef = 336D5AEF262D8D3C0052E0C9 /* findinpage.js */; };
@@ -846,6 +847,7 @@
 		31B7C84E288008E00049841F /* CookieConsent.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = CookieConsent.storyboard; sourceTree = "<group>"; };
 		31B7C85028800A5D0049841F /* CookieConsentPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieConsentPopover.swift; sourceTree = "<group>"; };
 		31B9226B288054D5001F55B7 /* CookieConsentPopoverManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieConsentPopoverManager.swift; sourceTree = "<group>"; };
+		31C3CE0128EDC1E70002C24A /* CustomRoundedCornersShape.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomRoundedCornersShape.swift; sourceTree = "<group>"; };
 		31CF3431288B0B1B0087244B /* NavigationBarBadgeAnimator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationBarBadgeAnimator.swift; sourceTree = "<group>"; };
 		31F7F2A5288AD2CA001C0D64 /* NavigationBarBadgeAnimationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationBarBadgeAnimationView.swift; sourceTree = "<group>"; };
 		336B39E22726B4B700C417D3 /* LocalUnprotectedDomains.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalUnprotectedDomains.swift; sourceTree = "<group>"; };
@@ -2503,6 +2505,7 @@
 				376705B227EC7D4F00DD8D76 /* TextButton.swift */,
 				37CC53F327E8D4620028713D /* NSPathControlView.swift */,
 				4B1E6EEF27AB5E5D00F51793 /* NSPopUpButtonView.swift */,
+				31C3CE0128EDC1E70002C24A /* CustomRoundedCornersShape.swift */,
 			);
 			path = SwiftUI;
 			sourceTree = "<group>";
@@ -4785,6 +4788,7 @@
 				AA61C0D22727F59B00E6B681 /* ArrayExtension.swift in Sources */,
 				AAC30A2C268F1ECD00D2D9CD /* CrashReportSender.swift in Sources */,
 				373A1AB02842C4EA00586521 /* BookmarkHTMLImporter.swift in Sources */,
+				31C3CE0228EDC1E70002C24A /* CustomRoundedCornersShape.swift in Sources */,
 				4B8D9062276D1D880078DB17 /* LocaleExtension.swift in Sources */,
 				4BE4005527CF3F19007D3161 /* SavePaymentMethodViewController.swift in Sources */,
 				AAFE068326C7082D005434CC /* WebKitVersionProvider.swift in Sources */,
