@@ -89,83 +89,16 @@ final class PrivatePlayer {
         }
     }
 
-    func image(for faviconView: FaviconView) -> NSImage? {
-        guard Self.isAvailable, mode != .disabled, faviconView.domain == Self.commonName else {
-            return nil
-        }
-        return .privatePlayer
-    }
+    // MARK: - Private
 
-    func domainForRecentlyVisitedSite(with url: URL) -> String? {
-        guard Self.isAvailable, mode != .disabled else {
-            return nil
-        }
+    private static let websiteTitlePrefix = "\(commonName) - "
+    private let preferences: PrivatePlayerPreferences
+    private var modeCancellable: AnyCancellable?
+}
 
-        return url.isPrivatePlayer ? PrivatePlayer.commonName : nil
-    }
+// MARK: - Navigation
 
-    func tabContent(for url: URL?) -> Tab.TabContent? {
-        guard Self.isAvailable, mode != .disabled, let url = url, let (videoID, timestamp) = url.youtubeVideoParams else {
-            return nil
-        }
-
-        let shouldAlwaysOpenPrivatePlayer = url.isYoutubeVideo && mode == .enabled
-
-        if url.isPrivatePlayerScheme || url.isPrivatePlayer || shouldAlwaysOpenPrivatePlayer {
-            return .privatePlayer(videoID: videoID, timestamp: timestamp)
-        }
-        return nil
-    }
-
-    func shouldSkipLoadingURL(for tab: Tab) -> Bool {
-        guard Self.isAvailable,
-              mode != .disabled,
-              case .privatePlayer(let videoID, let timestamp) = tab.content,
-              tab.webView.url == .youtubeNoCookie(videoID, timestamp: timestamp)
-                || (tab.webView.url == .youtube(videoID, timestamp: timestamp) && mode != .enabled)
-        else {
-            return false
-        }
-        return true
-    }
-
-    func goBackAndLoadURLIfNeeded(for tab: Tab) -> Bool {
-        guard Self.isAvailable,
-              mode != .disabled,
-              tab.content.isPrivatePlayer,
-              tab.webView.url?.isPrivatePlayer == true,
-              tab.content.url?.youtubeVideoID == tab.webView.url?.youtubeVideoID,
-              let url = tab.content.url
-        else {
-            return false
-        }
-
-        if tab.webView.canGoBack {
-            _ = tab.webView.goBack()
-        }
-        tab.webView.load(url)
-
-        return true
-    }
-
-    func goBackSkippingLastItemIfNeeded(for webView: WKWebView) -> Bool {
-        guard Self.isAvailable, mode == .enabled, webView.url?.isPrivatePlayer == true else {
-            return false
-        }
-
-        let backList = webView.backForwardList.backList
-
-        guard let backURL = webView.backForwardList.backItem?.url,
-           backURL.isYoutubeVideo,
-           backURL.youtubeVideoID == webView.url?.youtubeVideoID,
-           let penultimateBackItem = backList[safe: backList.count - 2]
-        else {
-            return false
-        }
-
-        webView.go(to: penultimateBackItem)
-        return true
-    }
+extension PrivatePlayer {
 
     func decidePolicy(for navigationAction: WKNavigationAction, in tab: Tab) -> WKNavigationActionPolicy? {
         guard Self.isAvailable, mode != .disabled else {
@@ -219,17 +152,26 @@ final class PrivatePlayer {
 
         return url.isYoutubeVideo && forwardURL.isPrivatePlayer && url.youtubeVideoID == forwardURL.youtubeVideoID
     }
-
-    // MARK: - Private
-
-    private static let websiteTitlePrefix = "\(commonName) - "
-    private let preferences: PrivatePlayerPreferences
-    private var modeCancellable: AnyCancellable?
 }
 
 // MARK: - Privacy Feed
 
 extension PrivatePlayer {
+
+    func image(for faviconView: FaviconView) -> NSImage? {
+        guard Self.isAvailable, mode != .disabled, faviconView.domain == Self.commonName else {
+            return nil
+        }
+        return .privatePlayer
+    }
+
+    func domainForRecentlyVisitedSite(with url: URL) -> String? {
+        guard Self.isAvailable, mode != .disabled else {
+            return nil
+        }
+
+        return url.isPrivatePlayer ? PrivatePlayer.commonName : nil
+    }
 
     func title(for page: HomePage.Models.RecentlyVisitedPageModel) -> String? {
         guard Self.isAvailable, mode != .disabled else {
@@ -250,6 +192,19 @@ extension PrivatePlayer {
 // MARK: - Tab Content updating
 
 extension PrivatePlayer {
+
+    func tabContent(for url: URL?) -> Tab.TabContent? {
+        guard Self.isAvailable, mode != .disabled, let url = url, let (videoID, timestamp) = url.youtubeVideoParams else {
+            return nil
+        }
+
+        let shouldAlwaysOpenPrivatePlayer = url.isYoutubeVideo && mode == .enabled
+
+        if url.isPrivatePlayerScheme || url.isPrivatePlayer || shouldAlwaysOpenPrivatePlayer {
+            return .privatePlayer(videoID: videoID, timestamp: timestamp)
+        }
+        return nil
+    }
 
     func updateContent(_ content: Tab.TabContent, for tab: Tab) -> Tab.TabContent? {
         guard Self.isAvailable, mode != .disabled else {
@@ -282,5 +237,65 @@ extension PrivatePlayer {
             return .url(url)
         }
         return nil
+    }
+}
+
+// MARK: - Private Player URL Loading
+
+extension PrivatePlayer {
+
+    func shouldSkipLoadingURL(for tab: Tab) -> Bool {
+        guard Self.isAvailable,
+              mode != .disabled,
+              case .privatePlayer(let videoID, let timestamp) = tab.content,
+              tab.webView.url == .youtubeNoCookie(videoID, timestamp: timestamp)
+                || (tab.webView.url == .youtube(videoID, timestamp: timestamp) && mode != .enabled)
+        else {
+            return false
+        }
+        return true
+    }
+
+    func goBackAndLoadURLIfNeeded(for tab: Tab) -> Bool {
+        guard Self.isAvailable,
+              mode != .disabled,
+              tab.content.isPrivatePlayer,
+              tab.webView.url?.isPrivatePlayer == true,
+              tab.content.url?.youtubeVideoID == tab.webView.url?.youtubeVideoID,
+              let url = tab.content.url
+        else {
+            return false
+        }
+
+        if tab.webView.canGoBack {
+            _ = tab.webView.goBack()
+        }
+        tab.webView.load(url)
+
+        return true
+    }
+}
+
+// MARK: - Back navigation
+
+extension PrivatePlayer {
+
+    func goBackSkippingLastItemIfNeeded(for webView: WKWebView) -> Bool {
+        guard Self.isAvailable, mode == .enabled, webView.url?.isPrivatePlayer == true else {
+            return false
+        }
+
+        let backList = webView.backForwardList.backList
+
+        guard let backURL = webView.backForwardList.backItem?.url,
+           backURL.isYoutubeVideo,
+           backURL.youtubeVideoID == webView.url?.youtubeVideoID,
+           let penultimateBackItem = backList[safe: backList.count - 2]
+        else {
+            return false
+        }
+
+        webView.go(to: penultimateBackItem)
+        return true
     }
 }

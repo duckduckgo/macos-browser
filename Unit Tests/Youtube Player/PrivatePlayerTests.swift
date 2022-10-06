@@ -45,6 +45,20 @@ final class PrivatePlayerTests: XCTestCase {
         XCTAssertNil(privatePlayer.image(for: otherFaviconView))
     }
 
+    func testThatDomainForRecentlyVisitedSiteIsReturnedForPrivatePlayerURLs() {
+        privatePlayer.mode = .enabled
+        XCTAssertEqual(privatePlayer.domainForRecentlyVisitedSite(with: privatePlayerURL()), PrivatePlayer.commonName)
+        XCTAssertNil(privatePlayer.domainForRecentlyVisitedSite(with: "https://duck.com".url!))
+
+        privatePlayer.mode = .alwaysAsk
+        XCTAssertEqual(privatePlayer.domainForRecentlyVisitedSite(with: privatePlayerURL()), PrivatePlayer.commonName)
+        XCTAssertNil(privatePlayer.domainForRecentlyVisitedSite(with: "https://duck.com".url!))
+
+        privatePlayer.mode = .disabled
+        XCTAssertEqual(privatePlayer.domainForRecentlyVisitedSite(with: privatePlayerURL()), nil)
+        XCTAssertNil(privatePlayer.domainForRecentlyVisitedSite(with: "https://duck.com".url!))
+    }
+
     func testThatTabContentReturnsNilIfDisabled() {
         privatePlayer.mode = .disabled
         XCTAssertNil(privatePlayer.tabContent(for: .privatePlayer("12345678")))
@@ -72,5 +86,38 @@ final class PrivatePlayerTests: XCTestCase {
 
         privatePlayer.mode = .alwaysAsk
         XCTAssertNil(privatePlayer.tabContent(for: .youtube("12345678", timestamp: "10m")))
+    }
+
+    func testThatTitleForRecentlyVisitedPageIsGeneratedForPrivatePlayerFeedItems() {
+        let feedItem = HomePage.Models.RecentlyVisitedPageModel(
+            actualTitle: "Duck Player - A sample video title",
+            url: privatePlayerURL(),
+            visited: Date()
+        )
+
+        privatePlayer.mode = .enabled
+        XCTAssertEqual(privatePlayer.title(for: feedItem), "A sample video title")
+
+        privatePlayer.mode = .disabled
+        XCTAssertNil(privatePlayer.title(for: feedItem))
+    }
+
+    func testThatTitleForRecentlyVisitedPageIsNotAdjustedForNonPrivatePlayerFeedItems() {
+        let feedItem = HomePage.Models.RecentlyVisitedPageModel(
+            actualTitle: "Duck Player - A sample video title",
+            url: "https://duck.com".url!,
+            visited: Date()
+        )
+
+        privatePlayer.mode = .enabled
+        XCTAssertNil(privatePlayer.title(for: feedItem))
+    }
+
+    private func privatePlayerURL() -> URL {
+        if #available(macOS 12.0, *) {
+            return .youtubeNoCookie("12345678")
+        } else {
+            return .privatePlayer("12345678")
+        }
     }
 }
