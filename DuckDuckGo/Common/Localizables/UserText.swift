@@ -140,7 +140,7 @@ struct UserText {
     static let privatePlayerAlwaysOpenInPlayer = NSLocalizedString("private-player.always-open-in-player", value: "Always open YouTube videos in Duck Player", comment: "Private YouTube Player option")
     static let privatePlayerShowPlayerButtons = NSLocalizedString("private-player.show-buttons", value: "Show option to use Duck Player on hover", comment: "Private YouTube Player option")
     static let privatePlayerOff = NSLocalizedString("private-player.off", value: "Never use Duck Player", comment: "Private YouTube Player option")
-    static let privatePlayerExplanation = NSLocalizedString("private-player.explanation", value: "DuckPlayer protects your viewing activity from advertiser profiling and from influencing your YouTube recommendations.", comment: "Private YouTube Player explanation in settings")
+    static let privatePlayerExplanation = NSLocalizedString("private-player.explanation", value: "Duck Player provides a clean viewing experience without personalized ads and prevents viewing activity from influencing your YouTube recommendations.", comment: "Private YouTube Player explanation in settings")
 
     static let gpcSettingsTitle = NSLocalizedString("gpc.title", value: "Global Privacy Control (GPC)", comment: "GPC settings title")
     static let gpcCheckboxTitle = NSLocalizedString("gpc.checkbox.title", value: "Enable Global Privacy Control", comment: "GPC settings checkbox title")
