@@ -26,6 +26,8 @@ extension Pixel {
         case appLaunch(isDefault: IsDefaultBrowser = .init(), launch: AppLaunch)
         case launchTiming
 
+        case appUsage
+
         case burn(repetition: Repetition = .init(key: "fire"),
                   burnedTabs: BurnedTabs = .init(),
                   burnedWindows: BurnedWindows = .init())
@@ -189,6 +191,9 @@ extension Pixel.Event {
 
         case .launchTiming:
             return "ml_mac_launch-timing"
+
+        case .appUsage:
+            return "m_mac_usage"
 
         case .burn(repetition: let repetition, burnedTabs: let tabs, burnedWindows: let windows):
             return "m_mac_fire-button.\(repetition)_\(tabs)_\(windows)"
