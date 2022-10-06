@@ -49,14 +49,14 @@ class PixelTests: XCTestCase {
                 return true
             }
             
-            XCTFail("Did not found param dur")
+            XCTFail("Did not find duration param")
             return true
         }, response: { _ -> HTTPStubsResponse in
             expectation.fulfill()
             return HTTPStubsResponse(data: Data(), statusCode: 200, headers: nil)
         })
 
-        let pixel = TimedPixel(.appLaunch(isDefault: .default, launch: .regular), time: date)
+        let pixel = TimedPixel(.burn(), time: date)
 
         pixel.fire(now)
         
@@ -84,14 +84,14 @@ class PixelTests: XCTestCase {
         let expectation = XCTestExpectation()
         let params = ["param1": "value1", "param2": "value2"]
 
-        stub(condition: isHost(host) && isPath("/t/ml_mac_app-launch_as-default_app-launch")) { request -> HTTPStubsResponse in
+        stub(condition: isHost(host) && isPath("/t/m_mac_crash")) { request -> HTTPStubsResponse in
             XCTAssertEqual("value1", request.url?.getParameter(named: "param1"))
             XCTAssertEqual("value2", request.url?.getParameter(named: "param2"))
             expectation.fulfill()
             return HTTPStubsResponse(data: Data(), statusCode: 200, headers: nil)
         }
 
-        Pixel.fire(.appLaunch(isDefault: .default, launch: .regular), withAdditionalParameters: params)
+        Pixel.fire(.crash, withAdditionalParameters: params)
 
         wait(for: [expectation], timeout: 1.0)
     }
@@ -128,19 +128,6 @@ class PixelTests: XCTestCase {
 
         Pixel.fire(.debug(event: Pixel.Event.Debug.appOpenURLFailed, error: error), withAdditionalParameters: params)
 
-    }
-
-    func testWhenAppLaunchPixelIsFiredThenCorrectURLRequestIsMade() {
-        let expectation = XCTestExpectation()
-
-        stub(condition: isHost(host) && isPath("/t/ml_mac_app-launch_as-default_app-launch")) { _ -> HTTPStubsResponse in
-            expectation.fulfill()
-            return HTTPStubsResponse(data: Data(), statusCode: 200, headers: nil)
-        }
-
-        Pixel.fire(.appLaunch(isDefault: .default, launch: .regular))
-
-        wait(for: [expectation], timeout: 1.0)
     }
 
     func testWhenPixelFiresSuccessfullyThenCompletesWithNoError() {
