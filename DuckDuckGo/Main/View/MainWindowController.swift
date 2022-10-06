@@ -65,9 +65,11 @@ final class MainWindowController: NSWindowController {
         window?.delegate = self
         window?.setFrameAutosaveName(Self.windowFrameSaveName)
         
+        #if !DEBUG && !REVIEW
         if !OnboardingViewModel().onboardingFinished {
             mainViewController.tabCollectionViewModel.selectedTabViewModel?.tab.startOnboarding()
         }
+        #endif
     }
     
     private func subscribeToResolutionChange() {
