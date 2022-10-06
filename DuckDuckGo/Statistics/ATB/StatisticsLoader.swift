@@ -34,8 +34,9 @@ final class StatisticsLoader {
     }
 
     func refreshRetentionAtb(isSearch: Bool, completion: @escaping Completion = {}) {
+        // Only request install statistics when performing a search for the first time. Even if a new user loads a domain, do not request install
+        // statistics - searches only. Once a search has been performed, app and search retention calls can take place as usual.
         guard isSearch || self.statisticsStore.hasInstallStatistics else {
-            print("DEBUG: Not refreshing ATB as this is either not a search, or there are no existing install statistics")
             completion()
             return
         }
@@ -53,7 +54,6 @@ final class StatisticsLoader {
             } else if !self.statisticsStore.isAppRetentionFiredToday {
                 self.refreshAppRetentionAtb(completion: completion)
             } else {
-                print("DEBUG: No need to refresh ATB now")
                 completion()
             }
         }
@@ -73,8 +73,6 @@ final class StatisticsLoader {
 
         guard !isAppRetentionRequestInProgress else { return }
         isAppRetentionRequestInProgress = true
-        
-        print("DEBUG: Requesting install statistics")
 
         APIRequest.request(url: URL.initialAtb) { response, error in
             DispatchQueue.main.async {
@@ -99,8 +97,6 @@ final class StatisticsLoader {
 
         guard !isAppRetentionRequestInProgress else { return }
         self.isAppRetentionRequestInProgress = true
-        
-        print("DEBUG: Requesting exti")
 
         let installAtb = atb.version + (statisticsStore.variant ?? "")
         let url = URL.exti(forAtb: installAtb)
@@ -132,8 +128,6 @@ final class StatisticsLoader {
             requestInstallStatistics(completion: completion)
             return
         }
-        
-        print("DEBUG: Refreshing search ATB")
 
         let url = URL.searchAtb(atbWithVariant: atbWithVariant, setAtb: searchRetentionAtb)
         APIRequest.request(url: url) { response, error in
@@ -162,8 +156,6 @@ final class StatisticsLoader {
             requestInstallStatistics(completion: completion)
             return
         }
-        
-        print("DEBUG: Requesting app retention ATB")
 
         isAppRetentionRequestInProgress = true
         
