@@ -61,15 +61,22 @@ final class MainWindowController: NSWindowController {
         fatalError("init(coder:) has not been implemented")
     }
 
+    private var shouldShowOnboarding: Bool {
+#if DEBUG
+        return false
+#else
+        let onboardingIsComplete = OnboardingViewModel().onboardingFinished || LocalStatisticsStore().waitlistUnlocked
+        return !onboardingIsComplete
+#endif
+    }
+
     private func setupWindow() {
         window?.delegate = self
         window?.setFrameAutosaveName(Self.windowFrameSaveName)
         
-        #if !DEBUG && !REVIEW
-        if !OnboardingViewModel().onboardingFinished {
+        if shouldShowOnboarding {
             mainViewController.tabCollectionViewModel.selectedTabViewModel?.tab.startOnboarding()
         }
-        #endif
     }
     
     private func subscribeToResolutionChange() {
