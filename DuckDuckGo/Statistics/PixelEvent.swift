@@ -23,9 +23,6 @@ import BrowserServicesKit
 extension Pixel {
 
     enum Event {
-        case appLaunch(isDefault: IsDefaultBrowser = .init(), launch: AppLaunch)
-        case appUsage
-
         case burn(repetition: Repetition = .init(key: "fire"),
                   burnedTabs: BurnedTabs = .init(),
                   burnedWindows: BurnedWindows = .init())
@@ -96,6 +93,7 @@ extension Pixel {
         
         case dataImportFailed(action: DataImportAction, source: DataImportSource)
 
+        // TODO: Remove these
         case formAutofilled(kind: FormAutofillKind)
         case autofillItemSaved(kind: FormAutofillKind)
         
@@ -184,12 +182,6 @@ extension Pixel.Event {
 
     var name: String {
         switch self {
-        case .appLaunch(isDefault: let isDefault, launch: let launch):
-            return "ml_mac_app-launch_\(isDefault)_\(launch)"
-
-        case .appUsage:
-            return "m_mac_usage"
-
         case .burn(repetition: let repetition, burnedTabs: let tabs, burnedWindows: let windows):
             return "m_mac_fire-button.\(repetition)_\(tabs)_\(windows)"
 

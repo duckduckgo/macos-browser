@@ -65,9 +65,7 @@ extension Pixel.Event {
             return params
 
         // Don't use default to force new items to be thought about
-        case .appLaunch,
-             .appUsage,
-             .burn,
+        case .burn,
              .crash,
              .brokenSiteReport,
              .compileRulesWait,
