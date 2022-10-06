@@ -672,7 +672,7 @@
                 isValidMessage: (e, message) => {
                     let hasMessage = e && e.data && typeof e.data[message] !== 'undefined',
                             isValidMessage = hasMessage && (e.data[message] === true || e.data[message] === false),
-                            hasCorrectOrigin = e.origin && (e.origin === 'https://www.youtube-nocookie.com' || e.origin === 'privateplayer://');
+                            hasCorrectOrigin = e.origin && (e.origin === 'https://www.youtube-nocookie.com' || e.origin === 'duck://player');
 
                     if (isValidMessage && hasCorrectOrigin) {
                         return true;
