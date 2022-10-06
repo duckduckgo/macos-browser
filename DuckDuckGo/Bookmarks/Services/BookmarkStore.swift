@@ -479,10 +479,16 @@ final class LocalBookmarkStore: BookmarkStore {
             case .root: newParentFolder = rootFolder
             case .parent(let newParentUUID):
                 let bookmarksFetchRequest = BaseBookmarkEntity.singleEntity(with: newParentUUID)
-                if let fetchedParent = try? self.context.fetch(bookmarksFetchRequest).first, fetchedParent.isFolder {
-                    newParentFolder = fetchedParent
-                } else {
-                    completion(nil) // Should use an error here
+                
+                do {
+                    if let fetchedParent = try self.context.fetch(bookmarksFetchRequest).first, fetchedParent.isFolder {
+                        newParentFolder = fetchedParent
+                    } else {
+                        completion(nil)
+                        return
+                    }
+                } catch {
+                    completion(error)
                     return
                 }
             }
