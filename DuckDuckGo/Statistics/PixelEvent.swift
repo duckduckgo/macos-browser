@@ -93,7 +93,6 @@ extension Pixel {
         
         case dataImportFailed(action: DataImportAction, source: DataImportSource)
 
-        // TODO: Remove these
         case formAutofilled(kind: FormAutofillKind)
         case autofillItemSaved(kind: FormAutofillKind)
         

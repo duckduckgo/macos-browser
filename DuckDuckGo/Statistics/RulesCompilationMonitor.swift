@@ -58,9 +58,11 @@ final class AbstractContentBlockingAssetsCompilationTimeReporter<Caller: Hashabl
         // report only once
         isFinished = true
 
-        Pixel.fire(.compileRulesWait(onboardingShown: self.onboardingShown, waitTime: waitTime, result: result),
-                   withAdditionalParameters: ["waitTime": String(waitTime)],
-                   onComplete: completionHandler)
+        // Temporarily removed until it's determined whether we need this:
+        //
+        // Pixel.fire(.compileRulesWait(onboardingShown: self.onboardingShown, waitTime: waitTime, result: result),
+        //            withAdditionalParameters: ["waitTime": String(waitTime)],
+        //            onComplete: completionHandler)
     }
 
     /// Called when Rules compilation finishes
