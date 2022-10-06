@@ -41,4 +41,5 @@ final class PrivacySecurityPreferences {
     // - false: Disabled by the user
     @UserDefaultsWrapper(key: .autoconsentEnabled, defaultValue: nil)
     public var autoconsentEnabled: Bool?
+
 }

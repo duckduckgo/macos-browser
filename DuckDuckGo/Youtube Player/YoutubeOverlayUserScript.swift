@@ -80,7 +80,6 @@ final class YoutubeOverlayUserScript: NSObject, StaticUserScript {
             return
         }
 
-        print("Always open \(alwaysOpenOnPrivatePlayer)")
         privatePlayerPreferences.privatePlayerMode = .enabled
     }
 

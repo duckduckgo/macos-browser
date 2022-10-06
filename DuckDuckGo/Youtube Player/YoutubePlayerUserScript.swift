@@ -70,7 +70,6 @@ final class YoutubePlayerUserScript: NSObject, StaticUserScript {
             return
         }
         
-        print("Always open \(alwaysOpenOnPrivatePlayer)")
         privatePlayerPreferences.privatePlayerMode = .init(alwaysOpenOnPrivatePlayer)
     }
     

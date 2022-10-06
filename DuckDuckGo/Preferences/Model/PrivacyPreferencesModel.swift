@@ -17,7 +17,6 @@
 //
 
 import Foundation
-import Combine
 
 final class PrivacyPreferencesModel: ObservableObject {
 
@@ -63,13 +62,7 @@ final class PrivacyPreferencesModel: ObservableObject {
         isLoginDetectionEnabled = privacySecurityPreferences.loginDetectionEnabled
         isGPCEnabled = privacySecurityPreferences.gpcEnabled
         isAutoconsentEnabled = privacySecurityPreferences.autoconsentEnabled ?? false
-
-        privacySecurityPreferences.$gpcEnabled
-            .removeDuplicates()
-            .assign(to: \.isGPCEnabled, onWeaklyHeld: self)
-            .store(in: &cancellables)
     }
 
     private let privacySecurityPreferences: PrivacySecurityPreferences
-    private var cancellables: Set<AnyCancellable> = []
 }

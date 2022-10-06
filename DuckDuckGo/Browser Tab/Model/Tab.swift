@@ -1202,6 +1202,10 @@ extension Tab: WKNavigationDelegate {
             return policy
         }
 
+        if navigationAction.request.url?.isFileURL == true {
+            return .allow
+        }
+
         let isLinkActivated = navigationAction.navigationType == .linkActivated
         let isNavigatingAwayFromPinnedTab: Bool = {
             let isNavigatingToAnotherDomain = navigationAction.request.url?.host != url?.host
