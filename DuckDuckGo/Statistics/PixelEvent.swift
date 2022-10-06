@@ -24,8 +24,6 @@ extension Pixel {
 
     enum Event {
         case appLaunch(isDefault: IsDefaultBrowser = .init(), launch: AppLaunch)
-        case launchTiming
-
         case appUsage
 
         case burn(repetition: Repetition = .init(key: "fire"),
@@ -188,9 +186,6 @@ extension Pixel.Event {
         switch self {
         case .appLaunch(isDefault: let isDefault, launch: let launch):
             return "ml_mac_app-launch_\(isDefault)_\(launch)"
-
-        case .launchTiming:
-            return "ml_mac_launch-timing"
 
         case .appUsage:
             return "m_mac_usage"

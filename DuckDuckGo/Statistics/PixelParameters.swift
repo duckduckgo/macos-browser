@@ -66,7 +66,6 @@ extension Pixel.Event {
 
         // Don't use default to force new items to be thought about
         case .appLaunch,
-             .launchTiming,
              .appUsage,
              .burn,
              .crash,

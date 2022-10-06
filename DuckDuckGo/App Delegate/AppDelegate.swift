@@ -24,8 +24,6 @@ import BrowserServicesKit
 @NSApplicationMain
 final class AppDelegate: NSObject, NSApplicationDelegate {
 
-    let launchTimingPixel = TimedPixel(.launchTiming)
-
     static var isRunningTests: Bool {
         #if DEBUG
         ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
@@ -111,8 +109,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         grammarFeaturesManager.manage()
 
         applyPreferredTheme()
-
-        launchTimingPixel.fire()
 
         appUsageActivityMonitor = AppUsageActivityMonitor(delegate: self)
 
