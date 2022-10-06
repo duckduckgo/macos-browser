@@ -46,7 +46,7 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
     case privacy
     case autofill
     case downloads
-    case privatePlayer
+    case privatePlayer = "duckplayer"
     case about
 
     var id: Self {
