@@ -178,6 +178,12 @@ final class PrivatePlayer {
         }
 
         let alwaysOpenInPrivatePlayer = mode == .enabled
+
+        if alwaysOpenInPrivatePlayer && isGoingBackFromPrivatePlayerToYoutubeVideo(for: navigationAction, in: tab) {
+            tab.webView.goBack()
+            return .cancel
+        }
+
         let didSelectRecommendationFromPrivatePlayer = tab.content.isPrivatePlayer && navigationAction.request.url?.isYoutubeVideoRecommendation == true
 
         guard alwaysOpenInPrivatePlayer || didSelectRecommendationFromPrivatePlayer, let videoID = navigationAction.request.url?.youtubeVideoID else {
@@ -193,6 +199,17 @@ final class PrivatePlayer {
             return .cancel
         }
         return nil
+    }
+
+    private func isGoingBackFromPrivatePlayerToYoutubeVideo(for navigationAction: WKNavigationAction, in tab: Tab) -> Bool {
+        guard navigationAction.navigationType == .backForward,
+              let url = tab.webView.backForwardList.currentItem?.url,
+              let forwardURL = tab.webView.backForwardList.forwardItem?.url
+        else {
+            return false
+        }
+
+        return url.isYoutubeVideo && forwardURL.isPrivatePlayer && url.youtubeVideoID == forwardURL.youtubeVideoID
     }
 
     // MARK: - Private
