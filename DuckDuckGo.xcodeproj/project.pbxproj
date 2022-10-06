@@ -6241,7 +6241,7 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				branch = "dharb/element-hiding-testing";
+				branch = "dharb/element-hiding-testing-alt";
 				kind = branch;
 			};
 		};

@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1664910317711,
+    "version": 1665018402144,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -187,6 +187,10 @@
                         "type": "closest-empty"
                     },
                     {
+                        "selector": "[class*='dfp-']",
+                        "type": "closest-empty"
+                    },
+                    {
                         "selector": "[id*='taboola-']",
                         "type": "closest-empty"
                     },
@@ -245,10 +249,12 @@
                 ],
                 "adLabelStrings": [
                     "advertisement",
+                    "advertisementclose",
                     "advertising",
                     "ad feedback",
                     "sponsored",
-                    "reklama"
+                    "reklama",
+                    "continue reading the main story"
                 ],
                 "domains": [
                     {
@@ -288,6 +294,24 @@
                         ]
                     },
                     {
+                        "domain": "fandom.com",
+                        "rules": [
+                            {
+                                "selector": ".top-ads-container",
+                                "type": "hide-empty"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "forbes.com",
+                        "rules": [
+                            {
+                                "selector": "fbs-ad",
+                                "type": "closest-empty"
+                            }
+                        ]
+                    },
+                    {
                         "domain": "fortune.com",
                         "rules": [
                             {
@@ -310,15 +334,6 @@
                             {
                                 "selector": "[id*='thirdparty']",
                                 "type": "hide-empty"
-                            }
-                        ]
-                    },
-                    {
-                        "domain": "latimes.com",
-                        "rules": [
-                            {
-                                "selector": ".google-dfp-ad-wrapper",
-                                "type": "closest-empty"
                             }
                         ]
                     },
@@ -358,6 +373,15 @@
                         "rules": [
                             {
                                 "selector": ".proper-dynamic-insertion",
+                                "type": "closest-empty"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "washingtonpost.com",
+                        "rules": [
+                            {
+                                "selector": "wp-ad",
                                 "type": "closest-empty"
                             }
                         ]
