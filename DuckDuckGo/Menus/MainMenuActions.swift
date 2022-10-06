@@ -638,7 +638,7 @@ extension MainViewController {
         }
         tabCollectionViewModel.pinnedTabsManager?.tabCollection.removeAll()
     }
-
+    
     @IBAction func showSaveCredentialsPopover(_ sender: Any?) {
         #if DEBUG || REVIEW
         NotificationCenter.default.post(name: .ShowSaveCredentialsPopover, object: nil)

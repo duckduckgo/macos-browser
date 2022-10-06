@@ -94,8 +94,8 @@ final class LocalBookmarkManager: BookmarkManager {
     }
 
     func isHostInBookmarks(host: String) -> Bool {
-        return list?.allBookmarkURLsOrdered.contains(where: { url in
-            url.host == host
+        return list?.allBookmarkURLsOrdered.contains(where: { bookmark in
+            bookmark.url.host == host
         }) ?? false
     }
 

@@ -18,11 +18,16 @@
 
 import Foundation
 
-enum BookmarkImportSource {
-    case chromium
+enum BookmarkImportSource: Equatable {
     case duckduckgoWebKit
-    case firefox
-    case safari
+    case thirdPartyBrowser(DataImport.Source)
+    
+    var importSourceName: String {
+        switch self {
+        case .duckduckgoWebKit: return UserText.importBookmarksHTML
+        case .thirdPartyBrowser(let source): return source.importSourceName
+        }
+    }
 }
 
 protocol BookmarkImporter {
