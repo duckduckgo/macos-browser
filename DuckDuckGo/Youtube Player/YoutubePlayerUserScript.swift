@@ -31,7 +31,7 @@ final class YoutubePlayerUserScript: NSObject, StaticUserScript {
     }
     
     static var injectionTime: WKUserScriptInjectionTime { .atDocumentStart}
-    static var forMainFrameOnly: Bool { false }
+    static var forMainFrameOnly: Bool { true }
     static var source: String = ""
     static var script: WKUserScript = YoutubePlayerUserScript.makeWKUserScript()
     var messageNames: [String] { MessageNames.allCases.map(\.rawValue) }
