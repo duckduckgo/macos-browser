@@ -59,7 +59,7 @@ final class YoutubeOverlayUserScript: NSObject, StaticUserScript {
     }
 
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-        // TODO: Are we supporting 10.x?
+        // Are we supporting 10.x?
     }
 
     private func handleSetUserValues(message: WKScriptMessage, _ replyHandler: @escaping (Any?, String?) -> Void) {

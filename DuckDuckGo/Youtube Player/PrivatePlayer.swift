@@ -51,7 +51,13 @@ enum PrivatePlayerMode: Equatable, Codable {
 }
 
 final class PrivatePlayer {
-    static let isAvailable: Bool = true
+    static let isAvailable: Bool = {
+        if #available(macOS 11.0, *) {
+            return true
+        } else {
+            return false
+        }
+    }()
 
     static let usesSimulatedRequests: Bool = {
         if #available(macOS 12.0, *) {
