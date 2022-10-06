@@ -19,13 +19,26 @@
 import Foundation
 
 extension URL {
+    /**
+     * Returns the actual URL of the Private Player page.
+     *
+     * Depending on the use of simulated requests, it's either the custom scheme URL
+     * (without simulated requests, macOS <12), or youtube-nocookie.com URL (macOS 12 and newer).
+     */
+    static func effectivePrivatePlayer(_ videoID: String, timestamp: String? = nil) -> URL {
+        if PrivatePlayer.usesSimulatedRequests {
+            return .youtubeNoCookie(videoID, timestamp: timestamp)
+        }
+        return .privatePlayer(videoID, timestamp: timestamp)
+    }
+
     static func privatePlayer(_ videoID: String, timestamp: String? = nil) -> URL {
         let url = "\(PrivatePlayer.privatePlayerScheme)://player/\(videoID)".url!
         return url.addingTimestamp(timestamp)
     }
 
     static func youtubeNoCookie(_ videoID: String, timestamp: String? = nil) -> URL {
-        let url = "https://\(PrivatePlayer.privatePlayerHost)/embed/\(videoID)".url!
+        let url = "https://www.youtube-nocookie.com/embed/\(videoID)".url!
         return url.addingTimestamp(timestamp)
     }
 
@@ -38,6 +51,12 @@ extension URL {
         scheme == PrivatePlayer.privatePlayerScheme
     }
 
+    /**
+     * Returns true if a URL represents a Private Player URL.
+     *
+     * When simulated requests are in use (macOS 12 and above), the Private Player Scheme URL is replaced by
+     * `www.youtube-nocookie.com/embed/VIDEOID` URL. Otherwise, checks for `duck://player/` URL.
+     */
     var isPrivatePlayer: Bool {
         if PrivatePlayer.usesSimulatedRequests {
             return host == PrivatePlayer.privatePlayerHost && pathComponents.count == 3 && pathComponents[safe: 1] == "embed"
@@ -46,7 +65,7 @@ extension URL {
         }
     }
 
-    /// Returns true only if the video represents a playlist itself, i.e. doesn't have `index` query parameter
+    /// Returns true only if the URL represents a playlist itself, i.e. doesn't have `index` query parameter
     var isYoutubePlaylist: Bool {
         guard isYoutubeWatch, let components = URLComponents(url: self, resolvingAgainstBaseURL: false) else {
             return false
@@ -59,10 +78,16 @@ extension URL {
         return isPlaylistURL
     }
 
+    /// Returns true if the URL represents a YouTube video, but not the playlist (playlists are not supported by Private Player)
     var isYoutubeVideo: Bool {
         isYoutubeWatch && !isYoutubePlaylist
     }
 
+    /**
+     * Returns true if the URL represents a YouTube video recommendation.
+     *
+     * Recommendations are shown at the end of the embedded video or while it's paused.
+     */
     var isYoutubeVideoRecommendation: Bool {
         guard isYoutubeVideo,
               let components = URLComponents(url: self, resolvingAgainstBaseURL: false),
@@ -76,14 +101,7 @@ extension URL {
         return recommendationFeatures.contains(featureQueryParameter)
     }
 
-    private var isYoutubeWatch: Bool {
-        host?.droppingWwwPrefix() == "youtube.com" && path == "/watch"
-    }
-
-    var youtubeVideoID: String? {
-        youtubeVideoParams?.videoID
-    }
-
+    /// Attempts extracting video ID and timestamp from the URL. Works with all types of YouTube URLs.
     var youtubeVideoParams: (videoID: String, timestamp: String?)? {
         if isPrivatePlayerScheme {
             guard let components = URLComponents(string: absoluteString) else {
@@ -111,7 +129,15 @@ extension URL {
         return (unsafeVideoID.removingCharacters(in: .youtubeVideoIDNotAllowed), timestamp)
     }
 
+    var youtubeVideoID: String? {
+        youtubeVideoParams?.videoID
+    }
+
     // MARK: - Private
+
+    private var isYoutubeWatch: Bool {
+        host?.droppingWwwPrefix() == "youtube.com" && path == "/watch"
+    }
 
     private func addingTimestamp(_ timestamp: String?) -> URL {
         guard let timestamp = timestamp,

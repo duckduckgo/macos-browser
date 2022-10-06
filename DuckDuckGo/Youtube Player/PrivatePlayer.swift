@@ -111,21 +111,27 @@ extension PrivatePlayer {
             return nil
         }
 
+        // Don't allow loading Private Player HTML directly
         if navigationAction.request.url?.path == YoutubePlayerNavigationHandler.htmlTemplatePath {
-            // don't allow loading Private Player HTML directly
             return .cancel
         }
 
+        // Always allow loading Private Player URLs (local HTML)
         if navigationAction.request.url?.isPrivatePlayerScheme == true {
             return .allow
         }
 
+        // We only care about YouTube video URLs loaded into main frame or within a Private Player
         guard navigationAction.isTargetingMainFrame || tab.content.isPrivatePlayer, navigationAction.request.url?.isYoutubeVideo == true else {
             return nil
         }
 
         let alwaysOpenInPrivatePlayer = mode == .enabled
 
+        // When Private Player is in enabled state (always open), and it's a back navigation from PP to a YouTube video page,
+        // the PP would automatically load on that YouTube video, effectively cancelling the back navigation.
+        // We need to go 2 sites back. That YouTube page wasn't really viewed by the user, but it was pushed on the
+        // navigation stack and immediately replaced with Private Player. That's why skipping it while going back makes sense.
         if alwaysOpenInPrivatePlayer && isGoingBackFromPrivatePlayerToYoutubeVideo(for: navigationAction, in: tab) {
             tab.webView.goBack()
             return .cancel
@@ -133,14 +139,17 @@ extension PrivatePlayer {
 
         let didSelectRecommendationFromPrivatePlayer = tab.content.isPrivatePlayer && navigationAction.request.url?.isYoutubeVideoRecommendation == true
 
+        // Recommendations must always be opened in Private Player.
         guard alwaysOpenInPrivatePlayer || didSelectRecommendationFromPrivatePlayer, let videoID = navigationAction.request.url?.youtubeVideoID else {
             return nil
         }
 
+        // If this is a child tab of a Private Player and it's loading a YouTube URL, don't override it ("Watch in YouTube").
         if case .privatePlayer(let parentVideoID, _) = tab.parentTab?.content, parentVideoID == videoID {
             return nil
         }
 
+        // Otherwise load priate player unless it's already loaded.
         guard case .privatePlayer(let currentVideoID, _) = tab.content, currentVideoID == videoID, tab.webView.url?.isPrivatePlayer == true else {
             tab.webView.load(.privatePlayer(videoID))
             return .cancel
@@ -188,6 +197,8 @@ extension PrivatePlayer {
             return nil
         }
 
+        // Private Player page titles are "Duck Player - <YouTube video title>".
+        // Extract YouTube video title or fall back to the video ID.
         guard let actualTitle = page.actualTitle, actualTitle.starts(with: Self.websiteTitlePrefix) else {
             return page.url.youtubeVideoID
         }
@@ -204,6 +215,7 @@ extension PrivatePlayer {
             return nil
         }
 
+        // this will override regular YouTube video URL with a Private Player TabContent.
         let shouldAlwaysOpenPrivatePlayer = url.isYoutubeVideo && mode == .enabled
 
         if url.isPrivatePlayerScheme || url.isPrivatePlayer || shouldAlwaysOpenPrivatePlayer {
@@ -212,11 +224,13 @@ extension PrivatePlayer {
         return nil
     }
 
-    func updateContent(_ content: Tab.TabContent, for tab: Tab) -> Tab.TabContent? {
+    func overrideContent(_ content: Tab.TabContent, for tab: Tab) -> Tab.TabContent? {
         guard Self.isAvailable, mode != .disabled else {
             return nil
         }
 
+        // If we're moving from Private Player to Private Player, sometimes it means we need to switch
+        // back to a regular URL TabContent ("Watch in YouTube" or clicking video title in Private Player).
         let newContent: Tab.TabContent? = {
             if case .privatePlayer(let oldVideoID, _) = tab.content,
                case .privatePlayer(let videoID, let timestamp) = content,
@@ -235,11 +249,15 @@ extension PrivatePlayer {
     private func overrideTabContent(forOpeningYoutubeVideo videoID: String, at timestamp: String?, fromPrivatePlayerTab tab: Tab) -> Tab.TabContent? {
         if case .privatePlayer(let parentVideoID, _) = tab.parentTab?.content,
            parentVideoID == videoID,
-           tab.webView.url != .youtubeNoCookie(videoID, timestamp: timestamp) {
+           tab.webView.url != .effectivePrivatePlayer(videoID, timestamp: timestamp) {
 
+            // Parent tab with the same videoID means it was a click on video title in Private Player.
+            // Override with a YouTube URL.
             return .url(.youtube(videoID))
 
         } else if let url = tab.webView.url, url.isYoutubeVideo == true {
+
+            // If a YouTube video URL is requested from Private Player, allow it.
             return .url(url)
         }
         return nil
@@ -251,11 +269,13 @@ extension PrivatePlayer {
 extension PrivatePlayer {
 
     func shouldSkipLoadingURL(for tab: Tab) -> Bool {
-        guard Self.isAvailable,
-              mode != .disabled,
-              case .privatePlayer(let videoID, let timestamp) = tab.content,
-              tab.webView.url == .youtubeNoCookie(videoID, timestamp: timestamp)
-                || (tab.webView.url == .youtube(videoID, timestamp: timestamp) && mode != .enabled)
+        guard Self.isAvailable, mode != .disabled else {
+            return false
+        }
+
+        // when in Private Player, don't reload if current URL is a Private Player target URL
+        guard case .privatePlayer(let videoID, let timestamp) = tab.content,
+              tab.webView.url == .effectivePrivatePlayer(videoID, timestamp: timestamp)
         else {
             return false
         }

@@ -288,7 +288,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
         lastUpgradedURL = nil
 
-        if let newContent = privatePlayer.updateContent(content, for: self) {
+        if let newContent = privatePlayer.overrideContent(content, for: self) {
             self.content = newContent
             return
         }
