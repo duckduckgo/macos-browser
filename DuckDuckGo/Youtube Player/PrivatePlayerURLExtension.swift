@@ -39,7 +39,11 @@ extension URL {
     }
 
     var isPrivatePlayer: Bool {
-        host == PrivatePlayer.privatePlayerHost && pathComponents.count == 3 && pathComponents[safe: 1] == "embed"
+        if PrivatePlayer.usesSimulatedRequests {
+            return host == PrivatePlayer.privatePlayerHost && pathComponents.count == 3 && pathComponents[safe: 1] == "embed"
+        } else {
+            return isPrivatePlayerScheme && host == PrivatePlayer.privatePlayerHost
+        }
     }
 
     /// Returns true only if the video represents a playlist itself, i.e. doesn't have `index` query parameter

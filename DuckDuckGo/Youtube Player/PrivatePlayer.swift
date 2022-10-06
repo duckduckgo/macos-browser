@@ -51,7 +51,21 @@ enum PrivatePlayerMode: Equatable, Codable {
 }
 
 final class PrivatePlayer {
-    static let privatePlayerHost = "www.youtube-nocookie.com"
+    static let usesSimulatedRequests: Bool = {
+        if #available(macOS 12.0, *) {
+            return true
+        } else {
+            return false
+        }
+    }()
+
+    static let privatePlayerHost: String = {
+        if usesSimulatedRequests {
+            return "www.youtube-nocookie.com"
+        } else {
+            return "player"
+        }
+    }()
     static let privatePlayerScheme = "duck"
     static let commonName = UserText.privatePlayer
 
@@ -83,15 +97,7 @@ final class PrivatePlayer {
             return nil
         }
 
-        let isPrivatePlayerSite: Bool = {
-            if #available(macOS 12.0, *) {
-                return url.isPrivatePlayer
-            } else {
-                return url.isPrivatePlayerScheme
-            }
-        }()
-
-        return isPrivatePlayerSite ? PrivatePlayer.commonName : nil
+        return url.isPrivatePlayer ? PrivatePlayer.commonName : nil
     }
 
     func tabContent(for url: URL?) -> Tab.TabContent? {
