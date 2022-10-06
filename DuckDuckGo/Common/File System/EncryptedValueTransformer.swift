@@ -66,12 +66,10 @@ final class EncryptedValueTransformer<T: NSSecureCoding & NSObject>: ValueTransf
         
         // if T is Data
         if let data = decryptedData as? T {
-            os_log("VALUETRANSFORMER: Value transformer for %{public}s returned data of length %{public}d", type: .error, String(describing: T.self), decryptedData.count)
             return data
         }
 
         if let unarchivedObject = try? NSKeyedUnarchiver.unarchivedObject(ofClass: T.self, from: decryptedData as Data) {
-            os_log("VALUETRANSFORMER: Value transformer for %{public}s successfully reverse transformed data of length %{public}d", type: .error, String(describing: T.self), decryptedData.count)
             return unarchivedObject
         }
         

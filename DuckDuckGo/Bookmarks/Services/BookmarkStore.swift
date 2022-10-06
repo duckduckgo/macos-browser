@@ -76,6 +76,8 @@ final class LocalBookmarkStore: BookmarkStore {
     }
     
     private func sharedInitialization() {
+        removeInvalidBookmarkEntities()
+        checkBookmarkStoreState()
         migrateTopLevelStorageToRootLevelBookmarksFolder()
         cacheReadOnlyTopLevelBookmarksFolder()
     }
@@ -717,6 +719,96 @@ final class LocalBookmarkStore: BookmarkStore {
     
     // MARK: - Migration
     
+    private func removeInvalidBookmarkEntities() {
+
+        context.performAndWait {
+            let entitiesFetchRequest = Bookmark.bookmarksAndFoldersFetchRequest()
+            entitiesFetchRequest.returnsObjectsAsFaults = false
+            
+            do {
+                let entities = try self.context.fetch(entitiesFetchRequest)
+                
+                var deletedEntityCount = 0
+                
+                for entity in entities where entity.isInvalid {
+                    self.context.delete(entity)
+                    deletedEntityCount += 1
+                }
+                
+                os_log("DEBUG: Deleting %{public}d invalid entities", deletedEntityCount)
+                
+                try self.context.save()
+            } catch {
+                os_log("Failed to remove invalid bookmark entities", type: .error)
+            }
+        }
+    }
+
+    private func checkBookmarkStoreState() {
+        context.performAndWait {
+                        
+            let entitiesFetchRequest = Bookmark.bookmarksAndFoldersFetchRequest()
+            entitiesFetchRequest.returnsObjectsAsFaults = false
+            
+            do {
+                let entities = try self.context.fetch(entitiesFetchRequest)
+
+                // os_log("DEBUG: Got %{public}d top level entities. Checking their state now...", type: .error, existingTopLevelEntities.count)
+                
+                var countedEntities = 0
+                var totalFolders = 0
+                var totalBookmarks = 0
+                var rootFolders = 0
+                var rootFoldersWithMatchingUUID = 0
+                var entitiesWithTitle = 0
+                var entitiesWithNoTitle = 0
+                
+                for entity in entities {
+                    countedEntities += 1
+
+                    if entity.isFolder {
+                        totalFolders += 1
+                    } else {
+                        totalBookmarks += 1
+                    }
+                    
+                    if entity.parentFolder == nil {
+                        rootFolders += 1
+                    }
+                    
+                    if entity.id == .rootBookmarkFolderUUID {
+                        rootFoldersWithMatchingUUID += 1
+                    }
+                    
+                    if entity.titleEncrypted == nil {
+                        entitiesWithNoTitle += 1
+                    } else {
+                        entitiesWithTitle += 1
+                    }
+                    
+                    os_log("DEBUG: %{public}s", String(describing: entity))
+                }
+                
+                os_log("DEBUG: ==================================")
+                os_log("DEBUG: Checking bookmark store state")
+                
+                os_log("DEBUG: • Entity count: %{public}d (%{public}d bookmarks, %{public}d folders)",
+                       countedEntities,
+                       totalBookmarks,
+                       totalFolders)
+                os_log("DEBUG: • Root folders count: %{public}d", rootFolders)
+                os_log("DEBUG: • Root folders with expected root folder UUID count: %{public}d", rootFoldersWithMatchingUUID)
+                os_log("DEBUG: • Entity title stats: with title = %{public}d, without title = %{public}d", entitiesWithTitle, entitiesWithNoTitle)
+                
+                os_log("DEBUG: Done checking bookmark store state")
+                os_log("DEBUG: ==================================")
+            } catch {
+                os_log("DEBUG: Failed to fetch entities from the bookmarks store")
+            }
+            
+        }
+    }
+
     private func migrateTopLevelStorageToRootLevelBookmarksFolder() {
         context.performAndWait {
             // 1. Fetch all top-level entities and check that there isn't an existing root folder
@@ -751,17 +843,6 @@ final class LocalBookmarkStore: BookmarkStore {
                 // 1. Get the existing top level entities and check for a root folder:
                 
                 var existingTopLevelEntities = try self.context.fetch(topLevelEntitiesFetchRequest)
-                
-                os_log("DEBUG: Got %{public}d top level entities. Checking their state now...", type: .error, existingTopLevelEntities.count)
-                
-                for entity in existingTopLevelEntities where entity.titleEncrypted == nil {
-                    os_log("DEBUG: Error! Found top level entity without a title. is folder = %{public}s, has URL = %{public}s",
-                           type: .error,
-                           String(entity.isFolder),
-                           (entity.urlEncrypted as? String) == nil ? "false" : "true")
-                }
-                
-                os_log("DEBUG: Done checking top level entity state")
                 
                 let existingTopLevelFolderIndex = existingTopLevelEntities.firstIndex { entity in
                     entity.id == .rootBookmarkFolderUUID
@@ -953,4 +1034,16 @@ extension UUID {
         return UUID(uuidString: LocalBookmarkStore.Constants.rootFolderUUID)!
     }
     
+}
+
+fileprivate extension BookmarkManagedObject {
+    
+    var isInvalid: Bool {
+        if titleEncrypted == nil {
+            return true
+        }
+        
+        return false
+    }
+
 }
