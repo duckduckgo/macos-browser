@@ -1,6 +1,47 @@
 <!doctype html>
 <html lang="en">
 <head>
+    <script>
+        window.webkit = {
+            messageHandlers: {
+                readUserValues: {
+                    async postMessage() {
+                        return JSON.stringify({privatePlayerMode: {alwaysAsk:{}}, overlayInteracted: false})
+                    }
+                }
+            }
+        }
+        let href = "https://example.com/watch?v=123";
+        function randomSrc() {
+            const url = new URL("/watch", "https://example.com");
+            const random = Math.floor(Math.random() * 100);
+            url.searchParams.set('v', String(random));
+            href = url.href;
+            document.querySelector('main video').src = random;
+        }
+        function setPref(playerMode) {
+            console.log(playerMode);
+            window.postMessage({
+                userValuesNotification: {
+                    privatePlayerMode: playerMode,
+                    overlayInteracted: false,
+                }
+            })
+        }
+        window.env = {
+            getHref() {
+                return href;
+            },
+            getLargeThumbnailSrc(videoId) {
+                return "https://images.unsplash.com/photo-1600357077527-930ccbaf7773?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2368&q=80"
+            },
+            setHref(href) {
+                console.log("would set href here...", href);
+            },
+            enabled() { return true }
+        }
+    </script>
+    <script src="dist/youtube-inject.bundle.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
@@ -26,6 +67,9 @@
 <body>
 <div class="tools">
     <button type="button" onclick="randomSrc()">Set a random src on image</button>
+    <button type="button" onclick="setPref({alwaysAsk:{}})">Always Ask</button>
+    <button type="button" onclick="setPref({enabled:{}})">Always On</button>
+    <button type="button" onclick="setPref({disabled:{}})">Always Off</button>
 </div>
 <main></main>
 <template id="inner">
@@ -38,73 +82,37 @@
     </div>
 </template>
 <script type="module">
-
-    import {VideoParams} from "./src/util.js";
-
-    const goodcases = [
-        ["/watch?v=123&t=3", {id: "123", time: "3"}],
-        ["/watch?v=123&t=", {id: "123", time: null}],
-        ["/watch?v=123&t=wfef", {id: "123", time: null}]
-    ]
-
-    const badcases = [
-        "/watch?v=<script>",
-    ]
-
-    for (let [testcase, expected] of goodcases) {
-        const parsed = VideoParams.fromPathname(testcase);
-        assert(parsed.id, expected.id)
-        assert(parsed.time, expected.time)
-    }
-
-    for (let testcase of badcases) {
-        const parsed = VideoParams.fromPathname(testcase);
-        assert(parsed, null)
-    }
-
-    function assert(actual, expected) {
-        if (actual !== expected) {
-            throw new Error(`expected '${actual}' to equal '${expected}'`)
-        } else {
-            console.log(`✅ ${actual} == ${expected}`)
-        }
-    }
-    // let href = "https://example.com/watch?v=123";
-    // function randomSrc() {
-    //     const url = new URL("/watch", "https://example.com");
-    //     const random = Math.floor(Math.random() * 100);
-    //     url.searchParams.set('v', String(random));
-    //     href = url.href;
-    //     document.querySelector('main video').src = random;
+    document.querySelector('main').innerHTML = document.querySelector('template[id="inner"]').innerHTML;
+    // import {VideoParams} from "./src/util.js";
+    //
+    // const goodcases = [
+    //     ["/watch?v=123&t=3", {id: "123", time: "3"}],
+    //     ["/watch?v=123&t=", {id: "123", time: null}],
+    //     ["/watch?v=123&t=wfef", {id: "123", time: null}]
+    // ]
+    //
+    // const badcases = [
+    //     "/watch?v=<script>",
+    // ]
+    //
+    // for (let [testcase, expected] of goodcases) {
+    //     const parsed = VideoParams.fromPathname(testcase);
+    //     assert(parsed.id, expected.id)
+    //     assert(parsed.time, expected.time)
     // }
     //
-    // const mockEnv = {
-    //     getHref() {
-    //         return href;
-    //     },
-    //     getLargeThumbnailSrc(videoId) {
-    //         return "https://images.unsplash.com/photo-1600357077527-930ccbaf7773?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2368&q=80"
-    //     },
-    //     setHref(href) {
-    //         console.log("would set href here...", href);
+    // for (let testcase of badcases) {
+    //     const parsed = VideoParams.fromPathname(testcase);
+    //     assert(parsed, null)
+    // }
+    //
+    // function assert(actual, expected) {
+    //     if (actual !== expected) {
+    //         throw new Error(`expected '${actual}' to equal '${expected}'`)
+    //     } else {
+    //         console.log(`✅ ${actual} == ${expected}`)
     //     }
     // }
-    //
-    // const mockComms = {
-    //     setInteracted(values) {
-    //         console.log("mockComms.setInteracted() called with", values);
-    //         return Promise.resolve(null);
-    //     }
-    // }
-    //
-    // enable({
-    //     userValues: {alwaysAsk:{}},
-    //     privatePlayerEnabled: null,
-    // }, mockEnv, mockComms);
-    //
-    // setTimeout(() => {
-    //     document.querySelector('main').innerHTML = document.querySelector('template[id="inner"]').innerHTML;
-    // }, 500);
 </script>
 </body>
 </html>

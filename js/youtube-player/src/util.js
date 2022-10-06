@@ -20,7 +20,7 @@ export function onDOMLoaded(callback) {
 
 export function onDOMChanged(callback) {
     let observer = new MutationObserver(callback);
-    observer.observe(document, {
+    observer.observe(document.body, {
         subtree: true,
         childList: true,
         attributeFilter: ['src']
@@ -101,33 +101,46 @@ export function appendImageAsBackground(parent, targetSelector, imageUrl) {
             targetElement.style.backgroundImage = ``;
         }
     }
-
-    /**
-     * Return a clean-up function to prevent any overlapping work
-     */
-    return () => {
-        canceled = true;
-    }
 }
 
 /**
- * @param cleanups
+ * Execute any stored tear-down functions.
+ *
+ * This handled anything you might want to 'undo', like stopping timers,
+ * removing things from the page etc.
+ *
+ * @param {({fn: ()=>void, name: string})[]} cleanups
  */
 export function execCleanups(cleanups) {
-    if (Array.isArray(cleanups) && cleanups.length > 0) {
-        console.log("cleaning up %d items", cleanups.length);
-    }
     for (let cleanup of cleanups) {
         if (typeof cleanup.fn === "function") {
             try {
                 cleanup.fn();
-                console.log("🧹 cleanup '%s' was successfully", cleanup.name)
+                console.log("🧹 cleanup '%s' was successfully executed", cleanup.name)
             } catch (e) {
                 console.error(`cleanup ${cleanup.name} threw`, e)
             }
         } else {
             throw new Error("invalid cleanup")
         }
+    }
+}
+
+/**
+ * @param {string} name
+ * @param {()=>void} fn
+ * @param {{name: string, fn: ()=>void}[]} storage
+ */
+export function applyEffect(name, fn, storage) {
+    let cleanup;
+    try {
+        cleanup = fn();
+        console.log(`☢️ side effect '%s' executed`, name)
+    } catch (e) {
+        console.error('%s threw an error', name, e);
+    }
+    if (typeof cleanup === "function") {
+        storage.push({name, fn: cleanup})
     }
 }
 
@@ -163,11 +176,26 @@ export class VideoParams {
      * @returns {string}
      */
     toPrivatePlayerUrl() {
-        let privatePlayerURL = this.id;
+        const duckUrl = new URL(this.id, 'https://player');
+        duckUrl.protocol = "duck:";
+
         if (this.time) {
-            privatePlayerURL += '?t=' + this.time;
+            duckUrl.searchParams.set("t", this.time);
         }
-        return 'duck://player/' + privatePlayerURL;
+        return duckUrl.href;
+    }
+
+    /**
+     * Convert a relative pathname into a
+     * @param {string} href
+     * @returns {VideoParams|null}
+     */
+    static forWatchPage(href) {
+        let url = new URL(href);
+        if (!url.pathname.startsWith("/watch")) {
+            return null;
+        }
+        return VideoParams.fromHref(url.href);
     }
 
     /**
