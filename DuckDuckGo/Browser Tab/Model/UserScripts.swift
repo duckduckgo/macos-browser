@@ -37,8 +37,8 @@ final class UserScripts {
     let contentScopeUserScript: ContentScopeUserScript
     let autofillScript: WebsiteAutofillUserScript
     let autoconsentUserScript: UserScriptWithAutoconsent?
-    let youtubeOverlayScript = YoutubeOverlayUserScript()
-    let youtubePlayerUserScript = YoutubePlayerUserScript()
+    let youtubeOverlayScript: YoutubeOverlayUserScript?
+    let youtubePlayerUserScript: YoutubePlayerUserScript?
 
     init(with sourceProvider: ScriptSourceProviding) {
         clickToLoadScript = ClickToLoadUserScript(scriptSourceProvider: sourceProvider)
@@ -54,10 +54,26 @@ final class UserScripts {
         if #available(macOS 11, *) {
             autoconsentUserScript = AutoconsentUserScript(scriptSource: sourceProvider,
                                                           config: sourceProvider.privacyConfigurationManager.privacyConfig)
-            userScripts.append(autoconsentUserScript!)
-            
         } else {
             autoconsentUserScript = nil
+        }
+
+        if PrivatePlayer.isAvailable {
+            youtubeOverlayScript = YoutubeOverlayUserScript()
+            youtubePlayerUserScript = YoutubePlayerUserScript()
+        } else {
+            youtubeOverlayScript = nil
+            youtubePlayerUserScript = nil
+        }
+
+        if let autoconsentUserScript = autoconsentUserScript {
+            userScripts.append(autoconsentUserScript)
+        }
+        if let youtubeOverlayScript = youtubeOverlayScript {
+            userScripts.append(youtubeOverlayScript)
+        }
+        if let youtubePlayerUserScript = youtubePlayerUserScript {
+            userScripts.append(youtubePlayerUserScript)
         }
     }
 
@@ -73,10 +89,7 @@ final class UserScripts {
         hoverUserScript,
         clickToLoadScript,
         contentScopeUserScript,
-        autofillScript,
-        youtubeOverlayScript,
-        youtubePlayerUserScript
-
+        autofillScript
     ]
 
     lazy var scripts = userScripts.map { $0.makeWKUserScript() }

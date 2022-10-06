@@ -800,6 +800,10 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     private var youtubePlayerCancellables: Set<AnyCancellable> = []
 
     func setUpYoutubeScriptsIfNeeded() {
+        guard PrivatePlayer.isAvailable else {
+            return
+        }
+
         youtubePlayerCancellables.removeAll()
 
         if webView.url?.host?.droppingWwwPrefix() == "youtube.com" {
@@ -812,7 +816,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                     let userValues = YoutubeOverlayUserScript.UserValues(
                             privatePlayerMode: playerMode,
                             overlayInteracted: self.privatePlayer.overlayInteracted
-                    );
+                    )
                     self.youtubeOverlayScript?.userValuesUpdated(userValues: userValues, inWebView: self.webView)
                 }
                 .store(in: &youtubePlayerCancellables)

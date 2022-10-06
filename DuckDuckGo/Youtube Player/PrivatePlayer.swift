@@ -51,6 +51,8 @@ enum PrivatePlayerMode: Equatable, Codable {
 }
 
 final class PrivatePlayer {
+    static let isAvailable: Bool = true
+
     static let usesSimulatedRequests: Bool = {
         if #available(macOS 12.0, *) {
             return true
@@ -80,20 +82,22 @@ final class PrivatePlayer {
         self.preferences = preferences
         mode = preferences.privatePlayerMode
 
-        modeCancellable = preferences.$privatePlayerMode
-            .removeDuplicates()
-            .assign(to: \.mode, onWeaklyHeld: self)
+        if Self.isAvailable {
+            modeCancellable = preferences.$privatePlayerMode
+                .removeDuplicates()
+                .assign(to: \.mode, onWeaklyHeld: self)
+        }
     }
 
     func image(for faviconView: FaviconView) -> NSImage? {
-        guard mode != .disabled, faviconView.domain == Self.commonName else {
+        guard Self.isAvailable, mode != .disabled, faviconView.domain == Self.commonName else {
             return nil
         }
         return .privatePlayer
     }
 
     func domainForRecentlyVisitedSite(with url: URL) -> String? {
-        guard mode != .disabled else {
+        guard Self.isAvailable, mode != .disabled else {
             return nil
         }
 
@@ -101,7 +105,7 @@ final class PrivatePlayer {
     }
 
     func tabContent(for url: URL?) -> Tab.TabContent? {
-        guard mode != .disabled, let url = url, let (videoID, timestamp) = url.youtubeVideoParams else {
+        guard Self.isAvailable, mode != .disabled, let url = url, let (videoID, timestamp) = url.youtubeVideoParams else {
             return nil
         }
 
@@ -114,9 +118,11 @@ final class PrivatePlayer {
     }
 
     func shouldSkipLoadingURL(for tab: Tab) -> Bool {
-        guard case .privatePlayer(let videoID, let timestamp) = tab.content,
-           tab.webView.url == .youtubeNoCookie(videoID, timestamp: timestamp)
-            || (tab.webView.url == .youtube(videoID, timestamp: timestamp) && mode != .enabled)
+        guard Self.isAvailable,
+              mode != .disabled,
+              case .privatePlayer(let videoID, let timestamp) = tab.content,
+              tab.webView.url == .youtubeNoCookie(videoID, timestamp: timestamp)
+                || (tab.webView.url == .youtube(videoID, timestamp: timestamp) && mode != .enabled)
         else {
             return false
         }
@@ -124,7 +130,9 @@ final class PrivatePlayer {
     }
 
     func goBackAndLoadURLIfNeeded(for tab: Tab) -> Bool {
-        guard tab.content.isPrivatePlayer,
+        guard Self.isAvailable,
+              mode != .disabled,
+              tab.content.isPrivatePlayer,
               tab.webView.url?.isPrivatePlayer == true,
               tab.content.url?.youtubeVideoID == tab.webView.url?.youtubeVideoID,
               let url = tab.content.url
@@ -141,7 +149,7 @@ final class PrivatePlayer {
     }
 
     func goBackSkippingLastItemIfNeeded(for webView: WKWebView) -> Bool {
-        guard mode == .enabled, webView.url?.isPrivatePlayer == true else {
+        guard Self.isAvailable, mode == .enabled, webView.url?.isPrivatePlayer == true else {
             return false
         }
 
@@ -160,7 +168,7 @@ final class PrivatePlayer {
     }
 
     func decidePolicy(for navigationAction: WKNavigationAction, in tab: Tab) -> WKNavigationActionPolicy? {
-        guard mode != .disabled else {
+        guard Self.isAvailable, mode != .disabled else {
             return nil
         }
 
@@ -224,7 +232,7 @@ final class PrivatePlayer {
 extension PrivatePlayer {
 
     func title(for page: HomePage.Models.RecentlyVisitedPageModel) -> String? {
-        guard mode != .disabled else {
+        guard Self.isAvailable, mode != .disabled else {
             return nil
         }
 
@@ -244,6 +252,10 @@ extension PrivatePlayer {
 extension PrivatePlayer {
 
     func updateContent(_ content: Tab.TabContent, for tab: Tab) -> Tab.TabContent? {
+        guard Self.isAvailable, mode != .disabled else {
+            return nil
+        }
+
         let newContent: Tab.TabContent? = {
             if case .privatePlayer(let oldVideoID, _) = tab.content,
                case .privatePlayer(let videoID, let timestamp) = content,
