@@ -153,7 +153,8 @@ final class Tab: NSObject, Identifiable, ObservableObject {
          shouldLoadInBackground: Bool = false,
          canBeClosedWithBack: Bool = false,
          lastSelectedAt: Date? = nil,
-         currentDownload: URL? = nil
+         currentDownload: URL? = nil,
+         webViewFrame: CGRect = .zero
     ) {
 
         self.content = content
@@ -174,8 +175,8 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
         let configuration = webViewConfiguration ?? WKWebViewConfiguration()
         configuration.applyStandardConfiguration()
-
-        webView = WebView(frame: CGRect.zero, configuration: configuration)
+        
+        webView = WebView(frame: webViewFrame, configuration: configuration)
         webView.allowsLinkPreview = false
         permissions = PermissionModel(webView: webView)
 
@@ -480,7 +481,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     lazy var referrerTrimming: ReferrerTrimming = {
         ReferrerTrimming(privacyManager: ContentBlocking.shared.privacyConfigurationManager,
                          contentBlockingManager: ContentBlocking.shared.contentBlockingManager,
-                         tld: TLD())
+                         tld: ContentBlocking.shared.tld)
     }()
     
     // MARK: - Ad Click Attribution
@@ -524,7 +525,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             
             if !didRestore {
                 if url.isFileURL {
-                    webView.loadFileURL(url, allowingReadAccessTo: URL(fileURLWithPath: "/"))
+                    _ = webView.loadFileURL(url, allowingReadAccessTo: URL(fileURLWithPath: "/"))
                 } else {
                     webView.load(url)
                 }
@@ -573,7 +574,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         var didRestore: Bool = false
         if let sessionStateData = self.sessionStateData {
             if contentURL.isFileURL {
-                webView.loadFileURL(contentURL, allowingReadAccessTo: URL(fileURLWithPath: "/"))
+                _ = webView.loadFileURL(contentURL, allowingReadAccessTo: URL(fileURLWithPath: "/"))
             }
             do {
                 try webView.restoreSessionState(from: sessionStateData)
@@ -592,7 +593,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         var didRestore: Bool = false
         if let interactionStateData = self.interactionStateData {
             if contentURL.isFileURL {
-                webView.loadFileURL(contentURL, allowingReadAccessTo: URL(fileURLWithPath: "/"))
+                _ = webView.loadFileURL(contentURL, allowingReadAccessTo: URL(fileURLWithPath: "/"))
             }
             
             webView.interactionState = interactionStateData
@@ -602,7 +603,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         return didRestore
     }
 
-    @MainActor
     private func addHomePageToWebViewIfNeeded() {
         guard !AppDelegate.isRunningTests else { return }
         if content == .homePage && webView.url == nil {
@@ -636,17 +636,17 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         superviewObserver = webView.observe(\.superview, options: .old) { [weak self] _, change in
             // if the webView is being added to superview - reload if needed
             if case .some(.none) = change.oldValue {
-                Task { [weak self] in
+                Task { @MainActor [weak self] in
                     await self?.reloadIfNeeded()
                 }
             }
         }
 
         // background tab loading should start immediately
-        Task {
+        Task { @MainActor in
             await reloadIfNeeded(shouldLoadInBackground: shouldLoadInBackground)
             if !shouldLoadInBackground {
-                await addHomePageToWebViewIfNeeded()
+                addHomePageToWebViewIfNeeded()
             }
         }
     }
@@ -1144,7 +1144,7 @@ extension Tab: WKNavigationDelegate {
             if let newRequest = referrerTrimming.trimReferrer(forNavigation: navigationAction,
                                                               originUrl: webView.url ?? navigationAction.sourceFrame.webView?.url) {
                 defer {
-                    webView.load(newRequest)
+                    _ = webView.load(newRequest)
                 }
                 return .cancel
             }
@@ -1164,7 +1164,7 @@ extension Tab: WKNavigationDelegate {
                       let request = GPCRequestFactory.shared.requestForGPC(basedOn: navigationAction.request) {
                 self.invalidateBackItemIfNeeded(for: navigationAction)
                 defer {
-                    webView.load(request)
+                    _ = webView.load(request)
                 }
                 return .cancel
             }
@@ -1428,6 +1428,10 @@ extension Tab: WKNavigationDelegate {
                  withError error: Error) {
         guard frame.isMainFrame else { return }
         self.mainFrameLoadState = .finished
+    }
+    
+    func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
+        Pixel.fire(.debug(event: .webKitDidTerminate))
     }
 
 }

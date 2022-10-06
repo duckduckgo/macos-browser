@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="19529" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="luO-ux-o3b">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="21225" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="luO-ux-o3b">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19529"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21225"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -378,7 +378,9 @@
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="clearDownloadsButton" destination="cev-k6-wFH" id="LWh-5Y-4p5"/>
                         <outlet property="contextMenu" destination="SCZ-TM-duL" id="Moa-bC-2Tb"/>
+                        <outlet property="openDownloadsFolderButton" destination="aKx-1h-4hp" id="kPG-jg-ZTE"/>
                         <outlet property="tableView" destination="zWp-mP-b3k" id="uqE-oO-u61"/>
                         <outlet property="tableViewHeightConstraint" destination="pa7-BQ-jMF" id="i8E-WJ-esr"/>
                     </connections>

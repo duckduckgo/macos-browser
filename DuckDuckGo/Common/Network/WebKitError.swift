@@ -20,7 +20,6 @@ import Foundation
 import WebKit
 
 struct WebKitError: Error, Hashable, _BridgedStoredNSError, CustomNSError {
-    static var errorDomain: String { WebKitErrorDomain }
 
     typealias _ErrorType = Code // swiftlint:disable:this type_name
     var _nsError: NSError // swiftlint:disable:this identifier_name
