@@ -138,6 +138,7 @@ extension Pixel {
         case exportedBookmarks(repetition: Repetition = .init(key: "exported-bookmarks"))
         
         case dataImportFailed(action: DataImportAction, source: DataImportSource)
+        case faviconImportFailed(source: DataImportSource)
 
         case formAutofilled(kind: FormAutofillKind)
         case autofillItemSaved(kind: FormAutofillKind)
@@ -321,6 +322,9 @@ extension Pixel.Event {
             
         case .dataImportFailed(action: let action, source: let source):
             return "m_mac_data-import-failed_\(action)_\(source)"
+            
+        case .faviconImportFailed(source: let source):
+            return "m_mac_favicon-import-failed_\(source)"
 
         case .formAutofilled(kind: let kind):
             return "m_mac_autofill_\(kind)"

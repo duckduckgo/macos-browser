@@ -93,6 +93,7 @@ extension Pixel.Event {
              .importedBookmarks,
              .exportedBookmarks,
              .dataImportFailed,
+             .faviconImportFailed,
              .formAutofilled,
              .autofillItemSaved,
              .onboardingStartPressed,

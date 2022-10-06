@@ -23,12 +23,19 @@ final class ChromeDataImporter: ChromiumDataImporter {
     override var processName: String {
         return "Chrome"
     }
+    
+    override var source: DataImport.Source {
+        return .chrome
+    }
 
     init(loginImporter: LoginImporter, bookmarkImporter: BookmarkImporter) {
         let applicationSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
         let defaultDataURL = applicationSupport.appendingPathComponent("Google/Chrome/Default/")
 
-        super.init(applicationDataDirectoryURL: defaultDataURL, loginImporter: loginImporter, bookmarkImporter: bookmarkImporter)
+        super.init(applicationDataDirectoryURL: defaultDataURL,
+                   loginImporter: loginImporter,
+                   bookmarkImporter: bookmarkImporter,
+                   faviconManager: FaviconManager.shared)
     }
 
 }

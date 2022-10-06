@@ -20,7 +20,7 @@ import AppKit
 
 enum DataImport {
 
-    enum Source: CaseIterable {
+    enum Source: CaseIterable, Equatable {
 
         case brave
         case chrome

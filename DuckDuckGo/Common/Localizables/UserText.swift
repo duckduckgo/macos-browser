@@ -404,12 +404,11 @@ struct UserText {
         return String(format: localized, String(totalFailedImports))
     }
 
-    static let bookmarkImportSafariPermissionDescription = NSLocalizedString("import.bookmarks.safari.permission-description", value: "DuckDuckGo needs your permission to read the Safari bookmarks file. Select the Bookmarks.plist file to import bookmarks.", comment: "Description text for the Safari bookmark import permission screen")
-    static let bookmarkImportSafariRequestPermissionButtonTitle = NSLocalizedString("import.bookmarks.safari.permission-button.title", value: "Select Bookmarks File…", comment: "Text for the Safari bookmark import permission button")
+    static let bookmarkImportSafariPermissionDescription = NSLocalizedString("import.bookmarks.safari.permission-description", value: "DuckDuckGo needs your permission to read the Safari bookmarks file. Select the Safari folder to import bookmarks.", comment: "Description text for the Safari bookmark import permission screen")
+    static let bookmarkImportSafariRequestPermissionButtonTitle = NSLocalizedString("import.bookmarks.safari.permission-button.title", value: "Select Safari Folder…", comment: "Text for the Safari data import permission button")
 
     static let bookmarkImportBookmarksBar = NSLocalizedString("import.bookmarks.folder.bookmarks-bar", value: "Bookmarks Bar", comment: "Title text for Bookmarks Bar import folder")
     static let bookmarkImportOtherBookmarks = NSLocalizedString("import.bookmarks.folder.other-bookmarks", value: "Other Bookmarks", comment: "Title text for Other Bookmarks import folder")
-    static let bookmarkImportImportedFavorites = NSLocalizedString("import.bookmarks.folder.imported-favorites", value: "Imported Favorites", comment: "Title text for Imported Favorites import folder")
 
     static let bookmarkImportBookmarks = NSLocalizedString("import.bookmarks.bookmarks", value: "Bookmarks", comment: "Title text for the Bookmarks import option")
     static let bookmarkImportBookmarksAndFavorites = NSLocalizedString("import.bookmarks.bookmarks-and-favorites", value: "Bookmarks & Favorites", comment: "Title text for the Bookmarks & Favorites import option")
