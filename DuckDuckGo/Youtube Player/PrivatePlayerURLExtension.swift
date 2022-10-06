@@ -86,9 +86,7 @@ extension URL {
 
     var youtubeVideoParams: (videoID: String, timestamp: String?)? {
         if isPrivatePlayerScheme {
-#warning("Remove this once Private Player URLs get fixed on the JS side")
-            let fixedAbsoluteString = absoluteString.replacingOccurrences(of: "&", with: "?")
-            guard let components = URLComponents(string: fixedAbsoluteString) else {
+            guard let components = URLComponents(string: absoluteString) else {
                 return nil
             }
             let unsafeVideoID = components.path
