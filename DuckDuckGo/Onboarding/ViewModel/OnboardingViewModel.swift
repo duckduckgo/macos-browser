@@ -87,6 +87,7 @@ final class OnboardingViewModel: ObservableObject {
         Pixel.fire(.onboardingSetDefaultPressed)
         delegate?.onboardingDidRequestSetDefault { [weak self] in
             self?.state = .startBrowsing
+            self?.onboardingFinished = true
             self?.delegate?.onboardingHasFinished()
         }
     }
