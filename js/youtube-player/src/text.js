@@ -9,7 +9,7 @@ const text = {
         "title": "Tired of targeted YouTube ads and recommendations?"
     },
     "videoOverlaySubtitle": {
-        "title": "<b>Duck Player</b> protects your viewing activity from advertiser profiling and from influencing your YouTube recommendations."
+        "title": "<b>Duck Player</b> provides a clean viewing experience without personalized ads and prevents viewing activity from influencing your YouTube recommendations."
     },
     "videoButtonOpen": {
         "title": "Watch in Duck Player"
