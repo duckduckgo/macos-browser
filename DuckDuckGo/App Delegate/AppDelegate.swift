@@ -95,10 +95,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         guard !Self.isRunningTests else { return }
 
-        #if DEBUG || REVIEW
-        Waitlist.unlockExistingInstallIfNecessary()
-        #endif
-
         HistoryCoordinator.shared.loadHistory()
         PrivacyFeatures.httpsUpgrade.loadDataAsync()
         LocalBookmarkManager.shared.loadBookmarks()
@@ -112,7 +108,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             // MARK: perform first time launch logic here
         }
 
-        fireWaitlistLaunchPixel()
         fireLaunchPixel(regularLaunch: (notification.userInfo?[NSApplication.launchIsDefaultUserInfoKey] as? NSNumber)?.boolValue)
 
         stateRestorationManager.applicationDidFinishLaunching()
@@ -184,12 +179,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                     Pixel.Event.AppLaunch.repetition().update()
                 }
             }
-        }
-    }
-
-    private func fireWaitlistLaunchPixel() {
-        if Pixel.Event.AppLaunch.repetition().value == .initial && !Waitlist.isUnlocked {
-            Pixel.fire(.waitlistFirstLaunch)
         }
     }
 

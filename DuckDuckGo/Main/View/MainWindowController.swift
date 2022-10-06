@@ -65,7 +65,9 @@ final class MainWindowController: NSWindowController {
         window?.delegate = self
         window?.setFrameAutosaveName(Self.windowFrameSaveName)
         
-        NotificationCenter.default.addObserver(self, selector: #selector(dismissLockScreen), name: .macWaitlistLockScreenDidUnlock, object: nil)
+        if !OnboardingViewModel().onboardingFinished {
+            mainViewController.tabCollectionViewModel.selectedTabViewModel?.tab.startOnboarding()
+        }
     }
     
     private func subscribeToResolutionChange() {
@@ -84,12 +86,6 @@ final class MainWindowController: NSWindowController {
                 window?.performZoom(nil)
             }
         }
-    }
-    
-    @objc
-    private func dismissLockScreen() {
-        updateWindowForLockScreen(lockScreenVisible: false)
-        mainViewController.tabCollectionViewModel.selectedTabViewModel?.tab.startOnboarding()
     }
 
     private func setupToolbar() {
@@ -199,32 +195,6 @@ extension MainWindowController: NSWindowDelegate {
         if (notification.object as? NSWindow)?.isPopUpWindow == false {
             WindowControllersManager.shared.lastKeyMainWindowController = self
         }
-        
-        displayLockScreenIfNecessary()
-    }
-    
-    private func displayLockScreenIfNecessary() {
-        // Displaying a modal so soon after the window becoming key causes issues related to the window animation and
-        // state, such as a double animation happening as the window opens, and the address bar state being incorrect.
-        // Dispatching this change to the end of the main queue fixes it.
-        DispatchQueue.main.async {
-#if DEBUG
-            if !AppDelegate.isRunningTests {
-                if Waitlist.displayLockScreenIfNecessary(in: self.mainViewController) {
-                    self.updateWindowForLockScreen(lockScreenVisible: true)
-                }
-            }
-#else
-            if Waitlist.displayLockScreenIfNecessary(in: self.mainViewController) {
-                self.updateWindowForLockScreen(lockScreenVisible: true)
-            }
-#endif
-        }
-    }
-    
-    private func updateWindowForLockScreen(lockScreenVisible: Bool) {
-        userInteraction(prevented: lockScreenVisible)
-        window?.isMovable = lockScreenVisible
     }
 
     func windowDidResignKey(_ notification: Notification) {
