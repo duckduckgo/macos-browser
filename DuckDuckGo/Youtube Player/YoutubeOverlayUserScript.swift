@@ -26,6 +26,7 @@ final class YoutubeOverlayUserScript: NSObject, StaticUserScript {
     enum MessageNames: String, CaseIterable {
         case setUserValues
         case readUserValues
+        case openDuckPlayer
     }
 
     static var injectionTime: WKUserScriptInjectionTime { .atDocumentStart }
@@ -84,6 +85,14 @@ final class YoutubeOverlayUserScript: NSObject, StaticUserScript {
         privatePlayerPreferences.privatePlayerMode = .enabled
     }
 
+    private func handleOpenDuckPlayer(message: WKScriptMessage) {
+        guard let urlString = message.body as? String, let url = urlString.url else {
+            assertionFailure("YoutubePlayerUserScript: expected URL")
+            return
+        }
+        message.webView?.load(url)
+    }
+
     private func handleReadUserValues(message: WKScriptMessage, _ replyHandler: @escaping (Any?, String?) -> Void) {
         replyHandler(encodeUserValues(), nil)
     }
@@ -131,6 +140,8 @@ extension YoutubeOverlayUserScript: WKScriptMessageHandlerWithReply {
             handleSetUserValues(message: message, replyHandler)
         case .readUserValues:
             handleReadUserValues(message: message, replyHandler)
+        case .openDuckPlayer:
+            handleOpenDuckPlayer(message: message)
         }
     }
 }
