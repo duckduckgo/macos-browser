@@ -102,7 +102,7 @@ final class LocalBookmarkStore: BookmarkStore {
                                                  #keyPath(BookmarkManagedObject.isFolder))
             
             let results = (try? context.fetch(fetchRequest)) ?? []
-            
+
             guard results.count == 1 else {
                 fatalError("There shouldn't be an orphaned folder")
             }
@@ -512,7 +512,7 @@ final class LocalBookmarkStore: BookmarkStore {
 
             do {
                 try self.context.save()
-            } catch {                
+            } catch {
                 assertionFailure("\(#file): Saving of context failed")
                 DispatchQueue.main.async { completion(error) }
                 return
@@ -736,7 +736,7 @@ final class LocalBookmarkStore: BookmarkStore {
             
             let topLevelEntitiesFetchRequest = Bookmark.topLevelEntitiesFetchRequest()
             topLevelEntitiesFetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(BookmarkManagedObject.dateAdded), ascending: true)]
-            topLevelEntitiesFetchRequest.returnsObjectsAsFaults = false
+            topLevelEntitiesFetchRequest.returnsObjectsAsFaults = true
             
             do {
                 // 0. Up front, check if a root folder exists but has been moved deeper into the hierarchy, and remove it if so:
