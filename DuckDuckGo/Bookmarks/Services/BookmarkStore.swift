@@ -473,7 +473,7 @@ final class LocalBookmarkStore: BookmarkStore {
             
             // Guarantee that bookmarks are fetched in the same order as the UUIDs. In the future, this should fetch all objects at once with a
             // batch fetch request and have them sorted in the correct order.
-            let bookmarkManagedObjects = objectUUIDs.compactMap { uuid in
+            let bookmarkManagedObjects: [BookmarkManagedObject] = objectUUIDs.compactMap { uuid in
                 let entityFetchRequest = BaseBookmarkEntity.singleEntity(with: uuid)
                 return (try? self.context.fetch(entityFetchRequest))?.first
             }
