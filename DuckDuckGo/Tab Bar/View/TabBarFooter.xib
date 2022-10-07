@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="18122" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="18122"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -15,7 +15,7 @@
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
                 <button translatesAutoresizingMaskIntoConstraints="NO" id="SoA-RN-wcO" userLabel="Add Button" customClass="LongPressButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                    <rect key="frame" x="6" y="3" width="28" height="28"/>
+                    <rect key="frame" x="6" y="2" width="28" height="28"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="28" id="JZ3-zG-Blg"/>
                         <constraint firstAttribute="width" constant="28" id="tO2-sL-qXC"/>
@@ -40,7 +40,7 @@
             </subviews>
             <constraints>
                 <constraint firstItem="SoA-RN-wcO" firstAttribute="centerX" secondItem="c22-O7-iKe" secondAttribute="centerX" id="PqP-lv-5KX"/>
-                <constraint firstAttribute="bottom" secondItem="SoA-RN-wcO" secondAttribute="bottom" constant="3" id="vr6-tg-21f"/>
+                <constraint firstAttribute="bottom" secondItem="SoA-RN-wcO" secondAttribute="bottom" constant="2" id="vr6-tg-21f"/>
             </constraints>
             <connections>
                 <outlet property="addButton" destination="SoA-RN-wcO" id="BvG-VP-8hs"/>
@@ -54,10 +54,10 @@
             <color red="0.28627450980392155" green="0.28627450980392155" blue="0.28627450980392155" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="ButtonMouseDownColor">
-            <color red="0.0" green="0.0" blue="0.0" alpha="0.18000000715255737" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.0" green="0.0" blue="0.0" alpha="0.20000000298023224" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="ButtonMouseOverColor">
-            <color red="0.0" green="0.0" blue="0.0" alpha="0.05000000074505806" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.0" green="0.0" blue="0.0" alpha="0.10000000149011612" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
     </resources>
 </document>
