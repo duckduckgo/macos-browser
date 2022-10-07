@@ -699,11 +699,11 @@ final class LocalBookmarkStore: BookmarkStore {
     
     // MARK: - Migration
     
+    /// There is a rare issue where bookmark managed objects can end up in the database with an invalid state, that is that they are missing their title value despite being non-optional.
+    /// They appear to be disjoint from a user's actual bookmarks data, so this function removes them.
     private func removeInvalidBookmarkEntities() {
-
         context.performAndWait {
             let entitiesFetchRequest = Bookmark.bookmarksAndFoldersFetchRequest()
-            entitiesFetchRequest.returnsObjectsAsFaults = false
             
             do {
                 let entities = try self.context.fetch(entitiesFetchRequest)
@@ -713,6 +713,10 @@ final class LocalBookmarkStore: BookmarkStore {
                 for entity in entities where entity.isInvalid {
                     self.context.delete(entity)
                     deletedEntityCount += 1
+                }
+                
+                if deletedEntityCount > 0 {
+                    Pixel.fire(.debug(event: .removedInvalidBookmarkManagedObjects))
                 }
                 
                 try self.context.save()
