@@ -92,6 +92,7 @@ extension Pixel {
         case serp
         
         case dataImportFailed(action: DataImportAction, source: DataImportSource)
+        case faviconImportFailed(source: DataImportSource)
 
         case formAutofilled(kind: FormAutofillKind)
         case autofillItemSaved(kind: FormAutofillKind)
@@ -112,6 +113,7 @@ extension Pixel {
 
         enum Debug {
 
+            case dbContainerInitializationError
             case dbInitializationError
             case dbSaveExcludedHTTPSDomainsError
             case dbSaveBloomFilterError
@@ -171,6 +173,8 @@ extension Pixel {
             case adAttributionLogicWrongVendorOnFailedCompilation
             
             case webKitDidTerminate
+            
+            case removedInvalidBookmarkManagedObjects
         }
 
     }
@@ -198,6 +202,9 @@ extension Pixel.Event {
 
         case .dataImportFailed(action: let action, source: let source):
             return "m_mac_data-import-failed_\(action)_\(source)"
+            
+        case .faviconImportFailed(source: let source):
+            return "m_mac_favicon-import-failed_\(source)"
 
         case .formAutofilled(kind: let kind):
             return "m_mac_autofill_\(kind)"
@@ -240,6 +247,8 @@ extension Pixel.Event.Debug {
     var name: String {
         switch self {
         
+        case .dbContainerInitializationError:
+            return "database_container_error"
         case .dbInitializationError:
             return "dbie"
         case .dbSaveExcludedHTTPSDomainsError:
@@ -353,6 +362,9 @@ extension Pixel.Event.Debug {
             
         case .webKitDidTerminate:
             return "webkit_did_terminate"
+            
+        case .removedInvalidBookmarkManagedObjects:
+            return "removed_invalid_bookmark_managed_objects"
         }
     }
 }

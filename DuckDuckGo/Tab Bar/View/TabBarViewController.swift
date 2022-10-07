@@ -133,6 +133,7 @@ final class TabBarViewController: NSViewController {
     }
 
     private func setupFireButton() {
+        fireButton.toolTip = UserText.clearBrowsingHistoryTooltip
         fireButton.animationNames = MouseOverAnimationButton.AnimationNames(aqua: "flame-mouse-over", dark: "dark-flame-mouse-over")
     }
 
@@ -800,7 +801,9 @@ extension TabBarViewController: NSCollectionViewDataSource {
         if let footer = view as? TabBarFooter {
             footer.addButton?.target = self
             footer.addButton?.action = #selector(addButtonAction(_:))
+            footer.toolTip = UserText.newTabTooltip
         }
+
         return view
     }
 

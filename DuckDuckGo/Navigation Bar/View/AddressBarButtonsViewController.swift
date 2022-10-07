@@ -183,6 +183,8 @@ final class AddressBarButtonsViewController: NSViewController {
         subscribeToEffectiveAppearance()
         subscribeToIsMouseOverAnimationVisible()
         updateBookmarkButtonVisibility()
+        
+        privacyEntryPointButton.toolTip = UserText.privacyDashboardTooltip
     }
 
     override func viewWillAppear() {
@@ -658,10 +660,12 @@ final class AddressBarButtonsViewController: NSViewController {
            isUrlBookmarked || bookmarkManager.isUrlBookmarked(url: url) {
             bookmarkButton.image = Self.bookmarkFilledImage
             bookmarkButton.mouseOverTintColor = NSColor.bookmarkFilledTint
+            bookmarkButton.toolTip = UserText.editBookmarkTooltip
         } else {
             bookmarkButton.mouseOverTintColor = nil
             bookmarkButton.image = Self.bookmarkImage
             bookmarkButton.contentTintColor = nil
+            bookmarkButton.toolTip = UserText.addBookmarkTooltip
         }
     }
 

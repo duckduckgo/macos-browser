@@ -153,7 +153,8 @@ final class Tab: NSObject, Identifiable, ObservableObject {
          shouldLoadInBackground: Bool = false,
          canBeClosedWithBack: Bool = false,
          lastSelectedAt: Date? = nil,
-         currentDownload: URL? = nil
+         currentDownload: URL? = nil,
+         webViewFrame: CGRect = .zero
     ) {
 
         self.content = content
@@ -174,8 +175,8 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
         let configuration = webViewConfiguration ?? WKWebViewConfiguration()
         configuration.applyStandardConfiguration()
-
-        webView = WebView(frame: CGRect.zero, configuration: configuration)
+        
+        webView = WebView(frame: webViewFrame, configuration: configuration)
         webView.allowsLinkPreview = false
         permissions = PermissionModel(webView: webView)
 
@@ -480,7 +481,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     lazy var referrerTrimming: ReferrerTrimming = {
         ReferrerTrimming(privacyManager: ContentBlocking.shared.privacyConfigurationManager,
                          contentBlockingManager: ContentBlocking.shared.contentBlockingManager,
-                         tld: TLD())
+                         tld: ContentBlocking.shared.tld)
     }()
     
     // MARK: - Ad Click Attribution

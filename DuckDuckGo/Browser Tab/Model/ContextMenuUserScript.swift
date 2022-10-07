@@ -136,7 +136,7 @@ final class ContextMenuUserScript: NSObject, StaticUserScript {
         }
 
         webkit.messageHandlers.contextMenu.postMessage(context);
-    });
+    }, true);
 
 }) ();
 """

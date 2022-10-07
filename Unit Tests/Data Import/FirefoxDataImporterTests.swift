@@ -24,8 +24,9 @@ class FirefoxDataImporterTests: XCTestCase {
     
     func testWhenImportingWithoutAnyDataTypes_ThenSummaryIsEmpty() async {
         let loginImporter = MockLoginImporter()
+        let faviconManager = FaviconManagerMock()
         let bookmarkImporter = MockBookmarkImporter(importBookmarks: { _, _ in .init(successful: 0, duplicates: 0, failed: 0) })
-        let importer = FirefoxDataImporter(loginImporter: loginImporter, bookmarkImporter: bookmarkImporter)
+        let importer = FirefoxDataImporter(loginImporter: loginImporter, bookmarkImporter: bookmarkImporter, faviconManager: faviconManager)
         
         let summary = await importer.importData(types: [], from: .init(profileURL: resourceURL()))
         
@@ -38,8 +39,9 @@ class FirefoxDataImporterTests: XCTestCase {
     
     func testWhenImportingBookmarks_AndBookmarkImportSucceeds_ThenSummaryIsPopulated() async {
         let loginImporter = MockLoginImporter()
+        let faviconManager = FaviconManagerMock()
         let bookmarkImporter = MockBookmarkImporter(importBookmarks: { _, _ in .init(successful: 1, duplicates: 2, failed: 3) })
-        let importer = FirefoxDataImporter(loginImporter: loginImporter, bookmarkImporter: bookmarkImporter)
+        let importer = FirefoxDataImporter(loginImporter: loginImporter, bookmarkImporter: bookmarkImporter, faviconManager: faviconManager)
         
         let summary = await importer.importData(types: [.bookmarks], from: .init(profileURL: resourceURL()))
         
@@ -55,9 +57,10 @@ class FirefoxDataImporterTests: XCTestCase {
 
     func testWhenImportingBookmarks_AndBookmarkImportFails_ThenErrorIsReturned() async {
         let loginImporter = MockLoginImporter()
+        let faviconManager = FaviconManagerMock()
         let bookmarkImporter = MockBookmarkImporter(throwableError: DataImportError.bookmarks(.cannotAccessCoreData),
                                                     importBookmarks: { _, _ in .init(successful: 0, duplicates: 0, failed: 0) })
-        let importer = FirefoxDataImporter(loginImporter: loginImporter, bookmarkImporter: bookmarkImporter)
+        let importer = FirefoxDataImporter(loginImporter: loginImporter, bookmarkImporter: bookmarkImporter, faviconManager: faviconManager)
         
         let summary = await importer.importData(types: [.bookmarks], from: .init(profileURL: resourceURL()))
         

@@ -148,6 +148,8 @@ final class NavigationBarViewController: NSViewController {
         bookmarkListButton.sendAction(on: .leftMouseDown)
         downloadsButton.sendAction(on: .leftMouseDown)
         
+        optionsButton.toolTip = UserText.applicationMenuTooltip
+        
         #if DEBUG || REVIEW
         addDebugNotificationListeners()
         #endif
@@ -423,6 +425,10 @@ final class NavigationBarViewController: NSViewController {
         let forwardButtonMenu = NSMenu()
         forwardButtonMenu.delegate = goForwardButtonMenuDelegate
         goForwardButton.menu = forwardButtonMenu
+        
+        goBackButton.toolTip = UserText.navigateBackTooltip
+        goForwardButton.toolTip = UserText.navigateForwardTooltip
+        refreshButton.toolTip = UserText.refreshPageTooltip
     }
 
     private func subscribeToSelectedTabViewModel() {

@@ -150,17 +150,32 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
                      validateDrop info: NSDraggingInfo,
                      proposedItem item: Any?,
                      proposedChildIndex index: Int) -> NSDragOperation {
-        guard index == -1 else {
+        if contentMode == .foldersOnly, index != -1 {
             return .none
         }
-
+        
         let destinationNode = nodeForItem(item)
+        
+        let bookmarks = PasteboardBookmark.pasteboardBookmarks(with: info.draggingPasteboard)
+        let folders = PasteboardFolder.pasteboardFolders(with: info.draggingPasteboard)
 
-        if let bookmarks = PasteboardBookmark.pasteboardBookmarks(with: info.draggingPasteboard) {
+        if let bookmarks = bookmarks, let folders = folders {
+            let canMoveBookmarks = validateDrop(for: bookmarks, destination: destinationNode) == .move
+            let canMoveFolders = validateDrop(for: folders, destination: destinationNode) == .move
+            
+            // If the dragged values contain both folders and bookmarks, only validate the move if all objects can be moved.
+            if canMoveBookmarks, canMoveFolders {
+                return .move
+            } else {
+                return .none
+            }
+        }
+
+        if let bookmarks = bookmarks {
             return validateDrop(for: bookmarks, destination: destinationNode)
         }
 
-        if let folders = PasteboardFolder.pasteboardFolders(with: info.draggingPasteboard) {
+        if let folders = folders {
             return validateDrop(for: folders, destination: destinationNode)
         }
 
@@ -220,16 +235,12 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
     }
 
     func outlineView(_ outlineView: NSOutlineView, acceptDrop info: NSDraggingInfo, item: Any?, childIndex index: Int) -> Bool {
-        let representedObject = (item as? BookmarkNode)?.representedObject
-        let draggedBookmarks = PasteboardBookmark.pasteboardBookmarks(with: info.draggingPasteboard) ?? Set<PasteboardBookmark>()
-        let draggedFolders = PasteboardFolder.pasteboardFolders(with: info.draggingPasteboard) ?? Set<PasteboardFolder>()
-
-        if draggedBookmarks.isEmpty && draggedFolders.isEmpty {
+        guard let draggedObjectIdentifiers = info.draggingPasteboard.pasteboardItems?.compactMap(\.bookmarkEntityUUID),
+              !draggedObjectIdentifiers.isEmpty else {
             return false
         }
-
-        let draggedObjectIdentifierStrings = draggedBookmarks.map(\.id) + draggedFolders.map(\.id)
-        let draggedObjectIdentifiers = draggedObjectIdentifierStrings.compactMap(UUID.init(uuidString:))
+        
+        let representedObject = (item as? BookmarkNode)?.representedObject
 
         // Handle the nil destination case:
 
@@ -255,9 +266,9 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
         }
 
         // Handle the existing destination case:
-        
+
         if let parent = representedObject as? BookmarkFolder {
-            bookmarkManager.add(objectsWithUUIDs: draggedObjectIdentifiers, to: parent) { error in
+            bookmarkManager.move(objectUUIDs: draggedObjectIdentifiers, toIndex: index, withinParentFolder: .parent(parent.id)) { error in
                 if let error = error {
                     os_log("Failed to accept existing parent drop via outline view: %s", error.localizedDescription)
                 }
@@ -265,7 +276,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
             
             return true
         } else if representedObject == nil {
-            bookmarkManager.add(objectsWithUUIDs: draggedObjectIdentifiers, to: nil) { error in
+            bookmarkManager.move(objectUUIDs: draggedObjectIdentifiers, toIndex: index, withinParentFolder: .root) { error in
                 if let error = error {
                     os_log("Failed to accept existing parent drop via outline view: %s", error.localizedDescription)
                 }

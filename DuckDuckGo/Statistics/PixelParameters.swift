@@ -71,6 +71,7 @@ extension Pixel.Event {
              .compileRulesWait,
              .serp,
              .dataImportFailed,
+             .faviconImportFailed,
              .formAutofilled,
              .autofillItemSaved,
              .waitlistFirstLaunch,

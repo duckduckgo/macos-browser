@@ -707,7 +707,7 @@ CQ
                                                             <action selector="resetDefaultGrammarChecks:" target="Ady-hI-5gd" id="Ces-GX-TM5"/>
                                                         </connections>
                                                     </menuItem>
-                                                    <menuItem title="Reset Secure Vault Data" id="opO-fm-tW5">
+                                                    <menuItem title="Reset Autofill Data" id="opO-fm-tW5">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                         <connections>
                                                             <action selector="resetSecureVaultData:" target="Ady-hI-5gd" id="5uS-MI-2BN"/>
