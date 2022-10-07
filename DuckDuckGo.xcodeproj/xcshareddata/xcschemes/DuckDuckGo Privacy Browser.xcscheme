@@ -68,6 +68,9 @@
             </BuildableReference>
             <SkippedTests>
                <Test
+                  Identifier = "CBRCompileTimeReporterTests">
+               </Test>
+               <Test
                   Identifier = "EncryptionKeyStoreTests">
                </Test>
                <Test
