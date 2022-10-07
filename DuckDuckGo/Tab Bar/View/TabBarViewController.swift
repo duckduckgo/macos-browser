@@ -54,6 +54,8 @@ final class TabBarViewController: NSViewController {
     private var selectionIndexCancellable: AnyCancellable?
     private var cancellables = Set<AnyCancellable>()
 
+    @IBOutlet weak var shadowView: TabShadowView!
+    
     required init?(coder: NSCoder) {
         fatalError("TabBarViewController: Bad initializer")
     }
