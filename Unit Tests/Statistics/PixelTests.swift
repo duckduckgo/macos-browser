@@ -37,31 +37,32 @@ class PixelTests: XCTestCase {
         super.tearDown()
     }
 
-//    func testWhenTimedPixelFiredThenCorrectDurationIsSet() {
-//        let expectation = XCTestExpectation()
-//
-//        let date: CFTimeInterval = 0
-//        let now: CFTimeInterval = 1
-//
-//        stub(condition: { request -> Bool in
-//            if let url = request.url {
-//                XCTAssertEqual("1.0", url.getParameter(named: "duration"))
-//                return true
-//            }
-//
-//            XCTFail("Did not find duration param")
-//            return true
-//        }, response: { _ -> HTTPStubsResponse in
-//            expectation.fulfill()
-//            return HTTPStubsResponse(data: Data(), statusCode: 200, headers: nil)
-//        })
-//
-//        let pixel = TimedPixel(.burn(), time: date)
-//
-//        pixel.fire(now)
-//
-//        wait(for: [expectation], timeout: 1.0)
-//    }
+    // Temporarily disabled, as this test gets caught in the Run Loop extension:
+    func testWhenTimedPixelFiredThenCorrectDurationIsSet() {
+        let expectation = XCTestExpectation()
+
+        let date: CFTimeInterval = 0
+        let now: CFTimeInterval = 1
+
+        stub(condition: { request -> Bool in
+            if let url = request.url {
+                XCTAssertEqual("1.0", url.getParameter(named: "duration"))
+                return true
+            }
+
+            XCTFail("Did not find duration param")
+            return true
+        }, response: { _ -> HTTPStubsResponse in
+            expectation.fulfill()
+            return HTTPStubsResponse(data: Data(), statusCode: 200, headers: nil)
+        })
+
+        let pixel = TimedPixel(.burn(), time: date)
+
+        pixel.fire(now)
+
+        wait(for: [expectation], timeout: 1.0)
+    }
     
     func testWhenPixelFiredThenAPIHeadersAreAdded() {
         let expectation = XCTestExpectation()

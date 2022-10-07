@@ -73,6 +73,9 @@
                <Test
                   Identifier = "PixelTests/testWhenErrorPixelIsFiredThenParametersAdded()">
                </Test>
+               <Test
+                  Identifier = "PixelTests/testWhenTimedPixelFiredThenCorrectDurationIsSet()">
+               </Test>
             </SkippedTests>
          </TestableReference>
          <TestableReference
