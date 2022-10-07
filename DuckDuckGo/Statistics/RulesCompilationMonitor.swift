@@ -57,12 +57,10 @@ final class AbstractContentBlockingAssetsCompilationTimeReporter<Caller: Hashabl
     private func report(waitTime: TimeInterval, result: Pixel.Event.WaitResult, completionHandler: @escaping ((Error?) -> Void) = { _ in }) {
         // report only once
         isFinished = true
-
-        // Temporarily removed until it's determined whether we need this:
-        //
-        // Pixel.fire(.compileRulesWait(onboardingShown: self.onboardingShown, waitTime: waitTime, result: result),
-        //            withAdditionalParameters: ["waitTime": String(waitTime)],
-        //            onComplete: completionHandler)
+        
+        Pixel.fire(.compileRulesWait(onboardingShown: self.onboardingShown, waitTime: waitTime, result: result),
+                   withAdditionalParameters: ["waitTime": String(waitTime)],
+                   onComplete: completionHandler)
     }
 
     /// Called when Rules compilation finishes
