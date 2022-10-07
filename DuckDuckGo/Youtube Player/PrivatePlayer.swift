@@ -108,6 +108,14 @@ extension PrivatePlayer {
 
     func decidePolicy(for navigationAction: WKNavigationAction, in tab: Tab) -> WKNavigationActionPolicy? {
         guard Self.isAvailable, mode != .disabled else {
+
+            // When the feature is disabled but the webView still gets a Private Player scheme URL,
+            // convert it back to a regular YouTube video URL.
+            if navigationAction.request.url?.isPrivatePlayerScheme == true,
+                let (videoID, timestamp) = navigationAction.request.url?.youtubeVideoParams {
+
+                tab.webView.load(.youtube(videoID, timestamp: timestamp))
+            }
             return nil
         }
 
