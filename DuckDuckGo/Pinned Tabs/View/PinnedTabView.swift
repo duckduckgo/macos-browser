@@ -16,7 +16,6 @@
 //  limitations under the License.
 //
 
-
 import SwiftUI
 
 struct PinnedTabView: View {
@@ -60,7 +59,9 @@ struct PinnedTabView: View {
                 collectionModel.hoveredItem = isHovered ? model : nil
             }
             
-            BorderView(isSelected: isSelected, cornerRadius: Const.cornerRadius, size: TabShadowConfig.dividerSize)
+            BorderView(isSelected: isSelected,
+                       cornerRadius: Const.cornerRadius,
+                       size: TabShadowConfig.dividerSize)
         }
     }
 
@@ -109,6 +110,10 @@ private struct BorderView: View {
         isSelected ? Color("InterfaceBackgroundColor") : Color(TabShadowConfig.colorName)
     }
     
+    private var cornerPixelsColor: Color {
+        isSelected ? .clear : bottomLineColor
+    }
+    
     var body: some View {
         ZStack {
             CustomRoundedCornersShape(inset: 0, tl: cornerRadius, tr: cornerRadius, bl: 0, br: 0)
@@ -118,11 +123,14 @@ private struct BorderView: View {
                 Spacer()
                 HStack {
                     Spacer().frame(width: 1, height: size, alignment: .leading)
+                        .background(cornerPixelsColor)
+                    
                     Rectangle()
                         .fill(bottomLineColor)
                         .frame(height: size, alignment: .leading)
                     
                     Spacer().frame(width: 1, height: size, alignment: .trailing)
+                        .background(cornerPixelsColor)
                 }
             }
         }
