@@ -59,7 +59,6 @@ protocol BookmarkStore {
 
 }
 
-// swiftlint:disable:next type_body_length
 final class LocalBookmarkStore: BookmarkStore {
     
     enum Constants {
