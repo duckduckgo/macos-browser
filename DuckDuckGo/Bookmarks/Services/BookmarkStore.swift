@@ -75,6 +75,7 @@ final class LocalBookmarkStore: BookmarkStore {
     }
     
     private func sharedInitialization() {
+        removeInvalidBookmarkEntities()
         migrateTopLevelStorageToRootLevelBookmarksFolder()
         cacheReadOnlyTopLevelBookmarksFolder()
     }
@@ -99,13 +100,13 @@ final class LocalBookmarkStore: BookmarkStore {
                                                  #keyPath(BookmarkManagedObject.parentFolder),
                                                  #keyPath(BookmarkManagedObject.isFolder))
             
-            let results = try? context.fetch(fetchRequest)
+            let results = (try? context.fetch(fetchRequest)) ?? []
 
-            guard (results?.count ?? 0) <= 1 else {
+            guard results.count == 1 else {
                 fatalError("There shouldn't be an orphaned folder")
             }
             
-            guard let folder = results?.first else {
+            guard let folder = results.first else {
                 fatalError("Top level folder missing")
             }
             
@@ -697,6 +698,33 @@ final class LocalBookmarkStore: BookmarkStore {
     
     // MARK: - Migration
     
+    /// There is a rare issue where bookmark managed objects can end up in the database with an invalid state, that is that they are missing their title value despite being non-optional.
+    /// They appear to be disjoint from a user's actual bookmarks data, so this function removes them.
+    private func removeInvalidBookmarkEntities() {
+        context.performAndWait {
+            let entitiesFetchRequest = Bookmark.bookmarksAndFoldersFetchRequest()
+            
+            do {
+                let entities = try self.context.fetch(entitiesFetchRequest)
+                
+                var deletedEntityCount = 0
+                
+                for entity in entities where entity.isInvalid {
+                    self.context.delete(entity)
+                    deletedEntityCount += 1
+                }
+                
+                if deletedEntityCount > 0 {
+                    Pixel.fire(.debug(event: .removedInvalidBookmarkManagedObjects))
+                }
+                
+                try self.context.save()
+            } catch {
+                os_log("Failed to remove invalid bookmark entities", type: .error)
+            }
+        }
+    }
+
     private func migrateTopLevelStorageToRootLevelBookmarksFolder() {
         context.performAndWait {
             // 1. Fetch all top-level entities and check that there isn't an existing root folder
@@ -714,6 +742,7 @@ final class LocalBookmarkStore: BookmarkStore {
                 
                 if let existingRootFolder = try self.context.fetch(rootFolderFetchRequest).first,
                    let rootFolderParent = existingRootFolder.parentFolder {
+                    
                     existingRootFolder.children?.forEach { child in
                         if let bookmarkEntity = child as? BookmarkManagedObject {
                             bookmarkEntity.parentFolder = rootFolderParent
@@ -748,17 +777,17 @@ final class LocalBookmarkStore: BookmarkStore {
                     existingTopLevelEntities.remove(at: existingTopLevelFolderIndex)
                 } else {
                     let managedObject = NSEntityDescription.insertNewObject(forEntityName: BookmarkManagedObject.className(), into: self.context)
-                    
+
                     guard let newTopLevelFolder = managedObject as? BookmarkManagedObject else {
                         assertionFailure("LocalBookmarkStore: Failed to migrate top level entities")
                         return
                     }
-                    
+
                     newTopLevelFolder.id = .rootBookmarkFolderUUID
                     newTopLevelFolder.titleEncrypted = "Root Bookmarks Folder" as NSString
                     newTopLevelFolder.isFolder = true
                     newTopLevelFolder.dateAdded = NSDate.now
-                    
+
                     topLevelFolder = newTopLevelFolder
                 }
                 
@@ -885,4 +914,16 @@ extension UUID {
         return UUID(uuidString: LocalBookmarkStore.Constants.rootFolderUUID)!
     }
     
+}
+
+fileprivate extension BookmarkManagedObject {
+    
+    var isInvalid: Bool {
+        if titleEncrypted == nil {
+            return true
+        }
+        
+        return false
+    }
+
 }

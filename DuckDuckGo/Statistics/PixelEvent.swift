@@ -234,6 +234,8 @@ extension Pixel {
             case adAttributionLogicWrongVendorOnFailedCompilation
             
             case webKitDidTerminate
+            
+            case removedInvalidBookmarkManagedObjects
         }
 
     }
@@ -525,6 +527,9 @@ extension Pixel.Event.Debug {
             
         case .webKitDidTerminate:
             return "webkit_did_terminate"
+            
+        case .removedInvalidBookmarkManagedObjects:
+            return "removed_invalid_bookmark_managed_objects"
         }
     }
 }
