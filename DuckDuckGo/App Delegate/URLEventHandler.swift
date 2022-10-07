@@ -44,7 +44,6 @@ final class URLEventHandler {
                 self.handler(url)
             }
 
-            Pixel.fire(.appLaunch(launch: urlsToOpen[0].isFileURL ? .openFile : .openURL))
             self.urlsToOpen = []
         }
         

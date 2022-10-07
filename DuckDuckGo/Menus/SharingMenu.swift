@@ -73,21 +73,8 @@ final class SharingMenu: NSMenu {
             return
         }
 
-        service.delegate = self
         service.subject = tabViewModel.title
         service.perform(withItems: [url])
-    }
-
-}
-
-extension SharingMenu: NSSharingServiceDelegate {
-
-    func sharingService(_ sharingService: NSSharingService, didShareItems items: [Any]) {
-        Pixel.fire(.sharingMenu(result: .success))
-    }
-
-    func sharingService(_ sharingService: NSSharingService, didFailToShareItems items: [Any], error: Error) {
-        Pixel.fire(.sharingMenu(result: .failure))
     }
 
 }

@@ -133,7 +133,6 @@ final class SaveCredentialsViewController: NSViewController {
 
         Pixel.fire(.autofillItemSaved(kind: .password))
         if self.fireproofCheck.state == .on {
-            Pixel.fire(.fireproof(kind: .pwm, suggested: .pwm))
             FireproofDomains.shared.add(domain: account.domain)
         } else {
             // If the Fireproof checkbox has been unchecked, and the domain is Fireproof, then un-Fireproof it.
@@ -172,13 +171,11 @@ final class SaveCredentialsViewController: NSViewController {
         let alert = NSAlert.fireproofAlert(with: host.droppingWwwPrefix())
         alert.beginSheetModal(for: window) { response in
             if response == NSApplication.ModalResponse.alertFirstButtonReturn {
-                Pixel.fire(.fireproof(kind: .pwm, suggested: .suggested))
                 FireproofDomains.shared.add(domain: host)
             }
             notifyDelegate()
         }
 
-        Pixel.fire(.fireproofSuggested())
     }
     
     @IBAction func onEditClicked(sender: Any?) {
