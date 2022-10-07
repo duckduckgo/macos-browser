@@ -155,12 +155,27 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
         }
         
         let destinationNode = nodeForItem(item)
+        
+        let bookmarks = PasteboardBookmark.pasteboardBookmarks(with: info.draggingPasteboard)
+        let folders = PasteboardFolder.pasteboardFolders(with: info.draggingPasteboard)
 
-        if let bookmarks = PasteboardBookmark.pasteboardBookmarks(with: info.draggingPasteboard) {
+        if let bookmarks = bookmarks, let folders = folders {
+            let canMoveBookmarks = validateDrop(for: bookmarks, destination: destinationNode) == .move
+            let canMoveFolders = validateDrop(for: folders, destination: destinationNode) == .move
+            
+            // If the dragged values contain both folders and bookmarks, only validate the move if all objects can be moved.
+            if canMoveBookmarks, canMoveFolders {
+                return .move
+            } else {
+                return .none
+            }
+        }
+
+        if let bookmarks = bookmarks {
             return validateDrop(for: bookmarks, destination: destinationNode)
         }
 
-        if let folders = PasteboardFolder.pasteboardFolders(with: info.draggingPasteboard) {
+        if let folders = folders {
             return validateDrop(for: folders, destination: destinationNode)
         }
 

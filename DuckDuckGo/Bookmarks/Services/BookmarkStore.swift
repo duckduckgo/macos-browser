@@ -464,13 +464,18 @@ final class LocalBookmarkStore: BookmarkStore {
                 completion(nil)
                 return
             }
-
-            let bookmarksFetchRequest = BaseBookmarkEntity.entities(with: objectUUIDs)
-
-            guard let bookmarkManagedObjects = try? self.context.fetch(bookmarksFetchRequest), let rootFolder = self.rootLevelFolder else {
-                assertionFailure("\(#file): Failed to get BookmarkManagedObject from the context")
+            
+            guard let rootFolder = self.rootLevelFolder else {
+                assertionFailure("\(#file): Failed to get root level folder")
                 completion(nil)
                 return
+            }
+            
+            // Guarantee that bookmarks are fetched in the same order as the UUIDs. In the future, this should fetch all objects at once with a
+            // batch fetch request and have them sorted in the correct order.
+            let bookmarkManagedObjects = objectUUIDs.compactMap { uuid in
+                let entityFetchRequest = BaseBookmarkEntity.singleEntity(with: uuid)
+                return (try? self.context.fetch(entityFetchRequest))?.first
             }
             
             let newParentFolder: BookmarkManagedObject
