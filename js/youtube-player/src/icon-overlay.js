@@ -40,6 +40,19 @@ export const IconOverlay = {
 
         overlayElement.querySelector('a.ddg-play-privately')?.setAttribute('href', href);
 
+        overlayElement.querySelector('a.ddg-play-privately').addEventListener('click', (event, a, b) => {
+            event.preventDefault();
+            event.stopPropagation();
+
+            let link = event.target.closest('a');
+            let href = link.getAttribute('href');
+
+            window.webkit?.messageHandlers?.openDuckPlayer?.postMessage(href);
+            console.log('SEND TO NATIVE: openDuckPlayer.postMessage("'+href+'")');
+
+            return;
+        })
+
         return overlayElement;
     },
 

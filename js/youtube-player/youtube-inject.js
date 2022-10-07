@@ -237,11 +237,52 @@ function enable(userValues, environment = defaultEnvironment, comms = defaultCom
         disable: () => {
             AllIconOverlays.enabled = false;
             IconOverlay.removeAll();
+        },
+
+        enableOpenDuckPlayerMessagingLinks: () => {
+            document.addEventListener('mousedown', (event) => {
+                let link = event.target.closest('a');
+
+                if (link) {
+                    event.preventDefault();
+                    event.stopPropagation();
+
+                    const href = VideoParams.fromHref(link.href)?.toPrivatePlayerUrl();
+
+                    window.webkit?.messageHandlers?.openDuckPlayer?.postMessage(href);
+                    console.log('SEND TO NATIVE: openDuckPlayer.postMessage("'+href+'")');
+
+                    return;
+                }
+            });
+        },
+
+        disableLinkClicks: () => {
+            document.querySelectorAll('a:not(.added)').forEach(element => {
+                if (element?.getAttribute('href')?.includes('/watch?v=')) {
+                    element.addEventListener('click', (event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        return;
+                    });
+
+                    element.classList.add('added');
+                }
+            });
         }
     };
 
     // Enable icon overlays on page load if not explicitly disabled
     if ('alwaysAsk' in userValues.privatePlayerMode) {
         AllIconOverlays.enableOnDOMLoaded();
+    } else {
+        onDOMLoaded(() => {
+            AllIconOverlays.enableOpenDuckPlayerMessagingLinks();
+            AllIconOverlays.disableLinkClicks();
+        });
+
+        onDOMChanged(() => {
+            AllIconOverlays.disableLinkClicks();
+        })
     }
 }

@@ -199,6 +199,15 @@
                     </div>
                 </a>`;
       overlayElement.querySelector("a.ddg-play-privately")?.setAttribute("href", href);
+      overlayElement.querySelector("a.ddg-play-privately").addEventListener("click", (event, a, b) => {
+        event.preventDefault();
+        event.stopPropagation();
+        let link = event.target.closest("a");
+        let href2 = link.getAttribute("href");
+        window.webkit?.messageHandlers?.openDuckPlayer?.postMessage(href2);
+        console.log('SEND TO NATIVE: openDuckPlayer.postMessage("' + href2 + '")');
+        return;
+      });
       return overlayElement;
     },
     getHoverOverlay: () => {
@@ -730,10 +739,43 @@
       disable: () => {
         AllIconOverlays.enabled = false;
         IconOverlay.removeAll();
+      },
+      enableOpenDuckPlayerMessagingLinks: () => {
+        document.addEventListener("mousedown", (event) => {
+          let link = event.target.closest("a");
+          if (link) {
+            event.preventDefault();
+            event.stopPropagation();
+            const href = VideoParams.fromHref(link.href)?.toPrivatePlayerUrl();
+            window.webkit?.messageHandlers?.openDuckPlayer?.postMessage(href);
+            console.log('SEND TO NATIVE: openDuckPlayer.postMessage("' + href + '")');
+            return;
+          }
+        });
+      },
+      disableLinkClicks: () => {
+        document.querySelectorAll("a:not(.added)").forEach((element) => {
+          if (element?.getAttribute("href")?.includes("/watch?v=")) {
+            element.addEventListener("click", (event) => {
+              event.preventDefault();
+              event.stopPropagation();
+              return;
+            });
+            element.classList.add("added");
+          }
+        });
       }
     };
     if ("alwaysAsk" in userValues.privatePlayerMode) {
       AllIconOverlays.enableOnDOMLoaded();
+    } else {
+      onDOMLoaded(() => {
+        AllIconOverlays.enableOpenDuckPlayerMessagingLinks();
+        AllIconOverlays.disableLinkClicks();
+      });
+      onDOMChanged(() => {
+        AllIconOverlays.disableLinkClicks();
+      });
     }
   }
 })();
