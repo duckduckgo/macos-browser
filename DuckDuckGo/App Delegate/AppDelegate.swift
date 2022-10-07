@@ -185,7 +185,7 @@ extension AppDelegate: AppUsageActivityMonitorDelegate {
     }
 
     func activeUsageTimeHasReachedThreshold(avgTabCount: Double) {
-        // This is a no-op.
+        // This is temporarily unused while we determine whether it required to determine an active user count.
     }
 
 }
