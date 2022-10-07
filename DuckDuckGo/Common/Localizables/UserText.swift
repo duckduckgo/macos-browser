@@ -138,7 +138,7 @@ struct UserText {
 
     static let privatePlayerSettingsTitle = NSLocalizedString("private-player.title", value: "Duck Player", comment: "Private YouTube Player settings title")
     static let privatePlayerAlwaysOpenInPlayer = NSLocalizedString("private-player.always-open-in-player", value: "Always open YouTube videos in Duck Player", comment: "Private YouTube Player option")
-    static let privatePlayerShowPlayerButtons = NSLocalizedString("private-player.show-buttons", value: "Show option to use Duck Player on hover", comment: "Private YouTube Player option")
+    static let privatePlayerShowPlayerButtons = NSLocalizedString("private-player.show-buttons", value: "Show option to use Duck Player over YouTube previews on hover", comment: "Private YouTube Player option")
     static let privatePlayerOff = NSLocalizedString("private-player.off", value: "Never use Duck Player", comment: "Private YouTube Player option")
     static let privatePlayerExplanation = NSLocalizedString("private-player.explanation", value: "Duck Player provides a clean viewing experience without personalized ads and prevents viewing activity from influencing your YouTube recommendations.", comment: "Private YouTube Player explanation in settings")
 
@@ -411,12 +411,11 @@ struct UserText {
         return String(format: localized, String(totalFailedImports))
     }
 
-    static let bookmarkImportSafariPermissionDescription = NSLocalizedString("import.bookmarks.safari.permission-description", value: "DuckDuckGo needs your permission to read the Safari bookmarks file. Select the Bookmarks.plist file to import bookmarks.", comment: "Description text for the Safari bookmark import permission screen")
-    static let bookmarkImportSafariRequestPermissionButtonTitle = NSLocalizedString("import.bookmarks.safari.permission-button.title", value: "Select Bookmarks File…", comment: "Text for the Safari bookmark import permission button")
+    static let bookmarkImportSafariPermissionDescription = NSLocalizedString("import.bookmarks.safari.permission-description", value: "DuckDuckGo needs your permission to read the Safari bookmarks file. Select the Safari folder to import bookmarks.", comment: "Description text for the Safari bookmark import permission screen")
+    static let bookmarkImportSafariRequestPermissionButtonTitle = NSLocalizedString("import.bookmarks.safari.permission-button.title", value: "Select Safari Folder…", comment: "Text for the Safari data import permission button")
 
     static let bookmarkImportBookmarksBar = NSLocalizedString("import.bookmarks.folder.bookmarks-bar", value: "Bookmarks Bar", comment: "Title text for Bookmarks Bar import folder")
     static let bookmarkImportOtherBookmarks = NSLocalizedString("import.bookmarks.folder.other-bookmarks", value: "Other Bookmarks", comment: "Title text for Other Bookmarks import folder")
-    static let bookmarkImportImportedFavorites = NSLocalizedString("import.bookmarks.folder.imported-favorites", value: "Imported Favorites", comment: "Title text for Imported Favorites import folder")
 
     static let bookmarkImportBookmarks = NSLocalizedString("import.bookmarks.bookmarks", value: "Bookmarks", comment: "Title text for the Bookmarks import option")
     static let bookmarkImportBookmarksAndFavorites = NSLocalizedString("import.bookmarks.bookmarks-and-favorites", value: "Bookmarks & Favorites", comment: "Title text for the Bookmarks & Favorites import option")

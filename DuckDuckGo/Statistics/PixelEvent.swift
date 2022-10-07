@@ -138,6 +138,7 @@ extension Pixel {
         case exportedBookmarks(repetition: Repetition = .init(key: "exported-bookmarks"))
         
         case dataImportFailed(action: DataImportAction, source: DataImportSource)
+        case faviconImportFailed(source: DataImportSource)
 
         case formAutofilled(kind: FormAutofillKind)
         case autofillItemSaved(kind: FormAutofillKind)
@@ -173,6 +174,7 @@ extension Pixel {
 
         enum Debug {
 
+            case dbContainerInitializationError
             case dbInitializationError
             case dbSaveExcludedHTTPSDomainsError
             case dbSaveBloomFilterError
@@ -324,6 +326,9 @@ extension Pixel.Event {
             
         case .dataImportFailed(action: let action, source: let source):
             return "m_mac_data-import-failed_\(action)_\(source)"
+            
+        case .faviconImportFailed(source: let source):
+            return "m_mac_favicon-import-failed_\(source)"
 
         case .formAutofilled(kind: let kind):
             return "m_mac_autofill_\(kind)"
@@ -341,7 +346,7 @@ extension Pixel.Event {
             return "m_mac_waitlist_lock_screen_dismissed"
 
         case .debug(event: let event, error: _):
-            return "m_mac_debug_\(event)"
+            return "m_mac_debug_\(event.name)"
 
         case .onboardingStartPressed:
             return "m_mac_onboarding_start_pressed"
@@ -405,6 +410,8 @@ extension Pixel.Event.Debug {
     var name: String {
         switch self {
         
+        case .dbContainerInitializationError:
+            return "database_container_error"
         case .dbInitializationError:
             return "dbie"
         case .dbSaveExcludedHTTPSDomainsError:

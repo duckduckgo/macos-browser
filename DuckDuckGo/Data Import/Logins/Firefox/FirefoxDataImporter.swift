@@ -22,19 +22,21 @@ final class FirefoxDataImporter: DataImporter {
 
     var primaryPassword: String?
 
-    let loginImporter: LoginImporter
-    let bookmarkImporter: BookmarkImporter
+    private let loginImporter: LoginImporter
+    private let bookmarkImporter: BookmarkImporter
+    private let faviconManager: FaviconManagement
 
-    init(loginImporter: LoginImporter, bookmarkImporter: BookmarkImporter) {
+    init(loginImporter: LoginImporter, bookmarkImporter: BookmarkImporter, faviconManager: FaviconManagement) {
         self.loginImporter = loginImporter
         self.bookmarkImporter = bookmarkImporter
+        self.faviconManager = faviconManager
     }
 
     func importableTypes() -> [DataImport.DataType] {
         return [.logins, .bookmarks]
     }
 
-    // swiftlint:disable:next cyclomatic_complexity
+    // swiftlint:disable:next cyclomatic_complexity function_body_length
     func importData(types: [DataImport.DataType],
                     from profile: DataImport.BrowserProfile?,
                     completion: @escaping (Result<DataImport.Summary, DataImportError>) -> Void) {
@@ -75,10 +77,12 @@ final class FirefoxDataImporter: DataImporter {
             let bookmarkReader = FirefoxBookmarksReader(firefoxDataDirectoryURL: firefoxProfileURL)
             let bookmarkResult = bookmarkReader.readBookmarks()
 
+            importFavicons(from: firefoxProfileURL)
+
             switch bookmarkResult {
             case .success(let bookmarks):
                 do {
-                    summary.bookmarksResult = try bookmarkImporter.importBookmarks(bookmarks, source: .firefox)
+                    summary.bookmarksResult = try bookmarkImporter.importBookmarks(bookmarks, source: .thirdPartyBrowser(.firefox))
                 } catch {
                     guard let error = error as? FirefoxBookmarksReader.ImportError else {
                         completion(.failure(.bookmarks(.unexpectedBookmarksDatabaseFormat)))
@@ -102,6 +106,32 @@ final class FirefoxDataImporter: DataImporter {
             importData(types: types, from: profile) { result in
                 continuation.resume(returning: result)
             }
+        }
+    }
+    
+    private func importFavicons(from firefoxProfileURL: URL) {
+        let faviconsReader = FirefoxFaviconsReader(firefoxDataDirectoryURL: firefoxProfileURL)
+        let faviconsResult = faviconsReader.readFavicons()
+        
+        switch faviconsResult {
+        case .success(let faviconsByURL):
+            for (pageURLString, fetchedFavicons) in faviconsByURL {
+                if let pageURL = URL(string: pageURLString) {
+                    let favicons = fetchedFavicons.map {
+                        Favicon(identifier: UUID(),
+                                url: pageURL,
+                                image: $0.image,
+                                relation: .icon,
+                                documentUrl: pageURL,
+                                dateCreated: Date())
+                    }
+                    
+                    faviconManager.handleFavicons(favicons, documentUrl: pageURL)
+                }
+            }
+            
+        case .failure:
+            Pixel.fire(.faviconImportFailed(source: .firefox))
         }
     }
 

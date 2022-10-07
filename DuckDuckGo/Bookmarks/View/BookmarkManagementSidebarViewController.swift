@@ -32,6 +32,13 @@ final class BookmarkManagementSidebarViewController: NSViewController {
         case empty
         case folder(BookmarkFolder)
         case favorites
+        
+        var selectedFolderUUID: UUID? {
+            switch self {
+            case .folder(let folder): return folder.id
+            default: return nil
+            }
+        }
     }
 
     @IBOutlet var tabSwitcherButton: NSPopUpButton!

@@ -27,8 +27,8 @@ enum BookmarkStoreFetchPredicateType {
 }
 
 enum ParentFolderType {
-    case parent
     case root
+    case parent(UUID)
 }
 
 struct BookmarkImportResult: Equatable {
@@ -54,7 +54,7 @@ protocol BookmarkStore {
     func add(objectsWithUUIDs: [UUID], to parent: BookmarkFolder?, completion: @escaping (Error?) -> Void)
     func update(objectsWithUUIDs uuids: [UUID], update: @escaping (BaseBookmarkEntity) -> Void, completion: @escaping (Error?) -> Void)
     func canMoveObjectWithUUID(objectUUID uuid: UUID, to parent: BookmarkFolder) -> Bool
-    func move(objectUUID: UUID, toIndex: Int?, withinParentFolder: ParentFolderType, completion: @escaping (Error?) -> Void)
+    func move(objectUUIDs: [UUID], toIndex: Int?, withinParentFolder: ParentFolderType, completion: @escaping (Error?) -> Void)
     func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarkImportResult
 
 }
@@ -457,38 +457,55 @@ final class LocalBookmarkStore: BookmarkStore {
         return canMoveObject
     }
     
-    func move(objectUUID: UUID, toIndex index: Int?, withinParentFolder type: ParentFolderType = .parent, completion: @escaping (Error?) -> Void) {
+    func move(objectUUIDs: [UUID], toIndex index: Int?, withinParentFolder type: ParentFolderType, completion: @escaping (Error?) -> Void) {
         context.perform { [weak self] in
             guard let self = self else {
                 assertionFailure("Couldn't get strong self")
                 completion(nil)
                 return
             }
-
-            let bookmarksFetchRequest = BaseBookmarkEntity.singleEntity(with: objectUUID)
-            let bookmarksResults = try? self.context.fetch(bookmarksFetchRequest)
-
-            guard let bookmarkManagedObject = bookmarksResults?.first,
-                  let currentParentFolder = bookmarkManagedObject.parentFolder,
-                  let rootFolder = self.rootLevelFolder else {
-                assertionFailure("\(#file): Failed to get BookmarkManagedObject from the context")
+            
+            guard let rootFolder = self.rootLevelFolder else {
+                assertionFailure("\(#file): Failed to get root level folder")
                 completion(nil)
                 return
+            }
+            
+            // Guarantee that bookmarks are fetched in the same order as the UUIDs. In the future, this should fetch all objects at once with a
+            // batch fetch request and have them sorted in the correct order.
+            let bookmarkManagedObjects: [BookmarkManagedObject] = objectUUIDs.compactMap { uuid in
+                let entityFetchRequest = BaseBookmarkEntity.singleEntity(with: uuid)
+                return (try? self.context.fetch(entityFetchRequest))?.first
             }
             
             let newParentFolder: BookmarkManagedObject
             
             switch type {
-            case .parent: newParentFolder = currentParentFolder
             case .root: newParentFolder = rootFolder
+            case .parent(let newParentUUID):
+                let bookmarksFetchRequest = BaseBookmarkEntity.singleEntity(with: newParentUUID)
+                
+                do {
+                    if let fetchedParent = try self.context.fetch(bookmarksFetchRequest).first, fetchedParent.isFolder {
+                        newParentFolder = fetchedParent
+                    } else {
+                        completion(nil)
+                        return
+                    }
+                } catch {
+                    completion(error)
+                    return
+                }
             }
-
-            currentParentFolder.mutableChildren.remove(bookmarkManagedObject)
             
             if let index = index, index < newParentFolder.mutableChildren.count {
-                newParentFolder.mutableChildren.insert(bookmarkManagedObject, at: index)
+                self.move(entities: bookmarkManagedObjects, to: index, within: newParentFolder)
             } else {
-                newParentFolder.mutableChildren.addObjects(from: [bookmarkManagedObject])
+                for bookmarkManagedObject in bookmarkManagedObjects {
+                    bookmarkManagedObject.parentFolder = nil
+                }
+
+                newParentFolder.mutableChildren.addObjects(from: bookmarkManagedObjects)
             }
 
             do {
@@ -500,6 +517,32 @@ final class LocalBookmarkStore: BookmarkStore {
             }
 
             DispatchQueue.main.async { completion(nil) }
+        }
+    }
+    
+    private func move(entities bookmarkManagedObjects: [BookmarkManagedObject], to index: Int, within newParentFolder: BookmarkManagedObject) {
+        var currentInsertionIndex = max(index, 0)
+        
+        for bookmarkManagedObject in bookmarkManagedObjects {
+            let movingObjectWithinSameFolder = bookmarkManagedObject.parentFolder?.id == newParentFolder.id
+            
+            var adjustedInsertionIndex = currentInsertionIndex
+            
+            if movingObjectWithinSameFolder, currentInsertionIndex > newParentFolder.mutableChildren.index(of: bookmarkManagedObject) {
+                adjustedInsertionIndex -= 1
+            }
+            
+            bookmarkManagedObject.parentFolder = nil
+            
+            // Removing the bookmark from its current parent may have removed it from the collection it is about to be added to, so re-check
+            // the bounds before adding it back.
+            if adjustedInsertionIndex < newParentFolder.mutableChildren.count {
+                newParentFolder.mutableChildren.insert(bookmarkManagedObject, at: adjustedInsertionIndex)
+            } else {
+                newParentFolder.mutableChildren.add(bookmarkManagedObject)
+            }
+
+            currentInsertionIndex += 1
         }
     }
 
@@ -519,25 +562,10 @@ final class LocalBookmarkStore: BookmarkStore {
 
         context.performAndWait {
             do {
-                var bookmarkURLs = Set<URL>()
-                let allBookmarks = try context.fetch(Bookmark.bookmarksFetchRequest())
-
-                for bookmark in allBookmarks {
-                    guard let bookmarkURL = bookmark.urlEncrypted as? URL else { continue }
-                    bookmarkURLs.insert(bookmarkURL)
-                }
-
                 let bookmarkCountBeforeImport = try context.count(for: Bookmark.bookmarksFetchRequest())
                 let allFolders = try context.fetch(BookmarkFolder.bookmarkFoldersFetchRequest())
-                
-                switch source {
-                case .duckduckgoWebKit:
-                    total += createEntitiesFromDDGWebKitBookmarks(allFolders: allFolders, bookmarks: bookmarks, bookmarkURLs: bookmarkURLs)
-                case .safari:
-                    total += createEntitiesFromSafariBookmarks(allFolders: allFolders, bookmarks: bookmarks, bookmarkURLs: bookmarkURLs)
-                case .chromium, .firefox:
-                    total += createEntitiesFromChromiumAndFirefoxBookmarks(allFolders: allFolders, bookmarks: bookmarks, bookmarkURLs: bookmarkURLs)
-                }
+
+                total += createEntitiesFromBookmarks(allFolders: allFolders, bookmarks: bookmarks, importSourceName: source.importSourceName)
 
                 try self.context.save()
                 let bookmarkCountAfterImport = try context.count(for: Bookmark.bookmarksFetchRequest())
@@ -556,16 +584,13 @@ final class LocalBookmarkStore: BookmarkStore {
         return total
     }
 
-    private func createEntitiesFromDDGWebKitBookmarks(allFolders: [BookmarkManagedObject],
-                                                      bookmarks: ImportedBookmarks,
-                                                      bookmarkURLs: Set<URL>) -> BookmarkImportResult {
+    private func createEntitiesFromDDGWebKitBookmarks(allFolders: [BookmarkManagedObject], bookmarks: ImportedBookmarks) -> BookmarkImportResult {
 
         var total = BookmarkImportResult(successful: 0, duplicates: 0, failed: 0)
 
         if let otherBookmarks = bookmarks.topLevelFolders.otherBookmarks.children {
             let result = recursivelyCreateEntities(from: otherBookmarks,
                                                    parent: nil,
-                                                   existingBookmarkURLs: bookmarkURLs,
                                                    in: self.context)
 
             total += result
@@ -575,20 +600,21 @@ final class LocalBookmarkStore: BookmarkStore {
 
     }
 
-    private func createEntitiesFromSafariBookmarks(allFolders: [BookmarkManagedObject],
-                                                   bookmarks: ImportedBookmarks,
-                                                   bookmarkURLs: Set<URL>) -> BookmarkImportResult {
+    private func createEntitiesFromBookmarks(allFolders: [BookmarkManagedObject],
+                                             bookmarks: ImportedBookmarks,
+                                             importSourceName: String) -> BookmarkImportResult {
         
         var total = BookmarkImportResult(successful: 0, duplicates: 0, failed: 0)
-        
-        let existingFolder = allFolders.first { ($0.titleEncrypted as? String) == UserText.bookmarkImportImportedFavorites }
-        let parent = existingFolder ?? createFolder(titled: UserText.bookmarkImportImportedFavorites, in: self.context)
-        
+        var parent: BookmarkManagedObject?
+
+        if rootLevelFolder?.children?.count != 0 {
+            parent = createFolder(titled: "Imported from \(importSourceName)", in: self.context)
+        }
+
         if let bookmarksBar = bookmarks.topLevelFolders.bookmarkBar.children {
             let result = recursivelyCreateEntities(from: bookmarksBar,
                                                    parent: parent,
-                                                   existingBookmarkURLs: bookmarkURLs,
-                                                   markBookmarksAsFavorite: true,
+                                                   markBookmarksAsFavorite: (parent == nil),
                                                    in: self.context)
 
             total += result
@@ -596,41 +622,7 @@ final class LocalBookmarkStore: BookmarkStore {
 
         if let otherBookmarks = bookmarks.topLevelFolders.otherBookmarks.children {
             let result = recursivelyCreateEntities(from: otherBookmarks,
-                                                   parent: nil,
-                                                   existingBookmarkURLs: bookmarkURLs,
-                                                   markBookmarksAsFavorite: false,
-                                                   in: self.context)
-            
-            total += result
-        }
-        
-        return total
-        
-    }
-    
-    private func createEntitiesFromChromiumAndFirefoxBookmarks(allFolders: [BookmarkManagedObject],
-                                                               bookmarks: ImportedBookmarks,
-                                                               bookmarkURLs: Set<URL>) -> BookmarkImportResult {
-        
-        var total = BookmarkImportResult(successful: 0, duplicates: 0, failed: 0)
-        
-        if let bookmarksBar = bookmarks.topLevelFolders.bookmarkBar.children {
-            let result = recursivelyCreateEntities(from: bookmarksBar,
-                                                   parent: nil,
-                                                   existingBookmarkURLs: bookmarkURLs,
-                                                   markBookmarksAsFavorite: true,
-                                                   in: self.context)
-
-            total += result
-        }
-        
-        let existingFolder = allFolders.first { ($0.titleEncrypted as? String) == UserText.bookmarkImportOtherBookmarks }
-        let parent = existingFolder ?? createFolder(titled: UserText.bookmarkImportOtherBookmarks, in: self.context)
-
-        if let otherBookmarks = bookmarks.topLevelFolders.otherBookmarks.children {
-            let result = recursivelyCreateEntities(from: otherBookmarks,
                                                    parent: parent,
-                                                   existingBookmarkURLs: bookmarkURLs,
                                                    markBookmarksAsFavorite: false,
                                                    in: self.context)
             
@@ -654,18 +646,11 @@ final class LocalBookmarkStore: BookmarkStore {
 
     private func recursivelyCreateEntities(from bookmarks: [ImportedBookmarks.BookmarkOrFolder],
                                            parent: BookmarkManagedObject?,
-                                           existingBookmarkURLs: Set<URL>,
                                            markBookmarksAsFavorite: Bool? = false,
                                            in context: NSManagedObjectContext) -> BookmarkImportResult {
         var total = BookmarkImportResult(successful: 0, duplicates: 0, failed: 0)
 
         for bookmarkOrFolder in bookmarks {
-            if let bookmarkURL = bookmarkOrFolder.url, existingBookmarkURLs.contains(bookmarkURL) {
-                // Avoid creating bookmarks that already exist in the database.
-                total.duplicates += 1
-                continue
-            }
-
             if bookmarkOrFolder.isInvalidBookmark {
                 // Skip importing bookmarks that don't have a valid URL
                 total.failed += 1
@@ -687,8 +672,7 @@ final class LocalBookmarkStore: BookmarkStore {
             if let children = bookmarkOrFolder.children {
                 let result = recursivelyCreateEntities(from: children,
                                                        parent: bookmarkManagedObject,
-                                                       existingBookmarkURLs: existingBookmarkURLs,
-                                                       markBookmarksAsFavorite: markBookmarksAsFavorite,
+                                                       markBookmarksAsFavorite: false,
                                                        in: context)
 
                 total += result
@@ -851,9 +835,9 @@ final class LocalBookmarkStore: BookmarkStore {
         }
     }
     
-    func move(objectUUID: UUID, toIndex index: Int, withinParentFolder parent: ParentFolderType = .parent) async -> Error? {
+    func move(objectUUIDs: [UUID], toIndex index: Int?, withinParentFolder parent: ParentFolderType) async -> Error? {
         return await withCheckedContinuation { continuation in
-            move(objectUUID: objectUUID, toIndex: index, withinParentFolder: parent) { error in
+            move(objectUUIDs: objectUUIDs, toIndex: index, withinParentFolder: parent) { error in
                 if let error = error {
                     continuation.resume(returning: error)
                     return

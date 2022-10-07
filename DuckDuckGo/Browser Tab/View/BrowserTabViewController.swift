@@ -317,7 +317,8 @@ final class BrowserTabViewController: NSViewController {
         let tab = Tab(content: content,
                       parentTab: parentTab,
                       shouldLoadInBackground: true,
-                      canBeClosedWithBack: canBeClosedWithBack)
+                      canBeClosedWithBack: canBeClosedWithBack,
+                      webViewFrame: view.frame)
 
         if parentTab != nil {
             tabCollectionViewModel.insertChild(tab: tab, selected: selected)
@@ -842,7 +843,8 @@ extension BrowserTabViewController: WKUIDelegate {
             return Tab(content: content,
                        webViewConfiguration: configuration,
                        parentTab: parentTab,
-                       canBeClosedWithBack: true)
+                       canBeClosedWithBack: true,
+                       webViewFrame: view.frame)
         }
         guard let parentTab = webView.tab else { return nil }
         func nextQuery(parentTab: Tab) -> PermissionAuthorizationQuery? {
