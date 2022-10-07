@@ -26,11 +26,20 @@ export const macOSCommunications = {
         return Promise.reject(resp)
     },
     onUserValuesNotification(cb) {
-        window.addEventListener("message", (evt) => {
-            if (!evt.isTrusted) return;
-            if (evt.origin !== window.location.origin) return;
-            if (!evt.data?.userValuesNotification) return;
-            cb(evt.data.userValuesNotification);
-        })
+        /**
+         * @typedef UserValuesNotification
+         * @property {import("../youtube-inject.js").UserValues} userValuesNotification
+         *
+         * This is how macOS 11+ receives updates
+         *
+         * @param {UserValuesNotification} values
+         */
+        window.onUserValuesChanged = function(values) {
+            if (!values?.userValuesNotification) {
+                console.error("missing userValuesNotification");
+                return;
+            }
+            cb(values.userValuesNotification)
+        }
     }
 }

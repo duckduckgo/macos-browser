@@ -15,7 +15,7 @@ const text = {
         "title": "Watch in Duck Player"
     },
     "videoButtonOptOut": {
-        "title": "No Thanks"
+        "title": "Watch Here"
     },
     "rememberLabel": {
         "title": "Remember my choice"
@@ -27,12 +27,12 @@ export const i18n = {
      * @param {keyof text} name
      */
     t(name) {
-        if (!Reflect.has(text, name)) {
+        if (!text.hasOwnProperty(name)) {
             console.error(`missing key ${name}`);
             return 'missing'
         }
-        const match = Reflect.get(text, name);
-        if (!Reflect.get(match, 'title')) {
+        const match = text[name];
+        if (!match.title) {
             return 'missing'
         }
         return match.title;

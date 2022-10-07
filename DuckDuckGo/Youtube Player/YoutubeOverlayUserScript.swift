@@ -54,12 +54,16 @@ final class YoutubeOverlayUserScript: NSObject, StaticUserScript {
             assertionFailure("YoutubeOverlayUserScript: could not convert UserValues into JSON")
             return
         }
-        let js = "window.postMessage(\(jsonString));"
-        evaluate(js: js, inWebView: webView)
+        if #available(macOS 11, *) {
+            let js = "window.onUserValuesChanged?.(\(jsonString));"
+            evaluate(js: js, inWebView: webView)
+        } else {
+            // for macos 10.x we're going to create and dispatch a Custom Event here with encrypted data
+        }
     }
 
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-        // Are we supporting 10.x?
+        // this will be used when we support macos 10.x
     }
 
     private func handleSetUserValues(message: WKScriptMessage, _ replyHandler: @escaping (Any?, String?) -> Void) {
