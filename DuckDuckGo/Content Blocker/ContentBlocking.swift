@@ -118,7 +118,9 @@ final class ContentBlocking {
             domainEvent = .contentBlockingCompilationFailed(listType: listType, component: component)
 
         case .contentBlockingCompilationTime:
-            domainEvent = .contentBlockingCompilationTime
+            // Temporarily avoid firing this pixel. This can be re-enabled if it's determined to be necessary later.
+            // domainEvent = .contentBlockingCompilationTime
+            return
         }
 
         Pixel.fire(.debug(event: domainEvent, error: error), withAdditionalParameters: parameters, onComplete: onComplete)
