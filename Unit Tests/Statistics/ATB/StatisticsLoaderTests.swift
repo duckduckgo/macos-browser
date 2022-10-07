@@ -234,7 +234,6 @@ class StatisticsLoaderTests: XCTestCase {
         let expect = expectation(description: "Search retention ATB requested")
         testee.refreshRetentionAtb(isSearch: true) {
             XCTAssertEqual(self.mockStatisticsStore.atb, "v20-1")
-            XCTAssertEqual(self.mockStatisticsStore.appRetentionAtb, "v77-5")
             XCTAssertEqual(self.mockStatisticsStore.searchRetentionAtb, "v77-5")
             expect.fulfill()
         }
@@ -242,6 +241,7 @@ class StatisticsLoaderTests: XCTestCase {
         waitForExpectations(timeout: 1, handler: nil)
     }
 
+    // Disabled, app retention ATB is not currently used
     func testWhenRefreshRetentionAtbIsPerformedForNavigationThenAppRetentionAtbRequested() {
         mockStatisticsStore.atb = "atb"
         mockStatisticsStore.appRetentionAtb = "appRetentionAtb"
