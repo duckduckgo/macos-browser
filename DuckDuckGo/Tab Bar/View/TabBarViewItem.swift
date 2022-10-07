@@ -302,7 +302,10 @@ final class TabBarViewItem: NSCollectionViewItem {
     
     private func updateBorderLayerColor() {
         NSAppearance.withAppAppearance {
+            CATransaction.begin()
+            CATransaction.setDisableActions(true)
             borderLayer.borderColor = NSColor(named: TabShadowConfig.colorName)?.cgColor
+            CATransaction.commit()
         }
     }
     
