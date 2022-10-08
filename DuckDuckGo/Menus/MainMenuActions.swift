@@ -618,12 +618,6 @@ extension MainViewController {
         LocalBookmarkManager.shared.resetBookmarks()
     }
 
-    @IBAction func resetMacWaitlistUnlockState(_ sender: Any?) {
-        OnboardingViewModel().restart()
-        let store = MacWaitlistEncryptedFileStorage()
-        store.deleteExistingMetadata()
-    }
-
     @IBAction func resetPinnedTabs(_ sender: Any?) {
         if tabCollectionViewModel.selectedTabIndex?.isPinnedTab == true, tabCollectionViewModel.tabCollection.tabs.count > 0 {
             tabCollectionViewModel.select(at: .unpinned(0))

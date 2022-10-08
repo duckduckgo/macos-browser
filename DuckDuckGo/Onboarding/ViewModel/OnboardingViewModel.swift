@@ -83,6 +83,7 @@ final class OnboardingViewModel: ObservableObject {
     func onSetDefaultPressed() {
         delegate?.onboardingDidRequestSetDefault { [weak self] in
             self?.state = .startBrowsing
+            self?.onboardingFinished = true
             self?.delegate?.onboardingHasFinished()
         }
     }
