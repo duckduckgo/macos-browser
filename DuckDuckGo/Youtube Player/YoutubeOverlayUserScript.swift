@@ -78,15 +78,6 @@ final class YoutubeOverlayUserScript: NSObject, StaticUserScript {
         replyHandler(encodeUserValues(), nil)
     }
 
-    private func handleAlwaysOpenSettings(message: WKScriptMessage) {
-        guard let alwaysOpenOnPrivatePlayer = message.body as? Bool else {
-            assertionFailure("YoutubePlayerUserScript: expected Bool")
-            return
-        }
-
-        privatePlayerPreferences.privatePlayerMode = .enabled
-    }
-
     private func handleReadUserValues(message: WKScriptMessage, _ replyHandler: @escaping (Any?, String?) -> Void) {
         replyHandler(encodeUserValues(), nil)
     }
