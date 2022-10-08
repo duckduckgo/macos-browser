@@ -697,7 +697,13 @@ extension BookmarkManagementDetailViewController: BookmarkMenuItemSelectors {
     }
     
     func deleteEntities(_ sender: NSMenuItem) {
-        guard let uuids = sender.representedObject as? [UUID] else {
+        let uuids: [UUID]
+        
+        if let array = sender.representedObject as? [UUID] {
+            uuids = array
+        } else if let objects = sender.representedObject as? [BaseBookmarkEntity] {
+            uuids = objects.map(\.id)
+        } else {
             assertionFailure("Failed to cast menu item's represented object to UUID array")
             return
         }
