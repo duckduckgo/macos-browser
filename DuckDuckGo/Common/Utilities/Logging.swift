@@ -72,10 +72,18 @@ extension OSLog {
     static var attribution: OSLog {
         Logging.attributionLoggingEnabled ? Logging.attributionLog : .disabled
     }
+    
+    static var atb: OSLog {
+        Logging.atbLoggingEnabled ? Logging.atbLog : .disabled
+    }
+    
 }
 
 struct Logging {
 
+    fileprivate static let atbLoggingEnabled = false
+    fileprivate static let atbLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "ATB")
+    
     fileprivate static let configLoggingEnabled = false
     fileprivate static let configLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Configuration Downloading")
 

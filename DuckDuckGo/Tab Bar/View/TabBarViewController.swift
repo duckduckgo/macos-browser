@@ -54,6 +54,8 @@ final class TabBarViewController: NSViewController {
     private var selectionIndexCancellable: AnyCancellable?
     private var cancellables = Set<AnyCancellable>()
 
+    @IBOutlet weak var shadowView: TabShadowView!
+    
     required init?(coder: NSCoder) {
         fatalError("TabBarViewController: Bad initializer")
     }
@@ -133,6 +135,7 @@ final class TabBarViewController: NSViewController {
     }
 
     private func setupFireButton() {
+        fireButton.toolTip = UserText.clearBrowsingHistoryTooltip
         fireButton.animationNames = MouseOverAnimationButton.AnimationNames(aqua: "flame-mouse-over", dark: "dark-flame-mouse-over")
     }
 
@@ -724,7 +727,6 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
     private func bookmarkTab(with url: URL, title: String) {
         if !bookmarkManager.isUrlBookmarked(url: url) {
             bookmarkManager.makeBookmark(for: url, title: title, isFavorite: false)
-            Pixel.fire(.bookmark(fireproofed: .init(url: url), source: .tabMenu))
         }
     }
 
@@ -734,7 +736,6 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
             return
         }
 
-        Pixel.fire(.fireproof(kind: .init(url: url), suggested: .manual))
         FireproofDomains.shared.add(domain: host)
     }
 
@@ -802,7 +803,9 @@ extension TabBarViewController: NSCollectionViewDataSource {
         if let footer = view as? TabBarFooter {
             footer.addButton?.target = self
             footer.addButton?.action = #selector(addButtonAction(_:))
+            footer.toolTip = UserText.newTabTooltip
         }
+
         return view
     }
 

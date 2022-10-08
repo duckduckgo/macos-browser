@@ -37,6 +37,9 @@
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="efe-Pc-ueP" userLabel="Window Dragging View" customClass="WindowDraggingView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="0.0" width="845" height="34"/>
                             </customView>
+                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="G3d-9f-GhJ" userLabel="ShadowView" customClass="TabShadowView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="0.0" width="845" height="34"/>
+                            </customView>
                             <stackView distribution="fillEqually" orientation="horizontal" alignment="top" spacing="0.0" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="kOb-4q-pAe">
                                 <rect key="frame" x="76" y="18" width="0.0" height="0.0"/>
                                 <subviews>
@@ -76,11 +79,11 @@
                             <scrollView wantsLayer="YES" borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasVerticalScroller="NO" verticalScrollElasticity="none" translatesAutoresizingMaskIntoConstraints="NO" id="O0X-yp-zLn" customClass="TabBarScrollView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                 <rect key="frame" x="76" y="1" width="693" height="34"/>
                                 <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zdf-RD-hTG">
-                                    <rect key="frame" x="0.0" y="0.0" width="693" height="34"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="693" height="19"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <collectionView selectable="YES" allowsEmptySelection="NO" translatesAutoresizingMaskIntoConstraints="NO" id="OEu-5P-cRF" customClass="TabBarCollectionView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                            <rect key="frame" x="0.0" y="0.0" width="693" height="34"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="693" height="19"/>
                                             <autoresizingMask key="autoresizingMask" heightSizable="YES"/>
                                             <collectionViewFlowLayout key="collectionViewLayout" scrollDirection="horizontal" id="oAv-jh-KDw">
                                                 <size key="itemSize" width="120" height="32"/>
@@ -100,7 +103,7 @@
                                 </constraints>
                                 <edgeInsets key="contentInsets" left="0.0" right="0.0" top="0.0" bottom="0.0"/>
                                 <scroller key="horizontalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="f6A-N1-Ed1">
-                                    <rect key="frame" x="0.0" y="18" width="693" height="16"/>
+                                    <rect key="frame" x="0.0" y="19" width="693" height="15"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
                                 <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="tXZ-5R-7cy">
@@ -223,7 +226,9 @@
                             <constraint firstItem="efe-Pc-ueP" firstAttribute="top" secondItem="JQD-ov-FCr" secondAttribute="top" id="IfJ-U1-mpT"/>
                             <constraint firstItem="dN1-y1-5Xe" firstAttribute="centerY" secondItem="O0X-yp-zLn" secondAttribute="centerY" id="M6c-OC-8Nn"/>
                             <constraint firstItem="O0X-yp-zLn" firstAttribute="leading" secondItem="kOb-4q-pAe" secondAttribute="trailing" id="MVf-BL-bYZ"/>
+                            <constraint firstAttribute="trailing" secondItem="G3d-9f-GhJ" secondAttribute="trailing" id="PAU-Zm-fHa"/>
                             <constraint firstItem="1Zn-JZ-2g3" firstAttribute="top" secondItem="G3c-kC-Gu9" secondAttribute="top" id="QN9-ks-xLD"/>
+                            <constraint firstItem="G3d-9f-GhJ" firstAttribute="leading" secondItem="JQD-ov-FCr" secondAttribute="leading" id="QP4-i8-VXO"/>
                             <constraint firstAttribute="bottom" secondItem="efe-Pc-ueT" secondAttribute="bottom" priority="750" id="Si3-u3-31S"/>
                             <constraint firstAttribute="trailing" secondItem="dN1-y1-5Xe" secondAttribute="trailing" constant="12" id="SiM-7u-jTo"/>
                             <constraint firstItem="efe-Pc-ueP" firstAttribute="leading" secondItem="JQD-ov-FCr" secondAttribute="leading" id="UBO-rv-mb4"/>
@@ -237,9 +242,11 @@
                             <constraint firstAttribute="bottom" secondItem="efe-Pc-ueP" secondAttribute="bottom" id="iYT-Di-UlL"/>
                             <constraint firstItem="1Zn-JZ-2g3" firstAttribute="leading" secondItem="G3c-kC-Gu9" secondAttribute="leading" id="kBj-jh-X0L"/>
                             <constraint firstItem="efe-Pc-ueT" firstAttribute="top" secondItem="JQD-ov-FCr" secondAttribute="top" priority="750" id="kNA-2I-L0U"/>
+                            <constraint firstAttribute="bottom" secondItem="G3d-9f-GhJ" secondAttribute="bottom" id="m1b-9d-wVV"/>
                             <constraint firstItem="G3c-kC-Gu9" firstAttribute="height" secondItem="O0X-yp-zLn" secondAttribute="height" id="n4S-57-Odv"/>
                             <constraint firstAttribute="bottom" secondItem="8Av-Au-VBq" secondAttribute="bottom" id="pat-VC-dVb"/>
                             <constraint firstItem="kOb-4q-pAe" firstAttribute="leading" secondItem="G3c-kC-Gu9" secondAttribute="trailing" id="qU6-dU-yJw"/>
+                            <constraint firstItem="G3d-9f-GhJ" firstAttribute="top" secondItem="JQD-ov-FCr" secondAttribute="top" id="wlc-yX-7YA"/>
                             <constraint firstItem="u4N-Qc-LMf" firstAttribute="top" secondItem="JQD-ov-FCr" secondAttribute="top" id="zB8-BE-pJR"/>
                         </constraints>
                     </view>
@@ -255,6 +262,7 @@
                         <outlet property="rightScrollButton" destination="2da-G7-xcP" id="4ka-kI-E1j"/>
                         <outlet property="rightShadowImageView" destination="u4N-Qc-LMf" id="QX4-lD-gfb"/>
                         <outlet property="scrollView" destination="O0X-yp-zLn" id="g9v-fn-qxC"/>
+                        <outlet property="shadowView" destination="G3d-9f-GhJ" id="OSV-TN-lVS"/>
                         <outlet property="windowDraggingViewLeadingConstraint" destination="5k3-uY-xby" id="kVU-yU-9M4"/>
                     </connections>
                 </viewController>

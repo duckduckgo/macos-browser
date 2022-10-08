@@ -148,6 +148,8 @@ final class NavigationBarViewController: NSViewController {
         bookmarkListButton.sendAction(on: .leftMouseDown)
         downloadsButton.sendAction(on: .leftMouseDown)
         
+        optionsButton.toolTip = UserText.applicationMenuTooltip
+        
         #if DEBUG || REVIEW
         addDebugNotificationListeners()
         #endif
@@ -228,7 +230,6 @@ final class NavigationBarViewController: NSViewController {
             return
         }
 
-        Pixel.fire(.refresh(source: .init(sender: sender, default: .button)))
         selectedTabViewModel.reload()
     }
 
@@ -370,7 +371,6 @@ final class NavigationBarViewController: NSViewController {
             bookmarkListPopover.viewController.currentTabWebsite = .init(tab)
         }
         bookmarkListPopover.show(relativeTo: bookmarkListButton.bounds.insetFromLineOfDeath(), of: bookmarkListButton, preferredEdge: .maxY)
-        Pixel.fire(.bookmarksList(source: .button))
     }
 
     func showPasswordManagementPopover(sender: Any, selectedCategory: SecureVaultSorting.Category?) {
@@ -380,10 +380,9 @@ final class NavigationBarViewController: NSViewController {
         passwordManagementPopover.show(relativeTo: passwordManagementButton.bounds.insetFromLineOfDeath(),
                                        of: passwordManagementButton,
                                        preferredEdge: .minY)
-        Pixel.fire(.manageLogins(source: sender is NSButton ? .button : (sender is MainMenu ? .mainMenu : .moreMenu)))
     }
 
-    func toggleDownloadsPopover(keepButtonVisible: Bool, shouldFirePixel: Bool = true) {
+    func toggleDownloadsPopover(keepButtonVisible: Bool) {
         if downloadsPopover.isShown {
             downloadsPopover.close()
             return
@@ -397,10 +396,6 @@ final class NavigationBarViewController: NSViewController {
             setDownloadButtonHidingTimer()
         }
         downloadsPopover.show(relativeTo: downloadsButton.bounds.insetFromLineOfDeath(), of: downloadsButton, preferredEdge: .maxY)
-
-        if shouldFirePixel {
-            Pixel.fire(.manageDownloads(source: .button))
-        }
     }
 
     private var downloadsPopoverTimer: Timer?
@@ -415,7 +410,7 @@ final class NavigationBarViewController: NSViewController {
         }
 
         if !self.downloadsPopover.isShown {
-            self.toggleDownloadsPopover(keepButtonVisible: true, shouldFirePixel: false)
+            self.toggleDownloadsPopover(keepButtonVisible: true)
 
             downloadsPopoverTimer = Timer.scheduledTimer(withTimeInterval: Constants.downloadsPopoverAutoHidingInterval,
                                                          repeats: false,
@@ -430,6 +425,10 @@ final class NavigationBarViewController: NSViewController {
         let forwardButtonMenu = NSMenu()
         forwardButtonMenu.delegate = goForwardButtonMenuDelegate
         goForwardButton.menu = forwardButtonMenu
+        
+        goBackButton.toolTip = UserText.navigateBackTooltip
+        goForwardButton.toolTip = UserText.navigateForwardTooltip
+        refreshButton.toolTip = UserText.refreshPageTooltip
     }
 
     private func subscribeToSelectedTabViewModel() {

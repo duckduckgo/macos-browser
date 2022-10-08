@@ -89,10 +89,6 @@ final class BookmarkPopoverViewController: NSViewController {
         self.bookmark = bookmark
 
         bookmarkManager.update(bookmark: bookmark)
-
-        if bookmark.isFavorite {
-            Pixel.fire(.favorite(fireproofed: .init(url: bookmark.url), source: .button))
-        }
     }
 
     private func updateSubviews() {

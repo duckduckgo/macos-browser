@@ -63,7 +63,6 @@ final class MoreOptionsMenu: NSMenu {
 
         addItem(withTitle: "Send Feedback", action: #selector(AppDelegate.openFeedback(_:)), keyEquivalent: "")
             .withImage(NSImage(named: "BetaLabel"))
-            .firingPixel(.feedback)
 
         addItem(NSMenuItem.separator())
 
@@ -88,7 +87,6 @@ final class MoreOptionsMenu: NSMenu {
         let preferencesItem = NSMenuItem(title: UserText.settings, action: #selector(openPreferences(_:)), keyEquivalent: "")
             .targetting(self)
             .withImage(NSImage(named: "Preferences"))
-            .firingPixel(Pixel.Event.MoreResult.preferences)
         addItem(preferencesItem)
     }
 
@@ -161,37 +159,17 @@ final class MoreOptionsMenu: NSMenu {
         actionDelegate?.optionsButtonMenuRequestedPrint(self)
     }
 
-    override func performActionForItem(at index: Int) {
-        defer {
-            super.performActionForItem(at: index)
-        }
-
-        guard let item = self.item(at: index) else {
-            assertionFailure("MainViewController: No Menu Item at index \(index)")
-            return
-        }
-
-        // For now assume there must be a pixel.  This might change later as we reign this in.
-        guard let pixel = item.representedObject as? Pixel.Event.MoreResult else {
-            assertionFailure("MainViewController: No pixel for menu at \(index)")
-            return
-        }
-        Pixel.fire(.moreMenu(result: pixel))
-    }
-
     private func addWindowItems() {
 
         // New Tab
         addItem(withTitle: UserText.plusButtonNewTabMenuItem, action: #selector(newTab(_:)), keyEquivalent: "t")
             .targetting(self)
             .withImage(NSImage(named: "Add"))
-            .firingPixel(Pixel.Event.MoreResult.newTab)
 
         // New Window
         addItem(withTitle: UserText.newWindowMenuItem, action: #selector(newWindow(_:)), keyEquivalent: "n")
             .targetting(self)
             .withImage(NSImage(named: "NewWindow"))
-            .firingPixel(Pixel.Event.MoreResult.newWindow)
 
         addItem(NSMenuItem.separator())
 
@@ -204,12 +182,10 @@ final class MoreOptionsMenu: NSMenu {
             .targetting(self)
             .withImage(NSImage(named: "Bookmarks"))
             .withSubmenu(bookmarksSubMenu)
-            .firingPixel(Pixel.Event.MoreResult.bookmarksList)
 
         addItem(withTitle: UserText.downloads, action: #selector(openDownloads), keyEquivalent: "j")
             .targetting(self)
             .withImage(NSImage(named: "Downloads"))
-            .firingPixel(Pixel.Event.MoreResult.downloads)
 
         let loginsSubMenu = LoginsSubMenu(targetting: self)
 
@@ -217,7 +193,6 @@ final class MoreOptionsMenu: NSMenu {
             .targetting(self)
             .withImage(NSImage(named: "PasswordManagement"))
             .withSubmenu(loginsSubMenu)
-            .firingPixel(Pixel.Event.MoreResult.loginsMenu)
 
         addItem(NSMenuItem.separator())
     }
@@ -234,14 +209,12 @@ final class MoreOptionsMenu: NSMenu {
             addItem(withTitle: title, action: #selector(toggleFireproofing(_:)), keyEquivalent: "")
                 .targetting(self)
                 .withImage(image)
-                .firingPixel(Pixel.Event.MoreResult.fireproof)
 
         }
 
         addItem(withTitle: UserText.findInPageMenuItem, action: #selector(findInPage(_:)), keyEquivalent: "f")
             .targetting(self)
             .withImage(NSImage(named: "Find-Search"))
-            .representedObject = Pixel.Event.MoreResult.findInPage
 
         addItem(withTitle: UserText.shareMenuItem, action: nil, keyEquivalent: "")
             .targetting(self)
@@ -251,7 +224,6 @@ final class MoreOptionsMenu: NSMenu {
         addItem(withTitle: UserText.printMenuItem, action: #selector(doPrint(_:)), keyEquivalent: "")
             .targetting(self)
             .withImage(NSImage(named: "Print"))
-            .firingPixel(Pixel.Event.MoreResult.print)
 
         addItem(NSMenuItem.separator())
 
@@ -316,18 +288,15 @@ final class EmailOptionsButtonSubMenu: NSMenu {
             NSPasteboard.general.setString(address, forType: .string)
             NotificationCenter.default.post(name: NSNotification.Name.privateEmailCopiedToClipboard, object: nil)
         }
-        Pixel.fire(.moreMenu(result: .emailProtectionCreateAddress))
     }
 
     @objc func turnOffEmailAction(_ sender: NSMenuItem) {
         emailManager.signOut()
-        Pixel.fire(.moreMenu(result: .emailProtectionOff))
     }
 
     @objc func turnOnEmailAction(_ sender: NSMenuItem) {
         let tab = Tab(content: .url(EmailUrls().emailProtectionLink))
         tabCollectionViewModel.append(tab: tab)
-        Pixel.fire(.moreMenu(result: .emailProtection))
     }
 
     @objc func emailDidSignInNotification(_ notification: Notification) {
@@ -387,7 +356,6 @@ final class BookmarksSubMenu: NSMenu {
         let bookmarkPageItem = addItem(withTitle: UserText.bookmarkThisPage, action: #selector(MoreOptionsMenu.bookmarkPage(_:)), keyEquivalent: "d")
             .withModifierMask([.command])
             .targetting(target)
-            .firingPixel(Pixel.Event.MoreResult.bookmarksMenuBookmarkThisPage)
 
         bookmarkPageItem.isEnabled = tabCollectionViewModel.selectedTabViewModel?.canBeBookmarked == true
         
@@ -395,7 +363,6 @@ final class BookmarksSubMenu: NSMenu {
         
         addItem(withTitle: UserText.bookmarksShowToolbarPanel, action: #selector(MoreOptionsMenu.openBookmarks(_:)), keyEquivalent: "")
             .targetting(target)
-            .firingPixel(Pixel.Event.MoreResult.bookmarksMenuShowToolbarPanel)
 
         addItem(NSMenuItem.separator())
         
@@ -423,9 +390,8 @@ final class BookmarksSubMenu: NSMenu {
         
         addItem(NSMenuItem.separator())
 
-        addItem(withTitle: "Import Bookmarks and Passwords...", action: #selector(MoreOptionsMenu.openBookmarkImportInterface(_:)), keyEquivalent: "")
+        addItem(withTitle: UserText.importBrowserData, action: #selector(MoreOptionsMenu.openBookmarkImportInterface(_:)), keyEquivalent: "")
             .targetting(target)
-            .firingPixel(Pixel.Event.MoreResult.bookmarksMenuImportBookmarks)
     }
     
     private func bookmarkMenuItems(from bookmarkViewModels: [BookmarkViewModel], topLevel: Bool = true) -> [NSMenuItem] {
@@ -475,35 +441,25 @@ final class LoginsSubMenu: NSMenu {
     private func updateMenuItems(with target: AnyObject) {
         addItem(withTitle: UserText.passwordManagementAllItems, action: #selector(MoreOptionsMenu.openAutofillWithAllItems), keyEquivalent: "")
             .targetting(target)
-            .firingPixel(Pixel.Event.MoreResult.loginsMenuAllItems)
 
         addItem(NSMenuItem.separator())
 
         addItem(withTitle: UserText.passwordManagementLogins, action: #selector(MoreOptionsMenu.openAutofillWithLogins), keyEquivalent: "")
             .targetting(target)
             .withImage(NSImage(named: "LoginGlyph"))
-            .firingPixel(Pixel.Event.MoreResult.loginsMenuLogins)
 
         addItem(withTitle: UserText.passwordManagementIdentities, action: #selector(MoreOptionsMenu.openAutofillWithIdentities), keyEquivalent: "")
             .targetting(target)
             .withImage(NSImage(named: "IdentityGlyph"))
-            .firingPixel(Pixel.Event.MoreResult.loginsMenuIdentities)
 
         addItem(withTitle: UserText.passwordManagementCreditCards, action: #selector(MoreOptionsMenu.openAutofillWithCreditCards), keyEquivalent: "")
             .targetting(target)
             .withImage(NSImage(named: "CreditCardGlyph"))
-            .firingPixel(Pixel.Event.MoreResult.loginsMenuCreditCards)
     }
 
 }
 
 extension NSMenuItem {
-
-    @discardableResult
-    func firingPixel(_ pixel: Pixel.Event.MoreResult) -> NSMenuItem {
-        representedObject = pixel
-        return self
-    }
 
     @discardableResult
     func withImage(_ image: NSImage?) -> NSMenuItem {
