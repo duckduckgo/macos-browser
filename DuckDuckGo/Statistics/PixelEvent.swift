@@ -96,10 +96,6 @@ extension Pixel {
 
         case formAutofilled(kind: FormAutofillKind)
         case autofillItemSaved(kind: FormAutofillKind)
-        
-        case waitlistFirstLaunch
-        case waitlistPresentedLockScreen
-        case waitlistDismissedLockScreen
 
         case autoconsentOptOutFailed
         case autoconsentSelfTestFailed
@@ -211,15 +207,6 @@ extension Pixel.Event {
 
         case .autofillItemSaved(kind: let kind):
             return "m_mac_save_\(kind)"
-            
-        case .waitlistFirstLaunch:
-            return "m_mac_waitlist_first_launch_while_locked"
-            
-        case .waitlistPresentedLockScreen:
-            return "m_mac_waitlist_lock_screen_presented"
-            
-        case .waitlistDismissedLockScreen:
-            return "m_mac_waitlist_lock_screen_dismissed"
 
         case .debug(event: let event, error: _):
             return "m_mac_debug_\(event.name)"

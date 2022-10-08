@@ -37,6 +37,15 @@ enum Preferences {
     }
 
     enum Const {
+
+        static let pickerHorizontalOffset: CGFloat = {
+            if #available(macOS 12.0, *) {
+                return -8
+            } else {
+                return 0
+            }
+        }()
+
         enum Fonts {
 
             static let popUpButton: NSFont = {

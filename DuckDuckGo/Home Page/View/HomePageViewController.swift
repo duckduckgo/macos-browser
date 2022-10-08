@@ -173,16 +173,16 @@ final class HomePageViewController: NSViewController {
         }
 
         if target == .newTab || NSApplication.shared.isCommandPressed && NSApplication.shared.isShiftPressed {
-            tabCollectionViewModel.appendNewTab(with: .url(url), selected: true)
+            tabCollectionViewModel.appendNewTab(with: .contentFromURL(url), selected: true)
             return
         }
 
         if NSApplication.shared.isCommandPressed {
-            tabCollectionViewModel.appendNewTab(with: .url(url), selected: false)
+            tabCollectionViewModel.appendNewTab(with: .contentFromURL(url), selected: false)
             return
         }
 
-        tabCollectionViewModel.selectedTabViewModel?.tab.setContent(.url(url))
+        tabCollectionViewModel.selectedTabViewModel?.tab.setContent(.contentFromURL(url))
     }
 
     private func showAddEditController(for bookmark: Bookmark? = nil) {

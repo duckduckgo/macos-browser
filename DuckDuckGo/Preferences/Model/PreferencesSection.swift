@@ -23,16 +23,20 @@ struct PreferencesSection: Hashable, Identifiable {
     let id: PreferencesSectionIdentifier
     let panes: [PreferencePaneIdentifier]
 
-    static let defaultSections: [PreferencesSection] = [
-        .init(
-            id: .regularPreferencePanes,
-            panes: [.general, .appearance, .privacy, .autofill, .downloads]
-        ),
-        .init(
-            id: .about,
-            panes: [.about]
-        )
-    ]
+    static let defaultSections: [PreferencesSection] = {
+        let regularPanes: [PreferencePaneIdentifier] = {
+            var panes: [PreferencePaneIdentifier] = [.general, .appearance, .privacy, .autofill, .downloads]
+            if PrivatePlayer.isAvailable {
+                panes.append(.privatePlayer)
+            }
+            return panes
+        }()
+
+        return [
+            .init(id: .regularPreferencePanes, panes: regularPanes),
+            .init(id: .about, panes: [.about])
+        ]
+    }()
 }
 
 enum PreferencesSectionIdentifier: Hashable, CaseIterable {
@@ -46,6 +50,7 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
     case privacy
     case autofill
     case downloads
+    case privatePlayer = "duckplayer"
     case about
 
     var id: Self {
@@ -70,6 +75,8 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
             return UserText.autofill
         case .downloads:
             return UserText.downloads
+        case .privatePlayer:
+            return UserText.privatePlayer
         case .about:
             return UserText.about
         }
@@ -87,6 +94,8 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
             return "Autofill"
         case .downloads:
             return "DownloadsPreferences"
+        case .privatePlayer:
+            return "PrivatePlayerSettings"
         case .about:
             return "About"
         }

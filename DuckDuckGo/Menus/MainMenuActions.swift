@@ -618,19 +618,17 @@ extension MainViewController {
         LocalBookmarkManager.shared.resetBookmarks()
     }
 
-    @IBAction func resetMacWaitlistUnlockState(_ sender: Any?) {
-        OnboardingViewModel().restart()
-        let store = MacWaitlistEncryptedFileStorage()
-        store.deleteExistingMetadata()
-    }
-
     @IBAction func resetPinnedTabs(_ sender: Any?) {
         if tabCollectionViewModel.selectedTabIndex?.isPinnedTab == true, tabCollectionViewModel.tabCollection.tabs.count > 0 {
             tabCollectionViewModel.select(at: .unpinned(0))
         }
         tabCollectionViewModel.pinnedTabsManager?.tabCollection.removeAll()
     }
-    
+
+    @IBAction func resetPrivatePlayerOverlayInteractions(_ sender: Any?) {
+        PrivatePlayerPreferences.shared.youtubeOverlayInteracted = false
+    }
+
     @IBAction func showSaveCredentialsPopover(_ sender: Any?) {
         #if DEBUG || REVIEW
         NotificationCenter.default.post(name: .ShowSaveCredentialsPopover, object: nil)

@@ -46,6 +46,8 @@ public struct UserDefaultsWrapper<T> {
         case selectedDownloadLocationKey = "preferences.download-location"
         case alwaysRequestDownloadLocationKey = "preferences.download-location.always-request"
         case autoconsentEnabled = "preferences.autoconsent-enabled"
+        case privatePlayerMode = "preferences.duck-player"
+        case youtubeOverlayInteracted = "preferences.youtube-overlay-interacted"
 
         case askToSaveUsernamesAndPasswords = "preferences.ask-to-save.usernames-passwords"
         case askToSaveAddresses = "preferences.ask-to-save.addresses"
