@@ -198,7 +198,7 @@ final class TabViewModel {
             return
         }
 
-        guard let url = tabURL else {
+        guard tab.content.isUrl, !tab.content.isPrivatePlayer, let url = tabURL else {
             addressBarString = ""
             passiveAddressBarString = ""
             return
@@ -251,7 +251,7 @@ final class TabViewModel {
             title = UserText.tabHomeTitle
         case .onboarding:
             title = UserText.tabOnboardingTitle
-        case .url, .none:
+        case .url, .none, .privatePlayer:
             if let title = tab.title {
                 self.title = title
             } else {
@@ -276,7 +276,7 @@ final class TabViewModel {
         case .bookmarks:
             favicon = Favicon.bookmarks
             return
-        case .url, .onboarding, .none: break
+        case .url, .onboarding, .privatePlayer, .none: break
         }
 
         if let favicon = tab.favicon {

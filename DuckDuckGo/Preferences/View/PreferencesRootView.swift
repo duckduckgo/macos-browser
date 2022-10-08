@@ -52,6 +52,8 @@ extension Preferences {
                                 AutofillView(model: AutofillPreferencesModel())
                             case .downloads:
                                 DownloadsView(model: DownloadsPreferences())
+                            case .privatePlayer:
+                                PrivatePlayerView(model: .shared)
                             case .about:
                                 AboutView(model: .init())
                             }

@@ -1,0 +1,147 @@
+/* -- VIDEO PLAYER OVERLAY */
+:host {
+    outline: 10px solid red;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    color: white;
+    z-index: 10000;
+}
+.ddg-video-player-overlay {
+    font-family: system, -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 16px;
+    text-align: center;
+
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    color: white;
+    z-index: 10000;
+}
+
+.ddg-eyeball svg {
+    width: 60px;
+    height: 60px;
+}
+
+.ddg-vpo-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    color: white;
+    text-align: center;
+    background: black;
+}
+
+.ddg-vpo-bg:after {
+    content: " ";
+    position: absolute;
+    display: block;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,1); /* this gets overriden if the background image can be found */
+    color: white;
+    text-align: center;
+}
+
+.ddg-video-player-overlay[data-thumb-loaded="true"] .ddg-vpo-bg:after {
+    background: rgba(0,0,0,0.75);
+}
+
+.ddg-vpo-content {
+    position: relative;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    left: 50%;
+    max-width: 90%;
+}
+
+.ddg-vpo-eyeball {
+    margin-bottom: 18px;
+}
+
+.ddg-vpo-title {
+    font-size: 22px;
+    font-weight: 400;
+    line-height: 26px;
+    margin-top: 25px;
+}
+
+.ddg-vpo-text {
+    margin-top: 16px;
+    width: 496px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.ddg-vpo-text b {
+    font-weight: 600;
+}
+
+.ddg-vpo-buttons {
+    margin-top: 25px;
+}
+.ddg-vpo-buttons > * {
+    display: inline-block;
+    margin: 0;
+    padding: 0;
+}
+
+.ddg-vpo-button {
+    color: white;
+    padding: 9px 16px;
+    font-size: 13px;
+    border-radius: 8px;
+    font-weight: 600;
+    display: inline-block;
+    text-decoration: none;
+}
+
+.ddg-vpo-button + .ddg-vpo-button {
+    margin-left: 10px;
+}
+
+.ddg-vpo-cancel {
+    background: #585b58;
+    border: 0.5px solid rgba(40, 145, 255, 0.05);
+    box-shadow: 0px 0px 0px 0.5px rgba(0, 0, 0, 0.1), 0px 0px 1px rgba(0, 0, 0, 0.05), 0px 1px 1px rgba(0, 0, 0, 0.2), inset 0px 0.5px 0px rgba(255, 255, 255, 0.2), inset 0px 1px 0px rgba(255, 255, 255, 0.05);
+}
+
+.ddg-vpo-open {
+    background: #3969EF;
+    border: 0.5px solid rgba(40, 145, 255, 0.05);
+    box-shadow: 0px 0px 0px 0.5px rgba(0, 0, 0, 0.1), 0px 0px 1px rgba(0, 0, 0, 0.05), 0px 1px 1px rgba(0, 0, 0, 0.2), inset 0px 0.5px 0px rgba(255, 255, 255, 0.2), inset 0px 1px 0px rgba(255, 255, 255, 0.05);
+}
+
+.ddg-vpo-open:hover {
+    background: #1d51e2;
+}
+.ddg-vpo-cancel:hover {
+    cursor: pointer;
+    background: #2f2f2f;
+}
+
+.ddg-vpo-remember {
+}
+.ddg-vpo-remember label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 25px;
+    cursor: pointer;
+}
+.ddg-vpo-remember input {
+    margin-right: 6px;
+}
