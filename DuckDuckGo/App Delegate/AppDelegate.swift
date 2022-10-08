@@ -24,8 +24,6 @@ import BrowserServicesKit
 @NSApplicationMain
 final class AppDelegate: NSObject, NSApplicationDelegate {
 
-    let launchTimingPixel = TimedPixel(.launchTiming)
-
     static var isRunningTests: Bool {
         #if DEBUG
         ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
@@ -113,7 +111,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         fireWaitlistLaunchPixel()
-        fireLaunchPixel(regularLaunch: (notification.userInfo?[NSApplication.launchIsDefaultUserInfoKey] as? NSNumber)?.boolValue)
 
         stateRestorationManager.applicationDidFinishLaunching()
 
@@ -124,8 +121,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         grammarFeaturesManager.manage()
 
         applyPreferredTheme()
-
-        launchTimingPixel.fire()
 
         appUsageActivityMonitor = AppUsageActivityMonitor(delegate: self)
 
@@ -174,19 +169,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         appearancePreferences.updateUserInterfaceStyle()
     }
 
-    private func fireLaunchPixel(regularLaunch: Bool?) {
-        if Pixel.Event.AppLaunch.repetition().value == .initial || regularLaunch ?? false {
-
-            Pixel.fire(.appLaunch(launch: .autoInitialOrRegular())) { error in
-                if let error = error, error is URLError {
-                    os_log("appLaunch Pixel send failed: %s", type: .error, "\(error)")
-                } else {
-                    Pixel.Event.AppLaunch.repetition().update()
-                }
-            }
-        }
-    }
-
     private func fireWaitlistLaunchPixel() {
         if Pixel.Event.AppLaunch.repetition().value == .initial && !Waitlist.isUnlocked {
             Pixel.fire(.waitlistFirstLaunch)
@@ -203,7 +185,7 @@ extension AppDelegate: AppUsageActivityMonitorDelegate {
     }
 
     func activeUsageTimeHasReachedThreshold(avgTabCount: Double) {
-        Pixel.fire(.appActiveUsage(avgTabs: .init(avgTabs: avgTabCount)))
+        // This is temporarily unused while we determine whether it required to determine an active user count.
     }
 
 }

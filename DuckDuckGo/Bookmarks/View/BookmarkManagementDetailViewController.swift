@@ -152,7 +152,6 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
             } else {
                 WindowControllersManager.shared.show(url: bookmark.url, newTab: true)
             }
-            Pixel.fire(.navigation(kind: .bookmark(isFavorite: bookmark.isFavorite), source: .managementInterface))
         } else if let folder = entity as? BookmarkFolder {
             resetSelections()
             delegate?.bookmarkManagementDetailViewControllerDidSelectFolder(folder)
@@ -698,7 +697,13 @@ extension BookmarkManagementDetailViewController: BookmarkMenuItemSelectors {
     }
     
     func deleteEntities(_ sender: NSMenuItem) {
-        guard let uuids = sender.representedObject as? [UUID] else {
+        let uuids: [UUID]
+        
+        if let array = sender.representedObject as? [UUID] {
+            uuids = array
+        } else if let objects = sender.representedObject as? [BaseBookmarkEntity] {
+            uuids = objects.map(\.id)
+        } else {
             assertionFailure("Failed to cast menu item's represented object to UUID array")
             return
         }

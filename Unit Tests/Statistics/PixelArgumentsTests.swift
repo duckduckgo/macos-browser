@@ -46,40 +46,6 @@ class PixelArgumentsTests: XCTestCase {
         NSApp.setValue(nil, forKey: "currentEvent")
     }
 
-    // MARK: NavigationKind
-    
-    func testWhenInitWithURLThenNavigationKindIsURL() {
-        let url = URL(string: "https://duckduckgo.com")!
-
-        let kind = Pixel.Event.NavigationKind(url: url, bookmarkManager: bookmarkManager)
-        XCTAssertEqual(kind, .url)
-    }
-
-    func testWhenInitWithSearchURLThenNavigationKindIsURL() {
-        let url = URL.makeSearchUrl(from: "Search query")
-
-        let kind = Pixel.Event.NavigationKind(url: url, bookmarkManager: bookmarkManager)
-        XCTAssertEqual(kind, .search)
-    }
-
-    func testWhenInitWithBookmarkedURLThenNavigationKindIsBookmark() {
-        let url = URL(string: "https://duckduckgo.com")!
-
-        bookmarkManager.makeBookmark(for: url, title: "DDG", isFavorite: false)
-
-        let kind = Pixel.Event.NavigationKind(url: url, bookmarkManager: bookmarkManager)
-        XCTAssertEqual(kind, .bookmark)
-    }
-
-    func testWhenInitWithFavoriteURLThenNavigationKindIsBookmark() {
-        let url = URL(string: "https://duckduckgo.com")!
-
-        bookmarkManager.makeBookmark(for: url, title: "DDG", isFavorite: true)
-
-        let kind = Pixel.Event.NavigationKind(url: url, bookmarkManager: bookmarkManager)
-        XCTAssertEqual(kind, .favorite)
-    }
-
     // MARK: AccessPoint
 
     func testWhenInitWithButtonThenAccessPointIsButton() {

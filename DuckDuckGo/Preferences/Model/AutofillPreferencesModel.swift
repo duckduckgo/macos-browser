@@ -67,20 +67,10 @@ final class AutofillPreferencesModel: ObservableObject {
             }
 
             if authenticationResult.authenticated {
-
-                // Only fire the auto-lock disabled pixel the setting is disabled and it has changed from its previous value
-                if !isAutoLockEnabled && self.isAutoLockEnabled {
-                    Pixel.fire(.passwordManagerLockScreenDisabled)
-                }
-
-                // Only fire the threshold pixel if it has changed, or if the setting is being turned on again
-                if (autoLockThreshold != self.autoLockThreshold) || (isAutoLockEnabled && !self.isAutoLockEnabled) {
-                    Pixel.fire(self.autoLockThreshold.pixelEvent)
-                }
-
                 if isAutoLockEnabled != self.isAutoLockEnabled {
                     self.isAutoLockEnabled = isAutoLockEnabled
                 }
+
                 if autoLockThreshold != self.autoLockThreshold {
                     self.autoLockThreshold = autoLockThreshold
                 }

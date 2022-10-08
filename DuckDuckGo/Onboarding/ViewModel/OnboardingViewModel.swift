@@ -67,24 +67,20 @@ final class OnboardingViewModel: ObservableObject {
     }
 
     func onStartPressed() {
-        Pixel.fire(.onboardingStartPressed)
         state = .importData
     }
 
     func onImportPressed() {
-        Pixel.fire(.onboardingImportPressed)
         delegate?.onboardingDidRequestImportData { [weak self] in
             self?.state = .setDefault
         }
     }
 
     func onImportSkipped() {
-        Pixel.fire(.onboardingImportSkipped)
         state = .setDefault
     }
 
     func onSetDefaultPressed() {
-        Pixel.fire(.onboardingSetDefaultPressed)
         delegate?.onboardingDidRequestSetDefault { [weak self] in
             self?.state = .startBrowsing
             self?.delegate?.onboardingHasFinished()
@@ -92,7 +88,6 @@ final class OnboardingViewModel: ObservableObject {
     }
 
     func onSetDefaultSkipped() {
-        Pixel.fire(.onboardingSetDefaultSkipped)
         state = .startBrowsing
         onboardingFinished = true
         delegate?.onboardingHasFinished()
@@ -100,10 +95,6 @@ final class OnboardingViewModel: ObservableObject {
 
     func skipTyping() {
         skipTypingRequested = true
-    }
-
-    func typingSkipped() {
-        Pixel.fire(.onboardingTypingSkipped)
     }
     
     func onboardingReshown() {

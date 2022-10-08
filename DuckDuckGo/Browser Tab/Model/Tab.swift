@@ -676,10 +676,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
               let host = url.host
         else { return }
 
-        let added = FireproofDomains.shared.toggle(domain: host)
-        if added {
-            Pixel.fire(.fireproof(kind: .init(url: url), suggested: .manual))
-        }
+        _ = FireproofDomains.shared.toggle(domain: host)
     }
 
     private var superviewObserver: NSKeyValueObservation?
@@ -1529,10 +1526,6 @@ extension Tab: WKNavigationDelegate {
         self.mainFrameLoadState = .finished
 
         StatisticsLoader.shared.refreshRetentionAtb(isSearch: request.url?.isDuckDuckGoSearch == true)
-
-        if [.initial, .dailyFirst].contains(Pixel.Event.Repetition(key: "app_usage")) {
-            Pixel.fire(.appUsage)
-        }
     }
 
     @objc(_webView:didFailProvisionalLoadWithRequest:inFrame:withError:)
