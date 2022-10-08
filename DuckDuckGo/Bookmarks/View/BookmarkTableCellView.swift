@@ -138,6 +138,18 @@ final class BookmarkTableCellView: NSTableCellView, NibLoadable {
             updateTitleLabelValue()
         }
     }
+    
+    override var draggingImageComponents: [NSDraggingImageComponent] {
+        let faviconComponent = NSDraggingImageComponent(key: .icon)
+        faviconComponent.contents = faviconImageView.image
+        faviconComponent.frame = faviconImageView.frame
+        
+        let labelComponent = NSDraggingImageComponent(key: .label)
+        labelComponent.contents = titleLabel.imageRepresentation()
+        labelComponent.frame = titleLabel.frame
+
+        return [faviconComponent, labelComponent]
+    }
 
     override func updateTrackingAreas() {
         super.updateTrackingAreas()

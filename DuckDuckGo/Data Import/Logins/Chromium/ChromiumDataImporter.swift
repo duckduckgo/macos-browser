@@ -23,15 +23,21 @@ internal class ChromiumDataImporter: DataImporter {
     var processName: String {
         fatalError("Subclasses must provide their own process name")
     }
+    
+    var source: DataImport.Source {
+        fatalError("Subclasses must return a source")
+    }
 
     private let applicationDataDirectoryURL: URL
     private let bookmarkImporter: BookmarkImporter
     private let loginImporter: LoginImporter
+    private let faviconManager: FaviconManagement
 
-    init(applicationDataDirectoryURL: URL, loginImporter: LoginImporter, bookmarkImporter: BookmarkImporter) {
+    init(applicationDataDirectoryURL: URL, loginImporter: LoginImporter, bookmarkImporter: BookmarkImporter, faviconManager: FaviconManagement) {
         self.applicationDataDirectoryURL = applicationDataDirectoryURL
         self.loginImporter = loginImporter
         self.bookmarkImporter = bookmarkImporter
+        self.faviconManager = faviconManager
     }
 
     func importableTypes() -> [DataImport.DataType] {
@@ -67,10 +73,12 @@ internal class ChromiumDataImporter: DataImporter {
             let bookmarkReader = ChromiumBookmarksReader(chromiumDataDirectoryURL: dataDirectoryURL)
             let bookmarkResult = bookmarkReader.readBookmarks()
 
+            importFavicons(from: dataDirectoryURL)
+            
             switch bookmarkResult {
             case .success(let bookmarks):
                 do {
-                    summary.bookmarksResult = try bookmarkImporter.importBookmarks(bookmarks, source: .chromium)
+                    summary.bookmarksResult = try bookmarkImporter.importBookmarks(bookmarks, source: .thirdPartyBrowser(source))
                 } catch {
                     completion(.failure(.bookmarks(.cannotAccessSecureVault)))
                     return
@@ -90,6 +98,32 @@ internal class ChromiumDataImporter: DataImporter {
         }
 
         completion(.success(summary))
+    }
+    
+    func importFavicons(from dataDirectoryURL: URL) {
+        let faviconsReader = ChromiumFaviconsReader(chromiumDataDirectoryURL: dataDirectoryURL)
+        let faviconsResult = faviconsReader.readFavicons()
+
+        switch faviconsResult {
+        case .success(let faviconsByURL):
+            for (pageURLString, fetchedFavicons) in faviconsByURL {
+                if let pageURL = URL(string: pageURLString) {
+                    let favicons = fetchedFavicons.map {
+                        Favicon(identifier: UUID(),
+                                url: pageURL,
+                                image: $0.image,
+                                relation: .icon,
+                                documentUrl: pageURL,
+                                dateCreated: Date())
+                    }
+                    
+                    faviconManager.handleFavicons(favicons, documentUrl: pageURL)
+                }
+            }
+            
+        case .failure:
+            Pixel.fire(.faviconImportFailed(source: self.source.pixelEventSource))
+        }
     }
 
 }

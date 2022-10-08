@@ -23,12 +23,19 @@ final class EdgeDataImporter: ChromiumDataImporter {
     override var processName: String {
         return "Microsoft Edge"
     }
+    
+    override var source: DataImport.Source {
+        return .edge
+    }
 
     init(loginImporter: LoginImporter, bookmarkImporter: BookmarkImporter) {
         let applicationSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
         let defaultDataURL = applicationSupport.appendingPathComponent("Microsoft Edge/Default/")
 
-        super.init(applicationDataDirectoryURL: defaultDataURL, loginImporter: loginImporter, bookmarkImporter: bookmarkImporter)
+        super.init(applicationDataDirectoryURL: defaultDataURL,
+                   loginImporter: loginImporter,
+                   bookmarkImporter: bookmarkImporter,
+                   faviconManager: FaviconManager.shared)
     }
 
 }
