@@ -892,6 +892,7 @@ extension Tab: UserContentControllerDelegate {
         userScripts.hoverUserScript.delegate = self
         userScripts.autoconsentUserScript?.delegate = self
         youtubeOverlayScript = userScripts.youtubeOverlayScript
+        youtubeOverlayScript?.delegate = self
         youtubePlayerScript = userScripts.youtubePlayerUserScript
         setUpYoutubeScriptsIfNeeded()
 
@@ -1605,6 +1606,19 @@ extension Tab: AutoconsentUserScriptDelegate {
     
     func autoconsentUserScriptPromptUserForConsent(_ result: @escaping (Bool) -> Void) {
         delegate?.tab(self, promptUserForCookieConsent: result)
+    }
+}
+
+extension Tab: YoutubeOverlayUserScriptDelegate {
+    func youtubeOverlayUserScriptDidRequestDuckPlayer(with url: URL) {
+        let content = Tab.TabContent.contentFromURL(url)
+        let isRequestingNewTab = NSApp.isCommandPressed
+        if isRequestingNewTab {
+            let shouldSelectNewTab = NSApp.isShiftPressed
+            self.delegate?.tab(self, requestedNewTabWith: content, selected: shouldSelectNewTab)
+        } else {
+            setContent(content)
+        }
     }
 }
 
