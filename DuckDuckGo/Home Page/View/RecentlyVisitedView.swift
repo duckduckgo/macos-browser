@@ -365,9 +365,9 @@ struct SiteIconAndConnector: View {
     var body: some View {
         VStack(spacing: 0) {
             if site.isRealDomain {
-                nonInteractiveFaviconView
-            } else {
                 faviconView
+            } else {
+                nonInteractiveFaviconView
             }
 
             Rectangle()
