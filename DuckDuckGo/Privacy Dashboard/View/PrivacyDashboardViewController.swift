@@ -177,9 +177,7 @@ final class PrivacyDashboardViewController: NSViewController {
             return
         }
 
-        let configuration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig
-        let isProtected = configuration.isProtected(domain: domain)
-        self.privacyDashboardScript.setProtectionStatus(isProtected, webView: self.webView)
+        self.privacyDashboardScript.setProtectionStatus(tabViewModel?.tab.protectionStatus, webView: self.webView)
     }
 
     private func sendPendingUpdates() {

@@ -839,6 +839,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     // MARK: - Dashboard Info
 
     @Published private(set) var trackerInfo: TrackerInfo?
+    @Published private(set) var protectionStatus: ProtectionStatus?
     @Published private(set) var serverTrust: ServerTrust?
     @Published private(set) var connectionUpgradedTo: URL?
     @Published private(set) var cookieConsentManaged: CookieConsentInfo?
@@ -848,6 +849,8 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         if self.serverTrust?.host != content.url?.host {
             serverTrust = nil
         }
+        
+        protectionStatus = makeProtectionStatus(for: webView.url?.host)
     }
 
     private func resetConnectionUpgradedTo(navigationAction: WKNavigationAction) {
@@ -864,6 +867,26 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     public func setMainFrameConnectionUpgradedTo(_ upgradedUrl: URL?) {
         if upgradedUrl == nil { return }
         connectionUpgradedTo = upgradedUrl
+    }
+    
+    private func makeProtectionStatus(for host: String?) -> ProtectionStatus? {
+        guard let host = host else { return nil }
+        
+        let config = ContentBlocking.shared.privacyConfigurationManager.privacyConfig
+        
+        let isTempUnprotected = config.isTempUnprotected(domain: host)
+        let isAllowlisted = config.isUserUnprotected(domain: host)
+        
+        var enabledFeatures: [String] = []
+        
+        if !config.isInExceptionList(domain: host, forFeature: .contentBlocking) {
+            enabledFeatures.append(PrivacyFeature.contentBlocking.rawValue)
+        }
+        
+        return ProtectionStatus(unprotectedTemporary: isTempUnprotected,
+                                enabledFeatures: enabledFeatures,
+                                allowlisted: isAllowlisted,
+                                denylisted: false)
     }
 
     // MARK: - Printing

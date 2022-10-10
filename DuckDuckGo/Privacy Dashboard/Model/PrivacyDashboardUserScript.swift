@@ -199,8 +199,15 @@ final class PrivacyDashboardUserScript: NSObject, StaticUserScript {
         evaluate(js: "window.onChangeTrackerBlockingData(\(safeTabUrl), \(trackerBlockingDataJson))", in: webView)
     }
 
-    func setProtectionStatus(_ isProtected: Bool, webView: WKWebView) {
-        evaluate(js: "window.onChangeProtectionStatus(\(isProtected))", in: webView)
+    func setProtectionStatus(_ protectionStatus: ProtectionStatus?, webView: WKWebView) {
+        
+        guard let protectionStatus = protectionStatus,
+              let protectionStatusJson = try? JSONEncoder().encode(protectionStatus).utf8String() else {
+            assertionFailure("Can't encode protectionStatus into JSON")
+            return
+        }
+        
+        evaluate(js: "window.onChangeProtectionStatus(\(protectionStatusJson))", in: webView)
     }
 
     func setUpgradedHttps(_ upgradedHttps: Bool, webView: WKWebView) {
