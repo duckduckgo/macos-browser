@@ -105,7 +105,7 @@ final class RecentlyVisitedModel: ObservableObject {
     }
 
     func open(_ site: RecentlyVisitedSiteModel) {
-        guard let url = site.url else { return }
+        guard site.isRealDomain, let url = site.url else { return }
         self.open(url)
     }
 
