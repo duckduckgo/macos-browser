@@ -39,17 +39,21 @@ defaultComms.readUserValues().then((userValues) => {
  */
 function enable(userValues, environment = defaultEnvironment, comms = defaultComms) {
     const videoPlayerOverlay = new VideoPlayerOverlay(userValues, environment, comms);
+
     defaultComms.onUserValuesNotification((userValues) => {
         console.log("got new values after zero", userValues)
         videoPlayerOverlay.userValues = userValues;
         videoPlayerOverlay.watchForVideoBeingAdded({ignoreCache: true});
 
-        if (userValues.privatePlayerMode.disabled || userValues.privatePlayerMode.enabled) {
+        if (userValues.privatePlayerMode.disabled) {
             AllIconOverlays.disable();
-        }
-
-        if (userValues.privatePlayerMode.alwaysAsk) {
+            OpenInDuckPlayer.disable();
+        } else if (userValues.privatePlayerMode.enabled) {
+            AllIconOverlays.disable();
+            OpenInDuckPlayer.enable();
+        } else if (userValues.privatePlayerMode.alwaysAsk) {
             AllIconOverlays.enable();
+            OpenInDuckPlayer.disable();
         }
     });
     const CSS = {
@@ -65,6 +69,14 @@ function enable(userValues, environment = defaultEnvironment, comms = defaultCom
     }
 
     const VideoThumbnail = {
+
+        isSingleVideoURL: (href) => {
+            return href && (
+                (href.includes('/watch?v=') && !href.includes('&list=')) ||
+                (href.includes('/watch?v=') && href.includes('&list=') && href.includes('&index='))
+            ) && !href.includes('&pp=') //exclude movies for rent
+        },
+
         /**
          * Find all video thumbnails on the page
          * @returns {array} array of videoElement(s)
@@ -72,10 +84,7 @@ function enable(userValues, environment = defaultEnvironment, comms = defaultCom
         findAll: () => {
             const linksToVideos = item => {
                 let href = item.getAttribute('href');
-                return href && (
-                    (href.includes('/watch?v=') && !href.includes('&list=')) ||
-                    (href.includes('/watch?v=') && href.includes('&list=') && href.includes('&index='))
-                ) && !href.includes('&pp=') //exclude movies for rent
+                return VideoThumbnail.isSingleVideoURL(href);
             }
 
             const linksWithImages = item => {
@@ -237,52 +246,86 @@ function enable(userValues, environment = defaultEnvironment, comms = defaultCom
         disable: () => {
             AllIconOverlays.enabled = false;
             IconOverlay.removeAll();
+        }
+
+    };
+
+    const OpenInDuckPlayer = {
+        clickBoundElements: new Map(),
+        enabled: false,
+
+        bindEventsToAll: () => {
+            if (!OpenInDuckPlayer.enabled) {
+                return;
+            }
+
+            let videoLinksAndPreview = Array.from(document.querySelectorAll('a[href^="/watch?v="], #media-container-link')),
+                isValidVideoLinkOrPreview = (element) => {
+                    return VideoThumbnail.isSingleVideoURL(element?.getAttribute('href')) ||
+                        element.getAttribute('id') === 'media-container-link';
+                },
+                excludeAlreadyBound = (element) => !OpenInDuckPlayer.clickBoundElements.has(element);
+
+            videoLinksAndPreview
+                .filter(excludeAlreadyBound)
+                .forEach(element => {
+                    if (isValidVideoLinkOrPreview(element)) {
+
+                        let onClickOpenDuckPlayer = (event) => {
+                            event.preventDefault();
+                            event.stopPropagation();
+
+                            let link = event.target.closest('a');
+
+                            if (link) {
+                                const href = VideoParams.fromHref(link.href)?.toPrivatePlayerUrl();
+                                comms.openInDuckPlayerViaMessage(href);
+                            }
+
+                            return false;
+                        };
+
+                        element.addEventListener('click', onClickOpenDuckPlayer, true);
+
+                        OpenInDuckPlayer.clickBoundElements.set(element, onClickOpenDuckPlayer);
+                    }
+                });
         },
 
-        enableOpenDuckPlayerMessagingLinks: () => {
-            document.addEventListener('mousedown', (event) => {
-                let link = event.target.closest('a');
+        disable: () => {
+            OpenInDuckPlayer.clickBoundElements.forEach((functionToRemove, element) => {
+                element.removeEventListener('click', functionToRemove, true);
+                OpenInDuckPlayer.clickBoundElements.delete(element);
+            });
 
-                if (link) {
-                    event.preventDefault();
-                    event.stopPropagation();
+            OpenInDuckPlayer.enabled = false;
+        },
 
-                    const href = VideoParams.fromHref(link.href)?.toPrivatePlayerUrl();
+        enable: () => {
+            OpenInDuckPlayer.enabled = true;
+            OpenInDuckPlayer.bindEventsToAll();
 
-                    window.webkit?.messageHandlers?.openDuckPlayer?.postMessage(href);
-                    console.log('SEND TO NATIVE: openDuckPlayer.postMessage("'+href+'")');
-
-                    return;
-                }
+            onDOMChanged(() => {
+                OpenInDuckPlayer.bindEventsToAll();
             });
         },
 
-        disableLinkClicks: () => {
-            document.querySelectorAll('a:not(.added)').forEach(element => {
-                if (element?.getAttribute('href')?.includes('/watch?v=')) {
-                    element.addEventListener('click', (event) => {
-                        event.preventDefault();
-                        event.stopPropagation();
-                        return;
-                    });
+        enableOnDOMLoaded: () => {
+            OpenInDuckPlayer.enabled = true;
+            onDOMLoaded(() => {
+                OpenInDuckPlayer.bindEventsToAll();
+            });
 
-                    element.classList.add('added');
-                }
+            onDOMChanged(() => {
+                OpenInDuckPlayer.bindEventsToAll();
             });
         }
-    };
+    }
 
     // Enable icon overlays on page load if not explicitly disabled
     if ('alwaysAsk' in userValues.privatePlayerMode) {
         AllIconOverlays.enableOnDOMLoaded();
-    } else {
-        onDOMLoaded(() => {
-            AllIconOverlays.enableOpenDuckPlayerMessagingLinks();
-            AllIconOverlays.disableLinkClicks();
-        });
-
-        onDOMChanged(() => {
-            AllIconOverlays.disableLinkClicks();
-        })
+    } else if ('enabled' in userValues.privatePlayerMode) {
+        OpenInDuckPlayer.enableOnDOMLoaded();
     }
 }

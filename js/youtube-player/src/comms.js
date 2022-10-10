@@ -15,6 +15,7 @@ export const macOSCommunications = {
         }
         return Promise.reject(resp)
     },
+
     readUserValues() {
         // @ts-ignore
         let resp = window.webkit?.messageHandlers?.readUserValues?.postMessage({});
@@ -25,6 +26,12 @@ export const macOSCommunications = {
         }
         return Promise.reject(resp)
     },
+
+    openInDuckPlayerViaMessage(href) {
+        window.webkit?.messageHandlers?.openDuckPlayer?.postMessage(href);
+        console.log("📤 [outgoing]", 'openDuckPlayer.postMessage("'+href+'")');
+    },
+
     onUserValuesNotification(cb) {
         window.addEventListener("message", (evt) => {
             if (!evt.isTrusted) return;
