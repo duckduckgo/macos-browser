@@ -1,6 +1,7 @@
 import {addTrustedEventListener, appendElement, VideoParams} from "./util";
 import dax from "../assets/dax.svg";
 import {i18n} from "./text.js";
+import {macOSCommunications} from "./comms";
 
 export const IconOverlay = {
     /**
@@ -47,8 +48,7 @@ export const IconOverlay = {
             let link = event.target.closest('a');
             let href = link.getAttribute('href');
 
-            window.webkit?.messageHandlers?.openDuckPlayer?.postMessage(href);
-            console.log('SEND TO NATIVE: openDuckPlayer.postMessage("'+href+'")');
+            macOSCommunications.openInDuckPlayerViaMessage(href);
 
             return;
         })
@@ -133,7 +133,6 @@ export const IconOverlay = {
             IconOverlay.hideOverlay(overlay);
             IconOverlay.hoverOverlayVisible = false;
         }
-
     },
 
     /**
