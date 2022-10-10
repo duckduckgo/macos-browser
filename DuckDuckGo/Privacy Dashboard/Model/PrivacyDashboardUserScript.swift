@@ -37,7 +37,7 @@ final class PrivacyDashboardUserScript: NSObject, StaticUserScript {
         case privacyDashboardFirePixel
         case privacyDashboardSetPermission
         case privacyDashboardSetPermissionPaused
-        case privacyDashboardSetHeight
+        case privacyDashboardSetSize
         case privacyDashboardOpenUrlInNewTab
     }
 
@@ -69,8 +69,8 @@ final class PrivacyDashboardUserScript: NSObject, StaticUserScript {
         case .privacyDashboardSetPermissionPaused:
             handleSetPermissionPaused(message: message)
 
-        case .privacyDashboardSetHeight:
-            handleSetHeight(message: message)
+        case .privacyDashboardSetSize:
+            handleSetSize(message: message)
 
         case .privacyDashboardOpenUrlInNewTab:
             handleOpenUrlInNewTab(message: message)
@@ -136,9 +136,10 @@ final class PrivacyDashboardUserScript: NSObject, StaticUserScript {
         delegate?.userScript(self, setPermission: permission, paused: paused)
     }
 
-    private func handleSetHeight(message: WKScriptMessage) {
-        guard let height = message.body as? Int else {
-            assertionFailure("privacyDashboardSetHeght: expected height Int")
+    private func handleSetSize(message: WKScriptMessage) {
+        guard let dict = message.body as? [String: Any],
+              let height = dict["height"] as? Int else {
+            assertionFailure("privacyDashboardSetHeight: expected height to be an Int")
             return
         }
 
