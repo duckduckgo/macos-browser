@@ -57,10 +57,6 @@ public struct TrackerInfo: Encodable {
         trackers.filter { $0.state == .blocked }
     }
     
-    var trackersBlocked: Set<DetectedRequest> {
-        return trackers.filter { $0.isBlocked }
-    }
-    
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         
