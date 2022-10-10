@@ -196,7 +196,7 @@ final class PrivacyDashboardUserScript: NSObject, StaticUserScript {
             return
         }
 
-        evaluate(js: "window.onChangeTrackerBlockingData(\(safeTabUrl), \(trackerBlockingDataJson))", in: webView)
+        evaluate(js: "window.onChangeRequestData(\(safeTabUrl), \(trackerBlockingDataJson))", in: webView)
     }
 
     func setProtectionStatus(_ protectionStatus: ProtectionStatus?, webView: WKWebView) {

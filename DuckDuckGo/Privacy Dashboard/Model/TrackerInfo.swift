@@ -20,32 +20,54 @@ import Foundation
 import TrackerRadarKit
 import BrowserServicesKit
 
-struct TrackerInfo: Encodable {
+public struct TrackerInfo: Encodable {
     
-    private(set) var trackers = Set<DetectedRequest>()
-    private(set) var thirdPartyRequests = Set<DetectedRequest>()
-    private(set) var installedSurrogates = Set<String>()
+    public struct Constants {
+        public static let majorNetworkPrevalence = 25.0
+    }
+    
+    enum CodingKeys: String, CodingKey {
+        case requests
+        case installedSurrogates
+    }
 
-    mutating func add(detectedTracker: DetectedRequest) {
+    public private (set) var trackers = Set<DetectedRequest>()
+    private(set) var thirdPartyRequests = Set<DetectedRequest>()
+    public private(set) var installedSurrogates = Set<String>()
+
+    public init() { }
+    
+    // MARK: - Collecting detected elements
+    
+    public mutating func add(detectedTracker: DetectedRequest) {
         trackers.insert(detectedTracker)
     }
     
-    mutating func add(detectedThirdPartyRequest request: DetectedRequest) {
+    public mutating func add(detectedThirdPartyRequest request: DetectedRequest) {
         thirdPartyRequests.insert(request)
     }
 
-    mutating func add(installedSurrogateHost: String) {
+    public mutating func add(installedSurrogateHost: String) {
         installedSurrogates.insert(installedSurrogateHost)
     }
 
-    var isEmpty: Bool {
-        return trackers.count == 0 &&
-            thirdPartyRequests.count == 0 &&
-            installedSurrogates.count == 0
+    // MARK: - Helper accessors
+    
+    public var trackersBlocked: [DetectedRequest] {
+        trackers.filter { $0.state == .blocked }
     }
     
     var trackersBlocked: Set<DetectedRequest> {
         return trackers.filter { $0.isBlocked }
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        
+        let allRequests = [] + trackers + thirdPartyRequests
+        
+        try container.encode(allRequests, forKey: .requests)
+        try container.encode(installedSurrogates, forKey: .installedSurrogates)
     }
 
 }
