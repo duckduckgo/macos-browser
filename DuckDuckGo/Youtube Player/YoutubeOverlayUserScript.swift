@@ -21,7 +21,15 @@ import BrowserServicesKit
 import WebKit
 import os
 
-final class YoutubeOverlayUserScript: NSObject, StaticUserScript {
+protocol YoutubeOverlayUserScriptDelegate: AnyObject {
+    func youtubeOverlayUserScriptDidRequestDuckPlayer(with url: URL)
+}
+
+protocol UserScriptWithYoutubeOverlay: UserScript {
+    var delegate: YoutubeOverlayUserScriptDelegate? { get set }
+}
+
+final class YoutubeOverlayUserScript: NSObject, StaticUserScript, UserScriptWithYoutubeOverlay {
 
     enum MessageNames: String, CaseIterable {
         case setUserValues
@@ -34,6 +42,8 @@ final class YoutubeOverlayUserScript: NSObject, StaticUserScript {
     static var source: String = YoutubeOverlayUserScript.loadJS("youtube-inject-bundle", from: .main)
     static var script: WKUserScript = YoutubeOverlayUserScript.makeWKUserScript()
     var messageNames: [String] { MessageNames.allCases.map(\.rawValue) }
+
+    var delegate: YoutubeOverlayUserScriptDelegate?
 
     init(preferences: PrivatePlayerPreferences = .shared) {
         privatePlayerPreferences = preferences
@@ -94,7 +104,7 @@ final class YoutubeOverlayUserScript: NSObject, StaticUserScript {
             assertionFailure("YoutubePlayerUserScript: expected URL")
             return
         }
-        message.webView?.load(url)
+        delegate?.youtubeOverlayUserScriptDidRequestDuckPlayer(with: url)
     }
 
     private func handleReadUserValues(message: WKScriptMessage, _ replyHandler: @escaping (Any?, String?) -> Void) {
