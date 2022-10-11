@@ -625,16 +625,21 @@
                         's': 1,
                     }
 
-                    let parts = timestamp.split(/(\d+[hms])/);
+                    let parts = timestamp.split(/(\d+[hms]?)/);
                     let totalSeconds = 0;
 
                     parts.forEach(part => {
                         if (part !== '') {
-                            for (unit in units) {
-                                let multiplicator = units[unit];
+                            if (parseInt(part) == part) {
+                                totalSeconds += parseInt(part);
+                            } else {
+                                for (unit in units) {
+                                    let multiplicator = units[unit];
 
-                                if (part.includes(unit)) {
-                                    totalSeconds += (parseInt(part) * multiplicator);
+                                    if (part.includes(unit)) {
+                                        totalSeconds += (parseInt(part) * multiplicator);
+                                        break;
+                                    }
                                 }
                             }
                         }

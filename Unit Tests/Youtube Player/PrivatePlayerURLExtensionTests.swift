@@ -79,6 +79,10 @@ final class PrivatePlayerURLExtensionTests: XCTestCase {
         let paramsWithTimestamp = "https://www.youtube.com/watch?v=abcdef12345&t=23s".url!.youtubeVideoParams
         XCTAssertEqual(paramsWithTimestamp?.videoID, "abcdef12345")
         XCTAssertEqual(paramsWithTimestamp?.timestamp, "23s")
+
+        let paramsWithTimestampWithoutUnits = "https://www.youtube.com/watch?t=102&v=abcdef12345&feature=youtu.be".url!.youtubeVideoParams
+        XCTAssertEqual(paramsWithTimestampWithoutUnits?.videoID, "abcdef12345")
+        XCTAssertEqual(paramsWithTimestampWithoutUnits?.timestamp, "102")
     }
 
     func testYoutubeVideoParamsFromYoutubeNocookieURL() {
@@ -106,7 +110,7 @@ final class PrivatePlayerURLExtensionTests: XCTestCase {
         XCTAssertEqual(URL.privatePlayer("abcdef12345", timestamp: "12h2s2h").absoluteString, "duck://player/abcdef12345?t=12h2s2h")
         XCTAssertEqual(URL.privatePlayer("abcdef12345", timestamp: "5m5m5m").absoluteString, "duck://player/abcdef12345?t=5m5m5m")
 
-        XCTAssertEqual(URL.privatePlayer("abcdef12345", timestamp: "5").absoluteString, "duck://player/abcdef12345")
+        XCTAssertEqual(URL.privatePlayer("abcdef12345", timestamp: "5").absoluteString, "duck://player/abcdef12345?t=5")
         XCTAssertEqual(URL.privatePlayer("abcdef12345", timestamp: "10d").absoluteString, "duck://player/abcdef12345")
     }
 
@@ -118,7 +122,7 @@ final class PrivatePlayerURLExtensionTests: XCTestCase {
         XCTAssertEqual(URL.youtube("abcdef12345", timestamp: "12h2s2h").absoluteString, "https://www.youtube.com/watch?v=abcdef12345&t=12h2s2h")
         XCTAssertEqual(URL.youtube("abcdef12345", timestamp: "5m5m5m").absoluteString, "https://www.youtube.com/watch?v=abcdef12345&t=5m5m5m")
 
-        XCTAssertEqual(URL.youtube("abcdef12345", timestamp: "5").absoluteString, "https://www.youtube.com/watch?v=abcdef12345")
+        XCTAssertEqual(URL.youtube("abcdef12345", timestamp: "5").absoluteString, "https://www.youtube.com/watch?v=abcdef12345&t=5")
         XCTAssertEqual(URL.youtube("abcdef12345", timestamp: "10d").absoluteString, "https://www.youtube.com/watch?v=abcdef12345")
     }
 
@@ -130,7 +134,7 @@ final class PrivatePlayerURLExtensionTests: XCTestCase {
         XCTAssertEqual(URL.youtubeNoCookie("abcdef12345", timestamp: "12h2s2h").absoluteString, "https://www.youtube-nocookie.com/embed/abcdef12345?t=12h2s2h")
         XCTAssertEqual(URL.youtubeNoCookie("abcdef12345", timestamp: "5m5m5m").absoluteString, "https://www.youtube-nocookie.com/embed/abcdef12345?t=5m5m5m")
 
-        XCTAssertEqual(URL.youtubeNoCookie("abcdef12345", timestamp: "5").absoluteString, "https://www.youtube-nocookie.com/embed/abcdef12345")
+        XCTAssertEqual(URL.youtubeNoCookie("abcdef12345", timestamp: "5").absoluteString, "https://www.youtube-nocookie.com/embed/abcdef12345?t=5")
         XCTAssertEqual(URL.youtubeNoCookie("abcdef12345", timestamp: "10d").absoluteString, "https://www.youtube-nocookie.com/embed/abcdef12345")
     }
 }
