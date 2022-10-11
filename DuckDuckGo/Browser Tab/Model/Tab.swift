@@ -206,6 +206,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
         super.init()
 
+        handleFavicon()
         initAttributionLogic(state: attributionState ?? parentTab?.adClickAttributionLogic.state)
         setupWebView(shouldLoadInBackground: shouldLoadInBackground)
 
@@ -266,7 +267,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
     @Published private(set) var content: TabContent {
         didSet {
-            handleFavicon(oldContent: oldValue)
+            handleFavicon()
             invalidateSessionStateData()
             if let oldUrl = oldValue.url {
                 historyCoordinating.commitChanges(url: oldUrl)
@@ -710,7 +711,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     @Published var favicon: NSImage?
     let faviconManagement: FaviconManagement
 
-    private func handleFavicon(oldContent: TabContent) {
+    private func handleFavicon() {
         guard faviconManagement.areFaviconsLoaded else { return }
 
         if content.isPrivatePlayer {
