@@ -148,7 +148,7 @@ extension PrivatePlayer {
         let didSelectRecommendationFromPrivatePlayer = tab.content.isPrivatePlayer && navigationAction.request.url?.isYoutubeVideoRecommendation == true
 
         // Recommendations must always be opened in Private Player.
-        guard alwaysOpenInPrivatePlayer || didSelectRecommendationFromPrivatePlayer, let videoID = navigationAction.request.url?.youtubeVideoID else {
+        guard alwaysOpenInPrivatePlayer || didSelectRecommendationFromPrivatePlayer, let (videoID, timestamp) = navigationAction.request.url?.youtubeVideoParams else {
             return nil
         }
 
@@ -159,7 +159,7 @@ extension PrivatePlayer {
 
         // Otherwise load priate player unless it's already loaded.
         guard case .privatePlayer(let currentVideoID, _) = tab.content, currentVideoID == videoID, tab.webView.url?.isPrivatePlayer == true else {
-            tab.webView.load(.privatePlayer(videoID))
+            tab.webView.load(.privatePlayer(videoID, timestamp: timestamp))
             return .cancel
         }
         return nil
