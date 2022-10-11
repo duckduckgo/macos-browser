@@ -841,9 +841,9 @@
           OpenInDuckPlayer.enabled = true;
           onDOMLoaded(() => {
             OpenInDuckPlayer.bindEventsToAll();
-          });
-          onDOMChanged(() => {
-            OpenInDuckPlayer.bindEventsToAll();
+            onDOMChanged(() => {
+              OpenInDuckPlayer.bindEventsToAll();
+            });
           });
         }
       };
