@@ -712,12 +712,12 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     let faviconManagement: FaviconManagement
 
     private func handleFavicon() {
-        guard faviconManagement.areFaviconsLoaded else { return }
-
         if content.isPrivatePlayer {
             favicon = .privatePlayer
             return
         }
+
+        guard faviconManagement.areFaviconsLoaded else { return }
 
         guard content.isUrl, let url = content.url else {
             favicon = nil
