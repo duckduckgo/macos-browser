@@ -133,13 +133,11 @@ final class TabViewModel {
     private func subscribeToTabError() {
         tab.$error
             .map { error -> ErrorViewState in
-                switch error {
-                case .none, // no error
-                    // don‘t show error for interrupted load like downloads
-                        .some(WebKitError.frameLoadInterrupted):
-                    return .init(isVisible: false, message: nil)
-                case .some(let error):
+                
+                if let error = error, !error.isFrameLoadInterrupted { // don‘t show error for interrupted load like downloads
                     return .init(isVisible: true, message: error.localizedDescription)
+                } else {
+                    return .init(isVisible: false, message: nil)
                 }
             }
             .assign(to: \.errorViewState, onWeaklyHeld: self)

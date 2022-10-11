@@ -24,4 +24,8 @@ extension Error {
         return (self as NSError).userInfo["NSErrorFailingURLKey"] as? URL
     }
 
+    var isFrameLoadInterrupted: Bool {
+        let error = self as NSError
+        return error.code == 102 && error.domain == "WebKitErrorDomain"
+    }
 }
