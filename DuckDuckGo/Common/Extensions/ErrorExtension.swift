@@ -28,4 +28,9 @@ extension Error {
         let error = self as NSError
         return error.code == 102 && error.domain == "WebKitErrorDomain"
     }
+
+    var isNavigationCancelled: Bool {
+        let error = self as NSError
+        return error.code == -999 && error.domain == "NSURLErrorDomain"
+    }
 }
