@@ -204,8 +204,6 @@ extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
         switch action {
         case .openInNewTab:
             tabCollectionViewModel.appendNewTab(with: .url(bookmark.url), selected: true)
-        case .openInBackgroundTab:
-            tabCollectionViewModel.appendNewTab(with: .url(bookmark.url), selected: false)
         case .openInNewWindow:
             WindowsManager.openNewWindow(with: bookmark.url)
         case .clickItem:

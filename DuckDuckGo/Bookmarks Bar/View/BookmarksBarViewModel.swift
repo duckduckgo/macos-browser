@@ -45,7 +45,6 @@ final class BookmarksBarViewModel: NSObject {
     
     enum BookmarksBarItemAction {
         case clickItem
-        case openInBackgroundTab
         case openInNewTab
         case openInNewWindow
         case addToFavorites
