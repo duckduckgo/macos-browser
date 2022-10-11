@@ -134,6 +134,11 @@ extension YoutubeOverlayUserScript: WKScriptMessageHandlerWithReply {
     func userContentController(_ userContentController: WKUserContentController,
                                didReceive message: WKScriptMessage,
                                replyHandler: @escaping (Any?, String?) -> Void) {
+
+        guard isMessageFromVerifiedOrigin(message) else {
+            return
+        }
+
         guard let messageType = MessageNames(rawValue: message.name) else {
             assertionFailure("YoutubeOverlayUserScript: unexpected message name \(message.name)")
             return
@@ -147,6 +152,10 @@ extension YoutubeOverlayUserScript: WKScriptMessageHandlerWithReply {
         case .openDuckPlayer:
             handleOpenDuckPlayer(message: message)
         }
+    }
+
+    private func isMessageFromVerifiedOrigin(_ message: WKScriptMessage) -> Bool {
+        message.frameInfo.request.url?.host?.droppingWwwPrefix() == "youtube.com"
     }
 }
 
