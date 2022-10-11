@@ -26,7 +26,7 @@ struct PreferencesSection: Hashable, Identifiable {
     static let defaultSections: [PreferencesSection] = {
         let regularPanes: [PreferencePaneIdentifier] = {
             var panes: [PreferencePaneIdentifier] = [.general, .appearance, .privacy, .autofill, .downloads]
-            if PrivatePlayer.isAvailable {
+            if PrivatePlayer.shared.isAvailable {
                 panes.append(.privatePlayer)
             }
             return panes
