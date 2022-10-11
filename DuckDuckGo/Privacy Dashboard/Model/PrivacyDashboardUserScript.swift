@@ -210,6 +210,19 @@ final class PrivacyDashboardUserScript: NSObject, StaticUserScript {
         evaluate(js: "window.onChangeProtectionStatus(\(protectionStatusJson))", in: webView)
     }
 
+    struct LocaleSettings: Encodable {
+        let locale: String
+    }
+
+    func setLocale(_ locale: String, webView: WKWebView) {
+        let locale = LocaleSettings(locale: locale);
+        guard let localSettingsJson = try? JSONEncoder().encode(locale).utf8String() else {
+            assertionFailure("Can't encode LocaleSettings into JSON")
+            return
+        }
+        evaluate(js: "window.onChangeLocale(\(localSettingsJson))", in: webView)
+    }
+
     func setUpgradedHttps(_ upgradedHttps: Bool, webView: WKWebView) {
         evaluate(js: "window.onChangeUpgradedHttps(\(upgradedHttps))", in: webView)
     }

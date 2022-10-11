@@ -180,6 +180,11 @@ final class PrivacyDashboardViewController: NSViewController {
         self.privacyDashboardScript.setProtectionStatus(protectionStatus, webView: self.webView)
     }
 
+    private func sendLocale() {
+        let locale = Locale.current.languageCode ?? "en";
+        self.privacyDashboardScript.setLocale(locale, webView: self.webView)
+    }
+
     private func sendPendingUpdates() {
         guard let domain = tabViewModel?.tab.content.url?.host else {
             assertionFailure("PrivacyDashboardViewController: no domain available")
@@ -294,6 +299,7 @@ extension PrivacyDashboardViewController: WKNavigationDelegate {
         subscribeToConnectionUpgradedTo()
         subscribeToServerTrust()
         sendProtectionStatus()
+        sendLocale()
         sendPendingUpdates()
         sendParentEntity()
         subscribeToConsentManaged()
