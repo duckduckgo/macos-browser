@@ -141,7 +141,7 @@ extension URL {
 
     private func addingTimestamp(_ timestamp: String?) -> URL {
         guard let timestamp = timestamp,
-              let regex = try? NSRegularExpression.init(pattern: "(\\d+[smh])+"),
+              let regex = try? NSRegularExpression.init(pattern: "^(\\d+[smh]?)+$"),
               timestamp.matches(regex)
         else {
             return self
