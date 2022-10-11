@@ -191,6 +191,38 @@
     }
   };
 
+  // src/comms.js
+  var macOSCommunications = {
+    setUserValues(userValues) {
+      console.log("\u{1F4E4} [outgoing]", userValues);
+      let resp = window.webkit?.messageHandlers?.setUserValues?.postMessage(userValues);
+      if (resp instanceof Promise) {
+        return resp.then((x) => JSON.parse(x)).catch((e) => console.error("could not call setInteracted", e));
+      }
+      return Promise.reject(resp);
+    },
+    readUserValues() {
+      let resp = window.webkit?.messageHandlers?.readUserValues?.postMessage({});
+      if (resp instanceof Promise) {
+        return resp.then((x) => JSON.parse(x)).catch((e) => console.error("could not call readUserValues", e));
+      }
+      return Promise.reject(resp);
+    },
+    openInDuckPlayerViaMessage(href) {
+      window.webkit?.messageHandlers?.openDuckPlayer?.postMessage(href);
+      console.log("\u{1F4E4} [outgoing]", 'openDuckPlayer.postMessage("' + href + '")');
+    },
+    onUserValuesNotification(cb) {
+      window.onUserValuesChanged = function(values) {
+        if (!values?.userValuesNotification) {
+          console.error("missing userValuesNotification");
+          return;
+        }
+        cb(values.userValuesNotification);
+      };
+    }
+  };
+
   // src/icon-overlay.js
   var IconOverlay = {
     HOVER_CLASS: "ddg-overlay-hover",
@@ -213,6 +245,14 @@
                     </div>
                 </a>`;
       overlayElement.querySelector("a.ddg-play-privately")?.setAttribute("href", href);
+      overlayElement.querySelector("a.ddg-play-privately").addEventListener("click", (event, a, b) => {
+        event.preventDefault();
+        event.stopPropagation();
+        let link = event.target.closest("a");
+        let href2 = link.getAttribute("href");
+        macOSCommunications.openInDuckPlayerViaMessage(href2);
+        return;
+      });
       return overlayElement;
     },
     getHoverOverlay: () => {
@@ -595,34 +635,6 @@
     }
   };
 
-  // src/comms.js
-  var macOSCommunications = {
-    setUserValues(userValues) {
-      console.log("\u{1F4E4} [outgoing]", userValues);
-      let resp = window.webkit?.messageHandlers?.setUserValues?.postMessage(userValues);
-      if (resp instanceof Promise) {
-        return resp.then((x) => JSON.parse(x)).catch((e) => console.error("could not call setInteracted", e));
-      }
-      return Promise.reject(resp);
-    },
-    readUserValues() {
-      let resp = window.webkit?.messageHandlers?.readUserValues?.postMessage({});
-      if (resp instanceof Promise) {
-        return resp.then((x) => JSON.parse(x)).catch((e) => console.error("could not call readUserValues", e));
-      }
-      return Promise.reject(resp);
-    },
-    onUserValuesNotification(cb) {
-      window.onUserValuesChanged = function(values) {
-        if (!values?.userValuesNotification) {
-          console.error("missing userValuesNotification");
-          return;
-        }
-        cb(values.userValuesNotification);
-      };
-    }
-  };
-
   // youtube-inject.js
   var defaultEnvironment = {
     getHref() {
@@ -650,14 +662,18 @@
       videoPlayerOverlay.handleFirstPageLoad();
       defaultComms.onUserValuesNotification((userValues2) => {
         console.log("got new values after zero", userValues2);
-        if (userValues2.privatePlayerMode.disabled || userValues2.privatePlayerMode.enabled) {
-          AllIconOverlays.disable();
-        }
-        if (userValues2.privatePlayerMode.alwaysAsk) {
-          AllIconOverlays.enable();
-        }
         videoPlayerOverlay.userValues = userValues2;
         videoPlayerOverlay.watchForVideoBeingAdded({ via: "user notification", ignoreCache: true });
+        if (userValues2.privatePlayerMode.disabled) {
+          AllIconOverlays.disable();
+          OpenInDuckPlayer.disable();
+        } else if (userValues2.privatePlayerMode.enabled) {
+          AllIconOverlays.disable();
+          OpenInDuckPlayer.enable();
+        } else if (userValues2.privatePlayerMode.alwaysAsk) {
+          AllIconOverlays.enable();
+          OpenInDuckPlayer.disable();
+        }
       });
       const CSS = {
         styles: styles_default,
@@ -668,10 +684,13 @@
         }
       };
       const VideoThumbnail = {
+        isSingleVideoURL: (href) => {
+          return href && (href.includes("/watch?v=") && !href.includes("&list=") || href.includes("/watch?v=") && href.includes("&list=") && href.includes("&index=")) && !href.includes("&pp=");
+        },
         findAll: () => {
           const linksToVideos = (item) => {
             let href = item.getAttribute("href");
-            return href && (href.includes("/watch?v=") && !href.includes("&list=") || href.includes("/watch?v=") && href.includes("&list=") && href.includes("&index=")) && !href.includes("&pp=");
+            return VideoThumbnail.isSingleVideoURL(href);
           };
           const linksWithImages = (item) => {
             return item.querySelector("img");
@@ -777,8 +796,61 @@
           IconOverlay.removeAll();
         }
       };
+      const OpenInDuckPlayer = {
+        clickBoundElements: /* @__PURE__ */ new Map(),
+        enabled: false,
+        bindEventsToAll: () => {
+          if (!OpenInDuckPlayer.enabled) {
+            return;
+          }
+          let videoLinksAndPreview = Array.from(document.querySelectorAll('a[href^="/watch?v="], #media-container-link')), isValidVideoLinkOrPreview = (element) => {
+            return VideoThumbnail.isSingleVideoURL(element?.getAttribute("href")) || element.getAttribute("id") === "media-container-link";
+          }, excludeAlreadyBound = (element) => !OpenInDuckPlayer.clickBoundElements.has(element);
+          videoLinksAndPreview.filter(excludeAlreadyBound).forEach((element) => {
+            if (isValidVideoLinkOrPreview(element)) {
+              let onClickOpenDuckPlayer = (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                let link = event.target.closest("a");
+                if (link) {
+                  const href = VideoParams.fromHref(link.href)?.toPrivatePlayerUrl();
+                  comms.openInDuckPlayerViaMessage(href);
+                }
+                return false;
+              };
+              element.addEventListener("click", onClickOpenDuckPlayer, true);
+              OpenInDuckPlayer.clickBoundElements.set(element, onClickOpenDuckPlayer);
+            }
+          });
+        },
+        disable: () => {
+          OpenInDuckPlayer.clickBoundElements.forEach((functionToRemove, element) => {
+            element.removeEventListener("click", functionToRemove, true);
+            OpenInDuckPlayer.clickBoundElements.delete(element);
+          });
+          OpenInDuckPlayer.enabled = false;
+        },
+        enable: () => {
+          OpenInDuckPlayer.enabled = true;
+          OpenInDuckPlayer.bindEventsToAll();
+          onDOMChanged(() => {
+            OpenInDuckPlayer.bindEventsToAll();
+          });
+        },
+        enableOnDOMLoaded: () => {
+          OpenInDuckPlayer.enabled = true;
+          onDOMLoaded(() => {
+            OpenInDuckPlayer.bindEventsToAll();
+          });
+          onDOMChanged(() => {
+            OpenInDuckPlayer.bindEventsToAll();
+          });
+        }
+      };
       if ("alwaysAsk" in userValues.privatePlayerMode) {
         AllIconOverlays.enableOnDOMLoaded();
+      } else if ("enabled" in userValues.privatePlayerMode) {
+        OpenInDuckPlayer.enableOnDOMLoaded();
       }
     }
   }

@@ -1,6 +1,7 @@
 import {addTrustedEventListener, appendElement, VideoParams} from "./util";
 import dax from "../assets/dax.svg";
 import {i18n} from "./text.js";
+import {macOSCommunications} from "./comms";
 
 export const IconOverlay = {
     /**
@@ -39,6 +40,18 @@ export const IconOverlay = {
                 </a>`;
 
         overlayElement.querySelector('a.ddg-play-privately')?.setAttribute('href', href);
+
+        overlayElement.querySelector('a.ddg-play-privately').addEventListener('click', (event, a, b) => {
+            event.preventDefault();
+            event.stopPropagation();
+
+            let link = event.target.closest('a');
+            let href = link.getAttribute('href');
+
+            macOSCommunications.openInDuckPlayerViaMessage(href);
+
+            return;
+        })
 
         return overlayElement;
     },
