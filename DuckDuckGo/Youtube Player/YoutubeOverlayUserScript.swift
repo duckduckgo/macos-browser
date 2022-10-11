@@ -43,7 +43,7 @@ final class YoutubeOverlayUserScript: NSObject, StaticUserScript, UserScriptWith
     static var script: WKUserScript = YoutubeOverlayUserScript.makeWKUserScript()
     var messageNames: [String] { MessageNames.allCases.map(\.rawValue) }
 
-    var delegate: YoutubeOverlayUserScriptDelegate?
+    weak var delegate: YoutubeOverlayUserScriptDelegate?
 
     init(preferences: PrivatePlayerPreferences = .shared) {
         privatePlayerPreferences = preferences
