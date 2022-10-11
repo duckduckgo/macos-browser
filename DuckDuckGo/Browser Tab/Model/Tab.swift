@@ -206,9 +206,11 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
         super.init()
 
-        handleFavicon()
         initAttributionLogic(state: attributionState ?? parentTab?.adClickAttributionLogic.state)
         setupWebView(shouldLoadInBackground: shouldLoadInBackground)
+        if favicon == nil {
+            handleFavicon()
+        }
 
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(onDuckDuckGoEmailSignOut),
