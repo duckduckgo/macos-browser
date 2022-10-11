@@ -118,7 +118,7 @@ extension WindowControllersManager {
     func open(bookmark: Bookmark) {
         if NSApplication.shared.isCommandPressed && NSApplication.shared.isShiftPressed {
             WindowsManager.openNewWindow(with: bookmark.url)
-        } else if NSApplication.shared.isCommandPressed {
+        } else if NSApplication.shared.isCommandPressed || mainWindowController?.mainViewController.view.window?.isPopUpWindow ?? false {
             show(url: bookmark.url, newTab: true)
         } else if selectedTab?.isPinned ?? false { // When selecting a bookmark with a pinned tab active, always open the URL in a new tab
             show(url: bookmark.url, newTab: true)
