@@ -153,6 +153,11 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             autofillScript?.currentOverlayTab = delegate
         }
     }
+    
+    var isPinned: Bool {
+        return pinnedTabsManager.isTabPinned(self)
+    }
+    
     private let cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter?
     private let pinnedTabsManager: PinnedTabsManager
     private let privatePlayer: PrivatePlayer

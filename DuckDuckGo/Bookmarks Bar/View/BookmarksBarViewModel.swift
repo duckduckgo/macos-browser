@@ -453,17 +453,7 @@ extension BookmarksBarViewModel: BookmarksBarCollectionViewItemDelegate {
             return
         }
 
-        let action: BookmarksBarItemAction
-        
-        if NSApplication.shared.isCommandPressed && NSApplication.shared.isShiftPressed {
-            action = .openInNewTab
-        } else if NSApplication.shared.isCommandPressed {
-            action = .openInBackgroundTab
-        } else {
-            action = .clickItem
-        }
-        
-        delegate?.bookmarksBarViewModelReceived(action: action, for: item)
+        delegate?.bookmarksBarViewModelReceived(action: .clickItem, for: item)
     }
     
     func bookmarksBarCollectionViewItemOpenInNewTabAction(_ item: BookmarksBarCollectionViewItem) {        

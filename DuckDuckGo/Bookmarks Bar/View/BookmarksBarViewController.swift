@@ -209,7 +209,7 @@ extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
         case .openInNewWindow:
             WindowsManager.openNewWindow(with: bookmark.url)
         case .clickItem:
-            WindowControllersManager.shared.show(url: bookmark.url)
+            WindowControllersManager.shared.open(bookmark: bookmark)
         case .addToFavorites:
             bookmark.isFavorite = true
             bookmarkManager.update(bookmark: bookmark)
