@@ -222,6 +222,11 @@ final class PrivacyDashboardViewController: NSViewController {
             })
             .store(in: &cancellables)
     }
+    
+    private func sendCurrentLocale() {
+        let enLanguageCode = "en" // Fix the language to english until the app supports localisation
+        privacyDashboardScript.setLocale(enLanguageCode, webView: webView)
+    }
 
 }
 
@@ -297,6 +302,7 @@ extension PrivacyDashboardViewController: WKNavigationDelegate {
         sendPendingUpdates()
         sendParentEntity()
         subscribeToConsentManaged()
+        sendCurrentLocale()
     }
 
 }
