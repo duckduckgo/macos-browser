@@ -117,6 +117,7 @@
         const scripts = document.getElementsByTagName('script')
         if (scripts && scripts.length > 0) {
             scripts[0].parentNode.insertBefore(s, scripts[0])
+            s.remove()
         }
     }
 
