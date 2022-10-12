@@ -44,6 +44,7 @@ final class PreferencesSidebarModel: ObservableObject {
             }
             .removeDuplicates()
             .asVoid()
+            .receive(on: DispatchQueue.main)
             .sink { [weak self] in
                 self?.refreshSections()
             }
