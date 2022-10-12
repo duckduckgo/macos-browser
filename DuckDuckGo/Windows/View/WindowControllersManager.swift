@@ -50,6 +50,19 @@ final class WindowControllersManager: WindowControllersManagerProtocol {
             }
         }
     }
+    
+    private var mainWindowController: MainWindowController? {
+        return mainWindowControllers.first(where: {
+            let isMain = $0.window?.isMainWindow ?? false
+            let hasMainChildWindow = $0.window?.childWindows?.contains { $0.isMainWindow } ?? false
+            
+            return $0.window?.isPopUpWindow == false && (isMain || hasMainChildWindow)
+        })
+    }
+    
+    var selectedTab: Tab? {
+        return mainWindowController?.mainViewController.tabCollectionViewModel.selectedTab
+    }
 
     let didChangeKeyWindowController = PassthroughSubject<Void, Never>()
     let didRegisterWindowController = PassthroughSubject<(MainWindowController), Never>()
@@ -105,7 +118,11 @@ extension WindowControllersManager {
     func open(bookmark: Bookmark) {
         if NSApplication.shared.isCommandPressed && NSApplication.shared.isShiftPressed {
             WindowsManager.openNewWindow(with: bookmark.url)
+        } else if mainWindowController?.mainViewController.view.window?.isPopUpWindow ?? false {
+            show(url: bookmark.url, newTab: true)
         } else if NSApplication.shared.isCommandPressed {
+            mainWindowController?.mainViewController.tabCollectionViewModel.appendNewTab(with: .url(bookmark.url), selected: false)
+        } else if selectedTab?.isPinned ?? false { // When selecting a bookmark with a pinned tab active, always open the URL in a new tab
             show(url: bookmark.url, newTab: true)
         } else {
             show(url: bookmark.url)
@@ -157,12 +174,7 @@ extension WindowControllersManager {
     }
 
     func showTab(with content: Tab.TabContent) {
-        guard let windowController = mainWindowControllers.first(where: {
-            let isMain = $0.window?.isMainWindow ?? false
-            let hasMainChildWindow = $0.window?.childWindows?.contains { $0.isMainWindow } ?? false
-
-            return $0.window?.isPopUpWindow == false && (isMain || hasMainChildWindow)
-        }) else { return }
+        guard let windowController = self.mainWindowController else { return }
 
         let viewController = windowController.mainViewController
         let tabCollectionViewModel = viewController.tabCollectionViewModel

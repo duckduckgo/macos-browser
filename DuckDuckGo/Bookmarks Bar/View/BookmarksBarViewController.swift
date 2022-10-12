@@ -204,12 +204,10 @@ extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
         switch action {
         case .openInNewTab:
             tabCollectionViewModel.appendNewTab(with: .url(bookmark.url), selected: true)
-        case .openInBackgroundTab:
-            tabCollectionViewModel.appendNewTab(with: .url(bookmark.url), selected: false)
         case .openInNewWindow:
             WindowsManager.openNewWindow(with: bookmark.url)
         case .clickItem:
-            WindowControllersManager.shared.show(url: bookmark.url)
+            WindowControllersManager.shared.open(bookmark: bookmark)
         case .addToFavorites:
             bookmark.isFavorite = true
             bookmarkManager.update(bookmark: bookmark)

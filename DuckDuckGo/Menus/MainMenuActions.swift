@@ -429,22 +429,11 @@ extension MainViewController {
             return
         }
 
-        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("MainViewController: No tab view model selected", type: .error)
-            return
-        }
-
         guard let bookmark = menuItem.representedObject as? Bookmark else {
             return
         }
 
-        if NSApplication.shared.isCommandPressed && NSApplication.shared.isShiftPressed {
-            WindowsManager.openNewWindow(with: bookmark.url)
-        } else if NSApplication.shared.isCommandPressed || self.view.window?.isPopUpWindow == true {
-            WindowControllersManager.shared.show(url: bookmark.url, newTab: true)
-        } else {
-            selectedTabViewModel.tab.setContent(.url(bookmark.url))
-        }
+        WindowControllersManager.shared.open(bookmark: bookmark)
     }
 
     @IBAction func openAllInTabs(_ sender: Any?) {
