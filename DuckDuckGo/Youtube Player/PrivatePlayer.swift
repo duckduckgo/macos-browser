@@ -52,16 +52,13 @@ enum PrivatePlayerMode: Equatable, Codable {
 }
 
 final class PrivatePlayer {
-//    var isAvailable: Bool {
-//        privacyConfiguration.isEnabled(featureKey: .duckPlayer)
-//    }
-    let isAvailable: Bool = {
+    var isAvailable: Bool {
         if #available(macOS 11.0, *) {
-            return true
+            return privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .duckPlayer)
         } else {
             return false
         }
-    }()
+    }
 
     static let usesSimulatedRequests: Bool = {
         if #available(macOS 12.0, *) {
@@ -88,9 +85,9 @@ final class PrivatePlayer {
         preferences.youtubeOverlayInteracted
     }
 
-    init(preferences: PrivatePlayerPreferences = .shared, privacyConfiguration: PrivacyConfiguration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig) {
+    init(preferences: PrivatePlayerPreferences = .shared, privacyConfigurationManager: PrivacyConfigurationManager = ContentBlocking.shared.privacyConfigurationManager) {
         self.preferences = preferences
-        self.privacyConfiguration = privacyConfiguration
+        self.privacyConfigurationManager = privacyConfigurationManager
         mode = preferences.privatePlayerMode
 
         if isAvailable {
@@ -104,7 +101,7 @@ final class PrivatePlayer {
 
     private static let websiteTitlePrefix = "\(commonName) - "
     private let preferences: PrivatePlayerPreferences
-    private let privacyConfiguration: PrivacyConfiguration
+    private let privacyConfigurationManager: PrivacyConfigurationManager
     private var modeCancellable: AnyCancellable?
 }
 
