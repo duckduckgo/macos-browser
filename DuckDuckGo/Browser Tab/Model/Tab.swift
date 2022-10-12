@@ -803,7 +803,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     private var youtubePlayerCancellables: Set<AnyCancellable> = []
 
     func setUpYoutubeScriptsIfNeeded() {
-        guard PrivatePlayer.isAvailable else {
+        guard PrivatePlayer.shared.isAvailable else {
             return
         }
 
