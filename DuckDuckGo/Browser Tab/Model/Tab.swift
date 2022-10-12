@@ -811,20 +811,23 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
         youtubePlayerCancellables.removeAll()
 
-        if webView.url?.host?.droppingWwwPrefix() == "youtube.com" {
-            privatePlayer.$mode
-                .dropFirst()
-                .sink { [weak self] playerMode in
-                    guard let self = self else {
-                        return
+        // only send push updates on macOS 11+ where it's safe to call window.* messages in the browser
+        if #available(macOS 11, *) {
+            if webView.url?.host?.droppingWwwPrefix() == "youtube.com" {
+                privatePlayer.$mode
+                    .dropFirst()
+                    .sink { [weak self] playerMode in
+                        guard let self = self else {
+                            return
+                        }
+                        let userValues = YoutubeOverlayUserScript.UserValues(
+                                privatePlayerMode: playerMode,
+                                overlayInteracted: self.privatePlayer.overlayInteracted
+                        )
+                        self.youtubeOverlayScript?.userValuesUpdated(userValues: userValues, inWebView: self.webView)
                     }
-                    let userValues = YoutubeOverlayUserScript.UserValues(
-                            privatePlayerMode: playerMode,
-                            overlayInteracted: self.privatePlayer.overlayInteracted
-                    )
-                    self.youtubeOverlayScript?.userValuesUpdated(userValues: userValues, inWebView: self.webView)
-                }
-                .store(in: &youtubePlayerCancellables)
+                    .store(in: &youtubePlayerCancellables)
+            }
         }
 
         if url?.isPrivatePlayerScheme == true {
