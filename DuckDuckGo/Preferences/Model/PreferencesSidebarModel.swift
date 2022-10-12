@@ -20,21 +20,25 @@ import SwiftUI
 
 final class PreferencesSidebarModel: ObservableObject {
 
-    let sections: [PreferencesSection]
     let tabSwitcherTabs: [Tab.TabContent]
 
+    @Published private(set) var sections: [PreferencesSection] = []
     @Published var selectedTabIndex: Int = 0
-
     @Published private(set) var selectedPane: PreferencePaneIdentifier = .general
 
     init(
-        sections: [PreferencesSection] = PreferencesSection.defaultSections,
+        loadSections: @autoclosure @escaping () -> [PreferencesSection] = PreferencesSection.defaultSections,
         tabSwitcherTabs: [Tab.TabContent] = Tab.TabContent.displayableTabTypes
     ) {
-        self.sections = sections
+        self.loadSections = loadSections
         self.tabSwitcherTabs = tabSwitcherTabs
         resetTabSelectionIfNeeded()
-        if let firstPane = sections.first?.panes.first {
+        refreshSections()
+    }
+
+    func refreshSections() {
+        sections = loadSections()
+        if !sections.flatMap(\.panes).contains(selectedPane), let firstPane = sections.first?.panes.first {
             selectedPane = firstPane
         }
     }
@@ -52,4 +56,6 @@ final class PreferencesSidebarModel: ObservableObject {
             }
         }
     }
+
+    private let loadSections: () -> [PreferencesSection]
 }

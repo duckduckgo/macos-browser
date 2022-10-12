@@ -39,6 +39,11 @@ final class PreferencesViewController: NSViewController {
         view.addAndLayout(host)
     }
 
+    override func viewWillAppear() {
+        super.viewWillAppear()
+        model.refreshSections()
+    }
+
     override func viewDidAppear() {
         super.viewDidAppear()
         selectedTabIndexCancellable = model.$selectedTabIndex

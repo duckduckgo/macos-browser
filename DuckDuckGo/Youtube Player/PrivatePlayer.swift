@@ -52,14 +52,6 @@ enum PrivatePlayerMode: Equatable, Codable {
 }
 
 final class PrivatePlayer {
-    var isAvailable: Bool {
-        if #available(macOS 11.0, *) {
-            return privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .duckPlayer)
-        } else {
-            return false
-        }
-    }
-
     static let usesSimulatedRequests: Bool = {
         if #available(macOS 12.0, *) {
             return true
@@ -80,29 +72,50 @@ final class PrivatePlayer {
 
     static let shared = PrivatePlayer()
 
+    var isAvailable: Bool {
+        if #available(macOS 11.0, *) {
+            return isFeatureEnabled
+        } else {
+            return false
+        }
+    }
+
     @Published var mode: PrivatePlayerMode
+
     var overlayInteracted: Bool {
         preferences.youtubeOverlayInteracted
     }
 
     init(preferences: PrivatePlayerPreferences = .shared, privacyConfigurationManager: PrivacyConfigurationManager = ContentBlocking.shared.privacyConfigurationManager) {
         self.preferences = preferences
-        self.privacyConfigurationManager = privacyConfigurationManager
+        isFeatureEnabled = privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .duckPlayer)
         mode = preferences.privatePlayerMode
 
-        if isAvailable {
-            modeCancellable = preferences.$privatePlayerMode
-                .removeDuplicates()
-                .assign(to: \.mode, onWeaklyHeld: self)
-        }
+        isFeatureEnabledCancellable = privacyConfigurationManager.updatesPublisher
+            .map { [weak privacyConfigurationManager] in
+                privacyConfigurationManager?.privacyConfig.isEnabled(featureKey: .duckPlayer) == true
+            }
+            .assign(to: \.isFeatureEnabled, onWeaklyHeld: self)
     }
 
     // MARK: - Private
 
     private static let websiteTitlePrefix = "\(commonName) - "
     private let preferences: PrivatePlayerPreferences
-    private let privacyConfigurationManager: PrivacyConfigurationManager
+
+    private var isFeatureEnabled: Bool = false {
+        didSet {
+            if isFeatureEnabled {
+                modeCancellable = preferences.$privatePlayerMode
+                    .removeDuplicates()
+                    .assign(to: \.mode, onWeaklyHeld: self)
+            } else {
+                modeCancellable = nil
+            }
+        }
+    }
     private var modeCancellable: AnyCancellable?
+    private var isFeatureEnabledCancellable: AnyCancellable?
 }
 
 // MARK: - Navigation
@@ -112,9 +125,9 @@ extension PrivatePlayer {
     func decidePolicy(for navigationAction: WKNavigationAction, in tab: Tab) -> WKNavigationActionPolicy? {
         guard isAvailable, mode != .disabled else {
 
-            // When the feature is disabled but the webView still gets a Private Player scheme URL,
+            // When the feature is disabled but the webView still gets a Private Player URL,
             // convert it back to a regular YouTube video URL.
-            if navigationAction.request.url?.isPrivatePlayerScheme == true,
+            if navigationAction.request.url?.isPrivatePlayer == true,
                 let (videoID, timestamp) = navigationAction.request.url?.youtubeVideoParams {
 
                 tab.webView.load(.youtube(videoID, timestamp: timestamp))
