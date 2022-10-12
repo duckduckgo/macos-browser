@@ -289,6 +289,35 @@ extension PrivacyDashboardViewController: PrivacyDashboardUserScriptDelegate {
         }
         tabCollection.appendNewTab(with: .url(url), selected: true)
     }
+    
+    func userScript(_ userScript: PrivacyDashboardUserScript, didRequestSubmitBrokenSiteReportWithCategory category: String, description: String) {
+        let websiteBreakage = makeWebsiteBreakage(category: category, description: description, currentTab: tabViewModel?.tab)
+        let websiteBreakageSender = WebsiteBreakageSender()
+        websiteBreakageSender.sendWebsiteBreakage(websiteBreakage)
+    }
+    
+    private func makeWebsiteBreakage(category: String, description: String, currentTab: Tab?) -> WebsiteBreakage {
+        // ⚠️ To limit privacy risk, site URL is trimmed to not include query and fragment
+        let currentURL = currentTab?.content.url?.trimmingQueryItemsAndFragment()?.absoluteString ?? ""
+        
+        let blockedTrackerDomains = currentTab?.trackerInfo?.trackersBlocked.compactMap { $0.domain } ?? []
+        let installedSurrogates = currentTab?.trackerInfo?.installedSurrogates.map {$0} ?? []
+        let ampURL = currentTab?.linkProtection.lastAMPURLString ?? ""
+        let urlParametersRemoved = currentTab?.linkProtection.urlParametersRemoved ?? false
+        
+        let websiteBreakage = WebsiteBreakage(category: WebsiteBreakage.Category(rawValue: category.lowercased()),
+                                              description: description,
+                                              siteUrlString: currentURL,
+                                              osVersion: "\(ProcessInfo.processInfo.operatingSystemVersion)",
+                                              upgradedHttps: currentTab?.connectionUpgradedTo != nil,
+                                              tdsETag: ContentBlocking.shared.contentBlockingManager.currentRules.first?.etag,
+                                              blockedTrackerDomains: blockedTrackerDomains,
+                                              installedSurrogates: installedSurrogates,
+                                              isGPCEnabled: PrivacySecurityPreferences.shared.gpcEnabled,
+                                              ampURL: ampURL,
+                                              urlParametersRemoved: urlParametersRemoved)
+        return websiteBreakage
+    }
 }
 
 extension PrivacyDashboardViewController: WKNavigationDelegate {

@@ -28,6 +28,7 @@ protocol PrivacyDashboardUserScriptDelegate: AnyObject {
     func userScript(_ userScript: PrivacyDashboardUserScript, setPermission permission: PermissionType, paused: Bool)
     func userScript(_ userScript: PrivacyDashboardUserScript, setHeight height: Int)
     func userScript(_ userScript: PrivacyDashboardUserScript, didRequestOpenUrlInNewTab: URL)
+    func userScript(_ userScript: PrivacyDashboardUserScript, didRequestSubmitBrokenSiteReportWithCategory category: String, description: String)
 }
 
 final class PrivacyDashboardUserScript: NSObject, StaticUserScript {
@@ -39,6 +40,7 @@ final class PrivacyDashboardUserScript: NSObject, StaticUserScript {
         case privacyDashboardSetPermissionPaused
         case privacyDashboardSetSize
         case privacyDashboardOpenUrlInNewTab
+        case privacyDashboardSubmitBrokenSiteReport
     }
 
     static var injectionTime: WKUserScriptInjectionTime { .atDocumentStart }
@@ -74,6 +76,9 @@ final class PrivacyDashboardUserScript: NSObject, StaticUserScript {
 
         case .privacyDashboardOpenUrlInNewTab:
             handleOpenUrlInNewTab(message: message)
+            
+        case .privacyDashboardSubmitBrokenSiteReport:
+            handleSubmitBrokenSiteReport(message: message)
         }
     }
 
@@ -144,6 +149,17 @@ final class PrivacyDashboardUserScript: NSObject, StaticUserScript {
         }
 
         delegate?.userScript(self, setHeight: height)
+    }
+    
+    private func handleSubmitBrokenSiteReport(message: WKScriptMessage) {
+        guard let dict = message.body as? [String: Any],
+              let category = dict["category"] as? String,
+              let description = dict["description"] as? String else {
+            assertionFailure("privacyDashboardSetHeight: expected { category: String, description: String }")
+            return
+        }
+
+        delegate?.userScript(self, didRequestSubmitBrokenSiteReportWithCategory: category, description: description)
     }
 
     typealias AuthorizationState = [(permission: PermissionType, state: PermissionAuthorizationState)]
