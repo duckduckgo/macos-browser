@@ -54,7 +54,7 @@ typedef NS_OPTIONS(NSUInteger, _WKCaptureDevices) {
 - (void)setMicrophoneCaptureState:(WKMediaCaptureState)state completionHandler:(void (^)(void))completionHandler API_AVAILABLE(macos(12.0), ios(15.0));
 - (void)setCameraCaptureState:(WKMediaCaptureState)state completionHandler:(void (^)(void))completionHandler API_AVAILABLE(macos(12.0), ios(15.0));
 - (void)_stopMediaCapture;
-
+- (void)_stopAllMediaPlayback;
 - (_WKMediaMutedState)_mediaMutedState;
 - (void)_setPageMuted:(_WKMediaMutedState)mutedState;
 
