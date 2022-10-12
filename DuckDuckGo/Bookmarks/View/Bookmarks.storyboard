@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="21225" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21225"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -714,84 +714,108 @@ Gw
                             <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="Wgx-ZT-vUV" userLabel="Divider">
                                 <rect key="frame" x="0.0" y="406" width="420" height="5"/>
                             </box>
-                            <button translatesAutoresizingMaskIntoConstraints="NO" id="qBa-rT-8sF" userLabel="New Bookmark Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="308" y="419" width="24" height="24"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="24" id="9mk-iy-mXT"/>
-                                    <constraint firstAttribute="width" constant="24" id="kiL-Lk-pWq"/>
-                                </constraints>
-                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="AddBookmark" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="KBc-mO-g1J">
-                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <color key="contentTintColor" name="ButtonColor"/>
-                                <userDefinedRuntimeAttributes>
-                                    <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
-                                        <color key="value" name="ButtonMouseOverColor"/>
-                                    </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="color" keyPath="mouseDownColor">
-                                        <color key="value" name="ButtonMouseDownColor"/>
-                                    </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
-                                        <real key="value" value="4"/>
-                                    </userDefinedRuntimeAttribute>
-                                </userDefinedRuntimeAttributes>
-                                <connections>
-                                    <action selector="newBookmarkButtonClicked:" target="Scx-gG-IP9" id="65N-1I-jOo"/>
-                                </connections>
-                            </button>
-                            <button translatesAutoresizingMaskIntoConstraints="NO" id="xMD-lr-ArK" userLabel="New Folder Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="342" y="419" width="24" height="24"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="24" id="BWu-UC-Ow7"/>
-                                    <constraint firstAttribute="width" constant="24" id="wml-gt-OK1"/>
-                                </constraints>
-                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="AddFolder" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="EkA-sE-QuN">
-                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <color key="contentTintColor" name="ButtonColor"/>
-                                <userDefinedRuntimeAttributes>
-                                    <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
-                                        <color key="value" name="ButtonMouseOverColor"/>
-                                    </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="color" keyPath="mouseDownColor">
-                                        <color key="value" name="ButtonMouseDownColor"/>
-                                    </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
-                                        <real key="value" value="4"/>
-                                    </userDefinedRuntimeAttribute>
-                                </userDefinedRuntimeAttributes>
-                                <connections>
-                                    <action selector="newFolderButtonClicked:" target="Scx-gG-IP9" id="Pk2-ov-PP7"/>
-                                </connections>
-                            </button>
-                            <button translatesAutoresizingMaskIntoConstraints="NO" id="pTk-xE-OqR" userLabel="Show Management UI Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="376" y="419" width="24" height="24"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="24" id="cBD-Aw-Rsl"/>
-                                    <constraint firstAttribute="height" constant="24" id="rgG-V6-CDn"/>
-                                </constraints>
-                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Expand" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="jdG-cU-IZR">
-                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <color key="contentTintColor" name="ButtonColor"/>
-                                <userDefinedRuntimeAttributes>
-                                    <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
-                                        <color key="value" name="ButtonMouseOverColor"/>
-                                    </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="color" keyPath="mouseDownColor">
-                                        <color key="value" name="ButtonMouseDownColor"/>
-                                    </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
-                                        <real key="value" value="4"/>
-                                    </userDefinedRuntimeAttribute>
-                                </userDefinedRuntimeAttributes>
-                                <connections>
-                                    <action selector="openManagementInterface:" target="Scx-gG-IP9" id="kQf-pI-TID"/>
-                                </connections>
-                            </button>
+                            <stackView distribution="fill" orientation="horizontal" alignment="centerY" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="0If-Lj-8IG">
+                                <rect key="frame" x="291" y="417" width="109" height="28"/>
+                                <subviews>
+                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="qBa-rT-8sF" userLabel="New Bookmark Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="0.0" width="28" height="28"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="28" id="9mk-iy-mXT"/>
+                                            <constraint firstAttribute="width" constant="28" id="kiL-Lk-pWq"/>
+                                        </constraints>
+                                        <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="AddBookmark" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="KBc-mO-g1J">
+                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                        </buttonCell>
+                                        <color key="contentTintColor" name="ButtonColor"/>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
+                                                <color key="value" name="ButtonMouseOverColor"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="color" keyPath="mouseDownColor">
+                                                <color key="value" name="ButtonMouseDownColor"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                                <real key="value" value="4"/>
+                                            </userDefinedRuntimeAttribute>
+                                        </userDefinedRuntimeAttributes>
+                                        <connections>
+                                            <action selector="newBookmarkButtonClicked:" target="Scx-gG-IP9" id="65N-1I-jOo"/>
+                                        </connections>
+                                    </button>
+                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="xMD-lr-ArK" userLabel="New Folder Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                        <rect key="frame" x="32" y="0.0" width="28" height="28"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="28" id="BWu-UC-Ow7"/>
+                                            <constraint firstAttribute="width" constant="28" id="wml-gt-OK1"/>
+                                        </constraints>
+                                        <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="AddFolder" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="EkA-sE-QuN">
+                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                        </buttonCell>
+                                        <color key="contentTintColor" name="ButtonColor"/>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
+                                                <color key="value" name="ButtonMouseOverColor"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="color" keyPath="mouseDownColor">
+                                                <color key="value" name="ButtonMouseDownColor"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                                <real key="value" value="4"/>
+                                            </userDefinedRuntimeAttribute>
+                                        </userDefinedRuntimeAttributes>
+                                        <connections>
+                                            <action selector="newFolderButtonClicked:" target="Scx-gG-IP9" id="Pk2-ov-PP7"/>
+                                        </connections>
+                                    </button>
+                                    <box horizontalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="fEN-MQ-Uoc">
+                                        <rect key="frame" x="62" y="5" width="17" height="18"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="13" id="Mv3-8I-hdg"/>
+                                            <constraint firstAttribute="height" constant="18" id="rtz-NW-cwa"/>
+                                        </constraints>
+                                    </box>
+                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="pTk-xE-OqR" userLabel="Show Management UI Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                        <rect key="frame" x="81" y="0.0" width="28" height="28"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="28" id="cBD-Aw-Rsl"/>
+                                            <constraint firstAttribute="height" constant="28" id="rgG-V6-CDn"/>
+                                        </constraints>
+                                        <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Expand" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="jdG-cU-IZR">
+                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                        </buttonCell>
+                                        <color key="contentTintColor" name="ButtonColor"/>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
+                                                <color key="value" name="ButtonMouseOverColor"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="color" keyPath="mouseDownColor">
+                                                <color key="value" name="ButtonMouseDownColor"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                                <real key="value" value="4"/>
+                                            </userDefinedRuntimeAttribute>
+                                        </userDefinedRuntimeAttributes>
+                                        <connections>
+                                            <action selector="openManagementInterface:" target="Scx-gG-IP9" id="kQf-pI-TID"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                                <visibilityPriorities>
+                                    <integer value="1000"/>
+                                    <integer value="1000"/>
+                                    <integer value="1000"/>
+                                    <integer value="1000"/>
+                                </visibilityPriorities>
+                                <customSpacing>
+                                    <real value="3.4028234663852886e+38"/>
+                                    <real value="3.4028234663852886e+38"/>
+                                    <real value="3.4028234663852886e+38"/>
+                                    <real value="3.4028234663852886e+38"/>
+                                </customSpacing>
+                            </stackView>
                             <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="24" horizontalPageScroll="10" verticalLineScroll="24" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="sfH-at-DQe" userLabel="Bookmarks Outline View">
                                 <rect key="frame" x="0.0" y="0.0" width="420" height="408"/>
                                 <clipView key="contentView" drawsBackground="NO" id="jhZ-VR-onf">
@@ -901,20 +925,16 @@ Gw
                             <constraint firstItem="ziZ-XM-tSu" firstAttribute="centerX" secondItem="Wgx-ZT-vUV" secondAttribute="centerX" id="6g2-xw-QwJ"/>
                             <constraint firstItem="sfH-at-DQe" firstAttribute="top" secondItem="Wgx-ZT-vUV" secondAttribute="bottom" id="HCS-40-lt3"/>
                             <constraint firstAttribute="trailing" secondItem="Wgx-ZT-vUV" secondAttribute="trailing" id="IHY-bB-P4D"/>
-                            <constraint firstAttribute="trailing" secondItem="pTk-xE-OqR" secondAttribute="trailing" constant="20" symbolic="YES" id="JB3-nj-EBU"/>
                             <constraint firstItem="Wgx-ZT-vUV" firstAttribute="leading" secondItem="xb9-2G-g28" secondAttribute="leading" id="MbT-Yq-ETA"/>
-                            <constraint firstItem="xMD-lr-ArK" firstAttribute="centerY" secondItem="TJx-89-ls4" secondAttribute="centerY" id="ORV-Cg-vc3"/>
+                            <constraint firstAttribute="trailing" secondItem="0If-Lj-8IG" secondAttribute="trailing" constant="20" symbolic="YES" id="Oby-6I-Ifs"/>
                             <constraint firstItem="TJx-89-ls4" firstAttribute="top" secondItem="xb9-2G-g28" secondAttribute="top" constant="12" id="RQs-Js-8RE"/>
                             <constraint firstAttribute="bottom" secondItem="sfH-at-DQe" secondAttribute="bottom" id="TRV-pD-KPb"/>
                             <constraint firstAttribute="trailing" secondItem="sfH-at-DQe" secondAttribute="trailing" id="XpF-rq-lc0"/>
-                            <constraint firstItem="pTk-xE-OqR" firstAttribute="leading" secondItem="xMD-lr-ArK" secondAttribute="trailing" constant="10" symbolic="YES" id="ZVK-LI-192"/>
                             <constraint firstItem="Wgx-ZT-vUV" firstAttribute="top" secondItem="TJx-89-ls4" secondAttribute="bottom" constant="12" id="c2w-eV-aIm"/>
                             <constraint firstItem="sfH-at-DQe" firstAttribute="leading" secondItem="xb9-2G-g28" secondAttribute="leading" id="j7E-WK-AS8"/>
-                            <constraint firstItem="xMD-lr-ArK" firstAttribute="leading" secondItem="qBa-rT-8sF" secondAttribute="trailing" constant="10" symbolic="YES" id="jLx-74-nNz"/>
                             <constraint firstItem="TJx-89-ls4" firstAttribute="leading" secondItem="xb9-2G-g28" secondAttribute="leading" constant="15" id="jlk-qH-vHa"/>
                             <constraint firstItem="ziZ-XM-tSu" firstAttribute="top" secondItem="Wgx-ZT-vUV" secondAttribute="bottom" id="oKx-XS-L5q"/>
-                            <constraint firstItem="qBa-rT-8sF" firstAttribute="centerY" secondItem="TJx-89-ls4" secondAttribute="centerY" id="pkc-Pa-8yn"/>
-                            <constraint firstItem="pTk-xE-OqR" firstAttribute="centerY" secondItem="TJx-89-ls4" secondAttribute="centerY" id="umv-FL-gFh"/>
+                            <constraint firstItem="0If-Lj-8IG" firstAttribute="centerY" secondItem="TJx-89-ls4" secondAttribute="centerY" id="r6F-u8-UVL"/>
                         </constraints>
                     </view>
                     <connections>
@@ -922,6 +942,9 @@ Gw
                         <outlet property="emptyState" destination="ziZ-XM-tSu" id="n1i-7d-W48"/>
                         <outlet property="emptyStateMessage" destination="1Te-SN-ek2" id="7Lu-g0-VVP"/>
                         <outlet property="emptyStateTitle" destination="1ce-Da-33o" id="n3W-I6-rcZ"/>
+                        <outlet property="manageBookmarksButton" destination="pTk-xE-OqR" id="pLF-oe-MAe"/>
+                        <outlet property="newBookmarkButton" destination="qBa-rT-8sF" id="trj-Hh-c8f"/>
+                        <outlet property="newFolderButton" destination="xMD-lr-ArK" id="UBg-Zh-fNd"/>
                         <outlet property="outlineView" destination="66p-cd-DbA" id="Shg-RA-vKK"/>
                     </connections>
                 </viewController>

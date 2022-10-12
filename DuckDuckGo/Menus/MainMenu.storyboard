@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="21225" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21225"/>
     </dependencies>
     <scenes>
         <!--Application-->
@@ -385,17 +385,33 @@
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="hB3-LF-h0Y"/>
-                                        <menuItem title="Open Downloads" keyEquivalent="j" id="qWL-J6-S8r">
-                                            <connections>
-                                                <action selector="toggleDownloads:" target="Ady-hI-5gd" id="UAV-kU-Drp"/>
-                                            </connections>
-                                        </menuItem>
-                                        <menuItem title="Toggle Bookmarks Bar" keyEquivalent="B" id="z3f-ie-l71">
+                                        <menuItem title="Show Bookmarks Bar" keyEquivalent="B" id="z3f-ie-l71">
                                             <connections>
                                                 <action selector="toggleBookmarksBar:" target="Ady-hI-5gd" id="nVa-wD-QtY"/>
                                             </connections>
                                         </menuItem>
+                                        <menuItem title="Show Downloads" keyEquivalent="j" id="qWL-J6-S8r">
+                                            <connections>
+                                                <action selector="toggleDownloads:" target="Ady-hI-5gd" id="UAV-kU-Drp"/>
+                                            </connections>
+                                        </menuItem>
                                         <menuItem isSeparatorItem="YES" id="Ucx-oU-4kc"/>
+                                        <menuItem title="Show Autofill Shortcut" keyEquivalent="A" id="ha5-uX-jTn">
+                                            <connections>
+                                                <action selector="toggleAutofillShortcut:" target="Ady-hI-5gd" id="JGc-Ym-QWK"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Show Bookmarks Shortcut" keyEquivalent="K" id="bXm-yY-7AL">
+                                            <connections>
+                                                <action selector="toggleBookmarksShortcut:" target="Ady-hI-5gd" id="Alc-0B-9mr"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Show Downloads Shortcut" keyEquivalent="J" id="3II-oR-MBb">
+                                            <connections>
+                                                <action selector="toggleDownloadsShortcut:" target="Ady-hI-5gd" id="ReL-VD-CSo"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem isSeparatorItem="YES" id="LIc-c6-SKt"/>
                                         <menuItem title="Enter Full Screen" keyEquivalent="f" id="4J7-dP-txa">
                                             <modifierMask key="keyEquivalentModifierMask" control="YES" command="YES"/>
                                             <connections>
@@ -691,7 +707,7 @@ CQ
                                                             <action selector="resetDefaultGrammarChecks:" target="Ady-hI-5gd" id="Ces-GX-TM5"/>
                                                         </connections>
                                                     </menuItem>
-                                                    <menuItem title="Reset Secure Vault Data" id="opO-fm-tW5">
+                                                    <menuItem title="Reset Autofill Data" id="opO-fm-tW5">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                         <connections>
                                                             <action selector="resetSecureVaultData:" target="Ady-hI-5gd" id="5uS-MI-2BN"/>
@@ -703,16 +719,16 @@ CQ
                                                             <action selector="resetBookmarks:" target="Ady-hI-5gd" id="3Q0-wb-PaD"/>
                                                         </connections>
                                                     </menuItem>
-                                                    <menuItem title="Reset Mac Waitlist Lock Screen" id="jXH-IC-kHl">
-                                                        <modifierMask key="keyEquivalentModifierMask"/>
-                                                        <connections>
-                                                            <action selector="resetMacWaitlistUnlockState:" target="Ady-hI-5gd" id="1Bd-q4-0F9"/>
-                                                        </connections>
-                                                    </menuItem>
                                                     <menuItem title="Reset Pinned Tabs" id="4sC-SF-6u1">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                         <connections>
                                                             <action selector="resetPinnedTabs:" target="Ady-hI-5gd" id="4iv-wI-8wp"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                    <menuItem title="Reset Youtube Overlay Interactions" id="tTd-ZO-0Zx">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="resetPrivatePlayerOverlayInteractions:" target="Ady-hI-5gd" id="Tr1-yK-ayF"/>
                                                         </connections>
                                                     </menuItem>
                                                 </items>
@@ -812,7 +828,10 @@ CQ
                             <outlet property="sendFeedbackMenuItem" destination="V8t-Ts-q0L" id="qwz-Oh-HGm"/>
                             <outlet property="shareMenuItem" destination="kUE-Qf-cwa" id="kEZ-Kc-Wf4"/>
                             <outlet property="stopMenuItem" destination="FyY-q1-f0k" id="BFN-Kd-aAb"/>
+                            <outlet property="toggleAutofillShortcutMenuItem" destination="ha5-uX-jTn" id="Rax-0E-qI3"/>
                             <outlet property="toggleBookmarksBarMenuItem" destination="z3f-ie-l71" id="AbM-1C-ubd"/>
+                            <outlet property="toggleBookmarksShortcutMenuItem" destination="bXm-yY-7AL" id="KjP-Tc-Hwo"/>
+                            <outlet property="toggleDownloadsShortcutMenuItem" destination="3II-oR-MBb" id="lBF-XY-b4Z"/>
                             <outlet property="toggleFullscreenMenuItem" destination="4J7-dP-txa" id="lyl-pp-TR0"/>
                             <outlet property="zoomInMenuItem" destination="lMK-tC-RJd" id="Ddo-RX-A6Z"/>
                             <outlet property="zoomOutMenuItem" destination="flw-Fc-cm6" id="1AB-0r-vvx"/>

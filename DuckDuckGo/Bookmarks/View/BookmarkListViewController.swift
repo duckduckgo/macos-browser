@@ -45,6 +45,10 @@ final class BookmarkListViewController: NSViewController {
     @IBOutlet var emptyState: NSView!
     @IBOutlet var emptyStateTitle: NSTextField!
     @IBOutlet var emptyStateMessage: NSTextField!
+    
+    @IBOutlet var newBookmarkButton: NSButton!
+    @IBOutlet var newFolderButton: NSButton!
+    @IBOutlet var manageBookmarksButton: NSButton!
 
     private var cancellables = Set<AnyCancellable>()
     private var bookmarkManager: BookmarkManager = LocalBookmarkManager.shared
@@ -91,6 +95,10 @@ final class BookmarkListViewController: NSViewController {
 
         emptyStateTitle.attributedStringValue = NSAttributedString.make(emptyStateTitle.stringValue, lineHeight: 1.14, kern: -0.23)
         emptyStateMessage.attributedStringValue = NSAttributedString.make(emptyStateMessage.stringValue, lineHeight: 1.05, kern: -0.08)
+        
+        newBookmarkButton.toolTip = UserText.newBookmarkTooltip
+        newFolderButton.toolTip = UserText.newFolderTooltip
+        manageBookmarksButton.toolTip = UserText.manageBookmarksTooltip
     }
 
     override func viewWillAppear() {
@@ -124,7 +132,6 @@ final class BookmarkListViewController: NSViewController {
     @IBAction func openManagementInterface(_ sender: NSButton) {
         WindowControllersManager.shared.showBookmarksTab()
         delegate?.popoverShouldClose(self)
-        Pixel.fire(.manageBookmarks(source: .button))
     }
     
     @IBAction func handleClick(_ sender: NSOutlineView) {
@@ -135,7 +142,6 @@ final class BookmarkListViewController: NSViewController {
            let bookmark = node.representedObject as? Bookmark {
             WindowControllersManager.shared.open(bookmark: bookmark)
             delegate?.popoverShouldClose(self)
-            Pixel.fire(.navigation(kind: .bookmark(isFavorite: bookmark.isFavorite), source: .listInterface))
         } else {
             if outlineView.isItemExpanded(item) {
                 outlineView.animator().collapseItem(item)

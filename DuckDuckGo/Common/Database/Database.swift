@@ -18,6 +18,7 @@
 
 import Foundation
 import CoreData
+import BrowserServicesKit
 
 final class Database {
     
@@ -25,27 +26,18 @@ final class Database {
         static let databaseName = "Database"
     }
     
-    static let shared: Database = {
+    static let shared: CoreDataDatabase = {
 #if DEBUG
         if AppDelegate.isRunningTests {
             let keyStoreMockClass = (NSClassFromString("EncryptionKeyStoreMock") as? NSObject.Type)!
             let keyStoreMock = (keyStoreMockClass.init() as? EncryptionKeyStoring)!
-            return Database(keyStore: keyStoreMock)
+            return makeDatabase(keyStore: keyStoreMock)
         }
 #endif
-        return Database()
+        return makeDatabase(keyStore: EncryptionKeyStore(generator: EncryptionKeyGenerator()))
     }()
 
-    private let container: NSPersistentContainer
-    private let storeLoadedCondition = RunLoop.ResumeCondition()
-    
-    var model: NSManagedObjectModel {
-        return container.managedObjectModel
-    }
-
-    init(name: String = Constants.databaseName,
-         model: NSManagedObjectModel = NSManagedObjectModel.mergedModel(from: [.main])!,
-         keyStore: EncryptionKeyStoring = EncryptionKeyStore(generator: EncryptionKeyGenerator())) {
+    static func makeDatabase(keyStore: EncryptionKeyStoring) -> CoreDataDatabase {
         do {
             try EncryptedValueTransformer<NSImage>.registerTransformer(keyStore: keyStore)
             try EncryptedValueTransformer<NSString>.registerTransformer(keyStore: keyStore)
@@ -57,61 +49,9 @@ final class Database {
             fatalError("Failed to register encryption value transformers")
         }
 
-        container = DDGPersistentContainer(name: name, managedObjectModel: model)
-    }
-    
-    func loadStore(migrationHandler: @escaping (NSManagedObjectContext) -> Void = { _ in }) {
-        container.loadPersistentStores { _, error in
-            if let error = error {
-                Pixel.fire(.debug(event: .dbInitializationError, error: error))
-                // Give Pixel a chance to be sent, but not too long
-                Thread.sleep(forTimeInterval: 1)
-                fatalError("Could not load DB: \(error.localizedDescription)")
-            }
-            
-            let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-            context.persistentStoreCoordinator = self.container.persistentStoreCoordinator
-            context.name = "Migration"
-            context.perform {
-                migrationHandler(context)
-
-                self.storeLoadedCondition.resolve()
-            }
-        }
-    }
-    
-    func makeContext(concurrencyType: NSManagedObjectContextConcurrencyType, name: String? = nil) -> NSManagedObjectContext {
-        RunLoop.current.run(until: storeLoadedCondition)
-
-        let context = NSManagedObjectContext(concurrencyType: concurrencyType)
-        context.persistentStoreCoordinator = container.persistentStoreCoordinator
-        context.name = name
-        
-        return context
-    }
-}
-
-extension NSManagedObjectContext {
-    
-    func deleteAll(entities: [NSManagedObject] = []) {
-        for entity in entities {
-            delete(entity)
-        }
-    }
-    
-    func deleteAll<T: NSManagedObject>(matching request: NSFetchRequest<T>) {
-        if let result = try? fetch(request) {
-            deleteAll(entities: result)
-        }
-    }
-    
-    func deleteAll(entityDescriptions: [NSEntityDescription] = []) {
-        for entityDescription in entityDescriptions {
-            let request = NSFetchRequest<NSManagedObject>()
-            request.entity = entityDescription
-            
-            deleteAll(matching: request)
-        }
+        return CoreDataDatabase(name: Constants.databaseName,
+                                containerLocation: URL.sandboxApplicationSupportURL,
+                                model: NSManagedObjectModel.mergedModel(from: [.main])!)
     }
 }
 
@@ -130,12 +70,4 @@ extension NSManagedObjectContext {
         }
         return obj
     }
-}
-
-private class DDGPersistentContainer: NSPersistentContainer {
-
-    override class func defaultDirectoryURL() -> URL {
-        return URL.sandboxApplicationSupportURL
-    }
-
 }

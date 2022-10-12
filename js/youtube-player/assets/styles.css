@@ -1,0 +1,125 @@
+/* -- THUMBNAIL OVERLAY -- */
+.ddg-overlay {
+    font-family: system, -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    position: absolute;
+    margin-top: 5px;
+    margin-left: 5px;
+    z-index: 1000;
+    height: 32px;
+
+    background: rgba(0, 0, 0, 0.6);
+    box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.25), 0px 4px 8px rgba(0, 0, 0, 0.1), inset 0px 0px 0px 1px rgba(0, 0, 0, 0.18);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    border-radius: 6px;
+
+    transition: 0.15s linear background;
+}
+
+.ddg-overlay a.ddg-play-privately {
+    color: white;
+    text-decoration: none;
+    font-style: normal;
+    font-weight: 600;
+    font-size: 12px;
+}
+
+.ddg-overlay .ddg-dax,
+.ddg-overlay .ddg-play-icon {
+    display: inline-block;
+
+}
+
+.ddg-overlay .ddg-dax {
+    float: left;
+    padding: 4px 4px;
+    width: 24px;
+    height: 24px;
+}
+
+.ddg-overlay .ddg-play-text-container {
+    width: 0px;
+    overflow: hidden;
+    float: left;
+    opacity: 0;
+    transition: all 0.15s linear;
+}
+
+.ddg-overlay .ddg-play-text {
+    line-height: 14px;
+    margin-top: 10px;
+    width: 200px;
+}
+
+.ddg-overlay .ddg-play-icon {
+    float: right;
+    width: 24px;
+    height: 20px;
+    padding: 6px 4px;
+}
+
+.ddg-overlay:not([data-size="fixed small"]):hover .ddg-play-text-container {
+    width: 80px;
+    opacity: 1;
+}
+
+.ddg-overlay[data-size^="video-player"].hidden {
+    display: none;
+}
+
+.ddg-overlay[data-size="video-player"] {
+    bottom: 145px;
+    right: 20px;
+    opacity: 1;
+    transition: opacity .2s;
+}
+
+.html5-video-player.playing-mode.ytp-autohide .ddg-overlay[data-size="video-player"] {
+    opacity: 0;
+}
+
+.html5-video-player.ad-showing .ddg-overlay[data-size="video-player"] {
+    display: none;
+}
+
+.html5-video-player.ytp-hide-controls .ddg-overlay[data-size="video-player"] {
+    display: none;
+}
+
+.ddg-overlay[data-size="video-player-with-title"] {
+    top: 40px;
+    left: 10px;
+}
+
+.ddg-overlay[data-size="video-player-with-paid-content"] {
+    top: 65px;
+    left: 11px;
+}
+
+.ddg-overlay[data-size="title"] {
+    position: relative;
+    margin: 0;
+    float: right;
+}
+
+.ddg-overlay[data-size="title"] .ddg-play-text-container {
+    width: 90px;
+}
+
+.ddg-overlay[data-size^="fixed"] {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: none;
+    z-index: 10;
+}
+
+#preview .ddg-overlay {
+    transition: transform 160ms ease-out 200ms;
+    /*TODO: scale needs to equal 1/--ytd-video-preview-initial-scale*/
+    transform: scale(1.15) translate(5px, 4px);
+}
+
+#preview ytd-video-preview[active] .ddg-overlay {
+    transform:scale(1) translate(0px, 0px);
+}
