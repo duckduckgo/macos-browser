@@ -86,7 +86,10 @@ final class PrivatePlayer {
         preferences.youtubeOverlayInteracted
     }
 
-    init(preferences: PrivatePlayerPreferences = .shared, privacyConfigurationManager: PrivacyConfigurationManager = ContentBlocking.shared.privacyConfigurationManager) {
+    init(
+        preferences: PrivatePlayerPreferences = .shared,
+        privacyConfigurationManager: PrivacyConfigurationManaging & AnyObject = ContentBlocking.shared.privacyConfigurationManager
+    ) {
         self.preferences = preferences
         isFeatureEnabled = privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .duckPlayer)
         mode = preferences.privatePlayerMode
