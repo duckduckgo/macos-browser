@@ -17,6 +17,8 @@
 //
 
 import SwiftUI
+import BrowserServicesKit
+import Combine
 
 final class PreferencesSidebarModel: ObservableObject {
 
@@ -28,12 +30,23 @@ final class PreferencesSidebarModel: ObservableObject {
 
     init(
         loadSections: @autoclosure @escaping () -> [PreferencesSection] = PreferencesSection.defaultSections,
-        tabSwitcherTabs: [Tab.TabContent] = Tab.TabContent.displayableTabTypes
+        tabSwitcherTabs: [Tab.TabContent] = Tab.TabContent.displayableTabTypes,
+        privacyConfigurationManager: PrivacyConfigurationManager = ContentBlocking.shared.privacyConfigurationManager
     ) {
         self.loadSections = loadSections
         self.tabSwitcherTabs = tabSwitcherTabs
         resetTabSelectionIfNeeded()
         refreshSections()
+
+        privacyConfigCancellable = privacyConfigurationManager.updatesPublisher
+            .map { [weak privacyConfigurationManager] in
+                privacyConfigurationManager?.privacyConfig.isEnabled(featureKey: .duckPlayer) == true
+            }
+            .removeDuplicates()
+            .asVoid()
+            .sink { [weak self] in
+                self?.refreshSections()
+            }
     }
 
     func refreshSections() {
@@ -58,4 +71,5 @@ final class PreferencesSidebarModel: ObservableObject {
     }
 
     private let loadSections: () -> [PreferencesSection]
+    private var privacyConfigCancellable: AnyCancellable?
 }
