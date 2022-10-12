@@ -1,4 +1,4 @@
-import css from "./assets/styles.css";
+import css from "./assets/global-styles.css";
 import {VideoOverlayManager} from "./src/video-overlay-manager.js";
 import {IconOverlay} from "./src/icon-overlay.js";
 import {onDOMLoaded, onDOMChanged, addTrustedEventListener, appendElement, VideoParams} from "./src/util.js";
@@ -139,6 +139,7 @@ function initWithEnvironment(environment, comms) {
 
         const Preview = {
             previewContainer: false,
+            hasAppended: false,
 
             /**
              * Get the video hover preview link
@@ -156,9 +157,14 @@ function initWithEnvironment(environment, comms) {
              * @returns {HTMLElement|boolean}
              */
             appendIfNotAppended: () => {
+                if (this.hasAppended) {
+                    return false;
+                }
+
                 let previewVideo = Preview.getPreviewVideoLink();
 
                 if (previewVideo) {
+                    this.hasAppended = true;
                     return IconOverlay.appendToVideo(previewVideo);
                 }
 
@@ -169,13 +175,14 @@ function initWithEnvironment(environment, comms) {
              * Updates the icon overlay to use the correct video url in the preview hover link whenever it is hovered
              */
             update: () => {
-                let updateOverlayVideoId = (element) => {
-                    let overlay = element?.querySelector('.ddg-overlay');
-                    const href = element?.getAttribute("href");
+                let updateOverlayVideoId = (videoLink) => {
+                    const href = videoLink?.getAttribute("href");
+
                     if (href) {
                         const privateUrl = VideoParams.fromPathname(href)?.toPrivatePlayerUrl();
+                        const overlay = document.querySelector('#preview ddg-icon-overlay');
                         if (overlay && privateUrl) {
-                            overlay.querySelector('a.ddg-play-privately')?.setAttribute('href', privateUrl);
+                            overlay.setAttribute('href', privateUrl);
                         }
                     }
                 }

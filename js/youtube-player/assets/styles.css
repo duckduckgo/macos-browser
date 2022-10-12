@@ -1,10 +1,15 @@
 /* -- THUMBNAIL OVERLAY -- */
+:host {
+    z-index: 1000;
+    position: absolute;
+}
+
 .ddg-overlay {
     font-family: system, -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-    position: absolute;
+
     margin-top: 5px;
     margin-left: 5px;
-    z-index: 1000;
+
     height: 32px;
 
     background: rgba(0, 0, 0, 0.6);
@@ -58,6 +63,10 @@
     padding: 6px 4px;
 }
 
+.ddg-overlay:not([data-size="fixed small"]):hover {
+    width: 112px;
+}
+
 .ddg-overlay:not([data-size="fixed small"]):hover .ddg-play-text-container {
     width: 80px;
     opacity: 1;
@@ -67,23 +76,14 @@
     display: none;
 }
 
-.ddg-overlay[data-size="video-player"] {
+:host[data-size="video-player"] {
     bottom: 145px;
     right: 20px;
+}
+
+.ddg-overlay[data-size="video-player"] {
     opacity: 1;
     transition: opacity .2s;
-}
-
-.html5-video-player.playing-mode.ytp-autohide .ddg-overlay[data-size="video-player"] {
-    opacity: 0;
-}
-
-.html5-video-player.ad-showing .ddg-overlay[data-size="video-player"] {
-    display: none;
-}
-
-.html5-video-player.ytp-hide-controls .ddg-overlay[data-size="video-player"] {
-    display: none;
 }
 
 .ddg-overlay[data-size="video-player-with-title"] {
@@ -107,10 +107,6 @@
 }
 
 .ddg-overlay[data-size^="fixed"] {
-    position: absolute;
-    top: 0;
-    left: 0;
-    display: none;
     z-index: 10;
 }
 

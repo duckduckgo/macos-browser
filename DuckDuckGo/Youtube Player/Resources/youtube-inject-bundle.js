@@ -7,8 +7,8 @@
     return value;
   };
 
-  // assets/styles.css
-  var styles_default = '/* -- THUMBNAIL OVERLAY -- */\n.ddg-overlay {\n    font-family: system, -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";\n    position: absolute;\n    margin-top: 5px;\n    margin-left: 5px;\n    z-index: 1000;\n    height: 32px;\n\n    background: rgba(0, 0, 0, 0.6);\n    box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.25), 0px 4px 8px rgba(0, 0, 0, 0.1), inset 0px 0px 0px 1px rgba(0, 0, 0, 0.18);\n    backdrop-filter: blur(2px);\n    -webkit-backdrop-filter: blur(2px);\n    border-radius: 6px;\n\n    transition: 0.15s linear background;\n}\n\n.ddg-overlay a.ddg-play-privately {\n    color: white;\n    text-decoration: none;\n    font-style: normal;\n    font-weight: 600;\n    font-size: 12px;\n}\n\n.ddg-overlay .ddg-dax,\n.ddg-overlay .ddg-play-icon {\n    display: inline-block;\n\n}\n\n.ddg-overlay .ddg-dax {\n    float: left;\n    padding: 4px 4px;\n    width: 24px;\n    height: 24px;\n}\n\n.ddg-overlay .ddg-play-text-container {\n    width: 0px;\n    overflow: hidden;\n    float: left;\n    opacity: 0;\n    transition: all 0.15s linear;\n}\n\n.ddg-overlay .ddg-play-text {\n    line-height: 14px;\n    margin-top: 10px;\n    width: 200px;\n}\n\n.ddg-overlay .ddg-play-icon {\n    float: right;\n    width: 24px;\n    height: 20px;\n    padding: 6px 4px;\n}\n\n.ddg-overlay:not([data-size="fixed small"]):hover .ddg-play-text-container {\n    width: 80px;\n    opacity: 1;\n}\n\n.ddg-overlay[data-size^="video-player"].hidden {\n    display: none;\n}\n\n.ddg-overlay[data-size="video-player"] {\n    bottom: 145px;\n    right: 20px;\n    opacity: 1;\n    transition: opacity .2s;\n}\n\n.html5-video-player.playing-mode.ytp-autohide .ddg-overlay[data-size="video-player"] {\n    opacity: 0;\n}\n\n.html5-video-player.ad-showing .ddg-overlay[data-size="video-player"] {\n    display: none;\n}\n\n.html5-video-player.ytp-hide-controls .ddg-overlay[data-size="video-player"] {\n    display: none;\n}\n\n.ddg-overlay[data-size="video-player-with-title"] {\n    top: 40px;\n    left: 10px;\n}\n\n.ddg-overlay[data-size="video-player-with-paid-content"] {\n    top: 65px;\n    left: 11px;\n}\n\n.ddg-overlay[data-size="title"] {\n    position: relative;\n    margin: 0;\n    float: right;\n}\n\n.ddg-overlay[data-size="title"] .ddg-play-text-container {\n    width: 90px;\n}\n\n.ddg-overlay[data-size^="fixed"] {\n    position: absolute;\n    top: 0;\n    left: 0;\n    display: none;\n    z-index: 10;\n}\n\n#preview .ddg-overlay {\n    transition: transform 160ms ease-out 200ms;\n    /*TODO: scale needs to equal 1/--ytd-video-preview-initial-scale*/\n    transform: scale(1.15) translate(5px, 4px);\n}\n\n#preview ytd-video-preview[active] .ddg-overlay {\n    transform:scale(1) translate(0px, 0px);\n}\n';
+  // assets/global-styles.css
+  var global_styles_default = '.html5-video-player.playing-mode.ytp-autohide ddg-icon-overlay[data-size="video-player"] {\n    opacity: 0;\n}\n\n.html5-video-player.ad-showing ddg-icon-overlay[data-size="video-player"] {\n    display: none;\n}\n\n.html5-video-player.ytp-hide-controls ddg-icon-overlay[data-size="video-player"] {\n    display: none;\n}\n';
 
   // src/util.js
   function addTrustedEventListener(element, event, callback) {
@@ -191,29 +191,67 @@
     }
   };
 
+  // assets/styles.css
+  var styles_default = '/* -- THUMBNAIL OVERLAY -- */\n:host {\n    z-index: 1000;\n    position: absolute;\n}\n\n.ddg-overlay {\n    font-family: system, -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";\n\n    margin-top: 5px;\n    margin-left: 5px;\n\n    height: 32px;\n\n    background: rgba(0, 0, 0, 0.6);\n    box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.25), 0px 4px 8px rgba(0, 0, 0, 0.1), inset 0px 0px 0px 1px rgba(0, 0, 0, 0.18);\n    backdrop-filter: blur(2px);\n    -webkit-backdrop-filter: blur(2px);\n    border-radius: 6px;\n\n    transition: 0.15s linear background;\n}\n\n.ddg-overlay a.ddg-play-privately {\n    color: white;\n    text-decoration: none;\n    font-style: normal;\n    font-weight: 600;\n    font-size: 12px;\n}\n\n.ddg-overlay .ddg-dax,\n.ddg-overlay .ddg-play-icon {\n    display: inline-block;\n\n}\n\n.ddg-overlay .ddg-dax {\n    float: left;\n    padding: 4px 4px;\n    width: 24px;\n    height: 24px;\n}\n\n.ddg-overlay .ddg-play-text-container {\n    width: 0px;\n    overflow: hidden;\n    float: left;\n    opacity: 0;\n    transition: all 0.15s linear;\n}\n\n.ddg-overlay .ddg-play-text {\n    line-height: 14px;\n    margin-top: 10px;\n    width: 200px;\n}\n\n.ddg-overlay .ddg-play-icon {\n    float: right;\n    width: 24px;\n    height: 20px;\n    padding: 6px 4px;\n}\n\n.ddg-overlay:not([data-size="fixed small"]):hover {\n    width: 112px;\n}\n\n.ddg-overlay:not([data-size="fixed small"]):hover .ddg-play-text-container {\n    width: 80px;\n    opacity: 1;\n}\n\n.ddg-overlay[data-size^="video-player"].hidden {\n    display: none;\n}\n\n:host[data-size="video-player"] {\n    bottom: 145px;\n    right: 20px;\n}\n\n.ddg-overlay[data-size="video-player"] {\n    opacity: 1;\n    transition: opacity .2s;\n}\n\n.ddg-overlay[data-size="video-player-with-title"] {\n    top: 40px;\n    left: 10px;\n}\n\n.ddg-overlay[data-size="video-player-with-paid-content"] {\n    top: 65px;\n    left: 11px;\n}\n\n.ddg-overlay[data-size="title"] {\n    position: relative;\n    margin: 0;\n    float: right;\n}\n\n.ddg-overlay[data-size="title"] .ddg-play-text-container {\n    width: 90px;\n}\n\n.ddg-overlay[data-size^="fixed"] {\n    z-index: 10;\n}\n\n#preview .ddg-overlay {\n    transition: transform 160ms ease-out 200ms;\n    /*TODO: scale needs to equal 1/--ytd-video-preview-initial-scale*/\n    transform: scale(1.15) translate(5px, 4px);\n}\n\n#preview ytd-video-preview[active] .ddg-overlay {\n    transform:scale(1) translate(0px, 0px);\n}\n';
+
   // src/icon-overlay.js
+  var DDGIconOverlay = class extends HTMLElement {
+    constructor(size, href) {
+      super();
+      this.size = size;
+      this.href = href;
+      const shadow = this.attachShadow({ mode: "closed" });
+      let style = document.createElement("style");
+      style.textContent = styles_default;
+      const overlay = this.createOverlay();
+      shadow.appendChild(overlay);
+      shadow.appendChild(style);
+      this.root = shadow;
+    }
+    createOverlay() {
+      let overlayElement = document.createElement("div");
+      overlayElement.setAttribute("class", "ddg-overlay");
+      overlayElement.setAttribute("data-size", this.size);
+      overlayElement.innerHTML = `
+            <a class="ddg-play-privately" href="#">
+                <div class="ddg-dax">
+                    ${dax_default}
+                </div>
+                <div class="ddg-play-text-container">
+                    <div class="ddg-play-text">
+                        ${i18n.t("playText")}
+                    </div>
+                </div>
+            </a>`;
+      overlayElement.querySelector("a.ddg-play-privately")?.setAttribute("href", this.href);
+      return overlayElement;
+    }
+    static get observedAttributes() {
+      return ["href", "data-size"];
+    }
+    attributeChangedCallback(name, oldValue, newValue) {
+      if (name === "href") {
+        this.root.querySelector("a.ddg-play-privately").setAttribute("href", newValue);
+      }
+      if (name === "data-size") {
+        console.log("change size", oldValue, newValue);
+        console.trace();
+        this.root.querySelector(".ddg-overlay").setAttribute("data-size", newValue);
+      }
+    }
+  };
+  customElements.define("ddg-icon-overlay", DDGIconOverlay);
   var IconOverlay = {
     HOVER_CLASS: "ddg-overlay-hover",
     OVERLAY_CLASS: "ddg-overlay",
     currentVideoElement: null,
     hoverOverlayVisible: false,
     create: (size, href, extraClass) => {
-      let overlayElement = document.createElement("div");
-      overlayElement.setAttribute("class", "ddg-overlay" + (extraClass ? " " + extraClass : ""));
-      overlayElement.setAttribute("data-size", size);
-      overlayElement.innerHTML = `
-                <a class="ddg-play-privately" href="#">
-                    <div class="ddg-dax">
-                        ${dax_default}
-                    </div>
-                    <div class="ddg-play-text-container">
-                        <div class="ddg-play-text">
-                            ${i18n.t("playText")}
-                        </div>
-                    </div>
-                </a>`;
-      overlayElement.querySelector("a.ddg-play-privately")?.setAttribute("href", href);
-      return overlayElement;
+      let el = new DDGIconOverlay(size, href);
+      if (extraClass) {
+        el.setAttribute("class", extraClass);
+      }
+      return el;
     },
     getHoverOverlay: () => {
       return document.querySelector("." + IconOverlay.HOVER_CLASS);
@@ -232,14 +270,14 @@
         let videoElementOffset = offset(videoElement);
         overlay.setAttribute(
           "style",
-          "top: " + videoElementOffset.top + "px;left: " + videoElementOffset.left + "px;display:block;"
+          "top: " + videoElementOffset.top + "px;left: " + videoElementOffset.left + "px;display:block;position:absolute;"
         );
         overlay.setAttribute("data-size", "fixed " + IconOverlay.getThumbnailSize(videoElement));
         const href = videoElement.getAttribute("href");
         if (href) {
           const privateUrl = VideoParams.fromPathname(href)?.toPrivatePlayerUrl();
           if (overlay && privateUrl) {
-            overlay.querySelector("a")?.setAttribute("href", privateUrl);
+            overlay.setAttribute("href", privateUrl);
           }
         }
         IconOverlay.hoverOverlayVisible = true;
@@ -273,12 +311,15 @@
       });
     },
     appendToVideo: (videoElement) => {
+      console.log("append to video", videoElement);
       let appendOverlayToThumbnail = (videoElement2) => {
         if (videoElement2) {
           const privateUrl = VideoParams.fromHref(videoElement2.href)?.toPrivatePlayerUrl();
           const thumbSize = IconOverlay.getThumbnailSize(videoElement2);
           if (privateUrl) {
-            appendElement(videoElement2, IconOverlay.create(thumbSize, privateUrl));
+            console.log("append IconOverlay with privateURL", privateUrl);
+            let overlay = IconOverlay.create(thumbSize, privateUrl);
+            appendElement(videoElement2, overlay);
             videoElement2.classList.add("has-dgg-overlay");
           }
         }
@@ -660,7 +701,7 @@
         videoPlayerOverlay.watchForVideoBeingAdded({ via: "user notification", ignoreCache: true });
       });
       const CSS = {
-        styles: styles_default,
+        styles: global_styles_default,
         init: () => {
           let style = document.createElement("style");
           style.innerText = CSS.styles;
@@ -699,26 +740,31 @@
       };
       const Preview = {
         previewContainer: false,
+        hasAppended: false,
         getPreviewVideoLink: () => {
           let linkSelector = 'a[href^="/watch?v="]';
           let previewVideo = document.querySelector("#preview " + linkSelector + " video");
           return previewVideo?.closest(linkSelector);
         },
         appendIfNotAppended: () => {
+          if (this.hasAppended) {
+            return false;
+          }
           let previewVideo = Preview.getPreviewVideoLink();
           if (previewVideo) {
+            this.hasAppended = true;
             return IconOverlay.appendToVideo(previewVideo);
           }
           return false;
         },
         update: () => {
-          let updateOverlayVideoId = (element) => {
-            let overlay = element?.querySelector(".ddg-overlay");
-            const href = element?.getAttribute("href");
+          let updateOverlayVideoId = (videoLink) => {
+            const href = videoLink?.getAttribute("href");
             if (href) {
               const privateUrl = VideoParams.fromPathname(href)?.toPrivatePlayerUrl();
+              const overlay = document.querySelector("#preview ddg-icon-overlay");
               if (overlay && privateUrl) {
-                overlay.querySelector("a.ddg-play-privately")?.setAttribute("href", privateUrl);
+                overlay.setAttribute("href", privateUrl);
               }
             }
           };

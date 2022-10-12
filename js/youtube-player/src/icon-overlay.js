@@ -1,6 +1,84 @@
 import {addTrustedEventListener, appendElement, VideoParams} from "./util";
 import dax from "../assets/dax.svg";
 import {i18n} from "./text.js";
+import css from "../assets/styles.css"
+
+class DDGIconOverlay extends HTMLElement {
+    constructor(size, href) {
+        super();
+
+        this.size = size;
+        this.href = href;
+
+        /**
+         * Create the shadow root, closed to prevent any outside observers
+         * @type {ShadowRoot}
+         */
+         const shadow = this.attachShadow({ mode: "closed" });
+
+         /**
+          * Add our styles
+          * @type {HTMLStyleElement}
+          */
+         let style = document.createElement("style");
+         style.textContent = css;
+
+         /**
+          * Create the overlay
+          * @type {HTMLDivElement}
+          */
+         const overlay = this.createOverlay();
+
+         /**
+          * Append both to the shadow root
+          */
+         shadow.appendChild(overlay)
+         shadow.appendChild(style);
+
+         this.root = shadow;
+    }
+
+    /**
+     * @returns {HTMLDivElement}
+     */
+    createOverlay() {
+        let overlayElement = document.createElement('div');
+
+        overlayElement.setAttribute('class', 'ddg-overlay');
+        overlayElement.setAttribute('data-size', this.size);
+        overlayElement.innerHTML = `
+            <a class="ddg-play-privately" href="#">
+                <div class="ddg-dax">
+                    ${dax}
+                </div>
+                <div class="ddg-play-text-container">
+                    <div class="ddg-play-text">
+                        ${i18n.t("playText")}
+                    </div>
+                </div>
+            </a>`;
+
+        overlayElement.querySelector('a.ddg-play-privately')?.setAttribute('href', this.href);
+
+        return overlayElement;
+    }
+
+    static get observedAttributes() { return ['href', 'data-size']; }
+
+    attributeChangedCallback(name, oldValue, newValue) {
+        if (name === 'href') {
+            this.root.querySelector('a.ddg-play-privately').setAttribute('href', newValue);
+        }
+
+        if (name === 'data-size') {
+            console.log('change size', oldValue, newValue);
+            console.trace();
+            this.root.querySelector('.ddg-overlay').setAttribute('data-size', newValue);
+        }
+    }
+}
+
+customElements.define('ddg-icon-overlay', DDGIconOverlay);
 
 export const IconOverlay = {
     /**
@@ -22,25 +100,13 @@ export const IconOverlay = {
      * @returns {HTMLElement}
      */
     create: (size, href, extraClass) => {
-        let overlayElement = document.createElement('div');
+        let el = new DDGIconOverlay(size, href);
 
-        overlayElement.setAttribute('class', 'ddg-overlay' + (extraClass ? ' ' + extraClass : ''));
-        overlayElement.setAttribute('data-size', size);
-        overlayElement.innerHTML = `
-                <a class="ddg-play-privately" href="#">
-                    <div class="ddg-dax">
-                        ${dax}
-                    </div>
-                    <div class="ddg-play-text-container">
-                        <div class="ddg-play-text">
-                            ${i18n.t("playText")}
-                        </div>
-                    </div>
-                </a>`;
+        if (extraClass) {
+            el.setAttribute('class', extraClass);
+        }
 
-        overlayElement.querySelector('a.ddg-play-privately')?.setAttribute('href', href);
-
-        return overlayElement;
+        return el;
     },
 
     /**
@@ -73,7 +139,8 @@ export const IconOverlay = {
             overlay.setAttribute('style', '' +
                 'top: ' + videoElementOffset.top + 'px;' +
                 'left: ' + videoElementOffset.left + 'px;' +
-                'display:block;'
+                'display:block;'+
+                'position:absolute;'
             );
 
             overlay.setAttribute('data-size', 'fixed ' + IconOverlay.getThumbnailSize(videoElement));
@@ -83,7 +150,7 @@ export const IconOverlay = {
             if (href) {
                 const privateUrl = VideoParams.fromPathname(href)?.toPrivatePlayerUrl();
                 if (overlay && privateUrl) {
-                    overlay.querySelector('a')?.setAttribute('href', privateUrl);
+                    overlay.setAttribute('href', privateUrl);
                 }
             }
 
@@ -153,12 +220,17 @@ export const IconOverlay = {
      * @returns {boolean} - whether the overlay was appended or not
      */
     appendToVideo: (videoElement) => {
+        console.log('append to video', videoElement);
+
         let appendOverlayToThumbnail = (videoElement) => {
             if (videoElement) {
                 const privateUrl = VideoParams.fromHref(videoElement.href)?.toPrivatePlayerUrl();
                 const thumbSize = IconOverlay.getThumbnailSize(videoElement);
                 if (privateUrl) {
-                    appendElement(videoElement, IconOverlay.create(thumbSize, privateUrl));
+                    console.log('append IconOverlay with privateURL', privateUrl);
+                    let overlay = IconOverlay.create(thumbSize, privateUrl);
+                    //overlay.setAttribute('style', 'z-index:1000;');
+                    appendElement(videoElement, overlay);
                     videoElement.classList.add('has-dgg-overlay');
                 }
             }
