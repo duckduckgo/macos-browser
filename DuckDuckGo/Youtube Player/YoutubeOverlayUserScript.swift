@@ -91,7 +91,7 @@ final class YoutubeOverlayUserScript: NSObject, StaticUserScript, UserScriptWith
 
     private func handleOpenDuckPlayer(message: WKScriptMessage) {
         guard let urlString = message.body as? String, let url = urlString.url else {
-            assertionFailure("YoutubePlayerUserScript: expected URL")
+            assertionFailure("YoutubeOverlayUserScript: expected URL")
             return
         }
         delegate?.youtubeOverlayUserScriptDidRequestDuckPlayer(with: url)
