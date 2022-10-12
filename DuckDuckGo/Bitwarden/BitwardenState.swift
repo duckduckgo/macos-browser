@@ -21,8 +21,17 @@ import Foundation
 enum BitwardenStatus {
 
     case disabled
-    case locked
-    case unlocked
+    case connected(vault: Vault)
     case error(error: BitwardenError)
 
+    struct Vault {
+        let id: String
+        let email: String
+        let status: Status
+
+        enum Status: String {
+            case locked
+            case unlocked
+        }
+    }
 }

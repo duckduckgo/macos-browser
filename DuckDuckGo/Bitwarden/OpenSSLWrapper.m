@@ -116,6 +116,7 @@ NSData *macKeyData;
     unsigned char ivCopy[16];
     memcpy(&ivCopy, ivBytes, 16);
 
+    //TODO: Set global encryption and decryption key
     // Encrypt
     AES_KEY enc_key;
     AES_set_encrypt_key(encryptionKeyData.bytes, (int)encryptionKeyData.length * 8, &enc_key);
@@ -141,6 +142,30 @@ NSData *macKeyData;
     encryptedMessage.data = encryptedData;
     encryptedMessage.hmac = hmacData;
     return encryptedMessage;
+}
+
+- (NSData *)decryptData:(NSData *)data andIv:(NSData *)ivData {
+    unsigned char dec_out[2000];
+    int i;
+    for(i=0;i < 2000;i++) {
+        dec_out[i] = 0;
+    }
+
+    unsigned char *ivBytes = (unsigned char *)ivData.bytes;
+    unsigned char ivCopy[ivData.length];
+    memcpy(&ivCopy, ivBytes, ivData.length);
+
+    AES_KEY dec_key;
+    AES_set_decrypt_key(encryptionKeyData.bytes, (int)encryptionKeyData.length * 8, &dec_key);
+    AES_cbc_encrypt(data.bytes, dec_out, data.length, &dec_key, (unsigned char *)ivCopy, AES_DECRYPT);
+
+    for(i=0;*(dec_out+i)!=0x00;i++);
+
+    //TODO: Padding removal
+    for(;*(dec_out+(i-1))==0x03;i--);
+
+    NSData *decryptedData = [NSData dataWithBytes:dec_out length: i];
+    return decryptedData;
 }
 
 @end

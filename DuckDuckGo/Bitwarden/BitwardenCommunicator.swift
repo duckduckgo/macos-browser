@@ -167,7 +167,7 @@ final class BitwardenComunicator: BitwardenCommunication {
 
 
     private func receiveErrorData(_ fileHandle: FileHandle) {
-        if let line = String(data: fileHandle.availableData, encoding: .utf8) {
+        if let _ = String(data: fileHandle.availableData, encoding: .utf8) {
             //TODO
 //            os_log("STDERR: %{public}@", line)
         }

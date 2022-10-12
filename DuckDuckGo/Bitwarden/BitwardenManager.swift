@@ -19,7 +19,9 @@
 import Foundation
 import SwiftUI
 import OpenSSL
+import os.log
 
+// TODO: Rename to BitwardenController
 protocol BitwardenManagement {
 
     var status: BitwardenStatus { get }
@@ -33,7 +35,11 @@ final class BitwardenManager {
 
     //TODO: adjust the init based on internal setting of password manager and subscribe for dynamic change
 
-    var state: BitwardenStatus = .disabled
+    var status: BitwardenStatus = .disabled {
+        didSet {
+            os_log("Status changed: %s", log: .bitwarden, type: .default, String(describing: status))
+        }
+    }
 
     private lazy var communicator: BitwardenCommunication = BitwardenComunicator()
 
@@ -69,9 +75,22 @@ final class BitwardenManager {
         scheduleConnectionAttempt()
     }
 
-    // MARK: - Messages
+    private func refreshStatus(payloadItem: BitwardenMessage.PayloadItem) {
+        guard let id = payloadItem.id,
+              let email = payloadItem.email,
+              let statusString = payloadItem.status,
+              let status = BitwardenStatus.Vault.Status(rawValue: statusString) else {
+            self.status = .error(error: .statusParsingFailed)
+            return
+        }
 
-    private func handle(command: String) {
+        let vault = BitwardenStatus.Vault(id: id, email: email, status: status)
+        self.status = .connected(vault: vault)
+    }
+
+    // MARK: - Handling Incoming Messages
+
+    private func handleCommand(_ command: String) {
         switch command {
         case "connected":
             sendHandshake()
@@ -86,19 +105,73 @@ final class BitwardenManager {
 
     private func handleHandshakeResponce(encryptedSharedKey: String, status: String) {
         guard status == "success" else {
-            state = .error(error: .handshakeFailed)
+            self.status = .error(error: .handshakeFailed)
             cancelConnectionAndScheduleNextAttempt()
             return
         }
 
         guard openSSLWrapper.decryptSharedKey(encryptedSharedKey) else {
-            state = .error(error: .decryptionOfSharedKeyFailed)
+            self.status = .error(error: .decryptionOfSharedKeyFailed)
             cancelConnectionAndScheduleNextAttempt()
             return
         }
 
         sendStatus()
     }
+
+    private func handleEncryptedResponce(_ encryptedPayload: BitwardenMessage.EncryptedPayload) {
+        guard let dataString = encryptedPayload.data,
+              let data = Data(base64Encoded: dataString),
+              let ivDataString = encryptedPayload.iv,
+              let ivData = Data(base64Encoded: ivDataString)
+        else {
+            status = .error(error: .parsingFailed)
+            return
+        }
+
+        let decryptedData = openSSLWrapper.decryptData(data, andIv:ivData)
+        guard decryptedData.count > 0 else {
+            status = .error(error: .decryptionOfDataFailed)
+            return
+        }
+
+        #if DEBUG
+        let decryptedString = String(bytes: decryptedData, encoding: .utf8)
+        os_log("Decrypted payload: %s", log: .bitwarden, type: .default, decryptedString ?? "")
+        #endif
+
+        guard let message = BitwardenMessage(from: decryptedData) else {
+            status = .error(error: .parsingFailed)
+            return
+        }
+
+        switch message.payload {
+        case .item(let payloadItem):
+            //TODO: Handle other messages
+            assertionFailure("Unhandled case")
+        case .array(let payloadItemArray):
+            if payloadItemArray.first?.status != nil {
+                handleStatusResponce(payloadItemArray: payloadItemArray)
+            }
+        case .none:
+            //TODO: Handle none
+            assertionFailure("Unhandled case")
+            return
+        }
+
+    }
+
+    private func handleStatusResponce(payloadItemArray: [BitwardenMessage.PayloadItem]) {
+        // Find the active vault
+        guard let activePayloadItem = payloadItemArray.filter({ $0.active ?? false }).first else {
+            status = .error(error: .noActiveVault)
+            return
+        }
+
+        refreshStatus(payloadItem: activePayloadItem)
+    }
+
+    // MARK: - Sending Messages
 
     private func sendHandshake() {
         guard let publicKey64Encoded = publicKey else {
@@ -115,7 +188,16 @@ final class BitwardenManager {
     }
 
     private func sendStatus() {
-        guard let messageData = BitwardenMessage.makeStatusMessage(openSSLWrapper: openSSLWrapper)?.data else {
+        //TODO: More general encryption method
+        let command = BitwardenMessage.EncryptedCommand(command: "bw-status", payload: nil)
+        guard let commandData = try? JSONEncoder().encode(command) else {
+            assertionFailure("JSON encoding failed")
+            return
+        }
+        let encryptedData = openSSLWrapper.encryptData(commandData)
+        let encryptedCommand = "2.\(encryptedData.iv.base64EncodedString())|\(encryptedData.data.base64EncodedString())|\(encryptedData.hmac.base64EncodedString())"
+
+        guard let messageData = BitwardenMessage.makeStatusMessage(encryptedCommand: encryptedCommand)?.data else {
             assertionFailure("Making the status message failed")
             return
         }
@@ -145,16 +227,26 @@ extension BitwardenManager: BitwardenCommunicatorDelegate {
             return
         }
 
+        //TODO: check id of received message. Throw away not requested messages.
+
         if let command = message.command {
-            handle(command: command)
+            handleCommand(command)
             return
         }
 
-        if let encryptedSharedKey = message.payload?.sharedKey, let status = message.payload?.status {
+        if case let .item(payloadItem) = message.payload,
+              let encryptedSharedKey = payloadItem.sharedKey,
+              let status = payloadItem.status {
             handleHandshakeResponce(encryptedSharedKey: encryptedSharedKey, status: status)
+            return
         }
 
-        //TODO check id of received message
+        if let encryptedPayload = message.encryptedPayload {
+            handleEncryptedResponce(encryptedPayload)
+            return
+        }
+
+        assertionFailure("Unhandled message from Bitwarden: %s")
     }
 
 }

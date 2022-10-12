@@ -26,14 +26,24 @@ struct BitwardenMessage: Codable {
     let payload: Payload?
     let command: String?
     let encryptedCommand: String? // encoded with symmetric key + base64 encoded string
+    let encryptedPayload: EncryptedPayload?
 
-    struct Payload: Codable {
+    struct PayloadItem: Codable {
 
         let error: String?
+
+        // Handshake request
         let publicKey: String? // base64 encoded
         let applicationName: String?
-        let status: String?
+
+        // Handshake responce
         let sharedKey: String? // base64 encoded
+
+        // Status
+        let id: String?
+        let email: String?
+        let status: String?
+        let active: Bool?
 
     }
 
@@ -44,17 +54,17 @@ struct BitwardenMessage: Codable {
 
     }
 
-    enum EncryptedPayload: Codable {
-        case array([String])
-        case string(String)
+    enum Payload: Codable {
+        case array([PayloadItem])
+        case item(PayloadItem)
 
         init(from decoder: Decoder) throws {
             let container = try decoder.singleValueContainer()
             do {
-                self = try .array(container.decode(Array.self))
+                self = try .array(container.decode(Array<PayloadItem>.self))
             } catch DecodingError.typeMismatch {
                 do {
-                    self = try .string(container.decode(String.self))
+                    self = try .item(container.decode(PayloadItem.self))
                 } catch DecodingError.typeMismatch {
                     throw DecodingError.typeMismatch(EncryptedPayload.self,
                                                      DecodingError.Context(codingPath: decoder.codingPath,
@@ -68,22 +78,34 @@ struct BitwardenMessage: Codable {
             switch self {
             case .array(let array):
                 try container.encode(array)
-            case .string(let string):
-                try container.encode(string)
+            case .item(let item):
+                try container.encode(item)
             }
         }
+    }
+
+    struct EncryptedPayload: Codable {
+
+        let encryptedString: String?
+        let encryptionType: Int?
+        let data: String?
+        let iv: String?
+        let mac: String?
+
     }
 
     init(messageId: String? = nil,
          version: Int? = nil,
          command: String? = nil,
          payload: BitwardenMessage.Payload? = nil,
-         encryptedCommand: String? = nil) {
+         encryptedCommand: String? = nil,
+         encryptedPayload: EncryptedPayload? = nil) {
         self.messageId = messageId
         self.version = version
         self.command = command
         self.payload = payload
         self.encryptedCommand = encryptedCommand
+        self.encryptedPayload = encryptedPayload
     }
 
     init?(from messageData: Data) {
@@ -110,29 +132,26 @@ struct BitwardenMessage: Codable {
     static let handshakeCommand = "bw-handshake"
 
     static func makeHandshakeMessage(with publicKey: String) -> BitwardenMessage {
-        let payload = Payload(error: nil,
-                              publicKey: publicKey,
-                              applicationName: Bundle.main.displayName,
-                              status: nil,
-                              sharedKey: nil)
+        let payloadItem = PayloadItem(error: nil,
+                                      publicKey: publicKey,
+                                      applicationName: Bundle.main.displayName,
+                                      sharedKey: nil,
+                                      id: nil,
+                                      email: nil,
+                                      status: nil,
+                                      active: nil)
+
+        let payload = Payload.item(payloadItem)
         return BitwardenMessage(messageId: generateMessageId(),
                                 version: version,
                                 command: handshakeCommand,
                                 payload: payload)
     }
 
-    static func makeStatusMessage(openSSLWrapper: OpenSSLWrapper) -> BitwardenMessage? {
-        let command = EncryptedCommand(command: "bw-status", payload: nil)
-        guard let commandData = try? JSONEncoder().encode(command) else {
-            assertionFailure("JSON encoding failed")
-            return nil
-        }
-        let encryptedData = openSSLWrapper.encryptData(commandData)
-        let encryptedDataSerialized = "2.\(encryptedData.iv.base64EncodedString())|\(encryptedData.data.base64EncodedString())|\(encryptedData.hmac.base64EncodedString())"
-
+    static func makeStatusMessage(encryptedCommand: String) -> BitwardenMessage? {
         return BitwardenMessage(messageId: generateMessageId(),
                                 version: version,
-                                encryptedCommand: encryptedDataSerialized)
+                                encryptedCommand: encryptedCommand)
     }
 
     static func generateMessageId() -> String {

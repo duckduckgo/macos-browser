@@ -40,6 +40,9 @@ NS_ASSUME_NONNULL_BEGIN
 // Encrypts data using the shared key decrypted in previous method
 - (EncryptedMessage *)encryptData:(NSData *)data;
 
+// Decrypts data using the shared key
+- (NSData *)decryptData:(NSData *)data andIv:(NSData *)ivData;
+
 @end
 
 
