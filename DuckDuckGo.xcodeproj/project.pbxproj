@@ -1755,8 +1755,8 @@
 				3767190128E724B2003A2A15 /* PrivatePlayerURLExtension.swift */,
 				31F28C5228C8EECA00119F70 /* PrivatePlayerSchemeHandler.swift */,
 				315AA06F28CA5CC800200030 /* YoutubePlayerNavigationHandler.swift */,
-				31F28C4E28C8EEC500119F70 /* YoutubeOverlayUserScript.swift */,
 				31F28C4C28C8EEC500119F70 /* YoutubePlayerUserScript.swift */,
+				31F28C4E28C8EEC500119F70 /* YoutubeOverlayUserScript.swift */,
 				A1DA5A20BFD17B83D72DCB7C /* YoutubeOverlayUserScript+Encryption.swift */,
 			);
 			path = "Youtube Player";

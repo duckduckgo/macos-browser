@@ -153,8 +153,8 @@ final class YoutubeOverlayUserScript: NSObject, UserScript, UserScriptWithYoutub
         return json
     }
 
-    fileprivate func isMessageFromVerifiedOrigin(_ message: WKScriptMessage) -> Bool {
-        message.frameInfo.request.url?.host?.droppingWwwPrefix() == "youtube.com"
+    fileprivate func isMessageFromVerifiedOrigin(_ message: YoutubeMessage) -> Bool {
+        message.messageHost.droppingWwwPrefix() == "youtube.com"
     }
 
     private func evaluate(js: String, inWebView webView: WKWebView) {
@@ -167,11 +167,9 @@ final class YoutubeOverlayUserScript: NSObject, UserScript, UserScriptWithYoutub
 
     internal func messageHandlerFor(_ messageName: String) -> MessageHandler? {
         guard let message = MessageNames(rawValue: messageName) else {
-            os_log("Failed to parse YoutubeOverlay User Script message: '%{public}s'", type: .debug, messageName)
+            assertionFailure("YoutubeOverlayUserScript: Failed to parse User Script message: \(messageName)")
             return nil
         }
-
-        os_log("AutofillUserScript: received '%{public}s'", type: .debug, messageName)
 
         switch message {
 
