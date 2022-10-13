@@ -31,7 +31,7 @@ protocol UserScriptWithYoutubeOverlay: UserScript {
 
 final class YoutubeOverlayUserScript: NSObject, UserScript, UserScriptWithYoutubeOverlay {
 
-    var injectionTime: WKUserScriptInjectionTime = .atDocumentStart;
+    var injectionTime: WKUserScriptInjectionTime = .atDocumentStart
     var forMainFrameOnly: Bool = true
 
     typealias MessageReplyHandler = (String?) -> Void
@@ -50,9 +50,9 @@ final class YoutubeOverlayUserScript: NSObject, UserScript, UserScriptWithYoutub
     weak var delegate: YoutubeOverlayUserScriptDelegate?
 
     struct WebkitMessagingConfig: Encodable {
-        var hasModernWebkitAPI: Bool;
-        var webkitMessageHandlerNames: [String];
-        let secret: String;
+        var hasModernWebkitAPI: Bool
+        var webkitMessageHandlerNames: [String]
+        let secret: String
     }
 
     lazy var runtimeValues: String = {
@@ -60,12 +60,12 @@ final class YoutubeOverlayUserScript: NSObject, UserScript, UserScriptWithYoutub
                 hasModernWebkitAPI: false,
                 webkitMessageHandlerNames: self.messageNames,
                 secret: generatedSecret
-        );
+        )
         if #available(macOS 11.0, *) {
             runtime.hasModernWebkitAPI = true
         }
         guard let json = try? JSONEncoder().encode(runtime).utf8String() else {
-            assertionFailure("YoutubeOverlayUserScript: could not convert RuntimeInjectedValues");
+            assertionFailure("YoutubeOverlayUserScript: could not convert RuntimeInjectedValues")
             return ""
         }
         return json
