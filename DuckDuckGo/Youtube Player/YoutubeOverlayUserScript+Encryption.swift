@@ -41,19 +41,19 @@ struct AESGCMYoutubeOverlayEncrypter: YoutubeEncrypter {
 
 protocol YoutubeHostProvider {
 
-    func hostForMessage(_ message: YTMessage) -> String
+    func hostForMessage(_ message: YoutubeMessage) -> String
 
 }
 
 struct SecurityOriginHostProvider: YoutubeHostProvider {
 
-    public func hostForMessage(_ message: YTMessage) -> String {
+    public func hostForMessage(_ message: YoutubeMessage) -> String {
         return message.messageHost
     }
 
 }
 
-protocol YTMessage {
+protocol YoutubeMessage {
     var messageName: String { get }
     var messageBody: Any { get }
     var messageHost: String { get }
@@ -61,7 +61,7 @@ protocol YTMessage {
     var messageWebView: WKWebView? { get }
 }
 
-extension WKScriptMessage: YTMessage {
+extension WKScriptMessage: YoutubeMessage {
     var messageName: String {
         return name
     }

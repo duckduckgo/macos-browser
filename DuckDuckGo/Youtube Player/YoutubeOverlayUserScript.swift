@@ -35,7 +35,7 @@ final class YoutubeOverlayUserScript: NSObject, UserScript, UserScriptWithYoutub
     var forMainFrameOnly: Bool = true
 
     typealias MessageReplyHandler = (String?) -> Void
-    typealias MessageHandler = (YTMessage, @escaping MessageReplyHandler) -> Void
+    typealias MessageHandler = (YoutubeMessage, @escaping MessageReplyHandler) -> Void
 
     enum MessageNames: String, CaseIterable {
         case setUserValues
@@ -77,7 +77,7 @@ final class YoutubeOverlayUserScript: NSObject, UserScript, UserScriptWithYoutub
         return js
     }()
 
-    func hostForMessage(_ message: YTMessage) -> String {
+    func hostForMessage(_ message: YoutubeMessage) -> String {
         hostProvider.hostForMessage(message)
     }
 
@@ -115,7 +115,7 @@ final class YoutubeOverlayUserScript: NSObject, UserScript, UserScriptWithYoutub
         evaluate(js: js, inWebView: webView)
     }
 
-    private func handleSetUserValues(message: YTMessage, _ replyHandler: @escaping MessageReplyHandler) {
+    private func handleSetUserValues(message: YoutubeMessage, _ replyHandler: @escaping MessageReplyHandler) {
         guard let userValues: UserValues = DecodableHelper.decode(from: message.messageBody) else {
             assertionFailure("YoutubeOverlayUserScript: expected JSON representation of UserValues")
             return
@@ -127,11 +127,11 @@ final class YoutubeOverlayUserScript: NSObject, UserScript, UserScriptWithYoutub
         replyHandler(encodeUserValues())
     }
 
-    private func handleReadUserValues(message: YTMessage, _ replyHandler: @escaping MessageReplyHandler) {
+    private func handleReadUserValues(message: YoutubeMessage, _ replyHandler: @escaping MessageReplyHandler) {
         replyHandler(encodeUserValues())
     }
 
-    private func handleOpenDuckPlayer(message: YTMessage, _ replyHandler: @escaping MessageReplyHandler) {
+    private func handleOpenDuckPlayer(message: YoutubeMessage, _ replyHandler: @escaping MessageReplyHandler) {
         guard let urlString = message.messageBody as? String, let url = urlString.url else {
             assertionFailure("YoutubePlayerUserScript: expected URL")
             return
