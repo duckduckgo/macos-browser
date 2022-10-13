@@ -213,6 +213,9 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
         initAttributionLogic(state: attributionState ?? parentTab?.adClickAttributionLogic.state)
         setupWebView(shouldLoadInBackground: shouldLoadInBackground)
+        if favicon == nil {
+            handleFavicon()
+        }
 
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(onDuckDuckGoEmailSignOut),
@@ -271,7 +274,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
     @Published private(set) var content: TabContent {
         didSet {
-            handleFavicon(oldContent: oldValue)
+            handleFavicon()
             invalidateSessionStateData()
             if let oldUrl = oldValue.url {
                 historyCoordinating.commitChanges(url: oldUrl)
@@ -715,13 +718,13 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     @Published var favicon: NSImage?
     let faviconManagement: FaviconManagement
 
-    private func handleFavicon(oldContent: TabContent) {
-        guard faviconManagement.areFaviconsLoaded else { return }
-
+    private func handleFavicon() {
         if content.isPrivatePlayer {
             favicon = .privatePlayer
             return
         }
+
+        guard faviconManagement.areFaviconsLoaded else { return }
 
         guard content.isUrl, let url = content.url else {
             favicon = nil
@@ -897,6 +900,7 @@ extension Tab: UserContentControllerDelegate {
         userScripts.hoverUserScript.delegate = self
         userScripts.autoconsentUserScript?.delegate = self
         youtubeOverlayScript = userScripts.youtubeOverlayScript
+        youtubeOverlayScript?.delegate = self
         youtubePlayerScript = userScripts.youtubePlayerUserScript
         setUpYoutubeScriptsIfNeeded()
 
@@ -1610,6 +1614,19 @@ extension Tab: AutoconsentUserScriptDelegate {
     
     func autoconsentUserScriptPromptUserForConsent(_ result: @escaping (Bool) -> Void) {
         delegate?.tab(self, promptUserForCookieConsent: result)
+    }
+}
+
+extension Tab: YoutubeOverlayUserScriptDelegate {
+    func youtubeOverlayUserScriptDidRequestDuckPlayer(with url: URL) {
+        let content = Tab.TabContent.contentFromURL(url)
+        let isRequestingNewTab = NSApp.isCommandPressed
+        if isRequestingNewTab {
+            let shouldSelectNewTab = NSApp.isShiftPressed
+            self.delegate?.tab(self, requestedNewTabWith: content, selected: shouldSelectNewTab)
+        } else {
+            setContent(content)
+        }
     }
 }
 

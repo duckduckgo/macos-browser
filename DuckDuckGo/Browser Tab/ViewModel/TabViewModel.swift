@@ -133,8 +133,9 @@ final class TabViewModel {
     private func subscribeToTabError() {
         tab.$error
             .map { error -> ErrorViewState in
-                
-                if let error = error, !error.isFrameLoadInterrupted { // don‘t show error for interrupted load like downloads
+
+                if let error = error, !error.isFrameLoadInterrupted, !error.isNavigationCancelled {
+                    // don‘t show error for interrupted load like downloads and for cancelled loads
                     return .init(isVisible: true, message: error.localizedDescription)
                 } else {
                     return .init(isVisible: false, message: nil)
