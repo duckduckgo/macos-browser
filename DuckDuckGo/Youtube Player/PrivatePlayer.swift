@@ -93,6 +93,7 @@ final class PrivatePlayer {
         self.preferences = preferences
         isFeatureEnabled = privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .duckPlayer)
         mode = preferences.privatePlayerMode
+        bindPrivatePlayerModeIfNeeded()
 
         isFeatureEnabledCancellable = privacyConfigurationManager.updatesPublisher
             .map { [weak privacyConfigurationManager] in
@@ -108,17 +109,21 @@ final class PrivatePlayer {
 
     private var isFeatureEnabled: Bool = false {
         didSet {
-            if isFeatureEnabled {
-                modeCancellable = preferences.$privatePlayerMode
-                    .removeDuplicates()
-                    .assign(to: \.mode, onWeaklyHeld: self)
-            } else {
-                modeCancellable = nil
-            }
+            bindPrivatePlayerModeIfNeeded()
         }
     }
     private var modeCancellable: AnyCancellable?
     private var isFeatureEnabledCancellable: AnyCancellable?
+
+    private func bindPrivatePlayerModeIfNeeded() {
+        if isFeatureEnabled {
+            modeCancellable = preferences.$privatePlayerMode
+                .removeDuplicates()
+                .assign(to: \.mode, onWeaklyHeld: self)
+        } else {
+            modeCancellable = nil
+        }
+    }
 }
 
 // MARK: - Navigation
