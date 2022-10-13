@@ -132,7 +132,9 @@ final class YoutubeOverlayUserScript: NSObject, UserScript, UserScriptWithYoutub
     }
 
     private func handleOpenDuckPlayer(message: YoutubeMessage, _ replyHandler: @escaping MessageReplyHandler) {
-        guard let urlString = message.messageBody as? String, let url = urlString.url else {
+        guard let dict = message.messageBody as? [String: Any],
+              let href = dict["href"] as? String,
+              let url = href.url else {
             assertionFailure("YoutubePlayerUserScript: expected URL")
             return
         }

@@ -21,7 +21,7 @@ export class MacOSCommunications {
         return this.messaging.wkSendAndWait('readUserValues', {})
     }
     openInDuckPlayerViaMessage(href) {
-        return this.messaging.wkSend('openDuckPlayer', href)
+        return this.messaging.wkSend('openDuckPlayer', {href})
     }
     /**
      * Get notification when preferences/state changed

@@ -741,7 +741,7 @@
       return this.messaging.wkSendAndWait("readUserValues", {});
     }
     openInDuckPlayerViaMessage(href) {
-      return this.messaging.wkSend("openDuckPlayer", href);
+      return this.messaging.wkSend("openDuckPlayer", { href });
     }
     onUserValuesNotification(cb, initialUserValues) {
       if (this.messaging.config.hasModernWebkitAPI) {
