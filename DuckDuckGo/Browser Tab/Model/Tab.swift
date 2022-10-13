@@ -784,8 +784,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             return
         }
 
-        guard url != .homePage else { return }
-
         // Add to global history
         historyCoordinating.addVisit(of: url)
 
@@ -1189,7 +1187,7 @@ extension Tab: WKNavigationDelegate {
 
     func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
         isBeingRedirected = false
-        if let url = webView.url {
+        if content.isUrl, let url = webView.url {
             addVisit(of: url)
         }
         webViewDidCommitNavigationPublisher.send()
