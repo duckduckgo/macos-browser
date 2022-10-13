@@ -26,9 +26,13 @@ protocol BitwardenManagement {
     var status: BitwardenStatus { get }
     var statusPublisher: Published<BitwardenStatus>.Publisher { get }
 
+    func retrieveCredentials(for url: URL, completion: @escaping ([BitwardenCredential], BitwardenError?) -> Void)
+    func create(credential: BitwardenCredential, completion: @escaping (BitwardenError?) -> Void)
+    func update(credential: BitwardenCredential, completion: @escaping (BitwardenError?) -> Void)
+
 }
 
-final class BitwardenManager {
+final class BitwardenManager: BitwardenManagement {
 
     static let shared = BitwardenManager()
 
@@ -160,7 +164,7 @@ final class BitwardenManager {
         }
 
         switch message.payload {
-        case .item(let _):
+        case .item:
             //TODO: Handle other messages
             assertionFailure("Unhandled case")
         case .array(let payloadItemArray):
@@ -237,13 +241,14 @@ final class BitwardenManager {
         publicKey = openSSLWrapper.generateKeys()
     }
 
-    // MARK: - Internal Logic
+    // MARK: - Status
 
-    private(set) var status: BitwardenStatus = .disabled {
+    @Published private(set) var status: BitwardenStatus = .disabled {
         didSet {
             os_log("Status changed: %s", log: .bitwarden, type: .default, String(describing: status))
         }
     }
+    var statusPublisher: Published<BitwardenStatus>.Publisher { $status }
 
     private func refreshStatus(payloadItem: BitwardenMessage.PayloadItem) {
         guard let id = payloadItem.id,
@@ -256,6 +261,40 @@ final class BitwardenManager {
 
         let vault = BitwardenStatus.Vault(id: id, email: email, status: status)
         self.status = .connected(vault: vault)
+    }
+
+    // MARK: - Cretentials
+
+    func retrieveCredentials(for url: URL, completion: @escaping ([BitwardenCredential], BitwardenError?) -> Void) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            let credentials = [
+                BitwardenCredential(userId: "user-id",
+                                    credentialId: "credential-id-1",
+                                    credentialName: "domain.com",
+                                    username: "username",
+                                    password: "password123",
+                                    url: url),
+                BitwardenCredential(userId: "user-id",
+                                           credentialId: "credential-id-2",
+                                           credentialName: "domain2.com",
+                                           username: "duck",
+                                           password: "password123",
+                                           url: url)
+            ]
+            completion(credentials, nil)
+        }
+    }
+
+    func create(credential: BitwardenCredential, completion: @escaping (BitwardenError?) -> Void) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            completion(nil)
+        }
+    }
+
+    func update(credential: BitwardenCredential, completion: @escaping (BitwardenError?) -> Void) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            completion(nil)
+        }
     }
 
 }
@@ -290,5 +329,4 @@ extension BitwardenManager: BitwardenCommunicatorDelegate {
 
         assertionFailure("Unhandled message from Bitwarden: %s")
     }
-
 }
