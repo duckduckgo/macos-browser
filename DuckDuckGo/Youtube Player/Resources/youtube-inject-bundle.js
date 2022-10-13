@@ -644,7 +644,6 @@
         const decrypted = await decrypt(cipher, key, iv);
         return ddgGlobals.JSONparse(decrypted || "{}");
       } catch (e) {
-        console.log("\u274C ER", e);
         if (e instanceof MissingWebkitHandler) {
           throw e;
         } else {
@@ -760,7 +759,8 @@
         const poll = () => {
           clearTimeout(timeout);
           timeout = setTimeout(async () => {
-            this.readUserValues().then((userValues) => {
+            try {
+              const userValues = await this.readUserValues();
               let nextMode = Object.keys(userValues.privatePlayerMode)?.[0];
               let nextInteracted = userValues.overlayInteracted;
               if (nextMode !== prevMode || nextInteracted !== prevInteracted) {
@@ -769,8 +769,8 @@
                 cb(userValues);
               }
               poll();
-            }).catch(() => {
-            });
+            } catch (e) {
+            }
           }, 1e3);
         };
         poll();

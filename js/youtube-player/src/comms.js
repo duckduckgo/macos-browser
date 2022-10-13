@@ -47,7 +47,7 @@ export class MacOSCommunications {
             }
         } else {
             /**
-             * But on macOS < 11 (Catalina) we need to poll the native side to receive
+             * On macOS < 11 (Catalina) we need to poll the native side to receive
              * notifications of any preferences changes
              */
             let timeout;
@@ -56,20 +56,19 @@ export class MacOSCommunications {
             const poll = () => {
                 clearTimeout(timeout)
                 timeout = setTimeout(async () => {
-                    this.readUserValues()
-                        .then(userValues => {
-                            let nextMode = Object.keys(userValues.privatePlayerMode)?.[0];
-                            let nextInteracted = userValues.overlayInteracted;
-                            if (nextMode !== prevMode || nextInteracted !== prevInteracted) {
-                                prevMode = nextMode
-                                prevInteracted = nextInteracted
-                                cb(userValues)
-                            }
-                            poll()
-                        })
-                        .catch(() => {
-                            // noop on error
-                        })
+                    try {
+                        const userValues = await this.readUserValues();
+                        let nextMode = Object.keys(userValues.privatePlayerMode)?.[0];
+                        let nextInteracted = userValues.overlayInteracted;
+                        if (nextMode !== prevMode || nextInteracted !== prevInteracted) {
+                            prevMode = nextMode
+                            prevInteracted = nextInteracted
+                            cb(userValues)
+                        }
+                        poll()
+                    } catch (e) {
+                        // on error we just stop polling
+                    }
                 }, 1000);
             }
             poll();
