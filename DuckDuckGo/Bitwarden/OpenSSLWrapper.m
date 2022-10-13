@@ -21,6 +21,9 @@
 
 #define KEY_LENGTH  2048
 #define PUB_EXP     65537
+#define IV_LENGTH   16
+#define ENC_OUT_LENGTH 500
+#define DEC_OUT_LENGTH 2000
 
 @implementation OpenSSLWrapper
 
@@ -98,32 +101,29 @@ NSData *macKeyData;
 - (EncryptedMessage *)encryptData:(NSData *)data {
 
     //TODO: Generate iv - random 16 bytes
-    NSData *ivData = [macKeyData subdataWithRange:NSMakeRange(0, 16)];
+    NSData *ivData = [macKeyData subdataWithRange:NSMakeRange(0, IV_LENGTH)];
 
-    unsigned char enc_out[500];
+    unsigned char encryptionOutput[ENC_OUT_LENGTH];
     int i;
-    for(i=0;i < 500;i++) {
-        enc_out[i] = 0;
+    for(i=0;i < ENC_OUT_LENGTH;i++) {
+        encryptionOutput[i] = 0;
     }
 
-    unsigned char dataArray[32];
-    for(i=0;i < 32;i++) {
-        dataArray[i] = 0;
-    }
-    memcpy(&dataArray, data.bytes, data.length);
+    unsigned char *dataArray = (unsigned char *)data.bytes;
+    size_t dataArrayLength = data.length;
 
     unsigned char *ivBytes = (unsigned char *)ivData.bytes;
-    unsigned char ivCopy[16];
-    memcpy(&ivCopy, ivBytes, 16);
+    unsigned char ivCopy[IV_LENGTH];
+    memcpy(&ivCopy, ivBytes, IV_LENGTH);
 
     //TODO: Set global encryption and decryption key
     // Encrypt
     AES_KEY enc_key;
     AES_set_encrypt_key(encryptionKeyData.bytes, (int)encryptionKeyData.length * 8, &enc_key);
-    AES_cbc_encrypt(dataArray, enc_out, 32, &enc_key, (unsigned char *)ivCopy, AES_ENCRYPT);
+    AES_cbc_encrypt(dataArray, encryptionOutput, dataArrayLength, &enc_key, (unsigned char *)ivCopy, AES_ENCRYPT);
 
-    for(i=0;*(enc_out+i)!=0x00;i++);
-    NSData *encryptedData = [NSData dataWithBytes:enc_out length: i];
+    for(i=0;*(encryptionOutput+i)!=0x00;i++);
+    NSData *encryptedData = [NSData dataWithBytes:encryptionOutput length: i];
 
     // Compute HMAC
     NSMutableData *macData = [NSMutableData data];
@@ -145,10 +145,10 @@ NSData *macKeyData;
 }
 
 - (NSData *)decryptData:(NSData *)data andIv:(NSData *)ivData {
-    unsigned char dec_out[2000];
+    unsigned char decryptionOutput[DEC_OUT_LENGTH];
     int i;
-    for(i=0;i < 2000;i++) {
-        dec_out[i] = 0;
+    for(i=0;i < DEC_OUT_LENGTH;i++) {
+        decryptionOutput[i] = 0;
     }
 
     unsigned char *ivBytes = (unsigned char *)ivData.bytes;
@@ -157,14 +157,14 @@ NSData *macKeyData;
 
     AES_KEY dec_key;
     AES_set_decrypt_key(encryptionKeyData.bytes, (int)encryptionKeyData.length * 8, &dec_key);
-    AES_cbc_encrypt(data.bytes, dec_out, data.length, &dec_key, (unsigned char *)ivCopy, AES_DECRYPT);
+    AES_cbc_encrypt(data.bytes, decryptionOutput, data.length, &dec_key, (unsigned char *)ivCopy, AES_DECRYPT);
 
-    for(i=0;*(dec_out+i)!=0x00;i++);
+    for(i=0;*(decryptionOutput+i)!=0x00;i++);
 
     //TODO: Padding removal
-    for(;*(dec_out+(i-1))==0x03 || *(dec_out+(i-1))==0x01;i--);
+    for(;*(decryptionOutput+(i-1))==0x03 || *(decryptionOutput+(i-1))==0x01;i--);
 
-    NSData *decryptedData = [NSData dataWithBytes:dec_out length: i];
+    NSData *decryptedData = [NSData dataWithBytes:decryptionOutput length: i];
     return decryptedData;
 }
 
