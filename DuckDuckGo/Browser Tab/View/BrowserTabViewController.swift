@@ -595,7 +595,7 @@ extension BrowserTabViewController: TabDelegate {
             }
             completionHandler(.useCredential, URLCredential(user: alert.usernameTextField.stringValue,
                                                             password: alert.passwordTextField.stringValue,
-                                                            persistence: .none))
+                                                            persistence: .forSession))
 
         }
     }
