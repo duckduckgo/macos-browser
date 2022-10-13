@@ -25,11 +25,7 @@ protocol YoutubeOverlayUserScriptDelegate: AnyObject {
     func youtubeOverlayUserScriptDidRequestDuckPlayer(with url: URL)
 }
 
-protocol UserScriptWithYoutubeOverlay: UserScript {
-    var delegate: YoutubeOverlayUserScriptDelegate? { get set }
-}
-
-final class YoutubeOverlayUserScript: NSObject, StaticUserScript, UserScriptWithYoutubeOverlay {
+final class YoutubeOverlayUserScript: NSObject, StaticUserScript, UserScript {
 
     enum MessageNames: String, CaseIterable {
         case setUserValues
