@@ -77,7 +77,7 @@ function initWithEnvironment(environment, comms) {
              */
             init: () => {
                 let style = document.createElement("style");
-                style.innerText = CSS.styles;
+                style.textContent = CSS.styles;
                 appendElement(document.head, style);
             }
         }
