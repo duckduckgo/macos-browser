@@ -87,7 +87,6 @@
       if (typeof cleanup.fn === "function") {
         try {
           cleanup.fn();
-          console.log("\u{1F9F9} cleanup '%s' was successfully executed", cleanup.name);
         } catch (e) {
           console.error(`cleanup ${cleanup.name} threw`, e);
         }
@@ -100,7 +99,6 @@
     let cleanup;
     try {
       cleanup = fn();
-      console.log(`\u2622\uFE0F side effect '%s' executed`, name);
     } catch (e) {
       console.error("%s threw an error", name, e);
     }
@@ -194,7 +192,6 @@
   // src/comms.js
   var macOSCommunications = {
     setUserValues(userValues) {
-      console.log("\u{1F4E4} [outgoing]", userValues);
       let resp = window.webkit?.messageHandlers?.setUserValues?.postMessage(userValues);
       if (resp instanceof Promise) {
         return resp.then((x) => JSON.parse(x)).catch((e) => console.error("could not call setInteracted", e));
@@ -210,7 +207,6 @@
     },
     openInDuckPlayerViaMessage(href) {
       window.webkit?.messageHandlers?.openDuckPlayer?.postMessage(href);
-      console.log("\u{1F4E4} [outgoing]", 'openDuckPlayer.postMessage("' + href + '")');
     },
     onUserValuesNotification(cb) {
       window.onUserValuesChanged = function(values) {
@@ -553,8 +549,6 @@
             this.addSmallDaxOverlay(params);
           }
         }
-        if ("disabled" in userValues.privatePlayerMode) {
-        }
       }
     }
     appendOverlayToPage(targetElement, params) {
@@ -565,8 +559,6 @@
           const prevOverlayElement = document.querySelector(DDGVideoOverlay.CUSTOM_TAG_NAME);
           if (prevOverlayElement) {
             prevOverlayElement.parentNode?.removeChild?.(prevOverlayElement);
-          } else {
-            console.log("exists, but disconnected");
           }
         };
       });
@@ -581,10 +573,8 @@
         return () => {
           clearInterval(int);
           if (videoElement?.isConnected) {
-            console.log("\u25B6\uFE0F called on original video element");
             videoElement.play();
           } else {
-            console.log("\u25B6\uFE0F trying to call 'play()' on newly queried element");
             const video = document.querySelector("#player video");
             if (video instanceof HTMLVideoElement) {
               video.play();
@@ -619,7 +609,6 @@
     }
     userChoice(userValues) {
       return this.comms.setUserValues(userValues).then((userValues2) => {
-        console.log("interacted flag set, now cleanup");
         return userValues2;
       }).catch((e) => console.error("could not set interacted after user opt out", e));
     }
@@ -662,7 +651,6 @@
       const videoPlayerOverlay = new VideoOverlayManager(userValues, environment, comms);
       videoPlayerOverlay.handleFirstPageLoad();
       defaultComms.onUserValuesNotification((userValues2) => {
-        console.log("got new values after zero", userValues2);
         videoPlayerOverlay.userValues = userValues2;
         videoPlayerOverlay.watchForVideoBeingAdded({ via: "user notification", ignoreCache: true });
         if (userValues2.privatePlayerMode.disabled) {

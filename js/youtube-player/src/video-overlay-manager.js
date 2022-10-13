@@ -125,7 +125,6 @@ export class VideoOverlayManager {
             const playerElement = document.querySelector('#player');
 
             if (!playerElement) {
-                // console.log("📎 video not found")
                 return null
             }
 
@@ -153,9 +152,6 @@ export class VideoOverlayManager {
                     this.addSmallDaxOverlay(params)
                 }
             }
-            if ('disabled' in userValues.privatePlayerMode) {
-                // console.log("do nothing");
-            }
         }
     }
 
@@ -175,8 +171,6 @@ export class VideoOverlayManager {
                 const prevOverlayElement = document.querySelector(DDGVideoOverlay.CUSTOM_TAG_NAME);
                 if (prevOverlayElement) {
                     prevOverlayElement.parentNode?.removeChild?.(prevOverlayElement);
-                } else {
-                    console.log("exists, but disconnected");
                 }
             }
         })
@@ -206,10 +200,8 @@ export class VideoOverlayManager {
                 clearInterval(int)
 
                 if (videoElement?.isConnected) {
-                    console.log("▶️ called on original video element");
                     videoElement.play();
                 } else {
-                    console.log("▶️ trying to call 'play()' on newly queried element");
                     const video = document.querySelector('#player video');
                     if (video instanceof HTMLVideoElement) {
                         video.play();
@@ -280,7 +272,6 @@ export class VideoOverlayManager {
     userChoice(userValues) {
         return this.comms.setUserValues(userValues)
             .then((userValues) => {
-                console.log("interacted flag set, now cleanup");
                 return userValues;
             })
             .catch(e => console.error("could not set interacted after user opt out", e))

@@ -54,7 +54,6 @@ function initWithEnvironment(environment, comms) {
         videoPlayerOverlay.handleFirstPageLoad();
 
         defaultComms.onUserValuesNotification((userValues) => {
-            console.log("got new values after zero", userValues)
             videoPlayerOverlay.userValues = userValues;
             videoPlayerOverlay.watchForVideoBeingAdded({ via: "user notification", ignoreCache: true });
 

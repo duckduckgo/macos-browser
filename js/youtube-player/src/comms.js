@@ -5,7 +5,6 @@ export const macOSCommunications = {
      * @returns {Promise<never>|Promise<unknown | void>}
      */
     setUserValues(userValues) {
-        console.log("📤 [outgoing]", userValues);
         // @ts-ignore
         let resp = window.webkit?.messageHandlers?.setUserValues?.postMessage(userValues);
         if (resp instanceof Promise) {
@@ -29,7 +28,6 @@ export const macOSCommunications = {
 
     openInDuckPlayerViaMessage(href) {
         window.webkit?.messageHandlers?.openDuckPlayer?.postMessage(href);
-        console.log("📤 [outgoing]", 'openDuckPlayer.postMessage("'+href+'")');
     },
 
     onUserValuesNotification(cb) {
