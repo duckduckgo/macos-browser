@@ -73,11 +73,7 @@ final class PrivatePlayer {
     static let shared = PrivatePlayer()
 
     var isAvailable: Bool {
-        if #available(macOS 11.0, *) {
-            return isFeatureEnabled
-        } else {
-            return false
-        }
+        isFeatureEnabled
     }
 
     @Published var mode: PrivatePlayerMode
