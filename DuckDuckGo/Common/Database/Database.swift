@@ -27,6 +27,34 @@ final class Database {
     }
     
     static let shared: CoreDataDatabase = {
+        let (database, error) = makeDatabase()
+        if database == nil {
+            firePixelErrorIfNeeded(error: error)
+            NSAlert.databaseFactoryFailed().runModal()
+            NSApp.terminate(nil)
+        }
+
+        return database!
+    }()
+
+    static func makeDatabase() -> (CoreDataDatabase?, Error?) {
+        func makeDatabase(keyStore: EncryptionKeyStoring) -> (CoreDataDatabase?, Error?) {
+            do {
+                try EncryptedValueTransformer<NSImage>.registerTransformer(keyStore: keyStore)
+                try EncryptedValueTransformer<NSString>.registerTransformer(keyStore: keyStore)
+                try EncryptedValueTransformer<NSURL>.registerTransformer(keyStore: keyStore)
+                try EncryptedValueTransformer<NSNumber>.registerTransformer(keyStore: keyStore)
+                try EncryptedValueTransformer<NSError>.registerTransformer(keyStore: keyStore)
+                try EncryptedValueTransformer<NSData>.registerTransformer(keyStore: keyStore)
+            } catch {
+                return (nil, error)
+            }
+
+            return (CoreDataDatabase(name: Constants.databaseName,
+                                     containerLocation: URL.sandboxApplicationSupportURL,
+                                     model: NSManagedObjectModel.mergedModel(from: [.main])!), nil)
+        }
+
 #if DEBUG
         if AppDelegate.isRunningTests {
             let keyStoreMockClass = (NSClassFromString("EncryptionKeyStoreMock") as? NSObject.Type)!
@@ -34,24 +62,21 @@ final class Database {
             return makeDatabase(keyStore: keyStoreMock)
         }
 #endif
+
         return makeDatabase(keyStore: EncryptionKeyStore(generator: EncryptionKeyGenerator()))
-    }()
+    }
 
-    static func makeDatabase(keyStore: EncryptionKeyStoring) -> CoreDataDatabase {
-        do {
-            try EncryptedValueTransformer<NSImage>.registerTransformer(keyStore: keyStore)
-            try EncryptedValueTransformer<NSString>.registerTransformer(keyStore: keyStore)
-            try EncryptedValueTransformer<NSURL>.registerTransformer(keyStore: keyStore)
-            try EncryptedValueTransformer<NSNumber>.registerTransformer(keyStore: keyStore)
-            try EncryptedValueTransformer<NSError>.registerTransformer(keyStore: keyStore)
-            try EncryptedValueTransformer<NSData>.registerTransformer(keyStore: keyStore)
-        } catch {
-            fatalError("Failed to register encryption value transformers")
+    // MARK: - Pixel
+
+    @UserDefaultsWrapper(key: .lastDatabaseFactoryFailureDate, defaultValue: nil)
+    static var lastDatabaseFactoryFailureDate: Date?
+
+    static func firePixelErrorIfNeeded(error: Error?) {
+        // Fire the pixel once a day at max
+        if lastDatabaseFactoryFailureDate == nil || (lastDatabaseFactoryFailureDate ?? Date.distantPast) < Date.daysAgo(1) {
+            lastDatabaseFactoryFailureDate = Date()
+            Pixel.fire(.debug(event: .dbMakeDatabaseError, error: error))
         }
-
-        return CoreDataDatabase(name: Constants.databaseName,
-                                containerLocation: URL.sandboxApplicationSupportURL,
-                                model: NSManagedObjectModel.mergedModel(from: [.main])!)
     }
 }
 
