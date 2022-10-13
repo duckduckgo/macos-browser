@@ -811,7 +811,16 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
         youtubePlayerCancellables.removeAll()
 
-        if webView.url?.host?.droppingWwwPrefix() == "youtube.com" {
+        // only send push updates on macOS 11+ where it's safe to call window.* messages in the browser
+        let canPushMessagesToJS: Bool = {
+            if #available(macOS 11, *) {
+                return true
+            } else {
+                return false
+            }
+        }()
+
+        if webView.url?.host?.droppingWwwPrefix() == "youtube.com" && canPushMessagesToJS {
             privatePlayer.$mode
                 .dropFirst()
                 .sink { [weak self] playerMode in
@@ -819,8 +828,8 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                         return
                     }
                     let userValues = YoutubeOverlayUserScript.UserValues(
-                            privatePlayerMode: playerMode,
-                            overlayInteracted: self.privatePlayer.overlayInteracted
+                        privatePlayerMode: playerMode,
+                        overlayInteracted: self.privatePlayer.overlayInteracted
                     )
                     self.youtubeOverlayScript?.userValuesUpdated(userValues: userValues, inWebView: self.webView)
                 }
@@ -829,15 +838,18 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
         if url?.isPrivatePlayerScheme == true {
             youtubePlayerScript?.isEnabled = true
-            privatePlayer.$mode
-                .map { $0 == .enabled }
-                .sink { [weak self] shouldAlwaysOpenPrivatePlayer in
-                    guard let self = self else {
-                        return
+
+            if canPushMessagesToJS {
+                privatePlayer.$mode
+                    .map { $0 == .enabled }
+                    .sink { [weak self] shouldAlwaysOpenPrivatePlayer in
+                        guard let self = self else {
+                            return
+                        }
+                        self.youtubePlayerScript?.setAlwaysOpenInPrivatePlayer(shouldAlwaysOpenPrivatePlayer, inWebView: self.webView)
                     }
-                    self.youtubePlayerScript?.setAlwaysOpenInPrivatePlayer(shouldAlwaysOpenPrivatePlayer, inWebView: self.webView)
-                }
-                .store(in: &youtubePlayerCancellables)
+                    .store(in: &youtubePlayerCancellables)
+            }
         } else {
             youtubePlayerScript?.isEnabled = false
         }

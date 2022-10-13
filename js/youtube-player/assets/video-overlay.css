@@ -1,6 +1,5 @@
 /* -- VIDEO PLAYER OVERLAY */
 :host {
-    outline: 10px solid red;
     position: absolute;
     top: 0;
     left: 0;

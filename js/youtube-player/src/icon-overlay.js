@@ -1,7 +1,6 @@
 import {addTrustedEventListener, appendElement, VideoParams} from "./util";
 import dax from "../assets/dax.svg";
 import {i18n} from "./text.js";
-import {macOSCommunications} from "./comms";
 
 export const IconOverlay = {
     /**
@@ -15,6 +14,17 @@ export const IconOverlay = {
     currentVideoElement: null,
     hoverOverlayVisible: false,
 
+    /**
+     * @type {import("./comms.js").MacOSCommunications | null}
+     */
+    comms: null,
+    /**
+     * // todo: when this is a class, pass this as a constructor arg
+     * @param {import("./comms.js").MacOSCommunications} comms
+     */
+    setComms(comms) {
+        IconOverlay.comms = comms;
+    },
     /**
      * Creates an Icon Overlay.
      * @param {string} size - currently kind-of unused
@@ -41,14 +51,15 @@ export const IconOverlay = {
 
         overlayElement.querySelector('a.ddg-play-privately')?.setAttribute('href', href);
 
-        overlayElement.querySelector('a.ddg-play-privately').addEventListener('click', (event, a, b) => {
+        overlayElement.querySelector('a.ddg-play-privately')?.addEventListener('click', (event) => {
             event.preventDefault();
             event.stopPropagation();
 
+            // @ts-ignore
             let link = event.target.closest('a');
             let href = link.getAttribute('href');
 
-            macOSCommunications.openInDuckPlayerViaMessage(href);
+            IconOverlay.comms?.openInDuckPlayerViaMessage(href);
 
             return;
         })
@@ -100,7 +111,7 @@ export const IconOverlay = {
 
     /**
      * Return the offset of an HTML Element
-     * @param {HTMLElement}
+     * @param {HTMLElement} el
      * @returns {Object}
      */
     getElementOffset: (el) => {

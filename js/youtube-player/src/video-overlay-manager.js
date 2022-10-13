@@ -18,7 +18,7 @@ export class VideoOverlayManager {
     /**
      * @param {import("../youtube-inject").UserValues} userValues
      * @param {{getHref(): string, getLargeThumbnailSrc(videoId: string): string, setHref(href: string): void}} environment
-     * @param {import("./comms.js").macOSCommunications} comms
+     * @param {import("./comms").MacOSCommunications} comms
      */
     constructor(userValues, environment, comms) {
         this.userValues = userValues;
@@ -112,6 +112,14 @@ export class VideoOverlayManager {
         const params = VideoParams.forWatchPage(this.environment.getHref());
 
         if (!params) {
+            /**
+             * If we've shown a video before, but now we don't have a valid ID,
+             * it's likely a 'back' navigation by the user, so we should always try to remove all overlays
+             */
+            if (this.lastVideoId) {
+                this.removeAllOverlays();
+                this.lastVideoId = null;
+            }
             return;
         }
 
@@ -231,7 +239,7 @@ export class VideoOverlayManager {
             overlayInteracted: false,
             privatePlayerMode,
         };
-        this.userChoice(outgoing)
+        this.comms.setUserValues(outgoing)
             .then(() => this.environment.setHref(params.toPrivatePlayerUrl()))
             .catch(e => console.error("error setting user choice", e))
     }
@@ -251,7 +259,7 @@ export class VideoOverlayManager {
         if (remember) {
             /** @type {import("../youtube-inject.js").UserValues['privatePlayerMode']} */
             let privatePlayerMode = {alwaysAsk: {}};
-            this.userChoice({
+            this.comms.setUserValues({
                 privatePlayerMode: privatePlayerMode,
                 overlayInteracted: true
             })
@@ -262,19 +270,6 @@ export class VideoOverlayManager {
             this.removeAllOverlays();
             this.addSmallDaxOverlay(params)
         }
-    }
-
-    /**
-     * Record the users choice
-     * @param {import("../youtube-inject.js").UserValues} userValues
-     * @returns {Promise<import("../youtube-inject").UserValues>}
-     */
-    userChoice(userValues) {
-        return this.comms.setUserValues(userValues)
-            .then((userValues) => {
-                return userValues;
-            })
-            .catch(e => console.error("could not set interacted after user opt out", e))
     }
 
     /** @type {{fn: () => void, name: string}[]} */

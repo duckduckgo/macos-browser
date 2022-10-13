@@ -40,7 +40,7 @@ final class TabViewModelTests: XCTestCase {
             XCTAssert(tabViewModel.canReload)
             canReloadExpectation.fulfill()
         } .store(in: &cancellables)
-        waitForExpectations(timeout: 1, handler: nil)
+        waitForExpectations(timeout: 2, handler: nil)
     }
 
     // MARK: - AddressBarString
