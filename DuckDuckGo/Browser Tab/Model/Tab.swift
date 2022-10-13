@@ -236,6 +236,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         }
         webView.stopLoading()
         webView.stopMediaCapture()
+        webView.stopAllMediaPlayback()
         webView.fullscreenWindowController?.close()
         userContentController.removeAllUserScripts()
 
