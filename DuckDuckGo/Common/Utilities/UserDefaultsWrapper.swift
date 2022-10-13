@@ -89,7 +89,7 @@ public struct UserDefaultsWrapper<T> {
         
         case pinnedViews = "pinning.pinned-views"
 
-        case lastDatabaseFactoryFailureDate = "last.database.factory.failure.date"
+        case lastDatabaseFactoryFailurePixelDate = "last.database.factory.failure.pixel.date"
     }
 
     enum RemovedKeys: String, CaseIterable {

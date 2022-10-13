@@ -68,13 +68,15 @@ final class Database {
 
     // MARK: - Pixel
 
-    @UserDefaultsWrapper(key: .lastDatabaseFactoryFailureDate, defaultValue: nil)
-    static var lastDatabaseFactoryFailureDate: Date?
+    @UserDefaultsWrapper(key: .lastDatabaseFactoryFailurePixelDate, defaultValue: nil)
+    static var lastDatabaseFactoryFailurePixelDate: Date?
 
     static func firePixelErrorIfNeeded(error: Error?) {
+        let lastPixelSentAt = lastDatabaseFactoryFailurePixelDate ?? Date.distantPast
+
         // Fire the pixel once a day at max
-        if lastDatabaseFactoryFailureDate == nil || (lastDatabaseFactoryFailureDate ?? Date.distantPast) < Date.daysAgo(1) {
-            lastDatabaseFactoryFailureDate = Date()
+        if lastPixelSentAt < Date.daysAgo(1) {
+            lastDatabaseFactoryFailurePixelDate = Date()
             Pixel.fire(.debug(event: .dbMakeDatabaseError, error: error))
         }
     }
