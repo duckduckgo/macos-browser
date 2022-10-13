@@ -905,16 +905,16 @@
                     let icon = Tooltip.icon()
                     let rect = icon && icon.getBoundingClientRect();
 
-                    if (rect && rect.top) {
-                        let iconTop = rect.top + window.pageYOffset;
-                        let spaceBelowIcon = window.innerHeight - iconTop;
-
-                        if (spaceBelowIcon < 125) {
-                            return true;
-                        }
+                    if (!rect || !rect.top) {
+                        return false;
                     }
 
-                    return false;
+                    let iconTop = rect.top + window.scrollY;
+                    let spaceBelowIcon = window.innerHeight - iconTop;
+
+                    if (spaceBelowIcon < 125) {
+                        return true;
+                    }
                 },
 
                 /**
