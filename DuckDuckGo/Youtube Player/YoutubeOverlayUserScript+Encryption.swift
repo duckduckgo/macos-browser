@@ -16,8 +16,12 @@
 //  limitations under the License.
 //
 
+// This file is mostly a copy-paste of AutofillUserScript+Encryption.swift from BSK (internal API).
+// Autofill solution will be refactored into a universal API and applied to Youtube Overlay script.
+
 import Foundation
 import CryptoKit
+import WebKit
 
 protocol YoutubeEncrypter {
     func encryptReply(_ reply: String, key: [UInt8], iv: [UInt8]) throws -> (ciphertext: Data, tag: Data)
