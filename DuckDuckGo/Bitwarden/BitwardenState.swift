@@ -20,7 +20,12 @@ import Foundation
 
 enum BitwardenStatus {
 
+    // Bitwarden disabled in settings
     case disabled
+
+    // Bitwarden application isn't running || User didn't approve DuckDuckGo browser integration
+    case notApproachable
+
     case connected(vault: Vault)
     case error(error: BitwardenError)
 

@@ -18,7 +18,7 @@
 
 import Foundation
 
-//TODO Divide at least to response and request
+//TODO: Divide at least to response and request
 struct BitwardenMessage: Codable {
 
     let messageId: String?

@@ -21,7 +21,6 @@ import SwiftUI
 import OpenSSL
 import os.log
 
-// TODO: Rename to BitwardenController
 protocol BitwardenManagement {
 
     var status: BitwardenStatus { get }
@@ -33,25 +32,26 @@ final class BitwardenManager {
 
     static let shared = BitwardenManager()
 
-    //TODO: adjust the init based on internal setting of password manager and subscribe for dynamic change
-
-    var status: BitwardenStatus = .disabled {
-        didSet {
-            os_log("Status changed: %s", log: .bitwarden, type: .default, String(describing: status))
-        }
-    }
-
-    private lazy var communicator: BitwardenCommunication = BitwardenComunicator()
-
     private init() {}
 
     init(communicator: BitwardenCommunication) {
         self.communicator = communicator
     }
 
+    private lazy var communicator: BitwardenCommunication = BitwardenComunicator()
+
     func initCommunication() {
+        //TODO: adjust the init based on internal setting of password manager and subscribe for dynamic change of the setting
+        //TODO: Retrieve keys if possible instead of generation
+
         generateKeyPair()
         communicator.delegate = self
+        startConnection()
+    }
+
+    // MARK: - Connection
+
+    private func startConnection() {
         communicator.enabled = true
     }
 
@@ -60,12 +60,16 @@ final class BitwardenManager {
     // Disables communicator (kills the proxy process)
     // and schedules future attempt to connect
     private func scheduleConnectionAttempt() {
-        connectionAttemptTimer?.invalidate()
-        connectionAttemptTimer = Timer.scheduledTimer(withTimeInterval: 2, repeats: false) { [weak self] timer in
+        guard connectionAttemptTimer == nil else {
+            //Already scheduled
+            return
+        }
+
+        connectionAttemptTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: false) { [weak self] timer in
             self?.connectionAttemptTimer?.invalidate()
             self?.connectionAttemptTimer = nil
 
-            self?.communicator.enabled = true
+            self?.startConnection()
         }
     }
 
@@ -75,17 +79,26 @@ final class BitwardenManager {
         scheduleConnectionAttempt()
     }
 
-    private func refreshStatus(payloadItem: BitwardenMessage.PayloadItem) {
-        guard let id = payloadItem.id,
-              let email = payloadItem.email,
-              let statusString = payloadItem.status,
-              let status = BitwardenStatus.Vault.Status(rawValue: statusString) else {
-            self.status = .error(error: .statusParsingFailed)
+    // MARK: - Status Refreshing
+
+    private var statusRefreshingTimer: Timer?
+
+    // Disables communicator (kills the proxy process)
+    // and schedules future attempt to connect
+    private func scheduleStatusRefreshing() {
+        guard statusRefreshingTimer == nil else {
+            //Already scheduled
             return
         }
 
-        let vault = BitwardenStatus.Vault(id: id, email: email, status: status)
-        self.status = .connected(vault: vault)
+        statusRefreshingTimer = Timer.scheduledTimer(withTimeInterval: 2, repeats: true) { [weak self] timer in
+            self?.sendStatus()
+        }
+    }
+
+    private func stopStatusRefreshing() {
+        statusRefreshingTimer?.invalidate()
+        statusRefreshingTimer = nil
     }
 
     // MARK: - Handling Incoming Messages
@@ -98,6 +111,7 @@ final class BitwardenManager {
         case "disconnected":
             // Bitwarden application isn't running || User didn't approve DuckDuckGo browser integration
             cancelConnectionAndScheduleNextAttempt()
+            status = .notApproachable
         default:
             assertionFailure("Unknown command")
         }
@@ -137,7 +151,7 @@ final class BitwardenManager {
 
         #if DEBUG
         let decryptedString = String(bytes: decryptedData, encoding: .utf8)
-        os_log("Decrypted payload: %s", log: .bitwarden, type: .default, decryptedString ?? "")
+        os_log("Decrypted payload:\n %s", log: .bitwarden, type: .default, decryptedString ?? "")
         #endif
 
         guard let message = BitwardenMessage(from: decryptedData) else {
@@ -146,7 +160,7 @@ final class BitwardenManager {
         }
 
         switch message.payload {
-        case .item(let payloadItem):
+        case .item(let _):
             //TODO: Handle other messages
             assertionFailure("Unhandled case")
         case .array(let payloadItemArray):
@@ -169,6 +183,14 @@ final class BitwardenManager {
         }
 
         refreshStatus(payloadItem: activePayloadItem)
+
+        // If vault is locked, keep refreshing the latest status
+        if case .connected(vault: let vault) = status,
+           vault.status == .locked {
+            scheduleStatusRefreshing()
+        } else {
+            stopStatusRefreshing()
+        }
     }
 
     // MARK: - Sending Messages
@@ -205,15 +227,35 @@ final class BitwardenManager {
         communicator.send(messageData: messageData)
     }
     
-    // MARK: - Keys
+    // MARK: - Encryption and Keys
 
     let openSSLWrapper = OpenSSLWrapper()
 
     var publicKey: String?
-    var sharedKey: String?
 
     private func generateKeyPair() {
         publicKey = openSSLWrapper.generateKeys()
+    }
+
+    // MARK: - Internal Logic
+
+    private(set) var status: BitwardenStatus = .disabled {
+        didSet {
+            os_log("Status changed: %s", log: .bitwarden, type: .default, String(describing: status))
+        }
+    }
+
+    private func refreshStatus(payloadItem: BitwardenMessage.PayloadItem) {
+        guard let id = payloadItem.id,
+              let email = payloadItem.email,
+              let statusString = payloadItem.status,
+              let status = BitwardenStatus.Vault.Status(rawValue: statusString) else {
+            self.status = .error(error: .statusParsingFailed)
+            return
+        }
+
+        let vault = BitwardenStatus.Vault(id: id, email: email, status: status)
+        self.status = .connected(vault: vault)
     }
 
 }

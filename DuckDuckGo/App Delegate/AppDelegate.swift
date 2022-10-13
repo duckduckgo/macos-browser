@@ -93,7 +93,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         _ = ConfigurationManager.shared
         _ = DownloadListCoordinator.shared
         _ = RecentlyClosedCoordinator.shared
-        BitwardenManager.shared.initCommunication()
 
         AtbAndVariantCleanup.cleanup()
         DefaultVariantManager().assignVariantIfNeeded { _ in
@@ -104,6 +103,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         fireLaunchPixel(regularLaunch: (notification.userInfo?[NSApplication.launchIsDefaultUserInfoKey] as? NSNumber)?.boolValue)
 
         stateRestorationManager.applicationDidFinishLaunching()
+
+        BitwardenManager.shared.initCommunication()
 
         if WindowsManager.windows.isEmpty {
             WindowsManager.openNewWindow(lazyLoadTabs: true)

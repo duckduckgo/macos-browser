@@ -38,12 +38,12 @@ final class BitwardenComunicator: BitwardenCommunication {
 
     static let appPath = "/Applications/Bitwarden.app/Contents/MacOS/Bitwarden"
 
-    //TODO keeps the communication active at all costs
+    //TODO: keep the communication active at all costs
 
     var enabled = false {
         didSet {
             if enabled {
-                //TODO keep the process running
+                //TODO: keep the process running
                 try? runProxyProcess()
             } else {
                 terminateProxyProcess()
@@ -64,6 +64,7 @@ final class BitwardenComunicator: BitwardenCommunication {
     private var process: BitwardenProcess?
 
     private func runProxyProcess() throws {
+
         let process = Process()
 
         let outputPipe = Pipe()
@@ -84,7 +85,9 @@ final class BitwardenComunicator: BitwardenCommunication {
         process.standardInput = inputPipe
         process.terminationHandler = processDidTerminate(_:)
 
+        //TODO: catch
         try process.run()
+        os_log("BitwardenComunicator: Proxy process running", log: .bitwarden, type: .default)
 
         self.process = BitwardenProcess(process: process, readingHandle: outHandle, writingHandle: inputHandle)
     }
@@ -95,7 +98,9 @@ final class BitwardenComunicator: BitwardenCommunication {
     }
 
     private func processDidTerminate(_ process: Process) {
-        //TODO handle the termination
+        os_log("BitwardenComunicator: Proxy process terminated", log: .bitwarden, type: .default)
+
+        //TODO: handle the termination
     }
 
     // MARK: - Sending Messages
@@ -123,15 +128,18 @@ final class BitwardenComunicator: BitwardenCommunication {
     func receiveData(_ fileHandle: FileHandle) {
 
         func readMessage(availableData: Data) -> (messageData: Data?, availableData: Data) {
+            guard availableData.count > 0 else { return (nil, availableData: availableData) }
+
+            // First 4 bytes of the message contain the message length
             let dataPrefix = availableData.prefix(4)
             guard dataPrefix.count == 4 else {
                 assertionFailure("Wrong format of the message")
                 return (nil, availableData)
             }
 
-            let messageLength = availableData.withUnsafeBytes { rawBuffer in
-                rawBuffer.load(as: UInt32.self)
-            }
+            let dataPrefixArray = [UInt8](dataPrefix)
+            let messageLength = fromByteArray(dataPrefixArray, UInt32.self)
+
             let dataPostfix = availableData.dropFirst(4)
             let messageData = dataPostfix.prefix(Int(messageLength))
             let availableData = dataPostfix.dropFirst(Int(messageLength))
@@ -157,19 +165,30 @@ final class BitwardenComunicator: BitwardenCommunication {
                 return
             }
 
-            os_log("%s", log: .bitwarden, type: .default, messageString)
+            os_log("Message received:\n %s", log: .bitwarden, type: .default, messageString)
         }
 #endif
 
-            delegate?.bitwadenCommunicator(self, didReceiveMessageData: messageData)
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+
+                self.delegate?.bitwadenCommunicator(self, didReceiveMessageData: messageData)
+            }
         } while availableData.count >= 2 /*EOF*/
     }
 
-
     private func receiveErrorData(_ fileHandle: FileHandle) {
         if let _ = String(data: fileHandle.availableData, encoding: .utf8) {
-            //TODO
+            //TODO: log error data
 //            os_log("STDERR: %{public}@", line)
+        }
+    }
+
+    private func fromByteArray<T>(_ value: [UInt8], _: T.Type) -> T {
+        return value.withUnsafeBufferPointer {
+            $0.baseAddress!.withMemoryRebound(to: T.self, capacity: 1) {
+                $0.pointee
+            }
         }
     }
 

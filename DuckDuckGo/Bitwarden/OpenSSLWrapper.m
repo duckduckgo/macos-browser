@@ -162,7 +162,7 @@ NSData *macKeyData;
     for(i=0;*(dec_out+i)!=0x00;i++);
 
     //TODO: Padding removal
-    for(;*(dec_out+(i-1))==0x03;i--);
+    for(;*(dec_out+(i-1))==0x03 || *(dec_out+(i-1))==0x01;i--);
 
     NSData *decryptedData = [NSData dataWithBytes:dec_out length: i];
     return decryptedData;
