@@ -364,31 +364,50 @@ struct SiteIconAndConnector: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 6)
-                    .fill(isHovering ? mouseOverColor : backgroundColor)
-
-                FaviconView(domain: site.domain, size: 22)
+            if site.isRealDomain {
+                faviconView
+            } else {
+                nonInteractiveFaviconView
             }
-            .link {
-                self.isHovering = $0
-
-                if isHovering {
-                    NSCursor.pointingHand.push()
-                } else {
-                    NSCursor.pointingHand.pop()
-                }
-                
-            } clicked: {
-                model.open(site)
-            }
-            .frame(width: 32, height: 32)
 
             Rectangle()
                 .fill(backgroundColor)
                 .frame(width: 1)
                 .frame(maxHeight: .infinity)
         }
+    }
+
+    @ViewBuilder
+    var faviconView: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 6)
+                .fill(isHovering ? mouseOverColor : backgroundColor)
+
+            FaviconView(domain: site.domain, size: 22)
+        }
+        .link {
+            self.isHovering = $0
+
+            if isHovering {
+                NSCursor.pointingHand.push()
+            } else {
+                NSCursor.pointingHand.pop()
+            }
+        } clicked: {
+            model.open(site)
+        }
+        .frame(width: 32, height: 32)
+    }
+
+    @ViewBuilder
+    var nonInteractiveFaviconView: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 6)
+                .fill(backgroundColor)
+
+            FaviconView(domain: site.domain, size: 22)
+        }
+        .frame(width: 32, height: 32)
     }
 
 }

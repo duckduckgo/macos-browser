@@ -19,6 +19,7 @@
 import Foundation
 import Combine
 import WebKit
+import BrowserServicesKit
 
 extension NSImage {
     static let privatePlayer: NSImage = #imageLiteral(resourceName: "PrivatePlayer")
@@ -51,14 +52,6 @@ enum PrivatePlayerMode: Equatable, Codable {
 }
 
 final class PrivatePlayer {
-    static let isAvailable: Bool = {
-        if #available(macOS 11.0, *) {
-            return true
-        } else {
-            return false
-        }
-    }()
-
     static let usesSimulatedRequests: Bool = {
         if #available(macOS 12.0, *) {
             return true
@@ -79,27 +72,54 @@ final class PrivatePlayer {
 
     static let shared = PrivatePlayer()
 
+    var isAvailable: Bool {
+        isFeatureEnabled
+    }
+
     @Published var mode: PrivatePlayerMode
+
     var overlayInteracted: Bool {
         preferences.youtubeOverlayInteracted
     }
 
-    init(preferences: PrivatePlayerPreferences = .shared) {
+    init(
+        preferences: PrivatePlayerPreferences = .shared,
+        privacyConfigurationManager: PrivacyConfigurationManaging & AnyObject = ContentBlocking.shared.privacyConfigurationManager
+    ) {
         self.preferences = preferences
+        isFeatureEnabled = privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .duckPlayer)
         mode = preferences.privatePlayerMode
+        bindPrivatePlayerModeIfNeeded()
 
-        if Self.isAvailable {
-            modeCancellable = preferences.$privatePlayerMode
-                .removeDuplicates()
-                .assign(to: \.mode, onWeaklyHeld: self)
-        }
+        isFeatureEnabledCancellable = privacyConfigurationManager.updatesPublisher
+            .map { [weak privacyConfigurationManager] in
+                privacyConfigurationManager?.privacyConfig.isEnabled(featureKey: .duckPlayer) == true
+            }
+            .assign(to: \.isFeatureEnabled, onWeaklyHeld: self)
     }
 
     // MARK: - Private
 
     private static let websiteTitlePrefix = "\(commonName) - "
     private let preferences: PrivatePlayerPreferences
+
+    private var isFeatureEnabled: Bool = false {
+        didSet {
+            bindPrivatePlayerModeIfNeeded()
+        }
+    }
     private var modeCancellable: AnyCancellable?
+    private var isFeatureEnabledCancellable: AnyCancellable?
+
+    private func bindPrivatePlayerModeIfNeeded() {
+        if isFeatureEnabled {
+            modeCancellable = preferences.$privatePlayerMode
+                .removeDuplicates()
+                .assign(to: \.mode, onWeaklyHeld: self)
+        } else {
+            modeCancellable = nil
+        }
+    }
 }
 
 // MARK: - Navigation
@@ -107,11 +127,11 @@ final class PrivatePlayer {
 extension PrivatePlayer {
 
     func decidePolicy(for navigationAction: WKNavigationAction, in tab: Tab) -> WKNavigationActionPolicy? {
-        guard Self.isAvailable, mode != .disabled else {
+        guard isAvailable, mode != .disabled else {
 
-            // When the feature is disabled but the webView still gets a Private Player scheme URL,
+            // When the feature is disabled but the webView still gets a Private Player URL,
             // convert it back to a regular YouTube video URL.
-            if navigationAction.request.url?.isPrivatePlayerScheme == true,
+            if navigationAction.request.url?.isPrivatePlayer == true,
                 let (videoID, timestamp) = navigationAction.request.url?.youtubeVideoParams {
 
                 tab.webView.load(.youtube(videoID, timestamp: timestamp))
@@ -148,7 +168,7 @@ extension PrivatePlayer {
         let didSelectRecommendationFromPrivatePlayer = tab.content.isPrivatePlayer && navigationAction.request.url?.isYoutubeVideoRecommendation == true
 
         // Recommendations must always be opened in Private Player.
-        guard alwaysOpenInPrivatePlayer || didSelectRecommendationFromPrivatePlayer, let videoID = navigationAction.request.url?.youtubeVideoID else {
+        guard alwaysOpenInPrivatePlayer || didSelectRecommendationFromPrivatePlayer, let (videoID, timestamp) = navigationAction.request.url?.youtubeVideoParams else {
             return nil
         }
 
@@ -159,7 +179,7 @@ extension PrivatePlayer {
 
         // Otherwise load priate player unless it's already loaded.
         guard case .privatePlayer(let currentVideoID, _) = tab.content, currentVideoID == videoID, tab.webView.url?.isPrivatePlayer == true else {
-            tab.webView.load(.privatePlayer(videoID))
+            tab.webView.load(.privatePlayer(videoID, timestamp: timestamp))
             return .cancel
         }
         return nil
@@ -182,14 +202,14 @@ extension PrivatePlayer {
 extension PrivatePlayer {
 
     func image(for faviconView: FaviconView) -> NSImage? {
-        guard Self.isAvailable, mode != .disabled, faviconView.domain == Self.commonName else {
+        guard isAvailable, mode != .disabled, faviconView.domain == Self.commonName else {
             return nil
         }
         return .privatePlayer
     }
 
     func domainForRecentlyVisitedSite(with url: URL) -> String? {
-        guard Self.isAvailable, mode != .disabled else {
+        guard isAvailable, mode != .disabled else {
             return nil
         }
 
@@ -197,7 +217,7 @@ extension PrivatePlayer {
     }
 
     func title(for page: HomePage.Models.RecentlyVisitedPageModel) -> String? {
-        guard Self.isAvailable, mode != .disabled else {
+        guard isAvailable, mode != .disabled else {
             return nil
         }
 
@@ -219,7 +239,7 @@ extension PrivatePlayer {
 extension PrivatePlayer {
 
     func tabContent(for url: URL?) -> Tab.TabContent? {
-        guard Self.isAvailable, mode != .disabled, let url = url, let (videoID, timestamp) = url.youtubeVideoParams else {
+        guard isAvailable, mode != .disabled, let url = url, let (videoID, timestamp) = url.youtubeVideoParams else {
             return nil
         }
 
@@ -233,7 +253,7 @@ extension PrivatePlayer {
     }
 
     func overrideContent(_ content: Tab.TabContent, for tab: Tab) -> Tab.TabContent? {
-        guard Self.isAvailable, mode != .disabled else {
+        guard isAvailable, mode != .disabled else {
             return nil
         }
 
@@ -277,7 +297,7 @@ extension PrivatePlayer {
 extension PrivatePlayer {
 
     func shouldSkipLoadingURL(for tab: Tab) -> Bool {
-        guard Self.isAvailable, mode != .disabled else {
+        guard isAvailable, mode != .disabled else {
             return false
         }
 
@@ -291,7 +311,7 @@ extension PrivatePlayer {
     }
 
     func goBackAndLoadURLIfNeeded(for tab: Tab) -> Bool {
-        guard Self.isAvailable,
+        guard isAvailable,
               mode != .disabled,
               tab.content.isPrivatePlayer,
               tab.webView.url?.isPrivatePlayer == true,
@@ -315,7 +335,7 @@ extension PrivatePlayer {
 extension PrivatePlayer {
 
     func goBackSkippingLastItemIfNeeded(for webView: WKWebView) -> Bool {
-        guard Self.isAvailable, mode == .enabled, webView.url?.isPrivatePlayer == true else {
+        guard isAvailable, mode == .enabled, webView.url?.isPrivatePlayer == true else {
             return false
         }
 

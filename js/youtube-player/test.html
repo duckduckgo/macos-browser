@@ -2,11 +2,55 @@
 <html lang="en">
 <head>
     <script>
+        async function encryptResponse (message, response) {
+            /**
+             * Create a `CryptoKey` based on the incoming message's 'key' field
+             * @type {CryptoKey}
+             */
+            const keyEncoded = await crypto.subtle.importKey(
+                'raw',
+                new Uint8Array(message.messageHandling.key),
+                'AES-GCM',
+                false,
+                ['encrypt', 'decrypt']
+            )
+
+            /**
+             * Encode the response JSON
+             */
+            const enc = new TextEncoder()
+            const encodedJson = enc.encode(JSON.stringify(response))
+
+            /**
+             * Encrypt the JSON string
+             */
+            const encryptedContent = await window.crypto.subtle.encrypt(
+                {
+                    name: 'AES-GCM',
+                    iv: new Uint8Array(message.messageHandling.iv)
+                },
+                keyEncoded,
+                encodedJson
+            )
+
+            /**
+             * Now return the encrypted data in the same shape that the native side would
+             */
+            return {
+                ciphertext: [...new Uint8Array(encryptedContent)],
+                tag: []
+            }
+        }
         window.webkit = {
             messageHandlers: {
                 readUserValues: {
-                    async postMessage() {
-                        return JSON.stringify({privatePlayerMode: {alwaysAsk:{}}, overlayInteracted: false})
+                    async postMessage(args) {
+                        const response = {privatePlayerMode: {alwaysAsk:{}}, overlayInteracted: false};
+                        const fn = window[args.messageHandling.methodName]
+                        if (typeof fn === 'function') {
+                            // @ts-ignore
+                            fn(encryptResponse(args, response))
+                        }
                     }
                 }
             }
@@ -21,7 +65,7 @@
         }
         function setPref(playerMode) {
             console.log(playerMode);
-            window.postMessage({
+            window.onUserValuesChanged({
                 userValuesNotification: {
                     privatePlayerMode: playerMode,
                     overlayInteracted: false,
@@ -38,8 +82,15 @@
             setHref(href) {
                 console.log("would set href here...", href);
             },
-            enabled() { return true }
+            enabled() {
+                return true
+            }
         }
+        window.$RuntimeInjectedValues$ = {
+            hasModernWebkitAPI: false,
+            webkitMessageHandlerNames: ['readUserValues'],
+            secret: 'sauce',
+        };
     </script>
     <script src="dist/youtube-inject.bundle.js"></script>
     <meta charset="UTF-8">

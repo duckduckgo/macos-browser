@@ -24,4 +24,13 @@ extension Error {
         return (self as NSError).userInfo["NSErrorFailingURLKey"] as? URL
     }
 
+    var isFrameLoadInterrupted: Bool {
+        let error = self as NSError
+        return error.code == 102 && error.domain == "WebKitErrorDomain"
+    }
+
+    var isNavigationCancelled: Bool {
+        let error = self as NSError
+        return error.code == -999 && error.domain == "NSURLErrorDomain"
+    }
 }

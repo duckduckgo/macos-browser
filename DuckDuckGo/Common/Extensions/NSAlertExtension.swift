@@ -108,4 +108,13 @@ extension NSAlert {
         alert.addButton(withTitle: UserText.ok)
         return alert
     }
+
+    static func databaseFactoryFailed() -> NSAlert {
+        let alert = NSAlert()
+        alert.messageText = UserText.databaseFactoryFailedMessage
+        alert.informativeText = UserText.databaseFactoryFailedInformative
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: UserText.ok)
+        return alert
+    }
 }

@@ -23,10 +23,10 @@ struct PreferencesSection: Hashable, Identifiable {
     let id: PreferencesSectionIdentifier
     let panes: [PreferencePaneIdentifier]
 
-    static let defaultSections: [PreferencesSection] = {
+    static var defaultSections: [PreferencesSection] {
         let regularPanes: [PreferencePaneIdentifier] = {
             var panes: [PreferencePaneIdentifier] = [.general, .appearance, .privacy, .autofill, .downloads]
-            if PrivatePlayer.isAvailable {
+            if PrivatePlayer.shared.isAvailable {
                 panes.append(.privatePlayer)
             }
             return panes
@@ -36,7 +36,7 @@ struct PreferencesSection: Hashable, Identifiable {
             .init(id: .regularPreferencePanes, panes: regularPanes),
             .init(id: .about, panes: [.about])
         ]
-    }()
+    }
 }
 
 enum PreferencesSectionIdentifier: Hashable, CaseIterable {

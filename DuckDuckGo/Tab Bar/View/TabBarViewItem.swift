@@ -294,18 +294,19 @@ final class TabBarViewItem: NSCollectionViewItem {
     override func viewWillLayout() {
         super.viewWillLayout()
         
-        borderLayer.frame = self.view.bounds
-        leftPixelMask.frame = CGRect(x: 0, y: 0, width: TabShadowConfig.dividerSize, height: TabShadowConfig.dividerSize)
-        rightPixelMask.frame = CGRect(x: borderLayer.bounds.width - TabShadowConfig.dividerSize, y: 0, width: TabShadowConfig.dividerSize, height: TabShadowConfig.dividerSize)
-        topContentLineMask.frame = CGRect(x: 0, y: TabShadowConfig.dividerSize, width: borderLayer.bounds.width, height: borderLayer.bounds.height - TabShadowConfig.dividerSize)
+        withoutAnimation {
+            borderLayer.frame = self.view.bounds
+            leftPixelMask.frame = CGRect(x: 0, y: 0, width: TabShadowConfig.dividerSize, height: TabShadowConfig.dividerSize)
+            rightPixelMask.frame = CGRect(x: borderLayer.bounds.width - TabShadowConfig.dividerSize, y: 0, width: TabShadowConfig.dividerSize, height: TabShadowConfig.dividerSize)
+            topContentLineMask.frame = CGRect(x: 0, y: TabShadowConfig.dividerSize, width: borderLayer.bounds.width, height: borderLayer.bounds.height - TabShadowConfig.dividerSize)
+        }
     }
     
     private func updateBorderLayerColor() {
         NSAppearance.withAppAppearance {
-            CATransaction.begin()
-            CATransaction.setDisableActions(true)
-            borderLayer.borderColor = NSColor(named: TabShadowConfig.colorName)?.cgColor
-            CATransaction.commit()
+            withoutAnimation {
+                borderLayer.borderColor = NSColor(named: TabShadowConfig.colorName)?.cgColor
+            }
         }
     }
     
