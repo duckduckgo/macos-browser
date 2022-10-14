@@ -2,7 +2,7 @@ import css from "./assets/styles.css";
 import {VideoOverlayManager} from "./src/video-overlay-manager.js";
 import {IconOverlay} from "./src/icon-overlay.js";
 import {onDOMLoaded, onDOMChanged, addTrustedEventListener, appendElement, VideoParams} from "./src/util.js";
-import {macOSCommunications} from "./src/comms";
+import {MacOSCommunications} from "./src/comms";
 
 /**
  * @typedef UserValues - A way to communicate some user state
@@ -10,6 +10,7 @@ import {macOSCommunications} from "./src/comms";
  * @property {boolean} overlayInteracted - always a boolean
  */
 
+// const defaultEnvironment =  window.env || {
 const defaultEnvironment = {
     getHref() {
         return window.location.href
@@ -26,22 +27,25 @@ const defaultEnvironment = {
     }
 }
 
-const defaultComms = macOSCommunications;
+const macos = MacOSCommunications.fromInjectedConfig(
+    // @ts-ignore
+    $WebkitMessagingConfig$
+)
 
 if (defaultEnvironment.enabled()) {
-    initWithEnvironment(defaultEnvironment, defaultComms)
+    initWithEnvironment(defaultEnvironment, macos)
 }
 
 /**
  * @param {typeof defaultEnvironment} environment - methods to read environment-sensitive things like the current URL etc
- * @param {macOSCommunications } [comms] - methods to communicate with a native backend
+ * @param {MacOSCommunications} comms - methods to communicate with a native backend
  */
 function initWithEnvironment(environment, comms) {
 
     /**
      * Entry point. Until this returns with initial user values, we cannot continue.
      */
-    defaultComms.readUserValues()
+    comms.readUserValues()
         .then((userValues) => enable(userValues))
         .catch(e => console.error(e))
 
@@ -53,7 +57,11 @@ function initWithEnvironment(environment, comms) {
         const videoPlayerOverlay = new VideoOverlayManager(userValues, environment, comms);
         videoPlayerOverlay.handleFirstPageLoad();
 
-        defaultComms.onUserValuesNotification((userValues) => {
+        // give access to macos communications
+        // todo: make this a class + constructor arg
+        IconOverlay.setComms(comms);
+
+        comms.onUserValuesNotification((userValues) => {
             videoPlayerOverlay.userValues = userValues;
             videoPlayerOverlay.watchForVideoBeingAdded({ via: "user notification", ignoreCache: true });
 
@@ -67,7 +75,7 @@ function initWithEnvironment(environment, comms) {
                 AllIconOverlays.enable();
                 OpenInDuckPlayer.disable();
             }
-        });
+        }, userValues);
 
         const CSS = {
             styles: css,
