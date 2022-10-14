@@ -63,16 +63,20 @@ final class PixelStoreTests: XCTestCase {
 
         let e1 = expectation(description: "Double saved")
         oldContext.perform {
+            print("Setting double in old context")
             oldStore.set(1.23, forKey: "a") { error in
                 XCTAssertNil(error)
+                print("Set double in old context")
                 e1.fulfill()
             }
         }
         
         let e2 = expectation(description: "Int saved")
         oldContext.perform {
+            print("Setting int in old context")
             oldStore.set(1, forKey: "b") { error in
                 XCTAssertNil(error)
+                print("Set int in old context")
                 e2.fulfill()
             }
         }
