@@ -27,6 +27,7 @@ final class WebView: WKWebView {
         "WKMenuItemIdentifierOpenLink": #selector(LinkMenuItemSelectors.openLinkInNewTab(_:)),
         "WKMenuItemIdentifierOpenLinkInNewWindow": #selector(LinkMenuItemSelectors.openLinkInNewWindow(_:)),
         "WKMenuItemIdentifierDownloadLinkedFile": #selector(LinkMenuItemSelectors.downloadLinkedFileAs(_:)),
+        "WKMenuItemIdentifierDownloadMedia": #selector(LinkMenuItemSelectors.downloadLinkedFileAs(_:)),
         "WKMenuItemIdentifierAddLinkToBookmarks": #selector(LinkMenuItemSelectors.addLinkToBookmarks(_:)),
         "WKMenuItemIdentifierCopyLink": #selector(LinkMenuItemSelectors.copyLink(_:)),
 
