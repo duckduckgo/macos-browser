@@ -20,6 +20,7 @@ import Foundation
 import BrowserServicesKit
 import WebKit
 import os
+import Common
 
 protocol YoutubeOverlayUserScriptDelegate: AnyObject {
     func youtubeOverlayUserScriptDidRequestDuckPlayer(with url: URL)
