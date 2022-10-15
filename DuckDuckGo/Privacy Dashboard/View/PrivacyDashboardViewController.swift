@@ -20,7 +20,7 @@ import Cocoa
 import WebKit
 import Combine
 import BrowserServicesKit
-import PrivacyDashboard
+import PrivacyDashboardResources
 
 final class PrivacyDashboardViewController: NSViewController {
 

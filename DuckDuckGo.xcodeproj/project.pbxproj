@@ -17,7 +17,7 @@
 		1456D6E124EFCBC300775049 /* TabBarCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1456D6E024EFCBC300775049 /* TabBarCollectionView.swift */; };
 		14D9B8FB24F7E089000D4D13 /* AddressBarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14D9B8F924F7E089000D4D13 /* AddressBarViewController.swift */; };
 		1E25269C28F8741A00E44DFA /* Common in Frameworks */ = {isa = PBXBuildFile; productRef = 1E25269B28F8741A00E44DFA /* Common */; };
-		1EF7E98928F4421B005C31CA /* PrivacyDashboard in Frameworks */ = {isa = PBXBuildFile; productRef = 1EF7E98828F4421B005C31CA /* PrivacyDashboard */; };
+		1E25CD5628FAEE0A00E04B42 /* PrivacyDashboardResources in Frameworks */ = {isa = PBXBuildFile; productRef = 1E25CD5528FAEE0A00E04B42 /* PrivacyDashboardResources */; };
 		1EF7E98B28F44432005C31CA /* ProtectionStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EF7E98A28F44432005C31CA /* ProtectionStatus.swift */; };
 		3106AD76287F000600159FE5 /* CookieConsentUserPermissionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3106AD75287F000600159FE5 /* CookieConsentUserPermissionViewController.swift */; };
 		311B262728E73E0A00FD181A /* TabShadowConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311B262628E73E0A00FD181A /* TabShadowConfig.swift */; };
@@ -1672,7 +1672,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1EF7E98928F4421B005C31CA /* PrivacyDashboard in Frameworks */,
+				1E25CD5628FAEE0A00E04B42 /* PrivacyDashboardResources in Frameworks */,
 				9807F645278CA16F00E1547B /* BrowserServicesKit in Frameworks */,
 				85AE2FF224A33A2D002D507F /* WebKit.framework in Frameworks */,
 				4B82E9B325B69E3E00656FE7 /* TrackerRadarKit in Frameworks */,
@@ -4235,7 +4235,7 @@
 				AA06B6B62672AF8100F541C5 /* Sparkle */,
 				9807F644278CA16F00E1547B /* BrowserServicesKit */,
 				1E25269B28F8741A00E44DFA /* Common */,
-				1EF7E98828F4421B005C31CA /* PrivacyDashboard */,
+				1E25CD5528FAEE0A00E04B42 /* PrivacyDashboardResources */,
 			);
 			productName = DuckDuckGo;
 			productReference = AA585D7E248FD31100E9A3E2 /* DuckDuckGo.app */;
@@ -6321,15 +6321,15 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		1EF7E98828F4421B005C31CA /* PrivacyDashboard */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 1EF7E98728F4421B005C31CA /* XCRemoteSwiftPackageReference "privacy-dashboard" */;
-			productName = PrivacyDashboard;
-		};
 		1E25269B28F8741A00E44DFA /* Common */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
 			productName = Common;
+		};
+		1E25CD5528FAEE0A00E04B42 /* PrivacyDashboardResources */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1EF7E98728F4421B005C31CA /* XCRemoteSwiftPackageReference "privacy-dashboard" */;
+			productName = PrivacyDashboardResources;
 		};
 		4B82E9B225B69E3E00656FE7 /* TrackerRadarKit */ = {
 			isa = XCSwiftPackageProductDependency;
