@@ -1,5 +1,5 @@
 //
-//  BitwardenStatus.swift
+//  BitwardenState.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -20,9 +20,23 @@ import Foundation
 
 enum BitwardenStatus: Equatable {
 
-    case unlocked(email: String)
-    case locked(email: String)
-    case error(error: BitwardenError)
+    // Bitwarden disabled in settings
     case disabled
 
+    // Bitwarden application isn't running || User didn't approve DuckDuckGo browser integration
+    case notApproachable
+
+    case connected(vault: Vault)
+    case error(error: BitwardenError)
+
+    struct Vault {
+        let id: String
+        let email: String
+        let status: Status
+
+        enum Status: String {
+            case locked
+            case unlocked
+        }
+    }
 }

@@ -20,6 +20,14 @@ import Foundation
 
 enum BitwardenError: Error {
 
-    case unknown
+    // Blocking errors (further communication blocked)
+    case handshakeFailed
+    case decryptionOfSharedKeyFailed
+    case parsingFailed
+    case statusParsingFailed
+
+    // Non-blocking errors
+    case decryptionOfDataFailed
+    case noActiveVault
 
 }
