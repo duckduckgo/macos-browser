@@ -29,7 +29,7 @@ enum BitwardenStatus: Equatable {
     case connected(vault: Vault)
     case error(error: BitwardenError)
 
-    struct Vault {
+    struct Vault: Equatable {
         let id: String
         let email: String
         let status: Status
@@ -39,4 +39,5 @@ enum BitwardenStatus: Equatable {
             case unlocked
         }
     }
+
 }
