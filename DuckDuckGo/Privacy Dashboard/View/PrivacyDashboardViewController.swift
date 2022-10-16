@@ -74,8 +74,8 @@ final class PrivacyDashboardViewController: NSViewController {
 
     private func prepareContentBlockingCancellables() {
         let completionEvents = ContentBlocking.shared.userContentUpdating.userContentBlockingAssets
-            // ⬇️ exaggerate the problem by pretending a delay of 2 seconds each time
-            .delay(for: 2, scheduler: RunLoop.main)
+            // ⬇️ uncomment to exaggerate the problem by pretending a delay of 2 seconds each time
+            // .delay(for: 2, scheduler: RunLoop.main)
             .compactMap { $0.rulesUpdate.completionTokens }
             .drop { $0.isEmpty }
             .drop { $0.count == 1 && $0[0] == "" }
