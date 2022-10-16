@@ -29,10 +29,10 @@ final class PrivacyDashboardViewController: NSViewController {
 
     enum Event {
         /// Used to record the fact that the Dashboard was the initiator of rules re-compilation
-        case updateRequested(token: ContentBlockerRulesManager.CompletionToken, domain: String);
+        case updateRequested(token: ContentBlockerRulesManager.CompletionToken, domain: String)
         /// A proxy for none-empty completion token lists. These can be read and compared to the ones
         /// saved in the `updateRequested`
-        case updateComplete(tokens: [ContentBlockerRulesManager.CompletionToken]);
+        case updateComplete(tokens: [ContentBlockerRulesManager.CompletionToken])
     }
 
     private var webView: WKWebView!
@@ -40,7 +40,7 @@ final class PrivacyDashboardViewController: NSViewController {
     private let privacyDashboardScript = PrivacyDashboardUserScript()
     private var webviewCancellables = Set<AnyCancellable>()
     private var contentBlockingCancellables = Set<AnyCancellable>()
-    public let events = PassthroughSubject<Event, Never>();
+    public let events = PassthroughSubject<Event, Never>()
     @Published var pendingUpdates = [String: String]()
 
     required init?(coder: NSCoder) {
@@ -85,10 +85,10 @@ final class PrivacyDashboardViewController: NSViewController {
             guard let self = self else { return }
             switch event {
             case .updateRequested(token: let token, domain: let domain):
-                self.pendingUpdates[token] = domain;
-                self.sendPendingUpdates();
+                self.pendingUpdates[token] = domain
+                self.sendPendingUpdates()
             case .updateComplete(tokens: let tokens):
-                let countBefore = self.pendingUpdates.count;
+                let countBefore = self.pendingUpdates.count
                 for token in tokens {
                     self.pendingUpdates.removeValue(forKey: token)
                 }
@@ -202,7 +202,7 @@ final class PrivacyDashboardViewController: NSViewController {
             assertionFailure("PrivacyDashboardViewController: no domain available")
             return
         }
-        let isPendingUpdates = pendingUpdates.values.contains(domain);
+        let isPendingUpdates = pendingUpdates.values.contains(domain)
         self.privacyDashboardScript.setIsPendingUpdates(isPendingUpdates, webView: self.webView)
     }
 
