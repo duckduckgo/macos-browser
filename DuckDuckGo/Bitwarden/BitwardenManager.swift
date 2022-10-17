@@ -318,12 +318,12 @@ extension BitwardenManager: BitwardenCommunicatorDelegate {
         if case let .item(payloadItem) = message.payload,
               let encryptedSharedKey = payloadItem.sharedKey,
               let status = payloadItem.status {
-            handleHandshakeResponce(encryptedSharedKey: encryptedSharedKey, status: status)
+            handleHandshakeResponse(encryptedSharedKey: encryptedSharedKey, status: status)
             return
         }
 
         if let encryptedPayload = message.encryptedPayload {
-            handleEncryptedResponce(encryptedPayload)
+            handleEncryptedResponse(encryptedPayload)
             return
         }
 
