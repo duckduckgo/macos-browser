@@ -215,11 +215,11 @@ final class BitwardenManager: BitwardenManagement {
 
     private func sendStatus() {
         //TODO: More general encryption method
-        let command = BitwardenMessage.EncryptedCommand(command: "bw-status", payload: nil)
-        guard let commandData = try? JSONEncoder().encode(command) else {
-            assertionFailure("JSON encoding failed")
+        guard let commandData = BitwardenMessage.EncryptedCommand(command: "bw-status", payload: nil).data else {
+            assertionFailure("Making the status message failed")
             return
         }
+
         let encryptedData = openSSLWrapper.encryptData(commandData)
         let encryptedCommand = "2.\(encryptedData.iv.base64EncodedString())|\(encryptedData.data.base64EncodedString())|\(encryptedData.hmac.base64EncodedString())"
 
