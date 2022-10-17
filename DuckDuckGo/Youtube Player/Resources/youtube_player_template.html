@@ -55,7 +55,7 @@
                 transition: all 1s ease-out;
             }
 
-            body.faded .bg::after {
+            body[faded] .bg::after {
                 top: 30%;
             }
 
@@ -116,7 +116,7 @@
                 height: 32px;
             }
 
-            body.faded .toolbar {
+            body[faded] .toolbar {
                 opacity: 0;
                 margin-top: -80px;
             }
@@ -179,17 +179,17 @@
                 left: 162px;
             }
 
-            .info-icon-tooltip.above {
+            .info-icon-tooltip[above] {
                 top: -105px;
                 z-index: 50;
             }
 
-            .info-icon-tooltip.above::after {
+            .info-icon-tooltip[above]::after {
                 top: 80px;
                 transform: rotate(225deg);
             }
 
-            .info-icon-tooltip.visible {
+            .info-icon-tooltip[visible] {
                 display: block;
             }
 
@@ -207,11 +207,11 @@
                 width: 299px;
             }
 
-            .setting-container.animatable {
+            .setting-container[animatable] {
                 transition: 0.3s linear all;
             }
 
-            .setting-container.hidden {
+            .setting-container[invisible] {
                 width: 0px;
             }
 
@@ -294,9 +294,8 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="options">
-                    <form class="setting-container hidden">
+                    <form class="setting-container" invisible>
                         <input id="setting" type="checkbox" class="settings-checkbox" />
                         <label for="setting" class="settings-label">Always open YouTube videos in Duck Player</label>
                     </form>
@@ -573,24 +572,16 @@
                     }
 
                     let parts = timestamp.split(/(\d+[hms]?)/);
-                    let totalSeconds = 0;
 
-                    parts.forEach(part => {
-                        if (part !== '') {
-                            if (parseInt(part) == part) {
-                                totalSeconds += parseInt(part);
-                            } else {
-                                for (unit in units) {
-                                    let multiplicator = units[unit];
+                    let totalSeconds = parts.reduce((total, part) => {
+                        if (!part) return total;
 
-                                    if (part.includes(unit)) {
-                                        totalSeconds += (parseInt(part) * multiplicator);
-                                        break;
-                                    }
-                                }
+                        for (unit in units) {
+                            if (part.includes(unit)) {
+                                return total + (parseInt(part) * units[unit]);
                             }
                         }
-                    });
+                    }, 0);
 
                     if (totalSeconds > 0) {
                         return totalSeconds;
@@ -722,7 +713,7 @@
                  * @param {boolean} visible
                  */
                 toggleVisibility: (visible) => {
-                    Setting.container().classList[!visible ? 'add' : 'remove']('hidden');
+                    Setting.container().toggleAttribute('invisible', !visible);
                 },
 
                 /**
@@ -731,7 +722,7 @@
                  * @param {boolean} animatable
                  */
                 toggleAnimatable: (animatable) => {
-                    Setting.container().classList[animatable ? 'add' : 'remove']('animatable');
+                    Setting.container().toggleAttribute('animatable', animatable);
                 },
 
                 /**
@@ -828,8 +819,8 @@
                  * @param {boolean} show
                  */
                 toggle: (show) => {
-                    Tooltip.tooltip().classList[Tooltip.isCloseToBottom() ? 'add' : 'remove' ]('above');
-                    Tooltip.tooltip().classList[show ? 'add' : 'remove' ]('visible');
+                    Tooltip.tooltip().toggleAttribute('above', Tooltip.isCloseToBottom());
+                    Tooltip.tooltip().toggleAttribute('visible', show);
                     Tooltip.visible = show;
                 },
 
@@ -964,7 +955,7 @@
                  * Updates the faded state of the content below the player
                  */
                 updateContent: (isFaded) => {
-                    document.body.classList[isFaded ? 'add' : 'remove']('faded');
+                    document.body.toggleAttribute('faded', isFaded);
 
                     setTimeout(() => {
                         MouseMove.isFaded = isFaded;
