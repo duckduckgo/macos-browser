@@ -16,6 +16,10 @@
 		14505A08256084EF00272CC6 /* UserAgent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14505A07256084EF00272CC6 /* UserAgent.swift */; };
 		1456D6E124EFCBC300775049 /* TabBarCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1456D6E024EFCBC300775049 /* TabBarCollectionView.swift */; };
 		14D9B8FB24F7E089000D4D13 /* AddressBarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14D9B8F924F7E089000D4D13 /* AddressBarViewController.swift */; };
+		1D02633928E0FA86005CBB41 /* BitwardenManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D02633828E0FA86005CBB41 /* BitwardenManager.swift */; };
+		1D02633B28E0FAAD005CBB41 /* BitwardenStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D02633A28E0FAAD005CBB41 /* BitwardenStatus.swift */; };
+		1D02633D28E0FC0D005CBB41 /* BitwardenCredential.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D02633C28E0FC0D005CBB41 /* BitwardenCredential.swift */; };
+		1D02633F28E0FDB6005CBB41 /* BitwardenError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D02633E28E0FDB6005CBB41 /* BitwardenError.swift */; };
 		1E25269C28F8741A00E44DFA /* Common in Frameworks */ = {isa = PBXBuildFile; productRef = 1E25269B28F8741A00E44DFA /* Common */; };
 		3106AD76287F000600159FE5 /* CookieConsentUserPermissionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3106AD75287F000600159FE5 /* CookieConsentUserPermissionViewController.swift */; };
 		311B262728E73E0A00FD181A /* TabShadowConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311B262628E73E0A00FD181A /* TabShadowConfig.swift */; };
@@ -246,8 +250,8 @@
 		4B9292DB2667125D00AD2C21 /* ContextualMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292DA2667125D00AD2C21 /* ContextualMenu.swift */; };
 		4B980E212817604000282EE1 /* NSNotificationName+Debug.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B980E202817604000282EE1 /* NSNotificationName+Debug.swift */; };
 		4B98D27A28D95F1A003C2B6F /* ChromiumFaviconsReaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B98D27928D95F1A003C2B6F /* ChromiumFaviconsReaderTests.swift */; };
-		4B98D27C28D960DD003C2B6F /* FirefoxFaviconsReaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B98D27B28D960DD003C2B6F /* FirefoxFaviconsReaderTests.swift */; };
 		4B98D28028D9722A003C2B6F /* RecentlyVisitedSiteModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B98D27F28D9722A003C2B6F /* RecentlyVisitedSiteModelTests.swift */; };
+		4B98D27C28D960DD003C2B6F /* FirefoxFaviconsReaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B98D27B28D960DD003C2B6F /* FirefoxFaviconsReaderTests.swift */; };
 		4BA1A69B258B076900F6F690 /* FileStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA1A69A258B076900F6F690 /* FileStore.swift */; };
 		4BA1A6A0258B079600F6F690 /* DataEncryption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA1A69F258B079600F6F690 /* DataEncryption.swift */; };
 		4BA1A6A5258B07DF00F6F690 /* EncryptedValueTransformer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA1A6A4258B07DF00F6F690 /* EncryptedValueTransformer.swift */; };
@@ -843,6 +847,10 @@
 		14505A07256084EF00272CC6 /* UserAgent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserAgent.swift; sourceTree = "<group>"; };
 		1456D6E024EFCBC300775049 /* TabBarCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarCollectionView.swift; sourceTree = "<group>"; };
 		14D9B8F924F7E089000D4D13 /* AddressBarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressBarViewController.swift; sourceTree = "<group>"; };
+		1D02633828E0FA86005CBB41 /* BitwardenManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BitwardenManager.swift; sourceTree = "<group>"; };
+		1D02633A28E0FAAD005CBB41 /* BitwardenStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BitwardenStatus.swift; sourceTree = "<group>"; };
+		1D02633C28E0FC0D005CBB41 /* BitwardenCredential.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BitwardenCredential.swift; sourceTree = "<group>"; };
+		1D02633E28E0FDB6005CBB41 /* BitwardenError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BitwardenError.swift; sourceTree = "<group>"; };
 		3106AD75287F000600159FE5 /* CookieConsentUserPermissionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieConsentUserPermissionViewController.swift; sourceTree = "<group>"; };
 		311B262628E73E0A00FD181A /* TabShadowConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabShadowConfig.swift; sourceTree = "<group>"; };
 		313AEDA0287CAD1D00E1E8F4 /* CookieConsentUserPermissionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieConsentUserPermissionView.swift; sourceTree = "<group>"; };
@@ -1706,6 +1714,17 @@
 				142879D924CE1179005419BB /* SuggestionViewModelTests.swift */,
 			);
 			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		1D02633728E0F405005CBB41 /* Bitwarden */ = {
+			isa = PBXGroup;
+			children = (
+				1D02633828E0FA86005CBB41 /* BitwardenManager.swift */,
+				1D02633A28E0FAAD005CBB41 /* BitwardenStatus.swift */,
+				1D02633C28E0FC0D005CBB41 /* BitwardenCredential.swift */,
+				1D02633E28E0FDB6005CBB41 /* BitwardenError.swift */,
+			);
+			path = Bitwarden;
 			sourceTree = "<group>";
 		};
 		313AED9F287CAC5A00E1E8F4 /* UI */ = {
@@ -2868,6 +2887,7 @@
 				7B1E819A27C8874900FF0E60 /* Autofill */,
 				B6A9E47526146A440067D1B9 /* API */,
 				AA4D700525545EDE00C3411E /* App Delegate */,
+				1D02633728E0F405005CBB41 /* Bitwarden */,
 				AAC5E4C025D6A6A9007F5990 /* Bookmarks */,
 				4BFD356E283ADE8B00CE9234 /* Bookmarks Bar */,
 				AA86491B24D837DE001BABEE /* Browser Tab */,
@@ -4692,6 +4712,7 @@
 				4BE65481271FCD4D008D1D63 /* PasswordManagementNoteModel.swift in Sources */,
 				3184AC6F288F2A1100C35E4B /* CookieNotificationAnimationModel.swift in Sources */,
 				B63ED0E526BB8FB900A9DAD1 /* SharingMenu.swift in Sources */,
+				1D02633F28E0FDB6005CBB41 /* BitwardenError.swift in Sources */,
 				AA4FF40C2624751A004E2377 /* GrammarFeaturesManager.swift in Sources */,
 				B693955B26F0CE300015B914 /* WebKitDownloadDelegate.swift in Sources */,
 				4B0AACAE28BC6FD0001038AC /* SafariFaviconsReader.swift in Sources */,
@@ -4733,6 +4754,7 @@
 				AA6197C6276B3168008396F0 /* FaviconHostReference.swift in Sources */,
 				AAD8078527B3F3BE00CF7703 /* WebsiteBreakageSender.swift in Sources */,
 				4B8AC93B26B48ADF00879451 /* ASN1Parser.swift in Sources */,
+				1D02633B28E0FAAD005CBB41 /* BitwardenStatus.swift in Sources */,
 				37CD54B327EE509700F1F7B9 /* View+Cursor.swift in Sources */,
 				B66E9DD22670EB2A00E53BB5 /* _WKDownload+WebKitDownload.swift in Sources */,
 				B6A9E4612614608B0067D1B9 /* AppVersion.swift in Sources */,
@@ -4826,6 +4848,7 @@
 				B68458C525C7EA0C00DC17B6 /* TabCollection+NSSecureCoding.swift in Sources */,
 				4BB88B5B25B7BA50006F6B06 /* Instruments.swift in Sources */,
 				9812D895276CEDA5004B6181 /* ContentBlockerRulesLists.swift in Sources */,
+				1D02633D28E0FC0D005CBB41 /* BitwardenCredential.swift in Sources */,
 				4B0511E2262CAA8600F6079C /* NSViewControllerExtension.swift in Sources */,
 				F44C130225C2DA0400426E3E /* NSAppearanceExtension.swift in Sources */,
 				B64C84F1269310120048FEBE /* PermissionManager.swift in Sources */,
@@ -4880,6 +4903,7 @@
 				4B9292A326670D2A00AD2C21 /* BookmarkManagedObject.swift in Sources */,
 				4B723E1326B0007A00E14D75 /* CSVLoginExporter.swift in Sources */,
 				85C48CCC278D808F00D3263E /* NSAttributedStringExtension.swift in Sources */,
+				1D02633928E0FA86005CBB41 /* BitwardenManager.swift in Sources */,
 				AA7EB6E527E7D6DC00036718 /* AnimationView.swift in Sources */,
 				8562599A269CA0A600EE44BC /* NSRectExtension.swift in Sources */,
 				31F28C5128C8EEC500119F70 /* YoutubeOverlayUserScript.swift in Sources */,
