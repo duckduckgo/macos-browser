@@ -287,14 +287,16 @@ extension PrivacyDashboardViewController: PrivacyDashboardUserScriptDelegate {
 extension PrivacyDashboardViewController: WKNavigationDelegate {
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        subscribeToPermissions()
-        subscribeToTrackerInfo()
-        subscribeToConnectionUpgradedTo()
-        subscribeToServerTrust()
-        sendProtectionStatus()
-        sendPendingUpdates()
-        sendParentEntity()
-        subscribeToConsentManaged()
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            self.sendProtectionStatus()
+            self.sendPendingUpdates()
+            self.sendParentEntity()
+            self.subscribeToPermissions()
+            self.subscribeToTrackerInfo()
+            self.subscribeToConnectionUpgradedTo()
+            self.subscribeToServerTrust()
+            self.subscribeToConsentManaged()
+        }
     }
-
 }
