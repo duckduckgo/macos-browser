@@ -121,7 +121,7 @@ final class BitwardenManager: BitwardenManagement {
         }
     }
 
-    private func handleHandshakeResponce(encryptedSharedKey: String, status: String) {
+    private func handleHandshakeResponse(encryptedSharedKey: String, status: String) {
         guard status == "success" else {
             self.status = .error(error: .handshakeFailed)
             cancelConnectionAndScheduleNextAttempt()
