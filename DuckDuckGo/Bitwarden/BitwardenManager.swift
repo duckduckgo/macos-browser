@@ -137,7 +137,7 @@ final class BitwardenManager: BitwardenManagement {
         sendStatus()
     }
 
-    private func handleEncryptedResponce(_ encryptedPayload: BitwardenMessage.EncryptedPayload) {
+    private func handleEncryptedResponse(_ encryptedPayload: BitwardenMessage.EncryptedPayload) {
         guard let dataString = encryptedPayload.data,
               let data = Data(base64Encoded: dataString),
               let ivDataString = encryptedPayload.iv,
