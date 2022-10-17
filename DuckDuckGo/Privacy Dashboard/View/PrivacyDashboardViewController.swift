@@ -107,7 +107,6 @@ final class PrivacyDashboardViewController: NSViewController {
 #endif
 
         let webView = PrivacyDashboardWebView(frame: .zero, configuration: configuration)
-        webView.navigationDelegate = self
         self.webView = webView
         view.addAndLayout(webView)
 
@@ -221,6 +220,16 @@ final class PrivacyDashboardViewController: NSViewController {
             .store(in: &cancellables)
     }
 
+    public func setupInitial() {
+        sendProtectionStatus()
+        sendPendingUpdates()
+        sendParentEntity()
+        subscribeToPermissions()
+        subscribeToTrackerInfo()
+        subscribeToConnectionUpgradedTo()
+        subscribeToServerTrust()
+        subscribeToConsentManaged()
+    }
 }
 
 extension PrivacyDashboardViewController: PrivacyDashboardUserScriptDelegate {
@@ -281,22 +290,5 @@ extension PrivacyDashboardViewController: PrivacyDashboardUserScriptDelegate {
             return
         }
         tabCollection.appendNewTab(with: .url(url), selected: true)
-    }
-}
-
-extension PrivacyDashboardViewController: WKNavigationDelegate {
-
-    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            self.sendProtectionStatus()
-            self.sendPendingUpdates()
-            self.sendParentEntity()
-            self.subscribeToPermissions()
-            self.subscribeToTrackerInfo()
-            self.subscribeToConnectionUpgradedTo()
-            self.subscribeToServerTrust()
-            self.subscribeToConsentManaged()
-        }
     }
 }

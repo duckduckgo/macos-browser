@@ -932,6 +932,16 @@ extension AddressBarButtonsViewController: PermissionContextMenuDelegate {
 }
 
 extension AddressBarButtonsViewController: NSPopoverDelegate {
+    public func popoverDidShow(_ notification: Notification) {
+        switch notification.object as? NSPopover {
+
+        case _privacyDashboardPopover:
+            privacyDashboardPopover.viewController.setupInitial();
+
+        default:
+            break
+        }
+    }
 
     func popoverDidClose(_ notification: Notification) {
         switch notification.object as? NSPopover {
