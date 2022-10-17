@@ -21,7 +21,7 @@ import SwiftUI
 
 final class ConnectBitwardenViewController: NSViewController {
     
-    private let viewSize = CGSize(width: 550, height: 300)
+    private let viewSize = CGSize(width: 550, height: 450)
     private let viewModel = ConnectBitwardenViewModel(bitwardenInstallationService: LocalBitwardenInstallationManager())
     
     public override func loadView() {

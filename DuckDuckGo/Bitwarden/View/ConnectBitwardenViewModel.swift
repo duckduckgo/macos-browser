@@ -74,7 +74,8 @@ final class ConnectBitwardenViewModel: ObservableObject {
         case .cancel:
             delegate?.connectBitwardenViewModelDismissedView(self)
         case .openBitwardenProductPage:
-            print("Opening the Mac App Store")
+            let bitwardenURL = URL(string: "https://apps.apple.com/us/app/bitwarden/id1352778147")!
+            NSWorkspace.shared.open(bitwardenURL)
         }
     }
     

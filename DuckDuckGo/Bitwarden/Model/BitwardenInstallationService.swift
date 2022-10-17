@@ -22,15 +22,33 @@ protocol BitwardenInstallationManager {
     
     var isBitwardenInstalled: Bool { get }
     
+    func openBitwarden() -> Bool
+    
 }
 
 final class LocalBitwardenInstallationManager: BitwardenInstallationManager {
     
     private let bitwardenBundleID = "com.bitwarden.desktop"
 
+    private var bitwardenURL: URL? {
+        guard let bitwardenApp = FileManager.default.urls(for: .allApplicationsDirectory, in: .localDomainMask).first else {
+            return nil
+        }
+
+        return bitwardenApp.appendingPathComponent("Bitwarden.app")
+    }
+
     var isBitwardenInstalled: Bool {
         // TODO: This installation check is bad, it will return true even when the Bitwarden DMG is mounted.
         return NSWorkspace.shared.absolutePathForApplication(withBundleIdentifier: bitwardenBundleID) != nil
+    }
+    
+    func openBitwarden() -> Bool {
+        guard let bitwardenURL = self.bitwardenURL else {
+            return false
+        }
+
+        return NSWorkspace.shared.open(bitwardenURL)
     }
     
 }

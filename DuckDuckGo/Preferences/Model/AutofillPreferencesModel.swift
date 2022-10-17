@@ -110,10 +110,12 @@ final class AutofillPreferencesModel: ObservableObject {
 
     init(
         persistor: AutofillPreferencesPersistor = AutofillPreferences(),
-        userAuthenticator: UserAuthenticating = DeviceAuthenticator.shared
+        userAuthenticator: UserAuthenticating = DeviceAuthenticator.shared,
+        bitwardenInstallationManager: BitwardenInstallationManager = LocalBitwardenInstallationManager()
     ) {
         self.persistor = persistor
         self.userAuthenticator = userAuthenticator
+        self.bitwardenInstallationManager = bitwardenInstallationManager
 
         isAutoLockEnabled = persistor.isAutoLockEnabled
         autoLockThreshold = persistor.autoLockThreshold
@@ -129,6 +131,7 @@ final class AutofillPreferencesModel: ObservableObject {
 
     private var persistor: AutofillPreferencesPersistor
     private var userAuthenticator: UserAuthenticating
+    private var bitwardenInstallationManager: BitwardenInstallationManager
     
     // MARK: - Password Manager
     
@@ -144,4 +147,9 @@ final class AutofillPreferencesModel: ObservableObject {
 
         parentWindowController.window?.beginSheet(connectBitwardenWindow)
     }
+    
+    func openBitwarden() {
+        bitwardenInstallationManager.openBitwarden()
+    }
+    
 }

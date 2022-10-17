@@ -56,7 +56,7 @@ final class BitwardenManager: BitwardenManagement {
     // MARK: - Connection
 
     private func startConnection() {
-        communicator.enabled = true
+        communicator.enabled = false // TODO: Change to true
     }
 
     private var connectionAttemptTimer: Timer?
@@ -311,6 +311,7 @@ extension BitwardenManager: BitwardenCommunicatorDelegate {
         //TODO: check id of received message. Throw away not requested messages.
 
         if let command = message.command {
+            print("Handling command: \(command)")
             handleCommand(command)
             return
         }
@@ -327,6 +328,6 @@ extension BitwardenManager: BitwardenCommunicatorDelegate {
             return
         }
 
-        assertionFailure("Unhandled message from Bitwarden: %s")
+        // assertionFailure("Unhandled message from Bitwarden: %s")
     }
 }

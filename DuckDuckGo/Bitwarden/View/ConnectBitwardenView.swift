@@ -35,8 +35,12 @@ struct ConnectBitwardenView: View {
                 BitwardenInstallationDetectionView(bitwardenDetected: false)
             case .bitwardenFound:
                 BitwardenInstallationDetectionView(bitwardenDetected: true)
-            default:
-                Text("\(viewModel.viewState.hashValue)")
+            case .waitingForConnectionPermission:
+                ConnectToBitwardenView(canConnect: false)
+            case .connectToBitwarden:
+                ConnectToBitwardenView(canConnect: true)
+            case .connectedToBitwarden:
+                ConnectedToBitwardenView()
             }
         }
         .padding(20)
@@ -93,17 +97,30 @@ private struct ConnectToBitwardenDisclaimerView: View {
 
 private struct BitwardenInstallationDetectionView: View {
     
+    @EnvironmentObject var viewModel: ConnectBitwardenViewModel
+    
     let bitwardenDetected: Bool
     
     var body: some View {
 
-        VStack(alignment: .leading) {
+        VStack(alignment: .leading, spacing: 10) {
             Text("Install Bitwarden")
                 .font(.system(size: 13, weight: .bold))
-                .padding(.top, 10)
+            
+            HStack {
+                NumberedBadge(value: 1)
+
+                Text("To begin setup, first install Bitwarden from the App Store.")
+            }
+            
+            HStack {
+                NumberedBadge(value: 2)
+                
+                Text("After installing, return to DuckDuckGo to complete the setup.")
+            }
             
             Button(action: {
-                print("Opening Mac App Store")
+                viewModel.process(action: .openBitwardenProductPage)
             }, label: {
                 Image("MacAppStoreButton")
             })
@@ -111,7 +128,10 @@ private struct BitwardenInstallationDetectionView: View {
             .frame(width: 156, height: 40)
             
             if bitwardenDetected {
-                Text("Bitwarden found!")
+                HStack {
+                    Image("SuccessCheckmark")
+                    Text("Bitwarden app found!")
+                }
             } else {
                 HStack {
                     ActivityIndicator(isAnimating: .constant(true), style: .spinning)
@@ -120,7 +140,85 @@ private struct BitwardenInstallationDetectionView: View {
                 }
             }
         }
+        .frame(maxWidth: .infinity)
 
+    }
+    
+}
+
+private struct ConnectToBitwardenView: View {
+    
+    let canConnect: Bool
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 15) {
+            Text("Allow Integration with DuckDuckGo")
+                .font(.system(size: 13, weight: .bold))
+            
+            HStack {
+                NumberedBadge(value: 1)
+                Text("Open Bitwarden and Log in or Unlock your vault.")
+                Spacer()
+            }
+            
+            HStack {
+                NumberedBadge(value: 2)
+                Text("Select Bitwarden → Preferences from the Mac menu bar.")
+                Spacer()
+            }
+            
+            HStack {
+                NumberedBadge(value: 3)
+                Text("Scroll to find the App Settings (All Accounts) section.")
+                Spacer()
+            }
+            
+            HStack {
+                NumberedBadge(value: 4)
+                Text("Check Allow integration with DuckDuckGo.")
+                Spacer()
+            }
+            
+            Image("BitwardenSettingsIllustration")
+            
+            if canConnect {
+                Text("Ready to connect")
+            } else {
+                
+                HStack {
+                    ActivityIndicator(isAnimating: .constant(true), style: .spinning)
+                        .frame(maxWidth: 8, maxHeight: 8)
+
+                    Text("Waiting for permission to use Bitwarden in DuckDuckGo…")
+                }
+            }
+        }
+    }
+    
+}
+
+private struct ConnectedToBitwardenView: View {
+
+    var body: some View {
+        Text("Connected")
+    }
+    
+}
+
+// MARK: - Reusable Views
+
+private struct NumberedBadge: View {
+    
+    let value: Int
+
+    var body: some View {
+        ZStack {
+            Circle().fill(.blue) // Color(hex: "3969EF").opacity(0.12)
+
+            Text("\(value)")
+                .foregroundColor(.white) // Color(hex: "2B55CA")
+        }
+        .frame(width: 20, height: 20)
     }
     
 }
@@ -154,7 +252,7 @@ private struct ButtonsView: View {
             }
         }
         .padding([.trailing, .bottom], 16)
-        .padding([.top], 10)
+        .padding(.top, 10)
         
     }
     

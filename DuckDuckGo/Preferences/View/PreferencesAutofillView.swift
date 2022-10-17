@@ -96,26 +96,26 @@ extension Preferences {
                             .offset(x: Const.autoLockWarningOffset)
                     case .bitwarden:
                         switch BitwardenManager.shared.status {
-                        case .unlocked(let email):
-                            BitwardenStatusView(iconType: .success,
-                                                title: email,
-                                                buttonValue: .init(title: "Open Bitwarden", action: { print("Unlocked action") }))
-                                .offset(x: Preferences.Const.autoLockWarningOffset)
-                        case .locked:
-                            BitwardenStatusView(iconType: .warning,
-                                                title: "Unlock Bitwarden",
-                                                buttonValue: .init(title: "Open Bitwarden", action: { print("Unlocked action") }))
-                                .offset(x: Preferences.Const.autoLockWarningOffset)
                         case .disabled:
                             BitwardenStatusView(iconType: .error,
                                                 title: "Unable to find or connect to Bitwarden",
-                                                buttonValue: .init(title: "Open Bitwarden", action: { print("Unlocked action") }))
-                                .offset(x: Preferences.Const.autoLockWarningOffset)
+                                                buttonValue: .init(title: "Open Bitwarden", action: { model.openBitwarden() }))
+                            .offset(x: Preferences.Const.autoLockWarningOffset)
+                        case .notApproachable:
+                            BitwardenStatusView(iconType: .warning,
+                                                title: "Unlock Bitwarden",
+                                                buttonValue: .init(title: "Open Bitwarden", action: { model.openBitwarden() }))
+                            .offset(x: Preferences.Const.autoLockWarningOffset)
+                        case .connected(vault: let vault):
+                            BitwardenStatusView(iconType: .success,
+                                                title: vault.email,
+                                                buttonValue: .init(title: "Open Bitwarden", action: { model.openBitwarden() }))
+                            .offset(x: Preferences.Const.autoLockWarningOffset)
                         case .error:
                             BitwardenStatusView(iconType: .error,
                                                 title: "Unable to find or connect to Bitwarden",
                                                 buttonValue: nil)
-                                .offset(x: Preferences.Const.autoLockWarningOffset)
+                            .offset(x: Preferences.Const.autoLockWarningOffset)
                         }
                     }
                 }
