@@ -107,17 +107,17 @@ final class BitwardenManager: BitwardenManagement {
 
     // MARK: - Handling Incoming Messages
 
-    private func handleCommand(_ command: String) {
+    private func handleCommand(_ command: BitwardenMessage.Command) {
         switch command {
-        case "connected":
+        case .connected:
             sendHandshake()
             return
-        case "disconnected":
+        case .disconnected:
             // Bitwarden application isn't running || User didn't approve DuckDuckGo browser integration
             cancelConnectionAndScheduleNextAttempt()
             status = .notApproachable
         default:
-            assertionFailure("Unknown command")
+            assertionFailure("Wrong handler")
         }
     }
 
@@ -215,7 +215,7 @@ final class BitwardenManager: BitwardenManagement {
 
     private func sendStatus() {
         //TODO: More general encryption method
-        guard let commandData = BitwardenMessage.EncryptedCommand(command: "bw-status", payload: nil).data else {
+        guard let commandData = BitwardenMessage.EncryptedCommand(command: .status, payload: nil).data else {
             assertionFailure("Making the status message failed")
             return
         }
@@ -235,6 +235,7 @@ final class BitwardenManager: BitwardenManagement {
 
     let openSSLWrapper = OpenSSLWrapper()
 
+    // TODO: Remove optional type to make sure the key is read or generated.
     var publicKey: String?
 
     private func generateKeyPair() {
@@ -310,7 +311,7 @@ extension BitwardenManager: BitwardenCommunicatorDelegate {
 
         //TODO: check id of received message. Throw away not requested messages.
 
-        if let command = message.command {
+        if let command = message.command, command == .connected || command == .disconnected {
             handleCommand(command)
             return
         }
@@ -327,6 +328,7 @@ extension BitwardenManager: BitwardenCommunicatorDelegate {
             return
         }
 
+        //TODO: Handle "cannot decrypt"
         assertionFailure("Unhandled message from Bitwarden: %s")
     }
 }
