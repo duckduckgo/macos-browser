@@ -39,11 +39,6 @@ extension EmailUrls {
         #endif
     }
 
-    func shouldAuthenticateWithEmailCredentials(url: URL) -> Bool {
-        guard let host = url.host else { return false }
-        return Url.emailAuthenticationHosts.contains(host)
-    }
-
     func isDuckDuckGoEmailProtection(url: URL) -> Bool {
         return url.absoluteString.starts(with: Url.emailProtectionLink)
     }
