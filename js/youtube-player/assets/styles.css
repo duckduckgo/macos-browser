@@ -18,7 +18,8 @@
     -webkit-backdrop-filter: blur(2px);
     border-radius: 6px;
 
-    transition: 0.15s linear background;
+    transition: 0.15s linear all;
+    width: 32px;
 }
 
 .ddg-overlay a.ddg-play-privately {
@@ -76,34 +77,14 @@
     display: none;
 }
 
-:host[data-size="video-player"] {
+:host([data-size="video-player"]) {
     bottom: 145px;
     right: 20px;
 }
 
-.ddg-overlay[data-size="video-player"] {
+:host([data-size="video-player"]) {
     opacity: 1;
     transition: opacity .2s;
-}
-
-.ddg-overlay[data-size="video-player-with-title"] {
-    top: 40px;
-    left: 10px;
-}
-
-.ddg-overlay[data-size="video-player-with-paid-content"] {
-    top: 65px;
-    left: 11px;
-}
-
-.ddg-overlay[data-size="title"] {
-    position: relative;
-    margin: 0;
-    float: right;
-}
-
-.ddg-overlay[data-size="title"] .ddg-play-text-container {
-    width: 90px;
 }
 
 .ddg-overlay[data-size^="fixed"] {

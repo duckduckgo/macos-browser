@@ -71,8 +71,6 @@ class DDGIconOverlay extends HTMLElement {
         }
 
         if (name === 'data-size') {
-            console.log('change size', oldValue, newValue);
-            console.trace();
             this.root.querySelector('.ddg-overlay').setAttribute('data-size', newValue);
         }
     }
@@ -101,6 +99,10 @@ export const IconOverlay = {
      */
     create: (size, href, extraClass) => {
         let el = new DDGIconOverlay(size, href);
+
+        if (size) {
+            el.setAttribute('data-size', size);
+        }
 
         if (extraClass) {
             el.setAttribute('class', extraClass);
@@ -220,16 +222,13 @@ export const IconOverlay = {
      * @returns {boolean} - whether the overlay was appended or not
      */
     appendToVideo: (videoElement) => {
-        console.log('append to video', videoElement);
-
         let appendOverlayToThumbnail = (videoElement) => {
             if (videoElement) {
                 const privateUrl = VideoParams.fromHref(videoElement.href)?.toPrivatePlayerUrl();
                 const thumbSize = IconOverlay.getThumbnailSize(videoElement);
                 if (privateUrl) {
-                    console.log('append IconOverlay with privateURL', privateUrl);
                     let overlay = IconOverlay.create(thumbSize, privateUrl);
-                    //overlay.setAttribute('style', 'z-index:1000;');
+
                     appendElement(videoElement, overlay);
                     videoElement.classList.add('has-dgg-overlay');
                 }
