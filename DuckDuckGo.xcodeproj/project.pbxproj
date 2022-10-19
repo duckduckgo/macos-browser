@@ -149,6 +149,7 @@
 		4B59024326B35F7C00489384 /* BrowserImportViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B59024226B35F7C00489384 /* BrowserImportViewController.swift */; };
 		4B59024826B3673600489384 /* ThirdPartyBrowser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B59024726B3673600489384 /* ThirdPartyBrowser.swift */; };
 		4B59024C26B38BB800489384 /* ChromiumLoginReaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B59024B26B38BB800489384 /* ChromiumLoginReaderTests.swift */; };
+		4B59CC8928FFF67B0058F2F6 /* RunningApplicationCheck.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B59CC8828FFF67B0058F2F6 /* RunningApplicationCheck.swift */; };
 		4B5A4F4C27F3A5AA008FBD88 /* NSNotificationName+DataImport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5A4F4B27F3A5AA008FBD88 /* NSNotificationName+DataImport.swift */; };
 		4B5FF67826B602B100D42879 /* FirefoxDataImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5FF67726B602B100D42879 /* FirefoxDataImporter.swift */; };
 		4B65143E263924B5005B46EB /* EmailUrlExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B65143D263924B5005B46EB /* EmailUrlExtensions.swift */; };
@@ -975,6 +976,7 @@
 		4B59024226B35F7C00489384 /* BrowserImportViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BrowserImportViewController.swift; sourceTree = "<group>"; };
 		4B59024726B3673600489384 /* ThirdPartyBrowser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThirdPartyBrowser.swift; sourceTree = "<group>"; };
 		4B59024B26B38BB800489384 /* ChromiumLoginReaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChromiumLoginReaderTests.swift; sourceTree = "<group>"; };
+		4B59CC8828FFF67B0058F2F6 /* RunningApplicationCheck.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RunningApplicationCheck.swift; sourceTree = "<group>"; };
 		4B5A4F4B27F3A5AA008FBD88 /* NSNotificationName+DataImport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSNotificationName+DataImport.swift"; sourceTree = "<group>"; };
 		4B5FF67726B602B100D42879 /* FirefoxDataImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirefoxDataImporter.swift; sourceTree = "<group>"; };
 		4B65143D263924B5005B46EB /* EmailUrlExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmailUrlExtensions.swift; sourceTree = "<group>"; };
@@ -1702,6 +1704,14 @@
 				142879D924CE1179005419BB /* SuggestionViewModelTests.swift */,
 			);
 			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		1D77921B28FFF26100BE0210 /* Third Party Apps */ = {
+			isa = PBXGroup;
+			children = (
+				4B59CC8828FFF67B0058F2F6 /* RunningApplicationCheck.swift */,
+			);
+			path = "Third Party Apps";
 			sourceTree = "<group>";
 		};
 		313AED9F287CAC5A00E1E8F4 /* UI */ = {
@@ -3234,6 +3244,7 @@
 				AA80EC52256BE33A007083E7 /* Localizables */,
 				85AC3B3325DA828900C7D2AA /* Network */,
 				4BB88B4E25B7BA20006F6B06 /* Utilities */,
+				1D77921B28FFF26100BE0210 /* Third Party Apps */,
 				AA86491424D831C4001BABEE /* View */,
 			);
 			path = Common;
@@ -4792,6 +4803,7 @@
 				4B92929F26670D2A00AD2C21 /* PasteboardBookmark.swift in Sources */,
 				37BF3F14286D8A6500BD9014 /* PinnedTabsManager.swift in Sources */,
 				856CADF0271710F400E79BB0 /* HoverUserScript.swift in Sources */,
+				4B59CC8928FFF67B0058F2F6 /* RunningApplicationCheck.swift in Sources */,
 				4B9292AC26670D3700AD2C21 /* Bookmark.xcdatamodeld in Sources */,
 				AA6EF9B525081B4C004754E6 /* MainMenuActions.swift in Sources */,
 				B63D466925BEB6C200874977 /* WKWebView+SessionState.swift in Sources */,

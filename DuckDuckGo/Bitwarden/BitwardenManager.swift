@@ -56,6 +56,11 @@ final class BitwardenManager: BitwardenManagement {
     // MARK: - Connection
 
     private func startConnection() {
+        guard RunningApplicationCheck.isApplicationRunning(bundleId: "com.bitwarden.desktop") else {
+            scheduleConnectionAttempt()
+            return
+        }
+
         communicator.enabled = true
     }
 
@@ -107,21 +112,21 @@ final class BitwardenManager: BitwardenManagement {
 
     // MARK: - Handling Incoming Messages
 
-    private func handleCommand(_ command: String) {
+    private func handleCommand(_ command: BitwardenMessage.Command) {
         switch command {
-        case "connected":
+        case .connected:
             sendHandshake()
             return
-        case "disconnected":
+        case .disconnected:
             // Bitwarden application isn't running || User didn't approve DuckDuckGo browser integration
             cancelConnectionAndScheduleNextAttempt()
             status = .notApproachable
         default:
-            assertionFailure("Unknown command")
+            assertionFailure("Wrong handler")
         }
     }
 
-    private func handleHandshakeResponce(encryptedSharedKey: String, status: String) {
+    private func handleHandshakeResponse(encryptedSharedKey: String, status: String) {
         guard status == "success" else {
             self.status = .error(error: .handshakeFailed)
             cancelConnectionAndScheduleNextAttempt()
@@ -137,7 +142,7 @@ final class BitwardenManager: BitwardenManagement {
         sendStatus()
     }
 
-    private func handleEncryptedResponce(_ encryptedPayload: BitwardenMessage.EncryptedPayload) {
+    private func handleEncryptedResponse(_ encryptedPayload: BitwardenMessage.EncryptedPayload) {
         guard let dataString = encryptedPayload.data,
               let data = Data(base64Encoded: dataString),
               let ivDataString = encryptedPayload.iv,
@@ -215,11 +220,11 @@ final class BitwardenManager: BitwardenManagement {
 
     private func sendStatus() {
         //TODO: More general encryption method
-        let command = BitwardenMessage.EncryptedCommand(command: "bw-status", payload: nil)
-        guard let commandData = try? JSONEncoder().encode(command) else {
-            assertionFailure("JSON encoding failed")
+        guard let commandData = BitwardenMessage.EncryptedCommand(command: .status, payload: nil).data else {
+            assertionFailure("Making the status message failed")
             return
         }
+
         let encryptedData = openSSLWrapper.encryptData(commandData)
         let encryptedCommand = "2.\(encryptedData.iv.base64EncodedString())|\(encryptedData.data.base64EncodedString())|\(encryptedData.hmac.base64EncodedString())"
 
@@ -235,6 +240,7 @@ final class BitwardenManager: BitwardenManagement {
 
     let openSSLWrapper = OpenSSLWrapper()
 
+    // TODO: Remove optional type to make sure the key is read or generated.
     var publicKey: String?
 
     private func generateKeyPair() {
@@ -310,7 +316,7 @@ extension BitwardenManager: BitwardenCommunicatorDelegate {
 
         //TODO: check id of received message. Throw away not requested messages.
 
-        if let command = message.command {
+        if let command = message.command, command == .connected || command == .disconnected {
             print("Handling command: \(command)")
             handleCommand(command)
             return
@@ -319,15 +325,16 @@ extension BitwardenManager: BitwardenCommunicatorDelegate {
         if case let .item(payloadItem) = message.payload,
               let encryptedSharedKey = payloadItem.sharedKey,
               let status = payloadItem.status {
-            handleHandshakeResponce(encryptedSharedKey: encryptedSharedKey, status: status)
+            handleHandshakeResponse(encryptedSharedKey: encryptedSharedKey, status: status)
             return
         }
 
         if let encryptedPayload = message.encryptedPayload {
-            handleEncryptedResponce(encryptedPayload)
+            handleEncryptedResponse(encryptedPayload)
             return
         }
 
+        //TODO: Handle "cannot decrypt"
         // assertionFailure("Unhandled message from Bitwarden: %s")
     }
 }

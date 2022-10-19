@@ -18,14 +18,23 @@
 
 import Foundation
 
+typealias Base64EncodedString = String
+
 //TODO: Divide at least to response and request
 struct BitwardenMessage: Codable {
+
+    enum Command: String, Codable {
+        case connected
+        case disconnected
+        case status = "bw-status"
+        case handshake = "bw-handshake"
+    }
 
     let messageId: String?
     let version: Int?
     let payload: Payload?
-    let command: String?
-    let encryptedCommand: String? // encoded with symmetric key + base64 encoded string
+    let command: Command?
+    let encryptedCommand: Base64EncodedString?
     let encryptedPayload: EncryptedPayload?
 
     struct PayloadItem: Codable {
@@ -33,11 +42,11 @@ struct BitwardenMessage: Codable {
         let error: String?
 
         // Handshake request
-        let publicKey: String? // base64 encoded
+        let publicKey: Base64EncodedString?
         let applicationName: String?
 
         // Handshake responce
-        let sharedKey: String? // base64 encoded
+        let sharedKey: Base64EncodedString?
 
         // Status
         let id: String?
@@ -49,8 +58,16 @@ struct BitwardenMessage: Codable {
 
     struct EncryptedCommand: Codable {
 
-        let command: String?
+        let command: Command?
         let payload: EncryptedPayload?
+
+        var data: Data? {
+            guard let commandData = try? JSONEncoder().encode(self) else {
+                assertionFailure("JSON encoding failed")
+                return nil
+            }
+            return commandData
+        }
 
     }
 
@@ -96,7 +113,7 @@ struct BitwardenMessage: Codable {
 
     init(messageId: String? = nil,
          version: Int? = nil,
-         command: String? = nil,
+         command: Command? = nil,
          payload: BitwardenMessage.Payload? = nil,
          encryptedCommand: String? = nil,
          encryptedPayload: EncryptedPayload? = nil) {
@@ -129,7 +146,6 @@ struct BitwardenMessage: Codable {
     }
 
     static let version = 1
-    static let handshakeCommand = "bw-handshake"
 
     static func makeHandshakeMessage(with publicKey: String) -> BitwardenMessage {
         let payloadItem = PayloadItem(error: nil,
@@ -144,7 +160,7 @@ struct BitwardenMessage: Codable {
         let payload = Payload.item(payloadItem)
         return BitwardenMessage(messageId: generateMessageId(),
                                 version: version,
-                                command: handshakeCommand,
+                                command: .handshake,
                                 payload: payload)
     }
 
