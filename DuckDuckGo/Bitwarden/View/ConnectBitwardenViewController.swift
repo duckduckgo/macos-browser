@@ -28,6 +28,8 @@ final class ConnectBitwardenViewController: NSViewController {
         bitwardenManager: BitwardenManager.shared
     )
     
+    var setupFlowCancellationHandler: (() -> Void)?
+    
     private var heightConstraint: NSLayoutConstraint?
     
     public override func loadView() {
@@ -68,7 +70,10 @@ final class ConnectBitwardenViewController: NSViewController {
 extension ConnectBitwardenViewController: ConnectBitwardenViewModelDelegate {
     
     func connectBitwardenViewModelDismissedView(_ viewModel: ConnectBitwardenViewModel, canceled: Bool) {
-        // TODO: Use the canceled value to reset the selected password manager.
+        if canceled {
+            setupFlowCancellationHandler?()
+        }
+
         dismiss()
     }
     

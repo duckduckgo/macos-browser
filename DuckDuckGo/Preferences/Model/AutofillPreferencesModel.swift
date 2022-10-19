@@ -54,7 +54,7 @@ final class AutofillPreferencesModel: ObservableObject {
         didSet {
             persistor.passwordManager = passwordManager
             
-            if passwordManager == .bitwarden, BitwardenManager.shared.status == .disabled {
+            if passwordManager == .bitwarden, !BitwardenManager.shared.status.isConnected {
                 presentBitwardenSetupFlow()
             } else {
                 print("Don't present setup flow")
@@ -123,11 +123,6 @@ final class AutofillPreferencesModel: ObservableObject {
         askToSaveAddresses = persistor.askToSaveAddresses
         askToSavePaymentMethods = persistor.askToSavePaymentMethods
         passwordManager = persistor.passwordManager
-
-        // TODO: Improve this. The goal is to reset the password manager back to DDG in the case that the user selects Bitwarden but does not complete the flow.
-        if persistor.passwordManager == .bitwarden, BitwardenManager.shared.status == .disabled {
-            self.persistor.passwordManager = .duckduckgo
-        }
     }
 
     private var persistor: AutofillPreferencesPersistor
@@ -137,9 +132,14 @@ final class AutofillPreferencesModel: ObservableObject {
     // MARK: - Password Manager
     
     func presentBitwardenSetupFlow() {
-        let connectBitwardenViewController = ConnectBitwardenViewController(nibName: nil, bundle: nil).wrappedInWindowController()
+        let connectBitwardenViewController = ConnectBitwardenViewController(nibName: nil, bundle: nil)
+        let connectBitwardenWindowController = connectBitwardenViewController.wrappedInWindowController()
+        
+        connectBitwardenViewController.setupFlowCancellationHandler = { [weak self] in
+            self?.passwordManager = .duckduckgo
+        }
 
-        guard let connectBitwardenWindow = connectBitwardenViewController.window,
+        guard let connectBitwardenWindow = connectBitwardenWindowController.window,
               let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController
         else {
             assertionFailure("Privacy Preferences: Failed to present ConnectBitwardenViewController")

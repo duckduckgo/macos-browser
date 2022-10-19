@@ -118,8 +118,12 @@ final class BitwardenManager: BitwardenManagement, ObservableObject {
         switch command {
         case .connected:
             status = .approachable
-            // On setup, the handshake should only be sent once the user reaches that phase in the flow:
-            // sendHandshake()
+            
+            // The handshake should only be sent automatically if the Bitwarden integration flow has already been completed:
+            if AutofillPreferences().passwordManager == .bitwarden {
+                sendHandshake()
+            }
+
             return
         case .disconnected:
             // Bitwarden application isn't running || User didn't approve DuckDuckGo browser integration
