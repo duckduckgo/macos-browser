@@ -343,6 +343,7 @@ struct ActivityIndicator: NSViewRepresentable {
     func makeNSView(context: NSViewRepresentableContext<ActivityIndicator>) -> NSProgressIndicator {
         let progressIndicator = NSProgressIndicator()
         progressIndicator.style = self.style
+        progressIndicator.controlSize = .small
         return progressIndicator
     }
 

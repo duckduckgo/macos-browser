@@ -25,6 +25,9 @@ enum BitwardenStatus: Equatable {
 
     // Bitwarden application isn't running || User didn't approve DuckDuckGo browser integration
     case notApproachable
+    
+    // Bitwarden application is running && user enabled DuckDuckGo browser integration, but has not granted connection permission
+    case approachable
 
     case connected(vault: Vault)
     case error(error: BitwardenError)
@@ -33,6 +36,7 @@ enum BitwardenStatus: Equatable {
         let id: String
         let email: String
         let status: Status
+        let active: Bool
 
         enum Status: String {
             case locked

@@ -90,6 +90,12 @@ final class ConnectBitwardenViewModel: ObservableObject {
         
         self.bitwardenManagerStatusCancellable = bitwardenManager.statusPublisher.sink { status in
             // TODO: Use this to change the view state, such as when the user grants permission for us to connect.
+            
+            print("DEBUG: Status in view model changed to \(status), view state = \(self.viewState)")
+            
+            if self.viewState == .waitingForConnectionPermission, status == .approachable {
+                self.viewState = self.nextState(for: .waitingForConnectionPermission)
+            }
         }
     }
     
@@ -98,6 +104,8 @@ final class ConnectBitwardenViewModel: ObservableObject {
         case .confirm:
             if viewState == .connectedToBitwarden {
                 delegate?.connectBitwardenViewModelDismissedView(self)
+            } else if viewState == .connectToBitwarden {
+                bitwardenManager.sendHandshake()
             } else {
                 self.viewState = nextState(for: viewState)
             }
@@ -121,12 +129,11 @@ final class ConnectBitwardenViewModel: ObservableObject {
         case .lookingForBitwarden:
             return .bitwardenFound
         case .bitwardenFound:
-            // TODO: Update this to listen for when permission is granted.
-            DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-                self.viewState = .connectToBitwarden
+            if bitwardenManager.status == .approachable {
+                return .connectToBitwarden
+            } else {
+                return .waitingForConnectionPermission
             }
-            
-            return .waitingForConnectionPermission
         case .waitingForConnectionPermission:
             return .connectToBitwarden
         case .connectToBitwarden:

@@ -26,6 +26,8 @@ protocol BitwardenManagement {
     var status: BitwardenStatus { get }
     var statusPublisher: Published<BitwardenStatus>.Publisher { get }
 
+    func sendHandshake()
+
     func retrieveCredentials(for url: URL, completion: @escaping ([BitwardenCredential], BitwardenError?) -> Void)
     func create(credential: BitwardenCredential, completion: @escaping (BitwardenError?) -> Void)
     func update(credential: BitwardenCredential, completion: @escaping (BitwardenError?) -> Void)
@@ -115,7 +117,10 @@ final class BitwardenManager: BitwardenManagement, ObservableObject {
     private func handleCommand(_ command: BitwardenMessage.Command) {
         switch command {
         case .connected:
-            sendHandshake()
+            print("DEBUG: Bitwarden is now connected")
+            status = .approachable
+            // On setup, the handshake should only be sent once the user reaches that phase in the flow:
+            // sendHandshake()
             return
         case .disconnected:
             // Bitwarden application isn't running || User didn't approve DuckDuckGo browser integration
@@ -134,6 +139,8 @@ final class BitwardenManager: BitwardenManagement, ObservableObject {
     }
 
     private func handleHandshakeResponse(encryptedSharedKey: String, status: String) {
+        print("DEBUG: Bitwarden response status = \(status)")
+
         guard status == "success" else {
             self.status = .error(error: .handshakeFailed)
             cancelConnectionAndScheduleNextAttempt()
@@ -211,7 +218,9 @@ final class BitwardenManager: BitwardenManagement, ObservableObject {
 
     // MARK: - Sending Messages
 
-    private func sendHandshake() {
+    func sendHandshake() {
+        print("DEBUG: Sending handshake")
+
         guard let publicKey64Encoded = publicKey else {
             assertionFailure("Public key is missing")
             return
@@ -226,6 +235,8 @@ final class BitwardenManager: BitwardenManagement, ObservableObject {
     }
 
     private func sendStatus() {
+        print("DEBUG: Sending status check")
+
         //TODO: More general encryption method
         guard let commandData = BitwardenMessage.EncryptedCommand(command: .status, payload: nil).data else {
             assertionFailure("Making the status message failed")
@@ -273,7 +284,7 @@ final class BitwardenManager: BitwardenManagement, ObservableObject {
             return
         }
 
-        let vault = BitwardenStatus.Vault(id: id, email: email, status: status)
+        let vault = BitwardenStatus.Vault(id: id, email: email, status: status, active: true)
         self.status = .connected(vault: vault)
     }
 
@@ -321,7 +332,7 @@ extension BitwardenManager: BitwardenCommunicatorDelegate {
             assertionFailure("Can't decode the message")
             return
         }
-
+        
         //TODO: check id of received message. Throw away not requested messages.
 
         if let command = message.command, command == .connected || command == .disconnected {
