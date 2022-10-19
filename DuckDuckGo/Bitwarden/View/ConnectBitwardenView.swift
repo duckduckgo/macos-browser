@@ -23,25 +23,30 @@ struct ConnectBitwardenView: View {
     
     @EnvironmentObject var viewModel: ConnectBitwardenViewModel
     
+    @Binding var viewHeight: Double
+    
     var body: some View {
         VStack {
             BitwardenTitleView()
-                .padding(.bottom, 10)
+                .padding(.bottom, 20)
             
-            switch viewModel.viewState {
-            case .disclaimer:
-                ConnectToBitwardenDisclaimerView()
-            case .lookingForBitwarden:
-                BitwardenInstallationDetectionView(bitwardenDetected: false)
-            case .bitwardenFound:
-                BitwardenInstallationDetectionView(bitwardenDetected: true)
-            case .waitingForConnectionPermission:
-                ConnectToBitwardenView(canConnect: false)
-            case .connectToBitwarden:
-                ConnectToBitwardenView(canConnect: true)
-            case .connectedToBitwarden:
-                ConnectedToBitwardenView()
-            }
+//            switch viewModel.viewState {
+//            case .disclaimer:
+//                ConnectToBitwardenDisclaimerView()
+//            case .lookingForBitwarden:
+//                BitwardenInstallationDetectionView(bitwardenDetected: false)
+//            case .bitwardenFound:
+//                BitwardenInstallationDetectionView(bitwardenDetected: true)
+//            case .waitingForConnectionPermission:
+//                ConnectToBitwardenView(canConnect: false)
+//            case .connectToBitwarden:
+//                ConnectToBitwardenView(canConnect: true)
+//            case .connectedToBitwarden:
+//                ConnectedToBitwardenView()
+//            }
+            
+            ConnectedToBitwardenView()
+                .frame(maxWidth: .infinity)
         }
         .padding(20)
         
@@ -200,7 +205,21 @@ private struct ConnectToBitwardenView: View {
 private struct ConnectedToBitwardenView: View {
 
     var body: some View {
-        Text("Connected")
+        VStack(alignment: .leading) {
+            
+            Text("Bitwarden integration complete!")
+                .font(.system(size: 13, weight: .bold))
+            
+            HStack {
+                Image("SuccessCheckmark")
+
+                Text("You are now using Bitwarden as your password manager.")
+                
+                Spacer()
+            }
+
+        }
+        .frame(maxWidth: .infinity)
     }
     
 }

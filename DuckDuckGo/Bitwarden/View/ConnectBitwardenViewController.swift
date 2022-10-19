@@ -21,6 +21,7 @@ import SwiftUI
 
 final class ConnectBitwardenViewController: NSViewController {
     
+    // TODO: Update this to be dynamic per-screen. Use GeometryReader to feed the size of the SwiftUI view to the view controller and resize.
     private let viewSize = CGSize(width: 550, height: 450)
     private let viewModel = ConnectBitwardenViewModel(
         bitwardenInstallationService: LocalBitwardenInstallationManager(),

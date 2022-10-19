@@ -123,7 +123,8 @@ final class AutofillPreferencesModel: ObservableObject {
         askToSaveAddresses = persistor.askToSaveAddresses
         askToSavePaymentMethods = persistor.askToSavePaymentMethods
         passwordManager = persistor.passwordManager
-        
+
+        // TODO: Improve this. The goal is to reset the password manager back to DDG in the case that the user selects Bitwarden but does not complete the flow.
         if persistor.passwordManager == .bitwarden, BitwardenManager.shared.status == .disabled {
             self.persistor.passwordManager = .duckduckgo
         }
@@ -131,7 +132,7 @@ final class AutofillPreferencesModel: ObservableObject {
 
     private var persistor: AutofillPreferencesPersistor
     private var userAuthenticator: UserAuthenticating
-    private var bitwardenInstallationManager: BitwardenInstallationManager
+    private let bitwardenInstallationManager: BitwardenInstallationManager
     
     // MARK: - Password Manager
     
@@ -149,7 +150,7 @@ final class AutofillPreferencesModel: ObservableObject {
     }
     
     func openBitwarden() {
-        bitwardenInstallationManager.openBitwarden()
+        bitwardenInstallationManager.openBitwarden() // TODO: Handle the failure case in case Bitwarden couldn't be opened.
     }
     
 }

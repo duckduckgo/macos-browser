@@ -202,7 +202,7 @@ private struct BitwardenStatusView: View {
         
         fileprivate var imageName: String {
             switch self {
-            case .success: return "Error"
+            case .success: return "SuccessCheckmark"
             case .warning: return "Warning"
             case .error: return "Error"
             }

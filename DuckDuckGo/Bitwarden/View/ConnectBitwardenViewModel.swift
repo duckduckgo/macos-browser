@@ -102,6 +102,11 @@ final class ConnectBitwardenViewModel: ObservableObject {
         case .lookingForBitwarden:
             return .bitwardenFound
         case .bitwardenFound:
+            // TODO: Update this to listen for when permission is granted.
+            DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+                self.viewState = .connectToBitwarden
+            }
+            
             return .waitingForConnectionPermission
         case .waitingForConnectionPermission:
             return .connectToBitwarden
