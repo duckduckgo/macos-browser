@@ -308,18 +308,20 @@ private struct ButtonsView: View {
         HStack {
             Spacer()
             
-            Button("Cancel") {
-                viewModel.process(action: .cancel)
+            if viewModel.viewState.cancelButtonVisible {
+                Button("Cancel") {
+                    viewModel.process(action: .cancel)
+                }
             }
             
             if #available(macOS 11.0, *) {
-                Button("Next") {
+                Button(viewModel.viewState.confirmButtonTitle) {
                     viewModel.process(action: .confirm)
                 }
                 .keyboardShortcut(.defaultAction)
                 .disabled(!viewModel.viewState.canContinue)
             } else {
-                Button("Next") {
+                Button(viewModel.viewState.confirmButtonTitle) {
                     viewModel.process(action: .confirm)
                 }
                 .disabled(!viewModel.viewState.canContinue)

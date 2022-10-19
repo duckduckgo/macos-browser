@@ -22,7 +22,7 @@ import SwiftUI
 
 final class ConnectBitwardenViewController: NSViewController {
     
-    private let defaultSize = CGSize(width: 550, height: 278)
+    private let defaultSize = CGSize(width: 550, height: 280)
     private let viewModel = ConnectBitwardenViewModel(
         bitwardenInstallationService: LocalBitwardenInstallationManager(),
         bitwardenManager: BitwardenManager.shared
@@ -60,7 +60,7 @@ final class ConnectBitwardenViewController: NSViewController {
     }
     
     private func updateViewHeight(height: CGFloat) {
-        heightConstraint?.constant = height + 85 // TODO: Work out the height calculation so that this magic number isn't needed.
+        heightConstraint?.constant = height + 87 // TODO: Work out the height calculation so that this magic number isn't needed.
     }
     
 }

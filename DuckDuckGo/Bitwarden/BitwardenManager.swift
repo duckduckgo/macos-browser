@@ -251,6 +251,7 @@ final class BitwardenManager: BitwardenManagement {
 
     @Published private(set) var status: BitwardenStatus = .disabled {
         didSet {
+            print("DEBUG \(Date()): Bitwarden Status changed to \(status)")
             os_log("Status changed: %s", log: .bitwarden, type: .default, String(describing: status))
         }
     }

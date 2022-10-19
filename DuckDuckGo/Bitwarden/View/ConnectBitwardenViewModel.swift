@@ -28,6 +28,7 @@ protocol ConnectBitwardenViewModelDelegate: AnyObject {
 final class ConnectBitwardenViewModel: ObservableObject {
     
     enum ViewState {
+
         // Initial state:
         case disclaimer
         
@@ -48,8 +49,21 @@ final class ConnectBitwardenViewModel: ObservableObject {
             default: return true
             }
         }
+
+        var confirmButtonTitle: String {
+            switch self {
+            case .disclaimer, .lookingForBitwarden, .bitwardenFound: return "Next"
+            case .waitingForConnectionPermission, .connectToBitwarden: return "Connect"
+            case .connectedToBitwarden: return "OK"
+            }
+        }
+        
+        var cancelButtonVisible: Bool {
+            return self != .connectedToBitwarden
+        }
+        
     }
-    
+     
     enum ViewAction {
         case cancel
         case confirm
@@ -63,7 +77,7 @@ final class ConnectBitwardenViewModel: ObservableObject {
     
     weak var delegate: ConnectBitwardenViewModelDelegate?
     
-    @Published private(set) var viewState: ViewState
+    @Published private(set) var viewState: ViewState = .disclaimer
     
     private let bitwardenInstallationService: BitwardenInstallationManager
     private let bitwardenManager: BitwardenManagement
@@ -73,18 +87,20 @@ final class ConnectBitwardenViewModel: ObservableObject {
     init(bitwardenInstallationService: BitwardenInstallationManager, bitwardenManager: BitwardenManagement) {
         self.bitwardenInstallationService = bitwardenInstallationService
         self.bitwardenManager = bitwardenManager
-
-        self.viewState = .disclaimer
         
         self.bitwardenManagerStatusCancellable = bitwardenManager.statusPublisher.sink { status in
-            print("VIEW MODEL STATUS CHANGED: \(status)")
+            // TODO: Use this to change the view state, such as when the user grants permission for us to connect.
         }
     }
     
     func process(action: ViewAction) {
         switch action {
         case .confirm:
-            self.viewState = nextState(for: viewState)
+            if viewState == .connectedToBitwarden {
+                delegate?.connectBitwardenViewModelDismissedView(self)
+            } else {
+                self.viewState = nextState(for: viewState)
+            }
         case .cancel:
             delegate?.connectBitwardenViewModelDismissedView(self)
         case .openBitwarden:
@@ -98,7 +114,7 @@ final class ConnectBitwardenViewModel: ObservableObject {
         switch currentState {
         case .disclaimer:
             if bitwardenInstallationService.isBitwardenInstalled {
-                return .bitwardenFound
+                return nextState(for: .bitwardenFound)
             } else {
                 return .lookingForBitwarden
             }
