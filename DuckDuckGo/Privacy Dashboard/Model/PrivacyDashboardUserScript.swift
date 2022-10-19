@@ -18,7 +18,7 @@
 
 import WebKit
 import os
-import BrowserServicesKit
+import UserScript
 import TrackerRadarKit
 
 protocol PrivacyDashboardUserScriptDelegate: AnyObject {

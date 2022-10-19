@@ -17,8 +17,7 @@
 //
 
 import Foundation
-import TrackerRadarKit
-import BrowserServicesKit
+import ContentBlocking
 
 public struct TrackerInfo: Encodable {
     

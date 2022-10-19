@@ -16,11 +16,10 @@
 //  limitations under the License.
 //
 
-import Foundation
-import BrowserServicesKit
 import WebKit
 import os
 import Common
+import UserScript
 
 protocol YoutubeOverlayUserScriptDelegate: AnyObject {
     func youtubeOverlayUserScriptDidRequestDuckPlayer(with url: URL)

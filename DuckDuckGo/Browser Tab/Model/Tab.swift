@@ -24,6 +24,8 @@ import os
 import Combine
 import BrowserServicesKit
 import TrackerRadarKit
+import ContentBlocking
+import UserScript
 
 protocol TabDelegate: FileDownloadManagerDelegate, ContentOverlayUserScriptDelegate {
     func tabWillStartNavigation(_ tab: Tab, isUserInitiated: Bool)
