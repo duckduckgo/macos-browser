@@ -74,6 +74,19 @@ final class ConnectBitwardenViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.viewState, .waitingForConnectionPermission)
     }
     
+    func testWhenViewModelReceivesConnectStateFromManager_ThenViewStateIsConnectedToBitwarden() {
+        let installationManager = MockBitwardenInstallationManager()
+        let bitwardenManager = MockBitwardenManager()
+        let viewModel = ConnectBitwardenViewModel(bitwardenInstallationService: installationManager, bitwardenManager: bitwardenManager)
+        
+        XCTAssertEqual(viewModel.viewState, .disclaimer)
+        
+        let vault = BitwardenStatus.Vault(id: "id", email: "dax@duck.com", status: .unlocked, active: true)
+        bitwardenManager.status = .connected(vault: vault)
+        
+        XCTAssertEqual(viewModel.viewState, .connectedToBitwarden)
+    }
+    
     func testWhenClickingOpenBitwardenButton_ThenBitwardenIsOpened() {
         let installationManager = MockBitwardenInstallationManager()
         let bitwardenManager = MockBitwardenManager()
@@ -107,7 +120,7 @@ class MockBitwardenManager: BitwardenManagement {
     var handshakeSent = false
     // var bitwardenStatus = BitwardenStatus.disabled
     
-    @Published private(set) var status: BitwardenStatus = .disabled
+    @Published var status: BitwardenStatus = .disabled
     var statusPublisher: Published<BitwardenStatus>.Publisher { $status }
     
     func sendHandshake() {
