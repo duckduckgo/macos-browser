@@ -56,6 +56,11 @@ final class BitwardenManager: BitwardenManagement {
     // MARK: - Connection
 
     private func startConnection() {
+        guard RunningApplicationCheck.isApplicationRunning(bundleId: "com.bitwarden.desktop") else {
+            scheduleConnectionAttempt()
+            return
+        }
+
         communicator.enabled = true
     }
 
