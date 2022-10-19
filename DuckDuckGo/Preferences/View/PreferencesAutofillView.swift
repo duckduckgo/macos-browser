@@ -172,25 +172,25 @@ extension Preferences {
             switch status {
             case .disabled, .notApproachable, .approachable:
                 BitwardenStatusView(iconType: .error,
-                                    title: "Unable to find or connect to Bitwarden",
-                                    buttonValue: .init(title: "Complete Setup…", action: { model.presentBitwardenSetupFlow() }))
+                                    title: UserText.bitwardenPreferencesUnableToConnect,
+                                    buttonValue: .init(title: UserText.bitwardenPreferencesCompleteSetup, action: { model.presentBitwardenSetupFlow() }))
                 .offset(x: Preferences.Const.autoLockWarningOffset)
             case .connected(vault: let vault):
                 switch vault.status {
                 case .locked:
                     BitwardenStatusView(iconType: .warning,
-                                        title: "Unlock Bitwarden",
-                                        buttonValue: .init(title: "Open Bitwarden…", action: { model.openBitwarden() }))
+                                        title: UserText.bitwardenPreferencesUnlock,
+                                        buttonValue: .init(title: UserText.bitwardenPreferencesCompleteSetup, action: { model.openBitwarden() }))
                     .offset(x: Preferences.Const.autoLockWarningOffset)
                 case .unlocked:
                     BitwardenStatusView(iconType: .success,
                                         title: vault.email,
-                                        buttonValue: .init(title: "Open Bitwarden…", action: { model.openBitwarden() }))
+                                        buttonValue: .init(title: UserText.bitwardenPreferencesCompleteSetup, action: { model.openBitwarden() }))
                     .offset(x: Preferences.Const.autoLockWarningOffset)
                 }
             case .error:
                 BitwardenStatusView(iconType: .error,
-                                    title: "Unable to find or connect to Bitwarden",
+                                    title: UserText.bitwardenPreferencesUnableToConnect,
                                     buttonValue: nil)
                 .offset(x: Preferences.Const.autoLockWarningOffset)
             }
