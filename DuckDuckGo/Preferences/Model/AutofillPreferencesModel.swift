@@ -150,7 +150,9 @@ final class AutofillPreferencesModel: ObservableObject {
     }
     
     func openBitwarden() {
-        bitwardenInstallationManager.openBitwarden() // TODO: Handle the failure case in case Bitwarden couldn't be opened.
+        if !bitwardenInstallationManager.openBitwarden() {
+            // TODO: Handle the failure case in case Bitwarden couldn't be opened.
+        }
     }
     
 }

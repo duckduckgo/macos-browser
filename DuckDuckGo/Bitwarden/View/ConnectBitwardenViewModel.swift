@@ -21,7 +21,7 @@ import Combine
 
 protocol ConnectBitwardenViewModelDelegate: AnyObject {
     
-    func connectBitwardenViewModelDismissedView(_ viewModel: ConnectBitwardenViewModel)
+    func connectBitwardenViewModelDismissedView(_ viewModel: ConnectBitwardenViewModel, canceled: Bool)
     
 }
 
@@ -89,12 +89,12 @@ final class ConnectBitwardenViewModel: ObservableObject {
         self.bitwardenManager = bitwardenManager
         
         self.bitwardenManagerStatusCancellable = bitwardenManager.statusPublisher.sink { status in
-            // TODO: Use this to change the view state, such as when the user grants permission for us to connect.
-            
-            print("DEBUG: Status in view model changed to \(status), view state = \(self.viewState)")
-            
             if self.viewState == .waitingForConnectionPermission, status == .approachable {
                 self.viewState = self.nextState(for: .waitingForConnectionPermission)
+            }
+            
+            if status.isConnected {
+                self.viewState = .connectedToBitwarden
             }
         }
     }
@@ -103,14 +103,14 @@ final class ConnectBitwardenViewModel: ObservableObject {
         switch action {
         case .confirm:
             if viewState == .connectedToBitwarden {
-                delegate?.connectBitwardenViewModelDismissedView(self)
+                delegate?.connectBitwardenViewModelDismissedView(self, canceled: false)
             } else if viewState == .connectToBitwarden {
                 bitwardenManager.sendHandshake()
             } else {
                 self.viewState = nextState(for: viewState)
             }
         case .cancel:
-            delegate?.connectBitwardenViewModelDismissedView(self)
+            delegate?.connectBitwardenViewModelDismissedView(self, canceled: true)
         case .openBitwarden:
             bitwardenInstallationService.openBitwarden()
         case .openBitwardenProductPage:

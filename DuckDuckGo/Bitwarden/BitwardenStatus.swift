@@ -31,6 +31,13 @@ enum BitwardenStatus: Equatable {
 
     case connected(vault: Vault)
     case error(error: BitwardenError)
+    
+    var isConnected: Bool {
+        switch self {
+        case .connected: return true
+        case .disabled, .notApproachable, .approachable, .error: return false
+        }
+    }
 
     struct Vault: Equatable {
         let id: String

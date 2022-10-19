@@ -117,7 +117,6 @@ final class BitwardenManager: BitwardenManagement, ObservableObject {
     private func handleCommand(_ command: BitwardenMessage.Command) {
         switch command {
         case .connected:
-            print("DEBUG: Bitwarden is now connected")
             status = .approachable
             // On setup, the handshake should only be sent once the user reaches that phase in the flow:
             // sendHandshake()
@@ -139,8 +138,6 @@ final class BitwardenManager: BitwardenManagement, ObservableObject {
     }
 
     private func handleHandshakeResponse(encryptedSharedKey: String, status: String) {
-        print("DEBUG: Bitwarden response status = \(status)")
-
         guard status == "success" else {
             self.status = .error(error: .handshakeFailed)
             cancelConnectionAndScheduleNextAttempt()
@@ -219,8 +216,6 @@ final class BitwardenManager: BitwardenManagement, ObservableObject {
     // MARK: - Sending Messages
 
     func sendHandshake() {
-        print("DEBUG: Sending handshake")
-
         guard let publicKey64Encoded = publicKey else {
             assertionFailure("Public key is missing")
             return
@@ -235,8 +230,6 @@ final class BitwardenManager: BitwardenManagement, ObservableObject {
     }
 
     private func sendStatus() {
-        print("DEBUG: Sending status check")
-
         //TODO: More general encryption method
         guard let commandData = BitwardenMessage.EncryptedCommand(command: .status, payload: nil).data else {
             assertionFailure("Making the status message failed")
@@ -269,7 +262,6 @@ final class BitwardenManager: BitwardenManagement, ObservableObject {
 
     @Published private(set) var status: BitwardenStatus = .disabled {
         didSet {
-            print("DEBUG \(Date()): Bitwarden Status changed to \(status)")
             os_log("Status changed: %s", log: .bitwarden, type: .default, String(describing: status))
         }
     }
@@ -336,7 +328,6 @@ extension BitwardenManager: BitwardenCommunicatorDelegate {
         //TODO: check id of received message. Throw away not requested messages.
 
         if let command = message.command, command == .connected || command == .disconnected {
-            print("Handling command: \(command)")
             handleCommand(command)
             return
         }

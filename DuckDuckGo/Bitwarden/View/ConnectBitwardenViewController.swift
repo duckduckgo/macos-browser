@@ -67,7 +67,8 @@ final class ConnectBitwardenViewController: NSViewController {
 
 extension ConnectBitwardenViewController: ConnectBitwardenViewModelDelegate {
     
-    func connectBitwardenViewModelDismissedView(_ viewModel: ConnectBitwardenViewModel) {
+    func connectBitwardenViewModelDismissedView(_ viewModel: ConnectBitwardenViewModel, canceled: Bool) {
+        // TODO: Use the canceled value to reset the selected password manager.
         dismiss()
     }
     
