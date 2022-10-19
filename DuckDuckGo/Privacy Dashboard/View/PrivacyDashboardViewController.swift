@@ -20,11 +20,12 @@ import Cocoa
 import WebKit
 import Combine
 import BrowserServicesKit
+import PrivacyDashboardResources
 
 final class PrivacyDashboardViewController: NSViewController {
 
     struct Constants {
-        static let initialContentHeight: CGFloat = 662
+        static let initialContentHeight: CGFloat = 452
     }
 
     private var webView: WKWebView!
@@ -84,8 +85,11 @@ final class PrivacyDashboardViewController: NSViewController {
     override func viewWillAppear() {
         guard let tabViewModel = tabViewModel else { return }
 
-        let url = Bundle.main.url(forResource: "popup", withExtension: "html", subdirectory: "duckduckgo-privacy-dashboard/build/macos/html")!
-        webView.loadFileURL(url, allowingReadAccessTo: url.deletingLastPathComponent())
+        // This is part of shared logic pasted from the dashboard package
+        guard let url = Bundle.privacyDashboardURL else { return }
+        webView.loadFileURL(url, allowingReadAccessTo: url.deletingLastPathComponent().deletingLastPathComponent())
+        //
+        
         prepareContentBlockingCancellable(publisher: tabViewModel.tab.cbrCompletionTokensPublisher)
     }
 
@@ -168,14 +172,12 @@ final class PrivacyDashboardViewController: NSViewController {
     }
 
     private func sendProtectionStatus() {
-        guard let domain = tabViewModel?.tab.content.url?.host else {
-            assertionFailure("PrivacyDashboardViewController: no domain available")
+        guard let protectionStatus = tabViewModel?.tab.protectionStatus else {
+            assertionFailure("PrivacyDashboardViewController: no protectionStatus available")
             return
         }
 
-        let configuration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig
-        let isProtected = configuration.isProtected(domain: domain)
-        self.privacyDashboardScript.setProtectionStatus(isProtected, webView: self.webView)
+        self.privacyDashboardScript.setProtectionStatus(protectionStatus, webView: self.webView)
     }
 
     private func sendPendingUpdates() {
@@ -219,6 +221,11 @@ final class PrivacyDashboardViewController: NSViewController {
                 self.privacyDashboardScript.setConsentManaged(consentManaged, webView: self.webView)
             })
             .store(in: &cancellables)
+    }
+    
+    private func sendCurrentLocale() {
+        let enLanguageCode = "en" // Fix the language to english until the app supports localisation
+        privacyDashboardScript.setLocale(enLanguageCode, webView: webView)
     }
 
 }
@@ -282,6 +289,35 @@ extension PrivacyDashboardViewController: PrivacyDashboardUserScriptDelegate {
         }
         tabCollection.appendNewTab(with: .url(url), selected: true)
     }
+    
+    func userScript(_ userScript: PrivacyDashboardUserScript, didRequestSubmitBrokenSiteReportWithCategory category: String, description: String) {
+        let websiteBreakage = makeWebsiteBreakage(category: category, description: description, currentTab: tabViewModel?.tab)
+        let websiteBreakageSender = WebsiteBreakageSender()
+        websiteBreakageSender.sendWebsiteBreakage(websiteBreakage)
+    }
+    
+    private func makeWebsiteBreakage(category: String, description: String, currentTab: Tab?) -> WebsiteBreakage {
+        // ⚠️ To limit privacy risk, site URL is trimmed to not include query and fragment
+        let currentURL = currentTab?.content.url?.trimmingQueryItemsAndFragment()?.absoluteString ?? ""
+        
+        let blockedTrackerDomains = currentTab?.trackerInfo?.trackersBlocked.compactMap { $0.domain } ?? []
+        let installedSurrogates = currentTab?.trackerInfo?.installedSurrogates.map {$0} ?? []
+        let ampURL = currentTab?.linkProtection.lastAMPURLString ?? ""
+        let urlParametersRemoved = currentTab?.linkProtection.urlParametersRemoved ?? false
+        
+        let websiteBreakage = WebsiteBreakage(category: WebsiteBreakage.Category(rawValue: category.lowercased()),
+                                              description: description,
+                                              siteUrlString: currentURL,
+                                              osVersion: "\(ProcessInfo.processInfo.operatingSystemVersion)",
+                                              upgradedHttps: currentTab?.connectionUpgradedTo != nil,
+                                              tdsETag: ContentBlocking.shared.contentBlockingManager.currentRules.first?.etag,
+                                              blockedTrackerDomains: blockedTrackerDomains,
+                                              installedSurrogates: installedSurrogates,
+                                              isGPCEnabled: PrivacySecurityPreferences.shared.gpcEnabled,
+                                              ampURL: ampURL,
+                                              urlParametersRemoved: urlParametersRemoved)
+        return websiteBreakage
+    }
 }
 
 extension PrivacyDashboardViewController: WKNavigationDelegate {
@@ -295,6 +331,7 @@ extension PrivacyDashboardViewController: WKNavigationDelegate {
         sendPendingUpdates()
         sendParentEntity()
         subscribeToConsentManaged()
+        sendCurrentLocale()
     }
 
 }

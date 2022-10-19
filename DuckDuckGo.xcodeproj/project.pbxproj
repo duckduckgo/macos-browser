@@ -17,6 +17,8 @@
 		1456D6E124EFCBC300775049 /* TabBarCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1456D6E024EFCBC300775049 /* TabBarCollectionView.swift */; };
 		14D9B8FB24F7E089000D4D13 /* AddressBarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14D9B8F924F7E089000D4D13 /* AddressBarViewController.swift */; };
 		1E25269C28F8741A00E44DFA /* Common in Frameworks */ = {isa = PBXBuildFile; productRef = 1E25269B28F8741A00E44DFA /* Common */; };
+		1E25CD5628FAEE0A00E04B42 /* PrivacyDashboardResources in Frameworks */ = {isa = PBXBuildFile; productRef = 1E25CD5528FAEE0A00E04B42 /* PrivacyDashboardResources */; };
+		1EF7E98B28F44432005C31CA /* ProtectionStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EF7E98A28F44432005C31CA /* ProtectionStatus.swift */; };
 		3106AD76287F000600159FE5 /* CookieConsentUserPermissionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3106AD75287F000600159FE5 /* CookieConsentUserPermissionViewController.swift */; };
 		311B262728E73E0A00FD181A /* TabShadowConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311B262628E73E0A00FD181A /* TabShadowConfig.swift */; };
 		313AEDA1287CAD1D00E1E8F4 /* CookieConsentUserPermissionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 313AEDA0287CAD1D00E1E8F4 /* CookieConsentUserPermissionView.swift */; };
@@ -40,7 +42,6 @@
 		31F28C5828C8EEDB00119F70 /* youtube_player_template.html in Resources */ = {isa = PBXBuildFile; fileRef = 31F28C5528C8EEDB00119F70 /* youtube_player_template.html */; };
 		31F7F2A6288AD2CA001C0D64 /* NavigationBarBadgeAnimationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31F7F2A5288AD2CA001C0D64 /* NavigationBarBadgeAnimationView.swift */; };
 		336D5B18262D8D3C0052E0C9 /* findinpage.js in Resources */ = {isa = PBXBuildFile; fileRef = 336D5AEF262D8D3C0052E0C9 /* findinpage.js */; };
-		339A6B5826A044BA00E3DAE8 /* duckduckgo-privacy-dashboard in Resources */ = {isa = PBXBuildFile; fileRef = 339A6B5726A044BA00E3DAE8 /* duckduckgo-privacy-dashboard */; };
 		37054FC92873301700033B6F /* PinnedTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37054FC82873301700033B6F /* PinnedTabView.swift */; };
 		37054FCE2876472D00033B6F /* WebViewSnapshotView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37054FCD2876472D00033B6F /* WebViewSnapshotView.swift */; };
 		3714B1E728EDB7FA0056C57A /* PrivatePlayerPreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3714B1E628EDB7FA0056C57A /* PrivatePlayerPreferencesTests.swift */; };
@@ -843,6 +844,7 @@
 		14505A07256084EF00272CC6 /* UserAgent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserAgent.swift; sourceTree = "<group>"; };
 		1456D6E024EFCBC300775049 /* TabBarCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarCollectionView.swift; sourceTree = "<group>"; };
 		14D9B8F924F7E089000D4D13 /* AddressBarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressBarViewController.swift; sourceTree = "<group>"; };
+		1EF7E98A28F44432005C31CA /* ProtectionStatus.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProtectionStatus.swift; sourceTree = "<group>"; };
 		3106AD75287F000600159FE5 /* CookieConsentUserPermissionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieConsentUserPermissionViewController.swift; sourceTree = "<group>"; };
 		311B262628E73E0A00FD181A /* TabShadowConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabShadowConfig.swift; sourceTree = "<group>"; };
 		313AEDA0287CAD1D00E1E8F4 /* CookieConsentUserPermissionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieConsentUserPermissionView.swift; sourceTree = "<group>"; };
@@ -1670,6 +1672,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1E25CD5628FAEE0A00E04B42 /* PrivacyDashboardResources in Frameworks */,
 				9807F645278CA16F00E1547B /* BrowserServicesKit in Frameworks */,
 				85AE2FF224A33A2D002D507F /* WebKit.framework in Frameworks */,
 				4B82E9B325B69E3E00656FE7 /* TrackerRadarKit in Frameworks */,
@@ -3969,6 +3972,7 @@
 				B6106BA226A7BEA00013B453 /* PermissionAuthorizationState.swift */,
 				AA9B7C7D26A06E040008D425 /* TrackerInfo.swift */,
 				AA9B7C8226A197A00008D425 /* ServerTrust.swift */,
+				1EF7E98A28F44432005C31CA /* ProtectionStatus.swift */,
 				B3FB199227BD0AD400513DC1 /* CookieConsentInfo.swift */,
 			);
 			path = Model;
@@ -4231,6 +4235,7 @@
 				AA06B6B62672AF8100F541C5 /* Sparkle */,
 				9807F644278CA16F00E1547B /* BrowserServicesKit */,
 				1E25269B28F8741A00E44DFA /* Common */,
+				1E25CD5528FAEE0A00E04B42 /* PrivacyDashboardResources */,
 			);
 			productName = DuckDuckGo;
 			productReference = AA585D7E248FD31100E9A3E2 /* DuckDuckGo.app */;
@@ -4300,6 +4305,7 @@
 				B6DA44152616C13800DD1EC2 /* XCRemoteSwiftPackageReference "OHHTTPStubs" */,
 				AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */,
 				9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */,
+				1EF7E98728F4421B005C31CA /* XCRemoteSwiftPackageReference "privacy-dashboard" */,
 			);
 			productRefGroup = AA585D7F248FD31100E9A3E2 /* Products */;
 			projectDirPath = "";
@@ -4379,7 +4385,6 @@
 				4B723E1126B0006C00E14D75 /* DataImport.storyboard in Resources */,
 				4B92929026670D1700AD2C21 /* BookmarkTableCellView.xib in Resources */,
 				85AC7AD927BD625000FFB69B /* HomePageAssets.xcassets in Resources */,
-				339A6B5826A044BA00E3DAE8 /* duckduckgo-privacy-dashboard in Resources */,
 				AA7EB6E727E8809D00036718 /* shield-mouse-over.json in Resources */,
 				4B92928E26670D1700AD2C21 /* BookmarkOutlineViewCell.xib in Resources */,
 				B64C84DE2692D7400048FEBE /* PermissionAuthorization.storyboard in Resources */,
@@ -4531,6 +4536,7 @@
 				14505A08256084EF00272CC6 /* UserAgent.swift in Sources */,
 				4B8AC93526B3B2FD00879451 /* NSAlert+DataImport.swift in Sources */,
 				AA7412BD24D2BEEE00D22FE0 /* MainWindow.swift in Sources */,
+				1EF7E98B28F44432005C31CA /* ProtectionStatus.swift in Sources */,
 				AAD6D8882696DF6D002393B3 /* CrashReportPromptViewController.swift in Sources */,
 				B693955126F04BEB0015B914 /* GradientView.swift in Sources */,
 				37AFCE8527DA2D3900471A10 /* PreferencesSidebar.swift in Sources */,
@@ -6264,6 +6270,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		1EF7E98728F4421B005C31CA /* XCRemoteSwiftPackageReference "privacy-dashboard" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/duckduckgo/privacy-dashboard";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
 		4B82E9B125B69E3E00656FE7 /* XCRemoteSwiftPackageReference "TrackerRadarKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/TrackerRadarKit.git";
@@ -6311,6 +6325,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
 			productName = Common;
+		};
+		1E25CD5528FAEE0A00E04B42 /* PrivacyDashboardResources */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1EF7E98728F4421B005C31CA /* XCRemoteSwiftPackageReference "privacy-dashboard" */;
+			productName = PrivacyDashboardResources;
 		};
 		4B82E9B225B69E3E00656FE7 /* TrackerRadarKit */ = {
 			isa = XCSwiftPackageProductDependency;
