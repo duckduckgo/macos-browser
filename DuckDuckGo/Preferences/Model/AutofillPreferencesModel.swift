@@ -56,8 +56,6 @@ final class AutofillPreferencesModel: ObservableObject {
             
             if passwordManager == .bitwarden, !BitwardenManager.shared.status.isConnected {
                 presentBitwardenSetupFlow()
-            } else {
-                print("Don't present setup flow")
             }
         }
     }

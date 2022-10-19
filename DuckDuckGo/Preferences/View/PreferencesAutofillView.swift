@@ -231,10 +231,13 @@ private struct BitwardenStatusView: View {
                 Text(title)
             }
             .padding([.leading, .trailing], 6)
-            .padding([.top, .bottom], 3)
+            .padding([.top, .bottom], 2)
             .background(Color.black.opacity(0.04))
-            .border(Color.black.opacity(0.08))
             .cornerRadius(5)
+            .overlay(
+                RoundedRectangle(cornerRadius: 5)
+                    .stroke(Color.black.opacity(0.08), lineWidth: 1)
+            )
             
             if let buttonValue = buttonValue {
                 Button(buttonValue.title, action: buttonValue.action)

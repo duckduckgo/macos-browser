@@ -105,7 +105,7 @@ struct BitwardenTitleView: View {
                 .resizable()
                 .frame(width: 32, height: 32)
             
-            Text("Connect to Bitwarden")
+            Text(UserText.connectToBitwarden)
                 .font(.system(size: 18, weight: .semibold))
             
             Spacer()
@@ -119,20 +119,20 @@ private struct ConnectToBitwardenDisclaimerView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("We’ll walk you through connecting to Bitwarden, so you can use it in DuckDuckGo.")
+            Text(UserText.connectToBitwardenDescription)
             
-            Text("Privacy")
+            Text(UserText.connectToBitwardenPrivacy)
                 .font(.system(size: 13, weight: .bold))
                 .padding(.top, 10)
             
             HStack {
                 Image("BitwardenLock")
-                Text("All communication between Bitwarden and DuckDuckGo is encrypted and the data never leaves your device.")
+                Text(UserText.bitwardenCommunicationInfo)
             }
             
             HStack {
                 Image("BitwardenClock")
-                Text("Bitwarden will have access to your browsing history.")
+                Text(UserText.bitwardenHistoryInfo)
             }
         }
     }
