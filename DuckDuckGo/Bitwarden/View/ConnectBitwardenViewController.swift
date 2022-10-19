@@ -22,7 +22,10 @@ import SwiftUI
 final class ConnectBitwardenViewController: NSViewController {
     
     private let viewSize = CGSize(width: 550, height: 450)
-    private let viewModel = ConnectBitwardenViewModel(bitwardenInstallationService: LocalBitwardenInstallationManager())
+    private let viewModel = ConnectBitwardenViewModel(
+        bitwardenInstallationService: LocalBitwardenInstallationManager(),
+        bitwardenManager: BitwardenManager.shared
+    )
     
     public override func loadView() {
         view = NSView(frame: NSRect(origin: CGPoint.zero, size: viewSize))

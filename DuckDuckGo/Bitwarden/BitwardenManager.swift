@@ -56,7 +56,7 @@ final class BitwardenManager: BitwardenManagement {
     // MARK: - Connection
 
     private func startConnection() {
-        communicator.enabled = false // TODO: Change to true
+        communicator.enabled = true
     }
 
     private var connectionAttemptTimer: Timer?

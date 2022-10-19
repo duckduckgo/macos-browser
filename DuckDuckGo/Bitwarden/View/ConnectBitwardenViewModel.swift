@@ -56,15 +56,28 @@ final class ConnectBitwardenViewModel: ObservableObject {
         case openBitwardenProductPage
     }
     
+    private enum Constants {
+        static let bitwardenAppStoreURL = URL(string: "https://apps.apple.com/us/app/bitwarden/id1352778147")!
+    }
+    
     weak var delegate: ConnectBitwardenViewModelDelegate?
     
     @Published private(set) var viewState: ViewState
     
     private let bitwardenInstallationService: BitwardenInstallationManager
+    private let bitwardenManager: BitwardenManagement
     
-    init(bitwardenInstallationService: BitwardenInstallationManager) {
+    private var bitwardenManagerStatusCancellable: AnyCancellable?
+    
+    init(bitwardenInstallationService: BitwardenInstallationManager, bitwardenManager: BitwardenManagement) {
         self.bitwardenInstallationService = bitwardenInstallationService
+        self.bitwardenManager = bitwardenManager
+
         self.viewState = .disclaimer
+        
+        self.bitwardenManagerStatusCancellable = bitwardenManager.statusPublisher.sink { status in
+            print("VIEW MODEL STATUS CHANGED: \(status)")
+        }
     }
     
     func process(action: ViewAction) {
@@ -74,8 +87,7 @@ final class ConnectBitwardenViewModel: ObservableObject {
         case .cancel:
             delegate?.connectBitwardenViewModelDismissedView(self)
         case .openBitwardenProductPage:
-            let bitwardenURL = URL(string: "https://apps.apple.com/us/app/bitwarden/id1352778147")!
-            NSWorkspace.shared.open(bitwardenURL)
+            NSWorkspace.shared.open(Constants.bitwardenAppStoreURL)
         }
     }
     
