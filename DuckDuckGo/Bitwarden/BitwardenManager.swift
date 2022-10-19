@@ -32,7 +32,7 @@ protocol BitwardenManagement {
 
 }
 
-final class BitwardenManager: BitwardenManagement {
+final class BitwardenManager: BitwardenManagement, ObservableObject {
 
     static let shared = BitwardenManager()
 

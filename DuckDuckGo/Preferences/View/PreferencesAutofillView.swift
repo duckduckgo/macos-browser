@@ -41,6 +41,9 @@ extension Preferences {
 
     struct AutofillView: View {
         @ObservedObject var model: AutofillPreferencesModel
+        
+        // TODO: Use the protocol here, and listen to statusPublisher. The manager should be dependency injected, likely into the view model.
+        @ObservedObject var bitwardenManager = BitwardenManager.shared
 
         var passwordManagerBinding: Binding<PasswordManager> {
             .init {
@@ -95,28 +98,7 @@ extension Preferences {
                             .fixMultilineScrollableText()
                             .offset(x: Const.autoLockWarningOffset)
                     case .bitwarden:
-                        switch BitwardenManager.shared.status {
-                        case .disabled:
-                            BitwardenStatusView(iconType: .error,
-                                                title: "Unable to find or connect to Bitwarden",
-                                                buttonValue: .init(title: "Open Bitwarden", action: { model.openBitwarden() }))
-                            .offset(x: Preferences.Const.autoLockWarningOffset)
-                        case .notApproachable:
-                            BitwardenStatusView(iconType: .warning,
-                                                title: "Unlock Bitwarden",
-                                                buttonValue: .init(title: "Open Bitwarden", action: { model.openBitwarden() }))
-                            .offset(x: Preferences.Const.autoLockWarningOffset)
-                        case .connected(vault: let vault):
-                            BitwardenStatusView(iconType: .success,
-                                                title: vault.email,
-                                                buttonValue: .init(title: "Open Bitwarden", action: { model.openBitwarden() }))
-                            .offset(x: Preferences.Const.autoLockWarningOffset)
-                        case .error:
-                            BitwardenStatusView(iconType: .error,
-                                                title: "Unable to find or connect to Bitwarden",
-                                                buttonValue: nil)
-                            .offset(x: Preferences.Const.autoLockWarningOffset)
-                        }
+                        bitwardenStatusView(for: bitwardenManager.status)
                     }
                 }
                 
@@ -183,6 +165,31 @@ extension Preferences {
                         model.openImportBrowserDataWindow()
                     }
                 }
+            }
+        }
+        
+        @ViewBuilder private func bitwardenStatusView(for status: BitwardenStatus) -> some View {
+            switch status {
+            case .disabled:
+                BitwardenStatusView(iconType: .error,
+                                    title: "Unable to find or connect to Bitwarden",
+                                    buttonValue: .init(title: "Open Bitwarden", action: { model.openBitwarden() }))
+                .offset(x: Preferences.Const.autoLockWarningOffset)
+            case .notApproachable:
+                BitwardenStatusView(iconType: .warning,
+                                    title: "Unlock Bitwarden",
+                                    buttonValue: .init(title: "Open Bitwarden", action: { model.openBitwarden() }))
+                .offset(x: Preferences.Const.autoLockWarningOffset)
+            case .connected(vault: let vault):
+                BitwardenStatusView(iconType: .success,
+                                    title: vault.email,
+                                    buttonValue: .init(title: "Open Bitwarden", action: { model.openBitwarden() }))
+                .offset(x: Preferences.Const.autoLockWarningOffset)
+            case .error:
+                BitwardenStatusView(iconType: .error,
+                                    title: "Unable to find or connect to Bitwarden",
+                                    buttonValue: nil)
+                .offset(x: Preferences.Const.autoLockWarningOffset)
             }
         }
     }
