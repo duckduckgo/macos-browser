@@ -74,6 +74,25 @@ final class ConnectBitwardenViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.viewState, .waitingForConnectionPermission)
     }
     
+    func testWhenViewModelIsInConnectToBitwardenState_AndNextIsClicked_ThenHandshakeIsSent() {
+        let installationManager = MockBitwardenInstallationManager()
+        let bitwardenManager = MockBitwardenManager()
+ 
+        installationManager.isInstalled = true
+        bitwardenManager.status = .approachable
+
+        let viewModel = ConnectBitwardenViewModel(bitwardenInstallationService: installationManager, bitwardenManager: bitwardenManager)
+        
+        XCTAssertFalse(bitwardenManager.handshakeSent)
+        
+        XCTAssertEqual(viewModel.viewState, .disclaimer)
+        viewModel.process(action: .confirm)
+        XCTAssertEqual(viewModel.viewState, .connectToBitwarden)
+        viewModel.process(action: .confirm)
+        
+        XCTAssertTrue(bitwardenManager.handshakeSent)
+    }
+    
     func testWhenViewModelReceivesConnectStateFromManager_ThenViewStateIsConnectedToBitwarden() {
         let installationManager = MockBitwardenInstallationManager()
         let bitwardenManager = MockBitwardenManager()
