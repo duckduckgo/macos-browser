@@ -116,7 +116,6 @@ export function execCleanups(cleanups) {
         if (typeof cleanup.fn === "function") {
             try {
                 cleanup.fn();
-                console.log("🧹 cleanup '%s' was successfully executed", cleanup.name)
             } catch (e) {
                 console.error(`cleanup ${cleanup.name} threw`, e)
             }
@@ -135,7 +134,6 @@ export function applyEffect(name, fn, storage) {
     let cleanup;
     try {
         cleanup = fn();
-        console.log(`☢️ side effect '%s' executed`, name)
     } catch (e) {
         console.error('%s threw an error', name, e);
     }

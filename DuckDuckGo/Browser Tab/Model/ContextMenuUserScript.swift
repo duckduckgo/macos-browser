@@ -65,6 +65,9 @@ final class ContextMenuUserScript: NSObject, StaticUserScript {
 
             case "IMG":
                 image = URL(string: url)
+                
+            case "VIDEO":
+                link = URL(string: url)
 
             default: break
             }
@@ -126,6 +129,14 @@ final class ContextMenuUserScript: NSObject, StaticUserScript {
                 context.elements.push({
                     "tagName": "IMG",
                     "url": e.srcElement.src
+                });
+            }
+
+            if (e.srcElement.tagName === "VIDEO") {
+                console.log("Got video");
+                context.elements.push({
+                    "tagName": "VIDEO",
+                    "url": e.srcElement.currentSrc
                 });
             }
 

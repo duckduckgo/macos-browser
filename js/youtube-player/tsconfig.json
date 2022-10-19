@@ -15,7 +15,7 @@
     "strictNullChecks": true,
     "maxNodeModuleJsDepth": 0
   },
-  "files": [
+  "include": [
     "youtube-inject.js",
     "types.d.ts",
   ],

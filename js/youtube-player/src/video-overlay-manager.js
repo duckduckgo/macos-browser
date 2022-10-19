@@ -18,7 +18,7 @@ export class VideoOverlayManager {
     /**
      * @param {import("../youtube-inject").UserValues} userValues
      * @param {{getHref(): string, getLargeThumbnailSrc(videoId: string): string, setHref(href: string): void}} environment
-     * @param {import("./comms.js").macOSCommunications} comms
+     * @param {import("./comms").MacOSCommunications} comms
      */
     constructor(userValues, environment, comms) {
         this.userValues = userValues;
@@ -112,6 +112,14 @@ export class VideoOverlayManager {
         const params = VideoParams.forWatchPage(this.environment.getHref());
 
         if (!params) {
+            /**
+             * If we've shown a video before, but now we don't have a valid ID,
+             * it's likely a 'back' navigation by the user, so we should always try to remove all overlays
+             */
+            if (this.lastVideoId) {
+                this.removeAllOverlays();
+                this.lastVideoId = null;
+            }
             return;
         }
 
@@ -125,7 +133,6 @@ export class VideoOverlayManager {
             const playerElement = document.querySelector('#player');
 
             if (!playerElement) {
-                // console.log("📎 video not found")
                 return null
             }
 
@@ -153,9 +160,6 @@ export class VideoOverlayManager {
                     this.addSmallDaxOverlay(params)
                 }
             }
-            if ('disabled' in userValues.privatePlayerMode) {
-                // console.log("do nothing");
-            }
         }
     }
 
@@ -175,8 +179,6 @@ export class VideoOverlayManager {
                 const prevOverlayElement = document.querySelector(DDGVideoOverlay.CUSTOM_TAG_NAME);
                 if (prevOverlayElement) {
                     prevOverlayElement.parentNode?.removeChild?.(prevOverlayElement);
-                } else {
-                    console.log("exists, but disconnected");
                 }
             }
         })
@@ -206,10 +208,8 @@ export class VideoOverlayManager {
                 clearInterval(int)
 
                 if (videoElement?.isConnected) {
-                    console.log("▶️ called on original video element");
                     videoElement.play();
                 } else {
-                    console.log("▶️ trying to call 'play()' on newly queried element");
                     const video = document.querySelector('#player video');
                     if (video instanceof HTMLVideoElement) {
                         video.play();
@@ -239,7 +239,7 @@ export class VideoOverlayManager {
             overlayInteracted: false,
             privatePlayerMode,
         };
-        this.userChoice(outgoing)
+        this.comms.setUserValues(outgoing)
             .then(() => this.environment.setHref(params.toPrivatePlayerUrl()))
             .catch(e => console.error("error setting user choice", e))
     }
@@ -259,7 +259,7 @@ export class VideoOverlayManager {
         if (remember) {
             /** @type {import("../youtube-inject.js").UserValues['privatePlayerMode']} */
             let privatePlayerMode = {alwaysAsk: {}};
-            this.userChoice({
+            this.comms.setUserValues({
                 privatePlayerMode: privatePlayerMode,
                 overlayInteracted: true
             })
@@ -270,20 +270,6 @@ export class VideoOverlayManager {
             this.removeAllOverlays();
             this.addSmallDaxOverlay(params)
         }
-    }
-
-    /**
-     * Record the users choice
-     * @param {import("../youtube-inject.js").UserValues} userValues
-     * @returns {Promise<import("../youtube-inject").UserValues>}
-     */
-    userChoice(userValues) {
-        return this.comms.setUserValues(userValues)
-            .then((userValues) => {
-                console.log("interacted flag set, now cleanup");
-                return userValues;
-            })
-            .catch(e => console.error("could not set interacted after user opt out", e))
     }
 
     /** @type {{fn: () => void, name: string}[]} */

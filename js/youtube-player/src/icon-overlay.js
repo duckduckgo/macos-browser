@@ -60,6 +60,19 @@ class DDGIconOverlay extends HTMLElement {
 
         overlayElement.querySelector('a.ddg-play-privately')?.setAttribute('href', this.href);
 
+        overlayElement.querySelector('a.ddg-play-privately')?.addEventListener('click', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+
+            // @ts-ignore
+            let link = event.target.closest('a');
+            let href = link.getAttribute('href');
+
+            IconOverlay.comms?.openInDuckPlayerViaMessage(href);
+
+            return;
+        });
+
         return overlayElement;
     }
 
@@ -90,6 +103,17 @@ export const IconOverlay = {
     currentVideoElement: null,
     hoverOverlayVisible: false,
 
+    /**
+     * @type {import("./comms.js").MacOSCommunications | null}
+     */
+    comms: null,
+    /**
+     * // todo: when this is a class, pass this as a constructor arg
+     * @param {import("./comms.js").MacOSCommunications} comms
+     */
+    setComms(comms) {
+        IconOverlay.comms = comms;
+    },
     /**
      * Creates an Icon Overlay.
      * @param {string} size - currently kind-of unused
@@ -126,39 +150,46 @@ export const IconOverlay = {
     moveHoverOverlayToVideoElement: (videoElement) => {
         let overlay = IconOverlay.getHoverOverlay();
 
-        if (overlay !== null) {
-            let offset = (el) => {
-                const box = el.getBoundingClientRect();
-                const docElem = document.documentElement;
-                return {
-                    top: box.top + window.pageYOffset - docElem.clientTop,
-                    left: box.left + window.pageXOffset - docElem.clientLeft,
-                };
-            }
-
-            let videoElementOffset = offset(videoElement);
-
-            overlay.setAttribute('style', '' +
-                'top: ' + videoElementOffset.top + 'px;' +
-                'left: ' + videoElementOffset.left + 'px;' +
-                'display:block;'+
-                'position:absolute;'
-            );
-
-            overlay.setAttribute('data-size', 'fixed ' + IconOverlay.getThumbnailSize(videoElement));
-
-            const href = videoElement.getAttribute('href');
-
-            if (href) {
-                const privateUrl = VideoParams.fromPathname(href)?.toPrivatePlayerUrl();
-                if (overlay && privateUrl) {
-                    overlay.setAttribute('href', privateUrl);
-                }
-            }
-
-            IconOverlay.hoverOverlayVisible = true;
-            IconOverlay.currentVideoElement = videoElement;
+        if (overlay === null) {
+            return;
         }
+
+        let videoElementOffset = IconOverlay.getElementOffset(videoElement);
+
+        overlay.setAttribute('style', '' +
+            'top: ' + videoElementOffset.top + 'px;' +
+            'left: ' + videoElementOffset.left + 'px;' +
+            'display:block;'+
+            'position:absolute;'
+        );
+
+        overlay.setAttribute('data-size', 'fixed ' + IconOverlay.getThumbnailSize(videoElement));
+
+        const href = videoElement.getAttribute('href');
+
+        if (href) {
+            const privateUrl = VideoParams.fromPathname(href)?.toPrivatePlayerUrl();
+            if (overlay && privateUrl) {
+                overlay.setAttribute('href', privateUrl);
+            }
+        }
+
+        IconOverlay.hoverOverlayVisible = true;
+        IconOverlay.currentVideoElement = videoElement;
+    },
+
+    /**
+     * Return the offset of an HTML Element
+     * @param {HTMLElement} el
+     * @returns {Object}
+     */
+    getElementOffset: (el) => {
+        const box = el.getBoundingClientRect();
+        const docElem = document.documentElement;
+        return {
+            top: box.top + window.pageYOffset - docElem.clientTop,
+            left: box.left + window.pageXOffset - docElem.clientLeft,
+        };
     },
 
     /**

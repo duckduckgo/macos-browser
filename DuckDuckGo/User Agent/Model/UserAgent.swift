@@ -18,6 +18,7 @@
 
 import Foundation
 import BrowserServicesKit
+import Common
 
 enum UserAgent {
 
@@ -70,7 +71,7 @@ enum UserAgent {
     static func duckDuckGoUserAgent(appVersion: String = AppVersion.shared.versionNumber,
                                     appID: String = AppVersion.shared.identifier,
                                     systemVersion: String = ProcessInfo.processInfo.operatingSystemVersionString) -> String {
-        return "ddg_macos/\(appVersion) (\(appID); macOS \(systemVersion))"
+        return "ddg_mac/\(appVersion) (\(appID); macOS \(systemVersion))"
     }
 
     static func `for`(_ url: URL?) -> String {

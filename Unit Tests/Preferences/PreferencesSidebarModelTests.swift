@@ -31,7 +31,7 @@ final class PreferencesSidebarModelTests: XCTestCase {
 
     func testWhenInitializedThenFirstPaneInFirstSectionIsSelected() throws {
         let sections: [PreferencesSection] = [.init(id: .regularPreferencePanes, panes: [.appearance, .downloads, .autofill])]
-        let model = PreferencesSidebarModel(sections: sections)
+        let model = PreferencesSidebarModel(loadSections: sections)
 
         XCTAssertEqual(model.selectedPane, .appearance)
     }
@@ -48,7 +48,7 @@ final class PreferencesSidebarModelTests: XCTestCase {
 
     func testWhenSelectPaneIsCalledWithTheSamePaneThenEventIsNotPublished() throws {
         let sections: [PreferencesSection] = [.init(id: .regularPreferencePanes, panes: [.appearance])]
-        let model = PreferencesSidebarModel(sections: sections)
+        let model = PreferencesSidebarModel(loadSections: sections)
 
         var selectedPaneUpdates = [PreferencePaneIdentifier]()
         model.$selectedPane.dropFirst()
@@ -63,7 +63,7 @@ final class PreferencesSidebarModelTests: XCTestCase {
 
     func testWhenSelectPaneIsCalledWithNonexistentPaneThenItHasNoEffect() throws {
         let sections: [PreferencesSection] = [.init(id: .regularPreferencePanes, panes: [.appearance, .downloads])]
-        let model = PreferencesSidebarModel(sections: sections)
+        let model = PreferencesSidebarModel(loadSections: sections)
 
         model.selectPane(.general)
         XCTAssertEqual(model.selectedPane, .appearance)
@@ -72,7 +72,7 @@ final class PreferencesSidebarModelTests: XCTestCase {
     func testWhenSelectedTabIndexIsChangedThenSelectedPaneIsNotAffected() throws {
         let sections: [PreferencesSection] = [.init(id: .regularPreferencePanes, panes: [.general, .appearance, .downloads, .autofill])]
         let tabs: [Tab.TabContent] = [.anyPreferencePane, .bookmarks]
-        let model = PreferencesSidebarModel(sections: sections, tabSwitcherTabs: tabs)
+        let model = PreferencesSidebarModel(loadSections: sections, tabSwitcherTabs: tabs)
 
         var selectedPaneUpdates = [PreferencePaneIdentifier]()
         model.$selectedPane.dropFirst()

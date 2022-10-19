@@ -2,7 +2,7 @@ import css from "./assets/global-styles.css";
 import {VideoOverlayManager} from "./src/video-overlay-manager.js";
 import {IconOverlay} from "./src/icon-overlay.js";
 import {onDOMLoaded, onDOMChanged, addTrustedEventListener, appendElement, VideoParams} from "./src/util.js";
-import {macOSCommunications} from "./src/comms";
+import {MacOSCommunications} from "./src/comms";
 
 /**
  * @typedef UserValues - A way to communicate some user state
@@ -10,6 +10,7 @@ import {macOSCommunications} from "./src/comms";
  * @property {boolean} overlayInteracted - always a boolean
  */
 
+// const defaultEnvironment =  window.env || {
 const defaultEnvironment = {
     getHref() {
         return window.location.href
@@ -26,22 +27,25 @@ const defaultEnvironment = {
     }
 }
 
-const defaultComms = macOSCommunications;
+const macos = MacOSCommunications.fromInjectedConfig(
+    // @ts-ignore
+    $WebkitMessagingConfig$
+)
 
 if (defaultEnvironment.enabled()) {
-    initWithEnvironment(defaultEnvironment, defaultComms)
+    initWithEnvironment(defaultEnvironment, macos)
 }
 
 /**
  * @param {typeof defaultEnvironment} environment - methods to read environment-sensitive things like the current URL etc
- * @param {macOSCommunications } [comms] - methods to communicate with a native backend
+ * @param {MacOSCommunications} comms - methods to communicate with a native backend
  */
 function initWithEnvironment(environment, comms) {
 
     /**
      * Entry point. Until this returns with initial user values, we cannot continue.
      */
-    defaultComms.readUserValues()
+    comms.readUserValues()
         .then((userValues) => enable(userValues))
         .catch(e => console.error(e))
 
@@ -53,20 +57,25 @@ function initWithEnvironment(environment, comms) {
         const videoPlayerOverlay = new VideoOverlayManager(userValues, environment, comms);
         videoPlayerOverlay.handleFirstPageLoad();
 
-        defaultComms.onUserValuesNotification((userValues) => {
-            console.log("got new values after zero", userValues)
+        // give access to macos communications
+        // todo: make this a class + constructor arg
+        IconOverlay.setComms(comms);
 
-            if (userValues.privatePlayerMode.disabled || userValues.privatePlayerMode.enabled) {
-                AllIconOverlays.disable();
-            }
-
-            if (userValues.privatePlayerMode.alwaysAsk) {
-                AllIconOverlays.enable();
-            }
-
+        comms.onUserValuesNotification((userValues) => {
             videoPlayerOverlay.userValues = userValues;
             videoPlayerOverlay.watchForVideoBeingAdded({ via: "user notification", ignoreCache: true });
-        });
+
+            if (userValues.privatePlayerMode.disabled) {
+                AllIconOverlays.disable();
+                OpenInDuckPlayer.disable();
+            } else if (userValues.privatePlayerMode.enabled) {
+                AllIconOverlays.disable();
+                OpenInDuckPlayer.enable();
+            } else if (userValues.privatePlayerMode.alwaysAsk) {
+                AllIconOverlays.enable();
+                OpenInDuckPlayer.disable();
+            }
+        }, userValues);
 
         const CSS = {
             styles: css,
@@ -75,12 +84,21 @@ function initWithEnvironment(environment, comms) {
              */
             init: () => {
                 let style = document.createElement("style");
-                style.innerText = CSS.styles;
+                style.textContent = CSS.styles;
                 appendElement(document.head, style);
             }
         }
 
         const VideoThumbnail = {
+            hoverBoundElements: new WeakMap(),
+
+            isSingleVideoURL: (href) => {
+                return href && (
+                    (href.includes('/watch?v=') && !href.includes('&list=')) ||
+                    (href.includes('/watch?v=') && href.includes('&list=') && href.includes('&index='))
+                ) && !href.includes('&pp=') //exclude movies for rent
+            },
+
             /**
              * Find all video thumbnails on the page
              * @returns {array} array of videoElement(s)
@@ -88,10 +106,7 @@ function initWithEnvironment(environment, comms) {
             findAll: () => {
                 const linksToVideos = item => {
                     let href = item.getAttribute('href');
-                    return href && (
-                        (href.includes('/watch?v=') && !href.includes('&list=')) ||
-                        (href.includes('/watch?v=') && href.includes('&list=') && href.includes('&index='))
-                    ) && !href.includes('&pp=') //exclude movies for rent
+                    return VideoThumbnail.isSingleVideoURL(href);
                 }
 
                 const linksWithImages = item => {
@@ -108,7 +123,12 @@ function initWithEnvironment(environment, comms) {
                     return linksInVideoPreview.indexOf(item) === -1;
                 }
 
+                const linksNotAlreadyBound = item => {
+                    return !VideoThumbnail.hoverBoundElements.has(item);
+                }
+
                 return Array.from(document.querySelectorAll('a[href^="/watch?v="]'))
+                    .filter(linksNotAlreadyBound)
                     .filter(linksToVideos)
                     .filter(linksWithoutSubLinks)
                     .filter(linksNotInVideoPreview)
@@ -126,6 +146,8 @@ function initWithEnvironment(environment, comms) {
                     });
 
                     addTrustedEventListener(video, 'mouseout', IconOverlay.hideHoverOverlay);
+
+                    VideoThumbnail.hoverBoundElements.set(video, true);
                 }
             },
 
@@ -263,9 +285,84 @@ function initWithEnvironment(environment, comms) {
             }
         };
 
+        const OpenInDuckPlayer = {
+            clickBoundElements: new Map(),
+            enabled: false,
+
+            bindEventsToAll: () => {
+                if (!OpenInDuckPlayer.enabled) {
+                    return;
+                }
+
+                let videoLinksAndPreview = Array.from(document.querySelectorAll('a[href^="/watch?v="], #media-container-link')),
+                    isValidVideoLinkOrPreview = (element) => {
+                        return VideoThumbnail.isSingleVideoURL(element?.getAttribute('href')) ||
+                            element.getAttribute('id') === 'media-container-link';
+                    },
+                    excludeAlreadyBound = (element) => !OpenInDuckPlayer.clickBoundElements.has(element);
+
+                videoLinksAndPreview
+                    .filter(excludeAlreadyBound)
+                    .forEach(element => {
+                        if (isValidVideoLinkOrPreview(element)) {
+
+                            let onClickOpenDuckPlayer = (event) => {
+                                event.preventDefault();
+                                event.stopPropagation();
+
+                                let link = event.target.closest('a');
+
+                                if (link) {
+                                    const href = VideoParams.fromHref(link.href)?.toPrivatePlayerUrl();
+                                    comms.openInDuckPlayerViaMessage(href);
+                                }
+
+                                return false;
+                            };
+
+                            element.addEventListener('click', onClickOpenDuckPlayer, true);
+
+                            OpenInDuckPlayer.clickBoundElements.set(element, onClickOpenDuckPlayer);
+                        }
+                    });
+            },
+
+            disable: () => {
+                OpenInDuckPlayer.clickBoundElements.forEach((functionToRemove, element) => {
+                    element.removeEventListener('click', functionToRemove, true);
+                    OpenInDuckPlayer.clickBoundElements.delete(element);
+                });
+
+                OpenInDuckPlayer.enabled = false;
+            },
+
+            enable: () => {
+                OpenInDuckPlayer.enabled = true;
+                OpenInDuckPlayer.bindEventsToAll();
+
+                onDOMChanged(() => {
+                    OpenInDuckPlayer.bindEventsToAll();
+                });
+            },
+
+            enableOnDOMLoaded: () => {
+                OpenInDuckPlayer.enabled = true;
+
+                onDOMLoaded(() => {
+                    OpenInDuckPlayer.bindEventsToAll();
+
+                    onDOMChanged(() => {
+                        OpenInDuckPlayer.bindEventsToAll();
+                    });
+                });
+            }
+        };
+
         // Enable icon overlays on page load if not explicitly disabled
         if ('alwaysAsk' in userValues.privatePlayerMode) {
             AllIconOverlays.enableOnDOMLoaded();
+        } else if ('enabled' in userValues.privatePlayerMode) {
+            OpenInDuckPlayer.enableOnDOMLoaded();
         }
     }
 }

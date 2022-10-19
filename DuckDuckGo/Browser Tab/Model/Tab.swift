@@ -153,6 +153,11 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             autofillScript?.currentOverlayTab = delegate
         }
     }
+    
+    var isPinned: Bool {
+        return pinnedTabsManager.isTabPinned(self)
+    }
+    
     private let cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter?
     private let pinnedTabsManager: PinnedTabsManager
     private let privatePlayer: PrivatePlayer
@@ -208,6 +213,9 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
         initAttributionLogic(state: attributionState ?? parentTab?.adClickAttributionLogic.state)
         setupWebView(shouldLoadInBackground: shouldLoadInBackground)
+        if favicon == nil {
+            handleFavicon()
+        }
 
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(onDuckDuckGoEmailSignOut),
@@ -228,6 +236,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         }
         webView.stopLoading()
         webView.stopMediaCapture()
+        webView.stopAllMediaPlayback()
         webView.fullscreenWindowController?.close()
         userContentController.removeAllUserScripts()
 
@@ -266,7 +275,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
     @Published private(set) var content: TabContent {
         didSet {
-            handleFavicon(oldContent: oldValue)
+            handleFavicon()
             invalidateSessionStateData()
             if let oldUrl = oldValue.url {
                 historyCoordinating.commitChanges(url: oldUrl)
@@ -710,13 +719,13 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     @Published var favicon: NSImage?
     let faviconManagement: FaviconManagement
 
-    private func handleFavicon(oldContent: TabContent) {
-        guard faviconManagement.areFaviconsLoaded else { return }
-
+    private func handleFavicon() {
         if content.isPrivatePlayer {
             favicon = .privatePlayer
             return
         }
+
+        guard faviconManagement.areFaviconsLoaded else { return }
 
         guard content.isUrl, let url = content.url else {
             favicon = nil
@@ -776,8 +785,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             return
         }
 
-        guard url != .homePage else { return }
-
         // Add to global history
         historyCoordinating.addVisit(of: url)
 
@@ -798,13 +805,22 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     private var youtubePlayerCancellables: Set<AnyCancellable> = []
 
     func setUpYoutubeScriptsIfNeeded() {
-        guard PrivatePlayer.isAvailable else {
+        guard PrivatePlayer.shared.isAvailable else {
             return
         }
 
         youtubePlayerCancellables.removeAll()
 
-        if webView.url?.host?.droppingWwwPrefix() == "youtube.com" {
+        // only send push updates on macOS 11+ where it's safe to call window.* messages in the browser
+        let canPushMessagesToJS: Bool = {
+            if #available(macOS 11, *) {
+                return true
+            } else {
+                return false
+            }
+        }()
+
+        if webView.url?.host?.droppingWwwPrefix() == "youtube.com" && canPushMessagesToJS {
             privatePlayer.$mode
                 .dropFirst()
                 .sink { [weak self] playerMode in
@@ -812,8 +828,8 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                         return
                     }
                     let userValues = YoutubeOverlayUserScript.UserValues(
-                            privatePlayerMode: playerMode,
-                            overlayInteracted: self.privatePlayer.overlayInteracted
+                        privatePlayerMode: playerMode,
+                        overlayInteracted: self.privatePlayer.overlayInteracted
                     )
                     self.youtubeOverlayScript?.userValuesUpdated(userValues: userValues, inWebView: self.webView)
                 }
@@ -822,15 +838,18 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
         if url?.isPrivatePlayerScheme == true {
             youtubePlayerScript?.isEnabled = true
-            privatePlayer.$mode
-                .map { $0 == .enabled }
-                .sink { [weak self] shouldAlwaysOpenPrivatePlayer in
-                    guard let self = self else {
-                        return
+
+            if canPushMessagesToJS {
+                privatePlayer.$mode
+                    .map { $0 == .enabled }
+                    .sink { [weak self] shouldAlwaysOpenPrivatePlayer in
+                        guard let self = self else {
+                            return
+                        }
+                        self.youtubePlayerScript?.setAlwaysOpenInPrivatePlayer(shouldAlwaysOpenPrivatePlayer, inWebView: self.webView)
                     }
-                    self.youtubePlayerScript?.setAlwaysOpenInPrivatePlayer(shouldAlwaysOpenPrivatePlayer, inWebView: self.webView)
-                }
-                .store(in: &youtubePlayerCancellables)
+                    .store(in: &youtubePlayerCancellables)
+            }
         } else {
             youtubePlayerScript?.isEnabled = false
         }
@@ -892,6 +911,7 @@ extension Tab: UserContentControllerDelegate {
         userScripts.hoverUserScript.delegate = self
         userScripts.autoconsentUserScript?.delegate = self
         youtubeOverlayScript = userScripts.youtubeOverlayScript
+        youtubeOverlayScript?.delegate = self
         youtubePlayerScript = userScripts.youtubePlayerUserScript
         setUpYoutubeScriptsIfNeeded()
 
@@ -1158,10 +1178,6 @@ extension Tab: WKNavigationDelegate {
                  completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
         webViewDidReceiveChallengePublisher.send()
 
-        if let url = webView.url, EmailUrls().shouldAuthenticateWithEmailCredentials(url: url) {
-            completionHandler(.useCredential, URLCredential(user: "dax", password: "qu4ckqu4ck!", persistence: .none))
-            return
-        }
         if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodHTTPBasic,
            let delegate = delegate {
             delegate.tab(self, requestedBasicAuthenticationChallengeWith: challenge.protectionSpace, completionHandler: completionHandler)
@@ -1180,7 +1196,7 @@ extension Tab: WKNavigationDelegate {
 
     func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
         isBeingRedirected = false
-        if let url = webView.url {
+        if content.isUrl, let url = webView.url {
             addVisit(of: url)
         }
         webViewDidCommitNavigationPublisher.send()
@@ -1605,6 +1621,19 @@ extension Tab: AutoconsentUserScriptDelegate {
     
     func autoconsentUserScriptPromptUserForConsent(_ result: @escaping (Bool) -> Void) {
         delegate?.tab(self, promptUserForCookieConsent: result)
+    }
+}
+
+extension Tab: YoutubeOverlayUserScriptDelegate {
+    func youtubeOverlayUserScriptDidRequestDuckPlayer(with url: URL) {
+        let content = Tab.TabContent.contentFromURL(url)
+        let isRequestingNewTab = NSApp.isCommandPressed
+        if isRequestingNewTab {
+            let shouldSelectNewTab = NSApp.isShiftPressed
+            self.delegate?.tab(self, requestedNewTabWith: content, selected: shouldSelectNewTab)
+        } else {
+            setContent(content)
+        }
     }
 }
 

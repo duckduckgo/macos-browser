@@ -17,7 +17,32 @@
 //
 
 import XCTest
+import BrowserServicesKit
+import Combine
 @testable import DuckDuckGo_Privacy_Browser
+
+private class MockPrivacyConfiguration: PrivacyConfiguration {
+    var identifier: String = "MockPrivacyConfiguration"
+    var userUnprotectedDomains: [String] = []
+    var tempUnprotectedDomains: [String] = []
+    var trackerAllowlist: PrivacyConfigurationData.TrackerAllowlistData = [:]
+
+    func exceptionsList(forFeature featureKey: PrivacyFeature) -> [String] { [] }
+    func isEnabled(featureKey: PrivacyFeature, versionProvider: AppVersionProvider) -> Bool { true }
+    func isFeature(_ feature: PrivacyFeature, enabledForDomain: String?) -> Bool { true }
+    func isProtected(domain: String?) -> Bool { true }
+    func isUserUnprotected(domain: String?) -> Bool { false }
+    func isTempUnprotected(domain: String?) -> Bool { false }
+    func isInExceptionList(domain: String?, forFeature featureKey: PrivacyFeature) -> Bool { false }
+    func settings(for feature: PrivacyFeature) -> PrivacyConfigurationData.PrivacyFeature.FeatureSettings { [:] }
+    func userEnabledProtection(forDomain: String) {}
+    func userDisabledProtection(forDomain: String) {}
+}
+
+private class MockPrivacyConfigurationManager: PrivacyConfigurationManaging {
+    var updatesPublisher: AnyPublisher<Void, Never> = Just(()).eraseToAnyPublisher()
+    var privacyConfig: PrivacyConfiguration = MockPrivacyConfiguration()
+}
 
 final class PrivatePlayerTests: XCTestCase {
 
@@ -25,7 +50,10 @@ final class PrivatePlayerTests: XCTestCase {
 
     override func setUpWithError() throws {
         try super.setUpWithError()
-        privatePlayer = PrivatePlayer(preferences: .init(persistor: PrivatePlayerPreferencesPersistorMock()))
+        privatePlayer = PrivatePlayer(
+            preferences: .init(persistor: PrivatePlayerPreferencesPersistorMock()),
+            privacyConfigurationManager: MockPrivacyConfigurationManager()
+        )
     }
 
     func testThatImageForFaviconViewReturnsHardcodedFaviconForDuckPlayer() {

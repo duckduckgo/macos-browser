@@ -18,6 +18,7 @@
 
 import Foundation
 import BrowserServicesKit
+import Common
 
 private typealias URLPatterns = [String: [NSRegularExpression]]
 

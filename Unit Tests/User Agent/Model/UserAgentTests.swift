@@ -45,7 +45,7 @@ final class UserAgentTests: XCTestCase {
         let systemVersion = "system_version"
         let userAgent = UserAgent.duckDuckGoUserAgent(appVersion: appVersion, appID: appID, systemVersion: systemVersion)
         
-        XCTAssertEqual(userAgent, "ddg_macos/\(appVersion) (\(appID); macOS \(systemVersion))")
+        XCTAssertEqual(userAgent, "ddg_mac/\(appVersion) (\(appID); macOS \(systemVersion))")
     }
 
 }

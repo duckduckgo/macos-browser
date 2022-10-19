@@ -87,7 +87,6 @@
       if (typeof cleanup.fn === "function") {
         try {
           cleanup.fn();
-          console.log("\u{1F9F9} cleanup '%s' was successfully executed", cleanup.name);
         } catch (e) {
           console.error(`cleanup ${cleanup.name} threw`, e);
         }
@@ -100,7 +99,6 @@
     let cleanup;
     try {
       cleanup = fn();
-      console.log(`\u2622\uFE0F side effect '%s' executed`, name);
     } catch (e) {
       console.error("%s threw an error", name, e);
     }
@@ -224,6 +222,14 @@
                 </div>
             </a>`;
       overlayElement.querySelector("a.ddg-play-privately")?.setAttribute("href", this.href);
+      overlayElement.querySelector("a.ddg-play-privately")?.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        let link = event.target.closest("a");
+        let href = link.getAttribute("href");
+        IconOverlay.comms?.openInDuckPlayerViaMessage(href);
+        return;
+      });
       return overlayElement;
     }
     static get observedAttributes() {
@@ -244,6 +250,10 @@
     OVERLAY_CLASS: "ddg-overlay",
     currentVideoElement: null,
     hoverOverlayVisible: false,
+    comms: null,
+    setComms(comms) {
+      IconOverlay.comms = comms;
+    },
     create: (size, href, extraClass) => {
       let el = new DDGIconOverlay(size, href);
       if (size) {
@@ -259,31 +269,32 @@
     },
     moveHoverOverlayToVideoElement: (videoElement) => {
       let overlay = IconOverlay.getHoverOverlay();
-      if (overlay !== null) {
-        let offset = (el) => {
-          const box = el.getBoundingClientRect();
-          const docElem = document.documentElement;
-          return {
-            top: box.top + window.pageYOffset - docElem.clientTop,
-            left: box.left + window.pageXOffset - docElem.clientLeft
-          };
-        };
-        let videoElementOffset = offset(videoElement);
-        overlay.setAttribute(
-          "style",
-          "top: " + videoElementOffset.top + "px;left: " + videoElementOffset.left + "px;display:block;position:absolute;"
-        );
-        overlay.setAttribute("data-size", "fixed " + IconOverlay.getThumbnailSize(videoElement));
-        const href = videoElement.getAttribute("href");
-        if (href) {
-          const privateUrl = VideoParams.fromPathname(href)?.toPrivatePlayerUrl();
-          if (overlay && privateUrl) {
-            overlay.setAttribute("href", privateUrl);
-          }
-        }
-        IconOverlay.hoverOverlayVisible = true;
-        IconOverlay.currentVideoElement = videoElement;
+      if (overlay === null) {
+        return;
       }
+      let videoElementOffset = IconOverlay.getElementOffset(videoElement);
+      overlay.setAttribute(
+        "style",
+        "top: " + videoElementOffset.top + "px;left: " + videoElementOffset.left + "px;display:block;position:absolute;"
+      );
+      overlay.setAttribute("data-size", "fixed " + IconOverlay.getThumbnailSize(videoElement));
+      const href = videoElement.getAttribute("href");
+      if (href) {
+        const privateUrl = VideoParams.fromPathname(href)?.toPrivatePlayerUrl();
+        if (overlay && privateUrl) {
+          overlay.setAttribute("href", privateUrl);
+        }
+      }
+      IconOverlay.hoverOverlayVisible = true;
+      IconOverlay.currentVideoElement = videoElement;
+    },
+    getElementOffset: (el) => {
+      const box = el.getBoundingClientRect();
+      const docElem = document.documentElement;
+      return {
+        top: box.top + window.pageYOffset - docElem.clientTop,
+        left: box.left + window.pageXOffset - docElem.clientLeft
+      };
     },
     repositionHoverOverlay: () => {
       if (IconOverlay.currentVideoElement && IconOverlay.hoverOverlayVisible) {
@@ -390,7 +401,7 @@
   };
 
   // assets/video-overlay.css
-  var video_overlay_default = '/* -- VIDEO PLAYER OVERLAY */\n:host {\n    outline: 10px solid red;\n    position: absolute;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n    color: white;\n    z-index: 10000;\n}\n.ddg-video-player-overlay {\n    font-family: system, -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";\n    font-size: 13px;\n    font-weight: 400;\n    line-height: 16px;\n    text-align: center;\n\n    position: absolute;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n    color: white;\n    z-index: 10000;\n}\n\n.ddg-eyeball svg {\n    width: 60px;\n    height: 60px;\n}\n\n.ddg-vpo-bg {\n    position: absolute;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n    color: white;\n    text-align: center;\n    background: black;\n}\n\n.ddg-vpo-bg:after {\n    content: " ";\n    position: absolute;\n    display: block;\n    width: 100%;\n    height: 100%;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n    background: rgba(0,0,0,1); /* this gets overriden if the background image can be found */\n    color: white;\n    text-align: center;\n}\n\n.ddg-video-player-overlay[data-thumb-loaded="true"] .ddg-vpo-bg:after {\n    background: rgba(0,0,0,0.75);\n}\n\n.ddg-vpo-content {\n    position: relative;\n    top: 50%;\n    transform: translate(-50%, -50%);\n    left: 50%;\n    max-width: 90%;\n}\n\n.ddg-vpo-eyeball {\n    margin-bottom: 18px;\n}\n\n.ddg-vpo-title {\n    font-size: 22px;\n    font-weight: 400;\n    line-height: 26px;\n    margin-top: 25px;\n}\n\n.ddg-vpo-text {\n    margin-top: 16px;\n    width: 496px;\n    margin-left: auto;\n    margin-right: auto;\n}\n\n.ddg-vpo-text b {\n    font-weight: 600;\n}\n\n.ddg-vpo-buttons {\n    margin-top: 25px;\n}\n.ddg-vpo-buttons > * {\n    display: inline-block;\n    margin: 0;\n    padding: 0;\n}\n\n.ddg-vpo-button {\n    color: white;\n    padding: 9px 16px;\n    font-size: 13px;\n    border-radius: 8px;\n    font-weight: 600;\n    display: inline-block;\n    text-decoration: none;\n}\n\n.ddg-vpo-button + .ddg-vpo-button {\n    margin-left: 10px;\n}\n\n.ddg-vpo-cancel {\n    background: #585b58;\n    border: 0.5px solid rgba(40, 145, 255, 0.05);\n    box-shadow: 0px 0px 0px 0.5px rgba(0, 0, 0, 0.1), 0px 0px 1px rgba(0, 0, 0, 0.05), 0px 1px 1px rgba(0, 0, 0, 0.2), inset 0px 0.5px 0px rgba(255, 255, 255, 0.2), inset 0px 1px 0px rgba(255, 255, 255, 0.05);\n}\n\n.ddg-vpo-open {\n    background: #3969EF;\n    border: 0.5px solid rgba(40, 145, 255, 0.05);\n    box-shadow: 0px 0px 0px 0.5px rgba(0, 0, 0, 0.1), 0px 0px 1px rgba(0, 0, 0, 0.05), 0px 1px 1px rgba(0, 0, 0, 0.2), inset 0px 0.5px 0px rgba(255, 255, 255, 0.2), inset 0px 1px 0px rgba(255, 255, 255, 0.05);\n}\n\n.ddg-vpo-open:hover {\n    background: #1d51e2;\n}\n.ddg-vpo-cancel:hover {\n    cursor: pointer;\n    background: #2f2f2f;\n}\n\n.ddg-vpo-remember {\n}\n.ddg-vpo-remember label {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    margin-top: 25px;\n    cursor: pointer;\n}\n.ddg-vpo-remember input {\n    margin-right: 6px;\n}\n';
+  var video_overlay_default = '/* -- VIDEO PLAYER OVERLAY */\n:host {\n    position: absolute;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n    color: white;\n    z-index: 10000;\n}\n.ddg-video-player-overlay {\n    font-family: system, -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";\n    font-size: 13px;\n    font-weight: 400;\n    line-height: 16px;\n    text-align: center;\n\n    position: absolute;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n    color: white;\n    z-index: 10000;\n}\n\n.ddg-eyeball svg {\n    width: 60px;\n    height: 60px;\n}\n\n.ddg-vpo-bg {\n    position: absolute;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n    color: white;\n    text-align: center;\n    background: black;\n}\n\n.ddg-vpo-bg:after {\n    content: " ";\n    position: absolute;\n    display: block;\n    width: 100%;\n    height: 100%;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n    background: rgba(0,0,0,1); /* this gets overriden if the background image can be found */\n    color: white;\n    text-align: center;\n}\n\n.ddg-video-player-overlay[data-thumb-loaded="true"] .ddg-vpo-bg:after {\n    background: rgba(0,0,0,0.75);\n}\n\n.ddg-vpo-content {\n    position: relative;\n    top: 50%;\n    transform: translate(-50%, -50%);\n    left: 50%;\n    max-width: 90%;\n}\n\n.ddg-vpo-eyeball {\n    margin-bottom: 18px;\n}\n\n.ddg-vpo-title {\n    font-size: 22px;\n    font-weight: 400;\n    line-height: 26px;\n    margin-top: 25px;\n}\n\n.ddg-vpo-text {\n    margin-top: 16px;\n    width: 496px;\n    margin-left: auto;\n    margin-right: auto;\n}\n\n.ddg-vpo-text b {\n    font-weight: 600;\n}\n\n.ddg-vpo-buttons {\n    margin-top: 25px;\n}\n.ddg-vpo-buttons > * {\n    display: inline-block;\n    margin: 0;\n    padding: 0;\n}\n\n.ddg-vpo-button {\n    color: white;\n    padding: 9px 16px;\n    font-size: 13px;\n    border-radius: 8px;\n    font-weight: 600;\n    display: inline-block;\n    text-decoration: none;\n}\n\n.ddg-vpo-button + .ddg-vpo-button {\n    margin-left: 10px;\n}\n\n.ddg-vpo-cancel {\n    background: #585b58;\n    border: 0.5px solid rgba(40, 145, 255, 0.05);\n    box-shadow: 0px 0px 0px 0.5px rgba(0, 0, 0, 0.1), 0px 0px 1px rgba(0, 0, 0, 0.05), 0px 1px 1px rgba(0, 0, 0, 0.2), inset 0px 0.5px 0px rgba(255, 255, 255, 0.2), inset 0px 1px 0px rgba(255, 255, 255, 0.05);\n}\n\n.ddg-vpo-open {\n    background: #3969EF;\n    border: 0.5px solid rgba(40, 145, 255, 0.05);\n    box-shadow: 0px 0px 0px 0.5px rgba(0, 0, 0, 0.1), 0px 0px 1px rgba(0, 0, 0, 0.05), 0px 1px 1px rgba(0, 0, 0, 0.2), inset 0px 0.5px 0px rgba(255, 255, 255, 0.2), inset 0px 1px 0px rgba(255, 255, 255, 0.05);\n}\n\n.ddg-vpo-open:hover {\n    background: #1d51e2;\n}\n.ddg-vpo-cancel:hover {\n    cursor: pointer;\n    background: #2f2f2f;\n}\n\n.ddg-vpo-remember {\n}\n.ddg-vpo-remember label {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    margin-top: 25px;\n    cursor: pointer;\n}\n.ddg-vpo-remember input {\n    margin-right: 6px;\n}\n';
 
   // src/components/ddg-video-overlay.js
   var DDGVideoOverlay = class extends HTMLElement {
@@ -527,6 +538,10 @@
     watchForVideoBeingAdded(opts = {}) {
       const params = VideoParams.forWatchPage(this.environment.getHref());
       if (!params) {
+        if (this.lastVideoId) {
+          this.removeAllOverlays();
+          this.lastVideoId = null;
+        }
         return;
       }
       const conditions = [
@@ -552,8 +567,6 @@
             this.addSmallDaxOverlay(params);
           }
         }
-        if ("disabled" in userValues.privatePlayerMode) {
-        }
       }
     }
     appendOverlayToPage(targetElement, params) {
@@ -564,8 +577,6 @@
           const prevOverlayElement = document.querySelector(DDGVideoOverlay.CUSTOM_TAG_NAME);
           if (prevOverlayElement) {
             prevOverlayElement.parentNode?.removeChild?.(prevOverlayElement);
-          } else {
-            console.log("exists, but disconnected");
           }
         };
       });
@@ -580,10 +591,8 @@
         return () => {
           clearInterval(int);
           if (videoElement?.isConnected) {
-            console.log("\u25B6\uFE0F called on original video element");
             videoElement.play();
           } else {
-            console.log("\u25B6\uFE0F trying to call 'play()' on newly queried element");
             const video = document.querySelector("#player video");
             if (video instanceof HTMLVideoElement) {
               video.play();
@@ -602,12 +611,12 @@
         overlayInteracted: false,
         privatePlayerMode
       };
-      this.userChoice(outgoing).then(() => this.environment.setHref(params.toPrivatePlayerUrl())).catch((e) => console.error("error setting user choice", e));
+      this.comms.setUserValues(outgoing).then(() => this.environment.setHref(params.toPrivatePlayerUrl())).catch((e) => console.error("error setting user choice", e));
     }
     userOptOut(remember, params) {
       if (remember) {
         let privatePlayerMode = { alwaysAsk: {} };
-        this.userChoice({
+        this.comms.setUserValues({
           privatePlayerMode,
           overlayInteracted: true
         }).then((values) => this.userValues = values).then(() => this.watchForVideoBeingAdded({ ignoreCache: true, via: "userOptOut" })).catch((e) => console.error("could not set userChoice for opt-out", e));
@@ -615,12 +624,6 @@
         this.removeAllOverlays();
         this.addSmallDaxOverlay(params);
       }
-    }
-    userChoice(userValues) {
-      return this.comms.setUserValues(userValues).then((userValues2) => {
-        console.log("interacted flag set, now cleanup");
-        return userValues2;
-      }).catch((e) => console.error("could not set interacted after user opt out", e));
     }
     sideEffect(name, fn) {
       applyEffect(name, fn, this._cleanups);
@@ -635,31 +638,192 @@
     }
   };
 
-  // src/comms.js
-  var macOSCommunications = {
-    setUserValues(userValues) {
-      console.log("\u{1F4E4} [outgoing]", userValues);
-      let resp = window.webkit?.messageHandlers?.setUserValues?.postMessage(userValues);
-      if (resp instanceof Promise) {
-        return resp.then((x) => JSON.parse(x)).catch((e) => console.error("could not call setInteracted", e));
+  // src/utils/WebkitMessaging.js
+  var WebkitMessaging = class {
+    constructor(opts) {
+      __publicField(this, "config");
+      this.config = opts;
+      if (!this.config.hasModernWebkitAPI) {
+        captureWebkitHandlers(this.config.webkitMessageHandlerNames);
       }
-      return Promise.reject(resp);
-    },
-    readUserValues() {
-      let resp = window.webkit?.messageHandlers?.readUserValues?.postMessage({});
-      if (resp instanceof Promise) {
-        return resp.then((x) => JSON.parse(x)).catch((e) => console.error("could not call readUserValues", e));
+    }
+    wkSend(handler, data = {}) {
+      if (!(handler in window.webkit.messageHandlers)) {
+        throw new MissingWebkitHandler(`Missing webkit handler: '${handler}'`);
       }
-      return Promise.reject(resp);
-    },
-    onUserValuesNotification(cb) {
-      window.onUserValuesChanged = function(values) {
-        if (!values?.userValuesNotification) {
-          console.error("missing userValuesNotification");
-          return;
+      const outgoing = { ...data, messageHandling: { ...data.messageHandling, secret: this.config.secret } };
+      if (!this.config.hasModernWebkitAPI) {
+        if (!(handler in ddgGlobals.capturedWebkitHandlers)) {
+          throw new Error(`cannot continue, method ${handler} not captured on macos < 11`);
+        } else {
+          return ddgGlobals.capturedWebkitHandlers[handler](outgoing);
         }
-        cb(values.userValuesNotification);
-      };
+      }
+      return window.webkit.messageHandlers[handler].postMessage?.(outgoing);
+    }
+    async wkSendAndWait(handler, data = {}) {
+      if (this.config.hasModernWebkitAPI) {
+        const response = await this.wkSend(handler, data);
+        return ddgGlobals.JSONparse(response || "{}");
+      }
+      try {
+        const randMethodName = createRandMethodName();
+        const key = await createRandKey();
+        const iv = createRandIv();
+        const { ciphertext, tag } = await new ddgGlobals.Promise((resolve) => {
+          generateRandomMethod(randMethodName, resolve);
+          data.messageHandling = {
+            methodName: randMethodName,
+            secret: this.config.secret,
+            key: ddgGlobals.Arrayfrom(key),
+            iv: ddgGlobals.Arrayfrom(iv)
+          };
+          this.wkSend(handler, data);
+        });
+        const cipher = new ddgGlobals.Uint8Array([...ciphertext, ...tag]);
+        const decrypted = await decrypt(cipher, key, iv);
+        return ddgGlobals.JSONparse(decrypted || "{}");
+      } catch (e) {
+        if (e instanceof MissingWebkitHandler) {
+          throw e;
+        } else {
+          console.error("decryption failed", e);
+          console.error(e);
+          return { error: e };
+        }
+      }
+    }
+  };
+  var WebkitMessagingConfig = class {
+    constructor(hasModernWebkitAPI, webkitMessageHandlerNames, secret) {
+      __publicField(this, "hasModernWebkitAPI");
+      __publicField(this, "webkitMessageHandlerNames");
+      __publicField(this, "secret");
+      this.hasModernWebkitAPI = hasModernWebkitAPI;
+      this.webkitMessageHandlerNames = webkitMessageHandlerNames;
+      this.secret = secret;
+    }
+  };
+  var MissingWebkitHandler = class extends Error {
+    constructor(handlerName) {
+      super();
+      __publicField(this, "handlerName");
+      this.handlerName = handlerName;
+    }
+  };
+  var ddgGlobals = {
+    window,
+    encrypt: window.crypto.subtle.encrypt.bind(window.crypto.subtle),
+    decrypt: window.crypto.subtle.decrypt.bind(window.crypto.subtle),
+    generateKey: window.crypto.subtle.generateKey.bind(window.crypto.subtle),
+    exportKey: window.crypto.subtle.exportKey.bind(window.crypto.subtle),
+    importKey: window.crypto.subtle.importKey.bind(window.crypto.subtle),
+    getRandomValues: window.crypto.getRandomValues.bind(window.crypto),
+    TextEncoder,
+    TextDecoder,
+    Uint8Array,
+    Uint16Array,
+    Uint32Array,
+    JSONstringify: window.JSON.stringify,
+    JSONparse: window.JSON.parse,
+    Arrayfrom: window.Array.from,
+    Promise: window.Promise,
+    ObjectDefineProperty: window.Object.defineProperty,
+    addEventListener: window.addEventListener.bind(window),
+    capturedWebkitHandlers: {}
+  };
+  var generateRandomMethod = (randomMethodName, callback) => {
+    ddgGlobals.ObjectDefineProperty(ddgGlobals.window, randomMethodName, {
+      enumerable: false,
+      configurable: true,
+      writable: false,
+      value: (...args) => {
+        callback(...args);
+        delete ddgGlobals.window[randomMethodName];
+      }
+    });
+  };
+  var randomString = () => "" + ddgGlobals.getRandomValues(new ddgGlobals.Uint32Array(1))[0];
+  var createRandMethodName = () => "_" + randomString();
+  var algoObj = { name: "AES-GCM", length: 256 };
+  var createRandKey = async () => {
+    const key = await ddgGlobals.generateKey(algoObj, true, ["encrypt", "decrypt"]);
+    const exportedKey = await ddgGlobals.exportKey("raw", key);
+    return new ddgGlobals.Uint8Array(exportedKey);
+  };
+  var createRandIv = () => ddgGlobals.getRandomValues(new ddgGlobals.Uint8Array(12));
+  var decrypt = async (ciphertext, key, iv) => {
+    const cryptoKey = await ddgGlobals.importKey("raw", key, "AES-GCM", false, ["decrypt"]);
+    const algo = { name: "AES-GCM", iv };
+    let decrypted = await ddgGlobals.decrypt(algo, cryptoKey, ciphertext);
+    let dec = new ddgGlobals.TextDecoder();
+    return dec.decode(decrypted);
+  };
+  function captureWebkitHandlers(handlerNames) {
+    for (let webkitMessageHandlerName of handlerNames) {
+      if (typeof window.webkit.messageHandlers?.[webkitMessageHandlerName]?.postMessage === "function") {
+        ddgGlobals.capturedWebkitHandlers[webkitMessageHandlerName] = window.webkit.messageHandlers[webkitMessageHandlerName].postMessage?.bind(window.webkit.messageHandlers[webkitMessageHandlerName]);
+        delete window.webkit.messageHandlers[webkitMessageHandlerName].postMessage;
+      }
+    }
+  }
+
+  // src/comms.js
+  var MacOSCommunications = class {
+    constructor(messaging) {
+      __publicField(this, "messaging");
+      this.messaging = messaging;
+    }
+    async setUserValues(userValues) {
+      return this.messaging.wkSendAndWait("setUserValues", userValues);
+    }
+    async readUserValues() {
+      return this.messaging.wkSendAndWait("readUserValues", {});
+    }
+    openInDuckPlayerViaMessage(href) {
+      return this.messaging.wkSend("openDuckPlayer", { href });
+    }
+    onUserValuesNotification(cb, initialUserValues) {
+      if (this.messaging.config.hasModernWebkitAPI) {
+        window.onUserValuesChanged = function(values) {
+          if (!values?.userValuesNotification) {
+            console.error("missing userValuesNotification");
+            return;
+          }
+          cb(values.userValuesNotification);
+        };
+      } else {
+        let timeout;
+        let prevMode = Object.keys(initialUserValues.privatePlayerMode)?.[0];
+        let prevInteracted = initialUserValues.overlayInteracted;
+        const poll = () => {
+          clearTimeout(timeout);
+          timeout = setTimeout(async () => {
+            try {
+              const userValues = await this.readUserValues();
+              let nextMode = Object.keys(userValues.privatePlayerMode)?.[0];
+              let nextInteracted = userValues.overlayInteracted;
+              if (nextMode !== prevMode || nextInteracted !== prevInteracted) {
+                prevMode = nextMode;
+                prevInteracted = nextInteracted;
+                cb(userValues);
+              }
+              poll();
+            } catch (e) {
+            }
+          }, 1e3);
+        };
+        poll();
+      }
+    }
+    static fromInjectedConfig(input) {
+      const opts = new WebkitMessagingConfig(
+        input.hasModernWebkitAPI,
+        input.webkitMessageHandlerNames,
+        input.secret
+      );
+      const webkit = new WebkitMessaging(opts);
+      return new MacOSCommunications(webkit);
     }
   };
 
@@ -679,39 +843,49 @@
       return window.location.hostname === "www.youtube.com";
     }
   };
-  var defaultComms = macOSCommunications;
+  var macos = MacOSCommunications.fromInjectedConfig(
+    $WebkitMessagingConfig$
+  );
   if (defaultEnvironment.enabled()) {
-    initWithEnvironment(defaultEnvironment, defaultComms);
+    initWithEnvironment(defaultEnvironment, macos);
   }
   function initWithEnvironment(environment, comms) {
-    defaultComms.readUserValues().then((userValues) => enable(userValues)).catch((e) => console.error(e));
+    comms.readUserValues().then((userValues) => enable(userValues)).catch((e) => console.error(e));
     function enable(userValues) {
       const videoPlayerOverlay = new VideoOverlayManager(userValues, environment, comms);
       videoPlayerOverlay.handleFirstPageLoad();
-      defaultComms.onUserValuesNotification((userValues2) => {
-        console.log("got new values after zero", userValues2);
-        if (userValues2.privatePlayerMode.disabled || userValues2.privatePlayerMode.enabled) {
-          AllIconOverlays.disable();
-        }
-        if (userValues2.privatePlayerMode.alwaysAsk) {
-          AllIconOverlays.enable();
-        }
+      IconOverlay.setComms(comms);
+      comms.onUserValuesNotification((userValues2) => {
         videoPlayerOverlay.userValues = userValues2;
         videoPlayerOverlay.watchForVideoBeingAdded({ via: "user notification", ignoreCache: true });
-      });
+        if (userValues2.privatePlayerMode.disabled) {
+          AllIconOverlays.disable();
+          OpenInDuckPlayer.disable();
+        } else if (userValues2.privatePlayerMode.enabled) {
+          AllIconOverlays.disable();
+          OpenInDuckPlayer.enable();
+        } else if (userValues2.privatePlayerMode.alwaysAsk) {
+          AllIconOverlays.enable();
+          OpenInDuckPlayer.disable();
+        }
+      }, userValues);
       const CSS = {
         styles: global_styles_default,
         init: () => {
           let style = document.createElement("style");
-          style.innerText = CSS.styles;
+          style.textContent = CSS.styles;
           appendElement(document.head, style);
         }
       };
       const VideoThumbnail = {
+        hoverBoundElements: /* @__PURE__ */ new WeakMap(),
+        isSingleVideoURL: (href) => {
+          return href && (href.includes("/watch?v=") && !href.includes("&list=") || href.includes("/watch?v=") && href.includes("&list=") && href.includes("&index=")) && !href.includes("&pp=");
+        },
         findAll: () => {
           const linksToVideos = (item) => {
             let href = item.getAttribute("href");
-            return href && (href.includes("/watch?v=") && !href.includes("&list=") || href.includes("/watch?v=") && href.includes("&list=") && href.includes("&index=")) && !href.includes("&pp=");
+            return VideoThumbnail.isSingleVideoURL(href);
           };
           const linksWithImages = (item) => {
             return item.querySelector("img");
@@ -723,7 +897,10 @@
             let linksInVideoPreview = Array.from(document.querySelectorAll("#preview a"));
             return linksInVideoPreview.indexOf(item) === -1;
           };
-          return Array.from(document.querySelectorAll('a[href^="/watch?v="]')).filter(linksToVideos).filter(linksWithoutSubLinks).filter(linksNotInVideoPreview).filter(linksWithImages);
+          const linksNotAlreadyBound = (item) => {
+            return !VideoThumbnail.hoverBoundElements.has(item);
+          };
+          return Array.from(document.querySelectorAll('a[href^="/watch?v="]')).filter(linksNotAlreadyBound).filter(linksToVideos).filter(linksWithoutSubLinks).filter(linksNotInVideoPreview).filter(linksWithImages);
         },
         bindEvents: (video) => {
           if (video) {
@@ -731,6 +908,7 @@
               IconOverlay.moveHoverOverlayToVideoElement(video);
             });
             addTrustedEventListener(video, "mouseout", IconOverlay.hideHoverOverlay);
+            VideoThumbnail.hoverBoundElements.set(video, true);
           }
         },
         bindEventsToAll: () => {
@@ -822,8 +1000,61 @@
           IconOverlay.removeAll();
         }
       };
+      const OpenInDuckPlayer = {
+        clickBoundElements: /* @__PURE__ */ new Map(),
+        enabled: false,
+        bindEventsToAll: () => {
+          if (!OpenInDuckPlayer.enabled) {
+            return;
+          }
+          let videoLinksAndPreview = Array.from(document.querySelectorAll('a[href^="/watch?v="], #media-container-link')), isValidVideoLinkOrPreview = (element) => {
+            return VideoThumbnail.isSingleVideoURL(element?.getAttribute("href")) || element.getAttribute("id") === "media-container-link";
+          }, excludeAlreadyBound = (element) => !OpenInDuckPlayer.clickBoundElements.has(element);
+          videoLinksAndPreview.filter(excludeAlreadyBound).forEach((element) => {
+            if (isValidVideoLinkOrPreview(element)) {
+              let onClickOpenDuckPlayer = (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                let link = event.target.closest("a");
+                if (link) {
+                  const href = VideoParams.fromHref(link.href)?.toPrivatePlayerUrl();
+                  comms.openInDuckPlayerViaMessage(href);
+                }
+                return false;
+              };
+              element.addEventListener("click", onClickOpenDuckPlayer, true);
+              OpenInDuckPlayer.clickBoundElements.set(element, onClickOpenDuckPlayer);
+            }
+          });
+        },
+        disable: () => {
+          OpenInDuckPlayer.clickBoundElements.forEach((functionToRemove, element) => {
+            element.removeEventListener("click", functionToRemove, true);
+            OpenInDuckPlayer.clickBoundElements.delete(element);
+          });
+          OpenInDuckPlayer.enabled = false;
+        },
+        enable: () => {
+          OpenInDuckPlayer.enabled = true;
+          OpenInDuckPlayer.bindEventsToAll();
+          onDOMChanged(() => {
+            OpenInDuckPlayer.bindEventsToAll();
+          });
+        },
+        enableOnDOMLoaded: () => {
+          OpenInDuckPlayer.enabled = true;
+          onDOMLoaded(() => {
+            OpenInDuckPlayer.bindEventsToAll();
+            onDOMChanged(() => {
+              OpenInDuckPlayer.bindEventsToAll();
+            });
+          });
+        }
+      };
       if ("alwaysAsk" in userValues.privatePlayerMode) {
         AllIconOverlays.enableOnDOMLoaded();
+      } else if ("enabled" in userValues.privatePlayerMode) {
+        OpenInDuckPlayer.enableOnDOMLoaded();
       }
     }
   }

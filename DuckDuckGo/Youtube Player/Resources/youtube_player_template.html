@@ -225,6 +225,16 @@
                 left: 162px;
             }
 
+            .logo .info-tooltip.above {
+                top: -105px;
+                z-index: 50;
+            }
+
+            .logo .info-tooltip.above::after {
+                top: 80px;
+                transform: rotate(225deg);
+            }
+
             .logo .info-tooltip.visible {
                 display: block;
             }
@@ -881,8 +891,30 @@
                  * @param {boolean} show
                  */
                 toggle: (show) => {
+                    Tooltip.tooltip().classList[Tooltip.isCloseToBottom() ? 'add' : 'remove' ]('above');
                     Tooltip.tooltip().classList[show ? 'add' : 'remove' ]('visible');
                     Tooltip.visible = show;
+                },
+
+                /**
+                 * Returns whether tooltip is too close too bottom, used for positioning it above
+                 * the icon when this happens
+                 * @returns {boolean}
+                 */
+                isCloseToBottom: () => {
+                    let icon = Tooltip.icon()
+                    let rect = icon && icon.getBoundingClientRect();
+
+                    if (!rect || !rect.top) {
+                        return false;
+                    }
+
+                    let iconTop = rect.top + window.scrollY;
+                    let spaceBelowIcon = window.innerHeight - iconTop;
+
+                    if (spaceBelowIcon < 125) {
+                        return true;
+                    }
                 },
 
                 /**

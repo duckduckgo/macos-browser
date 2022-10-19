@@ -100,7 +100,7 @@ final class FireTests: XCTestCase {
             finishedBurningExpectation.fulfill()
         }
 
-        waitForExpectations(timeout: 1)
+        waitForExpectations(timeout: 5)
         XCTAssert(manager.clearCalled)
         XCTAssert(historyCoordinator.burnCalled)
         XCTAssert(permissionManager.burnPermissionsCalled)
