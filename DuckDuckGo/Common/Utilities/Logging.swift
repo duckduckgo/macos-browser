@@ -112,7 +112,7 @@ struct Logging {
     fileprivate static let bookmarksLoggingEnabled = false
     fileprivate static let bookmarksLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Bookmarks")
 
-    fileprivate static let bitwardenLoggingEnabled = false
+    fileprivate static let bitwardenLoggingEnabled = true
     fileprivate static let bitwardenLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Bitwarden")
 
 }

@@ -39,6 +39,29 @@ final class ConnectBitwardenViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.viewState, .lookingForBitwarden)
     }
     
+    func testWhenViewModelIsLookingForBitwarden_AndBitwardenIsThenInstalled_ThenViewStateIsBitwardenFound() {
+        let installationManager = MockBitwardenInstallationManager()
+        installationManager.isInstalled = false
+
+        let bitwardenManager = MockBitwardenManager()
+        let viewModel = ConnectBitwardenViewModel(bitwardenInstallationService: installationManager,
+                                                  bitwardenManager: bitwardenManager,
+                                                  bitwardenInstallationCheckInterval: 0.1)
+        
+        XCTAssertEqual(viewModel.viewState, .disclaimer)
+        viewModel.process(action: .confirm)
+        XCTAssertEqual(viewModel.viewState, .lookingForBitwarden)
+        
+        installationManager.isInstalled = true
+        
+        let predicate = NSPredicate { _, _ in
+            return viewModel.viewState == .bitwardenFound
+        }
+
+        let expectation = XCTNSPredicateExpectation(predicate: predicate, object: .none)
+        wait(for: [expectation], timeout: 2.0)
+    }
+    
     func testWhenViewModelIsOnDisclaimer_AndBitwardenIsInstalled_AndNextIsClicked_ThenViewStateIsWaitingForConnectionPermission() {
         let installationManager = MockBitwardenInstallationManager()
         installationManager.isInstalled = true
@@ -49,6 +72,16 @@ final class ConnectBitwardenViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.viewState, .disclaimer)
         viewModel.process(action: .confirm)
         XCTAssertEqual(viewModel.viewState, .waitingForConnectionPermission)
+    }
+    
+    func testWhenClickingOpenBitwardenButton_ThenBitwardenIsOpened() {
+        let installationManager = MockBitwardenInstallationManager()
+        let bitwardenManager = MockBitwardenManager()
+        let viewModel = ConnectBitwardenViewModel(bitwardenInstallationService: installationManager, bitwardenManager: bitwardenManager)
+        
+        XCTAssertFalse(installationManager.bitwardenOpened)
+        viewModel.process(action: .openBitwarden)
+        XCTAssertTrue(installationManager.bitwardenOpened)
     }
 
 }
