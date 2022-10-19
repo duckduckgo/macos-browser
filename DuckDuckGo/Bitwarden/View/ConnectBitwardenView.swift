@@ -21,38 +21,77 @@ import SwiftUI
 
 struct ConnectBitwardenView: View {
     
+    private enum Constants {
+        static let headerPadding = 20.0
+        static let bodyPadding = 20.0
+    }
+
+    struct ViewSize {
+        fileprivate(set) var headerHeight: Double = 0.0
+        fileprivate(set) var viewHeight: Double = 0.0
+        fileprivate(set) var buttonsHeight: Double = 0.0
+        
+        var totalHeight: Double {
+            headerHeight + Constants.headerPadding + viewHeight + Constants.bodyPadding + buttonsHeight
+        }
+    }
+    
     @EnvironmentObject var viewModel: ConnectBitwardenViewModel
     
-    @Binding var viewHeight: Double
+    let sizeChanged: (CGFloat) -> Void
+    
+    @State var viewSize: ViewSize = .init() {
+        didSet {
+            sizeChanged(viewSize.totalHeight)
+        }
+    }
     
     var body: some View {
         VStack {
-            BitwardenTitleView()
-                .padding(.bottom, 20)
+            VStack(spacing: Constants.bodyPadding) {
+                BitwardenTitleView()
+                    .background(
+                        GeometryReader { proxy in
+                            Color.clear.onAppear {
+                                viewSize.headerHeight = proxy.size.height
+                            }
+                        }
+                    )
+                
+                bodyView(for: viewModel.viewState)
+                    .frame(maxWidth: .infinity)
+                    .background(
+                        GeometryReader { proxy in
+                            Color.clear.onAppear {
+                                viewSize.viewHeight = proxy.size.height
+                            }
+                        }
+                    )
+            }
+            .padding(20)
             
-//            switch viewModel.viewState {
-//            case .disclaimer:
-//                ConnectToBitwardenDisclaimerView()
-//            case .lookingForBitwarden:
-//                BitwardenInstallationDetectionView(bitwardenDetected: false)
-//            case .bitwardenFound:
-//                BitwardenInstallationDetectionView(bitwardenDetected: true)
-//            case .waitingForConnectionPermission:
-//                ConnectToBitwardenView(canConnect: false)
-//            case .connectToBitwarden:
-//                ConnectToBitwardenView(canConnect: true)
-//            case .connectedToBitwarden:
-//                ConnectedToBitwardenView()
-//            }
+            Spacer()
             
-            ConnectedToBitwardenView()
-                .frame(maxWidth: .infinity)
+            ButtonsView()
+                .background(
+                    GeometryReader { proxy in
+                        Color.clear.onAppear {
+                            viewSize.buttonsHeight = proxy.size.height
+                        }
+                    }
+                )
         }
-        .padding(20)
-        
-        Spacer()
-        
-        ButtonsView()
+    }
+    
+    @ViewBuilder private func bodyView(for state: ConnectBitwardenViewModel.ViewState) -> some View {
+        switch viewModel.viewState {
+        case .disclaimer: ConnectToBitwardenDisclaimerView()
+        case .lookingForBitwarden: BitwardenInstallationDetectionView(bitwardenDetected: false)
+        case .bitwardenFound: BitwardenInstallationDetectionView(bitwardenDetected: true)
+        case .waitingForConnectionPermission: ConnectToBitwardenView(canConnect: false)
+        case .connectToBitwarden: ConnectToBitwardenView(canConnect: true)
+        case .connectedToBitwarden: ConnectedToBitwardenView()
+        }
     }
     
 }
@@ -116,12 +155,16 @@ private struct BitwardenInstallationDetectionView: View {
                 NumberedBadge(value: 1)
 
                 Text("To begin setup, first install Bitwarden from the App Store.")
+                
+                Spacer()
             }
             
             HStack {
                 NumberedBadge(value: 2)
                 
                 Text("After installing, return to DuckDuckGo to complete the setup.")
+                
+                Spacer()
             }
             
             Button(action: {
@@ -152,6 +195,8 @@ private struct BitwardenInstallationDetectionView: View {
 }
 
 private struct ConnectToBitwardenView: View {
+    
+    @EnvironmentObject var viewModel: ConnectBitwardenViewModel
     
     let canConnect: Bool
 
@@ -186,8 +231,18 @@ private struct ConnectToBitwardenView: View {
             
             Image("BitwardenSettingsIllustration")
             
+            Button("Open Bitwarden") {
+                viewModel.process(action: .openBitwarden)
+            }
+            
             if canConnect {
-                Text("Ready to connect")
+                HStack {
+                    Image("SuccessCheckmark")
+                    
+                    Text("Bitwarden is ready to connect to DuckDuckGo!")
+                    
+                    Spacer()
+                }
             } else {
                 
                 HStack {

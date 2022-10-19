@@ -17,39 +17,50 @@
 //
 
 import Foundation
+import Combine
 import SwiftUI
 
 final class ConnectBitwardenViewController: NSViewController {
     
-    // TODO: Update this to be dynamic per-screen. Use GeometryReader to feed the size of the SwiftUI view to the view controller and resize.
-    private let viewSize = CGSize(width: 550, height: 450)
+    private let defaultSize = CGSize(width: 550, height: 278)
     private let viewModel = ConnectBitwardenViewModel(
         bitwardenInstallationService: LocalBitwardenInstallationManager(),
         bitwardenManager: BitwardenManager.shared
     )
     
+    private var heightConstraint: NSLayoutConstraint?
+    
     public override func loadView() {
-        view = NSView(frame: NSRect(origin: CGPoint.zero, size: viewSize))
+        view = NSView(frame: NSRect(origin: CGPoint.zero, size: defaultSize))
     }
     
     public override func viewDidLoad() {
         super.viewDidLoad()
         viewModel.delegate = self
         
-        let connectBitwardenView = ConnectBitwardenView() .environmentObject(self.viewModel)
-        let hostingView = NSHostingView(rootView: connectBitwardenView)
+        let connectBitwardenView = ConnectBitwardenView { newHeight in
+            self.updateViewHeight(height: newHeight)
+        }
+
+        let hostingView = NSHostingView(rootView: connectBitwardenView.environmentObject(self.viewModel))
         hostingView.translatesAutoresizingMaskIntoConstraints = false
-        
         view.addSubview(hostingView)
         
+        let heightConstraint = hostingView.heightAnchor.constraint(equalToConstant: defaultSize.height)
+        self.heightConstraint = heightConstraint
+        
         NSLayoutConstraint.activate([
-            hostingView.heightAnchor.constraint(equalToConstant: viewSize.height),
-            hostingView.widthAnchor.constraint(equalToConstant: viewSize.width),
+            heightConstraint,
+            hostingView.widthAnchor.constraint(equalToConstant: defaultSize.width),
             hostingView.topAnchor.constraint(equalTo: view.topAnchor),
             hostingView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             hostingView.leftAnchor.constraint(equalTo: view.leftAnchor),
             hostingView.rightAnchor.constraint(equalTo: view.rightAnchor)
         ])
+    }
+    
+    private func updateViewHeight(height: CGFloat) {
+        heightConstraint?.constant = height + 85 // TODO: Work out the height calculation so that this magic number isn't needed.
     }
     
 }

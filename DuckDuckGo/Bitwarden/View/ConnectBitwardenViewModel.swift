@@ -53,6 +53,7 @@ final class ConnectBitwardenViewModel: ObservableObject {
     enum ViewAction {
         case cancel
         case confirm
+        case openBitwarden
         case openBitwardenProductPage
     }
     
@@ -86,6 +87,8 @@ final class ConnectBitwardenViewModel: ObservableObject {
             self.viewState = nextState(for: viewState)
         case .cancel:
             delegate?.connectBitwardenViewModelDismissedView(self)
+        case .openBitwarden:
+            bitwardenInstallationService.openBitwarden()
         case .openBitwardenProductPage:
             NSWorkspace.shared.open(Constants.bitwardenAppStoreURL)
         }
@@ -103,7 +106,7 @@ final class ConnectBitwardenViewModel: ObservableObject {
             return .bitwardenFound
         case .bitwardenFound:
             // TODO: Update this to listen for when permission is granted.
-            DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
                 self.viewState = .connectToBitwarden
             }
             
