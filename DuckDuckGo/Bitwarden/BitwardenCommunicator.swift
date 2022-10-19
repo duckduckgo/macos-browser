@@ -121,6 +121,8 @@ final class BitwardenComunicator: BitwardenCommunication {
         let finalMessage = messagePrefix + messageData
 
         process.writingHandle.write(finalMessage)
+
+        os_log("Message sent:\n %s", log: .bitwarden, type: .default, messageData.utf8String() ?? "")
     }
 
     // MARK: - Receiving Messages

@@ -126,6 +126,13 @@ final class BitwardenManager: BitwardenManagement {
         }
     }
 
+    private func handleError(_ error: String) {
+        switch error {
+        case "cannot-decrypt": os_log("BitwardenManagement: Bitwarden error - cannot decrypt", type: .error)
+        default: os_log("BitwardenManagement: Bitwarden error - unknown", type: .error)
+        }
+    }
+
     private func handleHandshakeResponse(encryptedSharedKey: String, status: String) {
         guard status == "success" else {
             self.status = .error(error: .handshakeFailed)
@@ -323,11 +330,17 @@ extension BitwardenManager: BitwardenCommunicatorDelegate {
             return
         }
 
-        if case let .item(payloadItem) = message.payload,
-              let encryptedSharedKey = payloadItem.sharedKey,
-              let status = payloadItem.status {
-            handleHandshakeResponse(encryptedSharedKey: encryptedSharedKey, status: status)
-            return
+        if case let .item(payloadItem) = message.payload {
+            if let error = payloadItem.error {
+                handleError(error)
+                return
+            }
+
+            if let encryptedSharedKey = payloadItem.sharedKey,
+               let status = payloadItem.status {
+                handleHandshakeResponse(encryptedSharedKey: encryptedSharedKey, status: status)
+                return
+            }
         }
 
         if let encryptedPayload = message.encryptedPayload {
@@ -335,7 +348,6 @@ extension BitwardenManager: BitwardenCommunicatorDelegate {
             return
         }
 
-        //TODO: Handle "cannot decrypt"
-        // assertionFailure("Unhandled message from Bitwarden: %s")
+        assertionFailure("Unhandled message from Bitwarden")
     }
 }
