@@ -287,6 +287,7 @@
                         <outlet property="pinnedTabsWindowDraggingView" destination="1Zn-JZ-2g3" id="Rld-aG-FZ2"/>
                         <outlet property="rightScrollButton" destination="2da-G7-xcP" id="4ka-kI-E1j"/>
                         <outlet property="rightShadowImageView" destination="u4N-Qc-LMf" id="QX4-lD-gfb"/>
+                        <outlet property="rightSideStackView" destination="dN1-y1-5Xe" id="bxw-hd-Zm5"/>
                         <outlet property="scrollView" destination="O0X-yp-zLn" id="g9v-fn-qxC"/>
                         <outlet property="shadowView" destination="G3d-9f-GhJ" id="OSV-TN-lVS"/>
                         <outlet property="windowDraggingViewLeadingConstraint" destination="5k3-uY-xby" id="kVU-yU-9M4"/>

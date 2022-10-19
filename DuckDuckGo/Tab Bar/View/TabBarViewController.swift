@@ -57,6 +57,7 @@ final class TabBarViewController: NSViewController {
 
     @IBOutlet weak var shadowView: TabShadowView!
     
+    @IBOutlet weak var rightSideStackView: NSStackView!
     var footerCurrentWidthDimension: CGFloat {
         if tabMode == .overflow {
             return 0.0
@@ -981,6 +982,14 @@ extension TabBarViewController: NSCollectionViewDelegate {
 extension TabBarViewController: TabBarViewItemDelegate {
 
     func tabBarViewItem(_ tabBarViewItem: TabBarViewItem, isMouseOver: Bool) {
+        let tabItemConvertedFrame = view.convert(tabBarViewItem.view.frame, from: tabBarViewItem.view)
+        let stackViewConvertedFrame = view.convert(rightSideStackView.frame, from: rightSideStackView)
+        
+        // Prevent tab preview from being shown if tab item is bellow the right side stack
+        if tabItemConvertedFrame.intersects(stackViewConvertedFrame) {
+            return
+        }
+        
         if isMouseOver {
             // Show tab preview for visible tab bar items
             if collectionView.visibleRect.intersects(tabBarViewItem.view.frame) {
