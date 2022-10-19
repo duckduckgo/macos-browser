@@ -40,7 +40,7 @@ final class PrivacyDashboardViewController: NSViewController {
     private let privacyDashboardScript = PrivacyDashboardUserScript()
     private var webviewCancellables = Set<AnyCancellable>()
     private var contentBlockingCancellables = Set<AnyCancellable>()
-    public let events = PassthroughSubject<Event, Never>()
+    private let events = PassthroughSubject<Event, Never>()
     @Published var pendingUpdates = [String: String]()
 
     required init?(coder: NSCoder) {
@@ -77,33 +77,35 @@ final class PrivacyDashboardViewController: NSViewController {
             // ⬇️ uncomment to exaggerate the problem by pretending a delay of 2 seconds each time
             // .delay(for: 2, scheduler: RunLoop.main)
             .compactMap { $0.rulesUpdate.completionTokens }
-            .drop { $0.isEmpty }
-            .drop { $0.count == 1 && $0[0] == "" }
-            .map { Event.updateComplete(tokens: $0) }
+            .drop { $0.isEmpty || ($0.count == 1 && $0[0].isEmpty) }
+            .map(Event.updateComplete)
 
-        self.events.merge(with: completionEvents).sink { [weak self] event in
-            guard let self = self else { return }
-            switch event {
-            case .updateRequested(token: let token, domain: let domain):
-                self.pendingUpdates[token] = domain
-                self.sendPendingUpdates()
-            case .updateComplete(tokens: let tokens):
-                let countBefore = self.pendingUpdates.count
-                for token in tokens {
-                    self.pendingUpdates.removeValue(forKey: token)
-                }
-                // if an item was removed, it means we've observed a completion
-                // for an event we initiated, so reload the page
-                if self.pendingUpdates.count < countBefore {
-                    self.tabViewModel?.reload()
+        events
+            .merge(with: completionEvents)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] event in
+                guard let self = self else { return }
+                switch event {
+                case .updateRequested(token: let token, domain: let domain):
+                    self.pendingUpdates[token] = domain
+                    self.sendPendingUpdates()
+                case .updateComplete(tokens: let tokens):
+                    let countBefore = self.pendingUpdates.count
+                    for token in tokens {
+                        self.pendingUpdates.removeValue(forKey: token)
+                    }
+                    // if an item was removed, it means we've observed a completion
+                    // for an event we initiated, so reload the page
+                    if self.pendingUpdates.count < countBefore {
+                        self.tabViewModel?.reload()
+                    }
                 }
             }
-        }
-        .store(in: &contentBlockingCancellables)
+            .store(in: &contentBlockingCancellables)
     }
 
     override func viewWillAppear() {
-        guard let tabViewModel = tabViewModel else { return }
+        guard tabViewModel != nil else { return }
 
         let url = Bundle.main.url(forResource: "popup", withExtension: "html", subdirectory: "duckduckgo-privacy-dashboard/build/macos/html")!
         webView.loadFileURL(url, allowingReadAccessTo: url.deletingLastPathComponent())
