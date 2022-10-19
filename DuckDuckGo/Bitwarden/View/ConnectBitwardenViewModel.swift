@@ -109,10 +109,13 @@ final class ConnectBitwardenViewModel: ObservableObject {
             } else {
                 self.viewState = nextState(for: viewState)
             }
+
         case .cancel:
             delegate?.connectBitwardenViewModelDismissedView(self, canceled: true)
+
         case .openBitwarden:
             bitwardenInstallationService.openBitwarden()
+
         case .openBitwardenProductPage:
             NSWorkspace.shared.open(Constants.bitwardenAppStoreURL)
         }
@@ -126,18 +129,23 @@ final class ConnectBitwardenViewModel: ObservableObject {
             } else {
                 return .lookingForBitwarden
             }
+
         case .lookingForBitwarden:
             return .bitwardenFound
+
         case .bitwardenFound:
             if bitwardenManager.status == .approachable {
                 return .connectToBitwarden
             } else {
                 return .waitingForConnectionPermission
             }
+
         case .waitingForConnectionPermission:
             return .connectToBitwarden
+
         case .connectToBitwarden:
             return .connectedToBitwarden
+
         case .connectedToBitwarden:
             return .connectedToBitwarden
         }
