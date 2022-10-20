@@ -250,8 +250,8 @@
 		4B9292DB2667125D00AD2C21 /* ContextualMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292DA2667125D00AD2C21 /* ContextualMenu.swift */; };
 		4B980E212817604000282EE1 /* NSNotificationName+Debug.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B980E202817604000282EE1 /* NSNotificationName+Debug.swift */; };
 		4B98D27A28D95F1A003C2B6F /* ChromiumFaviconsReaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B98D27928D95F1A003C2B6F /* ChromiumFaviconsReaderTests.swift */; };
-		4B98D28028D9722A003C2B6F /* RecentlyVisitedSiteModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B98D27F28D9722A003C2B6F /* RecentlyVisitedSiteModelTests.swift */; };
 		4B98D27C28D960DD003C2B6F /* FirefoxFaviconsReaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B98D27B28D960DD003C2B6F /* FirefoxFaviconsReaderTests.swift */; };
+		4B98D28028D9722A003C2B6F /* RecentlyVisitedSiteModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B98D27F28D9722A003C2B6F /* RecentlyVisitedSiteModelTests.swift */; };
 		4BA1A69B258B076900F6F690 /* FileStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA1A69A258B076900F6F690 /* FileStore.swift */; };
 		4BA1A6A0258B079600F6F690 /* DataEncryption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA1A69F258B079600F6F690 /* DataEncryption.swift */; };
 		4BA1A6A5258B07DF00F6F690 /* EncryptedValueTransformer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA1A6A4258B07DF00F6F690 /* EncryptedValueTransformer.swift */; };
@@ -6309,7 +6309,7 @@
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
 				kind = revision;
-				revision = 407dc1be46a60aae3189ad1fc434cd7285352773;
+				revision = 3b27f14d5b4a1a4c436fc32078bde3aced52f6cb;
 			};
 		};
 		AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
