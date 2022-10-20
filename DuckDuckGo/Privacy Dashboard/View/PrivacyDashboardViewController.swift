@@ -103,13 +103,29 @@ final class PrivacyDashboardViewController: NSViewController {
 //            self?.privacyDashboardProtectionSwitchChangeHandler(enabled: isEnabled)
         }
         
-        privacyDashboardController.onCloseTapped = { [weak self] in
-//            self?.privacyDashboardCloseTappedHandler()
+        privacyDashboardController.onHeightChange = { [weak self] height in
+            guard let self = self else { return }
+            
+            var height = CGFloat(height)
+            if height > self.preferredMaxHeight {
+                height = self.preferredMaxHeight
+            }
+            
+            if self.skipLayoutAnimation {
+                self.contentHeightConstraint.constant = height
+                self.skipLayoutAnimation = false
+            } else {
+                NSAnimationContext.runAnimationGroup { [weak self] context in
+                    context.duration = 1/3
+                    context.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+                    self?.contentHeightConstraint.animator().constant = height
+                }
+            }
         }
         
-        privacyDashboardController.onShowReportBrokenSiteTapped = { [weak self] in
-//            self?.performSegue(withIdentifier: "ReportBrokenSite", sender: self)
-        }
+        privacyDashboardController.onCloseTapped = { }
+        
+        privacyDashboardController.onShowReportBrokenSiteTapped = { }
         
         privacyDashboardController.onOpenUrlInNewTab = { url in
             guard let tabCollection = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.tabCollectionViewModel
@@ -233,31 +249,11 @@ extension PrivacyDashboardViewController: PrivacyDashboardUserScriptDelegate {
     }
 
     func userScript(_ userScript: PrivacyDashboardUserScript, setHeight height: Int) {
-        var height = CGFloat(height)
-        if height > preferredMaxHeight {
-            height = preferredMaxHeight
-        }
-        
-        if skipLayoutAnimation {
-            contentHeightConstraint.constant = height
-            skipLayoutAnimation = false
-        } else {
-            NSAnimationContext.runAnimationGroup { [weak self] context in
-                context.duration = 1/3
-                context.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
-                self?.contentHeightConstraint.animator().constant = height
-            }
-        }
+
     }
 
     func userScript(_ userScript: PrivacyDashboardUserScript, didRequestOpenUrlInNewTab url: URL) {
-        // Handled 
-//        guard let tabCollection = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.tabCollectionViewModel
-//        else {
-//            assertionFailure("could not access shared tabCollectionViewModel")
-//            return
-//        }
-//        tabCollection.appendNewTab(with: .url(url), selected: true)
+
     }
     
     func userScript(_ userScript: PrivacyDashboardUserScript, didRequestSubmitBrokenSiteReportWithCategory category: String, description: String) {
