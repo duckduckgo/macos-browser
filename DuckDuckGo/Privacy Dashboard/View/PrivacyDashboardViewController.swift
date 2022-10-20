@@ -27,20 +27,6 @@ final class PrivacyDashboardViewController: NSViewController {
         static let initialContentHeight: CGFloat = 662
     }
 
-    enum Event {
-        /// Used to record the fact that the Dashboard was the initiator of rules re-compilation
-        case updateRequested(token: ContentBlockerRulesManager.CompletionToken, domain: String)
-        /// A proxy for none-empty completion token lists. These can be read and compared to the ones
-        /// saved in the `updateRequested`
-        case updateComplete(tokens: [ContentBlockerRulesManager.CompletionToken])
-    }
-
-    private var webView: WKWebView!
-    private var contentHeightConstraint: NSLayoutConstraint!
-    private let privacyDashboardScript = PrivacyDashboardUserScript()
-    private var webviewCancellables = Set<AnyCancellable>()
-    private var contentBlockingCancellables = Set<AnyCancellable>()
-    private let events = PassthroughSubject<Event, Never>()
     @Published var pendingUpdates = [String: String]()
 
     required init?(coder: NSCoder) {
@@ -51,12 +37,6 @@ final class PrivacyDashboardViewController: NSViewController {
     weak var tabViewModel: TabViewModel?
     var serverTrustViewModel: ServerTrustViewModel?
 
-    /// Running the resize animation block during the popover animation causes frame hitching.
-    /// The animation only needs to run when transitioning between views in the popover, so this is used to track when to run the animation.
-    /// This should be set to true any time the popover is displayed (i.e., reset to true when dismissing the popover), and false after the initial resize pass is complete.
-    private var skipLayoutAnimation = true
-    
-    private var preferredMaxHeight: CGFloat = Constants.initialContentHeight
     func setPreferredMaxHeight(_ height: CGFloat) {
         guard height > Constants.initialContentHeight else { return }
         
@@ -73,23 +53,26 @@ final class PrivacyDashboardViewController: NSViewController {
     }
 
     private func prepareContentBlockingCancellables() {
-        let completionEvents = ContentBlocking.shared.userContentUpdating.userContentBlockingAssets
-            // ⬇️ uncomment to exaggerate the problem by pretending a delay of 2 seconds each time
-            // .delay(for: 2, scheduler: RunLoop.main)
-            .compactMap { $0.rulesUpdate.completionTokens }
-            .drop { $0.isEmpty || ($0.count == 1 && $0[0].isEmpty) }
-            .map(Event.updateComplete)
+        let rulesRecompilationCompletion = ContentBlocking.shared.userContentUpdating.userContentBlockingAssets
+            .compactMap { newContent -> [ContentBlockerRulesManager.CompletionToken]? in
+                let nonEmptyTokens = newContent.rulesUpdate.completionTokens.filter { !$0.isEmpty }
+                if nonEmptyTokens.isEmpty {
+                    return nil
+                }
+                return nonEmptyTokens
+            }
+            .map(RulesRecompilationEvent.complete)
 
-        events
-            .merge(with: completionEvents)
+        rulesRecompilationRequestsSubject
+            .merge(with: rulesRecompilationCompletion)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] event in
                 guard let self = self else { return }
                 switch event {
-                case .updateRequested(token: let token, domain: let domain):
+                case .requested(token: let token, domain: let domain):
                     self.pendingUpdates[token] = domain
                     self.sendPendingUpdates()
-                case .updateComplete(tokens: let tokens):
+                case .complete(tokens: let tokens):
                     let countBefore = self.pendingUpdates.count
                     for token in tokens {
                         self.pendingUpdates.removeValue(forKey: token)
@@ -113,7 +96,7 @@ final class PrivacyDashboardViewController: NSViewController {
 
     override func viewWillDisappear() {
         contentHeightConstraint.constant = Constants.initialContentHeight
-        webviewCancellables.removeAll()
+        webViewCancellables.removeAll()
         skipLayoutAnimation = true
     }
 
@@ -140,7 +123,7 @@ final class PrivacyDashboardViewController: NSViewController {
     private func subscribeToPermissions() {
         tabViewModel?.$usedPermissions.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.updatePermissions()
-        }.store(in: &webviewCancellables)
+        }.store(in: &webViewCancellables)
     }
 
     private func updatePermissions() {
@@ -175,7 +158,7 @@ final class PrivacyDashboardViewController: NSViewController {
                 let upgradedHttps = connectionUpgradedTo != nil
                 self.privacyDashboardScript.setUpgradedHttps(upgradedHttps, webView: self.webView)
             })
-            .store(in: &webviewCancellables)
+            .store(in: &webViewCancellables)
     }
 
     private func subscribeToTrackerInfo() {
@@ -185,7 +168,7 @@ final class PrivacyDashboardViewController: NSViewController {
                 guard let self = self, let trackerInfo = trackerInfo, let tabUrl = self.tabViewModel?.tab.content.url else { return }
                 self.privacyDashboardScript.setTrackerInfo(tabUrl, trackerInfo: trackerInfo, webView: self.webView)
             })
-            .store(in: &webviewCancellables)
+            .store(in: &webViewCancellables)
     }
 
     private func sendProtectionStatus() {
@@ -229,7 +212,7 @@ final class PrivacyDashboardViewController: NSViewController {
                 guard let self = self, let serverTrustViewModel = serverTrustViewModel else { return }
                 self.privacyDashboardScript.setServerTrust(serverTrustViewModel, webView: self.webView)
             })
-            .store(in: &webviewCancellables)
+            .store(in: &webViewCancellables)
     }
 
     private func subscribeToConsentManaged() {
@@ -239,9 +222,30 @@ final class PrivacyDashboardViewController: NSViewController {
                 guard let self = self else { return }
                 self.privacyDashboardScript.setConsentManaged(consentManaged, webView: self.webView)
             })
-            .store(in: &webviewCancellables)
+            .store(in: &webViewCancellables)
     }
 
+    private enum RulesRecompilationEvent {
+        /// Used to record the fact that the Dashboard was the initiator of rules re-compilation
+        case requested(token: ContentBlockerRulesManager.CompletionToken, domain: String)
+        /// A proxy for non-empty completion token lists. These can be read and compared to the ones
+        /// saved in the `updateRequested`
+        case complete(tokens: [ContentBlockerRulesManager.CompletionToken])
+    }
+
+    private var webView: WKWebView!
+    private var contentHeightConstraint: NSLayoutConstraint!
+    private let privacyDashboardScript = PrivacyDashboardUserScript()
+    private var webViewCancellables = Set<AnyCancellable>()
+    private var contentBlockingCancellables = Set<AnyCancellable>()
+    private let rulesRecompilationRequestsSubject = PassthroughSubject<RulesRecompilationEvent, Never>()
+
+    /// Running the resize animation block during the popover animation causes frame hitching.
+    /// The animation only needs to run when transitioning between views in the popover, so this is used to track when to run the animation.
+    /// This should be set to true any time the popover is displayed (i.e., reset to true when dismissing the popover), and false after the initial resize pass is complete.
+    private var skipLayoutAnimation = true
+
+    private var preferredMaxHeight: CGFloat = Constants.initialContentHeight
 }
 
 extension PrivacyDashboardViewController: PrivacyDashboardUserScriptDelegate {
@@ -260,7 +264,7 @@ extension PrivacyDashboardViewController: PrivacyDashboardUserScriptDelegate {
         }
 
         let completionToken = ContentBlocking.shared.contentBlockingManager.scheduleCompilation()
-        self.events.send(.updateRequested(token: completionToken, domain: domain))
+        rulesRecompilationRequestsSubject.send(.requested(token: completionToken, domain: domain))
     }
 
     func userScript(_ userScript: PrivacyDashboardUserScript, didSetPermission permission: PermissionType, to state: PermissionAuthorizationState) {
