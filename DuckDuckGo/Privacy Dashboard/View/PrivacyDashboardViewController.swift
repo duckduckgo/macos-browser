@@ -127,6 +127,16 @@ final class PrivacyDashboardViewController: NSViewController {
         
         privacyDashboardController.onShowReportBrokenSiteTapped = { }
         
+        privacyDashboardController.onSubmitBrokenSiteReportWithCategory = { [weak self] category, description in
+            guard let websiteBreakage = self?.makeWebsiteBreakage(category: category, description: description, currentTab: self?.tabViewModel?.tab) else {
+                assertionFailure("could not build website breakage model")
+                return
+            }
+            
+            let websiteBreakageSender = WebsiteBreakageSender()
+            websiteBreakageSender.sendWebsiteBreakage(websiteBreakage)
+        }
+        
         privacyDashboardController.onOpenUrlInNewTab = { url in
             guard let tabCollection = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.tabCollectionViewModel
             else {
@@ -137,6 +147,29 @@ final class PrivacyDashboardViewController: NSViewController {
         }
     }
 
+    private func makeWebsiteBreakage(category: String, description: String, currentTab: Tab?) -> WebsiteBreakage {
+        // ⚠️ To limit privacy risk, site URL is trimmed to not include query and fragment
+        let currentURL = currentTab?.content.url?.trimmingQueryItemsAndFragment()?.absoluteString ?? ""
+        
+        let blockedTrackerDomains = currentTab?.privacyInfo?.trackerInfo.trackersBlocked.compactMap { $0.domain } ?? []
+        let installedSurrogates = currentTab?.privacyInfo?.trackerInfo.installedSurrogates.map {$0} ?? []
+        let ampURL = currentTab?.linkProtection.lastAMPURLString ?? ""
+        let urlParametersRemoved = currentTab?.linkProtection.urlParametersRemoved ?? false
+        
+        let websiteBreakage = WebsiteBreakage(category: WebsiteBreakage.Category(rawValue: category.lowercased()),
+                                              description: description,
+                                              siteUrlString: currentURL,
+                                              osVersion: "\(ProcessInfo.processInfo.operatingSystemVersion)",
+                                              upgradedHttps: currentTab?.privacyInfo?.connectionUpgradedTo != nil,
+                                              tdsETag: ContentBlocking.shared.contentBlockingManager.currentRules.first?.etag,
+                                              blockedTrackerDomains: blockedTrackerDomains,
+                                              installedSurrogates: installedSurrogates,
+                                              isGPCEnabled: PrivacySecurityPreferences.shared.gpcEnabled,
+                                              ampURL: ampURL,
+                                              urlParametersRemoved: urlParametersRemoved)
+        return websiteBreakage
+    }
+    
 //    private func prepareContentBlockingCancellable<Pub: Publisher>(publisher: Pub)
 //    where Pub.Output == [ContentBlockerRulesManager.CompletionToken], Pub.Failure == Never {
 //
@@ -215,7 +248,7 @@ final class PrivacyDashboardViewController: NSViewController {
     
 }
 
-extension PrivacyDashboardViewController { 
+extension PrivacyDashboardViewController {
 
     func userScript(_ userScript: OLDPrivacyDashboardUserScript, didChangeProtectionStateTo isProtected: Bool) {
         guard let domain = tabViewModel?.tab.content.url?.host else {
@@ -248,40 +281,4 @@ extension PrivacyDashboardViewController {
         tabViewModel?.tab.permissions.set([permission], muted: paused)
     }
 
-    func userScript(_ userScript: OLDPrivacyDashboardUserScript, setHeight height: Int) {
-
-    }
-
-    func userScript(_ userScript: OLDPrivacyDashboardUserScript, didRequestOpenUrlInNewTab url: URL) {
-
-    }
-    
-    func userScript(_ userScript: OLDPrivacyDashboardUserScript, didRequestSubmitBrokenSiteReportWithCategory category: String, description: String) {
-        let websiteBreakage = makeWebsiteBreakage(category: category, description: description, currentTab: tabViewModel?.tab)
-        let websiteBreakageSender = WebsiteBreakageSender()
-        websiteBreakageSender.sendWebsiteBreakage(websiteBreakage)
-    }
-    
-    private func makeWebsiteBreakage(category: String, description: String, currentTab: Tab?) -> WebsiteBreakage {
-        // ⚠️ To limit privacy risk, site URL is trimmed to not include query and fragment
-        let currentURL = currentTab?.content.url?.trimmingQueryItemsAndFragment()?.absoluteString ?? ""
-        
-        let blockedTrackerDomains = currentTab?.privacyInfo?.trackerInfo.trackersBlocked.compactMap { $0.domain } ?? []
-        let installedSurrogates = currentTab?.privacyInfo?.trackerInfo.installedSurrogates.map {$0} ?? []
-        let ampURL = currentTab?.linkProtection.lastAMPURLString ?? ""
-        let urlParametersRemoved = currentTab?.linkProtection.urlParametersRemoved ?? false
-        
-        let websiteBreakage = WebsiteBreakage(category: WebsiteBreakage.Category(rawValue: category.lowercased()),
-                                              description: description,
-                                              siteUrlString: currentURL,
-                                              osVersion: "\(ProcessInfo.processInfo.operatingSystemVersion)",
-                                              upgradedHttps: currentTab?.privacyInfo?.connectionUpgradedTo != nil,
-                                              tdsETag: ContentBlocking.shared.contentBlockingManager.currentRules.first?.etag,
-                                              blockedTrackerDomains: blockedTrackerDomains,
-                                              installedSurrogates: installedSurrogates,
-                                              isGPCEnabled: PrivacySecurityPreferences.shared.gpcEnabled,
-                                              ampURL: ampURL,
-                                              urlParametersRemoved: urlParametersRemoved)
-        return websiteBreakage
-    }
 }

@@ -27,32 +27,18 @@ protocol OLDPrivacyDashboardUserScriptDelegate: AnyObject {
     func userScript(_ userScript: OLDPrivacyDashboardUserScript, didChangeProtectionStateTo protectionState: Bool)
     func userScript(_ userScript: OLDPrivacyDashboardUserScript, didSetPermission permission: PermissionType, to state: PermissionAuthorizationState)
     func userScript(_ userScript: OLDPrivacyDashboardUserScript, setPermission permission: PermissionType, paused: Bool)
-    func userScript(_ userScript: OLDPrivacyDashboardUserScript, setHeight height: Int)
-    func userScript(_ userScript: OLDPrivacyDashboardUserScript, didRequestOpenUrlInNewTab: URL)
-    func userScript(_ userScript: OLDPrivacyDashboardUserScript, didRequestSubmitBrokenSiteReportWithCategory category: String, description: String)
 }
 
-final class OLDPrivacyDashboardUserScript: NSObject, StaticUserScript {
+final class OLDPrivacyDashboardUserScript {
 
     enum MessageNames: String, CaseIterable {
         case privacyDashboardSetProtection
-        case privacyDashboardFirePixel
         case privacyDashboardSetPermission
         case privacyDashboardSetPermissionPaused
-        case privacyDashboardSetSize
-        case privacyDashboardOpenUrlInNewTab
-        case privacyDashboardSubmitBrokenSiteReport
     }
 
-    static var injectionTime: WKUserScriptInjectionTime { .atDocumentStart }
-    static var forMainFrameOnly: Bool { false }
-    static var source: String = ""
-    static var script: WKUserScript = OLDPrivacyDashboardUserScript.makeWKUserScript()
-    var messageNames: [String] { MessageNames.allCases.map(\.rawValue) }
-
     weak var delegate: OLDPrivacyDashboardUserScriptDelegate?
-    weak var model: FindInPageModel?
-
+    
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         guard let messageType = MessageNames(rawValue: message.name) else {
             assertionFailure("PrivacyDashboardUserScript: unexpected message name \(message.name)")
@@ -63,36 +49,13 @@ final class OLDPrivacyDashboardUserScript: NSObject, StaticUserScript {
         case .privacyDashboardSetProtection:
             handleSetProtection(message: message)
 
-        case .privacyDashboardFirePixel:
-            handleFirePixel(message: message)
-
         case .privacyDashboardSetPermission:
             handleSetPermission(message: message)
 
         case .privacyDashboardSetPermissionPaused:
             handleSetPermissionPaused(message: message)
-
-        case .privacyDashboardSetSize:
-            handleSetSize(message: message)
-
-        case .privacyDashboardOpenUrlInNewTab:
-            handleOpenUrlInNewTab(message: message)
             
-        case .privacyDashboardSubmitBrokenSiteReport:
-            handleSubmitBrokenSiteReport(message: message)
         }
-    }
-
-    private func handleOpenUrlInNewTab(message: WKScriptMessage) {
-        guard let dict = message.body as? [String: Any],
-              let urlString = dict["url"] as? String,
-              let url = URL(string: urlString)
-        else {
-            assertionFailure("handleOpenUrlInNewTab: expected { url: '...' } ")
-            return
-        }
-
-        delegate?.userScript(self, didRequestOpenUrlInNewTab: url)
     }
 
     private func handleSetProtection(message: WKScriptMessage) {
@@ -102,20 +65,6 @@ final class OLDPrivacyDashboardUserScript: NSObject, StaticUserScript {
         }
 
         delegate?.userScript(self, didChangeProtectionStateTo: isProtected)
-    }
-
-    private func handleFirePixel(message: WKScriptMessage) {
-        guard let pixel = message.body as? String else {
-            assertionFailure("privacyDashboardFirePixel: expected Pixel String")
-            return
-        }
-
-        let etag = ContentBlocking.shared.contentBlockingManager.currentRules.first?.etag
-                    .trimmingCharacters(in: CharacterSet(charactersIn: "\"")) ?? ""
-        Pixel.shared?.fire(pixelNamed: pixel,
-                           withAdditionalParameters: [
-                            "tds": etag
-        ])
     }
 
     private func handleSetPermission(message: WKScriptMessage) {
@@ -141,27 +90,8 @@ final class OLDPrivacyDashboardUserScript: NSObject, StaticUserScript {
 
         delegate?.userScript(self, setPermission: permission, paused: paused)
     }
-
-    private func handleSetSize(message: WKScriptMessage) {
-        guard let dict = message.body as? [String: Any],
-              let height = dict["height"] as? Int else {
-            assertionFailure("privacyDashboardSetHeight: expected height to be an Int")
-            return
-        }
-
-        delegate?.userScript(self, setHeight: height)
-    }
     
-    private func handleSubmitBrokenSiteReport(message: WKScriptMessage) {
-        guard let dict = message.body as? [String: Any],
-              let category = dict["category"] as? String,
-              let description = dict["description"] as? String else {
-            assertionFailure("privacyDashboardSetHeight: expected { category: String, description: String }")
-            return
-        }
-
-        delegate?.userScript(self, didRequestSubmitBrokenSiteReportWithCategory: category, description: description)
-    }
+    ///
 
     typealias AuthorizationState = [(permission: PermissionType, state: PermissionAuthorizationState)]
     func setPermissions(_ usedPermissions: Permissions,
@@ -203,54 +133,6 @@ final class OLDPrivacyDashboardUserScript: NSObject, StaticUserScript {
         evaluate(js: "window.onChangeAllowedPermissions(\(allowedPermissionsJson))", in: webView)
     }
 
-    func setTrackerInfo(_ tabUrl: URL, trackerInfo: TrackerInfo, webView: WKWebView) {
-        guard let trackerBlockingDataJson = try? JSONEncoder().encode(trackerInfo).utf8String() else {
-            assertionFailure("Can't encode trackerInfoViewModel into JSON")
-            return
-        }
-
-        guard let safeTabUrl = try? JSONEncoder().encode(tabUrl).utf8String() else {
-            assertionFailure("Can't encode tabUrl into JSON")
-            return
-        }
-
-        evaluate(js: "window.onChangeRequestData(\(safeTabUrl), \(trackerBlockingDataJson))", in: webView)
-    }
-
-    func setProtectionStatus(_ protectionStatus: ProtectionStatus, webView: WKWebView) {
-        
-        guard let protectionStatusJson = try? JSONEncoder().encode(protectionStatus).utf8String() else {
-            assertionFailure("Can't encode protectionStatus into JSON")
-            return
-        }
-        
-        evaluate(js: "window.onChangeProtectionStatus(\(protectionStatusJson))", in: webView)
-    }
-
-    func setUpgradedHttps(_ upgradedHttps: Bool, webView: WKWebView) {
-        evaluate(js: "window.onChangeUpgradedHttps(\(upgradedHttps))", in: webView)
-    }
-
-    func setParentEntity(_ parentEntity: Entity?, webView: WKWebView) {
-        if parentEntity == nil { return }
-
-        guard let parentEntityJson = try? JSONEncoder().encode(parentEntity).utf8String() else {
-            assertionFailure("Can't encode parentEntity into JSON")
-            return
-        }
-
-        evaluate(js: "window.onChangeParentEntity(\(parentEntityJson))", in: webView)
-    }
-
-    func setServerTrust(_ serverTrustViewModel: ServerTrustViewModel, webView: WKWebView) {
-        guard let certificateDataJson = try? JSONEncoder().encode(serverTrustViewModel).utf8String() else {
-            assertionFailure("Can't encode serverTrustViewModel into JSON")
-            return
-        }
-
-        evaluate(js: "window.onChangeCertificateData(\(certificateDataJson))", in: webView)
-    }
-
     func setIsPendingUpdates(_ isPendingUpdates: Bool, webView: WKWebView) {
         evaluate(js: "window.onIsPendingUpdates(\(isPendingUpdates))", in: webView)
     }
@@ -261,18 +143,6 @@ final class OLDPrivacyDashboardUserScript: NSObject, StaticUserScript {
             return
         }
         evaluate(js: "window.onChangeConsentManaged(\(consentDataJson))", in: webView)
-    }
-    
-    func setLocale(_ currentLocale: String, webView: WKWebView) {
-        struct LocaleSetting: Encodable {
-            var locale: String
-        }
-        
-        guard let localeSettingJson = try? JSONEncoder().encode(LocaleSetting(locale: currentLocale)).utf8String() else {
-            assertionFailure("Can't encode consentInfo into JSON")
-            return
-        }
-        evaluate(js: "window.onChangeLocale(\(localeSettingJson))", in: webView)
     }
 
     private func evaluate(js: String, in webView: WKWebView) {
