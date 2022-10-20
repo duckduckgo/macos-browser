@@ -105,7 +105,7 @@ final class RecentlyVisitedModel: ObservableObject {
     }
 
     func open(_ site: RecentlyVisitedSiteModel) {
-        guard let url = site.url else { return }
+        guard site.isRealDomain, let url = site.url else { return }
         self.open(url)
     }
 
@@ -153,6 +153,7 @@ final class RecentlyVisitedSiteModel: ObservableObject {
     
     private let baseURL: URL?
 
+    @Published var isRealDomain: Bool = true
     @Published var isFavorite: Bool
     @Published var isFireproof: Bool
     @Published var blockedEntities = [String]()
@@ -170,8 +171,13 @@ final class RecentlyVisitedSiteModel: ObservableObject {
         guard let domain = originalURL.host?.droppingWwwPrefix() else {
             return nil
         }
-        
-        self.domain = domain
+
+        if let privatePlayer = PrivatePlayer.shared.domainForRecentlyVisitedSite(with: originalURL) {
+            self.domain = privatePlayer
+            isRealDomain = false
+        } else {
+            self.domain = domain
+        }
         
         var components = URLComponents()
         components.scheme = originalURL.scheme
@@ -220,6 +226,10 @@ final class RecentlyVisitedSiteModel: ObservableObject {
                 } else {
                     urlsToRemove.append($0.url)
                 }
+
+            } else if let displayTitle = PrivatePlayer.shared.title(for: $0) {
+
+                $0.displayTitle = displayTitle
 
             } else if !showTitlesForPagesSetting {
 

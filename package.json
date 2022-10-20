@@ -1,9 +1,15 @@
 {
   "name": "macos-browser",
   "version": "1.0.0",
+  "config": {
+    "yt_inject_bundle": "DuckDuckGo/Youtube Player/Resources/youtube-inject-bundle.js"
+  },
   "scripts": {
     "test": "echo 'no test required'",
-    "rebuild-autoconsent": "rollup -c"
+    "rebuild-autoconsent": "rollup -c",
+    "postinstall": "cd js/youtube-player; npm install",
+    "build-yt": "OUT_FILE=\"$(pwd)/$npm_package_config_yt_inject_bundle\"; cd js/youtube-player; npm run _build -- --outfile=\"$OUT_FILE\"",
+    "build-yt:watch": "OUT_FILE=\"$(pwd)/$npm_package_config_yt_inject_bundle\"; cd js/youtube-player; npm run _build -- --outfile=\"$OUT_FILE\" --watch"
   },
   "devDependencies": {
     "@rollup/plugin-json": "^4.1.0",
@@ -12,6 +18,6 @@
     "rollup-plugin-terser": "^7.0.2"
   },
   "dependencies": {
-    "@duckduckgo/autoconsent": "2.2.0"
+    "@duckduckgo/autoconsent": "3.0.2"
   }
 }

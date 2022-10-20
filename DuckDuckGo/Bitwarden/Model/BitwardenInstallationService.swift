@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import AppKit
 
 protocol BitwardenInstallationManager {
     

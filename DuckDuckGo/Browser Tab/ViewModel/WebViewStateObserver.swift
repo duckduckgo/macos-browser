@@ -108,10 +108,12 @@ final class WebViewStateObserver: NSObject {
 
     private func handleURLChange(in webView: WKWebView, tabViewModel: TabViewModel) {
         if let url = webView.url {
-            tabViewModel.tab.setContent(.contentFromURL(url))
-            if !webView.isLoading {
+            let content = Tab.TabContent.contentFromURL(url)
+
+            if content.isUrl, !webView.isLoading {
                 tabViewModel.tab.addVisit(of: url)
             }
+            tabViewModel.tab.setContent(content)
         }
         updateTitle() // The title might not change if webView doesn't think anything is different so update title here as well
     }

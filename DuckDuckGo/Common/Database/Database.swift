@@ -18,6 +18,7 @@
 
 import Foundation
 import CoreData
+import BrowserServicesKit
 
 final class Database {
     
@@ -25,92 +26,58 @@ final class Database {
         static let databaseName = "Database"
     }
     
-    static let shared: Database = {
+    static let shared: CoreDataDatabase = {
+        let (database, error) = makeDatabase()
+        if database == nil {
+            firePixelErrorIfNeeded(error: error)
+            NSAlert.databaseFactoryFailed().runModal()
+            NSApp.terminate(nil)
+        }
+
+        return database!
+    }()
+
+    static func makeDatabase() -> (CoreDataDatabase?, Error?) {
+        func makeDatabase(keyStore: EncryptionKeyStoring) -> (CoreDataDatabase?, Error?) {
+            do {
+                try EncryptedValueTransformer<NSImage>.registerTransformer(keyStore: keyStore)
+                try EncryptedValueTransformer<NSString>.registerTransformer(keyStore: keyStore)
+                try EncryptedValueTransformer<NSURL>.registerTransformer(keyStore: keyStore)
+                try EncryptedValueTransformer<NSNumber>.registerTransformer(keyStore: keyStore)
+                try EncryptedValueTransformer<NSError>.registerTransformer(keyStore: keyStore)
+                try EncryptedValueTransformer<NSData>.registerTransformer(keyStore: keyStore)
+            } catch {
+                return (nil, error)
+            }
+
+            return (CoreDataDatabase(name: Constants.databaseName,
+                                     containerLocation: URL.sandboxApplicationSupportURL,
+                                     model: NSManagedObjectModel.mergedModel(from: [.main])!), nil)
+        }
+
 #if DEBUG
         if AppDelegate.isRunningTests {
             let keyStoreMockClass = (NSClassFromString("EncryptionKeyStoreMock") as? NSObject.Type)!
             let keyStoreMock = (keyStoreMockClass.init() as? EncryptionKeyStoring)!
-            return Database(keyStore: keyStoreMock)
+            return makeDatabase(keyStore: keyStoreMock)
         }
 #endif
-        return Database()
-    }()
 
-    private let container: NSPersistentContainer
-    private let storeLoadedCondition = RunLoop.ResumeCondition()
-    
-    var model: NSManagedObjectModel {
-        return container.managedObjectModel
+        return makeDatabase(keyStore: EncryptionKeyStore(generator: EncryptionKeyGenerator()))
     }
 
-    init(name: String = Constants.databaseName,
-         model: NSManagedObjectModel = NSManagedObjectModel.mergedModel(from: [.main])!,
-         keyStore: EncryptionKeyStoring = EncryptionKeyStore(generator: EncryptionKeyGenerator())) {
-        do {
-            try EncryptedValueTransformer<NSImage>.registerTransformer(keyStore: keyStore)
-            try EncryptedValueTransformer<NSString>.registerTransformer(keyStore: keyStore)
-            try EncryptedValueTransformer<NSURL>.registerTransformer(keyStore: keyStore)
-            try EncryptedValueTransformer<NSNumber>.registerTransformer(keyStore: keyStore)
-            try EncryptedValueTransformer<NSError>.registerTransformer(keyStore: keyStore)
-            try EncryptedValueTransformer<NSData>.registerTransformer(keyStore: keyStore)
-        } catch {
-            fatalError("Failed to register encryption value transformers")
-        }
+    // MARK: - Pixel
 
-        container = DDGPersistentContainer(name: name, managedObjectModel: model)
-    }
-    
-    func loadStore(migrationHandler: @escaping (NSManagedObjectContext) -> Void = { _ in }) {
-        container.loadPersistentStores { _, error in
-            if let error = error {
-                Pixel.fire(.debug(event: .dbInitializationError, error: error))
-                // Give Pixel a chance to be sent, but not too long
-                Thread.sleep(forTimeInterval: 1)
-                fatalError("Could not load DB: \(error.localizedDescription)")
-            }
-            
-            let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-            context.persistentStoreCoordinator = self.container.persistentStoreCoordinator
-            context.name = "Migration"
-            context.perform {
-                migrationHandler(context)
+    @UserDefaultsWrapper(key: .lastDatabaseFactoryFailurePixelDate, defaultValue: nil)
+    static var lastDatabaseFactoryFailurePixelDate: Date?
 
-                self.storeLoadedCondition.resolve()
-            }
-        }
-    }
-    
-    func makeContext(concurrencyType: NSManagedObjectContextConcurrencyType, name: String? = nil) -> NSManagedObjectContext {
-        RunLoop.current.run(until: storeLoadedCondition)
+    static func firePixelErrorIfNeeded(error: Error?) {
+        let lastPixelSentAt = lastDatabaseFactoryFailurePixelDate ?? Date.distantPast
 
-        let context = NSManagedObjectContext(concurrencyType: concurrencyType)
-        context.persistentStoreCoordinator = container.persistentStoreCoordinator
-        context.name = name
-        
-        return context
-    }
-}
-
-extension NSManagedObjectContext {
-    
-    func deleteAll(entities: [NSManagedObject] = []) {
-        for entity in entities {
-            delete(entity)
-        }
-    }
-    
-    func deleteAll<T: NSManagedObject>(matching request: NSFetchRequest<T>) {
-        if let result = try? fetch(request) {
-            deleteAll(entities: result)
-        }
-    }
-    
-    func deleteAll(entityDescriptions: [NSEntityDescription] = []) {
-        for entityDescription in entityDescriptions {
-            let request = NSFetchRequest<NSManagedObject>()
-            request.entity = entityDescription
-            
-            deleteAll(matching: request)
+        // Fire the pixel once a day at max
+        if lastPixelSentAt < Date.daysAgo(1) {
+            lastDatabaseFactoryFailurePixelDate = Date()
+            Pixel.fire(.debug(event: .dbMakeDatabaseError, error: error))
         }
     }
 }
@@ -130,12 +97,4 @@ extension NSManagedObjectContext {
         }
         return obj
     }
-}
-
-private class DDGPersistentContainer: NSPersistentContainer {
-
-    override class func defaultDirectoryURL() -> URL {
-        return URL.sandboxApplicationSupportURL
-    }
-
 }

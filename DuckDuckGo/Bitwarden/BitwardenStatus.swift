@@ -49,6 +49,7 @@ enum BitwardenStatus: Equatable {
             case locked
             case unlocked
         }
+
     }
 
 }

@@ -59,7 +59,9 @@ final class ConfigurationManager {
     /// Use the shared instance if subscribing to events.  Only use the constructor for testing.
     init(configDownloader: ConfigurationDownloading = DefaultConfigurationDownloader(deliveryQueue: ConfigurationManager.queue)) {
         self.configDownloader = configDownloader
+    }
 
+    func start() {
         os_log("Starting configuration refresh timer", log: .config, type: .debug)
         timerCancellable = Timer.publish(every: Constants.refreshCheckIntervalSeconds, on: .main, in: .default)
             .autoconnect()
@@ -68,6 +70,7 @@ final class ConfigurationManager {
                 self.lastRefreshCheckTime = Date()
                 self.refreshIfNeeded()
             })
+        refreshNow()
     }
 
     func log() {
@@ -122,7 +125,7 @@ final class ConfigurationManager {
 
     }
 
-    private func refreshIfNeeded() {
+    public func refreshIfNeeded() {
         guard self.isReadyToRefresh(), refreshCancellable == nil else {
             os_log("Configuration refresh is not needed at this time", log: .config, type: .debug)
             return

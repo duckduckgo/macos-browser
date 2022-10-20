@@ -44,7 +44,7 @@ final class BitwardenManager: BitwardenManagement, ObservableObject {
         self.communicator = communicator
     }
 
-    private lazy var communicator: BitwardenCommunication = BitwardenComunicator()
+    private lazy var communicator: BitwardenCommunication = BitwardenCommunicator()
 
     func initCommunication() {
         //TODO: adjust the init based on internal setting of password manager and subscribe for dynamic change of the setting
@@ -124,6 +124,7 @@ final class BitwardenManager: BitwardenManagement, ObservableObject {
                 sendHandshake()
             }
 
+            sendHandshake()
             return
         case .disconnected:
             // Bitwarden application isn't running || User didn't approve DuckDuckGo browser integration
@@ -322,13 +323,12 @@ final class BitwardenManager: BitwardenManagement, ObservableObject {
 
 extension BitwardenManager: BitwardenCommunicatorDelegate {
 
-    func bitwadenCommunicator(_ bitwardenCommunicator: BitwardenComunicator, didReceiveMessageData messageData: Data) {
-
+    func bitwadenCommunicator(_ bitwardenCommunicator: BitwardenCommunication, didReceiveMessageData messageData: Data) {
         guard let message = BitwardenMessage(from: messageData) else {
             assertionFailure("Can't decode the message")
             return
         }
-        
+
         //TODO: check id of received message. Throw away not requested messages.
 
         if let command = message.command, command == .connected || command == .disconnected {

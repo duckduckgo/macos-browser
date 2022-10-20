@@ -72,7 +72,7 @@ private extension NSMenuItem {
         case .bookmarks:
             image = TabViewModel.Favicon.preferences
             title = UserText.tabPreferencesTitle
-        case .url:
+        case .url, .privatePlayer:
             image = recentlyClosedTab.favicon
             image?.size = NSSize.faviconSize
             title = recentlyClosedTab.title ?? recentlyClosedTab.tabContent.url?.absoluteString ?? ""

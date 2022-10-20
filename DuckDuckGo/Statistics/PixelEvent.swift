@@ -23,14 +23,6 @@ import BrowserServicesKit
 extension Pixel {
 
     enum Event {
-        case appLaunch(isDefault: IsDefaultBrowser = .init(), launch: AppLaunch)
-        case launchTiming
-
-        case appUsage
-        case appActiveUsage(isDefault: IsDefaultBrowser = .init(), avgTabs: AverageTabsCount)
-
-        case browserMadeDefault
-
         case burn(repetition: Repetition = .init(key: "fire"),
                   burnedTabs: BurnedTabs = .init(),
                   burnedWindows: BurnedWindows = .init())
@@ -72,6 +64,7 @@ extension Pixel {
             case lessThan40s = "40"
             case more = "more"
         }
+
         case compileRulesWait(onboardingShown: OnboardingShown, waitTime: CompileRulesWaitTime, result: WaitResult)
         static func compileRulesWait(onboardingShown: Bool, waitTime interval: TimeInterval, result: WaitResult) -> Event {
             let waitTime: CompileRulesWaitTime
@@ -96,80 +89,28 @@ extension Pixel {
                                      result: result)
         }
 
-        case fireproof(kind: FireproofKind, repetition: Repetition = .init(key: "fireproof"), suggested: FireproofingSuggested)
-        case fireproofSuggested(repetition: Repetition = .init(key: "fireproof-suggested"))
-
-        case manageBookmarks(repetition: Repetition = .init(key: "manage-bookmarks"), source: AccessPoint)
-        case bookmarksList(repetition: Repetition = .init(key: "bookmarks-list"), source: AccessPoint)
-        case manageLogins(repetition: Repetition = .init(key: "manage-logins"), source: AccessPoint)
-        case manageDownloads(repetition: Repetition = .init(key: "manage-downloads"), source: AccessPoint)
-
-        case bookmark(fireproofed: IsBookmarkFireproofed, repetition: Repetition = .init(key: "bookmark"), source: AccessPoint)
-        case favorite(fireproofed: IsBookmarkFireproofed, repetition: Repetition = .init(key: "favorite"), source: AccessPoint)
-
-        static func bookmark(isFavorite: Bool, fireproofed: IsBookmarkFireproofed, source: AccessPoint) -> Event {
-            if isFavorite {
-                return .favorite(fireproofed: fireproofed, source: source)
-            }
-            return .bookmark(fireproofed: fireproofed, source: source)
-        }
-
-        case navigation(kind: NavigationKind, source: NavigationAccessPoint)
-
         case serp
-
-        case suggestionsDisplayed(hasBookmark: HasBookmark, hasFavorite: HasFavorite, hasHistoryEntry: HasHistoryEntry)
-
-        static func suggestionsDisplayed(_ characteristics: SuggestionListChacteristics) -> Event {
-            return .suggestionsDisplayed(hasBookmark: characteristics.hasBookmark ? .hasBookmark : .noBookmarks,
-                                         hasFavorite: characteristics.hasFavorite ? .hasFavorite : .noFavorites,
-                                         hasHistoryEntry: characteristics.hasHistoryEntry ? .hasHistoryEntry : .noHistoryEntry)
-        }
-
-        case sharingMenu(repetition: Repetition = .init(key: "sharing"), result: SharingResult)
-
-        case moreMenu(repetition: Repetition = .init(key: "more"), result: MoreResult)
-
-        case refresh(source: RefreshAccessPoint)
-
-        case importedLogins(repetition: Repetition = .init(key: "imported-logins"), source: DataImportSource)
-        case exportedLogins(repetition: Repetition = .init(key: "exported-logins"))
-        case importedBookmarks(repetition: Repetition = .init(key: "imported-bookmarks"), source: DataImportSource)
-        case exportedBookmarks(repetition: Repetition = .init(key: "exported-bookmarks"))
         
         case dataImportFailed(action: DataImportAction, source: DataImportSource)
+        case faviconImportFailed(source: DataImportSource)
 
         case formAutofilled(kind: FormAutofillKind)
         case autofillItemSaved(kind: FormAutofillKind)
-        
-        case waitlistFirstLaunch
-        case waitlistPresentedLockScreen
-        case waitlistDismissedLockScreen
 
-        case onboardingStartPressed
-        case onboardingImportPressed
-        case onboardingImportSkipped
-        case onboardingSetDefaultPressed
-        case onboardingSetDefaultSkipped
-        case onboardingTypingSkipped
-        
         case autoconsentOptOutFailed
         case autoconsentSelfTestFailed
         
-        case passwordManagerLockScreenPreferencesButtonPressed
-        case passwordManagerLockScreenDisabled
-        case passwordManagerLockScreenTimeoutSelected1Minute
-        case passwordManagerLockScreenTimeoutSelected5Minutes
-        case passwordManagerLockScreenTimeoutSelected15Minutes
-        case passwordManagerLockScreenTimeoutSelected30Minutes
-        case passwordManagerLockScreenTimeoutSelected1Hour
-        
         case ampBlockingRulesCompilationFailed
-
+        
+        case adClickAttributionDetected
+        case adClickAttributionActive
+        
         case debug(event: Debug, error: Error? = nil)
 
         enum Debug {
 
+            case dbMakeDatabaseError
+            case dbContainerInitializationError
             case dbInitializationError
             case dbSaveExcludedHTTPSDomainsError
             case dbSaveBloomFilterError
@@ -216,6 +157,21 @@ extension Pixel {
             case emailAutofillKeychainError
 
             case bookmarksStoreRootFolderMigrationFailed
+            
+            case adAttributionCompilationFailedForAttributedRulesList
+            case adAttributionGlobalAttributedRulesDoNotExist
+            case adAttributionDetectionHeuristicsDidNotMatchDomain
+            case adAttributionLogicUnexpectedStateOnRulesCompiled
+            case adAttributionLogicUnexpectedStateOnInheritedAttribution
+            case adAttributionLogicUnexpectedStateOnRulesCompilationFailed
+            case adAttributionDetectionInvalidDomainInParameter
+            case adAttributionLogicRequestingAttributionTimedOut
+            case adAttributionLogicWrongVendorOnSuccessfulCompilation
+            case adAttributionLogicWrongVendorOnFailedCompilation
+            
+            case webKitDidTerminate
+            
+            case removedInvalidBookmarkManagedObjects
         }
 
     }
@@ -226,20 +182,6 @@ extension Pixel.Event {
 
     var name: String {
         switch self {
-        case .appLaunch(isDefault: let isDefault, launch: let launch):
-            return "ml_mac_app-launch_\(isDefault)_\(launch)"
-        case .launchTiming:
-            return "ml_mac_launch-timing"
-
-        case .appUsage:
-            return "m_mac_usage"
-
-        case .appActiveUsage(isDefault: let isDefault, avgTabs: let avgTabs):
-            return "m_mac_active-usage_\(isDefault)_\(avgTabs)"
-
-        case .browserMadeDefault:
-            return "m_mac_made-default-browser"
-
         case .burn(repetition: let repetition, burnedTabs: let tabs, burnedWindows: let windows):
             return "m_mac_fire-button.\(repetition)_\(tabs)_\(windows)"
 
@@ -251,99 +193,24 @@ extension Pixel.Event {
 
         case .compileRulesWait(onboardingShown: let onboardingShown, waitTime: let waitTime, result: let result):
             return "m_mac_cbr-wait_\(onboardingShown)_\(waitTime)_\(result)"
-
-        case .fireproof(kind: let kind, repetition: let repetition, suggested: let suggested):
-            return "m_mac_fireproof_\(kind)_\(repetition)_\(suggested)"
-
-        case .fireproofSuggested(repetition: let repetition):
-            return "m_mac_fireproof-suggested_\(repetition)"
-
-        case .manageBookmarks(repetition: let repetition, source: let source):
-            return "m_mac_manage-bookmarks_\(repetition)_\(source)"
-
-        case .bookmarksList(repetition: let repetition, source: let source):
-            return "m_mac_bookmarks-list_\(repetition)_\(source)"
-
-        case .manageLogins(repetition: let repetition, source: let source):
-            return "m_mac_manage-logins_\(repetition)_\(source)"
-
-        case .manageDownloads(repetition: let repetition, source: let source):
-            return "m_mac_manage-downloads_\(repetition)_\(source)"
-
-        case .bookmark(fireproofed: let fireproofed, repetition: let repetition, source: let source):
-            return "m_mac_bookmark_\(fireproofed)_\(repetition)_\(source)"
-
-        case .favorite(fireproofed: let fireproofed, repetition: let repetition, source: let source):
-            return "m_mac_favorite_\(fireproofed)_\(repetition)_\(source)"
-
-        case .navigation(kind: let kind, source: let source):
-            return "m_mac_navigation_\(kind)_\(source)"
             
         case .serp:
             return "m_mac_navigation_search"
 
-        case .suggestionsDisplayed(hasBookmark: let hasBookmark, hasFavorite: let hasFavorite, hasHistoryEntry: let hasHistoryEntry):
-            return "m_mac_suggestions-displayed_\(hasBookmark)_\(hasFavorite)_\(hasHistoryEntry)"
-
-        case .sharingMenu(repetition: let repetition, result: let result):
-            return "m_mac_share_\(repetition)_\(result)"
-
-        case .moreMenu(repetition: let repetition, result: let result):
-            return "m_mac_more-menu_\(repetition)_\(result)"
-
-        case .refresh(source: let source):
-            return "m_mac_refresh_\(source)"
-
-        case .importedLogins(repetition: let repetition, source: let source):
-            return "m_mac_imported-logins_\(repetition)_\(source)"
-
-        case .exportedLogins(repetition: let repetition):
-            return "m_mac_exported-logins_\(repetition)"
-
-        case .importedBookmarks(repetition: let repetition, source: let source):
-            return "m_mac_imported-bookmarks_\(repetition)_\(source)"
-
-        case .exportedBookmarks(repetition: let repetition):
-            return "m_mac_exported-bookmarks_\(repetition)"
-            
         case .dataImportFailed(action: let action, source: let source):
             return "m_mac_data-import-failed_\(action)_\(source)"
+            
+        case .faviconImportFailed(source: let source):
+            return "m_mac_favicon-import-failed_\(source)"
 
         case .formAutofilled(kind: let kind):
             return "m_mac_autofill_\(kind)"
 
         case .autofillItemSaved(kind: let kind):
             return "m_mac_save_\(kind)"
-            
-        case .waitlistFirstLaunch:
-            return "m_mac_waitlist_first_launch_while_locked"
-            
-        case .waitlistPresentedLockScreen:
-            return "m_mac_waitlist_lock_screen_presented"
-            
-        case .waitlistDismissedLockScreen:
-            return "m_mac_waitlist_lock_screen_dismissed"
 
         case .debug(event: let event, error: _):
-            return "m_mac_debug_\(event)"
-
-        case .onboardingStartPressed:
-            return "m_mac_onboarding_start_pressed"
-
-        case .onboardingImportPressed:
-            return "m_mac_onboarding_import_pressed"
-
-        case .onboardingImportSkipped:
-            return "m_mac_onboarding_import_skipped"
-
-        case .onboardingSetDefaultPressed:
-            return "m_mac_onboarding_setdefault_pressed"
-
-        case .onboardingSetDefaultSkipped:
-            return "m_mac_onboarding_setdefault_skipped"
-
-        case .onboardingTypingSkipped:
-            return "m_mac_onboarding_setdefault_skipped"
+            return "m_mac_debug_\(event.name)"
 
         case .autoconsentOptOutFailed:
             return "m_mac_autoconsent_optout_failed"
@@ -351,29 +218,14 @@ extension Pixel.Event {
         case .autoconsentSelfTestFailed:
             return "m_mac_autoconsent_selftest_failed"
             
-        case .passwordManagerLockScreenPreferencesButtonPressed:
-            return "m_mac_password_mananger_lock_screen_preferences_button_pressed"
-            
-        case .passwordManagerLockScreenDisabled:
-            return "m_mac_password_mananger_lock_screen_disabled"
-            
-        case .passwordManagerLockScreenTimeoutSelected1Minute:
-            return "m_mac_password_mananger_lock_screen_timeout_selected_1_minute"
-
-        case .passwordManagerLockScreenTimeoutSelected5Minutes:
-            return "m_mac_password_mananger_lock_screen_timeout_selected_5_minutes"
-            
-        case .passwordManagerLockScreenTimeoutSelected15Minutes:
-            return "m_mac_password_mananger_lock_screen_timeout_selected_15_minutes"
-            
-        case .passwordManagerLockScreenTimeoutSelected30Minutes:
-            return "m_mac_password_mananger_lock_screen_timeout_selected_30_minutes"
-            
-        case .passwordManagerLockScreenTimeoutSelected1Hour:
-            return "m_mac_password_mananger_lock_screen_timeout_selected_1_hour"
-            
         case .ampBlockingRulesCompilationFailed:
             return "m_mac_amp_rules_compilation_failed"
+            
+        case .adClickAttributionDetected:
+            return "m_mac_ad_click_detected"
+            
+        case .adClickAttributionActive:
+            return "m_mac_ad_click_active"
         }
     }
 }
@@ -382,7 +234,11 @@ extension Pixel.Event.Debug {
     
     var name: String {
         switch self {
-        
+
+        case .dbMakeDatabaseError:
+            return "database_make_database_error"
+        case .dbContainerInitializationError:
+            return "database_container_error"
         case .dbInitializationError:
             return "dbie"
         case .dbSaveExcludedHTTPSDomainsError:
@@ -472,6 +328,33 @@ extension Pixel.Event.Debug {
             
         case .bookmarksStoreRootFolderMigrationFailed:
             return "bookmarks_store_root_folder_migration_failed"
+            
+        case .adAttributionCompilationFailedForAttributedRulesList:
+            return "ad_attribution_compilation_failed_for_attributed_rules_list"
+        case .adAttributionGlobalAttributedRulesDoNotExist:
+            return "ad_attribution_global_attributed_rules_do_not_exist"
+        case .adAttributionDetectionHeuristicsDidNotMatchDomain:
+            return "ad_attribution_detection_heuristics_did_not_match_domain"
+        case .adAttributionLogicUnexpectedStateOnRulesCompiled:
+            return "ad_attribution_logic_unexpected_state_on_rules_compiled"
+        case .adAttributionLogicUnexpectedStateOnInheritedAttribution:
+            return "ad_attribution_logic_unexpected_state_on_inherited_attribution"
+        case .adAttributionLogicUnexpectedStateOnRulesCompilationFailed:
+            return "ad_attribution_logic_unexpected_state_on_rules_compilation_failed"
+        case .adAttributionDetectionInvalidDomainInParameter:
+            return "ad_attribution_detection_invalid_domain_in_parameter"
+        case .adAttributionLogicRequestingAttributionTimedOut:
+            return "ad_attribution_logic_requesting_attribution_timed_out"
+        case .adAttributionLogicWrongVendorOnSuccessfulCompilation:
+            return "ad_attribution_logic_wrong_vendor_on_successful_compilation"
+        case .adAttributionLogicWrongVendorOnFailedCompilation:
+            return "ad_attribution_logic_wrong_vendor_on_failed_compilation"
+            
+        case .webKitDidTerminate:
+            return "webkit_did_terminate"
+            
+        case .removedInvalidBookmarkManagedObjects:
+            return "removed_invalid_bookmark_managed_objects"
         }
     }
 }

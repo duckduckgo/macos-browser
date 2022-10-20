@@ -36,6 +36,9 @@ final class DownloadsViewController: NSViewController {
         return controller
     }
 
+    @IBOutlet var openDownloadsFolderButton: NSButton!
+    @IBOutlet var clearDownloadsButton: NSButton!
+    
     @IBOutlet var contextMenu: NSMenu!
     @IBOutlet var tableView: NSTableView!
     @IBOutlet var tableViewHeightConstraint: NSLayoutConstraint?
@@ -50,6 +53,9 @@ final class DownloadsViewController: NSViewController {
         super.viewDidLoad()
 
         setupDragAndDrop()
+        
+        openDownloadsFolderButton.toolTip = UserText.openDownloadsFolderTooltip
+        clearDownloadsButton.toolTip = UserText.clearDownloadHistoryTooltip
     }
 
     override func viewWillAppear() {

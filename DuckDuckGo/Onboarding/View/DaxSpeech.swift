@@ -84,7 +84,6 @@ struct DaxSpeech: View {
                 return
             } else if model.skipTypingRequested {
                 typedText = text
-                model.typingSkipped()
             }
 
             if typedText == text {

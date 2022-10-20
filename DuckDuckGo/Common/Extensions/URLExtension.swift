@@ -395,13 +395,4 @@ extension URL {
         return false
     }
 
-    // MARK: - Waitlist
-
-    static let developmentEndpoint = URL(string: "https://quackdev.duckduckgo.com/api/")!
-    static let productionEndpoint = URL(string: "https://quack.duckduckgo.com/api/")!
-
-    static func redeemMacWaitlistInviteCode(endpoint: URL = .developmentEndpoint) -> URL {
-        return endpoint.appendingPathComponent("auth/invites/macosbrowser/redeem")
-    }
-
 }

@@ -34,6 +34,12 @@ final class StatisticsLoader {
     }
 
     func refreshRetentionAtb(isSearch: Bool, completion: @escaping Completion = {}) {
+        // Search ATB is the only call being used currently. This guard statement can be removed to re-enable app retention ATB.
+        guard isSearch else {
+            completion()
+            return
+        }
+
         load {
             dispatchPrecondition(condition: .onQueue(.main))
 
@@ -57,6 +63,7 @@ final class StatisticsLoader {
             completion()
             return
         }
+
         requestInstallStatistics(completion: completion)
     }
     
@@ -66,6 +73,8 @@ final class StatisticsLoader {
         guard !isAppRetentionRequestInProgress else { return }
         isAppRetentionRequestInProgress = true
 
+        os_log("Requesting install statistics", log: .atb, type: .debug)
+        
         APIRequest.request(url: URL.initialAtb) { response, error in
             DispatchQueue.main.async {
                 self.isAppRetentionRequestInProgress = false
@@ -75,6 +84,8 @@ final class StatisticsLoader {
                     return
                 }
 
+                os_log("Install statistics request succeeded", log: .atb, type: .debug)
+                
                 if let data = response?.data, let atb  = try? self.parser.convert(fromJsonData: data) {
                     self.requestExti(atb: atb, completion: completion)
                 } else {
@@ -90,6 +101,8 @@ final class StatisticsLoader {
         guard !isAppRetentionRequestInProgress else { return }
         self.isAppRetentionRequestInProgress = true
 
+        os_log("Requesting exti", log: .atb, type: .debug)
+        
         let installAtb = atb.version + (statisticsStore.variant ?? "")
         let url = URL.exti(forAtb: installAtb)
         APIRequest.request(url: url) { _, error in
@@ -100,6 +113,8 @@ final class StatisticsLoader {
                     completion()
                     return
                 }
+                
+                os_log("Exti request succeeded", log: .atb, type: .debug)
 
                 assert(self.statisticsStore.atb == nil)
                 assert(self.statisticsStore.installDate == nil)
@@ -120,6 +135,8 @@ final class StatisticsLoader {
             requestInstallStatistics(completion: completion)
             return
         }
+        
+        os_log("Requesting search retention ATB", log: .atb, type: .debug)
 
         let url = URL.searchAtb(atbWithVariant: atbWithVariant, setAtb: searchRetentionAtb)
         APIRequest.request(url: url) { response, error in
@@ -129,10 +146,14 @@ final class StatisticsLoader {
                     completion()
                     return
                 }
+                
+                os_log("Search retention ATB request succeeded", log: .atb, type: .debug)
+                
                 if let data = response?.data, let atb  = try? self.parser.convert(fromJsonData: data) {
                     self.statisticsStore.searchRetentionAtb = atb.version
                     self.storeUpdateVersionIfPresent(atb)
                 }
+                
                 completion()
             }
         }
@@ -149,6 +170,8 @@ final class StatisticsLoader {
             return
         }
 
+        os_log("Requesting app retention ATB", log: .atb, type: .debug)
+        
         isAppRetentionRequestInProgress = true
         
         let url = URL.appRetentionAtb(atbWithVariant: atbWithVariant, setAtb: appRetentionAtb)
@@ -161,11 +184,15 @@ final class StatisticsLoader {
                     completion()
                     return
                 }
+
+                os_log("App retention ATB request succeeded", log: .atb, type: .debug)
+                
                 if let data = response?.data, let atb  = try? self.parser.convert(fromJsonData: data) {
                     self.statisticsStore.appRetentionAtb = atb.version
                     self.statisticsStore.lastAppRetentionRequestDate = Date()
                     self.storeUpdateVersionIfPresent(atb)
                 }
+
                 completion()
             }
         }

@@ -204,12 +204,10 @@ extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
         switch action {
         case .openInNewTab:
             tabCollectionViewModel.appendNewTab(with: .url(bookmark.url), selected: true)
-        case .openInBackgroundTab:
-            tabCollectionViewModel.appendNewTab(with: .url(bookmark.url), selected: false)
         case .openInNewWindow:
             WindowsManager.openNewWindow(with: bookmark.url)
         case .clickItem:
-            WindowControllersManager.shared.show(url: bookmark.url)
+            WindowControllersManager.shared.open(bookmark: bookmark)
         case .addToFavorites:
             bookmark.isFavorite = true
             bookmarkManager.update(bookmark: bookmark)
@@ -219,7 +217,7 @@ extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
             addBookmarkViewController.edit(bookmark: bookmark)
             presentAsModalWindow(addBookmarkViewController)
         case .moveToEnd:
-            bookmarkManager.move(objectUUID: bookmark.id, toIndex: nil) { _ in }
+            bookmarkManager.move(objectUUIDs: [bookmark.id], toIndex: nil, withinParentFolder: .root) { _ in }
         case .copyURL:
             NSPasteboard.general.copy(url: bookmark.url)
         case .deleteEntity:
@@ -242,7 +240,7 @@ extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
             addFolderViewController.edit(folder: folder)
             presentAsModalWindow(addFolderViewController)
         case .moveToEnd:
-            bookmarkManager.move(objectUUID: folder.id, toIndex: nil) { _ in }
+            bookmarkManager.move(objectUUIDs: [folder.id], toIndex: nil, withinParentFolder: .root) { _ in }
         case .deleteEntity:
             bookmarkManager.remove(folder: folder)
         default:

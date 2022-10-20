@@ -65,6 +65,9 @@ final class ContextMenuUserScript: NSObject, StaticUserScript {
 
             case "IMG":
                 image = URL(string: url)
+                
+            case "VIDEO":
+                link = URL(string: url)
 
             default: break
             }
@@ -129,6 +132,14 @@ final class ContextMenuUserScript: NSObject, StaticUserScript {
                 });
             }
 
+            if (e.srcElement.tagName === "VIDEO") {
+                console.log("Got video");
+                context.elements.push({
+                    "tagName": "VIDEO",
+                    "url": e.srcElement.currentSrc
+                });
+            }
+
             var parentLink = findParentLink(e.srcElement);
             if (parentLink) {
                 context.elements.push(parentLink);
@@ -136,7 +147,7 @@ final class ContextMenuUserScript: NSObject, StaticUserScript {
         }
 
         webkit.messageHandlers.contextMenu.postMessage(context);
-    });
+    }, true);
 
 }) ();
 """
