@@ -219,6 +219,8 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         if favicon == nil {
             handleFavicon()
         }
+        
+        resetDashboardInfo()
 
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(onDuckDuckGoEmailSignOut),
@@ -1498,7 +1500,6 @@ extension Tab: WKNavigationDelegate {
         if error != nil { error = nil }
 
         invalidateSessionStateData()
-        resetDashboardInfo()
         linkProtection.cancelOngoingExtraction()
         linkProtection.setMainFrameUrl(webView.url)
         referrerTrimming.onBeginNavigation(to: webView.url)
