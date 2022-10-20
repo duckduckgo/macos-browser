@@ -259,6 +259,15 @@ final class NavigationBarViewController: NSViewController {
         toggleDownloadsPopover(keepButtonVisible: false)
     }
 
+    override func mouseDown(with event: NSEvent) {
+        if let menu = view.menu, NSEvent.isContextClick(event) {
+            NSMenu.popUpContextMenu(menu, with: event, for: view)
+            return
+        }
+        
+        super.mouseDown(with: event)
+    }
+    
     func listenToPasswordManagerNotifications() {
         passwordManagerNotificationCancellable = NotificationCenter.default.publisher(for: .PasswordManagerChanged).sink { [weak self] _ in
             self?.updatePasswordManagementButton()
