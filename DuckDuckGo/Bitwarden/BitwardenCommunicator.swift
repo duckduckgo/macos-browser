@@ -34,7 +34,7 @@ protocol BitwardenCommunication {
 
 }
 
-final class BitwardenComunicator: BitwardenCommunication {
+final class BitwardenCommunicator: BitwardenCommunication {
 
     static let appPath = "/Applications/Bitwarden.app/Contents/MacOS/Bitwarden"
 
