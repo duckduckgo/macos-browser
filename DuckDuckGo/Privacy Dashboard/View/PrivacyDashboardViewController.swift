@@ -215,9 +215,9 @@ final class PrivacyDashboardViewController: NSViewController {
     
 }
 
-extension PrivacyDashboardViewController: PrivacyDashboardUserScriptDelegate {
+extension PrivacyDashboardViewController { 
 
-    func userScript(_ userScript: PrivacyDashboardUserScript, didChangeProtectionStateTo isProtected: Bool) {
+    func userScript(_ userScript: OLDPrivacyDashboardUserScript, didChangeProtectionStateTo isProtected: Bool) {
         guard let domain = tabViewModel?.tab.content.url?.host else {
             assertionFailure("PrivacyDashboardViewController: no domain available")
             return
@@ -235,7 +235,7 @@ extension PrivacyDashboardViewController: PrivacyDashboardUserScriptDelegate {
 //        sendPendingUpdates()
     }
 
-    func userScript(_ userScript: PrivacyDashboardUserScript, didSetPermission permission: PermissionType, to state: PermissionAuthorizationState) {
+    func userScript(_ userScript: OLDPrivacyDashboardUserScript, didSetPermission permission: PermissionType, to state: PermissionAuthorizationState) {
         guard let domain = tabViewModel?.tab.content.url?.host else {
             assertionFailure("PrivacyDashboardViewController: no domain available")
             return
@@ -244,19 +244,19 @@ extension PrivacyDashboardViewController: PrivacyDashboardUserScriptDelegate {
         PermissionManager.shared.setPermission(state.persistedPermissionDecision, forDomain: domain, permissionType: permission)
     }
 
-    func userScript(_ userScript: PrivacyDashboardUserScript, setPermission permission: PermissionType, paused: Bool) {
+    func userScript(_ userScript: OLDPrivacyDashboardUserScript, setPermission permission: PermissionType, paused: Bool) {
         tabViewModel?.tab.permissions.set([permission], muted: paused)
     }
 
-    func userScript(_ userScript: PrivacyDashboardUserScript, setHeight height: Int) {
+    func userScript(_ userScript: OLDPrivacyDashboardUserScript, setHeight height: Int) {
 
     }
 
-    func userScript(_ userScript: PrivacyDashboardUserScript, didRequestOpenUrlInNewTab url: URL) {
+    func userScript(_ userScript: OLDPrivacyDashboardUserScript, didRequestOpenUrlInNewTab url: URL) {
 
     }
     
-    func userScript(_ userScript: PrivacyDashboardUserScript, didRequestSubmitBrokenSiteReportWithCategory category: String, description: String) {
+    func userScript(_ userScript: OLDPrivacyDashboardUserScript, didRequestSubmitBrokenSiteReportWithCategory category: String, description: String) {
         let websiteBreakage = makeWebsiteBreakage(category: category, description: description, currentTab: tabViewModel?.tab)
         let websiteBreakageSender = WebsiteBreakageSender()
         websiteBreakageSender.sendWebsiteBreakage(websiteBreakage)

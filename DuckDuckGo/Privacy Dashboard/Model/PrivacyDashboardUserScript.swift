@@ -22,17 +22,17 @@ import UserScript
 import TrackerRadarKit
 import PrivacyDashboard
 
-protocol PrivacyDashboardUserScriptDelegate: AnyObject {
+protocol OLDPrivacyDashboardUserScriptDelegate: AnyObject {
 
-    func userScript(_ userScript: PrivacyDashboardUserScript, didChangeProtectionStateTo protectionState: Bool)
-    func userScript(_ userScript: PrivacyDashboardUserScript, didSetPermission permission: PermissionType, to state: PermissionAuthorizationState)
-    func userScript(_ userScript: PrivacyDashboardUserScript, setPermission permission: PermissionType, paused: Bool)
-    func userScript(_ userScript: PrivacyDashboardUserScript, setHeight height: Int)
-    func userScript(_ userScript: PrivacyDashboardUserScript, didRequestOpenUrlInNewTab: URL)
-    func userScript(_ userScript: PrivacyDashboardUserScript, didRequestSubmitBrokenSiteReportWithCategory category: String, description: String)
+    func userScript(_ userScript: OLDPrivacyDashboardUserScript, didChangeProtectionStateTo protectionState: Bool)
+    func userScript(_ userScript: OLDPrivacyDashboardUserScript, didSetPermission permission: PermissionType, to state: PermissionAuthorizationState)
+    func userScript(_ userScript: OLDPrivacyDashboardUserScript, setPermission permission: PermissionType, paused: Bool)
+    func userScript(_ userScript: OLDPrivacyDashboardUserScript, setHeight height: Int)
+    func userScript(_ userScript: OLDPrivacyDashboardUserScript, didRequestOpenUrlInNewTab: URL)
+    func userScript(_ userScript: OLDPrivacyDashboardUserScript, didRequestSubmitBrokenSiteReportWithCategory category: String, description: String)
 }
 
-final class PrivacyDashboardUserScript: NSObject, StaticUserScript {
+final class OLDPrivacyDashboardUserScript: NSObject, StaticUserScript {
 
     enum MessageNames: String, CaseIterable {
         case privacyDashboardSetProtection
@@ -47,10 +47,10 @@ final class PrivacyDashboardUserScript: NSObject, StaticUserScript {
     static var injectionTime: WKUserScriptInjectionTime { .atDocumentStart }
     static var forMainFrameOnly: Bool { false }
     static var source: String = ""
-    static var script: WKUserScript = PrivacyDashboardUserScript.makeWKUserScript()
+    static var script: WKUserScript = OLDPrivacyDashboardUserScript.makeWKUserScript()
     var messageNames: [String] { MessageNames.allCases.map(\.rawValue) }
 
-    weak var delegate: PrivacyDashboardUserScriptDelegate?
+    weak var delegate: OLDPrivacyDashboardUserScriptDelegate?
     weak var model: FindInPageModel?
 
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
