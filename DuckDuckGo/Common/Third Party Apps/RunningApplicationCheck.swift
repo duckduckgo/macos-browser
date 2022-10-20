@@ -1,5 +1,5 @@
 //
-//  BitwardenState.swift
+//  RunningApplicationCheck.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -18,25 +18,14 @@
 
 import Foundation
 
-enum BitwardenStatus {
+class RunningApplicationCheck {
 
-    // Bitwarden disabled in settings
-    case disabled
-
-    // Bitwarden application isn't running || User didn't approve DuckDuckGo browser integration
-    case notApproachable
-
-    case connected(vault: Vault)
-    case error(error: BitwardenError)
-
-    struct Vault {
-        let id: String
-        let email: String
-        let status: Status
-
-        enum Status: String {
-            case locked
-            case unlocked
+    static func isApplicationRunning(bundleId: String) -> Bool {
+        let runningApplication = NSWorkspace.shared.runningApplications.first { runningApplication in
+            runningApplication.bundleIdentifier == bundleId
         }
+
+        return runningApplication != nil
     }
+
 }
