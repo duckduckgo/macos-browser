@@ -329,6 +329,8 @@ final class AddressBarButtonsViewController: NSViewController {
             privacyDashboardPopover.close()
             return
         }
+        
+        privacyDashboardPopover.viewController.updatePrivacyInfo(selectedTabViewModel.tab.privacyInfo)
         privacyDashboardPopover.viewController.tabViewModel = selectedTabViewModel
         
         let positioningViewInWindow = privacyDashboardPositioningView.convert(privacyDashboardPositioningView.bounds, to: view.window?.contentView)
@@ -781,7 +783,7 @@ final class AddressBarButtonsViewController: NSViewController {
             return
         }
 
-        if let trackerInfo = selectedTabViewModel.tab.trackerInfo {
+        if let trackerInfo = selectedTabViewModel.tab.privacyInfo?.trackerInfo {
             let lastTrackerImages = PrivacyIconViewModel.trackerImages(from: trackerInfo)
             trackerAnimationImageProvider.lastTrackerImages = lastTrackerImages
 

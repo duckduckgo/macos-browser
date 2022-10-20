@@ -30,12 +30,13 @@ final class PrivacyDashboardViewController: NSViewController {
 
     private var webView: WKWebView!
     private var contentHeightConstraint: NSLayoutConstraint!
-    private let privacyDashboardScript = PrivacyDashboardUserScript()
+
+    private let privacyDashboardController =  PrivacyDashboardController(privacyInfo: nil)
+    
     private var cancellables = Set<AnyCancellable>()
     @Published var pendingUpdates = [String: String]()
 
     weak var tabViewModel: TabViewModel?
-    var serverTrustViewModel: ServerTrustViewModel?
     
     private var contentBlockinRulesUpdatedCancellable: AnyCancellable?
     
@@ -53,56 +54,21 @@ final class PrivacyDashboardViewController: NSViewController {
             webView.reload()
         }
     }
-
-    override func viewDidLoad() {
-        privacyDashboardScript.delegate = self
-        initWebView()
-        webView.configuration.userContentController.addHandlerNoContentWorld(privacyDashboardScript)
+    
+    public func updatePrivacyInfo(_ privacyInfo: PrivacyInfo?) {
+        privacyDashboardController.didFinishRulesCompilation()
+        privacyDashboardController.updatePrivacyInfo(privacyInfo)
     }
-
-    private func prepareContentBlockingCancellable<Pub: Publisher>(publisher: Pub)
-    where Pub.Output == [ContentBlockerRulesManager.CompletionToken], Pub.Failure == Never {
-
-        publisher.receive(on: RunLoop.main).sink { [weak self] completionTokens in
-            dispatchPrecondition(condition: .onQueue(.main))
-
-            guard let self = self, !self.pendingUpdates.isEmpty else { return }
-
-            var didUpdate = false
-            for token in completionTokens {
-                if self.pendingUpdates.removeValue(forKey: token) != nil {
-                    didUpdate = true
-                }
-            }
-
-            if didUpdate {
-                self.sendPendingUpdates()
-                self.tabViewModel?.reload()
-            }
-        }.store(in: &cancellables)
-    }
-
-    override func viewWillAppear() {
-        guard let tabViewModel = tabViewModel else { return }
-
-        // This is part of shared logic pasted from the dashboard package
-        guard let url = Bundle.privacyDashboardURL else { return }
-        webView.loadFileURL(url, allowingReadAccessTo: url.deletingLastPathComponent().deletingLastPathComponent())
-        //
+    
+    public override func viewDidLoad() {
+        super.viewDidLoad()
         
-        prepareContentBlockingCancellable(publisher: tabViewModel.tab.cbrCompletionTokensPublisher)
+        initWebView()
+        setupPrivacyDashboardControllerHandlers()
+        
+//        applyTheme(ThemeManager.shared.currentTheme)
     }
-
-    override func viewWillDisappear() {
-        contentHeightConstraint.constant = Constants.initialContentHeight
-        cancellables.removeAll()
-        skipLayoutAnimation = true
-    }
-
-    public func isPendingUpdates() -> Bool {
-        return !pendingUpdates.isEmpty
-    }
-
+    
     private func initWebView() {
         let configuration = WKWebViewConfiguration()
 
@@ -111,123 +77,126 @@ final class PrivacyDashboardViewController: NSViewController {
 #endif
 
         let webView = PrivacyDashboardWebView(frame: .zero, configuration: configuration)
-        webView.navigationDelegate = self
+//        webView.navigationDelegate = self
         self.webView = webView
         view.addAndLayout(webView)
 
         contentHeightConstraint = view.heightAnchor.constraint(equalToConstant: Constants.initialContentHeight)
         contentHeightConstraint.isActive = true
     }
-
-    private func subscribeToPermissions() {
-        tabViewModel?.$usedPermissions.receive(on: DispatchQueue.main).sink { [weak self] _ in
-            self?.updatePermissions()
-        }.store(in: &cancellables)
-
+    
+    override func viewWillAppear() {
+        privacyDashboardController.setup(for: webView)
+        privacyDashboardController.preferredLocale = "en"
+        
+//        prepareContentBlockingCancellable(publisher: tabViewModel.tab.cbrCompletionTokensPublisher)
     }
 
-    private func updatePermissions() {
-        guard let usedPermissions = tabViewModel?.usedPermissions else {
-            assertionFailure("PrivacyDashboardViewController: tabViewModel not set")
-            return
+    override func viewWillDisappear() {
+        privacyDashboardController.cleanUp()
+        contentHeightConstraint.constant = Constants.initialContentHeight
+        skipLayoutAnimation = true
+    }
+    
+    private func setupPrivacyDashboardControllerHandlers() {
+        privacyDashboardController.onProtectionSwitchChange = { [weak self] isEnabled in
+//            self?.privacyDashboardProtectionSwitchChangeHandler(enabled: isEnabled)
         }
-        guard let domain = tabViewModel?.tab.content.url?.host else {
-            privacyDashboardScript.setPermissions(Permissions(), authorizationState: [], domain: "", in: webView)
-            return
+        
+        privacyDashboardController.onCloseTapped = { [weak self] in
+//            self?.privacyDashboardCloseTappedHandler()
         }
-
-        let authState: PrivacyDashboardUserScript.AuthorizationState
-        authState = PermissionManager.shared.persistedPermissionTypes.union(usedPermissions.keys).compactMap { permissionType in
-            guard PermissionManager.shared.hasPermissionPersisted(forDomain: domain, permissionType: permissionType)
-                    || usedPermissions[permissionType] != nil
+        
+        privacyDashboardController.onShowReportBrokenSiteTapped = { [weak self] in
+//            self?.performSegue(withIdentifier: "ReportBrokenSite", sender: self)
+        }
+        
+        privacyDashboardController.onOpenUrlInNewTab = { url in
+            guard let tabCollection = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.tabCollectionViewModel
             else {
-                return nil
+                assertionFailure("could not access shared tabCollectionViewModel")
+                return
             }
-            let decision = PermissionManager.shared.permission(forDomain: domain, permissionType: permissionType)
-            return (permissionType, PermissionAuthorizationState(decision: decision))
+            tabCollection.appendNewTab(with: .url(url), selected: true)
         }
-
-        privacyDashboardScript.setPermissions(usedPermissions, authorizationState: authState, domain: domain, in: webView)
     }
 
-    private func subscribeToConnectionUpgradedTo() {
-        tabViewModel?.tab.$connectionUpgradedTo
-            .receive(on: DispatchQueue.main)
-            .sink(receiveValue: { [weak self] connectionUpgradedTo in
-                guard let self = self else { return }
-                let upgradedHttps = connectionUpgradedTo != nil
-                self.privacyDashboardScript.setUpgradedHttps(upgradedHttps, webView: self.webView)
-            })
-            .store(in: &cancellables)
+//    private func prepareContentBlockingCancellable<Pub: Publisher>(publisher: Pub)
+//    where Pub.Output == [ContentBlockerRulesManager.CompletionToken], Pub.Failure == Never {
+//
+//        publisher.receive(on: RunLoop.main).sink { [weak self] completionTokens in
+//            dispatchPrecondition(condition: .onQueue(.main))
+//
+//            guard let self = self, !self.pendingUpdates.isEmpty else { return }
+//
+//            var didUpdate = false
+//            for token in completionTokens {
+//                if self.pendingUpdates.removeValue(forKey: token) != nil {
+//                    didUpdate = true
+//                }
+//            }
+//
+//            if didUpdate {
+//                self.sendPendingUpdates()
+//                self.tabViewModel?.reload()
+//            }
+//        }.store(in: &cancellables)
+//    }
+
+    public func isPendingUpdates() -> Bool {
+        return !pendingUpdates.isEmpty
     }
 
-    private func subscribeToTrackerInfo() {
-        tabViewModel?.tab.$trackerInfo
-            .receive(on: DispatchQueue.main)
-            .sink(receiveValue: { [weak self] trackerInfo in
-                guard let self = self, let trackerInfo = trackerInfo, let tabUrl = self.tabViewModel?.tab.content.url else { return }
-                self.privacyDashboardScript.setTrackerInfo(tabUrl, trackerInfo: trackerInfo, webView: self.webView)
-            })
-            .store(in: &cancellables)
-    }
+//    private func subscribeToPermissions() {
+//        tabViewModel?.$usedPermissions.receive(on: DispatchQueue.main).sink { [weak self] _ in
+//            self?.updatePermissions()
+//        }.store(in: &cancellables)
+//
+//    }
 
-    private func sendProtectionStatus() {
-        guard let protectionStatus = tabViewModel?.tab.protectionStatus else {
-            assertionFailure("PrivacyDashboardViewController: no protectionStatus available")
-            return
-        }
+//    private func updatePermissions() {
+//        guard let usedPermissions = tabViewModel?.usedPermissions else {
+//            assertionFailure("PrivacyDashboardViewController: tabViewModel not set")
+//            return
+//        }
+//        guard let domain = tabViewModel?.tab.content.url?.host else {
+//            privacyDashboardScript.setPermissions(Permissions(), authorizationState: [], domain: "", in: webView)
+//            return
+//        }
+//
+//        let authState: PrivacyDashboardUserScript.AuthorizationState
+//        authState = PermissionManager.shared.persistedPermissionTypes.union(usedPermissions.keys).compactMap { permissionType in
+//            guard PermissionManager.shared.hasPermissionPersisted(forDomain: domain, permissionType: permissionType)
+//                    || usedPermissions[permissionType] != nil
+//            else {
+//                return nil
+//            }
+//            let decision = PermissionManager.shared.permission(forDomain: domain, permissionType: permissionType)
+//            return (permissionType, PermissionAuthorizationState(decision: decision))
+//        }
+//
+//        privacyDashboardScript.setPermissions(usedPermissions, authorizationState: authState, domain: domain, in: webView)
+//    }
 
-        self.privacyDashboardScript.setProtectionStatus(protectionStatus, webView: self.webView)
-    }
+//    private func sendPendingUpdates() {
+//        guard let domain = tabViewModel?.tab.content.url?.host else {
+//            assertionFailure("PrivacyDashboardViewController: no domain available")
+//            return
+//        }
+//
+//        self.privacyDashboardScript.setIsPendingUpdates(pendingUpdates.values.contains(domain), webView: self.webView)
+//    }
 
-    private func sendPendingUpdates() {
-        guard let domain = tabViewModel?.tab.content.url?.host else {
-            assertionFailure("PrivacyDashboardViewController: no domain available")
-            return
-        }
-
-        self.privacyDashboardScript.setIsPendingUpdates(pendingUpdates.values.contains(domain), webView: self.webView)
-    }
-
-    private func sendParentEntity() {
-        guard let domain = tabViewModel?.tab.content.url?.host else {
-            assertionFailure("PrivacyDashboardViewController: no domain available")
-            return
-        }
-
-        let pageEntity = ContentBlocking.shared.trackerDataManager.trackerData.findEntity(forHost: domain)
-        self.privacyDashboardScript.setParentEntity(pageEntity, webView: self.webView)
-    }
-
-    private func subscribeToServerTrust() {
-        tabViewModel?.tab.$serverTrust
-            .receive(on: DispatchQueue.global(qos: .userInitiated))
-            .map { serverTrust in
-                ServerTrustViewModel(serverTrust: serverTrust)
-            }
-            .receive(on: DispatchQueue.main)
-            .sink(receiveValue: { [weak self] serverTrustViewModel in
-                guard let self = self, let serverTrustViewModel = serverTrustViewModel else { return }
-                self.privacyDashboardScript.setServerTrust(serverTrustViewModel, webView: self.webView)
-            })
-            .store(in: &cancellables)
-    }
+//    private func subscribeToConsentManaged() {
+//        tabViewModel?.tab.$cookieConsentManaged
+//            .receive(on: DispatchQueue.main)
+//            .sink(receiveValue: { [weak self] consentManaged in
+//                guard let self = self else { return }
+//                self.privacyDashboardScript.setConsentManaged(consentManaged, webView: self.webView)
+//            })
+//            .store(in: &cancellables)
+//    }
     
-    private func subscribeToConsentManaged() {
-        tabViewModel?.tab.$cookieConsentManaged
-            .receive(on: DispatchQueue.main)
-            .sink(receiveValue: { [weak self] consentManaged in
-                guard let self = self else { return }
-                self.privacyDashboardScript.setConsentManaged(consentManaged, webView: self.webView)
-            })
-            .store(in: &cancellables)
-    }
-    
-    private func sendCurrentLocale() {
-        let enLanguageCode = "en" // Fix the language to english until the app supports localisation
-        privacyDashboardScript.setLocale(enLanguageCode, webView: webView)
-    }
-
 }
 
 extension PrivacyDashboardViewController: PrivacyDashboardUserScriptDelegate {
@@ -247,7 +216,7 @@ extension PrivacyDashboardViewController: PrivacyDashboardUserScriptDelegate {
 
         let completionToken = ContentBlocking.shared.contentBlockingManager.scheduleCompilation()
         pendingUpdates[completionToken] = domain
-        sendPendingUpdates()
+//        sendPendingUpdates()
     }
 
     func userScript(_ userScript: PrivacyDashboardUserScript, didSetPermission permission: PermissionType, to state: PermissionAuthorizationState) {
@@ -282,12 +251,13 @@ extension PrivacyDashboardViewController: PrivacyDashboardUserScriptDelegate {
     }
 
     func userScript(_ userScript: PrivacyDashboardUserScript, didRequestOpenUrlInNewTab url: URL) {
-        guard let tabCollection = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.tabCollectionViewModel
-        else {
-            assertionFailure("could not access shared tabCollectionViewModel")
-            return
-        }
-        tabCollection.appendNewTab(with: .url(url), selected: true)
+        // Handled 
+//        guard let tabCollection = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.tabCollectionViewModel
+//        else {
+//            assertionFailure("could not access shared tabCollectionViewModel")
+//            return
+//        }
+//        tabCollection.appendNewTab(with: .url(url), selected: true)
     }
     
     func userScript(_ userScript: PrivacyDashboardUserScript, didRequestSubmitBrokenSiteReportWithCategory category: String, description: String) {
@@ -300,8 +270,8 @@ extension PrivacyDashboardViewController: PrivacyDashboardUserScriptDelegate {
         // ⚠️ To limit privacy risk, site URL is trimmed to not include query and fragment
         let currentURL = currentTab?.content.url?.trimmingQueryItemsAndFragment()?.absoluteString ?? ""
         
-        let blockedTrackerDomains = currentTab?.trackerInfo?.trackersBlocked.compactMap { $0.domain } ?? []
-        let installedSurrogates = currentTab?.trackerInfo?.installedSurrogates.map {$0} ?? []
+        let blockedTrackerDomains = currentTab?.privacyInfo?.trackerInfo.trackersBlocked.compactMap { $0.domain } ?? []
+        let installedSurrogates = currentTab?.privacyInfo?.trackerInfo.installedSurrogates.map {$0} ?? []
         let ampURL = currentTab?.linkProtection.lastAMPURLString ?? ""
         let urlParametersRemoved = currentTab?.linkProtection.urlParametersRemoved ?? false
         
@@ -309,7 +279,7 @@ extension PrivacyDashboardViewController: PrivacyDashboardUserScriptDelegate {
                                               description: description,
                                               siteUrlString: currentURL,
                                               osVersion: "\(ProcessInfo.processInfo.operatingSystemVersion)",
-                                              upgradedHttps: currentTab?.connectionUpgradedTo != nil,
+                                              upgradedHttps: currentTab?.privacyInfo?.connectionUpgradedTo != nil,
                                               tdsETag: ContentBlocking.shared.contentBlockingManager.currentRules.first?.etag,
                                               blockedTrackerDomains: blockedTrackerDomains,
                                               installedSurrogates: installedSurrogates,
@@ -318,20 +288,4 @@ extension PrivacyDashboardViewController: PrivacyDashboardUserScriptDelegate {
                                               urlParametersRemoved: urlParametersRemoved)
         return websiteBreakage
     }
-}
-
-extension PrivacyDashboardViewController: WKNavigationDelegate {
-
-    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        subscribeToPermissions()
-        subscribeToTrackerInfo()
-        subscribeToConnectionUpgradedTo()
-        subscribeToServerTrust()
-        sendProtectionStatus()
-        sendPendingUpdates()
-        sendParentEntity()
-        subscribeToConsentManaged()
-        sendCurrentLocale()
-    }
-
 }

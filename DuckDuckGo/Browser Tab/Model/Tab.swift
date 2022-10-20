@@ -291,6 +291,8 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             if let title = content.title {
                 self.title = title
             }
+            
+            resetDashboardInfo()
         }
     }
 
@@ -859,41 +861,52 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     }
     
     // MARK: - Dashboard Info
-
-    @Published private(set) var trackerInfo: TrackerInfo?
-    @Published private(set) var protectionStatus: ProtectionStatus?
-    @Published private(set) var serverTrust: ServerTrust?
-    @Published private(set) var connectionUpgradedTo: URL?
+    private(set) var privacyInfo: PrivacyInfo?
     @Published private(set) var cookieConsentManaged: CookieConsentInfo?
 
     private func resetDashboardInfo() {
-        trackerInfo = TrackerInfo()
-        if self.serverTrust?.host != content.url?.host {
-            serverTrust = nil
+        guard let url = content.url, let host = url.host else {
+            privacyInfo = nil
+            return
         }
         
-        protectionStatus = makeProtectionStatus(for: webView.url?.host)
+        let entity = ContentBlocking.shared.trackerDataManager.trackerData.findEntity(forHost: host)
+        
+        privacyInfo = PrivacyInfo(url: url,
+                                  parentEntity: entity,
+                                  protectionStatus: makeProtectionStatus(for: host),
+                                  serverTrust: previousServerTrustIfSameHost(host))
     }
-
+    
+    private func previousServerTrustIfSameHost(_ host: String) -> ServerTrust? {
+        let previousServerTrustForSameHost: ServerTrust?
+    
+        if let serverTrust = privacyInfo?.serverTrust, serverTrust.host == host {
+            previousServerTrustForSameHost = serverTrust
+        } else {
+            previousServerTrustForSameHost = nil
+        }
+        
+        return previousServerTrustForSameHost
+    }
+    
     private func resetConnectionUpgradedTo(navigationAction: WKNavigationAction) {
-        let isOnUpgradedPage = navigationAction.request.url == connectionUpgradedTo
+        let isOnUpgradedPage = navigationAction.request.url == privacyInfo?.connectionUpgradedTo
         if !navigationAction.isTargetingMainFrame || isOnUpgradedPage { return }
-        connectionUpgradedTo = nil
+        privacyInfo?.connectionUpgradedTo = nil
     }
 
     private func setConnectionUpgradedTo(_ upgradedUrl: URL, navigationAction: WKNavigationAction) {
         if !navigationAction.isTargetingMainFrame { return }
-        connectionUpgradedTo = upgradedUrl
+        privacyInfo?.connectionUpgradedTo = upgradedUrl
     }
 
     public func setMainFrameConnectionUpgradedTo(_ upgradedUrl: URL?) {
         if upgradedUrl == nil { return }
-        connectionUpgradedTo = upgradedUrl
+        privacyInfo?.connectionUpgradedTo = upgradedUrl
     }
     
-    private func makeProtectionStatus(for host: String?) -> ProtectionStatus? {
-        guard let host = host else { return nil }
-        
+    private func makeProtectionStatus(for host: String) -> ProtectionStatus {
         let config = ContentBlocking.shared.privacyConfigurationManager.privacyConfig
         
         let isTempUnprotected = config.isTempUnprotected(domain: host)
@@ -1041,14 +1054,14 @@ extension Tab: ContentBlockerRulesUserScriptDelegate {
     }
     
     func contentBlockerRulesUserScript(_ script: ContentBlockerRulesUserScript, detectedTracker tracker: DetectedRequest) {
-        trackerInfo?.add(detectedTracker: tracker)
+        privacyInfo?.trackerInfo.add(detectedTracker: tracker)
         adClickAttributionLogic.onRequestDetected(request: tracker)
         guard let url = URL(string: tracker.pageUrl) else { return }
         historyCoordinating.addDetectedTracker(tracker, onURL: url)
     }
 
     func contentBlockerRulesUserScript(_ script: ContentBlockerRulesUserScript, detectedThirdPartyRequest request: DetectedRequest) {
-        trackerInfo?.add(detectedThirdPartyRequest: request)
+        privacyInfo?.trackerInfo.add(detectedThirdPartyRequest: request)
     }
     
 }
@@ -1103,8 +1116,8 @@ extension Tab: SurrogatesUserScriptDelegate {
     }
 
     func surrogatesUserScript(_ script: SurrogatesUserScript, detectedTracker tracker: DetectedRequest, withSurrogate host: String) {
-        trackerInfo?.add(installedSurrogateHost: host)
-        trackerInfo?.add(detectedTracker: tracker)
+        privacyInfo?.trackerInfo.add(installedSurrogateHost: host)
+        privacyInfo?.trackerInfo.add(detectedTracker: tracker)
         guard let url = webView.url else { return }
         historyCoordinating.addDetectedTracker(tracker, onURL: url)
     }
@@ -1216,7 +1229,7 @@ extension Tab: WKNavigationDelegate {
 
         completionHandler(.performDefaultHandling, nil)
         if let host = webView.url?.host, let serverTrust = challenge.protectionSpace.serverTrust, host == challenge.protectionSpace.host {
-            self.serverTrust = ServerTrust(host: host, secTrust: serverTrust)
+            privacyInfo?.serverTrust = ServerTrust(host: host, secTrust: serverTrust)
         }
     }
 
