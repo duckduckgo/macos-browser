@@ -982,15 +982,16 @@ extension TabBarViewController: NSCollectionViewDelegate {
 extension TabBarViewController: TabBarViewItemDelegate {
 
     func tabBarViewItem(_ tabBarViewItem: TabBarViewItem, isMouseOver: Bool) {
-        let tabItemConvertedFrame = view.convert(tabBarViewItem.view.frame, from: tabBarViewItem.view)
-        let stackViewConvertedFrame = view.convert(rightSideStackView.frame, from: rightSideStackView)
-        
-        // Prevent tab preview from being shown if tab item is bellow the right side stack
-        if tabItemConvertedFrame.intersects(stackViewConvertedFrame) {
-            return
-        }
+
+       
         
         if isMouseOver {
+            
+            // Do not display preview if entire frame is not visible
+            if tabBarViewItem.view.visibleRect.width != tabBarViewItem.view.frame.width {
+                return
+            }
+            
             // Show tab preview for visible tab bar items
             if collectionView.visibleRect.intersects(tabBarViewItem.view.frame) {
                 showTabPreview(for: tabBarViewItem)
