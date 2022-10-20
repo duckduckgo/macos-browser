@@ -21,7 +21,7 @@ import os.log
 
 protocol BitwardenCommunicatorDelegate: AnyObject {
 
-    func bitwadenCommunicator(_ bitwardenCommunicator: BitwardenComunicator,
+    func bitwadenCommunicator(_ bitwardenCommunicator: BitwardenCommunication,
                               didReceiveMessageData messageData: Data)
 
 }
@@ -87,7 +87,7 @@ final class BitwardenCommunicator: BitwardenCommunication {
 
         //TODO: catch
         try process.run()
-        os_log("BitwardenComunicator: Proxy process running", log: .bitwarden, type: .default)
+        os_log("BitwardenCommunicator: Proxy process running", log: .bitwarden, type: .default)
 
         self.process = BitwardenProcess(process: process, readingHandle: outHandle, writingHandle: inputHandle)
     }
@@ -98,7 +98,7 @@ final class BitwardenCommunicator: BitwardenCommunication {
     }
 
     private func processDidTerminate(_ process: Process) {
-        os_log("BitwardenComunicator: Proxy process terminated", log: .bitwarden, type: .default)
+        os_log("BitwardenCommunicator: Proxy process terminated", log: .bitwarden, type: .default)
 
         //TODO: handle the termination
     }

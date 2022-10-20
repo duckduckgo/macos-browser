@@ -95,7 +95,6 @@ final class AddressBarTextField: NSTextField {
                 guard let self = self else { return }
                 if self.suggestionContainerViewModel?.suggestionContainer.result?.count ?? 0 > 0 {
                     self.showSuggestionWindow()
-                    Pixel.fire(.suggestionsDisplayed(self.suggestionsContainLocalItems()))
                 }
             }
     }
@@ -264,21 +263,19 @@ final class AddressBarTextField: NSTextField {
         if url.isDuckDuckGoSearch,
            let oldURL = selectedTabViewModel.tab.content.url,
             oldURL.isDuckDuckGoSearch {
-            if let ia = try? oldURL.getParameter(name: URL.DuckDuckGoParameters.ia.rawValue),
-               let newURL = try? url.appendingParameter(name: URL.DuckDuckGoParameters.ia.rawValue, value: ia) {
-                url = newURL
+            if let ia = oldURL.getParameter(named: URL.DuckDuckGoParameters.ia.rawValue) {
+                url = url.removingParameters(named: [URL.DuckDuckGoParameters.ia.rawValue])
+                    .appendingParameter(name: URL.DuckDuckGoParameters.ia.rawValue, value: ia)
             }
-            if let iax = try? oldURL.getParameter(name: URL.DuckDuckGoParameters.iax.rawValue),
-               let newURL = try? url.appendingParameter(name: URL.DuckDuckGoParameters.iax.rawValue, value: iax) {
-                url = newURL
+            if let iax = oldURL.getParameter(named: URL.DuckDuckGoParameters.iax.rawValue) {
+                url = url.removingParameters(named: [URL.DuckDuckGoParameters.iax.rawValue])
+                    .appendingParameter(name: URL.DuckDuckGoParameters.iax.rawValue, value: iax)
             }
         }
 
         if selectedTabViewModel.tab.content.url == url {
-            Pixel.fire(.refresh(source: .reloadURL))
             selectedTabViewModel.reload()
         } else {
-            Pixel.fire(.navigation(kind: .init(url: url), source: suggestion != nil ? .suggestion : .addressBar))
             selectedTabViewModel.tab.update(url: url)
         }
 
@@ -308,7 +305,6 @@ final class AddressBarTextField: NSTextField {
             return
         }
 
-        Pixel.fire(.navigation(kind: .init(url: url), source: suggestion != nil ? .suggestion : .addressBar))
         let tab = Tab(content: .url(url), shouldLoadInBackground: true)
         tabCollectionViewModel.append(tab: tab, selected: selected)
     }

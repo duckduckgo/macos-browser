@@ -183,6 +183,8 @@ final class AddressBarButtonsViewController: NSViewController {
         subscribeToEffectiveAppearance()
         subscribeToIsMouseOverAnimationVisible()
         updateBookmarkButtonVisibility()
+        
+        privacyEntryPointButton.toolTip = UserText.privacyDashboardTooltip
     }
 
     override func viewWillAppear() {
@@ -328,6 +330,9 @@ final class AddressBarButtonsViewController: NSViewController {
             return
         }
         privacyDashboardPopover.viewController.tabViewModel = selectedTabViewModel
+        
+        let positioningViewInWindow = privacyDashboardPositioningView.convert(privacyDashboardPositioningView.bounds, to: view.window?.contentView)
+        privacyDashboardPopover.setPreferredMaxHeight(positioningViewInWindow.origin.y)
         privacyDashboardPopover.show(relativeTo: privacyDashboardPositioningView.bounds, of: privacyDashboardPositioningView, preferredEdge: .maxY)
 
         privacyEntryPointButton.state = .on
@@ -615,20 +620,24 @@ final class AddressBarButtonsViewController: NSViewController {
         }
 
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else { return }
+        
+        if controllerMode == .editing(isUrl: false) {
+            [geolocationButton, cameraButton, microphoneButton, popupsButton, externalSchemeButton].forEach {
+                $0?.buttonState = .none
+            }
+        } else {
+            geolocationButton.buttonState = selectedTabViewModel.usedPermissions.geolocation
 
-        geolocationButton.buttonState = selectedTabViewModel.usedPermissions.geolocation
+            let (camera, microphone) = PermissionState?.combineCamera(selectedTabViewModel.usedPermissions.camera,
+                                                                      withMicrophone: selectedTabViewModel.usedPermissions.microphone)
+            cameraButton.buttonState = camera
+            microphoneButton.buttonState = microphone
 
-        let (camera, microphone) = PermissionState?.combineCamera(selectedTabViewModel.usedPermissions.camera,
-                                                                  withMicrophone: selectedTabViewModel.usedPermissions.microphone)
-        cameraButton.buttonState = camera
-        microphoneButton.buttonState = microphone
-
-        popupsButton.buttonState = selectedTabViewModel.usedPermissions.popups?.isRequested == true // show only when there're popups blocked
-            ? selectedTabViewModel.usedPermissions.popups
-            : nil
-        externalSchemeButton.buttonState = selectedTabViewModel.usedPermissions.externalScheme
-
-        showOrHidePermissionPopoverIfNeeded()
+            popupsButton.buttonState = selectedTabViewModel.usedPermissions.popups?.isRequested == true // show only when there're popups blocked
+                ? selectedTabViewModel.usedPermissions.popups
+                : nil
+            externalSchemeButton.buttonState = selectedTabViewModel.usedPermissions.externalScheme
+        }
     }
 
     private func showOrHidePermissionPopoverIfNeeded() {
@@ -655,10 +664,12 @@ final class AddressBarButtonsViewController: NSViewController {
            isUrlBookmarked || bookmarkManager.isUrlBookmarked(url: url) {
             bookmarkButton.image = Self.bookmarkFilledImage
             bookmarkButton.mouseOverTintColor = NSColor.bookmarkFilledTint
+            bookmarkButton.toolTip = UserText.editBookmarkTooltip
         } else {
             bookmarkButton.mouseOverTintColor = nil
             bookmarkButton.image = Self.bookmarkImage
             bookmarkButton.contentTintColor = nil
+            bookmarkButton.toolTip = UserText.addBookmarkTooltip
         }
     }
 
@@ -869,8 +880,6 @@ final class AddressBarButtonsViewController: NSViewController {
                                                     title: selectedTabViewModel.title,
                                                     isFavorite: setFavorite)
         updateBookmarkButtonImage(isUrlBookmarked: bookmark != nil)
-
-        Pixel.fire(.bookmark(isFavorite: setFavorite, fireproofed: .init(url: url), source: accessPoint))
 
         return bookmark
     }

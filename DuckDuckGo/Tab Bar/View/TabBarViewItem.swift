@@ -255,6 +255,61 @@ final class TabBarViewItem: NSCollectionViewItem {
         }
     }
 
+    private lazy var borderLayer: CALayer = {
+        let layer = CALayer()
+        layer.borderWidth = TabShadowConfig.dividerSize
+        layer.opacity = TabShadowConfig.alpha
+        layer.maskedCorners = [.layerMaxXMaxYCorner, .layerMinXMaxYCorner]
+        layer.cornerRadius = 7
+        layer.mask = layerMask
+        return layer
+    }()
+        
+    private lazy var layerMask: CALayer = {
+        let layer = CALayer()
+        layer.addSublayer(leftPixelMask)
+        layer.addSublayer(rightPixelMask)
+        layer.addSublayer(topContentLineMask)
+        return layer
+    }()
+    
+    private lazy var leftPixelMask: CALayer = {
+        let layer = CALayer()
+        layer.backgroundColor = NSColor.white.cgColor
+        return layer
+    }()
+    
+    private lazy var rightPixelMask: CALayer = {
+        let layer = CALayer()
+        layer.backgroundColor = NSColor.white.cgColor
+        return layer
+    }()
+    
+    private lazy var topContentLineMask: CALayer = {
+        let layer = CALayer()
+        layer.backgroundColor = NSColor.white.cgColor
+        return layer
+    }()
+    
+    override func viewWillLayout() {
+        super.viewWillLayout()
+        
+        withoutAnimation {
+            borderLayer.frame = self.view.bounds
+            leftPixelMask.frame = CGRect(x: 0, y: 0, width: TabShadowConfig.dividerSize, height: TabShadowConfig.dividerSize)
+            rightPixelMask.frame = CGRect(x: borderLayer.bounds.width - TabShadowConfig.dividerSize, y: 0, width: TabShadowConfig.dividerSize, height: TabShadowConfig.dividerSize)
+            topContentLineMask.frame = CGRect(x: 0, y: TabShadowConfig.dividerSize, width: borderLayer.bounds.width, height: borderLayer.bounds.height - TabShadowConfig.dividerSize)
+        }
+    }
+    
+    private func updateBorderLayerColor() {
+        NSAppearance.withAppAppearance {
+            withoutAnimation {
+                borderLayer.borderColor = NSColor(named: TabShadowConfig.colorName)?.cgColor
+            }
+        }
+    }
+    
     private func setupView() {
         mouseOverView.delegate = self
         mouseClickView.delegate = self
@@ -263,8 +318,9 @@ final class TabBarViewItem: NSCollectionViewItem {
         view.layer?.cornerRadius = 7
         view.layer?.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
         view.layer?.masksToBounds = true
+        view.layer?.addSublayer(borderLayer)
     }
-
+    
     private func clearSubscriptions() {
         cancellables.removeAll()
     }
@@ -284,6 +340,14 @@ final class TabBarViewItem: NSCollectionViewItem {
 
         faviconWrapperViewCenterConstraint.priority = titleTextField.isHidden ? .defaultHigh : .defaultLow
         faviconWrapperViewLeadingConstraint.priority = titleTextField.isHidden ? .defaultLow : .defaultHigh
+        
+        updateBorderLayerColor()
+        
+        if isSelected {
+            borderLayer.isHidden = false
+        } else {
+            borderLayer.isHidden = true
+        }
     }
 
     private var usedPermissions = Permissions() {

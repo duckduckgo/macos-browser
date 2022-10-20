@@ -45,7 +45,6 @@ final class BookmarksBarViewModel: NSObject {
     
     enum BookmarksBarItemAction {
         case clickItem
-        case openInBackgroundTab
         case openInNewTab
         case openInNewWindow
         case addToFavorites
@@ -180,13 +179,18 @@ final class BookmarksBarViewModel: NSObject {
         }
 
         if bookmarksBarItemsTotalWidth >= clipThreshold {
-            if clipLastBarItem() {
-                delegate?.bookmarksBarViewModelReloadedData()
+            while bookmarksBarItemsTotalWidth >= clipThreshold {
+                if !clipLastBarItem() {
+                    // Short circuit the while loop in the case that clipping the last item doesn't succeed.
+                    break
+                }
             }
-        } else if let nextRestorableClippedItem = clippedItems.first {
+
+            delegate?.bookmarksBarViewModelReloadedData()
+        } else if !clippedItems.isEmpty {
             var restoredItem = false
 
-            while true {
+            while let nextRestorableClippedItem = clippedItems.first {
                 if !restoreNextClippedItemToBookmarksBarIfPossible(item: nextRestorableClippedItem) {
                     break
                 }
@@ -223,11 +227,11 @@ final class BookmarksBarViewModel: NSObject {
             textSizeCalculationLabel.stringValue = buttonTitle
             textSizeCalculationLabel.sizeToFit()
 
-            let cappedTitleWidth = min(Constants.maximumButtonWidth, textSizeCalculationLabel.frame.width)
+            let cappedTitleWidth = ceil(min(Constants.maximumButtonWidth, textSizeCalculationLabel.frame.width))
             let calculatedWidth = min(Constants.maximumButtonWidth, textSizeCalculationLabel.frame.width) + Constants.additionalItemWidth
             collectionViewItemSizeCache[buttonTitle] = cappedTitleWidth
             
-            return calculatedWidth
+            return ceil(calculatedWidth)
         }
     }
     
@@ -386,7 +390,7 @@ extension BookmarksBarViewModel: NSCollectionViewDelegate, NSCollectionViewDataS
             collectionView.animator().moveItem(at: existingIndexPath, to: IndexPath(item: index, section: 0))
             existingItemDraggingIndexPath = nil
             
-            bookmarkManager.move(objectUUID: entityUUID, toIndex: index, withinParentFolder: .root) { error in
+            bookmarkManager.move(objectUUIDs: [entityUUID], toIndex: newIndexPath.item, withinParentFolder: .root) { error in
                 if error != nil {
                     self.delegate?.bookmarksBarViewModelReloadedData()
                 }
@@ -398,7 +402,7 @@ extension BookmarksBarViewModel: NSCollectionViewDelegate, NSCollectionViewDataS
 
             for item in pasteboardItems {
                 if let bookmarkEntityUUID = item.bookmarkEntityUUID {
-                    bookmarkManager.move(objectUUID: bookmarkEntityUUID, toIndex: currentIndexPathItem, withinParentFolder: .root) { error in
+                    bookmarkManager.move(objectUUIDs: [bookmarkEntityUUID], toIndex: currentIndexPathItem, withinParentFolder: .root) { error in
                         if error != nil {
                             self.delegate?.bookmarksBarViewModelReloadedData()
                         }
@@ -448,17 +452,7 @@ extension BookmarksBarViewModel: BookmarksBarCollectionViewItemDelegate {
             return
         }
 
-        let action: BookmarksBarItemAction
-        
-        if NSApplication.shared.isCommandPressed && NSApplication.shared.isShiftPressed {
-            action = .openInNewTab
-        } else if NSApplication.shared.isCommandPressed {
-            action = .openInBackgroundTab
-        } else {
-            action = .clickItem
-        }
-        
-        delegate?.bookmarksBarViewModelReceived(action: action, for: item)
+        delegate?.bookmarksBarViewModelReceived(action: .clickItem, for: item)
     }
     
     func bookmarksBarCollectionViewItemOpenInNewTabAction(_ item: BookmarksBarCollectionViewItem) {        

@@ -248,53 +248,12 @@ extension Pixel.Event {
 
     }
 
-    enum NavigationKind: String, CustomStringConvertible {
-        var description: String { rawValue }
-
-        case search
-        case url
-        case bookmark
-        case favorite
-
-        static func bookmark(isFavorite: Bool) -> NavigationKind {
-            if isFavorite {
-                return .favorite
-            }
-            return .bookmark
-        }
-
-        init(url: URL?, bookmarkManager: BookmarkManager = LocalBookmarkManager.shared) {
-            guard let url = url,
-                  !url.isDuckDuckGoSearch else {
-                self = .search
-                return
-            }
-            guard let bookmark = bookmarkManager.getBookmark(for: url) else {
-                self = .url
-                return
-            }
-            self = .bookmark(isFavorite: bookmark.isFavorite)
-        }
-
-    }
-
     enum FormAutofillKind: String, CustomStringConvertible {
         var description: String { rawValue }
 
         case password
         case card
         case identity
-    }
-
-    enum NavigationAccessPoint: String, CustomStringConvertible {
-        var description: String { rawValue }
-
-        case mainMenu = "source-menu"
-        case addressBar = "source-address-bar"
-        case suggestion = "source-suggestion"
-        case newTab = "source-new-tab"
-        case listInterface = "source-list-interface"
-        case managementInterface = "source-management-interface"
     }
 
     enum HasBookmark: String, CustomStringConvertible {
@@ -316,72 +275,6 @@ extension Pixel.Event {
 
         case hasHistoryEntry = "has-history-entry"
         case noHistoryEntry = "no-history-entry"
-    }
-
-    enum SharingResult: String, CustomStringConvertible {
-        var description: String { rawValue }
-
-        case success
-        case failure
-        case cancelled
-    }
-
-    enum MoreResult: String, CustomStringConvertible {
-        var description: String { rawValue }
-
-        case newTab = "new-tab"
-        case cancelled = "cancelled"
-        case newWindow = "new-window"
-        case feedback = "feedback"
-        case bookmarksList = "bookmarks-list"
-        case loginsMenu = "logins-menu"
-        case loginsMenuAllItems = "logins-menu-all-items"
-        case loginsMenuLogins = "logins-menu-logins"
-        case loginsMenuIdentities = "logins-menu-identities"
-        case loginsMenuCreditCards = "logins-menu-credit-cards"
-        case loginsMenuNotes = "logins-menu-notes"
-        case emailProtection = "email-protection"
-        case emailProtectionCreateAddress = "email-protection-create"
-        case emailProtectionOff = "email-protection-off"
-        case fireproof = "fireproof"
-        case preferences = "preferences"
-        case downloads = "downloads"
-        case findInPage = "find-in-page"
-        case print = "print"
-    }
-
-    enum RefreshAccessPoint: String, CustomStringConvertible {
-        var description: String { rawValue }
-
-        case hotKey = "source-cmd-r"
-        case button = "source-button"
-        case mainMenu = "source-menu"
-        case reloadURL = "source-url"
-
-        init(sender: Any, default: RefreshAccessPoint, mainMenuCheck: (NSMenu?) -> Bool = { $0 is MainMenu }) {
-            switch sender {
-            case let menuItem as NSMenuItem:
-                if mainMenuCheck(menuItem.topMenu) {
-                    if let event = NSApp.currentEvent,
-                       case .keyDown = event.type,
-                       event.characters == menuItem.keyEquivalent {
-
-                        self = .hotKey
-                    } else {
-                        self = .mainMenu
-                    }
-                } else {
-                    self = `default`
-                }
-
-            case is NSButton:
-                self = .button
-
-            default:
-                assertionFailure("RefreshAccessPoint: Unexpected type of sender: \(type(of: sender))")
-                self = `default`
-            }
-        }
     }
 
     enum DataImportAction: String, CustomStringConvertible {

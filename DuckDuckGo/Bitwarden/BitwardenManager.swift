@@ -42,7 +42,7 @@ final class BitwardenManager: BitwardenManagement {
         self.communicator = communicator
     }
 
-    private lazy var communicator: BitwardenCommunication = BitwardenComunicator()
+    private lazy var communicator: BitwardenCommunication = BitwardenCommunicator()
 
     func initCommunication() {
         //TODO: adjust the init based on internal setting of password manager and subscribe for dynamic change of the setting
@@ -314,7 +314,7 @@ final class BitwardenManager: BitwardenManagement {
 
 extension BitwardenManager: BitwardenCommunicatorDelegate {
 
-    func bitwadenCommunicator(_ bitwardenCommunicator: BitwardenComunicator, didReceiveMessageData messageData: Data) {
+    func bitwadenCommunicator(_ bitwardenCommunicator: BitwardenCommunication, didReceiveMessageData messageData: Data) {
 
         guard let message = BitwardenMessage(from: messageData) else {
             assertionFailure("Can't decode the message")

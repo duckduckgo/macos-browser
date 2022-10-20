@@ -313,11 +313,12 @@ final class BrowserTabViewController: NSViewController {
         guard tabCollectionViewModel.selectDisplayableTabIfPresent(content) == false else {
             return
         }
-
+        
         let tab = Tab(content: content,
                       parentTab: parentTab,
                       shouldLoadInBackground: true,
-                      canBeClosedWithBack: canBeClosedWithBack)
+                      canBeClosedWithBack: canBeClosedWithBack,
+                      webViewFrame: view.frame)
 
         if parentTab != nil {
             tabCollectionViewModel.insertChild(tab: tab, selected: selected)
@@ -385,7 +386,7 @@ final class BrowserTabViewController: NSViewController {
             }
             showTransientTabContentController(OnboardingViewController.create(withDelegate: self))
 
-        case .url:
+        case .url, .privatePlayer:
             if shouldReplaceWebView(for: tabViewModel) {
                 removeAllTabContent(includingWebView: true)
                 changeWebView(tabViewModel: tabViewModel)
@@ -594,7 +595,7 @@ extension BrowserTabViewController: TabDelegate {
             }
             completionHandler(.useCredential, URLCredential(user: alert.usernameTextField.stringValue,
                                                             password: alert.passwordTextField.stringValue,
-                                                            persistence: .none))
+                                                            persistence: .forSession))
 
         }
     }
@@ -726,7 +727,7 @@ extension BrowserTabViewController: LinkMenuItemSelectors {
 
     func openLinkInNewWindow(_ sender: NSMenuItem) {
         guard let url = contextMenuLink else { return }
-        WindowsManager.openNewWindow(with: url)
+        WindowsManager.openNewWindow(with: url, sourceTab: tabViewModel?.tab)
     }
 
     func downloadLinkedFileAs(_ sender: NSMenuItem) {
@@ -842,7 +843,8 @@ extension BrowserTabViewController: WKUIDelegate {
             return Tab(content: content,
                        webViewConfiguration: configuration,
                        parentTab: parentTab,
-                       canBeClosedWithBack: true)
+                       canBeClosedWithBack: true,
+                       webViewFrame: view.frame)
         }
         guard let parentTab = webView.tab else { return nil }
         func nextQuery(parentTab: Tab) -> PermissionAuthorizationQuery? {

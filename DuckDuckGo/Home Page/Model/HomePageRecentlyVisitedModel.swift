@@ -67,8 +67,7 @@ final class RecentlyVisitedModel: ObservableObject {
             guard let host = $0.url.host?.droppingWwwPrefix() else { return }
 
             var site = sitesByDomain[host]
-            if site == nil {
-                let newSite = RecentlyVisitedSiteModel(domain: host)
+            if site == nil, let newSite = RecentlyVisitedSiteModel(originalURL: $0.url) {
                 sitesByDomain[host] = newSite
                 recentSites.append(newSite)
                 site = newSite
@@ -106,7 +105,7 @@ final class RecentlyVisitedModel: ObservableObject {
     }
 
     func open(_ site: RecentlyVisitedSiteModel) {
-        guard let url = site.domain.url else { return }
+        guard site.isRealDomain, let url = site.url else { return }
         self.open(url)
     }
 
@@ -147,7 +146,14 @@ final class RecentlyVisitedSiteModel: ObservableObject {
     let maxPageListSize = 10
 
     let domain: String
+    
+    var url: URL? {
+        return baseURL ?? domain.url
+    }
+    
+    private let baseURL: URL?
 
+    @Published var isRealDomain: Bool = true
     @Published var isFavorite: Bool
     @Published var isFireproof: Bool
     @Published var blockedEntities = [String]()
@@ -159,13 +165,31 @@ final class RecentlyVisitedSiteModel: ObservableObject {
     @Published var isBurning = false
     @Published var isHidden = false
 
-    init(domain: String, bookmarkManager: BookmarkManager = LocalBookmarkManager.shared, fireproofDomains: FireproofDomains = FireproofDomains.shared) {
-        self.domain = domain
+    init?(originalURL: URL,
+          bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
+          fireproofDomains: FireproofDomains = FireproofDomains.shared) {
+        guard let domain = originalURL.host?.droppingWwwPrefix() else {
+            return nil
+        }
+
+        if let privatePlayer = PrivatePlayer.shared.domainForRecentlyVisitedSite(with: originalURL) {
+            self.domain = privatePlayer
+            isRealDomain = false
+        } else {
+            self.domain = domain
+        }
+        
+        var components = URLComponents()
+        components.scheme = originalURL.scheme
+        components.host = originalURL.host
+        self.baseURL = components.url
+
         if let url = domain.url {
             isFavorite = bookmarkManager.isUrlFavorited(url: url)
         } else {
             isFavorite = false
         }
+
         isFireproof = fireproofDomains.isFireproof(fireproofDomain: domain)
     }
 
@@ -202,6 +226,10 @@ final class RecentlyVisitedSiteModel: ObservableObject {
                 } else {
                     urlsToRemove.append($0.url)
                 }
+
+            } else if let displayTitle = PrivatePlayer.shared.title(for: $0) {
+
+                $0.displayTitle = displayTitle
 
             } else if !showTitlesForPagesSetting {
 

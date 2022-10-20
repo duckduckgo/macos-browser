@@ -19,14 +19,6 @@
 import SwiftUI
 
 fileprivate extension Preferences.Const {
-    static let autoLockPickerHorizontalOffset: CGFloat = {
-        if #available(macOS 12.0, *) {
-            return -8
-        } else {
-            return 0
-        }
-    }()
-
     static let autoLockWarningOffset: CGFloat = {
         if #available(macOS 12.0, *) {
             return 18
@@ -34,7 +26,6 @@ fileprivate extension Preferences.Const {
             return 20
         }
     }()
-
 }
 
 extension Preferences {
@@ -107,7 +98,7 @@ extension Preferences {
                         Text(UserText.autofillNeverLock).tag(false)
                     }, label: {})
                     .pickerStyle(.radioGroup)
-                    .offset(x: Const.autoLockPickerHorizontalOffset)
+                    .offset(x: Const.pickerHorizontalOffset)
                     .padding(.bottom, 6)
 
                     Text(UserText.autofillNeverLockWarning)

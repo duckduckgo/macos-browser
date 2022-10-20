@@ -122,7 +122,6 @@ extension AppDelegate {
             assertionFailure("Unexpected type of menuItem.representedObject: \(type(of: menuItem.representedObject))")
             return
         }
-        Pixel.fire(.navigation(kind: .bookmark(isFavorite: bookmark.isFavorite), source: .mainMenu))
 
         let tab = Tab(content: .url(bookmark.url))
         WindowsManager.openNewWindow(with: tab)
@@ -131,7 +130,6 @@ extension AppDelegate {
     @IBAction func showManageBookmarks(_ sender: Any?) {
         let tabCollection = TabCollection(tabs: [Tab(content: .bookmarks)])
         let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection)
-        Pixel.fire(.manageBookmarks(source: .mainMenu))
         WindowsManager.openNewWindow(with: tabCollectionViewModel)
     }
 
@@ -175,7 +173,6 @@ extension AppDelegate {
                 let exporter = CSVLoginExporter(secureVault: vault!)
                 do {
                     try exporter.exportVaultLogins(to: selectedURL)
-                    Pixel.fire(.exportedLogins())
                 } catch {
                     NSAlert.exportLoginsFailed()
                         .beginSheetModal(for: window, completionHandler: nil)
@@ -199,7 +196,6 @@ extension AppDelegate {
             let exporter = BookmarksExporter(list: list)
             do {
                 try exporter.exportBookmarksTo(url: selectedURL)
-                Pixel.fire(.exportedBookmarks())
             } catch {
                 NSAlert.exportBookmarksFailed()
                     .beginSheetModal(for: window, completionHandler: nil)
@@ -258,7 +254,6 @@ extension MainViewController {
             return
         }
 
-        Pixel.fire(.refresh(source: .init(sender: sender, default: .mainMenu)))
         selectedTabViewModel.reload()
     }
 
@@ -317,6 +312,18 @@ extension MainViewController {
 
     @IBAction func toggleBookmarksBar(_ sender: Any) {
         PersistentAppInterfaceSettings.shared.showBookmarksBar.toggle()
+    }
+    
+    @IBAction func toggleAutofillShortcut(_ sender: Any) {
+        LocalPinningManager.shared.togglePinning(for: .autofill)
+    }
+    
+    @IBAction func toggleBookmarksShortcut(_ sender: Any) {
+        LocalPinningManager.shared.togglePinning(for: .bookmarks)
+    }
+    
+    @IBAction func toggleDownloadsShortcut(_ sender: Any) {
+        LocalPinningManager.shared.togglePinning(for: .downloads)
     }
 
     // MARK: - History
@@ -422,24 +429,11 @@ extension MainViewController {
             return
         }
 
-        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("MainViewController: No tab view model selected", type: .error)
-            return
-        }
-
         guard let bookmark = menuItem.representedObject as? Bookmark else {
             return
         }
 
-        Pixel.fire(.navigation(kind: .bookmark(isFavorite: bookmark.isFavorite), source: .mainMenu))
-
-        if NSApplication.shared.isCommandPressed && NSApplication.shared.isShiftPressed {
-            WindowsManager.openNewWindow(with: bookmark.url)
-        } else if NSApplication.shared.isCommandPressed || self.view.window?.isPopUpWindow == true {
-            WindowControllersManager.shared.show(url: bookmark.url, newTab: true)
-        } else {
-            selectedTabViewModel.tab.setContent(.url(bookmark.url))
-        }
+        WindowControllersManager.shared.open(bookmark: bookmark)
     }
 
     @IBAction func openAllInTabs(_ sender: Any?) {
@@ -458,7 +452,6 @@ extension MainViewController {
 
     @IBAction func showManageBookmarks(_ sender: Any?) {
         browserTabViewController.openNewTab(with: .bookmarks, selected: true)
-        Pixel.fire(.manageBookmarks(source: .mainMenu))
     }
 
     // MARK: - Window
@@ -614,17 +607,15 @@ extension MainViewController {
         LocalBookmarkManager.shared.resetBookmarks()
     }
 
-    @IBAction func resetMacWaitlistUnlockState(_ sender: Any?) {
-        OnboardingViewModel().restart()
-        let store = MacWaitlistEncryptedFileStorage()
-        store.deleteExistingMetadata()
-    }
-
     @IBAction func resetPinnedTabs(_ sender: Any?) {
         if tabCollectionViewModel.selectedTabIndex?.isPinnedTab == true, tabCollectionViewModel.tabCollection.tabs.count > 0 {
             tabCollectionViewModel.select(at: .unpinned(0))
         }
         tabCollectionViewModel.pinnedTabsManager?.tabCollection.removeAll()
+    }
+
+    @IBAction func resetPrivatePlayerOverlayInteractions(_ sender: Any?) {
+        PrivatePlayerPreferences.shared.youtubeOverlayInteracted = false
     }
 
     @IBAction func showSaveCredentialsPopover(_ sender: Any?) {
@@ -637,6 +628,11 @@ extension MainViewController {
         #if DEBUG || REVIEW
         NotificationCenter.default.post(name: .ShowCredentialsSavedPopover, object: nil)
         #endif
+    }
+    
+    @IBAction func fetchConfigurationNow(_ sender: Any?) {
+        ConfigurationManager.shared.lastUpdateTime = .distantPast
+        ConfigurationManager.shared.refreshIfNeeded()
     }
 
     // MARK: - Developer Tools

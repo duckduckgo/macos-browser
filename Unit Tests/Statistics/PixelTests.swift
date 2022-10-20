@@ -37,29 +37,30 @@ class PixelTests: XCTestCase {
         super.tearDown()
     }
 
+    // Temporarily disabled, as this test gets caught in the Run Loop extension:
     func testWhenTimedPixelFiredThenCorrectDurationIsSet() {
         let expectation = XCTestExpectation()
-        
+
         let date: CFTimeInterval = 0
         let now: CFTimeInterval = 1
-        
+
         stub(condition: { request -> Bool in
             if let url = request.url {
-                XCTAssertEqual("1.0", try? url.getParameter(name: "duration"))
+                XCTAssertEqual("1.0", url.getParameter(named: "duration"))
                 return true
             }
-            
-            XCTFail("Did not found param dur")
+
+            XCTFail("Did not find duration param")
             return true
         }, response: { _ -> HTTPStubsResponse in
             expectation.fulfill()
             return HTTPStubsResponse(data: Data(), statusCode: 200, headers: nil)
         })
 
-        let pixel = TimedPixel(.appLaunch(isDefault: .default, launch: .regular), time: date)
+        let pixel = TimedPixel(.burn(), time: date)
 
         pixel.fire(now)
-        
+
         wait(for: [expectation], timeout: 1.0)
     }
     
@@ -84,14 +85,14 @@ class PixelTests: XCTestCase {
         let expectation = XCTestExpectation()
         let params = ["param1": "value1", "param2": "value2"]
 
-        stub(condition: isHost(host) && isPath("/t/ml_mac_app-launch_as-default_app-launch")) { request -> HTTPStubsResponse in
-            XCTAssertEqual("value1", try? request.url?.getParameter(name: "param1"))
-            XCTAssertEqual("value2", try? request.url?.getParameter(name: "param2"))
+        stub(condition: isHost(host) && isPath("/t/m_mac_crash")) { request -> HTTPStubsResponse in
+            XCTAssertEqual("value1", request.url?.getParameter(named: "param1"))
+            XCTAssertEqual("value2", request.url?.getParameter(named: "param2"))
             expectation.fulfill()
             return HTTPStubsResponse(data: Data(), statusCode: 200, headers: nil)
         }
 
-        Pixel.fire(.appLaunch(isDefault: .default, launch: .regular), withAdditionalParameters: params)
+        Pixel.fire(.crash, withAdditionalParameters: params)
 
         wait(for: [expectation], timeout: 1.0)
     }
@@ -101,8 +102,8 @@ class PixelTests: XCTestCase {
         let error = NSError(domain: "TestErrorDomain", code: 42, userInfo: nil)
 
         stub(condition: isHost(host) && isPath("/t/m_mac_debug_url")) { request -> HTTPStubsResponse in
-            XCTAssertEqual("TestErrorDomain", try? request.url?.getParameter(name: "d"))
-            XCTAssertEqual("42", try? request.url?.getParameter(name: "e"))
+            XCTAssertEqual("TestErrorDomain", request.url?.getParameter(named: "d"))
+            XCTAssertEqual("42", request.url?.getParameter(named: "e"))
             expectation.fulfill()
             return HTTPStubsResponse(data: Data(), statusCode: 200, headers: nil)
         }
@@ -118,29 +119,16 @@ class PixelTests: XCTestCase {
         let error = NSError(domain: "TestErrorDomain", code: 42, userInfo: ["key": 41])
 
         stub(condition: isHost(host) && isPath("/t/ml_mac_app-launch_as-default_app-launch")) { request -> HTTPStubsResponse in
-            XCTAssertEqual("TheMainQuestion", try? request.url?.getParameter(name: "d"))
-            XCTAssertEqual("42", try? request.url?.getParameter(name: "e"))
-            XCTAssertEqual("value1", try? request.url?.getParameter(name: "param1"))
-            XCTAssertEqual("value2", try? request.url?.getParameter(name: "param2"))
+            XCTAssertEqual("TheMainQuestion", request.url?.getParameter(named: "d"))
+            XCTAssertEqual("42", request.url?.getParameter(named: "e"))
+            XCTAssertEqual("value1", request.url?.getParameter(named: "param1"))
+            XCTAssertEqual("value2", request.url?.getParameter(named: "param2"))
             expectation.fulfill()
             return HTTPStubsResponse(data: Data(), statusCode: 200, headers: nil)
         }
 
         Pixel.fire(.debug(event: Pixel.Event.Debug.appOpenURLFailed, error: error), withAdditionalParameters: params)
 
-    }
-
-    func testWhenAppLaunchPixelIsFiredThenCorrectURLRequestIsMade() {
-        let expectation = XCTestExpectation()
-
-        stub(condition: isHost(host) && isPath("/t/ml_mac_app-launch_as-default_app-launch")) { _ -> HTTPStubsResponse in
-            expectation.fulfill()
-            return HTTPStubsResponse(data: Data(), statusCode: 200, headers: nil)
-        }
-
-        Pixel.fire(.appLaunch(isDefault: .default, launch: .regular))
-
-        wait(for: [expectation], timeout: 1.0)
     }
 
     func testWhenPixelFiresSuccessfullyThenCompletesWithNoError() {

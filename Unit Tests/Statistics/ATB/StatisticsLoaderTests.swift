@@ -73,7 +73,7 @@ class StatisticsLoaderTests: XCTestCase {
         loadSuccessfulAtbStub()
         loadSuccessfulExiStub()
 
-        let expect = expectation(description: "Successfult atb and exti updates store")
+        let expect = expectation(description: "Successful atb and exti updates store")
         testee.load {
             XCTAssertTrue(self.mockStatisticsStore.hasInstallStatistics)
             XCTAssertEqual(self.mockStatisticsStore.atb, "v77-5")
@@ -88,7 +88,7 @@ class StatisticsLoaderTests: XCTestCase {
         loadUnsuccessfulAtbStub()
         loadSuccessfulExiStub()
 
-        let expect = expectation(description: "Unsuccessfult atb does not update store")
+        let expect = expectation(description: "Unsuccessful atb does not update store")
         testee.load {
             XCTAssertFalse(self.mockStatisticsStore.hasInstallStatistics)
             XCTAssertNil(self.mockStatisticsStore.atb)
@@ -234,7 +234,6 @@ class StatisticsLoaderTests: XCTestCase {
         let expect = expectation(description: "Search retention ATB requested")
         testee.refreshRetentionAtb(isSearch: true) {
             XCTAssertEqual(self.mockStatisticsStore.atb, "v20-1")
-            XCTAssertEqual(self.mockStatisticsStore.appRetentionAtb, "v77-5")
             XCTAssertEqual(self.mockStatisticsStore.searchRetentionAtb, "v77-5")
             expect.fulfill()
         }
@@ -242,6 +241,7 @@ class StatisticsLoaderTests: XCTestCase {
         waitForExpectations(timeout: 1, handler: nil)
     }
 
+    // Disabled, app retention ATB is not currently used
     func testWhenRefreshRetentionAtbIsPerformedForNavigationThenAppRetentionAtbRequested() {
         mockStatisticsStore.atb = "atb"
         mockStatisticsStore.appRetentionAtb = "appRetentionAtb"
@@ -278,6 +278,21 @@ class StatisticsLoaderTests: XCTestCase {
 
         waitForExpectations(timeout: 1, handler: nil)
     }
+    
+    func testWhenRefreshRetentionAtbIsPerformedForNonSearchAndNoInstallStatisticsExistThenAtbNotRequested() {
+        loadSuccessfulUpdateAtbStub()
+
+        let expect = expectation(description: "App retention ATB not requested")
+        testee.refreshRetentionAtb(isSearch: false) {
+            XCTAssertNil(self.mockStatisticsStore.atb)
+            XCTAssertNil(self.mockStatisticsStore.appRetentionAtb)
+            XCTAssertNil(self.mockStatisticsStore.searchRetentionAtb)
+            XCTAssertFalse(self.mockStatisticsStore.isAppRetentionFiredToday)
+            expect.fulfill()
+        }
+
+        waitForExpectations(timeout: 1, handler: nil)
+    }
 
     func loadSuccessfulAtbStub() {
         stub(condition: isHost(URL.initialAtb.host!)) { _ in
@@ -301,14 +316,14 @@ class StatisticsLoaderTests: XCTestCase {
     }
 
     func loadSuccessfulExiStub() {
-        stub(condition: isPath(URL.exti(forAtb: "")!.path)) { _ -> HTTPStubsResponse in
+        stub(condition: isPath(URL.exti(forAtb: "").path)) { _ -> HTTPStubsResponse in
             let path = OHPathForFile("empty", type(of: self))!
             return fixture(filePath: path, status: 200, headers: nil)
         }
     }
 
     func loadUnsuccessfulExiStub() {
-        stub(condition: isPath(URL.exti(forAtb: "")!.path)) { _ -> HTTPStubsResponse in
+        stub(condition: isPath(URL.exti(forAtb: "").path)) { _ -> HTTPStubsResponse in
             let path = OHPathForFile("empty", type(of: self))!
             return fixture(filePath: path, status: 400, headers: nil)
         }

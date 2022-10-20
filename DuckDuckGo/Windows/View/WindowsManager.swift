@@ -18,6 +18,7 @@
 
 import Cocoa
 import os.log
+import BrowserServicesKit
 
 final class WindowsManager {
 
@@ -79,8 +80,9 @@ final class WindowsManager {
                       popUp: popUp)
     }
 
-    class func openNewWindow(with initialUrl: URL) {
-        openNewWindow(with: Tab(content: .contentFromURL(initialUrl)))
+    class func openNewWindow(with initialUrl: URL, sourceTab: Tab? = nil) {
+        openNewWindow(with: Tab(content: .contentFromURL(initialUrl),
+                                attributionState: sourceTab?.currentAttributionState))
     }
 
     class func openNewWindow(with tabCollection: TabCollection, droppingPoint: NSPoint? = nil, contentSize: NSSize? = nil, popUp: Bool = false) {
