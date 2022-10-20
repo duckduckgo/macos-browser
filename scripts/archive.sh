@@ -105,7 +105,7 @@ create_dmg_preflight() {
 set_up_environment() {
 	workdir="${PWD}/release"
 	archive="${workdir}/DuckDuckGo.xcarchive"
-	team_id=$(security find-certificate -c "Developer ID Application:" | grep "alis" | awk 'NF { print $NF }' | tr -d \(\)\")
+	team_id=$(security find-certificate -c "Developer ID Application: Duck" | grep "alis" | awk 'NF { print $NF }' | tr -d \(\)\")
 
 	if [[ -z $CI ]]; then
 		export_options_plist="${cwd}/assets/ExportOptions.plist"
