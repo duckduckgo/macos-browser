@@ -512,7 +512,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     }
 
     var cbrCompletionTokensPublisher: AnyPublisher<[ContentBlockerRulesManager.CompletionToken], Never> {
-        userContentController.$contentBlockingAssets.compactMap { $0?.completionTokens }.eraseToAnyPublisher()
+        userContentController.$contentBlockingAssets.compactMap { $0?.updateEvent.completionTokens }.eraseToAnyPublisher()
     }
 
     private static let debugEvents = EventMapping<AMPProtectionDebugEvents> { event, _, _, _ in
@@ -895,7 +895,9 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
 extension Tab: UserContentControllerDelegate {
 
-    func userContentController(_ userContentController: UserContentController, didInstallUserScripts userScripts: UserScripts) {
+    func userContentController(_ userContentController: UserContentController, didInstallContentRuleLists contentRuleLists: [String: WKContentRuleList], userScripts: UserScriptsProvider, updateEvent: ContentBlockerRulesManager.UpdateEvent) {
+        guard let userScripts = userScripts as? UserScripts else { fatalError("Unexpected UserScripts") }
+
         userScripts.debugScript.instrumentation = instrumentation
         userScripts.faviconScript.delegate = self
         userScripts.contextMenuScript.delegate = self
@@ -1089,7 +1091,8 @@ extension Tab: AdClickAttributionLogicDelegate {
     func attributionLogic(_ logic: AdClickAttributionLogic,
                           didRequestRuleApplication rules: ContentBlockerRulesManager.Rules?,
                           forVendor vendor: String?) {
-        let contentBlockerRulesScript = userContentController.contentBlockingAssets?.userScripts.contentBlockerRulesScript
+        let contentBlockerRulesScript = (userContentController.contentBlockingAssets?.userScripts as? UserScripts)?
+            .contentBlockerRulesScript
         let attributedTempListName = AdClickAttributionRulesProvider.Constants.attributedTempRuleListName
         
         guard ContentBlocking.shared.privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .contentBlocking)

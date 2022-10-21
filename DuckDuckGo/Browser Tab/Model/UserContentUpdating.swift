@@ -22,11 +22,11 @@ import BrowserServicesKit
 
 final class UserContentUpdating {
 
-    struct NewContent {
+    private struct NewContent {
         let rulesUpdate: ContentBlockerRulesManager.UpdateEvent
         let sourceProvider: ScriptSourceProviding
 
-        fileprivate init(rulesUpdate: ContentBlockerRulesManager.UpdateEvent, sourceProvider: ScriptSourceProviding) {
+        init(rulesUpdate: ContentBlockerRulesManager.UpdateEvent, sourceProvider: ScriptSourceProviding) {
             self.rulesUpdate = rulesUpdate
             self.sourceProvider = sourceProvider
         }
@@ -35,7 +35,7 @@ final class UserContentUpdating {
     @Published private var bufferedValue: NewContent?
     private var cancellable: AnyCancellable?
 
-    private(set) var userContentBlockingAssets: AnyPublisher<UserContentUpdating.NewContent, Never>!
+    private(set) var userContentBlockingAssets: AnyPublisher<UserContentController.ContentBlockingAssets, Never>!
 
     init(contentBlockerRulesManager: ContentBlockerRulesManagerProtocol,
          privacyConfigurationManager: PrivacyConfigurationManager = ContentBlocking.shared.privacyConfigurationManager,
@@ -62,6 +62,11 @@ final class UserContentUpdating {
         // 2. Publish ContentBlockingAssets(Rules+Scripts) for WKUserContentController per subscription
         self.userContentBlockingAssets = $bufferedValue
             .compactMap { $0 } // drop initial nil
+            .map { value in
+                UserContentController.ContentBlockingAssets(globalRuleLists: value.rulesUpdate.rules,
+                                                            userScripts: UserScripts(with: value.sourceProvider),
+                                                            updateEvent: value.rulesUpdate)
+            }
             .eraseToAnyPublisher()
     }
 
