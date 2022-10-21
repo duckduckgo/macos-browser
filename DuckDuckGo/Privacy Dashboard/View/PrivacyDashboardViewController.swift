@@ -29,13 +29,13 @@ final class PrivacyDashboardViewController: NSViewController {
 
     @Published var pendingUpdates = [String: String]()
 
+    weak var tabViewModel: TabViewModel?
+    var serverTrustViewModel: ServerTrustViewModel?
+
     required init?(coder: NSCoder) {
         super.init(coder: coder)
         bindRulesRecompilation()
     }
-
-    weak var tabViewModel: TabViewModel?
-    var serverTrustViewModel: ServerTrustViewModel?
 
     func setPreferredMaxHeight(_ height: CGFloat) {
         guard height > Constants.initialContentHeight else { return }
