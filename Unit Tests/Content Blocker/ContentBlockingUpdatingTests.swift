@@ -109,7 +109,7 @@ class ContentBlockingUpdatingTests: XCTestCase {
         let update2 = Self.testUpdate()
         var update1received = false
         let e = expectation(description: "2 updates received")
-        let c = updating.userContentBlockingAssets.map { $0.rulesUpdate.completionTokens }.sink { tokens in
+        let c = updating.userContentBlockingAssets.map { $0.updateEvent.completionTokens }.sink { tokens in
             if !update1received {
                 XCTAssertEqual(tokens, update1.completionTokens)
                 update1received = true
@@ -166,10 +166,10 @@ class ContentBlockingUpdatingTests: XCTestCase {
 
 }
 
-extension UserContentUpdating.NewContent {
+extension UserContentController.ContentBlockingAssets {
     
     func rules(withName name: String) -> WKContentRuleList? {
-        rulesUpdate.rules.first(where: { $0.name == name})?.rulesList
+        self.updateEvent.rules.first(where: { $0.name == name})?.rulesList
     }
     
     var isValid: Bool {
