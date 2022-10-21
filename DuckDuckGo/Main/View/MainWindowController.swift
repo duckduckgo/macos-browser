@@ -192,11 +192,6 @@ final class MainWindowController: NSWindowController {
 
 extension MainWindowController: NSWindowDelegate {
 
-    func window(_ window: NSWindow,
-                willUseFullScreenPresentationOptions: NSApplication.PresentationOptions) -> NSApplication.PresentationOptions {
-        return [.fullScreen, .autoHideMenuBar]
-    }
-
     func windowDidBecomeKey(_ notification: Notification) {
         mainViewController.windowDidBecomeMain()
         mainViewController.navigationBarViewController.windowDidBecomeMain()
