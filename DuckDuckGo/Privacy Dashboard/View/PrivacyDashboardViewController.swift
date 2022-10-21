@@ -31,7 +31,8 @@ final class PrivacyDashboardViewController: NSViewController {
     private var contentHeightConstraint: NSLayoutConstraint!
 
     private let privacyDashboardController =  PrivacyDashboardController(privacyInfo: nil)
-    public var rulesUpdateObserver = ContentBlockingRulesUpdateObserver()
+    public let rulesUpdateObserver = ContentBlockingRulesUpdateObserver()
+    private let websiteBreakageReporter = WebsiteBreakageReporter()
 
     /// Running the resize animation block during the popover animation causes frame hitching.
     /// The animation only needs to run when transitioning between views in the popover, so this is used to track when to run the animation.
@@ -53,6 +54,7 @@ final class PrivacyDashboardViewController: NSViewController {
         rulesUpdateObserver.updateTabViewModel(tabViewModel, onPendingUpdates: { [weak self] in
             self?.sendPendingUpdates()
         })
+        websiteBreakageReporter.updateTabViewModel(tabViewModel)
     }
         
     public override func viewDidLoad() {
@@ -131,14 +133,7 @@ final class PrivacyDashboardViewController: NSViewController {
         privacyDashboardController.onShowReportBrokenSiteTapped = { }
         
         privacyDashboardController.onSubmitBrokenSiteReportWithCategory = { [weak self] category, description in
-            // TODO: Fix
-//            guard let websiteBreakage = self?.makeWebsiteBreakage(category: category, description: description, currentTab: self?.tabViewModel?.tab) else {
-//                assertionFailure("could not build website breakage model")
-//                return
-//            }
-            
-//            let websiteBreakageSender = WebsiteBreakageSender()
-//            websiteBreakageSender.sendWebsiteBreakage(websiteBreakage)
+            self?.websiteBreakageReporter.reportBreakage(category: category, description: description)
         }
         
         privacyDashboardController.onOpenUrlInNewTab = { url in
@@ -150,32 +145,7 @@ final class PrivacyDashboardViewController: NSViewController {
             tabCollection.appendNewTab(with: .url(url), selected: true)
         }
     }
-
-    private func makeWebsiteBreakage(category: String, description: String, currentTab: Tab?) -> WebsiteBreakage {
-        // ⚠️ To limit privacy risk, site URL is trimmed to not include query and fragment
-        let currentURL = currentTab?.content.url?.trimmingQueryItemsAndFragment()?.absoluteString ?? ""
-        
-        let blockedTrackerDomains = currentTab?.privacyInfo?.trackerInfo.trackersBlocked.compactMap { $0.domain } ?? []
-        let installedSurrogates = currentTab?.privacyInfo?.trackerInfo.installedSurrogates.map {$0} ?? []
-        let ampURL = currentTab?.linkProtection.lastAMPURLString ?? ""
-        let urlParametersRemoved = currentTab?.linkProtection.urlParametersRemoved ?? false
-        
-        let websiteBreakage = WebsiteBreakage(category: WebsiteBreakage.Category(rawValue: category.lowercased()),
-                                              description: description,
-                                              siteUrlString: currentURL,
-                                              osVersion: "\(ProcessInfo.processInfo.operatingSystemVersion)",
-                                              upgradedHttps: currentTab?.privacyInfo?.connectionUpgradedTo != nil,
-                                              tdsETag: ContentBlocking.shared.contentBlockingManager.currentRules.first?.etag,
-                                              blockedTrackerDomains: blockedTrackerDomains,
-                                              installedSurrogates: installedSurrogates,
-                                              isGPCEnabled: PrivacySecurityPreferences.shared.gpcEnabled,
-                                              ampURL: ampURL,
-                                              urlParametersRemoved: urlParametersRemoved)
-        return websiteBreakage
-    }
     
-    
-
     public func isPendingUpdates() -> Bool {
         return !rulesUpdateObserver.pendingUpdates.isEmpty
     }
