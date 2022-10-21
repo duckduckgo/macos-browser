@@ -32,6 +32,11 @@ final class PrivacyDashboardViewController: NSViewController {
     weak var tabViewModel: TabViewModel?
     var serverTrustViewModel: ServerTrustViewModel?
 
+    override init(nibName nibNameOrNil: NSNib.Name?, bundle nibBundleOrNil: Bundle?) {
+        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+        bindRulesRecompilation()
+    }
+
     required init?(coder: NSCoder) {
         super.init(coder: coder)
         bindRulesRecompilation()
