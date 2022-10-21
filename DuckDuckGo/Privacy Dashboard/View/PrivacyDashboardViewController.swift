@@ -57,6 +57,7 @@ final class PrivacyDashboardViewController: NSViewController {
             .compactMap(\.nonEmptyCompletionTokens)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] tokens in
+                dispatchPrecondition(condition: .onQueue(.main))
                 guard let self = self else { return }
 
                 var didUpdate = false
