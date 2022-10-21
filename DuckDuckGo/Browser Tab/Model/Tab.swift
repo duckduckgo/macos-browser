@@ -864,7 +864,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     
     // MARK: - Dashboard Info
     private(set) var privacyInfo: PrivacyInfo?
-    @Published private(set) var cookieConsentManaged: CookieConsentInfo?
 
     private func resetDashboardInfo() {
         guard let url = content.url, let host = url.host else {
@@ -1661,7 +1660,7 @@ extension Tab: HoverUserScriptDelegate {
 @available(macOS 11, *)
 extension Tab: AutoconsentUserScriptDelegate {
     func autoconsentUserScript(consentStatus: CookieConsentInfo) {
-        self.cookieConsentManaged = consentStatus
+        self.privacyInfo?.cookieConsentManaged = consentStatus
     }
     
     func autoconsentUserScriptPromptUserForConsent(_ result: @escaping (Bool) -> Void) {

@@ -193,18 +193,7 @@ final class PrivacyDashboardViewController: NSViewController {
         } else {
             privacyDashboardController.didFinishRulesCompilation()
         }
-    }
-
-//    private func subscribeToConsentManaged() {
-//        tabViewModel?.tab.$cookieConsentManaged
-//            .receive(on: DispatchQueue.main)
-//            .sink(receiveValue: { [weak self] consentManaged in
-//                guard let self = self else { return }
-//                self.privacyDashboardScript.setConsentManaged(consentManaged, webView: self.webView)
-//            })
-//            .store(in: &cancellables)
-//    }
-    
+    }    
 }
 
 extension PrivacyDashboardViewController {
