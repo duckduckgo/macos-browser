@@ -21,6 +21,7 @@
 		1E7E2E88290057CB00C01B54 /* ContentBlocking in Frameworks */ = {isa = PBXBuildFile; productRef = 1E7E2E87290057CB00C01B54 /* ContentBlocking */; };
 		1E7E2E8A290057CB00C01B54 /* PrivacyDashboard in Frameworks */ = {isa = PBXBuildFile; productRef = 1E7E2E89290057CB00C01B54 /* PrivacyDashboard */; };
 		1E7E2E8C290057CB00C01B54 /* UserScript in Frameworks */ = {isa = PBXBuildFile; productRef = 1E7E2E8B290057CB00C01B54 /* UserScript */; };
+		1E7E2E9029029A2A00C01B54 /* ContentBlockingRulesUpdateObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E7E2E8F29029A2A00C01B54 /* ContentBlockingRulesUpdateObserver.swift */; };
 		3106AD76287F000600159FE5 /* CookieConsentUserPermissionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3106AD75287F000600159FE5 /* CookieConsentUserPermissionViewController.swift */; };
 		311B262728E73E0A00FD181A /* TabShadowConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311B262628E73E0A00FD181A /* TabShadowConfig.swift */; };
 		313AEDA1287CAD1D00E1E8F4 /* CookieConsentUserPermissionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 313AEDA0287CAD1D00E1E8F4 /* CookieConsentUserPermissionView.swift */; };
@@ -844,6 +845,7 @@
 		1456D6E024EFCBC300775049 /* TabBarCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarCollectionView.swift; sourceTree = "<group>"; };
 		14D9B8F924F7E089000D4D13 /* AddressBarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressBarViewController.swift; sourceTree = "<group>"; };
 		1E7E2E8629004E9800C01B54 /* BrowserServicesKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = BrowserServicesKit; path = ../BrowserServicesKit; sourceTree = "<group>"; };
+		1E7E2E8F29029A2A00C01B54 /* ContentBlockingRulesUpdateObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentBlockingRulesUpdateObserver.swift; sourceTree = "<group>"; };
 		3106AD75287F000600159FE5 /* CookieConsentUserPermissionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieConsentUserPermissionViewController.swift; sourceTree = "<group>"; };
 		311B262628E73E0A00FD181A /* TabShadowConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabShadowConfig.swift; sourceTree = "<group>"; };
 		313AEDA0287CAD1D00E1E8F4 /* CookieConsentUserPermissionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieConsentUserPermissionView.swift; sourceTree = "<group>"; };
@@ -4129,6 +4131,7 @@
 			children = (
 				B68172A7269C4334006D1092 /* Model */,
 				B6FA893B269C41ED00588ECD /* View */,
+				1E7E2E8F29029A2A00C01B54 /* ContentBlockingRulesUpdateObserver.swift */,
 			);
 			path = "Privacy Dashboard";
 			sourceTree = "<group>";
@@ -4577,6 +4580,7 @@
 				4BB99D0626FE1979001E4761 /* RequestFilePermissionViewController.swift in Sources */,
 				4B0A63E8289DB58E00378EF7 /* FirefoxFaviconsReader.swift in Sources */,
 				858A798326A8B75F00A75A42 /* CopyHandler.swift in Sources */,
+				1E7E2E9029029A2A00C01B54 /* ContentBlockingRulesUpdateObserver.swift in Sources */,
 				4B8AC93926B48A5100879451 /* FirefoxLoginReader.swift in Sources */,
 				B69B503E2726A12500758A2B /* AtbParser.swift in Sources */,
 				37F19A6528E1B3FB00740DC6 /* PreferencesPrivatePlayerView.swift in Sources */,
