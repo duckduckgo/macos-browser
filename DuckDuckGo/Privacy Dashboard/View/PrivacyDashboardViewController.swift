@@ -63,7 +63,7 @@ final class PrivacyDashboardViewController: NSViewController {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] tokens in
                 dispatchPrecondition(condition: .onQueue(.main))
-                guard let self = self else { return }
+                guard let self = self, !self.pendingUpdates.isEmpty else { return }
 
                 var didUpdate = false
                 for token in tokens {
