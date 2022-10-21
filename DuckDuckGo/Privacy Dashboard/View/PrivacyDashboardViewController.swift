@@ -53,7 +53,7 @@ final class PrivacyDashboardViewController: NSViewController {
     }
 
     private func prepareContentBlockingCancellables() {
-        let rulesRecompilationCompletion = ContentBlocking.shared.userContentUpdating.userContentBlockingAssets
+        ContentBlocking.shared.userContentUpdating.userContentBlockingAssets
             .compactMap { newContent -> [ContentBlockerRulesManager.CompletionToken]? in
                 let nonEmptyTokens = newContent.rulesUpdate.completionTokens.filter { !$0.isEmpty }
                 if nonEmptyTokens.isEmpty {
@@ -61,27 +61,19 @@ final class PrivacyDashboardViewController: NSViewController {
                 }
                 return nonEmptyTokens
             }
-            .map(RulesRecompilationEvent.complete)
-
-        rulesRecompilationRequestsSubject
-            .merge(with: rulesRecompilationCompletion)
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] event in
+            .sink { [weak self] tokens in
                 guard let self = self else { return }
-                switch event {
-                case .requested(token: let token, domain: let domain):
-                    self.pendingUpdates[token] = domain
-                    self.sendPendingUpdates()
-                case .complete(tokens: let tokens):
-                    let countBefore = self.pendingUpdates.count
-                    for token in tokens {
-                        self.pendingUpdates.removeValue(forKey: token)
+
+                var didUpdate = false
+                for token in tokens {
+                    if self.pendingUpdates.removeValue(forKey: token) != nil {
+                        didUpdate = true
                     }
-                    // if an item was removed, it means we've observed a completion
-                    // for an event we initiated, so reload the page
-                    if self.pendingUpdates.count < countBefore {
-                        self.tabViewModel?.reload()
-                    }
+                }
+
+                if didUpdate {
+                    self.tabViewModel?.reload()
                 }
             }
             .store(in: &contentBlockingCancellables)
@@ -225,20 +217,11 @@ final class PrivacyDashboardViewController: NSViewController {
             .store(in: &webViewCancellables)
     }
 
-    private enum RulesRecompilationEvent {
-        /// Used to record the fact that the Dashboard was the initiator of rules re-compilation
-        case requested(token: ContentBlockerRulesManager.CompletionToken, domain: String)
-        /// A proxy for non-empty completion token lists. These can be read and compared to the ones
-        /// saved in the `updateRequested`
-        case complete(tokens: [ContentBlockerRulesManager.CompletionToken])
-    }
-
     private var webView: WKWebView!
     private var contentHeightConstraint: NSLayoutConstraint!
     private let privacyDashboardScript = PrivacyDashboardUserScript()
     private var webViewCancellables = Set<AnyCancellable>()
     private var contentBlockingCancellables = Set<AnyCancellable>()
-    private let rulesRecompilationRequestsSubject = PassthroughSubject<RulesRecompilationEvent, Never>()
 
     /// Running the resize animation block during the popover animation causes frame hitching.
     /// The animation only needs to run when transitioning between views in the popover, so this is used to track when to run the animation.
@@ -264,7 +247,8 @@ extension PrivacyDashboardViewController: PrivacyDashboardUserScriptDelegate {
         }
 
         let completionToken = ContentBlocking.shared.contentBlockingManager.scheduleCompilation()
-        rulesRecompilationRequestsSubject.send(.requested(token: completionToken, domain: domain))
+        pendingUpdates[completionToken] = domain
+        sendPendingUpdates()
     }
 
     func userScript(_ userScript: PrivacyDashboardUserScript, didSetPermission permission: PermissionType, to state: PermissionAuthorizationState) {
