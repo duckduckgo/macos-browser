@@ -1500,6 +1500,7 @@ extension Tab: WKNavigationDelegate {
         if error != nil { error = nil }
 
         invalidateSessionStateData()
+        resetDashboardInfo()
         linkProtection.cancelOngoingExtraction()
         linkProtection.setMainFrameUrl(webView.url)
         referrerTrimming.onBeginNavigation(to: webView.url)

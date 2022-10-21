@@ -32,14 +32,8 @@ final class PrivacyDashboardViewController: NSViewController {
     private var contentHeightConstraint: NSLayoutConstraint!
 
     private let privacyDashboardController =  PrivacyDashboardController(privacyInfo: nil)
-    
-    private var cancellables = Set<AnyCancellable>()
-    @Published var pendingUpdates = [String: String]()
+    public var rulesUpdateObserver = ContentBlockingRulesUpdateObserver()
 
-    weak var tabViewModel: TabViewModel?
-    
-    private var contentBlockinRulesUpdatedCancellable: AnyCancellable?
-    
     /// Running the resize animation block during the popover animation causes frame hitching.
     /// The animation only needs to run when transitioning between views in the popover, so this is used to track when to run the animation.
     /// This should be set to true any time the popover is displayed (i.e., reset to true when dismissing the popover), and false after the initial resize pass is complete.
@@ -55,18 +49,18 @@ final class PrivacyDashboardViewController: NSViewController {
         }
     }
     
-    public func updatePrivacyInfo(_ privacyInfo: PrivacyInfo?) {
-        privacyDashboardController.didFinishRulesCompilation()
-        privacyDashboardController.updatePrivacyInfo(privacyInfo)
+    public func updateTabViewModel(_ tabViewModel: TabViewModel) {
+        privacyDashboardController.updatePrivacyInfo(tabViewModel.tab.privacyInfo)
+        rulesUpdateObserver.updateTabViewModel(tabViewModel, onPendingUpdates: { [weak self] in
+            self?.sendPendingUpdates()
+        })
     }
-    
+        
     public override func viewDidLoad() {
         super.viewDidLoad()
         
         initWebView()
         setupPrivacyDashboardControllerHandlers()
-        
-//        applyTheme(ThemeManager.shared.currentTheme)
     }
     
     private func initWebView() {
@@ -77,7 +71,6 @@ final class PrivacyDashboardViewController: NSViewController {
 #endif
 
         let webView = PrivacyDashboardWebView(frame: .zero, configuration: configuration)
-//        webView.navigationDelegate = self
         self.webView = webView
         view.addAndLayout(webView)
 
@@ -88,19 +81,30 @@ final class PrivacyDashboardViewController: NSViewController {
     override func viewWillAppear() {
         privacyDashboardController.setup(for: webView)
         privacyDashboardController.preferredLocale = "en"
-        
-//        prepareContentBlockingCancellable(publisher: tabViewModel.tab.cbrCompletionTokensPublisher)
     }
 
     override func viewWillDisappear() {
         privacyDashboardController.cleanUp()
+        
         contentHeightConstraint.constant = Constants.initialContentHeight
         skipLayoutAnimation = true
     }
     
     private func setupPrivacyDashboardControllerHandlers() {
         privacyDashboardController.onProtectionSwitchChange = { [weak self] isEnabled in
-//            self?.privacyDashboardProtectionSwitchChangeHandler(enabled: isEnabled)
+            guard let domain = self?.privacyDashboardController.privacyInfo?.url.host else {
+                return
+            }
+
+            let configuration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig
+            if isEnabled && configuration.isUserUnprotected(domain: domain) {
+                configuration.userEnabledProtection(forDomain: domain)
+            } else {
+                configuration.userDisabledProtection(forDomain: domain)
+            }
+
+            let completionToken = ContentBlocking.shared.contentBlockingManager.scheduleCompilation()
+            self?.rulesUpdateObserver.didStartCompilation(for: domain, token: completionToken)
         }
         
         privacyDashboardController.onHeightChange = { [weak self] height in
@@ -128,13 +132,14 @@ final class PrivacyDashboardViewController: NSViewController {
         privacyDashboardController.onShowReportBrokenSiteTapped = { }
         
         privacyDashboardController.onSubmitBrokenSiteReportWithCategory = { [weak self] category, description in
-            guard let websiteBreakage = self?.makeWebsiteBreakage(category: category, description: description, currentTab: self?.tabViewModel?.tab) else {
-                assertionFailure("could not build website breakage model")
-                return
-            }
+            // TODO: Fix
+//            guard let websiteBreakage = self?.makeWebsiteBreakage(category: category, description: description, currentTab: self?.tabViewModel?.tab) else {
+//                assertionFailure("could not build website breakage model")
+//                return
+//            }
             
-            let websiteBreakageSender = WebsiteBreakageSender()
-            websiteBreakageSender.sendWebsiteBreakage(websiteBreakage)
+//            let websiteBreakageSender = WebsiteBreakageSender()
+//            websiteBreakageSender.sendWebsiteBreakage(websiteBreakage)
         }
         
         privacyDashboardController.onOpenUrlInNewTab = { url in
@@ -170,30 +175,10 @@ final class PrivacyDashboardViewController: NSViewController {
         return websiteBreakage
     }
     
-//    private func prepareContentBlockingCancellable<Pub: Publisher>(publisher: Pub)
-//    where Pub.Output == [ContentBlockerRulesManager.CompletionToken], Pub.Failure == Never {
-//
-//        publisher.receive(on: RunLoop.main).sink { [weak self] completionTokens in
-//            dispatchPrecondition(condition: .onQueue(.main))
-//
-//            guard let self = self, !self.pendingUpdates.isEmpty else { return }
-//
-//            var didUpdate = false
-//            for token in completionTokens {
-//                if self.pendingUpdates.removeValue(forKey: token) != nil {
-//                    didUpdate = true
-//                }
-//            }
-//
-//            if didUpdate {
-//                self.sendPendingUpdates()
-//                self.tabViewModel?.reload()
-//            }
-//        }.store(in: &cancellables)
-//    }
+    
 
     public func isPendingUpdates() -> Bool {
-        return !pendingUpdates.isEmpty
+        return !rulesUpdateObserver.pendingUpdates.isEmpty
     }
 
 //    private func subscribeToPermissions() {
@@ -227,14 +212,19 @@ final class PrivacyDashboardViewController: NSViewController {
 //        privacyDashboardScript.setPermissions(usedPermissions, authorizationState: authState, domain: domain, in: webView)
 //    }
 
-//    private func sendPendingUpdates() {
-//        guard let domain = tabViewModel?.tab.content.url?.host else {
-//            assertionFailure("PrivacyDashboardViewController: no domain available")
-//            return
-//        }
-//
-//        self.privacyDashboardScript.setIsPendingUpdates(pendingUpdates.values.contains(domain), webView: self.webView)
-//    }
+    private func sendPendingUpdates() {
+        guard let domain = privacyDashboardController.privacyInfo?.url.host else {
+            assertionFailure("PrivacyDashboardViewController: no domain available")
+            return
+        }
+
+        let isPending = rulesUpdateObserver.pendingUpdates.values.contains(domain)
+        if isPending {
+            privacyDashboardController.didStartRulesCompilation()
+        } else {
+            privacyDashboardController.didFinishRulesCompilation()
+        }
+    }
 
 //    private func subscribeToConsentManaged() {
 //        tabViewModel?.tab.$cookieConsentManaged
@@ -250,35 +240,63 @@ final class PrivacyDashboardViewController: NSViewController {
 
 extension PrivacyDashboardViewController {
 
-    func userScript(_ userScript: OLDPrivacyDashboardUserScript, didChangeProtectionStateTo isProtected: Bool) {
-        guard let domain = tabViewModel?.tab.content.url?.host else {
-            assertionFailure("PrivacyDashboardViewController: no domain available")
-            return
-        }
-
-        let configuration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig
-        if isProtected && configuration.isUserUnprotected(domain: domain) {
-            configuration.userEnabledProtection(forDomain: domain)
-        } else {
-            configuration.userDisabledProtection(forDomain: domain)
-        }
-
-        let completionToken = ContentBlocking.shared.contentBlockingManager.scheduleCompilation()
-        pendingUpdates[completionToken] = domain
-//        sendPendingUpdates()
-    }
-
     func userScript(_ userScript: OLDPrivacyDashboardUserScript, didSetPermission permission: PermissionType, to state: PermissionAuthorizationState) {
-        guard let domain = tabViewModel?.tab.content.url?.host else {
-            assertionFailure("PrivacyDashboardViewController: no domain available")
-            return
-        }
-
-        PermissionManager.shared.setPermission(state.persistedPermissionDecision, forDomain: domain, permissionType: permission)
+//        guard let domain = tabViewModel?.tab.content.url?.host else {
+//            assertionFailure("PrivacyDashboardViewController: no domain available")
+//            return
+//        }
+//
+//        PermissionManager.shared.setPermission(state.persistedPermissionDecision, forDomain: domain, permissionType: permission)
     }
 
     func userScript(_ userScript: OLDPrivacyDashboardUserScript, setPermission permission: PermissionType, paused: Bool) {
-        tabViewModel?.tab.permissions.set([permission], muted: paused)
+//        tabViewModel?.tab.permissions.set([permission], muted: paused)
     }
 
+}
+
+final class ContentBlockingRulesUpdateObserver {
+    
+    @Published public private(set) var pendingUpdates = [String: String]()
+    
+    public private(set) weak var tabViewModel: TabViewModel?
+    private var onPendingUpdates: (() -> Void)?
+    private var contentBlockinRulesUpdatedCancellable = Set<AnyCancellable>()
+    
+    init() { }
+    
+    public func updateTabViewModel(_ tabViewModel: TabViewModel, onPendingUpdates: @escaping () -> Void) {
+        contentBlockinRulesUpdatedCancellable.removeAll()
+        prepareContentBlockingCancellable(publisher: tabViewModel.tab.cbrCompletionTokensPublisher)
+        
+        self.tabViewModel = tabViewModel
+        self.onPendingUpdates = onPendingUpdates
+    }
+    
+    public func didStartCompilation(for domain: String, token: ContentBlockerRulesManager.CompletionToken ) {
+        pendingUpdates[token] = domain
+        onPendingUpdates?()
+    }
+    
+    private func prepareContentBlockingCancellable<Pub: Publisher>(publisher: Pub)
+    where Pub.Output == [ContentBlockerRulesManager.CompletionToken], Pub.Failure == Never {
+
+        publisher.receive(on: RunLoop.main).sink { [weak self] completionTokens in
+            dispatchPrecondition(condition: .onQueue(.main))
+
+            guard let self = self, !self.pendingUpdates.isEmpty else { return }
+
+            var didUpdate = false
+            for token in completionTokens {
+                if self.pendingUpdates.removeValue(forKey: token) != nil {
+                    didUpdate = true
+                }
+            }
+
+            if didUpdate {
+                self.tabViewModel?.reload()
+                self.onPendingUpdates?()
+            }
+        }.store(in: &contentBlockinRulesUpdatedCancellable)
+    }
 }

@@ -24,7 +24,6 @@ import PrivacyDashboard
 
 protocol OLDPrivacyDashboardUserScriptDelegate: AnyObject {
 
-    func userScript(_ userScript: OLDPrivacyDashboardUserScript, didChangeProtectionStateTo protectionState: Bool)
     func userScript(_ userScript: OLDPrivacyDashboardUserScript, didSetPermission permission: PermissionType, to state: PermissionAuthorizationState)
     func userScript(_ userScript: OLDPrivacyDashboardUserScript, setPermission permission: PermissionType, paused: Bool)
 }
@@ -32,7 +31,6 @@ protocol OLDPrivacyDashboardUserScriptDelegate: AnyObject {
 final class OLDPrivacyDashboardUserScript {
 
     enum MessageNames: String, CaseIterable {
-        case privacyDashboardSetProtection
         case privacyDashboardSetPermission
         case privacyDashboardSetPermissionPaused
     }
@@ -46,9 +44,6 @@ final class OLDPrivacyDashboardUserScript {
         }
 
         switch messageType {
-        case .privacyDashboardSetProtection:
-            handleSetProtection(message: message)
-
         case .privacyDashboardSetPermission:
             handleSetPermission(message: message)
 
@@ -56,15 +51,6 @@ final class OLDPrivacyDashboardUserScript {
             handleSetPermissionPaused(message: message)
             
         }
-    }
-
-    private func handleSetProtection(message: WKScriptMessage) {
-        guard let isProtected = message.body as? Bool else {
-            assertionFailure("privacyDashboardSetProtection: expected Bool")
-            return
-        }
-
-        delegate?.userScript(self, didChangeProtectionStateTo: isProtected)
     }
 
     private func handleSetPermission(message: WKScriptMessage) {
