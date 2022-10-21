@@ -27,15 +27,14 @@ final class ContentBlockingRulesUpdateObserver {
     public private(set) weak var tabViewModel: TabViewModel?
     private var onPendingUpdates: (() -> Void)?
     private var contentBlockinRulesUpdatedCancellable = Set<AnyCancellable>()
-    
-    init() { }
-    
+        
     public func updateTabViewModel(_ tabViewModel: TabViewModel, onPendingUpdates: @escaping () -> Void) {
         contentBlockinRulesUpdatedCancellable.removeAll()
-        prepareContentBlockingCancellable(publisher: tabViewModel.tab.cbrCompletionTokensPublisher)
         
         self.tabViewModel = tabViewModel
         self.onPendingUpdates = onPendingUpdates
+        
+        prepareContentBlockingCancellable(publisher: tabViewModel.tab.cbrCompletionTokensPublisher)
     }
     
     public func didStartCompilation(for domain: String, token: ContentBlockerRulesManager.CompletionToken ) {

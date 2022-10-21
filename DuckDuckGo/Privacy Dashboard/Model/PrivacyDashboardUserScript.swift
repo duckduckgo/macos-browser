@@ -119,10 +119,6 @@ final class OLDPrivacyDashboardUserScript {
         evaluate(js: "window.onChangeAllowedPermissions(\(allowedPermissionsJson))", in: webView)
     }
 
-    func setIsPendingUpdates(_ isPendingUpdates: Bool, webView: WKWebView) {
-        evaluate(js: "window.onIsPendingUpdates(\(isPendingUpdates))", in: webView)
-    }
-
     private func evaluate(js: String, in webView: WKWebView) {
         webView.evaluateJavaScript(js)
     }

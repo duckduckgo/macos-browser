@@ -33,6 +33,7 @@ final class PrivacyDashboardViewController: NSViewController {
     private let privacyDashboardController =  PrivacyDashboardController(privacyInfo: nil)
     public let rulesUpdateObserver = ContentBlockingRulesUpdateObserver()
     private let websiteBreakageReporter = WebsiteBreakageReporter()
+    private let permissionHandler = PrivacyDashboardPermissionHandler()
 
     /// Running the resize animation block during the popover animation causes frame hitching.
     /// The animation only needs to run when transitioning between views in the popover, so this is used to track when to run the animation.
@@ -51,10 +52,16 @@ final class PrivacyDashboardViewController: NSViewController {
     
     public func updateTabViewModel(_ tabViewModel: TabViewModel) {
         privacyDashboardController.updatePrivacyInfo(tabViewModel.tab.privacyInfo)
+        
         rulesUpdateObserver.updateTabViewModel(tabViewModel, onPendingUpdates: { [weak self] in
             self?.sendPendingUpdates()
         })
+        
         websiteBreakageReporter.updateTabViewModel(tabViewModel)
+        
+        permissionHandler.updateTabViewModel(tabViewModel) { [weak self] allowedPermissions in
+            self?.privacyDashboardController.updateAllowedPermissions(allowedPermissions)
+        }
     }
         
     public override func viewDidLoad() {
@@ -149,37 +156,6 @@ final class PrivacyDashboardViewController: NSViewController {
     public func isPendingUpdates() -> Bool {
         return !rulesUpdateObserver.pendingUpdates.isEmpty
     }
-
-//    private func subscribeToPermissions() {
-//        tabViewModel?.$usedPermissions.receive(on: DispatchQueue.main).sink { [weak self] _ in
-//            self?.updatePermissions()
-//        }.store(in: &cancellables)
-//
-//    }
-
-//    private func updatePermissions() {
-//        guard let usedPermissions = tabViewModel?.usedPermissions else {
-//            assertionFailure("PrivacyDashboardViewController: tabViewModel not set")
-//            return
-//        }
-//        guard let domain = tabViewModel?.tab.content.url?.host else {
-//            privacyDashboardScript.setPermissions(Permissions(), authorizationState: [], domain: "", in: webView)
-//            return
-//        }
-//
-//        let authState: PrivacyDashboardUserScript.AuthorizationState
-//        authState = PermissionManager.shared.persistedPermissionTypes.union(usedPermissions.keys).compactMap { permissionType in
-//            guard PermissionManager.shared.hasPermissionPersisted(forDomain: domain, permissionType: permissionType)
-//                    || usedPermissions[permissionType] != nil
-//            else {
-//                return nil
-//            }
-//            let decision = PermissionManager.shared.permission(forDomain: domain, permissionType: permissionType)
-//            return (permissionType, PermissionAuthorizationState(decision: decision))
-//        }
-//
-//        privacyDashboardScript.setPermissions(usedPermissions, authorizationState: authState, domain: domain, in: webView)
-//    }
 
     private func sendPendingUpdates() {
         guard let domain = privacyDashboardController.privacyInfo?.url.host else {
