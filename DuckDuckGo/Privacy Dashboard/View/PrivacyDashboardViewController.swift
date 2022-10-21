@@ -81,7 +81,7 @@ final class PrivacyDashboardViewController: NSViewController {
 
     override func viewWillDisappear() {
         contentHeightConstraint.constant = Constants.initialContentHeight
-        webViewCancellables.removeAll()
+        tabViewModelCancellables.removeAll()
         skipLayoutAnimation = true
     }
 
@@ -108,7 +108,7 @@ final class PrivacyDashboardViewController: NSViewController {
     private func subscribeToPermissions() {
         tabViewModel?.$usedPermissions.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.updatePermissions()
-        }.store(in: &webViewCancellables)
+        }.store(in: &tabViewModelCancellables)
     }
 
     private func updatePermissions() {
@@ -143,7 +143,7 @@ final class PrivacyDashboardViewController: NSViewController {
                 let upgradedHttps = connectionUpgradedTo != nil
                 self.privacyDashboardScript.setUpgradedHttps(upgradedHttps, webView: self.webView)
             })
-            .store(in: &webViewCancellables)
+            .store(in: &tabViewModelCancellables)
     }
 
     private func subscribeToTrackerInfo() {
@@ -153,7 +153,7 @@ final class PrivacyDashboardViewController: NSViewController {
                 guard let self = self, let trackerInfo = trackerInfo, let tabUrl = self.tabViewModel?.tab.content.url else { return }
                 self.privacyDashboardScript.setTrackerInfo(tabUrl, trackerInfo: trackerInfo, webView: self.webView)
             })
-            .store(in: &webViewCancellables)
+            .store(in: &tabViewModelCancellables)
     }
 
     private func sendProtectionStatus() {
@@ -197,7 +197,7 @@ final class PrivacyDashboardViewController: NSViewController {
                 guard let self = self, let serverTrustViewModel = serverTrustViewModel else { return }
                 self.privacyDashboardScript.setServerTrust(serverTrustViewModel, webView: self.webView)
             })
-            .store(in: &webViewCancellables)
+            .store(in: &tabViewModelCancellables)
     }
 
     private func subscribeToConsentManaged() {
@@ -207,13 +207,13 @@ final class PrivacyDashboardViewController: NSViewController {
                 guard let self = self else { return }
                 self.privacyDashboardScript.setConsentManaged(consentManaged, webView: self.webView)
             })
-            .store(in: &webViewCancellables)
+            .store(in: &tabViewModelCancellables)
     }
 
     private var webView: WKWebView!
     private var contentHeightConstraint: NSLayoutConstraint!
     private let privacyDashboardScript = PrivacyDashboardUserScript()
-    private var webViewCancellables = Set<AnyCancellable>()
+    private var tabViewModelCancellables = Set<AnyCancellable>()
     private var rulesRecompilationCancellable: AnyCancellable?
 
     /// Running the resize animation block during the popover animation causes frame hitching.
