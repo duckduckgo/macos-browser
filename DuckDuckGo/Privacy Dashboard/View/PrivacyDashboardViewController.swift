@@ -31,7 +31,7 @@ final class PrivacyDashboardViewController: NSViewController {
 
     required init?(coder: NSCoder) {
         super.init(coder: coder)
-        prepareContentBlockingCancellables()
+        bindRulesRecompilation()
     }
 
     weak var tabViewModel: TabViewModel?
@@ -52,15 +52,9 @@ final class PrivacyDashboardViewController: NSViewController {
         webView.configuration.userContentController.addHandlerNoContentWorld(privacyDashboardScript)
     }
 
-    private func prepareContentBlockingCancellables() {
-        ContentBlocking.shared.userContentUpdating.userContentBlockingAssets
-            .compactMap { newContent -> [ContentBlockerRulesManager.CompletionToken]? in
-                let nonEmptyTokens = newContent.rulesUpdate.completionTokens.filter { !$0.isEmpty }
-                if nonEmptyTokens.isEmpty {
-                    return nil
-                }
-                return nonEmptyTokens
-            }
+    private func bindRulesRecompilation() {
+        rulesRecompilationCancellable = ContentBlocking.shared.userContentUpdating.userContentBlockingAssets
+            .compactMap(\.nonEmptyCompletionTokens)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] tokens in
                 guard let self = self else { return }
@@ -76,7 +70,6 @@ final class PrivacyDashboardViewController: NSViewController {
                     self.tabViewModel?.reload()
                 }
             }
-            .store(in: &contentBlockingCancellables)
     }
 
     override func viewWillAppear() {
@@ -221,7 +214,7 @@ final class PrivacyDashboardViewController: NSViewController {
     private var contentHeightConstraint: NSLayoutConstraint!
     private let privacyDashboardScript = PrivacyDashboardUserScript()
     private var webViewCancellables = Set<AnyCancellable>()
-    private var contentBlockingCancellables = Set<AnyCancellable>()
+    private var rulesRecompilationCancellable: AnyCancellable?
 
     /// Running the resize animation block during the popover animation causes frame hitching.
     /// The animation only needs to run when transitioning between views in the popover, so this is used to track when to run the animation.
@@ -305,4 +298,15 @@ extension PrivacyDashboardViewController: WKNavigationDelegate {
         subscribeToConsentManaged()
     }
 
+}
+
+private extension UserContentUpdating.NewContent {
+
+    var nonEmptyCompletionTokens: [ContentBlockerRulesManager.CompletionToken]? {
+        let nonEmptyTokens = rulesUpdate.completionTokens.filter { !$0.isEmpty }
+        if nonEmptyTokens.isEmpty {
+            return nil
+        }
+        return nonEmptyTokens
+    }
 }
