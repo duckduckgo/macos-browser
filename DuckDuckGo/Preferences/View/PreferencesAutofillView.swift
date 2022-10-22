@@ -171,7 +171,7 @@ extension Preferences {
                 case .locked:
                     BitwardenStatusView(iconType: .warning,
                                         title: UserText.bitwardenPreferencesUnlock,
-                                        buttonValue: .init(title: UserText.bitwardenPreferencesCompleteSetup, action: { model.openBitwarden() }))
+                                        buttonValue: .init(title: UserText.bitwardenPreferencesOpenBitwarden, action: { model.openBitwarden() }))
                     .offset(x: Preferences.Const.autoLockWarningOffset)
                 case .unlocked:
                     BitwardenStatusView(iconType: .success,
