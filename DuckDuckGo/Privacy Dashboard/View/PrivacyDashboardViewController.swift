@@ -61,7 +61,7 @@ final class PrivacyDashboardViewController: NSViewController {
         websiteBreakageReporter.updateTabViewModel(tabViewModel)
         
         permissionHandler.updateTabViewModel(tabViewModel) { [weak self] allowedPermissions in
-            self?.privacyDashboardController.updateAllowedPermissions(allowedPermissions)
+            self?.privacyDashboardController.allowedPermissions = allowedPermissions
         }
     }
     
