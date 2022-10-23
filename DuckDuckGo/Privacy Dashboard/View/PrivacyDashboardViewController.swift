@@ -39,16 +39,16 @@ final class PrivacyDashboardViewController: NSViewController {
     /// Running the resize animation block during the popover animation causes frame hitching.
     /// The animation only needs to run when transitioning between views in the popover, so this is used to track when to run the animation.
     /// This should be set to true any time the popover is displayed (i.e., reset to true when dismissing the popover), and false after the initial resize pass is complete.
-    private var skipLayoutAnimation = true
+    let shouldAnimateHeightChange: CurrentValueSubject<Bool, Never> = CurrentValueSubject(false)
+    
+    let demandedHeight: CurrentValueSubject<Int, Never> = CurrentValueSubject(Int(Constants.initialContentHeight))
+    var heightSink: AnyCancellable?
     
     private var preferredMaxHeight: CGFloat = Constants.initialContentHeight
     func setPreferredMaxHeight(_ height: CGFloat) {
         guard height > Constants.initialContentHeight else { return }
         
         preferredMaxHeight = height
-        if let webView = webView {
-//            webView.reload()
-        }
     }
     
     public func updateTabViewModel(_ tabViewModel: TabViewModel) {
@@ -71,32 +71,36 @@ final class PrivacyDashboardViewController: NSViewController {
         initWebView()
         privacyDashboardController.setup(for: webView)
         setupPrivacyDashboardControllerHandlers()
-        setupHeighChangeHandler()
+        setupHeightChangeHandler()
     }
     
     override func viewWillAppear() {
-        skipLayoutAnimation = true
-//        privacyDashboardController.setup(for: webView)
-        privacyDashboardController.preferredLocale = "en"
-        webView.reload()
+        super.viewWillAppear()
+
+        privacyDashboardController.willAppear()
+        privacyDashboardController.preferredLocale = "en" // fixed until app is localised
     }
     
     override func viewDidAppear() {
-        skipLayoutAnimation = true
+        super.viewDidAppear()
+            
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+            self.shouldAnimateHeightChange.send(true)
+        }
     }
 
     override func viewWillDisappear() {
-//        privacyDashboardController.cleanUp()
-
-//        contentHeightConstraint.constant = Constants.initialContentHeight
-//        skipLayoutAnimation = true
+        super.viewWillDisappear()
+        
+        privacyDashboardController.willDisappear()
+        shouldAnimateHeightChange.send(false)
     }
     
     override func viewDidDisappear() {
-        contentHeightConstraint.constant = Constants.initialContentHeight
-        skipLayoutAnimation = true
+        super.viewDidDisappear()
+        
         demandedHeight.send(Int(Constants.initialContentHeight))
-        skipLayoutAnimation = true
+        webView.reload() // reset navigation state of the dashboard before next use
     }
     
     private func initWebView() {
@@ -109,22 +113,22 @@ final class PrivacyDashboardViewController: NSViewController {
         let webView = PrivacyDashboardWebView(frame: .zero, configuration: configuration)
         self.webView = webView
         view.addAndLayout(webView)
-
+        
+        view.topAnchor.constraint(equalTo: webView.topAnchor).isActive = true
+        
         contentHeightConstraint = view.heightAnchor.constraint(equalToConstant: Constants.initialContentHeight)
         contentHeightConstraint.isActive = true
     }
     
-    let demandedHeight: CurrentValueSubject<Int, Never> = CurrentValueSubject(Int(Constants.initialContentHeight))
-    var heightSink: AnyCancellable?
-    
-    private func setupHeighChangeHandler() {
+    private func setupHeightChangeHandler() {
         heightSink = demandedHeight
-            .removeDuplicates()
-            .debounce(for: .milliseconds(50), scheduler: RunLoop.main)
-            .sink(receiveValue: { [weak self] height in
-                Swift.print("new height: \(height)")
-                self?.onHeightChange(height)
-        })
+            .combineLatest(shouldAnimateHeightChange)
+            .removeDuplicates { prev, current in
+                prev.0 == current.0
+            }
+            .sink(receiveValue: { [weak self] (height, shouldAnimate) in
+                self?.onHeightChange(height, shouldAnimate: shouldAnimate)
+            })
     }
     
     private func setupPrivacyDashboardControllerHandlers() {
@@ -185,25 +189,20 @@ final class PrivacyDashboardViewController: NSViewController {
         }
     }
     
-    private func onHeightChange(_ height: Int) {
-        Swift.print("height change \(height)")
-
+    private func onHeightChange(_ height: Int, shouldAnimate: Bool) {
         var height = CGFloat(height)
         if height > self.preferredMaxHeight {
             height = self.preferredMaxHeight
         }
-         
-        if self.skipLayoutAnimation {
-            Swift.print(" - skipping animation")
-            self.contentHeightConstraint.constant = height
-            self.skipLayoutAnimation = false
-        } else {
-            Swift.print(" - animating")
+
+        if shouldAnimate {
             NSAnimationContext.runAnimationGroup { [weak self] context in
                 context.duration = 1/3
                 context.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
                 self?.contentHeightConstraint.animator().constant = height
             }
+        } else {
+            self.contentHeightConstraint.constant = height
         }
     }
 }
