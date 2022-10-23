@@ -37,6 +37,18 @@ final class PrivacyDashboardPermissionHandler {
         subscribeToPermissions()
     }
     
+    public func setPermission(with permissionName: String, paused: Bool) {
+        guard let permission = PermissionType(rawValue: permissionName) else { return }
+        
+        tabViewModel?.tab.permissions.set([permission], muted: paused)
+    }
+    
+    public func setPermissionAuthorization(authorizationState: PermissionAuthorizationState, domain: String, permissionName: String) {
+        guard let permission = PermissionType(rawValue: permissionName) else { return }
+        
+        PermissionManager.shared.setPermission(authorizationState.persistedPermissionDecision, forDomain: domain, permissionType: permission)
+    }
+    
     private func subscribeToPermissions() {
         tabViewModel?.$usedPermissions.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.updatePermissions()
@@ -94,6 +106,61 @@ final class PrivacyDashboardPermissionHandler {
                 "id": decision.rawValue,
                 "title": String(format: decision.localizedFormat(for: item.permission), domain)
             ]
+        }
+    }
+}
+
+extension PermissionType {
+    var jsStyle: String {
+        switch self {
+        case .camera, .microphone, .geolocation, .popups:
+            return self.rawValue
+        case .externalScheme:
+            return "externalScheme"
+        }
+    }
+    
+    var jsTitle: String {
+        switch self {
+        case .camera, .microphone, .geolocation, .popups:
+            return self.localizedDescription
+        case .externalScheme:
+            return String(format: UserText.permissionExternalSchemeOpenFormat, self.localizedDescription)
+        }
+    }
+}
+
+extension PermissionAuthorizationState {
+    
+    init(decision: PersistedPermissionDecision) {
+        switch decision {
+        case .ask:
+            self = .ask
+        case .allow:
+            self = .grant
+        case .deny:
+            self = .deny
+        }
+    }
+    
+    var persistedPermissionDecision: PersistedPermissionDecision {
+        switch self {
+        case .ask: return .ask
+        case .grant: return .allow
+        case .deny: return .deny
+        }
+    }
+    
+    func localizedFormat(for permission: PermissionType) -> String {
+        switch (permission, self) {
+        case (.popups, .ask):
+            return UserText.privacyDashboardPopupsAlwaysAsk
+        case (_, .ask):
+            return UserText.privacyDashboardPermissionAsk
+        case (_, .grant):
+            return UserText.privacyDashboardPermissionAlwaysAllow
+        case (_, .deny):
+            return UserText.privacyDashboardPermissionAlwaysDeny
         }
     }
 }

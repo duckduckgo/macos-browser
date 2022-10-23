@@ -171,6 +171,18 @@ final class PrivacyDashboardViewController: NSViewController {
             }
             tabCollection.appendNewTab(with: .url(url), selected: true)
         }
+        
+        privacyDashboardController.onPermissionAuthorizationStateChange = { [weak self] permissionName, authorizationState in
+            guard let self = self, let domain = self.privacyDashboardController.privacyInfo?.url.host else { return }
+
+            self.permissionHandler.setPermissionAuthorization(authorizationState: authorizationState, domain: domain, permissionName: permissionName)
+        }
+        
+        privacyDashboardController.onPermissionPause = { [weak self] permissionName, isPaused in
+            guard let self = self else { return }
+            
+            self.permissionHandler.setPermission(with: permissionName, paused: isPaused )
+        }
     }
     
     public func isPendingUpdates() -> Bool {
@@ -207,21 +219,4 @@ final class PrivacyDashboardViewController: NSViewController {
             self.contentHeightConstraint.constant = height
         }
     }
-}
-
-extension PrivacyDashboardViewController {
-
-    func userScript(_ userScript: OLDPrivacyDashboardUserScript, didSetPermission permission: PermissionType, to state: PermissionAuthorizationState) {
-//        guard let domain = tabViewModel?.tab.content.url?.host else {
-//            assertionFailure("PrivacyDashboardViewController: no domain available")
-//            return
-//        }
-//
-//        PermissionManager.shared.setPermission(state.persistedPermissionDecision, forDomain: domain, permissionType: permission)
-    }
-
-    func userScript(_ userScript: OLDPrivacyDashboardUserScript, setPermission permission: PermissionType, paused: Bool) {
-//        tabViewModel?.tab.permissions.set([permission], muted: paused)
-    }
-
 }
