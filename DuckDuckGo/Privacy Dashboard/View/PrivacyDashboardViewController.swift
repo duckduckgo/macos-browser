@@ -18,6 +18,7 @@
 
 import Cocoa
 import WebKit
+import Combine
 import BrowserServicesKit
 import PrivacyDashboard
 
@@ -46,7 +47,7 @@ final class PrivacyDashboardViewController: NSViewController {
         
         preferredMaxHeight = height
         if let webView = webView {
-            webView.reload()
+//            webView.reload()
         }
     }
     
@@ -63,12 +64,39 @@ final class PrivacyDashboardViewController: NSViewController {
             self?.privacyDashboardController.updateAllowedPermissions(allowedPermissions)
         }
     }
-        
+    
     public override func viewDidLoad() {
         super.viewDidLoad()
         
         initWebView()
+        privacyDashboardController.setup(for: webView)
         setupPrivacyDashboardControllerHandlers()
+        setupHeighChangeHandler()
+    }
+    
+    override func viewWillAppear() {
+        skipLayoutAnimation = true
+//        privacyDashboardController.setup(for: webView)
+        privacyDashboardController.preferredLocale = "en"
+        webView.reload()
+    }
+    
+    override func viewDidAppear() {
+        skipLayoutAnimation = true
+    }
+
+    override func viewWillDisappear() {
+//        privacyDashboardController.cleanUp()
+
+//        contentHeightConstraint.constant = Constants.initialContentHeight
+//        skipLayoutAnimation = true
+    }
+    
+    override func viewDidDisappear() {
+        contentHeightConstraint.constant = Constants.initialContentHeight
+        skipLayoutAnimation = true
+        demandedHeight.send(Int(Constants.initialContentHeight))
+        skipLayoutAnimation = true
     }
     
     private func initWebView() {
@@ -86,16 +114,17 @@ final class PrivacyDashboardViewController: NSViewController {
         contentHeightConstraint.isActive = true
     }
     
-    override func viewWillAppear() {
-        privacyDashboardController.setup(for: webView)
-        privacyDashboardController.preferredLocale = "en"
-    }
-
-    override func viewWillDisappear() {
-        privacyDashboardController.cleanUp()
-        
-        contentHeightConstraint.constant = Constants.initialContentHeight
-        skipLayoutAnimation = true
+    let demandedHeight: CurrentValueSubject<Int, Never> = CurrentValueSubject(Int(Constants.initialContentHeight))
+    var heightSink: AnyCancellable?
+    
+    private func setupHeighChangeHandler() {
+        heightSink = demandedHeight
+            .removeDuplicates()
+            .debounce(for: .milliseconds(50), scheduler: RunLoop.main)
+            .sink(receiveValue: { [weak self] height in
+                Swift.print("new height: \(height)")
+                self?.onHeightChange(height)
+        })
     }
     
     private func setupPrivacyDashboardControllerHandlers() {
@@ -117,22 +146,7 @@ final class PrivacyDashboardViewController: NSViewController {
         
         privacyDashboardController.onHeightChange = { [weak self] height in
             guard let self = self else { return }
-            
-            var height = CGFloat(height)
-            if height > self.preferredMaxHeight {
-                height = self.preferredMaxHeight
-            }
-            
-            if self.skipLayoutAnimation {
-                self.contentHeightConstraint.constant = height
-                self.skipLayoutAnimation = false
-            } else {
-                NSAnimationContext.runAnimationGroup { [weak self] context in
-                    context.duration = 1/3
-                    context.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
-                    self?.contentHeightConstraint.animator().constant = height
-                }
-            }
+            self.demandedHeight.send(height)
         }
         
         privacyDashboardController.onCloseTapped = { }
@@ -169,7 +183,29 @@ final class PrivacyDashboardViewController: NSViewController {
         } else {
             privacyDashboardController.didFinishRulesCompilation()
         }
-    }    
+    }
+    
+    private func onHeightChange(_ height: Int) {
+        Swift.print("height change \(height)")
+
+        var height = CGFloat(height)
+        if height > self.preferredMaxHeight {
+            height = self.preferredMaxHeight
+        }
+         
+        if self.skipLayoutAnimation {
+            Swift.print(" - skipping animation")
+            self.contentHeightConstraint.constant = height
+            self.skipLayoutAnimation = false
+        } else {
+            Swift.print(" - animating")
+            NSAnimationContext.runAnimationGroup { [weak self] context in
+                context.duration = 1/3
+                context.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+                self?.contentHeightConstraint.animator().constant = height
+            }
+        }
+    }
 }
 
 extension PrivacyDashboardViewController {
