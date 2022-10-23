@@ -39,10 +39,10 @@ final class PrivacyDashboardViewController: NSViewController {
     /// Running the resize animation block during the popover animation causes frame hitching.
     /// The animation only needs to run when transitioning between views in the popover, so this is used to track when to run the animation.
     /// This should be set to true any time the popover is displayed (i.e., reset to true when dismissing the popover), and false after the initial resize pass is complete.
-    let shouldAnimateHeightChange: CurrentValueSubject<Bool, Never> = CurrentValueSubject(false)
+    @Published private var shouldAnimateHeightChange: Bool = false
     
-    let demandedHeight: CurrentValueSubject<Int, Never> = CurrentValueSubject(Int(Constants.initialContentHeight))
-    var heightSink: AnyCancellable?
+    @Published private var currentContentHeight: Int = Int(Constants.initialContentHeight)
+    private var currentContentHeightCancellable: AnyCancellable?
     
     private var preferredMaxHeight: CGFloat = Constants.initialContentHeight
     func setPreferredMaxHeight(_ height: CGFloat) {
@@ -70,6 +70,7 @@ final class PrivacyDashboardViewController: NSViewController {
         
         initWebView()
         privacyDashboardController.setup(for: webView)
+        
         setupPrivacyDashboardControllerHandlers()
         setupHeightChangeHandler()
     }
@@ -85,7 +86,7 @@ final class PrivacyDashboardViewController: NSViewController {
         super.viewDidAppear()
             
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
-            self.shouldAnimateHeightChange.send(true)
+            self.shouldAnimateHeightChange = true
         }
     }
 
@@ -93,13 +94,13 @@ final class PrivacyDashboardViewController: NSViewController {
         super.viewWillDisappear()
         
         privacyDashboardController.willDisappear()
-        shouldAnimateHeightChange.send(false)
+        shouldAnimateHeightChange = false
     }
     
     override func viewDidDisappear() {
         super.viewDidDisappear()
         
-        demandedHeight.send(Int(Constants.initialContentHeight))
+        currentContentHeight = Int(Constants.initialContentHeight)
         webView.reload() // reset navigation state of the dashboard before next use
     }
     
@@ -121,12 +122,13 @@ final class PrivacyDashboardViewController: NSViewController {
     }
     
     private func setupHeightChangeHandler() {
-        heightSink = demandedHeight
-            .combineLatest(shouldAnimateHeightChange)
+        currentContentHeightCancellable = $currentContentHeight
+            .combineLatest($shouldAnimateHeightChange)
             .removeDuplicates { prev, current in
                 prev.0 == current.0
             }
             .sink(receiveValue: { [weak self] (height, shouldAnimate) in
+                print("new height: \(height), shouldAnimate: \(shouldAnimate)")
                 self?.onHeightChange(height, shouldAnimate: shouldAnimate)
             })
     }
@@ -150,7 +152,7 @@ final class PrivacyDashboardViewController: NSViewController {
         
         privacyDashboardController.onHeightChange = { [weak self] height in
             guard let self = self else { return }
-            self.demandedHeight.send(height)
+            self.currentContentHeight = height
         }
         
         privacyDashboardController.onCloseTapped = { }
