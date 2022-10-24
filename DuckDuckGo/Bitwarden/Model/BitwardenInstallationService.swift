@@ -24,33 +24,21 @@ protocol BitwardenInstallationManager {
     var isBitwardenInstalled: Bool { get }
     
     func openBitwarden() -> Bool
-    
+
 }
 
 final class LocalBitwardenInstallationManager: BitwardenInstallationManager {
     
-    private let bitwardenBundleID = "com.bitwarden.desktop"
-    private let expectedBitwardenURL = "/Applications/Bitwarden.app"
-
-    /// Returns the URL of the Bitwarden app.
-    private var bitwardenURL: URL? {
-        return NSWorkspace.shared.absolutePathForApplication(withBundleIdentifier: bitwardenBundleID)?.url
-    }
+    private lazy var bitwardenBundleID = "com.bitwarden.desktop"
+    private lazy var bitwardenBundlePath = "/Applications/Bitwarden.app"
+    private lazy var bitwardenUrl = URL(string: bitwardenBundlePath)!
 
     var isBitwardenInstalled: Bool {
-        guard let detectedBitwardenURL = NSWorkspace.shared.absolutePathForApplication(withBundleIdentifier: bitwardenBundleID) else {
-            return false
-        }
-        
-        return detectedBitwardenURL == expectedBitwardenURL
+        return FileManager.default.fileExists(atPath: bitwardenBundlePath)
     }
     
     func openBitwarden() -> Bool {
-        guard let bitwardenURL = self.bitwardenURL else {
-            return false
-        }
-
-        return NSWorkspace.shared.open(bitwardenURL)
+        return NSWorkspace.shared.open(bitwardenUrl)
     }
     
 }
