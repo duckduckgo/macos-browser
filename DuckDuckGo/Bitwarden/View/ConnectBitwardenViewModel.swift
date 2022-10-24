@@ -18,6 +18,7 @@
 
 import Foundation
 import Combine
+import os.log
 
 protocol ConnectBitwardenViewModelDelegate: AnyObject {
     
@@ -178,7 +179,7 @@ final class ConnectBitwardenViewModel: ObservableObject {
         installationCheckTimer = Timer.scheduledTimer(withTimeInterval: bitwardenInstallationCheckInterval, repeats: true) { [weak self] _ in
             guard let self = self else { return }
 
-            print("Checking for Bitwarden installation...")
+            os_log("Checking for Bitwarden installation...", log: .bitwarden, type: .debug)
 
             if self.bitwardenInstallationService.isBitwardenInstalled {
                 self.viewState = .bitwardenFound
