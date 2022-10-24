@@ -148,13 +148,13 @@ private struct BitwardenInstallationDetectionView: View {
     var body: some View {
 
         VStack(alignment: .leading, spacing: 10) {
-            Text("Install Bitwarden")
+            Text(UserText.installBitwarden)
                 .font(.system(size: 13, weight: .bold))
             
             HStack {
                 NumberedBadge(value: 1)
 
-                Text("To begin setup, first install Bitwarden from the App Store.")
+                Text(UserText.installBitwardenInfo)
                 
                 Spacer()
             }
@@ -162,7 +162,7 @@ private struct BitwardenInstallationDetectionView: View {
             HStack {
                 NumberedBadge(value: 2)
                 
-                Text("After installing, return to DuckDuckGo to complete the setup.")
+                Text(UserText.afterBitwardenInstallationInfo)
                 
                 Spacer()
             }
@@ -178,13 +178,13 @@ private struct BitwardenInstallationDetectionView: View {
             if bitwardenDetected {
                 HStack {
                     Image("SuccessCheckmark")
-                    Text("Bitwarden app found!")
+                    Text(UserText.bitwardenAppFound)
                 }
             } else {
                 HStack {
                     ActivityIndicator(isAnimating: .constant(true), style: .spinning)
                     
-                    Text("Looking for Bitwarden app...")
+                    Text(UserText.lookingForBitwaden)
                 }
             }
         }
@@ -202,36 +202,36 @@ private struct ConnectToBitwardenView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 15) {
-            Text("Allow Integration with DuckDuckGo")
+            Text(UserText.allowIntegration)
                 .font(.system(size: 13, weight: .bold))
             
             HStack {
                 NumberedBadge(value: 1)
-                Text("Open Bitwarden and Log in or Unlock your vault.")
+                Text(UserText.openBitwadenAndLogInOrUnlock)
                 Spacer()
             }
             
             HStack {
                 NumberedBadge(value: 2)
-                Text("Select Bitwarden → Preferences from the Mac menu bar.")
+                Text(UserText.selectBitwadenPreferences)
                 Spacer()
             }
             
             HStack {
                 NumberedBadge(value: 3)
-                Text("Scroll to find the App Settings (All Accounts) section.")
+                Text(UserText.scrollToFindAppSettings)
                 Spacer()
             }
             
             HStack {
                 NumberedBadge(value: 4)
-                Text("Check Allow integration with DuckDuckGo.")
+                Text(UserText.checkAllowIntegration)
                 Spacer()
             }
             
             Image("BitwardenSettingsIllustration")
             
-            Button("Open Bitwarden") {
+            Button(UserText.openBitwaden) {
                 viewModel.process(action: .openBitwarden)
             }
             
@@ -239,7 +239,7 @@ private struct ConnectToBitwardenView: View {
                 HStack {
                     Image("SuccessCheckmark")
                     
-                    Text("Bitwarden is ready to connect to DuckDuckGo!")
+                    Text(UserText.bitwardenIsReadyToConnect)
                     
                     Spacer()
                 }
@@ -249,7 +249,7 @@ private struct ConnectToBitwardenView: View {
                     ActivityIndicator(isAnimating: .constant(true), style: .spinning)
                         .frame(maxWidth: 8, maxHeight: 8)
 
-                    Text("Waiting for permission to use Bitwarden in DuckDuckGo…")
+                    Text(UserText.bitwardenWaitingForPermissions)
                 }
             }
         }
@@ -262,13 +262,13 @@ private struct ConnectedToBitwardenView: View {
     var body: some View {
         VStack(alignment: .leading) {
             
-            Text("Bitwarden integration complete!")
+            Text(UserText.bitwardenIntegrationComplete)
                 .font(.system(size: 13, weight: .bold))
             
             HStack {
                 Image("SuccessCheckmark")
 
-                Text("You are now using Bitwarden as your password manager.")
+                Text(UserText.bitwardenIntegrationCompleteInfo)
                 
                 Spacer()
             }
@@ -309,7 +309,7 @@ private struct ButtonsView: View {
             Spacer()
             
             if viewModel.viewState.cancelButtonVisible {
-                Button("Cancel") {
+                Button(UserText.cancel) {
                     viewModel.process(action: .cancel)
                 }
             }
