@@ -253,6 +253,10 @@ function initWithEnvironment(environment, comms) {
                     window.addEventListener('resize', () => {
                         IconOverlay.repositionHoverOverlay();
                     });
+
+                    window.addEventListener('scroll', (e) => {
+                        IconOverlay.hidePlaylistOverlayOnScroll(e);
+                    }, true);
                 }
 
                 IconOverlay.appendHoverOverlay();
