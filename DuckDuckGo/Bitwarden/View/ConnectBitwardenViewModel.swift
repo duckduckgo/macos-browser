@@ -116,6 +116,7 @@ final class ConnectBitwardenViewModel: ObservableObject {
                 delegate?.connectBitwardenViewModelDismissedView(self, canceled: false)
             } else if viewState == .connectToBitwarden {
                 bitwardenManager.sendHandshake()
+                bitwardenInstallationService.openBitwarden()
             } else {
                 self.viewState = nextState(for: viewState)
                 

@@ -179,9 +179,9 @@ extension Preferences {
                                         buttonValue: .init(title: UserText.bitwardenPreferencesCompleteSetup, action: { model.openBitwarden() }))
                     .offset(x: Preferences.Const.autoLockWarningOffset)
                 }
-            case .error:
+            case .error(let error):
                 BitwardenStatusView(iconType: .error,
-                                    title: UserText.bitwardenPreferencesUnableToConnect,
+                                    title: error.text,
                                     buttonValue: nil)
                 .offset(x: Preferences.Const.autoLockWarningOffset)
             }

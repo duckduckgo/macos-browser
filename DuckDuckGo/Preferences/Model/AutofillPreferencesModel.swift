@@ -53,9 +53,14 @@ final class AutofillPreferencesModel: ObservableObject {
     @Published private(set) var passwordManager: PasswordManager {
         didSet {
             persistor.passwordManager = passwordManager
-            
-            if passwordManager == .bitwarden, !BitwardenManager.shared.status.isConnected {
-                presentBitwardenSetupFlow()
+
+            if passwordManager == .bitwarden {
+                if !BitwardenManager.shared.status.isConnected {
+                    BitwardenManager.shared.initCommunication(applicationDidFinishLaunching: false)
+                    presentBitwardenSetupFlow()
+                }
+            } else {
+                BitwardenManager.shared.cancelCommunication()
             }
         }
     }

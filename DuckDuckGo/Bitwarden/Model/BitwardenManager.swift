@@ -26,7 +26,9 @@ protocol BitwardenManagement {
     var status: BitwardenStatus { get }
     var statusPublisher: Published<BitwardenStatus>.Publisher { get }
 
+    func initCommunication(applicationDidFinishLaunching: Bool)
     func sendHandshake()
+    func cancelCommunication()
 
     func retrieveCredentials(for url: URL, completion: @escaping ([BitwardenCredential], BitwardenError?) -> Void)
     func create(credential: BitwardenCredential, completion: @escaping (BitwardenError?) -> Void)
@@ -46,18 +48,34 @@ final class BitwardenManager: BitwardenManagement, ObservableObject {
 
     private lazy var communicator: BitwardenCommunication = BitwardenCommunicator()
 
-    func initCommunication() {
-        //TODO: adjust the init based on internal setting of password manager and subscribe for dynamic change of the setting
-        //TODO: Retrieve keys if possible instead of generation
-
-        generateKeyPair()
+    func initCommunication(applicationDidFinishLaunching: Bool) {
         communicator.delegate = self
-        startConnection()
+
+        let autofillPreferences = AutofillPreferences()
+        guard autofillPreferences.passwordManager == .bitwarden else {
+            // The built-in password manager is used
+            return
+        }
+
+        let sharedKey = try? keyStorage.retrieveSharedKey()
+        if applicationDidFinishLaunching && sharedKey == nil {
+            // The onboarding flow wasn't finished successfully
+            status = .error(error: .noSharedKey)
+        }
+
+        connectToBitwadenProcess()
+    }
+
+    func cancelCommunication() {
+        status = .disabled
+        communicator.enabled = false
+        try? keyStorage.cleanSharedKey()
+        openSSLWrapper.cleanKeys()
     }
 
     // MARK: - Connection
 
-    private func startConnection() {
+    private func connectToBitwadenProcess() {
         guard RunningApplicationCheck.isApplicationRunning(bundleId: "com.bitwarden.desktop") else {
             scheduleConnectionAttempt()
             return
@@ -80,7 +98,7 @@ final class BitwardenManager: BitwardenManagement, ObservableObject {
             self?.connectionAttemptTimer?.invalidate()
             self?.connectionAttemptTimer = nil
 
-            self?.startConnection()
+            self?.connectToBitwadenProcess()
         }
     }
 
@@ -118,13 +136,26 @@ final class BitwardenManager: BitwardenManagement, ObservableObject {
         switch command {
         case .connected:
             status = .approachable
-            
-            // The handshake should only be sent automatically if the Bitwarden integration flow has already been completed:
-            if AutofillPreferences().passwordManager == .bitwarden {
-                sendHandshake()
+
+            let sharedKey: Base64EncodedString?
+            do {
+                sharedKey = try keyStorage.retrieveSharedKey()
+            } catch {
+                assertionFailure("Failed to retrieve shared key")
+                return
             }
 
-            sendHandshake()
+            // If shared key retrieval is successfull, we already onboarded the user.
+            if let sharedKey = sharedKey {
+                guard let sharedKeyData = Data(base64Encoded: sharedKey),
+                      openSSLWrapper.setSharedKey(sharedKeyData) else {
+                    status = .error(error: .injectingOfSharedKeyFailed)
+                    return
+                }
+                sendStatus()
+            }
+
+            // Otherwise, other part of the code is responsible for sending the handshake message
             return
         case .disconnected:
             // Bitwarden application isn't running || User didn't approve DuckDuckGo browser integration
@@ -149,9 +180,16 @@ final class BitwardenManager: BitwardenManagement, ObservableObject {
             return
         }
 
-        guard openSSLWrapper.decryptSharedKey(encryptedSharedKey) else {
+        guard let sharedKey = openSSLWrapper.decryptSharedKey(encryptedSharedKey) else {
             self.status = .error(error: .decryptionOfSharedKeyFailed)
             cancelConnectionAndScheduleNextAttempt()
+            return
+        }
+
+        do {
+            try keyStorage.save(sharedKey: sharedKey)
+        } catch {
+            self.status = .error(error: .storingOfTheSharedKeyFailed)
             return
         }
 
@@ -221,12 +259,12 @@ final class BitwardenManager: BitwardenManagement, ObservableObject {
     // MARK: - Sending Messages
 
     func sendHandshake() {
-        guard let publicKey64Encoded = publicKey else {
+        guard let publicKey = generateKeyPair() else {
             assertionFailure("Public key is missing")
             return
         }
 
-        guard let messageData = BitwardenMessage.makeHandshakeMessage(with: publicKey64Encoded).data else {
+        guard let messageData = BitwardenMessage.makeHandshakeMessage(with: publicKey).data else {
             assertionFailure("Making the handshake message failed")
             return
         }
@@ -238,10 +276,15 @@ final class BitwardenManager: BitwardenManagement, ObservableObject {
         //TODO: More general encryption method
         guard let commandData = BitwardenMessage.EncryptedCommand(command: .status, payload: nil).data else {
             assertionFailure("Making the status message failed")
+            status = .error(error: .sendingOfStatusMessageFailed)
             return
         }
 
-        let encryptedData = openSSLWrapper.encryptData(commandData)
+        guard let encryptedData = openSSLWrapper.encryptData(commandData) else {
+            status = .error(error: .sendingOfStatusMessageFailed)
+            return
+        }
+
         let encryptedCommand = "2.\(encryptedData.iv.base64EncodedString())|\(encryptedData.data.base64EncodedString())|\(encryptedData.hmac.base64EncodedString())"
 
         guard let messageData = BitwardenMessage.makeStatusMessage(encryptedCommand: encryptedCommand)?.data else {
@@ -252,16 +295,17 @@ final class BitwardenManager: BitwardenManagement, ObservableObject {
         communicator.send(messageData: messageData)
     }
     
-    // MARK: - Encryption and Keys
+    // MARK: - Encryption
 
     let openSSLWrapper = OpenSSLWrapper()
 
-    // TODO: Remove optional type to make sure the key is read or generated.
-    var publicKey: String?
-
-    private func generateKeyPair() {
-        publicKey = openSSLWrapper.generateKeys()
+    private func generateKeyPair() -> Base64EncodedString? {
+        return openSSLWrapper.generateKeys()
     }
+
+    // MARK: - Shared Key Storage
+
+    let keyStorage: BitwardenKeyStoring = BitwardenKeyStorage()
 
     // MARK: - Status
 

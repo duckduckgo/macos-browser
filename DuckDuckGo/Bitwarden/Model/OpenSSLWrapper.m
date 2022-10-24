@@ -59,13 +59,18 @@ NSData *macKeyData;
     return [outputData base64EncodedStringWithOptions:0];
 }
 
-- (void)cleanKeyData {
-    sharedKeyData = nil;
-    encryptionKeyData = nil;
-    macKeyData = nil;
+- (BOOL)setSharedKey:(NSData *)sharedKey {
+    if ([sharedKey length] != 64) {
+        return false;
+    }
+
+    sharedKeyData = sharedKey;
+    encryptionKeyData = [sharedKeyData subdataWithRange:NSMakeRange(0, 32)];
+    macKeyData = [sharedKeyData subdataWithRange:NSMakeRange(32, 32)];
+    return true;
 }
 
-- (BOOL)decryptSharedKey:(NSString *)encryptedSharedKey {
+- (nullable NSString *)decryptSharedKey:(NSString *)encryptedSharedKey {
     // Make sure key pair is generated
     if (keypair == NULL) { return false; }
     [self cleanKeyData];
@@ -86,19 +91,17 @@ NSData *macKeyData;
         return false;
     }
 
+    NSData *sharedKeyData = [NSData dataWithBytes:decryptedDataArray length:decryptedLength];
+
     // Hold for further communication
-    sharedKeyData = [NSData dataWithBytes:decryptedDataArray length:decryptedLength];
-    if (decryptedLength != 64) {
-        return false;
-    }
+    [self setSharedKey:sharedKeyData];
 
-    encryptionKeyData = [sharedKeyData subdataWithRange:NSMakeRange(0, 32)];
-    macKeyData = [sharedKeyData subdataWithRange:NSMakeRange(32, 32)];
-
-    return true;
+    // Return to store for future sessions
+    return [sharedKeyData base64EncodedStringWithOptions:0];
 }
 
-- (EncryptedMessage *)encryptData:(NSData *)data {
+- (nullable EncryptedMessage *)encryptData:(NSData *)data {
+    if (macKeyData == nil) { return nil; }
 
     //TODO: Generate iv - random 16 bytes
     NSData *ivData = [macKeyData subdataWithRange:NSMakeRange(0, IV_LENGTH)];
@@ -166,6 +169,19 @@ NSData *macKeyData;
 
     NSData *decryptedData = [NSData dataWithBytes:decryptionOutput length: i];
     return decryptedData;
+}
+
+- (void)cleanKeys {
+    RSA_free(keypair);
+    keypair = nil;
+
+    [self cleanKeyData];
+}
+
+- (void)cleanKeyData {
+    sharedKeyData = nil;
+    encryptionKeyData = nil;
+    macKeyData = nil;
 }
 
 @end

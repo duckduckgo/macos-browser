@@ -31,7 +31,7 @@ final class LocalBitwardenInstallationManager: BitwardenInstallationManager {
     
     private lazy var bitwardenBundleID = "com.bitwarden.desktop"
     private lazy var bitwardenBundlePath = "/Applications/Bitwarden.app"
-    private lazy var bitwardenUrl = URL(string: bitwardenBundlePath)!
+    private lazy var bitwardenUrl = URL(fileURLWithPath: bitwardenBundlePath)
 
     var isBitwardenInstalled: Bool {
         return FileManager.default.fileExists(atPath: bitwardenBundlePath)

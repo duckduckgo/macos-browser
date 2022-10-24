@@ -26,6 +26,7 @@
 		1D2DC009290167A0008083A1 /* BitwardenStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DDF075F28F815AD00EDFBE3 /* BitwardenStatus.swift */; };
 		1D2DC00A290167A9008083A1 /* OpenSSLWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 1D02633528D8A9A9005CBB41 /* OpenSSLWrapper.m */; };
 		1D2DC00B290167EC008083A1 /* RunningApplicationCheck.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D77921C28FFF27C00BE0210 /* RunningApplicationCheck.swift */; };
+		1D6216B229069BBF00386B2C /* BitwardenKeyStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D6216B129069BBF00386B2C /* BitwardenKeyStorage.swift */; };
 		1DDF076228F815AD00EDFBE3 /* BitwardenCredential.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DDF075C28F815AD00EDFBE3 /* BitwardenCredential.swift */; };
 		1DDF076328F815AD00EDFBE3 /* BitwardenCommunicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DDF075D28F815AD00EDFBE3 /* BitwardenCommunicator.swift */; };
 		1DDF076428F815AD00EDFBE3 /* BitwardenManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DDF075E28F815AD00EDFBE3 /* BitwardenManager.swift */; };
@@ -866,6 +867,7 @@
 		14D9B8F924F7E089000D4D13 /* AddressBarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressBarViewController.swift; sourceTree = "<group>"; };
 		1D02633428D8A9A9005CBB41 /* OpenSSLWrapper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OpenSSLWrapper.h; sourceTree = "<group>"; };
 		1D02633528D8A9A9005CBB41 /* OpenSSLWrapper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OpenSSLWrapper.m; sourceTree = "<group>"; };
+		1D6216B129069BBF00386B2C /* BitwardenKeyStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BitwardenKeyStorage.swift; sourceTree = "<group>"; };
 		1D77921C28FFF27C00BE0210 /* RunningApplicationCheck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunningApplicationCheck.swift; sourceTree = "<group>"; };
 		1DDF075C28F815AD00EDFBE3 /* BitwardenCredential.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BitwardenCredential.swift; sourceTree = "<group>"; };
 		1DDF075D28F815AD00EDFBE3 /* BitwardenCommunicator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BitwardenCommunicator.swift; sourceTree = "<group>"; };
@@ -2437,7 +2439,16 @@
 		4BBDEE8B28FC14760092FAA6 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				1DDF075E28F815AD00EDFBE3 /* BitwardenManager.swift */,
+				1DDF075D28F815AD00EDFBE3 /* BitwardenCommunicator.swift */,
+				1DDF076128F815AD00EDFBE3 /* BitwardenMessage.swift */,
+				1D6216B129069BBF00386B2C /* BitwardenKeyStorage.swift */,
+				1DDF075C28F815AD00EDFBE3 /* BitwardenCredential.swift */,
+				1DDF076028F815AD00EDFBE3 /* BitwardenError.swift */,
+				1DDF075F28F815AD00EDFBE3 /* BitwardenStatus.swift */,
 				4BBDEE8C28FC14760092FAA6 /* BitwardenInstallationService.swift */,
+				1D02633428D8A9A9005CBB41 /* OpenSSLWrapper.h */,
+				1D02633528D8A9A9005CBB41 /* OpenSSLWrapper.m */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -3203,14 +3214,6 @@
 			children = (
 				4BBDEE8B28FC14760092FAA6 /* Model */,
 				4BBDEE8D28FC14760092FAA6 /* View */,
-				1DDF075D28F815AD00EDFBE3 /* BitwardenCommunicator.swift */,
-				1DDF075C28F815AD00EDFBE3 /* BitwardenCredential.swift */,
-				1DDF076028F815AD00EDFBE3 /* BitwardenError.swift */,
-				1DDF075E28F815AD00EDFBE3 /* BitwardenManager.swift */,
-				1DDF076128F815AD00EDFBE3 /* BitwardenMessage.swift */,
-				1DDF075F28F815AD00EDFBE3 /* BitwardenStatus.swift */,
-				1D02633428D8A9A9005CBB41 /* OpenSSLWrapper.h */,
-				1D02633528D8A9A9005CBB41 /* OpenSSLWrapper.m */,
 			);
 			path = Bitwarden;
 			sourceTree = "<group>";
@@ -4656,6 +4659,7 @@
 				4BBE0AA727B9B027003B37A8 /* PopUpButton.swift in Sources */,
 				AABEE6A524AA0A7F0043105B /* SuggestionViewController.swift in Sources */,
 				85589E8027BBB8630038AD11 /* AddEditFavoriteWindow.swift in Sources */,
+				1D6216B229069BBF00386B2C /* BitwardenKeyStorage.swift in Sources */,
 				AA7E919F287872EA00AB6B62 /* VisitViewModel.swift in Sources */,
 				B69B503B2726A12500758A2B /* Atb.swift in Sources */,
 				B6B1E88026D5DA9B0062C350 /* DownloadsViewController.swift in Sources */,

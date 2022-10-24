@@ -29,5 +29,24 @@ enum BitwardenError: Error {
     // Non-blocking errors
     case decryptionOfDataFailed
     case noActiveVault
+    case noSharedKey
+    case storingOfTheSharedKeyFailed
+    case sendingOfStatusMessageFailed
+    case injectingOfSharedKeyFailed
+
+    var text: String {
+        switch self {
+        case .handshakeFailed: return "Handshake failed"
+        case .decryptionOfSharedKeyFailed: return "Decryption of shared key failed"
+        case .parsingFailed: return "Parsing failed"
+        case .statusParsingFailed: return "Status parsing failed"
+        case .decryptionOfDataFailed: return "Decryption of data failed"
+        case .noActiveVault: return "No active vault"
+        case .noSharedKey: return "No shared key"
+        case .storingOfTheSharedKeyFailed: return "Storing of the shared key Failed"
+        case .sendingOfStatusMessageFailed: return "Sending of the status message failed"
+        case .injectingOfSharedKeyFailed: return "Injecting of the shared key failed"
+        }
+    }
 
 }
