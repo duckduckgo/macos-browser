@@ -26,13 +26,15 @@ protocol BitwardenManagement {
     var status: BitwardenStatus { get }
     var statusPublisher: Published<BitwardenStatus>.Publisher { get }
 
+    func sendHandshake()
+
     func retrieveCredentials(for url: URL, completion: @escaping ([BitwardenCredential], BitwardenError?) -> Void)
     func create(credential: BitwardenCredential, completion: @escaping (BitwardenError?) -> Void)
     func update(credential: BitwardenCredential, completion: @escaping (BitwardenError?) -> Void)
 
 }
 
-final class BitwardenManager: BitwardenManagement {
+final class BitwardenManager: BitwardenManagement, ObservableObject {
 
     static let shared = BitwardenManager()
 
@@ -115,6 +117,13 @@ final class BitwardenManager: BitwardenManagement {
     private func handleCommand(_ command: BitwardenMessage.Command) {
         switch command {
         case .connected:
+            status = .approachable
+            
+            // The handshake should only be sent automatically if the Bitwarden integration flow has already been completed:
+            if AutofillPreferences().passwordManager == .bitwarden {
+                sendHandshake()
+            }
+
             sendHandshake()
             return
         case .disconnected:
@@ -211,7 +220,7 @@ final class BitwardenManager: BitwardenManagement {
 
     // MARK: - Sending Messages
 
-    private func sendHandshake() {
+    func sendHandshake() {
         guard let publicKey64Encoded = publicKey else {
             assertionFailure("Public key is missing")
             return
@@ -272,7 +281,7 @@ final class BitwardenManager: BitwardenManagement {
             return
         }
 
-        let vault = BitwardenStatus.Vault(id: id, email: email, status: status)
+        let vault = BitwardenStatus.Vault(id: id, email: email, status: status, active: true)
         self.status = .connected(vault: vault)
     }
 
@@ -315,7 +324,6 @@ final class BitwardenManager: BitwardenManagement {
 extension BitwardenManager: BitwardenCommunicatorDelegate {
 
     func bitwadenCommunicator(_ bitwardenCommunicator: BitwardenCommunication, didReceiveMessageData messageData: Data) {
-
         guard let message = BitwardenMessage(from: messageData) else {
             assertionFailure("Can't decode the message")
             return

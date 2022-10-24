@@ -72,7 +72,7 @@ extension OSLog {
     static var bitwarden: OSLog {
         Logging.bitwardenLoggingEnabled ? Logging.bitwardenLog : .disabled
     }
-    
+
     static var attribution: OSLog {
         Logging.attributionLoggingEnabled ? Logging.attributionLog : .disabled
     }
