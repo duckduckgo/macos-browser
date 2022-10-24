@@ -90,6 +90,8 @@ function initWithEnvironment(environment, comms) {
         }
 
         const VideoThumbnail = {
+            hoverBoundElements: new WeakMap(),
+
             isSingleVideoURL: (href) => {
                 return href && (
                     (href.includes('/watch?v=') && !href.includes('&list=')) ||
@@ -121,7 +123,12 @@ function initWithEnvironment(environment, comms) {
                     return linksInVideoPreview.indexOf(item) === -1;
                 }
 
+                const linksNotAlreadyBound = item => {
+                    return !VideoThumbnail.hoverBoundElements.has(item);
+                }
+
                 return Array.from(document.querySelectorAll('a[href^="/watch?v="]'))
+                    .filter(linksNotAlreadyBound)
                     .filter(linksToVideos)
                     .filter(linksWithoutSubLinks)
                     .filter(linksNotInVideoPreview)
@@ -139,6 +146,8 @@ function initWithEnvironment(environment, comms) {
                     });
 
                     addTrustedEventListener(video, 'mouseout', IconOverlay.hideHoverOverlay);
+
+                    VideoThumbnail.hoverBoundElements.set(video, true);
                 }
             },
 
