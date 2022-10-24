@@ -959,12 +959,8 @@
               }
               videoPlayerOverlay.watchForVideoBeingAdded({ via: "mutation observer" });
             });
-            window.addEventListener("resize", () => {
-              IconOverlay.repositionHoverOverlay();
-            });
-            window.addEventListener("scroll", (e) => {
-              IconOverlay.hidePlaylistOverlayOnScroll(e);
-            }, true);
+            window.addEventListener("resize", IconOverlay.repositionHoverOverlay);
+            window.addEventListener("scroll", IconOverlay.hidePlaylistOverlayOnScroll, true);
           }
           IconOverlay.appendHoverOverlay();
           VideoThumbnail.bindEventsToAll();
