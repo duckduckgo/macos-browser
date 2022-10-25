@@ -74,41 +74,52 @@ final class ConnectBitwardenViewModel: ObservableObject {
     
     private enum Constants {
         static let bitwardenAppStoreURL = URL(string: "https://apps.apple.com/us/app/bitwarden/id1352778147")!
-        static let defaultBitwardenInstallationCheckDuration: TimeInterval = 1.0
     }
     
     weak var delegate: ConnectBitwardenViewModelDelegate?
     
     @Published private(set) var viewState: ViewState = .disclaimer
-    
-    private let bitwardenInstallationService: BitwardenInstallationManager
+    @Published private(set) var error: Error?
+
     private let bitwardenManager: BitwardenManagement
-    private let bitwardenInstallationCheckInterval: TimeInterval
     
     private var bitwardenManagerStatusCancellable: AnyCancellable?
-    
-    init(bitwardenInstallationService: BitwardenInstallationManager,
-         bitwardenManager: BitwardenManagement,
-         bitwardenInstallationCheckInterval: TimeInterval = Constants.defaultBitwardenInstallationCheckDuration) {
-        self.bitwardenInstallationService = bitwardenInstallationService
+
+    init(bitwardenManager: BitwardenManagement) {
         self.bitwardenManager = bitwardenManager
-        self.bitwardenInstallationCheckInterval = bitwardenInstallationCheckInterval
-        
-        self.bitwardenManagerStatusCancellable = bitwardenManager.statusPublisher.sink { status in
-            if self.viewState == .waitingForConnectionPermission, status == .approachable {
-                self.viewState = self.nextState(for: .waitingForConnectionPermission)
-            }
-            
-            if status.isConnected {
-                self.viewState = .connectedToBitwarden
-            }
+        self.bitwardenManagerStatusCancellable = bitwardenManager.statusPublisher.sink { [weak self] status in
+            self?.adjustViewState(status: status)
         }
     }
-    
-    deinit {
-        stopBitwardenInstallationCheckTimer()
+
+    func adjustViewState(status: BitwardenStatus) {
+        switch status {
+        case .disabled:
+            self.viewState = .disclaimer
+        case .notInstalled:
+            self.viewState = .lookingForBitwarden
+        case .notRunning:
+            self.viewState = .waitingForConnectionPermission
+        case .integrationNotApproved:
+            self.viewState = .waitingForConnectionPermission
+        case .missingHandshake:
+            self.viewState = .connectToBitwarden
+        case .waitingForHandshakeApproval:
+            self.viewState = .connectToBitwarden
+        case .handshakeNotApproved:
+            self.viewState = .connectToBitwarden
+        case .connecting:
+            self.viewState = .connectToBitwarden
+        case .waitingForTheStatusResponse:
+            self.viewState = .connectedToBitwarden
+        case .connected(vault: _):
+            self.viewState = .connectedToBitwarden
+        case .error(error: let error):
+            self.error = error
+
+        }
     }
-    
+
     func process(action: ViewAction) {
         switch action {
         case .confirm:
@@ -116,81 +127,17 @@ final class ConnectBitwardenViewModel: ObservableObject {
                 delegate?.connectBitwardenViewModelDismissedView(self, canceled: false)
             } else if viewState == .connectToBitwarden {
                 bitwardenManager.sendHandshake()
-                bitwardenInstallationService.openBitwarden()
-            } else {
-                self.viewState = nextState(for: viewState)
-                
-                if viewState == .lookingForBitwarden {
-                    startBitwardenInstallationCheckTimer()
-                } else {
-                    stopBitwardenInstallationCheckTimer()
-                }
+                bitwardenManager.openBitwarden()
             }
             
         case .cancel:
             delegate?.connectBitwardenViewModelDismissedView(self, canceled: true)
             
         case .openBitwarden:
-            bitwardenInstallationService.openBitwarden()
+            bitwardenManager.openBitwarden()
             
         case .openBitwardenProductPage:
             NSWorkspace.shared.open(Constants.bitwardenAppStoreURL)
         }
-    }
-    
-    private func nextState(for currentState: ViewState) -> ViewState {
-        switch currentState {
-        case .disclaimer:
-            if bitwardenInstallationService.isBitwardenInstalled {
-                return nextState(for: .bitwardenFound)
-            } else {
-                return .lookingForBitwarden
-            }
-            
-        case .lookingForBitwarden:
-            return .bitwardenFound
-            
-        case .bitwardenFound:
-            if bitwardenManager.status == .approachable {
-                return .connectToBitwarden
-            } else {
-                return .waitingForConnectionPermission
-            }
-            
-        case .waitingForConnectionPermission:
-            return .connectToBitwarden
-            
-        case .connectToBitwarden:
-            return .connectedToBitwarden
-            
-        case .connectedToBitwarden:
-            return .connectedToBitwarden
-        }
-    }
-    
-    // MARK: - Installation Timer
-    
-    private var installationCheckTimer: Timer?
-    
-    private func startBitwardenInstallationCheckTimer() {
-        guard installationCheckTimer == nil else {
-            return
-        }
-        
-        installationCheckTimer = Timer.scheduledTimer(withTimeInterval: bitwardenInstallationCheckInterval, repeats: true) { [weak self] _ in
-            guard let self = self else { return }
-
-            os_log("Checking for Bitwarden installation...", log: .bitwarden, type: .debug)
-
-            if self.bitwardenInstallationService.isBitwardenInstalled {
-                self.viewState = .bitwardenFound
-                self.stopBitwardenInstallationCheckTimer()
-            }
-        }
-    }
-    
-    private func stopBitwardenInstallationCheckTimer() {
-        installationCheckTimer?.invalidate()
-        installationCheckTimer = nil
     }
 }

@@ -28,7 +28,10 @@ protocol BitwardenManagement {
 
     func initCommunication(applicationDidFinishLaunching: Bool)
     func sendHandshake()
+    func refreshStatusIfNeeded()
     func cancelCommunication()
+
+    func openBitwarden()
 
     func retrieveCredentials(for url: URL, completion: @escaping ([BitwardenCredential], BitwardenError?) -> Void)
     func create(credential: BitwardenCredential, completion: @escaping (BitwardenError?) -> Void)
@@ -51,37 +54,75 @@ final class BitwardenManager: BitwardenManagement, ObservableObject {
     func initCommunication(applicationDidFinishLaunching: Bool) {
         communicator.delegate = self
 
+        // Check preferences to make sure Bitwarden is set as password manager
         let autofillPreferences = AutofillPreferences()
         guard autofillPreferences.passwordManager == .bitwarden else {
             // The built-in password manager is used
             return
         }
 
-        let sharedKey = try? keyStorage.retrieveSharedKey()
-        if applicationDidFinishLaunching && sharedKey == nil {
-            // The onboarding flow wasn't finished successfully
-            status = .error(error: .noSharedKey)
-        }
-
         connectToBitwadenProcess()
     }
 
     func cancelCommunication() {
+        connectionAttemptTimer?.invalidate()
+        connectionAttemptTimer = nil
         status = .disabled
-        communicator.enabled = false
+        communicator.terminateProxyProcess()
         try? keyStorage.cleanSharedKey()
         openSSLWrapper.cleanKeys()
     }
 
+    // MARK: - Installation
+
+    private let installationManager = LocalBitwardenInstallationManager()
+
+    func openBitwarden() {
+        installationManager.openBitwarden()
+    }
+
+
     // MARK: - Connection
 
     private func connectToBitwadenProcess() {
-        guard RunningApplicationCheck.isApplicationRunning(bundleId: "com.bitwarden.desktop") else {
+        // Check whether Bitwarden is installed
+        guard installationManager.isBitwardenInstalled else {
+            status = .notInstalled
             scheduleConnectionAttempt()
             return
         }
 
-        communicator.enabled = true
+        // Check whether Bitwarden app is running
+        guard RunningApplicationCheck.isApplicationRunning(bundleId: "com.bitwarden.desktop") else {
+            status = .notRunning
+            scheduleConnectionAttempt()
+            return
+        }
+
+        // Check whether user approved integration with DuckDuckGo in Bitwarden
+        guard installationManager.isIntegrationWithDuckDuckGoEnabled else {
+            status = .integrationNotApproved
+            scheduleConnectionAttempt()
+            return
+        }
+
+        // Check wheter the onboarding flow finished successfully
+        let sharedKey = try? keyStorage.retrieveSharedKey()
+        if sharedKey == nil {
+            // The onboarding flow wasn't finished successfully
+            status = .missingHandshake
+        } else {
+            status = .connecting
+        }
+
+        // Run the proxy process
+        do {
+            try communicator.runProxyProcess()
+        } catch {
+            os_log("BitwardenManagement: Running of proxy process failed", type: .error)
+            status = .error(error: .runningOfProxyProcessFailed)
+            scheduleConnectionAttempt()
+        }
     }
 
     private var connectionAttemptTimer: Timer?
@@ -104,7 +145,7 @@ final class BitwardenManager: BitwardenManagement, ObservableObject {
 
     private func cancelConnectionAndScheduleNextAttempt() {
         // Kill the proxy process and schedule the next attempt
-        communicator.enabled = false
+        communicator.terminateProxyProcess()
         scheduleConnectionAttempt()
     }
 
@@ -121,7 +162,7 @@ final class BitwardenManager: BitwardenManagement, ObservableObject {
         }
 
         statusRefreshingTimer = Timer.scheduledTimer(withTimeInterval: 2, repeats: true) { [weak self] timer in
-            self?.sendStatus()
+            self?.sendStatus(withDelay: false)
         }
     }
 
@@ -135,12 +176,11 @@ final class BitwardenManager: BitwardenManagement, ObservableObject {
     private func handleCommand(_ command: BitwardenMessage.Command) {
         switch command {
         case .connected:
-            status = .approachable
-
             let sharedKey: Base64EncodedString?
             do {
                 sharedKey = try keyStorage.retrieveSharedKey()
             } catch {
+                status = .handshakeNotApproved
                 assertionFailure("Failed to retrieve shared key")
                 return
             }
@@ -152,15 +192,18 @@ final class BitwardenManager: BitwardenManagement, ObservableObject {
                     status = .error(error: .injectingOfSharedKeyFailed)
                     return
                 }
-                sendStatus()
+                status = .waitingForTheStatusResponse
+                sendStatus(withDelay: true)
+            } else {
+                // Onboarding is in progress
+                // Other part of the code is responsible for sending the handshake message
             }
-
-            // Otherwise, other part of the code is responsible for sending the handshake message
-            return
         case .disconnected:
-            // Bitwarden application isn't running || User didn't approve DuckDuckGo browser integration
+            // Bitwarden application isn't running
             cancelConnectionAndScheduleNextAttempt()
-            status = .notApproachable
+            if status != .disabled {
+                status = .notRunning
+            }
         default:
             assertionFailure("Wrong handler")
         }
@@ -168,8 +211,11 @@ final class BitwardenManager: BitwardenManagement, ObservableObject {
 
     private func handleError(_ error: String) {
         switch error {
-        case "cannot-decrypt": os_log("BitwardenManagement: Bitwarden error - cannot decrypt", type: .error)
+        case "cannot-decrypt":
+            os_log("BitwardenManagement: Bitwarden error - cannot decrypt", type: .error)
+            status = .error(error: .bitwardenCannotDecrypt)
         default: os_log("BitwardenManagement: Bitwarden error - unknown", type: .error)
+            status = .error(error: .bitwardenRespondedWithError)
         }
     }
 
@@ -272,7 +318,7 @@ final class BitwardenManager: BitwardenManagement, ObservableObject {
         communicator.send(messageData: messageData)
     }
 
-    private func sendStatus() {
+    private func sendStatus(withDelay: Bool = false) {
         //TODO: More general encryption method
         guard let commandData = BitwardenMessage.EncryptedCommand(command: .status, payload: nil).data else {
             assertionFailure("Making the status message failed")
@@ -292,7 +338,13 @@ final class BitwardenManager: BitwardenManagement, ObservableObject {
             return
         }
 
-        communicator.send(messageData: messageData)
+        if withDelay {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in
+                self?.communicator.send(messageData: messageData)
+            }
+        } else {
+            communicator.send(messageData: messageData)
+        }
     }
     
     // MARK: - Encryption
@@ -327,6 +379,13 @@ final class BitwardenManager: BitwardenManagement, ObservableObject {
 
         let vault = BitwardenStatus.Vault(id: id, email: email, status: status, active: true)
         self.status = .connected(vault: vault)
+    }
+
+    func refreshStatusIfNeeded() {
+        switch status {
+        case .connected(vault: _), .error(error: _): sendStatus()
+        default: return
+        }
     }
 
     // MARK: - Cretentials
@@ -366,6 +425,13 @@ final class BitwardenManager: BitwardenManagement, ObservableObject {
 }
 
 extension BitwardenManager: BitwardenCommunicatorDelegate {
+
+    func bitwadenCommunicatorProcessDidTerminate(_ bitwardenCommunicator: BitwardenCommunication) {
+        status = .notRunning
+
+        scheduleConnectionAttempt()
+    }
+
 
     func bitwadenCommunicator(_ bitwardenCommunicator: BitwardenCommunication, didReceiveMessageData messageData: Data) {
         guard let message = BitwardenMessage(from: messageData) else {

@@ -23,12 +23,15 @@ protocol BitwardenCommunicatorDelegate: AnyObject {
 
     func bitwadenCommunicator(_ bitwardenCommunicator: BitwardenCommunication,
                               didReceiveMessageData messageData: Data)
+    func bitwadenCommunicatorProcessDidTerminate(_ bitwardenCommunicator: BitwardenCommunication)
 
 }
 
 protocol BitwardenCommunication {
 
-    var enabled: Bool { get set }
+    func runProxyProcess() throws
+    func terminateProxyProcess()
+
     var delegate: BitwardenCommunicatorDelegate? { get set }
     func send(messageData: Data)
 
@@ -37,19 +40,6 @@ protocol BitwardenCommunication {
 final class BitwardenCommunicator: BitwardenCommunication {
 
     static let appPath = "/Applications/Bitwarden.app/Contents/MacOS/Bitwarden"
-
-    //TODO: keep the communication active at all costs
-
-    var enabled = false {
-        didSet {
-            if enabled {
-                //TODO: keep the process running
-                try? runProxyProcess()
-            } else {
-                terminateProxyProcess()
-            }
-        }
-    }
 
     weak var delegate: BitwardenCommunicatorDelegate?
 
@@ -63,7 +53,7 @@ final class BitwardenCommunicator: BitwardenCommunication {
 
     private var process: BitwardenProcess?
 
-    private func runProxyProcess() throws {
+    func runProxyProcess() throws {
 
         let process = Process()
 
@@ -92,7 +82,7 @@ final class BitwardenCommunicator: BitwardenCommunication {
         self.process = BitwardenProcess(process: process, readingHandle: outHandle, writingHandle: inputHandle)
     }
 
-    private func terminateProxyProcess() {
+    func terminateProxyProcess() {
         process?.process.terminate()
         process = nil
     }
@@ -100,7 +90,10 @@ final class BitwardenCommunicator: BitwardenCommunication {
     private func processDidTerminate(_ process: Process) {
         os_log("BitwardenCommunicator: Proxy process terminated", log: .bitwarden, type: .default)
 
-        //TODO: handle the termination
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            self.delegate?.bitwadenCommunicatorProcessDidTerminate(self)
+        }
     }
 
     // MARK: - Sending Messages

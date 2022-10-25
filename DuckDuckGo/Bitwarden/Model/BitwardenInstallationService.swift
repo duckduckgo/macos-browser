@@ -23,22 +23,40 @@ protocol BitwardenInstallationManager {
     
     var isBitwardenInstalled: Bool { get }
     
-    func openBitwarden() -> Bool
+    func openBitwarden()
 
 }
 
 final class LocalBitwardenInstallationManager: BitwardenInstallationManager {
-    
-    private lazy var bitwardenBundleID = "com.bitwarden.desktop"
+
     private lazy var bitwardenBundlePath = "/Applications/Bitwarden.app"
     private lazy var bitwardenUrl = URL(fileURLWithPath: bitwardenBundlePath)
 
     var isBitwardenInstalled: Bool {
         return FileManager.default.fileExists(atPath: bitwardenBundlePath)
     }
+
+
+    var bitwardenManifestPath: String {
+#if DEBUG
+
+        let sandboxPathComponent = "Containers/com.duckduckgo.macos.browser/Data/Library/Application Support/"
+        let libraryURL = FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask).first!
+        let applicationSupport = libraryURL.appendingPathComponent(sandboxPathComponent)
+#else
+        let applicationSupport = URL.sandboxApplicationSupportURL
+#endif
+        return applicationSupport            .appendingPathComponent("NativeMessagingHosts/com.8bit.bitwarden.json")
+            .path
+    }
+
+
+    var isIntegrationWithDuckDuckGoEnabled: Bool {
+        return FileManager.default.fileExists(atPath: bitwardenManifestPath)
+    }
     
-    func openBitwarden() -> Bool {
-        return NSWorkspace.shared.open(bitwardenUrl)
+    func openBitwarden() {
+        NSWorkspace.shared.open(bitwardenUrl)
     }
     
 }

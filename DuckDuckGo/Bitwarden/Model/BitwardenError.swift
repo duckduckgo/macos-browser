@@ -29,10 +29,13 @@ enum BitwardenError: Error {
     // Non-blocking errors
     case decryptionOfDataFailed
     case noActiveVault
-    case noSharedKey
     case storingOfTheSharedKeyFailed
     case sendingOfStatusMessageFailed
     case injectingOfSharedKeyFailed
+    case runningOfProxyProcessFailed
+
+    case bitwardenCannotDecrypt
+    case bitwardenRespondedWithError
 
     var text: String {
         switch self {
@@ -42,10 +45,12 @@ enum BitwardenError: Error {
         case .statusParsingFailed: return "Status parsing failed"
         case .decryptionOfDataFailed: return "Decryption of data failed"
         case .noActiveVault: return "No active vault"
-        case .noSharedKey: return "No shared key"
         case .storingOfTheSharedKeyFailed: return "Storing of the shared key Failed"
         case .sendingOfStatusMessageFailed: return "Sending of the status message failed"
         case .injectingOfSharedKeyFailed: return "Injecting of the shared key failed"
+        case .runningOfProxyProcessFailed: return "Running of proxy process failed"
+        case .bitwardenCannotDecrypt: return "Bitwarden cannot decrypt the message"
+        case .bitwardenRespondedWithError: return "Bitwarden responded with error"
         }
     }
 

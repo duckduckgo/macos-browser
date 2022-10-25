@@ -23,11 +23,29 @@ enum BitwardenStatus: Equatable {
     // Bitwarden disabled in settings
     case disabled
 
-    // Bitwarden application isn't running || User didn't approve DuckDuckGo browser integration
-    case notApproachable
+    // Bitwarden is not installed
+    case notInstalled
+
+    // Bitwarden application isn't running
+    case notRunning
+
+    // User didn't approve DuckDuckGo browser
+    case integrationNotApproved
+
+    // There is handshake necessary in order to receive the shared key
+    case missingHandshake
     
-    // Bitwarden application is running && user enabled DuckDuckGo browser integration, but has not granted connection permission
-    case approachable
+    // Waiting for the handshake approval in Bitwarden
+    case waitingForHandshakeApproval
+
+    // User dismissed the handshake dialog in Bitwarden
+    case handshakeNotApproved
+
+    // The proxy process is starting to run
+    case connecting
+
+    // We sent the status message and are waiting for the response
+    case waitingForTheStatusResponse
 
     case connected(vault: Vault)
     case error(error: BitwardenError)
@@ -35,7 +53,7 @@ enum BitwardenStatus: Equatable {
     var isConnected: Bool {
         switch self {
         case .connected: return true
-        case .disabled, .notApproachable, .approachable, .error: return false
+        default: return false
         }
     }
 

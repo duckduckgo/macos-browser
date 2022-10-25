@@ -65,6 +65,8 @@ final class AutofillPreferencesModel: ObservableObject {
         }
     }
 
+    @Published private(set) var isBitwardenSetupFlowPresented = false
+
     func authorizeAutoLockSettingsChange(
         isEnabled isAutoLockEnabledNewValue: Bool? = nil,
         threshold autoLockThresholdNewValue: AutofillAutoLockThreshold? = nil
@@ -139,13 +141,14 @@ final class AutofillPreferencesModel: ObservableObject {
             return
         }
 
-        parentWindowController.window?.beginSheet(connectBitwardenWindow)
-    }
-    
-    func openBitwarden() {
-        if !bitwardenInstallationManager.openBitwarden() {
-            // TODO: Handle the failure case in case Bitwarden couldn't be opened.
+        isBitwardenSetupFlowPresented = true
+        parentWindowController.window?.beginSheet(connectBitwardenWindow) { [weak self] _ in
+            self?.isBitwardenSetupFlowPresented = false
         }
     }
     
+    func openBitwarden() {
+        BitwardenManager.shared.openBitwarden()
+    }
+
 }
