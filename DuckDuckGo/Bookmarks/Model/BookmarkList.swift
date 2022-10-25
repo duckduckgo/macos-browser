@@ -154,7 +154,7 @@ struct BookmarkList {
         return newBookmark
     }
 
-    func bookmarks() -> [BrowserServicesKit.Bookmark] {
+    func bookmarks() -> [IdentifiableBookmark] {
         return allBookmarkURLsOrdered
     }
 
