@@ -147,8 +147,6 @@ final class LocalBookmarkManagerTests: XCTestCase {
         let (bookmarkManager, bookmarkStoreMock) = LocalBookmarkManager.aManager
         let bookmark = bookmarkManager.makeBookmark(for: URL.duckDuckGo, title: "Title", isFavorite: false)!
 
-        bookmark.isFavorite = !bookmark.isFavorite
-
         let newURL = URL.duckDuckGoAutocomplete
         let newBookmark = bookmarkManager.updateUrl(of: bookmark, to: newURL)
 

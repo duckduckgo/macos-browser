@@ -30,7 +30,7 @@ final class BookmarkListTests: XCTestCase {
         bookmarkList.insert(bookmark)
 
         XCTAssert(bookmarkList.bookmarks().count == 1)
-        XCTAssert(bookmarkList.bookmarks().first == bookmark)
+        XCTAssert((bookmarkList.bookmarks()).first == bookmark.identifiableBookmark)
         XCTAssertNotNil(bookmarkList[bookmark.url])
     }
 
@@ -42,7 +42,7 @@ final class BookmarkListTests: XCTestCase {
         bookmarkList.insert(bookmark)
 
         XCTAssert(bookmarkList.bookmarks().count == 1)
-        XCTAssert(bookmarkList.bookmarks().first == bookmark)
+        XCTAssert(bookmarkList.bookmarks().first == bookmark.identifiableBookmark)
     }
 
     func testWhenBookmarkIsRemoved_ThenItIsNoLongerInList() {
@@ -53,7 +53,7 @@ final class BookmarkListTests: XCTestCase {
 
         bookmarkList.remove(bookmark)
 
-        XCTAssertFalse(bookmarkList.bookmarks().contains(bookmark))
+        XCTAssertFalse(bookmarkList.bookmarks().contains(bookmark.identifiableBookmark))
         XCTAssertNil(bookmarkList[bookmark.url])
     }
 
@@ -87,7 +87,7 @@ final class BookmarkListTests: XCTestCase {
         XCTAssert(bookmarkList[bookmark.url]?.isFavorite == bookmark.isFavorite)
         XCTAssert(bookmarkList[bookmark.url]?.title == bookmark.title)
         XCTAssert(bookmarkList.bookmarks().count == 1)
-        XCTAssert(bookmarkList.bookmarks().first == bookmark)
+        XCTAssert(bookmarkList.bookmarks().first == bookmark.identifiableBookmark)
         XCTAssertNotNil(bookmarkList[bookmark.url])
         XCTAssertNil(bookmarkList[unknownBookmark.url])
         XCTAssertNil(updateUrlResult)
@@ -140,5 +140,9 @@ fileprivate extension Bookmark {
                                               title: "Title",
                                               isFavorite: false,
                                               faviconManagement: FaviconManagerMock())
+
+    var identifiableBookmark: BookmarkList.IdentifiableBookmark {
+        return BookmarkList.IdentifiableBookmark(from: self)
+    }
 
 }
