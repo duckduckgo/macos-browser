@@ -25,4 +25,12 @@ extension NSWindow {
         setFrameOrigin(frameOrigin)
     }
 
+    func evilHackToClearLastLeftHitInWindow() {
+        guard self.responds(to: #selector(NSWindow._evilHackToClearlastLeftHitInWindow)) else {
+            assertionFailure("_evilHackToClearlastLeftHitInWindow is gone")
+            return
+        }
+        self._evilHackToClearlastLeftHitInWindow()
+    }
+
 }

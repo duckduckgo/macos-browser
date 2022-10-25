@@ -6,6 +6,7 @@
 #import "FirefoxBerkeleyDatabaseReader.h"
 
 #import "WKWebView+Private.h"
+#import "NSWindow+Private.h"
 #import "NSException+Catch.h"
 #import "_WKDownload.h"
 #import "WKProcessPool+Private.h"

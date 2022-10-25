@@ -708,6 +708,7 @@
 		B693956126F1C1BC0015B914 /* DownloadListStoreMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B693956026F1C1BC0015B914 /* DownloadListStoreMock.swift */; };
 		B693956326F1C2A40015B914 /* FileDownloadManagerMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B693956226F1C2A40015B914 /* FileDownloadManagerMock.swift */; };
 		B693956926F352DB0015B914 /* DownloadsWebViewMock.m in Sources */ = {isa = PBXBuildFile; fileRef = B693956826F352DB0015B914 /* DownloadsWebViewMock.m */; };
+		B698E5042908011E00A746A8 /* AppKitPrivateMethodsAvailabilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B698E5032908011E00A746A8 /* AppKitPrivateMethodsAvailabilityTests.swift */; };
 		B69B503A2726A12500758A2B /* StatisticsLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = B69B50342726A11F00758A2B /* StatisticsLoader.swift */; };
 		B69B503B2726A12500758A2B /* Atb.swift in Sources */ = {isa = PBXBuildFile; fileRef = B69B50352726A11F00758A2B /* Atb.swift */; };
 		B69B503C2726A12500758A2B /* StatisticsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B69B50362726A12000758A2B /* StatisticsStore.swift */; };
@@ -1553,6 +1554,8 @@
 		B693956626F352940015B914 /* TestsBridging.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TestsBridging.h; sourceTree = "<group>"; };
 		B693956726F352DB0015B914 /* DownloadsWebViewMock.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DownloadsWebViewMock.h; sourceTree = "<group>"; };
 		B693956826F352DB0015B914 /* DownloadsWebViewMock.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DownloadsWebViewMock.m; sourceTree = "<group>"; };
+		B698E502290800B200A746A8 /* NSWindow+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSWindow+Private.h"; sourceTree = "<group>"; };
+		B698E5032908011E00A746A8 /* AppKitPrivateMethodsAvailabilityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppKitPrivateMethodsAvailabilityTests.swift; sourceTree = "<group>"; };
 		B69B50342726A11F00758A2B /* StatisticsLoader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StatisticsLoader.swift; sourceTree = "<group>"; };
 		B69B50352726A11F00758A2B /* Atb.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Atb.swift; sourceTree = "<group>"; };
 		B69B50362726A12000758A2B /* StatisticsStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StatisticsStore.swift; sourceTree = "<group>"; };
@@ -2736,6 +2739,7 @@
 				4BA1A6CE258BF58C00F6F690 /* File System */,
 				B6AE74322609AFBB005B9B1A /* Progress */,
 				4B0511E6262CAB3700F6079C /* UserDefaultsWrapperUtilities.swift */,
+				B698E5032908011E00A746A8 /* AppKitPrivateMethodsAvailabilityTests.swift */,
 				B6B3E0952654DACD0040E0A2 /* UTTypeTests.swift */,
 				B693956626F352940015B914 /* TestsBridging.h */,
 			);
@@ -3680,6 +3684,7 @@
 				AA6FFB4324DC33320028F4D0 /* NSViewExtension.swift */,
 				AA9E9A5525A3AE8400D1959D /* NSWindowExtension.swift */,
 				B643BF1327ABF772000BACEC /* NSWorkspaceExtension.swift */,
+				B698E502290800B200A746A8 /* NSWindow+Private.h */,
 				B6A9E46A2614618A0067D1B9 /* OperatingSystemVersionExtension.swift */,
 				B637273C26CCF0C200C8CB02 /* OptionalExtension.swift */,
 				B684592125C93BE000DC17B6 /* Publisher.asVoid.swift */,
@@ -5177,6 +5182,7 @@
 				3767190028E58513003A2A15 /* PrivatePlayerURLExtensionTests.swift in Sources */,
 				B6B3E0962654DACD0040E0A2 /* UTTypeTests.swift in Sources */,
 				4B2975992828285900187C4E /* FirefoxKeyReaderTests.swift in Sources */,
+				B698E5042908011E00A746A8 /* AppKitPrivateMethodsAvailabilityTests.swift in Sources */,
 				4B02199D25E063DE00ED7DEA /* FireproofingURLExtensionsTests.swift in Sources */,
 				4BB99D0F26FE1A84001E4761 /* ChromiumBookmarksReaderTests.swift in Sources */,
 				4BB99D1026FE1A84001E4761 /* FirefoxBookmarksReaderTests.swift in Sources */,
