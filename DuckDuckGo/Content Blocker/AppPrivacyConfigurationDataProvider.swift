@@ -22,8 +22,13 @@ import BrowserServicesKit
 final class AppPrivacyConfigurationDataProvider: EmbeddedDataProvider {
 
     public struct Constants {
+        public static let remoteConfigEnabled = false
         public static let embeddedDataETag = "\"935fa59752c73635441e270a83b7e232\""
         public static let embeddedDataSHA = "2bded09f6e401c16fa071629b95d9a3cb4707e2c37de0ddf306c7866016a44ed"
+    }
+
+    var remoteConfigEnabled: Bool {
+        return Constants.remoteConfigEnabled
     }
 
     var embeddedDataEtag: String {
