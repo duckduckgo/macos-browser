@@ -29,5 +29,5 @@ extension ContentScopeFeatureToggles {
                                                                     passwordGeneration: true,
                                                                     inlineIconCredentials: true,
                                                                     // TODO: use dynamic value
-                                                                    credentialsProvider: "bitwarden")
+                                                                    thirdPartyCredentialsProvider: true)
 }
