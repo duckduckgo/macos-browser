@@ -31,6 +31,11 @@ final class WindowDraggingView: NSView {
     }
 
     override func mouseDown(with event: NSEvent) {
+        if NSEvent.isContextClick(event) {
+            super.mouseDown(with: event)
+            return
+        }
+        
         mouseDownSubject.send(event)
 
         if event.clickCount == 2 {
