@@ -37,7 +37,9 @@ extension NSWindow {
         NSException.try {
             let oldValueRetainCount = CFGetRetainCount(oldValue)
 
-            self.setValue(nil, forKey: Self.lastLeftHitKey)
+            autoreleasepool {
+                self.setValue(nil, forKey: Self.lastLeftHitKey)
+            }
 
             // compensate unbalanced release call
             if CFGetRetainCount(oldValue) < oldValueRetainCount {
