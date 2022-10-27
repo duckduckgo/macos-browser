@@ -68,7 +68,11 @@ extension OSLog {
     static var bookmarks: OSLog {
         Logging.bookmarksLoggingEnabled ? Logging.bookmarksLog : .disabled
     }
-    
+
+    static var bitwarden: OSLog {
+        Logging.bitwardenLoggingEnabled ? Logging.bitwardenLog : .disabled
+    }
+
     static var attribution: OSLog {
         Logging.attributionLoggingEnabled ? Logging.attributionLog : .disabled
     }
@@ -76,7 +80,7 @@ extension OSLog {
     static var atb: OSLog {
         Logging.atbLoggingEnabled ? Logging.atbLog : .disabled
     }
-    
+
 }
 
 struct Logging {
@@ -122,5 +126,8 @@ struct Logging {
     
     fileprivate static let attributionLoggingEnabled = false
     fileprivate static let attributionLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Ad Attribution")
+
+    fileprivate static let bitwardenLoggingEnabled = true
+    fileprivate static let bitwardenLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Bitwarden")
 
 }

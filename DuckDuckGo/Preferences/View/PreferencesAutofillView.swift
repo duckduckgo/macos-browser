@@ -32,7 +32,18 @@ extension Preferences {
 
     struct AutofillView: View {
         @ObservedObject var model: AutofillPreferencesModel
+        
+        // TODO: Use the protocol here, and listen to statusPublisher. The manager should be dependency injected, likely into the view model.
+        @ObservedObject var bitwardenManager = BitwardenManager.shared
 
+        var passwordManagerBinding: Binding<PasswordManager> {
+            .init {
+                model.passwordManager
+            } set: { newValue in
+                model.passwordManagerSettingsChange(passwordManager: newValue)
+            }
+        }
+        
         var isAutoLockEnabledBinding: Binding<Bool> {
             .init {
                 model.isAutoLockEnabled
@@ -54,6 +65,36 @@ extension Preferences {
                 Text(UserText.autofill)
                     .font(Const.Fonts.preferencePaneTitle)
 
+                // Password Manager:
+                
+                Section(spacing: 0) {
+                    Text(UserText.autofillPasswordManager)
+                        .font(Const.Fonts.preferencePaneSectionHeader)
+                        .padding(.bottom, 6)
+
+                    Picker(selection: passwordManagerBinding, content: {
+                        Text(UserText.autofillPasswordManagerDuckDuckGo).tag(PasswordManager.duckduckgo)
+
+                        Text(UserText.autofillPasswordManagerBitwarden).tag(PasswordManager.bitwarden)
+                    }, label: {})
+                    .pickerStyle(.radioGroup)
+                    .offset(x: Const.pickerHorizontalOffset)
+                    .padding(.bottom, 6)
+
+                    switch (model.passwordManager, model.isBitwardenSetupFlowPresented) {
+                    case (.bitwarden, false):
+                        bitwardenStatusView(for: bitwardenManager.status)
+                    case (.duckduckgo, _), (.bitwarden, true):
+                        Text(UserText.autofillPasswordManagerBitwardenDisclaimer)
+                            .font(Const.Fonts.preferencePaneCaption)
+                            .foregroundColor(Color("GreyTextColor"))
+                            .fixMultilineScrollableText()
+                            .offset(x: Const.autoLockWarningOffset)
+                    }
+                }
+                
+                // Ask to Save:
+                
                 Section(spacing: 0) {
                     Text(UserText.autofillAskToSave)
                         .font(Const.Fonts.preferencePaneSectionHeader)
@@ -75,6 +116,8 @@ extension Preferences {
                     }
                 }
 
+                // Auto-Lock:
+                
                 Section(spacing: 0) {
                     Text(UserText.autofillAutoLock)
                         .font(Const.Fonts.preferencePaneSectionHeader)
@@ -115,5 +158,124 @@ extension Preferences {
                 }
             }
         }
+        
+        @ViewBuilder private func bitwardenStatusView(for status: BitwardenStatus) -> some View {
+            switch status {
+            case .disabled:
+                BitwardenStatusView(iconType: .error,
+                                    title: UserText.bitwardenPreferencesUnableToConnect,
+                                    buttonValue: .init(title: UserText.bitwardenPreferencesCompleteSetup, action: { model.presentBitwardenSetupFlow() }))
+                .offset(x: Preferences.Const.autoLockWarningOffset)
+            case .notInstalled:
+                BitwardenStatusView(iconType: .warning,
+                                    title: UserText.bitwardenNotInstalled,
+                                    buttonValue: nil)
+                .offset(x: Preferences.Const.autoLockWarningOffset)
+            case .notRunning:
+                BitwardenStatusView(iconType: .warning,
+                                    title: UserText.bitwardenPreferencesRun,
+                                    buttonValue: .init(title: UserText.bitwardenPreferencesOpenBitwarden, action: { model.openBitwarden() }))
+                .offset(x: Preferences.Const.autoLockWarningOffset)
+            case .integrationNotApproved:
+                BitwardenStatusView(iconType: .error,
+                                    title: UserText.bitwardenIntegrationNotApproved,
+                                    buttonValue: .init(title: UserText.bitwardenPreferencesCompleteSetup, action: { model.presentBitwardenSetupFlow() }))
+                .offset(x: Preferences.Const.autoLockWarningOffset)
+            case .missingHandshake:
+                BitwardenStatusView(iconType: .error,
+                                    title: UserText.bitwardenMissingHandshake,
+                                    buttonValue: .init(title: UserText.bitwardenPreferencesCompleteSetup, action: { model.presentBitwardenSetupFlow() }))
+                .offset(x: Preferences.Const.autoLockWarningOffset)
+            case .waitingForHandshakeApproval:
+                BitwardenStatusView(iconType: .error,
+                                    title: UserText.bitwardenWaitingForHandshake,
+                                    buttonValue: .init(title: UserText.bitwardenPreferencesCompleteSetup, action: { model.presentBitwardenSetupFlow() }))
+                .offset(x: Preferences.Const.autoLockWarningOffset)
+            case .handshakeNotApproved:
+                BitwardenStatusView(iconType: .error,
+                                    title: UserText.bitwardenHanshakeNotApproved,
+                                    buttonValue: .init(title: UserText.bitwardenPreferencesCompleteSetup, action: { model.presentBitwardenSetupFlow() }))
+                .offset(x: Preferences.Const.autoLockWarningOffset)
+            case .connecting:
+                BitwardenStatusView(iconType: .warning,
+                                    title: UserText.bitwardenConnecting,
+                                    buttonValue: .init(title: UserText.bitwardenPreferencesOpenBitwarden, action: { model.openBitwarden() }))
+                .offset(x: Preferences.Const.autoLockWarningOffset)
+            case .waitingForTheStatusResponse:
+                BitwardenStatusView(iconType: .warning,
+                                    title: UserText.bitwardenWaitingForStatusResponse,
+                                    buttonValue: .init(title: UserText.bitwardenPreferencesOpenBitwarden, action: { model.openBitwarden() }))
+                .offset(x: Preferences.Const.autoLockWarningOffset)
+
+            case .connected(vault: let vault):
+                switch vault.status {
+                case .locked:
+                    BitwardenStatusView(iconType: .warning,
+                                        title: UserText.bitwardenPreferencesUnlock,
+                                        buttonValue: .init(title: UserText.bitwardenPreferencesOpenBitwarden, action: { model.openBitwarden() }))
+                    .offset(x: Preferences.Const.autoLockWarningOffset)
+                case .unlocked:
+                    BitwardenStatusView(iconType: .success,
+                                        title: vault.email,
+                                        buttonValue: .init(title: UserText.bitwardenPreferencesOpenBitwarden, action: { model.openBitwarden() }))
+                    .offset(x: Preferences.Const.autoLockWarningOffset)
+                }
+            case .error(let error):
+                BitwardenStatusView(iconType: .error,
+                                    title: error.text,
+                                    buttonValue: nil)
+                .offset(x: Preferences.Const.autoLockWarningOffset)
+            }
+        }
     }
+}
+
+private struct BitwardenStatusView: View {
+    
+    struct ButtonValue {
+        let title: String
+        let action: () -> Void
+    }
+    
+    enum IconType {
+        case success
+        case warning
+        case error
+        
+        fileprivate var imageName: String {
+            switch self {
+            case .success: return "SuccessCheckmark"
+            case .warning: return "Warning"
+            case .error: return "Error"
+            }
+        }
+    }
+    
+    let iconType: IconType
+    let title: String
+    let buttonValue: ButtonValue?
+    
+    var body: some View {
+        
+        HStack {
+            HStack {
+                Image(iconType.imageName)
+                Text(title)
+            }
+            .padding([.leading, .trailing], 6)
+            .padding([.top, .bottom], 2)
+            .background(Color.black.opacity(0.04))
+            .cornerRadius(5)
+            .overlay(
+                RoundedRectangle(cornerRadius: 5)
+                    .stroke(Color.black.opacity(0.08), lineWidth: 1)
+            )
+            
+            if let buttonValue = buttonValue {
+                Button(buttonValue.title, action: buttonValue.action)
+            }
+        }
+        
+    }
+    
 }

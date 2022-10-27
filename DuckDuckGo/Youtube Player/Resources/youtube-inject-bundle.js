@@ -838,6 +838,7 @@
         }
       };
       const VideoThumbnail = {
+        hoverBoundElements: /* @__PURE__ */ new WeakMap(),
         isSingleVideoURL: (href) => {
           return href && (href.includes("/watch?v=") && !href.includes("&list=") || href.includes("/watch?v=") && href.includes("&list=") && href.includes("&index=")) && !href.includes("&pp=");
         },
@@ -856,7 +857,10 @@
             let linksInVideoPreview = Array.from(document.querySelectorAll("#preview a"));
             return linksInVideoPreview.indexOf(item) === -1;
           };
-          return Array.from(document.querySelectorAll('a[href^="/watch?v="]')).filter(linksToVideos).filter(linksWithoutSubLinks).filter(linksNotInVideoPreview).filter(linksWithImages);
+          const linksNotAlreadyBound = (item) => {
+            return !VideoThumbnail.hoverBoundElements.has(item);
+          };
+          return Array.from(document.querySelectorAll('a[href^="/watch?v="]')).filter(linksNotAlreadyBound).filter(linksToVideos).filter(linksWithoutSubLinks).filter(linksNotInVideoPreview).filter(linksWithImages);
         },
         bindEvents: (video) => {
           if (video) {
@@ -864,6 +868,7 @@
               IconOverlay.moveHoverOverlayToVideoElement(video);
             });
             addTrustedEventListener(video, "mouseout", IconOverlay.hideHoverOverlay);
+            VideoThumbnail.hoverBoundElements.set(video, true);
           }
         },
         bindEventsToAll: () => {

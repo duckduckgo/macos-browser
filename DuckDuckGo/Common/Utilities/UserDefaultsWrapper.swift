@@ -49,6 +49,8 @@ public struct UserDefaultsWrapper<T> {
         case privatePlayerMode = "preferences.duck-player"
         case youtubeOverlayInteracted = "preferences.youtube-overlay-interacted"
 
+        case selectedPasswordManager = "preferences.autofill.selected-password-manager"
+
         case askToSaveUsernamesAndPasswords = "preferences.ask-to-save.usernames-passwords"
         case askToSaveAddresses = "preferences.ask-to-save.addresses"
         case askToSavePaymentMethods = "preferences.ask-to-save.payment-methods"

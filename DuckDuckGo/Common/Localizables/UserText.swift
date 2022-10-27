@@ -147,6 +147,11 @@ struct UserText {
     static let gpcExplanation = NSLocalizedString("gpc.explanation", value: "DuckDuckGo automatically blocks many trackers. With Global Privacy Control (GPC), you can also ask participating websites to restrict selling or sharing your personal data with other companies.", comment: "GPC explanation in settings")
     static let gpcLearnMore = NSLocalizedString("gpc.learnmore.link", value: "Learn More", comment: "Learn More link")
     
+    static let autofillPasswordManager = NSLocalizedString("autofill.password-manager", value: "Password Manager", comment: "Autofill settings section title")
+    static let autofillPasswordManagerDuckDuckGo = NSLocalizedString("autofill.password-manager.duckduckgo", value: "DuckDuckGo built-in password manager", comment: "Autofill password manager row title")
+    static let autofillPasswordManagerBitwarden = NSLocalizedString("autofill.password-manager.bitwarden", value: "Bitwarden", comment: "Autofill password manager row title")
+    static let autofillPasswordManagerBitwardenDisclaimer = NSLocalizedString("autofill.password-manager.bitwarden.disclaimer", value: "Setup requires installing the Bitwarden app.", comment: "Autofill password manager Bitwarden disclaimer")
+    
     static let autofillAskToSave = NSLocalizedString("autofill.ask-to-save", value: "Ask to Save", comment: "Autofill settings section title")
     static let autofillAskToSaveExplanation = NSLocalizedString("autofill.ask-to-save.explanation", value: "Receive prompts to save new Autofill information when filling out online forms.", comment: "Description of Autofill autosaving feature - used in settings")
     static let autofillUsernamesAndPasswords = NSLocalizedString("autofill.usernames-and-passwords", value: "Usernames and passwords", comment: "Autofill autosaved data type")
@@ -543,7 +548,47 @@ struct UserText {
     static let bookmarksBarContextMenuCopy = NSLocalizedString("bookmarks.bar.context-menu.copy", value: "Copy", comment: "Copy menu item for the bookmarks bar context menu")
     static let bookmarksBarContextMenuDelete = NSLocalizedString("bookmarks.bar.context-menu.delete", value: "Delete", comment: "Delete menu item for the bookmarks bar context menu")
     static let bookmarksBarContextMenuMoveToEnd = NSLocalizedString("bookmarks.bar.context-menu.move-to-end", value: "Move to End", comment: "Move to End menu item for the bookmarks bar context menu")
+
+    // MARK: - Bitwarden
+
+    static let bitwardenPreferencesUnableToConnect = NSLocalizedString("bitwarden.preferences.unable-to-connect", value: "Unable to find or connect to Bitwarden", comment: "")
+    static let bitwardenPreferencesCompleteSetup = NSLocalizedString("bitwarden.preferences.complete-setup", value: "Complete Setup…", comment: "")
+    static let bitwardenPreferencesOpenBitwarden = NSLocalizedString("bitwarden.preferences.open-bitwarden", value: "Open Bitwarden", comment: "")
+    static let bitwardenPreferencesUnlock = NSLocalizedString("bitwarden.preferences.unlock", value: "Unlock Bitwarden", comment: "")
+    static let bitwardenPreferencesRun = NSLocalizedString("bitwarden.preferences.run", value: "Bitwarden app not running", comment: "")
+
+    static let bitwardenNotInstalled = NSLocalizedString("bitwarden.not.installed", value: "Bitwarden app is not installed", comment: "")
+    static let bitwardenIntegrationNotApproved = NSLocalizedString("bitwarden.integration.not.approved", value: "Integration with DuckDuckGo is not approved in Bitwarden app", comment: "")
+    static let bitwardenMissingHandshake = NSLocalizedString("bitwarden.missing.handshake", value: "Missing handshake", comment: "")
+    static let bitwardenWaitingForHandshake = NSLocalizedString("bitwarden.waiting.for.handshake", value: "Waiting for the handshake approval in Bitwarden app", comment: "")
+    static let bitwardenHanshakeNotApproved = NSLocalizedString("bitwarden.handshake.not.approved", value: "Handshake not approved in Bitwarden app", comment: "")
+    static let bitwardenConnecting = NSLocalizedString("bitwarden.connecting", value: "Connecting to Bitwarden", comment: "")
+    static let bitwardenWaitingForStatusResponse = NSLocalizedString("bitwarden.waiting.for.status.response", value: "Waiting for the status response from Bitwarden", comment: "")
     
+    static let connectToBitwarden = NSLocalizedString("bitwarden.connect.title", value: "Connect to Bitwarden", comment: "Title for the Bitwarden onboarding flow")
+    
+    static let connectToBitwardenDescription = NSLocalizedString("bitwarden.connect.description", value: "We’ll walk you through connecting to Bitwarden, so you can use it in DuckDuckGo.", comment: "")
+    
+    static let connectToBitwardenPrivacy = NSLocalizedString("bitwarden.connect.privacy", value: "Privacy", comment: "")
+    static let installBitwarden = NSLocalizedString("bitwarden.install", value: "Install Bitwarden", comment: "Button to install Bitwarden app")
+    static let installBitwardenInfo = NSLocalizedString("bitwarden.install.info", value: "To begin setup, first install Bitwarden from the App Store.", comment: "Setup of the integration with Bitwarden app")
+    static let afterBitwardenInstallationInfo = NSLocalizedString("after.bitwarden.installation.info", value: "After installing, return to DuckDuckGo to complete the setup.", comment: "Setup of the integration with Bitwarden app")
+    static let bitwardenAppFound = NSLocalizedString("bitwarden.app.found", value: "Bitwarden app found!", comment: "Setup of the integration with Bitwarden app")
+    static let lookingForBitwaden = NSLocalizedString("looking.for.bitwarden", value: "Looking for Bitwarden app...", comment: "Setup of the integration with Bitwarden app")
+    static let allowIntegration = NSLocalizedString("allow.integration", value: "Allow Integration with DuckDuckGo", comment: "Setup of the integration with Bitwarden app")
+    static let openBitwadenAndLogInOrUnlock = NSLocalizedString("open.bitwarden.and.log.in.or.unlock", value: "Open Bitwarden and Log in or Unlock your vault.", comment: "Setup of the integration with Bitwarden app")
+    static let selectBitwadenPreferences = NSLocalizedString("select.bitwarden.preferences", value: "Select Bitwarden → Preferences from the Mac menu bar.", comment: "Setup of the integration with Bitwarden app")
+    static let scrollToFindAppSettings = NSLocalizedString("scroll.to.find.app.settings", value: "Scroll to find the App Settings (All Accounts) section.", comment: "Setup of the integration with Bitwarden app")
+    static let checkAllowIntegration = NSLocalizedString("check.allow.integration", value: "Check Allow integration with DuckDuckGo.", comment: "Setup of the integration with Bitwarden app")
+    static let openBitwaden = NSLocalizedString("open.bitwarden", value: "Open Bitwarden", comment: "Button to open Bitwaden app")
+    static let bitwardenIsReadyToConnect = NSLocalizedString("bitwarden.is.ready.to.connect", value: "Bitwarden is ready to connect to DuckDuckGo!", comment: "Setup of the integration with Bitwarden app")
+    static let bitwardenWaitingForPermissions = NSLocalizedString("bitwarden.waiting.for.permissions", value: "Waiting for permission to use Bitwarden in DuckDuckGo…", comment: "Setup of the integration with Bitwarden app")
+    static let bitwardenIntegrationComplete = NSLocalizedString("bitwarden.integration.complete", value: "Bitwarden integration complete!", comment: "Setup of the integration with Bitwarden app")
+    static let bitwardenIntegrationCompleteInfo = NSLocalizedString("bitwarden.integration.complete.info", value: "You are now using Bitwarden as your password manager.", comment: "Setup of the integration with Bitwarden app")
+
+    static let bitwardenCommunicationInfo = NSLocalizedString("bitwarden.connect.communication-info", value: "All communication between Bitwarden and DuckDuckGo is encrypted and the data never leaves your device.", comment: "")
+    static let bitwardenHistoryInfo = NSLocalizedString("bitwarden.connect.history-info", value: "Bitwarden will have access to your browsing history.", comment: "")
+
     static let showAutofillShortcut = NSLocalizedString("pinning.show-autofill-shortcut", value: "Show Autofill Shortcut", comment: "Menu item for showing the autofill shortcut")
     static let hideAutofillShortcut = NSLocalizedString("pinning.hide-autofill-shortcut", value: "Hide Autofill Shortcut", comment: "Menu item for hiding the autofill shortcut")
     
@@ -592,4 +637,5 @@ struct UserText {
 
     static let databaseFactoryFailedMessage = NSLocalizedString("database.factory.failed.message", value: "There was an error initializing the database", comment: "Alert title when we fail to init database")
     static let databaseFactoryFailedInformative = NSLocalizedString("database.factory.failed.information", value: "Restart your Mac and try again", comment: "Info to restart macOS after database init failure")
+
 }
