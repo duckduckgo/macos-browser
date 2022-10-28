@@ -34,16 +34,16 @@ extension NSWindow {
 
     func evilHackToClearLastLeftHitInWindow() {
         guard let oldValue = self.lastLeftHit else { return }
-        NSException.try {
-            let oldValueRetainCount = CFGetRetainCount(oldValue)
-
-            autoreleasepool {
-                self.setValue(nil, forKey: Self.lastLeftHitKey)
-            }
-
+        let oldValueRetainCount = CFGetRetainCount(oldValue)
+        defer {
             // compensate unbalanced release call
             if CFGetRetainCount(oldValue) < oldValueRetainCount {
                 _=Unmanaged.passUnretained(oldValue).retain()
+            }
+        }
+        NSException.try {
+            autoreleasepool {
+                self.setValue(nil, forKey: Self.lastLeftHitKey)
             }
         }
     }
