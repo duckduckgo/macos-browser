@@ -34,6 +34,7 @@ enum BitwardenError: Error {
     case injectingOfSharedKeyFailed
     case runningOfProxyProcessFailed
 
+    // Errors received from Bitwarden
     case bitwardenCannotDecrypt
     case bitwardenRespondedWithError
 

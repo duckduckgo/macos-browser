@@ -443,7 +443,7 @@ final class PasswordManagementViewController: NSViewController {
 
         do {
             guard let id = try secureVault?.storeWebsiteCredentials(credentials),
-                  let savedCredentials = try secureVault?.websiteCredentialsFor(accountId: id) else {
+                  let savedCredentials = try secureVault?.websiteCredentialsFor(accountId: String(id)) else {
                 return
             }
 
@@ -532,7 +532,8 @@ final class PasswordManagementViewController: NSViewController {
 
     private func promptToDelete(credentials: SecureVaultModels.WebsiteCredentials) {
         guard let window = self.view.window,
-              let id = credentials.account.id else { return }
+              let stringId = credentials.account.id,
+              let id = Int64(stringId) else { return }
 
         let alert = NSAlert.passwordManagerConfirmDeleteLogin()
         alert.beginSheetModal(for: window) { response in
@@ -627,7 +628,7 @@ final class PasswordManagementViewController: NSViewController {
             func loadNewItemWithID() {
                 switch newValue {
                 case .account:
-                    guard let credentials = try? self?.secureVault?.websiteCredentialsFor(accountId: id) else { return }
+                    guard let credentials = try? self?.secureVault?.websiteCredentialsFor(accountId: String(id)) else { return }
                     self?.createLoginItemView()
                     self?.syncModelsOnCredentials(credentials)
                 case .card:

@@ -18,26 +18,95 @@
 
 import Foundation
 
+enum BitwardenCommand: String, Codable {
+    case connected // Returned after the proxy process conects to Bitwarden app successfully
+    case disconnected // Returned when the conection from the proxy process to Bitwarden is canceled
+    case status = "bw-status"
+    case handshake = "bw-handshake"
+    case credentialRetrieval = "bw-credential-retrieval"
+}
+
+struct BitwardenRequest: Codable {
+
+    let messageId: String?
+    let version: Int?
+    let encryptedCommand: Base64EncodedString
+
+    // Need encryption before inserting into encryptedCommand
+    struct EncryptedCommand: Codable {
+
+        let command: BitwardenCommand?
+        let payload: Payload?
+
+        struct Payload: Codable {
+            // Credential Retrieval
+            let uri: String?
+        }
+
+        var data: Data? {
+            guard let commandData = try? JSONEncoder().encode(self) else {
+                assertionFailure("JSON encoding failed")
+                return nil
+            }
+            return commandData
+        }
+
+    }
+
+    var data: Data? {
+        let jsonData: Data
+        do {
+            jsonData = try JSONEncoder().encode(self)
+        } catch {
+            assertionFailure("BitwardenMessage: Can't encode the message \(error)")
+            return nil
+        }
+        return jsonData
+    }
+
+}
+
 typealias Base64EncodedString = String
 
 //TODO: Divide at least to response and request
 struct BitwardenMessage: Codable {
 
-    enum Command: String, Codable {
-        case connected
-        case disconnected
-        case status = "bw-status"
-        case handshake = "bw-handshake"
-    }
-
     let messageId: String?
     let version: Int?
     let payload: Payload?
-    let command: Command?
+    let command: BitwardenCommand?
     let encryptedCommand: Base64EncodedString?
     let encryptedPayload: EncryptedPayload?
 
     struct PayloadItem: Codable {
+
+        init(error: String? = nil,
+             publicKey: Base64EncodedString? = nil,
+             applicationName: String? = nil,
+             sharedKey: Base64EncodedString? = nil,
+             id: String? = nil,
+             email: String? = nil,
+             status: String? = nil,
+             active: Bool? = nil,
+             userId: String? = nil,
+             credentialId: String? = nil,
+             userName: String? = nil,
+             password: String? = nil,
+             name: String? = nil) {
+            self.error = error
+            self.publicKey = publicKey
+            self.applicationName = applicationName
+            self.sharedKey = sharedKey
+            self.id = id
+            self.email = email
+            self.status = status
+            self.active = active
+            self.userId = userId
+            self.credentialId = credentialId
+            self.userName = userName
+            self.password = password
+            self.name = name
+        }
 
         let error: String?
 
@@ -54,11 +123,17 @@ struct BitwardenMessage: Codable {
         let status: String?
         let active: Bool?
 
+        // Credential Retrieval
+        let userId: String?
+        let credentialId: String?
+        let userName: String?
+        let password: String?
+        let name: String?
     }
 
     struct EncryptedCommand: Codable {
 
-        let command: Command?
+        let command: BitwardenCommand?
         let payload: EncryptedPayload?
 
         var data: Data? {
@@ -113,7 +188,7 @@ struct BitwardenMessage: Codable {
 
     init(messageId: String? = nil,
          version: Int? = nil,
-         command: Command? = nil,
+         command: BitwardenCommand? = nil,
          payload: BitwardenMessage.Payload? = nil,
          encryptedCommand: String? = nil,
          encryptedPayload: EncryptedPayload? = nil) {
@@ -148,14 +223,8 @@ struct BitwardenMessage: Codable {
     static let version = 1
 
     static func makeHandshakeMessage(with publicKey: String) -> BitwardenMessage {
-        let payloadItem = PayloadItem(error: nil,
-                                      publicKey: publicKey,
-                                      applicationName: Bundle.main.displayName,
-                                      sharedKey: nil,
-                                      id: nil,
-                                      email: nil,
-                                      status: nil,
-                                      active: nil)
+        let payloadItem = PayloadItem(publicKey: publicKey,
+                                      applicationName: Bundle.main.displayName)
 
         let payload = Payload.item(payloadItem)
         return BitwardenMessage(messageId: generateMessageId(),
@@ -166,6 +235,12 @@ struct BitwardenMessage: Codable {
 
     static func makeStatusMessage(encryptedCommand: String) -> BitwardenMessage? {
         return BitwardenMessage(messageId: generateMessageId(),
+                                version: version,
+                                encryptedCommand: encryptedCommand)
+    }
+
+    static func makeCredentialRetrievalMessage(encryptedCommand: String) -> BitwardenRequest? {
+        return BitwardenRequest(messageId: generateMessageId(),
                                 version: version,
                                 encryptedCommand: encryptedCommand)
     }

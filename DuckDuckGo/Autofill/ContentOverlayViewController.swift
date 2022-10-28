@@ -37,7 +37,7 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
     }()
 
     lazy var vaultManager: SecureVaultManager = {
-        let manager = SecureVaultManager()
+        let manager = SecureVaultManager(passwordManager: PasswordManagerCoordinator())
         manager.delegate = self
         return manager
     }()
@@ -227,7 +227,7 @@ extension ContentOverlayViewController: SecureVaultManagerDelegate {
         // no-op on macOS
     }
 
-    public func secureVaultManager(_: SecureVaultManager, didAutofill type: AutofillType, withObjectId objectId: Int64) {
+    public func secureVaultManager(_: SecureVaultManager, didAutofill type: AutofillType, withObjectId objectId: String) {
         Pixel.fire(.formAutofilled(kind: type.formAutofillKind))
     }
     

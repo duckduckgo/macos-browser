@@ -18,6 +18,7 @@
 		14D9B8FB24F7E089000D4D13 /* AddressBarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14D9B8F924F7E089000D4D13 /* AddressBarViewController.swift */; };
 		1D02633328D898E1005CBB41 /* OpenSSL in Frameworks */ = {isa = PBXBuildFile; productRef = 1D02633228D898E1005CBB41 /* OpenSSL */; };
 		1D02633628D8A9A9005CBB41 /* OpenSSLWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 1D02633528D8A9A9005CBB41 /* OpenSSLWrapper.m */; };
+		1D074B272909A433006E4AC3 /* PasswordManagerCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D074B262909A433006E4AC3 /* PasswordManagerCoordinator.swift */; };
 		1D2DC00429016793008083A1 /* BitwardenManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DDF075E28F815AD00EDFBE3 /* BitwardenManager.swift */; };
 		1D2DC00529016796008083A1 /* BitwardenCommunicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DDF075D28F815AD00EDFBE3 /* BitwardenCommunicator.swift */; };
 		1D2DC00629016798008083A1 /* BitwardenCredential.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DDF075C28F815AD00EDFBE3 /* BitwardenCredential.swift */; };
@@ -867,6 +868,7 @@
 		14D9B8F924F7E089000D4D13 /* AddressBarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressBarViewController.swift; sourceTree = "<group>"; };
 		1D02633428D8A9A9005CBB41 /* OpenSSLWrapper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OpenSSLWrapper.h; sourceTree = "<group>"; };
 		1D02633528D8A9A9005CBB41 /* OpenSSLWrapper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OpenSSLWrapper.m; sourceTree = "<group>"; };
+		1D074B262909A433006E4AC3 /* PasswordManagerCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordManagerCoordinator.swift; sourceTree = "<group>"; };
 		1D6216B129069BBF00386B2C /* BitwardenKeyStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BitwardenKeyStorage.swift; sourceTree = "<group>"; };
 		1D77921C28FFF27C00BE0210 /* RunningApplicationCheck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunningApplicationCheck.swift; sourceTree = "<group>"; };
 		1DDF075C28F815AD00EDFBE3 /* BitwardenCredential.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BitwardenCredential.swift; sourceTree = "<group>"; };
@@ -1744,6 +1746,15 @@
 				142879D924CE1179005419BB /* SuggestionViewModelTests.swift */,
 			);
 			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		1D074B252909A371006E4AC3 /* Password Managers */ = {
+			isa = PBXGroup;
+			children = (
+				1D074B262909A433006E4AC3 /* PasswordManagerCoordinator.swift */,
+				AA7191CA28B3DEC000333866 /* Bitwarden */,
+			);
+			path = "Password Managers";
 			sourceTree = "<group>";
 		};
 		1D77921B28FFF26100BE0210 /* Third Party Apps */ = {
@@ -2957,7 +2968,6 @@
 				7B1E819A27C8874900FF0E60 /* Autofill */,
 				B6A9E47526146A440067D1B9 /* API */,
 				AA4D700525545EDE00C3411E /* App Delegate */,
-				AA7191CA28B3DEC000333866 /* Bitwarden */,
 				AAC5E4C025D6A6A9007F5990 /* Bookmarks */,
 				4BFD356E283ADE8B00CE9234 /* Bookmarks Bar */,
 				AA86491B24D837DE001BABEE /* Browser Tab */,
@@ -2997,6 +3007,7 @@
 				AACB8E7224A4C8BC005F2218 /* Suggestions */,
 				AA86491124D8318F001BABEE /* Tab Bar */,
 				AAE8B0FD258A416F00E81239 /* Tab Preview */,
+				1D074B252909A371006E4AC3 /* Password Managers */,
 				B6040859274B8C5200680351 /* Unprotected Domains */,
 				AACF6FD426BC35C200CF09F9 /* User Agent */,
 				AA6EF9AE25066F99004754E6 /* Windows */,
@@ -4752,6 +4763,7 @@
 				4BBC16A027C4859400E00A38 /* DeviceAuthenticationService.swift in Sources */,
 				3776582F27F82E62009A6B35 /* AutofillPreferences.swift in Sources */,
 				AAD8078727B3F45600CF7703 /* WebsiteBreakage.swift in Sources */,
+				1D074B272909A433006E4AC3 /* PasswordManagerCoordinator.swift in Sources */,
 				4BE6547E271FCD4D008D1D63 /* PasswordManagementIdentityModel.swift in Sources */,
 				85C6A29625CC1FFD00EEB5F1 /* UserDefaultsWrapper.swift in Sources */,
 				85625998269C9C5F00EE44BC /* PasswordManagementPopover.swift in Sources */,
@@ -6396,8 +6408,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				kind = exactVersion;
-				version = 33.0.0;
+				kind = revision;
+				revision = 8edbd95321578571044b8fad4374708380e35479;
 			};
 		};
 		AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */ = {

@@ -750,7 +750,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     }()
 
     lazy var vaultManager: SecureVaultManager = {
-        let manager = SecureVaultManager()
+        let manager = SecureVaultManager(passwordManager: PasswordManagerCoordinator())
         manager.delegate = self
         return manager
     }()
@@ -1142,7 +1142,7 @@ extension Tab: SecureVaultManagerDelegate {
         // no-op on macOS
     }
 
-    func secureVaultManager(_: SecureVaultManager, didAutofill type: AutofillType, withObjectId objectId: Int64) {
+    func secureVaultManager(_: SecureVaultManager, didAutofill type: AutofillType, withObjectId objectId: String) {
         Pixel.fire(.formAutofilled(kind: type.formAutofillKind))
     }
 

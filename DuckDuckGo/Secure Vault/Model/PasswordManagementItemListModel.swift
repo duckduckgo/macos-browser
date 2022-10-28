@@ -43,7 +43,10 @@ enum SecureVaultItem: Equatable, Identifiable, Comparable {
     var secureVaultID: Int64? {
         switch self {
         case .account(let account):
-            return account.id
+            if let accountId = account.id {
+                return Int64(accountId)
+            }
+            return nil
         case .card(let card):
             return card.id
         case .identity(let identity):

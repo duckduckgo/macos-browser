@@ -27,6 +27,24 @@ struct BitwardenCredential {
     var username: String
     var password: String
 
-    var url: URL?
+    var domain: String {
+        return credentialName
+    }
+
+}
+
+extension BitwardenCredential {
+
+    init?(from payloadItem: BitwardenMessage.PayloadItem) {
+        guard let userId = payloadItem.userId,
+              let credentialId = payloadItem.credentialId,
+              let credentialName = payloadItem.name,
+              let username = payloadItem.userName,
+              let password = payloadItem.password else {
+            //TODO: Warning
+            return nil
+        }
+        self.init(userId: userId, credentialId: credentialId, credentialName: credentialName, username: username, password: password)
+    }
 
 }

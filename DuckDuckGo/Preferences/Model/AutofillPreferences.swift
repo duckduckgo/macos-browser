@@ -113,7 +113,7 @@ final class AutofillPreferences: AutofillPreferencesPersistor {
             selectedPasswordManager = newValue.rawValue
         }
     }
-    
+
     @UserDefaultsWrapper(key: .selectedPasswordManager, defaultValue: PasswordManager.duckduckgo.rawValue)
     private var selectedPasswordManager: String
 
