@@ -70,8 +70,8 @@ final class PrivacyDashboardViewController: NSViewController {
         
         initWebView()
         privacyDashboardController.setup(for: webView)
+        privacyDashboardController.delegate = self
         
-        setupPrivacyDashboardControllerHandlers()
         setupHeightChangeHandler()
     }
     
@@ -133,58 +133,6 @@ final class PrivacyDashboardViewController: NSViewController {
             })
     }
     
-    private func setupPrivacyDashboardControllerHandlers() {
-        privacyDashboardController.onProtectionSwitchChange = { [weak self] isEnabled in
-            guard let domain = self?.privacyDashboardController.privacyInfo?.url.host else {
-                return
-            }
-
-            let configuration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig
-            if isEnabled && configuration.isUserUnprotected(domain: domain) {
-                configuration.userEnabledProtection(forDomain: domain)
-            } else {
-                configuration.userDisabledProtection(forDomain: domain)
-            }
-
-            let completionToken = ContentBlocking.shared.contentBlockingManager.scheduleCompilation()
-            self?.rulesUpdateObserver.didStartCompilation(for: domain, token: completionToken)
-        }
-        
-        privacyDashboardController.onHeightChange = { [weak self] height in
-            guard let self = self else { return }
-            self.currentContentHeight = height
-        }
-        
-        privacyDashboardController.onCloseTapped = { }
-        
-        privacyDashboardController.onShowReportBrokenSiteTapped = { }
-        
-        privacyDashboardController.onSubmitBrokenSiteReportWithCategory = { [weak self] category, description in
-            self?.websiteBreakageReporter.reportBreakage(category: category, description: description)
-        }
-        
-        privacyDashboardController.onOpenUrlInNewTab = { url in
-            guard let tabCollection = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.tabCollectionViewModel
-            else {
-                assertionFailure("could not access shared tabCollectionViewModel")
-                return
-            }
-            tabCollection.appendNewTab(with: .url(url), selected: true)
-        }
-        
-        privacyDashboardController.onPermissionAuthorizationStateChange = { [weak self] permissionName, authorizationState in
-            guard let self = self, let domain = self.privacyDashboardController.privacyInfo?.url.host else { return }
-
-            self.permissionHandler.setPermissionAuthorization(authorizationState: authorizationState, domain: domain, permissionName: permissionName)
-        }
-        
-        privacyDashboardController.onPermissionPause = { [weak self] permissionName, isPaused in
-            guard let self = self else { return }
-            
-            self.permissionHandler.setPermission(with: permissionName, paused: isPaused )
-        }
-    }
-    
     public func isPendingUpdates() -> Bool {
         return !rulesUpdateObserver.pendingUpdates.isEmpty
     }
@@ -219,4 +167,51 @@ final class PrivacyDashboardViewController: NSViewController {
             self.contentHeightConstraint.constant = height
         }
     }
+}
+
+extension PrivacyDashboardViewController: PrivacyDashboardControllerDelegate {
+    
+    func privacyDashboardController(_ privacyDashboardController: PrivacyDashboardController, didChangeProtectionSwitch isEnabled: Bool) {
+        guard let domain = privacyDashboardController.privacyInfo?.url.host else {
+            return
+        }
+
+        let configuration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig
+        if isEnabled && configuration.isUserUnprotected(domain: domain) {
+            configuration.userEnabledProtection(forDomain: domain)
+        } else {
+            configuration.userDisabledProtection(forDomain: domain)
+        }
+
+        let completionToken = ContentBlocking.shared.contentBlockingManager.scheduleCompilation()
+        rulesUpdateObserver.didStartCompilation(for: domain, token: completionToken)
+    }
+    
+    func privacyDashboardController(_ privacyDashboardController: PrivacyDashboardController, didRequestOpenUrlInNewTab url: URL) {
+        guard let tabCollection = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.tabCollectionViewModel
+        else {
+            assertionFailure("could not access shared tabCollectionViewModel")
+            return
+        }
+        tabCollection.appendNewTab(with: .url(url), selected: true)
+    }
+    
+    func privacyDashboardController(_ privacyDashboardController: PrivacyDashboardController, didSetHeight height: Int) {
+        currentContentHeight = height
+    }
+    
+    func privacyDashboardController(_ privacyDashboardController: PrivacyDashboardController, didRequestSubmitBrokenSiteReportWithCategory category: String, description: String) {
+        websiteBreakageReporter.reportBreakage(category: category, description: description)
+    }
+    
+    func privacyDashboardController(_ privacyDashboardController: PrivacyDashboardController, didSetPermission permissionName: String, to state: PermissionAuthorizationState) {
+        guard let domain = self.privacyDashboardController.privacyInfo?.url.host else { return }
+
+        permissionHandler.setPermissionAuthorization(authorizationState: state, domain: domain, permissionName: permissionName)
+    }
+    
+    func privacyDashboardController(_ privacyDashboardController: PrivacyDashboardController, setPermission permissionName: String, paused: Bool) {
+        permissionHandler.setPermission(with: permissionName, paused: paused)
+    }
+
 }
