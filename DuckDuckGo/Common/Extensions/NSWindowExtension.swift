@@ -25,4 +25,27 @@ extension NSWindow {
         setFrameOrigin(frameOrigin)
     }
 
+    private static let lastLeftHitKey = "_lastLeftHit"
+    var lastLeftHit: NSView? {
+        return try? NSException.catch {
+            self.value(forKey: Self.lastLeftHitKey) as? NSView
+        }
+    }
+
+    func evilHackToClearLastLeftHitInWindow() {
+        guard let oldValue = self.lastLeftHit else { return }
+        let oldValueRetainCount = CFGetRetainCount(oldValue)
+        defer {
+            // compensate unbalanced release call
+            if CFGetRetainCount(oldValue) < oldValueRetainCount {
+                _=Unmanaged.passUnretained(oldValue).retain()
+            }
+        }
+        NSException.try {
+            autoreleasepool {
+                self.setValue(nil, forKey: Self.lastLeftHitKey)
+            }
+        }
+    }
+
 }

@@ -620,20 +620,24 @@ final class AddressBarButtonsViewController: NSViewController {
         }
 
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else { return }
+        
+        if controllerMode == .editing(isUrl: false) {
+            [geolocationButton, cameraButton, microphoneButton, popupsButton, externalSchemeButton].forEach {
+                $0?.buttonState = .none
+            }
+        } else {
+            geolocationButton.buttonState = selectedTabViewModel.usedPermissions.geolocation
 
-        geolocationButton.buttonState = selectedTabViewModel.usedPermissions.geolocation
+            let (camera, microphone) = PermissionState?.combineCamera(selectedTabViewModel.usedPermissions.camera,
+                                                                      withMicrophone: selectedTabViewModel.usedPermissions.microphone)
+            cameraButton.buttonState = camera
+            microphoneButton.buttonState = microphone
 
-        let (camera, microphone) = PermissionState?.combineCamera(selectedTabViewModel.usedPermissions.camera,
-                                                                  withMicrophone: selectedTabViewModel.usedPermissions.microphone)
-        cameraButton.buttonState = camera
-        microphoneButton.buttonState = microphone
-
-        popupsButton.buttonState = selectedTabViewModel.usedPermissions.popups?.isRequested == true // show only when there're popups blocked
-            ? selectedTabViewModel.usedPermissions.popups
-            : nil
-        externalSchemeButton.buttonState = selectedTabViewModel.usedPermissions.externalScheme
-
-        showOrHidePermissionPopoverIfNeeded()
+            popupsButton.buttonState = selectedTabViewModel.usedPermissions.popups?.isRequested == true // show only when there're popups blocked
+                ? selectedTabViewModel.usedPermissions.popups
+                : nil
+            externalSchemeButton.buttonState = selectedTabViewModel.usedPermissions.externalScheme
+        }
     }
 
     private func showOrHidePermissionPopoverIfNeeded() {
