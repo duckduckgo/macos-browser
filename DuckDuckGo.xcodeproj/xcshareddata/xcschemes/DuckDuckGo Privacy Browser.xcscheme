@@ -68,10 +68,16 @@
             </BuildableReference>
             <SkippedTests>
                <Test
+                  Identifier = "AutoconsentMessageProtocolTests/testEval()">
+               </Test>
+               <Test
                   Identifier = "CBRCompileTimeReporterTests">
                </Test>
                <Test
                   Identifier = "EncryptionKeyStoreTests">
+               </Test>
+               <Test
+                  Identifier = "PixelStoreTests/testPixelStoreMigration()">
                </Test>
                <Test
                   Identifier = "PixelTests/testWhenErrorPixelIsFiredThenParametersAdded()">
