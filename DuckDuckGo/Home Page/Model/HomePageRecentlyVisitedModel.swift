@@ -30,7 +30,7 @@ final class RecentlyVisitedModel: ObservableObject {
     } ()
 
     private let fire: Fire
-    
+
     @UserDefaultsWrapper(key: .homePageShowPagesOnHover, defaultValue: false)
     private static var showPagesOnHoverSetting: Bool
 
@@ -44,7 +44,7 @@ final class RecentlyVisitedModel: ObservableObject {
             Self.showPagesOnHoverSetting = showPagesOnHover
         }
     }
-    
+
     @Published var showRecentlyVisited: Bool {
         didSet {
             Self.showRecentlyVisitedSetting = showRecentlyVisited
