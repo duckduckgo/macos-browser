@@ -71,6 +71,18 @@ final class FaviconManager: FaviconManagement {
 
     private lazy var imageCache = FaviconImageCache(faviconStoring: store)
     private lazy var referenceCache = FaviconReferenceCache(faviconStoring: store)
+    
+    private func forceFakeDownloadForAlreadyDownloadedFavicons(_ favicons: [FaviconUserScript.FaviconLink]) {
+        let newSession = URLSession(configuration: .ephemeral)
+        favicons.forEach { faviconLink in
+            guard let faviconUrl = URL(string: faviconLink.href) else {
+                return
+            }
+
+            newSession.dataTask(with: faviconUrl) { _, _, _ in
+            }.resume()
+        }
+    }
 
     func handleFaviconLinks(_ faviconLinks: [FaviconUserScript.FaviconLink],
                             documentUrl: URL,
@@ -80,6 +92,12 @@ final class FaviconManager: FaviconManagement {
 
         // Fetch favicons if needed
         let faviconLinksToFetch = filteringAlreadyFetchedFaviconLinks(from: faviconLinks)
+        
+        // Fake download favicons already downloaded
+        // https://app.asana.com/0/1177771139624306/1203270151638325/f
+        let fetchedFavicons = alreadyFetchedFaviconLinks(from: faviconLinks)
+        forceFakeDownloadForAlreadyDownloadedFavicons(fetchedFavicons)
+        
         fetchFavicons(faviconLinks: faviconLinksToFetch, documentUrl: documentUrl) { [weak self] newFavicons in
             guard let self = self else { return }
 
@@ -229,6 +247,20 @@ final class FaviconManager: FaviconManagement {
                 return false
             } else {
                 return true
+            }
+        }
+    }
+    
+    private func alreadyFetchedFaviconLinks(from faviconLinks: [FaviconUserScript.FaviconLink]) -> [FaviconUserScript.FaviconLink] {
+        return faviconLinks.filter { faviconLink in
+            guard let faviconUrl = URL(string: faviconLink.href) else {
+                return true
+            }
+
+            if let favicon = imageCache.get(faviconUrl: faviconUrl), favicon.dateCreated > Date.weekAgo {
+                return true
+            } else {
+                return false
             }
         }
     }
