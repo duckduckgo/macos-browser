@@ -21,7 +21,10 @@ import XCTest
 import Combine
 
 final class PixelStoreTests: XCTestCase {
-    var container: NSPersistentContainer!
+    lazy var container: NSPersistentContainer = {
+        NSPersistentContainer.createInMemoryPersistentContainer(modelName: "PixelDataModel",
+                                                                bundle: Bundle(for: PixelData.self))
+    }()
     var context: NSManagedObjectContext!
     var store: LocalPixelDataStore<PixelData>!
 
@@ -35,9 +38,7 @@ final class PixelStoreTests: XCTestCase {
     }
 
     func makeStore() {
-        container = NSPersistentContainer.createInMemoryPersistentContainer(modelName: "PixelDataModel",
-                                                                            bundle: Bundle(for: PixelData.self))
-        context = container.viewContext
+        context = container.newBackgroundContext()
         store = LocalPixelDataStore(context: context, updateModel: PixelData.update)
     }
 
@@ -92,6 +93,67 @@ final class PixelStoreTests: XCTestCase {
         validateStore(with: values)
 
         waitForExpectations(timeout: 1)
+
+        XCTAssertEqual(store.cache, values)
+        validateStore(with: values)
+    }
+
+    func testWhenSavedThenTheyAreReloaded() {
+        let values = ["a": NSNumber(value: 1.23), "b": NSNumber(value: 12), "c": "string" as NSString]
+        addValues(values)
+        waitForExpectations(timeout: 1)
+
+        makeStore()
+
+        XCTAssertEqual(store.cache, values)
+        validateStore(with: values)
+    }
+
+    func testWhenValuesAreRemovedThenTheyAreNotInCache() {
+        var values = ["a": NSNumber(value: 1.23),
+                      "b": NSNumber(value: 12),
+                      "c": "string" as NSString,
+                      "d": "string 2" as NSString]
+        addValues(values)
+
+        for key in ["a", "b", "c"] {
+            let e = expectation(description: "\(key) removed")
+            store.removeValue(forKey: key) { error in
+                XCTAssertNil(error)
+                e.fulfill()
+            }
+            values[key] = nil
+        }
+        XCTAssertEqual(store.cache, values)
+        validateStore(with: values)
+
+        waitForExpectations(timeout: 1)
+
+        makeStore()
+
+        XCTAssertEqual(store.cache, values)
+        validateStore(with: values)
+    }
+
+    func testWhenValuesAreUpdatedThenTheyAreSaved() {
+        var values = ["a": NSNumber(value: 1.23),
+                      "b": NSNumber(value: 12),
+                      "c": "string" as NSString,
+                      "d": "string 2" as NSString]
+        addValues(values)
+
+        values = ["a": NSNumber(value: 2.23),
+                  "b": NSNumber(value: 12),
+                  "c": NSNumber(value: 13),
+                  "d": "none" as NSString]
+        addValues(values)
+
+        XCTAssertEqual(store.cache, values)
+        validateStore(with: values)
+
+        waitForExpectations(timeout: 1)
+
+        makeStore()
 
         XCTAssertEqual(store.cache, values)
         validateStore(with: values)
