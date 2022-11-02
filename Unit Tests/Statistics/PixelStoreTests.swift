@@ -21,51 +21,80 @@ import XCTest
 import Combine
 
 final class PixelStoreTests: XCTestCase {
+    var container: NSPersistentContainer!
+    var context: NSManagedObjectContext!
+    var store: LocalPixelDataStore<PixelData>!
 
     override func setUp() {
         let keyStore = EncryptionKeyStoreMock()
         try? EncryptedValueTransformer<NSNumber>.registerTransformer(keyStore: keyStore)
         try? EncryptedValueTransformer<NSString>.registerTransformer(keyStore: keyStore)
+        try? EncryptedValueTransformer<NSData>.registerTransformer(keyStore: keyStore)
+
+        makeStore()
     }
 
-    func testLocalPixelDataStore() throws {
-        let container = NSPersistentContainer.createInMemoryPersistentContainer(modelName: "PixelDataModel",
-                                                                                bundle: Bundle(for: PixelData.self))
-        var context: NSManagedObjectContext! = container.viewContext
-        var store: LocalPixelDataStore! = LocalPixelDataStore(context: context, updateModel: PixelData.update)
-
-        let e1 = expectation(description: "Double saved")
-        store.set(1.23, forKey: "a") { error in
-            XCTAssertNil(error)
-            e1.fulfill()
-        }
-        
-        let e2 = expectation(description: "Int saved")
-        store.set(12, forKey: "b") { error in
-            XCTAssertNil(error)
-            e2.fulfill()
-        }
-
-        let e3 = expectation(description: "String saved")
-        store.set("string", forKey: "c") { error in
-            XCTAssertNil(error)
-            e3.fulfill()
-        }
-
-        XCTAssertEqual(store.value(forKey: "a"), 1.23)
-        XCTAssertEqual(store.value(forKey: "b"), 12 as Int)
-        XCTAssertEqual(store.value(forKey: "c"), "string")
-        XCTAssertEqual(store.cache, ["b": NSNumber(value: 12), "a": NSNumber(value: 1.23), "c": "string" as NSString])
-        waitForExpectations(timeout: 5)
-
-        store = nil
+    func makeStore() {
+        container = NSPersistentContainer.createInMemoryPersistentContainer(modelName: "PixelDataModel",
+                                                                            bundle: Bundle(for: PixelData.self))
         context = container.viewContext
         store = LocalPixelDataStore(context: context, updateModel: PixelData.update)
+    }
 
-        XCTAssertEqual(store.value(forKey: "a"), 1.23)
-        XCTAssertEqual(store.value(forKey: "b"), 12 as Int)
-        XCTAssertEqual(store.value(forKey: "c"), "string")
-        XCTAssertEqual(store.cache, ["b": NSNumber(value: 12), "a": NSNumber(value: 1.23), "c": "string" as NSString])
+    override func tearDown() {
+        super.tearDown()
+        ValueTransformer.unregisterAll()
+    }
+
+    func set(_ value: NSObject, forKey key: String) {
+        let e = expectation(description: "\(type(of: value)) saved")
+        let completionHandler = { (error: Error?) in
+            XCTAssertNil(error)
+            e.fulfill()
+        }
+        switch value {
+        case let string as NSString:
+            store.set(string as String, forKey: key, completionHandler: completionHandler)
+        case let number as NSNumber where [.doubleType, .floatType, .float64Type].contains(CFNumberGetType(number)):
+            store.set(number.doubleValue, forKey: key, completionHandler: completionHandler)
+        case let number as NSNumber where [.intType, .sInt64Type].contains(CFNumberGetType(number)):
+            store.set(number.intValue, forKey: key, completionHandler: completionHandler)
+        default:
+            fatalError("Unexpected type \((value as? NSNumber).map(CFNumberGetType).map(String.init(describing:)) ?? type(of: value).debugDescription())")
+        }
+    }
+
+    func addValues(_ values: [String: NSObject]) {
+        for (key, value) in values {
+            set(value, forKey: key)
+        }
+    }
+
+    func validateStore(with expectedValues: [String: NSObject]) {
+        for (key, value) in expectedValues {
+            switch value {
+            case let string as NSString:
+                XCTAssertEqual(store.value(forKey: key), string as String)
+            case let number as NSNumber where [.doubleType, .floatType, .float32Type, .float64Type].contains(CFNumberGetType(number)):
+                XCTAssertEqual(store.value(forKey: key), number.doubleValue)
+            case let number as NSNumber where [.intType, .sInt64Type].contains(CFNumberGetType(number)):
+                XCTAssertEqual(store.value(forKey: key), number.intValue)
+            default:
+                fatalError("Unexpected type \((value as? NSNumber).map(CFNumberGetType).map(String.init(describing:)) ?? type(of: value).debugDescription())")
+            }
+        }
+    }
+
+    func testWhenValuesAreAddedThenCallbacksAreCalled() {
+        let values = ["a": NSNumber(value: 1.23), "b": NSNumber(value: 12), "c": "string" as NSString]
+        addValues(values)
+        XCTAssertEqual(store.cache, values)
+        validateStore(with: values)
+
+        waitForExpectations(timeout: 1)
+
+        XCTAssertEqual(store.cache, values)
+        validateStore(with: values)
     }
 
 }
