@@ -616,7 +616,7 @@ extension BrowserTabViewController: TabDelegate {
         subscribeToTabSelectedInCurrentKeyWindow()
     }
 
-    func tabWillGoBackToSearchResults(_ tab: Tab) {
+    func tabDidRequestSearchResults(_ tab: Tab) {
         if let serpWebView = tab.serpWebView {
             webViewContainer?.showSERPWebView(serpWebView)
         }

@@ -42,7 +42,7 @@ protocol TabDelegate: FileDownloadManagerDelegate, ContentOverlayUserScriptDeleg
     func tabPageDOMLoaded(_ tab: Tab)
     func closeTab(_ tab: Tab)
     func tab(_ tab: Tab, promptUserForCookieConsent result: @escaping (Bool) -> Void)
-    func tabWillGoBackToSearchResults(_ tab: Tab)
+    func tabDidRequestSearchResults(_ tab: Tab)
 }
 
 // swiftlint:disable:next type_body_length
@@ -459,16 +459,22 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         }
 
         if #available(macOS 12.0, *), webView.backForwardList.backItem?.url.isDuckDuckGoSearch == true {
-            if serpWebView == nil {
-                serpWebView = WebView(frame: .zero, configuration: webView.configuration)
-                serpWebView?.allowsLinkPreview = false
-            }
-            serpWebView?.interactionState = webView.interactionState
-            serpWebView?.goBack()
-            delegate?.tabWillGoBackToSearchResults(self)
+            prepareAndShowSERPWebView()
         } else {
             webView.goBack()
         }
+    }
+
+    @available(macOS 12.0, *)
+    fileprivate func prepareAndShowSERPWebView() {
+        if serpWebView == nil {
+            serpWebView = WebView(frame: .zero, configuration: webView.configuration)
+            serpWebView?.allowsLinkPreview = false
+        }
+        serpWebView?.interactionState = webView.interactionState
+        serpWebView?.goBack()
+
+        delegate?.tabDidRequestSearchResults(self)
     }
 
     func go(to item: WKBackForwardListItem) {
@@ -922,6 +928,7 @@ extension Tab: UserContentControllerDelegate {
         userScripts.pageObserverScript.delegate = self
         userScripts.printingUserScript.delegate = self
         userScripts.hoverUserScript.delegate = self
+        userScripts.swipeUserScript.delegate = self
         userScripts.autoconsentUserScript?.delegate = self
         youtubeOverlayScript = userScripts.youtubeOverlayScript
         youtubeOverlayScript?.delegate = self
@@ -1657,5 +1664,15 @@ extension Tab: TabDataClearing {
 
         webView.navigationDelegate = caller
         webView.load(URL(string: "about:blank")!)
+    }
+}
+
+extension Tab: SwipeUserScriptDelegate {
+    func swipeUserScriptDidDetectSwipeBack(_ swipeUserScript: SwipeUserScript) {
+        if #available(macOS 12.0, *), webView.backForwardList.backItem?.url.isDuckDuckGoSearch == true {
+            prepareAndShowSERPWebView()
+        } else {
+            webView.goBack()
+        }
     }
 }

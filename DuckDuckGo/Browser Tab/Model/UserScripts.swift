@@ -29,6 +29,7 @@ final class UserScripts {
     let findInPageScript = FindInPageUserScript()
     let printingUserScript = PrintingUserScript()
     let hoverUserScript = HoverUserScript()
+    let swipeUserScript = SwipeUserScript()
     let debugScript = DebugUserScript()
     let clickToLoadScript: ClickToLoadUserScript
 
@@ -88,6 +89,7 @@ final class UserScripts {
         printingUserScript,
         hoverUserScript,
         clickToLoadScript,
+        swipeUserScript,
         contentScopeUserScript,
         autofillScript
     ]
