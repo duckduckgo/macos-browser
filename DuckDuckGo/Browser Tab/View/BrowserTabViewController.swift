@@ -622,6 +622,10 @@ extension BrowserTabViewController: TabDelegate {
         }
     }
 
+    func tabDidCloseSearchResults(_ tab: Tab) {
+        webViewContainer?.hideSERPWebView()
+    }
+
     private func scheduleHoverLabelUpdatesForUrl(_ url: URL?) {
         // cancel previous animation, if any
         hoverLabelWorkItem?.cancel()

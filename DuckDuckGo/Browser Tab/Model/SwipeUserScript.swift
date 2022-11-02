@@ -21,6 +21,7 @@ import WebKit
 
 protocol SwipeUserScriptDelegate: AnyObject {
     func swipeUserScriptDidDetectSwipeBack(_ swipeUserScript: SwipeUserScript)
+    func swipeUserScriptDidDetectSwipeForward(_ swipeUserScript: SwipeUserScript)
 }
 
 final class SwipeUserScript: NSObject, UserScript {
@@ -35,13 +36,18 @@ final class SwipeUserScript: NSObject, UserScript {
 
     public var injectionTime: WKUserScriptInjectionTime = .atDocumentStart
     public var forMainFrameOnly: Bool = true
-    public var messageNames: [String] = ["swipeBackHandler"]
+    public var messageNames: [String] = ["swipeBack", "swipeForward"]
 
     private(set) var lastURL: URL?
 
     public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-        if message.name == messageNames[0] {
+        switch message.name {
+        case "swipeBack":
             delegate?.swipeUserScriptDidDetectSwipeBack(self)
+        case "swipeForward":
+            delegate?.swipeUserScriptDidDetectSwipeForward(self)
+        default:
+            break
         }
     }
 

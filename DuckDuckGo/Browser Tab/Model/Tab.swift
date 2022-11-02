@@ -43,6 +43,7 @@ protocol TabDelegate: FileDownloadManagerDelegate, ContentOverlayUserScriptDeleg
     func closeTab(_ tab: Tab)
     func tab(_ tab: Tab, promptUserForCookieConsent result: @escaping (Bool) -> Void)
     func tabDidRequestSearchResults(_ tab: Tab)
+    func tabDidCloseSearchResults(_ tab: Tab)
 }
 
 // swiftlint:disable:next type_body_length
@@ -432,6 +433,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     func goForward() {
         guard canGoForward else { return }
         shouldStoreNextVisit = false
+        hideSERPWebView()
         webView.goForward()
     }
 
@@ -475,6 +477,10 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         serpWebView?.goBack()
 
         delegate?.tabDidRequestSearchResults(self)
+    }
+
+    fileprivate func hideSERPWebView() {
+        delegate?.tabDidCloseSearchResults(self)
     }
 
     func go(to item: WKBackForwardListItem) {
@@ -1674,5 +1680,9 @@ extension Tab: SwipeUserScriptDelegate {
         } else {
             webView.goBack()
         }
+    }
+
+    func swipeUserScriptDidDetectSwipeForward(_ swipeUserScript: SwipeUserScript) {
+        hideSERPWebView()
     }
 }

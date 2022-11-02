@@ -22,7 +22,7 @@ import Combine
 final class WebViewContainerView: NSView {
     private let stackView: NSStackView
     let webView: WebView
-    private(set) var serpWebView: WebView?
+    private(set) weak var serpWebView: WebView?
 
     override var constraints: [NSLayoutConstraint] {
         // return nothing to WKFullScreenWindowController which will keep the constraints
@@ -38,6 +38,10 @@ final class WebViewContainerView: NSView {
         serpWebView.removeConstraints(serpWebView.constraints)
         serpWebView.widthAnchor.constraint(equalToConstant: 720).isActive = true
         stackView.insertArrangedSubview(serpWebView.tabContentView, at: 0)
+    }
+
+    func hideSERPWebView() {
+        serpWebView?.removeFromSuperview()
     }
 
     init(webView: WebView, frame: NSRect) {
