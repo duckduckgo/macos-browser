@@ -98,7 +98,7 @@ final class PixelStoreTests: XCTestCase {
         validateStore(with: values)
     }
 
-    func testWhenSavedThenTheyAreReloaded() {
+    func testWhenValuesAreSavedThenTheyAreReloaded() {
         let values = ["a": NSNumber(value: 1.23), "b": NSNumber(value: 12), "c": "string" as NSString]
         addValues(values)
         waitForExpectations(timeout: 1)
