@@ -36,7 +36,7 @@ final class BrowserTabViewController: NSViewController {
     @IBOutlet weak var hoverLabel: NSTextField!
     @IBOutlet weak var hoverLabelContainer: NSView!
     private weak var webView: WebView?
-    private weak var webViewContainer: NSView?
+    private weak var webViewContainer: WebViewContainerView?
     private weak var webViewSnapshot: NSView?
 
     var tabViewModel: TabViewModel?
@@ -614,6 +614,12 @@ extension BrowserTabViewController: TabDelegate {
         pinnedTabsDelegatesCancellable = nil
         scheduleHoverLabelUpdatesForUrl(nil)
         subscribeToTabSelectedInCurrentKeyWindow()
+    }
+
+    func tabWillGoBackToSearchResults(_ tab: Tab) {
+        if let serpWebView = tab.serpWebView {
+            webViewContainer?.showSERPWebView(serpWebView)
+        }
     }
 
     private func scheduleHoverLabelUpdatesForUrl(_ url: URL?) {

@@ -42,6 +42,7 @@ protocol TabDelegate: FileDownloadManagerDelegate, ContentOverlayUserScriptDeleg
     func tabPageDOMLoaded(_ tab: Tab)
     func closeTab(_ tab: Tab)
     func tab(_ tab: Tab, promptUserForCookieConsent result: @escaping (Bool) -> Void)
+    func tabWillGoBackToSearchResults(_ tab: Tab)
 }
 
 // swiftlint:disable:next type_body_length
@@ -260,6 +261,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     // MARK: - Properties
 
     let webView: WebView
+    private(set) var serpWebView: WebView?
 
     private var lastUpgradedURL: URL?
 
@@ -455,7 +457,18 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         if privatePlayer.goBackSkippingLastItemIfNeeded(for: webView) {
             return
         }
-        webView.goBack()
+
+        if #available(macOS 12.0, *), webView.backForwardList.backItem?.url.isDuckDuckGoSearch == true {
+            if serpWebView == nil {
+                serpWebView = WebView(frame: .zero, configuration: webView.configuration)
+                serpWebView?.allowsLinkPreview = false
+            }
+            serpWebView?.interactionState = webView.interactionState
+            serpWebView?.goBack()
+            delegate?.tabWillGoBackToSearchResults(self)
+        } else {
+            webView.goBack()
+        }
     }
 
     func go(to item: WKBackForwardListItem) {

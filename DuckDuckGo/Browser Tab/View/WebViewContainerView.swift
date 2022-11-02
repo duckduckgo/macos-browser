@@ -20,7 +20,9 @@ import AppKit
 import Combine
 
 final class WebViewContainerView: NSView {
+    private let stackView: NSStackView
     let webView: WebView
+    private(set) var serpWebView: WebView?
 
     override var constraints: [NSLayoutConstraint] {
         // return nothing to WKFullScreenWindowController which will keep the constraints
@@ -29,18 +31,32 @@ final class WebViewContainerView: NSView {
         return []
     }
 
+    func showSERPWebView(_ serpWebView: WebView) {
+        self.serpWebView = serpWebView
+
+        serpWebView.translatesAutoresizingMaskIntoConstraints = false
+        serpWebView.removeConstraints(serpWebView.constraints)
+        serpWebView.widthAnchor.constraint(equalToConstant: 720).isActive = true
+        stackView.insertArrangedSubview(serpWebView.tabContentView, at: 0)
+    }
+
     init(webView: WebView, frame: NSRect) {
+        stackView = NSStackView()
         self.webView = webView
         super.init(frame: frame)
-        
-        self.autoresizingMask = [.width, .height]
-        webView.translatesAutoresizingMaskIntoConstraints = true
 
-        // WebView itself or FullScreen Placeholder view
-        let displayedView = webView.tabContentView
-        displayedView.frame = self.bounds
-        displayedView.autoresizingMask = [.width, .height]
-        self.addSubview(displayedView)
+        self.autoresizingMask = [.width, .height]
+
+        stackView.orientation = .horizontal
+//        stackView.distribution = .fillEqually
+        stackView.spacing = 0
+        stackView.translatesAutoresizingMaskIntoConstraints = true
+        stackView.frame = bounds
+        stackView.autoresizingMask = [.width, .height]
+        addSubview(stackView)
+        stackView.addArrangedSubview(webView)
+
+        webView.translatesAutoresizingMaskIntoConstraints = false
     }
     
     required init?(coder: NSCoder) {
