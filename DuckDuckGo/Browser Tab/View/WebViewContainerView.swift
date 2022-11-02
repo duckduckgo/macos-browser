@@ -19,8 +19,77 @@
 import AppKit
 import Combine
 
+final class SwipeGestureView: NSView {
+
+    enum Direction: Equatable {
+        case back, forward
+    }
+
+    override init(frame frameRect: NSRect) {
+        gestureEventPublisher = gestureEventSubject.eraseToAnyPublisher()
+        super.init(frame: frameRect)
+    }
+
+    required init?(coder: NSCoder) {
+        gestureEventPublisher = gestureEventSubject.eraseToAnyPublisher()
+        super.init(coder: coder)
+    }
+
+    let gestureEventPublisher: AnyPublisher<Direction, Never>
+
+    private let gestureEventSubject = PassthroughSubject<Direction, Never>()
+    private var distance: CGSize = .zero
+    private var isTrackingSwipe = false
+
+    override func scrollWheel(with event: NSEvent) {
+        switch event.momentumPhase {
+        case .began:
+            distance = .zero
+            isTrackingSwipe = true
+        case .changed:
+            if isTrackingSwipe {
+                distance.width += event.scrollingDeltaX
+                distance.height += event.scrollingDeltaY
+                if abs(distance.width) > 100 && abs(distance.width) > abs(distance.height) {
+                    isTrackingSwipe = false
+                    gestureEventSubject.send(distance.width > 0 ? .back : .forward)
+                }
+            }
+        default:
+            break
+        }
+        super.scrollWheel(with: event)
+    }
+}
+
 final class WebViewContainerView: NSView {
     let webView: WebView
+    let swipeGestureView: SwipeGestureView
+
+    private lazy var lightShadowView = {
+        let view = ShadowView()
+        view.autoresizingMask = [.width, .height]
+        view.shadowSides = .left
+        view.shadowOpacity = 1
+        view.shadowColor = .init(white: 0, alpha: 0.08)
+        view.shadowOffset = .init(width: 0, height: 20)
+        view.shadowRadius = 40
+        return view
+    }()
+
+    private lazy var darkShadowView = {
+        let view = ShadowView()
+        view.autoresizingMask = [.width, .height]
+        view.shadowSides = .left
+        view.shadowOpacity = 1
+        view.shadowColor = .init(white: 0, alpha: 0.1)
+        view.shadowOffset = .init(width: 0, height: 4)
+        view.shadowRadius = 12
+        return view
+    }()
+
+    private(set) weak var serpWebView: WebView?
+    private var needsCustomLayout: Bool = false
 
     override var constraints: [NSLayoutConstraint] {
         // return nothing to WKFullScreenWindowController which will keep the constraints
@@ -29,18 +98,79 @@ final class WebViewContainerView: NSView {
         return []
     }
 
+    func showSERPWebView(_ serpWebView: WebView) {
+        guard self.serpWebView == nil else {
+            return
+        }
+
+        self.serpWebView = serpWebView
+        darkShadowView.alphaValue = 0
+        lightShadowView.alphaValue = 0
+
+        serpWebView.translatesAutoresizingMaskIntoConstraints = true
+        serpWebView.autoresizingMask = [.height]
+
+        var frame = bounds
+        frame.size.width = 720
+        frame.origin.x = -720
+        serpWebView.frame = frame
+        addSubview(serpWebView, positioned: .below, relativeTo: webView)
+        addSubview(darkShadowView, positioned: .below, relativeTo: webView)
+        addSubview(lightShadowView, positioned: .below, relativeTo: darkShadowView)
+
+        NSAnimationContext.runAnimationGroup({ context in
+            context.duration = 0.3
+            context.allowsImplicitAnimation = true
+
+            webView.frame.origin.x += 720
+            serpWebView.frame.origin.x = 0
+            darkShadowView.frame = webView.frame
+            lightShadowView.frame = webView.frame
+            darkShadowView.alphaValue = 1
+            lightShadowView.alphaValue = 1
+        }) {
+            self.needsCustomLayout = true
+        }
+    }
+
+    func hideSERPWebView() {
+
+        guard let serpWebView else {
+            return
+        }
+
+        self.needsCustomLayout = false
+
+        NSAnimationContext.runAnimationGroup({ context in
+            context.duration = 0.3
+            context.allowsImplicitAnimation = true
+
+            serpWebView.frame.origin.x -= 720
+            webView.frame = bounds
+            darkShadowView.alphaValue = 0
+            lightShadowView.alphaValue = 0
+        }) {
+            serpWebView.removeFromSuperview()
+            self.darkShadowView.removeFromSuperview()
+            self.lightShadowView.removeFromSuperview()
+            self.serpWebView = nil
+        }
+    }
+
     init(webView: WebView, frame: NSRect) {
         self.webView = webView
+        swipeGestureView = SwipeGestureView()
         super.init(frame: frame)
-        
-        self.autoresizingMask = [.width, .height]
-        webView.translatesAutoresizingMaskIntoConstraints = true
 
-        // WebView itself or FullScreen Placeholder view
-        let displayedView = webView.tabContentView
-        displayedView.frame = self.bounds
-        displayedView.autoresizingMask = [.width, .height]
-        self.addSubview(displayedView)
+        self.autoresizingMask = [.width, .height]
+        swipeGestureView.autoresizingMask = [.width, .height]
+        swipeGestureView.frame = bounds
+
+        webView.translatesAutoresizingMaskIntoConstraints = true
+        webView.autoresizingMask = [.width, .height]
+        webView.frame = bounds
+        addSubview(webView)
+        addSubview(swipeGestureView)
     }
     
     required init?(coder: NSCoder) {
@@ -73,6 +203,16 @@ final class WebViewContainerView: NSView {
     override func removeFromSuperview() {
         self.webView.tabContentView.removeFromSuperview()
         super.removeFromSuperview()
+    }
+
+    override func layout() {
+        super.layout()
+
+        if needsCustomLayout {
+            webView.frame.origin.x = 720
+            darkShadowView.frame = webView.frame
+            lightShadowView.frame = webView.frame
+        }
     }
 
 }

@@ -42,6 +42,8 @@ protocol TabDelegate: FileDownloadManagerDelegate, ContentOverlayUserScriptDeleg
     func tabPageDOMLoaded(_ tab: Tab)
     func closeTab(_ tab: Tab)
     func tab(_ tab: Tab, promptUserForCookieConsent result: @escaping (Bool) -> Void)
+    func tabDidRequestSearchResults(_ tab: Tab)
+    func tabDidCloseSearchResults(_ tab: Tab)
 }
 
 // swiftlint:disable:next type_body_length
@@ -260,6 +262,12 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     // MARK: - Properties
 
     let webView: WebView
+    private(set) var serpWebView: WebView?
+    private var searchPanelNavigationDelegate: SearchPanelNavigationDelegate?
+    private var searchPanelUserScript: SearchPanelUserScript?
+    private var preventHidingSearchPanel = false
+    private var searchPanelResults: Set<URL> = []
+    fileprivate var searchPanelInteractionState: Any?
 
     private var lastUpgradedURL: URL?
 
@@ -428,6 +436,9 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     }
 
     func goForward() {
+        if hideSERPWebView() {
+            return
+        }
         guard canGoForward else { return }
         shouldStoreNextVisit = false
         webView.goForward()
@@ -455,7 +466,66 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         if privatePlayer.goBackSkippingLastItemIfNeeded(for: webView) {
             return
         }
+
+        if #available(macOS 12.0, *),
+           let backURL = webView.backForwardList.backItem?.url, let currentURL = webView.url,
+           backURL.isDuckDuckGoSearch || searchPanelResults.contains(currentURL) {
+            if prepareAndShowSERPWebView() {
+                return
+            }
+            if webView.backForwardList.backItem?.url == serpWebView?.backForwardList.currentItem?.url {
+                _ = hideSERPWebView()
+            }
+        }
+
         webView.goBack()
+    }
+
+    @available(macOS 12.0, *)
+    fileprivate func prepareAndShowSERPWebView() -> Bool {
+        if serpWebView == nil {
+            serpWebView = WebView(frame: .zero, configuration: WKWebViewConfiguration())
+            serpWebView?.allowsLinkPreview = false
+            serpWebView?.allowsBackForwardNavigationGestures = false
+
+            let script = SearchPanelUserScript()
+            script.delegate = self
+            serpWebView?.configuration.userContentController.addUserScript(script.makeWKUserScript())
+            serpWebView?.configuration.userContentController.addHandler(script)
+            serpWebView?.configuration.applyStandardConfiguration()
+            searchPanelUserScript = script
+
+            let navigationDelegate = SearchPanelNavigationDelegate()
+            navigationDelegate.searchPanelUserScript = searchPanelUserScript
+            navigationDelegate.tab = self
+            serpWebView?.navigationDelegate = navigationDelegate
+            searchPanelNavigationDelegate = navigationDelegate
+        }
+
+        if let serpWebView, serpWebView.superview == nil, let url = webView.url {
+            searchPanelResults.insert(url)
+            if let searchPanelInteractionState {
+                serpWebView.interactionState = searchPanelInteractionState
+            } else {
+                serpWebView.interactionState = webView.interactionState
+                _ = serpWebView.goBack()
+            }
+            searchPanelNavigationDelegate?.url = url
+            delegate?.tabDidRequestSearchResults(self)
+            return true
+        }
+        return false
+    }
+
+    func hideSERPWebView() -> Bool {
+        guard !preventHidingSearchPanel, serpWebView != nil else {
+            return false
+        }
+
+        delegate?.tabDidCloseSearchResults(self)
+        serpWebView = nil
+        searchPanelUserScript = nil
+        return true
     }
 
     func go(to item: WKBackForwardListItem) {
@@ -692,7 +762,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
     private func setupWebView(shouldLoadInBackground: Bool) {
         webView.navigationDelegate = self
-        webView.allowsBackForwardNavigationGestures = true
+        webView.allowsBackForwardNavigationGestures = false
         webView.allowsMagnification = true
         userContentController.delegate = self
 
@@ -796,6 +866,26 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
     func updateVisitTitle(_ title: String, url: URL) {
         historyCoordinating.updateTitleIfNeeded(title: title, url: url)
+    }
+
+    // MARK: - Swipe Gesture Navigation
+
+    private var swipeGestureCancellable: AnyCancellable?
+
+    func setUpSwipeGestureRecognizer(_ publisher: AnyPublisher<SwipeGestureView.Direction, Never>) {
+        swipeGestureCancellable = publisher.sink { [weak self] direction in
+            guard self?.webView.superview != nil else {
+                return
+            }
+
+            if direction == .back {
+                Swift.print("SWIPE BACK")
+                self?.goBack()
+            } else {
+                Swift.print("SWIPE FORWARD")
+                self?.goForward()
+            }
+        }
     }
 
     // MARK: - Youtube Player
@@ -1466,6 +1556,7 @@ extension Tab: WKNavigationDelegate {
     @MainActor
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         isBeingRedirected = false
+        preventHidingSearchPanel = false
         invalidateSessionStateData()
         webViewDidFinishNavigationPublisher.send()
         if isAMPProtectionExtracting { isAMPProtectionExtracting = false }
@@ -1481,6 +1572,7 @@ extension Tab: WKNavigationDelegate {
         //        hasError = true
 
         isBeingRedirected = false
+        preventHidingSearchPanel = false
         invalidateSessionStateData()
         linkProtection.setMainFrameUrl(nil)
         referrerTrimming.onFailedNavigation()
@@ -1499,6 +1591,7 @@ extension Tab: WKNavigationDelegate {
 
         self.error = error
         isBeingRedirected = false
+        preventHidingSearchPanel = false
         linkProtection.setMainFrameUrl(nil)
         referrerTrimming.onFailedNavigation()
         adClickAttributionDetection.onDidFailNavigation()
@@ -1644,5 +1737,31 @@ extension Tab: TabDataClearing {
 
         webView.navigationDelegate = caller
         webView.load(URL(string: "about:blank")!)
+    }
+}
+
+extension Tab: SearchPanelUserScriptDelegate {
+    func searchPanelUserScript(_ searchPanelUserScript: SearchPanelUserScript, didSelectSearchResult url: URL) {
+        preventHidingSearchPanel = true
+        searchPanelResults.insert(url)
+        webView.load(url)
+    }
+}
+
+private final class SearchPanelNavigationDelegate: NSObject, WKNavigationDelegate {
+    var url: URL?
+    weak var searchPanelUserScript: SearchPanelUserScript?
+    weak var tab: Tab?
+
+    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        guard let url else {
+            return
+        }
+        self.url = nil
+        if #available(macOS 12.0, *) {
+            tab?.searchPanelInteractionState = webView.interactionState
+        }
+
+        searchPanelUserScript?.highlightSearchResult(with: url, inWebView: webView)
     }
 }

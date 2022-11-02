@@ -66,12 +66,12 @@ final class UserContentController: WKUserContentController {
             }
             .assign(to: \.contentBlockingAssets, onWeaklyHeld: self)
 
-#if DEBUG
-        // make sure delegate for UserScripts is set shortly after init
-        DispatchQueue.main.async { [weak self] in
-            assert(self == nil || self?.delegate != nil, "UserContentController delegate not set")
-        }
-#endif
+//#if DEBUG
+//        // make sure delegate for UserScripts is set shortly after init
+//        DispatchQueue.main.async { [weak self] in
+//            assert(self == nil || self?.delegate != nil, "UserContentController delegate not set")
+//        }
+//#endif
     }
 
     public convenience init(privacyConfigurationManager: PrivacyConfigurationManager = ContentBlocking.shared.privacyConfigurationManager) {
