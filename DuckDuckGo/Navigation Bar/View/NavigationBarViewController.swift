@@ -69,11 +69,6 @@ final class NavigationBarViewController: NSViewController {
     // swiftlint:enable weak_delegate
 
     private var _bookmarkListPopover: BookmarkListPopover?
-    private var bookmarkListPopover: BookmarkListPopover {
-        let popover = _bookmarkListPopover ?? BookmarkListPopover()
-        popover.delegate = self
-        return popover
-    }
 
     private lazy var saveCredentialsPopover: SaveCredentialsPopover = {
         let popover = SaveCredentialsPopover()
@@ -97,7 +92,8 @@ final class NavigationBarViewController: NSViewController {
         return [saveCredentialsPopover, saveIdentityPopover, savePaymentMethodPopover]
     }
 
-    private lazy var passwordManagementPopover: PasswordManagementPopover = PasswordManagementPopover()
+    private var _passwordManagementPopover: PasswordManagementPopover?
+
     private lazy var downloadsPopover: DownloadsPopover = {
         let downloadsPopover = DownloadsPopover()
         downloadsPopover.delegate = self
@@ -241,16 +237,16 @@ final class NavigationBarViewController: NSViewController {
     }
 
     @IBAction func bookmarksButtonAction(_ sender: NSButton) {
-        if bookmarkListPopover.isShown {
-            bookmarkListPopover.close()
+        if _bookmarkListPopover?.isShown == true {
+            _bookmarkListPopover?.close()
         } else {
             showBookmarkListPopover()
         }
     }
 
     @IBAction func passwordManagementButtonAction(_ sender: NSButton) {
-        if passwordManagementPopover.isShown {
-            passwordManagementPopover.close()
+        if _passwordManagementPopover?.isShown == true {
+            _passwordManagementPopover?.close()
         } else {
             showPasswordManagementPopover(sender: sender, selectedCategory: nil)
         }
@@ -359,12 +355,12 @@ final class NavigationBarViewController: NSViewController {
             return false
         }
 
-        if bookmarkListPopover.isShown {
-            bookmarkListPopover.close()
+        if _bookmarkListPopover?.isShown == true {
+            _bookmarkListPopover?.close()
         }
 
-        if passwordManagementPopover.isShown {
-            passwordManagementPopover.close()
+        if _passwordManagementPopover?.isShown == true {
+            _passwordManagementPopover?.close()
         }
 
         if downloadsPopover.isShown {
@@ -376,20 +372,32 @@ final class NavigationBarViewController: NSViewController {
 
     func showBookmarkListPopover() {
         guard closeTransientPopovers() else { return }
+
+        let popover = _bookmarkListPopover ?? BookmarkListPopover()
+        _bookmarkListPopover = popover
+        popover.delegate = self
+
         bookmarkListButton.isHidden = false
         if let tab = tabCollectionViewModel.selectedTabViewModel?.tab {
-            bookmarkListPopover.viewController.currentTabWebsite = .init(tab)
+            popover.viewController.currentTabWebsite = .init(tab)
         }
-        bookmarkListPopover.show(relativeTo: bookmarkListButton.bounds.insetFromLineOfDeath(), of: bookmarkListButton, preferredEdge: .maxY)
+        popover.show(relativeTo: bookmarkListButton.bounds.insetFromLineOfDeath(),
+                     of: bookmarkListButton,
+                     preferredEdge: .maxY)
     }
 
     func showPasswordManagementPopover(sender: Any, selectedCategory: SecureVaultSorting.Category?) {
         guard closeTransientPopovers() else { return }
+
+        let popover = _passwordManagementPopover ?? PasswordManagementPopover()
+        _passwordManagementPopover = popover
+        popover.delegate = self
+
         passwordManagementButton.isHidden = false
-        passwordManagementPopover.select(category: selectedCategory)
-        passwordManagementPopover.show(relativeTo: passwordManagementButton.bounds.insetFromLineOfDeath(),
-                                       of: passwordManagementButton,
-                                       preferredEdge: .minY)
+        popover.select(category: selectedCategory)
+        popover.show(relativeTo: passwordManagementButton.bounds.insetFromLineOfDeath(),
+                     of: passwordManagementButton,
+                     preferredEdge: .minY)
     }
 
     func toggleDownloadsPopover(keepButtonVisible: Bool) {
@@ -539,7 +547,7 @@ final class NavigationBarViewController: NSViewController {
             return
         }
 
-        if passwordManagementPopover.viewController.isDirty {
+        if _passwordManagementPopover?.viewController.isDirty == true {
             passwordManagementButton.image = NSImage(named: "PasswordManagementDirty")
             return
         }
@@ -547,14 +555,14 @@ final class NavigationBarViewController: NSViewController {
         if LocalPinningManager.shared.isPinned(.autofill) {
             passwordManagementButton.isHidden = false
         } else {
-            passwordManagementButton.isHidden = !passwordManagementPopover.isShown
+            passwordManagementButton.isHidden = !(_passwordManagementPopover?.isShown ?? false)
         }
 
-        passwordManagementPopover.viewController.domain = nil
+        _passwordManagementPopover?.viewController.domain = nil
         guard let url = url, let domain = url.host else {
             return
         }
-        passwordManagementPopover.viewController.domain = domain
+        _passwordManagementPopover?.viewController.domain = domain
     }
 
     private func updateDownloadsButton(updatingFromPinnedViewsNotification: Bool = false) {
@@ -629,7 +637,7 @@ final class NavigationBarViewController: NSViewController {
         if LocalPinningManager.shared.isPinned(.bookmarks) {
             bookmarkListButton.isHidden = false
         } else {
-            bookmarkListButton.isHidden = !bookmarkListPopover.isShown
+            bookmarkListButton.isHidden = !(_bookmarkListPopover?.isShown ?? false)
         }
     }
 
@@ -816,6 +824,8 @@ extension NavigationBarViewController: NSPopoverDelegate {
         } else if notification.object is BookmarkListPopover {
             updateBookmarksButton()
             _bookmarkListPopover = nil
+        } else if notification.object is PasswordManagementPopover {
+            _passwordManagementPopover = nil
         } else if popovers.contains(where: { notification.object as AnyObject? === $0 }) {
             updatePasswordManagementButton()
         }
