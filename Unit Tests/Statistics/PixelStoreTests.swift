@@ -22,78 +22,50 @@ import Combine
 
 final class PixelStoreTests: XCTestCase {
 
-    let fm = FileManager.default
-    var tempURL: URL!
-    let testFile = "pixel_db"
-
-    func clearTemp() {
-        let tempDir = fm.temporaryDirectory
-        for file in (try? fm.contentsOfDirectory(atPath: tempDir.path)) ?? [] where file.hasPrefix(testFile) {
-            try? fm.removeItem(at: tempDir.appendingPathComponent(file))
-        }
-    }
-
     override func setUp() {
-        clearTemp()
-
-        self.tempURL = fm.temporaryDirectory
-
         let keyStore = EncryptionKeyStoreMock()
         try? EncryptedValueTransformer<NSNumber>.registerTransformer(keyStore: keyStore)
-        try? EncryptedValueTransformer<NSData>.registerTransformer(keyStore: keyStore)
+        try? EncryptedValueTransformer<NSString>.registerTransformer(keyStore: keyStore)
     }
 
-    override func tearDown() {
-        clearTemp()
-    }
-
-    func testPixelStoreMigration() throws {
-        let url = tempURL.appendingPathComponent(testFile)
-        var oldContainer: NSPersistentContainer! = NSPersistentContainer.createPersistentContainer(at: url,
-                                                                                                   modelName: "OldPixelDataModel",
-                                                                                                   bundle: Bundle(for: type(of: self)))
-        var oldContext: NSManagedObjectContext! = oldContainer.viewContext
-        func updateModelOld(_ managedObject: NSManagedObject) -> (PixelDataRecord) throws -> Void {
-            { record in
-                managedObject.setValue(record.key, forKey: #keyPath(PixelData.key))
-                managedObject.setValue((record.value as? NSNumber)!, forKey: #keyPath(PixelData.valueEncrypted))
-            }
-        }
-        var oldStore: LocalPixelDataStore! = LocalPixelDataStore(context: oldContext, updateModel: updateModelOld, entityName: PixelData.className())
+    func testLocalPixelDataStore() throws {
+        let container = NSPersistentContainer.createInMemoryPersistentContainer(modelName: "PixelDataModel",
+                                                                                bundle: Bundle(for: PixelData.self))
+        var context: NSManagedObjectContext! = container.viewContext
+        var store: LocalPixelDataStore! = LocalPixelDataStore(context: context, updateModel: PixelData.update)
 
         let e1 = expectation(description: "Double saved")
-        oldContext.perform {
-            oldStore.set(1.23, forKey: "a") { error in
-                XCTAssertNil(error)
-                e1.fulfill()
-            }
+        store.set(1.23, forKey: "a") { error in
+            XCTAssertNil(error)
+            e1.fulfill()
         }
         
         let e2 = expectation(description: "Int saved")
-        oldContext.perform {
-            oldStore.set(1, forKey: "b") { error in
-                XCTAssertNil(error)
-                e2.fulfill()
-            }
+        store.set(12, forKey: "b") { error in
+            XCTAssertNil(error)
+            e2.fulfill()
         }
 
-        withExtendedLifetime(oldContext) {
-            withExtendedLifetime(oldContainer) {
-                waitForExpectations(timeout: 5)
-            }
+        let e3 = expectation(description: "String saved")
+        store.set("string", forKey: "c") { error in
+            XCTAssertNil(error)
+            e3.fulfill()
         }
 
-        oldContext = nil
-        oldStore = nil
-        oldContainer = nil
+        XCTAssertEqual(store.value(forKey: "a"), 1.23)
+        XCTAssertEqual(store.value(forKey: "b"), 12 as Int)
+        XCTAssertEqual(store.value(forKey: "c"), "string")
+        XCTAssertEqual(store.cache, ["b": NSNumber(value: 12), "a": NSNumber(value: 1.23), "c": "string" as NSString])
+        waitForExpectations(timeout: 5)
 
-        let newContainer = NSPersistentContainer.createPersistentContainer(at: url,
-                                                                           modelName: "PixelDataModel",
-                                                                           bundle: Bundle(for: DuckDuckGo_Privacy_Browser.PixelData.self))
-        let newContext = newContainer.viewContext
-        let newStore = LocalPixelDataStore(context: newContext, updateModel: DuckDuckGo_Privacy_Browser.PixelData.update)
+        store = nil
+        context = container.viewContext
+        store = LocalPixelDataStore(context: context, updateModel: PixelData.update)
 
-        XCTAssertEqual(newStore.cache, ["b": NSNumber(value: 1), "a": NSNumber(value: 1.23)])
+        XCTAssertEqual(store.value(forKey: "a"), 1.23)
+        XCTAssertEqual(store.value(forKey: "b"), 12 as Int)
+        XCTAssertEqual(store.value(forKey: "c"), "string")
+        XCTAssertEqual(store.cache, ["b": NSNumber(value: 12), "a": NSNumber(value: 1.23), "c": "string" as NSString])
     }
 
 }
