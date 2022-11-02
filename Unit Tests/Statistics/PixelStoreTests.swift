@@ -52,7 +52,7 @@ final class PixelStoreTests: XCTestCase {
         var oldContainer: NSPersistentContainer! = NSPersistentContainer.createPersistentContainer(at: url,
                                                                                                    modelName: "OldPixelDataModel",
                                                                                                    bundle: Bundle(for: type(of: self)))
-        var oldContext: NSManagedObjectContext! = oldContainer.newBackgroundContext()
+        var oldContext: NSManagedObjectContext! = oldContainer.viewContext
         func updateModelOld(_ managedObject: NSManagedObject) -> (PixelDataRecord) throws -> Void {
             { record in
                 managedObject.setValue(record.key, forKey: #keyPath(PixelData.key))
