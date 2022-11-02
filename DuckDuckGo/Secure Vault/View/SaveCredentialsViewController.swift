@@ -39,6 +39,9 @@ final class SaveCredentialsViewController: NSViewController {
     }
 
     @IBOutlet var titleLabel: NSTextField!
+    @IBOutlet var passwordManagerTitle: NSView!
+    @IBOutlet var passwordManagerAccountLabel: NSTextField!
+    @IBOutlet var unlockPasswordManagerTitle: NSView!
     @IBOutlet var faviconImage: NSImageView!
     @IBOutlet var domainLabel: NSTextField!
     @IBOutlet var usernameField: NSTextField!
@@ -51,7 +54,9 @@ final class SaveCredentialsViewController: NSViewController {
     @IBOutlet var dontUpdateButton: NSButton!
     @IBOutlet var doneButton: NSButton!
     @IBOutlet var editButton: NSButton!
-    
+    @IBOutlet var openPasswordManagerButton: NSButton!
+    @IBOutlet weak var passwordManagerNotNowButton: NSButton!
+
     @IBOutlet var fireproofCheck: NSButton!
 
     weak var delegate: SaveCredentialsDelegate?
@@ -60,6 +65,9 @@ final class SaveCredentialsViewController: NSViewController {
 
     private var faviconManagement: FaviconManagement = FaviconManager.shared
 
+    private var passwordManagerCoordinator = PasswordManagerCoordinator()
+    private var passwordManagerStateCancellable: AnyCancellable?
+
     private var saveButtonAction: (() -> Void)?
 
     private var appearanceCancellable: AnyCancellable?
@@ -67,6 +75,25 @@ final class SaveCredentialsViewController: NSViewController {
     var passwordData: Data {
         let string = hiddenPasswordField.isHidden ? visiblePasswordField.stringValue : hiddenPasswordField.stringValue
         return string.data(using: .utf8)!
+    }
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        appearanceCancellable = view.subscribeForAppApperanceUpdates()
+        visiblePasswordField.isHidden = true
+        saveButton.becomeFirstResponder()
+    }
+
+    override func viewWillAppear() {
+        super.viewWillAppear()
+        updatePasswordFieldVisibility(visible: false)
+
+        subscribeToPasswordManagerState()
+    }
+
+    override func viewWillDisappear() {
+        passwordManagerStateCancellable = nil
     }
     
     /// Note that if the credentials.account.id is not nil, then we consider this an update rather than a save.
@@ -81,8 +108,9 @@ final class SaveCredentialsViewController: NSViewController {
         fireproofCheck.state = FireproofDomains.shared.isFireproof(fireproofDomain: credentials.account.domain) ? .on : .off
         
         // Only use the non-editable state if a credential was automatically saved and it didn't already exist.
-        let condition = credentials.account.id != nil && !credentials.account.username.isEmpty && automaticallySaved 
+        let condition = credentials.account.id != nil && !credentials.account.username.isEmpty && automaticallySaved
         updateViewState(editable: !condition)
+        //TODO: Start polling the status
     }
     
     private func updateViewState(editable: Bool) {
@@ -90,15 +118,21 @@ final class SaveCredentialsViewController: NSViewController {
         hiddenPasswordField.setEditable(editable)
         visiblePasswordField.setEditable(editable)
 
-        if editable {
-            notNowButton.isHidden = credentials?.account.id != nil
-            saveButton.isHidden = credentials?.account.id != nil
-            updateButton.isHidden = credentials?.account.id == nil
+        if editable || passwordManagerCoordinator.isEnabled {
+            notNowButton.isHidden = passwordManagerCoordinator.isEnabled || credentials?.account.id != nil
+            passwordManagerNotNowButton.isHidden = !passwordManagerCoordinator.isEnabled || credentials?.account.id != nil
+            saveButton.isHidden = credentials?.account.id != nil || passwordManagerCoordinator.isLocked
+            updateButton.isHidden = credentials?.account.id == nil || passwordManagerCoordinator.isLocked
             dontUpdateButton.isHidden = credentials?.account.id == nil
-            
+            openPasswordManagerButton.isHidden = !passwordManagerCoordinator.isLocked
+
             editButton.isHidden = true
             doneButton.isHidden = true
-            
+
+            titleLabel.isHidden = passwordManagerCoordinator.isEnabled
+            passwordManagerTitle.isHidden = !passwordManagerCoordinator.isEnabled || passwordManagerCoordinator.isLocked
+            passwordManagerAccountLabel.stringValue = "Connected to \(passwordManagerCoordinator.activeVaultEmail ?? "")" 
+            unlockPasswordManagerTitle.isHidden = !passwordManagerCoordinator.isEnabled || !passwordManagerCoordinator.isLocked
             titleLabel.stringValue = UserText.pmSaveCredentialsEditableTitle
             usernameField.makeMeFirstResponder()
         } else {
@@ -109,7 +143,7 @@ final class SaveCredentialsViewController: NSViewController {
 
             editButton.isHidden = false
             doneButton.isHidden = false
-            
+
             titleLabel.stringValue = UserText.pmSaveCredentialsNonEditableTitle
             view.window?.makeFirstResponder(nil)
         }
@@ -126,7 +160,20 @@ final class SaveCredentialsViewController: NSViewController {
         let credentials = SecureVaultModels.WebsiteCredentials(account: account, password: passwordData)
 
         do {
-            try SecureVaultFactory.default.makeVault(errorReporter: SecureVaultErrorReporter.shared).storeWebsiteCredentials(credentials)
+            if passwordManagerCoordinator.isEnabled {
+                guard !passwordManagerCoordinator.isLocked else {
+                    os_log("Failed to store credentials: Password manager is locked")
+                    return
+                }
+
+                passwordManagerCoordinator.storeWebsiteCredentials(credentials) { error in
+                    if let error = error {
+                        os_log("Failed to store credentials: %s", type: .error, error.localizedDescription)
+                    }
+                }
+            } else {
+                try SecureVaultFactory.default.makeVault(errorReporter: SecureVaultErrorReporter.shared).storeWebsiteCredentials(credentials)
+            }
         } catch {
             os_log("%s:%s: failed to store credentials %s", type: .error, className, #function, error.localizedDescription)
         }
@@ -177,6 +224,10 @@ final class SaveCredentialsViewController: NSViewController {
         }
 
     }
+
+    @IBAction func onOpenPasswordManagerClicked(sender: Any?) {
+        passwordManagerCoordinator.openPasswordManager()
+    }
     
     @IBAction func onEditClicked(sender: Any?) {
         updateViewState(editable: true)
@@ -188,19 +239,6 @@ final class SaveCredentialsViewController: NSViewController {
 
     @IBAction func onTogglePasswordVisibility(sender: Any?) {
         updatePasswordFieldVisibility(visible: !hiddenPasswordField.isHidden)
-    }
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-
-        appearanceCancellable = view.subscribeForAppApperanceUpdates()
-        visiblePasswordField.isHidden = true
-        saveButton.becomeFirstResponder()
-    }
-
-    override func viewWillAppear() {
-        super.viewWillAppear()
-        updatePasswordFieldVisibility(visible: false)
     }
 
     func loadFaviconForDomain(_ domain: String) {
@@ -218,6 +256,16 @@ final class SaveCredentialsViewController: NSViewController {
             hiddenPasswordField.isHidden = false
             visiblePasswordField.isHidden = true
         }
+    }
+
+    private func subscribeToPasswordManagerState() {
+        passwordManagerStateCancellable = passwordManagerCoordinator.bitwardenManagement.statusPublisher
+            .dropFirst()
+            .removeDuplicates()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.updateViewState(editable: true)
+            }
     }
 
 }

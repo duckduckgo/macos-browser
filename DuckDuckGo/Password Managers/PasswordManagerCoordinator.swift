@@ -38,15 +38,28 @@ class PasswordManagerCoordinator: BrowserServicesKit.PasswordManager {
     var isLocked: Bool {
         switch bitwardenManagement.status {
         case .connected(vault: let vault): return vault.status == .locked
+        case .disabled: return false
         default: return true
+        }
+    }
+
+    var activeVaultEmail: String? {
+        switch bitwardenManagement.status {
+        case .connected(vault: let vault): return vault.email
+        default: return nil
         }
     }
 
     func askToUnlock(completionHandler: @escaping () -> Void) {
         bitwardenManagement.openBitwarden()
+        //TODO: Call completion handler when Bitwarden is unlocked
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
             completionHandler()
         }
+    }
+
+    func openPasswordManager() {
+        bitwardenManagement.openBitwarden()
     }
 
     func accountsFor(domain: String, completion: @escaping ([BrowserServicesKit.SecureVaultModels.WebsiteAccount], Error?) -> Void) {
@@ -70,6 +83,16 @@ class PasswordManagerCoordinator: BrowserServicesKit.PasswordManager {
                 completion(accounts, nil)
             }
         }
+    }
+
+    func cachedAccountsFor(domain: String) -> [BrowserServicesKit.SecureVaultModels.WebsiteAccount] {
+        return cache
+            .filter { (_, credential) in
+                credential.domain == domain
+            }
+            .compactMap {
+                SecureVaultModels.WebsiteAccount(from: $0.value)
+            }
     }
 
     func websiteCredentialsFor(accountId: String, completion: @escaping (BrowserServicesKit.SecureVaultModels.WebsiteCredentials?, Error?) -> Void) {
@@ -106,6 +129,11 @@ class PasswordManagerCoordinator: BrowserServicesKit.PasswordManager {
                 completion(credentials, nil)
             }
         }
+    }
+
+    func storeWebsiteCredentials(_ credentials: SecureVaultModels.WebsiteCredentials, completion: @escaping (Error?) -> Void)  {
+        //TODO: Store credentials
+        completion(nil)
     }
 
     // MARK: - Cache
