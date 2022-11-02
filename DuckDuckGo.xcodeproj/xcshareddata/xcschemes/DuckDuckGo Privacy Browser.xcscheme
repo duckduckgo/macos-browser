@@ -76,6 +76,15 @@
                <Test
                   Identifier = "EncryptionKeyStoreTests">
                </Test>
+               <Test
+                  Identifier = "PixelTests/testWhenErrorPixelIsFiredThenParametersAdded()">
+               </Test>
+               <Test
+                  Identifier = "PixelTests/testWhenTimedPixelFiredThenCorrectDurationIsSet()">
+               </Test>
+               <Test
+                  Identifier = "StatisticsLoaderTests/testWhenRefreshRetentionAtbIsPerformedForNavigationThenAppRetentionAtbRequested()">
+               </Test>
             </SkippedTests>
          </TestableReference>
          <TestableReference
