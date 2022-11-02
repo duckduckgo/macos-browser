@@ -24,12 +24,10 @@ struct RecentlyVisited: View {
 
     @EnvironmentObject var model: HomePage.Models.RecentlyVisitedModel
 
-    @State var isExpanded = true
-
     var body: some View {
 
         VStack(spacing: 0) {
-            RecentlyVisitedTitle(isExpanded: $isExpanded)
+            RecentlyVisitedTitle(isExpanded: $model.showRecentlyVisited)
                 .padding(.bottom, 18)
 
             Group {
@@ -51,7 +49,7 @@ struct RecentlyVisited: View {
                     .visibility(model.recentSites.isEmpty ? .visible : .gone)
 
             }
-            .visibility(isExpanded ? .visible : .gone)
+            .visibility(model.showRecentlyVisited ? .visible : .gone)
 
         }.padding(.bottom, 24)
 
