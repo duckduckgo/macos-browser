@@ -38,12 +38,6 @@ class CoreDataEncryptionTests: XCTestCase {
         super.setUp()
 
         mockValueTransformer.numberOfTransformations = 0
-        try? EncryptedValueTransformer<NSString>.registerTransformer(keyStore: EncryptionKeyStoreMock())
-    }
-
-    override func tearDown() {
-        super.tearDown()
-        ValueTransformer.unregisterAll()
     }
 
     func testSavingIncorrectValueTypes() {

@@ -22,29 +22,18 @@ import Combine
 
 final class PixelStoreTests: XCTestCase {
     lazy var container: NSPersistentContainer = {
-        NSPersistentContainer.createInMemoryPersistentContainer(modelName: "PixelDataModel",
-                                                                bundle: Bundle(for: PixelData.self))
+        CoreData.createInMemoryPersistentContainer(modelName: "PixelDataModel", bundle: Bundle(for: PixelData.self))
     }()
     var context: NSManagedObjectContext!
     var store: LocalPixelDataStore<PixelData>!
 
     override func setUp() {
-        let keyStore = EncryptionKeyStoreMock()
-        try? EncryptedValueTransformer<NSNumber>.registerTransformer(keyStore: keyStore)
-        try? EncryptedValueTransformer<NSString>.registerTransformer(keyStore: keyStore)
-        try? EncryptedValueTransformer<NSData>.registerTransformer(keyStore: keyStore)
-
         makeStore()
     }
 
     func makeStore() {
         context = container.newBackgroundContext()
         store = LocalPixelDataStore(context: context, updateModel: PixelData.update)
-    }
-
-    override func tearDown() {
-        super.tearDown()
-        ValueTransformer.unregisterAll()
     }
 
     func set(_ value: NSObject, forKey key: String) {
@@ -92,7 +81,7 @@ final class PixelStoreTests: XCTestCase {
         XCTAssertEqual(store.cache, values)
         validateStore(with: values)
 
-        waitForExpectations(timeout: 1)
+        waitForExpectations(timeout: 5)
 
         XCTAssertEqual(store.cache, values)
         validateStore(with: values)
@@ -101,7 +90,7 @@ final class PixelStoreTests: XCTestCase {
     func testWhenValuesAreSavedThenTheyAreReloaded() {
         let values = ["a": NSNumber(value: 1.23), "b": NSNumber(value: 12), "c": "string" as NSString]
         addValues(values)
-        waitForExpectations(timeout: 1)
+        waitForExpectations(timeout: 5)
 
         makeStore()
 
@@ -127,7 +116,7 @@ final class PixelStoreTests: XCTestCase {
         XCTAssertEqual(store.cache, values)
         validateStore(with: values)
 
-        waitForExpectations(timeout: 1)
+        waitForExpectations(timeout: 5)
 
         makeStore()
 
@@ -151,7 +140,7 @@ final class PixelStoreTests: XCTestCase {
         XCTAssertEqual(store.cache, values)
         validateStore(with: values)
 
-        waitForExpectations(timeout: 1)
+        waitForExpectations(timeout: 5)
 
         makeStore()
 

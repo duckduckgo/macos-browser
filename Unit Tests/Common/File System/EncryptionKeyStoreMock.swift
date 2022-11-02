@@ -58,11 +58,3 @@ final class EncryptionKeyStoreMock: NSObject, EncryptionKeyStoring {
     }
 
 }
-
-extension ValueTransformer {
-    static func unregisterAll() {
-        for name in ValueTransformer.valueTransformerNames() {
-            ValueTransformer.setValueTransformer(nil, forName: name)
-        }
-    }
-}
