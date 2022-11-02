@@ -68,11 +68,12 @@ final class NavigationBarViewController: NSViewController {
     private let goForwardButtonMenuDelegate: NavigationButtonMenuDelegate
     // swiftlint:enable weak_delegate
 
-    private lazy var bookmarkListPopover: BookmarkListPopover = {
-        let popover = BookmarkListPopover()
+    private var _bookmarkListPopover: BookmarkListPopover?
+    private var bookmarkListPopover: BookmarkListPopover {
+        let popover = _bookmarkListPopover ?? BookmarkListPopover()
         popover.delegate = self
         return popover
-    }()
+    }
 
     private lazy var saveCredentialsPopover: SaveCredentialsPopover = {
         let popover = SaveCredentialsPopover()
@@ -812,8 +813,9 @@ extension NavigationBarViewController: NSPopoverDelegate {
             updateDownloadsButton()
             downloadsPopoverTimer?.invalidate()
             downloadsPopoverTimer = nil
-        } else if notification.object as AnyObject? === bookmarkListPopover {
+        } else if notification.object is BookmarkListPopover {
             updateBookmarksButton()
+            _bookmarkListPopover = nil
         } else if popovers.contains(where: { notification.object as AnyObject? === $0 }) {
             updatePasswordManagementButton()
         }
