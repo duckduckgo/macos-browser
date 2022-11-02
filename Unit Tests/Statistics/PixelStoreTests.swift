@@ -37,7 +37,7 @@ final class PixelStoreTests: XCTestCase {
     }
 
     func set(_ value: NSObject, forKey key: String) {
-        let e = expectation(description: "\(type(of: value)) saved")
+        let e = expectation(description: "\(value) saved")
         let completionHandler = { (error: Error?) in
             XCTAssertNil(error)
             e.fulfill()
@@ -81,7 +81,7 @@ final class PixelStoreTests: XCTestCase {
         XCTAssertEqual(store.cache, values)
         validateStore(with: values)
 
-        waitForExpectations(timeout: 5)
+        waitForExpectations(timeout: 15)
 
         XCTAssertEqual(store.cache, values)
         validateStore(with: values)
