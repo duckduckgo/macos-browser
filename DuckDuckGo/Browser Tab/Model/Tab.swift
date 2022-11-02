@@ -1270,7 +1270,12 @@ extension Tab: WKNavigationDelegate {
         if navigationAction.isTargetingMainFrame, navigationAction.navigationType != .backForward {
             if let newRequest = referrerTrimming.trimReferrer(forNavigation: navigationAction,
                                                               originUrl: webView.url ?? navigationAction.sourceFrame.webView?.url) {
-                defer {
+                if isRequestingNewTab {
+                    delegate?.tab(
+                        self,
+                        requestedNewTabWith: newRequest.url.map { .contentFromURL($0) } ?? .none,
+                        selected: shouldSelectNewTab)
+                } else {
                     _ = webView.load(newRequest)
                 }
                 return .cancel
