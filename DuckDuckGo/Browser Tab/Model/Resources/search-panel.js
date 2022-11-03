@@ -95,3 +95,16 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
 });
+
+// Listen for message from Native
+window.addEventListener('message', (event) => {
+    alert('got message');
+    alert('message data:' + (event.data && JSON.stringify(event.data)));
+});
+
+// Send swipeForward if swiping forward in the SERP Panel
+document.addEventListener('wheel', (event) => {
+    if (event.deltaX > 1 && event.deltaY === 0) {
+        window.webkit.messageHandlers.swipeForward.postMessage(true);
+    }
+});
