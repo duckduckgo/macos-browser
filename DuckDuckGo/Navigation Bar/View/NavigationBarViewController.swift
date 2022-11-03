@@ -25,7 +25,6 @@ final class NavigationBarViewController: NSViewController {
 
     enum Constants {
         static let downloadsButtonAutoHidingInterval: TimeInterval = 5 * 60
-        static let downloadsPopoverAutoHidingInterval: TimeInterval = 10
     }
 
     @IBOutlet weak var mouseOverView: MouseOverView!
@@ -68,18 +67,9 @@ final class NavigationBarViewController: NSViewController {
     private let goForwardButtonMenuDelegate: NavigationButtonMenuDelegate
     // swiftlint:enable weak_delegate
 
-    private var bookmarkListPopover: BookmarkListPopover?
-    private var saveCredentialsPopover: SaveCredentialsPopover?
-    private var saveIdentityPopover: SaveIdentityPopover?
-    private var savePaymentMethodPopover: SavePaymentMethodPopover?
-    private var passwordManagementPopover: PasswordManagementPopover?
-    private var downloadsPopover: DownloadsPopover?
+    private var popovers = NavigationBarPopovers()
     var isDownloadsPopoverShown: Bool {
-        downloadsPopover?.isShown ?? false
-    }
-
-    private var savePopovers: [NSPopover?] {
-        [saveIdentityPopover, saveCredentialsPopover, savePaymentMethodPopover]
+        popovers.isDownloadsPopoverShown
     }
 
     private var urlCancellable: AnyCancellable?
@@ -215,19 +205,13 @@ final class NavigationBarViewController: NSViewController {
     }
 
     @IBAction func bookmarksButtonAction(_ sender: NSButton) {
-        if bookmarkListPopover?.isShown == true {
-            bookmarkListPopover?.close()
-        } else {
-            showBookmarkListPopover()
-        }
+        popovers.bookmarksButtonPressed(anchorView: bookmarkListButton,
+                                        popoverDelegate: self,
+                                        tab: tabCollectionViewModel.selectedTabViewModel?.tab)
     }
 
     @IBAction func passwordManagementButtonAction(_ sender: NSButton) {
-        if passwordManagementPopover?.isShown == true {
-            passwordManagementPopover?.close()
-        } else {
-            showPasswordManagementPopover(sender: sender, selectedCategory: nil)
-        }
+        popovers.passwordManagementButtonPressed(usingView: passwordManagementButton, withDelegate: self)
     }
 
     @IBAction func downloadsButtonAction(_ sender: NSButton) {
@@ -328,98 +312,14 @@ final class NavigationBarViewController: NSViewController {
         }
     }
 
-    func closeTransientPopovers() -> Bool {
-        guard savePopovers.allSatisfy({ !($0?.isShown ?? false) }) else {
-            return false
-        }
-
-        if bookmarkListPopover?.isShown ?? false {
-            bookmarkListPopover?.close()
-        }
-
-        if passwordManagementPopover?.isShown ?? false {
-            passwordManagementPopover?.close()
-        }
-
-        if downloadsPopover?.isShown ?? false {
-            downloadsPopover?.close()
-        }
-
-        return true
-    }
-
-    func showBookmarkListPopover() {
-        guard closeTransientPopovers() else { return }
-
-        let popover = bookmarkListPopover ?? BookmarkListPopover()
-        bookmarkListPopover = popover
-        popover.delegate = self
-
-        bookmarkListButton.isHidden = false
-        if let tab = tabCollectionViewModel.selectedTabViewModel?.tab {
-            popover.viewController.currentTabWebsite = .init(tab)
-        }
-        popover.show(relativeTo: bookmarkListButton.bounds.insetFromLineOfDeath(),
-                     of: bookmarkListButton,
-                     preferredEdge: .maxY)
-    }
-
-    func showPasswordManagementPopover(sender: Any, selectedCategory: SecureVaultSorting.Category?) {
-        guard closeTransientPopovers() else { return }
-
-        let popover = passwordManagementPopover ?? PasswordManagementPopover()
-        passwordManagementPopover = popover
-        popover.delegate = self
-
-        passwordManagementButton.isHidden = false
-        popover.select(category: selectedCategory)
-        popover.show(relativeTo: passwordManagementButton.bounds.insetFromLineOfDeath(),
-                     of: passwordManagementButton,
-                     preferredEdge: .minY)
-    }
-
     func toggleDownloadsPopover(keepButtonVisible: Bool) {
-        if downloadsPopover?.isShown ?? false {
-            downloadsPopover?.close()
-            return
-        }
-        guard closeTransientPopovers(),
-              downloadsButton.window != nil
-        else { return }
-
-        let popover = DownloadsPopover()
-        popover.delegate = self
-        popover.viewController.delegate = self
-        downloadsPopover = popover
 
         downloadsButton.isHidden = false
         if keepButtonVisible {
             setDownloadButtonHidingTimer()
         }
 
-        popover.show(relativeTo: downloadsButton.bounds.insetFromLineOfDeath(),
-                     of: downloadsButton,
-                     preferredEdge: .maxY)
-    }
-
-    private var downloadsPopoverTimer: Timer?
-    private func showDownloadsPopoverAndAutoHide() {
-        let timerBlock: (Timer) -> Void = { [weak self] _ in
-            self?.downloadsPopoverTimer?.invalidate()
-            self?.downloadsPopoverTimer = nil
-
-            if self?.downloadsPopover?.isShown ?? false {
-                self?.downloadsPopover?.close()
-            }
-        }
-
-        if !isDownloadsPopoverShown {
-            self.toggleDownloadsPopover(keepButtonVisible: true)
-
-            downloadsPopoverTimer = Timer.scheduledTimer(withTimeInterval: Constants.downloadsPopoverAutoHidingInterval,
-                                                         repeats: false,
-                                                         block: timerBlock)
-        }
+        popovers.toggleDownloadsPopover(usingView: downloadsButton, popoverDelegate: self, downloadsDelegate: self)
     }
 
     private func setupNavigationButtonMenus() {
@@ -495,7 +395,9 @@ final class NavigationBarViewController: NSViewController {
                     && WindowControllersManager.shared.lastKeyMainWindowController?.window === self.downloadsButton.window
 
                 if shouldShowPopover {
-                    self.showDownloadsPopoverAndAutoHide()
+                    self.popovers.showDownloadsPopoverAndAutoHide(usingView: self.passwordManagementButton,
+                                                                  popoverDelegate: self,
+                                                                  downloadsDelegate: self)
                 }
                 self.updateDownloadsButton()
             }
@@ -529,11 +431,11 @@ final class NavigationBarViewController: NSViewController {
 
         passwordManagementButton.image = NSImage(named: "PasswordManagement")
 
-        if savePopovers.contains(where: { $0?.isShown ?? false }) {
+        if popovers.hasAnySavePopoversVisible() {
             return
         }
 
-        if passwordManagementPopover?.viewController.isDirty == true {
+        if popovers.isPasswordManagementDirty {
             passwordManagementButton.image = NSImage(named: "PasswordManagementDirty")
             return
         }
@@ -541,14 +443,14 @@ final class NavigationBarViewController: NSViewController {
         if LocalPinningManager.shared.isPinned(.autofill) {
             passwordManagementButton.isHidden = false
         } else {
-            passwordManagementButton.isHidden = !(passwordManagementPopover?.isShown ?? false)
+            passwordManagementButton.isHidden = !popovers.isPasswordManagementPopoverShown
         }
 
-        passwordManagementPopover?.viewController.domain = nil
+        popovers.passwordManagementDomain = nil
         guard let url = url, let domain = url.host else {
             return
         }
-        passwordManagementPopover?.viewController.domain = domain
+        popovers.passwordManagementDomain = domain
     }
 
     private func updateDownloadsButton(updatingFromPinnedViewsNotification: Bool = false) {
@@ -571,7 +473,7 @@ final class NavigationBarViewController: NSViewController {
         downloadsButton.isHidden = !(hasActiveDownloads || isTimerActive)
 
         if !downloadsButton.isHidden { setDownloadButtonHidingTimer() }
-        downloadsButton.isMouseDown = isDownloadsPopoverShown
+        downloadsButton.isMouseDown = popovers.isDownloadsPopoverShown
         
         // If the user has selected Hide Downloads from the navigation bar context menu, and no downloads are active, then force it to be hidden
         // even if the timer is active.
@@ -607,7 +509,7 @@ final class NavigationBarViewController: NSViewController {
     private func hideDownloadButtonIfPossible() {
         if LocalPinningManager.shared.isPinned(.downloads) ||
             DownloadListCoordinator.shared.hasActiveDownloads ||
-            isDownloadsPopoverShown { return }
+            popovers.isDownloadsPopoverShown { return }
         
         downloadsButton.isHidden = true
     }
@@ -623,7 +525,7 @@ final class NavigationBarViewController: NSViewController {
         if LocalPinningManager.shared.isPinned(.bookmarks) {
             bookmarkListButton.isHidden = false
         } else {
-            bookmarkListButton.isHidden = !(bookmarkListPopover?.isShown ?? false)
+            bookmarkListButton.isHidden = !popovers.bookmarkListPopoverShown
         }
     }
 
@@ -643,47 +545,23 @@ final class NavigationBarViewController: NSViewController {
 
         if autofillPreferences.askToSaveUsernamesAndPasswords, let credentials = data.credentials {
             os_log("Presenting Save Credentials popover", log: .passwordManager)
-            showSaveCredentialsPopover()
-            saveCredentialsPopover?.viewController.update(credentials: credentials, automaticallySaved: data.automaticallySavedCredentials)
+            popovers.displaySaveCredentials(credentials,
+                                            automaticallySaved: data.automaticallySavedCredentials,
+                                            usingView: passwordManagementButton,
+                                            withDelegate: self)
         } else if autofillPreferences.askToSavePaymentMethods, let card = data.creditCard {
             os_log("Presenting Save Payment Method popover", log: .passwordManager)
-            showSavePaymentMethodPopover()
-            savePaymentMethodPopover?.viewController.savePaymentMethod(card)
+            popovers.displaySavePaymentMethod(card,
+                                              usingView: passwordManagementButton,
+                                              withDelegate: self)
         } else if autofillPreferences.askToSaveAddresses, let identity = data.identity {
             os_log("Presenting Save Identity popover", log: .passwordManager)
-            showSaveIdentityPopover()
-            saveIdentityPopover?.viewController.saveIdentity(identity)
+            popovers.displaySaveIdentity(identity,
+                                         usingView: passwordManagementButton,
+                                         withDelegate: self)
         } else {
             os_log("Received save autofill data call, but there was no data to present", log: .passwordManager)
         }
-    }
-
-    private func showSaveCredentialsPopover() {
-        let popover = SaveCredentialsPopover()
-        popover.delegate = self
-        saveCredentialsPopover = popover
-        show(popover: popover)
-    }
-
-    private func showSavePaymentMethodPopover() {
-        let popover = SavePaymentMethodPopover()
-        popover.delegate = self
-        savePaymentMethodPopover = popover
-        show(popover: popover)
-    }
-
-    private func showSaveIdentityPopover() {
-        let popover = SaveIdentityPopover()
-        popover.delegate = self
-        saveIdentityPopover = popover
-        show(popover: popover)
-    }
-
-    private func show(popover: NSPopover) {
-        passwordManagementButton.isHidden = false
-        popover.show(relativeTo: passwordManagementButton.bounds.insetFromLineOfDeath(),
-                     of: passwordManagementButton,
-                     preferredEdge: .minY)
     }
 
     private func subscribeToNavigationActionFlags() {
@@ -780,7 +658,9 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
     }
 
     func optionsButtonMenuRequestedBookmarkPopover(_ menu: NSMenu) {
-        showBookmarkListPopover()
+        popovers.showBookmarkListPopover(usingView: bookmarkListButton,
+                                         withDelegate: self,
+                                         forTab: tabCollectionViewModel.selectedTabViewModel?.tab)
     }
 
     func optionsButtonMenuRequestedToggleBookmarksBar(_ menu: NSMenu) {
@@ -796,7 +676,9 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
     }
 
     func optionsButtonMenuRequestedLoginsPopover(_ menu: NSMenu, selectedCategory: SecureVaultSorting.Category) {
-        showPasswordManagementPopover(sender: menu, selectedCategory: selectedCategory)
+        popovers.showPasswordManagementPopover(selectedCategory: selectedCategory,
+                                               usingView: passwordManagementButton,
+                                               withDelegate: self)
     }
 
     func optionsButtonMenuRequestedDownloadsPopover(_ menu: NSMenu) {
@@ -813,24 +695,22 @@ extension NavigationBarViewController: NSPopoverDelegate {
 
     /// We check references here because these popovers might be on other windows.
     func popoverDidClose(_ notification: Notification) {
-        if let popover = downloadsPopover, notification.object as AnyObject? === popover {
-            downloadsPopover = nil
+        if let popover = popovers.downloadsPopover, notification.object as AnyObject? === popover {
+            popovers.downloadsPopoverClosed()
             updateDownloadsButton()
-            downloadsPopoverTimer?.invalidate()
-            downloadsPopoverTimer = nil
-        } else if let popover = bookmarkListPopover, notification.object as AnyObject? === popover {
-            bookmarkListPopover = nil
+        } else if let popover = popovers.bookmarkListPopover, notification.object as AnyObject? === popover {
+            popovers.bookmarkListPopoverClosed()
             updateBookmarksButton()
-        } else if let popover = passwordManagementPopover, notification.object as AnyObject? === popover {
-            passwordManagementPopover = nil
-        } else if let popover = saveIdentityPopover, notification.object as AnyObject? === popover {
-            saveIdentityPopover = nil
+        } else if let popover = popovers.passwordManagementPopover, notification.object as AnyObject? === popover {
+            popovers.passwordManagementPopoverClosed()
+        } else if let popover = popovers.saveIdentityPopover, notification.object as AnyObject? === popover {
+            popovers.saveIdentityPopoverClosed()
             updatePasswordManagementButton()
-        } else if let popover = saveCredentialsPopover, notification.object as AnyObject? === popover {
-            saveCredentialsPopover = nil
+        } else if let popover = popovers.saveCredentialsPopover, notification.object as AnyObject? === popover {
+            popovers.saveCredentialsPopoverClosed()
             updatePasswordManagementButton()
-        } else if let popover = savePaymentMethodPopover, notification.object as AnyObject? === popover {
-            savePaymentMethodPopover = nil
+        } else if let popover = popovers.savePaymentMethodPopover, notification.object as AnyObject? === popover {
+            popovers.savePaymentMethodPopoverClosed()
             updatePasswordManagementButton()
         }
     }
@@ -862,17 +742,20 @@ extension NavigationBarViewController {
     fileprivate func showMockSaveCredentialsPopover() {
         let account = SecureVaultModels.WebsiteAccount(title: nil, username: "example-username", domain: "example.com")
         let mockCredentials = SecureVaultModels.WebsiteCredentials(account: account, password: "password".data(using: .utf8)!)
-        
-        showSaveCredentialsPopover()
-        saveCredentialsPopover?.viewController.update(credentials: mockCredentials, automaticallySaved: false)
+
+        popovers.displaySaveCredentials(mockCredentials, automaticallySaved: false,
+                                        usingView: passwordManagementButton,
+                                        withDelegate: self)
     }
     
     fileprivate func showMockCredentialsSavedPopover() {
         let account = SecureVaultModels.WebsiteAccount(title: nil, username: "example-username", domain: "example.com")
         let mockCredentials = SecureVaultModels.WebsiteCredentials(account: account, password: "password".data(using: .utf8)!)
-        
-        showSaveCredentialsPopover()
-        saveCredentialsPopover?.viewController.update(credentials: mockCredentials, automaticallySaved: true)
+
+        popovers.displaySaveCredentials(mockCredentials,
+                                        automaticallySaved: true,
+                                        usingView: passwordManagementButton,
+                                        withDelegate: self)
     }
     
 }

@@ -316,6 +316,7 @@
 		7B1E81A027C8874900FF0E60 /* ContentOverlayViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1E819D27C8874900FF0E60 /* ContentOverlayViewController.swift */; };
 		7B4CE8E726F02135009134B1 /* TabBarTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B4CE8E626F02134009134B1 /* TabBarTests.swift */; };
 		7BA4727D26F01BC400EAA165 /* CoreDataTestUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292C42667104B00AD2C21 /* CoreDataTestUtilities.swift */; };
+		85012B0229133F9F003D0DCC /* NavigationBarPopovers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85012B0129133F9F003D0DCC /* NavigationBarPopovers.swift */; };
 		8511E18425F82B34002F516B /* 01_Fire_really_small.json in Resources */ = {isa = PBXBuildFile; fileRef = 8511E18325F82B34002F516B /* 01_Fire_really_small.json */; };
 		853014D625E671A000FB8205 /* PageObserverUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 853014D525E671A000FB8205 /* PageObserverUserScript.swift */; };
 		85308E25267FC9F2001ABD76 /* NSAlertExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85308E24267FC9F2001ABD76 /* NSAlertExtension.swift */; };
@@ -1148,6 +1149,7 @@
 		7B4CE8DA26F02108009134B1 /* UI Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "UI Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		7B4CE8DE26F02108009134B1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7B4CE8E626F02134009134B1 /* TabBarTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarTests.swift; sourceTree = "<group>"; };
+		85012B0129133F9F003D0DCC /* NavigationBarPopovers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationBarPopovers.swift; sourceTree = "<group>"; };
 		8511E18325F82B34002F516B /* 01_Fire_really_small.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = 01_Fire_really_small.json; sourceTree = "<group>"; };
 		853014D525E671A000FB8205 /* PageObserverUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageObserverUserScript.swift; sourceTree = "<group>"; };
 		85308E24267FC9F2001ABD76 /* NSAlertExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSAlertExtension.swift; sourceTree = "<group>"; };
@@ -3249,6 +3251,7 @@
 				AAC5E4F025D6BF10007F5990 /* AddressBarButton.swift */,
 				AAA0CC32252F181A0079BC96 /* NavigationButtonMenuDelegate.swift */,
 				AAA0CC462533833C0079BC96 /* MoreOptionsMenu.swift */,
+				85012B0129133F9F003D0DCC /* NavigationBarPopovers.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -4671,6 +4674,7 @@
 				85C6A29625CC1FFD00EEB5F1 /* UserDefaultsWrapper.swift in Sources */,
 				85625998269C9C5F00EE44BC /* PasswordManagementPopover.swift in Sources */,
 				85589E9127BFB9810038AD11 /* HomePageRecentlyVisitedModel.swift in Sources */,
+				85012B0229133F9F003D0DCC /* NavigationBarPopovers.swift in Sources */,
 				37D23785287F4E6500BCE03B /* PinnedTabsHostingView.swift in Sources */,
 				4BB99CFE26FE191E001E4761 /* FirefoxBookmarksReader.swift in Sources */,
 				4BBC16A227C485BC00E00A38 /* DeviceIdleStateDetector.swift in Sources */,
