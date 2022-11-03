@@ -719,8 +719,8 @@ extension BrowserTabViewController: WKUIDelegate {
         }
     }
 
-    // swiftlint:disable:next cyclomatic_complexity
-    // swiftlint:disable:next function_body_length
+    // swiftlint:disable cyclomatic_complexity
+    // swiftlint:disable function_body_length
     func webView(_ webView: WKWebView,
                  createWebViewWith configuration: WKWebViewConfiguration,
                  for navigationAction: WKNavigationAction,
@@ -799,6 +799,8 @@ extension BrowserTabViewController: WKUIDelegate {
         // WebKit loads the request in the returned web view.
         return tab.webView
     }
+    // swiftlint:enable cyclomatic_complexity
+    // swiftlint:enable function_body_length
 
     @objc(_webView:checkUserMediaPermissionForURL:mainFrameURL:frameIdentifier:decisionHandler:)
     func webView(_ webView: WKWebView,
