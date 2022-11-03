@@ -43,7 +43,7 @@ final class FaviconStoringMock: FaviconStoring {
 
     func loadFaviconReferences() -> Future<([FaviconHostReference], [FaviconUrlReference]), Error> {
         return Future { promise in
-            promise(.success(([],[])))
+            promise(.success(([], [])))
         }
     }
 
