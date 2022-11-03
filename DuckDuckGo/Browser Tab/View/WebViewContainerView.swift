@@ -20,9 +20,9 @@ import AppKit
 import Combine
 
 final class WebViewContainerView: NSView {
-    private let stackView: NSStackView
     let webView: WebView
     private(set) weak var serpWebView: WebView?
+    private var needsCustomLayout: Bool = false
 
     override var constraints: [NSLayoutConstraint] {
         // return nothing to WKFullScreenWindowController which will keep the constraints
@@ -32,35 +32,63 @@ final class WebViewContainerView: NSView {
     }
 
     func showSERPWebView(_ serpWebView: WebView) {
+        guard self.serpWebView == nil else {
+            return
+        }
+
         self.serpWebView = serpWebView
 
-        serpWebView.translatesAutoresizingMaskIntoConstraints = false
-        serpWebView.removeConstraints(serpWebView.constraints)
-        serpWebView.widthAnchor.constraint(equalToConstant: 720).isActive = true
-        stackView.insertArrangedSubview(serpWebView.tabContentView, at: 0)
+        serpWebView.translatesAutoresizingMaskIntoConstraints = true
+        serpWebView.autoresizingMask = [.height]
+
+        var frame = bounds
+        frame.size.width = 720
+        frame.origin.x = -720
+        serpWebView.frame = frame
+        addSubview(serpWebView, positioned: .below, relativeTo: webView)
+
+        NSAnimationContext.runAnimationGroup({ context in
+            context.duration = 0.3
+            context.allowsImplicitAnimation = true
+
+            webView.frame.origin.x += 720
+            webView.frame.size.width = bounds.width - 720
+            serpWebView.frame.origin.x = 0
+        }) {
+            self.needsCustomLayout = true
+        }
     }
 
     func hideSERPWebView() {
-        serpWebView?.removeFromSuperview()
+
+        guard let serpWebView else {
+            return
+        }
+
+        self.needsCustomLayout = false
+
+        NSAnimationContext.runAnimationGroup({ context in
+            context.duration = 0.3
+            context.allowsImplicitAnimation = true
+
+            serpWebView.frame.origin.x -= 720
+            webView.frame = bounds
+        }) {
+            serpWebView.removeFromSuperview()
+            self.serpWebView = nil
+        }
     }
 
     init(webView: WebView, frame: NSRect) {
-        stackView = NSStackView()
         self.webView = webView
         super.init(frame: frame)
 
         self.autoresizingMask = [.width, .height]
 
-        stackView.orientation = .horizontal
-//        stackView.distribution = .fillEqually
-        stackView.spacing = 0
-        stackView.translatesAutoresizingMaskIntoConstraints = true
-        stackView.frame = bounds
-        stackView.autoresizingMask = [.width, .height]
-        addSubview(stackView)
-        stackView.addArrangedSubview(webView)
-
-        webView.translatesAutoresizingMaskIntoConstraints = false
+        webView.translatesAutoresizingMaskIntoConstraints = true
+        webView.autoresizingMask = [.width, .height]
+        webView.frame = bounds
+        addSubview(webView)
     }
     
     required init?(coder: NSCoder) {
@@ -93,6 +121,15 @@ final class WebViewContainerView: NSView {
     override func removeFromSuperview() {
         self.webView.tabContentView.removeFromSuperview()
         super.removeFromSuperview()
+    }
+
+    override func layout() {
+        super.layout()
+
+        if needsCustomLayout {
+            webView.frame.size.width = bounds.size.width - 720
+            webView.frame.origin.x = 720
+        }
     }
 
 }
