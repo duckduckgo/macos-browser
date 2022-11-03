@@ -115,5 +115,3 @@ extension HistoryEntry: BrowserServicesKit.HistoryEntry {
     }
 
 }
-
-extension Bookmark: BrowserServicesKit.Bookmark {}
