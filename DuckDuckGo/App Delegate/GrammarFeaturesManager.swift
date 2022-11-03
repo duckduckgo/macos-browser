@@ -21,7 +21,7 @@ import Foundation
 final class GrammarFeaturesManager {
 
     // Please see initialize() method of WebView in Source/WebKit/mac/WebView/WebView.mm
-    enum Feature {
+    private enum Feature {
         case continuousSpellChecking
         case grammarChecking
         case autocorrection
@@ -37,7 +37,7 @@ final class GrammarFeaturesManager {
 
     // swiftlint:disable identifier_name
     // Please see Source/WebKit/mac/WebView/WebPreferenceKeysPrivate.h for more info
-    enum WebKitPreferenceKey: String {
+    private enum WebKitPreferenceKey: String {
         // Continuous spell checking
         case WebContinuousSpellCheckingEnabled
 
@@ -50,10 +50,10 @@ final class GrammarFeaturesManager {
     // swiftlint:enable identifier_name
 
     @UserDefaultsWrapper(key: .spellingCheckEnabledOnce, defaultValue: false)
-    var spellingCheckEnabledOnce: Bool
+    private var spellingCheckEnabledOnce: Bool
 
     @UserDefaultsWrapper(key: .grammarCheckEnabledOnce, defaultValue: false)
-    var grammarCheckEnabledOnce: Bool
+    private var grammarCheckEnabledOnce: Bool
 
     func manage() {
 
