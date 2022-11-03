@@ -47,7 +47,6 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
         addTrackingArea()
 
         appearanceCancellable = NSApp.publisher(for: \.effectiveAppearance).map { $0 as NSAppearance? }.sink { [weak self] appearance in
-            print("DEBUG: Got new appearance \(appearance)")
             self?.webView.appearance = appearance
         }
     }
