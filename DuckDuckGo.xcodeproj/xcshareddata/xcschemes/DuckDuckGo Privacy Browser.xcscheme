@@ -74,15 +74,6 @@
                   Identifier = "CBRCompileTimeReporterTests">
                </Test>
                <Test
-                  Identifier = "EncryptionKeyStoreTests">
-               </Test>
-               <Test
-                  Identifier = "PixelTests/testWhenErrorPixelIsFiredThenParametersAdded()">
-               </Test>
-               <Test
-                  Identifier = "PixelTests/testWhenTimedPixelFiredThenCorrectDurationIsSet()">
-               </Test>
-               <Test
                   Identifier = "StatisticsLoaderTests/testWhenRefreshRetentionAtbIsPerformedForNavigationThenAppRetentionAtbRequested()">
                </Test>
             </SkippedTests>
@@ -98,10 +89,7 @@
             </BuildableReference>
             <SkippedTests>
                <Test
-                  Identifier = "CoreDataEncryptionTests">
-               </Test>
-               <Test
-                  Identifier = "EncryptionKeyStoreTests">
+                  Identifier = "CoreDataEncryptionTests/testSavingIncorrectValueTypes()">
                </Test>
             </SkippedTests>
          </TestableReference>
