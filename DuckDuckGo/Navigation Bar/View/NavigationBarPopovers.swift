@@ -33,12 +33,30 @@ final class NavigationBarPopovers {
     private(set) var passwordManagementPopover: PasswordManagementPopover?
     private(set) var downloadsPopover: DownloadsPopover?
 
+    var passwordManagementDomain: String? {
+        didSet {
+            passwordManagementPopover?.viewController.domain = passwordManagementDomain
+        }
+    }
+
     var isDownloadsPopoverShown: Bool {
         downloadsPopover?.isShown ?? false
     }
 
     var savePopovers: [NSPopover?] {
         [saveIdentityPopover, saveCredentialsPopover, savePaymentMethodPopover]
+    }
+
+    var isPasswordManagementDirty: Bool {
+        passwordManagementPopover?.viewController.isDirty ?? false
+    }
+
+    var isPasswordManagementPopoverShown: Bool {
+        passwordManagementPopover?.isShown ?? false
+    }
+
+    var bookmarkListPopoverShown: Bool {
+        bookmarkListPopover?.isShown ?? false
     }
 
     func bookmarksButtonPressed(anchorView: NSView, popoverDelegate delegate: NSPopoverDelegate, tab: Tab?) {
@@ -72,16 +90,11 @@ final class NavigationBarPopovers {
         popover.viewController.delegate = downloadsDelegate
         downloadsPopover = popover
 
-        popover.show(relativeTo: view.bounds.insetFromLineOfDeath(),
-                     of: view,
-                     preferredEdge: .maxY)
-
+        show(popover: popover, usingView: view)
     }
 
     private var downloadsPopoverTimer: Timer?
-    func showDownloadsPopoverAndAutoHide(usingView view: NSView,
-                                         popoverDelegate: NSPopoverDelegate,
-                                         downloadsDelegate: DownloadsViewControllerDelegate) {
+    func showDownloadsPopoverAndAutoHide(usingView view: NSView, popoverDelegate: NSPopoverDelegate, downloadsDelegate: DownloadsViewControllerDelegate) {
         let timerBlock: (Timer) -> Void = { [weak self] _ in
             self?.downloadsPopoverTimer?.invalidate()
             self?.downloadsPopoverTimer = nil
@@ -127,101 +140,41 @@ final class NavigationBarPopovers {
         bookmarkListPopover = popover
         popover.delegate = delegate
 
-        view.isHidden = false
         if let tab = tab {
             popover.viewController.currentTabWebsite = .init(tab)
         }
-        popover.show(relativeTo: view.bounds.insetFromLineOfDeath(),
-                     of: view,
-                     preferredEdge: .maxY)
+
+        show(popover: popover, usingView: view)
     }
 
-    func showPasswordManagementPopover(selectedCategory: SecureVaultSorting.Category?,
-                                       usingView view: NSView,
-                                       withDelegate delegate: NSPopoverDelegate) {
+    func showPasswordManagementPopover(selectedCategory: SecureVaultSorting.Category?, usingView view: NSView, withDelegate delegate: NSPopoverDelegate) {
         guard closeTransientPopovers() else { return }
 
         let popover = passwordManagementPopover ?? PasswordManagementPopover()
         passwordManagementPopover = popover
         popover.delegate = delegate
-
-        view.isHidden = false
         popover.select(category: selectedCategory)
-        popover.show(relativeTo: view.bounds.insetFromLineOfDeath(),
-                     of: view,
-                     preferredEdge: .minY)
+
+        show(popover: popover, usingView: view)
     }
 
     func hasAnySavePopoversVisible() -> Bool {
         return savePopovers.contains(where: { $0?.isShown ?? false })
     }
 
-    var isPasswordManagementDirty: Bool {
-        passwordManagementPopover?.viewController.isDirty ?? false
-    }
-
-    var isPasswordManagementPopoverShown: Bool {
-        passwordManagementPopover?.isShown ?? false
-    }
-
-    var passwordManagementDomain: String? {
-        didSet {
-            passwordManagementPopover?.viewController.domain = passwordManagementDomain
-        }
-    }
-
-    var bookmarkListPopoverShown: Bool {
-        bookmarkListPopover?.isShown ?? false
-    }
-
-    func displaySaveCredentials(_ credentials: SecureVaultModels.WebsiteCredentials,
-                                automaticallySaved: Bool,
-                                usingView view: NSView,
-                                withDelegate delegate: NSPopoverDelegate) {
+    func displaySaveCredentials(_ credentials: SecureVaultModels.WebsiteCredentials, automaticallySaved: Bool, usingView view: NSView, withDelegate delegate: NSPopoverDelegate) {
         showSaveCredentialsPopover(usingView: view, withDelegate: delegate)
         saveCredentialsPopover?.viewController.update(credentials: credentials, automaticallySaved: automaticallySaved)
     }
 
-    func displaySavePaymentMethod(_ card: SecureVaultModels.CreditCard,
-                                  usingView view: NSView,
-                                  withDelegate delegate: NSPopoverDelegate) {
+    func displaySavePaymentMethod(_ card: SecureVaultModels.CreditCard, usingView view: NSView, withDelegate delegate: NSPopoverDelegate) {
         showSavePaymentMethodPopover(usingView: view, withDelegate: delegate)
         savePaymentMethodPopover?.viewController.savePaymentMethod(card)
     }
 
-    func displaySaveIdentity(_ identity: SecureVaultModels.Identity,
-                             usingView view: NSView,
-                             withDelegate delegate: NSPopoverDelegate) {
+    func displaySaveIdentity(_ identity: SecureVaultModels.Identity, usingView view: NSView, withDelegate delegate: NSPopoverDelegate) {
         showSaveIdentityPopover(usingView: view, withDelegate: delegate)
         saveIdentityPopover?.viewController.saveIdentity(identity)
-    }
-
-    private func showSaveCredentialsPopover(usingView view: NSView, withDelegate delegate: NSPopoverDelegate) {
-        let popover = SaveCredentialsPopover()
-        popover.delegate = delegate
-        saveCredentialsPopover = popover
-        show(popover: popover, usingView: view)
-    }
-
-    private func showSavePaymentMethodPopover(usingView view: NSView, withDelegate delegate: NSPopoverDelegate) {
-        let popover = SavePaymentMethodPopover()
-        popover.delegate = delegate
-        savePaymentMethodPopover = popover
-        show(popover: popover, usingView: view)
-    }
-
-    private func showSaveIdentityPopover(usingView view: NSView, withDelegate delegate: NSPopoverDelegate) {
-        let popover = SaveIdentityPopover()
-        popover.delegate = delegate
-        saveIdentityPopover = popover
-        show(popover: popover, usingView: view)
-    }
-
-    private func show(popover: NSPopover, usingView view: NSView) {
-        view.isHidden = false
-        popover.show(relativeTo: view.bounds.insetFromLineOfDeath(),
-                     of: view,
-                     preferredEdge: .minY)
     }
 
     func downloadsPopoverClosed() {
@@ -249,4 +202,31 @@ final class NavigationBarPopovers {
     func savePaymentMethodPopoverClosed() {
         savePaymentMethodPopover = nil
     }
+
+    private func showSaveCredentialsPopover(usingView view: NSView, withDelegate delegate: NSPopoverDelegate) {
+        let popover = SaveCredentialsPopover()
+        popover.delegate = delegate
+        saveCredentialsPopover = popover
+        show(popover: popover, usingView: view)
+    }
+
+    private func showSavePaymentMethodPopover(usingView view: NSView, withDelegate delegate: NSPopoverDelegate) {
+        let popover = SavePaymentMethodPopover()
+        popover.delegate = delegate
+        savePaymentMethodPopover = popover
+        show(popover: popover, usingView: view)
+    }
+
+    private func showSaveIdentityPopover(usingView view: NSView, withDelegate delegate: NSPopoverDelegate) {
+        let popover = SaveIdentityPopover()
+        popover.delegate = delegate
+        saveIdentityPopover = popover
+        show(popover: popover, usingView: view)
+    }
+
+    private func show(popover: NSPopover, usingView view: NSView) {
+        view.isHidden = false
+        popover.show(relativeTo: view.bounds.insetFromLineOfDeath(), of: view, preferredEdge: .minY)
+    }
+
 }
