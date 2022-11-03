@@ -91,6 +91,9 @@
                <Test
                   Identifier = "CoreDataEncryptionTests/testSavingIncorrectValueTypes()">
                </Test>
+               <Test
+                  Identifier = "EncryptionKeyStoreTests">
+               </Test>
             </SkippedTests>
          </TestableReference>
       </Testables>
