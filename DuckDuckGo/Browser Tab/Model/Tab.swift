@@ -478,6 +478,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         if serpWebView == nil {
             serpWebView = WebView(frame: .zero, configuration: WKWebViewConfiguration())
             serpWebView?.allowsLinkPreview = false
+            serpWebView?.allowsBackForwardNavigationGestures = false
             let script = SearchPanelUserScript()
             script.delegate = self
             serpWebView?.configuration.userContentController.addUserScript(script.makeWKUserScript())
@@ -735,7 +736,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
     private func setupWebView(shouldLoadInBackground: Bool) {
         webView.navigationDelegate = self
-        webView.allowsBackForwardNavigationGestures = true
+        webView.allowsBackForwardNavigationGestures = false
         webView.allowsMagnification = true
         userContentController.delegate = self
 
@@ -839,6 +840,29 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
     func updateVisitTitle(_ title: String, url: URL) {
         historyCoordinating.updateTitleIfNeeded(title: title, url: url)
+    }
+
+    // MARK: - Swipe Script
+
+    private weak var swipeUserScript: SwipeUserScript?
+    private var swipeUserScriptCancellables: Set<AnyCancellable> = []
+
+    func setUpSwipeUserScript() {
+        swipeUserScriptCancellables.removeAll()
+
+        swipeUserScript?.swipeBackPublisher
+            .sink { [weak self] in
+                Swift.print("SWIPE BACK")
+                self?.goBack()
+            }
+            .store(in: &swipeUserScriptCancellables)
+
+        swipeUserScript?.swipeForwardPublisher
+            .sink { [weak self] in
+                Swift.print("SWIPE FORWARD")
+                self?.goForward()
+            }
+            .store(in: &swipeUserScriptCancellables)
     }
 
     // MARK: - Youtube Player
@@ -952,7 +976,8 @@ extension Tab: UserContentControllerDelegate {
         userScripts.pageObserverScript.delegate = self
         userScripts.printingUserScript.delegate = self
         userScripts.hoverUserScript.delegate = self
-        userScripts.swipeUserScript.delegate = self
+        swipeUserScript = userScripts.swipeUserScript
+        setUpSwipeUserScript()
         userScripts.autoconsentUserScript?.delegate = self
         youtubeOverlayScript = userScripts.youtubeOverlayScript
         youtubeOverlayScript?.delegate = self
@@ -1688,25 +1713,6 @@ extension Tab: TabDataClearing {
 
         webView.navigationDelegate = caller
         webView.load(URL(string: "about:blank")!)
-    }
-}
-
-extension Tab: SwipeUserScriptDelegate {
-    func swipeUserScriptDidDetectSwipeBack(_ swipeUserScript: SwipeUserScript) {
-        if #available(macOS 12.0, *), webView.backForwardList.backItem?.url.isDuckDuckGoSearch == true {
-            if prepareAndShowSERPWebView() {
-                return
-            }
-            if webView.backForwardList.backItem?.url == serpWebView?.backForwardList.currentItem?.url {
-                hideSERPWebView()
-            }
-        }
-
-        webView.goBack()
-    }
-
-    func swipeUserScriptDidDetectSwipeForward(_ swipeUserScript: SwipeUserScript) {
-        hideSERPWebView()
     }
 }
 

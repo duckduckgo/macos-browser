@@ -17,29 +17,46 @@
 //
 
 import BrowserServicesKit
+import Combine
 import WebKit
-
-protocol SwipeUserScriptDelegate: AnyObject {
-    func swipeUserScriptDidDetectSwipeBack(_ swipeUserScript: SwipeUserScript)
-    func swipeUserScriptDidDetectSwipeForward(_ swipeUserScript: SwipeUserScript)
-}
 
 final class SwipeUserScript: NSObject, UserScript {
 
-    public weak var delegate: SwipeUserScriptDelegate?
+    private(set) lazy var source: String = SwipeUserScript.loadJS("swipe", from: .main)
 
-    lazy var source: String = SwipeUserScript.loadJS("swipe", from: .main)
+    let injectionTime: WKUserScriptInjectionTime = .atDocumentStart
+    let forMainFrameOnly: Bool = true
+    let messageNames: [String] = ["swipeBack", "swipeForward"]
 
-    public var injectionTime: WKUserScriptInjectionTime = .atDocumentStart
-    public var forMainFrameOnly: Bool = true
-    public var messageNames: [String] = ["swipeBack", "swipeForward"]
+    let swipeBackPublisher: AnyPublisher<Void, Never>
+    let swipeForwardPublisher: AnyPublisher<Void, Never>
+    var isEnabled: Bool = true
 
-    public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+    private let swipeBackSubject = PassthroughSubject<Void, Never>()
+    private let swipeForwardSubject = PassthroughSubject<Void, Never>()
+
+    override init() {
+        swipeBackPublisher = swipeBackSubject
+            .throttle(for: 1, scheduler: DispatchQueue.main, latest: false)
+            .eraseToAnyPublisher()
+
+        swipeForwardPublisher = swipeForwardSubject
+            .throttle(for: 1, scheduler: DispatchQueue.main, latest: false)
+            .eraseToAnyPublisher()
+
+        super.init()
+    }
+
+    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+        guard isEnabled else {
+            return
+        }
+
         switch message.name {
         case "swipeBack":
-            delegate?.swipeUserScriptDidDetectSwipeBack(self)
+            swipeBackSubject.send()
         case "swipeForward":
-            delegate?.swipeUserScriptDidDetectSwipeForward(self)
+            swipeForwardSubject.send()
         default:
             break
         }
