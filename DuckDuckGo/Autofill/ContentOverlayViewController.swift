@@ -75,6 +75,8 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
         guard let topAutofillUserScript = topAutofillUserScript else { return }
         topAutofillUserScript.websiteAutofillInstance = autofillInterfaceToChild
 
+        webView.appearance = NSApp.appearance
+
         let url = Autofill.bundle.url(forResource: "assets/TopAutofill", withExtension: "html")
         if let url = url {
             webView.loadFileURL(url, allowingReadAccessTo: url.deletingLastPathComponent())
