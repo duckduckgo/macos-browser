@@ -511,10 +511,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         return true
     }
 
-    var cbrCompletionTokensPublisher: AnyPublisher<[ContentBlockerRulesManager.CompletionToken], Never> {
-        userContentController.$contentBlockingAssets.compactMap { $0?.updateEvent.completionTokens }.eraseToAnyPublisher()
-    }
-
     private static let debugEvents = EventMapping<AMPProtectionDebugEvents> { event, _, _, _ in
         switch event {
         case .ampBlockingRulesCompilationFailed:
