@@ -480,6 +480,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             serpWebView?.allowsLinkPreview = false
             let script = SearchPanelUserScript()
             script.delegate = self
+            serpWebView?.configuration.userContentController.addUserScript(script.makeWKUserScript())
             serpWebView?.configuration.userContentController.addHandler(script)
             searchPanelUserScript = script
         }
