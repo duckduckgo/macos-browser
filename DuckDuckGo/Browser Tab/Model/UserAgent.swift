@@ -35,10 +35,8 @@ enum UserAgent {
             return Self.default
         }
 
-        for (regex, userAgent) in domainUserAgents {
-            if absoluteString.matches(regex) {
-                return userAgent
-            }
+        for (regex, userAgent) in domainUserAgents where absoluteString.matches(regex) {
+            return userAgent
         }
 
         return Self.default
