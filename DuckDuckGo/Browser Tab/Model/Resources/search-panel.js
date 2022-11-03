@@ -79,6 +79,26 @@ let makeSlim = () => {
     document.querySelector('#links_wrapper').setAttribute('style', 'min-width:0px;');
 }
 
+let hijackOrganicClicks = () => {
+    document.querySelectorAll('.nrn-react-div').forEach((item) => {
+        item.addEventListener('click', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+
+            let clickedDiv = event.target.closest('.nrn-react-div');
+            let url = clickedDiv?.querySelector('a[data-testid="result-title-a"]')?.getAttribute('href');
+
+            console.log('url', url);
+            window.webkit.messageHandlers.selectedSearchResult.postMessage(url);
+
+            let clickedResultId = clickedDiv.querySelector('article').getAttribute('id');
+
+            createFocus('#' + clickedResultId);
+
+        }, true);
+    });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     createShadow();
 
@@ -88,6 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log('finished!');
             createFocus(resultId);
             makeSlim();
+            hijackOrganicClicks();
             clearInterval(deepLoaded);
         } else {
             console.log('deep not loaded, wait');
@@ -108,3 +129,5 @@ document.addEventListener('wheel', (event) => {
         window.webkit.messageHandlers.swipeForward.postMessage(true);
     }
 });
+
+
