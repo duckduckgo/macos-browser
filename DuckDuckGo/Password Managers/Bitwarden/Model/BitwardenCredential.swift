@@ -24,8 +24,8 @@ struct BitwardenCredential {
     var credentialId: String?
     var credentialName: String
 
-    var username: String
-    var password: String
+    var username: String?
+    var password: String?
 
     var domain: String {
         return credentialName
@@ -43,13 +43,11 @@ extension BitwardenCredential {
     init?(from payloadItem: BitwardenMessage.PayloadItem) {
         guard let userId = payloadItem.userId,
               let credentialId = payloadItem.credentialId,
-              let credentialName = payloadItem.name,
-              let username = payloadItem.userName,
-              let password = payloadItem.password else {
-            //TODO: Warning
+              let credentialName = payloadItem.name else {
+            assertionFailure("Failed to init BitwardenCredential from PayloadItem")
             return nil
         }
-        self.init(userId: userId, credentialId: credentialId, credentialName: credentialName, username: username, password: password)
+        self.init(userId: userId, credentialId: credentialId, credentialName: credentialName, username: payloadItem.userName, password: payloadItem.password)
     }
 
 }

@@ -168,7 +168,7 @@ extension BrowserServicesKit.SecureVaultModels.WebsiteAccount {
             return nil
         }
         self.init(id: credentialId,
-                  username: bitwardenCredential.username,
+                  username: bitwardenCredential.username ?? "",
                   domain: bitwardenCredential.domain,
                   created: Date(),
                   lastUpdated: Date())
@@ -180,7 +180,7 @@ extension BrowserServicesKit.SecureVaultModels.WebsiteCredentials {
 
     init?(from bitwardenCredential: BitwardenCredential) {
         guard let account = BrowserServicesKit.SecureVaultModels.WebsiteAccount(from: bitwardenCredential),
-        let password = bitwardenCredential.password.data(using: .utf8) else {
+        let password = bitwardenCredential.password?.data(using: .utf8) else {
             return nil
         }
         self.init(account: account, password: password)
