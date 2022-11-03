@@ -238,13 +238,13 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         webView.stopMediaCapture()
         webView.stopAllMediaPlayback()
         webView.fullscreenWindowController?.close()
-        userContentController.removeAllUserScripts()
+        webView.configuration.userContentController.removeAllUserScripts()
 
         cbaTimeReporter?.tabWillClose(self.instrumentation.currentTabIdentifier)
     }
 
-    private var userContentController: UserContentController {
-        (webView.configuration.userContentController as? UserContentController)!
+    private var userContentController: UserContentController? {
+        webView.configuration.userContentController as? UserContentController
     }
 
     // MARK: - Event Publishers
@@ -493,14 +493,14 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
         if enabled {
             do {
-                try userContentController.enableGlobalContentRuleList(withIdentifier: ContentBlockerRulesLists.Constants.clickToLoadRulesListName)
+                try userContentController!.enableGlobalContentRuleList(withIdentifier: ContentBlockerRulesLists.Constants.clickToLoadRulesListName)
             } catch {
                 assertionFailure("Missing FB List")
                 return false
             }
         } else {
             do {
-                try userContentController.disableGlobalContentRuleList(withIdentifier: ContentBlockerRulesLists.Constants.clickToLoadRulesListName)
+                try userContentController!.disableGlobalContentRuleList(withIdentifier: ContentBlockerRulesLists.Constants.clickToLoadRulesListName)
             } catch {
                 assertionFailure("FB List was not enabled")
                 return false
@@ -509,10 +509,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         self.fbBlockingEnabled = enabled
 
         return true
-    }
-
-    var cbrCompletionTokensPublisher: AnyPublisher<[ContentBlockerRulesManager.CompletionToken], Never> {
-        userContentController.$contentBlockingAssets.compactMap { $0?.completionTokens }.eraseToAnyPublisher()
     }
 
     private static let debugEvents = EventMapping<AMPProtectionDebugEvents> { event, _, _, _ in
@@ -694,7 +690,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         webView.navigationDelegate = self
         webView.allowsBackForwardNavigationGestures = true
         webView.allowsMagnification = true
-        userContentController.delegate = self
+        userContentController?.delegate = self
 
         superviewObserver = webView.observe(\.superview, options: .old) { [weak self] _, change in
             // if the webView is being added to superview - reload if needed
@@ -1089,12 +1085,12 @@ extension Tab: AdClickAttributionLogicDelegate {
     func attributionLogic(_ logic: AdClickAttributionLogic,
                           didRequestRuleApplication rules: ContentBlockerRulesManager.Rules?,
                           forVendor vendor: String?) {
-        let contentBlockerRulesScript = userContentController.contentBlockingAssets?.userScripts.contentBlockerRulesScript
+        let contentBlockerRulesScript = userContentController?.contentBlockingAssets?.userScripts.contentBlockerRulesScript
         let attributedTempListName = AdClickAttributionRulesProvider.Constants.attributedTempRuleListName
         
         guard ContentBlocking.shared.privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .contentBlocking)
          else {
-            userContentController.removeLocalContentRuleList(withIdentifier: attributedTempListName)
+            userContentController?.removeLocalContentRuleList(withIdentifier: attributedTempListName)
             contentBlockerRulesScript?.currentAdClickAttributionVendor = nil
             contentBlockerRulesScript?.supplementaryTrackerData = []
             return
@@ -1107,11 +1103,11 @@ extension Tab: AdClickAttributionLogicDelegate {
             let globalAttributionListName = AdClickAttributionRulesSplitter.blockingAttributionRuleListName(forListNamed: globalListName)
             
             if vendor != nil {
-                userContentController.installLocalContentRuleList(rules.rulesList, identifier: attributedTempListName)
-                try? userContentController.disableGlobalContentRuleList(withIdentifier: globalAttributionListName)
+                userContentController?.installLocalContentRuleList(rules.rulesList, identifier: attributedTempListName)
+                try? userContentController?.disableGlobalContentRuleList(withIdentifier: globalAttributionListName)
             } else {
-                userContentController.removeLocalContentRuleList(withIdentifier: attributedTempListName)
-                try? userContentController.enableGlobalContentRuleList(withIdentifier: globalAttributionListName)
+                userContentController?.removeLocalContentRuleList(withIdentifier: attributedTempListName)
+                try? userContentController?.enableGlobalContentRuleList(withIdentifier: globalAttributionListName)
             }
             
             contentBlockerRulesScript?.supplementaryTrackerData = [rules.trackerData]
@@ -1380,9 +1376,9 @@ extension Tab: WKNavigationDelegate {
     @MainActor
     private func prepareForContentBlocking() async {
         // Ensure Content Blocking Assets (WKContentRuleList&UserScripts) are installed
-        if !userContentController.contentBlockingAssetsInstalled {
+        if userContentController?.contentBlockingAssetsInstalled == false {
             cbaTimeReporter?.tabWillWaitForRulesCompilation(self.instrumentation.currentTabIdentifier)
-            await userContentController.awaitContentBlockingAssetsInstalled()
+            await userContentController?.awaitContentBlockingAssetsInstalled()
             cbaTimeReporter?.reportWaitTimeForTabFinishedWaitingForRules(self.instrumentation.currentTabIdentifier)
         } else {
             cbaTimeReporter?.reportNavigationDidNotWaitForRules()
@@ -1640,7 +1636,7 @@ extension Tab: YoutubeOverlayUserScriptDelegate {
 extension Tab: TabDataClearing {
     func prepareForDataClearing(caller: TabDataCleaner) {
         webView.stopLoading()
-        userContentController.removeAllUserScripts()
+        webView.configuration.userContentController.removeAllUserScripts()
 
         webView.navigationDelegate = caller
         webView.load(URL(string: "about:blank")!)
