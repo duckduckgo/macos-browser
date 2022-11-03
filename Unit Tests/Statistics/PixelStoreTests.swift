@@ -81,7 +81,7 @@ final class PixelStoreTests: XCTestCase {
         XCTAssertEqual(store.cache, values)
         validateStore(with: values)
 
-        waitForExpectations(timeout: 15)
+        waitForExpectations(timeout: 0.1)
 
         XCTAssertEqual(store.cache, values)
         validateStore(with: values)
@@ -90,7 +90,7 @@ final class PixelStoreTests: XCTestCase {
     func testWhenValuesAreSavedThenTheyAreReloaded() {
         let values = ["a": NSNumber(value: 1.23), "b": NSNumber(value: 12), "c": "string" as NSString]
         addValues(values)
-        waitForExpectations(timeout: 5)
+        waitForExpectations(timeout: 0.1)
 
         makeStore()
 
@@ -116,7 +116,7 @@ final class PixelStoreTests: XCTestCase {
         XCTAssertEqual(store.cache, values)
         validateStore(with: values)
 
-        waitForExpectations(timeout: 5)
+        waitForExpectations(timeout: 0.1)
 
         makeStore()
 
@@ -140,7 +140,7 @@ final class PixelStoreTests: XCTestCase {
         XCTAssertEqual(store.cache, values)
         validateStore(with: values)
 
-        waitForExpectations(timeout: 5)
+        waitForExpectations(timeout: 0.1)
 
         makeStore()
 

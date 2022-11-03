@@ -68,9 +68,6 @@
             </BuildableReference>
             <SkippedTests>
                <Test
-                  Identifier = "AutoconsentMessageProtocolTests/testEval()">
-               </Test>
-               <Test
                   Identifier = "CBRCompileTimeReporterTests">
                </Test>
                <Test
