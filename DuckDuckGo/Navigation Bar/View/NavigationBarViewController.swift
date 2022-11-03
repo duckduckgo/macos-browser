@@ -68,24 +68,18 @@ final class NavigationBarViewController: NSViewController {
     private let goForwardButtonMenuDelegate: NavigationButtonMenuDelegate
     // swiftlint:enable weak_delegate
 
-    private var _bookmarkListPopover: BookmarkListPopover?
-    private var _saveCredentialsPopover: SaveCredentialsPopover?
-    private var _saveIdentityPopover: SaveIdentityPopover?
-    private var _savePaymentMethodPopover: SavePaymentMethodPopover?
-    private var _passwordManagementPopover: PasswordManagementPopover?
-
-    private lazy var downloadsPopover: DownloadsPopover = {
-        let downloadsPopover = DownloadsPopover()
-        downloadsPopover.delegate = self
-        (downloadsPopover.contentViewController as? DownloadsViewController)?.delegate = self
-        return downloadsPopover
-    }()
+    private var bookmarkListPopover: BookmarkListPopover?
+    private var saveCredentialsPopover: SaveCredentialsPopover?
+    private var saveIdentityPopover: SaveIdentityPopover?
+    private var savePaymentMethodPopover: SavePaymentMethodPopover?
+    private var passwordManagementPopover: PasswordManagementPopover?
+    private var downloadsPopover: DownloadsPopover?
     var isDownloadsPopoverShown: Bool {
-        downloadsPopover.isShown
+        downloadsPopover?.isShown ?? false
     }
 
     private var savePopovers: [NSPopover?] {
-        [_saveIdentityPopover, _saveCredentialsPopover, _savePaymentMethodPopover]
+        [saveIdentityPopover, saveCredentialsPopover, savePaymentMethodPopover]
     }
 
     private var urlCancellable: AnyCancellable?
@@ -221,16 +215,16 @@ final class NavigationBarViewController: NSViewController {
     }
 
     @IBAction func bookmarksButtonAction(_ sender: NSButton) {
-        if _bookmarkListPopover?.isShown == true {
-            _bookmarkListPopover?.close()
+        if bookmarkListPopover?.isShown == true {
+            bookmarkListPopover?.close()
         } else {
             showBookmarkListPopover()
         }
     }
 
     @IBAction func passwordManagementButtonAction(_ sender: NSButton) {
-        if _passwordManagementPopover?.isShown == true {
-            _passwordManagementPopover?.close()
+        if passwordManagementPopover?.isShown == true {
+            passwordManagementPopover?.close()
         } else {
             showPasswordManagementPopover(sender: sender, selectedCategory: nil)
         }
@@ -339,16 +333,16 @@ final class NavigationBarViewController: NSViewController {
             return false
         }
 
-        if _bookmarkListPopover?.isShown == true {
-            _bookmarkListPopover?.close()
+        if bookmarkListPopover?.isShown ?? false {
+            bookmarkListPopover?.close()
         }
 
-        if _passwordManagementPopover?.isShown == true {
-            _passwordManagementPopover?.close()
+        if passwordManagementPopover?.isShown ?? false {
+            passwordManagementPopover?.close()
         }
 
-        if downloadsPopover.isShown {
-            downloadsPopover.close()
+        if downloadsPopover?.isShown ?? false {
+            downloadsPopover?.close()
         }
 
         return true
@@ -357,8 +351,8 @@ final class NavigationBarViewController: NSViewController {
     func showBookmarkListPopover() {
         guard closeTransientPopovers() else { return }
 
-        let popover = _bookmarkListPopover ?? BookmarkListPopover()
-        _bookmarkListPopover = popover
+        let popover = bookmarkListPopover ?? BookmarkListPopover()
+        bookmarkListPopover = popover
         popover.delegate = self
 
         bookmarkListButton.isHidden = false
@@ -373,8 +367,8 @@ final class NavigationBarViewController: NSViewController {
     func showPasswordManagementPopover(sender: Any, selectedCategory: SecureVaultSorting.Category?) {
         guard closeTransientPopovers() else { return }
 
-        let popover = _passwordManagementPopover ?? PasswordManagementPopover()
-        _passwordManagementPopover = popover
+        let popover = passwordManagementPopover ?? PasswordManagementPopover()
+        passwordManagementPopover = popover
         popover.delegate = self
 
         passwordManagementButton.isHidden = false
@@ -385,19 +379,27 @@ final class NavigationBarViewController: NSViewController {
     }
 
     func toggleDownloadsPopover(keepButtonVisible: Bool) {
-        if downloadsPopover.isShown {
-            downloadsPopover.close()
+        if downloadsPopover?.isShown ?? false {
+            downloadsPopover?.close()
             return
         }
         guard closeTransientPopovers(),
               downloadsButton.window != nil
         else { return }
 
+        let popover = DownloadsPopover()
+        popover.delegate = self
+        popover.viewController.delegate = self
+        downloadsPopover = popover
+
         downloadsButton.isHidden = false
         if keepButtonVisible {
             setDownloadButtonHidingTimer()
         }
-        downloadsPopover.show(relativeTo: downloadsButton.bounds.insetFromLineOfDeath(), of: downloadsButton, preferredEdge: .maxY)
+
+        popover.show(relativeTo: downloadsButton.bounds.insetFromLineOfDeath(),
+                     of: downloadsButton,
+                     preferredEdge: .maxY)
     }
 
     private var downloadsPopoverTimer: Timer?
@@ -406,12 +408,12 @@ final class NavigationBarViewController: NSViewController {
             self?.downloadsPopoverTimer?.invalidate()
             self?.downloadsPopoverTimer = nil
 
-            if self?.downloadsPopover.isShown ?? false {
-                self?.downloadsPopover.close()
+            if self?.downloadsPopover?.isShown ?? false {
+                self?.downloadsPopover?.close()
             }
         }
 
-        if !self.downloadsPopover.isShown {
+        if !isDownloadsPopoverShown {
             self.toggleDownloadsPopover(keepButtonVisible: true)
 
             downloadsPopoverTimer = Timer.scheduledTimer(withTimeInterval: Constants.downloadsPopoverAutoHidingInterval,
@@ -531,7 +533,7 @@ final class NavigationBarViewController: NSViewController {
             return
         }
 
-        if _passwordManagementPopover?.viewController.isDirty == true {
+        if passwordManagementPopover?.viewController.isDirty == true {
             passwordManagementButton.image = NSImage(named: "PasswordManagementDirty")
             return
         }
@@ -539,14 +541,14 @@ final class NavigationBarViewController: NSViewController {
         if LocalPinningManager.shared.isPinned(.autofill) {
             passwordManagementButton.isHidden = false
         } else {
-            passwordManagementButton.isHidden = !(_passwordManagementPopover?.isShown ?? false)
+            passwordManagementButton.isHidden = !(passwordManagementPopover?.isShown ?? false)
         }
 
-        _passwordManagementPopover?.viewController.domain = nil
+        passwordManagementPopover?.viewController.domain = nil
         guard let url = url, let domain = url.host else {
             return
         }
-        _passwordManagementPopover?.viewController.domain = domain
+        passwordManagementPopover?.viewController.domain = domain
     }
 
     private func updateDownloadsButton(updatingFromPinnedViewsNotification: Bool = false) {
@@ -569,7 +571,7 @@ final class NavigationBarViewController: NSViewController {
         downloadsButton.isHidden = !(hasActiveDownloads || isTimerActive)
 
         if !downloadsButton.isHidden { setDownloadButtonHidingTimer() }
-        downloadsButton.isMouseDown = downloadsPopover.isShown
+        downloadsButton.isMouseDown = isDownloadsPopoverShown
         
         // If the user has selected Hide Downloads from the navigation bar context menu, and no downloads are active, then force it to be hidden
         // even if the timer is active.
@@ -604,8 +606,8 @@ final class NavigationBarViewController: NSViewController {
 
     private func hideDownloadButtonIfPossible() {
         if LocalPinningManager.shared.isPinned(.downloads) ||
-        DownloadListCoordinator.shared.hasActiveDownloads ||
-        self.downloadsPopover.isShown { return }
+            DownloadListCoordinator.shared.hasActiveDownloads ||
+            isDownloadsPopoverShown { return }
         
         downloadsButton.isHidden = true
     }
@@ -621,7 +623,7 @@ final class NavigationBarViewController: NSViewController {
         if LocalPinningManager.shared.isPinned(.bookmarks) {
             bookmarkListButton.isHidden = false
         } else {
-            bookmarkListButton.isHidden = !(_bookmarkListPopover?.isShown ?? false)
+            bookmarkListButton.isHidden = !(bookmarkListPopover?.isShown ?? false)
         }
     }
 
@@ -642,15 +644,15 @@ final class NavigationBarViewController: NSViewController {
         if autofillPreferences.askToSaveUsernamesAndPasswords, let credentials = data.credentials {
             os_log("Presenting Save Credentials popover", log: .passwordManager)
             showSaveCredentialsPopover()
-            _saveCredentialsPopover?.viewController.update(credentials: credentials, automaticallySaved: data.automaticallySavedCredentials)
+            saveCredentialsPopover?.viewController.update(credentials: credentials, automaticallySaved: data.automaticallySavedCredentials)
         } else if autofillPreferences.askToSavePaymentMethods, let card = data.creditCard {
             os_log("Presenting Save Payment Method popover", log: .passwordManager)
             showSavePaymentMethodPopover()
-            _savePaymentMethodPopover?.viewController.savePaymentMethod(card)
+            savePaymentMethodPopover?.viewController.savePaymentMethod(card)
         } else if autofillPreferences.askToSaveAddresses, let identity = data.identity {
             os_log("Presenting Save Identity popover", log: .passwordManager)
             showSaveIdentityPopover()
-            _saveIdentityPopover?.viewController.saveIdentity(identity)
+            saveIdentityPopover?.viewController.saveIdentity(identity)
         } else {
             os_log("Received save autofill data call, but there was no data to present", log: .passwordManager)
         }
@@ -659,21 +661,21 @@ final class NavigationBarViewController: NSViewController {
     private func showSaveCredentialsPopover() {
         let popover = SaveCredentialsPopover()
         popover.delegate = self
-        _saveCredentialsPopover = popover
+        saveCredentialsPopover = popover
         show(popover: popover)
     }
 
     private func showSavePaymentMethodPopover() {
         let popover = SavePaymentMethodPopover()
         popover.delegate = self
-        _savePaymentMethodPopover = popover
+        savePaymentMethodPopover = popover
         show(popover: popover)
     }
 
     private func showSaveIdentityPopover() {
         let popover = SaveIdentityPopover()
         popover.delegate = self
-        _saveIdentityPopover = popover
+        saveIdentityPopover = popover
         show(popover: popover)
     }
 
@@ -811,23 +813,24 @@ extension NavigationBarViewController: NSPopoverDelegate {
 
     /// We check references here because these popovers might be on other windows.
     func popoverDidClose(_ notification: Notification) {
-        if notification.object as AnyObject? === downloadsPopover {
+        if let popover = downloadsPopover, notification.object as AnyObject? === popover {
+            downloadsPopover = nil
             updateDownloadsButton()
             downloadsPopoverTimer?.invalidate()
             downloadsPopoverTimer = nil
-        } else if let popover = _bookmarkListPopover, notification.object as AnyObject? === popover {
+        } else if let popover = bookmarkListPopover, notification.object as AnyObject? === popover {
+            bookmarkListPopover = nil
             updateBookmarksButton()
-            _bookmarkListPopover = nil
-        } else if let popover = _passwordManagementPopover, notification.object as AnyObject? === popover {
-            _passwordManagementPopover = nil
-        } else if let popover = _saveIdentityPopover, notification.object as AnyObject? === popover {
-            _saveIdentityPopover = nil
+        } else if let popover = passwordManagementPopover, notification.object as AnyObject? === popover {
+            passwordManagementPopover = nil
+        } else if let popover = saveIdentityPopover, notification.object as AnyObject? === popover {
+            saveIdentityPopover = nil
             updatePasswordManagementButton()
-        } else if let popover = _saveCredentialsPopover, notification.object as AnyObject? === popover {
-            _saveCredentialsPopover = nil
+        } else if let popover = saveCredentialsPopover, notification.object as AnyObject? === popover {
+            saveCredentialsPopover = nil
             updatePasswordManagementButton()
-        } else if let popover = _savePaymentMethodPopover, notification.object as AnyObject? === popover {
-            _savePaymentMethodPopover = nil
+        } else if let popover = savePaymentMethodPopover, notification.object as AnyObject? === popover {
+            savePaymentMethodPopover = nil
             updatePasswordManagementButton()
         }
     }
@@ -861,7 +864,7 @@ extension NavigationBarViewController {
         let mockCredentials = SecureVaultModels.WebsiteCredentials(account: account, password: "password".data(using: .utf8)!)
         
         showSaveCredentialsPopover()
-        _saveCredentialsPopover?.viewController.update(credentials: mockCredentials, automaticallySaved: false)
+        saveCredentialsPopover?.viewController.update(credentials: mockCredentials, automaticallySaved: false)
     }
     
     fileprivate func showMockCredentialsSavedPopover() {
@@ -869,7 +872,7 @@ extension NavigationBarViewController {
         let mockCredentials = SecureVaultModels.WebsiteCredentials(account: account, password: "password".data(using: .utf8)!)
         
         showSaveCredentialsPopover()
-        _saveCredentialsPopover?.viewController.update(credentials: mockCredentials, automaticallySaved: true)
+        saveCredentialsPopover?.viewController.update(credentials: mockCredentials, automaticallySaved: true)
     }
     
 }
