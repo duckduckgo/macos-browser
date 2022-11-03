@@ -29,8 +29,6 @@ protocol TabDelegate: FileDownloadManagerDelegate, ContentOverlayUserScriptDeleg
     func tabWillStartNavigation(_ tab: Tab, isUserInitiated: Bool)
     func tabDidStartNavigation(_ tab: Tab)
     func tab(_ tab: Tab, requestedNewTabWith content: Tab.TabContent, selected: Bool)
-    // swiftlint:disable:next function_parameter_count
-    func tab(_ tab: Tab, willShowContextMenuAt position: NSPoint, image: URL?, title: String?, link: URL?, selectedText: String?)
     func tab(_ tab: Tab, requestedOpenExternalURL url: URL, forUserEnteredURL: Bool)
     func tab(_ tab: Tab, requestedSaveAutofillData autofillData: AutofillData)
     func tab(_ tab: Tab,
@@ -147,10 +145,12 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         }
     }
 
-    weak var autofillScript: WebsiteAutofillUserScript?
+    private let contextMenuManager = ContextMenuManager()
+    private weak var autofillScript: WebsiteAutofillUserScript?
     weak var delegate: TabDelegate? {
         didSet {
             autofillScript?.currentOverlayTab = delegate
+            contextMenuManager.delegate = self
         }
     }
     
@@ -509,6 +509,10 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         self.fbBlockingEnabled = enabled
 
         return true
+    }
+
+    func decideNewWindowPolicy(for navigationAction: WKNavigationAction) -> NewWindowPolicy? {
+        contextMenuManager.decideNewWindowPolicy(for: navigationAction)
     }
 
     var cbrCompletionTokensPublisher: AnyPublisher<[ContentBlockerRulesManager.CompletionToken], Never> {
@@ -898,7 +902,7 @@ extension Tab: UserContentControllerDelegate {
     func userContentController(_ userContentController: UserContentController, didInstallUserScripts userScripts: UserScripts) {
         userScripts.debugScript.instrumentation = instrumentation
         userScripts.faviconScript.delegate = self
-        userScripts.contextMenuScript.delegate = self
+        userScripts.contextMenuScript.delegate = self.contextMenuManager
         userScripts.surrogatesScript.delegate = self
         userScripts.contentBlockerRulesScript.delegate = self
         userScripts.clickToLoadScript.delegate = self
@@ -975,16 +979,18 @@ extension Tab: PageObserverUserScriptDelegate {
 
 }
 
-extension Tab: ContextMenuDelegate {
+extension Tab: NSMenuDelegate, ContextMenuDelegate {
 
-    // swiftlint:disable:next function_parameter_count
-    func contextMenu(forUserScript script: ContextMenuUserScript,
-                     willShowAt position: NSPoint,
-                     image: URL?,
-                     title: String?,
-                     link: URL?,
-                     selectedText: String?) {
-        delegate?.tab(self, willShowContextMenuAt: position, image: image, title: title, link: link, selectedText: selectedText)
+    func menuWillOpen(_ menu: NSMenu) {
+        contextMenuManager.menuWillOpen(menu)
+    }
+
+    func menuDidClose(_ menu: NSMenu) {
+        contextMenuManager.menuDidClose(menu)
+    }
+
+    func openNewTab(with url: URL, selected: Bool) {
+        delegate?.tab(self, requestedNewTabWith: .url(url), selected: selected)
     }
 
 }
@@ -1228,8 +1234,24 @@ extension Tab: WKNavigationDelegate {
         }()
 
         let isMiddleButtonClicked = navigationAction.buttonNumber == Constants.webkitMiddleClick
-        let isRequestingNewTab = (isLinkActivated && NSApp.isCommandPressed) || isMiddleButtonClicked || isNavigatingAwayFromPinnedTab
-        let shouldSelectNewTab = NSApp.isShiftPressed || (isNavigatingAwayFromPinnedTab && !isMiddleButtonClicked && !NSApp.isCommandPressed)
+
+        // to be modularized later on, see https://app.asana.com/0/0/1203268245242140/f
+        var isRequestingNewTab = (isLinkActivated && NSApp.isCommandPressed) || isMiddleButtonClicked || isNavigatingAwayFromPinnedTab
+        var shouldSelectNewTab = NSApp.isShiftPressed || (isNavigatingAwayFromPinnedTab && !isMiddleButtonClicked && !NSApp.isCommandPressed)
+
+        switch await contextMenuManager.decidePolicy(for: navigationAction) {
+        case .instantAllow:
+            return .allow
+        case .newTab(selected: let selected):
+            isRequestingNewTab = true
+            shouldSelectNewTab = shouldSelectNewTab || selected
+        case .cancel:
+            return .cancel
+        case .download:
+            return .download(navigationAction, using: webView)
+        case .none:
+            break
+        }
 
         // This check needs to happen before GPC checks. Otherwise the navigation type may be rewritten to `.other`
         // which would skip link rewrites.
@@ -1518,13 +1540,13 @@ extension Tab: WKNavigationDelegate {
     }
 
     @objc(_webView:didStartProvisionalLoadWithRequest:inFrame:)
-    func webView(_ webView: WKWebView, didStartProvisionalLoadWithRequest request: URLRequest, inFrame frame: WKFrameInfo) {
+    func webView(_ webView: WKWebView, didStartProvisionalLoadWithRequest request: URLRequest, in frame: WKFrameInfo) {
         guard frame.isMainFrame else { return }
         self.mainFrameLoadState = .provisional
     }
 
     @objc(_webView:didCommitLoadWithRequest:inFrame:)
-    func webView(_ webView: WKWebView, didCommitLoadWithRequest request: URLRequest, inFrame frame: WKFrameInfo) {
+    func webView(_ webView: WKWebView, didCommitLoadWithRequest request: URLRequest, in frame: WKFrameInfo) {
         guard frame.isMainFrame else { return }
         self.mainFrameLoadState = .committed
     }
@@ -1537,7 +1559,7 @@ extension Tab: WKNavigationDelegate {
     }
 
     @objc(_webView:didFinishLoadWithRequest:inFrame:)
-    func webView(_ webView: WKWebView, didFinishLoadWithRequest request: URLRequest, inFrame frame: WKFrameInfo) {
+    func webView(_ webView: WKWebView, didFinishLoadWithRequest request: URLRequest, in frame: WKFrameInfo) {
         guard frame.isMainFrame else { return }
         self.mainFrameLoadState = .finished
 
@@ -1547,7 +1569,7 @@ extension Tab: WKNavigationDelegate {
     @objc(_webView:didFailProvisionalLoadWithRequest:inFrame:withError:)
     func webView(_ webView: WKWebView,
                  didFailProvisionalLoadWithRequest request: URLRequest,
-                 inFrame frame: WKFrameInfo,
+                 in frame: WKFrameInfo,
                  withError error: Error) {
         guard frame.isMainFrame else { return }
         self.mainFrameLoadState = .finished
@@ -1577,6 +1599,14 @@ extension Tab: WKWebViewDownloadDelegate {
             }
         }
     }
+
+    @objc(_webView:contextMenuDidCreateDownload:)
+    func webView(_ webView: WKWebView, contextMenuDidCreateDownload download: WebKitDownload) {
+        let location: FileDownloadManager.DownloadLocationPreference
+            = contextMenuManager.shouldAskForDownloadLocation() == false ? .auto : .prompt
+        FileDownloadManager.shared.add(download, delegate: self.delegate, location: location, postflight: .none)
+    }
+
 }
 
 extension Tab {

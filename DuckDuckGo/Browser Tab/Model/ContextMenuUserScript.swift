@@ -19,66 +19,82 @@
 import WebKit
 import BrowserServicesKit
 
-protocol ContextMenuDelegate: AnyObject {
+protocol ContextMenuUserScriptDelegate: AnyObject {
 
-    // swiftlint:disable:next function_parameter_count
-    func contextMenu(forUserScript script: ContextMenuUserScript,
-                     willShowAt position: NSPoint,
-                     image: URL?,
-                     title: String?,
-                     link: URL?,
-                     selectedText: String?)
+    func willShowContextMenu(at position: NSPoint, with context: ContextMenuUserScript.Context)
 
 }
 
 final class ContextMenuUserScript: NSObject, StaticUserScript {
+
+    enum Element {
+        case link(url: URL?, title: String?)
+        case image(URL?)
+        case video(URL?)
+        case other(tag: String, html: String?)
+    }
+    struct Context {
+        let elements: [Element]
+        let selectedText: String?
+        let frame: WKFrameInfo
+
+        var link: (url: URL?, title: String?)? {
+            for item in elements {
+                if case let .link(url: url, title: title) = item {
+                    return (url, title)
+                }
+            }
+            return nil
+        }
+        var videoURL: URL? {
+            for item in elements {
+                if case .video(let url) = item {
+                    return url
+                }
+            }
+            return nil
+        }
+    }
 
     static var injectionTime: WKUserScriptInjectionTime { .atDocumentStart }
     static var forMainFrameOnly: Bool { false }
     static var script: WKUserScript = ContextMenuUserScript.makeWKUserScript()
     var messageNames: [String] { ["contextMenu"] }
 
-    weak var delegate: ContextMenuDelegate?
-
-    var lastAnchor: URL?
-    var lastImage: URL?
+    weak var delegate: ContextMenuUserScriptDelegate?
 
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
 
         guard let dict = message.body as? [String: Any],
               let point = point(from: dict) else { return }
 
-        var image: URL?
-        var link: URL?
-        var title: String?
+        var elements = [Element]()
         let selectedText = dict["selectedText"] as? String
 
-        guard let elements = dict["elements"] as? [[String: String]] else { return }
-        elements.forEach { dict in
+        guard let elementsArray = dict["elements"] as? [[String: String]] else { return }
+        elementsArray.forEach { dict in
 
             guard let url = dict["url"] else { return }
 
             switch dict["tagName"] {
             case "A":
-                link = URL(string: url)
-                title = dict["title"]
+                elements.append(.link(url: URL(string: url), title: dict["title"]))
 
             case "IMG":
-                image = URL(string: url)
+                elements.append(.image(URL(string: url)))
                 
             case "VIDEO":
-                link = URL(string: url)
+                elements.append(.video(URL(string: url)))
+
+            case let .some(tagName):
+                elements.append(.other(tag: tagName, html: dict["html"]))
 
             default: break
             }
         }
 
-        delegate?.contextMenu(forUserScript: self,
-                              willShowAt: point,
-                              image: image,
-                              title: title,
-                              link: link,
-                              selectedText: selectedText)
+        let context = Context(elements: elements, selectedText: selectedText, frame: message.frameInfo)
+        delegate?.willShowContextMenu(at: point, with: context)
     }
 
     private func point(from dict: [String: Any]) -> NSPoint? {
@@ -130,13 +146,16 @@ final class ContextMenuUserScript: NSObject, StaticUserScript {
                     "tagName": "IMG",
                     "url": e.srcElement.src
                 });
-            }
-
-            if (e.srcElement.tagName === "VIDEO") {
+            } else if (e.srcElement.tagName === "VIDEO") {
                 console.log("Got video");
                 context.elements.push({
                     "tagName": "VIDEO",
                     "url": e.srcElement.currentSrc
+                });
+            } else {
+                context.elements.push({
+                    "tagName": e.srcElement.tagName,
+                    "url": e.srcElement.outerHTML
                 });
             }
 

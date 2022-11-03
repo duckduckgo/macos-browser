@@ -66,6 +66,8 @@ private extension LegacyWebKitDownloadDelegate {
         } else if let navigationResponse = self.navigationResponses[url] {
             self.navigationResponses[url] = nil
             delegate.webView(webView, navigationResponse: navigationResponse, didBecomeDownload: download)
+        } else {
+            delegate.webView(webView, contextMenuDidCreateDownload: download)
         }
     }
 
