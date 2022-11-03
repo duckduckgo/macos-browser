@@ -26,17 +26,11 @@ final class GrammarFeaturesManager {
         case grammarChecking
         case autocorrection
 
-        var webKitPreferenceKeys: [WebKitPreferenceKey] {
+        var webKitPreferenceKey: WebKitPreferenceKey {
             switch self {
-            case .continuousSpellChecking: return [.WebContinuousSpellCheckingEnabled]
-            case .grammarChecking: return [.WebGrammarCheckingEnabled]
-            case .autocorrection: return [
-                .WebAutomaticSpellingCorrectionEnabled,
-                .WebAutomaticTextReplacementEnabled,
-                .WebAutomaticQuoteSubstitutionEnabled,
-                .WebAutomaticLinkDetectionEnabled,
-                .WebAutomaticDashSubstitutionEnabled
-            ]
+            case .continuousSpellChecking: return .WebContinuousSpellCheckingEnabled
+            case .grammarChecking: return .WebGrammarCheckingEnabled
+            case .autocorrection: return .WebAutomaticSpellingCorrectionEnabled
             }
         }
     }
@@ -52,10 +46,6 @@ final class GrammarFeaturesManager {
 
         // Autocorrection
         case WebAutomaticSpellingCorrectionEnabled
-        case WebAutomaticTextReplacementEnabled
-        case WebAutomaticQuoteSubstitutionEnabled
-        case WebAutomaticLinkDetectionEnabled
-        case WebAutomaticDashSubstitutionEnabled
     }
     // swiftlint:enable identifier_name
 
@@ -72,17 +62,13 @@ final class GrammarFeaturesManager {
                 return
             }
 
-            for key in feature.webKitPreferenceKeys {
-                UserDefaults.standard.setValue(true, forKey: key.rawValue)
-            }
+            UserDefaults.standard.setValue(true, forKey: feature.webKitPreferenceKey.rawValue)
 
             alreadyEnabledOnce = true
         }
 
         func disableFeature(_ feature: Feature) {
-            for key in feature.webKitPreferenceKeys {
-                UserDefaults.standard.setValue(false, forKey: key.rawValue)
-            }
+            UserDefaults.standard.setValue(false, forKey: feature.webKitPreferenceKey.rawValue)
         }
 
         enableFeatureOnce(.continuousSpellChecking, alreadyEnabledOnce: &spellingCheckEnabledOnce)
