@@ -263,6 +263,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
     let webView: WebView
     private(set) var serpWebView: WebView?
+    private var searchPanelUserScript: SearchPanelUserScript?
 
     private var lastUpgradedURL: URL?
 
@@ -461,26 +462,42 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         }
 
         if #available(macOS 12.0, *), webView.backForwardList.backItem?.url.isDuckDuckGoSearch == true {
-            prepareAndShowSERPWebView()
-        } else {
-            webView.goBack()
+            if prepareAndShowSERPWebView() {
+                return
+            }
+            if webView.backForwardList.backItem?.url == serpWebView?.backForwardList.currentItem?.url {
+                hideSERPWebView()
+            }
         }
+
+        webView.goBack()
     }
 
     @available(macOS 12.0, *)
-    fileprivate func prepareAndShowSERPWebView() {
+    fileprivate func prepareAndShowSERPWebView() -> Bool {
         if serpWebView == nil {
-            serpWebView = WebView(frame: .zero, configuration: webView.configuration)
+            serpWebView = WebView(frame: .zero, configuration: WKWebViewConfiguration())
             serpWebView?.allowsLinkPreview = false
+            let script = SearchPanelUserScript()
+            script.delegate = self
+            serpWebView?.configuration.userContentController.addHandler(script)
+            searchPanelUserScript = script
         }
-        serpWebView?.interactionState = webView.interactionState
-        serpWebView?.goBack()
 
-        delegate?.tabDidRequestSearchResults(self)
+        if let serpWebView, serpWebView.superview == nil, let url = webView.url {
+            serpWebView.interactionState = webView.interactionState
+            _ = serpWebView.goBack()
+            searchPanelUserScript?.highlightSearchResult(with: url, inWebView: serpWebView)
+            delegate?.tabDidRequestSearchResults(self)
+            return true
+        }
+        return false
     }
 
     fileprivate func hideSERPWebView() {
         delegate?.tabDidCloseSearchResults(self)
+        serpWebView = nil
+        searchPanelUserScript = nil
     }
 
     func go(to item: WKBackForwardListItem) {
@@ -1676,13 +1693,24 @@ extension Tab: TabDataClearing {
 extension Tab: SwipeUserScriptDelegate {
     func swipeUserScriptDidDetectSwipeBack(_ swipeUserScript: SwipeUserScript) {
         if #available(macOS 12.0, *), webView.backForwardList.backItem?.url.isDuckDuckGoSearch == true {
-            prepareAndShowSERPWebView()
-        } else {
-            webView.goBack()
+            if prepareAndShowSERPWebView() {
+                return
+            }
+            if webView.backForwardList.backItem?.url == serpWebView?.backForwardList.currentItem?.url {
+                hideSERPWebView()
+            }
         }
+
+        webView.goBack()
     }
 
     func swipeUserScriptDidDetectSwipeForward(_ swipeUserScript: SwipeUserScript) {
         hideSERPWebView()
+    }
+}
+
+extension Tab: SearchPanelUserScriptDelegate {
+    func searchPanelUserScript(_ searchPanelUserScript: SearchPanelUserScript, didSelectSearchResult url: URL) {
+        webView.load(url)
     }
 }

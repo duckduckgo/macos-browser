@@ -28,17 +28,11 @@ final class SwipeUserScript: NSObject, UserScript {
 
     public weak var delegate: SwipeUserScriptDelegate?
 
-    public var source: String = """
-(function() {
-
-}) ();
-"""
+    lazy var source: String = SwipeUserScript.loadJS("swipe", from: .main)
 
     public var injectionTime: WKUserScriptInjectionTime = .atDocumentStart
     public var forMainFrameOnly: Bool = true
     public var messageNames: [String] = ["swipeBack", "swipeForward"]
-
-    private(set) var lastURL: URL?
 
     public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         switch message.name {
