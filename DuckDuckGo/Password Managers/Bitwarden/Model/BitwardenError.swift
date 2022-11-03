@@ -33,6 +33,8 @@ enum BitwardenError: Error {
     case sendingOfStatusMessageFailed
     case injectingOfSharedKeyFailed
     case runningOfProxyProcessFailed
+    case credentialCreationFailed
+    case credentialUpdateFailed
 
     // Errors received from Bitwarden
     case bitwardenCannotDecrypt
@@ -52,6 +54,8 @@ enum BitwardenError: Error {
         case .runningOfProxyProcessFailed: return "Running of proxy process failed"
         case .bitwardenCannotDecrypt: return "Bitwarden cannot decrypt the message"
         case .bitwardenRespondedWithError: return "Bitwarden responded with error"
+        case .credentialCreationFailed: return "Credential creation in Bitwarden failed"
+        case .credentialUpdateFailed: return "Credential update in Bitwarden failed"
         }
     }
 

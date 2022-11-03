@@ -18,17 +18,22 @@
 
 import Foundation
 
+typealias Base64EncodedString = String
+typealias MessageId = String
+
 enum BitwardenCommand: String, Codable {
     case connected // Returned after the proxy process conects to Bitwarden app successfully
     case disconnected // Returned when the conection from the proxy process to Bitwarden is canceled
     case status = "bw-status"
     case handshake = "bw-handshake"
     case credentialRetrieval = "bw-credential-retrieval"
+    case credentialCreate = "bw-credential-create"
+    case credentialUpdate = "bw-credential-update"
 }
 
 struct BitwardenRequest: Codable {
 
-    let messageId: String?
+    let messageId: MessageId?
     let version: Int?
     let encryptedCommand: Base64EncodedString
 
@@ -39,8 +44,31 @@ struct BitwardenRequest: Codable {
         let payload: Payload?
 
         struct Payload: Codable {
+            internal init(uri: String? = nil,
+                          userId: String? = nil,
+                          userName: String? = nil,
+                          password: String? = nil,
+                          name: String? = nil,
+                          credentialId: String? = nil) {
+                self.uri = uri
+                self.userId = userId
+                self.userName = userName
+                self.password = password
+                self.name = name
+                self.credentialId = credentialId
+            }
+
             // Credential Retrieval
             let uri: String?
+
+            // Credential Creation
+            let userId: String?
+            let userName: String?
+            let password: String?
+            let name: String?
+
+            // Credential Update
+            let credentialId: String?
         }
 
         var data: Data? {
@@ -66,12 +94,10 @@ struct BitwardenRequest: Codable {
 
 }
 
-typealias Base64EncodedString = String
-
 //TODO: Divide at least to response and request
 struct BitwardenMessage: Codable {
 
-    let messageId: String?
+    let messageId: MessageId?
     let version: Int?
     let payload: Payload?
     let command: BitwardenCommand?
@@ -241,6 +267,12 @@ struct BitwardenMessage: Codable {
 
     static func makeCredentialRetrievalMessage(encryptedCommand: String) -> BitwardenRequest? {
         return BitwardenRequest(messageId: generateMessageId(),
+                                version: version,
+                                encryptedCommand: encryptedCommand)
+    }
+
+    static func makeCredentialCreationMessage(encryptedCommand: String, messageId: String) -> BitwardenRequest? {
+        return BitwardenRequest(messageId: messageId,
                                 version: version,
                                 encryptedCommand: encryptedCommand)
     }

@@ -209,11 +209,13 @@ final class BitwardenManager: BitwardenManagement, ObservableObject {
         }
     }
 
-    private func handleError(_ error: String) {
+    private func handleError(_ error: String, blocking: Bool) {
         switch error {
         case "cannot-decrypt":
             os_log("BitwardenManagement: Bitwarden error - cannot decrypt", type: .error)
-            status = .error(error: .bitwardenCannotDecrypt)
+            if blocking {
+                status = .error(error: .bitwardenCannotDecrypt)
+            }
             //TODO: callback
         default: os_log("BitwardenManagement: Bitwarden error - unknown", type: .error)
             status = .error(error: .bitwardenRespondedWithError)
@@ -243,7 +245,7 @@ final class BitwardenManager: BitwardenManagement, ObservableObject {
         sendStatus()
     }
 
-    private func handleEncryptedResponse(_ encryptedPayload: BitwardenMessage.EncryptedPayload) {
+    private func handleEncryptedResponse(_ encryptedPayload: BitwardenMessage.EncryptedPayload, messageId: MessageId) {
         guard let dataString = encryptedPayload.data,
               let data = Data(base64Encoded: dataString),
               let ivDataString = encryptedPayload.iv,
@@ -269,30 +271,37 @@ final class BitwardenManager: BitwardenManagement, ObservableObject {
             return
         }
 
-        //TODO: ! check message command
-//        switch message.command {
-//        case .connected: print("")
-//        case .disconnected: print("")
-//        default: print("")
-//        }
+        switch message.command {
+        case .credentialRetrieval:
+            if let payload = message.payload {
+                handleCredentialRetrievalResponse(payload: payload)
+                return
+            }
+        case .credentialCreate:
+            if case let .item(payloadIdem) = message.payload {
+                handleCredentialCreationResponse(messageId: messageId, payloadItem: payloadIdem)
+                return
+            }
+        case .credentialUpdate:
+            if case let .item(payloadIdem) = message.payload {
+                handleCredentialUpdateResponse(messageId: messageId, payloadItem: payloadIdem)
+                return
+            }
 
+        default: break
+        }
+
+        //TODO: Refactor to use command for triage (as above)
         switch message.payload {
-        case .item:
-            //TODO: Handle other messages
-            assertionFailure("Unhandled case")
         case .array(let payloadItemArray):
             if payloadItemArray.first?.status != nil {
                 handleStatusResponse(payloadItemArray: payloadItemArray)
+                return
             }
-            if payloadItemArray.first?.credentialId != nil {
-                handleCredentialRetrievalResponse(payloadItemArray: payloadItemArray)
-            }
-        case .none:
-            //TODO: Handle none
-            assertionFailure("Unhandled case")
-            return
+        default: break
         }
 
+        assertionFailure("Unhandled response")
     }
 
     private func handleStatusResponse(payloadItemArray: [BitwardenMessage.PayloadItem]) {
@@ -313,14 +322,47 @@ final class BitwardenManager: BitwardenManagement, ObservableObject {
         }
     }
 
-    private func handleCredentialRetrievalResponse(payloadItemArray: [BitwardenMessage.PayloadItem]) {
+    private func handleCredentialRetrievalResponse(payload: BitwardenMessage.Payload) {
         // TODO: Error
-        let credentials = payloadItemArray.compactMap { BitwardenCredential(from: $0) }
-        for completion in retrieveCredentialsCompletionCache {
-            completion(credentials, nil)
+        // TODO: Use message ID
+        if case let .array(payloadItemArray) = payload {
+            let credentials = payloadItemArray.compactMap { BitwardenCredential(from: $0) }
+            for completion in retrieveCredentialsCompletionCache {
+                completion(credentials, nil)
+            }
+            retrieveCredentialsCompletionCache = []
         }
-        retrieveCredentialsCompletionCache = []
         //TODO: refactor to delete before called
+    }
+
+    private func handleCredentialCreationResponse(messageId: MessageId, payloadItem: BitwardenMessage.PayloadItem) {
+
+        guard let completion = createCredentialCompletionCache[messageId] else {
+            assertionFailure("Missing completion block")
+            return
+        }
+        createCredentialCompletionCache[messageId] = nil
+
+        if payloadItem.status == "success" {
+            completion(nil)
+        } else {
+            completion(BitwardenError.credentialCreationFailed)
+        }
+    }
+
+    private func handleCredentialUpdateResponse(messageId: MessageId, payloadItem: BitwardenMessage.PayloadItem) {
+
+        guard let completion = updateCredentialCompletionCache[messageId] else {
+            assertionFailure("Missing completion block")
+            return
+        }
+        updateCredentialCompletionCache[messageId] = nil
+
+        if payloadItem.status == "success" {
+            completion(nil)
+        } else {
+            completion(BitwardenError.credentialUpdateFailed)
+        }
     }
 
     // MARK: - Sending Messages
@@ -391,6 +433,63 @@ final class BitwardenManager: BitwardenManagement, ObservableObject {
 
         communicator.send(messageData: messageData)
     }
+
+    private func sendCredentialCreation(_ credential: BitwardenCredential, messageId: MessageId) {
+        let payload = BitwardenRequest.EncryptedCommand.Payload(uri: credential.url,
+                                                                userId: credential.userId,
+                                                                userName: credential.username,
+                                                                password: credential.password,
+                                                                name: credential.credentialName)
+        guard let commandData = BitwardenRequest.EncryptedCommand(command: .credentialCreate,
+                                                                  payload: payload).data else {
+            assertionFailure("Making the credential retrieval message failed")
+            status = .error(error: .sendingOfStatusMessageFailed)
+            return
+        }
+
+        guard let encryptedData = openSSLWrapper.encryptData(commandData) else {
+            status = .error(error: .sendingOfStatusMessageFailed)
+            return
+        }
+
+        let encryptedCommand = "2.\(encryptedData.iv.base64EncodedString())|\(encryptedData.data.base64EncodedString())|\(encryptedData.hmac.base64EncodedString())"
+
+        guard let messageData = BitwardenMessage.makeCredentialCreationMessage(encryptedCommand: encryptedCommand, messageId: messageId)?.data else {
+            assertionFailure("Making the status message failed")
+            return
+        }
+
+        communicator.send(messageData: messageData)
+    }
+
+    private func sendCredentialUpdate(_ credential: BitwardenCredential, messageId: MessageId) {
+        let payload = BitwardenRequest.EncryptedCommand.Payload(uri: credential.url,
+                                                                userId: credential.userId,
+                                                                userName: credential.username,
+                                                                password: credential.password,
+                                                                name: credential.credentialName,
+                                                                credentialId: credential.credentialId)
+        guard let commandData = BitwardenRequest.EncryptedCommand(command: .credentialUpdate,
+                                                                  payload: payload).data else {
+            assertionFailure("Making the credential retrieval message failed")
+            status = .error(error: .sendingOfStatusMessageFailed)
+            return
+        }
+
+        guard let encryptedData = openSSLWrapper.encryptData(commandData) else {
+            status = .error(error: .sendingOfStatusMessageFailed)
+            return
+        }
+
+        let encryptedCommand = "2.\(encryptedData.iv.base64EncodedString())|\(encryptedData.data.base64EncodedString())|\(encryptedData.hmac.base64EncodedString())"
+
+        guard let messageData = BitwardenMessage.makeCredentialCreationMessage(encryptedCommand: encryptedCommand, messageId: messageId)?.data else {
+            assertionFailure("Making the status message failed")
+            return
+        }
+
+        communicator.send(messageData: messageData)
+    }
     
     // MARK: - Encryption
 
@@ -417,12 +516,12 @@ final class BitwardenManager: BitwardenManagement, ObservableObject {
         guard let id = payloadItem.id,
               let email = payloadItem.email,
               let statusString = payloadItem.status,
-              let status = BitwardenStatus.Vault.Status(rawValue: statusString) else {
+              let status = BitwardenVault.Status(rawValue: statusString) else {
             self.status = .error(error: .statusParsingFailed)
             return
         }
 
-        let vault = BitwardenStatus.Vault(id: id, email: email, status: status, active: true)
+        let vault = BitwardenVault(id: id, email: email, status: status, active: true)
         self.status = .connected(vault: vault)
     }
 
@@ -442,16 +541,20 @@ final class BitwardenManager: BitwardenManagement, ObservableObject {
         sendCredentialRetrieval(url: url)
     }
 
+    var createCredentialCompletionCache = [MessageId: ((BitwardenError?) -> Void)]()
+
     func create(credential: BitwardenCredential, completion: @escaping (BitwardenError?) -> Void) {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            completion(nil)
-        }
+        let messageId = BitwardenMessage.generateMessageId()
+        createCredentialCompletionCache[messageId] = completion
+        sendCredentialCreation(credential, messageId: messageId)
     }
 
+    var updateCredentialCompletionCache = [MessageId: ((BitwardenError?) -> Void)]()
+
     func update(credential: BitwardenCredential, completion: @escaping (BitwardenError?) -> Void) {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            completion(nil)
-        }
+        let messageId = BitwardenMessage.generateMessageId()
+        updateCredentialCompletionCache[messageId] = completion
+        sendCredentialUpdate(credential, messageId: messageId)
     }
 
 }
@@ -478,9 +581,10 @@ extension BitwardenManager: BitwardenCommunicatorDelegate {
             return
         }
 
+        //TODO: Make the error blocking for certain messages
         if case let .item(payloadItem) = message.payload {
             if let error = payloadItem.error {
-                handleError(error)
+                handleError(error, blocking: false)
                 return
             }
 
@@ -491,8 +595,8 @@ extension BitwardenManager: BitwardenCommunicatorDelegate {
             }
         }
 
-        if let encryptedPayload = message.encryptedPayload {
-            handleEncryptedResponse(encryptedPayload)
+        if let encryptedPayload = message.encryptedPayload, let messageId = message.messageId {
+            handleEncryptedResponse(encryptedPayload, messageId: messageId)
             return
         }
 

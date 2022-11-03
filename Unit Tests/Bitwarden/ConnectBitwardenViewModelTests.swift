@@ -100,7 +100,7 @@ final class ConnectBitwardenViewModelTests: XCTestCase {
         
         XCTAssertEqual(viewModel.viewState, .disclaimer)
         
-        let vault = BitwardenStatus.Vault(id: "id", email: "dax@duck.com", status: .unlocked, active: true)
+        let vault = BitwardenVault(id: "id", email: "dax@duck.com", status: .unlocked, active: true)
         bitwardenManager.status = .connected(vault: vault)
         
         XCTAssertEqual(viewModel.viewState, .connectedToBitwarden)

@@ -31,6 +31,11 @@ struct BitwardenCredential {
         return credentialName
     }
 
+    var url: String? {
+        guard !domain.isEmpty else { return nil }
+        return "\(URL.NavigationalScheme.https.separated())\(domain)"
+    }
+
 }
 
 extension BitwardenCredential {

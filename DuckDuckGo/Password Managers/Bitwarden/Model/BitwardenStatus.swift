@@ -47,7 +47,7 @@ enum BitwardenStatus: Equatable {
     // We sent the status message and are waiting for the response
     case waitingForTheStatusResponse
 
-    case connected(vault: Vault)
+    case connected(vault: BitwardenVault)
     case error(error: BitwardenError)
     
     var isConnected: Bool {
@@ -55,19 +55,6 @@ enum BitwardenStatus: Equatable {
         case .connected: return true
         default: return false
         }
-    }
-
-    struct Vault: Equatable {
-        let id: String
-        let email: String
-        let status: Status
-        let active: Bool
-
-        enum Status: String {
-            case locked
-            case unlocked
-        }
-
     }
 
 }

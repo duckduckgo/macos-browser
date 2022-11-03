@@ -18,6 +18,7 @@
 
 import Foundation
 import BrowserServicesKit
+import os.log
 
 class PasswordManagerCoordinator: BrowserServicesKit.PasswordManager {
 
@@ -132,8 +133,18 @@ class PasswordManagerCoordinator: BrowserServicesKit.PasswordManager {
     }
 
     func storeWebsiteCredentials(_ credentials: SecureVaultModels.WebsiteCredentials, completion: @escaping (Error?) -> Void)  {
-        //TODO: Store credentials
-        completion(nil)
+        guard case let .connected(vault) = bitwardenManagement.status,
+              let bitwardenCredential = BitwardenCredential(from: credentials, vault: vault) else {
+            assertionFailure("Bitwarden is not connected or bad credential")
+            os_log("Failed to store credentials: Bitwarden is not connected or bad credential", type: .error)
+            return
+        }
+
+        if bitwardenCredential.credentialId == nil {
+            bitwardenManagement.create(credential: bitwardenCredential, completion: completion)
+        } else {
+            bitwardenManagement.update(credential: bitwardenCredential, completion: completion)
+        }
     }
 
     // MARK: - Cache
@@ -173,6 +184,18 @@ extension BrowserServicesKit.SecureVaultModels.WebsiteCredentials {
             return nil
         }
         self.init(account: account, password: password)
+    }
+
+}
+
+extension BitwardenCredential {
+
+    init?(from websiteCredentials: BrowserServicesKit.SecureVaultModels.WebsiteCredentials, vault: BitwardenVault) {
+        self.init(userId: vault.id,
+                  credentialId: websiteCredentials.account.id,
+                  credentialName: websiteCredentials.account.domain,
+                  username: websiteCredentials.account.username,
+                  password: websiteCredentials.password.utf8String() ?? "")
     }
 
 }
