@@ -265,8 +265,8 @@ struct BitwardenMessage: Codable {
                                 encryptedCommand: encryptedCommand)
     }
 
-    static func makeCredentialRetrievalMessage(encryptedCommand: String) -> BitwardenRequest? {
-        return BitwardenRequest(messageId: generateMessageId(),
+    static func makeCredentialRetrievalMessage(encryptedCommand: String, messageId: String) -> BitwardenRequest? {
+        return BitwardenRequest(messageId: messageId,
                                 version: version,
                                 encryptedCommand: encryptedCommand)
     }
