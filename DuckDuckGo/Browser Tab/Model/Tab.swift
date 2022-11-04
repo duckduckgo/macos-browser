@@ -265,6 +265,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     private(set) var serpWebView: WebView?
     private var searchPanelNavigationDelegate: SearchPanelNavigationDelegate?
     private var searchPanelUserScript: SearchPanelUserScript?
+    private var preventHidingSearchPanel = false
 
     private var lastUpgradedURL: URL?
 
@@ -506,8 +507,8 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         return false
     }
 
-    fileprivate func hideSERPWebView() -> Bool {
-        guard serpWebView != nil else {
+    func hideSERPWebView() -> Bool {
+        guard !preventHidingSearchPanel, serpWebView != nil else {
             return false
         }
 
@@ -1545,6 +1546,7 @@ extension Tab: WKNavigationDelegate {
     @MainActor
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         isBeingRedirected = false
+        preventHidingSearchPanel = false
         invalidateSessionStateData()
         webViewDidFinishNavigationPublisher.send()
         if isAMPProtectionExtracting { isAMPProtectionExtracting = false }
@@ -1560,6 +1562,7 @@ extension Tab: WKNavigationDelegate {
         //        hasError = true
 
         isBeingRedirected = false
+        preventHidingSearchPanel = false
         invalidateSessionStateData()
         linkProtection.setMainFrameUrl(nil)
         referrerTrimming.onFailedNavigation()
@@ -1578,6 +1581,7 @@ extension Tab: WKNavigationDelegate {
 
         self.error = error
         isBeingRedirected = false
+        preventHidingSearchPanel = false
         linkProtection.setMainFrameUrl(nil)
         referrerTrimming.onFailedNavigation()
         adClickAttributionDetection.onDidFailNavigation()
@@ -1728,6 +1732,7 @@ extension Tab: TabDataClearing {
 
 extension Tab: SearchPanelUserScriptDelegate {
     func searchPanelUserScript(_ searchPanelUserScript: SearchPanelUserScript, didSelectSearchResult url: URL) {
+        preventHidingSearchPanel = true
         webView.load(url)
     }
 }

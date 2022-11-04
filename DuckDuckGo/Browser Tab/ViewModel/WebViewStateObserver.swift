@@ -107,6 +107,10 @@ final class WebViewStateObserver: NSObject {
     }
 
     private func handleURLChange(in webView: WKWebView, tabViewModel: TabViewModel) {
+        if webView.isLoading {
+            _ = tabViewModel.tab.hideSERPWebView()
+        }
+
         if let url = webView.url {
             let content = Tab.TabContent.contentFromURL(url)
 
