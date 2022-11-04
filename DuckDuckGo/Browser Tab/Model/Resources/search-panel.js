@@ -99,6 +99,17 @@ let hijackOrganicClicks = () => {
     });
 }
 
+var findResultIdBasedOnURL = (url) => {
+    let link = document.querySelector('a[data-testid="result-title-a"][href="'+url+'"]');
+    let div = link.closest('article[data-testid="result"]');
+
+    if (!link || !div) {
+        document.body.innerHTML = 'Error, url: ' + url;
+    }
+
+    return div.getAttribute('id');
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     createShadow();
 
@@ -106,7 +117,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let resultId = '#r1-1';
         if (document.querySelector(resultId)) {
             console.log('finished!');
-            createFocus(resultId);
+            //createFocus(resultId);
             makeSlim();
             hijackOrganicClicks();
             clearInterval(deepLoaded);
@@ -119,8 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Listen for message from Native
 window.addEventListener('message', (event) => {
-    console.log("got message", event);
-    alert('message data:' + (event.data && JSON.stringify(event.data)));
+    createFocus('#'+findResultIdBasedOnURL(event.data.highlightSearchResult));
 });
 
 // Send swipeForward if swiping forward in the SERP Panel
