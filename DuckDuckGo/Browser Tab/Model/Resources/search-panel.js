@@ -114,7 +114,7 @@ var findResultIdBasedOnURL = (url) => {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    createShadow();
+    //createShadow();
 
     let deepLoaded = setInterval(() => {
         let resultId = '#r1-1';
