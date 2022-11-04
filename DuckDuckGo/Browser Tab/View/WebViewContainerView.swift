@@ -123,7 +123,6 @@ final class WebViewContainerView: NSView {
             context.allowsImplicitAnimation = true
 
             webView.frame.origin.x += 720
-            webView.frame.size.width = bounds.width - 720
             serpWebView.frame.origin.x = 0
             darkShadowView.frame = webView.frame
             lightShadowView.frame = webView.frame
@@ -210,7 +209,6 @@ final class WebViewContainerView: NSView {
         super.layout()
 
         if needsCustomLayout {
-            webView.frame.size.width = bounds.size.width - 720
             webView.frame.origin.x = 720
             darkShadowView.frame = webView.frame
             lightShadowView.frame = webView.frame
