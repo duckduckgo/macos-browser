@@ -17,17 +17,22 @@
 //
 
 import Foundation
+import BrowserServicesKit
 import os.log
 
 struct BookmarkList {
     
-    struct IdentifiableBookmark: Equatable {
+    struct IdentifiableBookmark: Equatable, BrowserServicesKit.Bookmark {
         let id: UUID
         let url: URL
+        let title: String
+        let isFavorite: Bool
         
         init(from bookmark: Bookmark) {
             self.id = bookmark.id
             self.url = bookmark.url
+            self.title = bookmark.title
+            self.isFavorite = bookmark.isFavorite
         }
     }
 
@@ -149,9 +154,8 @@ struct BookmarkList {
         return newBookmark
     }
 
-    func bookmarks() -> [Bookmark] {
-        let mappedBookmarks = allBookmarkURLsOrdered.compactMap { itemsDict[$0.url] }
-        return mappedBookmarks.reduce([], +)
+    func bookmarks() -> [IdentifiableBookmark] {
+        return allBookmarkURLsOrdered
     }
 
 }

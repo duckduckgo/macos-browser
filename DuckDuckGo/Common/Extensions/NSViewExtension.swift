@@ -130,7 +130,7 @@ extension NSView {
 
     func mouseLocationInsideBounds(_ point: NSPoint?) -> NSPoint? {
         withMouseLocationInViewCoordinates(point) { locationInView in
-            guard self.bounds.contains(locationInView) else { return nil }
+            guard self.visibleRect.contains(locationInView) else { return nil }
             return locationInView
         }
     }
