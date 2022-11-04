@@ -19,6 +19,7 @@
 import Foundation
 import BrowserServicesKit
 import os.log
+import Combine
 
 class PasswordManagerCoordinator: BrowserServicesKit.PasswordManager {
 
@@ -51,12 +52,27 @@ class PasswordManagerCoordinator: BrowserServicesKit.PasswordManager {
         }
     }
 
+    var statusCancellable: AnyCancellable?
+
     func askToUnlock(completionHandler: @escaping () -> Void) {
         bitwardenManagement.openBitwarden()
-        //TODO: Call completion handler when Bitwarden is unlocked
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-            completionHandler()
-        }
+
+        statusCancellable = bitwardenManagement.statusPublisher
+            .receive(on: DispatchQueue.main)
+            .removeDuplicates()
+            .sink { [weak self] status in
+                guard let self = self else {
+                    self?.statusCancellable?.cancel()
+                    return
+                }
+
+                if case let .connected(vault: vault) = status,
+                   vault.status == .unlocked {
+                    self.statusCancellable?.cancel()
+                    self.statusCancellable = nil
+                    completionHandler()
+                }
+            }
     }
 
     func openPasswordManager() {
@@ -103,6 +119,7 @@ class PasswordManagerCoordinator: BrowserServicesKit.PasswordManager {
         }
 
         if let credential = cache[accountId] {
+            let account = SecureVaultModels.WebsiteAccount(from: credential)
             completion(BrowserServicesKit.SecureVaultModels.WebsiteCredentials(from: credential), nil)
         } else {
             assertionFailure("Credentials not cached")
@@ -178,9 +195,16 @@ extension BrowserServicesKit.SecureVaultModels.WebsiteAccount {
 
 extension BrowserServicesKit.SecureVaultModels.WebsiteCredentials {
 
-    init?(from bitwardenCredential: BitwardenCredential) {
-        guard let account = BrowserServicesKit.SecureVaultModels.WebsiteAccount(from: bitwardenCredential),
-        let password = bitwardenCredential.password?.data(using: .utf8) else {
+    init?(from bitwardenCredential: BitwardenCredential, emptyPasswordAllowed: Bool = true) {
+        guard let account = BrowserServicesKit.SecureVaultModels.WebsiteAccount(from: bitwardenCredential) else {
+            assertionFailure("Failed to init account from BitwardenCredential")
+            return nil
+        }
+
+        let passwordString = emptyPasswordAllowed ? bitwardenCredential.password ?? "" : bitwardenCredential.password
+
+        guard let password = passwordString?.data(using: .utf8) else {
+            assertionFailure("Failed to init account from BitwardenCredential")
             return nil
         }
         self.init(account: account, password: password)
