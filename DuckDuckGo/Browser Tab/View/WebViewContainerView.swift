@@ -66,6 +66,28 @@ final class WebViewContainerView: NSView {
     let webView: WebView
     let swipeGestureView: SwipeGestureView
 
+    private lazy var lightShadowView = {
+        let view = ShadowView()
+        view.autoresizingMask = [.width, .height]
+        view.shadowSides = .left
+        view.shadowOpacity = 1
+        view.shadowColor = .init(white: 0, alpha: 0.08)
+        view.shadowOffset = .init(width: 0, height: 20)
+        view.shadowRadius = 40
+        return view
+    }()
+
+    private lazy var darkShadowView = {
+        let view = ShadowView()
+        view.autoresizingMask = [.width, .height]
+        view.shadowSides = .left
+        view.shadowOpacity = 1
+        view.shadowColor = .init(white: 0, alpha: 0.1)
+        view.shadowOffset = .init(width: 0, height: 4)
+        view.shadowRadius = 12
+        return view
+    }()
+
     private(set) weak var serpWebView: WebView?
     private var needsCustomLayout: Bool = false
 
@@ -82,6 +104,8 @@ final class WebViewContainerView: NSView {
         }
 
         self.serpWebView = serpWebView
+        darkShadowView.alphaValue = 0
+        lightShadowView.alphaValue = 0
 
         serpWebView.translatesAutoresizingMaskIntoConstraints = true
         serpWebView.autoresizingMask = [.height]
@@ -91,6 +115,8 @@ final class WebViewContainerView: NSView {
         frame.origin.x = -720
         serpWebView.frame = frame
         addSubview(serpWebView, positioned: .below, relativeTo: webView)
+        addSubview(darkShadowView, positioned: .below, relativeTo: webView)
+        addSubview(lightShadowView, positioned: .below, relativeTo: darkShadowView)
 
         NSAnimationContext.runAnimationGroup({ context in
             context.duration = 0.3
@@ -99,6 +125,10 @@ final class WebViewContainerView: NSView {
             webView.frame.origin.x += 720
             webView.frame.size.width = bounds.width - 720
             serpWebView.frame.origin.x = 0
+            darkShadowView.frame = webView.frame
+            lightShadowView.frame = webView.frame
+            darkShadowView.alphaValue = 1
+            lightShadowView.alphaValue = 1
         }) {
             self.needsCustomLayout = true
         }
@@ -118,8 +148,12 @@ final class WebViewContainerView: NSView {
 
             serpWebView.frame.origin.x -= 720
             webView.frame = bounds
+            darkShadowView.alphaValue = 0
+            lightShadowView.alphaValue = 0
         }) {
             serpWebView.removeFromSuperview()
+            self.darkShadowView.removeFromSuperview()
+            self.lightShadowView.removeFromSuperview()
             self.serpWebView = nil
         }
     }
@@ -178,6 +212,8 @@ final class WebViewContainerView: NSView {
         if needsCustomLayout {
             webView.frame.size.width = bounds.size.width - 720
             webView.frame.origin.x = 720
+            darkShadowView.frame = webView.frame
+            lightShadowView.frame = webView.frame
         }
     }
 
