@@ -433,7 +433,9 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     }
 
     func goForward() {
-        hideSERPWebView()
+        if hideSERPWebView() {
+            return
+        }
         guard canGoForward else { return }
         shouldStoreNextVisit = false
         webView.goForward()
@@ -504,10 +506,15 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         return false
     }
 
-    fileprivate func hideSERPWebView() {
+    fileprivate func hideSERPWebView() -> Bool {
+        guard serpWebView != nil else {
+            return false
+        }
+
         delegate?.tabDidCloseSearchResults(self)
         serpWebView = nil
         searchPanelUserScript = nil
+        return true
     }
 
     func go(to item: WKBackForwardListItem) {
