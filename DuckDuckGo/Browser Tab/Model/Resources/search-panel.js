@@ -119,7 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Listen for message from Native
 window.addEventListener('message', (event) => {
-    alert('got message');
+    console.log("got message", event);
     alert('message data:' + (event.data && JSON.stringify(event.data)));
 });
 

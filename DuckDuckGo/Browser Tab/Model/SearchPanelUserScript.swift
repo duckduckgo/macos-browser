@@ -34,7 +34,8 @@ final class SearchPanelUserScript: NSObject, UserScript {
     let messageNames: [String] = ["selectedSearchResult"]
 
     func highlightSearchResult(with url: URL, inWebView webView: WKWebView) {
-        let js = "window.postMessage({ highlightSearchResult: \(url.absoluteString) });"
+        let js = "window.postMessage({ highlightSearchResult: '\(url.absoluteString)' });"
+        print("HIGHLIGHT", url)
         evaluate(js: js, inWebView: webView)
     }
 

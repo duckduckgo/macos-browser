@@ -489,7 +489,9 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         if let serpWebView, serpWebView.superview == nil, let url = webView.url {
             serpWebView.interactionState = webView.interactionState
             _ = serpWebView.goBack()
-            searchPanelUserScript?.highlightSearchResult(with: url, inWebView: serpWebView)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+                self.searchPanelUserScript?.highlightSearchResult(with: url, inWebView: serpWebView)
+            }
             delegate?.tabDidRequestSearchResults(self)
             return true
         }
