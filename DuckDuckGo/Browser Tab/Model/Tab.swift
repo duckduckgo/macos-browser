@@ -432,9 +432,9 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     }
 
     func goForward() {
+        hideSERPWebView()
         guard canGoForward else { return }
         shouldStoreNextVisit = false
-        hideSERPWebView()
         webView.goForward()
     }
 
@@ -842,27 +842,24 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         historyCoordinating.updateTitleIfNeeded(title: title, url: url)
     }
 
-    // MARK: - Swipe Script
+    // MARK: - Swipe Gesture Navigation
 
-    private weak var swipeUserScript: SwipeUserScript?
-    private var swipeUserScriptCancellables: Set<AnyCancellable> = []
+    private var swipeGestureCancellable: AnyCancellable?
 
-    func setUpSwipeUserScript() {
-        swipeUserScriptCancellables.removeAll()
+    func setUpSwipeGestureRecognizer(_ publisher: AnyPublisher<SwipeGestureView.Direction, Never>) {
+        swipeGestureCancellable = publisher.sink { [weak self] direction in
+            guard self?.webView.superview != nil else {
+                return
+            }
 
-        swipeUserScript?.swipeBackPublisher
-            .sink { [weak self] in
+            if direction == .back {
                 Swift.print("SWIPE BACK")
                 self?.goBack()
-            }
-            .store(in: &swipeUserScriptCancellables)
-
-        swipeUserScript?.swipeForwardPublisher
-            .sink { [weak self] in
+            } else {
                 Swift.print("SWIPE FORWARD")
                 self?.goForward()
             }
-            .store(in: &swipeUserScriptCancellables)
+        }
     }
 
     // MARK: - Youtube Player
@@ -976,8 +973,6 @@ extension Tab: UserContentControllerDelegate {
         userScripts.pageObserverScript.delegate = self
         userScripts.printingUserScript.delegate = self
         userScripts.hoverUserScript.delegate = self
-        swipeUserScript = userScripts.swipeUserScript
-        setUpSwipeUserScript()
         userScripts.autoconsentUserScript?.delegate = self
         youtubeOverlayScript = userScripts.youtubeOverlayScript
         youtubeOverlayScript?.delegate = self

@@ -19,8 +19,53 @@
 import AppKit
 import Combine
 
+final class SwipeGestureView: NSView {
+
+    enum Direction: Equatable {
+        case back, forward
+    }
+
+    override init(frame frameRect: NSRect) {
+        gestureEventPublisher = gestureEventSubject.eraseToAnyPublisher()
+        super.init(frame: frameRect)
+    }
+
+    required init?(coder: NSCoder) {
+        gestureEventPublisher = gestureEventSubject.eraseToAnyPublisher()
+        super.init(coder: coder)
+    }
+
+    let gestureEventPublisher: AnyPublisher<Direction, Never>
+
+    private let gestureEventSubject = PassthroughSubject<Direction, Never>()
+    private var distance: CGSize = .zero
+    private var isTrackingSwipe = false
+
+    override func scrollWheel(with event: NSEvent) {
+        switch event.momentumPhase {
+        case .began:
+            distance = .zero
+            isTrackingSwipe = true
+        case .changed:
+            if isTrackingSwipe {
+                distance.width += event.scrollingDeltaX
+                distance.height += event.scrollingDeltaY
+                if abs(distance.width) > 100 && abs(distance.width) > abs(distance.height) {
+                    isTrackingSwipe = false
+                    gestureEventSubject.send(distance.width > 0 ? .back : .forward)
+                }
+            }
+        default:
+            break
+        }
+        super.scrollWheel(with: event)
+    }
+}
+
 final class WebViewContainerView: NSView {
     let webView: WebView
+    let swipeGestureView: SwipeGestureView
+
     private(set) weak var serpWebView: WebView?
     private var needsCustomLayout: Bool = false
 
@@ -81,14 +126,18 @@ final class WebViewContainerView: NSView {
 
     init(webView: WebView, frame: NSRect) {
         self.webView = webView
+        swipeGestureView = SwipeGestureView()
         super.init(frame: frame)
 
         self.autoresizingMask = [.width, .height]
+        swipeGestureView.autoresizingMask = [.width, .height]
+        swipeGestureView.frame = bounds
 
         webView.translatesAutoresizingMaskIntoConstraints = true
         webView.autoresizingMask = [.width, .height]
         webView.frame = bounds
         addSubview(webView)
+        addSubview(swipeGestureView)
     }
     
     required init?(coder: NSCoder) {

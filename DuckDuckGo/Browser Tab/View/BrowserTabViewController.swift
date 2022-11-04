@@ -202,6 +202,9 @@ final class BrowserTabViewController: NSViewController {
             webView = newWebView
 
             addWebViewToViewHierarchy(newWebView)
+            if let publisher = self.webViewContainer?.swipeGestureView.gestureEventPublisher {
+                tabViewModel.tab.setUpSwipeGestureRecognizer(publisher)
+            }
         }
 
         guard let tabViewModel = tabViewModel else {
