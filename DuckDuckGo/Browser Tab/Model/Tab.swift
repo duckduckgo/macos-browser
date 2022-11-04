@@ -266,6 +266,8 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     private var searchPanelNavigationDelegate: SearchPanelNavigationDelegate?
     private var searchPanelUserScript: SearchPanelUserScript?
     private var preventHidingSearchPanel = false
+    private var searchPanelResults: Set<URL> = []
+    fileprivate var searchPanelInteractionState: Any?
 
     private var lastUpgradedURL: URL?
 
@@ -465,12 +467,14 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             return
         }
 
-        if #available(macOS 12.0, *), webView.backForwardList.backItem?.url.isDuckDuckGoSearch == true {
+        if #available(macOS 12.0, *),
+           let backURL = webView.backForwardList.backItem?.url, let currentURL = webView.url,
+           backURL.isDuckDuckGoSearch || searchPanelResults.contains(currentURL) {
             if prepareAndShowSERPWebView() {
                 return
             }
             if webView.backForwardList.backItem?.url == serpWebView?.backForwardList.currentItem?.url {
-                hideSERPWebView()
+                _ = hideSERPWebView()
             }
         }
 
@@ -493,13 +497,19 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
             let navigationDelegate = SearchPanelNavigationDelegate()
             navigationDelegate.searchPanelUserScript = searchPanelUserScript
+            navigationDelegate.tab = self
             serpWebView?.navigationDelegate = navigationDelegate
             searchPanelNavigationDelegate = navigationDelegate
         }
 
         if let serpWebView, serpWebView.superview == nil, let url = webView.url {
-            serpWebView.interactionState = webView.interactionState
-            _ = serpWebView.goBack()
+            searchPanelResults.insert(url)
+            if let searchPanelInteractionState {
+                serpWebView.interactionState = searchPanelInteractionState
+            } else {
+                serpWebView.interactionState = webView.interactionState
+                _ = serpWebView.goBack()
+            }
             searchPanelNavigationDelegate?.url = url
             delegate?.tabDidRequestSearchResults(self)
             return true
@@ -1733,6 +1743,7 @@ extension Tab: TabDataClearing {
 extension Tab: SearchPanelUserScriptDelegate {
     func searchPanelUserScript(_ searchPanelUserScript: SearchPanelUserScript, didSelectSearchResult url: URL) {
         preventHidingSearchPanel = true
+        searchPanelResults.insert(url)
         webView.load(url)
     }
 }
@@ -1740,12 +1751,17 @@ extension Tab: SearchPanelUserScriptDelegate {
 private final class SearchPanelNavigationDelegate: NSObject, WKNavigationDelegate {
     var url: URL?
     weak var searchPanelUserScript: SearchPanelUserScript?
+    weak var tab: Tab?
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         guard let url else {
             return
         }
         self.url = nil
+        if #available(macOS 12.0, *) {
+            tab?.searchPanelInteractionState = webView.interactionState
+        }
+
         searchPanelUserScript?.highlightSearchResult(with: url, inWebView: webView)
     }
 }
