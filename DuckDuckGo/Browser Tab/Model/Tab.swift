@@ -1232,7 +1232,7 @@ extension Tab: WKNavigationDelegate {
 
         // This check needs to happen before GPC checks. Otherwise the navigation type may be rewritten to `.other`
         // which would skip link rewrites.
-        if navigationAction.navigationType == .linkActivated {
+        if navigationAction.navigationType != .backForward {
             let navigationActionPolicy = await linkProtection
                 .requestTrackingLinkRewrite(
                     initiatingURL: webView.url,
