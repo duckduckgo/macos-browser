@@ -39,6 +39,8 @@ let createFocus = (resultId) => {
     let resultPosition = document.querySelector(resultId).getBoundingClientRect();
     let top = resultPosition.top - 5 + window.scrollY;
     let height = (resultPosition.height + 10);
+    let left = resultPosition.left - 5;
+    let right = window.innerWidth - resultPosition.left - resultPosition.width - 5;
     let hasFocusEl = document.querySelector('#organic-focus')
 
     if (hasFocusEl) {
@@ -50,24 +52,25 @@ let createFocus = (resultId) => {
             border: 1px solid rgba(150,150,150,0.3);
             position: absolute;
             top: ${top}px;
-            left: 0px;
-            right: 0px;
+            left: ${left}px;
+            right: ${right}px;
             height: ${height}px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.3);
             pointer-events: none;
+            border: 2px solid #3969EF;
+            border-radius: 12px;
         `);
         focus.setAttribute('id', 'organic-focus');
         document.body.appendChild(focus);
     }
 
-    let shadowAbove = document.querySelector('#shadowAbove');
+    /*let shadowAbove = document.querySelector('#shadowAbove');
     let shadowBelow = document.querySelector('#shadowBelow');
 
     shadowAbove.style['bottom'] = 'auto';
     shadowAbove.style['height'] = top + 'px';
 
     shadowBelow.style['display'] = 'block';
-    shadowBelow.style['top'] = (top + height) + 'px';
+    shadowBelow.style['top'] = (top + height) + 'px';*/
 
 }
 
