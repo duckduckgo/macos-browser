@@ -485,6 +485,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             script.delegate = self
             serpWebView?.configuration.userContentController.addUserScript(script.makeWKUserScript())
             serpWebView?.configuration.userContentController.addHandler(script)
+            serpWebView?.configuration.applyStandardConfiguration()
             searchPanelUserScript = script
 
             let navigationDelegate = SearchPanelNavigationDelegate()
