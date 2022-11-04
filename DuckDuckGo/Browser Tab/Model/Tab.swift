@@ -263,6 +263,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
     let webView: WebView
     private(set) var serpWebView: WebView?
+    private var searchPanelNavigationDelegate: SearchPanelNavigationDelegate?
     private var searchPanelUserScript: SearchPanelUserScript?
 
     private var lastUpgradedURL: URL?
@@ -479,19 +480,23 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             serpWebView = WebView(frame: .zero, configuration: WKWebViewConfiguration())
             serpWebView?.allowsLinkPreview = false
             serpWebView?.allowsBackForwardNavigationGestures = false
+
             let script = SearchPanelUserScript()
             script.delegate = self
             serpWebView?.configuration.userContentController.addUserScript(script.makeWKUserScript())
             serpWebView?.configuration.userContentController.addHandler(script)
             searchPanelUserScript = script
+
+            let navigationDelegate = SearchPanelNavigationDelegate()
+            navigationDelegate.searchPanelUserScript = searchPanelUserScript
+            serpWebView?.navigationDelegate = navigationDelegate
+            searchPanelNavigationDelegate = navigationDelegate
         }
 
         if let serpWebView, serpWebView.superview == nil, let url = webView.url {
             serpWebView.interactionState = webView.interactionState
             _ = serpWebView.goBack()
-            DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
-                self.searchPanelUserScript?.highlightSearchResult(with: url, inWebView: serpWebView)
-            }
+            searchPanelNavigationDelegate?.url = url
             delegate?.tabDidRequestSearchResults(self)
             return true
         }
@@ -1716,5 +1721,18 @@ extension Tab: TabDataClearing {
 extension Tab: SearchPanelUserScriptDelegate {
     func searchPanelUserScript(_ searchPanelUserScript: SearchPanelUserScript, didSelectSearchResult url: URL) {
         webView.load(url)
+    }
+}
+
+private final class SearchPanelNavigationDelegate: NSObject, WKNavigationDelegate {
+    var url: URL?
+    weak var searchPanelUserScript: SearchPanelUserScript?
+
+    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        guard let url else {
+            return
+        }
+        self.url = nil
+        searchPanelUserScript?.highlightSearchResult(with: url, inWebView: webView)
     }
 }
