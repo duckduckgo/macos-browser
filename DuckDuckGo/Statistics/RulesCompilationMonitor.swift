@@ -57,6 +57,7 @@ final class AbstractContentBlockingAssetsCompilationTimeReporter<Caller: Hashabl
     private func report(waitTime: TimeInterval, result: Pixel.Event.WaitResult, completionHandler: @escaping ((Error?) -> Void) = { _ in }) {
         // report only once
         isFinished = true
+        completionHandler(nil)
         
         /**
         This is temporarily disabled:

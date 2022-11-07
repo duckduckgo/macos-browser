@@ -34,11 +34,20 @@ final class RecentlyVisitedModel: ObservableObject {
     @UserDefaultsWrapper(key: .homePageShowPagesOnHover, defaultValue: false)
     private static var showPagesOnHoverSetting: Bool
 
+    @UserDefaultsWrapper(key: .homePageShowRecentlyVisited, defaultValue: true)
+    private static var showRecentlyVisitedSetting: Bool
+
     @Published var numberOfTrackersBlocked = 0
     @Published var recentSites = [RecentlyVisitedSiteModel]()
     @Published var showPagesOnHover: Bool {
         didSet {
             Self.showPagesOnHoverSetting = showPagesOnHover
+        }
+    }
+
+    @Published var showRecentlyVisited: Bool {
+        didSet {
+            Self.showRecentlyVisitedSetting = showRecentlyVisited
         }
     }
 
@@ -49,6 +58,7 @@ final class RecentlyVisitedModel: ObservableObject {
         self.open = open
         self.fire = fire
         showPagesOnHover = Self.showPagesOnHoverSetting
+        showRecentlyVisited = Self.showRecentlyVisitedSetting
     }
 
     func refreshWithHistory(_ history: [HistoryEntry]) {

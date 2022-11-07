@@ -1,7 +1,7 @@
 //
-//  PublisherExtension.swift
+//  NSEventExtension.swift
 //
-//  Copyright © 2021 DuckDuckGo. All rights reserved.
+//  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -17,14 +17,11 @@
 //
 
 import Foundation
-import Combine
 
-extension Publisher where Failure == Never {
-
-    func assign<T: AnyObject>(to keyPath: ReferenceWritableKeyPath<T, Output>, onWeaklyHeld object: T) -> AnyCancellable {
-        sink { [weak object] value in
-            object?[keyPath: keyPath] = value
-        }
+extension NSEvent {
+    static func isContextClick(_ event: NSEvent) -> Bool {
+        let isControlClick = event.type == .leftMouseDown && (event.modifierFlags.rawValue & NSEvent.ModifierFlags.control.rawValue != 0)
+        let isRightClick = event.type == .rightMouseDown
+        return isControlClick || isRightClick
     }
-
 }
