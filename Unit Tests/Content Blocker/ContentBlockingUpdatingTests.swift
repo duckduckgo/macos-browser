@@ -166,7 +166,7 @@ class ContentBlockingUpdatingTests: XCTestCase {
 
 }
 
-extension UserContentUpdating.NewContent {
+extension UserContentControllerNewContent {
     
     func rules(withName name: String) -> WKContentRuleList? {
         rulesUpdate.rules.first(where: { $0.name == name})?.rulesList
