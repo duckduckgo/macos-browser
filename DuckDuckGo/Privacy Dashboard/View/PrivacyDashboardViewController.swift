@@ -128,7 +128,6 @@ final class PrivacyDashboardViewController: NSViewController {
                 prev.0 == current.0
             }
             .sink(receiveValue: { [weak self] (height, shouldAnimate) in
-                print("new height: \(height), shouldAnimate: \(shouldAnimate)")
                 self?.onHeightChange(height, shouldAnimate: shouldAnimate)
             })
     }
