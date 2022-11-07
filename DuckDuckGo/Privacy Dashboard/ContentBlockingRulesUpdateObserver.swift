@@ -26,15 +26,16 @@ final class ContentBlockingRulesUpdateObserver {
     
     public private(set) weak var tabViewModel: TabViewModel?
     private var onPendingUpdates: (() -> Void)?
-    private var contentBlockinRulesUpdatedCancellable = Set<AnyCancellable>()
+    private var rulesRecompilationCancellable: AnyCancellable?
         
     public func updateTabViewModel(_ tabViewModel: TabViewModel, onPendingUpdates: @escaping () -> Void) {
-        contentBlockinRulesUpdatedCancellable.removeAll()
+        rulesRecompilationCancellable?.cancel()
+        rulesRecompilationCancellable = nil
         
         self.tabViewModel = tabViewModel
         self.onPendingUpdates = onPendingUpdates
         
-        prepareContentBlockingCancellable(publisher: tabViewModel.tab.cbrCompletionTokensPublisher)
+        bindContentBlockingRulesRecompilation(publisher: ContentBlocking.shared.userContentUpdating.userContentBlockingAssets)
     }
     
     public func didStartCompilation(for domain: String, token: ContentBlockerRulesManager.CompletionToken ) {
@@ -42,25 +43,39 @@ final class ContentBlockingRulesUpdateObserver {
         onPendingUpdates?()
     }
     
-    private func prepareContentBlockingCancellable<Pub: Publisher>(publisher: Pub)
-    where Pub.Output == [ContentBlockerRulesManager.CompletionToken], Pub.Failure == Never {
-
-        publisher.receive(on: RunLoop.main).sink { [weak self] completionTokens in
-            dispatchPrecondition(condition: .onQueue(.main))
-
-            guard let self = self, !self.pendingUpdates.isEmpty else { return }
-
-            var didUpdate = false
-            for token in completionTokens {
-                if self.pendingUpdates.removeValue(forKey: token) != nil {
-                    didUpdate = true
+    private func bindContentBlockingRulesRecompilation<Pub: Publisher>(publisher: Pub)
+    where Pub.Output == UserContentUpdating.NewContent, Pub.Failure == Never {
+        
+        rulesRecompilationCancellable = publisher
+            .compactMap(\.nonEmptyCompletionTokens)
+            .receive(on: RunLoop.main)
+            .sink { [weak self] completionTokens in
+                dispatchPrecondition(condition: .onQueue(.main))
+                
+                guard let self = self, !self.pendingUpdates.isEmpty else { return }
+                
+                var didUpdate = false
+                for token in completionTokens {
+                    if self.pendingUpdates.removeValue(forKey: token) != nil {
+                        didUpdate = true
+                    }
+                }
+                
+                if didUpdate {
+                    self.tabViewModel?.reload()
+                    self.onPendingUpdates?()
                 }
             }
+    }
+}
 
-            if didUpdate {
-                self.tabViewModel?.reload()
-                self.onPendingUpdates?()
-            }
-        }.store(in: &contentBlockinRulesUpdatedCancellable)
+private extension UserContentUpdating.NewContent {
+
+    var nonEmptyCompletionTokens: [ContentBlockerRulesManager.CompletionToken]? {
+        let nonEmptyTokens = rulesUpdate.completionTokens.filter { !$0.isEmpty }
+        if nonEmptyTokens.isEmpty {
+            return nil
+        }
+        return nonEmptyTokens
     }
 }
