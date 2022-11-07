@@ -22,14 +22,10 @@ import BrowserServicesKit
 
 final class UserContentUpdating {
 
-    struct NewContent {
+    struct NewContent: UserContentControllerNewContent {
         let rulesUpdate: ContentBlockerRulesManager.UpdateEvent
         let sourceProvider: ScriptSourceProviding
-
-        fileprivate init(rulesUpdate: ContentBlockerRulesManager.UpdateEvent, sourceProvider: ScriptSourceProviding) {
-            self.rulesUpdate = rulesUpdate
-            self.sourceProvider = sourceProvider
-        }
+        var makeUserScripts: (ScriptSourceProviding) -> UserScripts { return UserScripts.init(with:) }
     }
 
     @Published private var bufferedValue: NewContent?
