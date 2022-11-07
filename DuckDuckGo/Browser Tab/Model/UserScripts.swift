@@ -21,7 +21,7 @@ import Foundation
 import BrowserServicesKit
 import UserScript
 
-final class UserScripts {
+final class UserScripts: UserScriptsProvider {
 
     let pageObserverScript = PageObserverUserScript()
     let faviconScript = FaviconUserScript()

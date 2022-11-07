@@ -175,7 +175,13 @@ final class TabBarViewItem: NSCollectionViewItem {
 
     private var lastKnownIndexPath: IndexPath?
 
-    @IBAction func closeButtonAction(_ sender: NSButton) {
+    @IBAction func closeButtonAction(_ sender: Any) {
+        // due to async nature of NSCollectionView views removal
+        // leaving window._lastLeftHit set to the button will prevent
+        // continuous clicks on the Close button
+        // this should be removed when the Tab Bar is redone without NSCollectionView
+        (sender as? NSButton)?.window?.evilHackToClearLastLeftHitInWindow()
+
         guard let indexPath = self.collectionView?.indexPath(for: self) else {
             // doubleclick event arrived at point when we're already removed
             // pass the closeButton action to the next TabBarViewItem

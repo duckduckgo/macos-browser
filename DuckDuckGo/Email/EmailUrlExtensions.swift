@@ -23,8 +23,6 @@ extension EmailUrls {
 
     private struct Url {
         static let emailProtectionLink = "https://duckduckgo.com/email"
-        static let emailGenerateTokenPage = "https://duckduckgo.com/email/new-address"
-        static let emailAuthenticationHosts = ["quack.duckduckgo.com", "quackdev.duckduckgo.com"]
     }
     
     private struct DevUrl {
@@ -39,12 +37,8 @@ extension EmailUrls {
         #endif
     }
 
-    func shouldAuthenticateWithEmailCredentials(url: URL) -> Bool {
-        guard let host = url.host else { return false }
-        return Url.emailAuthenticationHosts.contains(host)
-    }
-
     func isDuckDuckGoEmailProtection(url: URL) -> Bool {
         return url.absoluteString.starts(with: Url.emailProtectionLink)
     }
+
 }

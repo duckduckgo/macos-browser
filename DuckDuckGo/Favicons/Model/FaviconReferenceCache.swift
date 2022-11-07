@@ -77,6 +77,11 @@ final class FaviconReferenceCache {
 
             if cacheEntry.smallFaviconUrl == faviconUrls.smallFaviconUrl && cacheEntry.mediumFaviconUrl == faviconUrls.mediumFaviconUrl {
                 // Equal
+
+                // There is a possibility of old cache entry in urlReferences
+                if urlReferences[documentUrl] != nil {
+                    invalidateUrlCache(for: host)
+                }
                 return
             }
 
