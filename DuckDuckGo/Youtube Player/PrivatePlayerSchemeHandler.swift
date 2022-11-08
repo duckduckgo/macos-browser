@@ -22,7 +22,16 @@ import WebKit
 final class PrivatePlayerSchemeHandler: NSObject, WKURLSchemeHandler {
 
     func webView(_ webView: WKWebView, start urlSchemeTask: WKURLSchemeTask) {
-        guard let requestURL = webView.url ?? urlSchemeTask.request.url else {
+        let isMainFrameRequest = urlSchemeTask.request.value(forHTTPHeaderField: "Referer") == nil
+
+        let requestURL: URL? = {
+            if isMainFrameRequest {
+                return webView.url ?? urlSchemeTask.request.url
+            }
+            return urlSchemeTask.request.url
+        }()
+
+        guard let requestURL = requestURL else {
             assertionFailure("No URL for Private Player scheme handler")
             return
         }
@@ -30,7 +39,7 @@ final class PrivatePlayerSchemeHandler: NSObject, WKURLSchemeHandler {
         let youtubeHandler = YoutubePlayerNavigationHandler()
         let html = youtubeHandler.makeHTMLFromTemplate()
 
-        if #available(macOS 12.0, *) {
+        if #available(macOS 12.0, *), isMainFrameRequest {
             let newRequest = youtubeHandler.makePrivatePlayerRequest(from: URLRequest(url: requestURL))
             webView.loadSimulatedRequest(newRequest, responseHTML: html)
         } else {
