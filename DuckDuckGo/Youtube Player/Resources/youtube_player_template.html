@@ -571,6 +571,9 @@
                  * NATIVE NOTE: Gets the video id from the location object, works for MacOS < > 12
                  */
                 getVideoIdFromLocation: () => {
+                    if (window._mockVideoID) {
+                        return window._mockVideoID;
+                    }
                     /**
                      * In MacOS < 12, the video id is the entire 'pathname' (duck://player/123 <- /123 is the 'pathname')
                      * In MacOS 12+, the video id is what's after "/embed/" in 'pathname' because of the
@@ -688,6 +691,10 @@
                     let hasMessage = e && e.data && typeof e.data[message] !== 'undefined',
                             isValidMessage = hasMessage && (e.data[message] === true || e.data[message] === false),
                             hasCorrectOrigin = e.origin && (e.origin === 'https://www.youtube-nocookie.com' || e.origin === 'duck://player');
+
+                    if (window._mockVideoID) {
+                        hasCorrectOrigin = true;
+                    }
 
                     if (isValidMessage && hasCorrectOrigin) {
                         return true;
