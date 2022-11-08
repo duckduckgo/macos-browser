@@ -70,15 +70,14 @@ final class PrivacyDashboardViewController: NSViewController {
         
         initWebView()
         privacyDashboardController.setup(for: webView)
-        privacyDashboardController.delegate = self
-        
+
         setupHeightChangeHandler()
     }
     
     override func viewWillAppear() {
         super.viewWillAppear()
 
-        privacyDashboardController.willAppear()
+        privacyDashboardController.delegate = self
         privacyDashboardController.preferredLocale = "en" // fixed until app is localised
         
         webView.reload()
@@ -95,7 +94,7 @@ final class PrivacyDashboardViewController: NSViewController {
     override func viewWillDisappear() {
         super.viewWillDisappear()
         
-        privacyDashboardController.willDisappear()
+        privacyDashboardController.delegate = nil
         shouldAnimateHeightChange = false
     }
     
