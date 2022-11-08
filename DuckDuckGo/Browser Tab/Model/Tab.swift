@@ -1663,7 +1663,9 @@ extension Tab {
                 title = String(title.truncated(length: MainMenu.Constants.maxTitleLength))
             }
             return title
-        case .onboarding, .none:
+        case .onboarding:
+            return UserText.tabOnboardingTitle
+        case .none:
             return ""
         }
     }
