@@ -54,6 +54,7 @@ final class TabBarViewController: NSViewController {
     private var tabsCancellable: AnyCancellable?
     private var selectionIndexCancellable: AnyCancellable?
     private var cancellables = Set<AnyCancellable>()
+    private var titleCancellable: AnyCancellable?
 
     @IBOutlet weak var shadowView: TabShadowView!
     
@@ -144,6 +145,36 @@ final class TabBarViewController: NSViewController {
     private func subscribeToSelectionIndex() {
         selectionIndexCancellable = tabCollectionViewModel.$selectionIndex.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.reloadSelection()
+            self?.changeWindowName()
+        }
+    }
+    
+    private func changeWindowName() {
+        
+        if let tab = self.tabCollectionViewModel.selectedTab {
+            titleCancellable = tab.$title.receive(on: DispatchQueue.main).sink {[weak self] _ in
+                self?.view.window?.title = self?.windowTitleFor(tab) ?? "a"
+            }
+        }
+    }
+    
+    private func windowTitleFor(_ tab: Tab) -> String {
+        switch tab.content {
+        case .homePage:
+            return UserText.tabHomeTitle
+        case .preferences:
+            return UserText.tabPreferencesTitle
+        case .bookmarks:
+            return UserText.tabPreferencesTitle
+        case .url, .privatePlayer:
+            var title = tab.title ?? tab.content.url?.absoluteString ?? ""
+
+            if title.count > MainMenu.Constants.maxTitleLength {
+                title = String(title.truncated(length: MainMenu.Constants.maxTitleLength))
+            }
+            return title
+        case .onboarding, .none:
+            return ""
         }
     }
 
