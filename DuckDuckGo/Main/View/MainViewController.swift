@@ -51,7 +51,8 @@ final class MainViewController: NSViewController {
     private var findInPageCancellable: AnyCancellable?
     private var keyDownMonitor: Any?
     private var mouseNavButtonsMonitor: Any?
-    
+    private var windowTitleCancellable: AnyCancellable?
+
     private var bookmarksBarIsVisible: Bool {
         return bookmarksBarViewController.parent != nil
     }
@@ -222,9 +223,20 @@ final class MainViewController: NSViewController {
             self?.subscribeToFindInPage()
             self?.subscribeToTabContent()
             self?.adjustFirstResponder()
+            self?.subscribeToTitleChange()
         }
     }
     
+    private func subscribeToTitleChange() {
+        if let tab = self.tabCollectionViewModel.selectedTab {
+            windowTitleCancellable = tab.$title.receive(on: DispatchQueue.main).sink {[weak self] _ in
+                
+                guard let self = self else { return }
+                self.view.window?.title = tab.windowTitle
+            }
+        }
+    }
+
     private func subscribeToAppSettingsNotifications() {
         bookmarksBarVisibilityChangedCancellable = NotificationCenter.default
             .publisher(for: PersistentAppInterfaceSettings.showBookmarksBarSettingChanged)
