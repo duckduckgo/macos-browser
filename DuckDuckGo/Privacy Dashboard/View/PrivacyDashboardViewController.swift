@@ -80,6 +80,8 @@ final class PrivacyDashboardViewController: NSViewController {
 
         privacyDashboardController.willAppear()
         privacyDashboardController.preferredLocale = "en" // fixed until app is localised
+        
+        webView.reload()
     }
     
     override func viewDidAppear() {
@@ -101,7 +103,6 @@ final class PrivacyDashboardViewController: NSViewController {
         super.viewDidDisappear()
         
         currentContentHeight = Int(Constants.initialContentHeight)
-        webView.reload() // reset navigation state of the dashboard before next use
     }
     
     private func initWebView() {
