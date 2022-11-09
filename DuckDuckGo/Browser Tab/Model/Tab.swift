@@ -891,8 +891,8 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     private func previousServerTrustIfSameHost(_ host: String) -> ServerTrust? {
         let previousServerTrustForSameHost: ServerTrust?
     
-        if let serverTrust = privacyInfo?.serverTrust, serverTrust.host == host {
-            previousServerTrustForSameHost = serverTrust
+        if let secTrust = ServerTrustCache.shared.get(forDomain: host.droppingWwwPrefix()) {
+            previousServerTrustForSameHost = ServerTrust(host: host, secTrust: secTrust)
         } else {
             previousServerTrustForSameHost = nil
         }
@@ -1229,17 +1229,19 @@ extension Tab: WKNavigationDelegate {
                  didReceive challenge: URLAuthenticationChallenge,
                  completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
         webViewDidReceiveChallengePublisher.send()
-
+        
+        if let host = webView.url?.host, let serverTrust = challenge.protectionSpace.serverTrust, host == challenge.protectionSpace.host {
+            privacyInfo?.serverTrust = ServerTrust(host: host, secTrust: serverTrust)
+            ServerTrustCache.shared.put(serverTrust: serverTrust, forDomain: host.droppingWwwPrefix())
+        }
+        
         if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodHTTPBasic,
            let delegate = delegate {
             delegate.tab(self, requestedBasicAuthenticationChallengeWith: challenge.protectionSpace, completionHandler: completionHandler)
             return
         }
-
+        
         completionHandler(.performDefaultHandling, nil)
-        if let host = webView.url?.host, let serverTrust = challenge.protectionSpace.serverTrust, host == challenge.protectionSpace.host {
-            privacyInfo?.serverTrust = ServerTrust(host: host, secTrust: serverTrust)
-        }
     }
 
     func webView(_ webView: WKWebView, didReceiveServerRedirectForProvisionalNavigation navigation: WKNavigation!) {
