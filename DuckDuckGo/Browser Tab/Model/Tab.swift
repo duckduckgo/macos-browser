@@ -515,10 +515,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         contextMenuManager.decideNewWindowPolicy(for: navigationAction)
     }
 
-    var cbrCompletionTokensPublisher: AnyPublisher<[ContentBlockerRulesManager.CompletionToken], Never> {
-        userContentController.$contentBlockingAssets.compactMap { $0?.completionTokens }.eraseToAnyPublisher()
-    }
-
     private static let debugEvents = EventMapping<AMPProtectionDebugEvents> { event, _, _, _ in
         switch event {
         case .ampBlockingRulesCompilationFailed:
@@ -899,7 +895,9 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
 extension Tab: UserContentControllerDelegate {
 
-    func userContentController(_ userContentController: UserContentController, didInstallUserScripts userScripts: UserScripts) {
+    func userContentController(_ userContentController: UserContentController, didInstallContentRuleLists contentRuleLists: [String: WKContentRuleList], userScripts: UserScriptsProvider, updateEvent: ContentBlockerRulesManager.UpdateEvent) {
+        guard let userScripts = userScripts as? UserScripts else { fatalError("Unexpected UserScripts") }
+
         userScripts.debugScript.instrumentation = instrumentation
         userScripts.faviconScript.delegate = self
         userScripts.contextMenuScript.delegate = self.contextMenuManager
@@ -1095,7 +1093,8 @@ extension Tab: AdClickAttributionLogicDelegate {
     func attributionLogic(_ logic: AdClickAttributionLogic,
                           didRequestRuleApplication rules: ContentBlockerRulesManager.Rules?,
                           forVendor vendor: String?) {
-        let contentBlockerRulesScript = userContentController.contentBlockingAssets?.userScripts.contentBlockerRulesScript
+        let contentBlockerRulesScript = (userContentController.contentBlockingAssets?.userScripts as? UserScripts)?
+            .contentBlockerRulesScript
         let attributedTempListName = AdClickAttributionRulesProvider.Constants.attributedTempRuleListName
         
         guard ContentBlocking.shared.privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .contentBlocking)
@@ -1255,7 +1254,7 @@ extension Tab: WKNavigationDelegate {
 
         // This check needs to happen before GPC checks. Otherwise the navigation type may be rewritten to `.other`
         // which would skip link rewrites.
-        if navigationAction.navigationType == .linkActivated {
+        if navigationAction.navigationType != .backForward {
             let navigationActionPolicy = await linkProtection
                 .requestTrackingLinkRewrite(
                     initiatingURL: webView.url,
@@ -1292,7 +1291,12 @@ extension Tab: WKNavigationDelegate {
         if navigationAction.isTargetingMainFrame, navigationAction.navigationType != .backForward {
             if let newRequest = referrerTrimming.trimReferrer(forNavigation: navigationAction,
                                                               originUrl: webView.url ?? navigationAction.sourceFrame.webView?.url) {
-                defer {
+                if isRequestingNewTab {
+                    delegate?.tab(
+                        self,
+                        requestedNewTabWith: newRequest.url.map { .contentFromURL($0) } ?? .none,
+                        selected: shouldSelectNewTab)
+                } else {
                     _ = webView.load(newRequest)
                 }
                 return .cancel
