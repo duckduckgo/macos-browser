@@ -149,11 +149,11 @@ NSData *macKeyData;
 }
 
 - (NSData *)decryptData:(NSData *)data andIv:(NSData *)ivData {
-    unsigned char decryptionOutput[DEC_OUT_LENGTH];
-    int i;
-    for(i=0;i < DEC_OUT_LENGTH;i++) {
-        decryptionOutput[i] = 0;
-    }
+    unsigned char *decryptionOutput;
+
+    // AES has a fixed block size of 16-bytes regardless key size
+    size_t decryptionOutputLength = (data.length/16 + 1) * 16;
+    decryptionOutput = calloc(decryptionOutputLength, sizeof(unsigned char));
 
     unsigned char *ivBytes = (unsigned char *)ivData.bytes;
     unsigned char ivCopy[ivData.length];
@@ -163,12 +163,12 @@ NSData *macKeyData;
     AES_set_decrypt_key(encryptionKeyData.bytes, (int)encryptionKeyData.length * 8, &dec_key);
     AES_cbc_encrypt(data.bytes, decryptionOutput, data.length, &dec_key, (unsigned char *)ivCopy, AES_DECRYPT);
 
-    for(i=0;*(decryptionOutput+i)!=0x00;i++);
-
     // Padding removal
-    for(;!isgraph(*(decryptionOutput+(i - 1)));i--);
+    for(;!isgraph(*(decryptionOutput+(decryptionOutputLength - 1)));decryptionOutputLength--);
 
-    NSData *decryptedData = [NSData dataWithBytes:decryptionOutput length: i];
+    NSData *decryptedData = [NSData dataWithBytes:decryptionOutput length: decryptionOutputLength];
+    free(decryptionOutput);
+
     return decryptedData;
 }
 
