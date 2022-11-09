@@ -25,7 +25,7 @@ import PrivacyDashboard
 final class PrivacyDashboardViewController: NSViewController {
 
     struct Constants {
-        static let initialContentHeight: CGFloat = 452
+        static let initialContentHeight: CGFloat = 499
     }
 
     private var webView: WKWebView!
