@@ -146,7 +146,7 @@ final class TabBarViewController: NSViewController {
             self?.reloadSelection()
         }
     }
-
+    
     private func setupFireButton() {
         fireButton.toolTip = UserText.clearBrowsingHistoryTooltip
         fireButton.animationNames = MouseOverAnimationButton.AnimationNames(aqua: "flame-mouse-over", dark: "dark-flame-mouse-over")
