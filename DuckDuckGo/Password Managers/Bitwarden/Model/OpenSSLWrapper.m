@@ -125,8 +125,9 @@ NSData *macKeyData;
     AES_set_encrypt_key(encryptionKeyData.bytes, (int)encryptionKeyData.length * 8, &enc_key);
     AES_cbc_encrypt(dataArray, encryptionOutput, dataArrayLength, &enc_key, (unsigned char *)ivCopy, AES_ENCRYPT);
 
-    for(i=0;*(encryptionOutput+i)!=0x00;i++);
-    NSData *encryptedData = [NSData dataWithBytes:encryptionOutput length: i];
+    // AES has a fixed block size of 16-bytes regardless key size
+    size_t encryptedDataLendth = (dataArrayLength/16 + 1) * 16;
+    NSData *encryptedData = [NSData dataWithBytes:encryptionOutput length: encryptedDataLendth];
 
     // Compute HMAC
     NSMutableData *macData = [NSMutableData data];

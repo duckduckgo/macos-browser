@@ -383,22 +383,11 @@ final class BitwardenManager: BitwardenManagement, ObservableObject {
     }
 
     private func sendStatus(withDelay: Bool = false) {
-        //TODO: More general encryption method
-        guard let commandData = BitwardenMessage.EncryptedCommand(command: .status, payload: nil).data else {
+        guard let commandData = BitwardenMessage.EncryptedCommand(command: .status, payload: nil).data,
+              let encryptedCommand = encryptCommandData(commandData),
+              let messageData = BitwardenMessage.makeStatusMessage(encryptedCommand: encryptedCommand)?.data else {
             assertionFailure("Making the status message failed")
             status = .error(error: .sendingOfStatusMessageFailed)
-            return
-        }
-
-        guard let encryptedData = openSSLWrapper.encryptData(commandData) else {
-            status = .error(error: .sendingOfStatusMessageFailed)
-            return
-        }
-
-        let encryptedCommand = "2.\(encryptedData.iv.base64EncodedString())|\(encryptedData.data.base64EncodedString())|\(encryptedData.hmac.base64EncodedString())"
-
-        guard let messageData = BitwardenMessage.makeStatusMessage(encryptedCommand: encryptedCommand)?.data else {
-            assertionFailure("Making the status message failed")
             return
         }
 
@@ -414,21 +403,11 @@ final class BitwardenManager: BitwardenManagement, ObservableObject {
     private func sendCredentialRetrieval(url: URL, messageId: MessageId) {
         let payload = BitwardenRequest.EncryptedCommand.Payload(uri: url.absoluteString)
         guard let commandData = BitwardenRequest.EncryptedCommand(command: .credentialRetrieval,
-                                                                  payload: payload).data else {
+                                                                  payload: payload).data,
+              let encryptedCommand = encryptCommandData(commandData),
+              let messageData = BitwardenMessage.makeCredentialRetrievalMessage(encryptedCommand: encryptedCommand, messageId: messageId)?.data else {
             assertionFailure("Making the credential retrieval message failed")
             status = .error(error: .sendingOfStatusMessageFailed)
-            return
-        }
-
-        guard let encryptedData = openSSLWrapper.encryptData(commandData) else {
-            status = .error(error: .sendingOfStatusMessageFailed)
-            return
-        }
-
-        let encryptedCommand = "2.\(encryptedData.iv.base64EncodedString())|\(encryptedData.data.base64EncodedString())|\(encryptedData.hmac.base64EncodedString())"
-
-        guard let messageData = BitwardenMessage.makeCredentialRetrievalMessage(encryptedCommand: encryptedCommand, messageId: messageId)?.data else {
-            assertionFailure("Making the status message failed")
             return
         }
 
@@ -442,21 +421,11 @@ final class BitwardenManager: BitwardenManagement, ObservableObject {
                                                                 password: credential.password,
                                                                 name: credential.credentialName)
         guard let commandData = BitwardenRequest.EncryptedCommand(command: .credentialCreate,
-                                                                  payload: payload).data else {
-            assertionFailure("Making the credential retrieval message failed")
+                                                                  payload: payload).data,
+              let encryptedCommand = encryptCommandData(commandData),
+              let messageData = BitwardenMessage.makeCredentialCreationMessage(encryptedCommand: encryptedCommand, messageId: messageId)?.data else {
+            assertionFailure("Making the credential creation message failed")
             status = .error(error: .sendingOfStatusMessageFailed)
-            return
-        }
-
-        guard let encryptedData = openSSLWrapper.encryptData(commandData) else {
-            status = .error(error: .sendingOfStatusMessageFailed)
-            return
-        }
-
-        let encryptedCommand = "2.\(encryptedData.iv.base64EncodedString())|\(encryptedData.data.base64EncodedString())|\(encryptedData.hmac.base64EncodedString())"
-
-        guard let messageData = BitwardenMessage.makeCredentialCreationMessage(encryptedCommand: encryptedCommand, messageId: messageId)?.data else {
-            assertionFailure("Making the status message failed")
             return
         }
 
@@ -471,25 +440,29 @@ final class BitwardenManager: BitwardenManagement, ObservableObject {
                                                                 name: credential.credentialName,
                                                                 credentialId: credential.credentialId)
         guard let commandData = BitwardenRequest.EncryptedCommand(command: .credentialUpdate,
-                                                                  payload: payload).data else {
-            assertionFailure("Making the credential retrieval message failed")
+                                                                  payload: payload).data,
+              let encryptedCommand = encryptCommandData(commandData),
+              let messageData = BitwardenMessage.makeCredentialCreationMessage(encryptedCommand: encryptedCommand, messageId: messageId)?.data else {
+            assertionFailure("Making the credential update message failed")
             status = .error(error: .sendingOfStatusMessageFailed)
-            return
-        }
-
-        guard let encryptedData = openSSLWrapper.encryptData(commandData) else {
-            status = .error(error: .sendingOfStatusMessageFailed)
-            return
-        }
-
-        let encryptedCommand = "2.\(encryptedData.iv.base64EncodedString())|\(encryptedData.data.base64EncodedString())|\(encryptedData.hmac.base64EncodedString())"
-
-        guard let messageData = BitwardenMessage.makeCredentialCreationMessage(encryptedCommand: encryptedCommand, messageId: messageId)?.data else {
-            assertionFailure("Making the status message failed")
             return
         }
 
         communicator.send(messageData: messageData)
+    }
+
+    private func encryptCommandData(_ commandData: Data) -> String? {
+        guard let encryptedData = openSSLWrapper.encryptData(commandData) else {
+            return nil
+        }
+
+#if DEBUG
+        // Verify encryption
+        let decryptedData = openSSLWrapper.decryptData(encryptedData.data, andIv: encryptedData.iv)
+        assert(decryptedData.utf8String() != nil)
+#endif
+
+        return "2.\(encryptedData.iv.base64EncodedString())|\(encryptedData.data.base64EncodedString())|\(encryptedData.hmac.base64EncodedString())"
     }
     
     // MARK: - Encryption
