@@ -881,23 +881,11 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         privacyInfo = PrivacyInfo(url: url,
                                   parentEntity: entity,
                                   protectionStatus: makeProtectionStatus(for: host),
-                                  serverTrust: previousServerTrustIfSameHost(host))
+                                  serverTrust: ServerTrustCache.shared.get(forDomain: host.droppingWwwPrefix()))
         
         previousPrivacyInfosByURL[url.absoluteString] = privacyInfo
         
         return privacyInfo
-    }
-    
-    private func previousServerTrustIfSameHost(_ host: String) -> ServerTrust? {
-        let previousServerTrustForSameHost: ServerTrust?
-    
-        if let secTrust = ServerTrustCache.shared.get(forDomain: host.droppingWwwPrefix()) {
-            previousServerTrustForSameHost = ServerTrust(host: host, secTrust: secTrust)
-        } else {
-            previousServerTrustForSameHost = nil
-        }
-        
-        return previousServerTrustForSameHost
     }
     
     private func resetConnectionUpgradedTo(navigationAction: WKNavigationAction) {
@@ -1231,8 +1219,8 @@ extension Tab: WKNavigationDelegate {
         webViewDidReceiveChallengePublisher.send()
         
         if let host = webView.url?.host, let serverTrust = challenge.protectionSpace.serverTrust, host == challenge.protectionSpace.host {
-            privacyInfo?.serverTrust = ServerTrust(host: host, secTrust: serverTrust)
-            ServerTrustCache.shared.put(serverTrust: serverTrust, forDomain: host.droppingWwwPrefix())
+            privacyInfo?.serverTrust = serverTrust
+            ServerTrustCache.shared.insert(serverTrust: serverTrust, forDomain: host.droppingWwwPrefix())
         }
         
         if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodHTTPBasic,
