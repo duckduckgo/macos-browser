@@ -162,7 +162,7 @@ final class BitwardenManager: BitwardenManagement, ObservableObject {
         }
 
         statusRefreshingTimer = Timer.scheduledTimer(withTimeInterval: 2, repeats: true) { [weak self] timer in
-            self?.sendStatus(withDelay: false)
+            self?.sendStatus()
         }
     }
 
@@ -193,7 +193,7 @@ final class BitwardenManager: BitwardenManagement, ObservableObject {
                     return
                 }
                 status = .waitingForTheStatusResponse
-                sendStatus(withDelay: true)
+                sendStatus()
             } else {
                 // Onboarding is in progress
                 // Other part of the code is responsible for sending the handshake message
@@ -382,7 +382,7 @@ final class BitwardenManager: BitwardenManagement, ObservableObject {
         communicator.send(messageData: messageData)
     }
 
-    private func sendStatus(withDelay: Bool = false) {
+    private func sendStatus() {
         guard let commandData = BitwardenMessage.EncryptedCommand(command: .status, payload: nil).data,
               let encryptedCommand = encryptCommandData(commandData),
               let messageData = BitwardenMessage.makeStatusMessage(encryptedCommand: encryptedCommand)?.data else {
@@ -391,13 +391,7 @@ final class BitwardenManager: BitwardenManagement, ObservableObject {
             return
         }
 
-        if withDelay {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in
-                self?.communicator.send(messageData: messageData)
-            }
-        } else {
-            communicator.send(messageData: messageData)
-        }
+        communicator.send(messageData: messageData)
     }
 
     private func sendCredentialRetrieval(url: URL, messageId: MessageId) {
