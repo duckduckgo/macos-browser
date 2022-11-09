@@ -880,8 +880,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         
         privacyInfo = PrivacyInfo(url: url,
                                   parentEntity: entity,
-                                  protectionStatus: makeProtectionStatus(for: host),
-                                  serverTrust: ServerTrustCache.shared.get(forDomain: host.droppingWwwPrefix()))
+                                  protectionStatus: makeProtectionStatus(for: host))
         
         previousPrivacyInfosByURL[url.absoluteString] = privacyInfo
         
@@ -1217,11 +1216,6 @@ extension Tab: WKNavigationDelegate {
                  didReceive challenge: URLAuthenticationChallenge,
                  completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
         webViewDidReceiveChallengePublisher.send()
-        
-        if let host = webView.url?.host, let serverTrust = challenge.protectionSpace.serverTrust, host == challenge.protectionSpace.host {
-            privacyInfo?.serverTrust = serverTrust
-            ServerTrustCache.shared.insert(serverTrust: serverTrust, forDomain: host.droppingWwwPrefix())
-        }
         
         if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodHTTPBasic,
            let delegate = delegate {

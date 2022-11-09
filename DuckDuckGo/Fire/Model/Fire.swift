@@ -94,7 +94,6 @@ final class Fire {
     let stateRestorationManager: AppStateRestorationManager?
     let recentlyClosedCoordinator: RecentlyClosedCoordinating?
     let pinnedTabsManager: PinnedTabsManager
-    let serverTrustCache: ServerTrustCache
     
     let tabsCleaner = TabDataCleaner()
 
@@ -113,8 +112,7 @@ final class Fire {
          autoconsentManagement: AutoconsentManagement? = nil,
          stateRestorationManager: AppStateRestorationManager? = nil,
          recentlyClosedCoordinator: RecentlyClosedCoordinating? = RecentlyClosedCoordinator.shared,
-         pinnedTabsManager: PinnedTabsManager = WindowControllersManager.shared.pinnedTabsManager,
-         serverTrustCache: ServerTrustCache = ServerTrustCache.shared
+         pinnedTabsManager: PinnedTabsManager = WindowControllersManager.shared.pinnedTabsManager
     ) {
         self.webCacheManager = cacheManager
         self.historyCoordinating = historyCoordinating
@@ -124,7 +122,6 @@ final class Fire {
         self.faviconManagement = faviconManagement
         self.recentlyClosedCoordinator = recentlyClosedCoordinator
         self.pinnedTabsManager = pinnedTabsManager
-        self.serverTrustCache = serverTrustCache
         
         if #available(macOS 11, *), autoconsentManagement == nil {
             self.autoconsentManagement = AutoconsentManagement.shared
@@ -205,7 +202,6 @@ final class Fire {
 
             self.burnRecentlyClosed(domains: burningDomains)
             self.burnAutoconsentCache()
-            self.burnServerTrustCache(domains: burningDomains)
 
             group.notify(queue: .main) {
                 self.burningData = nil
@@ -254,7 +250,6 @@ final class Fire {
 
             self.burnRecentlyClosed()
             self.burnAutoconsentCache()
-            self.burnServerTrustCache()
 
             group.notify(queue: .main) {
                 self.burningData = nil
@@ -427,16 +422,6 @@ final class Fire {
 
     private func burnRecentlyClosed(domains: Set<String>? = nil) {
         recentlyClosedCoordinator?.burnCache(domains: domains)
-    }
-    
-    // MARK: - Burn ServerTrustCache
-
-    private func burnServerTrustCache(domains: Set<String>? = nil) {
-        if let domains = domains {
-            domains.forEach { serverTrustCache.remove(forDomain: $0) }
-        } else {
-            serverTrustCache.clear()
-        }
     }
 }
 
