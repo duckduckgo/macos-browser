@@ -219,8 +219,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         if favicon == nil {
             handleFavicon()
         }
-        
-        resetDashboardInfo()
 
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(onDuckDuckGoEmailSignOut),
@@ -294,7 +292,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                 self.title = title
             }
             
-            resetDashboardInfo()
         }
     }
 
