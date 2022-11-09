@@ -138,11 +138,12 @@ class PasswordManagerCoordinator: BrowserServicesKit.PasswordManager {
             return
         }
 
-        bitwardenManagement.retrieveCredentials(for: url) { credentials, error in
+        bitwardenManagement.retrieveCredentials(for: url) { [weak self] credentials, error in
             if let error = error {
                 completion([], error)
                 return
             } else {
+                self?.cache(credentials: credentials)
                 let credentials = credentials.compactMap { BrowserServicesKit.SecureVaultModels.WebsiteCredentials(from: $0) }
                 completion(credentials, nil)
             }
