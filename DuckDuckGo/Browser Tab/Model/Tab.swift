@@ -857,12 +857,24 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     
     // MARK: - Dashboard Info
     private(set) var privacyInfo: PrivacyInfo?
+    private var previousPrivacyInfosByURL: [String: PrivacyInfo] = [:]
+    private var didGoBackForward: Bool = false
 
     private func resetDashboardInfo() {
-        guard let url = content.url, let host = url.host else {
+        if let url = content.url {
+            if didGoBackForward, let privacyInfo = previousPrivacyInfosByURL[url.absoluteString] {
+                self.privacyInfo = privacyInfo
+                didGoBackForward = false
+            } else {
+                privacyInfo = makePrivacyInfo(url: url)
+            }
+        } else {
             privacyInfo = nil
-            return
         }
+    }
+    
+    private func makePrivacyInfo(url: URL) -> PrivacyInfo? {
+        guard let url = content.url, let host = url.host else { return nil }
         
         let entity = ContentBlocking.shared.trackerDataManager.trackerData.findEntity(forHost: host)
         
@@ -870,6 +882,10 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                                   parentEntity: entity,
                                   protectionStatus: makeProtectionStatus(for: host),
                                   serverTrust: previousServerTrustIfSameHost(host))
+        
+        previousPrivacyInfosByURL[url.absoluteString] = privacyInfo
+        
+        return privacyInfo
     }
     
     private func previousServerTrustIfSameHost(_ host: String) -> ServerTrust? {
@@ -1267,6 +1283,8 @@ extension Tab: WKNavigationDelegate {
         let isRequestingNewTab = (isLinkActivated && NSApp.isCommandPressed) || isMiddleButtonClicked || isNavigatingAwayFromPinnedTab
         let shouldSelectNewTab = NSApp.isShiftPressed || (isNavigatingAwayFromPinnedTab && !isMiddleButtonClicked && !NSApp.isCommandPressed)
 
+        didGoBackForward = (navigationAction.navigationType == .backForward)
+        
         // This check needs to happen before GPC checks. Otherwise the navigation type may be rewritten to `.other`
         // which would skip link rewrites.
         if navigationAction.navigationType != .backForward {
