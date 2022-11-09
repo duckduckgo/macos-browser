@@ -19,11 +19,11 @@
 #import "OpenSSLWrapper.h"
 #import "os/log.h"
 
-#define KEY_LENGTH  2048
-#define PUB_EXP     65537
-#define IV_LENGTH   16
-#define ENC_OUT_LENGTH 500
-#define DEC_OUT_LENGTH 2000
+#define KEY_LENGTH      2048
+#define PUB_EXP         65537
+#define IV_LENGTH       16
+#define BLOCK_SIZE      16
+#define SHARED_KEY_SIZE  64
 
 @implementation OpenSSLWrapper
 
@@ -60,7 +60,7 @@ NSData *macKeyData;
 }
 
 - (BOOL)setSharedKey:(NSData *)sharedKey {
-    if ([sharedKey length] != 64) {
+    if ([sharedKey length] != SHARED_KEY_SIZE) {
         return false;
     }
 
@@ -106,14 +106,12 @@ NSData *macKeyData;
     //TODO: Generate iv - random 16 bytes
     NSData *ivData = [macKeyData subdataWithRange:NSMakeRange(0, IV_LENGTH)];
 
-    unsigned char encryptionOutput[ENC_OUT_LENGTH];
-    int i;
-    for(i=0;i < ENC_OUT_LENGTH;i++) {
-        encryptionOutput[i] = 0;
-    }
-
     unsigned char *dataArray = (unsigned char *)data.bytes;
     size_t dataArrayLength = data.length;
+
+    // AES has a fixed block size of 16-bytes regardless key size
+    size_t encryptedDataLength = (dataArrayLength/BLOCK_SIZE + 1) * BLOCK_SIZE;
+    unsigned char *encryptionOutput = calloc(encryptedDataLength, sizeof(unsigned char));
 
     unsigned char *ivBytes = (unsigned char *)ivData.bytes;
     unsigned char ivCopy[IV_LENGTH];
@@ -125,9 +123,8 @@ NSData *macKeyData;
     AES_set_encrypt_key(encryptionKeyData.bytes, (int)encryptionKeyData.length * 8, &enc_key);
     AES_cbc_encrypt(dataArray, encryptionOutput, dataArrayLength, &enc_key, (unsigned char *)ivCopy, AES_ENCRYPT);
 
-    // AES has a fixed block size of 16-bytes regardless key size
-    size_t encryptedDataLendth = (dataArrayLength/16 + 1) * 16;
-    NSData *encryptedData = [NSData dataWithBytes:encryptionOutput length: encryptedDataLendth];
+    NSData *encryptedData = [NSData dataWithBytes:encryptionOutput length: encryptedDataLength];
+    free(encryptionOutput);
 
     // Compute HMAC
     NSMutableData *macData = [NSMutableData data];
@@ -152,7 +149,7 @@ NSData *macKeyData;
     unsigned char *decryptionOutput;
 
     // AES has a fixed block size of 16-bytes regardless key size
-    size_t decryptionOutputLength = (data.length/16 + 1) * 16;
+    size_t decryptionOutputLength = (data.length/BLOCK_SIZE + 1) * BLOCK_SIZE;
     decryptionOutput = calloc(decryptionOutputLength, sizeof(unsigned char));
 
     unsigned char *ivBytes = (unsigned char *)ivData.bytes;
