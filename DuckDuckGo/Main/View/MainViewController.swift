@@ -228,13 +228,17 @@ final class MainViewController: NSViewController {
     }
     
     private func subscribeToTitleChange() {
-        if let tab = self.tabCollectionViewModel.selectedTab {
-            windowTitleCancellable = tab.$title.receive(on: DispatchQueue.main).sink {[weak self] _ in
-                
-                guard let self = self else { return }
-                self.view.window?.title = tab.windowTitle
+        guard let window = self.view.window else { return }
+        windowTitleCancellable = tabCollectionViewModel.$selectedTabViewModel
+            .compactMap { tabViewModel in
+                tabViewModel?.$title
             }
-        }
+            .switchToLatest()
+            .map {
+                $0.truncated(length: MainMenu.Constants.maxTitleLength)
+            }
+            .receive(on: DispatchQueue.main)
+            .assign(to: \.title, onWeaklyHeld: window)
     }
 
     private func subscribeToAppSettingsNotifications() {

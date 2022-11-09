@@ -1645,28 +1645,3 @@ extension Tab: TabDataClearing {
         webView.load(URL(string: "about:blank")!)
     }
 }
-
-extension Tab {
-    
-    var windowTitle: String {
-        switch content {
-        case .homePage:
-            return UserText.tabHomeTitle
-        case .preferences:
-            return UserText.tabPreferencesTitle
-        case .bookmarks:
-            return UserText.tabPreferencesTitle
-        case .url, .privatePlayer:
-            var title = title ?? content.url?.absoluteString ?? ""
-            
-            if title.count > MainMenu.Constants.maxTitleLength {
-                title = String(title.truncated(length: MainMenu.Constants.maxTitleLength))
-            }
-            return title
-        case .onboarding:
-            return UserText.tabOnboardingTitle
-        case .none:
-            return ""
-        }
-    }
-}
