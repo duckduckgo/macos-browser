@@ -874,7 +874,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     }
     
     private func makePrivacyInfo(url: URL) -> PrivacyInfo? {
-        guard let url = content.url, let host = url.host else { return nil }
+        guard let host = url.host else { return nil }
         
         let entity = ContentBlocking.shared.trackerDataManager.trackerData.findEntity(forHost: host)
         
@@ -1228,6 +1228,7 @@ extension Tab: WKNavigationDelegate {
 
     func webView(_ webView: WKWebView, didReceiveServerRedirectForProvisionalNavigation navigation: WKNavigation!) {
         isBeingRedirected = true
+        resetDashboardInfo()
     }
 
     func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
