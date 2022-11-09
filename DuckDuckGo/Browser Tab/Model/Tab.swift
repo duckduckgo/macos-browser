@@ -394,6 +394,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                 historyCoordinating.commitChanges(url: oldUrl)
             }
             error = nil
+            alertHandlingState = .notShown
             Task {
                 await reloadIfNeeded(shouldLoadInBackground: true)
             }
@@ -575,6 +576,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         if privatePlayer.goBackSkippingLastItemIfNeeded(for: webView) {
             return
         }
+        userInteractionDialog = nil
         webView.goBack()
     }
 
@@ -592,6 +594,8 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     }
 
     func reload() {
+        alertHandlingState = .notShown
+        userInteractionDialog = nil
         currentDownload = nil
         if let error = error, let failingUrl = error.failingUrl {
             webView.load(failingUrl)
@@ -993,6 +997,20 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                                 denylisted: false)
     }
 
+    // MARK: - Alerts
+
+    enum AlertHandlingState {
+        case notShown, shown, blocked
+
+        var hasShown: Bool {
+            switch self {
+            case .notShown: return false
+            case .shown, .blocked: return true
+            }
+        }
+    }
+
+    var alertHandlingState = AlertHandlingState.notShown
 }
 
 extension Tab: UserContentControllerDelegate {

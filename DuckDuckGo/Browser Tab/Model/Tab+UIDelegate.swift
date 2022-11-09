@@ -223,20 +223,34 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
     }
 
     func webView(_ webView: WKWebView, runJavaScriptAlertPanelWithMessage message: String, initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping () -> Void) {
-        let dialog = UserDialogType.jsDialog(.alert(.init(message) { _ in
-            completionHandler()
-        }))
-        userInteractionDialog = UserDialog(sender: .page(domain: frame.request.url?.host), dialog: dialog)
+        createAlertDialog(initiatedByFrame: frame, prompt: message) { [weak self] parameters in
+            .alert(.init(parameters, callback: { [weak self] result in
+                switch result {
+                case .failure:
+                    completionHandler()
+                case .success(let alertResult):
+                    self?.setAlertBlocking(alertResult.shouldBlockNext)
+                    completionHandler()
+                }
+            }))
+        }
     }
 
     func webView(_ webView: WKWebView,
                  runJavaScriptConfirmPanelWithMessage message: String,
                  initiatedByFrame frame: WKFrameInfo,
                  completionHandler: @escaping (Bool) -> Void) {
-        let dialog = UserDialogType.jsDialog(.confirm(.init(message) { result in
-            completionHandler((try? result.get()) ?? false)
-        }))
-        userInteractionDialog = UserDialog(sender: .page(domain: frame.request.url?.host), dialog: dialog)
+        createAlertDialog(initiatedByFrame: frame, prompt: message) { [weak self] parameters in
+            .confirm(.init(parameters, callback: { [weak self] result in
+                switch result {
+                case .failure:
+                    completionHandler(false)
+                case .success(let alertResult):
+                    self?.setAlertBlocking(alertResult.shouldBlockNext)
+                    completionHandler(alertResult.completionArgument)
+                }
+            }))
+        }
     }
 
     func webView(_ webView: WKWebView,
@@ -244,11 +258,42 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
                  defaultText: String?,
                  initiatedByFrame frame: WKFrameInfo,
                  completionHandler: @escaping (String?) -> Void) {
+        createAlertDialog(initiatedByFrame: frame, prompt: prompt, defaultInputText: defaultText) { [weak self] parameters in
+            .textInput(.init(parameters, callback: { [weak self] result in
+                switch result {
+                case .failure:
+                    completionHandler(nil)
+                case .success(let alertResult):
+                    self?.setAlertBlocking(alertResult.shouldBlockNext)
+                    completionHandler(alertResult.completionArgument)
+                }
+            }))
+        }
+    }
 
-        let dialog = UserDialogType.jsDialog(.textInput(.init( (prompt: prompt, defaultText: defaultText) ) { result in
-            completionHandler(try? result.get())
-        }))
+    private func createAlertDialog(initiatedByFrame frame: WKFrameInfo, prompt: String, defaultInputText: String? = nil, queryCreator: (JSAlertParameters) -> JSAlertQuery) {
+        let parameters = JSAlertParameters(
+            hasDomainShownAlert: alertHandlingState.hasShown,
+            domain: frame.request.url?.host ?? "",
+            prompt: prompt,
+            defaultInputText: nil
+        )
+        let alertQuery = queryCreator(parameters)
+        guard alertHandlingState != .blocked else {
+            alertQuery.cancel()
+            return
+        }
+        let dialog = UserDialogType.jsDialog(alertQuery)
         userInteractionDialog = UserDialog(sender: .page(domain: frame.request.url?.host), dialog: dialog)
+        alertHandlingState = .shown
+    }
+
+    private func setAlertBlocking(_ shouldBlockAlerts: Bool) {
+        if shouldBlockAlerts {
+            alertHandlingState = .blocked
+        } else {
+            alertHandlingState = .shown
+        }
     }
 
     func webViewDidClose(_ webView: WKWebView) {

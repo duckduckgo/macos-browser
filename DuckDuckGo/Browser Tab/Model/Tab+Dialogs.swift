@@ -24,11 +24,30 @@ struct SavePanelParameters {
     let fileTypes: [UTType]
 }
 
+struct JSAlertParameters {
+    let hasDomainShownAlert: Bool
+    let domain: String
+    let prompt: String
+    let defaultInputText: String?
+}
+
+struct JSAlertResult<JSCallbackArgument> {
+    let completionArgument: JSCallbackArgument
+    let shouldBlockNext: Bool
+}
+
+extension JSAlertResult where JSCallbackArgument == Void {
+    init(shouldBlockNext: Bool) {
+        self.shouldBlockNext = shouldBlockNext
+        completionArgument = ()
+    }
+}
+
 typealias OpenPanelDialogRequest = UserDialogRequest<WKOpenPanelParameters, [URL]?>
 typealias SavePanelDialogRequest = UserDialogRequest<SavePanelParameters, (url: URL, fileType: UTType?)?>
-typealias ConfirmDialogRequest = UserDialogRequest<String, Bool>
-typealias TextInputDialogRequest = UserDialogRequest<(prompt: String, defaultText: String?), String?>
-typealias AlertDialogRequest = UserDialogRequest<String, Void>
+typealias ConfirmDialogRequest = UserDialogRequest<JSAlertParameters, JSAlertResult<Bool>>
+typealias TextInputDialogRequest = UserDialogRequest<JSAlertParameters, JSAlertResult<String?>>
+typealias AlertDialogRequest = UserDialogRequest<JSAlertParameters, JSAlertResult<Void>>
 typealias BasicAuthDialogRequest = UserDialogRequest<URLProtectionSpace, (URLSession.AuthChallengeDisposition, URLCredential?)>
 typealias PrintDialogRequest = UserDialogRequest<NSPrintOperation, Bool>
 
