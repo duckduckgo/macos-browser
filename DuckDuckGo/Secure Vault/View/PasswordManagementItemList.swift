@@ -198,6 +198,7 @@ private struct PasswordManagementItemStackContentsView: View {
 
 private struct PasswordManagerItemView: View {
     @ObservedObject var model: PasswordManagementItemListModel
+    
     let action: () -> Void
     
     private var isLocked: Bool {
@@ -205,7 +206,7 @@ private struct PasswordManagerItemView: View {
     }
     
     private var lockStatusLabel: String {
-        isLocked ? "Locked" : "Unlocked"
+        isLocked ? UserText.passwordManagerLockedStatus : UserText.passwordManagerUnlockedStatus
     }
     
     private var selected: Bool {
@@ -231,7 +232,7 @@ private struct PasswordManagerItemView: View {
                     .padding(.leading, 6)
                 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Bitwarden")
+                    Text(model.externalPasswordViewManager.managerName)
                         .foregroundColor(textColor)
                         .font(font)
                     Text(lockStatusLabel)

@@ -638,4 +638,24 @@ struct UserText {
     static let databaseFactoryFailedMessage = NSLocalizedString("database.factory.failed.message", value: "There was an error initializing the database", comment: "Alert title when we fail to init database")
     static let databaseFactoryFailedInformative = NSLocalizedString("database.factory.failed.information", value: "Restart your Mac and try again", comment: "Info to restart macOS after database init failure")
 
+    static func passwordManagerPopoverTitle(managerName: String) -> String {
+        let localized = NSLocalizedString("autofill.popover.password-manager-title", value: "You're using %@ to manage passwords", comment: "Explanation of what password manager is being used")
+        return String(format: localized, managerName)
+    }
+    static let passwordManagerPopoverSettingsButton = NSLocalizedString("autofill.popover.settings-button", value: "Settings", comment: "Open Settings Button")
+    static let passwordManagerPopoverChangeInSettingsLabel = NSLocalizedString("autofill.popover.change-in", value: "Change in", comment: "Suffix of the label - change in settings - ")
+   
+    static func passwordManagerPopoverConnectedToUser(user: String) -> String {
+        let localized = NSLocalizedString("autofill.popover.password-manager-connected-to-user", value: "Connected to user %@", comment: "Label describing what user is connected to the password manager")
+        return String(format: localized, user)
+    }
+
+    static func openPasswordManagerButton(managerName: String) -> String {
+        let localized = NSLocalizedString("autofill.popover.open-password-manager", value: "Open %@", comment: "Open password manager button")
+        return String(format: localized, managerName)
+    }
+    
+    static let passwordManagerLockedStatus = NSLocalizedString("autofill.manager.status.locked", value: "Locked", comment: "Locked status for password manager")
+    static let passwordManagerUnlockedStatus = NSLocalizedString("autofill.manager.status.unlocked", value: "Unlocked", comment: "Unlocked status for password manager")
 }
+

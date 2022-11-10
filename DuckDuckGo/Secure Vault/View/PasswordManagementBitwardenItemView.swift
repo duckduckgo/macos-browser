@@ -27,19 +27,19 @@ struct PasswordManagementBitwardenItemView: View {
             Image("BitwardenLogin")
             
             VStack(spacing: 2) {
-                Text("You're using Bitwarden to manage passwords")
+                Text(UserText.passwordManagerPopoverTitle(managerName: manager.managerName))
                 HStack (spacing: 3) {
-                    Text("Change in")
+                    Text(UserText.passwordManagerPopoverChangeInSettingsLabel)
                     Button {
                         manager.openSettings()
                         didFinish()
                     } label: {
-                        Text("Settings")
+                        Text(UserText.passwordManagerPopoverSettingsButton)
                     }.buttonStyle(.link)
                 }
             }
             if let email = manager.username {
-                Text("Connected to user \(email)")
+                Text(UserText.passwordManagerPopoverConnectedToUser(user: email))
                     .font(.subheadline)
                     .foregroundColor(Color("BlackWhite60"))
             }
@@ -48,7 +48,7 @@ struct PasswordManagementBitwardenItemView: View {
                 manager.openExternalPasswordManager()
                 didFinish()
             } label: {
-                Text("Open \(manager.managerName)")
+                Text(UserText.openPasswordManagerButton(managerName: manager.managerName))
             }
         }
     }
