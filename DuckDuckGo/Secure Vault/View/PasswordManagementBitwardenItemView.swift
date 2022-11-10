@@ -36,12 +36,12 @@ struct PasswordManagementBitwardenItemView: View {
                     } label: {
                         Text("Settings")
                     }.buttonStyle(.link)
-                    
                 }
             }
             if let email = manager.email {
                 Text("Connected to user \(email)")
-                    .font(.caption)
+                    .font(.subheadline)
+                    .foregroundColor(Color("BlackWhite60"))
             }
             
             Button {
