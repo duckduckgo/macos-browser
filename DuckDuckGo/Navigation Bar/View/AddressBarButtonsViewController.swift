@@ -329,7 +329,8 @@ final class AddressBarButtonsViewController: NSViewController {
             privacyDashboardPopover.close()
             return
         }
-        privacyDashboardPopover.viewController.tabViewModel = selectedTabViewModel
+        
+        privacyDashboardPopover.viewController.updateTabViewModel(selectedTabViewModel)
         
         let positioningViewInWindow = privacyDashboardPositioningView.convert(privacyDashboardPositioningView.bounds, to: view.window?.contentView)
         privacyDashboardPopover.setPreferredMaxHeight(positioningViewInWindow.origin.y)
@@ -593,7 +594,7 @@ final class AddressBarButtonsViewController: NSViewController {
     private func subscribePrivacyDashboardPendingUpdates() {
         privacyDashboadPendingUpdatesCancellable?.cancel()
 
-        privacyDashboadPendingUpdatesCancellable = privacyDashboardPopover.viewController
+        privacyDashboadPendingUpdatesCancellable = privacyDashboardPopover.viewController.rulesUpdateObserver
             .$pendingUpdates.receive(on: DispatchQueue.main).sink { [weak self] _ in
             let isPendingUpdate = self?.privacyDashboardPopover.viewController.isPendingUpdates() ?? false
 
@@ -785,7 +786,7 @@ final class AddressBarButtonsViewController: NSViewController {
             return
         }
 
-        if let trackerInfo = selectedTabViewModel.tab.trackerInfo {
+        if let trackerInfo = selectedTabViewModel.tab.privacyInfo?.trackerInfo {
             let lastTrackerImages = PrivacyIconViewModel.trackerImages(from: trackerInfo)
             trackerAnimationImageProvider.lastTrackerImages = lastTrackerImages
 
