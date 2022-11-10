@@ -49,6 +49,9 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
         appearanceCancellable = NSApp.publisher(for: \.effectiveAppearance).map { $0 as NSAppearance? }.sink { [weak self] appearance in
             self?.webView.appearance = appearance
         }
+
+        // Initialize to default size to reduce flicker
+        requestResizeToSize(CGSize(width: 0, height: 0))
     }
 
     public func setType(serializedInputContext: String, zoomFactor: CGFloat?) {
