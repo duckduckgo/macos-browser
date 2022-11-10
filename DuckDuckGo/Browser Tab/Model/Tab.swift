@@ -490,17 +490,20 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     @discardableResult
     private func setFBProtection(enabled: Bool) -> Bool {
         guard self.fbBlockingEnabled != enabled else { return false }
-
+        guard let userContentController = userContentController else {
+            assertionFailure("Missing UserContentController")
+            return false
+        }
         if enabled {
             do {
-                try userContentController!.enableGlobalContentRuleList(withIdentifier: ContentBlockerRulesLists.Constants.clickToLoadRulesListName)
+                try userContentController.enableGlobalContentRuleList(withIdentifier: ContentBlockerRulesLists.Constants.clickToLoadRulesListName)
             } catch {
                 assertionFailure("Missing FB List")
                 return false
             }
         } else {
             do {
-                try userContentController!.disableGlobalContentRuleList(withIdentifier: ContentBlockerRulesLists.Constants.clickToLoadRulesListName)
+                try userContentController.disableGlobalContentRuleList(withIdentifier: ContentBlockerRulesLists.Constants.clickToLoadRulesListName)
             } catch {
                 assertionFailure("FB List was not enabled")
                 return false

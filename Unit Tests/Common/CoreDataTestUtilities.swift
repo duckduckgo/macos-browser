@@ -50,11 +50,11 @@ final class CoreData {
         guard let encodableType = propertyClass as? (NSObject & NSSecureCoding).Type else {
             fatalError("Unsupported type")
         }
-        func registerValueTransformer<T: NSObject & NSSecureCoding>(_ type: T.Type) -> NSValueTransformerName {
+        func registerValueTransformer<T: NSObject & NSSecureCoding>(for type: T.Type) -> NSValueTransformerName {
             (try? EncryptedValueTransformer<T>.registerTransformer(keyStore: keyStore))!
             return EncryptedValueTransformer<T>.transformerName
         }
-        return _openExistential(encodableType, do: registerValueTransformer)
+        return registerValueTransformer(for: encodableType)
     }
 
     static func registerValueTransformers(for managedObjectModel: NSManagedObjectModel) -> [NSValueTransformerName] {
