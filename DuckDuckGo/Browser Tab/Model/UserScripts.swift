@@ -21,7 +21,7 @@ import Foundation
 import BrowserServicesKit
 import TrackerRadarKit
 
-final class UserScripts {
+final class UserScripts: UserScriptsProvider {
 
     let pageObserverScript = PageObserverUserScript()
     let faviconScript = FaviconUserScript()

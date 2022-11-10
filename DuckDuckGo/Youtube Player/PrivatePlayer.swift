@@ -131,10 +131,11 @@ extension PrivatePlayer {
 
             // When the feature is disabled but the webView still gets a Private Player URL,
             // convert it back to a regular YouTube video URL.
-            if navigationAction.request.url?.isPrivatePlayer == true,
+            if navigationAction.request.url?.isPrivatePlayerScheme == true,
                 let (videoID, timestamp) = navigationAction.request.url?.youtubeVideoParams {
 
                 tab.webView.load(.youtube(videoID, timestamp: timestamp))
+                return .cancel
             }
             return nil
         }
@@ -206,6 +207,12 @@ extension PrivatePlayer {
             return nil
         }
         return .privatePlayer
+    }
+
+    func image(for bookmark: Bookmark) -> NSImage? {
+        // Bookmarks to Duck Player pages retain duck:// URL even when Duck Player is disabled,
+        // so we keep the Duck Player favicon even if Duck Player is currently disabled
+        return bookmark.url.isPrivatePlayerScheme ? .privatePlayer : nil
     }
 
     func domainForRecentlyVisitedSite(with url: URL) -> String? {

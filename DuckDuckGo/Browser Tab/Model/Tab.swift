@@ -894,7 +894,9 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
 extension Tab: UserContentControllerDelegate {
 
-    func userContentController(_ userContentController: UserContentController, didInstallUserScripts userScripts: UserScripts) {
+    func userContentController(_ userContentController: UserContentController, didInstallContentRuleLists contentRuleLists: [String: WKContentRuleList], userScripts: UserScriptsProvider, updateEvent: ContentBlockerRulesManager.UpdateEvent) {
+        guard let userScripts = userScripts as? UserScripts else { fatalError("Unexpected UserScripts") }
+
         userScripts.debugScript.instrumentation = instrumentation
         userScripts.faviconScript.delegate = self
         userScripts.contextMenuScript.delegate = self
@@ -908,7 +910,9 @@ extension Tab: UserContentControllerDelegate {
         userScripts.pageObserverScript.delegate = self
         userScripts.printingUserScript.delegate = self
         userScripts.hoverUserScript.delegate = self
-        userScripts.autoconsentUserScript?.delegate = self
+        if #available(macOS 11, *) {
+            userScripts.autoconsentUserScript?.delegate = self
+        }
         youtubeOverlayScript = userScripts.youtubeOverlayScript
         youtubeOverlayScript?.delegate = self
         youtubePlayerScript = userScripts.youtubePlayerUserScript
@@ -1088,34 +1092,41 @@ extension Tab: AdClickAttributionLogicDelegate {
     func attributionLogic(_ logic: AdClickAttributionLogic,
                           didRequestRuleApplication rules: ContentBlockerRulesManager.Rules?,
                           forVendor vendor: String?) {
-        let contentBlockerRulesScript = userContentController?.contentBlockingAssets?.userScripts.contentBlockerRulesScript
+        guard let userContentController = userContentController,
+              let userScripts = userContentController.contentBlockingAssets?.userScripts as? UserScripts
+        else {
+            assertionFailure("UserScripts not loaded")
+            return
+        }
+
+        let contentBlockerRulesScript = userScripts.contentBlockerRulesScript
         let attributedTempListName = AdClickAttributionRulesProvider.Constants.attributedTempRuleListName
         
         guard ContentBlocking.shared.privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .contentBlocking)
          else {
-            userContentController?.removeLocalContentRuleList(withIdentifier: attributedTempListName)
-            contentBlockerRulesScript?.currentAdClickAttributionVendor = nil
-            contentBlockerRulesScript?.supplementaryTrackerData = []
+            userContentController.removeLocalContentRuleList(withIdentifier: attributedTempListName)
+            contentBlockerRulesScript.currentAdClickAttributionVendor = nil
+            contentBlockerRulesScript.supplementaryTrackerData = []
             return
         }
         
-        contentBlockerRulesScript?.currentAdClickAttributionVendor = vendor
+        contentBlockerRulesScript.currentAdClickAttributionVendor = vendor
         if let rules = rules {
             
             let globalListName = DefaultContentBlockerRulesListsSource.Constants.trackerDataSetRulesListName
             let globalAttributionListName = AdClickAttributionRulesSplitter.blockingAttributionRuleListName(forListNamed: globalListName)
             
             if vendor != nil {
-                userContentController?.installLocalContentRuleList(rules.rulesList, identifier: attributedTempListName)
-                try? userContentController?.disableGlobalContentRuleList(withIdentifier: globalAttributionListName)
+                userContentController.installLocalContentRuleList(rules.rulesList, identifier: attributedTempListName)
+                try? userContentController.disableGlobalContentRuleList(withIdentifier: globalAttributionListName)
             } else {
-                userContentController?.removeLocalContentRuleList(withIdentifier: attributedTempListName)
-                try? userContentController?.enableGlobalContentRuleList(withIdentifier: globalAttributionListName)
+                userContentController.removeLocalContentRuleList(withIdentifier: attributedTempListName)
+                try? userContentController.enableGlobalContentRuleList(withIdentifier: globalAttributionListName)
             }
             
-            contentBlockerRulesScript?.supplementaryTrackerData = [rules.trackerData]
+            contentBlockerRulesScript.supplementaryTrackerData = [rules.trackerData]
         } else {
-            contentBlockerRulesScript?.supplementaryTrackerData = []
+            contentBlockerRulesScript.supplementaryTrackerData = []
         }
     }
 
@@ -1232,7 +1243,7 @@ extension Tab: WKNavigationDelegate {
 
         // This check needs to happen before GPC checks. Otherwise the navigation type may be rewritten to `.other`
         // which would skip link rewrites.
-        if navigationAction.navigationType == .linkActivated {
+        if navigationAction.navigationType != .backForward {
             let navigationActionPolicy = await linkProtection
                 .requestTrackingLinkRewrite(
                     initiatingURL: webView.url,
@@ -1269,7 +1280,12 @@ extension Tab: WKNavigationDelegate {
         if navigationAction.isTargetingMainFrame, navigationAction.navigationType != .backForward {
             if let newRequest = referrerTrimming.trimReferrer(forNavigation: navigationAction,
                                                               originUrl: webView.url ?? navigationAction.sourceFrame.webView?.url) {
-                defer {
+                if isRequestingNewTab {
+                    delegate?.tab(
+                        self,
+                        requestedNewTabWith: newRequest.url.map { .contentFromURL($0) } ?? .none,
+                        selected: shouldSelectNewTab)
+                } else {
                     _ = webView.load(newRequest)
                 }
                 return .cancel

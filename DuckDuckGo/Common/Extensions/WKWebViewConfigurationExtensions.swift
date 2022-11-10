@@ -18,6 +18,7 @@
 
 import WebKit
 import Combine
+import BrowserServicesKit
 
 extension WKWebViewConfiguration {
 
@@ -46,5 +47,14 @@ extension WKWebViewConfiguration {
         self.userContentController = UserContentController()
         self.processPool.geolocationProvider = GeolocationProvider(processPool: self.processPool)
      }
+
+}
+
+extension UserContentController {
+
+    convenience init(privacyConfigurationManager: PrivacyConfigurationManager = ContentBlocking.shared.privacyConfigurationManager) {
+        self.init(assetsPublisher: ContentBlocking.shared.userContentUpdating.userContentBlockingAssets,
+                  privacyConfigurationManager: privacyConfigurationManager)
+    }
 
 }
