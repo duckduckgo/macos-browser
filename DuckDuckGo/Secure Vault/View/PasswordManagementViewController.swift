@@ -143,6 +143,8 @@ final class PasswordManagementViewController: NSViewController {
         try? SecureVaultFactory.default.makeVault(errorReporter: SecureVaultErrorReporter.shared)
     }
 
+    private let bitwardenViewManager = BitwardenSecureVaultViewManager()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         createListView()
@@ -613,6 +615,8 @@ final class PasswordManagementViewController: NSViewController {
         self.postChange()
     }
 
+    var externalPasswordManagerSelectionCancellable: AnyCancellable?
+    
     // swiftlint:disable function_body_length
     private func createListView() {
         let listModel = PasswordManagementItemListModel { [weak self] previousValue, newValue in
@@ -673,7 +677,21 @@ final class PasswordManagementViewController: NSViewController {
 
         self.listModel = listModel
         self.listView = NSHostingView(rootView: PasswordManagementItemListView().environmentObject(listModel))
+        
+        externalPasswordManagerSelectionCancellable = listModel.$externalPasswordManagerSelected
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] value in
+                if value {
+                    self?.displayExternalPasswordManagerView()
+                }
+            }
     }
+    
+    private func displayExternalPasswordManagerView() {
+        let view = NSHostingView(rootView: PasswordManagementBitwardenItemView(manager: bitwardenViewManager))
+        replaceItemContainerChildView(with: view)
+    }
+    
     // swiftlint:enable function_body_length
 
     private func createNewSecureVaultItemMenu() -> NSMenu {

@@ -160,6 +160,15 @@ private struct PasswordManagementItemStackContentsView: View {
         
         ForEach(Array(model.displayedItems.enumerated()), id: \.offset) { index, section in
             
+            if index == 0 {
+                Section(header: Text("Password Manager").padding(.leading, 18).padding(.top, 0)) {
+                    PasswordManagerItemView(selected: model.externalPasswordManagerSelected) {
+                        model.externalPasswordManagerSelected = true
+                    }
+                    .padding(.horizontal, 10)
+                }
+            }
+            
             Section(header: Text(section.title).padding(.leading, 18).padding(.top, index == 0 ? 0 : 10)) {
                 
                 ForEach(section.items, id: \.id) { item in
@@ -175,6 +184,40 @@ private struct PasswordManagementItemStackContentsView: View {
         Spacer(minLength: 10)
     }
     
+}
+
+private struct PasswordManagerItemView: View {
+    
+    let selected: Bool
+    let action: () -> Void
+
+    var body: some View {
+        let textColor = selected ? .white : Color(NSColor.controlTextColor)
+        let font = Font.custom("SFProText-Regular", size: 13)
+
+        Button(action: action, label: {
+            HStack(spacing: 0) {
+                Image("BitwardenIcon")
+                    .frame(width: 32)
+                    .padding(.leading, 6)
+                
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Bitwarder")
+                        .foregroundColor(textColor)
+                        .font(font)
+                    Text("locked")
+                        .foregroundColor(textColor.opacity(0.8))
+                        .font(font)
+                }
+                .padding(.leading, 4)
+            }
+        })
+            .frame(maxHeight: 48)
+            .buttonStyle(selected ?
+                         PasswordManagerItemButtonStyle(bgColor: Color.accentColor) :
+                            // Almost clear, so that whole view is clickable
+                         PasswordManagerItemButtonStyle(bgColor: Color(NSColor.windowBackgroundColor.withAlphaComponent(0.001))))
+    }
 }
 
 private struct ItemView: View {

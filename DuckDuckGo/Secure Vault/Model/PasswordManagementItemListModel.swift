@@ -261,6 +261,13 @@ final class PasswordManagementItemListModel: ObservableObject {
     }
 
     @Published private(set) var selected: SecureVaultItem?
+    @Published var externalPasswordManagerSelected: Bool = false {
+        didSet {
+            if externalPasswordManagerSelected {
+                selected = nil
+            }
+        }
+    }
     @Published private(set) var emptyState: EmptyState = .none
     @Published var canChangeCategory: Bool = true
 
@@ -282,6 +289,10 @@ final class PasswordManagementItemListModel: ObservableObject {
         
         let previous = selected
         selected = item
+        
+        if selected != nil {
+            externalPasswordManagerSelected = false
+        }
         
         if notify {
             onItemSelected(previous, item)
