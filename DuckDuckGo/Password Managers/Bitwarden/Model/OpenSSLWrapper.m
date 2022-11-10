@@ -127,15 +127,7 @@ NSData *macKeyData;
     free(encryptionOutput);
 
     // Compute HMAC
-    NSMutableData *macData = [NSMutableData data];
-    [macData appendData:ivData];
-    [macData appendData:encryptedData];
-
-    unsigned char *hmac = NULL;
-    unsigned int hmacLength = -1;
-
-    hmac = HMAC(EVP_sha256(),macKeyData.bytes, (int)macKeyData.length * 8, macData.bytes, (int)macData.length, hmac, &hmacLength);
-    NSData *hmacData = [[NSData alloc] initWithBytes:hmac length:hmacLength];
+    NSData *hmacData = [self computeHmac:encryptedData iv:ivData];
 
     // Wrap into EncryptedMessage structure
     EncryptedMessage *encryptedMessage = [[EncryptedMessage alloc] init];
@@ -143,6 +135,18 @@ NSData *macKeyData;
     encryptedMessage.data = encryptedData;
     encryptedMessage.hmac = hmacData;
     return encryptedMessage;
+}
+
+- (NSData *)computeHmac:(NSData *)data iv:(NSData *)ivData {
+    NSMutableData *macData = [NSMutableData data];
+    [macData appendData:ivData];
+    [macData appendData:data];
+
+    unsigned char cHMAC[CC_SHA256_DIGEST_LENGTH];
+    CCHmac(kCCHmacAlgSHA256, macKeyData.bytes, macKeyData.length, macData.bytes, macData.length, cHMAC);
+    NSData *hash = [[NSData alloc] initWithBytes:cHMAC length:sizeof(cHMAC)];
+
+    return hash;
 }
 
 - (NSData *)decryptData:(NSData *)data andIv:(NSData *)ivData {
