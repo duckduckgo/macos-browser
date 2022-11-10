@@ -51,6 +51,7 @@
 		31A031A6288191230090F792 /* CookieConsentAnimationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31A031A5288191230090F792 /* CookieConsentAnimationView.swift */; };
 		31A031A928819D920090F792 /* CookieConsentAnimationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31A031A828819D920090F792 /* CookieConsentAnimationModel.swift */; };
 		31B12BE6291C15A3007F3E2C /* PasswordManagementBitwardenItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31B12BE5291C15A3007F3E2C /* PasswordManagementBitwardenItemView.swift */; };
+		31B12BEA291D80CB007F3E2C /* BitwardenSecureVaultViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31B12BE9291D80CB007F3E2C /* BitwardenSecureVaultViewModel.swift */; };
 		31B4AF532901A4F20013585E /* NSEventExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31B4AF522901A4F20013585E /* NSEventExtension.swift */; };
 		31B7C84F288008E00049841F /* CookieConsent.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 31B7C84E288008E00049841F /* CookieConsent.storyboard */; };
 		31B7C85128800A5D0049841F /* CookieConsentPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31B7C85028800A5D0049841F /* CookieConsentPopover.swift */; };
@@ -897,6 +898,7 @@
 		31A031A5288191230090F792 /* CookieConsentAnimationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieConsentAnimationView.swift; sourceTree = "<group>"; };
 		31A031A828819D920090F792 /* CookieConsentAnimationModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieConsentAnimationModel.swift; sourceTree = "<group>"; };
 		31B12BE5291C15A3007F3E2C /* PasswordManagementBitwardenItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordManagementBitwardenItemView.swift; sourceTree = "<group>"; };
+		31B12BE9291D80CB007F3E2C /* BitwardenSecureVaultViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BitwardenSecureVaultViewModel.swift; sourceTree = "<group>"; };
 		31B4AF522901A4F20013585E /* NSEventExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSEventExtension.swift; sourceTree = "<group>"; };
 		31B7C84E288008E00049841F /* CookieConsent.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = CookieConsent.storyboard; sourceTree = "<group>"; };
 		31B7C85028800A5D0049841F /* CookieConsentPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieConsentPopover.swift; sourceTree = "<group>"; };
@@ -2770,6 +2772,7 @@
 				4BE6547A271FCD4D008D1D63 /* PasswordManagementIdentityModel.swift */,
 				4BE6547C271FCD4D008D1D63 /* PasswordManagementLoginModel.swift */,
 				4BE6547D271FCD4D008D1D63 /* PasswordManagementNoteModel.swift */,
+				31B12BE9291D80CB007F3E2C /* BitwardenSecureVaultViewModel.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -4693,6 +4696,7 @@
 				1D6216B229069BBF00386B2C /* BitwardenKeyStorage.swift in Sources */,
 				AA7E919F287872EA00AB6B62 /* VisitViewModel.swift in Sources */,
 				B69B503B2726A12500758A2B /* Atb.swift in Sources */,
+				31B12BEA291D80CB007F3E2C /* BitwardenSecureVaultViewModel.swift in Sources */,
 				B6B1E88026D5DA9B0062C350 /* DownloadsViewController.swift in Sources */,
 				1D2DC00429016793008083A1 /* BitwardenManager.swift in Sources */,
 				85AC3AF725D5DBFD00C7D2AA /* DataExtension.swift in Sources */,
