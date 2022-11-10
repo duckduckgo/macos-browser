@@ -37,9 +37,11 @@ class BitwardenKeyStorage: BitwardenKeyStoring {
     }
 
 
-    private static let keychainKey = "bitwarden.shared.key"
+    private static let keychainKey = "\(Bundle.main.bundleIdentifier ?? "").bitwarden.shared.key"
 
     func save(sharedKey: Base64EncodedString) throws {
+        try cleanSharedKey()
+
         guard let data = Data(base64Encoded: sharedKey) else {
             throw BitwardenKeyStorageError.failedToDecodeKey
         }
@@ -67,7 +69,7 @@ class BitwardenKeyStorage: BitwardenKeyStoring {
 
         let status = SecItemDelete(query as CFDictionary)
 
-        if status != errSecSuccess {
+        if status != errSecSuccess && status != errSecItemNotFound {
             throw BitwardenKeyStorageError.failedToCleanKey(status: status)
         }
     }

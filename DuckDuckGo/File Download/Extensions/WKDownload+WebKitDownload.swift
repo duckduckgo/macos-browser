@@ -28,7 +28,7 @@ import WebKit
     func cancel()
 }
 
-@available(macOS 12, *)
+@available(macOS 11.3, *)
 extension WKDownload: WebKitDownload {
 
     var downloadDelegate: WebKitDownloadDelegate? {
@@ -58,7 +58,7 @@ extension WKDownload: WebKitDownload {
 
 // Used for forwarding WKDownloadDelegate methods with WKDownload sender to WebKitDownloadDelegate methods
 // with universal sender protocol WebKitDownload representing both WKDownload and Legacy _WKDownload classes
-@available(macOS 12, *)
+@available(macOS 11.3, *)
 final private class WKDownloadDelegateWrapper: NSObject, WKDownloadDelegate {
     weak var delegate: WebKitDownloadDelegate?
 

@@ -1,7 +1,7 @@
 //
-//  ApplicationDockMenu.swift
+//  TestNavigationDelegate.swift
 //
-//  Copyright © 2020 DuckDuckGo. All rights reserved.
+//  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,17 +16,17 @@
 //  limitations under the License.
 //
 
-import AppKit
+import XCTest
+import WebKit
 
-final class ApplicationDockMenu: NSMenu {
+final class TestNavigationDelegate: NSObject, WKNavigationDelegate {
+    let e: XCTestExpectation
 
-    init() {
-        super.init(title: "")
-        addItem(withTitle: UserText.newWindowMenuItem, action: #selector(AppDelegate.newWindow), keyEquivalent: "")
+    init(e: XCTestExpectation) {
+        self.e = e
     }
 
-    required init(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        e.fulfill()
     }
-
 }

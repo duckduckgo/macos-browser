@@ -38,10 +38,35 @@ class RecentlyVisitedSiteModelTests: XCTestCase {
         assertModelWithURL(URL(string: "http://www.example.com")!, matches: URL(string: "http://www.example.com")!, expectedDomain: "example.com")
     }
 
+    func testWhenPrivatePlayerIsEnabled_ThenPrivatePlayerURLSetsDomainPlaceholder() {
+        let model = HomePage.Models.RecentlyVisitedSiteModel(
+            originalURL: .effectivePrivatePlayer("abcde12345"),
+            privatePlayer: .mock(withMode: .enabled)
+        )
+        XCTAssertEqual(model?.isRealDomain, false)
+        XCTAssertEqual(model?.domainToDisplay, PrivatePlayer.commonName)
+    }
+
+    func testWhenPrivatePlayerIsDisabled_ThenPrivatePlayerURLDoesNotSetDomainPlaceholder() {
+        let url = URL.effectivePrivatePlayer("abcde12345")
+        let model = HomePage.Models.RecentlyVisitedSiteModel(originalURL: url, privatePlayer: .mock(withMode: .disabled))
+        XCTAssertEqual(model?.isRealDomain, true)
+        XCTAssertEqual(model?.domainToDisplay, model?.domain)
+    }
+
     private func assertModelWithURL(_ url: URL, matches expectedURL: URL, expectedDomain: String) {
         let model = HomePage.Models.RecentlyVisitedSiteModel(originalURL: url)
+        XCTAssertEqual(model?.isRealDomain, true)
         XCTAssertEqual(model?.domain, expectedDomain)
         XCTAssertEqual(model?.url, expectedURL)
     }
+}
 
+private extension PrivatePlayer {
+
+    static func mock(withMode mode: PrivatePlayerMode = .enabled) -> PrivatePlayer {
+        let preferencesPersistor = PrivatePlayerPreferencesPersistorMock(privatePlayerMode: mode, youtubeOverlayInteracted: true)
+        let preferences = PrivatePlayerPreferences(persistor: preferencesPersistor)
+        return PrivatePlayer(preferences: preferences)
+    }
 }

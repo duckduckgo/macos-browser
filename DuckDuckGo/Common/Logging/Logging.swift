@@ -131,3 +131,11 @@ struct Logging {
     fileprivate static let bitwardenLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Bitwarden")
 
 }
+
+func logOrAssertionFailure(_ message: StaticString, args: CVarArg...) {
+#if DEBUG
+    assertionFailure("\(message)")
+#else
+    os_log("BitwardenManager: Wrong handler", type: .error)
+#endif
+}

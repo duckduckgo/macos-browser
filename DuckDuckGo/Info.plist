@@ -83,7 +83,7 @@
 	<key>SUAllowsAutomaticUpdates</key>
 	<false/>
 	<key>SUEnableAutomaticChecks</key>
-	<true/>
+	<false/>
 	<key>SUFeedURL</key>
 	<string>https://staticcdn.duckduckgo.com/macos-desktop-browser/appcast.xml</string>
 	<key>SUScheduledCheckInterval</key>

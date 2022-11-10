@@ -120,12 +120,12 @@ struct RecentlyVisitedSite: View {
                 VStack(alignment: .leading, spacing: 6) {
 
                     if site.isRealDomain {
-                        HyperLink(site.domain, textColor: Color("HomeFeedItemTitleColor")) {
+                        HyperLink(site.domainToDisplay, textColor: Color("HomeFeedItemTitleColor")) {
                             model.open(site)
                         }
                         .font(.system(size: 15, weight: .semibold, design: .default))
                     } else {
-                        Text(site.domain)
+                        Text(site.domainToDisplay)
                             .foregroundColor(Color("HomeFeedItemTitleColor"))
                             .font(.system(size: 15, weight: .semibold, design: .default))
                     }
@@ -381,7 +381,7 @@ struct SiteIconAndConnector: View {
             RoundedRectangle(cornerRadius: 6)
                 .fill(isHovering ? mouseOverColor : backgroundColor)
 
-            FaviconView(domain: site.domain, size: 22)
+            FaviconView(domain: site.domainToDisplay, size: 22)
         }
         .link {
             self.isHovering = $0
@@ -403,7 +403,7 @@ struct SiteIconAndConnector: View {
             RoundedRectangle(cornerRadius: 6)
                 .fill(backgroundColor)
 
-            FaviconView(domain: site.domain, size: 22)
+            FaviconView(domain: site.domainToDisplay, size: 22)
         }
         .frame(width: 32, height: 32)
     }

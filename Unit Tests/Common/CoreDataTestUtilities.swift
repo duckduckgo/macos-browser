@@ -46,7 +46,31 @@ final class CoreData {
         return createInMemoryPersistentContainer(modelName: "CoreDataEncryptionTesting", bundle: Bundle(for: CoreData.self))
     }
 
-    static func createInMemoryPersistentContainer(modelName: String, bundle: Bundle) -> NSPersistentContainer {
+    static func registerValueTransformer(for propertyClass: AnyClass, with keyStore: EncryptionKeyStoring) -> NSValueTransformerName {
+        guard let encodableType = propertyClass as? (NSObject & NSSecureCoding).Type else {
+            fatalError("Unsupported type")
+        }
+        func registerValueTransformer<T: NSObject & NSSecureCoding>(for type: T.Type) -> NSValueTransformerName {
+            (try? EncryptedValueTransformer<T>.registerTransformer(keyStore: keyStore))!
+            return EncryptedValueTransformer<T>.transformerName
+        }
+        return registerValueTransformer(for: encodableType)
+    }
+
+    static func registerValueTransformers(for managedObjectModel: NSManagedObjectModel) -> [NSValueTransformerName] {
+        let storedClasses = managedObjectModel.entities.reduce(into: Set<String>()) { result, entity in
+            result.formUnion(entity.properties.compactMap { property in
+                (property as? NSAttributeDescription)?.attributeValueClassName
+            })
+        }.compactMap(NSClassFromString)
+
+        let keyStore = EncryptionKeyStoreMock()
+        return storedClasses.map { propertyClass in
+            registerValueTransformer(for: propertyClass, with: keyStore)
+        }
+    }
+
+    static func createPersistentContainer(at url: URL, modelName: String, bundle: Bundle) -> NSPersistentContainer {
         guard let modelURL = bundle.url(forResource: modelName, withExtension: "momd") else {
             fatalError("Error loading model from bundle")
         }
@@ -55,14 +79,13 @@ final class CoreData {
             fatalError("Error initializing object model from: \(modelURL)")
         }
 
-        let container = NSPersistentContainer(name: modelName, managedObjectModel: objectModel)
-
-        // Creates a persistent store using the in-memory model, no state will be written to disk.
-        // This was the approach recommended in a WWDC session, but there is also an `NSInMemoryStoreType` option.
-        // More info: https://www.donnywals.com/setting-up-a-core-data-store-for-unit-tests/
+        let transformers = registerValueTransformers(for: objectModel)
+        let container = TestPersistentContainer(name: modelName,
+                                                managedObjectModel: objectModel,
+                                                registeredTransformers: transformers)
 
         let description = NSPersistentStoreDescription()
-        description.url = URL(fileURLWithPath: "/dev/null")
+        description.url = url
         container.persistentStoreDescriptions = [description]
 
         container.loadPersistentStores(completionHandler: { _, error in
@@ -74,4 +97,27 @@ final class CoreData {
         return container
     }
 
+    static func createInMemoryPersistentContainer(modelName: String, bundle: Bundle) -> NSPersistentContainer {
+        // Creates a persistent store using the in-memory model, no state will be written to disk.
+        // This was the approach I had seen recommended in a WWDC session, but there is also a
+        // `NSInMemoryStoreType` option for doing this.
+        //
+        // This approach is apparently the recommended choice: https://www.donnywals.com/setting-up-a-core-data-store-for-unit-tests/
+        return createPersistentContainer(at: URL(fileURLWithPath: "/dev/null"), modelName: modelName, bundle: bundle)
+    }
+
+}
+
+final class TestPersistentContainer: NSPersistentContainer {
+    let registeredTransformers: [NSValueTransformerName]
+    init(name: String, managedObjectModel model: NSManagedObjectModel, registeredTransformers: [NSValueTransformerName]) {
+        self.registeredTransformers = registeredTransformers
+        super.init(name: name, managedObjectModel: model)
+    }
+
+    deinit {
+        for name in registeredTransformers {
+            ValueTransformer.setValueTransformer(nil, forName: name)
+        }
+    }
 }

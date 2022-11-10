@@ -141,6 +141,9 @@ final class Bookmark: BaseBookmarkEntity {
     var oldFavicon: NSImage?
     let faviconManagement: FaviconManagement
     func favicon(_ sizeCategory: Favicon.SizeCategory) -> NSImage? {
+        if let privatePlayerFavicon = PrivatePlayer.shared.image(for: self) {
+            return privatePlayerFavicon
+        }
         return faviconManagement.getCachedFavicon(for: url, sizeCategory: sizeCategory)?.image ?? oldFavicon
     }
 

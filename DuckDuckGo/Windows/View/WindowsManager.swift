@@ -51,6 +51,9 @@ final class WindowsManager {
         }
         if showWindow {
             mainWindowController.showWindow(self)
+            if !NSApp.isActive {
+                NSApp.activate(ignoringOtherApps: true)
+            }
         } else {
             mainWindowController.orderWindowBack(self)
         }

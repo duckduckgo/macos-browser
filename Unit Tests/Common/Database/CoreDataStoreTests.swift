@@ -24,7 +24,7 @@ final class CoreDataStoreTests: XCTestCase {
 
     let container = CoreData.coreDataStoreTestsContainer()
     typealias Store = CoreDataStore<TestManagedObject>
-    lazy var store = Store(context: container.viewContext, tableName: "TestDataModel")
+    lazy var store = Store(context: container.newBackgroundContext(), tableName: "TestDataModel")
 
     private func load(into result: inout [CoreDataTestStruct: NSManagedObjectID],
                       idValue: Store.IDValueTuple) throws {

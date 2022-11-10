@@ -24,7 +24,7 @@ private protocol WKWebView_macOS_11_3 {
     func resumeDownload(from data: Data, completionHandler: @escaping (WebKitDownload) -> Void)
 }
 
-@available(macOS 12, *)
+@available(macOS 11.3, *)
 extension WKWebView: WKWebView_macOS_11_3 {
     func startDownload(using request: URLRequest, completionHandler: @escaping (WebKitDownload) -> Void) {
         self.startDownload(using: request) { (download: WKDownload) in completionHandler(download) }

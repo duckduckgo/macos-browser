@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import os.log
 
 typealias Base64EncodedString = String
 typealias MessageId = String
@@ -72,11 +73,14 @@ struct BitwardenRequest: Codable {
         }
 
         var data: Data? {
-            guard let commandData = try? JSONEncoder().encode(self) else {
-                assertionFailure("JSON encoding failed")
+            let jsonData: Data
+            do {
+                jsonData = try JSONEncoder().encode(self)
+            } catch {
+                logOrAssertionFailure("BitwardenMessage: Can't encode the message")
                 return nil
             }
-            return commandData
+            return jsonData
         }
 
     }
@@ -86,7 +90,7 @@ struct BitwardenRequest: Codable {
         do {
             jsonData = try JSONEncoder().encode(self)
         } catch {
-            assertionFailure("BitwardenMessage: Can't encode the message \(error)")
+            logOrAssertionFailure("BitwardenMessage: Can't encode the message")
             return nil
         }
         return jsonData
@@ -163,11 +167,14 @@ struct BitwardenMessage: Codable {
         let payload: EncryptedPayload?
 
         var data: Data? {
-            guard let commandData = try? JSONEncoder().encode(self) else {
-                assertionFailure("JSON encoding failed")
+            let jsonData: Data
+            do {
+                jsonData = try JSONEncoder().encode(self)
+            } catch {
+                logOrAssertionFailure("BitwardenMessage: Can't encode the message")
                 return nil
             }
-            return commandData
+            return jsonData
         }
 
     }
@@ -230,7 +237,7 @@ struct BitwardenMessage: Codable {
         do {
             self = try JSONDecoder().decode(BitwardenMessage.self, from: messageData)
         } catch {
-            assertionFailure("Decoding the message failed \(error)")
+            logOrAssertionFailure("Decoding the message failed")
             return nil
         }
     }
@@ -240,7 +247,7 @@ struct BitwardenMessage: Codable {
         do {
             jsonData = try JSONEncoder().encode(self)
         } catch {
-            assertionFailure("BitwardenMessage: Can't encode the message \(error)")
+            logOrAssertionFailure("BitwardenMessage: Can't encode the message")
             return nil
         }
         return jsonData

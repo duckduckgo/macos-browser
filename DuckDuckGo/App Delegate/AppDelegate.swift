@@ -150,10 +150,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationDockMenu(_ sender: NSApplication) -> NSMenu? {
-        let applicationDockMenu = ApplicationDockMenu()
-        applicationDockMenu.dataSource = WindowControllersManager.shared
-        applicationDockMenu.applicationDockMenuDelegate = WindowControllersManager.shared
-        return applicationDockMenu
+        return ApplicationDockMenu()
     }
 
     func application(_ sender: NSApplication, openFiles files: [String]) {
