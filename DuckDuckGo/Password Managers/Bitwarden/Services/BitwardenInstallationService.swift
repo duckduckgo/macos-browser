@@ -19,25 +19,20 @@
 import Foundation
 import AppKit
 
-protocol BitwardenInstallationManager {
+protocol BitwardenInstallationService {
     
     var isBitwardenInstalled: Bool { get }
-    
+
     func openBitwarden()
 
 }
 
-final class LocalBitwardenInstallationManager: BitwardenInstallationManager {
+final class LocalBitwardenInstallationService: BitwardenInstallationService {
 
     private lazy var bitwardenBundlePath = "/Applications/Bitwarden.app"
     private lazy var bitwardenUrl = URL(fileURLWithPath: bitwardenBundlePath)
 
-    var isBitwardenInstalled: Bool {
-        return FileManager.default.fileExists(atPath: bitwardenBundlePath)
-    }
-
-
-    var bitwardenManifestPath: String {
+    private lazy var bitwardenManifestPath: String = {
 #if DEBUG
 
         let sandboxPathComponent = "Containers/com.duckduckgo.macos.browser/Data/Library/Application Support/"
@@ -48,11 +43,28 @@ final class LocalBitwardenInstallationManager: BitwardenInstallationManager {
 #endif
         return applicationSupport            .appendingPathComponent("NativeMessagingHosts/com.8bit.bitwarden.json")
             .path
+    }()
+
+    private lazy var bitwardenDataFileUrl: URL = {
+        let libraryURL = FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask).first!
+        let bitwardenPathComponent = "Containers/com.bitwarden.desktop/Data/Library/Application Support/Bitwarden/data.json"
+        return libraryURL.appendingPathComponent(bitwardenPathComponent)
+    }()
+
+    var isBitwardenInstalled: Bool {
+        return FileManager.default.fileExists(atPath: bitwardenBundlePath)
     }
 
-
     var isIntegrationWithDuckDuckGoEnabled: Bool {
-        return FileManager.default.fileExists(atPath: bitwardenManifestPath)
+        do {
+            let dataFile = try String(contentsOf: bitwardenDataFileUrl)
+            return dataFile.range(of: "\"enableDuckDuckGoBrowserIntegration\": true") != nil
+        } catch {
+            return false
+        }
+
+        // Older implementation not working with Bitwarden installed from App Store
+//        return FileManager.default.fileExists(atPath: bitwardenManifestPath)
     }
     
     func openBitwarden() {
