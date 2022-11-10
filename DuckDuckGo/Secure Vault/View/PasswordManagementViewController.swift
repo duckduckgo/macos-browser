@@ -619,7 +619,7 @@ final class PasswordManagementViewController: NSViewController {
     
     // swiftlint:disable function_body_length
     private func createListView() {
-        let listModel = PasswordManagementItemListModel { [weak self] previousValue, newValue in
+        let listModel = PasswordManagementItemListModel(externalPasswordViewManager: self.bitwardenViewManager) { [weak self] previousValue, newValue in
             guard let newValue = newValue,
                   let id = newValue.secureVaultID,
                   let window = self?.view.window else {
@@ -680,6 +680,7 @@ final class PasswordManagementViewController: NSViewController {
         
         externalPasswordManagerSelectionCancellable = listModel.$externalPasswordManagerSelected
             .receive(on: DispatchQueue.main)
+            .removeDuplicates()
             .sink { [weak self] value in
                 if value {
                     self?.displayExternalPasswordManagerView()
@@ -688,7 +689,11 @@ final class PasswordManagementViewController: NSViewController {
     }
     
     private func displayExternalPasswordManagerView() {
-        let view = NSHostingView(rootView: PasswordManagementBitwardenItemView(manager: bitwardenViewManager))
+        let passwordManagerView = PasswordManagementBitwardenItemView(manager: bitwardenViewManager) { [weak self] in
+            self?.dismiss()
+        }
+        
+        let view = NSHostingView(rootView: passwordManagerView)
         replaceItemContainerChildView(with: view)
     }
     

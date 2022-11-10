@@ -151,24 +151,36 @@ struct PasswordManagementItemListStackView: View {
     
 }
 
+private struct ExternalPasswordManagerItemSection: View {
+    @ObservedObject var model: PasswordManagementItemListModel
+    
+    var body: some View {
+        Section(header: Text("Password Manager").padding(.leading, 18).padding(.top, 0)) {
+            PasswordManagerItemView(model: model) {
+                model.externalPasswordManagerSelected = true
+            }
+            .padding(.horizontal, 10)
+        }
+    }
+}
+
 private struct PasswordManagementItemStackContentsView: View {
     
     @EnvironmentObject var model: PasswordManagementItemListModel
 
+    private var shouldDisplayExternalPasswordManagerRow: Bool {
+        model.externalPasswordViewManager.isConnected &&
+        (model.sortDescriptor.category == .allItems || model.sortDescriptor.category == .logins)
+    }
+    
     var body: some View {
         Spacer(minLength: 10)
         
+        if shouldDisplayExternalPasswordManagerRow {
+            ExternalPasswordManagerItemSection(model: model)
+        }
+        
         ForEach(Array(model.displayedItems.enumerated()), id: \.offset) { index, section in
-            
-            if index == 0 {
-                Section(header: Text("Password Manager").padding(.leading, 18).padding(.top, 0)) {
-                    PasswordManagerItemView(selected: model.externalPasswordManagerSelected) {
-                        model.externalPasswordManagerSelected = true
-                    }
-                    .padding(.horizontal, 10)
-                }
-            }
-            
             Section(header: Text(section.title).padding(.leading, 18).padding(.top, index == 0 ? 0 : 10)) {
                 
                 ForEach(section.items, id: \.id) { item in
@@ -178,34 +190,51 @@ private struct PasswordManagementItemStackContentsView: View {
                     .padding(.horizontal, 10)
                 }
             }
-            
         }
-        
         Spacer(minLength: 10)
     }
     
 }
 
 private struct PasswordManagerItemView: View {
-    
-    let selected: Bool
+    @ObservedObject var model: PasswordManagementItemListModel
     let action: () -> Void
-
+    
+    private var isLocked: Bool {
+        model.externalPasswordViewManager.status == .locked
+    }
+    
+    private var lockStatusLabel: String {
+        isLocked ? "Locked" : "Unlocked"
+    }
+    
+    private var selected: Bool {
+        model.externalPasswordManagerSelected
+    }
+    
     var body: some View {
         let textColor = selected ? .white : Color(NSColor.controlTextColor)
         let font = Font.custom("SFProText-Regular", size: 13)
 
         Button(action: action, label: {
-            HStack(spacing: 0) {
-                Image("BitwardenIcon")
-                    .frame(width: 32)
+            HStack(spacing: 3) {
+                ZStack {
+                    Image("BitwardenIcon")
+                    
+                    if isLocked {
+                        Image("PasswordManager-lock")
+                            .padding(.leading, 28)
+                            .padding(.top, 21)
+                    }
+                    
+                }.frame(width: 32)
                     .padding(.leading, 6)
                 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Bitwarder")
+                    Text("Bitwarden")
                         .foregroundColor(textColor)
                         .font(font)
-                    Text("locked")
+                    Text(lockStatusLabel)
                         .foregroundColor(textColor.opacity(0.8))
                         .font(font)
                 }
@@ -234,7 +263,7 @@ private struct ItemView: View {
         let font = Font.custom("SFProText-Regular", size: 13)
 
         Button(action: action, label: {
-            HStack(spacing: 0) {
+            HStack(spacing: 2) {
 
                 switch item {
                 case .account(let account):

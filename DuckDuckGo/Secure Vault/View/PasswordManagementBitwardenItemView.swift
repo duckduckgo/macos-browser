@@ -20,18 +20,19 @@ import SwiftUI
 
 struct PasswordManagementBitwardenItemView: View {
     @ObservedObject var manager: BitwardenSecureVaultViewManager
-    
-    let user = "bunn@duck.com"
+    let didFinish: () -> Void
     
     var body: some View {
         VStack(spacing: 16) {
             Image("BitwardenLogin")
+            
             VStack(spacing: 2) {
                 Text("You're using Bitwarden to manage passwords")
                 HStack (spacing: 3) {
                     Text("Change in")
                     Button {
-                        print("Settings")
+                        manager.openSettings()
+                        didFinish()
                     } label: {
                         Text("Settings")
                     }.buttonStyle(.link)
@@ -44,7 +45,8 @@ struct PasswordManagementBitwardenItemView: View {
             }
             
             Button {
-                BitwardenManager.shared.openBitwarden()
+                manager.openBitwarden()
+                didFinish()
             } label: {
                 Text("Open Bitwarden")
             }
@@ -54,7 +56,7 @@ struct PasswordManagementBitwardenItemView: View {
 
 struct PasswordManagementBitwardenItemView_Previews: PreviewProvider {
     static var previews: some View {
-        PasswordManagementBitwardenItemView(manager: BitwardenSecureVaultViewManager())
+        PasswordManagementBitwardenItemView(manager: BitwardenSecureVaultViewManager()) { }
     }
 }
 
@@ -72,6 +74,10 @@ final class BitwardenSecureVaultViewManager: ObservableObject {
        return nil
     }
     
+    var isConnected: Bool {
+        bitwardenManager.status.isConnected
+    }
+    
     var status: BitwardenVault.Status {
         guard let vault = vault  else { return .locked }
         return vault.status
@@ -84,5 +90,9 @@ final class BitwardenSecureVaultViewManager: ObservableObject {
     
     func openBitwarden() {
         bitwardenManager.openBitwarden()
+    }
+    
+    func openSettings() {
+        WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .autofill)
     }
 }
