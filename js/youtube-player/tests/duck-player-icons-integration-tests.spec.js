@@ -1,53 +1,8 @@
 import { test, expect } from '@playwright/test';
-import * as fs from 'node:fs/promises';
+import { setupIconOverlays, waitFor } from './utils.js';
 
-const waitFor = delay => { new Promise(resolve => setTimeout(resolve, delay)) };
-
-const setupIconOverlays = async (page, startURL = '/icon-overlay-integration-test.html') => {
-  await page.addInitScript(() => {
-    window.webkit = {
-      messageHandlers: {
-        setUserValues: { postMessage: () => { } },
-        readUserValues:  {
-          postMessage: async () => {
-            return JSON.stringify({ privatePlayerMode: { alwaysAsk: {} }, overlayInteracted: false });
-          }
-        },
-        openDuckPlayer:  {
-          postMessage: (message) => {
-            window._clickedDuckPlayerLink = message.href;
-          }
-        },
-      }
-    };
-  });
-
-  await page.goto(startURL);
-
-  const getFileString = async (path) => {
-    return await fs.readFile(path, { encoding: 'utf-8' });
-  }
-
-  const injectScript = await getFileString('../../DuckDuckGo/Youtube\ Player/Resources/youtube-inject-bundle.js');
-
-  const script = injectScript.replace('$WebkitMessagingConfig$', JSON.stringify({
-    hasModernWebkitAPI: true,
-  })).replace('enabled() {', 'enabled() { return true;');
-
-  await page.evaluate(script);
-
-  await page.evaluate(() => {
-      window.onUserValuesChanged({
-        userValuesNotification: { privatePlayerMode: { alwaysAsk: {} }, overlayInteracted: false }
-      });
-  });
-
-}
-
-const getClickedDuckPlayerLink = async (page) => {
-  return await page.evaluate(() => {
-    return window._clickedDuckPlayerLink;
-  });
+const setupMockIconOverlays = async (page) => {
+  return setupIconOverlays(page, '/icon-overlay-integration-test.html');
 }
 
 const thumbnail = (page, section, nthChild) => {
@@ -63,7 +18,7 @@ const hoverOverlayLink = (page) => {
 }
 
 test('thumbnail hover', async ({ page }) => {
-  await setupIconOverlays(page);
+  await setupMockIconOverlays(page);
 
   // 1. Hover overlay hidden at page load
   await expect(hoverOverlay(page)).toBeHidden();
@@ -97,7 +52,7 @@ test('thumbnail hover', async ({ page }) => {
 });
 
 test('playlist thumbnail hover', async ({ page }) => {
-  await setupIconOverlays(page);
+  await setupMockIconOverlays(page);
 
   // 1. Hover overlay hidden at page load
   await expect(hoverOverlay(page)).toBeHidden();
