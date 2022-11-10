@@ -39,6 +39,7 @@ final class UserScripts: UserScriptsProvider {
     let autoconsentUserScript: UserScriptWithAutoconsent?
     let youtubeOverlayScript: YoutubeOverlayUserScript?
     let youtubePlayerUserScript: YoutubePlayerUserScript?
+    let youtubePlayerSERPUserScript: YoutubePlayerSERPUserScript?
 
     init(with sourceProvider: ScriptSourceProviding) {
         clickToLoadScript = ClickToLoadUserScript(scriptSourceProvider: sourceProvider)
@@ -61,9 +62,11 @@ final class UserScripts: UserScriptsProvider {
         if PrivatePlayer.shared.isAvailable {
             youtubeOverlayScript = YoutubeOverlayUserScript()
             youtubePlayerUserScript = YoutubePlayerUserScript()
+            youtubePlayerSERPUserScript = YoutubePlayerSERPUserScript()
         } else {
             youtubeOverlayScript = nil
             youtubePlayerUserScript = nil
+            youtubePlayerSERPUserScript = nil
         }
 
         if let autoconsentUserScript = autoconsentUserScript {
@@ -74,6 +77,9 @@ final class UserScripts: UserScriptsProvider {
         }
         if let youtubePlayerUserScript = youtubePlayerUserScript {
             userScripts.append(youtubePlayerUserScript)
+        }
+        if let youtubePlayerSERPUserScript = youtubePlayerSERPUserScript {
+            userScripts.append(youtubePlayerSERPUserScript)
         }
     }
 

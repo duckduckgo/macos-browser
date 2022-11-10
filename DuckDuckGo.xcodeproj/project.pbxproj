@@ -85,6 +85,8 @@
 		37BF3F21286F0A7A00BD9014 /* PinnedTabsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BF3F1E286F0A7A00BD9014 /* PinnedTabsViewModel.swift */; };
 		37BF3F22286F0A7A00BD9014 /* PinnedTabsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BF3F1F286F0A7A00BD9014 /* PinnedTabsView.swift */; };
 		37BF3F24286F0AAE00BD9014 /* View+RoundedCorners.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BF3F23286F0AAE00BD9014 /* View+RoundedCorners.swift */; };
+		37C3C311291D0F470064C8FC /* YoutubePlayerSERPUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C3C310291D0F470064C8FC /* YoutubePlayerSERPUserScript.swift */; };
+		37C3C313291D0FAB0064C8FC /* youtube-player-serp.js in Resources */ = {isa = PBXBuildFile; fileRef = 37C3C312291D0FAB0064C8FC /* youtube-player-serp.js */; };
 		37CC53EC27E8A4D10028713D /* PreferencesPrivacyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CC53EB27E8A4D10028713D /* PreferencesPrivacyView.swift */; };
 		37CC53F027E8D1440028713D /* PreferencesDownloadsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CC53EF27E8D1440028713D /* PreferencesDownloadsView.swift */; };
 		37CC53F427E8D4620028713D /* NSPathControlView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CC53F327E8D4620028713D /* NSPathControlView.swift */; };
@@ -914,6 +916,8 @@
 		37BF3F1E286F0A7A00BD9014 /* PinnedTabsViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PinnedTabsViewModel.swift; sourceTree = "<group>"; };
 		37BF3F1F286F0A7A00BD9014 /* PinnedTabsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PinnedTabsView.swift; sourceTree = "<group>"; };
 		37BF3F23286F0AAE00BD9014 /* View+RoundedCorners.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "View+RoundedCorners.swift"; sourceTree = "<group>"; };
+		37C3C310291D0F470064C8FC /* YoutubePlayerSERPUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YoutubePlayerSERPUserScript.swift; sourceTree = "<group>"; };
+		37C3C312291D0FAB0064C8FC /* youtube-player-serp.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "youtube-player-serp.js"; sourceTree = "<group>"; };
 		37CC53EB27E8A4D10028713D /* PreferencesPrivacyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesPrivacyView.swift; sourceTree = "<group>"; };
 		37CC53EF27E8D1440028713D /* PreferencesDownloadsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesDownloadsView.swift; sourceTree = "<group>"; };
 		37CC53F327E8D4620028713D /* NSPathControlView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSPathControlView.swift; sourceTree = "<group>"; };
@@ -1774,6 +1778,7 @@
 				31F28C4C28C8EEC500119F70 /* YoutubePlayerUserScript.swift */,
 				31F28C4E28C8EEC500119F70 /* YoutubeOverlayUserScript.swift */,
 				A1DA5A20BFD17B83D72DCB7C /* YoutubeOverlayUserScript+Encryption.swift */,
+				37C3C310291D0F470064C8FC /* YoutubePlayerSERPUserScript.swift */,
 			);
 			path = "Youtube Player";
 			sourceTree = "<group>";
@@ -1783,6 +1788,7 @@
 			children = (
 				31F28C5528C8EEDB00119F70 /* youtube_player_template.html */,
 				AA64777C28E63B1F006C9AF2 /* youtube-inject-bundle.js */,
+				37C3C312291D0FAB0064C8FC /* youtube-player-serp.js */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -4410,6 +4416,7 @@
 				AA7EB6E327E7D05500036718 /* dark-flame-mouse-over.json in Resources */,
 				AA7EB6E227E7D05500036718 /* flame-mouse-over.json in Resources */,
 				4B677433255DBEB800025BD8 /* httpsMobileV2Bloom.bin in Resources */,
+				37C3C313291D0FAB0064C8FC /* youtube-player-serp.js in Resources */,
 				AA34397B2754D55100B241FA /* trackers-3.json in Resources */,
 				026ADE1426C3010C002518EE /* macos-config.json in Resources */,
 				4B677432255DBEB800025BD8 /* httpsMobileV2BloomSpec.json in Resources */,
@@ -5027,6 +5034,7 @@
 				31A031A6288191230090F792 /* CookieConsentAnimationView.swift in Sources */,
 				4BE0DF06267819A1006337B7 /* NSStoryboardExtension.swift in Sources */,
 				37AFCE8127DA2CA600471A10 /* PreferencesViewController.swift in Sources */,
+				37C3C311291D0F470064C8FC /* YoutubePlayerSERPUserScript.swift in Sources */,
 				4B02198A25E05FAC00ED7DEA /* FireproofDomains.swift in Sources */,
 				4B677442255DBEEA00025BD8 /* Database.swift in Sources */,
 				4BE5336E286915A10019DBFD /* HorizontallyCenteredLayout.swift in Sources */,

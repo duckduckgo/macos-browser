@@ -801,6 +801,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     
     private weak var youtubeOverlayScript: YoutubeOverlayUserScript?
     private weak var youtubePlayerScript: YoutubePlayerUserScript?
+    private weak var youtubePlayerSERPScript: YoutubePlayerSERPUserScript?
     private var youtubePlayerCancellables: Set<AnyCancellable> = []
 
     func setUpYoutubeScriptsIfNeeded() {
@@ -851,6 +852,19 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             }
         } else {
             youtubePlayerScript?.isEnabled = false
+        }
+
+        if content.url?.isDuckDuckGoSearch == true {
+            privatePlayer.$mode
+                .map { $0 != .disabled }
+                .removeDuplicates()
+                .sink { [weak self] isPrivatePlayerEnabled in
+                    guard let self = self else {
+                        return
+                    }
+                    self.youtubePlayerSERPScript?.setPrivatePlayerEnabled(isPrivatePlayerEnabled, inWebView: self.webView)
+                }
+                .store(in: &youtubePlayerCancellables)
         }
     }
     
@@ -916,6 +930,7 @@ extension Tab: UserContentControllerDelegate {
         youtubeOverlayScript = userScripts.youtubeOverlayScript
         youtubeOverlayScript?.delegate = self
         youtubePlayerScript = userScripts.youtubePlayerUserScript
+        youtubePlayerSERPScript = userScripts.youtubePlayerSERPUserScript
         setUpYoutubeScriptsIfNeeded()
 
         findInPageScript = userScripts.findInPageScript
