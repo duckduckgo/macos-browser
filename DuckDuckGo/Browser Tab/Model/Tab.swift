@@ -238,13 +238,13 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         webView.stopMediaCapture()
         webView.stopAllMediaPlayback()
         webView.fullscreenWindowController?.close()
-        userContentController.removeAllUserScripts()
+        webView.configuration.userContentController.removeAllUserScripts()
 
         cbaTimeReporter?.tabWillClose(self.instrumentation.currentTabIdentifier)
     }
 
-    private var userContentController: UserContentController {
-        (webView.configuration.userContentController as? UserContentController)!
+    private var userContentController: UserContentController? {
+        webView.configuration.userContentController as? UserContentController
     }
 
     // MARK: - Event Publishers
@@ -490,7 +490,10 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     @discardableResult
     private func setFBProtection(enabled: Bool) -> Bool {
         guard self.fbBlockingEnabled != enabled else { return false }
-
+        guard let userContentController = userContentController else {
+            assertionFailure("Missing UserContentController")
+            return false
+        }
         if enabled {
             do {
                 try userContentController.enableGlobalContentRuleList(withIdentifier: ContentBlockerRulesLists.Constants.clickToLoadRulesListName)
@@ -690,7 +693,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         webView.navigationDelegate = self
         webView.allowsBackForwardNavigationGestures = true
         webView.allowsMagnification = true
-        userContentController.delegate = self
+        userContentController?.delegate = self
 
         superviewObserver = webView.observe(\.superview, options: .old) { [weak self] _, change in
             // if the webView is being added to superview - reload if needed
@@ -907,7 +910,9 @@ extension Tab: UserContentControllerDelegate {
         userScripts.pageObserverScript.delegate = self
         userScripts.printingUserScript.delegate = self
         userScripts.hoverUserScript.delegate = self
-        userScripts.autoconsentUserScript?.delegate = self
+        if #available(macOS 11, *) {
+            userScripts.autoconsentUserScript?.delegate = self
+        }
         youtubeOverlayScript = userScripts.youtubeOverlayScript
         youtubeOverlayScript?.delegate = self
         youtubePlayerScript = userScripts.youtubePlayerUserScript
@@ -1087,19 +1092,25 @@ extension Tab: AdClickAttributionLogicDelegate {
     func attributionLogic(_ logic: AdClickAttributionLogic,
                           didRequestRuleApplication rules: ContentBlockerRulesManager.Rules?,
                           forVendor vendor: String?) {
-        let contentBlockerRulesScript = (userContentController.contentBlockingAssets?.userScripts as? UserScripts)?
-            .contentBlockerRulesScript
+        guard let userContentController = userContentController,
+              let userScripts = userContentController.contentBlockingAssets?.userScripts as? UserScripts
+        else {
+            assertionFailure("UserScripts not loaded")
+            return
+        }
+
+        let contentBlockerRulesScript = userScripts.contentBlockerRulesScript
         let attributedTempListName = AdClickAttributionRulesProvider.Constants.attributedTempRuleListName
         
         guard ContentBlocking.shared.privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .contentBlocking)
          else {
             userContentController.removeLocalContentRuleList(withIdentifier: attributedTempListName)
-            contentBlockerRulesScript?.currentAdClickAttributionVendor = nil
-            contentBlockerRulesScript?.supplementaryTrackerData = []
+            contentBlockerRulesScript.currentAdClickAttributionVendor = nil
+            contentBlockerRulesScript.supplementaryTrackerData = []
             return
         }
         
-        contentBlockerRulesScript?.currentAdClickAttributionVendor = vendor
+        contentBlockerRulesScript.currentAdClickAttributionVendor = vendor
         if let rules = rules {
             
             let globalListName = DefaultContentBlockerRulesListsSource.Constants.trackerDataSetRulesListName
@@ -1113,9 +1124,9 @@ extension Tab: AdClickAttributionLogicDelegate {
                 try? userContentController.enableGlobalContentRuleList(withIdentifier: globalAttributionListName)
             }
             
-            contentBlockerRulesScript?.supplementaryTrackerData = [rules.trackerData]
+            contentBlockerRulesScript.supplementaryTrackerData = [rules.trackerData]
         } else {
-            contentBlockerRulesScript?.supplementaryTrackerData = []
+            contentBlockerRulesScript.supplementaryTrackerData = []
         }
     }
 
@@ -1269,7 +1280,12 @@ extension Tab: WKNavigationDelegate {
         if navigationAction.isTargetingMainFrame, navigationAction.navigationType != .backForward {
             if let newRequest = referrerTrimming.trimReferrer(forNavigation: navigationAction,
                                                               originUrl: webView.url ?? navigationAction.sourceFrame.webView?.url) {
-                defer {
+                if isRequestingNewTab {
+                    delegate?.tab(
+                        self,
+                        requestedNewTabWith: newRequest.url.map { .contentFromURL($0) } ?? .none,
+                        selected: shouldSelectNewTab)
+                } else {
                     _ = webView.load(newRequest)
                 }
                 return .cancel
@@ -1379,9 +1395,9 @@ extension Tab: WKNavigationDelegate {
     @MainActor
     private func prepareForContentBlocking() async {
         // Ensure Content Blocking Assets (WKContentRuleList&UserScripts) are installed
-        if !userContentController.contentBlockingAssetsInstalled {
+        if userContentController?.contentBlockingAssetsInstalled == false {
             cbaTimeReporter?.tabWillWaitForRulesCompilation(self.instrumentation.currentTabIdentifier)
-            await userContentController.awaitContentBlockingAssetsInstalled()
+            await userContentController?.awaitContentBlockingAssetsInstalled()
             cbaTimeReporter?.reportWaitTimeForTabFinishedWaitingForRules(self.instrumentation.currentTabIdentifier)
         } else {
             cbaTimeReporter?.reportNavigationDidNotWaitForRules()
@@ -1638,7 +1654,7 @@ extension Tab: YoutubeOverlayUserScriptDelegate {
 extension Tab: TabDataClearing {
     func prepareForDataClearing(caller: TabDataCleaner) {
         webView.stopLoading()
-        userContentController.removeAllUserScripts()
+        webView.configuration.userContentController.removeAllUserScripts()
 
         webView.navigationDelegate = caller
         webView.load(URL(string: "about:blank")!)

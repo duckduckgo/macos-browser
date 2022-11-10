@@ -39,7 +39,7 @@ final class HistoryStoreTests: XCTestCase {
     }
 
     func testWhenHistoryEntryIsSavedMultipleTimes_ThenTheNewestValueMustBeLoadedFromStore() {
-        let container = NSPersistentContainer.createInMemoryPersistentContainer(modelName: "History", bundle: Bundle(for: type(of: self)))
+        let container = CoreData.createInMemoryPersistentContainer(modelName: "History", bundle: Bundle(for: type(of: self)))
         let context = container.viewContext
         let historyStore = HistoryStore(context: context)
 
@@ -77,7 +77,7 @@ final class HistoryStoreTests: XCTestCase {
     }
 
     func testWhenCleanOldIsCalled_ThenOlderEntriesThanDateAreCleaned() {
-        let container = NSPersistentContainer.createInMemoryPersistentContainer(modelName: "History", bundle: Bundle(for: type(of: self)))
+        let container = CoreData.createInMemoryPersistentContainer(modelName: "History", bundle: Bundle(for: type(of: self)))
         let context = container.viewContext
         let historyStore = HistoryStore(context: context)
 
@@ -120,7 +120,7 @@ final class HistoryStoreTests: XCTestCase {
     }
 
     func testWhenRemoveEntriesIsCalled_ThenEntriesMustBeCleaned() {
-        let container = NSPersistentContainer.createInMemoryPersistentContainer(modelName: "History", bundle: Bundle(for: type(of: self)))
+        let container = CoreData.createInMemoryPersistentContainer(modelName: "History", bundle: Bundle(for: type(of: self)))
         let context = container.viewContext
         let historyStore = HistoryStore(context: context)
 
