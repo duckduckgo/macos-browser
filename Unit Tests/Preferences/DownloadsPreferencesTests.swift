@@ -68,7 +68,6 @@ class DownloadsPreferencesTests: XCTestCase {
     }
     
     func testWhenAlwaysAskIsOnAndCustomLocationWasNotSetThenEffectiveDownloadLocationIsReturned() {
-        let testDirectory = createTemporaryTestDirectory()
         let persistor = DownloadsPreferencesPersistorMock(selectedDownloadLocation: nil, alwaysRequestDownloadLocation: true)
         let preferences = DownloadsPreferences(persistor: persistor)
 

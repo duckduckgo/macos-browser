@@ -23,6 +23,10 @@ import BrowserServicesKit
 extension WKWebViewConfiguration {
 
     func applyStandardConfiguration() {
+#if DEBUG
+        guard !AppDelegate.isRunningTests else { return }
+#endif
+
         allowsAirPlayForMediaPlayback = true
         preferences.setValue(true, forKey: "fullScreenEnabled")
         preferences.setValue(true, forKey: "allowsPictureInPictureMediaPlayback")

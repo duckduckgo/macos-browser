@@ -56,11 +56,7 @@ final class Database {
         }
 
 #if DEBUG
-        if AppDelegate.isRunningTests {
-            let keyStoreMockClass = (NSClassFromString("EncryptionKeyStoreMock") as? NSObject.Type)!
-            let keyStoreMock = (keyStoreMockClass.init() as? EncryptionKeyStoring)!
-            return makeDatabase(keyStore: keyStoreMock)
-        }
+        assert(!AppDelegate.isRunningTests, "Use CoreData.---Container() methods for testing purposes")
 #endif
 
         return makeDatabase(keyStore: EncryptionKeyStore(generator: EncryptionKeyGenerator()))
