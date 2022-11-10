@@ -234,7 +234,9 @@ final class NavigationBarViewController: NSViewController {
     }
 
     @IBAction func optionsButtonAction(_ sender: NSButton) {
-        let menu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel)
+        
+        let menu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
+                                   externalPasswordManagerViewModel: BitwardenSecureVaultViewModel())
         menu.actionDelegate = self
         menu.popUp(positioning: nil, at: NSPoint(x: 0, y: sender.bounds.height + 4), in: sender)
     }
@@ -768,6 +770,9 @@ extension NavigationBarViewController: NSMenuDelegate {
 }
 
 extension NavigationBarViewController: OptionsButtonMenuDelegate {
+    func optionsButtonMenuRequestedOpenExternalPasswordManager(_ menu: NSMenu) {
+        BitwardenManager.shared.openBitwarden()
+    }
 
     func optionsButtonMenuRequestedBookmarkThisPage(_ sender: NSMenuItem) {
         addressBarViewController?

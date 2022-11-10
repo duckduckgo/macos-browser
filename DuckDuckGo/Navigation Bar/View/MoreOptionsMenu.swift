@@ -29,6 +29,7 @@ protocol OptionsButtonMenuDelegate: AnyObject {
     func optionsButtonMenuRequestedBookmarkManagementInterface(_ menu: NSMenu)
     func optionsButtonMenuRequestedBookmarkImportInterface(_ menu: NSMenu)
     func optionsButtonMenuRequestedLoginsPopover(_ menu: NSMenu, selectedCategory: SecureVaultSorting.Category)
+    func optionsButtonMenuRequestedOpenExternalPasswordManager(_ menu: NSMenu)
     func optionsButtonMenuRequestedDownloadsPopover(_ menu: NSMenu)
     func optionsButtonMenuRequestedPrint(_ menu: NSMenu)
 
@@ -40,18 +41,23 @@ final class MoreOptionsMenu: NSMenu {
 
     private let tabCollectionViewModel: TabCollectionViewModel
     private let emailManager: EmailManager
-
+    private let externalPasswordManagerViewModel: ExternalPasswordManagerViewModel
+    
     required init(coder: NSCoder) {
         fatalError("MoreOptionsMenu: Bad initializer")
     }
-
-    init(tabCollectionViewModel: TabCollectionViewModel, emailManager: EmailManager = EmailManager()) {
+    
+    init(tabCollectionViewModel: TabCollectionViewModel,
+         emailManager: EmailManager = EmailManager(),
+         externalPasswordManagerViewModel: ExternalPasswordManagerViewModel) {
+        
         self.tabCollectionViewModel = tabCollectionViewModel
         self.emailManager = emailManager
+        self.externalPasswordManagerViewModel = externalPasswordManagerViewModel
         super.init(title: "")
-
+        
         self.emailManager.requestDelegate = self
-
+        
         setupMenuItems()
     }
 
@@ -138,6 +144,10 @@ final class MoreOptionsMenu: NSMenu {
     @objc func openAutofillWithLogins(_ sender: NSMenuItem) {
         actionDelegate?.optionsButtonMenuRequestedLoginsPopover(self, selectedCategory: .logins)
     }
+    
+    @objc func openExternalPasswordManager(_ sender: NSMenuItem) {
+        actionDelegate?.optionsButtonMenuRequestedOpenExternalPasswordManager(self)
+    }
 
     @objc func openAutofillWithIdentities(_ sender: NSMenuItem) {
         actionDelegate?.optionsButtonMenuRequestedLoginsPopover(self, selectedCategory: .identities)
@@ -187,7 +197,8 @@ final class MoreOptionsMenu: NSMenu {
             .targetting(self)
             .withImage(NSImage(named: "Downloads"))
 
-        let loginsSubMenu = LoginsSubMenu(targetting: self)
+        let loginsSubMenu = LoginsSubMenu(targetting: self,
+                                          externalPasswordManagerViewModel: externalPasswordManagerViewModel)
 
         addItem(withTitle: UserText.passwordManagement, action: #selector(openAutofillWithAllItems), keyEquivalent: "")
             .targetting(self)
@@ -428,8 +439,10 @@ final class BookmarksSubMenu: NSMenu {
 }
 
 final class LoginsSubMenu: NSMenu {
+    let externalPasswordManagerViewModel: ExternalPasswordManagerViewModel
 
-    init(targetting target: AnyObject) {
+    init(targetting target: AnyObject, externalPasswordManagerViewModel: ExternalPasswordManagerViewModel) {
+        self.externalPasswordManagerViewModel = externalPasswordManagerViewModel
         super.init(title: UserText.passwordManagement)
         updateMenuItems(with: target)
     }
@@ -444,7 +457,18 @@ final class LoginsSubMenu: NSMenu {
 
         addItem(NSMenuItem.separator())
 
-        addItem(withTitle: UserText.passwordManagementLogins, action: #selector(MoreOptionsMenu.openAutofillWithLogins), keyEquivalent: "")
+        let autofillSelector: Selector
+        let autofillTitle: String
+        
+        if externalPasswordManagerViewModel.isConnected {
+            autofillSelector = #selector(MoreOptionsMenu.openExternalPasswordManager)
+            autofillTitle = "\(UserText.passwordManagementLogins) (Open in \(externalPasswordManagerViewModel.managerName))"
+        } else {
+            autofillSelector = #selector(MoreOptionsMenu.openAutofillWithLogins)
+            autofillTitle = UserText.passwordManagementLogins
+        }
+        
+        addItem(withTitle: autofillTitle, action: autofillSelector, keyEquivalent: "")
             .targetting(target)
             .withImage(NSImage(named: "LoginGlyph"))
 

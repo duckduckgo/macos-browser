@@ -19,7 +19,7 @@
 import SwiftUI
 
 struct PasswordManagementBitwardenItemView: View {
-    @ObservedObject var manager: BitwardenSecureVaultViewManager
+    @ObservedObject var manager: BitwardenSecureVaultViewModel
     let didFinish: () -> Void
     
     var body: some View {
@@ -38,17 +38,17 @@ struct PasswordManagementBitwardenItemView: View {
                     }.buttonStyle(.link)
                 }
             }
-            if let email = manager.email {
+            if let email = manager.username {
                 Text("Connected to user \(email)")
                     .font(.subheadline)
                     .foregroundColor(Color("BlackWhite60"))
             }
             
             Button {
-                manager.openBitwarden()
+                manager.openExternalPasswordManager()
                 didFinish()
             } label: {
-                Text("Open Bitwarden")
+                Text("Open \(manager.managerName)")
             }
         }
     }
@@ -56,11 +56,11 @@ struct PasswordManagementBitwardenItemView: View {
 
 struct PasswordManagementBitwardenItemView_Previews: PreviewProvider {
     static var previews: some View {
-        PasswordManagementBitwardenItemView(manager: BitwardenSecureVaultViewManager()) { }
+        PasswordManagementBitwardenItemView(manager: BitwardenSecureVaultViewModel()) { }
     }
 }
 
-final class BitwardenSecureVaultViewManager: ObservableObject {
+final class BitwardenSecureVaultViewModel: ExternalPasswordManagerViewModel, ObservableObject {
     private let bitwardenManager: BitwardenManager
     
     internal init(bitwardenManager: BitwardenManager = .shared) {
@@ -75,24 +75,54 @@ final class BitwardenSecureVaultViewManager: ObservableObject {
     }
     
     var isConnected: Bool {
-        bitwardenManager.status.isConnected
+        switch bitwardenManager.status {
+        case .connected(vault: _), .notRunning:
+            return true
+        default:
+            return false
+        }
     }
     
-    var status: BitwardenVault.Status {
+    var status: ExternalPasswordManagerStatus {
         guard let vault = vault  else { return .locked }
-        return vault.status
+        
+        switch vault.status {
+        case .locked:
+            return .locked
+        case .unlocked:
+            return .unlocked
+        }
     }
     
-    var email: String? {
+    var username: String? {
         guard let vault = vault  else { return nil }
         return vault.email
     }
     
-    func openBitwarden() {
+    var managerName: String {
+        "Bitwarden"
+    }
+    
+    func openExternalPasswordManager() {
         bitwardenManager.openBitwarden()
     }
     
     func openSettings() {
         WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .autofill)
     }
+}
+
+enum ExternalPasswordManagerStatus: String {
+    case locked
+    case unlocked
+}
+
+protocol ExternalPasswordManagerViewModel {
+    var isConnected: Bool { get }
+    var username: String? { get }
+    var managerName: String { get }
+    var status: ExternalPasswordManagerStatus { get }
+    
+    func openExternalPasswordManager()
+    func openSettings()
 }
