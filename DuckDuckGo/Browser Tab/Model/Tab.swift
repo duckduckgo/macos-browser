@@ -1395,7 +1395,9 @@ extension Tab: WKNavigationDelegate {
     @MainActor
     private func prepareForContentBlocking() async {
         // Ensure Content Blocking Assets (WKContentRuleList&UserScripts) are installed
-        if userContentController?.contentBlockingAssetsInstalled == false {
+        if userContentController?.contentBlockingAssetsInstalled == false
+            && ContentBlocking.shared.privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .contentBlocking) {
+
             cbaTimeReporter?.tabWillWaitForRulesCompilation(self.instrumentation.currentTabIdentifier)
             await userContentController?.awaitContentBlockingAssetsInstalled()
             cbaTimeReporter?.reportWaitTimeForTabFinishedWaitingForRules(self.instrumentation.currentTabIdentifier)
