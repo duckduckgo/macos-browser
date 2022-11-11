@@ -36,7 +36,18 @@ class PasswordManagerCoordinator: BrowserServicesKit.PasswordManager {
     var name: String {
         return "bitwarden"
     }
-
+    
+    var displayName: String {
+        return "Bitwarden"
+    }
+    
+    var username: String? {
+        if case let .connected(vault: vault) = bitwardenManagement.status {
+            return vault.email
+        }
+        return nil
+    }
+    
     var isLocked: Bool {
         switch bitwardenManagement.status {
         case .connected(vault: let vault): return vault.status == .locked

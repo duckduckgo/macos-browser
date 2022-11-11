@@ -143,6 +143,8 @@ final class PasswordManagementViewController: NSViewController {
         try? SecureVaultFactory.default.makeVault(errorReporter: SecureVaultErrorReporter.shared)
     }
 
+    private let passwordManagerCoordinator = PasswordManagerCoordinator()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         createListView()
@@ -613,9 +615,11 @@ final class PasswordManagementViewController: NSViewController {
         self.postChange()
     }
 
+    var externalPasswordManagerSelectionCancellable: AnyCancellable?
+    
     // swiftlint:disable function_body_length
     private func createListView() {
-        let listModel = PasswordManagementItemListModel { [weak self] previousValue, newValue in
+        let listModel = PasswordManagementItemListModel(passwordManagerCoordinator: self.passwordManagerCoordinator) { [weak self] previousValue, newValue in
             guard let newValue = newValue,
                   let id = newValue.secureVaultID,
                   let window = self?.view.window else {
@@ -673,7 +677,26 @@ final class PasswordManagementViewController: NSViewController {
 
         self.listModel = listModel
         self.listView = NSHostingView(rootView: PasswordManagementItemListView().environmentObject(listModel))
+        
+        externalPasswordManagerSelectionCancellable = listModel.$externalPasswordManagerSelected
+            .receive(on: DispatchQueue.main)
+            .removeDuplicates()
+            .sink { [weak self] value in
+                if value {
+                    self?.displayExternalPasswordManagerView()
+                }
+            }
     }
+    
+    private func displayExternalPasswordManagerView() {
+        let passwordManagerView = PasswordManagementBitwardenItemView(manager: passwordManagerCoordinator) { [weak self] in
+            self?.dismiss()
+        }
+        
+        let view = NSHostingView(rootView: passwordManagerView)
+        replaceItemContainerChildView(with: view)
+    }
+    
     // swiftlint:enable function_body_length
 
     private func createNewSecureVaultItemMenu() -> NSMenu {
