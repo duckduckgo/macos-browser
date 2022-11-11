@@ -16,8 +16,6 @@ test('youtube homepage', async ({ page }) => {
   // 2. Once the preview animates in, expect the previewOverlay to be shown
   await sleep(1500);
   await expect(previewOverlay).toBeVisible();
-  // Cannot, because of https://github.com/microsoft/playwright/discussions/13528
-  // await expect(hoverOverlay).toBeHidden();
 
   // 3. Clicking the preview overlay should open duck player
   await previewOverlay.hover();

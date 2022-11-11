@@ -73,3 +73,32 @@ test('playlist thumbnail hover', async ({ page }) => {
   await thumbnail(page, 'PLAYLIST', 3).hover();
   await expect(hoverOverlay(page)).toBeVisible();
 });
+
+test('hovering overlay itself', async ({ page }) => {
+  await setupMockIconOverlays(page);
+
+  // 1. Hover overlay hidden at page load
+  await expect(hoverOverlay(page)).toBeHidden();
+
+  // 2. Hover overlay shown when hovering 1st thumbnail
+  await thumbnail(page, 'THUMBNAILS', 1).hover();
+  await expect(hoverOverlay(page)).toBeVisible();
+
+  // 3. Hover the overlay itself
+  await hoverOverlay(page).hover();
+  await sleep(300);
+  await expect(hoverOverlayLink(page)).toHaveCSS('width', '80px');
+
+  // 4. Hover the thumbnail again, overlaylink to be hidden
+  await thumbnail(page, 'THUMBNAILS', 1).hover();
+  await sleep(300);
+  await expect(hoverOverlayLink(page)).toHaveCSS('width', '0px');
+
+  // 5. Hovering the overlay in the playlist should NOT show the overlay link
+  await thumbnail(page, 'PLAYLIST', 1).hover();
+  await expect(hoverOverlay(page)).toBeVisible();
+  await hoverOverlay(page).hover();
+  await sleep(300);
+  await expect(hoverOverlayLink(page)).toHaveCSS('width', '0px');
+
+});
