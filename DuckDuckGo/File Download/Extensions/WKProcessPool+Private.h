@@ -26,6 +26,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (_WKDownload *)_downloadURLRequest:(NSURLRequest *)request websiteDataStore:(WKWebsiteDataStore *)dataStore originatingWebView:(WKWebView *)webView;
 - (_WKDownload *)_resumeDownloadFromData:(NSData *)resumeData websiteDataStore:(WKWebsiteDataStore *)dataStore path:(NSString *)path originatingWebView:(WKWebView *)webView;
 
+- (void)_registerURLSchemeAsSecure:(NSString *)scheme;
+
 @end
 
 NS_ASSUME_NONNULL_END

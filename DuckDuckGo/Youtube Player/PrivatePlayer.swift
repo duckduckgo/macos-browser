@@ -173,6 +173,13 @@ extension PrivatePlayer {
             return nil
         }
 
+        if alwaysOpenInPrivatePlayer,
+           let refererURLString = navigationAction.request.value(forHTTPHeaderField: "Referer")?.url?.absoluteString,
+           ["https://www.youtube-nocookie.com/", "https://duckduckgo.com/", "duck://player/"].contains(refererURLString) {
+
+            return nil
+        }
+
         // If this is a child tab of a Private Player and it's loading a YouTube URL, don't override it ("Watch in YouTube").
         if case .privatePlayer(let parentVideoID, _) = tab.parentTab?.content, parentVideoID == videoID {
             return nil
@@ -262,6 +269,10 @@ extension PrivatePlayer {
     func overrideContent(_ content: Tab.TabContent, for tab: Tab) -> Tab.TabContent? {
         guard isAvailable, mode != .disabled else {
             return nil
+        }
+
+        if mode == .enabled, content.isPrivatePlayer, tab.content.url?.isDuckDuckGoSearch == true, let (videoID, timestamp) = content.url?.youtubeVideoParams {
+            return .url(.youtube(videoID, timestamp: timestamp))
         }
 
         // If we're moving from Private Player to Private Player, sometimes it means we need to switch

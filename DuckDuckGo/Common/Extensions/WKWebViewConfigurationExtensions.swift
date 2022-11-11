@@ -42,6 +42,9 @@ extension WKWebViewConfiguration {
         
         if urlSchemeHandler(forURLScheme: PrivatePlayer.privatePlayerScheme) == nil {
             setURLSchemeHandler(PrivatePlayerSchemeHandler(), forURLScheme: PrivatePlayer.privatePlayerScheme)
+            if processPool.responds(to: #selector(WKProcessPool._registerURLScheme(asSecure:))) {
+                processPool._registerURLScheme(asSecure: PrivatePlayer.privatePlayerScheme)
+            }
         }
 
         self.userContentController = UserContentController()
