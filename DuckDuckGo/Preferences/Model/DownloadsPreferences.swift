@@ -20,6 +20,8 @@ import Foundation
 
 protocol DownloadsPreferencesPersistor {
     var selectedDownloadLocation: String? { get set }
+    var lastUsedCustomDownloadLocation: String? { get set }
+
     var alwaysRequestDownloadLocation: Bool { get set }
 
     var defaultDownloadLocation: URL? { get }
@@ -29,6 +31,9 @@ protocol DownloadsPreferencesPersistor {
 struct DownloadsPreferencesUserDefaultsPersistor: DownloadsPreferencesPersistor {
     @UserDefaultsWrapper(key: .selectedDownloadLocationKey, defaultValue: nil)
     var selectedDownloadLocation: String?
+    
+    @UserDefaultsWrapper(key: .lastUsedCustomDownloadLocation, defaultValue: nil)
+    var lastUsedCustomDownloadLocation: String?
 
     @UserDefaultsWrapper(key: .alwaysRequestDownloadLocationKey, defaultValue: false)
     var alwaysRequestDownloadLocation: Bool
@@ -54,14 +59,40 @@ struct DownloadsPreferencesUserDefaultsPersistor: DownloadsPreferencesPersistor 
 
 final class DownloadsPreferences: ObservableObject {
 
-    var effectiveDownloadLocation: URL? {
-        if let selectedLocation = persistor.selectedDownloadLocation,
+    private func validatedDownloadLocation(_ location: String?) -> URL? {
+        if let selectedLocation = location,
            let selectedLocationURL = URL(string: selectedLocation),
            Self.isDownloadLocationValid(selectedLocationURL) {
             return selectedLocationURL
         }
-
+        return nil
+    }
+    
+    var effectiveDownloadLocation: URL? {
+        if let selectedLocationURL = alwaysRequestDownloadLocation ? validatedDownloadLocation(persistor.lastUsedCustomDownloadLocation) : validatedDownloadLocation(persistor.selectedDownloadLocation) {
+            return selectedLocationURL
+        }
         return Self.defaultDownloadLocation()
+    }
+    
+    var lastUsedCustomDownloadLocation: URL? {
+        get {
+            persistor.lastUsedCustomDownloadLocation?.url
+        }
+        
+        set {
+            defer {
+                objectWillChange.send()
+            }
+            guard let newDownloadLocation = newValue else {
+                persistor.lastUsedCustomDownloadLocation = nil
+                return
+            }
+
+            if Self.isDownloadLocationValid(newDownloadLocation) {
+                persistor.lastUsedCustomDownloadLocation = newDownloadLocation.absoluteString
+            }
+        }
     }
 
     var selectedDownloadLocation: URL? {

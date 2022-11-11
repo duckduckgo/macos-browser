@@ -181,13 +181,17 @@ extension FileDownloadManager: WebKitDownloadTaskDelegate {
             suggestedFilename = suggestedFilename.dropping(suffix: "." + ext)
         }
 
-        locationChooser(suggestedFilename, downloadLocation, fileType.map { [$0] } ?? []) { url, fileType in
-            if let url = url,
-               FileManager.default.fileExists(atPath: url.path) {
-                // if SavePanel points to an existing location that means overwrite was chosen
-                try? FileManager.default.removeItem(at: url)
-            }
+        locationChooser(suggestedFilename, downloadLocation, fileType.map { [$0] } ?? []) {[weak self] url, fileType in
+            
+            if let url = url {
+                self?.preferences.lastUsedCustomDownloadLocation = url.deletingLastPathComponent()
 
+                if FileManager.default.fileExists(atPath: url.path) {
+                    // if SavePanel points to an existing location that means overwrite was chosen
+                    try? FileManager.default.removeItem(at: url)
+                }
+            }
+            
             completion(url, fileType)
         }
     }

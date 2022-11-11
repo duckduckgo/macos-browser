@@ -32,11 +32,16 @@ class AutoconsentBackgroundTests: XCTestCase {
 
         configuration.userContentController.addUserScript(autoconsentUserScript.makeWKUserScript())
         configuration.userContentController.addHandler(autoconsentUserScript)
+
         let webview = WKWebView(frame: .zero, configuration: configuration)
-        let expectation = XCTestExpectation(description: "Async call")
+        let navigationDelegate = TestNavigationDelegate(e: expectation(description: "WebView Did finish navigation"))
+        webview.navigationDelegate = navigationDelegate
         let url = Bundle(for: type(of: self)).url(forResource: "autoconsent-test-page", withExtension: "html")!
         webview.loadFileURL(url, allowingReadAccessTo: url.deletingLastPathComponent())
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+        waitForExpectations(timeout: 1)
+
+        let expectation = expectation(description: "Async call")
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
             webview.evaluateJavaScript("results.results.includes('button_clicked')", in: nil, in: .page,
                                        completionHandler: { result in
                 switch result {
@@ -50,7 +55,7 @@ class AutoconsentBackgroundTests: XCTestCase {
                 expectation.fulfill()
             })
         }
-        wait(for: [expectation], timeout: 4)
+        waitForExpectations(timeout: 4)
     }
 
 }
