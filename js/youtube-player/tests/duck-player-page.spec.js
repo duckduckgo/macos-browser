@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { waitFor } from './utils.js';
+import { sleep } from './utils.js';
 
 const MOCK_VIDEO_ID = 'VIDEO_ID';
 const MOCK_IFRAME_SRC = 'https://www.youtube-nocookie.com/embed/'+MOCK_VIDEO_ID+'?iv_load_policy=1&autoplay=1&rel=0&modestbranding=1';
@@ -26,7 +26,6 @@ test('iframe loaded with invalid timestamp', async ({ page }) => {
   await expect(page.locator('iframe')).toHaveAttribute('src', MOCK_IFRAME_SRC);
 });
 
-
 test('iframe loaded with valid video id', async ({ page }) => {
   await loadMockVideo(page);
   await expect(page.locator('iframe')).toHaveAttribute('src', MOCK_IFRAME_SRC);
@@ -49,12 +48,12 @@ test('inactivity timer shows and hides toolbar based on user activity', async ({
   await page.mouse.move(1,1);
 
   // 2. Expect it to be hidden after 2 seconds of inactivity
-  await waitFor(2000);
+  await sleep(2000);
   await expect(page.locator('.content-body')).toHaveCSS('opacity', '0');
 
   // 3. Expect it to be shown if there is mouse activity
   await page.mouse.move(10, 10);
-  await waitFor(500);
+  await sleep(500);
   await expect(page.locator('.content-body')).not.toHaveCSS('opacity', '0');
 });
 
@@ -125,7 +124,7 @@ test('always open setting', async ({ page }) => {
 
   // 2. Expect the setting to slide out and be hidden and a message sent to native after clicking it.
   await page.locator('.setting input').click();
-  await waitFor(1000);
+  await sleep(1000);
   await expect(page.locator('.setting-container')).toHaveCSS('width', '0px');
   await expect(await getMockSettingSentToNative(page)).toEqual(true);
 

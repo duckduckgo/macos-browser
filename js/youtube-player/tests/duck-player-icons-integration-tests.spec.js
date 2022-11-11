@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { setupIconOverlays, waitFor } from './utils.js';
+import { setupIconOverlays, sleep } from './utils.js';
 
 const setupMockIconOverlays = async (page) => {
   return setupIconOverlays(page, '/icon-overlay-integration-test.html');
@@ -40,7 +40,7 @@ test('thumbnail hover', async ({ page }) => {
   await expect(hoverOverlay(page)).toBeVisible();
 
   // 6. Wait for new content to be added and make sure hover overlay is shown when hovering it
-  await waitFor(1000);
+  await sleep(1000);
   await thumbnail(page, 'LOADED_THUMBNAILS', 1).hover();
   await expect(hoverOverlay(page)).toBeVisible();
 

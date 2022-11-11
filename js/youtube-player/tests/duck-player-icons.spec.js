@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { setupIconOverlays, waitFor, getClickedDuckPlayerLink } from './utils.js';
+import { setupIconOverlays, sleep, getClickedDuckPlayerLink } from './utils.js';
 
 test('youtube homepage', async ({ page }) => {
   await setupIconOverlays(page);
@@ -14,7 +14,7 @@ test('youtube homepage', async ({ page }) => {
   await expect(hoverOverlay).toBeVisible();
 
   // 2. Once the preview animates in, expect the previewOverlay to be shown
-  await waitFor(1500);
+  await sleep(1500);
   await expect(previewOverlay).toBeVisible();
   // Cannot, because of https://github.com/microsoft/playwright/discussions/13528
   // await expect(hoverOverlay).toBeHidden();

@@ -4,8 +4,8 @@ import * as fs from 'node:fs/promises';
  * Wait for a set amount of seconds (mainly used when waiting for CSS transitions)
  * @param {number} delay - delay in ms
  */
-export function waitFor(delay) {
-    new Promise(resolve => setTimeout(resolve, delay));
+export async function sleep(delay) {
+    await new Promise(resolve => setTimeout(resolve, delay));
 };
 
 /**
