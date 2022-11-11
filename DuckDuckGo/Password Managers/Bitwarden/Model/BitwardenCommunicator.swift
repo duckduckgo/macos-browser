@@ -75,7 +75,6 @@ final class BitwardenCommunicator: BitwardenCommunication {
         process.standardInput = inputPipe
         process.terminationHandler = processDidTerminate(_:)
 
-        //TODO: catch
         try process.run()
         os_log("BitwardenCommunicator: Proxy process running", log: .bitwarden, type: .default)
 
@@ -173,9 +172,8 @@ final class BitwardenCommunicator: BitwardenCommunication {
     }
 
     private func receiveErrorData(_ fileHandle: FileHandle) {
-        if let _ = String(data: fileHandle.availableData, encoding: .utf8) {
-            //TODO: log error data
-//            os_log("STDERR: %{public}@", line)
+        if let stderrOutput = String(data: fileHandle.availableData, encoding: .utf8) {
+            os_log("Stderr output:\n %s", log: .bitwarden, type: .error, stderrOutput)
         }
     }
 

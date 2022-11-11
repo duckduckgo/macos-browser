@@ -110,7 +110,6 @@ final class SaveCredentialsViewController: NSViewController {
         // Only use the non-editable state if a credential was automatically saved and it didn't already exist.
         let condition = credentials.account.id != nil && !credentials.account.username.isEmpty && automaticallySaved
         updateViewState(editable: !condition)
-        //TODO: Start polling the status
     }
     
     private func updateViewState(editable: Bool) {

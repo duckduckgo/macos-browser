@@ -210,15 +210,24 @@ final class BitwardenManager: BitwardenManagement, ObservableObject {
     }
 
     private func handleError(_ error: String, blocking: Bool) {
+        let bitwardenError: BitwardenError
         switch error {
         case "cannot-decrypt":
-            os_log("BitwardenManagement: Bitwarden error - cannot decrypt", type: .error)
-            if blocking {
-                status = .error(error: .bitwardenCannotDecrypt)
+            logOrAssertionFailure("BitwardenManagement: Bitwarden error - cannot decrypt")
+            bitwardenError = .bitwardenCannotDecrypt
+        case "locked":
+            if case let .connected(vault) = status {
+                status = .connected(vault: vault.locked)
+            } else {
+                sendStatus()
             }
-            //TODO: callback
-        default: os_log("BitwardenManagement: Bitwarden error - unknown", type: .error)
-            status = .error(error: .bitwardenRespondedWithError)
+            return
+        default: logOrAssertionFailure("BitwardenManager: Unhandled error")
+            bitwardenError = .bitwardenRespondedWithError
+        }
+
+        if blocking {
+            status = .error(error: bitwardenError)
         }
     }
 
@@ -272,6 +281,11 @@ final class BitwardenManager: BitwardenManagement, ObservableObject {
         }
 
         switch message.command {
+        case .status:
+            if case let .array(payloadItemArray) = message.payload {
+                handleStatusResponse(payloadItemArray: payloadItemArray)
+                return
+            }
         case .credentialRetrieval:
             if let payload = message.payload {
                 handleCredentialRetrievalResponse(messageId: messageId, payload: payload)
@@ -288,16 +302,6 @@ final class BitwardenManager: BitwardenManagement, ObservableObject {
                 return
             }
 
-        default: break
-        }
-
-        //TODO: Refactor to use command for triage (as above)
-        switch message.payload {
-        case .array(let payloadItemArray):
-            if payloadItemArray.first?.status != nil {
-                handleStatusResponse(payloadItemArray: payloadItemArray)
-                return
-            }
         default: break
         }
 
@@ -330,17 +334,9 @@ final class BitwardenManager: BitwardenManagement, ObservableObject {
                 logOrAssertionFailure("BitwardenManager: Unexpected response in credential retrieval")
                 return
             }
-            //TODO: Call handle error?
-            if error == "locked" {
-                if case let .connected(vault) = status {
-                    status = .connected(vault: vault.locked)
-                } else {
-                    sendStatus()
-                }
-                completion([], nil)
-            } else {
-                completion([], BitwardenError.credentialRetrievalFailed)
-            }
+
+            handleError(error, blocking: false)
+            completion([], BitwardenError.credentialRetrievalFailed)
         }
     }
 
@@ -566,7 +562,6 @@ extension BitwardenManager: BitwardenCommunicatorDelegate {
             return
         }
 
-        //TODO: Make the error blocking for certain messages
         if case let .item(payloadItem) = message.payload {
             if let error = payloadItem.error {
                 handleError(error, blocking: false)
