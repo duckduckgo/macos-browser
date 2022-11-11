@@ -34,50 +34,33 @@ protocol ExternalPasswordManagerViewModel {
 }
 
 final class BitwardenSecureVaultViewModel: ExternalPasswordManagerViewModel, ObservableObject {
-    private let bitwardenManager: BitwardenManager
+    private let managerCoordinator: PasswordManagerCoordinator
     
-    internal init(bitwardenManager: BitwardenManager = .shared) {
-        self.bitwardenManager = bitwardenManager
-    }
-    
-    private var vault: BitwardenVault? {
-        if case let .connected(vault: vault) = bitwardenManager.status {
-            return vault
-        }
-       return nil
+    internal init(managerCoordinator: PasswordManagerCoordinator) {
+        self.managerCoordinator = managerCoordinator
     }
     
     var isConnected: Bool {
-        switch bitwardenManager.status {
-        case .connected(vault: _), .notRunning:
-            return true
-        default:
-            return false
-        }
+        managerCoordinator.isEnabled
     }
     
     var status: ExternalPasswordManagerStatus {
-        guard let vault = vault  else { return .locked }
-        
-        switch vault.status {
-        case .locked:
+        if managerCoordinator.isLocked {
             return .locked
-        case .unlocked:
-            return .unlocked
         }
+        return .unlocked
     }
     
     var username: String? {
-        guard let vault = vault  else { return nil }
-        return vault.email
+        managerCoordinator.username
     }
     
     var managerName: String {
-        "Bitwarden"
+        managerCoordinator.displayName
     }
     
     func openExternalPasswordManager() {
-        bitwardenManager.openBitwarden()
+        managerCoordinator.openPasswordManager()
     }
     
     func openSettings() {

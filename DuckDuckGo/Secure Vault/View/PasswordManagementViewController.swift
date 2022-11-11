@@ -143,7 +143,7 @@ final class PasswordManagementViewController: NSViewController {
         try? SecureVaultFactory.default.makeVault(errorReporter: SecureVaultErrorReporter.shared)
     }
 
-    private let bitwardenViewManager = BitwardenSecureVaultViewModel()
+    private let bitwardenViewManager = BitwardenSecureVaultViewModel(managerCoordinator: PasswordManagerCoordinator())
     
     override func viewDidLoad() {
         super.viewDidLoad()
