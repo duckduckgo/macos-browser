@@ -14,7 +14,7 @@ test('youtube homepage', async ({ page }) => {
   await expect(hoverOverlay).toBeVisible();
 
   // 2. Once the preview animates in, expect the previewOverlay to be shown
-  await sleep(1500);
+  await sleep(2500);
   await expect(previewOverlay).toBeVisible();
 
   // 3. Clicking the preview overlay should open duck player
