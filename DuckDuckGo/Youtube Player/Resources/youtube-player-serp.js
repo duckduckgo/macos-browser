@@ -1,3 +1,3 @@
-window.addEventListener('message', (e) => {
-    alert(JSON.stringify(e.data));
-});
+//window.addEventListener('message', (e) => {
+//    alert(JSON.stringify(e.data));
+//});

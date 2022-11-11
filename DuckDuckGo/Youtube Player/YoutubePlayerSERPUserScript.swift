@@ -34,8 +34,14 @@ final class YoutubePlayerSERPUserScript: NSObject, StaticUserScript {
     let messageNames: [String] = []
 
     func setPrivatePlayerEnabled(_ enabled: Bool, inWebView webView: WKWebView) {
+        var allowEmbed = "false";
+
+        if #available(macOS 12.0, *) {
+            allowEmbed = "true";
+        }
+
         let value = enabled ? "true" : "false"
-        let js = "window.postMessage({ enabled: \(value) });"
+        let js = "window.postMessage({ enabled: \(value), allowEmbed: \(allowEmbed) });"
         print("ENABLED", enabled)
         evaluate(js: js, inWebView: webView)
     }
