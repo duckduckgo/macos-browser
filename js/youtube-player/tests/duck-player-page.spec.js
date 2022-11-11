@@ -1,15 +1,35 @@
 import { test, expect } from '@playwright/test';
+import { waitFor } from './utils.js';
 
-const loadMockVideo = async (page) => {
-  await page.addInitScript(() => { window._mockVideoID = 'VIDEO_ID'; });
-  await page.goto('/youtube_player_template.html');
+const MOCK_VIDEO_ID = 'VIDEO_ID';
+const MOCK_IFRAME_SRC = 'https://www.youtube-nocookie.com/embed/'+MOCK_VIDEO_ID+'?iv_load_policy=1&autoplay=1&rel=0&modestbranding=1';
+
+const loadMockVideo = async (page, videoID = MOCK_VIDEO_ID, timestamp) => {
+  await page.addInitScript((videoID) => { window._mockVideoID = videoID; }, videoID);
+  await page.goto('/youtube_player_template.html' + (timestamp ? '?t='+timestamp : ''));
 }
 
-const waitFor = delay => { new Promise(resolve => setTimeout(resolve, delay)) };
+Object.entries({
+  '2h3m1s': 7381,
+  '5m20s': 320,
+  '50s': 50,
+  '1h2m': 3720
+}).forEach(([ timestamp, seconds ]) => {
+  test(`timestamp: ${timestamp} should output ${seconds}`, async ({ page }) => {
+    await loadMockVideo(page, 'VIDEO_ID', timestamp);
+    await expect(page.locator('iframe')).toHaveAttribute('src', MOCK_IFRAME_SRC + '&start='+seconds);
+  });
+});
+
+test('iframe loaded with invalid timestamp', async ({ page }) => {
+  await loadMockVideo(page, 'VIDEO_ID', 'aaaqkw');
+  await expect(page.locator('iframe')).toHaveAttribute('src', MOCK_IFRAME_SRC);
+});
+
 
 test('iframe loaded with valid video id', async ({ page }) => {
   await loadMockVideo(page);
-  await expect(page.locator('iframe')).toHaveAttribute('src','https://www.youtube-nocookie.com/embed/VIDEO_ID?iv_load_policy=1&autoplay=1&rel=0&modestbranding=1');
+  await expect(page.locator('iframe')).toHaveAttribute('src', MOCK_IFRAME_SRC);
 });
 
 test('error shown with invalid video id', async ({ page }) => {
