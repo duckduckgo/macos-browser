@@ -143,7 +143,7 @@ final class PasswordManagementViewController: NSViewController {
         try? SecureVaultFactory.default.makeVault(errorReporter: SecureVaultErrorReporter.shared)
     }
 
-    private let bitwardenViewManager = BitwardenSecureVaultViewModel(managerCoordinator: PasswordManagerCoordinator())
+    private let passwordManagerCoordinator = PasswordManagerCoordinator()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -619,7 +619,7 @@ final class PasswordManagementViewController: NSViewController {
     
     // swiftlint:disable function_body_length
     private func createListView() {
-        let listModel = PasswordManagementItemListModel(externalPasswordViewManager: self.bitwardenViewManager) { [weak self] previousValue, newValue in
+        let listModel = PasswordManagementItemListModel(passwordManagerCoordinator: self.passwordManagerCoordinator) { [weak self] previousValue, newValue in
             guard let newValue = newValue,
                   let id = newValue.secureVaultID,
                   let window = self?.view.window else {
@@ -689,7 +689,7 @@ final class PasswordManagementViewController: NSViewController {
     }
     
     private func displayExternalPasswordManagerView() {
-        let passwordManagerView = PasswordManagementBitwardenItemView(manager: bitwardenViewManager) { [weak self] in
+        let passwordManagerView = PasswordManagementBitwardenItemView(manager: passwordManagerCoordinator) { [weak self] in
             self?.dismiss()
         }
         

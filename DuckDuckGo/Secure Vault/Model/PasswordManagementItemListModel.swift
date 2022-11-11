@@ -205,7 +205,7 @@ enum SecureVaultItem: Equatable, Identifiable, Comparable {
 ///
 /// Could maybe even abstract a bunch of this code to be more generic re-usable styled list for use elsewhere.
 final class PasswordManagementItemListModel: ObservableObject {
-    let externalPasswordViewManager: BitwardenSecureVaultViewModel
+    let passwordManagerCoordinator: PasswordManagerCoordinator
     
     enum EmptyState {
         /// Displays nothing for the empty state. Used when data is still loading, or when filtering the All Items list.
@@ -274,9 +274,9 @@ final class PasswordManagementItemListModel: ObservableObject {
 
     private var onItemSelected: (_ old: SecureVaultItem?, _ new: SecureVaultItem?) -> Void
 
-    init(externalPasswordViewManager: BitwardenSecureVaultViewModel, onItemSelected: @escaping (_ old: SecureVaultItem?, _ new: SecureVaultItem?) -> Void) {
+    init(passwordManagerCoordinator: PasswordManagerCoordinator, onItemSelected: @escaping (_ old: SecureVaultItem?, _ new: SecureVaultItem?) -> Void) {
         self.onItemSelected = onItemSelected
-        self.externalPasswordViewManager = externalPasswordViewManager
+        self.passwordManagerCoordinator = passwordManagerCoordinator
     }
 
     func update(items: [SecureVaultItem]) {
@@ -369,7 +369,7 @@ final class PasswordManagementItemListModel: ObservableObject {
     func selectFirst() {
         selected = nil
 
-        if externalPasswordViewManager.isConnected && (sortDescriptor.category == .allItems || sortDescriptor.category == .logins) {
+        if passwordManagerCoordinator.isEnabled && (sortDescriptor.category == .allItems || sortDescriptor.category == .logins) {
             externalPasswordManagerSelected = true
         } else if let firstSection = displayedItems.first, let selectedItem = firstSection.items.first {
             selected(item: selectedItem)

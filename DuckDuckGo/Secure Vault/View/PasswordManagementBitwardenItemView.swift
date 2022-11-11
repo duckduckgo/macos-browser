@@ -19,7 +19,7 @@
 import SwiftUI
 
 struct PasswordManagementBitwardenItemView: View {
-    @ObservedObject var manager: BitwardenSecureVaultViewModel
+    var manager: PasswordManagerCoordinator
     let didFinish: () -> Void
     
     var body: some View {
@@ -27,11 +27,11 @@ struct PasswordManagementBitwardenItemView: View {
             Image("BitwardenLogin")
             
             VStack(spacing: 2) {
-                Text(UserText.passwordManagerPopoverTitle(managerName: manager.managerName))
+                Text(UserText.passwordManagerPopoverTitle(managerName: manager.displayName))
                 HStack (spacing: 3) {
                     Text(UserText.passwordManagerPopoverChangeInSettingsLabel)
                     Button {
-                        manager.openSettings()
+                        WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .autofill)
                         didFinish()
                     } label: {
                         Text(UserText.passwordManagerPopoverSettingsButton)
@@ -45,10 +45,10 @@ struct PasswordManagementBitwardenItemView: View {
             }
             
             Button {
-                manager.openExternalPasswordManager()
+                manager.openPasswordManager()
                 didFinish()
             } label: {
-                Text(UserText.openPasswordManagerButton(managerName: manager.managerName))
+                Text(UserText.openPasswordManagerButton(managerName: manager.displayName))
             }
         }
     }
@@ -56,6 +56,6 @@ struct PasswordManagementBitwardenItemView: View {
 
 struct PasswordManagementBitwardenItemView_Previews: PreviewProvider {
     static var previews: some View {
-        PasswordManagementBitwardenItemView(manager: BitwardenSecureVaultViewModel(managerCoordinator: PasswordManagerCoordinator())) { }
+        PasswordManagementBitwardenItemView(manager: PasswordManagerCoordinator(), didFinish: {})
     }
 }

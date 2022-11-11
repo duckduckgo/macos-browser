@@ -41,7 +41,7 @@ final class MoreOptionsMenu: NSMenu {
 
     private let tabCollectionViewModel: TabCollectionViewModel
     private let emailManager: EmailManager
-    private let externalPasswordManagerViewModel: ExternalPasswordManagerViewModel
+    private let passwordManagerCoordinator: PasswordManagerCoordinator
     
     required init(coder: NSCoder) {
         fatalError("MoreOptionsMenu: Bad initializer")
@@ -49,11 +49,11 @@ final class MoreOptionsMenu: NSMenu {
     
     init(tabCollectionViewModel: TabCollectionViewModel,
          emailManager: EmailManager = EmailManager(),
-         externalPasswordManagerViewModel: ExternalPasswordManagerViewModel) {
+         passwordManagerCoordinator: PasswordManagerCoordinator) {
         
         self.tabCollectionViewModel = tabCollectionViewModel
         self.emailManager = emailManager
-        self.externalPasswordManagerViewModel = externalPasswordManagerViewModel
+        self.passwordManagerCoordinator = passwordManagerCoordinator
         super.init(title: "")
         
         self.emailManager.requestDelegate = self
@@ -198,7 +198,7 @@ final class MoreOptionsMenu: NSMenu {
             .withImage(NSImage(named: "Downloads"))
 
         let loginsSubMenu = LoginsSubMenu(targetting: self,
-                                          externalPasswordManagerViewModel: externalPasswordManagerViewModel)
+                                          passwordManagerCoordinator: passwordManagerCoordinator)
 
         addItem(withTitle: UserText.passwordManagement, action: #selector(openAutofillWithAllItems), keyEquivalent: "")
             .targetting(self)
@@ -439,10 +439,10 @@ final class BookmarksSubMenu: NSMenu {
 }
 
 final class LoginsSubMenu: NSMenu {
-    let externalPasswordManagerViewModel: ExternalPasswordManagerViewModel
+    let passwordManagerCoordinator: PasswordManagerCoordinator
 
-    init(targetting target: AnyObject, externalPasswordManagerViewModel: ExternalPasswordManagerViewModel) {
-        self.externalPasswordManagerViewModel = externalPasswordManagerViewModel
+    init(targetting target: AnyObject, passwordManagerCoordinator: PasswordManagerCoordinator) {
+        self.passwordManagerCoordinator = passwordManagerCoordinator
         super.init(title: UserText.passwordManagement)
         updateMenuItems(with: target)
     }
@@ -460,9 +460,9 @@ final class LoginsSubMenu: NSMenu {
         let autofillSelector: Selector
         let autofillTitle: String
         
-        if externalPasswordManagerViewModel.isConnected {
+        if passwordManagerCoordinator.isEnabled {
             autofillSelector = #selector(MoreOptionsMenu.openExternalPasswordManager)
-            autofillTitle = "\(UserText.passwordManagementLogins) (Open in \(externalPasswordManagerViewModel.managerName))"
+            autofillTitle = "\(UserText.passwordManagementLogins) (Open in \(passwordManagerCoordinator.displayName))"
         } else {
             autofillSelector = #selector(MoreOptionsMenu.openAutofillWithLogins)
             autofillTitle = UserText.passwordManagementLogins

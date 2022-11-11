@@ -169,7 +169,7 @@ private struct PasswordManagementItemStackContentsView: View {
     @EnvironmentObject var model: PasswordManagementItemListModel
 
     private var shouldDisplayExternalPasswordManagerRow: Bool {
-        model.externalPasswordViewManager.isConnected &&
+        model.passwordManagerCoordinator.isEnabled &&
         (model.sortDescriptor.category == .allItems || model.sortDescriptor.category == .logins)
     }
     
@@ -202,7 +202,7 @@ private struct PasswordManagerItemView: View {
     let action: () -> Void
     
     private var isLocked: Bool {
-        model.externalPasswordViewManager.status == .locked
+        model.passwordManagerCoordinator.isLocked
     }
     
     private var lockStatusLabel: String {
@@ -232,7 +232,7 @@ private struct PasswordManagerItemView: View {
                     .padding(.leading, 6)
                 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(model.externalPasswordViewManager.managerName)
+                    Text(model.passwordManagerCoordinator.displayName)
                         .foregroundColor(textColor)
                         .font(font)
                     Text(lockStatusLabel)
