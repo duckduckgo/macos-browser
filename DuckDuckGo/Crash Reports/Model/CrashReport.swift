@@ -43,8 +43,8 @@ struct LegacyCrashReport: CrashReport {
         try? String(contentsOf: url)
             .components(separatedBy: "\n")
             .filter({ line in
-                for headerItemToFilter in Self.headerItemsToFilter {
-                    if line.hasPrefix(headerItemToFilter) { return false }
+                for headerItemToFilter in Self.headerItemsToFilter where line.hasPrefix(headerItemToFilter) {
+                    return false
                 }
                 return true
             })

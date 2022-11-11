@@ -32,6 +32,13 @@ final class UpdateController: NSObject {
     }
 
     func checkForUpdates(_ sender: Any!) {
+        NSApp.windows.forEach {
+            if let controller = $0.windowController, "\(type(of: controller))" == "SUUpdateAlert" {
+                $0.orderFrontRegardless()
+                $0.makeKey()
+                $0.makeMain()
+            }
+        }
         updater.checkForUpdates(sender)
     }
 

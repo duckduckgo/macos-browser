@@ -26,7 +26,7 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
 
     @IBOutlet var webView: WKWebView!
     private var topAutofillUserScript: OverlayAutofillUserScript?
-    private var cancellables = Set<AnyCancellable>()
+    private var appearanceCancellable: AnyCancellable?
 
     public weak var autofillInterfaceToChild: OverlayAutofillUserScriptDelegate?
 
@@ -45,6 +45,10 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
     public override func viewDidLoad() {
         initWebView()
         addTrackingArea()
+
+        appearanceCancellable = NSApp.publisher(for: \.effectiveAppearance).map { $0 as NSAppearance? }.sink { [weak self] appearance in
+            self?.webView.appearance = appearance
+        }
     }
 
     public func setType(serializedInputContext: String, zoomFactor: CGFloat?) {
@@ -75,6 +79,8 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
         guard let topAutofillUserScript = topAutofillUserScript else { return }
         topAutofillUserScript.websiteAutofillInstance = autofillInterfaceToChild
 
+        webView.appearance = NSApp.effectiveAppearance
+
         let url = Autofill.bundle.url(forResource: "assets/TopAutofill", withExtension: "html")
         if let url = url {
             webView.loadFileURL(url, allowingReadAccessTo: url.deletingLastPathComponent())
@@ -83,7 +89,6 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
     }
 
     public override func viewWillDisappear() {
-        cancellables.removeAll()
         // We should never see this but it's better than a flash of old content
         webView.load(URLRequest(url: URL(string: "about:blank")!))
     }
