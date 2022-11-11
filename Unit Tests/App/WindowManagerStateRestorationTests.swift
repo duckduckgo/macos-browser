@@ -58,13 +58,11 @@ final class WindowManagerStateRestorationTests: XCTestCase {
         let tabs1 = [
             Tab(content: .url(URL(string: "https://duckduckgo.com")!),
                 title: "DDG",
-                error: nil,
                 sessionStateData: "data".data(using: .utf8)!,
                 interactionStateData: "data".data(using: .utf8)!),
             Tab(),
             Tab(content: .url(URL(string: "https://duckduckgo.com/?q=search&t=osx&ia=web")!),
                 title: "DDG search",
-                error: nil,
                 sessionStateData: "data 2".data(using: .utf8)!,
                 interactionStateData: "data 2".data(using: .utf8)!)
         ]
@@ -73,7 +71,6 @@ final class WindowManagerStateRestorationTests: XCTestCase {
             Tab(),
             Tab(content: .url(URL(string: "https://duckduckgo.com/?q=another_search&t=osx&ia=web")!),
                 title: "DDG search",
-                error: nil,
                 sessionStateData: "data 3".data(using: .utf8)!,
                 interactionStateData: "data 3".data(using: .utf8)!)
         ]
@@ -82,7 +79,6 @@ final class WindowManagerStateRestorationTests: XCTestCase {
             Tab(content: .url(URL(string: "https://wikipedia.org")!)),
             Tab(content: .url(URL(string: "https://duckduckgo.com/?q=search_in_pinned_tab&t=osx&ia=web")!),
                 title: "DDG search",
-                error: nil,
                 sessionStateData: "data 4".data(using: .utf8)!,
                 interactionStateData: "data 4".data(using: .utf8)!)
         ]

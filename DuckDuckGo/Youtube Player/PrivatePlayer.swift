@@ -124,9 +124,9 @@ final class PrivatePlayer {
 
 // MARK: - Navigation
 
-extension PrivatePlayer {
+extension PrivatePlayer: PartialNavigationPolicyHandler {
 
-    func decidePolicy(for navigationAction: WKNavigationAction, in tab: Tab) -> WKNavigationActionPolicy? {
+    func decidePolicy(for navigationAction: NavigationAction) async -> NavigationActionPolicy? {
         guard isAvailable, mode != .disabled else {
 
             // When the feature is disabled but the webView still gets a Private Player URL,
@@ -134,7 +134,7 @@ extension PrivatePlayer {
             if navigationAction.request.url?.isPrivatePlayer == true,
                 let (videoID, timestamp) = navigationAction.request.url?.youtubeVideoParams {
 
-                tab.webView.load(.youtube(videoID, timestamp: timestamp))
+                return .redirect(url: .youtube(videoID, timestamp: timestamp))
             }
             return nil
         }
@@ -146,11 +146,13 @@ extension PrivatePlayer {
 
         // Always allow loading Private Player URLs (local HTML)
         if navigationAction.request.url?.isPrivatePlayerScheme == true {
-            return .allow
+            return .instantAllow
         }
 
         // We only care about YouTube video URLs loaded into main frame or within a Private Player
-        guard navigationAction.isTargetingMainFrame || tab.content.isPrivatePlayer, navigationAction.request.url?.isYoutubeVideo == true else {
+        guard navigationAction.isTargetingMainFrame || navigationAction.targetFrame?.request.url?.isPrivatePlayer == true,
+              navigationAction.request.url?.isYoutubeVideo == true
+        else {
             return nil
         }
 
@@ -160,40 +162,51 @@ extension PrivatePlayer {
         // the PP would automatically load on that YouTube video, effectively cancelling the back navigation.
         // We need to go 2 sites back. That YouTube page wasn't really viewed by the user, but it was pushed on the
         // navigation stack and immediately replaced with Private Player. That's why skipping it while going back makes sense.
-        if alwaysOpenInPrivatePlayer && isGoingBackFromPrivatePlayerToYoutubeVideo(for: navigationAction, in: tab) {
-            tab.webView.goBack()
+        // TODO: broken for forward navigation
+        if alwaysOpenInPrivatePlayer && isGoingBackFromPrivatePlayerToYoutubeVideo(for: navigationAction) {
+            _=navigationAction.sourceFrame.webView?.goBack()
             return .cancel
         }
 
-        let didSelectRecommendationFromPrivatePlayer = tab.content.isPrivatePlayer && navigationAction.request.url?.isYoutubeVideoRecommendation == true
+        let didSelectRecommendationFromPrivatePlayer = navigationAction.targetFrame?.request.url?.isPrivatePlayer == true
+            && navigationAction.request.url?.isYoutubeVideoRecommendation == true
 
         // Recommendations must always be opened in Private Player.
-        guard alwaysOpenInPrivatePlayer || didSelectRecommendationFromPrivatePlayer, let (videoID, timestamp) = navigationAction.request.url?.youtubeVideoParams else {
+        guard alwaysOpenInPrivatePlayer || didSelectRecommendationFromPrivatePlayer,
+              let (videoID, timestamp) = navigationAction.request.url?.youtubeVideoParams
+        else {
             return nil
         }
 
         // If this is a child tab of a Private Player and it's loading a YouTube URL, don't override it ("Watch in YouTube").
-        if case .privatePlayer(let parentVideoID, _) = tab.parentTab?.content, parentVideoID == videoID {
-            return nil
-        }
+        // TODO: navigationAction.sourceFrame
+//        if case .privatePlayer(let parentVideoID, _) = context.parentTabContent,
+//           parentVideoID == videoID {
+//            return nil
+//        }
+//
+//        // Otherwise load priate player unless it's already loaded.
+//        guard case .privatePlayer(let currentVideoID, _) = context.currentContent,
+//              currentVideoID == videoID,
+//              // TODO: it was webView.url is it the current URL or URL being navigated to?
+//              context.currentURL?.isPrivatePlayer == true
+//        else {
+//            return .redirect(url: .privatePlayer(videoID, timestamp: timestamp), invalidateBackItem: false)
+//        }
 
-        // Otherwise load priate player unless it's already loaded.
-        guard case .privatePlayer(let currentVideoID, _) = tab.content, currentVideoID == videoID, tab.webView.url?.isPrivatePlayer == true else {
-            tab.webView.load(.privatePlayer(videoID, timestamp: timestamp))
-            return .cancel
-        }
         return nil
     }
 
-    private func isGoingBackFromPrivatePlayerToYoutubeVideo(for navigationAction: WKNavigationAction, in tab: Tab) -> Bool {
-        guard navigationAction.navigationType == .backForward,
-              let url = tab.webView.backForwardList.currentItem?.url,
-              let forwardURL = tab.webView.backForwardList.forwardItem?.url
+    private func isGoingBackFromPrivatePlayerToYoutubeVideo(for navigationAction: NavigationAction) -> Bool {
+        guard /* case .backNavigation = navigationAction.navigationType, */
+              let toURL = navigationAction.request.url, // context.backForwardList.currentItem?.url,
+              let fromURL = navigationAction.targetFrame?.request.url,
+              fromURL == navigationAction.targetFrame?.webView?.backForwardList.forwardItem?.url
         else {
             return false
         }
 
-        return url.isYoutubeVideo && forwardURL.isPrivatePlayer && url.youtubeVideoID == forwardURL.youtubeVideoID
+        return toURL.isYoutubeVideo && fromURL.isPrivatePlayer && toURL.youtubeVideoID == fromURL.youtubeVideoID
     }
 }
 
@@ -281,6 +294,7 @@ extension PrivatePlayer {
 
             // Parent tab with the same videoID means it was a click on video title in Private Player.
             // Override with a YouTube URL.
+            // TODO: this is also triggered for reload action
             return .url(.youtube(videoID))
 
         } else if let url = tab.webView.url, url.isYoutubeVideo == true {

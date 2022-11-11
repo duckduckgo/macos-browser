@@ -32,7 +32,7 @@ protocol TabDataClearing {
  
  Once done, remove Tab objects.
  */
-final class TabDataCleaner: NSObject, WKNavigationDelegate {
+final class TabDataCleaner: NSObject, WebViewNavigationDelegate {
     
     private var numberOfTabs = 0
     private var processedTabs = 0

@@ -640,6 +640,10 @@
 		B63ED0E526BB8FB900A9DAD1 /* SharingMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = B63ED0E426BB8FB900A9DAD1 /* SharingMenu.swift */; };
 		B642738227B65BAC0005DFD1 /* SecureVaultErrorReporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B642738127B65BAC0005DFD1 /* SecureVaultErrorReporter.swift */; };
 		B643BF1427ABF772000BACEC /* NSWorkspaceExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B643BF1327ABF772000BACEC /* NSWorkspaceExtension.swift */; };
+		B647EFA0291D32EA00BA628D /* AppDependencyProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = B647EF9F291D32EA00BA628D /* AppDependencyProvider.swift */; };
+		B647EFA3291D4BA400BA628D /* NavigationDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B647EFA2291D4BA400BA628D /* NavigationDelegate.swift */; };
+		B647EFA6291D6C4D00BA628D /* AdClickAttribution.swift in Sources */ = {isa = PBXBuildFile; fileRef = B647EFA5291D6C4D00BA628D /* AdClickAttribution.swift */; };
+		B647EFA9291E4E8700BA628D /* DependencyProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B647EFA8291E4E8700BA628D /* DependencyProviderTests.swift */; };
 		B64C84DE2692D7400048FEBE /* PermissionAuthorization.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B64C84DD2692D7400048FEBE /* PermissionAuthorization.storyboard */; };
 		B64C84E32692DC9F0048FEBE /* PermissionAuthorizationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B64C84E22692DC9F0048FEBE /* PermissionAuthorizationViewController.swift */; };
 		B64C84EB2692DD650048FEBE /* PermissionAuthorizationPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = B64C84EA2692DD650048FEBE /* PermissionAuthorizationPopover.swift */; };
@@ -1482,6 +1486,10 @@
 		B63ED0E426BB8FB900A9DAD1 /* SharingMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharingMenu.swift; sourceTree = "<group>"; };
 		B642738127B65BAC0005DFD1 /* SecureVaultErrorReporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecureVaultErrorReporter.swift; sourceTree = "<group>"; };
 		B643BF1327ABF772000BACEC /* NSWorkspaceExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSWorkspaceExtension.swift; sourceTree = "<group>"; };
+		B647EF9F291D32EA00BA628D /* AppDependencyProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDependencyProvider.swift; sourceTree = "<group>"; };
+		B647EFA2291D4BA400BA628D /* NavigationDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationDelegate.swift; sourceTree = "<group>"; };
+		B647EFA5291D6C4D00BA628D /* AdClickAttribution.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdClickAttribution.swift; sourceTree = "<group>"; };
+		B647EFA8291E4E8700BA628D /* DependencyProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DependencyProviderTests.swift; sourceTree = "<group>"; };
 		B64C84DD2692D7400048FEBE /* PermissionAuthorization.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = PermissionAuthorization.storyboard; sourceTree = "<group>"; };
 		B64C84E22692DC9F0048FEBE /* PermissionAuthorizationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionAuthorizationViewController.swift; sourceTree = "<group>"; };
 		B64C84EA2692DD650048FEBE /* PermissionAuthorizationPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionAuthorizationPopover.swift; sourceTree = "<group>"; };
@@ -2820,6 +2828,7 @@
 			isa = PBXGroup;
 			children = (
 				AA585D81248FD31100E9A3E2 /* AppDelegate.swift */,
+				B647EF9F291D32EA00BA628D /* AppDependencyProvider.swift */,
 				AA4D700625545EF800C3411E /* URLEventHandler.swift */,
 				AA4FF40B2624751A004E2377 /* GrammarFeaturesManager.swift */,
 				AAD86E51267A0DFF005C11BE /* UpdateController.swift */,
@@ -3254,6 +3263,8 @@
 				AA86491C24D83868001BABEE /* View */,
 				AA86491D24D83A59001BABEE /* ViewModel */,
 				AA86491E24D83A66001BABEE /* Model */,
+				B647EFA4291D6C4100BA628D /* Extensions */,
+				B647EFA1291D4B9700BA628D /* Navigation */,
 				AA512D1224D99D4900230283 /* Services */,
 			);
 			path = "Browser Tab";
@@ -3913,6 +3924,22 @@
 			path = Extensions;
 			sourceTree = "<group>";
 		};
+		B647EFA1291D4B9700BA628D /* Navigation */ = {
+			isa = PBXGroup;
+			children = (
+				B647EFA2291D4BA400BA628D /* NavigationDelegate.swift */,
+			);
+			path = Navigation;
+			sourceTree = "<group>";
+		};
+		B647EFA4291D6C4100BA628D /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				B647EFA5291D6C4D00BA628D /* AdClickAttribution.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
 		B64C84DB2692D6E80048FEBE /* Permissions */ = {
 			isa = PBXGroup;
 			children = (
@@ -4053,6 +4080,7 @@
 				B6A5A2A725BAA35500AA7ADA /* WindowManagerStateRestorationTests.swift */,
 				B6A5A29F25B96E8300AA7ADA /* AppStateChangePublisherTests.swift */,
 				B6C2C9EE276081AB005B7F0A /* DeallocationTests.swift */,
+				B647EFA8291E4E8700BA628D /* DependencyProviderTests.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -4785,6 +4813,7 @@
 				856CADF0271710F400E79BB0 /* HoverUserScript.swift in Sources */,
 				4B9292AC26670D3700AD2C21 /* Bookmark.xcdatamodeld in Sources */,
 				AA6EF9B525081B4C004754E6 /* MainMenuActions.swift in Sources */,
+				B647EFA0291D32EA00BA628D /* AppDependencyProvider.swift in Sources */,
 				B63D466925BEB6C200874977 /* WKWebView+SessionState.swift in Sources */,
 				4B723E1226B0006E00E14D75 /* DataImport.swift in Sources */,
 				B6085D092743AAB600A9C456 /* FireproofDomains.xcdatamodeld in Sources */,
@@ -4849,6 +4878,7 @@
 				4BE65479271FCD41008D1D63 /* EditableTextView.swift in Sources */,
 				AA9FF95D24A1FA1C0039E328 /* TabCollection.swift in Sources */,
 				B688B4DA273E6D3B0087BEAF /* MainView.swift in Sources */,
+				B647EFA3291D4BA400BA628D /* NavigationDelegate.swift in Sources */,
 				4B65143E263924B5005B46EB /* EmailUrlExtensions.swift in Sources */,
 				85CC1D7D26A05F250062F04E /* PasswordManagementItemModel.swift in Sources */,
 				AAD86E52267A0DFF005C11BE /* UpdateController.swift in Sources */,
@@ -4979,6 +5009,7 @@
 				AA13DCB4271480B0006D48D3 /* FirePopoverViewModel.swift in Sources */,
 				F41D174125CB131900472416 /* NSColorExtension.swift in Sources */,
 				AA7E919C2875C65000AB6B62 /* Stored.swift in Sources */,
+				B647EFA6291D6C4D00BA628D /* AdClickAttribution.swift in Sources */,
 				AAC5E4F625D6BF2C007F5990 /* AddressBarButtonsViewController.swift in Sources */,
 				4B59023D26B35F3600489384 /* ChromeDataImporter.swift in Sources */,
 				B68C92C42750EF76002AC6B0 /* PixelDataRecord.swift in Sources */,
@@ -5198,6 +5229,7 @@
 				B6C0B24626E9CB190031CB7F /* RunLoopExtensionTests.swift in Sources */,
 				B693956326F1C2A40015B914 /* FileDownloadManagerMock.swift in Sources */,
 				B6C2C9EF276081AB005B7F0A /* DeallocationTests.swift in Sources */,
+				B647EFA9291E4E8700BA628D /* DependencyProviderTests.swift in Sources */,
 				B63ED0D826AE729600A9DAD1 /* PermissionModelTests.swift in Sources */,
 				B69B504B2726CA2900758A2B /* MockStatisticsStore.swift in Sources */,
 				37CD54BD27F2ECAE00F1F7B9 /* AutofillPreferencesModelTests.swift in Sources */,
@@ -5692,6 +5724,7 @@
 				CURRENT_PROJECT_VERSION = "$(MARKETING_VERSION)";
 				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
 				INFOPLIST_FILE = DuckDuckGo/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -5947,6 +5980,7 @@
 				CURRENT_PROJECT_VERSION = "$(MARKETING_VERSION)";
 				DEVELOPMENT_TEAM = HKE973VLUW;
 				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_TESTABILITY = YES;
 				INFOPLIST_FILE = DuckDuckGo/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

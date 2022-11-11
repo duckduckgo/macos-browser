@@ -159,8 +159,7 @@ extension WKNavigationActionPolicy {
     // https://github.com/WebKit/WebKit/blob/9a6f03d46238213231cf27641ed1a55e1949d074/Source/WebKit/UIProcess/API/Cocoa/WKNavigationDelegate.h#L49
     private static let download = WKNavigationActionPolicy(rawValue: Self.allow.rawValue + 1) ?? .cancel
 
-    static func download(_ navigationAction: WKNavigationAction,
-                         using webView: WKWebView) -> WKNavigationActionPolicy {
+    static func download(_ navigationAction: WKNavigationAction, using webView: WKWebView) -> WKNavigationActionPolicy {
         webView.configuration.processPool
             .setDownloadDelegateIfNeeded(using: LegacyWebKitDownloadDelegate.init)?
             .registerDownloadNavigationAction(navigationAction)

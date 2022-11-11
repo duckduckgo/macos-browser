@@ -30,10 +30,10 @@ final class PrivatePlayerSchemeHandler: NSObject, WKURLSchemeHandler {
         let youtubeHandler = YoutubePlayerNavigationHandler()
         let html = youtubeHandler.makeHTMLFromTemplate()
 
-        if #available(macOS 12.0, *) {
-            let newRequest = youtubeHandler.makePrivatePlayerRequest(from: URLRequest(url: requestURL))
-            webView.loadSimulatedRequest(newRequest, responseHTML: html)
-        } else {
+//        if #available(macOS 12.0, *) {
+//            let newRequest = youtubeHandler.makePrivatePlayerRequest(from: URLRequest(url: requestURL))
+//            webView.loadSimulatedRequest(newRequest, responseHTML: html)
+//        } else {
             guard let data = html.data(using: .utf8) else { return }
 
             let response = URLResponse(url: requestURL,
@@ -44,7 +44,7 @@ final class PrivatePlayerSchemeHandler: NSObject, WKURLSchemeHandler {
             urlSchemeTask.didReceive(response)
             urlSchemeTask.didReceive(data)
             urlSchemeTask.didFinish()
-        }
+//        }
     }
     
     func webView(_ webView: WKWebView, stop urlSchemeTask: WKURLSchemeTask) {}

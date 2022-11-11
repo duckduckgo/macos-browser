@@ -24,15 +24,13 @@ import BrowserServicesKit
 @NSApplicationMain
 final class AppDelegate: NSObject, NSApplicationDelegate {
 
-    static var isRunningTests: Bool {
-        #if DEBUG
-        ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
-        #else
-        return false
-        #endif
-    }
+#if DEBUG
+    static var isRunningTests: Bool = ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
+#else
+    static var isRunningTests: Bool { false }
+#endif
 
-    #if DEBUG
+#if DEBUG
     let disableCVDisplayLinkLogs: Void = {
         // Disable CVDisplayLink logs
         CFPreferencesSetValue("cv_note" as CFString,
@@ -42,7 +40,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                               kCFPreferencesAnyHost)
         CFPreferencesSynchronize("com.apple.corevideo" as CFString, kCFPreferencesCurrentUser, kCFPreferencesAnyHost)
     }()
-    #endif
+#endif
 
     let urlEventHandler = URLEventHandler()
 

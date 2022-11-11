@@ -26,12 +26,11 @@ public protocol PrintingUserScriptDelegate: AnyObject {
 
 }
 
+// TODO: StaticUserScript?
 public class PrintingUserScript: NSObject, UserScript {
     public var requiresRunInPageContentWorld: Bool {
         return true
     }
-
-    public weak var delegate: PrintingUserScriptDelegate?
 
     public var source: String = """
 (function() {
@@ -41,12 +40,52 @@ public class PrintingUserScript: NSObject, UserScript {
 }) ();
 """
 
+    // To avoid webpages invoking the printHandler and overwhelming the browser, this property keeps track of the active
+    // print operation and ignores incoming printHandler messages if one exists.
+    fileprivate var activePrintOperation: NSPrintOperation?
+
     public var injectionTime: WKUserScriptInjectionTime = .atDocumentStart
     public var forMainFrameOnly: Bool = false
     public var messageNames: [String] = ["printHandler"]
 
     public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-        delegate?.printingUserScriptDidRequestPrintController(self)
+        guard let webView = message.webView else { return }
+        self.print(using: webView)
     }
 
+    func print(using webView: WKWebView, frameHandle: Any? = nil) {
+        guard activePrintOperation == nil else { return }
+
+        guard let window = webView.window,
+              let printOperation = webView.printOperation(for: frameHandle)
+        else { return }
+
+        self.activePrintOperation = printOperation
+
+        if printOperation.view?.frame.isEmpty == true {
+            printOperation.view?.frame = webView.bounds
+        }
+
+        let selector = #selector(printOperationDidRun(printOperation:success:contextInfo:))
+        printOperation.runModal(for: window, delegate: self, didRun: selector, contextInfo: nil)
+        // TODO: UI dependency provider
+        NSApp.runModal(for: window)
+    }
+
+    @objc func printOperationDidRun(printOperation: NSPrintOperation,
+                                    success: Bool,
+                                    contextInfo: UnsafeMutableRawPointer?) {
+        activePrintOperation = nil
+        // TODO: UI dependency provider
+        if NSApp.modalWindow != nil {
+            NSApp.stopModal()
+        }
+    }
+
+}
+
+extension Tab {
+    func print() {
+        userScripts?.printingUserScript.print(using: webView)
+    }
 }

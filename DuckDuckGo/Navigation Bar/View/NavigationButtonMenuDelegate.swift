@@ -127,6 +127,7 @@ extension NavigationButtonMenuDelegate: NSMenuDelegate {
                 list.insert(.error, at: 0)
                 currentIndex = 0
             } else {
+                // TODO: can we really have a forward item here?!
                 list = []
                 currentIndex = nil
             }

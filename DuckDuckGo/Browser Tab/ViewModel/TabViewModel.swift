@@ -92,7 +92,8 @@ final class TabViewModel {
         subscribeToPermissions()
         subscribeToAppearancePreferences()
         subscribeToWebViewDidFinishNavigation()
-        $isWebViewLoading.combineLatest(tab.$isAMPProtectionExtracting) { $0 || $1 }
+        // TODO: on decideActionForNavigationAction should set isLoading
+        $isWebViewLoading //.combineLatest(tab.$isAMPProtectionExtracting) { $0 || $1 }
             .assign(to: \.isLoading, onWeaklyHeld: self)
             .store(in: &cancellables)
     }
@@ -166,7 +167,7 @@ final class TabViewModel {
     }
 
     private func updateCanReload() {
-        canReload = tab.content.url ?? .blankPage != .blankPage
+        canReload = (tab.content.url ?? .blankPage) != .blankPage
     }
 
     func updateCanGoBack() {
@@ -178,7 +179,7 @@ final class TabViewModel {
     }
 
     private func updateCanBeBookmarked() {
-        canBeBookmarked = tab.content.url ?? .blankPage != .blankPage
+        canBeBookmarked = (tab.content.url ?? .blankPage) != .blankPage
     }
     
     private var tabURL: URL? {
@@ -297,7 +298,7 @@ final class TabViewModel {
     private var trackerAnimationTimer: Timer?
 
     private func sendAnimationTrigger() {
-        if self.tab.trackerInfo?.trackersBlocked.count ?? 0 > 0 {
+        if (self.tab.trackerInfo?.trackersBlocked.count ?? 0) > 0 {
             self.trackersAnimationTriggerPublisher.send()
         }
     }
@@ -307,7 +308,7 @@ final class TabViewModel {
 extension TabViewModel {
 
     func startFindInPage() {
-        tab.findInPage = findInPage
+        tab.attachFindInPage(findInPage)
         findInPage.show()
     }
 

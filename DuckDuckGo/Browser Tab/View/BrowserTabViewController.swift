@@ -29,7 +29,7 @@ protocol BrowserTabViewControllerClickDelegate: AnyObject {
 
 // swiftlint:disable file_length
 final class BrowserTabViewController: NSViewController {
-    
+
     @IBOutlet weak var errorView: NSView!
     @IBOutlet weak var homePageView: NSView!
     @IBOutlet weak var errorMessageLabel: NSTextField!
@@ -60,7 +60,7 @@ final class BrowserTabViewController: NSViewController {
     private var transientTabContentViewController: NSViewController?
 
     private var mouseDownMonitor: Any?
-    
+
     private var cookieConsentPopoverManager = CookieConsentPopoverManager()
 
     required init?(coder: NSCoder) {
@@ -116,11 +116,11 @@ final class BrowserTabViewController: NSViewController {
     private func windowWillClose(_ notification: NSNotification) {
         self.removeWebViewFromHierarchy()
     }
-    
+
     private func subscribeToSelectedTabViewModel() {
         tabCollectionViewModel.$selectedTabViewModel
             .sink { [weak self] selectedTabViewModel in
-                
+
                 guard let self = self else { return }
                 self.tabViewModel = selectedTabViewModel
                 self.showTabContent(of: selectedTabViewModel)
@@ -313,7 +313,7 @@ final class BrowserTabViewController: NSViewController {
         guard tabCollectionViewModel.selectDisplayableTabIfPresent(content) == false else {
             return
         }
-        
+
         let tab = Tab(content: content,
                       parentTab: parentTab,
                       shouldLoadInBackground: true,
@@ -367,38 +367,38 @@ final class BrowserTabViewController: NSViewController {
         }
         scheduleHoverLabelUpdatesForUrl(nil)
 
-        switch tabViewModel?.tab.content {
-        case .bookmarks:
-            removeAllTabContent()
-            showTabContentController(bookmarksViewController)
-
-        case let .preferences(pane):
-            removeAllTabContent()
-            if let pane = pane, preferencesViewController.model.selectedPane != pane {
-                preferencesViewController.model.selectPane(pane)
-            }
-            showTabContentController(preferencesViewController)
-
-        case .onboarding:
-            removeAllTabContent()
-            if !OnboardingViewModel().onboardingFinished {
-                requestDisableUI()
-            }
-            showTransientTabContentController(OnboardingViewController.create(withDelegate: self))
-
-        case .url, .privatePlayer:
+//        switch tabViewModel?.tab.content {
+//        case .bookmarks:
+//            removeAllTabContent()
+//            showTabContentController(bookmarksViewController)
+//
+//        case let .preferences(pane):
+//            removeAllTabContent()
+//            if let pane = pane, preferencesViewController.model.selectedPane != pane {
+//                preferencesViewController.model.selectPane(pane)
+//            }
+//            showTabContentController(preferencesViewController)
+//
+//        case .onboarding:
+//            removeAllTabContent()
+//            if !OnboardingViewModel().onboardingFinished {
+//                requestDisableUI()
+//            }
+//            showTransientTabContentController(OnboardingViewController.create(withDelegate: self))
+//
+//        case .url, .privatePlayer:
             if shouldReplaceWebView(for: tabViewModel) {
                 removeAllTabContent(includingWebView: true)
                 changeWebView(tabViewModel: tabViewModel)
             }
-
-        case .homePage:
-            removeAllTabContent()
-            view.addAndLayout(homePageView)
-
-        default:
-            break
-        }
+//
+//        case .homePage:
+//            removeAllTabContent()
+//            view.addAndLayout(homePageView)
+//
+//        default:
+//            break
+//        }
     }
 
     private func shouldReplaceWebView(for tabViewModel: TabViewModel?) -> Bool {
@@ -449,7 +449,7 @@ final class BrowserTabViewController: NSViewController {
 
     @objc(_webView:printFrame:)
     func webView(_ webView: WKWebView, printFrame handle: Any) {
-        webView.tab?.print(frame: handle)
+        webView.tab?.userScripts?.printingUserScript.print(using: webView, frameHandle: handle)
     }
 
     @available(macOS 12, *)
@@ -479,58 +479,18 @@ extension BrowserTabViewController: ContentOverlayUserScriptDelegate {
 extension BrowserTabViewController: TabDelegate {
 
     func tab(_ tab: Tab, promptUserForCookieConsent result: @escaping (Bool) -> Void) {
-       cookieConsentPopoverManager.show(on: view, animated: true, result: result)
-       cookieConsentPopoverManager.currentTab = tab
+        cookieConsentPopoverManager.show(on: view, animated: true, result: result)
+        cookieConsentPopoverManager.currentTab = tab
     }
-    
+
     func tabWillStartNavigation(_ tab: Tab, isUserInitiated: Bool) {
         if isUserInitiated,
            let window = self.view.window,
            window.isPopUpWindow == true,
            window.isKeyWindow == false {
-            
+
             window.makeKeyAndOrderFront(nil)
         }
-    }
-
-    func tab(_ tab: Tab, requestedOpenExternalURL url: URL, forUserEnteredURL userEntered: Bool) {
-
-        let searchForExternalUrl = { [weak tab] in
-            // Redirect after handing WebView.url update after cancelling the request
-            DispatchQueue.main.async {
-                tab?.update(url: URL.makeSearchUrl(from: url.absoluteString), userEntered: false)
-            }
-        }
-
-        // Another way of detecting whether an app is installed to handle a protocol is described in Asana:
-        // https://app.asana.com/0/1201037661562251/1202055908401751/f
-        guard NSWorkspace.shared.urlForApplication(toOpen: url) != nil else {
-            if userEntered {
-                searchForExternalUrl()
-            }
-            return
-        }
-        self.view.makeMeFirstResponder()
-
-        let permissionType = PermissionType.externalScheme(scheme: url.scheme ?? "")
-
-        tab.permissions.permissions([permissionType],
-                                    requestedForDomain: webView?.url?.host,
-                                    url: url) { [weak self, weak tab] granted in
-            guard granted, let tab = tab else {
-                if userEntered {
-                    searchForExternalUrl()
-                }
-                return
-            }
-
-            self?.tab(tab, openExternalURL: url, touchingPermissionType: permissionType)
-        }
-    }
-
-    private func tab(_ tab: Tab, openExternalURL url: URL, touchingPermissionType permissionType: PermissionType) {
-        NSWorkspace.shared.open(url)
-        tab.permissions.permissions[permissionType].externalSchemeOpened()
     }
 
     func tabPageDOMLoaded(_ tab: Tab) {
@@ -727,7 +687,7 @@ extension BrowserTabViewController: LinkMenuItemSelectors {
 
     func openLinkInNewWindow(_ sender: NSMenuItem) {
         guard let url = contextMenuLink else { return }
-        WindowsManager.openNewWindow(with: url, sourceTab: tabViewModel?.tab)
+        WindowsManager.openNewWindow(with: url, parentTab: tabViewModel?.tab)
     }
 
     func downloadLinkedFileAs(_ sender: NSMenuItem) {
@@ -736,12 +696,12 @@ extension BrowserTabViewController: LinkMenuItemSelectors {
 
         tab.download(from: url)
     }
-    
+
     func addLinkToBookmarks(_ sender: NSMenuItem) {
         guard let url = contextMenuLink else { return }
         LocalBookmarkManager.shared.makeBookmark(for: url, title: contextMenuTitle ?? url.absoluteString, isFavorite: false)
     }
-    
+
     func bookmarkPage(_ sender: NSMenuItem) {
         guard let tab = tabCollectionViewModel.selectedTabViewModel?.tab, let tabURL = tab.url else { return }
         LocalBookmarkManager.shared.makeBookmark(for: tabURL, title: tab.title ?? tabURL.absoluteString, isFavorite: false)
@@ -833,64 +793,87 @@ extension BrowserTabViewController: WKUIDelegate {
         }
     }
 
+    @objc(_webView:createWebViewWithConfiguration:forNavigationAction:windowFeatures:completionHandler:)
     func webView(_ webView: WKWebView,
                  createWebViewWith configuration: WKWebViewConfiguration,
                  for navigationAction: WKNavigationAction,
-                 windowFeatures: WKWindowFeatures) -> WKWebView? {
-
-        func makeTab(parentTab: Tab, content: Tab.TabContent) -> Tab {
-            // Returned web view must be created with the specified configuration.
-            return Tab(content: content,
-                       webViewConfiguration: configuration,
-                       parentTab: parentTab,
-                       canBeClosedWithBack: true,
-                       webViewFrame: view.frame)
+                 windowFeatures: WKWindowFeatures,
+                 completionHandler: @escaping (WKWebView?) -> Void) {
+        guard let parentTab = webView.tab else {
+            completionHandler(nil)
+            return
         }
-        guard let parentTab = webView.tab else { return nil }
-        func nextQuery(parentTab: Tab) -> PermissionAuthorizationQuery? {
+
+        let url = navigationAction.request.url
+        let domain = navigationAction.sourceFrame.request.url?.host ?? parentTab.url?.host
+        let webViewFrame = view.frame
+        let windowContentSize = NSSize(width: windowFeatures.width?.intValue ?? 1024,
+                                       height: windowFeatures.height?.intValue ?? 752)
+
+        func nextQuery(for parentTab: Tab) -> PermissionAuthorizationQuery? {
             parentTab.permissions.authorizationQueries.first(where: { $0.permissions.contains(.popups) })
         }
+        let shouldOpenPopupNow: Bool = {
+            if navigationAction.isUserInitiated { return true }
 
-        let contentSize = NSSize(width: windowFeatures.width?.intValue ?? 1024, height: windowFeatures.height?.intValue ?? 752)
-        var shouldOpenPopUp = navigationAction.isUserInitiated
-        if !shouldOpenPopUp {
-            let url = navigationAction.request.url
-            parentTab.permissions.permissions(.popups, requestedForDomain: webView.url?.host, url: url) { [weak parentTab] granted in
+            var isCalledSynchronously = true
+            defer { isCalledSynchronously = false }
+            var result = false
 
-                guard let parentTab = parentTab else { return }
-
-                switch (granted, shouldOpenPopUp) {
-                case (true, false):
-                    // callback called synchronously - will return webView for the request
-                    shouldOpenPopUp = true
-                case (true, true):
-                    // called asynchronously
-                    guard let url = navigationAction.request.url else { return }
-                    let tab = makeTab(parentTab: parentTab, content: .url(url))
-                    WindowsManager.openPopUpWindow(with: tab, contentSize: contentSize)
-
-                    parentTab.permissions.permissions.popups.popupOpened(nextQuery: nextQuery(parentTab: parentTab))
-
-                case (false, _):
+            parentTab.permissions.permissions(.popups, requestedForDomain: domain, url: url) { [weak parentTab] granted in
+                if isCalledSynchronously {
+                    result = granted
                     return
                 }
+
+                guard granted, let parentTab = parentTab else {
+                    completionHandler(nil)
+                    return
+                }
+
+                let tab = parentTab.createChildTab(with: .none, configuration: configuration, webViewFrame: webViewFrame)
+                WindowsManager.openPopUpWindow(with: tab, contentSize: windowContentSize)
+
+                parentTab.permissions.permissions.popups.popupOpened(nextQuery: nextQuery(for: parentTab))
+
+                completionHandler(tab.webView)
+            }
+            return result
+        }()
+
+        // TODO: tab.decidePolicyForNewWindowAction
+        guard shouldOpenPopupNow else { return }
+
+        let tab = parentTab.createChildTab(with: .none, configuration: configuration, webViewFrame: webViewFrame)
+        if windowFeatures.toolbarsVisibility?.boolValue == true {
+            self.tabCollectionViewModel.insertChild(tab: tab, selected: !NSApp.isCommandPressed)
+        } else {
+            WindowsManager.openPopUpWindow(with: tab, contentSize: windowContentSize)
+        }
+        parentTab.permissions.permissions.popups.popupOpened(nextQuery: nextQuery(for: parentTab))
+
+        // WebKit automatically loads the request in the returned web view.
+        completionHandler(tab.webView)
+    }
+
+    // official API callback fallback if async _webView::::completionHandler: can‘t be called for whatever reason
+    func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
+
+        var result: WKWebView?
+        var isCalledSynchronously = true
+        defer { isCalledSynchronously = false }
+
+        self.webView(webView, createWebViewWith: configuration, for: navigationAction, windowFeatures: windowFeatures) { [weak self] webView in
+            guard self != nil else { return }
+            result = webView
+            if !isCalledSynchronously,
+                let url = navigationAction.request.url {
+                // automatic loading won‘t start for async callback
+                webView?.tab?.setContent(.url(url))
             }
         }
-        guard shouldOpenPopUp else {
-            shouldOpenPopUp = true // if granted asynchronously
-            return nil
-        }
 
-        let tab = makeTab(parentTab: parentTab, content: .none)
-        if windowFeatures.toolbarsVisibility?.boolValue == true {
-            tabCollectionViewModel.insertChild(tab: tab, selected: !NSApp.isCommandPressed)
-        } else {
-            WindowsManager.openPopUpWindow(with: tab, contentSize: contentSize)
-        }
-        parentTab.permissions.permissions.popups.popupOpened(nextQuery: nextQuery(parentTab: parentTab))
-
-        // WebKit loads the request in the returned web view.
-        return tab.webView
+        return result
     }
 
     @objc(_webView:checkUserMediaPermissionForURL:mainFrameURL:frameIdentifier:decisionHandler:)
@@ -1084,13 +1067,14 @@ extension BrowserTabViewController: BrowserTabSelectionDelegate {
 
 private extension WKWebView {
 
+    // TODO: Redo
     var tab: Tab? {
         guard let navigationDelegate = self.navigationDelegate else { return nil }
-        guard let tab = navigationDelegate as? Tab else {
+        guard let tab = navigationDelegate as? NavigationDelegate else {
             assertionFailure("webView.navigationDelegate is not a Tab")
             return nil
         }
-        return tab
+        return tab.tab
     }
 
 }

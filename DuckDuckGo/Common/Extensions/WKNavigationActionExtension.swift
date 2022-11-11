@@ -32,15 +32,13 @@ extension WKNavigationAction {
         }
     }
 
-    private static let _isUserInitiated = "_isUserInitiated"
-
     static var supportsIsUserInitiated: Bool {
-        instancesRespond(to: NSSelectorFromString(_isUserInitiated))
+        instancesRespond(to: #selector(getter: _isUserInitiated))
     }
 
     var isUserInitiated: Bool {
         guard Self.supportsIsUserInitiated else { return true }
-        return self.value(forKey: Self._isUserInitiated) as? Bool ?? true
+        return self._isUserInitiated
     }
 
 }

@@ -80,9 +80,9 @@ final class WindowsManager {
                       popUp: popUp)
     }
 
-    class func openNewWindow(with initialUrl: URL, sourceTab: Tab? = nil) {
+    class func openNewWindow(with initialUrl: URL, parentTab: Tab? = nil) {
         openNewWindow(with: Tab(content: .contentFromURL(initialUrl),
-                                attributionState: sourceTab?.currentAttributionState))
+                                parentTab: parentTab))
     }
 
     class func openNewWindow(with tabCollection: TabCollection, droppingPoint: NSPoint? = nil, contentSize: NSSize? = nil, popUp: Bool = false) {

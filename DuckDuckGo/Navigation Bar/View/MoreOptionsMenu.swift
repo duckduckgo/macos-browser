@@ -152,7 +152,7 @@ final class MoreOptionsMenu: NSMenu {
     }
 
     @objc func findInPage(_ sender: NSMenuItem) {
-        tabCollectionViewModel.selectedTabViewModel?.findInPage.show()
+        tabCollectionViewModel.selectedTabViewModel?.startFindInPage()
     }
 
     @objc func doPrint(_ sender: NSMenuItem) {

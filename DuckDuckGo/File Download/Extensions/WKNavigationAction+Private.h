@@ -20,5 +20,5 @@
 
 @interface WKNavigationAction (Private)
 @property (nonatomic, readonly) BOOL _shouldPerformDownload;
-
+@property (nonatomic, readonly, getter=_isUserInitiated) BOOL _userInitiated;
 @end
