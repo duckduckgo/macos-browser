@@ -29,4 +29,8 @@ struct BitwardenVault: Equatable {
         case unlocked
     }
 
+    var locked: BitwardenVault {
+        return BitwardenVault(id: id, email: email, status: .locked, active: active)
+    }
+
 }

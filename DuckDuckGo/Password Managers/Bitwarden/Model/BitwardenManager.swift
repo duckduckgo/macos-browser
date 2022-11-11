@@ -312,27 +312,35 @@ final class BitwardenManager: BitwardenManagement, ObservableObject {
         }
 
         refreshStatus(payloadItem: activePayloadItem)
-
-        // If vault is locked, keep refreshing the latest status
-        if case .connected(vault: let vault) = status,
-           vault.status == .locked {
-            scheduleStatusRefreshing()
-        } else {
-            stopStatusRefreshing()
-        }
     }
 
     private func handleCredentialRetrievalResponse(messageId: MessageId, payload: BitwardenMessage.Payload) {
-        // TODO: Error
-        if case let .array(payloadItemArray) = payload {
-            let credentials = payloadItemArray.compactMap { BitwardenCredential(from: $0) }
-            guard let completion = retrieveCredentialsCompletionCache[messageId] else {
-                logOrAssertionFailure("BitwardenManager: Missing or already removed completion block")
-                return
-            }
+        guard let completion = retrieveCredentialsCompletionCache[messageId] else {
+            logOrAssertionFailure("BitwardenManager: Missing or already removed completion block")
+            return
+        }
 
+        switch payload {
+        case .array(let payloadItemArray):
+            let credentials = payloadItemArray.compactMap { BitwardenCredential(from: $0) }
             retrieveCredentialsCompletionCache[messageId] = nil
             completion(credentials, nil)
+        case .item(let payloadItem):
+            guard let error = payloadItem.error else {
+                logOrAssertionFailure("BitwardenManager: Unexpected response in credential retrieval")
+                return
+            }
+            //TODO: Call handle error?
+            if error == "locked" {
+                if case let .connected(vault) = status {
+                    status = .connected(vault: vault.locked)
+                } else {
+                    sendStatus()
+                }
+                completion([], nil)
+            } else {
+                completion([], BitwardenError.credentialRetrievalFailed)
+            }
         }
     }
 
@@ -476,6 +484,14 @@ final class BitwardenManager: BitwardenManagement, ObservableObject {
     @Published private(set) var status: BitwardenStatus = .disabled {
         didSet {
             os_log("Status changed: %s", log: .bitwarden, type: .default, String(describing: status))
+
+            // If vault is locked, keep refreshing the latest status
+            if case .connected(vault: let vault) = status,
+               vault.status == .locked {
+                scheduleStatusRefreshing()
+            } else {
+                stopStatusRefreshing()
+            }
         }
     }
     var statusPublisher: Published<BitwardenStatus>.Publisher { $status }
