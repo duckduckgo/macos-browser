@@ -28,7 +28,7 @@ extension HomePage.Models {
 
     }
 
-    struct FavoriteModel {
+    struct FavoriteModel: Identifiable {
 
         let id: UUID
         let favoriteType: FavoriteType
@@ -64,10 +64,12 @@ extension HomePage.Models {
                     favorites.append(FavoriteModel(id: UUID(), favoriteType: .ghostButton))
                 }
 
+                models = favorites
                 self.rows = favorites.chunked(into: HomePage.favoritesPerRow)
             }
         }
 
+        @Published private(set) var models: [FavoriteModel] = []
         @Published private(set) var rows: [[FavoriteModel]] = []
 
         let open: (Bookmark, OpenTarget) -> Void

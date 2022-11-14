@@ -64,14 +64,16 @@ struct FavoritesGrid: View {
         model.showAllFavorites ? model.rows.indices : model.rows.indices.prefix(HomePage.favoritesRowCountWhenCollapsed)
     }
 
+    var itemIndices: Range<Int> {
+        model.showAllFavorites ? model.models.indices : model.models.indices.prefix(HomePage.favoritesRowCountWhenCollapsed * HomePage.favoritesPerRow)
+    }
+
     var body: some View {
 
-        ForEach(rowIndices, id: \.self) { index in
-
-            HStack(alignment: .top, spacing: 20) {
-                ForEach(model.rows[index], id: \.id) { favorite in
-
-                    switch favorite.favoriteType {
+        if #available(macOS 11.0, *) {
+            LazyVGrid(columns: Array(repeating: GridItem(.fixed(74)), count: HomePage.favoritesPerRow), spacing: 10) {
+                ForEach(itemIndices, id: \.self) { index in
+                    switch model.models[index].favoriteType {
                     case .bookmark(let bookmark):
                         Favorite(bookmark: bookmark)
 
@@ -81,9 +83,33 @@ struct FavoritesGrid: View {
                     case .ghostButton:
                         FavoritesGridGhostButton()
                     }
+//                    GridItemView(d: favorite)
+//                        .overlay(dragging?.id == favorite.id ? Color.white.opacity(0.8) : Color.clear)
+//                        .onDrag {
+//                            self.dragging = favorite
+//                            return NSItemProvider(object: String(favorite.id) as NSString)
+//                        }
+//                        .onDrop(of: [UTType.text], delegate: DragRelocateDelegate(item: favorite, listData: $model.data, current: $dragging))
+                }.animation(.none, value: itemIndices)
+            }
+        } else {
+            ForEach(rowIndices, id: \.self) { index in
+                HStack(alignment: .top, spacing: 20) {
+                    ForEach(model.rows[index], id: \.id) { favorite in
+
+                        switch favorite.favoriteType {
+                        case .bookmark(let bookmark):
+                            Favorite(bookmark: bookmark)
+
+                        case .addButton:
+                            FavoritesGridAddButton()
+
+                        case .ghostButton:
+                            FavoritesGridGhostButton()
+                        }
+                    }
                 }
             }
-            
         }
 
         MoreOrLess(isExpanded: $model.showAllFavorites)
