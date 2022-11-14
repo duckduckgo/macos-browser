@@ -727,7 +727,7 @@ extension BrowserTabViewController: LinkMenuItemSelectors {
 
     func openLinkInNewWindow(_ sender: NSMenuItem) {
         guard let url = contextMenuLink else { return }
-        WindowsManager.openNewWindow(with: url, sourceTab: tabViewModel?.tab)
+        WindowsManager.openNewWindow(with: url, parentTab: tabViewModel?.tab)
     }
 
     func downloadLinkedFileAs(_ sender: NSMenuItem) {

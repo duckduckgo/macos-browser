@@ -646,6 +646,7 @@
 		B647EFB5292253A400BA628D /* TabExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B647EFB4292253A400BA628D /* TabExtensions.swift */; };
 		B647EFB7292253BA00BA628D /* Tab+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B647EFB6292253BA00BA628D /* Tab+Extensions.swift */; };
 		B647EFB92922555200BA628D /* TabPrintExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B647EFB82922555200BA628D /* TabPrintExtension.swift */; };
+		B647EFBB2922584B00BA628D /* AdClickAttribution.swift in Sources */ = {isa = PBXBuildFile; fileRef = B647EFBA2922584B00BA628D /* AdClickAttribution.swift */; };
 		B64C84DE2692D7400048FEBE /* PermissionAuthorization.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B64C84DD2692D7400048FEBE /* PermissionAuthorization.storyboard */; };
 		B64C84E32692DC9F0048FEBE /* PermissionAuthorizationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B64C84E22692DC9F0048FEBE /* PermissionAuthorizationViewController.swift */; };
 		B64C84EB2692DD650048FEBE /* PermissionAuthorizationPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = B64C84EA2692DD650048FEBE /* PermissionAuthorizationPopover.swift */; };
@@ -1496,6 +1497,7 @@
 		B647EFB4292253A400BA628D /* TabExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabExtensions.swift; sourceTree = "<group>"; };
 		B647EFB6292253BA00BA628D /* Tab+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Tab+Extensions.swift"; sourceTree = "<group>"; };
 		B647EFB82922555200BA628D /* TabPrintExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabPrintExtension.swift; sourceTree = "<group>"; };
+		B647EFBA2922584B00BA628D /* AdClickAttribution.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdClickAttribution.swift; sourceTree = "<group>"; };
 		B64C84DD2692D7400048FEBE /* PermissionAuthorization.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = PermissionAuthorization.storyboard; sourceTree = "<group>"; };
 		B64C84E22692DC9F0048FEBE /* PermissionAuthorizationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionAuthorizationViewController.swift; sourceTree = "<group>"; };
 		B64C84EA2692DD650048FEBE /* PermissionAuthorizationPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionAuthorizationPopover.swift; sourceTree = "<group>"; };
@@ -3946,6 +3948,7 @@
 			children = (
 				85AC3AEE25D5CE9800C7D2AA /* UserScripts.swift */,
 				B647EFB4292253A400BA628D /* TabExtensions.swift */,
+				B647EFBA2922584B00BA628D /* AdClickAttribution.swift */,
 				B647EFB82922555200BA628D /* TabPrintExtension.swift */,
 			);
 			path = Extensions;
@@ -4759,6 +4762,7 @@
 				B63BDF7E27FDAA640072D75B /* PrivacyDashboardWebView.swift in Sources */,
 				37CD54CF27F2FDD100F1F7B9 /* AppearancePreferences.swift in Sources */,
 				B6B1E87B26D381710062C350 /* DownloadListCoordinator.swift in Sources */,
+				B647EFBB2922584B00BA628D /* AdClickAttribution.swift in Sources */,
 				4B980E212817604000282EE1 /* NSNotificationName+Debug.swift in Sources */,
 				31F7F2A6288AD2CA001C0D64 /* NavigationBarBadgeAnimationView.swift in Sources */,
 				AAC5E4F125D6BF10007F5990 /* AddressBarButton.swift in Sources */,
