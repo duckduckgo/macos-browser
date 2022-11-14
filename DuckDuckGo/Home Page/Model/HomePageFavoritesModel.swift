@@ -76,17 +76,21 @@ extension HomePage.Models {
         let removeFavorite: (Bookmark) -> Void
         let deleteBookmark: (Bookmark) -> Void
         let addEdit: (Bookmark?) -> Void
+        let moveFavorite: (Bookmark, Int) -> Void
 
         init(open: @escaping (Bookmark, OpenTarget) -> Void,
              removeFavorite: @escaping (Bookmark) -> Void,
              deleteBookmark: @escaping (Bookmark) -> Void,
-             addEdit: @escaping (Bookmark?) -> Void) {
+             addEdit: @escaping (Bookmark?) -> Void,
+             moveFavorite: @escaping (Bookmark, Int) -> Void
+        ) {
 
             self.showAllFavorites = Self.showAllFavoritesSetting
             self.open = open
             self.removeFavorite = removeFavorite
             self.deleteBookmark = deleteBookmark
             self.addEdit = addEdit
+            self.moveFavorite = moveFavorite
         }
 
         func openInNewTab(_ bookmark: Bookmark) {

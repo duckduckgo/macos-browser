@@ -40,6 +40,7 @@ protocol BookmarkManager: AnyObject {
     func update(objectsWithUUIDs uuids: [UUID], update: @escaping (BaseBookmarkEntity) -> Void, completion: @escaping (Error?) -> Void)
     func canMoveObjectWithUUID(objectUUID uuid: UUID, to parent: BookmarkFolder) -> Bool
     func move(objectUUIDs: [UUID], toIndex: Int?, withinParentFolder: ParentFolderType, completion: @escaping (Error?) -> Void)
+    func updateFavoriteIndex(of objectUUIDs: [UUID], toIndex: Int?, completion: @escaping (Error?) -> Void)
     func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarkImportResult
 
     // Wrapper definition in a protocol is not supported yet
@@ -246,7 +247,14 @@ final class LocalBookmarkManager: BookmarkManager {
             completion(error)
         }
     }
-    
+
+    func updateFavoriteIndex(of objectUUIDs: [UUID], toIndex index: Int?, completion: @escaping (Error?) -> Void) {
+        bookmarkStore.updateFavoriteIndex(of: objectUUIDs, toIndex: index) { [weak self] error in
+            self?.loadBookmarks()
+            completion(error)
+        }
+    }
+
     // MARK: - Favicons
 
     private func favicon(for host: String?) -> NSImage? {

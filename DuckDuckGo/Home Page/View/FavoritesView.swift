@@ -94,7 +94,14 @@ struct FavoritesGrid: View {
     }
 
     private func endDrag(_ value: DragGesture.Value) {
-        draggedFavorite = nil
+        defer {
+            draggedFavorite = nil
+        }
+        guard case let .bookmark(bookmark) = draggedFavorite?.favoriteType else {
+            return
+        }
+        let index = itemIndex(for: value.location)
+        model.moveFavorite(bookmark, index)
     }
 
     private func itemIndex(for point: CGPoint) -> Int {
