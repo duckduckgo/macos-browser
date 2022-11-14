@@ -21,6 +21,18 @@ import XCTest
 
 final class TabTests: XCTestCase {
 
+    override func setUp() {
+        TestsDependencyProvider<Tab>.setUp {
+            $0.faviconManagement = FaviconManagerMock()
+            $0.useDefault(for: \.privatePlayer)
+            $0.useDefault(for: \.windowControllersManager)
+        }
+    }
+
+    override func tearDown() {
+        TestsDependencyProvider<Tab>.reset()
+    }
+
     func testWhenSettingURLThenTabTypeChangesToStandard() {
         let tab = Tab(content: .preferences(pane: .autofill))
         XCTAssertEqual(tab.content, .preferences(pane: .autofill))

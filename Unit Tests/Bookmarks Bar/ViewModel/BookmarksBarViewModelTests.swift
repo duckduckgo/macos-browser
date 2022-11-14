@@ -20,7 +20,19 @@ import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 class BookmarksBarViewModelTests: XCTestCase {
-    
+
+    override func setUp() {
+        TestsDependencyProvider<Tab>.setUp {
+            $0.faviconManagement = FaviconManagerMock()
+            $0.useDefault(for: \.privatePlayer)
+            $0.useDefault(for: \.windowControllersManager)
+        }
+    }
+
+    override func tearDown() {
+        TestsDependencyProvider<Tab>.reset()
+    }
+
     func testWhenClippingTheLastBarItem_AndNoItemsCanBeClipped_ThenNoItemsAreClipped() {
         let manager = createMockBookmarksManager()
         let bookmarksBarViewModel = BookmarksBarViewModel(bookmarkManager: manager, tabCollectionViewModel: .mock())

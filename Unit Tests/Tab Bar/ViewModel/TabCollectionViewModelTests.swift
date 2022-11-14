@@ -23,6 +23,20 @@ import Combine
 // MARK: - Tests for TabCollectionViewModel with PinnedTabsManager but without pinned tabs
 final class TabCollectionViewModelTests: XCTestCase {
 
+    override func setUp() {
+        TestsDependencyProvider<Tab>.setUp {
+            $0.faviconManagement = FaviconManagerMock()
+            $0.useDefault(for: \.privatePlayer)
+            $0.useDefault(for: \.windowControllersManager)
+            $0.useDefault(for: \.pinnedTabsManager)
+            $0.useDefault(for: \.historyCoordinating)
+        }
+    }
+
+    override func tearDown() {
+        TestsDependencyProvider<Tab>.reset()
+    }
+
     // MARK: - TabViewModel
 
     func testWhenTabViewModelIsCalledWithIndexOutOfBoundsThenNilIsReturned() {

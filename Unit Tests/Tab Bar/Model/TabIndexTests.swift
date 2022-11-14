@@ -21,6 +21,20 @@ import XCTest
 
 final class TabIndexTests: XCTestCase {
 
+    override func setUp() {
+        TestsDependencyProvider<Tab>.setUp {
+            $0.faviconManagement = FaviconManagerMock()
+            $0.useDefault(for: \.privatePlayer)
+            $0.useDefault(for: \.windowControllersManager)
+            $0.useDefault(for: \.pinnedTabsManager)
+            $0.useDefault(for: \.historyCoordinating)
+        }
+    }
+
+    override func tearDown() {
+        TestsDependencyProvider<Tab>.reset()
+    }
+
     func testComparison() {
         XCTAssertLessThan(TabIndex.pinned(0), TabIndex.unpinned(0))
         XCTAssertLessThan(TabIndex.pinned(0), TabIndex.pinned(1))

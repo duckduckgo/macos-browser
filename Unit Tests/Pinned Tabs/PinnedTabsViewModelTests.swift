@@ -24,8 +24,13 @@ class PinnedTabsViewModelTests: XCTestCase {
     var model: PinnedTabsViewModel!
     var collection: TabCollection!
 
-    override func setUpWithError() throws {
-        try super.setUpWithError()
+    override func setUp() {
+        assert(WindowControllersManager.shared.mainWindowControllers.isEmpty)
+        TestsDependencyProvider<Tab>.setUp {
+            $0.faviconManagement = FaviconManagerMock()
+            $0.useDefault(for: \.privatePlayer)
+            $0.useDefault(for: \.windowControllersManager)
+        }
         collection = TabCollection(tabs: [
             Tab(content: .url("http://a.com".url!)),
             Tab(content: .url("http://b.com".url!)),
@@ -34,6 +39,14 @@ class PinnedTabsViewModelTests: XCTestCase {
             Tab(content: .url("http://e.com".url!))
         ])
         model = PinnedTabsViewModel(collection: collection)
+    }
+
+    override func tearDown() {
+        WindowsManager.closeWindows()
+        for controller in WindowControllersManager.shared.mainWindowControllers {
+            WindowControllersManager.shared.unregister(controller)
+        }
+        TestsDependencyProvider<Tab>.reset()
     }
 
     func testInitialState() throws {
