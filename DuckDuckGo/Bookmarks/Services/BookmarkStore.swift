@@ -24,6 +24,7 @@ import os.log
 enum BookmarkStoreFetchPredicateType {
     case bookmarks
     case topLevelEntities
+    case favorites
 }
 
 enum ParentFolderType {
@@ -133,6 +134,13 @@ final class LocalBookmarkStore: BookmarkStore {
         }
 
         context.perform {
+            if type == .favorites {
+                let favorites = self.favoritesFolder?.favorites?.compactMap({ $0 as? BookmarkManagedObject })
+                let entities = favorites?.compactMap { BaseBookmarkEntity.from(managedObject: $0, parentFolderUUID: $0.parentFolder?.id) }
+                mainQueueCompletion(bookmarks: entities, error: nil)
+                return
+            }
+
             let fetchRequest: NSFetchRequest<BookmarkManagedObject>
 
             switch type {
@@ -140,6 +148,10 @@ final class LocalBookmarkStore: BookmarkStore {
                 fetchRequest = Bookmark.bookmarksFetchRequest()
             case .topLevelEntities:
                 fetchRequest = Bookmark.topLevelEntitiesFetchRequest()
+            case .favorites:
+                assertionFailure("Should not get there")
+                completion(nil, nil)
+                return
             }
 
             fetchRequest.returnsObjectsAsFaults = false
@@ -148,7 +160,7 @@ final class LocalBookmarkStore: BookmarkStore {
                 let results: [BookmarkManagedObject]
                 
                 switch type {
-                case .bookmarks:
+                case .bookmarks, .favorites:
                     results = try self.context.fetch(fetchRequest)
                 case .topLevelEntities:
                     // When fetching the top level entities, the root folder will be returned. To make things simpler for the caller, this function

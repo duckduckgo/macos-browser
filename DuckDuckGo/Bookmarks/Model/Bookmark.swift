@@ -142,12 +142,6 @@ final class Bookmark: BaseBookmarkEntity {
         return request
     }
 
-    static func favoritesFetchRequest() -> NSFetchRequest<BookmarkManagedObject> {
-        let request = NSFetchRequest<BookmarkManagedObject>(entityName: "BookmarkManagedObject")
-        request.predicate = NSPredicate(format: "isFolder == NO AND favo == YES")
-        return request
-    }
-
     let url: URL
     var isFavorite: Bool
     private(set) var parentFolderUUID: UUID?

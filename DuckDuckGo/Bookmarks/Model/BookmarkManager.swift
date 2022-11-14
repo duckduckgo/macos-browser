@@ -80,7 +80,14 @@ final class LocalBookmarkManager: BookmarkManager {
                     return
                 }
 
-                self?.list = BookmarkList(entities: bookmarks, topLevelEntities: topLevelEntities)
+                self?.bookmarkStore.loadAll(type: .favorites) { [weak self] (favorites, error) in
+                    guard error == nil, let favorites = favorites else {
+                        os_log("LocalBookmarkManager: Failed to fetch favorites.", type: .error)
+                        return
+                    }
+
+                    self?.list = BookmarkList(entities: bookmarks, topLevelEntities: topLevelEntities, favorites: favorites)
+                }
             }
         }
     }
