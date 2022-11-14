@@ -59,10 +59,12 @@ protocol BookmarkStore {
 
 }
 
+// swiftlint:disable:next type_body_length
 final class LocalBookmarkStore: BookmarkStore {
     
     enum Constants {
         static let rootFolderUUID = "87E09C05-17CB-4185-9EDF-8D1AF4312BAF"
+        static let favoritesFolderUUID = "23B11CC4-EA56-4937-8EC1-15854109AE35"
     }
 
     init() {
@@ -78,6 +80,7 @@ final class LocalBookmarkStore: BookmarkStore {
         removeInvalidBookmarkEntities()
         migrateTopLevelStorageToRootLevelBookmarksFolder()
         cacheReadOnlyTopLevelBookmarksFolder()
+        createAndCacheFavoritesFolderIfNeeded()
     }
 
     enum BookmarkStoreError: Error {
@@ -92,18 +95,23 @@ final class LocalBookmarkStore: BookmarkStore {
     
     /// All entities within the bookmarks store must exist under this root level folder. Because this value is used so frequently, it is cached here.
     private var rootLevelFolder: BookmarkManagedObject?
-    
+
+    /// All favorites must additionally be children of this special folder. Because this value is used so frequently, it is cached here.
+    private(set) var favoritesFolder: BookmarkManagedObject?
+
     private func cacheReadOnlyTopLevelBookmarksFolder() {
         context.performAndWait {
             let fetchRequest = NSFetchRequest<BookmarkManagedObject>(entityName: BookmarkManagedObject.className())
-            fetchRequest.predicate = NSPredicate(format: "%K == nil AND %K == true",
+            fetchRequest.predicate = NSPredicate(format: "%K == %@ AND %K == nil AND %K == true",
+                                                 "id",
+                                                 Constants.rootFolderUUID,
                                                  #keyPath(BookmarkManagedObject.parentFolder),
                                                  #keyPath(BookmarkManagedObject.isFolder))
             
             let results = (try? context.fetch(fetchRequest)) ?? []
 
             guard results.count == 1 else {
-                fatalError("There shouldn't be an orphaned folder")
+                fatalError("There shouldn't be more than one root folder")
             }
             
             guard let folder = results.first else {
@@ -177,7 +185,7 @@ final class LocalBookmarkStore: BookmarkStore {
             bookmarkMO.id = bookmark.id
             bookmarkMO.urlEncrypted = bookmark.url as NSURL?
             bookmarkMO.titleEncrypted = bookmark.title as NSString
-            bookmarkMO.isFavorite = bookmark.isFavorite
+            bookmarkMO.favoritesFolder = bookmark.isFavorite ? self.favoritesFolder : nil
             bookmarkMO.isFolder = bookmark.isFolder
             bookmarkMO.dateAdded = NSDate.now
 
@@ -254,7 +262,7 @@ final class LocalBookmarkStore: BookmarkStore {
                 return
             }
 
-            bookmarkMO.update(with: bookmark)
+            bookmarkMO.update(with: bookmark, favoritesFolder: self.favoritesFolder)
 
             do {
                 try self.context.save()
@@ -352,7 +360,7 @@ final class LocalBookmarkStore: BookmarkStore {
             bookmarkManagedObjects.forEach { managedObject in
                 if let entity = BaseBookmarkEntity.from(managedObject: managedObject, parentFolderUUID: nil) {
                     update(entity)
-                    managedObject.update(with: entity)
+                    managedObject.update(with: entity, favoritesFolder: self.favoritesFolder)
                 }
             }
 
@@ -668,7 +676,9 @@ final class LocalBookmarkStore: BookmarkStore {
             bookmarkManagedObject.parentFolder = parent ?? self.rootLevelFolder
             
             // Bookmarks from the bookmarks bar are imported as favorites
-            bookmarkManagedObject.isFavorite = bookmarkOrFolder.isDDGFavorite || (!bookmarkOrFolder.isFolder && markBookmarksAsFavorite == true)
+            if bookmarkOrFolder.isDDGFavorite || (!bookmarkOrFolder.isFolder && markBookmarksAsFavorite == true) {
+                bookmarkManagedObject.favoritesFolder = favoritesFolder
+            }
 
             if let children = bookmarkOrFolder.children {
                 let result = recursivelyCreateEntities(from: children,
@@ -725,6 +735,43 @@ final class LocalBookmarkStore: BookmarkStore {
         }
     }
 
+    /// Fetch and cache favorites folder, or create it if it does not exist
+    private func createAndCacheFavoritesFolderIfNeeded() {
+        context.performAndWait {
+            let fetchRequest = NSFetchRequest<BookmarkManagedObject>(entityName: BookmarkManagedObject.className())
+            fetchRequest.predicate = NSPredicate(format: "%K == %@ AND %K == nil AND %K == YES",
+                                                 "id",
+                                                 Constants.favoritesFolderUUID,
+                                                 #keyPath(BookmarkManagedObject.parentFolder),
+                                                 #keyPath(BookmarkManagedObject.isFolder))
+            do {
+                if let favoritesFolder = try context.fetch(fetchRequest).first {
+                    self.favoritesFolder = favoritesFolder
+                    return
+                }
+
+                let managedObject = NSEntityDescription.insertNewObject(forEntityName: BookmarkManagedObject.className(), into: self.context)
+
+                guard let favoritesFolder = managedObject as? BookmarkManagedObject else {
+                    assertionFailure("LocalBookmarkStore: Failed to migrate top level entities")
+                    return
+                }
+
+                favoritesFolder.id = .favoritesFolderUUID
+                favoritesFolder.titleEncrypted = "Favorites Folder" as NSString
+                favoritesFolder.isFolder = true
+                favoritesFolder.dateAdded = NSDate.now
+                favoritesFolder.parentFolder = nil
+
+                self.favoritesFolder = favoritesFolder
+
+                try context.save()
+            } catch {
+                Pixel.fire(.debug(event: .bookmarksStoreFavoritesFolderCreationFailed, error: error))
+            }
+        }
+    }
+
     private func migrateTopLevelStorageToRootLevelBookmarksFolder() {
         context.performAndWait {
             // 1. Fetch all top-level entities and check that there isn't an existing root folder
@@ -762,7 +809,7 @@ final class LocalBookmarkStore: BookmarkStore {
                 let existingTopLevelFolderIndex = existingTopLevelEntities.firstIndex { entity in
                     entity.id == .rootBookmarkFolderUUID
                 }
-                
+
                 // Check if there's only one top level folder, and it's the root folder:
                 if existingTopLevelFolderIndex != nil, existingTopLevelEntities.count == 1 {
                     return
@@ -790,12 +837,18 @@ final class LocalBookmarkStore: BookmarkStore {
 
                     topLevelFolder = newTopLevelFolder
                 }
-                
-                // 3. Add existing top level entities as children of the new top level folder:
+
+                // 3. Remove existing favorites folder from top level entities, if it exists:
+
+                if let existingFavoritesFolderIndex = existingTopLevelEntities.firstIndex(where: { $0.id == .favoritesFolderUUID }) {
+                    existingTopLevelEntities.remove(at: existingFavoritesFolderIndex)
+                }
+
+                // 4. Add existing top level entities as children of the new top level folder:
                 
                 topLevelFolder.mutableChildren.addObjects(from: existingTopLevelEntities)
                 
-                // 4. Save the migration:
+                // 5. Save the migration:
                 
                 try context.save()
             } catch {
@@ -881,9 +934,9 @@ final class LocalBookmarkStore: BookmarkStore {
 
 fileprivate extension BookmarkManagedObject {
 
-    func update(with baseEntity: BaseBookmarkEntity) {
+    func update(with baseEntity: BaseBookmarkEntity, favoritesFolder: BookmarkManagedObject?) {
         if let bookmark = baseEntity as? Bookmark {
-            update(with: bookmark)
+            update(with: bookmark, favoritesFolder: favoritesFolder)
         } else if let folder = baseEntity as? BookmarkFolder {
             update(with: folder)
         } else {
@@ -891,18 +944,18 @@ fileprivate extension BookmarkManagedObject {
         }
     }
 
-    func update(with bookmark: Bookmark) {
+    func update(with bookmark: Bookmark, favoritesFolder: BookmarkManagedObject?) {
         id = bookmark.id
         urlEncrypted = bookmark.url as NSURL?
         titleEncrypted = bookmark.title as NSString
-        isFavorite = bookmark.isFavorite
+        self.favoritesFolder = bookmark.isFavorite ? favoritesFolder : nil
         isFolder = false
     }
 
     func update(with folder: BookmarkFolder) {
         id = folder.id
         titleEncrypted = folder.title as NSString
-        isFavorite = false
+        favoritesFolder = nil
         isFolder = true
     }
 
@@ -912,6 +965,10 @@ extension UUID {
     
     static var rootBookmarkFolderUUID: UUID {
         return UUID(uuidString: LocalBookmarkStore.Constants.rootFolderUUID)!
+    }
+
+    static var favoritesFolderUUID: UUID {
+        return UUID(uuidString: LocalBookmarkStore.Constants.favoritesFolderUUID)!
     }
     
 }

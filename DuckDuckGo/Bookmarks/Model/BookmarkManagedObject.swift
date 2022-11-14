@@ -52,7 +52,7 @@ extension BookmarkManagedObject {
     }
     
     func validateThatEntitiesExistInsideTheRootFolder() throws {
-        if parentFolder == nil, id != .rootBookmarkFolderUUID {
+        if parentFolder == nil, ![UUID.rootBookmarkFolderUUID, .favoritesFolderUUID].contains(id) {
             throw BookmarkError.mustExistInsideRootFolder
         }
     }

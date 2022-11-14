@@ -81,7 +81,7 @@ internal class BaseBookmarkEntity {
                             url: url,
                             title: title,
                             oldFavicon: managedObject.faviconEncrypted as? NSImage,
-                            isFavorite: managedObject.isFavorite,
+                            isFavorite: managedObject.favoritesFolder != nil,
                             parentFolderUUID: parentFolderUUID)
         }
     }
@@ -130,6 +130,12 @@ final class Bookmark: BaseBookmarkEntity {
     static func bookmarksFetchRequest() -> NSFetchRequest<BookmarkManagedObject> {
         let request = NSFetchRequest<BookmarkManagedObject>(entityName: "BookmarkManagedObject")
         request.predicate = NSPredicate(format: "isFolder == NO")
+        return request
+    }
+
+    static func favoritesFetchRequest() -> NSFetchRequest<BookmarkManagedObject> {
+        let request = NSFetchRequest<BookmarkManagedObject>(entityName: "BookmarkManagedObject")
+        request.predicate = NSPredicate(format: "isFolder == NO AND favo == YES")
         return request
     }
 
