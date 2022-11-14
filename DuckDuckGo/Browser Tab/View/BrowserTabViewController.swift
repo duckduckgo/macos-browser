@@ -441,7 +441,7 @@ final class BrowserTabViewController: NSViewController {
 
     @objc(_webView:printFrame:)
     func webView(_ webView: WKWebView, printFrame handle: Any) {
-        webView.tab?.print(frame: handle)
+        webView.tab?.extensions.printing.print(using: webView, frameHandle: handle)
     }
 
     @available(macOS 12, *)

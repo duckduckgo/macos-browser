@@ -247,8 +247,14 @@ final class Tab: NSObject, Identifiable, ObservableObject, DependencyProviderCli
         dependencyProvider.cbaTimeReporter?.tabWillClose(self.instrumentation.currentTabIdentifier)
     }
 
-    private var userContentController: UserContentController? {
+    var userContentController: UserContentController? {
         webView.configuration.userContentController as? UserContentController
+    }
+    var userScripts: UserScripts? {
+        userContentController?.contentBlockingAssets?.userScripts as? UserScripts
+    }
+    var userScriptsPublisher: AnyPublisher<UserScripts?, Never>? {
+        userContentController?.$contentBlockingAssets.map { $0?.userScripts as? UserScripts }.eraseToAnyPublisher()
     }
 
     // MARK: - Event Publishers
@@ -915,7 +921,6 @@ extension Tab: UserContentControllerDelegate {
         userScripts.autofillScript.vaultDelegate = vaultManager
         self.autofillScript = userScripts.autofillScript
         userScripts.pageObserverScript.delegate = self
-        userScripts.printingUserScript.delegate = self
         userScripts.hoverUserScript.delegate = self
         if #available(macOS 11, *) {
             userScripts.autoconsentUserScript?.delegate = self
@@ -938,41 +943,6 @@ extension Tab: BrowserTabViewControllerClickDelegate {
     func browserTabViewController(_ browserTabViewController: BrowserTabViewController, didClickAtPoint: NSPoint) {
         guard let autofillScript = autofillScript else { return }
         autofillScript.clickPoint = didClickAtPoint
-    }
-
-}
-
-extension Tab: PrintingUserScriptDelegate {
-
-    func print(frame: Any? = nil) {
-        guard activePrintOperation == nil else { return }
-
-        guard let window = webView.window,
-              let printOperation = webView.printOperation(for: frame)
-        else { return }
-
-        self.activePrintOperation = printOperation
-
-        if printOperation.view?.frame.isEmpty == true {
-            printOperation.view?.frame = webView.bounds
-        }
-
-        let selector = #selector(printOperationDidRun(printOperation:success:contextInfo:))
-        printOperation.runModal(for: window, delegate: self, didRun: selector, contextInfo: nil)
-        NSApp.runModal(for: window)
-    }
-
-    func printingUserScriptDidRequestPrintController(_ script: PrintingUserScript) {
-        self.print()
-    }
-
-    @objc func printOperationDidRun(printOperation: NSPrintOperation,
-                                    success: Bool,
-                                    contextInfo: UnsafeMutableRawPointer?) {
-        activePrintOperation = nil
-        if NSApp.modalWindow != nil {
-            NSApp.stopModal()
-        }
     }
 
 }

@@ -22,9 +22,7 @@ import WebKit
 import UserScript
 
 public protocol PrintingUserScriptDelegate: AnyObject {
-
-    func printingUserScriptDidRequestPrintController(_ script: PrintingUserScript)
-
+    func printingUserScript(_ script: PrintingUserScript, didRequestPrintControllerFor webView: WKWebView)
 }
 
 public class PrintingUserScript: NSObject, UserScript {
@@ -47,7 +45,8 @@ public class PrintingUserScript: NSObject, UserScript {
     public var messageNames: [String] = ["printHandler"]
 
     public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-        delegate?.printingUserScriptDidRequestPrintController(self)
+        guard let webView = message.webView else { return }
+        delegate?.printingUserScript(self, didRequestPrintControllerFor: webView)
     }
 
 }
