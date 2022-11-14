@@ -30,6 +30,7 @@ class PinnedTabsViewModelTests: XCTestCase {
             $0.faviconManagement = FaviconManagerMock()
             $0.useDefault(for: \.privatePlayer)
             $0.useDefault(for: \.windowControllersManager)
+            $0.extensionsBuilder = TestTabExtensionsBuilder()
         }
         collection = TabCollection(tabs: [
             Tab(content: .url("http://a.com".url!)),

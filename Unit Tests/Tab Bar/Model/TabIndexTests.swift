@@ -28,6 +28,7 @@ final class TabIndexTests: XCTestCase {
             $0.useDefault(for: \.windowControllersManager)
             $0.useDefault(for: \.pinnedTabsManager)
             $0.useDefault(for: \.historyCoordinating)
+            $0.extensionsBuilder = TestTabExtensionsBuilder()
         }
     }
 

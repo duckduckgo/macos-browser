@@ -26,6 +26,7 @@ final class TabTests: XCTestCase {
             $0.faviconManagement = FaviconManagerMock()
             $0.useDefault(for: \.privatePlayer)
             $0.useDefault(for: \.windowControllersManager)
+            $0.extensionsBuilder = TestTabExtensionsBuilder()
         }
     }
 
