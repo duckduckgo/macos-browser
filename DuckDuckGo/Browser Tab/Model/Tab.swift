@@ -52,6 +52,9 @@ extension DependencyProvider<Tab> {
     var privatePlayer: PrivatePlayer { .shared }
     var cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter? { .shared }
     var workspace: NSWorkspace { .shared }
+
+    var extensionsBuilder: ExtensionsBuilder { TabExtensionsBuilder() }
+
 }
 
 // swiftlint:disable:next type_body_length
@@ -170,6 +173,8 @@ final class Tab: NSObject, Identifiable, ObservableObject, DependencyProviderCli
         return dependencyProvider.pinnedTabsManager.isTabPinned(self)
     }
 
+    private(set) var extensions = DynamicTabExtensions()
+
     init(content: TabContent,
          webViewConfiguration: WKWebViewConfiguration? = nil,
          localHistory: Set<String> = Set<String>(),
@@ -207,6 +212,8 @@ final class Tab: NSObject, Identifiable, ObservableObject, DependencyProviderCli
         permissions = PermissionModel(webView: webView)
 
         super.init()
+
+        dependencyProvider.extensionsBuilder.buildExtensions(into: &extensions, for: self)
 
         initAttributionLogic(state: attributionState ?? parentTab?.adClickAttributionLogic.state)
         setupWebView(shouldLoadInBackground: shouldLoadInBackground)
