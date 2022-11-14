@@ -32,6 +32,10 @@ extension BookmarkManagedObject {
         return mutableOrderedSetValue(forKey: "children")
     }
 
+    public var mutableFavorites: NSMutableOrderedSet {
+        return mutableOrderedSetValue(forKey: "favorites")
+    }
+
     public override func validateForInsert() throws {
         try super.validateForInsert()
         try validate()

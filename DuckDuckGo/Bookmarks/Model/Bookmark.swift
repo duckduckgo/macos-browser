@@ -26,6 +26,15 @@ internal class BaseBookmarkEntity {
         return request
     }
 
+    static func favorite(with uuid: UUID) -> NSFetchRequest<BookmarkManagedObject> {
+        let request = NSFetchRequest<BookmarkManagedObject>(entityName: "BookmarkManagedObject")
+        request.predicate = NSPredicate(format: "id == %@ AND %K != nil AND %K == NO",
+                                        uuid as CVarArg,
+                                        #keyPath(BookmarkManagedObject.favoritesFolder),
+                                        #keyPath(BookmarkManagedObject.isFolder))
+        return request
+    }
+
     static func entities(with identifiers: [UUID]) -> NSFetchRequest<BookmarkManagedObject> {
         let request = NSFetchRequest<BookmarkManagedObject>(entityName: "BookmarkManagedObject")
         request.predicate = NSPredicate(format: "id IN %@", identifiers)

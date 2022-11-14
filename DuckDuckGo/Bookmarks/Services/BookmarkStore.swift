@@ -55,6 +55,7 @@ protocol BookmarkStore {
     func update(objectsWithUUIDs uuids: [UUID], update: @escaping (BaseBookmarkEntity) -> Void, completion: @escaping (Error?) -> Void)
     func canMoveObjectWithUUID(objectUUID uuid: UUID, to parent: BookmarkFolder) -> Bool
     func move(objectUUIDs: [UUID], toIndex: Int?, withinParentFolder: ParentFolderType, completion: @escaping (Error?) -> Void)
+    func updateFavoriteIndex(of objectUUIDs: [UUID], toIndex: Int?, completion: @escaping (Error?) -> Void)
     func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarkImportResult
 
 }
@@ -552,6 +553,62 @@ final class LocalBookmarkStore: BookmarkStore {
             }
 
             currentInsertionIndex += 1
+        }
+    }
+
+    func updateFavoriteIndex(of objectUUIDs: [UUID], toIndex index: Int?, completion: @escaping (Error?) -> Void) {
+        context.perform { [weak self] in
+            guard let self = self else {
+                assertionFailure("Couldn't get strong self")
+                completion(nil)
+                return
+            }
+
+            guard let favoritesFolder = self.favoritesFolder else {
+                assertionFailure("\(#file): Failed to get favorites folder")
+                completion(nil)
+                return
+            }
+
+            // Guarantee that bookmarks are fetched in the same order as the UUIDs. In the future, this should fetch all objects at once with a
+            // batch fetch request and have them sorted in the correct order.
+            let bookmarkManagedObjects: [BookmarkManagedObject] = objectUUIDs.compactMap { uuid in
+                let entityFetchRequest = BaseBookmarkEntity.favorite(with: uuid)
+                return (try? self.context.fetch(entityFetchRequest))?.first
+            }
+
+            if let index, index < favoritesFolder.mutableFavorites.count {
+                for bookmarkManagedObject in bookmarkManagedObjects {
+                    var currentInsertionIndex = max(index, 0)
+                    var adjustedInsertionIndex = currentInsertionIndex
+
+                    if currentInsertionIndex > favoritesFolder.mutableFavorites.index(of: bookmarkManagedObject) {
+                        adjustedInsertionIndex -= 1
+                    }
+
+                    bookmarkManagedObject.favoritesFolder = nil
+                    if adjustedInsertionIndex < favoritesFolder.mutableFavorites.count {
+                        favoritesFolder.mutableFavorites.insert(bookmarkManagedObject, at: adjustedInsertionIndex)
+                    } else {
+                        favoritesFolder.mutableFavorites.add(bookmarkManagedObject)
+                    }
+                    currentInsertionIndex += 1
+                }
+            } else {
+                for bookmarkManagedObject in bookmarkManagedObjects {
+                    bookmarkManagedObject.favoritesFolder = nil
+                }
+            }
+
+            do {
+                try self.context.save()
+            } catch {
+                assertionFailure("\(#file): Saving of context failed")
+                DispatchQueue.main.async { completion(error) }
+                return
+            }
+
+            DispatchQueue.main.async { completion(nil) }
         }
     }
 
