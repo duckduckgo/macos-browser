@@ -22,6 +22,7 @@ import AppKit
 protocol BitwardenInstallationService {
     
     var isBitwardenInstalled: Bool { get }
+    var isIntegrationWithDuckDuckGoEnabled: Bool { get }
 
     func openBitwarden()
 
@@ -56,15 +57,18 @@ final class LocalBitwardenInstallationService: BitwardenInstallationService {
     }
 
     var isIntegrationWithDuckDuckGoEnabled: Bool {
+        let integrationEnabledInSettingsFile: Bool
         do {
             let dataFile = try String(contentsOf: bitwardenDataFileUrl)
-            return dataFile.range(of: "\"enableDuckDuckGoBrowserIntegration\": true") != nil
+            integrationEnabledInSettingsFile = dataFile.range(of: "\"enableDuckDuckGoBrowserIntegration\": true") != nil
         } catch {
+            integrationEnabledInSettingsFile = false
             return false
         }
 
         // Older implementation not working with Bitwarden installed from App Store
-//        return FileManager.default.fileExists(atPath: bitwardenManifestPath)
+        let integrationFileAvailable = FileManager.default.fileExists(atPath: bitwardenManifestPath)
+        return integrationEnabledInSettingsFile || integrationFileAvailable
     }
     
     func openBitwarden() {
