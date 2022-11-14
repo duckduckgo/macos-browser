@@ -20,7 +20,7 @@ import Foundation
 
 struct TabExtensions {
 
-//    let adClickAttribution = AdClickAttributionTabExtension.self
+    let adClickAttribution = AdClickAttributionTabExtension.self
     let printing = TabPrintExtension.self
 
 }

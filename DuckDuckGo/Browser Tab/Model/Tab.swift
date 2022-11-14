@@ -184,7 +184,6 @@ final class Tab: NSObject, Identifiable, ObservableObject, DependencyProviderCli
          sessionStateData: Data? = nil,
          interactionStateData: Data? = nil,
          parentTab: Tab? = nil,
-         attributionState: AdClickAttributionLogic.State? = nil,
          shouldLoadInBackground: Bool = false,
          canBeClosedWithBack: Bool = false,
          lastSelectedAt: Date? = nil,
@@ -215,7 +214,6 @@ final class Tab: NSObject, Identifiable, ObservableObject, DependencyProviderCli
 
         dependencyProvider.extensionsBuilder.buildExtensions(into: &extensions, for: self)
 
-        initAttributionLogic(state: attributionState ?? parentTab?.adClickAttributionLogic.state)
         setupWebView(shouldLoadInBackground: shouldLoadInBackground)
         if favicon == nil {
             handleFavicon()
@@ -546,24 +544,6 @@ final class Tab: NSObject, Identifiable, ObservableObject, DependencyProviderCli
                          contentBlockingManager: ContentBlocking.shared.contentBlockingManager,
                          tld: ContentBlocking.shared.tld)
     }()
-    
-    // MARK: - Ad Click Attribution
-    
-    private let adClickAttributionDetection = ContentBlocking.shared.makeAdClickAttributionDetection()
-    let adClickAttributionLogic = ContentBlocking.shared.makeAdClickAttributionLogic()
-    
-    public var currentAttributionState: AdClickAttributionLogic.State? {
-        adClickAttributionLogic.state
-    }
-    
-    private func initAttributionLogic(state: AdClickAttributionLogic.State?) {
-        adClickAttributionLogic.delegate = self
-        adClickAttributionDetection.delegate = adClickAttributionLogic
-        
-        if let state = state {
-            adClickAttributionLogic.applyInheritedAttribution(state: state)
-        }
-    }
 
     @MainActor
     private func reloadIfNeeded(shouldLoadInBackground: Bool = false) async {
@@ -932,8 +912,6 @@ extension Tab: UserContentControllerDelegate {
 
         findInPageScript = userScripts.findInPageScript
         attachFindInPage()
-        
-        adClickAttributionLogic.onRulesChanged(latestRules: ContentBlocking.shared.contentBlockingManager.currentRules)
     }
 
 }
@@ -1001,7 +979,7 @@ extension Tab: ContentBlockerRulesUserScriptDelegate {
     
     func contentBlockerRulesUserScript(_ script: ContentBlockerRulesUserScript, detectedTracker tracker: DetectedRequest) {
         trackerInfo?.add(detectedTracker: tracker)
-        adClickAttributionLogic.onRequestDetected(request: tracker)
+        self.extensions.adClickAttribution.logic.onRequestDetected(request: tracker)
         guard let url = URL(string: tracker.pageUrl) else { return }
         dependencyProvider.historyCoordinating.addDetectedTracker(tracker, onURL: url)
     }
@@ -1067,51 +1045,6 @@ extension Tab: SurrogatesUserScriptDelegate {
         guard let url = webView.url else { return }
         dependencyProvider.historyCoordinating.addDetectedTracker(tracker, onURL: url)
     }
-}
-
-extension Tab: AdClickAttributionLogicDelegate {
-    
-    func attributionLogic(_ logic: AdClickAttributionLogic,
-                          didRequestRuleApplication rules: ContentBlockerRulesManager.Rules?,
-                          forVendor vendor: String?) {
-        guard let userContentController = userContentController,
-              let userScripts = userContentController.contentBlockingAssets?.userScripts as? UserScripts
-        else {
-            assertionFailure("UserScripts not loaded")
-            return
-        }
-
-        let contentBlockerRulesScript = userScripts.contentBlockerRulesScript
-        let attributedTempListName = AdClickAttributionRulesProvider.Constants.attributedTempRuleListName
-        
-        guard ContentBlocking.shared.privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .contentBlocking)
-         else {
-            userContentController.removeLocalContentRuleList(withIdentifier: attributedTempListName)
-            contentBlockerRulesScript.currentAdClickAttributionVendor = nil
-            contentBlockerRulesScript.supplementaryTrackerData = []
-            return
-        }
-        
-        contentBlockerRulesScript.currentAdClickAttributionVendor = vendor
-        if let rules = rules {
-            
-            let globalListName = DefaultContentBlockerRulesListsSource.Constants.trackerDataSetRulesListName
-            let globalAttributionListName = AdClickAttributionRulesSplitter.blockingAttributionRuleListName(forListNamed: globalListName)
-            
-            if vendor != nil {
-                userContentController.installLocalContentRuleList(rules.rulesList, identifier: attributedTempListName)
-                try? userContentController.disableGlobalContentRuleList(withIdentifier: globalAttributionListName)
-            } else {
-                userContentController.removeLocalContentRuleList(withIdentifier: attributedTempListName)
-                try? userContentController.enableGlobalContentRuleList(withIdentifier: globalAttributionListName)
-            }
-            
-            contentBlockerRulesScript.supplementaryTrackerData = [rules.trackerData]
-        } else {
-            contentBlockerRulesScript.supplementaryTrackerData = []
-        }
-    }
-
 }
 
 extension Tab: EmailManagerRequestDelegate { }
@@ -1260,7 +1193,7 @@ extension Tab: WKNavigationDelegate {
         }
         
         if navigationAction.isTargetingMainFrame, navigationAction.navigationType == .backForward {
-            adClickAttributionLogic.onBackForwardNavigation(mainFrameURL: webView.url)
+            self.extensions.adClickAttribution.logic.onBackForwardNavigation(mainFrameURL: webView.url)
         }
         
         if navigationAction.isTargetingMainFrame, navigationAction.navigationType != .backForward {
@@ -1452,10 +1385,10 @@ extension Tab: WKNavigationDelegate {
         }
         
         if navigationResponse.isForMainFrame && isSuccessfulResponse {
-            adClickAttributionDetection.on2XXResponse(url: webView.url)
+            self.extensions.adClickAttribution.detection.on2XXResponse(url: webView.url)
         }
         
-        await adClickAttributionLogic.onProvisionalNavigation()
+        await self.extensions.adClickAttribution.logic.onProvisionalNavigation()
 
         return .allow
     }
@@ -1471,7 +1404,7 @@ extension Tab: WKNavigationDelegate {
         linkProtection.cancelOngoingExtraction()
         linkProtection.setMainFrameUrl(webView.url)
         referrerTrimming.onBeginNavigation(to: webView.url)
-        adClickAttributionDetection.onStartNavigation(url: webView.url)
+        self.extensions.adClickAttribution.detection.onStartNavigation(url: webView.url)
         
     }
 
@@ -1483,8 +1416,8 @@ extension Tab: WKNavigationDelegate {
         if isAMPProtectionExtracting { isAMPProtectionExtracting = false }
         linkProtection.setMainFrameUrl(nil)
         referrerTrimming.onFinishNavigation()
-        adClickAttributionDetection.onDidFinishNavigation(url: webView.url)
-        adClickAttributionLogic.onDidFinishNavigation(host: webView.url?.host)
+        self.extensions.adClickAttribution.detection.onDidFinishNavigation(url: webView.url)
+        self.extensions.adClickAttribution.logic.onDidFinishNavigation(host: webView.url?.host)
     }
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
@@ -1496,7 +1429,7 @@ extension Tab: WKNavigationDelegate {
         invalidateSessionStateData()
         linkProtection.setMainFrameUrl(nil)
         referrerTrimming.onFailedNavigation()
-        adClickAttributionDetection.onDidFailNavigation()
+        self.extensions.adClickAttribution.detection.onDidFailNavigation()
         webViewDidFailNavigationPublisher.send()
     }
 
@@ -1513,7 +1446,7 @@ extension Tab: WKNavigationDelegate {
         isBeingRedirected = false
         linkProtection.setMainFrameUrl(nil)
         referrerTrimming.onFailedNavigation()
-        adClickAttributionDetection.onDidFailNavigation()
+        self.extensions.adClickAttribution.detection.onDidFailNavigation()
         webViewDidFailNavigationPublisher.send()
     }
 
