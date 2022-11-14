@@ -108,7 +108,6 @@ struct FavoritesGrid: View {
         let row = Int(point.y) / Int(Self.gridItemHeight + Self.gridSpacing)
         let column = Int(point.x) / Int(Self.gridItemWidth + Self.gridSpacing)
         let index = row * HomePage.favoritesPerRow + column
-        print(point, index)
 
         return max(0, min(index, model.favorites.count - 1))
     }
@@ -137,7 +136,7 @@ struct FavoritesGrid: View {
                         }
                     }
                 }
-                .animation(.default, value: model.models)
+                .animation(.easeOut, value: model.models)
             }
             .simultaneousGesture(dragGesture)
         } else {
