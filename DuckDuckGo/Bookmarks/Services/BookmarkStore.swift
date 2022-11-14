@@ -590,21 +590,29 @@ final class LocalBookmarkStore: BookmarkStore {
             }
 
             if let index, index < favoritesFolder.mutableFavorites.count {
+                var currentInsertionIndex = max(index, 0)
+
                 for bookmarkManagedObject in bookmarkManagedObjects {
-                    var currentInsertionIndex = max(index, 0)
+                    var adjustedInsertionIndex = currentInsertionIndex
+
+                    if currentInsertionIndex > favoritesFolder.mutableFavorites.index(of: bookmarkManagedObject) {
+                        adjustedInsertionIndex -= 1
+                    }
 
                     bookmarkManagedObject.favoritesFolder = nil
-                    if currentInsertionIndex < favoritesFolder.mutableFavorites.count {
-                        favoritesFolder.mutableFavorites.insert(bookmarkManagedObject, at: currentInsertionIndex)
+                    if adjustedInsertionIndex < favoritesFolder.mutableFavorites.count {
+                        favoritesFolder.mutableFavorites.insert(bookmarkManagedObject, at: adjustedInsertionIndex)
                     } else {
                         favoritesFolder.mutableFavorites.add(bookmarkManagedObject)
                     }
+
                     currentInsertionIndex += 1
                 }
             } else {
                 for bookmarkManagedObject in bookmarkManagedObjects {
                     bookmarkManagedObject.favoritesFolder = nil
                 }
+                favoritesFolder.mutableFavorites.addObjects(from: bookmarkManagedObjects)
             }
 
             do {

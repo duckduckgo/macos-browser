@@ -100,8 +100,11 @@ struct FavoritesGrid: View {
         guard case let .bookmark(bookmark) = draggedFavorite?.favoriteType else {
             return
         }
+        let from = itemIndex(for: value.startLocation)
         let index = itemIndex(for: value.location)
-        model.moveFavorite(bookmark, index)
+
+        let correctedIndex = from < index ? index + 1 : index
+        model.moveFavorite(bookmark, correctedIndex)
     }
 
     private func itemIndex(for point: CGPoint) -> Int {
