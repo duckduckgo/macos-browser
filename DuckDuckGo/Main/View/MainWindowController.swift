@@ -131,22 +131,22 @@ final class MainWindowController: NSWindowController {
     }
 
     func userInteraction(prevented: Bool) {
-        mainViewController.tabCollectionViewModel.changesEnabled = !prevented
-        mainViewController.tabCollectionViewModel.selectedTabViewModel?.tab.contentChangeEnabled = !prevented
-
-        mainViewController.tabBarViewController.fireButton.isEnabled = !prevented
-        mainViewController.navigationBarViewController.controlsForUserPrevention.forEach { $0?.isEnabled = !prevented }
-        
-        NSApplication.shared.mainMenuTyped.autoupdatingMenusForUserPrevention.forEach { $0.autoenablesItems = !prevented }
-        NSApplication.shared.mainMenuTyped.menuItemsForUserPrevention.forEach { $0.isEnabled = !prevented }
-
-        if prevented {
-            window?.styleMask.remove(.closable)
-            mainViewController.view.makeMeFirstResponder()
-        } else {
-            window?.styleMask.update(with: .closable)
-            mainViewController.adjustFirstResponder()
-        }
+//        mainViewController.tabCollectionViewModel.changesEnabled = !prevented
+//        mainViewController.tabCollectionViewModel.selectedTabViewModel?.tab.contentChangeEnabled = !prevented
+//
+//        mainViewController.tabBarViewController.fireButton.isEnabled = !prevented
+//        mainViewController.navigationBarViewController.controlsForUserPrevention.forEach { $0?.isEnabled = !prevented }
+//
+//        NSApplication.shared.mainMenuTyped.autoupdatingMenusForUserPrevention.forEach { $0.autoenablesItems = !prevented }
+//        NSApplication.shared.mainMenuTyped.menuItemsForUserPrevention.forEach { $0.isEnabled = !prevented }
+//
+//        if prevented {
+//            window?.styleMask.remove(.closable)
+//            mainViewController.view.makeMeFirstResponder()
+//        } else {
+//            window?.styleMask.update(with: .closable)
+//            mainViewController.adjustFirstResponder()
+//        }
     }
 
     private func moveTabBarView(toTitlebarView: Bool) {
