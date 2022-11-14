@@ -112,8 +112,33 @@ struct FavoritesGrid: View {
 
     var body: some View {
 
-        if #available(macOS 11.0, *) {
-            LazyVGrid(columns: Array(repeating: GridItem(.fixed(Self.gridItemHeight)), count: HomePage.favoritesPerRow), spacing: Self.gridSpacing) {
+        if #available(macOS 13.0, *) {
+            Grid(horizontalSpacing: Self.gridSpacing * 2, verticalSpacing: Self.gridSpacing * 2) {
+                ForEach(rowIndices, id: \.self) { index in
+                    GridRow(alignment: .top) {
+                        ForEach(model.models[HomePage.favoritesPerRow*index..<HomePage.favoritesPerRow*(index+1)], id: \.id) { favorite in
+
+                            switch favorite.favoriteType {
+                            case .bookmark(let bookmark):
+                                Favorite(bookmark: bookmark)
+
+                            case .addButton:
+                                FavoritesGridAddButton()
+
+                            case .ghostButton:
+                                VStack(spacing: 0) {
+                                    FavoritesGridGhostButton()
+                                    Spacer()
+                                }
+                            }
+                        }
+                    }
+                }
+                .animation(.default, value: model.models)
+            }
+            .simultaneousGesture(dragGesture)
+        } else if #available(macOS 11.0, *) {
+            LazyVGrid(columns: Array(repeating: GridItem(.fixed(Self.gridItemWidth)), count: HomePage.favoritesPerRow), spacing: Self.gridSpacing) {
                 ForEach(itemIndices, id: \.self) { index in
                     let favorite = model.models[index]
 
