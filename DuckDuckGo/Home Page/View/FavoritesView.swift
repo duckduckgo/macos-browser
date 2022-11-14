@@ -34,8 +34,7 @@ struct Favorites: View {
 
         if #available(macOS 11.0, *) {
             LazyVStack(spacing: 4) {
-                FavoritesGrid(isHovering: $isHovering)
-            }
+                FavoritesGrid(isHovering: $isHovering)            }
             .frame(maxWidth: .infinity)
             .onHover { isHovering in
                 self.isHovering = isHovering
@@ -68,12 +67,57 @@ struct FavoritesGrid: View {
         model.showAllFavorites ? model.models.indices : model.models.indices.prefix(HomePage.favoritesRowCountWhenCollapsed * HomePage.favoritesPerRow)
     }
 
+    @State private var draggedFavorite: HomePage.Models.FavoriteModel?
+
+    var dragGesture: some Gesture {
+        DragGesture()
+            .onChanged(updateDrag)
+            .onEnded(endDrag)
+    }
+
+    private func updateDrag(_ value: DragGesture.Value) {
+        if draggedFavorite == nil {
+            let draggedFavoriteIndex = itemIndex(for: value.startLocation)
+            draggedFavorite = model.models[draggedFavoriteIndex]
+        }
+        guard let draggedFavorite = draggedFavorite, let from = model.models.firstIndex(of: draggedFavorite) else {
+            return
+        }
+        let to = itemIndex(for: value.location)
+
+        if to != from, model.models[to] != draggedFavorite {
+            withAnimation(.easeInOut(duration: 0.2)) {
+                model.models.move(fromOffsets: IndexSet(integer: from),
+                                  toOffset: to > from ? to + 1 : to)
+            }
+        }
+    }
+
+    private func endDrag(_ value: DragGesture.Value) {
+        draggedFavorite = nil
+    }
+
+    private func itemIndex(for point: CGPoint) -> Int {
+        let row = Int(point.y) / Int(Self.gridItemHeight + Self.gridSpacing)
+        let column = Int(point.x) / Int(Self.gridItemWidth + Self.gridSpacing)
+        let index = row * HomePage.favoritesPerRow + column
+        print(point, index)
+
+        return max(0, min(index, model.favorites.count - 1))
+    }
+
+    static let gridItemWidth: CGFloat = 74
+    static let gridSpacing: CGFloat = 10
+    static let gridItemHeight: CGFloat = 96
+
     var body: some View {
 
         if #available(macOS 11.0, *) {
-            LazyVGrid(columns: Array(repeating: GridItem(.fixed(74)), count: HomePage.favoritesPerRow), spacing: 10) {
+            LazyVGrid(columns: Array(repeating: GridItem(.fixed(Self.gridItemHeight)), count: HomePage.favoritesPerRow), spacing: Self.gridSpacing) {
                 ForEach(itemIndices, id: \.self) { index in
-                    switch model.models[index].favoriteType {
+                    let favorite = model.models[index]
+
+                    switch favorite.favoriteType {
                     case .bookmark(let bookmark):
                         Favorite(bookmark: bookmark)
 
@@ -81,17 +125,15 @@ struct FavoritesGrid: View {
                         FavoritesGridAddButton()
 
                     case .ghostButton:
-                        FavoritesGridGhostButton()
+                        VStack(spacing: 0) {
+                            FavoritesGridGhostButton()
+                            Spacer()
+                        }
                     }
-//                    GridItemView(d: favorite)
-//                        .overlay(dragging?.id == favorite.id ? Color.white.opacity(0.8) : Color.clear)
-//                        .onDrag {
-//                            self.dragging = favorite
-//                            return NSItemProvider(object: String(favorite.id) as NSString)
-//                        }
-//                        .onDrop(of: [UTType.text], delegate: DragRelocateDelegate(item: favorite, listData: $model.data, current: $dragging))
-                }.animation(.none, value: itemIndices)
+                }
+                .animation(.default, value: model.models)
             }
+            .simultaneousGesture(dragGesture)
         } else {
             ForEach(rowIndices, id: \.self) { index in
                 HStack(alignment: .top, spacing: 20) {

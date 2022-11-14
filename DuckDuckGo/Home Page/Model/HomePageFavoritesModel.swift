@@ -20,7 +20,7 @@ import Foundation
 
 extension HomePage.Models {
 
-    enum FavoriteType {
+    enum FavoriteType: Equatable {
 
         case bookmark(Bookmark)
         case addButton
@@ -28,7 +28,7 @@ extension HomePage.Models {
 
     }
 
-    struct FavoriteModel: Identifiable {
+    struct FavoriteModel: Identifiable, Equatable {
 
         let id: UUID
         let favoriteType: FavoriteType
@@ -69,7 +69,7 @@ extension HomePage.Models {
             }
         }
 
-        @Published private(set) var models: [FavoriteModel] = []
+        @Published var models: [FavoriteModel] = []
         @Published private(set) var rows: [[FavoriteModel]] = []
 
         let open: (Bookmark, OpenTarget) -> Void
