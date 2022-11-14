@@ -644,6 +644,8 @@
 		B647EFA3291D4BA400BA628D /* NavigationDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B647EFA2291D4BA400BA628D /* NavigationDelegate.swift */; };
 		B647EFA6291D6C4D00BA628D /* AdClickAttribution.swift in Sources */ = {isa = PBXBuildFile; fileRef = B647EFA5291D6C4D00BA628D /* AdClickAttribution.swift */; };
 		B647EFA9291E4E8700BA628D /* DependencyProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B647EFA8291E4E8700BA628D /* DependencyProviderTests.swift */; };
+		B647EFAC29221CBB00BA628D /* TabExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B647EFAA29221C2B00BA628D /* TabExtensions.swift */; };
+		B647EFAE29222C3000BA628D /* TabPrintExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B647EFAD29222C3000BA628D /* TabPrintExtension.swift */; };
 		B64C84DE2692D7400048FEBE /* PermissionAuthorization.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B64C84DD2692D7400048FEBE /* PermissionAuthorization.storyboard */; };
 		B64C84E32692DC9F0048FEBE /* PermissionAuthorizationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B64C84E22692DC9F0048FEBE /* PermissionAuthorizationViewController.swift */; };
 		B64C84EB2692DD650048FEBE /* PermissionAuthorizationPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = B64C84EA2692DD650048FEBE /* PermissionAuthorizationPopover.swift */; };
@@ -1490,6 +1492,8 @@
 		B647EFA2291D4BA400BA628D /* NavigationDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationDelegate.swift; sourceTree = "<group>"; };
 		B647EFA5291D6C4D00BA628D /* AdClickAttribution.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdClickAttribution.swift; sourceTree = "<group>"; };
 		B647EFA8291E4E8700BA628D /* DependencyProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DependencyProviderTests.swift; sourceTree = "<group>"; };
+		B647EFAA29221C2B00BA628D /* TabExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabExtensions.swift; sourceTree = "<group>"; };
+		B647EFAD29222C3000BA628D /* TabPrintExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabPrintExtension.swift; sourceTree = "<group>"; };
 		B64C84DD2692D7400048FEBE /* PermissionAuthorization.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = PermissionAuthorization.storyboard; sourceTree = "<group>"; };
 		B64C84E22692DC9F0048FEBE /* PermissionAuthorizationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionAuthorizationViewController.swift; sourceTree = "<group>"; };
 		B64C84EA2692DD650048FEBE /* PermissionAuthorizationPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionAuthorizationPopover.swift; sourceTree = "<group>"; };
@@ -3935,7 +3939,9 @@
 		B647EFA4291D6C4100BA628D /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				B647EFAA29221C2B00BA628D /* TabExtensions.swift */,
 				B647EFA5291D6C4D00BA628D /* AdClickAttribution.swift */,
+				B647EFAD29222C3000BA628D /* TabPrintExtension.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -4588,6 +4594,7 @@
 				85AC3B3525DA82A600C7D2AA /* DataTaskProviding.swift in Sources */,
 				AA3D531727A1EEED00074EC1 /* FeedbackViewController.swift in Sources */,
 				AAEF6BC8276A081C0024DCF4 /* FaviconSelector.swift in Sources */,
+				B647EFAE29222C3000BA628D /* TabPrintExtension.swift in Sources */,
 				85589E7F27BBB8630038AD11 /* AddEditFavoriteViewController.swift in Sources */,
 				4B2E7D6326FF9D6500D2DB17 /* PrintingUserScript.swift in Sources */,
 				0230C0A52721F3750018F728 /* GPCRequestFactory.swift in Sources */,
@@ -4747,6 +4754,7 @@
 				37CD54CF27F2FDD100F1F7B9 /* AppearancePreferences.swift in Sources */,
 				B6B1E87B26D381710062C350 /* DownloadListCoordinator.swift in Sources */,
 				4B980E212817604000282EE1 /* NSNotificationName+Debug.swift in Sources */,
+				B647EFAC29221CBB00BA628D /* TabExtensions.swift in Sources */,
 				31F7F2A6288AD2CA001C0D64 /* NavigationBarBadgeAnimationView.swift in Sources */,
 				AAC5E4F125D6BF10007F5990 /* AddressBarButton.swift in Sources */,
 				AAE7527E263B05C600B973F8 /* HistoryEntry.swift in Sources */,

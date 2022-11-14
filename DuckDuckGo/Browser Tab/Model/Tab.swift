@@ -69,39 +69,60 @@ extension DependencyProvider<Tab> {
     var workspace: NSWorkspace { .shared }
 
     var extensionsBuilder: ExtensionsBuilder { TabExtensionsBuilder() }
+    var navigationPolicyMakersProvider: NavigationPolicyHandlersProvider { TabNavigationPolicyHandlers() }
 
 }
 
-struct ExtensionsBuilderResult {
-    let extensions: [TabExtension]
-    let navigationPolicyMakers: [PartialNavigationPolicyHandler]
+protocol NavigationPolicyHandlersProvider {
+    func policyHandlers(for tab: Tab) -> [PartialNavigationPolicyHandler]
 }
+
+struct TabNavigationPolicyHandlers: NavigationPolicyHandlersProvider {
+
+    func policyHandlers(for tab: Tab) -> [PartialNavigationPolicyHandler] {
+        [
+            tab.extensions.adClickAttribution
+        ]
+    }
+
+}
+
+@dynamicMemberLookup
+struct DynamicTabExtensions {
+    private var storage = [AnyKeyPath: TabExtension]()
+
+    subscript<T: TabExtension>(dynamicMember keyPath: KeyPath<TabExtensions, T.Type>) -> T {
+        (storage[\T.self] as? T)!
+    }
+
+    mutating func register<T: TabExtension>(_ tabExtension: T) {
+        assert(storage[\T.self] == nil, "Trying to register \(T.self) twice!")
+        storage[\T.self] = tabExtension
+    }
+
+}
+
 protocol ExtensionsBuilder {
-    func build(for tab: Tab) -> ExtensionsBuilderResult
+    func buildExtensions(into result: inout DynamicTabExtensions, for tab: Tab)
 }
 
 struct TabExtensionsBuilder: ExtensionsBuilder {
-    func build(for tab: Tab) -> ExtensionsBuilderResult {
-        let adClickAttribution = AdClickAttributionTabExtension(tab: tab)
 
-        return ExtensionsBuilderResult(extensions: [adClickAttribution],
-                                       navigationPolicyMakers: [adClickAttribution])
+    func buildExtensions(into result: inout DynamicTabExtensions, for tab: Tab) {
+
+        for child in Mirror(reflecting: TabExtensions()).children {
+            guard let extensionType = child.value as? TabExtension.Type else {
+                assertionFailure("\(child.label!) should be TabExtension.Type")
+                continue
+            }
+            result.register(extensionType.init(tab: tab))
+        }
     }
+
 }
 
 protocol TabExtension {
     init(tab: Tab)
-}
-
-extension Array<TabExtension> {
-    func get<T>(_ type: T.Type) -> T? {
-        for item in self {
-            if let some = item as? T {
-                return some
-            }
-        }
-        return nil
-    }
 }
 
 final class Tab: NSObject, Identifiable, ObservableObject, DependencyProviderClient {
@@ -209,7 +230,7 @@ final class Tab: NSObject, Identifiable, ObservableObject, DependencyProviderCli
     weak var delegate: TabDelegate?
 
     private let instrumentation = TabInstrumentation()
-    var extensions = [TabExtension]()
+    private(set) var extensions = DynamicTabExtensions()
     private let navigationDelegate = NavigationDelegate()
 
     private var youtubePlayerCancellables: Set<AnyCancellable> = []
@@ -252,12 +273,9 @@ final class Tab: NSObject, Identifiable, ObservableObject, DependencyProviderCli
 
         super.init()
 
-        // TODO: should it go into setupWebView?
-        let result = dependencyProvider.extensionsBuilder.build(for: self)
-        extensions = result.extensions
-        navigationDelegate.navigationPolicyHandlers = result.navigationPolicyMakers
-
+        dependencyProvider.extensionsBuilder.buildExtensions(into: &extensions, for: self)
         setupWebView(shouldLoadInBackground: shouldLoadInBackground)
+
         if favicon == nil {
             handleFavicon()
         }
@@ -305,6 +323,9 @@ final class Tab: NSObject, Identifiable, ObservableObject, DependencyProviderCli
     }
     var userScripts: UserScripts? {
         userContentController.contentBlockingAssets?.userScripts
+    }
+    var userScriptsPublisher: AnyPublisher<UserScripts?, Never> {
+        userContentController.$contentBlockingAssets.map(\.?.userScripts).eraseToAnyPublisher()
     }
 
     // MARK: - Event Publishers
@@ -723,12 +744,7 @@ final class Tab: NSObject, Identifiable, ObservableObject, DependencyProviderCli
     }
 
     private func setupWebView(shouldLoadInBackground: Bool) {
-        // TODO: experiment with bat.js
-        // TODO: write down manual test cases!
-//        handlers = PolicyHandlers.make()
-//        navigationDelegate = NavigationDelegate(provider: handlers)
-//
-//        handlers.batjs.delegate = self
+        navigationDelegate.navigationPolicyHandlers = dependencyProvider.navigationPolicyMakersProvider.policyHandlers(for: self)
         navigationDelegate.tab = self
 
         webView.navigationDelegate = navigationDelegate

@@ -20,10 +20,6 @@ import Combine
 import Foundation
 import BrowserServicesKit
 
-extension Tab {
-    var adClickAttribution: AdClickAttributionTabExtension? { extensions.get(AdClickAttributionTabExtension.self) }
-}
-
 extension DependencyProvider<AdClickAttributionTabExtension> {
     var currentRules: [ContentBlockerRulesManager.Rules] { ContentBlocking.shared.contentBlockingManager.currentRules }
 }
@@ -109,6 +105,10 @@ extension AdClickAttributionTabExtension: AdClickAttributionLogicDelegate {
         }
     }
 
+}
+
+private extension Tab {
+    var adClickAttribution: AdClickAttributionTabExtension? { extensions.adClickAttribution }
 }
 
 // TODO: Maybe this is not needed
