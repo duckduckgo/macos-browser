@@ -27,6 +27,7 @@ class PinnedTabsManagerTests: XCTestCase {
             $0.useDefault(for: \.privatePlayer)
             $0.useDefault(for: \.windowControllersManager)
             $0.useDefault(for: \.pinnedTabsManager)
+            $0.extensionsBuilder = TestTabExtensionsBuilder()
         }
     }
 

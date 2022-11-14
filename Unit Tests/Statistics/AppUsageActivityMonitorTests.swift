@@ -44,6 +44,7 @@ class AppUsageActivityMonitorTests: XCTestCase {
             $0.useDefault(for: \.privatePlayer)
             $0.useDefault(for: \.windowControllersManager)
             $0.useDefault(for: \.historyCoordinating)
+            $0.extensionsBuilder = TestTabExtensionsBuilder()
         }
     }
 
