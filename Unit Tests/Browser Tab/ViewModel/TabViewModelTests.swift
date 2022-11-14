@@ -24,6 +24,18 @@ final class TabViewModelTests: XCTestCase {
 
     var cancellables = Set<AnyCancellable>()
 
+    override func setUp() {
+        TestsDependencyProvider<Tab>.setUp {
+            $0.faviconManagement = FaviconManagerMock()
+            $0.useDefault(for: \.privatePlayer)
+            $0.useDefault(for: \.windowControllersManager)
+        }
+    }
+
+    override func tearDown() {
+        TestsDependencyProvider<Tab>.reset()
+    }
+
     // MARK: - Can reload
 
     func testWhenURLIsNilThenCanReloadIsFalse() {

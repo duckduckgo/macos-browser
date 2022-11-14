@@ -105,7 +105,7 @@ private struct DependencyProviders {
 }
 
 final class DependencyProvider<Client: DependencyProviderClient>: DependencyProviderProtocol {
-    fileprivate init() {}
+    init() {}
 }
 
 #if DEBUG
@@ -113,7 +113,7 @@ final class DependencyProvider<Client: DependencyProviderClient>: DependencyProv
 @dynamicMemberLookup
 final class DebugDependencyProvider<Client: DependencyProviderClient>: DependencyProviderProtocol {
 
-    fileprivate init() { }
+    init() { }
 
     private let dependencyProvider = DependencyProvider<Client>()
 
@@ -146,6 +146,38 @@ final class TestsDependencyProvider<Client: DependencyProviderClient>: Dependenc
             storage[keyPath] = newValue
         }
     }
+
+    subscript(_ keyPath: PartialKeyPath<DependencyProvider<Client>>) -> Any? {
+        get {
+            storage[keyPath]
+        }
+        set {
+            storage[keyPath] = newValue
+        }
+    }
+
+    func useDefault(for keyPath: PartialKeyPath<DependencyProvider<Client>>) {
+        self[keyPath] = DependencyProvider<Client>()[keyPath: keyPath]
+    }
+
+    func useDefault(for keyPaths: [PartialKeyPath<DependencyProvider<Client>>]) {
+        for keyPath in keyPaths {
+            useDefault(for: keyPath)
+        }
+    }
+
+    static func useDefault(for keyPaths: [PartialKeyPath<DependencyProvider<Client>>]) {
+        self.shared.useDefault(for: keyPaths)
+    }
+
+    static func setUp(using block: (TestsDependencyProvider) -> Void) {
+        block(self.shared)
+    }
+
+    static func reset() {
+        self.shared.storage = [:]
+    }
+
 }
 
 #endif
