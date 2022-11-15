@@ -54,11 +54,11 @@ struct Favorites: View {
 }
     
 struct FavoritesGrid: View {
-    
+
     @EnvironmentObject var model: HomePage.Models.FavoritesModel
-    
+
     @Binding var isHovering: Bool
-    
+
     var rowIndices: Range<Int> {
         model.showAllFavorites ? model.rows.indices : model.rows.indices.prefix(HomePage.favoritesRowCountWhenCollapsed)
     }
@@ -136,7 +136,6 @@ struct FavoritesGrid: View {
                     }
                 }
             }
-            .animation(.easeOut, value: model.visibleModels)
             .simultaneousGesture(dragGesture)
         } else {
             ForEach(rowIndices, id: \.self) { index in
@@ -163,7 +162,7 @@ struct FavoritesGrid: View {
             .visibility(model.rows.count > HomePage.favoritesRowCountWhenCollapsed && isHovering ? .visible : .invisible)
 
     }
-    
+
 }
     
 private struct FavoritesGridAddButton: View {
