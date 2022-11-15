@@ -226,7 +226,7 @@ final class NavigationBarPopovers {
 
     private func show(popover: NSPopover, usingView view: NSView) {
         view.isHidden = false
-        popover.show(relativeTo: view.bounds.insetFromLineOfDeath(), of: view, preferredEdge: .maxX)
+        popover.show(relativeTo: view.bounds.insetFromLineOfDeath(), of: view, preferredEdge: .minY)
     }
 
 }
