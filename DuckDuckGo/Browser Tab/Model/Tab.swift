@@ -212,7 +212,7 @@ final class Tab: NSObject, Identifiable, ObservableObject, DependencyProviderCli
 
         super.init()
 
-        dependencyProvider.extensionsBuilder.buildExtensions(into: &extensions, for: self)
+        extensions = dependencyProvider.extensionsBuilder.buildExtensions(for: self)
 
         setupWebView(shouldLoadInBackground: shouldLoadInBackground)
         if favicon == nil {

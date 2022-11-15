@@ -38,13 +38,13 @@ struct DynamicTabExtensions {
 }
 
 protocol ExtensionsBuilder {
-    func buildExtensions(into result: inout DynamicTabExtensions, for tab: Tab)
+    func buildExtensions(for tab: Tab) -> DynamicTabExtensions
 }
 
 struct TabExtensionsBuilder: ExtensionsBuilder {
 
-    func buildExtensions(into result: inout DynamicTabExtensions, for tab: Tab) {
-
+    func buildExtensions(for tab: Tab) -> DynamicTabExtensions {
+        var result = DynamicTabExtensions()
         for child in Mirror(reflecting: TabExtensions()).children {
             guard let extensionType = child.value as? TabExtension.Type else {
                 assertionFailure("\(child.label!) should be TabExtension.Type")
@@ -52,6 +52,7 @@ struct TabExtensionsBuilder: ExtensionsBuilder {
             }
             result.register(extensionType.init(tab: tab))
         }
+        return result
     }
 
 }

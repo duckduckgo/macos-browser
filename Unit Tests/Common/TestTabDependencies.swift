@@ -21,9 +21,8 @@ import Foundation
 
 struct TestTabExtensionsBuilder: ExtensionsBuilder {
 
-    func buildExtensions(into result: inout DynamicTabExtensions, for tab: Tab) {
-
+    func buildExtensions(for tab: Tab) -> DynamicTabExtensions {
+        DynamicTabExtensions()
     }
 
 }
-
