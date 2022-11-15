@@ -34,7 +34,8 @@ struct Favorites: View {
 
         if #available(macOS 11.0, *) {
             LazyVStack(spacing: 4) {
-                FavoritesGrid(isHovering: $isHovering)            }
+                FavoritesGrid(isHovering: $isHovering)
+            }
             .frame(maxWidth: .infinity)
             .onHover { isHovering in
                 self.isHovering = isHovering
@@ -119,40 +120,13 @@ struct FavoritesGrid: View {
 
         if #available(macOS 11.0, *) {
             LazyVGrid(columns: Array(repeating: GridItem(.fixed(Self.gridItemWidth)), count: HomePage.favoritesPerRow), spacing: Self.gridSpacing) {
-                ForEach(model.visibleModels) { favorite in
-
-                    switch favorite.favoriteType {
-                    case .bookmark(let bookmark):
-                        Favorite(bookmark: bookmark)
-
-                    case .addButton:
-                        FavoritesGridAddButton()
-
-                    case .ghostButton:
-                        VStack(spacing: 0) {
-                            FavoritesGridGhostButton()
-                            Spacer()
-                        }
-                    }
-                }
+                ForEach(model.visibleModels, content: \.favoriteView)
             }
             .simultaneousGesture(dragGesture)
         } else {
             ForEach(rowIndices, id: \.self) { index in
                 HStack(alignment: .top, spacing: 20) {
-                    ForEach(model.rows[index], id: \.id) { favorite in
-
-                        switch favorite.favoriteType {
-                        case .bookmark(let bookmark):
-                            Favorite(bookmark: bookmark)
-
-                        case .addButton:
-                            FavoritesGridAddButton()
-
-                        case .ghostButton:
-                            FavoritesGridGhostButton()
-                        }
-                    }
+                    ForEach(model.rows[index], id: \.id, content: \.favoriteView)
                 }
             }
         }
@@ -165,7 +139,7 @@ struct FavoritesGrid: View {
 
 }
     
-private struct FavoritesGridAddButton: View {
+fileprivate struct FavoritesGridAddButton: View {
     
     @EnvironmentObject var model: HomePage.Models.FavoritesModel
 
@@ -187,7 +161,7 @@ private struct FavoritesGridAddButton: View {
     
 }
     
-private struct FavoritesGridGhostButton: View {
+fileprivate struct FavoritesGridGhostButton: View {
     
     var body: some View {
         
@@ -195,6 +169,7 @@ private struct FavoritesGridGhostButton: View {
             RoundedRectangle(cornerRadius: 12)
                 .stroke(Color("HomeFavoritesGhostColor"), style: StrokeStyle(lineWidth: 1.5, dash: [4.0, 2.0]))
                 .frame(width: 64, height: 64)
+            Spacer()
         }
         .frame(width: 64)
         
@@ -273,4 +248,21 @@ struct Favorite: View {
 
 }
 
+}
+
+extension HomePage.Models.FavoriteModel {
+
+    @ViewBuilder
+    var favoriteView: some View {
+        switch favoriteType {
+        case .bookmark(let bookmark):
+            HomePage.Views.Favorite(bookmark: bookmark)
+
+        case .addButton:
+            HomePage.Views.FavoritesGridAddButton()
+
+        case .ghostButton:
+            HomePage.Views.FavoritesGridGhostButton()
+        }
+    }
 }
