@@ -1378,9 +1378,7 @@ extension Tab: WKNavigationDelegate {
         if navigationAction.isTargetingMainFrame, navigationAction.request.url?.isDuckDuckGo == true, navigationAction.request.value(forHTTPHeaderField: "X-DDG-Client") == nil {
             var request = navigationAction.request
             request.setValue("macos", forHTTPHeaderField: "X-DDG-Client")
-            defer {
-                _ = webView.load(request)
-            }
+            _ = webView.load(request)
             return .cancel
         }
 
