@@ -49,6 +49,7 @@ extension HomePage.Models {
         @Published var showAllFavorites: Bool {
             didSet {
                 Self.showAllFavoritesSetting = showAllFavorites
+                visibleModels = showAllFavorites ? models : Array(models.prefix(HomePage.favoritesRowCountWhenCollapsed * HomePage.favoritesPerRow))
             }
         }
 
@@ -69,7 +70,12 @@ extension HomePage.Models {
             }
         }
 
-        @Published var models: [FavoriteModel] = []
+        @Published var models: [FavoriteModel] = [] {
+            didSet {
+                visibleModels = showAllFavorites ? models : Array(models.prefix(HomePage.favoritesRowCountWhenCollapsed * HomePage.favoritesPerRow))
+            }
+        }
+        @Published private(set) var visibleModels: [FavoriteModel] = []
         @Published private(set) var rows: [[FavoriteModel]] = []
 
         let open: (Bookmark, OpenTarget) -> Void

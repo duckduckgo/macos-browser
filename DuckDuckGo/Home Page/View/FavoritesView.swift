@@ -63,10 +63,6 @@ struct FavoritesGrid: View {
         model.showAllFavorites ? model.rows.indices : model.rows.indices.prefix(HomePage.favoritesRowCountWhenCollapsed)
     }
 
-    var itemIndices: Range<Int> {
-        model.showAllFavorites ? model.models.indices : model.models.indices.prefix(HomePage.favoritesRowCountWhenCollapsed * HomePage.favoritesPerRow)
-    }
-
     @State private var draggedFavorite: HomePage.Models.FavoriteModel?
 
     var dragGesture: some Gesture {
@@ -123,7 +119,7 @@ struct FavoritesGrid: View {
 
         if #available(macOS 11.0, *) {
             LazyVGrid(columns: Array(repeating: GridItem(.fixed(Self.gridItemWidth)), count: HomePage.favoritesPerRow), spacing: Self.gridSpacing) {
-                ForEach(model.models) { favorite in
+                ForEach(model.visibleModels) { favorite in
 
                     switch favorite.favoriteType {
                     case .bookmark(let bookmark):
@@ -139,8 +135,8 @@ struct FavoritesGrid: View {
                         }
                     }
                 }
-                .animation(.easeOut, value: model.models)
             }
+            .animation(.easeOut, value: model.visibleModels)
             .simultaneousGesture(dragGesture)
         } else {
             ForEach(rowIndices, id: \.self) { index in
