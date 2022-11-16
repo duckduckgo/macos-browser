@@ -40,6 +40,7 @@ struct DependencyInjection {
                 }
                 return _wrappedValue!
             }
+            // -> getting here right before the DependencyInjection.register(&Client.key, value: value) is called
             _modify {
 #if DEBUG
                 if _wrappedValue != nil && !AppDelegate.isRunningTests {
@@ -47,15 +48,21 @@ struct DependencyInjection {
                 }
 #endif
 
+                // result type is non-optional but the actual value is nullable
                 // the trick is to modify the value in place so the Copy Construcor isn‘t called
                 // and hope for caller‘s good intentions not to unwrap the old value
-                yield &withUnsafeMutableBytes(of: &_wrappedValue) { ptr in
+                let nonOptionalPtr = withUnsafeMutableBytes(of: &_wrappedValue) { ptr in
                     return ptr.baseAddress!.assumingMemoryBound(to: Value.self)
-                }.pointee
+                }
+                // now passing control to DependencyInjection.register(&Client.key, value: value)
+                yield &nonOptionalPtr.pointee
 
 #if DEBUG
-                assert(DependencyInjection.isRegisteringDependency,
-                       "Don‘t set depencencies directly, use `DependencyInjection.register(&Client.key, value: value)` instead")
+                // now we got back from DependencyInjection.register(&Client.key, value: value)
+                // and it‘s the only place to check if the call was performed correctly:
+                // by using DependencyInjection.register and not directly assigning the value
+                assert(DependencyInjection.isRegisteringDependency, "Don‘t set depencencies directly, " +
+                       "use `DependencyInjection.register(&Client.key, value: value)` instead")
                 DependencyInjection.isRegisteringDependency = false
 #endif
             }
@@ -68,11 +75,13 @@ struct DependencyInjection {
             storage storageKeyPath: ReferenceWritableKeyPath<EnclosingSelf, Injected<Value>>
         ) -> Value {
             get {
+                // we either get initialised with @Injected(default: value)
                 if let value = object[keyPath: storageKeyPath]._wrappedValue {
                     assert(DependencyInjection.store[wrappedKeyPath] == nil, "\(Value.self) dependecy has been set twice!")
                     return value
                 }
 
+                // or by using DependencyInjection.register(\\Client.key, value: value)
                 guard let value = store[wrappedKeyPath] as? Value else {
                     fatalError("\(Value.self) dependency not provided by the time of the first use. " +
                                "Provide dependency value using `DependencyInjection.register(\\Client.key, value: value)`")
@@ -126,11 +135,15 @@ struct DependencyInjection {
             return
         }
 
+        // we get here after retreiving the initial value from `yield &ptr` in Injected.wrappedValue._modify
+        // the initial value can be nil although the result type is not
+        // by this nullable pointer casting we allow the value to be nullable and so rollbackable
         let wrappedPtr = withUnsafeMutableBytes(of: &dependency) { ptr in
             ptr.baseAddress!.assumingMemoryBound(to: Optional<Value>.self)
         }
         let initialValue = wrappedPtr.pointee
 
+        // setting flag to privent direct `Struct.staticDependency = value` setting
         isRegisteringDependency = true
 #endif
 
@@ -138,6 +151,7 @@ struct DependencyInjection {
 
 #if DEBUG
         if AppDelegate.isRunningTests {
+            // rollback to default value in XCTestCase.tearDown
             resetInjectedValues = { [next=resetInjectedValues] in
                 wrappedPtr.pointee = initialValue
                 next?() ?? {
