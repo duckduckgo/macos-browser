@@ -1214,6 +1214,8 @@ extension Tab: WKNavigationDelegate {
 
     struct Constants {
         static let webkitMiddleClick = 4
+        static let ddgClientHeaderKey = "X-DDG-Client"
+        static let ddgClientHeaderValue = "macOS"
     }
 
     // swiftlint:disable cyclomatic_complexity
@@ -1375,9 +1377,9 @@ extension Tab: WKNavigationDelegate {
             }
         }
         
-        if navigationAction.isTargetingMainFrame, navigationAction.request.url?.isDuckDuckGo == true, navigationAction.request.value(forHTTPHeaderField: "X-DDG-Client") == nil {
+        if navigationAction.isTargetingMainFrame, navigationAction.request.url?.isDuckDuckGo == true, navigationAction.request.value(forHTTPHeaderField: Constants.ddgClientHeaderKey) == nil {
             var request = navigationAction.request
-            request.setValue("macos", forHTTPHeaderField: "X-DDG-Client")
+            request.setValue(Constants.ddgClientHeaderValue, forHTTPHeaderField: Constants.ddgClientHeaderKey)
             _ = webView.load(request)
             return .cancel
         }
