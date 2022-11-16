@@ -985,6 +985,19 @@ final class LocalBookmarkStore: BookmarkStore {
         }
     }
 
+    func updateFavoriteIndex(of objectUUIDs: [UUID], toIndex index: Int?) async -> Error? {
+        return await withCheckedContinuation { continuation in
+            updateFavoriteIndex(of: objectUUIDs, toIndex: index) { error in
+                if let error = error {
+                    continuation.resume(returning: error)
+                    return
+                }
+
+                continuation.resume(returning: nil)
+            }
+        }
+    }
+
 }
 
 fileprivate extension BookmarkManagedObject {

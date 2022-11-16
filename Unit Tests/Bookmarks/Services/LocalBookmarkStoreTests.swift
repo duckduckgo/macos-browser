@@ -481,7 +481,156 @@ final class LocalBookmarkStoreTests: XCTestCase {
         let topLevelEntityIDs = updatedTopLevelEntities.map(\.id)
         XCTAssertEqual(topLevelEntityIDs, [testState.initialParentFolder.id, testState.bookmark3.id])
     }
-    
+
+    // MARK: - Moving Favorites
+
+    func testWhenMovingFavorite_AndIndexIsValid_ThenFavoriteIsMoved() async {
+        let container = CoreData.bookmarkContainer()
+        let context = container.viewContext
+        let bookmarkStore = LocalBookmarkStore(context: context)
+
+        let folder = BookmarkFolder(id: UUID(), title: "Parent")
+        let bookmark1 = Bookmark(id: UUID(), url: URL(string: "https://example1.com")!, title: "Example 1", isFavorite: true)
+        let bookmark2 = Bookmark(id: UUID(), url: URL(string: "https://example2.com")!, title: "Example 2", isFavorite: true)
+        let bookmark3 = Bookmark(id: UUID(), url: URL(string: "https://example3.com")!, title: "Example 3", isFavorite: true)
+
+        // Save the initial bookmarks state:
+
+        _ = await bookmarkStore.save(folder: folder, parent: nil)
+        _ = await bookmarkStore.save(bookmark: bookmark1, parent: folder, index: nil)
+        _ = await bookmarkStore.save(bookmark: bookmark2, parent: folder, index: nil)
+        _ = await bookmarkStore.save(bookmark: bookmark3, parent: folder, index: nil)
+
+        // Fetch persisted favorites back from the store:
+
+        guard case let .success(initialFavorites) = await bookmarkStore.loadAll(type: .favorites) else {
+            XCTFail("Couldn't load favorites")
+            return
+        }
+
+        XCTAssertEqual(initialFavorites.count, 3)
+
+        // Verify initial order of saved favorites:
+
+        let initialBookmarkUUIDs = [bookmark1.id, bookmark2.id, bookmark3.id]
+        let initialFetchedBookmarkUUIDs = initialFavorites.map(\.id)
+        XCTAssertEqual(initialBookmarkUUIDs, initialFetchedBookmarkUUIDs)
+
+        // Update the order of the favorites:
+
+        let moveFavoritesError = await bookmarkStore.updateFavoriteIndex(of: [bookmark3.id], toIndex: 0)
+        XCTAssertNil(moveFavoritesError)
+
+        // Check the new favorites order:
+
+        guard case let .success(updatedFavorites) = await bookmarkStore.loadAll(type: .favorites) else {
+            XCTFail("Couldn't load favorites")
+            return
+        }
+
+        let expectedBookmarkUUIDs = [bookmark3.id, bookmark1.id, bookmark2.id]
+        let updatedFetchedBookmarkUUIDs = updatedFavorites.map(\.id)
+        XCTAssertEqual(expectedBookmarkUUIDs, updatedFetchedBookmarkUUIDs)
+    }
+
+    func testWhenMovingFavorite_AndIndexIsOutOfBounds_ThenFavoriteIsAppended() async {
+        let container = CoreData.bookmarkContainer()
+        let context = container.viewContext
+        let bookmarkStore = LocalBookmarkStore(context: context)
+
+        let initialParentFolder = BookmarkFolder(id: UUID(), title: "Parent")
+        let bookmark1 = Bookmark(id: UUID(), url: URL(string: "https://example1.com")!, title: "Example 1", isFavorite: true)
+        let bookmark2 = Bookmark(id: UUID(), url: URL(string: "https://example2.com")!, title: "Example 2", isFavorite: true)
+        let bookmark3 = Bookmark(id: UUID(), url: URL(string: "https://example3.com")!, title: "Example 3", isFavorite: true)
+
+        // Save the initial bookmarks state:
+
+        _ = await bookmarkStore.save(folder: initialParentFolder, parent: nil)
+        _ = await bookmarkStore.save(bookmark: bookmark1, parent: initialParentFolder, index: nil)
+        _ = await bookmarkStore.save(bookmark: bookmark2, parent: initialParentFolder, index: nil)
+        _ = await bookmarkStore.save(bookmark: bookmark3, parent: initialParentFolder, index: nil)
+
+        // Fetch persisted favorites back from the store:
+
+        guard case let .success(initialFavorites) = await bookmarkStore.loadAll(type: .favorites) else {
+            XCTFail("Couldn't load favorites")
+            return
+        }
+
+        XCTAssertEqual(initialFavorites.count, 3)
+
+        // Verify initial order of saved favorites:
+
+        let initialBookmarkUUIDs = [bookmark1.id, bookmark2.id, bookmark3.id]
+        let initialFetchedBookmarkUUIDs = initialFavorites.map(\.id)
+        XCTAssertEqual(initialBookmarkUUIDs, initialFetchedBookmarkUUIDs)
+
+        // Update the order of the favorites:
+
+        let moveFavoritesError = await bookmarkStore.updateFavoriteIndex(of: [bookmark1.id], toIndex: 999)
+        XCTAssertNil(moveFavoritesError)
+
+        // Check the new favorites order:
+
+        guard case let .success(updatedFavorites) = await bookmarkStore.loadAll(type: .favorites) else {
+            XCTFail("Couldn't load favorites")
+            return
+        }
+
+        let expectedBookmarkUUIDs = [bookmark2.id, bookmark3.id, bookmark1.id]
+        let updatedFetchedBookmarkUUIDs = updatedFavorites.map(\.id)
+        XCTAssertEqual(expectedBookmarkUUIDs, updatedFetchedBookmarkUUIDs)
+    }
+
+    func testWhenMovingMultipleFavorites_AndIndexIsValid_ThenFavoritesAreMoved() async {
+        let container = CoreData.bookmarkContainer()
+        let context = container.viewContext
+        let bookmarkStore = LocalBookmarkStore(context: context)
+
+        let folder = BookmarkFolder(id: UUID(), title: "Parent")
+        let bookmark1 = Bookmark(id: UUID(), url: URL(string: "https://example1.com")!, title: "Example 1", isFavorite: true)
+        let bookmark2 = Bookmark(id: UUID(), url: URL(string: "https://example2.com")!, title: "Example 2", isFavorite: true)
+        let bookmark3 = Bookmark(id: UUID(), url: URL(string: "https://example3.com")!, title: "Example 3", isFavorite: true)
+
+        // Save the initial bookmarks state:
+
+        _ = await bookmarkStore.save(folder: folder, parent: nil)
+        _ = await bookmarkStore.save(bookmark: bookmark1, parent: folder, index: nil)
+        _ = await bookmarkStore.save(bookmark: bookmark2, parent: folder, index: nil)
+        _ = await bookmarkStore.save(bookmark: bookmark3, parent: folder, index: nil)
+
+        // Fetch persisted favorites back from the store:
+
+        guard case let .success(initialFavorites) = await bookmarkStore.loadAll(type: .favorites) else {
+            XCTFail("Couldn't load favorites")
+            return
+        }
+
+        XCTAssertEqual(initialFavorites.count, 3)
+
+        // Verify initial order of saved favorites:
+
+        let initialBookmarkUUIDs = [bookmark1.id, bookmark2.id, bookmark3.id]
+        let initialFetchedBookmarkUUIDs = initialFavorites.map(\.id)
+        XCTAssertEqual(initialBookmarkUUIDs, initialFetchedBookmarkUUIDs)
+
+        // Update the order of the favorites:
+
+        let moveFavoritesError = await bookmarkStore.updateFavoriteIndex(of: [bookmark1.id, bookmark2.id], toIndex: 3)
+        XCTAssertNil(moveFavoritesError)
+
+        // Check the new favorites order:
+
+        guard case let .success(updatedFavorites) = await bookmarkStore.loadAll(type: .favorites) else {
+            XCTFail("Couldn't load favorites")
+            return
+        }
+
+        let expectedBookmarkUUIDs = [bookmark3.id, bookmark1.id, bookmark2.id]
+        let updatedFetchedBookmarkUUIDs = updatedFavorites.map(\.id)
+        XCTAssertEqual(expectedBookmarkUUIDs, updatedFetchedBookmarkUUIDs)
+    }
+
     private struct EntityMovementTestState {
         let bookmarkStore: LocalBookmarkStore
         let bookmark1: Bookmark
