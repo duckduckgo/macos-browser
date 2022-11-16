@@ -38,14 +38,6 @@ class AppUsageActivityMonitorTests: XCTestCase {
 
         wasActive = NSApp.isActive
         NSApp.setValue(true, forKey: "isActive")
-
-        TestsDependencyProvider<Tab>.setUp {
-            $0.faviconManagement = FaviconManagerMock()
-            $0.useDefault(for: \.privatePlayer)
-            $0.useDefault(for: \.windowControllersManager)
-            $0.useDefault(for: \.historyCoordinating)
-            $0.extensionsBuilder = TestTabExtensionsBuilder()
-        }
     }
 
     override func tearDown() {
@@ -53,7 +45,6 @@ class AppUsageActivityMonitorTests: XCTestCase {
         openWindowsAndTabs = nil
         callback = nil
         NSApp.setValue(wasActive, forKey: "isActive")
-        TestsDependencyProvider<Tab>.reset()
     }
 
     func sendKeyEvent() {

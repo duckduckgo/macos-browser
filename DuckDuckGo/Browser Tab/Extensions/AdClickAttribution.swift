@@ -20,17 +20,15 @@ import Combine
 import Foundation
 import BrowserServicesKit
 
-extension DependencyProvider<AdClickAttributionTabExtension> {
-    var currentRules: [ContentBlockerRulesManager.Rules] { ContentBlocking.shared.contentBlockingManager.currentRules }
-}
-
-final class AdClickAttributionTabExtension: TabExtension, DependencyProviderClient {
+final class AdClickAttributionTabExtension: TabExtension {
 
     private weak var tab: Tab?
     private var cancellables = Set<AnyCancellable>()
 
     let detection = ContentBlocking.shared.makeAdClickAttributionDetection()
     let logic = ContentBlocking.shared.makeAdClickAttributionLogic()
+
+    static var currentRules: () -> [ContentBlockerRulesManager.Rules] = { ContentBlocking.shared.contentBlockingManager.currentRules }
 
     private var state: AdClickAttributionLogic.State? {
         logic.state
@@ -55,7 +53,7 @@ final class AdClickAttributionTabExtension: TabExtension, DependencyProviderClie
 
         tab.userContentController!.$contentBlockingAssets
             .sink { [weak self] _ in
-                self?.logic.onRulesChanged(latestRules: self!.dependencyProvider.currentRules)
+                self?.logic.onRulesChanged(latestRules: Self.currentRules())
             }
             .store(in: &cancellables)
 

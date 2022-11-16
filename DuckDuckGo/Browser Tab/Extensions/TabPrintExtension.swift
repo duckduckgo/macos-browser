@@ -30,11 +30,7 @@ protocol PrintOperationUI {
 
 extension NSApplication: PrintOperationUI {}
 
-extension DependencyProvider<TabPrintExtension> {
-    var ui: PrintOperationUI { NSApp }
-}
-
-final class TabPrintExtension: TabExtension, DependencyProviderClient {
+final class TabPrintExtension: TabExtension {
 
     private var contentBlockingAssetsCancellable: AnyCancellable?
 
@@ -43,6 +39,8 @@ final class TabPrintExtension: TabExtension, DependencyProviderClient {
     private var modalWindow: NSWindow?
     private var activePrintOperation: NSPrintOperation?
 
+    static var ui: PrintOperationUI = NSApp
+    
     init(tab: Tab) {
         contentBlockingAssetsCancellable = tab.userScriptsPublisher!.sink { [weak self] userScripts in
             userScripts?.printingUserScript.delegate = self
@@ -67,7 +65,7 @@ final class TabPrintExtension: TabExtension, DependencyProviderClient {
                                 delegate: self,
                                 didRun: #selector(printOperationDidRun(printOperation:success:contextInfo:)),
                                 contextInfo: nil)
-        dependencyProvider.ui.runModal(for: window)
+        Self.ui.runModal(for: window)
     }
 
     @objc func printOperationDidRun(printOperation: NSPrintOperation,
@@ -75,8 +73,8 @@ final class TabPrintExtension: TabExtension, DependencyProviderClient {
                                     contextInfo: UnsafeMutableRawPointer?) {
         activePrintOperation = nil
 
-        if dependencyProvider.ui.modalWindow === self.modalWindow {
-            dependencyProvider.ui.stopModal()
+        if Self.ui.modalWindow === self.modalWindow {
+            Self.ui.stopModal()
             self.modalWindow = nil
         }
     }

@@ -21,20 +21,6 @@ import XCTest
 
 class PinnedTabsManagerTests: XCTestCase {
 
-    override func setUp() {
-        TestsDependencyProvider<Tab>.setUp {
-            $0.faviconManagement = FaviconManagerMock()
-            $0.useDefault(for: \.privatePlayer)
-            $0.useDefault(for: \.windowControllersManager)
-            $0.useDefault(for: \.pinnedTabsManager)
-            $0.extensionsBuilder = TestTabExtensionsBuilder()
-        }
-    }
-
-    override func tearDown() {
-        TestsDependencyProvider<Tab>.reset()
-    }
-
     func testInitialState() throws {
         let manager = PinnedTabsManager()
         XCTAssertTrue(manager.tabCollection.tabs.isEmpty)

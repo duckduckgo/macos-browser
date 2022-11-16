@@ -26,19 +26,6 @@ final class FireTests: XCTestCase {
 
     var cancellables = Set<AnyCancellable>()
 
-    override func setUp() {
-        TestsDependencyProvider<Tab>.setUp {
-            $0.faviconManagement = FaviconManagerMock()
-            $0.useDefault(for: \.privatePlayer)
-            $0.useDefault(for: \.windowControllersManager)
-            $0.extensionsBuilder = TestTabExtensionsBuilder()
-        }
-    }
-
-    override func tearDown() {
-        TestsDependencyProvider<Tab>.reset()
-    }
-
     func testWhenBurnAllThenTabsAreClosedAndNewEmptyTabIsOpen() {
         let manager = WebCacheManagerMock()
         let historyCoordinator = HistoryCoordinatingMock()
