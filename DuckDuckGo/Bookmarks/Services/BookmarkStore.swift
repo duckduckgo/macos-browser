@@ -56,7 +56,7 @@ protocol BookmarkStore {
     func update(objectsWithUUIDs uuids: [UUID], update: @escaping (BaseBookmarkEntity) -> Void, completion: @escaping (Error?) -> Void)
     func canMoveObjectWithUUID(objectUUID uuid: UUID, to parent: BookmarkFolder) -> Bool
     func move(objectUUIDs: [UUID], toIndex: Int?, withinParentFolder: ParentFolderType, completion: @escaping (Error?) -> Void)
-    func updateFavoriteIndex(of objectUUIDs: [UUID], toIndex: Int?, completion: @escaping (Error?) -> Void)
+    func moveFavorites(with objectUUIDs: [UUID], toIndex: Int?, completion: @escaping (Error?) -> Void)
     func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarkImportResult
 
 }
@@ -562,7 +562,7 @@ final class LocalBookmarkStore: BookmarkStore {
         }
     }
 
-    func updateFavoriteIndex(of objectUUIDs: [UUID], toIndex index: Int?, completion: @escaping (Error?) -> Void) {
+    func moveFavorites(with objectUUIDs: [UUID], toIndex index: Int?, completion: @escaping (Error?) -> Void) {
         context.perform { [weak self] in
             guard let self = self else {
                 assertionFailure("Couldn't get strong self")
@@ -985,9 +985,9 @@ final class LocalBookmarkStore: BookmarkStore {
         }
     }
 
-    func updateFavoriteIndex(of objectUUIDs: [UUID], toIndex index: Int?) async -> Error? {
+    func moveFavorites(with objectUUIDs: [UUID], toIndex index: Int?) async -> Error? {
         return await withCheckedContinuation { continuation in
-            updateFavoriteIndex(of: objectUUIDs, toIndex: index) { error in
+            moveFavorites(with: objectUUIDs, toIndex: index) { error in
                 if let error = error {
                     continuation.resume(returning: error)
                     return

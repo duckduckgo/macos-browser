@@ -104,7 +104,7 @@ final class BookmarkStoreMock: BookmarkStore {
     }
 
     var updateFavoriteIndexCalled = false
-    func updateFavoriteIndex(of objectUUIDs: [UUID], toIndex: Int?, completion: @escaping (Error?) -> Void) {
+    func moveFavorites(with objectUUIDs: [UUID], toIndex: Int?, completion: @escaping (Error?) -> Void) {
         updateFavoriteIndexCalled = true
     }
 

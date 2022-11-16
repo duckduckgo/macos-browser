@@ -419,7 +419,7 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
             return true
         } else {
             if selectionState == .favorites {
-                LocalBookmarkManager.shared.updateFavoriteIndex(of: draggedItemIdentifiers, toIndex: row) { _ in }
+                LocalBookmarkManager.shared.moveFavorites(with: draggedItemIdentifiers, toIndex: row) { _ in }
             } else {
                 LocalBookmarkManager.shared.move(objectUUIDs: draggedItemIdentifiers,
                                                  toIndex: row,
