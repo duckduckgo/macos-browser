@@ -56,7 +56,7 @@ final class GPCRequestFactory {
         }
         
         // Add GPC header if needed
-        if config.isEnabled(featureKey: .gpc) && privacySecurityPreferences.gpcEnabled {
+        if config.isFeature(.gpc, enabledForDomain: incomingRequest.url?.host) && privacySecurityPreferences.gpcEnabled {
             var request = incomingRequest
             if let headers = request.allHTTPHeaderFields,
                headers.firstIndex(where: { $0.key == Constants.secGPCHeader }) == nil {
