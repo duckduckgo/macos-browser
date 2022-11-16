@@ -43,7 +43,7 @@ internal class BaseBookmarkEntity {
 
     static func topLevelEntitiesFetchRequest() -> NSFetchRequest<BookmarkManagedObject> {
         let request = NSFetchRequest<BookmarkManagedObject>(entityName: "BookmarkManagedObject")
-        request.predicate = NSPredicate(format: "parentFolder == nil")
+        request.predicate = NSPredicate(format: "id != %@ AND parentFolder == nil", UUID.favoritesFolderUUID as CVarArg)
         return request
     }
 
