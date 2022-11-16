@@ -31,7 +31,7 @@ internal class Bookmark2ToBookmark3MigrationPolicy: NSEntityMigrationPolicy {
     }
 
     override func createDestinationInstances(forSource sInstance: NSManagedObject, in mapping: NSEntityMapping, manager: NSMigrationManager) throws {
-        guard let favoritesFolder else {
+        guard let favoritesFolder = favoritesFolder else {
             assertionFailure("Failed to create Favorites Folder")
             return
         }

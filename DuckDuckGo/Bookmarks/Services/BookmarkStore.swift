@@ -583,7 +583,7 @@ final class LocalBookmarkStore: BookmarkStore {
                 return (try? self.context.fetch(entityFetchRequest))?.first
             }
 
-            if let index, index < favoritesFolder.mutableFavorites.count {
+            if let index = index, index < favoritesFolder.mutableFavorites.count {
                 var currentInsertionIndex = max(index, 0)
 
                 for bookmarkManagedObject in bookmarkManagedObjects {

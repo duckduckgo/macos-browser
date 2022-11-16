@@ -123,7 +123,7 @@ struct FavoritesGrid: View {
             return
         }
 
-        let to = {
+        let to: Int = {
             let index = itemIndex(for: value.location)
             return index > from ? index + 1 : index
         }()
@@ -146,7 +146,7 @@ struct FavoritesGrid: View {
             return
         }
         let from = itemIndex(for: value.startLocation)
-        let to = {
+        let to: Int = {
             let index = itemIndex(for: value.location)
             return index > from ? index + 1 : index
         }()
