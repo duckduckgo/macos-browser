@@ -20,47 +20,89 @@ import XCTest
 import Combine
 @testable import DuckDuckGo_Privacy_Browser
 
+extension XCTestCase {
+
+    func registerDependency<Client, Value>(_ keyPath: KeyPath<Client, Value>, value: Value) {
+        DependencyInjection.register(keyPath, value: value, .testable)
+        addTeardownBlock {
+            DependencyInjection.reset()
+        }
+    }
+
+    func registerDependency<Value>(_ dependency: inout Value, value: Value) {
+        DependencyInjection.register(&dependency, value: value, .testable)
+        addTeardownBlock {
+            DependencyInjection.reset()
+        }
+    }
+
+}
+
 final class DependencyProviderTests: XCTestCase {
 
     override func tearDown() {
-        AppDelegate.isRunningTests = true
     }
 
-    func testDependencyProvider() {
-        AppDelegate.isRunningTests = false
+    func testDependencyProviderResetsValueAfterTest() {
+        class Dep {
+            var onDeinit: (() -> Void)?
+            deinit {
+                onDeinit?()
+            }
+        }
+        struct Dependencies {
+            @Injected(.testable) static var testDep = Dep()
+        }
 
-        let client = SomeClient()
-        XCTAssertEqual(client.providedValue, "value")
-        ValueProvider.value = "another value"
-        client.updateValue()
-        XCTAssertEqual(client.providedValue, "another value")
+        weak var mock1: Dep?
+        let deinitExpectation = expectation(description: "Dep should deinit")
+        autoreleasepool {
+            mock1 = Dependencies.testDep
+
+            let mock2 = Dep()
+            mock2.onDeinit = {
+                deinitExpectation.fulfill()
+            }
+
+            registerDependency(&Dependencies.testDep, value: mock2)
+            XCTAssertTrue(Dependencies.testDep === mock2)
+        }
+
+        DependencyInjection.reset()
+        waitForExpectations(timeout: 0)
+
+        XCTAssertTrue(Dependencies.testDep === mock1!)
     }
 
-    func testTestDependencyProvider() {
-        TestsDependencyProvider<SomeClient>.shared.providedValue = "test value"
-        let client = SomeClient()
-        XCTAssertEqual(client.providedValue, "test value")
-        TestsDependencyProvider<SomeClient>.shared.providedValue = "new value"
-        client.updateValue()
-        XCTAssertEqual(client.providedValue, "new value")
+    func testDependencyProviderNoInitialValue() {
+        class Dep {
+            var onDeinit: (() -> Void)?
+            deinit {
+                onDeinit?() ?? {
+                    XCTFail("Unexpected deinit")
+                }()
+            }
+        }
+        struct Dependencies {
+            @Injected() static var testDep = Dep()
+        }
+
+        let deinitExpectation = expectation(description: "Dep should deinit")
+        weak var weakMock: Dep?
+        autoreleasepool {
+            let mock = Dep()
+            weakMock = mock
+            mock.onDeinit = {
+                deinitExpectation.fulfill()
+            }
+
+            registerDependency(&Dependencies.testDep, value: mock)
+            XCTAssertTrue(Dependencies.testDep === mock)
+        }
+        XCTAssertTrue(Dependencies.testDep === weakMock!)
+
+        DependencyInjection.reset()
+        waitForExpectations(timeout: 0)
     }
 
-}
-
-private struct ValueProvider {
-    static var value = "value"
-}
-
-extension DependencyProvider<SomeClient> {
-    var providedValue: String { ValueProvider.value }
-}
-
-final class SomeClient: DependencyProviderClient {
-    var providedValue: String
-    init() {
-        self.providedValue = type(of: self).dependencyProvider.providedValue
-    }
-    func updateValue() {
-        self.providedValue = dependencyProvider.providedValue
-    }
 }

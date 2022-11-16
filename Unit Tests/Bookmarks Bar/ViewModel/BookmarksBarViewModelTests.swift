@@ -21,17 +21,18 @@ import XCTest
 
 class BookmarksBarViewModelTests: XCTestCase {
 
-    override func setUp() {
-        TestsDependencyProvider<Tab>.setUp {
-            $0.faviconManagement = FaviconManagerMock()
-            $0.useDefault(for: \.privatePlayer)
-            $0.useDefault(for: \.windowControllersManager)
-        }
-    }
-
-    override func tearDown() {
-        TestsDependencyProvider<Tab>.reset()
-    }
+//    override func setUp() {
+//        TestsDependencyProvider<Tab>.setUp {
+//            $0.faviconManagement = FaviconManagerMock()
+//            $0.useDefault(for: \.privatePlayer)
+//            $0.useDefault(for: \.windowControllersManager)
+//            $0.extensionsBuilder = TestTabExtensionsBuilder()
+//        }
+//    }
+//
+//    override func tearDown() {
+//        TestsDependencyProvider<Tab>.reset()
+//    }
 
     func testWhenClippingTheLastBarItem_AndNoItemsCanBeClipped_ThenNoItemsAreClipped() {
         let manager = createMockBookmarksManager()

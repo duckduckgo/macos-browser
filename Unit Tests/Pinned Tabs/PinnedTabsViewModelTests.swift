@@ -26,11 +26,12 @@ class PinnedTabsViewModelTests: XCTestCase {
 
     override func setUp() {
         assert(WindowControllersManager.shared.mainWindowControllers.isEmpty)
-        TestsDependencyProvider<Tab>.setUp {
-            $0.faviconManagement = FaviconManagerMock()
-            $0.useDefault(for: \.privatePlayer)
-            $0.useDefault(for: \.windowControllersManager)
-        }
+//        TestsDependencyProvider<Tab>.setUp {
+//            $0.faviconManagement = FaviconManagerMock()
+//            $0.useDefault(for: \.privatePlayer)
+//            $0.useDefault(for: \.windowControllersManager)
+//            $0.extensionsBuilder = TestTabExtensionsBuilder()
+//        }
         collection = TabCollection(tabs: [
             Tab(content: .url("http://a.com".url!)),
             Tab(content: .url("http://b.com".url!)),
@@ -46,7 +47,7 @@ class PinnedTabsViewModelTests: XCTestCase {
         for controller in WindowControllersManager.shared.mainWindowControllers {
             WindowControllersManager.shared.unregister(controller)
         }
-        TestsDependencyProvider<Tab>.reset()
+//        TestsDependencyProvider<Tab>.reset()
     }
 
     func testInitialState() throws {

@@ -25,11 +25,12 @@ final class DeallocationTests: XCTestCase {
 
     override func setUp() {
         assert(WindowControllersManager.shared.mainWindowControllers.isEmpty)
-        TestsDependencyProvider<Tab>.setUp {
-            $0.faviconManagement = FaviconManagerMock()
-            $0.useDefault(for: \.privatePlayer)
-            $0.useDefault(for: \.windowControllersManager)
-        }
+//        TestsDependencyProvider<Tab>.setUp {
+//            $0.faviconManagement = FaviconManagerMock()
+//            $0.useDefault(for: \.privatePlayer)
+//            $0.useDefault(for: \.windowControllersManager)
+//            $0.extensionsBuilder = TestTabExtensionsBuilder()
+//        }
     }
 
     override func tearDown() {
@@ -37,7 +38,7 @@ final class DeallocationTests: XCTestCase {
         for controller in WindowControllersManager.shared.mainWindowControllers {
             WindowControllersManager.shared.unregister(controller)
         }
-        TestsDependencyProvider<Tab>.reset()
+//        TestsDependencyProvider<Tab>.reset()
     }
 
     class DeallocationTracker {

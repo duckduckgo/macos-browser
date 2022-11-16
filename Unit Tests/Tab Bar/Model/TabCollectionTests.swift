@@ -21,19 +21,20 @@ import XCTest
 
 final class TabCollectionTests: XCTestCase {
 
-    override func setUp() {
-        TestsDependencyProvider<Tab>.setUp {
-            $0.faviconManagement = FaviconManagerMock()
-            $0.useDefault(for: \.privatePlayer)
-            $0.useDefault(for: \.windowControllersManager)
-            $0.useDefault(for: \.pinnedTabsManager)
-            $0.useDefault(for: \.historyCoordinating)
-        }
-    }
-
-    override func tearDown() {
-        TestsDependencyProvider<Tab>.reset()
-    }
+//    override func setUp() {
+//        TestsDependencyProvider<Tab>.setUp {
+//            $0.faviconManagement = FaviconManagerMock()
+//            $0.useDefault(for: \.privatePlayer)
+//            $0.useDefault(for: \.windowControllersManager)
+//            $0.useDefault(for: \.pinnedTabsManager)
+//            $0.useDefault(for: \.historyCoordinating)
+//            $0.extensionsBuilder = TestTabExtensionsBuilder()
+//        }
+//    }
+//
+//    override func tearDown() {
+//        TestsDependencyProvider<Tab>.reset()
+//    }
 
     // MARK: - Append
 

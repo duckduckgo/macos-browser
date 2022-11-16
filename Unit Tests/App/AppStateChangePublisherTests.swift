@@ -25,12 +25,13 @@ final class AppStateChangePublisherTests: XCTestCase {
 
     override func setUp() {
         assert(WindowControllersManager.shared.mainWindowControllers.isEmpty)
-        TestsDependencyProvider<Tab>.setUp {
-            $0.faviconManagement = FaviconManagerMock()
-            $0.useDefault(for: \.privatePlayer)
-            $0.useDefault(for: \.windowControllersManager)
-            $0.useDefault(for: \.historyCoordinating)
-        }
+//        TestsDependencyProvider<Tab>.setUp {
+//            $0.faviconManagement = FaviconManagerMock()
+//            $0.useDefault(for: \.privatePlayer)
+//            $0.useDefault(for: \.windowControllersManager)
+//            $0.useDefault(for: \.historyCoordinating)
+//            $0.extensionsBuilder = TestTabExtensionsBuilder()
+//        }
     }
 
     override func tearDown() {
