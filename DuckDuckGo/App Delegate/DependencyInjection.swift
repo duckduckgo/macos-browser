@@ -16,7 +16,7 @@
 //  limitations under the License.
 //
 
-import AppKit
+import os
 import Foundation
 
 typealias Injected = DependencyInjection.Injected
@@ -96,6 +96,7 @@ struct DependencyInjection {
 
         init(wrappedValue getDefault: @autoclosure () -> Value, _ testability: Testability = .appOnly) {
             if AppDelegate.isRunningTests, case .appOnly = testability {
+                os_log("Ignoring %s dependency default value", log: .default, type: .debug, "\(Value.self)")
                 return
             }
 
@@ -118,22 +119,24 @@ struct DependencyInjection {
     private static var store = [AnyKeyPath: Any]()
     private init() {}
 
-    static func register<Client, Value>(_ keyPath: KeyPath<Client, Value>, value: @autoclosure () -> Value) {
+    static func register<Client, Value>(_ keyPath: KeyPath<Client, Value>, value: @autoclosure () -> Value, _ testability: Testability = .appOnly) {
 #if DEBUG
         dispatchPrecondition(condition: .onQueue(.main))
-        if AppDelegate.isRunningTests {
+        if AppDelegate.isRunningTests, case .appOnly = testability {
+            os_log("Skipping %s dependency registration", log: .default, type: .debug, "\(Client.self).\(Value.self)")
             return
         }
 #endif
 
-        assert(store[keyPath] == nil)
+        assert(store[keyPath] == nil, "\(Client.self).\(Value.self) dependency is already registered")
         store[keyPath] = value()
     }
 
-    static func register<Value>(_ dependency: inout Value, value: Value, _ testability: Testability = .appOnly) {
+    static func register<Value>(_ dependency: inout Value, value: @autoclosure () -> Value, _ testability: Testability = .appOnly) {
 #if DEBUG
         dispatchPrecondition(condition: .onQueue(.main))
         if AppDelegate.isRunningTests, case .appOnly = testability {
+            os_log("Skipping %s dependency registration", log: .default, type: .debug, "\(Value.self)")
             return
         }
 
@@ -149,7 +152,7 @@ struct DependencyInjection {
         isRegisteringDependency = true
 #endif
 
-        dependency = value
+        dependency = value()
 
 #if DEBUG
         if AppDelegate.isRunningTests {
