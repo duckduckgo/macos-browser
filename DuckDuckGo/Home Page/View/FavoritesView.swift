@@ -73,7 +73,7 @@ struct FavoritesGrid: View {
             ) {
                 ForEach(model.visibleModels, content: \.favoriteView)
             }
-            .frame(maxWidth: GridDimensions.gridWidth)
+            .frame(maxWidth: GridDimensions.width)
             .simultaneousGesture(dragGesture)
         } else {
             ForEach(rowIndices, id: \.self) { index in
@@ -94,9 +94,9 @@ struct FavoritesGrid: View {
         static let verticalSpacing: CGFloat = 10
         static let horizontalSpacing: CGFloat = 20
 
-        static let gridWidth: CGFloat = (itemWidth + horizontalSpacing) * CGFloat(HomePage.favoritesPerRow) - horizontalSpacing
+        static let width: CGFloat = (itemWidth + horizontalSpacing) * CGFloat(HomePage.favoritesPerRow) - horizontalSpacing
 
-        static func gridHeight(for rowCount: Int) -> CGFloat {
+        static func height(for rowCount: Int) -> CGFloat {
             (itemHeight + verticalSpacing) * CGFloat(rowCount) - verticalSpacing
         }
     }
@@ -174,10 +174,10 @@ struct FavoritesGrid: View {
             }
             return HomePage.favoritesRowCountWhenCollapsed
         }()
-        let height = GridDimensions.gridHeight(for: rowCount)
+        let height = GridDimensions.height(for: rowCount)
 
         var constrainedPoint = point
-        constrainedPoint.x = max(0, min(GridDimensions.gridWidth, point.x))
+        constrainedPoint.x = max(0, min(GridDimensions.width, point.x))
         constrainedPoint.y = max(0, min(height, point.y))
         return constrainedPoint
     }
