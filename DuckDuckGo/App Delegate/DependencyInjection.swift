@@ -137,11 +137,13 @@ struct DependencyInjection {
         dependency = value
 
 #if DEBUG
-        resetInjectedValues = { [next=resetInjectedValues] in
-            wrappedPtr.pointee = initialValue
-            next?() ?? {
-                self.resetInjectedValues = nil
-            }()
+        if AppDelegate.isRunningTests {
+            resetInjectedValues = { [next=resetInjectedValues] in
+                wrappedPtr.pointee = initialValue
+                next?() ?? {
+                    self.resetInjectedValues = nil
+                }()
+            }
         }
 #endif
     }
