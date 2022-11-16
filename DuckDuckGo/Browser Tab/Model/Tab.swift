@@ -1214,7 +1214,7 @@ extension Tab: WKNavigationDelegate {
 
     struct Constants {
         static let webkitMiddleClick = 4
-        static let ddgClientHeaderKey = "X-DDG-Client"
+        static let ddgClientHeaderKey = "X-DuckDuckGo-Client"
         static let ddgClientHeaderValue = "macOS"
     }
 
