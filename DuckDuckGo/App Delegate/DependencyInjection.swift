@@ -120,6 +120,7 @@ struct DependencyInjection {
 
     static func register<Client, Value>(_ keyPath: KeyPath<Client, Value>, value: @autoclosure () -> Value) {
 #if DEBUG
+        dispatchPrecondition(condition: .onQueue(.main))
         if AppDelegate.isRunningTests {
             return
         }
@@ -131,6 +132,7 @@ struct DependencyInjection {
 
     static func register<Value>(_ dependency: inout Value, value: Value, _ testability: Testability = .appOnly) {
 #if DEBUG
+        dispatchPrecondition(condition: .onQueue(.main))
         if AppDelegate.isRunningTests, case .appOnly = testability {
             return
         }
