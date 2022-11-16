@@ -49,7 +49,7 @@ extension HomePage.Models {
         @Published var showAllFavorites: Bool {
             didSet {
                 Self.showAllFavoritesSetting = showAllFavorites
-                visibleModels = showAllFavorites ? models : Array(models.prefix(HomePage.favoritesRowCountWhenCollapsed * HomePage.favoritesPerRow))
+                updateVisibleModels()
             }
         }
 
@@ -66,16 +66,18 @@ extension HomePage.Models {
                 }
 
                 models = favorites
-                self.rows = favorites.chunked(into: HomePage.favoritesPerRow)
             }
         }
 
         @Published var models: [FavoriteModel] = [] {
             didSet {
-                visibleModels = showAllFavorites ? models : Array(models.prefix(HomePage.favoritesRowCountWhenCollapsed * HomePage.favoritesPerRow))
+                updateVisibleModels()
             }
         }
+
         @Published private(set) var visibleModels: [FavoriteModel] = []
+
+        @available(macOS, obsoleted: 11.0, message: "Use visibleModels and LazyVGrid instead")
         @Published private(set) var rows: [[FavoriteModel]] = []
 
         let open: (Bookmark, OpenTarget) -> Void
@@ -117,6 +119,14 @@ extension HomePage.Models {
 
         func addNew() {
             addEdit(nil)
+        }
+
+        private func updateVisibleModels() {
+            if #available(macOS 11.0, *) {
+                visibleModels = showAllFavorites ? models : Array(models.prefix(HomePage.favoritesRowCountWhenCollapsed * HomePage.favoritesPerRow))
+            } else {
+                rows = models.chunked(into: HomePage.favoritesPerRow)
+            }
         }
     }
     
