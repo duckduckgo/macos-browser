@@ -564,7 +564,7 @@ final class LocalBookmarkStore: BookmarkStore {
                 newParentFolder.mutableChildren.add(bookmarkManagedObject)
             }
 
-            currentInsertionIndex += 1
+            currentInsertionIndex = adjustedInsertionIndex + 1
         }
     }
 
@@ -606,7 +606,7 @@ final class LocalBookmarkStore: BookmarkStore {
                         favoritesFolder.mutableFavorites.add(bookmarkManagedObject)
                     }
 
-                    currentInsertionIndex += 1
+                    currentInsertionIndex = adjustedInsertionIndex + 1
                 }
             } else {
                 for bookmarkManagedObject in bookmarkManagedObjects {
