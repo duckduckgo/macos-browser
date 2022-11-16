@@ -134,13 +134,6 @@ final class LocalBookmarkStore: BookmarkStore {
         }
 
         context.perform {
-            if type == .favorites {
-                let favorites = self.favoritesFolder?.favorites?.compactMap({ $0 as? BookmarkManagedObject })
-                let entities = favorites?.compactMap { BaseBookmarkEntity.from(managedObject: $0, parentFolderUUID: $0.parentFolder?.id) }
-                mainQueueCompletion(bookmarks: entities, error: nil)
-                return
-            }
-
             let fetchRequest: NSFetchRequest<BookmarkManagedObject>
 
             switch type {
@@ -149,8 +142,9 @@ final class LocalBookmarkStore: BookmarkStore {
             case .topLevelEntities:
                 fetchRequest = Bookmark.topLevelEntitiesFetchRequest()
             case .favorites:
-                assertionFailure("Should not get there")
-                completion(nil, nil)
+                let favorites = self.favoritesFolder?.favorites?.compactMap({ $0 as? BookmarkManagedObject })
+                let entities = favorites?.compactMap { BaseBookmarkEntity.from(managedObject: $0, parentFolderUUID: $0.parentFolder?.id) }
+                mainQueueCompletion(bookmarks: entities, error: nil)
                 return
             }
 
@@ -160,13 +154,16 @@ final class LocalBookmarkStore: BookmarkStore {
                 let results: [BookmarkManagedObject]
                 
                 switch type {
-                case .bookmarks, .favorites:
+                case .bookmarks:
                     results = try self.context.fetch(fetchRequest)
                 case .topLevelEntities:
                     // When fetching the top level entities, the root folder will be returned. To make things simpler for the caller, this function
                     // will return the children of the root folder, as the root folder is an implementation detail of the bookmarks store.
                     let entities = try self.context.fetch(fetchRequest)
                     results = entities.first?.children?.array as? [BookmarkManagedObject] ?? []
+                case .favorites:
+                    assertionFailure("Should not get there, favorites are already handled")
+                    results = []
                 }
                 
                 let entities: [BaseBookmarkEntity] = results.compactMap { entity in
