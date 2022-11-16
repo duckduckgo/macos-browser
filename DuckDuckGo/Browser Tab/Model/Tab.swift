@@ -1209,21 +1209,6 @@ extension Tab: WKNavigationDelegate {
         static let webkitMiddleClick = 4
     }
 
-    // 1. Open in new Tab/Window (will repeat the process in the new tab) -> cancel
-    // 2. Open file:// URL -> allow
-    // 3. Open in external app -> cancel
-    // 4. if Private Player -> redirect
-    // 5. Invalicate back item on redirect -> goBack
-    // 6. linkProtection.getCleanURL -> redirect
-    // 7. linkProtection.requestTrackingLinkRewrite -> redirect
-    // 8. referrerTrimming.trimReferrer -> redirect
-    // 9. GPC -> redirect
-    // 10. HTTPSUpgrade -> redirect
-    // 11. Download if needed (should be done after HTTPS upgrade) -> download
-    // 12. Wait for Content Blocking Rules -> wait
-    // -> allow
-
-
     // swiftlint:disable cyclomatic_complexity
     // swiftlint:disable function_body_length
     @MainActor

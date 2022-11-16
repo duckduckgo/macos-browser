@@ -41,7 +41,7 @@ final class AppStateChangePublisherTests: XCTestCase {
             WindowControllersManager.shared.unregister(controller)
         }
 
-        TestsDependencyProvider<Tab>.reset()
+//        TestsDependencyProvider<Tab>.reset()
     }
 
     final class MultiExpectation {
