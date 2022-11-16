@@ -99,7 +99,7 @@ final class LocalBookmarkStore: BookmarkStore {
     private var rootLevelFolder: BookmarkManagedObject?
 
     /// All favorites must additionally be children of this special folder. Because this value is used so frequently, it is cached here.
-    private(set) var favoritesFolder: BookmarkManagedObject?
+    private var favoritesFolder: BookmarkManagedObject?
 
     private func cacheReadOnlyTopLevelBookmarksFolder() {
         context.performAndWait {
@@ -142,10 +142,7 @@ final class LocalBookmarkStore: BookmarkStore {
             case .topLevelEntities:
                 fetchRequest = Bookmark.topLevelEntitiesFetchRequest()
             case .favorites:
-                let favorites = self.favoritesFolder?.favorites?.compactMap({ $0 as? BookmarkManagedObject })
-                let entities = favorites?.compactMap { BaseBookmarkEntity.from(managedObject: $0, parentFolderUUID: $0.parentFolder?.id) }
-                mainQueueCompletion(bookmarks: entities, error: nil)
-                return
+                fetchRequest = Bookmark.favoritesFolderFetchRequest()
             }
 
             fetchRequest.returnsObjectsAsFaults = false
@@ -162,8 +159,8 @@ final class LocalBookmarkStore: BookmarkStore {
                     let entities = try self.context.fetch(fetchRequest)
                     results = entities.first?.children?.array as? [BookmarkManagedObject] ?? []
                 case .favorites:
-                    assertionFailure("Should not get there, favorites are already handled")
-                    results = []
+                    let entities = try self.context.fetch(fetchRequest)
+                    results = entities.first?.favorites?.array as? [BookmarkManagedObject] ?? []
                 }
                 
                 let entities: [BaseBookmarkEntity] = results.compactMap { entity in
@@ -807,33 +804,22 @@ final class LocalBookmarkStore: BookmarkStore {
     /// Fetch and cache favorites folder, or create it if it does not exist
     private func createAndCacheFavoritesFolderIfNeeded() {
         context.performAndWait {
-            let fetchRequest = NSFetchRequest<BookmarkManagedObject>(entityName: BookmarkManagedObject.className())
-            fetchRequest.predicate = NSPredicate(format: "%K == %@ AND %K == nil AND %K == YES",
-                                                 "id",
-                                                 Constants.favoritesFolderUUID,
-                                                 #keyPath(BookmarkManagedObject.parentFolder),
-                                                 #keyPath(BookmarkManagedObject.isFolder))
+            let fetchRequest = Bookmark.favoritesFolderFetchRequest()
+
             do {
                 if let favoritesFolder = try context.fetch(fetchRequest).first {
                     self.favoritesFolder = favoritesFolder
                     return
                 }
 
-                let managedObject = NSEntityDescription.insertNewObject(forEntityName: BookmarkManagedObject.className(), into: self.context)
+                let managedObject = BookmarkManagedObject.createFavoritesFolder(in: context)
 
                 guard let favoritesFolder = managedObject as? BookmarkManagedObject else {
-                    assertionFailure("LocalBookmarkStore: Failed to migrate top level entities")
+                    assertionFailure("LocalBookmarkStore: Failed to create Favorites Folder")
                     return
                 }
 
-                favoritesFolder.id = .favoritesFolderUUID
-                favoritesFolder.titleEncrypted = "Favorites Folder" as NSString
-                favoritesFolder.isFolder = true
-                favoritesFolder.dateAdded = NSDate.now
-                favoritesFolder.parentFolder = nil
-
                 self.favoritesFolder = favoritesFolder
-
                 try context.save()
             } catch {
                 Pixel.fire(.debug(event: .bookmarksStoreFavoritesFolderCreationFailed, error: error))

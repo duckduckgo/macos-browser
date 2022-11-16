@@ -46,6 +46,17 @@ extension BookmarkManagedObject {
         try validate()
     }
 
+    static func createFavoritesFolder(in context: NSManagedObjectContext) -> NSManagedObject {
+        let managedObject = NSEntityDescription.insertNewObject(forEntityName: BookmarkManagedObject.className(), into: context)
+
+        managedObject.setValue(UUID.favoritesFolderUUID, forKey: "id")
+        managedObject.setValue("Favorites Folder" as NSString, forKey: "titleEncrypted")
+        managedObject.setValue(true, forKey: "isFolder")
+        managedObject.setValue(NSDate.now, forKey: "dateAdded")
+
+        return managedObject
+    }
+
     // MARK: - Private
 
     func validate() throws {

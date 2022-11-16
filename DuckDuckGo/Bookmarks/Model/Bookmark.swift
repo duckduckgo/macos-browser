@@ -47,6 +47,15 @@ internal class BaseBookmarkEntity {
         return request
     }
 
+    static func favoritesFolderFetchRequest() -> NSFetchRequest<BookmarkManagedObject> {
+        let request = NSFetchRequest<BookmarkManagedObject>(entityName: "BookmarkManagedObject")
+        request.predicate = NSPredicate(format: "id == %@ AND %K == nil AND %K == YES",
+                                        UUID.favoritesFolderUUID as CVarArg,
+                                        #keyPath(BookmarkManagedObject.parentFolder),
+                                        #keyPath(BookmarkManagedObject.isFolder))
+        return request
+    }
+
     static func bookmarksAndFoldersFetchRequest() -> NSFetchRequest<BookmarkManagedObject> {
         return BookmarkManagedObject.fetchRequest()
     }

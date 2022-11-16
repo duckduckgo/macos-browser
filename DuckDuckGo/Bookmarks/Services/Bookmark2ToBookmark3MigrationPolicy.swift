@@ -26,17 +26,8 @@ internal class Bookmark2ToBookmark3MigrationPolicy: NSEntityMigrationPolicy {
     override func begin(_ mapping: NSEntityMapping, with manager: NSMigrationManager) throws {
         try super.begin(mapping, with: manager)
 
-        let managedObject = NSEntityDescription.insertNewObject(forEntityName: BookmarkManagedObject.className(), into: manager.destinationContext)
-
-        managedObject.setValue(UUID.favoritesFolderUUID, forKey: "id")
-        managedObject.setValue("Favorites Folder" as NSString, forKey: "titleEncrypted")
-        managedObject.setValue(true, forKey: "isFolder")
-        managedObject.setValue(NSDate.now, forKey: "dateAdded")
-
+        self.favoritesFolder = BookmarkManagedObject.createFavoritesFolder(in: manager.destinationContext)
         try manager.destinationContext.save()
-
-        self.favoritesFolder = managedObject
-        print("Migrating from \(manager.sourceModel.versionIdentifiers) to \(manager.destinationModel.versionIdentifiers)")
     }
 
     override func createDestinationInstances(forSource sInstance: NSManagedObject, in mapping: NSEntityMapping, manager: NSMigrationManager) throws {
