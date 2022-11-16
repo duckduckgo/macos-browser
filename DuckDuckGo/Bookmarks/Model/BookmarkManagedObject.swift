@@ -26,6 +26,7 @@ extension BookmarkManagedObject {
         case folderStructureHasCycle
         case folderHasURL
         case bookmarkRequiresURL
+        case invalidFavoritesFolder
     }
 
     public var mutableChildren: NSMutableOrderedSet {
@@ -64,6 +65,7 @@ extension BookmarkManagedObject {
         try validateBookmarkURLRequirement()
         try validateThatFoldersDoNotHaveURLs()
         try validateThatFolderHierarchyHasNoCycles()
+        try validateFavoritesFolder()
     }
     
     func validateThatEntitiesExistInsideTheRootFolder() throws {
@@ -75,6 +77,12 @@ extension BookmarkManagedObject {
     func validateBookmarkURLRequirement() throws {
         if !isFolder, urlEncrypted == nil {
             throw BookmarkError.bookmarkRequiresURL
+        }
+    }
+
+    func validateFavoritesFolder() throws {
+        if let favoritesFolderID = favoritesFolder?.id, favoritesFolderID != .favoritesFolderUUID {
+            throw BookmarkError.invalidFavoritesFolder
         }
     }
 
