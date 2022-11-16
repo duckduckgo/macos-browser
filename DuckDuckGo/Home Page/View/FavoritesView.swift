@@ -64,22 +64,20 @@ struct FavoritesGrid: View {
         model.showAllFavorites ? model.rows.indices : model.rows.indices.prefix(HomePage.favoritesRowCountWhenCollapsed)
     }
 
-    static let gridItemWidth: CGFloat = 64
-    static let gridSpacing: CGFloat = 10
-    static let gridHorizontalSpacing: CGFloat = 20
-    static let gridItemHeight: CGFloat = 101
-
     var body: some View {
 
         if #available(macOS 11.0, *) {
-            LazyVGrid(columns: Array(repeating: GridItem(.fixed(Self.gridItemWidth), spacing: Self.gridHorizontalSpacing), count: HomePage.favoritesPerRow), spacing: Self.gridSpacing) {
+            LazyVGrid(
+                columns: Array(repeating: GridItem(.fixed(GridDimensions.itemWidth), spacing: GridDimensions.horizontalSpacing), count: HomePage.favoritesPerRow),
+                spacing: GridDimensions.verticalSpacing
+            ) {
                 ForEach(model.visibleModels, content: \.favoriteView)
             }
-            .frame(maxWidth: (Self.gridItemWidth + Self.gridHorizontalSpacing) * CGFloat(HomePage.favoritesPerRow) - Self.gridHorizontalSpacing)
+            .frame(maxWidth: GridDimensions.gridWidth)
             .simultaneousGesture(dragGesture)
         } else {
             ForEach(rowIndices, id: \.self) { index in
-                HStack(alignment: .top, spacing: Self.gridHorizontalSpacing) {
+                HStack(alignment: .top, spacing: GridDimensions.horizontalSpacing) {
                     ForEach(model.rows[index], id: \.id, content: \.favoriteView)
                 }
             }
@@ -88,7 +86,19 @@ struct FavoritesGrid: View {
         MoreOrLess(isExpanded: $model.showAllFavorites)
             .padding(.top, 2)
             .visibility(model.rows.count > HomePage.favoritesRowCountWhenCollapsed && isHovering ? .visible : .invisible)
+    }
 
+    private enum GridDimensions {
+        static let itemWidth: CGFloat = 64
+        static let itemHeight: CGFloat = 101
+        static let verticalSpacing: CGFloat = 10
+        static let horizontalSpacing: CGFloat = 20
+
+        static let gridWidth: CGFloat = (itemWidth + horizontalSpacing) * CGFloat(HomePage.favoritesPerRow) - horizontalSpacing
+
+        static func gridHeight(for rowCount: Int) -> CGFloat {
+            (itemHeight + verticalSpacing) * CGFloat(rowCount) - verticalSpacing
+        }
     }
 
     // MARK: - Reordering
@@ -106,15 +116,24 @@ struct FavoritesGrid: View {
             let draggedFavoriteIndex = itemIndex(for: value.startLocation)
             draggedFavorite = model.models[draggedFavoriteIndex]
         }
-        guard let draggedFavorite = draggedFavorite, let from = model.models.firstIndex(of: draggedFavorite) else {
+        guard let draggedFavorite = draggedFavorite,
+              case .bookmark = draggedFavorite.favoriteType,
+              let from = model.models.firstIndex(of: draggedFavorite)
+        else {
             return
         }
-        let to = itemIndex(for: value.location)
 
-        if to != from, model.models[to] != draggedFavorite {
+        let to = {
+            let index = itemIndex(for: value.location)
+            return index > from ? index + 1 : index
+        }()
+
+        // `to` technically cannot point to an index outside of models array bounds,
+        // because there's always at least the "Add Favorite" button at the end,
+        // but we're using [safe:] subscript to not crash if the button ever gets removed.
+        if to != from, model.models[safe: to] != draggedFavorite {
             withAnimation(.easeInOut(duration: 0.2)) {
-                model.models.move(fromOffsets: IndexSet(integer: from),
-                                  toOffset: to > from ? to + 1 : to)
+                model.models.move(fromOffsets: IndexSet(integer: from), toOffset: to)
             }
         }
     }
@@ -127,50 +146,59 @@ struct FavoritesGrid: View {
             return
         }
         let from = itemIndex(for: value.startLocation)
-        let index = itemIndex(for: value.location)
+        let to = {
+            let index = itemIndex(for: value.location)
+            return index > from ? index + 1 : index
+        }()
 
-        let correctedIndex = index > from ? index + 1 : index
-        model.moveFavorite(bookmark, correctedIndex)
+        // `to` can point to an index outside of array bounds, in which case it means move to the end.
+        if to != from, model.favorites[safe: to] != bookmark {
+            model.moveFavorite(bookmark, to)
+        }
     }
 
     private func itemIndex(for point: CGPoint) -> Int {
-        let constrainedPoint = pointConstrainedToFavoritesView(point)
+        let pointInView = pointConstrainedToFavoritesView(point)
 
-        let row = row(for: constrainedPoint.y)
-        let column = column(for: constrainedPoint.x)
+        let row = row(for: pointInView.y)
+        let column = column(for: pointInView.x)
         let index = row * HomePage.favoritesPerRow + column
 
         return max(0, min(index, model.favorites.count - 1))
     }
 
     private func pointConstrainedToFavoritesView(_ point: CGPoint) -> CGPoint {
-        let rowCount = model.showAllFavorites ? model.favorites.count / HomePage.favoritesPerRow : 1
-        let width = (Self.gridItemWidth + 20) * CGFloat(HomePage.favoritesPerRow) - 20
-        let height = (Self.gridItemHeight + Self.gridSpacing) * CGFloat(rowCount) - Self.gridSpacing
+        let rowCount: Int = {
+            if model.showAllFavorites {
+                return model.models.count / HomePage.favoritesPerRow
+            }
+            return HomePage.favoritesRowCountWhenCollapsed
+        }()
+        let height = GridDimensions.gridHeight(for: rowCount)
 
         var constrainedPoint = point
-        constrainedPoint.x = max(0, min(width, point.x))
+        constrainedPoint.x = max(0, min(GridDimensions.gridWidth, point.x))
         constrainedPoint.y = max(0, min(height, point.y))
         return constrainedPoint
     }
 
     private func column(for x: CGFloat) -> Int {
-        if x < (Self.gridItemWidth + Self.gridHorizontalSpacing / 2) {
+        if x < (GridDimensions.itemWidth + GridDimensions.horizontalSpacing / 2) {
             return 0
         }
         var column = 1
-        let value = x - (Self.gridItemWidth + Self.gridHorizontalSpacing / 2)
-        column += Int(value) / Int(Self.gridItemWidth + Self.gridHorizontalSpacing)
+        let value = x - (GridDimensions.itemWidth + GridDimensions.horizontalSpacing / 2)
+        column += Int(value) / Int(GridDimensions.itemWidth + GridDimensions.horizontalSpacing)
         return column
     }
 
     private func row(for y: CGFloat) -> Int {
-        if y < (Self.gridItemHeight + Self.gridSpacing / 2) {
+        if y < (GridDimensions.itemHeight + GridDimensions.verticalSpacing / 2) {
             return 0
         }
         var row = 1
-        let value = y - (Self.gridItemHeight + Self.gridSpacing / 2)
-        row += Int(value) / Int(Self.gridItemHeight + Self.gridSpacing)
+        let value = y - (GridDimensions.itemHeight + GridDimensions.verticalSpacing / 2)
+        row += Int(value) / Int(GridDimensions.itemHeight + GridDimensions.verticalSpacing)
         return row
     }
 }
