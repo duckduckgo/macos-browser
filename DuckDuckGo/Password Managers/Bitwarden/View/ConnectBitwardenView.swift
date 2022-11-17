@@ -174,9 +174,7 @@ private struct BitwardenInstallationDetectionView: View {
             })
             .buttonStyle(PlainButtonStyle())
             .frame(width: 156, height: 40)
-
-            Spacer().frame(height: 170)
-
+            
             if bitwardenDetected {
                 HStack {
                     Image("SuccessCheckmark")
