@@ -40,10 +40,9 @@ struct DependencyInjection {
                 }
                 if let none = (Value.self as? AnyOptionalType)?.none as? Value {
 #if DEBUG
-                    if !AppDelegate.isRunningTests {
-                        os_log("Optional dependency %s not provided, this may indicate a bug",
-                               log: .default, type: .debug, "\(Value.self)")
-                    }
+                    assert(AppDelegate.isRunningTests,
+                           "Value not provided for Optional dependency \(Value.self), " +
+                           "initialise it with nil value explicitly if it is intended")
 #endif
                     return none
                 }
@@ -97,10 +96,9 @@ struct DependencyInjection {
 
                 if let none = (Value.self as? AnyOptionalType)?.none as? Value {
 #if DEBUG
-                    if !AppDelegate.isRunningTests {
-                        os_log("Optional dependency %s not provided, this may indicate a bug",
-                               log: .default, type: .debug, "\(Client.self).\(Value.self)")
-                    }
+                    assert(AppDelegate.isRunningTests,
+                           "Value not provided for Optional dependency \(Client.self).\(Value.self), " +
+                           "initialise it with nil value explicitly if it is intended")
 #endif
                     return none
                 }
