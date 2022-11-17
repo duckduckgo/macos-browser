@@ -93,7 +93,7 @@ struct FavoritesGrid: View {
         return (isHovering && model.models.count > thresholdFavoritesCount) ? .visible : .invisible
     }
 
-    private enum GridDimensions {
+    enum GridDimensions {
         static let itemWidth: CGFloat = 64
         static let itemHeight: CGFloat = 101
         static let verticalSpacing: CGFloat = 10
@@ -220,7 +220,7 @@ fileprivate struct FavoritesGridAddButton: View {
                 Image("Add")
                     .resizable()
                     .frame(width: 22, height: 22)
-            }.frame(width: 64, height: 64)
+            }.frame(width: FavoritesGrid.GridDimensions.itemWidth, height: FavoritesGrid.GridDimensions.itemWidth)
         }
         .link {
             model.addNew()
@@ -237,10 +237,10 @@ fileprivate struct FavoritesGridGhostButton: View {
         VStack {
             RoundedRectangle(cornerRadius: 12)
                 .stroke(Color("HomeFavoritesGhostColor"), style: StrokeStyle(lineWidth: 1.5, dash: [4.0, 2.0]))
-                .frame(width: 64, height: 64)
+                .frame(width: FavoritesGrid.GridDimensions.itemWidth, height: FavoritesGrid.GridDimensions.itemWidth)
             Spacer()
         }
-        .frame(width: 64)
+        .frame(width: FavoritesGrid.GridDimensions.itemWidth, height: FavoritesGrid.GridDimensions.itemHeight)
         
     }
     
@@ -267,7 +267,7 @@ struct FavoriteTemplate: View {
                         .padding(9)
                 }
             }
-            .frame(width: 64, height: 64)
+            .frame(width: FavoritesGrid.GridDimensions.itemWidth, height: FavoritesGrid.GridDimensions.itemWidth)
             .clipped()
 
             Text(title)
@@ -277,8 +277,8 @@ struct FavoriteTemplate: View {
                 .frame(height: 32, alignment: .top)
 
         }
-        .frame(width: 64)
-        .frame(maxWidth: 64)
+        .frame(width: FavoritesGrid.GridDimensions.itemWidth)
+        .frame(maxWidth: FavoritesGrid.GridDimensions.itemWidth)
         .onHover { isHovering in
             self.isHovering = isHovering
             
