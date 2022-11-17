@@ -644,10 +644,8 @@
 		B647EFB02922405C00BA628D /* DependencyInjection.swift in Sources */ = {isa = PBXBuildFile; fileRef = B647EFAF2922405C00BA628D /* DependencyInjection.swift */; };
 		B647EFB22922408000BA628D /* DependencyProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B647EFB12922408000BA628D /* DependencyProviderTests.swift */; };
 		B647EFB5292253A400BA628D /* TabExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B647EFB4292253A400BA628D /* TabExtensions.swift */; };
-		B647EFB7292253BA00BA628D /* Tab+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B647EFB6292253BA00BA628D /* Tab+Extensions.swift */; };
 		B647EFB92922555200BA628D /* TabPrintExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B647EFB82922555200BA628D /* TabPrintExtension.swift */; };
 		B647EFBB2922584B00BA628D /* AdClickAttribution.swift in Sources */ = {isa = PBXBuildFile; fileRef = B647EFBA2922584B00BA628D /* AdClickAttribution.swift */; };
-		B647EFBD29225C9D00BA628D /* TestTabDependencies.swift in Sources */ = {isa = PBXBuildFile; fileRef = B647EFBC29225C9D00BA628D /* TestTabDependencies.swift */; };
 		B647EFC32925EA8100BA628D /* XCTestCaseExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B647EFC22925EA8100BA628D /* XCTestCaseExtension.swift */; };
 		B64C84DE2692D7400048FEBE /* PermissionAuthorization.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B64C84DD2692D7400048FEBE /* PermissionAuthorization.storyboard */; };
 		B64C84E32692DC9F0048FEBE /* PermissionAuthorizationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B64C84E22692DC9F0048FEBE /* PermissionAuthorizationViewController.swift */; };
@@ -1497,10 +1495,8 @@
 		B647EFAF2922405C00BA628D /* DependencyInjection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DependencyInjection.swift; sourceTree = "<group>"; };
 		B647EFB12922408000BA628D /* DependencyProviderTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DependencyProviderTests.swift; sourceTree = "<group>"; };
 		B647EFB4292253A400BA628D /* TabExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabExtensions.swift; sourceTree = "<group>"; };
-		B647EFB6292253BA00BA628D /* Tab+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Tab+Extensions.swift"; sourceTree = "<group>"; };
 		B647EFB82922555200BA628D /* TabPrintExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabPrintExtension.swift; sourceTree = "<group>"; };
 		B647EFBA2922584B00BA628D /* AdClickAttribution.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdClickAttribution.swift; sourceTree = "<group>"; };
-		B647EFBC29225C9D00BA628D /* TestTabDependencies.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestTabDependencies.swift; sourceTree = "<group>"; };
 		B647EFC22925EA8100BA628D /* XCTestCaseExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XCTestCaseExtension.swift; sourceTree = "<group>"; };
 		B64C84DD2692D7400048FEBE /* PermissionAuthorization.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = PermissionAuthorization.storyboard; sourceTree = "<group>"; };
 		B64C84E22692DC9F0048FEBE /* PermissionAuthorizationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionAuthorizationViewController.swift; sourceTree = "<group>"; };
@@ -2758,7 +2754,6 @@
 			isa = PBXGroup;
 			children = (
 				4B723E1726B000DC00E14D75 /* TemporaryFileCreator.swift */,
-				B647EFBC29225C9D00BA628D /* TestTabDependencies.swift */,
 				4BBF09222830812900EE1418 /* FileSystemDSL.swift */,
 				4BBF0924283083EC00EE1418 /* FileSystemDSLTests.swift */,
 				4B9292C42667104B00AD2C21 /* CoreDataTestUtilities.swift */,
@@ -3327,7 +3322,6 @@
 				85D438B5256E7C9E00F3BAF8 /* ContextMenuUserScript.swift */,
 				4BB88B4425B7B55C006F6B06 /* DebugUserScript.swift */,
 				AA9FF95824A1ECF20039E328 /* Tab.swift */,
-				B647EFB6292253BA00BA628D /* Tab+Extensions.swift */,
 				F4A6198B283CFFBB007F2080 /* ContentScopeFeatureFlagging.swift */,
 				983DFB2428B67036006B7E34 /* UserContentUpdating.swift */,
 			);
@@ -4797,7 +4791,6 @@
 				AAECA42024EEA4AC00EFA63A /* IndexPathExtension.swift in Sources */,
 				4BE65478271FCD41008D1D63 /* PasswordManagementNoteItemView.swift in Sources */,
 				AA5C8F632591021700748EB7 /* NSApplicationExtension.swift in Sources */,
-				B647EFB7292253BA00BA628D /* Tab+Extensions.swift in Sources */,
 				AA9E9A5625A3AE8400D1959D /* NSWindowExtension.swift in Sources */,
 				AAC5E4C725D6A6E8007F5990 /* BookmarkPopover.swift in Sources */,
 				37CC53F027E8D1440028713D /* PreferencesDownloadsView.swift in Sources */,
@@ -5243,7 +5236,6 @@
 				EA8AE76A279FBDB20078943E /* ClickToLoadTDSTests.swift in Sources */,
 				B63ED0DA26AE7AF400A9DAD1 /* PermissionManagerMock.swift in Sources */,
 				AA9C362825518C44004B1BA3 /* WebsiteDataStoreMock.swift in Sources */,
-				B647EFBD29225C9D00BA628D /* TestTabDependencies.swift in Sources */,
 				3776582D27F71652009A6B35 /* WebsiteBreakageReportTests.swift in Sources */,
 				4B723E0826B0003E00E14D75 /* MockSecureVault.swift in Sources */,
 				37CD54B527F1AC1300F1F7B9 /* PreferencesSidebarModelTests.swift in Sources */,

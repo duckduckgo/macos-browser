@@ -57,8 +57,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         @Injected(default: .shared, .testable) static var privatePlayer: PrivatePlayer
         @Injected(default: .shared) static var cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter?
         @Injected(default: .shared) static var workspace: NSWorkspace
-
-        @Injected(default: TabExtensionsBuilder()) static var extensionsBuilder: ExtensionsBuilder
     }
 
     enum TabContent: Equatable {
@@ -172,7 +170,18 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         return Dependencies.pinnedTabsManager.isTabPinned(self)
     }
 
-    private(set) var extensions = DynamicTabExtensions()
+    private let webViewConfiguration: WKWebViewConfiguration
+    private(set) var extensions: TabExtensions!
+
+    var userContentController: UserContentController {
+        (webViewConfiguration.userContentController as? UserContentController)!
+    }
+    var userScripts: UserScripts? {
+        userContentController.contentBlockingAssets?.userScripts as? UserScripts
+    }
+    var userScriptsPublisher: AnyPublisher<UserScripts?, Never> {
+        userContentController.$contentBlockingAssets.map { $0?.userScripts as? UserScripts }.eraseToAnyPublisher()
+    }
 
     init(content: TabContent,
          webViewConfiguration: WKWebViewConfiguration? = nil,
@@ -203,17 +212,18 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         self.currentDownload = currentDownload
 
         let configuration = webViewConfiguration ?? WKWebViewConfiguration()
-        configuration.applyStandardConfiguration()
-        
+        self.webViewConfiguration = configuration
+
         webView = WebView(frame: webViewFrame, configuration: configuration)
         webView.allowsLinkPreview = false
         permissions = PermissionModel(webView: webView)
 
         super.init()
 
-        extensions = Dependencies.extensionsBuilder.buildExtensions(for: self)
-
+        configuration.applyStandardConfiguration(with: self)
+        extensions = TabExtensions.buildForTab(self)
         setupWebView(shouldLoadInBackground: shouldLoadInBackground)
+
         if favicon == nil {
             handleFavicon()
         }
@@ -242,16 +252,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         webView.configuration.userContentController.removeAllUserScripts()
 
         Dependencies.cbaTimeReporter?.tabWillClose(self.instrumentation.currentTabIdentifier)
-    }
-
-    var userContentController: UserContentController? {
-        webView.configuration.userContentController as? UserContentController
-    }
-    var userScripts: UserScripts? {
-        userContentController?.contentBlockingAssets?.userScripts as? UserScripts
-    }
-    var userScriptsPublisher: AnyPublisher<UserScripts?, Never>? {
-        userContentController?.$contentBlockingAssets.map { $0?.userScripts as? UserScripts }.eraseToAnyPublisher()
     }
 
     // MARK: - Event Publishers
@@ -497,10 +497,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     @discardableResult
     private func setFBProtection(enabled: Bool) -> Bool {
         guard self.fbBlockingEnabled != enabled else { return false }
-        guard let userContentController = userContentController else {
-            assertionFailure("Missing UserContentController")
-            return false
-        }
         if enabled {
             do {
                 try userContentController.enableGlobalContentRuleList(withIdentifier: ContentBlockerRulesLists.Constants.clickToLoadRulesListName)
@@ -682,7 +678,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         webView.navigationDelegate = self
         webView.allowsBackForwardNavigationGestures = true
         webView.allowsMagnification = true
-        userContentController?.delegate = self
 
         superviewObserver = webView.observe(\.superview, options: .old) { [weak self] _, change in
             // if the webView is being added to superview - reload if needed
@@ -968,7 +963,7 @@ extension Tab: ContentBlockerRulesUserScriptDelegate {
     
     func contentBlockerRulesUserScript(_ script: ContentBlockerRulesUserScript, detectedTracker tracker: DetectedRequest) {
         trackerInfo?.add(detectedTracker: tracker)
-        self.extensions.adClickAttribution.logic.onRequestDetected(request: tracker)
+        self.extensions.adClickAttribution?.logic.onRequestDetected(request: tracker)
         guard let url = URL(string: tracker.pageUrl) else { return }
         Dependencies.historyCoordinating.addDetectedTracker(tracker, onURL: url)
     }
@@ -1178,7 +1173,7 @@ extension Tab: WKNavigationDelegate {
         }
         
         if navigationAction.isTargetingMainFrame, navigationAction.navigationType == .backForward {
-            self.extensions.adClickAttribution.logic.onBackForwardNavigation(mainFrameURL: webView.url)
+            self.extensions.adClickAttribution?.logic.onBackForwardNavigation(mainFrameURL: webView.url)
         }
         
         if navigationAction.isTargetingMainFrame, navigationAction.navigationType != .backForward {
@@ -1299,9 +1294,9 @@ extension Tab: WKNavigationDelegate {
     @MainActor
     private func prepareForContentBlocking() async {
         // Ensure Content Blocking Assets (WKContentRuleList&UserScripts) are installed
-        if userContentController?.contentBlockingAssetsInstalled == false {
+        if !userContentController.contentBlockingAssetsInstalled {
             Dependencies.cbaTimeReporter?.tabWillWaitForRulesCompilation(self.instrumentation.currentTabIdentifier)
-            await userContentController?.awaitContentBlockingAssetsInstalled()
+            await userContentController.awaitContentBlockingAssetsInstalled()
             Dependencies.cbaTimeReporter?.reportWaitTimeForTabFinishedWaitingForRules(self.instrumentation.currentTabIdentifier)
         } else {
             Dependencies.cbaTimeReporter?.reportNavigationDidNotWaitForRules()
@@ -1359,10 +1354,10 @@ extension Tab: WKNavigationDelegate {
         }
         
         if navigationResponse.isForMainFrame && isSuccessfulResponse {
-            self.extensions.adClickAttribution.detection.on2XXResponse(url: webView.url)
+            self.extensions.adClickAttribution?.detection.on2XXResponse(url: webView.url)
         }
         
-        await self.extensions.adClickAttribution.logic.onProvisionalNavigation()
+        await self.extensions.adClickAttribution?.logic.onProvisionalNavigation()
 
         return .allow
     }
@@ -1378,8 +1373,7 @@ extension Tab: WKNavigationDelegate {
         linkProtection.cancelOngoingExtraction()
         linkProtection.setMainFrameUrl(webView.url)
         referrerTrimming.onBeginNavigation(to: webView.url)
-        self.extensions.adClickAttribution.detection.onStartNavigation(url: webView.url)
-        
+        self.extensions.adClickAttribution?.detection.onStartNavigation(url: webView.url)
     }
 
     @MainActor
@@ -1390,8 +1384,8 @@ extension Tab: WKNavigationDelegate {
         if isAMPProtectionExtracting { isAMPProtectionExtracting = false }
         linkProtection.setMainFrameUrl(nil)
         referrerTrimming.onFinishNavigation()
-        self.extensions.adClickAttribution.detection.onDidFinishNavigation(url: webView.url)
-        self.extensions.adClickAttribution.logic.onDidFinishNavigation(host: webView.url?.host)
+        self.extensions.adClickAttribution?.detection.onDidFinishNavigation(url: webView.url)
+        self.extensions.adClickAttribution?.logic.onDidFinishNavigation(host: webView.url?.host)
     }
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
@@ -1403,7 +1397,7 @@ extension Tab: WKNavigationDelegate {
         invalidateSessionStateData()
         linkProtection.setMainFrameUrl(nil)
         referrerTrimming.onFailedNavigation()
-        self.extensions.adClickAttribution.detection.onDidFailNavigation()
+        self.extensions.adClickAttribution?.detection.onDidFailNavigation()
         webViewDidFailNavigationPublisher.send()
     }
 
@@ -1420,7 +1414,7 @@ extension Tab: WKNavigationDelegate {
         isBeingRedirected = false
         linkProtection.setMainFrameUrl(nil)
         referrerTrimming.onFailedNavigation()
-        self.extensions.adClickAttribution.detection.onDidFailNavigation()
+        self.extensions.adClickAttribution?.detection.onDidFailNavigation()
         webViewDidFailNavigationPublisher.send()
     }
 

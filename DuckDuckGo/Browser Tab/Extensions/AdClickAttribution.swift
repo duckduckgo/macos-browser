@@ -20,7 +20,7 @@ import Combine
 import Foundation
 import BrowserServicesKit
 
-final class AdClickAttributionTabExtension: TabExtension {
+final class AdClickAttributionTabExtension {
 
     struct Dependencies {
         @Injected(default: ContentBlocking.shared.contentBlockingManager.currentRules) static var currentRules: [ContentBlockerRulesManager.Rules]
@@ -49,11 +49,13 @@ final class AdClickAttributionTabExtension: TabExtension {
         logic.delegate = self
         detection.delegate = logic
 
-        if let state = tab.parentTab?.adClickAttribution?.state {
+        if let state = tab.parentTab?.extensions.adClickAttribution?.state {
             logic.applyInheritedAttribution(state: state)
         }
 
-        tab.userContentController!.$contentBlockingAssets
+        tab.userContentController.$contentBlockingAssets
+            .compactMap { $0 }
+            .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 self?.logic.onRulesChanged(latestRules: Dependencies.currentRules)
             }
@@ -116,8 +118,4 @@ extension AdClickAttributionTabExtension: AdClickAttributionLogicDelegate {
         }
     }
 
-}
-
-private extension Tab {
-    var adClickAttribution: AdClickAttributionTabExtension? { extensions.adClickAttribution }
 }
