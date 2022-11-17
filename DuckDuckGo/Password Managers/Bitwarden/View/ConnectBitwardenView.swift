@@ -212,6 +212,10 @@ private struct ConnectToBitwardenView: View {
                 Text(UserText.openBitwadenAndLogInOrUnlock)
                 Spacer()
             }
+
+            Button(UserText.openBitwaden) {
+                viewModel.process(action: .openBitwarden)
+            }
             
             HStack {
                 NumberedBadge(value: 2)
@@ -232,10 +236,6 @@ private struct ConnectToBitwardenView: View {
             }
             
             Image("BitwardenSettingsIllustration")
-            
-            Button(UserText.openBitwaden) {
-                viewModel.process(action: .openBitwarden)
-            }
             
             if canConnect {
                 HStack {
