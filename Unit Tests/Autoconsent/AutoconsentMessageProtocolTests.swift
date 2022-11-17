@@ -16,14 +16,23 @@
 //  limitations under the License.
 //
 
+import BrowserServicesKit
+import Common
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 @available(macOS 11, *)
 class AutoconsentMessageProtocolTests: XCTestCase {
     let userScript = AutoconsentUserScript(
-        scriptSource: DefaultScriptSourceProvider(),
-        config: ContentBlocking.shared.privacyConfigurationManager.privacyConfig
+        scriptSource: DefaultScriptSourceProvider(privacyConfigurationManager: MockPrivacyConfigurationManager(),
+                                                  contentBlockingManager: ContentBlockerRulesManagerMock(),
+                                                  trackerDataManager: TrackerDataManager(etag: DefaultConfigurationStorage.shared.loadEtag(for: .trackerRadar),
+                                                                                         data: DefaultConfigurationStorage.shared.loadData(for: .trackerRadar),
+                                                                                         embeddedDataProvider: AppTrackerDataSetProvider(),
+                                                                                         errorReporting: nil),
+
+                                                  tld: TLD()),
+        config: MockPrivacyConfiguration()
     )
     
     override func setUp() {

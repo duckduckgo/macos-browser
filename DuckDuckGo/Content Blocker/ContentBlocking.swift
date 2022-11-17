@@ -26,7 +26,7 @@ import Common
 final class ContentBlocking {
     static let shared = ContentBlocking()
 
-    let privacyConfigurationManager: PrivacyConfigurationManager
+    let privacyConfigurationManager: PrivacyConfigurationManager & AnyObject
     let trackerDataManager: TrackerDataManager
     let contentBlockingManager: ContentBlockerRulesManager
     let userContentUpdating: UserContentUpdating
@@ -128,25 +128,8 @@ final class ContentBlocking {
     }
     
     // MARK: - Ad Click Attribution
-    
-    public func makeAdClickAttributionDetection() -> AdClickAttributionDetection {
-        AdClickAttributionDetection(feature: adClickAttribution,
-                                    tld: tld,
-                                    eventReporting: attributionEvents,
-                                    errorReporting: attributionDebugEvents,
-                                    log: OSLog.attribution)
-    }
-    
-    public func makeAdClickAttributionLogic() -> AdClickAttributionLogic {
-        AdClickAttributionLogic(featureConfig: adClickAttribution,
-                                rulesProvider: adClickAttributionRulesProvider,
-                                tld: tld,
-                                eventReporting: attributionEvents,
-                                errorReporting: attributionDebugEvents,
-                                log: OSLog.attribution)
-    }
-    
-    private let attributionEvents = EventMapping<AdClickAttributionEvents> { event, _, parameters, _ in
+
+    let attributionEvents = EventMapping<AdClickAttributionEvents> { event, _, parameters, _ in
         let domainEvent: Pixel.Event
         switch event {
         case .adAttributionDetected:
@@ -158,7 +141,7 @@ final class ContentBlocking {
         Pixel.fire(domainEvent, withAdditionalParameters: parameters ?? [:])
     }
     
-    private let attributionDebugEvents = EventMapping<AdClickAttributionDebugEvents> { event, _, _, _ in
+    let attributionDebugEvents = EventMapping<AdClickAttributionDebugEvents> { event, _, _, _ in
         let domainEvent: Pixel.Event.Debug
         switch event {
         case .adAttributionCompilationFailedForAttributedRulesList:
@@ -188,7 +171,7 @@ final class ContentBlocking {
     }
 }
 
-protocol ContentBlockerRulesManagerProtocol: AnyObject {
+protocol ContentBlockerRulesManagerProtocol: CompiledRuleListsSource {
     var updatesPublisher: AnyPublisher<ContentBlockerRulesManager.UpdateEvent, Never> { get }
     var currentRules: [ContentBlockerRulesManager.Rules] { get }
 }

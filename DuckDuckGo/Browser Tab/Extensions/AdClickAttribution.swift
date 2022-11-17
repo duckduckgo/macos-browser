@@ -16,17 +16,62 @@
 //  limitations under the License.
 //
 
+import os.log
 import Combine
+import Common
 import Foundation
 import BrowserServicesKit
 
-final class AdClickAttributionTabExtension: TabExtension {
+final class AdClickAttributionTabExtension {
 
     private weak var tab: Tab?
     private var cancellables = Set<AnyCancellable>()
 
-    let detection = ContentBlocking.shared.makeAdClickAttributionDetection()
-    let logic = ContentBlocking.shared.makeAdClickAttributionLogic()
+    private static func makeAdClickAttributionFeature(with privacyConfigurationManager: PrivacyConfigurationManaging) -> AdClickAttributionFeature {
+        AdClickAttributionFeature(with: privacyConfigurationManager)
+    }
+    private static func makeAdClickAttributionDetection(featureConfig: AdClickAttributing) -> AdClickAttributionDetection {
+#if DEBUG
+        if AppDelegate.isRunningTests {
+            return AdClickAttributionDetection(feature: featureConfig,
+                                               tld: TLD(),
+                                               eventReporting: nil,
+                                               errorReporting: nil,
+                                               log: .disabled)
+        }
+#endif
+        return AdClickAttributionDetection(feature: featureConfig,
+                                           tld: ContentBlocking.shared.tld,
+                                           eventReporting: ContentBlocking.shared.attributionEvents,
+                                           errorReporting: ContentBlocking.shared.attributionDebugEvents,
+                                           log: OSLog.attribution)
+
+    }
+
+    private static func makeAdClickAttributionLogic(featureConfig: AdClickAttributing) -> AdClickAttributionLogic {
+#if DEBUG
+        if AppDelegate.isRunningTests {
+            let rulesProvider: AdClickAttributionRulesProviding =
+                ((NSClassFromString("EmptyAttributionRulesProver") as? (NSObject).Type)!.init() as? AdClickAttributionRulesProviding)!
+
+            return AdClickAttributionLogic(featureConfig: featureConfig,
+                                           rulesProvider: rulesProvider,
+                                           tld: TLD(),
+                                           eventReporting: nil,
+                                           errorReporting: nil,
+                                           log: .disabled)
+        }
+#endif
+        return AdClickAttributionLogic(featureConfig: ContentBlocking.shared.adClickAttribution,
+                                       rulesProvider: ContentBlocking.shared.adClickAttributionRulesProvider,
+                                       tld: ContentBlocking.shared.tld,
+                                       eventReporting: ContentBlocking.shared.attributionEvents,
+                                       errorReporting: ContentBlocking.shared.attributionDebugEvents,
+                                       log: OSLog.attribution)
+    }
+
+    let detection: AdClickAttributionDetection
+    let logic: AdClickAttributionLogic
 
     static var currentRules: () -> [ContentBlockerRulesManager.Rules] = { ContentBlocking.shared.contentBlockingManager.currentRules }
 
@@ -36,6 +81,9 @@ final class AdClickAttributionTabExtension: TabExtension {
 
     init(tab: Tab) {
         self.tab = tab
+        let adClickAttributionFeature = Self.makeAdClickAttributionFeature(with: tab.privacyConfigurationManager)
+        self.detection = Self.makeAdClickAttributionDetection(featureConfig: adClickAttributionFeature)
+        self.logic = Self.makeAdClickAttributionLogic(featureConfig: adClickAttributionFeature)
         initAttributionLogic(tab: tab)
     }
 
@@ -47,11 +95,13 @@ final class AdClickAttributionTabExtension: TabExtension {
         logic.delegate = self
         detection.delegate = logic
 
-        if let state = tab.parentTab?.adClickAttribution?.state {
+        if let state = tab.parentTab?.extensions.adClickAttribution?.state {
             logic.applyInheritedAttribution(state: state)
         }
 
-        tab.userContentController!.$contentBlockingAssets
+        tab.userContentController.$contentBlockingAssets
+            .compactMap { $0 }
+            .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 self?.logic.onRulesChanged(latestRules: Self.currentRules())
             }
@@ -114,8 +164,4 @@ extension AdClickAttributionTabExtension: AdClickAttributionLogicDelegate {
         }
     }
 
-}
-
-private extension Tab {
-    var adClickAttribution: AdClickAttributionTabExtension? { extensions.adClickAttribution }
 }

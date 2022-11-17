@@ -20,16 +20,6 @@ import Foundation
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-final class PrivatePlayerPreferencesPersistorMock: PrivatePlayerPreferencesPersistor {
-    var privatePlayerMode: PrivatePlayerMode
-    var youtubeOverlayInteracted: Bool
-
-    init(privatePlayerMode: PrivatePlayerMode = .alwaysAsk, youtubeOverlayInteracted: Bool = false) {
-        self.privatePlayerMode = privatePlayerMode
-        self.youtubeOverlayInteracted = youtubeOverlayInteracted
-    }
-}
-
 final class PrivatePlayerPreferencesTests: XCTestCase {
 
     func testWhenInitializedThenItLoadsPersistedValues() throws {

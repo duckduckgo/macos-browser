@@ -637,7 +637,6 @@
 		B642738227B65BAC0005DFD1 /* SecureVaultErrorReporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B642738127B65BAC0005DFD1 /* SecureVaultErrorReporter.swift */; };
 		B643BF1427ABF772000BACEC /* NSWorkspaceExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B643BF1327ABF772000BACEC /* NSWorkspaceExtension.swift */; };
 		B647EFB5292253A400BA628D /* TabExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B647EFB4292253A400BA628D /* TabExtensions.swift */; };
-		B647EFB7292253BA00BA628D /* Tab+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B647EFB6292253BA00BA628D /* Tab+Extensions.swift */; };
 		B647EFB92922555200BA628D /* TabPrintExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B647EFB82922555200BA628D /* TabPrintExtension.swift */; };
 		B647EFBB2922584B00BA628D /* AdClickAttribution.swift in Sources */ = {isa = PBXBuildFile; fileRef = B647EFBA2922584B00BA628D /* AdClickAttribution.swift */; };
 		B64C84DE2692D7400048FEBE /* PermissionAuthorization.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B64C84DD2692D7400048FEBE /* PermissionAuthorization.storyboard */; };
@@ -747,6 +746,11 @@
 		B6A9E4A3261475C70067D1B9 /* AppUsageActivityMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A9E4A2261475C70067D1B9 /* AppUsageActivityMonitor.swift */; };
 		B6AAAC2D260330580029438D /* PublishedAfter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6AAAC2C260330580029438D /* PublishedAfter.swift */; };
 		B6AAAC3E26048F690029438D /* RandomAccessCollectionExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6AAAC3D26048F690029438D /* RandomAccessCollectionExtension.swift */; };
+		B6AE39F129373AF200C37AA4 /* EmptyAttributionRulesProver.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6AE39F029373AF200C37AA4 /* EmptyAttributionRulesProver.swift */; };
+		B6AE39F329374AEC00C37AA4 /* OHHTTPStubs in Frameworks */ = {isa = PBXBuildFile; productRef = B6AE39F229374AEC00C37AA4 /* OHHTTPStubs */; };
+		B6AE39F529374AEC00C37AA4 /* OHHTTPStubsSwift in Frameworks */ = {isa = PBXBuildFile; productRef = B6AE39F429374AEC00C37AA4 /* OHHTTPStubsSwift */; };
+		B6AE39F629374B8E00C37AA4 /* ContentBlockerRulesManagerMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B610F2E727AA397100FCEBE9 /* ContentBlockerRulesManagerMock.swift */; };
+		B6AE39F729374B9900C37AA4 /* PrivatePlayerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3714B1E828EDBAAB0056C57A /* PrivatePlayerTests.swift */; };
 		B6AE74342609AFCE005B9B1A /* ProgressEstimationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6AE74332609AFCE005B9B1A /* ProgressEstimationTests.swift */; };
 		B6B1E87B26D381710062C350 /* DownloadListCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B1E87A26D381710062C350 /* DownloadListCoordinator.swift */; };
 		B6B1E87E26D5DA0E0062C350 /* DownloadsPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B1E87D26D5DA0E0062C350 /* DownloadsPopover.swift */; };
@@ -1485,7 +1489,6 @@
 		B642738127B65BAC0005DFD1 /* SecureVaultErrorReporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecureVaultErrorReporter.swift; sourceTree = "<group>"; };
 		B643BF1327ABF772000BACEC /* NSWorkspaceExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSWorkspaceExtension.swift; sourceTree = "<group>"; };
 		B647EFB4292253A400BA628D /* TabExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabExtensions.swift; sourceTree = "<group>"; };
-		B647EFB6292253BA00BA628D /* Tab+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Tab+Extensions.swift"; sourceTree = "<group>"; };
 		B647EFB82922555200BA628D /* TabPrintExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabPrintExtension.swift; sourceTree = "<group>"; };
 		B647EFBA2922584B00BA628D /* AdClickAttribution.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdClickAttribution.swift; sourceTree = "<group>"; };
 		B64C84DD2692D7400048FEBE /* PermissionAuthorization.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = PermissionAuthorization.storyboard; sourceTree = "<group>"; };
@@ -1598,6 +1601,7 @@
 		B6A9E4A2261475C70067D1B9 /* AppUsageActivityMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppUsageActivityMonitor.swift; sourceTree = "<group>"; };
 		B6AAAC2C260330580029438D /* PublishedAfter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PublishedAfter.swift; sourceTree = "<group>"; };
 		B6AAAC3D26048F690029438D /* RandomAccessCollectionExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomAccessCollectionExtension.swift; sourceTree = "<group>"; };
+		B6AE39F029373AF200C37AA4 /* EmptyAttributionRulesProver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyAttributionRulesProver.swift; sourceTree = "<group>"; };
 		B6AE74332609AFCE005B9B1A /* ProgressEstimationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressEstimationTests.swift; sourceTree = "<group>"; };
 		B6B1E87A26D381710062C350 /* DownloadListCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadListCoordinator.swift; sourceTree = "<group>"; };
 		B6B1E87D26D5DA0E0062C350 /* DownloadsPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadsPopover.swift; sourceTree = "<group>"; };
@@ -1666,6 +1670,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B6AE39F329374AEC00C37AA4 /* OHHTTPStubs in Frameworks */,
+				B6AE39F529374AEC00C37AA4 /* OHHTTPStubsSwift in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2262,6 +2268,7 @@
 				EA8AE769279FBDB20078943E /* ClickToLoadTDSTests.swift */,
 				B610F2E527AA388100FCEBE9 /* ContentBlockingUpdatingTests.swift */,
 				B610F2E727AA397100FCEBE9 /* ContentBlockerRulesManagerMock.swift */,
+				B6AE39F029373AF200C37AA4 /* EmptyAttributionRulesProver.swift */,
 			);
 			path = "Content Blocker";
 			sourceTree = "<group>";
@@ -3312,7 +3319,6 @@
 				4BB88B4425B7B55C006F6B06 /* DebugUserScript.swift */,
 				AA9FF95824A1ECF20039E328 /* Tab.swift */,
 				B6DA06E32913ECEE00225DE2 /* ContextMenuManager.swift */,
-				B647EFB6292253BA00BA628D /* Tab+Extensions.swift */,
 				F4A6198B283CFFBB007F2080 /* ContentScopeFeatureFlagging.swift */,
 				983DFB2428B67036006B7E34 /* UserContentUpdating.swift */,
 				B6DA06E7291401D700225DE2 /* WKMenuItemIdentifier.swift */,
@@ -3849,7 +3855,6 @@
 				AADE11BF26D916D70032D8A7 /* StringExtensionTests.swift */,
 				85F69B3B25EDE81F00978E59 /* URLExtensionTests.swift */,
 				4B8AD0B027A86D9200AE44D6 /* WKWebsiteDataStoreExtensionTests.swift */,
-				B647EFC22925EA8100BA628D /* XCTestCaseExtension.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -4219,6 +4224,10 @@
 				4B1AD8A325FC27E200261379 /* PBXTargetDependency */,
 			);
 			name = "Integration Tests";
+			packageProductDependencies = (
+				B6AE39F229374AEC00C37AA4 /* OHHTTPStubs */,
+				B6AE39F429374AEC00C37AA4 /* OHHTTPStubsSwift */,
+			);
 			productName = "Integration Tests";
 			productReference = 4B1AD89D25FC27E200261379 /* Integration Tests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
@@ -4503,7 +4512,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B6AE39F629374B8E00C37AA4 /* ContentBlockerRulesManagerMock.swift in Sources */,
 				B662D3DF275616FF0035D4D6 /* EncryptionKeyStoreMock.swift in Sources */,
+				B6AE39F729374B9900C37AA4 /* PrivatePlayerTests.swift in Sources */,
 				4B1AD8E225FC390B00261379 /* EncryptionMocks.swift in Sources */,
 				B6DA06E22913AEDC00225DE2 /* TestNavigationDelegate.swift in Sources */,
 				B31055CE27A1BA44001AC618 /* AutoconsentBackgroundTests.swift in Sources */,
@@ -4781,7 +4792,6 @@
 				AAECA42024EEA4AC00EFA63A /* IndexPathExtension.swift in Sources */,
 				4BE65478271FCD41008D1D63 /* PasswordManagementNoteItemView.swift in Sources */,
 				AA5C8F632591021700748EB7 /* NSApplicationExtension.swift in Sources */,
-				B647EFB7292253BA00BA628D /* Tab+Extensions.swift in Sources */,
 				AA9E9A5625A3AE8400D1959D /* NSWindowExtension.swift in Sources */,
 				AAC5E4C725D6A6E8007F5990 /* BookmarkPopover.swift in Sources */,
 				37CC53F027E8D1440028713D /* PreferencesDownloadsView.swift in Sources */,
@@ -5178,7 +5188,6 @@
 				4BA1A6FE258C5C1300F6F690 /* EncryptedValueTransformerTests.swift in Sources */,
 				85F69B3C25EDE81F00978E59 /* URLExtensionTests.swift in Sources */,
 				B6DA44112616C0FC00DD1EC2 /* PixelTests.swift in Sources */,
-				B647EFC32925EA8100BA628D /* XCTestCaseExtension.swift in Sources */,
 				4B9292BA2667103100AD2C21 /* BookmarkNodePathTests.swift in Sources */,
 				4B9292C02667103100AD2C21 /* BookmarkManagedObjectTests.swift in Sources */,
 				373A1AB228451ED400586521 /* BookmarksHTMLImporterTests.swift in Sources */,
@@ -5187,6 +5196,7 @@
 				AA652CCE25DD9071009059CC /* BookmarkListTests.swift in Sources */,
 				859E7D6D274548F2009C2B69 /* BookmarksExporterTests.swift in Sources */,
 				B6A5A2A825BAA35500AA7ADA /* WindowManagerStateRestorationTests.swift in Sources */,
+				B6AE39F129373AF200C37AA4 /* EmptyAttributionRulesProver.swift in Sources */,
 				4BB99D1126FE1A84001E4761 /* SafariBookmarksReaderTests.swift in Sources */,
 				4BBF0925283083EC00EE1418 /* FileSystemDSLTests.swift in Sources */,
 				4B11060A25903EAC0039B979 /* CoreDataEncryptionTests.swift in Sources */,
@@ -6339,8 +6349,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				kind = exactVersion;
-				version = 36.1.1;
+				kind = revision;
+				revision = 45b4a7073ffdc351c8c03809cd4ef5cc45742a06;
 			};
 		};
 		AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
@@ -6386,6 +6396,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */;
 			productName = Sparkle;
+		};
+		B6AE39F229374AEC00C37AA4 /* OHHTTPStubs */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B6DA44152616C13800DD1EC2 /* XCRemoteSwiftPackageReference "OHHTTPStubs" */;
+			productName = OHHTTPStubs;
+		};
+		B6AE39F429374AEC00C37AA4 /* OHHTTPStubsSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B6DA44152616C13800DD1EC2 /* XCRemoteSwiftPackageReference "OHHTTPStubs" */;
+			productName = OHHTTPStubsSwift;
 		};
 		B6DA44162616C13800DD1EC2 /* OHHTTPStubs */ = {
 			isa = XCSwiftPackageProductDependency;

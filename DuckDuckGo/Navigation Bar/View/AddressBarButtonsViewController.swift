@@ -592,7 +592,7 @@ final class AddressBarButtonsViewController: NSViewController {
 
     private func subscribePrivacyDashboardPendingUpdates() {
         privacyDashboadPendingUpdatesCancellable?.cancel()
-
+        guard !AppDelegate.isRunningTests else { return }
         privacyDashboadPendingUpdatesCancellable = privacyDashboardPopover.viewController
             .$pendingUpdates.receive(on: DispatchQueue.main).sink { [weak self] _ in
             let isPendingUpdate = self?.privacyDashboardPopover.viewController.isPendingUpdates() ?? false
@@ -719,6 +719,7 @@ final class AddressBarButtonsViewController: NSViewController {
     }
 
     private func updatePrivacyEntryPointIcon() {
+        guard !AppDelegate.isRunningTests else { return }
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             return
         }
@@ -811,7 +812,7 @@ final class AddressBarButtonsViewController: NSViewController {
     }
 
     private func closePopover() {
-        privacyDashboardPopover.close()
+        _privacyDashboardPopover?.close()
     }
     
     private func stopAnimations(trackerAnimations: Bool = true,

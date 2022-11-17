@@ -330,7 +330,7 @@ final class BrowserTabViewController: NSViewController {
     private func removeAllTabContent(includingWebView: Bool = true) {
         self.homePageView.removeFromSuperview()
         transientTabContentViewController?.removeCompletely()
-        preferencesViewController.removeCompletely()
+        _preferencesViewController?.removeCompletely()
         bookmarksViewController.removeCompletely()
         if includingWebView {
             self.removeWebViewFromHierarchy()
@@ -409,12 +409,16 @@ final class BrowserTabViewController: NSViewController {
 
     // MARK: - Preferences
 
-    private(set) lazy var preferencesViewController: PreferencesViewController = {
+    private var _preferencesViewController: PreferencesViewController?
+    var preferencesViewController: PreferencesViewController {
+        if let _preferencesViewController = _preferencesViewController { // swiftlint:disable:this identifier_name
+            return _preferencesViewController
+        }
         let viewController = PreferencesViewController()
         viewController.delegate = self
-
+        _preferencesViewController = viewController
         return viewController
-    }()
+    }
 
     // MARK: - Bookmarks
 

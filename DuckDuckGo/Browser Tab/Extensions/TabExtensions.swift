@@ -20,7 +20,17 @@ import Foundation
 
 struct TabExtensions {
 
-    let adClickAttribution = AdClickAttributionTabExtension.self
-    let printing = TabPrintExtension.self
+    let adClickAttribution: AdClickAttributionTabExtension?
+    let printing: TabPrintExtension
+
+    static var buildForTab: (Tab) -> TabExtensions = { tab in
+        TabExtensions(adClickAttribution: AdClickAttributionTabExtension(tab: tab),
+                      printing: TabPrintExtension(tab: tab))
+    }
+
+    private static func defaultExtensionsForTests(_ tab: Tab) -> TabExtensions {
+        TabExtensions(adClickAttribution: nil,
+                      printing: TabPrintExtension(tab: tab))
+    }
 
 }

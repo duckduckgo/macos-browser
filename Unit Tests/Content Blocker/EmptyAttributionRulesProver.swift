@@ -1,5 +1,5 @@
 //
-//  TestTabDependencies.swift
+//  EmptyAttributionRulesProver.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -17,12 +17,15 @@
 //
 
 import Foundation
-@testable import DuckDuckGo_Privacy_Browser
+import TrackerRadarKit
+import BrowserServicesKit
 
-struct TestTabExtensionsBuilder: ExtensionsBuilder {
+@objc(EmptyAttributionRulesProver)
+final class EmptyAttributionRulesProver: NSObject, AdClickAttributionRulesProviding {
+    var globalAttributionRules: BrowserServicesKit.ContentBlockerRulesManager.Rules?
 
-    func buildExtensions(for tab: Tab) -> DynamicTabExtensions {
-        DynamicTabExtensions()
+    func requestAttribution(forVendor vendor: String, completion: @escaping (BrowserServicesKit.ContentBlockerRulesManager.Rules?) -> Void) {
+        completion(nil)
     }
 
 }

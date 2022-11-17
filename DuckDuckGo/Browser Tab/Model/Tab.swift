@@ -161,36 +161,121 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
     private let cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter?
     private let pinnedTabsManager: PinnedTabsManager
+    let privacyConfigurationManager: PrivacyConfigurationManaging
+    private let contentBlockerRulesManager: ContentBlockerRulesManagerProtocol
     private let privatePlayer: PrivatePlayer
 
-    private(set) var extensions = DynamicTabExtensions()
+    private let webViewConfiguration: WKWebViewConfiguration
+    private(set) var extensions: TabExtensions!
+
+    var userContentController: UserContentController {
+        (webViewConfiguration.userContentController as? UserContentController)!
+    }
+    var userScripts: UserScripts? {
+        userContentController.contentBlockingAssets?.userScripts as? UserScripts
+    }
+    var userScriptsPublisher: AnyPublisher<UserScripts?, Never> {
+        userContentController.$contentBlockingAssets.map { $0?.userScripts as? UserScripts }.eraseToAnyPublisher()
+    }
+
+    convenience init(content: TabContent,
+                     faviconManagement: FaviconManagement = FaviconManager.shared,
+                     webCacheManager: WebCacheManager = WebCacheManager.shared,
+                     webViewConfiguration: WKWebViewConfiguration? = nil,
+                     historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
+                     pinnedTabsManager: PinnedTabsManager = WindowControllersManager.shared.pinnedTabsManager,
+                     privacyConfigurationManager: (PrivacyConfigurationManaging & AnyObject)? = nil,
+                     contentBlockerRulesManager: ContentBlockerRulesManagerProtocol? = nil,
+                     privatePlayer: PrivatePlayer? = nil,
+                     cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter? = ContentBlockingAssetsCompilationTimeReporter.shared,
+                     localHistory: Set<String> = Set<String>(),
+                     title: String? = nil,
+                     error: Error? = nil,
+                     favicon: NSImage? = nil,
+                     sessionStateData: Data? = nil,
+                     interactionStateData: Data? = nil,
+                     parentTab: Tab? = nil,
+                     shouldLoadInBackground: Bool = false,
+                     canBeClosedWithBack: Bool = false,
+                     lastSelectedAt: Date? = nil,
+                     currentDownload: URL? = nil,
+                     webViewFrame: CGRect = .zero
+    ) {
+
+#if DEBUG
+        let contentBlockingAssetsPublisher = AppDelegate.isRunningTests ? PassthroughSubject().eraseToAnyPublisher() : ContentBlocking.shared.userContentUpdating.userContentBlockingAssets!
+        let contentBlockerRulesManager = contentBlockerRulesManager
+            ?? (AppDelegate.isRunningTests
+                ? ((NSClassFromString("ContentBlockerRulesManagerMock") as? (NSObject).Type)!.init() as? ContentBlockerRulesManagerProtocol)!
+                : ContentBlocking.shared.contentBlockingManager)
+        let privacyConfigurationManager: (PrivacyConfigurationManaging & AnyObject) = privacyConfigurationManager
+            ?? (AppDelegate.isRunningTests
+                ? ((NSClassFromString("MockPrivacyConfigurationManager") as? (NSObject).Type)!.init() as? (PrivacyConfigurationManaging & AnyObject))!
+                : ContentBlocking.shared.privacyConfigurationManager)
+        let privatePlayer = privatePlayer
+            ?? (AppDelegate.isRunningTests ? PrivatePlayer.mock(withMode: .enabled) : PrivatePlayer.shared)
+#else
+        let contentBlockingAssetsPublisher = ContentBlocking.shared.userContentUpdating.userContentBlockingAssets!
+        let contentBlockerRulesManager = contentBlockerRulesManager ?? ContentBlocking.shared.contentBlockingManager
+        let privacyConfigurationManager = privacyConfigurationManager ?? ContentBlocking.shared.privacyConfigurationManager
+        let privatePlayer = privatePlayer ?? PrivatePlayer.shared
+#endif
+        self.init(content: content,
+                  faviconManagement: faviconManagement,
+                  webCacheManager: webCacheManager,
+                  webViewConfiguration: webViewConfiguration,
+                  historyCoordinating: historyCoordinating,
+                  pinnedTabsManager: pinnedTabsManager,
+                  privacyConfigurationManager: privacyConfigurationManager,
+                  contentBlockerRulesManager: contentBlockerRulesManager,
+                  contentBlockingAssetsPublisher: contentBlockingAssetsPublisher,
+                  privatePlayer: privatePlayer,
+                  cbaTimeReporter: cbaTimeReporter,
+                  localHistory: localHistory,
+                  title: title,
+                  error: error,
+                  favicon: favicon,
+                  sessionStateData: sessionStateData,
+                  interactionStateData: interactionStateData,
+                  parentTab: parentTab,
+                  shouldLoadInBackground: shouldLoadInBackground,
+                  canBeClosedWithBack: canBeClosedWithBack,
+                  lastSelectedAt: lastSelectedAt,
+                  currentDownload: currentDownload,
+                  webViewFrame: webViewFrame)
+    }
 
     init(content: TabContent,
-         faviconManagement: FaviconManagement = FaviconManager.shared,
-         webCacheManager: WebCacheManager = WebCacheManager.shared,
-         webViewConfiguration: WKWebViewConfiguration? = nil,
-         historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
-         pinnedTabsManager: PinnedTabsManager = WindowControllersManager.shared.pinnedTabsManager,
-         privatePlayer: PrivatePlayer = .shared,
-         cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter? = ContentBlockingAssetsCompilationTimeReporter.shared,
-         localHistory: Set<String> = Set<String>(),
-         title: String? = nil,
-         error: Error? = nil,
-         favicon: NSImage? = nil,
-         sessionStateData: Data? = nil,
-         interactionStateData: Data? = nil,
-         parentTab: Tab? = nil,
-         shouldLoadInBackground: Bool = false,
-         canBeClosedWithBack: Bool = false,
-         lastSelectedAt: Date? = nil,
-         currentDownload: URL? = nil,
-         webViewFrame: CGRect = .zero
+         faviconManagement: FaviconManagement,
+         webCacheManager: WebCacheManager,
+         webViewConfiguration: WKWebViewConfiguration?,
+         historyCoordinating: HistoryCoordinating,
+         pinnedTabsManager: PinnedTabsManager,
+         privacyConfigurationManager: PrivacyConfigurationManaging,
+         contentBlockerRulesManager: ContentBlockerRulesManagerProtocol,
+         contentBlockingAssetsPublisher: some Publisher<some UserContentControllerNewContent, Never>,
+         privatePlayer: PrivatePlayer,
+         cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter?,
+         localHistory: Set<String>,
+         title: String?,
+         error: Error?,
+         favicon: NSImage?,
+         sessionStateData: Data?,
+         interactionStateData: Data?,
+         parentTab: Tab?,
+         shouldLoadInBackground: Bool,
+         canBeClosedWithBack: Bool,
+         lastSelectedAt: Date?,
+         currentDownload: URL?,
+         webViewFrame: CGRect
     ) {
 
         self.content = content
         self.faviconManagement = faviconManagement
         self.historyCoordinating = historyCoordinating
         self.pinnedTabsManager = pinnedTabsManager
+        self.privacyConfigurationManager = privacyConfigurationManager
+        self.contentBlockerRulesManager = contentBlockerRulesManager
         self.privatePlayer = privatePlayer
         self.cbaTimeReporter = cbaTimeReporter
         self.localHistory = localHistory
@@ -205,17 +290,18 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         self.currentDownload = currentDownload
 
         let configuration = webViewConfiguration ?? WKWebViewConfiguration()
-        configuration.applyStandardConfiguration()
-        
+        self.webViewConfiguration = configuration
+
         webView = WebView(frame: webViewFrame, configuration: configuration)
         webView.allowsLinkPreview = false
         permissions = PermissionModel(webView: webView)
 
         super.init()
 
-        extensions = TabExtensionsBuilder().buildExtensions(for: self)
-
+        configuration.applyStandardConfiguration(with: self, assetsPublisher: contentBlockingAssetsPublisher, privacyConfigurationManager: privacyConfigurationManager)
+        extensions = TabExtensions.buildForTab(self)
         setupWebView(shouldLoadInBackground: shouldLoadInBackground)
+
         if favicon == nil {
             handleFavicon()
         }
@@ -244,16 +330,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         webView.configuration.userContentController.removeAllUserScripts()
 
         cbaTimeReporter?.tabWillClose(self.instrumentation.currentTabIdentifier)
-    }
-
-    var userContentController: UserContentController? {
-        webView.configuration.userContentController as? UserContentController
-    }
-    var userScripts: UserScripts? {
-        userContentController?.contentBlockingAssets?.userScripts as? UserScripts
-    }
-    var userScriptsPublisher: AnyPublisher<UserScripts?, Never>? {
-        userContentController?.$contentBlockingAssets.map { $0?.userScripts as? UserScripts }.eraseToAnyPublisher()
     }
 
     // MARK: - Event Publishers
@@ -499,10 +575,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     @discardableResult
     private func setFBProtection(enabled: Bool) -> Bool {
         guard self.fbBlockingEnabled != enabled else { return false }
-        guard let userContentController = userContentController else {
-            assertionFailure("Missing UserContentController")
-            return false
-        }
         if enabled {
             do {
                 try userContentController.enableGlobalContentRuleList(withIdentifier: ContentBlockerRulesLists.Constants.clickToLoadRulesListName)
@@ -535,14 +607,14 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     }
 
     lazy var linkProtection: LinkProtection = {
-        LinkProtection(privacyManager: ContentBlocking.shared.privacyConfigurationManager,
-                       contentBlockingManager: ContentBlocking.shared.contentBlockingManager,
+        LinkProtection(privacyManager: self.privacyConfigurationManager,
+                       contentBlockingManager: self.contentBlockerRulesManager,
                        errorReporting: Self.debugEvents)
     }()
     
     lazy var referrerTrimming: ReferrerTrimming = {
-        ReferrerTrimming(privacyManager: ContentBlocking.shared.privacyConfigurationManager,
-                         contentBlockingManager: ContentBlocking.shared.contentBlockingManager,
+        ReferrerTrimming(privacyManager: self.privacyConfigurationManager,
+                         contentBlockingManager: self.contentBlockerRulesManager,
                          tld: ContentBlocking.shared.tld)
     }()
 
@@ -689,7 +761,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         webView.contextMenuDelegate = contextMenuManager
         webView.allowsBackForwardNavigationGestures = true
         webView.allowsMagnification = true
-        userContentController?.delegate = self
 
         superviewObserver = webView.observe(\.superview, options: .old) { [weak self] _, change in
             // if the webView is being added to superview - reload if needed
@@ -800,7 +871,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     private var youtubePlayerCancellables: Set<AnyCancellable> = []
 
     func setUpYoutubeScriptsIfNeeded() {
-        guard PrivatePlayer.shared.isAvailable else {
+        guard privatePlayer.isAvailable else {
             return
         }
 
@@ -982,7 +1053,7 @@ extension Tab: ContentBlockerRulesUserScriptDelegate {
     
     func contentBlockerRulesUserScript(_ script: ContentBlockerRulesUserScript, detectedTracker tracker: DetectedRequest) {
         trackerInfo?.add(detectedTracker: tracker)
-        self.extensions.adClickAttribution.logic.onRequestDetected(request: tracker)
+        self.extensions.adClickAttribution?.logic.onRequestDetected(request: tracker)
         guard let url = URL(string: tracker.pageUrl) else { return }
         historyCoordinating.addDetectedTracker(tracker, onURL: url)
     }
@@ -1196,7 +1267,7 @@ extension Tab: WKNavigationDelegate {
         }
         
         if navigationAction.isTargetingMainFrame, navigationAction.navigationType == .backForward {
-            self.extensions.adClickAttribution.logic.onBackForwardNavigation(mainFrameURL: webView.url)
+            self.extensions.adClickAttribution?.logic.onBackForwardNavigation(mainFrameURL: webView.url)
         }
         
         if navigationAction.isTargetingMainFrame, navigationAction.navigationType != .backForward {
@@ -1328,9 +1399,9 @@ extension Tab: WKNavigationDelegate {
     @MainActor
     private func prepareForContentBlocking() async {
         // Ensure Content Blocking Assets (WKContentRuleList&UserScripts) are installed
-        if userContentController?.contentBlockingAssetsInstalled == false {
+        if !userContentController.contentBlockingAssetsInstalled {
             cbaTimeReporter?.tabWillWaitForRulesCompilation(self.instrumentation.currentTabIdentifier)
-            await userContentController?.awaitContentBlockingAssetsInstalled()
+            await userContentController.awaitContentBlockingAssetsInstalled()
             cbaTimeReporter?.reportWaitTimeForTabFinishedWaitingForRules(self.instrumentation.currentTabIdentifier)
         } else {
             cbaTimeReporter?.reportNavigationDidNotWaitForRules()
@@ -1388,10 +1459,10 @@ extension Tab: WKNavigationDelegate {
         }
         
         if navigationResponse.isForMainFrame && isSuccessfulResponse {
-            self.extensions.adClickAttribution.detection.on2XXResponse(url: webView.url)
+            self.extensions.adClickAttribution?.detection.on2XXResponse(url: webView.url)
         }
         
-        await self.extensions.adClickAttribution.logic.onProvisionalNavigation()
+        await self.extensions.adClickAttribution?.logic.onProvisionalNavigation()
 
         return .allow
     }
@@ -1407,8 +1478,7 @@ extension Tab: WKNavigationDelegate {
         linkProtection.cancelOngoingExtraction()
         linkProtection.setMainFrameUrl(webView.url)
         referrerTrimming.onBeginNavigation(to: webView.url)
-        self.extensions.adClickAttribution.detection.onStartNavigation(url: webView.url)
-        
+        self.extensions.adClickAttribution?.detection.onStartNavigation(url: webView.url)
     }
 
     @MainActor
@@ -1419,8 +1489,8 @@ extension Tab: WKNavigationDelegate {
         if isAMPProtectionExtracting { isAMPProtectionExtracting = false }
         linkProtection.setMainFrameUrl(nil)
         referrerTrimming.onFinishNavigation()
-        self.extensions.adClickAttribution.detection.onDidFinishNavigation(url: webView.url)
-        self.extensions.adClickAttribution.logic.onDidFinishNavigation(host: webView.url?.host)
+        self.extensions.adClickAttribution?.detection.onDidFinishNavigation(url: webView.url)
+        self.extensions.adClickAttribution?.logic.onDidFinishNavigation(host: webView.url?.host)
     }
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
@@ -1432,7 +1502,7 @@ extension Tab: WKNavigationDelegate {
         invalidateSessionStateData()
         linkProtection.setMainFrameUrl(nil)
         referrerTrimming.onFailedNavigation()
-        self.extensions.adClickAttribution.detection.onDidFailNavigation()
+        self.extensions.adClickAttribution?.detection.onDidFailNavigation()
         webViewDidFailNavigationPublisher.send()
     }
 
@@ -1449,7 +1519,7 @@ extension Tab: WKNavigationDelegate {
         isBeingRedirected = false
         linkProtection.setMainFrameUrl(nil)
         referrerTrimming.onFailedNavigation()
-        self.extensions.adClickAttribution.detection.onDidFailNavigation()
+        self.extensions.adClickAttribution?.detection.onDidFailNavigation()
         webViewDidFailNavigationPublisher.send()
     }
 

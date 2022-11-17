@@ -18,6 +18,7 @@
 
 import Foundation
 import Combine
+import Common
 import BrowserServicesKit
 import UserScript
 
@@ -35,15 +36,19 @@ final class UserContentUpdating {
     private(set) var userContentBlockingAssets: AnyPublisher<UserContentUpdating.NewContent, Never>!
 
     init(contentBlockerRulesManager: ContentBlockerRulesManagerProtocol,
-         privacyConfigurationManager: PrivacyConfigurationManager = ContentBlocking.shared.privacyConfigurationManager,
+         privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager,
+         trackerDataManager: TrackerDataManager = ContentBlocking.shared.trackerDataManager,
          configStorage: ConfigurationStoring = DefaultConfigurationStorage.shared,
-         privacySecurityPreferences: PrivacySecurityPreferences = PrivacySecurityPreferences.shared) {
+         privacySecurityPreferences: PrivacySecurityPreferences = PrivacySecurityPreferences.shared,
+         tld: TLD = ContentBlocking.shared.tld) {
 
         let makeValue: (ContentBlockerRulesManager.UpdateEvent) -> NewContent = { rulesUpdate in
             let sourceProvider = DefaultScriptSourceProvider(configStorage: configStorage,
                                                              privacyConfigurationManager: privacyConfigurationManager,
                                                              privacySettings: privacySecurityPreferences,
-                                                             contentBlockingManager: contentBlockerRulesManager)
+                                                             contentBlockingManager: contentBlockerRulesManager,
+                                                             trackerDataManager: trackerDataManager,
+                                                             tld: tld)
             return NewContent(rulesUpdate: rulesUpdate, sourceProvider: sourceProvider)
         }
 

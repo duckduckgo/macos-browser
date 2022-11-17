@@ -18,6 +18,7 @@
 
 import XCTest
 import WebKit
+import Common
 import TrackerRadarKit
 import BrowserServicesKit
 @testable import DuckDuckGo_Privacy_Browser
@@ -28,7 +29,14 @@ class ContentBlockingUpdatingTests: XCTestCase {
     var updating: UserContentUpdating!
 
     override func setUp() {
-        updating = UserContentUpdating(contentBlockerRulesManager: rulesManager, privacySecurityPreferences: preferences)
+        updating = UserContentUpdating(contentBlockerRulesManager: rulesManager,
+                                       privacyConfigurationManager: MockPrivacyConfigurationManager(),
+                                       trackerDataManager: TrackerDataManager(etag: DefaultConfigurationStorage.shared.loadEtag(for: .trackerRadar),
+                                                                                                                                              data: DefaultConfigurationStorage.shared.loadData(for: .trackerRadar),
+                                                                                                                                              embeddedDataProvider: AppTrackerDataSetProvider(),
+                                                                                                                                              errorReporting: nil),
+                                       privacySecurityPreferences: preferences,
+                                       tld: TLD())
     }
 
     override static func setUp() {
