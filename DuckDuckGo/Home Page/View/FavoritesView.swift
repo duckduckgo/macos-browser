@@ -85,7 +85,12 @@ struct FavoritesGrid: View {
 
         MoreOrLess(isExpanded: $model.showAllFavorites)
             .padding(.top, 2)
-            .visibility(model.rows.count > HomePage.favoritesRowCountWhenCollapsed && isHovering ? .visible : .invisible)
+            .visibility(moreOrLessButtonVisibility)
+    }
+
+    var moreOrLessButtonVisibility: ViewVisibility {
+        let thresholdFavoritesCount = HomePage.favoritesRowCountWhenCollapsed * HomePage.favoritesPerRow
+        return (isHovering && model.models.count > thresholdFavoritesCount) ? .visible : .invisible
     }
 
     private enum GridDimensions {
