@@ -118,8 +118,8 @@ struct FavoritesGrid: View {
 
     private func updateDrag(_ value: DragGesture.Value) {
         if draggedFavorite == nil {
-            let draggedFavoriteIndex = itemIndex(for: value.startLocation)
-            draggedFavorite = model.models[draggedFavoriteIndex]
+            let draggedFavoriteIndex = favoriteIndex(for: value.startLocation, forExistingFavoriteOnly: false)
+            draggedFavorite = model.models[safe: draggedFavoriteIndex]
         }
         guard let draggedFavorite = draggedFavorite,
               case .bookmark = draggedFavorite.favoriteType,
@@ -129,7 +129,7 @@ struct FavoritesGrid: View {
         }
 
         let to: Int = {
-            let index = itemIndex(for: value.location)
+            let index = favoriteIndex(for: value.location)
             return index > from ? index + 1 : index
         }()
 
@@ -150,9 +150,9 @@ struct FavoritesGrid: View {
         guard case let .bookmark(bookmark) = draggedFavorite?.favoriteType else {
             return
         }
-        let from = itemIndex(for: value.startLocation)
+        let from = favoriteIndex(for: value.startLocation)
         let to: Int = {
-            let index = itemIndex(for: value.location)
+            let index = favoriteIndex(for: value.location)
             return index > from ? index + 1 : index
         }()
 
@@ -162,14 +162,14 @@ struct FavoritesGrid: View {
         }
     }
 
-    private func itemIndex(for point: CGPoint) -> Int {
+    private func favoriteIndex(for point: CGPoint, forExistingFavoriteOnly: Bool = true) -> Int {
         let pointInView = pointConstrainedToFavoritesView(point)
 
         let row = row(for: pointInView.y)
         let column = column(for: pointInView.x)
         let index = row * HomePage.favoritesPerRow + column
 
-        return max(0, min(index, model.favorites.count - 1))
+        return forExistingFavoriteOnly ? max(0, min(index, model.favorites.count - 1)) : index
     }
 
     private func pointConstrainedToFavoritesView(_ point: CGPoint) -> CGPoint {
