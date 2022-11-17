@@ -54,6 +54,9 @@ final class BitwardenCommunicator: BitwardenCommunication {
     private var process: BitwardenProcess?
 
     func runProxyProcess() throws {
+        if self.process != nil {
+            terminateProxyProcess()
+        }
 
         let process = Process()
 
