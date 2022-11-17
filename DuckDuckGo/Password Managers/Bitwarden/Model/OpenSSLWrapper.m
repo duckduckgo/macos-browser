@@ -103,8 +103,7 @@ NSData *macKeyData;
 - (nullable EncryptedMessage *)encryptData:(NSData *)data {
     if (macKeyData == nil) { return nil; }
 
-    //TODO: Generate iv - random 16 bytes
-    NSData *ivData = [macKeyData subdataWithRange:NSMakeRange(0, IV_LENGTH)];
+    NSData *ivData = [self generateIv];
 
     unsigned char *dataArray = (unsigned char *)data.bytes;
     size_t dataArrayLength = data.length;
@@ -135,6 +134,14 @@ NSData *macKeyData;
     encryptedMessage.data = encryptedData;
     encryptedMessage.hmac = hmacData;
     return encryptedMessage;
+}
+
+- (nullable NSData *)generateIv {
+    unsigned char iv[IV_LENGTH];
+    if(SecRandomCopyBytes(kSecRandomDefault, IV_LENGTH, &iv) != errSecSuccess) {
+        return nil;
+    }
+    return [NSData dataWithBytes:iv length:IV_LENGTH];
 }
 
 - (NSData *)computeHmac:(NSData *)data iv:(NSData *)ivData {
