@@ -44,22 +44,20 @@ protocol TabDelegate: FileDownloadManagerDelegate, ContentOverlayUserScriptDeleg
     func tab(_ tab: Tab, promptUserForCookieConsent result: @escaping (Bool) -> Void)
 }
 
-extension DependencyProvider<Tab> {
-    var windowControllersManager: WindowControllersManager { WindowControllersManager.shared }
-    var faviconManagement: FaviconManagement { FaviconManager.shared }
-    var webCacheManager: WebCacheManager { WebCacheManager.shared }
-    var historyCoordinating: HistoryCoordinating { HistoryCoordinator.shared }
-    var pinnedTabsManager: PinnedTabsManager { windowControllersManager.pinnedTabsManager }
-    var privatePlayer: PrivatePlayer { .shared }
-    var cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter? { .shared }
-    var workspace: NSWorkspace { .shared }
-
-    var extensionsBuilder: ExtensionsBuilder { TabExtensionsBuilder() }
-
-}
-
 // swiftlint:disable:next type_body_length
-final class Tab: NSObject, Identifiable, ObservableObject, DependencyProviderClient {
+final class Tab: NSObject, Identifiable, ObservableObject {
+
+    struct Dependencies {
+        @Injected(default: FaviconManager.shared) static var faviconManagement: FaviconManagement
+        @Injected(default: HistoryCoordinator.shared, .testable) static var historyCoordinating: HistoryCoordinating
+
+        @Injected(default: WindowControllersManager.shared.pinnedTabsManager, .testable) static var pinnedTabsManager: PinnedTabsManager
+        @Injected(default: .shared, .testable) static var privatePlayer: PrivatePlayer
+        @Injected(default: .shared) static var cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter?
+        @Injected(default: .shared) static var workspace: NSWorkspace
+
+        @Injected(default: TabExtensionsBuilder()) static var extensionsBuilder: ExtensionsBuilder
+    }
 
     enum TabContent: Equatable {
         case homePage
@@ -169,7 +167,7 @@ final class Tab: NSObject, Identifiable, ObservableObject, DependencyProviderCli
     }
     
     var isPinned: Bool {
-        return dependencyProvider.pinnedTabsManager.isTabPinned(self)
+        return Dependencies.pinnedTabsManager.isTabPinned(self)
     }
 
     private(set) var extensions = DynamicTabExtensions()
@@ -211,7 +209,7 @@ final class Tab: NSObject, Identifiable, ObservableObject, DependencyProviderCli
 
         super.init()
 
-        extensions = dependencyProvider.extensionsBuilder.buildExtensions(for: self)
+        extensions = Dependencies.extensionsBuilder.buildExtensions(for: self)
 
         setupWebView(shouldLoadInBackground: shouldLoadInBackground)
         if favicon == nil {
@@ -233,7 +231,7 @@ final class Tab: NSObject, Identifiable, ObservableObject, DependencyProviderCli
 
     deinit {
         if content.isUrl, let url = webView.url {
-            dependencyProvider.historyCoordinating.commitChanges(url: url)
+            Dependencies.historyCoordinating.commitChanges(url: url)
         }
         webView.stopLoading()
         webView.stopMediaCapture()
@@ -241,7 +239,7 @@ final class Tab: NSObject, Identifiable, ObservableObject, DependencyProviderCli
         webView.fullscreenWindowController?.close()
         webView.configuration.userContentController.removeAllUserScripts()
 
-        dependencyProvider.cbaTimeReporter?.tabWillClose(self.instrumentation.currentTabIdentifier)
+        Dependencies.cbaTimeReporter?.tabWillClose(self.instrumentation.currentTabIdentifier)
     }
 
     var userContentController: UserContentController? {
@@ -285,7 +283,7 @@ final class Tab: NSObject, Identifiable, ObservableObject, DependencyProviderCli
             handleFavicon()
             invalidateSessionStateData()
             if let oldUrl = oldValue.url {
-                dependencyProvider.historyCoordinating.commitChanges(url: oldUrl)
+                Dependencies.historyCoordinating.commitChanges(url: oldUrl)
             }
             error = nil
             Task {
@@ -305,7 +303,7 @@ final class Tab: NSObject, Identifiable, ObservableObject, DependencyProviderCli
 
         lastUpgradedURL = nil
 
-        if let newContent = dependencyProvider.privatePlayer.overrideContent(content, for: self) {
+        if let newContent = Dependencies.privatePlayer.overrideContent(content, for: self) {
             self.content = newContent
             return
         }
@@ -459,7 +457,7 @@ final class Tab: NSObject, Identifiable, ObservableObject, DependencyProviderCli
 
         shouldStoreNextVisit = false
 
-        if dependencyProvider.privatePlayer.goBackSkippingLastItemIfNeeded(for: webView) {
+        if Dependencies.privatePlayer.goBackSkippingLastItemIfNeeded(for: webView) {
             return
         }
         webView.goBack()
@@ -565,7 +563,7 @@ final class Tab: NSObject, Identifiable, ObservableObject, DependencyProviderCli
                 didRestore = restoreSessionStateDataIfNeeded()
             }
 
-            if dependencyProvider.privatePlayer.goBackAndLoadURLIfNeeded(for: self) {
+            if Dependencies.privatePlayer.goBackAndLoadURLIfNeeded(for: self) {
                 return
             }
 
@@ -605,7 +603,7 @@ final class Tab: NSObject, Identifiable, ObservableObject, DependencyProviderCli
             return false
         }
 
-        if dependencyProvider.privatePlayer.shouldSkipLoadingURL(for: self) {
+        if Dependencies.privatePlayer.shouldSkipLoadingURL(for: self) {
             return false
         }
 
@@ -712,14 +710,14 @@ final class Tab: NSObject, Identifiable, ObservableObject, DependencyProviderCli
             return
         }
 
-        guard dependencyProvider.faviconManagement.areFaviconsLoaded else { return }
+        guard Dependencies.faviconManagement.areFaviconsLoaded else { return }
 
         guard content.isUrl, let url = content.url else {
             favicon = nil
             return
         }
 
-        if let cachedFavicon = dependencyProvider.faviconManagement.getCachedFavicon(for: url, sizeCategory: .small)?.image {
+        if let cachedFavicon = Dependencies.faviconManagement.getCachedFavicon(for: url, sizeCategory: .small)?.image {
             if cachedFavicon != favicon {
                 favicon = cachedFavicon
             }
@@ -772,7 +770,7 @@ final class Tab: NSObject, Identifiable, ObservableObject, DependencyProviderCli
         }
 
         // Add to global history
-        dependencyProvider.historyCoordinating.addVisit(of: url)
+        Dependencies.historyCoordinating.addVisit(of: url)
 
         // Add to local history
         if let host = url.host, !host.isEmpty {
@@ -781,7 +779,7 @@ final class Tab: NSObject, Identifiable, ObservableObject, DependencyProviderCli
     }
 
     func updateVisitTitle(_ title: String, url: URL) {
-        dependencyProvider.historyCoordinating.updateTitleIfNeeded(title: title, url: url)
+        Dependencies.historyCoordinating.updateTitleIfNeeded(title: title, url: url)
     }
 
     // MARK: - Youtube Player
@@ -807,7 +805,7 @@ final class Tab: NSObject, Identifiable, ObservableObject, DependencyProviderCli
         }()
 
         if webView.url?.host?.droppingWwwPrefix() == "youtube.com" && canPushMessagesToJS {
-            dependencyProvider.privatePlayer.$mode
+            Dependencies.privatePlayer.$mode
                 .dropFirst()
                 .sink { [weak self] playerMode in
                     guard let self = self else {
@@ -815,7 +813,7 @@ final class Tab: NSObject, Identifiable, ObservableObject, DependencyProviderCli
                     }
                     let userValues = YoutubeOverlayUserScript.UserValues(
                         privatePlayerMode: playerMode,
-                        overlayInteracted: self.dependencyProvider.privatePlayer.overlayInteracted
+                        overlayInteracted: Dependencies.privatePlayer.overlayInteracted
                     )
                     self.youtubeOverlayScript?.userValuesUpdated(userValues: userValues, inWebView: self.webView)
                 }
@@ -826,7 +824,7 @@ final class Tab: NSObject, Identifiable, ObservableObject, DependencyProviderCli
             youtubePlayerScript?.isEnabled = true
 
             if canPushMessagesToJS {
-                dependencyProvider.privatePlayer.$mode
+                Dependencies.privatePlayer.$mode
                     .map { $0 == .enabled }
                     .sink { [weak self] shouldAlwaysOpenPrivatePlayer in
                         guard let self = self else {
@@ -946,7 +944,7 @@ extension Tab: FaviconUserScriptDelegate {
     func faviconUserScript(_ faviconUserScript: FaviconUserScript,
                            didFindFaviconLinks faviconLinks: [FaviconUserScript.FaviconLink],
                            for documentUrl: URL) {
-        dependencyProvider.faviconManagement.handleFaviconLinks(faviconLinks, documentUrl: documentUrl) { favicon in
+        Dependencies.faviconManagement.handleFaviconLinks(faviconLinks, documentUrl: documentUrl) { favicon in
             guard documentUrl == self.content.url, let favicon = favicon else {
                 return
             }
@@ -970,7 +968,7 @@ extension Tab: ContentBlockerRulesUserScriptDelegate {
         trackerInfo?.add(detectedTracker: tracker)
         self.extensions.adClickAttribution.logic.onRequestDetected(request: tracker)
         guard let url = URL(string: tracker.pageUrl) else { return }
-        dependencyProvider.historyCoordinating.addDetectedTracker(tracker, onURL: url)
+        Dependencies.historyCoordinating.addDetectedTracker(tracker, onURL: url)
     }
 
     func contentBlockerRulesUserScript(_ script: ContentBlockerRulesUserScript, detectedThirdPartyRequest request: DetectedRequest) {
@@ -1032,7 +1030,7 @@ extension Tab: SurrogatesUserScriptDelegate {
         trackerInfo?.add(installedSurrogateHost: host)
         trackerInfo?.add(detectedTracker: tracker)
         guard let url = webView.url else { return }
-        dependencyProvider.historyCoordinating.addDetectedTracker(tracker, onURL: url)
+        Dependencies.historyCoordinating.addDetectedTracker(tracker, onURL: url)
     }
 }
 
@@ -1126,7 +1124,7 @@ extension Tab: WKNavigationDelegate {
     func webView(_ webView: WKWebView,
                  decidePolicyFor navigationAction: WKNavigationAction) async -> WKNavigationActionPolicy {
                 
-        if let policy = dependencyProvider.privatePlayer.decidePolicy(for: navigationAction, in: self) {
+        if let policy = Dependencies.privatePlayer.decidePolicy(for: navigationAction, in: self) {
             return policy
         }
 
@@ -1137,7 +1135,7 @@ extension Tab: WKNavigationDelegate {
         let isLinkActivated = navigationAction.navigationType == .linkActivated
         let isNavigatingAwayFromPinnedTab: Bool = {
             let isNavigatingToAnotherDomain = navigationAction.request.url?.host != url?.host
-            let isPinned = dependencyProvider.pinnedTabsManager.isTabPinned(self)
+            let isPinned = Dependencies.pinnedTabsManager.isTabPinned(self)
             return isLinkActivated && isPinned && isNavigatingToAnotherDomain
         }()
 
@@ -1300,11 +1298,11 @@ extension Tab: WKNavigationDelegate {
     private func prepareForContentBlocking() async {
         // Ensure Content Blocking Assets (WKContentRuleList&UserScripts) are installed
         if userContentController?.contentBlockingAssetsInstalled == false {
-            dependencyProvider.cbaTimeReporter?.tabWillWaitForRulesCompilation(self.instrumentation.currentTabIdentifier)
+            Dependencies.cbaTimeReporter?.tabWillWaitForRulesCompilation(self.instrumentation.currentTabIdentifier)
             await userContentController?.awaitContentBlockingAssetsInstalled()
-            dependencyProvider.cbaTimeReporter?.reportWaitTimeForTabFinishedWaitingForRules(self.instrumentation.currentTabIdentifier)
+            Dependencies.cbaTimeReporter?.reportWaitTimeForTabFinishedWaitingForRules(self.instrumentation.currentTabIdentifier)
         } else {
-            dependencyProvider.cbaTimeReporter?.reportNavigationDidNotWaitForRules()
+            Dependencies.cbaTimeReporter?.reportNavigationDidNotWaitForRules()
         }
     }
 
@@ -1412,7 +1410,7 @@ extension Tab: WKNavigationDelegate {
         case URLError.notConnectedToInternet,
              URLError.networkConnectionLost:
             guard let failingUrl = error.failingUrl else { break }
-            dependencyProvider.historyCoordinating.markFailedToLoadUrl(failingUrl)
+            Dependencies.historyCoordinating.markFailedToLoadUrl(failingUrl)
         default: break
         }
 
