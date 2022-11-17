@@ -29,11 +29,12 @@ final class PreferencesSidebarModel: ObservableObject {
     @Published private(set) var selectedPane: PreferencePaneIdentifier = .general
 
     init(
-        loadSections: @autoclosure @escaping () -> [PreferencesSection] = PreferencesSection.defaultSections,
+        loadSections: (() -> [PreferencesSection])? = nil,
         tabSwitcherTabs: [Tab.TabContent] = Tab.TabContent.displayableTabTypes,
-        privacyConfigurationManager: PrivacyConfigurationManager = ContentBlocking.shared.privacyConfigurationManager
+        privacyConfigurationManager: PrivacyConfigurationManaging & AnyObject = ContentBlocking.shared.privacyConfigurationManager,
+        privatePlayer: PrivatePlayer = PrivatePlayer.shared
     ) {
-        self.loadSections = loadSections
+        self.loadSections = loadSections ?? { PreferencesSection.defaultSections(includePrivatePlayer: privatePlayer.isAvailable) }
         self.tabSwitcherTabs = tabSwitcherTabs
         resetTabSelectionIfNeeded()
         refreshSections()

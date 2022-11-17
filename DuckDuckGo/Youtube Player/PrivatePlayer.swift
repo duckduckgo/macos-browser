@@ -361,3 +361,28 @@ extension PrivatePlayer {
         return true
     }
 }
+
+#if DEBUG
+
+final class PrivatePlayerPreferencesPersistorMock: PrivatePlayerPreferencesPersistor {
+    var privatePlayerMode: PrivatePlayerMode
+    var youtubeOverlayInteracted: Bool
+
+    init(privatePlayerMode: PrivatePlayerMode = .alwaysAsk, youtubeOverlayInteracted: Bool = false) {
+        self.privatePlayerMode = privatePlayerMode
+        self.youtubeOverlayInteracted = youtubeOverlayInteracted
+    }
+}
+
+extension PrivatePlayer {
+
+    static func mock(withMode mode: PrivatePlayerMode = .enabled) -> PrivatePlayer {
+        let preferencesPersistor = PrivatePlayerPreferencesPersistorMock(privatePlayerMode: mode, youtubeOverlayInteracted: true)
+        let preferences = PrivatePlayerPreferences(persistor: preferencesPersistor)
+        let privacyConfigurationManager = ((NSClassFromString("MockPrivacyConfigurationManager") as? (NSObject).Type)!.init() as? (PrivacyConfigurationManaging & AnyObject))!
+        return PrivatePlayer(preferences: preferences, privacyConfigurationManager: privacyConfigurationManager)
+    }
+
+}
+
+#endif

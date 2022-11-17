@@ -20,7 +20,11 @@
 import BrowserServicesKit
 import Combine
 
-final class ContentBlockerRulesManagerMock: ContentBlockerRulesManagerProtocol {
+@objc(ContentBlockerRulesManagerMock)
+final class ContentBlockerRulesManagerMock: NSObject, ContentBlockerRulesManagerProtocol {
+    var currentMainRules: BrowserServicesKit.ContentBlockerRulesManager.Rules?
+
+    var currentAttributionRules: BrowserServicesKit.ContentBlockerRulesManager.Rules?
 
     var updatesPublisher: AnyPublisher<ContentBlockerRulesManager.UpdateEvent, Never> {
         updatesSubject.eraseToAnyPublisher()

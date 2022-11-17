@@ -161,35 +161,112 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     
     private let cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter?
     private let pinnedTabsManager: PinnedTabsManager
+    let privacyConfigurationManager: PrivacyConfigurationManaging
+    private let contentBlockerRulesManager: ContentBlockerRulesManagerProtocol
     private let privatePlayer: PrivatePlayer
 
+    // swiftlint:disable:next function_body_length
+    convenience init(content: TabContent,
+                     faviconManagement: FaviconManagement = FaviconManager.shared,
+                     webCacheManager: WebCacheManager = WebCacheManager.shared,
+                     webViewConfiguration: WKWebViewConfiguration? = nil,
+                     historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
+                     pinnedTabsManager: PinnedTabsManager = WindowControllersManager.shared.pinnedTabsManager,
+                     privacyConfigurationManager: (PrivacyConfigurationManaging & AnyObject)? = nil,
+                     contentBlockerRulesManager: ContentBlockerRulesManagerProtocol? = nil,
+                     privatePlayer: PrivatePlayer? = nil,
+                     cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter? = ContentBlockingAssetsCompilationTimeReporter.shared,
+                     localHistory: Set<String> = Set<String>(),
+                     title: String? = nil,
+                     error: Error? = nil,
+                     favicon: NSImage? = nil,
+                     sessionStateData: Data? = nil,
+                     interactionStateData: Data? = nil,
+                     parentTab: Tab? = nil,
+                     attributionState: AdClickAttributionLogic.State? = nil,
+                     shouldLoadInBackground: Bool = false,
+                     canBeClosedWithBack: Bool = false,
+                     lastSelectedAt: Date? = nil,
+                     currentDownload: URL? = nil,
+                     webViewFrame: CGRect = .zero
+    ) {
+
+#if DEBUG
+        let contentBlockingAssetsPublisher = AppDelegate.isRunningTests ? PassthroughSubject().eraseToAnyPublisher() : ContentBlocking.shared.userContentUpdating.userContentBlockingAssets!
+        let contentBlockerRulesManager = contentBlockerRulesManager
+            ?? (AppDelegate.isRunningTests
+                ? ((NSClassFromString("ContentBlockerRulesManagerMock") as? (NSObject).Type)!.init() as? ContentBlockerRulesManagerProtocol)!
+                : ContentBlocking.shared.contentBlockingManager)
+        let privacyConfigurationManager: (PrivacyConfigurationManaging & AnyObject) = privacyConfigurationManager
+            ?? (AppDelegate.isRunningTests
+                ? ((NSClassFromString("MockPrivacyConfigurationManager") as? (NSObject).Type)!.init() as? (PrivacyConfigurationManaging & AnyObject))!
+                : ContentBlocking.shared.privacyConfigurationManager)
+        let privatePlayer = privatePlayer
+            ?? (AppDelegate.isRunningTests ? PrivatePlayer.mock(withMode: .enabled) : PrivatePlayer.shared)
+#else
+        let contentBlockingAssetsPublisher = ContentBlocking.shared.userContentUpdating.userContentBlockingAssets!
+        let contentBlockerRulesManager = contentBlockerRulesManager ?? ContentBlocking.shared.contentBlockingManager
+        let privacyConfigurationManager = privacyConfigurationManager ?? ContentBlocking.shared.privacyConfigurationManager
+        let privatePlayer = privatePlayer ?? PrivatePlayer.shared
+#endif
+        self.init(content: content,
+                  faviconManagement: faviconManagement,
+                  webCacheManager: webCacheManager,
+                  webViewConfiguration: webViewConfiguration,
+                  historyCoordinating: historyCoordinating,
+                  pinnedTabsManager: pinnedTabsManager,
+                  privacyConfigurationManager: privacyConfigurationManager,
+                  contentBlockerRulesManager: contentBlockerRulesManager,
+                  contentBlockingAssetsPublisher: contentBlockingAssetsPublisher,
+                  privatePlayer: privatePlayer,
+                  cbaTimeReporter: cbaTimeReporter,
+                  localHistory: localHistory,
+                  title: title,
+                  error: error,
+                  favicon: favicon,
+                  sessionStateData: sessionStateData,
+                  interactionStateData: interactionStateData,
+                  parentTab: parentTab,
+                  attributionState: attributionState,
+                  shouldLoadInBackground: shouldLoadInBackground,
+                  canBeClosedWithBack: canBeClosedWithBack,
+                  lastSelectedAt: lastSelectedAt,
+                  currentDownload: currentDownload,
+                  webViewFrame: webViewFrame)
+    }
+
     init(content: TabContent,
-         faviconManagement: FaviconManagement = FaviconManager.shared,
-         webCacheManager: WebCacheManager = WebCacheManager.shared,
-         webViewConfiguration: WKWebViewConfiguration? = nil,
-         historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
-         pinnedTabsManager: PinnedTabsManager = WindowControllersManager.shared.pinnedTabsManager,
-         privatePlayer: PrivatePlayer = .shared,
-         cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter? = ContentBlockingAssetsCompilationTimeReporter.shared,
-         localHistory: Set<String> = Set<String>(),
-         title: String? = nil,
-         error: Error? = nil,
-         favicon: NSImage? = nil,
-         sessionStateData: Data? = nil,
-         interactionStateData: Data? = nil,
-         parentTab: Tab? = nil,
-         attributionState: AdClickAttributionLogic.State? = nil,
-         shouldLoadInBackground: Bool = false,
-         canBeClosedWithBack: Bool = false,
-         lastSelectedAt: Date? = nil,
-         currentDownload: URL? = nil,
-         webViewFrame: CGRect = .zero
+         faviconManagement: FaviconManagement,
+         webCacheManager: WebCacheManager,
+         webViewConfiguration: WKWebViewConfiguration?,
+         historyCoordinating: HistoryCoordinating,
+         pinnedTabsManager: PinnedTabsManager,
+         privacyConfigurationManager: PrivacyConfigurationManaging,
+         contentBlockerRulesManager: ContentBlockerRulesManagerProtocol,
+         contentBlockingAssetsPublisher: some Publisher<some UserContentControllerNewContent, Never>,
+         privatePlayer: PrivatePlayer,
+         cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter?,
+         localHistory: Set<String>,
+         title: String?,
+         error: Error?,
+         favicon: NSImage?,
+         sessionStateData: Data?,
+         interactionStateData: Data?,
+         parentTab: Tab?,
+         attributionState: AdClickAttributionLogic.State?,
+         shouldLoadInBackground: Bool,
+         canBeClosedWithBack: Bool,
+         lastSelectedAt: Date?,
+         currentDownload: URL?,
+         webViewFrame: CGRect
     ) {
 
         self.content = content
         self.faviconManagement = faviconManagement
         self.historyCoordinating = historyCoordinating
         self.pinnedTabsManager = pinnedTabsManager
+        self.privacyConfigurationManager = privacyConfigurationManager
+        self.contentBlockerRulesManager = contentBlockerRulesManager
         self.privatePlayer = privatePlayer
         self.cbaTimeReporter = cbaTimeReporter
         self.localHistory = localHistory
@@ -203,9 +280,13 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         self.lastSelectedAt = lastSelectedAt
         self.currentDownload = currentDownload
 
+        let adClickAttribution = ContentBlocking.makeAdClickAttributionFeature(with: privacyConfigurationManager)
+        adClickAttributionDetection = ContentBlocking.makeAdClickAttributionDetection(featureConfig: adClickAttribution)
+        adClickAttributionLogic = ContentBlocking.makeAdClickAttributionLogic(featureConfig: adClickAttribution)
+
         let configuration = webViewConfiguration ?? WKWebViewConfiguration()
-        configuration.applyStandardConfiguration()
-        
+        configuration.applyStandardConfiguration(assetsPublisher: contentBlockingAssetsPublisher, privacyConfigurationManager: privacyConfigurationManager)
+
         webView = WebView(frame: webViewFrame, configuration: configuration)
         webView.allowsLinkPreview = false
         permissions = PermissionModel(webView: webView)
@@ -527,21 +608,21 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     }
 
     lazy var linkProtection: LinkProtection = {
-        LinkProtection(privacyManager: ContentBlocking.shared.privacyConfigurationManager,
-                       contentBlockingManager: ContentBlocking.shared.contentBlockingManager,
+        LinkProtection(privacyManager: self.privacyConfigurationManager,
+                       contentBlockingManager: self.contentBlockerRulesManager,
                        errorReporting: Self.debugEvents)
     }()
     
     lazy var referrerTrimming: ReferrerTrimming = {
-        ReferrerTrimming(privacyManager: ContentBlocking.shared.privacyConfigurationManager,
-                         contentBlockingManager: ContentBlocking.shared.contentBlockingManager,
+        ReferrerTrimming(privacyManager: self.privacyConfigurationManager,
+                         contentBlockingManager: self.contentBlockerRulesManager,
                          tld: ContentBlocking.shared.tld)
     }()
     
     // MARK: - Ad Click Attribution
     
-    private let adClickAttributionDetection = ContentBlocking.shared.makeAdClickAttributionDetection()
-    let adClickAttributionLogic = ContentBlocking.shared.makeAdClickAttributionLogic()
+    private let adClickAttributionDetection: AdClickAttributionDetection
+    private let adClickAttributionLogic: AdClickAttributionLogic
     
     public var currentAttributionState: AdClickAttributionLogic.State? {
         adClickAttributionLogic.state
@@ -810,7 +891,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     private var youtubePlayerCancellables: Set<AnyCancellable> = []
 
     func setUpYoutubeScriptsIfNeeded() {
-        guard PrivatePlayer.shared.isAvailable else {
+        guard privatePlayer.isAvailable else {
             return
         }
 
@@ -1520,7 +1601,6 @@ extension Tab: WKNavigationDelegate {
         linkProtection.setMainFrameUrl(webView.url)
         referrerTrimming.onBeginNavigation(to: webView.url)
         adClickAttributionDetection.onStartNavigation(url: webView.url)
-        
     }
 
     @MainActor

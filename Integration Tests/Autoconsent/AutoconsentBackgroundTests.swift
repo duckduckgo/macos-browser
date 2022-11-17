@@ -17,6 +17,9 @@
 //
 
 import XCTest
+import Common
+import BrowserServicesKit
+import TrackerRadarKit
 @testable import DuckDuckGo_Privacy_Browser
 
 @available(macOS 11, *)
@@ -26,8 +29,16 @@ class AutoconsentBackgroundTests: XCTestCase {
         let prefs = PrivacySecurityPreferences.shared
         prefs.autoconsentEnabled = true
         // setup a webview with autoconsent userscript installed
-        let autoconsentUserScript = AutoconsentUserScript(scriptSource: DefaultScriptSourceProvider(),
-                                                          config: ContentBlocking.shared.privacyConfigurationManager.privacyConfig)
+        let sourceProvider = DefaultScriptSourceProvider(privacyConfigurationManager: MockPrivacyConfigurationManager(),
+                                                         contentBlockingManager: ContentBlockerRulesManagerMock(),
+                                                         trackerDataManager: TrackerDataManager(etag: DefaultConfigurationStorage.shared.loadEtag(for: .trackerRadar),
+                                                                                                data: DefaultConfigurationStorage.shared.loadData(for: .trackerRadar),
+                                                                                                embeddedDataProvider: AppTrackerDataSetProvider(),
+                                                                                                errorReporting: nil),
+
+                                                         tld: TLD())
+        let autoconsentUserScript = AutoconsentUserScript(scriptSource: sourceProvider,
+                                                          config: MockPrivacyConfigurationManager().privacyConfig)
         let configuration = WKWebViewConfiguration()
 
         configuration.userContentController.addUserScript(autoconsentUserScript.makeWKUserScript())

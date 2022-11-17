@@ -22,10 +22,8 @@ import BrowserServicesKit
 
 extension WKWebViewConfiguration {
 
-    func applyStandardConfiguration() {
-#if DEBUG
-        guard !AppDelegate.isRunningTests else { return }
-#endif
+    func applyStandardConfiguration(assetsPublisher: some Publisher<some UserContentControllerNewContent, Never>,
+                                    privacyConfigurationManager: PrivacyConfigurationManaging) {
 
         allowsAirPlayForMediaPlayback = true
         preferences.setValue(true, forKey: "fullScreenEnabled")
@@ -39,22 +37,15 @@ extension WKWebViewConfiguration {
             preferences.javaScriptCanOpenWindowsAutomatically = false
         }
         preferences.isFraudulentWebsiteWarningEnabled = false
-        
+
         if urlSchemeHandler(forURLScheme: PrivatePlayer.privatePlayerScheme) == nil {
             setURLSchemeHandler(PrivatePlayerSchemeHandler(), forURLScheme: PrivatePlayer.privatePlayerScheme)
         }
 
-        self.userContentController = UserContentController()
+        self.userContentController = UserContentController(assetsPublisher: assetsPublisher,
+                                                           privacyConfigurationManager: privacyConfigurationManager)
+
         self.processPool.geolocationProvider = GeolocationProvider(processPool: self.processPool)
      }
-
-}
-
-extension UserContentController {
-
-    convenience init(privacyConfigurationManager: PrivacyConfigurationManager = ContentBlocking.shared.privacyConfigurationManager) {
-        self.init(assetsPublisher: ContentBlocking.shared.userContentUpdating.userContentBlockingAssets,
-                  privacyConfigurationManager: privacyConfigurationManager)
-    }
 
 }
