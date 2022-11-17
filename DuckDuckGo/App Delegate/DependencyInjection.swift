@@ -112,6 +112,14 @@ struct DependencyInjection {
             }
         }
 
+        init(wrappedValue getDefault: @autoclosure () -> Value, forTests getValueForTests: @autoclosure () -> Value) {
+            if AppDelegate.isRunningTests {
+                self._wrappedValue = getValueForTests()
+            } else {
+                self._wrappedValue = getDefault()
+            }
+        }
+
         init(wrappedValue getDefault: @autoclosure () -> Value, _ testability: Testability = .appOnly) {
             if AppDelegate.isRunningTests, case .appOnly = testability {
                 os_log("Ignoring %s dependency default value", log: .default, type: .debug, "\(Value.self)")
@@ -137,7 +145,7 @@ struct DependencyInjection {
     private static var store = [AnyKeyPath: Any]()
     private init() {}
 
-    static func register<Client, Value>(_ keyPath: KeyPath<Client, Value>, value: @autoclosure () -> Value, _ testability: Testability = .appOnly) {
+    static func register<Client, Value>(_ keyPath: KeyPath<Client, Value>, value getValue: @autoclosure () -> Value, _ testability: Testability = .appOnly) {
 #if DEBUG
         dispatchPrecondition(condition: .onQueue(.main))
         if AppDelegate.isRunningTests, case .appOnly = testability {
@@ -147,7 +155,7 @@ struct DependencyInjection {
 #endif
 
         assert(store[keyPath] == nil, "\(Client.self).\(Value.self) dependency is already registered")
-        store[keyPath] = value()
+        store[keyPath] = getValue()
     }
 
     static func register<Value>(_ dependency: UnsafeMutablePointer<Value> /* a.k.a. inout Value */,
