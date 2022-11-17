@@ -211,9 +211,14 @@ private struct ConnectToBitwardenView: View {
                 Spacer()
             }
 
-            Button(UserText.openBitwaden) {
-                viewModel.process(action: .openBitwarden)
+            HStack {
+                Spacer().frame(width: 26)
+                Button(UserText.openBitwaden) {
+                    viewModel.process(action: .openBitwarden)
+                }
             }
+
+            Spacer().frame(height: 2)
             
             HStack {
                 NumberedBadge(value: 2)
