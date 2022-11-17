@@ -54,7 +54,7 @@ final class BitwardenCommunicator: BitwardenCommunication {
     private var process: BitwardenProcess?
 
     func runProxyProcess() throws {
-        if self.process != nil {
+        if process != nil {
             terminateProxyProcess()
         }
 
@@ -91,6 +91,13 @@ final class BitwardenCommunicator: BitwardenCommunication {
 
     private func processDidTerminate(_ process: Process) {
         os_log("BitwardenCommunicator: Proxy process terminated", log: .bitwarden, type: .default)
+
+        if let runningProcess = self.process?.process {
+            if process != runningProcess {
+                // Terminated to run another process
+                return
+            }
+        }
 
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }

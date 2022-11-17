@@ -54,13 +54,6 @@ final class BitwardenManager: BitwardenManagement, ObservableObject {
     func initCommunication(applicationDidFinishLaunching: Bool) {
         communicator.delegate = self
 
-        // Check preferences to make sure Bitwarden is set as password manager
-        let autofillPreferences = AutofillPreferences()
-        guard autofillPreferences.passwordManager == .bitwarden else {
-            // The built-in password manager is used
-            return
-        }
-
         connectToBitwadenProcess()
     }
 
@@ -84,7 +77,18 @@ final class BitwardenManager: BitwardenManagement, ObservableObject {
 
     // MARK: - Connection
 
+    var isBitwadenPasswordManager: Bool {
+        let autofillPreferences = AutofillPreferences()
+        return autofillPreferences.passwordManager == .bitwarden
+    }
+
     private func connectToBitwadenProcess() {
+        // Check preferences to make sure Bitwarden is set as password manager
+        guard isBitwadenPasswordManager else {
+            // The built-in password manager is used
+            return
+        }
+
         // Check whether Bitwarden is installed
         guard installationService.isBitwardenInstalled else {
             status = .notInstalled
@@ -543,6 +547,10 @@ final class BitwardenManager: BitwardenManagement, ObservableObject {
 extension BitwardenManager: BitwardenCommunicatorDelegate {
 
     func bitwadenCommunicatorProcessDidTerminate(_ bitwardenCommunicator: BitwardenCommunication) {
+        guard isBitwadenPasswordManager else {
+            return
+        }
+
         status = .notRunning
 
         scheduleConnectionAttempt()
