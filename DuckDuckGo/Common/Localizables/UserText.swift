@@ -574,7 +574,7 @@ struct UserText {
     static let installBitwardenInfo = NSLocalizedString("bitwarden.install.info", value: "To begin setup, first install Bitwarden from the App Store.", comment: "Setup of the integration with Bitwarden app")
     static let afterBitwardenInstallationInfo = NSLocalizedString("after.bitwarden.installation.info", value: "After installing, return to DuckDuckGo to complete the setup.", comment: "Setup of the integration with Bitwarden app")
     static let bitwardenAppFound = NSLocalizedString("bitwarden.app.found", value: "Bitwarden app found!", comment: "Setup of the integration with Bitwarden app")
-    static let lookingForBitwaden = NSLocalizedString("looking.for.bitwarden", value: "Looking for Bitwarden app...", comment: "Setup of the integration with Bitwarden app")
+    static let lookingForBitwaden = NSLocalizedString("looking.for.bitwarden", value: "Bitwarden not installed...", comment: "Setup of the integration with Bitwarden app")
     static let allowIntegration = NSLocalizedString("allow.integration", value: "Allow Integration with DuckDuckGo", comment: "Setup of the integration with Bitwarden app")
     static let openBitwadenAndLogInOrUnlock = NSLocalizedString("open.bitwarden.and.log.in.or.unlock", value: "Open Bitwarden and Log in or Unlock your vault.", comment: "Setup of the integration with Bitwarden app")
     static let selectBitwadenPreferences = NSLocalizedString("select.bitwarden.preferences", value: "Select Bitwarden → Preferences from the Mac menu bar.", comment: "Setup of the integration with Bitwarden app")
