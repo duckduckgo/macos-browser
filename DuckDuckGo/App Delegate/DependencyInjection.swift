@@ -35,10 +35,20 @@ struct DependencyInjection {
         var wrappedValue: Value {
             // swiftlint:disable:next implicit_getter
             get {
-                guard _wrappedValue != nil else {
-                    fatalError("\(Value.self) dependency not provided by the time of the first use")
+                if let value = _wrappedValue {
+                    return value
                 }
-                return _wrappedValue!
+                if let none = (Value.self as? AnyOptionalType)?.none as? Value {
+#if DEBUG
+                    if !AppDelegate.isRunningTests {
+                        os_log("Optional dependency %s not provided, this may indicate a bug",
+                               log: .default, type: .debug, "\(Value.self)")
+                    }
+#endif
+                    return none
+                }
+
+                fatalError("\(Value.self) dependency not provided by the time of the first use")
             }
             // -> getting here right before the DependencyInjection.register(&Client.key, value: value) is called
             _modify {
@@ -69,28 +79,38 @@ struct DependencyInjection {
         }
 
         /// Used for class instance variables
-        static subscript<EnclosingSelf: AnyObject>(
-            _enclosingInstance object: EnclosingSelf,
-            wrapped wrappedKeyPath: KeyPath<EnclosingSelf, Value>,
-            storage storageKeyPath: ReferenceWritableKeyPath<EnclosingSelf, Injected<Value>>
-        ) -> Value {
+        static subscript<Client: AnyObject>(_enclosingInstance object: Client,
+                                            wrapped wrappedKeyPath: KeyPath<Client, Value>,
+                                            storage storageKeyPath: ReferenceWritableKeyPath<Client, Injected<Value>>) -> Value {
             get {
                 // we either get initialised with @Injected(default: value)
                 if let value = object[keyPath: storageKeyPath]._wrappedValue {
-                    assert(DependencyInjection.store[wrappedKeyPath] == nil, "\(Value.self) dependecy has been set twice!")
+                    assert(DependencyInjection.store[wrappedKeyPath] == nil,
+                           "\(Client.self).\(Value.self) dependecy has been set twice!")
                     return value
                 }
 
                 // or by using DependencyInjection.register(\\Client.key, value: value)
-                guard let value = store[wrappedKeyPath] as? Value else {
-                    fatalError("\(Value.self) dependency not provided by the time of the first use. " +
-                               "Provide dependency value using `DependencyInjection.register(\\Client.key, value: value)`")
+                if let value = store[wrappedKeyPath] as? Value {
+                    return value
                 }
 
-                return value
+                if let none = (Value.self as? AnyOptionalType)?.none as? Value {
+#if DEBUG
+                    if !AppDelegate.isRunningTests {
+                        os_log("Optional dependency %s not provided, this may indicate a bug",
+                               log: .default, type: .debug, "\(Client.self).\(Value.self)")
+                    }
+#endif
+                    return none
+                }
+
+                fatalError("\(Client.self).\(Value.self) dependency not provided by the time of the first use. " +
+                           "Provide dependency value using `DependencyInjection.register(\\\(Client.self).key, value: value)`")
             }
             set {
-                fatalError("Don‘t set depencencies directly, use `DependencyInjection.register(\\Client.key, value: value)` instead")
+                fatalError("Don‘t set depencencies directly, " +
+                           "use `DependencyInjection.register(\\\(Client.self).key, value: value)` instead")
             }
         }
 
@@ -132,33 +152,38 @@ struct DependencyInjection {
         store[keyPath] = value()
     }
 
-    static func register<Value>(_ dependency: inout Value, value: @autoclosure () -> Value, _ testability: Testability = .appOnly) {
+    static func register<Value>(_ dependency: UnsafeMutablePointer<Value> /* a.k.a. inout Value */,
+                                value: @autoclosure () -> Value,
+                                _ testability: Testability = .appOnly) {
 #if DEBUG
         dispatchPrecondition(condition: .onQueue(.main))
+
+        // setting flag to privent direct `Struct.staticDependency = value` setting
+        isRegisteringDependency = true
+
         if AppDelegate.isRunningTests, case .appOnly = testability {
             os_log("Skipping %s dependency registration", log: .default, type: .debug, "\(Value.self)")
             return
         }
+#endif
 
         // we get here after retreiving the initial value from `yield &ptr` in Injected.wrappedValue._modify
         // the initial value can be nil although the result type is not
         // by this nullable pointer casting we allow the value to be nullable and so rollbackable
-        let wrappedPtr = withUnsafeMutableBytes(of: &dependency) { ptr in
-            ptr.baseAddress!.assumingMemoryBound(to: Optional<Value>.self)
-        }
-        let initialValue = wrappedPtr.pointee
+        assert(MemoryLayout<Value>.size == MemoryLayout<Value?>.size)
+        assert(MemoryLayout<Value>.stride == MemoryLayout<Value?>.stride)
+        let optionalPtr = dependency.withMemoryRebound(to: Value?.self, capacity: 1) { $0 }
 
-        // setting flag to privent direct `Struct.staticDependency = value` setting
-        isRegisteringDependency = true
+#if DEBUG
+        let initialValue = optionalPtr.pointee
 #endif
-
-        dependency = value()
+        optionalPtr.pointee = value()
 
 #if DEBUG
         if AppDelegate.isRunningTests {
             // rollback to default value in XCTestCase.tearDown
             resetInjectedValues = { [next=resetInjectedValues] in
-                wrappedPtr.pointee = initialValue
+                optionalPtr.pointee = initialValue
                 next?() ?? {
                     self.resetInjectedValues = nil
                 }()

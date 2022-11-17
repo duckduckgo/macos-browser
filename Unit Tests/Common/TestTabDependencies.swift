@@ -1,7 +1,7 @@
 //
-//  OptionalExtension.swift
+//  TestTabDependencies.swift
 //
-//  Copyright © 2021 DuckDuckGo. All rights reserved.
+//  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -17,25 +17,12 @@
 //
 
 import Foundation
+@testable import DuckDuckGo_Privacy_Browser
 
-protocol OptionalProtocol {
-    associatedtype Wrapped
+struct TestTabExtensionsBuilder: ExtensionsBuilder {
 
-    var isNil: Bool { get }
-
-    static var none: Self { get }
-    static func some(_: Wrapped) -> Self
-}
-typealias AnyOptional = any OptionalProtocol
-typealias AnyOptionalType = any OptionalProtocol.Type
-
-extension Optional: OptionalProtocol {
-
-    var isNil: Bool {
-        if case .none = self {
-            return true
-        }
-        return false
+    func buildExtensions(for tab: Tab) -> DynamicTabExtensions {
+        DynamicTabExtensions()
     }
 
 }

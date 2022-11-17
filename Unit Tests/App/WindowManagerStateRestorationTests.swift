@@ -21,18 +21,11 @@ import XCTest
 
 final class WindowManagerStateRestorationTests: XCTestCase {
 
-//    override func setUp() {
-//        TestsDependencyProvider<Tab>.setUp {
-//            $0.faviconManagement = FaviconManagerMock()
-//            $0.useDefault(for: \.privatePlayer)
-//            $0.useDefault(for: \.windowControllersManager)
-//            $0.extensionsBuilder = TestTabExtensionsBuilder()
-//        }
-//    }
-
+    override func setUp() {
+        registerDependency(&Tab.Dependencies.faviconManagement, value: FaviconManagerMock())
+    }
     override func tearDown() {
         WindowsManager.closeWindows()
-//        TestsDependencyProvider<Tab>.reset()
     }
 
     func isTab(_ a: Tab, equalTo b: Tab) -> Bool {

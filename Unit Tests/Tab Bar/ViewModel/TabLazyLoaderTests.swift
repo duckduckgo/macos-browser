@@ -97,20 +97,10 @@ class TabLazyLoaderTests: XCTestCase {
     var cancellables = Set<AnyCancellable>()
 
     override func setUp() {
-//        TestsDependencyProvider<Tab>.setUp {
-//            $0.faviconManagement = FaviconManagerMock()
-//            $0.useDefault(for: \.privatePlayer)
-//            $0.useDefault(for: \.windowControllersManager)
-//            $0.useDefault(for: \.pinnedTabsManager)
-//            $0.useDefault(for: \.historyCoordinating)
-//            $0.extensionsBuilder = TestTabExtensionsBuilder()
-//        }
+        registerDependency(&Tab.Dependencies.faviconManagement, value: FaviconManagerMock())
+
         dataSource = TabLazyLoaderDataSourceMock()
         cancellables.removeAll()
-    }
-
-    override func tearDown() {
-//        TestsDependencyProvider<Tab>.reset()
     }
 
     func testWhenThereAreNoTabsThenLazyLoaderIsNotInstantiated() throws {
