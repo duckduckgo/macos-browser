@@ -69,8 +69,8 @@ jobs:
       with:
         submodules: recursive
 
-    - name: Select Xcode 14.0
-      run: sudo xcode-select -s /Applications/Xcode_14.0.app/Contents/Developer
+    - name: Select Xcode
+      run: sudo xcode-select -s /Applications/Xcode_14.1.app/Contents/Developer
 
     - name: Build and test
       run: |
