@@ -25,6 +25,7 @@
 		3151D6502924192600278B0F /* GPCTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3151D64C2924192600278B0F /* GPCTests.swift */; };
 		3151D65929241CA500278B0F /* global-privacy-control in Resources */ = {isa = PBXBuildFile; fileRef = 3151D65829241CA500278B0F /* global-privacy-control */; };
 		3154FD1428E6011A00909769 /* TabShadowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3154FD1328E6011A00909769 /* TabShadowView.swift */; };
+		31570B7F2926BD6E00882A64 /* PrivacyReferenceTestHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31570B7E2926BD6E00882A64 /* PrivacyReferenceTestHelper.swift */; };
 		315AA07028CA5CC800200030 /* YoutubePlayerNavigationHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 315AA06F28CA5CC800200030 /* YoutubePlayerNavigationHandler.swift */; };
 		3171D6B82889849F0068632A /* CookieManagedNotificationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3171D6B72889849F0068632A /* CookieManagedNotificationView.swift */; };
 		3171D6BA288984D00068632A /* BadgeAnimationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3171D6B9288984D00068632A /* BadgeAnimationView.swift */; };
@@ -856,6 +857,7 @@
 		3151D64C2924192600278B0F /* GPCTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GPCTests.swift; sourceTree = "<group>"; };
 		3151D65829241CA500278B0F /* global-privacy-control */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "global-privacy-control"; sourceTree = "<group>"; };
 		3154FD1328E6011A00909769 /* TabShadowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabShadowView.swift; sourceTree = "<group>"; };
+		31570B7E2926BD6E00882A64 /* PrivacyReferenceTestHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyReferenceTestHelper.swift; sourceTree = "<group>"; };
 		315AA06F28CA5CC800200030 /* YoutubePlayerNavigationHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YoutubePlayerNavigationHandler.swift; sourceTree = "<group>"; };
 		3171D6B72889849F0068632A /* CookieManagedNotificationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieManagedNotificationView.swift; sourceTree = "<group>"; };
 		3171D6B9288984D00068632A /* BadgeAnimationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BadgeAnimationView.swift; sourceTree = "<group>"; };
@@ -1744,6 +1746,7 @@
 			children = (
 				3151D65829241CA500278B0F /* global-privacy-control */,
 				3151D64C2924192600278B0F /* GPCTests.swift */,
+				31570B7E2926BD6E00882A64 /* PrivacyReferenceTestHelper.swift */,
 			);
 			path = "Privacy Reference Tests";
 			sourceTree = "<group>";
@@ -5146,6 +5149,7 @@
 				4B723E1926B000DC00E14D75 /* TemporaryFileCreator.swift in Sources */,
 				98EB5D1027516A4800681FE6 /* AppPrivacyConfigurationTests.swift in Sources */,
 				4B9292C22667103100AD2C21 /* BookmarkTests.swift in Sources */,
+				31570B7F2926BD6E00882A64 /* PrivacyReferenceTestHelper.swift in Sources */,
 				142879DC24CE1185005419BB /* SuggestionContainerViewModelTests.swift in Sources */,
 				AA0877B826D5160D00B05660 /* SafariVersionReaderTests.swift in Sources */,
 				B69B50452726C5C200758A2B /* AtbParserTests.swift in Sources */,
