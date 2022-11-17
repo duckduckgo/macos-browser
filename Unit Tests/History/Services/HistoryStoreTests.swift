@@ -25,7 +25,7 @@ final class HistoryStoreTests: XCTestCase {
     private var cancellables = Set<AnyCancellable>()
 
     override func setUp() {
-        DependencyInjection.register(&Tab.Dependencies.faviconManagement, value: FaviconManagerMock())
+        registerDependency(&Tab.Dependencies.faviconManagement, value: FaviconManagerMock())
     }
 
     func save(entry: HistoryEntry, historyStore: HistoryStore, expectation: XCTestExpectation) {

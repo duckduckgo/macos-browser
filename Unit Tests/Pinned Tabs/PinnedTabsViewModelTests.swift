@@ -26,7 +26,7 @@ class PinnedTabsViewModelTests: XCTestCase {
 
     override func setUp() {
         assert(WindowControllersManager.shared.mainWindowControllers.isEmpty)
-        DependencyInjection.register(&Tab.Dependencies.faviconManagement, value: FaviconManagerMock())
+        registerDependency(&Tab.Dependencies.faviconManagement, value: FaviconManagerMock())
         collection = TabCollection(tabs: [
             Tab(content: .url("http://a.com".url!)),
             Tab(content: .url("http://b.com".url!)),

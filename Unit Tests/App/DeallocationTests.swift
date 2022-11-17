@@ -25,7 +25,7 @@ final class DeallocationTests: XCTestCase {
 
     override func setUp() {
         assert(WindowControllersManager.shared.mainWindowControllers.isEmpty)
-        DependencyInjection.register(&Tab.Dependencies.faviconManagement, value: FaviconManagerMock())    }
+        registerDependency(&Tab.Dependencies.faviconManagement, value: FaviconManagerMock())    }
 
     override func tearDown() {
         WindowsManager.closeWindows()

@@ -22,7 +22,7 @@ import XCTest
 class PinnedTabsManagerTests: XCTestCase {
 
     override func setUp() {
-        DependencyInjection.register(&Tab.Dependencies.faviconManagement, value: FaviconManagerMock())
+        registerDependency(&Tab.Dependencies.faviconManagement, value: FaviconManagerMock())
     }
 
     func testInitialState() throws {

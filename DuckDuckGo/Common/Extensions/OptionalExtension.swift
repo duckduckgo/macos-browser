@@ -19,8 +19,15 @@
 import Foundation
 
 protocol OptionalProtocol {
+    associatedtype Wrapped
+
     var isNil: Bool { get }
+
+    static var none: Self { get }
+    static func some(_: Wrapped) -> Self
 }
+typealias AnyOptional = any OptionalProtocol
+typealias AnyOptionalType = any OptionalProtocol.Type
 
 extension Optional: OptionalProtocol {
 

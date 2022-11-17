@@ -27,7 +27,7 @@ final class FireTests: XCTestCase {
     var cancellables = Set<AnyCancellable>()
 
     override func setUp() {
-        DependencyInjection.register(&Tab.Dependencies.faviconManagement, value: FaviconManagerMock())
+        registerDependency(&Tab.Dependencies.faviconManagement, value: FaviconManagerMock())
     }
 
     func testWhenBurnAllThenTabsAreClosedAndNewEmptyTabIsOpen() {

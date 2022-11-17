@@ -22,7 +22,8 @@ import XCTest
 final class FirePopoverViewModelTests: XCTestCase {
 
     override func setUp() {
-        DependencyInjection.register(&Tab.Dependencies.faviconManagement, value: FaviconManagerMock())
+        registerDependency(&Tab.Dependencies.faviconManagement, value: FaviconManagerMock())
+        registerDependency(&Tab.Dependencies.historyCoordinating, value: HistoryCoordinatingMock())
     }
 
     func testWhenThereIsOneTabWithNoHistoryThenClearingOptionsContainsCurrentTab() {

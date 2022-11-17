@@ -25,7 +25,8 @@ final class AppStateChangePublisherTests: XCTestCase {
 
     override func setUp() {
         assert(WindowControllersManager.shared.mainWindowControllers.isEmpty)
-        DependencyInjection.register(&Tab.Dependencies.faviconManagement, value: FaviconManagerMock())
+        registerDependency(&Tab.Dependencies.faviconManagement, value: FaviconManagerMock())
+        registerDependency(&Tab.Dependencies.historyCoordinating, value: HistoryCoordinatingMock())
     }
 
     override func tearDown() {
@@ -34,7 +35,6 @@ final class AppStateChangePublisherTests: XCTestCase {
         for controller in WindowControllersManager.shared.mainWindowControllers {
             WindowControllersManager.shared.unregister(controller)
         }
-
     }
 
     final class MultiExpectation {

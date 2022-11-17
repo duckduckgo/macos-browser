@@ -39,7 +39,7 @@ class AppUsageActivityMonitorTests: XCTestCase {
         wasActive = NSApp.isActive
         NSApp.setValue(true, forKey: "isActive")
 
-        DependencyInjection.register(&Tab.Dependencies.faviconManagement, value: FaviconManagerMock())
+        registerDependency(&Tab.Dependencies.faviconManagement, value: FaviconManagerMock())
     }
 
     override func tearDown() {

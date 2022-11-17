@@ -20,24 +20,6 @@ import XCTest
 import Combine
 @testable import DuckDuckGo_Privacy_Browser
 
-extension XCTestCase {
-
-    func registerDependency<Client, Value>(_ keyPath: KeyPath<Client, Value>, value: Value) {
-        DependencyInjection.register(keyPath, value: value, .testable)
-        addTeardownBlock {
-            DependencyInjection.reset()
-        }
-    }
-
-    func registerDependency<Value>(_ dependency: inout Value, value: Value) {
-        DependencyInjection.register(&dependency, value: value, .testable)
-        addTeardownBlock {
-            DependencyInjection.reset()
-        }
-    }
-
-}
-
 final class DependencyProviderTests: XCTestCase {
 
     func testDependencyProviderResetsValueAfterTest() {

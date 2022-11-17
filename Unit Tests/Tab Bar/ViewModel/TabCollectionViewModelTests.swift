@@ -24,7 +24,7 @@ import Combine
 final class TabCollectionViewModelTests: XCTestCase {
 
     override func setUp() {
-        DependencyInjection.register(&Tab.Dependencies.faviconManagement, value: FaviconManagerMock())
+        registerDependency(&Tab.Dependencies.faviconManagement, value: FaviconManagerMock())
     }
 
     // MARK: - TabViewModel

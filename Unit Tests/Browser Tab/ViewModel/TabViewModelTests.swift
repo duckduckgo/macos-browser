@@ -25,7 +25,7 @@ final class TabViewModelTests: XCTestCase {
     var cancellables = Set<AnyCancellable>()
 
     override func setUp() {
-        DependencyInjection.register(&Tab.Dependencies.faviconManagement, value: FaviconManagerMock())
+        registerDependency(&Tab.Dependencies.faviconManagement, value: FaviconManagerMock())
     }
 
     // MARK: - Can reload

@@ -51,7 +51,9 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         @Injected(default: FaviconManager.shared) static var faviconManagement: FaviconManagement
         @Injected(default: HistoryCoordinator.shared, .testable) static var historyCoordinating: HistoryCoordinating
 
-        @Injected(default: WindowControllersManager.shared.pinnedTabsManager, .testable) static var pinnedTabsManager: PinnedTabsManager
+        @Injected(default: WindowControllersManager.shared.pinnedTabsManager, .testable)
+        static var pinnedTabsManager: PinnedTabsManager
+
         @Injected(default: .shared, .testable) static var privatePlayer: PrivatePlayer
         @Injected(default: .shared) static var cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter?
         @Injected(default: .shared) static var workspace: NSWorkspace

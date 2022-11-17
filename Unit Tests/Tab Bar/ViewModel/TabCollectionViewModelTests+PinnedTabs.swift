@@ -21,7 +21,12 @@ import XCTest
 
 // MARK: - Tests for TabCollectionViewModel with pinned tabs
 
-extension TabCollectionViewModelTests {
+final class TabCollectionViewModelWithPinnedTabsTests: XCTestCase {
+
+    override func setUp() {
+        registerDependency(&Tab.Dependencies.faviconManagement, value: FaviconManagerMock())
+        registerDependency(&Tab.Dependencies.historyCoordinating, value: HistoryCoordinatingMock())
+    }
 
     // MARK: - Select
 

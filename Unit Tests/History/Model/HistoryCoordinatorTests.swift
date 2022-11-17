@@ -22,7 +22,7 @@ import XCTest
 class HistoryCoordinatorTests: XCTestCase {
 
     override func setUp() {
-        DependencyInjection.register(&Tab.Dependencies.faviconManagement, value: FaviconManagerMock())
+        registerDependency(&Tab.Dependencies.faviconManagement, value: FaviconManagerMock())
     }
 
     func testWhenHistoryCoordinatorIsInitialized_ThenHistoryIsCleanedAndLoadedFromTheStore() {
@@ -104,7 +104,7 @@ class HistoryCoordinatorTests: XCTestCase {
 
     func testWhenTabChangesContent_commitHistoryIsCalled() {
         let historyCoordinatorMock = HistoryCoordinatingMock()
-//        TestsDependencyProvider<Tab>.shared.historyCoordinating = historyCoordinatorMock
+        registerDependency(&Tab.Dependencies.historyCoordinating, value: historyCoordinatorMock)
         let tab = Tab(content: .url(.duckDuckGo))
         tab.setContent(.url(.aboutDuckDuckGo))
 
