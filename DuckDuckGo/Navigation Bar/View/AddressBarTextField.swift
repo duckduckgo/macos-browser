@@ -988,6 +988,20 @@ extension AddressBarTextField: NSTextViewDelegate {
 
 final class AddressBarTextEditor: NSTextView {
 
+    override func mouseDown(with event: NSEvent) {
+        super.mouseDown(with: event)
+
+        guard let delegate = delegate as? AddressBarTextField else {
+            os_log("AddressBarTextEditor: unexpected kind of delegate")
+            return
+        }
+
+        if let currentSelection = selectedRanges.first as? NSRange {
+            let adjustedSelection = delegate.filterSuffix(fromSelectionRange: currentSelection, for: string)
+            setSelectedRange(adjustedSelection)
+        }
+    }
+
     override func paste(_ sender: Any?) {
         guard let delegate = delegate as? AddressBarTextField else {
             os_log("AddressBarTextEditor: unexpected kind of delegate")
