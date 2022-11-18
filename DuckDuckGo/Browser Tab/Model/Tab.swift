@@ -681,6 +681,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
     private func setupWebView(shouldLoadInBackground: Bool) {
         webView.navigationDelegate = self
+        webView.contextMenuDelegate = contextMenuManager
         webView.allowsBackForwardNavigationGestures = true
         webView.allowsMagnification = true
 
@@ -927,18 +928,21 @@ extension Tab: PageObserverUserScriptDelegate {
 
 }
 
-extension Tab: NSMenuDelegate, ContextMenuDelegate {
+extension Tab: ContextMenuManagerDelegate {
 
-    func menuWillOpen(_ menu: NSMenu) {
-        contextMenuManager.menuWillOpen(menu)
+    func launchSearch(for text: String) {
+        guard let url = URL.makeSearchUrl(from: text) else {
+            assertionFailure("Failed to make Search URL")
+            return
+        }
+
+        self.delegate?.tab(self, requestedNewTabWith: .url(url), selected: true)
     }
 
-    func menuDidClose(_ menu: NSMenu) {
-        contextMenuManager.menuDidClose(menu)
-    }
-
-    func openNewTab(with url: URL, selected: Bool) {
-        delegate?.tab(self, requestedNewTabWith: .url(url), selected: selected)
+    func prepareForContextMenuDownload() {
+        // handling legacy WebKit Downloads for downloads initiated by Context Menu
+        self.webView.configuration.processPool
+            .setDownloadDelegateIfNeeded(using: LegacyWebKitDownloadDelegate.init)
     }
 
 }
@@ -1120,6 +1124,8 @@ extension Tab: WKNavigationDelegate {
 
     struct Constants {
         static let webkitMiddleClick = 4
+        static let ddgClientHeaderKey = "X-DuckDuckGo-Client"
+        static let ddgClientHeaderValue = "macOS"
     }
 
     // swiftlint:disable cyclomatic_complexity
@@ -1295,6 +1301,17 @@ extension Tab: WKNavigationDelegate {
                     await prepareForContentBlocking()
                 }
             }
+        }
+        
+        if navigationAction.isTargetingMainFrame,
+           navigationAction.request.url?.isDuckDuckGo == true,
+           navigationAction.request.value(forHTTPHeaderField: Constants.ddgClientHeaderKey) == nil,
+           navigationAction.navigationType != .backForward {
+            
+            var request = navigationAction.request
+            request.setValue(Constants.ddgClientHeaderValue, forHTTPHeaderField: Constants.ddgClientHeaderKey)
+            _ = webView.load(request)
+            return .cancel
         }
 
         toggleFBProtection(for: url)

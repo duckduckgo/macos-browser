@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="21512" systemVersion="22A380" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="BookmarkManagedObject" representedClassName="BookmarkManagedObject" syncable="YES" codeGenerationType="class">
+        <attribute name="dateAdded" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="faviconEncrypted" optional="YES" attributeType="Transformable" valueTransformerName="NSImageTransformer"/>
+        <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="isFolder" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="titleEncrypted" attributeType="Transformable" valueTransformerName="NSStringTransformer"/>
+        <attribute name="urlEncrypted" optional="YES" attributeType="Transformable" valueTransformerName="NSURLTransformer"/>
+        <relationship name="children" optional="YES" toMany="YES" deletionRule="Cascade" ordered="YES" destinationEntity="BookmarkManagedObject" inverseName="parentFolder" inverseEntity="BookmarkManagedObject"/>
+        <relationship name="favorites" optional="YES" toMany="YES" deletionRule="Nullify" ordered="YES" destinationEntity="BookmarkManagedObject" inverseName="favoritesFolder" inverseEntity="BookmarkManagedObject"/>
+        <relationship name="favoritesFolder" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="BookmarkManagedObject" inverseName="favorites" inverseEntity="BookmarkManagedObject"/>
+        <relationship name="parentFolder" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="BookmarkManagedObject" inverseName="children" inverseEntity="BookmarkManagedObject"/>
+        <fetchIndex name="byDateAdded">
+            <fetchIndexElement property="dateAdded" type="Binary" order="descending"/>
+        </fetchIndex>
+        <fetchIndex name="byID">
+            <fetchIndexElement property="id" type="Binary" order="ascending"/>
+        </fetchIndex>
+        <uniquenessConstraints>
+            <uniquenessConstraint>
+                <constraint value="id"/>
+            </uniquenessConstraint>
+        </uniquenessConstraints>
+    </entity>
+</model>
