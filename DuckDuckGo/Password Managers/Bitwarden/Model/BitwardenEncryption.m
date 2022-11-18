@@ -35,6 +35,8 @@ RSA *keypair;
 // Second half (32 bytes) for hmac
 NSData *sharedKeyData;
 NSData *encryptionKeyData;
+AES_KEY encryptionKey;
+AES_KEY decryptionKey;
 NSData *macKeyData;
 
 - (nullable NSString *)generateKeys {
@@ -65,7 +67,12 @@ NSData *macKeyData;
     }
 
     sharedKeyData = sharedKey;
+    // First 32 bytes are encryption/decryption key
     encryptionKeyData = [sharedKeyData subdataWithRange:NSMakeRange(0, 32)];
+    AES_set_encrypt_key(encryptionKeyData.bytes, (int)encryptionKeyData.length * 8, &encryptionKey);
+    AES_set_decrypt_key(encryptionKeyData.bytes, (int)encryptionKeyData.length * 8, &decryptionKey);
+
+    // Last 32 bytes are mac key
     macKeyData = [sharedKeyData subdataWithRange:NSMakeRange(32, 32)];
     return true;
 }
@@ -117,11 +124,8 @@ NSData *macKeyData;
     unsigned char ivCopy[IV_LENGTH];
     memcpy(&ivCopy, ivBytes, IV_LENGTH);
 
-    //TODO: Set global encryption and decryption key
     // Encrypt
-    AES_KEY enc_key;
-    AES_set_encrypt_key(encryptionKeyData.bytes, (int)encryptionKeyData.length * 8, &enc_key);
-    AES_cbc_encrypt(dataArray, encryptionOutput, dataArrayLength, &enc_key, (unsigned char *)ivCopy, AES_ENCRYPT);
+    AES_cbc_encrypt(dataArray, encryptionOutput, dataArrayLength, &encryptionKey, (unsigned char *)ivCopy, AES_ENCRYPT);
 
     NSData *encryptedData = [NSData dataWithBytes:encryptionOutput length: encryptedDataLength];
     free(encryptionOutput);
@@ -168,9 +172,8 @@ NSData *macKeyData;
     unsigned char ivCopy[ivData.length];
     memcpy(&ivCopy, ivBytes, ivData.length);
 
-    AES_KEY dec_key;
-    AES_set_decrypt_key(encryptionKeyData.bytes, (int)encryptionKeyData.length * 8, &dec_key);
-    AES_cbc_encrypt(data.bytes, decryptionOutput, data.length, &dec_key, (unsigned char *)ivCopy, AES_DECRYPT);
+    // Decrypt
+    AES_cbc_encrypt(data.bytes, decryptionOutput, data.length, &decryptionKey, (unsigned char *)ivCopy, AES_DECRYPT);
 
     // Padding removal
     for(;!isgraph(*(decryptionOutput+(decryptionOutputLength - 1)));decryptionOutputLength--);
