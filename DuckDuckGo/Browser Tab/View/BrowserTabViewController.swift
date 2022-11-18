@@ -27,9 +27,8 @@ protocol BrowserTabViewControllerClickDelegate: AnyObject {
     func browserTabViewController(_ browserTabViewController: BrowserTabViewController, didClickAtPoint: CGPoint)
 }
 
-// swiftlint:disable file_length
 final class BrowserTabViewController: NSViewController {
-    
+
     @IBOutlet weak var errorView: NSView!
     @IBOutlet weak var homePageView: NSView!
     @IBOutlet weak var errorMessageLabel: NSTextField!
@@ -40,7 +39,6 @@ final class BrowserTabViewController: NSViewController {
     private weak var webViewSnapshot: NSView?
 
     var tabViewModel: TabViewModel?
-    var clickPoint: NSPoint?
 
     private let tabCollectionViewModel: TabCollectionViewModel
     private var tabContentCancellable: AnyCancellable?
@@ -49,18 +47,12 @@ final class BrowserTabViewController: NSViewController {
     private var keyWindowSelectedTabCancellable: AnyCancellable?
     private var cancellables = Set<AnyCancellable>()
 
-    private var contextMenuExpected = false
-    private var contextMenuTitle: String?
-    private var contextMenuLink: URL?
-    private var contextMenuImage: URL?
-    private var contextMenuSelectedText: String?
-
     private var hoverLabelWorkItem: DispatchWorkItem?
 
     private var transientTabContentViewController: NSViewController?
 
     private var mouseDownMonitor: Any?
-    
+
     private var cookieConsentPopoverManager = CookieConsentPopoverManager()
 
     required init?(coder: NSCoder) {
@@ -116,11 +108,11 @@ final class BrowserTabViewController: NSViewController {
     private func windowWillClose(_ notification: NSNotification) {
         self.removeWebViewFromHierarchy()
     }
-    
+
     private func subscribeToSelectedTabViewModel() {
         tabCollectionViewModel.$selectedTabViewModel
             .sink { [weak self] selectedTabViewModel in
-                
+
                 guard let self = self else { return }
                 self.tabViewModel = selectedTabViewModel
                 self.showTabContent(of: selectedTabViewModel)
@@ -313,7 +305,7 @@ final class BrowserTabViewController: NSViewController {
         guard tabCollectionViewModel.selectDisplayableTabIfPresent(content) == false else {
             return
         }
-        
+
         let tab = Tab(content: content,
                       parentTab: parentTab,
                       shouldLoadInBackground: true,
@@ -479,16 +471,16 @@ extension BrowserTabViewController: ContentOverlayUserScriptDelegate {
 extension BrowserTabViewController: TabDelegate {
 
     func tab(_ tab: Tab, promptUserForCookieConsent result: @escaping (Bool) -> Void) {
-       cookieConsentPopoverManager.show(on: view, animated: true, result: result)
-       cookieConsentPopoverManager.currentTab = tab
+        cookieConsentPopoverManager.show(on: view, animated: true, result: result)
+        cookieConsentPopoverManager.currentTab = tab
     }
-    
+
     func tabWillStartNavigation(_ tab: Tab, isUserInitiated: Bool) {
         if isUserInitiated,
            let window = self.view.window,
            window.isPopUpWindow == true,
            window.isKeyWindow == false {
-            
+
             window.makeKeyAndOrderFront(nil)
         }
     }
@@ -560,20 +552,6 @@ extension BrowserTabViewController: TabDelegate {
             return
         }
         tabCollectionViewModel.remove(at: .unpinned(index))
-    }
-
-    // swiftlint:disable:next function_parameter_count
-    func tab(_ tab: Tab,
-             willShowContextMenuAt position: NSPoint,
-             image: URL?,
-             title: String?,
-             link: URL?,
-             selectedText: String?) {
-        contextMenuImage = image
-        contextMenuTitle = title
-        contextMenuLink = link
-        contextMenuExpected = true
-        contextMenuSelectedText = selectedText
     }
 
     func tab(_ tab: Tab,
@@ -704,98 +682,6 @@ extension BrowserTabViewController: FileDownloadManagerDelegate {
 
 }
 
-extension BrowserTabViewController: NSMenuDelegate {
-
-    func menuWillOpen(_ menu: NSMenu) {
-        guard contextMenuExpected else {
-            os_log("%s: Unexpected menuWillOpen", type: .error, className)
-            contextMenuLink = nil
-            contextMenuImage = nil
-            return
-        }
-        contextMenuExpected = false
-    }
-
-}
-
-extension BrowserTabViewController: LinkMenuItemSelectors {
-
-    func openLinkInNewTab(_ sender: NSMenuItem) {
-        guard let url = contextMenuLink else { return }
-        openNewTab(with: .url(url), parentTab: tabViewModel?.tab)
-    }
-
-    func openLinkInNewWindow(_ sender: NSMenuItem) {
-        guard let url = contextMenuLink else { return }
-        WindowsManager.openNewWindow(with: url, sourceTab: tabViewModel?.tab)
-    }
-
-    func downloadLinkedFileAs(_ sender: NSMenuItem) {
-        guard let tab = tabCollectionViewModel.selectedTabViewModel?.tab,
-              let url = contextMenuLink else { return }
-
-        tab.download(from: url)
-    }
-    
-    func addLinkToBookmarks(_ sender: NSMenuItem) {
-        guard let url = contextMenuLink else { return }
-        LocalBookmarkManager.shared.makeBookmark(for: url, title: contextMenuTitle ?? url.absoluteString, isFavorite: false)
-    }
-    
-    func bookmarkPage(_ sender: NSMenuItem) {
-        guard let tab = tabCollectionViewModel.selectedTabViewModel?.tab, let tabURL = tab.url else { return }
-        LocalBookmarkManager.shared.makeBookmark(for: tabURL, title: tab.title ?? tabURL.absoluteString, isFavorite: false)
-    }
-
-    func copyLink(_ sender: NSMenuItem) {
-        guard let url = contextMenuLink as NSURL? else { return }
-
-        let pasteboard = NSPasteboard.general
-        pasteboard.declareTypes([.URL], owner: nil)
-        url.write(to: pasteboard)
-        pasteboard.setString(url.absoluteString ?? "", forType: .string)
-    }
-
-}
-
-extension BrowserTabViewController: ImageMenuItemSelectors {
-
-    func openImageInNewTab(_ sender: NSMenuItem) {
-        guard let url = contextMenuImage else { return }
-        openNewTab(with: .url(url), parentTab: tabViewModel?.tab)
-    }
-
-    func openImageInNewWindow(_ sender: NSMenuItem) {
-        guard let url = contextMenuImage else { return }
-        WindowsManager.openNewWindow(with: url)
-    }
-
-    func saveImageAs(_ sender: NSMenuItem) {
-        guard let tab = tabCollectionViewModel.selectedTabViewModel?.tab,
-              let url = contextMenuImage else { return }
-
-        tab.download(from: url)
-    }
-
-    func copyImageAddress(_ sender: NSMenuItem) {
-        guard let url = contextMenuImage else { return }
-        NSPasteboard.general.clearContents()
-        NSPasteboard.general.setString(url.absoluteString, forType: .string)
-        NSPasteboard.general.setString(url.absoluteString, forType: .URL)
-    }
-
-}
-
-extension BrowserTabViewController: MenuItemSelectors {
-
-    func search(_ sender: NSMenuItem) {
-        let selectedText = contextMenuSelectedText ?? ""
-        guard let url = URL.makeSearchUrl(from: selectedText) else { return }
-        openNewTab(with: .url(url), parentTab: tabViewModel?.tab, selected: true)
-    }
-
-}
-
 extension BrowserTabViewController: WKUIDelegate {
 
     @objc(_webView:saveDataToFile:suggestedFilename:mimeType:originatingURL:)
@@ -833,6 +719,8 @@ extension BrowserTabViewController: WKUIDelegate {
         }
     }
 
+    // swiftlint:disable cyclomatic_complexity
+    // swiftlint:disable function_body_length
     func webView(_ webView: WKWebView,
                  createWebViewWith configuration: WKWebViewConfiguration,
                  for navigationAction: WKNavigationAction,
@@ -853,6 +741,23 @@ extension BrowserTabViewController: WKUIDelegate {
 
         let contentSize = NSSize(width: windowFeatures.width?.intValue ?? 1024, height: windowFeatures.height?.intValue ?? 752)
         var shouldOpenPopUp = navigationAction.isUserInitiated
+        var shouldOpenNewTab = windowFeatures.toolbarsVisibility?.boolValue == true
+        var shouldSelectNewTab = !NSApp.isCommandPressed
+
+        switch parentTab.decideNewWindowPolicy(for: navigationAction) {
+        case .newWindow:
+            shouldOpenPopUp = true
+            shouldOpenNewTab = false
+        case .newTab(selected: let selected):
+            shouldOpenPopUp = true
+            shouldOpenNewTab = true
+            shouldSelectNewTab = selected
+        case .cancel:
+            return nil
+        case .none:
+            break
+        }
+
         if !shouldOpenPopUp {
             let url = navigationAction.request.url
             parentTab.permissions.permissions(.popups, requestedForDomain: webView.url?.host, url: url) { [weak parentTab] granted in
@@ -882,8 +787,10 @@ extension BrowserTabViewController: WKUIDelegate {
         }
 
         let tab = makeTab(parentTab: parentTab, content: .none)
-        if windowFeatures.toolbarsVisibility?.boolValue == true {
-            tabCollectionViewModel.insertChild(tab: tab, selected: !NSApp.isCommandPressed)
+        if shouldOpenNewTab {
+            tabCollectionViewModel.insertChild(tab: tab, selected: shouldSelectNewTab)
+        } else if windowFeatures.toolbarsVisibility?.boolValue == true {
+            WindowsManager.openNewWindow(with: tab, contentSize: contentSize)
         } else {
             WindowsManager.openPopUpWindow(with: tab, contentSize: contentSize)
         }
@@ -892,6 +799,8 @@ extension BrowserTabViewController: WKUIDelegate {
         // WebKit loads the request in the returned web view.
         return tab.webView
     }
+    // swiftlint:enable cyclomatic_complexity
+    // swiftlint:enable function_body_length
 
     @objc(_webView:checkUserMediaPermissionForURL:mainFrameURL:frameIdentifier:decisionHandler:)
     func webView(_ webView: WKWebView,
@@ -1140,9 +1049,8 @@ extension BrowserTabViewController {
     }
 
     func mouseDown(with event: NSEvent) -> NSEvent? {
-        self.clickPoint = event.locationInWindow
-        guard event.window === self.view.window, let clickPoint = self.clickPoint else { return event }
-        tabViewModel?.tab.browserTabViewController(self, didClickAtPoint: clickPoint)
+        guard event.window === self.view.window else { return event }
+        tabViewModel?.tab.browserTabViewController(self, didClickAtPoint: event.locationInWindow)
         return event
     }
 }
@@ -1214,4 +1122,3 @@ extension BrowserTabViewController {
         }
     }
 }
-// swiftlint:enable file_length
