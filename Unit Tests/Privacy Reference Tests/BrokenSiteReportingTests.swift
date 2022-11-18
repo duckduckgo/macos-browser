@@ -55,17 +55,17 @@ final class BrokenSiteReportingTests: XCTestCase {
             var category = WebsiteBreakage.Category(rawValue: test.category)
             
             let breakage = WebsiteBreakage(category: category,
-                            description: nil,
-                            siteUrlString: test.siteURL,
-                            osVersion: test.os ?? "",
-                            upgradedHttps: test.wasUpgraded,
-                            tdsETag: nil,
-                            blockedTrackerDomains: test.blockedTrackers,
-                            installedSurrogates: test.surrogates,
-                            isGPCEnabled: test.gpcEnabled ?? false,
-                            ampURL: "",
-                            urlParametersRemoved: false,
-                            manufacturer: test.manufacturer ?? "")
+                                           description: nil,
+                                           siteUrlString: test.siteURL,
+                                           osVersion: test.os ?? "",
+                                           upgradedHttps: test.wasUpgraded,
+                                           tdsETag: test.blocklistVersion,
+                                           blockedTrackerDomains: test.blockedTrackers,
+                                           installedSurrogates: test.surrogates,
+                                           isGPCEnabled: test.gpcEnabled ?? false,
+                                           ampURL: "",
+                                           urlParametersRemoved: false,
+                                           manufacturer: test.manufacturer ?? "")
             
             let request = makeURLRequest(with: breakage.requestParameters)
             
@@ -81,7 +81,7 @@ final class BrokenSiteReportingTests: XCTestCase {
             }
             
             for param in test.expectReportURLParams {
-                let pattern = "[?&]\(param.name)=\(param.value)[&$]"
+                let pattern = "[?&]\(param.name)=\(param.value)[&$]?"
                 
                 guard let regex = try? NSRegularExpression(pattern: pattern,
                                                            options: []) else {
