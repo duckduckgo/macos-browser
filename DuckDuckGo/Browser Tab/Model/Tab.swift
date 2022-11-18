@@ -696,6 +696,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
     private func setupWebView(shouldLoadInBackground: Bool) {
         webView.navigationDelegate = self
+        webView.contextMenuDelegate = contextMenuManager
         webView.allowsBackForwardNavigationGestures = true
         webView.allowsMagnification = true
         userContentController?.delegate = self
@@ -983,18 +984,21 @@ extension Tab: PageObserverUserScriptDelegate {
 
 }
 
-extension Tab: NSMenuDelegate, ContextMenuDelegate {
+extension Tab: ContextMenuManagerDelegate {
 
-    func menuWillOpen(_ menu: NSMenu) {
-        contextMenuManager.menuWillOpen(menu)
+    func launchSearch(for text: String) {
+        guard let url = URL.makeSearchUrl(from: text) else {
+            assertionFailure("Failed to make Search URL")
+            return
+        }
+
+        self.delegate?.tab(self, requestedNewTabWith: .url(url), selected: true)
     }
 
-    func menuDidClose(_ menu: NSMenu) {
-        contextMenuManager.menuDidClose(menu)
-    }
-
-    func openNewTab(with url: URL, selected: Bool) {
-        delegate?.tab(self, requestedNewTabWith: .url(url), selected: selected)
+    func prepareForContextMenuDownload() {
+        // handling legacy WebKit Downloads for downloads initiated by Context Menu
+        self.webView.configuration.processPool
+            .setDownloadDelegateIfNeeded(using: LegacyWebKitDownloadDelegate.init)
     }
 
 }
