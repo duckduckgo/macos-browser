@@ -157,7 +157,7 @@ extension Pixel {
             case emailAutofillKeychainError
 
             case bookmarksStoreRootFolderMigrationFailed
-            case bookmarksStoreFavoritesFolderCreationFailed
+            case bookmarksStoreFavoritesFolderMigrationFailed
 
             case adAttributionCompilationFailedForAttributedRulesList
             case adAttributionGlobalAttributedRulesDoNotExist
@@ -329,8 +329,8 @@ extension Pixel.Event.Debug {
             
         case .bookmarksStoreRootFolderMigrationFailed:
             return "bookmarks_store_root_folder_migration_failed"
-        case .bookmarksStoreFavoritesFolderCreationFailed:
-            return "bookmarks_store_favorites_folder_creation_failed"
+        case .bookmarksStoreFavoritesFolderMigrationFailed:
+            return "bookmarks_store_favorites_folder_migration_failed"
             
         case .adAttributionCompilationFailedForAttributedRulesList:
             return "ad_attribution_compilation_failed_for_attributed_rules_list"
