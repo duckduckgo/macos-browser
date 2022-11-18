@@ -104,6 +104,7 @@ NSData *macKeyData;
     if (macKeyData == nil) { return nil; }
 
     NSData *ivData = [self generateIv];
+    if (ivData == nil) { return nil; }
 
     unsigned char *dataArray = (unsigned char *)data.bytes;
     size_t dataArrayLength = data.length;
