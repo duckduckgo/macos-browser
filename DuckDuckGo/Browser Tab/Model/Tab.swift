@@ -1053,9 +1053,10 @@ extension Tab: ContentBlockerRulesUserScriptDelegate {
     }
     
     func contentBlockerRulesUserScript(_ script: ContentBlockerRulesUserScript, detectedTracker tracker: DetectedRequest) {
-        privacyInfo?.trackerInfo.add(detectedTracker: tracker)
+        guard let url = webView.url else { return }
+        
+        privacyInfo?.trackerInfo.addDetectedTracker(tracker, onPageWithURL: url)
         adClickAttributionLogic.onRequestDetected(request: tracker)
-        guard let url = URL(string: tracker.pageUrl) else { return }
         historyCoordinating.addDetectedTracker(tracker, onURL: url)
     }
 
@@ -1115,9 +1116,11 @@ extension Tab: SurrogatesUserScriptDelegate {
     }
 
     func surrogatesUserScript(_ script: SurrogatesUserScript, detectedTracker tracker: DetectedRequest, withSurrogate host: String) {
-        privacyInfo?.trackerInfo.add(installedSurrogateHost: host)
-        privacyInfo?.trackerInfo.add(detectedTracker: tracker)
         guard let url = webView.url else { return }
+        
+        privacyInfo?.trackerInfo.addInstalledSurrogateHost(host, for: tracker, onPageWithURL: url)
+        privacyInfo?.trackerInfo.addDetectedTracker(tracker, onPageWithURL: url)
+        
         historyCoordinating.addDetectedTracker(tracker, onURL: url)
     }
 }
