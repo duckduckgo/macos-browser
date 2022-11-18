@@ -1,5 +1,5 @@
 //
-//  OpenSSLWrapper.h
+//  BitwardenEncryption.h
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -19,18 +19,11 @@
 #import <Foundation/Foundation.h>
 #import <OpenSSL/OpenSSL.h>
 #import <CommonCrypto/CommonHMAC.h>
+#import "EncryptionOutput.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface EncryptedMessage : NSObject
-
-@property (nonatomic, strong) NSData* iv;
-@property (nonatomic, strong) NSData* data;
-@property (nonatomic, strong) NSData* hmac;
-
-@end
-
-@interface OpenSSLWrapper : NSObject
+@interface BitwardenEncryption : NSObject
 
 // Returns public key base64 encoded
 - (nullable NSString *)generateKeys;
@@ -42,7 +35,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (nullable NSString *)decryptSharedKey:(NSString *)sharedKey;
 
 // Encrypts data using the shared key decrypted in previous method
-- (nullable EncryptedMessage *)encryptData:(NSData *)data;
+- (nullable EncryptionOutput *)encryptData:(NSData *)data;
 
 // Decrypts data using the shared key
 - (NSData *)decryptData:(NSData *)data andIv:(NSData *)ivData;

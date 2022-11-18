@@ -63,7 +63,7 @@ final class BitwardenManager: BitwardenManagement, ObservableObject {
         status = .disabled
         communicator.terminateProxyProcess()
         try? keyStorage.cleanSharedKey()
-        openSSLWrapper.cleanKeys()
+        encryption.cleanKeys()
     }
 
     // MARK: - Installation
@@ -192,7 +192,7 @@ final class BitwardenManager: BitwardenManagement, ObservableObject {
             // If shared key retrieval is successfull, we already onboarded the user.
             if let sharedKey = sharedKey {
                 guard let sharedKeyData = Data(base64Encoded: sharedKey),
-                      openSSLWrapper.setSharedKey(sharedKeyData) else {
+                      encryption.setSharedKey(sharedKeyData) else {
                     status = .error(error: .injectingOfSharedKeyFailed)
                     return
                 }
@@ -242,7 +242,7 @@ final class BitwardenManager: BitwardenManagement, ObservableObject {
             return
         }
 
-        guard let sharedKey = openSSLWrapper.decryptSharedKey(encryptedSharedKey) else {
+        guard let sharedKey = encryption.decryptSharedKey(encryptedSharedKey) else {
             self.status = .error(error: .decryptionOfSharedKeyFailed)
             cancelConnectionAndScheduleNextAttempt()
             return
@@ -268,7 +268,7 @@ final class BitwardenManager: BitwardenManagement, ObservableObject {
             return
         }
 
-        let decryptedData = openSSLWrapper.decryptData(data, andIv:ivData)
+        let decryptedData = encryption.decryptData(data, andIv:ivData)
         guard decryptedData.count > 0 else {
             status = .error(error: .decryptionOfDataFailed)
             return
@@ -454,13 +454,13 @@ final class BitwardenManager: BitwardenManagement, ObservableObject {
     }
 
     private func encryptCommandData(_ commandData: Data) -> String? {
-        guard let encryptedData = openSSLWrapper.encryptData(commandData) else {
+        guard let encryptedData = encryption.encryptData(commandData) else {
             return nil
         }
 
 #if DEBUG
         // Verify encryption
-        let decryptedData = openSSLWrapper.decryptData(encryptedData.data, andIv: encryptedData.iv)
+        let decryptedData = encryption.decryptData(encryptedData.data, andIv: encryptedData.iv)
         assert(decryptedData.utf8String() != nil)
 #endif
 
@@ -469,10 +469,10 @@ final class BitwardenManager: BitwardenManagement, ObservableObject {
     
     // MARK: - Encryption
 
-    let openSSLWrapper = OpenSSLWrapper()
+    lazy var encryption = BitwardenEncryption()
 
     private func generateKeyPair() -> Base64EncodedString? {
-        return openSSLWrapper.generateKeys()
+        return encryption.generateKeys()
     }
 
     // MARK: - Shared Key Storage
@@ -563,7 +563,7 @@ extension BitwardenManager: BitwardenCommunicatorDelegate {
             return
         }
 
-        //TODO: check id of received message. Throw away not requested messages.
+        // TODO: check id of received message. Throw away not requested messages.
 
         if let command = message.command, command == .connected || command == .disconnected {
             handleCommand(command)

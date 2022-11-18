@@ -1,5 +1,5 @@
 //
-//  OpenSSLWrapper.m
+//  BitwardenEncryption.m
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -16,7 +16,7 @@
 //  limitations under the License.
 //
 
-#import "OpenSSLWrapper.h"
+#import "BitwardenEncryption.h"
 #import "os/log.h"
 
 #define KEY_LENGTH      2048
@@ -25,7 +25,7 @@
 #define BLOCK_SIZE      16
 #define SHARED_KEY_SIZE  64
 
-@implementation OpenSSLWrapper
+@implementation BitwardenEncryption
 
 // Key pair is used for encryption(public key - server) and decryption(private key - client) of the shared key
 RSA *keypair;
@@ -100,7 +100,7 @@ NSData *macKeyData;
     return [sharedKeyData base64EncodedStringWithOptions:0];
 }
 
-- (nullable EncryptedMessage *)encryptData:(NSData *)data {
+- (nullable EncryptionOutput *)encryptData:(NSData *)data {
     if (macKeyData == nil) { return nil; }
 
     NSData *ivData = [self generateIv];
@@ -128,12 +128,12 @@ NSData *macKeyData;
     // Compute HMAC
     NSData *hmacData = [self computeHmac:encryptedData iv:ivData];
 
-    // Wrap into EncryptedMessage structure
-    EncryptedMessage *encryptedMessage = [[EncryptedMessage alloc] init];
-    encryptedMessage.iv = ivData;
-    encryptedMessage.data = encryptedData;
-    encryptedMessage.hmac = hmacData;
-    return encryptedMessage;
+    // Wrap into EncryptionOutput structure
+    EncryptionOutput *encryptionOutputObject = [[EncryptionOutput alloc] init];
+    encryptionOutputObject.iv = ivData;
+    encryptionOutputObject.data = encryptedData;
+    encryptionOutputObject.hmac = hmacData;
+    return encryptionOutputObject;
 }
 
 - (nullable NSData *)generateIv {
@@ -192,9 +192,5 @@ NSData *macKeyData;
     encryptionKeyData = nil;
     macKeyData = nil;
 }
-
-@end
-
-@implementation EncryptedMessage
 
 @end
