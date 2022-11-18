@@ -24,7 +24,7 @@ import os.log
 @testable import DuckDuckGo_Privacy_Browser
 
 final class GPCTests: XCTestCase {
-    let testHelper = PrivacyReferenceTestHelper()
+    private let testHelper = PrivacyReferenceTestHelper()
     
     private enum Resource {
         static let config = "global-privacy-control/config_reference.json"
@@ -43,6 +43,7 @@ final class GPCTests: XCTestCase {
                 os_log("Skipping test, ignore platform for [%s]", type: .info, test.name)
                 continue
             }
+            
             os_log("Testing [%s]", type: .info, test.name)
 
             let preferences = PrivacySecurityPreferences.shared
@@ -79,18 +80,21 @@ final class GPCTests: XCTestCase {
 }
 
 // MARK: - GPCTestData
+
 private struct GPCTestData: Codable {
     let gpcHeader: GpcHeader
     let gpcJavaScriptAPI: GpcJavaScriptAPI
 }
 
 // MARK: - GpcHeader
+
 struct GpcHeader: Codable {
     let name, desc: String
     let tests: [GpcHeaderTest]
 }
 
 // MARK: - GpcHeaderTest
+
 struct GpcHeaderTest: Codable {
     let name: String
     let siteURL: String
@@ -102,12 +106,14 @@ struct GpcHeaderTest: Codable {
 }
 
 // MARK: - GpcJavaScriptAPI
+
 struct GpcJavaScriptAPI: Codable {
     let name, desc: String
     let tests: [GpcJavaScriptAPITest]
 }
 
 // MARK: - GpcJavaScriptAPITest
+
 struct GpcJavaScriptAPITest: Codable {
     let name: String
     let siteURL: String

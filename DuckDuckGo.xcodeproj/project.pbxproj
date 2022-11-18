@@ -26,6 +26,8 @@
 		3151D65929241CA500278B0F /* global-privacy-control in Resources */ = {isa = PBXBuildFile; fileRef = 3151D65829241CA500278B0F /* global-privacy-control */; };
 		3154FD1428E6011A00909769 /* TabShadowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3154FD1328E6011A00909769 /* TabShadowView.swift */; };
 		31570B7F2926BD6E00882A64 /* PrivacyReferenceTestHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31570B7E2926BD6E00882A64 /* PrivacyReferenceTestHelper.swift */; };
+		31570B812926C38500882A64 /* BrokenSiteReportingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31570B802926C38500882A64 /* BrokenSiteReportingTests.swift */; };
+		31570B832926C3A600882A64 /* broken-site-reporting in Resources */ = {isa = PBXBuildFile; fileRef = 31570B822926C3A600882A64 /* broken-site-reporting */; };
 		315AA07028CA5CC800200030 /* YoutubePlayerNavigationHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 315AA06F28CA5CC800200030 /* YoutubePlayerNavigationHandler.swift */; };
 		3171D6B82889849F0068632A /* CookieManagedNotificationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3171D6B72889849F0068632A /* CookieManagedNotificationView.swift */; };
 		3171D6BA288984D00068632A /* BadgeAnimationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3171D6B9288984D00068632A /* BadgeAnimationView.swift */; };
@@ -858,6 +860,8 @@
 		3151D65829241CA500278B0F /* global-privacy-control */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "global-privacy-control"; sourceTree = "<group>"; };
 		3154FD1328E6011A00909769 /* TabShadowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabShadowView.swift; sourceTree = "<group>"; };
 		31570B7E2926BD6E00882A64 /* PrivacyReferenceTestHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyReferenceTestHelper.swift; sourceTree = "<group>"; };
+		31570B802926C38500882A64 /* BrokenSiteReportingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrokenSiteReportingTests.swift; sourceTree = "<group>"; };
+		31570B822926C3A600882A64 /* broken-site-reporting */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "broken-site-reporting"; sourceTree = "<group>"; };
 		315AA06F28CA5CC800200030 /* YoutubePlayerNavigationHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YoutubePlayerNavigationHandler.swift; sourceTree = "<group>"; };
 		3171D6B72889849F0068632A /* CookieManagedNotificationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieManagedNotificationView.swift; sourceTree = "<group>"; };
 		3171D6B9288984D00068632A /* BadgeAnimationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BadgeAnimationView.swift; sourceTree = "<group>"; };
@@ -1744,9 +1748,11 @@
 		3151D6472924192600278B0F /* Privacy Reference Tests */ = {
 			isa = PBXGroup;
 			children = (
+				31570B822926C3A600882A64 /* broken-site-reporting */,
 				3151D65829241CA500278B0F /* global-privacy-control */,
 				3151D64C2924192600278B0F /* GPCTests.swift */,
 				31570B7E2926BD6E00882A64 /* PrivacyReferenceTestHelper.swift */,
+				31570B802926C38500882A64 /* BrokenSiteReportingTests.swift */,
 			);
 			path = "Privacy Reference Tests";
 			sourceTree = "<group>";
@@ -4446,6 +4452,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				31570B832926C3A600882A64 /* broken-site-reporting in Resources */,
 				3151D65929241CA500278B0F /* global-privacy-control in Resources */,
 				B69B50532726CD8100758A2B /* empty in Resources */,
 				B69B50542726CD8100758A2B /* atb-with-update.json in Resources */,
@@ -5086,6 +5093,7 @@
 				85F1B0C925EF9759004792B6 /* URLEventHandlerTests.swift in Sources */,
 				4B9292BD2667103100AD2C21 /* BookmarkOutlineViewDataSourceTests.swift in Sources */,
 				4BBF0917282DD6EF00EE1418 /* TemporaryFileHandlerTests.swift in Sources */,
+				31570B812926C38500882A64 /* BrokenSiteReportingTests.swift in Sources */,
 				B6A5A27925B93FFF00AA7ADA /* StateRestorationManagerTests.swift in Sources */,
 				4B9292BB2667103100AD2C21 /* BookmarkNodeTests.swift in Sources */,
 				4B0219A825E0646500ED7DEA /* WebsiteDataStoreTests.swift in Sources */,
