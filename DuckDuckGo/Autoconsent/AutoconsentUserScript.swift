@@ -19,6 +19,7 @@
 import WebKit
 import os
 import BrowserServicesKit
+import UserScript
 
 protocol AutoconsentUserScriptDelegate: AnyObject {
     func autoconsentUserScript(consentStatus: CookieConsentInfo)
