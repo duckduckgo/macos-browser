@@ -198,12 +198,6 @@ extension WKWebView {
         }
     }
 
-    func getSelectedText(callback: @escaping (String?) -> Void) {
-        self.evaluateJavaScript("window.getSelection().toString()") { (result, _) in
-            callback(result as? String)
-        }
-    }
-
     static var canPrint: Bool {
         if #available(macOS 11.0, *) {
             return true

@@ -905,6 +905,7 @@ extension Tab: UserContentControllerDelegate {
 
         userScripts.debugScript.instrumentation = instrumentation
         userScripts.faviconScript.delegate = self
+        userScripts.contextMenuScript.delegate = self.contextMenuManager
         userScripts.surrogatesScript.delegate = self
         userScripts.contentBlockerRulesScript.delegate = self
         userScripts.clickToLoadScript.delegate = self

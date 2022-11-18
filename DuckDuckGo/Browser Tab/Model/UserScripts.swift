@@ -26,6 +26,7 @@ final class UserScripts: UserScriptsProvider {
 
     let pageObserverScript = PageObserverUserScript()
     let faviconScript = FaviconUserScript()
+    let contextMenuScript = ContextMenuUserScript()
     let findInPageScript = FindInPageUserScript()
     let printingUserScript = PrintingUserScript()
     let hoverUserScript = HoverUserScript()
@@ -80,6 +81,7 @@ final class UserScripts: UserScriptsProvider {
     lazy var userScripts: [UserScript] = [
         debugScript,
         faviconScript,
+        contextMenuScript,
         findInPageScript,
         surrogatesScript,
         contentBlockerRulesScript,

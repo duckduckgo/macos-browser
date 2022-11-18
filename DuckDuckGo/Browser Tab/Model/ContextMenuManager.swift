@@ -46,6 +46,8 @@ final class ContextMenuManager: NSObject {
     private var onNewWindow: ((WKNavigationAction?) -> NewWindowPolicy)?
     private var askForDownloadLocation: Bool?
 
+    private var selectedText: String?
+
     @MainActor
     func decidePolicy(for navigationAction: WKNavigationAction) async -> NavigationPolicy? {
         defer {
@@ -146,9 +148,6 @@ extension ContextMenuManager {
 extension ContextMenuManager: WebViewContextMenuDelegate {
 
     func webView(_ webView: WebView, willOpenContextMenu menu: NSMenu, with event: NSEvent) {
-        webView.getSelectedText { [weak menu] selectedText in
-            menu?.title = selectedText ?? ""
-        }
         for (index, item) in menu.items.enumerated().reversed() {
             guard let identifier = item.identifier.flatMap(WKMenuItemIdentifier.init) else { continue }
             Self.menuItemHandlers[identifier]?(self)(item, index, menu)
@@ -156,6 +155,9 @@ extension ContextMenuManager: WebViewContextMenuDelegate {
     }
 
     func webView(_ webView: WebView, didCloseContextMenu menu: NSMenu, with event: NSEvent?) {
+        DispatchQueue.main.async { [weak self] in
+            self?.selectedText = nil
+        }
     }
 
 }
@@ -242,7 +244,7 @@ private extension ContextMenuManager {
 @objc extension ContextMenuManager {
 
     func search(_ sender: NSMenuItem) {
-        guard let selectedText = sender.menu?.title else {
+        guard let selectedText = selectedText else {
             assertionFailure("Failed to get search term")
             return
         }
@@ -317,7 +319,7 @@ private extension ContextMenuManager {
             return
         }
 
-        onNavigation = { [selectedText=sender.menu?.title] navigationAction in
+        onNavigation = { [selectedText] navigationAction in
             guard let url = navigationAction?.request.url else { return .cancel }
 
             let title = selectedText ?? url.absoluteString
@@ -413,6 +415,15 @@ private extension ContextMenuManager {
             return .cancel
         }
         NSApp.sendAction(action, to: originalItem.target, from: originalItem)
+    }
+
+}
+
+// MARK: - ContextMenuUserScriptDelegate
+extension ContextMenuManager: ContextMenuUserScriptDelegate {
+
+    func willShowContextMenu(withSelectedText selectedText: String) {
+        self.selectedText = selectedText
     }
 
 }
