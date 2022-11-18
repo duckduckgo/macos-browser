@@ -1377,7 +1377,11 @@ extension Tab: WKNavigationDelegate {
             }
         }
         
-        if navigationAction.isTargetingMainFrame, navigationAction.request.url?.isDuckDuckGo == true, navigationAction.request.value(forHTTPHeaderField: Constants.ddgClientHeaderKey) == nil {
+        if navigationAction.isTargetingMainFrame,
+           navigationAction.request.url?.isDuckDuckGo == true,
+           navigationAction.request.value(forHTTPHeaderField: Constants.ddgClientHeaderKey) == nil,
+           navigationAction.navigationType != .backForward {
+            
             var request = navigationAction.request
             request.setValue(Constants.ddgClientHeaderValue, forHTTPHeaderField: Constants.ddgClientHeaderKey)
             _ = webView.load(request)
