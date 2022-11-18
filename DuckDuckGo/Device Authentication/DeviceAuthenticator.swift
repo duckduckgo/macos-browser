@@ -48,8 +48,8 @@ final class DeviceAuthenticator: UserAuthenticating {
         }
     }
 
-    private enum Constants {
-        static let intervalBetweenIdleChecks: TimeInterval = 1
+    internal enum Constants {
+        static var intervalBetweenIdleChecks: TimeInterval = 1
     }
 
     static var deviceSupportsBiometrics: Bool {

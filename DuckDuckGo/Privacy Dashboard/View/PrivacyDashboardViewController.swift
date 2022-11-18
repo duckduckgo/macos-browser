@@ -66,10 +66,8 @@ final class PrivacyDashboardViewController: NSViewController {
                 guard let self = self, !self.pendingUpdates.isEmpty else { return }
 
                 var didUpdate = false
-                for token in tokens {
-                    if self.pendingUpdates.removeValue(forKey: token) != nil {
-                        didUpdate = true
-                    }
+                for token in tokens where self.pendingUpdates.removeValue(forKey: token) != nil {
+                    didUpdate = true
                 }
 
                 if didUpdate {

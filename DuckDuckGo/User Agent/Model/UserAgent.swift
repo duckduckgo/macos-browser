@@ -79,10 +79,8 @@ enum UserAgent {
             return Self.default
         }
 
-        for (regex, userAgent) in domainUserAgents {
-            if absoluteString.matches(regex) {
-                return userAgent
-            }
+        if let userAgent = domainUserAgents.first(where: { (regex, _) in absoluteString.matches(regex) })?.value {
+            return userAgent
         }
 
         return Self.default
