@@ -27,6 +27,7 @@ class BookmarkMigrationTests: XCTestCase {
 
     func testMigratingStores() {
         migrateStore(from: "Bookmark", to: "Bookmark 2")
+        migrateStore(from: "Bookmark 2", to: "Bookmark 3")
     }
 
     private func storeURL(_ version: String) -> URL? {

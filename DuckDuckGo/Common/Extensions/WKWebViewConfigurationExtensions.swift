@@ -47,7 +47,7 @@ extension WKWebViewConfiguration {
         }
     }
 
-    func applyStandardConfiguration(with delegate: UserContentControllerDelegate) {
+    func applyStandardConfiguration() {
         self.apply(Dependencies.preferences)
 
         if urlSchemeHandler(forURLScheme: PrivatePlayer.privatePlayerScheme) == nil {
@@ -56,7 +56,6 @@ extension WKWebViewConfiguration {
 
         let userContentController = UserContentController(assetsPublisher: Dependencies.userContentBlockingAssets,
                                                           privacyConfigurationManager: Dependencies.privacyConfigurationManager)
-        userContentController.delegate = delegate
         self.userContentController = userContentController
 
         self.processPool.geolocationProvider = Dependencies.geolocationProviderFactory(self.processPool)

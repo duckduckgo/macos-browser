@@ -158,12 +158,10 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         }
     }
 
-    private let contextMenuManager = ContextMenuManager()
     private weak var autofillScript: WebsiteAutofillUserScript?
     weak var delegate: TabDelegate? {
         didSet {
             autofillScript?.currentOverlayTab = delegate
-            contextMenuManager.delegate = self
         }
     }
     
@@ -213,6 +211,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         self.currentDownload = currentDownload
 
         let configuration = webViewConfiguration ?? WKWebViewConfiguration()
+        configuration.applyStandardConfiguration()
         self.webViewConfiguration = configuration
 
         webView = WebView(frame: webViewFrame, configuration: configuration)
@@ -221,7 +220,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
         super.init()
 
-        configuration.applyStandardConfiguration(with: self)
+        userContentController.delegate = self
         extensions = TabExtensions.buildForTab(self)
         setupWebView(shouldLoadInBackground: shouldLoadInBackground)
 
@@ -519,7 +518,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     }
 
     func decideNewWindowPolicy(for navigationAction: WKNavigationAction) -> NewWindowPolicy? {
-        contextMenuManager.decideNewWindowPolicy(for: navigationAction)
+        extensions.contextMenu?.decideNewWindowPolicy(for: navigationAction)
     }
 
     private static let debugEvents = EventMapping<AMPProtectionDebugEvents> { event, _, _, _ in
@@ -681,6 +680,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
     private func setupWebView(shouldLoadInBackground: Bool) {
         webView.navigationDelegate = self
+        webView.contextMenuDelegate = extensions.contextMenu
         webView.allowsBackForwardNavigationGestures = true
         webView.allowsMagnification = true
 
@@ -886,7 +886,6 @@ extension Tab: UserContentControllerDelegate {
 
         userScripts.debugScript.instrumentation = instrumentation
         userScripts.faviconScript.delegate = self
-        userScripts.contextMenuScript.delegate = self.contextMenuManager
         userScripts.surrogatesScript.delegate = self
         userScripts.contentBlockerRulesScript.delegate = self
         userScripts.clickToLoadScript.delegate = self
@@ -923,22 +922,6 @@ extension Tab: PageObserverUserScriptDelegate {
 
     func pageDOMLoaded() {
         self.delegate?.tabPageDOMLoaded(self)
-    }
-
-}
-
-extension Tab: NSMenuDelegate, ContextMenuDelegate {
-
-    func menuWillOpen(_ menu: NSMenu) {
-        contextMenuManager.menuWillOpen(menu)
-    }
-
-    func menuDidClose(_ menu: NSMenu) {
-        contextMenuManager.menuDidClose(menu)
-    }
-
-    func openNewTab(with url: URL, selected: Bool) {
-        delegate?.tab(self, requestedNewTabWith: .url(url), selected: selected)
     }
 
 }
@@ -1120,6 +1103,8 @@ extension Tab: WKNavigationDelegate {
 
     struct Constants {
         static let webkitMiddleClick = 4
+        static let ddgClientHeaderKey = "X-DuckDuckGo-Client"
+        static let ddgClientHeaderValue = "macOS"
     }
 
     // swiftlint:disable cyclomatic_complexity
@@ -1149,7 +1134,7 @@ extension Tab: WKNavigationDelegate {
         var isRequestingNewTab = (isLinkActivated && NSApp.isCommandPressed) || isMiddleButtonClicked || isNavigatingAwayFromPinnedTab
         var shouldSelectNewTab = NSApp.isShiftPressed || (isNavigatingAwayFromPinnedTab && !isMiddleButtonClicked && !NSApp.isCommandPressed)
 
-        switch await contextMenuManager.decidePolicy(for: navigationAction) {
+        switch await extensions.contextMenu?.decidePolicy(for: navigationAction) {
         case .instantAllow:
             return .allow
         case .newTab(selected: let selected):
@@ -1295,6 +1280,17 @@ extension Tab: WKNavigationDelegate {
                     await prepareForContentBlocking()
                 }
             }
+        }
+        
+        if navigationAction.isTargetingMainFrame,
+           navigationAction.request.url?.isDuckDuckGo == true,
+           navigationAction.request.value(forHTTPHeaderField: Constants.ddgClientHeaderKey) == nil,
+           navigationAction.navigationType != .backForward {
+            
+            var request = navigationAction.request
+            request.setValue(Constants.ddgClientHeaderValue, forHTTPHeaderField: Constants.ddgClientHeaderKey)
+            _ = webView.load(request)
+            return .cancel
         }
 
         toggleFBProtection(for: url)
@@ -1517,7 +1513,7 @@ extension Tab: WKWebViewDownloadDelegate {
     @objc(_webView:contextMenuDidCreateDownload:)
     func webView(_ webView: WKWebView, contextMenuDidCreateDownload download: WebKitDownload) {
         let location: FileDownloadManager.DownloadLocationPreference
-            = contextMenuManager.shouldAskForDownloadLocation() == false ? .auto : .prompt
+            = extensions.contextMenu?.shouldAskForDownloadLocation() == false ? .auto : .prompt
         FileDownloadManager.shared.add(download, delegate: self.delegate, location: location, postflight: .none)
     }
 
