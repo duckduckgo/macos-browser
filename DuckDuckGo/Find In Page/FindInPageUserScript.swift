@@ -18,6 +18,7 @@
 
 import WebKit
 import BrowserServicesKit
+import UserScript
 
 final class FindInPageUserScript: NSObject, StaticUserScript {
 

@@ -22,41 +22,16 @@ import os.log
 
 final class WebView: WKWebView {
 
-    static let itemSelectors: [String: Selector] = [
-        // Links
-        "WKMenuItemIdentifierOpenLink": #selector(LinkMenuItemSelectors.openLinkInNewTab(_:)),
-        "WKMenuItemIdentifierOpenLinkInNewWindow": #selector(LinkMenuItemSelectors.openLinkInNewWindow(_:)),
-        "WKMenuItemIdentifierDownloadLinkedFile": #selector(LinkMenuItemSelectors.downloadLinkedFileAs(_:)),
-        "WKMenuItemIdentifierDownloadMedia": #selector(LinkMenuItemSelectors.downloadLinkedFileAs(_:)),
-        "WKMenuItemIdentifierAddLinkToBookmarks": #selector(LinkMenuItemSelectors.addLinkToBookmarks(_:)),
-        "WKMenuItemIdentifierCopyLink": #selector(LinkMenuItemSelectors.copyLink(_:)),
-
-        // Images
-        "WKMenuItemIdentifierOpenImageInNewWindow": #selector(ImageMenuItemSelectors.openImageInNewWindow(_:)),
-        "WKMenuItemIdentifierDownloadImage": #selector(ImageMenuItemSelectors.saveImageAs(_:)),
-
-        "WKMenuItemIdentifierSearchWeb": #selector(MenuItemSelectors.search(_:))
-    ]
-
-    static let itemTitles: [String: String] = [
-        "WKMenuItemIdentifierOpenLink": UserText.openLinkInNewTab,
-        "WKMenuItemIdentifierDownloadImage": UserText.saveImageAs,
-        "WKMenuItemIdentifierDownloadLinkedFile": UserText.downloadLinkedFileAs,
-        "WKMenuItemIdentifierAddLinkToBookmarks": UserText.addLinkToBookmarks,
-        "WKMenuItemIdentifierBookmarkPage": UserText.bookmarkPage,
-        "WKMenuItemIdentifierSearchWeb": UserText.searchWithDuckDuckGo
-    ]
-  
     deinit {
         self.configuration.userContentController.removeAllUserScripts()
     }
-  
+
     // MARK: - Zoom
 
     static private let maxZoomLevel: CGFloat = 3.0
     static private let minZoomLevel: CGFloat = 0.5
     static private let zoomLevelStep: CGFloat = 0.1
-    
+
     var zoomLevel: CGFloat {
         get {
             if #available(macOS 11.0, *) {
@@ -112,48 +87,12 @@ final class WebView: WKWebView {
 
     override func willOpenMenu(_ menu: NSMenu, with event: NSEvent) {
         super.willOpenMenu(menu, with: event)
-
-        updateActionsAndTitles(menu.items)
-
-        menu.insertItemBeforeItemWithIdentifier("WKMenuItemIdentifierOpenImageInNewWindow",
-                                                title: UserText.openImageInNewTab,
-                                                target: uiDelegate,
-                                                selector: #selector(ImageMenuItemSelectors.openImageInNewTab(_:)))
-        
-        menu.insertItemBeforeItemWithIdentifier("WKMenuItemIdentifierCopyLink",
-                                                title: "Add Link to Bookmarks",
-                                                target: uiDelegate,
-                                                selector: #selector(LinkMenuItemSelectors.addLinkToBookmarks(_:)))
-
-        menu.insertSeparatorBeforeItemWithIdentifier("WKMenuItemIdentifierCopyImage")
-
-        menu.insertItemBeforeItemWithIdentifier("WKMenuItemIdentifierCopyImage",
-                                                title: UserText.copyImageAddress,
-                                                target: uiDelegate,
-                                                selector: #selector(ImageMenuItemSelectors.copyImageAddress(_:)))
-        
-        menu.insertItemAfterItemWithIdentifier("WKMenuItemIdentifierReload",
-                                               title: UserText.bookmarkPage,
-                                               target: uiDelegate,
-                                               selector: #selector(LinkMenuItemSelectors.bookmarkPage(_:)))
-
-        // calling .menuWillOpen here manually as it's already calling the latter Menu Owner's willOpenMenu at this point
-        (uiDelegate as? NSMenuDelegate)?.menuWillOpen?(menu)
+        (navigationDelegate as? NSMenuDelegate)?.menuWillOpen?(menu)
     }
 
-    private func updateActionsAndTitles(_ items: [NSMenuItem]) {
-        items.forEach {
-            guard let id = $0.identifier?.rawValue else { return }
-
-            if let selector = Self.itemSelectors[id] {
-                $0.target = uiDelegate
-                $0.action = selector
-            }
-
-            if let title = Self.itemTitles[id] {
-                $0.title = title
-            }
-        }
+    override func didCloseMenu(_ menu: NSMenu, with event: NSEvent?) {
+        super.didCloseMenu(menu, with: event)
+        (navigationDelegate as? NSMenuDelegate)?.menuDidClose?(menu)
     }
 
     // MARK: - Developer Tools

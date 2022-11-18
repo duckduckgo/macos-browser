@@ -202,7 +202,7 @@ final class HistoryStore: HistoryStoring {
                 do {
                     try self.context.save()
                 } catch {
-                    Pixel.fire(.debug(event: .historyCleanEntriesFailed, error: error))
+                    Pixel.fire(.debug(event: .historySaveFailed, error: error))
                     promise(.failure(HistoryStoreError.savingFailed))
                     return
                 }
