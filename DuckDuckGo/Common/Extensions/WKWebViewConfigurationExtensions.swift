@@ -22,8 +22,7 @@ import BrowserServicesKit
 
 extension WKWebViewConfiguration {
 
-    func applyStandardConfiguration(with delegate: UserContentControllerDelegate,
-                                    assetsPublisher: some Publisher<some UserContentControllerNewContent, Never>,
+    func applyStandardConfiguration(assetsPublisher: some Publisher<some UserContentControllerNewContent, Never>,
                                     privacyConfigurationManager: PrivacyConfigurationManaging) {
 
         allowsAirPlayForMediaPlayback = true
@@ -45,7 +44,7 @@ extension WKWebViewConfiguration {
 
         let userContentController = UserContentController(assetsPublisher: assetsPublisher,
                                                           privacyConfigurationManager: privacyConfigurationManager)
-        userContentController.delegate = delegate
+
         self.userContentController = userContentController
         self.processPool.geolocationProvider = GeolocationProvider(processPool: self.processPool)
      }

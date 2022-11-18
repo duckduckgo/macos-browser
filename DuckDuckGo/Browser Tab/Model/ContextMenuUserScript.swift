@@ -43,7 +43,6 @@ final class ContextMenuUserScript: NSObject, StaticUserScript {
         document.addEventListener("contextmenu", function(e) {
             webkit.messageHandlers.contextMenu.postMessage(window.getSelection().toString());
         }, true);
-
     }) ();
     """
 

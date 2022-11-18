@@ -33,6 +33,7 @@ extension NSApplication: PrintOperationUI {}
 final class TabPrintExtension {
 
     private var contentBlockingAssetsCancellable: AnyCancellable?
+    private var userScriptsCancellable: AnyCancellable?
 
     // To avoid webpages invoking the printHandler and overwhelming the browser, this property keeps track of the active
     // print operation and ignores incoming printHandler messages if one exists.
@@ -42,7 +43,7 @@ final class TabPrintExtension {
     static var ui: PrintOperationUI = NSApp
     
     init(tab: Tab) {
-        contentBlockingAssetsCancellable = tab.userScriptsPublisher.sink { [weak self] userScripts in
+        userScriptsCancellable = tab.userScriptsPublisher.sink { [weak self] userScripts in
             userScripts?.printingUserScript.delegate = self
         }
     }
@@ -92,7 +93,7 @@ extension TabPrintExtension: PrintingUserScriptDelegate {
 extension Tab {
 
     func print() {
-        extensions.printing.print(using: webView)
+        extensions.printing?.print(using: webView)
     }
 
 }

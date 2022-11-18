@@ -17,6 +17,7 @@
 //
 
 import AppKit
+import Combine
 import Foundation
 import WebKit
 
@@ -40,6 +41,7 @@ enum NewWindowPolicy {
 
 final class ContextMenuManager: NSObject {
 
+    private var userScriptsCancellable: AnyCancellable?
     weak var delegate: ContextMenuManagerDelegate?
 
     private var onNavigation: ((WKNavigationAction?) -> NavigationPolicy)?
@@ -47,6 +49,14 @@ final class ContextMenuManager: NSObject {
     private var askForDownloadLocation: Bool?
 
     private var selectedText: String?
+
+    init(tab: Tab) {
+        super.init()
+        self.delegate = tab
+        userScriptsCancellable = tab.userScriptsPublisher.sink { [weak self] userScripts in
+            userScripts?.contextMenuScript.delegate = self
+        }
+    }
 
     @MainActor
     func decidePolicy(for navigationAction: WKNavigationAction) async -> NavigationPolicy? {
@@ -424,6 +434,27 @@ extension ContextMenuManager: ContextMenuUserScriptDelegate {
 
     func willShowContextMenu(withSelectedText selectedText: String) {
         self.selectedText = selectedText
+    }
+
+}
+
+// MARK: - ContextMenuManagerDelegate
+
+extension Tab: ContextMenuManagerDelegate {
+
+    func launchSearch(for text: String) {
+        guard let url = URL.makeSearchUrl(from: text) else {
+            assertionFailure("Failed to make Search URL")
+            return
+        }
+
+        self.delegate?.tab(self, requestedNewTabWith: .url(url), selected: true)
+    }
+
+    func prepareForContextMenuDownload() {
+        // handling legacy WebKit Downloads for downloads initiated by Context Menu
+        self.webView.configuration.processPool
+            .setDownloadDelegateIfNeeded(using: LegacyWebKitDownloadDelegate.init)
     }
 
 }

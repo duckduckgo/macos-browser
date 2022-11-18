@@ -21,16 +21,19 @@ import Foundation
 struct TabExtensions {
 
     let adClickAttribution: AdClickAttributionTabExtension?
-    let printing: TabPrintExtension
+    let contextMenu: ContextMenuManager?
+    let printing: TabPrintExtension?
 
     static var buildForTab: (Tab) -> TabExtensions = { tab in
         TabExtensions(adClickAttribution: AdClickAttributionTabExtension(tab: tab),
+                      contextMenu: ContextMenuManager(tab: tab),
                       printing: TabPrintExtension(tab: tab))
     }
 
     private static func defaultExtensionsForTests(_ tab: Tab) -> TabExtensions {
         TabExtensions(adClickAttribution: nil,
-                      printing: TabPrintExtension(tab: tab))
+                      contextMenu: nil,
+                      printing: nil)
     }
 
 }
