@@ -20,6 +20,8 @@ import WebKit
 
 extension WKWebView {
 
+    // MARK: Permissions
+
     static var canMuteCameraAndMicrophoneSeparately: Bool {
         if #available(macOS 12.0, *) {
             return true
@@ -181,6 +183,8 @@ extension WKWebView {
         }
     }
 
+    // MARK: - Helper methods
+
     func load(_ url: URL) {
 
         // Occasionally, the web view will try to load a URL but will find itself with no cookies, even if they've been restored.
@@ -192,11 +196,26 @@ extension WKWebView {
         }
     }
 
+    // https://developer.mozilla.org/en-US/docs/Web/API/Window/open
+    // TODO: noopener, noreferrer?
+    func load(_ url: URL, in target: TargetWindowName?, windowFeatures: WindowFeatures? = nil) {
+        let urlEnc = "'\(url.absoluteString.escapedJavaScriptString())'"
+        let targetEnc = target.map { ", '\($0.rawValue)'" } ?? ""
+        let windowFeaturesEnc = windowFeatures.map { ", '\($0.encoded())'" } ?? ""
+        self.evaluateJavaScript("window.open(\(urlEnc)\(targetEnc)\(windowFeaturesEnc))")
+    }
+
     func getMimeType(callback: @escaping (String?) -> Void) {
         self.evaluateJavaScript("document.contentType") { (result, _) in
             callback(result as? String)
         }
     }
+
+    func close() {
+        self.evaluateJavaScript("window.close()")
+    }
+
+    // MARK: - Printing
 
     static var canPrint: Bool {
         if #available(macOS 11.0, *) {
@@ -232,9 +251,116 @@ extension WKWebView {
         return self._printOperation(with: printInfo)
     }
 
+    // MARK: - Zoom
+
+    static private let maxZoomLevel: CGFloat = 3.0
+    static private let minZoomLevel: CGFloat = 0.5
+    static private let zoomLevelStep: CGFloat = 0.1
+
+    var zoomLevel: CGFloat {
+        get {
+            if #available(macOS 11.0, *) {
+                return pageZoom
+            }
+            return magnification
+        }
+        set {
+            if #available(macOS 11.0, *) {
+                pageZoom = newValue
+            } else {
+                magnification = newValue
+            }
+        }
+    }
+
+    var canZoomToActualSize: Bool {
+        self.window != nil && self.zoomLevel != 1.0
+    }
+
+    var canZoomIn: Bool {
+        self.window != nil && self.zoomLevel < Self.maxZoomLevel
+    }
+
+    var canZoomOut: Bool {
+        self.window != nil && self.zoomLevel > Self.minZoomLevel
+    }
+
+    func zoomIn() {
+        guard canZoomIn else { return }
+        self.zoomLevel = min(self.zoomLevel + Self.zoomLevelStep, Self.maxZoomLevel)
+    }
+
+    func zoomOut() {
+        guard canZoomOut else { return }
+        self.zoomLevel = max(self.zoomLevel - Self.zoomLevelStep, Self.minZoomLevel)
+    }
+
+    // MARK: - Developer Tools
+
+    @nonobjc var mainFrame: AnyObject? {
+        guard self.responds(to: NSSelectorFromString("_mainFrame")) else {
+            assertionFailure("WKWebView does not respond to _mainFrame")
+            return nil
+        }
+        return self.perform(NSSelectorFromString("_mainFrame"))?.takeUnretainedValue()
+    }
+
+    @discardableResult
+    private func inspectorPerform(_ selectorName: String, with object: Any? = nil) -> Unmanaged<AnyObject>? {
+        guard self.responds(to: NSSelectorFromString("_inspector")),
+              let inspector = self.value(forKey: "_inspector") as? NSObject,
+              inspector.responds(to: NSSelectorFromString(selectorName)) else {
+            assertionFailure("_WKInspector does not respond to \(selectorName)")
+            return nil
+        }
+        return inspector.perform(NSSelectorFromString(selectorName), with: object)
+    }
+
+    var isInspectorShown: Bool {
+        return inspectorPerform("isVisible") != nil
+    }
+
+    @nonobjc func openDeveloperTools() {
+        inspectorPerform("show")
+    }
+
+    @nonobjc func closeDeveloperTools() {
+        inspectorPerform("close")
+    }
+
+    @nonobjc func openJavaScriptConsole() {
+        inspectorPerform("showConsole")
+    }
+
+    @nonobjc func showPageSource() {
+        guard let mainFrameHandle = self.mainFrame else { return }
+        inspectorPerform("showMainResourceForFrame:", with: mainFrameHandle)
+    }
+
+    @nonobjc func showPageResources() {
+        inspectorPerform("showResources")
+    }
+
+    // MARK: - Fullscreen
+
     var fullScreenPlaceholderView: NSView? {
         guard self.responds(to: #selector(WKWebView._fullScreenPlaceholderView)) else { return nil }
         return self._fullScreenPlaceholderView()
+    }
+
+    /// actual view to be displayed as a Tab content
+    /// may be the WebView itself or FullScreen Placeholder view
+    var tabContentView: NSView {
+        return fullScreenPlaceholderView ?? self
+    }
+
+    var fullscreenWindowController: NSWindowController? {
+        guard let fullscreenWindowController = self.window?.windowController,
+              fullscreenWindowController.className.contains("FullScreen")
+        else {
+            return nil
+        }
+        return fullscreenWindowController
     }
 
 }

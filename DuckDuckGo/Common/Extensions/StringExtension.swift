@@ -41,6 +41,12 @@ extension String {
         .init(self[utf16.index(startIndex, offsetBy: range.lowerBound) ..< utf16.index(startIndex, offsetBy: range.upperBound)])
     }
 
+    func escapedJavaScriptString() -> String {
+        self.replacingOccurrences(of: "\\", with: "\\\\")
+            .replacingOccurrences(of: "\"", with: "\\\"")
+            .replacingOccurrences(of: "'", with: "\\'")
+    }
+
     // MARK: - URL
 
     var url: URL? {
