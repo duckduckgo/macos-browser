@@ -39,20 +39,28 @@ AES_KEY encryptionKey;
 AES_KEY decryptionKey;
 NSData *macKeyData;
 
-- (nullable NSString *)generateKeys {
-    // Generate key pair
-    keypair = RSA_generate_key(KEY_LENGTH, PUB_EXP, NULL, NULL);
+-(void)dealloc {
+    RSA_free(keypair);
+}
 
-    // Return the public key in the desired format
-    size_t outputLength;
-    char   *outputKey;
-    BIO *output = BIO_new(BIO_s_mem());
-    int result = i2d_RSA_PUBKEY_bio(output,keypair);
+- (nullable NSString *)generateKeys {
+    BIGNUM *bignum = BN_new();
+    BN_set_word(bignum, PUB_EXP);
+
+    keypair = RSA_new();
+    int result = RSA_generate_key_ex(keypair, KEY_LENGTH, bignum, NULL);
     if (!result) {
         return NULL;
     }
-    outputLength = BIO_pending(output);
-    outputKey = calloc(outputLength + 1, sizeof(unsigned char));
+
+    // Return the public key in the desired format
+    BIO *output = BIO_new(BIO_s_mem());
+    result = i2d_RSA_PUBKEY_bio(output,keypair);
+    if (!result) {
+        return NULL;
+    }
+    size_t outputLength = BIO_pending(output);
+    char   *outputKey = calloc(outputLength + 1, sizeof(unsigned char));
     BIO_read(output, outputKey, (int)outputLength);
 
     NSData *outputData = [NSData dataWithBytes:outputKey length:outputLength];
