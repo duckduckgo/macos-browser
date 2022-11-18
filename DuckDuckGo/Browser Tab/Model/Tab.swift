@@ -158,12 +158,10 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         }
     }
 
-    private let contextMenuManager = ContextMenuManager()
     private weak var autofillScript: WebsiteAutofillUserScript?
     weak var delegate: TabDelegate? {
         didSet {
             autofillScript?.currentOverlayTab = delegate
-            contextMenuManager.delegate = self
         }
     }
     
@@ -213,6 +211,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         self.currentDownload = currentDownload
 
         let configuration = webViewConfiguration ?? WKWebViewConfiguration()
+        configuration.applyStandardConfiguration()
         self.webViewConfiguration = configuration
 
         webView = WebView(frame: webViewFrame, configuration: configuration)
@@ -221,7 +220,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
         super.init()
 
-        configuration.applyStandardConfiguration(with: self)
+        userContentController.delegate = self
         extensions = TabExtensions.buildForTab(self)
         setupWebView(shouldLoadInBackground: shouldLoadInBackground)
 
@@ -519,7 +518,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     }
 
     func decideNewWindowPolicy(for navigationAction: WKNavigationAction) -> NewWindowPolicy? {
-        contextMenuManager.decideNewWindowPolicy(for: navigationAction)
+        extensions.contextMenu?.decideNewWindowPolicy(for: navigationAction)
     }
 
     private static let debugEvents = EventMapping<AMPProtectionDebugEvents> { event, _, _, _ in
@@ -681,7 +680,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
     private func setupWebView(shouldLoadInBackground: Bool) {
         webView.navigationDelegate = self
-        webView.contextMenuDelegate = contextMenuManager
+        webView.contextMenuDelegate = extensions.contextMenu
         webView.allowsBackForwardNavigationGestures = true
         webView.allowsMagnification = true
 
@@ -887,7 +886,6 @@ extension Tab: UserContentControllerDelegate {
 
         userScripts.debugScript.instrumentation = instrumentation
         userScripts.faviconScript.delegate = self
-        userScripts.contextMenuScript.delegate = self.contextMenuManager
         userScripts.surrogatesScript.delegate = self
         userScripts.contentBlockerRulesScript.delegate = self
         userScripts.clickToLoadScript.delegate = self
@@ -924,25 +922,6 @@ extension Tab: PageObserverUserScriptDelegate {
 
     func pageDOMLoaded() {
         self.delegate?.tabPageDOMLoaded(self)
-    }
-
-}
-
-extension Tab: ContextMenuManagerDelegate {
-
-    func launchSearch(for text: String) {
-        guard let url = URL.makeSearchUrl(from: text) else {
-            assertionFailure("Failed to make Search URL")
-            return
-        }
-
-        self.delegate?.tab(self, requestedNewTabWith: .url(url), selected: true)
-    }
-
-    func prepareForContextMenuDownload() {
-        // handling legacy WebKit Downloads for downloads initiated by Context Menu
-        self.webView.configuration.processPool
-            .setDownloadDelegateIfNeeded(using: LegacyWebKitDownloadDelegate.init)
     }
 
 }
@@ -1155,7 +1134,7 @@ extension Tab: WKNavigationDelegate {
         var isRequestingNewTab = (isLinkActivated && NSApp.isCommandPressed) || isMiddleButtonClicked || isNavigatingAwayFromPinnedTab
         var shouldSelectNewTab = NSApp.isShiftPressed || (isNavigatingAwayFromPinnedTab && !isMiddleButtonClicked && !NSApp.isCommandPressed)
 
-        switch await contextMenuManager.decidePolicy(for: navigationAction) {
+        switch await extensions.contextMenu?.decidePolicy(for: navigationAction) {
         case .instantAllow:
             return .allow
         case .newTab(selected: let selected):
@@ -1534,7 +1513,7 @@ extension Tab: WKWebViewDownloadDelegate {
     @objc(_webView:contextMenuDidCreateDownload:)
     func webView(_ webView: WKWebView, contextMenuDidCreateDownload download: WebKitDownload) {
         let location: FileDownloadManager.DownloadLocationPreference
-            = contextMenuManager.shouldAskForDownloadLocation() == false ? .auto : .prompt
+            = extensions.contextMenu?.shouldAskForDownloadLocation() == false ? .auto : .prompt
         FileDownloadManager.shared.add(download, delegate: self.delegate, location: location, postflight: .none)
     }
 
