@@ -43,7 +43,7 @@ extension HomePage.Models {
 
         }
 
-        @UserDefaultsWrapper(key: .homePageShowAllFavorites, defaultValue: false)
+        @UserDefaultsWrapper(key: .homePageShowAllFavorites, defaultValue: true)
         private static var showAllFavoritesSetting: Bool
 
         @Published var showAllFavorites: Bool {
