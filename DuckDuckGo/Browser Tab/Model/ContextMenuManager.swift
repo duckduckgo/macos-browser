@@ -20,9 +20,9 @@ import AppKit
 import Foundation
 import WebKit
 
-protocol ContextMenuDelegate: AnyObject {
-    func openNewTab(with url: URL, selected: Bool)
-    func download(from url: URL, promptForLocation: Bool)
+protocol ContextMenuManagerDelegate: AnyObject {
+    func launchSearch(for text: String)
+    func prepareForContextMenuDownload()
 }
 
 enum NavigationPolicy {
@@ -40,9 +40,8 @@ enum NewWindowPolicy {
 
 final class ContextMenuManager: NSObject {
 
-    weak var delegate: ContextMenuDelegate?
+    weak var delegate: ContextMenuManagerDelegate?
 
-    private var menuContext: ContextMenuUserScript.Context?
     private var onNavigation: ((WKNavigationAction?) -> NavigationPolicy)?
     private var onNewWindow: ((WKNavigationAction?) -> NewWindowPolicy)?
     private var askForDownloadLocation: Bool?
@@ -134,12 +133,7 @@ extension ContextMenuManager {
     }
 
     private func handleSearchWebItem(_ item: NSMenuItem, at index: Int, in menu: NSMenu) {
-        guard let selectedText = self.menuContext?.selectedText else {
-            assertionFailure("Selected Text missing")
-            menu.removeItem(at: index)
-            return
-        }
-        menu.replaceItem(at: index, with: searchMenuItem(selectedText: selectedText))
+        menu.replaceItem(at: index, with: self.searchMenuItem())
     }
 
     private func handleReloadItem(_ item: NSMenuItem, at index: Int, in menu: NSMenu) {
@@ -149,17 +143,19 @@ extension ContextMenuManager {
 }
 
 // MARK: - NSMenuDelegate
-extension ContextMenuManager: NSMenuDelegate {
+extension ContextMenuManager: WebViewContextMenuDelegate {
 
-    func menuWillOpen(_ menu: NSMenu) {
+    func webView(_ webView: WebView, willOpenContextMenu menu: NSMenu, with event: NSEvent) {
+        webView.getSelectedText { [weak menu] selectedText in
+            menu?.title = selectedText ?? ""
+        }
         for (index, item) in menu.items.enumerated().reversed() {
             guard let identifier = item.identifier.flatMap(WKMenuItemIdentifier.init) else { continue }
             Self.menuItemHandlers[identifier]?(self)(item, index, menu)
         }
     }
 
-    func menuDidClose(_ menu: NSMenu) {
-        self.menuContext = nil
+    func webView(_ webView: WebView, didCloseContextMenu menu: NSMenu, with event: NSEvent?) {
     }
 
 }
@@ -222,8 +218,8 @@ private extension ContextMenuManager {
         makeMenuItem(withTitle: UserText.saveImageAs, action: #selector(saveImageAs), from: item, with: .downloadImage)
     }
 
-    func searchMenuItem(selectedText: String) -> NSMenuItem {
-        NSMenuItem(title: UserText.searchWithDuckDuckGo, action: #selector(search), target: self, representedObject: selectedText)
+    func searchMenuItem() -> NSMenuItem {
+        NSMenuItem(title: UserText.searchWithDuckDuckGo, action: #selector(search), target: self)
     }
 
     private func makeMenuItem(withTitle title: String, action: Selector, from item: NSMenuItem, with identifier: WKMenuItemIdentifier, keyEquivalent: String? = nil) -> NSMenuItem {
@@ -246,14 +242,12 @@ private extension ContextMenuManager {
 @objc extension ContextMenuManager {
 
     func search(_ sender: NSMenuItem) {
-        guard let selectedText = sender.representedObject as? String,
-              let url = URL.makeSearchUrl(from: selectedText)
-        else {
-            assertionFailure("Failed to make Search URL")
+        guard let selectedText = sender.menu?.title else {
+            assertionFailure("Failed to get search term")
             return
         }
 
-        delegate?.openNewTab(with: url, selected: true)
+        delegate?.launchSearch(for: selectedText)
     }
 
     func openLinkInNewTab(_ sender: NSMenuItem) {
@@ -308,9 +302,7 @@ private extension ContextMenuManager {
             return
         }
 
-        menuContext?.frame.webView?.configuration.processPool
-            .setDownloadDelegateIfNeeded(using: LegacyWebKitDownloadDelegate.init)
-
+        delegate?.prepareForContextMenuDownload()
         askForDownloadLocation = true
         NSApp.sendAction(action, to: originalItem.target, from: originalItem)
     }
@@ -325,10 +317,10 @@ private extension ContextMenuManager {
             return
         }
 
-        onNavigation = { [context=menuContext] navigationAction in
+        onNavigation = { [selectedText=sender.menu?.title] navigationAction in
             guard let url = navigationAction?.request.url else { return .cancel }
 
-            let title = context?.link?.title ?? context?.selectedText ?? url.absoluteString
+            let title = selectedText ?? url.absoluteString
             LocalBookmarkManager.shared.makeBookmark(for: url, title: title, isFavorite: false)
 
             return .cancel
@@ -397,10 +389,7 @@ private extension ContextMenuManager {
             return
         }
 
-        // handling legacy WebKit Downloads
-        menuContext?.frame.webView?.configuration.processPool
-            .setDownloadDelegateIfNeeded(using: LegacyWebKitDownloadDelegate.init)
-
+        delegate?.prepareForContextMenuDownload()
         askForDownloadLocation = true
         NSApp.sendAction(action, to: originalItem.target, from: originalItem)
     }
@@ -424,15 +413,6 @@ private extension ContextMenuManager {
             return .cancel
         }
         NSApp.sendAction(action, to: originalItem.target, from: originalItem)
-    }
-
-}
-
-// MARK: - ContextMenuUserScriptDelegate
-extension ContextMenuManager: ContextMenuUserScriptDelegate {
-
-    func willShowContextMenu(at position: NSPoint, with context: ContextMenuUserScript.Context) {
-        self.menuContext = context
     }
 
 }

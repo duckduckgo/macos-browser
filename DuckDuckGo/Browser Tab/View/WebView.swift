@@ -20,7 +20,14 @@ import Cocoa
 import WebKit
 import os.log
 
+protocol WebViewContextMenuDelegate: AnyObject {
+    func webView(_ webView: WebView, willOpenContextMenu menu: NSMenu, with event: NSEvent)
+    func webView(_ webView: WebView, didCloseContextMenu menu: NSMenu, with event: NSEvent?)
+}
+
 final class WebView: WKWebView {
+
+    weak var contextMenuDelegate: WebViewContextMenuDelegate?
 
     deinit {
         self.configuration.userContentController.removeAllUserScripts()
@@ -87,12 +94,12 @@ final class WebView: WKWebView {
 
     override func willOpenMenu(_ menu: NSMenu, with event: NSEvent) {
         super.willOpenMenu(menu, with: event)
-        (navigationDelegate as? NSMenuDelegate)?.menuWillOpen?(menu)
+        contextMenuDelegate?.webView(self, willOpenContextMenu: menu, with: event)
     }
 
     override func didCloseMenu(_ menu: NSMenu, with event: NSEvent?) {
         super.didCloseMenu(menu, with: event)
-        (navigationDelegate as? NSMenuDelegate)?.menuDidClose?(menu)
+        contextMenuDelegate?.webView(self, didCloseContextMenu: menu, with: event)
     }
 
     // MARK: - Developer Tools
