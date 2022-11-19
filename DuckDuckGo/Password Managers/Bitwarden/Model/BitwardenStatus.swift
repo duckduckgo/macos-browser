@@ -45,7 +45,7 @@ enum BitwardenStatus: Equatable {
     case connecting
 
     // We sent the status message and are waiting for the response
-    case waitingForTheStatusResponse
+    case waitingForStatusResponse
 
     case connected(vault: BitwardenVault)
     case error(error: BitwardenError)

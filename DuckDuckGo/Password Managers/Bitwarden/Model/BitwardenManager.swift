@@ -42,6 +42,8 @@ protocol BitwardenManagement {
 final class BitwardenManager: BitwardenManagement, ObservableObject {
 
     static let shared = BitwardenManager()
+    static let bundleId = "com.bitwarden.desktop"
+    static let applicationName = "Bitwarden"
 
     private init() {}
 
@@ -97,7 +99,7 @@ final class BitwardenManager: BitwardenManagement, ObservableObject {
         }
 
         // Check whether Bitwarden app is running
-        guard RunningApplicationCheck.isApplicationRunning(bundleId: "com.bitwarden.desktop") else {
+        guard RunningApplicationCheck.isApplicationRunning(bundleId: Self.bundleId) else {
             status = .notRunning
             scheduleConnectionAttempt()
             return
@@ -196,7 +198,9 @@ final class BitwardenManager: BitwardenManagement, ObservableObject {
                     status = .error(error: .injectingOfSharedKeyFailed)
                     return
                 }
-                status = .waitingForTheStatusResponse
+                status = .waitingForStatusResponse
+
+                verifyBitwardenIsResponding()
                 sendStatus()
             } else {
                 // Onboarding is in progress
@@ -210,6 +214,14 @@ final class BitwardenManager: BitwardenManagement, ObservableObject {
             }
         default:
             logOrAssertionFailure("BitwardenManager: Wrong handler")
+        }
+    }
+
+    private func verifyBitwardenIsResponding() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5) { [weak self] in
+            if (self?.status == .waitingForStatusResponse) {
+                BitwardenNotRespondingAlert.show()
+            }
         }
     }
 

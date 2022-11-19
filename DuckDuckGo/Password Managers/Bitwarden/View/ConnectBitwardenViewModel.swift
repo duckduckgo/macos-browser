@@ -110,7 +110,7 @@ final class ConnectBitwardenViewModel: ObservableObject {
             self.viewState = .connectToBitwarden
         case .connecting:
             self.viewState = .connectToBitwarden
-        case .waitingForTheStatusResponse:
+        case .waitingForStatusResponse:
             self.viewState = .connectedToBitwarden
         case .connected(vault: _):
             self.viewState = .connectedToBitwarden

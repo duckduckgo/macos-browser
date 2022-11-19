@@ -201,7 +201,7 @@ extension Preferences {
                                     title: UserText.bitwardenConnecting,
                                     buttonValue: .init(title: UserText.bitwardenPreferencesOpenBitwarden, action: { model.openBitwarden() }))
                 .offset(x: Preferences.Const.autoLockWarningOffset)
-            case .waitingForTheStatusResponse:
+            case .waitingForStatusResponse:
                 BitwardenStatusView(iconType: .warning,
                                     title: UserText.bitwardenWaitingForStatusResponse,
                                     buttonValue: .init(title: UserText.bitwardenPreferencesOpenBitwarden, action: { model.openBitwarden() }))
