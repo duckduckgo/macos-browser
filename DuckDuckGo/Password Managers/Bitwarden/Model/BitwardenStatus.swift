@@ -26,6 +26,9 @@ enum BitwardenStatus: Equatable {
     // Bitwarden is not installed
     case notInstalled
 
+    // Installed Bitwarden doesn't support the integration
+    case oldVersion
+
     // Bitwarden application isn't running
     case notRunning
 

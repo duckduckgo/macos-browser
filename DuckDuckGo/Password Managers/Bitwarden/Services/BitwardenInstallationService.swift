@@ -20,9 +20,17 @@ import Foundation
 import AppKit
 import os.log
 
+enum BitwardenInstallationState {
+
+    case notInstalled
+    case oldVersion
+    case installed
+
+}
+
 protocol BitwardenInstallationService {
-    
-    var isBitwardenInstalled: Bool { get }
+
+    var installationState: BitwardenInstallationState { get }
     var isIntegrationWithDuckDuckGoEnabled: Bool { get }
 
     func openBitwarden()
@@ -31,12 +39,13 @@ protocol BitwardenInstallationService {
 
 final class LocalBitwardenInstallationService: BitwardenInstallationService {
 
-    private lazy var bundlePath = "/Applications/Bitwarden.app"
-    private lazy var bundleUrl = URL(fileURLWithPath: bundlePath)
+    static var bundlePath = "/Applications/Bitwarden.app"
+    private lazy var bundleUrl = URL(fileURLWithPath: Self.bundlePath)
+    static var minimumVersion = "2022.10.2"
 
     private lazy var manifestPath: String = {
 #if DEBUG
-
+        // Even if debugging or developing, look at the standard location of the manifest file
         let sandboxPathComponent = "Containers/com.duckduckgo.macos.browser/Data/Library/Application Support/"
         let libraryURL = FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask).first!
         let applicationSupport = libraryURL.appendingPathComponent(sandboxPathComponent)
@@ -59,15 +68,22 @@ final class LocalBitwardenInstallationService: BitwardenInstallationService {
         return libraryURL.appendingPathComponent(bitwardenPathComponent)
     }()
 
-    var isBitwardenInstalled: Bool {
-        return FileManager.default.fileExists(atPath: bundlePath)
+    var installationState: BitwardenInstallationState {
+        guard let version = ApplicationVersionReader.getVersion(of: Self.bundlePath) else {
+            return .notInstalled
+        }
+
+        guard Self.minimumVersion.compare(version, options: .numeric) != .orderedDescending else {
+            return .oldVersion
+        }
+
+        return .installed
     }
 
     var isIntegrationWithDuckDuckGoEnabled: Bool {
+        // Select correct data file and check the integration setting
         let isIntegrationInSandboxDataFileEnabled = isIntegrationEnabled(in: sandboxDataFileUrl)
-        os_log("LocalBitwardenInstallationService: Sandbox data file: enableDuckDuckGoBrowserIntegration: %{public}s", log: .bitwarden, type: .default, isIntegrationInSandboxDataFileEnabled.description)
         let isIntegrationInDataFileEnabled = isIntegrationEnabled(in: dataFileUrl)
-        os_log("LocalBitwardenInstallationService: Standard data file: enableDuckDuckGoBrowserIntegration: %{public}s", log: .bitwarden, type: .default, isIntegrationInDataFileEnabled.description)
         let sandboxDataFileModificationDate = getModificationDate(for: sandboxDataFileUrl)
         let dataFileModificationDate = getModificationDate(for: dataFileUrl)
 
@@ -75,19 +91,15 @@ final class LocalBitwardenInstallationService: BitwardenInstallationService {
         if let sandboxDataFileModificationDate = sandboxDataFileModificationDate {
             if let dataFileModificationDate = dataFileModificationDate {
                 if dataFileModificationDate > sandboxDataFileModificationDate {
-                    os_log("LocalBitwardenInstallationService: Using standard data file", log: .bitwarden, type: .default)
                     isIntegrationEnabled = isIntegrationInDataFileEnabled
                 } else {
-                    os_log("LocalBitwardenInstallationService: Using sandbox data file", log: .bitwarden, type: .default)
                     isIntegrationEnabled = isIntegrationInSandboxDataFileEnabled
                 }
             } else {
-                os_log("LocalBitwardenInstallationService: Using sandbox data file", log: .bitwarden, type: .default)
                 isIntegrationEnabled = isIntegrationInSandboxDataFileEnabled
             }
         } else {
             if dataFileModificationDate != nil {
-                os_log("LocalBitwardenInstallationService: Using sandbox data file", log: .bitwarden, type: .default)
                 isIntegrationEnabled = isIntegrationInSandboxDataFileEnabled
             } else {
                 isIntegrationEnabled = false
@@ -96,7 +108,6 @@ final class LocalBitwardenInstallationService: BitwardenInstallationService {
 
         // Check for the existence of manifest file. (Not working for Bitwarden installed from App Store)
         let manifestExists = FileManager.default.fileExists(atPath: manifestPath)
-        os_log("LocalBitwardenInstallationService: Is manifest available: %{public}s", log: .bitwarden, type: .default, manifestExists.description)
 
         return manifestExists || isIntegrationEnabled
     }

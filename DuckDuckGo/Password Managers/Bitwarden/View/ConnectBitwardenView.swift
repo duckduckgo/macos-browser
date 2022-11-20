@@ -86,8 +86,9 @@ struct ConnectBitwardenView: View {
     @ViewBuilder private func bodyView(for state: ConnectBitwardenViewModel.ViewState) -> some View {
         switch viewModel.viewState {
         case .disclaimer: ConnectToBitwardenDisclaimerView()
-        case .lookingForBitwarden: BitwardenInstallationDetectionView(bitwardenDetected: false)
-        case .bitwardenFound: BitwardenInstallationDetectionView(bitwardenDetected: true)
+        case .lookingForBitwarden: BitwardenInstallationDetectionView(bitwardenDetected: false, bitwardenNeedsUpdate: false)
+        case .oldVersion: BitwardenInstallationDetectionView(bitwardenDetected: true, bitwardenNeedsUpdate: true)
+        case .bitwardenFound: BitwardenInstallationDetectionView(bitwardenDetected: true, bitwardenNeedsUpdate: false)
         case .waitingForConnectionPermission: ConnectToBitwardenView(canConnect: false)
         case .connectToBitwarden: ConnectToBitwardenView(canConnect: true)
         case .connectedToBitwarden: ConnectedToBitwardenView()
@@ -144,6 +145,7 @@ private struct BitwardenInstallationDetectionView: View {
     @EnvironmentObject var viewModel: ConnectBitwardenViewModel
     
     let bitwardenDetected: Bool
+    let bitwardenNeedsUpdate: Bool
     
     var body: some View {
 
@@ -176,9 +178,17 @@ private struct BitwardenInstallationDetectionView: View {
             .frame(width: 156, height: 40)
             
             if bitwardenDetected {
-                HStack {
-                    Image("SuccessCheckmark")
-                    Text(UserText.bitwardenAppFound)
+                if bitwardenNeedsUpdate {
+                    HStack {
+                        ActivityIndicator(isAnimating: .constant(true), style: .spinning)
+
+                        Text(UserText.bitwardenOldVersion)
+                    }
+                } else {
+                    HStack {
+                        Image("SuccessCheckmark")
+                        Text(UserText.bitwardenAppFound)
+                    }
                 }
             } else {
                 HStack {

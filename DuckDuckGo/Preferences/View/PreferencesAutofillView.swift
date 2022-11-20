@@ -171,6 +171,11 @@ extension Preferences {
                                     title: UserText.bitwardenNotInstalled,
                                     buttonValue: nil)
                 .offset(x: Preferences.Const.autoLockWarningOffset)
+            case .oldVersion:
+                BitwardenStatusView(iconType: .warning,
+                                    title: UserText.bitwardenOldVersion,
+                                    buttonValue: nil)
+                .offset(x: Preferences.Const.autoLockWarningOffset)
             case .notRunning:
                 BitwardenStatusView(iconType: .warning,
                                     title: UserText.bitwardenPreferencesRun,

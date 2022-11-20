@@ -91,11 +91,18 @@ final class BitwardenManager: BitwardenManagement, ObservableObject {
             return
         }
 
-        // Check whether Bitwarden is installed
-        guard installationService.isBitwardenInstalled else {
+        // Check whether Bitwarden is installed and make sure it supports the integration
+        switch installationService.installationState {
+        case .notInstalled:
             status = .notInstalled
             scheduleConnectionAttempt()
             return
+        case .oldVersion:
+            status = .oldVersion
+            scheduleConnectionAttempt()
+            return
+        case .installed:
+            break
         }
 
         // Check whether Bitwarden app is running

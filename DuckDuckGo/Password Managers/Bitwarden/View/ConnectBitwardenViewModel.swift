@@ -35,6 +35,7 @@ final class ConnectBitwardenViewModel: ObservableObject {
         
         // Bitwarden installation:
         case lookingForBitwarden
+        case oldVersion
         case bitwardenFound
         
         // Bitwarden connection:
@@ -46,14 +47,14 @@ final class ConnectBitwardenViewModel: ObservableObject {
         
         var canContinue: Bool {
             switch self {
-            case .lookingForBitwarden, .waitingForConnectionPermission: return false
+            case .lookingForBitwarden, .oldVersion, .waitingForConnectionPermission: return false
             default: return true
             }
         }
         
         var confirmButtonTitle: String {
             switch self {
-            case .disclaimer, .lookingForBitwarden, .bitwardenFound: return "Next"
+            case .disclaimer, .lookingForBitwarden, .oldVersion, .bitwardenFound: return "Next"
             case .waitingForConnectionPermission, .connectToBitwarden: return "Connect"
             case .connectedToBitwarden: return "OK"
             }
@@ -98,6 +99,8 @@ final class ConnectBitwardenViewModel: ObservableObject {
             self.viewState = .disclaimer
         case .notInstalled:
             self.viewState = .lookingForBitwarden
+        case .oldVersion:
+            self.viewState = .oldVersion
         case .notRunning:
             self.viewState = .waitingForConnectionPermission
         case .integrationNotApproved:
@@ -116,7 +119,6 @@ final class ConnectBitwardenViewModel: ObservableObject {
             self.viewState = .connectedToBitwarden
         case .error(error: let error):
             self.error = error
-
         }
     }
 

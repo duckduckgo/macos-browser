@@ -18,27 +18,16 @@
 
 import Foundation
 
-struct SafariVersionReader {
+class SafariVersionReader: ApplicationVersionReader {
 
-    static let safariPlistPath = "/Applications/Safari.app/Contents/Info.plist"
+    static let safariPath = "/Applications/Safari.app"
 
     static func getVersion() -> String? {
-        guard let plist = NSDictionary(contentsOfFile: Self.safariPlistPath),
-              let versionNumber = plist.object(forKey: Bundle.Keys.versionNumber) as? String else {
-            assertionFailure("Reading the version of Safari failed")
-            return nil
-        }
-
-        return versionNumber
+        super.getVersion(of: safariPath)
     }
 
     static func getMajorVersion() -> Int? {
-        if let safariVersionString = SafariVersionReader.getVersion(),
-           let majorVersion = safariVersionString.components(separatedBy: ".")[safe: 0] {
-            return Int(majorVersion)
-        } else {
-            return nil
-        }
+        super.getMajorVersion(of: safariPath)
     }
 
 }
