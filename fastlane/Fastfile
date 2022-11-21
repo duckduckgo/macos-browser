@@ -1,0 +1,47 @@
+# frozen_string_literal: true
+
+UI.user_error!('Please run fastlane via `bundle exec`') unless FastlaneCore::Helper.bundler?
+
+########################################################################
+# Environment Variables
+########################################################################
+DEFAULT_BRANCH = 'develop'
+
+default_platform(:mac)
+
+platform :mac do
+#################################################
+# Public lanes
+#################################################
+
+  # Executes the release preparation work in the repository
+  #
+  # - Cuts a new release branch
+  # - Updates submodules and embedded files
+  #
+  # @option [String] build_number (default: nil) 
+  # @option [Boolean] skip_confirm (default: false) If true, avoids any interactive prompt
+  #
+  desc "Executes the release preparation work in the repository"
+  lane :code_freeze do
+    macos_codefreeze_prechecks
+  end
+
+
+#################################################
+# Helper functions
+#################################################
+  # Ensure that the local repository is in good shape for the release:
+  #
+  # - Checks out the default branch
+  # - Ensures git status is clean
+  #
+  private_lane :macos_codefreeze_prechecks do
+    ensure_git_status_clean()
+
+    ensure_git_branch(branch: DEFAULT_BRANCH)
+    git_pull
+
+    git_submodule_update(recursive: true, init: true)
+  end
+end
