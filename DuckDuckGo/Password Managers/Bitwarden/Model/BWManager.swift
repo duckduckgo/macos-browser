@@ -26,7 +26,7 @@ protocol BWManagement {
     var status: BWStatus { get }
     var statusPublisher: Published<BWStatus>.Publisher { get }
 
-    func initCommunication(applicationDidFinishLaunching: Bool)
+    func initCommunication()
     func sendHandshake()
     func refreshStatusIfNeeded()
     func cancelCommunication()
@@ -53,7 +53,7 @@ final class BWManager: BWManagement, ObservableObject {
 
     private lazy var communicator: BWCommunication = BWCommunicator()
 
-    func initCommunication(applicationDidFinishLaunching: Bool) {
+    func initCommunication() {
         communicator.delegate = self
 
         connectToBitwadenProcess()
@@ -592,7 +592,7 @@ extension BWManager: BWCommunicatorDelegate {
         }
 
         guard let messageId = response.messageId, messageIdGenerator.verify(messageId: messageId) else {
-            logOrAssertionFailure("BWManager: Unkown or missing message id")
+            os_log("BWManager: Unkown message id", log: .bitwarden, type: .default, String(describing: status))
             return
         }
 

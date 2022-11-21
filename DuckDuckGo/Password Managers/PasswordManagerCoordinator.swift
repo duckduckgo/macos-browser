@@ -69,7 +69,7 @@ class PasswordManagerCoordinator: BrowserServicesKit.PasswordManager {
     func setEnabled(_ enabled: Bool) {
         if enabled {
             if !bitwardenManagement.status.isConnected {
-                bitwardenManagement.initCommunication(applicationDidFinishLaunching: false)
+                bitwardenManagement.initCommunication()
             }
         } else {
             BWManager.shared.cancelCommunication()
