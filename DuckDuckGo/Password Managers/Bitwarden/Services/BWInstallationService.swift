@@ -41,7 +41,7 @@ final class LocalBitwardenInstallationService: BWInstallationService {
 
     static var bundlePath = "/Applications/Bitwarden.app"
     private lazy var bundleUrl = URL(fileURLWithPath: Self.bundlePath)
-    static var minimumVersion = "2022.10.2"
+    static var minimumVersion = "2022.10.1"
 
     private lazy var manifestPath: String = {
 #if DEBUG
