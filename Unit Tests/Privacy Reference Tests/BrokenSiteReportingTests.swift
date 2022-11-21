@@ -100,20 +100,20 @@ final class BrokenSiteReportingTests: XCTestCase {
 
 // MARK: - BrokenSiteReportingTestData
 
-struct BrokenSiteReportingTestData: Codable {
+private struct BrokenSiteReportingTestData: Codable {
     let reportURL: ReportURL
 }
 
 // MARK: - ReportURL
 
-struct ReportURL: Codable {
+private struct ReportURL: Codable {
     let name: String
     let tests: [Test]
 }
 
 // MARK: - Test
 
-struct Test: Codable {
+private struct Test: Codable {
     let name: String
     let siteURL: String
     let wasUpgraded: Bool
@@ -129,6 +129,6 @@ struct Test: Codable {
 
 // MARK: - ExpectReportURLParam
 
-struct ExpectReportURLParam: Codable {
+private struct ExpectReportURLParam: Codable {
     let name, value: String
 }

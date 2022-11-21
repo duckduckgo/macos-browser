@@ -40,7 +40,7 @@ struct PrivacyReferenceTestHelper {
             return jsonResult
             
         } catch {
-            fatalError("Can't decode \(path)")
+            fatalError("Can't decode \(path) - Error \(error.localizedDescription)")
         }
     }
     

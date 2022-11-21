@@ -34,6 +34,8 @@
 		3171D6DB2889B64D0068632A /* CookieManagedNotificationContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3171D6DA2889B64D0068632A /* CookieManagedNotificationContainerView.swift */; };
 		3184AC6D288F29D800C35E4B /* BadgeNotificationAnimationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3184AC6C288F29D800C35E4B /* BadgeNotificationAnimationModel.swift */; };
 		3184AC6F288F2A1100C35E4B /* CookieNotificationAnimationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3184AC6E288F2A1100C35E4B /* CookieNotificationAnimationModel.swift */; };
+		31979800292BCCD0002C260F /* PrivacyConfigurationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 319797FF292BCCD0002C260F /* PrivacyConfigurationTests.swift */; };
+		31979802292BCDB5002C260F /* privacy-configuration in Resources */ = {isa = PBXBuildFile; fileRef = 31979801292BCDB4002C260F /* privacy-configuration */; };
 		31A031A6288191230090F792 /* CookieConsentAnimationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31A031A5288191230090F792 /* CookieConsentAnimationView.swift */; };
 		31A031A928819D920090F792 /* CookieConsentAnimationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31A031A828819D920090F792 /* CookieConsentAnimationModel.swift */; };
 		31B4AF532901A4F20013585E /* NSEventExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31B4AF522901A4F20013585E /* NSEventExtension.swift */; };
@@ -868,6 +870,8 @@
 		3171D6DA2889B64D0068632A /* CookieManagedNotificationContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieManagedNotificationContainerView.swift; sourceTree = "<group>"; };
 		3184AC6C288F29D800C35E4B /* BadgeNotificationAnimationModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BadgeNotificationAnimationModel.swift; sourceTree = "<group>"; };
 		3184AC6E288F2A1100C35E4B /* CookieNotificationAnimationModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieNotificationAnimationModel.swift; sourceTree = "<group>"; };
+		319797FF292BCCD0002C260F /* PrivacyConfigurationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyConfigurationTests.swift; sourceTree = "<group>"; };
+		31979801292BCDB4002C260F /* privacy-configuration */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "privacy-configuration"; sourceTree = "<group>"; };
 		31A031A5288191230090F792 /* CookieConsentAnimationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieConsentAnimationView.swift; sourceTree = "<group>"; };
 		31A031A828819D920090F792 /* CookieConsentAnimationModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieConsentAnimationModel.swift; sourceTree = "<group>"; };
 		31B4AF522901A4F20013585E /* NSEventExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSEventExtension.swift; sourceTree = "<group>"; };
@@ -1748,11 +1752,13 @@
 		3151D6472924192600278B0F /* Privacy Reference Tests */ = {
 			isa = PBXGroup;
 			children = (
+				31979801292BCDB4002C260F /* privacy-configuration */,
 				31570B822926C3A600882A64 /* broken-site-reporting */,
 				3151D65829241CA500278B0F /* global-privacy-control */,
 				3151D64C2924192600278B0F /* GPCTests.swift */,
 				31570B7E2926BD6E00882A64 /* PrivacyReferenceTestHelper.swift */,
 				31570B802926C38500882A64 /* BrokenSiteReportingTests.swift */,
+				319797FF292BCCD0002C260F /* PrivacyConfigurationTests.swift */,
 			);
 			path = "Privacy Reference Tests";
 			sourceTree = "<group>";
@@ -4458,6 +4464,7 @@
 				B69B50542726CD8100758A2B /* atb-with-update.json in Resources */,
 				37A803DB27FD69D300052F4C /* Data Import Resources in Resources */,
 				B69B50522726CD8100758A2B /* atb.json in Resources */,
+				31979802292BCDB5002C260F /* privacy-configuration in Resources */,
 				4B70C00127B0793D000386ED /* DuckDuckGo-ExampleCrash.ips in Resources */,
 				B67C6C422654BF49006C872E /* DuckDuckGo-Symbol.jpg in Resources */,
 				B69B50552726CD8100758A2B /* invalid.json in Resources */,
@@ -5125,6 +5132,7 @@
 				858A798826A99DBE00A75A42 /* PasswordManagementItemListModelTests.swift in Sources */,
 				4B8AD0B127A86D9200AE44D6 /* WKWebsiteDataStoreExtensionTests.swift in Sources */,
 				B69B50472726C5C200758A2B /* VariantManagerTests.swift in Sources */,
+				31979800292BCCD0002C260F /* PrivacyConfigurationTests.swift in Sources */,
 				8546DE6225C03056000CA5E1 /* UserAgentTests.swift in Sources */,
 				B63ED0DE26AFD9A300A9DAD1 /* AVCaptureDeviceMock.swift in Sources */,
 				B63ED0E026AFE32F00A9DAD1 /* GeolocationProviderMock.swift in Sources */,
