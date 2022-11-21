@@ -80,6 +80,10 @@ final class MoreOptionsMenu: NSMenu {
             .withImage(NSImage(named: "OptionsButtonMenuEmail"))
             .withSubmenu(EmailOptionsButtonSubMenu(tabCollectionViewModel: tabCollectionViewModel, emailManager: emailManager))
 
+        addItem(withTitle: "Network Protection", action: #selector(toggleNetworkProtection(_:)), keyEquivalent: "")
+            .targetting(self)
+            .withImage(NSImage(named: "PasswordManagement"))
+
         addItem(NSMenuItem.separator())
 
         addPageItems()
@@ -145,6 +149,10 @@ final class MoreOptionsMenu: NSMenu {
 
     @objc func openAutofillWithCreditCards(_ sender: NSMenuItem) {
         actionDelegate?.optionsButtonMenuRequestedLoginsPopover(self, selectedCategory: .cards)
+    }
+
+    @objc func toggleNetworkProtection(_ sender: NSMenuItem) {
+        // toggle NetP
     }
 
     @objc func openPreferences(_ sender: NSMenuItem) {
