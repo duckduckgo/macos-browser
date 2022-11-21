@@ -125,20 +125,19 @@ final class PrivatePlayer {
 
 // MARK: - Navigation
 
-extension PrivatePlayer {
+extension PrivatePlayer: NavigationResponder {
 
-    func decidePolicy(for navigationAction: WKNavigationAction, in tab: Tab) -> WKNavigationActionPolicy? {
+    func webView(_ webView: WebView, decidePolicyFor navigationAction: WKNavigationAction, preferences: WKWebpagePreferences) async -> NavigationActionPolicy? {
+
         guard isAvailable, mode != .disabled else {
-
             // When the feature is disabled but the webView still gets a Private Player URL,
             // convert it back to a regular YouTube video URL.
             if navigationAction.request.url?.isPrivatePlayerScheme == true,
                 let (videoID, timestamp) = navigationAction.request.url?.youtubeVideoParams {
 
-                tab.webView.load(.youtube(videoID, timestamp: timestamp))
-                return .cancel
+                return .redirect(to: .youtube(videoID, timestamp: timestamp))
             }
-            return nil
+            return .next
         }
 
         // Don't allow loading Private Player HTML directly
@@ -148,12 +147,12 @@ extension PrivatePlayer {
 
         // Always allow loading Private Player URLs (local HTML)
         if navigationAction.request.url?.isPrivatePlayerScheme == true {
-            return .allow
+            return .allow()
         }
 
         // We only care about YouTube video URLs loaded into main frame or within a Private Player
-        guard navigationAction.isTargetingMainFrame || tab.content.isPrivatePlayer, navigationAction.request.url?.isYoutubeVideo == true else {
-            return nil
+        guard navigationAction.isTargetingMainFrame || webView.url?.isPrivatePlayer == true, navigationAction.request.url?.isYoutubeVideo == true else {
+            return .next
         }
 
         let alwaysOpenInPrivatePlayer = mode == .enabled
@@ -162,35 +161,34 @@ extension PrivatePlayer {
         // the PP would automatically load on that YouTube video, effectively cancelling the back navigation.
         // We need to go 2 sites back. That YouTube page wasn't really viewed by the user, but it was pushed on the
         // navigation stack and immediately replaced with Private Player. That's why skipping it while going back makes sense.
-        if alwaysOpenInPrivatePlayer && isGoingBackFromPrivatePlayerToYoutubeVideo(for: navigationAction, in: tab) {
-            tab.webView.goBack()
+        if alwaysOpenInPrivatePlayer && isGoingBackFromPrivatePlayerToYoutubeVideo(for: navigationAction, in: webView.tab) {
+            _=webView.goBack()
             return .cancel
         }
 
-        let didSelectRecommendationFromPrivatePlayer = tab.content.isPrivatePlayer && navigationAction.request.url?.isYoutubeVideoRecommendation == true
+        let didSelectRecommendationFromPrivatePlayer = webView.url?.isPrivatePlayer == true && navigationAction.request.url?.isYoutubeVideoRecommendation == true
 
         // Recommendations must always be opened in Private Player.
         guard alwaysOpenInPrivatePlayer || didSelectRecommendationFromPrivatePlayer, let (videoID, timestamp) = navigationAction.request.url?.youtubeVideoParams else {
-            return nil
+            return .next
         }
 
         // If this is a child tab of a Private Player and it's loading a YouTube URL, don't override it ("Watch in YouTube").
-        if case .privatePlayer(let parentVideoID, _) = tab.parentTab?.content, parentVideoID == videoID {
-            return nil
+        if case .privatePlayer(let parentVideoID, _) = webView.tab?.parentTab?.content, parentVideoID == videoID {
+            return .next
         }
 
         // Otherwise load priate player unless it's already loaded.
-        guard case .privatePlayer(let currentVideoID, _) = tab.content, currentVideoID == videoID, tab.webView.url?.isPrivatePlayer == true else {
-            tab.webView.load(.privatePlayer(videoID, timestamp: timestamp))
-            return .cancel
+        guard case .privatePlayer(let currentVideoID, _) = webView.tab?.content, currentVideoID == videoID, webView.url?.isPrivatePlayer == true else {
+            return .redirect(to: .privatePlayer(videoID, timestamp: timestamp))
         }
-        return nil
+        return .next
     }
 
-    private func isGoingBackFromPrivatePlayerToYoutubeVideo(for navigationAction: WKNavigationAction, in tab: Tab) -> Bool {
+    private func isGoingBackFromPrivatePlayerToYoutubeVideo(for navigationAction: WKNavigationAction, in tab: Tab?) -> Bool {
         guard navigationAction.navigationType == .backForward,
-              let url = tab.webView.backForwardList.currentItem?.url,
-              let forwardURL = tab.webView.backForwardList.forwardItem?.url
+              let url = tab?.webView.backForwardList.currentItem?.url,
+              let forwardURL = tab?.webView.backForwardList.forwardItem?.url
         else {
             return false
         }

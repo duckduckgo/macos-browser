@@ -1,7 +1,7 @@
 //
-//  WKWebViewDownloadDelegate.swift
+//  URLResponseExtension.swift
 //
-//  Copyright © 2021 DuckDuckGo. All rights reserved.
+//  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,13 +16,12 @@
 //  limitations under the License.
 //
 
-import WebKit
+import Foundation
 
-@MainActor
-protocol WKWebViewDownloadDelegate: AnyObject {
+extension URLResponse {
 
-    func webView(_ webView: WKWebView, navigationAction: WKNavigationAction, didBecomeDownload download: WebKitDownload)
-    func webView(_ webView: WKWebView, navigationResponse: WKNavigationResponse, didBecomeDownload download: WebKitDownload)
-    func webView(_ webView: WKWebView, contextMenuDidCreateDownload download: WebKitDownload)
-    
+    var isSuccessfulHTTPURLResponse: Bool {
+        (self as? HTTPURLResponse)?.validateStatusCode(statusCode: 200..<300) == nil
+    }
+
 }

@@ -50,6 +50,7 @@ final class LegacyWebKitDownloadDelegate: NSObject {
 // https://github.com/WebKit/webkit/blob/main/Source/WebKit/UIProcess/API/Cocoa/_WKDownloadDelegate.h
 private extension LegacyWebKitDownloadDelegate {
 
+    @MainActor
     @objc func _downloadDidStart(_ download: WebKitDownload) {
         guard let webView = download.webView, let url = download.originalRequest?.url else {
             assertionFailure("WebKitDownload webView or url is nil")

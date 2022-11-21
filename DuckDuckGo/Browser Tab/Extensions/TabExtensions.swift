@@ -23,18 +23,24 @@ struct TabExtensions {
     let adClickAttribution: AdClickAttributionTabExtension?
     let contextMenu: ContextMenuManager?
     let printing: TabPrintExtension?
+    let navigations: TabNavigationsProtocol
+    let navigationDelegate: DistributedNavigationDelegate
 
     @Injected(forTests: defaultExtensionsForTests)
     static var buildForTab: (Tab) -> TabExtensions = { tab in
-        TabExtensions(adClickAttribution: AdClickAttributionTabExtension(tab: tab),
-                      contextMenu: ContextMenuManager(tab: tab),
-                      printing: TabPrintExtension(tab: tab))
+        return TabExtensions(adClickAttribution: AdClickAttributionTabExtension(tab: tab),
+                             contextMenu: ContextMenuManager(tab: tab),
+                             printing: TabPrintExtension(tab: tab),
+                             navigations: TabNavigations(),
+                             navigationDelegate: DistributedNavigationDelegate())
     }
 
     private static func defaultExtensionsForTests(_ tab: Tab) -> TabExtensions {
-        TabExtensions(adClickAttribution: nil,
-                      contextMenu: nil,
-                      printing: nil)
+        return TabExtensions(adClickAttribution: nil,
+                             contextMenu: nil,
+                             printing: nil,
+                             navigations: TabNavigations(),
+                             navigationDelegate: DistributedNavigationDelegate())
     }
 
 }

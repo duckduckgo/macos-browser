@@ -31,7 +31,7 @@ extension WKWebView {
         return self._sessionStateData()
     }
 
-    @nonobjc
+    @objc
     @available(macOS, deprecated: 12.0)
     func restoreSessionState(from data: Data) throws {
         guard self.responds(to: #selector(WKWebView._restore(fromSessionStateData:))) else {

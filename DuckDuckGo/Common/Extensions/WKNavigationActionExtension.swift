@@ -43,4 +43,8 @@ extension WKNavigationAction {
         return self.value(forKey: Self._isUserInitiated) as? Bool ?? true
     }
 
+    var isMiddleClick: Bool {
+        self.buttonNumber == 4
+    }
+
 }

@@ -20,7 +20,11 @@ import WebKit
 
 final class WindowFeatures: WKWindowFeatures {
 
-    static let tab = WindowFeatures(menuBar: true, statusBar: true, toolbars: true, resizable: true, x: 0, y: 1, noReferrer: true, noOpener: true)
+    // TODO: norefferer noopener?
+    static let backgroundTab = WindowFeatures(selected: false, menuBar: true, statusBar: true, toolbars: true, resizable: true, noReferrer: true, noOpener: true)
+    static let selectedTab = WindowFeatures(selected: true, menuBar: true, statusBar: true, toolbars: true, resizable: true, noReferrer: true, noOpener: true)
+
+    static let window = WindowFeatures(window: true, menuBar: true, statusBar: true, toolbars: true, resizable: true, noReferrer: true, noOpener: true)
     static let popup = WindowFeatures(toolbars: false)
 
     private let _menuBarVisibility: Bool?
@@ -40,10 +44,14 @@ final class WindowFeatures: WKWindowFeatures {
     private let _height: CGFloat?
     override var height: NSNumber? { _height.map { NSNumber(value: Double($0)) } }
 
+    let window: Bool?
+    let selected: Bool?
     let noReferrer: Bool?
     let noOpener: Bool?
 
-    init(menuBar: Bool? = nil,
+    init(window: Bool? = nil,
+         selected: Bool? = nil,
+         menuBar: Bool? = nil,
          statusBar: Bool? = nil,
          toolbars: Bool? = nil,
          resizable: Bool? = nil,
@@ -54,6 +62,8 @@ final class WindowFeatures: WKWindowFeatures {
          noReferrer: Bool? = nil,
          noOpener: Bool? = nil) {
 
+        self.window = window
+        self.selected = selected
         self._menuBarVisibility = menuBar
         self._statusBarVisibility = statusBar
         self._toolbarsVisibility = toolbars
@@ -64,6 +74,20 @@ final class WindowFeatures: WKWindowFeatures {
         self._height = height
         self.noOpener = noOpener
         self.noReferrer = noReferrer
+    }
+
+    convenience init(wkWindowFeatures other: WKWindowFeatures,
+                     window: Bool? = nil,
+                     selected: Bool? = nil) {
+        self.init(window: window,
+                  selected: selected,
+                  statusBar: other.statusBarVisibility?.boolValue,
+                  toolbars: other.toolbarsVisibility?.boolValue,
+                  resizable: other.allowsResizing?.boolValue,
+                  x: other.x.map { CGFloat($0.doubleValue) },
+                  y: other.y.map { CGFloat($0.doubleValue) },
+                  width: other.width.map { CGFloat($0.doubleValue) },
+                  height: other.height.map { CGFloat($0.doubleValue) })
     }
 
     func encoded() -> String {

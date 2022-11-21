@@ -20,14 +20,17 @@ import Cocoa
 import WebKit
 import os.log
 
-protocol WebViewContextMenuDelegate: AnyObject {
-    func webView(_ webView: WebView, willOpenContextMenu menu: NSMenu, with event: NSEvent)
-    func webView(_ webView: WebView, didCloseContextMenu menu: NSMenu, with event: NSEvent?)
-}
-
 final class WebView: WKWebView {
 
-    weak var contextMenuDelegate: WebViewContextMenuDelegate?
+    var extendedNavigationDelegate: WebViewNavigationDelegate? {
+        get { navigationDelegate as? WebViewNavigationDelegate }
+        set { navigationDelegate = newValue }
+    }
+
+    var extendedUIDelegate: WebViewUIDelegate? {
+        get { uiDelegate as? WebViewUIDelegate }
+        set { uiDelegate = newValue }
+    }
 
     override func viewDidMoveToWindow() {
         super.viewDidMoveToWindow()
@@ -41,8 +44,51 @@ final class WebView: WKWebView {
         self.configuration.userContentController.removeAllUserScripts()
     }
 
+    // MARK: - Navigation
+
+    @discardableResult
+    override func load(_ request: URLRequest) -> WKNavigation? {
+        let navigation = super.load(request)
+        extendedNavigationDelegate?.webView?(self, willStartNavigation: navigation, with: request)
+        return navigation
+    }
+
+    override func load(_ url: URL, inTargetNamed target: String?, windowFeatures: WindowFeatures? = nil) {
+        extendedNavigationDelegate?.webView?(self, willRequestNewWebViewFor: url, inTargetNamed: target, windowFeatures: windowFeatures)
+        super.load(url, inTargetNamed: target, windowFeatures: windowFeatures)
+    }
+
+    @discardableResult
+    override func reload() -> WKNavigation? {
+        let navigation = super.reload()
+        extendedNavigationDelegate?.webView?(self, willStartReloadNavigation: navigation)
+        return navigation
+    }
+
+    // TODO: LoadSimulated/File etc..
+
     // MARK: - Back/Forward Navigation
 
+    @discardableResult
+    override func go(to item: WKBackForwardListItem) -> WKNavigation? {
+        let navigation = super.go(to: item)
+        extendedNavigationDelegate?.webView?(self, willStartUserInitiatedNavigation: navigation, to: item)
+        return navigation
+    }
+
+    @discardableResult
+    override func goBack() -> WKNavigation? {
+        backForwardList.backItem.flatMap { self.go(to: $0) }
+    }
+
+    @discardableResult
+    override func goForward() -> WKNavigation? {
+        backForwardList.forwardItem.flatMap { self.go(to: $0) }
+    }
+
+    // TODO: Stop navigation calls delegate failure method?
+
+    // TODO: Move to Tab Extension
     var frozenCanGoBack: Bool?
     var frozenCanGoForward: Bool?
 
@@ -54,16 +100,36 @@ final class WebView: WKWebView {
         frozenCanGoForward ?? super.canGoForward
     }
 
+    // MARK: - Session State Restoration
+
+    @available(macOS, deprecated: 12.0)
+    override func restoreSessionState(from data: Data) throws {
+        guard self.responds(to: #selector(WKWebView._restore(fromSessionStateData:))) else {
+            throw DoesNotSupportRestoreFromSessionData()
+        }
+        extendedNavigationDelegate?.webViewWillRestoreSessionState?(self)
+        self._restore(fromSessionStateData: data)
+    }
+
+    @available(macOS 12, *)
+    override var interactionState: Any? {
+        get { super.interactionState }
+        set {
+            extendedNavigationDelegate?.webViewWillRestoreSessionState?(self)
+            super.interactionState = newValue
+        }
+    }
+
     // MARK: - Menu
 
     override func willOpenMenu(_ menu: NSMenu, with event: NSEvent) {
         super.willOpenMenu(menu, with: event)
-        contextMenuDelegate?.webView(self, willOpenContextMenu: menu, with: event)
+        extendedUIDelegate?.webView?(self, willOpenContextMenu: menu, with: event)
     }
 
     override func didCloseMenu(_ menu: NSMenu, with event: NSEvent?) {
         super.didCloseMenu(menu, with: event)
-        contextMenuDelegate?.webView(self, didCloseContextMenu: menu, with: event)
+        extendedUIDelegate?.webView?(self, didCloseContextMenu: menu, with: event)
     }
 
 }

@@ -22,15 +22,9 @@ import Foundation
 import WebKit
 
 protocol ContextMenuManagerDelegate: AnyObject {
+    var downloadDelegate: FileDownloadManagerDelegate? { get }
     func launchSearch(for text: String)
     func prepareForContextMenuDownload()
-}
-
-enum NavigationPolicy {
-    case instantAllow
-    case newTab(selected: Bool)
-    case download
-    case cancel
 }
 
 enum NewWindowPolicy {
@@ -44,8 +38,8 @@ final class ContextMenuManager: NSObject {
     private var userScriptsCancellable: AnyCancellable?
     weak var delegate: ContextMenuManagerDelegate?
 
-    private var onNavigation: ((WKNavigationAction?) -> NavigationPolicy)?
-    private var onNewWindow: ((WKNavigationAction?) -> NewWindowPolicy)?
+    private var onNavigation: ((WebView, WKNavigationAction) -> NavigationActionPolicy?)?
+    private var onNewWindow: ((WKNavigationAction) -> NewWindowPolicy?)?
     private var askForDownloadLocation: Bool?
 
     private var selectedText: String?
@@ -58,26 +52,11 @@ final class ContextMenuManager: NSObject {
         }
     }
 
-    @MainActor
-    func decidePolicy(for navigationAction: WKNavigationAction) async -> NavigationPolicy? {
-        defer {
-            onNavigation = nil
-        }
-        return onNavigation?(navigationAction)
-    }
-
     func decideNewWindowPolicy(for navigationAction: WKNavigationAction) -> NewWindowPolicy? {
         defer {
             onNewWindow = nil
         }
         return onNewWindow?(navigationAction)
-    }
-
-    func shouldAskForDownloadLocation() -> Bool? {
-        defer {
-            askForDownloadLocation = nil
-        }
-        return askForDownloadLocation
     }
 
 }
@@ -154,8 +133,8 @@ extension ContextMenuManager {
 
 }
 
-// MARK: - NSMenuDelegate
-extension ContextMenuManager: WebViewContextMenuDelegate {
+// MARK: - WebViewContextMenuDelegate
+extension ContextMenuManager {
 
     func webView(_ webView: WebView, willOpenContextMenu menu: NSMenu, with event: NSEvent) {
         for (index, item) in menu.items.enumerated().reversed() {
@@ -272,7 +251,7 @@ private extension ContextMenuManager {
             return
         }
 
-        self.onNavigation = { _ in .newTab(selected: false) }
+        self.onNavigation = { _, _ in .retarget(in: .backgroundTab) }
         NSApp.sendAction(action, to: originalItem.target, from: originalItem)
     }
 
@@ -329,8 +308,8 @@ private extension ContextMenuManager {
             return
         }
 
-        onNavigation = { [selectedText] navigationAction in
-            guard let url = navigationAction?.request.url else { return .cancel }
+        onNavigation = { [selectedText] _, navigationAction in
+            guard let url = navigationAction.request.url else { return .cancel }
 
             let title = selectedText ?? url.absoluteString
             LocalBookmarkManager.shared.makeBookmark(for: url, title: title, isFavorite: false)
@@ -350,8 +329,8 @@ private extension ContextMenuManager {
             return
         }
 
-        onNavigation = { navigationAction in
-            guard let url = navigationAction?.request.url as NSURL? else { return .cancel }
+        onNavigation = { _, navigationAction in
+            guard let url = navigationAction.request.url as NSURL? else { return .cancel }
 
             let pasteboard = NSPasteboard.general
             pasteboard.declareTypes([.URL], owner: nil)
@@ -373,6 +352,7 @@ private extension ContextMenuManager {
             return
         }
 
+        // TODO: new window
         onNewWindow = { _ in .newTab(selected: true) }
         NSApp.sendAction(action, to: originalItem.target, from: originalItem)
     }
@@ -417,7 +397,7 @@ private extension ContextMenuManager {
         }
 
         onNewWindow = { navigationAction in
-            guard let url = navigationAction?.request.url else { return .cancel }
+            guard let url = navigationAction.request.url else { return .cancel }
             NSPasteboard.general.clearContents()
             NSPasteboard.general.setString(url.absoluteString, forType: .string)
             NSPasteboard.general.setString(url.absoluteString, forType: .URL)
@@ -425,6 +405,21 @@ private extension ContextMenuManager {
             return .cancel
         }
         NSApp.sendAction(action, to: originalItem.target, from: originalItem)
+    }
+
+}
+
+// MARK: - NavigationResponder
+extension ContextMenuManager: NavigationResponder {
+
+    func webView(_ webView: WebView, decidePolicyFor navigationAction: WKNavigationAction, preferences: WKWebpagePreferences) async -> NavigationActionPolicy? {
+        self.onNavigation?(webView, navigationAction)
+    }
+
+    func webView(_ webView: WebView, contextMenuDidCreate download: WebKitDownload) {
+        guard let prompt = self.askForDownloadLocation else { return }
+        FileDownloadManager.shared
+            .add(download, delegate: self.delegate?.downloadDelegate, location: prompt ? .prompt : .auto, postflight: .none)
     }
 
 }
@@ -442,19 +437,33 @@ extension ContextMenuManager: ContextMenuUserScriptDelegate {
 
 extension Tab: ContextMenuManagerDelegate {
 
+    var downloadDelegate: FileDownloadManagerDelegate? {
+        self.delegate
+    }
+
     func launchSearch(for text: String) {
         guard let url = URL.makeSearchUrl(from: text) else {
             assertionFailure("Failed to make Search URL")
             return
         }
 
-        self.delegate?.tab(self, requestedNewTabWith: .url(url), selected: true)
+        webView.load(url, in: .blank, windowFeatures: .selectedTab)
     }
 
     func prepareForContextMenuDownload() {
         // handling legacy WebKit Downloads for downloads initiated by Context Menu
         self.webView.configuration.processPool
             .setDownloadDelegateIfNeeded(using: LegacyWebKitDownloadDelegate.init)
+    }
+
+    // MARK: WebViewUIDelegate
+
+    func webView(_ webView: WebView, willOpenContextMenu menu: NSMenu, with event: NSEvent) {
+        extensions.contextMenu?.webView(webView, willOpenContextMenu: menu, with: event)
+    }
+
+    func webView(_ webView: WebView, didCloseContextMenu menu: NSMenu, with event: NSEvent?) {
+        extensions.contextMenu?.webView(webView, didCloseContextMenu: menu, with: event)
     }
 
 }

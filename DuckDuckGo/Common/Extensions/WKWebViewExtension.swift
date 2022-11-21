@@ -198,11 +198,23 @@ extension WKWebView {
 
     // https://developer.mozilla.org/en-US/docs/Web/API/Window/open
     // TODO: noopener, noreferrer?
-    func load(_ url: URL, in target: TargetWindowName?, windowFeatures: WindowFeatures? = nil) {
+    @objc func load(_ url: URL, inTargetNamed target: String?, windowFeatures: WindowFeatures? = nil) {
         let urlEnc = "'\(url.absoluteString.escapedJavaScriptString())'"
-        let targetEnc = target.map { ", '\($0.rawValue)'" } ?? ""
+        let targetEnc = target.map { ", '\($0.escapedJavaScriptString())'" } ?? ""
         let windowFeaturesEnc = windowFeatures.map { ", '\($0.encoded())'" } ?? ""
         self.evaluateJavaScript("window.open(\(urlEnc)\(targetEnc)\(windowFeaturesEnc))")
+    }
+
+    func load(_ url: URL, in target: TargetWindowName?, windowFeatures: WindowFeatures? = nil) {
+        self.load(url, inTargetNamed: target?.rawValue, windowFeatures: windowFeatures)
+    }
+
+    func replaceLocation(with url: URL, in frame: WKFrameInfo? = nil) {
+        if #available(macOS 11.0, *) {
+            self.evaluateJavaScript("location.replace('\(url.absoluteString.escapedJavaScriptString())')", in: frame, in: .defaultClient)
+        } else {
+            self.evaluateJavaScript("location.replace('\(url.absoluteString.escapedJavaScriptString())')")
+        }
     }
 
     func getMimeType(callback: @escaping (String?) -> Void) {

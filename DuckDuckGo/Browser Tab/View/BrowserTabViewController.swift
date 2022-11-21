@@ -190,7 +190,6 @@ final class BrowserTabViewController: NSViewController {
         func displayWebView(of tabViewModel: TabViewModel) {
             let newWebView = tabViewModel.tab.webView
             cleanUpRemoteWebViewIfNeeded(newWebView)
-            newWebView.uiDelegate = self
             webView = newWebView
 
             addWebViewToViewHierarchy(newWebView)
@@ -288,12 +287,13 @@ final class BrowserTabViewController: NSViewController {
         homePageView.isHidden = shown
     }
 
+    // TODO: Remove this
     func openNewTab(with content: Tab.TabContent, parentTab: Tab? = nil, selected: Bool = false, canBeClosedWithBack: Bool = false) {
         // shouldn't open New Tabs in PopUp window
         guard view.window?.isPopUpWindow == false else {
             // Prefer Tab's Parent
             if let parentTab = tabCollectionViewModel.selectedTabViewModel?.tab.parentTab, parentTab.delegate !== self {
-                parentTab.delegate?.tab(parentTab, requestedNewTabWith: content, selected: true)
+                parentTab.webView.load(content.url!, in: .blank, windowFeatures: .selectedTab)
                 parentTab.webView.window?.makeKeyAndOrderFront(nil)
                 // Act as default URL Handler if no Parent
             } else {
@@ -317,6 +317,10 @@ final class BrowserTabViewController: NSViewController {
         } else {
             tabCollectionViewModel.append(tab: tab, selected: selected)
         }
+    }
+
+    func tab(_ tab: Tab, createdChild childTab: Tab, selected: Bool) {
+        self.tabCollectionViewModel.insertChild(tab: childTab, selected: selected)
     }
 
     // MARK: - Browser Tabs
@@ -437,18 +441,6 @@ final class BrowserTabViewController: NSViewController {
             return overlayPopover
         }
         return overlay
-    }
-
-    @objc(_webView:printFrame:)
-    func webView(_ webView: WKWebView, printFrame handle: Any) {
-        webView.tab?.extensions.printing?.print(using: webView, frameHandle: handle)
-    }
-
-    @available(macOS 12, *)
-    @objc(_webView:printFrame:pdfFirstPageSize:completionHandler:)
-    func webView(_ webView: WKWebView, printFrame handle: Any, pdfFirstPageSize size: CGSize, completionHandler: () -> Void) {
-        self.webView(webView, printFrame: handle)
-        completionHandler()
     }
 
 }
@@ -623,6 +615,25 @@ extension BrowserTabViewController: TabDelegate {
             DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: item)
         }
     }
+
+    // TODO: Convert to Published
+    func tab(_ tab: Tab, runOpenPanelAllowingMultipleSelection multipleSelection: Bool, allowsDirectories: Bool) async -> [URL]? {
+        guard let window = view.window else {
+            os_log("%s: Window is nil", type: .error, className)
+            return nil
+        }
+
+        let openPanel = NSOpenPanel()
+        openPanel.allowsMultipleSelection = multipleSelection
+
+        switch await openPanel.beginSheetModal(for: window) {
+        case .OK:
+            return openPanel.urls
+        default:
+            return nil
+        }
+    }
+
 }
 
 extension BrowserTabViewController: FileDownloadManagerDelegate {
@@ -682,297 +693,6 @@ extension BrowserTabViewController: FileDownloadManagerDelegate {
 
 }
 
-extension BrowserTabViewController: WKUIDelegate {
-
-    @objc(_webView:saveDataToFile:suggestedFilename:mimeType:originatingURL:)
-    func webView(_ webView: WKWebView, saveDataToFile data: Data, suggestedFilename: String, mimeType: String, originatingURL: URL) {
-        func write(to url: URL) throws {
-            let progress = Progress(totalUnitCount: 1,
-                                    fileOperationKind: .downloading,
-                                    kind: .file,
-                                    isPausable: false,
-                                    isCancellable: false,
-                                    fileURL: url)
-            progress.publish()
-            defer {
-                progress.unpublish()
-            }
-
-            try data.write(to: url)
-            progress.completedUnitCount = progress.totalUnitCount
-        }
-
-        let prefs = DownloadsPreferences()
-        if !prefs.alwaysRequestDownloadLocation,
-           let location = prefs.effectiveDownloadLocation {
-            let url = location.appendingPathComponent(suggestedFilename)
-            try? write(to: url)
-
-            return
-        }
-
-        chooseDestination(suggestedFilename: suggestedFilename,
-                          directoryURL: prefs.effectiveDownloadLocation,
-                          fileTypes: UTType(mimeType: mimeType).map { [$0] } ?? []) { url, _ in
-            guard let url = url else { return }
-            try? write(to: url)
-        }
-    }
-
-    // swiftlint:disable cyclomatic_complexity
-    // swiftlint:disable function_body_length
-    func webView(_ webView: WKWebView,
-                 createWebViewWith configuration: WKWebViewConfiguration,
-                 for navigationAction: WKNavigationAction,
-                 windowFeatures: WKWindowFeatures) -> WKWebView? {
-
-        func makeTab(parentTab: Tab, content: Tab.TabContent) -> Tab {
-            // Returned web view must be created with the specified configuration.
-            return Tab(content: content,
-                       webViewConfiguration: configuration,
-                       parentTab: parentTab,
-                       canBeClosedWithBack: true,
-                       webViewFrame: view.frame)
-        }
-        guard let parentTab = webView.tab else { return nil }
-        func nextQuery(parentTab: Tab) -> PermissionAuthorizationQuery? {
-            parentTab.permissions.authorizationQueries.first(where: { $0.permissions.contains(.popups) })
-        }
-
-        let contentSize = NSSize(width: windowFeatures.width?.intValue ?? 1024, height: windowFeatures.height?.intValue ?? 752)
-        var shouldOpenPopUp = navigationAction.isUserInitiated
-        var shouldOpenNewTab = windowFeatures.toolbarsVisibility?.boolValue == true
-        var shouldSelectNewTab = !NSApp.isCommandPressed
-
-        switch parentTab.decideNewWindowPolicy(for: navigationAction) {
-        case .newWindow:
-            shouldOpenPopUp = true
-            shouldOpenNewTab = false
-        case .newTab(selected: let selected):
-            shouldOpenPopUp = true
-            shouldOpenNewTab = true
-            shouldSelectNewTab = selected
-        case .cancel:
-            return nil
-        case .none:
-            break
-        }
-
-        if !shouldOpenPopUp {
-            let url = navigationAction.request.url
-            parentTab.permissions.permissions(.popups, requestedForDomain: webView.url?.host, url: url) { [weak parentTab] granted in
-
-                guard let parentTab = parentTab else { return }
-
-                switch (granted, shouldOpenPopUp) {
-                case (true, false):
-                    // callback called synchronously - will return webView for the request
-                    shouldOpenPopUp = true
-                case (true, true):
-                    // called asynchronously
-                    guard let url = navigationAction.request.url else { return }
-                    let tab = makeTab(parentTab: parentTab, content: .url(url))
-                    WindowsManager.openPopUpWindow(with: tab, contentSize: contentSize)
-
-                    parentTab.permissions.permissions.popups.popupOpened(nextQuery: nextQuery(parentTab: parentTab))
-
-                case (false, _):
-                    return
-                }
-            }
-        }
-        guard shouldOpenPopUp else {
-            shouldOpenPopUp = true // if granted asynchronously
-            return nil
-        }
-
-        let tab = makeTab(parentTab: parentTab, content: .none)
-        if shouldOpenNewTab {
-            tabCollectionViewModel.insertChild(tab: tab, selected: shouldSelectNewTab)
-        } else if windowFeatures.toolbarsVisibility?.boolValue == true {
-            WindowsManager.openNewWindow(with: tab, contentSize: contentSize)
-        } else {
-            WindowsManager.openPopUpWindow(with: tab, contentSize: contentSize)
-        }
-        parentTab.permissions.permissions.popups.popupOpened(nextQuery: nextQuery(parentTab: parentTab))
-
-        // WebKit loads the request in the returned web view.
-        return tab.webView
-    }
-    // swiftlint:enable cyclomatic_complexity
-    // swiftlint:enable function_body_length
-
-    @objc(_webView:checkUserMediaPermissionForURL:mainFrameURL:frameIdentifier:decisionHandler:)
-    func webView(_ webView: WKWebView,
-                 checkUserMediaPermissionFor url: URL,
-                 mainFrameURL: URL,
-                 frameIdentifier frame: UInt,
-                 decisionHandler: @escaping (String, Bool) -> Void) {
-        webView.tab?.permissions.checkUserMediaPermission(for: url, mainFrameURL: mainFrameURL, decisionHandler: decisionHandler)
-            ?? /* Tab deallocated: */ {
-                decisionHandler("", false)
-            }()
-    }
-
-    // https://github.com/WebKit/WebKit/blob/995f6b1595611c934e742a4f3a9af2e678bc6b8d/Source/WebKit/UIProcess/API/Cocoa/WKUIDelegate.h#L147
-    @objc(webView:requestMediaCapturePermissionForOrigin:initiatedByFrame:type:decisionHandler:)
-    @available(macOS 12, *)
-    func webView(_ webView: WKWebView,
-                 requestMediaCapturePermissionFor origin: WKSecurityOrigin,
-                 initiatedByFrame frame: WKFrameInfo,
-                 type: WKMediaCaptureType,
-                 decisionHandler: @escaping (WKPermissionDecision) -> Void) {
-        guard let permissions = [PermissionType](devices: type) else {
-            assertionFailure("Could not decode PermissionType")
-            decisionHandler(.deny)
-            return
-        }
-
-        webView.tab?.permissions.permissions(permissions, requestedForDomain: origin.host) { granted in
-            decisionHandler(granted ? .grant : .deny)
-        } ?? /* Tab deallocated: */ {
-            decisionHandler(.deny)
-        }()
-    }
-
-    // https://github.com/WebKit/WebKit/blob/9d7278159234e0bfa3d27909a19e695928f3b31e/Source/WebKit/UIProcess/API/Cocoa/WKUIDelegatePrivate.h#L126
-    @objc(_webView:requestUserMediaAuthorizationForDevices:url:mainFrameURL:decisionHandler:)
-    func webView(_ webView: WKWebView,
-                 requestUserMediaAuthorizationFor devices: _WKCaptureDevices,
-                 url: URL,
-                 mainFrameURL: URL,
-                 decisionHandler: @escaping (Bool) -> Void) {
-        guard let permissions = [PermissionType](devices: devices) else {
-            decisionHandler(false)
-            return
-        }
-
-        webView.tab?.permissions.permissions(permissions, requestedForDomain: url.host, decisionHandler: decisionHandler)
-            ?? /* Tab deallocated: */ {
-                decisionHandler(false)
-            }()
-    }
-
-    @objc(_webView:mediaCaptureStateDidChange:)
-    func webView(_ webView: WKWebView, mediaCaptureStateDidChange state: _WKMediaCaptureStateDeprecated) {
-        webView.tab?.permissions.mediaCaptureStateDidChange()
-    }
-
-    // https://github.com/WebKit/WebKit/blob/9d7278159234e0bfa3d27909a19e695928f3b31e/Source/WebKit/UIProcess/API/Cocoa/WKUIDelegatePrivate.h#L131
-    @objc(_webView:requestGeolocationPermissionForFrame:decisionHandler:)
-    func webView(_ webView: WKWebView, requestGeolocationPermissionFor frame: WKFrameInfo, decisionHandler: @escaping (Bool) -> Void) {
-        webView.tab?.permissions.permissions(.geolocation, requestedForDomain: frame.request.url?.host, decisionHandler: decisionHandler)
-            ?? /* Tab deallocated: */ {
-                decisionHandler(false)
-            }()
-    }
-
-    // https://github.com/WebKit/WebKit/blob/9d7278159234e0bfa3d27909a19e695928f3b31e/Source/WebKit/UIProcess/API/Cocoa/WKUIDelegatePrivate.h#L132
-    @objc(_webView:requestGeolocationPermissionForOrigin:initiatedByFrame:decisionHandler:)
-    @available(macOS 12, *)
-    func webView(_ webView: WKWebView,
-                 requestGeolocationPermissionFor origin: WKSecurityOrigin,
-                 initiatedBy frame: WKFrameInfo,
-                 decisionHandler: @escaping (WKPermissionDecision) -> Void) {
-        webView.tab?.permissions.permissions(.geolocation, requestedForDomain: frame.request.url?.host) { granted in
-            decisionHandler(granted ? .grant : .deny)
-        } ?? /* Tab deallocated: */ {
-            decisionHandler(.deny)
-        }()
-    }
-
-    func webView(_ webView: WKWebView,
-                 runOpenPanelWith parameters: WKOpenPanelParameters,
-                 initiatedByFrame frame: WKFrameInfo,
-                 completionHandler: @escaping ([URL]?) -> Void) {
-
-        guard let window = view.window else {
-            os_log("%s: Window is nil", type: .error, className)
-            completionHandler(nil)
-            return
-        }
-
-        let openPanel = NSOpenPanel()
-        openPanel.allowsMultipleSelection = parameters.allowsMultipleSelection
-
-        openPanel.beginSheetModal(for: window) { response in
-            if response == NSApplication.ModalResponse.OK {
-                completionHandler(openPanel.urls)
-            } else {
-                completionHandler(nil)
-            }
-        }
-    }
-
-    func webView(_ webView: WKWebView,
-                 runJavaScriptAlertPanelWithMessage message: String,
-                 initiatedByFrame frame: WKFrameInfo,
-                 completionHandler: @escaping () -> Void) {
-
-        guard webView === self.webView, let window = view.window else {
-            os_log("%s: Could not display JS alert panel", type: .error, className)
-            completionHandler()
-            return
-        }
-
-        let alert = NSAlert.javascriptAlert(with: message)
-        alert.beginSheetModal(for: window) { _ in
-            completionHandler()
-        }
-    }
-
-    func webView(_ webView: WKWebView,
-                 runJavaScriptConfirmPanelWithMessage message: String,
-                 initiatedByFrame frame: WKFrameInfo,
-                 completionHandler: @escaping (Bool) -> Void) {
-
-        guard webView === self.webView, let window = view.window else {
-            os_log("%s: Could not display JS confirmation panel", type: .error, className)
-            completionHandler(false)
-            return
-        }
-
-        let alert = NSAlert.javascriptConfirmation(with: message)
-        alert.beginSheetModal(for: window) { response in
-            completionHandler(response == .alertFirstButtonReturn)
-        }
-    }
-
-    func webView(_ webView: WKWebView,
-                 runJavaScriptTextInputPanelWithPrompt prompt: String,
-                 defaultText: String?,
-                 initiatedByFrame frame: WKFrameInfo,
-                 completionHandler: @escaping (String?) -> Void) {
-
-        guard webView === self.webView, let window = view.window else {
-            os_log("%s: Could not display JS text input panel", type: .error, className)
-            completionHandler(nil)
-            return
-        }
-
-        let alert = NSAlert.javascriptTextInput(prompt: prompt, defaultText: defaultText)
-        alert.beginSheetModal(for: window) { response in
-            guard let textField = alert.accessoryView as? NSTextField else {
-                os_log("BrowserTabViewController: Textfield not found in alert", type: .error)
-                completionHandler(nil)
-                return
-            }
-            let answer = response == .alertFirstButtonReturn ? textField.stringValue : nil
-            completionHandler(answer)
-        }
-    }
-
-    func webViewDidClose(_ webView: WKWebView) {
-        guard let webView = webView as? WebView else {
-            os_log("BrowserTabViewController: Unknown instance of WKWebView", type: .error)
-            return
-        }
-
-        tabCollectionViewModel.remove(ownerOf: webView)
-    }
-
-}
-
 extension BrowserTabViewController: BrowserTabSelectionDelegate {
 
     func selectedTab(at index: Int) {
@@ -987,19 +707,6 @@ extension BrowserTabViewController: BrowserTabSelectionDelegate {
         if case .preferences = selectedTab.content {
             selectedTab.setContent(.preferences(pane: identifier))
         }
-    }
-
-}
-
-private extension WKWebView {
-
-    var tab: Tab? {
-        guard let navigationDelegate = self.navigationDelegate else { return nil }
-        guard let tab = navigationDelegate as? Tab else {
-            assertionFailure("webView.navigationDelegate is not a Tab")
-            return nil
-        }
-        return tab
     }
 
 }

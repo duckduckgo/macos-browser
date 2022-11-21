@@ -119,3 +119,40 @@ extension AdClickAttributionTabExtension: AdClickAttributionLogicDelegate {
     }
 
 }
+
+extension AdClickAttributionTabExtension: NavigationResponder {
+
+    func webView(_ webView: WebView, willGoTo backForwardListItem: WKBackForwardListItem, inPageCache: Bool) {
+        // TODO: Validate this is really called twice
+        guard webView.mainFrameNavigation?.contains(where: {
+            if case .willGoToBackForwardListItem(backForwardListItem, inPageCache: inPageCache) = $0 { return true }; return false
+        }) == true else { return }
+        self.logic.onBackForwardNavigation(mainFrameURL: backForwardListItem.url)
+    }
+
+    func webView(_ webView: WebView, didStartNavigationWith request: URLRequest, in frame: WKFrameInfo) {
+        guard frame.isMainFrame else { return }
+        self.detection.onStartNavigation(url: webView.url)
+    }
+
+    func webView(_ webView: WebView, decidePolicyFor navigationResponse: WKNavigationResponse) async -> WKNavigationResponsePolicy? {
+        if navigationResponse.isForMainFrame && navigationResponse.response.isSuccessfulHTTPURLResponse {
+            self.detection.on2XXResponse(url: webView.url)
+        }
+
+        await self.logic.onProvisionalNavigation()
+        return .next
+    }
+
+    func webView(_ webView: WebView, didFinishNavigationWith request: URLRequest, in frame: WKFrameInfo) {
+        guard frame.isMainFrame else { return }
+        self.detection.onDidFinishNavigation(url: webView.url)
+        self.logic.onDidFinishNavigation(host: webView.url?.host)
+    }
+
+    func webView(_ webView: WebView, navigationWith request: URLRequest, in frame: WKFrameInfo, didFailWith error: Error) {
+        guard frame.isMainFrame else { return }
+        self.detection.onDidFailNavigation()
+    }
+
+}

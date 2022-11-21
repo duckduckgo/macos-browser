@@ -1,7 +1,7 @@
 //
-//  WKWebViewDownloadDelegate.swift
+//  LocalFileNavigationResponder.swift
 //
-//  Copyright © 2021 DuckDuckGo. All rights reserved.
+//  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -17,12 +17,15 @@
 //
 
 import WebKit
+import Foundation
 
-@MainActor
-protocol WKWebViewDownloadDelegate: AnyObject {
+final class LocalFileNavigationResponder: NavigationResponder {
 
-    func webView(_ webView: WKWebView, navigationAction: WKNavigationAction, didBecomeDownload download: WebKitDownload)
-    func webView(_ webView: WKWebView, navigationResponse: WKNavigationResponse, didBecomeDownload download: WebKitDownload)
-    func webView(_ webView: WKWebView, contextMenuDidCreateDownload download: WebKitDownload)
-    
+    func webView(_ webView: WebView, decidePolicyFor navigationAction: WKNavigationAction, preferences: WKWebpagePreferences) async -> NavigationActionPolicy? {
+        if navigationAction.request.url?.isFileURL == true {
+            return .allow()
+        }
+        return .next
+    }
+
 }
