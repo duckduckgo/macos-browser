@@ -23,13 +23,16 @@
 		1D2DC00529016796008083A1 /* BitwardenCommunicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DDF075D28F815AD00EDFBE3 /* BitwardenCommunicator.swift */; };
 		1D2DC00629016798008083A1 /* BitwardenCredential.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DDF075C28F815AD00EDFBE3 /* BitwardenCredential.swift */; };
 		1D2DC0072901679C008083A1 /* BitwardenError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DDF076028F815AD00EDFBE3 /* BitwardenError.swift */; };
-		1D2DC0082901679E008083A1 /* BitwardenMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DDF076128F815AD00EDFBE3 /* BitwardenMessage.swift */; };
+		1D2DC0082901679E008083A1 /* BitwardenResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DDF076128F815AD00EDFBE3 /* BitwardenResponse.swift */; };
 		1D2DC009290167A0008083A1 /* BitwardenStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DDF075F28F815AD00EDFBE3 /* BitwardenStatus.swift */; };
 		1D2DC00A290167A9008083A1 /* BitwardenEncryption.m in Sources */ = {isa = PBXBuildFile; fileRef = 1D02633528D8A9A9005CBB41 /* BitwardenEncryption.m */; };
 		1D2DC00B290167EC008083A1 /* RunningApplicationCheck.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D77921C28FFF27C00BE0210 /* RunningApplicationCheck.swift */; };
 		1D43EB32292788C70065E5D6 /* EncryptionOutput.m in Sources */ = {isa = PBXBuildFile; fileRef = 1D43EB31292788C70065E5D6 /* EncryptionOutput.m */; };
 		1D43EB3429297D760065E5D6 /* BitwardenNotRespondingAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D43EB3329297D760065E5D6 /* BitwardenNotRespondingAlert.swift */; };
 		1D43EB36292ACE690065E5D6 /* ApplicationVersionReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D43EB35292ACE690065E5D6 /* ApplicationVersionReader.swift */; };
+		1D43EB38292B636E0065E5D6 /* BitwardenCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D43EB37292B636E0065E5D6 /* BitwardenCommand.swift */; };
+		1D43EB3A292B63B00065E5D6 /* BitwardenRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D43EB39292B63B00065E5D6 /* BitwardenRequest.swift */; };
+		1D43EB3C292B664A0065E5D6 /* BitwardenMessageIdGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D43EB3B292B664A0065E5D6 /* BitwardenMessageIdGenerator.swift */; };
 		1D6216B229069BBF00386B2C /* BitwardenKeyStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D6216B129069BBF00386B2C /* BitwardenKeyStorage.swift */; };
 		1D69C553291302F200B75945 /* BitwardenVault.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D69C552291302F200B75945 /* BitwardenVault.swift */; };
 		1D77921828FDC54C00BE0210 /* FaviconReferenceCacheTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D77921728FDC54C00BE0210 /* FaviconReferenceCacheTests.swift */; };
@@ -39,7 +42,7 @@
 		1DDF076428F815AD00EDFBE3 /* BitwardenManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DDF075E28F815AD00EDFBE3 /* BitwardenManager.swift */; };
 		1DDF076528F815AD00EDFBE3 /* BitwardenStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DDF075F28F815AD00EDFBE3 /* BitwardenStatus.swift */; };
 		1DDF076628F815AD00EDFBE3 /* BitwardenError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DDF076028F815AD00EDFBE3 /* BitwardenError.swift */; };
-		1DDF076728F815AD00EDFBE3 /* BitwardenMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DDF076128F815AD00EDFBE3 /* BitwardenMessage.swift */; };
+		1DDF076728F815AD00EDFBE3 /* BitwardenResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DDF076128F815AD00EDFBE3 /* BitwardenResponse.swift */; };
 		1E25269C28F8741A00E44DFA /* Common in Frameworks */ = {isa = PBXBuildFile; productRef = 1E25269B28F8741A00E44DFA /* Common */; };
 		3106AD76287F000600159FE5 /* CookieConsentUserPermissionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3106AD75287F000600159FE5 /* CookieConsentUserPermissionViewController.swift */; };
 		311B262728E73E0A00FD181A /* TabShadowConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311B262628E73E0A00FD181A /* TabShadowConfig.swift */; };
@@ -881,6 +884,9 @@
 		1D43EB31292788C70065E5D6 /* EncryptionOutput.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = EncryptionOutput.m; sourceTree = "<group>"; };
 		1D43EB3329297D760065E5D6 /* BitwardenNotRespondingAlert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BitwardenNotRespondingAlert.swift; sourceTree = "<group>"; };
 		1D43EB35292ACE690065E5D6 /* ApplicationVersionReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplicationVersionReader.swift; sourceTree = "<group>"; };
+		1D43EB37292B636E0065E5D6 /* BitwardenCommand.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BitwardenCommand.swift; sourceTree = "<group>"; };
+		1D43EB39292B63B00065E5D6 /* BitwardenRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BitwardenRequest.swift; sourceTree = "<group>"; };
+		1D43EB3B292B664A0065E5D6 /* BitwardenMessageIdGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BitwardenMessageIdGenerator.swift; sourceTree = "<group>"; };
 		1D6216B129069BBF00386B2C /* BitwardenKeyStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BitwardenKeyStorage.swift; sourceTree = "<group>"; };
 		1D69C552291302F200B75945 /* BitwardenVault.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BitwardenVault.swift; sourceTree = "<group>"; };
 		1D77921728FDC54C00BE0210 /* FaviconReferenceCacheTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaviconReferenceCacheTests.swift; sourceTree = "<group>"; };
@@ -891,7 +897,7 @@
 		1DDF075E28F815AD00EDFBE3 /* BitwardenManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BitwardenManager.swift; sourceTree = "<group>"; };
 		1DDF075F28F815AD00EDFBE3 /* BitwardenStatus.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BitwardenStatus.swift; sourceTree = "<group>"; };
 		1DDF076028F815AD00EDFBE3 /* BitwardenError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BitwardenError.swift; sourceTree = "<group>"; };
-		1DDF076128F815AD00EDFBE3 /* BitwardenMessage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BitwardenMessage.swift; sourceTree = "<group>"; };
+		1DDF076128F815AD00EDFBE3 /* BitwardenResponse.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BitwardenResponse.swift; sourceTree = "<group>"; };
 		3106AD75287F000600159FE5 /* CookieConsentUserPermissionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieConsentUserPermissionViewController.swift; sourceTree = "<group>"; };
 		311B262628E73E0A00FD181A /* TabShadowConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabShadowConfig.swift; sourceTree = "<group>"; };
 		313AEDA0287CAD1D00E1E8F4 /* CookieConsentUserPermissionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieConsentUserPermissionView.swift; sourceTree = "<group>"; };
@@ -1777,6 +1783,12 @@
 			isa = PBXGroup;
 			children = (
 				4BBDEE8C28FC14760092FAA6 /* BitwardenInstallationService.swift */,
+				1DDF075D28F815AD00EDFBE3 /* BitwardenCommunicator.swift */,
+				1D02633428D8A9A9005CBB41 /* BitwardenEncryption.h */,
+				1D02633528D8A9A9005CBB41 /* BitwardenEncryption.m */,
+				1D43EB30292788C70065E5D6 /* EncryptionOutput.h */,
+				1D43EB31292788C70065E5D6 /* EncryptionOutput.m */,
+				1D6216B129069BBF00386B2C /* BitwardenKeyStorage.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -2492,17 +2504,14 @@
 			isa = PBXGroup;
 			children = (
 				1DDF075E28F815AD00EDFBE3 /* BitwardenManager.swift */,
-				1DDF075D28F815AD00EDFBE3 /* BitwardenCommunicator.swift */,
-				1DDF076128F815AD00EDFBE3 /* BitwardenMessage.swift */,
-				1D6216B129069BBF00386B2C /* BitwardenKeyStorage.swift */,
+				1D43EB37292B636E0065E5D6 /* BitwardenCommand.swift */,
+				1D43EB39292B63B00065E5D6 /* BitwardenRequest.swift */,
+				1DDF076128F815AD00EDFBE3 /* BitwardenResponse.swift */,
+				1D43EB3B292B664A0065E5D6 /* BitwardenMessageIdGenerator.swift */,
 				1DDF075C28F815AD00EDFBE3 /* BitwardenCredential.swift */,
 				1DDF076028F815AD00EDFBE3 /* BitwardenError.swift */,
 				1DDF075F28F815AD00EDFBE3 /* BitwardenStatus.swift */,
 				1D69C552291302F200B75945 /* BitwardenVault.swift */,
-				1D02633428D8A9A9005CBB41 /* BitwardenEncryption.h */,
-				1D02633528D8A9A9005CBB41 /* BitwardenEncryption.m */,
-				1D43EB30292788C70065E5D6 /* EncryptionOutput.h */,
-				1D43EB31292788C70065E5D6 /* EncryptionOutput.m */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -3271,9 +3280,9 @@
 		AA7191CA28B3DEC000333866 /* Bitwarden */ = {
 			isa = PBXGroup;
 			children = (
+				4BBDEE8D28FC14760092FAA6 /* View */,
 				4BBDEE8B28FC14760092FAA6 /* Model */,
 				1D43EAFE291D29E40065E5D6 /* Services */,
-				4BBDEE8D28FC14760092FAA6 /* View */,
 			);
 			path = Bitwarden;
 			sourceTree = "<group>";
@@ -4638,7 +4647,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				AAA0CC572539EBC90079BC96 /* FaviconUserScript.swift in Sources */,
-				1D2DC0082901679E008083A1 /* BitwardenMessage.swift in Sources */,
+				1D2DC0082901679E008083A1 /* BitwardenResponse.swift in Sources */,
 				B6A9E45A261460350067D1B9 /* ApiRequestError.swift in Sources */,
 				AADCBF3A26F7C2CE00EF67A8 /* LottieAnimationCache.swift in Sources */,
 				37D2377A287EB8CA00BCE03B /* TabIndex.swift in Sources */,
@@ -4675,7 +4684,7 @@
 				85707F2E276A394C00DC0649 /* ViewExtensions.swift in Sources */,
 				371C0A2927E33EDC0070591F /* FeedbackPresenter.swift in Sources */,
 				14505A08256084EF00272CC6 /* UserAgent.swift in Sources */,
-				1DDF076728F815AD00EDFBE3 /* BitwardenMessage.swift in Sources */,
+				1DDF076728F815AD00EDFBE3 /* BitwardenResponse.swift in Sources */,
 				4B8AC93526B3B2FD00879451 /* NSAlert+DataImport.swift in Sources */,
 				AA7412BD24D2BEEE00D22FE0 /* MainWindow.swift in Sources */,
 				AAD6D8882696DF6D002393B3 /* CrashReportPromptViewController.swift in Sources */,
@@ -4683,6 +4692,7 @@
 				37AFCE8527DA2D3900471A10 /* PreferencesSidebar.swift in Sources */,
 				AA5C8F5E2590EEE800748EB7 /* NSPointExtension.swift in Sources */,
 				AA6EF9AD25066F42004754E6 /* WindowsManager.swift in Sources */,
+				1D43EB3A292B63B00065E5D6 /* BitwardenRequest.swift in Sources */,
 				B68458CD25C7EB9000DC17B6 /* WKWebViewConfigurationExtensions.swift in Sources */,
 				85AC7ADD27BEB6EE00FFB69B /* HomePageDefaultBrowserModel.swift in Sources */,
 				AAC30A26268DFEE200D2D9CD /* CrashReporter.swift in Sources */,
@@ -4940,6 +4950,7 @@
 				4B02198925E05FAC00ED7DEA /* FireproofingURLExtensions.swift in Sources */,
 				7B1E819E27C8874900FF0E60 /* ContentOverlayPopover.swift in Sources */,
 				3154FD1428E6011A00909769 /* TabShadowView.swift in Sources */,
+				1D43EB3C292B664A0065E5D6 /* BitwardenMessageIdGenerator.swift in Sources */,
 				4BA1A6A5258B07DF00F6F690 /* EncryptedValueTransformer.swift in Sources */,
 				4B92929F26670D2A00AD2C21 /* PasteboardBookmark.swift in Sources */,
 				37BF3F14286D8A6500BD9014 /* PinnedTabsManager.swift in Sources */,
@@ -5144,6 +5155,7 @@
 				85707F28276A34D900DC0649 /* DaxSpeech.swift in Sources */,
 				31F28C5328C8EECA00119F70 /* PrivatePlayerSchemeHandler.swift in Sources */,
 				AA13DCB4271480B0006D48D3 /* FirePopoverViewModel.swift in Sources */,
+				1D43EB38292B636E0065E5D6 /* BitwardenCommand.swift in Sources */,
 				F41D174125CB131900472416 /* NSColorExtension.swift in Sources */,
 				AA7E919C2875C65000AB6B62 /* Stored.swift in Sources */,
 				AAC5E4F625D6BF2C007F5990 /* AddressBarButtonsViewController.swift in Sources */,

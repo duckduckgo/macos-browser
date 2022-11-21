@@ -32,8 +32,6 @@ extension Preferences {
 
     struct AutofillView: View {
         @ObservedObject var model: AutofillPreferencesModel
-        
-        // TODO: Use the protocol here, and listen to statusPublisher. The manager should be dependency injected, likely into the view model.
         @ObservedObject var bitwardenManager = BitwardenManager.shared
 
         var passwordManagerBinding: Binding<PasswordManager> {

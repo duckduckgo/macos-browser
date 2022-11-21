@@ -40,7 +40,7 @@ struct BitwardenCredential {
 
 extension BitwardenCredential {
 
-    init?(from payloadItem: BitwardenMessage.PayloadItem) {
+    init?(from payloadItem: BitwardenResponse.PayloadItem) {
         guard let userId = payloadItem.userId,
               let credentialId = payloadItem.credentialId,
               let credentialName = payloadItem.name else {
