@@ -152,7 +152,8 @@ final class MoreOptionsMenu: NSMenu {
     }
 
     @objc func toggleNetworkProtection(_ sender: NSMenuItem) {
-        // toggle NetP
+        let networkProtection = NetworkProtection()
+        networkProtection.start()
     }
 
     @objc func openPreferences(_ sender: NSMenuItem) {

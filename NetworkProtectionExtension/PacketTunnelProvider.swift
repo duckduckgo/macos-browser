@@ -20,7 +20,7 @@ import NetworkExtension
 
 final class PacketTunnelProvider: NEPacketTunnelProvider {
 
-    override func startTunnel(options: [String: NSObject]?, completionHandler: @escaping (Error?) -> Void) {
+    override func startTunnel(options: [String : NSObject]?, completionHandler: @escaping (Error?) -> Void) {
         // Add code here to start the process of connecting the tunnel.
     }
     
