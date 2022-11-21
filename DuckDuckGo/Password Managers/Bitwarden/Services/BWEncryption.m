@@ -16,7 +16,7 @@
 //  limitations under the License.
 //
 
-#import "BitwardenEncryption.h"
+#import "BWEncryption.h"
 #import "os/log.h"
 
 #define KEY_LENGTH      2048
@@ -25,7 +25,7 @@
 #define BLOCK_SIZE      16
 #define SHARED_KEY_SIZE  64
 
-@implementation BitwardenEncryption
+@implementation BWEncryption
 
 // Key pair is used for encryption(public key - server) and decryption(private key - client) of the shared key
 RSA *keypair;
@@ -115,7 +115,7 @@ NSData *macKeyData;
     return [sharedKeyData base64EncodedStringWithOptions:0];
 }
 
-- (nullable EncryptionOutput *)encryptData:(NSData *)data {
+- (nullable BWEncryptionOutput *)encryptData:(NSData *)data {
     if (macKeyData == nil) { return nil; }
 
     NSData *ivData = [self generateIv];
@@ -142,7 +142,7 @@ NSData *macKeyData;
     NSData *hmacData = [self computeHmac:encryptedData iv:ivData];
 
     // Wrap into EncryptionOutput structure
-    EncryptionOutput *encryptionOutputObject = [[EncryptionOutput alloc] init];
+    BWEncryptionOutput *encryptionOutputObject = [[BWEncryptionOutput alloc] init];
     encryptionOutputObject.iv = ivData;
     encryptionOutputObject.data = encryptedData;
     encryptionOutputObject.hmac = hmacData;

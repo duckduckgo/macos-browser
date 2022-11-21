@@ -28,7 +28,7 @@ final class PreferencesViewController: NSViewController {
     private var selectedTabIndexCancellable: AnyCancellable?
     private var selectedPreferencePaneCancellable: AnyCancellable?
 
-    private var bitwardenManager: BitwardenManagement = BitwardenManager.shared
+    private var bitwardenManager: BWManagement = BWManager.shared
 
     override func loadView() {
         view = NSView()

@@ -1,5 +1,5 @@
 //
-//  BitwardenCredential.swift
+//  BWCredential.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -18,7 +18,7 @@
 
 import Foundation
 
-struct BitwardenCredential {
+struct BWCredential {
 
     var userId: String
     var credentialId: String?
@@ -38,9 +38,9 @@ struct BitwardenCredential {
 
 }
 
-extension BitwardenCredential {
+extension BWCredential {
 
-    init?(from payloadItem: BitwardenResponse.PayloadItem) {
+    init?(from payloadItem: BWResponse.PayloadItem) {
         guard let userId = payloadItem.userId,
               let credentialId = payloadItem.credentialId,
               let credentialName = payloadItem.name else {

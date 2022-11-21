@@ -21,13 +21,14 @@ import BrowserServicesKit
 import os.log
 import Combine
 
+// Encapsulation of third party password managers
 class PasswordManagerCoordinator: BrowserServicesKit.PasswordManager {
 
     enum PasswordManagerCoordinatorError: Error {
         case makingOfUrlFailed
     }
 
-    let bitwardenManagement: BitwardenManagement = BitwardenManager.shared
+    let bitwardenManagement: BWManagement = BWManager.shared
 
     var isEnabled: Bool {
         return bitwardenManagement.status != .disabled
@@ -64,6 +65,16 @@ class PasswordManagerCoordinator: BrowserServicesKit.PasswordManager {
     }
 
     var statusCancellable: AnyCancellable?
+
+    func setEnabled(_ enabled: Bool) {
+        if enabled {
+            if !bitwardenManagement.status.isConnected {
+                bitwardenManagement.initCommunication(applicationDidFinishLaunching: false)
+            }
+        } else {
+            BWManager.shared.cancelCommunication()
+        }
+    }
 
     func askToUnlock(completionHandler: @escaping () -> Void) {
         bitwardenManagement.openBitwarden()
@@ -163,7 +174,7 @@ class PasswordManagerCoordinator: BrowserServicesKit.PasswordManager {
 
     func storeWebsiteCredentials(_ credentials: SecureVaultModels.WebsiteCredentials, completion: @escaping (Error?) -> Void)  {
         guard case let .connected(vault) = bitwardenManagement.status,
-              let bitwardenCredential = BitwardenCredential(from: credentials, vault: vault) else {
+              let bitwardenCredential = BWCredential(from: credentials, vault: vault) else {
             assertionFailure("Bitwarden is not connected or bad credential")
             os_log("Failed to store credentials: Bitwarden is not connected or bad credential", type: .error)
             return
@@ -178,7 +189,7 @@ class PasswordManagerCoordinator: BrowserServicesKit.PasswordManager {
 
     // MARK: - Cache
 
-    private func cache(credentials: [BitwardenCredential]) {
+    private func cache(credentials: [BWCredential]) {
         credentials.forEach { credential in
             if let credentialId = credential.credentialId {
                 cache[credentialId] = credential
@@ -186,13 +197,13 @@ class PasswordManagerCoordinator: BrowserServicesKit.PasswordManager {
         }
     }
 
-    private var cache = [String: BitwardenCredential]()
+    private var cache = [String: BWCredential]()
 
 }
 
 extension BrowserServicesKit.SecureVaultModels.WebsiteAccount {
 
-    init?(from bitwardenCredential: BitwardenCredential) {
+    init?(from bitwardenCredential: BWCredential) {
         guard let credentialId = bitwardenCredential.credentialId else {
             return nil
         }
@@ -207,7 +218,7 @@ extension BrowserServicesKit.SecureVaultModels.WebsiteAccount {
 
 extension BrowserServicesKit.SecureVaultModels.WebsiteCredentials {
 
-    init?(from bitwardenCredential: BitwardenCredential, emptyPasswordAllowed: Bool = true) {
+    init?(from bitwardenCredential: BWCredential, emptyPasswordAllowed: Bool = true) {
         guard let account = BrowserServicesKit.SecureVaultModels.WebsiteAccount(from: bitwardenCredential) else {
             assertionFailure("Failed to init account from BitwardenCredential")
             return nil
@@ -224,9 +235,9 @@ extension BrowserServicesKit.SecureVaultModels.WebsiteCredentials {
 
 }
 
-extension BitwardenCredential {
+extension BWCredential {
 
-    init?(from websiteCredentials: BrowserServicesKit.SecureVaultModels.WebsiteCredentials, vault: BitwardenVault) {
+    init?(from websiteCredentials: BrowserServicesKit.SecureVaultModels.WebsiteCredentials, vault: BWVault) {
         self.init(userId: vault.id,
                   credentialId: websiteCredentials.account.id,
                   credentialName: websiteCredentials.account.domain,

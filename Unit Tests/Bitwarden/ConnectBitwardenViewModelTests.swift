@@ -100,7 +100,7 @@ final class ConnectBitwardenViewModelTests: XCTestCase {
         
         XCTAssertEqual(viewModel.viewState, .disclaimer)
         
-        let vault = BitwardenVault(id: "id", email: "dax@duck.com", status: .unlocked, active: true)
+        let vault = BWVault(id: "id", email: "dax@duck.com", status: .unlocked, active: true)
         bitwardenManager.status = .connected(vault: vault)
         
         XCTAssertEqual(viewModel.viewState, .connectedToBitwarden)
@@ -134,27 +134,27 @@ class MockBitwardenInstallationManager: BitwardenInstallationManager {
     
 }
 
-class MockBitwardenManager: BitwardenManagement {
+class MockBitwardenManager: BWManagement {
 
     var handshakeSent = false
     // var bitwardenStatus = BitwardenStatus.disabled
     
-    @Published var status: BitwardenStatus = .disabled
-    var statusPublisher: Published<BitwardenStatus>.Publisher { $status }
+    @Published var status: BWStatus = .disabled
+    var statusPublisher: Published<BWStatus>.Publisher { $status }
     
     func sendHandshake() {
         handshakeSent = true
     }
     
-    func retrieveCredentials(for url: URL, completion: @escaping ([BitwardenCredential], BitwardenError?) -> Void) {
+    func retrieveCredentials(for url: URL, completion: @escaping ([BWCredential], BWError?) -> Void) {
         // no-op
     }
     
-    func create(credential: BitwardenCredential, completion: @escaping (BitwardenError?) -> Void) {
+    func create(credential: BWCredential, completion: @escaping (BWError?) -> Void) {
         // no-op
     }
     
-    func update(credential: BitwardenCredential, completion: @escaping (BitwardenError?) -> Void) {
+    func update(credential: BWCredential, completion: @escaping (BWError?) -> Void) {
         // no-op
     }
     

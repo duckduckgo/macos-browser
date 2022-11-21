@@ -32,7 +32,7 @@ extension Preferences {
 
     struct AutofillView: View {
         @ObservedObject var model: AutofillPreferencesModel
-        @ObservedObject var bitwardenManager = BitwardenManager.shared
+        @ObservedObject var bitwardenManager = BWManager.shared
 
         var passwordManagerBinding: Binding<PasswordManager> {
             .init {
@@ -157,7 +157,7 @@ extension Preferences {
             }
         }
         
-        @ViewBuilder private func bitwardenStatusView(for status: BitwardenStatus) -> some View {
+        @ViewBuilder private func bitwardenStatusView(for status: BWStatus) -> some View {
             switch status {
             case .disabled:
                 BitwardenStatusView(iconType: .error,

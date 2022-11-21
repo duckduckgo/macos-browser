@@ -1,5 +1,5 @@
 //
-//  BitwardenRequest.swift
+//  BWRequest.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -18,48 +18,48 @@
 
 import Foundation
 
-struct BitwardenRequest: Codable {
+struct BWRequest: Codable {
 
     static let version = 1
 
-    static func makeHandshakeRequest(with publicKey: String, messageId: String) -> BitwardenRequest {
+    static func makeHandshakeRequest(with publicKey: String, messageId: String) -> BWRequest {
         let payload = Payload(publicKey: publicKey,
                                       applicationName: Bundle.main.displayName)
 
-        return BitwardenRequest(messageId: messageId,
+        return BWRequest(messageId: messageId,
                                 version: version,
                                 command: .handshake,
                                 payload: payload)
     }
 
-    static func makeStatusRequest(encryptedCommand: String, messageId: String) -> BitwardenRequest? {
-        return BitwardenRequest(messageId: messageId,
+    static func makeStatusRequest(encryptedCommand: String, messageId: String) -> BWRequest? {
+        return BWRequest(messageId: messageId,
                                 version: version,
                                 encryptedCommand: encryptedCommand)
     }
 
-    static func makeCredentialRetrievalRequest(encryptedCommand: String, messageId: String) -> BitwardenRequest? {
-        return BitwardenRequest(messageId: messageId,
+    static func makeCredentialRetrievalRequest(encryptedCommand: String, messageId: String) -> BWRequest? {
+        return BWRequest(messageId: messageId,
                                 version: version,
                                 encryptedCommand: encryptedCommand)
     }
 
-    static func makeCredentialCreationRequest(encryptedCommand: String, messageId: String) -> BitwardenRequest? {
-        return BitwardenRequest(messageId: messageId,
+    static func makeCredentialCreationRequest(encryptedCommand: String, messageId: String) -> BWRequest? {
+        return BWRequest(messageId: messageId,
                                 version: version,
                                 encryptedCommand: encryptedCommand)
     }
 
     let messageId: MessageId?
     let version: Int?
-    let command: BitwardenCommand?
+    let command: BWCommand?
     let payload: Payload?
     let encryptedCommand: Base64EncodedString?
 
     init(messageId: String? = nil,
          version: Int? = nil,
-         command: BitwardenCommand? = nil,
-         payload: BitwardenRequest.Payload? = nil,
+         command: BWCommand? = nil,
+         payload: BWRequest.Payload? = nil,
          encryptedCommand: String? = nil) {
         self.messageId = messageId
         self.version = version
@@ -85,7 +85,7 @@ struct BitwardenRequest: Codable {
     // Need encryption before inserting into encryptedCommand
     struct EncryptedCommand: Codable {
 
-        let command: BitwardenCommand?
+        let command: BWCommand?
         let payload: Payload?
 
         struct Payload: Codable {
@@ -121,7 +121,7 @@ struct BitwardenRequest: Codable {
             do {
                 jsonData = try JSONEncoder().encode(self)
             } catch {
-                logOrAssertionFailure("BitwardenRequest: Can't encode the message")
+                logOrAssertionFailure("BWRequest: Can't encode the message")
                 return nil
             }
             return jsonData
@@ -134,7 +134,7 @@ struct BitwardenRequest: Codable {
         do {
             jsonData = try JSONEncoder().encode(self)
         } catch {
-            logOrAssertionFailure("BitwardenRequest: Can't encode the message")
+            logOrAssertionFailure("BWRequest: Can't encode the message")
             return nil
         }
         return jsonData

@@ -1,5 +1,5 @@
 //
-//  EncryptionOutput.h
+//  BWCommand.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -16,16 +16,25 @@
 //  limitations under the License.
 //
 
-#import <Foundation/Foundation.h>
+import Foundation
 
-NS_ASSUME_NONNULL_BEGIN
+enum BWCommand: String, Codable {
 
-@interface EncryptionOutput : NSObject
+    // Received after the proxy process conects to Bitwarden app successfully
+    case connected
 
-@property (nonatomic, strong) NSData* iv;
-@property (nonatomic, strong) NSData* data;
-@property (nonatomic, strong) NSData* hmac;
+    // Received when the conection from the proxy process to Bitwarden is canceled
+    case disconnected
 
-@end
+    //  Handshake message that initiates communication. Sent during the onboarding only
+    case handshake = "bw-handshake"
 
-NS_ASSUME_NONNULL_END
+    // Status message
+    case status = "bw-status"
+
+    // Credentials
+    case credentialRetrieval = "bw-credential-retrieval"
+    case credentialCreate = "bw-credential-create"
+    case credentialUpdate = "bw-credential-update"
+
+}

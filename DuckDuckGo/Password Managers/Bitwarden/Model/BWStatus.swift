@@ -18,7 +18,7 @@
 
 import Foundation
 
-enum BitwardenStatus: Equatable {
+enum BWStatus: Equatable {
 
     // Bitwarden disabled in settings
     case disabled
@@ -50,8 +50,8 @@ enum BitwardenStatus: Equatable {
     // We sent the status message and are waiting for the response
     case waitingForStatusResponse
 
-    case connected(vault: BitwardenVault)
-    case error(error: BitwardenError)
+    case connected(vault: BWVault)
+    case error(error: BWError)
     
     var isConnected: Bool {
         switch self {

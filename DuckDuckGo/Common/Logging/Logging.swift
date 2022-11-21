@@ -136,6 +136,6 @@ func logOrAssertionFailure(_ message: StaticString, args: CVarArg...) {
 #if DEBUG
     assertionFailure("\(message)")
 #else
-    os_log("BitwardenManager: Wrong handler", type: .error)
+    os_log("BWManager: Wrong handler", type: .error)
 #endif
 }

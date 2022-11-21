@@ -82,18 +82,18 @@ final class ConnectBitwardenViewModel: ObservableObject {
     @Published private(set) var viewState: ViewState = .disclaimer
     @Published private(set) var error: Error?
 
-    private let bitwardenManager: BitwardenManagement
+    private let bitwardenManager: BWManagement
     
     private var bitwardenManagerStatusCancellable: AnyCancellable?
 
-    init(bitwardenManager: BitwardenManagement) {
+    init(bitwardenManager: BWManagement) {
         self.bitwardenManager = bitwardenManager
         self.bitwardenManagerStatusCancellable = bitwardenManager.statusPublisher.sink { [weak self] status in
             self?.adjustViewState(status: status)
         }
     }
 
-    func adjustViewState(status: BitwardenStatus) {
+    func adjustViewState(status: BWStatus) {
         switch status {
         case .disabled:
             self.viewState = .disclaimer

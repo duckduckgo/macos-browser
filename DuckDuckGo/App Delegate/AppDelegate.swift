@@ -108,7 +108,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         stateRestorationManager.applicationDidFinishLaunching()
 
-        BitwardenManager.shared.initCommunication(applicationDidFinishLaunching: true)
+        BWManager.shared.initCommunication(applicationDidFinishLaunching: true)
 
         if WindowsManager.windows.isEmpty {
             WindowsManager.openNewWindow(lazyLoadTabs: true)

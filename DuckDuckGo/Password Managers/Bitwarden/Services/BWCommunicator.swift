@@ -1,5 +1,5 @@
 //
-//  BitwardenCommunicator.swift
+//  BWCommunicator.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -19,29 +19,29 @@
 import Foundation
 import os.log
 
-protocol BitwardenCommunicatorDelegate: AnyObject {
+protocol BWCommunicatorDelegate: AnyObject {
 
-    func bitwadenCommunicator(_ bitwardenCommunicator: BitwardenCommunication,
+    func bitwadenCommunicator(_ bitwardenCommunicator: BWCommunication,
                               didReceiveMessageData messageData: Data)
-    func bitwadenCommunicatorProcessDidTerminate(_ bitwardenCommunicator: BitwardenCommunication)
+    func bitwadenCommunicatorProcessDidTerminate(_ bitwardenCommunicator: BWCommunication)
 
 }
 
-protocol BitwardenCommunication {
+protocol BWCommunication {
 
     func runProxyProcess() throws
     func terminateProxyProcess()
 
-    var delegate: BitwardenCommunicatorDelegate? { get set }
+    var delegate: BWCommunicatorDelegate? { get set }
     func send(messageData: Data)
 
 }
 
-final class BitwardenCommunicator: BitwardenCommunication {
+final class BWCommunicator: BWCommunication {
 
     static let appPath = "/Applications/Bitwarden.app/Contents/MacOS/Bitwarden"
 
-    weak var delegate: BitwardenCommunicatorDelegate?
+    weak var delegate: BWCommunicatorDelegate?
 
     // MARK: - Running Proxy Process
 
@@ -79,7 +79,7 @@ final class BitwardenCommunicator: BitwardenCommunication {
         process.terminationHandler = processDidTerminate(_:)
 
         try process.run()
-        os_log("BitwardenCommunicator: Proxy process running", log: .bitwarden, type: .default)
+        os_log("BWCommunicator: Proxy process running", log: .bitwarden, type: .default)
 
         self.process = BitwardenProcess(process: process, readingHandle: outHandle, writingHandle: inputHandle)
     }
@@ -90,7 +90,7 @@ final class BitwardenCommunicator: BitwardenCommunication {
     }
 
     private func processDidTerminate(_ process: Process) {
-        os_log("BitwardenCommunicator: Proxy process terminated", log: .bitwarden, type: .default)
+        os_log("BWCommunicator: Proxy process terminated", log: .bitwarden, type: .default)
 
         if let runningProcess = self.process?.process {
             if process != runningProcess {

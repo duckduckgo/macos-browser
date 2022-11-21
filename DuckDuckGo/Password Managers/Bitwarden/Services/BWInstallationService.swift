@@ -1,5 +1,5 @@
 //
-//  BitwardenInstallationService.swift
+//  BWInstallationService.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -20,7 +20,7 @@ import Foundation
 import AppKit
 import os.log
 
-enum BitwardenInstallationState {
+enum BWInstallationState {
 
     case notInstalled
     case oldVersion
@@ -28,16 +28,16 @@ enum BitwardenInstallationState {
 
 }
 
-protocol BitwardenInstallationService {
+protocol BWInstallationService {
 
-    var installationState: BitwardenInstallationState { get }
+    var installationState: BWInstallationState { get }
     var isIntegrationWithDuckDuckGoEnabled: Bool { get }
 
     func openBitwarden()
 
 }
 
-final class LocalBitwardenInstallationService: BitwardenInstallationService {
+final class LocalBitwardenInstallationService: BWInstallationService {
 
     static var bundlePath = "/Applications/Bitwarden.app"
     private lazy var bundleUrl = URL(fileURLWithPath: Self.bundlePath)
@@ -68,7 +68,7 @@ final class LocalBitwardenInstallationService: BitwardenInstallationService {
         return libraryURL.appendingPathComponent(bitwardenPathComponent)
     }()
 
-    var installationState: BitwardenInstallationState {
+    var installationState: BWInstallationState {
         guard let version = ApplicationVersionReader.getVersion(of: Self.bundlePath) else {
             return .notInstalled
         }

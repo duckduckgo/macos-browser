@@ -1,5 +1,5 @@
 //
-//  BitwardenNotRespondingAlert.swift
+//  BWNotRespondingAlert.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -18,16 +18,16 @@
 
 import Foundation
 
-class BitwardenNotRespondingAlert: NSAlert {
+class BWNotRespondingAlert: NSAlert {
 
     static func show() {
-        alert = BitwardenNotRespondingAlert()
+        alert = BWNotRespondingAlert()
         if alert?.runModal() == .alertFirstButtonReturn {
             alert?.restartBitwarden()
         }
     }
 
-    private static var alert: BitwardenNotRespondingAlert?
+    private static var alert: BWNotRespondingAlert?
 
     override init() {
         super.init()
@@ -41,13 +41,13 @@ class BitwardenNotRespondingAlert: NSAlert {
     private func restartBitwarden() {
         let runningApplications = NSWorkspace.shared.runningApplications
         let bitwarden = runningApplications.first { runningApplication in
-            runningApplication.bundleIdentifier == BitwardenManager.bundleId
+            runningApplication.bundleIdentifier == BWManager.bundleId
         }
 
         bitwarden?.terminate()
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-            NSWorkspace.shared.launchApplication(BitwardenManager.applicationName)
+            NSWorkspace.shared.launchApplication(BWManager.applicationName)
         }
     }
 

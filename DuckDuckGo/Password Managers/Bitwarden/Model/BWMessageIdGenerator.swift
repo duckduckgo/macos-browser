@@ -1,5 +1,5 @@
 //
-//  BitwardenCommand.swift
+//  BWMessageIdGenerator.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -18,23 +18,23 @@
 
 import Foundation
 
-enum BitwardenCommand: String, Codable {
+class BWMessageIdGenerator {
 
-    // Received after the proxy process conects to Bitwarden app successfully
-    case connected
+    private(set) var cache = Set<String>()
 
-    // Received when the conection from the proxy process to Bitwarden is canceled
-    case disconnected
+    func generateMessageId() -> String {
+        let id = UUID().uuidString
+        cache.insert(id)
+        return id
+    }
 
-    //  Handshake message that initiates communication. Sent during the onboarding only
-    case handshake = "bw-handshake"
+    func verify(messageId: String) -> Bool {
+        if cache.contains(messageId) {
+            cache.remove(messageId)
+            return true
+        }
 
-    // Status message
-    case status = "bw-status"
-
-    // Credentials
-    case credentialRetrieval = "bw-credential-retrieval"
-    case credentialCreate = "bw-credential-create"
-    case credentialUpdate = "bw-credential-update"
+        return false
+    }
 
 }

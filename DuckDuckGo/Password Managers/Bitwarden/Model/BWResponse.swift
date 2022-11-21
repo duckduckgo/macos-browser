@@ -1,5 +1,5 @@
 //
-//  BitwardenResponse.swift
+//  BWResponse.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -22,12 +22,12 @@ import os.log
 typealias Base64EncodedString = String
 typealias MessageId = String
 
-struct BitwardenResponse: Codable {
+struct BWResponse: Codable {
 
     let messageId: MessageId?
     let version: Int?
     let payload: Payload?
-    let command: BitwardenCommand?
+    let command: BWCommand?
     let encryptedCommand: Base64EncodedString?
     let encryptedPayload: EncryptedPayload?
 
@@ -93,7 +93,7 @@ struct BitwardenResponse: Codable {
 
     init?(from messageData: Data) {
         do {
-            self = try JSONDecoder().decode(BitwardenResponse.self, from: messageData)
+            self = try JSONDecoder().decode(BWResponse.self, from: messageData)
         } catch {
             logOrAssertionFailure("Decoding the message failed")
             return nil

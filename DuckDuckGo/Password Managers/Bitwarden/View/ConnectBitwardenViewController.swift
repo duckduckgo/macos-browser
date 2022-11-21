@@ -23,7 +23,7 @@ import SwiftUI
 final class ConnectBitwardenViewController: NSViewController {
     
     private let defaultSize = CGSize(width: 550, height: 280)
-    private let viewModel = ConnectBitwardenViewModel(bitwardenManager: BitwardenManager.shared)
+    private let viewModel = ConnectBitwardenViewModel(bitwardenManager: BWManager.shared)
     
     var setupFlowCancellationHandler: (() -> Void)?
     

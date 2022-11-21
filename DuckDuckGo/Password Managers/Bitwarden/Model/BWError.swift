@@ -1,5 +1,5 @@
 //
-//  BitwardenError.swift
+//  BWError.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -18,7 +18,7 @@
 
 import Foundation
 
-enum BitwardenError: Error {
+enum BWError: Error {
 
     // Blocking errors (further communication blocked)
     case handshakeFailed

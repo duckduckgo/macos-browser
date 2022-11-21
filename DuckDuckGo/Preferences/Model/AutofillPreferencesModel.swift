@@ -54,13 +54,10 @@ final class AutofillPreferencesModel: ObservableObject {
         didSet {
             persistor.passwordManager = passwordManager
 
-            if passwordManager == .bitwarden {
-                if !BitwardenManager.shared.status.isConnected {
-                    BitwardenManager.shared.initCommunication(applicationDidFinishLaunching: false)
-                    presentBitwardenSetupFlow()
-                }
-            } else {
-                BitwardenManager.shared.cancelCommunication()
+            let enabled = passwordManager == .bitwarden
+            PasswordManagerCoordinator().setEnabled(enabled)
+            if enabled {
+                presentBitwardenSetupFlow()
             }
         }
     }
@@ -106,7 +103,7 @@ final class AutofillPreferencesModel: ObservableObject {
     init(
         persistor: AutofillPreferencesPersistor = AutofillPreferences(),
         userAuthenticator: UserAuthenticating = DeviceAuthenticator.shared,
-        bitwardenInstallationService: BitwardenInstallationService = LocalBitwardenInstallationService()
+        bitwardenInstallationService: BWInstallationService = LocalBitwardenInstallationService()
     ) {
         self.persistor = persistor
         self.userAuthenticator = userAuthenticator
@@ -122,7 +119,7 @@ final class AutofillPreferencesModel: ObservableObject {
 
     private var persistor: AutofillPreferencesPersistor
     private var userAuthenticator: UserAuthenticating
-    private let bitwardenInstallationService: BitwardenInstallationService
+    private let bitwardenInstallationService: BWInstallationService
     
     // MARK: - Password Manager
     
@@ -148,7 +145,7 @@ final class AutofillPreferencesModel: ObservableObject {
     }
     
     func openBitwarden() {
-        BitwardenManager.shared.openBitwarden()
+        PasswordManagerCoordinator().openPasswordManager()
     }
 
 }

@@ -1,5 +1,5 @@
 //
-//  BitwardenKeyStorage.swift
+//  BWKeyStorage.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -18,7 +18,7 @@
 
 import Foundation
 
-protocol BitwardenKeyStoring {
+protocol BWKeyStoring {
 
     func save(sharedKey: Base64EncodedString) throws
     func retrieveSharedKey() throws -> Base64EncodedString?
@@ -26,7 +26,7 @@ protocol BitwardenKeyStoring {
 
 }
 
-class BitwardenKeyStorage: BitwardenKeyStoring {
+class BWKeyStorage: BWKeyStoring {
 
     enum BitwardenKeyStorageError: Error {
         case failedToSaveKey(status: OSStatus)

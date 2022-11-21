@@ -1,5 +1,5 @@
 //
-//  BitwardenMessageIdGenerator.swift
+//  EncryptionOutput.h
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -16,25 +16,16 @@
 //  limitations under the License.
 //
 
-import Foundation
+#import <Foundation/Foundation.h>
 
-class BitwardenMessageIdGenerator {
+NS_ASSUME_NONNULL_BEGIN
 
-    private(set) var cache = Set<String>()
+@interface BWEncryptionOutput : NSObject
 
-    func generateMessageId() -> String {
-        let id = UUID().uuidString
-        cache.insert(id)
-        return id
-    }
+@property (nonatomic, strong) NSData* iv;
+@property (nonatomic, strong) NSData* data;
+@property (nonatomic, strong) NSData* hmac;
 
-    func verify(messageId: String) -> Bool {
-        if cache.contains(messageId) {
-            cache.remove(messageId)
-            return true
-        }
+@end
 
-        return false
-    }
-
-}
+NS_ASSUME_NONNULL_END

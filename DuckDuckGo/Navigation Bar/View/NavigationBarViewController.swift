@@ -653,7 +653,7 @@ extension NavigationBarViewController: NSMenuDelegate {
 
 extension NavigationBarViewController: OptionsButtonMenuDelegate {
     func optionsButtonMenuRequestedOpenExternalPasswordManager(_ menu: NSMenu) {
-        BitwardenManager.shared.openBitwarden()
+        BWManager.shared.openBitwarden()
     }
 
     func optionsButtonMenuRequestedBookmarkThisPage(_ sender: NSMenuItem) {

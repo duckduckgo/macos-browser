@@ -1,5 +1,5 @@
 //
-//  BitwardenVault.swift
+//  EncryptionOutput.m
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -16,21 +16,8 @@
 //  limitations under the License.
 //
 
-import Foundation
+#import "BWEncryptionOutput.h"
 
-struct BitwardenVault: Equatable {
-    let id: String
-    let email: String
-    let status: Status
-    let active: Bool
+@implementation BWEncryptionOutput
 
-    enum Status: String {
-        case locked
-        case unlocked
-    }
-
-    var locked: BitwardenVault {
-        return BitwardenVault(id: id, email: email, status: .locked, active: active)
-    }
-
-}
+@end
