@@ -22,18 +22,18 @@ struct BitwardenRequest: Codable {
 
     static let version = 1
 
-    static func makeHandshakeRequest(with publicKey: String) -> BitwardenRequest {
+    static func makeHandshakeRequest(with publicKey: String, messageId: String) -> BitwardenRequest {
         let payload = Payload(publicKey: publicKey,
                                       applicationName: Bundle.main.displayName)
 
-        return BitwardenRequest(messageId: BitwardenMessageIdGenerator.generateMessageId(),
+        return BitwardenRequest(messageId: messageId,
                                 version: version,
                                 command: .handshake,
                                 payload: payload)
     }
 
-    static func makeStatusRequest(encryptedCommand: String) -> BitwardenRequest? {
-        return BitwardenRequest(messageId: BitwardenMessageIdGenerator.generateMessageId(),
+    static func makeStatusRequest(encryptedCommand: String, messageId: String) -> BitwardenRequest? {
+        return BitwardenRequest(messageId: messageId,
                                 version: version,
                                 encryptedCommand: encryptedCommand)
     }

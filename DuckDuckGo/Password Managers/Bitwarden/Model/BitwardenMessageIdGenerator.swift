@@ -20,8 +20,21 @@ import Foundation
 
 class BitwardenMessageIdGenerator {
 
-    static func generateMessageId() -> String {
-        return UUID().uuidString
+    private(set) var cache = Set<String>()
+
+    func generateMessageId() -> String {
+        let id = UUID().uuidString
+        cache.insert(id)
+        return id
+    }
+
+    func verify(messageId: String) -> Bool {
+        if cache.contains(messageId) {
+            cache.remove(messageId)
+            return true
+        }
+
+        return false
     }
 
 }

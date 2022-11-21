@@ -395,13 +395,16 @@ final class BitwardenManager: BitwardenManagement, ObservableObject {
 
     // MARK: - Sending Messages
 
+    lazy var messageIdGenerator = BitwardenMessageIdGenerator()
+
     func sendHandshake() {
         guard let publicKey = generateKeyPair() else {
             logOrAssertionFailure("BitwardenManager: Public key is missing")
             return
         }
 
-        guard let messageData = BitwardenRequest.makeHandshakeRequest(with: publicKey).data else {
+        guard let messageData = BitwardenRequest.makeHandshakeRequest(with: publicKey,
+                                                                      messageId: messageIdGenerator.generateMessageId()).data else {
             logOrAssertionFailure("BitwardenManager: Making the handshake message failed")
             return
         }
@@ -412,7 +415,8 @@ final class BitwardenManager: BitwardenManagement, ObservableObject {
     private func sendStatus() {
         guard let commandData = BitwardenRequest.EncryptedCommand(command: .status, payload: nil).data,
               let encryptedCommand = encryptCommandData(commandData),
-              let messageData = BitwardenRequest.makeStatusRequest(encryptedCommand: encryptedCommand)?.data else {
+              let messageData = BitwardenRequest.makeStatusRequest(encryptedCommand: encryptedCommand,
+                                                                   messageId: messageIdGenerator.generateMessageId())?.data else {
             logOrAssertionFailure("BitwardenManager: Making the status message failed")
             status = .error(error: .sendingOfStatusMessageFailed)
             return
@@ -540,7 +544,7 @@ final class BitwardenManager: BitwardenManagement, ObservableObject {
     var retrieveCredentialsCompletionCache = [MessageId: ([BitwardenCredential], BitwardenError?) -> Void]()
 
     func retrieveCredentials(for url: URL, completion: @escaping ([BitwardenCredential], BitwardenError?) -> Void) {
-        let messageId = BitwardenMessageIdGenerator.generateMessageId()
+        let messageId = messageIdGenerator.generateMessageId()
         retrieveCredentialsCompletionCache[messageId] = completion
         sendCredentialRetrieval(url: url, messageId: messageId)
     }
@@ -548,7 +552,7 @@ final class BitwardenManager: BitwardenManagement, ObservableObject {
     var createCredentialCompletionCache = [MessageId: ((BitwardenError?) -> Void)]()
 
     func create(credential: BitwardenCredential, completion: @escaping (BitwardenError?) -> Void) {
-        let messageId = BitwardenMessageIdGenerator.generateMessageId()
+        let messageId = messageIdGenerator.generateMessageId()
         createCredentialCompletionCache[messageId] = completion
         sendCredentialCreation(credential, messageId: messageId)
     }
@@ -556,7 +560,7 @@ final class BitwardenManager: BitwardenManagement, ObservableObject {
     var updateCredentialCompletionCache = [MessageId: ((BitwardenError?) -> Void)]()
 
     func update(credential: BitwardenCredential, completion: @escaping (BitwardenError?) -> Void) {
-        let messageId = BitwardenMessageIdGenerator.generateMessageId()
+        let messageId = messageIdGenerator.generateMessageId()
         updateCredentialCompletionCache[messageId] = completion
         sendCredentialUpdate(credential, messageId: messageId)
     }
@@ -582,10 +586,13 @@ extension BitwardenManager: BitwardenCommunicatorDelegate {
             return
         }
 
-        // TODO: check id of received message. Throw away not requested messages.
-
         if let command = response.command, command == .connected || command == .disconnected {
             handleCommand(command)
+            return
+        }
+
+        guard let messageId = response.messageId, messageIdGenerator.verify(messageId: messageId) else {
+            logOrAssertionFailure("BitwardenManager: Unkown or missing message id")
             return
         }
 
