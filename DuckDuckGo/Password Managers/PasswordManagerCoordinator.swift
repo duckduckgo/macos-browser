@@ -141,7 +141,6 @@ class PasswordManagerCoordinator: BrowserServicesKit.PasswordManager {
         }
 
         if let credential = cache[accountId] {
-            let account = SecureVaultModels.WebsiteAccount(from: credential)
             completion(BrowserServicesKit.SecureVaultModels.WebsiteCredentials(from: credential), nil)
         } else {
             assertionFailure("Credentials not cached")
