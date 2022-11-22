@@ -28,7 +28,7 @@ extension NETunnelProviderProtocol {
             return nil
         }
 
-        providerBundleIdentifier = "com.duckduckgo.network.protection.network-extension"
+        providerBundleIdentifier = "com.duckduckgo.network.protection.network-extension" //"com.duckduckgo.macos.browser.network-protection.debug.network-extension" //"com.duckduckgo.macos.browser.network-protection.debug.network-extension" //"com.duckduckgo.network.protection.network-extension"
         passwordReference = Keychain.makeReference(containing: tunnelConfiguration.asWgQuickConfig(), called: name, previouslyReferencedBy: old?.passwordReference)
         if passwordReference == nil {
             return nil
