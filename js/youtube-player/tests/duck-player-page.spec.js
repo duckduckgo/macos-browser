@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { sleep } from './utils.js';
+import { DuckPlayerPage } from './DuckPlayerPageObject.js';
 
 const MOCK_VIDEO_ID = 'VIDEO_ID';
 const MOCK_IFRAME_SRC = 'https://www.youtube-nocookie.com/embed/'+MOCK_VIDEO_ID+'?iv_load_policy=1&autoplay=1&rel=0&modestbranding=1';
@@ -14,59 +15,61 @@ Object.entries({
   '5m20s': 320,
   '50s': 50,
   '1h2m': 3720
-}).forEach(([ timestamp, seconds ]) => {
-  test(`timestamp: ${timestamp} should output ${seconds}`, async ({ page }) => {
-    await loadMockVideo(page, 'VIDEO_ID', timestamp);
-    await expect(page.locator('iframe')).toHaveAttribute('src', MOCK_IFRAME_SRC + '&start='+seconds);
-  });
-});
+}).forEach(
+  ([ timestamp, seconds ]) => {
+    test(`timestamp: ${timestamp} should output ${seconds}`, async ({ page }) => {
+      await loadMockVideo(page, 'VIDEO_ID', timestamp);
+      await expect(DuckPlayerPage.videoIframe(page)).toHaveAttribute('src', MOCK_IFRAME_SRC + '&start='+seconds);
+    });
+  }
+);
 
 test('iframe loaded with invalid timestamp', async ({ page }) => {
   await loadMockVideo(page, 'VIDEO_ID', 'aaaqkw');
-  await expect(page.locator('iframe')).toHaveAttribute('src', MOCK_IFRAME_SRC);
+  await expect(DuckPlayerPage.videoIframe(page)).toHaveAttribute('src', MOCK_IFRAME_SRC);
 });
 
 test('iframe loaded with valid video id', async ({ page }) => {
   await loadMockVideo(page);
-  await expect(page.locator('iframe')).toHaveAttribute('src', MOCK_IFRAME_SRC);
+  await expect(DuckPlayerPage.videoIframe(page)).toHaveAttribute('src', MOCK_IFRAME_SRC);
 });
 
 test('error shown with invalid video id', async ({ page }) => {
   await page.addInitScript(() => { window._mockVideoID = '€%dd#"'; });
   await page.goto('/youtube_player_template.html');
 
-  await expect(page.locator('.player-error')).toBeVisible();
-  await expect(page.locator('.player-error')).toHaveText('ERROR: Invalid video id');
-  await expect(page.locator('iframe')).toHaveCount(0);
+  await expect(DuckPlayerPage.playerError(page)).toBeVisible();
+  await expect(DuckPlayerPage.playerError(page)).toHaveText('ERROR: Invalid video id');
+  await expect(DuckPlayerPage.videoIframe(page)).toHaveCount(0);
 });
 
 test('inactivity timer shows and hides toolbar based on user activity', async ({ page }) => {
   await loadMockVideo(page);
 
   // 1. Expect toolbar to be visible at page load
-  await expect(page.locator('.content-body')).not.toHaveCSS('opacity', '0');
+  await expect(DuckPlayerPage.toolbar(page)).not.toHaveCSS('opacity', '0');
   await page.mouse.move(1,1);
 
   // 2. Expect it to be hidden after 2 seconds of inactivity
   await sleep(2000);
-  await expect(page.locator('.content-body')).toHaveCSS('opacity', '0');
+  await expect(DuckPlayerPage.toolbar(page)).toHaveCSS('opacity', '0');
 
   // 3. Expect it to be shown if there is mouse activity
   await page.mouse.move(10, 10);
   await sleep(500);
-  await expect(page.locator('.content-body')).not.toHaveCSS('opacity', '0');
+  await expect(DuckPlayerPage.toolbar(page)).not.toHaveCSS('opacity', '0');
 });
 
 test('tooltip shown on hover', async ({ page }) => {
   await loadMockVideo(page);
 
   // 1. Show tooltip on hover of info icon
-  await page.locator('.info-icon-container svg').hover();
-  await expect(page.locator('.info-tooltip')).toBeVisible();
+  await DuckPlayerPage.infoIcon(page).hover();
+  await expect(DuckPlayerPage.infoTooltip(page)).toBeVisible();
 
   // 2. Hide tooltip when mouse leaves
   await page.mouse.move(1,1);
-  await expect(page.locator('.info-tooltip')).toBeHidden();
+  await expect(DuckPlayerPage.infoTooltip(page)).toBeHidden();
 
 });
 
@@ -75,7 +78,7 @@ test('click on settings cog', async ({ page, context }) => {
 
   const [newPage] = await Promise.all([
     context.waitForEvent('page'),
-    page.locator('.open-settings').click()
+    DuckPlayerPage.settingsCog(page).click()
   ])
   await newPage.waitForLoadState();
   await expect(newPage).toHaveURL('about:preferences/duckplayer');
@@ -84,7 +87,7 @@ test('click on settings cog', async ({ page, context }) => {
 
 test('click on open in YouTube', async ({ page }) => {
   await loadMockVideo(page);
-  await page.locator('.play-on-youtube').click()
+  await DuckPlayerPage.playOnYouTubeButton(page).click()
   await expect(page).toHaveURL('https://www.youtube.com/watch?v=VIDEO_ID');
 });
 
@@ -120,12 +123,13 @@ test('always open setting', async ({ page }) => {
   await mockSendSettingFromNative(page, false);
 
   // 1. Expect always open setting to be visible if it is turned OFF at page load
-  await expect(page.locator('.setting')).toBeVisible();
+  await expect(DuckPlayerPage.settingsContainer(page)).toBeVisible();
 
   // 2. Expect the setting to slide out and be hidden and a message sent to native after clicking it.
-  await page.locator('.setting input').click();
+  await DuckPlayerPage.settingsCheckbox(page).click();
   await sleep(1000);
-  await expect(page.locator('.setting-container')).toHaveCSS('width', '0px');
+  await page.pause();
+  await expect(DuckPlayerPage.settingsContainer(page)).toHaveCSS('width', '0px');
   await expect(await getMockSettingSentToNative(page)).toEqual(true);
 
 });
