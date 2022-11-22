@@ -98,7 +98,9 @@ final class ConnectBitwardenViewModel: ObservableObject {
         case .disabled:
             self.viewState = .disclaimer
         case .notInstalled:
-            self.viewState = .lookingForBitwarden
+            if self.viewState != .lookingForBitwarden {
+                self.viewState = .disclaimer
+            }
         case .oldVersion:
             self.viewState = .oldVersion
         case .notRunning:
@@ -130,6 +132,8 @@ final class ConnectBitwardenViewModel: ObservableObject {
             } else if viewState == .connectToBitwarden {
                 bitwardenManager.sendHandshake()
                 bitwardenManager.openBitwarden()
+            } else if viewState == .disclaimer {
+                viewState = .lookingForBitwarden
             }
             
         case .cancel:
