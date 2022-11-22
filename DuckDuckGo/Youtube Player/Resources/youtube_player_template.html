@@ -55,7 +55,7 @@
                 transition: all 1s ease-out;
             }
 
-            body[faded] .bg::after {
+            body.faded .bg::after {
                 top: 30%;
             }
 
@@ -116,7 +116,7 @@
                 height: 32px;
             }
 
-            body[faded] .toolbar {
+            body.faded .toolbar {
                 opacity: 0;
                 margin-top: -80px;
             }
@@ -179,17 +179,17 @@
                 left: 162px;
             }
 
-            .info-icon-tooltip[above] {
+            .info-icon-tooltip.above {
                 top: -105px;
                 z-index: 50;
             }
 
-            .info-icon-tooltip[above]::after {
+            .info-icon-tooltip.above::after {
                 top: 80px;
                 transform: rotate(225deg);
             }
 
-            .info-icon-tooltip[visible] {
+            .info-icon-tooltip.visible {
                 display: block;
             }
 
@@ -207,11 +207,11 @@
                 width: 299px;
             }
 
-            .setting-container[animatable] {
+            .setting-container.animatable {
                 transition: 0.3s linear all;
             }
 
-            .setting-container[invisible] {
+            .setting-container.invisible {
                 width: 0px;
             }
 
@@ -713,7 +713,7 @@
                  * @param {boolean} visible
                  */
                 toggleVisibility: (visible) => {
-                    Setting.container().toggleAttribute('invisible', !visible);
+                    Setting.container()?.classList?.toggle('invisible', !visible);
                 },
 
                 /**
@@ -722,7 +722,7 @@
                  * @param {boolean} animatable
                  */
                 toggleAnimatable: (animatable) => {
-                    Setting.container().toggleAttribute('animatable', animatable);
+                    Setting.container()?.classList?.toggle('animatable', animatable);
                 },
 
                 /**
@@ -819,8 +819,8 @@
                  * @param {boolean} show
                  */
                 toggle: (show) => {
-                    Tooltip.tooltip().toggleAttribute('above', Tooltip.isCloseToBottom());
-                    Tooltip.tooltip().toggleAttribute('visible', show);
+                    Tooltip.tooltip()?.classList?.toggle('above', Tooltip.isCloseToBottom());
+                    Tooltip.tooltip()?.classList?.toggle('visible', show);
                     Tooltip.visible = show;
                 },
 
@@ -955,7 +955,7 @@
                  * Updates the faded state of the content below the player
                  */
                 updateContent: (isFaded) => {
-                    document.body.toggleAttribute('faded', isFaded);
+                    document.body?.classList?.toggle('faded', isFaded);
 
                     setTimeout(() => {
                         MouseMove.isFaded = isFaded;
