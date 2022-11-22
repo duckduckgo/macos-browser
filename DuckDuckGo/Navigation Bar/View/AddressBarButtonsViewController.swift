@@ -159,6 +159,8 @@ final class AddressBarButtonsViewController: NSViewController {
     private var permissionsCancellables = Set<AnyCancellable>()
     private var trackerAnimationTriggerCancellable: AnyCancellable?
     private var isMouseOverAnimationVisibleCancellable: AnyCancellable?
+    private var privacyInfoCancellable: AnyCancellable?
+    
     private lazy var buttonsBadgeAnimator = NavigationBarBadgeAnimator()
     
     required init?(coder: NSCoder) {
@@ -337,6 +339,15 @@ final class AddressBarButtonsViewController: NSViewController {
         privacyDashboardPopover.show(relativeTo: privacyDashboardPositioningView.bounds, of: privacyDashboardPositioningView, preferredEdge: .maxY)
 
         privacyEntryPointButton.state = .on
+                
+        privacyInfoCancellable?.cancel()
+        privacyInfoCancellable = selectedTabViewModel.tab.$privacyInfo
+            .dropFirst()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self, weak selectedTabViewModel] _ in
+                guard self?.privacyDashboardPopover.isShown == true, let tabViewModel = selectedTabViewModel else { return }
+                self?.privacyDashboardPopover.viewController.updateTabViewModel(tabViewModel)
+            }
     }
 
     func updateButtons() {

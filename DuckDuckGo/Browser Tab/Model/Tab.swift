@@ -856,7 +856,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     }
     
     // MARK: - Dashboard Info
-    private(set) var privacyInfo: PrivacyInfo?
+    @Published private(set) var privacyInfo: PrivacyInfo?
     private var previousPrivacyInfosByURL: [String: PrivacyInfo] = [:]
     private var didGoBackForward: Bool = false
 
