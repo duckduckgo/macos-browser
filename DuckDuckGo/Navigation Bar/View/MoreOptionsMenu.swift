@@ -80,7 +80,7 @@ final class MoreOptionsMenu: NSMenu {
             .withImage(NSImage(named: "OptionsButtonMenuEmail"))
             .withSubmenu(EmailOptionsButtonSubMenu(tabCollectionViewModel: tabCollectionViewModel, emailManager: emailManager))
 
-        addItem(withTitle: "Network Protection", action: #selector(toggleNetworkProtection(_:)), keyEquivalent: "")
+        addItem(withTitle: UserText.networkProtection, action: #selector(toggleNetworkProtection(_:)), keyEquivalent: "")
             .targetting(self)
             .withImage(NSImage(named: "PasswordManagement"))
 

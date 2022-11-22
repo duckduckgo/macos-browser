@@ -35,10 +35,6 @@ extension FileManager {
         return sharedFolderURL?.appendingPathComponent("last-error.txt")
     }
 
-    static var loginHelperTimestampURL: URL? {
-        return sharedFolderURL?.appendingPathComponent("login-helper-timestamp.bin")
-    }
-
     static func deleteFile(at url: URL) -> Bool {
         do {
             try FileManager.default.removeItem(at: url)
