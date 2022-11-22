@@ -17,11 +17,11 @@ extension FileManager {
     }
     private static var sharedFolderURL: URL? {
         guard let appGroupId = FileManager.appGroupId else {
-            os_log("Cannot obtain app group ID from bundle", log: OSLog.default, type: .error)
+            os_log("Cannot obtain app group ID from bundle", log: networkExtensionLog, type: .error)
             return nil
         }
         guard let sharedFolderURL = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroupId) else {
-            os_log("Cannot obtain shared folder URL", log: OSLog.default, type: .error)
+            os_log("Cannot obtain shared folder URL", log: networkExtensionLog, type: .error)
             return nil
         }
         return sharedFolderURL

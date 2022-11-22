@@ -1,10 +1,3 @@
-//
-//  PacketTunnelProvider.swift
-//  NetworkProtectionExtensionmacOS
-//
-//  Created by DDG on 04/11/22.
-//
-
 // SPDX-License-Identifier: MIT
 // Copyright © 2018-2021 WireGuard LLC. All Rights Reserved.
 
@@ -19,16 +12,14 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         return WireGuardAdapter(with: self) { logLevel, message in
             let logType: OSLogType = logLevel == .error ? .error : .info
 
-            os_log("Received message from adapter: %{public}@", log: vpnLog, type: logType, message)
+            os_log("Received message from adapter: %{public}@", log: networkExtensionLog, type: logType, message)
         }
     }()
 
     override func startTunnel(options: [String: NSObject]?, completionHandler: @escaping (Error?) -> Void) {
         let activationAttemptId = options?["activationAttemptId"] as? String
 
-        //Logger.configureGlobal(tagged: "NET", withFilePath: FileManager.logFileURL?.path)
-
-        os_log("Starting tunnel from the %{public}@", log: vpnLog, type: .info, activationAttemptId == nil ? "OS directly, rather than the app" : "app")
+        os_log("Starting tunnel from the %{public}@", log: networkExtensionLog, type: .info, activationAttemptId == nil ? "OS directly, rather than the app" : "app")
 
         guard let tunnelProviderProtocol = self.protocolConfiguration as? NETunnelProviderProtocol,
               let tunnelConfiguration = tunnelProviderProtocol.asTunnelConfiguration() else {
@@ -42,7 +33,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
             guard let adapterError = adapterError else {
                 let interfaceName = self.adapter.interfaceName ?? "unknown"
 
-                os_log("Tunnel interface is %{public}@", log: vpnLog, type: .info, interfaceName)
+                os_log("Tunnel interface is %{public}@", log: networkExtensionLog, type: .info, interfaceName)
 
                 completionHandler(nil)
                 return
@@ -50,24 +41,24 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
 
             switch adapterError {
             case .cannotLocateTunnelFileDescriptor:
-                os_log("Starting tunnel failed: could not determine file descriptor", log: vpnLog, type: .error)
+                os_log("Starting tunnel failed: could not determine file descriptor", log: networkExtensionLog, type: .error)
 
                 completionHandler(PacketTunnelProviderError.couldNotDetermineFileDescriptor)
 
             case .dnsResolution(let dnsErrors):
                 let hostnamesWithDnsResolutionFailure = dnsErrors.map { $0.address }
                     .joined(separator: ", ")
-                os_log("DNS resolution failed for the following hostnames: %{public}@", log: vpnLog, type: .error, hostnamesWithDnsResolutionFailure)
+                os_log("DNS resolution failed for the following hostnames: %{public}@", log: networkExtensionLog, type: .error, hostnamesWithDnsResolutionFailure)
 
                 completionHandler(PacketTunnelProviderError.dnsResolutionFailure)
 
             case .setNetworkSettings(let error):
-                os_log("Starting tunnel failed with setTunnelNetworkSettings returning: %{public}@", log: vpnLog, type: .error, error.localizedDescription)
+                os_log("Starting tunnel failed with setTunnelNetworkSettings returning: %{public}@", log: networkExtensionLog, type: .error, error.localizedDescription)
 
                 completionHandler(PacketTunnelProviderError.couldNotSetNetworkSettings)
 
             case .startWireGuardBackend(let errorCode):
-                os_log("Starting tunnel failed with wgTurnOn returning: %{public}@", log: vpnLog, type: .error, errorCode)
+                os_log("Starting tunnel failed with wgTurnOn returning: %{public}@", log: networkExtensionLog, type: .error, errorCode)
 
                 completionHandler(PacketTunnelProviderError.couldNotStartBackend)
 
@@ -79,11 +70,11 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
     }
 
     override func stopTunnel(with reason: NEProviderStopReason, completionHandler: @escaping () -> Void) {
-        os_log("Stopping tunnel", log: vpnLog, type: .info)
+        os_log("Stopping tunnel", log: networkExtensionLog, type: .info)
 
         adapter.stop { error in
             if let error = error {
-                os_log("Failed to stop WireGuard adapter: %{public}@", log: vpnLog, type: .info, error.localizedDescription)
+                os_log("Failed to stop WireGuard adapter: %{public}@", log: networkExtensionLog, type: .info, error.localizedDescription)
             }
             completionHandler()
 
@@ -123,4 +114,3 @@ extension WireGuardLogLevel {
         }
     }
 }
-
