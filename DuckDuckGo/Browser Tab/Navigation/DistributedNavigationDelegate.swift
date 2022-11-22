@@ -160,6 +160,8 @@ extension DistributedNavigationDelegate: WebViewNavigationDelegate {
             case .cancel:
                 decisionHandler(.cancel, preferences)
             case .download:
+                // register the navigationAction for legacy _WKDownload to be called back on the Navigation Delegate
+                // further download will be passed to webView:navigationAction:didBecomeDownload:
                 decisionHandler(.download(navigationAction), preferences)
             case .redirect(request: let request):
                 decisionHandler(.cancel, preferences)
@@ -173,45 +175,13 @@ extension DistributedNavigationDelegate: WebViewNavigationDelegate {
         } defaultHandler: {
             decisionHandler(.allow, preferences)
         }
-
-//
-//
-//
-//        webView.customUserAgent = UserAgent.for(navigationAction.request.url)
-//
 //
 //      referrerTrimming
 //
         // GPC
 //
-//        if navigationAction.isTargetingMainFrame {
-//            if navigationAction.request.url != currentDownload || navigationAction.isUserInitiated {
-//                currentDownload = nil
-//            }
-//        }
+        // Download
 //
-//
-//        if isRequestingNewTab {
-//            defer {
-//                delegate?.tab(
-//                    self,
-//                    requestedNewTabWith: navigationAction.request.url.map { .contentFromURL($0) } ?? .none,
-//                    selected: shouldSelectNewTab)
-//            }
-//            return .cancel
-//        } else if isLinkActivated && NSApp.isOptionPressed && !NSApp.isCommandPressed {
-//            return .download(navigationAction, using: webView)
-//        }
-//
-//        guard let url = navigationAction.request.url, url.scheme != nil else {
-//            self.willPerformNavigationAction(navigationAction)
-//            return .allow
-//        }
-//
-//        if navigationAction.shouldDownload {
-//            // register the navigationAction for legacy _WKDownload to be called back on the Tab
-//            // further download will be passed to webView:navigationAction:didBecomeDownload:
-//            return .download(navigationAction, using: webView)
 //
 //        } else if url.isExternalSchemeLink {
 //            // always allow user entered URLs
@@ -231,16 +201,6 @@ extension DistributedNavigationDelegate: WebViewNavigationDelegate {
         // httpsUpgrade
         // prepare for content blocking
 //
-//        if navigationAction.isTargetingMainFrame,
-//           navigationAction.request.url?.isDuckDuckGo == true,
-//           navigationAction.request.value(forHTTPHeaderField: Constants.ddgClientHeaderKey) == nil,
-//           navigationAction.navigationType != .backForward {
-//
-//            var request = navigationAction.request
-//            request.setValue(Constants.ddgClientHeaderValue, forHTTPHeaderField: Constants.ddgClientHeaderKey)
-//            _ = webView.load(request)
-//            return .cancel
-//        }
 //
 //        toggleFBProtection(for: url)
 //        willPerformNavigationAction(navigationAction)
@@ -250,6 +210,7 @@ extension DistributedNavigationDelegate: WebViewNavigationDelegate {
 
     // MARK: Navigation
 
+    @MainActor
     func webView(_ webView: WKWebView,
                  didReceive challenge: URLAuthenticationChallenge,
                  completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
@@ -282,7 +243,6 @@ extension DistributedNavigationDelegate: WebViewNavigationDelegate {
         }
     }
 
-
 //    @MainActor
 //    private func prepareForContentBlocking() async {
         // Ensure Content Blocking Assets (WKContentRuleList&UserScripts) are installed
@@ -310,6 +270,7 @@ extension DistributedNavigationDelegate: WebViewNavigationDelegate {
 //        delegate?.tabWillStartNavigation(self, isUserInitiated: navigationAction.isUserInitiated)
 //    }
 
+    @MainActor
     func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
 
         makeAsyncDecision(for: webView) { responder, webView in
@@ -319,28 +280,6 @@ extension DistributedNavigationDelegate: WebViewNavigationDelegate {
         } defaultHandler: {
             decisionHandler(.allow)
         }
-
-//        userEnteredUrl = false // subsequent requests will be navigations
-//
-        
-//
-//        if !navigationResponse.canShowMIMEType || navigationResponse.shouldDownload {
-//            if navigationResponse.isForMainFrame {
-//                guard currentDownload != navigationResponse.response.url else {
-//                    // prevent download twice
-//                    return .cancel
-//                }
-//                currentDownload = navigationResponse.response.url
-//            }
-//
-//        if navigationResponse.response.isSuccessfulHTTPURLResponse {
-//                // register the navigationResponse for legacy _WKDownload to be called back on the Tab
-//                // further download will be passed to webView:navigationResponse:didBecomeDownload:
-//                return .download(navigationResponse, using: webView)
-//            }
-//        }
-//
-//        return .allow
     }
 
     @MainActor
@@ -383,10 +322,10 @@ extension DistributedNavigationDelegate: WebViewNavigationDelegate {
     @MainActor
     func webView(_ webView: WKWebView, didCommit navigation: WKNavigation) {
         notifyResponders(with: webView) { responder, webView, mainFrame, request in
-            responder.webView(webView, didCommit: navigation, with: request)
-        }
-        notifyResponders(with: webView) { responder, webView, mainFrame, request in
             responder.webView(webView, didCommitNavigationWith: request, in: mainFrame)
+        }
+        notifyResponders(with: webView) { responder, webView, _, request in
+            responder.webView(webView, didCommit: navigation, with: request)
         }
 
         //        if content.isUrl, let url = webView.url {
@@ -416,7 +355,7 @@ extension DistributedNavigationDelegate: WebViewNavigationDelegate {
         notifyResponders(with: webView) { responder, webView, mainFrame, request in
             responder.webView(webView, didFinishNavigationWith: request, in: mainFrame)
         }
-        notifyResponders(with: webView) { responder, webView, mainFrame, request in
+        notifyResponders(with: webView) { responder, webView, _, request in
             responder.webView(webView, didFinish: navigation, with: request)
         }
 
@@ -433,13 +372,12 @@ extension DistributedNavigationDelegate: WebViewNavigationDelegate {
 //        StatisticsLoader.shared.refreshRetentionAtb(isSearch: request.url?.isDuckDuckGoSearch == true)
     }
 
-
     @MainActor
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation, withError error: Error) {
         notifyResponders(with: webView) { responder, webView, mainFrame, request in
             responder.webView(webView, navigationWith: request, in: mainFrame, didFailWith: error)
         }
-        notifyResponders(with: webView) { responder, webView, mainFrame, request in
+        notifyResponders(with: webView) { responder, webView, _, request in
             responder.webView(webView, navigation: navigation, with: request, didFailWith: error)
         }
 
@@ -465,7 +403,7 @@ extension DistributedNavigationDelegate: WebViewNavigationDelegate {
         notifyResponders(with: webView) { responder, webView, mainFrame, request in
             responder.webView(webView, navigationWith: request, in: mainFrame, didFailWith: error)
         }
-        notifyResponders(with: webView) { responder, webView, mainFrame, request in
+        notifyResponders(with: webView) { responder, webView, _, request in
             responder.webView(webView, navigation: navigation, with: request, didFailWith: error)
         }
 
@@ -530,6 +468,7 @@ extension DistributedNavigationDelegate: WebViewNavigationDelegate {
     }
 
 }
+
 // universal download event handlers for Legacy _WKDownload and modern WKDownload
 extension DistributedNavigationDelegate: WKWebViewDownloadDelegate {
 
@@ -537,26 +476,12 @@ extension DistributedNavigationDelegate: WKWebViewDownloadDelegate {
         notifyResponders(with: webView) { responder, webView in
             responder.webView(webView, navigationAction: navigationAction, didBecome: download)
         }
-
-//        FileDownloadManager.shared.add(download, delegate: self.delegate, location: .auto, postflight: .none)
     }
 
     func webView(_ webView: WKWebView, navigationResponse: WKNavigationResponse, didBecomeDownload download: WebKitDownload) {
         notifyResponders(with: webView) { responder, webView in
             responder.webView(webView, navigationResponse: navigationResponse, didBecome: download)
         }
-        
-//        FileDownloadManager.shared.add(download, delegate: self.delegate, location: .auto, postflight: .none)
-//
-//        // Note this can result in tabs being left open, e.g. download button on this page:
-//        // https://en.wikipedia.org/wiki/Guitar#/media/File:GuitareClassique5.png
-//        // Safari closes new tabs that were opened and then create a download instantly.
-//        if self.webView.backForwardList.currentItem == nil,
-//           self.parentTab != nil {
-//            DispatchQueue.main.async { [weak delegate=self.delegate] in
-//                delegate?.closeTab(self)
-//            }
-//        }
     }
 
     func webView(_ webView: WKWebView, contextMenuDidCreateDownload download: WebKitDownload) {

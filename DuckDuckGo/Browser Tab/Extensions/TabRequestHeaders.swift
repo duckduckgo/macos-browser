@@ -1,5 +1,5 @@
 //
-//  GlobalPrivacyControlResponder.swift
+//  TabRequestHeaders.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -16,16 +16,27 @@
 //  limitations under the License.
 //
 
-import Foundation
 import WebKit
 
-struct GlobalPrivacyControlResponder: NavigationResponder {
+struct TabRequestHeaders: NavigationResponder {
+
+    struct Constants {
+        static let ddgClientHeaderKey = "X-DuckDuckGo-Client"
+        static let ddgClientHeaderValue = "macOS"
+    }
 
     func webView(_ webView: WebView, decidePolicyFor navigationAction: WKNavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
         guard navigationAction.isTargetingMainFrame,
-              navigationAction.navigationType != .backForward,
-              let request = GPCRequestFactory.shared.requestForGPC(basedOn: navigationAction.request)
-        else { return .next }
+              navigationAction.request.url?.isDuckDuckGo == true,
+              navigationAction.request.value(forHTTPHeaderField: Constants.ddgClientHeaderKey) == nil,
+              // TODO: check for .backForward for other navigations
+              navigationAction.navigationType != .backForward
+        else {
+            return .next
+        }
+
+        var request = navigationAction.request
+        request.setValue(Constants.ddgClientHeaderValue, forHTTPHeaderField: Constants.ddgClientHeaderKey)
 
         return .redirect(request: request)
     }

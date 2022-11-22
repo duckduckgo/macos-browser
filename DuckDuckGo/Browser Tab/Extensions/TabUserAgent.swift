@@ -1,5 +1,5 @@
 //
-//  GlobalPrivacyControlResponder.swift
+//  TabUserAgent.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -16,18 +16,14 @@
 //  limitations under the License.
 //
 
-import Foundation
 import WebKit
 
-struct GlobalPrivacyControlResponder: NavigationResponder {
+struct TabUserAgent: NavigationResponder {
 
     func webView(_ webView: WebView, decidePolicyFor navigationAction: WKNavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
-        guard navigationAction.isTargetingMainFrame,
-              navigationAction.navigationType != .backForward,
-              let request = GPCRequestFactory.shared.requestForGPC(basedOn: navigationAction.request)
-        else { return .next }
 
-        return .redirect(request: request)
+        preferences.userAgent = UserAgent.for(navigationAction.request.url)
+        return .next
     }
 
 }

@@ -196,7 +196,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
          shouldLoadInBackground: Bool = false,
          canBeClosedWithBack: Bool = false,
          lastSelectedAt: Date? = nil,
-         currentDownload: URL? = nil,
          webViewFrame: CGRect = .zero
     ) {
 
@@ -210,7 +209,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         self.sessionStateData = sessionStateData
         self.interactionStateData = interactionStateData
         self.lastSelectedAt = lastSelectedAt
-        self.currentDownload = currentDownload
 
         let configuration = webViewConfiguration ?? WKWebViewConfiguration()
         configuration.applyStandardConfiguration()
@@ -225,6 +223,9 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         userContentController.delegate = self
         extensions = TabExtensions.buildForTab(self)
         extensions.navigationDelegate.responders.set(
+            TabUserAgent(),
+            extensions.navigations,
+
             NewTabNavigationResponder(),
             extensions.contextMenu,
 
@@ -233,11 +234,13 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             extensions.linkProtection,
             extensions.referrerTrimming,
             GlobalPrivacyControlResponder(),
+            TabRequestHeaders(),
+
+            extensions.downloads,
 
             extensions.adClickAttribution,
-            extensions.httpsUpgrade,
+            extensions.httpsUpgrade
             
-            extensions.navigations
         )
 
         setupWebView(shouldLoadInBackground: shouldLoadInBackground)
@@ -396,9 +399,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         userEnteredUrl = userEntered
     }
 
-    // Used to track if an error was caused by a download navigation.
-    private(set) var currentDownload: URL?
-
     func download(from url: URL, promptForLocation: Bool = true) {
         webView.startDownload(URLRequest(url: url, cachePolicy: .returnCacheDataElseLoad)) { download in
             FileDownloadManager.shared.add(download, delegate: self.delegate, location: promptForLocation ? .prompt : .auto, postflight: .none)
@@ -485,7 +485,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     }
 
     func reload() {
-        currentDownload = nil
         if let error = error, let failingUrl = error.failingUrl {
             webView.load(failingUrl)
             return
@@ -1047,13 +1046,6 @@ extension Tab {
 
     func findPrevious() {
         findInPageScript?.previous(withWebView: webView)
-    }
-}
-
-fileprivate extension WKNavigationResponse {
-    var shouldDownload: Bool {
-        let contentDisposition = (response as? HTTPURLResponse)?.allHeaderFields["Content-Disposition"] as? String
-        return contentDisposition?.hasPrefix("attachment") ?? false
     }
 }
 

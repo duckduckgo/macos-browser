@@ -98,7 +98,7 @@ extension WKNavigationResponsePolicy? {
     static let next = WKNavigationResponsePolicy?.none
 }
 
-protocol NavigationResponder: AnyObject {
+protocol NavigationResponder {
 
     // MARK: - Expectation
 

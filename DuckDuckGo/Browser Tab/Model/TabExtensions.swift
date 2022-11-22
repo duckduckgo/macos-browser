@@ -29,6 +29,7 @@ struct TabExtensions {
     let linkProtection: LinkProtectionExtension?
     let referrerTrimming: ReferrerTrimming?
     let httpsUpgrade: HTTPSUpgradeTabExtension?
+    let downloads: TabDownloadsExtension?
 
     @Injected(forTests: defaultExtensionsForTests)
     static var buildForTab: (Tab) -> TabExtensions = { tab in
@@ -39,7 +40,8 @@ struct TabExtensions {
                              navigationDelegate: DistributedNavigationDelegate(),
                              linkProtection: LinkProtectionExtension(),
                              referrerTrimming: ReferrerTrimming(),
-                             httpsUpgrade: HTTPSUpgradeTabExtension())
+                             httpsUpgrade: HTTPSUpgradeTabExtension(),
+                             downloads: TabDownloadsExtension(tab: tab))
     }
 
     private static func defaultExtensionsForTests(_ tab: Tab) -> TabExtensions {
@@ -50,7 +52,8 @@ struct TabExtensions {
                              navigationDelegate: DistributedNavigationDelegate(),
                              linkProtection: nil,
                              referrerTrimming: nil,
-                             httpsUpgrade: nil)
+                             httpsUpgrade: nil,
+                             downloads: nil)
     }
 
 }
