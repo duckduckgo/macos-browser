@@ -44,7 +44,7 @@ struct PrivacyReferenceTestHelper {
         }
     }
     
-    func privacyConfiguration(withConfigPath path: String, bundle: Bundle) -> PrivacyConfiguration {
+    func privacyConfigurationData(withConfigPath path: String, bundle: Bundle) -> PrivacyConfigurationData {
         guard let configData = try? data(for: path, in: bundle) else {
             fatalError("Can't decode \(path)")
         }
@@ -53,8 +53,11 @@ struct PrivacyReferenceTestHelper {
             fatalError("Can't decode \(path)")
         }
         
+        return PrivacyConfigurationData(json: json)
+    }
+        
+    func privacyConfiguration(withData data: PrivacyConfigurationData) -> PrivacyConfiguration {
         let domain = MockDomainsProtectionStore()
-        let configurationData = PrivacyConfigurationData(json: json)
-        return AppPrivacyConfiguration(data: configurationData, identifier: UUID().uuidString, localProtection: domain)
+        return AppPrivacyConfiguration(data: data, identifier: UUID().uuidString, localProtection: domain)
     }
 }

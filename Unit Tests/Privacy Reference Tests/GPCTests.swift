@@ -34,7 +34,8 @@ final class GPCTests: XCTestCase {
     func testGPC() {
         let bundle = Bundle(for: GPCTests.self)
         let tests: GPCTestData = testHelper.decodeResource(Resource.tests, from: bundle)
-        let privacyConfigurationData = testHelper.privacyConfiguration(withConfigPath: Resource.config, bundle: bundle)
+        let privacyConfigurationData = testHelper.privacyConfigurationData(withConfigPath: Resource.config, bundle: bundle)
+        let privacyConfiguration = testHelper.privacyConfiguration(withData: privacyConfigurationData)
 
         for test in tests.gpcHeader.tests {
             os_log("--------")
@@ -55,7 +56,7 @@ final class GPCTests: XCTestCase {
             // Simulate request with actual headers
             testRequest.addValue("DDG-Test", forHTTPHeaderField: "User-Agent")
 
-            let request = factory.requestForGPC(basedOn: testRequest, config: privacyConfigurationData)
+            let request = factory.requestForGPC(basedOn: testRequest, config: privacyConfiguration)
             
             if !test.gpcUserSettingOn {
                 XCTAssertNil(request, "User opt out, request should not exist \([test.name])")

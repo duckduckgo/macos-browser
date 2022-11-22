@@ -52,7 +52,7 @@ final class BrokenSiteReportingTests: XCTestCase {
             
             os_log("Testing [%s]", type: .info, test.name)
             
-            var category = WebsiteBreakage.Category(rawValue: test.category)
+            let category = WebsiteBreakage.Category(rawValue: test.category)
             
             let breakage = WebsiteBreakage(category: category,
                                            description: nil,

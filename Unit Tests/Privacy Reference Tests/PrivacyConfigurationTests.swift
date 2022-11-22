@@ -27,47 +27,42 @@ final class PrivacyConfigurationTests: XCTestCase {
         static let tests = "privacy-configuration/tests.json"
     }
     
-    /*
-     for $testSet in test.json
-       loadRemoteConfig($testSet.referenceConfig)
-
-       for $test in $testSet
-         $enabled = isEnabled(
-             feature=$test.featureName,
-             url=$test.siteURL,
-             frame=$test.frameURL,
-             script=$test.scriptURL
-         )
-
-         expect($enabled === $test.expectFeatureEnabled)
-     */
-    
     func testPrivacyConfiguration() {
         let bundle = Bundle(for: PrivacyConfigurationTests.self)
         let testData: TestData = testHelper.decodeResource(Resource.tests, from: bundle)
 
         for testConfig in testData.testConfigs {
             let path = "\(Resource.configRootPath)/\(testConfig.referenceConfig)"
-            let privacyConfigurationData = testHelper.privacyConfiguration(withConfigPath: path,
-                                                                           bundle: bundle)
-
+            
+            let privacyConfigurationData = testHelper.privacyConfigurationData(withConfigPath: path, bundle: bundle)
+            let privacyConfiguration = testHelper.privacyConfiguration(withData: privacyConfigurationData)
+            
             for test in testConfig.tests {
                 if test.exceptPlatforms.contains(.macosBrowser) {
-                    print("SKIPPING TEST \(test.name)")
+                    print("Skipping test \(test.name)")
                     continue
                 }
                 
-                guard let feature = PrivacyFeature(rawValue: test.featureName) else {
-                    print("CANT CREATE FEATURE \(test.featureName)")
+                let testInfo = "\nName: \(test.name)\nFeature: \(test.featureName)\nsiteURL: \(test.siteURL)\nConfig: \(testConfig.referenceConfig)"
+  
+                guard let url = URL(string: test.siteURL),
+                      let siteDomain = url.host else {
+                    XCTFail("Can't get domain \(testInfo)")
                     continue
                 }
                 
-                let isEnabled = privacyConfigurationData.isFeature(feature, enabledForDomain: test.siteURL)
-
-                let list = privacyConfigurationData.exceptionsList(forFeature: feature)
-                let testInfo = "\nName: \(test.name)\nFeature: \(test.featureName)\nsiteURL: \(test.siteURL)\nConfig: \(testConfig.referenceConfig)\nExceptionList: \(list)\nisEnabled: \(isEnabled)"
-
-                XCTAssertEqual(isEnabled, test.expectFeatureEnabled, testInfo)
+                if let feature = PrivacyFeature(rawValue: test.featureName) {
+                    let isEnabled = privacyConfiguration.isFeature(feature, enabledForDomain: siteDomain)
+                    XCTAssertEqual(isEnabled, test.expectFeatureEnabled, testInfo)
+                    
+                } else if test.featureName == "trackerAllowlist" {
+                    let isEnabled = privacyConfigurationData.trackerAllowlist.state == "enabled"
+                    XCTAssertEqual(isEnabled, test.expectFeatureEnabled, testInfo)
+                    
+                } else {
+                    XCTFail("Can't create feature \(testInfo)")
+                    continue
+                }
             }
         }
     }
