@@ -319,9 +319,7 @@
 		7B02C7A2292B8FFA00E677CF /* TunnelConfiguration+WgQuickConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B02C7A1292B8FFA00E677CF /* TunnelConfiguration+WgQuickConfig.swift */; };
 		7B02C7A4292B901400E677CF /* String+ArrayConversion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B02C7A3292B901400E677CF /* String+ArrayConversion.swift */; };
 		7B02C7F3292BA77300E677CF /* NetworkExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B8A4911291C41C9001BF58A /* NetworkExtension.framework */; };
-		7B02C7F6292BA77400E677CF /* PacketTunnelProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B02C7F5292BA77400E677CF /* PacketTunnelProvider.swift */; };
 		7B02C7FB292BA77400E677CF /* NetworkProtectionExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 7B02C7F2292BA77300E677CF /* NetworkProtectionExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		7B02C80B292BA78300E677CF /* ErrorNotifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B02C805292BA78300E677CF /* ErrorNotifier.swift */; };
 		7B02C80C292BA78300E677CF /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B02C806292BA78300E677CF /* main.swift */; };
 		7B02C80D292BA78300E677CF /* NETunnelProviderProtocol+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B02C807292BA78300E677CF /* NETunnelProviderProtocol+Extension.swift */; };
 		7B02C80E292BA78300E677CF /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B02C808292BA78300E677CF /* Logger.swift */; };
@@ -1215,7 +1213,6 @@
 		7B02C7F5292BA77400E677CF /* PacketTunnelProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PacketTunnelProvider.swift; sourceTree = "<group>"; };
 		7B02C7F7292BA77400E677CF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7B02C7F8292BA77400E677CF /* NetworkProtectionExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = NetworkProtectionExtension.entitlements; sourceTree = "<group>"; };
-		7B02C805292BA78300E677CF /* ErrorNotifier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ErrorNotifier.swift; sourceTree = "<group>"; };
 		7B02C806292BA78300E677CF /* main.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		7B02C807292BA78300E677CF /* NETunnelProviderProtocol+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NETunnelProviderProtocol+Extension.swift"; sourceTree = "<group>"; };
 		7B02C808292BA78300E677CF /* Logger.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
@@ -2529,7 +2526,6 @@
 		7B02C7D1292BA61A00E677CF /* NetworkProtectionExtension */ = {
 			isa = PBXGroup;
 			children = (
-				7B02C805292BA78300E677CF /* ErrorNotifier.swift */,
 				7B02C80A292BA78300E677CF /* FileManager+Extension.swift */,
 				7B02C808292BA78300E677CF /* Logger.swift */,
 				7B02C806292BA78300E677CF /* main.swift */,
@@ -4703,11 +4699,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				7B02C80E292BA78300E677CF /* Logger.swift in Sources */,
-				7B02C80B292BA78300E677CF /* ErrorNotifier.swift in Sources */,
 				7B02C813292BA79700E677CF /* TunnelConfiguration+WgQuickConfig.swift in Sources */,
 				7B02C80F292BA78300E677CF /* PacketTunnelProvider.swift in Sources */,
 				7B02C80D292BA78300E677CF /* NETunnelProviderProtocol+Extension.swift in Sources */,
-				7B02C7F6292BA77400E677CF /* PacketTunnelProvider.swift in Sources */,
 				7B02C811292BA79000E677CF /* Keychain.swift in Sources */,
 				7B02C810292BA78300E677CF /* FileManager+Extension.swift in Sources */,
 				7B02C80C292BA78300E677CF /* main.swift in Sources */,

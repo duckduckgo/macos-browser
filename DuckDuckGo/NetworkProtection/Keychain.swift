@@ -1,10 +1,3 @@
-//
-//  NetworkProtection.swift
-//  NetworkProtection
-//
-//  Added by Diego Rey Mendez on 03/11/22.
-//
-
 // SPDX-License-Identifier: MIT
 // Copyright © 2018-2021 WireGuard LLC. All Rights Reserved.
 

@@ -1,8 +1,19 @@
 //
-//  NetworkProtection.swift
-//  NetworkProtection
+//  NSImage+NetworkProtection.swift
 //
-//  Created by Diego Rey Mendez on 03/11/22.
+//  Copyright © 2022 DuckDuckGo. All rights reserved.
+//
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+//
+//  http://www.apache.org/licenses/LICENSE-2.0
+//
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
 //
 
 import SwiftUI
@@ -13,8 +24,10 @@ extension NETunnelProviderProtocol {
     convenience init?(tunnelConfiguration: TunnelConfiguration, previouslyFrom old: NEVPNProtocol? = nil) {
         self.init()
 
-        guard let name = tunnelConfiguration.name else { return nil }
-        //guard let appId = Bundle.main.bundleIdentifier else { return nil }
+        guard let name = tunnelConfiguration.name else {
+            return nil
+        }
+
         providerBundleIdentifier = "com.duckduckgo.network.protection.network-extension"
         passwordReference = Keychain.makeReference(containing: tunnelConfiguration.asWgQuickConfig(), called: name, previouslyReferencedBy: old?.passwordReference)
         if passwordReference == nil {
@@ -33,17 +46,6 @@ extension NETunnelProviderProtocol {
             serverAddress = "Multiple endpoints"
         }
     }
-/*
-    func asTunnelConfiguration(called name: String? = nil) -> TunnelConfiguration? {
-        if let passwordReference = passwordReference,
-            let config = Keychain.openReference(called: passwordReference) {
-            return try? TunnelConfiguration(fromWgQuickConfig: config, called: name)
-        }
-        if let oldConfig = providerConfiguration?["WgQuickConfig"] as? String {
-            return try? TunnelConfiguration(fromWgQuickConfig: oldConfig, called: name)
-        }
-        return nil
-    }*/
 
     func destroyConfigurationReference() {
         guard let ref = passwordReference else { return }
