@@ -143,6 +143,8 @@ final class HomePageViewController: NSViewController {
             self?.bookmarkManager.remove(bookmark: bookmark)
         }, addEdit: { [weak self] bookmark in
             self?.showAddEditController(for: bookmark)
+        }, moveFavorite: { [weak self] (bookmark, index) in
+            self?.bookmarkManager.moveFavorites(with: [bookmark.id], toIndex: index) { _ in }
         })
     }
 

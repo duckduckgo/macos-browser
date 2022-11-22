@@ -76,7 +76,6 @@ class BookmarkTests: XCTestCase {
 
         managedObject.id = UUID()
         managedObject.dateAdded = NSDate.now
-        managedObject.isFavorite = false
         managedObject.titleEncrypted = title as NSString
         managedObject.urlEncrypted = url as NSURL
 
@@ -88,7 +87,6 @@ class BookmarkTests: XCTestCase {
 
         managedObject.id = UUID()
         managedObject.dateAdded = NSDate.now
-        managedObject.isFavorite = false
         managedObject.isFolder = true
         managedObject.titleEncrypted = title as NSString
 
