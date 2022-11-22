@@ -153,7 +153,14 @@ final class MoreOptionsMenu: NSMenu {
 
     @objc func toggleNetworkProtection(_ sender: NSMenuItem) {
         Task {
-            let networkProtection = await NetworkProtection()
+            let networkProtection: NetworkProtection
+
+            do {
+                networkProtection = try await NetworkProtection()
+            } catch {
+                print("🔴 Error creating the VPN tunnel: \(error)")
+                return
+            }
 
             if networkProtection.isConnected() {
                 do {

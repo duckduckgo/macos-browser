@@ -23,7 +23,7 @@ import NetworkExtension
 final class NetworkProtection: ObservableObject {
 
     private lazy var interfaceConfiguration: InterfaceConfiguration = {
-        let privateKey = PrivateKey(base64Key: "3+K8uIBcVwqqAmC5QFJg6pOCBzFFwJ3CDyqMzaPhom0=")!
+        let privateKey = PrivateKey(base64Key: "aEjzbMK7P/jzKo/hDatqn3dlvPcupT2zq45UZU25P0E=")!
         let addressRange = IPAddressRange(from: "10.64.158.41/32")! // ,fc00:bbbb:bbbb:bb01::1:9e28/128
         let dnsServerIPAddress = IPv4Address("10.64.0.1")!
         let dnsServer = DNSServer(address: dnsServerIPAddress)
@@ -55,7 +55,7 @@ final class NetworkProtection: ObservableObject {
 
     private let tunnelManager: NETunnelProviderManager
 
-    init() async {
+    init() async throws {
         if let tunnelManager = try? await NETunnelProviderManager.loadAllFromPreferences().first {
             self.tunnelManager = tunnelManager
         } else {
@@ -63,6 +63,8 @@ final class NetworkProtection: ObservableObject {
             tunnelManager.protocolConfiguration = NETunnelProviderProtocol(tunnelConfiguration: tunnelConfiguration, previouslyFrom: nil)
             tunnelManager.isEnabled = true
             tunnelManager.localizedDescription = UserText.networkProtectionTunnelName
+
+            try await tunnelManager.saveToPreferences()
         }
     }
 
