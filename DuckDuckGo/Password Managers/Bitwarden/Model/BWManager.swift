@@ -224,8 +224,13 @@ final class BWManager: BWManagement, ObservableObject {
         }
     }
 
+    private var verificationTimer: Timer?
+
     private func verifyBitwardenIsResponding() {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 5) { [weak self] in
+        verificationTimer = Timer.scheduledTimer(withTimeInterval: 5, repeats: false) { [weak self] timer in
+            self?.verificationTimer?.invalidate()
+            self?.verificationTimer = nil
+
             if (self?.status == .waitingForStatusResponse) {
                 BWNotRespondingAlert.show()
             }
@@ -515,6 +520,8 @@ final class BWManager: BWManagement, ObservableObject {
             } else {
                 stopStatusRefreshing()
             }
+            verificationTimer?.invalidate()
+            verificationTimer = nil
         }
     }
     var statusPublisher: Published<BWStatus>.Publisher { $status }
