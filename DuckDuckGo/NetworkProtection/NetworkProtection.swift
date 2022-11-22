@@ -21,9 +21,6 @@ import WireGuardKit
 import NetworkExtension
 
 final class NetworkProtection: ObservableObject {
-    enum NetworkProtectionError: Error {
-        case unexpectedNilSession
-    }
 
     private lazy var interfaceConfiguration: InterfaceConfiguration = {
         let privateKey = PrivateKey(base64Key: "3+K8uIBcVwqqAmC5QFJg6pOCBzFFwJ3CDyqMzaPhom0=")!
@@ -97,11 +94,7 @@ final class NetworkProtection: ObservableObject {
     func stop() throws {
         switch tunnelManager.connection.status {
         case .connected, .connecting, .reasserting:
-            guard let session = tunnelManager.connection as? NETunnelProviderSession else {
-                throw NetworkProtectionError.unexpectedNilSession
-            }
-
-            session.stopTunnel()
+            tunnelManager.connection.stopVPNTunnel()
         default:
             break
         }
