@@ -152,8 +152,27 @@ final class MoreOptionsMenu: NSMenu {
     }
 
     @objc func toggleNetworkProtection(_ sender: NSMenuItem) {
-        let networkProtection = NetworkProtection()
-        networkProtection.start()
+        Task {
+            let networkProtection = await NetworkProtection()
+
+            if networkProtection.isConnected() {
+                do {
+                    try networkProtection.stop()
+                } catch {
+                    // TODO: replace with proper logging or UI error handling
+                    print("🔴 Error stopping the VPN tunnel: \(error)")
+                }
+            } else {
+                Task {
+                    do {
+                        try await networkProtection.start()
+                    } catch {
+                        // TODO: replace with proper logging or UI error handling
+                        print("🔴 Error starting the VPN tunnel: \(error)")
+                    }
+                }
+            }
+        }
     }
 
     @objc func openPreferences(_ sender: NSMenuItem) {
