@@ -140,7 +140,7 @@ final class PrivacyDashboardViewController: NSViewController {
     }
 
     private func subscribeToConnectionUpgradedTo() {
-        tabViewModel?.tab.$connectionUpgradedTo
+        tabViewModel?.tab.connectionUpgradedToPublisher?
             .receive(on: DispatchQueue.main)
             .sink(receiveValue: { [weak self] connectionUpgradedTo in
                 guard let self = self else { return }

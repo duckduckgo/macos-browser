@@ -25,6 +25,12 @@ final class DistributedNavigationDelegate: NSObject {
     private var mainFrame: WKFrameInfo?
     private var mainFrameRequest: URLRequest?
 
+    override init() {
+        super.init()
+        // Fix nullable navigationAction.sourceFrame
+        WKNavigationAction.swizzleNonnullSourceFrameFix()
+    }
+
     func notifyResponders(with webView: WKWebView, do closure: (NavigationResponder, WebView) -> Void) {
         guard let webView = webView as? WebView else {
             assertionFailure("Expected WebView subclass")
@@ -68,7 +74,10 @@ final class DistributedNavigationDelegate: NSObject {
 
 }
 
+// MARK: - WebViewNavigationDelegate
 extension DistributedNavigationDelegate: WebViewNavigationDelegate {
+
+    // MARK: Expectaion
 
     func webView(_ webView: WebView, willStartNavigation navigation: WKNavigation?, with request: URLRequest) {
         notifyResponders(with: webView) { responder, webView in
@@ -115,50 +124,17 @@ extension DistributedNavigationDelegate: WebViewNavigationDelegate {
         }
     }
 
-    func webView(_ webView: WKWebView,
-                 didReceive challenge: URLAuthenticationChallenge,
-                 completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-
-        makeAsyncDecision(for: webView) { responder, webView in
-            await responder.webView(webView, didReceive: challenge)
-        } completion: { disposition in
-            disposition.pass(to: completionHandler)
-        } defaultHandler: {
-            completionHandler(.performDefaultHandling, nil)
-        }
-
-//
-//        if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodHTTPBasic,
-//           let delegate = delegate {
-//            delegate.tab(self, requestedBasicAuthenticationChallengeWith: challenge.protectionSpace, completionHandler: completionHandler)
-//            return
-//        }
-//
-//        completionHandler(.performDefaultHandling, nil)
-//        if let host = webView.url?.host, let serverTrust = challenge.protectionSpace.serverTrust, host == challenge.protectionSpace.host {
-//            self.serverTrust = ServerTrust(host: host, secTrust: serverTrust)
-//        }
-    }
-
-    @MainActor
-    func webView(_ webView: WKWebView, didReceiveServerRedirectForProvisionalNavigation navigation: WKNavigation) {
+    @objc(_webView:willPerformClientRedirectToURL:delay:)
+    func webView(_ webView: WKWebView, willPerformClientRedirectTo url: URL, delay: TimeInterval) {
         notifyResponders(with: webView) { responder, webView in
-            responder.webView(webView, didReceiveServerRedirectFor: navigation)
+            responder.webView(webView, willPerformClientRedirectTo: url, delay: delay)
         }
+        //        if case .committed = self.mainFrameLoadState {
+        //            self.clientRedirectedDuringNavigationURL = url
+        //        }
     }
 
-    @MainActor
-    func webView(_ webView: WKWebView, didCommit navigation: WKNavigation) {
-        notifyResponders(with: webView) { responder, webView, mainFrame, request in
-            responder.webView(webView, didCommitNavigationWith: request, in: mainFrame)
-        }
-
-//        isBeingRedirected = false
-//        if content.isUrl, let url = webView.url {
-//            addVisit(of: url)
-//        }
-//        webViewDidCommitNavigationPublisher.send()
-    }
+    // MARK: Decide Policy for Navigation Action
 
     func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, preferences: WKWebpagePreferences, decisionHandler: @escaping (WKNavigationActionPolicy, WKWebpagePreferences) -> Void) {
 
@@ -172,20 +148,14 @@ extension DistributedNavigationDelegate: WebViewNavigationDelegate {
             decisionHandler(decision, preferences)
         }
 
+        var navigationPreferences = NavigationPreferences(userAgent: webView.customUserAgent, preferences: preferences)
         makeAsyncDecision(for: webView) { responder, webView in
-            await responder.webView(webView, decidePolicyFor: navigationAction, preferences: preferences)
+            await responder.webView(webView, decidePolicyFor: navigationAction, preferences: &navigationPreferences)
         } completion: { (decision: NavigationActionPolicy) in
             switch decision {
-            case .allow(userAgent: let userAgent, contentMode: let contentMode, javaScriptEnabled: let jsEnabled):
-                // TODO: make this inout passed throughout all the handlers and return in the end?, maybe extend with some more properties or subclass
-                let preferences = WKWebpagePreferences()
-                preferences.preferredContentMode = contentMode
-                if #available(macOS 11.0, *) {
-                    preferences.allowsContentJavaScript = jsEnabled
-                } else {
-                    webView.configuration.preferences.javaScriptEnabled = jsEnabled
-                }
-                webView.customUserAgent = userAgent
+            case .allow:
+                navigationPreferences.export(to: preferences)
+                webView.customUserAgent = navigationPreferences.userAgent
                 decisionHandler(.allow, preferences)
             case .cancel:
                 decisionHandler(.cancel, preferences)
@@ -193,6 +163,7 @@ extension DistributedNavigationDelegate: WebViewNavigationDelegate {
                 decisionHandler(.download(navigationAction), preferences)
             case .redirect(request: let request):
                 decisionHandler(.cancel, preferences)
+                // TODO: If navigation is committed only!
                 webView.replaceLocation(with: request.url!, in: navigationAction.targetFrame ?? navigationAction.sourceFrame)
             case .retarget(in: let windowFeatures):
                 decisionHandler(.cancel, preferences)
@@ -205,84 +176,20 @@ extension DistributedNavigationDelegate: WebViewNavigationDelegate {
 
 //
 //
-//        // This check needs to happen before GPC checks. Otherwise the navigation type may be rewritten to `.other`
-//        // which would skip link rewrites.
-//        if navigationAction.navigationType != .backForward {
-//            let navigationActionPolicy = await linkProtection
-//                .requestTrackingLinkRewrite(
-//                    initiatingURL: webView.url,
-//                    navigationAction: navigationAction,
-//                    onStartExtracting: { if !isRequestingNewTab { isAMPProtectionExtracting = true }},
-//                    onFinishExtracting: { [weak self] in self?.isAMPProtectionExtracting = false },
-//                    onLinkRewrite: { [weak self] url, _ in
-//                        guard let self = self else { return }
-//                        if isRequestingNewTab || !navigationAction.isTargetingMainFrame {
-//                            self.delegate?.tab(
-//                                self,
-//                                requestedNewTabWith: .url(url),
-//                                selected: shouldSelectNewTab || !navigationAction.isTargetingMainFrame
-//                            )
-//                        } else {
-//                            webView.load(url)
-//                        }
-//                    })
-//            if let navigationActionPolicy = navigationActionPolicy, navigationActionPolicy == .cancel {
-//                return navigationActionPolicy
-//            }
-//        }
 //
 //        webView.customUserAgent = UserAgent.for(navigationAction.request.url)
 //
-//                                                if navigationAction.isTargetingMainFrame, navigationAction.request.mainDocumentURL?.host != lastUpgradedURL?.host {
-//            lastUpgradedURL = nil
-//        }
 //
+//      referrerTrimming
 //
-//        if navigationAction.isTargetingMainFrame, navigationAction.navigationType != .backForward {
-//            if let newRequest = referrerTrimming.trimReferrer(forNavigation: navigationAction,
-//                                                              originUrl: webView.url ?? navigationAction.sourceFrame.webView?.url) {
-//                if isRequestingNewTab {
-//                    delegate?.tab(
-//                        self,
-//                        requestedNewTabWith: newRequest.url.map { .contentFromURL($0) } ?? .none,
-//                        selected: shouldSelectNewTab)
-//                } else {
-//                    _ = webView.load(newRequest)
-//                }
-//                return .cancel
-//            }
-//        }
-//
-//        if navigationAction.isTargetingMainFrame {
-//            if navigationAction.navigationType == .backForward,
-//               self.webView.frozenCanGoForward != nil {
-//
-//                // Auto-cancel simulated Back action when upgrading to HTTPS or GPC from Client Redirect
-//                self.webView.frozenCanGoForward = nil
-//                self.webView.frozenCanGoBack = nil
-//
-//                return .cancel
-//
-//            } else if navigationAction.navigationType != .backForward, !isRequestingNewTab,
-//                      let request = GPCRequestFactory.shared.requestForGPC(basedOn: navigationAction.request) {
-//                self.invalidateBackItemIfNeeded(for: navigationAction)
-//                defer {
-//                    _ = webView.load(request)
-//                }
-//                return .cancel
-//            }
-//        }
+        // GPC
 //
 //        if navigationAction.isTargetingMainFrame {
 //            if navigationAction.request.url != currentDownload || navigationAction.isUserInitiated {
 //                currentDownload = nil
 //            }
-//            if navigationAction.request.url != self.clientRedirectedDuringNavigationURL {
-//                self.clientRedirectedDuringNavigationURL = nil
-//            }
 //        }
 //
-//        self.resetConnectionUpgradedTo(navigationAction: navigationAction)
 //
 //        if isRequestingNewTab {
 //            defer {
@@ -321,20 +228,8 @@ extension DistributedNavigationDelegate: WebViewNavigationDelegate {
 //            return .cancel
 //        }
 //
-//        if navigationAction.isTargetingMainFrame {
-//            let result = await PrivacyFeatures.httpsUpgrade.upgrade(url: url)
-//            switch result {
-//            case let .success(upgradedURL):
-//                if lastUpgradedURL != upgradedURL {
-//                    urlDidUpgrade(upgradedURL, navigationAction: navigationAction)
-//                    return .cancel
-//                }
-//            case .failure:
-//                if !url.isDuckDuckGo {
-//                    await prepareForContentBlocking()
-//                }
-//            }
-//        }
+        // httpsUpgrade
+        // prepare for content blocking
 //
 //        if navigationAction.isTargetingMainFrame,
 //           navigationAction.request.url?.isDuckDuckGo == true,
@@ -353,13 +248,40 @@ extension DistributedNavigationDelegate: WebViewNavigationDelegate {
 //        return .allow
     }
 
-//    private func urlDidUpgrade(_ upgradedURL: URL,
-//                               navigationAction: WKNavigationAction) {
-//        lastUpgradedURL = upgradedURL
-//        invalidateBackItemIfNeeded(for: navigationAction)
-//        webView.load(upgradedURL)
-//        setConnectionUpgradedTo(upgradedURL, navigationAction: navigationAction)
-//    }
+    // MARK: Navigation
+
+    func webView(_ webView: WKWebView,
+                 didReceive challenge: URLAuthenticationChallenge,
+                 completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+
+        makeAsyncDecision(for: webView) { responder, webView in
+            await responder.webView(webView, didReceive: challenge)
+        } completion: { disposition in
+            disposition.pass(to: completionHandler)
+        } defaultHandler: {
+            completionHandler(.performDefaultHandling, nil)
+        }
+
+        //
+        //        if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodHTTPBasic,
+        //           let delegate = delegate {
+        //            delegate.tab(self, requestedBasicAuthenticationChallengeWith: challenge.protectionSpace, completionHandler: completionHandler)
+        //            return
+        //        }
+        //
+        //        completionHandler(.performDefaultHandling, nil)
+        //        if let host = webView.url?.host, let serverTrust = challenge.protectionSpace.serverTrust, host == challenge.protectionSpace.host {
+        //            self.serverTrust = ServerTrust(host: host, secTrust: serverTrust)
+        //        }
+    }
+
+    @MainActor
+    func webView(_ webView: WKWebView, didReceiveServerRedirectForProvisionalNavigation navigation: WKNavigation) {
+        notifyResponders(with: webView) { responder, webView in
+            responder.webView(webView, didReceiveServerRedirectFor: navigation)
+        }
+    }
+
 
 //    @MainActor
 //    private func prepareForContentBlocking() async {
@@ -386,18 +308,6 @@ extension DistributedNavigationDelegate: WebViewNavigationDelegate {
 //
 //        self.externalSchemeOpenedPerPageLoad = false
 //        delegate?.tabWillStartNavigation(self, isUserInitiated: navigationAction.isUserInitiated)
-//    }
-
-//    private func invalidateBackItemIfNeeded(for navigationAction: WKNavigationAction) {
-//        guard let url = navigationAction.request.url,
-//              url == self.clientRedirectedDuringNavigationURL
-//        else { return }
-//
-//        // Cancelled & Upgraded Client Redirect URL leaves wrong backForwardList record
-//        // https://app.asana.com/0/inbox/1199237043628108/1201280322539473/1201353436736961
-//        self.webView.goBack()
-//        self.webView.frozenCanGoBack = self.webView.canGoBack
-//        self.webView.frozenCanGoForward = false
 //    }
 
     func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
@@ -441,6 +351,9 @@ extension DistributedNavigationDelegate: WebViewNavigationDelegate {
         notifyResponders(with: webView) { responder, webView in
             responder.webView(webView, didStartNavigationWith: request, in: mainFrame)
         }
+        notifyResponders(with: webView) { responder, webView in
+            responder.webView(webView, didStart: navigation, with: request)
+        }
 
 //        delegate?.tabDidStartNavigation(self)
 //
@@ -449,9 +362,53 @@ extension DistributedNavigationDelegate: WebViewNavigationDelegate {
 //
 //        invalidateSessionStateData()
 //        resetDashboardInfo()
-//        linkProtection.cancelOngoingExtraction()
-//        linkProtection.setMainFrameUrl(webView.url)
-//        referrerTrimming.onBeginNavigation(to: webView.url)
+    }
+
+    @objc(_webView:didStartProvisionalLoadWithRequest:inFrame:)
+    func webView(_ webView: WKWebView, didStartProvisionalLoadWith request: URLRequest, in frame: WKFrameInfo) {
+        // main frame events are handled in didStartProvisionalNavigation:
+        guard !frame.isMainFrame
+                || mainFrame == nil // initial navigation happens without decidePolicyForNavigationAction
+        else { return }
+        if frame.isMainFrame {
+            self.mainFrame = frame
+            self.mainFrameRequest = request
+        }
+
+        notifyResponders(with: webView) { responder, webView in
+            responder.webView(webView, didStartNavigationWith: request, in: frame)
+        }
+    }
+
+    @MainActor
+    func webView(_ webView: WKWebView, didCommit navigation: WKNavigation) {
+        notifyResponders(with: webView) { responder, webView, mainFrame, request in
+            responder.webView(webView, didCommit: navigation, with: request)
+        }
+        notifyResponders(with: webView) { responder, webView, mainFrame, request in
+            responder.webView(webView, didCommitNavigationWith: request, in: mainFrame)
+        }
+
+        //        if content.isUrl, let url = webView.url {
+        //            addVisit(of: url)
+        //        }
+        //        webViewDidCommitNavigationPublisher.send()
+    }
+
+    @MainActor
+    func webView(_ webView: WKWebView, backForwardListItemAdded itemAdded: WKBackForwardListItem, itemsRemoved: [WKBackForwardListItem]) {
+        notifyResponders(with: webView) { responder, webView in
+            responder.webView(webView, backForwardListItemAdded: itemAdded, itemsRemoved: itemsRemoved)
+        }
+    }
+
+    @objc(_webView:didCommitLoadWithRequest:inFrame:)
+    func webView(_ webView: WKWebView, didCommitLoadWith request: URLRequest, in frame: WKFrameInfo) {
+        // main frame events are handled in didCommitNavigation:
+        guard !frame.isMainFrame else { return }
+        notifyResponders(with: webView) { responder, webView in
+            responder.webView(webView, didCommitNavigationWith: request, in: frame)
+        }
     }
 
     @MainActor
@@ -459,36 +416,57 @@ extension DistributedNavigationDelegate: WebViewNavigationDelegate {
         notifyResponders(with: webView) { responder, webView, mainFrame, request in
             responder.webView(webView, didFinishNavigationWith: request, in: mainFrame)
         }
+        notifyResponders(with: webView) { responder, webView, mainFrame, request in
+            responder.webView(webView, didFinish: navigation, with: request)
+        }
 
-//        isBeingRedirected = false
 //        invalidateSessionStateData()
-//        webViewDidFinishNavigationPublisher.send()
-//        if isAMPProtectionExtracting { isAMPProtectionExtracting = false }
-//        linkProtection.setMainFrameUrl(nil)
-//        referrerTrimming.onFinishNavigation()
     }
+
+    @objc(_webView:didFinishLoadWithRequest:inFrame:)
+    func webView(_ webView: WKWebView, didFinishLoadWith request: URLRequest, in frame: WKFrameInfo) {
+        // main frame events are handled in didCommitNavigation:
+        guard !frame.isMainFrame else { return }
+        notifyResponders(with: webView) { responder, webView in
+            responder.webView(webView, didFinishNavigationWith: request, in: frame)
+        }
+//        StatisticsLoader.shared.refreshRetentionAtb(isSearch: request.url?.isDuckDuckGoSearch == true)
+    }
+
 
     @MainActor
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation, withError error: Error) {
         notifyResponders(with: webView) { responder, webView, mainFrame, request in
             responder.webView(webView, navigationWith: request, in: mainFrame, didFailWith: error)
         }
+        notifyResponders(with: webView) { responder, webView, mainFrame, request in
+            responder.webView(webView, navigation: navigation, with: request, didFailWith: error)
+        }
 
         // Failing not captured. Seems the method is called after calling the webview's method goBack()
         // https://app.asana.com/0/1199230911884351/1200381133504356/f
         //        hasError = true
 
-//        isBeingRedirected = false
 //        invalidateSessionStateData()
-//        linkProtection.setMainFrameUrl(nil)
-//        referrerTrimming.onFailedNavigation()
 //        webViewDidFailNavigationPublisher.send()
+    }
+
+    @objc(_webView:didFailLoadWithRequest:inFrame:withError:)
+    func webView(_ webView: WKWebView, didFailLoadWith request: URLRequest, in frame: WKFrameInfo, with error: Error) {
+        // main frame events are handled in didFailNavigation:
+        guard !frame.isMainFrame else { return }
+        notifyResponders(with: webView) { responder, webView in
+            responder.webView(webView, navigationWith: request, in: frame, didFailWith: error)
+        }
     }
 
     @MainActor
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation, withError error: Error) {
         notifyResponders(with: webView) { responder, webView, mainFrame, request in
             responder.webView(webView, navigationWith: request, in: mainFrame, didFailWith: error)
+        }
+        notifyResponders(with: webView) { responder, webView, mainFrame, request in
+            responder.webView(webView, navigation: navigation, with: request, didFailWith: error)
         }
 
 //        switch error {
@@ -500,73 +478,21 @@ extension DistributedNavigationDelegate: WebViewNavigationDelegate {
 //        }
 //
 //        self.error = error
-//        isBeingRedirected = false
-//        linkProtection.setMainFrameUrl(nil)
-//        referrerTrimming.onFailedNavigation()
 //        webViewDidFailNavigationPublisher.send()
-    }
-
-    @objc(_webView:willPerformClientRedirectToURL:delay:)
-    func webView(_ webView: WKWebView, willPerformClientRedirectTo url: URL, delay: TimeInterval) {
-        notifyResponders(with: webView) { responder, webView in
-            responder.webView(webView, willPerformClientRedirectTo: url, delay: delay)
-        }
-        //        if case .committed = self.mainFrameLoadState {
-        //            self.clientRedirectedDuringNavigationURL = url
-        //        }
-    }
-//_webView:navigationDidFinishDocumentLoad:
-//_webView:renderingProgressDidChange:
-//_webView:contentRuleListWithIdentifier:performedAction:forURL:
-    @objc(_webView:didStartProvisionalLoadWithRequest:inFrame:)
-    func webView(_ webView: WKWebView, didStartProvisionalLoadWith request: URLRequest, in frame: WKFrameInfo) {
-        guard !frame.isMainFrame
-                || mainFrame == nil // initial navigation happens without decidePolicyForNavigationAction
-        else { return }
-        if frame.isMainFrame {
-            self.mainFrame = frame
-            self.mainFrameRequest = request
-        }
-        notifyResponders(with: webView) { responder, webView in
-            responder.webView(webView, didStartNavigationWith: request, in: frame)
-        }
-//        self.mainFrameLoadState = .provisional
-    }
-
-    @objc(_webView:didCommitLoadWithRequest:inFrame:)
-    func webView(_ webView: WKWebView, didCommitLoadWith request: URLRequest, in frame: WKFrameInfo) {
-        guard !frame.isMainFrame else { return }
-        notifyResponders(with: webView) { responder, webView in
-            responder.webView(webView, didCommitNavigationWith: request, in: frame)
-        }
-//        guard frame.isMainFrame else { return }
-//        self.mainFrameLoadState = .committed
-    }
-
-    @objc(_webView:didFinishLoadWithRequest:inFrame:)
-    func webView(_ webView: WKWebView, didFinishLoadWith request: URLRequest, in frame: WKFrameInfo) {
-        guard !frame.isMainFrame else { return }
-        notifyResponders(with: webView) { responder, webView in
-            responder.webView(webView, didFinishNavigationWith: request, in: frame)
-        }
-//        StatisticsLoader.shared.refreshRetentionAtb(isSearch: request.url?.isDuckDuckGoSearch == true)
-    }
-
-    @objc(_webView:didFailLoadWithRequest:inFrame:withError:)
-    func webView(_ webView: WKWebView, didFailLoadWith request: URLRequest, in frame: WKFrameInfo, with error: Error) {
-        guard !frame.isMainFrame else { return }
-        notifyResponders(with: webView) { responder, webView in
-            responder.webView(webView, navigationWith: request, in: frame, didFailWith: error)
-        }
     }
 
     @objc(_webView:didFailProvisionalLoadWithRequest:inFrame:withError:)
     func webView(_ webView: WKWebView, didFailProvisionalLoadWith request: URLRequest, in frame: WKFrameInfo, with error: Error) {
+        // main frame events are handled in didFailProvisionalNavigation:
         guard !frame.isMainFrame else { return }
         notifyResponders(with: webView) { responder, webView in
             responder.webView(webView, navigationWith: request, in: frame, didFailWith: error)
         }
     }
+
+//_webView:navigationDidFinishDocumentLoad:
+//_webView:renderingProgressDidChange:
+//_webView:contentRuleListWithIdentifier:performedAction:forURL:
 
     @MainActor
     @available(macOS 11.3, *)
@@ -593,7 +519,7 @@ extension DistributedNavigationDelegate: WebViewNavigationDelegate {
         notifyResponders(with: webView) { responder, webView in
             responder.webView(webView, webContentProcessDidTerminateWith: nil)
         }
-//        Pixel.fire(.debug(event: .webKitDidTerminate))
+        Pixel.fire(.debug(event: .webKitDidTerminate))
     }
 
     @objc(_webView:webContentProcessDidTerminateWithReason:)

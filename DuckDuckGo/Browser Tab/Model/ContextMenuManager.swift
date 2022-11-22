@@ -412,7 +412,7 @@ private extension ContextMenuManager {
 // MARK: - NavigationResponder
 extension ContextMenuManager: NavigationResponder {
 
-    func webView(_ webView: WebView, decidePolicyFor navigationAction: WKNavigationAction, preferences: WKWebpagePreferences) async -> NavigationActionPolicy? {
+    func webView(_ webView: WebView, decidePolicyFor navigationAction: WKNavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
         self.onNavigation?(webView, navigationAction)
     }
 

@@ -44,9 +44,7 @@ extension AuthChallengeDisposition? {
 }
 
 enum NavigationActionPolicy {
-    case allow(userAgent: String? = nil,
-               contentMode: WKWebpagePreferences.ContentMode = .recommended,
-               javaScriptEnabled: Bool = true)
+    case allow
     case cancel
     case download
     // TODO: maybe URL instead? what about POST?
@@ -56,6 +54,37 @@ enum NavigationActionPolicy {
 
     static func redirect(to url: URL) -> NavigationActionPolicy {
         return .redirect(request: URLRequest(url: url))
+    }
+}
+
+struct NavigationPreferences {
+    var userAgent: String?
+    var contentMode: WKWebpagePreferences.ContentMode
+    private var _javaScriptEnabled: Bool
+    @available(macOS 11.0, *)
+    var javaScriptEnabled: Bool {
+        get {
+            _javaScriptEnabled
+        }
+        set {
+            _javaScriptEnabled = newValue
+        }
+    }
+
+    init(userAgent: String?, preferences: WKWebpagePreferences) {
+        self.contentMode = preferences.preferredContentMode
+        if #available(macOS 11.0, *) {
+            self._javaScriptEnabled = preferences.allowsContentJavaScript
+        } else {
+            self._javaScriptEnabled = true
+        }
+    }
+
+    func export(to preferences: WKWebpagePreferences) {
+        preferences.preferredContentMode = contentMode
+        if #available(macOS 11.0, *) {
+            preferences.allowsContentJavaScript = javaScriptEnabled
+        }
     }
 }
 
@@ -106,7 +135,7 @@ protocol NavigationResponder: AnyObject {
 
     /// Decides whether to allow or cancel a navigation.
     @MainActor
-    func webView(_ webView: WebView, decidePolicyFor navigationAction: WKNavigationAction, preferences: WKWebpagePreferences) async -> NavigationActionPolicy?
+    func webView(_ webView: WebView, decidePolicyFor navigationAction: WKNavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy?
 
     // MARK: Navigation
 
@@ -122,12 +151,25 @@ protocol NavigationResponder: AnyObject {
     func webView(_ webView: WebView, didReceiveServerRedirectFor navigation: WKNavigation)
 
     @MainActor
+    func webView(_ webView: WebView, didStart navigation: WKNavigation, with request: URLRequest)
+    @MainActor
     func webView(_ webView: WebView, didStartNavigationWith request: URLRequest, in frame: WKFrameInfo)
+
+    @MainActor
+    func webView(_ webView: WebView, didCommit navigation: WKNavigation, with request: URLRequest)
     @MainActor
     func webView(_ webView: WebView, didCommitNavigationWith request: URLRequest, in frame: WKFrameInfo)
 
     @MainActor
+    func webView(_ webView: WebView, backForwardListItemAdded itemAdded: WKBackForwardListItem, itemsRemoved: [WKBackForwardListItem])
+
+    @MainActor
+    func webView(_ webView: WebView, didFinish navigation: WKNavigation, with request: URLRequest)
+    @MainActor
     func webView(_ webView: WebView, didFinishNavigationWith request: URLRequest, in frame: WKFrameInfo)
+
+    @MainActor
+    func webView(_ webView: WebView, navigation: WKNavigation, with request: URLRequest, didFailWith error: Error)
     @MainActor
     func webView(_ webView: WebView, navigationWith request: URLRequest, in frame: WKFrameInfo, didFailWith error: Error)
 
@@ -176,7 +218,7 @@ extension NavigationResponder {
     func webView(_ webView: WebView, willRequestNewWebViewFor url: URL, inTargetNamed target: TargetWindowName?, windowFeatures: WindowFeatures?) {}
     func webViewWillRestoreSessionState(_ webView: WebView) {}
 
-    func webView(_: WebView, decidePolicyFor _: WKNavigationAction, preferences: WKWebpagePreferences) async -> NavigationActionPolicy? {
+    func webView(_: WebView, decidePolicyFor _: WKNavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
         return .next
     }
 
@@ -191,10 +233,18 @@ extension NavigationResponder {
     }
 
     func webView(_ webView: WebView, didStartNavigationWith request: URLRequest, in frame: WKFrameInfo) {}
+    func webView(_ webView: WebView, didStart navigation: WKNavigation, with request: URLRequest) {}
+
     func webView(_ webView: WebView, didCommitNavigationWith request: URLRequest, in frame: WKFrameInfo) {}
+    func webView(_ webView: WebView, didCommit navigation: WKNavigation, with request: URLRequest) {}
+
+    func webView(_ webView: WebView, backForwardListItemAdded itemAdded: WKBackForwardListItem, itemsRemoved: [WKBackForwardListItem]) {}
 
     func webView(_ webView: WebView, didFinishNavigationWith request: URLRequest, in frame: WKFrameInfo) {}
+    func webView(_ webView: WebView, didFinish navigation: WKNavigation, with request: URLRequest) {}
+
     func webView(_ webView: WebView, navigationWith request: URLRequest, in frame: WKFrameInfo, didFailWith: Error) {}
+    func webView(_ webView: WebView, navigation: WKNavigation, with request: URLRequest, didFailWith error: Error) {}
 
     func webView(_ webView: WebView, willPerformClientRedirectTo url: URL, delay: TimeInterval) {}
 

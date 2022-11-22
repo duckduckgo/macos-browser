@@ -235,11 +235,7 @@ final class AddressBarTextField: NSTextField {
         suggestionContainerViewModel?.clearUserStringValue()
 
         let suggestion = suggestionContainerViewModel?.selectedSuggestionViewModel?.suggestion
-        if NSApp.isCommandPressed {
-            openNewTab(selected: NSApp.isShiftPressed, suggestion: suggestion)
-        } else {
-            navigate(suggestion: suggestion)
-        }
+        navigate(suggestion: suggestion)
 
         hideSuggestionWindow()
     }
@@ -249,6 +245,12 @@ final class AddressBarTextField: NSTextField {
         updateTabUrl(suggestion: suggestion)
 
         currentEditor()?.selectAll(self)
+    }
+
+    // TODO: Check for UI Glitch when URL Upgrade is done
+    private func updateTabUrl(suggestion: Suggestion?) {
+        guard let url = makeUrl(suggestion: suggestion, stringValueWithoutSuffix: stringValueWithoutSuffix) else { return }
+        updateTabUrlWithUrl(url, suggestion: suggestion)
     }
 
     private func updateTabUrlWithUrl(_ providedUrl: URL, suggestion: Suggestion?) {
@@ -273,82 +275,21 @@ final class AddressBarTextField: NSTextField {
             }
         }
 
-        if selectedTabViewModel.tab.content.url == url {
-            selectedTabViewModel.reload()
-        } else {
-            selectedTabViewModel.tab.update(url: url)
-        }
-
+        selectedTabViewModel.tab.update(url: url)
         self.window?.makeFirstResponder(nil)
     }
 
-    private func updateTabUrl(suggestion: Suggestion?) {
-        makeUrl(suggestion: suggestion,
-                stringValueWithoutSuffix: stringValueWithoutSuffix,
-                completion: { [weak self] url, isUpgraded in
-            guard let url = url else { return }
-
-            if isUpgraded { self?.updateTabUpgradedToUrl(url) }
-            self?.updateTabUrlWithUrl(url, suggestion: suggestion)
-        })
-    }
-
-    private func updateTabUpgradedToUrl(_ url: URL?) {
-        if url == nil { return }
-        let tab = tabCollectionViewModel.selectedTabViewModel?.tab
-        tab?.setMainFrameConnectionUpgradedTo(url)
-    }
-
-    private func openNewTabWithUrl(_ providedUrl: URL?, selected: Bool, suggestion: Suggestion?) {
-        guard let url = providedUrl else {
-            os_log("%s: Making url from address bar string failed", type: .error, className)
-            return
-        }
-
-        let tab = Tab(content: .url(url), shouldLoadInBackground: true)
-        tabCollectionViewModel.append(tab: tab, selected: selected)
-    }
-
-    private func openNewTab(selected: Bool, suggestion: Suggestion?) {
-        makeUrl(suggestion: suggestion,
-                stringValueWithoutSuffix: stringValueWithoutSuffix,
-                completion: { [weak self] url, isUpgraded in
-                    if isUpgraded { self?.updateTabUpgradedToUrl(url) }
-                    self?.openNewTabWithUrl(url, selected: selected, suggestion: suggestion)
-                })
-    }
-
-    private func makeUrl(suggestion: Suggestion?, stringValueWithoutSuffix: String, completion: @escaping (URL?, Bool) -> Void) {
-        let finalUrl: URL?
+    private func makeUrl(suggestion: Suggestion?, stringValueWithoutSuffix: String) -> URL? {
         switch suggestion {
         case .bookmark(title: _, url: let url, isFavorite: _, allowedInTopHits: _),
-             .historyEntry(title: _, url: let url, allowedInTopHits: _),
-             .website(url: let url):
-            finalUrl = url
+              .historyEntry(title: _, url: let url, allowedInTopHits: _),
+              .website(url: let url):
+            return url
         case .phrase(phrase: let phrase),
              .unknown(value: let phrase):
-            finalUrl = URL.makeSearchUrl(from: phrase)
+            return URL.makeSearchUrl(from: phrase)
         case .none:
-            finalUrl = URL.makeURL(from: stringValueWithoutSuffix)
-        }
-
-        guard let url = finalUrl else {
-            completion(finalUrl, false)
-            return
-        }
-
-        upgradeToHttps(url: url, completion: completion)
-    }
-    
-    private func upgradeToHttps(url: URL, completion: @escaping (URL?, Bool) -> Void) {
-        Task {
-            let result = await PrivacyFeatures.httpsUpgrade.upgrade(url: url)
-            switch result {
-            case let .success(upgradedUrl):
-                completion(upgradedUrl, true)
-            case .failure:
-                completion(url, false)
-            }
+            return URL.makeURL(from: stringValueWithoutSuffix)
         }
     }
 
@@ -824,10 +765,6 @@ extension AddressBarTextField: SuggestionViewControllerDelegate {
 
     func suggestionViewControllerDidConfirmSelection(_ suggestionViewController: SuggestionViewController) {
         let suggestion = suggestionContainerViewModel?.selectedSuggestionViewModel?.suggestion
-        if NSApp.isCommandPressed {
-            openNewTab(selected: NSApp.isShiftPressed, suggestion: suggestion)
-            return
-        }
         navigate(suggestion: suggestion)
     }
 

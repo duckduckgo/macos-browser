@@ -86,19 +86,7 @@ final class WebView: WKWebView {
         backForwardList.forwardItem.flatMap { self.go(to: $0) }
     }
 
-    // TODO: Stop navigation calls delegate failure method?
-
-    // TODO: Move to Tab Extension
-    var frozenCanGoBack: Bool?
-    var frozenCanGoForward: Bool?
-
-    override var canGoBack: Bool {
-        frozenCanGoBack ?? super.canGoBack
-    }
-
-    override var canGoForward: Bool {
-        frozenCanGoForward ?? super.canGoForward
-    }
+    // TODO: stop() navigation calls delegate failure method?
 
     // MARK: - Session State Restoration
 

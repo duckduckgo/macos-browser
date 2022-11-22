@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import BrowserServicesKit
 import Foundation
 
 struct TabExtensions {
@@ -25,6 +26,9 @@ struct TabExtensions {
     let printing: TabPrintExtension?
     let navigations: TabNavigationsProtocol
     let navigationDelegate: DistributedNavigationDelegate
+    let linkProtection: LinkProtectionExtension?
+    let referrerTrimming: ReferrerTrimming?
+    let httpsUpgrade: HTTPSUpgradeTabExtension?
 
     @Injected(forTests: defaultExtensionsForTests)
     static var buildForTab: (Tab) -> TabExtensions = { tab in
@@ -32,7 +36,10 @@ struct TabExtensions {
                              contextMenu: ContextMenuManager(tab: tab),
                              printing: TabPrintExtension(tab: tab),
                              navigations: TabNavigations(),
-                             navigationDelegate: DistributedNavigationDelegate())
+                             navigationDelegate: DistributedNavigationDelegate(),
+                             linkProtection: LinkProtectionExtension(),
+                             referrerTrimming: ReferrerTrimming(),
+                             httpsUpgrade: HTTPSUpgradeTabExtension())
     }
 
     private static func defaultExtensionsForTests(_ tab: Tab) -> TabExtensions {
@@ -40,7 +47,10 @@ struct TabExtensions {
                              contextMenu: nil,
                              printing: nil,
                              navigations: TabNavigations(),
-                             navigationDelegate: DistributedNavigationDelegate())
+                             navigationDelegate: DistributedNavigationDelegate(),
+                             linkProtection: nil,
+                             referrerTrimming: nil,
+                             httpsUpgrade: nil)
     }
 
 }

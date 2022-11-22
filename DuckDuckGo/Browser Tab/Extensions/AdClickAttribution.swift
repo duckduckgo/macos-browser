@@ -130,8 +130,7 @@ extension AdClickAttributionTabExtension: NavigationResponder {
         self.logic.onBackForwardNavigation(mainFrameURL: backForwardListItem.url)
     }
 
-    func webView(_ webView: WebView, didStartNavigationWith request: URLRequest, in frame: WKFrameInfo) {
-        guard frame.isMainFrame else { return }
+    func webView(_ webView: WebView, didStart navigation: WKNavigation, with request: URLRequest) {
         self.detection.onStartNavigation(url: webView.url)
     }
 
@@ -144,14 +143,12 @@ extension AdClickAttributionTabExtension: NavigationResponder {
         return .next
     }
 
-    func webView(_ webView: WebView, didFinishNavigationWith request: URLRequest, in frame: WKFrameInfo) {
-        guard frame.isMainFrame else { return }
+    func webView(_ webView: WebView, didFinish navigation: WKNavigation, with request: URLRequest) {
         self.detection.onDidFinishNavigation(url: webView.url)
         self.logic.onDidFinishNavigation(host: webView.url?.host)
     }
 
-    func webView(_ webView: WebView, navigationWith request: URLRequest, in frame: WKFrameInfo, didFailWith error: Error) {
-        guard frame.isMainFrame else { return }
+    func webView(_ webView: WebView, navigation: WKNavigation, with request: URLRequest, didFailWith error: Error) {
         self.detection.onDidFailNavigation()
     }
 

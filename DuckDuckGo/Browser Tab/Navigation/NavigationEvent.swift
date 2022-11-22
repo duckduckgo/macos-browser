@@ -29,7 +29,7 @@ enum NavigationEvent {
     case willRequestNewWebView(url: URL, target: TargetWindowName?, windowFeatures: WindowFeatures?)
 
     // Decision
-    case decidePolicyForNavigationAction(WKNavigationAction, preferences: WKWebpagePreferences)
+    case decidePolicyForNavigationAction(WKNavigationAction, preferences: NavigationPreferences)
 
     // Navigation
     case didStart(URLRequest, frame: WKFrameInfo)

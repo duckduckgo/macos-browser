@@ -58,7 +58,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
         @Injected(default: .shared, .testable) static var privatePlayer: PrivatePlayer
         @Injected(default: .shared) static var cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter?
-        @Injected(default: .shared) static var workspace: NSWorkspace
     }
 
     enum TabContent: Equatable {
@@ -230,7 +229,13 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             extensions.contextMenu,
 
             LocalFileNavigationResponder(),
+
+            extensions.linkProtection,
+            extensions.referrerTrimming,
+            GlobalPrivacyControlResponder(),
+
             extensions.adClickAttribution,
+            extensions.httpsUpgrade,
             
             extensions.navigations
         )
@@ -274,14 +279,9 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     let webViewDidFinishNavigationPublisher = PassthroughSubject<Void, Never>()
     let webViewDidFailNavigationPublisher = PassthroughSubject<Void, Never>()
 
-    @MainActor
-    @Published var isAMPProtectionExtracting: Bool = false
-
     // MARK: - Properties
 
     let webView: WebView
-
-    private var lastUpgradedURL: URL?
 
     var userEnteredUrl = false
 
@@ -296,6 +296,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     @Published private(set) var content: TabContent {
         didSet {
             handleFavicon()
+            // TODO: removing this breaks navigation
             invalidateSessionStateData()
             if let oldUrl = oldValue.url {
                 Dependencies.historyCoordinating.commitChanges(url: oldUrl)
@@ -315,8 +316,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         guard contentChangeEnabled else {
             return
         }
-
-        lastUpgradedURL = nil
 
         if let newContent = Dependencies.privatePlayer.overrideContent(content, for: self) {
             self.content = newContent
@@ -368,7 +367,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             return sessionStateData
         }
 
-        guard webView.url != nil else { return nil }
+        guard webView.backForwardList.currentItem != nil else { return nil }
         // collect and cache actual SessionStateData on demand and store until invalidated
         self.sessionStateData = (try? webView.sessionStateData())
         return self.sessionStateData
@@ -380,7 +379,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             return interactionStateData
         }
 
-        guard webView.url != nil else { return nil }
+        guard webView.backForwardList.currentItem != nil else { return nil }
         
         self.interactionStateData = (webView.interactionState as? Data)
         
@@ -428,20 +427,14 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     }
 
     private let instrumentation = TabInstrumentation()
-    private enum FrameLoadState {
-        case provisional
-        case committed
-        case finished
-    }
-    private var mainFrameLoadState: FrameLoadState = .finished {
-        didSet {
-            if mainFrameLoadState == .finished {
-                setUpYoutubeScriptsIfNeeded()
-            }
-        }
-    }
-    private var clientRedirectedDuringNavigationURL: URL?
-    private var externalSchemeOpenedPerPageLoad = false
+
+//    private var mainFrameLoadState: FrameLoadState = .finished {
+//        didSet {
+//            if mainFrameLoadState == .finished {
+//                setUpYoutubeScriptsIfNeeded()
+//            }
+//        }
+//    }
 
     var canGoForward: Bool {
         webView.canGoForward
@@ -534,41 +527,13 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         extensions.contextMenu?.decideNewWindowPolicy(for: navigationAction)
     }
 
-    private static let debugEvents = EventMapping<AMPProtectionDebugEvents> { event, _, _, _ in
-        switch event {
-        case .ampBlockingRulesCompilationFailed:
-            Pixel.fire(.ampBlockingRulesCompilationFailed)
-        }
-    }
-
-    lazy var linkProtection: LinkProtection = {
-        LinkProtection(privacyManager: ContentBlocking.shared.privacyConfigurationManager,
-                       contentBlockingManager: ContentBlocking.shared.contentBlockingManager,
-                       errorReporting: Self.debugEvents)
-    }()
-    
-    lazy var referrerTrimming: ReferrerTrimming = {
-        ReferrerTrimming(privacyManager: ContentBlocking.shared.privacyConfigurationManager,
-                         contentBlockingManager: ContentBlocking.shared.contentBlockingManager,
-                         tld: ContentBlocking.shared.tld)
-    }()
-
     @MainActor
-    private func reloadIfNeeded(shouldLoadInBackground: Bool = false) async {
+    private func reloadIfNeeded(shouldLoadInBackground: Bool = false) {
         guard content.url != nil else {
             return
         }
 
-        let url: URL = await {
-            if contentURL.isFileURL {
-                return contentURL
-            }
-            return await linkProtection.getCleanURL(from: contentURL, onStartExtracting: {
-                isAMPProtectionExtracting = true
-            }, onFinishExtracting: { [weak self]
-                in self?.isAMPProtectionExtracting = false
-            })
-        }()
+        let url = contentURL
         if shouldLoadURL(url, shouldLoadInBackground: shouldLoadInBackground) {
             let didRestore: Bool
             
@@ -858,7 +823,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
     @Published private(set) var trackerInfo: TrackerInfo?
     @Published private(set) var serverTrust: ServerTrust?
-    @Published private(set) var connectionUpgradedTo: URL?
     @Published private(set) var cookieConsentManaged: CookieConsentInfo?
 
     private func resetDashboardInfo() {
@@ -866,22 +830,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         if self.serverTrust?.host != content.url?.host {
             serverTrust = nil
         }
-    }
-
-    private func resetConnectionUpgradedTo(navigationAction: WKNavigationAction) {
-        let isOnUpgradedPage = navigationAction.request.url == connectionUpgradedTo
-        if !navigationAction.isTargetingMainFrame || isOnUpgradedPage { return }
-        connectionUpgradedTo = nil
-    }
-
-    private func setConnectionUpgradedTo(_ upgradedUrl: URL, navigationAction: WKNavigationAction) {
-        if !navigationAction.isTargetingMainFrame { return }
-        connectionUpgradedTo = upgradedUrl
-    }
-
-    public func setMainFrameConnectionUpgradedTo(_ upgradedUrl: URL?) {
-        if upgradedUrl == nil { return }
-        connectionUpgradedTo = upgradedUrl
     }
 
     // MARK: - Printing

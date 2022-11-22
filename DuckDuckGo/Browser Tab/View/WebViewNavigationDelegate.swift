@@ -59,6 +59,9 @@ enum CreateWebViewDecision {
     @objc(_webView:didCommitLoadWithRequest:inFrame:)
     optional func webView(_ webView: WKWebView, didCommitLoadWith request: URLRequest, in frame: WKFrameInfo)
 
+    @objc(_webView:backForwardListItemAdded:removed:)
+    optional func webView(_ webView: WKWebView, backForwardListItemAdded itemAdded: WKBackForwardListItem, itemsRemoved: [WKBackForwardListItem])
+
     @objc(_webView:willPerformClientRedirectToURL:delay:)
     optional func webView(_ webView: WKWebView, willPerformClientRedirectTo url: URL, delay: TimeInterval)
 

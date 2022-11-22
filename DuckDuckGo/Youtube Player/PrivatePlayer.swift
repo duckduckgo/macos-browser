@@ -127,7 +127,7 @@ final class PrivatePlayer {
 
 extension PrivatePlayer: NavigationResponder {
 
-    func webView(_ webView: WebView, decidePolicyFor navigationAction: WKNavigationAction, preferences: WKWebpagePreferences) async -> NavigationActionPolicy? {
+    func webView(_ webView: WebView, decidePolicyFor navigationAction: WKNavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
 
         guard isAvailable, mode != .disabled else {
             // When the feature is disabled but the webView still gets a Private Player URL,
@@ -147,7 +147,7 @@ extension PrivatePlayer: NavigationResponder {
 
         // Always allow loading Private Player URLs (local HTML)
         if navigationAction.request.url?.isPrivatePlayerScheme == true {
-            return .allow()
+            return .allow
         }
 
         // We only care about YouTube video URLs loaded into main frame or within a Private Player

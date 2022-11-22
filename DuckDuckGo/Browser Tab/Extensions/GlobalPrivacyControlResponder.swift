@@ -1,5 +1,5 @@
 //
-//  LocalFileNavigationResponder.swift
+//  GlobalPrivacyControlResponder.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -16,16 +16,18 @@
 //  limitations under the License.
 //
 
-import WebKit
 import Foundation
+import WebKit
 
-final class LocalFileNavigationResponder: NavigationResponder {
+final class GlobalPrivacyControlResponder: NavigationResponder {
 
     func webView(_ webView: WebView, decidePolicyFor navigationAction: WKNavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
-        if navigationAction.request.url?.isFileURL == true {
-            return .allow
-        }
-        return .next
+        guard navigationAction.isTargetingMainFrame,
+              navigationAction.navigationType != .backForward,
+              let request = GPCRequestFactory.shared.requestForGPC(basedOn: navigationAction.request)
+        else { return .next }
+
+        return .redirect(request: request)
     }
 
 }

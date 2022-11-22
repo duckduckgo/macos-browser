@@ -73,11 +73,11 @@ extension TabNavigations: NavigationResponder {
         expected!.append(.willRequestNewWebView(url: url, target: target, windowFeatures: windowFeatures))
     }
 
-    func webView(_ webView: WebView, decidePolicyFor navigationAction: WKNavigationAction, preferences: WKWebpagePreferences) async -> NavigationActionPolicy? {
+    func webView(_ webView: WebView, decidePolicyFor navigationAction: WKNavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
         // TODO: create if not exist; compare
         expected?.append(.decidePolicyForNavigationAction(navigationAction, preferences: preferences))
 
-        return .allow() // this should be the last one
+        return .allow // this should be the last one
     }
 
 }

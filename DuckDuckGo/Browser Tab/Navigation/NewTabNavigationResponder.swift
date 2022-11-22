@@ -25,7 +25,7 @@ final class NewTabNavigationResponder: NavigationResponder {
         @Injected static var pinnedTabsManager: PinnedTabsManager = Tab.Dependencies.pinnedTabsManager
     }
 
-    func webView(_ webView: WebView, decidePolicyFor navigationAction: WKNavigationAction, preferences: WKWebpagePreferences) async -> NavigationActionPolicy? {
+    func webView(_ webView: WebView, decidePolicyFor navigationAction: WKNavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
 
         let isLinkActivated = navigationAction.navigationType == .linkActivated
         let isNavigatingAwayFromPinnedTab: Bool = {
@@ -36,6 +36,7 @@ final class NewTabNavigationResponder: NavigationResponder {
 
         let isMiddleButtonClicked = navigationAction.isMiddleClick
 
+        // TODO: Fixthis in centralised decision maker
         // to be modularized later on, see https://app.asana.com/0/0/1203268245242140/f
         let isRequestingNewTab = (isLinkActivated && NSApp.isCommandPressed) || isMiddleButtonClicked || isNavigatingAwayFromPinnedTab
         let shouldSelectNewTab = NSApp.isShiftPressed || (isNavigatingAwayFromPinnedTab && !isMiddleButtonClicked && !NSApp.isCommandPressed)

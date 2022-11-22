@@ -92,7 +92,7 @@ final class TabViewModel {
         subscribeToPermissions()
         subscribeToAppearancePreferences()
         subscribeToWebViewDidFinishNavigation()
-        $isWebViewLoading.combineLatest(tab.$isAMPProtectionExtracting) { $0 || $1 }
+        $isWebViewLoading
             .assign(to: \.isLoading, onWeaklyHeld: self)
             .store(in: &cancellables)
     }
