@@ -2,7 +2,7 @@
 //  Logger.swift
 //  NetworkProtectionExtensionmacOS
 //
-//  Created by DDG on 07/11/22.
+//  Created by Diego Rey Mendez on 07/11/22.
 //
 
 import Foundation

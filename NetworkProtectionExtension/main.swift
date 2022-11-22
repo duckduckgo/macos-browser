@@ -2,7 +2,7 @@
 //  main.swift
 //  NetworkProtectionExtensionmacOS
 //
-//  Created by DDG on 04/11/22.
+//  Created by Diego Rey Mendez on 04/11/22.
 //
 
 import Foundation
