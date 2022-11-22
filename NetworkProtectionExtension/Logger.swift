@@ -8,4 +8,8 @@
 import Foundation
 import OSLog
 
-let vpnLog = OSLog(subsystem: "com.duckduckgo.network.protection.extension", category: "log")
+let vpnLog: OSLog = {
+    let subsystem = Bundle(for: PacketTunnelProvider.self).bundleIdentifier ?? "com.duckduckgo.NetworkProtectionExtension"
+
+    return OSLog(subsystem: subsystem, category: "log")
+}()
