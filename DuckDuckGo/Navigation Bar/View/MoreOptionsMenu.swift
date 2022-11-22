@@ -82,7 +82,7 @@ final class MoreOptionsMenu: NSMenu {
 
         addItem(withTitle: UserText.networkProtection, action: #selector(toggleNetworkProtection(_:)), keyEquivalent: "")
             .targetting(self)
-            .withImage(NSImage(named: "PasswordManagement"))
+            .withImage(.NetworkProtection.moreOptionsIcon)
 
         addItem(NSMenuItem.separator())
 
