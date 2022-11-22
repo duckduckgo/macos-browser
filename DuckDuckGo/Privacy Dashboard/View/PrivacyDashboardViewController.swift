@@ -52,6 +52,7 @@ final class PrivacyDashboardViewController: NSViewController {
     }
     
     public func updateTabViewModel(_ tabViewModel: TabViewModel) {
+
         privacyDashboardController.updatePrivacyInfo(tabViewModel.tab.privacyInfo)
         
         rulesUpdateObserver.updateTabViewModel(tabViewModel, onPendingUpdates: { [weak self] in
@@ -137,17 +138,17 @@ final class PrivacyDashboardViewController: NSViewController {
     }
 
     private func sendPendingUpdates() {
-        guard let domain = privacyDashboardController.privacyInfo?.url.host else {
-            assertionFailure("PrivacyDashboardViewController: no domain available")
-            return
-        }
 
-        let isPending = rulesUpdateObserver.pendingUpdates.values.contains(domain)
-        if isPending {
+        if isPendingUpdatesForCurrentDomain() {
             privacyDashboardController.didStartRulesCompilation()
         } else {
             privacyDashboardController.didFinishRulesCompilation()
         }
+    }
+    
+    private func isPendingUpdatesForCurrentDomain() -> Bool {
+        guard let domain = privacyDashboardController.privacyInfo?.url.host else { return false }
+        return rulesUpdateObserver.pendingUpdates.values.contains(domain)
     }
     
     private func onHeightChange(_ height: Int, shouldAnimate: Bool) {
