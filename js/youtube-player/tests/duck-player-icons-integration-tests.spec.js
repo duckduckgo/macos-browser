@@ -3,7 +3,7 @@ import { setupIconOverlays } from './utils.js';
 import { IconOverlayPage } from './IconOverlayPageObject.js';
 
 const setupMockIconOverlays = async (page) => {
-  return setupIconOverlays(page, '/icon-overlay-integration-test.html');
+  return setupIconOverlays(page, 'https://www.youtube.com/', true);
 }
 
 test('thumbnail hover', async ({ page }) => {

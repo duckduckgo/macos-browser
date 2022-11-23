@@ -1,5 +1,10 @@
 import * as fs from 'node:fs/promises';
 
+
+const getFileString = async (path) => {
+    return await fs.readFile(path, { encoding: 'utf-8' });
+}
+
 /**
  * Using the setupIconOverlays below, we mock icon link clicks by setting a
  * global variable ._test_clickedDuckPlayerLink. This function returns the value of
@@ -13,10 +18,6 @@ export async function getClickedDuckPlayerLink(page) {
 }
 
 export async function getDuckPlayerPage() {
-    const getFileString = async (path) => {
-        return await fs.readFile(path, { encoding: 'utf-8' });
-    }
-
     return await getFileString('../../DuckDuckGo/Youtube\ Player/Resources/youtube_player_template.html');
 };
 
@@ -27,9 +28,7 @@ export async function getDuckPlayerPage() {
  * @param {string} startURL - URL to start test from
  * @param {boolean} isLocal - whether test test is run locally
  */
-export async function setupIconOverlays(page, startURL = 'https://www.youtube.com/') {
-    const isYouTube = startURL.includes('youtube.com');
-
+export async function setupIconOverlays(page, startURL = 'https://www.youtube.com/', mock) {
     const mockWebkitMessaging = async () => {
         await page.addInitScript(() => {
             window.webkit = {
@@ -49,25 +48,16 @@ export async function setupIconOverlays(page, startURL = 'https://www.youtube.co
             };
         });
     },
-    injectIconOverlayBundle = async () => {
-        const getFileString = async (path) => {
-            return await fs.readFile(path, { encoding: 'utf-8' });
-        }
 
+    injectIconOverlayBundle = async () => {
         const injectScript = await getFileString('../../DuckDuckGo/Youtube\ Player/Resources/youtube-inject-bundle.js');
 
         // This is replaced on the native side, replace it here instead.
         let script = injectScript.replace('$WebkitMessagingConfig$', JSON.stringify({
-            hasModernWebkitAPI: true,
+            hasModernWebkitAPI: true
         }));
 
-        // Ugly way of making sure enable (which relies on the un-mockable window.location.hostname === 'youtube.com') returns true
-        // when we're not running the test on YouTube.com
-        if (!isYouTube) {
-            script = script.replace('enabled() {', 'enabled() { return true;');
-        }
-
-        await page.evaluate(script);
+        await page.evaluate(script.toString());
     },
 
     triggerDuckPlayerSettings = async () => {
@@ -82,16 +72,32 @@ export async function setupIconOverlays(page, startURL = 'https://www.youtube.co
             });
         });
     },
+
     rejectYouTubeCookies = async () => {
         await page.getByText('Reject all', { exact: true}).click();
+    },
+
+    mockYouTubeURL = async () => {
+        const duckIconOverlayMockPage = await getFileString('../../DuckDuckGo/Youtube\ Player/Resources/icon-overlay-integration-test.html');
+
+        await page.route('**/*', route => {
+            return route.fulfill({
+                status: 200,
+                body: duckIconOverlayMockPage,
+                contentType: 'text/html'
+            });
+        });
     };
 
+    if (mock) {
+        await mockYouTubeURL();
+    }
     await mockWebkitMessaging();
     await page.goto(startURL);
     await injectIconOverlayBundle();
     await triggerDuckPlayerSettings();
 
-    if (isYouTube) {
+    if (!mock) {
         await rejectYouTubeCookies();
     }
   }
