@@ -156,14 +156,23 @@ final class RecentlyVisitedSiteModel: ObservableObject {
     let maxPageListSize = 10
 
     let domain: String
-    
+
     var url: URL? {
         return baseURL ?? domain.url
     }
+
+    var domainToDisplay: String {
+        domainPlaceholder ?? domain
+    }
+
+    var isRealDomain: Bool {
+        domainPlaceholder == nil
+    }
     
     private let baseURL: URL?
+    private let domainPlaceholder: String?
+    private let privatePlayer: PrivatePlayer
 
-    @Published var isRealDomain: Bool = true
     @Published var isFavorite: Bool
     @Published var isFireproof: Bool
     @Published var blockedEntities = [String]()
@@ -177,18 +186,17 @@ final class RecentlyVisitedSiteModel: ObservableObject {
 
     init?(originalURL: URL,
           bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
-          fireproofDomains: FireproofDomains = FireproofDomains.shared) {
+          fireproofDomains: FireproofDomains = FireproofDomains.shared,
+          privatePlayer: PrivatePlayer = PrivatePlayer.shared) {
         guard let domain = originalURL.host?.droppingWwwPrefix() else {
             return nil
         }
 
-        if let privatePlayer = PrivatePlayer.shared.domainForRecentlyVisitedSite(with: originalURL) {
-            self.domain = privatePlayer
-            isRealDomain = false
-        } else {
-            self.domain = domain
-        }
-        
+        self.privatePlayer = privatePlayer
+
+        self.domain = domain
+        self.domainPlaceholder = privatePlayer.domainForRecentlyVisitedSite(with: originalURL)
+
         var components = URLComponents()
         components.scheme = originalURL.scheme
         components.host = originalURL.host
@@ -237,7 +245,7 @@ final class RecentlyVisitedSiteModel: ObservableObject {
                     urlsToRemove.append($0.url)
                 }
 
-            } else if let displayTitle = PrivatePlayer.shared.title(for: $0) {
+            } else if let displayTitle = privatePlayer.title(for: $0) {
 
                 $0.displayTitle = displayTitle
 

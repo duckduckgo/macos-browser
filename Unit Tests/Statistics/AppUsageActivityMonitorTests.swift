@@ -58,8 +58,9 @@ class AppUsageActivityMonitorTests: XCTestCase {
     // MARK: - Tests
 
     func testActivityMonitorEventsAreThrottled() {
+        pixelDataStore = PixelStoreMock()
         let mon = AppUsageActivityMonitor(delegate: self, dateProvider: self.now, storage: pixelDataStore,
-                                          throttle: 0.2, maxIdleTime: 10.0, threshold: 5.0)
+                                          throttle: 0.05, maxIdleTime: 10.0, threshold: 5.0)
 
         let e = expectation(description: "activity received")
 
@@ -77,9 +78,8 @@ class AppUsageActivityMonitorTests: XCTestCase {
         sendKeyEvent()
 
         withExtendedLifetime(mon) {
-            waitForExpectations(timeout: 5)
+            waitForExpectations(timeout: 1)
         }
-
     }
 
     func testWhenActivityMonitorReachesThresholdThenActivityCallbackIsFired() {

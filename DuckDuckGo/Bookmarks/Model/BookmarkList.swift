@@ -58,22 +58,17 @@ struct BookmarkList {
         return bookmarks
     }
 
-    init(entities: [BaseBookmarkEntity] = [], topLevelEntities: [BaseBookmarkEntity] = []) {
+    init(entities: [BaseBookmarkEntity] = [], topLevelEntities: [BaseBookmarkEntity] = [], favorites: [BaseBookmarkEntity] = []) {
         let bookmarks = entities.compactMap { $0 as? Bookmark }
         let keysOrdered = bookmarks.compactMap { IdentifiableBookmark(from: $0) }
-        var favoriteKeysOrdered = [IdentifiableBookmark]()
 
         var itemsDict = [URL: [Bookmark]]()
         
         for bookmark in bookmarks {
             itemsDict[bookmark.url] = (itemsDict[bookmark.url] ?? []) + [bookmark]
-
-            if bookmark.isFavorite {
-                favoriteKeysOrdered.append(IdentifiableBookmark(from: bookmark))
-            }
         }
         
-        self.favoriteBookmarksOrdered = favoriteKeysOrdered
+        self.favoriteBookmarksOrdered = favorites.compactMap({$0 as? Bookmark}).map(IdentifiableBookmark.init(from:))
         self.allBookmarkURLsOrdered = keysOrdered
         self.itemsDict = itemsDict
         self.topLevelEntities = topLevelEntities

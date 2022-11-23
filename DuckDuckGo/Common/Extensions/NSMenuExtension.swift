@@ -28,36 +28,18 @@ extension NSMenu {
         }
     }
 
-    func indexOfItem(withIdentifier id: String) -> Int? {
+    func index(ofItemWithIdentifier id: String) -> Int? {
         guard let item = items.first(where: { $0.identifier?.rawValue == id }) else { return nil }
         return index(of: item)
     }
 
-    func insertItemBeforeItemWithIdentifier(_ id: String, title: String, target: AnyObject?, selector: Selector) {
-        guard let index = indexOfItem(withIdentifier: id) else { return }
+    func item(with identifier: WKMenuItemIdentifier) -> NSMenuItem? {
+        return index(ofItemWithIdentifier: identifier.rawValue).map { self.items[$0] }
+    }
 
-        let newItem = NSMenuItem()
-        newItem.title = title
-        newItem.action = selector
-        newItem.target = target
-
+    func replaceItem(at index: Int, with newItem: NSMenuItem) {
+        removeItem(at: index)
         insertItem(newItem, at: index)
-    }
-
-    func insertItemAfterItemWithIdentifier(_ id: String, title: String, target: AnyObject?, selector: Selector) {
-        guard let index = indexOfItem(withIdentifier: id) else { return }
-
-        let newItem = NSMenuItem()
-        newItem.title = title
-        newItem.action = selector
-        newItem.target = target
-
-        insertItem(newItem, at: index + 1)
-    }
-
-    func insertSeparatorBeforeItemWithIdentifier(_ id: String) {
-        guard let index = indexOfItem(withIdentifier: id) else { return }
-        insertItem(.separator(), at: index)
     }
 
 }
