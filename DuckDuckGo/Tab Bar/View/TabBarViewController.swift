@@ -43,6 +43,7 @@ final class TabBarViewController: NSViewController {
     @IBOutlet weak var draggingSpace: NSView!
     @IBOutlet weak var windowDraggingViewLeadingConstraint: NSLayoutConstraint!
 
+    @IBOutlet weak var addTabButton: MouseOverButton!
     let tabCollectionViewModel: TabCollectionViewModel
 
     private let bookmarkManager: BookmarkManager = LocalBookmarkManager.shared
@@ -55,6 +56,15 @@ final class TabBarViewController: NSViewController {
     private var cancellables = Set<AnyCancellable>()
 
     @IBOutlet weak var shadowView: TabShadowView!
+    
+    @IBOutlet weak var rightSideStackView: NSStackView!
+    var footerCurrentWidthDimension: CGFloat {
+        if tabMode == .overflow {
+            return 0.0
+        } else {
+            return HorizontalSpace.button.rawValue + HorizontalSpace.buttonPadding.rawValue
+        }
+    }
     
     required init?(coder: NSCoder) {
         fatalError("TabBarViewController: Bad initializer")
@@ -85,6 +95,8 @@ final class TabBarViewController: NSViewController {
         subscribeToSelectionIndex()
         setupFireButton()
         setupPinnedTabsView()
+        subscribeToTabModeChanges()
+        setupAddTabButton()
     }
 
     override func viewWillAppear() {
@@ -117,9 +129,10 @@ final class TabBarViewController: NSViewController {
         NotificationCenter.default.removeObserver(self)
     }
 
-    @IBAction func addButtonAction(_ sender: NSButton) {
+    @objc func addButtonAction(_ sender: NSButton) {
         tabCollectionViewModel.appendNewTab(with: .homePage)
     }
+    
     @IBAction func rightScrollButtonAction(_ sender: NSButton) {
         collectionView.scrollToEnd()
     }
@@ -133,7 +146,7 @@ final class TabBarViewController: NSViewController {
             self?.reloadSelection()
         }
     }
-
+    
     private func setupFireButton() {
         fireButton.toolTip = UserText.clearBrowsingHistoryTooltip
         fireButton.animationNames = MouseOverAnimationButton.AnimationNames(aqua: "flame-mouse-over", dark: "dark-flame-mouse-over")
@@ -329,7 +342,7 @@ final class TabBarViewController: NSViewController {
 
     private func updateEmptyTabArea() {
         let totalTabWidth = self.totalTabWidth
-        let plusButtonWidth = HorizontalSpace.buttonPadding.rawValue + HorizontalSpace.button.rawValue
+        let plusButtonWidth = footerCurrentWidthDimension
 
         // Window dragging
         let leadingSpace = min(totalTabWidth + plusButtonWidth, scrollView.frame.size.width)
@@ -456,7 +469,7 @@ final class TabBarViewController: NSViewController {
             return 0
         }
 
-        let tabsWidth = scrollView.bounds.width - HorizontalSpace.button.rawValue - HorizontalSpace.buttonPadding.rawValue
+        let tabsWidth = scrollView.bounds.width - footerCurrentWidthDimension
         let minimumWidth = selected ? TabBarViewItem.Width.minimumSelected.rawValue : TabBarViewItem.Width.minimum.rawValue
 
         if tabMode == .divided {
@@ -517,6 +530,22 @@ final class TabBarViewController: NSViewController {
         leftScrollButton.isHidden = scrollViewsAreHidden
         rightShadowImageView.isHidden = scrollViewsAreHidden
         leftShadowImageView.isHidden = scrollViewsAreHidden
+        addTabButton.isHidden = scrollViewsAreHidden
+    }
+    
+    private func setupAddTabButton() {
+        addTabButton.target = self
+        addTabButton.action = #selector(addButtonAction(_:))
+        addTabButton.toolTip = UserText.newTabTooltip
+    }
+
+    private func subscribeToTabModeChanges() {
+        $tabMode
+            .receive(on: DispatchQueue.main)
+            .sink(receiveValue: { [weak self] _ in
+            self?.displayScrollButtons()
+        })
+        .store(in: &cancellables)
     }
 
     // MARK: - Tab Preview
@@ -940,8 +969,12 @@ extension TabBarViewController: NSCollectionViewDelegate {
     func collectionView(_ collectionView: NSCollectionView,
                         layout collectionViewLayout: NSCollectionViewLayout,
                         referenceSizeForFooterInSection section: Int) -> NSSize {
-        let width = HorizontalSpace.button.rawValue + HorizontalSpace.buttonPadding.rawValue
-        return NSSize(width: width, height: collectionView.frame.size.height)
+        if tabMode == .overflow {
+            return .zero
+        } else {
+            let width = footerCurrentWidthDimension
+            return NSSize(width: width, height: collectionView.frame.size.height)
+        }
     }
 
 }
@@ -949,6 +982,7 @@ extension TabBarViewController: NSCollectionViewDelegate {
 extension TabBarViewController: TabBarViewItemDelegate {
 
     func tabBarViewItem(_ tabBarViewItem: TabBarViewItem, isMouseOver: Bool) {
+        
         if isMouseOver {
             // Show tab preview for visible tab bar items
             if collectionView.visibleRect.intersects(tabBarViewItem.view.frame) {

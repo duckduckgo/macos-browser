@@ -383,13 +383,11 @@ extension URL {
                              config: PrivacyConfiguration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig) -> Bool {
         let enabledSites = gpcHeadersEnabled(config: config)
 
-        for gpcHost in enabledSites {
-            if url.isPart(ofDomain: gpcHost) {
-                // Check if url is on exception list
-                // Since headers are only enabled for a small numbers of sites
-                // perfrom this check here for efficency
-                return config.isFeature(.gpc, enabledForDomain: url.host)
-            }
+        if enabledSites.contains(where: { gpcHost in url.isPart(ofDomain: gpcHost) }) {
+            // Check if url is on exception list
+            // Since headers are only enabled for a small numbers of sites
+            // perfrom this check here for efficency
+            return config.isFeature(.gpc, enabledForDomain: url.host)
         }
 
         return false

@@ -18,10 +18,15 @@
 
 import WebKit
 import Combine
+import BrowserServicesKit
 
 extension WKWebViewConfiguration {
 
     func applyStandardConfiguration() {
+#if DEBUG
+        guard !AppDelegate.isRunningTests else { return }
+#endif
+
         allowsAirPlayForMediaPlayback = true
         preferences.setValue(true, forKey: "fullScreenEnabled")
         preferences.setValue(true, forKey: "allowsPictureInPictureMediaPlayback")
@@ -42,5 +47,14 @@ extension WKWebViewConfiguration {
         self.userContentController = UserContentController()
         self.processPool.geolocationProvider = GeolocationProvider(processPool: self.processPool)
      }
+
+}
+
+extension UserContentController {
+
+    convenience init(privacyConfigurationManager: PrivacyConfigurationManager = ContentBlocking.shared.privacyConfigurationManager) {
+        self.init(assetsPublisher: ContentBlocking.shared.userContentUpdating.userContentBlockingAssets,
+                  privacyConfigurationManager: privacyConfigurationManager)
+    }
 
 }

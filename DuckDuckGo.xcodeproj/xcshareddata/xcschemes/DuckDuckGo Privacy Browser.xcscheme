@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "1340"
+   LastUpgradeVersion = "1400"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -71,15 +71,6 @@
                   Identifier = "CBRCompileTimeReporterTests">
                </Test>
                <Test
-                  Identifier = "EncryptionKeyStoreTests">
-               </Test>
-               <Test
-                  Identifier = "PixelTests/testWhenErrorPixelIsFiredThenParametersAdded()">
-               </Test>
-               <Test
-                  Identifier = "PixelTests/testWhenTimedPixelFiredThenCorrectDurationIsSet()">
-               </Test>
-               <Test
                   Identifier = "StatisticsLoaderTests/testWhenRefreshRetentionAtbIsPerformedForNavigationThenAppRetentionAtbRequested()">
                </Test>
             </SkippedTests>
@@ -95,7 +86,7 @@
             </BuildableReference>
             <SkippedTests>
                <Test
-                  Identifier = "CoreDataEncryptionTests">
+                  Identifier = "CoreDataEncryptionTests/testSavingIncorrectValueTypes()">
                </Test>
                <Test
                   Identifier = "EncryptionKeyStoreTests">

@@ -44,6 +44,7 @@ public struct UserDefaultsWrapper<T> {
         case loginDetectionEnabled = "fireproofing.login-detection-enabled"
         case gpcEnabled = "preferences.gpc-enabled"
         case selectedDownloadLocationKey = "preferences.download-location"
+        case lastUsedCustomDownloadLocation = "preferences.custom-last-used-download-location"
         case alwaysRequestDownloadLocationKey = "preferences.download-location.always-request"
         case autoconsentEnabled = "preferences.autoconsent-enabled"
         case privatePlayerMode = "preferences.duck-player"
@@ -80,6 +81,7 @@ public struct UserDefaultsWrapper<T> {
         case homePageShowPagesOnHover = "home.page.show.pages.on.hover"
         case homePageShowAllFavorites = "home.page.show.all.favorites"
         case homePageShowPageTitles = "home.page.show.page.titles"
+        case homePageShowRecentlyVisited = "home.page.show.recently.visited"
 
         case appIsRelaunchingAutomatically = "app-relaunching-automatically"
 

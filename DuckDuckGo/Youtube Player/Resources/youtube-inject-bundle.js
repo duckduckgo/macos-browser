@@ -248,6 +248,8 @@
   var IconOverlay = {
     HOVER_CLASS: "ddg-overlay-hover",
     OVERLAY_CLASS: "ddg-overlay",
+    CSS_OVERLAY_MARGIN_TOP: 5,
+    CSS_OVERLAY_HEIGHT: 32,
     currentVideoElement: null,
     hoverOverlayVisible: false,
     comms: null,
@@ -269,7 +271,7 @@
     },
     moveHoverOverlayToVideoElement: (videoElement) => {
       let overlay = IconOverlay.getHoverOverlay();
-      if (overlay === null) {
+      if (overlay === null || IconOverlay.videoScrolledOutOfViewInPlaylist(videoElement)) {
         return;
       }
       let videoElementOffset = IconOverlay.getElementOffset(videoElement);
@@ -288,6 +290,17 @@
       IconOverlay.hoverOverlayVisible = true;
       IconOverlay.currentVideoElement = videoElement;
     },
+    videoScrolledOutOfViewInPlaylist: (videoElement) => {
+      let inPlaylist = videoElement.closest("#items.playlist-items");
+      if (inPlaylist) {
+        let video = videoElement.getBoundingClientRect(), playlist = inPlaylist.getBoundingClientRect();
+        let videoOutsideTop = video.top + IconOverlay.CSS_OVERLAY_MARGIN_TOP < playlist.top, videoOutsideBottom = video.top + IconOverlay.CSS_OVERLAY_HEIGHT + IconOverlay.CSS_OVERLAY_MARGIN_TOP > playlist.bottom;
+        if (videoOutsideTop || videoOutsideBottom) {
+          return true;
+        }
+      }
+      return false;
+    },
     getElementOffset: (el) => {
       const box = el.getBoundingClientRect();
       const docElem = document.documentElement;
@@ -299,6 +312,11 @@
     repositionHoverOverlay: () => {
       if (IconOverlay.currentVideoElement && IconOverlay.hoverOverlayVisible) {
         IconOverlay.moveHoverOverlayToVideoElement(IconOverlay.currentVideoElement);
+      }
+    },
+    hidePlaylistOverlayOnScroll: (e) => {
+      if (e?.target?.id === "items") {
+        IconOverlay.hideOverlay(IconOverlay.getHoverOverlay());
       }
     },
     hideHoverOverlay: (event, force) => {
@@ -986,9 +1004,8 @@
               }
               videoPlayerOverlay.watchForVideoBeingAdded({ via: "mutation observer" });
             });
-            window.addEventListener("resize", () => {
-              IconOverlay.repositionHoverOverlay();
-            });
+            window.addEventListener("resize", IconOverlay.repositionHoverOverlay);
+            window.addEventListener("scroll", IconOverlay.hidePlaylistOverlayOnScroll, true);
           }
           IconOverlay.appendHoverOverlay();
           VideoThumbnail.bindEventsToAll();

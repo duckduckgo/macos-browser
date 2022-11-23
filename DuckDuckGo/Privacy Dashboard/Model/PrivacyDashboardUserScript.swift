@@ -20,6 +20,7 @@ import WebKit
 import os
 import BrowserServicesKit
 import TrackerRadarKit
+import UserScript
 
 protocol PrivacyDashboardUserScriptDelegate: AnyObject {
 

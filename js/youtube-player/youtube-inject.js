@@ -266,9 +266,9 @@ function initWithEnvironment(environment, comms) {
                         videoPlayerOverlay.watchForVideoBeingAdded({ via: "mutation observer" });
                     });
 
-                    window.addEventListener('resize', () => {
-                        IconOverlay.repositionHoverOverlay();
-                    });
+                    window.addEventListener('resize', IconOverlay.repositionHoverOverlay);
+
+                    window.addEventListener('scroll', IconOverlay.hidePlaylistOverlayOnScroll, true);
                 }
 
                 IconOverlay.appendHoverOverlay();

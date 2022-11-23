@@ -62,7 +62,13 @@ final class FireViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        fireAnimationViewLoadingTask = Task.detached(priority: .userInitiated) {
+#if DEBUG
+        let isRunningTests = AppDelegate.isRunningTests
+#else
+        let isRunningTests = false
+#endif
+
+        fireAnimationViewLoadingTask = isRunningTests ? nil : Task.detached(priority: .userInitiated) {
             await self.setupFireAnimationView()
         }
     }

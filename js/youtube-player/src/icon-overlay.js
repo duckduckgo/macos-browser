@@ -99,6 +99,9 @@ export const IconOverlay = {
     HOVER_CLASS: 'ddg-overlay-hover',
     OVERLAY_CLASS: 'ddg-overlay',
 
+    CSS_OVERLAY_MARGIN_TOP: 5,
+    CSS_OVERLAY_HEIGHT: 32,
+
     /** @type {HTMLElement | null} */
     currentVideoElement: null,
     hoverOverlayVisible: false,
@@ -150,7 +153,7 @@ export const IconOverlay = {
     moveHoverOverlayToVideoElement: (videoElement) => {
         let overlay = IconOverlay.getHoverOverlay();
 
-        if (overlay === null) {
+        if (overlay === null || IconOverlay.videoScrolledOutOfViewInPlaylist(videoElement)) {
             return;
         }
 
@@ -179,6 +182,30 @@ export const IconOverlay = {
     },
 
     /**
+     * Returns true if the videoElement is scrolled out of view in a playlist. (In these cases
+     * we don't want to show the overlay.)
+     * @param {HTMLElement} videoElement
+     * @returns {boolean}
+     */
+    videoScrolledOutOfViewInPlaylist: (videoElement) => {
+        let inPlaylist = videoElement.closest('#items.playlist-items');
+
+        if (inPlaylist) {
+            let video = videoElement.getBoundingClientRect(),
+                playlist = inPlaylist.getBoundingClientRect();
+
+            let videoOutsideTop = (video.top + IconOverlay.CSS_OVERLAY_MARGIN_TOP) < playlist.top,
+                videoOutsideBottom = ((video.top + IconOverlay.CSS_OVERLAY_HEIGHT + IconOverlay.CSS_OVERLAY_MARGIN_TOP) > playlist.bottom);
+
+            if (videoOutsideTop || videoOutsideBottom) {
+                return true;
+            }
+        }
+
+        return false;
+    },
+
+    /**
      * Return the offset of an HTML Element
      * @param {HTMLElement} el
      * @returns {Object}
@@ -203,6 +230,16 @@ export const IconOverlay = {
     },
 
     /**
+     * The IconOverlay is absolutely positioned and at the end of the body tag. This means that if its placed in
+     * a scrollable playlist, it will "float" above the playlist on scroll.
+     */
+    hidePlaylistOverlayOnScroll: (e) => {
+        if (e?.target?.id === 'items') {
+            IconOverlay.hideOverlay(IconOverlay.getHoverOverlay());
+        }
+    },
+
+    /**
      * Hides the hover overlay element, but only if mouse pointer is outside of the hover overlay element
      */
     hideHoverOverlay: (event, force) => {
@@ -220,7 +257,6 @@ export const IconOverlay = {
             IconOverlay.hideOverlay(overlay);
             IconOverlay.hoverOverlayVisible = false;
         }
-
     },
 
     /**

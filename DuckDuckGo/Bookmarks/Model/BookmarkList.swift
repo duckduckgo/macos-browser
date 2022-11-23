@@ -17,17 +17,22 @@
 //
 
 import Foundation
+import BrowserServicesKit
 import os.log
 
 struct BookmarkList {
     
-    struct IdentifiableBookmark: Equatable {
+    struct IdentifiableBookmark: Equatable, BrowserServicesKit.Bookmark {
         let id: UUID
         let url: URL
+        let title: String
+        let isFavorite: Bool
         
         init(from bookmark: Bookmark) {
             self.id = bookmark.id
             self.url = bookmark.url
+            self.title = bookmark.title
+            self.isFavorite = bookmark.isFavorite
         }
     }
 
@@ -53,22 +58,17 @@ struct BookmarkList {
         return bookmarks
     }
 
-    init(entities: [BaseBookmarkEntity] = [], topLevelEntities: [BaseBookmarkEntity] = []) {
+    init(entities: [BaseBookmarkEntity] = [], topLevelEntities: [BaseBookmarkEntity] = [], favorites: [BaseBookmarkEntity] = []) {
         let bookmarks = entities.compactMap { $0 as? Bookmark }
         let keysOrdered = bookmarks.compactMap { IdentifiableBookmark(from: $0) }
-        var favoriteKeysOrdered = [IdentifiableBookmark]()
 
         var itemsDict = [URL: [Bookmark]]()
         
         for bookmark in bookmarks {
             itemsDict[bookmark.url] = (itemsDict[bookmark.url] ?? []) + [bookmark]
-
-            if bookmark.isFavorite {
-                favoriteKeysOrdered.append(IdentifiableBookmark(from: bookmark))
-            }
         }
         
-        self.favoriteBookmarksOrdered = favoriteKeysOrdered
+        self.favoriteBookmarksOrdered = favorites.compactMap({$0 as? Bookmark}).map(IdentifiableBookmark.init(from:))
         self.allBookmarkURLsOrdered = keysOrdered
         self.itemsDict = itemsDict
         self.topLevelEntities = topLevelEntities
@@ -149,9 +149,8 @@ struct BookmarkList {
         return newBookmark
     }
 
-    func bookmarks() -> [Bookmark] {
-        let mappedBookmarks = allBookmarkURLsOrdered.compactMap { itemsDict[$0.url] }
-        return mappedBookmarks.reduce([], +)
+    func bookmarks() -> [IdentifiableBookmark] {
+        return allBookmarkURLsOrdered
     }
 
 }

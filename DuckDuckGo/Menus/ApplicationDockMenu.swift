@@ -16,70 +16,17 @@
 //  limitations under the License.
 //
 
-import Cocoa
-import os.log
-
-protocol ApplicationDockMenuDataSource: AnyObject {
-
-    func numberOfWindowMenuItems(in applicationDockMenu: ApplicationDockMenu) -> Int
-    func applicationDockMenu(_ applicationDockMenu: ApplicationDockMenu, windowTitleFor windowMenuItemIndex: Int) -> String
-    func indexOfSelectedWindowMenuItem(in applicationDockMenu: ApplicationDockMenu) -> Int?
-
-}
-
-protocol ApplicationDockMenuDelegate: AnyObject {
-
-    func applicationDockMenu(_ applicationDockMenu: ApplicationDockMenu, selectWindowWith index: Int)
-
-}
+import AppKit
 
 final class ApplicationDockMenu: NSMenu {
 
-    weak var dataSource: ApplicationDockMenuDataSource? {
-        didSet {
-            reloadData()
-        }
+    init() {
+        super.init(title: "")
+        addItem(withTitle: UserText.newWindowMenuItem, action: #selector(AppDelegate.newWindow), keyEquivalent: "")
     }
 
-    weak var applicationDockMenuDelegate: ApplicationDockMenuDelegate?
-
-    func reloadData() {
-        removeAllItems()
-
-        guard let dataSource = dataSource else { return }
-
-        let numberOfWindowMenuItems = dataSource.numberOfWindowMenuItems(in: self)
-        let selectedIndex = dataSource.indexOfSelectedWindowMenuItem(in: self)
-
-        for index in 0..<numberOfWindowMenuItems {
-            let windowItemTitle = dataSource.applicationDockMenu(self, windowTitleFor: index)
-            let windowItem = NSMenuItem(title: windowItemTitle, action: #selector(menuItemAction(_:)), keyEquivalent: "")
-            windowItem.target = self
-            windowItem.state = index == selectedIndex ? .on : .mixed
-            addItem(windowItem)
-        }
-
-        if numberOfWindowMenuItems > 0 {
-            addItem(.separator())
-        }
-
-        let newWindowItem = NSMenuItem(title: UserText.newWindowMenuItem,
-                                       action: #selector(AppDelegate.newWindow(_:)),
-                                       target: nil,
-                                       keyEquivalent: "")
-        addItem(newWindowItem)
-    }
-
-    @objc func menuItemAction(_ sender: Any?) {
-        guard let menuItem = sender as? NSMenuItem else {
-            os_log("ApplicationDockMenu: Sender is not instance of NSMenuItem", type: .error)
-            return
-        }
-        guard let index = items.firstIndex(of: menuItem) else {
-            os_log("ApplicationDockMenu: NSMenuItem not part of this menu", type: .error)
-            return
-        }
-        applicationDockMenuDelegate?.applicationDockMenu(self, selectWindowWith: index)
+    required init(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 
 }

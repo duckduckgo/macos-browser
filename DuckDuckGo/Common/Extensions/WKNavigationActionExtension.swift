@@ -25,7 +25,7 @@ extension WKNavigationAction {
     }
 
     var shouldDownload: Bool {
-        if #available(macOS 12, *) {
+        if #available(macOS 11.3, *) {
             return shouldPerformDownload
         } else {
             return _shouldPerformDownload

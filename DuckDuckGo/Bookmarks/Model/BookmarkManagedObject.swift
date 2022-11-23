@@ -26,10 +26,15 @@ extension BookmarkManagedObject {
         case folderStructureHasCycle
         case folderHasURL
         case bookmarkRequiresURL
+        case invalidFavoritesFolder
     }
 
     public var mutableChildren: NSMutableOrderedSet {
         return mutableOrderedSetValue(forKey: "children")
+    }
+
+    public var mutableFavorites: NSMutableOrderedSet {
+        return mutableOrderedSetValue(forKey: "favorites")
     }
 
     public override func validateForInsert() throws {
@@ -42,6 +47,17 @@ extension BookmarkManagedObject {
         try validate()
     }
 
+    static func createFavoritesFolder(in context: NSManagedObjectContext) -> NSManagedObject {
+        let managedObject = NSEntityDescription.insertNewObject(forEntityName: BookmarkManagedObject.className(), into: context)
+
+        managedObject.setValue(UUID.favoritesFolderUUID, forKey: "id")
+        managedObject.setValue("Favorites Folder" as NSString, forKey: "titleEncrypted")
+        managedObject.setValue(true, forKey: "isFolder")
+        managedObject.setValue(NSDate.now, forKey: "dateAdded")
+
+        return managedObject
+    }
+
     // MARK: - Private
 
     func validate() throws {
@@ -49,10 +65,11 @@ extension BookmarkManagedObject {
         try validateBookmarkURLRequirement()
         try validateThatFoldersDoNotHaveURLs()
         try validateThatFolderHierarchyHasNoCycles()
+        try validateFavoritesFolder()
     }
     
     func validateThatEntitiesExistInsideTheRootFolder() throws {
-        if parentFolder == nil, id != .rootBookmarkFolderUUID {
+        if parentFolder == nil, ![UUID.rootBookmarkFolderUUID, .favoritesFolderUUID].contains(id) {
             throw BookmarkError.mustExistInsideRootFolder
         }
     }
@@ -60,6 +77,12 @@ extension BookmarkManagedObject {
     func validateBookmarkURLRequirement() throws {
         if !isFolder, urlEncrypted == nil {
             throw BookmarkError.bookmarkRequiresURL
+        }
+    }
+
+    func validateFavoritesFolder() throws {
+        if let favoritesFolderID = favoritesFolder?.id, favoritesFolderID != .favoritesFolderUUID {
+            throw BookmarkError.invalidFavoritesFolder
         }
     }
 

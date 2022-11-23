@@ -40,6 +40,7 @@ protocol BookmarkManager: AnyObject {
     func update(objectsWithUUIDs uuids: [UUID], update: @escaping (BaseBookmarkEntity) -> Void, completion: @escaping (Error?) -> Void)
     func canMoveObjectWithUUID(objectUUID uuid: UUID, to parent: BookmarkFolder) -> Bool
     func move(objectUUIDs: [UUID], toIndex: Int?, withinParentFolder: ParentFolderType, completion: @escaping (Error?) -> Void)
+    func moveFavorites(with objectUUIDs: [UUID], toIndex: Int?, completion: @escaping (Error?) -> Void)
     func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarkImportResult
 
     // Wrapper definition in a protocol is not supported yet
@@ -80,7 +81,14 @@ final class LocalBookmarkManager: BookmarkManager {
                     return
                 }
 
-                self?.list = BookmarkList(entities: bookmarks, topLevelEntities: topLevelEntities)
+                self?.bookmarkStore.loadAll(type: .favorites) { [weak self] (favorites, error) in
+                    guard error == nil, let favorites = favorites else {
+                        os_log("LocalBookmarkManager: Failed to fetch favorites.", type: .error)
+                        return
+                    }
+
+                    self?.list = BookmarkList(entities: bookmarks, topLevelEntities: topLevelEntities, favorites: favorites)
+                }
             }
         }
     }
@@ -239,7 +247,14 @@ final class LocalBookmarkManager: BookmarkManager {
             completion(error)
         }
     }
-    
+
+    func moveFavorites(with objectUUIDs: [UUID], toIndex index: Int?, completion: @escaping (Error?) -> Void) {
+        bookmarkStore.moveFavorites(with: objectUUIDs, toIndex: index) { [weak self] error in
+            self?.loadBookmarks()
+            completion(error)
+        }
+    }
+
     // MARK: - Favicons
 
     private func favicon(for host: String?) -> NSImage? {

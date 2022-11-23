@@ -40,6 +40,22 @@ private class MockPrivacyConfiguration: PrivacyConfiguration {
 }
 
 private class MockPrivacyConfigurationManager: PrivacyConfigurationManaging {
+    var embeddedConfigData: BrowserServicesKit.PrivacyConfigurationManager.ConfigurationData {
+        fatalError("not implemented")
+    }
+
+    var fetchedConfigData: BrowserServicesKit.PrivacyConfigurationManager.ConfigurationData? {
+        fatalError("not implemented")
+    }
+
+    var currentConfig: Data {
+        Data()
+    }
+
+    func reload(etag: String?, data: Data?) -> BrowserServicesKit.PrivacyConfigurationManager.ReloadResult {
+        fatalError("not implemented")
+    }
+
     var updatesPublisher: AnyPublisher<Void, Never> = Just(()).eraseToAnyPublisher()
     var privacyConfig: PrivacyConfiguration = MockPrivacyConfiguration()
 }
