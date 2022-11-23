@@ -67,7 +67,6 @@ class BookmarkManagedObjectTests: XCTestCase {
         bookmark.urlEncrypted = nil
         bookmark.titleEncrypted = "Bookmark" as NSObject
         bookmark.isFolder = false
-        bookmark.isFavorite = false
         bookmark.dateAdded = NSDate.now
         bookmark.parentFolder = parent
 
@@ -88,7 +87,6 @@ class BookmarkManagedObjectTests: XCTestCase {
         folder.urlEncrypted = URL(string: "https://example.com")! as NSObject
         folder.titleEncrypted = "Folder" as NSObject
         folder.isFolder = true
-        folder.isFavorite = false
         folder.dateAdded = NSDate.now
         folder.parentFolder = parent
 
@@ -106,7 +104,6 @@ class BookmarkManagedObjectTests: XCTestCase {
         folder.id = id
         folder.titleEncrypted = "Folder" as NSObject
         folder.isFolder = true
-        folder.isFavorite = false
         folder.dateAdded = NSDate.now
         folder.parentFolder = folder
 
@@ -149,7 +146,6 @@ class BookmarkManagedObjectTests: XCTestCase {
         bookmark.urlEncrypted = URL(string: "https://example.com")! as NSObject
         bookmark.titleEncrypted = "Bookmark" as NSObject
         bookmark.isFolder = false
-        bookmark.isFavorite = false
         bookmark.dateAdded = NSDate.now
 
         XCTAssertThrowsError(try context.save()) { error in
@@ -167,11 +163,33 @@ class BookmarkManagedObjectTests: XCTestCase {
         folder.id = id
         folder.titleEncrypted = "Folder" as NSObject
         folder.isFolder = false
-        folder.isFavorite = false
         folder.dateAdded = NSDate.now
 
         XCTAssertThrowsError(try context.save()) { error in
             XCTAssertEqual(error as? BookmarkManagedObject.BookmarkError, BookmarkManagedObject.BookmarkError.mustExistInsideRootFolder)
+        }
+    }
+
+    func testWhenSavingBookmark_AndBookmarkHasInvalidFavoritesFolder_ThenSavingFails() {
+        let container = CoreData.bookmarkContainer()
+        let context = container.viewContext
+        let rootFolder = createTestRootFolderManagedObject(in: context)
+        let otherFolder = createTestFolderManagedObject(in: context, parent: rootFolder)
+        let id = UUID()
+
+        let bookmark = BookmarkManagedObject(context: context)
+
+        bookmark.id = id
+        bookmark.urlEncrypted = URL(string: "https://example.com")! as NSObject
+        bookmark.titleEncrypted = "Bookmark" as NSObject
+        bookmark.isFolder = false
+        bookmark.dateAdded = NSDate.now
+
+        bookmark.parentFolder = rootFolder
+        bookmark.favoritesFolder = otherFolder
+
+        XCTAssertThrowsError(try context.save()) { error in
+            XCTAssertEqual(error as? BookmarkManagedObject.BookmarkError, BookmarkManagedObject.BookmarkError.invalidFavoritesFolder)
         }
     }
 
@@ -182,12 +200,11 @@ class BookmarkManagedObjectTests: XCTestCase {
         folder.id = UUID.rootBookmarkFolderUUID
         folder.titleEncrypted = "RootFolder" as NSObject
         folder.isFolder = true
-        folder.isFavorite = false
         folder.dateAdded = NSDate.now
 
         return folder
     }
-    
+
     @discardableResult
     private func createTestBookmarkManagedObject(with id: UUID = UUID(),
                                                  in context: NSManagedObjectContext,
@@ -198,7 +215,6 @@ class BookmarkManagedObjectTests: XCTestCase {
         bookmark.urlEncrypted = URL(string: "https://example.com")! as NSObject
         bookmark.titleEncrypted = "Bookmark" as NSObject
         bookmark.isFolder = false
-        bookmark.isFavorite = false
         bookmark.dateAdded = NSDate.now
         bookmark.parentFolder = parent
 
@@ -214,7 +230,6 @@ class BookmarkManagedObjectTests: XCTestCase {
         folder.id = id
         folder.titleEncrypted = "Folder" as NSObject
         folder.isFolder = true
-        folder.isFavorite = false
         folder.dateAdded = NSDate.now
         folder.parentFolder = parent
 

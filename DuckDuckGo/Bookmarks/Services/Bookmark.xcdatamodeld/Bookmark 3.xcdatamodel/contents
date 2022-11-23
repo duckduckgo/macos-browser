@@ -9,6 +9,8 @@
         <attribute name="titleEncrypted" attributeType="Transformable" valueTransformerName="NSStringTransformer"/>
         <attribute name="urlEncrypted" optional="YES" attributeType="Transformable" valueTransformerName="NSURLTransformer"/>
         <relationship name="children" optional="YES" toMany="YES" deletionRule="Cascade" ordered="YES" destinationEntity="BookmarkManagedObject" inverseName="parentFolder" inverseEntity="BookmarkManagedObject"/>
+        <relationship name="favorites" optional="YES" toMany="YES" deletionRule="Nullify" ordered="YES" destinationEntity="BookmarkManagedObject" inverseName="favoritesFolder" inverseEntity="BookmarkManagedObject"/>
+        <relationship name="favoritesFolder" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="BookmarkManagedObject" inverseName="favorites" inverseEntity="BookmarkManagedObject"/>
         <relationship name="parentFolder" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="BookmarkManagedObject" inverseName="children" inverseEntity="BookmarkManagedObject"/>
         <fetchIndex name="byDateAdded">
             <fetchIndexElement property="dateAdded" type="Binary" order="descending"/>

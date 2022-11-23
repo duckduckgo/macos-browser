@@ -18,6 +18,7 @@
 
 import BrowserServicesKit
 import WebKit
+import UserScript
 
 protocol HoverUserScriptDelegate: AnyObject {
 
