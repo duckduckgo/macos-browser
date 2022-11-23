@@ -65,7 +65,8 @@ final class SaveCredentialsViewController: NSViewController {
 
     private var faviconManagement: FaviconManagement = FaviconManager.shared
 
-    private var passwordManagerCoordinator = PasswordManagerCoordinator()
+    private var passwordManagerCoordinator = PasswordManagerCoordinator.shared
+
     private var passwordManagerStateCancellable: AnyCancellable?
 
     private var saveButtonAction: (() -> Void)?

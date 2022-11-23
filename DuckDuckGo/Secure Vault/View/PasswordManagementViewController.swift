@@ -143,7 +143,7 @@ final class PasswordManagementViewController: NSViewController {
         try? SecureVaultFactory.default.makeVault(errorReporter: SecureVaultErrorReporter.shared)
     }
 
-    private let passwordManagerCoordinator = PasswordManagerCoordinator()
+    private let passwordManagerCoordinator = PasswordManagerCoordinator.shared
     
     override func viewDidLoad() {
         super.viewDidLoad()

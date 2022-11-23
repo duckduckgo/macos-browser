@@ -24,6 +24,8 @@ import Combine
 // Encapsulation of third party password managers
 class PasswordManagerCoordinator: BrowserServicesKit.PasswordManager {
 
+    static let shared = PasswordManagerCoordinator()
+
     enum PasswordManagerCoordinatorError: Error {
         case makingOfUrlFailed
     }
@@ -133,6 +135,14 @@ class PasswordManagerCoordinator: BrowserServicesKit.PasswordManager {
                 SecureVaultModels.WebsiteAccount(from: $0.value)
             }
     }
+    func cachedWebsiteCredentialsFor(domain: String, username: String) -> BrowserServicesKit.SecureVaultModels.WebsiteCredentials? {
+        if let credential: BWCredential = cache.values.first(where: { credential in
+            credential.domain == domain && credential.username == username
+        }) {
+            return SecureVaultModels.WebsiteCredentials(from: credential)
+        }
+        return nil
+    }
 
     func websiteCredentialsFor(accountId: String, completion: @escaping (BrowserServicesKit.SecureVaultModels.WebsiteCredentials?, Error?) -> Void) {
         guard !isLocked else {
@@ -180,9 +190,17 @@ class PasswordManagerCoordinator: BrowserServicesKit.PasswordManager {
         }
 
         if bitwardenCredential.credentialId == nil {
-            bitwardenManagement.create(credential: bitwardenCredential, completion: completion)
+            bitwardenManagement.create(credential: bitwardenCredential) { [weak self] error in
+                self?.websiteCredentialsFor(domain: credentials.account.domain) { _, _ in
+                    completion(error)
+                }
+            }
         } else {
-            bitwardenManagement.update(credential: bitwardenCredential, completion: completion)
+            bitwardenManagement.update(credential: bitwardenCredential) { [weak self] error in
+                self?.websiteCredentialsFor(domain: credentials.account.domain) { _, _ in
+                    completion(error)
+                }
+            }
         }
     }
 

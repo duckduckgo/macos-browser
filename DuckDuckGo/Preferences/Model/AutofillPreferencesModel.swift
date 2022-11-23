@@ -55,7 +55,7 @@ final class AutofillPreferencesModel: ObservableObject {
             persistor.passwordManager = passwordManager
 
             let enabled = passwordManager == .bitwarden
-            PasswordManagerCoordinator().setEnabled(enabled)
+            PasswordManagerCoordinator.shared.setEnabled(enabled)
             if enabled {
                 presentBitwardenSetupFlow()
             }
@@ -145,7 +145,7 @@ final class AutofillPreferencesModel: ObservableObject {
     }
     
     func openBitwarden() {
-        PasswordManagerCoordinator().openPasswordManager()
+        PasswordManagerCoordinator.shared.openPasswordManager()
     }
 
 }

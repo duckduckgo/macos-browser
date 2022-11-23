@@ -755,7 +755,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     }()
 
     lazy var vaultManager: SecureVaultManager = {
-        let manager = SecureVaultManager(passwordManager: PasswordManagerCoordinator())
+        let manager = SecureVaultManager(passwordManager: PasswordManagerCoordinator.shared)
         manager.delegate = self
         return manager
     }()

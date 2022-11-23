@@ -56,6 +56,6 @@ struct PasswordManagementBitwardenItemView: View {
 
 struct PasswordManagementBitwardenItemView_Previews: PreviewProvider {
     static var previews: some View {
-        PasswordManagementBitwardenItemView(manager: PasswordManagerCoordinator(), didFinish: {})
+        PasswordManagementBitwardenItemView(manager: PasswordManagerCoordinator.shared, didFinish: {})
     }
 }
