@@ -1,14 +1,6 @@
 import * as fs from 'node:fs/promises';
 
 /**
- * Wait for a set amount of seconds (mainly used when waiting for CSS transitions)
- * @param {number} delay - delay in ms
- */
-export async function sleep(delay) {
-    await new Promise(resolve => setTimeout(resolve, delay));
-};
-
-/**
  * Using the setupIconOverlays below, we mock icon link clicks by setting a
  * global variable ._test_clickedDuckPlayerLink. This function returns the value of
  * it so that we can detect if a link was clicked. (Clicks into duck://player doesn't work)

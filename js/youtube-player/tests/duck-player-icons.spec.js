@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { setupIconOverlays, sleep, getClickedDuckPlayerLink } from './utils.js';
+import { setupIconOverlays, getClickedDuckPlayerLink } from './utils.js';
 
 test('youtube homepage', async ({ page }) => {
   await setupIconOverlays(page);
@@ -14,7 +14,6 @@ test('youtube homepage', async ({ page }) => {
   await expect(hoverOverlay).toBeVisible();
 
   // 2. Once the preview animates in, expect the previewOverlay to be shown
-  await sleep(2500);
   await expect(previewOverlay).toBeVisible();
 
   // 3. Clicking the preview overlay should open duck player

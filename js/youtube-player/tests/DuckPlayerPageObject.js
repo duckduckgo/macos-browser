@@ -15,5 +15,13 @@ export const DuckPlayerPage = {
 
     settingsContainer: page => page.locator('.setting-container'),
 
-    settingsCheckbox: page => page.locator('.setting input')
+    settingsCheckbox: page => page.locator('.setting input'),
+
+    moveMouseOutOfContent: async (page) => {
+        await page.mouse.move(1, 1);
+    },
+
+    moveMouseToNewPositionOutsideOfContent: async (page) => {
+        await page.mouse.move(10, 10);
+    }
 };

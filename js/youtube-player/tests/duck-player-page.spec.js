@@ -1,5 +1,4 @@
 import { test, expect } from '@playwright/test';
-import { sleep } from './utils.js';
 import { DuckPlayerPage } from './DuckPlayerPageObject.js';
 
 const MOCK_VIDEO_ID = 'VIDEO_ID';
@@ -48,15 +47,13 @@ test('inactivity timer shows and hides toolbar based on user activity', async ({
 
   // 1. Expect toolbar to be visible at page load
   await expect(DuckPlayerPage.toolbar(page)).not.toHaveCSS('opacity', '0');
-  await page.mouse.move(1,1);
+  await DuckPlayerPage.moveMouseOutOfContent(page);
 
   // 2. Expect it to be hidden after 2 seconds of inactivity
-  await sleep(2000);
   await expect(DuckPlayerPage.toolbar(page)).toHaveCSS('opacity', '0');
 
   // 3. Expect it to be shown if there is mouse activity
-  await page.mouse.move(10, 10);
-  await sleep(500);
+  await DuckPlayerPage.moveMouseToNewPositionOutsideOfContent(page);
   await expect(DuckPlayerPage.toolbar(page)).not.toHaveCSS('opacity', '0');
 });
 
@@ -68,7 +65,7 @@ test('tooltip shown on hover', async ({ page }) => {
   await expect(DuckPlayerPage.infoTooltip(page)).toBeVisible();
 
   // 2. Hide tooltip when mouse leaves
-  await page.mouse.move(1,1);
+  await DuckPlayerPage.moveMouseOutOfContent(page);
   await expect(DuckPlayerPage.infoTooltip(page)).toBeHidden();
 
 });
@@ -127,8 +124,6 @@ test('always open setting', async ({ page }) => {
 
   // 2. Expect the setting to slide out and be hidden and a message sent to native after clicking it.
   await DuckPlayerPage.settingsCheckbox(page).click();
-  await sleep(1000);
-  await page.pause();
   await expect(DuckPlayerPage.settingsContainer(page)).toHaveCSS('width', '0px');
   await expect(await getMockSettingSentToNative(page)).toEqual(true);
 

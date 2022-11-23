@@ -7,4 +7,8 @@ export const IconOverlayPage = {
 
     hoverOverlayLink: page => page.locator('.ddg-overlay-hover .ddg-play-text-container'),
 
+    moveMouseAway: async (page) => {
+        await page.mouse.move(1, 1);
+    }
+
 }

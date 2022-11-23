@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { setupIconOverlays, sleep } from './utils.js';
+import { setupIconOverlays } from './utils.js';
 import { IconOverlayPage } from './IconOverlayPageObject.js';
 
 const setupMockIconOverlays = async (page) => {
@@ -17,7 +17,7 @@ test('thumbnail hover', async ({ page }) => {
   await expect(IconOverlayPage.hoverOverlay(page)).toBeVisible();
 
   // 3. Expect hover overlay to be hidden when moving mouse away
-  await page.mouse.move(1,1);
+  await IconOverlayPage.moveMouseAway(page);
   await expect(IconOverlayPage.hoverOverlay(page)).toBeHidden();
 
   // 4. Hover overlay to be shown when hovering 2nd thumbnail
@@ -29,12 +29,11 @@ test('thumbnail hover', async ({ page }) => {
   await expect(IconOverlayPage.hoverOverlay(page)).toBeVisible();
 
   // 6. Wait for new content to be added and make sure hover overlay is shown when hovering it
-  await sleep(1000);
   await IconOverlayPage.thumbnail(page, 'LOADED_THUMBNAILS', 1).hover();
   await expect(IconOverlayPage.hoverOverlay(page)).toBeVisible();
 
   // 7. Make sure hover also works for 2nd loaded thumbnails
-  await page.mouse.move(1,1);
+  await IconOverlayPage.moveMouseAway(page);
   await IconOverlayPage.thumbnail(page, 'LOADED_THUMBNAILS', 2).hover();
   await expect(IconOverlayPage.hoverOverlay(page)).toBeVisible();
 
@@ -51,7 +50,7 @@ test('playlist thumbnail hover', async ({ page }) => {
   await expect(IconOverlayPage.hoverOverlay(page)).toBeVisible();
 
   // 3. Expect hover overlay to be hidden when moving mouse away
-  await page.mouse.move(1,1);
+  await IconOverlayPage.moveMouseAway(page);
   await expect(IconOverlayPage.hoverOverlay(page)).toBeHidden();
 
   // 4. Hover overlay to be shown when hovering 2nd thumbnail
@@ -75,19 +74,16 @@ test('hovering overlay itself', async ({ page }) => {
 
   // 3. Hover the overlay itself
   await IconOverlayPage.hoverOverlay(page).hover();
-  await sleep(300);
   await expect(IconOverlayPage.hoverOverlayLink(page)).toHaveCSS('width', '80px');
 
   // 4. Hover the thumbnail again, overlaylink to be hidden
   await IconOverlayPage.thumbnail(page, 'THUMBNAILS', 1).hover();
-  await sleep(300);
   await expect(IconOverlayPage.hoverOverlayLink(page)).toHaveCSS('width', '0px');
 
   // 5. Hovering the overlay in the playlist should NOT show the overlay link
   await IconOverlayPage.thumbnail(page, 'PLAYLIST', 1).hover();
   await expect(IconOverlayPage.hoverOverlay(page)).toBeVisible();
   await IconOverlayPage.hoverOverlay(page).hover();
-  await sleep(300);
   await expect(IconOverlayPage.hoverOverlayLink(page)).toHaveCSS('width', '0px');
 
 });
