@@ -1,12 +1,33 @@
 import { test, expect } from '@playwright/test';
 import { DuckPlayerPage } from './DuckPlayerPageObject.js';
+import { getDuckPlayerPage } from './utils.js';
 
 const MOCK_VIDEO_ID = 'VIDEO_ID';
-const MOCK_IFRAME_SRC = 'https://www.youtube-nocookie.com/embed/'+MOCK_VIDEO_ID+'?iv_load_policy=1&autoplay=1&rel=0&modestbranding=1';
+const MOCK_IFRAME_SRC = 'https://www.youtube-nocookie.com/embed/' + MOCK_VIDEO_ID + '?iv_load_policy=1&autoplay=1&rel=0&modestbranding=1';
 
 const loadMockVideo = async (page, videoID = MOCK_VIDEO_ID, timestamp) => {
-  await page.addInitScript((videoID) => { window._mockVideoID = videoID; }, videoID);
-  await page.goto('/youtube_player_template.html' + (timestamp ? '?t='+timestamp : ''));
+  let duckPlayerPage = await getDuckPlayerPage();
+
+  await page.route('**/*', route => {
+
+    let isMainFrame = route.request().frame().parentFrame() === null;
+
+    if (isMainFrame) {
+      return route.fulfill({
+        status: 200,
+        body: duckPlayerPage,
+        contentType: 'text/html'
+      });
+    } else {
+      return route.fulfill({
+        status: 200,
+        body: 'mocked iframe',
+        contentType: 'text/html'
+      });
+    }
+  });
+
+  await page.goto('https://www.youtube-nocookie.com/embed/' + videoID + (timestamp ? '?t='+timestamp : ''));
 }
 
 Object.entries({
@@ -34,9 +55,7 @@ test('iframe loaded with valid video id', async ({ page }) => {
 });
 
 test('error shown with invalid video id', async ({ page }) => {
-  await page.addInitScript(() => { window._mockVideoID = '€%dd#"'; });
-  await page.goto('/youtube_player_template.html');
-
+  await loadMockVideo(page, '€%dd#"');
   await expect(DuckPlayerPage.playerError(page)).toBeVisible();
   await expect(DuckPlayerPage.playerError(page)).toHaveText('ERROR: Invalid video id');
   await expect(DuckPlayerPage.videoIframe(page)).toHaveCount(0);

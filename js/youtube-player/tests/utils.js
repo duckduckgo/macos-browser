@@ -12,6 +12,14 @@ export async function getClickedDuckPlayerLink(page) {
     });
 }
 
+export async function getDuckPlayerPage() {
+    const getFileString = async (path) => {
+        return await fs.readFile(path, { encoding: 'utf-8' });
+    }
+
+    return await getFileString('../../DuckDuckGo/Youtube\ Player/Resources/youtube_player_template.html');
+};
+
 /**
  * Injects the icon overlay bundle and adds mocks so we intercept native MacOS browser comms
  * (as we don't have it in webkit)
@@ -61,6 +69,7 @@ export async function setupIconOverlays(page, startURL = 'https://www.youtube.co
 
         await page.evaluate(script);
     },
+
     triggerDuckPlayerSettings = async () => {
         await page.evaluate(() => {
             window.onUserValuesChanged({
