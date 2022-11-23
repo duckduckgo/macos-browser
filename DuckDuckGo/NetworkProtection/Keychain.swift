@@ -3,15 +3,20 @@
 
 import Foundation
 import Security
+import OSLog
 
 final class Keychain {
     static func openReference(called ref: Data) -> String? {
+        let query: [CFString: Any] = [
+            kSecValuePersistentRef: ref,
+            kSecReturnData: true
+        ]
+
         var result: CFTypeRef?
-        let ret = SecItemCopyMatching([kSecValuePersistentRef: ref,
-                                        kSecReturnData: true] as CFDictionary,
+        let ret = SecItemCopyMatching(query as CFDictionary,
                                        &result)
         if ret != errSecSuccess || result == nil {
-            // wg_log(.error, message: "Unable to open config from keychain: \(ret)")
+            os_log(.error, "🔵 Unable to open config from keychain: %d, %{public}@", ret, query)
             return nil
         }
         guard let data = result as? Data else { return nil }
@@ -40,32 +45,10 @@ final class Keychain {
         items[kSecAttrAccessGroup] = FileManager.appGroupId
         items[kSecAttrAccessible] = kSecAttrAccessibleAfterFirstUnlock
         #elseif os(macOS)
+        items[kSecUseDataProtectionKeychain] = true
+        items[kSecAttrAccessGroup] = "HKE973VLUW.com.duckduckgo.network-protection"
         items[kSecAttrSynchronizable] = false
         items[kSecAttrAccessible] = kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
-
-        guard let extensionPath = Bundle.main.builtInPlugInsURL?.appendingPathComponent("NetworkProtectionExtension.appex", isDirectory: true).path else {
-            //wg_log(.error, staticMessage: "Unable to determine app extension path")
-            return nil
-        }
-        var extensionApp: SecTrustedApplication?
-        var mainApp: SecTrustedApplication?
-        ret = SecTrustedApplicationCreateFromPath(extensionPath, &extensionApp)
-        if ret != kOSReturnSuccess || extensionApp == nil {
-            //wg_log(.error, message: "Unable to create keychain extension trusted application object: \(ret)")
-            return nil
-        }
-        ret = SecTrustedApplicationCreateFromPath(nil, &mainApp)
-        if ret != errSecSuccess || mainApp == nil {
-            //wg_log(.error, message: "Unable to create keychain local trusted application object: \(ret)")
-            return nil
-        }
-        var access: SecAccess?
-        ret = SecAccessCreate(itemLabel as CFString, [extensionApp!, mainApp!] as CFArray, &access)
-        if ret != errSecSuccess || access == nil {
-            //wg_log(.error, message: "Unable to create keychain ACL object: \(ret)")
-            return nil
-        }
-        items[kSecAttrAccess] = access!
         #else
         #error("Unimplemented")
         #endif

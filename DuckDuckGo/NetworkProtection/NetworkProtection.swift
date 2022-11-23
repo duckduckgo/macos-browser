@@ -58,6 +58,7 @@ final class NetworkProtection: ObservableObject {
     init() async throws {
         if let tunnelManager = try? await NETunnelProviderManager.loadAllFromPreferences().first {
             self.tunnelManager = tunnelManager
+            try await ensureProperTunnelConfiguration()
         } else {
             tunnelManager = NETunnelProviderManager()
             tunnelManager.protocolConfiguration = NETunnelProviderProtocol(tunnelConfiguration: tunnelConfiguration, previouslyFrom: nil)
@@ -65,6 +66,21 @@ final class NetworkProtection: ObservableObject {
             tunnelManager.localizedDescription = UserText.networkProtectionTunnelName
 
             try await tunnelManager.saveToPreferences()
+        }
+    }
+
+    // MARK: - Tunnel Configuration
+
+    /// There's always a chance that a user could delete their tunnel configuration from their Keychain.  If that happens we want to make sure
+    /// we'll handle things gracefully.
+    ///
+    func ensureProperTunnelConfiguration() async throws {
+        guard let tunnelProviderProtocol = tunnelManager.protocolConfiguration as? NETunnelProviderProtocol,
+              tunnelProviderProtocol.verifyConfigurationReference() else {
+
+            tunnelManager.protocolConfiguration = NETunnelProviderProtocol(tunnelConfiguration: tunnelConfiguration, previouslyFrom: nil)
+            try await tunnelManager.saveToPreferences()
+            return
         }
     }
 

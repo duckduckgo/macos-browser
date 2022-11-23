@@ -17,6 +17,7 @@
 	<key>keychain-access-groups</key>
 	<array>
 		<string>$(AppIdentifierPrefix)com.duckduckgo.macos.browser</string>
+		<string>$(AppIdentifierPrefix)com.duckduckgo.network-protection</string>
 	</array>
 </dict>
 </plist>
