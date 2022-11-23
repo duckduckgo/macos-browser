@@ -73,9 +73,8 @@ internal class CoreDataStore<ManagedObject: ValueRepresentableManagedObject> {
     private func writeContext() -> NSManagedObjectContext? {
         guard let context = readContext else { return nil }
 
-        let newContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        let newContext = Database.shared.makeContext(concurrencyType: .privateQueueConcurrencyType, name: context.name)
         newContext.persistentStoreCoordinator = context.persistentStoreCoordinator
-        newContext.name = context.name
 
         return newContext
     }

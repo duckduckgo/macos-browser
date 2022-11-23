@@ -61,19 +61,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             Pixel.setUp()
             #endif
 
-            Database.shared.loadStore { _, error in
-                guard let error = error else { return }
-                
-                switch error {
-                case CoreDataDatabase.Error.containerLocationCouldNotBePrepared(let underlyingError):
-                    Pixel.fire(.debug(event: .dbContainerInitializationError, error: underlyingError))
-                default:
-                    Pixel.fire(.debug(event: .dbInitializationError, error: error))
+            Task {
+                do {
+                    _=try await Database.shared.loadStore().value
+                } catch let error {
+                    switch error {
+                    case CoreDataDatabase.Error.containerLocationCouldNotBePrepared(let underlyingError):
+                        Pixel.fire(.debug(event: .dbContainerInitializationError, error: underlyingError))
+                    default:
+                        Pixel.fire(.debug(event: .dbInitializationError, error: error))
+                    }
+
+                    // Give Pixel a chance to be sent, but not too long
+                    Thread.sleep(forTimeInterval: 1)
+                    fatalError("Could not load DB: \(error.localizedDescription)")
                 }
-                
-                // Give Pixel a chance to be sent, but not too long
-                Thread.sleep(forTimeInterval: 1)
-                fatalError("Could not load DB: \(error.localizedDescription)")
             }
         }
 

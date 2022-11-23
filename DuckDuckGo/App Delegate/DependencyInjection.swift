@@ -41,6 +41,47 @@ struct Injected2<Value> {
     }
 }
 
+@propertyWrapper
+struct Injected5<Value> {
+    private var _wrappedValue: Value?
+    var wrappedValue: Value {
+        fatalError()
+    }
+
+    init<Provider: DependencyProvider>(from providerType: Provider.Type, at: KeyPath<Provider, Value>) {
+
+    }
+}
+
+@propertyWrapper
+struct Injected3<Value> {
+    private var _wrappedValue: Value?
+    var wrappedValue: Value {
+        fatalError()
+    }
+
+    init<Provider: DependencyProvider>(from: @autoclosure () -> Provider) {
+
+    }
+}
+
+@propertyWrapper
+struct Injected4<Value> {
+    private var _wrappedValue: Value?
+    var wrappedValue: Value {
+        fatalError()
+    }
+
+    init<Provider: DependencyProvider>(from: @autoclosure () -> Provider, get: (Provider) -> Value) {
+
+    }
+
+    init<Provider: DependencyProvider>(wrappedValue: (Provider) -> Value, from: @autoclosure () -> Provider) {
+        
+    }
+}
+
+
 typealias Injected = DependencyInjection.Injected
 struct DependencyInjection {
 

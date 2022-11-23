@@ -24,11 +24,9 @@ extension NSApplication {
     var dependencies: AppDependencies {
         Self.dependencies
     }
-
 }
 
 struct AppDependencies: RootDependencyProvider {
-    
     var faviconManagement: FaviconManagement
 
     var databaseManagement: DatabaseManagement = .init()
@@ -37,5 +35,18 @@ struct AppDependencies: RootDependencyProvider {
     init() {
         self.faviconManagement = FaviconManager()
     }
-
 }
+
+struct DatabaseManagement: DependencyProvider {
+    typealias Parent = AppDependencies
+    static var keyPath: KeyPath<AppDependencies, DatabaseManagement> { \.databaseManagement }
+
+    var database: CoreDataDatabase = .shared
+}
+struct OSInteraction: DependencyProvider {
+    typealias Parent = AppDependencies
+    static var keyPath: KeyPath<AppDependencies, OSInteraction> { \.osInteraction }
+
+    var workspace: NSWorkspace { .shared }
+}
+

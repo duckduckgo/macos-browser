@@ -20,6 +20,7 @@ import Foundation
 import CoreData
 import BrowserServicesKit
 
+typealias NSManagedObjectContext = MyManagedObjectContext
 final class Database {
     
     fileprivate struct Constants {

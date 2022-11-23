@@ -43,18 +43,17 @@ protocol TabDelegate: FileDownloadManagerDelegate, ContentOverlayUserScriptDeleg
     func tab(_ tab: Tab, promptUserForCookieConsent result: @escaping (Bool) -> Void)
 }
 
-struct DatabaseManagement: DependencyProvider {
-    typealias Parent = AppDependencies
-    static var keyPath: KeyPath<AppDependencies, DatabaseManagement> { \.databaseManagement }
+
+protocol TabDependencies {
+    var faviconManagement: FaviconManagement { get }
 }
-struct OSInteraction: DependencyProvider {
-    typealias Parent = AppDependencies
-    static var keyPath: KeyPath<AppDependencies, OSInteraction> { \.osInteraction }
-}
+
+extension AppDependencies: TabDependencies {}
 
 // swiftlint:disable:next type_body_length
 final class Tab: NSObject, Identifiable, ObservableObject {
 
+    // TODO: Cleanup
     struct Dependencies {
 //        @Injected(default: FaviconManager.shared) static var faviconManagement: FaviconManagement
         @Injected(default: HistoryCoordinator.shared) static var historyCoordinating: HistoryCoordinating
@@ -64,10 +63,21 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
         @Injected(default: .shared, .testable) static var privatePlayer: PrivatePlayer
         @Injected(default: .shared) static var cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter?
-        @Injected(default: .shared) static var workspace: NSWorkspace
-
+//        @Injected(default: .shared) static var workspace: NSWorkspace
 
         @Injected2(from: NSApp.dependencies, at: \.faviconManagement) static var faviconManagement: FaviconManagement
+
+        @Injected5(from: AppDependencies.self, at: \.faviconManagement) static var faviconManagement2: FaviconManagement
+        @Injected5(from: OSInteraction.self, at: \.workspace) static var workspace: NSWorkspace
+        @Injected5(from: DatabaseManagement.self, at: \.database) static var data: CoreDataDatabase
+    }
+
+    @Injected3(from: NSApp.dependencies.osInteraction) static var dependencies: TabDependencies
+
+    @Injected4(from: NSApp.dependencies, get: { $0 as TabDependencies }) static var dependencies2: TabDependencies
+
+    @Injected4(from: NSApp.dependencies) static var dependencies3: TabDependencies = {
+        $0 as TabDependencies
     }
 
     enum TabContent: Equatable {
