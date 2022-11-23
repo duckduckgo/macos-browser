@@ -74,7 +74,7 @@ final class ConnectBitwardenViewModel: ObservableObject {
     }
     
     private enum Constants {
-        static let bitwardenAppStoreURL = URL(string: "https://apps.apple.com/us/app/bitwarden/id1352778147")!
+        static let bitwardenAppStoreURL = URL(string: "macappstores://apps.apple.com/app/bitwarden/id1352778147")!
     }
     
     weak var delegate: ConnectBitwardenViewModelDelegate?
