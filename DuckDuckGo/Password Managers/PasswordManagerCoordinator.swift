@@ -120,7 +120,7 @@ class PasswordManagerCoordinator: BrowserServicesKit.PasswordManager {
                 return
             } else {
                 let accounts = credentials.compactMap { return BrowserServicesKit.SecureVaultModels.WebsiteAccount(from: $0) }
-                self?.cache(credentials: credentials)
+                self?.cache(credentials: credentials, for: url)
                 completion(accounts, nil)
             }
         }
@@ -174,7 +174,7 @@ class PasswordManagerCoordinator: BrowserServicesKit.PasswordManager {
                 completion([], error)
                 return
             } else {
-                self?.cache(credentials: credentials)
+                self?.cache(credentials: credentials, for: url)
                 let credentials = credentials.compactMap { BrowserServicesKit.SecureVaultModels.WebsiteCredentials(from: $0) }
                 completion(credentials, nil)
             }
@@ -206,7 +206,13 @@ class PasswordManagerCoordinator: BrowserServicesKit.PasswordManager {
 
     // MARK: - Cache
 
-    private func cache(credentials: [BWCredential]) {
+    private func cache(credentials: [BWCredential], for url: URL) {
+        cache.forEach { key, value in
+            if value.domain == url.host {
+                cache.removeValue(forKey: key)
+            }
+        }
+
         credentials.forEach { credential in
             if let credentialId = credential.credentialId {
                 cache[credentialId] = credential
