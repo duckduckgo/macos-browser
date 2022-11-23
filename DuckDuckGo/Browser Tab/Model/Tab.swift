@@ -43,11 +43,20 @@ protocol TabDelegate: FileDownloadManagerDelegate, ContentOverlayUserScriptDeleg
     func tab(_ tab: Tab, promptUserForCookieConsent result: @escaping (Bool) -> Void)
 }
 
+struct DatabaseManagement: DependencyProvider {
+    typealias Parent = AppDependencies
+    static var keyPath: KeyPath<AppDependencies, DatabaseManagement> { \.databaseManagement }
+}
+struct OSInteraction: DependencyProvider {
+    typealias Parent = AppDependencies
+    static var keyPath: KeyPath<AppDependencies, OSInteraction> { \.osInteraction }
+}
+
 // swiftlint:disable:next type_body_length
 final class Tab: NSObject, Identifiable, ObservableObject {
 
     struct Dependencies {
-        @Injected(default: FaviconManager.shared) static var faviconManagement: FaviconManagement
+//        @Injected(default: FaviconManager.shared) static var faviconManagement: FaviconManagement
         @Injected(default: HistoryCoordinator.shared) static var historyCoordinating: HistoryCoordinating
 
         @Injected(default: WindowControllersManager.shared.pinnedTabsManager, .testable)
@@ -56,6 +65,9 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         @Injected(default: .shared, .testable) static var privatePlayer: PrivatePlayer
         @Injected(default: .shared) static var cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter?
         @Injected(default: .shared) static var workspace: NSWorkspace
+
+
+        @Injected2(from: NSApp.dependencies, at: \.faviconManagement) static var faviconManagement: FaviconManagement
     }
 
     enum TabContent: Equatable {

@@ -19,6 +19,28 @@
 import os
 import Foundation
 
+protocol DependencyProvider {
+    associatedtype Parent: DependencyProvider
+    static var keyPath: KeyPath<Parent, Self> { get }
+}
+protocol RootDependencyProvider: DependencyProvider where Parent == Self {
+}
+extension RootDependencyProvider {
+    static var keyPath: KeyPath<Parent, Self> { \.self }
+}
+
+@propertyWrapper
+struct Injected2<Value> {
+    private var _wrappedValue: Value?
+    var wrappedValue: Value {
+        fatalError()
+    }
+
+    init<Provider: DependencyProvider>(from: @autoclosure () -> Provider, at: KeyPath<Provider, Value>) {
+
+    }
+}
+
 typealias Injected = DependencyInjection.Injected
 struct DependencyInjection {
 
