@@ -239,8 +239,9 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             extensions.downloads,
 
             extensions.adClickAttribution,
-            extensions.httpsUpgrade
-            
+            extensions.httpsUpgrade,
+
+            extensions.clickToLoad
         )
 
         setupWebView(shouldLoadInBackground: shouldLoadInBackground)
@@ -289,8 +290,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     var userEnteredUrl = false
 
     var contentChangeEnabled = true
-
-    var fbBlockingEnabled = true
 
     var isLazyLoadingInProgress = false
 
@@ -497,29 +496,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         } else {
             webView.reload()
         }
-    }
-
-    @discardableResult
-    private func setFBProtection(enabled: Bool) -> Bool {
-        guard self.fbBlockingEnabled != enabled else { return false }
-        if enabled {
-            do {
-                try userContentController.enableGlobalContentRuleList(withIdentifier: ContentBlockerRulesLists.Constants.clickToLoadRulesListName)
-            } catch {
-                assertionFailure("Missing FB List")
-                return false
-            }
-        } else {
-            do {
-                try userContentController.disableGlobalContentRuleList(withIdentifier: ContentBlockerRulesLists.Constants.clickToLoadRulesListName)
-            } catch {
-                assertionFailure("FB List was not enabled")
-                return false
-            }
-        }
-        self.fbBlockingEnabled = enabled
-
-        return true
     }
 
     func decideNewWindowPolicy(for navigationAction: WKNavigationAction) -> NewWindowPolicy? {
@@ -848,7 +824,6 @@ extension Tab: UserContentControllerDelegate {
         userScripts.faviconScript.delegate = self
         userScripts.surrogatesScript.delegate = self
         userScripts.contentBlockerRulesScript.delegate = self
-        userScripts.clickToLoadScript.delegate = self
         userScripts.autofillScript.currentOverlayTab = self.delegate
         userScripts.autofillScript.emailDelegate = emailManager
         userScripts.autofillScript.vaultDelegate = vaultManager
@@ -908,7 +883,7 @@ extension Tab: ContentBlockerRulesUserScriptDelegate {
     }
 
     func contentBlockerRulesUserScriptShouldProcessCTLTrackers(_ script: ContentBlockerRulesUserScript) -> Bool {
-        return fbBlockingEnabled
+        return extensions.clickToLoad?.fbBlockingEnabled == true
     }
     
     func contentBlockerRulesUserScript(_ script: ContentBlockerRulesUserScript, detectedTracker tracker: DetectedRequest) {
@@ -952,21 +927,6 @@ extension ContentBlocking {
 
 }
 
-extension Tab: ClickToLoadUserScriptDelegate {
-
-    func clickToLoadUserScriptAllowFB(_ script: UserScript, replyHandler: @escaping (Bool) -> Void) {
-        guard self.fbBlockingEnabled else {
-            replyHandler(true)
-            return
-        }
-
-        if setFBProtection(enabled: false) {
-            replyHandler(true)
-        } else {
-            replyHandler(false)
-        }
-    }
-}
 
 extension Tab: SurrogatesUserScriptDelegate {
     func surrogatesUserScriptShouldProcessTrackers(_ script: SurrogatesUserScript) -> Bool {

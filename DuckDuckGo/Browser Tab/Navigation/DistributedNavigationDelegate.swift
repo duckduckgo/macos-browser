@@ -202,7 +202,6 @@ extension DistributedNavigationDelegate: WebViewNavigationDelegate {
         // prepare for content blocking
 //
 //
-//        toggleFBProtection(for: url)
 //        willPerformNavigationAction(navigationAction)
 //
 //        return .allow
@@ -253,14 +252,6 @@ extension DistributedNavigationDelegate: WebViewNavigationDelegate {
 //        } else {
 //            Dependencies.cbaTimeReporter?.reportNavigationDidNotWaitForRules()
 //        }
-//    }
-
-//    private func toggleFBProtection(for url: URL) {
-        // Enable/disable FBProtection only after UserScripts are installed (awaitContentBlockingAssetsInstalled)
-//        let privacyConfiguration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig
-//
-//        let featureEnabled = privacyConfiguration.isFeature(.clickToPlay, enabledForDomain: url.host)
-//        setFBProtection(enabled: featureEnabled)
 //    }
 
 //    private func willPerformNavigationAction(_ navigationAction: WKNavigationAction) {

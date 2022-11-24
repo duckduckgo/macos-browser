@@ -22,6 +22,7 @@ import Foundation
 struct TabExtensions {
 
     let adClickAttribution: AdClickAttributionTabExtension?
+    let clickToLoad: ClickToLoad?
     let contextMenu: ContextMenuManager?
     let printing: TabPrintExtension?
     let navigations: TabNavigationsProtocol
@@ -34,6 +35,7 @@ struct TabExtensions {
     @Injected(forTests: defaultExtensionsForTests)
     static var buildForTab: (Tab) -> TabExtensions = { tab in
         return TabExtensions(adClickAttribution: AdClickAttributionTabExtension(tab: tab),
+                             clickToLoad: ClickToLoad(tab: tab),
                              contextMenu: ContextMenuManager(tab: tab),
                              printing: TabPrintExtension(tab: tab),
                              navigations: TabNavigations(),
@@ -46,6 +48,7 @@ struct TabExtensions {
 
     private static func defaultExtensionsForTests(_ tab: Tab) -> TabExtensions {
         return TabExtensions(adClickAttribution: nil,
+                             clickToLoad: nil,
                              contextMenu: nil,
                              printing: nil,
                              navigations: TabNavigations(),

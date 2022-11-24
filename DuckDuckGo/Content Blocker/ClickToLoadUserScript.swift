@@ -22,7 +22,7 @@ import UserScript
 
 protocol ClickToLoadUserScriptDelegate: AnyObject {
 
-    func clickToLoadUserScriptAllowFB(_ script: UserScript, replyHandler: @escaping (Bool) -> Void)
+    func clickToLoadUserScriptAllowFB(_ script: ClickToLoadUserScript, replyHandler: @escaping (Bool) -> Void)
 }
 
 final class ClickToLoadUserScript: NSObject, UserScript, WKScriptMessageHandlerWithReply {
