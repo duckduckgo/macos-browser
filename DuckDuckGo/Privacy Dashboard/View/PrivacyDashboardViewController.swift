@@ -151,7 +151,7 @@ final class PrivacyDashboardViewController: NSViewController {
     }
 
     private func subscribeToTrackerInfo() {
-        tabViewModel?.tab.$trackerInfo
+        tabViewModel?.tab.trackerInfoPublisher
             .receive(on: DispatchQueue.main)
             .sink(receiveValue: { [weak self] trackerInfo in
                 guard let self = self, let trackerInfo = trackerInfo, let tabUrl = self.tabViewModel?.tab.content.url else { return }
@@ -191,7 +191,7 @@ final class PrivacyDashboardViewController: NSViewController {
     }
 
     private func subscribeToServerTrust() {
-        tabViewModel?.tab.$serverTrust
+        tabViewModel?.tab.serverTrustPublisher
             .receive(on: DispatchQueue.global(qos: .userInitiated))
             .map { serverTrust in
                 ServerTrustViewModel(serverTrust: serverTrust)
@@ -205,7 +205,7 @@ final class PrivacyDashboardViewController: NSViewController {
     }
 
     private func subscribeToConsentManaged() {
-        tabViewModel?.tab.$cookieConsentManaged
+        tabViewModel?.tab.cookieConsentManagedPublisher
             .receive(on: DispatchQueue.main)
             .sink(receiveValue: { [weak self] consentManaged in
                 guard let self = self else { return }

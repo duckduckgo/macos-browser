@@ -61,14 +61,9 @@ final class AdClickAttributionTabExtension {
             }
             .store(in: &cancellables)
 
-        tab.$trackerInfo
-            .scan((old: Set<DetectedRequest>(), new: tab.trackerInfo?.trackers ?? [])) {
-                ($0.new, $1?.trackers ?? [])
-            }
-            .sink { [weak self] (old, new) in
-                for tracker in new.subtracting(old) {
-                    self?.logic.onRequestDetected(request: tracker)
-                }
+        tab.detectedTrackersPublisher
+            .sink { [weak self] (tracker, _) in
+                self?.logic.onRequestDetected(request: tracker)
             }
             .store(in: &cancellables)
     }

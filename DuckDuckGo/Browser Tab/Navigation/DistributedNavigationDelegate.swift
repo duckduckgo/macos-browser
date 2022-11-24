@@ -242,18 +242,6 @@ extension DistributedNavigationDelegate: WebViewNavigationDelegate {
         }
     }
 
-//    @MainActor
-//    private func prepareForContentBlocking() async {
-        // Ensure Content Blocking Assets (WKContentRuleList&UserScripts) are installed
-//        if !userContentController.contentBlockingAssetsInstalled {
-//            Dependencies.cbaTimeReporter?.tabWillWaitForRulesCompilation(self.instrumentation.currentTabIdentifier)
-//            await userContentController.awaitContentBlockingAssetsInstalled()
-//            Dependencies.cbaTimeReporter?.reportWaitTimeForTabFinishedWaitingForRules(self.instrumentation.currentTabIdentifier)
-//        } else {
-//            Dependencies.cbaTimeReporter?.reportNavigationDidNotWaitForRules()
-//        }
-//    }
-
 //    private func willPerformNavigationAction(_ navigationAction: WKNavigationAction) {
 //        guard navigationAction.isTargetingMainFrame else { return }
 //
@@ -291,7 +279,6 @@ extension DistributedNavigationDelegate: WebViewNavigationDelegate {
 //        if error != nil { error = nil }
 //
 //        invalidateSessionStateData()
-//        resetDashboardInfo()
     }
 
     @objc(_webView:didStartProvisionalLoadWithRequest:inFrame:)
@@ -319,9 +306,6 @@ extension DistributedNavigationDelegate: WebViewNavigationDelegate {
             responder.webView(webView, didCommit: navigation, with: request)
         }
 
-        //        if content.isUrl, let url = webView.url {
-        //            addVisit(of: url)
-        //        }
         //        webViewDidCommitNavigationPublisher.send()
     }
 
@@ -360,7 +344,6 @@ extension DistributedNavigationDelegate: WebViewNavigationDelegate {
         notifyResponders(with: webView) { responder, webView in
             responder.webView(webView, didFinishNavigationWith: request, in: frame)
         }
-//        StatisticsLoader.shared.refreshRetentionAtb(isSearch: request.url?.isDuckDuckGoSearch == true)
     }
 
     @MainActor
@@ -398,14 +381,6 @@ extension DistributedNavigationDelegate: WebViewNavigationDelegate {
             responder.webView(webView, navigation: navigation, with: request, didFailWith: error)
         }
 
-//        switch error {
-//        case URLError.notConnectedToInternet,
-//            URLError.networkConnectionLost:
-//            guard let failingUrl = error.failingUrl else { break }
-//            Dependencies.historyCoordinating.markFailedToLoadUrl(failingUrl)
-//        default: break
-//        }
-//
 //        self.error = error
 //        webViewDidFailNavigationPublisher.send()
     }

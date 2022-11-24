@@ -50,13 +50,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
     struct Dependencies {
         @Injected(default: FaviconManager.shared) static var faviconManagement: FaviconManagement
-        @Injected(default: HistoryCoordinator.shared, .testable) static var historyCoordinating: HistoryCoordinating
-
-        @Injected(default: WindowControllersManager.shared.pinnedTabsManager, .testable)
-        static var pinnedTabsManager: PinnedTabsManager
-
         @Injected(default: .shared, .testable) static var privatePlayer: PrivatePlayer
-        @Injected(default: .shared) static var cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter?
     }
 
     enum TabContent: Equatable {
@@ -185,7 +179,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
     init(content: TabContent,
          webViewConfiguration: WKWebViewConfiguration? = nil,
-         localHistory: Set<String> = Set<String>(),
          title: String? = nil,
          error: Error? = nil,
          favicon: NSImage? = nil,
@@ -199,7 +192,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     ) {
 
         self.content = content
-        self.localHistory = localHistory
         self.title = title
         self.error = error
         self.favicon = favicon
@@ -228,6 +220,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             NewTabNavigationResponder(),
             extensions.contextMenu,
 
+            extensions.history,
             LocalFileNavigationResponder(),
 
             extensions.linkProtection,
@@ -239,6 +232,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
             extensions.adClickAttribution,
             extensions.httpsUpgrade,
+            extensions.contentBlocking,
 
             extensions.clickToLoad
         )
@@ -263,16 +257,11 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     }
 
     deinit {
-        if content.isUrl, let url = webView.url {
-            Dependencies.historyCoordinating.commitChanges(url: url)
-        }
         webView.stopLoading()
         webView.stopMediaCapture()
         webView.stopAllMediaPlayback()
         webView.fullscreenWindowController?.close()
         webView.configuration.userContentController.removeAllUserScripts()
-
-        Dependencies.cbaTimeReporter?.tabWillClose(self.instrumentation.currentTabIdentifier)
     }
 
     // MARK: - Event Publishers
@@ -299,9 +288,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             handleFavicon()
             // TODO: removing this breaks navigation
             invalidateSessionStateData()
-            if let oldUrl = oldValue.url {
-                Dependencies.historyCoordinating.commitChanges(url: oldUrl)
-            }
             error = nil
             Task {
                 await reloadIfNeeded(shouldLoadInBackground: true)
@@ -418,8 +404,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         }
     }
 
-    private let instrumentation = TabInstrumentation()
-
 //    private var mainFrameLoadState: FrameLoadState = .finished {
 //        didSet {
 //            if mainFrameLoadState == .finished {
@@ -434,7 +418,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
     func goForward() {
         guard canGoForward else { return }
-        shouldStoreNextVisit = false
         webView.goForward()
     }
 
@@ -455,8 +438,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             return
         }
 
-        shouldStoreNextVisit = false
-
         if Dependencies.privatePlayer.goBackSkippingLastItemIfNeeded(for: webView) {
             return
         }
@@ -464,7 +445,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     }
 
     func go(to item: WKBackForwardListItem) {
-        shouldStoreNextVisit = false
         webView.go(to: item)
     }
 
@@ -674,30 +654,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         }
     }
 
-    // MARK: - Global & Local History
-
-    private var shouldStoreNextVisit = true
-    private(set) var localHistory: Set<String>
-
-    func addVisit(of url: URL) {
-        guard shouldStoreNextVisit else {
-            shouldStoreNextVisit = true
-            return
-        }
-
-        // Add to global history
-        Dependencies.historyCoordinating.addVisit(of: url)
-
-        // Add to local history
-        if let host = url.host, !host.isEmpty {
-            localHistory.insert(host.droppingWwwPrefix())
-        }
-    }
-
-    func updateVisitTitle(_ title: String, url: URL) {
-        Dependencies.historyCoordinating.updateTitleIfNeeded(title: title, url: url)
-    }
-
     // MARK: - Youtube Player
     
     private weak var youtubeOverlayScript: YoutubeOverlayUserScript?
@@ -755,25 +711,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         }
     }
     
-    // MARK: - Dashboard Info
-
-    @Published private(set) var trackerInfo: TrackerInfo?
-    @Published private(set) var serverTrust: ServerTrust?
-    @Published private(set) var cookieConsentManaged: CookieConsentInfo?
-
-    private func resetDashboardInfo() {
-        trackerInfo = TrackerInfo()
-        if self.serverTrust?.host != content.url?.host {
-            serverTrust = nil
-        }
-    }
-
-    // MARK: - Printing
-
-    // To avoid webpages invoking the printHandler and overwhelming the browser, this property keeps track of the active
-    // print operation and ignores incoming printHandler messages if one exists.
-    fileprivate var activePrintOperation: NSPrintOperation?
-
 }
 
 extension Tab: UserContentControllerDelegate {
@@ -781,15 +718,10 @@ extension Tab: UserContentControllerDelegate {
     func userContentController(_ userContentController: UserContentController, didInstallContentRuleLists contentRuleLists: [String: WKContentRuleList], userScripts: UserScriptsProvider, updateEvent: ContentBlockerRulesManager.UpdateEvent) {
         guard let userScripts = userScripts as? UserScripts else { fatalError("Unexpected UserScripts") }
 
-        userScripts.debugScript.instrumentation = instrumentation
+        userScripts.debugScript.instrumentation = extensions.instrumentation
         userScripts.faviconScript.delegate = self
-        userScripts.surrogatesScript.delegate = self
-        userScripts.contentBlockerRulesScript.delegate = self
         userScripts.pageObserverScript.delegate = self
         userScripts.hoverUserScript.delegate = self
-        if #available(macOS 11, *) {
-            userScripts.autoconsentUserScript?.delegate = self
-        }
         youtubeOverlayScript = userScripts.youtubeOverlayScript
         youtubeOverlayScript?.delegate = self
         youtubePlayerScript = userScripts.youtubePlayerUserScript
@@ -829,88 +761,12 @@ extension Tab: FaviconUserScriptDelegate {
 
 }
 
-extension Tab: ContentBlockerRulesUserScriptDelegate {
-
-    func contentBlockerRulesUserScriptShouldProcessTrackers(_ script: ContentBlockerRulesUserScript) -> Bool {
-        return true
-    }
-
-    func contentBlockerRulesUserScriptShouldProcessCTLTrackers(_ script: ContentBlockerRulesUserScript) -> Bool {
-        return extensions.clickToLoad?.fbBlockingEnabled == true
-    }
-    
-    func contentBlockerRulesUserScript(_ script: ContentBlockerRulesUserScript, detectedTracker tracker: DetectedRequest) {
-        trackerInfo?.add(detectedTracker: tracker)
-        self.extensions.adClickAttribution?.logic.onRequestDetected(request: tracker)
-        guard let url = URL(string: tracker.pageUrl) else { return }
-        Dependencies.historyCoordinating.addDetectedTracker(tracker, onURL: url)
-    }
-
-    func contentBlockerRulesUserScript(_ script: ContentBlockerRulesUserScript, detectedThirdPartyRequest request: DetectedRequest) {
-        trackerInfo?.add(detectedThirdPartyRequest: request)
-    }
-    
-}
-
-extension HistoryCoordinating {
-
-    func addDetectedTracker(_ tracker: DetectedRequest, onURL url: URL) {
-        trackerFound(on: url)
-
-        guard tracker.isBlocked,
-              let entityName = tracker.entityName else { return }
-
-        addBlockedTracker(entityName: entityName, on: url)
-    }
-
-}
-
-extension ContentBlocking {
-
-    func entityName(forDomain domain: String) -> String? {
-        var entityName: String?
-        var parts = domain.components(separatedBy: ".")
-        while parts.count > 1 && entityName == nil {
-            let host = parts.joined(separator: ".")
-            entityName = trackerDataManager.trackerData.domains[host]
-            parts.removeFirst()
-        }
-        return entityName
-    }
-
-}
-
-
-extension Tab: SurrogatesUserScriptDelegate {
-    func surrogatesUserScriptShouldProcessTrackers(_ script: SurrogatesUserScript) -> Bool {
-        return true
-    }
-
-    func surrogatesUserScript(_ script: SurrogatesUserScript, detectedTracker tracker: DetectedRequest, withSurrogate host: String) {
-        trackerInfo?.add(installedSurrogateHost: host)
-        trackerInfo?.add(detectedTracker: tracker)
-        guard let url = webView.url else { return }
-        Dependencies.historyCoordinating.addDetectedTracker(tracker, onURL: url)
-    }
-}
-
 extension Tab: HoverUserScriptDelegate {
 
     func hoverUserScript(_ script: HoverUserScript, didChange url: URL?) {
         delegate?.tab(self, didChangeHoverLink: url)
     }
 
-}
-
-@available(macOS 11, *)
-extension Tab: AutoconsentUserScriptDelegate {
-    func autoconsentUserScript(consentStatus: CookieConsentInfo) {
-        self.cookieConsentManaged = consentStatus
-    }
-    
-    func autoconsentUserScriptPromptUserForConsent(_ result: @escaping (Bool) -> Void) {
-        delegate?.tab(self, promptUserForCookieConsent: result)
-    }
 }
 
 extension Tab: YoutubeOverlayUserScriptDelegate {

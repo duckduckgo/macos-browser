@@ -21,9 +21,12 @@ import Foundation
 
 struct TabExtensions {
 
+    let instrumentation = TabInstrumentation()
+    let contentBlocking: ContentBlockingTabExtension?
     let adClickAttribution: AdClickAttributionTabExtension?
     let clickToLoad: ClickToLoad?
     let contextMenu: ContextMenuManager?
+    let history: TabHistoryExtension?
     let printing: TabPrintExtension?
     let findInPage: FindInPageTabExtension?
     let autofill: AutofillTabExtension?
@@ -36,9 +39,11 @@ struct TabExtensions {
 
     @Injected(forTests: defaultExtensionsForTests)
     static var buildForTab: (Tab) -> TabExtensions = { tab in
-        return TabExtensions(adClickAttribution: AdClickAttributionTabExtension(tab: tab),
+        return TabExtensions(contentBlocking: ContentBlockingTabExtension(tab: tab),
+                             adClickAttribution: AdClickAttributionTabExtension(tab: tab),
                              clickToLoad: ClickToLoad(tab: tab),
                              contextMenu: ContextMenuManager(tab: tab),
+                             history: TabHistoryExtension(tab: tab),
                              printing: TabPrintExtension(tab: tab),
                              findInPage: FindInPageTabExtension(tab: tab),
                              autofill: AutofillTabExtension(tab: tab),
@@ -51,9 +56,11 @@ struct TabExtensions {
     }
 
     private static func defaultExtensionsForTests(_ tab: Tab) -> TabExtensions {
-        return TabExtensions(adClickAttribution: nil,
+        return TabExtensions(contentBlocking: nil,
+                             adClickAttribution: nil,
                              clickToLoad: nil,
                              contextMenu: nil,
+                             history: nil,
                              printing: nil,
                              findInPage: nil,
                              autofill: nil,
