@@ -63,8 +63,6 @@ final class TabViewModel {
         }
     }
 
-    @Published var autofillDataToSave: AutofillData?
-
     var loadingStartTime: CFTimeInterval?
 
     @Published private(set) var addressBarString: String = ""
@@ -307,7 +305,7 @@ final class TabViewModel {
 extension TabViewModel {
 
     func startFindInPage() {
-        tab.findInPage = findInPage
+        tab.openFindInPage(with: findInPage)
         findInPage.show()
     }
 

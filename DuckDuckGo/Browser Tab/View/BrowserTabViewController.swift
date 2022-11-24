@@ -676,10 +676,6 @@ extension BrowserTabViewController: FileDownloadManagerDelegate {
         return dockScreenRect
     }
 
-    func tab(_ tab: Tab, requestedSaveAutofillData autofillData: AutofillData) {
-        tabViewModel?.autofillDataToSave = autofillData
-    }
-
 }
 
 extension BrowserTabViewController: WKUIDelegate {

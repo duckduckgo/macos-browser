@@ -530,14 +530,13 @@ final class NavigationBarViewController: NSViewController {
     }
 
     private func subscribeToCredentialsToSave() {
-        credentialsToSaveCancellable = tabCollectionViewModel.selectedTabViewModel?.$autofillDataToSave
+        credentialsToSaveCancellable = tabCollectionViewModel.selectedTabViewModel?.tab.autofillDataToSavePublisher
             .receive(on: DispatchQueue.main)
-            .sink(receiveValue: { [weak self] in
-                if let data = $0 {
-                    self?.promptToSaveAutofillData(data)
-                    self?.tabCollectionViewModel.selectedTabViewModel?.autofillDataToSave = nil
-                }
-            })
+            .sink { [weak self] data in
+                guard let self = self, let data = data else { return }
+                self.promptToSaveAutofillData(data)
+                self.tabCollectionViewModel.selectedTabViewModel?.tab.resetAutofillData()
+            }
     }
 
     private func promptToSaveAutofillData(_ data: AutofillData) {
