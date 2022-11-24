@@ -26,6 +26,15 @@ internal class BaseBookmarkEntity {
         return request
     }
 
+    static func favorite(with uuid: UUID) -> NSFetchRequest<BookmarkManagedObject> {
+        let request = NSFetchRequest<BookmarkManagedObject>(entityName: "BookmarkManagedObject")
+        request.predicate = NSPredicate(format: "id == %@ AND %K != nil AND %K == NO",
+                                        uuid as CVarArg,
+                                        #keyPath(BookmarkManagedObject.favoritesFolder),
+                                        #keyPath(BookmarkManagedObject.isFolder))
+        return request
+    }
+
     static func entities(with identifiers: [UUID]) -> NSFetchRequest<BookmarkManagedObject> {
         let request = NSFetchRequest<BookmarkManagedObject>(entityName: "BookmarkManagedObject")
         request.predicate = NSPredicate(format: "id IN %@", identifiers)
@@ -34,7 +43,16 @@ internal class BaseBookmarkEntity {
 
     static func topLevelEntitiesFetchRequest() -> NSFetchRequest<BookmarkManagedObject> {
         let request = NSFetchRequest<BookmarkManagedObject>(entityName: "BookmarkManagedObject")
-        request.predicate = NSPredicate(format: "parentFolder == nil")
+        request.predicate = NSPredicate(format: "id != %@ AND parentFolder == nil", UUID.favoritesFolderUUID as CVarArg)
+        return request
+    }
+
+    static func favoritesFolderFetchRequest() -> NSFetchRequest<BookmarkManagedObject> {
+        let request = NSFetchRequest<BookmarkManagedObject>(entityName: "BookmarkManagedObject")
+        request.predicate = NSPredicate(format: "id == %@ AND %K == nil AND %K == YES",
+                                        UUID.favoritesFolderUUID as CVarArg,
+                                        #keyPath(BookmarkManagedObject.parentFolder),
+                                        #keyPath(BookmarkManagedObject.isFolder))
         return request
     }
 
@@ -81,7 +99,7 @@ internal class BaseBookmarkEntity {
                             url: url,
                             title: title,
                             oldFavicon: managedObject.faviconEncrypted as? NSImage,
-                            isFavorite: managedObject.isFavorite,
+                            isFavorite: managedObject.favoritesFolder != nil,
                             parentFolderUUID: parentFolderUUID)
         }
     }

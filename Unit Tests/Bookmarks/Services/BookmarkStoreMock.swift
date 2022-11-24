@@ -102,5 +102,10 @@ final class BookmarkStoreMock: BookmarkStore {
     func move(objectUUIDs: [UUID], toIndex: Int?, withinParentFolder: DuckDuckGo_Privacy_Browser.ParentFolderType, completion: @escaping (Error?) -> Void) {
         moveObjectUUIDCalled = true
     }
-    
+
+    var updateFavoriteIndexCalled = false
+    func moveFavorites(with objectUUIDs: [UUID], toIndex: Int?, completion: @escaping (Error?) -> Void) {
+        updateFavoriteIndexCalled = true
+    }
+
 }
