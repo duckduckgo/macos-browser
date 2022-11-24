@@ -177,6 +177,33 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         clicksSubject.eraseToAnyPublisher()
     }
 
+    private func navigationResponders() -> [NavigationResponder?] {
+        [
+            TabUserAgent(),
+            extensions.navigations,
+
+            NewTabNavigationResponder(),
+            extensions.contextMenu,
+
+            extensions.history,
+            LocalFileNavigationResponder(),
+
+            extensions.linkProtection,
+            extensions.referrerTrimming,
+            GlobalPrivacyControlResponder(),
+            TabRequestHeaders(),
+
+            extensions.downloads,
+
+            extensions.adClickAttribution,
+            extensions.httpsUpgrade,
+            extensions.contentBlocking,
+
+            extensions.clickToLoad,
+            extensions.duckPlayer
+        ]
+    }
+
     init(content: TabContent,
          webViewConfiguration: WKWebViewConfiguration? = nil,
          title: String? = nil,
@@ -213,29 +240,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
         userContentController.delegate = self
         extensions = TabExtensions.buildForTab(self)
-        extensions.navigationDelegate.responders.set(
-            TabUserAgent(),
-            extensions.navigations,
-
-            NewTabNavigationResponder(),
-            extensions.contextMenu,
-
-            extensions.history,
-            LocalFileNavigationResponder(),
-
-            extensions.linkProtection,
-            extensions.referrerTrimming,
-            GlobalPrivacyControlResponder(),
-            TabRequestHeaders(),
-
-            extensions.downloads,
-
-            extensions.adClickAttribution,
-            extensions.httpsUpgrade,
-            extensions.contentBlocking,
-
-            extensions.clickToLoad
-        )
+        extensions.navigationDelegate.responders = navigationResponders().compactMap { $0 }
 
         setupWebView(shouldLoadInBackground: shouldLoadInBackground)
 
@@ -404,14 +409,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         }
     }
 
-//    private var mainFrameLoadState: FrameLoadState = .finished {
-//        didSet {
-//            if mainFrameLoadState == .finished {
-//                setUpYoutubeScriptsIfNeeded()
-//            }
-//        }
-//    }
-
     var canGoForward: Bool {
         webView.canGoForward
     }
@@ -438,9 +435,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             return
         }
 
-        if Dependencies.privatePlayer.goBackSkippingLastItemIfNeeded(for: webView) {
-            return
-        }
         webView.goBack()
     }
 
@@ -654,63 +648,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         }
     }
 
-    // MARK: - Youtube Player
-    
-    private weak var youtubeOverlayScript: YoutubeOverlayUserScript?
-    private weak var youtubePlayerScript: YoutubePlayerUserScript?
-    private var youtubePlayerCancellables: Set<AnyCancellable> = []
-
-    func setUpYoutubeScriptsIfNeeded() {
-        guard PrivatePlayer.shared.isAvailable else {
-            return
-        }
-
-        youtubePlayerCancellables.removeAll()
-
-        // only send push updates on macOS 11+ where it's safe to call window.* messages in the browser
-        let canPushMessagesToJS: Bool = {
-            if #available(macOS 11, *) {
-                return true
-            } else {
-                return false
-            }
-        }()
-
-        if webView.url?.host?.droppingWwwPrefix() == "youtube.com" && canPushMessagesToJS {
-            Dependencies.privatePlayer.$mode
-                .dropFirst()
-                .sink { [weak self] playerMode in
-                    guard let self = self else {
-                        return
-                    }
-                    let userValues = YoutubeOverlayUserScript.UserValues(
-                        privatePlayerMode: playerMode,
-                        overlayInteracted: Dependencies.privatePlayer.overlayInteracted
-                    )
-                    self.youtubeOverlayScript?.userValuesUpdated(userValues: userValues, inWebView: self.webView)
-                }
-                .store(in: &youtubePlayerCancellables)
-        }
-
-        if url?.isPrivatePlayerScheme == true {
-            youtubePlayerScript?.isEnabled = true
-
-            if canPushMessagesToJS {
-                Dependencies.privatePlayer.$mode
-                    .map { $0 == .enabled }
-                    .sink { [weak self] shouldAlwaysOpenPrivatePlayer in
-                        guard let self = self else {
-                            return
-                        }
-                        self.youtubePlayerScript?.setAlwaysOpenInPrivatePlayer(shouldAlwaysOpenPrivatePlayer, inWebView: self.webView)
-                    }
-                    .store(in: &youtubePlayerCancellables)
-            }
-        } else {
-            youtubePlayerScript?.isEnabled = false
-        }
-    }
-    
 }
 
 extension Tab: UserContentControllerDelegate {
@@ -722,10 +659,6 @@ extension Tab: UserContentControllerDelegate {
         userScripts.faviconScript.delegate = self
         userScripts.pageObserverScript.delegate = self
         userScripts.hoverUserScript.delegate = self
-        youtubeOverlayScript = userScripts.youtubeOverlayScript
-        youtubeOverlayScript?.delegate = self
-        youtubePlayerScript = userScripts.youtubePlayerUserScript
-        setUpYoutubeScriptsIfNeeded()
     }
 
 }
@@ -767,19 +700,6 @@ extension Tab: HoverUserScriptDelegate {
         delegate?.tab(self, didChangeHoverLink: url)
     }
 
-}
-
-extension Tab: YoutubeOverlayUserScriptDelegate {
-    func youtubeOverlayUserScriptDidRequestDuckPlayer(with url: URL) {
-        let isRequestingNewTab = NSApp.isCommandPressed
-        if isRequestingNewTab {
-            let shouldSelectNewTab = NSApp.isShiftPressed
-            self.webView.load(url, in: .blank, windowFeatures: shouldSelectNewTab ? .selectedTab : .backgroundTab)
-        } else {
-            let content = Tab.TabContent.contentFromURL(url)
-            setContent(content)
-        }
-    }
 }
 
 extension Tab: TabDataClearing {

@@ -129,9 +129,6 @@ extension DistributedNavigationDelegate: WebViewNavigationDelegate {
         notifyResponders(with: webView) { responder, webView in
             responder.webView(webView, willPerformClientRedirectTo: url, delay: delay)
         }
-        //        if case .committed = self.mainFrameLoadState {
-        //            self.clientRedirectedDuringNavigationURL = url
-        //        }
     }
 
     // MARK: Decide Policy for Navigation Action
@@ -456,10 +453,4 @@ extension DistributedNavigationDelegate: WKWebViewDownloadDelegate {
         }
     }
 
-}
-
-extension Array where Element == NavigationResponder {
-    mutating func set(_ responders: NavigationResponder?...) {
-        self = responders.compactMap { $0 }
-    }
 }

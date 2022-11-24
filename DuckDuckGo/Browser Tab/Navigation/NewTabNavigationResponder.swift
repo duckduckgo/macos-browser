@@ -22,7 +22,7 @@ import Foundation
 final class NewTabNavigationResponder: NavigationResponder {
 
     struct Dependencies {
-        @Injected static var pinnedTabsManager: PinnedTabsManager = Tab.Dependencies.pinnedTabsManager
+        @Injected static var pinnedTabsManager: PinnedTabsManager = WindowControllersManager.shared.pinnedTabsManager
     }
 
     func webView(_ webView: WebView, decidePolicyFor navigationAction: WKNavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {

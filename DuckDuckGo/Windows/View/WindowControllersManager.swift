@@ -185,7 +185,9 @@ extension WindowControllersManager {
 }
 
 extension Tab {
+    @Injected private static var pinnedTabsManager = WindowControllersManager.shared.pinnedTabsManager
+
     var isPinned: Bool {
-        return Dependencies.pinnedTabsManager.isTabPinned(self)
+        return Self.pinnedTabsManager.isTabPinned(self)
     }
 }
