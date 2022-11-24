@@ -52,8 +52,7 @@ final class LocalBitwardenInstallationService: BWInstallationService {
 #else
         let applicationSupport = URL.sandboxApplicationSupportURL
 #endif
-        return applicationSupport            .appendingPathComponent("NativeMessagingHosts/com.8bit.bitwarden.json")
-            .path
+        return applicationSupport.appendingPathComponent("NativeMessagingHosts/com.8bit.bitwarden.json").path
     }()
 
     private lazy var sandboxDataFileUrl : URL = {
