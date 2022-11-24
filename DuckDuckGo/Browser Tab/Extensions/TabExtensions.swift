@@ -23,17 +23,23 @@ struct TabExtensions {
     let adClickAttribution: AdClickAttributionTabExtension?
     let contextMenu: ContextMenuManager?
     let printing: TabPrintExtension?
+    let findInPage: FindInPageTabExtension?
+    let autofill: AutofillTabExtension?
 
     static var buildForTab: (Tab) -> TabExtensions = { tab in
         TabExtensions(adClickAttribution: AdClickAttributionTabExtension(tab: tab),
                       contextMenu: ContextMenuManager(tab: tab),
-                      printing: TabPrintExtension(tab: tab))
+                      printing: TabPrintExtension(tab: tab),
+                      findInPage: FindInPageTabExtension(tab: tab),
+                      autofill: AutofillTabExtension(tab: tab))
     }
 
     private static func defaultExtensionsForTests(_ tab: Tab) -> TabExtensions {
         TabExtensions(adClickAttribution: nil,
                       contextMenu: nil,
-                      printing: nil)
+                      printing: nil,
+                      findInPage: nil,
+                      autofill: nil)
     }
 
 }
