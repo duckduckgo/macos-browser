@@ -26,6 +26,7 @@ struct TabExtensions {
     let adClickAttribution: AdClickAttributionTabExtension?
     let clickToLoad: ClickToLoad?
     let contextMenu: ContextMenuManager?
+    let hoveredLinks: HoveredLinkTabExtension?
     let history: TabHistoryExtension?
     let printing: TabPrintExtension?
     let findInPage: FindInPageTabExtension?
@@ -44,6 +45,7 @@ struct TabExtensions {
                              adClickAttribution: AdClickAttributionTabExtension(tab: tab),
                              clickToLoad: ClickToLoad(tab: tab),
                              contextMenu: ContextMenuManager(tab: tab),
+                             hoveredLinks: HoveredLinkTabExtension(tab: tab),
                              history: TabHistoryExtension(tab: tab),
                              printing: TabPrintExtension(tab: tab),
                              findInPage: FindInPageTabExtension(tab: tab),
@@ -62,6 +64,7 @@ struct TabExtensions {
                              adClickAttribution: nil,
                              clickToLoad: nil,
                              contextMenu: nil,
+                             hoveredLinks: nil,
                              history: nil,
                              printing: nil,
                              findInPage: nil,

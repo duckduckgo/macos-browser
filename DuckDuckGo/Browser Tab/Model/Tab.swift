@@ -34,8 +34,6 @@ protocol TabDelegate: FileDownloadManagerDelegate, ContentOverlayUserScriptDeleg
              requestedBasicAuthenticationChallengeWith protectionSpace: URLProtectionSpace,
              completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void)
 
-    func tab(_ tab: Tab, didChangeHoverLink url: URL?)
-
     func tabPageDOMLoaded(_ tab: Tab)
     func closeTab(_ tab: Tab)
 
@@ -658,7 +656,6 @@ extension Tab: UserContentControllerDelegate {
         userScripts.debugScript.instrumentation = extensions.instrumentation
         userScripts.faviconScript.delegate = self
         userScripts.pageObserverScript.delegate = self
-        userScripts.hoverUserScript.delegate = self
     }
 
 }
@@ -690,14 +687,6 @@ extension Tab: FaviconUserScriptDelegate {
             }
             self.favicon = favicon.image
         }
-    }
-
-}
-
-extension Tab: HoverUserScriptDelegate {
-
-    func hoverUserScript(_ script: HoverUserScript, didChange url: URL?) {
-        delegate?.tab(self, didChangeHoverLink: url)
     }
 
 }
