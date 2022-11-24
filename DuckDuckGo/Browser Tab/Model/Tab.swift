@@ -29,7 +29,7 @@ protocol TabDelegate: FileDownloadManagerDelegate, ContentOverlayUserScriptDeleg
     func tabDidStartNavigation(_ tab: Tab)
     func tab(_ tab: Tab, createdChild childTab: Tab, selected: Bool)
     func tab(_ tab: Tab, requestedOpenExternalURL url: URL, forUserEnteredURL: Bool)
-    func tab(_ tab: Tab, requestedSaveAutofillData autofillData: AutofillData)
+
     func tab(_ tab: Tab,
              requestedBasicAuthenticationChallengeWith protectionSpace: URLProtectionSpace,
              completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void)
@@ -46,7 +46,6 @@ protocol TabDelegate: FileDownloadManagerDelegate, ContentOverlayUserScriptDeleg
     func tab(_ tab: Tab, runOpenPanelAllowingMultipleSelection multipleSelection: Bool, allowsDirectories: Bool) async -> [URL]?
 }
 
-// swiftlint:disable type_body_length
 final class Tab: NSObject, Identifiable, ObservableObject {
 
     struct Dependencies {
@@ -160,15 +159,10 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         }
     }
 
-    private weak var autofillScript: WebsiteAutofillUserScript?
     weak var delegate: TabDelegate? {
         didSet {
-            autofillScript?.currentOverlayTab = delegate
+            userScripts?.autofillScript.currentOverlayTab = delegate
         }
-    }
-    
-    var isPinned: Bool {
-        return Dependencies.pinnedTabsManager.isTabPinned(self)
     }
 
     private let webViewConfiguration: WKWebViewConfiguration
@@ -182,6 +176,11 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     }
     var userScriptsPublisher: AnyPublisher<UserScripts?, Never> {
         userContentController.$contentBlockingAssets.map { $0?.userScripts as? UserScripts }.eraseToAnyPublisher()
+    }
+
+    private lazy var clicksSubject = PassthroughSubject<NSPoint, Never>()
+    var clicksPublisher: AnyPublisher<NSPoint, Never> {
+        clicksSubject.eraseToAnyPublisher()
     }
 
     init(content: TabContent,
@@ -347,12 +346,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         // Reset canBeClosedWithBack on any WebView navigation
         _canBeClosedWithBack = _canBeClosedWithBack && parentTab != nil && !webView.canGoBack && !webView.canGoForward
         return _canBeClosedWithBack
-    }
-
-    weak var findInPage: FindInPageModel? {
-        didSet {
-            attachFindInPage()
-        }
     }
 
     @available(macOS, obsoleted: 12.0, renamed: "interactionStateData")
@@ -681,38 +674,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         }
     }
 
-    // MARK: - User Scripts
-
-    lazy var emailManager: EmailManager = {
-        let emailManager = EmailManager()
-        emailManager.requestDelegate = self
-        return emailManager
-    }()
-
-    lazy var vaultManager: SecureVaultManager = {
-        let manager = SecureVaultManager()
-        manager.delegate = self
-        return manager
-    }()
-
-    // MARK: - Find in Page
-
-    weak var findInPageScript: FindInPageUserScript?
-    var findInPageCancellable: AnyCancellable?
-    private func subscribeToFindInPageTextChange() {
-        findInPageCancellable?.cancel()
-        if let findInPage = findInPage {
-            findInPageCancellable = findInPage.$text.receive(on: DispatchQueue.main).sink { [weak self] text in
-                self?.find(text: text)
-            }
-        }
-    }
-
-    private func attachFindInPage() {
-        findInPageScript?.model = findInPage
-        subscribeToFindInPageTextChange()
-    }
-
     // MARK: - Global & Local History
 
     private var shouldStoreNextVisit = true
@@ -824,10 +785,6 @@ extension Tab: UserContentControllerDelegate {
         userScripts.faviconScript.delegate = self
         userScripts.surrogatesScript.delegate = self
         userScripts.contentBlockerRulesScript.delegate = self
-        userScripts.autofillScript.currentOverlayTab = self.delegate
-        userScripts.autofillScript.emailDelegate = emailManager
-        userScripts.autofillScript.vaultDelegate = vaultManager
-        self.autofillScript = userScripts.autofillScript
         userScripts.pageObserverScript.delegate = self
         userScripts.hoverUserScript.delegate = self
         if #available(macOS 11, *) {
@@ -837,18 +794,14 @@ extension Tab: UserContentControllerDelegate {
         youtubeOverlayScript?.delegate = self
         youtubePlayerScript = userScripts.youtubePlayerUserScript
         setUpYoutubeScriptsIfNeeded()
-
-        findInPageScript = userScripts.findInPageScript
-        attachFindInPage()
     }
 
 }
 
 extension Tab: BrowserTabViewControllerClickDelegate {
 
-    func browserTabViewController(_ browserTabViewController: BrowserTabViewController, didClickAtPoint: NSPoint) {
-        guard let autofillScript = autofillScript else { return }
-        autofillScript.clickPoint = didClickAtPoint
+    func browserTabViewController(_ browserTabViewController: BrowserTabViewController, didClickAtPoint point: NSPoint) {
+        clicksSubject.send(point)
     }
 
 }
@@ -938,74 +891,6 @@ extension Tab: SurrogatesUserScriptDelegate {
         trackerInfo?.add(detectedTracker: tracker)
         guard let url = webView.url else { return }
         Dependencies.historyCoordinating.addDetectedTracker(tracker, onURL: url)
-    }
-}
-
-extension Tab: EmailManagerRequestDelegate { }
-
-extension Tab: SecureVaultManagerDelegate {
-
-    public func secureVaultManagerIsEnabledStatus(_: SecureVaultManager) -> Bool {
-        return true
-    }
-    
-    func secureVaultManager(_: SecureVaultManager, promptUserToStoreAutofillData data: AutofillData) {
-        delegate?.tab(self, requestedSaveAutofillData: data)
-    }
-    
-    func secureVaultManager(_: SecureVaultManager,
-                            promptUserToAutofillCredentialsForDomain domain: String,
-                            withAccounts accounts: [SecureVaultModels.WebsiteAccount],
-                            withTrigger trigger: AutofillUserScript.GetTriggerType,
-                            completionHandler: @escaping (SecureVaultModels.WebsiteAccount?) -> Void) {
-        // no-op on macOS
-    }
-
-    func secureVaultManager(_: SecureVaultManager, didAutofill type: AutofillType, withObjectId objectId: Int64) {
-        Pixel.fire(.formAutofilled(kind: type.formAutofillKind))
-    }
-
-    func secureVaultManager(_: SecureVaultManager, didRequestAuthenticationWithCompletionHandler handler: @escaping (Bool) -> Void) {
-        DeviceAuthenticator.shared.authenticateUser(reason: .autofill) { authenticationResult in
-            handler(authenticationResult.authenticated)
-        }
-    }
-
-    func secureVaultInitFailed(_ error: SecureVaultError) {
-        SecureVaultErrorReporter.shared.secureVaultInitFailed(error)
-    }
-    
-    func secureVaultManagerShouldAutomaticallyUpdateCredentialsWithoutUsername(_: SecureVaultManager) -> Bool {
-        return true
-    }
-}
-
-extension AutofillType {
-    var formAutofillKind: Pixel.Event.FormAutofillKind {
-        switch self {
-        case .password: return .password
-        case .card: return .card
-        case .identity: return .identity
-        }
-    }
-}
-
-extension Tab {
-
-    private func find(text: String) {
-        findInPageScript?.find(text: text, inWebView: webView)
-    }
-
-    func findDone() {
-        findInPageScript?.done(withWebView: webView)
-    }
-
-    func findNext() {
-        findInPageScript?.next(withWebView: webView)
-    }
-
-    func findPrevious() {
-        findInPageScript?.previous(withWebView: webView)
     }
 }
 

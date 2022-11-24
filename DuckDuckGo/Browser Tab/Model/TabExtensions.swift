@@ -25,6 +25,8 @@ struct TabExtensions {
     let clickToLoad: ClickToLoad?
     let contextMenu: ContextMenuManager?
     let printing: TabPrintExtension?
+    let findInPage: FindInPageTabExtension?
+    let autofill: AutofillTabExtension?
     let navigations: TabNavigationsProtocol
     let navigationDelegate: DistributedNavigationDelegate
     let linkProtection: LinkProtectionExtension?
@@ -38,6 +40,8 @@ struct TabExtensions {
                              clickToLoad: ClickToLoad(tab: tab),
                              contextMenu: ContextMenuManager(tab: tab),
                              printing: TabPrintExtension(tab: tab),
+                             findInPage: FindInPageTabExtension(tab: tab),
+                             autofill: AutofillTabExtension(tab: tab),
                              navigations: TabNavigations(),
                              navigationDelegate: DistributedNavigationDelegate(),
                              linkProtection: LinkProtectionExtension(),
@@ -51,6 +55,8 @@ struct TabExtensions {
                              clickToLoad: nil,
                              contextMenu: nil,
                              printing: nil,
+                             findInPage: nil,
+                             autofill: nil,
                              navigations: TabNavigations(),
                              navigationDelegate: DistributedNavigationDelegate(),
                              linkProtection: nil,

@@ -183,3 +183,9 @@ extension WindowControllersManager {
     }
 
 }
+
+extension Tab {
+    var isPinned: Bool {
+        return Dependencies.pinnedTabsManager.isTabPinned(self)
+    }
+}
