@@ -59,7 +59,7 @@ final class ConnectBitwardenViewController: NSViewController {
     }
     
     private func updateViewHeight(height: CGFloat) {
-        heightConstraint?.constant = height + 87 // TODO: Work out the height calculation so that this magic number isn't needed.
+        heightConstraint?.constant = height
     }
     
 }

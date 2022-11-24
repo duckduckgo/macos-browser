@@ -29,10 +29,11 @@ struct ConnectBitwardenView: View {
     struct ViewSize {
         fileprivate(set) var headerHeight: Double = 0.0
         fileprivate(set) var viewHeight: Double = 0.0
+        fileprivate(set) var spacerHeight: Double = 0.0
         fileprivate(set) var buttonsHeight: Double = 0.0
-        
+
         var totalHeight: Double {
-            headerHeight + Constants.headerPadding + viewHeight + Constants.bodyPadding + buttonsHeight
+            headerHeight + 2 * Constants.headerPadding + viewHeight + 4 * Constants.bodyPadding + spacerHeight + buttonsHeight
         }
     }
     
@@ -68,9 +69,16 @@ struct ConnectBitwardenView: View {
                         }
                     )
             }
-            .padding(20)
+            .padding(Constants.headerPadding)
             
             Spacer()
+                .background(
+                GeometryReader { proxy in
+                    Color.clear.onAppear {
+                        viewSize.spacerHeight = proxy.size.height
+                    }
+                }
+            )
             
             ButtonsView()
                 .background(
