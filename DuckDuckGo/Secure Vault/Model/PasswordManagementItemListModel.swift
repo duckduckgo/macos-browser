@@ -311,7 +311,7 @@ final class PasswordManagementItemListModel: ObservableObject {
     
     func selectLoginWithDomainOrFirst(domain: String, notify: Bool = true) {
         for section in displayedItems {
-            if let account = section.items.first(where: { $0.websiteAccount?.domain == domain }) {
+            if let account = section.items.first(where: { $0.websiteAccount?.domain.droppingWwwPrefix() == domain.droppingWwwPrefix() }) {
                 selected(item: account, notify: notify)
                 return
             }
