@@ -3,11 +3,11 @@ export const DuckPlayerPage = {
 
     playerError: page => page.locator('.player-error'),
 
-    toolbar: page => page.locator('.content-body'),
+    toolbar: page => page.locator('.toolbar'),
 
     infoIcon: page => page.locator('.info-icon-container svg'),
 
-    infoTooltip: page => page.locator('.info-tooltip'),
+    infoTooltip: page => page.locator('.info-icon-tooltip'),
 
     settingsCog: page => page.locator('.open-settings'),
 
@@ -15,7 +15,7 @@ export const DuckPlayerPage = {
 
     settingsContainer: page => page.locator('.setting-container'),
 
-    settingsCheckbox: page => page.locator('.setting input'),
+    settingsCheckbox: page => page.locator('.setting-container input'),
 
     moveMouseOutOfContent: async (page) => {
         await page.mouse.move(1, 1);
