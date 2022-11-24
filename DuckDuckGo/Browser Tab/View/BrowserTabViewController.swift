@@ -43,6 +43,7 @@ final class BrowserTabViewController: NSViewController {
     private let tabCollectionViewModel: TabCollectionViewModel
     private var tabContentCancellable: AnyCancellable?
     private var errorViewStateCancellable: AnyCancellable?
+    private var hoverLinkCancellable: AnyCancellable?
     private var pinnedTabsDelegatesCancellable: AnyCancellable?
     private var keyWindowSelectedTabCancellable: AnyCancellable?
     private var cancellables = Set<AnyCancellable>()
@@ -118,6 +119,7 @@ final class BrowserTabViewController: NSViewController {
                 self.showTabContent(of: selectedTabViewModel)
                 self.subscribeToErrorViewState()
                 self.subscribeToTabContent(of: selectedTabViewModel)
+                self.subscribeToHoveredLink(of: selectedTabViewModel)
                 self.showCookieConsentPopoverIfNecessary(selectedTabViewModel)
             }
             .store(in: &cancellables)
@@ -257,6 +259,12 @@ final class BrowserTabViewController: NSViewController {
                 self?.tabViewModel?.errorViewState.isVisible ?? false,
                 message: self?.tabViewModel?.errorViewState.message ?? UserText.unknownErrorMessage
             )
+        }
+    }
+
+    func subscribeToHoveredLink(of tabViewModel: TabViewModel?) {
+        hoverLinkCancellable = tabViewModel?.tab.hoveredLinkPublisher.sink { [weak self] in
+            self?.scheduleHoverLabelUpdatesForUrl($0)
         }
     }
 
@@ -576,10 +584,6 @@ extension BrowserTabViewController: TabDelegate {
                                                             persistence: .forSession))
 
         }
-    }
-
-    func tab(_ tab: Tab, didChangeHoverLink url: URL?) {
-        scheduleHoverLabelUpdatesForUrl(url)
     }
 
     func windowDidBecomeKey() {

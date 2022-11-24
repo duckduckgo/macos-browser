@@ -36,8 +36,6 @@ protocol TabDelegate: FileDownloadManagerDelegate, ContentOverlayUserScriptDeleg
              requestedBasicAuthenticationChallengeWith protectionSpace: URLProtectionSpace,
              completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void)
 
-    func tab(_ tab: Tab, didChangeHoverLink url: URL?)
-
     func tabPageDOMLoaded(_ tab: Tab)
     func closeTab(_ tab: Tab)
     func tab(_ tab: Tab, promptUserForCookieConsent result: @escaping (Bool) -> Void)
@@ -851,7 +849,6 @@ extension Tab: UserContentControllerDelegate {
         userScripts.contentBlockerRulesScript.delegate = self
         userScripts.clickToLoadScript.delegate = self
         userScripts.pageObserverScript.delegate = self
-        userScripts.hoverUserScript.delegate = self
         if #available(macOS 11, *) {
             userScripts.autoconsentUserScript?.delegate = self
         }
@@ -1428,14 +1425,6 @@ fileprivate extension WKNavigationResponse {
         let contentDisposition = (response as? HTTPURLResponse)?.allHeaderFields["Content-Disposition"] as? String
         return contentDisposition?.hasPrefix("attachment") ?? false
     }
-}
-
-extension Tab: HoverUserScriptDelegate {
-
-    func hoverUserScript(_ script: HoverUserScript, didChange url: URL?) {
-        delegate?.tab(self, didChangeHoverLink: url)
-    }
-
 }
 
 @available(macOS 11, *)

@@ -22,6 +22,7 @@ struct TabExtensions {
 
     let adClickAttribution: AdClickAttributionTabExtension?
     let contextMenu: ContextMenuManager?
+    let hoveredLinks: HoveredLinkTabExtension?
     let printing: TabPrintExtension?
     let findInPage: FindInPageTabExtension?
     let autofill: AutofillTabExtension?
@@ -30,6 +31,7 @@ struct TabExtensions {
     static var buildForTab: (Tab) -> TabExtensions = { tab in
         TabExtensions(adClickAttribution: AdClickAttributionTabExtension(tab: tab),
                       contextMenu: ContextMenuManager(tab: tab),
+                      hoveredLinks: HoveredLinkTabExtension(tab: tab),
                       printing: TabPrintExtension(tab: tab),
                       findInPage: FindInPageTabExtension(tab: tab),
                       autofill: AutofillTabExtension(tab: tab))
@@ -38,6 +40,7 @@ struct TabExtensions {
     private static func defaultExtensionsForTests(_ tab: Tab) -> TabExtensions {
         TabExtensions(adClickAttribution: nil,
                       contextMenu: nil,
+                      hoveredLinks: nil,
                       printing: nil,
                       findInPage: nil,
                       autofill: nil)
