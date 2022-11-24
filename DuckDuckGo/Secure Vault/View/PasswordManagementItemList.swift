@@ -155,7 +155,7 @@ private struct ExternalPasswordManagerItemSection: View {
     @ObservedObject var model: PasswordManagementItemListModel
     
     var body: some View {
-        Section(header: Text("Password Manager").padding(.leading, 18).padding(.top, 0)) {
+        Section(header: Text(UserText.passwordManager).padding(.leading, 18).padding(.top, 0)) {
             PasswordManagerItemView(model: model) {
                 model.externalPasswordManagerSelected = true
             }
