@@ -19,17 +19,27 @@
 import SwiftUI
 import WireGuardKit
 import NetworkExtension
+import OSLog
 
 final class NetworkProtection: ObservableObject {
 
     private lazy var interfaceConfiguration: InterfaceConfiguration = {
-        let privateKey = PrivateKey(base64Key: "aEjzbMK7P/jzKo/hDatqn3dlvPcupT2zq45UZU25P0E=")!
-        let addressRange = IPAddressRange(from: "10.64.158.41/32")! // ,fc00:bbbb:bbbb:bb01::1:9e28/128
+        let rawPrivateKey = ProcessInfo.processInfo.environment["NETP_PRIVATE_KEY"] ?? ""
+
+        if rawPrivateKey.isEmpty {
+            let error = StaticString("Missing NetP private key")
+            assertionFailure("\(error)")
+            os_log(.error, error)
+        }
+
+        let privateKey = PrivateKey(base64Key: rawPrivateKey)!
+        let ipv4AddressRange = IPAddressRange(from: "10.64.158.41/32")!
+        let ipv6AddressRange = IPAddressRange(from: "fc00:bbbb:bbbb:bb01::1:9e28/128")!
         let dnsServerIPAddress = IPv4Address("10.64.0.1")!
         let dnsServer = DNSServer(address: dnsServerIPAddress)
 
         var configuration = InterfaceConfiguration(privateKey: privateKey)
-        configuration.addresses = [addressRange]
+        configuration.addresses = [ipv4AddressRange, ipv6AddressRange]
         configuration.dns = [dnsServer]
 
         return configuration
