@@ -98,13 +98,13 @@ extension ContextMenuManager {
         menu.replaceItem(at: index, with: self.downloadMenuItem(from: item))
     }
 
-    private func handleCopyLinkItem(_ item: NSMenuItem, at index: Int, in menu: NSMenu) {
+    private func handleCopyLinkItem(_ copyLinkItem: NSMenuItem, at index: Int, in menu: NSMenu) {
         guard let openLinkItem = menu.item(with: .openLink) else {
             assertionFailure("WKMenuItemIdentifierCopyLink item not found")
             return
         }
         menu.insertItem(self.addLinkToBookmarksMenuItem(from: openLinkItem), at: index)
-        menu.replaceItem(at: index + 1, with: self.copyLinkMenuItem(from: openLinkItem))
+        menu.replaceItem(at: index + 1, with: self.copyLinkMenuItem(withTitle: copyLinkItem.title, from: openLinkItem))
     }
 
     private func handleCopyImageItem(_ item: NSMenuItem, at index: Int, in menu: NSMenu) {
@@ -192,8 +192,8 @@ private extension ContextMenuManager {
                      withIdentifierIn: [.downloadLinkedFile, .downloadMedia])
     }
 
-    func copyLinkMenuItem(from item: NSMenuItem) -> NSMenuItem {
-        makeMenuItem(withTitle: item.title, action: #selector(copyLink), from: item, with: .openLink)
+    func copyLinkMenuItem(withTitle title: String, from openLinkItem: NSMenuItem) -> NSMenuItem {
+        makeMenuItem(withTitle: title, action: #selector(copyLink), from: openLinkItem, with: .openLink)
     }
 
     func copyImageAddressMenuItem(from item: NSMenuItem) -> NSMenuItem {
