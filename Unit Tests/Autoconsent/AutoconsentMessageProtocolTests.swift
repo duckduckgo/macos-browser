@@ -65,9 +65,17 @@ class AutoconsentMessageProtocolTests: XCTestCase {
         userScript.handleMessage(
             replyHandler: {(msg: Any?, _: String?) in
                 expect.fulfill()
-                XCTAssertEqual(self.replyToJson(msg: msg!), """
-                {"config":{"autoAction":"optOut","detectRetries":20,"disabledCmps":[],"enabled":true,"enablePrehide":true},"rules":null,"type":"initResp"}
-                """)
+                guard let jsonData = try? JSONSerialization.data(withJSONObject: msg!, options: .sortedKeys),
+                      let json = try? JSONSerialization.jsonObject(with: jsonData, options: []),
+                      let dict = json as? [String: Any],
+                      let config = dict["config"] as? [String: Any]
+                else {
+                    XCTFail("Could not parse init response")
+                    return
+                }
+                
+                XCTAssertEqual(dict["type"] as? String, "initResp")
+                XCTAssertEqual(config["autoAction"] as? String, "optOut")
             },
             message: message
         )

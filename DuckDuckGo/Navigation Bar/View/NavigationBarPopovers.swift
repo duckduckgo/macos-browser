@@ -153,9 +153,8 @@ final class NavigationBarPopovers {
         let popover = passwordManagementPopover ?? PasswordManagementPopover()
         passwordManagementPopover = popover
         popover.delegate = delegate
-        popover.select(category: selectedCategory)
-
         show(popover: popover, usingView: view)
+        popover.select(category: selectedCategory)
     }
 
     func hasAnySavePopoversVisible() -> Bool {
