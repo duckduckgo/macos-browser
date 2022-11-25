@@ -86,3 +86,21 @@ jobs:
       with:
         report_paths: unittests.xml
 
+  verify-autoconsent-bundle:
+    name: 'Verify autoconsent bundle'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: 'npm'
+      - name: Build bundle
+        run: |
+          npm ci
+          npm run rebuild-autoconsent
+      - name: Verify clean tree
+        run: |
+          git update-index --refresh 
+          git diff-index --quiet HEAD --

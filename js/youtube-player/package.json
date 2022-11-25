@@ -2,8 +2,8 @@
   "name": "@duckduckgo/youtube",
   "version": "1.0.0",
   "private": true,
-  "type": "module",
   "devDependencies": {
+    "@playwright/test": "^1.27.1",
     "esbuild": "^0.15.9",
     "typescript": "^4.8.4"
   },
