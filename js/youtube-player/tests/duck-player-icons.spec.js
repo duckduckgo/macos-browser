@@ -6,8 +6,8 @@ test('youtube homepage', async ({ page }) => {
 
   let firstHomepageVideoThumbnail = page.locator('ytd-rich-grid-renderer ytd-rich-grid-row:first-child ytd-rich-item-renderer:first-child #thumbnail'),
       hoverOverlay = page.locator('.ddg-overlay-hover'),
-      previewOverlay = page.locator('#preview .ddg-overlay'),
-      previewLink = page.locator('#preview .ddg-overlay .ddg-play-privately');
+      previewOverlay = page.locator('#preview ddg-icon-overlay'),
+      previewLink = page.locator('#preview ddg-icon-overlay .ddg-play-privately');
 
   // 1. Expect hover overlay shown on hovering thumbnail
   await firstHomepageVideoThumbnail.hover();
