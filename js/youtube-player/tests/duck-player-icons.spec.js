@@ -6,8 +6,7 @@ test('youtube homepage', async ({ page }) => {
 
   let firstHomepageVideoThumbnail = page.locator('ytd-rich-grid-renderer ytd-rich-grid-row:first-child ytd-rich-item-renderer:first-child #thumbnail'),
       hoverOverlay = page.locator('.ddg-overlay-hover'),
-      previewOverlay = page.locator('#preview ddg-icon-overlay'),
-      previewLink = page.locator('#preview ddg-icon-overlay .ddg-play-privately');
+      previewOverlay = page.locator('#preview ddg-icon-overlay');
 
   // 1. Expect hover overlay shown on hovering thumbnail
   await firstHomepageVideoThumbnail.hover();
@@ -19,7 +18,7 @@ test('youtube homepage', async ({ page }) => {
   // 3. Clicking the preview overlay should open duck player
   await previewOverlay.hover();
   await previewOverlay.click();
-  await expect(await getClickedDuckPlayerLink(page)).toEqual(await previewLink.getAttribute('href'));
+  await expect(await getClickedDuckPlayerLink(page)).toEqual(await previewOverlay.getAttribute('href'));
 
 });
 
@@ -30,8 +29,7 @@ test('youtube search', async ({ page }) => {
   await page.keyboard.type('duckduckgo', { delay: 100 });
   await page.keyboard.press('Enter');
 
-  let hoverOverlay = page.locator('.ddg-overlay-hover'),
-      hoverOverlayLink = page.locator('.ddg-overlay-hover a');
+  let hoverOverlay = page.locator('.ddg-overlay-hover');
 
   const getVideoResultThumbnail = num => {
     return 'ytd-section-list-renderer ytd-item-section-renderer #contents.ytd-item-section-renderer .ytd-item-section-renderer:nth-child('+num+') #thumbnail';
@@ -53,15 +51,14 @@ test('youtube search', async ({ page }) => {
   // 4. Clicking the hover overlay should open the video in duck player
   await hoverOverlay.hover();
   await hoverOverlay.click();
-  await expect(await getClickedDuckPlayerLink(page)).toEqual(await hoverOverlayLink.getAttribute('href'));
+  await expect(await getClickedDuckPlayerLink(page)).toEqual(await hoverOverlay.getAttribute('href'));
 });
 
 test('recommended videos', async ({ page }) => {
   await setupIconOverlays(page);
 
   let firstHomepageVideoThumbnail = page.locator('ytd-rich-grid-renderer ytd-rich-grid-row:first-child ytd-rich-item-renderer:first-child #thumbnail'),
-      hoverOverlay = page.locator('.ddg-overlay-hover'),
-      hoverOverlayLink = page.locator('.ddg-overlay-hover a');
+      hoverOverlay = page.locator('.ddg-overlay-hover');
 
   const getRecommendedVideoThumbnail = num => {
     return '#playlist ~ #related #items ytd-compact-video-renderer:nth-child(' + num + ') #thumbnail';
@@ -85,7 +82,7 @@ test('recommended videos', async ({ page }) => {
   // 5. Clicking the hover overlay should open the video in duck player
   await hoverOverlay.hover();
   await hoverOverlay.click();
-  await expect(await getClickedDuckPlayerLink(page)).toEqual(await hoverOverlayLink.getAttribute('href'));
+  await expect(await getClickedDuckPlayerLink(page)).toEqual(await hoverOverlay.getAttribute('href'));
 
 });
 
@@ -116,5 +113,5 @@ test('playlist', async ({ page }) => {
   await hoverOverlay.click();
 
   await expect(hoverOverlayLink).toBeHidden();
-  await expect(await getClickedDuckPlayerLink(page)).toEqual(await hoverOverlayLink.getAttribute('href'));
+  await expect(await getClickedDuckPlayerLink(page)).toEqual(await hoverOverlay.getAttribute('href'));
 });
