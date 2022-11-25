@@ -135,6 +135,8 @@ export const IconOverlay = {
             el.setAttribute('class', extraClass);
         }
 
+        el.setAttribute('style', 'display:none;');
+
         return el;
     },
 

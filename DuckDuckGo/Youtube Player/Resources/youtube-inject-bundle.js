@@ -264,6 +264,7 @@
       if (extraClass) {
         el.setAttribute("class", extraClass);
       }
+      el.setAttribute("style", "display:none;");
       return el;
     },
     getHoverOverlay: () => {
