@@ -1,13 +1,21 @@
-import {WebkitMessaging, WebkitMessagingConfig} from "./utils/WebkitMessaging.js";
+import {WebkitMessagingConfig, Messaging} from "@duckduckgo/content-scope-utils/lib/messaging.js";
 
-export class MacOSCommunications {
-    /** @type {WebkitMessaging} */
+/**
+ * A wrapper for cross-platform communications.
+ *
+ * Please see https://duckduckgo.github.io/content-scope-utils/modules/Webkit_Messaging for the underlying
+ * messaging primitives.
+ */
+export class Communications {
+    /** @type {Messaging} */
     messaging;
     /**
-     * @param {WebkitMessaging} messaging
+     * @param {Messaging} messaging
+     * @param {{updateStrategy: "window-method" | "polling"}} options
      */
-    constructor(messaging) {
+    constructor(messaging, options) {
         this.messaging = messaging;
+        this.options = options;
     }
     /**
      * Inform the native layer that an interaction occurred
@@ -15,13 +23,13 @@ export class MacOSCommunications {
      * @returns {Promise<import("../youtube-inject").UserValues>}
      */
     async setUserValues(userValues) {
-        return this.messaging.wkSendAndWait('setUserValues', userValues)
+        return this.messaging.request('setUserValues', userValues)
     }
     async readUserValues() {
-        return this.messaging.wkSendAndWait('readUserValues', {})
+        return this.messaging.request('readUserValues', {})
     }
     openInDuckPlayerViaMessage(href) {
-        return this.messaging.wkSend('openDuckPlayer', {href})
+        return this.messaging.notify('openDuckPlayer', {href})
     }
     /**
      * Get notification when preferences/state changed
@@ -29,7 +37,7 @@ export class MacOSCommunications {
      * @param {import("../youtube-inject.js").UserValues} initialUserValues
      */
     onUserValuesNotification(cb, initialUserValues) {
-        if (this.messaging.config.hasModernWebkitAPI) {
+        if (this.options.updateStrategy === "window-method") {
             /**
              * @typedef UserValuesNotification
              * @property {import("../youtube-inject.js").UserValues} userValuesNotification
@@ -45,7 +53,8 @@ export class MacOSCommunications {
                 }
                 cb(values.userValuesNotification)
             }
-        } else {
+        }
+        if (this.options.updateStrategy === "polling") {
             /**
              * On macOS < 11 (Catalina) we need to poll the native side to receive
              * notifications of any preferences changes
@@ -77,16 +86,16 @@ export class MacOSCommunications {
 
     /**
      * @param {WebkitMessagingConfig} input
-     * @returns {MacOSCommunications}
+     * @returns {Communications}
      */
     static fromInjectedConfig(input) {
-        const opts = new WebkitMessagingConfig(
-            input.hasModernWebkitAPI,
-            input.webkitMessageHandlerNames,
-            input.secret,
-        )
-        const webkit = new WebkitMessaging(opts);
-        return new MacOSCommunications(webkit);
+        const opts = new WebkitMessagingConfig(input)
+        const messaging = new Messaging(opts);
+        return new Communications(messaging, {
+            updateStrategy: opts.hasModernWebkitAPI
+                ? "window-method"
+                : "polling"
+        });
     }
 }
 
