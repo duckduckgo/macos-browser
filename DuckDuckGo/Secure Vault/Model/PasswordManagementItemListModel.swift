@@ -205,7 +205,7 @@ enum SecureVaultItem: Equatable, Identifiable, Comparable {
 ///
 /// Could maybe even abstract a bunch of this code to be more generic re-usable styled list for use elsewhere.
 final class PasswordManagementItemListModel: ObservableObject {
-    let passwordManagerCoordinator: PasswordManagerCoordinator
+    let passwordManagerCoordinator: PasswordManagerCoordinating
     
     enum EmptyState {
         /// Displays nothing for the empty state. Used when data is still loading, or when filtering the All Items list.
@@ -274,7 +274,8 @@ final class PasswordManagementItemListModel: ObservableObject {
 
     private var onItemSelected: (_ old: SecureVaultItem?, _ new: SecureVaultItem?) -> Void
 
-    init(passwordManagerCoordinator: PasswordManagerCoordinator, onItemSelected: @escaping (_ old: SecureVaultItem?, _ new: SecureVaultItem?) -> Void) {
+    init(passwordManagerCoordinator: PasswordManagerCoordinating,
+         onItemSelected: @escaping (_ old: SecureVaultItem?, _ new: SecureVaultItem?) -> Void) {
         self.onItemSelected = onItemSelected
         self.passwordManagerCoordinator = passwordManagerCoordinator
     }

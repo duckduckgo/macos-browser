@@ -21,8 +21,14 @@ import BrowserServicesKit
 import os.log
 import Combine
 
+protocol PasswordManagerCoordinating: BrowserServicesKit.PasswordManager {
+
+    var displayName: String { get }
+
+}
+
 // Encapsulation of third party password managers
-class PasswordManagerCoordinator: BrowserServicesKit.PasswordManager {
+class PasswordManagerCoordinator: PasswordManagerCoordinating {
 
     static let shared = PasswordManagerCoordinator()
 

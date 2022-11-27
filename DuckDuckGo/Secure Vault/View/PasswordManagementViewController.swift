@@ -143,7 +143,7 @@ final class PasswordManagementViewController: NSViewController {
         try? SecureVaultFactory.default.makeVault(errorReporter: SecureVaultErrorReporter.shared)
     }
 
-    private let passwordManagerCoordinator = PasswordManagerCoordinator.shared
+    private let passwordManagerCoordinator: PasswordManagerCoordinating = PasswordManagerCoordinator.shared
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -445,7 +445,7 @@ final class PasswordManagementViewController: NSViewController {
 
         do {
             guard let id = try secureVault?.storeWebsiteCredentials(credentials),
-                  let savedCredentials = try secureVault?.websiteCredentialsFor(accountId: String(id)) else {
+                  let savedCredentials = try secureVault?.websiteCredentialsFor(accountId: id) else {
                 return
             }
 
@@ -632,7 +632,7 @@ final class PasswordManagementViewController: NSViewController {
             func loadNewItemWithID() {
                 switch newValue {
                 case .account:
-                    guard let credentials = try? self?.secureVault?.websiteCredentialsFor(accountId: String(id)) else { return }
+                    guard let credentials = try? self?.secureVault?.websiteCredentialsFor(accountId: id) else { return }
                     self?.createLoginItemView()
                     self?.syncModelsOnCredentials(credentials)
                 case .card:
@@ -689,7 +689,7 @@ final class PasswordManagementViewController: NSViewController {
     }
     
     private func displayExternalPasswordManagerView() {
-        let passwordManagerView = PasswordManagementBitwardenItemView(manager: passwordManagerCoordinator) { [weak self] in
+        let passwordManagerView = PasswordManagementBitwardenItemView(manager: PasswordManagerCoordinator.shared) { [weak self] in
             self?.dismiss()
         }
         

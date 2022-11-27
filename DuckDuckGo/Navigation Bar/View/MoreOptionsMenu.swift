@@ -41,7 +41,7 @@ final class MoreOptionsMenu: NSMenu {
 
     private let tabCollectionViewModel: TabCollectionViewModel
     private let emailManager: EmailManager
-    private let passwordManagerCoordinator: PasswordManagerCoordinator
+    private let passwordManagerCoordinator: PasswordManagerCoordinating
     
     required init(coder: NSCoder) {
         fatalError("MoreOptionsMenu: Bad initializer")
@@ -439,9 +439,9 @@ final class BookmarksSubMenu: NSMenu {
 }
 
 final class LoginsSubMenu: NSMenu {
-    let passwordManagerCoordinator: PasswordManagerCoordinator
+    let passwordManagerCoordinator: PasswordManagerCoordinating
 
-    init(targetting target: AnyObject, passwordManagerCoordinator: PasswordManagerCoordinator) {
+    init(targetting target: AnyObject, passwordManagerCoordinator: PasswordManagerCoordinating) {
         self.passwordManagerCoordinator = passwordManagerCoordinator
         super.init(title: UserText.passwordManagement)
         updateMenuItems(with: target)

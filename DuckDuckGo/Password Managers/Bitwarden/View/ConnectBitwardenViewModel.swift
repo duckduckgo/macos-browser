@@ -19,6 +19,7 @@
 import Foundation
 import Combine
 import os.log
+import AppKit
 
 protocol ConnectBitwardenViewModelDelegate: AnyObject {
     
