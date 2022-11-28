@@ -39,7 +39,7 @@ enum NewWindowPolicy {
     case cancel
 }
 
-final class ContextMenuManager: NSObject {
+final class ContextMenuManager: NSObject, TabExtension {
 
     private var userScriptsCancellable: AnyCancellable?
     weak var delegate: ContextMenuManagerDelegate?
@@ -50,8 +50,11 @@ final class ContextMenuManager: NSObject {
 
     private var selectedText: String?
 
-    init(tab: Tab) {
+    override init() {
         super.init()
+    }
+
+    func attach(to tab: Tab) {
         self.delegate = tab
         userScriptsCancellable = tab.userScriptsPublisher.sink { [weak self] userScripts in
             userScripts?.contextMenuScript.delegate = self

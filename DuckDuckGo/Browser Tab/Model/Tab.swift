@@ -162,7 +162,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     }
 
     private let webViewConfiguration: WKWebViewConfiguration
-    private(set) var extensions: TabExtensions!
+    private(set) var extensions: TabExtensions = .createExtensions()
 
     var userContentController: UserContentController {
         (webViewConfiguration.userContentController as? UserContentController)!
@@ -218,7 +218,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         super.init()
 
         userContentController.delegate = self
-        extensions = TabExtensions.buildForTab(self)
+        extensions.attach(to: self)
         setupWebView(shouldLoadInBackground: shouldLoadInBackground)
 
         if favicon == nil {

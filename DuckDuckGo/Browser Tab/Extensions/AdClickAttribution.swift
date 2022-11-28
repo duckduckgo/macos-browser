@@ -20,7 +20,7 @@ import Combine
 import Foundation
 import BrowserServicesKit
 
-final class AdClickAttributionTabExtension {
+final class AdClickAttributionTabExtension: TabExtension {
 
     struct Dependencies {
         @Injected(default: ContentBlocking.shared.contentBlockingManager.currentRules) static var currentRules: [ContentBlockerRulesManager.Rules]
@@ -36,16 +36,15 @@ final class AdClickAttributionTabExtension {
         logic.state
     }
 
-    init(tab: Tab) {
-        self.tab = tab
-        initAttributionLogic(tab: tab)
-    }
+    init() {}
 
     public var currentAttributionState: AdClickAttributionLogic.State? {
         logic.state
     }
 
-    private func initAttributionLogic(tab: Tab) {
+    func attach(to tab: Tab) {
+        self.tab = tab
+
         logic.delegate = self
         detection.delegate = logic
 

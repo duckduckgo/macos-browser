@@ -18,6 +18,18 @@
 
 import Foundation
 
+protocol TabExtension {
+    init()
+    func attach(to tab: Tab)
+
+    func encode(using coder: NSCoder)
+    func awakeAfter(using decoder: NSCoder)
+}
+extension TabExtension {
+    func encode(using coder: NSCoder) {}
+    func awakeAfter(using coder: NSCoder) {}
+}
+
 struct TabExtensions {
 
     let adClickAttribution: AdClickAttributionTabExtension?
@@ -27,23 +39,42 @@ struct TabExtensions {
     let findInPage: FindInPageTabExtension?
     let autofill: AutofillTabExtension?
 
-    @Injected(forTests: defaultExtensionsForTests)
-    static var buildForTab: (Tab) -> TabExtensions = { tab in
-        TabExtensions(adClickAttribution: AdClickAttributionTabExtension(tab: tab),
-                      contextMenu: ContextMenuManager(tab: tab),
-                      hoveredLinks: HoveredLinkTabExtension(tab: tab),
-                      printing: TabPrintExtension(tab: tab),
-                      findInPage: FindInPageTabExtension(tab: tab),
-                      autofill: AutofillTabExtension(tab: tab))
+    @Injected(forTests: extensionsForTests)
+    static var createExtensions: () -> TabExtensions = {
+        TabExtensions(adClickAttribution: AdClickAttributionTabExtension(),
+                      contextMenu: ContextMenuManager(),
+                      hoveredLinks: HoveredLinkTabExtension(),
+                      printing: TabPrintExtension(),
+                      findInPage: FindInPageTabExtension(),
+                      autofill: AutofillTabExtension())
     }
 
-    private static func defaultExtensionsForTests(_ tab: Tab) -> TabExtensions {
+    private static func extensionsForTests() -> TabExtensions {
         TabExtensions(adClickAttribution: nil,
                       contextMenu: nil,
                       hoveredLinks: nil,
                       printing: nil,
                       findInPage: nil,
                       autofill: nil)
+    }
+
+    func attach(to tab: Tab) {
+        self.forEach { $0.attach(to: tab) }
+    }
+
+}
+
+extension TabExtensions: Sequence {
+    typealias Iterator = IndexingIterator<[TabExtension]>
+
+    func makeIterator() -> Iterator {
+        Mirror(reflecting: self).children.compactMap { child -> TabExtension? in
+            guard let tabExtension = child.value as? TabExtension else {
+                assertionFailure("\(child.label!) should conform to TabExtension")
+                return nil
+            }
+            return tabExtension
+        }.makeIterator()
     }
 
 }
