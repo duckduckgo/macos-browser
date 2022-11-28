@@ -260,11 +260,13 @@
       let el = new DDGIconOverlay(size, href);
       if (size) {
         el.setAttribute("data-size", size);
+        if (size === "fixed") {
+          el.setAttribute("style", "display:none;");
+        }
       }
       if (extraClass) {
         el.setAttribute("class", extraClass);
       }
-      el.setAttribute("style", "display:none;");
       return el;
     },
     getHoverOverlay: () => {

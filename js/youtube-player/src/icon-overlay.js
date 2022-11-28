@@ -129,13 +129,16 @@ export const IconOverlay = {
 
         if (size) {
             el.setAttribute('data-size', size);
+
+            // Prevent the hover overlay from being displayed briefly when it's created.
+            if (size === 'fixed') {
+                el.setAttribute('style', 'display:none;');
+            }
         }
 
         if (extraClass) {
             el.setAttribute('class', extraClass);
         }
-
-        el.setAttribute('style', 'display:none;');
 
         return el;
     },
