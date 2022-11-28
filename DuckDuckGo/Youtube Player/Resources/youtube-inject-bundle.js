@@ -247,7 +247,6 @@
   customElements.define("ddg-icon-overlay", DDGIconOverlay);
   var IconOverlay = {
     HOVER_CLASS: "ddg-overlay-hover",
-    OVERLAY_CLASS: "ddg-overlay",
     CSS_OVERLAY_MARGIN_TOP: 5,
     CSS_OVERLAY_HEIGHT: 32,
     currentVideoElement: null,
@@ -380,7 +379,7 @@
       return getSizeType(imagesByArea[largestImage].offsetWidth, imagesByArea[largestImage].offsetHeight);
     },
     removeAll: () => {
-      document.querySelectorAll("." + IconOverlay.OVERLAY_CLASS).forEach((element) => {
+      document.querySelectorAll("ddg-icon-overlay").forEach((element) => {
         element.remove();
       });
     }

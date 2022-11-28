@@ -97,7 +97,6 @@ export const IconOverlay = {
      * single element and move it around to the hovered video element.
      */
     HOVER_CLASS: 'ddg-overlay-hover',
-    OVERLAY_CLASS: 'ddg-overlay',
 
     CSS_OVERLAY_MARGIN_TOP: 5,
     CSS_OVERLAY_HEIGHT: 32,
@@ -340,7 +339,7 @@ export const IconOverlay = {
     },
 
     removeAll: () => {
-        document.querySelectorAll('.' + IconOverlay.OVERLAY_CLASS).forEach(element => {
+        document.querySelectorAll('ddg-icon-overlay').forEach(element => {
             element.remove();
         });
     }
