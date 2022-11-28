@@ -20,7 +20,7 @@ import BrowserServicesKit
 import Combine
 import Foundation
 
-final class AutofillTabExtension {
+final class AutofillTabExtension: TabExtension {
 
     static var emailManagerProvider: (EmailManagerRequestDelegate) -> AutofillEmailDelegate = { delegate in
         let emailManager = EmailManager()
@@ -43,7 +43,9 @@ final class AutofillTabExtension {
 
     @Published var autofillDataToSave: AutofillData?
 
-    init(tab: Tab) {
+    func attach(to tab: Tab) {
+        self.tab = tab
+        
         tab.userScriptsPublisher.sink { [weak self] userScripts in
             guard let self = self,
                   let autofillScript = userScripts?.autofillScript

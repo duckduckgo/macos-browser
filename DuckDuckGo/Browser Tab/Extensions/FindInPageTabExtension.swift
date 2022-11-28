@@ -19,7 +19,7 @@
 import Combine
 import Foundation
 
-final class FindInPageTabExtension {
+final class FindInPageTabExtension: TabExtension {
 
     private weak var tab: Tab?
     private var findInPageCancellable: AnyCancellable?
@@ -36,7 +36,9 @@ final class FindInPageTabExtension {
         }
     }
 
-    init(tab: Tab) {
+    init() {}
+
+    func attach(to tab: Tab) {
         self.tab = tab
         userScriptsCancellable = tab.userScriptsPublisher.sink { [weak self] userScripts in
             self?.findInPageScript = userScripts?.findInPageScript

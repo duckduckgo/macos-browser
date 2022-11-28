@@ -22,7 +22,7 @@ import Common
 import Foundation
 import BrowserServicesKit
 
-final class AdClickAttributionTabExtension {
+final class AdClickAttributionTabExtension: TabExtension {
 
     private weak var tab: Tab?
     private var cancellables = Set<AnyCancellable>()
@@ -70,8 +70,8 @@ final class AdClickAttributionTabExtension {
                                        log: OSLog.attribution)
     }
 
-    let detection: AdClickAttributionDetection
-    let logic: AdClickAttributionLogic
+    private(set) var detection: AdClickAttributionDetection!
+    private(set) var logic: AdClickAttributionLogic!
 
     static var currentRules: () -> [ContentBlockerRulesManager.Rules] = { ContentBlocking.shared.contentBlockingManager.currentRules }
 
@@ -79,19 +79,19 @@ final class AdClickAttributionTabExtension {
         logic.state
     }
 
-    init(tab: Tab) {
-        self.tab = tab
-        let adClickAttributionFeature = Self.makeAdClickAttributionFeature(with: tab.privacyConfigurationManager)
-        self.detection = Self.makeAdClickAttributionDetection(featureConfig: adClickAttributionFeature)
-        self.logic = Self.makeAdClickAttributionLogic(featureConfig: adClickAttributionFeature)
-        initAttributionLogic(tab: tab)
-    }
+    init() {}
 
     public var currentAttributionState: AdClickAttributionLogic.State? {
         logic.state
     }
 
-    private func initAttributionLogic(tab: Tab) {
+    func attach(to tab: Tab) {
+        self.tab = tab
+
+        let adClickAttributionFeature = Self.makeAdClickAttributionFeature(with: tab.privacyConfigurationManager)
+        self.detection = Self.makeAdClickAttributionDetection(featureConfig: adClickAttributionFeature)
+        self.logic = Self.makeAdClickAttributionLogic(featureConfig: adClickAttributionFeature)
+
         logic.delegate = self
         detection.delegate = logic
 

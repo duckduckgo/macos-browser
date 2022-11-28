@@ -19,12 +19,14 @@
 import Combine
 import Foundation
 
-final class HoveredLinkTabExtension {
+final class HoveredLinkTabExtension: TabExtension {
 
     private var userScriptsCancellable: AnyCancellable?
     fileprivate var hoveredLinkSubject = PassthroughSubject<URL?, Never>()
 
-    init(tab: Tab) {
+    init() {}
+
+    func attach(to tab: Tab) {
         userScriptsCancellable = tab.userScriptsPublisher.sink { [weak self] userScripts in
             userScripts?.hoverUserScript.delegate = self
         }

@@ -61,6 +61,10 @@ extension Tab: NSSecureCoding {
                   interactionStateData: decoder.decodeIfPresent(at: NSSecureCodingKeys.interactionStateData),
                   lastSelectedAt: decoder.decodeIfPresent(at: NSSecureCodingKeys.lastSelectedAt),
                   currentDownload: currentDownload)
+
+        for tabExtension in self.extensions {
+            tabExtension.awakeAfter(using: decoder)
+        }
     }
 
     func encode(with coder: NSCoder) {
@@ -87,6 +91,10 @@ extension Tab: NSSecureCoding {
 
         if let pane = content.preferencePane {
             coder.encode(pane.rawValue, forKey: NSSecureCodingKeys.preferencePane)
+        }
+
+        for tabExtension in self.extensions {
+            tabExtension.encode(using: coder)
         }
     }
 

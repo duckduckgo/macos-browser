@@ -30,7 +30,7 @@ protocol PrintOperationUI {
 
 extension NSApplication: PrintOperationUI {}
 
-final class TabPrintExtension {
+final class TabPrintExtension: NSObject, TabExtension {
 
     private var contentBlockingAssetsCancellable: AnyCancellable?
     private var userScriptsCancellable: AnyCancellable?
@@ -42,7 +42,11 @@ final class TabPrintExtension {
 
     static var ui: PrintOperationUI = NSApp
     
-    init(tab: Tab) {
+    override init() {
+        super.init()
+    }
+
+    func attach(to tab: Tab) {
         userScriptsCancellable = tab.userScriptsPublisher.sink { [weak self] userScripts in
             userScripts?.printingUserScript.delegate = self
         }
