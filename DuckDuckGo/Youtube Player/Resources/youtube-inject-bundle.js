@@ -945,12 +945,12 @@
           return previewVideo?.closest(linkSelector);
         },
         appendIfNotAppended: () => {
-          if (this.hasAppended) {
+          if (Preview.hasAppended) {
             return false;
           }
           let previewVideo = Preview.getPreviewVideoLink();
           if (previewVideo) {
-            this.hasAppended = true;
+            Preview.hasAppended = true;
             return IconOverlay.appendToVideo(previewVideo);
           }
           return false;

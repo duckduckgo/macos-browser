@@ -98,6 +98,6 @@ export async function setupIconOverlays(page, startURL = 'https://www.youtube.co
     await triggerDuckPlayerSettings();
 
     if (!mock) {
-        await rejectYouTubeCookies();
+        //await rejectYouTubeCookies();
     }
   }

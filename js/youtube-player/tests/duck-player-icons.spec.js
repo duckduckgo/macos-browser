@@ -32,7 +32,7 @@ test('youtube search', async ({ page }) => {
   let hoverOverlay = page.locator('.ddg-overlay-hover');
 
   const getVideoResultThumbnail = num => {
-    return 'ytd-section-list-renderer ytd-item-section-renderer #contents.ytd-item-section-renderer .ytd-item-section-renderer:nth-child('+num+') #thumbnail';
+    return 'ytd-section-list-renderer ytd-item-section-renderer #contents.ytd-item-section-renderer .ytd-item-section-renderer:nth-child('+num+') a#thumbnail';
   }
 
   // 1. Hover first result, make sure hover overlay is visible
