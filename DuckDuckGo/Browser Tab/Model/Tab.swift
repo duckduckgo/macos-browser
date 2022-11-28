@@ -158,7 +158,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     }
 
     private let webViewConfiguration: WKWebViewConfiguration
-    private(set) var extensions: TabExtensions!
+    private(set) var extensions: TabExtensions = .createExtensions()
 
     var userContentController: UserContentController {
         (webViewConfiguration.userContentController as? UserContentController)!
@@ -177,11 +177,10 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
     private func navigationResponders() -> [NavigationResponder?] {
         [
+            extensions.contextMenu,
             TabUserAgent(),
-            extensions.navigations,
 
             NewTabNavigationResponder(),
-            extensions.contextMenu,
 
             extensions.history,
             LocalFileNavigationResponder(),
@@ -237,7 +236,8 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         super.init()
 
         userContentController.delegate = self
-        extensions = TabExtensions.buildForTab(self)
+
+        extensions.attach(to: self)
         extensions.navigationDelegate.responders = navigationResponders().compactMap { $0 }
 
         setupWebView(shouldLoadInBackground: shouldLoadInBackground)

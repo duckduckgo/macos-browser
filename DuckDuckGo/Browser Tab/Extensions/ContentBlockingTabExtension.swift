@@ -21,7 +21,7 @@ import Combine
 import Foundation
 
 typealias DetectedTracker = (tracker: DetectedRequest, surrogateHost: String?)
-final class ContentBlockingTabExtension: NSObject {
+final class ContentBlockingTabExtension: NSObject, TabExtension {
 
     @Injected(default: .shared) static var cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter?
 
@@ -36,8 +36,13 @@ final class ContentBlockingTabExtension: NSObject {
     @Published private(set) var serverTrust: ServerTrust?
     @Published private(set) var cookieConsentManaged: CookieConsentInfo?
 
-    init(tab: Tab) {
+    override init() {
         super.init()
+    }
+    
+    func attach(to tab: Tab) {
+        self.tab = tab
+
         userScriptsCancellable = tab.userScriptsPublisher.sink { [weak self] userScripts in
             self?.tabIdentifier = self?.tab?.extensions.instrumentation.currentTabIdentifier
 

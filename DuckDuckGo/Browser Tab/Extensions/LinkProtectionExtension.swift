@@ -20,7 +20,7 @@ import BrowserServicesKit
 import Foundation
 import WebKit
 
-final class LinkProtectionExtension {
+final class LinkProtectionExtension: TabExtension {
 
     struct Dependencies {
         @Injected(default: ContentBlocking.shared.privacyConfigurationManager) static var privacyManager: PrivacyConfigurationManaging
@@ -37,6 +37,10 @@ final class LinkProtectionExtension {
     fileprivate var linkProtection = LinkProtection(privacyManager: Dependencies.privacyManager,
                                                     contentBlockingManager: Dependencies.contentBlockingManager,
                                                     errorReporting: Dependencies.debugEvents)
+
+    init() {}
+    func attach(to tab: Tab) {
+    }
 
 }
 

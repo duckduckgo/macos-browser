@@ -19,13 +19,19 @@
 import Foundation
 import WebKit
 
-final class TabDownloadsExtension: NavigationResponder {
+final class TabDownloadsExtension: TabExtension {
 
     private weak var tab: Tab?
 
-    init(tab: Tab) {
+    init() {}
+
+    func attach(to tab: Tab) {
         self.tab = tab
     }
+
+}
+
+extension TabDownloadsExtension: NavigationResponder {
 
     func webView(_ webView: WebView, decidePolicyFor navigationAction: WKNavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
 

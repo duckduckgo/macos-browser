@@ -19,10 +19,14 @@
 import Combine
 import Foundation
 
-final class HTTPSUpgradeTabExtension {
+final class HTTPSUpgradeTabExtension: TabExtension {
 
     private var lastUpgradedURL: URL?
     @Published fileprivate(set) var connectionUpgradedTo: URL?
+
+    init() {}
+    func attach(to tab: Tab) {
+    }
 
     private func resetConnectionUpgradedTo(navigationAction: WKNavigationAction) {
         let isOnUpgradedPage = navigationAction.request.url == connectionUpgradedTo

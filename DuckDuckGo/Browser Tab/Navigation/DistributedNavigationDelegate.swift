@@ -19,7 +19,7 @@
 import Foundation
 import WebKit
 
-final class DistributedNavigationDelegate: NSObject {
+final class DistributedNavigationDelegate: NSObject, TabExtension {
 
     var responders = [NavigationResponder]()
     private var mainFrame: WKFrameInfo?
@@ -29,6 +29,9 @@ final class DistributedNavigationDelegate: NSObject {
         super.init()
         // Fix nullable navigationAction.sourceFrame
         WKNavigationAction.swizzleNonnullSourceFrameFix()
+    }
+
+    func attach(to tab: Tab) {
     }
 
     func notifyResponders(with webView: WKWebView, do closure: (NavigationResponder, WebView) -> Void) {

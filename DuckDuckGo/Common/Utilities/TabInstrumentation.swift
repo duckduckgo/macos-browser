@@ -19,7 +19,7 @@
 import Foundation
 import os.signpost
 
-final class TabInstrumentation: TabInstrumentationProtocol {
+final class TabInstrumentation: TabExtension, TabInstrumentationProtocol {
 
     static let tabsLog = OSLog(subsystem: "com.duckduckgo.instrumentation",
                                category: "TabInstrumentation")
@@ -33,6 +33,8 @@ final class TabInstrumentation: TabInstrumentationProtocol {
     init() {
         type(of: self).tabMaxIdentifier += 1
         currentTabIdentifier = type(of: self).tabMaxIdentifier
+    }
+    func attach(to tab: Tab) {
     }
 
     private var tabInitSPID: Any?

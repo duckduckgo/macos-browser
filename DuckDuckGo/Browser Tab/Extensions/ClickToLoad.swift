@@ -21,7 +21,7 @@ import Combine
 import Foundation
 import WebKit
 
-final class ClickToLoad {
+final class ClickToLoad: TabExtension {
     
     private weak var tab: Tab?
     private var userScriptsCancellable: AnyCancellable?
@@ -29,7 +29,11 @@ final class ClickToLoad {
 
     private(set) var fbBlockingEnabled = true
 
-    init(tab: Tab) {
+    init() {}
+
+    func attach(to tab: Tab) {
+        self.tab = tab
+
         userScriptsCancellable = tab.userScriptsPublisher.sink { [weak self] userScripts in
             userScripts?.clickToLoadScript.delegate = self
         }

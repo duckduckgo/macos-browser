@@ -31,7 +31,6 @@ extension Tab: NSSecureCoding {
         static let favicon = "icon"
         static let tabType = "tabType"
         static let preferencePane = "preferencePane"
-        static let visitedDomains = "visitedDomains"
         static let lastSelectedAt = "lastSelectedAt"
     }
 
@@ -49,22 +48,22 @@ extension Tab: NSSecureCoding {
               let content = TabContent(type: tabType, url: url, videoID: videoID, timestamp: videoTimestamp, preferencePane: preferencePane)
         else { return nil }
 
-        let visitedDomains = decoder.decodeObject(of: [NSArray.self, NSString.self], forKey: NSSecureCodingKeys.visitedDomains) as? [String] ?? []
-
         self.init(content: content,
                   title: decoder.decodeIfPresent(at: NSSecureCodingKeys.title),
                   favicon: decoder.decodeIfPresent(at: NSSecureCodingKeys.favicon),
                   sessionStateData: decoder.decodeIfPresent(at: NSSecureCodingKeys.sessionStateData),
                   interactionStateData: decoder.decodeIfPresent(at: NSSecureCodingKeys.interactionStateData),
                   lastSelectedAt: decoder.decodeIfPresent(at: NSSecureCodingKeys.lastSelectedAt))
-        self.extensions.history?.localHistory = Set(visitedDomains)
+
+        for tabExtension in self.extensions {
+            tabExtension.awakeAfter(using: decoder)
+        }
     }
 
     func encode(with coder: NSCoder) {
         guard webView.configuration.websiteDataStore.isPersistent == true else { return }
 
         content.url.map(coder.encode(forKey: NSSecureCodingKeys.url))
-        coder.encode(Array(localHistory), forKey: NSSecureCodingKeys.visitedDomains)
         title.map(coder.encode(forKey: NSSecureCodingKeys.title))
         favicon.map(coder.encode(forKey: NSSecureCodingKeys.favicon))
 
@@ -83,6 +82,10 @@ extension Tab: NSSecureCoding {
 
         if let pane = content.preferencePane {
             coder.encode(pane.rawValue, forKey: NSSecureCodingKeys.preferencePane)
+        }
+
+        for tabExtension in self.extensions {
+            tabExtension.encode(using: coder)
         }
     }
 

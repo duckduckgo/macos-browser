@@ -30,7 +30,7 @@ protocol PrintOperationUI {
 
 extension NSApplication: PrintOperationUI {}
 
-final class TabPrintExtension {
+final class TabPrintExtension: NSObject, TabExtension {
 
     struct Dependencies {
         @Injected(default: NSApp) static var ui: PrintOperationUI
@@ -43,7 +43,11 @@ final class TabPrintExtension {
     private var modalWindow: NSWindow?
     private var activePrintOperation: NSPrintOperation?
 
-    init(tab: Tab) {
+    override init() {
+        super.init()
+    }
+
+    func attach(to tab: Tab) {
         userScriptsCancellable = tab.userScriptsPublisher.sink { [weak self] userScripts in
             userScripts?.printingUserScript.delegate = self
         }

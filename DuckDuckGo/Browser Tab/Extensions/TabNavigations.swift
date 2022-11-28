@@ -43,7 +43,7 @@ final class TabNavigations: NSObject, TabNavigationsProtocol {
 extension WebView {
 
     private var navigations: TabNavigationsProtocol? {
-        self.tab?.extensions.navigations
+        nil
     }
 
     var expectedNavigation: NavigationHistory? {

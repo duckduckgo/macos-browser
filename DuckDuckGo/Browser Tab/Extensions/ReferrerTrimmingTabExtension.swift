@@ -1,5 +1,5 @@
 //
-//  ReferrerTrimmingExtension.swift
+//  ReferrerTrimmingTabExtension.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -21,7 +21,7 @@ import Common
 import Foundation
 import WebKit
 
-extension ReferrerTrimming {
+struct ReferrerTrimmingTabExtension: TabExtension {
 
     struct Dependencies {
         @Injected(default: ContentBlocking.shared.privacyConfigurationManager) static var privacyManager: PrivacyConfigurationManaging
@@ -29,18 +29,26 @@ extension ReferrerTrimming {
         @Injected(default: ContentBlocking.shared.tld) static var tld: TLD
     }
 
-    convenience init() {
-        self.init(privacyManager: Dependencies.privacyManager, contentBlockingManager: Dependencies.contentBlockingManager, tld: Dependencies.tld)
+
+    private let referrerTrimming: ReferrerTrimming
+
+    init() {
+        referrerTrimming = ReferrerTrimming(privacyManager: Dependencies.privacyManager,
+                                            contentBlockingManager: Dependencies.contentBlockingManager,
+                                            tld: Dependencies.tld)
     }
 
+    func attach(to tab: Tab) {
+    }
+    
 }
 
-extension ReferrerTrimming: NavigationResponder {
+extension ReferrerTrimmingTabExtension: NavigationResponder {
 
     func webView(_ webView: WebView, decidePolicyFor navigationAction: WKNavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
         guard navigationAction.isTargetingMainFrame,
               navigationAction.navigationType != .backForward,
-              let newRequest = trimReferrer(forNavigation: navigationAction, originUrl: navigationAction.sourceFrame.request.url)
+              let newRequest = referrerTrimming.trimReferrer(forNavigation: navigationAction, originUrl: navigationAction.sourceFrame.request.url)
         else {
             return .next
         }
@@ -51,15 +59,15 @@ extension ReferrerTrimming: NavigationResponder {
     }
 
     func webView(_ webView: WebView, didStart navigation: WKNavigation, with request: URLRequest) {
-        self.onBeginNavigation(to: webView.url)
+        referrerTrimming.onBeginNavigation(to: webView.url)
     }
 
     func webView(_ webView: WebView, didFinish navigation: WKNavigation, with request: URLRequest) {
-        self.onFinishNavigation()
+        referrerTrimming.onFinishNavigation()
     }
 
     func webView(_ webView: WebView, navigation: WKNavigation, with request: URLRequest, didFailWith error: Error) {
-        self.onFailedNavigation()
+        referrerTrimming.onFailedNavigation()
     }
 
 }

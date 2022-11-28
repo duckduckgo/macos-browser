@@ -749,7 +749,7 @@
 		B69B50542726CD8100758A2B /* atb-with-update.json in Resources */ = {isa = PBXBuildFile; fileRef = B69B50502726CD7F00758A2B /* atb-with-update.json */; };
 		B69B50552726CD8100758A2B /* invalid.json in Resources */ = {isa = PBXBuildFile; fileRef = B69B50512726CD8000758A2B /* invalid.json */; };
 		B69B50572727D16900758A2B /* AtbAndVariantCleanup.swift in Sources */ = {isa = PBXBuildFile; fileRef = B69B50562727D16900758A2B /* AtbAndVariantCleanup.swift */; };
-		B69E454E292BB9A2007BB496 /* ReferrerTrimmingExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B69E454D292BB9A2007BB496 /* ReferrerTrimmingExtension.swift */; };
+		B69E454E292BB9A2007BB496 /* ReferrerTrimmingTabExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B69E454D292BB9A2007BB496 /* ReferrerTrimmingTabExtension.swift */; };
 		B6A5A27125B9377300AA7ADA /* StatePersistenceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A5A27025B9377300AA7ADA /* StatePersistenceService.swift */; };
 		B6A5A27925B93FFF00AA7ADA /* StateRestorationManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A5A27825B93FFE00AA7ADA /* StateRestorationManagerTests.swift */; };
 		B6A5A27E25B9403E00AA7ADA /* FileStoreMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A5A27D25B9403E00AA7ADA /* FileStoreMock.swift */; };
@@ -1633,7 +1633,7 @@
 		B69B50502726CD7F00758A2B /* atb-with-update.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "atb-with-update.json"; sourceTree = "<group>"; };
 		B69B50512726CD8000758A2B /* invalid.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = invalid.json; sourceTree = "<group>"; };
 		B69B50562727D16900758A2B /* AtbAndVariantCleanup.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AtbAndVariantCleanup.swift; sourceTree = "<group>"; };
-		B69E454D292BB9A2007BB496 /* ReferrerTrimmingExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReferrerTrimmingExtension.swift; sourceTree = "<group>"; };
+		B69E454D292BB9A2007BB496 /* ReferrerTrimmingTabExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReferrerTrimmingTabExtension.swift; sourceTree = "<group>"; };
 		B6A5A27025B9377300AA7ADA /* StatePersistenceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatePersistenceService.swift; sourceTree = "<group>"; };
 		B6A5A27825B93FFE00AA7ADA /* StateRestorationManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StateRestorationManagerTests.swift; sourceTree = "<group>"; };
 		B6A5A27D25B9403E00AA7ADA /* FileStoreMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileStoreMock.swift; sourceTree = "<group>"; };
@@ -4019,7 +4019,7 @@
 				B647EFBA2922584B00BA628D /* AdClickAttribution.swift */,
 				B65B1BD9292BAB900058AEBC /* LinkProtectionExtension.swift */,
 				B6C00EC8292F7FE2009C73A6 /* ClickToLoad.swift */,
-				B69E454D292BB9A2007BB496 /* ReferrerTrimmingExtension.swift */,
+				B69E454D292BB9A2007BB496 /* ReferrerTrimmingTabExtension.swift */,
 				B6C00ED2292FAB93009C73A6 /* DuckPlayerTabExtension.swift */,
 				B6C00ED0292F9B3A009C73A6 /* ContentBlockingTabExtension.swift */,
 				B6C00ECE292F98CF009C73A6 /* TabHistoryExtension.swift */,
@@ -5144,7 +5144,7 @@
 				B643BF1427ABF772000BACEC /* NSWorkspaceExtension.swift in Sources */,
 				B6C00ECB292F839D009C73A6 /* AutofillTabExtension.swift in Sources */,
 				4B677439255DBEB800025BD8 /* AppHTTPSUpgradeStore.swift in Sources */,
-				B69E454E292BB9A2007BB496 /* ReferrerTrimmingExtension.swift in Sources */,
+				B69E454E292BB9A2007BB496 /* ReferrerTrimmingTabExtension.swift in Sources */,
 				AAB549DF25DAB8F80058460B /* BookmarkViewModel.swift in Sources */,
 				85707F28276A34D900DC0649 /* DaxSpeech.swift in Sources */,
 				31F28C5328C8EECA00119F70 /* PrivatePlayerSchemeHandler.swift in Sources */,

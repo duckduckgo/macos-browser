@@ -19,9 +19,21 @@
 import BrowserServicesKit
 import Foundation
 
+protocol TabExtension {
+    init()
+    func attach(to tab: Tab)
+
+    func encode(using coder: NSCoder)
+    func awakeAfter(using decoder: NSCoder)
+}
+extension TabExtension {
+    func encode(using coder: NSCoder) {}
+    func awakeAfter(using coder: NSCoder) {}
+}
+
 struct TabExtensions {
 
-    let instrumentation = TabInstrumentation()
+    let instrumentation: TabInstrumentation
     let contentBlocking: ContentBlockingTabExtension?
     let adClickAttribution: AdClickAttributionTabExtension?
     let clickToLoad: ClickToLoad?
@@ -31,36 +43,36 @@ struct TabExtensions {
     let printing: TabPrintExtension?
     let findInPage: FindInPageTabExtension?
     let autofill: AutofillTabExtension?
-    let navigations: TabNavigationsProtocol
     let navigationDelegate: DistributedNavigationDelegate
     let linkProtection: LinkProtectionExtension?
-    let referrerTrimming: ReferrerTrimming?
+    let referrerTrimming: ReferrerTrimmingTabExtension?
     let httpsUpgrade: HTTPSUpgradeTabExtension?
     let downloads: TabDownloadsExtension?
     let duckPlayer: DuckPlayerTabExtension?
 
-    @Injected(forTests: defaultExtensionsForTests)
-    static var buildForTab: (Tab) -> TabExtensions = { tab in
-        return TabExtensions(contentBlocking: ContentBlockingTabExtension(tab: tab),
-                             adClickAttribution: AdClickAttributionTabExtension(tab: tab),
-                             clickToLoad: ClickToLoad(tab: tab),
-                             contextMenu: ContextMenuManager(tab: tab),
-                             hoveredLinks: HoveredLinkTabExtension(tab: tab),
-                             history: TabHistoryExtension(tab: tab),
-                             printing: TabPrintExtension(tab: tab),
-                             findInPage: FindInPageTabExtension(tab: tab),
-                             autofill: AutofillTabExtension(tab: tab),
-                             navigations: TabNavigations(),
+    @Injected(forTests: extensionsForTests)
+    static var createExtensions: () -> TabExtensions = {
+        return TabExtensions(instrumentation: TabInstrumentation(),
+                             contentBlocking: ContentBlockingTabExtension(),
+                             adClickAttribution: AdClickAttributionTabExtension(),
+                             clickToLoad: ClickToLoad(),
+                             contextMenu: ContextMenuManager(),
+                             hoveredLinks: HoveredLinkTabExtension(),
+                             history: TabHistoryExtension(),
+                             printing: TabPrintExtension(),
+                             findInPage: FindInPageTabExtension(),
+                             autofill: AutofillTabExtension(),
                              navigationDelegate: DistributedNavigationDelegate(),
                              linkProtection: LinkProtectionExtension(),
-                             referrerTrimming: ReferrerTrimming(),
+                             referrerTrimming: ReferrerTrimmingTabExtension(),
                              httpsUpgrade: HTTPSUpgradeTabExtension(),
-                             downloads: TabDownloadsExtension(tab: tab),
-                             duckPlayer: DuckPlayerTabExtension(tab: tab))
+                             downloads: TabDownloadsExtension(),
+                             duckPlayer: DuckPlayerTabExtension())
     }
 
-    private static func defaultExtensionsForTests(_ tab: Tab) -> TabExtensions {
-        return TabExtensions(contentBlocking: nil,
+    private static func extensionsForTests() -> TabExtensions {
+        return TabExtensions(instrumentation: TabInstrumentation(),
+                             contentBlocking: nil,
                              adClickAttribution: nil,
                              clickToLoad: nil,
                              contextMenu: nil,
@@ -69,13 +81,31 @@ struct TabExtensions {
                              printing: nil,
                              findInPage: nil,
                              autofill: nil,
-                             navigations: TabNavigations(),
                              navigationDelegate: DistributedNavigationDelegate(),
                              linkProtection: nil,
                              referrerTrimming: nil,
                              httpsUpgrade: nil,
                              downloads: nil,
                              duckPlayer: nil)
+    }
+
+    func attach(to tab: Tab) {
+        self.forEach { $0.attach(to: tab) }
+    }
+
+}
+
+extension TabExtensions: Sequence {
+    typealias Iterator = IndexingIterator<[TabExtension]>
+
+    func makeIterator() -> Iterator {
+        Mirror(reflecting: self).children.compactMap { child -> TabExtension? in
+            guard let tabExtension = child.value as? TabExtension else {
+                assertionFailure("\(child.label!) should conform to TabExtension")
+                return nil
+            }
+            return tabExtension
+        }.makeIterator()
     }
 
 }

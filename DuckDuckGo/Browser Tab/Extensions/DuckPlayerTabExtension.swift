@@ -19,7 +19,7 @@
 import Combine
 import Foundation
 
-final class DuckPlayerTabExtension {
+final class DuckPlayerTabExtension: TabExtension {
     
     @Injected(default: .shared, .testable) static var privatePlayer: PrivatePlayer
     
@@ -29,9 +29,12 @@ final class DuckPlayerTabExtension {
     private weak var tab: Tab?
     private weak var youtubeOverlayScript: YoutubeOverlayUserScript?
     private weak var youtubePlayerScript: YoutubePlayerUserScript?
-    
-    init(tab: Tab) {
+
+    init() {}
+
+    func attach(to tab: Tab) {
         self.tab = tab
+
         userScriptsCancellable = tab.userScriptsPublisher.sink { [weak self] userScripts in
             self?.youtubeOverlayScript = userScripts?.youtubeOverlayScript
             self?.youtubeOverlayScript?.delegate = self

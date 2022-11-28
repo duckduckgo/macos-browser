@@ -20,7 +20,7 @@ import BrowserServicesKit
 import Combine
 import Foundation
 
-final class TabHistoryExtension {
+final class TabHistoryExtension: TabExtension {
 
     @Injected(default: HistoryCoordinator.shared, .testable) static var historyCoordinating: HistoryCoordinating
 
@@ -34,7 +34,9 @@ final class TabHistoryExtension {
     }
     private var cancellables = Set<AnyCancellable>()
 
-    init(tab: Tab) {
+    init() {}
+
+    func attach(to tab: Tab) {
         self.tab = tab
 
         tab.$content
@@ -57,6 +59,17 @@ final class TabHistoryExtension {
                 Self.historyCoordinating.addDetectedTracker(tracker, onURL: url)
             }
             .store(in: &cancellables)
+    }
+
+    private enum NSSecureCodingKeys {
+        static let visitedDomains = "visitedDomains"
+    }
+    func awakeAfter(using decoder: NSCoder) {
+        let visitedDomains = decoder.decodeObject(of: [NSArray.self, NSString.self], forKey: NSSecureCodingKeys.visitedDomains) as? [String] ?? []
+        self.localHistory = Set(visitedDomains)
+    }
+    func encode(using coder: NSCoder) {
+        coder.encode(Array(localHistory), forKey: NSSecureCodingKeys.visitedDomains)
     }
 
     deinit {
