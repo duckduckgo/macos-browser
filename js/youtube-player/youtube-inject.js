@@ -161,7 +161,6 @@ function initWithEnvironment(environment, comms) {
 
         const Preview = {
             previewContainer: false,
-            hasAppended: false,
 
             /**
              * Get the video hover preview link
@@ -179,14 +178,9 @@ function initWithEnvironment(environment, comms) {
              * @returns {HTMLElement|boolean}
              */
             appendIfNotAppended: () => {
-                if (Preview.hasAppended) {
-                    return false;
-                }
-
                 let previewVideo = Preview.getPreviewVideoLink();
 
                 if (previewVideo) {
-                    Preview.hasAppended = true;
                     return IconOverlay.appendToVideo(previewVideo);
                 }
 

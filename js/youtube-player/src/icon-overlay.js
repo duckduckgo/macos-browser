@@ -307,7 +307,7 @@ export const IconOverlay = {
             }
         };
 
-        let videoElementAlreadyHasOverlay = videoElement && videoElement.querySelector('div[class="ddg-overlay"]');
+        let videoElementAlreadyHasOverlay = videoElement && videoElement.querySelector('ddg-icon-overlay');
 
         if (!videoElementAlreadyHasOverlay) {
             appendOverlayToThumbnail(videoElement);

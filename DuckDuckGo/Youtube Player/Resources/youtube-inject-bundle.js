@@ -355,7 +355,7 @@
           }
         }
       };
-      let videoElementAlreadyHasOverlay = videoElement && videoElement.querySelector('div[class="ddg-overlay"]');
+      let videoElementAlreadyHasOverlay = videoElement && videoElement.querySelector("ddg-icon-overlay");
       if (!videoElementAlreadyHasOverlay) {
         appendOverlayToThumbnail(videoElement);
         return true;
@@ -938,19 +938,14 @@
       };
       const Preview = {
         previewContainer: false,
-        hasAppended: false,
         getPreviewVideoLink: () => {
           let linkSelector = 'a[href^="/watch?v="]';
           let previewVideo = document.querySelector("#preview " + linkSelector + " video");
           return previewVideo?.closest(linkSelector);
         },
         appendIfNotAppended: () => {
-          if (Preview.hasAppended) {
-            return false;
-          }
           let previewVideo = Preview.getPreviewVideoLink();
           if (previewVideo) {
-            Preview.hasAppended = true;
             return IconOverlay.appendToVideo(previewVideo);
           }
           return false;
