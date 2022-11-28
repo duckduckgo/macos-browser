@@ -1,7 +1,7 @@
 import {addTrustedEventListener, appendElement, VideoParams} from "./util";
 import dax from "../assets/dax.svg";
 import {i18n} from "./text.js";
-import css from "../assets/styles.css"
+import css from "../assets/icon-overlay.css"
 
 class DDGIconOverlay extends HTMLElement {
     constructor(size, href) {

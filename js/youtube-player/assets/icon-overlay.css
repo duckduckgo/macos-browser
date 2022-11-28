@@ -1,4 +1,3 @@
-/* -- THUMBNAIL OVERLAY -- */
 :host {
     z-index: 1000;
     position: absolute;
