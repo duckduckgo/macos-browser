@@ -4,7 +4,7 @@
 <dict>
 	<key>com.apple.developer.networking.networkextension</key>
 	<array>
-		<string>packet-tunnel-provider-systemextension</string>
+		<string>packet-tunnel-provider</string>
 	</array>
 	<key>com.apple.security.device.audio-input</key>
 	<true/>
@@ -17,6 +17,7 @@
 	<key>keychain-access-groups</key>
 	<array>
 		<string>$(AppIdentifierPrefix)com.duckduckgo.macos.browser</string>
+		<string>$(AppIdentifierPrefix)com.duckduckgo.network-protection</string>
 	</array>
 </dict>
 </plist>

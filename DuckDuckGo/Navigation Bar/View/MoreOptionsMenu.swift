@@ -80,6 +80,10 @@ final class MoreOptionsMenu: NSMenu {
             .withImage(NSImage(named: "OptionsButtonMenuEmail"))
             .withSubmenu(EmailOptionsButtonSubMenu(tabCollectionViewModel: tabCollectionViewModel, emailManager: emailManager))
 
+        addItem(withTitle: UserText.networkProtection, action: #selector(toggleNetworkProtection(_:)), keyEquivalent: "")
+            .targetting(self)
+            .withImage(.NetworkProtection.moreOptionsIcon)
+
         addItem(NSMenuItem.separator())
 
         addPageItems()
@@ -145,6 +149,37 @@ final class MoreOptionsMenu: NSMenu {
 
     @objc func openAutofillWithCreditCards(_ sender: NSMenuItem) {
         actionDelegate?.optionsButtonMenuRequestedLoginsPopover(self, selectedCategory: .cards)
+    }
+
+    @objc func toggleNetworkProtection(_ sender: NSMenuItem) {
+        Task {
+            let networkProtection: NetworkProtection
+
+            do {
+                networkProtection = try await NetworkProtection()
+            } catch {
+                print("🔴 Error creating the VPN tunnel: \(error)")
+                return
+            }
+
+            if networkProtection.isConnected() {
+                do {
+                    try networkProtection.stop()
+                } catch {
+                    // TODO: replace with proper logging or UI error handling
+                    print("🔴 Error stopping the VPN tunnel: \(error)")
+                }
+            } else {
+                Task {
+                    do {
+                        try await networkProtection.start()
+                    } catch {
+                        // TODO: replace with proper logging or UI error handling
+                        print("🔴 Error starting the VPN tunnel: \(error)")
+                    }
+                }
+            }
+        }
     }
 
     @objc func openPreferences(_ sender: NSMenuItem) {

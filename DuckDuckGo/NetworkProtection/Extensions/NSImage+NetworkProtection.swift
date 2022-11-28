@@ -1,5 +1,5 @@
 //
-//  main.swift
+//  NSImage+NetworkProtection.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -16,11 +16,10 @@
 //  limitations under the License.
 //
 
-import Foundation
-import NetworkExtension
+import AppKit
 
-autoreleasepool {
-    NEProvider.startSystemExtensionMode()
+extension NSImage {
+    enum NetworkProtection {
+        static let moreOptionsIcon = NSImage(named: "PasswordManagement")
+    }
 }
-
-dispatchMain()
