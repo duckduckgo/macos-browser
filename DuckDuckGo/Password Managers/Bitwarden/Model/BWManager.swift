@@ -286,9 +286,18 @@ final class BWManager: BWManagement, ObservableObject {
         guard let dataString = encryptedPayload.data,
               let data = Data(base64Encoded: dataString),
               let ivDataString = encryptedPayload.iv,
-              let ivData = Data(base64Encoded: ivDataString)
+              let ivData = Data(base64Encoded: ivDataString),
+              let hmacString = encryptedPayload.mac,
+              let hmac = Data(base64Encoded: hmacString)
         else {
             status = .error(error: .parsingFailed)
+            return
+        }
+
+        // Compare HMAC
+        let ourHmac = encryption.computeHmac(data, iv: ivData)
+        guard ourHmac == hmac else {
+            logOrAssertionFailure("BWManager: HMAC comparison failed")
             return
         }
 

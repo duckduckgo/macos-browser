@@ -27,6 +27,7 @@ enum BWError: Error {
     case statusParsingFailed
 
     // Non-blocking errors
+    case hmacComparisonFailed
     case decryptionOfDataFailed
     case noActiveVault
     case storingOfTheSharedKeyFailed
@@ -47,6 +48,7 @@ enum BWError: Error {
         case .decryptionOfSharedKeyFailed: return "Decryption of shared key failed"
         case .parsingFailed: return "Parsing failed"
         case .statusParsingFailed: return "Status parsing failed"
+        case .hmacComparisonFailed: return "Hmac comparison failed"
         case .decryptionOfDataFailed: return "Decryption of data failed"
         case .noActiveVault: return "No active vault"
         case .storingOfTheSharedKeyFailed: return "Storing of the shared key Failed"

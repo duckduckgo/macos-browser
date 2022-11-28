@@ -40,6 +40,9 @@ NS_ASSUME_NONNULL_BEGIN
 // Decrypts data using the shared key
 - (NSData *)decryptData:(NSData *)data andIv:(NSData *)ivData;
 
+// Computes Hmac used for comparison after receiving of messages
+- (NSData *)computeHmac:(NSData *)data iv:(NSData *)ivData;
+
 // Cleans public, private and shared key
 - (void)cleanKeys;
 
