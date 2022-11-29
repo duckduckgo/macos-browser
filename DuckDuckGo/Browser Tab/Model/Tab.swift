@@ -1235,25 +1235,6 @@ extension Tab: WKNavigationDelegate {
     func webView(_ webView: WKWebView,
                  decidePolicyFor navigationAction: WKNavigationAction) async -> WKNavigationActionPolicy {
 
-        switch await contextMenuManager.decidePolicy(for: navigationAction) {
-        case .instantAllow:
-            return .allow
-        case .newTab(selected: let selected):
-            guard let url = navigationAction.request.url else { return .cancel }
-            self.delegate?.tab(
-                self,
-                requestedNewTabWith: .url(url),
-                selected: selected
-            )
-            return .cancel
-        case .cancel:
-            return .cancel
-        case .download:
-            return .download(navigationAction, using: webView)
-        case .none:
-            break
-        }
-
         if let policy = privatePlayer.decidePolicy(for: navigationAction, in: self) {
             return policy
         }

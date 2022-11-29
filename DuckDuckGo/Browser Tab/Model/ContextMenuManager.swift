@@ -42,19 +42,10 @@ final class ContextMenuManager: NSObject {
 
     weak var delegate: ContextMenuManagerDelegate?
 
-    private var onNavigation: ((WKNavigationAction?) -> NavigationPolicy)?
     private var onNewWindow: ((WKNavigationAction?) -> NewWindowPolicy)?
     private var askForDownloadLocation: Bool?
 
     private var selectedText: String?
-
-    @MainActor
-    func decidePolicy(for navigationAction: WKNavigationAction) async -> NavigationPolicy? {
-        defer {
-            onNavigation = nil
-        }
-        return onNavigation?(navigationAction)
-    }
 
     func decideNewWindowPolicy(for navigationAction: WKNavigationAction) -> NewWindowPolicy? {
         defer {
@@ -262,7 +253,7 @@ private extension ContextMenuManager {
             return
         }
 
-        self.onNavigation = { _ in .newTab(selected: false) }
+        onNewWindow = { _ in .newTab(selected: false) }
         NSApp.sendAction(action, to: originalItem.target, from: originalItem)
     }
 
@@ -319,7 +310,7 @@ private extension ContextMenuManager {
             return
         }
 
-        onNavigation = { [selectedText] navigationAction in
+        onNewWindow = { [selectedText] navigationAction in
             guard let url = navigationAction?.request.url else { return .cancel }
 
             let title = selectedText ?? url.absoluteString
@@ -340,7 +331,7 @@ private extension ContextMenuManager {
             return
         }
 
-        onNavigation = { navigationAction in
+        onNewWindow = { navigationAction in
             guard let url = navigationAction?.request.url as NSURL? else { return .cancel }
 
             let pasteboard = NSPasteboard.general
