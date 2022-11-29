@@ -25,7 +25,6 @@ protocol ContextMenuManagerDelegate: AnyObject {
     func prepareForContextMenuDownload()
 }
 
-
 enum NewWindowPolicy {
     case newWindow
     case newTab(selected: Bool)
@@ -38,7 +37,7 @@ final class ContextMenuManager: NSObject {
 
     private var onNewWindow: ((WKNavigationAction?) -> NewWindowPolicy)?
     private var askForDownloadLocation: Bool?
-
+    private var originalItems: [WKMenuItemIdentifier: NSMenuItem]?
     private var selectedText: String?
 
     func decideNewWindowPolicy(for navigationAction: WKNavigationAction) -> NewWindowPolicy? {
@@ -76,11 +75,15 @@ extension ContextMenuManager {
     ]
 
     private func handleOpenLinkItem(_ item: NSMenuItem, at index: Int, in menu: NSMenu) {
-        menu.replaceItem(at: index, with: self.openLinkInNewTabMenuItem(from: item))
+        guard let openLinkInNewWindowItem = originalItems?[.openLinkInNewWindow] else {
+            assertionFailure("WKMenuItemIdentifierOpenLinkInNewWindow item not found")
+            return
+        }
+        menu.replaceItem(at: index, with: self.openLinkInNewTabMenuItem(from: openLinkInNewWindowItem))
     }
 
     private func handleOpenLinkInNewWindowItem(_ item: NSMenuItem, at index: Int, in menu: NSMenu) {
-        menu.replaceItem(at: index, with: self.openLinkInNewWindowMenuItem(from: item))
+        menu.replaceItem(at: index, with: self.openLinkInNewWindowMenuItem(from: openLinkInNewWindowItem))
     }
 
     private func handleOpenFrameInNewWindowItem(_ item: NSMenuItem, at index: Int, in menu: NSMenu) {
@@ -126,13 +129,18 @@ extension ContextMenuManager {
     private func handleReloadItem(_ item: NSMenuItem, at index: Int, in menu: NSMenu) {
         menu.insertItem(self.bookmarkPageMenuItem(), at: index + 1)
     }
-
 }
 
 // MARK: - NSMenuDelegate
 extension ContextMenuManager: WebViewContextMenuDelegate {
 
     func webView(_ webView: WebView, willOpenContextMenu menu: NSMenu, with event: NSEvent) {
+        originalItems = menu.items.reduce(into: [WKMenuItemIdentifier: NSMenuItem]()) { partialResult, item in
+            if let identifier = item.identifier.flatMap(WKMenuItemIdentifier.init) {
+                partialResult[identifier] = item
+            }
+        }
+
         for (index, item) in menu.items.enumerated().reversed() {
             guard let identifier = item.identifier.flatMap(WKMenuItemIdentifier.init) else { continue }
             Self.menuItemHandlers[identifier]?(self)(item, index, menu)
@@ -151,7 +159,7 @@ extension ContextMenuManager: WebViewContextMenuDelegate {
 private extension ContextMenuManager {
 
     func openLinkInNewTabMenuItem(from item: NSMenuItem) -> NSMenuItem {
-        makeMenuItem(withTitle: UserText.openLinkInNewTab, action: #selector(openLinkInNewTab), from: item, with: .openLink)
+        makeMenuItem(withTitle: UserText.openLinkInNewTab, action: #selector(openLinkInNewTab), from: item, with: .openLinkInNewWindow)
     }
 
     func addLinkToBookmarksMenuItem(from item: NSMenuItem) -> NSMenuItem {
@@ -240,7 +248,7 @@ private extension ContextMenuManager {
     func openLinkInNewTab(_ sender: NSMenuItem) {
         guard let originalItem = sender.representedObject as? NSMenuItem,
               let identifier = originalItem.identifier.map(WKMenuItemIdentifier.init),
-              identifier == .openLink,
+              identifier == .openLinkInNewWindow,
               let action = originalItem.action
         else {
             assertionFailure("Original WebKit Menu Item is missing")
