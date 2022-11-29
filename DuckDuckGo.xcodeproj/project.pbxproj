@@ -27,6 +27,7 @@
 		1D3B1AB92934062B006F4388 /* PasswordManagerCoordinatingMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D3B1AB82934062B006F4388 /* PasswordManagerCoordinatingMock.swift */; };
 		1D3B1ABD29369F3D006F4388 /* BWManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D3B1ABC29369F3D006F4388 /* BWManagerTests.swift */; };
 		1D3B1ABF29369FC8006F4388 /* BWEncryptionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D3B1ABE29369FC8006F4388 /* BWEncryptionTests.swift */; };
+		1D3B1AC22936B816006F4388 /* BWMessageIdGeneratorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D3B1AC12936B816006F4388 /* BWMessageIdGeneratorTests.swift */; };
 		1D43EB32292788C70065E5D6 /* BWEncryptionOutput.m in Sources */ = {isa = PBXBuildFile; fileRef = 1D43EB31292788C70065E5D6 /* BWEncryptionOutput.m */; };
 		1D43EB3429297D760065E5D6 /* BWNotRespondingAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D43EB3329297D760065E5D6 /* BWNotRespondingAlert.swift */; };
 		1D43EB36292ACE690065E5D6 /* ApplicationVersionReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D43EB35292ACE690065E5D6 /* ApplicationVersionReader.swift */; };
@@ -877,6 +878,7 @@
 		1D3B1AB82934062B006F4388 /* PasswordManagerCoordinatingMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordManagerCoordinatingMock.swift; sourceTree = "<group>"; };
 		1D3B1ABC29369F3D006F4388 /* BWManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BWManagerTests.swift; sourceTree = "<group>"; };
 		1D3B1ABE29369FC8006F4388 /* BWEncryptionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BWEncryptionTests.swift; sourceTree = "<group>"; };
+		1D3B1AC12936B816006F4388 /* BWMessageIdGeneratorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BWMessageIdGeneratorTests.swift; sourceTree = "<group>"; };
 		1D43EB30292788C70065E5D6 /* BWEncryptionOutput.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BWEncryptionOutput.h; sourceTree = "<group>"; };
 		1D43EB31292788C70065E5D6 /* BWEncryptionOutput.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BWEncryptionOutput.m; sourceTree = "<group>"; };
 		1D43EB3329297D760065E5D6 /* BWNotRespondingAlert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BWNotRespondingAlert.swift; sourceTree = "<group>"; };
@@ -1805,6 +1807,7 @@
 			isa = PBXGroup;
 			children = (
 				1D3B1ABC29369F3D006F4388 /* BWManagerTests.swift */,
+				1D3B1AC12936B816006F4388 /* BWMessageIdGeneratorTests.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -5334,6 +5337,7 @@
 				EA1E52B52798CF98002EC53C /* ClickToLoadModelTests.swift in Sources */,
 				B6A5A27E25B9403E00AA7ADA /* FileStoreMock.swift in Sources */,
 				B693955F26F1C17F0015B914 /* DownloadListCoordinatorTests.swift in Sources */,
+				1D3B1AC22936B816006F4388 /* BWMessageIdGeneratorTests.swift in Sources */,
 				B6C2C9F62760B659005B7F0A /* TestDataModel.xcdatamodeld in Sources */,
 				B68172AE269EB43F006D1092 /* GeolocationServiceTests.swift in Sources */,
 				B6AE74342609AFCE005B9B1A /* ProgressEstimationTests.swift in Sources */,
