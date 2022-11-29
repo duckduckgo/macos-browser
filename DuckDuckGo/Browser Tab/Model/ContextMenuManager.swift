@@ -83,7 +83,7 @@ extension ContextMenuManager {
     }
 
     private func handleOpenLinkInNewWindowItem(_ item: NSMenuItem, at index: Int, in menu: NSMenu) {
-        menu.replaceItem(at: index, with: self.openLinkInNewWindowMenuItem(from: openLinkInNewWindowItem))
+        menu.replaceItem(at: index, with: self.openLinkInNewWindowMenuItem(from: item))
     }
 
     private func handleOpenFrameInNewWindowItem(_ item: NSMenuItem, at index: Int, in menu: NSMenu) {
