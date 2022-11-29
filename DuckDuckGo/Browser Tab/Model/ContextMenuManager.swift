@@ -92,12 +92,12 @@ extension ContextMenuManager {
     }
 
     private func handleCopyLinkItem(_ copyLinkItem: NSMenuItem, at index: Int, in menu: NSMenu) {
-        guard let openLinkItem = menu.item(with: .openLinkInNewWindow) else {
+        guard let openLinkInNewWindowItem = menu.item(with: .openLinkInNewWindow) else {
             assertionFailure("WKMenuItemIdentifierCopyLink item not found")
             return
         }
-        menu.insertItem(self.addLinkToBookmarksMenuItem(from: openLinkItem), at: index)
-        menu.replaceItem(at: index + 1, with: self.copyLinkMenuItem(withTitle: copyLinkItem.title, from: openLinkItem))
+        menu.insertItem(self.addLinkToBookmarksMenuItem(from: openLinkInNewWindowItem), at: index)
+        menu.replaceItem(at: index + 1, with: self.copyLinkMenuItem(withTitle: copyLinkItem.title, from: openLinkInNewWindowItem))
     }
 
     private func handleCopyImageItem(_ item: NSMenuItem, at index: Int, in menu: NSMenu) {
@@ -297,7 +297,7 @@ private extension ContextMenuManager {
     func addLinkToBookmarks(_ sender: NSMenuItem) {
         guard let originalItem = sender.representedObject as? NSMenuItem,
               let identifier = originalItem.identifier.map(WKMenuItemIdentifier.init),
-              identifier == .openLink,
+              identifier == .openLinkInNewWindow,
               let action = originalItem.action
         else {
             assertionFailure("Original WebKit Menu Item is missing")
