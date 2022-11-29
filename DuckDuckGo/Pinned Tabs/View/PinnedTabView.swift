@@ -78,21 +78,42 @@ struct PinnedTabView: View {
 
     @ViewBuilder
     private var contextMenu: some View {
-        Button(UserText.duplicateTab, action: { collectionModel.duplicate(model) })
-        Button(UserText.unpinTab, action: { collectionModel.unpin(model) })
+        Button(UserText.duplicateTab) { [weak collectionModel, weak model] in
+            guard let model = model else { return }
+            collectionModel?.duplicate(model)
+        }
+
+        Button(UserText.unpinTab) { [weak collectionModel, weak model] in
+            guard let model = model else { return }
+            collectionModel?.unpin(model)
+        }
         Divider()
-        Button(UserText.bookmarkThisPage, action: { collectionModel.bookmark(model) })
+        Button(UserText.bookmarkThisPage) { [weak collectionModel, weak model] in
+            guard let model = model else { return }
+            collectionModel?.bookmark(model)
+        }
+
         fireproofAction
         Divider()
-        Button(UserText.closeTab, action: { collectionModel.close(model) })
+
+        Button(UserText.closeTab) { [weak collectionModel, weak model] in
+            guard let model = model else { return }
+            collectionModel?.close(model)
+        }
     }
 
     @ViewBuilder
     private var fireproofAction: some View {
         if collectionModel.isFireproof(model) {
-            Button(UserText.removeFireproofing, action: { collectionModel.removeFireproofing(model) })
+            Button(UserText.removeFireproofing) { [weak collectionModel, weak model] in
+                guard let model = model else { return }
+                collectionModel?.removeFireproofing(model)
+            }
         } else {
-            Button(UserText.fireproofSite, action: { collectionModel.fireproof(model) })
+            Button(UserText.fireproofSite) { [weak collectionModel, weak model] in
+                guard let model = model else { return }
+                collectionModel?.fireproof(model)
+            }
         }
     }
 }
