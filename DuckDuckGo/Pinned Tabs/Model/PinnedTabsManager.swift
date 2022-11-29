@@ -81,12 +81,25 @@ final class PinnedTabsManager {
         didUnpinTabPublisher = didUnpinTabSubject.eraseToAnyPublisher()
         self.tabCollection = tabCollection
         subscribeToPinnedTabs()
+        subscribeToWindowWillClose()
+    }
+
+    private func subscribeToWindowWillClose() {
+        windowWillCloseCancellable = NotificationCenter.default
+            .publisher(for: NSWindow.willCloseNotification)
+            .filter { $0.object is MainWindow }
+            .sink { [weak self] notification in
+                if NSApp.windows.filter({ $0 is MainWindow }).count == 1 {
+                    self?.tabCollection.tabs.forEach { $0.cleanUpBeforeClosing() }
+                }
+            }
     }
 
     // MARK: - Private
 
     private let didUnpinTabSubject = PassthroughSubject<Int, Never>()
     private var tabsCancellable: AnyCancellable?
+    private var windowWillCloseCancellable: AnyCancellable?
 
     private func subscribeToPinnedTabs() {
         tabsCancellable = tabCollection.$tabs.sink { [weak self] newTabs in
