@@ -25,6 +25,8 @@
 		1D2DC009290167A0008083A1 /* BWStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DDF075F28F815AD00EDFBE3 /* BWStatus.swift */; };
 		1D2DC00B290167EC008083A1 /* RunningApplicationCheck.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D77921C28FFF27C00BE0210 /* RunningApplicationCheck.swift */; };
 		1D3B1AB92934062B006F4388 /* PasswordManagerCoordinatingMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D3B1AB82934062B006F4388 /* PasswordManagerCoordinatingMock.swift */; };
+		1D3B1ABD29369F3D006F4388 /* BWManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D3B1ABC29369F3D006F4388 /* BWManagerTests.swift */; };
+		1D3B1ABF29369FC8006F4388 /* BWEncryptionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D3B1ABE29369FC8006F4388 /* BWEncryptionTests.swift */; };
 		1D43EB32292788C70065E5D6 /* BWEncryptionOutput.m in Sources */ = {isa = PBXBuildFile; fileRef = 1D43EB31292788C70065E5D6 /* BWEncryptionOutput.m */; };
 		1D43EB3429297D760065E5D6 /* BWNotRespondingAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D43EB3329297D760065E5D6 /* BWNotRespondingAlert.swift */; };
 		1D43EB36292ACE690065E5D6 /* ApplicationVersionReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D43EB35292ACE690065E5D6 /* ApplicationVersionReader.swift */; };
@@ -873,6 +875,8 @@
 		1D02633528D8A9A9005CBB41 /* BWEncryption.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BWEncryption.m; sourceTree = "<group>"; };
 		1D074B262909A433006E4AC3 /* PasswordManagerCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordManagerCoordinator.swift; sourceTree = "<group>"; };
 		1D3B1AB82934062B006F4388 /* PasswordManagerCoordinatingMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordManagerCoordinatingMock.swift; sourceTree = "<group>"; };
+		1D3B1ABC29369F3D006F4388 /* BWManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BWManagerTests.swift; sourceTree = "<group>"; };
+		1D3B1ABE29369FC8006F4388 /* BWEncryptionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BWEncryptionTests.swift; sourceTree = "<group>"; };
 		1D43EB30292788C70065E5D6 /* BWEncryptionOutput.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BWEncryptionOutput.h; sourceTree = "<group>"; };
 		1D43EB31292788C70065E5D6 /* BWEncryptionOutput.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BWEncryptionOutput.m; sourceTree = "<group>"; };
 		1D43EB3329297D760065E5D6 /* BWNotRespondingAlert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BWNotRespondingAlert.swift; sourceTree = "<group>"; };
@@ -1774,9 +1778,35 @@
 		1D3B1AB7293405F5006F4388 /* PasswordManagers */ = {
 			isa = PBXGroup;
 			children = (
+				1D3B1ABA29369DBC006F4388 /* Bitwarden */,
 				1D3B1AB82934062B006F4388 /* PasswordManagerCoordinatingMock.swift */,
 			);
 			path = PasswordManagers;
+			sourceTree = "<group>";
+		};
+		1D3B1ABA29369DBC006F4388 /* Bitwarden */ = {
+			isa = PBXGroup;
+			children = (
+				1D3B1AC029369FD7006F4388 /* Model */,
+				1D3B1ABB29369F23006F4388 /* Services */,
+			);
+			path = Bitwarden;
+			sourceTree = "<group>";
+		};
+		1D3B1ABB29369F23006F4388 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				1D3B1ABE29369FC8006F4388 /* BWEncryptionTests.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		1D3B1AC029369FD7006F4388 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				1D3B1ABC29369F3D006F4388 /* BWManagerTests.swift */,
+			);
+			path = Model;
 			sourceTree = "<group>";
 		};
 		1D43EAFE291D29E40065E5D6 /* Services */ = {
@@ -5221,6 +5251,7 @@
 				4B0219A825E0646500ED7DEA /* WebsiteDataStoreTests.swift in Sources */,
 				AAC9C01E24CB6BEB00AD1325 /* TabCollectionViewModelTests.swift in Sources */,
 				B662D3DE275613BB0035D4D6 /* EncryptionKeyStoreMock.swift in Sources */,
+				1D3B1ABF29369FC8006F4388 /* BWEncryptionTests.swift in Sources */,
 				37D23780287EFEE200BCE03B /* PinnedTabsManagerTests.swift in Sources */,
 				AA0877BA26D5161D00B05660 /* WebKitVersionProviderTests.swift in Sources */,
 				B69B50462726C5C200758A2B /* AtbAndVariantCleanupTests.swift in Sources */,
@@ -5321,6 +5352,7 @@
 				4BBF0925283083EC00EE1418 /* FileSystemDSLTests.swift in Sources */,
 				4B11060A25903EAC0039B979 /* CoreDataEncryptionTests.swift in Sources */,
 				4B9292C32667103100AD2C21 /* PasteboardBookmarkTests.swift in Sources */,
+				1D3B1ABD29369F3D006F4388 /* BWManagerTests.swift in Sources */,
 				B610F2E427A8F37A00FCEBE9 /* CBRCompileTimeReporterTests.swift in Sources */,
 				AABAF59C260A7D130085060C /* FaviconManagerMock.swift in Sources */,
 				4BF6962028BEEE8B00D402D4 /* LocalPinningManagerTests.swift in Sources */,

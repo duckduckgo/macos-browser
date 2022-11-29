@@ -25,37 +25,42 @@
 #define BLOCK_SIZE      16
 #define SHARED_KEY_SIZE  64
 
-@implementation BWEncryption
+@interface BWEncryption ()
 
 // Key pair is used for encryption(public key - server) and decryption(private key - client) of the shared key
-RSA *keypair;
+@property (nonatomic) RSA *keypair;
 
 // Shared key is received from Bitwarden
 // First half (32 bytes) is used for encryption/decryption of messages
 // Second half (32 bytes) for hmac
-NSData *sharedKeyData;
-NSData *encryptionKeyData;
-AES_KEY encryptionKey;
-AES_KEY decryptionKey;
-NSData *macKeyData;
+@property (nonatomic) NSData *sharedKeyData;
+
+@property (nonatomic) NSData *encryptionKeyData;
+@property (nonatomic) AES_KEY encryptionKey;
+@property (nonatomic) AES_KEY decryptionKey;
+@property (nonatomic) NSData *macKeyData;
+
+@end
+
+@implementation BWEncryption
 
 -(void)dealloc {
-    RSA_free(keypair);
+    RSA_free(self.keypair);
 }
 
 - (nullable NSString *)generateKeys {
     BIGNUM *bignum = BN_new();
     BN_set_word(bignum, PUB_EXP);
 
-    keypair = RSA_new();
-    int result = RSA_generate_key_ex(keypair, KEY_LENGTH, bignum, NULL);
+    self.keypair = RSA_new();
+    int result = RSA_generate_key_ex(self.keypair, KEY_LENGTH, bignum, NULL);
     if (!result) {
         return NULL;
     }
 
     // Return the public key in the desired format
     BIO *output = BIO_new(BIO_s_mem());
-    result = i2d_RSA_PUBKEY_bio(output,keypair);
+    result = i2d_RSA_PUBKEY_bio(output,self.keypair);
     if (!result) {
         return NULL;
     }
@@ -74,20 +79,20 @@ NSData *macKeyData;
         return false;
     }
 
-    sharedKeyData = sharedKey;
+    self.sharedKeyData = sharedKey;
     // First 32 bytes are encryption/decryption key
-    encryptionKeyData = [sharedKeyData subdataWithRange:NSMakeRange(0, 32)];
-    AES_set_encrypt_key(encryptionKeyData.bytes, (int)encryptionKeyData.length * 8, &encryptionKey);
-    AES_set_decrypt_key(encryptionKeyData.bytes, (int)encryptionKeyData.length * 8, &decryptionKey);
+    self.encryptionKeyData = [self.sharedKeyData subdataWithRange:NSMakeRange(0, 32)];
+    AES_set_encrypt_key(self.encryptionKeyData.bytes, (int)self.encryptionKeyData.length * 8, &_encryptionKey);
+    AES_set_decrypt_key(self.encryptionKeyData.bytes, (int)self.encryptionKeyData.length * 8, &_decryptionKey);
 
     // Last 32 bytes are mac key
-    macKeyData = [sharedKeyData subdataWithRange:NSMakeRange(32, 32)];
+    self.macKeyData = [self.sharedKeyData subdataWithRange:NSMakeRange(32, 32)];
     return true;
 }
 
 - (nullable NSString *)decryptSharedKey:(NSString *)encryptedSharedKey {
     // Make sure key pair is generated
-    if (keypair == NULL) { return false; }
+    if (self.keypair == NULL) { return nil; }
     [self cleanKeyData];
 
     NSData *encryptedSharedKeyData = [[NSData alloc] initWithBase64EncodedString:encryptedSharedKey options:0];
@@ -95,10 +100,10 @@ NSData *macKeyData;
 
     // Decrypt the shared key
     unsigned char decryptedDataArray[2560] = { 0 };
-    int decryptedLength = RSA_private_decrypt(RSA_size(keypair),
+    int decryptedLength = RSA_private_decrypt(RSA_size(self.keypair),
                                               encryptedSharedKeyDataPointer,
                                               decryptedDataArray,
-                                              keypair,
+                                              self.keypair,
                                               RSA_PKCS1_OAEP_PADDING);
     if(decryptedLength == -1) {
         os_log_with_type(OS_LOG_DEFAULT, OS_LOG_TYPE_DEBUG,"OpenSSLWrapper: Decryption of the shared key failed %s",
@@ -116,7 +121,7 @@ NSData *macKeyData;
 }
 
 - (nullable BWEncryptionOutput *)encryptData:(NSData *)data {
-    if (macKeyData == nil) { return nil; }
+    if (self.macKeyData == nil) { return nil; }
 
     NSData *ivData = [self generateIv];
     if (ivData == nil) { return nil; }
@@ -134,7 +139,7 @@ NSData *macKeyData;
     memcpy(&ivCopy, ivBytes, IV_LENGTH);
 
     // Encrypt
-    AES_cbc_encrypt(dataArray, encryptionOutput, dataArrayLength, &encryptionKey, (unsigned char *)ivCopy, AES_ENCRYPT);
+    AES_cbc_encrypt(dataArray, encryptionOutput, dataArrayLength, &_encryptionKey, (unsigned char *)ivCopy, AES_ENCRYPT);
 
     NSData *encryptedData = [NSData dataWithBytes:encryptionOutput length: encryptedDataLength];
     free(encryptionOutput);
@@ -164,7 +169,7 @@ NSData *macKeyData;
     [macData appendData:data];
 
     unsigned char cHMAC[CC_SHA256_DIGEST_LENGTH];
-    CCHmac(kCCHmacAlgSHA256, macKeyData.bytes, macKeyData.length, macData.bytes, macData.length, cHMAC);
+    CCHmac(kCCHmacAlgSHA256, self.macKeyData.bytes, self.macKeyData.length, macData.bytes, macData.length, cHMAC);
     NSData *hash = [[NSData alloc] initWithBytes:cHMAC length:sizeof(cHMAC)];
 
     return hash;
@@ -182,7 +187,7 @@ NSData *macKeyData;
     memcpy(&ivCopy, ivBytes, ivData.length);
 
     // Decrypt
-    AES_cbc_encrypt(data.bytes, decryptionOutput, data.length, &decryptionKey, (unsigned char *)ivCopy, AES_DECRYPT);
+    AES_cbc_encrypt(data.bytes, decryptionOutput, data.length, &_decryptionKey, (unsigned char *)ivCopy, AES_DECRYPT);
 
     // Padding removal
     for(;!isgraph(*(decryptionOutput+(decryptionOutputLength - 1)));decryptionOutputLength--);
@@ -194,16 +199,16 @@ NSData *macKeyData;
 }
 
 - (void)cleanKeys {
-    RSA_free(keypair);
-    keypair = nil;
+    RSA_free(self.keypair);
+    self.keypair = nil;
 
     [self cleanKeyData];
 }
 
 - (void)cleanKeyData {
-    sharedKeyData = nil;
-    encryptionKeyData = nil;
-    macKeyData = nil;
+    self.sharedKeyData = nil;
+    self.encryptionKeyData = nil;
+    self.macKeyData = nil;
 }
 
 @end
