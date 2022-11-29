@@ -130,7 +130,7 @@ class FirefoxLoginReaderTests: XCTestCase {
         let result = firefoxLoginReader.readLogins(dataFormat: nil)
         
         if case let .failure(error) = result {
-            XCTAssertEqual(error, .couldNotReadLoginsFile)
+            XCTAssertEqual(error, .couldNotFindLoginsFile)
         } else {
             XCTFail("Expected to fail when decrypting a database that is protected with a Primary Password")
         }
