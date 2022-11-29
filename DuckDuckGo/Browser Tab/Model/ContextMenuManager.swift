@@ -25,12 +25,6 @@ protocol ContextMenuManagerDelegate: AnyObject {
     func prepareForContextMenuDownload()
 }
 
-enum NavigationPolicy {
-    case instantAllow
-    case newTab(selected: Bool)
-    case download
-    case cancel
-}
 
 enum NewWindowPolicy {
     case newWindow
@@ -98,7 +92,7 @@ extension ContextMenuManager {
     }
 
     private func handleCopyLinkItem(_ copyLinkItem: NSMenuItem, at index: Int, in menu: NSMenu) {
-        guard let openLinkItem = menu.item(with: .openLink) else {
+        guard let openLinkItem = menu.item(with: .openLinkInNewWindow) else {
             assertionFailure("WKMenuItemIdentifierCopyLink item not found")
             return
         }
@@ -161,7 +155,7 @@ private extension ContextMenuManager {
     }
 
     func addLinkToBookmarksMenuItem(from item: NSMenuItem) -> NSMenuItem {
-        makeMenuItem(withTitle: UserText.addLinkToBookmarks, action: #selector(addLinkToBookmarks), from: item, with: .openLink, keyEquivalent: "")
+        makeMenuItem(withTitle: UserText.addLinkToBookmarks, action: #selector(addLinkToBookmarks), from: item, with: .openLinkInNewWindow, keyEquivalent: "")
     }
 
     func bookmarkPageMenuItem() -> NSMenuItem {
@@ -192,7 +186,7 @@ private extension ContextMenuManager {
     }
 
     func copyLinkMenuItem(withTitle title: String, from openLinkItem: NSMenuItem) -> NSMenuItem {
-        makeMenuItem(withTitle: title, action: #selector(copyLink), from: openLinkItem, with: .openLink)
+        makeMenuItem(withTitle: title, action: #selector(copyLink), from: openLinkItem, with: .openLinkInNewWindow)
     }
 
     func copyImageAddressMenuItem(from item: NSMenuItem) -> NSMenuItem {
@@ -324,7 +318,7 @@ private extension ContextMenuManager {
     func copyLink(_ sender: NSMenuItem) {
         guard let originalItem = sender.representedObject as? NSMenuItem,
               let identifier = originalItem.identifier.map(WKMenuItemIdentifier.init),
-              identifier == .openLink,
+              identifier == .openLinkInNewWindow,
               let action = originalItem.action
         else {
             assertionFailure("Original WebKit Menu Item is missing")
