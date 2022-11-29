@@ -105,6 +105,8 @@ extension Pixel {
         case adClickAttributionDetected
         case adClickAttributionActive
         
+        case jsPixel(_ pixel: AutofillUserScript.JSPixel)
+        
         case debug(event: Debug, error: Error? = nil)
 
         enum Debug {
@@ -227,6 +229,9 @@ extension Pixel.Event {
             
         case .adClickAttributionActive:
             return "m_mac_ad_click_active"
+            
+        case .jsPixel(pixel: let pixel):
+            return "m_mac_\(pixel.pixelName)"
         }
     }
 }

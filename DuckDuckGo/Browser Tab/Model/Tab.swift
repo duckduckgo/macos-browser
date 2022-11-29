@@ -1180,6 +1180,10 @@ extension Tab: SecureVaultManagerDelegate {
     func secureVaultManagerShouldAutomaticallyUpdateCredentialsWithoutUsername(_: SecureVaultManager) -> Bool {
         return true
     }
+    
+    public func secureVaultManager(_: BrowserServicesKit.SecureVaultManager, didReceivePixel pixel: BrowserServicesKit.AutofillUserScript.JSPixel) {
+        Pixel.fire(.jsPixel(pixel))
+    }
 }
 
 extension AutofillType {

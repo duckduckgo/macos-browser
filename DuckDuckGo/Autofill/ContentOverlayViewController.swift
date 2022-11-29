@@ -249,5 +249,9 @@ extension ContentOverlayViewController: SecureVaultManagerDelegate {
     public func secureVaultInitFailed(_ error: SecureVaultError) {
         SecureVaultErrorReporter.shared.secureVaultInitFailed(error)
     }
+    
+    public func secureVaultManager(_: BrowserServicesKit.SecureVaultManager, didReceivePixel pixel: BrowserServicesKit.AutofillUserScript.JSPixel) {
+        Pixel.fire(.jsPixel(pixel))
+    }
 
 }
