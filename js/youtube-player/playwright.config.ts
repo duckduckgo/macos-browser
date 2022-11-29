@@ -39,10 +39,18 @@ const config: PlaywrightTestConfig = {
   /* Configure projects for major browsers */
   projects: [
     {
-      name: 'webkit',
+      name: 'integration',
       use: {
         ...devices['Desktop Safari'],
       },
+      testMatch: /\.integration\.js$/
+    },
+    {
+      name: 'e2e',
+      use: {
+        ...devices['Desktop Safari'],
+      },
+      testMatch: /\.e2e\.js$/
     },
   ],
 
