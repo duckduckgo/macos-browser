@@ -26,7 +26,6 @@ struct PinnedTabView: View {
 
     @ObservedObject var model: Tab
     @EnvironmentObject var collectionModel: PinnedTabsViewModel
-    @State var isHovered: Bool = false
 
     @Environment(\.controlActiveState) private var controlActiveState
 
@@ -34,10 +33,10 @@ struct PinnedTabView: View {
     var showsHover: Bool
 
     var body: some View {
-        ZStack {
-            Button {
+        let stack = ZStack {
+            Button { [weak collectionModel, weak model] in
                 if !isSelected {
-                    collectionModel.selectedItem = model
+                    collectionModel?.selectedItem = model
                 }
             } label: {
                 PinnedTabInnerView(
@@ -49,18 +48,20 @@ struct PinnedTabView: View {
             .buttonStyle(TouchDownButtonStyle())
             .cornerRadius(Const.cornerRadius, corners: [.topLeft, .topRight])
             .contextMenu { contextMenu }
-            .onHover { [weak collectionModel] isHovered in
-                guard controlActiveState == .key else {
-                    return
-                }
-                self.isHovered = isHovered
-                collectionModel?.hoveredItem = isHovered ? model : nil
-            }
-            
+
             BorderView(isSelected: isSelected,
                        cornerRadius: Const.cornerRadius,
                        size: TabShadowConfig.dividerSize)
         }
+
+        if controlActiveState == .key {
+            stack.onHover { [weak collectionModel, weak model] isHovered in
+                collectionModel?.hoveredItem = isHovered ? model : nil
+            }
+        } else {
+            stack
+        }
+
     }
 
     private var isSelected: Bool {
@@ -71,6 +72,7 @@ struct PinnedTabView: View {
         if isSelected {
             return Color("InterfaceBackgroundColor")
         }
+        let isHovered = collectionModel.hoveredItem == model
         return showsHover && isHovered ? Color("TabMouseOverColor") : Color.clear
     }
 
