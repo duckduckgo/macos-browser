@@ -15,7 +15,7 @@ print_usage_and_exit() {
 
 	cat <<- EOF
 	Usage:
-	  $ $(basename "$0") <review|release> [-a <asana_task_url>] [-d] [-s] [-v <version>]
+	  $ $(basename "$0") <review|release|review-sandbox|release-sandbox> [-a <asana_task_url>] [-d] [-s] [-v <version>]
 
 	Options:
 	 -a <asana_task_url>  Update Asana task after building the app (implies -d)
@@ -47,6 +47,16 @@ read_command_line_arguments() {
 			app_name="DuckDuckGo"
 			scheme="DuckDuckGo Privacy Browser"
 			configuration="Release"
+			;;
+		review-sandbox)
+			app_name="DuckDuckGo Review"
+			scheme="Product Review Release App Store"
+			configuration="Sandbox_Review"
+			;;
+		release-sandbox)
+			app_name="DuckDuckGo"
+			scheme="DuckDuckGo Privacy Browser App Store"
+			configuration="Sandbox_Release"
 			;;
 		clear-keychain)
 			clear_keychain
