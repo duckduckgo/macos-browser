@@ -20,15 +20,10 @@ jobs:
     - name: Check out the code
       uses: actions/checkout@v3
 
-    - name: Fetch PR's target branch
-      run: git fetch --no-tags --prune --depth=1 origin ${{ github.base_ref }}
-
     - name: Run SwiftLint on files changed in the PR
-      uses: ayoy/action-swiftlint@3.2.2
+      uses: norio-nomura/action-swiftlint@3.2.1
       with:
         args: --strict --force-exclude
-      env:
-        DIFF_BASE: ${{ github.base_ref }}
 
   shellcheck:
 

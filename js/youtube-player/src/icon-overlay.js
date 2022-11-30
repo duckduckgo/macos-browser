@@ -18,12 +18,12 @@ export const IconOverlay = {
     hoverOverlayVisible: false,
 
     /**
-     * @type {import("./comms.js").MacOSCommunications | null}
+     * @type {import("./comms.js").Communications | null}
      */
     comms: null,
     /**
      * // todo: when this is a class, pass this as a constructor arg
-     * @param {import("./comms.js").MacOSCommunications} comms
+     * @param {import("./comms.js").Communications} comms
      */
     setComms(comms) {
         IconOverlay.comms = comms;
@@ -166,7 +166,10 @@ export const IconOverlay = {
      */
     hidePlaylistOverlayOnScroll: (e) => {
         if (e?.target?.id === 'items') {
-            IconOverlay.hideOverlay(IconOverlay.getHoverOverlay());
+            let overlay = IconOverlay.getHoverOverlay();
+            if (overlay) {
+                IconOverlay.hideOverlay(overlay);
+            }
         }
     },
 
