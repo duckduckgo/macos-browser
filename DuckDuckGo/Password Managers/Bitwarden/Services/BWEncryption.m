@@ -108,7 +108,7 @@
     if(decryptedLength == -1) {
         os_log_with_type(OS_LOG_DEFAULT, OS_LOG_TYPE_DEBUG,"OpenSSLWrapper: Decryption of the shared key failed %s",
                          ERR_error_string(ERR_get_error(), NULL));
-        return false;
+        return nil;
     }
 
     NSData *sharedKeyData = [NSData dataWithBytes:decryptedDataArray length:decryptedLength];
