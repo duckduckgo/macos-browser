@@ -38,12 +38,12 @@ final class HistoryStoreTests: XCTestCase {
         }
     }
     
-    override func tearDown() {
-        super.tearDown()
+    override func tearDownWithError() throws {
+        try super.tearDownWithError()
         let context = database.makeContext(concurrencyType: .mainQueueConcurrencyType)
         context.deleteAll(entityDescriptions: [HistoryEntryManagedObject.entity(),
-                                               HistoryEntryManagedObject.entity()])
-        try? context.save()
+                                               VisitManagedObject.entity()])
+        try context.save()
         database = nil
     }
 
