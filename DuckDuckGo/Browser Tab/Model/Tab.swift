@@ -1364,11 +1364,13 @@ extension Tab: WKNavigationDelegate {
                 // Auto-cancel simulated Back action when upgrading to HTTPS or GPC from Client Redirect
                 self.webView.frozenCanGoForward = nil
                 self.webView.frozenCanGoBack = nil
-
                 return .cancel
-
-            } else if navigationAction.navigationType != .backForward, !isRequestingNewTab,
-                      let request = GPCRequestFactory.shared.requestForGPC(basedOn: navigationAction.request) {
+                
+            } else if navigationAction.navigationType != .backForward,
+                      !isRequestingNewTab,
+                      let request = GPCRequestFactory().requestForGPC(basedOn: navigationAction.request,
+                                                                      config: ContentBlocking.shared.privacyConfigurationManager.privacyConfig,
+                                                                      gpcEnabled: PrivacySecurityPreferences.shared.gpcEnabled) {
                 self.invalidateBackItemIfNeeded(for: navigationAction)
                 defer {
                     _ = webView.load(request)
