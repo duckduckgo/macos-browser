@@ -178,6 +178,55 @@ final class HistoryStoreTests: XCTestCase {
 
         waitForExpectations(timeout: 1, handler: nil)
     }
+    
+    func testWhenCleanOldIsCalled_ThenRelationshipsAreConsistentBothWays() {
+        let context = database.makeContext(concurrencyType: .mainQueueConcurrencyType)
+        let historyStore = HistoryStore(context: context)
+        
+        let oldVisitDate = Date(timeIntervalSince1970: 0)
+        let slightlyLessOldVisitDate = Date(timeIntervalSince1970: 12345)
+        let oldVisit = Visit(date: oldVisitDate)
+        let slightlyLessOldVisit = Visit(date: slightlyLessOldVisitDate)
+
+        let oldHistoryEntry = HistoryEntry(identifier: UUID(),
+                                           url: URL.duckDuckGo,
+                                           title: nil,
+                                           numberOfVisits: 2,
+                                           lastVisit: slightlyLessOldVisitDate,
+                                           visits: [oldVisit, slightlyLessOldVisit])
+        let firstSavingExpectation = self.expectation(description: "Saving")
+        save(entry: oldHistoryEntry, historyStore: historyStore, expectation: firstSavingExpectation)
+
+        let newHistoryEntryIdentifier = UUID()
+        let newHistoryEntry = HistoryEntry(identifier: newHistoryEntryIdentifier,
+                                           url: URL(string: "wikipedia.org")!,
+                                           title: nil,
+                                           numberOfVisits: 1,
+                                           lastVisit: Date(),
+                                           visits: [])
+        let secondSavingExpectation = self.expectation(description: "Saving")
+        save(entry: newHistoryEntry, historyStore: historyStore, expectation: secondSavingExpectation)
+
+        let loadingExpectation = self.expectation(description: "Loading")
+        historyStore.cleanOld(until: Date(timeIntervalSince1970: 1))
+            .receive(on: DispatchQueue.main)
+            .sink { completion in
+                switch completion {
+                case .finished:
+                    loadingExpectation.fulfill()
+                case .failure(let error):
+                    XCTFail("Loading of history failed - \(error.localizedDescription)")
+                }
+            } receiveValue: { history in
+                XCTAssertEqual(history.count, 2)
+                for entry in history {
+                    XCTAssertEqual(entry.visits.count, 1)
+                }
+            }
+            .store(in: &cancellables)
+
+        waitForExpectations(timeout: 1, handler: nil)
+    }
 
 }
 
