@@ -17,19 +17,17 @@
 //
 
 import Foundation
-import BrowserServicesKit
 import WebKit
 import os
+import BrowserServicesKit
 import Common
+import UserScript
 
 protocol YoutubeOverlayUserScriptDelegate: AnyObject {
     func youtubeOverlayUserScriptDidRequestDuckPlayer(with url: URL)
 }
 
-final class YoutubeOverlayUserScript: NSObject, UserScript {
-
-    typealias MessageReplyHandler = (String?) -> Void
-    typealias MessageHandler = (YoutubeMessage, @escaping MessageReplyHandler) -> Void
+final class YoutubeOverlayUserScript: NSObject, UserScript, UserScriptMessageEncryption {
 
     enum MessageNames: String, CaseIterable {
         case setUserValues
@@ -37,6 +35,7 @@ final class YoutubeOverlayUserScript: NSObject, UserScript {
         case openDuckPlayer
     }
 
+    // This conforms to https://duckduckgo.github.io/content-scope-utils/classes/Webkit_Messaging.WebkitMessagingConfig.html
     struct WebkitMessagingConfig: Encodable {
         var hasModernWebkitAPI: Bool
         var webkitMessageHandlerNames: [String]
@@ -80,18 +79,14 @@ final class YoutubeOverlayUserScript: NSObject, UserScript {
         return js
     }()
 
-    func hostForMessage(_ message: YoutubeMessage) -> String {
-        hostProvider.hostForMessage(message)
-    }
-
-    let encrypter: YoutubeEncrypter
-    let hostProvider: YoutubeHostProvider
+    let encrypter: UserScriptEncrypter
+    let hostProvider: UserScriptHostProvider
     let generatedSecret: String = UUID().uuidString
 
     init(
         preferences: PrivatePlayerPreferences = .shared,
-        encrypter: YoutubeEncrypter = AESGCMYoutubeOverlayEncrypter(),
-        hostProvider: SecurityOriginHostProvider = SecurityOriginHostProvider()
+        encrypter: UserScriptEncrypter = AESGCMUserScriptEncrypter(),
+        hostProvider: UserScriptHostProvider = SecurityOriginHostProvider()
     ) {
         self.hostProvider = hostProvider
         self.encrypter = encrypter
@@ -124,13 +119,30 @@ final class YoutubeOverlayUserScript: NSObject, UserScript {
         return json
     }
 
-    // MARK: - Private
+    func messageHandlerFor(_ messageName: String) -> MessageHandler? {
+        guard let message = MessageNames(rawValue: messageName) else {
+            assertionFailure("YoutubeOverlayUserScript: Failed to parse User Script message: \(messageName)")
+            return nil
+        }
 
-    fileprivate func isMessageFromVerifiedOrigin(_ message: YoutubeMessage) -> Bool {
-        message.messageHost.droppingWwwPrefix() == "youtube.com"
+        switch message {
+
+        case .setUserValues:
+            return handleSetUserValues
+        case .readUserValues:
+            return handleReadUserValues
+        case .openDuckPlayer:
+            return handleOpenDuckPlayer
+        }
     }
 
-    private func handleSetUserValues(message: YoutubeMessage, _ replyHandler: @escaping MessageReplyHandler) {
+    // MARK: - Private
+
+    fileprivate func isMessageFromVerifiedOrigin(_ message: UserScriptMessage) -> Bool {
+        hostProvider.hostForMessage(message).droppingWwwPrefix() == "youtube.com"
+    }
+
+    private func handleSetUserValues(message: UserScriptMessage, _ replyHandler: @escaping MessageReplyHandler) {
         guard let userValues: UserValues = DecodableHelper.decode(from: message.messageBody) else {
             assertionFailure("YoutubeOverlayUserScript: expected JSON representation of UserValues")
             return
@@ -142,11 +154,11 @@ final class YoutubeOverlayUserScript: NSObject, UserScript {
         replyHandler(encodeUserValues())
     }
 
-    private func handleReadUserValues(message: YoutubeMessage, _ replyHandler: @escaping MessageReplyHandler) {
+    private func handleReadUserValues(message: UserScriptMessage, _ replyHandler: @escaping MessageReplyHandler) {
         replyHandler(encodeUserValues())
     }
 
-    private func handleOpenDuckPlayer(message: YoutubeMessage, _ replyHandler: @escaping MessageReplyHandler) {
+    private func handleOpenDuckPlayer(message: UserScriptMessage, _ replyHandler: @escaping MessageReplyHandler) {
         guard let dict = message.messageBody as? [String: Any],
               let href = dict["href"] as? String,
               let url = href.url else {
@@ -161,23 +173,6 @@ final class YoutubeOverlayUserScript: NSObject, UserScript {
             webView.evaluateJavaScript(js, in: nil, in: WKContentWorld.defaultClient)
         } else {
             webView.evaluateJavaScript(js)
-        }
-    }
-
-    private func messageHandlerFor(_ messageName: String) -> MessageHandler? {
-        guard let message = MessageNames(rawValue: messageName) else {
-            assertionFailure("YoutubeOverlayUserScript: Failed to parse User Script message: \(messageName)")
-            return nil
-        }
-
-        switch message {
-
-        case .setUserValues:
-            return handleSetUserValues
-        case .readUserValues:
-            return handleReadUserValues
-        case .openDuckPlayer:
-            return handleOpenDuckPlayer
         }
     }
 
@@ -215,57 +210,6 @@ extension YoutubeOverlayUserScript: WKScriptMessageHandler {
             return
         }
 
-        guard let messageHandler = messageHandlerFor(message.messageName) else {
-            // Unsupported message fail silently
-            return
-        }
-
-        guard let body = message.messageBody as? [String: Any],
-              let messageHandling = body["messageHandling"] as? [String: Any],
-              let secret = messageHandling["secret"] as? String,
-              // If this does not match the page is playing shenanigans.
-              secret == generatedSecret
-        else {
-            return
-        }
-
-        messageHandler(message) { reply in
-            guard let reply = reply,
-                  let messageHandling = body["messageHandling"] as? [String: Any],
-                  let key = messageHandling["key"] as? [UInt8],
-                  let iv = messageHandling["iv"] as? [UInt8],
-                  let methodName = messageHandling["methodName"] as? String,
-                  let encryption = try? self.encrypter.encryptReply(reply, key: key, iv: iv)
-            else {
-                return
-            }
-
-            let ciphertext = encryption.ciphertext.withUnsafeBytes { bytes in
-                        return bytes.map {
-                            String($0)
-                        }
-                    }
-                    .joined(separator: ",")
-
-            let tag = encryption.tag.withUnsafeBytes { bytes in
-                        return bytes.map {
-                            String($0)
-                        }
-                    }
-                    .joined(separator: ",")
-
-            let script = """
-                         (() => {
-                             window.\(methodName) && window.\(methodName)({
-                                 ciphertext: [\(ciphertext)],
-                                 tag: [\(tag)]
-                             });
-                         })();
-                         """
-
-            assert(message.messageWebView != nil)
-            dispatchPrecondition(condition: .onQueue(DispatchQueue.main))
-            message.messageWebView?.evaluateJavaScript(script)
-        }
+        processEncryptedMessage(message, from: userContentController)
     }
 }

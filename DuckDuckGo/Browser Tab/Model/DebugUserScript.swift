@@ -19,6 +19,7 @@
 import WebKit
 import os
 import BrowserServicesKit
+import UserScript
 
 protocol TabInstrumentationProtocol: AnyObject {
     func request(url: String, allowedIn timeInMs: Double)

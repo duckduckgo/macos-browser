@@ -90,7 +90,7 @@ final class NavigationBarPopovers {
         popover.viewController.delegate = downloadsDelegate
         downloadsPopover = popover
 
-        show(popover: popover, usingView: view)
+        show(popover: popover, usingView: view, preferredEdge: .maxY)
     }
 
     private var downloadsPopoverTimer: Timer?
@@ -153,9 +153,8 @@ final class NavigationBarPopovers {
         let popover = passwordManagementPopover ?? PasswordManagementPopover()
         passwordManagementPopover = popover
         popover.delegate = delegate
-        popover.select(category: selectedCategory)
-
         show(popover: popover, usingView: view)
+        popover.select(category: selectedCategory)
     }
 
     func hasAnySavePopoversVisible() -> Bool {
@@ -224,9 +223,9 @@ final class NavigationBarPopovers {
         show(popover: popover, usingView: view)
     }
 
-    private func show(popover: NSPopover, usingView view: NSView) {
+    private func show(popover: NSPopover, usingView view: NSView, preferredEdge edge: NSRectEdge = .minY) {
         view.isHidden = false
-        popover.show(relativeTo: view.bounds.insetFromLineOfDeath(), of: view, preferredEdge: .maxX)
+        popover.show(relativeTo: view.bounds.insetFromLineOfDeath(), of: view, preferredEdge: edge)
     }
 
 }

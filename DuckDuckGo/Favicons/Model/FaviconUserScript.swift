@@ -19,6 +19,7 @@
 import Foundation
 import WebKit
 import BrowserServicesKit
+import UserScript
 
 protocol FaviconUserScriptDelegate: AnyObject {
 

@@ -95,6 +95,7 @@ final class PrivatePlayer {
             .map { [weak privacyConfigurationManager] in
                 privacyConfigurationManager?.privacyConfig.isEnabled(featureKey: .duckPlayer) == true
             }
+            .receive(on: DispatchQueue.main)
             .assign(to: \.isFeatureEnabled, onWeaklyHeld: self)
     }
 

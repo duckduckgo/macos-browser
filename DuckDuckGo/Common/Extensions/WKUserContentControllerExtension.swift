@@ -19,6 +19,7 @@
 import Cocoa
 import WebKit
 import BrowserServicesKit
+import UserScript
 
 extension WKUserContentController {
 

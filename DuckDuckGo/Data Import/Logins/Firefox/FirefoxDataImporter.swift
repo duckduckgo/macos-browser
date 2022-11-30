@@ -64,6 +64,7 @@ final class FirefoxDataImporter: DataImporter {
                 case .databaseAccessFailed: completion(.failure(.logins(DataImportError.ImportErrorType.databaseAccessFailed)))
                 case .couldNotFindProfile: completion(.failure(.logins(.couldNotFindProfile)))
                 case .couldNotGetDecryptionKey: completion(.failure(.logins(.couldNotGetDecryptionKey)))
+                case .couldNotFindLoginsFile: completion(.failure(.logins(.cannotFindFile)))
                 case .couldNotReadLoginsFile: completion(.failure(.logins(.cannotReadFile)))
                 case .decryptionFailed: completion(.failure(.logins(.cannotDecryptFile)))
                 case .failedToTemporarilyCopyFile: completion(.failure(.logins(.failedToTemporarilyCopyFile)))

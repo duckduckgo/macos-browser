@@ -1,7 +1,24 @@
 "use strict";
 (() => {
   var __defProp = Object.defineProperty;
+  var __defProps = Object.defineProperties;
+  var __getOwnPropDescs = Object.getOwnPropertyDescriptors;
+  var __getOwnPropSymbols = Object.getOwnPropertySymbols;
+  var __hasOwnProp = Object.prototype.hasOwnProperty;
+  var __propIsEnum = Object.prototype.propertyIsEnumerable;
   var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+  var __spreadValues = (a, b) => {
+    for (var prop in b || (b = {}))
+      if (__hasOwnProp.call(b, prop))
+        __defNormalProp(a, prop, b[prop]);
+    if (__getOwnPropSymbols)
+      for (var prop of __getOwnPropSymbols(b)) {
+        if (__propIsEnum.call(b, prop))
+          __defNormalProp(a, prop, b[prop]);
+      }
+    return a;
+  };
+  var __spreadProps = (a, b) => __defProps(a, __getOwnPropDescs(b));
   var __publicField = (obj, key, value) => {
     __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
     return value;
@@ -202,6 +219,7 @@
       IconOverlay.comms = comms;
     },
     create: (size, href, extraClass) => {
+      var _a, _b;
       let overlayElement = document.createElement("div");
       overlayElement.setAttribute("class", "ddg-overlay" + (extraClass ? " " + extraClass : ""));
       overlayElement.setAttribute("data-size", size);
@@ -216,13 +234,14 @@
                         </div>
                     </div>
                 </a>`;
-      overlayElement.querySelector("a.ddg-play-privately")?.setAttribute("href", href);
-      overlayElement.querySelector("a.ddg-play-privately")?.addEventListener("click", (event) => {
+      (_a = overlayElement.querySelector("a.ddg-play-privately")) == null ? void 0 : _a.setAttribute("href", href);
+      (_b = overlayElement.querySelector("a.ddg-play-privately")) == null ? void 0 : _b.addEventListener("click", (event) => {
+        var _a2;
         event.preventDefault();
         event.stopPropagation();
         let link = event.target.closest("a");
         let href2 = link.getAttribute("href");
-        IconOverlay.comms?.openInDuckPlayerViaMessage(href2);
+        (_a2 = IconOverlay.comms) == null ? void 0 : _a2.openInDuckPlayerViaMessage(href2);
         return;
       });
       return overlayElement;
@@ -231,6 +250,7 @@
       return document.querySelector("." + IconOverlay.HOVER_CLASS);
     },
     moveHoverOverlayToVideoElement: (videoElement) => {
+      var _a, _b;
       let overlay = IconOverlay.getHoverOverlay();
       if (overlay === null || IconOverlay.videoScrolledOutOfViewInPlaylist(videoElement)) {
         return;
@@ -243,9 +263,9 @@
       overlay.setAttribute("data-size", "fixed " + IconOverlay.getThumbnailSize(videoElement));
       const href = videoElement.getAttribute("href");
       if (href) {
-        const privateUrl = VideoParams.fromPathname(href)?.toPrivatePlayerUrl();
+        const privateUrl = (_a = VideoParams.fromPathname(href)) == null ? void 0 : _a.toPrivatePlayerUrl();
         if (overlay && privateUrl) {
-          overlay.querySelector("a")?.setAttribute("href", privateUrl);
+          (_b = overlay.querySelector("a")) == null ? void 0 : _b.setAttribute("href", privateUrl);
         }
       }
       IconOverlay.hoverOverlayVisible = true;
@@ -276,8 +296,12 @@
       }
     },
     hidePlaylistOverlayOnScroll: (e) => {
-      if (e?.target?.id === "items") {
-        IconOverlay.hideOverlay(IconOverlay.getHoverOverlay());
+      var _a;
+      if (((_a = e == null ? void 0 : e.target) == null ? void 0 : _a.id) === "items") {
+        let overlay = IconOverlay.getHoverOverlay();
+        if (overlay) {
+          IconOverlay.hideOverlay(overlay);
+        }
       }
     },
     hideHoverOverlay: (event, force) => {
@@ -303,8 +327,9 @@
     },
     appendToVideo: (videoElement) => {
       let appendOverlayToThumbnail = (videoElement2) => {
+        var _a;
         if (videoElement2) {
-          const privateUrl = VideoParams.fromHref(videoElement2.href)?.toPrivatePlayerUrl();
+          const privateUrl = (_a = VideoParams.fromHref(videoElement2.href)) == null ? void 0 : _a.toPrivatePlayerUrl();
           const thumbSize = IconOverlay.getThumbnailSize(videoElement2);
           if (privateUrl) {
             appendElement(videoElement2, IconOverlay.create(thumbSize, privateUrl));
@@ -363,7 +388,7 @@
         appendElement(containerElement, iconElement);
         iconElement.classList.remove("hidden");
         return () => {
-          if (iconElement.isConnected && containerElement?.contains(iconElement)) {
+          if (iconElement.isConnected && (containerElement == null ? void 0 : containerElement.contains(iconElement))) {
             containerElement.removeChild(iconElement);
           }
         };
@@ -398,6 +423,7 @@
       shadow.appendChild(style);
     }
     createOverlay() {
+      var _a;
       let overlayElement = document.createElement("div");
       overlayElement.classList.add("ddg-video-player-overlay");
       overlayElement.innerHTML = `
@@ -418,7 +444,7 @@
             </div>
             `;
       const href = this.params.toPrivatePlayerUrl();
-      overlayElement.querySelector(".ddg-vpo-open")?.setAttribute("href", href);
+      (_a = overlayElement.querySelector(".ddg-vpo-open")) == null ? void 0 : _a.setAttribute("href", href);
       this.appendThumbnail(overlayElement, this.params.id);
       this.setupButtonsInsideOverlay(overlayElement, this.params);
       return overlayElement;
@@ -552,9 +578,10 @@
         const overlayElement = new DDGVideoOverlay(this.environment, params, this);
         targetElement.appendChild(overlayElement);
         return () => {
+          var _a, _b;
           const prevOverlayElement = document.querySelector(DDGVideoOverlay.CUSTOM_TAG_NAME);
           if (prevOverlayElement) {
-            prevOverlayElement.parentNode?.removeChild?.(prevOverlayElement);
+            (_b = (_a = prevOverlayElement.parentNode) == null ? void 0 : _a.removeChild) == null ? void 0 : _b.call(_a, prevOverlayElement);
           }
         };
       });
@@ -568,7 +595,7 @@
         }, 10);
         return () => {
           clearInterval(int);
-          if (videoElement?.isConnected) {
+          if (videoElement == null ? void 0 : videoElement.isConnected) {
             videoElement.play();
           } else {
             const video = document.querySelector("#player video");
@@ -616,53 +643,78 @@
     }
   };
 
-  // src/utils/WebkitMessaging.js
-  var WebkitMessaging = class {
-    constructor(opts) {
+  // node_modules/@duckduckgo/content-scope-utils/lib/messaging/windows.js
+  var WindowsMessagingTransport = class {
+    constructor(config) {
       __publicField(this, "config");
-      this.config = opts;
+      this.config = config;
+    }
+    notify(name, data = {}) {
+      throw new Error("todo: implement notify for windows");
+    }
+    request(name, data = {}, opts = {}) {
+      throw new Error("todo: implement request for windows");
+    }
+  };
+  var WindowsMessagingConfig = class {
+    constructor(params) {
+      this.featureName = params.featureName;
+    }
+  };
+
+  // node_modules/@duckduckgo/content-scope-utils/lib/messaging/webkit.js
+  var WebkitMessagingTransport = class {
+    constructor(config) {
+      __publicField(this, "config");
+      __publicField(this, "globals");
+      __publicField(this, "algoObj", { name: "AES-GCM", length: 256 });
+      this.config = config;
+      this.globals = captureGlobals();
       if (!this.config.hasModernWebkitAPI) {
-        captureWebkitHandlers(this.config.webkitMessageHandlerNames);
+        this.captureWebkitHandlers(this.config.webkitMessageHandlerNames);
       }
     }
     wkSend(handler, data = {}) {
-      if (!(handler in window.webkit.messageHandlers)) {
-        throw new MissingWebkitHandler(`Missing webkit handler: '${handler}'`);
+      var _a, _b;
+      if (!(handler in this.globals.window.webkit.messageHandlers)) {
+        throw new MissingHandler(`Missing webkit handler: '${handler}'`, handler);
       }
-      const outgoing = { ...data, messageHandling: { ...data.messageHandling, secret: this.config.secret } };
+      const outgoing = __spreadProps(__spreadValues({}, data), {
+        messageHandling: __spreadProps(__spreadValues({}, data.messageHandling), { secret: this.config.secret })
+      });
       if (!this.config.hasModernWebkitAPI) {
-        if (!(handler in ddgGlobals.capturedWebkitHandlers)) {
-          throw new Error(`cannot continue, method ${handler} not captured on macos < 11`);
+        if (!(handler in this.globals.capturedWebkitHandlers)) {
+          throw new MissingHandler(`cannot continue, method ${handler} not captured on macos < 11`, handler);
         } else {
-          return ddgGlobals.capturedWebkitHandlers[handler](outgoing);
+          return this.globals.capturedWebkitHandlers[handler](outgoing);
         }
       }
-      return window.webkit.messageHandlers[handler].postMessage?.(outgoing);
+      return (_b = (_a = this.globals.window.webkit.messageHandlers[handler]).postMessage) == null ? void 0 : _b.call(_a, outgoing);
     }
     async wkSendAndWait(handler, data = {}) {
       if (this.config.hasModernWebkitAPI) {
         const response = await this.wkSend(handler, data);
-        return ddgGlobals.JSONparse(response || "{}");
+        return this.globals.JSONparse(response || "{}");
       }
       try {
-        const randMethodName = createRandMethodName();
-        const key = await createRandKey();
-        const iv = createRandIv();
-        const { ciphertext, tag } = await new ddgGlobals.Promise((resolve) => {
-          generateRandomMethod(randMethodName, resolve);
-          data.messageHandling = {
+        const randMethodName = this.createRandMethodName();
+        const key = await this.createRandKey();
+        const iv = this.createRandIv();
+        const { ciphertext, tag } = await new this.globals.Promise((resolve) => {
+          this.generateRandomMethod(randMethodName, resolve);
+          data.messageHandling = new SecureMessagingParams({
             methodName: randMethodName,
             secret: this.config.secret,
-            key: ddgGlobals.Arrayfrom(key),
-            iv: ddgGlobals.Arrayfrom(iv)
-          };
+            key: this.globals.Arrayfrom(key),
+            iv: this.globals.Arrayfrom(iv)
+          });
           this.wkSend(handler, data);
         });
-        const cipher = new ddgGlobals.Uint8Array([...ciphertext, ...tag]);
-        const decrypted = await decrypt(cipher, key, iv);
-        return ddgGlobals.JSONparse(decrypted || "{}");
+        const cipher = new this.globals.Uint8Array([...ciphertext, ...tag]);
+        const decrypted = await this.decrypt(cipher, key, iv);
+        return this.globals.JSONparse(decrypted || "{}");
       } catch (e) {
-        if (e instanceof MissingWebkitHandler) {
+        if (e instanceof MissingHandler) {
           throw e;
         } else {
           console.error("decryption failed", e);
@@ -671,115 +723,164 @@
         }
       }
     }
-  };
-  var WebkitMessagingConfig = class {
-    constructor(hasModernWebkitAPI, webkitMessageHandlerNames, secret) {
-      __publicField(this, "hasModernWebkitAPI");
-      __publicField(this, "webkitMessageHandlerNames");
-      __publicField(this, "secret");
-      this.hasModernWebkitAPI = hasModernWebkitAPI;
-      this.webkitMessageHandlerNames = webkitMessageHandlerNames;
-      this.secret = secret;
+    notify(name, data = {}) {
+      this.wkSend(name, data);
+    }
+    request(name, data = {}) {
+      return this.wkSendAndWait(name, data);
+    }
+    generateRandomMethod(randomMethodName, callback) {
+      this.globals.ObjectDefineProperty(this.globals.window, randomMethodName, {
+        enumerable: false,
+        configurable: true,
+        writable: false,
+        value: (...args) => {
+          callback(...args);
+          delete this.globals.window[randomMethodName];
+        }
+      });
+    }
+    randomString() {
+      return "" + this.globals.getRandomValues(new this.globals.Uint32Array(1))[0];
+    }
+    createRandMethodName() {
+      return "_" + this.randomString();
+    }
+    async createRandKey() {
+      const key = await this.globals.generateKey(this.algoObj, true, ["encrypt", "decrypt"]);
+      const exportedKey = await this.globals.exportKey("raw", key);
+      return new this.globals.Uint8Array(exportedKey);
+    }
+    createRandIv() {
+      return this.globals.getRandomValues(new this.globals.Uint8Array(12));
+    }
+    async decrypt(ciphertext, key, iv) {
+      const cryptoKey = await this.globals.importKey("raw", key, "AES-GCM", false, ["decrypt"]);
+      const algo = { name: "AES-GCM", iv };
+      let decrypted = await this.globals.decrypt(algo, cryptoKey, ciphertext);
+      let dec = new this.globals.TextDecoder();
+      return dec.decode(decrypted);
+    }
+    captureWebkitHandlers(handlerNames) {
+      var _a, _b;
+      const handlers = window.webkit.messageHandlers;
+      if (!handlers)
+        throw new MissingHandler("window.webkit.messageHandlers was absent", "all");
+      for (let webkitMessageHandlerName of handlerNames) {
+        if (typeof ((_a = handlers[webkitMessageHandlerName]) == null ? void 0 : _a.postMessage) === "function") {
+          const original = handlers[webkitMessageHandlerName];
+          const bound = (_b = handlers[webkitMessageHandlerName].postMessage) == null ? void 0 : _b.bind(original);
+          this.globals.capturedWebkitHandlers[webkitMessageHandlerName] = bound;
+          delete handlers[webkitMessageHandlerName].postMessage;
+        }
+      }
     }
   };
-  var MissingWebkitHandler = class extends Error {
-    constructor(handlerName) {
-      super();
-      __publicField(this, "handlerName");
+  var WebkitMessagingConfig = class {
+    constructor(params) {
+      this.hasModernWebkitAPI = params.hasModernWebkitAPI;
+      this.webkitMessageHandlerNames = params.webkitMessageHandlerNames;
+      this.secret = params.secret;
+    }
+  };
+  var SecureMessagingParams = class {
+    constructor(params) {
+      this.methodName = params.methodName;
+      this.secret = params.secret;
+      this.key = params.key;
+      this.iv = params.iv;
+    }
+  };
+  function captureGlobals() {
+    return {
+      window,
+      encrypt: window.crypto.subtle.encrypt.bind(window.crypto.subtle),
+      decrypt: window.crypto.subtle.decrypt.bind(window.crypto.subtle),
+      generateKey: window.crypto.subtle.generateKey.bind(window.crypto.subtle),
+      exportKey: window.crypto.subtle.exportKey.bind(window.crypto.subtle),
+      importKey: window.crypto.subtle.importKey.bind(window.crypto.subtle),
+      getRandomValues: window.crypto.getRandomValues.bind(window.crypto),
+      TextEncoder,
+      TextDecoder,
+      Uint8Array,
+      Uint16Array,
+      Uint32Array,
+      JSONstringify: window.JSON.stringify,
+      JSONparse: window.JSON.parse,
+      Arrayfrom: window.Array.from,
+      Promise: window.Promise,
+      ObjectDefineProperty: window.Object.defineProperty,
+      addEventListener: window.addEventListener.bind(window),
+      capturedWebkitHandlers: {}
+    };
+  }
+
+  // node_modules/@duckduckgo/content-scope-utils/lib/messaging.js
+  var Messaging = class {
+    constructor(config) {
+      this.transport = getTransport(config);
+    }
+    notify(name, data = {}) {
+      this.transport.notify(name, data);
+    }
+    request(name, data = {}) {
+      return this.transport.request(name, data);
+    }
+  };
+  function getTransport(config) {
+    if (config instanceof WebkitMessagingConfig) {
+      return new WebkitMessagingTransport(config);
+    }
+    if (config instanceof WindowsMessagingConfig) {
+      return new WindowsMessagingTransport(config);
+    }
+    throw new Error("unreachable");
+  }
+  var MissingHandler = class extends Error {
+    constructor(message, handlerName) {
+      super(message);
       this.handlerName = handlerName;
     }
   };
-  var ddgGlobals = {
-    window,
-    encrypt: window.crypto.subtle.encrypt.bind(window.crypto.subtle),
-    decrypt: window.crypto.subtle.decrypt.bind(window.crypto.subtle),
-    generateKey: window.crypto.subtle.generateKey.bind(window.crypto.subtle),
-    exportKey: window.crypto.subtle.exportKey.bind(window.crypto.subtle),
-    importKey: window.crypto.subtle.importKey.bind(window.crypto.subtle),
-    getRandomValues: window.crypto.getRandomValues.bind(window.crypto),
-    TextEncoder,
-    TextDecoder,
-    Uint8Array,
-    Uint16Array,
-    Uint32Array,
-    JSONstringify: window.JSON.stringify,
-    JSONparse: window.JSON.parse,
-    Arrayfrom: window.Array.from,
-    Promise: window.Promise,
-    ObjectDefineProperty: window.Object.defineProperty,
-    addEventListener: window.addEventListener.bind(window),
-    capturedWebkitHandlers: {}
-  };
-  var generateRandomMethod = (randomMethodName, callback) => {
-    ddgGlobals.ObjectDefineProperty(ddgGlobals.window, randomMethodName, {
-      enumerable: false,
-      configurable: true,
-      writable: false,
-      value: (...args) => {
-        callback(...args);
-        delete ddgGlobals.window[randomMethodName];
-      }
-    });
-  };
-  var randomString = () => "" + ddgGlobals.getRandomValues(new ddgGlobals.Uint32Array(1))[0];
-  var createRandMethodName = () => "_" + randomString();
-  var algoObj = { name: "AES-GCM", length: 256 };
-  var createRandKey = async () => {
-    const key = await ddgGlobals.generateKey(algoObj, true, ["encrypt", "decrypt"]);
-    const exportedKey = await ddgGlobals.exportKey("raw", key);
-    return new ddgGlobals.Uint8Array(exportedKey);
-  };
-  var createRandIv = () => ddgGlobals.getRandomValues(new ddgGlobals.Uint8Array(12));
-  var decrypt = async (ciphertext, key, iv) => {
-    const cryptoKey = await ddgGlobals.importKey("raw", key, "AES-GCM", false, ["decrypt"]);
-    const algo = { name: "AES-GCM", iv };
-    let decrypted = await ddgGlobals.decrypt(algo, cryptoKey, ciphertext);
-    let dec = new ddgGlobals.TextDecoder();
-    return dec.decode(decrypted);
-  };
-  function captureWebkitHandlers(handlerNames) {
-    for (let webkitMessageHandlerName of handlerNames) {
-      if (typeof window.webkit.messageHandlers?.[webkitMessageHandlerName]?.postMessage === "function") {
-        ddgGlobals.capturedWebkitHandlers[webkitMessageHandlerName] = window.webkit.messageHandlers[webkitMessageHandlerName].postMessage?.bind(window.webkit.messageHandlers[webkitMessageHandlerName]);
-        delete window.webkit.messageHandlers[webkitMessageHandlerName].postMessage;
-      }
-    }
-  }
 
   // src/comms.js
-  var MacOSCommunications = class {
-    constructor(messaging) {
+  var Communications = class {
+    constructor(messaging, options) {
       __publicField(this, "messaging");
       this.messaging = messaging;
+      this.options = options;
     }
     async setUserValues(userValues) {
-      return this.messaging.wkSendAndWait("setUserValues", userValues);
+      return this.messaging.request("setUserValues", userValues);
     }
     async readUserValues() {
-      return this.messaging.wkSendAndWait("readUserValues", {});
+      return this.messaging.request("readUserValues", {});
     }
     openInDuckPlayerViaMessage(href) {
-      return this.messaging.wkSend("openDuckPlayer", { href });
+      return this.messaging.notify("openDuckPlayer", { href });
     }
     onUserValuesNotification(cb, initialUserValues) {
-      if (this.messaging.config.hasModernWebkitAPI) {
+      var _a;
+      if (this.options.updateStrategy === "window-method") {
         window.onUserValuesChanged = function(values) {
-          if (!values?.userValuesNotification) {
+          if (!(values == null ? void 0 : values.userValuesNotification)) {
             console.error("missing userValuesNotification");
             return;
           }
           cb(values.userValuesNotification);
         };
-      } else {
+      }
+      if (this.options.updateStrategy === "polling") {
         let timeout;
-        let prevMode = Object.keys(initialUserValues.privatePlayerMode)?.[0];
+        let prevMode = (_a = Object.keys(initialUserValues.privatePlayerMode)) == null ? void 0 : _a[0];
         let prevInteracted = initialUserValues.overlayInteracted;
         const poll = () => {
           clearTimeout(timeout);
           timeout = setTimeout(async () => {
+            var _a2;
             try {
               const userValues = await this.readUserValues();
-              let nextMode = Object.keys(userValues.privatePlayerMode)?.[0];
+              let nextMode = (_a2 = Object.keys(userValues.privatePlayerMode)) == null ? void 0 : _a2[0];
               let nextInteracted = userValues.overlayInteracted;
               if (nextMode !== prevMode || nextInteracted !== prevInteracted) {
                 prevMode = nextMode;
@@ -795,13 +896,11 @@
       }
     }
     static fromInjectedConfig(input) {
-      const opts = new WebkitMessagingConfig(
-        input.hasModernWebkitAPI,
-        input.webkitMessageHandlerNames,
-        input.secret
-      );
-      const webkit = new WebkitMessaging(opts);
-      return new MacOSCommunications(webkit);
+      const opts = new WebkitMessagingConfig(input);
+      const messaging = new Messaging(opts);
+      return new Communications(messaging, {
+        updateStrategy: opts.hasModernWebkitAPI ? "window-method" : "polling"
+      });
     }
   };
 
@@ -821,10 +920,10 @@
       return window.location.hostname === "www.youtube.com";
     }
   };
-  var macos = MacOSCommunications.fromInjectedConfig(
-    $WebkitMessagingConfig$
-  );
   if (defaultEnvironment.enabled()) {
+    const macos = Communications.fromInjectedConfig(
+      $WebkitMessagingConfig$
+    );
     initWithEnvironment(defaultEnvironment, macos);
   }
   function initWithEnvironment(environment, comms) {
@@ -898,7 +997,7 @@
         getPreviewVideoLink: () => {
           let linkSelector = 'a[href^="/watch?v="]';
           let previewVideo = document.querySelector("#preview " + linkSelector + " video");
-          return previewVideo?.closest(linkSelector);
+          return previewVideo == null ? void 0 : previewVideo.closest(linkSelector);
         },
         appendIfNotAppended: () => {
           let previewVideo = Preview.getPreviewVideoLink();
@@ -909,12 +1008,13 @@
         },
         update: () => {
           let updateOverlayVideoId = (element) => {
-            let overlay = element?.querySelector(".ddg-overlay");
-            const href = element?.getAttribute("href");
+            var _a, _b;
+            let overlay = element == null ? void 0 : element.querySelector(".ddg-overlay");
+            const href = element == null ? void 0 : element.getAttribute("href");
             if (href) {
-              const privateUrl = VideoParams.fromPathname(href)?.toPrivatePlayerUrl();
+              const privateUrl = (_a = VideoParams.fromPathname(href)) == null ? void 0 : _a.toPrivatePlayerUrl();
               if (overlay && privateUrl) {
-                overlay.querySelector("a.ddg-play-privately")?.setAttribute("href", privateUrl);
+                (_b = overlay.querySelector("a.ddg-play-privately")) == null ? void 0 : _b.setAttribute("href", privateUrl);
               }
             }
           };
@@ -922,11 +1022,12 @@
           updateOverlayVideoId(videoElement);
         },
         fixLinkClick: () => {
-          let previewLink = Preview.getPreviewVideoLink()?.querySelector("a.ddg-play-privately");
+          var _a;
+          let previewLink = (_a = Preview.getPreviewVideoLink()) == null ? void 0 : _a.querySelector("a.ddg-play-privately");
           if (!previewLink)
             return;
           addTrustedEventListener(previewLink, "click", () => {
-            const href = previewLink?.getAttribute("href");
+            const href = previewLink == null ? void 0 : previewLink.getAttribute("href");
             if (href) {
               environment.setHref(href);
             }
@@ -980,16 +1081,17 @@
             return;
           }
           let videoLinksAndPreview = Array.from(document.querySelectorAll('a[href^="/watch?v="], #media-container-link')), isValidVideoLinkOrPreview = (element) => {
-            return VideoThumbnail.isSingleVideoURL(element?.getAttribute("href")) || element.getAttribute("id") === "media-container-link";
+            return VideoThumbnail.isSingleVideoURL(element == null ? void 0 : element.getAttribute("href")) || element.getAttribute("id") === "media-container-link";
           }, excludeAlreadyBound = (element) => !OpenInDuckPlayer.clickBoundElements.has(element);
           videoLinksAndPreview.filter(excludeAlreadyBound).forEach((element) => {
             if (isValidVideoLinkOrPreview(element)) {
               let onClickOpenDuckPlayer = (event) => {
+                var _a;
                 event.preventDefault();
                 event.stopPropagation();
                 let link = event.target.closest("a");
                 if (link) {
-                  const href = VideoParams.fromHref(link.href)?.toPrivatePlayerUrl();
+                  const href = (_a = VideoParams.fromHref(link.href)) == null ? void 0 : _a.toPrivatePlayerUrl();
                   comms.openInDuckPlayerViaMessage(href);
                 }
                 return false;
