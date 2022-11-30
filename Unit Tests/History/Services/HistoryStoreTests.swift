@@ -19,10 +19,34 @@
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 import Combine
+import class BrowserServicesKit.CoreDataDatabase
 
 final class HistoryStoreTests: XCTestCase {
 
     private var cancellables = Set<AnyCancellable>()
+    
+    private var database: CoreDataDatabase!
+    
+    override func setUp() {
+        let model = CoreDataDatabase.loadModel(from: .main, named: "History")!
+        let className = String(describing: self)
+        let location = FileManager.default.temporaryDirectory.appendingPathComponent(className)
+        database = CoreDataDatabase(name: className, containerLocation: location, model: model)
+        database.loadStore { _, error in
+            if let e = error {
+                XCTFail("Could not load store: \(e.localizedDescription)")
+            }
+        }
+    }
+    
+    override func tearDown() {
+        super.tearDown()
+        let context = database.makeContext(concurrencyType: .mainQueueConcurrencyType)
+        context.deleteAll(entityDescriptions: [HistoryEntryManagedObject.entity(),
+                                               HistoryEntryManagedObject.entity()])
+        try? context.save()
+        database = nil
+    }
 
     func save(entry: HistoryEntry, historyStore: HistoryStore, expectation: XCTestExpectation) {
         historyStore.save(entry: entry)
@@ -39,8 +63,7 @@ final class HistoryStoreTests: XCTestCase {
     }
 
     func testWhenHistoryEntryIsSavedMultipleTimes_ThenTheNewestValueMustBeLoadedFromStore() {
-        let container = CoreData.createInMemoryPersistentContainer(modelName: "History", bundle: Bundle(for: type(of: self)))
-        let context = container.viewContext
+        let context = database.makeContext(concurrencyType: .mainQueueConcurrencyType)
         let historyStore = HistoryStore(context: context)
 
         let historyEntry = HistoryEntry(identifier: UUID(),
@@ -77,8 +100,7 @@ final class HistoryStoreTests: XCTestCase {
     }
 
     func testWhenCleanOldIsCalled_ThenOlderEntriesThanDateAreCleaned() {
-        let container = CoreData.createInMemoryPersistentContainer(modelName: "History", bundle: Bundle(for: type(of: self)))
-        let context = container.viewContext
+        let context = database.makeContext(concurrencyType: .mainQueueConcurrencyType)
         let historyStore = HistoryStore(context: context)
 
         let oldHistoryEntry = HistoryEntry(identifier: UUID(),
@@ -120,8 +142,7 @@ final class HistoryStoreTests: XCTestCase {
     }
 
     func testWhenRemoveEntriesIsCalled_ThenEntriesMustBeCleaned() {
-        let container = CoreData.createInMemoryPersistentContainer(modelName: "History", bundle: Bundle(for: type(of: self)))
-        let context = container.viewContext
+        let context = database.makeContext(concurrencyType: .mainQueueConcurrencyType)
         let historyStore = HistoryStore(context: context)
 
         let notToRemoveIdentifier = UUID()
