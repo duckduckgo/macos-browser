@@ -53,12 +53,18 @@ extension Tab: NSSecureCoding {
         let visitedDomains = decoder.decodeObject(of: [NSArray.self, NSString.self], forKey: NSSecureCodingKeys.visitedDomains) as? [String] ?? []
         let currentDownload = decoder.decodeObject(of: NSURL.self, forKey: NSSecureCodingKeys.currentDownload) as? URL
 
+        let interactionStateData: Data? = {
+            if #available(macOS 12.0, *) {
+                return decoder.decodeIfPresent(at: NSSecureCodingKeys.interactionStateData)
+            }
+            return decoder.decodeIfPresent(at: NSSecureCodingKeys.sessionStateData)
+        }()
+
         self.init(content: content,
                   localHistory: Set(visitedDomains),
                   title: decoder.decodeIfPresent(at: NSSecureCodingKeys.title),
                   favicon: decoder.decodeIfPresent(at: NSSecureCodingKeys.favicon),
-                  sessionStateData: decoder.decodeIfPresent(at: NSSecureCodingKeys.sessionStateData),
-                  interactionStateData: decoder.decodeIfPresent(at: NSSecureCodingKeys.interactionStateData),
+                  interactionStateData: interactionStateData,
                   shouldLoadInBackground: false,
                   lastSelectedAt: decoder.decodeIfPresent(at: NSSecureCodingKeys.lastSelectedAt),
                   currentDownload: currentDownload)
@@ -75,7 +81,7 @@ extension Tab: NSSecureCoding {
         if #available(macOS 12, *) {
             getActualInteractionStateData().map(coder.encode(forKey: NSSecureCodingKeys.interactionStateData))
         } else {
-            getActualSessionStateData().map(coder.encode(forKey: NSSecureCodingKeys.sessionStateData))
+            getActualInteractionStateData().map(coder.encode(forKey: NSSecureCodingKeys.sessionStateData))
         }
 
         coder.encode(content.type.rawValue, forKey: NSSecureCodingKeys.tabType)

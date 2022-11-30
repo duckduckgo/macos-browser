@@ -23,12 +23,15 @@ import WebKit
 final class WKWebViewPrivateMethodsAvailabilityTests: XCTestCase {
 
     func testWebViewRespondsTo_sessionStateData() {
-        let webView = WebView.init(frame: CGRect(), configuration: .init())
+        if #available(macOS 12.0, *) { return }
 
+        let webView = WebView.init(frame: CGRect(), configuration: .init())
         XCTAssertNoThrow(try XCTAssertNotNil(webView.sessionStateData()))
     }
 
     func testWebViewRespondsTo_restoreFromSessionStateData() {
+        if #available(macOS 12.0, *) { return }
+
         let webView = WebView(frame: CGRect(), configuration: .init())
         XCTAssertNoThrow(try webView.restoreSessionState(from: Data()))
     }
