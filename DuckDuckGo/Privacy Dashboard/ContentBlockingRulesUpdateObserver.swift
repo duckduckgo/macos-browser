@@ -56,6 +56,7 @@ final class ContentBlockingRulesUpdateObserver {
                 
                 var didUpdate = false
                 for token in completionTokens {
+                    // swiftlint:disable:next for_where
                     if self.pendingUpdates.removeValue(forKey: token) != nil {
                         didUpdate = true
                     }
