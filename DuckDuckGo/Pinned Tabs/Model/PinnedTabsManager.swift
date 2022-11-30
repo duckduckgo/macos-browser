@@ -88,7 +88,8 @@ final class PinnedTabsManager {
         windowWillCloseCancellable = NotificationCenter.default
             .publisher(for: NSWindow.willCloseNotification)
             .filter { $0.object is MainWindow }
-            .sink { [weak self] notification in
+            .asVoid()
+            .sink { [weak self] in
                 if NSApp.windows.filter({ $0 is MainWindow }).count == 1 {
                     self?.tabCollection.tabs.forEach { $0.cleanUpBeforeClosing() }
                 }
