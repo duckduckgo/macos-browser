@@ -34,7 +34,8 @@ class ContentBlockingUpdatingTests: XCTestCase {
                                        trackerDataManager: TrackerDataManager(etag: DefaultConfigurationStorage.shared.loadEtag(for: .trackerRadar),
                                                                                                                                               data: DefaultConfigurationStorage.shared.loadData(for: .trackerRadar),
                                                                                                                                               embeddedDataProvider: AppTrackerDataSetProvider(),
-                                                                                                                                              errorReporting: nil),
+                                                                              errorReporting: nil),
+                                       configStorage: DefaultConfigurationStorage.shared,
                                        privacySecurityPreferences: preferences,
                                        tld: TLD())
     }

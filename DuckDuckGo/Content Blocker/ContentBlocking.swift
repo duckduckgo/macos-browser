@@ -63,10 +63,14 @@ final class ContentBlocking {
                                                             cache: ContentBlockingRulesCache(),
                                                             errorReporting: Self.debugEvents,
                                                             logger: OSLog.contentBlocking)
+
         userContentUpdating = UserContentUpdating(contentBlockerRulesManager: contentBlockingManager,
                                                   privacyConfigurationManager: privacyConfigurationManager,
-                                                  configStorage: configStorage)
-        
+                                                  trackerDataManager: trackerDataManager,
+                                                  configStorage: configStorage,
+                                                  privacySecurityPreferences: PrivacySecurityPreferences.shared,
+                                                  tld: tld)
+
         adClickAttributionRulesProvider = AdClickAttributionRulesProvider(config: adClickAttribution,
                                                                           compiledRulesSource: contentBlockingManager,
                                                                           exceptionsSource: exceptionsSource,
