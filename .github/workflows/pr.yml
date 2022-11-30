@@ -48,6 +48,19 @@ jobs:
 
     name: Unit Tests
 
+    strategy:
+      matrix:
+        flavor: [ "Sandbox", "Non-Sandbox" ]
+        include:
+          - scheme: DuckDuckGo Privacy Browser
+            flavor: Non-Sandbox
+          - scheme: DuckDuckGo Privacy Browser App Store
+            flavor: Sandbox
+          - configuration: CI
+            flavor: Non-Sandbox
+          - configuration: CI_Sandbox_Debug
+            flavor: Sandbox
+
     runs-on: macos-12
     timeout-minutes: 30
 
@@ -70,16 +83,17 @@ jobs:
     - name: Build and test
       run: |
         set -o pipefail && xcodebuild test \
-          -scheme "DuckDuckGo Privacy Browser" \
-          -configuration "CI" \
+          -scheme "${{ matrix.scheme }}" \
+          -configuration "${{ matrix.configuration }}" \
           ENABLE_TESTABILITY=true \
-          | xcpretty -r junit -o unittests.xml
+          | xcpretty -r junit -o unittests-${{ matrix.flavor }}.xml
 
     - name: Publish unit tests report
       uses: mikepenz/action-junit-report@v3
       if: always() # always run even if the previous step fails
       with:
-        report_paths: unittests.xml
+        check_name: "Test Report: ${{ matrix.flavor }}"
+        report_paths: unittests-${{ matrix.flavor }}.xml
 
   verify-autoconsent-bundle:
     name: 'Verify autoconsent bundle'
