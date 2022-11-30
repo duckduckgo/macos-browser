@@ -47,16 +47,14 @@ struct PinnedTabView: View {
                 .environmentObject(model)
             }
             .buttonStyle(TouchDownButtonStyle())
-
             .cornerRadius(Const.cornerRadius, corners: [.topLeft, .topRight])
-
             .contextMenu { contextMenu }
-            .onHover { isHovered in
+            .onHover { [weak collectionModel] isHovered in
                 guard controlActiveState == .key else {
                     return
                 }
                 self.isHovered = isHovered
-                collectionModel.hoveredItem = isHovered ? model : nil
+                collectionModel?.hoveredItem = isHovered ? model : nil
             }
             
             BorderView(isSelected: isSelected,
