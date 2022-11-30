@@ -24,7 +24,9 @@ import os
 import Combine
 import BrowserServicesKit
 import TrackerRadarKit
+import ContentBlocking
 import UserScript
+import PrivacyDashboard
 
 protocol TabDelegate: FileDownloadManagerDelegate, ContentOverlayUserScriptDelegate {
     func tabWillStartNavigation(_ tab: Tab, isUserInitiated: Bool)
@@ -289,6 +291,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             if let title = content.title {
                 self.title = title
             }
+            
         }
     }
 
@@ -861,33 +864,69 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     }
     
     // MARK: - Dashboard Info
-
-    @Published private(set) var trackerInfo: TrackerInfo?
-    @Published private(set) var serverTrust: ServerTrust?
-    @Published private(set) var connectionUpgradedTo: URL?
-    @Published private(set) var cookieConsentManaged: CookieConsentInfo?
+    @Published private(set) var privacyInfo: PrivacyInfo?
+    private var previousPrivacyInfosByURL: [String: PrivacyInfo] = [:]
+    private var didGoBackForward: Bool = false
 
     private func resetDashboardInfo() {
-        trackerInfo = TrackerInfo()
-        if self.serverTrust?.host != content.url?.host {
-            serverTrust = nil
+        if let url = content.url {
+            if didGoBackForward, let privacyInfo = previousPrivacyInfosByURL[url.absoluteString] {
+                self.privacyInfo = privacyInfo
+                didGoBackForward = false
+            } else {
+                privacyInfo = makePrivacyInfo(url: url)
+            }
+        } else {
+            privacyInfo = nil
         }
     }
-
+    
+    private func makePrivacyInfo(url: URL) -> PrivacyInfo? {
+        guard let host = url.host else { return nil }
+        
+        let entity = ContentBlocking.shared.trackerDataManager.trackerData.findEntity(forHost: host)
+        
+        privacyInfo = PrivacyInfo(url: url,
+                                  parentEntity: entity,
+                                  protectionStatus: makeProtectionStatus(for: host))
+        
+        previousPrivacyInfosByURL[url.absoluteString] = privacyInfo
+        
+        return privacyInfo
+    }
+    
     private func resetConnectionUpgradedTo(navigationAction: WKNavigationAction) {
-        let isOnUpgradedPage = navigationAction.request.url == connectionUpgradedTo
+        let isOnUpgradedPage = navigationAction.request.url == privacyInfo?.connectionUpgradedTo
         if !navigationAction.isTargetingMainFrame || isOnUpgradedPage { return }
-        connectionUpgradedTo = nil
+        privacyInfo?.connectionUpgradedTo = nil
     }
 
     private func setConnectionUpgradedTo(_ upgradedUrl: URL, navigationAction: WKNavigationAction) {
         if !navigationAction.isTargetingMainFrame { return }
-        connectionUpgradedTo = upgradedUrl
+        privacyInfo?.connectionUpgradedTo = upgradedUrl
     }
 
     public func setMainFrameConnectionUpgradedTo(_ upgradedUrl: URL?) {
         if upgradedUrl == nil { return }
-        connectionUpgradedTo = upgradedUrl
+        privacyInfo?.connectionUpgradedTo = upgradedUrl
+    }
+    
+    private func makeProtectionStatus(for host: String) -> ProtectionStatus {
+        let config = ContentBlocking.shared.privacyConfigurationManager.privacyConfig
+        
+        let isTempUnprotected = config.isTempUnprotected(domain: host)
+        let isAllowlisted = config.isUserUnprotected(domain: host)
+        
+        var enabledFeatures: [String] = []
+        
+        if !config.isInExceptionList(domain: host, forFeature: .contentBlocking) {
+            enabledFeatures.append(PrivacyFeature.contentBlocking.rawValue)
+        }
+        
+        return ProtectionStatus(unprotectedTemporary: isTempUnprotected,
+                                enabledFeatures: enabledFeatures,
+                                allowlisted: isAllowlisted,
+                                denylisted: false)
     }
 
     // MARK: - Printing
@@ -1029,14 +1068,15 @@ extension Tab: ContentBlockerRulesUserScriptDelegate {
     }
     
     func contentBlockerRulesUserScript(_ script: ContentBlockerRulesUserScript, detectedTracker tracker: DetectedRequest) {
-        trackerInfo?.add(detectedTracker: tracker)
+        guard let url = webView.url else { return }
+        
+        privacyInfo?.trackerInfo.addDetectedTracker(tracker, onPageWithURL: url)
         adClickAttributionLogic.onRequestDetected(request: tracker)
-        guard let url = URL(string: tracker.pageUrl) else { return }
         historyCoordinating.addDetectedTracker(tracker, onURL: url)
     }
 
     func contentBlockerRulesUserScript(_ script: ContentBlockerRulesUserScript, detectedThirdPartyRequest request: DetectedRequest) {
-        trackerInfo?.add(detectedThirdPartyRequest: request)
+        privacyInfo?.trackerInfo.add(detectedThirdPartyRequest: request)
     }
     
 }
@@ -1091,9 +1131,11 @@ extension Tab: SurrogatesUserScriptDelegate {
     }
 
     func surrogatesUserScript(_ script: SurrogatesUserScript, detectedTracker tracker: DetectedRequest, withSurrogate host: String) {
-        trackerInfo?.add(installedSurrogateHost: host)
-        trackerInfo?.add(detectedTracker: tracker)
         guard let url = webView.url else { return }
+        
+        privacyInfo?.trackerInfo.addInstalledSurrogateHost(host, for: tracker, onPageWithURL: url)
+        privacyInfo?.trackerInfo.addDetectedTracker(tracker, onPageWithURL: url)
+        
         historyCoordinating.addDetectedTracker(tracker, onURL: url)
     }
 }
@@ -1198,21 +1240,19 @@ extension Tab: WKNavigationDelegate {
                  didReceive challenge: URLAuthenticationChallenge,
                  completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
         webViewDidReceiveChallengePublisher.send()
-
+        
         if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodHTTPBasic,
            let delegate = delegate {
             delegate.tab(self, requestedBasicAuthenticationChallengeWith: challenge.protectionSpace, completionHandler: completionHandler)
             return
         }
-
+        
         completionHandler(.performDefaultHandling, nil)
-        if let host = webView.url?.host, let serverTrust = challenge.protectionSpace.serverTrust, host == challenge.protectionSpace.host {
-            self.serverTrust = ServerTrust(host: host, secTrust: serverTrust)
-        }
     }
 
     func webView(_ webView: WKWebView, didReceiveServerRedirectForProvisionalNavigation navigation: WKNavigation!) {
         isBeingRedirected = true
+        resetDashboardInfo()
     }
 
     func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
@@ -1264,6 +1304,8 @@ extension Tab: WKNavigationDelegate {
         let isRequestingNewTab = (isLinkActivated && NSApp.isCommandPressed) || isMiddleButtonClicked || isNavigatingAwayFromPinnedTab
         let shouldSelectNewTab = NSApp.isShiftPressed || (isNavigatingAwayFromPinnedTab && !isMiddleButtonClicked && !NSApp.isCommandPressed)
 
+        didGoBackForward = (navigationAction.navigationType == .backForward)
+        
         // This check needs to happen before GPC checks. Otherwise the navigation type may be rewritten to `.other`
         // which would skip link rewrites.
         if navigationAction.navigationType != .backForward {
@@ -1673,7 +1715,7 @@ extension Tab: HoverUserScriptDelegate {
 @available(macOS 11, *)
 extension Tab: AutoconsentUserScriptDelegate {
     func autoconsentUserScript(consentStatus: CookieConsentInfo) {
-        self.cookieConsentManaged = consentStatus
+        self.privacyInfo?.cookieConsentManaged = consentStatus
     }
     
     func autoconsentUserScriptPromptUserForConsent(_ result: @escaping (Bool) -> Void) {

@@ -18,7 +18,6 @@
 
 import WebKit
 import os
-import BrowserServicesKit
 import UserScript
 
 protocol TabInstrumentationProtocol: AnyObject {
