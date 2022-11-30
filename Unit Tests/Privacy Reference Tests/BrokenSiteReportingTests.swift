@@ -26,7 +26,7 @@ final class BrokenSiteReportingTests: XCTestCase {
     private let testHelper = PrivacyReferenceTestHelper()
     
     private enum Resource {
-        static let tests = "broken-site-reporting/tests.json"
+        static let tests = "privacy-reference-tests/broken-site-reporting/tests.json"
     }
     
     private func makeURLRequest(with parameters: [String: String]) -> URLRequest {

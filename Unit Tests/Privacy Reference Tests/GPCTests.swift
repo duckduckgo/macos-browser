@@ -27,8 +27,8 @@ final class GPCTests: XCTestCase {
     private let testHelper = PrivacyReferenceTestHelper()
     
     private enum Resource {
-        static let config = "global-privacy-control/config_reference.json"
-        static let tests = "global-privacy-control/tests.json"
+        static let config = "privacy-reference-tests/global-privacy-control/config_reference.json"
+        static let tests = "privacy-reference-tests/global-privacy-control/tests.json"
     }
     
     func testGPC() {

@@ -4,3 +4,6 @@
 [submodule "Submodules/duckduckgo-privacy-dashboard"]
 	path = Submodules/duckduckgo-privacy-dashboard
 	url = git@github.com:more-duckduckgo-org/duckduckgo-privacy-dashboard.git
+[submodule "Submodules/privacy-reference-tests"]
+	path = Submodules/privacy-reference-tests
+	url = git@github.com:duckduckgo/privacy-reference-tests.git
