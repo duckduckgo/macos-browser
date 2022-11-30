@@ -52,6 +52,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var grammarFeaturesManager = GrammarFeaturesManager()
     private let crashReporter = CrashReporter()
     let updateController = UpdateController()
+    private var networkProtectionMenu: NetworkProtectionStatusBarMenu!
 
     var appUsageActivityMonitor: AppUsageActivityMonitor?
 
@@ -123,6 +124,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         urlEventHandler.applicationDidFinishLaunching()
 
         UserDefaultsWrapper<Any>.clearRemovedKeys()
+
+        Task {
+            do {
+                networkProtectionMenu = try await NetworkProtectionStatusBarMenu(networkProtection: NetworkProtection())
+                networkProtectionMenu.show()
+            } catch {
+                let error = StaticString(stringLiteral: "🔴 Failed to create VPN status bar menu")
+                assertionFailure("\(error)")
+                os_log(error, type: .error)
+            }
+        }
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {

@@ -20,6 +20,7 @@ import AppKit
 
 extension NSImage {
     enum NetworkProtection {
+        static let statusBarMenuIcon = NSImage(named: "PasswordManagement")
         static let moreOptionsIcon = NSImage(named: "PasswordManagement")
     }
 }
