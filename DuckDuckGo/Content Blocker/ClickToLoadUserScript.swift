@@ -19,7 +19,6 @@
 import WebKit
 import UserScript
 import BrowserServicesKit
-import UserScript
 
 protocol ClickToLoadUserScriptDelegate: AnyObject {
 
