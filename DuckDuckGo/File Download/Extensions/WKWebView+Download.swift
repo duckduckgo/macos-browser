@@ -156,27 +156,32 @@ extension WKWebView {
 }
 
 extension WKNavigationActionPolicy {
-    // https://github.com/WebKit/WebKit/blob/9a6f03d46238213231cf27641ed1a55e1949d074/Source/WebKit/UIProcess/API/Cocoa/WKNavigationDelegate.h#L49
-    private static let download = WKNavigationActionPolicy(rawValue: Self.allow.rawValue + 1) ?? .cancel
-
     static func download(_ navigationAction: WKNavigationAction,
                          using webView: WKWebView) -> WKNavigationActionPolicy {
         webView.configuration.processPool
             .setDownloadDelegateIfNeeded(using: LegacyWebKitDownloadDelegate.init)?
             .registerDownloadNavigationAction(navigationAction)
-        return .download
+
+        if #available(macOS 11.3, *) {
+            return .download
+        }
+        // https://github.com/WebKit/WebKit/blob/9a6f03d46238213231cf27641ed1a55e1949d074/Source/WebKit/UIProcess/API/Cocoa/WKNavigationDelegate.h#L49
+        return WKNavigationActionPolicy(rawValue: Self.allow.rawValue + 1) ?? .cancel
     }
 
 }
 
 extension WKNavigationResponsePolicy {
-    private static let download = WKNavigationResponsePolicy(rawValue: Self.allow.rawValue + 1) ?? .cancel
-
     static func download(_ navigationResponse: WKNavigationResponse,
                          using webView: WKWebView) -> WKNavigationResponsePolicy {
         webView.configuration.processPool
             .setDownloadDelegateIfNeeded(using: LegacyWebKitDownloadDelegate.init)?
             .registerDownloadNavigationResponse(navigationResponse)
-        return .download
+
+        if #available(macOS 11.3, *) {
+            return .download
+        }
+        // https://github.com/WebKit/WebKit/blob/9a6f03d46238213231cf27641ed1a55e1949d074/Source/WebKit/UIProcess/API/Cocoa/WKNavigationDelegate.h#L49
+        return WKNavigationResponsePolicy(rawValue: Self.allow.rawValue + 1) ?? .cancel
     }
 }
