@@ -17,7 +17,6 @@
 //
 
 import WebKit
-import BrowserServicesKit
 import UserScript
 
 protocol ContextMenuUserScriptDelegate: AnyObject {

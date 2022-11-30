@@ -8,8 +8,5 @@ declare module "*.css" {
 }
 
 interface Window {
-    onUserValuesChanged: any
-    webkit: {
-        messageHandlers: Record<string, any>
-    }
+    onUserValuesChanged: any;
 }

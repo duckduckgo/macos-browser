@@ -17,6 +17,7 @@
 //
 
 import WebKit
+import UserScript
 import BrowserServicesKit
 import UserScript
 

@@ -19,6 +19,7 @@
 import Foundation
 import os.log
 import BrowserServicesKit
+import PrivacyDashboard
 import WebKit
 
 protocol TabDataClearing {

@@ -3,13 +3,14 @@
   "version": "1.0.0",
   "private": true,
   "devDependencies": {
+    "@duckduckgo/content-scope-utils": "github:duckduckgo/content-scope-utils#1.0.1",
     "@playwright/test": "^1.27.1",
     "esbuild": "^0.15.9",
     "typescript": "^4.8.4"
   },
   "scripts": {
     "test": "npm run build &&  npm run tsc",
-    "_build": "esbuild --loader:.css=text --loader:.svg=text --bundle youtube-inject.js",
+    "_build": "esbuild --loader:.css=text --loader:.svg=text --bundle youtube-inject.js --target=safari11,es2021",
     "build": "npm run _build -- --outfile='dist/youtube-inject.bundle.js'",
     "build:watch": "npm run _build -- --outfile='dist/youtube-inject.bundle.js' --watch",
     "tsc": "tsc",

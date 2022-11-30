@@ -19,7 +19,6 @@
 import Foundation
 import WebKit
 import os
-import BrowserServicesKit
 import Common
 import UserScript
 
@@ -35,6 +34,7 @@ final class YoutubeOverlayUserScript: NSObject, UserScript, UserScriptMessageEnc
         case openDuckPlayer
     }
 
+    // This conforms to https://duckduckgo.github.io/content-scope-utils/classes/Webkit_Messaging.WebkitMessagingConfig.html
     struct WebkitMessagingConfig: Encodable {
         var hasModernWebkitAPI: Bool
         var webkitMessageHandlerNames: [String]
