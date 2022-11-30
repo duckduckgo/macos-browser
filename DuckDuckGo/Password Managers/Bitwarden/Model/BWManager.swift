@@ -307,11 +307,6 @@ final class BWManager: BWManagement, ObservableObject {
             return
         }
 
-        #if DEBUG
-        let decryptedString = String(bytes: decryptedData, encoding: .utf8)
-        os_log("Decrypted payload:\n %s", log: .bitwarden, type: .default, decryptedString ?? "")
-        #endif
-
         guard let response = BWResponse(from: decryptedData) else {
             status = .error(error: .parsingFailed)
             return
@@ -611,7 +606,7 @@ extension BWManager: BWCommunicatorDelegate {
         }
 
         guard let messageId = response.messageId, messageIdGenerator.verify(messageId: messageId) else {
-            os_log("BWManager: Unkown message id", log: .bitwarden, type: .default, String(describing: status))
+            os_log("BWManager: Unkown message id. Ignoring the message", log: .bitwarden, type: .default)
             return
         }
 

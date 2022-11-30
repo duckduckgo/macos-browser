@@ -123,8 +123,6 @@ final class BWCommunicator: BWCommunication {
         let finalMessage = messagePrefix + messageData
 
         process.writingHandle.write(finalMessage)
-
-        os_log("Message sent:\n %s", log: .bitwarden, type: .default, messageData.utf8String() ?? "")
     }
 
     // MARK: - Receiving Messages
@@ -162,17 +160,6 @@ final class BWCommunicator: BWCommunication {
                 return
             }
 
-#if DEBUG
-        if OSLog.bitwarden != .disabled {
-            guard let messageString = String(data: messageData, encoding: .utf8) else {
-                assertionFailure("Receving the message failed")
-                return
-            }
-
-            os_log("Message received:\n %s", log: .bitwarden, type: .default, messageString)
-        }
-#endif
-
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
 
@@ -182,9 +169,10 @@ final class BWCommunicator: BWCommunication {
     }
 
     private func receiveErrorData(_ fileHandle: FileHandle) {
-        if let stderrOutput = String(data: fileHandle.availableData, encoding: .utf8) {
-            os_log("Stderr output:\n %s", log: .bitwarden, type: .error, stderrOutput)
-        }
+        // Stderr is too verbose. Uncomment if necessary
+        // if let stderrOutput = String(data: fileHandle.availableData, encoding: .utf8) {
+        //     os_log("Stderr output:\n %s", log: .bitwarden, type: .error, stderrOutput)
+        // }
     }
 
     private func fromByteArray<T>(_ value: [UInt8], _: T.Type) -> T {
