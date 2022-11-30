@@ -21,6 +21,10 @@ import Combine
 
 extension NSApplication {
 
+    var isSandboxed: Bool {
+        ProcessInfo.processInfo.environment["APP_SANDBOX_CONTAINER_ID"] != nil
+    }
+
     // swiftlint:disable force_cast
     var mainMenuTyped: MainMenu {
         return mainMenu as! MainMenu

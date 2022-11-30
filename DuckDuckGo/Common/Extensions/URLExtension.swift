@@ -32,7 +32,24 @@ extension URL {
 
     // MARK: - Local
 
+    static var nonSandboxLibraryDirectoryURL: URL {
+        guard NSApp.isSandboxed else {
+            return FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask).first!
+        }
+        return FileManager.default.homeDirectoryForCurrentUser.deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+    }
+
+    static var nonSandboxApplicationSupportDirectoryURL: URL {
+        guard NSApp.isSandboxed else {
+            return FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
+        }
+        return nonSandboxLibraryDirectoryURL.appendingPathComponent("Application Support")
+    }
+
     static var sandboxApplicationSupportURL: URL {
+        if NSApp.isSandboxed {
+            return FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
+        }
         let sandboxPathComponent = "Containers/\(Bundle.main.bundleIdentifier!)/Data/Library/Application Support/"
         let libraryURL = FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask).first!
         return libraryURL.appendingPathComponent(sandboxPathComponent)

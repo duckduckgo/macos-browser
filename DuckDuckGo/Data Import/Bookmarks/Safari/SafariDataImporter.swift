@@ -38,8 +38,7 @@ internal class SafariDataImporter: DataImporter {
     }
     
     static private var safariDataDirectoryURL: URL {
-        let applicationSupport = FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask).first!
-        return applicationSupport.appendingPathComponent("Safari/")
+        return URL.nonSandboxLibraryDirectoryURL.appendingPathComponent("Safari/")
     }
     
     static private var bookmarksFileURL: URL {
