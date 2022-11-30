@@ -1093,7 +1093,7 @@ extension Tab: WKNavigationDelegate {
     @MainActor
     func webView(_ webView: WKWebView,
                  decidePolicyFor navigationAction: WKNavigationAction) async -> WKNavigationActionPolicy {
-                
+
         if let policy = privatePlayer.decidePolicy(for: navigationAction, in: self) {
             return policy
         }
@@ -1102,7 +1102,15 @@ extension Tab: WKNavigationDelegate {
             return .allow
         }
 
-        let isLinkActivated = navigationAction.navigationType == .linkActivated
+        // source frame is actually nullable here so we‘re using #keyPath
+        let sourceWebView = navigationAction.value(forKeyPath: #keyPath(WKNavigationAction.sourceFrame.webView)) as? WKWebView
+        // temporary hack to check is it the original navigation or redirect
+        let isRedirect = navigationAction.value(forKeyPath: "_isRedirect") as? Bool ?? false
+
+        let isLinkActivated = webView === sourceWebView
+            && !isRedirect
+            && navigationAction.navigationType == .linkActivated
+
         let isNavigatingAwayFromPinnedTab: Bool = {
             let isNavigatingToAnotherDomain = navigationAction.request.url?.host != url?.host
             let isPinned = pinnedTabsManager.isTabPinned(self)
