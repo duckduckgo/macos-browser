@@ -202,7 +202,7 @@ private struct BitwardenInstallationDetectionView: View {
                 HStack {
                     ActivityIndicator(isAnimating: .constant(true), style: .spinning)
                     
-                    Text(UserText.lookingForBitwaden)
+                    Text(UserText.lookingForBitwarden)
                 }
             }
         }
@@ -225,13 +225,13 @@ private struct ConnectToBitwardenView: View {
             
             HStack {
                 NumberedBadge(value: 1)
-                Text(UserText.openBitwadenAndLogInOrUnlock)
+                Text(UserText.openBitwardenAndLogInOrUnlock)
                 Spacer()
             }
 
             HStack {
                 Spacer().frame(width: 26)
-                Button(UserText.openBitwaden) {
+                Button(UserText.openBitwarden) {
                     viewModel.process(action: .openBitwarden)
                 }
             }
@@ -240,7 +240,7 @@ private struct ConnectToBitwardenView: View {
             
             HStack {
                 NumberedBadge(value: 2)
-                Text(UserText.selectBitwadenPreferences)
+                Text(UserText.selectBitwardenPreferences)
                 Spacer()
             }
             

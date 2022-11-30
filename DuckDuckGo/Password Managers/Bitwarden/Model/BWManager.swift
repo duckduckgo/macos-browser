@@ -56,7 +56,7 @@ final class BWManager: BWManagement, ObservableObject {
     func initCommunication() {
         communicator.delegate = self
 
-        connectToBitwadenProcess()
+        connectToBitwardenProcess()
     }
 
     func cancelCommunication() {
@@ -79,14 +79,14 @@ final class BWManager: BWManagement, ObservableObject {
 
     // MARK: - Connection
 
-    var isBitwadenPasswordManager: Bool {
+    var isBitwardenPasswordManager: Bool {
         let autofillPreferences = AutofillPreferences()
         return autofillPreferences.passwordManager == .bitwarden
     }
 
-    private func connectToBitwadenProcess() {
+    private func connectToBitwardenProcess() {
         // Check preferences to make sure Bitwarden is set as password manager
-        guard isBitwadenPasswordManager else {
+        guard isBitwardenPasswordManager else {
             // The built-in password manager is used
             return
         }
@@ -152,7 +152,7 @@ final class BWManager: BWManagement, ObservableObject {
             self?.connectionAttemptTimer?.invalidate()
             self?.connectionAttemptTimer = nil
 
-            self?.connectToBitwadenProcess()
+            self?.connectToBitwardenProcess()
         }
     }
 
@@ -583,8 +583,8 @@ final class BWManager: BWManagement, ObservableObject {
 
 extension BWManager: BWCommunicatorDelegate {
 
-    func bitwadenCommunicatorProcessDidTerminate(_ bitwardenCommunicator: BWCommunication) {
-        guard isBitwadenPasswordManager else {
+    func bitwardenCommunicatorProcessDidTerminate(_ bitwardenCommunicator: BWCommunication) {
+        guard isBitwardenPasswordManager else {
             return
         }
 
@@ -594,7 +594,7 @@ extension BWManager: BWCommunicatorDelegate {
     }
 
 
-    func bitwadenCommunicator(_ bitwardenCommunicator: BWCommunication, didReceiveMessageData messageData: Data) {
+    func bitwardenCommunicator(_ bitwardenCommunicator: BWCommunication, didReceiveMessageData messageData: Data) {
         guard let response = BWResponse(from: messageData) else {
             logOrAssertionFailure("BWManager: Can't decode the message")
             return

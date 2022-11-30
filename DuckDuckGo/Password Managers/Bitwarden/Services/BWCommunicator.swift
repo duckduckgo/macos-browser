@@ -21,9 +21,9 @@ import os.log
 
 protocol BWCommunicatorDelegate: AnyObject {
 
-    func bitwadenCommunicator(_ bitwardenCommunicator: BWCommunication,
+    func bitwardenCommunicator(_ bitwardenCommunicator: BWCommunication,
                               didReceiveMessageData messageData: Data)
-    func bitwadenCommunicatorProcessDidTerminate(_ bitwardenCommunicator: BWCommunication)
+    func bitwardenCommunicatorProcessDidTerminate(_ bitwardenCommunicator: BWCommunication)
 
 }
 
@@ -101,7 +101,7 @@ final class BWCommunicator: BWCommunication {
 
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
-            self.delegate?.bitwadenCommunicatorProcessDidTerminate(self)
+            self.delegate?.bitwardenCommunicatorProcessDidTerminate(self)
         }
     }
 
@@ -163,7 +163,7 @@ final class BWCommunicator: BWCommunication {
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
 
-                self.delegate?.bitwadenCommunicator(self, didReceiveMessageData: messageData)
+                self.delegate?.bitwardenCommunicator(self, didReceiveMessageData: messageData)
             }
         } while availableData.count >= 2 /*EOF*/
     }
