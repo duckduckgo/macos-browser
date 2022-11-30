@@ -29,6 +29,7 @@
 		1D3B1ABF29369FC8006F4388 /* BWEncryptionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D3B1ABE29369FC8006F4388 /* BWEncryptionTests.swift */; };
 		1D3B1AC22936B816006F4388 /* BWMessageIdGeneratorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D3B1AC12936B816006F4388 /* BWMessageIdGeneratorTests.swift */; };
 		1D3B1AC429378953006F4388 /* BWResponseTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D3B1AC329378953006F4388 /* BWResponseTests.swift */; };
+		1D3B1AC62937A478006F4388 /* BWRequestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D3B1AC52937A478006F4388 /* BWRequestTests.swift */; };
 		1D43EB32292788C70065E5D6 /* BWEncryptionOutput.m in Sources */ = {isa = PBXBuildFile; fileRef = 1D43EB31292788C70065E5D6 /* BWEncryptionOutput.m */; };
 		1D43EB3429297D760065E5D6 /* BWNotRespondingAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D43EB3329297D760065E5D6 /* BWNotRespondingAlert.swift */; };
 		1D43EB36292ACE690065E5D6 /* ApplicationVersionReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D43EB35292ACE690065E5D6 /* ApplicationVersionReader.swift */; };
@@ -880,6 +881,7 @@
 		1D3B1ABE29369FC8006F4388 /* BWEncryptionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BWEncryptionTests.swift; sourceTree = "<group>"; };
 		1D3B1AC12936B816006F4388 /* BWMessageIdGeneratorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BWMessageIdGeneratorTests.swift; sourceTree = "<group>"; };
 		1D3B1AC329378953006F4388 /* BWResponseTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BWResponseTests.swift; sourceTree = "<group>"; };
+		1D3B1AC52937A478006F4388 /* BWRequestTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BWRequestTests.swift; sourceTree = "<group>"; };
 		1D43EB30292788C70065E5D6 /* BWEncryptionOutput.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BWEncryptionOutput.h; sourceTree = "<group>"; };
 		1D43EB31292788C70065E5D6 /* BWEncryptionOutput.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BWEncryptionOutput.m; sourceTree = "<group>"; };
 		1D43EB3329297D760065E5D6 /* BWNotRespondingAlert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BWNotRespondingAlert.swift; sourceTree = "<group>"; };
@@ -1808,6 +1810,7 @@
 			isa = PBXGroup;
 			children = (
 				1D3B1ABC29369F3D006F4388 /* BWManagerTests.swift */,
+				1D3B1AC52937A478006F4388 /* BWRequestTests.swift */,
 				1D3B1AC329378953006F4388 /* BWResponseTests.swift */,
 				1D3B1AC12936B816006F4388 /* BWMessageIdGeneratorTests.swift */,
 			);
@@ -5388,6 +5391,7 @@
 				B69B504B2726CA2900758A2B /* MockStatisticsStore.swift in Sources */,
 				37CD54BD27F2ECAE00F1F7B9 /* AutofillPreferencesModelTests.swift in Sources */,
 				37D23789288009CF00BCE03B /* TabCollectionViewModelTests+PinnedTabs.swift in Sources */,
+				1D3B1AC62937A478006F4388 /* BWRequestTests.swift in Sources */,
 				B630793A26731F2600DCEE41 /* FileDownloadManagerTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

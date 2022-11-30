@@ -32,19 +32,7 @@ struct BWRequest: Codable {
                                 payload: payload)
     }
 
-    static func makeStatusRequest(encryptedCommand: String, messageId: String) -> BWRequest? {
-        return BWRequest(messageId: messageId,
-                                version: version,
-                                encryptedCommand: encryptedCommand)
-    }
-
-    static func makeCredentialRetrievalRequest(encryptedCommand: String, messageId: String) -> BWRequest? {
-        return BWRequest(messageId: messageId,
-                                version: version,
-                                encryptedCommand: encryptedCommand)
-    }
-
-    static func makeCredentialCreationRequest(encryptedCommand: String, messageId: String) -> BWRequest? {
+    static func makeEncryptedCommandRequest(encryptedCommand: String, messageId: String) -> BWRequest {
         return BWRequest(messageId: messageId,
                                 version: version,
                                 encryptedCommand: encryptedCommand)

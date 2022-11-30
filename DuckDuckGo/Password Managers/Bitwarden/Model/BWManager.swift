@@ -429,8 +429,8 @@ final class BWManager: BWManagement, ObservableObject {
     private func sendStatus() {
         guard let commandData = BWRequest.EncryptedCommand(command: .status, payload: nil).data,
               let encryptedCommand = encryptCommandData(commandData),
-              let messageData = BWRequest.makeStatusRequest(encryptedCommand: encryptedCommand,
-                                                                   messageId: messageIdGenerator.generateMessageId())?.data else {
+              let messageData = BWRequest.makeEncryptedCommandRequest(encryptedCommand: encryptedCommand,
+                                                                      messageId: messageIdGenerator.generateMessageId()).data else {
             logOrAssertionFailure("BWManager: Making the status message failed")
             status = .error(error: .sendingOfStatusMessageFailed)
             return
@@ -444,7 +444,8 @@ final class BWManager: BWManagement, ObservableObject {
         guard let commandData = BWRequest.EncryptedCommand(command: .credentialRetrieval,
                                                                   payload: payload).data,
               let encryptedCommand = encryptCommandData(commandData),
-              let messageData = BWRequest.makeCredentialRetrievalRequest(encryptedCommand: encryptedCommand, messageId: messageId)?.data else {
+              let messageData = BWRequest.makeEncryptedCommandRequest(encryptedCommand: encryptedCommand,
+                                                                      messageId: messageId).data else {
             logOrAssertionFailure("BWManager: Making the credential retrieval message failed")
             status = .error(error: .sendingOfStatusMessageFailed)
             return
@@ -462,7 +463,8 @@ final class BWManager: BWManagement, ObservableObject {
         guard let commandData = BWRequest.EncryptedCommand(command: .credentialCreate,
                                                                   payload: payload).data,
               let encryptedCommand = encryptCommandData(commandData),
-              let messageData = BWRequest.makeCredentialCreationRequest(encryptedCommand: encryptedCommand, messageId: messageId)?.data else {
+              let messageData = BWRequest.makeEncryptedCommandRequest(encryptedCommand: encryptedCommand,
+                                                                      messageId: messageId).data else {
             logOrAssertionFailure("BWManager: Making the credential creation message failed")
             status = .error(error: .sendingOfStatusMessageFailed)
             return
@@ -481,7 +483,8 @@ final class BWManager: BWManagement, ObservableObject {
         guard let commandData = BWRequest.EncryptedCommand(command: .credentialUpdate,
                                                                   payload: payload).data,
               let encryptedCommand = encryptCommandData(commandData),
-              let messageData = BWRequest.makeCredentialCreationRequest(encryptedCommand: encryptedCommand, messageId: messageId)?.data else {
+              let messageData = BWRequest.makeEncryptedCommandRequest(encryptedCommand: encryptedCommand,
+                                                                      messageId: messageId).data else {
             logOrAssertionFailure("BWManager: Making the credential update message failed")
             status = .error(error: .sendingOfStatusMessageFailed)
             return
