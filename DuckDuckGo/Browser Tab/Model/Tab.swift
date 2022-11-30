@@ -1274,7 +1274,26 @@ extension Tab: WKNavigationDelegate {
     @MainActor
     func webView(_ webView: WKWebView,
                  decidePolicyFor navigationAction: WKNavigationAction) async -> WKNavigationActionPolicy {
-                
+
+        switch await contextMenuManager.decidePolicy(for: navigationAction) {
+        case .instantAllow:
+            return .allow
+        case .newTab(selected: let selected):
+            guard let url = navigationAction.request.url else { return .cancel }
+            self.delegate?.tab(
+                self,
+                requestedNewTabWith: .url(url),
+                selected: selected
+            )
+            return .cancel
+        case .cancel:
+            return .cancel
+        case .download:
+            return .download(navigationAction, using: webView)
+        case .none:
+            break
+        }
+
         if let policy = privatePlayer.decidePolicy(for: navigationAction, in: self) {
             return policy
         }
@@ -1293,22 +1312,8 @@ extension Tab: WKNavigationDelegate {
         let isMiddleButtonClicked = navigationAction.buttonNumber == Constants.webkitMiddleClick
 
         // to be modularized later on, see https://app.asana.com/0/0/1203268245242140/f
-        var isRequestingNewTab = (isLinkActivated && NSApp.isCommandPressed) || isMiddleButtonClicked || isNavigatingAwayFromPinnedTab
-        var shouldSelectNewTab = NSApp.isShiftPressed || (isNavigatingAwayFromPinnedTab && !isMiddleButtonClicked && !NSApp.isCommandPressed)
-
-        switch await contextMenuManager.decidePolicy(for: navigationAction) {
-        case .instantAllow:
-            return .allow
-        case .newTab(selected: let selected):
-            isRequestingNewTab = true
-            shouldSelectNewTab = shouldSelectNewTab || selected
-        case .cancel:
-            return .cancel
-        case .download:
-            return .download(navigationAction, using: webView)
-        case .none:
-            break
-        }
+        let isRequestingNewTab = (isLinkActivated && NSApp.isCommandPressed) || isMiddleButtonClicked || isNavigatingAwayFromPinnedTab
+        let shouldSelectNewTab = NSApp.isShiftPressed || (isNavigatingAwayFromPinnedTab && !isMiddleButtonClicked && !NSApp.isCommandPressed)
 
         didGoBackForward = (navigationAction.navigationType == .backForward)
         
