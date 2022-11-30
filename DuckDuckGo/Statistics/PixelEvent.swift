@@ -19,7 +19,6 @@
 import Foundation
 import BrowserServicesKit
 
-// swiftlint:disable identifier_name
 extension Pixel {
 
     enum Event {
@@ -177,7 +176,6 @@ extension Pixel {
 
     }
 }
-// swiftlint:enable identifier_name
 
 extension Pixel.Event {
 

@@ -168,7 +168,6 @@ final class MainMenu: NSMenu {
     }
 
     // Nested recursing functions cause body length
-    // swiftlint:disable function_body_length
     func updateBookmarksMenu(favoriteViewModels: [BookmarkViewModel], topLevelBookmarkViewModels: [BookmarkViewModel]) {
 
         func bookmarkMenuItems(from bookmarkViewModels: [BookmarkViewModel], topLevel: Bool = true) -> [NSMenuItem] {

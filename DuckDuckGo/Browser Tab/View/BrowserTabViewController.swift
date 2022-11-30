@@ -724,7 +724,6 @@ extension BrowserTabViewController: WKUIDelegate {
     }
 
     // swiftlint:disable cyclomatic_complexity
-    // swiftlint:disable function_body_length
     func webView(_ webView: WKWebView,
                  createWebViewWith configuration: WKWebViewConfiguration,
                  for navigationAction: WKNavigationAction,

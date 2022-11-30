@@ -612,7 +612,6 @@ final class PasswordManagementViewController: NSViewController {
         self.postChange()
     }
 
-    // swiftlint:disable function_body_length
     private func createListView() {
         let listModel = PasswordManagementItemListModel { [weak self] previousValue, newValue in
             guard let newValue = newValue,

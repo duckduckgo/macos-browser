@@ -19,7 +19,7 @@
 import WebKit
 
 // A workaround to bring WKDownload support back to macOS 11.3 (which really has WKDownload support)
-private protocol WKWebView_macOS_11_3 {
+private protocol WKWebView_macOS_11_3 {  // swiftlint:disable:this type_name
     func startDownload(using request: URLRequest, completionHandler: @escaping (WebKitDownload) -> Void)
     func resumeDownload(from data: Data, completionHandler: @escaping (WebKitDownload) -> Void)
 }

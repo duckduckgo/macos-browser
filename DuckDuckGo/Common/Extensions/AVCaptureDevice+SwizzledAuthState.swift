@@ -19,7 +19,7 @@
 import Foundation
 import AVFoundation
 
-@objc private protocol AVCaptureDevice_Swizzled {
+@objc private protocol AVCaptureDevice_Swizzled { // swiftlint:disable:this type_name
     static func swizzled_authorizationStatus(for mediaType: AVMediaType) -> AVAuthorizationStatus
 }
 extension AVCaptureDevice: AVCaptureDevice_Swizzled {

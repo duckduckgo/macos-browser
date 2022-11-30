@@ -165,7 +165,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     private let contentBlockerRulesManager: ContentBlockerRulesManagerProtocol
     private let privatePlayer: PrivatePlayer
 
-    // swiftlint:disable:next function_body_length
     convenience init(content: TabContent,
                      faviconManagement: FaviconManagement = FaviconManager.shared,
                      webCacheManager: WebCacheManager = WebCacheManager.shared,

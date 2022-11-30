@@ -27,6 +27,7 @@ protocol AddressBarTextFieldDelegate: AnyObject {
 
 }
 
+// swiftlint:disable type_body_length
 final class AddressBarTextField: NSTextField {
 
     weak var addressBarTextFieldDelegate: AddressBarTextFieldDelegate?

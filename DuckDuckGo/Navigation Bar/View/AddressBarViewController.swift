@@ -140,12 +140,10 @@ final class AddressBarViewController: NSViewController {
         subscribeForShadowViewUpdates()
     }
 
-    // swiftlint:disable notification_center_detachment
     override func viewWillDisappear() {
         NotificationCenter.default.removeObserver(self)
         removeMouseMonitors()
     }
-    // swiftlint:enable notification_center_detachment
 
     override func viewDidLayout() {
         super.viewDidLayout()
