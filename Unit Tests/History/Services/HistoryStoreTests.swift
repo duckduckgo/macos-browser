@@ -184,28 +184,18 @@ final class HistoryStoreTests: XCTestCase {
         let historyStore = HistoryStore(context: context)
         
         let oldVisitDate = Date(timeIntervalSince1970: 0)
-        let slightlyLessOldVisitDate = Date(timeIntervalSince1970: 12345)
+        let newVisitDate = Date(timeIntervalSince1970: 12345)
         let oldVisit = Visit(date: oldVisitDate)
-        let slightlyLessOldVisit = Visit(date: slightlyLessOldVisitDate)
+        let newVisit = Visit(date: newVisitDate)
 
-        let oldHistoryEntry = HistoryEntry(identifier: UUID(),
+        let historyEntry = HistoryEntry(identifier: UUID(),
                                            url: URL.duckDuckGo,
                                            title: nil,
                                            numberOfVisits: 2,
-                                           lastVisit: slightlyLessOldVisitDate,
-                                           visits: [oldVisit, slightlyLessOldVisit])
+                                           lastVisit: newVisitDate,
+                                           visits: [oldVisit, newVisit])
         let firstSavingExpectation = self.expectation(description: "Saving")
-        save(entry: oldHistoryEntry, historyStore: historyStore, expectation: firstSavingExpectation)
-
-        let newHistoryEntryIdentifier = UUID()
-        let newHistoryEntry = HistoryEntry(identifier: newHistoryEntryIdentifier,
-                                           url: URL(string: "wikipedia.org")!,
-                                           title: nil,
-                                           numberOfVisits: 1,
-                                           lastVisit: Date(),
-                                           visits: [])
-        let secondSavingExpectation = self.expectation(description: "Saving")
-        save(entry: newHistoryEntry, historyStore: historyStore, expectation: secondSavingExpectation)
+        save(entry: historyEntry, historyStore: historyStore, expectation: firstSavingExpectation)
 
         let loadingExpectation = self.expectation(description: "Loading")
         historyStore.cleanOld(until: Date(timeIntervalSince1970: 1))
@@ -218,14 +208,70 @@ final class HistoryStoreTests: XCTestCase {
                     XCTFail("Loading of history failed - \(error.localizedDescription)")
                 }
             } receiveValue: { history in
-                XCTAssertEqual(history.count, 2)
+                XCTAssertEqual(history.count, 1)
+                for entry in history {
+                    // Note:
+                    // Visits are consistent, as CoreData is not using additional table to manage to-many relationships, just a column on a Visit. Since we are removing visits, we implicitly remove History reference.
+                    XCTAssertEqual(entry.visits.count, 1)
+                }
+            }
+            .store(in: &cancellables)
+
+        waitForExpectations(timeout: 500, handler: nil)
+        
+        
+    }
+    
+    func testWhenCleanOldIsCalled_ThenFollowingSaveShouldSucceed() {
+        let context = database.makeContext(concurrencyType: .mainQueueConcurrencyType)
+        let historyStore = HistoryStore(context: context)
+        
+        let oldVisitDate = Date(timeIntervalSince1970: 0)
+        let newVisitDate = Date(timeIntervalSince1970: 12345)
+        
+        let oldVisit = Visit(date: oldVisitDate)
+        let newVisit = Visit(date: newVisitDate)
+
+        let historyEntry = HistoryEntry(identifier: UUID(),
+                                           url: URL.duckDuckGo,
+                                           title: nil,
+                                           numberOfVisits: 2,
+                                           lastVisit: newVisitDate,
+                                           visits: [oldVisit, newVisit])
+        let firstSavingExpectation = self.expectation(description: "Saving")
+        save(entry: historyEntry, historyStore: historyStore, expectation: firstSavingExpectation)
+
+        let loadingExpectation = self.expectation(description: "Loading")
+        historyStore.cleanOld(until: Date(timeIntervalSince1970: 1))
+            .receive(on: DispatchQueue.main)
+            .sink { completion in
+                switch completion {
+                case .finished:
+                    loadingExpectation.fulfill()
+                case .failure(let error):
+                    XCTFail("Loading of history failed - \(error.localizedDescription)")
+                }
+            } receiveValue: { history in
+                XCTAssertEqual(history.count, 1)
                 for entry in history {
                     XCTAssertEqual(entry.visits.count, 1)
                 }
             }
             .store(in: &cancellables)
 
-        waitForExpectations(timeout: 1, handler: nil)
+        waitForExpectations(timeout: 2, handler: nil)
+        
+        let newHistoryEntry = HistoryEntry(identifier: UUID(),
+                                           url: URL.duckDuckGo,
+                                           title: nil,
+                                           numberOfVisits: 2,
+                                           lastVisit: newVisitDate,
+                                           visits: [oldVisit, newVisit])
+        let secondSavingExpectation = self.expectation(description: "Saving")
+        // This should not fail, but apparently internal version of objects is broken after BatchDelete request causing merge failure.
+        save(entry: newHistoryEntry, historyStore: historyStore, expectation: secondSavingExpectation)
+        
+        waitForExpectations(timeout: 2, handler: nil)
     }
 
 }
