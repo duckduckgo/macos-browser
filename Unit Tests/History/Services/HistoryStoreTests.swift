@@ -29,8 +29,7 @@ final class HistoryStoreTests: XCTestCase {
     
     override func setUp() {
         let model = CoreDataDatabase.loadModel(from: .main, named: "History")!
-        let className = String(describing: self)
-        let location = FileManager.default.temporaryDirectory.appendingPathComponent(className)
+        let location = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         database = CoreDataDatabase(name: className, containerLocation: location, model: model)
         database.loadStore { _, error in
             if let e = error {
