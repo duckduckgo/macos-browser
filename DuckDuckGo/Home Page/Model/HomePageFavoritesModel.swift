@@ -77,7 +77,6 @@ extension HomePage.Models {
 
         @Published private(set) var visibleModels: [FavoriteModel] = []
 
-        @available(macOS, obsoleted: 11.0, message: "Use visibleModels and LazyVGrid instead")
         @Published private(set) var rows: [[FavoriteModel]] = []
 
         let open: (Bookmark, OpenTarget) -> Void
