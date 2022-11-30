@@ -130,8 +130,7 @@
     size_t dataArrayLength = data.length;
 
     // AES has a fixed block size of 16-bytes regardless key size
-    size_t padding = dataArrayLength % BLOCK_SIZE ? 1 : 0;
-    size_t encryptedDataLength = (dataArrayLength/BLOCK_SIZE + padding) * BLOCK_SIZE;
+    size_t encryptedDataLength = ceil((float)dataArrayLength / (float)BLOCK_SIZE) * BLOCK_SIZE;
     unsigned char *encryptionOutput = calloc(encryptedDataLength, sizeof(unsigned char));
 
     unsigned char *ivBytes = (unsigned char *)ivData.bytes;
