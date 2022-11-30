@@ -482,7 +482,7 @@ final class TabCollectionViewModel: NSObject {
             return
         }
 
-        let tabCopy = Tab(content: tab.content, favicon: tab.favicon, sessionStateData: tab.sessionStateData)
+        let tabCopy = Tab(content: tab.content, favicon: tab.favicon, interactionStateData: tab.interactionStateData)
         let newIndex = tabIndex.makeNext()
 
         tabCollection(for: tabIndex)?.insert(tab: tabCopy, at: newIndex.item)
