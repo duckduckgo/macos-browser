@@ -105,7 +105,9 @@ final class LocalBitwardenInstallationService: BWInstallationService {
             }
         }
 
-        // Check for the existence of manifest file. (Not working for Bitwarden installed from App Store)
+        // Check for the existence of manifest file. It is a correct way to detect that integration
+        // with DuckDuckGo is enabled. Unfortunately, Bitwarden installed though App Store can't
+        // create manifest file (sandbox)
         let manifestExists = FileManager.default.fileExists(atPath: manifestPath)
 
         return manifestExists || isIntegrationEnabled
