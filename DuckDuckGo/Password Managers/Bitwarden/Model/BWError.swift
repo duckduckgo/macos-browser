@@ -42,25 +42,4 @@ enum BWError: Error {
     case bitwardenCannotDecrypt
     case bitwardenRespondedWithError
 
-    var text: String {
-        switch self {
-        case .handshakeFailed: return "Handshake failed"
-        case .decryptionOfSharedKeyFailed: return "Decryption of shared key failed"
-        case .parsingFailed: return "Parsing failed"
-        case .statusParsingFailed: return "Status parsing failed"
-        case .hmacComparisonFailed: return "Hmac comparison failed"
-        case .decryptionOfDataFailed: return "Decryption of data failed"
-        case .noActiveVault: return "No active vault"
-        case .storingOfTheSharedKeyFailed: return "Storing of the shared key Failed"
-        case .sendingOfStatusMessageFailed: return "Sending of the status message failed"
-        case .injectingOfSharedKeyFailed: return "Injecting of the shared key failed"
-        case .runningOfProxyProcessFailed: return "Running of proxy process failed"
-        case .bitwardenCannotDecrypt: return "Bitwarden cannot decrypt the message"
-        case .bitwardenRespondedWithError: return "Bitwarden responded with error"
-        case .credentialCreationFailed: return "Credential creation in Bitwarden failed"
-        case .credentialUpdateFailed: return "Credential update in Bitwarden failed"
-        case .credentialRetrievalFailed: return "Credential retrieval failed"
-        }
-    }
-
 }

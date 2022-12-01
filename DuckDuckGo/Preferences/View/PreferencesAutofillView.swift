@@ -227,7 +227,7 @@ extension Preferences {
                 }
             case .error(let error):
                 BitwardenStatusView(iconType: .error,
-                                    title: error.text,
+                                    title: UserText.bitwardenError,
                                     buttonValue: nil)
                 .offset(x: Preferences.Const.autoLockWarningOffset)
             }
