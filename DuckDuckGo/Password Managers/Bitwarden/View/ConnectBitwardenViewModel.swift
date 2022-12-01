@@ -119,7 +119,7 @@ final class ConnectBitwardenViewModel: ObservableObject {
             self.viewState = .connectToBitwarden
         case .waitingForStatusResponse:
             self.viewState = .connectedToBitwarden
-        case .connected(vault: _):
+        case .connected:
             self.viewState = .connectedToBitwarden
         case .error(error: let error):
             self.error = error

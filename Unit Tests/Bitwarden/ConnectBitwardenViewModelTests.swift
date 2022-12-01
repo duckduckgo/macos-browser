@@ -39,7 +39,6 @@ final class ConnectBitwardenViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.viewState, .lookingForBitwarden)
     }
 
-    // TODO:
 //    func testWhenBitwardenIsInstalled_AndIntegrationIsNotApproved_ThenViewStateIsWaitingForConnectionPermission() {
 //        let installationManager = MockBitwardenInstallationService()
 //        installationManager.isInstalled = false

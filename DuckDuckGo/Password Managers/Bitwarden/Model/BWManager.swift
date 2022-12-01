@@ -549,7 +549,7 @@ final class BWManager: BWManagement, ObservableObject {
 
     func refreshStatusIfNeeded() {
         switch status {
-        case .connected(vault: _), .error(error: _): sendStatus()
+        case .connected, .error: sendStatus()
         default: return
         }
     }
