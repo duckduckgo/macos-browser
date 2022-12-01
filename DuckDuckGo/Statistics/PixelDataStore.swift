@@ -83,17 +83,20 @@ final class LocalPixelDataStore<T: NSManagedObject>: PixelDataStore {
     private func loadAll() -> [String: NSObject] {
         let fetchRequest = PixelData.fetchRequest() as NSFetchRequest<PixelData>
         var dict = [String: NSObject]()
-        do {
-            let result = try context.fetch(fetchRequest)
-            for item in result {
-                guard let record = item.valueRepresentation() else {
-                    assertionFailure("LocalPixelDataStore: could not load PixelDataRecord")
-                    continue
-                }
 
-                dict[record.key] = record.value
+        context.performAndWait { [context] in
+            do {
+                let result = try context.fetch(fetchRequest)
+                for item in result {
+                    guard let record = item.valueRepresentation() else {
+                        assertionFailure("LocalPixelDataStore: could not load PixelDataRecord")
+                        continue
+                    }
+
+                    dict[record.key] = record.value
+                }
+            } catch {
             }
-        } catch {
         }
         return dict
     }

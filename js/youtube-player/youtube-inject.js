@@ -2,7 +2,7 @@ import css from "./assets/styles.css";
 import {VideoOverlayManager} from "./src/video-overlay-manager.js";
 import {IconOverlay} from "./src/icon-overlay.js";
 import {onDOMLoaded, onDOMChanged, addTrustedEventListener, appendElement, VideoParams} from "./src/util.js";
-import {MacOSCommunications} from "./src/comms";
+import {Communications} from "./src/comms";
 
 /**
  * @typedef UserValues - A way to communicate some user state
@@ -27,18 +27,17 @@ const defaultEnvironment = {
     }
 }
 
-const macos = MacOSCommunications.fromInjectedConfig(
-    // @ts-ignore
-    $WebkitMessagingConfig$
-)
-
 if (defaultEnvironment.enabled()) {
+    const macos = Communications.fromInjectedConfig(
+        // @ts-ignore
+        $WebkitMessagingConfig$
+    )
     initWithEnvironment(defaultEnvironment, macos)
 }
 
 /**
  * @param {typeof defaultEnvironment} environment - methods to read environment-sensitive things like the current URL etc
- * @param {MacOSCommunications} comms - methods to communicate with a native backend
+ * @param {Communications} comms - methods to communicate with a native backend
  */
 function initWithEnvironment(environment, comms) {
 

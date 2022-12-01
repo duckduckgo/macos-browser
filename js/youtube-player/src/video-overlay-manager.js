@@ -18,7 +18,7 @@ export class VideoOverlayManager {
     /**
      * @param {import("../youtube-inject").UserValues} userValues
      * @param {{getHref(): string, getLargeThumbnailSrc(videoId: string): string, setHref(href: string): void}} environment
-     * @param {import("./comms").MacOSCommunications} comms
+     * @param {import("./comms").Communications} comms
      */
     constructor(userValues, environment, comms) {
         this.userValues = userValues;

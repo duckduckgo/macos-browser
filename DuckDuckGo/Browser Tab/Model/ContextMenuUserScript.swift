@@ -17,18 +17,10 @@
 //
 
 import WebKit
-import BrowserServicesKit
+import UserScript
 
-protocol ContextMenuDelegate: AnyObject {
-
-    // swiftlint:disable:next function_parameter_count
-    func contextMenu(forUserScript script: ContextMenuUserScript,
-                     willShowAt position: NSPoint,
-                     image: URL?,
-                     title: String?,
-                     link: URL?,
-                     selectedText: String?)
-
+protocol ContextMenuUserScriptDelegate: AnyObject {
+    func willShowContextMenu(withSelectedText: String)
 }
 
 final class ContextMenuUserScript: NSObject, StaticUserScript {
@@ -38,118 +30,20 @@ final class ContextMenuUserScript: NSObject, StaticUserScript {
     static var script: WKUserScript = ContextMenuUserScript.makeWKUserScript()
     var messageNames: [String] { ["contextMenu"] }
 
-    weak var delegate: ContextMenuDelegate?
-
-    var lastAnchor: URL?
-    var lastImage: URL?
+    weak var delegate: ContextMenuUserScriptDelegate?
 
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-
-        guard let dict = message.body as? [String: Any],
-              let point = point(from: dict) else { return }
-
-        var image: URL?
-        var link: URL?
-        var title: String?
-        let selectedText = dict["selectedText"] as? String
-
-        guard let elements = dict["elements"] as? [[String: String]] else { return }
-        elements.forEach { dict in
-
-            guard let url = dict["url"] else { return }
-
-            switch dict["tagName"] {
-            case "A":
-                link = URL(string: url)
-                title = dict["title"]
-
-            case "IMG":
-                image = URL(string: url)
-                
-            case "VIDEO":
-                link = URL(string: url)
-
-            default: break
-            }
-        }
-
-        delegate?.contextMenu(forUserScript: self,
-                              willShowAt: point,
-                              image: image,
-                              title: title,
-                              link: link,
-                              selectedText: selectedText)
-    }
-
-    private func point(from dict: [String: Any]) -> NSPoint? {
-        guard let position = dict["position"] as? [String: Int],
-              let x = position["x"],
-              let y = position["y"] else { return nil }
-        return NSPoint(x: x, y: y)
+        guard let selectedText = message.body as? String else { return }
+        delegate?.willShowContextMenu(withSelectedText: selectedText)
     }
 
     static let source = """
-(function() {
+    (function() {
+        document.addEventListener("contextmenu", function(e) {
+            webkit.messageHandlers.contextMenu.postMessage(window.getSelection().toString());
+        }, true);
 
-    function linkFrom(element) {
-        return {
-            "tagName": "A",
-            "url": element.href,
-            "title": element.textContent
-        };
-    }
-
-    function findParentLink(element) {
-        var parent;
-        while (parent = element.parentElement) {
-            if (parent.tagName === "A") {
-                return linkFrom(parent);
-            }
-            element = parent;
-        }
-        return null;
-    }
-
-    document.addEventListener("contextmenu", function(e) {
-
-        var context = {
-            "position": {
-                "x": e.clientX,
-                "y": e.clientY
-            },
-            "elements": [
-            ],
-            "selectedText": window.getSelection().toString()
-        };
-
-        if (e.srcElement.tagName === "A") {
-            context.elements.push(linkFrom(e.srcElement));
-        } else {
-            if (e.srcElement.tagName === "IMG") {
-                context.elements.push({
-                    "tagName": "IMG",
-                    "url": e.srcElement.src
-                });
-            }
-
-            if (e.srcElement.tagName === "VIDEO") {
-                console.log("Got video");
-                context.elements.push({
-                    "tagName": "VIDEO",
-                    "url": e.srcElement.currentSrc
-                });
-            }
-
-            var parentLink = findParentLink(e.srcElement);
-            if (parentLink) {
-                context.elements.push(parentLink);
-            }
-        }
-
-        webkit.messageHandlers.contextMenu.postMessage(context);
-    }, true);
-
-}) ();
-"""
+    }) ();
+    """
 
 }

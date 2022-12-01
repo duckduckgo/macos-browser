@@ -1,4 +1,3 @@
-
 disabled_rules:
   - trailing_whitespace
   - no_space_in_method_call
@@ -7,6 +6,7 @@ disabled_rules:
   - compiler_protocol_init
   - unused_setter_value
   - line_length
+  - type_name
   - todo # Temporarily disabled for NetP work - once NetP is complete, this can be re-enabled
 
 opt_in_rules:
@@ -30,11 +30,6 @@ identifier_name:
   max_length:
     warning: 40
     error: 60
-type_name:
-  min_length: 3
-  max_length:
-    warning: 80
-    error: 100
 file_length:
   warning: 1200
   error: 1200
