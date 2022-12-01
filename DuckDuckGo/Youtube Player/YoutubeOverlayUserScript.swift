@@ -19,7 +19,6 @@
 import Foundation
 import WebKit
 import os
-import BrowserServicesKit
 import Common
 import UserScript
 

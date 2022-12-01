@@ -27,6 +27,8 @@ struct WebsiteBreakage {
         case browserIsIncompatible = "unsupported"
         case theSiteAskedToDisable = "paywall"
         case videoOrImagesDidntLoad = "images"
+        case videoDidntPlay = "video"
+        case commentsDidntLoad = "comments"
         case somethingElse = "other"
     }
 

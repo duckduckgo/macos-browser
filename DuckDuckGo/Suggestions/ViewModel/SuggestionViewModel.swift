@@ -91,9 +91,9 @@ final class SuggestionViewModel {
 
     var title: String? {
         switch suggestion {
-        case .phrase(phrase: _),
-             .website(url: _),
-             .unknown(value: _):
+        case .phrase,
+             .website,
+             .unknown:
             return nil
         case .historyEntry(title: let title, url: let url, allowedInTopHits: _):
             if url.isDuckDuckGoSearch {
@@ -157,17 +157,17 @@ final class SuggestionViewModel {
 
     var icon: NSImage? {
         switch suggestion {
-        case .phrase(phrase: _):
+        case .phrase:
             return Self.searchImage
-        case .website(url: _):
+        case .website:
             return Self.webImage
-        case .historyEntry(title: _, url: _, allowedInTopHits: _):
+        case .historyEntry:
             return Self.historyImage
         case .bookmark(title: _, url: _, isFavorite: false, allowedInTopHits: _):
             return Self.bookmarkImage
         case .bookmark(title: _, url: _, isFavorite: true, allowedInTopHits: _):
             return Self.favoriteImage
-        case .unknown(value: _):
+        case .unknown:
             return Self.webImage
         }
     }
