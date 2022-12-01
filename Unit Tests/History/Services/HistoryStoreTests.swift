@@ -218,8 +218,6 @@ final class HistoryStoreTests: XCTestCase {
             .store(in: &cancellables)
 
         waitForExpectations(timeout: 500, handler: nil)
-        
-        
     }
     
     func testWhenCleanOldIsCalled_ThenFollowingSaveShouldSucceed() {
@@ -267,6 +265,51 @@ final class HistoryStoreTests: XCTestCase {
                                            numberOfVisits: 2,
                                            lastVisit: newVisitDate,
                                            visits: [oldVisit, newVisit])
+    
+    func testWhenRemoveVisitsIsCalled_ThenFollowingSaveShouldSucceed() {
+        let context = database.makeContext(concurrencyType: .mainQueueConcurrencyType)
+        let historyStore = HistoryStore(context: context)
+        
+        let oldVisitDate = Date(timeIntervalSince1970: 0)
+        let newVisitDate = Date(timeIntervalSince1970: 12345)
+        
+        let oldVisit = Visit(date: oldVisitDate)
+        let newVisit = Visit(date: newVisitDate)
+
+        let historyEntry = HistoryEntry(identifier: UUID(),
+                                        url: URL.duckDuckGo,
+                                        title: nil,
+                                        numberOfVisits: 2,
+                                        lastVisit: newVisitDate,
+                                        visits: [oldVisit, newVisit])
+        oldVisit.historyEntry = historyEntry
+        newVisit.historyEntry = historyEntry
+        let firstSavingExpectation = self.expectation(description: "Saving")
+        save(entry: historyEntry, historyStore: historyStore, expectation: firstSavingExpectation)
+
+        let loadingExpectation = self.expectation(description: "Loading")
+        historyStore.removeVisits([oldVisit])
+            .receive(on: DispatchQueue.main)
+            .sink { completion in
+                switch completion {
+                case .finished:
+                    loadingExpectation.fulfill()
+                case .failure(let error):
+                    XCTFail("Loading of history failed - \(error.localizedDescription)")
+                }
+            } receiveValue: { _ in }
+            .store(in: &cancellables)
+
+        waitForExpectations(timeout: 2, handler: nil)
+        
+        let newHistoryEntry = HistoryEntry(identifier: UUID(),
+                                           url: URL.duckDuckGo,
+                                           title: nil,
+                                           numberOfVisits: 2,
+                                           lastVisit: newVisitDate,
+                                           visits: [oldVisit, newVisit])
+        oldVisit.historyEntry = newHistoryEntry
+        newVisit.historyEntry = newHistoryEntry
         let secondSavingExpectation = self.expectation(description: "Saving")
         // This should not fail, but apparently internal version of objects is broken after BatchDelete request causing merge failure.
         save(entry: newHistoryEntry, historyStore: historyStore, expectation: secondSavingExpectation)

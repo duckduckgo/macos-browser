@@ -259,7 +259,7 @@ final class HistoryStore: HistoryStoring {
         let chunkedVisits = visits.chunked(into: 100)
 
         for visits in chunkedVisits {
-            let deleteRequest = NSFetchRequest<NSFetchRequestResult>(entityName: VisitManagedObject.className())
+            let deleteRequest = NSFetchRequest<VisitManagedObject>(entityName: VisitManagedObject.className())
             let predicates = visits.compactMap({ (visit: Visit) -> NSPredicate? in
                 guard let historyEntry = visit.historyEntry else {
                     assertionFailure("No history entry")
@@ -269,19 +269,19 @@ final class HistoryStore: HistoryStoring {
                 return NSPredicate(format: "historyEntry.identifier == %@ && date == %@", argumentArray: [historyEntry.identifier, visit.date])
             })
             deleteRequest.predicate = NSCompoundPredicate(type: .or, subpredicates: predicates)
-            let batchDeleteRequest =    NSBatchDeleteRequest(fetchRequest: deleteRequest)
-            batchDeleteRequest.resultType = .resultTypeObjectIDs
             do {
-                let result = try self.context.execute(batchDeleteRequest) as? NSBatchDeleteResult
-                let deletedObjects = result?.result as? [NSManagedObjectID] ?? []
-                let changes: [AnyHashable: Any] = [ NSDeletedObjectsKey: deletedObjects ]
-                NSManagedObjectContext.mergeChanges(fromRemoteContextSave: changes, into: [context])
-                os_log("%d visits cleaned from history", log: .history, deletedObjects.count)
-                assert(deletedObjects.count >= visits.count, "Not all visits removed")
+                try self.context.execute(deleteRequest)
             } catch {
                 Pixel.fire(.debug(event: .historyRemoveVisitsFailed))
                 return .failure(error)
             }
+        }
+        
+        do {
+            try context.save()
+        } catch {
+            Pixel.fire(.debug(event: .historyRemoveVisitsFailed))
+            return .failure(error)
         }
 
         return .success(())
