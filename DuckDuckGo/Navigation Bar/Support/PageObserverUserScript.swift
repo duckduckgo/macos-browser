@@ -16,8 +16,8 @@
 //  limitations under the License.
 //
 
-import Foundation
-import BrowserServicesKit
+import WebKit
+import UserScript
 
 protocol PageObserverUserScriptDelegate: AnyObject {
 

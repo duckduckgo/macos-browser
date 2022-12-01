@@ -18,14 +18,14 @@
 
 import Foundation
 
-/// Abstraction to abstract the logic needed to interact with the Network Protection status bar menu.
+/// Abstraction of the the Network Protection status bar menu with a simple interface.
 ///
 final class NetworkProtectionStatusBarMenu {
     private let statusItem: NSStatusItem
 
     // MARK: - Initialization
 
-    init(networkProtection: NetworkProtection, statusItem: NSStatusItem? = nil) {
+    init(networkProtection: NetworkProtection = NetworkProtection(), statusItem: NSStatusItem? = nil) {
         self.statusItem = statusItem ?? NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         self.statusItem.menu = NetworkProtectionMenu(networkProtection: networkProtection)
         self.statusItem.button?.image = .NetworkProtection.statusBarMenuIcon

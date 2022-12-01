@@ -125,16 +125,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         UserDefaultsWrapper<Any>.clearRemovedKeys()
 
-        Task {
-            do {
-                networkProtectionMenu = try await NetworkProtectionStatusBarMenu(networkProtection: NetworkProtection())
-                networkProtectionMenu.show()
-            } catch {
-                let error = StaticString(stringLiteral: "🔴 Failed to create VPN status bar menu")
-                assertionFailure("\(error)")
-                os_log(error, type: .error)
-            }
-        }
+        networkProtectionMenu = NetworkProtectionStatusBarMenu()
+        networkProtectionMenu.show()
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
@@ -160,10 +152,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationDockMenu(_ sender: NSApplication) -> NSMenu? {
-        let applicationDockMenu = ApplicationDockMenu()
-        applicationDockMenu.dataSource = WindowControllersManager.shared
-        applicationDockMenu.applicationDockMenuDelegate = WindowControllersManager.shared
-        return applicationDockMenu
+        return ApplicationDockMenu()
     }
 
     func application(_ sender: NSApplication, openFiles files: [String]) {

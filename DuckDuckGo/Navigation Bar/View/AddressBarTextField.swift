@@ -27,6 +27,7 @@ protocol AddressBarTextFieldDelegate: AnyObject {
 
 }
 
+// swiftlint:disable:next type_body_length
 final class AddressBarTextField: NSTextField {
 
     weak var addressBarTextFieldDelegate: AddressBarTextFieldDelegate?
@@ -463,7 +464,7 @@ final class AddressBarTextField: NSTextField {
 
         init?(suggestionViewModel: SuggestionViewModel) {
             switch suggestionViewModel.suggestion {
-            case .phrase(phrase: _):
+            case .phrase:
                 self = Suffix.search
             case .website(url: let url):
                 guard let host = url.root?.toString(decodePunycode: true, dropScheme: true, dropTrailingSlash: true) else {
@@ -483,7 +484,7 @@ final class AddressBarTextField: NSTextField {
                     self = .url(url)
                 }
 
-            case .unknown(value: _):
+            case .unknown:
                 self = Suffix.search
             }
         }
@@ -987,6 +988,20 @@ extension AddressBarTextField: NSTextViewDelegate {
 }
 
 final class AddressBarTextEditor: NSTextView {
+
+    override func mouseDown(with event: NSEvent) {
+        super.mouseDown(with: event)
+
+        guard let delegate = delegate as? AddressBarTextField else {
+            os_log("AddressBarTextEditor: unexpected kind of delegate")
+            return
+        }
+
+        if let currentSelection = selectedRanges.first as? NSRange {
+            let adjustedSelection = delegate.filterSuffix(fromSelectionRange: currentSelection, for: string)
+            setSelectedRange(adjustedSelection)
+        }
+    }
 
     override func paste(_ sender: Any?) {
         guard let delegate = delegate as? AddressBarTextField else {

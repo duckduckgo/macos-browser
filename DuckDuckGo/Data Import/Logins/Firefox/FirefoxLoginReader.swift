@@ -27,6 +27,7 @@ final class FirefoxLoginReader {
         case databaseAccessFailed
         case couldNotFindProfile
         case couldNotGetDecryptionKey
+        case couldNotFindLoginsFile
         case couldNotReadLoginsFile
         case decryptionFailed
         case failedToTemporarilyCopyFile
@@ -84,7 +85,7 @@ final class FirefoxLoginReader {
         }
         
         guard let detectedFormat = detectedFormat else {
-            return .failure(.couldNotReadLoginsFile)
+            return .failure(.couldNotFindLoginsFile)
         }
         
         let databaseURL = firefoxProfileURL.appendingPathComponent(detectedFormat.formatFileNames.databaseName)

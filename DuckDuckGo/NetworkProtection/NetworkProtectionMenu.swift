@@ -17,7 +17,11 @@
 //
 
 import Foundation
+import OSLog
 
+/// The network protection menu.  This is mostly intended to be shown in the status bar, but was designed to be reusable in case
+/// we want to show this menu elsewhere.
+///
 final class NetworkProtectionMenu: NSMenu {
     private var networkProtection: NetworkProtection
 
@@ -38,24 +42,30 @@ final class NetworkProtectionMenu: NSMenu {
     // MARK: Setup & Reloading
 
     private func setup() {
+        reload()
+
+        networkProtection.onConnectionChange = { [weak self] change in
+            switch change {
+            case .configuration:
+                print("configuration!")
+            case .status(let newStatus):
+                print("status! \(newStatus)")
+            }
+
+            guard let self = self else {
+                return
+            }
+
+            self.reload()
+        }
+    }
+
+    private func reload() {
         Task {
-            try await reload()
-
-            networkProtection.onConnectionChange = { [weak self] change in
-                switch change {
-                case .configuration:
-                    print("configuration!")
-                case .status(let newStatus):
-                    print("status! \(newStatus)")
-                }
-
-                guard let self = self else {
-                    return
-                }
-                
-                Task {
-                    try await self.reload()
-                }
+            do {
+                try await reload()
+            } catch {
+                os_log(.error, "🔴 Failed to reload menu: %@", String(describing: error))
             }
         }
     }
@@ -63,7 +73,7 @@ final class NetworkProtectionMenu: NSMenu {
     /// Reloads the full menu.
     ///
     @MainActor
-    func reload() async throws {
+    private func reload() async throws {
         removeAllItems()
 
         let menuItem: NSMenuItem

@@ -1,5 +1,5 @@
 //
-//  CookieConsentInfo.swift
+//  TestNavigationDelegate.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -16,10 +16,17 @@
 //  limitations under the License.
 //
 
-import Foundation
+import XCTest
+import WebKit
 
-struct CookieConsentInfo: Encodable {
-    let consentManaged: Bool
-    let optoutFailed: Bool?
-    let selftestFailed: Bool?
+final class TestNavigationDelegate: NSObject, WKNavigationDelegate {
+    let e: XCTestExpectation
+
+    init(e: XCTestExpectation) {
+        self.e = e
+    }
+
+    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        e.fulfill()
+    }
 }

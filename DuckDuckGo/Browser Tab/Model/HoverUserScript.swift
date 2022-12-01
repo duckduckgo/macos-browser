@@ -16,8 +16,8 @@
 //  limitations under the License.
 //
 
-import BrowserServicesKit
 import WebKit
+import UserScript
 
 protocol HoverUserScriptDelegate: AnyObject {
 

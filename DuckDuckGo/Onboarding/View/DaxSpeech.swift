@@ -154,9 +154,17 @@ fileprivate struct SpeechBubble: View {
 
                 }
                 .fill(Color(NSColor.interfaceBackgroundColor))
-                .shadow(color: Color("OnboardingDaxSpeechShadowColor"), radius: 2, x: 0, y: 0)
+                .shadow(color: Color("OnboardingDaxSpeechShadowColor"), radius: 2, x: shadowXOffset, y: 0)
             }
 
+        }
+    }
+
+    var shadowXOffset: CGFloat {
+        if #available(macOS 11.0, *) {
+            return 0
+        } else {
+            return tailSize
         }
     }
 }
