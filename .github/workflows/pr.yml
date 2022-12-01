@@ -2,9 +2,9 @@ name: PR Checks
 
 on: 
   push:
-    branches: [ develop, "release/**" ]
+    branches: [ develop, "release/**", network-protection ]
   pull_request:
-    branches: [ develop, "release/**" ]
+    branches: [ develop, "release/**", network-protection ]
 
 
 jobs:

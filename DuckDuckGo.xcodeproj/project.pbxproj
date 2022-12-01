@@ -315,10 +315,29 @@
 		4BF4951826C08395000547B8 /* ThirdPartyBrowserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF4951726C08395000547B8 /* ThirdPartyBrowserTests.swift */; };
 		4BF4EA5027C71F26004E57C4 /* PasswordManagementListSectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF4EA4F27C71F26004E57C4 /* PasswordManagementListSectionTests.swift */; };
 		4BF6962028BEEE8B00D402D4 /* LocalPinningManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF6961F28BEEE8B00D402D4 /* LocalPinningManagerTests.swift */; };
+		7B02C789292B8C8E00E677CF /* NetworkProtection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B02C788292B8C8E00E677CF /* NetworkProtection.swift */; };
+		7B02C78C292B8D6700E677CF /* WireGuardKit in Frameworks */ = {isa = PBXBuildFile; productRef = 7B02C78B292B8D6700E677CF /* WireGuardKit */; };
+		7B02C7A0292B8FB800E677CF /* Keychain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B02C79F292B8FB800E677CF /* Keychain.swift */; };
+		7B02C7A4292B901400E677CF /* String+ArrayConversion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B02C7A3292B901400E677CF /* String+ArrayConversion.swift */; };
+		7B02C7F3292BA77300E677CF /* NetworkExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B8A4911291C41C9001BF58A /* NetworkExtension.framework */; };
+		7B02C7FB292BA77400E677CF /* NetworkProtectionExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 7B02C7F2292BA77300E677CF /* NetworkProtectionExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		7B02C80C292BA78300E677CF /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B02C806292BA78300E677CF /* main.swift */; };
+		7B02C80D292BA78300E677CF /* NETunnelProviderProtocol+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B02C807292BA78300E677CF /* NETunnelProviderProtocol+Extension.swift */; };
+		7B02C80E292BA78300E677CF /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B02C808292BA78300E677CF /* Logger.swift */; };
+		7B02C80F292BA78300E677CF /* PacketTunnelProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B02C809292BA78300E677CF /* PacketTunnelProvider.swift */; };
+		7B02C810292BA78300E677CF /* FileManager+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B02C80A292BA78300E677CF /* FileManager+Extension.swift */; };
+		7B02C811292BA79000E677CF /* Keychain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B02C79F292B8FB800E677CF /* Keychain.swift */; };
+		7B02C812292BA79400E677CF /* String+ArrayConversion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B02C7A3292B901400E677CF /* String+ArrayConversion.swift */; };
+		7B02C819292BA80400E677CF /* WireGuardKit in Frameworks */ = {isa = PBXBuildFile; productRef = 7B02C818292BA80400E677CF /* WireGuardKit */; };
 		7B1E819E27C8874900FF0E60 /* ContentOverlayPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1E819B27C8874900FF0E60 /* ContentOverlayPopover.swift */; };
 		7B1E819F27C8874900FF0E60 /* ContentOverlay.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7B1E819C27C8874900FF0E60 /* ContentOverlay.storyboard */; };
 		7B1E81A027C8874900FF0E60 /* ContentOverlayViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1E819D27C8874900FF0E60 /* ContentOverlayViewController.swift */; };
 		7B4CE8E726F02135009134B1 /* TabBarTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B4CE8E626F02134009134B1 /* TabBarTests.swift */; };
+		7B4D3B66292D513F00F03BED /* NETunnelProviderProtocol+NetworkProtection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B4D3B65292D513F00F03BED /* NETunnelProviderProtocol+NetworkProtection.swift */; };
+		7B4D3B67292D51DE00F03BED /* TunnelConfiguration+WgQuickConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B02C7A1292B8FFA00E677CF /* TunnelConfiguration+WgQuickConfig.swift */; };
+		7B4D3B68292D520400F03BED /* TunnelConfiguration+WgQuickConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B02C7A1292B8FFA00E677CF /* TunnelConfiguration+WgQuickConfig.swift */; };
+		7B9DD3EC292CF28C009504CD /* UserText+NetworkProtection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B9DD3EB292CF28C009504CD /* UserText+NetworkProtection.swift */; };
+		7B9DD3EE292CF403009504CD /* NSImage+NetworkProtection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B9DD3ED292CF403009504CD /* NSImage+NetworkProtection.swift */; };
 		7BA4727D26F01BC400EAA165 /* CoreDataTestUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292C42667104B00AD2C21 /* CoreDataTestUtilities.swift */; };
 		85012B0229133F9F003D0DCC /* NavigationBarPopovers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85012B0129133F9F003D0DCC /* NavigationBarPopovers.swift */; };
 		8511E18425F82B34002F516B /* 01_Fire_really_small.json in Resources */ = {isa = PBXBuildFile; fileRef = 8511E18325F82B34002F516B /* 01_Fire_really_small.json */; };
@@ -817,6 +836,20 @@
 			remoteGlobalIDString = AA585D7D248FD31100E9A3E2;
 			remoteInfo = "DuckDuckGo Privacy Browser";
 		};
+		7B02C7F9292BA77400E677CF /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AA585D76248FD31100E9A3E2 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 7B02C7F1292BA77300E677CF;
+			remoteInfo = NetworkProtectionExtension;
+		};
+		7B02C816292BA7F900E677CF /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AA585D76248FD31100E9A3E2 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 7B02C793292B8E0700E677CF;
+			remoteInfo = WireGuardGoBridgemacOS;
+		};
 		7B4CE8DF26F02108009134B1 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = AA585D76248FD31100E9A3E2 /* Project object */;
@@ -832,6 +865,20 @@
 			remoteInfo = DuckDuckGo;
 		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		7B02C7CA292BA5B700E677CF /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				7B02C7FB292BA77400E677CF /* NetworkProtectionExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		0230C0A2272080090018F728 /* KeyedCodingExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyedCodingExtension.swift; sourceTree = "<group>"; };
@@ -1023,10 +1070,13 @@
 		4B723E0326B0003E00E14D75 /* MockSecureVault.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockSecureVault.swift; sourceTree = "<group>"; };
 		4B723E0426B0003E00E14D75 /* CSVLoginExporterTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CSVLoginExporterTests.swift; sourceTree = "<group>"; };
 		4B723E1726B000DC00E14D75 /* TemporaryFileCreator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TemporaryFileCreator.swift; sourceTree = "<group>"; };
+		4B77EC112919BCBD006ACF94 /* DuckDuckGo_NetP_Debug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = DuckDuckGo_NetP_Debug.entitlements; sourceTree = "<group>"; };
+		4B77EC122919BCD6006ACF94 /* DuckDuckGo_NetP_Release.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = DuckDuckGo_NetP_Release.entitlements; sourceTree = "<group>"; };
 		4B78A86A26BB3ADD0071BB16 /* BrowserImportSummaryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserImportSummaryViewController.swift; sourceTree = "<group>"; };
 		4B7A57CE279A4EF300B1C70E /* ChromePreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChromePreferences.swift; sourceTree = "<group>"; };
 		4B7A60A0273E0BE400BBDFEB /* WKWebsiteDataStoreExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WKWebsiteDataStoreExtension.swift; sourceTree = "<group>"; };
 		4B85A47F28821CC500FC4C39 /* NSPasteboardItemExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSPasteboardItemExtension.swift; sourceTree = "<group>"; };
+		4B8A4911291C41C9001BF58A /* NetworkExtension.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NetworkExtension.framework; path = System/Library/Frameworks/NetworkExtension.framework; sourceTree = SDKROOT; };
 		4B8A4DFE27C83B29005F40E8 /* SaveIdentityViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveIdentityViewController.swift; sourceTree = "<group>"; };
 		4B8A4E0027C8447E005F40E8 /* SaveIdentityPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveIdentityPopover.swift; sourceTree = "<group>"; };
 		4B8AC93226B3B06300879451 /* EdgeDataImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EdgeDataImporter.swift; sourceTree = "<group>"; };
@@ -1143,6 +1193,18 @@
 		4BF4951726C08395000547B8 /* ThirdPartyBrowserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThirdPartyBrowserTests.swift; sourceTree = "<group>"; };
 		4BF4EA4F27C71F26004E57C4 /* PasswordManagementListSectionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PasswordManagementListSectionTests.swift; sourceTree = "<group>"; };
 		4BF6961F28BEEE8B00D402D4 /* LocalPinningManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalPinningManagerTests.swift; sourceTree = "<group>"; };
+		7B02C788292B8C8E00E677CF /* NetworkProtection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkProtection.swift; sourceTree = "<group>"; };
+		7B02C79F292B8FB800E677CF /* Keychain.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Keychain.swift; sourceTree = "<group>"; };
+		7B02C7A1292B8FFA00E677CF /* TunnelConfiguration+WgQuickConfig.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "TunnelConfiguration+WgQuickConfig.swift"; sourceTree = "<group>"; };
+		7B02C7A3292B901400E677CF /* String+ArrayConversion.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "String+ArrayConversion.swift"; sourceTree = "<group>"; };
+		7B02C7D4292BA61A00E677CF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		7B02C7D5292BA61A00E677CF /* NetworkProtectionExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = NetworkProtectionExtension.entitlements; sourceTree = "<group>"; };
+		7B02C7F2292BA77300E677CF /* NetworkProtectionExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = NetworkProtectionExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		7B02C806292BA78300E677CF /* main.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
+		7B02C807292BA78300E677CF /* NETunnelProviderProtocol+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NETunnelProviderProtocol+Extension.swift"; sourceTree = "<group>"; };
+		7B02C808292BA78300E677CF /* Logger.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
+		7B02C809292BA78300E677CF /* PacketTunnelProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PacketTunnelProvider.swift; sourceTree = "<group>"; };
+		7B02C80A292BA78300E677CF /* FileManager+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "FileManager+Extension.swift"; sourceTree = "<group>"; };
 		7B1E819B27C8874900FF0E60 /* ContentOverlayPopover.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentOverlayPopover.swift; sourceTree = "<group>"; };
 		7B1E819C27C8874900FF0E60 /* ContentOverlay.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = ContentOverlay.storyboard; sourceTree = "<group>"; };
 		7B1E819D27C8874900FF0E60 /* ContentOverlayViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentOverlayViewController.swift; sourceTree = "<group>"; };
@@ -1150,6 +1212,9 @@
 		7B4CE8DE26F02108009134B1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7B4CE8E626F02134009134B1 /* TabBarTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarTests.swift; sourceTree = "<group>"; };
 		85012B0129133F9F003D0DCC /* NavigationBarPopovers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationBarPopovers.swift; sourceTree = "<group>"; };
+		7B4D3B65292D513F00F03BED /* NETunnelProviderProtocol+NetworkProtection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NETunnelProviderProtocol+NetworkProtection.swift"; sourceTree = "<group>"; };
+		7B9DD3EB292CF28C009504CD /* UserText+NetworkProtection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserText+NetworkProtection.swift"; sourceTree = "<group>"; };
+		7B9DD3ED292CF403009504CD /* NSImage+NetworkProtection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSImage+NetworkProtection.swift"; sourceTree = "<group>"; };
 		8511E18325F82B34002F516B /* 01_Fire_really_small.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = 01_Fire_really_small.json; sourceTree = "<group>"; };
 		853014D525E671A000FB8205 /* PageObserverUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageObserverUserScript.swift; sourceTree = "<group>"; };
 		85308E24267FC9F2001ABD76 /* NSAlertExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSAlertExtension.swift; sourceTree = "<group>"; };
@@ -1657,6 +1722,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		7B02C7EF292BA77300E677CF /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7B02C819292BA80400E677CF /* WireGuardKit in Frameworks */,
+				7B02C7F3292BA77300E677CF /* NetworkExtension.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		7B4CE8D726F02108009134B1 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -1676,6 +1750,7 @@
 				AA06B6B72672AF8100F541C5 /* Sparkle in Frameworks */,
 				85FF55C825F82E4F00E2AB99 /* Lottie in Frameworks */,
 				1E950E412912A10D0051A99B /* PrivacyDashboard in Frameworks */,
+				7B02C78C292B8D6700E677CF /* WireGuardKit in Frameworks */,
 				1E25269C28F8741A00E44DFA /* Common in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2421,6 +2496,31 @@
 			path = "Bookmarks Bar";
 			sourceTree = "<group>";
 		};
+		7B02C787292B8C6E00E677CF /* NetworkProtection */ = {
+			isa = PBXGroup;
+			children = (
+				7B9DD3EF292CF6F6009504CD /* Extensions */,
+				7B02C79F292B8FB800E677CF /* Keychain.swift */,
+				7B02C788292B8C8E00E677CF /* NetworkProtection.swift */,
+				7B02C7A3292B901400E677CF /* String+ArrayConversion.swift */,
+			);
+			path = NetworkProtection;
+			sourceTree = "<group>";
+		};
+		7B02C7D1292BA61A00E677CF /* NetworkProtectionExtension */ = {
+			isa = PBXGroup;
+			children = (
+				7B02C80A292BA78300E677CF /* FileManager+Extension.swift */,
+				7B02C808292BA78300E677CF /* Logger.swift */,
+				7B02C806292BA78300E677CF /* main.swift */,
+				7B02C807292BA78300E677CF /* NETunnelProviderProtocol+Extension.swift */,
+				7B02C809292BA78300E677CF /* PacketTunnelProvider.swift */,
+				7B02C7D4292BA61A00E677CF /* Info.plist */,
+				7B02C7D5292BA61A00E677CF /* NetworkProtectionExtension.entitlements */,
+			);
+			path = NetworkProtectionExtension;
+			sourceTree = "<group>";
+		};
 		7B1E819A27C8874900FF0E60 /* Autofill */ = {
 			isa = PBXGroup;
 			children = (
@@ -2438,6 +2538,16 @@
 				7B4CE8DE26F02108009134B1 /* Info.plist */,
 			);
 			path = "UI Tests";
+			sourceTree = "<group>";
+		};
+		7B9DD3EF292CF6F6009504CD /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				7B9DD3ED292CF403009504CD /* NSImage+NetworkProtection.swift */,
+				7B4D3B65292D513F00F03BED /* NETunnelProviderProtocol+NetworkProtection.swift */,
+				7B02C7A1292B8FFA00E677CF /* TunnelConfiguration+WgQuickConfig.swift */,
+			);
+			path = Extensions;
 			sourceTree = "<group>";
 		};
 		853014D425E6709500FB8205 /* Support */ = {
@@ -2622,6 +2732,7 @@
 			isa = PBXGroup;
 			children = (
 				85AE2FF124A33A2D002D507F /* WebKit.framework */,
+				4B8A4911291C41C9001BF58A /* NetworkExtension.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -2856,6 +2967,7 @@
 				AA585D93248FD31400E9A3E2 /* Unit Tests */,
 				4B1AD89E25FC27E200261379 /* Integration Tests */,
 				7B4CE8DB26F02108009134B1 /* UI Tests */,
+				7B02C7D1292BA61A00E677CF /* NetworkProtectionExtension */,
 				AA585D7F248FD31100E9A3E2 /* Products */,
 				85AE2FF024A33A2D002D507F /* Frameworks */,
 			);
@@ -2868,6 +2980,7 @@
 				AA585D90248FD31400E9A3E2 /* Unit Tests.xctest */,
 				4B1AD89D25FC27E200261379 /* Integration Tests.xctest */,
 				7B4CE8DA26F02108009134B1 /* UI Tests.xctest */,
+				7B02C7F2292BA77300E677CF /* NetworkProtectionExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -2904,6 +3017,7 @@
 				AA97BF4425135CB60014931A /* Menus */,
 				85378D9A274E618C007C5CBF /* Message Views */,
 				AA86491524D83384001BABEE /* Navigation Bar */,
+				7B02C787292B8C6E00E677CF /* NetworkProtection */,
 				85B7184727677A7D00B4277F /* Onboarding */,
 				B64C84DB2692D6E80048FEBE /* Permissions */,
 				37BF3F12286D8A4B00BD9014 /* Pinned Tabs */,
@@ -2926,6 +3040,8 @@
 				4B677454255DC18000025BD8 /* Bridging.h */,
 				AAD86E502678D104005C11BE /* DuckDuckGoCI.entitlements */,
 				AA585D8B248FD31400E9A3E2 /* DuckDuckGo.entitlements */,
+				4B77EC112919BCBD006ACF94 /* DuckDuckGo_NetP_Debug.entitlements */,
+				4B77EC122919BCD6006ACF94 /* DuckDuckGo_NetP_Release.entitlements */,
 				AA585D8A248FD31400E9A3E2 /* Info.plist */,
 			);
 			path = DuckDuckGo;
@@ -3173,6 +3289,7 @@
 			isa = PBXGroup;
 			children = (
 				AA80EC53256BE3BC007083E7 /* UserText.swift */,
+				7B9DD3EB292CF28C009504CD /* UserText+NetworkProtection.swift */,
 				AA80EC8B256C49B8007083E7 /* Localizable.strings */,
 				AA80EC91256C49BC007083E7 /* Localizable.stringsdict */,
 			);
@@ -4163,6 +4280,23 @@
 		};
 /* End PBXGroup section */
 
+/* Begin PBXLegacyTarget section */
+		7B02C793292B8E0700E677CF /* WireGuardGoBridgemacOS */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = "$(ACTION)";
+			buildConfigurationList = 7B02C794292B8E0700E677CF /* Build configuration list for PBXLegacyTarget "WireGuardGoBridgemacOS" */;
+			buildPhases = (
+			);
+			buildToolPath = /usr/bin/make;
+			buildWorkingDirectory = "${BUILD_DIR}/../../SourcePackages/checkouts/wireguard-apple/Sources/WireGuardKitGo";
+			dependencies = (
+			);
+			name = WireGuardGoBridgemacOS;
+			passBuildSettingsInEnvironment = 1;
+			productName = WireGuardGoBridgemacOS;
+		};
+/* End PBXLegacyTarget section */
+
 /* Begin PBXNativeTarget section */
 		4B1AD89C25FC27E200261379 /* Integration Tests */ = {
 			isa = PBXNativeTarget;
@@ -4181,6 +4315,28 @@
 			productName = "Integration Tests";
 			productReference = 4B1AD89D25FC27E200261379 /* Integration Tests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		7B02C7F1292BA77300E677CF /* NetworkProtectionExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7B02C7FC292BA77500E677CF /* Build configuration list for PBXNativeTarget "NetworkProtectionExtension" */;
+			buildPhases = (
+				7B02C7EE292BA77300E677CF /* Sources */,
+				7B02C7EF292BA77300E677CF /* Frameworks */,
+				7B02C7F0292BA77300E677CF /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				7B02C817292BA7F900E677CF /* PBXTargetDependency */,
+				7B02C815292BA7F500E677CF /* PBXTargetDependency */,
+			);
+			name = NetworkProtectionExtension;
+			packageProductDependencies = (
+				7B02C818292BA80400E677CF /* WireGuardKit */,
+			);
+			productName = NetworkProtectionExtension;
+			productReference = 7B02C7F2292BA77300E677CF /* NetworkProtectionExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 		7B4CE8D926F02108009134B1 /* UI Tests */ = {
 			isa = PBXNativeTarget;
@@ -4209,10 +4365,13 @@
 				AA8EDF2824925E940071C2E8 /* Swift Lint */,
 				AA585D7B248FD31100E9A3E2 /* Frameworks */,
 				AA585D7C248FD31100E9A3E2 /* Resources */,
+				7B02C7CA292BA5B700E677CF /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				7B02C78E292B8D8600E677CF /* PBXTargetDependency */,
+				7B02C7FA292BA77400E677CF /* PBXTargetDependency */,
 			);
 			name = "DuckDuckGo Privacy Browser";
 			packageProductDependencies = (
@@ -4224,6 +4383,7 @@
 				1E950E3E2912A10D0051A99B /* ContentBlocking */,
 				1E950E402912A10D0051A99B /* PrivacyDashboard */,
 				1E950E422912A10D0051A99B /* UserScript */,
+				7B02C78B292B8D6700E677CF /* WireGuardKit */,
 			);
 			productName = DuckDuckGo;
 			productReference = AA585D7E248FD31100E9A3E2 /* DuckDuckGo.app */;
@@ -4257,13 +4417,19 @@
 		AA585D76248FD31100E9A3E2 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 1250;
-				LastUpgradeCheck = 1400;
+				LastSwiftUpdateCheck = 1410;
+				LastUpgradeCheck = 1340;
 				ORGANIZATIONNAME = DuckDuckGo;
 				TargetAttributes = {
 					4B1AD89C25FC27E200261379 = {
 						CreatedOnToolsVersion = 12.4;
 						TestTargetID = AA585D7D248FD31100E9A3E2;
+					};
+					7B02C793292B8E0700E677CF = {
+						CreatedOnToolsVersion = 14.1;
+					};
+					7B02C7F1292BA77300E677CF = {
+						CreatedOnToolsVersion = 14.1;
 					};
 					7B4CE8D926F02108009134B1 = {
 						CreatedOnToolsVersion = 12.5.1;
@@ -4293,15 +4459,18 @@
 				B6DA44152616C13800DD1EC2 /* XCRemoteSwiftPackageReference "OHHTTPStubs" */,
 				AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */,
 				9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */,
+				7B02C78A292B8D6700E677CF /* XCRemoteSwiftPackageReference "wireguard-apple" */,
 			);
 			productRefGroup = AA585D7F248FD31100E9A3E2 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
 				AA585D7D248FD31100E9A3E2 /* DuckDuckGo Privacy Browser */,
+				7B02C7F1292BA77300E677CF /* NetworkProtectionExtension */,
 				AA585D8F248FD31400E9A3E2 /* Unit Tests */,
 				4B1AD89C25FC27E200261379 /* Integration Tests */,
 				7B4CE8D926F02108009134B1 /* UI Tests */,
+				7B02C793292B8E0700E677CF /* WireGuardGoBridgemacOS */,
 			);
 		};
 /* End PBXProject section */
@@ -4313,6 +4482,13 @@
 			files = (
 				B3FB199027BC015600513DC1 /* autoconsent-test.js in Resources */,
 				B3FB198E27BC013C00513DC1 /* autoconsent-test-page.html in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7B02C7F0292BA77300E677CF /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4472,6 +4648,21 @@
 				7BA4727D26F01BC400EAA165 /* CoreDataTestUtilities.swift in Sources */,
 				4B1AD92125FC474E00261379 /* CoreDataEncryptionTesting.xcdatamodeld in Sources */,
 				4B1AD8D525FC38DD00261379 /* EncryptionKeyStoreTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7B02C7EE292BA77300E677CF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7B02C80E292BA78300E677CF /* Logger.swift in Sources */,
+				7B02C80F292BA78300E677CF /* PacketTunnelProvider.swift in Sources */,
+				7B02C80D292BA78300E677CF /* NETunnelProviderProtocol+Extension.swift in Sources */,
+				7B02C811292BA79000E677CF /* Keychain.swift in Sources */,
+				7B4D3B67292D51DE00F03BED /* TunnelConfiguration+WgQuickConfig.swift in Sources */,
+				7B02C810292BA78300E677CF /* FileManager+Extension.swift in Sources */,
+				7B02C80C292BA78300E677CF /* main.swift in Sources */,
+				7B02C812292BA79400E677CF /* String+ArrayConversion.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4687,6 +4878,7 @@
 				AA4FF40C2624751A004E2377 /* GrammarFeaturesManager.swift in Sources */,
 				B6DA06E8291401D700225DE2 /* WKMenuItemIdentifier.swift in Sources */,
 				B693955B26F0CE300015B914 /* WebKitDownloadDelegate.swift in Sources */,
+				7B02C7A0292B8FB800E677CF /* Keychain.swift in Sources */,
 				4B0AACAE28BC6FD0001038AC /* SafariFaviconsReader.swift in Sources */,
 				B6B3E0E12657EA7A0040E0A2 /* NSScreenExtension.swift in Sources */,
 				B65E6BA026D9F10600095F96 /* NSBezierPathExtension.swift in Sources */,
@@ -4720,6 +4912,7 @@
 				AAADFD06264AA282001555EA /* TimeIntervalExtension.swift in Sources */,
 				4B9292D42667123700AD2C21 /* BookmarkListViewController.swift in Sources */,
 				4B723E0D26B0006100E14D75 /* SecureVaultLoginImporter.swift in Sources */,
+				7B02C7A4292B901400E677CF /* String+ArrayConversion.swift in Sources */,
 				4B9292D32667123700AD2C21 /* AddBookmarkModalViewController.swift in Sources */,
 				AA5C1DD5285C780C0089850C /* RecentlyClosedCoordinator.swift in Sources */,
 				AA88D14B252A557100980B4E /* URLRequestExtension.swift in Sources */,
@@ -4736,6 +4929,7 @@
 				AAEEC6A927088ADB008445F7 /* FireCoordinator.swift in Sources */,
 				B655369B268442EE00085A79 /* GeolocationProvider.swift in Sources */,
 				B6C0B23C26E87D900031CB7F /* NSAlert+ActiveDownloadsTermination.swift in Sources */,
+				7B4D3B66292D513F00F03BED /* NETunnelProviderProtocol+NetworkProtection.swift in Sources */,
 				AAECA42024EEA4AC00EFA63A /* IndexPathExtension.swift in Sources */,
 				4BE65478271FCD41008D1D63 /* PasswordManagementNoteItemView.swift in Sources */,
 				AA5C8F632591021700748EB7 /* NSApplicationExtension.swift in Sources */,
@@ -4752,6 +4946,7 @@
 				4B29759728281F0900187C4E /* FirefoxEncryptionKeyReader.swift in Sources */,
 				4B9292D02667123700AD2C21 /* BookmarkManagementSplitViewController.swift in Sources */,
 				3171D6DB2889B64D0068632A /* CookieManagedNotificationContainerView.swift in Sources */,
+				7B4D3B68292D520400F03BED /* TunnelConfiguration+WgQuickConfig.swift in Sources */,
 				B6E61EE3263AC0C8004E11AB /* FileManagerExtension.swift in Sources */,
 				B6DB3CFB26A17CB800D459B7 /* PermissionModel.swift in Sources */,
 				4B92929C26670D2A00AD2C21 /* PasteboardFolder.swift in Sources */,
@@ -4767,6 +4962,7 @@
 				AAC5E4D125D6A709007F5990 /* BookmarkManager.swift in Sources */,
 				37CD54CD27F2FDD100F1F7B9 /* AboutModel.swift in Sources */,
 				4BE65476271FCD41008D1D63 /* PasswordManagementCreditCardItemView.swift in Sources */,
+				7B02C789292B8C8E00E677CF /* NetworkProtection.swift in Sources */,
 				AA5C8F59258FE21F00748EB7 /* NSTextFieldExtension.swift in Sources */,
 				B6830961274CDE99004B46BB /* FireproofDomainsContainer.swift in Sources */,
 				B65536AE2685E17200085A79 /* GeolocationService.swift in Sources */,
@@ -4876,6 +5072,7 @@
 				8562599A269CA0A600EE44BC /* NSRectExtension.swift in Sources */,
 				31F28C5128C8EEC500119F70 /* YoutubeOverlayUserScript.swift in Sources */,
 				B6040856274B830F00680351 /* DictionaryExtension.swift in Sources */,
+				7B9DD3EE292CF403009504CD /* NSImage+NetworkProtection.swift in Sources */,
 				B684592725C93C0500DC17B6 /* Publishers.NestedObjectChanges.swift in Sources */,
 				B6DA06E62913F39400225DE2 /* MenuItemSelectors.swift in Sources */,
 				85589E9A27BFE3C30038AD11 /* FaviconView.swift in Sources */,
@@ -4956,6 +5153,7 @@
 				1456D6E124EFCBC300775049 /* TabBarCollectionView.swift in Sources */,
 				85308E25267FC9F2001ABD76 /* NSAlertExtension.swift in Sources */,
 				4B59024826B3673600489384 /* ThirdPartyBrowser.swift in Sources */,
+				7B9DD3EC292CF28C009504CD /* UserText+NetworkProtection.swift in Sources */,
 				B65E6B9E26D9EC0800095F96 /* CircularProgressView.swift in Sources */,
 				AABEE69C24A902BB0043105B /* SuggestionContainer.swift in Sources */,
 				85589E8327BBB8630038AD11 /* HomePageViewController.swift in Sources */,
@@ -5204,6 +5402,24 @@
 			target = AA585D7D248FD31100E9A3E2 /* DuckDuckGo Privacy Browser */;
 			targetProxy = 4B1AD8A225FC27E200261379 /* PBXContainerItemProxy */;
 		};
+		7B02C78E292B8D8600E677CF /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = 7B02C78D292B8D8600E677CF /* WireGuardKit */;
+		};
+		7B02C7FA292BA77400E677CF /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 7B02C7F1292BA77300E677CF /* NetworkProtectionExtension */;
+			targetProxy = 7B02C7F9292BA77400E677CF /* PBXContainerItemProxy */;
+		};
+		7B02C815292BA7F500E677CF /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = 7B02C814292BA7F500E677CF /* WireGuardKit */;
+		};
+		7B02C817292BA7F900E677CF /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 7B02C793292B8E0700E677CF /* WireGuardGoBridgemacOS */;
+			targetProxy = 7B02C816292BA7F900E677CF /* PBXContainerItemProxy */;
+		};
 		7B4CE8E026F02108009134B1 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = AA585D7D248FD31100E9A3E2 /* DuckDuckGo Privacy Browser */;
@@ -5318,6 +5534,7 @@
 		377762432800D59E00250E31 /* CI_Review */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = "Icon - Review";
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = GlobalAccentColor;
 				CLANG_ANALYZER_LOCALIZABILITY_EMPTY_CONTEXT = YES;
@@ -5473,6 +5690,7 @@
 		377762482800ECB000250E31 /* CI_Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = GlobalAccentColor;
 				CLANG_ANALYZER_LOCALIZABILITY_EMPTY_CONTEXT = YES;
@@ -5679,6 +5897,7 @@
 		4B1AD8B125FC322600261379 /* CI */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = "Icon - Debug";
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = GlobalAccentColor;
 				CLANG_ANALYZER_LOCALIZABILITY_EMPTY_CONTEXT = YES;
@@ -5754,6 +5973,666 @@
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DuckDuckGo.app/Contents/MacOS/DuckDuckGo";
 			};
 			name = CI;
+		};
+		4B77EC072919B79F006ACF94 /* NetworkProtection_Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 85B8757E28B903D900D39E04 /* Configuration.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = NetworkProtection_Debug;
+		};
+		4B77EC082919B79F006ACF94 /* NetworkProtection_Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = "Icon - Network Protection";
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = GlobalAccentColor;
+				CLANG_ANALYZER_LOCALIZABILITY_EMPTY_CONTEXT = YES;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CODE_SIGN_ENTITLEMENTS = DuckDuckGo/DuckDuckGo_NetP_Debug.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = "$(MARKETING_VERSION)";
+				DEVELOPMENT_TEAM = HKE973VLUW;
+				ENABLE_HARDENED_RUNTIME = YES;
+				INFOPLIST_FILE = DuckDuckGo/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = "$(MARKETING_VERSION)";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.duckduckgo.macos.browser.network-protection.debug";
+				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
+				PRODUCT_NAME = "DuckDuckGo Network Protection";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "FEEDBACK $(inherited)";
+				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/DuckDuckGo/Bridging.h";
+				SWIFT_VERSION = 5.0;
+			};
+			name = NetworkProtection_Debug;
+		};
+		4B77EC092919B79F006ACF94 /* NetworkProtection_Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = HKE973VLUW;
+				INFOPLIST_FILE = "Unit Tests/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser.DuckDuckGoTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/Unit Tests/Common/TestsBridging.h";
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DuckDuckGo.app/Contents/MacOS/DuckDuckGo";
+			};
+			name = NetworkProtection_Debug;
+		};
+		4B77EC0A2919B79F006ACF94 /* NetworkProtection_Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = HKE973VLUW;
+				INFOPLIST_FILE = "Integration Tests/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 11.1;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.duckduckgo.Integration-Tests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DuckDuckGo.app/Contents/MacOS/DuckDuckGo";
+			};
+			name = NetworkProtection_Debug;
+		};
+		4B77EC0B2919B79F006ACF94 /* NetworkProtection_Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = HKE973VLUW;
+				INFOPLIST_FILE = "UI Tests/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 11.3;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.duckduckgo.UI-Tests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = "DuckDuckGo Privacy Browser";
+			};
+			name = NetworkProtection_Debug;
+		};
+		4B77EC0C2919B7AB006ACF94 /* NetworkProtection_Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 85B8757E28B903D900D39E04 /* Configuration.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+			};
+			name = NetworkProtection_Release;
+		};
+		4B77EC0D2919B7AB006ACF94 /* NetworkProtection_Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = "Icon - Network Protection";
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = GlobalAccentColor;
+				CLANG_ANALYZER_LOCALIZABILITY_EMPTY_CONTEXT = YES;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CODE_SIGN_ENTITLEMENTS = DuckDuckGo/DuckDuckGo_NetP_Release.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Developer ID Application";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = "$(MARKETING_VERSION)";
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=macosx*]" = HKE973VLUW;
+				ENABLE_HARDENED_RUNTIME = YES;
+				INFOPLIST_FILE = DuckDuckGo/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = "$(MARKETING_VERSION)";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.duckduckgo.macos.browser.network-protection";
+				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
+				PRODUCT_NAME = "DuckDuckGo Network Protection";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "macOS Network Protection";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = FEEDBACK;
+				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/DuckDuckGo/Bridging.h";
+				SWIFT_VERSION = 5.0;
+			};
+			name = NetworkProtection_Release;
+		};
+		4B77EC0E2919B7AB006ACF94 /* NetworkProtection_Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = HKE973VLUW;
+				INFOPLIST_FILE = "Unit Tests/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser.DuckDuckGoTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/Unit Tests/Common/TestsBridging.h";
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DuckDuckGo.app/Contents/MacOS/DuckDuckGo";
+			};
+			name = NetworkProtection_Release;
+		};
+		4B77EC0F2919B7AB006ACF94 /* NetworkProtection_Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = HKE973VLUW;
+				INFOPLIST_FILE = "Integration Tests/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 11.1;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.duckduckgo.Integration-Tests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DuckDuckGo.app/Contents/MacOS/DuckDuckGo";
+			};
+			name = NetworkProtection_Release;
+		};
+		4B77EC102919B7AB006ACF94 /* NetworkProtection_Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = HKE973VLUW;
+				INFOPLIST_FILE = "UI Tests/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 11.3;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.duckduckgo.UI-Tests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = "DuckDuckGo Privacy Browser";
+			};
+			name = NetworkProtection_Release;
+		};
+		7B02C795292B8E0700E677CF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				DEBUGGING_SYMBOLS = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = HKE973VLUW;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PATH = "$(inherit):/opt/homebrew/bin";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		7B02C796292B8E0700E677CF /* NetworkProtection_Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = HKE973VLUW;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PATH = "$(inherit):/opt/homebrew/bin";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = NetworkProtection_Debug;
+		};
+		7B02C797292B8E0700E677CF /* CI */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = HKE973VLUW;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PATH = "$(inherit):/opt/homebrew/bin";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = CI;
+		};
+		7B02C798292B8E0700E677CF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = HKE973VLUW;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PATH = "$(inherit):/opt/homebrew/bin";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		7B02C799292B8E0700E677CF /* NetworkProtection_Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = HKE973VLUW;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PATH = "$(inherit):/opt/homebrew/bin";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = NetworkProtection_Release;
+		};
+		7B02C79A292B8E0700E677CF /* CI_Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = HKE973VLUW;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PATH = "$(inherit):/opt/homebrew/bin";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = CI_Release;
+		};
+		7B02C79B292B8E0700E677CF /* Review */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = HKE973VLUW;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PATH = "$(inherit):/opt/homebrew/bin";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Review;
+		};
+		7B02C79C292B8E0700E677CF /* CI_Review */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = HKE973VLUW;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PATH = "$(inherit):/opt/homebrew/bin";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = CI_Review;
+		};
+		7B02C7FD292BA77500E677CF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_ENTITLEMENTS = NetworkProtectionExtension/NetworkProtectionExtension.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = HKE973VLUW;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = NetworkProtectionExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = NetworkProtectionExtension;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2022 DuckDuckGo. All rights reserved.";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.duckduckgo.macos.browser.debug.network-extension";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		7B02C7FE292BA77500E677CF /* NetworkProtection_Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_ENTITLEMENTS = NetworkProtectionExtension/NetworkProtectionExtension.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = HKE973VLUW;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = NetworkProtectionExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = NetworkProtectionExtension;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2022 DuckDuckGo. All rights reserved.";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.duckduckgo.macos.browser.network-protection.debug.network-extension";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = NetworkProtection_Debug;
+		};
+		7B02C7FF292BA77500E677CF /* CI */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_ENTITLEMENTS = NetworkProtectionExtension/NetworkProtectionExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = NetworkProtectionExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = NetworkProtectionExtension;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2022 DuckDuckGo. All rights reserved.";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.duckduckgo.macos.browser.debug.network-extension";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = CI;
+		};
+		7B02C800292BA77500E677CF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_ENTITLEMENTS = NetworkProtectionExtension/NetworkProtectionExtension.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = HKE973VLUW;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = NetworkProtectionExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = NetworkProtectionExtension;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2022 DuckDuckGo. All rights reserved.";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.duckduckgo.macos.browser.network-extension";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		7B02C801292BA77500E677CF /* NetworkProtection_Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_ENTITLEMENTS = NetworkProtectionExtension/NetworkProtectionExtension.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Developer ID Application";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = NetworkProtectionExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = NetworkProtectionExtension;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2022 DuckDuckGo. All rights reserved.";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.duckduckgo.macos.browser.network-protection.network-extension";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = NetworkProtection_Release;
+		};
+		7B02C802292BA77500E677CF /* CI_Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_ENTITLEMENTS = NetworkProtectionExtension/NetworkProtectionExtension.entitlements;
+				CODE_SIGN_IDENTITY = "Developer ID Application";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = HKE973VLUW;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = NetworkProtectionExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = NetworkProtectionExtension;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2022 DuckDuckGo. All rights reserved.";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.duckduckgo.macos.browser.network-extension";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = CI_Release;
+		};
+		7B02C803292BA77500E677CF /* Review */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_ENTITLEMENTS = NetworkProtectionExtension/NetworkProtectionExtension.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = HKE973VLUW;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = NetworkProtectionExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = NetworkProtectionExtension;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2022 DuckDuckGo. All rights reserved.";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.duckduckgo.macos.browser.review.network-extension";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Review;
+		};
+		7B02C804292BA77500E677CF /* CI_Review */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_ENTITLEMENTS = NetworkProtectionExtension/NetworkProtectionExtension.entitlements;
+				CODE_SIGN_IDENTITY = "Developer ID Application";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = HKE973VLUW;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = NetworkProtectionExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = NetworkProtectionExtension;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2022 DuckDuckGo. All rights reserved.";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.duckduckgo.macos.browser.review.network-extension";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = CI_Review;
 		};
 		7B4CE8E126F02108009134B1 /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -5939,6 +6818,7 @@
 		AA585DA5248FD31500E9A3E2 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = "Icon - Debug";
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = GlobalAccentColor;
 				CLANG_ANALYZER_LOCALIZABILITY_EMPTY_CONTEXT = YES;
@@ -5968,6 +6848,7 @@
 		AA585DA6248FD31500E9A3E2 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = GlobalAccentColor;
 				CLANG_ANALYZER_LOCALIZABILITY_EMPTY_CONTEXT = YES;
@@ -6104,6 +6985,7 @@
 		AAE814AC2716DFE8009D3531 /* Review */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = "Icon - Review";
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = GlobalAccentColor;
 				CLANG_ANALYZER_LOCALIZABILITY_EMPTY_CONTEXT = YES;
@@ -6208,11 +7090,43 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				4B1AD8A425FC27E200261379 /* Debug */,
+				4B77EC0A2919B79F006ACF94 /* NetworkProtection_Debug */,
 				4B1AD8B325FC322600261379 /* CI */,
 				4B1AD8A525FC27E200261379 /* Release */,
+				4B77EC0F2919B7AB006ACF94 /* NetworkProtection_Release */,
 				3777624A2800ECB000250E31 /* CI_Release */,
 				AAE814AE2716DFE8009D3531 /* Review */,
 				377762452800D59E00250E31 /* CI_Review */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		7B02C794292B8E0700E677CF /* Build configuration list for PBXLegacyTarget "WireGuardGoBridgemacOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7B02C795292B8E0700E677CF /* Debug */,
+				7B02C796292B8E0700E677CF /* NetworkProtection_Debug */,
+				7B02C797292B8E0700E677CF /* CI */,
+				7B02C798292B8E0700E677CF /* Release */,
+				7B02C799292B8E0700E677CF /* NetworkProtection_Release */,
+				7B02C79A292B8E0700E677CF /* CI_Release */,
+				7B02C79B292B8E0700E677CF /* Review */,
+				7B02C79C292B8E0700E677CF /* CI_Review */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		7B02C7FC292BA77500E677CF /* Build configuration list for PBXNativeTarget "NetworkProtectionExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7B02C7FD292BA77500E677CF /* Debug */,
+				7B02C7FE292BA77500E677CF /* NetworkProtection_Debug */,
+				7B02C7FF292BA77500E677CF /* CI */,
+				7B02C800292BA77500E677CF /* Release */,
+				7B02C801292BA77500E677CF /* NetworkProtection_Release */,
+				7B02C802292BA77500E677CF /* CI_Release */,
+				7B02C803292BA77500E677CF /* Review */,
+				7B02C804292BA77500E677CF /* CI_Review */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -6221,8 +7135,10 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				7B4CE8E126F02108009134B1 /* Debug */,
+				4B77EC0B2919B79F006ACF94 /* NetworkProtection_Debug */,
 				7B4CE8E226F02108009134B1 /* CI */,
 				7B4CE8E326F02108009134B1 /* Release */,
+				4B77EC102919B7AB006ACF94 /* NetworkProtection_Release */,
 				3777624B2800ECB000250E31 /* CI_Release */,
 				AAE814AF2716DFE8009D3531 /* Review */,
 				377762462800D59E00250E31 /* CI_Review */,
@@ -6234,8 +7150,10 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				AA585DA2248FD31500E9A3E2 /* Debug */,
+				4B77EC072919B79F006ACF94 /* NetworkProtection_Debug */,
 				4B1AD8B025FC322600261379 /* CI */,
 				AA585DA3248FD31500E9A3E2 /* Release */,
+				4B77EC0C2919B7AB006ACF94 /* NetworkProtection_Release */,
 				377762472800ECB000250E31 /* CI_Release */,
 				AAE814AB2716DFE8009D3531 /* Review */,
 				377762422800D59E00250E31 /* CI_Review */,
@@ -6247,8 +7165,10 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				AA585DA5248FD31500E9A3E2 /* Debug */,
+				4B77EC082919B79F006ACF94 /* NetworkProtection_Debug */,
 				4B1AD8B125FC322600261379 /* CI */,
 				AA585DA6248FD31500E9A3E2 /* Release */,
+				4B77EC0D2919B7AB006ACF94 /* NetworkProtection_Release */,
 				377762482800ECB000250E31 /* CI_Release */,
 				AAE814AC2716DFE8009D3531 /* Review */,
 				377762432800D59E00250E31 /* CI_Review */,
@@ -6260,8 +7180,10 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				AA585DA8248FD31500E9A3E2 /* Debug */,
+				4B77EC092919B79F006ACF94 /* NetworkProtection_Debug */,
 				4B1AD8B225FC322600261379 /* CI */,
 				AA585DA9248FD31500E9A3E2 /* Release */,
+				4B77EC0E2919B7AB006ACF94 /* NetworkProtection_Release */,
 				377762492800ECB000250E31 /* CI_Release */,
 				AAE814AD2716DFE8009D3531 /* Review */,
 				377762442800D59E00250E31 /* CI_Review */,
@@ -6278,6 +7200,14 @@
 			requirement = {
 				kind = exactVersion;
 				version = 1.1.1;
+			};
+		};
+		7B02C78A292B8D6700E677CF /* XCRemoteSwiftPackageReference "wireguard-apple" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/WireGuard/wireguard-apple";
+			requirement = {
+				kind = exactVersion;
+				version = "1.0.15-26";
 			};
 		};
 		85FF55C625F82E4F00E2AB99 /* XCRemoteSwiftPackageReference "lottie-ios" */ = {
@@ -6339,6 +7269,26 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 4B82E9B125B69E3E00656FE7 /* XCRemoteSwiftPackageReference "TrackerRadarKit" */;
 			productName = TrackerRadarKit;
+		};
+		7B02C78B292B8D6700E677CF /* WireGuardKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7B02C78A292B8D6700E677CF /* XCRemoteSwiftPackageReference "wireguard-apple" */;
+			productName = WireGuardKit;
+		};
+		7B02C78D292B8D8600E677CF /* WireGuardKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7B02C78A292B8D6700E677CF /* XCRemoteSwiftPackageReference "wireguard-apple" */;
+			productName = WireGuardKit;
+		};
+		7B02C814292BA7F500E677CF /* WireGuardKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7B02C78A292B8D6700E677CF /* XCRemoteSwiftPackageReference "wireguard-apple" */;
+			productName = WireGuardKit;
+		};
+		7B02C818292BA80400E677CF /* WireGuardKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7B02C78A292B8D6700E677CF /* XCRemoteSwiftPackageReference "wireguard-apple" */;
+			productName = WireGuardKit;
 		};
 		85FF55C725F82E4F00E2AB99 /* Lottie */ = {
 			isa = XCSwiftPackageProductDependency;

@@ -29,6 +29,10 @@ final class UpdateController: NSObject {
         super.init()
 
         configureUpdater()
+        
+        // TODO (NetP): The Network Protection builds do not support automatic updates.
+        // This function should be removed once Network Protection has been merged into the upstream repo.
+        configureUpdaterForNetworkProtection()
     }
 
     func checkForUpdates(_ sender: Any!) {
@@ -51,6 +55,11 @@ final class UpdateController: NSObject {
         updater.automaticallyChecksForUpdates = false
         updater.updateCheckInterval = 0
 #endif
+    }
+    
+    private func configureUpdaterForNetworkProtection() {
+        updater.automaticallyChecksForUpdates = false
+        updater.updateCheckInterval = 0
     }
 
     private let updater = SUUpdater()
