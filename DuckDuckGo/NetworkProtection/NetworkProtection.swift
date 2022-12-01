@@ -20,23 +20,26 @@ import Foundation
 import SwiftUI
 import WireGuardKit
 import NetworkExtension
-import OSLog
 
 final class NetworkProtection {
 
-    typealias ConnectionChangeHandler = (ConnectionChange) -> Void
+    typealias StatusChangeHandler = (NEVPNStatus) -> Void
+    typealias ConfigChangeHandler = () -> Void
 
     enum QuickConfigLoadingError: Error {
         case quickConfigFilePathEnvVarMissing
     }
 
-    enum ConnectionChange {
-        case status(newStatus: NEVPNStatus)
-        case configuration
+    enum StatusChangeError: Error {
+        case couldNotRetrieveStatusFromNotification
     }
 
-    private var statusChangeOberverToken: NSObjectProtocol?
-    private var configurationChangeObserverToken: NSObjectProtocol?
+    private var statusChangeObserverToken: NSObjectProtocol?
+    private var configChangeObserverToken: NSObjectProtocol?
+
+    /// The logger that this object will use for errors that are handled by this class.
+    ///
+    private let logger: NetworkProtectionLogger
 
     /// The notification center to use to observe tunnel change notifications.
     ///
@@ -67,17 +70,23 @@ final class NetworkProtection {
         }
     }
 
-    var onConnectionChange: ConnectionChangeHandler?
+    var onConfigChange: ConfigChangeHandler?
+    var onStatusChange: StatusChangeHandler?
 
     // MARK: - Initialization & deinitialization
 
     /// Default initializer
     ///
     /// - Parameters:
-    ///         - notificationCenter: overrideable for testing.  Don't override in production code.
+    ///         - notificationCenter: (meant for testing) the notification center that this object will use.
+    ///         - logger: (meant for testing) the logger that this object will use.
     ///
-    init(notificationCenter: NotificationCenter = .default) {
+    init(notificationCenter: NotificationCenter = .default,
+         logger: NetworkProtectionLogger = DefaultNetworkProtectionLogger()) {
+
+        self.logger = logger
         self.notificationCenter = notificationCenter
+
         startObservingNotifications()
     }
 
@@ -93,53 +102,38 @@ final class NetworkProtection {
     }
 
     private func startObservingVPNConfigChanges() {
-        guard configurationChangeObserverToken == nil else {
+        guard configChangeObserverToken == nil else {
             return
         }
 
-        configurationChangeObserverToken = notificationCenter.addObserver(forName: .NEVPNConfigurationChange, object: nil, queue: nil) { [weak self] _ in
+        configChangeObserverToken = notificationCenter.addObserver(forName: .NEVPNConfigurationChange, object: nil, queue: nil) { [weak self] _ in
 
             guard let self = self else {
                 return
             }
 
-            Task {
-                do {
-                    try await self.reloadTunnelManager()
-                } catch {
-                    let errorMessage = StaticString(stringLiteral: "🔴 Error reloading the tunnel after a configuration change")
-                    assertionFailure(String("\(errorMessage)"))
-                    os_log(errorMessage, type: .error)
-                }
-
-                self.onConnectionChange?(.configuration)
-            }
+            self.reloadTunnelManager()
+            self.onConfigChange?()
         }
     }
 
     private func startObservingVPNStatusChanges() {
-        guard statusChangeOberverToken == nil else {
+        guard statusChangeObserverToken == nil else {
             return
         }
 
-        statusChangeOberverToken = notificationCenter.addObserver(forName: .NEVPNStatusDidChange, object: nil, queue: nil) { [weak self] _ in
+        statusChangeObserverToken = notificationCenter.addObserver(forName: .NEVPNStatusDidChange, object: nil, queue: nil) { [weak self] notification in
 
-            guard let self = self,
-                  let onConnectionChange = self.onConnectionChange else {
+            guard let self = self else {
                 return
             }
 
-            Task {
-                do {
-                    let tunnelManager = try await self.tunnelManager
-                    onConnectionChange(.status(newStatus: tunnelManager.connection.status))
-                } catch {
-                    let error = StaticString(stringLiteral: "🔴 Error obtaining the tunnel manager")
-
-                    assertionFailure("\(error)")
-                    os_log(error, type: .error)
-                }
+            guard let status = (notification.object as? NETunnelProviderSession)?.status else {
+                self.logger.log(StatusChangeError.couldNotRetrieveStatusFromNotification)
+                return
             }
+
+            self.onStatusChange?(status)
         }
     }
 
@@ -149,21 +143,21 @@ final class NetworkProtection {
     }
 
     private func stopObservingVPNConfigChanges() {
-        guard let token = configurationChangeObserverToken else {
+        guard let token = configChangeObserverToken else {
             return
         }
 
         notificationCenter.removeObserver(token)
-        configurationChangeObserverToken = nil
+        configChangeObserverToken = nil
     }
 
     private func stopObservingVPNStatusChanges() {
-        guard let token = statusChangeOberverToken else {
+        guard let token = statusChangeObserverToken else {
             return
         }
 
         notificationCenter.removeObserver(token)
-        statusChangeOberverToken = nil
+        statusChangeObserverToken = nil
     }
 
     // MARK: - Tunnel Configuration
@@ -172,7 +166,6 @@ final class NetworkProtection {
     ///
     private func loadTunnelConfiguration() throws -> TunnelConfiguration {
         guard let quickConfigFile = ProcessInfo.processInfo.environment[Self.quickConfigFilePathEnvironmentVariable] else {
-
             throw QuickConfigLoadingError.quickConfigFilePathEnvVarMissing
         }
 
@@ -185,7 +178,7 @@ final class NetworkProtection {
 
     /// Reloads the tunnel manager from preferences.
     ///
-    private func reloadTunnelManager() async throws {
+    private func reloadTunnelManager() {
         // Doing this ensures the tunnel will be reloaded
         internalTunnelManager = nil
     }

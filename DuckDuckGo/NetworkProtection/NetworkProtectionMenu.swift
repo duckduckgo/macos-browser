@@ -17,17 +17,22 @@
 //
 
 import Foundation
-import OSLog
+
+protocol NetworkProtectionMenuProtocol: NSMenu {}
 
 /// The network protection menu.  This is mostly intended to be shown in the status bar, but was designed to be reusable in case
 /// we want to show this menu elsewhere.
 ///
-final class NetworkProtectionMenu: NSMenu {
+final class NetworkProtectionMenu: NSMenu, NetworkProtectionMenuProtocol {
     private var networkProtection: NetworkProtection
+    private let logger: NetworkProtectionLogger
 
     // MARK: - Initialization
 
-    init(networkProtection: NetworkProtection = NetworkProtection()) {
+    init(networkProtection: NetworkProtection = NetworkProtection(),
+         logger: NetworkProtectionLogger = DefaultNetworkProtectionLogger()) {
+
+        self.logger = logger
         self.networkProtection = networkProtection
 
         super.init(title: "Network Protection")
@@ -44,14 +49,7 @@ final class NetworkProtectionMenu: NSMenu {
     private func setup() {
         reload()
 
-        networkProtection.onConnectionChange = { [weak self] change in
-            switch change {
-            case .configuration:
-                print("configuration!")
-            case .status(let newStatus):
-                print("status! \(newStatus)")
-            }
-
+        networkProtection.onStatusChange = { [weak self] _ in
             guard let self = self else {
                 return
             }
@@ -60,25 +58,40 @@ final class NetworkProtectionMenu: NSMenu {
         }
     }
 
+    /// Reload using this method if the caller doesn't need to wait for completion.
+    ///
     private func reload() {
         Task {
-            do {
-                try await reload()
-            } catch {
-                os_log(.error, "🔴 Failed to reload menu: %@", String(describing: error))
-            }
+            await reload()
         }
     }
 
     /// Reloads the full menu.
     ///
     @MainActor
-    private func reload() async throws {
+    private func reload() async {
         removeAllItems()
 
-        let menuItem: NSMenuItem
+        let connectionMenuItem = await connectionMenuItem()
 
-        if try await networkProtection.isConnected() {
+        items = [connectionMenuItem]
+    }
+
+    private func connectionMenuItem() async -> NSMenuItem {
+        let menuItem: NSMenuItem
+        let isConnected: Bool
+
+        do {
+            isConnected = try await networkProtection.isConnected()
+        } catch {
+            // We'll log an error but we'll also react as if the tunnel was not connected, so that users
+            // can attempt to connect (and maybe who knows, make things work well again?), and not be completely
+            // stuck by a non-working UI.
+            logger.log(error)
+            isConnected = false
+        }
+
+        if isConnected {
             menuItem = NSMenuItem()
             menuItem.title = "Stop Network Protection"
             menuItem.target = self
@@ -90,7 +103,7 @@ final class NetworkProtectionMenu: NSMenu {
             menuItem.action = #selector(startNetworkProtectionSelected)
         }
 
-        items = [menuItem]
+        return menuItem
     }
 
     // MARK: - Network Protection Interaction
@@ -105,8 +118,7 @@ final class NetworkProtectionMenu: NSMenu {
 
                 try await networkProtection.start()
             } catch {
-                // TODO: replace with proper logging or UI error handling
-                print("🔴 Error starting the VPN tunnel: \(error)")
+                logger.log(error)
             }
         }
     }
@@ -121,8 +133,7 @@ final class NetworkProtectionMenu: NSMenu {
 
                 try await networkProtection.stop()
             } catch {
-                // TODO: replace with proper logging or UI error handling
-                print("🔴 Error stopping the VPN tunnel: \(error)")
+                logger.log(error)
             }
         }
     }

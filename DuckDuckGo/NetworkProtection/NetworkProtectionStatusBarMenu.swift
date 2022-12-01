@@ -25,9 +25,15 @@ final class NetworkProtectionStatusBarMenu {
 
     // MARK: - Initialization
 
-    init(networkProtection: NetworkProtection = NetworkProtection(), statusItem: NSStatusItem? = nil) {
+    /// Default initializer
+    ///
+    /// - Parameters:
+    ///     - menu: (meant for testing) this allows us to inject our own ``NSMenu`` to make automated testing easier.
+    ///     - statusItem: (meant for testing) this allows us to inject our own status `NSStatusItem` to make automated testing easier..
+    ///
+    init(menu: NetworkProtectionMenuProtocol = NetworkProtectionMenu(), statusItem: NSStatusItem? = nil) {
         self.statusItem = statusItem ?? NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
-        self.statusItem.menu = NetworkProtectionMenu(networkProtection: networkProtection)
+        self.statusItem.menu = menu
         self.statusItem.button?.image = .NetworkProtection.statusBarMenuIcon
         self.statusItem.isVisible = false
     }
