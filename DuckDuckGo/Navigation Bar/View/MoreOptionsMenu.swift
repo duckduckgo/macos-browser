@@ -462,7 +462,7 @@ final class LoginsSubMenu: NSMenu {
         
         if passwordManagerCoordinator.isEnabled {
             autofillSelector = #selector(MoreOptionsMenu.openExternalPasswordManager)
-            autofillTitle = "\(UserText.passwordManagementLogins) (Open in \(passwordManagerCoordinator.displayName))"
+            autofillTitle = "\(UserText.passwordManagementLogins) (\(UserText.openIn(value: passwordManagerCoordinator.displayName)))"
         } else {
             autofillSelector = #selector(MoreOptionsMenu.openAutofillWithLogins)
             autofillTitle = UserText.passwordManagementLogins
