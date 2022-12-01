@@ -27,9 +27,7 @@ struct BWCredential {
     var username: String?
     var password: String?
 
-    var domain: String {
-        return credentialName
-    }
+    var domain: String
 
     var url: String? {
         guard !domain.isEmpty else { return nil }
@@ -40,14 +38,14 @@ struct BWCredential {
 
 extension BWCredential {
 
-    init?(from payloadItem: BWResponse.PayloadItem) {
+    init?(from payloadItem: BWResponse.PayloadItem, domain: String) {
         guard let userId = payloadItem.userId,
               let credentialId = payloadItem.credentialId,
               let credentialName = payloadItem.name else {
             assertionFailure("Failed to init BitwardenCredential from PayloadItem")
             return nil
         }
-        self.init(userId: userId, credentialId: credentialId, credentialName: credentialName, username: payloadItem.userName, password: payloadItem.password)
+        self.init(userId: userId, credentialId: credentialId, credentialName: credentialName, username: payloadItem.userName, password: payloadItem.password, domain: domain)
     }
 
 }

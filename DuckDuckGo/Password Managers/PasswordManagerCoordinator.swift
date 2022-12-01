@@ -272,7 +272,8 @@ extension BWCredential {
                   credentialId: websiteCredentials.account.id,
                   credentialName: websiteCredentials.account.domain,
                   username: websiteCredentials.account.username,
-                  password: websiteCredentials.password.utf8String() ?? "")
+                  password: websiteCredentials.password.utf8String() ?? "",
+                  domain: websiteCredentials.account.domain)
     }
 
 }

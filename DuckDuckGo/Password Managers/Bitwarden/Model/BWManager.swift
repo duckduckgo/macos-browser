@@ -352,14 +352,14 @@ final class BWManager: BWManagement, ObservableObject {
     }
 
     private func handleCredentialRetrievalResponse(messageId: MessageId, payload: BWResponse.Payload) {
-        guard let completion = retrieveCredentialsCompletionCache[messageId] else {
+        guard let (domain, completion) = retrieveCredentialsCompletionCache[messageId] else {
             logOrAssertionFailure("BWManager: Missing or already removed completion block")
             return
         }
 
         switch payload {
         case .array(let payloadItemArray):
-            let credentials = payloadItemArray.compactMap { BWCredential(from: $0) }
+            let credentials = payloadItemArray.compactMap { BWCredential(from: $0, domain: domain) }
             retrieveCredentialsCompletionCache[messageId] = nil
             completion(credentials, nil)
         case .item(let payloadItem):
@@ -556,11 +556,12 @@ final class BWManager: BWManagement, ObservableObject {
 
     // MARK: - Cretentials
 
-    var retrieveCredentialsCompletionCache = [MessageId: ([BWCredential], BWError?) -> Void]()
+    // Caches domain and completion handler
+    var retrieveCredentialsCompletionCache = [MessageId: (String, ([BWCredential], BWError?) -> Void)]()
 
     func retrieveCredentials(for url: URL, completion: @escaping ([BWCredential], BWError?) -> Void) {
         let messageId = messageIdGenerator.generateMessageId()
-        retrieveCredentialsCompletionCache[messageId] = completion
+        retrieveCredentialsCompletionCache[messageId] = (url.host ?? "", completion)
         sendCredentialRetrieval(url: url, messageId: messageId)
     }
 
