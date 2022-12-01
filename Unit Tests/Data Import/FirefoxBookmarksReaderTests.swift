@@ -33,6 +33,10 @@ class FirefoxBookmarksReaderTests: XCTestCase {
 
         XCTAssertEqual(bookmarks.topLevelFolders.bookmarkBar.type, "folder")
         XCTAssertEqual(bookmarks.topLevelFolders.otherBookmarks.type, "folder")
+        
+        XCTAssertTrue(bookmarks.topLevelFolders.bookmarkBar.children!.contains(where: { bookmark in
+            bookmark.url?.absoluteString == "https://duckduckgo.com/"
+        }))
     }
 
     private func resourceURL() -> URL {

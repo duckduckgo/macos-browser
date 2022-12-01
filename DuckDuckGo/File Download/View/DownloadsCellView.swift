@@ -252,7 +252,7 @@ extension DownloadsCellView.DownloadError: LocalizedError {
             return UserText.downloadFailedToMoveFileToDownloads
         case .downloadFailed(let error) where error.isCancelled:
             return UserText.downloadCanceled
-        case .downloadFailed(.failedToCompleteDownloadTask(underlyingError: _, resumeData: _)):
+        case .downloadFailed(.failedToCompleteDownloadTask):
             return UserText.downloadFailed
         }
     }
