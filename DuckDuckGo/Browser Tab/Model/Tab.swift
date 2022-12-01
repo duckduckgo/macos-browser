@@ -234,6 +234,11 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     }
 
     deinit {
+        cleanUpBeforeClosing()
+        webView.configuration.userContentController.removeAllUserScripts()
+    }
+
+    func cleanUpBeforeClosing() {
         if content.isUrl, let url = webView.url {
             historyCoordinating.commitChanges(url: url)
         }
@@ -241,7 +246,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         webView.stopMediaCapture()
         webView.stopAllMediaPlayback()
         webView.fullscreenWindowController?.close()
-        webView.configuration.userContentController.removeAllUserScripts()
 
         cbaTimeReporter?.tabWillClose(self.instrumentation.currentTabIdentifier)
     }

@@ -397,7 +397,7 @@ final class NavigationBarViewController: NSViewController {
                     && WindowControllersManager.shared.lastKeyMainWindowController?.window === self.downloadsButton.window
 
                 if shouldShowPopover {
-                    self.popovers.showDownloadsPopoverAndAutoHide(usingView: self.passwordManagementButton,
+                    self.popovers.showDownloadsPopoverAndAutoHide(usingView: self.downloadsButton,
                                                                   popoverDelegate: self,
                                                                   downloadsDelegate: self)
                 }

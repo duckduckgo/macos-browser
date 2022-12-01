@@ -27,6 +27,7 @@ protocol AddressBarTextFieldDelegate: AnyObject {
 
 }
 
+// swiftlint:disable:next type_body_length
 final class AddressBarTextField: NSTextField {
 
     weak var addressBarTextFieldDelegate: AddressBarTextFieldDelegate?
@@ -463,7 +464,7 @@ final class AddressBarTextField: NSTextField {
 
         init?(suggestionViewModel: SuggestionViewModel) {
             switch suggestionViewModel.suggestion {
-            case .phrase(phrase: _):
+            case .phrase:
                 self = Suffix.search
             case .website(url: let url):
                 guard let host = url.root?.toString(decodePunycode: true, dropScheme: true, dropTrailingSlash: true) else {
@@ -483,7 +484,7 @@ final class AddressBarTextField: NSTextField {
                     self = .url(url)
                 }
 
-            case .unknown(value: _):
+            case .unknown:
                 self = Suffix.search
             }
         }
