@@ -23,6 +23,7 @@ import CoreLocation
 import WebKit
 @testable import DuckDuckGo_Privacy_Browser
 
+// swiftlint:disable type_body_length
 final class GeolocationProviderTests: XCTestCase {
 
     let geolocationServiceMock = GeolocationServiceMock()
