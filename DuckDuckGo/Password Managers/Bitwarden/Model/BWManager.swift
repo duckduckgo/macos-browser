@@ -76,7 +76,6 @@ final class BWManager: BWManagement, ObservableObject {
         installationService.openBitwarden()
     }
 
-
     // MARK: - Connection
 
     var isBitwardenPasswordManager: Bool {
@@ -144,11 +143,11 @@ final class BWManager: BWManagement, ObservableObject {
     // and schedules future attempt to connect
     private func scheduleConnectionAttempt() {
         guard connectionAttemptTimer == nil else {
-            //Already scheduled
+            // Already scheduled
             return
         }
 
-        connectionAttemptTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: false) { [weak self] timer in
+        connectionAttemptTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: false) { [weak self] _ in
             self?.connectionAttemptTimer?.invalidate()
             self?.connectionAttemptTimer = nil
 
@@ -170,11 +169,11 @@ final class BWManager: BWManagement, ObservableObject {
     // and schedules future attempt to connect
     private func scheduleStatusRefreshing() {
         guard statusRefreshingTimer == nil else {
-            //Already scheduled
+            // Already scheduled
             return
         }
 
-        statusRefreshingTimer = Timer.scheduledTimer(withTimeInterval: 2, repeats: true) { [weak self] timer in
+        statusRefreshingTimer = Timer.scheduledTimer(withTimeInterval: 2, repeats: true) { [weak self] _ in
             self?.sendStatus()
         }
     }
@@ -227,11 +226,11 @@ final class BWManager: BWManagement, ObservableObject {
     private var verificationTimer: Timer?
 
     private func verifyBitwardenIsResponding() {
-        verificationTimer = Timer.scheduledTimer(withTimeInterval: 5, repeats: false) { [weak self] timer in
+        verificationTimer = Timer.scheduledTimer(withTimeInterval: 5, repeats: false) { [weak self] _ in
             self?.verificationTimer?.invalidate()
             self?.verificationTimer = nil
 
-            if (self?.status == .waitingForStatusResponse) {
+            if self?.status == .waitingForStatusResponse {
                 BWNotRespondingAlert.show()
             }
         }
@@ -282,6 +281,7 @@ final class BWManager: BWManagement, ObservableObject {
         sendStatus()
     }
 
+    // swiftlint:disable cyclomatic_complexity
     private func handleEncryptedResponse(_ encryptedPayload: BWResponse.EncryptedPayload, messageId: MessageId) {
         guard let dataString = encryptedPayload.data,
               let data = Data(base64Encoded: dataString),
@@ -301,7 +301,7 @@ final class BWManager: BWManagement, ObservableObject {
             return
         }
 
-        let decryptedData = encryption.decryptData(data, andIv:ivData)
+        let decryptedData = encryption.decryptData(data, andIv: ivData)
         guard decryptedData.count > 0 else {
             status = .error(error: .decryptionOfDataFailed)
             return
@@ -339,6 +339,7 @@ final class BWManager: BWManagement, ObservableObject {
 
         logOrAssertionFailure("BWManager: Unhandled response")
     }
+    // swiftlint:enable cyclomatic_complexity
 
     private func handleStatusResponse(payloadItemArray: [BWResponse.PayloadItem]) {
         // Find the active vault
@@ -592,7 +593,6 @@ extension BWManager: BWCommunicatorDelegate {
 
         scheduleConnectionAttempt()
     }
-
 
     func bitwardenCommunicator(_ bitwardenCommunicator: BWCommunication, didReceiveMessageData messageData: Data) {
         guard let response = BWResponse(from: messageData) else {

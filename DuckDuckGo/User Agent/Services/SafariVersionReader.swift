@@ -18,7 +18,7 @@
 
 import Foundation
 
-class SafariVersionReader: ApplicationVersionReader {
+final class SafariVersionReader: ApplicationVersionReader {
 
     static let safariPath = "/Applications/Safari.app"
 

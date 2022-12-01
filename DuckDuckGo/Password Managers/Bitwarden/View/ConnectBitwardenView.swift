@@ -371,7 +371,11 @@ struct ActivityIndicator: NSViewRepresentable {
     }
 
     func updateNSView(_ nsView: NSProgressIndicator, context: NSViewRepresentableContext<ActivityIndicator>) {
-        isAnimating ? nsView.startAnimation(nil) : nsView.stopAnimation(nil)
+        if isAnimating {
+            nsView.startAnimation(nil)
+        } else {
+            nsView.stopAnimation(nil)
+        }
     }
     
 }

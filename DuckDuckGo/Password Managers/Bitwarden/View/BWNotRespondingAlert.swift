@@ -18,7 +18,7 @@
 
 import Foundation
 
-class BWNotRespondingAlert: NSAlert {
+final class BWNotRespondingAlert: NSAlert {
 
     static func show() {
         alert = BWNotRespondingAlert()

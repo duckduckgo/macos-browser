@@ -18,7 +18,7 @@
 
 import Foundation
 
-class ApplicationVersionReader {
+internal class ApplicationVersionReader {
 
     static let plistRelativePath = "Contents/Info.plist"
 

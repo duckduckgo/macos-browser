@@ -44,7 +44,7 @@ final class BWResponseTests: XCTestCase {
         XCTAssertEqual(response.messageId, messageId)
         XCTAssertEqual(String(response.version!), version)
         switch response.payload! {
-        case .array(_): XCTFail("Not correct parsing")
+        case .array: XCTFail("Not correct parsing")
         case .item(let payloadItem):
             XCTAssertEqual(payloadItem.status, status)
             XCTAssertEqual(payloadItem.sharedKey, sharedKey)
@@ -81,7 +81,7 @@ final class BWResponseTests: XCTestCase {
         let response = BWResponse(from: data!)!
         XCTAssertEqual(response.command, command)
         switch response.payload! {
-        case .item(_): XCTFail("Not correct parsing")
+        case .item: XCTFail("Not correct parsing")
         case .array(let payloadItemArray):
             XCTAssertEqual(payloadItemArray.count, 1)
             let payloadItem = payloadItemArray.first!
@@ -103,7 +103,7 @@ final class BWResponseTests: XCTestCase {
         let response = BWResponse(from: data!)!
         XCTAssertEqual(response.command, command)
         switch response.payload! {
-        case .item(_): XCTFail("Not correct parsing")
+        case .item: XCTFail("Not correct parsing")
         case .array(let payloadItemArray):
             XCTAssertEqual(payloadItemArray.count, 1)
             let payloadItem = payloadItemArray.first!
@@ -122,7 +122,7 @@ final class BWResponseTests: XCTestCase {
         let response = BWResponse(from: data!)!
         XCTAssertEqual(response.command, command)
         switch response.payload! {
-        case .array(_): XCTFail("Not correct parsing")
+        case .array: XCTFail("Not correct parsing")
         case .item(let payloadItem):
             XCTAssertEqual(payloadItem.status, status)
         }
@@ -135,7 +135,7 @@ final class BWResponseTests: XCTestCase {
         let response = BWResponse(from: data!)!
         XCTAssertEqual(response.command, command)
         switch response.payload! {
-        case .array(_): XCTFail("Not correct parsing")
+        case .array: XCTFail("Not correct parsing")
         case .item(let payloadItem):
             XCTAssertEqual(payloadItem.status, status)
         }

@@ -21,7 +21,7 @@ import XCTest
 import BrowserServicesKit
 @testable import DuckDuckGo_Privacy_Browser
 
-class PasswordManagerCoordinatingMock: PasswordManagerCoordinating {
+final class PasswordManagerCoordinatingMock: PasswordManagerCoordinating {
 
     var isEnabled: Bool = false
     var isLocked: Bool = false

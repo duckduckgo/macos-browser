@@ -18,7 +18,7 @@
 
 import Foundation
 
-class BWMessageIdGenerator {
+final class BWMessageIdGenerator {
 
     private(set) var cache = Set<String>()
 

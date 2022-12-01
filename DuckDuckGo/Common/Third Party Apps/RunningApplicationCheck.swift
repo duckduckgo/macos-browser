@@ -18,7 +18,7 @@
 
 import Foundation
 
-class RunningApplicationCheck {
+final class RunningApplicationCheck {
 
     static func isApplicationRunning(bundleId: String) -> Bool {
         let runningApplication = NSWorkspace.shared.runningApplications.first { runningApplication in

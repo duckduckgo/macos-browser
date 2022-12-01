@@ -55,7 +55,7 @@ final class LocalBitwardenInstallationService: BWInstallationService {
         return applicationSupport.appendingPathComponent("NativeMessagingHosts/com.8bit.bitwarden.json").path
     }()
 
-    private lazy var sandboxDataFileUrl : URL = {
+    private lazy var sandboxDataFileUrl: URL = {
         let libraryURL = FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask).first!
         let bitwardenPathComponent = "Containers/com.bitwarden.desktop/Data/Library/Application Support/Bitwarden/data.json"
         return libraryURL.appendingPathComponent(bitwardenPathComponent)

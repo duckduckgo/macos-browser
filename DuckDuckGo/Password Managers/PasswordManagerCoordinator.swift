@@ -28,7 +28,7 @@ protocol PasswordManagerCoordinating: BrowserServicesKit.PasswordManager {
 }
 
 // Encapsulation of third party password managers
-class PasswordManagerCoordinator: PasswordManagerCoordinating {
+final class PasswordManagerCoordinator: PasswordManagerCoordinating {
 
     static let shared = PasswordManagerCoordinator()
 
@@ -187,7 +187,8 @@ class PasswordManagerCoordinator: PasswordManagerCoordinating {
         }
     }
 
-    func storeWebsiteCredentials(_ credentials: SecureVaultModels.WebsiteCredentials, completion: @escaping (Error?) -> Void)  {
+    func storeWebsiteCredentials(_ credentials: SecureVaultModels.WebsiteCredentials,
+                                 completion: @escaping (Error?) -> Void) {
         guard case let .connected(vault) = bitwardenManagement.status,
               let bitwardenCredential = BWCredential(from: credentials, vault: vault) else {
             assertionFailure("Bitwarden is not connected or bad credential")

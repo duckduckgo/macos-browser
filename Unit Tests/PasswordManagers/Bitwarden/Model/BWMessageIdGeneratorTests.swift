@@ -45,5 +45,4 @@ final class BWMessageGeneratorTests: XCTestCase {
         XCTAssertFalse(verificationResult)
     }
 
-
 }

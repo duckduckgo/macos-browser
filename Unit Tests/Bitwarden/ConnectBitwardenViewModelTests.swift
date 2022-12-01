@@ -173,6 +173,5 @@ class MockBitwardenManager: BWManagement {
     func update(credential: BWCredential, completion: @escaping (BWError?) -> Void) {
         // no-op
     }
-    
-    
+
 }

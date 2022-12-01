@@ -22,7 +22,7 @@ import os.log
 protocol BWCommunicatorDelegate: AnyObject {
 
     func bitwardenCommunicator(_ bitwardenCommunicator: BWCommunication,
-                              didReceiveMessageData messageData: Data)
+                               didReceiveMessageData messageData: Data)
     func bitwardenCommunicatorProcessDidTerminate(_ bitwardenCommunicator: BWCommunication)
 
 }

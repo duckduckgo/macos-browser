@@ -26,7 +26,7 @@ protocol BWKeyStoring {
 
 }
 
-class BWKeyStorage: BWKeyStoring {
+final class BWKeyStorage: BWKeyStoring {
 
     enum BitwardenKeyStorageError: Error {
         case failedToSaveKey(status: OSStatus)
@@ -35,7 +35,6 @@ class BWKeyStorage: BWKeyStoring {
         case failedToRetrieveKey(status: OSStatus)
         case failedToCleanKey(status: OSStatus)
     }
-
 
     private static let keychainKey = "\(Bundle.main.bundleIdentifier ?? "").bitwarden.shared.key"
 

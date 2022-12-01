@@ -615,7 +615,7 @@ final class PasswordManagementViewController: NSViewController {
         self.postChange()
     }
 
-    var externalPasswordManagerSelectionCancellable: AnyCancellable?
+    var passwordManagerSelectionCancellable: AnyCancellable?
     
     // swiftlint:disable function_body_length
     private func createListView() {
@@ -678,7 +678,7 @@ final class PasswordManagementViewController: NSViewController {
         self.listModel = listModel
         self.listView = NSHostingView(rootView: PasswordManagementItemListView().environmentObject(listModel))
         
-        externalPasswordManagerSelectionCancellable = listModel.$externalPasswordManagerSelected
+        passwordManagerSelectionCancellable = listModel.$externalPasswordManagerSelected
             .receive(on: DispatchQueue.main)
             .removeDuplicates()
             .sink { [weak self] value in
