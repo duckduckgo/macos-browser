@@ -170,6 +170,7 @@ final class HistoryStore: HistoryStoring {
                 do {
                     fetchedObjects = try self.context.fetch(fetchRequest)
                 } catch {
+                    Pixel.fire(.debug(event: .historySaveFailed, error: error))
                     promise(.failure(error))
                     return
                 }
