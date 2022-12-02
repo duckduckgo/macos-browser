@@ -65,7 +65,9 @@ final class ContentBlocking {
                                                             logger: OSLog.contentBlocking)
         userContentUpdating = UserContentUpdating(contentBlockerRulesManager: contentBlockingManager,
                                                   privacyConfigurationManager: privacyConfigurationManager,
-                                                  configStorage: configStorage)
+                                                  trackerDataManager: trackerDataManager,
+                                                  configStorage: configStorage,
+                                                  tld: tld)
         
         adClickAttributionRulesProvider = AdClickAttributionRulesProvider(config: adClickAttribution,
                                                                           compiledRulesSource: contentBlockingManager,

@@ -30,7 +30,14 @@ protocol PrintOperationUI {
 
 extension NSApplication: PrintOperationUI {}
 
-final class TabPrintExtension: NSObject, TabExtension {
+protocol UIProvider {
+    var printOperationUI: PrintOperationUI { get }
+}
+protocol PrintingUserScriptPublisherProvider {
+    var printingUserScriptPublisher: AnyPublisher<PrintingUserScript?, Never> { get }
+}
+
+final class TabPrintExtension: NSObject {
 
     private var contentBlockingAssetsCancellable: AnyCancellable?
     private var userScriptsCancellable: AnyCancellable?
@@ -40,15 +47,16 @@ final class TabPrintExtension: NSObject, TabExtension {
     private var modalWindow: NSWindow?
     private var activePrintOperation: NSPrintOperation?
 
-    static var ui: PrintOperationUI = NSApp
-    
-    override init() {
-        super.init()
-    }
+    typealias Dependencies = UIProvider & PrintingUserScriptPublisherProvider
 
-    func attach(to tab: Tab) {
-        userScriptsCancellable = tab.userScriptsPublisher.sink { [weak self] userScripts in
-            userScripts?.printingUserScript.delegate = self
+    let ui: PrintOperationUI
+
+    init(dependencies: some Dependencies) {
+        self.ui = dependencies.printOperationUI
+        super.init()
+
+        userScriptsCancellable = dependencies.printingUserScriptPublisher.sink { [weak self] printingUserScript in
+            printingUserScript?.delegate = self
         }
     }
 
@@ -70,7 +78,7 @@ final class TabPrintExtension: NSObject, TabExtension {
                                 delegate: self,
                                 didRun: #selector(printOperationDidRun(printOperation:success:contextInfo:)),
                                 contextInfo: nil)
-        Self.ui.runModal(for: window)
+        ui.runModal(for: window)
     }
 
     @objc func printOperationDidRun(printOperation: NSPrintOperation,
@@ -78,8 +86,8 @@ final class TabPrintExtension: NSObject, TabExtension {
                                     contextInfo: UnsafeMutableRawPointer?) {
         activePrintOperation = nil
 
-        if Self.ui.modalWindow === self.modalWindow {
-            Self.ui.stopModal()
+        if ui.modalWindow === self.modalWindow {
+            ui.stopModal()
             self.modalWindow = nil
         }
     }
@@ -87,17 +95,38 @@ final class TabPrintExtension: NSObject, TabExtension {
 }
 
 extension TabPrintExtension: PrintingUserScriptDelegate {
-
     func printingUserScript(_ script: PrintingUserScript, didRequestPrintControllerFor webView: WKWebView) {
         self.print(using: webView)
     }
-
 }
 
 extension Tab {
-
     func print() {
         extensions.printing?.print(using: webView)
     }
+}
 
+extension TabPrintExtension: TabExtension {
+    final class ResolvingHelper: TabExtensionResolvingHelper {
+        static func make(owner: Tab) -> TabPrintExtension {
+            TabPrintExtension(dependencies: owner)
+        }
+    }
+}
+
+extension TabExtensions {
+    var printing: TabPrintExtension? {
+        resolve() 
+    }
+}
+
+extension Tab: PrintingUserScriptPublisherProvider {
+    var printingUserScriptPublisher: AnyPublisher<PrintingUserScript?, Never> {
+        userScriptsPublisher.compactMap { $0?.printingUserScript }.eraseToAnyPublisher()
+    }
+}
+extension Tab: UIProvider {
+    var printOperationUI: PrintOperationUI {
+        NSApplication.shared
+    }
 }

@@ -18,62 +18,85 @@
 
 import Foundation
 
-protocol TabExtension {
-    init()
-    func attach(to tab: Tab)
+@objc protocol ObjcExtensionResolvingHelper: AnyObject {
+}
+protocol ExtensionResolvingHelper: ObjcExtensionResolvingHelper {
+    associatedtype OwnerType: Extendable
+    associatedtype ExtensionType: Extension
 
+    static func make(owner: OwnerType) -> ExtensionType
+}
+
+protocol Extension {
+}
+
+protocol TabExtension: Extension { associatedtype ResolvingHelper: TabExtensionResolvingHelper }
+protocol TabExtensionResolvingHelper: ExtensionResolvingHelper where OwnerType == Tab, ExtensionType: TabExtension {}
+
+extension ExtensionResolvingHelper {
+    static var ownerType: OwnerType.Type { OwnerType.self }
+}
+
+protocol Extendable {}
+extension Tab: Extendable {}
+
+protocol NSCodingExtension: Extension {
     func encode(using coder: NSCoder)
     func awakeAfter(using decoder: NSCoder)
 }
-extension TabExtension {
+extension Extension {
     func encode(using coder: NSCoder) {}
     func awakeAfter(using coder: NSCoder) {}
 }
 
 struct TabExtensions {
+    typealias Dependencies = AdClickAttributionTabExtension.Dependencies
 
-    let adClickAttribution: AdClickAttributionTabExtension?
-    let contextMenu: ContextMenuManager?
-    let hoveredLinks: HoveredLinkTabExtension?
-    let printing: TabPrintExtension?
-    let findInPage: FindInPageTabExtension?
-    let autofill: AutofillTabExtension?
+    // TODO: Finish converting these and Autofill to TabExtension
+    var hoveredLinks: HoveredLinkTabExtension?
+    var findInPage: FindInPageTabExtension?
 
-    static var createExtensions: () -> TabExtensions = {
-        TabExtensions(adClickAttribution: AdClickAttributionTabExtension(),
-                      contextMenu: ContextMenuManager(),
-                      hoveredLinks: HoveredLinkTabExtension(),
-                      printing: TabPrintExtension(),
-                      findInPage: FindInPageTabExtension(),
-                      autofill: AutofillTabExtension())
+    private static var initExtensionsOnce: [AnyKeyPath: [any ExtensionResolvingHelper.Type]] = {
+        let resolvingHelpers = getClasses(conformingTo: ObjcExtensionResolvingHelper.self)
+        print(resolvingHelpers)
+        var result = [AnyKeyPath: [any ExtensionResolvingHelper.Type]]()
+        for helperType in resolvingHelpers {
+            let resolverType = (helperType as? any ExtensionResolvingHelper.Type)!
+            func add<T: ExtensionResolvingHelper>(_: T.Type) {
+                result[\(T.OwnerType).self, default: []].append(resolverType)
+            }
+            add(resolverType)
+        }
+        return result
+    }()
+
+    fileprivate var extensions: [AnyKeyPath: any TabExtension]
+
+    init(_ tab: Tab) {
+        let extTypes = Self.initExtensionsOnce[\Tab.self]!.map { $0 as! any TabExtensionResolvingHelper.Type }
+        var extensions = [AnyKeyPath: any TabExtension]()
+        func add<T: TabExtensionResolvingHelper>(_ type: T.Type) {
+            assert(extensions[\T.ExtensionType.self] == nil)
+            extensions[\T.ExtensionType.self] = type.make(owner: tab)
+        }
+        extTypes.forEach { add($0) }
+        self.extensions = extensions
     }
 
-    private static func extensionsForTests() -> TabExtensions {
-        TabExtensions(adClickAttribution: nil,
-                      contextMenu: nil,
-                      hoveredLinks: nil,
-                      printing: nil,
-                      findInPage: nil,
-                      autofill: nil)
+    func resolve<T: TabExtension>() -> T {
+        resolve()!
     }
-
-    func attach(to tab: Tab) {
-        self.forEach { $0.attach(to: tab) }
+    func resolve<T: TabExtension>() -> T? {
+        extensions[\T.self] as? T
     }
 
 }
 
 extension TabExtensions: Sequence {
-    typealias Iterator = IndexingIterator<[TabExtension]>
+    typealias Iterator = Dictionary<AnyKeyPath, any TabExtension>.Values.Iterator
 
     func makeIterator() -> Iterator {
-        Mirror(reflecting: self).children.compactMap { child -> TabExtension? in
-            guard let tabExtension = child.value as? TabExtension else {
-                assertionFailure("\(child.label!) should conform to TabExtension")
-                return nil
-            }
-            return tabExtension
-        }.makeIterator()
+        self.extensions.values.makeIterator()
     }
 
 }

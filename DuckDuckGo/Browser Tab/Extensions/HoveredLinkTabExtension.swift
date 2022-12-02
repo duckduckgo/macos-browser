@@ -19,7 +19,7 @@
 import Combine
 import Foundation
 
-final class HoveredLinkTabExtension: TabExtension {
+final class HoveredLinkTabExtension {
 
     private var userScriptsCancellable: AnyCancellable?
     fileprivate var hoveredLinkSubject = PassthroughSubject<URL?, Never>()

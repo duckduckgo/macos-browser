@@ -63,7 +63,7 @@ extension Tab: NSSecureCoding {
                   currentDownload: currentDownload)
 
         for tabExtension in self.extensions {
-            tabExtension.awakeAfter(using: decoder)
+            (tabExtension as? (any NSCodingExtension))?.awakeAfter(using: decoder)
         }
     }
 
@@ -94,7 +94,7 @@ extension Tab: NSSecureCoding {
         }
 
         for tabExtension in self.extensions {
-            tabExtension.encode(using: coder)
+            (tabExtension as? (any NSCodingExtension))?.encode(using: coder)
         }
     }
 

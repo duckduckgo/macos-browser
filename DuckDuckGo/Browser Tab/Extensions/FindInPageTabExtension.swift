@@ -19,7 +19,7 @@
 import Combine
 import Foundation
 
-final class FindInPageTabExtension: TabExtension {
+final class FindInPageTabExtension {
 
     private weak var tab: Tab?
     private var findInPageCancellable: AnyCancellable?

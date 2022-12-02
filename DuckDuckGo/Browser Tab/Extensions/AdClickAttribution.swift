@@ -22,11 +22,34 @@ import Common
 import ContentBlocking
 import Foundation
 import BrowserServicesKit
+import PrivacyDashboard
 
-final class AdClickAttributionTabExtension: TabExtension {
+protocol ContentBlockingAssetsPublisherProvider {
+    var contentBlockingAssetsPublisher: AnyPublisher<UserContentController.ContentBlockingAssets?, Never> { get }
+}
+protocol PrivacyConfigurationManagerProvider {
+    var privacyConfigurationManager: PrivacyConfigurationManaging { get }
+}
+protocol AdClickAttributionStateProvider {
+    var inheritedAttribution: AdClickAttributionLogic.State? { get }
+}
+protocol PrivacyInfoPublisherProvider {
+    var privacyInfoPublisher: AnyPublisher<PrivacyInfo?, Never> { get }
+}
+protocol UserContentControllerProtocol {
+    func enableGlobalContentRuleList(withIdentifier identifier: String) throws
+    func disableGlobalContentRuleList(withIdentifier identifier: String) throws
+    func removeLocalContentRuleList(withIdentifier identifier: String)
+    func installLocalContentRuleList(_ ruleList: WKContentRuleList, identifier: String)
+}
+protocol UserContentControllerProvider {
+    var anyUserContentController: UserContentControllerProtocol { get }
+}
+protocol ContentBlockerRulesPublisherProvider {
+    var contentBlockerRulesScriptPublisher: AnyPublisher<ContentBlockerRulesUserScript?, Never> { get }
+}
 
-    private weak var tab: Tab?
-    private var cancellables = Set<AnyCancellable>()
+final class AdClickAttributionTabExtension {
 
     private static func makeAdClickAttributionFeature(with privacyConfigurationManager: PrivacyConfigurationManaging) -> AdClickAttributionFeature {
         AdClickAttributionFeature(with: privacyConfigurationManager)
@@ -74,43 +97,53 @@ final class AdClickAttributionTabExtension: TabExtension {
     private(set) var detection: AdClickAttributionDetection!
     private(set) var logic: AdClickAttributionLogic!
 
+    typealias Dependencies = ContentBlockingAssetsPublisherProvider
+        & PrivacyConfigurationManagerProvider
+        & AdClickAttributionStateProvider
+        & PrivacyInfoPublisherProvider
+        & ContentBlockerRulesPublisherProvider
+        & UserContentControllerProvider
+    private var dependencies: Dependencies!
+    private weak var contentBlockerRulesScript: ContentBlockerRulesUserScript?
+
+    private var cancellables = Set<AnyCancellable>()
+
     static var currentRules: () -> [ContentBlockerRulesManager.Rules] = { ContentBlocking.shared.contentBlockingManager.currentRules }
 
     private var state: AdClickAttributionLogic.State? {
         logic.state
     }
 
-    init() {}
-
     public var currentAttributionState: AdClickAttributionLogic.State? {
         logic.state
     }
 
-    func attach(to tab: Tab) {
-        self.tab = tab
+    init(provider: some Dependencies) {
+        self.dependencies = provider
 
-        let adClickAttributionFeature = Self.makeAdClickAttributionFeature(with: tab.privacyConfigurationManager)
+        let adClickAttributionFeature = Self.makeAdClickAttributionFeature(with: dependencies.privacyConfigurationManager)
         self.detection = Self.makeAdClickAttributionDetection(featureConfig: adClickAttributionFeature)
         self.logic = Self.makeAdClickAttributionLogic(featureConfig: adClickAttributionFeature)
 
         logic.delegate = self
         detection.delegate = logic
 
-        if let state = tab.parentTab?.extensions.adClickAttribution?.state {
+        if let state = dependencies.inheritedAttribution {
             logic.applyInheritedAttribution(state: state)
         }
 
-        tab.userContentController.$contentBlockingAssets
+        dependencies.contentBlockerRulesScriptPublisher
             .compactMap { $0 }
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
+            .sink { [weak self] contentBlockerRulesScript in
+                self?.contentBlockerRulesScript = contentBlockerRulesScript
                 self?.logic.onRulesChanged(latestRules: Self.currentRules())
             }
             .store(in: &cancellables)
 
-        tab.$privacyInfo.compactMap { $0?.$trackerInfo }
+        dependencies.privacyInfoPublisher.compactMap { $0?.$trackerInfo }
             .switchToLatest()
-            .scan((old: Set<DetectedRequest>(), new: tab.privacyInfo?.trackerInfo.trackers ?? [])) {
+            .scan( (old: Set<DetectedRequest>(), new: Set<DetectedRequest>()) ) {
                 ($0.new, $1.trackers)
             }
             .sink { [weak self] (old, new) in
@@ -128,14 +161,11 @@ extension AdClickAttributionTabExtension: AdClickAttributionLogicDelegate {
     func attributionLogic(_ logic: AdClickAttributionLogic,
                           didRequestRuleApplication rules: ContentBlockerRulesManager.Rules?,
                           forVendor vendor: String?) {
-        guard let userContentController = tab?.userContentController,
-              let userScripts = userContentController.contentBlockingAssets?.userScripts as? UserScripts
-        else {
+        guard let userContentController = dependencies?.anyUserContentController, let contentBlockerRulesScript else {
             assertionFailure("UserScripts not loaded")
             return
         }
 
-        let contentBlockerRulesScript = userScripts.contentBlockerRulesScript
         let attributedTempListName = AdClickAttributionRulesProvider.Constants.attributedTempRuleListName
 
         guard ContentBlocking.shared.privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .contentBlocking)
@@ -166,4 +196,45 @@ extension AdClickAttributionTabExtension: AdClickAttributionLogicDelegate {
         }
     }
 
+}
+
+extension AdClickAttributionTabExtension: TabExtension {
+    final class ResolvingHelper: TabExtensionResolvingHelper {
+        static func make(owner: Tab) -> AdClickAttributionTabExtension {
+            // TODO: make it WEAK
+            AdClickAttributionTabExtension(provider: owner)
+        }
+    }
+}
+
+extension TabExtensions {
+    var adClickAttribution: AdClickAttributionTabExtension? {
+        resolve()
+    }
+}
+
+extension Tab: ContentBlockingAssetsPublisherProvider {
+    var contentBlockingAssetsPublisher: AnyPublisher<BrowserServicesKit.UserContentController.ContentBlockingAssets?, Never> {
+        userContentController.$contentBlockingAssets.eraseToAnyPublisher()
+    }
+}
+extension Tab: AdClickAttributionStateProvider {
+    var inheritedAttribution: AdClickAttributionLogic.State? {
+        self.parentTab?.extensions.adClickAttribution?.currentAttributionState
+    }
+}
+extension Tab: PrivacyConfigurationManagerProvider {}
+extension Tab: PrivacyInfoPublisherProvider {
+    var privacyInfoPublisher: AnyPublisher<PrivacyInfo?, Never> {
+        $privacyInfo.eraseToAnyPublisher()
+    }
+}
+extension Tab: UserContentControllerProvider {
+    var anyUserContentController: UserContentControllerProtocol { userContentController }
+}
+extension UserContentController: UserContentControllerProtocol {}
+extension Tab: ContentBlockerRulesPublisherProvider {
+    var contentBlockerRulesScriptPublisher: AnyPublisher<BrowserServicesKit.ContentBlockerRulesUserScript?, Never> {
+        userScriptsPublisher.compactMap { $0?.contentBlockerRulesScript }.eraseToAnyPublisher()
+    }
 }

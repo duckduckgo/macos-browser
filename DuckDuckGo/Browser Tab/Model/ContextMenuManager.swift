@@ -32,7 +32,11 @@ enum NewWindowPolicy {
     case cancel
 }
 
-final class ContextMenuManager: NSObject, TabExtension {
+protocol ContextMenuUserScriptPublisherProvider {
+    var contextMenuScriptPublisher: AnyPublisher<ContextMenuUserScript?, Never> { get }
+}
+
+final class ContextMenuManager: NSObject {
 
     private var userScriptsCancellable: AnyCancellable?
     weak var delegate: ContextMenuManagerDelegate?
@@ -42,14 +46,14 @@ final class ContextMenuManager: NSObject, TabExtension {
     private var originalItems: [WKMenuItemIdentifier: NSMenuItem]?
     private var selectedText: String?
 
-    override init() {
-        super.init()
-    }
+    typealias Dependencies = ContextMenuUserScriptPublisherProvider & ContextMenuManagerDelegate
 
-    func attach(to tab: Tab) {
-        self.delegate = tab
-        userScriptsCancellable = tab.userScriptsPublisher.sink { [weak self] userScripts in
-            userScripts?.contextMenuScript.delegate = self
+    init(provider: some Dependencies) {
+        super.init()
+
+        self.delegate = provider
+        userScriptsCancellable = provider.contextMenuScriptPublisher.sink { [weak self] contextMenuScript in
+            contextMenuScript?.delegate = self
         }
     }
 
@@ -453,4 +457,24 @@ extension Tab: ContextMenuManagerDelegate {
             .setDownloadDelegateIfNeeded(using: LegacyWebKitDownloadDelegate.init)
     }
 
+}
+
+extension ContextMenuManager: TabExtension {
+    class ResolvingHelper: TabExtensionResolvingHelper {
+        static func make(owner: Tab) -> ContextMenuManager {
+            ContextMenuManager(provider: owner)
+        }
+    }
+}
+
+extension TabExtensions {
+    var contextMenu: ContextMenuManager? {
+        resolve()
+    }
+}
+
+extension Tab: ContextMenuUserScriptPublisherProvider {
+    var contextMenuScriptPublisher: AnyPublisher<ContextMenuUserScript?, Never> {
+        userScriptsPublisher.compactMap { $0?.contextMenuScript }.eraseToAnyPublisher()
+    }
 }

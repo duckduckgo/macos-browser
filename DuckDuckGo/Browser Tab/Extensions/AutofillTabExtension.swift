@@ -20,7 +20,16 @@ import BrowserServicesKit
 import Combine
 import Foundation
 
-final class AutofillTabExtension: TabExtension {
+protocol AutofillUserScriptPublisherProvider {
+    var autofillUserScriptPublisher: AnyPublisher<WebsiteAutofillUserScript?, Never> { get }
+}
+protocol ClicksPublisherProvider {
+    var clicksPublisher: AnyPublisher<NSPoint, Never> { get }
+}
+protocol ContentOverlayUserScriptDelegateProvider {
+    var contentOverlayUserScriptDelegate: ContentOverlayUserScriptDelegate? { get }
+}
+final class AutofillTabExtension {
 
     static var emailManagerProvider: (EmailManagerRequestDelegate) -> AutofillEmailDelegate = { delegate in
         let emailManager = EmailManager()
@@ -34,7 +43,7 @@ final class AutofillTabExtension: TabExtension {
         return manager
     }
 
-    private weak var tab: Tab?
+    private weak var delegate: ContentOverlayUserScriptDelegate?
     private var cancellables = Set<AnyCancellable>()
 
     private weak var autofillScript: WebsiteAutofillUserScript?
@@ -43,23 +52,25 @@ final class AutofillTabExtension: TabExtension {
 
     @Published var autofillDataToSave: AutofillData?
 
-    func attach(to tab: Tab) {
-        self.tab = tab
-        
-        tab.userScriptsPublisher.sink { [weak self] userScripts in
-            guard let self = self,
-                  let autofillScript = userScripts?.autofillScript
-            else { return }
+    typealias Dependencies = AutofillUserScriptPublisherProvider
+        & ClicksPublisherProvider
+        & ContentOverlayUserScriptDelegateProvider
+
+    func attach(to provider: some Dependencies) {
+        delegate = provider.contentOverlayUserScriptDelegate
+
+        provider.autofillUserScriptPublisher.sink { [weak self] autofillScript in
+            guard let self, let autofillScript else { return }
 
             self.autofillScript = autofillScript
-            autofillScript.currentOverlayTab = self.tab?.delegate
+            autofillScript.currentOverlayTab = self.delegate
             self.emailManager = Self.emailManagerProvider(self)
             autofillScript.emailDelegate = self.emailManager
             self.vaultManager = Self.vaultManagerProvider(self)
             autofillScript.vaultDelegate = self.vaultManager
         }.store(in: &cancellables)
 
-        tab.clicksPublisher.sink { [weak self] point in
+        provider.clicksPublisher.sink { [weak self] point in
             self?.autofillScript?.clickPoint = point
         }.store(in: &cancellables)
     }
@@ -116,6 +127,10 @@ extension AutofillType {
 
 extension AutofillTabExtension: EmailManagerRequestDelegate { }
 
+extension TabExtensions {
+    var autofill: AutofillTabExtension? { nil }// TabExtensionResolver.resolve() }
+}
+
 extension Tab {
 
     var autofillDataToSavePublisher: AnyPublisher<AutofillData?, Never> {
@@ -126,4 +141,17 @@ extension Tab {
         extensions.autofill?.autofillDataToSave = nil
     }
 
+}
+
+extension Tab: ClicksPublisherProvider {
+}
+extension Tab: AutofillUserScriptPublisherProvider {
+    var autofillUserScriptPublisher: AnyPublisher<WebsiteAutofillUserScript?, Never> {
+        userScriptsPublisher.compactMap { $0?.autofillScript }.eraseToAnyPublisher()
+    }
+}
+extension Tab: ContentOverlayUserScriptDelegateProvider {
+    var contentOverlayUserScriptDelegate: ContentOverlayUserScriptDelegate? {
+        self.delegate
+    }
 }
