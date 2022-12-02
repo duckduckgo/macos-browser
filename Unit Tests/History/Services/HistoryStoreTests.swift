@@ -280,6 +280,46 @@ final class HistoryStoreTests: XCTestCase {
         
         waitForExpectations(timeout: 2, handler: nil)
     }
+    
+    func testWhenRemoveEntriesIsCalled_ThenFollowingSaveShouldSucceed() {
+        let context = database.makeContext(concurrencyType: .mainQueueConcurrencyType)
+        let historyStore = HistoryStore(context: context)
+        
+        let oldVisitDate = Date(timeIntervalSince1970: 0)
+        let newVisitDate = Date(timeIntervalSince1970: 12345)
+        
+        let oldVisit = Visit(date: oldVisitDate)
+        let newVisit = Visit(date: newVisitDate)
+
+        let firstSavingExpectation = self.expectation(description: "Saving")
+        let historyEntry = saveNewHistoryEntry(including: [oldVisit, newVisit],
+                                               lastVisit: newVisitDate,
+                                               historyStore: historyStore,
+                                               expectation: firstSavingExpectation)
+        
+        let loadingExpectation = self.expectation(description: "Loading")
+        historyStore.removeEntries([historyEntry])
+            .receive(on: DispatchQueue.main)
+            .sink { completion in
+                switch completion {
+                case .finished:
+                    loadingExpectation.fulfill()
+                case .failure(let error):
+                    XCTFail("Loading of history failed - \(error.localizedDescription)")
+                }
+            } receiveValue: { _ in }
+            .store(in: &cancellables)
+
+        waitForExpectations(timeout: 2, handler: nil)
+        
+        let secondSavingExpectation = self.expectation(description: "Saving")
+        saveNewHistoryEntry(including: [oldVisit, newVisit],
+                            lastVisit: newVisitDate,
+                            historyStore: historyStore,
+                            expectation: secondSavingExpectation)
+        
+        waitForExpectations(timeout: 2, handler: nil)
+    }
 }
 
 fileprivate extension HistoryEntry {
