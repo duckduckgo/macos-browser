@@ -16,9 +16,7 @@
 //  limitations under the License.
 //
 
-import Foundation
 import WebKit
-import BrowserServicesKit
 import UserScript
 
 protocol FaviconUserScriptDelegate: AnyObject {

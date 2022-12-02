@@ -24,10 +24,19 @@ final class PinnedTabsViewModel: ObservableObject {
 
     @Published var items: [Tab] = [] {
         didSet {
-            if oldValue != items && Set(oldValue) == Set(items) {
-                tabsDidReorderSubject.send(items)
-                if let selectedItem = selectedItem {
-                    selectedItemIndex = items.firstIndex(of: selectedItem)
+            if oldValue != items {
+                if let selectedItem = selectedItem, !items.contains(selectedItem) {
+                    self.selectedItem = nil
+                }
+                if let hoveredItem = hoveredItem, !items.contains(hoveredItem) {
+                    self.hoveredItem = nil
+                }
+
+                if Set(oldValue) == Set(items) {
+                    tabsDidReorderSubject.send(items)
+                    if let selectedItem = selectedItem {
+                        selectedItemIndex = items.firstIndex(of: selectedItem)
+                    }
                 }
             }
         }
