@@ -26,10 +26,11 @@ final class HistoryStoreTests: XCTestCase {
     private var cancellables = Set<AnyCancellable>()
     
     private var database: CoreDataDatabase!
+    private var location: URL!
     
     override func setUp() {
         let model = CoreDataDatabase.loadModel(from: .main, named: "History")!
-        let location = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        location = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         database = CoreDataDatabase(name: className, containerLocation: location, model: model)
         database.loadStore { _, error in
             if let e = error {
@@ -40,10 +41,7 @@ final class HistoryStoreTests: XCTestCase {
     
     override func tearDownWithError() throws {
         try super.tearDownWithError()
-        let context = database.makeContext(concurrencyType: .mainQueueConcurrencyType)
-        context.deleteAll(entityDescriptions: [HistoryEntryManagedObject.entity(),
-                                               VisitManagedObject.entity()])
-        try context.save()
+        try FileManager.default.removeItem(at: location)
         database = nil
     }
     
