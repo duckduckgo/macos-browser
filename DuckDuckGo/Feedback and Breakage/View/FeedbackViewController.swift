@@ -299,15 +299,15 @@ final class FeedbackViewController: NSViewController {
         switch selectedFormOption {
         case .feedback: assertionFailure("Wrong method executed")
         case .websiteBreakage:
-            let blockedTrackerDomains = currentTab?.trackerInfo?.trackersBlocked.compactMap { $0.domain } ?? []
-            let installedSurrogates = currentTab?.trackerInfo?.installedSurrogates.map {$0} ?? []
+            let blockedTrackerDomains = currentTab?.privacyInfo?.trackerInfo.trackersBlocked.compactMap { $0.domain } ?? []
+            let installedSurrogates = currentTab?.privacyInfo?.trackerInfo.installedSurrogates.map {$0} ?? []
             let ampURL = currentTab?.linkProtection.lastAMPURLString ?? ""
             let urlParametersRemoved = currentTab?.linkProtection.urlParametersRemoved ?? false
             let websiteBreakage = WebsiteBreakage(category: selectedWebsiteBreakageCategory,
                                                   description: browserFeedbackTextView.string,
                                                   siteUrlString: urlTextField.stringValue,
                                                   osVersion: "\(ProcessInfo.processInfo.operatingSystemVersion)",
-                                                  upgradedHttps: currentTab?.connectionUpgradedTo != nil,
+                                                  upgradedHttps: currentTab?.privacyInfo?.connectionUpgradedTo != nil,
                                                   tdsETag: ContentBlocking.shared.contentBlockingManager.currentRules.first?.etag,
                                                   blockedTrackerDomains: blockedTrackerDomains,
                                                   installedSurrogates: installedSurrogates,
@@ -364,7 +364,7 @@ extension FeedbackViewController: NSTextViewDelegate {
 
 }
 
-private extension URL {
+extension URL {
 
     func trimmingQueryItemsAndFragment() -> URL? {
         var components = URLComponents(url: self, resolvingAgainstBaseURL: true)

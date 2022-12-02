@@ -159,6 +159,8 @@ final class AddressBarButtonsViewController: NSViewController {
     private var permissionsCancellables = Set<AnyCancellable>()
     private var trackerAnimationTriggerCancellable: AnyCancellable?
     private var isMouseOverAnimationVisibleCancellable: AnyCancellable?
+    private var privacyInfoCancellable: AnyCancellable?
+    
     private lazy var buttonsBadgeAnimator = NavigationBarBadgeAnimator()
     
     required init?(coder: NSCoder) {
@@ -329,13 +331,23 @@ final class AddressBarButtonsViewController: NSViewController {
             privacyDashboardPopover.close()
             return
         }
-        privacyDashboardPopover.viewController.tabViewModel = selectedTabViewModel
+        
+        privacyDashboardPopover.viewController.updateTabViewModel(selectedTabViewModel)
         
         let positioningViewInWindow = privacyDashboardPositioningView.convert(privacyDashboardPositioningView.bounds, to: view.window?.contentView)
         privacyDashboardPopover.setPreferredMaxHeight(positioningViewInWindow.origin.y)
         privacyDashboardPopover.show(relativeTo: privacyDashboardPositioningView.bounds, of: privacyDashboardPositioningView, preferredEdge: .maxY)
 
         privacyEntryPointButton.state = .on
+                
+        privacyInfoCancellable?.cancel()
+        privacyInfoCancellable = selectedTabViewModel.tab.$privacyInfo
+            .dropFirst()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self, weak selectedTabViewModel] _ in
+                guard self?.privacyDashboardPopover.isShown == true, let tabViewModel = selectedTabViewModel else { return }
+                self?.privacyDashboardPopover.viewController.updateTabViewModel(tabViewModel)
+            }
     }
 
     func updateButtons() {
@@ -593,7 +605,8 @@ final class AddressBarButtonsViewController: NSViewController {
     private func subscribePrivacyDashboardPendingUpdates() {
         privacyDashboadPendingUpdatesCancellable?.cancel()
         guard !AppDelegate.isRunningTests else { return }
-        privacyDashboadPendingUpdatesCancellable = privacyDashboardPopover.viewController
+
+        privacyDashboadPendingUpdatesCancellable = privacyDashboardPopover.viewController.rulesUpdateObserver
             .$pendingUpdates.receive(on: DispatchQueue.main).sink { [weak self] _ in
             let isPendingUpdate = self?.privacyDashboardPopover.viewController.isPendingUpdates() ?? false
 
@@ -786,7 +799,7 @@ final class AddressBarButtonsViewController: NSViewController {
             return
         }
 
-        if let trackerInfo = selectedTabViewModel.tab.trackerInfo {
+        if let trackerInfo = selectedTabViewModel.tab.privacyInfo?.trackerInfo {
             let lastTrackerImages = PrivacyIconViewModel.trackerImages(from: trackerInfo)
             trackerAnimationImageProvider.lastTrackerImages = lastTrackerImages
 

@@ -75,7 +75,7 @@ final class SuggestionContainerViewModelTests: XCTestCase {
 
         let selectedSuggestionViewModelExpectation2 = expectation(description: "Selected suggestion view model expectation")
 
-        suggestionListViewModel.$selectedSuggestionViewModel.debounce(for: 0.1, scheduler: RunLoop.main).sink { selectedSuggestionViewModel in
+        suggestionListViewModel.$selectedSuggestionViewModel.debounce(for: 0.1, scheduler: RunLoop.main).sink { _ in
             XCTAssertNil(suggestionListViewModel.selectionIndex)
             XCTAssertNil(suggestionListViewModel.selectedSuggestionViewModel)
             selectedSuggestionViewModelExpectation2.fulfill()

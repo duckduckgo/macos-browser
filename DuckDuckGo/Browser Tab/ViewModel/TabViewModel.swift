@@ -295,7 +295,7 @@ final class TabViewModel {
     private var trackerAnimationTimer: Timer?
 
     private func sendAnimationTrigger() {
-        if self.tab.trackerInfo?.trackersBlocked.count ?? 0 > 0 {
+        if self.tab.privacyInfo?.trackerInfo.trackersBlocked.count ?? 0 > 0 {
             self.trackersAnimationTriggerPublisher.send()
         }
     }

@@ -19,6 +19,7 @@
 import os.log
 import Combine
 import Common
+import ContentBlocking
 import Foundation
 import BrowserServicesKit
 
@@ -107,9 +108,10 @@ final class AdClickAttributionTabExtension: TabExtension {
             }
             .store(in: &cancellables)
 
-        tab.$trackerInfo
-            .scan((old: Set<DetectedRequest>(), new: tab.trackerInfo?.trackers ?? [])) {
-                ($0.new, $1?.trackers ?? [])
+        tab.$privacyInfo.compactMap { $0?.$trackerInfo }
+            .switchToLatest()
+            .scan((old: Set<DetectedRequest>(), new: tab.privacyInfo?.trackerInfo.trackers ?? [])) {
+                ($0.new, $1.trackers)
             }
             .sink { [weak self] (old, new) in
                 for tracker in new.subtracting(old) {
