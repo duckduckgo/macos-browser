@@ -133,6 +133,7 @@ final class HistoryStore: HistoryStoring {
             }
             try context.save()
         } catch {
+            Pixel.fire(.debug(event: .historyCleanEntriesFailed, error: error))
             return .failure(error)
         }
         
@@ -147,6 +148,7 @@ final class HistoryStore: HistoryStoring {
             try context.save()
             return .success(())
         } catch {
+            Pixel.fire(.debug(event: .historyCleanVisitsFailed, error: error))
             return .failure(error)
         }
     }
