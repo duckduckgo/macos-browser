@@ -22,10 +22,11 @@ import BrowserServicesKit
 extension ContentScopeFeatureToggles {
     
     static let supportedFeaturesOnMacOS = ContentScopeFeatureToggles(emailProtection: true,
-                                                                    credentialsAutofill: true,
-                                                                    identitiesAutofill: true,
-                                                                    creditCardsAutofill: true,
-                                                                    credentialsSaving: true,
-                                                                    passwordGeneration: true,
-                                                                    inlineIconCredentials: true)
+                                                                     credentialsAutofill: true,
+                                                                     identitiesAutofill: true,
+                                                                     creditCardsAutofill: true,
+                                                                     credentialsSaving: true,
+                                                                     passwordGeneration: true,
+                                                                     inlineIconCredentials: true,
+                                                                     thirdPartyCredentialsProvider: true)
 }

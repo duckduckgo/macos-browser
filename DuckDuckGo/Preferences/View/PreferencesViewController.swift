@@ -28,13 +28,15 @@ final class PreferencesViewController: NSViewController {
     private var selectedTabIndexCancellable: AnyCancellable?
     private var selectedPreferencePaneCancellable: AnyCancellable?
 
+    private var bitwardenManager: BWManagement = BWManager.shared
+
     override func loadView() {
         view = NSView()
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         let host = NSHostingView(rootView: Preferences.RootView(model: model))
         view.addAndLayout(host)
     }
@@ -42,6 +44,7 @@ final class PreferencesViewController: NSViewController {
     override func viewWillAppear() {
         super.viewWillAppear()
         model.refreshSections()
+        bitwardenManager.refreshStatusIfNeeded()
     }
 
     override func viewDidAppear() {

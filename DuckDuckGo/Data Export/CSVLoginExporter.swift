@@ -41,11 +41,11 @@ final class CSVLoginExporter {
         var credentialsToExport: [SecureVaultModels.WebsiteCredentials] = []
 
         for account in accounts {
-            guard let accountID = account.id else {
+            guard let accountID = account.id, let accountIDInt = Int64(accountID) else {
                 continue
             }
 
-            if let credentials = try? secureVault.websiteCredentialsFor(accountId: accountID) {
+            if let credentials = try? secureVault.websiteCredentialsFor(accountId: accountIDInt) {
                 credentialsToExport.append(credentials)
             }
         }

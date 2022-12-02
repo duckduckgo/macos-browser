@@ -31,9 +31,9 @@ final class PasswordManagementItemModelTests: XCTestCase {
                                                 onSaveRequested: onSaveRequested,
                                                 onDeleteRequested: onDeleteRequested)
 
-        model.credentials = makeCredentials(id: 1)
+        model.credentials = makeCredentials(id: "1")
         model.save()
-        XCTAssertEqual(savedCredentials?.account.id, 1)
+        XCTAssertEqual(savedCredentials?.account.id, "1")
         XCTAssertNil(deletedCredentials)
 
     }
@@ -43,9 +43,9 @@ final class PasswordManagementItemModelTests: XCTestCase {
                                                 onSaveRequested: onSaveRequested,
                                                 onDeleteRequested: onDeleteRequested)
 
-        model.credentials = makeCredentials(id: 1)
+        model.credentials = makeCredentials(id: "1")
         model.requestDelete()
-        XCTAssertEqual(deletedCredentials?.account.id, 1)
+        XCTAssertEqual(deletedCredentials?.account.id, "1")
         XCTAssertNil(savedCredentials)
 
     }
@@ -69,7 +69,7 @@ final class PasswordManagementItemModelTests: XCTestCase {
                                                 onSaveRequested: onSaveRequested,
                                                 onDeleteRequested: onDeleteRequested)
 
-        model.credentials = makeCredentials(id: 1)
+        model.credentials = makeCredentials(id: "1")
         XCTAssertEqual(model.domain, "domain")
         XCTAssertEqual(model.username, "username")
         XCTAssertFalse(model.isEditing)
@@ -114,7 +114,7 @@ final class PasswordManagementItemModelTests: XCTestCase {
         deletedCredentials = credentials
     }
 
-    func makeCredentials(id: Int64,
+    func makeCredentials(id: String,
                          username: String = "username",
                          domain: String = "domain",
                          password: String = "password") -> SecureVaultModels.WebsiteCredentials {
@@ -127,7 +127,7 @@ final class PasswordManagementItemModelTests: XCTestCase {
 
 extension SecureVaultModels.WebsiteAccount {
 
-    init(id: Int64, title: String? = nil, username: String = "username", domain: String = "domain") {
+    init(id: String, title: String? = nil, username: String = "username", domain: String = "domain") {
         self.init(title: title, username: username, domain: domain)
         self.id = id
     }
