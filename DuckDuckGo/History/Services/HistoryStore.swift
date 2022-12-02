@@ -88,21 +88,27 @@ final class HistoryStore: HistoryStoring {
         let chunkedIdentifiers = identifiers.chunked(into: 100)
 
         for identifiers in chunkedIdentifiers {
-            let deleteRequest = NSFetchRequest<NSFetchRequestResult>(entityName: HistoryEntryManagedObject.className())
+            let deleteRequest = NSFetchRequest<HistoryEntryManagedObject>(entityName: HistoryEntryManagedObject.className())
             let predicates = identifiers.map({ NSPredicate(format: "identifier == %@", argumentArray: [$0]) })
             deleteRequest.predicate = NSCompoundPredicate(type: .or, subpredicates: predicates)
-            let batchDeleteRequest = NSBatchDeleteRequest(fetchRequest: deleteRequest)
-            batchDeleteRequest.resultType = .resultTypeObjectIDs
+            
             do {
-                let result = try self.context.execute(batchDeleteRequest) as? NSBatchDeleteResult
-                let deletedObjects = result?.result as? [NSManagedObjectID] ?? []
-                let changes: [AnyHashable: Any] = [ NSDeletedObjectsKey: deletedObjects ]
-                NSManagedObjectContext.mergeChanges(fromRemoteContextSave: changes, into: [context])
-                os_log("%d items cleaned from history", log: .history, deletedObjects.count)
+                let entriesToDelete = try context.fetch(deleteRequest)
+                for entry in entriesToDelete {
+                    context.delete(entry)
+                }
+                os_log("%d items cleaned from history", log: .history, entriesToDelete.count)
             } catch {
                 Pixel.fire(.debug(event: .historyRemoveFailed, error: error))
                 return .failure(error)
             }
+        }
+        
+        do {
+            try context.save()
+        } catch {
+            Pixel.fire(.debug(event: .historyRemoveFailed, error: error))
+            return .failure(error)
         }
 
         return .success(())
