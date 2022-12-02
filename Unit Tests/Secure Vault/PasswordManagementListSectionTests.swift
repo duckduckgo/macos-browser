@@ -131,7 +131,7 @@ final class PasswordManagementListSectionTests: XCTestCase {
         let components = DateComponents(calendar: calendar, year: year, month: month, day: 1)
         let date = calendar.date(from: components) ?? Date()
         
-        let account = SecureVaultModels.WebsiteAccount(id: 1,
+        let account = SecureVaultModels.WebsiteAccount(id: "1",
                                                        title: name,
                                                        username: "Username",
                                                        domain: "\(name).com",

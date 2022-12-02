@@ -175,6 +175,24 @@ extension Pixel {
             case webKitDidTerminate
             
             case removedInvalidBookmarkManagedObjects
+
+            case bitwardenNotResponding
+            case bitwardenRespondedCannotDecrypt
+            case bitwardenHandshakeFailed
+            case bitwardenDecryptionOfSharedKeyFailed
+            case bitwardenStoringOfTheSharedKeyFailed
+            case bitwardenCredentialRetrievalFailed
+            case bitwardenCredentialCreationFailed
+            case bitwardenCredentialUpdateFailed
+            case bitwardenRespondedWithError
+            case bitwardenNoActiveVault
+            case bitwardenParsingFailed
+            case bitwardenStatusParsingFailed
+            case bitwardenHmacComparisonFailed
+            case bitwardenDecryptionFailed
+            case bitwardenSendingOfMessageFailed
+            case bitwardenSharedKeyInjectionFailed
+
         }
 
     }
@@ -363,6 +381,39 @@ extension Pixel.Event.Debug {
             
         case .removedInvalidBookmarkManagedObjects:
             return "removed_invalid_bookmark_managed_objects"
+
+        case .bitwardenNotResponding:
+            return "bitwarden_not_responding"
+        case .bitwardenRespondedCannotDecrypt:
+            return "bitwarden_responded_cannot_decrypt"
+        case .bitwardenHandshakeFailed:
+            return "bitwarden_handshake_failed"
+        case .bitwardenDecryptionOfSharedKeyFailed:
+            return "bitwarden_decryption_of_shared_key_failed"
+        case .bitwardenStoringOfTheSharedKeyFailed:
+            return "bitwarden_storing_of_the_shared_key_failed"
+        case .bitwardenCredentialRetrievalFailed:
+            return "bitwarden_credential_retrieval_failed"
+        case .bitwardenCredentialCreationFailed:
+            return "bitwarden_credential_creation_failed"
+        case .bitwardenCredentialUpdateFailed:
+            return "bitwarden_credential_update_failed"
+        case .bitwardenRespondedWithError:
+            return "bitwarden_responded_with_error"
+        case .bitwardenNoActiveVault:
+            return "bitwarden_no_active_vault"
+        case .bitwardenParsingFailed:
+            return "bitwarden_parsing_failed"
+        case .bitwardenStatusParsingFailed:
+            return "bitwarden_status_parsing_failed"
+        case .bitwardenHmacComparisonFailed:
+            return "bitwarden_hmac_comparison_failed"
+        case .bitwardenDecryptionFailed:
+            return "bitwarden_decryption_failed"
+        case .bitwardenSendingOfMessageFailed:
+            return "bitwarden_sending_of_message_failed"
+        case .bitwardenSharedKeyInjectionFailed:
+            return "bitwarden_shared_key_injection_failed"
         }
     }
 }
