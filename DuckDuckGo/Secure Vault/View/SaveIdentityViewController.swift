@@ -69,6 +69,7 @@ final class SaveIdentityViewController: NSViewController {
         
         do {
             try SecureVaultFactory.default.makeVault(errorReporter: SecureVaultErrorReporter.shared).storeIdentity(identity)
+            Pixel.fire(.autofillItemSaved(kind: .identity))
         } catch {
             os_log("%s:%s: failed to store identity %s", type: .error, className, #function, error.localizedDescription)
         }
