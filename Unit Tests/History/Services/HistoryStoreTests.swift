@@ -43,6 +43,8 @@ final class HistoryStoreTests: XCTestCase {
         try super.tearDownWithError()
         try FileManager.default.removeItem(at: location)
         database = nil
+        location = nil
+        cancellables.removeAll()
     }
     
     @discardableResult
