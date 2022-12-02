@@ -20,20 +20,19 @@ import Foundation
 
 enum BWError: Error {
 
-    // Blocking errors (further communication blocked)
+    // Blocking errors (further communication not possible)
     case handshakeFailed
+    case runningOfProxyProcessFailed
     case decryptionOfSharedKeyFailed
+
     case parsingFailed
     case statusParsingFailed
-
-    // Non-blocking errors
-    case hmacComparisonFailed
     case decryptionOfDataFailed
     case noActiveVault
     case storingOfTheSharedKeyFailed
-    case sendingOfStatusMessageFailed
-    case injectingOfSharedKeyFailed
-    case runningOfProxyProcessFailed
+    case sendingOfMessageFailed
+    case sharedKeyInjectionFailed
+
     case credentialCreationFailed
     case credentialUpdateFailed
     case credentialRetrievalFailed

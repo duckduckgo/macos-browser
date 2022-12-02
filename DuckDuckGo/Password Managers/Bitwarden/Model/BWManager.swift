@@ -132,6 +132,7 @@ final class BWManager: BWManagement, ObservableObject {
             try communicator.runProxyProcess()
         } catch {
             os_log("BWManagement: Running of proxy process failed", type: .error)
+            Pixel.fire(.debug(event: .bitwardenNotResponding))
             status = .error(error: .runningOfProxyProcessFailed)
             scheduleConnectionAttempt()
         }
@@ -201,7 +202,8 @@ final class BWManager: BWManagement, ObservableObject {
             if let sharedKey = sharedKey {
                 guard let sharedKeyData = Data(base64Encoded: sharedKey),
                       encryption.setSharedKey(sharedKeyData) else {
-                    status = .error(error: .injectingOfSharedKeyFailed)
+                    Pixel.fire(.debug(event: .bitwardenSharedKeyInjectionFailed))
+                    status = .error(error: .sharedKeyInjectionFailed)
                     return
                 }
                 status = .waitingForStatusResponse
@@ -231,17 +233,17 @@ final class BWManager: BWManagement, ObservableObject {
             self?.verificationTimer = nil
 
             if self?.status == .waitingForStatusResponse {
+                Pixel.fire(.debug(event: .bitwardenNotResponding))
                 BWNotRespondingAlert.show()
             }
         }
     }
 
-    private func handleError(_ error: String, blocking: Bool) {
-        let bitwardenError: BWError
+    private func handleError(_ error: String) {
         switch error {
         case "cannot-decrypt":
             logOrAssertionFailure("BWManagement: Bitwarden error - cannot decrypt")
-            bitwardenError = .bitwardenCannotDecrypt
+            Pixel.fire(.debug(event: .bitwardenRespondedCannotDecrypt))
         case "locked":
             if case let .connected(vault) = status {
                 status = .connected(vault: vault.locked)
@@ -250,22 +252,20 @@ final class BWManager: BWManagement, ObservableObject {
             }
             return
         default: logOrAssertionFailure("BWManager: Unhandled error")
-            bitwardenError = .bitwardenRespondedWithError
-        }
-
-        if blocking {
-            status = .error(error: bitwardenError)
+            Pixel.fire(.debug(event: .bitwardenRespondedWithError))
         }
     }
 
     private func handleHandshakeResponse(encryptedSharedKey: String, status: String) {
         guard status == "success" else {
+            Pixel.fire(.debug(event: .bitwardenHandshakeFailed))
             self.status = .error(error: .handshakeFailed)
             cancelConnectionAndScheduleNextAttempt()
             return
         }
 
         guard let sharedKey = encryption.decryptSharedKey(encryptedSharedKey) else {
+            Pixel.fire(.debug(event: .bitwardenDecryptionOfSharedKeyFailed))
             self.status = .error(error: .decryptionOfSharedKeyFailed)
             cancelConnectionAndScheduleNextAttempt()
             return
@@ -274,6 +274,7 @@ final class BWManager: BWManagement, ObservableObject {
         do {
             try keyStorage.save(sharedKey: sharedKey)
         } catch {
+            Pixel.fire(.debug(event: .bitwardenStoringOfTheSharedKeyFailed))
             self.status = .error(error: .storingOfTheSharedKeyFailed)
             return
         }
@@ -282,6 +283,7 @@ final class BWManager: BWManagement, ObservableObject {
     }
 
     // swiftlint:disable cyclomatic_complexity
+    // swiftlint:disable function_body_length
     private func handleEncryptedResponse(_ encryptedPayload: BWResponse.EncryptedPayload, messageId: MessageId) {
         guard let dataString = encryptedPayload.data,
               let data = Data(base64Encoded: dataString),
@@ -290,6 +292,7 @@ final class BWManager: BWManagement, ObservableObject {
               let hmacString = encryptedPayload.mac,
               let hmac = Data(base64Encoded: hmacString)
         else {
+            Pixel.fire(.debug(event: .bitwardenParsingFailed))
             status = .error(error: .parsingFailed)
             return
         }
@@ -297,17 +300,20 @@ final class BWManager: BWManagement, ObservableObject {
         // Compare HMAC
         let ourHmac = encryption.computeHmac(data, iv: ivData)
         guard ourHmac == hmac else {
+            Pixel.fire(.debug(event: .bitwardenHmacComparisonFailed))
             logOrAssertionFailure("BWManager: HMAC comparison failed")
             return
         }
 
         let decryptedData = encryption.decryptData(data, andIv: ivData)
         guard decryptedData.count > 0 else {
+            Pixel.fire(.debug(event: .bitwardenDecryptionFailed))
             status = .error(error: .decryptionOfDataFailed)
             return
         }
 
         guard let response = BWResponse(from: decryptedData) else {
+            Pixel.fire(.debug(event: .bitwardenParsingFailed))
             status = .error(error: .parsingFailed)
             return
         }
@@ -340,10 +346,12 @@ final class BWManager: BWManagement, ObservableObject {
         logOrAssertionFailure("BWManager: Unhandled response")
     }
     // swiftlint:enable cyclomatic_complexity
+    // swiftlint:enable function_body_length
 
     private func handleStatusResponse(payloadItemArray: [BWResponse.PayloadItem]) {
         // Find the active vault
         guard let activePayloadItem = payloadItemArray.filter({ $0.active ?? false }).first else {
+            Pixel.fire(.debug(event: .bitwardenNoActiveVault))
             status = .error(error: .noActiveVault)
             return
         }
@@ -368,7 +376,8 @@ final class BWManager: BWManagement, ObservableObject {
                 return
             }
 
-            handleError(error, blocking: false)
+            handleError(error)
+            Pixel.fire(.debug(event: .bitwardenCredentialRetrievalFailed))
             completion([], BWError.credentialRetrievalFailed)
         }
     }
@@ -384,6 +393,7 @@ final class BWManager: BWManagement, ObservableObject {
         if payloadItem.status == "success" {
             completion(nil)
         } else {
+            Pixel.fire(.debug(event: .bitwardenCredentialCreationFailed))
             completion(BWError.credentialCreationFailed)
         }
     }
@@ -399,6 +409,7 @@ final class BWManager: BWManagement, ObservableObject {
         if payloadItem.status == "success" {
             completion(nil)
         } else {
+            Pixel.fire(.debug(event: .bitwardenCredentialUpdateFailed))
             completion(BWError.credentialUpdateFailed)
         }
     }
@@ -428,7 +439,8 @@ final class BWManager: BWManagement, ObservableObject {
               let messageData = BWRequest.makeEncryptedCommandRequest(encryptedCommand: encryptedCommand,
                                                                       messageId: messageIdGenerator.generateMessageId()).data else {
             logOrAssertionFailure("BWManager: Making the status message failed")
-            status = .error(error: .sendingOfStatusMessageFailed)
+            Pixel.fire(.debug(event: .bitwardenSendingOfMessageFailed))
+            status = .error(error: .sendingOfMessageFailed)
             return
         }
 
@@ -443,7 +455,8 @@ final class BWManager: BWManagement, ObservableObject {
               let messageData = BWRequest.makeEncryptedCommandRequest(encryptedCommand: encryptedCommand,
                                                                       messageId: messageId).data else {
             logOrAssertionFailure("BWManager: Making the credential retrieval message failed")
-            status = .error(error: .sendingOfStatusMessageFailed)
+            Pixel.fire(.debug(event: .bitwardenSendingOfMessageFailed))
+            status = .error(error: .sendingOfMessageFailed)
             return
         }
 
@@ -462,7 +475,8 @@ final class BWManager: BWManagement, ObservableObject {
               let messageData = BWRequest.makeEncryptedCommandRequest(encryptedCommand: encryptedCommand,
                                                                       messageId: messageId).data else {
             logOrAssertionFailure("BWManager: Making the credential creation message failed")
-            status = .error(error: .sendingOfStatusMessageFailed)
+            Pixel.fire(.debug(event: .bitwardenSendingOfMessageFailed))
+            status = .error(error: .sendingOfMessageFailed)
             return
         }
 
@@ -482,7 +496,8 @@ final class BWManager: BWManagement, ObservableObject {
               let messageData = BWRequest.makeEncryptedCommandRequest(encryptedCommand: encryptedCommand,
                                                                       messageId: messageId).data else {
             logOrAssertionFailure("BWManager: Making the credential update message failed")
-            status = .error(error: .sendingOfStatusMessageFailed)
+            Pixel.fire(.debug(event: .bitwardenSendingOfMessageFailed))
+            status = .error(error: .sendingOfMessageFailed)
             return
         }
 
@@ -539,6 +554,7 @@ final class BWManager: BWManagement, ObservableObject {
               let email = payloadItem.email,
               let statusString = payloadItem.status,
               let status = BWVault.Status(rawValue: statusString) else {
+            Pixel.fire(.debug(event: .bitwardenStatusParsingFailed))
             self.status = .error(error: .statusParsingFailed)
             return
         }
@@ -613,7 +629,7 @@ extension BWManager: BWCommunicatorDelegate {
 
         if case let .item(payloadItem) = response.payload {
             if let error = payloadItem.error {
-                handleError(error, blocking: false)
+                handleError(error)
                 return
             }
 
