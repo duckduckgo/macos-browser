@@ -22,7 +22,6 @@ import XCTest
 final class ConnectBitwardenViewModelTests: XCTestCase {
 
     func testWhenCreatingViewModel_ThenStatusIsDisclaimer() throws {
-        let installationManager = MockBitwardenInstallationService()
         let bitwardenManager = MockBitwardenManager()
         let viewModel = ConnectBitwardenViewModel(bitwardenManager: bitwardenManager)
         
@@ -30,7 +29,6 @@ final class ConnectBitwardenViewModelTests: XCTestCase {
     }
     
     func testWhenViewModelIsOnDisclaimer_AndBitwardenIsNotInstalled_AndNextIsClicked_ThenViewStateIsLookingForBitwarden() {
-        let installationManager = MockBitwardenInstallationService()
         let bitwardenManager = MockBitwardenManager()
         let viewModel = ConnectBitwardenViewModel(bitwardenManager: bitwardenManager)
         
@@ -39,60 +37,40 @@ final class ConnectBitwardenViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.viewState, .lookingForBitwarden)
     }
 
-//    func testWhenBitwardenIsInstalled_AndIntegrationIsNotApproved_ThenViewStateIsWaitingForConnectionPermission() {
-//        let installationManager = MockBitwardenInstallationService()
-//        installationManager.isInstalled = false
-//
-//        let bitwardenManager = MockBitwardenManager()
-//        let viewModel = ConnectBitwardenViewModel(bitwardenManager: bitwardenManager)
-//
-//        XCTAssertEqual(viewModel.viewState, .disclaimer)
-//        viewModel.process(action: .confirm)
-//        XCTAssertEqual(viewModel.viewState, .lookingForBitwarden)
-//
-//        installationManager.isInstalled = true
-//
-//        let predicate = NSPredicate { _, _ in
-//            return viewModel.viewState == .bitwardenFound
-//        }
-//
-//        let expectation = XCTNSPredicateExpectation(predicate: predicate, object: .none)
-//        wait(for: [expectation], timeout: 2.0)
-//    }
+    func testWhenBitwardenIsInstalled_ThenViewStateIsWaitingForConnectionPermission() {
+        let bitwardenManager = MockBitwardenManager()
+        let viewModel = ConnectBitwardenViewModel(bitwardenManager: bitwardenManager)
 
-//    func testWhenViewModelIsOnDisclaimer_AndBitwardenIsInstalled_AndNextIsClicked_ThenViewStateIsWaitingForConnectionPermission() {
-//        let installationManager = MockBitwardenInstallationService()
-//        installationManager.isInstalled = true
-//
-//        let bitwardenManager = MockBitwardenManager()
-//        let viewModel = ConnectBitwardenViewModel(bitwardenManager: bitwardenManager)
-//
-//        XCTAssertEqual(viewModel.viewState, .disclaimer)
-//        viewModel.process(action: .confirm)
-//        XCTAssertEqual(viewModel.viewState, .waitingForConnectionPermission)
-//    }
-//
-//    func testWhenViewModelIsInConnectToBitwardenState_AndNextIsClicked_ThenHandshakeIsSent() {
-//        let installationManager = MockBitwardenInstallationService()
-//        let bitwardenManager = MockBitwardenManager()
-//
-//        installationManager.isInstalled = true
-//        bitwardenManager.status = .missingHandshake
-//
-//        let viewModel = ConnectBitwardenViewModel(bitwardenManager: bitwardenManager)
-//
-//        XCTAssertFalse(bitwardenManager.handshakeSent)
-//
-//        XCTAssertEqual(viewModel.viewState, .disclaimer)
-//        viewModel.process(action: .confirm)
-//        XCTAssertEqual(viewModel.viewState, .connectToBitwarden)
-//        viewModel.process(action: .confirm)
-//
-//        XCTAssertTrue(bitwardenManager.handshakeSent)
-//    }
+        XCTAssertEqual(viewModel.viewState, .disclaimer)
+        viewModel.process(action: .confirm)
+
+        XCTAssertEqual(viewModel.viewState, .lookingForBitwarden)
+        bitwardenManager.status = .notRunning
+
+        let predicate = NSPredicate { _, _ in
+            return viewModel.viewState == .waitingForConnectionPermission
+        }
+
+        let expectation = XCTNSPredicateExpectation(predicate: predicate, object: .none)
+        wait(for: [expectation], timeout: 2.0)
+    }
+
+    func testWhenViewModelIsInConnectToBitwardenState_AndNextIsClicked_ThenHandshakeIsSent() {
+        let bitwardenManager = MockBitwardenManager()
+
+        bitwardenManager.status = .missingHandshake
+
+        let viewModel = ConnectBitwardenViewModel(bitwardenManager: bitwardenManager)
+
+        XCTAssertFalse(bitwardenManager.handshakeSent)
+
+        XCTAssertEqual(viewModel.viewState, .connectToBitwarden)
+        viewModel.process(action: .confirm)
+
+        XCTAssertTrue(bitwardenManager.handshakeSent)
+    }
     
     func testWhenViewModelReceivesConnectStateFromManager_ThenViewStateIsConnectedToBitwarden() {
-        let installationManager = MockBitwardenInstallationService()
         let bitwardenManager = MockBitwardenManager()
         let viewModel = ConnectBitwardenViewModel(bitwardenManager: bitwardenManager)
         
@@ -103,34 +81,7 @@ final class ConnectBitwardenViewModelTests: XCTestCase {
         
         XCTAssertEqual(viewModel.viewState, .connectedToBitwarden)
     }
-    
-//    func testWhenClickingOpenBitwardenButton_ThenBitwardenIsOpened() {
-//        let installationManager = MockBitwardenInstallationService()
-//        let bitwardenManager = MockBitwardenManager()
-//        let viewModel = ConnectBitwardenViewModel(bitwardenManager: bitwardenManager)
-//
-//        XCTAssertFalse(installationManager.bitwardenOpened)
-//        viewModel.process(action: .openBitwarden)
-//        XCTAssertTrue(installationManager.bitwardenOpened)
-//    }
 
-}
-
-class MockBitwardenInstallationService: BWInstallationService {
-
-    var isInstalled = false
-    var bitwardenOpened = false
-    var installationState: DuckDuckGo_Privacy_Browser.BWInstallationState = .notInstalled
-    var isIntegrationWithDuckDuckGoEnabled = false
-    
-    var isBitwardenInstalled: Bool {
-        return isInstalled
-    }
-    
-    func openBitwarden() {
-        bitwardenOpened = true
-    }
-    
 }
 
 class MockBitwardenManager: BWManagement {
