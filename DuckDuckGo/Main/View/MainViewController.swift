@@ -433,8 +433,7 @@ extension MainViewController {
        guard let locWindow = self.view.window,
           NSApplication.shared.keyWindow === locWindow else { return false }
 
-        let flags = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
-            .subtracting(.capsLock)
+        let flags = event.modifierFlags.intersection([.command, .shift, .option, .control])
 
         switch Int(event.keyCode) {
         case kVK_Escape:

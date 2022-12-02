@@ -21,7 +21,7 @@ import Foundation
 
 final class LocalFileNavigationResponder: NavigationResponder {
 
-    func webView(_ webView: WebView, decidePolicyFor navigationAction: WKNavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
+    func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
         if navigationAction.request.url?.isFileURL == true {
             return .allow
         }

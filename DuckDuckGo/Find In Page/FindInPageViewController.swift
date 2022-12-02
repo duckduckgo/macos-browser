@@ -70,12 +70,10 @@ final class FindInPageViewController: NSViewController {
 
     func control(_ control: NSControl, textView: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
         // Handle pressing enter here rather than didEndEditing otherwise it moving to the next match doesn't work.
-        guard NSApp.isReturnOrEnterPressed,
-           var modifiers = NSApp.currentEvent?.modifierFlags.intersection(.deviceIndependentFlagsMask)
-        else {
+        guard let currentEvent = NSApp.currentEvent, currentEvent.isReturnOrEnterPressed else {
             return false
         }
-        modifiers.remove(.capsLock)
+        let modifiers = currentEvent.modifierFlags.intersection([.shift, .command, .option, .control])
         switch modifiers {
         case .shift:
             delegate?.findInPagePrevious(self)

@@ -19,9 +19,16 @@
 import Foundation
 
 extension NSEvent {
-    static func isContextClick(_ event: NSEvent) -> Bool {
-        let isControlClick = event.type == .leftMouseDown && (event.modifierFlags.rawValue & NSEvent.ModifierFlags.control.rawValue != 0)
-        let isRightClick = event.type == .rightMouseDown
+
+    var isContextClick: Bool {
+        let isControlClick = self.type == .leftMouseDown && (self.modifierFlags.rawValue & NSEvent.ModifierFlags.control.rawValue != 0)
+        let isRightClick = self.type == .rightMouseDown
         return isControlClick || isRightClick
     }
+
+    var isReturnOrEnterPressed: Bool {
+        guard self.type == .keyDown else { return false }
+        return [36, 76].contains(self.keyCode)
+    }
+
 }

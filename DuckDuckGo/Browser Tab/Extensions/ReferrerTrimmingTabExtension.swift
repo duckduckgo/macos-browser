@@ -45,10 +45,10 @@ struct ReferrerTrimmingTabExtension: TabExtension {
 
 extension ReferrerTrimmingTabExtension: NavigationResponder {
 
-    func webView(_ webView: WebView, decidePolicyFor navigationAction: WKNavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
-        guard navigationAction.isTargetingMainFrame,
+    func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
+        guard navigationAction.isForMainFrame,
               navigationAction.navigationType != .backForward,
-              let newRequest = referrerTrimming.trimReferrer(forNavigation: navigationAction, originUrl: navigationAction.sourceFrame.request.url)
+              let newRequest = referrerTrimming.trimReferrer(for: navigationAction.request, originUrl: navigationAction.sourceFrame.url)
         else {
             return .next
         }
@@ -58,15 +58,15 @@ extension ReferrerTrimmingTabExtension: NavigationResponder {
         return .redirect(request: newRequest)
     }
 
-    func webView(_ webView: WebView, didStart navigation: WKNavigation, with request: URLRequest) {
-        referrerTrimming.onBeginNavigation(to: webView.url)
+    func didStart(_ navigation: Navigation) {
+        referrerTrimming.onBeginNavigation(to: navigation.url)
     }
 
-    func webView(_ webView: WebView, didFinish navigation: WKNavigation, with request: URLRequest) {
+    func navigationDidFinishOrReceivedClientRedirect(_ navigation: Navigation) {
         referrerTrimming.onFinishNavigation()
     }
 
-    func webView(_ webView: WebView, navigation: WKNavigation, with request: URLRequest, didFailWith error: Error) {
+    func navigation(_ navigation: Navigation, didFailWith error: WKError) {
         referrerTrimming.onFailedNavigation()
     }
 

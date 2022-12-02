@@ -116,33 +116,32 @@ extension AdClickAttributionTabExtension: AdClickAttributionLogicDelegate {
 
 extension AdClickAttributionTabExtension: NavigationResponder {
 
-    func webView(_ webView: WebView, willGoTo backForwardListItem: WKBackForwardListItem, inPageCache: Bool) {
-        // TODO: Validate this is really called twice
-        guard webView.mainFrameNavigation?.contains(where: {
-            if case .willGoToBackForwardListItem(backForwardListItem, inPageCache: inPageCache) = $0 { return true }; return false
-        }) == true else { return }
-        self.logic.onBackForwardNavigation(mainFrameURL: backForwardListItem.url)
-    }
-
-    func webView(_ webView: WebView, didStart navigation: WKNavigation, with request: URLRequest) {
-        self.detection.onStartNavigation(url: webView.url)
-    }
-
-    func webView(_ webView: WebView, decidePolicyFor navigationResponse: WKNavigationResponse) async -> WKNavigationResponsePolicy? {
-        if navigationResponse.isForMainFrame && navigationResponse.response.isSuccessfulHTTPURLResponse {
-            self.detection.on2XXResponse(url: webView.url)
+    func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
+        if navigationAction.isForMainFrame, navigationAction.navigationType == .backForward {
+            self.logic.onBackForwardNavigation(mainFrameURL: navigationAction.sourceFrame.url)
         }
+        return .next
+    }
 
+    func didStart(_ navigation: Navigation) {
+        self.detection.onStartNavigation(url: navigation.request.url)
+    }
+
+    func decidePolicy(for navigationResponse: NavigationResponse) async -> NavigationResponsePolicy? {
+        if navigationResponse.isForMainFrame && navigationResponse.response.isSuccessfulHTTPURLResponse {
+            self.detection.on2XXResponse(url: navigationResponse.url)
+        }
+        // TODO: Should it always send? (not for the main frame)
         await self.logic.onProvisionalNavigation()
         return .next
     }
 
-    func webView(_ webView: WebView, didFinish navigation: WKNavigation, with request: URLRequest) {
-        self.detection.onDidFinishNavigation(url: webView.url)
-        self.logic.onDidFinishNavigation(host: webView.url?.host)
+    func navigationDidFinishOrReceivedClientRedirect(_ navigation: Navigation) {
+        self.detection.onDidFinishNavigation(url: navigation.request.url)
+        self.logic.onDidFinishNavigation(host: navigation.request.url?.host)
     }
 
-    func webView(_ webView: WebView, navigation: WKNavigation, with request: URLRequest, didFailWith error: Error) {
+    func navigation(_ navigation: Navigation, didFailWith error: WKError) {
         self.detection.onDidFailNavigation()
     }
 

@@ -197,16 +197,20 @@ extension WKWebView {
     }
 
     // https://developer.mozilla.org/en-US/docs/Web/API/Window/open
-    // TODO: noopener, noreferrer?
-    @objc func load(_ url: URL, inTargetNamed target: String?, windowFeatures: WindowFeatures? = nil) {
+    @objc func load(_ url: URL, inTargetNamed target: String?, windowFeatures: String? = nil) {
         let urlEnc = "'\(url.absoluteString.escapedJavaScriptString())'"
         let targetEnc = target.map { ", '\($0.escapedJavaScriptString())'" } ?? ""
-        let windowFeaturesEnc = windowFeatures.map { ", '\($0.encoded())'" } ?? ""
+        assert(windowFeatures?.contains("'") != true)
+        let windowFeaturesEnc = windowFeatures.map { ", '\($0)'" } ?? ""
         self.evaluateJavaScript("window.open(\(urlEnc)\(targetEnc)\(windowFeaturesEnc))")
     }
 
-    func load(_ url: URL, in target: TargetWindowName?, windowFeatures: WindowFeatures? = nil) {
-        self.load(url, inTargetNamed: target?.rawValue, windowFeatures: windowFeatures)
+    @objc func load(_ url: URL, in frame: WKFrameInfo) {
+        if #available(macOS 11.0, *), !frame.isMainFrame {
+            self.evaluateJavaScript("location.href = '\(url.absoluteString.escapedJavaScriptString())'", in: frame, in: .defaultClient)
+        } else {
+            self.load(URLRequest(url: url))
+        }
     }
 
     func replaceLocation(with url: URL, in frame: WKFrameInfo? = nil) {

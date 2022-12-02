@@ -345,6 +345,14 @@ final class PermissionModel {
         }
     }
 
+    func request(_ permissions: [PermissionType], forDomain domain: String?, url: URL? = nil) -> Future<Bool, Never> {
+        Future { fulfill in
+            self.permissions(permissions, requestedForDomain: domain, url: url) { granted in
+                fulfill(.success(granted))
+            }
+        }
+    }
+
     func mediaCaptureStateDidChange() {
         updatePermissions()
     }

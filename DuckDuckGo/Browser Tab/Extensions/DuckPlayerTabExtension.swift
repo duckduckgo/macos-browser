@@ -22,6 +22,7 @@ import Foundation
 final class DuckPlayerTabExtension: TabExtension {
     
     @Injected(default: .shared, .testable) static var privatePlayer: PrivatePlayer
+    @Injected(default: LoadTargetModifiers.current, .testable) static var loadTargetModifiers: () -> LoadTargetModifiers?
     
     private var userScriptsCancellable: AnyCancellable?
     private var youtubePlayerCancellables: Set<AnyCancellable> = []
@@ -107,13 +108,10 @@ final class DuckPlayerTabExtension: TabExtension {
 extension DuckPlayerTabExtension: YoutubeOverlayUserScriptDelegate {
 
     func youtubeOverlayUserScriptDidRequestDuckPlayer(with url: URL) {
-        let isRequestingNewTab = NSApp.isCommandPressed
-        if isRequestingNewTab {
-            let shouldSelectNewTab = NSApp.isShiftPressed
-            self.tab?.webView.load(url, in: .blank, windowFeatures: shouldSelectNewTab ? .selectedTab : .backgroundTab)
+        if case .retarget(let newWindowKind) = Self.loadTargetModifiers() {
+            self.tab?.load(url, in: newWindowKind)
         } else {
-            let content = Tab.TabContent.contentFromURL(url)
-            self.tab?.setContent(content)
+            self.tab?.setContent(.contentFromURL(url))
         }
     }
 
@@ -121,8 +119,7 @@ extension DuckPlayerTabExtension: YoutubeOverlayUserScriptDelegate {
 
 extension DuckPlayerTabExtension: NavigationResponder {
 
-    func webView(_ webView: WebView, decidePolicyFor navigationAction: WKNavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
-
+    func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
         guard Self.privatePlayer.isAvailable, Self.privatePlayer.mode != .disabled else {
             // When the feature is disabled but the webView still gets a Private Player URL,
             // convert it back to a regular YouTube video URL.
@@ -145,7 +142,7 @@ extension DuckPlayerTabExtension: NavigationResponder {
         }
 
         // We only care about YouTube video URLs loaded into main frame or within a Private Player
-        guard navigationAction.isTargetingMainFrame || webView.url?.isPrivatePlayer == true, navigationAction.request.url?.isYoutubeVideo == true else {
+        guard navigationAction.isForMainFrame || navigationAction.sourceFrame.url?.isPrivatePlayer == true, navigationAction.request.url?.isYoutubeVideo == true else {
             return .next
         }
 
@@ -155,12 +152,12 @@ extension DuckPlayerTabExtension: NavigationResponder {
         // the PP would automatically load on that YouTube video, effectively cancelling the back navigation.
         // We need to go 2 sites back. That YouTube page wasn't really viewed by the user, but it was pushed on the
         // navigation stack and immediately replaced with Private Player. That's why skipping it while going back makes sense.
-        if alwaysOpenInPrivatePlayer && isGoingBackFromPrivatePlayerToYoutubeVideo(for: navigationAction, in: webView.tab) {
-            _=webView.goBack()
+        if alwaysOpenInPrivatePlayer && isGoingBackFromPrivatePlayerToYoutubeVideo(for: navigationAction, in: tab) {
+            // TODO: _=webView.goBack()
             return .cancel
         }
 
-        let didSelectRecommendationFromPrivatePlayer = webView.url?.isPrivatePlayer == true && navigationAction.request.url?.isYoutubeVideoRecommendation == true
+        let didSelectRecommendationFromPrivatePlayer = navigationAction.sourceFrame.url?.isPrivatePlayer == true && navigationAction.url.isYoutubeVideoRecommendation == true
 
         // Recommendations must always be opened in Private Player.
         guard alwaysOpenInPrivatePlayer || didSelectRecommendationFromPrivatePlayer, let (videoID, timestamp) = navigationAction.request.url?.youtubeVideoParams else {
@@ -168,18 +165,18 @@ extension DuckPlayerTabExtension: NavigationResponder {
         }
 
         // If this is a child tab of a Private Player and it's loading a YouTube URL, don't override it ("Watch in YouTube").
-        if case .privatePlayer(let parentVideoID, _) = webView.tab?.parentTab?.content, parentVideoID == videoID {
+        if case .privatePlayer(let parentVideoID, _) = tab?.parentTab?.content, parentVideoID == videoID {
             return .next
         }
 
         // Otherwise load priate player unless it's already loaded.
-        guard case .privatePlayer(let currentVideoID, _) = webView.tab?.content, currentVideoID == videoID, webView.url?.isPrivatePlayer == true else {
+        guard case .privatePlayer(let currentVideoID, _) = tab?.content, currentVideoID == videoID, navigationAction.sourceFrame.url?.isPrivatePlayer == true else {
             return .redirect(to: .privatePlayer(videoID, timestamp: timestamp))
         }
         return .next
     }
 
-    private func isGoingBackFromPrivatePlayerToYoutubeVideo(for navigationAction: WKNavigationAction, in tab: Tab?) -> Bool {
+    private func isGoingBackFromPrivatePlayerToYoutubeVideo(for navigationAction: NavigationAction, in tab: Tab?) -> Bool {
         guard navigationAction.navigationType == .backForward,
               let url = tab?.webView.backForwardList.currentItem?.url,
               let forwardURL = tab?.webView.backForwardList.forwardItem?.url

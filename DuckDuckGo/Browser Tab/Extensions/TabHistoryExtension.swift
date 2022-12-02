@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import ContentBlocking
 import BrowserServicesKit
 import Combine
 import Foundation
@@ -108,17 +109,17 @@ extension TabHistoryExtension: NavigationResponder {
         shouldStoreNextVisit = false
     }
 
-    func webView(_ webView: WebView, didCommit navigation: WKNavigation, with request: URLRequest) {
-        if tab?.content.isUrl == true, let url = request.url {
-            addVisit(of: url)
+    func didCommit(_ navigation: Navigation) {
+        if tab?.content.isUrl == true {
+            addVisit(of: navigation.url)
         }
     }
 
-    func webView(_ webView: WebView, didFinish navigation: WKNavigation, with request: URLRequest) {
-        StatisticsLoader.shared.refreshRetentionAtb(isSearch: request.url?.isDuckDuckGoSearch == true)
+    func navigationDidFinishOrReceivedClientRedirect(_ navigation: Navigation) {
+        StatisticsLoader.shared.refreshRetentionAtb(isSearch: navigation.url.isDuckDuckGoSearch)
     }
 
-    func webView(_ webView: WebView, navigation: WKNavigation, with request: URLRequest, didFailWith error: Error) {
+    func navigation(_ navigation: Navigation, didFailWith error: WKError) {
         switch error {
         case URLError.notConnectedToInternet,
              URLError.networkConnectionLost:

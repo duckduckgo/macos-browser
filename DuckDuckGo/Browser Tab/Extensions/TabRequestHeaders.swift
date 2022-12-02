@@ -25,11 +25,12 @@ struct TabRequestHeaders: NavigationResponder {
         static let ddgClientHeaderValue = "macOS"
     }
 
-    func webView(_ webView: WebView, decidePolicyFor navigationAction: WKNavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
-        guard navigationAction.isTargetingMainFrame,
+    func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
+        guard navigationAction.isForMainFrame,
               navigationAction.request.url?.isDuckDuckGo == true,
               navigationAction.request.value(forHTTPHeaderField: Constants.ddgClientHeaderKey) == nil,
               // TODO: check for .backForward for other navigations
+              // TODO: When page in history is error (Failing) this is -1 (session restore) an not the backForward
               navigationAction.navigationType != .backForward
         else {
             return .next

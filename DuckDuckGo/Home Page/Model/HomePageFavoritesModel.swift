@@ -38,9 +38,8 @@ extension HomePage.Models {
     final class FavoritesModel: ObservableObject {
 
         enum OpenTarget {
-
-            case current, newTab, newWindow
-
+            case newTab
+            case newWindow
         }
 
         @UserDefaultsWrapper(key: .homePageShowAllFavorites, defaultValue: true)
@@ -80,13 +79,13 @@ extension HomePage.Models {
         @available(macOS, obsoleted: 11.0, message: "Use visibleModels and LazyVGrid instead")
         @Published private(set) var rows: [[FavoriteModel]] = []
 
-        let open: (Bookmark, OpenTarget) -> Void
+        let open: (Bookmark, OpenTarget?) -> Void
         let removeFavorite: (Bookmark) -> Void
         let deleteBookmark: (Bookmark) -> Void
         let addEdit: (Bookmark?) -> Void
         let moveFavorite: (Bookmark, Int) -> Void
 
-        init(open: @escaping (Bookmark, OpenTarget) -> Void,
+        init(open: @escaping (Bookmark, OpenTarget?) -> Void,
              removeFavorite: @escaping (Bookmark) -> Void,
              deleteBookmark: @escaping (Bookmark) -> Void,
              addEdit: @escaping (Bookmark?) -> Void,
@@ -110,7 +109,7 @@ extension HomePage.Models {
         }
 
         func open(_ bookmark: Bookmark) {
-            open(bookmark, .current)
+            open(bookmark, nil)
         }
 
         func edit(_ bookmark: Bookmark) {

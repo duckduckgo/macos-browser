@@ -76,7 +76,11 @@ extension OSLog {
     static var atb: OSLog {
         Logging.atbLoggingEnabled ? Logging.atbLog : .disabled
     }
-    
+
+    static var navigation: OSLog {
+        Logging.navigationLoggingEnabled ? Logging.navigationLog : .disabled
+    }
+
 }
 
 struct Logging {
@@ -122,5 +126,8 @@ struct Logging {
     
     fileprivate static let attributionLoggingEnabled = false
     fileprivate static let attributionLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Ad Attribution")
+
+    fileprivate static let navigationLoggingEnabled = true
+    fileprivate static let navigationLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Navigation")
 
 }

@@ -89,7 +89,7 @@ extension ClickToLoad: ClickToLoadUserScriptDelegate {
 
 extension ClickToLoad: NavigationResponder {
 
-    func webView(_: WebView, decidePolicyFor navigationAction: WKNavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
+    func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
         navigationAction.request.url.map(updateFBProtectionEnabled(for:))
 
         return .next

@@ -169,22 +169,23 @@ final class HomePageViewController: NSViewController {
     }
 
     private func openUrl(_ url: URL, target: HomePage.Models.FavoritesModel.OpenTarget? = nil) {
-        if target == .newWindow || NSApplication.shared.isCommandPressed && NSApplication.shared.isOptionPressed {
-            WindowsManager.openNewWindow(with: url)
-            return
+        let modifiers: LoadTargetModifiers?
+        switch target {
+        case .newTab:
+            modifiers = .retarget(.tab(selected: true))
+        case .newWindow:
+            modifiers = .retarget(.window(active: true))
+        case .none:
+            modifiers = .current()
         }
-
-        if target == .newTab || NSApplication.shared.isCommandPressed && NSApplication.shared.isShiftPressed {
-            tabCollectionViewModel.appendNewTab(with: .contentFromURL(url), selected: true)
-            return
+        switch modifiers {
+        case .none, .download, .retarget(.popup):
+            tabCollectionViewModel.selectedTabViewModel?.tab.setContent(.contentFromURL(url))
+        case .retarget(.window(active: let showWindow)):
+            WindowsManager.openNewWindow(with: url, showWindow: showWindow)
+        case .retarget(.tab(selected: let selected)):
+            tabCollectionViewModel.appendNewTab(with: .contentFromURL(url), selected: selected)
         }
-
-        if NSApplication.shared.isCommandPressed {
-            tabCollectionViewModel.appendNewTab(with: .contentFromURL(url), selected: false)
-            return
-        }
-
-        tabCollectionViewModel.selectedTabViewModel?.tab.setContent(.contentFromURL(url))
     }
 
     private func showAddEditController(for bookmark: Bookmark? = nil) {

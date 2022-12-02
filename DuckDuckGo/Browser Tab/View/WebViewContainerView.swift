@@ -18,9 +18,10 @@
 
 import AppKit
 import Combine
+import WebKit
 
 final class WebViewContainerView: NSView {
-    let webView: WebView
+    let webView: WKWebView
 
     override var constraints: [NSLayoutConstraint] {
         // return nothing to WKFullScreenWindowController which will keep the constraints
@@ -29,7 +30,7 @@ final class WebViewContainerView: NSView {
         return []
     }
 
-    init(webView: WebView, frame: NSRect) {
+    init(webView: WKWebView, frame: NSRect) {
         self.webView = webView
         super.init(frame: frame)
         
@@ -75,9 +76,24 @@ final class WebViewContainerView: NSView {
         super.removeFromSuperview()
     }
 
+    override func viewDidMoveToWindow() {
+        super.viewDidMoveToWindow()
+        // Reopen Developer Tools when moved to another window
+        if webView.isInspectorShown {
+            webView.openDeveloperTools()
+        }
+    }
+// TODO: Handle outside of WebView
+    override func willOpenMenu(_ menu: NSMenu, with event: NSEvent) {
+        super.willOpenMenu(menu, with: event)
+    }
+    override func didCloseMenu(_ menu: NSMenu, with event: NSEvent?) {
+        super.didCloseMenu(menu, with: event)
+    }
+
 }
 
-extension WebView {
+extension WKWebView {
     var containerView: WebViewContainerView? {
         superview as? WebViewContainerView ?? tabContentView.superview as? WebViewContainerView
     }

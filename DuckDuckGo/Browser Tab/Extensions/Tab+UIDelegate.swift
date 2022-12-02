@@ -16,10 +16,11 @@
 //  limitations under the License.
 //
 
+import Combine
 import Foundation
 import WebKit
 
-extension Tab: WebViewUIDelegate {
+extension Tab: WKUIDelegate {
 
     @objc(_webView:saveDataToFile:suggestedFilename:mimeType:originatingURL:)
     func webView(_ webView: WKWebView, saveDataToFile data: Data, suggestedFilename: String, mimeType: String, originatingURL: URL) {
@@ -63,12 +64,6 @@ extension Tab: WebViewUIDelegate {
                  windowFeatures: WKWindowFeatures,
                  completionHandler: @escaping (WKWebView?) -> Void) {
 
-        let url = navigationAction.request.url
-        let domain = navigationAction.sourceFrame.request.url?.host ?? self.url?.host
-        let webViewFrame = webView.frame
-        let windowContentSize = NSSize(width: windowFeatures.width?.intValue ?? 1024,
-                                       height: windowFeatures.height?.intValue ?? 752)
-
         // TODO: works wrong!
         // cmd+click should open background tab
         // cmd+shift+click should open selected tab
@@ -76,69 +71,64 @@ extension Tab: WebViewUIDelegate {
         // cmd+alt+shift+click should open new window
         // alt+[shift]+click should download
 
-        let popup = windowFeatures.toolbarsVisibility?.boolValue != true
-        let windowFeatures = self.webView.expectedNavigation?.find(lastWhere: {
-            if case .willRequestNewWebView(url: url, target: _, windowFeatures: let expectedFeatures) = $0 { return expectedFeatures }
-            return nil
-        }) ?? {
-            // not initiated by Tab - check initiating event
-            // TODO: !NSApp.isCommandPressed? what about this event? NSApp.currentEvent maybe?
-            WindowFeatures(wkWindowFeatures: windowFeatures, selected: NSApp.isShiftPressed)
-        }()
-        
-        let newWindow = windowFeatures.window ?? false
-        let selected = windowFeatures.selected ?? false
-
-        func nextQuery(for parentTab: Tab) -> PermissionAuthorizationQuery? {
-            parentTab.permissions.authorizationQueries.first(where: { $0.permissions.contains(.popups) })
-        }
-        let shouldOpenPopupNow: Bool = {
-            if navigationAction.isUserInitiated { return true }
-
-            var isCalledSynchronously = true
-            defer { isCalledSynchronously = false }
-            var result = false
-
-            self.permissions.permissions(.popups, requestedForDomain: domain, url: url) { [weak self] granted in
-                if isCalledSynchronously {
-                    result = granted
-                    return
-                }
-
-                guard granted, let self = self else {
-                    completionHandler(nil)
-                    return
-                }
-
-                let tab = Tab(content: .none, webViewConfiguration: configuration, parentTab: self, webViewFrame: webViewFrame)
-                if popup {
-                    WindowsManager.openPopUpWindow(with: tab, contentSize: windowContentSize)
-                } else {
-                    WindowsManager.openNewWindow(with: tab)
-                }
-
-                self.permissions.permissions.popups.popupOpened(nextQuery: nextQuery(for: self))
-
-                completionHandler(tab.webView)
+        var retargetedNavigation: Navigation?
+        let newWindowPolicy: NewWindowPolicy? = {
+            if let newWindowPolicy = extensions.contextMenu?.decideNewWindowPolicy(for: navigationAction) {
+                return newWindowPolicy
             }
-            return result
+            if let (newWindowPolicy, navigation) = extensions.newTabNavigation?.decideNewWindowPolicy(for: navigationAction) {
+                retargetedNavigation = navigation
+                return newWindowPolicy
+            }
+            return nil
         }()
-
-        guard shouldOpenPopupNow else { return }
-
-        let tab = Tab(content: .none, webViewConfiguration: configuration, parentTab: self, webViewFrame: webViewFrame)
-        if popup {
-            WindowsManager.openPopUpWindow(with: tab, contentSize: windowContentSize)
-        } else if newWindow {
-            WindowsManager.openNewWindow(with: tab)
-        } else {
-            self.delegate?.tab(self, createdChild: tab, selected: selected)
+        switch newWindowPolicy {
+        case .open(let kind):
+            completionHandler(self.createWebView(from: webView, with: configuration, for: navigationAction, of: kind, withRetargetedNavigation: retargetedNavigation))
+            return
+        case .none where navigationAction.isUserInitiated:
+            completionHandler(self.createWebView(from: webView, with: configuration, for: navigationAction, of: NewWindowKind(windowFeatures), withRetargetedNavigation: nil))
+            return
+        case .cancel:
+            completionHandler(nil)
+            return
+        case .none:
+            break
         }
 
-        self.permissions.permissions.popups.popupOpened(nextQuery: nextQuery(for: self))
+        let url = navigationAction.request.url
+        let domain = navigationAction.sourceFrame.request.url?.host ?? self.url?.host
+        self.permissions.request([.popups], forDomain: domain, url: url).receive { [weak self] result in
+            guard case .success(true) = result,
+                  let self = self
+            else {
+                completionHandler(nil)
+                return
+            }
+            let webView = self.createWebView(from: webView, with: configuration, for: navigationAction, of: NewWindowKind(windowFeatures), withRetargetedNavigation: nil)
+
+            self.permissions.permissions.popups
+                .popupOpened(nextQuery: self.permissions.authorizationQueries.first(where: { $0.permissions.contains(.popups) }))
+            completionHandler(webView)
+        }
+    }
+
+    private func createWebView(from webView: WKWebView, with configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, of kind: NewWindowKind, withRetargetedNavigation retargetedNavigation: Navigation?) -> WKWebView? {
+
+        guard let delegate = delegate else { return nil }
+
+        let tab = Tab(content: .none, webViewConfiguration: configuration, parentTab: self, webViewFrame: webView.frame)
+        delegate.tab(self, createdChild: tab, of: kind)
+
+        let webView = tab.webView
+        if let navigationDelegate = webView.navigationDelegate as? DistributedNavigationDelegate {
+            navigationDelegate.currentNavigation = retargetedNavigation
+        } else {
+            assertionFailure("DistributedNavigationDelegate expected at webView.navigationDelegate")
+        }
 
         // WebKit automatically loads the request in the returned web view.
-        completionHandler(tab.webView)
+        return webView
     }
 
     // official API callback fallback if async _webView::::completionHandler: can‘t be called for whatever reason

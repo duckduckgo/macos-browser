@@ -19,31 +19,52 @@
 import WebKit
 import Foundation
 
-final class NewTabNavigationResponder: NavigationResponder {
+final class NewTabNavigationResponder: TabExtension {
+
+    private weak var tab: Tab?
+    var retargetedNavigation: Navigation?
+
+    func attach(to tab: Tab) {
+        self.tab = tab
+    }
+
+    func decideNewWindowPolicy(for navigationAction: WKNavigationAction) -> (NewWindowPolicy, retargetedNavigation: Navigation?)? {
+        nil // TODO: decide and return with retargetedNavigation
+    }
+
+}
+
+extension NewTabNavigationResponder: NavigationResponder {
 
     struct Dependencies {
         @Injected static var pinnedTabsManager: PinnedTabsManager = WindowControllersManager.shared.pinnedTabsManager
     }
 
-    func webView(_ webView: WebView, decidePolicyFor navigationAction: WKNavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
+    func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
+        // TODO: What about form posted?
+//        if navigationAction.isMiddleClick {
+//            return .retarget(in: .)
+//        }
+//
+//        let isLinkActivated = navigationAction.navigationType == .linkActivated
+//        let isNavigatingAwayFromPinnedTab: Bool = {
+//            let isNavigatingToAnotherDomain = navigationAction.url.host != navigationAction.sourceFrame.url?.host
+//            let isPinned = tab.map(Dependencies.pinnedTabsManager.isTabPinned) ?? false
+//            return isLinkActivated && isPinned && isNavigatingToAnotherDomain
+//        }()
+//
+//        let isMiddleButtonClicked = navigationAction.isMiddleClick
+//
+//        // TODO: Fixthis in centralised decision maker
+        // TODO: When context menu + cmd pressed: opens 2 tabs for www.duckduckgo.com link
+//        // to be modularized later on, see https://app.asana.com/0/0/1203268245242140/f
+//        let isRequestingNewTab = (isLinkActivated && NSApp.isCommandPressed) || isMiddleButtonClicked || isNavigatingAwayFromPinnedTab
+//        let shouldSelectNewTab = NSApp.isShiftPressed || (isNavigatingAwayFromPinnedTab && !isMiddleButtonClicked && !NSApp.isCommandPressed)
 
-        let isLinkActivated = navigationAction.navigationType == .linkActivated
-        let isNavigatingAwayFromPinnedTab: Bool = {
-            let isNavigatingToAnotherDomain = navigationAction.request.url?.host != webView.url?.host
-            let isPinned = webView.tab.map(Dependencies.pinnedTabsManager.isTabPinned) ?? false
-            return isLinkActivated && isPinned && isNavigatingToAnotherDomain
-        }()
+//        if isRequestingNewTab {
+//            return .retarget(in: .tab(selected: shouldSelectNewTab))
+//        }
 
-        let isMiddleButtonClicked = navigationAction.isMiddleClick
-
-        // TODO: Fixthis in centralised decision maker
-        // to be modularized later on, see https://app.asana.com/0/0/1203268245242140/f
-        let isRequestingNewTab = (isLinkActivated && NSApp.isCommandPressed) || isMiddleButtonClicked || isNavigatingAwayFromPinnedTab
-        let shouldSelectNewTab = NSApp.isShiftPressed || (isNavigatingAwayFromPinnedTab && !isMiddleButtonClicked && !NSApp.isCommandPressed)
-
-        if isRequestingNewTab {
-            return .retarget(in: shouldSelectNewTab ? .selectedTab : .backgroundTab)
-        }
         return .next
     }
 

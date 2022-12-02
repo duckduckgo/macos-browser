@@ -20,9 +20,10 @@ import WebKit
 
 struct TabUserAgent: NavigationResponder {
 
-    func webView(_ webView: WebView, decidePolicyFor navigationAction: WKNavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
-
-        preferences.userAgent = UserAgent.for(navigationAction.request.url)
+    func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
+        if navigationAction.isForMainFrame {
+            preferences.userAgent = UserAgent.for(navigationAction.request.url)
+        }
         return .next
     }
 

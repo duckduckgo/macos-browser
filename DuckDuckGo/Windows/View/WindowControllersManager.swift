@@ -116,39 +116,37 @@ extension WindowControllersManager {
 
     /// Opens a bookmark in a tab, respecting the current modifier keys when deciding where to open the bookmark's URL.
     func open(bookmark: Bookmark) {
-        if NSApplication.shared.isCommandPressed && NSApplication.shared.isShiftPressed {
-            WindowsManager.openNewWindow(with: bookmark.url)
-        } else if mainWindowController?.mainViewController.view.window?.isPopUpWindow ?? false {
-            show(url: bookmark.url, newTab: true)
-        } else if NSApplication.shared.isCommandPressed {
-            mainWindowController?.mainViewController.tabCollectionViewModel.appendNewTab(with: .url(bookmark.url), selected: false)
-        } else if selectedTab?.isPinned ?? false { // When selecting a bookmark with a pinned tab active, always open the URL in a new tab
-            show(url: bookmark.url, newTab: true)
-        } else {
-            show(url: bookmark.url)
+        var showWindow = true
+        switch LoadTargetModifiers.current() {
+        case .retarget(.window(active: let active)):
+            showWindow = active
+        case .retarget(.tab(selected: let selected)):
+            showWindow = selected
+            guard mainWindowController?.mainViewController.view.window?.isPopUpWindow ?? false else { break }
+            show(url: bookmark.url, newTab: true, selected: selected)
+        case .none, .download:
+            guard mainWindowController?.mainViewController.view.window?.isPopUpWindow ?? false else { break }
+            // When selecting a bookmark with a pinned tab active, always open the URL in a new tab
+            show(url: bookmark.url, newTab: selectedTab?.isPinned ?? false)
+        case .retarget(.popup):
+            break
         }
+        WindowsManager.openNewWindow(with: bookmark.url, showWindow: showWindow)
     }
     
-    func show(url: URL?, newTab: Bool = false) {
+    func show(url: URL?, newTab: Bool = false, selected: Bool = true) {
 
         func show(url: URL?, in windowController: MainWindowController) {
             let viewController = windowController.mainViewController
             windowController.window?.makeKeyAndOrderFront(self)
 
             let tabCollectionViewModel = viewController.tabCollectionViewModel
-            let tabCollection = tabCollectionViewModel.tabCollection
+            let tabContent: Tab.TabContent = url.map { .url($0) } ?? .homePage
 
-            if tabCollection.tabs.count == 1,
-               let firstTab = tabCollection.tabs.first,
-               case .homePage = firstTab.content,
-               !newTab {
-                firstTab.setContent(url.map { .url($0) } ?? .homePage)
-            } else if let tab = tabCollectionViewModel.selectedTabViewModel?.tab, !newTab {
-                tab.setContent(url.map { .url($0) } ?? .homePage)
+            if !newTab {
+                tabCollectionViewModel.selectedTabViewModel?.tab.setContent(tabContent)
             } else {
-                let newTab = Tab(content: url.map { .url($0) } ?? .homePage)
-                newTab.setContent(url.map { .url($0) } ?? .homePage)
-                tabCollectionViewModel.append(tab: newTab)
+                tabCollectionViewModel.insert(tab: Tab(content: tabContent), selected: selected)
             }
         }
 
@@ -167,7 +165,7 @@ extension WindowControllersManager {
 
         // Open a new window
         if let url = url {
-            WindowsManager.openNewWindow(with: url)
+            WindowsManager.openNewWindow(with: url, showWindow: selected)
         } else {
             WindowsManager.openNewWindow()
         }

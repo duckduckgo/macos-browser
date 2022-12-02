@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import ContentBlocking
 import Foundation
 import TrackerRadarKit
 import BrowserServicesKit

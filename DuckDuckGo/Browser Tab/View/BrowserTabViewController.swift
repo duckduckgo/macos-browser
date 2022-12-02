@@ -295,40 +295,50 @@ final class BrowserTabViewController: NSViewController {
         homePageView.isHidden = shown
     }
 
-    // TODO: Remove this
-    func openNewTab(with content: Tab.TabContent, parentTab: Tab? = nil, selected: Bool = false, canBeClosedWithBack: Bool = false) {
-        // shouldn't open New Tabs in PopUp window
-        guard view.window?.isPopUpWindow == false else {
-            // Prefer Tab's Parent
-            if let parentTab = tabCollectionViewModel.selectedTabViewModel?.tab.parentTab, parentTab.delegate !== self {
-                parentTab.webView.load(content.url!, in: .blank, windowFeatures: .selectedTab)
-                parentTab.webView.window?.makeKeyAndOrderFront(nil)
-                // Act as default URL Handler if no Parent
-            } else {
-                WindowControllersManager.shared.showTab(with: content)
+    enum NewTabContent {
+        case homePage
+        case anyPreferencePane
+        case bookmarks
+
+        fileprivate var tabContent: Tab.TabContent {
+            switch self {
+            case .homePage:
+                return .homePage
+            case .anyPreferencePane:
+                return .anyPreferencePane
+            case .bookmarks:
+                return .bookmarks
             }
-            return
-        }
-
-        guard tabCollectionViewModel.selectDisplayableTabIfPresent(content) == false else {
-            return
-        }
-
-        let tab = Tab(content: content,
-                      parentTab: parentTab,
-                      shouldLoadInBackground: true,
-                      canBeClosedWithBack: canBeClosedWithBack,
-                      webViewFrame: view.frame)
-
-        if parentTab != nil {
-            tabCollectionViewModel.insertChild(tab: tab, selected: selected)
-        } else {
-            tabCollectionViewModel.append(tab: tab, selected: selected)
         }
     }
 
-    func tab(_ tab: Tab, createdChild childTab: Tab, selected: Bool) {
-        self.tabCollectionViewModel.insertChild(tab: childTab, selected: selected)
+    func openNewTab(with content: NewTabContent) {
+        let content = content.tabContent
+
+        var parentTab = self.tabViewModel?.tab
+        // shouldn't open New Tabs in PopUp window
+        while parentTab != nil && (parentTab?.delegate as? BrowserTabViewController)?.view.window?.isPopUpWindow == true {
+            // Prefer Tab's Parent
+            parentTab = parentTab?.parentTab
+        }
+        guard let parentTab = parentTab else {
+            WindowControllersManager.shared.showTab(with: content)
+            return
+        }
+
+        parentTab.delegate?.tab(parentTab, createdChild: Tab(content: content), of: .tab(selected: true))
+        (parentTab.delegate as? BrowserTabViewController)?.view.window?.makeKeyAndOrderFront(nil)
+    }
+
+    func tab(_ tab: Tab, createdChild childTab: Tab, of kind: NewWindowKind) {
+        switch kind {
+        case .popup(size: let windowContentSize):
+            WindowsManager.openPopUpWindow(with: tab, contentSize: windowContentSize)
+        case .window(active: let active):
+            WindowsManager.openNewWindow(with: tab, showWindow: active)
+        case .tab(selected: let selected):
+            self.tabCollectionViewModel.insert(childTab, after: tab, selected: selected)
+        }
     }
 
     // MARK: - Browser Tabs
@@ -371,38 +381,38 @@ final class BrowserTabViewController: NSViewController {
         }
         scheduleHoverLabelUpdatesForUrl(nil)
 
-        switch tabViewModel?.tab.content {
-        case .bookmarks:
-            removeAllTabContent()
-            showTabContentController(bookmarksViewController)
-
-        case let .preferences(pane):
-            removeAllTabContent()
-            if let pane = pane, preferencesViewController.model.selectedPane != pane {
-                preferencesViewController.model.selectPane(pane)
-            }
-            showTabContentController(preferencesViewController)
-
-        case .onboarding:
-            removeAllTabContent()
-            if !OnboardingViewModel().onboardingFinished {
-                requestDisableUI()
-            }
-            showTransientTabContentController(OnboardingViewController.create(withDelegate: self))
-
-        case .url, .privatePlayer:
+//        switch tabViewModel?.tab.content {
+//        case .bookmarks:
+//            removeAllTabContent()
+//            showTabContentController(bookmarksViewController)
+//
+//        case let .preferences(pane):
+//            removeAllTabContent()
+//            if let pane = pane, preferencesViewController.model.selectedPane != pane {
+//                preferencesViewController.model.selectPane(pane)
+//            }
+//            showTabContentController(preferencesViewController)
+//
+//        case .onboarding:
+//            removeAllTabContent()
+//            if !OnboardingViewModel().onboardingFinished {
+//                requestDisableUI()
+//            }
+//            showTransientTabContentController(OnboardingViewController.create(withDelegate: self))
+//
+//        case .url, .privatePlayer:
             if shouldReplaceWebView(for: tabViewModel) {
                 removeAllTabContent(includingWebView: true)
                 changeWebView(tabViewModel: tabViewModel)
             }
-
-        case .homePage:
-            removeAllTabContent()
-            view.addAndLayout(homePageView)
-
-        default:
-            break
-        }
+//
+//        case .homePage:
+//            removeAllTabContent()
+//            view.addAndLayout(homePageView)
+//
+//        default:
+//            break
+//        }
     }
 
     private func shouldReplaceWebView(for tabViewModel: TabViewModel?) -> Bool {
@@ -470,11 +480,16 @@ extension BrowserTabViewController: ContentOverlayUserScriptDelegate {
 
 extension BrowserTabViewController: TabDelegate {
 
+    func removeFirstResponderFromWebView() {
+        self.view.makeMeFirstResponder()
+    }
+
     func tab(_ tab: Tab, promptUserForCookieConsent result: @escaping (Bool) -> Void) {
         cookieConsentPopoverManager.show(on: view, animated: true, result: result)
         cookieConsentPopoverManager.currentTab = tab
     }
 
+    // TODO: handle this
     func tabWillStartNavigation(_ tab: Tab, isUserInitiated: Bool) {
         if isUserInitiated,
            let window = self.view.window,
@@ -485,52 +500,13 @@ extension BrowserTabViewController: TabDelegate {
         }
     }
 
-    func tab(_ tab: Tab, requestedOpenExternalURL url: URL, forUserEnteredURL userEntered: Bool) {
-
-        let searchForExternalUrl = { [weak tab] in
-            // Redirect after handing WebView.url update after cancelling the request
-            DispatchQueue.main.async {
-                tab?.update(url: URL.makeSearchUrl(from: url.absoluteString), userEntered: false)
-            }
-        }
-
-        // Another way of detecting whether an app is installed to handle a protocol is described in Asana:
-        // https://app.asana.com/0/1201037661562251/1202055908401751/f
-        guard NSWorkspace.shared.urlForApplication(toOpen: url) != nil else {
-            if userEntered {
-                searchForExternalUrl()
-            }
-            return
-        }
-        self.view.makeMeFirstResponder()
-
-        let permissionType = PermissionType.externalScheme(scheme: url.scheme ?? "")
-
-        tab.permissions.permissions([permissionType],
-                                    requestedForDomain: webView?.url?.host,
-                                    url: url) { [weak self, weak tab] granted in
-            guard granted, let tab = tab else {
-                if userEntered {
-                    searchForExternalUrl()
-                }
-                return
-            }
-
-            self?.tab(tab, openExternalURL: url, touchingPermissionType: permissionType)
-        }
-    }
-
-    private func tab(_ tab: Tab, openExternalURL url: URL, touchingPermissionType permissionType: PermissionType) {
-        NSWorkspace.shared.open(url)
-        tab.permissions.permissions[permissionType].externalSchemeOpened()
-    }
-
     func tabPageDOMLoaded(_ tab: Tab) {
         if tabViewModel?.tab == tab {
             tabViewModel?.isLoading = false
         }
     }
 
+    // TODO: handle this
     func tabDidStartNavigation(_ tab: Tab) {
         setFirstResponderIfNeeded()
         guard let tabViewModel = tabViewModel else { return }
@@ -541,10 +517,6 @@ extension BrowserTabViewController: TabDelegate {
            tabViewModel.tab.webView.isLoading {
             tabViewModel.isLoading = true
         }
-    }
-
-    func tab(_ tab: Tab, requestedNewTabWith content: Tab.TabContent, selected: Bool) {
-        openNewTab(with: content, parentTab: tab, selected: selected, canBeClosedWithBack: selected == true)
     }
 
     func closeTab(_ tab: Tab) {

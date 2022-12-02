@@ -25,10 +25,10 @@ import TrackerRadarKit
 import UserScript
 
 protocol TabDelegate: FileDownloadManagerDelegate, ContentOverlayUserScriptDelegate {
-    func tabWillStartNavigation(_ tab: Tab, isUserInitiated: Bool)
-    func tabDidStartNavigation(_ tab: Tab)
-    func tab(_ tab: Tab, createdChild childTab: Tab, selected: Bool)
-    func tab(_ tab: Tab, requestedOpenExternalURL url: URL, forUserEnteredURL: Bool)
+
+    func removeFirstResponderFromWebView()
+
+    func tab(_ tab: Tab, createdChild childTab: Tab, of kind: NewWindowKind)
 
     func tab(_ tab: Tab,
              requestedBasicAuthenticationChallengeWith protectionSpace: URLProtectionSpace,
@@ -158,6 +158,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     }
 
     private let webViewConfiguration: WKWebViewConfiguration
+    private let navigationDelegate = DistributedNavigationDelegate(logger: .navigation)
     private(set) var extensions: TabExtensions = .createExtensions()
 
     var userContentController: UserContentController {
@@ -175,30 +176,33 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         clicksSubject.eraseToAnyPublisher()
     }
 
-    private func navigationResponders() -> [NavigationResponder?] {
-        [
-            extensions.contextMenu,
-            TabUserAgent(),
+    private func setupNavigationResponders() {
+        navigationDelegate.setResponders(
+            .weak(self),
 
-            NewTabNavigationResponder(),
+            .weak(nullable: extensions.contextMenu),
+            .struct(TabUserAgent()),
 
-            extensions.history,
-            LocalFileNavigationResponder(),
+            .strong(NewTabNavigationResponder()),
 
-            extensions.linkProtection,
-            extensions.referrerTrimming,
-            GlobalPrivacyControlResponder(),
-            TabRequestHeaders(),
+            .weak(nullable: extensions.externalSchemes),
+            .weak(nullable: extensions.history),
+            .strong(LocalFileNavigationResponder()),
 
-            extensions.downloads,
+            .weak(nullable: extensions.linkProtection),
+            .struct(nullable: extensions.referrerTrimming),
+            .struct(GlobalPrivacyControlResponder()),
+            .struct(TabRequestHeaders()),
 
-            extensions.adClickAttribution,
-            extensions.httpsUpgrade,
-            extensions.contentBlocking,
+            .weak(nullable: extensions.downloads),
 
-            extensions.clickToLoad,
-            extensions.duckPlayer
-        ]
+            .weak(nullable: extensions.adClickAttribution),
+            .weak(nullable: extensions.httpsUpgrade),
+            .weak(nullable: extensions.contentBlocking),
+
+            .weak(nullable: extensions.clickToLoad),
+            .weak(nullable: extensions.duckPlayer)
+        )
     }
 
     init(content: TabContent,
@@ -238,7 +242,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         userContentController.delegate = self
 
         extensions.attach(to: self)
-        extensions.navigationDelegate.responders = navigationResponders().compactMap { $0 }
+        setupNavigationResponders()
 
         setupWebView(shouldLoadInBackground: shouldLoadInBackground)
 
@@ -411,6 +415,10 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         webView.canGoForward
     }
 
+    var forwardItem: WKBackForwardListItem? {
+        return webView.backForwardList.forwardItem
+    }
+
     func goForward() {
         guard canGoForward else { return }
         webView.goForward()
@@ -418,6 +426,10 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
     var canGoBack: Bool {
         webView.canGoBack || error != nil
+    }
+
+    var backItem: WKBackForwardListItem? {
+        return webView.backForwardList.backItem
     }
 
     func goBack() {
@@ -436,8 +448,16 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         webView.goBack()
     }
 
+    func close() {
+        webView.close()
+    }
+
     func go(to item: WKBackForwardListItem) {
         webView.go(to: item)
+    }
+
+    func load(_ url: URL, in newWindowKind: NewWindowKind) {
+        webView.load(url, in: newWindowKind)
     }
 
     func openHomePage() {
@@ -461,10 +481,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         } else {
             webView.reload()
         }
-    }
-
-    func decideNewWindowPolicy(for navigationAction: WKNavigationAction) -> NewWindowPolicy? {
-        extensions.contextMenu?.decideNewWindowPolicy(for: navigationAction)
     }
 
     @MainActor
@@ -491,7 +507,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                 if url.isFileURL {
                     _ = webView.loadFileURL(url, allowingReadAccessTo: URL(fileURLWithPath: "/"))
                 } else {
-                    webView.load(url)
+                    webView.load(URLRequest(url: url, userInitiated: userEnteredUrl))
                 }
             }
         }
@@ -597,7 +613,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     private var superviewObserver: NSKeyValueObservation?
 
     private func setupWebView(shouldLoadInBackground: Bool) {
-        webView.navigationDelegate = extensions.navigationDelegate
+        webView.navigationDelegate = navigationDelegate
         webView.uiDelegate = self
         webView.allowsBackForwardNavigationGestures = true
         webView.allowsMagnification = true
@@ -691,6 +707,32 @@ extension Tab: FaviconUserScriptDelegate {
 
 }
 
+extension Tab: NavigationResponder {
+
+    func redirect(_ navigationAction: NavigationAction, to request: URLRequest) {
+        guard navigationAction.isForMainFrame else {
+            assertionFailure("Redirect for frames is not supported")
+            return
+        }
+        assert(![.reload, .backForward, .sessionRestoration].contains(navigationAction.navigationType),
+               "Avoid using redirects for non-load navigations, this will corrupt navigation history")
+
+        if case .redirect(type: _, navigation: .some(let previousNavigation)) = navigationAction.navigationType,
+           previousNavigation.isCommitted {
+
+//            webView.goBack()
+            Swift.print("goback")
+        }
+        webView.load(request)
+    }
+
+    func retarget(_ navigationAction: NavigationAction, to windowKind: NewWindowKind) {
+        assert(navigationAction.request.httpMethod == "GET")
+        self.load(navigationAction.url, in: windowKind)
+    }
+
+}
+
 extension Tab: TabDataClearing {
     func prepareForDataClearing(caller: TabDataCleaner) {
         webView.stopLoading()
@@ -704,7 +746,6 @@ extension Tab: TabDataClearing {
 extension WebView {
 
     var tab: Tab? {
-        guard let uiDelegate = self.extendedUIDelegate else { return nil }
         guard let tab = uiDelegate as? Tab else {
             assertionFailure("webView.uiDelegate is not a Tab")
             return nil

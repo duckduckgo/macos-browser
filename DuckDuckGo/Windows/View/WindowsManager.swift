@@ -66,7 +66,7 @@ final class WindowsManager {
     }
 
     @discardableResult
-    class func openNewWindow(with tab: Tab, droppingPoint: NSPoint? = nil, contentSize: NSSize? = nil, popUp: Bool = false) -> MainWindow? {
+    class func openNewWindow(with tab: Tab, droppingPoint: NSPoint? = nil, contentSize: NSSize? = nil, showWindow: Bool = true, popUp: Bool = false) -> MainWindow? {
         let tabCollection = TabCollection()
         tabCollection.append(tab: tab)
 
@@ -78,13 +78,14 @@ final class WindowsManager {
         }()
 
         return openNewWindow(with: tabCollectionViewModel,
-                      droppingPoint: droppingPoint,
-                      contentSize: contentSize,
-                      popUp: popUp)
+                             droppingPoint: droppingPoint,
+                             contentSize: contentSize,
+                             showWindow: showWindow,
+                             popUp: popUp)
     }
 
-    class func openNewWindow(with initialUrl: URL, parentTab: Tab? = nil) {
-        openNewWindow(with: Tab(content: .contentFromURL(initialUrl), parentTab: parentTab))
+    class func openNewWindow(with initialUrl: URL, parentTab: Tab? = nil, showWindow: Bool = true) {
+        openNewWindow(with: Tab(content: .contentFromURL(initialUrl), parentTab: parentTab), showWindow: showWindow)
     }
 
     class func openNewWindow(with tabCollection: TabCollection, droppingPoint: NSPoint? = nil, contentSize: NSSize? = nil, popUp: Bool = false) {
@@ -99,10 +100,11 @@ final class WindowsManager {
     class func openPopUpWindow(with tab: Tab, contentSize: NSSize?) {
         if let mainWindowController = WindowControllersManager.shared.lastKeyMainWindowController,
            mainWindowController.window?.styleMask.contains(.fullScreen) == true,
-           mainWindowController.window?.isPopUpWindow == false {
-            mainWindowController.mainViewController.tabCollectionViewModel.insertChild(tab: tab, selected: true)
+           mainWindowController.window?.isPopUpWindow == false,
+           let parentTab = tab.parentTab {
+            mainWindowController.mainViewController.tabCollectionViewModel.insert(tab, after: parentTab, selected: true)
         } else {
-            self.openNewWindow(with: tab, contentSize: contentSize, popUp: true)
+            self.openNewWindow(with: tab, contentSize: contentSize, showWindow: true, popUp: true)
         }
     }
 

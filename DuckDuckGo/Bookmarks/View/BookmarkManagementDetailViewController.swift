@@ -145,13 +145,7 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
         }
 
         if let bookmark = entity as? Bookmark {
-            if NSApplication.shared.isCommandPressed && NSApplication.shared.isShiftPressed {
-                WindowsManager.openNewWindow(with: bookmark.url)
-            } else if NSApplication.shared.isCommandPressed {
-                WindowControllersManager.shared.show(url: bookmark.url, newTab: true)
-            } else {
-                WindowControllersManager.shared.show(url: bookmark.url, newTab: true)
-            }
+            WindowControllersManager.shared.open(bookmark: bookmark)
         } else if let folder = entity as? BookmarkFolder {
             resetSelections()
             delegate?.bookmarkManagementDetailViewControllerDidSelectFolder(folder)

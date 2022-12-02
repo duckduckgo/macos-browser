@@ -28,14 +28,14 @@ final class HTTPSUpgradeTabExtension: TabExtension {
     func attach(to tab: Tab) {
     }
 
-    private func resetConnectionUpgradedTo(navigationAction: WKNavigationAction) {
+    private func resetConnectionUpgradedTo(navigationAction: NavigationAction) {
         let isOnUpgradedPage = navigationAction.request.url == connectionUpgradedTo
-        if !navigationAction.isTargetingMainFrame || isOnUpgradedPage { return }
+        if !navigationAction.isForMainFrame || isOnUpgradedPage { return }
         connectionUpgradedTo = nil
     }
 
-    private func setConnectionUpgradedTo(_ upgradedUrl: URL, navigationAction: WKNavigationAction) {
-        if !navigationAction.isTargetingMainFrame { return }
+    private func setConnectionUpgradedTo(_ upgradedUrl: URL, navigationAction: NavigationAction) {
+        if !navigationAction.isForMainFrame { return }
         connectionUpgradedTo = upgradedUrl
     }
 
@@ -43,13 +43,13 @@ final class HTTPSUpgradeTabExtension: TabExtension {
 
 extension HTTPSUpgradeTabExtension: NavigationResponder {
 
+    // TODO: willStartNav
     func webView(_ webView: WebView, willStartNavigation navigation: WKNavigation?, with request: URLRequest) {
         lastUpgradedURL = nil
     }
 
-    func webView(_ webView: WebView, decidePolicyFor navigationAction: WKNavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
-
-        guard navigationAction.isTargetingMainFrame,
+    func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
+        guard navigationAction.isForMainFrame,
               navigationAction.navigationType != .backForward,
               let url = navigationAction.request.url
         else {

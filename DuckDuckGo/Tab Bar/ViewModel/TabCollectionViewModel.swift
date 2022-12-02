@@ -286,10 +286,9 @@ final class TabCollectionViewModel: NSObject {
         }
     }
 
-    func insertChild(tab: Tab, selected: Bool) {
+    func insert(_ tab: Tab, after parentTab: Tab, selected: Bool) {
         guard changesEnabled else { return }
-        guard let parentTab = tab.parentTab,
-              let parentTabIndex = indexInAllTabs(of: parentTab) else {
+        guard let parentTabIndex = indexInAllTabs(of: parentTab) else {
             os_log("TabCollection: No parent tab", type: .error)
             return
         }

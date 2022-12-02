@@ -22,6 +22,8 @@ import WebKit
 final class TabDownloadsExtension: TabExtension {
 
     private weak var tab: Tab?
+    // Used to track if an error was caused by a download navigation.
+    private var currentDownload: URL?
 
     init() {}
 
@@ -31,49 +33,69 @@ final class TabDownloadsExtension: TabExtension {
 
 }
 
+extension TabDownloadsExtension: NSCodingExtension {
+
+    private enum NSSecureCodingKeys {
+        static let currentDownload = "currentDownload"
+    }
+
+    func encode(using coder: NSCoder) {
+        coder.encode(currentDownload, forKey: NSSecureCodingKeys.currentDownload)
+    }
+    func awakeAfter(using decoder: NSCoder) {
+        self.currentDownload = decoder.decodeObject(of: NSURL.self, forKey: NSSecureCodingKeys.currentDownload) as? URL
+    }
+
+}
+
 extension TabDownloadsExtension: NavigationResponder {
 
-    func webView(_ webView: WebView, decidePolicyFor navigationAction: WKNavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
+    func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
+//        var isDownloadLinkAction: Bool {
+//            // TODO: move NSApp modifier options check to dependedncies
+//            navigationAction.navigationType == .linkActivated && NSApp.isOptionPressed && !NSApp.isCommandPressed
+//        }
 
-        var isDownloadLinkAction: Bool {
-            // TODO: move NSApp modifier options check to dependedncies
-            navigationAction.navigationType == .linkActivated && NSApp.isOptionPressed && !NSApp.isCommandPressed
+        if navigationAction.request.url != currentDownload || navigationAction.isUserInitiated {
+            currentDownload = nil
         }
+//        if navigationAction.shouldDownload || isDownloadLinkAction {
+//            return .download
+//        }
 
-        if navigationAction.shouldDownload || isDownloadLinkAction {
+        return .next
+    }
+
+    func decidePolicy(for navigationResponse: NavigationResponse) async -> NavigationResponsePolicy? {
+        guard !navigationResponse.canShowMIMEType || navigationResponse.shouldDownload else { return .next }
+
+        if navigationResponse.response.isSuccessfulHTTPURLResponse {
+            // prevent download twice
+            guard currentDownload != navigationResponse.response.url else {
+                // prevent download twice
+                return .cancel
+            }
+            currentDownload = navigationResponse.response.url
             return .download
         }
 
         return .next
     }
 
-    func webView(_ webView: WebView, decidePolicyFor navigationResponse: WKNavigationResponse) async -> WKNavigationResponsePolicy? {
-        guard !navigationResponse.canShowMIMEType || navigationResponse.shouldDownload else { return .next }
-
-        if navigationResponse.response.isSuccessfulHTTPURLResponse {
-            // register the navigationResponse for legacy _WKDownload to be called back on the Tab
-            // further download will be passed to webView:navigationResponse:didBecomeDownload:
-            return .download(navigationResponse, using: webView)
-            // prevent download twice
-            // TODO: redirect(ro: .privateScheme(.download_succecss(navigationResponse.response.url)))
-        }
-
-        return .next
-    }
-
-    func webView(_ webView: WebView, navigationAction: WKNavigationAction, didBecome download: WebKitDownload) {
+    func navigationAction(_ navigationAction: NavigationAction, didBecome download: WebKitDownload) {
         FileDownloadManager.shared.add(download, delegate: tab?.delegate, location: .auto, postflight: .none)
     }
 
-    func webView(_ webView: WebView, navigationResponse: WKNavigationResponse, didBecome download: WebKitDownload) {
+    func navigationResponse(_ navigationResponse: NavigationResponse, didBecome download: WebKitDownload) {
         FileDownloadManager.shared.add(download, delegate: tab?.delegate, location: .auto, postflight: .none)
 
         // Note this can result in tabs being left open, e.g. download button on this page:
         // https://en.wikipedia.org/wiki/Guitar#/media/File:GuitareClassique5.png
         // Safari closes new tabs that were opened and then create a download instantly.
-        if webView.backForwardList.currentItem == nil, self.tab?.parentTab != nil {
-            DispatchQueue.main.async { [weak webView] in
-                webView?.close()
+        // TODO: Navigation.didComit?
+        if tab?.canBeClosedWithBack ?? false {
+            DispatchQueue.main.async { [weak tab] in
+                tab?.close()
             }
         }
     }

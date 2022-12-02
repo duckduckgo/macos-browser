@@ -26,7 +26,7 @@ enum NavigationEvent {
     // Expectation
     case willGoToBackForwardListItem(WKBackForwardListItem, inPageCache: Bool)
 
-    case willRequestNewWebView(url: URL, target: TargetWindowName?, windowFeatures: WindowFeatures?)
+//    case willRequestNewWebView(url: URL, target: TargetWindowName?, windowFeatures: WindowFeatures?)
 
     // Decision
     case decidePolicyForNavigationAction(WKNavigationAction, preferences: NavigationPreferences)

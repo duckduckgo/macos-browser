@@ -20,25 +20,8 @@ import Cocoa
 import WebKit
 import os.log
 
+@objc(WebView)
 final class WebView: WKWebView {
-
-    var extendedNavigationDelegate: WebViewNavigationDelegate? {
-        get { navigationDelegate as? WebViewNavigationDelegate }
-        set { navigationDelegate = newValue }
-    }
-
-    var extendedUIDelegate: WebViewUIDelegate? {
-        get { uiDelegate as? WebViewUIDelegate }
-        set { uiDelegate = newValue }
-    }
-
-    override func viewDidMoveToWindow() {
-        super.viewDidMoveToWindow()
-        // Reopen Developer Tools when moved to another window
-        if self.isInspectorShown {
-            self.openDeveloperTools()
-        }
-    }
 
     deinit {
         self.configuration.userContentController.removeAllUserScripts()
@@ -49,30 +32,38 @@ final class WebView: WKWebView {
     @discardableResult
     override func load(_ request: URLRequest) -> WKNavigation? {
         let navigation = super.load(request)
-        extendedNavigationDelegate?.webView?(self, willStartNavigation: navigation, with: request)
+//        extendedNavigationDelegate?.webView?(self, willStartNavigation: navigation, with: request)
         return navigation
     }
 
-    override func load(_ url: URL, inTargetNamed target: String?, windowFeatures: WindowFeatures? = nil) {
-        extendedNavigationDelegate?.webView?(self, willRequestNewWebViewFor: url, inTargetNamed: target, windowFeatures: windowFeatures)
+    func load(_ url: URL, in targetKind: NewWindowKind) {
+//        extendedNavigationDelegate?.webView(self, willRequestNewWebViewFor: url, with: targetKind)
+        // TODO: noopener, noreferrer?
+        super.load(url, inTargetNamed: "_blank", windowFeatures: "noopener, noreferrer")
+    }
+
+    @available(*, unavailable)
+    override func load(_ url: URL, inTargetNamed target: String?, windowFeatures: String?) {
         super.load(url, inTargetNamed: target, windowFeatures: windowFeatures)
     }
 
     @discardableResult
     override func reload() -> WKNavigation? {
         let navigation = super.reload()
-        extendedNavigationDelegate?.webView?(self, willStartReloadNavigation: navigation)
+//        extendedNavigationDelegate?.webView?(self, willStartReloadNavigation: navigation)
         return navigation
     }
 
     // TODO: LoadSimulated/File etc..
+    // TODO: replaceLocation override
+    // TODO: loadURLInFrame override
 
     // MARK: - Back/Forward Navigation
 
     @discardableResult
     override func go(to item: WKBackForwardListItem) -> WKNavigation? {
         let navigation = super.go(to: item)
-        extendedNavigationDelegate?.webView?(self, willStartUserInitiatedNavigation: navigation, to: item)
+//        extendedNavigationDelegate?.webView?(self, willStartUserInitiatedNavigation: navigation, to: item)
         return navigation
     }
 
@@ -95,7 +86,7 @@ final class WebView: WKWebView {
         guard self.responds(to: #selector(WKWebView._restore(fromSessionStateData:))) else {
             throw DoesNotSupportRestoreFromSessionData()
         }
-        extendedNavigationDelegate?.webViewWillRestoreSessionState?(self)
+//        extendedNavigationDelegate?.webViewWillRestoreSessionState?(self)
         self._restore(fromSessionStateData: data)
     }
 
@@ -103,7 +94,7 @@ final class WebView: WKWebView {
     override var interactionState: Any? {
         get { super.interactionState }
         set {
-            extendedNavigationDelegate?.webViewWillRestoreSessionState?(self)
+//            extendedNavigationDelegate?.webViewWillRestoreSessionState?(self)
             super.interactionState = newValue
         }
     }
@@ -112,12 +103,28 @@ final class WebView: WKWebView {
 
     override func willOpenMenu(_ menu: NSMenu, with event: NSEvent) {
         super.willOpenMenu(menu, with: event)
-        extendedUIDelegate?.webView?(self, willOpenContextMenu: menu, with: event)
+        // TODO: extendedUIDelegate?.webView?(self, willOpenContextMenu: menu, with: event)
     }
 
     override func didCloseMenu(_ menu: NSMenu, with event: NSEvent?) {
         super.didCloseMenu(menu, with: event)
-        extendedUIDelegate?.webView?(self, didCloseContextMenu: menu, with: event)
+        // TODO: extendedUIDelegate?.webView?(self, didCloseContextMenu: menu, with: event)
     }
 
+}
+
+enum NewWindowKind {
+    case tab(selected: Bool)
+    case popup(size: CGSize)
+    case window(active: Bool)
+
+    init(_ windowFeatures: WKWindowFeatures) {
+        if windowFeatures.toolbarsVisibility?.boolValue ?? false {
+            let windowContentSize = NSSize(width: windowFeatures.width?.intValue ?? 1024,
+                                           height: windowFeatures.height?.intValue ?? 752)
+            self = .popup(size: windowContentSize)
+        } else {
+            self = .tab(selected: false)
+        }
+    }
 }

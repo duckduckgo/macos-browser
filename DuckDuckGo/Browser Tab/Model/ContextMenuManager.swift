@@ -28,8 +28,7 @@ protocol ContextMenuManagerDelegate: AnyObject {
 }
 
 enum NewWindowPolicy {
-    case newWindow
-    case newTab(selected: Bool)
+    case open(NewWindowKind)
     case cancel
 }
 
@@ -76,6 +75,7 @@ extension ContextMenuManager {
         .copyLink: handleCopyLinkItem,
         .copyImage: handleCopyImageItem,
         .openImageInNewWindow: handleOpenImageInNewWindowItem,
+        // TODO: openMediaInNewWindow
         .downloadImage: handleDownloadImageItem,
         .searchWeb: handleSearchWebItem,
         .reload: handleReloadItem,
@@ -254,7 +254,7 @@ private extension ContextMenuManager {
             return
         }
 
-        self.onNavigation = { _, _ in .retarget(in: .backgroundTab) }
+        self.onNavigation = { _, _ in .retarget(in: .tab(selected: false)) }
         NSApp.sendAction(action, to: originalItem.target, from: originalItem)
     }
 
@@ -268,7 +268,7 @@ private extension ContextMenuManager {
             return
         }
 
-        onNewWindow = { _ in .newWindow }
+        onNewWindow = { _ in .open(.window(active: true)) }
         NSApp.sendAction(action, to: originalItem.target, from: originalItem)
     }
 
@@ -282,7 +282,7 @@ private extension ContextMenuManager {
             return
         }
 
-        onNewWindow = { _ in .newWindow }
+        onNewWindow = { _ in .open(.window(active: true)) }
         NSApp.sendAction(action, to: originalItem.target, from: originalItem)
     }
 
@@ -355,8 +355,7 @@ private extension ContextMenuManager {
             return
         }
 
-        // TODO: new window
-        onNewWindow = { _ in .newTab(selected: true) }
+        onNewWindow = { _ in .open(.tab(selected: true)) }
         NSApp.sendAction(action, to: originalItem.target, from: originalItem)
     }
 
@@ -370,7 +369,7 @@ private extension ContextMenuManager {
             return
         }
 
-        onNewWindow = { _ in .newWindow }
+        onNewWindow = { _ in .open(.window(active: true)) }
         NSApp.sendAction(action, to: originalItem.target, from: originalItem)
     }
 
@@ -450,7 +449,7 @@ extension Tab: ContextMenuManagerDelegate {
             return
         }
 
-        webView.load(url, in: .blank, windowFeatures: .selectedTab)
+        self.load(url, in: .tab(selected: true))
     }
 
     func prepareForContextMenuDownload() {

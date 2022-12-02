@@ -21,8 +21,8 @@ import WebKit
 
 struct GlobalPrivacyControlResponder: NavigationResponder {
 
-    func webView(_ webView: WebView, decidePolicyFor navigationAction: WKNavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
-        guard navigationAction.isTargetingMainFrame,
+    func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
+        guard navigationAction.isForMainFrame,
               navigationAction.navigationType != .backForward,
               let request = GPCRequestFactory.shared.requestForGPC(basedOn: navigationAction.request)
         else { return .next }

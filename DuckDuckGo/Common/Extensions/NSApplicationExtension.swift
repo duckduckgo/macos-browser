@@ -27,25 +27,6 @@ extension NSApplication {
     }
     // swiftlint:enable force_cast
 
-    var isCommandPressed: Bool {
-        currentEvent?.modifierFlags.contains(.command) ?? false
-    }
-
-    var isShiftPressed: Bool {
-        currentEvent?.modifierFlags.contains(.shift) ?? false
-    }
-
-    var isOptionPressed: Bool {
-        currentEvent?.modifierFlags.contains(.option) ?? false
-    }
-
-    var isReturnOrEnterPressed: Bool {
-        guard let event = currentEvent,
-              case .keyDown = event.type
-        else { return false }
-        return event.keyCode == 36 || event.keyCode == 76
-    }
-
     func isActivePublisher() -> AnyPublisher<Bool, Never> {
         let activated = NotificationCenter.default
             .publisher(for: NSApplication.didBecomeActiveNotification).map { _ in true }

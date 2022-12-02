@@ -46,12 +46,13 @@ final class LinkProtectionExtension: TabExtension {
 
 extension LinkProtectionExtension: NavigationResponder {
 
-    func webView(_ webView: WebView, decidePolicyFor navigationAction: WKNavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
-        guard navigationAction.isTargetingMainFrame,
+    func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
+        guard navigationAction.isForMainFrame,
               navigationAction.navigationType != .backForward,
               let url = navigationAction.request.url
         else { return .next }
 
+        // TODO: breaking POST requests, make asana if valid
         // TODO: Only do this for new user-intent requests
         var cleanURL = await linkProtection.getCleanURL(from: url)
         cleanURL = await linkProtection.requestTrackingLinkRewrite(navigationAction: navigationAction) ?? cleanURL
@@ -62,16 +63,16 @@ extension LinkProtectionExtension: NavigationResponder {
         return .next
     }
 
-    func webView(_ webView: WebView, didStart navigation: WKNavigation, with request: URLRequest) {
+    func didStart(_ navigation: Navigation) {
         linkProtection.cancelOngoingExtraction()
-        linkProtection.setMainFrameUrl(webView.url)
+        linkProtection.setMainFrameUrl(navigation.request.url)
     }
 
-    func webView(_ webView: WebView, didFinish navigation: WKNavigation, with request: URLRequest) {
+    func navigationDidFinishOrReceivedClientRedirect(_ navigation: Navigation) {
         linkProtection.setMainFrameUrl(nil)
     }
 
-    func webView(_ webView: WebView, navigation: WKNavigation, with request: URLRequest, didFailWith error: Error) {
+    func navigation(_ navigation: Navigation, didFailWith error: WKError) {
         linkProtection.setMainFrameUrl(nil)
     }
 
@@ -95,20 +96,20 @@ private extension LinkProtection {
     }
 
     @MainActor
-    func requestTrackingLinkRewrite(navigationAction: WKNavigationAction,
+    func requestTrackingLinkRewrite(navigationAction: NavigationAction,
                                     onStartExtracting: () -> Void = {},
                                     onFinishExtracting: @escaping () -> Void = {}) async -> URL? {
         await withCheckedContinuation { continuation in
             var resultURL: URL?
-            let didRewriteLink = requestTrackingLinkRewrite(initiatingURL: navigationAction.sourceFrame.request.url,
-                                                            navigationAction: navigationAction,
+            let didRewriteLink = requestTrackingLinkRewrite(initiatingURL: navigationAction.sourceFrame.url,
+                                                            destinationURL: navigationAction.url,
                                                             onStartExtracting: onStartExtracting,
                                                             onFinishExtracting: onFinishExtracting,
-                                                            onLinkRewrite: { url, _ in
+                                                            onLinkRewrite: { url in
                 resultURL = url
 
             }) { navigationActionPolicy in
-                continuation.resume(returning: navigationActionPolicy == .cancel ? resultURL : nil)
+                continuation.resume(returning: navigationActionPolicy ? nil : resultURL)
             }
 
             if !didRewriteLink {

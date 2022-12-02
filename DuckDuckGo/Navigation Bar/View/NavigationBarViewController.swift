@@ -157,36 +157,34 @@ final class NavigationBarViewController: NSViewController {
     }
 
     @IBAction func goBackAction(_ sender: NSButton) {
-        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
+        guard let tab = tabCollectionViewModel.selectedTabViewModel?.tab,
+              let backItem = tab.backItem
+        else {
             os_log("%s: Selected tab view model is nil", type: .error, className)
             return
         }
 
-        if NSApp.isCommandPressed,
-           let backItem = selectedTabViewModel.tab.webView.backForwardList.backItem {
-            openNewChildTab(with: backItem.url)
+
+        if case .retarget(let newWindowKind) = LoadTargetModifiers.current() {
+            tab.load(backItem.url, in: newWindowKind)
         } else {
-            selectedTabViewModel.tab.goBack()
+            tab.goBack()
         }
     }
 
     @IBAction func goForwardAction(_ sender: NSButton) {
-        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
+        guard let tab = tabCollectionViewModel.selectedTabViewModel?.tab,
+              let forwardItem = tab.forwardItem
+        else {
             os_log("%s: Selected tab view model is nil", type: .error, className)
             return
         }
 
-        if NSApp.isCommandPressed,
-           let forwardItem = selectedTabViewModel.tab.webView.backForwardList.forwardItem {
-            openNewChildTab(with: forwardItem.url)
+        if case .retarget(let newWindowKind) = LoadTargetModifiers.current() {
+            tab.load(forwardItem.url, in: newWindowKind)
         } else {
-            selectedTabViewModel.tab.goForward()
+            tab.goForward()
         }
-    }
-
-    private func openNewChildTab(with url: URL) {
-        let tab = Tab(content: .url(url), parentTab: tabCollectionViewModel.selectedTabViewModel?.tab, shouldLoadInBackground: true)
-        tabCollectionViewModel.insertChild(tab: tab, selected: false)
     }
 
     @IBAction func refreshAction(_ sender: NSButton) {
@@ -219,7 +217,7 @@ final class NavigationBarViewController: NSViewController {
     }
 
     override func mouseDown(with event: NSEvent) {
-        if let menu = view.menu, NSEvent.isContextClick(event) {
+        if let menu = view.menu, event.isContextClick {
             NSMenu.popUpContextMenu(menu, with: event, for: view)
             return
         }

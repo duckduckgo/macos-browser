@@ -19,6 +19,7 @@
 import BrowserServicesKit
 import Combine
 import Foundation
+import ContentBlocking
 
 typealias DetectedTracker = (tracker: DetectedRequest, surrogateHost: String?)
 final class ContentBlockingTabExtension: NSObject, TabExtension {
@@ -136,7 +137,7 @@ extension ContentBlockingTabExtension: AutoconsentUserScriptDelegate {
 
 extension ContentBlockingTabExtension: NavigationResponder {
 
-    func webView(_ webView: WebView, decidePolicyFor navigationAction: WKNavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
+    func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
         // Ensure Content Blocking Assets (WKContentRuleList&UserScripts) are installed
         if tab?.userContentController.contentBlockingAssetsInstalled == false, let tabIdentifier = tabIdentifier {
             Self.cbaTimeReporter?.tabWillWaitForRulesCompilation(tabIdentifier)
@@ -148,7 +149,7 @@ extension ContentBlockingTabExtension: NavigationResponder {
         return .next
     }
 
-    func webView(_ webView: WebView, didStart navigation: WKNavigation, with request: URLRequest) {
+    func didStart(_ navigation: Navigation) {
         resetDashboardInfo()
     }
 

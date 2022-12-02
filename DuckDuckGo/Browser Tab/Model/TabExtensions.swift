@@ -19,14 +19,18 @@
 import BrowserServicesKit
 import Foundation
 
-protocol TabExtension {
-    init()
-    func attach(to tab: Tab)
+protocol Extension {
+    associatedtype Owner
+    func attach(to owner: Owner)
+}
+protocol TabExtension: Extension where Owner == Tab {}
+typealias AnyTabExtension = any TabExtension
 
+protocol NSCodingExtension: Extension {
     func encode(using coder: NSCoder)
     func awakeAfter(using decoder: NSCoder)
 }
-extension TabExtension {
+extension Extension {
     func encode(using coder: NSCoder) {}
     func awakeAfter(using coder: NSCoder) {}
 }
@@ -43,14 +47,14 @@ struct TabExtensions {
     let printing: TabPrintExtension?
     let findInPage: FindInPageTabExtension?
     let autofill: AutofillTabExtension?
-    let navigationDelegate: DistributedNavigationDelegate
+    let externalSchemes: ExternalSchemeHandler?
     let linkProtection: LinkProtectionExtension?
     let referrerTrimming: ReferrerTrimmingTabExtension?
     let httpsUpgrade: HTTPSUpgradeTabExtension?
+    let newTabNavigation: NewTabNavigationResponder?
     let downloads: TabDownloadsExtension?
     let duckPlayer: DuckPlayerTabExtension?
 
-    @Injected(forTests: extensionsForTests)
     static var createExtensions: () -> TabExtensions = {
         return TabExtensions(instrumentation: TabInstrumentation(),
                              contentBlocking: ContentBlockingTabExtension(),
@@ -62,10 +66,11 @@ struct TabExtensions {
                              printing: TabPrintExtension(),
                              findInPage: FindInPageTabExtension(),
                              autofill: AutofillTabExtension(),
-                             navigationDelegate: DistributedNavigationDelegate(),
+                             externalSchemes: ExternalSchemeHandler(),
                              linkProtection: LinkProtectionExtension(),
                              referrerTrimming: ReferrerTrimmingTabExtension(),
                              httpsUpgrade: HTTPSUpgradeTabExtension(),
+                             newTabNavigation: NewTabNavigationResponder(),
                              downloads: TabDownloadsExtension(),
                              duckPlayer: DuckPlayerTabExtension())
     }
@@ -81,10 +86,11 @@ struct TabExtensions {
                              printing: nil,
                              findInPage: nil,
                              autofill: nil,
-                             navigationDelegate: DistributedNavigationDelegate(),
+                             externalSchemes: nil,
                              linkProtection: nil,
                              referrerTrimming: nil,
                              httpsUpgrade: nil,
+                             newTabNavigation: nil,
                              downloads: nil,
                              duckPlayer: nil)
     }
@@ -96,11 +102,11 @@ struct TabExtensions {
 }
 
 extension TabExtensions: Sequence {
-    typealias Iterator = IndexingIterator<[TabExtension]>
+    typealias Iterator = IndexingIterator<[AnyTabExtension]>
 
     func makeIterator() -> Iterator {
-        Mirror(reflecting: self).children.compactMap { child -> TabExtension? in
-            guard let tabExtension = child.value as? TabExtension else {
+        Mirror(reflecting: self).children.compactMap { child -> AnyTabExtension? in
+            guard let tabExtension = child.value as? AnyTabExtension else {
                 assertionFailure("\(child.label!) should conform to TabExtension")
                 return nil
             }
