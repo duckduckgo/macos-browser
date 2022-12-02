@@ -21,14 +21,12 @@ import Foundation
 extension NSException {
 
     struct Error: Swift.Error, LocalizedError, CustomDebugStringConvertible {
-        let exception: NSException
+        let errorDescription: String?
+        let debugDescription: String
 
-        var errorDescription: String? {
-            exception.description
-        }
-
-        var debugDescription: String {
-            exception.debugDescription
+        init(exception: NSException) {
+            errorDescription = exception.description
+            debugDescription = exception.debugDescription
         }
     }
 

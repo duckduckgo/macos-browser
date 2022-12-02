@@ -28,7 +28,6 @@ internal class SafariDataImporter: DataImporter {
         let openPanel = NSOpenPanel()
         openPanel.directoryURL = safariDataDirectoryURL
         openPanel.message = UserText.bookmarkImportSafariRequestPermissionButtonTitle
-        openPanel.allowedFileTypes = nil
         openPanel.allowsOtherFileTypes = false
         openPanel.canChooseFiles = false
         openPanel.canChooseDirectories = true
