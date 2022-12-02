@@ -279,7 +279,10 @@ final class HistoryStore: HistoryStoring {
             })
             deleteRequest.predicate = NSCompoundPredicate(type: .or, subpredicates: predicates)
             do {
-                try self.context.execute(deleteRequest)
+                let visitsToDelete = try self.context.fetch(deleteRequest)
+                for visit in visitsToDelete {
+                    context.delete(visit)
+                }
             } catch {
                 Pixel.fire(.debug(event: .historyRemoveVisitsFailed))
                 return .failure(error)
