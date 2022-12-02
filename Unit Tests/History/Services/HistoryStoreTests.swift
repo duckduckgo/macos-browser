@@ -179,47 +179,6 @@ final class HistoryStoreTests: XCTestCase {
         waitForExpectations(timeout: 1, handler: nil)
     }
     
-    func testWhenCleanOldIsCalled_ThenRelationshipsAreConsistentBothWays() {
-        let context = database.makeContext(concurrencyType: .mainQueueConcurrencyType)
-        let historyStore = HistoryStore(context: context)
-        
-        let oldVisitDate = Date(timeIntervalSince1970: 0)
-        let newVisitDate = Date(timeIntervalSince1970: 12345)
-        let oldVisit = Visit(date: oldVisitDate)
-        let newVisit = Visit(date: newVisitDate)
-
-        let historyEntry = HistoryEntry(identifier: UUID(),
-                                           url: URL.duckDuckGo,
-                                           title: nil,
-                                           numberOfVisits: 2,
-                                           lastVisit: newVisitDate,
-                                           visits: [oldVisit, newVisit])
-        let firstSavingExpectation = self.expectation(description: "Saving")
-        save(entry: historyEntry, historyStore: historyStore, expectation: firstSavingExpectation)
-
-        let loadingExpectation = self.expectation(description: "Loading")
-        historyStore.cleanOld(until: Date(timeIntervalSince1970: 1))
-            .receive(on: DispatchQueue.main)
-            .sink { completion in
-                switch completion {
-                case .finished:
-                    loadingExpectation.fulfill()
-                case .failure(let error):
-                    XCTFail("Loading of history failed - \(error.localizedDescription)")
-                }
-            } receiveValue: { history in
-                XCTAssertEqual(history.count, 1)
-                for entry in history {
-                    // Note:
-                    // Visits are consistent, as CoreData is not using additional table to manage to-many relationships, just a column on a Visit. Since we are removing visits, we implicitly remove History reference.
-                    XCTAssertEqual(entry.visits.count, 1)
-                }
-            }
-            .store(in: &cancellables)
-
-        waitForExpectations(timeout: 500, handler: nil)
-    }
-    
     func testWhenCleanOldIsCalled_ThenFollowingSaveShouldSucceed() {
         let context = database.makeContext(concurrencyType: .mainQueueConcurrencyType)
         let historyStore = HistoryStore(context: context)
