@@ -23,75 +23,48 @@ import OSLog
 
 final class NetworkProtection: ObservableObject {
 
-    private lazy var interfaceConfiguration: InterfaceConfiguration = {
-        let rawPrivateKey = ProcessInfo.processInfo.environment["NETP_PRIVATE_KEY"] ?? ""
+    enum QuickConfigLoadingError: Error {
+        case quickConfigFilePathEnvVarMissing
+    }
 
-        if rawPrivateKey.isEmpty {
-            let error = StaticString("Missing NetP private key")
-            assertionFailure("\(error)")
-            os_log(.error, error)
-        }
-
-        let privateKey = PrivateKey(base64Key: rawPrivateKey)!
-        let ipv4AddressRange = IPAddressRange(from: "10.64.158.41/32")!
-        let ipv6AddressRange = IPAddressRange(from: "fc00:bbbb:bbbb:bb01::1:9e28/128")!
-        let dnsServerIPAddress = IPv4Address("10.64.0.1")!
-        let dnsServer = DNSServer(address: dnsServerIPAddress)
-
-        var configuration = InterfaceConfiguration(privateKey: privateKey)
-        configuration.addresses = [ipv4AddressRange, ipv6AddressRange]
-        configuration.dns = [dnsServer]
-
-        return configuration
-    }()
-
-    private lazy var peerConfiguration: PeerConfiguration = {
-        let publicKey = PublicKey(base64Key: "F4Scn2i1IIHTsWsCfXesNb2XYyrIu8Wn+vJihvPVk2M=")!
-        let addressRange = IPAddressRange(from: "0.0.0.0/0")! // ,::0/0
-        let endpoint = Endpoint(from: "37.120.201.82:51820")
-        var configuration = PeerConfiguration(publicKey: publicKey)
-
-        configuration.allowedIPs = [addressRange]
-        configuration.endpoint = endpoint
-
-        return configuration
-    }()
-
-    private lazy var tunnelConfiguration: TunnelConfiguration = {
-        TunnelConfiguration(name: "Test tunnel",
-                            interface: interfaceConfiguration,
-                            peers: [peerConfiguration])
-    }()
-
+    static let quickConfigFilePathEnvironmentVariable = "NETP_QUICK_CONFIG_FILE_PATH"
     private let tunnelManager: NETunnelProviderManager
 
     init() async throws {
-        if let tunnelManager = try? await NETunnelProviderManager.loadAllFromPreferences().first {
-            self.tunnelManager = tunnelManager
-            try await ensureProperTunnelConfiguration()
-        } else {
-            tunnelManager = NETunnelProviderManager()
-            tunnelManager.protocolConfiguration = NETunnelProviderProtocol(tunnelConfiguration: tunnelConfiguration, previouslyFrom: nil)
-            tunnelManager.isEnabled = true
-            tunnelManager.localizedDescription = UserText.networkProtectionTunnelName
-
-            try await tunnelManager.saveToPreferences()
-        }
+        tunnelManager = try await NETunnelProviderManager.loadAllFromPreferences().first ?? NETunnelProviderManager()
+        try await setupTunnelManager()
     }
 
     // MARK: - Tunnel Configuration
 
-    /// There's always a chance that a user could delete their tunnel configuration from their Keychain.  If that happens we want to make sure
-    /// we'll handle things gracefully.
+    /// Loads the tunnel configuration from the filesystem.
     ///
-    func ensureProperTunnelConfiguration() async throws {
-        guard let tunnelProviderProtocol = tunnelManager.protocolConfiguration as? NETunnelProviderProtocol,
-              tunnelProviderProtocol.verifyConfigurationReference() else {
+    func loadTunnelConfiguration() throws -> TunnelConfiguration {
+        guard let quickConfigFile = ProcessInfo.processInfo.environment[Self.quickConfigFilePathEnvironmentVariable] else {
 
-            tunnelManager.protocolConfiguration = NETunnelProviderProtocol(tunnelConfiguration: tunnelConfiguration, previouslyFrom: nil)
-            try await tunnelManager.saveToPreferences()
-            return
+            throw QuickConfigLoadingError.quickConfigFilePathEnvVarMissing
         }
+
+        let quickConfig = try String(contentsOfFile: quickConfigFile)
+
+        let configuration = try TunnelConfiguration(fromWgQuickConfig: quickConfig)
+        configuration.name = "DuckDuckGo Network Protection Configuration"
+        return configuration
+    }
+
+    // MARK: - Tunnel Manager Configuration
+
+    func setupTunnelManager() async throws {
+        let tunnelConfiguration = try loadTunnelConfiguration()
+
+        if tunnelManager.protocolConfiguration as? NETunnelProviderProtocol == nil {
+            tunnelManager.protocolConfiguration = NETunnelProviderProtocol(tunnelConfiguration: tunnelConfiguration, previouslyFrom: nil)
+        }
+
+        tunnelManager.isEnabled = true
+        tunnelManager.localizedDescription = UserText.networkProtectionTunnelName
+
+        try await tunnelManager.saveToPreferences()
     }
 
     // MARK: - Connection Status Querying
