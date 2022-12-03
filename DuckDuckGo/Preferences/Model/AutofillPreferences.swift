@@ -106,16 +106,10 @@ final class AutofillPreferences: AutofillPreferencesPersistor {
     
     var passwordManager: PasswordManager {
         get {
-            if NSApp.isSandboxed {
-                return .duckduckgo
-            }
             return PasswordManager(rawValue: selectedPasswordManager) ?? .duckduckgo
         }
 
         set {
-            if NSApp.isSandboxed {
-                return
-            }
             selectedPasswordManager = newValue.rawValue
         }
     }
