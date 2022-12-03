@@ -26,6 +26,8 @@ final class NetworkProtection {
     typealias StatusChangeHandler = (NEVPNStatus) -> Void
     typealias ConfigChangeHandler = () -> Void
 
+    // MARK: - Errors & Logging
+
     enum QuickConfigLoadingError: Error {
         case quickConfigFilePathEnvVarMissing
     }
@@ -34,16 +36,33 @@ final class NetworkProtection {
         case couldNotRetrieveStatusFromNotification
     }
 
-    private var statusChangeObserverToken: NSObjectProtocol?
-    private var configChangeObserverToken: NSObjectProtocol?
-
     /// The logger that this object will use for errors that are handled by this class.
     ///
     private let logger: NetworkProtectionLogger
 
+    // MARK: - Notifications & Observers
+
     /// The notification center to use to observe tunnel change notifications.
     ///
     private let notificationCenter: NotificationCenter
+
+    /// The observer token for VPN status changes,
+    ///
+    private var statusChangeObserverToken: NSObjectProtocol?
+
+    /// The observer token for VPN configuration changes,
+    ///
+    private var configChangeObserverToken: NSObjectProtocol?
+
+    /// Callback for VPN configuration changes.
+    ///
+    var onConfigChange: ConfigChangeHandler?
+
+    /// Callback for VPN status changes.
+    ///
+    var onStatusChange: StatusChangeHandler?
+
+    // MARK: - VPN Tunnel & Configuration
 
     /// The environment variable that holds the path to the WG quick configuration file that will be used for the tunnel.
     ///
@@ -59,19 +78,17 @@ final class NetworkProtection {
         get async throws {
             guard let tunnelManager = internalTunnelManager else {
                 let tunnelManager = try await NETunnelProviderManager.loadAllFromPreferences().first ?? NETunnelProviderManager()
-                internalTunnelManager = tunnelManager
-
                 try await setup(tunnelManager)
+                try await tunnelManager.saveToPreferences()
+                try await tunnelManager.loadFromPreferences()
 
+                internalTunnelManager = tunnelManager
                 return tunnelManager
             }
 
             return tunnelManager
         }
     }
-
-    var onConfigChange: ConfigChangeHandler?
-    var onStatusChange: StatusChangeHandler?
 
     // MARK: - Initialization & deinitialization
 
@@ -186,7 +203,7 @@ final class NetworkProtection {
     /// Setups the tunnel manager if it's not set up already.
     ///
     private func setup(_ tunnelManager: NETunnelProviderManager) async throws {
-        guard tunnelManager.protocolConfiguration as? NETunnelProviderProtocol != nil else {
+        guard tunnelManager.protocolConfiguration as? NETunnelProviderProtocol == nil else {
             return
         }
 
@@ -222,8 +239,8 @@ final class NetworkProtection {
 
         switch tunnelManager.connection.status {
         case .invalid:
-            try await tunnelManager.loadFromPreferences()
-            try tunnelManager.connection.startVPNTunnel()
+            reloadTunnelManager()
+            try await start()
         case .disconnected, .disconnecting:
             try tunnelManager.connection.startVPNTunnel()
         default:
