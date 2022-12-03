@@ -47,14 +47,12 @@ final class BWManager: BWManagement, ObservableObject {
 
     private init() {}
 
-    init(communicator: BWCommunication) {
-        self.communicator = communicator
-    }
-
-    private lazy var communicator: BWCommunication = BWCommunicator()
+//    private lazy var communicator: BWCommunication = BWCommunicator()
+    private var proxy: BWCommunicationXPC?
+    private var connection: NSXPCConnection?
 
     func initCommunication() {
-        communicator.delegate = self
+//        communicator.delegate = self
 
         connectToBitwardenProcess()
     }
@@ -63,7 +61,11 @@ final class BWManager: BWManagement, ObservableObject {
         connectionAttemptTimer?.invalidate()
         connectionAttemptTimer = nil
         status = .disabled
-        communicator.terminateProxyProcess()
+
+        proxy?.terminateProxyProcess()
+//        connection?.invalidate()
+//        communicator.terminateProxyProcess()
+
         try? keyStorage.cleanSharedKey()
         encryption.cleanKeys()
     }
@@ -128,13 +130,33 @@ final class BWManager: BWManagement, ObservableObject {
         }
 
         // Run the proxy process
-        do {
-            try communicator.runProxyProcess()
-        } catch {
+        let connection = NSXPCConnection(serviceName: "com.duckduckgo.BitwardenProxy")
+        connection.remoteObjectInterface = NSXPCInterface(with: BWCommunicationXPC.self)
+        connection.interruptionHandler = { [weak self] in
+            guard let self = self, self.isBitwardenPasswordManager else {
+                return
+            }
+
+            self.status = .notRunning
+
+            self.scheduleConnectionAttempt()
+        }
+        connection.resume()
+        self.connection = connection
+
+        if let proxy = connection.remoteObjectProxy as? BWCommunicationXPC {
+            self.proxy = proxy
+            proxy.processDidReceiveMessage = { [weak self] data in
+                self?.processMessage(data)
+            }
+        }
+
+        proxy?.runProxyProcess { [weak self] _ in
+            guard let self = self else { return }
             os_log("BWManagement: Running of proxy process failed", type: .error)
             Pixel.fire(.debug(event: .bitwardenNotResponding))
-            status = .error(error: .runningOfProxyProcessFailed)
-            scheduleConnectionAttempt()
+            self.status = .error(error: .runningOfProxyProcessFailed)
+            self.scheduleConnectionAttempt()
         }
     }
 
@@ -158,7 +180,9 @@ final class BWManager: BWManagement, ObservableObject {
 
     private func cancelConnectionAndScheduleNextAttempt() {
         // Kill the proxy process and schedule the next attempt
-        communicator.terminateProxyProcess()
+        proxy?.terminateProxyProcess()
+//        connection?.invalidate()
+//        communicator.terminateProxyProcess()
         scheduleConnectionAttempt()
     }
 
@@ -430,7 +454,8 @@ final class BWManager: BWManagement, ObservableObject {
             return
         }
 
-        communicator.send(messageData: messageData)
+        proxy?.send(messageData: messageData)
+//        communicator.send(messageData: messageData)
     }
 
     private func sendStatus() {
@@ -444,7 +469,8 @@ final class BWManager: BWManagement, ObservableObject {
             return
         }
 
-        communicator.send(messageData: messageData)
+        proxy?.send(messageData: messageData)
+//        communicator.send(messageData: messageData)
     }
 
     private func sendCredentialRetrieval(url: URL, messageId: MessageId) {
@@ -460,7 +486,8 @@ final class BWManager: BWManagement, ObservableObject {
             return
         }
 
-        communicator.send(messageData: messageData)
+        proxy?.send(messageData: messageData)
+//        communicator.send(messageData: messageData)
     }
 
     private func sendCredentialCreation(_ credential: BWCredential, messageId: MessageId) {
@@ -480,7 +507,8 @@ final class BWManager: BWManagement, ObservableObject {
             return
         }
 
-        communicator.send(messageData: messageData)
+        proxy?.send(messageData: messageData)
+//        communicator.send(messageData: messageData)
     }
 
     private func sendCredentialUpdate(_ credential: BWCredential, messageId: MessageId) {
@@ -501,7 +529,8 @@ final class BWManager: BWManagement, ObservableObject {
             return
         }
 
-        communicator.send(messageData: messageData)
+        proxy?.send(messageData: messageData)
+//        communicator.send(messageData: messageData)
     }
 
     private func encryptCommandData(_ commandData: Data) -> String? {
@@ -612,6 +641,10 @@ extension BWManager: BWCommunicatorDelegate {
     }
 
     func bitwardenCommunicator(_ bitwardenCommunicator: BWCommunication, didReceiveMessageData messageData: Data) {
+        processMessage(messageData)
+    }
+
+    func processMessage(_ messageData: Data) {
         guard let response = BWResponse(from: messageData) else {
             logOrAssertionFailure("BWManager: Can't decode the message")
             return

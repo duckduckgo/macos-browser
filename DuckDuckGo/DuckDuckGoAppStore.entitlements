@@ -9,6 +9,8 @@
 		<string>/Library/Application Support/BraveSoftware/Brave-Browser/</string>
 		<string>/Library/Application Support/Firefox/</string>
 		<string>/Library/Application Support/Microsoft Edge/</string>
+		<string>/Library/Containers/com.bitwarden.desktop/Data/Library/Application Support/Bitwarden/data.json</string>
+		<string>/Library/Application Support/Bitwarden/data.json</string>
 	</array>
 	<key>com.apple.security.app-sandbox</key>
 	<true/>

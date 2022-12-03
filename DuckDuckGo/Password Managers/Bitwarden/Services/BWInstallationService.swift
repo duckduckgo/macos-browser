@@ -56,13 +56,13 @@ final class LocalBitwardenInstallationService: BWInstallationService {
     }()
 
     private lazy var sandboxDataFileUrl: URL = {
-        let libraryURL = FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask).first!
+        let libraryURL = URL.nonSandboxLibraryDirectoryURL
         let bitwardenPathComponent = "Containers/com.bitwarden.desktop/Data/Library/Application Support/Bitwarden/data.json"
         return libraryURL.appendingPathComponent(bitwardenPathComponent)
     }()
 
     private lazy var dataFileUrl: URL = {
-        let libraryURL = FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask).first!
+        let libraryURL = URL.nonSandboxLibraryDirectoryURL
         let bitwardenPathComponent = "Application Support/Bitwarden/data.json"
         return libraryURL.appendingPathComponent(bitwardenPathComponent)
     }()
