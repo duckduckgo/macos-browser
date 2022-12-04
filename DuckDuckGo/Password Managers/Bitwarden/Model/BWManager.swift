@@ -619,7 +619,9 @@ final class BWManager: BWManagement, ObservableObject {
 extension BWManager: BWProxyIncomingCommunication {
 
     func messageReceived(_ data: Data) {
-        processMessage(data)
+        DispatchQueue.main.async {
+            self.processMessage(data)
+        }
     }
 
     private func proxyConnectionDidTerminate() {

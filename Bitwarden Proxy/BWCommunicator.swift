@@ -160,9 +160,7 @@ final class BWCommunicator: BWProxyManaging {
                 return
             }
 
-            DispatchQueue.main.async {
-                self.remoteObjectProxy?.messageReceived(messageData)
-            }
+            remoteObjectProxy?.messageReceived(messageData)
 
         } while availableData.count >= 2 /*EOF*/
     }
