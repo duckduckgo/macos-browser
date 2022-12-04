@@ -43,15 +43,19 @@ func logOrAssertionFailure(_ message: StaticString, args: CVarArg...) {
     func runProxyProcess(errorHandler: ((Error) -> Void)?)
     func terminateProxyProcess()
     func send(messageData: Data)
-    var processDidReceiveMessage: ((Data) -> Void)? { get set }
+}
+
+@objc protocol BWCommunicatorReplyHandler {
+    func messageReceived(_ data: Data)
 }
 
 final class BWCommunicator: BWCommunicationXPC {
 
     static let appPath = "/Applications/Bitwarden.app/Contents/MacOS/Bitwarden"
 
-    var processDidReceiveMessage: ((Data) -> Void)?
+    private var processDidReceiveMessage: ((Data) -> Void)?
     var processDidTerminate: (() -> Void)?
+    weak var connection: NSXPCConnection?
 
     // MARK: - Running Proxy Process
 
@@ -59,6 +63,10 @@ final class BWCommunicator: BWCommunicationXPC {
         let process: Process
         let readingHandle: FileHandle
         let writingHandle: FileHandle
+    }
+
+    init(connection: NSXPCConnection?) {
+        self.connection = connection
     }
 
     deinit {
@@ -106,6 +114,10 @@ final class BWCommunicator: BWCommunicationXPC {
         process = nil
     }
 
+    func setMessageHandler(_ handler: @escaping (Data) -> Void) {
+        processDidReceiveMessage = handler
+    }
+
     private func processDidTerminate(_ process: Process) {
         os_log("BWCommunicator: Proxy process terminated", log: .bitwarden, type: .default)
 
@@ -116,10 +128,7 @@ final class BWCommunicator: BWCommunicationXPC {
             }
         }
 
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            self.processDidTerminate?()
-        }
+        processDidTerminate?()
     }
 
     // MARK: - Sending Messages
@@ -177,11 +186,16 @@ final class BWCommunicator: BWCommunicationXPC {
                 return
             }
 
-            DispatchQueue.main.async { [weak self] in
-                guard let self = self else { return }
+            print("will call message handler", String(bytes: messageData, encoding: .utf8))
+//            processDidReceiveMessage?(messageData)
+            (connection?.remoteObjectProxy as? BWCommunicatorReplyHandler)?.messageReceived(messageData)
 
-                self.processDidReceiveMessage?(messageData)
-            }
+//            DispatchQueue.main.async { [weak self] in
+//                guard let self = self else { return }
+//
+//                print("will call message handler", String(bytes: messageData, encoding: .utf8))
+//                self.processDidReceiveMessage?(messageData)
+//            }
         } while availableData.count >= 2 /*EOF*/
     }
 

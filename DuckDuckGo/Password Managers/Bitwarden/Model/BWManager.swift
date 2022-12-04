@@ -39,7 +39,7 @@ protocol BWManagement {
 
 }
 
-final class BWManager: BWManagement, ObservableObject {
+final class BWManager: BWManagement, ObservableObject, BWCommunicatorReplyHandler {
 
     static let shared = BWManager()
     static let bundleId = "com.bitwarden.desktop"
@@ -63,7 +63,7 @@ final class BWManager: BWManagement, ObservableObject {
         status = .disabled
 
         proxy?.terminateProxyProcess()
-//        connection?.invalidate()
+        connection?.invalidate()
 //        communicator.terminateProxyProcess()
 
         try? keyStorage.cleanSharedKey()
@@ -79,6 +79,13 @@ final class BWManager: BWManagement, ObservableObject {
     }
 
     // MARK: - Connection
+
+    func messageReceived(_ data: Data) {
+        DispatchQueue.main.async {
+            print("************", String(bytes: data, encoding: .utf8))
+            self.processMessage(data)
+        }
+    }
 
     var isBitwardenPasswordManager: Bool {
         let autofillPreferences = AutofillPreferences()
@@ -132,6 +139,8 @@ final class BWManager: BWManagement, ObservableObject {
         // Run the proxy process
         let connection = NSXPCConnection(serviceName: "com.duckduckgo.BitwardenProxy")
         connection.remoteObjectInterface = NSXPCInterface(with: BWCommunicationXPC.self)
+        connection.exportedInterface = NSXPCInterface(with: BWCommunicatorReplyHandler.self)
+        connection.exportedObject = self
         connection.interruptionHandler = { [weak self] in
             guard let self = self, self.isBitwardenPasswordManager else {
                 return
@@ -145,10 +154,8 @@ final class BWManager: BWManagement, ObservableObject {
         self.connection = connection
 
         if let proxy = connection.remoteObjectProxy as? BWCommunicationXPC {
+            print("Setting new PROXY", proxy)
             self.proxy = proxy
-            proxy.processDidReceiveMessage = { [weak self] data in
-                self?.processMessage(data)
-            }
         }
 
         proxy?.runProxyProcess { [weak self] _ in
@@ -181,7 +188,7 @@ final class BWManager: BWManagement, ObservableObject {
     private func cancelConnectionAndScheduleNextAttempt() {
         // Kill the proxy process and schedule the next attempt
         proxy?.terminateProxyProcess()
-//        connection?.invalidate()
+        connection?.invalidate()
 //        communicator.terminateProxyProcess()
         scheduleConnectionAttempt()
     }

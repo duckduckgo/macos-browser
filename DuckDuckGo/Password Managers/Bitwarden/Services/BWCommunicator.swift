@@ -23,7 +23,10 @@ import os.log
     func runProxyProcess(errorHandler: ((Error) -> Void)?)
     func terminateProxyProcess()
     func send(messageData: Data)
-    var processDidReceiveMessage: ((Data) -> Void)? { get set }
+}
+
+@objc protocol BWCommunicatorReplyHandler {
+    func messageReceived(_ data: Data)
 }
 
 protocol BWCommunicatorDelegate: AnyObject {
