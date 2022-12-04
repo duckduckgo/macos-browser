@@ -1,5 +1,5 @@
 //
-//  BWCommunicator.swift
+//  BWProxyProtocols.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -17,32 +17,13 @@
 //
 
 import Foundation
-import os.log
 
-@objc protocol BWCommunicationXPC {
+@objc protocol BWProxyManaging {
     func runProxyProcess(errorHandler: ((Error) -> Void)?)
     func terminateProxyProcess()
     func send(messageData: Data)
 }
 
-@objc protocol BWCommunicatorReplyHandler {
+@objc protocol BWProxyIncomingCommunication {
     func messageReceived(_ data: Data)
-}
-
-protocol BWCommunicatorDelegate: AnyObject {
-
-    func bitwardenCommunicator(_ bitwardenCommunicator: BWCommunication,
-                               didReceiveMessageData messageData: Data)
-    func bitwardenCommunicatorProcessDidTerminate(_ bitwardenCommunicator: BWCommunication)
-
-}
-
-protocol BWCommunication {
-
-    func runProxyProcess() throws
-    func terminateProxyProcess()
-
-    var delegate: BWCommunicatorDelegate? { get set }
-    func send(messageData: Data)
-
 }

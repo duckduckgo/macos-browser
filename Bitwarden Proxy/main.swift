@@ -22,9 +22,9 @@ final class ServiceDelegate: NSObject, NSXPCListenerDelegate {
     
     func listener(_ listener: NSXPCListener, shouldAcceptNewConnection newConnection: NSXPCConnection) -> Bool {
         
-        newConnection.exportedInterface = NSXPCInterface(with: BWCommunicationXPC.self)
+        newConnection.exportedInterface = NSXPCInterface(with: BWProxyManaging.self)
         newConnection.exportedObject = BWCommunicator(connection: newConnection)
-        newConnection.remoteObjectInterface = NSXPCInterface(with: BWCommunicatorReplyHandler.self)
+        newConnection.remoteObjectInterface = NSXPCInterface(with: BWProxyIncomingCommunication.self)
 
         newConnection.resume()
         return true

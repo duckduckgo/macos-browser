@@ -39,7 +39,6 @@
 		1D69C553291302F200B75945 /* BWVault.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D69C552291302F200B75945 /* BWVault.swift */; };
 		1D77921828FDC54C00BE0210 /* FaviconReferenceCacheTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D77921728FDC54C00BE0210 /* FaviconReferenceCacheTests.swift */; };
 		1D77921A28FDC79800BE0210 /* FaviconStoringMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D77921928FDC79800BE0210 /* FaviconStoringMock.swift */; };
-		1DDF076328F815AD00EDFBE3 /* BWCommunicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DDF075D28F815AD00EDFBE3 /* BWCommunicator.swift */; };
 		1DDF076428F815AD00EDFBE3 /* BWManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DDF075E28F815AD00EDFBE3 /* BWManager.swift */; };
 		1E25269C28F8741A00E44DFA /* Common in Frameworks */ = {isa = PBXBuildFile; productRef = 1E25269B28F8741A00E44DFA /* Common */; };
 		1E7E2E9029029A2A00C01B54 /* ContentBlockingRulesUpdateObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E7E2E8F29029A2A00C01B54 /* ContentBlockingRulesUpdateObserver.swift */; };
@@ -77,11 +76,12 @@
 		37054FCE2876472D00033B6F /* WebViewSnapshotView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37054FCD2876472D00033B6F /* WebViewSnapshotView.swift */; };
 		3714B1E728EDB7FA0056C57A /* PrivatePlayerPreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3714B1E628EDB7FA0056C57A /* PrivatePlayerPreferencesTests.swift */; };
 		3714B1E928EDBAAB0056C57A /* PrivatePlayerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3714B1E828EDBAAB0056C57A /* PrivatePlayerTests.swift */; };
-		3714E452293BDACD001EC517 /* BitwardenProxyProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3714E451293BDACD001EC517 /* BitwardenProxyProtocol.swift */; };
-		3714E454293BDACD001EC517 /* BitwardenProxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3714E453293BDACD001EC517 /* BitwardenProxy.swift */; };
+		3714E452293BDACD001EC517 /* BWProxyProtocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3714E451293BDACD001EC517 /* BWProxyProtocols.swift */; };
 		3714E456293BDACD001EC517 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3714E455293BDACD001EC517 /* main.swift */; };
 		3714E45A293BDACD001EC517 /* Bitwarden Proxy.xpc in Embed XPC Services */ = {isa = PBXBuildFile; fileRef = 3714E44F293BDACD001EC517 /* Bitwarden Proxy.xpc */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		3714E468293BE229001EC517 /* BWCommunicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3714E467293BE229001EC517 /* BWCommunicator.swift */; };
+		3714E469293C9D3F001EC517 /* BWProxyProtocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3714E451293BDACD001EC517 /* BWProxyProtocols.swift */; };
+		3714E46B293C9F2F001EC517 /* Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3714E46A293C9F2F001EC517 /* Logging.swift */; };
 		371C0A2927E33EDC0070591F /* FeedbackPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371C0A2827E33EDC0070591F /* FeedbackPresenter.swift */; };
 		371E141927E92E42009E3B5B /* MultilineScrollableTextFix.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371E141827E92E42009E3B5B /* MultilineScrollableTextFix.swift */; };
 		373A1AA8283ED1B900586521 /* BookmarkHTMLReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373A1AA7283ED1B900586521 /* BookmarkHTMLReader.swift */; };
@@ -919,7 +919,6 @@
 		1D77921928FDC79800BE0210 /* FaviconStoringMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaviconStoringMock.swift; sourceTree = "<group>"; };
 		1D77921C28FFF27C00BE0210 /* RunningApplicationCheck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunningApplicationCheck.swift; sourceTree = "<group>"; };
 		1DDF075C28F815AD00EDFBE3 /* BWCredential.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BWCredential.swift; sourceTree = "<group>"; };
-		1DDF075D28F815AD00EDFBE3 /* BWCommunicator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BWCommunicator.swift; sourceTree = "<group>"; };
 		1DDF075E28F815AD00EDFBE3 /* BWManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BWManager.swift; sourceTree = "<group>"; };
 		1DDF075F28F815AD00EDFBE3 /* BWStatus.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BWStatus.swift; sourceTree = "<group>"; };
 		1DDF076028F815AD00EDFBE3 /* BWError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BWError.swift; sourceTree = "<group>"; };
@@ -959,11 +958,11 @@
 		3714B1E628EDB7FA0056C57A /* PrivatePlayerPreferencesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivatePlayerPreferencesTests.swift; sourceTree = "<group>"; };
 		3714B1E828EDBAAB0056C57A /* PrivatePlayerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivatePlayerTests.swift; sourceTree = "<group>"; };
 		3714E44F293BDACD001EC517 /* Bitwarden Proxy.xpc */ = {isa = PBXFileReference; explicitFileType = "wrapper.xpc-service"; includeInIndex = 0; path = "Bitwarden Proxy.xpc"; sourceTree = BUILT_PRODUCTS_DIR; };
-		3714E451293BDACD001EC517 /* BitwardenProxyProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BitwardenProxyProtocol.swift; sourceTree = "<group>"; };
-		3714E453293BDACD001EC517 /* BitwardenProxy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BitwardenProxy.swift; sourceTree = "<group>"; };
+		3714E451293BDACD001EC517 /* BWProxyProtocols.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BWProxyProtocols.swift; sourceTree = "<group>"; };
 		3714E455293BDACD001EC517 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		3714E457293BDACD001EC517 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3714E467293BE229001EC517 /* BWCommunicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BWCommunicator.swift; sourceTree = "<group>"; };
+		3714E46A293C9F2F001EC517 /* Logging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logging.swift; sourceTree = "<group>"; };
 		371C0A2827E33EDC0070591F /* FeedbackPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackPresenter.swift; sourceTree = "<group>"; };
 		371E141827E92E42009E3B5B /* MultilineScrollableTextFix.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultilineScrollableTextFix.swift; sourceTree = "<group>"; };
 		373A1AA7283ED1B900586521 /* BookmarkHTMLReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkHTMLReader.swift; sourceTree = "<group>"; };
@@ -1859,7 +1858,6 @@
 			isa = PBXGroup;
 			children = (
 				4BBDEE8C28FC14760092FAA6 /* BWInstallationService.swift */,
-				1DDF075D28F815AD00EDFBE3 /* BWCommunicator.swift */,
 				1D02633428D8A9A9005CBB41 /* BWEncryption.h */,
 				1D02633528D8A9A9005CBB41 /* BWEncryption.m */,
 				1D43EB30292788C70065E5D6 /* BWEncryptionOutput.h */,
@@ -1990,9 +1988,9 @@
 		3714E450293BDACD001EC517 /* Bitwarden Proxy */ = {
 			isa = PBXGroup;
 			children = (
-				3714E451293BDACD001EC517 /* BitwardenProxyProtocol.swift */,
+				3714E451293BDACD001EC517 /* BWProxyProtocols.swift */,
 				3714E467293BE229001EC517 /* BWCommunicator.swift */,
-				3714E453293BDACD001EC517 /* BitwardenProxy.swift */,
+				3714E46A293C9F2F001EC517 /* Logging.swift */,
 				3714E455293BDACD001EC517 /* main.swift */,
 				3714E457293BDACD001EC517 /* Info.plist */,
 			);
@@ -4739,9 +4737,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3714E452293BDACD001EC517 /* BitwardenProxyProtocol.swift in Sources */,
+				3714E46B293C9F2F001EC517 /* Logging.swift in Sources */,
+				3714E452293BDACD001EC517 /* BWProxyProtocols.swift in Sources */,
 				3714E468293BE229001EC517 /* BWCommunicator.swift in Sources */,
-				3714E454293BDACD001EC517 /* BitwardenProxy.swift in Sources */,
 				3714E456293BDACD001EC517 /* main.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -4952,7 +4950,6 @@
 				4BE6547E271FCD4D008D1D63 /* PasswordManagementIdentityModel.swift in Sources */,
 				85C6A29625CC1FFD00EEB5F1 /* UserDefaultsWrapper.swift in Sources */,
 				85625998269C9C5F00EE44BC /* PasswordManagementPopover.swift in Sources */,
-				1DDF076328F815AD00EDFBE3 /* BWCommunicator.swift in Sources */,
 				85589E9127BFB9810038AD11 /* HomePageRecentlyVisitedModel.swift in Sources */,
 				85012B0229133F9F003D0DCC /* NavigationBarPopovers.swift in Sources */,
 				37D23785287F4E6500BCE03B /* PinnedTabsHostingView.swift in Sources */,
@@ -5221,6 +5218,7 @@
 				B6DB3AF6278EA0130024C5C4 /* BundleExtension.swift in Sources */,
 				4B677438255DBEB800025BD8 /* HTTPSUpgrade.xcdatamodeld in Sources */,
 				4B0511E1262CAA8600F6079C /* NSOpenPanelExtensions.swift in Sources */,
+				3714E469293C9D3F001EC517 /* BWProxyProtocols.swift in Sources */,
 				AAE99B8927088A19008B6BD9 /* FirePopover.swift in Sources */,
 				AAE75280263B0A4D00B973F8 /* HistoryCoordinator.swift in Sources */,
 				4B677434255DBEB800025BD8 /* HTTPSBloomFilterSpecification.swift in Sources */,

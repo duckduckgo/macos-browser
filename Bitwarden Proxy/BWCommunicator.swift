@@ -19,43 +19,17 @@
 import Foundation
 import os.log
 
-extension OSLog {
-
-    static var bitwarden: OSLog {
-        Logging.bitwardenLoggingEnabled ? Logging.bitwardenLog : .disabled
-    }
-}
-
-struct Logging {
-    fileprivate static let bitwardenLoggingEnabled = true
-    fileprivate static let bitwardenLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Bitwarden")
-}
-
-func logOrAssertionFailure(_ message: StaticString, args: CVarArg...) {
-#if DEBUG
-    assertionFailure("\(message)")
-#else
-    os_log("BWManager: Wrong handler", type: .error)
-#endif
-}
-
-@objc protocol BWCommunicationXPC {
-    func runProxyProcess(errorHandler: ((Error) -> Void)?)
-    func terminateProxyProcess()
-    func send(messageData: Data)
-}
-
-@objc protocol BWCommunicatorReplyHandler {
-    func messageReceived(_ data: Data)
-}
-
-final class BWCommunicator: BWCommunicationXPC {
+final class BWCommunicator: BWProxyManaging {
 
     static let appPath = "/Applications/Bitwarden.app/Contents/MacOS/Bitwarden"
 
     private var processDidReceiveMessage: ((Data) -> Void)?
     var processDidTerminate: (() -> Void)?
+
     weak var connection: NSXPCConnection?
+    var remoteObjectProxy: BWProxyIncomingCommunication? {
+        connection?.remoteObjectProxy as? BWProxyIncomingCommunication
+    }
 
     // MARK: - Running Proxy Process
 
@@ -102,7 +76,7 @@ final class BWCommunicator: BWCommunicationXPC {
 
         do {
             try process.run()
-            os_log("BWCommunicator: Proxy process running", log: .bitwarden, type: .default)
+            os_log("BWCommunicator: Proxy process running", log: .bitwardenProxy, type: .default)
             self.process = BitwardenProcess(process: process, readingHandle: outHandle, writingHandle: inputHandle)
         } catch {
             errorHandler?(error)
@@ -119,7 +93,7 @@ final class BWCommunicator: BWCommunicationXPC {
     }
 
     private func processDidTerminate(_ process: Process) {
-        os_log("BWCommunicator: Proxy process terminated", log: .bitwarden, type: .default)
+        os_log("BWCommunicator: Proxy process terminated", log: .bitwardenProxy, type: .default)
 
         if let runningProcess = self.process?.process {
             if process != runningProcess {
@@ -186,23 +160,17 @@ final class BWCommunicator: BWCommunicationXPC {
                 return
             }
 
-            print("will call message handler", String(bytes: messageData, encoding: .utf8))
-//            processDidReceiveMessage?(messageData)
-            (connection?.remoteObjectProxy as? BWCommunicatorReplyHandler)?.messageReceived(messageData)
+            DispatchQueue.main.async {
+                self.remoteObjectProxy?.messageReceived(messageData)
+            }
 
-//            DispatchQueue.main.async { [weak self] in
-//                guard let self = self else { return }
-//
-//                print("will call message handler", String(bytes: messageData, encoding: .utf8))
-//                self.processDidReceiveMessage?(messageData)
-//            }
         } while availableData.count >= 2 /*EOF*/
     }
 
     private func receiveErrorData(_ fileHandle: FileHandle) {
         // Stderr is too verbose. Uncomment if necessary
         // if let stderrOutput = String(data: fileHandle.availableData, encoding: .utf8) {
-        //     os_log("Stderr output:\n %s", log: .bitwarden, type: .error, stderrOutput)
+        //     os_log("Stderr output:\n %s", log: .bitwardenProxy, type: .error, stderrOutput)
         // }
     }
 
