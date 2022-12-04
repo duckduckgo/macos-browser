@@ -11,6 +11,7 @@
 		<string>/Library/Application Support/Microsoft Edge/</string>
 		<string>/Library/Containers/com.bitwarden.desktop/Data/Library/Application Support/Bitwarden/data.json</string>
 		<string>/Library/Application Support/Bitwarden/data.json</string>
+		<string>/Library/Containers/com.duckduckgo.macos.browser/Data/Library/Application Support/NativeMessagingHosts/com.8bit.bitwarden.json</string>
 	</array>
 	<key>com.apple.security.app-sandbox</key>
 	<true/>

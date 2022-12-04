@@ -47,10 +47,18 @@ final class LocalBitwardenInstallationService: BWInstallationService {
 #if DEBUG
         // Even if debugging or developing, look at the standard location of the manifest file
         let sandboxPathComponent = "Containers/com.duckduckgo.macos.browser/Data/Library/Application Support/"
-        let libraryURL = FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask).first!
+        let libraryURL = URL.nonSandboxLibraryDirectoryURL
         let applicationSupport = libraryURL.appendingPathComponent(sandboxPathComponent)
 #else
-        let applicationSupport = URL.sandboxApplicationSupportURL
+        let applicationSupport: URL = {
+            if NSApp.isSandboxed {
+                // Temporary workaround for sandboxed release app with different bundle identifier than non-sandboxed app
+                let sandboxPathComponent = "Containers/com.duckduckgo.macos.browser/Data/Library/Application Support/"
+                let libraryURL = URL.nonSandboxLibraryDirectoryURL
+                return libraryURL.appendingPathComponent(sandboxPathComponent)
+            }
+            return URL.sandboxApplicationSupportURL
+        }()
 #endif
         return applicationSupport.appendingPathComponent("NativeMessagingHosts/com.8bit.bitwarden.json").path
     }()
