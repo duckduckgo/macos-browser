@@ -11,6 +11,8 @@ on:
         options:
         - review
         - release
+        - review-sandbox
+        - release-sandbox
       create-dmg:
         description: "Create DMG image"
         required: true
