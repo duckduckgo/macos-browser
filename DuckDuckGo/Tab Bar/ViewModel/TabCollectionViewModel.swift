@@ -266,14 +266,14 @@ final class TabCollectionViewModel: NSObject {
         delegate?.tabCollectionViewModelDidMultipleChanges(self)
     }
 
-    func insert(tab: Tab, at index: TabIndex = .unpinned(0), selected: Bool = true) {
+    func insert(_ tab: Tab, at index: TabIndex, selected: Bool = true) {
         guard changesEnabled else { return }
         guard let tabCollection = tabCollection(for: index) else {
             os_log("TabCollectionViewModel: Tab collection for index %s not found", type: .error, String(describing: index))
             return
         }
 
-        tabCollection.insert(tab: tab, at: index.item)
+        tabCollection.insert(tab, at: index.item)
         if selected {
             select(at: index)
         }
@@ -286,9 +286,9 @@ final class TabCollectionViewModel: NSObject {
         }
     }
 
-    func insertChild(tab: Tab, selected: Bool) {
+    func insert(_ tab: Tab, after parentTab: Tab?, selected: Bool) {
         guard changesEnabled else { return }
-        guard let parentTab = tab.parentTab,
+        guard let parentTab = parentTab ?? tab.parentTab,
               let parentTabIndex = indexInAllTabs(of: parentTab) else {
             os_log("TabCollection: No parent tab", type: .error)
             return
@@ -297,7 +297,15 @@ final class TabCollectionViewModel: NSObject {
         // Insert at the end of the child tabs
         var newIndex = parentTabIndex.isPinnedTab ? 0 : parentTabIndex.item + 1
         while tabCollection.tabs[safe: newIndex]?.parentTab === parentTab { newIndex += 1 }
-        insert(tab: tab, at: .unpinned(newIndex), selected: selected)
+        insert(tab, at: .unpinned(newIndex), selected: selected)
+    }
+
+    func insert(_ tab: Tab, selected: Bool = true) {
+        if let parentTab = tab.parentTab {
+            self.insert(tab, after: parentTab, selected: selected)
+        } else {
+            self.insert(tab, at: .unpinned(0))
+        }
     }
 
     // MARK: - Removal
@@ -315,7 +323,7 @@ final class TabCollectionViewModel: NSObject {
         guard changesEnabled else { return }
 
         let parentTab = tabCollection.tabs[safe: index]?.parentTab
-        guard tabCollection.remove(at: index, published: published) else { return }
+        guard tabCollection.removeTab(at: index, published: published) else { return }
 
         didRemoveTab(at: .unpinned(index), withParent: parentTab)
     }
@@ -485,7 +493,7 @@ final class TabCollectionViewModel: NSObject {
         let tabCopy = Tab(content: tab.content, favicon: tab.favicon, sessionStateData: tab.sessionStateData)
         let newIndex = tabIndex.makeNext()
 
-        tabCollection(for: tabIndex)?.insert(tab: tabCopy, at: newIndex.item)
+        tabCollection(for: tabIndex)?.insert(tabCopy, at: newIndex.item)
         select(at: newIndex)
 
         if newIndex.isUnpinnedTab {
@@ -521,7 +529,7 @@ final class TabCollectionViewModel: NSObject {
             return
         }
 
-        insert(tab: tab)
+        insert(tab)
     }
     
     func title(forTabWithURL url: URL) -> String? {

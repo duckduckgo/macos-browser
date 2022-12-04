@@ -25,9 +25,8 @@ protocol ContextMenuManagerDelegate: AnyObject {
     func prepareForContextMenuDownload()
 }
 
-enum NewWindowPolicy {
-    case newWindow
-    case newTab(selected: Bool)
+enum NavigationDecision {
+    case allow(NewWindowPolicy)
     case cancel
 }
 
@@ -35,12 +34,12 @@ final class ContextMenuManager: NSObject {
 
     weak var delegate: ContextMenuManagerDelegate?
 
-    private var onNewWindow: ((WKNavigationAction?) -> NewWindowPolicy)?
+    private var onNewWindow: ((WKNavigationAction?) -> NavigationDecision)?
     private var askForDownloadLocation: Bool?
     private var originalItems: [WKMenuItemIdentifier: NSMenuItem]?
     private var selectedText: String?
 
-    func decideNewWindowPolicy(for navigationAction: WKNavigationAction) -> NewWindowPolicy? {
+    func decideNewWindowPolicy(for navigationAction: WKNavigationAction) -> NavigationDecision? {
         defer {
             onNewWindow = nil
         }
@@ -255,7 +254,7 @@ private extension ContextMenuManager {
             return
         }
 
-        onNewWindow = { _ in .newTab(selected: false) }
+        onNewWindow = { _ in .allow(.tab(selected: false)) }
         NSApp.sendAction(action, to: originalItem.target, from: originalItem)
     }
 
@@ -269,7 +268,7 @@ private extension ContextMenuManager {
             return
         }
 
-        onNewWindow = { _ in .newWindow }
+        onNewWindow = { _ in .allow(.window(active: true)) }
         NSApp.sendAction(action, to: originalItem.target, from: originalItem)
     }
 
@@ -283,7 +282,7 @@ private extension ContextMenuManager {
             return
         }
 
-        onNewWindow = { _ in .newWindow }
+        onNewWindow = { _ in .allow(.window(active: true)) }
         NSApp.sendAction(action, to: originalItem.target, from: originalItem)
     }
 
@@ -356,7 +355,7 @@ private extension ContextMenuManager {
             return
         }
 
-        onNewWindow = { _ in .newTab(selected: true) }
+        onNewWindow = { _ in .allow(.tab(selected: true)) }
         NSApp.sendAction(action, to: originalItem.target, from: originalItem)
     }
 
@@ -370,7 +369,7 @@ private extension ContextMenuManager {
             return
         }
 
-        onNewWindow = { _ in .newWindow }
+        onNewWindow = { _ in .allow(.window(active: true)) }
         NSApp.sendAction(action, to: originalItem.target, from: originalItem)
     }
 

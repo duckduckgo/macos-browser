@@ -28,21 +28,21 @@ import ContentBlocking
 import UserScript
 import PrivacyDashboard
 
-protocol TabDelegate: FileDownloadManagerDelegate, ContentOverlayUserScriptDelegate {
+protocol TabDelegate: ContentOverlayUserScriptDelegate {
     func tabWillStartNavigation(_ tab: Tab, isUserInitiated: Bool)
     func tabDidStartNavigation(_ tab: Tab)
-    func tab(_ tab: Tab, requestedNewTabWith content: Tab.TabContent, selected: Bool)
-    func tab(_ tab: Tab, requestedOpenExternalURL url: URL, forUserEnteredURL: Bool)
-    func tab(_ tab: Tab, requestedSaveAutofillData autofillData: AutofillData)
-    func tab(_ tab: Tab,
-             requestedBasicAuthenticationChallengeWith protectionSpace: URLProtectionSpace,
-             completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void)
+    func tab(_ tab: Tab, createdChild childTab: Tab, of kind: NewWindowPolicy)
 
+    func tab(_ tab: Tab, requestedOpenExternalURL url: URL, forUserEnteredURL userEntered: Bool) -> Bool
+    func tab(_ tab: Tab, requestedSaveAutofillData autofillData: AutofillData)
+    func tab(_ tab: Tab, promptUserForCookieConsent result: @escaping (Bool) -> Void)
     func tab(_ tab: Tab, didChangeHoverLink url: URL?)
 
     func tabPageDOMLoaded(_ tab: Tab)
     func closeTab(_ tab: Tab)
-    func tab(_ tab: Tab, promptUserForCookieConsent result: @escaping (Bool) -> Void)
+
+    func fileIconFlyAnimationOriginalRect(for downloadTask: WebKitDownloadTask) -> NSRect?
+
 }
 
 // swiftlint:disable:next type_body_length
@@ -148,7 +148,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         }
     }
 
-    private let contextMenuManager = ContextMenuManager()
+    let contextMenuManager = ContextMenuManager()
     private weak var autofillScript: WebsiteAutofillUserScript?
     weak var delegate: TabDelegate? {
         didSet {
@@ -210,7 +210,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         
         webView = WebView(frame: webViewFrame, configuration: configuration)
         webView.allowsLinkPreview = false
-        permissions = PermissionModel(webView: webView)
+        permissions = PermissionModel()
 
         super.init()
 
@@ -328,6 +328,18 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     @Published var error: Error?
     let permissions: PermissionModel
 
+    @Published
+    var userInteractionDialog: UserDialog? {
+        didSet {
+            guard let query = userInteractionDialog?.query else { return }
+            query.addCompletionHandler { [weak self, weak query] _ in
+                if self?.userInteractionDialog?.query === query {
+                    self?.userInteractionDialog = nil
+                }
+            }
+        }
+    }
+
     weak private(set) var parentTab: Tab?
     private var _canBeClosedWithBack: Bool
     var canBeClosedWithBack: Bool {
@@ -390,28 +402,27 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
     func download(from url: URL, promptForLocation: Bool = true) {
         webView.startDownload(URLRequest(url: url, cachePolicy: .returnCacheDataElseLoad)) { download in
-            FileDownloadManager.shared.add(download, delegate: self.delegate, location: promptForLocation ? .prompt : .auto, postflight: .none)
+            FileDownloadManager.shared.add(download, delegate: self, location: promptForLocation ? .prompt : .auto, postflight: .none)
         }
     }
 
-    func saveWebContentAs(completionHandler: ((Result<URL, Error>) -> Void)? = nil) {
-        webView.getMimeType { mimeType in
-            if case .some(.html) = mimeType.flatMap(UTType.init(mimeType:)) {
-                self.delegate?.chooseDestination(suggestedFilename: self.webView.suggestedFilename,
-                                                 directoryURL: DownloadsPreferences().effectiveDownloadLocation,
-                                                 fileTypes: [.html, .webArchive, .pdf]) { url, fileType in
-                    guard let url = url else {
-                        completionHandler?(.failure(URLError(.cancelled)))
-                        return
-                    }
-                    self.webView.exportWebContent(to: url,
-                                                  as: fileType.flatMap(WKWebView.ContentExportType.init) ?? .html,
-                                                  completionHandler: completionHandler)
+    func saveWebContentAs() {
+        webView.getMimeType { [weak self] mimeType in
+            guard let self else { return }
+            let webView = self.webView
+            guard case .some(.html) = mimeType.flatMap(UTType.init(mimeType:)) else {
+                if let url = webView.url {
+                    self.download(from: url, promptForLocation: true)
                 }
-            } else if let url = self.webView.url {
-                assert(completionHandler == nil, "Completion handling not implemented for downloaded content, use WebKitDownloadTask.output")
-                self.download(from: url, promptForLocation: true)
+                return
             }
+
+            let dialog = UserDialogType.savePanel(.init(SavePanelParameters(suggestedFilename: webView.suggestedFilename,
+                                                                            fileTypes: [.html, .webArchive, .pdf])) { result in
+                guard let (url, fileType) = try? result.get() else { return }
+                webView.exportWebContent(to: url, as: fileType.flatMap(WKWebView.ContentExportType.init) ?? .html)
+            })
+            self.userInteractionDialog = .init(sender: .user, dialog: dialog)
         }
     }
 
@@ -520,10 +531,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         self.fbBlockingEnabled = enabled
 
         return true
-    }
-
-    func decideNewWindowPolicy(for navigationAction: WKNavigationAction) -> NewWindowPolicy? {
-        contextMenuManager.decideNewWindowPolicy(for: navigationAction)
     }
 
     private static let debugEvents = EventMapping<AMPProtectionDebugEvents> { event, _, _, _ in
@@ -703,10 +710,12 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
     private func setupWebView(shouldLoadInBackground: Bool) {
         webView.navigationDelegate = self
+        webView.uiDelegate = self
         webView.contextMenuDelegate = contextMenuManager
         webView.allowsBackForwardNavigationGestures = true
         webView.allowsMagnification = true
         userContentController?.delegate = self
+        permissions.webView = webView
 
         superviewObserver = webView.observe(\.superview, options: .old) { [weak self] _, change in
             // if the webView is being added to superview - reload if needed
@@ -933,12 +942,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                                 denylisted: false)
     }
 
-    // MARK: - Printing
-
-    // To avoid webpages invoking the printHandler and overwhelming the browser, this property keeps track of the active
-    // print operation and ignores incoming printHandler messages if one exists.
-    fileprivate var activePrintOperation: NSPrintOperation?
-
 }
 
 extension Tab: UserContentControllerDelegate {
@@ -986,35 +989,21 @@ extension Tab: BrowserTabViewControllerClickDelegate {
 
 extension Tab: PrintingUserScriptDelegate {
 
-    func print(frame: Any? = nil) {
-        guard activePrintOperation == nil else { return }
-
-        guard let window = webView.window,
-              let printOperation = webView.printOperation(for: frame)
-        else { return }
-
-        self.activePrintOperation = printOperation
+    func print(frame: Any? = nil, completionHandler: ((Bool) -> Void)? = nil) {
+        guard let printOperation = webView.printOperation(for: frame) else { return }
 
         if printOperation.view?.frame.isEmpty == true {
             printOperation.view?.frame = webView.bounds
         }
 
-        let selector = #selector(printOperationDidRun(printOperation:success:contextInfo:))
-        printOperation.runModal(for: window, delegate: self, didRun: selector, contextInfo: nil)
-        NSApp.runModal(for: window)
+        let dialog = UserDialogType.print(.init(printOperation) { result in
+            completionHandler?((try? result.get()) ?? false)
+        })
+        self.userInteractionDialog = .init(sender: .user, dialog: dialog)
     }
 
     func printingUserScriptDidRequestPrintController(_ script: PrintingUserScript) {
         self.print()
-    }
-
-    @objc func printOperationDidRun(printOperation: NSPrintOperation,
-                                    success: Bool,
-                                    contextInfo: UnsafeMutableRawPointer?) {
-        activePrintOperation = nil
-        if NSApp.modalWindow != nil {
-            NSApp.stopModal()
-        }
     }
 
 }
@@ -1035,7 +1024,8 @@ extension Tab: ContextMenuManagerDelegate {
             return
         }
 
-        self.delegate?.tab(self, requestedNewTabWith: .url(url), selected: true)
+        let newTab = Tab(content: .url(url), parentTab: self)
+        self.delegate?.tab(self, createdChild: newTab, of: .tab(selected: true))
     }
 
     func prepareForContextMenuDownload() {
@@ -1245,12 +1235,15 @@ extension Tab: WKNavigationDelegate {
                  completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
         webViewDidReceiveChallengePublisher.send()
         
-        if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodHTTPBasic,
-           let delegate = delegate {
-            delegate.tab(self, requestedBasicAuthenticationChallengeWith: challenge.protectionSpace, completionHandler: completionHandler)
+        if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodHTTPBasic {
+            let dialog = UserDialogType.basicAuthenticationChallenge(.init(challenge.protectionSpace) { result in
+                let (disposition, credential) = (try? result.get()) ?? (nil, nil)
+                completionHandler(disposition ?? .cancelAuthenticationChallenge, credential)
+            })
+            self.userInteractionDialog = .init(sender: .page(domain: challenge.protectionSpace.host), dialog: dialog)
             return
         }
-        
+
         completionHandler(.performDefaultHandling, nil)
     }
 
@@ -1322,11 +1315,8 @@ extension Tab: WKNavigationDelegate {
                     onLinkRewrite: { [weak self] url, _ in
                         guard let self = self else { return }
                         if isRequestingNewTab || !navigationAction.isTargetingMainFrame {
-                            self.delegate?.tab(
-                                self,
-                                requestedNewTabWith: .url(url),
-                                selected: shouldSelectNewTab || !navigationAction.isTargetingMainFrame
-                            )
+                            let tab = Tab(content: .url(url), parentTab: self)
+                            self.delegate?.tab(self, createdChild: tab, of: .tab(selected: shouldSelectNewTab || !navigationAction.isTargetingMainFrame))
                         } else {
                             webView.load(url)
                         }
@@ -1350,10 +1340,8 @@ extension Tab: WKNavigationDelegate {
             if let newRequest = referrerTrimming.trimReferrer(forNavigation: navigationAction,
                                                               originUrl: webView.url ?? navigationAction.sourceFrame.webView?.url) {
                 if isRequestingNewTab {
-                    delegate?.tab(
-                        self,
-                        requestedNewTabWith: newRequest.url.map { .contentFromURL($0) } ?? .none,
-                        selected: shouldSelectNewTab)
+                    let tab = Tab(content: newRequest.url.map { .contentFromURL($0) } ?? .none, parentTab: self)
+                    self.delegate?.tab(self, createdChild: tab, of: .tab(selected: shouldSelectNewTab))
                 } else {
                     _ = webView.load(newRequest)
                 }
@@ -1394,10 +1382,8 @@ extension Tab: WKNavigationDelegate {
 
         if isRequestingNewTab {
             defer {
-                delegate?.tab(
-                    self,
-                    requestedNewTabWith: navigationAction.request.url.map { .contentFromURL($0) } ?? .none,
-                    selected: shouldSelectNewTab)
+                let tab = Tab(content: navigationAction.request.url.map { .contentFromURL($0) } ?? .none, parentTab: self)
+                delegate?.tab(self, createdChild: tab, of: .tab(selected: shouldSelectNewTab))
             }
             return .cancel
         } else if isLinkActivated && NSApp.isOptionPressed && !NSApp.isCommandPressed {
@@ -1415,17 +1401,9 @@ extension Tab: WKNavigationDelegate {
             return .download(navigationAction, using: webView)
 
         } else if url.isExternalSchemeLink {
-            // always allow user entered URLs
-            if !userEnteredUrl {
-                // ignore <iframe src="custom://url">
-                // ignore 2nd+ external scheme navigation not initiated by user
-                guard navigationAction.sourceFrame.isMainFrame,
-                      !self.externalSchemeOpenedPerPageLoad || navigationAction.isUserInitiated
-                else { return .cancel }
 
-                self.externalSchemeOpenedPerPageLoad = true
-            }
-            self.delegate?.tab(self, requestedOpenExternalURL: url, forUserEnteredURL: userEnteredUrl)
+            // request if OS can handle extenrnal url
+            self.host(webView.url?.host, requestedOpenExternalURL: url)
             return .cancel
         }
 
@@ -1459,6 +1437,39 @@ extension Tab: WKNavigationDelegate {
         willPerformNavigationAction(navigationAction)
 
         return .allow
+    }
+
+    private func host(_ host: String?, requestedOpenExternalURL url: URL) {
+        let searchForExternalUrl = { [weak self] in
+            // Redirect after handing WebView.url update after cancelling the request
+            DispatchQueue.main.async {
+                guard let self, let url = URL.makeSearchUrl(from: url.absoluteString) else { return }
+                self.update(url: url)
+            }
+        }
+
+        guard self.delegate?.tab(self, requestedOpenExternalURL: url, forUserEnteredURL: userEnteredUrl) == true else {
+            // search if external URL can‘t be opened but entered by user
+            if userEnteredUrl {
+                searchForExternalUrl()
+            }
+            return
+        }
+
+        let permissionType = PermissionType.externalScheme(scheme: url.scheme ?? "")
+
+        permissions.permissions([permissionType], requestedForDomain: host, url: url) { [weak self, userEnteredUrl] granted in
+            guard granted, let self else {
+                // search if denied but entered by user
+                if userEnteredUrl {
+                    searchForExternalUrl()
+                }
+                return
+            }
+            // handle opening extenral URL
+            NSWorkspace.shared.open(url)
+            self.permissions.permissions[permissionType].externalSchemeOpened()
+        }
     }
 
     // swiftlint:enable cyclomatic_complexity
@@ -1545,6 +1556,7 @@ extension Tab: WKNavigationDelegate {
 
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
         delegate?.tabDidStartNavigation(self)
+        userInteractionDialog = nil
 
         // Unnecessary assignment triggers publishing
         if error != nil { error = nil }
@@ -1655,11 +1667,11 @@ extension Tab: WKNavigationDelegate {
 // universal download event handlers for Legacy _WKDownload and modern WKDownload
 extension Tab: WKWebViewDownloadDelegate {
     func webView(_ webView: WKWebView, navigationAction: WKNavigationAction, didBecomeDownload download: WebKitDownload) {
-        FileDownloadManager.shared.add(download, delegate: self.delegate, location: .auto, postflight: .none)
+        FileDownloadManager.shared.add(download, delegate: self, location: .auto, postflight: .none)
     }
 
     func webView(_ webView: WKWebView, navigationResponse: WKNavigationResponse, didBecomeDownload download: WebKitDownload) {
-        FileDownloadManager.shared.add(download, delegate: self.delegate, location: .auto, postflight: .none)
+        FileDownloadManager.shared.add(download, delegate: self, location: .auto, postflight: .none)
 
         // Note this can result in tabs being left open, e.g. download button on this page:
         // https://en.wikipedia.org/wiki/Guitar#/media/File:GuitareClassique5.png
@@ -1676,7 +1688,27 @@ extension Tab: WKWebViewDownloadDelegate {
     func webView(_ webView: WKWebView, contextMenuDidCreateDownload download: WebKitDownload) {
         let location: FileDownloadManager.DownloadLocationPreference
             = contextMenuManager.shouldAskForDownloadLocation() == false ? .auto : .prompt
-        FileDownloadManager.shared.add(download, delegate: self.delegate, location: location, postflight: .none)
+        FileDownloadManager.shared.add(download, delegate: self, location: location, postflight: .none)
+    }
+
+}
+
+extension Tab: FileDownloadManagerDelegate {
+
+    func chooseDestination(suggestedFilename: String?, directoryURL: URL?, fileTypes: [UTType], callback: @escaping (URL?, UTType?) -> Void) {
+        let dialog = UserDialogType.savePanel(.init(SavePanelParameters(suggestedFilename: suggestedFilename,
+                                                                        fileTypes: fileTypes)) { result in
+            guard case let .success(.some( (url: url, fileType: fileType) )) = result else {
+                callback(nil, nil)
+                return
+            }
+            callback(url, fileType)
+        })
+        self.userInteractionDialog = .init(sender: .user, dialog: dialog)
+    }
+
+    func fileIconFlyAnimationOriginalRect(for downloadTask: WebKitDownloadTask) -> NSRect? {
+        self.delegate?.fileIconFlyAnimationOriginalRect(for: downloadTask)
     }
 
 }
@@ -1732,7 +1764,8 @@ extension Tab: YoutubeOverlayUserScriptDelegate {
         let isRequestingNewTab = NSApp.isCommandPressed
         if isRequestingNewTab {
             let shouldSelectNewTab = NSApp.isShiftPressed
-            self.delegate?.tab(self, requestedNewTabWith: content, selected: shouldSelectNewTab)
+            let tab = Tab(content: content, parentTab: self)
+            self.delegate?.tab(self, createdChild: tab, of: .tab(selected: shouldSelectNewTab))
         } else {
             setContent(content)
         }
