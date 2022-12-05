@@ -92,7 +92,6 @@ final class NetworkProtection {
         try? await NETunnelProviderManager.loadAllFromPreferences().first
     }
 
-    @MainActor
     private func loadOrMakeTunnelManager() async throws -> NETunnelProviderManager {
         guard let tunnelManager = await tunnelManager else {
             let tunnelManager = NETunnelProviderManager()
@@ -216,7 +215,6 @@ final class NetworkProtection {
 
     /// Reloads the tunnel manager from preferences.
     ///
-    @MainActor
     private func reloadTunnelManager() {
         internalTunnelManager = nil
     }
