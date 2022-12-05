@@ -26,9 +26,7 @@ custom_rules:
 # Rule Config
 identifier_name:
   min_length: 1
-  max_length:
-    warning: 40
-    error: 60
+  max_length: 1000
 file_length:
   warning: 1200
   error: 1200
