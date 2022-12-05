@@ -46,7 +46,7 @@ final class MockSecureVault: SecureVault {
     }
 
     func storeWebsiteCredentials(_ credentials: SecureVaultModels.WebsiteCredentials) throws -> Int64 {
-        let accountID = credentials.account.id!
+        let accountID = Int64(credentials.account.id!)!
         storedCredentials[accountID] = credentials
 
         return accountID

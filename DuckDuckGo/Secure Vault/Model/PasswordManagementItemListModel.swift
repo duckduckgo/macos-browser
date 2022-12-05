@@ -43,7 +43,10 @@ enum SecureVaultItem: Equatable, Identifiable, Comparable {
     var secureVaultID: Int64? {
         switch self {
         case .account(let account):
-            return account.id
+            if let accountId = account.id {
+                return Int64(accountId)
+            }
+            return nil
         case .card(let card):
             return card.id
         case .identity(let identity):
@@ -202,6 +205,7 @@ enum SecureVaultItem: Equatable, Identifiable, Comparable {
 ///
 /// Could maybe even abstract a bunch of this code to be more generic re-usable styled list for use elsewhere.
 final class PasswordManagementItemListModel: ObservableObject {
+    let passwordManagerCoordinator: PasswordManagerCoordinating
     
     enum EmptyState {
         /// Displays nothing for the empty state. Used when data is still loading, or when filtering the All Items list.
@@ -258,13 +262,22 @@ final class PasswordManagementItemListModel: ObservableObject {
     }
 
     @Published private(set) var selected: SecureVaultItem?
+    @Published var externalPasswordManagerSelected: Bool = false {
+        didSet {
+            if externalPasswordManagerSelected {
+                selected = nil
+            }
+        }
+    }
     @Published private(set) var emptyState: EmptyState = .none
     @Published var canChangeCategory: Bool = true
 
     private var onItemSelected: (_ old: SecureVaultItem?, _ new: SecureVaultItem?) -> Void
 
-    init(onItemSelected: @escaping (_ old: SecureVaultItem?, _ new: SecureVaultItem?) -> Void) {
+    init(passwordManagerCoordinator: PasswordManagerCoordinating,
+         onItemSelected: @escaping (_ old: SecureVaultItem?, _ new: SecureVaultItem?) -> Void) {
         self.onItemSelected = onItemSelected
+        self.passwordManagerCoordinator = passwordManagerCoordinator
     }
 
     func update(items: [SecureVaultItem]) {
@@ -279,6 +292,10 @@ final class PasswordManagementItemListModel: ObservableObject {
         
         let previous = selected
         selected = item
+        
+        if selected != nil {
+            externalPasswordManagerSelected = false
+        }
         
         if notify {
             onItemSelected(previous, item)
@@ -353,7 +370,9 @@ final class PasswordManagementItemListModel: ObservableObject {
     func selectFirst() {
         selected = nil
 
-        if let firstSection = displayedItems.first, let selectedItem = firstSection.items.first {
+        if passwordManagerCoordinator.isEnabled && (sortDescriptor.category == .allItems || sortDescriptor.category == .logins) {
+            externalPasswordManagerSelected = true
+        } else if let firstSection = displayedItems.first, let selectedItem = firstSection.items.first {
             selected(item: selectedItem)
         } else {
             selected(item: nil)
