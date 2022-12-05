@@ -72,22 +72,43 @@ final class NetworkProtection {
     ///
     private var internalTunnelManager: NETunnelProviderManager?
 
-    /// The tunnel manager to use for the VPN connection.
+    /// The tunnel manager: will try to load if it its not loaded yet, but if one can't be loaded from preferences,
+    /// a new one will not be created.  This is useful for querying the connection state and information without triggering
+    /// a VPN-access popup to the user.
     ///
-    private var tunnelManager: NETunnelProviderManager {
-        get async throws {
+    private var tunnelManager: NETunnelProviderManager? {
+        get async {
             guard let tunnelManager = internalTunnelManager else {
-                let tunnelManager = try await NETunnelProviderManager.loadAllFromPreferences().first ?? NETunnelProviderManager()
-                try await setup(tunnelManager)
-                try await tunnelManager.saveToPreferences()
-                try await tunnelManager.loadFromPreferences()
-
-                internalTunnelManager = tunnelManager
+                let tunnelManager = await loadTunnelManager()
+                self.internalTunnelManager = tunnelManager
                 return tunnelManager
             }
 
             return tunnelManager
         }
+    }
+
+    private func loadTunnelManager() async -> NETunnelProviderManager? {
+        try? await NETunnelProviderManager.loadAllFromPreferences().first
+    }
+
+    @MainActor
+    private func loadOrMakeTunnelManager() async throws -> NETunnelProviderManager {
+        guard let tunnelManager = await tunnelManager else {
+            let tunnelManager = NETunnelProviderManager()
+            try await setupAndSave(tunnelManager)
+            self.internalTunnelManager = tunnelManager
+            return tunnelManager
+        }
+
+        try await setupAndSave(tunnelManager)
+        return tunnelManager
+    }
+
+    private func setupAndSave(_ tunnelManager: NETunnelProviderManager) async throws {
+        try await self.setup(tunnelManager)
+        try await tunnelManager.saveToPreferences()
+        try await tunnelManager.loadFromPreferences()
     }
 
     // MARK: - Initialization & deinitialization
@@ -195,22 +216,32 @@ final class NetworkProtection {
 
     /// Reloads the tunnel manager from preferences.
     ///
+    @MainActor
     private func reloadTunnelManager() {
-        // Doing this ensures the tunnel will be reloaded
         internalTunnelManager = nil
     }
 
     /// Setups the tunnel manager if it's not set up already.
     ///
     private func setup(_ tunnelManager: NETunnelProviderManager) async throws {
-        guard tunnelManager.protocolConfiguration as? NETunnelProviderProtocol == nil else {
+        guard let protocolConfiguration = tunnelManager.protocolConfiguration as? NETunnelProviderProtocol else {
+            tunnelManager.isEnabled = true
+            tunnelManager.localizedDescription = UserText.networkProtectionTunnelName
+            try await reloadConfiguration(for: tunnelManager)
             return
         }
 
+        if !protocolConfiguration.verifyConfigurationReference() {
+            try await reloadConfiguration(for: tunnelManager)
+        }
+    }
+
+    /// Reloads the WG configuration for the tunnel manager.
+    ///
+    private func reloadConfiguration(for tunnelManager: NETunnelProviderManager) async throws {
         let tunnelConfiguration = try loadTunnelConfiguration()
-        tunnelManager.isEnabled = true
-        tunnelManager.localizedDescription = UserText.networkProtectionTunnelName
-        tunnelManager.protocolConfiguration = NETunnelProviderProtocol(tunnelConfiguration: tunnelConfiguration, previouslyFrom: nil)
+
+        tunnelManager.protocolConfiguration = await NETunnelProviderProtocol(tunnelConfiguration: tunnelConfiguration, previouslyFrom: tunnelManager.protocolConfiguration)
     }
 
     // MARK: - Connection Status Querying
@@ -219,8 +250,10 @@ final class NetworkProtection {
     ///
     /// - Returns: `true` if the VPN is connected, connecting or reasserting, and `false` otherwise.
     ///
-    func isConnected() async throws -> Bool {
-        let tunnelManager = try await tunnelManager
+    func isConnected() async -> Bool {
+        guard let tunnelManager = await tunnelManager else {
+            return false
+        }
 
         switch tunnelManager.connection.status {
         case .connected, .connecting, .reasserting:
@@ -235,15 +268,17 @@ final class NetworkProtection {
     /// Starts the VPN connection used for Network Protection
     ///
     func start() async throws {
-        let tunnelManager = try await tunnelManager
+        // let tunnelManager = try await tunnelManager
+        let tunnelManager = try await loadOrMakeTunnelManager()
 
         switch tunnelManager.connection.status {
         case .invalid:
-            reloadTunnelManager()
+            await reloadTunnelManager()
             try await start()
         case .disconnected, .disconnecting:
             try tunnelManager.connection.startVPNTunnel()
         default:
+            // Intentional no-op
             break
         }
     }
@@ -251,7 +286,9 @@ final class NetworkProtection {
     /// Stops the VPN connection used for Network Protection
     ///
     func stop() async throws {
-        let tunnelManager = try await tunnelManager
+        guard let tunnelManager = await tunnelManager else {
+            return
+        }
 
         switch tunnelManager.connection.status {
         case .connected, .connecting, .reasserting:

@@ -21,6 +21,7 @@ import NetworkExtension
 import WireGuardKit
 
 extension NETunnelProviderProtocol {
+    @MainActor
     convenience init?(tunnelConfiguration: TunnelConfiguration, previouslyFrom old: NEVPNProtocol? = nil) {
         self.init()
 
