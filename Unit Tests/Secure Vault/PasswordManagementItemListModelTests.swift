@@ -80,7 +80,7 @@ final class PasswordManagementItemListModelTests: XCTestCase {
         let model = PasswordManagementItemListModel(onItemSelected: onItemSelected)
         XCTAssertEqual(model.emptyState, .none)
     }
-    
+
     func testWhenGettingEmptyState_AndViewModelGetsGivenEmptyDataSet_ThenEmptyStateIsNoData() {
         let model = PasswordManagementItemListModel(onItemSelected: onItemSelected)
         model.update(items: [])
@@ -118,7 +118,7 @@ final class PasswordManagementItemListModelTests: XCTestCase {
     }
     
     func makeAccount(id: Int64, title: String? = nil, username: String = "username", domain: String = "domain") -> SecureVaultItem {
-        let account = SecureVaultModels.WebsiteAccount(id: id,
+        let account = SecureVaultModels.WebsiteAccount(id: String(id),
                                                 title: title,
                                                 username: username,
                                                 domain: domain)
@@ -145,6 +145,15 @@ final class PasswordManagementItemListModelTests: XCTestCase {
         }
 
         return accounts
+    }
+
+}
+
+extension PasswordManagementItemListModel {
+
+    convenience init(onItemSelected: @escaping (_ old: SecureVaultItem?, _ new: SecureVaultItem?) -> Void) {
+        self.init(passwordManagerCoordinator: PasswordManagerCoordinatingMock(),
+                  onItemSelected: onItemSelected)
     }
 
 }

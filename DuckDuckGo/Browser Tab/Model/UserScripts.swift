@@ -19,7 +19,6 @@
 import os
 import Foundation
 import BrowserServicesKit
-import TrackerRadarKit
 import UserScript
 
 final class UserScripts: UserScriptsProvider {

@@ -17,8 +17,8 @@
 //
 
 import WebKit
-import BrowserServicesKit
 import UserScript
+import BrowserServicesKit
 
 protocol ClickToLoadUserScriptDelegate: AnyObject {
 

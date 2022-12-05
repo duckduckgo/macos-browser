@@ -143,6 +143,8 @@ final class PasswordManagementViewController: NSViewController {
         try? SecureVaultFactory.default.makeVault(errorReporter: SecureVaultErrorReporter.shared)
     }
 
+    private let passwordManagerCoordinator: PasswordManagerCoordinating = PasswordManagerCoordinator.shared
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         createListView()
@@ -211,7 +213,7 @@ final class PasswordManagementViewController: NSViewController {
         // Only select the matching item directly if macOS 11 is available, as 10.15 doesn't support scrolling directly to a given
         // item in SwiftUI. On 10.15, show the matching item by filtering the search bar automatically instead.
         if #available(macOS 11.0, *) {
-            refetchWithText("", selectItemMatchingDomain: domain?.droppingWwwPrefix(), clearWhenNoMatches: true)
+            refetchWithText("", selectItemMatchingDomain: domain, clearWhenNoMatches: true)
         } else {
             refetchWithText(isDirty ? "" : domain ?? "", clearWhenNoMatches: true)
         }
@@ -532,7 +534,8 @@ final class PasswordManagementViewController: NSViewController {
 
     private func promptToDelete(credentials: SecureVaultModels.WebsiteCredentials) {
         guard let window = self.view.window,
-              let id = credentials.account.id else { return }
+              let stringId = credentials.account.id,
+              let id = Int64(stringId) else { return }
 
         let alert = NSAlert.passwordManagerConfirmDeleteLogin()
         alert.beginSheetModal(for: window) { response in
@@ -612,9 +615,11 @@ final class PasswordManagementViewController: NSViewController {
         self.postChange()
     }
 
+    var passwordManagerSelectionCancellable: AnyCancellable?
+    
     // swiftlint:disable function_body_length
     private func createListView() {
-        let listModel = PasswordManagementItemListModel { [weak self] previousValue, newValue in
+        let listModel = PasswordManagementItemListModel(passwordManagerCoordinator: self.passwordManagerCoordinator) { [weak self] previousValue, newValue in
             guard let newValue = newValue,
                   let id = newValue.secureVaultID,
                   let window = self?.view.window else {
@@ -672,7 +677,26 @@ final class PasswordManagementViewController: NSViewController {
 
         self.listModel = listModel
         self.listView = NSHostingView(rootView: PasswordManagementItemListView().environmentObject(listModel))
+        
+        passwordManagerSelectionCancellable = listModel.$externalPasswordManagerSelected
+            .receive(on: DispatchQueue.main)
+            .removeDuplicates()
+            .sink { [weak self] value in
+                if value {
+                    self?.displayExternalPasswordManagerView()
+                }
+            }
     }
+    
+    private func displayExternalPasswordManagerView() {
+        let passwordManagerView = PasswordManagementBitwardenItemView(manager: PasswordManagerCoordinator.shared) { [weak self] in
+            self?.dismiss()
+        }
+        
+        let view = NSHostingView(rootView: passwordManagerView)
+        replaceItemContainerChildView(with: view)
+    }
+    
     // swiftlint:enable function_body_length
 
     private func createNewSecureVaultItemMenu() -> NSMenu {

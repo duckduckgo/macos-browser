@@ -12,3 +12,4 @@
 #import "WKNavigationAction+Private.h"
 
 #import "WKGeolocationProvider.h"
+#import "BWEncryption.h"

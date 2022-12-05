@@ -26,7 +26,6 @@ struct PinnedTabView: View {
 
     @ObservedObject var model: Tab
     @EnvironmentObject var collectionModel: PinnedTabsViewModel
-    @State var isHovered: Bool = false
 
     @Environment(\.controlActiveState) private var controlActiveState
 
@@ -34,10 +33,10 @@ struct PinnedTabView: View {
     var showsHover: Bool
 
     var body: some View {
-        ZStack {
-            Button {
+        let stack = ZStack {
+            Button { [weak collectionModel, weak model] in
                 if !isSelected {
-                    collectionModel.selectedItem = model
+                    collectionModel?.selectedItem = model
                 }
             } label: {
                 PinnedTabInnerView(
@@ -47,22 +46,22 @@ struct PinnedTabView: View {
                 .environmentObject(model)
             }
             .buttonStyle(TouchDownButtonStyle())
-
             .cornerRadius(Const.cornerRadius, corners: [.topLeft, .topRight])
-
             .contextMenu { contextMenu }
-            .onHover { isHovered in
-                guard controlActiveState == .key else {
-                    return
-                }
-                self.isHovered = isHovered
-                collectionModel.hoveredItem = isHovered ? model : nil
-            }
-            
+
             BorderView(isSelected: isSelected,
                        cornerRadius: Const.cornerRadius,
                        size: TabShadowConfig.dividerSize)
         }
+
+        if controlActiveState == .key {
+            stack.onHover { [weak collectionModel, weak model] isHovered in
+                collectionModel?.hoveredItem = isHovered ? model : nil
+            }
+        } else {
+            stack
+        }
+
     }
 
     private var isSelected: Bool {
@@ -73,26 +72,48 @@ struct PinnedTabView: View {
         if isSelected {
             return Color("InterfaceBackgroundColor")
         }
+        let isHovered = collectionModel.hoveredItem == model
         return showsHover && isHovered ? Color("TabMouseOverColor") : Color.clear
     }
 
     @ViewBuilder
     private var contextMenu: some View {
-        Button(UserText.duplicateTab, action: { collectionModel.duplicate(model) })
-        Button(UserText.unpinTab, action: { collectionModel.unpin(model) })
+        Button(UserText.duplicateTab) { [weak collectionModel, weak model] in
+            guard let model = model else { return }
+            collectionModel?.duplicate(model)
+        }
+
+        Button(UserText.unpinTab) { [weak collectionModel, weak model] in
+            guard let model = model else { return }
+            collectionModel?.unpin(model)
+        }
         Divider()
-        Button(UserText.bookmarkThisPage, action: { collectionModel.bookmark(model) })
+        Button(UserText.bookmarkThisPage) { [weak collectionModel, weak model] in
+            guard let model = model else { return }
+            collectionModel?.bookmark(model)
+        }
+
         fireproofAction
         Divider()
-        Button(UserText.closeTab, action: { collectionModel.close(model) })
+
+        Button(UserText.closeTab) { [weak collectionModel, weak model] in
+            guard let model = model else { return }
+            collectionModel?.close(model)
+        }
     }
 
     @ViewBuilder
     private var fireproofAction: some View {
         if collectionModel.isFireproof(model) {
-            Button(UserText.removeFireproofing, action: { collectionModel.removeFireproofing(model) })
+            Button(UserText.removeFireproofing) { [weak collectionModel, weak model] in
+                guard let model = model else { return }
+                collectionModel?.removeFireproofing(model)
+            }
         } else {
-            Button(UserText.fireproofSite, action: { collectionModel.fireproof(model) })
+            Button(UserText.fireproofSite) { [weak collectionModel, weak model] in
+                guard let model = model else { return }
+                collectionModel?.fireproof(model)
+            }
         }
     }
 }

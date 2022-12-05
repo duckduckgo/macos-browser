@@ -1,7 +1,7 @@
 //
-//  PermissionAuthorizationState.swift
+//  RunningApplicationCheck.swift
 //
-//  Copyright © 2021 DuckDuckGo. All rights reserved.
+//  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -18,28 +18,14 @@
 
 import Foundation
 
-enum PermissionAuthorizationState: String, CaseIterable {
-    case ask
-    case grant
-    case deny
+final class RunningApplicationCheck {
 
-    init(decision: PersistedPermissionDecision) {
-        switch decision {
-        case .ask:
-            self = .ask
-        case .allow:
-            self = .grant
-        case .deny:
-            self = .deny
+    static func isApplicationRunning(bundleId: String) -> Bool {
+        let runningApplication = NSWorkspace.shared.runningApplications.first { runningApplication in
+            runningApplication.bundleIdentifier == bundleId
         }
-    }
 
-    var persistedPermissionDecision: PersistedPermissionDecision {
-        switch self {
-        case .ask: return .ask
-        case .grant: return .allow
-        case .deny: return .deny
-        }
+        return runningApplication != nil
     }
 
 }

@@ -1,5 +1,5 @@
 //
-//  CookieConsentInfo.swift
+//  BWMessageIdGenerator.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -18,8 +18,23 @@
 
 import Foundation
 
-struct CookieConsentInfo: Encodable {
-    let consentManaged: Bool
-    let optoutFailed: Bool?
-    let selftestFailed: Bool?
+final class BWMessageIdGenerator {
+
+    private(set) var cache = Set<String>()
+
+    func generateMessageId() -> String {
+        let id = UUID().uuidString
+        cache.insert(id)
+        return id
+    }
+
+    func verify(messageId: String) -> Bool {
+        if cache.contains(messageId) {
+            cache.remove(messageId)
+            return true
+        }
+
+        return false
+    }
+
 }
