@@ -185,6 +185,43 @@ final class HistoryStoreTests: XCTestCase {
         }
     }
     
+    func testWhenRemoveEntriesIsCalled_visitsCascadeDelete() {
+        let context = database.makeContext(concurrencyType: .mainQueueConcurrencyType)
+        let historyStore = HistoryStore(context: context)
+        var toBeDeleted = [Visit]()
+        for j in 0..<10 {
+            let visitDate = Date(timeIntervalSince1970: Double(j))
+            let visit = Visit(date: visitDate)
+            toBeDeleted.append(visit)
+        }
+        let history = saveNewHistoryEntry(including: toBeDeleted, lastVisit: toBeDeleted.last!.date, historyStore: historyStore)
+        
+        let loadingExpectation = self.expectation(description: "Loading")
+        historyStore.removeEntries([history])
+            .receive(on: DispatchQueue.main)
+            .sink { completion in
+                switch completion {
+                case .finished:
+                    loadingExpectation.fulfill()
+                case .failure(let error):
+                    XCTFail("Loading of history failed - \(error.localizedDescription)")
+                }
+            } receiveValue: {}
+            .store(in: &cancellables)
+
+        waitForExpectations(timeout: 1, handler: nil)
+        
+        context.performAndWait {
+            let request = DuckDuckGo_Privacy_Browser.VisitManagedObject.fetchRequest()
+            do {
+                let results = try context.fetch(request)
+                XCTAssertEqual(results.count, 0)
+            } catch {
+                XCTFail(error.localizedDescription)
+            }
+        }
+    }
+    
     func testWhenRemoveVisitsIsCalled_ThenVisitsMustBeCleaned() {
         let context = database.makeContext(concurrencyType: .mainQueueConcurrencyType)
         let historyStore = HistoryStore(context: context)
