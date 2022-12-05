@@ -61,11 +61,11 @@ private extension LegacyWebKitDownloadDelegate {
         if let navigationAction = self.navigationActions[url] {
             self.navigationActions[url] = nil
             assert(delegate.responds(to: #selector(WKNavigationDelegate.webView(_:navigationAction:didBecome:))))
-            delegate.webView!(webView, navigationAction: navigationAction, didBecome: download)
+            delegate.webView?(webView, navigationAction: navigationAction, didBecome: download)
         } else if let navigationResponse = self.navigationResponses[url] {
             self.navigationResponses[url] = nil
             assert(delegate.responds(to: #selector(WKNavigationDelegate.webView(_:navigationResponse:didBecome:))))
-            delegate.webView!(webView, navigationResponse: navigationResponse, didBecome: download)
+            delegate.webView?(webView, navigationResponse: navigationResponse, didBecome: download)
         } else {
             let selector = NSSelectorFromString("_webView:contextMenuDidCreateDownload:")
             guard delegate.responds(to: selector) else {
