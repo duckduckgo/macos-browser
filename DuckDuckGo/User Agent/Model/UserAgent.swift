@@ -26,7 +26,6 @@ enum UserAgent {
 
     static let fallbackSafariVersion = "14.1.2"
     static let fallbackWebKitVersion = "605.1.15"
-    static let fallbackWebViewDefault = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko)"
 
     // MARK: - Loaded versions
 
@@ -58,14 +57,10 @@ enum UserAgent {
         "Chrome/91.0.4472.101 " +
         "Safari/537.36"
     static let `default` = UserAgent.safari
-    static let webViewDefault = ""
 
     static let domainUserAgents: KeyValuePairs<RegEx, String> = [
         // use safari when serving up PDFs from duckduckgo directly
         regex("https://duckduckgo\\.com/[^?]*\\.pdf"): UserAgent.safari,
-
-        // use default WKWebView user agent for duckduckgo domain to remove CTA
-        regex("https://duckduckgo\\.com/.*"): UserAgent.webViewDefault
     ]
     
     static func duckDuckGoUserAgent(appVersion: String = AppVersion.shared.versionNumber,
