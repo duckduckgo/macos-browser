@@ -46,35 +46,6 @@ final class HistoryStoreTests: XCTestCase {
         location = nil
         cancellables.removeAll()
     }
-    
-    @discardableResult
-    func saveNewHistoryEntry(including visits: [Visit], lastVisit: Date, historyStore: HistoryStore, expectation: XCTestExpectation) -> HistoryEntry {
-        let historyEntry = HistoryEntry(identifier: UUID(),
-                                        url: URL.duckDuckGo,
-                                        title: nil,
-                                        numberOfVisits: visits.count,
-                                        lastVisit: lastVisit,
-                                        visits: visits)
-        for visit in visits {
-            visit.historyEntry = historyEntry
-        }
-        save(entry: historyEntry, historyStore: historyStore, expectation: expectation)
-        return historyEntry
-    }
-
-    func save(entry: HistoryEntry, historyStore: HistoryStore, expectation: XCTestExpectation) {
-        historyStore.save(entry: entry)
-            .receive(on: DispatchQueue.main)
-            .sink { completion in
-                switch completion {
-                case .finished:
-                    expectation.fulfill()
-                case .failure(let error):
-                    XCTFail("Saving of history entry failed - \(error.localizedDescription)")
-                }
-            } receiveValue: {}
-            .store(in: &cancellables)
-    }
 
     func testWhenHistoryEntryIsSavedMultipleTimes_ThenTheNewestValueMustBeLoadedFromStore() {
         let context = database.makeContext(concurrencyType: .mainQueueConcurrencyType)
@@ -117,27 +88,34 @@ final class HistoryStoreTests: XCTestCase {
         let context = database.makeContext(concurrencyType: .mainQueueConcurrencyType)
         let historyStore = HistoryStore(context: context)
 
-        let oldHistoryEntry = HistoryEntry(identifier: UUID(),
-                                           url: URL.duckDuckGo,
-                                           title: nil,
-                                           numberOfVisits: 1,
-                                           lastVisit: Date.init(timeIntervalSince1970: 0),
-                                           visits: [])
-        let firstSavingExpectation = self.expectation(description: "Saving")
-        save(entry: oldHistoryEntry, historyStore: historyStore, expectation: firstSavingExpectation)
-
-        let newHistoryEntryIdentifier = UUID()
-        let newHistoryEntry = HistoryEntry(identifier: newHistoryEntryIdentifier,
+        let toBeKeptIdentifier = UUID()
+        let newHistoryEntry = HistoryEntry(identifier: toBeKeptIdentifier,
                                            url: URL(string: "wikipedia.org")!,
                                            title: nil,
                                            numberOfVisits: 1,
                                            lastVisit: Date(),
                                            visits: [])
-        let secondSavingExpectation = self.expectation(description: "Saving")
-        save(entry: newHistoryEntry, historyStore: historyStore, expectation: secondSavingExpectation)
+        let savingExpectation = self.expectation(description: "Saving")
+        save(entry: newHistoryEntry, historyStore: historyStore, expectation: savingExpectation)
+        
+        var toBeDeleted: [HistoryEntry] = []
+        for i in 0..<150 {
+            let identifier = UUID()
+            let visitDate = Date(timeIntervalSince1970: 1000.0 * Double(i))
+            let visit = Visit(date: visitDate)
+            let toRemoveHistoryEntry = HistoryEntry(identifier: identifier,
+                                                    url: URL(string: "wikipedia.org/\(identifier)")!,
+                                                    title: nil,
+                                                    numberOfVisits: 1,
+                                                    lastVisit: visitDate,
+                                                    visits: [visit])
+            visit.historyEntry = toRemoveHistoryEntry
+            save(entry: toRemoveHistoryEntry, historyStore: historyStore)
+            toBeDeleted.append(toRemoveHistoryEntry)
+        }
 
         let loadingExpectation = self.expectation(description: "Loading")
-        historyStore.cleanOld(until: Date(timeIntervalSince1970: 1))
+        historyStore.cleanOld(until: .weekAgo)
             .receive(on: DispatchQueue.main)
             .sink { completion in
                 switch completion {
@@ -148,7 +126,7 @@ final class HistoryStoreTests: XCTestCase {
                 }
             } receiveValue: { history in
                 XCTAssertEqual(history.count, 1)
-                XCTAssertEqual(history.first!.identifier, newHistoryEntryIdentifier)
+                XCTAssertEqual(history.first!.identifier, toBeKeptIdentifier)
             }
             .store(in: &cancellables)
 
@@ -159,27 +137,29 @@ final class HistoryStoreTests: XCTestCase {
         let context = database.makeContext(concurrencyType: .mainQueueConcurrencyType)
         let historyStore = HistoryStore(context: context)
 
-        let notToRemoveIdentifier = UUID()
-        let historyEntry = HistoryEntry(identifier: notToRemoveIdentifier,
-                                        url: URL.duckDuckGo,
-                                        title: nil,
-                                        numberOfVisits: 1,
-                                        lastVisit: Date(),
-                                        visits: [])
+        let visitDate = Date(timeIntervalSince1970: 1234)
+        let visit = Visit(date: visitDate)
         let firstSavingExpectation = self.expectation(description: "Saving")
-        save(entry: historyEntry, historyStore: historyStore, expectation: firstSavingExpectation)
+        let toBeKept = saveNewHistoryEntry(including: [visit], lastVisit: visitDate, historyStore: historyStore, expectation: firstSavingExpectation)
 
-        let toRemoveHistoryEntry = HistoryEntry(identifier: UUID(),
-                                                url: URL(string: "wikipedia.org")!,
-                                                title: nil,
-                                                numberOfVisits: 1,
-                                                lastVisit: Date(),
-                                                visits: [])
-        let secondSavingExpectation = self.expectation(description: "Saving")
-        save(entry: toRemoveHistoryEntry, historyStore: historyStore, expectation: secondSavingExpectation)
+        var toBeDeleted: [HistoryEntry] = []
+        for _ in 0..<150 {
+            let identifier = UUID()
+            let visitDate = Date()
+            let visit = Visit(date: visitDate)
+            let toRemoveHistoryEntry = HistoryEntry(identifier: identifier,
+                                                    url: URL(string: "wikipedia.org/\(identifier)")!,
+                                                    title: nil,
+                                                    numberOfVisits: 1,
+                                                    lastVisit: visitDate,
+                                                    visits: [visit])
+            visit.historyEntry = toRemoveHistoryEntry
+            save(entry: toRemoveHistoryEntry, historyStore: historyStore)
+            toBeDeleted.append(toRemoveHistoryEntry)
+        }
 
         let loadingExpectation = self.expectation(description: "Loading")
-        historyStore.removeEntries([toRemoveHistoryEntry])
+        historyStore.removeEntries(toBeDeleted)
             .receive(on: DispatchQueue.main)
             .sink { completion in
                 switch completion {
@@ -192,6 +172,75 @@ final class HistoryStoreTests: XCTestCase {
             .store(in: &cancellables)
 
         waitForExpectations(timeout: 1, handler: nil)
+        
+        context.performAndWait {
+            let request = DuckDuckGo_Privacy_Browser.HistoryEntryManagedObject.fetchRequest()
+            do {
+                let results = try context.fetch(request)
+                XCTAssertEqual(results.first?.identifier, toBeKept.identifier)
+                XCTAssertEqual(results.count, 1)
+            } catch {
+                XCTFail(error.localizedDescription)
+            }
+        }
+    }
+    
+    func testWhenRemoveVisitsIsCalled_ThenVisitsMustBeCleaned() {
+        let context = database.makeContext(concurrencyType: .mainQueueConcurrencyType)
+        let historyStore = HistoryStore(context: context)
+
+        let visitDate = Date(timeIntervalSince1970: 1234)
+        let toBeKept = Visit(date: visitDate)
+        let firstSavingExpectation = self.expectation(description: "Saving")
+        let toBeKeptsHistory = saveNewHistoryEntry(including: [toBeKept], lastVisit: visitDate, historyStore: historyStore, expectation: firstSavingExpectation)
+
+        var toBeDeleted: [Visit] = []
+        var historiesToPreventFromDeallocation = [HistoryEntry]()
+        let addVisitsToEntry = { [weak self] (visits: [Visit]) in
+            guard let self = self else { return }
+            let history = self.saveNewHistoryEntry(including: visits, lastVisit: visits.last!.date, historyStore: historyStore)
+            historiesToPreventFromDeallocation.append(history)
+        }
+        
+        for _ in 0..<3 {
+            var visits = [Visit]()
+            for j in 0..<50 {
+                let visitDate = Date(timeIntervalSince1970: Double(j))
+                let visit = Visit(date: visitDate)
+                visits.append(visit)
+                toBeDeleted.append(visit)
+            }
+            addVisitsToEntry(visits)
+        }
+
+        let loadingExpectation = self.expectation(description: "Loading")
+        withExtendedLifetime(historiesToPreventFromDeallocation) { _ in
+            historyStore.removeVisits(toBeDeleted)
+                .receive(on: DispatchQueue.main)
+                .sink { completion in
+                    switch completion {
+                    case .finished:
+                        loadingExpectation.fulfill()
+                    case .failure(let error):
+                        XCTFail("Loading of history failed - \(error.localizedDescription)")
+                    }
+                } receiveValue: {}
+                .store(in: &cancellables)
+
+            waitForExpectations(timeout: 1, handler: nil)
+        }
+        
+        context.performAndWait {
+            let request = DuckDuckGo_Privacy_Browser.VisitManagedObject.fetchRequest()
+            do {
+                let results = try context.fetch(request)
+                XCTAssertEqual(results.first?.historyEntry?.identifier, toBeKeptsHistory.identifier)
+                XCTAssertEqual(results.first?.date, toBeKept.date)
+                XCTAssertEqual(results.count, 1)
+            } catch {
+                XCTFail(error.localizedDescription)
+            }
+        }
     }
     
     func testWhenCleanOldIsCalled_ThenFollowingSaveShouldSucceed() {
@@ -319,6 +368,35 @@ final class HistoryStoreTests: XCTestCase {
                             expectation: secondSavingExpectation)
         
         waitForExpectations(timeout: 2, handler: nil)
+    }
+    
+    @discardableResult
+    private func saveNewHistoryEntry(including visits: [Visit], lastVisit: Date, historyStore: HistoryStore, expectation: XCTestExpectation? = nil) -> HistoryEntry {
+        let historyEntry = HistoryEntry(identifier: UUID(),
+                                        url: URL.duckDuckGo,
+                                        title: nil,
+                                        numberOfVisits: visits.count,
+                                        lastVisit: lastVisit,
+                                        visits: visits)
+        for visit in visits {
+            visit.historyEntry = historyEntry
+        }
+        save(entry: historyEntry, historyStore: historyStore, expectation: expectation)
+        return historyEntry
+    }
+
+    private func save(entry: HistoryEntry, historyStore: HistoryStore, expectation: XCTestExpectation? = nil) {
+        historyStore.save(entry: entry)
+            .receive(on: DispatchQueue.main)
+            .sink { completion in
+                switch completion {
+                case .finished:
+                    expectation?.fulfill()
+                case .failure(let error):
+                    XCTFail("Saving of history entry failed - \(error.localizedDescription)")
+                }
+            } receiveValue: {}
+            .store(in: &cancellables)
     }
 }
 
