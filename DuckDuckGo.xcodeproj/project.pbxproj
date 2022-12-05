@@ -6520,8 +6520,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
+				branch = "dharb/bump-css-pin-3.4.1";
 				kind = branch;
-				version = "dharb/bump-css-pin-3.4.1";
 			};
 		};
 		AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
