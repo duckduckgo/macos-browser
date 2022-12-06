@@ -388,9 +388,7 @@ final class MainViewController: NSViewController {
         }
     }
 
-    // swiftlint:disable identifier_name
     var shouldAdjustFirstResponderOnContentChange = false
-    // swiftlint:enable identifier_name
 
     func adjustFirstResponderOnContentChange(content: Tab.TabContent) {
         guard shouldAdjustFirstResponderOnContentChange, content != .none else {
