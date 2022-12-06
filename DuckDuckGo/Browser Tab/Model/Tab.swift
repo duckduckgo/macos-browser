@@ -763,7 +763,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     }()
 
     lazy var vaultManager: SecureVaultManager = {
-        let manager = SecureVaultManager()
+        let manager = SecureVaultManager(passwordManager: PasswordManagerCoordinator.shared)
         manager.delegate = self
         return manager
     }()
@@ -1210,7 +1210,7 @@ extension Tab: SecureVaultManagerDelegate {
         // no-op on macOS
     }
 
-    func secureVaultManager(_: SecureVaultManager, didAutofill type: AutofillType, withObjectId objectId: Int64) {
+    func secureVaultManager(_: SecureVaultManager, didAutofill type: AutofillType, withObjectId objectId: String) {
         Pixel.fire(.formAutofilled(kind: type.formAutofillKind))
     }
 
@@ -1226,6 +1226,10 @@ extension Tab: SecureVaultManagerDelegate {
     
     func secureVaultManagerShouldAutomaticallyUpdateCredentialsWithoutUsername(_: SecureVaultManager) -> Bool {
         return true
+    }
+    
+    public func secureVaultManager(_: BrowserServicesKit.SecureVaultManager, didReceivePixel pixel: AutofillUserScript.JSPixel) {
+        Pixel.fire(.jsPixel(pixel))
     }
 }
 
@@ -1342,11 +1346,11 @@ extension Tab: WKNavigationDelegate {
         if navigationAction.isTargetingMainFrame, navigationAction.request.mainDocumentURL?.host != lastUpgradedURL?.host {
             lastUpgradedURL = nil
         }
-        
+
         if navigationAction.isTargetingMainFrame, navigationAction.navigationType == .backForward {
             adClickAttributionLogic.onBackForwardNavigation(mainFrameURL: webView.url)
         }
-        
+
         if navigationAction.isTargetingMainFrame, navigationAction.navigationType != .backForward {
             if let newRequest = referrerTrimming.trimReferrer(forNavigation: navigationAction,
                                                               originUrl: webView.url ?? navigationAction.sourceFrame.webView?.url) {
@@ -1556,7 +1560,6 @@ extension Tab: WKNavigationDelegate {
         linkProtection.setMainFrameUrl(webView.url)
         referrerTrimming.onBeginNavigation(to: webView.url)
         adClickAttributionDetection.onStartNavigation(url: webView.url)
-        
     }
 
     @MainActor

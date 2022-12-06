@@ -37,7 +37,7 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
     }()
 
     lazy var vaultManager: SecureVaultManager = {
-        let manager = SecureVaultManager()
+        let manager = SecureVaultManager(passwordManager: PasswordManagerCoordinator.shared)
         manager.delegate = self
         return manager
     }()
@@ -49,6 +49,9 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
         appearanceCancellable = NSApp.publisher(for: \.effectiveAppearance).map { $0 as NSAppearance? }.sink { [weak self] appearance in
             self?.webView.appearance = appearance
         }
+
+        // Initialize to default size to reduce flicker
+        requestResizeToSize(CGSize(width: 0, height: 0))
     }
 
     public func setType(serializedInputContext: String, zoomFactor: CGFloat?) {
@@ -232,7 +235,7 @@ extension ContentOverlayViewController: SecureVaultManagerDelegate {
         // no-op on macOS
     }
 
-    public func secureVaultManager(_: SecureVaultManager, didAutofill type: AutofillType, withObjectId objectId: Int64) {
+    public func secureVaultManager(_: SecureVaultManager, didAutofill type: AutofillType, withObjectId objectId: String) {
         Pixel.fire(.formAutofilled(kind: type.formAutofillKind))
     }
     
@@ -248,6 +251,10 @@ extension ContentOverlayViewController: SecureVaultManagerDelegate {
 
     public func secureVaultInitFailed(_ error: SecureVaultError) {
         SecureVaultErrorReporter.shared.secureVaultInitFailed(error)
+    }
+    
+    public func secureVaultManager(_: BrowserServicesKit.SecureVaultManager, didReceivePixel pixel: AutofillUserScript.JSPixel) {
+        Pixel.fire(.jsPixel(pixel))
     }
 
 }
