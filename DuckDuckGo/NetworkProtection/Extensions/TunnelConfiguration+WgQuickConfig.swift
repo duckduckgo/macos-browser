@@ -180,7 +180,7 @@ extension TunnelConfiguration {
             interface.listenPort = listenPort
         }
         if let addressesString = attributes["address"] {
-            var addresses = [IPAddressRange]()
+            var addresses = [WireGuardKit.IPAddressRange]()
             for addressString in addressesString.splitToArray(trimmingCharacters: .whitespacesAndNewlines) {
                 guard let address = IPAddressRange(from: addressString) else {
                     throw ParseError.interfaceHasInvalidAddress(addressString)
@@ -226,7 +226,7 @@ extension TunnelConfiguration {
             peer.preSharedKey = preSharedKey
         }
         if let allowedIPsString = attributes["allowedips"] {
-            var allowedIPs = [IPAddressRange]()
+            var allowedIPs = [WireGuardKit.IPAddressRange]()
             for allowedIPString in allowedIPsString.splitToArray(trimmingCharacters: .whitespacesAndNewlines) {
                 guard let allowedIP = IPAddressRange(from: allowedIPString) else {
                     throw ParseError.peerHasInvalidAllowedIP(allowedIPString)
