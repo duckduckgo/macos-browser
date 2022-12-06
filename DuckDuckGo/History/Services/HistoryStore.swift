@@ -324,12 +324,12 @@ fileprivate extension HistoryEntry {
         }
 
         let title = historyEntryMO.titleEncrypted as? String
-        let numberOfTotalVisits = historyEntryMO.numberOfTotalVisits
         let numberOfTrackersBlocked = historyEntryMO.numberOfTrackersBlocked
         let blockedTrackingEntities = historyEntryMO.blockedTrackingEntities ?? ""
         let visits = Set(historyEntryMO.visits?.allObjects.compactMap {
             Visit(visitMO: $0 as? VisitManagedObject)
         } ?? [])
+        let numberOfTotalVisits = visits.count
 
         assert(Dictionary(grouping: visits, by: \.date).filter({ $1.count > 1 }).isEmpty, "Duplicate of visit stored")
 
@@ -366,7 +366,6 @@ fileprivate extension HistoryEntryManagedObject {
         if let title = entry.title, !title.isEmpty {
             self.titleEncrypted = title as NSString
         }
-        numberOfTotalVisits = Int64(entry.numberOfTotalVisits)
         lastVisit = entry.lastVisit
         failedToLoad = entry.failedToLoad
         numberOfTrackersBlocked = Int64(entry.numberOfTrackersBlocked)
