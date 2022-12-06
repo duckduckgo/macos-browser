@@ -1,7 +1,7 @@
 //
-//  WKWebViewDownloadDelegate.swift
+//  BWMessageIdGenerator.swift
 //
-//  Copyright © 2021 DuckDuckGo. All rights reserved.
+//  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,12 +16,25 @@
 //  limitations under the License.
 //
 
-import WebKit
+import Foundation
 
-protocol WKWebViewDownloadDelegate: AnyObject {
+final class BWMessageIdGenerator {
 
-    func webView(_ webView: WKWebView, navigationAction: WKNavigationAction, didBecomeDownload download: WebKitDownload)
-    func webView(_ webView: WKWebView, navigationResponse: WKNavigationResponse, didBecomeDownload download: WebKitDownload)
-    func webView(_ webView: WKWebView, contextMenuDidCreateDownload download: WebKitDownload)
-    
+    private(set) var cache = Set<String>()
+
+    func generateMessageId() -> String {
+        let id = UUID().uuidString
+        cache.insert(id)
+        return id
+    }
+
+    func verify(messageId: String) -> Bool {
+        if cache.contains(messageId) {
+            cache.remove(messageId)
+            return true
+        }
+
+        return false
+    }
+
 }

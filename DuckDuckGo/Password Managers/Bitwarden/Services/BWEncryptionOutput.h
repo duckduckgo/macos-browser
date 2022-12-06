@@ -1,7 +1,7 @@
 //
-//  ServerTrust.swift
+//  EncryptionOutput.h
 //
-//  Copyright © 2021 DuckDuckGo. All rights reserved.
+//  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,11 +16,16 @@
 //  limitations under the License.
 //
 
-import Foundation
+#import <Foundation/Foundation.h>
 
-struct ServerTrust {
+NS_ASSUME_NONNULL_BEGIN
 
-    let host: String
-    let secTrust: SecTrust
+@interface BWEncryptionOutput : NSObject
 
-}
+@property (nonatomic, strong) NSData* iv;
+@property (nonatomic, strong) NSData* data;
+@property (nonatomic, strong) NSData* hmac;
+
+@end
+
+NS_ASSUME_NONNULL_END

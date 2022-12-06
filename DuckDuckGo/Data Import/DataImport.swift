@@ -248,6 +248,7 @@ struct DataImportError: Error, Equatable {
     
     enum ImportErrorType: Equatable {
         case noFileFound
+        case cannotFindFile
         case cannotReadFile
         case userDeniedKeychainPrompt
         case couldNotFindProfile
@@ -264,6 +265,7 @@ struct DataImportError: Error, Equatable {
             switch self {
             case .couldNotAccessKeychain: return "couldNotAccessKeychain"
             case .noFileFound,
+                    .cannotFindFile,
                     .cannotReadFile,
                     .userDeniedKeychainPrompt,
                     .couldNotFindProfile,
@@ -283,6 +285,7 @@ struct DataImportError: Error, Equatable {
             switch self {
             case .couldNotAccessKeychain(let status): parameters["keychainErrorCode"] = String(status)
             case .noFileFound,
+                    .cannotFindFile,
                     .cannotReadFile,
                     .userDeniedKeychainPrompt,
                     .couldNotFindProfile,

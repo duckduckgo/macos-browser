@@ -20,79 +20,91 @@ import Cocoa
 import WebKit
 import Combine
 import BrowserServicesKit
+import PrivacyDashboard
 
 final class PrivacyDashboardViewController: NSViewController {
 
     struct Constants {
-        static let initialContentHeight: CGFloat = 662
+        static let initialContentHeight: CGFloat = 499
     }
 
-    @Published var pendingUpdates = [String: String]()
+    private var webView: WKWebView!
+    private var contentHeightConstraint: NSLayoutConstraint!
 
-    weak var tabViewModel: TabViewModel?
-    var serverTrustViewModel: ServerTrustViewModel?
+    private let privacyDashboardController =  PrivacyDashboardController(privacyInfo: nil)
+    public let rulesUpdateObserver = ContentBlockingRulesUpdateObserver()
+    private let websiteBreakageReporter = WebsiteBreakageReporter()
+    private let permissionHandler = PrivacyDashboardPermissionHandler()
 
-    override init(nibName nibNameOrNil: NSNib.Name?, bundle nibBundleOrNil: Bundle?) {
-        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
-        bindRulesRecompilation()
-    }
-
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
-        bindRulesRecompilation()
-    }
-
+    /// Running the resize animation block during the popover animation causes frame hitching.
+    /// The animation only needs to run when transitioning between views in the popover, so this is used to track when to run the animation.
+    /// This should be set to true any time the popover is displayed (i.e., reset to true when dismissing the popover), and false after the initial resize pass is complete.
+    @Published private var shouldAnimateHeightChange: Bool = false
+    
+    @Published private var currentContentHeight: Int = Int(Constants.initialContentHeight)
+    private var currentContentHeightCancellable: AnyCancellable?
+    
+    private var preferredMaxHeight: CGFloat = Constants.initialContentHeight
     func setPreferredMaxHeight(_ height: CGFloat) {
         guard height > Constants.initialContentHeight else { return }
         
         preferredMaxHeight = height
-        if let webView = webView {
-            webView.reload()
+    }
+    
+    public func updateTabViewModel(_ tabViewModel: TabViewModel) {
+
+        privacyDashboardController.updatePrivacyInfo(tabViewModel.tab.privacyInfo)
+        
+        rulesUpdateObserver.updateTabViewModel(tabViewModel, onPendingUpdates: { [weak self] in
+            self?.sendPendingUpdates()
+        })
+        
+        websiteBreakageReporter.updateTabViewModel(tabViewModel)
+        
+        permissionHandler.updateTabViewModel(tabViewModel) { [weak self] allowedPermissions in
+            self?.privacyDashboardController.allowedPermissions = allowedPermissions
+        }
+    }
+    
+    public override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        initWebView()
+        privacyDashboardController.setup(for: webView)
+
+        setupHeightChangeHandler()
+    }
+    
+    override func viewWillAppear() {
+        super.viewWillAppear()
+
+        privacyDashboardController.delegate = self
+        privacyDashboardController.preferredLocale = "en" // fixed until app is localised
+        
+        webView.reload()
+    }
+    
+    override func viewDidAppear() {
+        super.viewDidAppear()
+            
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+            self.shouldAnimateHeightChange = true
         }
     }
 
-    override func viewDidLoad() {
-        privacyDashboardScript.delegate = self
-        initWebView()
-        webView.configuration.userContentController.addHandlerNoContentWorld(privacyDashboardScript)
-    }
-
-    private func bindRulesRecompilation() {
-        rulesRecompilationCancellable = ContentBlocking.shared.userContentUpdating.userContentBlockingAssets
-            .compactMap(\.nonEmptyCompletionTokens)
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] tokens in
-                dispatchPrecondition(condition: .onQueue(.main))
-                guard let self = self, !self.pendingUpdates.isEmpty else { return }
-
-                var didUpdate = false
-                for token in tokens where self.pendingUpdates.removeValue(forKey: token) != nil {
-                    didUpdate = true
-                }
-
-                if didUpdate {
-                    self.tabViewModel?.reload()
-                }
-            }
-    }
-
-    override func viewWillAppear() {
-        guard tabViewModel != nil else { return }
-
-        let url = Bundle.main.url(forResource: "popup", withExtension: "html", subdirectory: "duckduckgo-privacy-dashboard/build/macos/html")!
-        webView.loadFileURL(url, allowingReadAccessTo: url.deletingLastPathComponent())
-    }
-
     override func viewWillDisappear() {
-        contentHeightConstraint.constant = Constants.initialContentHeight
-        tabViewModelCancellables.removeAll()
-        skipLayoutAnimation = true
+        super.viewWillDisappear()
+        
+        privacyDashboardController.delegate = nil
+        shouldAnimateHeightChange = false
     }
-
-    public func isPendingUpdates() -> Bool {
-        return !pendingUpdates.isEmpty
+    
+    override func viewDidDisappear() {
+        super.viewDidDisappear()
+        
+        currentContentHeight = Int(Constants.initialContentHeight)
     }
-
+    
     private func initWebView() {
         let configuration = WKWebViewConfiguration()
 
@@ -101,185 +113,81 @@ final class PrivacyDashboardViewController: NSViewController {
 #endif
 
         let webView = PrivacyDashboardWebView(frame: .zero, configuration: configuration)
-        webView.navigationDelegate = self
         self.webView = webView
         view.addAndLayout(webView)
-
+        
+        view.topAnchor.constraint(equalTo: webView.topAnchor).isActive = true
+        
         contentHeightConstraint = view.heightAnchor.constraint(equalToConstant: Constants.initialContentHeight)
         contentHeightConstraint.isActive = true
     }
-
-    private func subscribeToPermissions() {
-        tabViewModel?.$usedPermissions.receive(on: DispatchQueue.main).sink { [weak self] _ in
-            self?.updatePermissions()
-        }.store(in: &tabViewModelCancellables)
-    }
-
-    private func updatePermissions() {
-        guard let usedPermissions = tabViewModel?.usedPermissions else {
-            assertionFailure("PrivacyDashboardViewController: tabViewModel not set")
-            return
-        }
-        guard let domain = tabViewModel?.tab.content.url?.host else {
-            privacyDashboardScript.setPermissions(Permissions(), authorizationState: [], domain: "", in: webView)
-            return
-        }
-
-        let authState: PrivacyDashboardUserScript.AuthorizationState
-        authState = PermissionManager.shared.persistedPermissionTypes.union(usedPermissions.keys).compactMap { permissionType in
-            guard PermissionManager.shared.hasPermissionPersisted(forDomain: domain, permissionType: permissionType)
-                    || usedPermissions[permissionType] != nil
-            else {
-                return nil
+    
+    private func setupHeightChangeHandler() {
+        currentContentHeightCancellable = $currentContentHeight
+            .combineLatest($shouldAnimateHeightChange)
+            .removeDuplicates { prev, current in
+                prev.0 == current.0
             }
-            let decision = PermissionManager.shared.permission(forDomain: domain, permissionType: permissionType)
-            return (permissionType, PermissionAuthorizationState(decision: decision))
-        }
-
-        privacyDashboardScript.setPermissions(usedPermissions, authorizationState: authState, domain: domain, in: webView)
-    }
-
-    private func subscribeToConnectionUpgradedTo() {
-        tabViewModel?.tab.$connectionUpgradedTo
-            .receive(on: DispatchQueue.main)
-            .sink(receiveValue: { [weak self] connectionUpgradedTo in
-                guard let self = self else { return }
-                let upgradedHttps = connectionUpgradedTo != nil
-                self.privacyDashboardScript.setUpgradedHttps(upgradedHttps, webView: self.webView)
+            .sink(receiveValue: { [weak self] (height, shouldAnimate) in
+                self?.onHeightChange(height, shouldAnimate: shouldAnimate)
             })
-            .store(in: &tabViewModelCancellables)
     }
-
-    private func subscribeToTrackerInfo() {
-        tabViewModel?.tab.$trackerInfo
-            .receive(on: DispatchQueue.main)
-            .sink(receiveValue: { [weak self] trackerInfo in
-                guard let self = self, let trackerInfo = trackerInfo, let tabUrl = self.tabViewModel?.tab.content.url else { return }
-                self.privacyDashboardScript.setTrackerInfo(tabUrl, trackerInfo: trackerInfo, webView: self.webView)
-            })
-            .store(in: &tabViewModelCancellables)
-    }
-
-    private func sendProtectionStatus() {
-        guard let domain = tabViewModel?.tab.content.url?.host else {
-            assertionFailure("PrivacyDashboardViewController: no domain available")
-            return
-        }
-
-        let configuration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig
-        let isProtected = configuration.isProtected(domain: domain)
-        self.privacyDashboardScript.setProtectionStatus(isProtected, webView: self.webView)
+    
+    public func isPendingUpdates() -> Bool {
+        return !rulesUpdateObserver.pendingUpdates.isEmpty
     }
 
     private func sendPendingUpdates() {
-        guard let domain = tabViewModel?.tab.content.url?.host else {
-            assertionFailure("PrivacyDashboardViewController: no domain available")
-            return
+
+        if isPendingUpdatesForCurrentDomain() {
+            privacyDashboardController.didStartRulesCompilation()
+        } else {
+            privacyDashboardController.didFinishRulesCompilation()
         }
-        let isPendingUpdates = pendingUpdates.values.contains(domain)
-        self.privacyDashboardScript.setIsPendingUpdates(isPendingUpdates, webView: self.webView)
     }
-
-    private func sendParentEntity() {
-        guard let domain = tabViewModel?.tab.content.url?.host else {
-            assertionFailure("PrivacyDashboardViewController: no domain available")
-            return
+    
+    private func isPendingUpdatesForCurrentDomain() -> Bool {
+        guard let domain = privacyDashboardController.privacyInfo?.url.host else { return false }
+        return rulesUpdateObserver.pendingUpdates.values.contains(domain)
+    }
+    
+    private func onHeightChange(_ height: Int, shouldAnimate: Bool) {
+        var height = CGFloat(height)
+        if height > self.preferredMaxHeight {
+            height = self.preferredMaxHeight
         }
 
-        let pageEntity = ContentBlocking.shared.trackerDataManager.trackerData.findEntity(forHost: domain)
-        self.privacyDashboardScript.setParentEntity(pageEntity, webView: self.webView)
-    }
-
-    private func subscribeToServerTrust() {
-        tabViewModel?.tab.$serverTrust
-            .receive(on: DispatchQueue.global(qos: .userInitiated))
-            .map { serverTrust in
-                ServerTrustViewModel(serverTrust: serverTrust)
+        if shouldAnimate {
+            NSAnimationContext.runAnimationGroup { [weak self] context in
+                context.duration = 1/3
+                context.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+                self?.contentHeightConstraint.animator().constant = height
             }
-            .receive(on: DispatchQueue.main)
-            .sink(receiveValue: { [weak self] serverTrustViewModel in
-                guard let self = self, let serverTrustViewModel = serverTrustViewModel else { return }
-                self.privacyDashboardScript.setServerTrust(serverTrustViewModel, webView: self.webView)
-            })
-            .store(in: &tabViewModelCancellables)
+        } else {
+            self.contentHeightConstraint.constant = height
+        }
     }
-
-    private func subscribeToConsentManaged() {
-        tabViewModel?.tab.$cookieConsentManaged
-            .receive(on: DispatchQueue.main)
-            .sink(receiveValue: { [weak self] consentManaged in
-                guard let self = self else { return }
-                self.privacyDashboardScript.setConsentManaged(consentManaged, webView: self.webView)
-            })
-            .store(in: &tabViewModelCancellables)
-    }
-
-    private var webView: WKWebView!
-    private var contentHeightConstraint: NSLayoutConstraint!
-    private let privacyDashboardScript = PrivacyDashboardUserScript()
-    private var tabViewModelCancellables = Set<AnyCancellable>()
-    private var rulesRecompilationCancellable: AnyCancellable?
-
-    /// Running the resize animation block during the popover animation causes frame hitching.
-    /// The animation only needs to run when transitioning between views in the popover, so this is used to track when to run the animation.
-    /// This should be set to true any time the popover is displayed (i.e., reset to true when dismissing the popover), and false after the initial resize pass is complete.
-    private var skipLayoutAnimation = true
-
-    private var preferredMaxHeight: CGFloat = Constants.initialContentHeight
 }
 
-extension PrivacyDashboardViewController: PrivacyDashboardUserScriptDelegate {
-
-    func userScript(_ userScript: PrivacyDashboardUserScript, didChangeProtectionStateTo isProtected: Bool) {
-        guard let domain = tabViewModel?.tab.content.url?.host else {
-            assertionFailure("PrivacyDashboardViewController: no domain available")
+extension PrivacyDashboardViewController: PrivacyDashboardControllerDelegate {
+    
+    func privacyDashboardController(_ privacyDashboardController: PrivacyDashboardController, didChangeProtectionSwitch isEnabled: Bool) {
+        guard let domain = privacyDashboardController.privacyInfo?.url.host else {
             return
         }
 
         let configuration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig
-        if isProtected && configuration.isUserUnprotected(domain: domain) {
+        if isEnabled && configuration.isUserUnprotected(domain: domain) {
             configuration.userEnabledProtection(forDomain: domain)
         } else {
             configuration.userDisabledProtection(forDomain: domain)
         }
 
         let completionToken = ContentBlocking.shared.contentBlockingManager.scheduleCompilation()
-        pendingUpdates[completionToken] = domain
-        sendPendingUpdates()
+        rulesUpdateObserver.didStartCompilation(for: domain, token: completionToken)
     }
-
-    func userScript(_ userScript: PrivacyDashboardUserScript, didSetPermission permission: PermissionType, to state: PermissionAuthorizationState) {
-        guard let domain = tabViewModel?.tab.content.url?.host else {
-            assertionFailure("PrivacyDashboardViewController: no domain available")
-            return
-        }
-
-        PermissionManager.shared.setPermission(state.persistedPermissionDecision, forDomain: domain, permissionType: permission)
-    }
-
-    func userScript(_ userScript: PrivacyDashboardUserScript, setPermission permission: PermissionType, paused: Bool) {
-        tabViewModel?.tab.permissions.set([permission], muted: paused)
-    }
-
-    func userScript(_ userScript: PrivacyDashboardUserScript, setHeight height: Int) {
-        var height = CGFloat(height)
-        if height > preferredMaxHeight {
-            height = preferredMaxHeight
-        }
-
-        if skipLayoutAnimation {
-            contentHeightConstraint.constant = height
-            skipLayoutAnimation = false
-        } else {
-            NSAnimationContext.runAnimationGroup { [weak self] context in
-                context.duration = 1/3
-                context.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
-                self?.contentHeightConstraint.animator().constant = height
-            }
-        }
-    }
-
-    func userScript(_ userScript: PrivacyDashboardUserScript, didRequestOpenUrlInNewTab url: URL) {
+    
+    func privacyDashboardController(_ privacyDashboardController: PrivacyDashboardController, didRequestOpenUrlInNewTab url: URL) {
         guard let tabCollection = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.tabCollectionViewModel
         else {
             assertionFailure("could not access shared tabCollectionViewModel")
@@ -287,30 +195,23 @@ extension PrivacyDashboardViewController: PrivacyDashboardUserScriptDelegate {
         }
         tabCollection.appendNewTab(with: .url(url), selected: true)
     }
-}
+    
+    func privacyDashboardController(_ privacyDashboardController: PrivacyDashboardController, didSetHeight height: Int) {
+        currentContentHeight = height
+    }
+    
+    func privacyDashboardController(_ privacyDashboardController: PrivacyDashboardController, didRequestSubmitBrokenSiteReportWithCategory category: String, description: String) {
+        websiteBreakageReporter.reportBreakage(category: category, description: description)
+    }
+    
+    func privacyDashboardController(_ privacyDashboardController: PrivacyDashboardController, didSetPermission permissionName: String, to state: PermissionAuthorizationState) {
+        guard let domain = self.privacyDashboardController.privacyInfo?.url.host else { return }
 
-extension PrivacyDashboardViewController: WKNavigationDelegate {
-
-    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        subscribeToPermissions()
-        subscribeToTrackerInfo()
-        subscribeToConnectionUpgradedTo()
-        subscribeToServerTrust()
-        sendProtectionStatus()
-        sendPendingUpdates()
-        sendParentEntity()
-        subscribeToConsentManaged()
+        permissionHandler.setPermissionAuthorization(authorizationState: state, domain: domain, permissionName: permissionName)
+    }
+    
+    func privacyDashboardController(_ privacyDashboardController: PrivacyDashboardController, setPermission permissionName: String, paused: Bool) {
+        permissionHandler.setPermission(with: permissionName, paused: paused)
     }
 
-}
-
-private extension UserContentUpdating.NewContent {
-
-    var nonEmptyCompletionTokens: [ContentBlockerRulesManager.CompletionToken]? {
-        let nonEmptyTokens = rulesUpdate.completionTokens.filter { !$0.isEmpty }
-        if nonEmptyTokens.isEmpty {
-            return nil
-        }
-        return nonEmptyTokens
-    }
 }

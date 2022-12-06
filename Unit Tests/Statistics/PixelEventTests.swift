@@ -1,5 +1,5 @@
 //
-//  CookieConsentInfo.swift
+//  PixelEventTests.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -16,10 +16,17 @@
 //  limitations under the License.
 //
 
-import Foundation
+import XCTest
+@testable import BrowserServicesKit
+@testable import DuckDuckGo_Privacy_Browser
 
-struct CookieConsentInfo: Encodable {
-    let consentManaged: Bool
-    let optoutFailed: Bool?
-    let selftestFailed: Bool?
+final class PixelEventTests: XCTestCase {
+
+    func testWhenFormattingJSPixel_ThenJSPixelIncludesPixelName() throws {
+        let pixel = AutofillUserScript.JSPixel(pixelName: "pixel_name")
+        let event = Pixel.Event.jsPixel(pixel)
+        
+        XCTAssertEqual(event.name, "m_mac_pixel_name")
+    }
+
 }
