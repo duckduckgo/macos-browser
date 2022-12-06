@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "3706FA6A293F65D500E42796"
-               BuildableName = "DuckDuckGo Privacy Browser App Store.app"
+               BuildableName = "DuckDuckGo.app"
                BlueprintName = "DuckDuckGo Privacy Browser App Store"
                ReferencedContainer = "container:DuckDuckGo.xcodeproj">
             </BuildableReference>
@@ -79,7 +79,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "3706FA6A293F65D500E42796"
-            BuildableName = "DuckDuckGo Privacy Browser App Store.app"
+            BuildableName = "DuckDuckGo.app"
             BlueprintName = "DuckDuckGo Privacy Browser App Store"
             ReferencedContainer = "container:DuckDuckGo.xcodeproj">
          </BuildableReference>
