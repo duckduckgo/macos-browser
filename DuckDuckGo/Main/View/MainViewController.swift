@@ -383,7 +383,7 @@ final class MainViewController: NSViewController {
             browserTabViewController.preferencesViewController.view.makeMeFirstResponder()
         case .bookmarks:
             browserTabViewController.bookmarksViewController.view.makeMeFirstResponder()
-        case .none:
+        case .none, .error:
             shouldAdjustFirstResponderOnContentChange = true
         }
     }

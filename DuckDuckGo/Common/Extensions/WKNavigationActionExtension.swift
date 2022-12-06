@@ -44,3 +44,17 @@ extension WKNavigationAction {
     }
 
 }
+
+extension WKNavigation {
+    private static let navigationActionKey = UnsafeRawPointer(bitPattern: "WKNavigationActionKey".hashValue)!
+
+    var navigationAction: WKNavigationAction? {
+        get {
+            return objc_getAssociatedObject(self, Self.navigationActionKey) as? WKNavigationAction
+        }
+        set {
+            objc_setAssociatedObject(self, Self.navigationActionKey, newValue, .OBJC_ASSOCIATION_RETAIN)
+        }
+    }
+
+}

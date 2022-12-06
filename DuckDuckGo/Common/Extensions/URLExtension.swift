@@ -95,6 +95,29 @@ extension URL {
         return Self.preferences.appendingPathComponent(pane.rawValue)
     }
 
+    static var bookmarks: URL {
+        return URL(string: "about:bookmarks")!
+    }
+
+    private static let ErrorURLPrefix = "about:error?"
+    static func errorURL(for error: WKError, withPageTitle title: String?) -> URL {
+        error.urlEncoded(withPrefix: Self.ErrorURLPrefix, withPageTitle: title)
+    }
+
+    func getError() -> WKError? {
+        guard self.absoluteString.hasPrefix(Self.ErrorURLPrefix) else { return nil }
+        let error = WKError(urlEncoded: self)
+        if let recursiveError = error.failingUrl?.getError() {
+            return recursiveError
+        }
+        return error
+    }
+
+    var isHypertextURL: Bool {
+        guard let scheme = self.scheme.map(NavigationalScheme.init(rawValue:)) else { return false }
+        return NavigationalScheme.validSchemes.contains(scheme)
+    }
+
     // MARK: Pixel
 
     static let pixelBase = ProcessInfo.processInfo.environment["PIXEL_BASE_URL", default: "https://improving.duckduckgo.com"]

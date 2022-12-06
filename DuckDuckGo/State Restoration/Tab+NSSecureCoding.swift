@@ -131,6 +131,7 @@ private extension Tab.TabContent {
         case .onboarding: return .onboarding
         case .privatePlayer: return .privatePlayer
         case .none: return .homePage
+        case .error: return .url
         }
     }
 

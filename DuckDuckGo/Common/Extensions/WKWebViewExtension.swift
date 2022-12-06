@@ -192,6 +192,15 @@ extension WKWebView {
         }
     }
 
+    func replaceLocation(with url: URL, in frame: WKFrameInfo? = nil) {
+        assert(frame == nil, "replaceLocation in frame not implemented for macOS < 11: need to set window.redirectFrame(uuid) in decidePolicyForNavigationAction")
+        if #available(macOS 11.0, *) {
+            self.evaluateJavaScript("location.replace('\(url.absoluteString.escapedJavaScriptString())')", in: frame, in: .defaultClient)
+        } else {
+            self.evaluateJavaScript("location.replace('\(url.absoluteString.escapedJavaScriptString())')")
+        }
+    }
+
     func getMimeType(callback: @escaping (String?) -> Void) {
         self.evaluateJavaScript("document.contentType") { (result, _) in
             callback(result as? String)

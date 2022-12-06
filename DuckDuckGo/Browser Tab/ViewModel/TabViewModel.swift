@@ -131,18 +131,18 @@ final class TabViewModel {
     }
 
     private func subscribeToTabError() {
-        tab.$error
-            .map { error -> ErrorViewState in
-
-                if let error = error, !error.isFrameLoadInterrupted, !error.isNavigationCancelled {
-                    // don‘t show error for interrupted load like downloads and for cancelled loads
-                    return .init(isVisible: true, message: error.localizedDescription)
-                } else {
-                    return .init(isVisible: false, message: nil)
-                }
-            }
-            .assign(to: \.errorViewState, onWeaklyHeld: self)
-            .store(in: &cancellables)
+//        tab.$error
+//            .map { error -> ErrorViewState in
+//
+//                if let error = error, !error.isFrameLoadInterrupted, !error.isNavigationCancelled {
+//                    // don‘t show error for interrupted load like downloads and for cancelled loads
+//                    return .init(isVisible: true, message: error.localizedDescription)
+//                } else {
+//                    return .init(isVisible: false, message: nil)
+//                }
+//            }
+//            .assign(to: \.errorViewState, onWeaklyHeld: self)
+//            .store(in: &cancellables)
     }
 
     private func subscribeToPermissions() {
@@ -170,11 +170,11 @@ final class TabViewModel {
     }
 
     func updateCanGoBack() {
-        canGoBack = tab.canGoBack || tab.canBeClosedWithBack || tab.error != nil
+        canGoBack = tab.canGoBack || tab.canBeClosedWithBack
     }
 
     func updateCanGoForward() {
-        canGoForward = tab.canGoForward && tab.error == nil
+        canGoForward = tab.canGoForward
     }
 
     private func updateCanBeBookmarked() {
@@ -191,9 +191,9 @@ final class TabViewModel {
 
     func updateAddressBarStrings() {
         guard !errorViewState.isVisible else {
-            let failingUrl = tab.error?.failingUrl
-            addressBarString = failingUrl?.absoluteString ?? ""
-            passiveAddressBarString = failingUrl?.host?.droppingWwwPrefix() ?? ""
+//            let failingUrl = tab.error?.failingUrl
+//            addressBarString = failingUrl?.absoluteString ?? ""
+//            passiveAddressBarString = failingUrl?.host?.droppingWwwPrefix() ?? ""
             return
         }
 
@@ -256,6 +256,8 @@ final class TabViewModel {
             } else {
                 title = addressBarString
             }
+        case .error:
+            title = UserText.tabErrorTitle
         }
     }
 
@@ -275,7 +277,7 @@ final class TabViewModel {
         case .bookmarks:
             favicon = Favicon.bookmarks
             return
-        case .url, .onboarding, .privatePlayer, .none: break
+        case .url, .onboarding, .privatePlayer, .none, .error: break
         }
 
         if let favicon = tab.favicon {

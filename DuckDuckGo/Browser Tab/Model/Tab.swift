@@ -55,6 +55,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         case preferences(pane: PreferencePaneIdentifier?)
         case bookmarks
         case onboarding
+        case error(WKError)
         case none
 
         static func contentFromURL(_ url: URL?) -> TabContent {
@@ -115,6 +116,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             case .preferences: return UserText.tabPreferencesTitle
             case .bookmarks: return UserText.tabBookmarksTitle
             case .onboarding: return UserText.tabOnboardingTitle
+            case .error: return UserText.tabErrorTitle
             }
         }
 
@@ -175,7 +177,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
          cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter? = ContentBlockingAssetsCompilationTimeReporter.shared,
          localHistory: Set<String> = Set<String>(),
          title: String? = nil,
-         error: Error? = nil,
          favicon: NSImage? = nil,
          sessionStateData: Data? = nil,
          interactionStateData: Data? = nil,
@@ -196,7 +197,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         self.cbaTimeReporter = cbaTimeReporter
         self.localHistory = localHistory
         self.title = title
-        self.error = error
         self.favicon = favicon
         self.parentTab = parentTab
         self._canBeClosedWithBack = canBeClosedWithBack
@@ -279,6 +279,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     var isLazyLoadingInProgress = false
 
     private var isBeingRedirected: Bool = false
+    private var lastNavigationAction: WKNavigationAction?
 
     @Published private(set) var content: TabContent {
         didSet {
@@ -287,7 +288,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             if let oldUrl = oldValue.url {
                 historyCoordinating.commitChanges(url: oldUrl)
             }
-            error = nil
             Task {
                 await reloadIfNeeded(shouldLoadInBackground: true)
             }
@@ -325,7 +325,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     var lastSelectedAt: Date?
 
     @Published var title: String?
-    @Published var error: Error?
+//    @Published var error: Error?
     let permissions: PermissionModel
 
     weak private(set) var parentTab: Tab?
@@ -442,7 +442,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     }
 
     var canGoBack: Bool {
-        webView.canGoBack || error != nil
+        webView.canGoBack
     }
 
     func goBack() {
@@ -453,10 +453,10 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             return
         }
 
-        guard error == nil else {
-            webView.reload()
-            return
-        }
+//        guard error == nil else {
+//            webView.reload()
+//            return
+//        }
 
         shouldStoreNextVisit = false
 
@@ -481,10 +481,10 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
     func reload() {
         currentDownload = nil
-        if let error = error, let failingUrl = error.failingUrl {
-            webView.load(failingUrl)
-            return
-        }
+//        if let error = error, let failingUrl = error.failingUrl {
+//            webView.load(failingUrl)
+//            return
+//        }
 
         if webView.url == nil, let url = content.url {
             webView.load(url)
@@ -633,16 +633,16 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         }
 
         // if content not loaded inspect error
-        switch error {
-        case .none, // no error
-            // error due to connection failure
-             .some(URLError.notConnectedToInternet),
-             .some(URLError.networkConnectionLost):
+//        switch error {
+//        case .none, // no error
+//            // error due to connection failure
+//             .some(URLError.notConnectedToInternet),
+//             .some(URLError.networkConnectionLost):
+//            return true
+//        case .some:
+//            // don‘t autoreload on other kinds of errors
             return true
-        case .some:
-            // don‘t autoreload on other kinds of errors
-            return false
-        }
+//        }
     }
 
     @MainActor
@@ -1258,12 +1258,13 @@ extension Tab: WKNavigationDelegate {
         completionHandler(.performDefaultHandling, nil)
     }
 
-    func webView(_ webView: WKWebView, didReceiveServerRedirectForProvisionalNavigation navigation: WKNavigation!) {
+    func webView(_ webView: WKWebView, didReceiveServerRedirectForProvisionalNavigation navigation: WKNavigation?) {
         isBeingRedirected = true
         resetDashboardInfo()
     }
 
-    func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
+    func webView(_ webView: WKWebView, didCommit navigation: WKNavigation?) {
+        self.mainFrameLoadState = .committed
         isBeingRedirected = false
         if content.isUrl, let url = webView.url {
             addVisit(of: url)
@@ -1280,14 +1281,24 @@ extension Tab: WKNavigationDelegate {
     // swiftlint:disable cyclomatic_complexity
     // swiftlint:disable function_body_length
     @MainActor
-    func webView(_ webView: WKWebView,
-                 decidePolicyFor navigationAction: WKNavigationAction) async -> WKNavigationActionPolicy {
+    func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction) async -> WKNavigationActionPolicy {
+        if navigationAction.isTargetingMainFrame {
+            self.lastNavigationAction = navigationAction
+        }
+        
+        if navigationAction.request.url?.getError() != nil {
+            return .allow
+        }
 
         if let policy = privatePlayer.decidePolicy(for: navigationAction, in: self) {
+            if policy == .allow {
+                self.willPerformNavigationAction(navigationAction)
+            }
             return policy
         }
 
         if navigationAction.request.url?.isFileURL == true {
+            self.willPerformNavigationAction(navigationAction)
             return .allow
         }
 
@@ -1516,10 +1527,11 @@ extension Tab: WKNavigationDelegate {
     }
 
     @MainActor
-    func webView(_ webView: WKWebView,
-                 decidePolicyFor navigationResponse: WKNavigationResponse) async -> WKNavigationResponsePolicy {
+    func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse) async -> WKNavigationResponsePolicy {
+        guard navigationResponse.response.url?.getError() == nil else { return .allow }
+
         userEnteredUrl = false // subsequent requests will be navigations
-        
+
         let isSuccessfulResponse = (navigationResponse.response as? HTTPURLResponse)?.validateStatusCode(statusCode: 200..<300) == nil
 
         if !navigationResponse.canShowMIMEType || navigationResponse.shouldDownload {
@@ -1547,11 +1559,28 @@ extension Tab: WKNavigationDelegate {
         return .allow
     }
 
-    func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
+    func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation?) {
+        // if we‘re navigating to about:error placeholder page
+        if let error = webView.url?.getError() {
+            // and it is a forward or reload navigation: replace page location with a failing url
+            if let failingUrl = error.failingUrl, let lastNavigationAction,
+               [.backForward, .reload].contains(lastNavigationAction.navigationType) {
+                // TODO: this sets -1 as navigation action type which causing a new error navigation on the next failure
+                webView.replaceLocation(with: failingUrl)
+            }
+            // otherwise we‘re opening the placeholder: ignore all the other stuff
+            return
+        }
+        if let lastNavigationAction {
+            navigation?.navigationAction = lastNavigationAction
+            self.lastNavigationAction = nil
+        }
+
+        self.mainFrameLoadState = .provisional
         delegate?.tabDidStartNavigation(self)
 
         // Unnecessary assignment triggers publishing
-        if error != nil { error = nil }
+//        if error != nil { error = nil }
 
         invalidateSessionStateData()
         resetDashboardInfo()
@@ -1562,7 +1591,12 @@ extension Tab: WKNavigationDelegate {
     }
 
     @MainActor
-    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation?) {
+        guard webView.url?.getError() == nil else { return }
+
+        self.mainFrameLoadState = .finished
+        StatisticsLoader.shared.refreshRetentionAtb(isSearch: webView.url?.isDuckDuckGoSearch == true)
+
         isBeingRedirected = false
         invalidateSessionStateData()
         webViewDidFinishNavigationPublisher.send()
@@ -1573,7 +1607,9 @@ extension Tab: WKNavigationDelegate {
         adClickAttributionLogic.onDidFinishNavigation(host: webView.url?.host)
     }
 
-    func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+    func webView(_ webView: WKWebView, didFail navigation: WKNavigation?, withError error: Error) {
+        self.mainFrameLoadState = .finished
+
         // Failing not captured. Seems the method is called after calling the webview's method goBack()
         // https://app.asana.com/0/1199230911884351/1200381133504356/f
         //        hasError = true
@@ -1586,7 +1622,12 @@ extension Tab: WKNavigationDelegate {
         webViewDidFailNavigationPublisher.send()
     }
 
-    func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+    func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation?, withError error: Error) {
+        webView.stopMediaCapture()
+        webView.stopAllMediaPlayback()
+
+        self.mainFrameLoadState = .finished
+
         switch error {
         case URLError.notConnectedToInternet,
              URLError.networkConnectionLost:
@@ -1595,12 +1636,18 @@ extension Tab: WKNavigationDelegate {
         default: break
         }
 
-        self.error = error
         isBeingRedirected = false
         linkProtection.setMainFrameUrl(nil)
         referrerTrimming.onFailedNavigation()
         adClickAttributionDetection.onDidFailNavigation()
         webViewDidFailNavigationPublisher.send()
+
+        // if current navigation is not changing navigation history load the error placeholder
+        // otherwise just display an error overlay
+        if let navigation, // on session restoration the navigation is nil
+            ![.backForward, .reload].contains(navigation.navigationAction?.navigationType) {
+            webView.load(URL.errorURL(for: WKError(_nsError: error as NSError), withPageTitle: nil))
+        }
     }
 
     @available(macOS 11.3, *)
@@ -1615,18 +1662,6 @@ extension Tab: WKNavigationDelegate {
         self.webView(webView, navigationResponse: navigationResponse, didBecomeDownload: download)
     }
 
-    @objc(_webView:didStartProvisionalLoadWithRequest:inFrame:)
-    func webView(_ webView: WKWebView, didStartProvisionalLoadWithRequest request: URLRequest, in frame: WKFrameInfo) {
-        guard frame.isMainFrame else { return }
-        self.mainFrameLoadState = .provisional
-    }
-
-    @objc(_webView:didCommitLoadWithRequest:inFrame:)
-    func webView(_ webView: WKWebView, didCommitLoadWithRequest request: URLRequest, in frame: WKFrameInfo) {
-        guard frame.isMainFrame else { return }
-        self.mainFrameLoadState = .committed
-    }
-
     @objc(_webView:willPerformClientRedirectToURL:delay:)
     func webView(_ webView: WKWebView, willPerformClientRedirectToURL url: URL, delay: TimeInterval) {
         if case .committed = self.mainFrameLoadState {
@@ -1634,23 +1669,6 @@ extension Tab: WKNavigationDelegate {
         }
     }
 
-    @objc(_webView:didFinishLoadWithRequest:inFrame:)
-    func webView(_ webView: WKWebView, didFinishLoadWithRequest request: URLRequest, in frame: WKFrameInfo) {
-        guard frame.isMainFrame else { return }
-        self.mainFrameLoadState = .finished
-
-        StatisticsLoader.shared.refreshRetentionAtb(isSearch: request.url?.isDuckDuckGoSearch == true)
-    }
-
-    @objc(_webView:didFailProvisionalLoadWithRequest:inFrame:withError:)
-    func webView(_ webView: WKWebView,
-                 didFailProvisionalLoadWithRequest request: URLRequest,
-                 in frame: WKFrameInfo,
-                 withError error: Error) {
-        guard frame.isMainFrame else { return }
-        self.mainFrameLoadState = .finished
-    }
-    
     func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
         Pixel.fire(.debug(event: .webKitDidTerminate))
     }

@@ -122,15 +122,15 @@ extension NavigationButtonMenuDelegate: NSMenuDelegate {
         }
 
         // Add error to the list
-        if selectedTabViewModel.tab.error != nil {
-            if buttonType == .back {
-                list.insert(.error, at: 0)
-                currentIndex = 0
-            } else {
-                list = []
-                currentIndex = nil
-            }
-        }
+//        if selectedTabViewModel.tab.error != nil {
+//            if buttonType == .back {
+//                list.insert(.error, at: 0)
+//                currentIndex = 0
+//            } else {
+//                list = []
+//                currentIndex = nil
+//            }
+//        }
 
         return (list, currentIndex)
     }
