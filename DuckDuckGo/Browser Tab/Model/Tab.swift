@@ -1603,13 +1603,13 @@ extension Tab: WKNavigationDelegate {
         webViewDidFailNavigationPublisher.send()
     }
 
-    @available(macOS 11.3, *) // objc does‘t care about availability
+    @available(macOS 11.3, *) // objc doesn‘t care about availability
     @objc(webView:navigationAction:didBecomeDownload:)
     func webView(_ webView: WKWebView, navigationAction: WKNavigationAction, didBecome download: WKDownload) {
         FileDownloadManager.shared.add(download, delegate: self.delegate, location: .auto, postflight: .none)
     }
 
-    @available(macOS 11.3, *) // objc does‘t care about availability
+    @available(macOS 11.3, *) // objc doesn‘t care about availability
     @objc(webView:navigationResponse:didBecomeDownload:)
     func webView(_ webView: WKWebView, navigationResponse: WKNavigationResponse, didBecome download: WKDownload) {
         FileDownloadManager.shared.add(download, delegate: self.delegate, location: .auto, postflight: .none)

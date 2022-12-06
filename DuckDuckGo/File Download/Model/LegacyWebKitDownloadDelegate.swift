@@ -51,7 +51,7 @@ final class LegacyWebKitDownloadDelegate: NSObject {
 private extension LegacyWebKitDownloadDelegate {
 
     // in reality we receive an instance of _WKDownload private class but we can‘t pass it to the WKNavigationDelegate without casting
-    @available(macOS 11.3, *) // objc does‘t care about availability
+    @available(macOS 11.3, *) // objc doesn‘t care about availability
     @objc func _downloadDidStart(_ download: WKDownload) {
         guard let webView = download.webView, let delegate = webView.navigationDelegate, let url = download.originalRequest?.url else {
             assertionFailure("WebKitDownload webView or delegate is nil")
