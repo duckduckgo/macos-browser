@@ -1,5 +1,5 @@
 //
-//  NSImage+NetworkProtection.swift
+//  NetworkProtectionLogger.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -16,11 +16,18 @@
 //  limitations under the License.
 //
 
-import AppKit
+import Foundation
+import OSLog
 
-extension NSImage {
-    enum NetworkProtection {
-        static let statusBarMenuIcon = NSImage(named: "PasswordManagement")
-        static let moreOptionsIcon = NSImage(named: "PasswordManagement")
+protocol NetworkProtectionLogger {
+    func log(_ error: Error)
+}
+
+final class DefaultNetworkProtectionLogger: NetworkProtectionLogger {
+    func log(_ error: Error) {
+        let loggedErrorMessageFormat = StaticString(stringLiteral: "🔴 %{public}@")
+        os_log(loggedErrorMessageFormat, type: .error, error.localizedDescription)
+
+        assertionFailure(error.localizedDescription)
     }
 }

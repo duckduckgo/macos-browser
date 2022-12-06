@@ -52,6 +52,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var grammarFeaturesManager = GrammarFeaturesManager()
     private let crashReporter = CrashReporter()
     let updateController = UpdateController()
+    private var networkProtectionMenu: NetworkProtectionStatusBarMenu?
 
     var appUsageActivityMonitor: AppUsageActivityMonitor?
 
@@ -123,6 +124,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         urlEventHandler.applicationDidFinishLaunching()
 
         UserDefaultsWrapper<Any>.clearRemovedKeys()
+
+        setupNetworkProtectionStatusBarMenu()
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
@@ -158,6 +161,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func applyPreferredTheme() {
         let appearancePreferences = AppearancePreferences()
         appearancePreferences.updateUserInterfaceStyle()
+    }
+
+    // MARK: - Network Protection
+
+    /// Sets up the network protection status bar menu.
+    ///
+    private func setupNetworkProtectionStatusBarMenu() {
+        let networkProtectionMenu = NetworkProtectionStatusBarMenu()
+        networkProtectionMenu.show()
+        self.networkProtectionMenu = networkProtectionMenu
     }
 
 }
