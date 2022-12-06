@@ -93,8 +93,6 @@ extension ContentOverlayPopover: ContentOverlayUserScriptDelegate {
         }
         let rect = NSRect(x: x, y: y, width: rectWidth, height: inputPosition.height)
 
-        // On open initialize to default size to reduce flicker
-        viewController.requestResizeToSize(CGSize(width: 0, height: 0))
         viewController.autofillInterfaceToChild = websiteAutofillUserScript
         viewController.setType(serializedInputContext: serializedInputContext, zoomFactor: zoomFactor)
 

@@ -762,7 +762,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     }()
 
     lazy var vaultManager: SecureVaultManager = {
-        let manager = SecureVaultManager()
+        let manager = SecureVaultManager(passwordManager: PasswordManagerCoordinator.shared)
         manager.delegate = self
         return manager
     }()
@@ -1209,7 +1209,7 @@ extension Tab: SecureVaultManagerDelegate {
         // no-op on macOS
     }
 
-    func secureVaultManager(_: SecureVaultManager, didAutofill type: AutofillType, withObjectId objectId: Int64) {
+    func secureVaultManager(_: SecureVaultManager, didAutofill type: AutofillType, withObjectId objectId: String) {
         Pixel.fire(.formAutofilled(kind: type.formAutofillKind))
     }
 
@@ -1225,6 +1225,10 @@ extension Tab: SecureVaultManagerDelegate {
     
     func secureVaultManagerShouldAutomaticallyUpdateCredentialsWithoutUsername(_: SecureVaultManager) -> Bool {
         return true
+    }
+    
+    public func secureVaultManager(_: BrowserServicesKit.SecureVaultManager, didReceivePixel pixel: AutofillUserScript.JSPixel) {
+        Pixel.fire(.jsPixel(pixel))
     }
 }
 
@@ -1341,11 +1345,11 @@ extension Tab: WKNavigationDelegate {
         if navigationAction.isTargetingMainFrame, navigationAction.request.mainDocumentURL?.host != lastUpgradedURL?.host {
             lastUpgradedURL = nil
         }
-        
+
         if navigationAction.isTargetingMainFrame, navigationAction.navigationType == .backForward {
             adClickAttributionLogic.onBackForwardNavigation(mainFrameURL: webView.url)
         }
-        
+
         if navigationAction.isTargetingMainFrame, navigationAction.navigationType != .backForward {
             if let newRequest = referrerTrimming.trimReferrer(forNavigation: navigationAction,
                                                               originUrl: webView.url ?? navigationAction.sourceFrame.webView?.url) {
@@ -1555,7 +1559,6 @@ extension Tab: WKNavigationDelegate {
         linkProtection.setMainFrameUrl(webView.url)
         referrerTrimming.onBeginNavigation(to: webView.url)
         adClickAttributionDetection.onStartNavigation(url: webView.url)
-        
     }
 
     @MainActor
@@ -1600,16 +1603,26 @@ extension Tab: WKNavigationDelegate {
         webViewDidFailNavigationPublisher.send()
     }
 
-    @available(macOS 11.3, *)
+    @available(macOS 11.3, *) // objc doesn‘t care about availability
     @objc(webView:navigationAction:didBecomeDownload:)
     func webView(_ webView: WKWebView, navigationAction: WKNavigationAction, didBecome download: WKDownload) {
-        self.webView(webView, navigationAction: navigationAction, didBecomeDownload: download)
+        FileDownloadManager.shared.add(download, delegate: self.delegate, location: .auto, postflight: .none)
     }
 
-    @available(macOS 11.3, *)
+    @available(macOS 11.3, *) // objc doesn‘t care about availability
     @objc(webView:navigationResponse:didBecomeDownload:)
     func webView(_ webView: WKWebView, navigationResponse: WKNavigationResponse, didBecome download: WKDownload) {
-        self.webView(webView, navigationResponse: navigationResponse, didBecomeDownload: download)
+        FileDownloadManager.shared.add(download, delegate: self.delegate, location: .auto, postflight: .none)
+
+        // Note this can result in tabs being left open, e.g. download button on this page:
+        // https://en.wikipedia.org/wiki/Guitar#/media/File:GuitareClassique5.png
+        // Safari closes new tabs that were opened and then create a download instantly.
+        if self.webView.backForwardList.currentItem == nil,
+           self.parentTab != nil {
+            DispatchQueue.main.async { [weak delegate=self.delegate] in
+                delegate?.closeTab(self)
+            }
+        }
     }
 
     @objc(_webView:didStartProvisionalLoadWithRequest:inFrame:)
@@ -1652,29 +1665,8 @@ extension Tab: WKNavigationDelegate {
         Pixel.fire(.debug(event: .webKitDidTerminate))
     }
 
-}
-// universal download event handlers for Legacy _WKDownload and modern WKDownload
-extension Tab: WKWebViewDownloadDelegate {
-    func webView(_ webView: WKWebView, navigationAction: WKNavigationAction, didBecomeDownload download: WebKitDownload) {
-        FileDownloadManager.shared.add(download, delegate: self.delegate, location: .auto, postflight: .none)
-    }
-
-    func webView(_ webView: WKWebView, navigationResponse: WKNavigationResponse, didBecomeDownload download: WebKitDownload) {
-        FileDownloadManager.shared.add(download, delegate: self.delegate, location: .auto, postflight: .none)
-
-        // Note this can result in tabs being left open, e.g. download button on this page:
-        // https://en.wikipedia.org/wiki/Guitar#/media/File:GuitareClassique5.png
-        // Safari closes new tabs that were opened and then create a download instantly.
-        if self.webView.backForwardList.currentItem == nil,
-           self.parentTab != nil {
-            DispatchQueue.main.async { [weak delegate=self.delegate] in
-                delegate?.closeTab(self)
-            }
-        }
-    }
-
     @objc(_webView:contextMenuDidCreateDownload:)
-    func webView(_ webView: WKWebView, contextMenuDidCreateDownload download: WebKitDownload) {
+    func webView(_ webView: WKWebView, contextMenuDidCreate download: WebKitDownload) {
         let location: FileDownloadManager.DownloadLocationPreference
             = contextMenuManager.shouldAskForDownloadLocation() == false ? .auto : .prompt
         FileDownloadManager.shared.add(download, delegate: self.delegate, location: location, postflight: .none)
