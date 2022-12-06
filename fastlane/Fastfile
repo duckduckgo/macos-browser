@@ -112,15 +112,15 @@ platform :mac do
     nopref_modified_files = modified_files.map { |str| str.delete_prefix('../') }
     nopref_modified_files.each do |modified_file|
       UI.abort_with_message!("Unexpected change to #{modified_file}.") unless UPGRADABLE_EMBEDDED_FILES.any? do |s|
-                                                                                s.include?(modified_file)
-                                                                              end
+        s.include?(modified_file)
+      end
     end
 
     # Run tests
     run_tests(scheme: 'DuckDuckGo Privacy Browser')
 
     # Every thing looks good: commit and push
-    modified_files.each { |modified_file| sh('git', 'add', "#{modified_file}") }
+    modified_files.each { |modified_file| sh('git', 'add', modified_file.to_s) }
     sh('git', 'commit', '-m', 'Update embedded files')
     ensure_git_status_clean
     sh('git', 'push')
