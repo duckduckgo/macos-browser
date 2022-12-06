@@ -21,24 +21,6 @@ import SwiftUI
 import OpenSSL
 import os.log
 
-protocol BWManagement {
-
-    var status: BWStatus { get }
-    var statusPublisher: Published<BWStatus>.Publisher { get }
-
-    func initCommunication()
-    func sendHandshake()
-    func refreshStatusIfNeeded()
-    func cancelCommunication()
-
-    func openBitwarden()
-
-    func retrieveCredentials(for url: URL, completion: @escaping ([BWCredential], BWError?) -> Void)
-    func create(credential: BWCredential, completion: @escaping (BWError?) -> Void)
-    func update(credential: BWCredential, completion: @escaping (BWError?) -> Void)
-
-}
-
 final class BWManager: BWManagement, ObservableObject {
 
     static let shared = BWManager()
