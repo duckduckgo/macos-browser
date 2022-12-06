@@ -322,25 +322,6 @@ final class HistoryStoreTests: XCTestCase {
         waitForExpectations(timeout: 2, handler: nil)
     }
     
-    func testWhenHistoryEntryIsAdded_NumberOfTotalVisitsDoesNotEqualVisitsCount_EntryWillHaveNumberOfTotalVisitsEqualToVisitsCount() {
-        let visits = [Date(timeIntervalSince1970: 1), Date(timeIntervalSince1970: 1234), Date()].map { Visit(date: $0) }
-        let historyEntry = HistoryEntry(identifier: UUID(),
-                                        url: URL.duckDuckGo,
-                                        title: nil,
-                                        numberOfVisits: 24,
-                                        lastVisit: visits.last!.date,
-                                        visits: visits)
-        for visit in visits {
-            visit.historyEntry = historyEntry
-        }
-        let savingExpectation = XCTestExpectation(description: "Saving")
-        save(entry: historyEntry, expectation: savingExpectation)
-        
-        cleanOldAndWait(cleanUntil: Date(timeIntervalSince1970: 0)) { history in
-            XCTAssertEqual(history.last?.numberOfTotalVisits, 3)
-        }
-    }
-    
     private func cleanOldAndWait(cleanUntil date: Date, assertion: @escaping (History) -> Void, file: StaticString = #file, line: UInt = #line) {
         let loadingExpectation = self.expectation(description: "Loading")
         historyStore.cleanOld(until: date)
