@@ -211,17 +211,15 @@ extension Tab: WKUIDelegate {
     }
 
     func webView(_ webView: WKWebView, runOpenPanelWith parameters: WKOpenPanelParameters, initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping ([URL]?) -> Void) {
-        let dialog = UserDialogType.openPanel(.init(parameters) { [weak self] result in
+        let dialog = UserDialogType.openPanel(.init(parameters) { result in
             completionHandler(try? result.get())
-            self?.userInteractionDialog = nil
         })
         userInteractionDialog = UserDialog(sender: .page(domain: frame.request.url?.host), dialog: dialog)
     }
 
     func webView(_ webView: WKWebView, runJavaScriptAlertPanelWithMessage message: String, initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping () -> Void) {
-        let dialog = UserDialogType.jsDialog(.alert(.init(message) { [weak self] _ in
+        let dialog = UserDialogType.jsDialog(.alert(.init(message) { _ in
             completionHandler()
-            self?.userInteractionDialog = nil
         }))
         userInteractionDialog = UserDialog(sender: .page(domain: frame.request.url?.host), dialog: dialog)
     }
@@ -230,9 +228,8 @@ extension Tab: WKUIDelegate {
                  runJavaScriptConfirmPanelWithMessage message: String,
                  initiatedByFrame frame: WKFrameInfo,
                  completionHandler: @escaping (Bool) -> Void) {
-        let dialog = UserDialogType.jsDialog(.confirm(.init(message) { [weak self] result in
+        let dialog = UserDialogType.jsDialog(.confirm(.init(message) { result in
             completionHandler((try? result.get()) ?? false)
-            self?.userInteractionDialog = nil
         }))
         userInteractionDialog = UserDialog(sender: .page(domain: frame.request.url?.host), dialog: dialog)
     }
@@ -243,9 +240,8 @@ extension Tab: WKUIDelegate {
                  initiatedByFrame frame: WKFrameInfo,
                  completionHandler: @escaping (String?) -> Void) {
 
-        let dialog = UserDialogType.jsDialog(.textInput(.init( (prompt: prompt, defaultText: defaultText) ) { [weak self] result in
+        let dialog = UserDialogType.jsDialog(.textInput(.init( (prompt: prompt, defaultText: defaultText) ) { result in
             completionHandler(try? result.get())
-            self?.userInteractionDialog = nil
         }))
         userInteractionDialog = UserDialog(sender: .page(domain: frame.request.url?.host), dialog: dialog)
     }

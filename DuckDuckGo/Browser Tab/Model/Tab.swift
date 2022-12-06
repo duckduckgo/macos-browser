@@ -332,9 +332,9 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     @Published
     var userInteractionDialog: UserDialog? {
         didSet {
-            guard let query = userInteractionDialog?.query else { return }
-            query.addCompletionHandler { [weak self, weak query] _ in
-                if self?.userInteractionDialog?.query === query {
+            guard let request = userInteractionDialog?.request else { return }
+            request.addCompletionHandler { [weak self, weak request] _ in
+                if self?.userInteractionDialog?.request === request {
                     self?.userInteractionDialog = nil
                 }
             }

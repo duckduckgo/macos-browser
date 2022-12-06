@@ -17,33 +17,35 @@
 //
 
 import Foundation
+import WebKit
 
 struct SavePanelParameters {
     let suggestedFilename: String?
     let fileTypes: [UTType]
 }
 
-typealias OpenPanelQuery = UserDialogRequest<WKOpenPanelParameters, [URL]?>
-typealias SavePanelQuery = UserDialogRequest<SavePanelParameters, (url: URL, fileType: UTType?)?>
-typealias ConfirmQuery = UserDialogRequest<String, Bool>
-typealias TextInputQuery = UserDialogRequest<(prompt: String, defaultText: String?), String?>
-typealias AlertQuery = UserDialogRequest<String, Void>
-typealias BasicAuthQuery = UserDialogRequest<URLProtectionSpace, (URLSession.AuthChallengeDisposition, URLCredential?)>
-typealias PrintQuery = UserDialogRequest<NSPrintOperation, Bool>
+typealias OpenPanelDialogRequest = UserDialogRequest<WKOpenPanelParameters, [URL]?>
+typealias SavePanelDialogRequest = UserDialogRequest<SavePanelParameters, (url: URL, fileType: UTType?)?>
+typealias ConfirmDialogRequest = UserDialogRequest<String, Bool>
+typealias TextInputDialogRequest = UserDialogRequest<(prompt: String, defaultText: String?), String?>
+typealias AlertDialogRequest = UserDialogRequest<String, Void>
+typealias BasicAuthDialogRequest = UserDialogRequest<URLProtectionSpace, (URLSession.AuthChallengeDisposition, URLCredential?)>
+typealias PrintDialogRequest = UserDialogRequest<NSPrintOperation, Bool>
+
 enum JSAlertQuery {
-    case confirm(ConfirmQuery)
-    case textInput(TextInputQuery)
-    case alert(AlertQuery)
+    case confirm(ConfirmDialogRequest)
+    case textInput(TextInputDialogRequest)
+    case alert(AlertDialogRequest)
 }
 
 extension Tab {
 
     enum UserDialogType {
-        case openPanel(OpenPanelQuery)
-        case savePanel(SavePanelQuery)
+        case openPanel(OpenPanelDialogRequest)
+        case savePanel(SavePanelDialogRequest)
         case jsDialog(JSAlertQuery)
-        case basicAuthenticationChallenge(BasicAuthQuery)
-        case print(PrintQuery)
+        case basicAuthenticationChallenge(BasicAuthDialogRequest)
+        case print(PrintDialogRequest)
     }
 
     enum UserDialogSender {
@@ -55,15 +57,15 @@ extension Tab {
         let sender: UserDialogSender
         let dialog: UserDialogType
 
-        var query: AnyUserDialogRequest {
+        var request: AnyUserDialogRequest {
             switch dialog {
-            case .openPanel(let query): return query
-            case .savePanel(let query): return query
-            case .jsDialog(.confirm(let query)): return query
-            case .jsDialog(.textInput(let query)): return query
-            case .jsDialog(.alert(let query)): return query
-            case .basicAuthenticationChallenge(let query): return query
-            case .print(let query): return query
+            case .openPanel(let request): return request
+            case .savePanel(let request): return request
+            case .jsDialog(.confirm(let request)): return request
+            case .jsDialog(.textInput(let request)): return request
+            case .jsDialog(.alert(let request)): return request
+            case .basicAuthenticationChallenge(let request): return request
+            case .print(let request): return request
             }
         }
     }
