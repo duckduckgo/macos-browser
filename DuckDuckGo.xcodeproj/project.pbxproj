@@ -652,7 +652,7 @@
 		B630794226731F5400DCEE41 /* WKDownloadMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B630794126731F5400DCEE41 /* WKDownloadMock.swift */; };
 		B634DBDF293C8F7F00C3C99E /* Tab+UIDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B634DBDE293C8F7F00C3C99E /* Tab+UIDelegate.swift */; };
 		B634DBE1293C8FD500C3C99E /* Tab+Dialogs.swift in Sources */ = {isa = PBXBuildFile; fileRef = B634DBE0293C8FD500C3C99E /* Tab+Dialogs.swift */; };
-		B634DBE3293C900000C3C99E /* OptionalCallbackQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = B634DBE2293C8FFF00C3C99E /* OptionalCallbackQuery.swift */; };
+		B634DBE3293C900000C3C99E /* UserDialogRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = B634DBE2293C8FFF00C3C99E /* UserDialogRequest.swift */; };
 		B634DBE5293C944700C3C99E /* NewWindowPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = B634DBE4293C944700C3C99E /* NewWindowPolicy.swift */; };
 		B634DBE7293C98C500C3C99E /* FutureExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B634DBE6293C98C500C3C99E /* FutureExtension.swift */; };
 		B637273B26CBC8AF00C8CB02 /* AuthenticationAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637273A26CBC8AF00C8CB02 /* AuthenticationAlert.swift */; };
@@ -789,6 +789,7 @@
 		B6BBF1702744CDE1004F850E /* CoreDataStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6BBF16F2744CDE1004F850E /* CoreDataStoreTests.swift */; };
 		B6BBF1722744CE36004F850E /* FireproofDomainsStoreMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6BBF1712744CE36004F850E /* FireproofDomainsStoreMock.swift */; };
 		B6BBF17427475B15004F850E /* PopupBlockedPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6BBF17327475B15004F850E /* PopupBlockedPopover.swift */; };
+		B6BE9FAA293F7955006363C6 /* ModalSheetCancellable.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6BE9FA9293F7955006363C6 /* ModalSheetCancellable.swift */; };
 		B6C0B22E26E61CE70031CB7F /* DownloadViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C0B22D26E61CE70031CB7F /* DownloadViewModel.swift */; };
 		B6C0B23026E61D630031CB7F /* DownloadListStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C0B22F26E61D630031CB7F /* DownloadListStore.swift */; };
 		B6C0B23426E71BCD0031CB7F /* Downloads.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = B6C0B23226E71BCD0031CB7F /* Downloads.xcdatamodeld */; };
@@ -1525,7 +1526,7 @@
 		B630794126731F5400DCEE41 /* WKDownloadMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WKDownloadMock.swift; sourceTree = "<group>"; };
 		B634DBDE293C8F7F00C3C99E /* Tab+UIDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Tab+UIDelegate.swift"; sourceTree = "<group>"; };
 		B634DBE0293C8FD500C3C99E /* Tab+Dialogs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Tab+Dialogs.swift"; sourceTree = "<group>"; };
-		B634DBE2293C8FFF00C3C99E /* OptionalCallbackQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptionalCallbackQuery.swift; sourceTree = "<group>"; };
+		B634DBE2293C8FFF00C3C99E /* UserDialogRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDialogRequest.swift; sourceTree = "<group>"; };
 		B634DBE4293C944700C3C99E /* NewWindowPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewWindowPolicy.swift; sourceTree = "<group>"; };
 		B634DBE6293C98C500C3C99E /* FutureExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FutureExtension.swift; sourceTree = "<group>"; };
 		B637273A26CBC8AF00C8CB02 /* AuthenticationAlert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationAlert.swift; sourceTree = "<group>"; };
@@ -1668,6 +1669,7 @@
 		B6BBF16F2744CDE1004F850E /* CoreDataStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataStoreTests.swift; sourceTree = "<group>"; };
 		B6BBF1712744CE36004F850E /* FireproofDomainsStoreMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FireproofDomainsStoreMock.swift; sourceTree = "<group>"; };
 		B6BBF17327475B15004F850E /* PopupBlockedPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopupBlockedPopover.swift; sourceTree = "<group>"; };
+		B6BE9FA9293F7955006363C6 /* ModalSheetCancellable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModalSheetCancellable.swift; sourceTree = "<group>"; };
 		B6C0B22D26E61CE70031CB7F /* DownloadViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadViewModel.swift; sourceTree = "<group>"; };
 		B6C0B22F26E61D630031CB7F /* DownloadListStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadListStore.swift; sourceTree = "<group>"; };
 		B6C0B23326E71BCD0031CB7F /* Downloads.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Downloads.xcdatamodel; sourceTree = "<group>"; };
@@ -3476,6 +3478,7 @@
 				B6B2400D28083B49001B8F3A /* WebViewContainerView.swift */,
 				37054FCD2876472D00033B6F /* WebViewSnapshotView.swift */,
 				B637273A26CBC8AF00C8CB02 /* AuthenticationAlert.swift */,
+				B6BE9FA9293F7955006363C6 /* ModalSheetCancellable.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -3496,7 +3499,7 @@
 				4B2E7D6226FF9D6500D2DB17 /* PrintingUserScript.swift */,
 				85D438B5256E7C9E00F3BAF8 /* ContextMenuUserScript.swift */,
 				4BB88B4425B7B55C006F6B06 /* DebugUserScript.swift */,
-				B634DBE2293C8FFF00C3C99E /* OptionalCallbackQuery.swift */,
+				B634DBE2293C8FFF00C3C99E /* UserDialogRequest.swift */,
 				B634DBE4293C944700C3C99E /* NewWindowPolicy.swift */,
 				AA9FF95824A1ECF20039E328 /* Tab.swift */,
 				B634DBE0293C8FD500C3C99E /* Tab+Dialogs.swift */,
@@ -4860,7 +4863,7 @@
 				31CF3432288B0B1B0087244B /* NavigationBarBadgeAnimator.swift in Sources */,
 				858A798526A8BB5D00A75A42 /* NSTextViewExtension.swift in Sources */,
 				B634DBE7293C98C500C3C99E /* FutureExtension.swift in Sources */,
-				B634DBE3293C900000C3C99E /* OptionalCallbackQuery.swift in Sources */,
+				B634DBE3293C900000C3C99E /* UserDialogRequest.swift in Sources */,
 				B6B1E88426D5EB570062C350 /* DownloadsCellView.swift in Sources */,
 				4B723E0C26B0005D00E14D75 /* FileImportSummaryViewController.swift in Sources */,
 				B6AAAC2D260330580029438D /* PublishedAfter.swift in Sources */,
@@ -4980,6 +4983,7 @@
 				85707F2A276A35FE00DC0649 /* ActionSpeech.swift in Sources */,
 				8585B63826D6E66C00C1416F /* ButtonStyles.swift in Sources */,
 				4B0511BD262CAA5A00F6079C /* PrivacySecurityPreferences.swift in Sources */,
+				B6BE9FAA293F7955006363C6 /* ModalSheetCancellable.swift in Sources */,
 				B6830963274CDEC7004B46BB /* FireproofDomainsStore.swift in Sources */,
 				1E7E2E942902AC0E00C01B54 /* PrivacyDashboardPermissionHandler.swift in Sources */,
 				AA9FF95F24A1FB690039E328 /* TabCollectionViewModel.swift in Sources */,

@@ -23,13 +23,13 @@ struct SavePanelParameters {
     let fileTypes: [UTType]
 }
 
-typealias OpenPanelQuery = OptionalCallbackQuery<WKOpenPanelParameters, [URL]?>
-typealias SavePanelQuery = OptionalCallbackQuery<SavePanelParameters, (url: URL, fileType: UTType?)?>
-typealias ConfirmQuery = OptionalCallbackQuery<String, Bool>
-typealias TextInputQuery = OptionalCallbackQuery<(prompt: String, defaultText: String?), String?>
-typealias AlertQuery = OptionalCallbackQuery<String, Void>
-typealias BasicAuthQuery = OptionalCallbackQuery<URLProtectionSpace, (URLSession.AuthChallengeDisposition, URLCredential?)>
-typealias PrintQuery = OptionalCallbackQuery<NSPrintOperation, Bool>
+typealias OpenPanelQuery = UserDialogRequest<WKOpenPanelParameters, [URL]?>
+typealias SavePanelQuery = UserDialogRequest<SavePanelParameters, (url: URL, fileType: UTType?)?>
+typealias ConfirmQuery = UserDialogRequest<String, Bool>
+typealias TextInputQuery = UserDialogRequest<(prompt: String, defaultText: String?), String?>
+typealias AlertQuery = UserDialogRequest<String, Void>
+typealias BasicAuthQuery = UserDialogRequest<URLProtectionSpace, (URLSession.AuthChallengeDisposition, URLCredential?)>
+typealias PrintQuery = UserDialogRequest<NSPrintOperation, Bool>
 enum JSAlertQuery {
     case confirm(ConfirmQuery)
     case textInput(TextInputQuery)
@@ -55,7 +55,7 @@ extension Tab {
         let sender: UserDialogSender
         let dialog: UserDialogType
 
-        var query: AnyOptionalCallbackQuery {
+        var query: AnyUserDialogRequest {
             switch dialog {
             case .openPanel(let query): return query
             case .savePanel(let query): return query

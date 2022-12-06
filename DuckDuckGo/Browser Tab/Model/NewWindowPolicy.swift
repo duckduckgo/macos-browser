@@ -30,7 +30,7 @@ enum NewWindowPolicy {
                                            height: windowFeatures.height?.intValue ?? 752)
             self = .popup(size: windowContentSize)
         } else {
-            self = .tab(selected: false)
+            self = .tab(selected: shouldSelectNewTab)
         }
     }
 

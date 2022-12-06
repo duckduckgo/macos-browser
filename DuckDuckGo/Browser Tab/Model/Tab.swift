@@ -328,6 +328,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     @Published var error: Error?
     let permissions: PermissionModel
 
+    /// an Interactive Dialog request (alert/open/save/print) made by a page to be published and presented asynchronously
     @Published
     var userInteractionDialog: UserDialog? {
         didSet {
@@ -422,7 +423,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                 guard let (url, fileType) = try? result.get() else { return }
                 webView.exportWebContent(to: url, as: fileType.flatMap(WKWebView.ContentExportType.init) ?? .html)
             })
-            self.userInteractionDialog = .init(sender: .user, dialog: dialog)
+            self.userInteractionDialog = UserDialog(sender: .user, dialog: dialog)
         }
     }
 
@@ -989,19 +990,6 @@ extension Tab: BrowserTabViewControllerClickDelegate {
 
 extension Tab: PrintingUserScriptDelegate {
 
-    func print(frame: Any? = nil, completionHandler: ((Bool) -> Void)? = nil) {
-        guard let printOperation = webView.printOperation(for: frame) else { return }
-
-        if printOperation.view?.frame.isEmpty == true {
-            printOperation.view?.frame = webView.bounds
-        }
-
-        let dialog = UserDialogType.print(.init(printOperation) { result in
-            completionHandler?((try? result.get()) ?? false)
-        })
-        self.userInteractionDialog = .init(sender: .user, dialog: dialog)
-    }
-
     func printingUserScriptDidRequestPrintController(_ script: PrintingUserScript) {
         self.print()
     }
@@ -1240,7 +1228,7 @@ extension Tab: WKNavigationDelegate {
                 let (disposition, credential) = (try? result.get()) ?? (nil, nil)
                 completionHandler(disposition ?? .cancelAuthenticationChallenge, credential)
             })
-            self.userInteractionDialog = .init(sender: .page(domain: challenge.protectionSpace.host), dialog: dialog)
+            self.userInteractionDialog = UserDialog(sender: .page(domain: challenge.protectionSpace.host), dialog: dialog)
             return
         }
 
@@ -1704,7 +1692,7 @@ extension Tab: FileDownloadManagerDelegate {
             }
             callback(url, fileType)
         })
-        self.userInteractionDialog = .init(sender: .user, dialog: dialog)
+        userInteractionDialog = UserDialog(sender: .user, dialog: dialog)
     }
 
     func fileIconFlyAnimationOriginalRect(for downloadTask: WebKitDownloadTask) -> NSRect? {

@@ -54,7 +54,7 @@ extension Tab: WKUIDelegate {
             guard let url = (try? result.get())?.url else { return }
             try? write(to: url)
         })
-        self.userInteractionDialog = UserDialog(sender: .user, dialog: dialog)
+        userInteractionDialog = UserDialog(sender: .user, dialog: dialog)
     }
 
     @objc(_webView:createWebViewWithConfiguration:forNavigationAction:windowFeatures:completionHandler:)
@@ -134,9 +134,9 @@ extension Tab: WKUIDelegate {
             guard self != nil else { return }
             if isCalledSynchronously {
                 synchronousResultWebView = webView
-            } else if let url = navigationAction.request.url {
+            } else {
                 // automatic loading won‘t start for asynchronous callback as we‘ve already returned nil at this point
-                webView?.load(url)
+                webView?.load(navigationAction.request)
             }
         }
         isCalledSynchronously = false
@@ -252,6 +252,19 @@ extension Tab: WKUIDelegate {
 
     func webViewDidClose(_ webView: WKWebView) {
         delegate?.closeTab(self)
+    }
+
+    func print(frame: Any? = nil, completionHandler: ((Bool) -> Void)? = nil) {
+        guard let printOperation = webView.printOperation(for: frame) else { return }
+
+        if printOperation.view?.frame.isEmpty == true {
+            printOperation.view?.frame = webView.bounds
+        }
+
+        let dialog = UserDialogType.print(.init(printOperation) { result in
+            completionHandler?((try? result.get()) ?? false)
+        })
+        userInteractionDialog = UserDialog(sender: .user, dialog: dialog)
     }
 
     @objc(_webView:printFrame:)

@@ -43,7 +43,7 @@ final class BrowserTabViewController: NSViewController {
     private let tabCollectionViewModel: TabCollectionViewModel
     private var tabContentCancellable: AnyCancellable?
     private var userDialogsCancellable: AnyCancellable?
-    private var activeUserDialog: AnyCancellable?
+    private var activeUserDialogCancellable: ModalSheetCancellable?
     private var errorViewStateCancellable: AnyCancellable?
     private var pinnedTabsDelegatesCancellable: AnyCancellable?
     private var keyWindowSelectedTabCancellable: AnyCancellable?
@@ -619,25 +619,26 @@ extension BrowserTabViewController: TabDelegate {
     fileprivate func show(_ dialog: Tab.UserDialog?) {
         switch dialog?.dialog {
         case .basicAuthenticationChallenge(let query):
-            self.activeUserDialog = showBasicAuthenticationChallenge(with: query)
+            activeUserDialogCancellable = showBasicAuthenticationChallenge(with: query)
         case .jsDialog(.alert(let query)):
-            self.activeUserDialog = showAlert(with: query)
+            activeUserDialogCancellable = showAlert(with: query)
         case .jsDialog(.confirm(let query)):
-            self.activeUserDialog = showConfirmDialog(with: query)
+            activeUserDialogCancellable = showConfirmDialog(with: query)
         case .jsDialog(.textInput(let query)):
-            self.activeUserDialog = showTextInput(with: query)
+            activeUserDialogCancellable = showTextInput(with: query)
         case .savePanel(let query):
-            self.activeUserDialog = showSavePanel(with: query)
+            activeUserDialogCancellable = showSavePanel(with: query)
         case .openPanel(let query):
-            self.activeUserDialog = showOpenPanel(with: query)
+            activeUserDialogCancellable = showOpenPanel(with: query)
         case .print(let query):
-            self.activeUserDialog = runPrintOperation(with: query)
+            activeUserDialogCancellable = runPrintOperation(with: query)
         case .none:
-            self.activeUserDialog = nil
+            // modal sheet will close automatcially (or switch to another Tab‘s dialog) when switching tabs
+            activeUserDialogCancellable = nil
         }
     }
 
-    private func showBasicAuthenticationChallenge(with query: BasicAuthQuery) -> AnyCancellable? {
+    private func showBasicAuthenticationChallenge(with query: BasicAuthQuery) -> ModalSheetCancellable? {
         guard let window = view.window else { return nil }
 
         let alert = AuthenticationAlert(host: query.parameters.host,
@@ -657,14 +658,11 @@ extension BrowserTabViewController: TabDelegate {
                                                          persistence: .forSession)) )
         }
 
-        // when subscribing to another tab, temporarily hide the alert
-        return AnyCancellable { [weak window, weak alert] in
-            guard let window, let alert, window.sheets.contains(alert.window), !query.isComplete else { return }
-            window.endSheet(alert.window, returnCode: .abort)
-        }
+        // when subscribing to another Tab, the sheet will be temporarily closed with response == .abort on the cancellable deinit
+        return ModalSheetCancellable(ownerWindow: window, modalSheet: alert.window, condition: !query.isComplete)
     }
 
-    private func showAlert(with query: AlertQuery) -> AnyCancellable? {
+    private func showAlert(with query: AlertQuery) -> ModalSheetCancellable? {
         guard let window = view.window else { return nil }
 
         let alert = NSAlert.javascriptAlert(with: query.parameters)
@@ -673,14 +671,12 @@ extension BrowserTabViewController: TabDelegate {
             if case .abort = response { return }
             query.submit()
         }
-        // when subscribing to another tab, temporarily hide the alert
-        return AnyCancellable { [weak window, weak alert] in
-            guard let window, let alert, window.sheets.contains(alert.window), !query.isComplete else { return }
-            window.endSheet(alert.window, returnCode: .abort)
-        }
+
+        // when subscribing to another Tab, the sheet will be temporarily closed with response == .abort on the cancellable deinit
+        return ModalSheetCancellable(ownerWindow: window, modalSheet: alert.window, condition: !query.isComplete)
     }
 
-    func showConfirmDialog(with query: ConfirmQuery) -> AnyCancellable? {
+    func showConfirmDialog(with query: ConfirmQuery) -> ModalSheetCancellable? {
         guard let window = view.window else { return nil }
 
         let alert = NSAlert.javascriptConfirmation(with: query.parameters)
@@ -690,14 +686,11 @@ extension BrowserTabViewController: TabDelegate {
             query.submit(response == .alertFirstButtonReturn)
         }
 
-        // when subscribing to another tab, temporarily hide the alert
-        return AnyCancellable { [weak window, weak alert] in
-            guard let window, let alert, window.sheets.contains(alert.window), !query.isComplete else { return }
-            window.endSheet(alert.window, returnCode: .abort)
-        }
+        // when subscribing to another Tab, the sheet will be temporarily closed with response == .abort on the cancellable deinit
+        return ModalSheetCancellable(ownerWindow: window, modalSheet: alert.window, condition: !query.isComplete)
     }
 
-    func showTextInput(with query: TextInputQuery) -> AnyCancellable? {
+    func showTextInput(with query: TextInputQuery) -> ModalSheetCancellable? {
         guard let window = view.window else { return nil }
 
         let alert = NSAlert.javascriptTextInput(prompt: query.parameters.prompt, defaultText: query.parameters.defaultText)
@@ -712,14 +705,11 @@ extension BrowserTabViewController: TabDelegate {
             let answer = response == .alertFirstButtonReturn ? textField.stringValue : nil
             query.submit(answer)
         }
-        // when subscribing to another tab, temporarily hide the alert
-        return AnyCancellable { [weak window, weak alert] in
-            guard let window, let alert, window.sheets.contains(alert.window), !query.isComplete else { return }
-            window.endSheet(alert.window, returnCode: .abort)
-        }
+        // when subscribing to another Tab, the sheet will be temporarily closed with response == .abort on the cancellable deinit
+        return ModalSheetCancellable(ownerWindow: window, modalSheet: alert.window, condition: !query.isComplete)
     }
 
-    func showSavePanel(with query: SavePanelQuery) -> AnyCancellable? {
+    func showSavePanel(with query: SavePanelQuery) -> ModalSheetCancellable? {
         dispatchPrecondition(condition: .onQueue(.main))
         guard let window = view.window else { return nil }
 
@@ -749,14 +739,12 @@ extension BrowserTabViewController: TabDelegate {
                 query.submit(nil)
             }
         }
-        // when subscribing to another tab, temporarily hide the panel
-        return AnyCancellable { [weak window, weak savePanel, query] in
-            guard let window, let savePanel, window.sheets.contains(savePanel), !query.isComplete else { return }
-            window.endSheet(savePanel, returnCode: .abort)
-        }
+
+        // when subscribing to another Tab, the sheet will be temporarily closed with response == .abort on the cancellable deinit
+        return ModalSheetCancellable(ownerWindow: window, modalSheet: savePanel, condition: !query.isComplete)
     }
 
-    func showOpenPanel(with query: OpenPanelQuery) -> AnyCancellable? {
+    func showOpenPanel(with query: OpenPanelQuery) -> ModalSheetCancellable? {
         guard let window = view.window else { return nil }
 
         let openPanel = NSOpenPanel()
@@ -771,11 +759,9 @@ extension BrowserTabViewController: TabDelegate {
             }
             query.submit(openPanel.urls)
         }
-        // when subscribing to another tab, temporarily hide the panel
-        return AnyCancellable { [weak window, weak openPanel, query] in
-            guard let window, let openPanel, window.sheets.contains(openPanel), !query.isComplete else { return }
-            window.endSheet(openPanel, returnCode: .abort)
-        }
+
+        // when subscribing to another Tab, the sheet will be temporarily closed with response == .abort on the cancellable deinit
+        return ModalSheetCancellable(ownerWindow: window, modalSheet: openPanel, condition: !query.isComplete)
     }
 
     private class PrintContext {
@@ -786,7 +772,7 @@ extension BrowserTabViewController: TabDelegate {
             self.query = query
         }
     }
-    func runPrintOperation(with query: PrintQuery) -> AnyCancellable? {
+    func runPrintOperation(with query: PrintQuery) -> ModalSheetCancellable? {
         guard let window = view.window else { return nil }
 
         let printOperation = query.parameters
@@ -802,14 +788,9 @@ extension BrowserTabViewController: TabDelegate {
         // get the Print Panel that (hopefully) was added to the window.sheets
         context.printPanel = Set(window.sheets).subtracting(windowSheetsBeforPrintOperation).first
 
-        // when subscribing to another tab, temporarily hide the panel
-        return AnyCancellable { [weak window, weak context] in
-            guard let window, let context, let printPanel = context.printPanel,
-                  window.sheets.contains(printPanel),
-                  !context.query.isComplete
-            else { return }
+        // when subscribing to another Tab, the sheet will be temporarily closed with response == .abort on the cancellable deinit
+        return ModalSheetCancellable(ownerWindow: window, modalSheet: context.printPanel, returnCode: nil, condition: !context.query.isComplete) {
             context.isAborted = true
-            window.endSheet(printPanel)
         }
     }
 

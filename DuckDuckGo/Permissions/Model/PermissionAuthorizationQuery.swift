@@ -30,9 +30,9 @@ enum PermissionAuthorizationQueryDecision {
     case granted(PermissionAuthorizationQuery)
     case denied(PermissionAuthorizationQuery)
 }
-typealias PermissionAuthorizationQueryResult = (decision: PermissionAuthorizationQueryDecision, remember: Bool?)
+typealias PermissionAuthorizationQueryOutput = (decision: PermissionAuthorizationQueryDecision, remember: Bool?)
 
-typealias PermissionAuthorizationQuery = OptionalCallbackQuery<PermissionAuthorizationQueryInfo, PermissionAuthorizationQueryResult>
+typealias PermissionAuthorizationQuery = UserDialogRequest<PermissionAuthorizationQueryInfo, PermissionAuthorizationQueryOutput>
 extension PermissionAuthorizationQuery {
     typealias Decision = Output
 
@@ -52,8 +52,8 @@ extension PermissionAuthorizationQuery {
         set { parameters.shouldShowCancelInsteadOfDeny = newValue }
     }
 
-    convenience init(domain: String, url: URL?, permissions: [PermissionType], decisionHandler: @escaping (Result) -> Void) {
-        self.init(.init(url: url, domain: domain, permissions: permissions), decisionHandler: decisionHandler)
+    convenience init(domain: String, url: URL?, permissions: [PermissionType], decisionHandler: @escaping (CallbackResult) -> Void) {
+        self.init(.init(url: url, domain: domain, permissions: permissions), callback: decisionHandler)
     }
 
     func handleDecision(grant: Bool, remember: Bool? = nil) {

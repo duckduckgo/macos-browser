@@ -131,7 +131,7 @@ final class PermissionModel {
 
         let query = PermissionAuthorizationQuery(domain: domain,
                                                  url: url,
-                                                 permissions: permissions) { [weak self] (result: PermissionAuthorizationQuery.Result) in
+                                                 permissions: permissions) { [weak self] (result: PermissionAuthorizationQuery.CallbackResult) in
 
             let (completedQuery: query, isGranted: isGranted) = self?.handleQueryDecision(result, requestedPermissions: permissions)
                 ?? (completedQuery: nil, isGranted: false)
@@ -171,8 +171,8 @@ final class PermissionModel {
         authorizationQueries.append(query)
     }
 
-    private func handleQueryDecision(_ result: PermissionAuthorizationQuery.Result, requestedPermissions: [PermissionType])
-    -> (completedQuery: PermissionAuthorizationQuery?, isGranted: Bool) {
+    private func handleQueryDecision(_ result: PermissionAuthorizationQuery.CallbackResult, requestedPermissions: [PermissionType])
+        -> (completedQuery: PermissionAuthorizationQuery?, isGranted: Bool) {
 
         var query: PermissionAuthorizationQuery?
         let isGranted: Bool
@@ -183,8 +183,6 @@ final class PermissionModel {
 
         case .success( (.denied(let completedQuery), remember: _) ):
             query = completedQuery
-            fallthrough
-        case .failure(.cancelled):
             isGranted = false
 
             for permission in requestedPermissions {
@@ -300,10 +298,10 @@ final class PermissionModel {
                 grant = .deny
             } else if let state = self.permissions[permission] {
                 switch state {
-                    // deny if already denied during current page being displayed
+                // deny if already denied during current page being displayed
                 case .denied, .revoking:
                     grant = .deny
-                    // ask otherwise
+                // ask otherwise
                 case .disabled, .requested, .active, .inactive, .paused, .reloading:
                     grant = .ask
                 }
@@ -327,11 +325,10 @@ final class PermissionModel {
         return true
     }
 
-    func permissions(_ permissions: [PermissionType],
-                     requestedForDomain domain: String?,
-                     url: URL? = nil,
-                     decisionHandler: @escaping (Bool) -> Void) {
-
+    /// Request user authorization for provided PermissionTypes
+    /// The decisionHandler will be called synchronously if there‘s a permanent (stored) permission granted or denied
+    /// If no permanent decision is stored a new AuthorizationQuery will be initialized and published via $authorizationQuery
+    func permissions(_ permissions: [PermissionType], requestedForDomain domain: String?, url: URL? = nil, decisionHandler: @escaping (Bool) -> Void) {
         guard let domain = domain,
               !domain.isEmpty,
               !permissions.isEmpty
@@ -355,6 +352,9 @@ final class PermissionModel {
         }
     }
 
+    /// Request user authorization for provided PermissionTypes
+    /// Same as `permissions(_:requestedForDomain:url:decisionHandler:)` with a result returned using a `Future`
+    /// Use `await future.get()` for async/await syntax
     func request(_ permissions: [PermissionType], forDomain domain: String?, url: URL? = nil) -> Future<Bool, Never> {
         Future { fulfill in
             self.permissions(permissions, requestedForDomain: domain, url: url) { granted in
