@@ -112,7 +112,7 @@ final class NetworkProtectionMenu: NSMenu, NetworkProtectionMenuProtocol {
     private func startNetworkProtectionSelected() {
         Task {
             do {
-                guard try await !networkProtection.isConnected() else {
+                guard await !networkProtection.isConnected() else {
                     return
                 }
 
@@ -127,7 +127,7 @@ final class NetworkProtectionMenu: NSMenu, NetworkProtectionMenuProtocol {
     private func stopNetworkProtectionSelected() {
         Task {
             do {
-                guard try await networkProtection.isConnected() else {
+                guard await networkProtection.isConnected() else {
                     return
                 }
 

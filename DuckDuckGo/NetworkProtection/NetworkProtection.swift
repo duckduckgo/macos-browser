@@ -222,24 +222,22 @@ final class NetworkProtection {
     /// Setups the tunnel manager if it's not set up already.
     ///
     private func setup(_ tunnelManager: NETunnelProviderManager) async throws {
-        guard let protocolConfiguration = tunnelManager.protocolConfiguration as? NETunnelProviderProtocol else {
+        if !tunnelManager.isEnabled {
             tunnelManager.isEnabled = true
+        }
+
+        if tunnelManager.localizedDescription == nil {
             tunnelManager.localizedDescription = UserText.networkProtectionTunnelName
-            try await reloadConfiguration(for: tunnelManager)
+        }
+
+        guard let protocolConfiguration = tunnelManager.protocolConfiguration as? NETunnelProviderProtocol,
+              protocolConfiguration.verifyConfigurationReference() else {
+
+            let tunnelConfiguration = try loadTunnelConfiguration()
+
+            tunnelManager.protocolConfiguration = await NETunnelProviderProtocol(tunnelConfiguration: tunnelConfiguration, previouslyFrom: tunnelManager.protocolConfiguration)
             return
         }
-
-        if !protocolConfiguration.verifyConfigurationReference() {
-            try await reloadConfiguration(for: tunnelManager)
-        }
-    }
-
-    /// Reloads the WG configuration for the tunnel manager.
-    ///
-    private func reloadConfiguration(for tunnelManager: NETunnelProviderManager) async throws {
-        let tunnelConfiguration = try loadTunnelConfiguration()
-
-        tunnelManager.protocolConfiguration = await NETunnelProviderProtocol(tunnelConfiguration: tunnelConfiguration, previouslyFrom: tunnelManager.protocolConfiguration)
     }
 
     // MARK: - Connection Status Querying
@@ -271,7 +269,7 @@ final class NetworkProtection {
 
         switch tunnelManager.connection.status {
         case .invalid:
-            await reloadTunnelManager()
+            reloadTunnelManager()
             try await start()
         case .disconnected, .disconnecting:
             try tunnelManager.connection.startVPNTunnel()

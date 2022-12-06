@@ -25,9 +25,9 @@ protocol NetworkProtectionLogger {
 
 final class DefaultNetworkProtectionLogger: NetworkProtectionLogger {
     func log(_ error: Error) {
-        assertionFailure(error.localizedDescription)
-
-        let loggedErrorMessageFormat = StaticString(stringLiteral: "🔴 %@")
+        let loggedErrorMessageFormat = StaticString(stringLiteral: "🔴 %{public}@")
         os_log(loggedErrorMessageFormat, type: .error, error.localizedDescription)
+
+        assertionFailure(error.localizedDescription)
     }
 }
