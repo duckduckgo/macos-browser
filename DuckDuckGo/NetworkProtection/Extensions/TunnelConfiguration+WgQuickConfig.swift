@@ -2,7 +2,7 @@
 // Copyright © 2018-2021 WireGuard LLC. All Rights Reserved.
 
 import Foundation
-import WireGuardKit
+import NetworkProtection
 
 extension TunnelConfiguration {
 
@@ -180,7 +180,7 @@ extension TunnelConfiguration {
             interface.listenPort = listenPort
         }
         if let addressesString = attributes["address"] {
-            var addresses = [WireGuardKit.IPAddressRange]()
+            var addresses = [NetworkProtection.IPAddressRange]()
             for addressString in addressesString.splitToArray(trimmingCharacters: .whitespacesAndNewlines) {
                 guard let address = IPAddressRange(from: addressString) else {
                     throw ParseError.interfaceHasInvalidAddress(addressString)
@@ -226,7 +226,7 @@ extension TunnelConfiguration {
             peer.preSharedKey = preSharedKey
         }
         if let allowedIPsString = attributes["allowedips"] {
-            var allowedIPs = [WireGuardKit.IPAddressRange]()
+            var allowedIPs = [NetworkProtection.IPAddressRange]()
             for allowedIPString in allowedIPsString.splitToArray(trimmingCharacters: .whitespacesAndNewlines) {
                 guard let allowedIP = IPAddressRange(from: allowedIPString) else {
                     throw ParseError.peerHasInvalidAllowedIP(allowedIPString)

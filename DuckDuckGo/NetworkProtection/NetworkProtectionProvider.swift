@@ -18,10 +18,11 @@
 
 import Foundation
 import SwiftUI
-import WireGuardKit
+import OSLog
 import NetworkExtension
+import NetworkProtection
 
-final class NetworkProtection {
+final class NetworkProtectionProvider {
 
     typealias StatusChangeHandler = (NEVPNStatus) -> Void
     typealias ConfigChangeHandler = () -> Void

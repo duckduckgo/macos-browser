@@ -24,12 +24,12 @@ protocol NetworkProtectionMenuProtocol: NSMenu {}
 /// we want to show this menu elsewhere.
 ///
 final class NetworkProtectionMenu: NSMenu, NetworkProtectionMenuProtocol {
-    private var networkProtection: NetworkProtection
+    private var networkProtection: NetworkProtectionProvider
     private let logger: NetworkProtectionLogger
 
     // MARK: - Initialization
 
-    init(networkProtection: NetworkProtection = NetworkProtection(),
+    init(networkProtection: NetworkProtectionProvider = NetworkProtectionProvider(),
          logger: NetworkProtectionLogger = DefaultNetworkProtectionLogger()) {
 
         self.logger = logger

@@ -18,7 +18,7 @@
 
 import Foundation
 import NetworkExtension
-import WireGuardKit
+import NetworkProtection
 
 extension NETunnelProviderProtocol {
     @MainActor
@@ -29,7 +29,7 @@ extension NETunnelProviderProtocol {
             return nil
         }
 
-        providerBundleIdentifier = "\(Bundle(for: NetworkProtection.self).bundleIdentifier!).network-extension"
+        providerBundleIdentifier = "\(Bundle(for: NetworkProtectionProvider.self).bundleIdentifier!).network-extension"
         passwordReference = Keychain.makeReference(containing: tunnelConfiguration.asWgQuickConfig(), called: name, previouslyReferencedBy: old?.passwordReference)
         if passwordReference == nil {
             return nil
