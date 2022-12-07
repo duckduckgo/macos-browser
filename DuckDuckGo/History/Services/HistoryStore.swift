@@ -284,7 +284,7 @@ final class HistoryStore: HistoryStoring {
                     context.delete(visit)
                 }
             } catch {
-                Pixel.fire(.debug(event: .historyRemoveVisitsFailed))
+                Pixel.fire(.debug(event: .historyRemoveVisitsFailed, error: error))
                 return .failure(error)
             }
         }
@@ -292,7 +292,7 @@ final class HistoryStore: HistoryStoring {
         do {
             try context.save()
         } catch {
-            Pixel.fire(.debug(event: .historyRemoveVisitsFailed))
+            Pixel.fire(.debug(event: .historyRemoveVisitsFailed, error: error))
             return .failure(error)
         }
 
