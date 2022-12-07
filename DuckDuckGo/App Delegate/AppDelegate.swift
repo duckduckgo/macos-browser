@@ -78,11 +78,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
 #if DEBUG
-        AppPrivacyFeatures.shared = AppDelegate.isRunningTests ?
-            AppPrivacyFeatures(contentBlocking: ((NSClassFromString("ContentBlockingMock") as? NSObject.Type)!.init() as? AnyContentBlocking)!,
-                               httpsUpgradeStore: ((NSClassFromString("HTTPSUpgradeStoreMock") as? NSObject.Type)!.init() as? HTTPSUpgradeStore)!) :
-            AppPrivacyFeatures(contentBlocking: AppContentBlocking(),
-                               httpsUpgradeStore: AppHTTPSUpgradeStore())
+        func mock<T>(_ className: String) -> T {
+            ((NSClassFromString(className) as? NSObject.Type)!.init() as? T)!
+        }
+        AppPrivacyFeatures.shared = AppDelegate.isRunningTests
+            // runtime mock-replacement for Test Run, to be redone when we‘ll be doing Dependency Injection
+            ? AppPrivacyFeatures(contentBlocking: mock("ContentBlockingMock"), httpsUpgradeStore: mock("HTTPSUpgradeStoreMock"))
+            : AppPrivacyFeatures(contentBlocking: AppContentBlocking(), httpsUpgradeStore: AppHTTPSUpgradeStore())
 #else
         PrivacyFeatures.shared = AppPrivacyFeatures(contentBlocking: AppContentBlocking())
 #endif

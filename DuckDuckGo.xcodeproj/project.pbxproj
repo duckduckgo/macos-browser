@@ -796,7 +796,7 @@
 		B6BBF1722744CE36004F850E /* FireproofDomainsStoreMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6BBF1712744CE36004F850E /* FireproofDomainsStoreMock.swift */; };
 		B6BBF17427475B15004F850E /* PopupBlockedPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6BBF17327475B15004F850E /* PopupBlockedPopover.swift */; };
 		B6BDD9EC2940688400F68088 /* ModalSheetCancellable.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6BE9FA9293F7955006363C6 /* ModalSheetCancellable.swift */; };
-		B6BDD9EE29406DFA00F68088 /* WKFrameInfo+handle.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6BDD9ED29406DFA00F68088 /* WKFrameInfo+handle.swift */; };
+		B6BDD9EE29406DFA00F68088 /* WKFrameInfoExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6BDD9ED29406DFA00F68088 /* WKFrameInfoExtension.swift */; };
 		B6BDD9F529409DDD00F68088 /* ContentBlockingMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6BDD9F429409DDD00F68088 /* ContentBlockingMock.swift */; };
 		B6BDD9F62940B5B500F68088 /* ContentBlockingMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6BDD9F429409DDD00F68088 /* ContentBlockingMock.swift */; };
 		B6BDD9F82940C2C100F68088 /* Lazy.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6BDD9F72940C2C000F68088 /* Lazy.swift */; };
@@ -1686,7 +1686,7 @@
 		B6BBF16F2744CDE1004F850E /* CoreDataStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataStoreTests.swift; sourceTree = "<group>"; };
 		B6BBF1712744CE36004F850E /* FireproofDomainsStoreMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FireproofDomainsStoreMock.swift; sourceTree = "<group>"; };
 		B6BBF17327475B15004F850E /* PopupBlockedPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopupBlockedPopover.swift; sourceTree = "<group>"; };
-		B6BDD9ED29406DFA00F68088 /* WKFrameInfo+handle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WKFrameInfo+handle.swift"; sourceTree = "<group>"; };
+		B6BDD9ED29406DFA00F68088 /* WKFrameInfoExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WKFrameInfoExtension.swift; sourceTree = "<group>"; };
 		B6BDD9F429409DDD00F68088 /* ContentBlockingMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentBlockingMock.swift; sourceTree = "<group>"; };
 		B6BDD9F72940C2C000F68088 /* Lazy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Lazy.swift; sourceTree = "<group>"; };
 		B6BE9FA9293F7955006363C6 /* ModalSheetCancellable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModalSheetCancellable.swift; sourceTree = "<group>"; };
@@ -3930,7 +3930,7 @@
 				B6DA06E7291401D700225DE2 /* WKMenuItemIdentifier.swift */,
 				AAA0CC69253CC43C0079BC96 /* WKUserContentControllerExtension.swift */,
 				B63D466725BEB6C200874977 /* WKWebView+Private.h */,
-				B6BDD9ED29406DFA00F68088 /* WKFrameInfo+handle.swift */,
+				B6BDD9ED29406DFA00F68088 /* WKFrameInfoExtension.swift */,
 				B63D466825BEB6C200874977 /* WKWebView+SessionState.swift */,
 				B68458CC25C7EB9000DC17B6 /* WKWebViewConfigurationExtensions.swift */,
 				AA92127625ADA07900600CD4 /* WKWebViewExtension.swift */,
@@ -5148,7 +5148,7 @@
 				AA92126F25ACCB1100600CD4 /* ErrorExtension.swift in Sources */,
 				B6A9E47026146A250067D1B9 /* DateExtension.swift in Sources */,
 				AAE7527A263B046100B973F8 /* History.xcdatamodeld in Sources */,
-				B6BDD9EE29406DFA00F68088 /* WKFrameInfo+handle.swift in Sources */,
+				B6BDD9EE29406DFA00F68088 /* WKFrameInfoExtension.swift in Sources */,
 				B64C853D26944B940048FEBE /* PermissionStore.swift in Sources */,
 				AA75A0AE26F3500C0086B667 /* PrivacyIconViewModel.swift in Sources */,
 				4BB99D0126FE191E001E4761 /* ChromiumBookmarksReader.swift in Sources */,

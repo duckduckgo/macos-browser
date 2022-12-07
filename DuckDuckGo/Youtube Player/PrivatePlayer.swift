@@ -379,7 +379,8 @@ extension PrivatePlayer {
     static func mock(withMode mode: PrivatePlayerMode = .enabled) -> PrivatePlayer {
         let preferencesPersistor = PrivatePlayerPreferencesPersistorMock(privatePlayerMode: mode, youtubeOverlayInteracted: true)
         let preferences = PrivatePlayerPreferences(persistor: preferencesPersistor)
-        let privacyConfigurationManager = ((NSClassFromString("MockPrivacyConfigurationManager") as? (NSObject).Type)!.init() as? (PrivacyConfigurationManaging & AnyObject))!
+        // runtime mock-replacement for Test Run, to be redone when we‘ll be doing Dependency Injection
+        let privacyConfigurationManager = ((NSClassFromString("MockPrivacyConfigurationManager") as? NSObject.Type)!.init() as? (PrivacyConfigurationManaging & AnyObject))!
         return PrivatePlayer(preferences: preferences, privacyConfigurationManager: privacyConfigurationManager)
     }
 

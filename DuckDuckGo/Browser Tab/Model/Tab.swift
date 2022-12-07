@@ -273,7 +273,9 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         let configuration = webViewConfiguration ?? WKWebViewConfiguration()
         configuration.applyStandardConfiguration(contentBlocking: privacyFeatures.contentBlocking)
         self.webViewConfiguration = configuration
-        self.userContentController = (configuration.userContentController as? UserContentController)!
+        let userContentController = configuration.userContentController as? UserContentController
+        assert(userContentController != nil)
+        self.userContentController = userContentController
 
         webView = WebView(frame: webViewFrame, configuration: configuration)
         webView.allowsLinkPreview = false
@@ -281,7 +283,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
         super.init()
 
-        userContentController!.delegate = self
+        userContentController?.delegate = self
         setupWebView(shouldLoadInBackground: shouldLoadInBackground)
 
         if favicon == nil {
@@ -755,7 +757,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         webView.contextMenuDelegate = extensions.contextMenu
         webView.allowsBackForwardNavigationGestures = true
         webView.allowsMagnification = true
-        userContentController!.delegate = self
+
         permissions.webView = webView
 
         superviewObserver = webView.observe(\.superview, options: .old) { [weak self] _, change in

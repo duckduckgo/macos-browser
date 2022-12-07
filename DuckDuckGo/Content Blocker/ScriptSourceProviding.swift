@@ -33,7 +33,7 @@ protocol ScriptSourceProviding {
 
 }
 
-// kill me!!!
+// refactor: ScriptSourceProvider to be passed to init methods as `some ScriptSourceProviding`, DefaultScriptSourceProvider to be killed
 // swiftlint:disable:next identifier_name
 func DefaultScriptSourceProvider() -> ScriptSourceProviding {
     ScriptSourceProvider(configStorage: DefaultConfigurationStorage.shared, privacyConfigurationManager: ContentBlocking.shared.privacyConfigurationManager, privacySettings: PrivacySecurityPreferences.shared, contentBlockingManager: ContentBlocking.shared.contentBlockingManager, trackerDataManager: ContentBlocking.shared.trackerDataManager, tld: ContentBlocking.shared.tld)

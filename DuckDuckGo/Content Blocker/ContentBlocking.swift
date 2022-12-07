@@ -41,7 +41,8 @@ protocol ContentBlockingProtocol {
 }
 typealias AnyContentBlocking = any ContentBlockingProtocol
 
-// kill me!!!
+// refactor: ContentBlocking.shared to be removed, ContentBlockingProtocol to be renamed to ContentBlocking
+// ContentBlocking to be passed to init methods as `some ContentBlocking`
 typealias ContentBlocking = AppContentBlocking
 extension ContentBlocking {
     static var shared: AnyContentBlocking { PrivacyFeatures.contentBlocking }

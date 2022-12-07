@@ -1,5 +1,5 @@
 //
-//  WKFrameInfo+handle.swift
+//  WKFrameInfoExtension.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
