@@ -170,7 +170,7 @@ final class RecentlyClosedCoordinator: RecentlyClosedCoordinating {
         }
 
         let tab = Tab(content: recentlyClosedTab.tabContent)
-        tabCollectionViewModel.insert(tab: tab, at: .unpinned(tabIndex), selected: true)
+        tabCollectionViewModel.insert(tab, at: .unpinned(tabIndex), selected: true)
     }
 
     private func reopenPinnedTab(_ recentlyClosedTab: RecentlyClosedTab) {
@@ -188,7 +188,7 @@ final class RecentlyClosedCoordinator: RecentlyClosedCoordinating {
         let tab = Tab(content: recentlyClosedTab.tabContent)
         let tabIndex = min(recentlyClosedTab.index.item, windowControllerManager.pinnedTabsManager.tabCollection.tabs.count)
 
-        tabCollectionViewModel.insert(tab: tab, at: .pinned(tabIndex), selected: true)
+        tabCollectionViewModel.insert(tab, at: .pinned(tabIndex), selected: true)
     }
 
     private func reopenWindow(_ recentlyClosedWindow: RecentlyClosedWindow) {

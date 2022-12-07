@@ -186,7 +186,7 @@ final class NavigationBarViewController: NSViewController {
 
     private func openNewChildTab(with url: URL) {
         let tab = Tab(content: .url(url), parentTab: tabCollectionViewModel.selectedTabViewModel?.tab, shouldLoadInBackground: true)
-        tabCollectionViewModel.insertChild(tab: tab, selected: false)
+        tabCollectionViewModel.insert(tab, selected: false)
     }
 
     @IBAction func refreshAction(_ sender: NSButton) {
@@ -199,7 +199,9 @@ final class NavigationBarViewController: NSViewController {
     }
 
     @IBAction func optionsButtonAction(_ sender: NSButton) {
-        let menu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel)
+        
+        let menu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
+                                   passwordManagerCoordinator: PasswordManagerCoordinator.shared)
         menu.actionDelegate = self
         menu.popUp(positioning: nil, at: NSPoint(x: 0, y: sender.bounds.height + 4), in: sender)
     }
@@ -533,7 +535,7 @@ final class NavigationBarViewController: NSViewController {
         credentialsToSaveCancellable = tabCollectionViewModel.selectedTabViewModel?.tab.autofillDataToSavePublisher
             .receive(on: DispatchQueue.main)
             .sink { [weak self] data in
-                guard let self = self, let data = data else { return }
+                guard let self, let data else { return }
                 self.promptToSaveAutofillData(data)
                 self.tabCollectionViewModel.selectedTabViewModel?.tab.resetAutofillData()
             }
@@ -649,6 +651,9 @@ extension NavigationBarViewController: NSMenuDelegate {
 }
 
 extension NavigationBarViewController: OptionsButtonMenuDelegate {
+    func optionsButtonMenuRequestedOpenExternalPasswordManager(_ menu: NSMenu) {
+        BWManager.shared.openBitwarden()
+    }
 
     func optionsButtonMenuRequestedBookmarkThisPage(_ sender: NSMenuItem) {
         addressBarViewController?

@@ -43,7 +43,7 @@ protocol UserContentControllerProtocol {
     func installLocalContentRuleList(_ ruleList: WKContentRuleList, identifier: String)
 }
 protocol UserContentControllerProvider {
-    var anyUserContentController: UserContentControllerProtocol { get }
+    var anyUserContentController: UserContentControllerProtocol? { get }
 }
 protocol ContentBlockerRulesPublisherProvider {
     var contentBlockerRulesScriptPublisher: AnyPublisher<ContentBlockerRulesUserScript?, Never> { get }
@@ -215,7 +215,7 @@ extension TabExtensions {
 
 extension Tab: ContentBlockingAssetsPublisherProvider {
     var contentBlockingAssetsPublisher: AnyPublisher<BrowserServicesKit.UserContentController.ContentBlockingAssets?, Never> {
-        userContentController.$contentBlockingAssets.eraseToAnyPublisher()
+        $userContentController.compactMap { $0?.$contentBlockingAssets }.switchToLatest().eraseToAnyPublisher()
     }
 }
 extension Tab: AdClickAttributionStateProvider {
@@ -230,7 +230,7 @@ extension Tab: PrivacyInfoPublisherProvider {
     }
 }
 extension Tab: UserContentControllerProvider {
-    var anyUserContentController: UserContentControllerProtocol { userContentController }
+    var anyUserContentController: UserContentControllerProtocol? { userContentController }
 }
 extension UserContentController: UserContentControllerProtocol {}
 extension Tab: ContentBlockerRulesPublisherProvider {

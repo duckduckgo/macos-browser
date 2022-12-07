@@ -584,7 +584,9 @@ extension MainViewController {
 
         let accounts = (try? vault?.accounts()) ?? []
         for accountID in accounts.compactMap(\.id) {
-            try? vault?.deleteWebsiteCredentialsFor(accountId: accountID)
+            if let accountID = Int64(accountID) {
+                try? vault?.deleteWebsiteCredentialsFor(accountId: accountID)
+            }
         }
 
         let cards = (try? vault?.creditCards()) ?? []

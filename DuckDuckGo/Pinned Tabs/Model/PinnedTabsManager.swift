@@ -29,7 +29,7 @@ final class PinnedTabsManager {
 
     func pin(_ tab: Tab, at index: Int? = nil) {
         if let index = index {
-            tabCollection.insert(tab: tab, at: index)
+            tabCollection.insert(tab, at: index)
         } else {
             tabCollection.append(tab: tab)
         }
@@ -40,7 +40,7 @@ final class PinnedTabsManager {
             os_log("PinnedTabsManager: unable to unpin a tab")
             return nil
         }
-        guard tabCollection.remove(at: index, published: published) else {
+        guard tabCollection.removeTab(at: index, published: published) else {
             os_log("PinnedTabsManager: unable to unpin a tab")
             return nil
         }

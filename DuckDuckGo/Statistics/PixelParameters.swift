@@ -78,7 +78,8 @@ extension Pixel.Event {
              .autoconsentSelfTestFailed,
              .ampBlockingRulesCompilationFailed,
              .adClickAttributionDetected,
-             .adClickAttributionActive:
+             .adClickAttributionActive,
+             .jsPixel:
             
             return nil
         }

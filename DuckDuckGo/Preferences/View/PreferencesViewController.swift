@@ -24,9 +24,11 @@ final class PreferencesViewController: NSViewController {
 
     weak var delegate: BrowserTabSelectionDelegate?
     
-    let model = PreferencesSidebarModel()
+    let model = PreferencesSidebarModel(includePrivatePlayer: PrivatePlayer.shared.isAvailable)
     private var selectedTabIndexCancellable: AnyCancellable?
     private var selectedPreferencePaneCancellable: AnyCancellable?
+
+    private var bitwardenManager: BWManagement = BWManager.shared
 
     override func loadView() {
         view = NSView()
@@ -34,7 +36,7 @@ final class PreferencesViewController: NSViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         let host = NSHostingView(rootView: Preferences.RootView(model: model))
         view.addAndLayout(host)
     }
@@ -42,6 +44,7 @@ final class PreferencesViewController: NSViewController {
     override func viewWillAppear() {
         super.viewWillAppear()
         model.refreshSections()
+        bitwardenManager.refreshStatusIfNeeded()
     }
 
     override func viewDidAppear() {

@@ -63,6 +63,8 @@ final class TabViewModel {
         }
     }
 
+    @Published var autofillDataToSave: AutofillData?
+
     var loadingStartTime: CFTimeInterval?
 
     @Published private(set) var addressBarString: String = ""

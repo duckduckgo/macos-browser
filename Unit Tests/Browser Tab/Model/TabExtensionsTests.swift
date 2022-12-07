@@ -21,6 +21,7 @@ import XCTest
 
 final class TabExtensionsTests: XCTestCase {
 
+    // TODO: Add tests
 //    override func setUp() {
 //        TestsDependencyProvider<Tab>.setUp {
 //            $0.faviconManagement = FaviconManagerMock()

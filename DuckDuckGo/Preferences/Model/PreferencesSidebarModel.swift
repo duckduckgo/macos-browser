@@ -29,12 +29,11 @@ final class PreferencesSidebarModel: ObservableObject {
     @Published private(set) var selectedPane: PreferencePaneIdentifier = .general
 
     init(
-        loadSections: (() -> [PreferencesSection])? = nil,
-        tabSwitcherTabs: [Tab.TabContent] = Tab.TabContent.displayableTabTypes,
-        privacyConfigurationManager: PrivacyConfigurationManaging & AnyObject = ContentBlocking.shared.privacyConfigurationManager,
-        privatePlayer: PrivatePlayer = PrivatePlayer.shared
+        loadSections: @escaping () -> [PreferencesSection],
+        tabSwitcherTabs: [Tab.TabContent],
+        privacyConfigurationManager: PrivacyConfigurationManaging & AnyObject
     ) {
-        self.loadSections = loadSections ?? { PreferencesSection.defaultSections(includePrivatePlayer: privatePlayer.isAvailable) }
+        self.loadSections = loadSections
         self.tabSwitcherTabs = tabSwitcherTabs
         resetTabSelectionIfNeeded()
         refreshSections()
@@ -49,6 +48,16 @@ final class PreferencesSidebarModel: ObservableObject {
             .sink { [weak self] in
                 self?.refreshSections()
             }
+    }
+
+    convenience init(
+        tabSwitcherTabs: [Tab.TabContent] = Tab.TabContent.displayableTabTypes,
+        privacyConfigurationManager: PrivacyConfigurationManaging & AnyObject = ContentBlocking.shared.privacyConfigurationManager,
+        includePrivatePlayer: Bool
+    ) {
+        self.init(loadSections: { PreferencesSection.defaultSections(includingPrivatePlayer: includePrivatePlayer) },
+                  tabSwitcherTabs: tabSwitcherTabs,
+                  privacyConfigurationManager: privacyConfigurationManager)
     }
 
     func refreshSections() {

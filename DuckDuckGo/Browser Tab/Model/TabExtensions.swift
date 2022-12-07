@@ -73,7 +73,7 @@ struct TabExtensions {
     fileprivate var extensions: [AnyKeyPath: any TabExtension]
 
     init(_ tab: Tab) {
-        let extTypes = Self.initExtensionsOnce[\Tab.self]!.map { $0 as! any TabExtensionResolvingHelper.Type }
+        let extTypes = Self.initExtensionsOnce[\Tab.self]!.map { ($0 as? any TabExtensionResolvingHelper.Type)! }
         var extensions = [AnyKeyPath: any TabExtension]()
         func add<T: TabExtensionResolvingHelper>(_ type: T.Type) {
             assert(extensions[\T.ExtensionType.self] == nil)

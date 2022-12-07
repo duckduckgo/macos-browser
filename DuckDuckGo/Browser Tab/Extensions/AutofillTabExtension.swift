@@ -95,7 +95,7 @@ extension AutofillTabExtension: SecureVaultManagerDelegate {
         // no-op on macOS
     }
 
-    func secureVaultManager(_: SecureVaultManager, didAutofill type: AutofillType, withObjectId objectId: Int64) {
+    func secureVaultManager(_: SecureVaultManager, didAutofill type: AutofillType, withObjectId objectId: String) {
         Pixel.fire(.formAutofilled(kind: type.formAutofillKind))
     }
 
@@ -107,6 +107,10 @@ extension AutofillTabExtension: SecureVaultManagerDelegate {
 
     func secureVaultInitFailed(_ error: SecureVaultError) {
         SecureVaultErrorReporter.shared.secureVaultInitFailed(error)
+    }
+
+    public func secureVaultManager(_: BrowserServicesKit.SecureVaultManager, didReceivePixel pixel: AutofillUserScript.JSPixel) {
+        Pixel.fire(.jsPixel(pixel))
     }
 
     func secureVaultManagerShouldAutomaticallyUpdateCredentialsWithoutUsername(_: SecureVaultManager) -> Bool {

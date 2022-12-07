@@ -26,38 +26,31 @@ protocol ContextMenuManagerDelegate: AnyObject {
     func prepareForContextMenuDownload()
 }
 
-enum NewWindowPolicy {
-    case newWindow
-    case newTab(selected: Bool)
+enum NavigationDecision {
+    case allow(NewWindowPolicy)
     case cancel
-}
-
-protocol ContextMenuUserScriptPublisherProvider {
-    var contextMenuScriptPublisher: AnyPublisher<ContextMenuUserScript?, Never> { get }
 }
 
 final class ContextMenuManager: NSObject {
 
-    private var userScriptsCancellable: AnyCancellable?
+    private var userScriptCancellable: AnyCancellable?
     weak var delegate: ContextMenuManagerDelegate?
 
-    private var onNewWindow: ((WKNavigationAction?) -> NewWindowPolicy)?
+    private var onNewWindow: ((WKNavigationAction?) -> NavigationDecision)?
     private var askForDownloadLocation: Bool?
     private var originalItems: [WKMenuItemIdentifier: NSMenuItem]?
     private var selectedText: String?
 
-    typealias Dependencies = ContextMenuUserScriptPublisherProvider & ContextMenuManagerDelegate
-
-    init(provider: some Dependencies) {
+    init(contextMenuScriptPublisher: some Publisher<ContextMenuUserScript?, Never>, delegate: ContextMenuManagerDelegate) {
+        self.delegate = delegate
         super.init()
 
-        self.delegate = provider
-        userScriptsCancellable = provider.contextMenuScriptPublisher.sink { [weak self] contextMenuScript in
+        userScriptCancellable = contextMenuScriptPublisher.sink { [weak self] contextMenuScript in
             contextMenuScript?.delegate = self
         }
     }
 
-    func decideNewWindowPolicy(for navigationAction: WKNavigationAction) -> NewWindowPolicy? {
+    func decideNewWindowPolicy(for navigationAction: WKNavigationAction) -> NavigationDecision? {
         defer {
             onNewWindow = nil
         }
@@ -272,7 +265,7 @@ private extension ContextMenuManager {
             return
         }
 
-        onNewWindow = { _ in .newTab(selected: false) }
+        onNewWindow = { _ in .allow(.tab(selected: false)) }
         NSApp.sendAction(action, to: originalItem.target, from: originalItem)
     }
 
@@ -286,7 +279,7 @@ private extension ContextMenuManager {
             return
         }
 
-        onNewWindow = { _ in .newWindow }
+        onNewWindow = { _ in .allow(.window(active: true)) }
         NSApp.sendAction(action, to: originalItem.target, from: originalItem)
     }
 
@@ -300,7 +293,7 @@ private extension ContextMenuManager {
             return
         }
 
-        onNewWindow = { _ in .newWindow }
+        onNewWindow = { _ in .allow(.window(active: true)) }
         NSApp.sendAction(action, to: originalItem.target, from: originalItem)
     }
 
@@ -373,7 +366,7 @@ private extension ContextMenuManager {
             return
         }
 
-        onNewWindow = { _ in .newTab(selected: true) }
+        onNewWindow = { _ in .allow(.tab(selected: true)) }
         NSApp.sendAction(action, to: originalItem.target, from: originalItem)
     }
 
@@ -387,7 +380,7 @@ private extension ContextMenuManager {
             return
         }
 
-        onNewWindow = { _ in .newWindow }
+        onNewWindow = { _ in .allow(.window(active: true)) }
         NSApp.sendAction(action, to: originalItem.target, from: originalItem)
     }
 
@@ -448,7 +441,7 @@ extension Tab: ContextMenuManagerDelegate {
             return
         }
 
-        self.delegate?.tab(self, requestedNewTabWith: .url(url), selected: true)
+        self.delegate?.tab(self, createdChild: Tab(content: .url(url)), of: .tab(selected: true))
     }
 
     func prepareForContextMenuDownload() {
@@ -459,22 +452,24 @@ extension Tab: ContextMenuManagerDelegate {
 
 }
 
+// MARK: - TabExtension
+
 extension ContextMenuManager: TabExtension {
-    class ResolvingHelper: TabExtensionResolvingHelper {
-        static func make(owner: Tab) -> ContextMenuManager {
-            ContextMenuManager(provider: owner)
+    final class ResolvingHelper: TabExtensionResolvingHelper {
+        static func make(owner tab: Tab) -> ContextMenuManager {
+            ContextMenuManager(contextMenuScriptPublisher: tab.contextMenuScriptPublisher, delegate: tab)
         }
+    }
+}
+
+private extension Tab {
+    var contextMenuScriptPublisher: AnyPublisher<ContextMenuUserScript?, Never> {
+        userScriptsPublisher.compactMap { $0?.contextMenuScript }.eraseToAnyPublisher()
     }
 }
 
 extension TabExtensions {
     var contextMenu: ContextMenuManager? {
         resolve()
-    }
-}
-
-extension Tab: ContextMenuUserScriptPublisherProvider {
-    var contextMenuScriptPublisher: AnyPublisher<ContextMenuUserScript?, Never> {
-        userScriptsPublisher.compactMap { $0?.contextMenuScript }.eraseToAnyPublisher()
     }
 }

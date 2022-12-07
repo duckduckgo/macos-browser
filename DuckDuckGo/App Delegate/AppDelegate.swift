@@ -106,6 +106,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         stateRestorationManager.applicationDidFinishLaunching()
 
+        BWManager.shared.initCommunication()
+
         if WindowsManager.windows.isEmpty {
             WindowsManager.openNewWindow(lazyLoadTabs: true)
         }
