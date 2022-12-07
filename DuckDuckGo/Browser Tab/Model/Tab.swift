@@ -599,14 +599,12 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         }
     }
 
-    // to be refactored out
     lazy var linkProtection: LinkProtection = {
         LinkProtection(privacyManager: contentBlocking.privacyConfigurationManager,
                        contentBlockingManager: contentBlocking.contentBlockingManager,
                        errorReporting: Self.debugEvents)
     }()
 
-    // to be refactored out
     lazy var referrerTrimming: ReferrerTrimming = {
         ReferrerTrimming(privacyManager: contentBlocking.privacyConfigurationManager,
                          contentBlockingManager: contentBlocking.contentBlockingManager,

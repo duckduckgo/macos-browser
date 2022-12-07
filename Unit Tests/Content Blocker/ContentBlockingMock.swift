@@ -23,7 +23,7 @@ import Foundation
 @testable import DuckDuckGo_Privacy_Browser
 
 @objc(ContentBlockingMock)
-class ContentBlockingMock: NSObject, ContentBlockingProtocol {
+final class ContentBlockingMock: NSObject, ContentBlockingProtocol {
     struct EDP: EmbeddedDataProvider {
         var embeddedDataEtag: String = ""
         var embeddedData: Data = .init()
@@ -42,11 +42,10 @@ class ContentBlockingMock: NSObject, ContentBlockingProtocol {
     let contentBlockerRulesManager = ContentBlockerRulesManagerMock()
     let privacyConfigurationManager = MockPrivacyConfigurationManager()
 
-
 }
 
 @objc(HTTPSUpgradeStoreMock)
-class HTTPSUpgradeStoreMock: NSObject, HTTPSUpgradeStore {
+final class HTTPSUpgradeStoreMock: NSObject, HTTPSUpgradeStore {
 
     var bloomFilter: BloomFilterWrapper?
     var bloomFilterSpecification: HTTPSBloomFilterSpecification?

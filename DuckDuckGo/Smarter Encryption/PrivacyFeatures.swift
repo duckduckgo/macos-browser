@@ -29,6 +29,7 @@ protocol PrivacyFeaturesProtocol {
 typealias AnyPrivacyFeatures = any PrivacyFeaturesProtocol
 
 // kill me plz!!!
+// swiftlint:disable:next identifier_name
 var PrivacyFeatures: AnyPrivacyFeatures {
     AppPrivacyFeatures.shared
 }
