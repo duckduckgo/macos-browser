@@ -30,7 +30,7 @@ struct Lazy<Owner: AnyObject, Value> {
     private var state: State
 
     /*
-     @Lazy(ClassName.initializingFunction) var varName: ValueType
+     @Lazy(OwnerClass.initializingFunction) var varName: ValueType
      func initializingFunction() -> ValueType {
         return ValueType.init(with: self)
      }
@@ -40,7 +40,7 @@ struct Lazy<Owner: AnyObject, Value> {
     }
 
     /*
-     @Lazy({ (self: ClassName) in return ValueType.init(with: self) }) var varName: ValueType
+     @Lazy({ (self: OwnerClass) in return ValueType.init(with: self) }) var varName: ValueType
      */
     init(_ initialize: @escaping (Owner) -> Value) {
         self.state = .none { owner in
@@ -51,7 +51,7 @@ struct Lazy<Owner: AnyObject, Value> {
     }
 
     /*
-     @Lazy({ (self: ClassName, value) in value.delegate = self }) var varName = ValueType()
+     @Lazy({ (self: OwnerClass, value) in value.delegate = self }) var varName = ValueType()
      */
     init(wrappedValue: @escaping @autoclosure () -> Value, _ initialize: @escaping (Owner, inout Value) -> Void) {
         self.state = .none { owner in
@@ -59,6 +59,17 @@ struct Lazy<Owner: AnyObject, Value> {
                 var value = wrappedValue()
                 initialize(owner, &value)
                 return value
+            }
+        }
+    }
+
+    /*
+     @Lazy(OwnerClass.self) var varName = ValueType()
+     */
+    init(wrappedValue: @escaping @autoclosure () -> Value, _: Owner.Type) {
+        self.state = .none { _ in
+            {
+                return wrappedValue()
             }
         }
     }

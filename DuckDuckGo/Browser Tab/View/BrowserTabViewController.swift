@@ -433,19 +433,15 @@ final class BrowserTabViewController: NSViewController {
     @Lazy({ (self: BrowserTabViewController, vc) in vc.delegate = self })
     var bookmarksViewController: BookmarkManagementSplitViewController = .create()
 
-    private var _contentOverlayPopover: ContentOverlayPopover?
-    public var contentOverlayPopover: ContentOverlayPopover {
-        guard let overlay = _contentOverlayPopover else {
-            let overlayPopover = ContentOverlayPopover(currentTabView: view)
-            WindowControllersManager.shared.stateChanged
-                .sink { [weak self] _ in
-                    self?._contentOverlayPopover?.websiteAutofillUserScriptCloseOverlay(nil)
-                }.store(in: &cancellables)
-            _contentOverlayPopover = overlayPopover
-            return overlayPopover
-        }
-        return overlay
-    }
+    @Lazy({ (self: BrowserTabViewController) in
+        let overlayPopover = ContentOverlayPopover(currentTabView: self.view)
+        WindowControllersManager.shared.stateChanged
+            .sink { [weak overlayPopover] _ in
+                overlayPopover?.websiteAutofillUserScriptCloseOverlay(nil)
+            }.store(in: &self.cancellables)
+        return overlayPopover
+    })
+    public var contentOverlayPopover: ContentOverlayPopover
 
 }
 
