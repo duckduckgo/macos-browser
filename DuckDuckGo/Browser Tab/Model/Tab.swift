@@ -1438,6 +1438,7 @@ extension Tab: WKNavigationDelegate {
 
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
         delegate?.tabDidStartNavigation(self)
+        userInteractionDialog = nil
 
         // Unnecessary assignment triggers publishing
         if error != nil { error = nil }
