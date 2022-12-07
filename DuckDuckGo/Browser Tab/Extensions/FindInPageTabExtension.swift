@@ -21,7 +21,6 @@ import Foundation
 
 final class FindInPageTabExtension {
 
-    private var findInPageCancellable: AnyCancellable?
     private var userScriptCancellable: AnyCancellable?
 
     fileprivate var model: FindInPageModel? {
@@ -41,21 +40,8 @@ final class FindInPageTabExtension {
         }
     }
 
-    private func subscribeToFindInPageTextChange() {
-        findInPageCancellable = model?.$text.receive(on: DispatchQueue.main)
-            .sink { [weak self] text in
-                self?.find(text)
-            }
-    }
-
     private func attachFindInPage() {
         findInPageScript?.model = model
-        subscribeToFindInPageTextChange()
-    }
-
-    private func find(_ text: String) {
-        guard let webView = model?.webView else { return }
-        findInPageScript?.find(text, in: webView)
     }
 
 }
@@ -67,15 +53,15 @@ extension Tab {
     }
 
     func findDone() {
-        userScripts?.findInPageScript.findDone(in: self.webView)
+        extensions.findInPage?.model?.findDone()
     }
 
     func findNext() {
-        userScripts?.findInPageScript.findNext(in: self.webView)
+        extensions.findInPage?.model?.findNext()
     }
 
     func findPrevious() {
-        userScripts?.findInPageScript.findPrevious(in: self.webView)
+        extensions.findInPage?.model?.findPrevious()
     }
 
 }

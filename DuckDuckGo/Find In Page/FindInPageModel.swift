@@ -27,10 +27,6 @@ final class FindInPageModel {
     @Published private(set) var matchesFound: Int = 0
     @Published private(set) var visible: Bool = false
 
-    func update(text: String) {
-        self.text = text
-    }
-
     func update(currentSelection: Int?, matchesFound: Int?) {
         self.currentSelection = currentSelection ?? self.currentSelection
         self.matchesFound = matchesFound ?? self.matchesFound
@@ -42,6 +38,31 @@ final class FindInPageModel {
 
     func hide() {
         visible = false
+    }
+
+    func find(_ text: String) {
+        self.text = text
+        evaluate("window.__firefox__.find('\(text.escapedJavaScriptString())')")
+    }
+
+    func findDone() {
+        evaluate("window.__firefox__.findDone()")
+    }
+
+    func findNext() {
+        evaluate("window.__firefox__.findNext()")
+    }
+
+    func findPrevious() {
+        evaluate("window.__firefox__.findPrevious()")
+    }
+
+    private func evaluate(_ js: String) {
+        if #available(macOS 11.0, *) {
+            webView?.evaluateJavaScript(js, in: nil, in: WKContentWorld.defaultClient)
+        } else {
+            webView?.evaluateJavaScript(js)
+        }
     }
 
 }
