@@ -31,7 +31,7 @@ final class PreferencesSidebarModel: ObservableObject {
     init(
         loadSections: @escaping () -> [PreferencesSection],
         tabSwitcherTabs: [Tab.TabContent],
-        privacyConfigurationManager: PrivacyConfigurationManaging & AnyObject
+        privacyConfigurationManager: PrivacyConfigurationManaging
     ) {
         self.loadSections = loadSections
         self.tabSwitcherTabs = tabSwitcherTabs
@@ -52,7 +52,7 @@ final class PreferencesSidebarModel: ObservableObject {
 
     convenience init(
         tabSwitcherTabs: [Tab.TabContent] = Tab.TabContent.displayableTabTypes,
-        privacyConfigurationManager: PrivacyConfigurationManaging & AnyObject = ContentBlocking.shared.privacyConfigurationManager,
+        privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager,
         includePrivatePlayer: Bool
     ) {
         self.init(loadSections: { PreferencesSection.defaultSections(includingPrivatePlayer: includePrivatePlayer) },

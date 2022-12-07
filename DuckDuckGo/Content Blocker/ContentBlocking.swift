@@ -25,7 +25,7 @@ import Common
 
 protocol ContentBlockingProtocol {
 
-    associatedtype ConfigurationManager: PrivacyConfigurationManaging & AnyObject
+    associatedtype ConfigurationManager: PrivacyConfigurationManaging
     var privacyConfigurationManager: ConfigurationManager { get }
 
     associatedtype ContentBlockingAssets: UserContentControllerNewContent
@@ -38,6 +38,7 @@ protocol ContentBlockingProtocol {
     var trackerDataManager: TrackerDataManager { get }
 
     var tld: TLD { get }
+    
 }
 typealias AnyContentBlocking = any ContentBlockingProtocol
 
