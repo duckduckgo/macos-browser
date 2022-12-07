@@ -154,18 +154,20 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
     private let cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter?
     let pinnedTabsManager: PinnedTabsManager
-    let privacyConfigurationManager: PrivacyConfigurationManaging
-    private let contentBlockerRulesManager: ContentBlockerRulesManagerProtocol
     private let privatePlayer: PrivatePlayer
+    private let privacyFeatures: AnyPrivacyFeatures
+    var contentBlocking: AnyContentBlocking { privacyFeatures.contentBlocking }
 
     private let webViewConfiguration: WKWebViewConfiguration
     private(set) lazy var extensions = TabExtensions(self)
 
     @Published
     private(set) var userContentController: UserContentController?
+
     var userScripts: UserScripts? {
         userContentController?.contentBlockingAssets?.userScripts as? UserScripts
     }
+
     var userScriptsPublisher: AnyPublisher<UserScripts?, Never> {
         $userContentController
             .compactMap { $0?.$contentBlockingAssets }
@@ -185,8 +187,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                      webViewConfiguration: WKWebViewConfiguration? = nil,
                      historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
                      pinnedTabsManager: PinnedTabsManager = WindowControllersManager.shared.pinnedTabsManager,
-                     privacyConfigurationManager: (PrivacyConfigurationManaging & AnyObject)? = nil,
-                     contentBlockerRulesManager: ContentBlockerRulesManagerProtocol? = nil,
                      privatePlayer: PrivatePlayer? = nil,
                      cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter? = ContentBlockingAssetsCompilationTimeReporter.shared,
                      localHistory: Set<String> = Set<String>(),
@@ -203,33 +203,16 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                      webViewFrame: CGRect = .zero
     ) {
 
-#if DEBUG
-        let contentBlockingAssetsPublisher = AppDelegate.isRunningTests ? PassthroughSubject().eraseToAnyPublisher() : ContentBlocking.shared.userContentUpdating.userContentBlockingAssets!
-        let contentBlockerRulesManager = contentBlockerRulesManager
-        ?? (AppDelegate.isRunningTests
-            ? ((NSClassFromString("ContentBlockerRulesManagerMock") as? (NSObject).Type)!.init() as? ContentBlockerRulesManagerProtocol)!
-            : ContentBlocking.shared.contentBlockingManager)
-        let privacyConfigurationManager: (PrivacyConfigurationManaging & AnyObject) = privacyConfigurationManager
-        ?? (AppDelegate.isRunningTests
-            ? ((NSClassFromString("MockPrivacyConfigurationManager") as? (NSObject).Type)!.init() as? (PrivacyConfigurationManaging & AnyObject))!
-            : ContentBlocking.shared.privacyConfigurationManager)
         let privatePlayer = privatePlayer
-        ?? (AppDelegate.isRunningTests ? PrivatePlayer.mock(withMode: .enabled) : PrivatePlayer.shared)
-#else
-        let contentBlockingAssetsPublisher = ContentBlocking.shared.userContentUpdating.userContentBlockingAssets!
-        let contentBlockerRulesManager = contentBlockerRulesManager ?? ContentBlocking.shared.contentBlockingManager
-        let privacyConfigurationManager = privacyConfigurationManager ?? ContentBlocking.shared.privacyConfigurationManager
-        let privatePlayer = privatePlayer ?? PrivatePlayer.shared
-#endif
+            ?? (AppDelegate.isRunningTests ? PrivatePlayer.mock(withMode: .enabled) : PrivatePlayer.shared)
+
         self.init(content: content,
                   faviconManagement: faviconManagement,
                   webCacheManager: webCacheManager,
                   webViewConfiguration: webViewConfiguration,
                   historyCoordinating: historyCoordinating,
                   pinnedTabsManager: pinnedTabsManager,
-                  privacyConfigurationManager: privacyConfigurationManager,
-                  contentBlockerRulesManager: contentBlockerRulesManager,
-                  contentBlockingAssetsPublisher: contentBlockingAssetsPublisher,
+                  privacyFeatures: PrivacyFeatures,
                   privatePlayer: privatePlayer,
                   cbaTimeReporter: cbaTimeReporter,
                   localHistory: localHistory,
@@ -252,9 +235,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
          webViewConfiguration: WKWebViewConfiguration?,
          historyCoordinating: HistoryCoordinating,
          pinnedTabsManager: PinnedTabsManager,
-         privacyConfigurationManager: PrivacyConfigurationManaging,
-         contentBlockerRulesManager: ContentBlockerRulesManagerProtocol,
-         contentBlockingAssetsPublisher: some Publisher<some UserContentControllerNewContent, Never>,
+         privacyFeatures: some PrivacyFeaturesProtocol,
          privatePlayer: PrivatePlayer,
          cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter?,
          localHistory: Set<String>,
@@ -275,8 +256,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         self.faviconManagement = faviconManagement
         self.historyCoordinating = historyCoordinating
         self.pinnedTabsManager = pinnedTabsManager
-        self.privacyConfigurationManager = privacyConfigurationManager
-        self.contentBlockerRulesManager = contentBlockerRulesManager
+        self.privacyFeatures = privacyFeatures
         self.privatePlayer = privatePlayer
         self.cbaTimeReporter = cbaTimeReporter
         self.localHistory = localHistory
@@ -291,7 +271,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         self.currentDownload = currentDownload
 
         let configuration = webViewConfiguration ?? WKWebViewConfiguration()
-        configuration.applyStandardConfiguration(assetsPublisher: contentBlockingAssetsPublisher, privacyConfigurationManager: privacyConfigurationManager)
+        configuration.applyStandardConfiguration(contentBlocking: privacyFeatures.contentBlocking)
         self.webViewConfiguration = configuration
         self.userContentController = (configuration.userContentController as? UserContentController)!
 
@@ -619,16 +599,18 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         }
     }
 
+    // to be refactored out
     lazy var linkProtection: LinkProtection = {
-        LinkProtection(privacyManager: self.privacyConfigurationManager,
-                       contentBlockingManager: self.contentBlockerRulesManager,
+        LinkProtection(privacyManager: contentBlocking.privacyConfigurationManager,
+                       contentBlockingManager: contentBlocking.contentBlockingManager,
                        errorReporting: Self.debugEvents)
     }()
-    
+
+    // to be refactored out
     lazy var referrerTrimming: ReferrerTrimming = {
-        ReferrerTrimming(privacyManager: self.privacyConfigurationManager,
-                         contentBlockingManager: self.contentBlockerRulesManager,
-                         tld: ContentBlocking.shared.tld)
+        ReferrerTrimming(privacyManager: contentBlocking.privacyConfigurationManager,
+                         contentBlockingManager: contentBlocking.contentBlockingManager,
+                         tld: contentBlocking.tld)
     }()
 
     @MainActor
@@ -926,7 +908,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     private func makePrivacyInfo(url: URL) -> PrivacyInfo? {
         guard let host = url.host else { return nil }
         
-        let entity = ContentBlocking.shared.trackerDataManager.trackerData.findEntity(forHost: host)
+        let entity = contentBlocking.trackerDataManager.trackerData.findEntity(forHost: host)
         
         privacyInfo = PrivacyInfo(url: url,
                                   parentEntity: entity,
@@ -954,7 +936,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     }
     
     private func makeProtectionStatus(for host: String) -> ProtectionStatus {
-        let config = ContentBlocking.shared.privacyConfigurationManager.privacyConfig
+        let config = contentBlocking.privacyConfigurationManager.privacyConfig
         
         let isTempUnprotected = config.isTempUnprotected(domain: host)
         let isAllowlisted = config.isUserUnprotected(domain: host)
@@ -1060,21 +1042,6 @@ extension HistoryCoordinating {
               let entityName = tracker.entityName else { return }
 
         addBlockedTracker(entityName: entityName, on: url)
-    }
-
-}
-
-extension ContentBlocking {
-
-    func entityName(forDomain domain: String) -> String? {
-        var entityName: String?
-        var parts = domain.components(separatedBy: ".")
-        while parts.count > 1 && entityName == nil {
-            let host = parts.joined(separator: ".")
-            entityName = trackerDataManager.trackerData.domains[host]
-            parts.removeFirst()
-        }
-        return entityName
     }
 
 }
@@ -1290,7 +1257,7 @@ extension Tab: WKNavigationDelegate {
         }
 
         if navigationAction.isTargetingMainFrame {
-            let result = await PrivacyFeatures.httpsUpgrade.upgrade(url: url)
+            let result = await privacyFeatures.httpsUpgrade.upgrade(url: url)
             switch result {
             case let .success(upgradedURL):
                 if lastUpgradedURL != upgradedURL {
@@ -1379,7 +1346,7 @@ extension Tab: WKNavigationDelegate {
 
     private func toggleFBProtection(for url: URL) {
         // Enable/disable FBProtection only after UserScripts are installed (awaitContentBlockingAssetsInstalled)
-        let privacyConfiguration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig
+        let privacyConfiguration = contentBlocking.privacyConfigurationManager.privacyConfig
 
         let featureEnabled = privacyConfiguration.isFeature(.clickToPlay, enabledForDomain: url.host)
         setFBProtection(enabled: featureEnabled)

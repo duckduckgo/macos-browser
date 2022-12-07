@@ -21,9 +21,8 @@ import Foundation
 
 final class FindInPageTabExtension {
 
-    private weak var tab: Tab?
     private var findInPageCancellable: AnyCancellable?
-    private var userScriptsCancellable: AnyCancellable?
+    private var userScriptCancellable: AnyCancellable?
 
     fileprivate var model: FindInPageModel? {
         didSet {
@@ -36,19 +35,17 @@ final class FindInPageTabExtension {
         }
     }
 
-    init() {}
-
-    func attach(to tab: Tab) {
-        self.tab = tab
-        userScriptsCancellable = tab.userScriptsPublisher.sink { [weak self] userScripts in
-            self?.findInPageScript = userScripts?.findInPageScript
+    init(findInPageScriptPublisher: some Publisher<FindInPageUserScript?, Never>) {
+        userScriptCancellable = findInPageScriptPublisher.sink { [weak self] findInPageScript in
+            self?.findInPageScript = findInPageScript
         }
     }
 
     private func subscribeToFindInPageTextChange() {
-        findInPageCancellable = model?.$text.receive(on: DispatchQueue.main).sink { [weak self] text in
-            self?.find(text: text)
-        }
+        findInPageCancellable = model?.$text.receive(on: DispatchQueue.main)
+            .sink { [weak self] text in
+                self?.find(text)
+            }
     }
 
     private func attachFindInPage() {
@@ -56,9 +53,9 @@ final class FindInPageTabExtension {
         subscribeToFindInPageTextChange()
     }
 
-    private func find(text: String) {
-        guard let webView = tab?.webView else { return }
-        findInPageScript?.find(text: text, inWebView: webView)
+    private func find(_ text: String) {
+        guard let webView = model?.webView else { return }
+        findInPageScript?.find(text, in: webView)
     }
 
 }
@@ -70,15 +67,39 @@ extension Tab {
     }
 
     func findDone() {
-        userScripts?.findInPageScript.done(withWebView: self.webView)
+        userScripts?.findInPageScript.findDone(in: self.webView)
     }
 
     func findNext() {
-        userScripts?.findInPageScript.next(withWebView: self.webView)
+        userScripts?.findInPageScript.findNext(in: self.webView)
     }
 
     func findPrevious() {
-        userScripts?.findInPageScript.previous(withWebView: self.webView)
+        userScripts?.findInPageScript.findPrevious(in: self.webView)
+    }
+
+}
+
+extension TabExtensions {
+
+    var findInPage: FindInPageTabExtension? {
+        resolve()
+    }
+
+}
+
+extension FindInPageTabExtension: TabExtension {
+    final class ResolvingHelper: TabExtensionResolvingHelper {
+        static func make(owner tab: Tab) -> FindInPageTabExtension {
+            FindInPageTabExtension(findInPageScriptPublisher: tab.findInPageScriptPublisher)
+        }
+    }
+}
+
+private extension Tab {
+
+    var findInPageScriptPublisher: some Publisher<FindInPageUserScript?, Never> {
+        userScriptsPublisher.compactMap { $0?.findInPageScript }
     }
 
 }

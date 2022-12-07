@@ -797,7 +797,8 @@
 		B6BBF17427475B15004F850E /* PopupBlockedPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6BBF17327475B15004F850E /* PopupBlockedPopover.swift */; };
 		B6BDD9EC2940688400F68088 /* ModalSheetCancellable.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6BE9FA9293F7955006363C6 /* ModalSheetCancellable.swift */; };
 		B6BDD9EE29406DFA00F68088 /* WKFrameInfo+handle.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6BDD9ED29406DFA00F68088 /* WKFrameInfo+handle.swift */; };
-		B6BDD9F02940731900F68088 /* TabExtensionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6BDD9EF2940731900F68088 /* TabExtensionsTests.swift */; };
+		B6BDD9F529409DDD00F68088 /* ContentBlockingMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6BDD9F429409DDD00F68088 /* ContentBlockingMock.swift */; };
+		B6BDD9F62940B5B500F68088 /* ContentBlockingMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6BDD9F429409DDD00F68088 /* ContentBlockingMock.swift */; };
 		B6C00ECB292F839D009C73A6 /* AutofillTabExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C00ECA292F839D009C73A6 /* AutofillTabExtension.swift */; };
 		B6C00ECD292F89D9009C73A6 /* FindInPageTabExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C00ECC292F89D9009C73A6 /* FindInPageTabExtension.swift */; };
 		B6C00ED5292FB21E009C73A6 /* HoveredLinkTabExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C00ED4292FB21E009C73A6 /* HoveredLinkTabExtension.swift */; };
@@ -1685,7 +1686,7 @@
 		B6BBF1712744CE36004F850E /* FireproofDomainsStoreMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FireproofDomainsStoreMock.swift; sourceTree = "<group>"; };
 		B6BBF17327475B15004F850E /* PopupBlockedPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopupBlockedPopover.swift; sourceTree = "<group>"; };
 		B6BDD9ED29406DFA00F68088 /* WKFrameInfo+handle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WKFrameInfo+handle.swift"; sourceTree = "<group>"; };
-		B6BDD9EF2940731900F68088 /* TabExtensionsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabExtensionsTests.swift; sourceTree = "<group>"; };
+		B6BDD9F429409DDD00F68088 /* ContentBlockingMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentBlockingMock.swift; sourceTree = "<group>"; };
 		B6BE9FA9293F7955006363C6 /* ModalSheetCancellable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModalSheetCancellable.swift; sourceTree = "<group>"; };
 		B6C00ECA292F839D009C73A6 /* AutofillTabExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutofillTabExtension.swift; sourceTree = "<group>"; };
 		B6C00ECC292F89D9009C73A6 /* FindInPageTabExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FindInPageTabExtension.swift; sourceTree = "<group>"; };
@@ -2434,6 +2435,7 @@
 				B610F2E527AA388100FCEBE9 /* ContentBlockingUpdatingTests.swift */,
 				B610F2E727AA397100FCEBE9 /* ContentBlockerRulesManagerMock.swift */,
 				B6AE39F029373AF200C37AA4 /* EmptyAttributionRulesProver.swift */,
+				B6BDD9F429409DDD00F68088 /* ContentBlockingMock.swift */,
 			);
 			path = "Content Blocker";
 			sourceTree = "<group>";
@@ -3585,7 +3587,6 @@
 			isa = PBXGroup;
 			children = (
 				AAC9C01424CAFBCE00AD1325 /* TabTests.swift */,
-				B6BDD9EF2940731900F68088 /* TabExtensionsTests.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -4732,6 +4733,7 @@
 				4B1AD91725FC46FB00261379 /* CoreDataEncryptionTests.swift in Sources */,
 				7BA4727D26F01BC400EAA165 /* CoreDataTestUtilities.swift in Sources */,
 				4B1AD92125FC474E00261379 /* CoreDataEncryptionTesting.xcdatamodeld in Sources */,
+				B6BDD9F62940B5B500F68088 /* ContentBlockingMock.swift in Sources */,
 				4B1AD8D525FC38DD00261379 /* EncryptionKeyStoreTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -5350,7 +5352,6 @@
 				AAC9C01724CAFBDC00AD1325 /* TabCollectionTests.swift in Sources */,
 				378205F8283BC6A600D1D4AA /* StartupPreferencesTests.swift in Sources */,
 				3714B1E928EDBAAB0056C57A /* PrivatePlayerTests.swift in Sources */,
-				B6BDD9F02940731900F68088 /* TabExtensionsTests.swift in Sources */,
 				B67C6C3D2654B897006C872E /* WebViewExtensionTests.swift in Sources */,
 				4BA1A6DE258C100A00F6F690 /* FileStoreTests.swift in Sources */,
 				AAC9C01C24CB594C00AD1325 /* TabViewModelTests.swift in Sources */,
@@ -5373,6 +5374,7 @@
 				8546DE6225C03056000CA5E1 /* UserAgentTests.swift in Sources */,
 				B63ED0DE26AFD9A300A9DAD1 /* AVCaptureDeviceMock.swift in Sources */,
 				B63ED0E026AFE32F00A9DAD1 /* GeolocationProviderMock.swift in Sources */,
+				B6BDD9F529409DDD00F68088 /* ContentBlockingMock.swift in Sources */,
 				378205FB283C277800D1D4AA /* MainMenuTests.swift in Sources */,
 				4B43469528655D1400177407 /* FirefoxDataImporterTests.swift in Sources */,
 				4B723E0926B0003E00E14D75 /* CSVLoginExporterTests.swift in Sources */,

@@ -20,15 +20,6 @@ import BrowserServicesKit
 import Combine
 import Foundation
 
-protocol AutofillUserScriptPublisherProvider {
-    var autofillUserScriptPublisher: AnyPublisher<WebsiteAutofillUserScript?, Never> { get }
-}
-protocol ClicksPublisherProvider {
-    var clicksPublisher: AnyPublisher<NSPoint, Never> { get }
-}
-protocol ContentOverlayUserScriptDelegateProvider {
-    var contentOverlayUserScriptDelegate: ContentOverlayUserScriptDelegate? { get }
-}
 final class AutofillTabExtension {
 
     static var emailManagerProvider: (EmailManagerRequestDelegate) -> AutofillEmailDelegate = { delegate in
@@ -52,14 +43,14 @@ final class AutofillTabExtension {
 
     @Published var autofillDataToSave: AutofillData?
 
-    typealias Dependencies = AutofillUserScriptPublisherProvider
-        & ClicksPublisherProvider
-        & ContentOverlayUserScriptDelegateProvider
+    init(autofillUserScriptPublisher: AnyPublisher<WebsiteAutofillUserScript?, Never>,
+         clicksPublisher: AnyPublisher<NSPoint, Never>,
+         contentOverlayUserScriptDelegate: ContentOverlayUserScriptDelegate?) {
 
-    func attach(to provider: some Dependencies) {
-        delegate = provider.contentOverlayUserScriptDelegate
+        assert(contentOverlayUserScriptDelegate != nil)
+        delegate = contentOverlayUserScriptDelegate
 
-        provider.autofillUserScriptPublisher.sink { [weak self] autofillScript in
+        autofillUserScriptPublisher.sink { [weak self] autofillScript in
             guard let self, let autofillScript else { return }
 
             self.autofillScript = autofillScript
@@ -70,7 +61,7 @@ final class AutofillTabExtension {
             autofillScript.vaultDelegate = self.vaultManager
         }.store(in: &cancellables)
 
-        provider.clicksPublisher.sink { [weak self] point in
+        clicksPublisher.sink { [weak self] point in
             self?.autofillScript?.clickPoint = point
         }.store(in: &cancellables)
     }
@@ -131,8 +122,18 @@ extension AutofillType {
 
 extension AutofillTabExtension: EmailManagerRequestDelegate { }
 
+extension AutofillTabExtension: TabExtension {
+    final class ResolvingHelper: TabExtensionResolvingHelper {
+        static func make(owner tab: Tab) -> AutofillTabExtension {
+            AutofillTabExtension(autofillUserScriptPublisher: tab.autofillUserScriptPublisher,
+                                 clicksPublisher: tab.clicksPublisher,
+                                 contentOverlayUserScriptDelegate: tab)
+        }
+    }
+}
+
 extension TabExtensions {
-    var autofill: AutofillTabExtension? { nil }// TabExtensionResolver.resolve() }
+    var autofill: AutofillTabExtension? { resolve() }
 }
 
 extension Tab {
@@ -147,15 +148,20 @@ extension Tab {
 
 }
 
-extension Tab: ClicksPublisherProvider {
-}
-extension Tab: AutofillUserScriptPublisherProvider {
+private extension Tab {
     var autofillUserScriptPublisher: AnyPublisher<WebsiteAutofillUserScript?, Never> {
         userScriptsPublisher.compactMap { $0?.autofillScript }.eraseToAnyPublisher()
     }
 }
-extension Tab: ContentOverlayUserScriptDelegateProvider {
-    var contentOverlayUserScriptDelegate: ContentOverlayUserScriptDelegate? {
-        self.delegate
+
+extension Tab: ContentOverlayUserScriptDelegate {
+
+    func websiteAutofillUserScriptCloseOverlay(_ websiteAutofillUserScript: WebsiteAutofillUserScript?) {
+        self.delegate?.websiteAutofillUserScriptCloseOverlay(websiteAutofillUserScript)
     }
+
+    func websiteAutofillUserScript(_ websiteAutofillUserScript: WebsiteAutofillUserScript, willDisplayOverlayAtClick point: CGPoint?, serializedInputContext: String, inputPosition: CGRect) {
+        self.delegate?.websiteAutofillUserScript(websiteAutofillUserScript, willDisplayOverlayAtClick: point, serializedInputContext: serializedInputContext, inputPosition: inputPosition)
+    }
+
 }

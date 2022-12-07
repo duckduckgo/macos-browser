@@ -24,6 +24,7 @@ import BrowserServicesKit
 @testable import DuckDuckGo_Privacy_Browser
 
 class ContentBlockingUpdatingTests: XCTestCase {
+    // todo: mock
     let preferences = PrivacySecurityPreferences.shared
     let rulesManager = ContentBlockerRulesManagerMock()
     var updating: UserContentUpdating!
@@ -35,6 +36,7 @@ class ContentBlockingUpdatingTests: XCTestCase {
                                                                                                                                               data: DefaultConfigurationStorage.shared.loadData(for: .trackerRadar),
                                                                                                                                               embeddedDataProvider: AppTrackerDataSetProvider(),
                                                                                                                                               errorReporting: nil),
+                                       configStorage: ConfigurationDownloaderTests.MockStorage(),
                                        privacySecurityPreferences: preferences,
                                        tld: TLD())
     }

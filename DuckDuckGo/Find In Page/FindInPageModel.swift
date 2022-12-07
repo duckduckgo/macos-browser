@@ -17,9 +17,11 @@
 //
 
 import Foundation
+import WebKit
 
 final class FindInPageModel {
 
+    weak var webView: WKWebView?
     @Published private(set) var text: String = ""
     @Published private(set) var currentSelection: Int = 1
     @Published private(set) var matchesFound: Int = 0

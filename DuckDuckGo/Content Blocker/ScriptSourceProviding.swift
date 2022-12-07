@@ -33,7 +33,12 @@ protocol ScriptSourceProviding {
 
 }
 
-struct DefaultScriptSourceProvider: ScriptSourceProviding {
+// kill me!!!
+func DefaultScriptSourceProvider() -> ScriptSourceProviding {
+    ScriptSourceProvider(configStorage: DefaultConfigurationStorage.shared, privacyConfigurationManager: ContentBlocking.shared.privacyConfigurationManager, privacySettings: PrivacySecurityPreferences.shared, contentBlockingManager: ContentBlocking.shared.contentBlockingManager, trackerDataManager: ContentBlocking.shared.trackerDataManager, tld: ContentBlocking.shared.tld)
+}
+
+struct ScriptSourceProvider: ScriptSourceProviding {
 
     private(set) var contentBlockerRulesConfig: ContentBlockerUserScriptConfig?
     private(set) var surrogatesConfig: SurrogatesUserScriptConfig?
@@ -48,12 +53,12 @@ struct DefaultScriptSourceProvider: ScriptSourceProviding {
     let privacySettings: PrivacySecurityPreferences
     let tld: TLD
 
-    init(configStorage: ConfigurationStoring = DefaultConfigurationStorage.shared,
-         privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager,
-         privacySettings: PrivacySecurityPreferences = PrivacySecurityPreferences.shared,
-         contentBlockingManager: ContentBlockerRulesManagerProtocol = ContentBlocking.shared.contentBlockingManager,
-         trackerDataManager: TrackerDataManager = ContentBlocking.shared.trackerDataManager,
-         tld: TLD = ContentBlocking.shared.tld) {
+    init(configStorage: ConfigurationStoring,
+         privacyConfigurationManager: PrivacyConfigurationManaging,
+         privacySettings: PrivacySecurityPreferences,
+         contentBlockingManager: ContentBlockerRulesManagerProtocol,
+         trackerDataManager: TrackerDataManager,
+         tld: TLD) {
 
         self.configStorage = configStorage
         self.privacyConfigurationManager = privacyConfigurationManager
@@ -72,7 +77,7 @@ struct DefaultScriptSourceProvider: ScriptSourceProviding {
     private func generateSessionKey() -> String {
         return UUID().uuidString
     }
-    
+
     public func buildAutofillSource() -> AutofillUserScriptSourceProvider {
 
         return DefaultAutofillSourceProvider(privacyConfigurationManager: self.privacyConfigurationManager,
@@ -100,11 +105,11 @@ struct DefaultScriptSourceProvider: ScriptSourceProviding {
     private func buildSurrogatesConfig() -> SurrogatesUserScriptConfig {
 
         let isDebugBuild: Bool
-        #if DEBUG
+#if DEBUG
         isDebugBuild = true
-        #else
+#else
         isDebugBuild = false
-        #endif
+#endif
 
         let surrogates = configStorage.loadData(for: .surrogates)?.utf8String() ?? ""
         let tdsName = DefaultContentBlockerRulesListsSource.Constants.trackerDataSetRulesListName

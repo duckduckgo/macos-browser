@@ -84,6 +84,7 @@ final class TabViewModel {
         self.appearancePreferences = appearancePreferences
 
         webViewStateObserver = WebViewStateObserver(webView: tab.webView, tabViewModel: self)
+        self.findInPage.webView = tab.webView
 
         subscribeToUrl()
         subscribeToTitle()

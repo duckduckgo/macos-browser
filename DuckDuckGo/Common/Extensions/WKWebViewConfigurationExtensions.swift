@@ -22,8 +22,7 @@ import BrowserServicesKit
 
 extension WKWebViewConfiguration {
 
-    func applyStandardConfiguration(assetsPublisher: some Publisher<some UserContentControllerNewContent, Never>,
-                                    privacyConfigurationManager: PrivacyConfigurationManaging) {
+    func applyStandardConfiguration(contentBlocking: some ContentBlockingProtocol) {
 
         allowsAirPlayForMediaPlayback = true
         preferences.setValue(true, forKey: "fullScreenEnabled")
@@ -42,8 +41,8 @@ extension WKWebViewConfiguration {
             setURLSchemeHandler(PrivatePlayerSchemeHandler(), forURLScheme: PrivatePlayer.privatePlayerScheme)
         }
 
-        let userContentController = UserContentController(assetsPublisher: assetsPublisher,
-                                                          privacyConfigurationManager: privacyConfigurationManager)
+        let userContentController = UserContentController(assetsPublisher: contentBlocking.contentBlockingAssetsPublisher,
+                                                          privacyConfigurationManager: contentBlocking.privacyConfigurationManager)
 
         self.userContentController = userContentController
         self.processPool.geolocationProvider = GeolocationProvider(processPool: self.processPool)

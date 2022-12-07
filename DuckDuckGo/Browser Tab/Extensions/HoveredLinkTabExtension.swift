@@ -21,14 +21,12 @@ import Foundation
 
 final class HoveredLinkTabExtension {
 
-    private var userScriptsCancellable: AnyCancellable?
+    private var cancellable: AnyCancellable?
     fileprivate var hoveredLinkSubject = PassthroughSubject<URL?, Never>()
 
-    init() {}
-
-    func attach(to tab: Tab) {
-        userScriptsCancellable = tab.userScriptsPublisher.sink { [weak self] userScripts in
-            userScripts?.hoverUserScript.delegate = self
+    init(hoverUserScriptPublisher: some Publisher<HoverUserScript?, Never>) {
+        cancellable = hoverUserScriptPublisher.sink { [weak self] hoverUserScript in
+            hoverUserScript?.delegate = self
         }
     }
 
@@ -42,10 +40,34 @@ extension HoveredLinkTabExtension: HoverUserScriptDelegate {
 
 }
 
+extension HoveredLinkTabExtension: TabExtension {
+    final class ResolvingHelper: TabExtensionResolvingHelper {
+        static func make(owner tab: Tab) -> HoveredLinkTabExtension {
+            HoveredLinkTabExtension(hoverUserScriptPublisher: tab.hoverUserScriptPublisher)
+        }
+    }
+}
+
 extension Tab {
 
     var hoveredLinkPublisher: AnyPublisher<URL?, Never> {
         extensions.hoveredLinks?.hoveredLinkSubject.eraseToAnyPublisher() ?? Just(nil).eraseToAnyPublisher()
     }
 
+}
+
+extension TabExtensions {
+
+    var hoveredLinks: HoveredLinkTabExtension? {
+        resolve()
+    }
+
+}
+
+private extension Tab {
+
+    var hoverUserScriptPublisher: some Publisher<HoverUserScript?, Never> {
+        userScriptsPublisher.compactMap { $0?.hoverUserScript }
+    }
+    
 }

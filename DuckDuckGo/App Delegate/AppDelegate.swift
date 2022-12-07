@@ -55,27 +55,37 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationWillFinishLaunching(_ notification: Notification) {
         if !Self.isRunningTests {
-            #if DEBUG
+#if DEBUG
             Pixel.setUp(dryRun: true)
-            #else
+#else
             Pixel.setUp()
-            #endif
+#endif
 
             Database.shared.loadStore { _, error in
                 guard let error = error else { return }
-                
+
                 switch error {
                 case CoreDataDatabase.Error.containerLocationCouldNotBePrepared(let underlyingError):
                     Pixel.fire(.debug(event: .dbContainerInitializationError, error: underlyingError))
                 default:
                     Pixel.fire(.debug(event: .dbInitializationError, error: error))
                 }
-                
+
                 // Give Pixel a chance to be sent, but not too long
                 Thread.sleep(forTimeInterval: 1)
                 fatalError("Could not load DB: \(error.localizedDescription)")
             }
         }
+
+#if DEBUG
+        AppPrivacyFeatures.shared = AppDelegate.isRunningTests ?
+            AppPrivacyFeatures(contentBlocking: ((NSClassFromString("ContentBlockingMock") as? NSObject.Type)!.init() as? AnyContentBlocking)!,
+                               httpsUpgradeStore: ((NSClassFromString("HTTPSUpgradeStoreMock") as? NSObject.Type)!.init() as? HTTPSUpgradeStore)!) :
+            AppPrivacyFeatures(contentBlocking: AppContentBlocking(),
+                               httpsUpgradeStore: AppHTTPSUpgradeStore())
+#else
+        PrivacyFeatures.shared = AppPrivacyFeatures(contentBlocking: AppContentBlocking())
+#endif
 
         do {
             let encryptionKey = Self.isRunningTests ? nil : try keyStore.readKey()

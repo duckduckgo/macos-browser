@@ -37,23 +37,23 @@ final class FindInPageUserScript: NSObject, StaticUserScript {
         model?.update(currentSelection: currentResult, matchesFound: totalResults)
     }
 
-    func find(text: String, inWebView webView: WKWebView) {
-        evaluate(js: "window.__firefox__.find('\(text.replacingOccurrences(of: "'", with: "\\\'"))')", inWebView: webView)
+    func find(_ text: String, in webView: WKWebView) {
+        evaluate("window.__firefox__.find('\(text.replacingOccurrences(of: "'", with: "\\\'"))')", in: webView)
     }
 
-    func done(withWebView webView: WKWebView) {
-        evaluate(js: "window.__firefox__.findDone()", inWebView: webView)
+    func findDone(in webView: WKWebView) {
+        evaluate("window.__firefox__.findDone()", in: webView)
     }
 
-    func next(withWebView webView: WKWebView) {
-        evaluate(js: "window.__firefox__.findNext()", inWebView: webView)
+    func findNext(in webView: WKWebView) {
+        evaluate("window.__firefox__.findNext()", in: webView)
     }
 
-    func previous(withWebView webView: WKWebView) {
-        evaluate(js: "window.__firefox__.findPrevious()", inWebView: webView)
+    func findPrevious(in webView: WKWebView) {
+        evaluate("window.__firefox__.findPrevious()", in: webView)
     }
 
-    private func evaluate(js: String, inWebView webView: WKWebView) {
+    private func evaluate(_ js: String, in webView: WKWebView) {
         if #available(macOS 11.0, *) {
             webView.evaluateJavaScript(js, in: nil, in: WKContentWorld.defaultClient)
         } else {

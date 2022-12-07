@@ -23,15 +23,18 @@ import XCTest
 
 @available(macOS 11, *)
 class AutoconsentMessageProtocolTests: XCTestCase {
-    let userScript = AutoconsentUserScript(
-        scriptSource: DefaultScriptSourceProvider(privacyConfigurationManager: MockPrivacyConfigurationManager(),
-                                                  contentBlockingManager: ContentBlockerRulesManagerMock(),
-                                                  trackerDataManager: TrackerDataManager(etag: DefaultConfigurationStorage.shared.loadEtag(for: .trackerRadar),
-                                                                                         data: DefaultConfigurationStorage.shared.loadData(for: .trackerRadar),
-                                                                                         embeddedDataProvider: AppTrackerDataSetProvider(),
-                                                                                         errorReporting: nil),
 
-                                                  tld: TLD()),
+    let userScript = AutoconsentUserScript(
+        scriptSource: ScriptSourceProvider(configStorage: ConfigurationDownloaderTests.MockStorage(),
+                                           privacyConfigurationManager: MockPrivacyConfigurationManager(),
+                                           privacySettings: PrivacySecurityPreferences.shared, // todo: mock
+                                           contentBlockingManager: ContentBlockerRulesManagerMock(),
+                                           trackerDataManager: TrackerDataManager(etag: DefaultConfigurationStorage.shared.loadEtag(for: .trackerRadar),
+                                                                                  data: DefaultConfigurationStorage.shared.loadData(for: .trackerRadar),
+                                                                                  embeddedDataProvider: AppTrackerDataSetProvider(),
+                                                                                  errorReporting: nil),
+
+                                           tld: TLD()),
         config: MockPrivacyConfiguration()
     )
     
