@@ -3488,6 +3488,7 @@
 				AA86491C24D83868001BABEE /* View */,
 				AA86491D24D83A59001BABEE /* ViewModel */,
 				AA86491E24D83A66001BABEE /* Model */,
+				B6BDD9F12940764100F68088 /* UserScripts */,
 				B647EFB32922539400BA628D /* Extensions */,
 				AA512D1224D99D4900230283 /* Services */,
 			);
@@ -3520,21 +3521,14 @@
 		AA86491E24D83A66001BABEE /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				856CADEF271710F400E79BB0 /* HoverUserScript.swift */,
-				4B2E7D6226FF9D6500D2DB17 /* PrintingUserScript.swift */,
-				85D438B5256E7C9E00F3BAF8 /* ContextMenuUserScript.swift */,
-				4BB88B4425B7B55C006F6B06 /* DebugUserScript.swift */,
-				B634DBE2293C8FFF00C3C99E /* UserDialogRequest.swift */,
+				F4A6198B283CFFBB007F2080 /* ContentScopeFeatureFlagging.swift */,
 				B634DBE4293C944700C3C99E /* NewWindowPolicy.swift */,
 				AA9FF95824A1ECF20039E328 /* Tab.swift */,
 				B634DBE0293C8FD500C3C99E /* Tab+Dialogs.swift */,
 				B634DBDE293C8F7F00C3C99E /* Tab+UIDelegate.swift */,
 				B6C00ED6292FB4B4009C73A6 /* TabExtensions.swift */,
-				85AC3AEE25D5CE9800C7D2AA /* UserScripts.swift */,
-				B6DA06E32913ECEE00225DE2 /* ContextMenuManager.swift */,
-				F4A6198B283CFFBB007F2080 /* ContentScopeFeatureFlagging.swift */,
 				983DFB2428B67036006B7E34 /* UserContentUpdating.swift */,
-				B6DA06E7291401D700225DE2 /* WKMenuItemIdentifier.swift */,
+				B634DBE2293C8FFF00C3C99E /* UserDialogRequest.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -3929,6 +3923,7 @@
 				AA8EDF2324923E980071C2E8 /* URLExtension.swift */,
 				AA88D14A252A557100980B4E /* URLRequestExtension.swift */,
 				B6DB3AEE278D5C370024C5C4 /* URLSessionExtension.swift */,
+				B6DA06E7291401D700225DE2 /* WKMenuItemIdentifier.swift */,
 				AAA0CC69253CC43C0079BC96 /* WKUserContentControllerExtension.swift */,
 				B63D466725BEB6C200874977 /* WKWebView+Private.h */,
 				B6BDD9ED29406DFA00F68088 /* WKFrameInfo+handle.swift */,
@@ -4153,6 +4148,7 @@
 			children = (
 				B647EFBA2922584B00BA628D /* AdClickAttribution.swift */,
 				B6C00ECA292F839D009C73A6 /* AutofillTabExtension.swift */,
+				B6DA06E32913ECEE00225DE2 /* ContextMenuManager.swift */,
 				B6C00ED4292FB21E009C73A6 /* HoveredLinkTabExtension.swift */,
 				B6C00ECC292F89D9009C73A6 /* FindInPageTabExtension.swift */,
 			);
@@ -4337,6 +4333,18 @@
 				B6C0B23B26E87D900031CB7F /* NSAlert+ActiveDownloadsTermination.swift */,
 			);
 			path = View;
+			sourceTree = "<group>";
+		};
+		B6BDD9F12940764100F68088 /* UserScripts */ = {
+			isa = PBXGroup;
+			children = (
+				85D438B5256E7C9E00F3BAF8 /* ContextMenuUserScript.swift */,
+				4BB88B4425B7B55C006F6B06 /* DebugUserScript.swift */,
+				856CADEF271710F400E79BB0 /* HoverUserScript.swift */,
+				4B2E7D6226FF9D6500D2DB17 /* PrintingUserScript.swift */,
+				85AC3AEE25D5CE9800C7D2AA /* UserScripts.swift */,
+			);
+			path = UserScripts;
 			sourceTree = "<group>";
 		};
 		B6C0B23126E71A800031CB7F /* Services */ = {
@@ -5033,7 +5041,6 @@
 				85707F2A276A35FE00DC0649 /* ActionSpeech.swift in Sources */,
 				8585B63826D6E66C00C1416F /* ButtonStyles.swift in Sources */,
 				4B0511BD262CAA5A00F6079C /* PrivacySecurityPreferences.swift in Sources */,
-				B6BE9FAA293F7955006363C6 /* ModalSheetCancellable.swift in Sources */,
 				B6830963274CDEC7004B46BB /* FireproofDomainsStore.swift in Sources */,
 				1E7E2E942902AC0E00C01B54 /* PrivacyDashboardPermissionHandler.swift in Sources */,
 				AA9FF95F24A1FB690039E328 /* TabCollectionViewModel.swift in Sources */,
