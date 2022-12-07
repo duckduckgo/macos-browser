@@ -1,3 +1,6 @@
 [submodule "Submodules/duckduckgo-find-in-page"]
 	path = Submodules/duckduckgo-find-in-page
 	url = git@github.com:more-duckduckgo-org/duckduckgo-find-in-page.git
+[submodule "Submodules/privacy-reference-tests"]
+	path = Submodules/privacy-reference-tests
+	url = git@github.com:duckduckgo/privacy-reference-tests.git
