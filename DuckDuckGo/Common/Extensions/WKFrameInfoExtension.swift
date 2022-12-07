@@ -23,7 +23,7 @@ extension WKFrameInfo {
     private static let _handle = "_handle"
     var handle: Any? {
         guard self.responds(to: NSSelectorFromString(Self._handle)) else {
-            assertionFailure("WKFrameInfo does not respond to _hadle")
+            assertionFailure("WKFrameInfo does not respond to _handle")
             return nil
         }
         return self.value(forKey: Self._handle)
