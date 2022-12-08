@@ -147,7 +147,7 @@
 		3706FAC2293F65D500E42796 /* FaviconSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAEF6BC7276A081C0024DCF4 /* FaviconSelector.swift */; };
 		3706FAC3293F65D500E42796 /* AddEditFavoriteViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85589E7927BBB8620038AD11 /* AddEditFavoriteViewController.swift */; };
 		3706FAC4293F65D500E42796 /* PrintingUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B2E7D6226FF9D6500D2DB17 /* PrintingUserScript.swift */; };
-		3706FAC5293F65D500E42796 /* GPCRequestFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0230C0A42721F3750018F728 /* GPCRequestFactory.swift */; };
+		3706FAC5293F65D500E42796 /* (null) in Sources */ = {isa = PBXBuildFile; };
 		3706FAC6293F65D500E42796 /* ConnectBitwardenViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BBDEE9028FC14760092FAA6 /* ConnectBitwardenViewController.swift */; };
 		3706FAC8293F65D500E42796 /* AppTrackerDataSetProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9833912E27AAA3CE00DAF119 /* AppTrackerDataSetProvider.swift */; };
 		3706FAC9293F65D500E42796 /* EncryptionKeyGeneration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA1A6B2258B080A00F6F690 /* EncryptionKeyGeneration.swift */; };
@@ -161,7 +161,7 @@
 		3706FAD2293F65D500E42796 /* Atb.swift in Sources */ = {isa = PBXBuildFile; fileRef = B69B50352726A11F00758A2B /* Atb.swift */; };
 		3706FAD3293F65D500E42796 /* DownloadsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B1E87F26D5DA9B0062C350 /* DownloadsViewController.swift */; };
 		3706FAD4293F65D500E42796 /* DataExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85AC3AF625D5DBFD00C7D2AA /* DataExtension.swift */; };
-		3706FAD5293F65D500E42796 /* WKWebViewDownloadDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A924D32664BBB9001A28CA /* WKWebViewDownloadDelegate.swift */; };
+		3706FAD5293F65D500E42796 /* (null) in Sources */ = {isa = PBXBuildFile; };
 		3706FAD6293F65D500E42796 /* ConfigurationStoring.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85480FCE25D1AA22009424E3 /* ConfigurationStoring.swift */; };
 		3706FAD7293F65D500E42796 /* Feedback.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA3D531A27A2F57E00074EC1 /* Feedback.swift */; };
 		3706FAD8293F65D500E42796 /* RequestFilePermissionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB99D0526FE1979001E4761 /* RequestFilePermissionViewController.swift */; };
@@ -5869,7 +5869,7 @@
 				3706FAC2293F65D500E42796 /* FaviconSelector.swift in Sources */,
 				3706FAC3293F65D500E42796 /* AddEditFavoriteViewController.swift in Sources */,
 				3706FAC4293F65D500E42796 /* PrintingUserScript.swift in Sources */,
-				3706FAC5293F65D500E42796 /* GPCRequestFactory.swift in Sources */,
+				3706FAC5293F65D500E42796 /* (null) in Sources */,
 				3706FEBF293F6EFF00E42796 /* BWError.swift in Sources */,
 				3706FAC6293F65D500E42796 /* ConnectBitwardenViewController.swift in Sources */,
 				3706FAC8293F65D500E42796 /* AppTrackerDataSetProvider.swift in Sources */,
@@ -5884,7 +5884,7 @@
 				3706FAD2293F65D500E42796 /* Atb.swift in Sources */,
 				3706FAD3293F65D500E42796 /* DownloadsViewController.swift in Sources */,
 				3706FAD4293F65D500E42796 /* DataExtension.swift in Sources */,
-				3706FAD5293F65D500E42796 /* WKWebViewDownloadDelegate.swift in Sources */,
+				3706FAD5293F65D500E42796 /* (null) in Sources */,
 				3706FAD6293F65D500E42796 /* ConfigurationStoring.swift in Sources */,
 				3706FAD7293F65D500E42796 /* Feedback.swift in Sources */,
 				3706FAD8293F65D500E42796 /* RequestFilePermissionViewController.swift in Sources */,
@@ -7536,7 +7536,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.3;
 				MARKETING_VERSION = "$(MARKETING_VERSION)";
-				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.mobile.review;
+				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.mobile.ios.review;
 				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PRODUCT_NAME = "DuckDuckGo Review";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -8395,9 +8395,7 @@
 				3706FCFB293F65D500E42796 /* Debug */,
 				3706FCFE293F65D500E42796 /* CI */,
 				3706FCFF293F65D500E42796 /* Release */,
-				3706FD01293F65D500E42796 /* CI_Release */,
 				3706FD02293F65D500E42796 /* Review */,
-				3706FD04293F65D500E42796 /* CI_Review */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -8408,9 +8406,7 @@
 				3706FE93293F661700E42796 /* Debug */,
 				3706FE94293F661700E42796 /* CI */,
 				3706FE95293F661700E42796 /* Release */,
-				3706FE96293F661700E42796 /* CI_Release */,
 				3706FE97293F661700E42796 /* Review */,
-				3706FE98293F661700E42796 /* CI_Review */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -8421,9 +8417,7 @@
 				3706FEAC293F662100E42796 /* Debug */,
 				3706FEAD293F662100E42796 /* CI */,
 				3706FEAE293F662100E42796 /* Release */,
-				3706FEAF293F662100E42796 /* CI_Release */,
 				3706FEB0293F662100E42796 /* Review */,
-				3706FEB1293F662100E42796 /* CI_Review */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
