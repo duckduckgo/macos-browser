@@ -34,20 +34,6 @@
                ReferencedContainer = "container:DuckDuckGo.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "NO"
-            buildForProfiling = "NO"
-            buildForArchiving = "NO"
-            buildForAnalyzing = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "3706FE9B293F662100E42796"
-               BuildableName = "Integration Tests App Store.xctest"
-               BlueprintName = "Integration Tests App Store"
-               ReferencedContainer = "container:DuckDuckGo.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
@@ -56,6 +42,42 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "3706FDD3293F661700E42796"
+               BuildableName = "Unit Tests App Store.xctest"
+               BlueprintName = "Unit Tests App Store"
+               ReferencedContainer = "container:DuckDuckGo.xcodeproj">
+            </BuildableReference>
+            <SkippedTests>
+               <Test
+                  Identifier = "CBRCompileTimeReporterTests">
+               </Test>
+               <Test
+                  Identifier = "StatisticsLoaderTests/testWhenRefreshRetentionAtbIsPerformedForNavigationThenAppRetentionAtbRequested()">
+               </Test>
+            </SkippedTests>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "3706FE9B293F662100E42796"
+               BuildableName = "Integration Tests App Store.xctest"
+               BlueprintName = "Integration Tests App Store"
+               ReferencedContainer = "container:DuckDuckGo.xcodeproj">
+            </BuildableReference>
+            <SkippedTests>
+               <Test
+                  Identifier = "CoreDataEncryptionTests/testSavingIncorrectValueTypes()">
+               </Test>
+               <Test
+                  Identifier = "EncryptionKeyStoreTests">
+               </Test>
+            </SkippedTests>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction

@@ -715,7 +715,6 @@
 		3706FDEB293F661700E42796 /* WebsiteDataStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0219A725E0646500ED7DEA /* WebsiteDataStoreTests.swift */; };
 		3706FDEC293F661700E42796 /* TabCollectionViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC9C01D24CB6BEB00AD1325 /* TabCollectionViewModelTests.swift */; };
 		3706FDED293F661700E42796 /* EncryptionKeyStoreMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B662D3DD275613BB0035D4D6 /* EncryptionKeyStoreMock.swift */; };
-		3706FDEE293F661700E42796 /* BWEncryptionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D3B1ABE29369FC8006F4388 /* BWEncryptionTests.swift */; };
 		3706FDEF293F661700E42796 /* PinnedTabsManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D2377F287EFEE200BCE03B /* PinnedTabsManagerTests.swift */; };
 		3706FDF0293F661700E42796 /* WebKitVersionProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0877B926D5161D00B05660 /* WebKitVersionProviderTests.swift */; };
 		3706FDF1293F661700E42796 /* AtbAndVariantCleanupTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B69B50422726C5C100758A2B /* AtbAndVariantCleanupTests.swift */; };
@@ -1671,28 +1670,14 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		3706FDD5293F661700E42796 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = AA585D76248FD31100E9A3E2 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = AA585D7D248FD31100E9A3E2;
-			remoteInfo = DuckDuckGo;
-		};
-		3706FE9D293F662100E42796 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = AA585D76248FD31100E9A3E2 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = AA585D7D248FD31100E9A3E2;
-			remoteInfo = "DuckDuckGo Privacy Browser";
-		};
-		3706FEB4293F662B00E42796 /* PBXContainerItemProxy */ = {
+		37079A92294236F20031BB3C /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = AA585D76248FD31100E9A3E2 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 3706FA6A293F65D500E42796;
 			remoteInfo = "DuckDuckGo Privacy Browser App Store";
 		};
-		3706FEB6293F662F00E42796 /* PBXContainerItemProxy */ = {
+		37079A94294236FA0031BB3C /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = AA585D76248FD31100E9A3E2 /* Project object */;
 			proxyType = 1;
@@ -5316,8 +5301,7 @@
 			buildRules = (
 			);
 			dependencies = (
-				3706FDD4293F661700E42796 /* PBXTargetDependency */,
-				3706FEB7293F662F00E42796 /* PBXTargetDependency */,
+				37079A93294236F20031BB3C /* PBXTargetDependency */,
 			);
 			name = "Unit Tests App Store";
 			packageProductDependencies = (
@@ -5339,8 +5323,7 @@
 			buildRules = (
 			);
 			dependencies = (
-				3706FE9C293F662100E42796 /* PBXTargetDependency */,
-				3706FEB5293F662B00E42796 /* PBXTargetDependency */,
+				37079A95294236FA0031BB3C /* PBXTargetDependency */,
 			);
 			name = "Integration Tests App Store";
 			productName = "Integration Tests";
@@ -6377,7 +6360,6 @@
 				3706FDEB293F661700E42796 /* WebsiteDataStoreTests.swift in Sources */,
 				3706FDEC293F661700E42796 /* TabCollectionViewModelTests.swift in Sources */,
 				3706FDED293F661700E42796 /* EncryptionKeyStoreMock.swift in Sources */,
-				3706FDEE293F661700E42796 /* BWEncryptionTests.swift in Sources */,
 				3706FDEF293F661700E42796 /* PinnedTabsManagerTests.swift in Sources */,
 				3706FDF0293F661700E42796 /* WebKitVersionProviderTests.swift in Sources */,
 				3706FDF1293F661700E42796 /* AtbAndVariantCleanupTests.swift in Sources */,
@@ -7323,25 +7305,15 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		3706FDD4293F661700E42796 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = AA585D7D248FD31100E9A3E2 /* DuckDuckGo Privacy Browser */;
-			targetProxy = 3706FDD5293F661700E42796 /* PBXContainerItemProxy */;
-		};
-		3706FE9C293F662100E42796 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = AA585D7D248FD31100E9A3E2 /* DuckDuckGo Privacy Browser */;
-			targetProxy = 3706FE9D293F662100E42796 /* PBXContainerItemProxy */;
-		};
-		3706FEB5293F662B00E42796 /* PBXTargetDependency */ = {
+		37079A93294236F20031BB3C /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 3706FA6A293F65D500E42796 /* DuckDuckGo Privacy Browser App Store */;
-			targetProxy = 3706FEB4293F662B00E42796 /* PBXContainerItemProxy */;
+			targetProxy = 37079A92294236F20031BB3C /* PBXContainerItemProxy */;
 		};
-		3706FEB7293F662F00E42796 /* PBXTargetDependency */ = {
+		37079A95294236FA0031BB3C /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 3706FA6A293F65D500E42796 /* DuckDuckGo Privacy Browser App Store */;
-			targetProxy = 3706FEB6293F662F00E42796 /* PBXContainerItemProxy */;
+			targetProxy = 37079A94294236FA0031BB3C /* PBXContainerItemProxy */;
 		};
 		4B1AD8A325FC27E200261379 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -7431,8 +7403,9 @@
 				MACOSX_DEPLOYMENT_TARGET = 12.3;
 				MARKETING_VERSION = "$(MARKETING_VERSION)";
 				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.mobile.ios.debug;
-				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
+				PRODUCT_MODULE_NAME = DuckDuckGo_Privacy_Browser;
 				PRODUCT_NAME = DuckDuckGo;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "FEEDBACK $(inherited) APPSTORE";
 				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/DuckDuckGo/Bridging.h";
 				SWIFT_VERSION = 5.0;
@@ -7467,7 +7440,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 12.3;
 				MARKETING_VERSION = "$(MARKETING_VERSION)";
 				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.mobile.ios.debug;
-				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
+				PRODUCT_MODULE_NAME = DuckDuckGo_Privacy_Browser;
 				PRODUCT_NAME = DuckDuckGo;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "FEEDBACK $(inherited) APPSTORE";
@@ -7501,7 +7474,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 12.3;
 				MARKETING_VERSION = "$(MARKETING_VERSION)";
 				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.mobile.ios;
-				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
+				PRODUCT_MODULE_NAME = DuckDuckGo_Privacy_Browser;
 				PRODUCT_NAME = DuckDuckGo;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "macOS Browser App Store";
@@ -7537,7 +7510,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 12.3;
 				MARKETING_VERSION = "$(MARKETING_VERSION)";
 				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.mobile.ios.review;
-				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
+				PRODUCT_MODULE_NAME = DuckDuckGo_Privacy_Browser;
 				PRODUCT_NAME = "DuckDuckGo Review";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "FEEDBACK REVIEW APPSTORE";
@@ -7556,6 +7529,11 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = HKE973VLUW;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+					"APPSTORE=1",
+				);
 				INFOPLIST_FILE = "Unit Tests/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -7563,12 +7541,12 @@
 					"@loader_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.3;
-				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser.DuckDuckGoTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.mobile.ios.DuckDuckGoTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/Unit Tests/Common/TestsBridging.h";
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DuckDuckGo Privacy Browser App Store.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/DuckDuckGo Privacy Browser App Store";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DuckDuckGo.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/DuckDuckGo";
 			};
 			name = Debug;
 		};
@@ -7582,6 +7560,12 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = "";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"CI=1",
+					"$(inherited)",
+					"APPSTORE=1",
+				);
 				INFOPLIST_FILE = "Unit Tests/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -7589,12 +7573,12 @@
 					"@loader_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.3;
-				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser.DuckDuckGoTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.mobile.ios.DuckDuckGoTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/Unit Tests/Common/TestsBridging.h";
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DuckDuckGo Privacy Browser App Store.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/DuckDuckGo Privacy Browser App Store";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DuckDuckGo.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/DuckDuckGo";
 			};
 			name = CI;
 		};
@@ -7608,6 +7592,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = HKE973VLUW;
+				GCC_PREPROCESSOR_DEFINITIONS = "APPSTORE=1";
 				INFOPLIST_FILE = "Unit Tests/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -7615,12 +7600,12 @@
 					"@loader_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.3;
-				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser.DuckDuckGoTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.mobile.ios.DuckDuckGoTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/Unit Tests/Common/TestsBridging.h";
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DuckDuckGo Privacy Browser App Store.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/DuckDuckGo Privacy Browser App Store";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DuckDuckGo.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/DuckDuckGo";
 			};
 			name = Release;
 		};
@@ -7634,6 +7619,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = HKE973VLUW;
+				GCC_PREPROCESSOR_DEFINITIONS = "APPSTORE=1";
 				INFOPLIST_FILE = "Unit Tests/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -7641,12 +7627,12 @@
 					"@loader_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.3;
-				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser.DuckDuckGoTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.mobile.ios.DuckDuckGoTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/Unit Tests/Common/TestsBridging.h";
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DuckDuckGo Privacy Browser App Store.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/DuckDuckGo Privacy Browser App Store";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DuckDuckGo.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/DuckDuckGo";
 			};
 			name = Review;
 		};
@@ -7658,6 +7644,11 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = HKE973VLUW;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+					"APPSTORE=1",
+				);
 				INFOPLIST_FILE = "Integration Tests/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -7665,10 +7656,10 @@
 					"@loader_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.3;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.duckduckgo.Integration-Tests";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.duckduckgo.mobile.ios.Integration-Tests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DuckDuckGo Privacy Browser App Store.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/DuckDuckGo Privacy Browser App Store";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DuckDuckGo.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/DuckDuckGo";
 			};
 			name = Debug;
 		};
@@ -7681,6 +7672,12 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = HKE973VLUW;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"CI=1",
+					"$(inherited)",
+					"APPSTORE=1",
+				);
 				INFOPLIST_FILE = "Integration Tests/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -7688,10 +7685,10 @@
 					"@loader_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.3;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.duckduckgo.Integration-Tests";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.duckduckgo.mobile.ios.Integration-Tests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DuckDuckGo Privacy Browser App Store.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/DuckDuckGo Privacy Browser App Store";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DuckDuckGo.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/DuckDuckGo";
 			};
 			name = CI;
 		};
@@ -7703,6 +7700,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = HKE973VLUW;
+				GCC_PREPROCESSOR_DEFINITIONS = "APPSTORE=1";
 				INFOPLIST_FILE = "Integration Tests/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -7710,10 +7708,10 @@
 					"@loader_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.3;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.duckduckgo.Integration-Tests";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.duckduckgo.mobile.ios.Integration-Tests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DuckDuckGo Privacy Browser App Store.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/DuckDuckGo Privacy Browser App Store";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DuckDuckGo.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/DuckDuckGo";
 			};
 			name = Release;
 		};
@@ -7725,6 +7723,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = HKE973VLUW;
+				GCC_PREPROCESSOR_DEFINITIONS = "APPSTORE=1";
 				INFOPLIST_FILE = "Integration Tests/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -7732,10 +7731,10 @@
 					"@loader_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.3;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.duckduckgo.Integration-Tests";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.duckduckgo.mobile.ios.Integration-Tests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DuckDuckGo Privacy Browser App Store.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/DuckDuckGo Privacy Browser App Store";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DuckDuckGo.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/DuckDuckGo";
 			};
 			name = Review;
 		};
