@@ -23,24 +23,20 @@ import ContentBlocking
 import Foundation
 import BrowserServicesKit
 import PrivacyDashboard
+import WebKit
 
 protocol AdClickAttributionDependencies {
-    associatedtype ConfigurationManager: PrivacyConfigurationManaging
-    var privacyConfigurationManager: ConfigurationManager { get }
 
-    associatedtype AdClickFeature: AdClickAttributing
-    var adClickAttribution: AdClickFeature { get }
+    var privacyConfigurationManager: PrivacyConfigurationManaging { get }
+    var contentBlockingManager: ContentBlockerRulesManagerProtocol { get }
+    var tld: TLD { get }
 
-    associatedtype AdClickRulesProvider: AdClickAttributionRulesProviding
-    var adClickAttributionRulesProvider: AdClickAttributionRulesProvider { get }
+    var adClickAttribution: AdClickAttributing { get }
+    var adClickAttributionRulesProvider: AdClickAttributionRulesProviding { get }
 
     var attributionEvents: EventMapping<AdClickAttributionEvents> { get }
     var attributionDebugEvents: EventMapping<AdClickAttributionDebugEvents> { get }
 
-    associatedtype ContentBlockingManager: ContentBlockerRulesManagerProtocol
-    var contentBlockingManager: ContentBlockingManager { get }
-
-    var tld: TLD { get }
 }
 
 protocol UserContentControllerProtocol {
@@ -173,14 +169,12 @@ extension AdClickAttributionTabExtension: AdClickAttributionLogicDelegate {
 }
 
 extension AdClickAttributionTabExtension: TabExtension {
-    final class ResolvingHelper: TabExtensionResolvingHelper {
-        static func make(owner tab: Tab) -> AdClickAttributionTabExtension {
-            AdClickAttributionTabExtension(inheritedAttribution: tab.inheritedAttribution,
-                                           userContentControllerProvider: tab,
-                                           contentBlockerRulesScriptPublisher: tab.contentBlockerRulesScriptPublisher,
-                                           privacyInfoPublisher: tab.$privacyInfo,
-                                           dependencies: (tab.contentBlocking as? AppContentBlocking)!)
-        }
+    static func make(owner tab: Tab) -> AdClickAttributionTabExtension {
+        AdClickAttributionTabExtension(inheritedAttribution: tab.inheritedAttribution,
+                                       userContentControllerProvider: tab,
+                                       contentBlockerRulesScriptPublisher: tab.contentBlockerRulesScriptPublisher,
+                                       privacyInfoPublisher: tab.$privacyInfo,
+                                       dependencies: (tab.contentBlocking as? AppContentBlocking)!)
     }
 }
 
@@ -190,9 +184,7 @@ extension TabExtensions {
     }
 }
 
-extension AppContentBlocking: AdClickAttributionDependencies {
-    typealias AdClickRulesProvider = AdClickAttributionRulesProvider
-}
+extension AppContentBlocking: AdClickAttributionDependencies {}
 
 private extension Tab {
     var inheritedAttribution: AdClickAttributionLogic.State? {

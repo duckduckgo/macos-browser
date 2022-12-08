@@ -123,12 +123,10 @@ extension AutofillType {
 extension AutofillTabExtension: EmailManagerRequestDelegate { }
 
 extension AutofillTabExtension: TabExtension {
-    final class ResolvingHelper: TabExtensionResolvingHelper {
-        static func make(owner tab: Tab) -> AutofillTabExtension {
-            AutofillTabExtension(autofillUserScriptPublisher: tab.autofillUserScriptPublisher,
-                                 clicksPublisher: tab.clicksPublisher,
-                                 contentOverlayUserScriptDelegate: tab)
-        }
+    static func make(owner tab: Tab) -> AutofillTabExtension {
+        AutofillTabExtension(autofillUserScriptPublisher: tab.autofillUserScriptPublisher,
+                             clicksPublisher: tab.clicksPublisher,
+                             contentOverlayUserScriptDelegate: tab)
     }
 }
 

@@ -25,21 +25,15 @@ import Common
 
 protocol ContentBlockingProtocol {
 
-    associatedtype ConfigurationManager: PrivacyConfigurationManaging
-    var privacyConfigurationManager: ConfigurationManager { get }
-
-    associatedtype ContentBlockingAssets: UserContentControllerNewContent
-    associatedtype ContentBlockingAssetsPublisher: Publisher<ContentBlockingAssets, Never>
-    var contentBlockingAssetsPublisher: ContentBlockingAssetsPublisher { get }
-
-    associatedtype ContentBlockingManager: ContentBlockerRulesManagerProtocol
-    var contentBlockingManager: ContentBlockingManager { get }
-
+    var privacyConfigurationManager: PrivacyConfigurationManaging { get }
+    var contentBlockingManager: ContentBlockerRulesManagerProtocol { get }
     var trackerDataManager: TrackerDataManager { get }
-
     var tld: TLD { get }
-    
+
+    var contentBlockingAssetsPublisher: AnyPublisher<UserContentUpdating.NewContent, Never> { get }
+
 }
+
 typealias AnyContentBlocking = any ContentBlockingProtocol
 
 // refactor: ContentBlocking.shared to be removed, ContentBlockingProtocol to be renamed to ContentBlocking
@@ -50,15 +44,15 @@ extension ContentBlocking {
 }
 
 final class AppContentBlocking {
-    let privacyConfigurationManager: PrivacyConfigurationManager
+    let privacyConfigurationManager: PrivacyConfigurationManaging
     let trackerDataManager: TrackerDataManager
-    let contentBlockingManager: ContentBlockerRulesManager
+    let contentBlockingManager: ContentBlockerRulesManagerProtocol
     let userContentUpdating: UserContentUpdating
 
     let tld = TLD()
 
-    let adClickAttribution: AdClickAttributionFeature
-    let adClickAttributionRulesProvider: AdClickAttributionRulesProvider
+    let adClickAttribution: AdClickAttributing
+    let adClickAttributionRulesProvider: AdClickAttributionRulesProviding
 
     private let contentBlockerRulesSource: ContentBlockerRulesLists
     private let exceptionsSource: DefaultContentBlockerRulesExceptionsSource
@@ -218,7 +212,6 @@ final class ContentBlockingRulesCache: ContentBlockerRulesCaching {
 }
 
 extension AppContentBlocking: ContentBlockingProtocol {
-    typealias ContentBlockingAssets = UserContentUpdating.NewContent
 
     var contentBlockingAssetsPublisher: AnyPublisher<UserContentUpdating.NewContent, Never> {
         self.userContentUpdating.userContentBlockingAssets

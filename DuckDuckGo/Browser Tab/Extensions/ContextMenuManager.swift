@@ -455,10 +455,8 @@ extension Tab: ContextMenuManagerDelegate {
 // MARK: - TabExtension
 
 extension ContextMenuManager: TabExtension {
-    final class ResolvingHelper: TabExtensionResolvingHelper {
-        static func make(owner tab: Tab) -> ContextMenuManager {
-            ContextMenuManager(contextMenuScriptPublisher: tab.contextMenuScriptPublisher, delegate: tab)
-        }
+    static func make(owner tab: Tab) -> ContextMenuManager {
+        ContextMenuManager(contextMenuScriptPublisher: tab.contextMenuScriptPublisher, delegate: tab)
     }
 }
 

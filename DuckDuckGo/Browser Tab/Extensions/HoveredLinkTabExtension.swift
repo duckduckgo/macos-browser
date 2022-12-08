@@ -41,10 +41,8 @@ extension HoveredLinkTabExtension: HoverUserScriptDelegate {
 }
 
 extension HoveredLinkTabExtension: TabExtension {
-    final class ResolvingHelper: TabExtensionResolvingHelper {
-        static func make(owner tab: Tab) -> HoveredLinkTabExtension {
-            HoveredLinkTabExtension(hoverUserScriptPublisher: tab.hoverUserScriptPublisher)
-        }
+    static func make(owner tab: Tab) -> HoveredLinkTabExtension {
+        HoveredLinkTabExtension(hoverUserScriptPublisher: tab.hoverUserScriptPublisher)
     }
 }
 

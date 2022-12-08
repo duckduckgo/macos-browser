@@ -75,10 +75,8 @@ extension TabExtensions {
 }
 
 extension FindInPageTabExtension: TabExtension {
-    final class ResolvingHelper: TabExtensionResolvingHelper {
-        static func make(owner tab: Tab) -> FindInPageTabExtension {
-            FindInPageTabExtension(findInPageScriptPublisher: tab.findInPageScriptPublisher)
-        }
+    static func make(owner tab: Tab) -> FindInPageTabExtension {
+        FindInPageTabExtension(findInPageScriptPublisher: tab.findInPageScriptPublisher)
     }
 }
 

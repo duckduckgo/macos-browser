@@ -1,5 +1,5 @@
 //
-//  ObjC.swift
+//  Extensions.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -18,12 +18,25 @@
 
 import Foundation
 
-func getClasses(conformingTo aProtocol: Protocol) -> [AnyClass] {
-    let expectedClassCount = objc_getClassList(nil, 0)
-    let allClasses = UnsafeMutablePointer<AnyClass>.allocate(capacity: Int(expectedClassCount))
-    let autoreleasingAllClasses = AutoreleasingUnsafeMutablePointer<AnyClass>(allClasses)
-    let count = Int(objc_getClassList(autoreleasingAllClasses, expectedClassCount))
-    return (0..<count).compactMap {
-        class_conformsToProtocol(allClasses[$0], aProtocol) ? allClasses[$0] : nil
+protocol Extension {}
+
+// Implement these methods for Extension State Restoration
+protocol NSCodingExtension: Extension {
+    func encode(using coder: NSCoder)
+    func awakeAfter(using decoder: NSCoder)
+}
+
+protocol Extensions: Sequence where Iterator == Dictionary<AnyKeyPath, ExtensionType>.Values.Iterator {
+
+    associatedtype ExtensionType
+
+    var extensions: [AnyKeyPath: ExtensionType] { get }
+}
+
+extension Extensions {
+
+    func makeIterator() -> Iterator {
+        self.extensions.values.makeIterator()
     }
+
 }
