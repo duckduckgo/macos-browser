@@ -181,7 +181,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
          interactionStateData: Data? = nil,
          parentTab: Tab? = nil,
          attributionState: AdClickAttributionLogic.State? = nil,
-         shouldLoadInBackground: Bool = false,
+         shouldLoadInBackground: Bool,
          canBeClosedWithBack: Bool = false,
          lastSelectedAt: Date? = nil,
          currentDownload: URL? = nil,
@@ -1012,7 +1012,7 @@ extension Tab: ContextMenuManagerDelegate {
             return
         }
 
-        let newTab = Tab(content: .url(url), parentTab: self)
+        let newTab = Tab(content: .url(url), parentTab: self, shouldLoadInBackground: true)
         self.delegate?.tab(self, createdChild: newTab, of: .tab(selected: true))
     }
 
@@ -1307,7 +1307,7 @@ extension Tab: WKNavigationDelegate {
                     onLinkRewrite: { [weak self] url, _ in
                         guard let self = self else { return }
                         if isRequestingNewTab || !navigationAction.isTargetingMainFrame {
-                            let tab = Tab(content: .url(url), parentTab: self)
+                            let tab = Tab(content: .url(url), parentTab: self, shouldLoadInBackground: true)
                             self.delegate?.tab(self, createdChild: tab, of: .tab(selected: shouldSelectNewTab || !navigationAction.isTargetingMainFrame))
                         } else {
                             webView.load(url)
@@ -1332,7 +1332,7 @@ extension Tab: WKNavigationDelegate {
             if let newRequest = referrerTrimming.trimReferrer(forNavigation: navigationAction,
                                                               originUrl: webView.url ?? navigationAction.sourceFrame.webView?.url) {
                 if isRequestingNewTab {
-                    let tab = Tab(content: newRequest.url.map { .contentFromURL($0) } ?? .none, parentTab: self)
+                    let tab = Tab(content: newRequest.url.map { .contentFromURL($0) } ?? .none, parentTab: self, shouldLoadInBackground: true)
                     self.delegate?.tab(self, createdChild: tab, of: .tab(selected: shouldSelectNewTab))
                 } else {
                     _ = webView.load(newRequest)
@@ -1374,7 +1374,7 @@ extension Tab: WKNavigationDelegate {
 
         if isRequestingNewTab {
             defer {
-                let tab = Tab(content: navigationAction.request.url.map { .contentFromURL($0) } ?? .none, parentTab: self)
+                let tab = Tab(content: navigationAction.request.url.map { .contentFromURL($0) } ?? .none, parentTab: self, shouldLoadInBackground: true)
                 delegate?.tab(self, createdChild: tab, of: .tab(selected: shouldSelectNewTab))
             }
             return .cancel
@@ -1745,7 +1745,7 @@ extension Tab: YoutubeOverlayUserScriptDelegate {
         let isRequestingNewTab = NSApp.isCommandPressed
         if isRequestingNewTab {
             let shouldSelectNewTab = NSApp.isShiftPressed
-            let tab = Tab(content: content, parentTab: self)
+            let tab = Tab(content: content, parentTab: self, shouldLoadInBackground: true)
             self.delegate?.tab(self, createdChild: tab, of: .tab(selected: shouldSelectNewTab))
         } else {
             setContent(content)

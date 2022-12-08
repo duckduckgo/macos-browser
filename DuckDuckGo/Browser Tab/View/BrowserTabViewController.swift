@@ -301,7 +301,8 @@ final class BrowserTabViewController: NSViewController {
         guard view.window?.isPopUpWindow == false else {
             // Prefer Tab's Parent
             if let parentTab = tabCollectionViewModel.selectedTabViewModel?.tab.parentTab, parentTab.delegate !== self {
-                parentTab.delegate?.tab(parentTab, createdChild: Tab(content: content, parentTab: parentTab), of: .tab(selected: true))
+                let tab = Tab(content: content, parentTab: parentTab, shouldLoadInBackground: true)
+                parentTab.delegate?.tab(parentTab, createdChild: tab, of: .tab(selected: true))
                 parentTab.webView.window?.makeKeyAndOrderFront(nil)
                 // Act as default URL Handler if no Parent
             } else {

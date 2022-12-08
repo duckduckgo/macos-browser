@@ -115,7 +115,7 @@ extension Tab: WKUIDelegate {
 
         guard let delegate else { return nil }
 
-        let tab = Tab(content: .none, webViewConfiguration: configuration, parentTab: self, webViewFrame: webView.superview?.bounds ?? .zero)
+        let tab = Tab(content: .none, webViewConfiguration: configuration, parentTab: self, shouldLoadInBackground: false, webViewFrame: webView.superview?.bounds ?? .zero)
         delegate.tab(self, createdChild: tab, of: kind)
 
         let webView = tab.webView

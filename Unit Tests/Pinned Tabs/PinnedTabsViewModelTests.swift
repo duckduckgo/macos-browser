@@ -19,6 +19,12 @@
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
+extension Tab {
+    convenience init(content: TabContent, parentTab: Tab? = nil) {
+        self.init(content: content, parentTab: parentTab, shouldLoadInBackground: false)
+    }
+}
+
 class PinnedTabsViewModelTests: XCTestCase {
 
     var model: PinnedTabsViewModel!
