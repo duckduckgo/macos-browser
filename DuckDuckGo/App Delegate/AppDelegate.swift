@@ -82,7 +82,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             ((NSClassFromString(className) as? NSObject.Type)!.init() as? T)!
         }
         AppPrivacyFeatures.shared = AppDelegate.isRunningTests
-            // runtime mock-replacement for Test Run, to be redone when we‘ll be doing Dependency Injection
+            // runtime mock-replacement for Unit Tests, to be redone when we‘ll be doing Dependency Injection
             ? AppPrivacyFeatures(contentBlocking: mock("ContentBlockingMock"), httpsUpgradeStore: mock("HTTPSUpgradeStoreMock"))
             : AppPrivacyFeatures(contentBlocking: AppContentBlocking(), httpsUpgradeStore: AppHTTPSUpgradeStore())
 #else

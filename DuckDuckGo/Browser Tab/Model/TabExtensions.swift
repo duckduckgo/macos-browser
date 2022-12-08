@@ -23,7 +23,6 @@ extension TabExtensions {
 
     // !!!!!
     // Add TabExtension-s for App builds here
-    // Extensions conforming to DynamicTabExtension will be resolved at runtime
     // Note: Tab Extensions with state restoration support should conform to NSCodingExtension
     // !!!!!
     static var tabExtensions: [(Tab) -> TabExtension] { [
@@ -43,8 +42,8 @@ extension TabExtensions {
 }
 
 /*
- Static TabExtension should implement the factory method for a Tab
- Don‘t make create a strong dependencies on a Tab for Tab Extensions to keep them testable
+ Static TabExtension should implement the `make` factory method for instantiation with a Tab owner
+ Avoid making strong dependencies on the Tab class for Tab Extensions to keep them testable
 
  e.g.:
  class MyExtension {
@@ -59,14 +58,15 @@ extension TabExtensions {
      MyExtension(dependencies: tab.dependencies)
    }
  }
-
 */
+
 protocol TabExtension {
     static func make(owner tab: Tab) -> Self
 }
 
-// TabExtensions are resoved dynamically in runtime
-// An extension should conform the TabExtension protocol
+// TabExtension-s are resoved dynamically in runtime
+// using TabExtension.tabExtensions or TabExtension.tabExtensionsInstantiatedForTests lists
+// An extension should conform to TabExtension protocol
 struct TabExtensions: Extensions, Sequence {
     typealias ExtensionType = TabExtension
     typealias Iterator = Dictionary<AnyKeyPath, ExtensionType>.Values.Iterator
@@ -98,8 +98,7 @@ struct TabExtensions: Extensions, Sequence {
         self.extensions = extensions
     }
 
-    /* Used for resolving an Extension object in an Extensions struct extension
-     e.g.:
+    /* Used for resolving a TabExtension object in the TabExtensions struct extension, e.g.:
 
      extension TabExtensions {
        var someTabExtension: MyTabExtension? {

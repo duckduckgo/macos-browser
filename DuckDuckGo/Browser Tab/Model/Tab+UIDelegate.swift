@@ -65,7 +65,7 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
                  completionHandler: @escaping (WKWebView?) -> Void) {
 
         let newWindowPolicy: NavigationDecision? = {
-            // Are we handling custom Context Menu actions (see ContextMenuManager?)
+            // Are we handling custom Context Menu navigation action? (see ContextMenuManager)
             if let newWindowPolicy = extensions.contextMenu?.decideNewWindowPolicy(for: navigationAction) {
                 return newWindowPolicy
             }

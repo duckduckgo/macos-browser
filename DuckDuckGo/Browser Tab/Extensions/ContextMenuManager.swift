@@ -445,7 +445,7 @@ extension Tab: ContextMenuManagerDelegate {
     }
 
     func prepareForContextMenuDownload() {
-        // handling legacy WebKit Downloads for downloads initiated by Context Menu
+        // handling legacy WebKit Downloads for downloads initiated by Context Menu, see ContextMenuManager
         self.webView.configuration.processPool
             .setDownloadDelegateIfNeeded(using: LegacyWebKitDownloadDelegate.init)
     }
