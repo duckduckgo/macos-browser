@@ -39,17 +39,15 @@ protocol AdClickAttributionDependencies {
 
 }
 
-protocol UserContentControllerProtocol {
+protocol UserContentControllerProtocol: AnyObject {
     func enableGlobalContentRuleList(withIdentifier identifier: String) throws
     func disableGlobalContentRuleList(withIdentifier identifier: String) throws
     func removeLocalContentRuleList(withIdentifier identifier: String)
     func installLocalContentRuleList(_ ruleList: WKContentRuleList, identifier: String)
 }
-protocol UserContentControllerProvider: AnyObject {
-    var anyUserContentController: UserContentControllerProtocol? { get }
-}
+typealias UserContentControllerProvider = () -> UserContentControllerProtocol?
 
-final class AdClickAttributionTabExtension {
+final class AdClickAttributionTabExtension: TabExtension {
 
     private static func makeAdClickAttributionDetection(with dependencies: some AdClickAttributionDependencies) -> AdClickAttributionDetection {
         return AdClickAttributionDetection(feature: dependencies.adClickAttribution,
@@ -71,7 +69,7 @@ final class AdClickAttributionTabExtension {
 
     private let dependencies: any AdClickAttributionDependencies
 
-    private weak var userContentControllerProvider: UserContentControllerProvider?
+    private let userContentControllerProvider: UserContentControllerProvider
     private weak var contentBlockerRulesScript: ContentBlockerRulesUserScript?
     private var cancellables = Set<AnyCancellable>()
 
@@ -83,7 +81,7 @@ final class AdClickAttributionTabExtension {
     }
 
     init(inheritedAttribution: AdClickAttributionLogic.State?,
-         userContentControllerProvider: some UserContentControllerProvider,
+         userContentControllerProvider: @escaping UserContentControllerProvider,
          contentBlockerRulesScriptPublisher: some Publisher<ContentBlockerRulesUserScript?, Never>,
          privacyInfoPublisher: some Publisher<PrivacyInfo?, Never>,
          dependencies: some AdClickAttributionDependencies) {
@@ -131,7 +129,9 @@ extension AdClickAttributionTabExtension: AdClickAttributionLogicDelegate {
     func attributionLogic(_ logic: AdClickAttributionLogic,
                           didRequestRuleApplication rules: ContentBlockerRulesManager.Rules?,
                           forVendor vendor: String?) {
-        guard let userContentController = userContentControllerProvider?.anyUserContentController, let contentBlockerRulesScript else {
+        guard let userContentController = userContentControllerProvider(),
+              let contentBlockerRulesScript
+        else {
             assertionFailure("UserScripts not loaded")
             return
         }
@@ -168,37 +168,22 @@ extension AdClickAttributionTabExtension: AdClickAttributionLogicDelegate {
 
 }
 
-extension AdClickAttributionTabExtension: TabExtension {
-    static func make(owner tab: Tab) -> AdClickAttributionTabExtension {
-        AdClickAttributionTabExtension(inheritedAttribution: tab.inheritedAttribution,
-                                       userContentControllerProvider: tab,
-                                       contentBlockerRulesScriptPublisher: tab.contentBlockerRulesScriptPublisher,
-                                       privacyInfoPublisher: tab.$privacyInfo,
-                                       dependencies: (tab.contentBlocking as? AppContentBlocking)!)
-    }
+extension AppContentBlocking: AdClickAttributionDependencies {}
+
+protocol AdClickAttributionProtocol {
+    var detection: AdClickAttributionDetection! { get }
+    var logic: AdClickAttributionLogic! { get }
+}
+
+extension AdClickAttributionTabExtension: AdClickAttributionProtocol {
+    func getPublicProtocol() -> AdClickAttributionProtocol { self }
 }
 
 extension TabExtensions {
-    var adClickAttribution: AdClickAttributionTabExtension? {
-        resolve()
+    var adClickAttribution: AdClickAttributionProtocol? {
+        resolve(AdClickAttributionTabExtension.self)
     }
 }
 
-extension AppContentBlocking: AdClickAttributionDependencies {}
-
-private extension Tab {
-    var inheritedAttribution: AdClickAttributionLogic.State? {
-        self.parentTab?.extensions.adClickAttribution?.currentAttributionState
-    }
-}
-
-extension Tab: UserContentControllerProvider {
-    var anyUserContentController: UserContentControllerProtocol? { userContentController }
-}
 extension UserContentController: UserContentControllerProtocol {}
 
-private extension Tab {
-    var contentBlockerRulesScriptPublisher: some Publisher<BrowserServicesKit.ContentBlockerRulesUserScript?, Never> {
-        userScriptsPublisher.compactMap { $0?.contentBlockerRulesScript }
-    }
-}

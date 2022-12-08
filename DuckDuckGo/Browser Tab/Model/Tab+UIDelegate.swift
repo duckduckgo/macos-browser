@@ -20,7 +20,18 @@ import Combine
 import Foundation
 import WebKit
 
+
+protocol TabDelegateProvider {
+    var delegate: TabDelegate? { get }
+}
+private protocol TabProtocol {
+    associatedtype T: TabDelegateProvider
+}
 extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
+
+    private var delegate: TabDelegate? {
+        self.value(forKeyPath: Tab.objcDelegateKeyPath) as? TabDelegate
+    }
 
     @objc(_webView:saveDataToFile:suggestedFilename:mimeType:originatingURL:)
     func webView(_ webView: WKWebView, saveDataToFile data: Data, suggestedFilename: String, mimeType: String, originatingURL: URL) {
@@ -66,7 +77,7 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
 
         let newWindowPolicy: NavigationDecision? = {
             // Are we handling custom Context Menu navigation action? (see ContextMenuManager)
-            if let newWindowPolicy = extensions.contextMenu?.decideNewWindowPolicy(for: navigationAction) {
+            if let newWindowPolicy = self.contextMenuManager?.decideNewWindowPolicy(for: navigationAction) {
                 return newWindowPolicy
             }
             

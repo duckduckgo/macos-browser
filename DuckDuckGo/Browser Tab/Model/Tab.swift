@@ -44,6 +44,7 @@ protocol TabDelegate: ContentOverlayUserScriptDelegate {
 }
 
 // swiftlint:disable type_body_length
+@dynamicMemberLookup
 final class Tab: NSObject, Identifiable, ObservableObject {
 
     enum TabContent: Equatable {
@@ -145,12 +146,19 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             }
         }
     }
-
-    weak var delegate: TabDelegate? {
-        didSet {
-            userScripts?.autofillScript.currentOverlayTab = delegate
-        }
+    struct ExtensionDependencies: TabExtensionDependencies {
+        var userScriptsPublisher: AnyPublisher<UserScripts?, Never>
+        var contentBlocking: ContentBlockingProtocol
+        var adClickAttributionDependencies: AdClickAttributionDependencies
+        var privacyInfoPublisher: AnyPublisher<PrivacyDashboard.PrivacyInfo?, Never>
+        var inheritedAttribution: BrowserServicesKit.AdClickAttributionLogic.State?
+        var userContentControllerProvider: UserContentControllerProvider
     }
+
+    private weak var delegate: TabDelegate?
+    @objc private var objc_delegate: Any? { delegate }
+    static var objcDelegateKeyPath: String { #keyPath(objc_delegate) }
+    func setDelegate(_ delegate: TabDelegate) { self.delegate = delegate }
 
     private let cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter?
     let pinnedTabsManager: PinnedTabsManager
@@ -159,27 +167,14 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     var contentBlocking: AnyContentBlocking { privacyFeatures.contentBlocking }
 
     private let webViewConfiguration: WKWebViewConfiguration
-    private(set) lazy var extensions = TabExtensions(self)
+
+    private var extensions: TabExtensions
+    subscript<Extension>(dynamicMember keyPath: KeyPath<TabExtensions, Extension?>) -> Extension? {
+        self.extensions[keyPath: keyPath]
+    }
 
     @Published
     private(set) var userContentController: UserContentController?
-
-    var userScripts: UserScripts? {
-        userContentController?.contentBlockingAssets?.userScripts as? UserScripts
-    }
-
-    var userScriptsPublisher: AnyPublisher<UserScripts?, Never> {
-        $userContentController
-            .compactMap { $0?.$contentBlockingAssets }
-            .switchToLatest()
-            .map { $0?.userScripts as? UserScripts }
-            .eraseToAnyPublisher()
-    }
-
-    private lazy var clicksSubject = PassthroughSubject<NSPoint, Never>()
-    var clicksPublisher: AnyPublisher<NSPoint, Never> {
-        clicksSubject.eraseToAnyPublisher()
-    }
 
     convenience init(content: TabContent,
                      faviconManagement: FaviconManagement = FaviconManager.shared,
@@ -281,7 +276,21 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         webView.allowsLinkPreview = false
         permissions = PermissionModel()
 
+        let userScripts = _userContentController.projectedValue
+            .compactMap { $0?.$contentBlockingAssets }
+            .switchToLatest()
+            .map { $0?.userScripts as? UserScripts }
+            .eraseToAnyPublisher()
+
+        var userContentControllerProvider: UserContentControllerProvider?
+        self.extensions = .builder().make(with: ExtensionDependencies(userScriptsPublisher: userScripts,
+                                                                      contentBlocking: privacyFeatures.contentBlocking,
+                                                                      adClickAttributionDependencies: privacyFeatures.contentBlocking,
+                                                                      privacyInfoPublisher: _privacyInfo.projectedValue.eraseToAnyPublisher(),
+                                                                      userContentControllerProvider: {  userContentControllerProvider?() }))
+
         super.init()
+        userContentControllerProvider = { [weak self] in self?.userContentController }
 
         userContentController?.delegate = self
         setupWebView(shouldLoadInBackground: shouldLoadInBackground)
@@ -294,6 +303,28 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                                                selector: #selector(onDuckDuckGoEmailSignOut),
                                                name: .emailDidSignOut,
                                                object: nil)
+    }
+
+    override func awakeAfter(using decoder: NSCoder) -> Any? {
+        for tabExtension in self.extensions {
+            (tabExtension as? (any NSCodingExtension))?.awakeAfter(using: decoder)
+        }
+        return self
+    }
+
+    func encodeExtensions(with coder: NSCoder) {
+        for tabExtension in self.extensions {
+            (tabExtension as? (any NSCodingExtension))?.encode(using: coder)
+        }
+    }
+
+    func openChild(with content: TabContent, of kind: NewWindowPolicy) {
+        guard let delegate else {
+            assertionFailure("no delegate set")
+            return
+        }
+        let tab = Tab(content: content, parentTab: self, shouldLoadInBackground: true)
+        delegate.tab(self, createdChild: tab, of: kind)
     }
 
     @objc func onDuckDuckGoEmailSignOut(_ notification: Notification) {
@@ -754,7 +785,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     private func setupWebView(shouldLoadInBackground: Bool) {
         webView.navigationDelegate = self
         webView.uiDelegate = self
-        webView.contextMenuDelegate = extensions.contextMenu
+        webView.contextMenuDelegate = self.contextMenuManager
         webView.allowsBackForwardNavigationGestures = true
         webView.allowsMagnification = true
 
@@ -978,14 +1009,6 @@ extension Tab: UserContentControllerDelegate {
 
 }
 
-extension Tab: BrowserTabViewControllerClickDelegate {
-
-    func browserTabViewController(_ browserTabViewController: BrowserTabViewController, didClickAtPoint point: NSPoint) {
-        clicksSubject.send(point)
-    }
-
-}
-
 extension Tab: PageObserverUserScriptDelegate {
 
     func pageDOMLoaded() {
@@ -1164,8 +1187,7 @@ extension Tab: WKNavigationDelegate {
                     onLinkRewrite: { [weak self] url in
                         guard let self = self else { return }
                         if isRequestingNewTab || !navigationAction.isTargetingMainFrame {
-                            let tab = Tab(content: .url(url), parentTab: self)
-                            self.delegate?.tab(self, createdChild: tab, of: .tab(selected: shouldSelectNewTab || !navigationAction.isTargetingMainFrame))
+                            self.openChild(with: .url(url), of: .tab(selected: shouldSelectNewTab || !navigationAction.isTargetingMainFrame))
                         } else {
                             webView.load(url)
                         }
@@ -1189,8 +1211,7 @@ extension Tab: WKNavigationDelegate {
             if let newRequest = referrerTrimming.trimReferrer(forNavigation: navigationAction,
                                                               originUrl: webView.url ?? navigationAction.sourceFrame.webView?.url) {
                 if isRequestingNewTab {
-                    let tab = Tab(content: newRequest.url.map { .contentFromURL($0) } ?? .none, parentTab: self)
-                    self.delegate?.tab(self, createdChild: tab, of: .tab(selected: shouldSelectNewTab))
+                    self.openChild(with: newRequest.url.map { .contentFromURL($0) } ?? .none, of: .tab(selected: shouldSelectNewTab))
                 } else {
                     _ = webView.load(newRequest)
                 }
@@ -1231,8 +1252,7 @@ extension Tab: WKNavigationDelegate {
 
         if isRequestingNewTab {
             defer {
-                let tab = Tab(content: navigationAction.request.url.map { .contentFromURL($0) } ?? .none, parentTab: self)
-                delegate?.tab(self, createdChild: tab, of: .tab(selected: shouldSelectNewTab))
+                self.openChild(with: navigationAction.request.url.map { .contentFromURL($0) } ?? .none, of: .tab(selected: shouldSelectNewTab))
             }
             return .cancel
         } else if isLinkActivated && NSApp.isOptionPressed && !NSApp.isCommandPressed {
@@ -1415,7 +1435,7 @@ extension Tab: WKNavigationDelegate {
         linkProtection.cancelOngoingExtraction()
         linkProtection.setMainFrameUrl(webView.url)
         referrerTrimming.onBeginNavigation(to: webView.url)
-        extensions.adClickAttribution?.detection.onStartNavigation(url: webView.url)
+        self.adClickAttribution?.detection.onStartNavigation(url: webView.url)
     }
 
     @MainActor
@@ -1426,8 +1446,8 @@ extension Tab: WKNavigationDelegate {
         if isAMPProtectionExtracting { isAMPProtectionExtracting = false }
         linkProtection.setMainFrameUrl(nil)
         referrerTrimming.onFinishNavigation()
-        extensions.adClickAttribution?.detection.onDidFinishNavigation(url: webView.url)
-        extensions.adClickAttribution?.logic.onDidFinishNavigation(host: webView.url?.host)
+        self.adClickAttribution?.detection.onDidFinishNavigation(url: webView.url)
+        self.adClickAttribution?.logic.onDidFinishNavigation(host: webView.url?.host)
     }
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
@@ -1439,7 +1459,7 @@ extension Tab: WKNavigationDelegate {
         invalidateSessionStateData()
         linkProtection.setMainFrameUrl(nil)
         referrerTrimming.onFailedNavigation()
-        extensions.adClickAttribution?.detection.onDidFailNavigation()
+        self.adClickAttribution?.detection.onDidFailNavigation()
         webViewDidFailNavigationPublisher.send()
     }
 
@@ -1456,7 +1476,7 @@ extension Tab: WKNavigationDelegate {
         isBeingRedirected = false
         linkProtection.setMainFrameUrl(nil)
         referrerTrimming.onFailedNavigation()
-        extensions.adClickAttribution?.detection.onDidFailNavigation()
+        self.adClickAttribution?.detection.onDidFailNavigation()
         webViewDidFailNavigationPublisher.send()
     }
 
@@ -1525,7 +1545,7 @@ extension Tab: WKNavigationDelegate {
     @objc(_webView:contextMenuDidCreateDownload:)
     func webView(_ webView: WKWebView, contextMenuDidCreate download: WebKitDownload) {
         let location: FileDownloadManager.DownloadLocationPreference
-            = extensions.contextMenu?.shouldAskForDownloadLocation() == false ? .auto : .prompt
+            = self.contextMenuManager?.shouldAskForDownloadLocation() == false ? .auto : .prompt
         FileDownloadManager.shared.add(download, delegate: self, location: location, postflight: .none)
     }
 
@@ -1575,8 +1595,7 @@ extension Tab: YoutubeOverlayUserScriptDelegate {
         let isRequestingNewTab = NSApp.isCommandPressed
         if isRequestingNewTab {
             let shouldSelectNewTab = NSApp.isShiftPressed
-            let tab = Tab(content: content, parentTab: self)
-            self.delegate?.tab(self, createdChild: tab, of: .tab(selected: shouldSelectNewTab))
+            self.openChild(with: content, of: .tab(selected: shouldSelectNewTab))
         } else {
             setContent(content)
         }

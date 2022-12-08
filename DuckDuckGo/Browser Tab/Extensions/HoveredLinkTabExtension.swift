@@ -19,7 +19,7 @@
 import Combine
 import Foundation
 
-final class HoveredLinkTabExtension {
+final class HoveredLinkTabExtension: TabExtension {
 
     private var cancellable: AnyCancellable?
     fileprivate var hoveredLinkSubject = PassthroughSubject<URL?, Never>()
@@ -33,39 +33,31 @@ final class HoveredLinkTabExtension {
 }
 
 extension HoveredLinkTabExtension: HoverUserScriptDelegate {
-
     func hoverUserScript(_ script: HoverUserScript, didChange url: URL?) {
         hoveredLinkSubject.send(url)
     }
-
 }
 
-extension HoveredLinkTabExtension: TabExtension {
-    static func make(owner tab: Tab) -> HoveredLinkTabExtension {
-        HoveredLinkTabExtension(hoverUserScriptPublisher: tab.hoverUserScriptPublisher)
+protocol HoveredLinksProtocol {
+    var hoveredLinkPublisher: AnyPublisher<URL?, Never> { get }
+}
+
+extension HoveredLinkTabExtension: HoveredLinksProtocol {
+    func getPublicProtocol() -> HoveredLinksProtocol { self }
+    
+    var hoveredLinkPublisher: AnyPublisher<URL?, Never> {
+        hoveredLinkSubject.eraseToAnyPublisher()
+    }
+}
+
+extension TabExtensions {
+    var hoveredLinks: HoveredLinksProtocol? {
+        resolve(HoveredLinkTabExtension.self)
     }
 }
 
 extension Tab {
-
     var hoveredLinkPublisher: AnyPublisher<URL?, Never> {
-        extensions.hoveredLinks?.hoveredLinkSubject.eraseToAnyPublisher() ?? Just(nil).eraseToAnyPublisher()
+        self.hoveredLinks?.hoveredLinkPublisher ?? Just(nil).eraseToAnyPublisher()
     }
-
-}
-
-extension TabExtensions {
-
-    var hoveredLinks: HoveredLinkTabExtension? {
-        resolve()
-    }
-
-}
-
-private extension Tab {
-
-    var hoverUserScriptPublisher: some Publisher<HoverUserScript?, Never> {
-        userScriptsPublisher.compactMap { $0?.hoverUserScript }
-    }
-    
 }

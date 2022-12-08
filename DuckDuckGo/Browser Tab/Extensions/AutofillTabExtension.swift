@@ -20,7 +20,7 @@ import BrowserServicesKit
 import Combine
 import Foundation
 
-final class AutofillTabExtension {
+final class AutofillTabExtension: TabExtension {
 
     static var emailManagerProvider: (EmailManagerRequestDelegate) -> AutofillEmailDelegate = { delegate in
         let emailManager = EmailManager()
@@ -35,35 +35,38 @@ final class AutofillTabExtension {
     }
 
     private weak var delegate: ContentOverlayUserScriptDelegate?
-    private var cancellables = Set<AnyCancellable>()
 
-    private weak var autofillScript: WebsiteAutofillUserScript?
+    func setDelegate(_ delegate: ContentOverlayUserScriptDelegate?) {
+        self.delegate = delegate
+        autofillScript?.currentOverlayTab = delegate
+    }
+
+    private var autofillUserScriptCancellable: AnyCancellable?
+
+    private weak var autofillScript: WebsiteAutofillUserScript? {
+        didSet {
+            autofillScript?.currentOverlayTab = self.delegate
+        }
+    }
     private var emailManager: AutofillEmailDelegate?
     private var vaultManager: AutofillSecureVaultDelegate?
 
     @Published var autofillDataToSave: AutofillData?
 
-    init(autofillUserScriptPublisher: AnyPublisher<WebsiteAutofillUserScript?, Never>,
-         clicksPublisher: AnyPublisher<NSPoint, Never>,
-         contentOverlayUserScriptDelegate: ContentOverlayUserScriptDelegate?) {
-
-        assert(contentOverlayUserScriptDelegate != nil)
-        delegate = contentOverlayUserScriptDelegate
-
-        autofillUserScriptPublisher.sink { [weak self] autofillScript in
+    init(autofillUserScriptPublisher: some Publisher<WebsiteAutofillUserScript?, Never>) {
+        autofillUserScriptCancellable = autofillUserScriptPublisher.sink { [weak self] autofillScript in
             guard let self, let autofillScript else { return }
 
             self.autofillScript = autofillScript
-            autofillScript.currentOverlayTab = self.delegate
             self.emailManager = Self.emailManagerProvider(self)
             autofillScript.emailDelegate = self.emailManager
             self.vaultManager = Self.vaultManagerProvider(self)
             autofillScript.vaultDelegate = self.vaultManager
-        }.store(in: &cancellables)
+        }
+    }
 
-        clicksPublisher.sink { [weak self] point in
-            self?.autofillScript?.clickPoint = point
-        }.store(in: &cancellables)
+    func didClick(at point: CGPoint) {
+        autofillScript?.clickPoint = point
     }
 
 }
@@ -122,44 +125,38 @@ extension AutofillType {
 
 extension AutofillTabExtension: EmailManagerRequestDelegate { }
 
-extension AutofillTabExtension: TabExtension {
-    static func make(owner tab: Tab) -> AutofillTabExtension {
-        AutofillTabExtension(autofillUserScriptPublisher: tab.autofillUserScriptPublisher,
-                             clicksPublisher: tab.clicksPublisher,
-                             contentOverlayUserScriptDelegate: tab)
-    }
+
+protocol AutofillProtocol {
+    func setDelegate(_: ContentOverlayUserScriptDelegate?)
+    func didClick(at point: CGPoint)
+
+    var autofillDataToSavePublisher: AnyPublisher<AutofillData?, Never> { get }
+    func resetAutofillData()
 }
 
 extension TabExtensions {
-    var autofill: AutofillTabExtension? { resolve() }
+    var autofill: AutofillProtocol? { resolve(AutofillTabExtension.self) }
+}
+
+extension AutofillTabExtension: AutofillProtocol {
+    func getPublicProtocol() -> AutofillProtocol { self }
+
+    var autofillDataToSavePublisher: AnyPublisher<AutofillData?, Never> {
+        self.$autofillDataToSave.eraseToAnyPublisher()
+    }
+    func resetAutofillData() {
+        self.autofillDataToSave = nil
+    }
 }
 
 extension Tab {
 
     var autofillDataToSavePublisher: AnyPublisher<AutofillData?, Never> {
-        extensions.autofill?.$autofillDataToSave.eraseToAnyPublisher() ?? Just(nil).eraseToAnyPublisher()
+        self.autofill?.autofillDataToSavePublisher.eraseToAnyPublisher() ?? Just(nil).eraseToAnyPublisher()
     }
 
     func resetAutofillData() {
-        extensions.autofill?.autofillDataToSave = nil
-    }
-
-}
-
-private extension Tab {
-    var autofillUserScriptPublisher: AnyPublisher<WebsiteAutofillUserScript?, Never> {
-        userScriptsPublisher.compactMap { $0?.autofillScript }.eraseToAnyPublisher()
-    }
-}
-
-extension Tab: ContentOverlayUserScriptDelegate {
-
-    func websiteAutofillUserScriptCloseOverlay(_ websiteAutofillUserScript: WebsiteAutofillUserScript?) {
-        self.delegate?.websiteAutofillUserScriptCloseOverlay(websiteAutofillUserScript)
-    }
-
-    func websiteAutofillUserScript(_ websiteAutofillUserScript: WebsiteAutofillUserScript, willDisplayOverlayAtClick point: CGPoint?, serializedInputContext: String, inputPosition: CGRect) {
-        self.delegate?.websiteAutofillUserScript(websiteAutofillUserScript, willDisplayOverlayAtClick: point, serializedInputContext: serializedInputContext, inputPosition: inputPosition)
+        self.autofill?.resetAutofillData()
     }
 
 }

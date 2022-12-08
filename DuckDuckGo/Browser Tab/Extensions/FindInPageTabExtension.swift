@@ -19,71 +19,53 @@
 import Combine
 import Foundation
 
-final class FindInPageTabExtension {
+final class FindInPageTabExtension: TabExtension {
 
-    private var userScriptCancellable: AnyCancellable?
+    let model: FindInPageModel
+    private let userScriptCancellable: AnyCancellable?
 
-    fileprivate var model: FindInPageModel? {
-        didSet {
-            attachFindInPage()
-        }
-    }
-    private weak var findInPageScript: FindInPageUserScript? {
-        didSet {
-            attachFindInPage()
-        }
-    }
+    var isVisible: Bool = false
 
     init(findInPageScriptPublisher: some Publisher<FindInPageUserScript?, Never>) {
-        userScriptCancellable = findInPageScriptPublisher.sink { [weak self] findInPageScript in
-            self?.findInPageScript = findInPageScript
+        model = FindInPageModel()
+        userScriptCancellable = findInPageScriptPublisher.sink { [weak model] findInPageScript in
+            findInPageScript?.model = model
         }
     }
 
-    private func attachFindInPage() {
-        findInPageScript?.model = model
+    func show(with webView: WKWebView) {
+        model.show(with: webView)
     }
 
-}
-
-extension Tab {
-
-    func openFindInPage(with model: FindInPageModel) {
-        extensions.findInPage?.model = model
-    }
-
-    func findDone() {
-        extensions.findInPage?.model?.findDone()
+    func close() {
+        guard model.isVisible else { return }
+        model.findDone()
+        model.close()
     }
 
     func findNext() {
-        extensions.findInPage?.model?.findNext()
+        model.findNext()
     }
 
     func findPrevious() {
-        extensions.findInPage?.model?.findPrevious()
+        model.findPrevious()
     }
 
+}
+
+protocol FindInPageProtocol {
+    var model: FindInPageModel { get }
+    func show(with webView: WKWebView)
+    func close()
+    func findNext()
+    func findPrevious()
+}
+extension FindInPageTabExtension: FindInPageProtocol {
+    func getPublicProtocol() -> FindInPageProtocol{ self }
 }
 
 extension TabExtensions {
-
-    var findInPage: FindInPageTabExtension? {
-        resolve()
+    var findInPage: FindInPageProtocol? {
+        resolve(FindInPageTabExtension.self)
     }
-
-}
-
-extension FindInPageTabExtension: TabExtension {
-    static func make(owner tab: Tab) -> FindInPageTabExtension {
-        FindInPageTabExtension(findInPageScriptPublisher: tab.findInPageScriptPublisher)
-    }
-}
-
-private extension Tab {
-
-    var findInPageScriptPublisher: some Publisher<FindInPageUserScript?, Never> {
-        userScriptsPublisher.compactMap { $0?.findInPageScript }
-    }
-
 }

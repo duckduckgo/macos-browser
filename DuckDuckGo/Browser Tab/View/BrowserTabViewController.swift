@@ -23,10 +23,6 @@ import Combine
 import SwiftUI
 import BrowserServicesKit
 
-protocol BrowserTabViewControllerClickDelegate: AnyObject {
-    func browserTabViewController(_ browserTabViewController: BrowserTabViewController, didClickAtPoint: CGPoint)
-}
-
 final class BrowserTabViewController: NSViewController {
 
     @IBOutlet weak var errorView: NSView!
@@ -140,21 +136,23 @@ final class BrowserTabViewController: NSViewController {
 
     private func subscribeToTabs() {
         tabCollectionViewModel.tabCollection.$tabs
-            .sink { [weak self] tabs in
-                for tab in tabs where tab.delegate !== self {
-                    tab.delegate = self
-                }
-            }
+            .sink(receiveValue: setDelegate())
             .store(in: &cancellables)
     }
 
     private func subscribeToPinnedTabs() {
         pinnedTabsDelegatesCancellable = tabCollectionViewModel.pinnedTabsCollection?.$tabs
-            .sink { [weak self] tabs in
-                for tab in tabs where tab.delegate !== self {
-                    tab.delegate = self
-                }
+            .sink(receiveValue: setDelegate())
+    }
+
+    private func setDelegate() -> ([Tab]) -> Void {
+        { [weak self] (tabs: [Tab]) in
+            guard let self else { return }
+            for tab in tabs {
+                tab.setDelegate(self)
+                tab.autofill?.setDelegate(self)
             }
+        }
     }
 
     private func removeWebViewFromHierarchy(webView: WebView? = nil,
@@ -308,8 +306,8 @@ final class BrowserTabViewController: NSViewController {
         // shouldn't open New Tabs in PopUp window
         guard view.window?.isPopUpWindow == false else {
             // Prefer Tab's Parent
-            if let parentTab = tabCollectionViewModel.selectedTabViewModel?.tab.parentTab, parentTab.delegate !== self {
-                parentTab.delegate?.tab(parentTab, createdChild: Tab(content: content, parentTab: parentTab), of: .tab(selected: true))
+            if let parentTab = tabCollectionViewModel.selectedTabViewModel?.tab.parentTab {
+                parentTab.openChild(with: content, of: .tab(selected: true))
                 parentTab.webView.window?.makeKeyAndOrderFront(nil)
                 // Act as default URL Handler if no Parent
             } else {
@@ -890,7 +888,7 @@ extension BrowserTabViewController {
 
     func mouseDown(with event: NSEvent) -> NSEvent? {
         guard event.window === self.view.window else { return event }
-        tabViewModel?.tab.browserTabViewController(self, didClickAtPoint: event.locationInWindow)
+        tabViewModel?.tab.autofill?.didClick(at: event.locationInWindow)
         return event
     }
 }

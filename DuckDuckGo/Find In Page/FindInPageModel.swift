@@ -21,23 +21,25 @@ import WebKit
 
 final class FindInPageModel {
 
-    weak var webView: WKWebView?
     @Published private(set) var text: String = ""
     @Published private(set) var currentSelection: Int = 1
     @Published private(set) var matchesFound: Int = 0
-    @Published private(set) var visible: Bool = false
+    @Published private(set) var isVisible: Bool = false
+
+    weak var webView: WKWebView?
 
     func update(currentSelection: Int?, matchesFound: Int?) {
         self.currentSelection = currentSelection ?? self.currentSelection
         self.matchesFound = matchesFound ?? self.matchesFound
     }
 
-    func show() {
-        visible = true
+    func show(with webView: WKWebView) {
+        self.webView = webView
+        isVisible = true
     }
 
-    func hide() {
-        visible = false
+    func close() {
+        isVisible = false
     }
 
     func find(_ text: String) {

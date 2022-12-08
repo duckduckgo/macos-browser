@@ -74,7 +74,7 @@ final class TabViewModel {
 
     @Published private(set) var title: String = UserText.tabHomeTitle
     @Published private(set) var favicon: NSImage?
-    @Published private(set) var findInPage: FindInPageModel = FindInPageModel()
+    var findInPage: FindInPageModel? { tab.findInPage?.model }
 
     @Published private(set) var usedPermissions = Permissions()
     @Published private(set) var permissionAuthorizationQuery: PermissionAuthorizationQuery?
@@ -84,7 +84,6 @@ final class TabViewModel {
         self.appearancePreferences = appearancePreferences
 
         webViewStateObserver = WebViewStateObserver(webView: tab.webView, tabViewModel: self)
-        self.findInPage.webView = tab.webView
 
         subscribeToUrl()
         subscribeToTitle()
@@ -307,23 +306,20 @@ final class TabViewModel {
 
 extension TabViewModel {
 
-    func startFindInPage() {
-        tab.openFindInPage(with: findInPage)
-        findInPage.show()
+    func showFindInPage() {
+        tab.findInPage?.show(with: tab.webView)
     }
 
     func closeFindInPage() {
-        guard findInPage.visible else { return }
-        tab.findDone()
-        findInPage.hide()
+        tab.findInPage?.close()
     }
 
     func findInPageNext() {
-        tab.findNext()
+        tab.findInPage?.findNext()
     }
 
     func findInPagePrevious() {
-        tab.findPrevious()
+        tab.findInPage?.findPrevious()
     }
 
 }

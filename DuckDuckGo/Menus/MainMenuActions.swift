@@ -523,7 +523,7 @@ extension MainViewController {
     // MARK: - Edit
 
     @IBAction func findInPage(_ sender: Any?) {
-        tabCollectionViewModel.selectedTabViewModel?.startFindInPage()
+        tabCollectionViewModel.selectedTabViewModel?.showFindInPage()
     }
 
     @IBAction func findInPageNext(_ sender: Any?) {

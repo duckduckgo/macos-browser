@@ -62,9 +62,7 @@ extension Tab: NSSecureCoding {
                   lastSelectedAt: decoder.decodeIfPresent(at: NSSecureCodingKeys.lastSelectedAt),
                   currentDownload: currentDownload)
 
-        for tabExtension in self.extensions {
-            (tabExtension as? (any NSCodingExtension))?.awakeAfter(using: decoder)
-        }
+        _=self.awakeAfter(using: decoder)
     }
 
     func encode(with coder: NSCoder) {
@@ -93,9 +91,7 @@ extension Tab: NSSecureCoding {
             coder.encode(pane.rawValue, forKey: NSSecureCodingKeys.preferencePane)
         }
 
-        for tabExtension in self.extensions {
-            (tabExtension as? (any NSCodingExtension))?.encode(using: coder)
-        }
+        self.encodeExtensions(with: coder)
     }
 
 }

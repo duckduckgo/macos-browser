@@ -274,10 +274,13 @@ final class MainViewController: NSViewController {
     }
 
     private func subscribeToFindInPage() {
-        let model = tabCollectionViewModel.selectedTabViewModel?.findInPage
-        model?.$visible.receive(on: DispatchQueue.main).sink { [weak self] _ in
-            self?.updateFindInPage()
-        }.store(in: &self.navigationalCancellables)
+        tabCollectionViewModel.selectedTabViewModel?.findInPage?
+            .$isVisible
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.updateFindInPage()
+            }
+            .store(in: &self.navigationalCancellables)
     }
 
     private func subscribeToCanGoBackForward() {
@@ -296,16 +299,15 @@ final class MainViewController: NSViewController {
     }
 
     private func updateFindInPage() {
-
         guard let model = tabCollectionViewModel.selectedTabViewModel?.findInPage else {
             findInPageViewController?.makeMeFirstResponder()
             os_log("MainViewController: Failed to get find in page model", type: .error)
             return
         }
 
-        findInPageContainerView.isHidden = !model.visible
+        findInPageContainerView.isHidden = !model.isVisible
         findInPageViewController?.model = model
-        if model.visible {
+        if model.isVisible {
             findInPageViewController?.makeMeFirstResponder()
         }
     }
