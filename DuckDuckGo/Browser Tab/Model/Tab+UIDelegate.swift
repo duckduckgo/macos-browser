@@ -102,7 +102,7 @@ extension Tab: WKUIDelegate {
                 completionHandler(nil)
                 return
             }
-            let webView = self.createWebView(from: webView, with: configuration, for: navigationAction, of: NewWindowPolicy(windowFeatures))
+            let webView = self.createWebView(from: webView, with: configuration, for: navigationAction, of: .popup(size: windowFeatures.windowContentSize))
 
             self.permissions.permissions.popups
                 .popupOpened(nextQuery: self.permissions.authorizationQueries.first(where: { $0.permissions.contains(.popups) }))
@@ -115,7 +115,7 @@ extension Tab: WKUIDelegate {
 
         guard let delegate else { return nil }
 
-        let tab = Tab(content: .none, webViewConfiguration: configuration, parentTab: self, webViewFrame: webView.frame)
+        let tab = Tab(content: .none, webViewConfiguration: configuration, parentTab: self, webViewFrame: webView.superview?.bounds ?? .zero)
         delegate.tab(self, createdChild: tab, of: kind)
 
         let webView = tab.webView
