@@ -238,11 +238,6 @@ extension URL {
         return filename
     }
 
-    public func isPart(ofDomain domain: String) -> Bool {
-        guard let host = host else { return false }
-        return host == domain || host.hasSuffix(".\(domain)")
-    }
-
     // MARK: - Validity
 
     var isDataURL: Bool {
@@ -366,31 +361,4 @@ extension URL {
         }
 
     }
-
-    // MARK: - GPC
-
-    static func gpcHeadersEnabled(config: PrivacyConfiguration) -> [String] {
-        let settings = config.settings(for: .gpc)
-
-        guard let enabledSites = settings["gpcHeaderEnabledSites"] as? [String] else {
-            return []
-        }
-
-        return enabledSites
-    }
-
-    static func isGPCEnabled(url: URL,
-                             config: PrivacyConfiguration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig) -> Bool {
-        let enabledSites = gpcHeadersEnabled(config: config)
-
-        if enabledSites.contains(where: { gpcHost in url.isPart(ofDomain: gpcHost) }) {
-            // Check if url is on exception list
-            // Since headers are only enabled for a small numbers of sites
-            // perfrom this check here for efficency
-            return config.isFeature(.gpc, enabledForDomain: url.host)
-        }
-
-        return false
-    }
-
 }

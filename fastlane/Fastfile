@@ -1,0 +1,183 @@
+# frozen_string_literal: true
+
+UI.abort_with_message!('Please run fastlane via `bundle exec`') unless FastlaneCore::Helper.bundler?
+
+########################################################################
+# Environment Variables
+########################################################################
+DEFAULT_BRANCH = 'develop'
+RELEASE_BRANCH = 'release'
+PROJECT_ROOT_FOLDER = File.dirname(File.expand_path(__dir__))
+VERSION_CONFIG_PATH = File.join(PROJECT_ROOT_FOLDER, 'Configuration/Version.xcconfig')
+VERSION_CONFIG_DEFINITION = 'MARKETING_VERSION'
+UPGRADABLE_EMBEDDED_FILES = [
+  'DuckDuckGo/Content Blocker/AppTrackerDataSetProvider.swift',
+  'DuckDuckGo/Content Blocker/trackerData.json',
+  'DuckDuckGo/Content Blocker/AppPrivacyConfigurationDataProvider.swift',
+  'DuckDuckGo/Content Blocker/macos-config.json'
+].freeze
+
+default_platform(:mac)
+
+platform :mac do
+  #################################################
+  # Public lanes
+  #################################################
+
+  # Executes the release preparation work in the repository
+  #
+  # - Cuts a new release branch
+  # - Updates submodules and embedded files
+  #
+  # @option [String] version (default: nil) Marketing version string
+  # @option [Boolean] skip_confirm (default: false) If true, avoids any interactive prompt
+  #
+  desc 'Executes the release preparation work in the repository'
+  lane :code_freeze do |options|
+    macos_codefreeze_prechecks
+    new_version = validate_new_version(options)
+    macos_create_release_branch(version: new_version)
+    macos_update_embedded_files
+    macos_update_version_config(version: new_version)
+  end
+
+  #################################################
+  # Helper functions
+  #################################################
+  # Ensures that the local repository is in good shape for the release:
+  #
+  # - Checks out the default branch
+  # - Ensures git status is clean
+  #
+  private_lane :macos_codefreeze_prechecks do
+    ensure_git_status_clean
+
+    ensure_git_branch(branch: DEFAULT_BRANCH)
+    git_pull
+
+    git_submodule_update(recursive: true, init: true)
+    ensure_git_status_clean
+  end
+
+  # Calculates the new version or validate the provided one, if it exists
+  # and prompts the user to confirm
+  #
+  # @option [String] version (default: nil) Marketing version string
+  #
+  private_lane :validate_new_version do |options|
+    current_version = macos_current_version
+    user_version = format_user_version(options[:version])
+    new_version = user_version.nil? ? macos_bump_patch_version(current_version) : user_version
+    unless UI.confirm(
+      "Current version is #{current_version}.\nNew version is #{new_version}.\nDo you want to continue?"
+    )
+      UI.abort_with_message!('Aborted by user.')
+    end
+    new_version
+  end
+
+  # Checks out a new branch from the current commit and pushes it
+  #
+  # @option [String] version (default: nil) Marketing version string
+  #
+  private_lane :macos_create_release_branch do |options|
+    version = options[:version]
+    UI.message("Creating new release branch for #{version}")
+    release_branch = "#{RELEASE_BRANCH}/#{version}"
+
+    # Abort if the branch already exists
+    UI.abort_with_message!("Branch #{release_branch} already exists in this repository. Aborting.") unless Action.sh(
+      'git', 'branch', '--list', release_branch
+    ).empty?
+
+    # Create the branch and push
+    Action.sh('git', 'checkout', '-b', release_branch)
+    Action.sh('git', 'push', '-u', 'origin', release_branch)
+  end
+
+  # Updates embedded files:
+  #
+  # - Calls update_embedded.sh shell script
+  # - Validate the changed files against the known ones list
+  # - Runs automated tests
+  # - Commits and pushes
+  #
+  private_lane :macos_update_embedded_files do
+    sh("cd #{PROJECT_ROOT_FOLDER} && ./scripts/update_embedded.sh")
+
+    # Verify no unexpected files were modified
+    result = sh('git', 'status')
+    modified_files = result.split("\n").select { |line| line.include?('modified:') }
+    modified_files = modified_files.map { |str| str.split(':')[1].strip }
+    nopref_modified_files = modified_files.map { |str| str.delete_prefix('../') }
+    nopref_modified_files.each do |modified_file|
+      UI.abort_with_message!("Unexpected change to #{modified_file}.") unless UPGRADABLE_EMBEDDED_FILES.any? do |s|
+        s.include?(modified_file)
+      end
+    end
+
+    # Run tests
+    run_tests(scheme: 'DuckDuckGo Privacy Browser')
+
+    # Every thing looks good: commit and push
+    modified_files.each { |modified_file| sh('git', 'add', modified_file.to_s) }
+    sh('git', 'commit', '-m', 'Update embedded files')
+    ensure_git_status_clean
+    sh('git', 'push')
+  end
+
+  # Updates version in the config file
+  #
+  # @option [String] version (default: nil) Marketing version string
+  #
+  private_lane :macos_update_version_config do |options|
+    version = options[:version]
+    File.write(VERSION_CONFIG_PATH, "#{VERSION_CONFIG_DEFINITION} = #{version}\n")
+    git_commit(path: VERSION_CONFIG_PATH, message: "Version Bump to #{version}")
+    sh('git', 'push')
+  end
+
+  # Updates version in the config file
+  #
+  # @return [String] version read from the file, or nil in case of failure
+  #
+  def macos_current_version
+    current_version = nil
+
+    file_data = File.read(VERSION_CONFIG_PATH).split("\n")
+    file_data.each do |line|
+      current_version = line.split('=')[1].strip if line.start_with?(VERSION_CONFIG_DEFINITION)
+    end
+
+    current_version
+  end
+
+  # Updates version in the config file by bumping the patch (third) number
+  #
+  # @param [String] current version
+  # @return [String] updated version
+  #
+  def macos_bump_patch_version(current_version)
+    current_version_array = current_version.split('.')
+    new_patch_number = current_version_array[2].to_i + 1
+    "#{current_version_array[0]}.#{current_version_array[1]}.#{new_patch_number}"
+  end
+
+  # Formats the version provided by the user to be Major.Minor.Patch
+  #
+  # @param [String] original version string
+  # @return [String] formatted version string
+  #
+  def format_user_version(version)
+    user_version = nil
+
+    unless version.nil?
+      version_numbers = version.split('.')
+      version_numbers[3] = 0
+      version_numbers.map! { |element| element.nil? ? 0 : element }
+      user_version = "#{version_numbers[0]}.#{version_numbers[1]}.#{version_numbers[2]}"
+    end
+
+    user_version
+  end
+end
