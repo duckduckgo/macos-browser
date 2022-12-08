@@ -108,7 +108,7 @@ class HistoryCoordinatorTests: XCTestCase {
 
     func testWhenHistoryIsBurning_ThenHistoryIsCleanedExceptFireproofDomains() {
         let (historyStoringMock, historyCoordinator) = HistoryCoordinator.aHistoryCoordinator
-
+        
         let url1 = URL(string: "https://duckduckgo.com")!
         historyCoordinator.addVisit(of: url1)
 
@@ -129,6 +129,73 @@ class HistoryCoordinatorTests: XCTestCase {
         historyCoordinator.burn(except: fireproofDomains) {
             XCTAssert(historyStoringMock.removeEntriesArray.count == 3)
         }
+    }
+    
+    func testWhenBurningVisits_removesHistoryWhenVisitsCountHitsZero() {
+        let (historyStoringMock, historyCoordinator) = HistoryCoordinator.aHistoryCoordinator
+        historyStoringMock.removeEntriesResult = .success(())
+        historyStoringMock.removeVisitsResult = .success(())
+        
+        let url1 = URL(string: "https://duckduckgo.com")!
+        historyCoordinator.addVisit(of: url1)
+        historyCoordinator.addVisit(of: url1)
+        historyCoordinator.addVisit(of: url1)
+        
+        let visitsToBurn = Array(historyCoordinator.history!.first!.visits)
+        
+        let waiter = expectation(description: "Wait")
+        historyCoordinator.burnVisits(visitsToBurn) {
+            waiter.fulfill()
+            XCTAssertEqual(historyStoringMock.removeEntriesArray.count, 1)
+            XCTAssertEqual(historyStoringMock.removeEntriesArray.first!.url, url1)
+        }
+        waitForExpectations(timeout: 1.0)
+    }
+    
+    func testWhenBurningVisits_removesVisitsFromTheStore() {
+        let (historyStoringMock, historyCoordinator) = HistoryCoordinator.aHistoryCoordinator
+        historyStoringMock.removeEntriesResult = .success(())
+        historyStoringMock.removeVisitsResult = .success(())
+        
+        let url1 = URL(string: "https://duckduckgo.com")!
+        historyCoordinator.addVisit(of: url1)
+        historyCoordinator.addVisit(of: url1)
+        historyCoordinator.addVisit(of: url1)
+        
+        let visitsToBurn = Array(historyCoordinator.history!.first!.visits)
+        
+        let waiter = expectation(description: "Wait")
+        historyCoordinator.burnVisits(visitsToBurn) {
+            waiter.fulfill()
+            XCTAssertEqual(historyStoringMock.removeVisitsArray.count, 3)
+        }
+        waitForExpectations(timeout: 1.0)
+    }
+    
+    func testWhenBurningVisits_DoesntDeleteHistoryBeforeVisits() {
+        // Needs real store to catch assertion which can be raised by improper call ordering in the coordinator
+        let context = CoreData.historyStoreContainer().newBackgroundContext()
+        let historyStore = HistoryStore(context: context)
+        let historyCoordinator = HistoryCoordinator(historyStoring: historyStore)
+        
+        let url1 = URL(string: "https://duckduckgo.com")!
+        historyCoordinator.addVisit(of: url1)
+        historyCoordinator.addVisit(of: url1)
+        historyCoordinator.addVisit(of: url1)
+
+        let url2 = URL(string: "https://test.duckduckgo.com")!
+        historyCoordinator.addVisit(of: url2)
+        historyCoordinator.addVisit(of: url2)
+        historyCoordinator.addVisit(of: url2)
+        
+        let visitsToBurn = Array(historyCoordinator.history!.first!.visits)
+        
+        let waiter = expectation(description: "Wait")
+        historyCoordinator.burnVisits(visitsToBurn) {
+            waiter.fulfill()
+            // Simply don't raise an assertion
+        }
+        waitForExpectations(timeout: 1.0)
     }
 
     func testWhenUrlIsMarkedAsFailedToLoad_ThenFailedToLoadFlagIsStored() {
