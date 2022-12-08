@@ -42,7 +42,7 @@ extension TabExtensions {
 }
 
 /*
- Static TabExtension should implement the `make` factory method for instantiation with a Tab owner
+ TabExtension should implement the `make` factory method for instantiation with a Tab owner
  Avoid making strong dependencies on the Tab class for Tab Extensions to keep them testable
 
  e.g.:
