@@ -18,40 +18,46 @@
 
 import Foundation
 
-final class PermissionAuthorizationQuery {
+struct PermissionAuthorizationQueryInfo {
     let url: URL?
     let domain: String
     let permissions: [PermissionType]
     var wasShownOnce: Bool = false
     var shouldShowAlwaysAllowCheckbox: Bool = false
     var shouldShowCancelInsteadOfDeny: Bool = false
+}
+enum PermissionAuthorizationQueryDecision {
+    case granted(PermissionAuthorizationQuery)
+    case denied(PermissionAuthorizationQuery)
+}
+typealias PermissionAuthorizationQueryOutput = (decision: PermissionAuthorizationQueryDecision, remember: Bool?)
 
-    enum Decision {
-        case granted(PermissionAuthorizationQuery)
-        case denied(PermissionAuthorizationQuery)
-        case deinitialized
+typealias PermissionAuthorizationQuery = UserDialogRequest<PermissionAuthorizationQueryInfo, PermissionAuthorizationQueryOutput>
+extension PermissionAuthorizationQuery {
+    typealias Decision = Output
+
+    var url: URL? { parameters.url }
+    var domain: String { parameters.domain }
+    var permissions: [PermissionType] { parameters.permissions }
+    var wasShownOnce: Bool {
+        get { parameters.wasShownOnce }
+        set { parameters.wasShownOnce = newValue }
     }
-    private var decisionHandler: ((Decision, Bool?) -> Void)?
+    var shouldShowAlwaysAllowCheckbox: Bool {
+        get { parameters.shouldShowAlwaysAllowCheckbox }
+        set { parameters.shouldShowAlwaysAllowCheckbox = newValue }
+    }
+    var shouldShowCancelInsteadOfDeny: Bool {
+        get { parameters.shouldShowCancelInsteadOfDeny }
+        set { parameters.shouldShowCancelInsteadOfDeny = newValue }
+    }
 
-    init(domain: String,
-         url: URL?,
-         permissions: [PermissionType],
-         decisionHandler: @escaping (Decision, Bool?) -> Void) {
-
-        self.domain = domain
-        self.url = url
-        self.permissions = permissions
-        self.decisionHandler = decisionHandler
+    convenience init(domain: String, url: URL?, permissions: [PermissionType], decisionHandler: @escaping (CallbackResult) -> Void) {
+        self.init(.init(url: url, domain: domain, permissions: permissions), callback: decisionHandler)
     }
 
     func handleDecision(grant: Bool, remember: Bool? = nil) {
-        var handler: ((Decision, Bool?) -> Void)?
-        swap(&handler, &decisionHandler) // only run once
-        handler?(grant ? .granted(self) : .denied(self), remember)
-    }
-
-    deinit {
-        decisionHandler?(.deinitialized, nil)
+        self.submit( (decision: grant ? .granted(self): .denied(self), remember: remember) )
     }
 
 }

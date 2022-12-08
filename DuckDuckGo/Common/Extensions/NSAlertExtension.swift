@@ -47,6 +47,7 @@ extension NSAlert {
         alert.addButton(withTitle: UserText.ok)
         alert.addButton(withTitle: UserText.cancel)
         let textField = NSTextField(frame: NSRect(x: 0, y: 0, width: 200, height: 24))
+        textField.stringValue = defaultText ?? ""
         textField.placeholderString = defaultText
         alert.accessoryView = textField
         alert.window.initialFirstResponder = textField
