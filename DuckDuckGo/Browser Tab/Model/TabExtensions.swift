@@ -21,10 +21,10 @@ import Foundation
 // swiftlint:disable trailing_comma
 extension TabExtensions {
 
-    // !!!!!
-    // Add TabExtension-s for App builds here
-    // Note: Tab Extensions with state restoration support should conform to NSCodingExtension
-    // !!!!!
+    /// !!!!!
+    /// Add `TabExtension`-s for App builds here
+    /// Note: Extensions with state restoration support should conform to `NSCodingExtension`
+    /// !!!!!
     static var tabExtensions: [(Tab) -> TabExtension] { [
         AdClickAttributionTabExtension.make,
         ContextMenuManager.make,
@@ -33,17 +33,17 @@ extension TabExtensions {
         AutofillTabExtension.make,
     ] } 
 
-    // Add TabExtension-s that should be loaded when running Unit Tests here
-    // By default the TabExtensions won‘t be loaded
+    /// Add `TabExtension`-s that should be loaded when running Unit Tests here
+    /// By default the Extensions won‘t be loaded
     static var tabExtensionsInstantiatedForTests: [(Tab) -> TabExtension] { [
         // SomeTabExtension.make, ...
     ] }
 
 }
 
-/*
- TabExtension should implement the `make` factory method for instantiation with a Tab owner
- Avoid making strong dependencies on the Tab class for Tab Extensions to keep them testable
+/**
+ `TabExtension` should implement the `make` factory method for instantiation with a `Tab` owner
+ Avoid making strong dependencies on the `Tab` class for Tab Extensions to keep them testable
 
  e.g.:
  class MyExtension {
@@ -58,15 +58,15 @@ extension TabExtensions {
      MyExtension(dependencies: tab.dependencies)
    }
  }
-*/
+**/
 
 protocol TabExtension {
     static func make(owner tab: Tab) -> Self
 }
 
-// TabExtension-s are resoved dynamically in runtime
-// using TabExtension.tabExtensions or TabExtension.tabExtensionsInstantiatedForTests lists
-// An extension should conform to TabExtension protocol
+/// `TabExtension`-s are resoved dynamically in runtime
+/// using `TabExtensions.tabExtensions` or `TabExtensions.tabExtensionsInstantiatedForTests` lists
+/// An extension should conform to TabExtension protocol
 struct TabExtensions: Extensions, Sequence {
     typealias ExtensionType = TabExtension
     typealias Iterator = Dictionary<AnyKeyPath, ExtensionType>.Values.Iterator
@@ -98,14 +98,15 @@ struct TabExtensions: Extensions, Sequence {
         self.extensions = extensions
     }
 
-    /* Used for resolving a TabExtension object in the TabExtensions struct extension, e.g.:
+    /** Used for resolving a TabExtension object in the TabExtensions struct extension,
+     e.g. for `tab.extensions.someTabExtension` add:
 
      extension TabExtensions {
        var someTabExtension: MyTabExtension? {
          resolve()
        }
      }
-     */
+     **/
     func resolve<T: TabExtension>() -> T? {
         extensions[\T.self] as? T
     }
