@@ -20,7 +20,6 @@ import Combine
 import Foundation
 import WebKit
 
-
 protocol TabDelegateProvider {
     var delegate: TabDelegate? { get }
 }
@@ -113,7 +112,7 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
                 completionHandler(nil)
                 return
             }
-            let webView = self.createWebView(from: webView, with: configuration, for: navigationAction, of: NewWindowPolicy(windowFeatures))
+            let webView = self.createWebView(from: webView, with: configuration, for: navigationAction, of: .popup(size: windowFeatures.windowContentSize))
 
             self.permissions.permissions.popups
                 .popupOpened(nextQuery: self.permissions.authorizationQueries.first(where: { $0.permissions.contains(.popups) }))
@@ -126,7 +125,7 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
 
         guard let delegate else { return nil }
 
-        let tab = Tab(content: .none, webViewConfiguration: configuration, parentTab: self, webViewFrame: webView.frame)
+        let tab = Tab(content: .none, webViewConfiguration: configuration, parentTab: self, shouldLoadInBackground: false, webViewFrame: webView.superview?.bounds ?? .zero)
         delegate.tab(self, createdChild: tab, of: kind)
 
         let webView = tab.webView

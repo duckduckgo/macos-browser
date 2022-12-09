@@ -60,8 +60,9 @@ protocol FindInPageProtocol {
     func findNext()
     func findPrevious()
 }
+
 extension FindInPageTabExtension: FindInPageProtocol {
-    func getPublicProtocol() -> FindInPageProtocol{ self }
+    func getPublicProtocol() -> FindInPageProtocol { self }
 }
 
 extension TabExtensions {

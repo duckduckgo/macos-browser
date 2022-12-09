@@ -156,8 +156,8 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     }
 
     private weak var delegate: TabDelegate?
-    @objc private var objc_delegate: Any? { delegate }
-    static var objcDelegateKeyPath: String { #keyPath(objc_delegate) }
+    @objc private var objcDelegate: Any? { delegate }
+    static var objcDelegateKeyPath: String { #keyPath(objcDelegate) }
     func setDelegate(_ delegate: TabDelegate) { self.delegate = delegate }
 
     private let cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter?
@@ -1226,11 +1226,13 @@ extension Tab: WKNavigationDelegate {
                 // Auto-cancel simulated Back action when upgrading to HTTPS or GPC from Client Redirect
                 self.webView.frozenCanGoForward = nil
                 self.webView.frozenCanGoBack = nil
-
                 return .cancel
-
-            } else if navigationAction.navigationType != .backForward, !isRequestingNewTab,
-                      let request = GPCRequestFactory.shared.requestForGPC(basedOn: navigationAction.request) {
+                
+            } else if navigationAction.navigationType != .backForward,
+                      !isRequestingNewTab,
+                      let request = GPCRequestFactory().requestForGPC(basedOn: navigationAction.request,
+                                                                      config: ContentBlocking.shared.privacyConfigurationManager.privacyConfig,
+                                                                      gpcEnabled: PrivacySecurityPreferences.shared.gpcEnabled) {
                 self.invalidateBackItemIfNeeded(for: navigationAction)
                 defer {
                     _ = webView.load(request)

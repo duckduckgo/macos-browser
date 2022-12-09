@@ -504,14 +504,14 @@ extension BrowserTabViewController: TabDelegate {
         }
     }
 
-    func tab(_ tab: Tab, createdChild childTab: Tab, of kind: NewWindowPolicy) {
+    func tab(_ parentTab: Tab, createdChild childTab: Tab, of kind: NewWindowPolicy) {
         switch kind {
         case .popup(size: let windowContentSize):
-            WindowsManager.openPopUpWindow(with: tab, contentSize: windowContentSize)
+            WindowsManager.openPopUpWindow(with: childTab, contentSize: windowContentSize)
         case .window(active: let active):
-            WindowsManager.openNewWindow(with: tab, showWindow: active)
+            WindowsManager.openNewWindow(with: childTab, showWindow: active)
         case .tab(selected: let selected):
-            self.tabCollectionViewModel.insert(childTab, after: tab, selected: selected)
+            self.tabCollectionViewModel.insert(childTab, after: parentTab, selected: selected)
         }
     }
 

@@ -37,9 +37,9 @@ struct TabExtensions {
 
     static func builder() -> TabExtensionInstantiation {
 #if DEBUG
-        AppDelegate.isRunningTests ? TestTabExtensions() : AppTabExtensions()
+        return AppDelegate.isRunningTests ? TestTabExtensions() : AppTabExtensions()
 #else
-        AppTabExtensions()
+        return AppTabExtensions()
 #endif
     }
 

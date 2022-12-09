@@ -125,17 +125,12 @@ extension AutofillType {
 
 extension AutofillTabExtension: EmailManagerRequestDelegate { }
 
-
 protocol AutofillProtocol {
     func setDelegate(_: ContentOverlayUserScriptDelegate?)
     func didClick(at point: CGPoint)
 
     var autofillDataToSavePublisher: AnyPublisher<AutofillData?, Never> { get }
     func resetAutofillData()
-}
-
-extension TabExtensions {
-    var autofill: AutofillProtocol? { resolve(AutofillTabExtension.self) }
 }
 
 extension AutofillTabExtension: AutofillProtocol {
@@ -147,6 +142,10 @@ extension AutofillTabExtension: AutofillProtocol {
     func resetAutofillData() {
         self.autofillDataToSave = nil
     }
+}
+
+extension TabExtensions {
+    var autofill: AutofillProtocol? { resolve(AutofillTabExtension.self) }
 }
 
 extension Tab {

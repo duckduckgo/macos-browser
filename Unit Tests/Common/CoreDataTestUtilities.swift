@@ -21,6 +21,10 @@ import CoreData
 @testable import DuckDuckGo_Privacy_Browser
 
 final class CoreData {
+    
+    static func historyStoreContainer() -> NSPersistentContainer {
+        createInMemoryPersistentContainer(modelName: "History", bundle: Bundle(for: AppDelegate.self))
+    }
 
     static func bookmarkContainer() -> NSPersistentContainer {
         return createInMemoryPersistentContainer(modelName: "Bookmark", bundle: Bundle(for: AppDelegate.self))

@@ -73,11 +73,11 @@ extension AppDelegate {
             return
         }
 
-        WindowsManager.openNewWindow(with: Tab(content: .contentFromURL(url)))
+        WindowsManager.openNewWindow(with: Tab(content: .contentFromURL(url), shouldLoadInBackground: true))
     }
 
     @objc func clearAllHistory(_ sender: NSMenuItem) {
-        guard let window = WindowsManager.openNewWindow(with: Tab(content: .homePage)),
+        guard let window = WindowsManager.openNewWindow(with: Tab(content: .homePage, shouldLoadInBackground: false)),
               let windowController = window.windowController as? MainWindowController else {
             assertionFailure("No reference to main window controller")
             return
@@ -87,7 +87,7 @@ extension AppDelegate {
     }
 
     @objc func clearThisHistory(_ sender: ClearThisHistoryMenuItem) {
-        guard let window = WindowsManager.openNewWindow(with: Tab(content: .homePage)),
+        guard let window = WindowsManager.openNewWindow(with: Tab(content: .homePage, shouldLoadInBackground: false)),
               let windowController = window.windowController as? MainWindowController else {
             assertionFailure("No reference to main window controller")
             return
@@ -123,18 +123,18 @@ extension AppDelegate {
             return
         }
 
-        let tab = Tab(content: .url(bookmark.url))
+        let tab = Tab(content: .url(bookmark.url), shouldLoadInBackground: true)
         WindowsManager.openNewWindow(with: tab)
     }
 
     @IBAction func showManageBookmarks(_ sender: Any?) {
-        let tabCollection = TabCollection(tabs: [Tab(content: .bookmarks)])
+        let tabCollection = TabCollection(tabs: [Tab(content: .bookmarks, shouldLoadInBackground: false)])
         let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection)
         WindowsManager.openNewWindow(with: tabCollectionViewModel)
     }
 
     @IBAction func openPreferences(_ sender: Any?) {
-        let tabCollection = TabCollection(tabs: [Tab(content: .anyPreferencePane)])
+        let tabCollection = TabCollection(tabs: [Tab(content: .anyPreferencePane, shouldLoadInBackground: false)])
         let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection)
         WindowsManager.openNewWindow(with: tabCollectionViewModel)
     }
@@ -237,7 +237,7 @@ extension MainViewController {
         // (this is in line with Safari behavior)
         if isHandlingKeyDownEvent, tabCollectionViewModel.selectionIndex?.isPinnedTab == true {
             if tabCollectionViewModel.tabCollection.tabs.isEmpty {
-                tabCollectionViewModel.append(tab: .init(content: .homePage), selected: true)
+                tabCollectionViewModel.append(tab: Tab(content: .homePage, shouldLoadInBackground: false), selected: true)
             } else {
                 tabCollectionViewModel.select(at: .unpinned(0))
             }
@@ -299,7 +299,7 @@ extension MainViewController {
             if let vc = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.navigationBarViewController {
                 navigationBarViewController = vc
             } else {
-                WindowsManager.openNewWindow(with: Tab(content: .homePage))
+                WindowsManager.openNewWindow(with: Tab(content: .homePage, shouldLoadInBackground: false))
                 guard let wc = WindowControllersManager.shared.mainWindowControllers.first(where: { $0.window?.isPopUpWindow == false }) else {
                     return
                 }

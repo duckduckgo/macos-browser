@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		0230C0A3272080090018F728 /* KeyedCodingExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0230C0A2272080090018F728 /* KeyedCodingExtension.swift */; };
-		0230C0A52721F3750018F728 /* GPCRequestFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0230C0A42721F3750018F728 /* GPCRequestFactory.swift */; };
 		026ADE1426C3010C002518EE /* macos-config.json in Resources */ = {isa = PBXBuildFile; fileRef = 026ADE1326C3010C002518EE /* macos-config.json */; };
 		142879DA24CE1179005419BB /* SuggestionViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 142879D924CE1179005419BB /* SuggestionViewModelTests.swift */; };
 		142879DC24CE1185005419BB /* SuggestionContainerViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 142879DB24CE1185005419BB /* SuggestionContainerViewModelTests.swift */; };
@@ -67,6 +66,9 @@
 		31C3CE0228EDC1E70002C24A /* CustomRoundedCornersShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31C3CE0128EDC1E70002C24A /* CustomRoundedCornersShape.swift */; };
 		31CF3432288B0B1B0087244B /* NavigationBarBadgeAnimator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CF3431288B0B1B0087244B /* NavigationBarBadgeAnimator.swift */; };
 		31D5375C291D944100407A95 /* PasswordManagementBitwardenItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31D5375B291D944100407A95 /* PasswordManagementBitwardenItemView.swift */; };
+		31E163BA293A56F400963C10 /* BrokenSiteReportingReferenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31E163B9293A56F400963C10 /* BrokenSiteReportingReferenceTests.swift */; };
+		31E163BD293A579E00963C10 /* PrivacyReferenceTestHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31E163BC293A579E00963C10 /* PrivacyReferenceTestHelper.swift */; };
+		31E163C0293A581900963C10 /* privacy-reference-tests in Resources */ = {isa = PBXBuildFile; fileRef = 31E163BF293A581900963C10 /* privacy-reference-tests */; };
 		31F28C4F28C8EEC500119F70 /* YoutubePlayerUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31F28C4C28C8EEC500119F70 /* YoutubePlayerUserScript.swift */; };
 		31F28C5128C8EEC500119F70 /* YoutubeOverlayUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31F28C4E28C8EEC500119F70 /* YoutubeOverlayUserScript.swift */; };
 		31F28C5328C8EECA00119F70 /* PrivatePlayerSchemeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31F28C5228C8EECA00119F70 /* PrivatePlayerSchemeHandler.swift */; };
@@ -795,13 +797,12 @@
 		B6BBF1702744CDE1004F850E /* CoreDataStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6BBF16F2744CDE1004F850E /* CoreDataStoreTests.swift */; };
 		B6BBF1722744CE36004F850E /* FireproofDomainsStoreMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6BBF1712744CE36004F850E /* FireproofDomainsStoreMock.swift */; };
 		B6BBF17427475B15004F850E /* PopupBlockedPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6BBF17327475B15004F850E /* PopupBlockedPopover.swift */; };
-		B6BDD9EC2940688400F68088 /* ModalSheetCancellable.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6BE9FA9293F7955006363C6 /* ModalSheetCancellable.swift */; };
 		B6BDD9EE29406DFA00F68088 /* WKFrameInfoExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6BDD9ED29406DFA00F68088 /* WKFrameInfoExtension.swift */; };
 		B6BDD9F529409DDD00F68088 /* ContentBlockingMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6BDD9F429409DDD00F68088 /* ContentBlockingMock.swift */; };
 		B6BDD9F62940B5B500F68088 /* ContentBlockingMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6BDD9F429409DDD00F68088 /* ContentBlockingMock.swift */; };
 		B6BDD9F82940C2C100F68088 /* Lazy.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6BDD9F72940C2C000F68088 /* Lazy.swift */; };
-		B6BDD9FF294236D300F68088 /* RePublished.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6BDD9FE294236D300F68088 /* RePublished.swift */; };
 		B6BDDA012942389000F68088 /* TabExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6BDDA002942389000F68088 /* TabExtensions.swift */; };
+		B6BE9FAA293F7955006363C6 /* ModalSheetCancellable.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6BE9FA9293F7955006363C6 /* ModalSheetCancellable.swift */; };
 		B6C00ECB292F839D009C73A6 /* AutofillTabExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C00ECA292F839D009C73A6 /* AutofillTabExtension.swift */; };
 		B6C00ECD292F89D9009C73A6 /* FindInPageTabExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C00ECC292F89D9009C73A6 /* FindInPageTabExtension.swift */; };
 		B6C00ED5292FB21E009C73A6 /* HoveredLinkTabExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C00ED4292FB21E009C73A6 /* HoveredLinkTabExtension.swift */; };
@@ -886,7 +887,6 @@
 
 /* Begin PBXFileReference section */
 		0230C0A2272080090018F728 /* KeyedCodingExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyedCodingExtension.swift; sourceTree = "<group>"; };
-		0230C0A42721F3750018F728 /* GPCRequestFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GPCRequestFactory.swift; sourceTree = "<group>"; };
 		026ADE1326C3010C002518EE /* macos-config.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "macos-config.json"; sourceTree = "<group>"; };
 		142879D924CE1179005419BB /* SuggestionViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionViewModelTests.swift; sourceTree = "<group>"; };
 		142879DB24CE1185005419BB /* SuggestionContainerViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionContainerViewModelTests.swift; sourceTree = "<group>"; };
@@ -942,6 +942,9 @@
 		31C3CE0128EDC1E70002C24A /* CustomRoundedCornersShape.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomRoundedCornersShape.swift; sourceTree = "<group>"; };
 		31CF3431288B0B1B0087244B /* NavigationBarBadgeAnimator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationBarBadgeAnimator.swift; sourceTree = "<group>"; };
 		31D5375B291D944100407A95 /* PasswordManagementBitwardenItemView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PasswordManagementBitwardenItemView.swift; sourceTree = "<group>"; };
+		31E163B9293A56F400963C10 /* BrokenSiteReportingReferenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrokenSiteReportingReferenceTests.swift; sourceTree = "<group>"; };
+		31E163BC293A579E00963C10 /* PrivacyReferenceTestHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyReferenceTestHelper.swift; sourceTree = "<group>"; };
+		31E163BF293A581900963C10 /* privacy-reference-tests */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "privacy-reference-tests"; path = "Submodules/privacy-reference-tests"; sourceTree = SOURCE_ROOT; };
 		31F28C4C28C8EEC500119F70 /* YoutubePlayerUserScript.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = YoutubePlayerUserScript.swift; sourceTree = "<group>"; };
 		31F28C4E28C8EEC500119F70 /* YoutubeOverlayUserScript.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = YoutubeOverlayUserScript.swift; sourceTree = "<group>"; };
 		31F28C5228C8EECA00119F70 /* PrivatePlayerSchemeHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrivatePlayerSchemeHandler.swift; sourceTree = "<group>"; };
@@ -1690,7 +1693,6 @@
 		B6BDD9ED29406DFA00F68088 /* WKFrameInfoExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WKFrameInfoExtension.swift; sourceTree = "<group>"; };
 		B6BDD9F429409DDD00F68088 /* ContentBlockingMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentBlockingMock.swift; sourceTree = "<group>"; };
 		B6BDD9F72940C2C000F68088 /* Lazy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Lazy.swift; sourceTree = "<group>"; };
-		B6BDD9FE294236D300F68088 /* RePublished.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RePublished.swift; sourceTree = "<group>"; };
 		B6BDDA002942389000F68088 /* TabExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabExtensions.swift; sourceTree = "<group>"; };
 		B6BE9FA9293F7955006363C6 /* ModalSheetCancellable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModalSheetCancellable.swift; sourceTree = "<group>"; };
 		B6C00ECA292F839D009C73A6 /* AutofillTabExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutofillTabExtension.swift; sourceTree = "<group>"; };
@@ -1793,14 +1795,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		0230C09D271F52D50018F728 /* GPC */ = {
-			isa = PBXGroup;
-			children = (
-				0230C0A42721F3750018F728 /* GPCRequestFactory.swift */,
-			);
-			path = GPC;
-			sourceTree = "<group>";
-		};
 		142879D824CE1139005419BB /* ViewModel */ = {
 			isa = PBXGroup;
 			children = (
@@ -1934,6 +1928,24 @@
 				3184AC6C288F29D800C35E4B /* BadgeNotificationAnimationModel.swift */,
 			);
 			path = BadgeAnimationContainer;
+			sourceTree = "<group>";
+		};
+		31E163BB293A577200963C10 /* Privacy Reference Tests */ = {
+			isa = PBXGroup;
+			children = (
+				31E163BE293A580000963C10 /* Resources */,
+				31E163B9293A56F400963C10 /* BrokenSiteReportingReferenceTests.swift */,
+				31E163BC293A579E00963C10 /* PrivacyReferenceTestHelper.swift */,
+			);
+			path = "Privacy Reference Tests";
+			sourceTree = "<group>";
+		};
+		31E163BE293A580000963C10 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				31E163BF293A581900963C10 /* privacy-reference-tests */,
+			);
+			path = Resources;
 			sourceTree = "<group>";
 		};
 		31F28C4B28C8EE9000119F70 /* Youtube Player */ = {
@@ -2515,7 +2527,6 @@
 				4BB88B5A25B7BA50006F6B06 /* Instruments.swift */,
 				B6BDD9F72940C2C000F68088 /* Lazy.swift */,
 				B6AAAC2C260330580029438D /* PublishedAfter.swift */,
-				B6BDD9FE294236D300F68088 /* RePublished.swift */,
 				4BB88B4F25B7BA2B006F6B06 /* TabInstrumentation.swift */,
 				85C6A29525CC1FFD00EEB5F1 /* UserDefaultsWrapper.swift */,
 			);
@@ -3112,7 +3123,6 @@
 				AA6820E825503A21005ED0D5 /* Fire */,
 				4B02197B25E05FAC00ED7DEA /* Fireproofing */,
 				B65536902684409300085A79 /* Geolocation */,
-				0230C09D271F52D50018F728 /* GPC */,
 				AAE75275263B036300B973F8 /* History */,
 				AA585DB02490E6FA00E9A3E2 /* Main */,
 				AAE71DB225F66A0900D74437 /* Home Page */,
@@ -3178,6 +3188,7 @@
 				B6106BA126A7BE430013B453 /* Permissions */,
 				37D2377E287EFECD00BCE03B /* Pinned Tabs */,
 				4B0511EE262CAEB300F6079C /* Preferences */,
+				31E163BB293A577200963C10 /* Privacy Reference Tests */,
 				AA7E9174286DAFB700AB6B62 /* Recently Closed */,
 				858A798626A99D9000A75A42 /* Secure Vault */,
 				B6DA440F2616C0F200DD1EC2 /* Statistics */,
@@ -4673,6 +4684,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B69B50532726CD8100758A2B /* empty in Resources */,
+				31E163C0293A581900963C10 /* privacy-reference-tests in Resources */,
 				B69B50542726CD8100758A2B /* atb-with-update.json in Resources */,
 				37A803DB27FD69D300052F4C /* Data Import Resources in Resources */,
 				B69B50522726CD8100758A2B /* atb.json in Resources */,
@@ -4721,7 +4733,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/zsh;
-			shellScript = "if [[ -n \"$CI\" ]]; then\n    echo \"Skipping SwiftLint run in CI\"\n    exit 0\nfi\n\n# Add brew into PATH\nif [[ -f /opt/homebrew/bin/brew ]]; then\n    eval $(/opt/homebrew/bin/brew shellenv)\nfi\n\nif which swiftlint >/dev/null; then\n   if [ \"$CONFIGURATION\" = \"Release\" ]; then\n       exit 1\n       swiftlint lint --strict\n       if [ $? -ne 0 ]; then\n           echo \"error: SwiftLint validation failed.\"\n           exit 1\n       fi\n   else\n       swiftlint lint\n   fi\nelse\n   echo \"error: SwiftLint not installed. Install using \\`brew install swiftlint\\`\"\n   exit 1\nfi\n";
+			shellScript = "if [[ -n \"$CI\" ]]; then\n    echo \"Skipping SwiftLint run in CI\"\n    exit 0\nfi\n\n# Add brew into PATH\nif [[ -f /opt/homebrew/bin/brew ]]; then\n    eval $(/opt/homebrew/bin/brew shellenv)\nfi\n\nif which swiftlint >/dev/null; then\n   if [ \"$CONFIGURATION\" = \"Release\" ]; then\n       swiftlint lint --strict\n       if [ $? -ne 0 ]; then\n           echo \"error: SwiftLint validation failed.\"\n           exit 1\n       fi\n   else\n       swiftlint lint\n   fi\nelse\n   echo \"error: SwiftLint not installed. Install using \\`brew install swiftlint\\`\"\n   exit 1\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -4831,7 +4843,6 @@
 				AAEF6BC8276A081C0024DCF4 /* FaviconSelector.swift in Sources */,
 				85589E7F27BBB8630038AD11 /* AddEditFavoriteViewController.swift in Sources */,
 				4B2E7D6326FF9D6500D2DB17 /* PrintingUserScript.swift in Sources */,
-				0230C0A52721F3750018F728 /* GPCRequestFactory.swift in Sources */,
 				4BBDEE9428FC14760092FAA6 /* ConnectBitwardenViewController.swift in Sources */,
 				1DDF076428F815AD00EDFBE3 /* BWManager.swift in Sources */,
 				9833912F27AAA3CE00DAF119 /* AppTrackerDataSetProvider.swift in Sources */,
@@ -4858,7 +4869,6 @@
 				37F19A6528E1B3FB00740DC6 /* PreferencesPrivatePlayerView.swift in Sources */,
 				4B9292D22667123700AD2C21 /* AddFolderModalViewController.swift in Sources */,
 				4B92929E26670D2A00AD2C21 /* BookmarkSidebarTreeController.swift in Sources */,
-				B6BDD9EC2940688400F68088 /* ModalSheetCancellable.swift in Sources */,
 				85589E8727BBB8F20038AD11 /* HomePageFavoritesModel.swift in Sources */,
 				4BB88B4A25B7B690006F6B06 /* SequenceExtensions.swift in Sources */,
 				4B59024026B35F3600489384 /* ChromiumDataImporter.swift in Sources */,
@@ -5049,6 +5059,7 @@
 				85707F2A276A35FE00DC0649 /* ActionSpeech.swift in Sources */,
 				8585B63826D6E66C00C1416F /* ButtonStyles.swift in Sources */,
 				4B0511BD262CAA5A00F6079C /* PrivacySecurityPreferences.swift in Sources */,
+				B6BE9FAA293F7955006363C6 /* ModalSheetCancellable.swift in Sources */,
 				B6830963274CDEC7004B46BB /* FireproofDomainsStore.swift in Sources */,
 				1E7E2E942902AC0E00C01B54 /* PrivacyDashboardPermissionHandler.swift in Sources */,
 				AA9FF95F24A1FB690039E328 /* TabCollectionViewModel.swift in Sources */,
@@ -5111,7 +5122,6 @@
 				B68458B025C7E76A00DC17B6 /* WindowManager+StateRestoration.swift in Sources */,
 				B68458C525C7EA0C00DC17B6 /* TabCollection+NSSecureCoding.swift in Sources */,
 				4BB88B5B25B7BA50006F6B06 /* Instruments.swift in Sources */,
-				B6BDD9FF294236D300F68088 /* RePublished.swift in Sources */,
 				9812D895276CEDA5004B6181 /* ContentBlockerRulesLists.swift in Sources */,
 				4B0511E2262CAA8600F6079C /* NSViewControllerExtension.swift in Sources */,
 				F44C130225C2DA0400426E3E /* NSAppearanceExtension.swift in Sources */,
@@ -5471,6 +5481,7 @@
 				37D23787287F5C2900BCE03B /* PinnedTabsViewModelTests.swift in Sources */,
 				4BF4EA5027C71F26004E57C4 /* PasswordManagementListSectionTests.swift in Sources */,
 				AA7E9176286DB05D00AB6B62 /* RecentlyClosedCoordinatorMock.swift in Sources */,
+				31E163BD293A579E00963C10 /* PrivacyReferenceTestHelper.swift in Sources */,
 				B693955D26F19CD70015B914 /* DownloadListStoreTests.swift in Sources */,
 				B610F2EB27AA8E4500FCEBE9 /* ContentBlockingUpdatingTests.swift in Sources */,
 				4B0511E7262CAB3700F6079C /* UserDefaultsWrapperUtilities.swift in Sources */,
@@ -5490,6 +5501,7 @@
 				B63ED0DA26AE7AF400A9DAD1 /* PermissionManagerMock.swift in Sources */,
 				AA9C362825518C44004B1BA3 /* WebsiteDataStoreMock.swift in Sources */,
 				3776582D27F71652009A6B35 /* WebsiteBreakageReportTests.swift in Sources */,
+				31E163BA293A56F400963C10 /* BrokenSiteReportingReferenceTests.swift in Sources */,
 				4B723E0826B0003E00E14D75 /* MockSecureVault.swift in Sources */,
 				37CD54B527F1AC1300F1F7B9 /* PreferencesSidebarModelTests.swift in Sources */,
 				AAEC74B22642C57200C2EFBC /* HistoryCoordinatingMock.swift in Sources */,
@@ -5574,315 +5586,6 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
-		377762422800D59E00250E31 /* CI_Review */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 85B8757E28B903D900D39E04 /* Configuration.xcconfig */;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
-				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
-				CLANG_WARN_BOOL_CONVERSION = YES;
-				CLANG_WARN_COMMA = YES;
-				CLANG_WARN_CONSTANT_CONVERSION = YES;
-				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN_ENUM_CONVERSION = YES;
-				CLANG_WARN_INFINITE_RECURSION = YES;
-				CLANG_WARN_INT_CONVERSION = YES;
-				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
-				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
-				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
-				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
-				CLANG_WARN_STRICT_PROTOTYPES = YES;
-				CLANG_WARN_SUSPICIOUS_MOVE = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				COPY_PHASE_STRIP = NO;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				ENABLE_NS_ASSERTIONS = NO;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
-				GCC_WARN_UNDECLARED_SELECTOR = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				MTL_ENABLE_DEBUG_INFO = NO;
-				MTL_FAST_MATH = YES;
-				SDKROOT = macosx;
-				SWIFT_COMPILATION_MODE = wholemodule;
-				SWIFT_OPTIMIZATION_LEVEL = "-O";
-			};
-			name = CI_Review;
-		};
-		377762432800D59E00250E31 /* CI_Review */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = "Icon - Review";
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = GlobalAccentColor;
-				CLANG_ANALYZER_LOCALIZABILITY_EMPTY_CONTEXT = YES;
-				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
-				CODE_SIGN_ENTITLEMENTS = DuckDuckGo/DuckDuckGo.entitlements;
-				CODE_SIGN_IDENTITY = "Developer ID Application";
-				CODE_SIGN_STYLE = Manual;
-				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = "$(MARKETING_VERSION)";
-				DEVELOPMENT_TEAM = HKE973VLUW;
-				ENABLE_HARDENED_RUNTIME = YES;
-				GCC_PREPROCESSOR_DEFINITIONS = "REVIEW=1";
-				INFOPLIST_FILE = DuckDuckGo/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-				);
-				MARKETING_VERSION = "$(MARKETING_VERSION)";
-				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser.review;
-				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
-				PRODUCT_NAME = "DuckDuckGo Review";
-				PROVISIONING_PROFILE_SPECIFIER = "MacOS Browser Product Review";
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "FEEDBACK REVIEW";
-				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/DuckDuckGo/Bridging.h";
-				SWIFT_VERSION = 5.0;
-			};
-			name = CI_Review;
-		};
-		377762442800D59E00250E31 /* CI_Review */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
-				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = HKE973VLUW;
-				INFOPLIST_FILE = "Unit Tests/Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-					"@loader_path/../Frameworks",
-				);
-				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser.DuckDuckGoTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/Unit Tests/Common/TestsBridging.h";
-				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DuckDuckGo.app/Contents/MacOS/DuckDuckGo";
-			};
-			name = CI_Review;
-		};
-		377762452800D59E00250E31 /* CI_Review */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
-				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = HKE973VLUW;
-				INFOPLIST_FILE = "Integration Tests/Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-					"@loader_path/../Frameworks",
-				);
-				MACOSX_DEPLOYMENT_TARGET = 11.1;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.duckduckgo.Integration-Tests";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DuckDuckGo.app/Contents/MacOS/DuckDuckGo";
-			};
-			name = CI_Review;
-		};
-		377762462800D59E00250E31 /* CI_Review */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
-				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = HKE973VLUW;
-				INFOPLIST_FILE = "UI Tests/Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-					"@loader_path/../Frameworks",
-				);
-				MACOSX_DEPLOYMENT_TARGET = 11.3;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.duckduckgo.UI-Tests";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 5.0;
-				TEST_TARGET_NAME = "DuckDuckGo Privacy Browser";
-			};
-			name = CI_Review;
-		};
-		377762472800ECB000250E31 /* CI_Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 85B8757E28B903D900D39E04 /* Configuration.xcconfig */;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
-				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
-				CLANG_WARN_BOOL_CONVERSION = YES;
-				CLANG_WARN_COMMA = YES;
-				CLANG_WARN_CONSTANT_CONVERSION = YES;
-				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN_ENUM_CONVERSION = YES;
-				CLANG_WARN_INFINITE_RECURSION = YES;
-				CLANG_WARN_INT_CONVERSION = YES;
-				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
-				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
-				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
-				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
-				CLANG_WARN_STRICT_PROTOTYPES = YES;
-				CLANG_WARN_SUSPICIOUS_MOVE = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				COPY_PHASE_STRIP = NO;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				ENABLE_NS_ASSERTIONS = NO;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
-				GCC_WARN_UNDECLARED_SELECTOR = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				MTL_ENABLE_DEBUG_INFO = NO;
-				MTL_FAST_MATH = YES;
-				SDKROOT = macosx;
-				SWIFT_COMPILATION_MODE = wholemodule;
-				SWIFT_OPTIMIZATION_LEVEL = "-O";
-			};
-			name = CI_Release;
-		};
-		377762482800ECB000250E31 /* CI_Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = GlobalAccentColor;
-				CLANG_ANALYZER_LOCALIZABILITY_EMPTY_CONTEXT = YES;
-				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
-				CODE_SIGN_ENTITLEMENTS = DuckDuckGo/DuckDuckGo.entitlements;
-				CODE_SIGN_IDENTITY = "Developer ID Application";
-				CODE_SIGN_STYLE = Manual;
-				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = "$(MARKETING_VERSION)";
-				DEVELOPMENT_TEAM = HKE973VLUW;
-				ENABLE_HARDENED_RUNTIME = YES;
-				INFOPLIST_FILE = DuckDuckGo/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-				);
-				MARKETING_VERSION = "$(MARKETING_VERSION)";
-				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser;
-				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
-				PRODUCT_NAME = DuckDuckGo;
-				PROVISIONING_PROFILE_SPECIFIER = "MacOS Browser";
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = FEEDBACK;
-				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/DuckDuckGo/Bridging.h";
-				SWIFT_VERSION = 5.0;
-			};
-			name = CI_Release;
-		};
-		377762492800ECB000250E31 /* CI_Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
-				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = HKE973VLUW;
-				INFOPLIST_FILE = "Unit Tests/Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-					"@loader_path/../Frameworks",
-				);
-				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser.DuckDuckGoTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/Unit Tests/Common/TestsBridging.h";
-				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DuckDuckGo.app/Contents/MacOS/DuckDuckGo";
-			};
-			name = CI_Release;
-		};
-		3777624A2800ECB000250E31 /* CI_Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
-				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = HKE973VLUW;
-				INFOPLIST_FILE = "Integration Tests/Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-					"@loader_path/../Frameworks",
-				);
-				MACOSX_DEPLOYMENT_TARGET = 11.1;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.duckduckgo.Integration-Tests";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DuckDuckGo.app/Contents/MacOS/DuckDuckGo";
-			};
-			name = CI_Release;
-		};
-		3777624B2800ECB000250E31 /* CI_Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
-				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = HKE973VLUW;
-				INFOPLIST_FILE = "UI Tests/Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-					"@loader_path/../Frameworks",
-				);
-				MACOSX_DEPLOYMENT_TARGET = 11.3;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.duckduckgo.UI-Tests";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 5.0;
-				TEST_TARGET_NAME = "DuckDuckGo Privacy Browser";
-			};
-			name = CI_Release;
-		};
 		4B1AD8A425FC27E200261379 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -6288,10 +5991,12 @@
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CODE_SIGN_ENTITLEMENTS = DuckDuckGo/DuckDuckGo.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Developer ID Application";
+				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = "$(MARKETING_VERSION)";
-				DEVELOPMENT_TEAM = HKE973VLUW;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=macosx*]" = HKE973VLUW;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = DuckDuckGo/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -6302,6 +6007,8 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser;
 				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PRODUCT_NAME = DuckDuckGo;
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "MacOS Browser";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = FEEDBACK;
 				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/DuckDuckGo/Bridging.h";
 				SWIFT_VERSION = 5.0;
@@ -6424,10 +6131,12 @@
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CODE_SIGN_ENTITLEMENTS = DuckDuckGo/DuckDuckGo.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Developer ID Application";
+				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = "$(MARKETING_VERSION)";
-				DEVELOPMENT_TEAM = HKE973VLUW;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=macosx*]" = HKE973VLUW;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = "REVIEW=1";
 				INFOPLIST_FILE = DuckDuckGo/Info.plist;
@@ -6440,6 +6149,7 @@
 				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PRODUCT_NAME = "DuckDuckGo Review";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "MacOS Browser Product Review";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "FEEDBACK REVIEW";
 				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/DuckDuckGo/Bridging.h";
 				SWIFT_VERSION = 5.0;
@@ -6524,9 +6234,7 @@
 				4B1AD8A425FC27E200261379 /* Debug */,
 				4B1AD8B325FC322600261379 /* CI */,
 				4B1AD8A525FC27E200261379 /* Release */,
-				3777624A2800ECB000250E31 /* CI_Release */,
 				AAE814AE2716DFE8009D3531 /* Review */,
-				377762452800D59E00250E31 /* CI_Review */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -6537,9 +6245,7 @@
 				7B4CE8E126F02108009134B1 /* Debug */,
 				7B4CE8E226F02108009134B1 /* CI */,
 				7B4CE8E326F02108009134B1 /* Release */,
-				3777624B2800ECB000250E31 /* CI_Release */,
 				AAE814AF2716DFE8009D3531 /* Review */,
-				377762462800D59E00250E31 /* CI_Review */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -6550,9 +6256,7 @@
 				AA585DA2248FD31500E9A3E2 /* Debug */,
 				4B1AD8B025FC322600261379 /* CI */,
 				AA585DA3248FD31500E9A3E2 /* Release */,
-				377762472800ECB000250E31 /* CI_Release */,
 				AAE814AB2716DFE8009D3531 /* Review */,
-				377762422800D59E00250E31 /* CI_Review */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -6563,9 +6267,7 @@
 				AA585DA5248FD31500E9A3E2 /* Debug */,
 				4B1AD8B125FC322600261379 /* CI */,
 				AA585DA6248FD31500E9A3E2 /* Release */,
-				377762482800ECB000250E31 /* CI_Release */,
 				AAE814AC2716DFE8009D3531 /* Review */,
-				377762432800D59E00250E31 /* CI_Review */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -6576,9 +6278,7 @@
 				AA585DA8248FD31500E9A3E2 /* Debug */,
 				4B1AD8B225FC322600261379 /* CI */,
 				AA585DA9248FD31500E9A3E2 /* Release */,
-				377762492800ECB000250E31 /* CI_Release */,
 				AAE814AD2716DFE8009D3531 /* Review */,
-				377762442800D59E00250E31 /* CI_Review */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -6615,7 +6315,7 @@
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
 				kind = revision;
-				revision = df78b23168ccacce64337de3161838a25aaea1fc;
+				revision = d4a72c821cdad9fd7be9b4017dfd87e2dde9591e;
 			};
 		};
 		AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */ = {

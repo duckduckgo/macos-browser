@@ -25,13 +25,20 @@ enum NewWindowPolicy {
     case window(active: Bool)
 
     init(_ windowFeatures: WKWindowFeatures, shouldSelectNewTab: Bool = false) {
-        if windowFeatures.toolbarsVisibility?.boolValue ?? false {
-            let windowContentSize = NSSize(width: windowFeatures.width?.intValue ?? 1024,
-                                           height: windowFeatures.height?.intValue ?? 752)
-            self = .popup(size: windowContentSize)
-        } else {
+        if windowFeatures.toolbarsVisibility?.boolValue == true {
             self = .tab(selected: shouldSelectNewTab)
+        } else {
+            self = .popup(size: windowFeatures.windowContentSize)
         }
+    }
+
+}
+
+extension WKWindowFeatures {
+
+    var windowContentSize: NSSize {
+        NSSize(width: self.width?.intValue ?? 1024,
+               height: self.height?.intValue ?? 752)
     }
 
 }

@@ -32,9 +32,9 @@ protocol HistoryStoring {
 
 final class HistoryStore: HistoryStoring {
 
-    init() {}
+    private let context: NSManagedObjectContext
 
-    init(context: NSManagedObjectContext) {
+    init(context: NSManagedObjectContext = Database.shared.makeContext(concurrencyType: .privateQueueConcurrencyType, name: "History")) {
         self.context = context
     }
 
@@ -42,8 +42,6 @@ final class HistoryStore: HistoryStoring {
         case storeDeallocated
         case savingFailed
     }
-
-    private lazy var context = Database.shared.makeContext(concurrencyType: .privateQueueConcurrencyType, name: "History")
 
     func removeEntries(_ entries: [HistoryEntry]) -> Future<Void, Error> {
         return Future { [weak self] promise in
@@ -88,21 +86,27 @@ final class HistoryStore: HistoryStoring {
         let chunkedIdentifiers = identifiers.chunked(into: 100)
 
         for identifiers in chunkedIdentifiers {
-            let deleteRequest = NSFetchRequest<NSFetchRequestResult>(entityName: HistoryEntryManagedObject.className())
+            let deleteRequest = NSFetchRequest<HistoryEntryManagedObject>(entityName: HistoryEntryManagedObject.className())
             let predicates = identifiers.map({ NSPredicate(format: "identifier == %@", argumentArray: [$0]) })
             deleteRequest.predicate = NSCompoundPredicate(type: .or, subpredicates: predicates)
-            let batchDeleteRequest = NSBatchDeleteRequest(fetchRequest: deleteRequest)
-            batchDeleteRequest.resultType = .resultTypeObjectIDs
+            
             do {
-                let result = try self.context.execute(batchDeleteRequest) as? NSBatchDeleteResult
-                let deletedObjects = result?.result as? [NSManagedObjectID] ?? []
-                let changes: [AnyHashable: Any] = [ NSDeletedObjectsKey: deletedObjects ]
-                NSManagedObjectContext.mergeChanges(fromRemoteContextSave: changes, into: [context])
-                os_log("%d items cleaned from history", log: .history, deletedObjects.count)
+                let entriesToDelete = try context.fetch(deleteRequest)
+                for entry in entriesToDelete {
+                    context.delete(entry)
+                }
+                os_log("%d items cleaned from history", log: .history, entriesToDelete.count)
             } catch {
                 Pixel.fire(.debug(event: .historyRemoveFailed, error: error))
                 return .failure(error)
             }
+        }
+        
+        do {
+            try context.save()
+        } catch {
+            Pixel.fire(.debug(event: .historyRemoveFailed, error: error))
+            return .failure(error)
         }
 
         return .success(())
@@ -124,33 +128,28 @@ final class HistoryStore: HistoryStoring {
 
     private func clean(_ context: NSManagedObjectContext, until date: Date) -> Result<Void, Error> {
         // Clean using batch delete requests
-        let deleteRequest = NSFetchRequest<NSFetchRequestResult>(entityName: HistoryEntryManagedObject.className())
+        let deleteRequest = NSFetchRequest<NSManagedObject>(entityName: HistoryEntryManagedObject.className())
         deleteRequest.predicate = NSPredicate(format: "lastVisit < %@", date as NSDate)
-        let batchDeleteRequest = NSBatchDeleteRequest(fetchRequest: deleteRequest)
-        batchDeleteRequest.resultType = .resultTypeObjectIDs
-
         do {
-            let result = try context.execute(batchDeleteRequest) as? NSBatchDeleteResult
-            let deletedObjects = result?.result as? [NSManagedObjectID] ?? []
-            let changes: [AnyHashable: Any] = [ NSDeletedObjectsKey: deletedObjects ]
-            NSManagedObjectContext.mergeChanges(fromRemoteContextSave: changes, into: [context])
-            os_log("%d entries cleaned from history", log: .history, deletedObjects.count)
+            let itemsToBeDeleted = try context.fetch(deleteRequest)
+            for item in itemsToBeDeleted {
+                context.delete(item)
+            }
+            try context.save()
         } catch {
             Pixel.fire(.debug(event: .historyCleanEntriesFailed, error: error))
             return .failure(error)
         }
-
-        let visitDeleteRequest = NSFetchRequest<NSFetchRequestResult>(entityName: VisitManagedObject.className())
+        
+        let visitDeleteRequest = NSFetchRequest<VisitManagedObject>(entityName: VisitManagedObject.className())
         visitDeleteRequest.predicate = NSPredicate(format: "date < %@", date as NSDate)
-        let visitBatchDeleteRequest = NSBatchDeleteRequest(fetchRequest: visitDeleteRequest)
-        visitBatchDeleteRequest.resultType = .resultTypeObjectIDs
-
+        
         do {
-            let result = try context.execute(visitBatchDeleteRequest) as? NSBatchDeleteResult
-            let deletedObjects = result?.result as? [NSManagedObjectID] ?? []
-            let changes: [AnyHashable: Any] = [ NSDeletedObjectsKey: deletedObjects ]
-            NSManagedObjectContext.mergeChanges(fromRemoteContextSave: changes, into: [context])
-            os_log("%d visits cleaned from history", log: .history, deletedObjects.count)
+            let itemsToBeDeleted = try context.fetch(visitDeleteRequest)
+            for item in itemsToBeDeleted {
+                context.delete(item)
+            }
+            try context.save()
             return .success(())
         } catch {
             Pixel.fire(.debug(event: .historyCleanVisitsFailed, error: error))
@@ -175,6 +174,7 @@ final class HistoryStore: HistoryStoring {
                 do {
                     fetchedObjects = try self.context.fetch(fetchRequest)
                 } catch {
+                    Pixel.fire(.debug(event: .historySaveFailed, error: error))
                     promise(.failure(error))
                     return
                 }
@@ -266,7 +266,7 @@ final class HistoryStore: HistoryStoring {
         let chunkedVisits = visits.chunked(into: 100)
 
         for visits in chunkedVisits {
-            let deleteRequest = NSFetchRequest<NSFetchRequestResult>(entityName: VisitManagedObject.className())
+            let deleteRequest = NSFetchRequest<VisitManagedObject>(entityName: VisitManagedObject.className())
             let predicates = visits.compactMap({ (visit: Visit) -> NSPredicate? in
                 guard let historyEntry = visit.historyEntry else {
                     assertionFailure("No history entry")
@@ -276,19 +276,22 @@ final class HistoryStore: HistoryStoring {
                 return NSPredicate(format: "historyEntry.identifier == %@ && date == %@", argumentArray: [historyEntry.identifier, visit.date])
             })
             deleteRequest.predicate = NSCompoundPredicate(type: .or, subpredicates: predicates)
-            let batchDeleteRequest = NSBatchDeleteRequest(fetchRequest: deleteRequest)
-            batchDeleteRequest.resultType = .resultTypeObjectIDs
             do {
-                let result = try self.context.execute(batchDeleteRequest) as? NSBatchDeleteResult
-                let deletedObjects = result?.result as? [NSManagedObjectID] ?? []
-                let changes: [AnyHashable: Any] = [ NSDeletedObjectsKey: deletedObjects ]
-                NSManagedObjectContext.mergeChanges(fromRemoteContextSave: changes, into: [context])
-                os_log("%d visits cleaned from history", log: .history, deletedObjects.count)
-                assert(deletedObjects.count >= visits.count, "Not all visits removed")
+                let visitsToDelete = try self.context.fetch(deleteRequest)
+                for visit in visitsToDelete {
+                    context.delete(visit)
+                }
             } catch {
-                Pixel.fire(.debug(event: .historyRemoveVisitsFailed))
+                Pixel.fire(.debug(event: .historyRemoveVisitsFailed, error: error))
                 return .failure(error)
             }
+        }
+        
+        do {
+            try context.save()
+        } catch {
+            Pixel.fire(.debug(event: .historyRemoveVisitsFailed, error: error))
+            return .failure(error)
         }
 
         return .success(())

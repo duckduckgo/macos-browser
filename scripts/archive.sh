@@ -106,13 +106,7 @@ set_up_environment() {
 	workdir="${PWD}/release"
 	archive="${workdir}/DuckDuckGo.xcarchive"
 	team_id=$(security find-certificate -c "Developer ID Application: Duck" | grep "alis" | awk 'NF { print $NF }' | tr -d \(\)\")
-
-	if [[ -z $CI ]]; then
-		export_options_plist="${cwd}/assets/ExportOptions.plist"
-	else
-		export_options_plist="${cwd}/assets/ExportOptions_CI.plist"
-		configuration="CI_${configuration}"
-	fi
+	export_options_plist="${cwd}/assets/ExportOptions.plist"
 
 	if [[ -n "${override_version}" ]]; then
 		app_version="${override_version}"
@@ -184,14 +178,12 @@ clear_working_directory() {
 	mkdir -p "${workdir}"
 }
 
-prepare_export_options_in_ci() {
-	if [[ -n $CI ]]; then
-		local signing_certificate
-		signing_certificate=$(security find-certificate -Z -c "Developer ID Application:" | grep "SHA-1" | awk 'NF { print $NF }')
+prepare_export_options_plist() {
+	local signing_certificate
+	signing_certificate=$(security find-certificate -Z -c "Developer ID Application:" | grep "SHA-1" | awk 'NF { print $NF }')
 
-		plutil -replace signingCertificate -string "${signing_certificate}" "${export_options_plist}"
-		plutil -replace teamID -string "${team_id}" "${export_options_plist}"
-	fi
+	plutil -replace signingCertificate -string "${signing_certificate}" "${export_options_plist}"
+	plutil -replace teamID -string "${team_id}" "${export_options_plist}"
 }
 
 check_xcpretty() {
@@ -222,7 +214,7 @@ archive_and_export() {
 
 	echo "Exporting archive ..."
 
-	prepare_export_options_in_ci
+	prepare_export_options_plist
 
 	${filter_output} xcrun xcodebuild -exportArchive \
 		-archivePath "${archive}" \

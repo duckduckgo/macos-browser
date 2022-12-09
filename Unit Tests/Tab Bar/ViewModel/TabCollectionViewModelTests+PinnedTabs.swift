@@ -301,6 +301,6 @@ fileprivate extension TabCollectionViewModel {
     }
 
     func appendPinnedTab() {
-        pinnedTabsManager?.tabCollection.append(tab: .init(content: .url("https://duck.com".url!)))
+        pinnedTabsManager?.tabCollection.append(tab: .init(content: .url("https://duck.com".url!), shouldLoadInBackground: false))
     }
 }

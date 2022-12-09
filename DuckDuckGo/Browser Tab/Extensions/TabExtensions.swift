@@ -21,25 +21,33 @@ import Combine
 import Foundation
 import PrivacyDashboard
 
-// Tab Extensions should conform to TabExtension protocol
+/**
+ Tab Extensions should conform to TabExtension protocol
+ To access an extension from other places you need to define its Public Protocol and extend `TabExtensions` using `resolve(ExtensionClass.self)` to get the extension:
+```
+    class MyTabExtension {
+      fileprivate var featureModel: FeatureModel
+    }
+
+    protocol MyExtensionPublicProtocol {
+      var publicVar { get }
+    }
+
+    extension MyTabExtension: TabExtension, MyExtensionPublicProtocol {
+      func getPublicProtocol() -> MyExtensionPublicProtocol { self }
+    }
+
+    extension TabExtensions {
+      var myFeature: MyExtensionPublicProtocol? {
+        extensions.resolve(MyTabExtension.self)
+      }
+    }
+ ```
+ **/
 protocol TabExtension {
     associatedtype PublicProtocol
     func getPublicProtocol() -> PublicProtocol
 }
-
-/** To access an extension from other places extend the Tab and use `resolve()` to get an extension:
-```
- class MyTabExtension: TabExtension {
-   fileprivate var featureModel: FeatureModel
- }
-
- extension Tab {
-   var myFeature: FeatureModel? {
-     extensions.resolve(MyTabExtension.self)?.featureModel
-   }
- }
- ```
- **/
 
 // Implement these methods for Extension State Restoration
 protocol NSCodingExtension: TabExtension {
@@ -47,6 +55,7 @@ protocol NSCodingExtension: TabExtension {
     func awakeAfter(using decoder: NSCoder)
 }
 
+// Define dependencies used to instantiate TabExtensions here:
 protocol TabExtensionDependencies {
     var userScriptsPublisher: AnyPublisher<UserScripts?, Never> { get }
     var contentBlocking: ContentBlockingProtocol { get }
