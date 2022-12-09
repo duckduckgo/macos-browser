@@ -127,13 +127,13 @@ final class PrivatePlayer {
 
 extension PrivatePlayer {
 
-    func decidePolicy(for navigationAction: WKNavigationAction, in tab: Tab) -> WKNavigationActionPolicy? {
+    func decidePolicy(for navigationAction: NavigationAction, in tab: Tab) -> NavigationActionPolicy? {
         guard isAvailable, mode != .disabled else {
 
             // When the feature is disabled but the webView still gets a Private Player URL,
             // convert it back to a regular YouTube video URL.
-            if navigationAction.request.url?.isPrivatePlayerScheme == true,
-                let (videoID, timestamp) = navigationAction.request.url?.youtubeVideoParams {
+            if navigationAction.url.isPrivatePlayerScheme,
+                let (videoID, timestamp) = navigationAction.url.youtubeVideoParams {
 
                 tab.webView.load(.youtube(videoID, timestamp: timestamp))
                 return .cancel
@@ -142,17 +142,19 @@ extension PrivatePlayer {
         }
 
         // Don't allow loading Private Player HTML directly
-        if navigationAction.request.url?.path == YoutubePlayerNavigationHandler.htmlTemplatePath {
+        if navigationAction.url.path == YoutubePlayerNavigationHandler.htmlTemplatePath {
             return .cancel
         }
 
         // Always allow loading Private Player URLs (local HTML)
-        if navigationAction.request.url?.isPrivatePlayerScheme == true {
+        if navigationAction.url.isPrivatePlayerScheme {
             return .allow
         }
 
         // We only care about YouTube video URLs loaded into main frame or within a Private Player
-        guard navigationAction.isTargetingMainFrame || tab.content.isPrivatePlayer, navigationAction.request.url?.isYoutubeVideo == true else {
+        guard navigationAction.isForMainFrame || tab.content.isPrivatePlayer,
+              navigationAction.url.isYoutubeVideo
+        else {
             return nil
         }
 
@@ -167,10 +169,12 @@ extension PrivatePlayer {
             return .cancel
         }
 
-        let didSelectRecommendationFromPrivatePlayer = tab.content.isPrivatePlayer && navigationAction.request.url?.isYoutubeVideoRecommendation == true
+        let didSelectRecommendationFromPrivatePlayer = tab.content.isPrivatePlayer && navigationAction.url.isYoutubeVideoRecommendation
 
         // Recommendations must always be opened in Private Player.
-        guard alwaysOpenInPrivatePlayer || didSelectRecommendationFromPrivatePlayer, let (videoID, timestamp) = navigationAction.request.url?.youtubeVideoParams else {
+        guard alwaysOpenInPrivatePlayer || didSelectRecommendationFromPrivatePlayer,
+              let (videoID, timestamp) = navigationAction.url.youtubeVideoParams
+        else {
             return nil
         }
 
@@ -187,8 +191,8 @@ extension PrivatePlayer {
         return nil
     }
 
-    private func isGoingBackFromPrivatePlayerToYoutubeVideo(for navigationAction: WKNavigationAction, in tab: Tab) -> Bool {
-        guard navigationAction.navigationType == .backForward,
+    private func isGoingBackFromPrivatePlayerToYoutubeVideo(for navigationAction: NavigationAction, in tab: Tab) -> Bool {
+        guard navigationAction.navigationType.isBackForward,
               let url = tab.webView.backForwardList.currentItem?.url,
               let forwardURL = tab.webView.backForwardList.forwardItem?.url
         else {

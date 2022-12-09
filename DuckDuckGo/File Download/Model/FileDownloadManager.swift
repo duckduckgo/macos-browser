@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import BrowserServicesKit
 import Cocoa
 import Combine
 import os

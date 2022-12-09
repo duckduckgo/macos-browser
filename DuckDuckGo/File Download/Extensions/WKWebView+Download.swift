@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import BrowserServicesKit
 import WebKit
 
 // A workaround to bring WKDownload support back to macOS 11.3 (which really has WKDownload support)
@@ -155,28 +156,20 @@ extension WKWebView {
 
 }
 
-extension WKNavigationActionPolicy {
-    // https://github.com/WebKit/WebKit/blob/9a6f03d46238213231cf27641ed1a55e1949d074/Source/WebKit/UIProcess/API/Cocoa/WKNavigationDelegate.h#L49
-    private static let download = WKNavigationActionPolicy(rawValue: Self.allow.rawValue + 1) ?? .cancel
-
-    static func download(_ navigationAction: WKNavigationAction,
-                         using webView: WKWebView) -> WKNavigationActionPolicy {
-        webView.configuration.processPool
-            .setDownloadDelegateIfNeeded(using: LegacyWebKitDownloadDelegate.init)?
-            .registerDownloadNavigationAction(navigationAction)
-        return .download
-    }
-
+protocol NavigationDownloadPolicy {
+    static var download: Self { get }
 }
 
-extension WKNavigationResponsePolicy {
-    private static let download = WKNavigationResponsePolicy(rawValue: Self.allow.rawValue + 1) ?? .cancel
+extension NavigationActionPolicy: NavigationDownloadPolicy {}
+extension NavigationResponsePolicy: NavigationDownloadPolicy {}
 
-    static func download(_ navigationResponse: WKNavigationResponse,
-                         using webView: WKWebView) -> WKNavigationResponsePolicy {
+extension NavigationDownloadPolicy {
+
+    static func download(_ url: URL, using webView: WKWebView, with callback: @escaping (WebKitDownload) -> Void) -> Self {
         webView.configuration.processPool
             .setDownloadDelegateIfNeeded(using: LegacyWebKitDownloadDelegate.init)?
-            .registerDownloadNavigationResponse(navigationResponse)
+            .registerDownloadDidStartCallback(callback, for: url)
         return .download
     }
+
 }

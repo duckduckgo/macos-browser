@@ -81,6 +81,10 @@ extension OSLog {
         Logging.atbLoggingEnabled ? Logging.atbLog : .disabled
     }
 
+    static var navigation: OSLog {
+        Logging.navigationLoggingEnabled ? Logging.navigationLog : .disabled
+    }
+
 }
 
 struct Logging {
@@ -129,6 +133,9 @@ struct Logging {
 
     fileprivate static let bitwardenLoggingEnabled = false
     fileprivate static let bitwardenLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Bitwarden")
+
+    fileprivate static let navigationLoggingEnabled = true
+    fileprivate static let navigationLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Navigation")
 
 }
 

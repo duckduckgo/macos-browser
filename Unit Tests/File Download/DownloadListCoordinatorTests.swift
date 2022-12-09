@@ -181,7 +181,7 @@ final class DownloadListCoordinatorTests: XCTestCase {
             }
         }
 
-        task.downloadDidFinish(download)
+        task.downloadDidFinish(download.asWKDownload())
 
         withExtendedLifetime(c) {
             waitForExpectations(timeout: 1)
@@ -204,7 +204,7 @@ final class DownloadListCoordinatorTests: XCTestCase {
             XCTAssertEqual(item.error?.resumeData, .resumeData)
         }
 
-        task.download(download, didFailWithError: TestError(), resumeData: .resumeData)
+        task.download(download.asWKDownload(), didFailWithError: TestError(), resumeData: .resumeData)
 
         withExtendedLifetime(c) {
             waitForExpectations(timeout: 1)
@@ -270,7 +270,7 @@ final class DownloadListCoordinatorTests: XCTestCase {
         let c1 = coordinator.updates.sink { _, _ in
             taskFailed.fulfill()
         }
-        task.download(download, didFailWithError: TestError(), resumeData: .resumeData)
+        task.download(download.asWKDownload(), didFailWithError: TestError(), resumeData: .resumeData)
         waitForExpectations(timeout: 1)
         c1.cancel()
 
@@ -397,8 +397,8 @@ final class DownloadListCoordinatorTests: XCTestCase {
         let (download2, task2, _) = setUpCoordinatorAndAddDownload()
         let (download3, task3, _) = setUpCoordinatorAndAddDownload()
 
-        task2.download(download2, didFailWithError: TestError(), resumeData: nil)
-        task3.downloadDidFinish(download3)
+        task2.download(download2.asWKDownload(), didFailWithError: TestError(), resumeData: nil)
+        task3.downloadDidFinish(download3.asWKDownload())
 
         let clearCalled = expectation(description: "clear called")
         store.clearBlock = { date, _ in
@@ -412,7 +412,7 @@ final class DownloadListCoordinatorTests: XCTestCase {
         XCTAssertTrue(coordinator.hasActiveDownloads)
         XCTAssertEqual(coordinator.downloads(sortedBy: \.modified, ascending: true).count, 1)
 
-        task1.download(download1, didFailWithError: TestError(), resumeData: nil)
+        task1.download(download1.asWKDownload(), didFailWithError: TestError(), resumeData: nil)
     }
 
     func testWhenDownloadCancelledThenTaskIsCancelled() {

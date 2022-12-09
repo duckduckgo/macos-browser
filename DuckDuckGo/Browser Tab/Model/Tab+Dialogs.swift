@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import BrowserServicesKit
 import Foundation
 import WebKit
 
@@ -29,7 +30,7 @@ typealias SavePanelDialogRequest = UserDialogRequest<SavePanelParameters, (url: 
 typealias ConfirmDialogRequest = UserDialogRequest<String, Bool>
 typealias TextInputDialogRequest = UserDialogRequest<(prompt: String, defaultText: String?), String?>
 typealias AlertDialogRequest = UserDialogRequest<String, Void>
-typealias BasicAuthDialogRequest = UserDialogRequest<URLProtectionSpace, (URLSession.AuthChallengeDisposition, URLCredential?)>
+typealias BasicAuthDialogRequest = UserDialogRequest<URLProtectionSpace, AuthChallengeDisposition?>
 typealias PrintDialogRequest = UserDialogRequest<NSPrintOperation, Bool>
 
 enum JSAlertQuery {

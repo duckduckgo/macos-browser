@@ -74,16 +74,10 @@ enum UserAgent {
         return "ddg_mac/\(appVersion) (\(appID); macOS \(systemVersion))"
     }
 
-    static func `for`(_ url: URL?) -> String {
-        guard let absoluteString = url?.absoluteString else {
-            return Self.default
-        }
-
-        if let userAgent = domainUserAgents.first(where: { (regex, _) in absoluteString.matches(regex) })?.value {
-            return userAgent
-        }
-
-        return Self.default
+    static func `for`(_ url: URL) -> String {
+        return domainUserAgents.first(where: { (regex, _) in
+            url.absoluteString.matches(regex)
+        })?.value ?? Self.default
     }
 
 }

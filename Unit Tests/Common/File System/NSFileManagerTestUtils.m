@@ -1,7 +1,7 @@
 //
-//  WebKitDownloadDelegate.swift
+//  NSFileManagerTestUrils.m
 //
-//  Copyright © 2021 DuckDuckGo. All rights reserved.
+//  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,11 +16,12 @@
 //  limitations under the License.
 //
 
-import WebKit
+#import <Foundation/Foundation.h>
 
-@available(macOS 11.3, *)
-@objc protocol WebKitDownloadDelegate: WKDownloadDelegate {
+@implementation NSFileManager (TestUtils)
 
-    func download(_ download: WKDownload, didReceiveDataWithLength length: UInt64)
-
++ (id)defaultManager {
+    return [NSClassFromString(@"TestFileManager") defaultManager];
 }
+
+@end

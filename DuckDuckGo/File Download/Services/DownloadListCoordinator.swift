@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import BrowserServicesKit
 import Foundation
 import Combine
 import os.log

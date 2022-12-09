@@ -16,21 +16,24 @@
 //  limitations under the License.
 //
 
-import Foundation
+import BrowserServicesKit
+import WebKit
 @testable import DuckDuckGo_Privacy_Browser
 
+@available(macOS 11.3, *)
 final class WKDownloadMock: NSObject, WebKitDownload, ProgressReporting {
     var originalRequest: URLRequest?
     var webView: WKWebView?
     var progress = Progress()
-    weak var downloadDelegate: WebKitDownloadDelegate?
+    weak var delegate: WKDownloadDelegate?
 
     var cancelBlock: (() -> Void)?
-    func cancel() {
+    @objc func cancel() {
         cancelBlock?()
     }
 
-    func asNSObject() -> NSObject {
-        self
+    func asWKDownload() -> WKDownload {
+        withUnsafePointer(to: self) { $0.withMemoryRebound(to: WKDownload.self, capacity: 1) { $0 } }.pointee
     }
+
 }
