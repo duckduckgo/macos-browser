@@ -30,7 +30,6 @@ protocol BrowserTabViewControllerClickDelegate: AnyObject {
 final class BrowserTabViewController: NSViewController {
 
     @IBOutlet weak var errorView: NSView!
-    @IBOutlet weak var homePageView: NSView!
     @IBOutlet weak var errorMessageLabel: NSTextField!
     @IBOutlet weak var hoverLabel: NSTextField!
     @IBOutlet weak var hoverLabelContainer: NSView!
@@ -57,23 +56,18 @@ final class BrowserTabViewController: NSViewController {
 
     private var cookieConsentPopoverManager = CookieConsentPopoverManager()
 
+    private let homepageViewController: HomePageViewController
+
     required init?(coder: NSCoder) {
         fatalError("BrowserTabViewController: Bad initializer")
     }
 
     init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel) {
         self.tabCollectionViewModel = tabCollectionViewModel
+        self.homepageViewController = HomePageViewController(tabCollectionViewModel: tabCollectionViewModel,
+                                                             bookmarkManager: LocalBookmarkManager.shared)
 
         super.init(coder: coder)
-    }
-
-    @IBSegueAction func createHomePageViewController(_ coder: NSCoder) -> NSViewController? {
-        guard let controller = HomePageViewController(coder: coder,
-                                                      tabCollectionViewModel: tabCollectionViewModel,
-                                                      bookmarkManager: LocalBookmarkManager.shared) else {
-            fatalError("BrowserTabViewController: Failed to init HomePageViewController")
-        }
-        return controller
     }
 
     override func viewDidLoad() {
@@ -293,7 +287,7 @@ final class BrowserTabViewController: NSViewController {
         errorMessageLabel.stringValue = message
         errorView.isHidden = !shown
         webView?.isHidden = shown
-        homePageView.isHidden = shown
+        homepageViewController.view.isHidden = shown
     }
 
     func openNewTab(with content: Tab.TabContent, parentTab: Tab? = nil, selected: Bool = false, canBeClosedWithBack: Bool = false) {
@@ -337,7 +331,7 @@ final class BrowserTabViewController: NSViewController {
     }
 
     private func removeAllTabContent(includingWebView: Bool = true) {
-        self.homePageView.removeFromSuperview()
+        homepageViewController.view.removeFromSuperview()
         transientTabContentViewController?.removeCompletely()
         preferencesViewController.removeCompletely()
         bookmarksViewController.removeCompletely()
@@ -395,7 +389,7 @@ final class BrowserTabViewController: NSViewController {
 
         case .homePage:
             removeAllTabContent()
-            view.addAndLayout(homePageView)
+            view.addAndLayout(homepageViewController.view)
 
         default:
             break

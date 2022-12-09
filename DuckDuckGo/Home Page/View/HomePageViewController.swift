@@ -41,18 +41,17 @@ final class HomePageViewController: NSViewController {
         fatalError("HomePageViewController: Bad initializer")
     }
 
-    init?(coder: NSCoder,
-          tabCollectionViewModel: TabCollectionViewModel,
-          bookmarkManager: BookmarkManager,
-          historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
-          fireViewModel: FireViewModel = FireCoordinator.fireViewModel) {
+    init(tabCollectionViewModel: TabCollectionViewModel,
+         bookmarkManager: BookmarkManager,
+         historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
+         fireViewModel: FireViewModel = FireCoordinator.fireViewModel) {
 
         self.tabCollectionViewModel = tabCollectionViewModel
         self.bookmarkManager = bookmarkManager
         self.historyCoordinating = historyCoordinating
         self.fireViewModel = fireViewModel
 
-        super.init(coder: coder)
+        super.init(nibName: nil, bundle: nil)
     }
 
     override func viewDidLoad() {
