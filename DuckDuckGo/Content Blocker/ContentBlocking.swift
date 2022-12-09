@@ -150,7 +150,7 @@ final class AppContentBlocking {
     
     // MARK: - Ad Click Attribution
 
-    let attributionEvents = EventMapping<AdClickAttributionEvents> { event, _, parameters, _ in
+    let attributionEvents: EventMapping<AdClickAttributionEvents>? = .init { event, _, parameters, _ in
         let domainEvent: Pixel.Event
         switch event {
         case .adAttributionDetected:
@@ -162,7 +162,7 @@ final class AppContentBlocking {
         Pixel.fire(domainEvent, withAdditionalParameters: parameters ?? [:])
     }
     
-    let attributionDebugEvents = EventMapping<AdClickAttributionDebugEvents> { event, _, _, _ in
+    let attributionDebugEvents: EventMapping<AdClickAttributionDebugEvents>? = .init { event, _, _, _ in
         let domainEvent: Pixel.Event.Debug
         switch event {
         case .adAttributionCompilationFailedForAttributedRulesList:

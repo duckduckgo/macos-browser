@@ -146,7 +146,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             }
         }
     }
-    struct ExtensionDependencies: TabExtensionDependencies {
+    private struct ExtensionDependencies: TabExtensionDependencies {
         var userScriptsPublisher: AnyPublisher<UserScripts?, Never>
         var contentBlocking: ContentBlockingProtocol
         var adClickAttributionDependencies: AdClickAttributionDependencies
@@ -155,6 +155,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         var userContentControllerProvider: UserContentControllerProvider
     }
 
+    // "protected" delegate property for extensions usage 
     private weak var delegate: TabDelegate?
     @objc private var objcDelegate: Any? { delegate }
     static var objcDelegateKeyPath: String { #keyPath(objcDelegate) }
@@ -164,11 +165,13 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     let pinnedTabsManager: PinnedTabsManager
     private let privatePlayer: PrivatePlayer
     private let privacyFeatures: AnyPrivacyFeatures
-    var contentBlocking: AnyContentBlocking { privacyFeatures.contentBlocking }
+    private var contentBlocking: AnyContentBlocking { privacyFeatures.contentBlocking }
 
     private let webViewConfiguration: WKWebViewConfiguration
 
     private var extensions: TabExtensions
+    // accesing TabExtensions‘ Public Protocols projecting tab.extensions.extensionName to tab.extensionName
+    // allows extending Tab functionality while maintaining encapsulation
     subscript<Extension>(dynamicMember keyPath: KeyPath<TabExtensions, Extension?>) -> Extension? {
         self.extensions[keyPath: keyPath]
     }
@@ -1046,7 +1049,7 @@ extension Tab: ContentBlockerRulesUserScriptDelegate {
         guard let url = webView.url else { return }
         
         privacyInfo?.trackerInfo.addDetectedTracker(tracker, onPageWithURL: url)
-        extensions.adClickAttribution?.logic.onRequestDetected(request: tracker)
+        self.adClickAttribution?.logic.onRequestDetected(request: tracker)
         historyCoordinating.addDetectedTracker(tracker, onURL: url)
     }
 
@@ -1204,7 +1207,7 @@ extension Tab: WKNavigationDelegate {
         }
 
         if navigationAction.isTargetingMainFrame, navigationAction.navigationType == .backForward {
-            extensions.adClickAttribution?.logic.onBackForwardNavigation(mainFrameURL: webView.url)
+            self.adClickAttribution?.logic.onBackForwardNavigation(mainFrameURL: webView.url)
         }
 
         if navigationAction.isTargetingMainFrame, navigationAction.navigationType != .backForward {
@@ -1417,10 +1420,10 @@ extension Tab: WKNavigationDelegate {
         }
         
         if navigationResponse.isForMainFrame && isSuccessfulResponse {
-            extensions.adClickAttribution?.detection.on2XXResponse(url: webView.url)
+            self.adClickAttribution?.detection.on2XXResponse(url: webView.url)
         }
         
-        await extensions.adClickAttribution?.logic.onProvisionalNavigation()
+        await self.adClickAttribution?.logic.onProvisionalNavigation()
 
         return .allow
     }

@@ -34,8 +34,8 @@ protocol AdClickAttributionDependencies {
     var adClickAttribution: AdClickAttributing { get }
     var adClickAttributionRulesProvider: AdClickAttributionRulesProviding { get }
 
-    var attributionEvents: EventMapping<AdClickAttributionEvents> { get }
-    var attributionDebugEvents: EventMapping<AdClickAttributionDebugEvents> { get }
+    var attributionEvents: EventMapping<AdClickAttributionEvents>? { get }
+    var attributionDebugEvents: EventMapping<AdClickAttributionDebugEvents>? { get }
 
 }
 

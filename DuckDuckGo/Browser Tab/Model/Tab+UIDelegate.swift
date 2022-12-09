@@ -20,14 +20,9 @@ import Combine
 import Foundation
 import WebKit
 
-protocol TabDelegateProvider {
-    var delegate: TabDelegate? { get }
-}
-private protocol TabProtocol {
-    associatedtype T: TabDelegateProvider
-}
 extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
 
+    // "protected" delegate property
     private var delegate: TabDelegate? {
         self.value(forKeyPath: Tab.objcDelegateKeyPath) as? TabDelegate
     }

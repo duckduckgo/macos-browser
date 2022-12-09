@@ -23,7 +23,8 @@ import Foundation
 @testable import DuckDuckGo_Privacy_Browser
 
 @objc(ContentBlockingMock)
-final class ContentBlockingMock: NSObject, ContentBlockingProtocol {
+final class ContentBlockingMock: NSObject, ContentBlockingProtocol, AdClickAttributionDependencies {
+
     struct EDP: EmbeddedDataProvider {
         var embeddedDataEtag: String = ""
         var embeddedData: Data = .init()
@@ -37,10 +38,16 @@ final class ContentBlockingMock: NSObject, ContentBlockingProtocol {
 
     typealias ContentBlockingManager = ContentBlockerRulesManagerMock
 
-    let contentBlockingManager = ContentBlockerRulesManagerMock()
+    let contentBlockingManager: ContentBlockerRulesManagerProtocol = ContentBlockerRulesManagerMock()
     let contentBlockingAssetsPublisher = PassthroughSubject<UserContentUpdating.NewContent, Never>().eraseToAnyPublisher()
     let contentBlockerRulesManager = ContentBlockerRulesManagerMock()
-    let privacyConfigurationManager = MockPrivacyConfigurationManager()
+    let privacyConfigurationManager: PrivacyConfigurationManaging = MockPrivacyConfigurationManager()
+
+    var adClickAttribution: AdClickAttributing = MockAttributing()
+    var adClickAttributionRulesProvider: AdClickAttributionRulesProviding = MockAttributionRulesProvider()
+
+    var attributionEvents: EventMapping<AdClickAttributionEvents>?
+    var attributionDebugEvents: BrowserServicesKit.EventMapping<BrowserServicesKit.AdClickAttributionDebugEvents>?
 
 }
 
@@ -53,6 +60,56 @@ final class HTTPSUpgradeStoreMock: NSObject, HTTPSUpgradeStore {
     var excludedDomains: [String] = []
     func hasExcludedDomain(_ domain: String) -> Bool {
         excludedDomains.contains(domain)
+    }
+
+}
+
+final class MockAttributing: AdClickAttributing {
+
+    init(onFormatMatching: @escaping (URL) -> Bool = { _ in return true },
+         onParameterNameQuery: @escaping (URL) -> String? = { _ in return nil }) {
+        self.onFormatMatching = onFormatMatching
+        self.onParameterNameQuery = onParameterNameQuery
+    }
+
+    var isEnabled = true
+
+    var allowlist = [AdClickAttributionFeature.AllowlistEntry]()
+
+    var navigationExpiration: Double = 30
+    var totalExpiration: Double = 7 * 24 * 60
+
+    var onFormatMatching: (URL) -> Bool
+    var onParameterNameQuery: (URL) -> String?
+
+    func isMatchingAttributionFormat(_ url: URL) -> Bool {
+        return onFormatMatching(url)
+    }
+
+    func attributionDomainParameterName(for url: URL) -> String? {
+        return onParameterNameQuery(url)
+    }
+
+    var isHeuristicDetectionEnabled: Bool = true
+    var isDomainDetectionEnabled: Bool = true
+
+}
+
+final class MockAttributionRulesProvider: AdClickAttributionRulesProviding {
+
+    enum Constants {
+        static let globalAttributionRulesListName = "global"
+    }
+
+    init() {
+    }
+
+    var globalAttributionRules: ContentBlockerRulesManager.Rules?
+
+    var onRequestingAttribution: (String, @escaping (ContentBlockerRulesManager.Rules?) -> Void) -> Void = { _, _  in }
+    func requestAttribution(forVendor vendor: String,
+                            completion: @escaping (ContentBlockerRulesManager.Rules?) -> Void) {
+        onRequestingAttribution(vendor, completion)
     }
 
 }
