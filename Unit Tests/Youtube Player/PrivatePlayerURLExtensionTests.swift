@@ -90,7 +90,7 @@ final class PrivatePlayerURLExtensionTests: XCTestCase {
         XCTAssertEqual(params?.videoID, "abcdef12345")
         XCTAssertEqual(params?.timestamp, nil)
 
-        let paramsWithTimestamp = "https://www.youtube-nocookie.com/embed/abcdef12345?t=23s".url!.youtubeVideoParams
+        let paramsWithTimestamp = "https://www.youtube-nocookie.com/embed/abcdef12345?start=23s".url!.youtubeVideoParams
         XCTAssertEqual(paramsWithTimestamp?.videoID, "abcdef12345")
         XCTAssertEqual(paramsWithTimestamp?.timestamp, "23s")
     }
@@ -128,13 +128,13 @@ final class PrivatePlayerURLExtensionTests: XCTestCase {
 
     func testYoutubeNoCookieURLTimestampValidation() {
         XCTAssertEqual(URL.youtubeNoCookie("abcdef12345", timestamp: nil).absoluteString, "https://www.youtube-nocookie.com/embed/abcdef12345")
-        XCTAssertEqual(URL.youtubeNoCookie("abcdef12345", timestamp: "23s").absoluteString, "https://www.youtube-nocookie.com/embed/abcdef12345?t=23s")
-        XCTAssertEqual(URL.youtubeNoCookie("abcdef12345", timestamp: "5m5s").absoluteString, "https://www.youtube-nocookie.com/embed/abcdef12345?t=5m5s")
-        XCTAssertEqual(URL.youtubeNoCookie("abcdef12345", timestamp: "12h400m100s").absoluteString, "https://www.youtube-nocookie.com/embed/abcdef12345?t=12h400m100s")
-        XCTAssertEqual(URL.youtubeNoCookie("abcdef12345", timestamp: "12h2s2h").absoluteString, "https://www.youtube-nocookie.com/embed/abcdef12345?t=12h2s2h")
-        XCTAssertEqual(URL.youtubeNoCookie("abcdef12345", timestamp: "5m5m5m").absoluteString, "https://www.youtube-nocookie.com/embed/abcdef12345?t=5m5m5m")
+        XCTAssertEqual(URL.youtubeNoCookie("abcdef12345", timestamp: "23s").absoluteString, "https://www.youtube-nocookie.com/embed/abcdef12345?start=23s")
+        XCTAssertEqual(URL.youtubeNoCookie("abcdef12345", timestamp: "5m5s").absoluteString, "https://www.youtube-nocookie.com/embed/abcdef12345?start=5m5s")
+        XCTAssertEqual(URL.youtubeNoCookie("abcdef12345", timestamp: "12h400m100s").absoluteString, "https://www.youtube-nocookie.com/embed/abcdef12345?start=12h400m100s")
+        XCTAssertEqual(URL.youtubeNoCookie("abcdef12345", timestamp: "12h2s2h").absoluteString, "https://www.youtube-nocookie.com/embed/abcdef12345?start=12h2s2h")
+        XCTAssertEqual(URL.youtubeNoCookie("abcdef12345", timestamp: "5m5m5m").absoluteString, "https://www.youtube-nocookie.com/embed/abcdef12345?start=5m5m5m")
 
-        XCTAssertEqual(URL.youtubeNoCookie("abcdef12345", timestamp: "5").absoluteString, "https://www.youtube-nocookie.com/embed/abcdef12345?t=5")
+        XCTAssertEqual(URL.youtubeNoCookie("abcdef12345", timestamp: "5").absoluteString, "https://www.youtube-nocookie.com/embed/abcdef12345?start=5")
         XCTAssertEqual(URL.youtubeNoCookie("abcdef12345", timestamp: "10d").absoluteString, "https://www.youtube-nocookie.com/embed/abcdef12345")
     }
 }

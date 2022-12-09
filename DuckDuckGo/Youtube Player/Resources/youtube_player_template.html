@@ -546,7 +546,8 @@
                 getSanitizedTimestamp: () => {
                     if (window.location && window.location.search) {
                         let parameters = new URLSearchParams(window.location.search);
-                        let timeParameter = parameters.get('t');
+                        // check both 't' and 'start' in case we're at the youtube-nocookie.com URL
+                        let timeParameter = parameters.get('t') || parameters.get('start');
 
                         if (timeParameter) {
                             return Comms.getTimestampInSeconds(timeParameter);
@@ -579,6 +580,8 @@
                         for (unit in units) {
                             if (part.includes(unit)) {
                                 return total + (parseInt(part) * units[unit]);
+                            } else {
+                                return total + parseInt(part);
                             }
                         }
                     }, 0);

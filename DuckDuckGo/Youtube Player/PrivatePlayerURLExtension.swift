@@ -39,7 +39,7 @@ extension URL {
 
     static func youtubeNoCookie(_ videoID: String, timestamp: String? = nil) -> URL {
         let url = "https://www.youtube-nocookie.com/embed/\(videoID)".url!
-        return url.addingTimestamp(timestamp)
+        return url.addingTimestamp(timestamp, forKey: "start")
     }
 
     static func youtube(_ videoID: String, timestamp: String? = nil) -> URL {
@@ -113,8 +113,9 @@ extension URL {
         }
 
         if isPrivatePlayer {
+            let timestampKey = isYoutubeNocookie ? "start" : "t"
             let unsafeVideoID = lastPathComponent
-            let timestamp = getParameter(named: "t")
+            let timestamp = getParameter(named: timestampKey)
             return (unsafeVideoID.removingCharacters(in: .youtubeVideoIDNotAllowed), timestamp)
         }
 
@@ -139,14 +140,18 @@ extension URL {
         host?.droppingWwwPrefix() == "youtube.com" && path == "/watch"
     }
 
-    private func addingTimestamp(_ timestamp: String?) -> URL {
+    private var isYoutubeNocookie: Bool {
+        host?.droppingWwwPrefix() == "youtube-nocookie.com"
+    }
+
+    private func addingTimestamp(_ timestamp: String?, forKey key: String = "t") -> URL {
         guard let timestamp = timestamp,
               let regex = try? NSRegularExpression.init(pattern: "^(\\d+[smh]?)+$"),
               timestamp.matches(regex)
         else {
             return self
         }
-        return appendingParameter(name: "t", value: timestamp)
+        return appendingParameter(name: key, value: timestamp)
     }
 }
 
