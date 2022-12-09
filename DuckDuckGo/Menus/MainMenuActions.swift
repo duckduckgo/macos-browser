@@ -290,7 +290,7 @@ extension MainViewController {
             return
         }
 
-        selectedTabViewModel.tab.webView.zoomLevel = 1.0
+        selectedTabViewModel.tab.webView.resetZoomLevel()
     }
 
     @IBAction func toggleDownloads(_ sender: Any) {

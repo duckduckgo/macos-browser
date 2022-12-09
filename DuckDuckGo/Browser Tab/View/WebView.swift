@@ -56,7 +56,7 @@ final class WebView: WKWebView {
     }
 
     var canZoomToActualSize: Bool {
-        self.window != nil && self.zoomLevel != 1.0
+        self.window != nil && (self.zoomLevel != 1.0 || self.magnification != 1.0)
     }
 
     var canZoomIn: Bool {
@@ -65,6 +65,11 @@ final class WebView: WKWebView {
 
     var canZoomOut: Bool {
         self.window != nil && self.zoomLevel > Self.minZoomLevel
+    }
+
+    func resetZoomLevel() {
+        zoomLevel = 1.0
+        magnification = 1.0
     }
 
     func zoomIn() {
