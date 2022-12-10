@@ -23,10 +23,6 @@ import Combine
 import SwiftUI
 import BrowserServicesKit
 
-protocol BrowserTabViewControllerClickDelegate: AnyObject {
-    func browserTabViewController(_ browserTabViewController: BrowserTabViewController, didClickAtPoint: CGPoint)
-}
-
 final class BrowserTabViewController: NSViewController {
 
     @IBOutlet weak var errorView: NSView!
@@ -45,6 +41,7 @@ final class BrowserTabViewController: NSViewController {
     private var userDialogsCancellable: AnyCancellable?
     private var activeUserDialogCancellable: ModalSheetCancellable?
     private var errorViewStateCancellable: AnyCancellable?
+    private var hoverLinkCancellable: AnyCancellable?
     private var pinnedTabsDelegatesCancellable: AnyCancellable?
     private var keyWindowSelectedTabCancellable: AnyCancellable?
     private var cancellables = Set<AnyCancellable>()
@@ -120,6 +117,7 @@ final class BrowserTabViewController: NSViewController {
                 self.showTabContent(of: selectedTabViewModel)
                 self.subscribeToErrorViewState()
                 self.subscribeToTabContent(of: selectedTabViewModel)
+                self.subscribeToHoveredLink(of: selectedTabViewModel)
                 self.showCookieConsentPopoverIfNecessary(selectedTabViewModel)
                 self.subscribeToUserDialogs(of: selectedTabViewModel)
             }
@@ -138,21 +136,23 @@ final class BrowserTabViewController: NSViewController {
 
     private func subscribeToTabs() {
         tabCollectionViewModel.tabCollection.$tabs
-            .sink { [weak self] tabs in
-                for tab in tabs where tab.delegate !== self {
-                    tab.delegate = self
-                }
-            }
+            .sink(receiveValue: setDelegate())
             .store(in: &cancellables)
     }
 
     private func subscribeToPinnedTabs() {
         pinnedTabsDelegatesCancellable = tabCollectionViewModel.pinnedTabsCollection?.$tabs
-            .sink { [weak self] tabs in
-                for tab in tabs where tab.delegate !== self {
-                    tab.delegate = self
-                }
+            .sink(receiveValue: setDelegate())
+    }
+
+    private func setDelegate() -> ([Tab]) -> Void {
+        { [weak self] (tabs: [Tab]) in
+            guard let self else { return }
+            for tab in tabs {
+                tab.setDelegate(self)
+                tab.autofill?.setDelegate(self)
             }
+        }
     }
 
     private func removeWebViewFromHierarchy(webView: WebView? = nil,
@@ -268,6 +268,12 @@ final class BrowserTabViewController: NSViewController {
         }
     }
 
+    func subscribeToHoveredLink(of tabViewModel: TabViewModel?) {
+        hoverLinkCancellable = tabViewModel?.tab.hoveredLinkPublisher.sink { [weak self] in
+            self?.scheduleHoverLabelUpdatesForUrl($0)
+        }
+    }
+
     func makeWebViewFirstResponder() {
         if let webView = self.webView {
             webView.makeMeFirstResponder()
@@ -300,9 +306,8 @@ final class BrowserTabViewController: NSViewController {
         // shouldn't open New Tabs in PopUp window
         guard view.window?.isPopUpWindow == false else {
             // Prefer Tab's Parent
-            if let parentTab = tabCollectionViewModel.selectedTabViewModel?.tab.parentTab, parentTab.delegate !== self {
-                let tab = Tab(content: content, parentTab: parentTab, shouldLoadInBackground: true)
-                parentTab.delegate?.tab(parentTab, createdChild: tab, of: .tab(selected: true))
+            if let parentTab = tabCollectionViewModel.selectedTabViewModel?.tab.parentTab {
+                parentTab.openChild(with: content, of: .tab(selected: true))
                 parentTab.webView.window?.makeKeyAndOrderFront(nil)
                 // Act as default URL Handler if no Parent
             } else {
@@ -339,8 +344,8 @@ final class BrowserTabViewController: NSViewController {
     private func removeAllTabContent(includingWebView: Bool = true) {
         self.homePageView.removeFromSuperview()
         transientTabContentViewController?.removeCompletely()
-        preferencesViewController.removeCompletely()
-        bookmarksViewController.removeCompletely()
+        $preferencesViewController?.removeCompletely()
+        $bookmarksViewController?.removeCompletely()
         if includingWebView {
             self.removeWebViewFromHierarchy()
         }
@@ -418,47 +423,23 @@ final class BrowserTabViewController: NSViewController {
 
     // MARK: - Preferences
 
-    private(set) lazy var preferencesViewController: PreferencesViewController = {
-        let viewController = PreferencesViewController()
-        viewController.delegate = self
-
-        return viewController
-    }()
+    @Lazy({ (self: BrowserTabViewController, vc) in vc.delegate = self })
+    var preferencesViewController = PreferencesViewController()
 
     // MARK: - Bookmarks
 
-    private(set) lazy var bookmarksViewController: BookmarkManagementSplitViewController = {
-        let viewController = BookmarkManagementSplitViewController.create()
-        viewController.delegate = self
+    @Lazy({ (self: BrowserTabViewController, vc) in vc.delegate = self })
+    var bookmarksViewController: BookmarkManagementSplitViewController = .create()
 
-        return viewController
-    }()
-
-    private var _contentOverlayPopover: ContentOverlayPopover?
-    public var contentOverlayPopover: ContentOverlayPopover {
-        guard let overlay = _contentOverlayPopover else {
-            let overlayPopover = ContentOverlayPopover(currentTabView: view)
-            WindowControllersManager.shared.stateChanged
-                .sink { [weak self] _ in
-                    self?._contentOverlayPopover?.websiteAutofillUserScriptCloseOverlay(nil)
-                }.store(in: &cancellables)
-            _contentOverlayPopover = overlayPopover
-            return overlayPopover
-        }
-        return overlay
-    }
-
-    @objc(_webView:printFrame:)
-    func webView(_ webView: WKWebView, printFrame handle: Any) {
-        webView.tab?.print(frame: handle)
-    }
-
-    @available(macOS 12, *)
-    @objc(_webView:printFrame:pdfFirstPageSize:completionHandler:)
-    func webView(_ webView: WKWebView, printFrame handle: Any, pdfFirstPageSize size: CGSize, completionHandler: () -> Void) {
-        self.webView(webView, printFrame: handle)
-        completionHandler()
-    }
+    @Lazy({ (self: BrowserTabViewController) in
+        let overlayPopover = ContentOverlayPopover(currentTabView: self.view)
+        WindowControllersManager.shared.stateChanged
+            .sink { [weak overlayPopover] _ in
+                overlayPopover?.websiteAutofillUserScriptCloseOverlay(nil)
+            }.store(in: &self.cancellables)
+        return overlayPopover
+    })
+    public var contentOverlayPopover: ContentOverlayPopover
 
 }
 
@@ -563,10 +544,6 @@ extension BrowserTabViewController: TabDelegate {
                                                             persistence: .forSession))
 
         }
-    }
-
-    func tab(_ tab: Tab, didChangeHoverLink url: URL?) {
-        scheduleHoverLabelUpdatesForUrl(url)
     }
 
     func windowDidBecomeKey() {
@@ -911,7 +888,7 @@ extension BrowserTabViewController {
 
     func mouseDown(with event: NSEvent) -> NSEvent? {
         guard event.window === self.view.window else { return event }
-        tabViewModel?.tab.browserTabViewController(self, didClickAtPoint: event.locationInWindow)
+        tabViewModel?.tab.autofill?.didClick(at: event.locationInWindow)
         return event
     }
 }

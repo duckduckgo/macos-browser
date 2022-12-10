@@ -35,7 +35,7 @@ final class ContentBlockingRulesUpdateObserver {
         self.tabViewModel = tabViewModel
         self.onPendingUpdates = onPendingUpdates
         
-        bindContentBlockingRulesRecompilation(publisher: ContentBlocking.shared.userContentUpdating.userContentBlockingAssets)
+        bindContentBlockingRulesRecompilation(publisher: (ContentBlocking.shared as? AppContentBlocking)!.userContentUpdating.userContentBlockingAssets)
     }
     
     public func didStartCompilation(for domain: String, token: ContentBlockerRulesManager.CompletionToken ) {

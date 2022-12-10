@@ -84,7 +84,7 @@ final class PrivatePlayer {
 
     init(
         preferences: PrivatePlayerPreferences = .shared,
-        privacyConfigurationManager: PrivacyConfigurationManaging & AnyObject = ContentBlocking.shared.privacyConfigurationManager
+        privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager
     ) {
         self.preferences = preferences
         isFeatureEnabled = privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .duckPlayer)
@@ -365,3 +365,29 @@ extension PrivatePlayer {
         return true
     }
 }
+
+#if DEBUG
+
+final class PrivatePlayerPreferencesPersistorMock: PrivatePlayerPreferencesPersistor {
+    var privatePlayerMode: PrivatePlayerMode
+    var youtubeOverlayInteracted: Bool
+
+    init(privatePlayerMode: PrivatePlayerMode = .alwaysAsk, youtubeOverlayInteracted: Bool = false) {
+        self.privatePlayerMode = privatePlayerMode
+        self.youtubeOverlayInteracted = youtubeOverlayInteracted
+    }
+}
+
+extension PrivatePlayer {
+
+    static func mock(withMode mode: PrivatePlayerMode = .enabled) -> PrivatePlayer {
+        let preferencesPersistor = PrivatePlayerPreferencesPersistorMock(privatePlayerMode: mode, youtubeOverlayInteracted: true)
+        let preferences = PrivatePlayerPreferences(persistor: preferencesPersistor)
+        // runtime mock-replacement for Unit Tests, to be redone when we‘ll be doing Dependency Injection
+        let privacyConfigurationManager = ((NSClassFromString("MockPrivacyConfigurationManager") as? NSObject.Type)!.init() as? PrivacyConfigurationManaging)!
+        return PrivatePlayer(preferences: preferences, privacyConfigurationManager: privacyConfigurationManager)
+    }
+
+}
+
+#endif

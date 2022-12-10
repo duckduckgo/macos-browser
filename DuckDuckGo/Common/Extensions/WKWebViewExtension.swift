@@ -192,6 +192,11 @@ extension WKWebView {
         }
     }
 
+    func loadInNewWindow(_ url: URL) {
+        let urlEnc = "'\(url.absoluteString.escapedJavaScriptString())'"
+        self.evaluateJavaScript("window.open(\(urlEnc), '_blank', 'noopener, noreferrer')")
+    }
+
     func getMimeType(callback: @escaping (String?) -> Void) {
         self.evaluateJavaScript("document.contentType") { (result, _) in
             callback(result as? String)

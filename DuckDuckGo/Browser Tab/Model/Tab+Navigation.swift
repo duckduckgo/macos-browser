@@ -43,7 +43,7 @@ extension Tab: WKNavigationDelegate {
     @objc(_webView:contextMenuDidCreateDownload:)
     func webView(_ webView: WKWebView, contextMenuDidCreate download: WebKitDownload) {
         let location: FileDownloadManager.DownloadLocationPreference
-        = contextMenuManager.shouldAskForDownloadLocation() == false ? .auto : .prompt
+            = self.contextMenuManager?.shouldAskForDownloadLocation() == false ? .auto : .prompt
         FileDownloadManager.shared.add(download, delegate: self, location: location, postflight: .none)
     }
 
