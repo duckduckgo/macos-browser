@@ -23,7 +23,7 @@ import XCTest
 // Automatically loading during test runs by shadowed
 // NSFileManager.defaultManager in NSFileManagerTestUtils.m
 @objc(TestFileManager)
-class TestFileManager: FileManager, XCTestObservation {
+final class TestFileManager: FileManager, XCTestObservation {
 
     static var defaultFileManager = FileManager()
     static var testFileManager = TestFileManager()
@@ -59,7 +59,7 @@ class TestFileManager: FileManager, XCTestObservation {
             return tempDirectory
         }
         let url = temporaryDirectory.appendingPathComponent(UUID().uuidString)
-        try! super.createDirectory(at: url, withIntermediateDirectories: true)
+        (try? super.createDirectory(at: url, withIntermediateDirectories: true))!
         createdDirectories!.append(url)
         tempDirectory = url
         return url
