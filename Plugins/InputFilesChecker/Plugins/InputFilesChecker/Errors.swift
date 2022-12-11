@@ -20,20 +20,42 @@ import Foundation
 
 struct NoTargetsFoundError: Error {}
 
-struct ExtraFilesError: Error {
+struct ExtraFilesInconsistencyError: Error {
     var target: String
-    var files: [InputFile]
+    var unexpected: [InputFile]
+    var superfluous: [InputFile]
+    var unrelated: [InputFile]
 
-    init(target: String, actual: Set<InputFile>, expected: Set<InputFile>) {
-        self.init(target: target, files: Array(actual.subtracting(expected)))
-    }
-
-    init(target: String, files: [InputFile]) {
+    init(target: String, actual: Set<InputFile>, expected: Set<InputFile>, unrelated: Set<InputFile>) {
         self.target = target
-        self.files = files
+        self.unexpected = actual.subtracting(expected).sorted()
+        self.superfluous = expected.subtracting(actual).subtracting(unrelated).sorted()
+        self.unrelated = unrelated.sorted()
     }
 
     var localizedDescription: String {
-        files.map(\.fileName).joined(separator: "\n")
+        var description = [String]()
+        if !unexpected.isEmpty {
+            description.append("""
+            \(target) includes files not present in other app targets:
+            \(unexpected.map({ "* \($0.fileName)" }).joined(separator: "\n"))
+            If this is expected, add these files to extraInputFiles in InputFilesChecker.swift.
+            """)
+        }
+        if !superfluous.isEmpty {
+            description.append("""
+            \(target) includes files that are included by all app targets:
+            \(superfluous.map({ "* \($0.fileName)" }).joined(separator: "\n"))
+            Remove these files from extraInputFiles in InputFilesChecker.swift.
+            """)
+        }
+        if !unrelated.isEmpty {
+            description.append("""
+            \(target) does not include files that are specified in extraInputFiles:
+            \(unrelated.map({ "* \($0.fileName)" }).joined(separator: "\n"))
+            Remove these files from extraInputFiles in InputFilesChecker.swift.
+            """)
+        }
+        return description.joined(separator: "\n\n")
     }
 }

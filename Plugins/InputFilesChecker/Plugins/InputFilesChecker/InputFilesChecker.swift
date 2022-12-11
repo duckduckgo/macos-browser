@@ -35,26 +35,20 @@ let extraInputFiles: [TargetName: Set<InputFile>] = [
 
 typealias TargetName = String
 
-struct InputFileDiff {
-    var extra: Set<InputFile>
-    var missing: Set<InputFile>
-
-    init(extra: Set<InputFile> = [], missing: Set<InputFile> = []) {
-        self.extra = extra
-        self.missing = missing
+struct InputFile: Hashable, Comparable {
+    static func < (lhs: InputFile, rhs: InputFile) -> Bool {
+        lhs.fileName < rhs.fileName
     }
-}
 
-public struct InputFile: Hashable {
-    public var fileName: String
-    public var type: FileType
+    var fileName: String
+    var type: FileType
 
-    public init(_ fileName: String, _ type: FileType) {
+    init(_ fileName: String, _ type: FileType) {
         self.fileName = fileName
         self.type = type
     }
 
-    public init(_ file: File) {
+    init(_ file: File) {
         self.fileName = file.path.lastComponent
         self.type = file.type
     }
@@ -73,7 +67,7 @@ struct TargetSourcesChecker: BuildToolPlugin, XcodeBuildToolPlugin {
 
         context.xcodeProject.targets.forEach { target in
             switch target.product?.kind {
-            case .application:
+            case .application where target.displayName.starts(with: "DuckDuckGo Privacy Browser"):
                 appTargets.append(target)
             case .other("com.apple.product-type.bundle.unit-test"):
                 if target.displayName.starts(with: "Unit Tests") {
@@ -103,7 +97,7 @@ struct TargetSourcesChecker: BuildToolPlugin, XcodeBuildToolPlugin {
         }
 
         var commonInputFiles: Set<InputFile> = Set(targets[0].inputFiles.map(InputFile.init))
-        for target in targets[1..<targets.count] {
+        for target in targets.dropFirst() {
             commonInputFiles.formIntersection(target.inputFiles.map(InputFile.init))
         }
 
@@ -112,9 +106,17 @@ struct TargetSourcesChecker: BuildToolPlugin, XcodeBuildToolPlugin {
             let extraFiles = inputFiles.subtracting(commonInputFiles)
 
             let expectedExtraFiles = extraInputFiles[target.displayName] ?? []
+            let unrelatedFiles = expectedExtraFiles.subtracting(inputFiles)
 
-            if expectedExtraFiles != extraFiles {
-                throw ExtraFilesError(target: target.displayName, actual: extraFiles, expected: expectedExtraFiles)
+            if expectedExtraFiles != extraFiles || !unrelatedFiles.isEmpty {
+                let error = ExtraFilesInconsistencyError(
+                    target: target.displayName,
+                    actual: extraFiles,
+                    expected: expectedExtraFiles,
+                    unrelated: unrelatedFiles
+                )
+                print(error.localizedDescription)
+                throw error
             }
         }
     }
