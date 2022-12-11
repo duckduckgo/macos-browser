@@ -359,10 +359,38 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
     // MARK: - Event Publishers
 
-    let webViewDidReceiveChallengePublisher = PassthroughSubject<Void, Never>()
-    let webViewDidCommitNavigationPublisher = PassthroughSubject<Void, Never>()
-    let webViewDidFinishNavigationPublisher = PassthroughSubject<Void, Never>()
-    let webViewDidFailNavigationPublisher = PassthroughSubject<Void, Never>()
+    @RePublished(Tab.navigationStatePublisher)
+    var navigationState: NavigationState?
+    private func navigationStatePublisher() -> some Publisher<NavigationState?, Never> {
+        navigationDelegate.$currentNavigation.map(\.?.state)
+    }
+
+    var webViewDidReceiveChallengePublisher: some Publisher<Void, Never> {
+        $currentNavigation
+            // filter false->true change events for `navigation.didReceiveAuthenticationChallenge`
+            .scan( (old: false, new: false) ) { (old: $0.new, new: $1?.didReceiveAuthenticationChallenge == true) }
+            .filter { $0.old == false && $0.new == true }
+            .asVoid()
+    }
+    var webViewDidCommitNavigationPublisher: some Publisher<Void, Never> {
+        $currentNavigation
+            // filter false->true change events for `navigation.isCommitted`
+            .scan( (old: false, new: false) ) { (old: $0.new, new: $1?.isCommitted == true) }
+            .filter { $0.old == false && $0.new == true }
+            .asVoid()
+    }
+    var webViewDidFinishNavigationPublisher: some Publisher<Void, Never> {
+        $currentNavigation
+            // filter active navigation state change to `finished`
+            .filter { $0?.state == .finished }
+            .asVoid()
+    }
+    var webViewDidFailNavigationPublisher: some Publisher<Void, Never> {
+        $currentNavigation
+            // filter active navigation state change to `failed`
+            .filter { $0?.state.isFailed == true }
+            .asVoid()
+    }
 
     @MainActor
     @Published var isAMPProtectionExtracting: Bool = false
@@ -541,8 +569,25 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     }
     private var externalSchemeOpenedPerPageLoad = false
 
-    var canGoForward: Bool {
-        webView.canGoForward
+    @RePublished(\Tab.navigationDelegate.$currentNavigation)
+    var currentNavigation: Navigation?
+
+    @RePublished(Tab.canGoForwardPublisher)
+    var canGoForward: Bool = false
+    private func canGoForwardPublisher() -> some Publisher<Bool, Never> {
+        Publishers.CombineLatest4(
+            // prevent back/forward blinking when redirecting after `invalidateBackItemIfNeeded`
+            $currentNavigation.map { $0?.navigationAction.navigationType == .redirectAfterGoBack },
+            // always disable Forward when performing regular loading navigations (non back-forward) as forward list will be reset
+            $currentNavigation.map { $0?.navigationAction.navigationType.isBackForward == false },
+            webView.publisher(for: \.canGoForward),
+            self.$error.map { $0 != nil }
+        ).compactMap { [weak self] (isFrozen, isRegularNavigation, canGoForward, hasError) -> Bool? in
+            let navigationType = self?.navigationDelegate.expectedNavigationAction?.navigationType
+            // filter out canGoForward update events for frozen back/forward navigation
+            guard !isFrozen && navigationType != .redirectAfterGoBack && navigationType != .goBackToInvalidateHistoryItem else { return nil }
+            return canGoForward && !isRegularNavigation && !hasError
+        }
     }
 
     func goForward() {
@@ -551,8 +596,24 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         webView.goForward()
     }
 
-    var canGoBack: Bool {
-        webView.canGoBack || error != nil
+    @RePublished(Tab.canGoBackPublisher)
+    var canGoBack: Bool = false
+    private func canGoBackPublisher() -> some Publisher<Bool, Never> {
+        Publishers.CombineLatest3(
+            // freeze back/forward updating when redirecting after `invalidateBackItemIfNeeded`
+            $currentNavigation.map(\.?.navigationAction.navigationType).map { navigationType in
+                navigationType == .redirectAfterGoBack ||
+                navigationType == .goBackToInvalidateHistoryItem ||
+                navigationType?.redirect?.initialNavigationType == .redirectAfterGoBack
+            },
+            webView.publisher(for: \.canGoBack),
+            self.$error.map { $0 != nil }
+        ).compactMap { [weak self] (isFrozen, canGoBack, hasError) -> Bool? in
+            let navigationType = self?.navigationDelegate.expectedNavigationAction?.navigationType
+            // filter out canGoBack update events for frozen back/forward navigation
+            guard !isFrozen && navigationType != .redirectAfterGoBack && navigationType != .goBackToInvalidateHistoryItem else { return nil }
+            return canGoBack || hasError
+        }
     }
 
     func goBack() {
@@ -1112,8 +1173,6 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
 
     @MainActor
     func didReceive(_ challenge: URLAuthenticationChallenge, for navigation: Navigation?) async -> AuthChallengeDisposition? {
-        webViewDidReceiveChallengePublisher.send()
-
         guard challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodHTTPBasic else { return nil }
 
         let (request, future) = BasicAuthDialogRequest.future(with: challenge.protectionSpace)
@@ -1130,7 +1189,6 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         if content.isUrl, navigation.url == content.url {
             addVisit(of: navigation.url)
         }
-        webViewDidCommitNavigationPublisher.send()
     }
 
     struct Constants {
@@ -1209,12 +1267,8 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         }
 
         if navigationAction.isForMainFrame {
-            if navigationAction.navigationType.isBackForward,
-               self.webView.frozenCanGoForward != nil {
-
+            if case .goBackToInvalidateHistoryItem = navigationAction.navigationType {
                 // Auto-cancel simulated Back action when upgrading to HTTPS or GPC from Client Redirect
-                self.webView.frozenCanGoForward = nil
-                self.webView.frozenCanGoBack = nil
                 return .cancel
                 
             } else if !navigationAction.navigationType.isBackForward,
@@ -1222,9 +1276,8 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
                       let request = GPCRequestFactory().requestForGPC(basedOn: navigationAction.request,
                                                                       config: ContentBlocking.shared.privacyConfigurationManager.privacyConfig,
                                                                       gpcEnabled: PrivacySecurityPreferences.shared.gpcEnabled) {
-                self.invalidateBackItemIfNeeded(for: navigationAction)
 
-                _=webView.load(request)
+                self.invalidateBackItemIfNeeded(for: navigationAction, andLoad: request)
                 return .cancel
             }
         }
@@ -1327,8 +1380,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
 
     private func urlDidUpgrade(_ upgradedURL: URL, navigationAction: NavigationAction) {
         lastUpgradedURL = upgradedURL
-        invalidateBackItemIfNeeded(for: navigationAction)
-        webView.load(upgradedURL)
+        invalidateBackItemIfNeeded(for: navigationAction, andLoad: URLRequest(url: upgradedURL))
         setConnectionUpgradedTo(upgradedURL, navigationAction: navigationAction)
     }
 
@@ -1364,17 +1416,21 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         }
     }
 
-    private func invalidateBackItemIfNeeded(for navigationAction: NavigationAction) {
-        // Cancelled & Upgraded Client Redirect URL leaves wrong backForwardList record
+    private func invalidateBackItemIfNeeded(for navigationAction: NavigationAction, andLoad request: URLRequest) {
+        // Cancelled & Upgraded client-redirected URL (window.location.replace) leaves extra record in BackForwardList
+        // Perform goBack&redirect to overwrite it
         // https://app.asana.com/0/inbox/1199237043628108/1201280322539473/1201353436736961
-        guard case .redirect(let redirect) = navigationAction.navigationType,
-              case .client(delay: 0) = redirect.type,
-              redirect.history.last?.fromHistoryItemIdentity != webView.backForwardList.currentItem?.identity
-        else { return }
+        if case .redirect(let redirect) = navigationAction.navigationType,
+           case .client(delay: 0) = redirect.type,
+           redirect.history.last?.fromHistoryItemIdentity != webView.backForwardList.currentItem?.identity {
 
-        self.webView.goBack()
-        self.webView.frozenCanGoBack = self.webView.canGoBack
-        self.webView.frozenCanGoForward = false
+            navigationDelegate.setExpectedNavigationType(.goBackToInvalidateHistoryItem, matching: .navigationType(.backForward))
+            self.webView.goBack()
+        }
+        DispatchQueue.main.async { [weak self] in
+            self?.navigationDelegate.setExpectedNavigationType(.redirectAfterGoBack, matching: .both(navigationType: .other, url: request.url!))
+            self?.webView.load(request)
+        }
     }
 
     @MainActor
@@ -1428,7 +1484,6 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
     @MainActor
     func navigationDidFinish(_ navigation: Navigation) {
         invalidateSessionStateData()
-        webViewDidFinishNavigationPublisher.send()
         if isAMPProtectionExtracting { isAMPProtectionExtracting = false }
         linkProtection.setMainFrameUrl(nil)
         referrerTrimming.onFinishNavigation()
@@ -1447,7 +1502,6 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         linkProtection.setMainFrameUrl(nil)
         referrerTrimming.onFailedNavigation()
         self.adClickAttribution?.detection.onDidFailNavigation()
-        webViewDidFailNavigationPublisher.send()
     }
 
     func navigationAction(_ navigationAction: NavigationAction, didBecome download: WebKitDownload) {

@@ -818,6 +818,7 @@
 		B6C2C9F62760B659005B7F0A /* TestDataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = B6C2C9F42760B659005B7F0A /* TestDataModel.xcdatamodeld */; };
 		B6CF78DE267B099C00CD4F13 /* WKNavigationActionExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6CF78DD267B099C00CD4F13 /* WKNavigationActionExtension.swift */; };
 		B6CFAA522943725600CB6B11 /* WebKitDownloadDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6CFAA512943725600CB6B11 /* WebKitDownloadDelegate.swift */; };
+		B6CFAA5A2945ADEF00CB6B11 /* RePublished.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6CFAA592945ADEF00CB6B11 /* RePublished.swift */; };
 		B6DA06E12913AEDC00225DE2 /* TestNavigationDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6DA06E02913AEDB00225DE2 /* TestNavigationDelegate.swift */; };
 		B6DA06E22913AEDC00225DE2 /* TestNavigationDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6DA06E02913AEDB00225DE2 /* TestNavigationDelegate.swift */; };
 		B6DA06E42913ECEE00225DE2 /* ContextMenuManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6DA06E32913ECEE00225DE2 /* ContextMenuManager.swift */; };
@@ -1711,6 +1712,7 @@
 		B6CF78DD267B099C00CD4F13 /* WKNavigationActionExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WKNavigationActionExtension.swift; sourceTree = "<group>"; };
 		B6CF78E2267B0A1900CD4F13 /* WKNavigationAction+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "WKNavigationAction+Private.h"; sourceTree = "<group>"; };
 		B6CFAA512943725600CB6B11 /* WebKitDownloadDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebKitDownloadDelegate.swift; sourceTree = "<group>"; };
+		B6CFAA592945ADEF00CB6B11 /* RePublished.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RePublished.swift; sourceTree = "<group>"; };
 		B6DA06E02913AEDB00225DE2 /* TestNavigationDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestNavigationDelegate.swift; sourceTree = "<group>"; };
 		B6DA06E32913ECEE00225DE2 /* ContextMenuManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContextMenuManager.swift; sourceTree = "<group>"; };
 		B6DA06E52913F39400225DE2 /* MenuItemSelectors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuItemSelectors.swift; sourceTree = "<group>"; };
@@ -2527,6 +2529,7 @@
 				4BB88B5A25B7BA50006F6B06 /* Instruments.swift */,
 				B6BDD9F72940C2C000F68088 /* Lazy.swift */,
 				B6AAAC2C260330580029438D /* PublishedAfter.swift */,
+				B6CFAA592945ADEF00CB6B11 /* RePublished.swift */,
 				4BB88B4F25B7BA2B006F6B06 /* TabInstrumentation.swift */,
 				85C6A29525CC1FFD00EEB5F1 /* UserDefaultsWrapper.swift */,
 			);
@@ -4993,6 +4996,7 @@
 				B6B1E88B26D774090062C350 /* LinkButton.swift in Sources */,
 				4BBF0915282DD40100EE1418 /* TemporaryFileHandler.swift in Sources */,
 				CB6BCDF927C6BEFF00CC76DC /* PrivacyFeatures.swift in Sources */,
+				B6CFAA5A2945ADEF00CB6B11 /* RePublished.swift in Sources */,
 				B693954D26F04BEB0015B914 /* MouseClickView.swift in Sources */,
 				B6DB3CF926A00E2D00D459B7 /* AVCaptureDevice+SwizzledAuthState.swift in Sources */,
 				AAAB9116288EB46B00A057A9 /* VisitMenuItem.swift in Sources */,
