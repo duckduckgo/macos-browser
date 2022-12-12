@@ -291,7 +291,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         userContentControllerProvider = { [weak self] in self?.userContentController }
 
         setupNavigationDelegate()
-
         // sanity check to validate all the Navigation Extensions are registered as Navigation Responders
         assert(!extensions.contains(where: { ($0 as? NavigationResponder).map { ext in navigationDelegate.responders.contains(where: { responder in
             (type(of: responder) == type(of: ext))
