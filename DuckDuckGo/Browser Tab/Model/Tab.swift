@@ -1281,7 +1281,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
 
         toggleFBProtection(for: navigationAction.url)
 
-        return .allow
+        return .next
     }
 
     private func host(_ host: String?, requestedOpenExternalURL url: URL) {
@@ -1393,8 +1393,8 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
                 }
             }
         }
-        
-        return .allow
+
+        return .next
     }
 
     func didStart(_ navigation: Navigation) {
