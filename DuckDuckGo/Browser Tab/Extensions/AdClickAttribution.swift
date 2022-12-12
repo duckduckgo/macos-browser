@@ -83,7 +83,7 @@ final class AdClickAttributionTabExtension: TabExtension {
     init(inheritedAttribution: AdClickAttributionLogic.State?,
          userContentControllerProvider: @escaping UserContentControllerProvider,
          contentBlockerRulesScriptPublisher: some Publisher<ContentBlockerRulesUserScript?, Never>,
-         privacyInfoPublisher: some Publisher<PrivacyInfo?, Never>,
+         trackerInfoPublisher: some Publisher<DetectedRequest, Never>,
          dependencies: some AdClickAttributionDependencies) {
 
         self.dependencies = dependencies
@@ -109,15 +109,9 @@ final class AdClickAttributionTabExtension: TabExtension {
             }
             .store(in: &cancellables)
 
-        privacyInfoPublisher.compactMap { $0?.$trackerInfo }
-            .switchToLatest()
-            .scan( (old: Set<DetectedRequest>(), new: Set<DetectedRequest>()) ) {
-                ($0.new, $1.trackers)
-            }
-            .sink { [weak self] (old, new) in
-                for tracker in new.subtracting(old) {
-                    self?.logic.onRequestDetected(request: tracker)
-                }
+        trackerInfoPublisher
+            .sink { [weak self] tracker in
+                self?.logic.onRequestDetected(request: tracker)
             }
             .store(in: &cancellables)
     }
