@@ -35,6 +35,9 @@ final class FindInPageTabExtension: TabExtension {
 
     func show(with webView: WKWebView) {
         model.show(with: webView)
+        if !model.text.isEmpty {
+            model.find(model.text)
+        }
     }
 
     func close() {
