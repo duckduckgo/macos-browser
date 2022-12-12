@@ -161,7 +161,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     static var objcNavigationDelegateKeyPath: String { #keyPath(objcNavigationDelegate) }
     @objc private var objcNavigationDelegate: Any? { navigationDelegate }
     private let navigationDelegate = DistributedNavigationDelegate(logger: .navigation)
-    
+
     let pinnedTabsManager: PinnedTabsManager
     private let privatePlayer: PrivatePlayer
     private let privacyFeatures: AnyPrivacyFeatures
@@ -330,7 +330,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             assertionFailure("no delegate set")
             return
         }
-        let tab = Tab(content: content, parentTab: self, shouldLoadInBackground: true)
+        let tab = Tab(content: content, parentTab: self, shouldLoadInBackground: true, canBeClosedWithBack: kind.isSelectedTab)
         delegate.tab(self, createdChild: tab, of: kind)
     }
 

@@ -196,7 +196,7 @@ extension AdClickAttributionTabExtension: NavigationResponder {
     func navigation(_ navigation: Navigation, didFailWith error: WKError, isProvisioned: Bool) {
         detection.onDidFailNavigation()
     }
-    
+
 }
 
 extension AppContentBlocking: AdClickAttributionDependencies {}
