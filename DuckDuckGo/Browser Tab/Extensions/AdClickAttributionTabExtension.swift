@@ -1,5 +1,5 @@
 //
-//  AdClickAttribution.swift
+//  AdClickAttributionTabExtension.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -45,6 +45,7 @@ protocol UserContentControllerProtocol: AnyObject {
     func removeLocalContentRuleList(withIdentifier identifier: String)
     func installLocalContentRuleList(_ ruleList: WKContentRuleList, identifier: String)
 }
+extension UserContentController: UserContentControllerProtocol {}
 typealias UserContentControllerProvider = () -> UserContentControllerProtocol?
 
 final class AdClickAttributionTabExtension: TabExtension {
@@ -178,5 +179,3 @@ extension TabExtensions {
         resolve(AdClickAttributionTabExtension.self)
     }
 }
-
-extension UserContentController: UserContentControllerProtocol {}
