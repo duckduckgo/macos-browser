@@ -17,29 +17,54 @@
 //
 
 import Foundation
+import WebKit
 
 final class FindInPageModel {
 
     @Published private(set) var text: String = ""
     @Published private(set) var currentSelection: Int = 1
     @Published private(set) var matchesFound: Int = 0
-    @Published private(set) var visible: Bool = false
+    @Published private(set) var isVisible: Bool = false
 
-    func update(text: String) {
-        self.text = text
-    }
+    weak var webView: WKWebView?
 
     func update(currentSelection: Int?, matchesFound: Int?) {
         self.currentSelection = currentSelection ?? self.currentSelection
         self.matchesFound = matchesFound ?? self.matchesFound
     }
 
-    func show() {
-        visible = true
+    func show(with webView: WKWebView) {
+        self.webView = webView
+        isVisible = true
     }
 
-    func hide() {
-        visible = false
+    func close() {
+        isVisible = false
+    }
+
+    func find(_ text: String) {
+        self.text = text
+        evaluate("window.__firefox__.find('\(text.escapedJavaScriptString())')")
+    }
+
+    func findDone() {
+        evaluate("window.__firefox__.findDone()")
+    }
+
+    func findNext() {
+        evaluate("window.__firefox__.findNext()")
+    }
+
+    func findPrevious() {
+        evaluate("window.__firefox__.findPrevious()")
+    }
+
+    private func evaluate(_ js: String) {
+        if #available(macOS 11.0, *) {
+            webView?.evaluateJavaScript(js, in: nil, in: WKContentWorld.defaultClient)
+        } else {
+            webView?.evaluateJavaScript(js)
+        }
     }
 
 }
