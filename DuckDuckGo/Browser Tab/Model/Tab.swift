@@ -31,8 +31,6 @@ protocol TabDelegate: ContentOverlayUserScriptDelegate {
     func tabDidStartNavigation(_ tab: Tab)
     func tab(_ tab: Tab, createdChild childTab: Tab, of kind: NewWindowPolicy)
 
-    func tab(_ tab: Tab, requestedOpenExternalURL url: URL, forUserEnteredURL userEntered: Bool) -> Bool
-
     func tabPageDOMLoaded(_ tab: Tab)
     func closeTab(_ tab: Tab)
 
@@ -1113,27 +1111,21 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
             }
         }
 
-        guard self.delegate?.tab(self, requestedOpenExternalURL: url, forUserEnteredURL: userEnteredUrl) == true else {
-            // search if external URL can‘t be opened but entered by user
+        // Another way of detecting whether an app is installed to handle a protocol is described in Asana:
+        // https://app.asana.com/0/1201037661562251/1202055908401751/f
+        guard NSWorkspace.shared.urlForApplication(toOpen: url) != nil else {
             if userEnteredUrl {
+                // search if external URL can‘t be opened but entered by user
                 searchForExternalUrl()
             }
             return
         }
 
         let permissionType = PermissionType.externalScheme(scheme: url.scheme ?? "")
-
-        permissions.permissions([permissionType], requestedForDomain: host, url: url) { [weak self, userEnteredUrl] granted in
-            guard granted, let self else {
-                // search if denied but entered by user
-                if userEnteredUrl {
-                    searchForExternalUrl()
-                }
-                return
+        permissions.permissions([permissionType], requestedForDomain: host, url: url) { isGranted in
+            if isGranted {
+                NSWorkspace.shared.open(url)
             }
-            // handle opening extenral URL
-            NSWorkspace.shared.open(url)
-            self.permissions.permissions[permissionType].externalSchemeOpened()
         }
     }
 

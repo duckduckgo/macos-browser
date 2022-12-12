@@ -24,8 +24,8 @@ import CoreLocation
 
 final class PermissionModel {
 
-    @PublishedAfter var permissions = Permissions()
-    @PublishedAfter var authorizationQuery: PermissionAuthorizationQuery?
+    @PublishedAfter private(set) var permissions = Permissions()
+    @PublishedAfter private(set) var authorizationQuery: PermissionAuthorizationQuery?
 
     private(set) var authorizationQueries = [PermissionAuthorizationQuery]() {
         didSet {
@@ -129,34 +129,28 @@ final class PermissionModel {
                                     url: URL?,
                                     decisionHandler: @escaping (Bool) -> Void) {
 
-        let query = PermissionAuthorizationQuery(domain: domain,
-                                                 url: url,
-                                                 permissions: permissions) { [weak self] (result: PermissionAuthorizationQuery.CallbackResult) in
-
-            let (completedQuery: query, isGranted: isGranted) = self?.handleQueryDecision(result, requestedPermissions: permissions)
-                ?? (completedQuery: nil, isGranted: false)
-
-            defer {
-                switch (permissions.first, result) {
-                case (.externalScheme, .failure(.deinitialized)):
-                    break
-                default:
-                    decisionHandler(isGranted)
-                }
-            }
-            guard let self = self,
-                  let query = query, // otherwise handling decision on Query deallocation
-                  let idx = self.authorizationQueries.firstIndex(where: { $0 === query })
-            else {
-                return
-            }
-            self.authorizationQueries.remove(at: idx)
-
-            if case .success( (_, remember: true) ) = result {
+        var query: PermissionAuthorizationQuery!
+        query = PermissionAuthorizationQuery(domain: domain, url: url, permissions: permissions) { [weak self, weak query] result in
+            let isGranted = (try? result.get())?.granted ?? false
+            if isGranted {
                 for permission in permissions {
-                    self.permissionManager.setPermission(isGranted ? .allow : .deny, forDomain: domain, permissionType: permission)
+                    self?.permissions[permission].granted()
                 }
             }
+
+            if let self, let query, // otherwise handling decision on Query deallocation
+               let idx = self.authorizationQueries.firstIndex(where: { $0 === query }) {
+
+                self.authorizationQueries.remove(at: idx)
+
+                if case .success( (_, remember: true) ) = result {
+                    for permission in permissions {
+                        self.permissionManager.setPermission(isGranted ? .allow : .deny, forDomain: domain, permissionType: permission)
+                    }
+                }
+            }
+
+            decisionHandler(isGranted)
         }
 
         // When Geolocation queried by a website but System Permission is denied: switch to `disabled`
@@ -169,36 +163,6 @@ final class PermissionModel {
 
         permissions.forEach { self.permissions[$0].authorizationQueried(query) }
         authorizationQueries.append(query)
-    }
-
-    private func handleQueryDecision(_ result: PermissionAuthorizationQuery.CallbackResult, requestedPermissions: [PermissionType])
-        -> (completedQuery: PermissionAuthorizationQuery?, isGranted: Bool) {
-
-        var query: PermissionAuthorizationQuery?
-        let isGranted: Bool
-        switch result {
-        case .failure(.deinitialized):
-            query = nil
-            isGranted = false
-
-        case .success( (.denied(let completedQuery), remember: _) ):
-            query = completedQuery
-            isGranted = false
-
-            for permission in requestedPermissions {
-                permissions[permission].denied()
-            }
-
-        case .success( (.granted(let completedQuery), remember: _) ):
-            query = completedQuery
-            isGranted = true
-
-            for permission in requestedPermissions {
-                permissions[permission].granted()
-            }
-        }
-
-        return (query, isGranted)
     }
 
     private func permissionManager(_: PermissionManagerProtocol,
@@ -329,16 +293,19 @@ final class PermissionModel {
     /// The decisionHandler will be called synchronously if there‘s a permanent (stored) permission granted or denied
     /// If no permanent decision is stored a new AuthorizationQuery will be initialized and published via $authorizationQuery
     func permissions(_ permissions: [PermissionType], requestedForDomain domain: String?, url: URL? = nil, decisionHandler: @escaping (Bool) -> Void) {
-        guard let domain = domain,
-              !domain.isEmpty,
-              !permissions.isEmpty
-        else {
+        guard let domain, !domain.isEmpty, !permissions.isEmpty else {
             assertionFailure("Unexpected permissions/domain")
             decisionHandler(false)
             return
         }
 
         let shouldGrant = shouldGrantPermission(for: permissions, requestedForDomain: domain)
+        let decisionHandler = { [weak self, decisionHandler] isGranted in
+            decisionHandler(isGranted)
+            if isGranted {
+                self?.permissionGranted(for: permissions[0])
+            }
+        }
         switch shouldGrant {
         case .none:
             queryAuthorization(for: permissions, domain: domain, url: url, decisionHandler: decisionHandler)
@@ -351,14 +318,34 @@ final class PermissionModel {
             }
         }
     }
+    @available(macOS 12.0, *)
+    func permissions(_ permissions: [PermissionType], requestedForDomain domain: String?, url: URL? = nil, decisionHandler: @escaping (WKPermissionDecision) -> Void) {
+        self.permissions(permissions, requestedForDomain: domain, url: url) { isGranted in
+            decisionHandler(isGranted ? .grant : .deny)
+        }
+    }
+
+    private func permissionGranted(for permission: PermissionType) {
+        // handle special permission granted for permission without `active` (used) state
+        switch permission {
+        case .externalScheme:
+            self.permissions[permission].externalSchemeOpened()
+        case .popups:
+            self.permissions[permission].popupOpened(nextQuery: authorizationQueries.first(where: { $0.permissions.contains(.popups) }))
+        case .camera, .microphone, .geolocation:
+            // permission usage activated
+            break
+        }
+
+    }
 
     /// Request user authorization for provided PermissionTypes
     /// Same as `permissions(_:requestedForDomain:url:decisionHandler:)` with a result returned using a `Future`
     /// Use `await future.get()` for async/await syntax
     func request(_ permissions: [PermissionType], forDomain domain: String?, url: URL? = nil) -> Future<Bool, Never> {
         Future { fulfill in
-            self.permissions(permissions, requestedForDomain: domain, url: url) { granted in
-                fulfill(.success(granted))
+            self.permissions(permissions, requestedForDomain: domain, url: url) { isGranted in
+                fulfill(.success(isGranted))
             }
         }
     }
