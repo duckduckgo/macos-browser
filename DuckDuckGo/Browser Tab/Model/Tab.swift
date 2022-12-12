@@ -426,7 +426,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     var lastSelectedAt: Date?
 
     @Published var title: String?
-    @Published var error: WKError? {
+    @PublishedAfter var error: WKError? {
         didSet {
             switch error {
             case .some(URLError.notConnectedToInternet),
@@ -1111,9 +1111,9 @@ extension Tab: SurrogatesUserScriptDelegate {
 extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
 
     @MainActor
-    func didReceive(_ challenge: URLAuthenticationChallenge) async -> AuthChallengeDisposition? {
+    func didReceive(_ challenge: URLAuthenticationChallenge, for navigation: Navigation?) async -> AuthChallengeDisposition? {
         webViewDidReceiveChallengePublisher.send()
-        
+
         guard challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodHTTPBasic else { return nil }
 
         let (request, future) = BasicAuthDialogRequest.future(with: challenge.protectionSpace)
@@ -1122,12 +1122,6 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
             return try await future.get()
         } catch {
             return .cancel
-        }
-    }
-
-    func willStart(_ navigationAction: NavigationAction) {
-        if navigationAction.isForMainFrame, navigationAction.navigationType.isRedirect {
-            resetDashboardInfo()
         }
     }
 
@@ -1256,10 +1250,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
             }
         }
 
-        guard navigationAction.url.scheme != nil else {
-            self.willPerformNavigationAction(navigationAction)
-            return .allow
-        }
+        guard navigationAction.url.scheme != nil else { return .allow }
 
         if navigationAction.url.isExternalSchemeLink {
             // request if OS can handle extenrnal url
@@ -1363,18 +1354,23 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         setFBProtection(enabled: featureEnabled)
     }
 
-    private func willPerformNavigationAction(_ navigationAction: NavigationAction) {
-        guard navigationAction.isForMainFrame else { return }
+    func willStart(_ navigationAction: NavigationAction) {
+        if error != nil { error = nil }
 
-        self.externalSchemeOpenedPerPageLoad = false
+        externalSchemeOpenedPerPageLoad = false
         delegate?.tabWillStartNavigation(self, isUserInitiated: navigationAction.isUserInitiated)
+
+        if navigationAction.navigationType.isRedirect {
+            resetDashboardInfo()
+        }
     }
 
     private func invalidateBackItemIfNeeded(for navigationAction: NavigationAction) {
         // Cancelled & Upgraded Client Redirect URL leaves wrong backForwardList record
         // https://app.asana.com/0/inbox/1199237043628108/1201280322539473/1201353436736961
-        guard case .redirect(type: .client, previousNavigation: let previousNavigation) = navigationAction.navigationType,
-              previousNavigation?.isCommitted == true
+        guard case .redirect(let redirect) = navigationAction.navigationType,
+              case .client(delay: 0) = redirect.type,
+              redirect.history.last?.fromHistoryItemIdentity != webView.backForwardList.currentItem?.identity
         else { return }
 
         self.webView.goBack()
@@ -1383,7 +1379,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
     }
 
     @MainActor
-    func decidePolicy(for navigationResponse: NavigationResponse) async -> NavigationResponsePolicy? {
+    func decidePolicy(for navigationResponse: NavigationResponse, currentNavigation: Navigation?) async -> NavigationResponsePolicy? {
         userEnteredUrl = false // subsequent requests will be navigations
         
         let isSuccessfulResponse = (navigationResponse.response as? HTTPURLResponse)?.validateStatusCode(statusCode: 200..<300) == nil
@@ -1401,7 +1397,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
                 // register the navigationResponse for legacy _WKDownload to be called back on the Tab
                 // further download will be passed to webView:navigationResponse:didBecomeDownload:
                 return .download(navigationResponse.url, using: webView) {  [weak self] download in
-                    self?.navigationResponse(navigationResponse, didBecome: download)
+                    self?.navigationResponse(navigationResponse, didBecome: download, currentNavigation: currentNavigation)
                 }
             }
         }
@@ -1459,7 +1455,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         FileDownloadManager.shared.add(download, delegate: self, location: .auto, postflight: .none)
     }
 
-    func navigationResponse(_ navigationResponse: NavigationResponse, didBecome download: WebKitDownload) {
+    func navigationResponse(_ navigationResponse: NavigationResponse, didBecome download: WebKitDownload, currentNavigation: Navigation?) {
         FileDownloadManager.shared.add(download, delegate: self, location: .auto, postflight: .none)
 
         // Note this can result in tabs being left open, e.g. download button on this page:
@@ -1497,13 +1493,6 @@ extension Tab: FileDownloadManagerDelegate {
         self.delegate?.fileIconFlyAnimationOriginalRect(for: downloadTask)
     }
 
-}
-
-fileprivate extension WKNavigationResponse {
-    var shouldDownload: Bool {
-        let contentDisposition = (response as? HTTPURLResponse)?.allHeaderFields["Content-Disposition"] as? String
-        return contentDisposition?.hasPrefix("attachment") ?? false
-    }
 }
 
 @available(macOS 11, *)
