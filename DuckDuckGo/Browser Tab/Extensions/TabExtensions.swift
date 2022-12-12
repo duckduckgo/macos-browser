@@ -58,10 +58,10 @@ protocol NSCodingExtension: TabExtension {
 
 // Define dependencies used to instantiate TabExtensions here:
 protocol TabExtensionDependencies {
+    var tabIdentifier: UInt64 { get }
+
     var userScriptsPublisher: AnyPublisher<UserScripts?, Never> { get }
-    var contentBlocking: ContentBlockingProtocol { get }
-    var adClickAttributionDependencies: AdClickAttributionDependencies { get }
-    var privacyInfoPublisher: AnyPublisher<PrivacyInfo?, Never> { get }
+    var privacyFeatures: PrivacyFeaturesProtocol { get }
 
     var inheritedAttribution: AdClickAttributionLogic.State? { get }
     var userContentControllerProvider: UserContentControllerProvider { get }
@@ -79,24 +79,40 @@ extension AppTabExtensions {
     mutating func make(with dependencies: TabExtensionDependencies) {
         let userScripts = dependencies.userScriptsPublisher
 
-        let trackerInfoPublisher = dependencies.privacyInfoPublisher
-            .compactMap { $0?.$trackerInfo }
-            .switchToLatest()
-            .scan( (old: Set<DetectedRequest>(), new: Set<DetectedRequest>()) ) {
-                ($0.new, $1.trackers)
-            }
-            .map { (old, new) in
-                new.subtracting(old).publisher
-            }
-            .switchToLatest()
+        let httpsUpgrade = add {
+            HTTPSUpgradeTabExtension(httpsUpgrade: dependencies.privacyFeatures.httpsUpgrade)
+        }
+
+        let fbProtection = add {
+            FBProtectionTabExtension(privacyConfigurationManager: dependencies.privacyFeatures.contentBlocking.privacyConfigurationManager,
+                                     userContentControllerProvider: dependencies.userContentControllerProvider,
+                                     clickToLoadUserScriptPublisher: userScripts.map(\.?.clickToLoadScript))
+        }
+
+        let contentBlocking = add {
+            ContentBlockingTabExtension(tabIdentifier: dependencies.tabIdentifier,
+                                        fbBlockingEnabledProvider: fbProtection,
+                                        contentBlockerRulesUserScriptPublisher: userScripts.map(\.?.contentBlockerRulesScript),
+                                        surrogatesUserScriptPublisher: userScripts.map(\.?.surrogatesScript),
+                                        privacyConfigurationManager: dependencies.privacyFeatures.contentBlocking.privacyConfigurationManager,
+                                        userContentControllerProvider: dependencies.userContentControllerProvider)
+        }
+
+        add {
+            PrivacyDashboardTabExtension(contentBlocking: dependencies.privacyFeatures.contentBlocking,
+                                         autoconsentUserScriptPublisher: userScripts.map(\.?.autoconsentUserScript),
+                                         didUpgradeToHttpsPublisher: httpsUpgrade.didUpgradeToHttpsPublisher,
+                                         trackersPublisher: contentBlocking.trackersPublisher)
+        }
 
         add {
             AdClickAttributionTabExtension(inheritedAttribution: dependencies.inheritedAttribution,
                                            userContentControllerProvider: dependencies.userContentControllerProvider,
                                            contentBlockerRulesScriptPublisher: userScripts.map(\.?.contentBlockerRulesScript),
-                                           trackerInfoPublisher: trackerInfoPublisher,
-                                           dependencies: dependencies.adClickAttributionDependencies)
+                                           detectedTrackersPublisher: contentBlocking.trackersPublisher.compactMap { $0.isBlockedTracker ? $0.request : nil },
+                                           dependencies: dependencies.privacyFeatures.contentBlocking)
         }
+
         add {
             AutofillTabExtension(autofillUserScriptPublisher: userScripts.map(\.?.autofillScript))
         }
@@ -108,17 +124,6 @@ extension AppTabExtensions {
         }
         add {
             FindInPageTabExtension(findInPageScriptPublisher: userScripts.map(\.?.findInPageScript))
-        }
-        let fbProtection = add {
-            FBProtectionTabExtension(privacyConfigurationManager: dependencies.contentBlocking.privacyConfigurationManager,
-                                     userContentControllerProvider: dependencies.userContentControllerProvider,
-                                     clickToLoadUserScriptPublisher: userScripts.map(\.?.clickToLoadScript))
-        }
-
-        add {
-            ContentBlockingTabExtension(fbBlockingEnabledProvider: fbProtection,
-                                        contentBlockerRulesUserScriptPublisher: userScripts.map(\.?.contentBlockerRulesScript),
-                                        surrogatesUserScriptPublisher: userScripts.map(\.?.surrogatesScript))
         }
     }
 

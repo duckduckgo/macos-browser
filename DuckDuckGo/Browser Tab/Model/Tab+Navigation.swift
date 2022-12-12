@@ -34,7 +34,12 @@ extension Tab: NavigationResponder {
 
             .weak(nullable: self.adClickAttribution),
 
+            .weak(nullable: self.privacyDashboard),
+            .weak(nullable: self.httpsUpgrade),
+            .weak(nullable: self.contentBlockingAndSurrogates),
+
             .struct(SerpHeadersNavigationResponder()),
+
             .weak(nullable: self.fbProtection)
         )
         navigationDelegate.registerCustomDelegateMethodHandler(.weak(self), for: #selector(webView(_:contextMenuDidCreate:)))

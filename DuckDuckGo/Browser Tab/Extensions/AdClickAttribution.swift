@@ -22,7 +22,6 @@ import Common
 import ContentBlocking
 import Foundation
 import BrowserServicesKit
-import PrivacyDashboard
 import WebKit
 
 protocol AdClickAttributionDependencies {
@@ -44,6 +43,9 @@ protocol UserContentControllerProtocol: AnyObject {
     func disableGlobalContentRuleList(withIdentifier identifier: String) throws
     func removeLocalContentRuleList(withIdentifier identifier: String)
     func installLocalContentRuleList(_ ruleList: WKContentRuleList, identifier: String)
+
+    var contentBlockingAssetsInstalled: Bool { get }
+    func awaitContentBlockingAssetsInstalled() async
 }
 typealias UserContentControllerProvider = () -> UserContentControllerProtocol?
 
@@ -83,7 +85,7 @@ final class AdClickAttributionTabExtension: TabExtension {
     init(inheritedAttribution: AdClickAttributionLogic.State?,
          userContentControllerProvider: @escaping UserContentControllerProvider,
          contentBlockerRulesScriptPublisher: some Publisher<ContentBlockerRulesUserScript?, Never>,
-         trackerInfoPublisher: some Publisher<DetectedRequest, Never>,
+         detectedTrackersPublisher: some Publisher<DetectedRequest, Never>,
          dependencies: some AdClickAttributionDependencies) {
 
         self.dependencies = dependencies
@@ -109,7 +111,7 @@ final class AdClickAttributionTabExtension: TabExtension {
             }
             .store(in: &cancellables)
 
-        trackerInfoPublisher
+        detectedTrackersPublisher
             .sink { [weak self] tracker in
                 self?.logic.onRequestDetected(request: tracker)
             }

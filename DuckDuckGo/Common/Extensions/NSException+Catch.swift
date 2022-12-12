@@ -20,15 +20,19 @@ import Foundation
 
 extension NSException {
 
-    struct Error: Swift.Error, LocalizedError, CustomDebugStringConvertible {
-        let exception: NSException
+    final class Error: NSError, LocalizedError {
 
-        var errorDescription: String? {
-            exception.description
+        init(exception: NSException) {
+            super.init(domain: exception.name.rawValue, code: -1, userInfo: [
+                "NSException": exception,
+                NSLocalizedDescriptionKey: exception.description,
+                NSDebugDescriptionErrorKey: exception.debugDescription,
+                NSLocalizedFailureReasonErrorKey: exception.reason ?? ""
+            ])
+
         }
-
-        var debugDescription: String {
-            exception.debugDescription
+        required init?(coder: NSCoder) {
+            super.init(coder: coder)
         }
     }
 

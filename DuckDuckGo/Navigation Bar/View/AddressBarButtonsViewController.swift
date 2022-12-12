@@ -354,7 +354,7 @@ final class AddressBarButtonsViewController: NSViewController {
         privacyEntryPointButton.state = .on
                 
         privacyInfoCancellable?.cancel()
-        privacyInfoCancellable = selectedTabViewModel.tab.$privacyInfo
+        privacyInfoCancellable = selectedTabViewModel.tab.privacyInfoPublisher
             .dropFirst()
             .receive(on: DispatchQueue.main)
             .sink { [weak privacyDashboardPopover, weak selectedTabViewModel] _ in

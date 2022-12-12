@@ -27,26 +27,43 @@ protocol FbBlockingEnabledProvider {
 
 struct DetectedTracker {
     enum TrackerType {
-        case tracker
+        case blockedTracker
         case trackerWithSurrogate(host: String)
         case thirdPartyRequest
     }
     let request: DetectedRequest
     let type: TrackerType
+
+    var isBlockedTracker: Bool {
+        if case .blockedTracker = type { return true }
+        return false
+    }
 }
 
 final class ContentBlockingTabExtension: NSObject {
 
+    private let tabIdentifier: UInt64
     private let fbBlockingEnabledProvider: FbBlockingEnabledProvider
+    private let cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter?
+    private let userContentControllerProvider: UserContentControllerProvider
+    private let privacyConfigurationManager: PrivacyConfigurationManaging
     private var trackersSubject = PassthroughSubject<DetectedTracker, Never>()
 
     private var cancellables = Set<AnyCancellable>()
 
-    init(fbBlockingEnabledProvider: FbBlockingEnabledProvider,
+    init(tabIdentifier: UInt64,
+         fbBlockingEnabledProvider: FbBlockingEnabledProvider,
          contentBlockerRulesUserScriptPublisher: some Publisher<ContentBlockerRulesUserScript?, Never>,
-         surrogatesUserScriptPublisher: some Publisher<SurrogatesUserScript?, Never>) {
+         surrogatesUserScriptPublisher: some Publisher<SurrogatesUserScript?, Never>,
+         privacyConfigurationManager: PrivacyConfigurationManaging,
+         userContentControllerProvider: @escaping UserContentControllerProvider,
+         cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter? = ContentBlockingAssetsCompilationTimeReporter.shared) {
 
+        self.tabIdentifier = tabIdentifier
+        self.cbaTimeReporter = cbaTimeReporter
         self.fbBlockingEnabledProvider = fbBlockingEnabledProvider
+        self.privacyConfigurationManager = privacyConfigurationManager
+        self.userContentControllerProvider = userContentControllerProvider
         super.init()
 
         contentBlockerRulesUserScriptPublisher.sink { [weak self] contentBlockerRulesUserScript in
@@ -55,6 +72,39 @@ final class ContentBlockingTabExtension: NSObject {
         surrogatesUserScriptPublisher.sink { [weak self] surrogatesUserScript in
             surrogatesUserScript?.delegate = self
         }.store(in: &cancellables)
+    }
+
+    deinit {
+        cbaTimeReporter?.tabWillClose(tabIdentifier)
+    }
+
+}
+
+extension ContentBlockingTabExtension: NavigationResponder {
+
+    func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
+        if !navigationAction.url.isDuckDuckGo {
+            await prepareForContentBlocking()
+        }
+
+        return .next
+    }
+
+    @MainActor
+    private func prepareForContentBlocking() async {
+        guard let userContentController = userContentControllerProvider() else {
+            assertionFailure("Could not get userContentController")
+            return
+        }
+        // Ensure Content Blocking Assets (WKContentRuleList&UserScripts) are installed
+        if userContentController.contentBlockingAssetsInstalled == false
+            && privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .contentBlocking) {
+            cbaTimeReporter?.tabWillWaitForRulesCompilation(tabIdentifier)
+            await userContentController.awaitContentBlockingAssetsInstalled()
+            cbaTimeReporter?.reportWaitTimeForTabFinishedWaitingForRules(tabIdentifier)
+        } else {
+            cbaTimeReporter?.reportNavigationDidNotWaitForRules()
+        }
     }
 
 }
@@ -70,7 +120,7 @@ extension ContentBlockingTabExtension: ContentBlockerRulesUserScriptDelegate {
     }
 
     func contentBlockerRulesUserScript(_ script: ContentBlockerRulesUserScript, detectedTracker tracker: DetectedRequest) {
-        trackersSubject.send(DetectedTracker(request: tracker, type: .tracker))
+        trackersSubject.send(DetectedTracker(request: tracker, type: .blockedTracker))
     }
 
     func contentBlockerRulesUserScript(_ script: ContentBlockerRulesUserScript, detectedThirdPartyRequest request: DetectedRequest) {
@@ -90,13 +140,12 @@ extension ContentBlockingTabExtension: SurrogatesUserScriptDelegate {
     }
 }
 
-protocol ContentBlockingExtensionProtocol: AnyObject {
+protocol ContentBlockingExtensionProtocol: AnyObject, NavigationResponder {
     var trackersPublisher: AnyPublisher<DetectedTracker, Never> { get }
 }
 
 extension ContentBlockingTabExtension: TabExtension, ContentBlockingExtensionProtocol {
     typealias PublicProtocol = ContentBlockingExtensionProtocol
-
     func getPublicProtocol() -> PublicProtocol { self }
 
     var trackersPublisher: AnyPublisher<DetectedTracker, Never> {
