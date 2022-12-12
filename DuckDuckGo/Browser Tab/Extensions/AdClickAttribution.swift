@@ -162,9 +162,44 @@ extension AdClickAttributionTabExtension: AdClickAttributionLogicDelegate {
 
 }
 
+extension AdClickAttributionTabExtension: NavigationResponder {
+
+    func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
+        if navigationAction.isForMainFrame, navigationAction.navigationType.isBackForward {
+            logic.onBackForwardNavigation(mainFrameURL: navigationAction.url)
+        }
+        return .next
+    }
+
+    func didStart(_ navigation: Navigation) {
+        detection.onStartNavigation(url: navigation.url)
+    }
+
+    func decidePolicy(for navigationResponse: NavigationResponse, currentNavigation: Navigation?) async -> NavigationResponsePolicy? {
+        if navigationResponse.isForMainFrame, let currentNavigation,
+           navigationResponse.httpResponse?.isSuccessful == true {
+            detection.on2XXResponse(url: currentNavigation.url)
+        }
+
+        await logic.onProvisionalNavigation()
+
+        return .next
+    }
+
+    func navigationDidFinish(_ navigation: Navigation) {
+        detection.onDidFinishNavigation(url: navigation.url)
+        logic.onDidFinishNavigation(host: navigation.url.host)
+    }
+
+    func navigation(_ navigation: Navigation, didFailWith error: WKError, isProvisioned: Bool) {
+        detection.onDidFailNavigation()
+    }
+    
+}
+
 extension AppContentBlocking: AdClickAttributionDependencies {}
 
-protocol AdClickAttributionProtocol {
+protocol AdClickAttributionProtocol: AnyObject, NavigationResponder {
     var detection: AdClickAttributionDetection! { get }
     var logic: AdClickAttributionLogic! { get }
 }

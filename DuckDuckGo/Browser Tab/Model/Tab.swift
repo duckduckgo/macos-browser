@@ -1192,10 +1192,6 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
             lastUpgradedURL = nil
         }
 
-        if navigationAction.isForMainFrame, navigationAction.navigationType.isBackForward {
-            self.adClickAttribution?.logic.onBackForwardNavigation(mainFrameURL: webView.url)
-        }
-
         if navigationAction.isForMainFrame, !navigationAction.navigationType.isBackForward {
             if let newRequest = referrerTrimming.trimReferrer(for: navigationAction.request, originUrl: navigationAction.sourceFrame.url) {
                 if isRequestingNewTab {
@@ -1380,8 +1376,6 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
     func decidePolicy(for navigationResponse: NavigationResponse, currentNavigation: Navigation?) async -> NavigationResponsePolicy? {
         userEnteredUrl = false // subsequent requests will be navigations
         
-        let isSuccessfulResponse = (navigationResponse.response as? HTTPURLResponse)?.validateStatusCode(statusCode: 200..<300) == nil
-
         if !navigationResponse.canShowMIMEType || navigationResponse.shouldDownload {
             if navigationResponse.isForMainFrame {
                 guard currentDownload != navigationResponse.url else {
@@ -1391,7 +1385,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
                 currentDownload = navigationResponse.url
             }
 
-            if isSuccessfulResponse {
+            if navigationResponse.httpResponse?.isSuccessful == true {
                 // register the navigationResponse for legacy _WKDownload to be called back on the Tab
                 // further download will be passed to webView:navigationResponse:didBecomeDownload:
                 return .download(navigationResponse.url, using: webView) {  [weak self] download in
@@ -1400,12 +1394,6 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
             }
         }
         
-        if navigationResponse.isForMainFrame && isSuccessfulResponse {
-            self.adClickAttribution?.detection.on2XXResponse(url: webView.url)
-        }
-        
-        await self.adClickAttribution?.logic.onProvisionalNavigation()
-
         return .allow
     }
 
@@ -1421,7 +1409,6 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         linkProtection.cancelOngoingExtraction()
         linkProtection.setMainFrameUrl(navigation.url)
         referrerTrimming.onBeginNavigation(to: navigation.url)
-        self.adClickAttribution?.detection.onStartNavigation(url: navigation.url)
     }
 
     @MainActor
@@ -1431,8 +1418,6 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         if isAMPProtectionExtracting { isAMPProtectionExtracting = false }
         linkProtection.setMainFrameUrl(nil)
         referrerTrimming.onFinishNavigation()
-        self.adClickAttribution?.detection.onDidFinishNavigation(url: navigation.url)
-        self.adClickAttribution?.logic.onDidFinishNavigation(host: navigation.url.host)
         setUpYoutubeScriptsIfNeeded()
         StatisticsLoader.shared.refreshRetentionAtb(isSearch: navigation.url.isDuckDuckGoSearch)
     }
@@ -1445,7 +1430,6 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         invalidateSessionStateData()
         linkProtection.setMainFrameUrl(nil)
         referrerTrimming.onFailedNavigation()
-        self.adClickAttribution?.detection.onDidFailNavigation()
         webViewDidFailNavigationPublisher.send()
     }
 
