@@ -802,6 +802,7 @@
 		B6BDD9F82940C2C100F68088 /* Lazy.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6BDD9F72940C2C000F68088 /* Lazy.swift */; };
 		B6BDDA012942389000F68088 /* TabExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6BDDA002942389000F68088 /* TabExtensions.swift */; };
 		B6BE9FAA293F7955006363C6 /* ModalSheetCancellable.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6BE9FA9293F7955006363C6 /* ModalSheetCancellable.swift */; };
+		B6BF5D932947199A006742B1 /* SerpHeadersNavigationResponder.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6BF5D922947199A006742B1 /* SerpHeadersNavigationResponder.swift */; };
 		B6C00ECB292F839D009C73A6 /* AutofillTabExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C00ECA292F839D009C73A6 /* AutofillTabExtension.swift */; };
 		B6C00ECD292F89D9009C73A6 /* FindInPageTabExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C00ECC292F89D9009C73A6 /* FindInPageTabExtension.swift */; };
 		B6C00ED5292FB21E009C73A6 /* HoveredLinkTabExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C00ED4292FB21E009C73A6 /* HoveredLinkTabExtension.swift */; };
@@ -1694,6 +1695,7 @@
 		B6BDD9F72940C2C000F68088 /* Lazy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Lazy.swift; sourceTree = "<group>"; };
 		B6BDDA002942389000F68088 /* TabExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabExtensions.swift; sourceTree = "<group>"; };
 		B6BE9FA9293F7955006363C6 /* ModalSheetCancellable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModalSheetCancellable.swift; sourceTree = "<group>"; };
+		B6BF5D922947199A006742B1 /* SerpHeadersNavigationResponder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SerpHeadersNavigationResponder.swift; sourceTree = "<group>"; };
 		B6C00ECA292F839D009C73A6 /* AutofillTabExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutofillTabExtension.swift; sourceTree = "<group>"; };
 		B6C00ECC292F89D9009C73A6 /* FindInPageTabExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FindInPageTabExtension.swift; sourceTree = "<group>"; };
 		B6C00ED4292FB21E009C73A6 /* HoveredLinkTabExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HoveredLinkTabExtension.swift; sourceTree = "<group>"; };
@@ -3507,6 +3509,7 @@
 				AA86491C24D83868001BABEE /* View */,
 				AA86491D24D83A59001BABEE /* ViewModel */,
 				AA86491E24D83A66001BABEE /* Model */,
+				B6BF5D912947198E006742B1 /* Navigation */,
 				B6BDD9F12940764100F68088 /* UserScripts */,
 				B647EFB32922539400BA628D /* Extensions */,
 				AA512D1224D99D4900230283 /* Services */,
@@ -4365,6 +4368,14 @@
 			path = UserScripts;
 			sourceTree = "<group>";
 		};
+		B6BF5D912947198E006742B1 /* Navigation */ = {
+			isa = PBXGroup;
+			children = (
+				B6BF5D922947199A006742B1 /* SerpHeadersNavigationResponder.swift */,
+			);
+			path = Navigation;
+			sourceTree = "<group>";
+		};
 		B6C0B23126E71A800031CB7F /* Services */ = {
 			isa = PBXGroup;
 			children = (
@@ -5085,6 +5096,7 @@
 				B6085D092743AAB600A9C456 /* FireproofDomains.xcdatamodeld in Sources */,
 				3106AD76287F000600159FE5 /* CookieConsentUserPermissionViewController.swift in Sources */,
 				85589E8227BBB8630038AD11 /* HomePageView.swift in Sources */,
+				B6BF5D932947199A006742B1 /* SerpHeadersNavigationResponder.swift in Sources */,
 				B6A924D92664C72E001A28CA /* WebKitDownloadTask.swift in Sources */,
 				4B59023E26B35F3600489384 /* ChromiumLoginReader.swift in Sources */,
 				85D885B326A5A9DE0077C374 /* NSAlert+PasswordManager.swift in Sources */,

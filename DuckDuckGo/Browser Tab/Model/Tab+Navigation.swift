@@ -32,7 +32,9 @@ extension Tab: NavigationResponder {
         navigationDelegate.setResponders(
             .weak(self),
 
-            .weak(nullable: self.adClickAttribution)
+            .weak(nullable: self.adClickAttribution),
+
+            .struct(SerpHeadersNavigationResponder())
         )
         navigationDelegate.registerCustomDelegateMethodHandler(.weak(self), for: #selector(webView(_:contextMenuDidCreate:)))
     }

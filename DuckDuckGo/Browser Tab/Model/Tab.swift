@@ -1132,11 +1132,6 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         webViewDidCommitNavigationPublisher.send()
     }
 
-    struct Constants {
-        static let ddgClientHeaderKey = "X-DuckDuckGo-Client"
-        static let ddgClientHeaderValue = "macOS"
-    }
-
     // swiftlint:disable cyclomatic_complexity
     // swiftlint:disable function_body_length
     @MainActor
@@ -1267,22 +1262,13 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
                 }
             }
         }
-        
-        if navigationAction.isForMainFrame,
-           navigationAction.url.isDuckDuckGo,
-           navigationAction.request.value(forHTTPHeaderField: Constants.ddgClientHeaderKey) == nil,
-           !navigationAction.navigationType.isBackForward {
-            
-            var request = navigationAction.request
-            request.setValue(Constants.ddgClientHeaderValue, forHTTPHeaderField: Constants.ddgClientHeaderKey)
-            _ = webView.load(request)
-            return .cancel
-        }
 
         toggleFBProtection(for: navigationAction.url)
 
         return .next
     }
+    // swiftlint:enable cyclomatic_complexity
+    // swiftlint:enable function_body_length
 
     private func host(_ host: String?, requestedOpenExternalURL url: URL) {
         let searchForExternalUrl = { [weak self] in
@@ -1316,9 +1302,6 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
             self.permissions.permissions[permissionType].externalSchemeOpened()
         }
     }
-
-    // swiftlint:enable cyclomatic_complexity
-    // swiftlint:enable function_body_length
 
     private func urlDidUpgrade(_ upgradedURL: URL, navigationAction: NavigationAction) {
         lastUpgradedURL = upgradedURL
