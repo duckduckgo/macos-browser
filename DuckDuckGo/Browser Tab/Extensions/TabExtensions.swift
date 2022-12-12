@@ -18,6 +18,7 @@
 
 import BrowserServicesKit
 import Combine
+import ContentBlocking
 import Foundation
 import PrivacyDashboard
 
@@ -73,10 +74,21 @@ struct AppTabExtensions: TabExtensionInstantiation {
     func make(with dependencies: TabExtensionDependencies) -> TabExtensions {
         let userScripts = dependencies.userScriptsPublisher
 
+        let trackerInfoPublisher = dependencies.privacyInfoPublisher
+            .compactMap { $0?.$trackerInfo }
+            .switchToLatest()
+            .scan( (old: Set<DetectedRequest>(), new: Set<DetectedRequest>()) ) {
+                ($0.new, $1.trackers)
+            }
+            .map { (old, new) in
+                new.subtracting(old).publisher
+            }
+            .switchToLatest()
+            
         AdClickAttributionTabExtension(inheritedAttribution: dependencies.inheritedAttribution,
                                        userContentControllerProvider: dependencies.userContentControllerProvider,
                                        contentBlockerRulesScriptPublisher: userScripts.map(\.?.contentBlockerRulesScript),
-                                       privacyInfoPublisher: dependencies.privacyInfoPublisher,
+                                       trackerInfoPublisher: trackerInfoPublisher,
                                        dependencies: dependencies.adClickAttributionDependencies)
 
         AutofillTabExtension(autofillUserScriptPublisher: userScripts.map(\.?.autofillScript))
