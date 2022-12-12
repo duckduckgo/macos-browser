@@ -65,6 +65,9 @@ protocol TabExtensionDependencies {
 
     var inheritedAttribution: AdClickAttributionLogic.State? { get }
     var userContentControllerProvider: UserContentControllerProvider { get }
+
+    var workspace: Workspace { get }
+    var permissionModel: PermissionModel { get }
 }
 
 extension AppTabExtensions {
@@ -124,6 +127,10 @@ extension AppTabExtensions {
         }
         add {
             FindInPageTabExtension(findInPageScriptPublisher: userScripts.map(\.?.findInPageScript))
+        }
+
+        add {
+            ExternalAppSchemeHandler(workspace: dependencies.workspace, permissionModel: dependencies.permissionModel)
         }
     }
 

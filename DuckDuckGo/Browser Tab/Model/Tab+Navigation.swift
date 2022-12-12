@@ -31,6 +31,7 @@ extension Tab: NavigationResponder {
     func setupNavigationDelegate() {
         navigationDelegate.setResponders(
             .weak(self),
+            .weak(nullable: self.externalAppSchemeHandler),
 
             .weak(nullable: self.adClickAttribution),
 
@@ -65,4 +66,17 @@ extension Tab: WKNavigationDelegate {
         FileDownloadManager.shared.add(download, delegate: self, location: location, postflight: .none)
     }
 
+}
+
+extension NavigationType {
+    static let userEnteredURL = NavigationType.custom(.init(\.userEnteredURL, true))
+
+}
+extension InitialNavigationType {
+    static let userEnteredURL = InitialNavigationType.custom(.init(\.userEnteredURL, true))
+
+}
+
+extension UserInfo.Values {
+    var userEnteredURL: Value<Bool> { Value(default: false) { $0 ? "userEnteredURL" : "" } }
 }

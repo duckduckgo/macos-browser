@@ -147,6 +147,8 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         var privacyFeatures: PrivacyFeaturesProtocol
         var inheritedAttribution: BrowserServicesKit.AdClickAttributionLogic.State?
         var userContentControllerProvider: UserContentControllerProvider
+        var permissionModel: PermissionModel
+        var workspace: Workspace
     }
 
     // "protected" delegate property for extensions usage 
@@ -186,6 +188,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                      webViewConfiguration: WKWebViewConfiguration? = nil,
                      historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
                      pinnedTabsManager: PinnedTabsManager = WindowControllersManager.shared.pinnedTabsManager,
+                     workspace: Workspace = NSWorkspace.shared,
                      privatePlayer: PrivatePlayer? = nil,
                      localHistory: Set<String> = Set<String>(),
                      title: String? = nil,
@@ -209,6 +212,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                   webViewConfiguration: webViewConfiguration,
                   historyCoordinating: historyCoordinating,
                   pinnedTabsManager: pinnedTabsManager,
+                  workspace: workspace,
                   privacyFeatures: PrivacyFeatures,
                   privatePlayer: privatePlayer,
                   localHistory: localHistory,
@@ -224,12 +228,14 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                   webViewFrame: webViewFrame)
     }
 
+    // swiftlint:disable:next function_body_length
     init(content: TabContent,
          faviconManagement: FaviconManagement,
          webCacheManager: WebCacheManager,
          webViewConfiguration: WKWebViewConfiguration?,
          historyCoordinating: HistoryCoordinating,
          pinnedTabsManager: PinnedTabsManager,
+         workspace: Workspace,
          privacyFeatures: some PrivacyFeaturesProtocol,
          privatePlayer: PrivatePlayer,
          localHistory: Set<String>,
@@ -282,7 +288,9 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         self.extensions = .builder().build(with: ExtensionDependencies(tabIdentifier: instrumentation.currentTabIdentifier,
                                                                        userScriptsPublisher: userScriptsPublisher,
                                                                        privacyFeatures: privacyFeatures,
-                                                                       userContentControllerProvider: {  userContentControllerProvider?() }))
+                                                                       userContentControllerProvider: {  userContentControllerProvider?() },
+                                                                       permissionModel: permissions,
+                                                                       workspace: workspace))
 
         super.init()
 
@@ -368,8 +376,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     let webView: WebView
 
     private var lastUpgradedURL: URL?
-
-    var userEnteredUrl = false
 
     var contentChangeEnabled = true
 
@@ -494,8 +500,9 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         }
         self.content = .contentFromURL(url)
 
-        // This function is called when the user has manually typed in a new address, which should reset the login detection flow.
-        userEnteredUrl = userEntered
+        if let url {
+            self.navigationDelegate.setExpectedNavigationType(.userEnteredURL, matching: .url(url))
+        }
     }
 
     // Used to track if an error was caused by a download navigation.
@@ -528,7 +535,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     }
 
     private let instrumentation = TabInstrumentation()
-    private var externalSchemeOpenedPerPageLoad = false
 
     var canGoForward: Bool {
         webView.canGoForward
@@ -1091,48 +1097,14 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
 
         guard navigationAction.url.scheme != nil else { return .allow }
 
-        if navigationAction.url.isExternalSchemeLink {
-            // request if OS can handle extenrnal url
-            self.host(webView.url?.host, requestedOpenExternalURL: navigationAction.url)
-            return .cancel
-        }
-
         return .next
     }
     // swiftlint:enable cyclomatic_complexity
     // swiftlint:enable function_body_length
 
-    private func host(_ host: String?, requestedOpenExternalURL url: URL) {
-        let searchForExternalUrl = { [weak self] in
-            // Redirect after handing WebView.url update after cancelling the request
-            DispatchQueue.main.async {
-                guard let self, let url = URL.makeSearchUrl(from: url.absoluteString) else { return }
-                self.update(url: url)
-            }
-        }
-
-        // Another way of detecting whether an app is installed to handle a protocol is described in Asana:
-        // https://app.asana.com/0/1201037661562251/1202055908401751/f
-        guard NSWorkspace.shared.urlForApplication(toOpen: url) != nil else {
-            if userEnteredUrl {
-                // search if external URL can‘t be opened but entered by user
-                searchForExternalUrl()
-            }
-            return
-        }
-
-        let permissionType = PermissionType.externalScheme(scheme: url.scheme ?? "")
-        permissions.permissions([permissionType], requestedForDomain: host, url: url) { isGranted in
-            if isGranted {
-                NSWorkspace.shared.open(url)
-            }
-        }
-    }
-
     func willStart(_ navigationAction: NavigationAction) {
         if error != nil { error = nil }
 
-        externalSchemeOpenedPerPageLoad = false
         delegate?.tabWillStartNavigation(self, isUserInitiated: navigationAction.isUserInitiated)
     }
 
@@ -1151,8 +1123,6 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
 
     @MainActor
     func decidePolicy(for navigationResponse: NavigationResponse, currentNavigation: Navigation?) async -> NavigationResponsePolicy? {
-        userEnteredUrl = false // subsequent requests will be navigations
-        
         if !navigationResponse.canShowMIMEType || navigationResponse.shouldDownload {
             if navigationResponse.isForMainFrame {
                 guard currentDownload != navigationResponse.url else {
