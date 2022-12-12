@@ -1342,7 +1342,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         }
     }
 
-    private func invalidateBackItemIfNeeded(for navigationAction: NavigationAction) {
+    func invalidateBackItemIfNeeded(for navigationAction: NavigationAction) {
         // Cancelled & Upgraded Client Redirect URL leaves wrong backForwardList record
         // https://app.asana.com/0/inbox/1199237043628108/1201280322539473/1201353436736961
         guard case .redirect(let redirect) = navigationAction.navigationType,

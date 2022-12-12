@@ -39,6 +39,16 @@ extension Tab: NavigationResponder {
         navigationDelegate.registerCustomDelegateMethodHandler(.weak(self), for: #selector(webView(_:contextMenuDidCreate:)))
     }
 
+
+    func didCancel(_ navigationAction: NavigationAction, with relatedAction: NavigationActionCancellationRelatedAction) {
+        if case .redirect(let request) = relatedAction {
+            invalidateBackItemIfNeeded(for: navigationAction)
+            DispatchQueue.main.async { [weak webView] in
+                webView?.load(request)
+            }
+        }
+    }
+
 }
 
 extension Tab: WKNavigationDelegate {
