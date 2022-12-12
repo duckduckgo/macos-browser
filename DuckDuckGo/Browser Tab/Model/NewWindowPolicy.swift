@@ -32,6 +32,11 @@ enum NewWindowPolicy {
         }
     }
 
+    var isTab: Bool {
+        if case .tab = self { return true }
+        return false
+    }
+
 }
 
 extension WKWindowFeatures {

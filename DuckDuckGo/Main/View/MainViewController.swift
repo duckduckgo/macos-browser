@@ -382,9 +382,9 @@ final class MainViewController: NSViewController {
         case .url, .privatePlayer:
             browserTabViewController.makeWebViewFirstResponder()
         case .preferences:
-            browserTabViewController.preferencesViewController.view.makeMeFirstResponder()
+            browserTabViewController.preferencesViewController?.view.makeMeFirstResponder()
         case .bookmarks:
-            browserTabViewController.bookmarksViewController.view.makeMeFirstResponder()
+            browserTabViewController.bookmarksViewController?.view.makeMeFirstResponder()
         case .none:
             shouldAdjustFirstResponderOnContentChange = true
         }
