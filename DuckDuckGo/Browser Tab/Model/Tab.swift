@@ -326,7 +326,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             assertionFailure("no delegate set")
             return
         }
-        let tab = Tab(content: content, parentTab: self, shouldLoadInBackground: true)
+        let tab = Tab(content: content, parentTab: self, shouldLoadInBackground: true, canBeClosedWithBack: kind.isSelectedTab)
         delegate.tab(self, createdChild: tab, of: kind)
     }
 

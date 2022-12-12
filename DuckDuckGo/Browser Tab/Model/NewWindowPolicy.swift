@@ -36,6 +36,10 @@ enum NewWindowPolicy {
         if case .tab = self { return true }
         return false
     }
+    var isSelectedTab: Bool {
+        if case .tab(selected: true) = self { return true }
+        return false
+    }
 
 }
 
