@@ -152,8 +152,7 @@ final class FirefoxDataImporter: DataImporter {
     }
 
     private func profilesDirectoryURL() -> URL {
-        let applicationSupportURL = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
-        return applicationSupportURL.appendingPathComponent("Firefox/Profiles")
+        URL.nonSandboxApplicationSupportDirectoryURL.appendingPathComponent("Firefox/Profiles")
     }
 
 }

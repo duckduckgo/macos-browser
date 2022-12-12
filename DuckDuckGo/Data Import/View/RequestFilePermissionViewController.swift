@@ -61,12 +61,12 @@ final class RequestFilePermissionViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        descriptionLabel.stringValue = UserText.bookmarkImportSafariPermissionDescription
-        requestPermissionButton.title = UserText.bookmarkImportSafariRequestPermissionButtonTitle
+        descriptionLabel.stringValue = UserText.bookmarkImportPermissionDescription(importSource.importSourceName)
+        requestPermissionButton.title = UserText.bookmarkImportRequestPermissionButtonTitle(importSource.importSourceName)
     }
 
     @IBAction private func presentBookmarksOpenPanel(_ sender: AnyObject) {
-        if SafariDataImporter.requestSafariDataDirectoryPermission() != nil, SafariDataImporter.canReadBookmarksFile() {
+        if importSource.requestDataDirectoryPermission() != nil, ThirdPartyBrowser.browser(for: importSource)?.canReadBookmarksFile() == true {
             delegate?.requestFilePermissionViewControllerDidReceivePermission(self)
         }
     }

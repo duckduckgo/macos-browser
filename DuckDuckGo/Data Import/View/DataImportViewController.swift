@@ -43,8 +43,13 @@ final class DataImportViewController: NSViewController {
 
         static func defaultState() -> ViewState {
             if let firstInstalledBrowser = ThirdPartyBrowser.installedBrowsers.first {
-                return ViewState(selectedImportSource: firstInstalledBrowser.importSource,
-                                 interactionState: firstInstalledBrowser.importSource == .safari ? .ableToImport : .moreInfoAvailable)
+                let interactionState: InteractionState = {
+                    if NSApp.isSandboxed || firstInstalledBrowser.importSource == .safari {
+                        return .moreInfoAvailable
+                    }
+                    return .ableToImport
+                }()
+                return ViewState(selectedImportSource: firstInstalledBrowser.importSource, interactionState: interactionState)
             } else {
                 return ViewState(selectedImportSource: .csv, interactionState: .ableToImport)
             }
@@ -134,9 +139,9 @@ final class DataImportViewController: NSViewController {
     @IBAction func actionButtonClicked(_ sender: Any) {
         switch viewState.interactionState {
         // Import click on first screen with Bookmarks checkmark: Can't read bookmarks: request permission
-        case .ableToImport where viewState.selectedImportSource == .safari
+        case .ableToImport where (NSApp.isSandboxed || viewState.selectedImportSource == .safari)
                 && selectedImportOptions.contains(.bookmarks)
-                && !SafariDataImporter.canReadBookmarksFile():
+                && ThirdPartyBrowser.browser(for: viewState.selectedImportSource)?.canReadBookmarksFile() == false:
 
             self.viewState = ViewState(selectedImportSource: viewState.selectedImportSource, interactionState: .permissionsRequired([.bookmarks]))
 
@@ -185,13 +190,17 @@ final class DataImportViewController: NSViewController {
             self.viewState = ViewState(selectedImportSource: source, interactionState: .unableToImport)
 
         case .chrome, .firefox, .brave, .edge, .safari:
-            let interactionState: InteractionState
-            switch (source, loginsSelected) {
-            case (.safari, _), (_, false):
-                interactionState = .ableToImport
-            case (_, true):
-                interactionState = .moreInfoAvailable
-            }
+            let interactionState: InteractionState = {
+                if NSApp.isSandboxed {
+                    return .ableToImport
+                }
+                switch (source, loginsSelected) {
+                case (.safari, _), (_, false):
+                    return .ableToImport
+                case (_, true):
+                    return .moreInfoAvailable
+                }
+            }()
 
             self.viewState = ViewState(selectedImportSource: source, interactionState: interactionState)
         }
@@ -280,10 +289,13 @@ final class DataImportViewController: NSViewController {
                 let filePermissionViewController =  RequestFilePermissionViewController.create(importSource: importSource, permissionsRequired: types)
                 filePermissionViewController.delegate = self
                 return filePermissionViewController
-            } else if browserImportViewController?.browser == importSource {
+            } else if let sourceBrowser = browserImportViewController?.browser,
+                      sourceBrowser == importSource, sourceBrowser.validImportableProfiles.count == 1 {
                 return browserImportViewController
             } else {
-                browserImportViewController = createBrowserImportViewController(for: importSource)
+                if let browserImportViewController = createBrowserImportViewController(for: importSource) {
+                    self.browserImportViewController = browserImportViewController
+                }
                 return browserImportViewController
             }
 
@@ -488,9 +500,13 @@ extension DataImportViewController: BrowserImportViewControllerDelegate {
 extension DataImportViewController: RequestFilePermissionViewControllerDelegate {
 
     func requestFilePermissionViewControllerDidReceivePermission(_ viewController: RequestFilePermissionViewController) {
-        if viewState.selectedImportSource == .safari
-            && selectedImportOptions.contains(.bookmarks) {
-
+        let shouldProceedToBookmarksImport: Bool = {
+            guard selectedImportOptions.contains(.bookmarks) else {
+                return false
+            }
+            return viewState.selectedImportSource == .safari || viewState.selectedImportSource.validImportableProfiles.count == 1
+        }()
+        if shouldProceedToBookmarksImport {
             self.completeImport()
             return
         }
@@ -540,4 +556,10 @@ extension NSPopUpButton {
         }
     }
 
+}
+
+extension DataImport.Source {
+    var validImportableProfiles: [DataImport.BrowserProfile] {
+        ThirdPartyBrowser.browser(for: self)?.browserProfiles()?.validImportableProfiles ?? []
+    }
 }

@@ -56,11 +56,18 @@ enum ThirdPartyBrowser: CaseIterable {
         }
     }
 
+    func canReadBookmarksFile() -> Bool {
+        guard let browserDataDirectory = profilesDirectory(applicationSupportURL: URL.nonSandboxApplicationSupportDirectoryURL)?.path else {
+            return false
+        }
+        return FileManager.default.isReadableFile(atPath: browserDataDirectory)
+    }
+
     var isInstalled: Bool {
         let detectedApplicationPath = applicationPath != nil
         let detectedBrowserProfiles = !(browserProfiles()?.profiles.isEmpty ?? false)
 
-        return detectedApplicationPath && detectedBrowserProfiles
+        return detectedApplicationPath && (NSApp.isSandboxed || detectedBrowserProfiles)
     }
 
     var isRunning: Bool {
@@ -155,7 +162,8 @@ enum ThirdPartyBrowser: CaseIterable {
                                                                                       options: [.skipsHiddenFiles]).filter(\.hasDirectoryPath) else {
             // Safari is an exception, as it may need permissions granted before being able to read the contents of the profile path. To be safe,
             // return the profile anyway and check the file system permissions when preparing to import.
-            if self == .safari,
+            let shouldReturnProvisionalProfileList = NSApp.isSandboxed || self == .safari
+            if shouldReturnProvisionalProfileList,
                let profilePath = profilesDirectory(applicationSupportURL: applicationSupportURL) {
                 return DataImport.BrowserProfileList(browser: self, profileURLs: [profilePath])
             } else {
@@ -178,7 +186,7 @@ enum ThirdPartyBrowser: CaseIterable {
     }
 
     // Returns the URL to the profiles for a given browser. This directory will contain a list of directories, each representing a profile.
-    private func profilesDirectory(applicationSupportURL: URL) -> URL? {
+    func profilesDirectory(applicationSupportURL: URL) -> URL? {
         switch self {
         case .brave: return applicationSupportURL.appendingPathComponent("BraveSoftware/Brave-Browser/")
         case .chrome: return applicationSupportURL.appendingPathComponent("Google/Chrome/")
@@ -189,4 +197,22 @@ enum ThirdPartyBrowser: CaseIterable {
         }
     }
 
+}
+
+extension DataImport.Source {
+
+    func requestDataDirectoryPermission() -> URL? {
+        let browser = ThirdPartyBrowser.browser(for: self)
+        assert(browser != nil, "Browser must not be nil")
+
+        let openPanel = NSOpenPanel()
+        openPanel.directoryURL = browser?.profilesDirectory(applicationSupportURL: URL.nonSandboxApplicationSupportDirectoryURL)
+        openPanel.message = UserText.bookmarkImportRequestPermissionButtonTitle(importSourceName)
+        openPanel.allowsOtherFileTypes = false
+        openPanel.canChooseFiles = false
+        openPanel.canChooseDirectories = true
+
+        _ = openPanel.runModal()
+        return openPanel.urls.first
+    }
 }

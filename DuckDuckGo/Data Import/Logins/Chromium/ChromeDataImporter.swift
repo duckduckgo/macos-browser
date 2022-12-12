@@ -29,8 +29,7 @@ final class ChromeDataImporter: ChromiumDataImporter {
     }
 
     init(loginImporter: LoginImporter, bookmarkImporter: BookmarkImporter) {
-        let applicationSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
-        let defaultDataURL = applicationSupport.appendingPathComponent("Google/Chrome/Default/")
+        let defaultDataURL = URL.nonSandboxApplicationSupportDirectoryURL.appendingPathComponent("Google/Chrome/Default/")
 
         super.init(applicationDataDirectoryURL: defaultDataURL,
                    loginImporter: loginImporter,

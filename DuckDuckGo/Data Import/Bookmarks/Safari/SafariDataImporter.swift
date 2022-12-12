@@ -20,22 +20,6 @@ import Foundation
 
 internal class SafariDataImporter: DataImporter {
 
-    static func canReadBookmarksFile() -> Bool {
-        return FileManager.default.isReadableFile(atPath: safariDataDirectoryURL.path)
-    }
-
-    static func requestSafariDataDirectoryPermission() -> URL? {
-        let openPanel = NSOpenPanel()
-        openPanel.directoryURL = safariDataDirectoryURL
-        openPanel.message = UserText.bookmarkImportSafariRequestPermissionButtonTitle
-        openPanel.allowsOtherFileTypes = false
-        openPanel.canChooseFiles = false
-        openPanel.canChooseDirectories = true
-
-        _ = openPanel.runModal()
-        return openPanel.urls.first
-    }
-    
     static private var safariDataDirectoryURL: URL {
         return URL.nonSandboxLibraryDirectoryURL.appendingPathComponent("Safari/")
     }

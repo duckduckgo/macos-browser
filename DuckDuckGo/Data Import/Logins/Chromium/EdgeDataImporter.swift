@@ -29,8 +29,7 @@ final class EdgeDataImporter: ChromiumDataImporter {
     }
 
     init(loginImporter: LoginImporter, bookmarkImporter: BookmarkImporter) {
-        let applicationSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
-        let defaultDataURL = applicationSupport.appendingPathComponent("Microsoft Edge/Default/")
+        let defaultDataURL = URL.nonSandboxApplicationSupportDirectoryURL.appendingPathComponent("Microsoft Edge/Default/")
 
         super.init(applicationDataDirectoryURL: defaultDataURL,
                    loginImporter: loginImporter,
