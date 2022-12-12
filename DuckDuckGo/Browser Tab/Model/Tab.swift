@@ -1054,7 +1054,6 @@ extension Tab: ContentBlockerRulesUserScriptDelegate {
         guard let url = webView.url else { return }
         
         privacyInfo?.trackerInfo.addDetectedTracker(tracker, onPageWithURL: url)
-        self.adClickAttribution?.logic.onRequestDetected(request: tracker)
         historyCoordinating.addDetectedTracker(tracker, onURL: url)
     }
 
