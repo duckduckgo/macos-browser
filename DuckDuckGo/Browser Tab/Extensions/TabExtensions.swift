@@ -18,6 +18,7 @@
 
 import BrowserServicesKit
 import Combine
+import ContentBlocking
 import Foundation
 import PrivacyDashboard
 
@@ -66,33 +67,58 @@ protocol TabExtensionDependencies {
     var userContentControllerProvider: UserContentControllerProvider { get }
 }
 
-struct AppTabExtensions: TabExtensionInstantiation {
+extension AppTabExtensions {
 
     /// Instantiate `TabExtension`-s for App builds here
+    /// use add { return SomeTabExtensions() } to register Tab Extensions
+    /// assign a result of add { .. } to a variable to use the registered Extensions for providing dependencies to other extensions
+    /// ` add { MySimpleExtension() }
+    /// ` let myPublishingExtension = add { MyPublishingExtension() }
+    /// ` add { MyOtherExtension(with: myExtension.resultPublisher) }
     /// Note: Extensions with state restoration support should conform to `NSCodingExtension`
-    func make(with dependencies: TabExtensionDependencies) -> TabExtensions {
+    mutating func make(with dependencies: TabExtensionDependencies) {
         let userScripts = dependencies.userScriptsPublisher
 
-        AdClickAttributionTabExtension(inheritedAttribution: dependencies.inheritedAttribution,
-                                       userContentControllerProvider: dependencies.userContentControllerProvider,
-                                       contentBlockerRulesScriptPublisher: userScripts.map(\.?.contentBlockerRulesScript),
-                                       privacyInfoPublisher: dependencies.privacyInfoPublisher,
-                                       dependencies: dependencies.adClickAttributionDependencies)
+        let trackerInfoPublisher = dependencies.privacyInfoPublisher
+            .compactMap { $0?.$trackerInfo }
+            .switchToLatest()
+            .scan( (old: Set<DetectedRequest>(), new: Set<DetectedRequest>()) ) {
+                ($0.new, $1.trackers)
+            }
+            .map { (old, new) in
+                new.subtracting(old).publisher
+            }
+            .switchToLatest()
 
-        AutofillTabExtension(autofillUserScriptPublisher: userScripts.map(\.?.autofillScript))
-        ContextMenuManager(contextMenuScriptPublisher: userScripts.map(\.?.contextMenuScript))
-        HoveredLinkTabExtension(hoverUserScriptPublisher: userScripts.map(\.?.hoverUserScript))
-        FindInPageTabExtension(findInPageScriptPublisher: userScripts.map(\.?.findInPageScript))
+        add {
+            AdClickAttributionTabExtension(inheritedAttribution: dependencies.inheritedAttribution,
+                                           userContentControllerProvider: dependencies.userContentControllerProvider,
+                                           contentBlockerRulesScriptPublisher: userScripts.map(\.?.contentBlockerRulesScript),
+                                           trackerInfoPublisher: trackerInfoPublisher,
+                                           dependencies: dependencies.adClickAttributionDependencies)
+        }
+        add {
+            AutofillTabExtension(autofillUserScriptPublisher: userScripts.map(\.?.autofillScript))
+        }
+        add {
+            ContextMenuManager(contextMenuScriptPublisher: userScripts.map(\.?.contextMenuScript))
+        }
+        add {
+            HoveredLinkTabExtension(hoverUserScriptPublisher: userScripts.map(\.?.hoverUserScript))
+        }
+        add {
+            FindInPageTabExtension(findInPageScriptPublisher: userScripts.map(\.?.findInPageScript))
+        }
     }
 
 }
 
 #if DEBUG
-struct TestTabExtensions: TabExtensionInstantiation {
+extension TestTabExtensions {
 
     /// Add `TabExtension`-s that should be loaded when running Unit Tests here
     /// By default the Extensions won‘t be loaded
-    func make(with dependencies: TabExtensionDependencies) -> TabExtensions {
+    mutating func make(with dependencies: TabExtensionDependencies) {
 
     }
 

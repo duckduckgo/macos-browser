@@ -280,18 +280,18 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         webView.allowsLinkPreview = false
         permissions = PermissionModel()
 
-        let userScripts = _userContentController.projectedValue
+        let userScriptsPublisher = _userContentController.projectedValue
             .compactMap { $0?.$contentBlockingAssets }
             .switchToLatest()
             .map { $0?.userScripts as? UserScripts }
             .eraseToAnyPublisher()
 
         var userContentControllerProvider: UserContentControllerProvider?
-        self.extensions = .builder().make(with: ExtensionDependencies(userScriptsPublisher: userScripts,
-                                                                      contentBlocking: privacyFeatures.contentBlocking,
-                                                                      adClickAttributionDependencies: privacyFeatures.contentBlocking,
-                                                                      privacyInfoPublisher: _privacyInfo.projectedValue.eraseToAnyPublisher(),
-                                                                      userContentControllerProvider: {  userContentControllerProvider?() }))
+        self.extensions = .builder().build(with: ExtensionDependencies(userScriptsPublisher: userScriptsPublisher,
+                                                                       contentBlocking: privacyFeatures.contentBlocking,
+                                                                       adClickAttributionDependencies: privacyFeatures.contentBlocking,
+                                                                       privacyInfoPublisher: _privacyInfo.projectedValue.eraseToAnyPublisher(),
+                                                                       userContentControllerProvider: {  userContentControllerProvider?() }))
 
         super.init()
 
@@ -1115,7 +1115,6 @@ extension Tab: ContentBlockerRulesUserScriptDelegate {
         guard let url = webView.url else { return }
         
         privacyInfo?.trackerInfo.addDetectedTracker(tracker, onPageWithURL: url)
-        self.adClickAttribution?.logic.onRequestDetected(request: tracker)
         historyCoordinating.addDetectedTracker(tracker, onURL: url)
     }
 
@@ -1339,7 +1338,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
 
         toggleFBProtection(for: navigationAction.url)
 
-        return .allow
+        return .next
     }
 
     private func host(_ host: String?, requestedOpenExternalURL url: URL) {
@@ -1463,7 +1462,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         
         await self.adClickAttribution?.logic.onProvisionalNavigation()
 
-        return .allow
+        return .next
     }
 
     func didStart(_ navigation: Navigation) {
