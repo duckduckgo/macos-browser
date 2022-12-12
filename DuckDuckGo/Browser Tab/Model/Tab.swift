@@ -286,11 +286,11 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             .eraseToAnyPublisher()
 
         var userContentControllerProvider: UserContentControllerProvider?
-        self.extensions = .builder().make(with: ExtensionDependencies(userScriptsPublisher: userScriptsPublisher,
-                                                                      contentBlocking: privacyFeatures.contentBlocking,
-                                                                      adClickAttributionDependencies: privacyFeatures.contentBlocking,
-                                                                      privacyInfoPublisher: _privacyInfo.projectedValue.eraseToAnyPublisher(),
-                                                                      userContentControllerProvider: {  userContentControllerProvider?() }))
+        self.extensions = .builder().build(with: ExtensionDependencies(userScriptsPublisher: userScriptsPublisher,
+                                                                       contentBlocking: privacyFeatures.contentBlocking,
+                                                                       adClickAttributionDependencies: privacyFeatures.contentBlocking,
+                                                                       privacyInfoPublisher: _privacyInfo.projectedValue.eraseToAnyPublisher(),
+                                                                       userContentControllerProvider: {  userContentControllerProvider?() }))
 
         super.init()
         userContentControllerProvider = { [weak self] in self?.userContentController }
