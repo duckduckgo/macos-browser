@@ -19,19 +19,32 @@
 import Combine
 import Foundation
 
-@resultBuilder
-struct TabExtensionsBuilder {
-    static func buildBlock(_ components: any TabExtension...) -> TabExtensions {
-        TabExtensions(components: components)
+protocol TabExtensionInstantiation {
+    var components: [any TabExtension] { get set }
+    mutating func make(with dependencies: TabExtensionDependencies)
+    func build(with dependencies: TabExtensionDependencies) -> TabExtensions
+}
+
+extension TabExtensionInstantiation {
+    @discardableResult
+    mutating func add<T: TabExtension>(_ makeTabExtension: () -> T) -> T {
+        let tabExtension = makeTabExtension()
+        components.append(tabExtension)
+        return tabExtension
+    }
+
+    func build(with dependencies: TabExtensionDependencies) -> TabExtensions {
+        var builder = self
+        builder.make(with: dependencies)
+        return TabExtensions(components: builder.components)
     }
 }
 
-protocol TabExtensionInstantiation {
-    @TabExtensionsBuilder func make(with dependencies: TabExtensionDependencies) -> TabExtensions
-    func add<T: TabExtension>(_ tabExtension: T) -> T
+struct AppTabExtensions: TabExtensionInstantiation {
+    var components = [any TabExtension]()
 }
-extension TabExtensionInstantiation {
-    func add<T: TabExtension>(_ tabExtension: T) -> T { tabExtension }
+struct TestTabExtensions: TabExtensionInstantiation {
+    var components = [any TabExtension]()
 }
 
 struct TabExtensions {
