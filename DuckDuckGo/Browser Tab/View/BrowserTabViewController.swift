@@ -344,8 +344,8 @@ final class BrowserTabViewController: NSViewController {
     private func removeAllTabContent(includingWebView: Bool = true) {
         self.homePageView.removeFromSuperview()
         transientTabContentViewController?.removeCompletely()
-        $preferencesViewController?.removeCompletely()
-        $bookmarksViewController?.removeCompletely()
+        preferencesViewController?.removeCompletely()
+        bookmarksViewController?.removeCompletely()
         if includingWebView {
             self.removeWebViewFromHierarchy()
         }
@@ -376,10 +376,11 @@ final class BrowserTabViewController: NSViewController {
         switch tabViewModel?.tab.content {
         case .bookmarks:
             removeAllTabContent()
-            showTabContentController(bookmarksViewController)
+            showTabContentController(bookmarksViewControllerCreatingIfNeeded())
 
         case let .preferences(pane):
             removeAllTabContent()
+            let preferencesViewController = preferencesViewControllerCreatingIfNeeded()
             if let pane = pane, preferencesViewController.model.selectedPane != pane {
                 preferencesViewController.model.selectPane(pane)
             }
@@ -423,38 +424,55 @@ final class BrowserTabViewController: NSViewController {
 
     // MARK: - Preferences
 
-    @Lazy({ (self: BrowserTabViewController, vc) in vc.delegate = self })
-    var preferencesViewController = PreferencesViewController()
+    var preferencesViewController: PreferencesViewController?
+    private func preferencesViewControllerCreatingIfNeeded() -> PreferencesViewController {
+        return preferencesViewController ?? {
+            let preferencesViewController = PreferencesViewController()
+            preferencesViewController.delegate = self
+            self.preferencesViewController = preferencesViewController
+            return preferencesViewController
+        }()
+    }
 
     // MARK: - Bookmarks
 
-    @Lazy({ (self: BrowserTabViewController, vc) in vc.delegate = self })
-    var bookmarksViewController: BookmarkManagementSplitViewController = .create()
+    var bookmarksViewController: BookmarkManagementSplitViewController?
+    private func bookmarksViewControllerCreatingIfNeeded() -> BookmarkManagementSplitViewController {
+        return bookmarksViewController ?? {
+            let bookmarksViewController = BookmarkManagementSplitViewController.create()
+            bookmarksViewController.delegate = self
+            self.bookmarksViewController = bookmarksViewController
+            return bookmarksViewController
+        }()
+    }
 
-    @Lazy({ (self: BrowserTabViewController) in
-        let overlayPopover = ContentOverlayPopover(currentTabView: self.view)
-        WindowControllersManager.shared.stateChanged
-            .sink { [weak overlayPopover] _ in
-                overlayPopover?.websiteAutofillUserScriptCloseOverlay(nil)
-            }.store(in: &self.cancellables)
-        return overlayPopover
-    })
-    public var contentOverlayPopover: ContentOverlayPopover
+    private var contentOverlayPopover: ContentOverlayPopover?
+    private func contentOverlayPopoverCreatingIfNeeded() -> ContentOverlayPopover {
+        return contentOverlayPopover ?? {
+            let overlayPopover = ContentOverlayPopover(currentTabView: self.view)
+            self.contentOverlayPopover = overlayPopover
+            WindowControllersManager.shared.stateChanged
+                .sink { [weak overlayPopover] _ in
+                    overlayPopover?.websiteAutofillUserScriptCloseOverlay(nil)
+                }.store(in: &self.cancellables)
+            return overlayPopover
+        }()
+    }
 
 }
 
 extension BrowserTabViewController: ContentOverlayUserScriptDelegate {
     public func websiteAutofillUserScriptCloseOverlay(_ websiteAutofillUserScript: WebsiteAutofillUserScript?) {
-        contentOverlayPopover.websiteAutofillUserScriptCloseOverlay(websiteAutofillUserScript)
+        contentOverlayPopoverCreatingIfNeeded().websiteAutofillUserScriptCloseOverlay(websiteAutofillUserScript)
     }
     public func websiteAutofillUserScript(_ websiteAutofillUserScript: WebsiteAutofillUserScript,
                                           willDisplayOverlayAtClick: NSPoint?,
                                           serializedInputContext: String,
                                           inputPosition: CGRect) {
-        contentOverlayPopover.websiteAutofillUserScript(websiteAutofillUserScript,
-                                                        willDisplayOverlayAtClick: willDisplayOverlayAtClick,
-                                                        serializedInputContext: serializedInputContext,
-                                                        inputPosition: inputPosition)
+        contentOverlayPopoverCreatingIfNeeded().websiteAutofillUserScript(websiteAutofillUserScript,
+                                                                          willDisplayOverlayAtClick: willDisplayOverlayAtClick,
+                                                                          serializedInputContext: serializedInputContext,
+                                                                          inputPosition: inputPosition)
     }
 }
 
