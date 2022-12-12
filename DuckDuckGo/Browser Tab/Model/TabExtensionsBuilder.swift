@@ -1,5 +1,5 @@
 //
-//  TabExtensions.swift
+//  TabExtensionsBuilder.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -19,13 +19,14 @@
 import Combine
 import Foundation
 
-protocol TabExtensionInstantiation {
+protocol TabExtensionsBuilder {
     var components: [any TabExtension] { get set }
     mutating func make(with dependencies: TabExtensionDependencies)
     func build(with dependencies: TabExtensionDependencies) -> TabExtensions
 }
 
-extension TabExtensionInstantiation {
+extension TabExtensionsBuilder {
+
     @discardableResult
     mutating func add<T: TabExtension>(_ makeTabExtension: () -> T) -> T {
         let tabExtension = makeTabExtension()
@@ -38,12 +39,13 @@ extension TabExtensionInstantiation {
         builder.make(with: dependencies)
         return TabExtensions(components: builder.components)
     }
+
 }
 
-struct AppTabExtensions: TabExtensionInstantiation {
+struct AppTabExtensions: TabExtensionsBuilder {
     var components = [any TabExtension]()
 }
-struct TestTabExtensions: TabExtensionInstantiation {
+struct TestTabExtensions: TabExtensionsBuilder {
     var components = [any TabExtension]()
 }
 
@@ -52,7 +54,7 @@ struct TabExtensions {
 
     private(set) var extensions: [AnyKeyPath: any TabExtension]
 
-    static func builder() -> TabExtensionInstantiation {
+    static func builder() -> TabExtensionsBuilder {
 #if DEBUG
         return AppDelegate.isRunningTests ? TestTabExtensions() : AppTabExtensions()
 #else
