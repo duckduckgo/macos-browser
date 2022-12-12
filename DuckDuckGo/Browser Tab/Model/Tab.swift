@@ -172,6 +172,9 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     private let privacyFeatures: AnyPrivacyFeatures
     private var contentBlocking: AnyContentBlocking { privacyFeatures.contentBlocking }
 
+    // to be wiped out later
+    private var detectedTrackersCancellables: AnyCancellable?
+
     private let webViewConfiguration: WKWebViewConfiguration
 
     private var extensions: TabExtensions
@@ -309,6 +312,8 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                                                selector: #selector(onDuckDuckGoEmailSignOut),
                                                name: .emailDidSignOut,
                                                object: nil)
+
+        self.subscribeToDetectedTrackers() 
     }
 
     override func awakeAfter(using decoder: NSCoder) -> Any? {
@@ -376,8 +381,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     var userEnteredUrl = false
 
     var contentChangeEnabled = true
-
-    var fbBlockingEnabled = true
 
     var isLazyLoadingInProgress = false
 
@@ -603,33 +606,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         } else {
             webView.reload()
         }
-    }
-
-    @discardableResult
-    private func setFBProtection(enabled: Bool) -> Bool {
-        guard self.fbBlockingEnabled != enabled else { return false }
-        guard let userContentController = userContentController else {
-            assertionFailure("Missing UserContentController")
-            return false
-        }
-        if enabled {
-            do {
-                try userContentController.enableGlobalContentRuleList(withIdentifier: ContentBlockerRulesLists.Constants.clickToLoadRulesListName)
-            } catch {
-                assertionFailure("Missing FB List")
-                return false
-            }
-        } else {
-            do {
-                try userContentController.disableGlobalContentRuleList(withIdentifier: ContentBlockerRulesLists.Constants.clickToLoadRulesListName)
-            } catch {
-                assertionFailure("FB List was not enabled")
-                return false
-            }
-        }
-        self.fbBlockingEnabled = enabled
-
-        return true
     }
 
     private static let debugEvents = EventMapping<AMPProtectionDebugEvents> { event, _, _, _ in
@@ -1001,9 +977,6 @@ extension Tab: UserContentControllerDelegate {
 
         userScripts.debugScript.instrumentation = instrumentation
         userScripts.faviconScript.delegate = self
-        userScripts.surrogatesScript.delegate = self
-        userScripts.contentBlockerRulesScript.delegate = self
-        userScripts.clickToLoadScript.delegate = self
         userScripts.pageObserverScript.delegate = self
         userScripts.printingUserScript.delegate = self
         if #available(macOS 11, *) {
@@ -1040,27 +1013,30 @@ extension Tab: FaviconUserScriptDelegate {
 
 }
 
-extension Tab: ContentBlockerRulesUserScriptDelegate {
+extension Tab {
+    // ContentBlockerRulesUserScriptDelegate & ClickToLoadUserScriptDelegate
+    // to be refactored to TabExtensions later
+    func subscribeToDetectedTrackers() {
+        detectedTrackersCancellables = self.trackersPublisher.sink { [weak self] tracker in
+            guard let self, let url = self.webView.url else { return }
 
-    func contentBlockerRulesUserScriptShouldProcessTrackers(_ script: ContentBlockerRulesUserScript) -> Bool {
-        return true
-    }
+            switch tracker.type {
+            case .tracker:
+                self.privacyInfo?.trackerInfo.addDetectedTracker(tracker.request, onPageWithURL: url)
+                self.historyCoordinating.addDetectedTracker(tracker.request, onURL: url)
 
-    func contentBlockerRulesUserScriptShouldProcessCTLTrackers(_ script: ContentBlockerRulesUserScript) -> Bool {
-        return fbBlockingEnabled
-    }
-    
-    func contentBlockerRulesUserScript(_ script: ContentBlockerRulesUserScript, detectedTracker tracker: DetectedRequest) {
-        guard let url = webView.url else { return }
-        
-        privacyInfo?.trackerInfo.addDetectedTracker(tracker, onPageWithURL: url)
-        historyCoordinating.addDetectedTracker(tracker, onURL: url)
-    }
+            case .thirdPartyRequest:
+                self.privacyInfo?.trackerInfo.add(detectedThirdPartyRequest: tracker.request)
 
-    func contentBlockerRulesUserScript(_ script: ContentBlockerRulesUserScript, detectedThirdPartyRequest request: DetectedRequest) {
-        privacyInfo?.trackerInfo.add(detectedThirdPartyRequest: request)
+            case .trackerWithSurrogate(host: let host):
+                self.privacyInfo?.trackerInfo.addInstalledSurrogateHost(host, for: tracker.request, onPageWithURL: url)
+                self.privacyInfo?.trackerInfo.addDetectedTracker(tracker.request, onPageWithURL: url)
+
+                self.historyCoordinating.addDetectedTracker(tracker.request, onURL: url)
+
+            }
+        }
     }
-    
 }
 
 extension HistoryCoordinating {
@@ -1074,37 +1050,6 @@ extension HistoryCoordinating {
         addBlockedTracker(entityName: entityName, on: url)
     }
 
-}
-
-extension Tab: ClickToLoadUserScriptDelegate {
-
-    func clickToLoadUserScriptAllowFB(_ script: UserScript, replyHandler: @escaping (Bool) -> Void) {
-        guard self.fbBlockingEnabled else {
-            replyHandler(true)
-            return
-        }
-
-        if setFBProtection(enabled: false) {
-            replyHandler(true)
-        } else {
-            replyHandler(false)
-        }
-    }
-}
-
-extension Tab: SurrogatesUserScriptDelegate {
-    func surrogatesUserScriptShouldProcessTrackers(_ script: SurrogatesUserScript) -> Bool {
-        return true
-    }
-
-    func surrogatesUserScript(_ script: SurrogatesUserScript, detectedTracker tracker: DetectedRequest, withSurrogate host: String) {
-        guard let url = webView.url else { return }
-        
-        privacyInfo?.trackerInfo.addInstalledSurrogateHost(host, for: tracker, onPageWithURL: url)
-        privacyInfo?.trackerInfo.addDetectedTracker(tracker, onPageWithURL: url)
-        
-        historyCoordinating.addDetectedTracker(tracker, onURL: url)
-    }
 }
 
 extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
@@ -1263,8 +1208,6 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
             }
         }
 
-        toggleFBProtection(for: navigationAction.url)
-
         return .next
     }
     // swiftlint:enable cyclomatic_complexity
@@ -1321,14 +1264,6 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         } else {
             cbaTimeReporter?.reportNavigationDidNotWaitForRules()
         }
-    }
-
-    private func toggleFBProtection(for url: URL) {
-        // Enable/disable FBProtection only after UserScripts are installed (awaitContentBlockingAssetsInstalled)
-        let privacyConfiguration = contentBlocking.privacyConfigurationManager.privacyConfig
-
-        let featureEnabled = privacyConfiguration.isFeature(.clickToPlay, enabledForDomain: url.host)
-        setFBProtection(enabled: featureEnabled)
     }
 
     func willStart(_ navigationAction: NavigationAction) {

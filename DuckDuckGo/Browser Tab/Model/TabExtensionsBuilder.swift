@@ -28,6 +28,10 @@ struct TabExtensionsBuilder {
 
 protocol TabExtensionInstantiation {
     @TabExtensionsBuilder func make(with dependencies: TabExtensionDependencies) -> TabExtensions
+    func add<T: TabExtension>(_ tabExtension: T) -> T
+}
+extension TabExtensionInstantiation {
+    func add<T: TabExtension>(_ tabExtension: T) -> T { tabExtension }
 }
 
 struct TabExtensions {

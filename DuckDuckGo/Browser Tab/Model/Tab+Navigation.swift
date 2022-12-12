@@ -34,11 +34,11 @@ extension Tab: NavigationResponder {
 
             .weak(nullable: self.adClickAttribution),
 
-            .struct(SerpHeadersNavigationResponder())
+            .struct(SerpHeadersNavigationResponder()),
+            .weak(nullable: self.fbProtection)
         )
         navigationDelegate.registerCustomDelegateMethodHandler(.weak(self), for: #selector(webView(_:contextMenuDidCreate:)))
     }
-
 
     func didCancel(_ navigationAction: NavigationAction, with relatedAction: NavigationActionCancellationRelatedAction) {
         if case .redirect(let request) = relatedAction {

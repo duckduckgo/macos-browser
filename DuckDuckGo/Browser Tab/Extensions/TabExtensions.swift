@@ -84,7 +84,7 @@ struct AppTabExtensions: TabExtensionInstantiation {
                 new.subtracting(old).publisher
             }
             .switchToLatest()
-            
+
         AdClickAttributionTabExtension(inheritedAttribution: dependencies.inheritedAttribution,
                                        userContentControllerProvider: dependencies.userContentControllerProvider,
                                        contentBlockerRulesScriptPublisher: userScripts.map(\.?.contentBlockerRulesScript),
@@ -95,6 +95,15 @@ struct AppTabExtensions: TabExtensionInstantiation {
         ContextMenuManager(contextMenuScriptPublisher: userScripts.map(\.?.contextMenuScript))
         HoveredLinkTabExtension(hoverUserScriptPublisher: userScripts.map(\.?.hoverUserScript))
         FindInPageTabExtension(findInPageScriptPublisher: userScripts.map(\.?.findInPageScript))
+
+        let fbProtection = FBProtectionTabExtension(privacyConfigurationManager: dependencies.contentBlocking.privacyConfigurationManager,
+                                                    userContentControllerProvider: dependencies.userContentControllerProvider,
+                                                    clickToLoadUserScriptPublisher: userScripts.map(\.?.clickToLoadScript))
+        add(fbProtection)
+
+        ContentBlockingTabExtension(fbBlockingEnabledProvider: fbProtection,
+                                    contentBlockerRulesUserScriptPublisher: userScripts.map(\.?.contentBlockerRulesScript),
+                                    surrogatesUserScriptPublisher: userScripts.map(\.?.surrogatesScript))
     }
 
 }
