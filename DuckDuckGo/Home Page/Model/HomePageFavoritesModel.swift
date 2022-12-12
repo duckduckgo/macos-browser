@@ -122,7 +122,7 @@ extension HomePage.Models {
         }
 
         private func updateVisibleModels() {
-            if #available(macOS 11.0, *) {
+            if #available(macOS 12.0, *) {
                 visibleModels = showAllFavorites ? models : Array(models.prefix(HomePage.favoritesRowCountWhenCollapsed * HomePage.favoritesPerRow))
             } else {
                 rows = models.chunked(into: HomePage.favoritesPerRow)
