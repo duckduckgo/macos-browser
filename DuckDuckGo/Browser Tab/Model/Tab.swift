@@ -1285,7 +1285,6 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         }
 
         toggleFBProtection(for: navigationAction.url)
-        willPerformNavigationAction(navigationAction)
 
         return .allow
     }

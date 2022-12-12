@@ -818,8 +818,6 @@
 		B6C2C9F62760B659005B7F0A /* TestDataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = B6C2C9F42760B659005B7F0A /* TestDataModel.xcdatamodeld */; };
 		B6CF78DE267B099C00CD4F13 /* WKNavigationActionExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6CF78DD267B099C00CD4F13 /* WKNavigationActionExtension.swift */; };
 		B6CFAA522943725600CB6B11 /* WebKitDownloadDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6CFAA512943725600CB6B11 /* WebKitDownloadDelegate.swift */; };
-		B6CFAA542943831A00CB6B11 /* FileManagerTestsUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6CFAA532943831A00CB6B11 /* FileManagerTestsUtils.swift */; };
-		B6CFAA5629438AD600CB6B11 /* NSFileManagerTestUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = B6CFAA5529438AD600CB6B11 /* NSFileManagerTestUtils.m */; };
 		B6DA06E12913AEDC00225DE2 /* TestNavigationDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6DA06E02913AEDB00225DE2 /* TestNavigationDelegate.swift */; };
 		B6DA06E22913AEDC00225DE2 /* TestNavigationDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6DA06E02913AEDB00225DE2 /* TestNavigationDelegate.swift */; };
 		B6DA06E42913ECEE00225DE2 /* ContextMenuManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6DA06E32913ECEE00225DE2 /* ContextMenuManager.swift */; };
@@ -1713,8 +1711,6 @@
 		B6CF78DD267B099C00CD4F13 /* WKNavigationActionExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WKNavigationActionExtension.swift; sourceTree = "<group>"; };
 		B6CF78E2267B0A1900CD4F13 /* WKNavigationAction+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "WKNavigationAction+Private.h"; sourceTree = "<group>"; };
 		B6CFAA512943725600CB6B11 /* WebKitDownloadDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebKitDownloadDelegate.swift; sourceTree = "<group>"; };
-		B6CFAA532943831A00CB6B11 /* FileManagerTestsUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileManagerTestsUtils.swift; sourceTree = "<group>"; };
-		B6CFAA5529438AD600CB6B11 /* NSFileManagerTestUtils.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NSFileManagerTestUtils.m; sourceTree = "<group>"; };
 		B6DA06E02913AEDB00225DE2 /* TestNavigationDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestNavigationDelegate.swift; sourceTree = "<group>"; };
 		B6DA06E32913ECEE00225DE2 /* ContextMenuManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContextMenuManager.swift; sourceTree = "<group>"; };
 		B6DA06E52913F39400225DE2 /* MenuItemSelectors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuItemSelectors.swift; sourceTree = "<group>"; };
@@ -2519,8 +2515,6 @@
 				B6A5A27D25B9403E00AA7ADA /* FileStoreMock.swift */,
 				4BBF0916282DD6EF00EE1418 /* TemporaryFileHandlerTests.swift */,
 				378205F52837CBA800D1D4AA /* SavedStateMock.swift */,
-				B6CFAA532943831A00CB6B11 /* FileManagerTestsUtils.swift */,
-				B6CFAA5529438AD600CB6B11 /* NSFileManagerTestUtils.m */,
 			);
 			path = "File System";
 			sourceTree = "<group>";
@@ -5479,7 +5473,6 @@
 				4BA1A6E6258C270800F6F690 /* EncryptionKeyGeneratorTests.swift in Sources */,
 				B6106BB326A7F4AA0013B453 /* GeolocationServiceMock.swift in Sources */,
 				4B8AC93D26B49BE600879451 /* FirefoxLoginReaderTests.swift in Sources */,
-				B6CFAA542943831A00CB6B11 /* FileManagerTestsUtils.swift in Sources */,
 				3714B1E728EDB7FA0056C57A /* PrivatePlayerPreferencesTests.swift in Sources */,
 				4BBF09232830812900EE1418 /* FileSystemDSL.swift in Sources */,
 				4B723E0526B0003E00E14D75 /* DataImportMocks.swift in Sources */,
@@ -5491,7 +5484,6 @@
 				31E163BD293A579E00963C10 /* PrivacyReferenceTestHelper.swift in Sources */,
 				B693955D26F19CD70015B914 /* DownloadListStoreTests.swift in Sources */,
 				B610F2EB27AA8E4500FCEBE9 /* ContentBlockingUpdatingTests.swift in Sources */,
-				B6CFAA5629438AD600CB6B11 /* NSFileManagerTestUtils.m in Sources */,
 				4B0511E7262CAB3700F6079C /* UserDefaultsWrapperUtilities.swift in Sources */,
 				4BA1A6F6258C4F9600F6F690 /* EncryptionMocks.swift in Sources */,
 				3767190028E58513003A2A15 /* PrivatePlayerURLExtensionTests.swift in Sources */,
