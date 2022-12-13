@@ -31,13 +31,25 @@ struct Favorites: View {
     }
 
     var body: some View {
-        VStack(spacing: 4) {
-            FavoritesGrid(isHovering: $isHovering)
+
+        if #available(macOS 11.0, *) {
+            LazyVStack(spacing: 4) {
+                FavoritesGrid(isHovering: $isHovering)
+            }
+            .frame(maxWidth: .infinity)
+            .onHover { isHovering in
+                self.isHovering = isHovering
+            }
+        } else {
+            VStack(spacing: 4) {
+                FavoritesGrid(isHovering: $isHovering)
+            }
+            .frame(maxWidth: .infinity)
+            .onHover { isHovering in
+                self.isHovering = isHovering
+            }
         }
-        .frame(maxWidth: .infinity)
-        .onHover { isHovering in
-            self.isHovering = isHovering
-        }
+
     }
 
 }
@@ -54,9 +66,20 @@ struct FavoritesGrid: View {
 
     var body: some View {
 
-        ForEach(rowIndices, id: \.self) { index in
-            HStack(alignment: .top, spacing: GridDimensions.horizontalSpacing) {
-                ForEach(model.rows[index], id: \.id, content: \.favoriteView)
+        if #available(macOS 11.0, *) {
+            LazyVGrid(
+                columns: Array(repeating: GridItem(.fixed(GridDimensions.itemWidth), spacing: GridDimensions.horizontalSpacing), count: HomePage.favoritesPerRow),
+                spacing: GridDimensions.verticalSpacing
+            ) {
+                ForEach(model.visibleModels, content: \.favoriteView)
+            }
+            .frame(maxWidth: GridDimensions.width)
+            .simultaneousGesture(dragGesture)
+        } else {
+            ForEach(rowIndices, id: \.self) { index in
+                HStack(alignment: .top, spacing: GridDimensions.horizontalSpacing) {
+                    ForEach(model.rows[index], id: \.id, content: \.favoriteView)
+                }
             }
         }
 
