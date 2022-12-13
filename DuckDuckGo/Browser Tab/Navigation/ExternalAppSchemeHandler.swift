@@ -53,7 +53,7 @@ extension ExternalAppSchemeHandler: NavigationResponder {
         let externalUrl = navigationAction.url
         guard externalUrl.isExternalSchemeLink, let scheme = externalUrl.scheme else { return .next }
         lazy var searchUrl = URL.makeSearchUrl(from: externalUrl.absoluteString)
-        let userEnteredUrl = navigationAction.navigationType == .userEnteredURL
+        let userEnteredUrl = navigationAction.navigationType.isUserEnteredUrl
 
         // can OS open the external url?
         guard workspace.urlForApplication(toOpen: externalUrl) != nil else {

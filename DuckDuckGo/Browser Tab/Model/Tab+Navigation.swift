@@ -69,14 +69,50 @@ extension Tab: WKNavigationDelegate {
 }
 
 extension NavigationType {
-    static let userEnteredURL = NavigationType.custom(.init(\.userEnteredURL, true))
+
+    // content-update navigation caused by Tab.setContent, URL navigation after failed session restoration,
+    // refresh on appear after error or initiated by user entering a URL (Tab.update called)
+    static func contentUpdate(userEnteredUrl: Bool) -> NavigationType {
+        .custom([.init(\.contentUpdate, true), .init(\.userEnteredUrl, userEnteredUrl)])
+    }
+
+    var isContentUpdate: Bool {
+        if case .custom(let userInfo) = self {
+            return userInfo.contentUpdate
+        }
+        return false
+    }
+    var isUserEnteredUrl: Bool {
+        if case .custom(let userInfo) = self {
+            return userInfo.userEnteredUrl
+        }
+        return false
+    }
 
 }
 extension InitialNavigationType {
-    static let userEnteredURL = InitialNavigationType.custom(.init(\.userEnteredURL, true))
-
+    var isContentUpdate: Bool {
+        if case .custom(let userInfo) = self {
+            return userInfo.contentUpdate
+        }
+        return false
+    }
+    var isUserEnteredUrl: Bool {
+        if case .custom(let userInfo) = self {
+            return userInfo.userEnteredUrl
+        }
+        return false
+    }
 }
 
-extension UserInfo.Values {
-    var userEnteredURL: Value<Bool> { Value(default: false) { $0 ? "userEnteredURL" : "" } }
+private extension UserInfo.Values {
+    var userEnteredUrl: Value<Bool> { Value(default: false) { $0 ? "userEnteredURL" : "" } }
+    var contentUpdate: Value<Bool> { Value(default: false) { $0 ? "contentUpdate" : "" } }
+}
+
+extension NavigationMatchingCondition {
+    var url: URL? {
+        if case .url(let url) = self { return url }
+        return nil
+    }
 }
