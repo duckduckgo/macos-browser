@@ -66,3 +66,52 @@ extension Tab: WKNavigationDelegate {
     }
 
 }
+
+extension NavigationType {
+
+    // content-update navigation caused by Tab.setContent, URL navigation after failed session restoration,
+    // refresh on appear after error or initiated by user entering a URL (Tab.update called)
+    static func contentUpdate(userEnteredUrl: Bool) -> NavigationType {
+        .custom([.init(\.contentUpdate, true), .init(\.userEnteredUrl, userEnteredUrl)])
+    }
+
+    var isContentUpdate: Bool {
+        if case .custom(let userInfo) = self {
+            return userInfo.contentUpdate
+        }
+        return false
+    }
+    var isUserEnteredUrl: Bool {
+        if case .custom(let userInfo) = self {
+            return userInfo.userEnteredUrl
+        }
+        return false
+    }
+
+}
+extension InitialNavigationType {
+    var isContentUpdate: Bool {
+        if case .custom(let userInfo) = self {
+            return userInfo.contentUpdate
+        }
+        return false
+    }
+    var isUserEnteredUrl: Bool {
+        if case .custom(let userInfo) = self {
+            return userInfo.userEnteredUrl
+        }
+        return false
+    }
+}
+
+private extension UserInfo.Values {
+    var userEnteredUrl: Value<Bool> { Value(default: false) { $0 ? "userEnteredURL" : "" } }
+    var contentUpdate: Value<Bool> { Value(default: false) { $0 ? "contentUpdate" : "" } }
+}
+
+extension NavigationMatchingCondition {
+    var url: URL? {
+        if case .url(let url) = self { return url }
+        return nil
+    }
+}

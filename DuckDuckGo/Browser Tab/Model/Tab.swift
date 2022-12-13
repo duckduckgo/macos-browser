@@ -369,10 +369,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
     let webView: WebView
 
-    private var lastUpgradedURL: URL?
-
-    var userEnteredUrl = false
-
     var contentChangeEnabled = true
 
     var isLazyLoadingInProgress = false
@@ -400,8 +396,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         guard contentChangeEnabled else {
             return
         }
-
-        lastUpgradedURL = nil
 
         if let newContent = privatePlayer.overrideContent(content, for: self) {
             self.content = newContent
@@ -494,10 +488,9 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         if url == .welcome {
             OnboardingViewModel().restart()
         }
+        // set `contentUpdate`+`userEnteredUrl` flags for an upcoming navigation
+        navigationDelegate.setExpectedNavigationType(.contentUpdate(userEnteredUrl: userEntered), matching: url.map(NavigationMatchingCondition.url))
         self.content = .contentFromURL(url)
-
-        // This function is called when the user has manually typed in a new address, which should reset the login detection flow.
-        userEnteredUrl = userEntered
     }
 
     // Used to track if an error was caused by a download navigation.
@@ -645,6 +638,10 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             }
 
             if !didRestore {
+                if navigationDelegate.expectedNavigationAction?.condition?.url != url {
+                    // set a `contentUpdate` flag for an upcoming content-update navigation
+                    navigationDelegate.setExpectedNavigationType(.contentUpdate(userEnteredUrl: false), matching: .url(url))
+                }
                 if url.isFileURL {
                     _ = webView.loadFileURL(url, allowingReadAccessTo: URL(fileURLWithPath: "/"))
                 } else {
@@ -1036,10 +1033,6 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
             }
         }
 
-        if navigationAction.isForMainFrame, navigationAction.request.mainDocumentURL?.host != lastUpgradedURL?.host {
-            lastUpgradedURL = nil
-        }
-
         if navigationAction.isForMainFrame, !navigationAction.navigationType.isBackForward {
             if let newRequest = referrerTrimming.trimReferrer(for: navigationAction.request, originUrl: navigationAction.sourceFrame.url) {
                 if isRequestingNewTab {
@@ -1095,7 +1088,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
 
         if navigationAction.url.isExternalSchemeLink {
             // request if OS can handle extenrnal url
-            self.host(webView.url?.host, requestedOpenExternalURL: navigationAction.url)
+            self.host(webView.url?.host, requestedOpenExternalURL: navigationAction.url, forUserEnteredURL: navigationAction.navigationType.isUserEnteredUrl)
             return .cancel
         }
 
@@ -1104,7 +1097,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
     // swiftlint:enable cyclomatic_complexity
     // swiftlint:enable function_body_length
 
-    private func host(_ host: String?, requestedOpenExternalURL url: URL) {
+    private func host(_ host: String?, requestedOpenExternalURL url: URL, forUserEnteredURL userEnteredUrl: Bool) {
         let searchForExternalUrl = { [weak self] in
             // Redirect after handing WebView.url update after cancelling the request
             DispatchQueue.main.async {
@@ -1159,8 +1152,6 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
 
     @MainActor
     func decidePolicy(for navigationResponse: NavigationResponse, currentNavigation: Navigation?) async -> NavigationResponsePolicy? {
-        userEnteredUrl = false // subsequent requests will be navigations
-        
         if !navigationResponse.canShowMIMEType || navigationResponse.shouldDownload {
             if navigationResponse.isForMainFrame {
                 guard currentDownload != navigationResponse.url else {
