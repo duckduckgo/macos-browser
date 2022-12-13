@@ -44,6 +44,7 @@ final class WKWebViewPrivateMethodsAvailabilityTests: XCTestCase {
         if #available(macOS 11.1, *) {
             throw XCTSkip("createWebArchiveData has been made public in macOS 11.1")
         } else {
+            // swiftlint:disable:next todo
 //             TODO
 //            XCTAssertTrue(WKWebView.instancesRespond(to: #selector(WKWebView.createWebArchiveData(completionHandler:))))
         }
