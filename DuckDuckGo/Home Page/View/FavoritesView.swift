@@ -32,7 +32,7 @@ struct Favorites: View {
 
     var body: some View {
 
-        if #available(macOS 12.0, *) {
+        if #available(macOS 11.0, *) {
             LazyVStack(spacing: 4) {
                 FavoritesGrid(isHovering: $isHovering)
             }
@@ -66,7 +66,7 @@ struct FavoritesGrid: View {
 
     var body: some View {
 
-        if #available(macOS 12.0, *) {
+        if #available(macOS 11.0, *) {
             LazyVGrid(
                 columns: Array(repeating: GridItem(.fixed(GridDimensions.itemWidth), spacing: GridDimensions.horizontalSpacing), count: HomePage.favoritesPerRow),
                 spacing: GridDimensions.verticalSpacing
