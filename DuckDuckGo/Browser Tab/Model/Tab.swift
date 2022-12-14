@@ -142,12 +142,8 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         }
     }
     private struct ExtensionDependencies: TabExtensionDependencies {
-        var tabIdentifier: UInt64
-        var userScriptsPublisher: AnyPublisher<UserScripts?, Never>
-        var privacyFeatures: PrivacyFeaturesProtocol
-        var inheritedAttribution: BrowserServicesKit.AdClickAttributionLogic.State?
-        var userContentControllerProvider: UserContentControllerProvider
-        var permissionModel: PermissionModel
+        let privacyFeatures: PrivacyFeaturesProtocol
+        let historyCoordinating: HistoryCoordinating
         var workspace: Workspace
     }
 
@@ -190,6 +186,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                      pinnedTabsManager: PinnedTabsManager = WindowControllersManager.shared.pinnedTabsManager,
                      workspace: Workspace = NSWorkspace.shared,
                      privatePlayer: PrivatePlayer? = nil,
+                     extensionsBuilder: TabExtensionsBuilderProtocol = TabExtensionsBuilder.default,
                      localHistory: Set<String> = Set<String>(),
                      title: String? = nil,
                      favicon: NSImage? = nil,
@@ -215,6 +212,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                   workspace: workspace,
                   privacyFeatures: PrivacyFeatures,
                   privatePlayer: privatePlayer,
+                  extensionsBuilder: extensionsBuilder,
                   localHistory: localHistory,
                   title: title,
                   favicon: favicon,
@@ -238,6 +236,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
          workspace: Workspace,
          privacyFeatures: some PrivacyFeaturesProtocol,
          privatePlayer: PrivatePlayer,
+         extensionsBuilder: TabExtensionsBuilderProtocol,
          localHistory: Set<String>,
          title: String?,
          favicon: NSImage?,
@@ -285,12 +284,16 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             .eraseToAnyPublisher()
 
         var userContentControllerProvider: UserContentControllerProvider?
-        self.extensions = .builder().build(with: ExtensionDependencies(tabIdentifier: instrumentation.currentTabIdentifier,
-                                                                       userScriptsPublisher: userScriptsPublisher,
-                                                                       privacyFeatures: privacyFeatures,
-                                                                       userContentControllerProvider: {  userContentControllerProvider?() },
-                                                                       permissionModel: permissions,
-                                                                       workspace: workspace))
+        self.extensions = extensionsBuilder
+            .build(with: (tabIdentifier: instrumentation.currentTabIdentifier,
+                          userScriptsPublisher: userScriptsPublisher,
+                          inheritedAttribution: parentTab?.adClickAttribution?.currentAttributionState,
+                          userContentControllerProvider: {  userContentControllerProvider?() },
+                          permissionModel: permissions
+                         ),
+                   dependencies: ExtensionDependencies(privacyFeatures: privacyFeatures,
+                                                       historyCoordinating: historyCoordinating,
+                                                       workspace: workspace))
 
         super.init()
 
