@@ -34,7 +34,7 @@ struct TabExtensionsBuilder: TabExtensionsBuilderProtocol {
 #if DEBUG
         return AppDelegate.isRunningTests ? TestTabExtensionsBuilder.default : TabExtensionsBuilder()
 #else
-        return TabExtensions()
+        return TabExtensionsBuilder()
 #endif
     }
 
