@@ -459,19 +459,19 @@ final class BrowserTabViewController: NSViewController {
     private var jsAlertController: JSAlertController?
 
     private func showAlert(with query: JSAlertQuery) -> AnyCancellable {
-        jsAlertController?.removeCompletely()
         let alertViewModel = JSAlertViewModel(query: query)
-        self.jsAlertController = JSAlertController.create(alertViewModel)
-        self.addAndLayoutChild(self.jsAlertController!)
+        jsAlertController = JSAlertController.create(alertViewModel)
+        addAndLayoutChild(self.jsAlertController!)
 
-        return AnyCancellable { [weak self] in
-            self?.jsAlertController?.dismiss { [weak self] in
-                self?.jsAlertController?.removeCompletely()
-                self?.jsAlertController = nil
+        return AnyCancellable { [jsAlertController = self.jsAlertController!, weak self] in
+            jsAlertController.dismiss { [jsAlertController = jsAlertController, weak self] in
+                jsAlertController.removeCompletely()
+                if self?.jsAlertController === jsAlertController {
+                    self?.jsAlertController = nil
+                }
             }
         }
     }
-
 }
 
 extension BrowserTabViewController: ContentOverlayUserScriptDelegate {

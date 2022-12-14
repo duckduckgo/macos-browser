@@ -225,11 +225,12 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
     func webView(_ webView: WKWebView, runJavaScriptAlertPanelWithMessage message: String, initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping () -> Void) {
         createAlertDialog(initiatedByFrame: frame, prompt: message) { [weak self] parameters in
             .alert(.init(parameters, callback: { [weak self] result in
+                guard let self = self else { return }
                 switch result {
                 case .failure:
                     completionHandler()
                 case .success(let alertResult):
-                    self?.setAlertBlocking(alertResult.shouldBlockNext)
+                    self.alertHandlingState = alertResult.shouldBlockNext ? .blocked : self.alertHandlingState
                     completionHandler()
                 }
             }))
@@ -242,11 +243,12 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
                  completionHandler: @escaping (Bool) -> Void) {
         createAlertDialog(initiatedByFrame: frame, prompt: message) { [weak self] parameters in
             .confirm(.init(parameters, callback: { [weak self] result in
+                guard let self = self else { return }
                 switch result {
                 case .failure:
                     completionHandler(false)
                 case .success(let alertResult):
-                    self?.setAlertBlocking(alertResult.shouldBlockNext)
+                    self.alertHandlingState = alertResult.shouldBlockNext ? .blocked : self.alertHandlingState
                     completionHandler(alertResult.completionArgument)
                 }
             }))
@@ -260,11 +262,12 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
                  completionHandler: @escaping (String?) -> Void) {
         createAlertDialog(initiatedByFrame: frame, prompt: prompt, defaultInputText: defaultText) { [weak self] parameters in
             .textInput(.init(parameters, callback: { [weak self] result in
+                guard let self = self else { return }
                 switch result {
                 case .failure:
                     completionHandler(nil)
                 case .success(let alertResult):
-                    self?.setAlertBlocking(alertResult.shouldBlockNext)
+                    self.alertHandlingState = alertResult.shouldBlockNext ? .blocked : self.alertHandlingState
                     completionHandler(alertResult.completionArgument)
                 }
             }))
@@ -283,17 +286,9 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
             alertQuery.cancel()
             return
         }
+        alertHandlingState = .shown
         let dialog = UserDialogType.jsDialog(alertQuery)
         userInteractionDialog = UserDialog(sender: .page(domain: frame.request.url?.host), dialog: dialog)
-        alertHandlingState = .shown
-    }
-
-    private func setAlertBlocking(_ shouldBlockAlerts: Bool) {
-        if shouldBlockAlerts {
-            alertHandlingState = .blocked
-        } else {
-            alertHandlingState = .shown
-        }
     }
 
     func webViewDidClose(_ webView: WKWebView) {
