@@ -236,7 +236,7 @@ struct DataImportError: Error, Equatable {
         case bookmarks
         case logins
         case generic
-        
+
         var pixelEventAction: Pixel.Event.DataImportAction {
             switch self {
             case .bookmarks: return .importBookmarks
@@ -245,7 +245,7 @@ struct DataImportError: Error, Equatable {
             }
         }
     }
-    
+
     enum ImportErrorType: Equatable {
         case noFileFound
         case cannotFindFile
@@ -260,7 +260,7 @@ struct DataImportError: Error, Equatable {
         case cannotDecryptFile
         case failedToTemporarilyCopyFile
         case databaseAccessFailed
-        
+
         var stringValue: String {
             switch self {
             case .couldNotAccessKeychain: return "couldNotAccessKeychain"
@@ -278,10 +278,10 @@ struct DataImportError: Error, Equatable {
                     .databaseAccessFailed: return String(describing: self)
             }
         }
-        
+
         var errorParameters: [String: String] {
             var parameters = ["error": stringValue]
-            
+
             switch self {
             case .couldNotAccessKeychain(let status): parameters["keychainErrorCode"] = String(status)
             case .noFileFound,
@@ -297,11 +297,11 @@ struct DataImportError: Error, Equatable {
                     .failedToTemporarilyCopyFile,
                     .databaseAccessFailed: break
             }
-            
+
             return parameters
         }
     }
-    
+
     static func generic(_ errorType: ImportErrorType) -> DataImportError {
         return DataImportError(actionType: .generic, errorType: errorType)
     }
@@ -319,7 +319,7 @@ struct DataImportError: Error, Equatable {
         case .failedToTemporarilyCopyFile: return DataImportError(actionType: .bookmarks, errorType: .failedToTemporarilyCopyFile)
         }
     }
-    
+
     static func bookmarks(_ errorType: SafariBookmarksReader.ImportError) -> DataImportError {
         switch errorType {
         case .unexpectedBookmarksFileFormat: return DataImportError(actionType: .bookmarks, errorType: .cannotReadFile)
@@ -333,11 +333,11 @@ struct DataImportError: Error, Equatable {
     }
 
     // MARK: Login Error Types
-    
+
     static func logins(_ errorType: ImportErrorType) -> DataImportError {
         return DataImportError(actionType: .logins, errorType: errorType)
     }
-    
+
     static func logins(_ errorType: ChromiumLoginReader.ImportError) -> DataImportError {
         switch errorType {
         case .decryptionKeyAccessFailed(let status): return DataImportError(actionType: .logins, errorType: .couldNotAccessKeychain(status))
@@ -349,7 +349,7 @@ struct DataImportError: Error, Equatable {
         case .userDeniedKeychainPrompt: return DataImportError(actionType: .logins, errorType: .userDeniedKeychainPrompt)
         }
     }
-    
+
     let actionType: ImportErrorAction
     let errorType: ImportErrorType
 

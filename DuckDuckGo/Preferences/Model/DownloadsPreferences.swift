@@ -31,7 +31,7 @@ protocol DownloadsPreferencesPersistor {
 struct DownloadsPreferencesUserDefaultsPersistor: DownloadsPreferencesPersistor {
     @UserDefaultsWrapper(key: .selectedDownloadLocationKey, defaultValue: nil)
     var selectedDownloadLocation: String?
-    
+
     @UserDefaultsWrapper(key: .lastUsedCustomDownloadLocation, defaultValue: nil)
     var lastUsedCustomDownloadLocation: String?
 
@@ -67,19 +67,19 @@ final class DownloadsPreferences: ObservableObject {
         }
         return nil
     }
-    
+
     var effectiveDownloadLocation: URL? {
         if let selectedLocationURL = alwaysRequestDownloadLocation ? validatedDownloadLocation(persistor.lastUsedCustomDownloadLocation) : validatedDownloadLocation(persistor.selectedDownloadLocation) {
             return selectedLocationURL
         }
         return Self.defaultDownloadLocation()
     }
-    
+
     var lastUsedCustomDownloadLocation: URL? {
         get {
             persistor.lastUsedCustomDownloadLocation?.url
         }
-        
+
         set {
             defer {
                 objectWillChange.send()
@@ -99,7 +99,7 @@ final class DownloadsPreferences: ObservableObject {
         get {
             persistor.selectedDownloadLocation?.url
         }
-        
+
         set {
             defer {
                 objectWillChange.send()
@@ -119,7 +119,7 @@ final class DownloadsPreferences: ObservableObject {
         get {
             persistor.alwaysRequestDownloadLocation
         }
-        
+
         set {
             persistor.alwaysRequestDownloadLocation = newValue
             objectWillChange.send()
@@ -137,7 +137,7 @@ final class DownloadsPreferences: ObservableObject {
 
     init(persistor: DownloadsPreferencesPersistor = DownloadsPreferencesUserDefaultsPersistor()) {
         self.persistor = persistor
-        
+
         // Fix the selected download location if it needs it
         if selectedDownloadLocation == nil || !Self.isDownloadLocationValid(selectedDownloadLocation!) {
             selectedDownloadLocation = Self.defaultDownloadLocation()

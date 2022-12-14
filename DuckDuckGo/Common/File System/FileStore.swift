@@ -78,7 +78,7 @@ final class EncryptedFileStore: FileStore {
     func hasData(at url: URL) -> Bool {
         return FileManager.default.fileExists(atPath: url.path)
     }
-    
+
     func directoryContents(at path: String) throws -> [String] {
         return try FileManager.default.contentsOfDirectory(atPath: path)
     }
@@ -115,7 +115,7 @@ extension FileManager: FileStore {
     func hasData(at url: URL) -> Bool {
         return fileExists(atPath: url.path)
     }
-    
+
     func directoryContents(at path: String) throws -> [String] {
         return try contentsOfDirectory(atPath: path)
     }

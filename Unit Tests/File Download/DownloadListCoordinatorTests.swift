@@ -407,7 +407,7 @@ final class DownloadListCoordinatorTests: XCTestCase {
         }
 
         coordinator.cleanupInactiveDownloads()
-        
+
         waitForExpectations(timeout: 1)
         XCTAssertTrue(coordinator.hasActiveDownloads)
         XCTAssertEqual(coordinator.downloads(sortedBy: \.modified, ascending: true).count, 1)

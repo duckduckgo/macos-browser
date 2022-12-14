@@ -102,17 +102,17 @@ final class SuggestionContainerViewModelTests: XCTestCase {
 
     func testSelectPreviousIfPossible() {
         let suggestionListViewModel = SuggestionContainerViewModel.aSuggestionContainerViewModel
-        
+
         suggestionListViewModel.selectPreviousIfPossible()
         XCTAssertEqual(suggestionListViewModel.selectionIndex, suggestionListViewModel.numberOfSuggestions - 1)
-        
+
         suggestionListViewModel.selectPreviousIfPossible()
         XCTAssertEqual(suggestionListViewModel.selectionIndex, suggestionListViewModel.numberOfSuggestions - 2)
-        
+
         let firstIndex = 0
         suggestionListViewModel.select(at: firstIndex)
         XCTAssertEqual(suggestionListViewModel.selectionIndex, firstIndex)
-        
+
         suggestionListViewModel.selectPreviousIfPossible()
         XCTAssertNil(suggestionListViewModel.selectionIndex)
     }

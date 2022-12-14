@@ -37,7 +37,7 @@ enum BWStatus: Equatable {
 
     // There is handshake necessary in order to receive the shared key
     case missingHandshake
-    
+
     // Waiting for the handshake approval in Bitwarden
     case waitingForHandshakeApproval
 
@@ -52,7 +52,7 @@ enum BWStatus: Equatable {
 
     case connected(vault: BWVault)
     case error(error: BWError)
-    
+
     var isConnected: Bool {
         switch self {
         case .connected: return true

@@ -56,7 +56,7 @@ final class TabBarViewController: NSViewController {
     private var cancellables = Set<AnyCancellable>()
 
     @IBOutlet weak var shadowView: TabShadowView!
-    
+
     @IBOutlet weak var rightSideStackView: NSStackView!
     var footerCurrentWidthDimension: CGFloat {
         if tabMode == .overflow {
@@ -65,7 +65,7 @@ final class TabBarViewController: NSViewController {
             return HorizontalSpace.button.rawValue + HorizontalSpace.buttonPadding.rawValue
         }
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("TabBarViewController: Bad initializer")
     }
@@ -132,7 +132,7 @@ final class TabBarViewController: NSViewController {
     @objc func addButtonAction(_ sender: NSButton) {
         tabCollectionViewModel.appendNewTab(with: .homePage)
     }
-    
+
     @IBAction func rightScrollButtonAction(_ sender: NSButton) {
         collectionView.scrollToEnd()
     }
@@ -146,7 +146,7 @@ final class TabBarViewController: NSViewController {
             self?.reloadSelection()
         }
     }
-    
+
     private func setupFireButton() {
         fireButton.toolTip = UserText.clearBrowsingHistoryTooltip
         fireButton.animationNames = MouseOverAnimationButton.AnimationNames(aqua: "flame-mouse-over", dark: "dark-flame-mouse-over")
@@ -316,7 +316,7 @@ final class TabBarViewController: NSViewController {
             collectionView.selectItems(at: [newSelectionIndexPath], scrollPosition: .centeredHorizontally)
         }
     }
-    
+
     private func selectTabWithPoint(_ point: NSPoint) {
         guard let pointLocationOnPinnedTabsView = pinnedTabsHostingView?.convert(point, from: view) else {
             return
@@ -379,14 +379,14 @@ final class TabBarViewController: NSViewController {
         tabCollectionViewModel.remove(at: .unpinned(indexPath.item), published: false)
         WindowsManager.openNewWindow(with: tab, droppingPoint: droppingPoint)
     }
-    
+
     // MARK: - Mouse Monitor
-    
+
     private var mouseDownMonitor: Any?
 
     private func addMouseMonitors() {
         guard mouseDownMonitor == nil else { return }
-        
+
         mouseDownMonitor = NSEvent.addLocalMonitorForEvents(matching: .leftMouseDown) { [weak self] event in
             self?.mouseDown(with: event)
         }
@@ -396,17 +396,17 @@ final class TabBarViewController: NSViewController {
         if let monitor = mouseDownMonitor {
             NSEvent.removeMonitor(monitor)
         }
-        
+
         mouseDownMonitor = nil
     }
-    
+
     func mouseDown(with event: NSEvent) -> NSEvent? {
         if event.window === view.window,
            view.window?.isMainWindow == false,
            let point = view.mouseLocationInsideBounds(event.locationInWindow) {
             selectTabWithPoint(point)
         }
-        
+
         return event
     }
 
@@ -532,7 +532,7 @@ final class TabBarViewController: NSViewController {
         leftShadowImageView.isHidden = scrollViewsAreHidden
         addTabButton.isHidden = scrollViewsAreHidden
     }
-    
+
     private func setupAddTabButton() {
         addTabButton.target = self
         addTabButton.action = #selector(addButtonAction(_:))
@@ -982,7 +982,7 @@ extension TabBarViewController: NSCollectionViewDelegate {
 extension TabBarViewController: TabBarViewItemDelegate {
 
     func tabBarViewItem(_ tabBarViewItem: TabBarViewItem, isMouseOver: Bool) {
-        
+
         if isMouseOver {
             // Show tab preview for visible tab bar items
             if collectionView.visibleRect.intersects(tabBarViewItem.view.frame) {

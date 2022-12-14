@@ -82,7 +82,7 @@ class ChromiumLoginReaderTests: XCTestCase {
         XCTAssertEqual(logins[0].username, "username")
         XCTAssertEqual(logins[0].password, "password")
     }
-    
+
     func testWhenImportingChromiumData_AndTheUserCancelsTheKeychainPrompt_ThenAnErrorIsReturned() {
         let mockPrompt = MockChromiumPrompt(returnValue: .userDeniedKeychainPrompt)
         let reader = ChromiumLoginReader(
@@ -90,16 +90,16 @@ class ChromiumLoginReaderTests: XCTestCase {
             processName: "Chrome",
             decryptionKeyPrompt: mockPrompt
         )
-        
+
         let result = reader.readLogins()
-        
+
         if case let .failure(type) = result {
             XCTAssertEqual(type, .userDeniedKeychainPrompt)
         } else {
             XCTFail("Received unexpected success")
         }
     }
-    
+
     func testWhenImportingChromiumData_AndTheKeychainCausesAnError_ThenTheStatusCodeIsReturned() {
         let mockPrompt = MockChromiumPrompt(returnValue: .keychainError(123))
         let reader = ChromiumLoginReader(
@@ -107,22 +107,22 @@ class ChromiumLoginReaderTests: XCTestCase {
             processName: "Chrome",
             decryptionKeyPrompt: mockPrompt
         )
-        
+
         let result = reader.readLogins()
-        
+
         if case let .failure(type) = result {
             XCTAssertEqual(type, .decryptionKeyAccessFailed(123))
         } else {
             XCTFail("Received unexpected success")
         }
     }
-    
+
 }
 
 private class MockChromiumPrompt: ChromiumKeychainPrompting {
-    
+
     var returnValue: ChromiumKeychainPromptResult
-    
+
     init(returnValue: ChromiumKeychainPromptResult) {
         self.returnValue = returnValue
     }
@@ -130,5 +130,5 @@ private class MockChromiumPrompt: ChromiumKeychainPrompting {
     func promptForChromiumPasswordKeychainAccess(processName: String) -> ChromiumKeychainPromptResult {
         returnValue
     }
-    
+
 }

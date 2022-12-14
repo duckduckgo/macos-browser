@@ -544,7 +544,7 @@ final class GeolocationProviderTests: XCTestCase {
         webView.loadHTMLString(Self.getCurrentPosition, baseURL: .duckDuckGo)
         NSApp.activate(ignoringOtherApps: true)
         webView.window?.orderFrontRegardless()
-        
+
         waitForExpectations(timeout: 5)
     }
 
@@ -669,7 +669,7 @@ extension GeolocationProviderTests: WKScriptMessageHandler {
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         let webView = webViews.first(where: { $0.configuration.userContentController === userContentController })!
         XCTAssertNoThrow(try geolocationHandler?(webView, message.body))
-        
+
     }
 }
 

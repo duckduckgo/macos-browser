@@ -20,7 +20,7 @@ import SwiftUI
 
 struct CookieConsentAnimationView<AnimationModel>: View where AnimationModel: CookieConsentAnimation {
     @ObservedObject var animationModel: AnimationModel
-    
+
     var body: some View {
         VStack {
             HStack {

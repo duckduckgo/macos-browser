@@ -74,7 +74,7 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
             if let newWindowPolicy = self.contextMenuManager?.decideNewWindowPolicy(for: navigationAction) {
                 return newWindowPolicy
             }
-            
+
             return nil
         }()
         switch newWindowPolicy {

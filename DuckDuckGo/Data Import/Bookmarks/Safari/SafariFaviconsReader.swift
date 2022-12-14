@@ -31,15 +31,15 @@ final class SafariFaviconsReader {
         case failedToTemporarilyCopyFile
         case unexpectedFaviconsDatabaseFormat
     }
-    
+
     fileprivate final class SafariFaviconRecord: FetchableRecord {
         let host: String
-        
+
         var formattedHost: String? {
             guard let url = URL(string: host) else {
                 return nil
             }
-            
+
             guard var components = URLComponents(url: url, resolvingAgainstBaseURL: true) else {
                 return nil
             }
@@ -47,7 +47,7 @@ final class SafariFaviconsReader {
             components.scheme = "https"
             components.host = components.path
             components.path = ""
-            
+
             return components.string
         }
 
@@ -55,15 +55,15 @@ final class SafariFaviconsReader {
             host = row["host"]
         }
     }
-    
+
     final class SafariFavicon {
         let host: String
         let imageData: Data
-        
+
         var image: NSImage? {
             NSImage(data: imageData)
         }
-        
+
         fileprivate init(host: String, imageData: Data) {
             self.host = host
             self.imageData = imageData
@@ -98,10 +98,10 @@ final class SafariFaviconsReader {
                 guard let records = try? SafariFaviconRecord.fetchAll(database, sql: allFaviconsQuery()) else {
                     throw ImportError.unexpectedFaviconsDatabaseFormat
                 }
-                
+
                 return records
             }
-            
+
             let favicons: [SafariFavicon] = faviconRecords.compactMap { record in
                 guard let imageData = fetchImageData(with: record.host) else {
                     return nil
@@ -115,13 +115,13 @@ final class SafariFaviconsReader {
             }
 
             let faviconsByURL = Dictionary(grouping: favicons, by: { $0.host })
-            
+
             return .success(faviconsByURL)
         } catch {
             return .failure(.unexpectedFaviconsDatabaseFormat)
         }
     }
-    
+
     private func fetchImageData(with host: String) -> Data? {
         guard let hostData = host.data(using: .utf8) else {
             return nil
@@ -134,7 +134,7 @@ final class SafariFaviconsReader {
 
         let faviconsDirectoryURL = safariFaviconsDatabaseURL.deletingLastPathComponent()
         let faviconURL = faviconsDirectoryURL.appendingPathComponent("Images").appendingPathComponent(hash).appendingPathExtension("png")
-        
+
         return try? Data(contentsOf: faviconURL)
     }
 

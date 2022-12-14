@@ -22,7 +22,7 @@ enum FileSystemEntity {
 
     case file(name: String, contents: File.FileContents)
     case directory(name: String, children: [FileSystemEntity])
-    
+
     var name: String {
         switch self {
         case .file(let name, _): return name
@@ -35,19 +35,19 @@ enum FileSystemEntity {
 protocol FileSystemEntityConvertible {
 
     func asFileSystemEntity() -> FileSystemEntity
-    
+
 }
 
 struct Directory: FileSystemEntityConvertible {
 
     let name: String
     let children: [FileSystemEntity]
-    
+
     init(_ name: String, @FileDirectoryStructureBuilder builder: () -> [FileSystemEntity]) {
         self.name = name
         self.children = builder()
     }
-    
+
     func asFileSystemEntity() -> FileSystemEntity {
         return .directory(name: name, children: children)
     }
@@ -60,15 +60,15 @@ struct File: FileSystemEntityConvertible {
         case string(String)
         case copy(URL)
     }
-    
+
     let name: String
     let contents: FileContents
-    
+
     init(_ name: String, contents: FileContents) {
         self.name = name
         self.contents = contents
     }
-    
+
     func asFileSystemEntity() -> FileSystemEntity {
         return .file(name: name, contents: contents)
     }
@@ -81,14 +81,14 @@ struct FileDirectoryStructureBuilder {
     static func buildBlock(_ elements: FileSystemEntityConvertible...) -> [FileSystemEntity] {
         return elements.compactMap { $0.asFileSystemEntity() }
     }
-    
+
 }
 
 struct FileSystem {
 
     var rootDirectoryName: String
     var children: [FileSystemEntity]
-    
+
     var rootDirectoryURL: URL {
         let temporaryURL = FileManager.default.temporaryDirectory
         return temporaryURL.appendingPathComponent(rootDirectoryName)
@@ -98,22 +98,22 @@ struct FileSystem {
         self.rootDirectoryName = rootDirectoryName
         self.children = builder()
     }
-    
+
     func writeToTemporaryDirectory() throws {
         try FileManager.default.createDirectory(at: rootDirectoryURL, withIntermediateDirectories: false)
-        
+
         for entity in children {
             try persist(entity: entity, parentDirectoryURL: rootDirectoryURL)
         }
     }
-    
+
     func removeCreatedFileSystemStructure() throws {
         try FileManager.default.removeItem(at: rootDirectoryURL)
     }
-    
+
     private func persist(entity: FileSystemEntity, parentDirectoryURL: URL) throws {
         let entityURL = parentDirectoryURL.appendingPathComponent(entity.name)
-        
+
         switch entity {
         case .file(_, let contents):
             switch contents {
@@ -124,7 +124,7 @@ struct FileSystem {
             }
         case .directory(_, let children):
             try FileManager.default.createDirectory(at: entityURL, withIntermediateDirectories: false)
-            
+
             for directoryChild in children {
                 try persist(entity: directoryChild, parentDirectoryURL: entityURL)
             }

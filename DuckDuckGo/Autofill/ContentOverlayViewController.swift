@@ -167,23 +167,23 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
         }.resume()
     }
     // swiftlint:enable function_parameter_count
-    
+
     public func emailManagerKeychainAccessFailed(accessType: EmailKeychainAccessType, error: EmailKeychainAccessError) {
         var parameters = [
             "access_type": accessType.rawValue,
             "error": error.errorDescription
         ]
-        
+
         if case let .keychainLookupFailure(status) = error {
             parameters["keychain_status"] = String(status)
             parameters["keychain_operation"] = "lookup"
         }
-        
+
         if case let .keychainDeleteFailure(status) = error {
             parameters["keychain_status"] = String(status)
             parameters["keychain_operation"] = "delete"
         }
-        
+
         if case let .keychainSaveFailure(status) = error {
             parameters["keychain_status"] = String(status)
             parameters["keychain_operation"] = "save"
@@ -217,7 +217,7 @@ extension ContentOverlayViewController: OverlayAutofillUserScriptPresentationDel
 }
 
 extension ContentOverlayViewController: SecureVaultManagerDelegate {
-    
+
     public func secureVaultManagerIsEnabledStatus(_: SecureVaultManager) -> Bool {
         return true
     }
@@ -225,7 +225,7 @@ extension ContentOverlayViewController: SecureVaultManagerDelegate {
     public func secureVaultManager(_: SecureVaultManager, promptUserToStoreAutofillData data: AutofillData) {
         // No-op, the content overlay view controller should not be prompting the user to store data
     }
-    
+
     public func secureVaultManager(_: SecureVaultManager,
                                    promptUserToAutofillCredentialsForDomain domain: String,
                                    withAccounts accounts: [SecureVaultModels.WebsiteAccount],
@@ -237,11 +237,11 @@ extension ContentOverlayViewController: SecureVaultManagerDelegate {
     public func secureVaultManager(_: SecureVaultManager, didAutofill type: AutofillType, withObjectId objectId: String) {
         Pixel.fire(.formAutofilled(kind: type.formAutofillKind))
     }
-    
+
     public func secureVaultManagerShouldAutomaticallyUpdateCredentialsWithoutUsername(_: SecureVaultManager) -> Bool {
         return true
     }
-    
+
     public func secureVaultManager(_: SecureVaultManager, didRequestAuthenticationWithCompletionHandler handler: @escaping (Bool) -> Void) {
         DeviceAuthenticator.shared.authenticateUser(reason: .autofill) { authenticationResult in
             handler(authenticationResult.authenticated)
@@ -251,7 +251,7 @@ extension ContentOverlayViewController: SecureVaultManagerDelegate {
     public func secureVaultInitFailed(_ error: SecureVaultError) {
         SecureVaultErrorReporter.shared.secureVaultInitFailed(error)
     }
-    
+
     public func secureVaultManager(_: BrowserServicesKit.SecureVaultManager, didReceivePixel pixel: AutofillUserScript.JSPixel) {
         Pixel.fire(.jsPixel(pixel))
     }

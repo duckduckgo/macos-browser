@@ -24,13 +24,13 @@ final class CookieNotificationAnimationModel: ObservableObject {
         case firstPhase
         case secondPhase
     }
-    
+
     @Published var state: AnimationState = .unstarted
-    
+
     let duration: CGFloat
     let secondPhaseDelay: CGFloat
     let halfDuration: CGFloat
-    
+
     init(duration: CGFloat = AnimationDefaultConsts.totalDuration) {
         self.duration = duration
         self.halfDuration = duration / 2.0

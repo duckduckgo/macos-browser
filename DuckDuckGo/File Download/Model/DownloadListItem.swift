@@ -35,7 +35,7 @@ struct DownloadListItem: Equatable {
             modified = Date()
         }
     }
-    
+
     var destinationURL: URL? {
         didSet {
             guard destinationURL != oldValue else { return }

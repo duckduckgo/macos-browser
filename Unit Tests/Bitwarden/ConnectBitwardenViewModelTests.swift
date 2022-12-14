@@ -24,14 +24,14 @@ final class ConnectBitwardenViewModelTests: XCTestCase {
     func testWhenCreatingViewModel_ThenStatusIsDisclaimer() throws {
         let bitwardenManager = MockBitwardenManager()
         let viewModel = ConnectBitwardenViewModel(bitwardenManager: bitwardenManager)
-        
+
         XCTAssertEqual(viewModel.viewState, .disclaimer)
     }
-    
+
     func testWhenViewModelIsOnDisclaimer_AndBitwardenIsNotInstalled_AndNextIsClicked_ThenViewStateIsLookingForBitwarden() {
         let bitwardenManager = MockBitwardenManager()
         let viewModel = ConnectBitwardenViewModel(bitwardenManager: bitwardenManager)
-        
+
         XCTAssertEqual(viewModel.viewState, .disclaimer)
         viewModel.process(action: .confirm)
         XCTAssertEqual(viewModel.viewState, .lookingForBitwarden)
@@ -69,16 +69,16 @@ final class ConnectBitwardenViewModelTests: XCTestCase {
 
         XCTAssertTrue(bitwardenManager.handshakeSent)
     }
-    
+
     func testWhenViewModelReceivesConnectStateFromManager_ThenViewStateIsConnectedToBitwarden() {
         let bitwardenManager = MockBitwardenManager()
         let viewModel = ConnectBitwardenViewModel(bitwardenManager: bitwardenManager)
-        
+
         XCTAssertEqual(viewModel.viewState, .disclaimer)
-        
+
         let vault = BWVault(id: "id", email: "dax@duck.com", status: .unlocked, active: true)
         bitwardenManager.status = .connected(vault: vault)
-        
+
         XCTAssertEqual(viewModel.viewState, .connectedToBitwarden)
     }
 
@@ -88,7 +88,7 @@ class MockBitwardenManager: BWManagement {
 
     var handshakeSent = false
     // var bitwardenStatus = BitwardenStatus.disabled
-    
+
     @Published var status: BWStatus = .disabled
     var statusPublisher: Published<BWStatus>.Publisher { $status }
 
@@ -111,15 +111,15 @@ class MockBitwardenManager: BWManagement {
     func openBitwarden() {
         // no-op
     }
-    
+
     func retrieveCredentials(for url: URL, completion: @escaping ([BWCredential], BWError?) -> Void) {
         // no-op
     }
-    
+
     func create(credential: BWCredential, completion: @escaping (BWError?) -> Void) {
         // no-op
     }
-    
+
     func update(credential: BWCredential, completion: @escaping (BWError?) -> Void) {
         // no-op
     }
