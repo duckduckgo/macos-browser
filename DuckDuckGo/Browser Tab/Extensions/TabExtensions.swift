@@ -58,16 +58,19 @@ protocol NSCodingExtension: TabExtension {
 
 // Define dependencies used to instantiate TabExtensions here:
 protocol TabExtensionDependencies {
-    var tabIdentifier: UInt64 { get }
-
-    var userScriptsPublisher: AnyPublisher<UserScripts?, Never> { get }
     var privacyFeatures: PrivacyFeaturesProtocol { get }
-
-    var inheritedAttribution: AdClickAttributionLogic.State? { get }
-    var userContentControllerProvider: UserContentControllerProvider { get }
+    var historyCoordinating: HistoryCoordinating { get }
 }
+// swiftlint:disable:next large_tuple
+typealias TabExtensionsBuilderArguments = (
+    tabIdentifier: UInt64,
+    userScriptsPublisher: AnyPublisher<UserScripts?, Never>,
+    inheritedAttribution: AdClickAttributionLogic.State?,
+    userContentControllerProvider: UserContentControllerProvider,
+    permissionModel: PermissionModel
+)
 
-extension AppTabExtensions {
+extension TabExtensionsBuilder {
 
     /// Instantiate `TabExtension`-s for App builds here
     /// use add { return SomeTabExtensions() } to register Tab Extensions
@@ -76,8 +79,8 @@ extension AppTabExtensions {
     /// ` let myPublishingExtension = add { MyPublishingExtension() }
     /// ` add { MyOtherExtension(with: myExtension.resultPublisher) }
     /// Note: Extensions with state restoration support should conform to `NSCodingExtension`
-    mutating func make(with dependencies: TabExtensionDependencies) {
-        let userScripts = dependencies.userScriptsPublisher
+    mutating func registerExtensions(with args: TabExtensionsBuilderArguments, dependencies: TabExtensionDependencies) {
+        let userScripts = args.userScriptsPublisher
 
         let httpsUpgrade = add {
             HTTPSUpgradeTabExtension(httpsUpgrade: dependencies.privacyFeatures.httpsUpgrade)
@@ -85,17 +88,17 @@ extension AppTabExtensions {
 
         let fbProtection = add {
             FBProtectionTabExtension(privacyConfigurationManager: dependencies.privacyFeatures.contentBlocking.privacyConfigurationManager,
-                                     userContentControllerProvider: dependencies.userContentControllerProvider,
+                                     userContentControllerProvider: args.userContentControllerProvider,
                                      clickToLoadUserScriptPublisher: userScripts.map(\.?.clickToLoadScript))
         }
 
         let contentBlocking = add {
-            ContentBlockingTabExtension(tabIdentifier: dependencies.tabIdentifier,
-                                        fbBlockingEnabledProvider: fbProtection,
+            ContentBlockingTabExtension(tabIdentifier: args.tabIdentifier,
+                                        fbBlockingEnabledProvider: fbProtection.value,
                                         contentBlockerRulesUserScriptPublisher: userScripts.map(\.?.contentBlockerRulesScript),
                                         surrogatesUserScriptPublisher: userScripts.map(\.?.surrogatesScript),
                                         privacyConfigurationManager: dependencies.privacyFeatures.contentBlocking.privacyConfigurationManager,
-                                        userContentControllerProvider: dependencies.userContentControllerProvider)
+                                        userContentControllerProvider: args.userContentControllerProvider)
         }
 
         add {
@@ -106,8 +109,8 @@ extension AppTabExtensions {
         }
 
         add {
-            AdClickAttributionTabExtension(inheritedAttribution: dependencies.inheritedAttribution,
-                                           userContentControllerProvider: dependencies.userContentControllerProvider,
+            AdClickAttributionTabExtension(inheritedAttribution: args.inheritedAttribution,
+                                           userContentControllerProvider: args.userContentControllerProvider,
                                            contentBlockerRulesScriptPublisher: userScripts.map(\.?.contentBlockerRulesScript),
                                            detectedTrackersPublisher: contentBlocking.trackersPublisher.compactMap { $0.isBlockedTracker ? $0.request : nil },
                                            dependencies: dependencies.privacyFeatures.contentBlocking)
@@ -130,11 +133,26 @@ extension AppTabExtensions {
 }
 
 #if DEBUG
-extension TestTabExtensions {
+extension TestTabExtensionsBuilder {
 
-    /// Add `TabExtension`-s that should be loaded when running Unit Tests here
-    /// By default the Extensions won‘t be loaded
-    mutating func make(with dependencies: TabExtensionDependencies) {
+    /// Used by default for Tab instantiation if not provided in Tab(... extensionsBuilder: TestTabExtensionsBuilder([HistoryTabExtension.self])
+    static var `default` = TestTabExtensionsBuilder(overrideExtensions: TestTabExtensionsBuilder.overrideExtensions, [
+        // FindInPageTabExtension.self, HistoryTabExtension.self, ... - add TabExtensions here to be loaded by default for ALL Unit Tests
+    ])
+
+    // override Tab Extensions initialisation registered in TabExtensionsBuilder.registerExtensions for Unit Tests
+    func overrideExtensions(with args: TabExtensionsBuilderArguments, dependencies: TabExtensionDependencies) {
+        /** ```
+         let fbProtection = get(FBProtectionTabExtension.self)
+
+         let contentBlocking = override {
+         ContentBlockingTabExtension(fbBlockingEnabledProvider: fbProtection.value)
+         }
+         override {
+         HistoryTabExtension(trackersPublisher: contentBlocking.trackersPublisher)
+         }
+         ...
+         */
 
     }
 
