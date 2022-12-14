@@ -300,7 +300,7 @@ final class PermissionModelTests: XCTestCase {
         XCTAssertEqual(model.permissions, [:])
     }
 
-    func testWhenExternalSchemePermissionQueryIsResetThenItDoesNotTriggerDecisionHandler() {
+    func testWhenExternalSchemePermissionQueryIsResetThenItTriggersDecisionHandler() {
         let c = model.$authorizationQuery.sink {
             if $0 != nil {
                 self.model!.tabDidStartNavigation()
@@ -308,7 +308,6 @@ final class PermissionModelTests: XCTestCase {
         }
 
         let e = expectation(description: "Permission granted")
-        e.isInverted = true
         model.permissions([.externalScheme(scheme: "mailto")], requestedForDomain: "test@example.com") { (_: Bool) in
             e.fulfill()
         }

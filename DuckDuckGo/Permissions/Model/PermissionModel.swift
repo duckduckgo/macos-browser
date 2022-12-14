@@ -129,17 +129,24 @@ final class PermissionModel {
                                     url: URL?,
                                     decisionHandler: @escaping (Bool) -> Void) {
 
-        var query: PermissionAuthorizationQuery!
-        query = PermissionAuthorizationQuery(domain: domain, url: url, permissions: permissions) { [weak self, weak query] result in
+        var queryPtr: UnsafeMutableRawPointer?
+        let query = PermissionAuthorizationQuery(domain: domain, url: url, permissions: permissions) { [weak self] result in
+
             let isGranted = (try? result.get())?.granted ?? false
-            if isGranted {
+
+            // change active permissions state for non-deinitialized query
+            if case .success = result {
                 for permission in permissions {
-                    self?.permissions[permission].granted()
+                    if isGranted {
+                        self?.permissions[permission].granted()
+                    } else {
+                        self?.permissions[permission].denied()
+                    }
                 }
             }
 
-            if let self, let query, // otherwise handling decision on Query deallocation
-               let idx = self.authorizationQueries.firstIndex(where: { $0 === query }) {
+            if let self,
+               let idx = self.authorizationQueries.firstIndex(where: { Unmanaged.passUnretained($0).toOpaque() == queryPtr }) {
 
                 self.authorizationQueries.remove(at: idx)
 
@@ -148,10 +155,11 @@ final class PermissionModel {
                         self.permissionManager.setPermission(isGranted ? .allow : .deny, forDomain: domain, permissionType: permission)
                     }
                 }
-            }
+            } // else: query has been removed, the decision is being handled on the query deallocation
 
             decisionHandler(isGranted)
         }
+        queryPtr = Unmanaged.passUnretained(query).toOpaque()
 
         // When Geolocation queried by a website but System Permission is denied: switch to `disabled`
         if permissions.contains(.geolocation),
