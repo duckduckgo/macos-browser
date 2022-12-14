@@ -32,12 +32,22 @@ struct Favorites: View {
 
     var body: some View {
 
-        VStack(spacing: 4) {
-            FavoritesGrid(isHovering: $isHovering)
-        }
-        .frame(maxWidth: .infinity)
-        .onHover { isHovering in
-            self.isHovering = isHovering
+        if #available(macOS 11.0, *) {
+            LazyVStack(spacing: 4) {
+                FavoritesGrid(isHovering: $isHovering)
+            }
+            .frame(maxWidth: .infinity)
+            .onHover { isHovering in
+                self.isHovering = isHovering
+            }
+        } else {
+            VStack(spacing: 4) {
+                FavoritesGrid(isHovering: $isHovering)
+            }
+            .frame(maxWidth: .infinity)
+            .onHover { isHovering in
+                self.isHovering = isHovering
+            }
         }
 
     }
