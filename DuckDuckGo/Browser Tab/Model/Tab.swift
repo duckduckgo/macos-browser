@@ -147,12 +147,8 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         }
     }
     private struct ExtensionDependencies: TabExtensionDependencies {
-        var userScriptsPublisher: AnyPublisher<UserScripts?, Never>
-        var contentBlocking: ContentBlockingProtocol
-        var adClickAttributionDependencies: AdClickAttributionDependencies
-        var privacyInfoPublisher: AnyPublisher<PrivacyDashboard.PrivacyInfo?, Never>
-        var inheritedAttribution: BrowserServicesKit.AdClickAttributionLogic.State?
-        var userContentControllerProvider: UserContentControllerProvider
+        let privacyFeatures: PrivacyFeaturesProtocol
+        let historyCoordinating: HistoryCoordinating
     }
 
     // "protected" delegate property for extensions usage 
@@ -195,6 +191,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                      pinnedTabsManager: PinnedTabsManager = WindowControllersManager.shared.pinnedTabsManager,
                      privatePlayer: PrivatePlayer? = nil,
                      cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter? = ContentBlockingAssetsCompilationTimeReporter.shared,
+                     extensionsBuilder: TabExtensionsBuilderProtocol = TabExtensionsBuilder.default,
                      localHistory: Set<String> = Set<String>(),
                      title: String? = nil,
                      favicon: NSImage? = nil,
@@ -219,6 +216,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                   pinnedTabsManager: pinnedTabsManager,
                   privacyFeatures: PrivacyFeatures,
                   privatePlayer: privatePlayer,
+                  extensionsBuilder: extensionsBuilder,
                   cbaTimeReporter: cbaTimeReporter,
                   localHistory: localHistory,
                   title: title,
@@ -233,6 +231,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                   webViewFrame: webViewFrame)
     }
 
+    // swiftlint:disable:next function_body_length
     init(content: TabContent,
          faviconManagement: FaviconManagement,
          webCacheManager: WebCacheManager,
@@ -241,6 +240,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
          pinnedTabsManager: PinnedTabsManager,
          privacyFeatures: some PrivacyFeaturesProtocol,
          privatePlayer: PrivatePlayer,
+         extensionsBuilder: TabExtensionsBuilderProtocol,
          cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter?,
          localHistory: Set<String>,
          title: String?,
@@ -290,11 +290,16 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             .eraseToAnyPublisher()
 
         var userContentControllerProvider: UserContentControllerProvider?
-        self.extensions = .builder().build(with: ExtensionDependencies(userScriptsPublisher: userScriptsPublisher,
-                                                                       contentBlocking: privacyFeatures.contentBlocking,
-                                                                       adClickAttributionDependencies: privacyFeatures.contentBlocking,
-                                                                       privacyInfoPublisher: _privacyInfo.projectedValue.eraseToAnyPublisher(),
-                                                                       userContentControllerProvider: {  userContentControllerProvider?() }))
+        self.extensions = extensionsBuilder
+            .build(with: (tabIdentifier: instrumentation.currentTabIdentifier,
+                          userScriptsPublisher: userScriptsPublisher,
+                          inheritedAttribution: parentTab?.adClickAttribution?.currentAttributionState,
+                          userContentControllerProvider: {  userContentControllerProvider?() },
+                          permissionModel: permissions,
+                          privacyInfoPublisher: _privacyInfo.projectedValue.eraseToAnyPublisher()
+                         ),
+                   dependencies: ExtensionDependencies(privacyFeatures: privacyFeatures,
+                                                       historyCoordinating: historyCoordinating))
 
         super.init()
 

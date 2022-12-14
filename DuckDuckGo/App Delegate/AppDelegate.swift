@@ -86,7 +86,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             ? AppPrivacyFeatures(contentBlocking: mock("ContentBlockingMock"), httpsUpgradeStore: mock("HTTPSUpgradeStoreMock"))
             : AppPrivacyFeatures(contentBlocking: AppContentBlocking(), httpsUpgradeStore: AppHTTPSUpgradeStore())
 #else
-        PrivacyFeatures.shared = AppPrivacyFeatures(contentBlocking: AppContentBlocking())
+        AppPrivacyFeatures.shared = AppPrivacyFeatures(contentBlocking: AppContentBlocking(),
+                                                       httpsUpgradeStore: AppHTTPSUpgradeStore())
 #endif
 
         do {
