@@ -45,9 +45,12 @@ extension TabExtensionsBuilder {
 struct AppTabExtensions: TabExtensionsBuilder {
     var components = [any TabExtension]()
 }
+
+#if DEBUG
 struct TestTabExtensions: TabExtensionsBuilder {
     var components = [any TabExtension]()
 }
+#endif
 
 struct TabExtensions {
     typealias ExtensionType = TabExtension
