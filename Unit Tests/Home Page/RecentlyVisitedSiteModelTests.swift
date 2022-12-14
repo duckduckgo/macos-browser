@@ -21,7 +21,6 @@ import XCTest
 
 class RecentlyVisitedSiteModelTests: XCTestCase {
 
-    // swiftlint:disable:next identifier_name
     private func RecentlyVisitedSiteModel(originalURL: URL, privatePlayer: PrivatePlayerMode = .disabled) -> HomePage.Models.RecentlyVisitedSiteModel? {
         HomePage.Models.RecentlyVisitedSiteModel(originalURL: originalURL, bookmarkManager: LocalBookmarkManager(bookmarkStore: BookmarkStoreMock(), faviconManagement: FaviconManagerMock()), fireproofDomains: FireproofDomains(store: FireproofDomainsStoreMock()), privatePlayer: .mock(withMode: privatePlayer))
     }

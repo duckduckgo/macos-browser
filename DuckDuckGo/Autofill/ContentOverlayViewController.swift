@@ -144,7 +144,6 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
 
     // EmailManagerRequestDelegate
 
-    // swiftlint:disable function_parameter_count
     public func emailManager(_ emailManager: EmailManager,
                              requested url: URL,
                              method: String,

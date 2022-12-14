@@ -1,3 +1,5 @@
+# swiftlint config applied for Tests
+
 disabled_rules:
   - trailing_whitespace
   - no_space_in_method_call
@@ -7,38 +9,28 @@ disabled_rules:
   - unused_setter_value
   - line_length
   - type_name
+  - force_cast
+  - force_try
+  - function_body_length
+  - cyclomatic_complexity
+  - identifier_name
   - implicit_getter
-  - function_parameter_count
 
 opt_in_rules:
   - file_header
 
-custom_rules:
-  explicit_non_final_class:
-    included: ".*\\.swift"
-    name: "Implicitly non-final class"
-    regex: "^\\s*(class) (?!func|var)"
-    capture_group: 0
-    match_kinds:
-      - keyword
-    message: "Classes should be `final` by default, use explicit `internal` or `public` for non-final classes."
-    severity: error
-
 # Rule Config
-identifier_name:
-  min_length: 1
-  max_length: 1000
 file_length:
-  warning: 1200
-  error: 1200
+  warning: 1800
+  error: 2000
 type_body_length:
-  warning: 500
-  error: 500
+  warning: 1000
+  error: 1500
 nesting:
-  type_level: 2
+  type_level: 4
 large_tuple:
-  warning: 4
-  error: 5
+  warning: 6
+  error: 10
 file_header:
   required_pattern: |
                     \/\/
@@ -58,10 +50,3 @@ file_header:
                     \/\/  See the License for the specific language governing permissions and
                     \/\/  limitations under the License\.
                     \/\/
-
-# General Config
-excluded:
-  - DuckDuckGo/Common/Localizables/UserText.swift
-  - Unit Tests
-  - Integration Tests
-  - UI Tests

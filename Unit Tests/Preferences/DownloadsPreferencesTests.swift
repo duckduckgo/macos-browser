@@ -25,7 +25,6 @@ struct DownloadsPreferencesPersistorMock: DownloadsPreferencesPersistor {
     var defaultDownloadLocation: URL?
     var lastUsedCustomDownloadLocation: String?
 
-    // swiftlint:disable:next identifier_name
     var _isDownloadLocationValid: (URL) -> Bool
 
     func isDownloadLocationValid(_ location: URL) -> Bool {

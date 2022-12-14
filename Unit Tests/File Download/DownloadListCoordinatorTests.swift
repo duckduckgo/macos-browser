@@ -60,7 +60,7 @@ final class DownloadListCoordinatorTests: XCTestCase {
         }
     }
 
-    func setUpCoordinatorAndAddDownload() -> (WKDownloadMock, WebKitDownloadTask, UUID) { // swiftlint:disable:this large_tuple
+    func setUpCoordinatorAndAddDownload() -> (WKDownloadMock, WebKitDownloadTask, UUID) {
         setUpCoordinator()
         let download = WKDownloadMock()
         let task = WebKitDownloadTask(download: download, promptForLocation: false, destinationURL: destURL, tempURL: tempURL)
