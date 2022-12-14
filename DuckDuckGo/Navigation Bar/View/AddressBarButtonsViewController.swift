@@ -631,7 +631,7 @@ final class AddressBarButtonsViewController: NSViewController {
 #if DEBUG
                 privacyDashboardPopover?.behavior = .semitransient
 #else
-                privacyDashboardPopover.behavior = .transient
+                privacyDashboardPopover?.behavior = .transient
 #endif
             }
         }

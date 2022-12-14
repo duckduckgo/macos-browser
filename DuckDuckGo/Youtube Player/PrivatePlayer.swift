@@ -386,4 +386,10 @@ extension PrivatePlayer {
 
 }
 
+#else
+
+extension PrivatePlayer {
+    static func mock(withMode mode: PrivatePlayerMode = .enabled) -> PrivatePlayer { fatalError() }
+}
+
 #endif
