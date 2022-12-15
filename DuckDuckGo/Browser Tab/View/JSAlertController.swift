@@ -64,7 +64,6 @@ final class JSAlertController: NSViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        presentData()
 
         NSAppearance.withAppAppearance {
             alertView.layer?.backgroundColor = NSColor.backgroundSecondaryColor.cgColor
@@ -77,6 +76,11 @@ final class JSAlertController: NSViewController {
         messageText.font = .systemFont(ofSize: 13)
 
         verticalStackView.setCustomSpacing(14.0, after: blockingCheckbox)
+    }
+
+    override func viewWillAppear() {
+        super.viewWillAppear()
+        presentData()
     }
 
     override func viewDidAppear() {
