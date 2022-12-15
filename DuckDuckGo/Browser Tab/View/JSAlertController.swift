@@ -66,7 +66,7 @@ final class JSAlertController: NSViewController {
         super.viewDidLoad()
 
         NSAppearance.withAppAppearance {
-            alertView.layer?.backgroundColor = NSColor.backgroundSecondaryColor.cgColor
+            alertView.layer?.backgroundColor = NSColor.panelBackgroundColor.cgColor
         }
         alertView.layer?.cornerRadius = 10.0
         alertView.applyDropShadow()
