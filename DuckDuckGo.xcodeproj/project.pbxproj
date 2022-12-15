@@ -7613,7 +7613,7 @@
 				PRODUCT_MODULE_NAME = DuckDuckGo_Privacy_Browser;
 				PRODUCT_NAME = DuckDuckGo;
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "macOS Browser App Store";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "match AppStore com.duckduckgo.mobile.ios macos";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "FEEDBACK APPSTORE";
 				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/DuckDuckGo/Bridging.h";
 				SWIFT_VERSION = 5.0;

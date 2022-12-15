@@ -210,9 +210,10 @@ GEM
 
 PLATFORMS
   arm64-darwin-21
+  arm64-darwin-22
 
 DEPENDENCIES
   fastlane (~> 2.211)
 
 BUNDLED WITH
-   2.3.23
+   2.3.26

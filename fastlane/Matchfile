@@ -1,0 +1,13 @@
+storage_mode("git")
+git_url("git@github.com:more-duckduckgo-org/macos-fastlane-match.git")
+git_branch("main")
+
+type("appstore") # The default type, can be: appstore, adhoc, enterprise or development
+platform("macos")
+
+app_identifier("com.duckduckgo.mobile.ios")
+
+generate_apple_certs(false)
+additional_cert_types(["mac_installer_distribution"])
+
+# The docs are available on https://docs.fastlane.tools/actions/match
