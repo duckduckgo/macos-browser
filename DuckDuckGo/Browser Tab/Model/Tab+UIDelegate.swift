@@ -225,12 +225,11 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
     func webView(_ webView: WKWebView, runJavaScriptAlertPanelWithMessage message: String, initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping () -> Void) {
         createAlertDialog(initiatedByFrame: frame, prompt: message) { [weak self] parameters in
             .alert(.init(parameters, callback: { [weak self] result in
-                guard let self = self else { return }
                 switch result {
                 case .failure:
                     completionHandler()
                 case .success(let alertResult):
-                    self.alertHandlingState = alertResult.shouldBlockNext ? .blocked : self.alertHandlingState
+                    self?.updateAlertHandling(shouldBlockNext: alertResult.shouldBlockNext)
                     completionHandler()
                 }
             }))
@@ -243,12 +242,11 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
                  completionHandler: @escaping (Bool) -> Void) {
         createAlertDialog(initiatedByFrame: frame, prompt: message) { [weak self] parameters in
             .confirm(.init(parameters, callback: { [weak self] result in
-                guard let self = self else { return }
                 switch result {
                 case .failure:
                     completionHandler(false)
                 case .success(let alertResult):
-                    self.alertHandlingState = alertResult.shouldBlockNext ? .blocked : self.alertHandlingState
+                    self?.updateAlertHandling(shouldBlockNext: alertResult.shouldBlockNext)
                     completionHandler(alertResult.completionArgument)
                 }
             }))
@@ -262,18 +260,21 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
                  completionHandler: @escaping (String?) -> Void) {
         createAlertDialog(initiatedByFrame: frame, prompt: prompt, defaultInputText: defaultText) { [weak self] parameters in
             .textInput(.init(parameters, callback: { [weak self] result in
-                guard let self = self else { return }
                 switch result {
                 case .failure:
                     completionHandler(nil)
                 case .success(let alertResult):
-                    self.alertHandlingState = alertResult.shouldBlockNext ? .blocked : self.alertHandlingState
+                    self?.updateAlertHandling(shouldBlockNext: alertResult.shouldBlockNext)
                     completionHandler(alertResult.completionArgument)
                 }
             }))
         }
     }
-
+    
+    private func updateAlertHandling(shouldBlockNext: Bool) {
+        self.alertHandlingState = shouldBlockNext ? .blocked : self.alertHandlingState
+    }
+    
     private func createAlertDialog(initiatedByFrame frame: WKFrameInfo, prompt: String, defaultInputText: String? = nil, queryCreator: (JSAlertParameters) -> JSAlertQuery) {
         let parameters = JSAlertParameters(
             hasDomainShownAlert: alertHandlingState.hasShown,
