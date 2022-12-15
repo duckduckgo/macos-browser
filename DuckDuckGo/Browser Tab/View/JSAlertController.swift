@@ -74,6 +74,7 @@ final class JSAlertController: NSViewController {
         print("Scroll text inset: \(messageText.textContainerInset)")
         messageText.textContainer?.lineFragmentPadding = 0.0
         messageText.font = .systemFont(ofSize: 13)
+        messageText.isEditable = false
 
         verticalStackView.setCustomSpacing(14.0, after: blockingCheckbox)
     }
