@@ -395,6 +395,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             }
             error = nil
             alertHandlingState = .notShown
+            userInteractionDialog = nil
             Task {
                 await reloadIfNeeded(shouldLoadInBackground: true)
             }
