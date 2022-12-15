@@ -35,18 +35,26 @@ final class PermissionModel {
 
     private let permissionManager: PermissionManagerProtocol
     private let geolocationService: GeolocationServiceProtocol
-    private weak var webView: WKWebView?
+    weak var webView: WKWebView? {
+        didSet {
+            guard let webView = webView else { return }
+            assert(oldValue == nil)
+            self.subscribe(to: webView)
+            self.subscribe(to: permissionManager)
+        }
+    }
     private var cancellables = Set<AnyCancellable>()
 
-    init(webView: WKWebView,
+    init(webView: WKWebView? = nil,
          permissionManager: PermissionManagerProtocol = PermissionManager.shared,
          geolocationService: GeolocationServiceProtocol = GeolocationService.shared) {
         self.permissionManager = permissionManager
-        self.webView = webView
         self.geolocationService = geolocationService
-
-        self.subscribe(to: webView)
-        self.subscribe(to: permissionManager)
+        if let webView {
+            self.webView = webView
+            self.subscribe(to: webView)
+            self.subscribe(to: permissionManager)
+        }
     }
 
     private func subscribe(to webView: WKWebView) {
@@ -123,13 +131,14 @@ final class PermissionModel {
 
         let query = PermissionAuthorizationQuery(domain: domain,
                                                  url: url,
-                                                 permissions: permissions) { [weak self] decision, remember in
+                                                 permissions: permissions) { [weak self] (result: PermissionAuthorizationQuery.CallbackResult) in
 
-            let (query, isGranted) = self?.handleQueryDecision(decision, requestedPermissions: permissions) ?? (nil, false)
+            let (completedQuery: query, isGranted: isGranted) = self?.handleQueryDecision(result, requestedPermissions: permissions)
+                ?? (completedQuery: nil, isGranted: false)
 
             defer {
-                switch (permissions.first, decision) {
-                case (.externalScheme, .deinitialized):
+                switch (permissions.first, result) {
+                case (.externalScheme, .failure(.deinitialized)):
                     break
                 default:
                     decisionHandler(isGranted)
@@ -143,7 +152,7 @@ final class PermissionModel {
             }
             self.authorizationQueries.remove(at: idx)
 
-            if remember == true {
+            if case .success( (_, remember: true) ) = result {
                 for permission in permissions {
                     self.permissionManager.setPermission(isGranted ? .allow : .deny, forDomain: domain, permissionType: permission)
                 }
@@ -162,17 +171,17 @@ final class PermissionModel {
         authorizationQueries.append(query)
     }
 
-    private func handleQueryDecision(_ decision: PermissionAuthorizationQuery.Decision, requestedPermissions: [PermissionType])
-    -> (completedQuery: PermissionAuthorizationQuery?, isGranted: Bool) {
+    private func handleQueryDecision(_ result: PermissionAuthorizationQuery.CallbackResult, requestedPermissions: [PermissionType])
+        -> (completedQuery: PermissionAuthorizationQuery?, isGranted: Bool) {
 
-        let query: PermissionAuthorizationQuery?
+        var query: PermissionAuthorizationQuery?
         let isGranted: Bool
-        switch decision {
-        case .deinitialized:
+        switch result {
+        case .failure(.deinitialized):
             query = nil
             isGranted = false
 
-        case .denied(let completedQuery):
+        case .success( (.denied(let completedQuery), remember: _) ):
             query = completedQuery
             isGranted = false
 
@@ -180,7 +189,7 @@ final class PermissionModel {
                 permissions[permission].denied()
             }
 
-        case .granted(let completedQuery):
+        case .success( (.granted(let completedQuery), remember: _) ):
             query = completedQuery
             isGranted = true
 
@@ -272,8 +281,7 @@ final class PermissionModel {
             @unknown default: break
             }
         }
-        decisionHandler(/*salt - seems not used anywhere:*/ "",
-                                                            /*includeSensitiveMediaDeviceDetails:*/ false)
+        decisionHandler(/*salt - seems not used anywhere:*/ "", /*includeSensitiveMediaDeviceDetails:*/ false)
         // make sure to swizzle it back after reasonable interval in case it wasn't called
         DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
             AVCaptureDevice.restoreAuthorizationStatusForMediaType()
@@ -317,11 +325,10 @@ final class PermissionModel {
         return true
     }
 
-    func permissions(_ permissions: [PermissionType],
-                     requestedForDomain domain: String?,
-                     url: URL? = nil,
-                     decisionHandler: @escaping (Bool) -> Void) {
-
+    /// Request user authorization for provided PermissionTypes
+    /// The decisionHandler will be called synchronously if there‘s a permanent (stored) permission granted or denied
+    /// If no permanent decision is stored a new AuthorizationQuery will be initialized and published via $authorizationQuery
+    func permissions(_ permissions: [PermissionType], requestedForDomain domain: String?, url: URL? = nil, decisionHandler: @escaping (Bool) -> Void) {
         guard let domain = domain,
               !domain.isEmpty,
               !permissions.isEmpty
@@ -341,6 +348,17 @@ final class PermissionModel {
             decisionHandler(false)
             for permission in permissions {
                 self.permissions[permission].denied()
+            }
+        }
+    }
+
+    /// Request user authorization for provided PermissionTypes
+    /// Same as `permissions(_:requestedForDomain:url:decisionHandler:)` with a result returned using a `Future`
+    /// Use `await future.get()` for async/await syntax
+    func request(_ permissions: [PermissionType], forDomain domain: String?, url: URL? = nil) -> Future<Bool, Never> {
+        Future { fulfill in
+            self.permissions(permissions, requestedForDomain: domain, url: url) { granted in
+                fulfill(.success(granted))
             }
         }
     }

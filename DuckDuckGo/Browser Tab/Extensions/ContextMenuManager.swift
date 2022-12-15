@@ -17,30 +17,33 @@
 //
 
 import AppKit
+import Combine
 import Foundation
 import WebKit
 
-protocol ContextMenuManagerDelegate: AnyObject {
-    func launchSearch(for text: String)
-    func prepareForContextMenuDownload()
-}
-
-enum NewWindowPolicy {
-    case newWindow
-    case newTab(selected: Bool)
+enum NavigationDecision {
+    case allow(NewWindowPolicy)
     case cancel
 }
 
 final class ContextMenuManager: NSObject {
+    private var userScriptCancellable: AnyCancellable?
 
-    weak var delegate: ContextMenuManagerDelegate?
-
-    private var onNewWindow: ((WKNavigationAction?) -> NewWindowPolicy)?
+    private var onNewWindow: ((WKNavigationAction?) -> NavigationDecision)?
     private var askForDownloadLocation: Bool?
     private var originalItems: [WKMenuItemIdentifier: NSMenuItem]?
     private var selectedText: String?
+    fileprivate weak var webView: WKWebView?
 
-    func decideNewWindowPolicy(for navigationAction: WKNavigationAction) -> NewWindowPolicy? {
+    init(contextMenuScriptPublisher: some Publisher<ContextMenuUserScript?, Never>) {
+        super.init()
+
+        userScriptCancellable = contextMenuScriptPublisher.sink { [weak self] contextMenuScript in
+            contextMenuScript?.delegate = self
+        }
+    }
+
+    func decideNewWindowPolicy(for navigationAction: WKNavigationAction) -> NavigationDecision? {
         defer {
             onNewWindow = nil
         }
@@ -145,6 +148,8 @@ extension ContextMenuManager: WebViewContextMenuDelegate {
             guard let identifier = item.identifier.flatMap(WKMenuItemIdentifier.init) else { continue }
             Self.menuItemHandlers[identifier]?(self)(item, index, menu)
         }
+
+        self.webView = webView
     }
 
     func webView(_ webView: WebView, didCloseContextMenu menu: NSMenu, with event: NSEvent?) {
@@ -237,12 +242,18 @@ private extension ContextMenuManager {
 @objc extension ContextMenuManager {
 
     func search(_ sender: NSMenuItem) {
-        guard let selectedText = selectedText else {
+        guard let selectedText,
+              let url = URL.makeSearchUrl(from: selectedText),
+              let webView
+        else {
             assertionFailure("Failed to get search term")
             return
         }
 
-        delegate?.launchSearch(for: selectedText)
+        self.onNewWindow = { _ in
+            .allow(.tab(selected: true))
+        }
+        webView.loadInNewWindow(url)
     }
 
     func openLinkInNewTab(_ sender: NSMenuItem) {
@@ -255,7 +266,7 @@ private extension ContextMenuManager {
             return
         }
 
-        onNewWindow = { _ in .newTab(selected: false) }
+        onNewWindow = { _ in .allow(.tab(selected: false)) }
         NSApp.sendAction(action, to: originalItem.target, from: originalItem)
     }
 
@@ -269,7 +280,7 @@ private extension ContextMenuManager {
             return
         }
 
-        onNewWindow = { _ in .newWindow }
+        onNewWindow = { _ in .allow(.window(active: true)) }
         NSApp.sendAction(action, to: originalItem.target, from: originalItem)
     }
 
@@ -283,7 +294,7 @@ private extension ContextMenuManager {
             return
         }
 
-        onNewWindow = { _ in .newWindow }
+        onNewWindow = { _ in .allow(.window(active: true)) }
         NSApp.sendAction(action, to: originalItem.target, from: originalItem)
     }
 
@@ -297,7 +308,6 @@ private extension ContextMenuManager {
             return
         }
 
-        delegate?.prepareForContextMenuDownload()
         askForDownloadLocation = true
         NSApp.sendAction(action, to: originalItem.target, from: originalItem)
     }
@@ -356,7 +366,7 @@ private extension ContextMenuManager {
             return
         }
 
-        onNewWindow = { _ in .newTab(selected: true) }
+        onNewWindow = { _ in .allow(.tab(selected: true)) }
         NSApp.sendAction(action, to: originalItem.target, from: originalItem)
     }
 
@@ -370,7 +380,7 @@ private extension ContextMenuManager {
             return
         }
 
-        onNewWindow = { _ in .newWindow }
+        onNewWindow = { _ in .allow(.window(active: true)) }
         NSApp.sendAction(action, to: originalItem.target, from: originalItem)
     }
 
@@ -384,7 +394,6 @@ private extension ContextMenuManager {
             return
         }
 
-        delegate?.prepareForContextMenuDownload()
         askForDownloadLocation = true
         NSApp.sendAction(action, to: originalItem.target, from: originalItem)
     }
@@ -414,9 +423,25 @@ private extension ContextMenuManager {
 
 // MARK: - ContextMenuUserScriptDelegate
 extension ContextMenuManager: ContextMenuUserScriptDelegate {
-
     func willShowContextMenu(withSelectedText selectedText: String) {
         self.selectedText = selectedText
     }
 
+}
+
+// MARK: - TabExtensions
+
+protocol ContextMenuManagerProtocol: WebViewContextMenuDelegate {
+    func decideNewWindowPolicy(for navigationAction: WKNavigationAction) -> NavigationDecision?
+    func shouldAskForDownloadLocation() -> Bool?
+}
+
+extension ContextMenuManager: TabExtension, ContextMenuManagerProtocol {
+    func getPublicProtocol() -> ContextMenuManagerProtocol { self }
+}
+
+extension TabExtensions {
+    var contextMenuManager: ContextMenuManagerProtocol? {
+        resolve(ContextMenuManager.self)
+    }
 }

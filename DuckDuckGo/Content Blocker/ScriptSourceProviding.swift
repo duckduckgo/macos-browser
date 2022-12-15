@@ -18,13 +18,14 @@
 
 import Foundation
 import Combine
+import Common
 import BrowserServicesKit
 
 protocol ScriptSourceProviding {
 
     var contentBlockerRulesConfig: ContentBlockerUserScriptConfig? { get }
     var surrogatesConfig: SurrogatesUserScriptConfig? { get }
-    var privacyConfigurationManager: PrivacyConfigurationManager { get }
+    var privacyConfigurationManager: PrivacyConfigurationManaging { get }
     var autofillSourceProvider: AutofillUserScriptSourceProvider? { get }
     var sessionKey: String? { get }
     var clickToLoadSource: String { get }
@@ -32,7 +33,13 @@ protocol ScriptSourceProviding {
 
 }
 
-struct DefaultScriptSourceProvider: ScriptSourceProviding {
+// refactor: ScriptSourceProvider to be passed to init methods as `some ScriptSourceProviding`, DefaultScriptSourceProvider to be killed
+// swiftlint:disable:next identifier_name
+func DefaultScriptSourceProvider() -> ScriptSourceProviding {
+    ScriptSourceProvider(configStorage: DefaultConfigurationStorage.shared, privacyConfigurationManager: ContentBlocking.shared.privacyConfigurationManager, privacySettings: PrivacySecurityPreferences.shared, contentBlockingManager: ContentBlocking.shared.contentBlockingManager, trackerDataManager: ContentBlocking.shared.trackerDataManager, tld: ContentBlocking.shared.tld)
+}
+
+struct ScriptSourceProvider: ScriptSourceProviding {
 
     private(set) var contentBlockerRulesConfig: ContentBlockerUserScriptConfig?
     private(set) var surrogatesConfig: SurrogatesUserScriptConfig?
@@ -41,19 +48,25 @@ struct DefaultScriptSourceProvider: ScriptSourceProviding {
     private(set) var clickToLoadSource: String = ""
 
     let configStorage: ConfigurationStoring
-    let privacyConfigurationManager: PrivacyConfigurationManager
+    let privacyConfigurationManager: PrivacyConfigurationManaging
     let contentBlockingManager: ContentBlockerRulesManagerProtocol
+    let trackerDataManager: TrackerDataManager
     let privacySettings: PrivacySecurityPreferences
+    let tld: TLD
 
-    init(configStorage: ConfigurationStoring = DefaultConfigurationStorage.shared,
-         privacyConfigurationManager: PrivacyConfigurationManager = ContentBlocking.shared.privacyConfigurationManager,
-         privacySettings: PrivacySecurityPreferences = PrivacySecurityPreferences.shared,
-         contentBlockingManager: ContentBlockerRulesManagerProtocol = ContentBlocking.shared.contentBlockingManager) {
+    init(configStorage: ConfigurationStoring,
+         privacyConfigurationManager: PrivacyConfigurationManaging,
+         privacySettings: PrivacySecurityPreferences,
+         contentBlockingManager: ContentBlockerRulesManagerProtocol,
+         trackerDataManager: TrackerDataManager,
+         tld: TLD) {
 
         self.configStorage = configStorage
         self.privacyConfigurationManager = privacyConfigurationManager
         self.privacySettings = privacySettings
         self.contentBlockingManager = contentBlockingManager
+        self.trackerDataManager = trackerDataManager
+        self.tld = tld
 
         self.contentBlockerRulesConfig = buildContentBlockerRulesConfig()
         self.surrogatesConfig = buildSurrogatesConfig()
@@ -65,7 +78,7 @@ struct DefaultScriptSourceProvider: ScriptSourceProviding {
     private func generateSessionKey() -> String {
         return UUID().uuidString
     }
-    
+
     public func buildAutofillSource() -> AutofillUserScriptSourceProvider {
 
         return DefaultAutofillSourceProvider(privacyConfigurationManager: self.privacyConfigurationManager,
@@ -86,18 +99,18 @@ struct DefaultScriptSourceProvider: ScriptSourceProviding {
         return DefaultContentBlockerUserScriptConfig(privacyConfiguration: privacyConfigurationManager.privacyConfig,
                                                      trackerData: trackerData,
                                                      ctlTrackerData: ctlTrackerData,
-                                                     tld: ContentBlocking.shared.tld,
-                                                     trackerDataManager: ContentBlocking.shared.trackerDataManager)
+                                                     tld: tld,
+                                                     trackerDataManager: trackerDataManager)
     }
 
     private func buildSurrogatesConfig() -> SurrogatesUserScriptConfig {
 
         let isDebugBuild: Bool
-        #if DEBUG
+#if DEBUG
         isDebugBuild = true
-        #else
+#else
         isDebugBuild = false
-        #endif
+#endif
 
         let surrogates = configStorage.loadData(for: .surrogates)?.utf8String() ?? ""
         let tdsName = DefaultContentBlockerRulesListsSource.Constants.trackerDataSetRulesListName
@@ -106,8 +119,8 @@ struct DefaultScriptSourceProvider: ScriptSourceProviding {
                                                  surrogates: surrogates,
                                                  trackerData: rules?.trackerData,
                                                  encodedSurrogateTrackerData: rules?.encodedTrackerData,
-                                                 trackerDataManager: ContentBlocking.shared.trackerDataManager,
-                                                 tld: ContentBlocking.shared.tld,
+                                                 trackerDataManager: trackerDataManager,
+                                                 tld: tld,
                                                  isDebugBuild: isDebugBuild)
     }
 

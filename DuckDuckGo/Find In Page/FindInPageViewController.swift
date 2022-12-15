@@ -157,7 +157,7 @@ extension FindInPageViewController {
 extension FindInPageViewController: NSTextFieldDelegate {
 
     func controlTextDidChange(_ obj: Notification) {
-        model?.update(text: textField.stringValue)
+        model?.find(textField.stringValue)
     }
 
 }

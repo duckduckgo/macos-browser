@@ -21,7 +21,7 @@ import UserScript
 
 public protocol PrintingUserScriptDelegate: AnyObject {
 
-    func printingUserScriptDidRequestPrintController(_ script: PrintingUserScript)
+    func runPrintOperation(for frameHandle: Any?, in webView: WKWebView, completionHandler: ((Bool) -> Void)?)
 
 }
 
@@ -45,7 +45,8 @@ public class PrintingUserScript: NSObject, UserScript {
     public var messageNames: [String] = ["printHandler"]
 
     public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-        delegate?.printingUserScriptDidRequestPrintController(self)
+        guard let webView = message.webView else { return }
+        delegate?.runPrintOperation(for: message.frameInfo.handle, in: webView, completionHandler: nil)
     }
 
 }

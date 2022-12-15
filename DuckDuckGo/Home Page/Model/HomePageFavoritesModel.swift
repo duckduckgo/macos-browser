@@ -77,7 +77,7 @@ extension HomePage.Models {
 
         @Published private(set) var visibleModels: [FavoriteModel] = []
 
-        @available(macOS, obsoleted: 11.0, message: "Use visibleModels and LazyVGrid instead")
+        @available(macOS, obsoleted: 12.0, message: "Use visibleModels and LazyVGrid instead")
         @Published private(set) var rows: [[FavoriteModel]] = []
 
         let open: (Bookmark, OpenTarget) -> Void
@@ -122,7 +122,7 @@ extension HomePage.Models {
         }
 
         private func updateVisibleModels() {
-            if #available(macOS 11.0, *) {
+            if #available(macOS 12.0, *) {
                 visibleModels = showAllFavorites ? models : Array(models.prefix(HomePage.favoritesRowCountWhenCollapsed * HomePage.favoritesPerRow))
             } else {
                 rows = models.chunked(into: HomePage.favoritesPerRow)

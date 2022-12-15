@@ -23,24 +23,42 @@ import os.log
 import BrowserServicesKit
 import Common
 
-final class ContentBlocking {
-    static let shared = ContentBlocking()
+protocol ContentBlockingProtocol {
 
-    let privacyConfigurationManager: PrivacyConfigurationManager
+    var privacyConfigurationManager: PrivacyConfigurationManaging { get }
+    var contentBlockingManager: ContentBlockerRulesManagerProtocol { get }
+    var trackerDataManager: TrackerDataManager { get }
+    var tld: TLD { get }
+
+    var contentBlockingAssetsPublisher: AnyPublisher<UserContentUpdating.NewContent, Never> { get }
+
+}
+
+typealias AnyContentBlocking = any ContentBlockingProtocol & AdClickAttributionDependencies
+
+// refactor: ContentBlocking.shared to be removed, ContentBlockingProtocol to be renamed to ContentBlocking
+// ContentBlocking to be passed to init methods as `some ContentBlocking`
+typealias ContentBlocking = AppContentBlocking
+extension ContentBlocking {
+    static var shared: AnyContentBlocking { PrivacyFeatures.contentBlocking }
+}
+
+final class AppContentBlocking {
+    let privacyConfigurationManager: PrivacyConfigurationManaging
     let trackerDataManager: TrackerDataManager
-    let contentBlockingManager: ContentBlockerRulesManager
+    let contentBlockingManager: ContentBlockerRulesManagerProtocol
     let userContentUpdating: UserContentUpdating
 
     let tld = TLD()
-    
+
     let adClickAttribution: AdClickAttributing
-    let adClickAttributionRulesProvider: AdClickAttributionRulesProvider
+    let adClickAttributionRulesProvider: AdClickAttributionRulesProviding
 
     private let contentBlockerRulesSource: ContentBlockerRulesLists
     private let exceptionsSource: DefaultContentBlockerRulesExceptionsSource
 
     // keeping whole ContentBlocking state initialization in one place to avoid races between updates publishing and rules storing
-    private init() {
+    init() {
         let configStorage = DefaultConfigurationStorage.shared
         privacyConfigurationManager = PrivacyConfigurationManager(fetchedETag: configStorage.loadEtag(for: .privacyConfiguration),
                                                                   fetchedData: configStorage.loadData(for: .privacyConfiguration),
@@ -65,7 +83,10 @@ final class ContentBlocking {
                                                             logger: OSLog.contentBlocking)
         userContentUpdating = UserContentUpdating(contentBlockerRulesManager: contentBlockingManager,
                                                   privacyConfigurationManager: privacyConfigurationManager,
-                                                  configStorage: configStorage)
+                                                  trackerDataManager: trackerDataManager,
+                                                  configStorage: configStorage,
+                                                  privacySecurityPreferences: PrivacySecurityPreferences.shared,
+                                                  tld: tld)
         
         adClickAttributionRulesProvider = AdClickAttributionRulesProvider(config: adClickAttribution,
                                                                           compiledRulesSource: contentBlockingManager,
@@ -128,25 +149,8 @@ final class ContentBlocking {
     }
     
     // MARK: - Ad Click Attribution
-    
-    public func makeAdClickAttributionDetection() -> AdClickAttributionDetection {
-        AdClickAttributionDetection(feature: adClickAttribution,
-                                    tld: tld,
-                                    eventReporting: attributionEvents,
-                                    errorReporting: attributionDebugEvents,
-                                    log: OSLog.attribution)
-    }
-    
-    public func makeAdClickAttributionLogic() -> AdClickAttributionLogic {
-        AdClickAttributionLogic(featureConfig: adClickAttribution,
-                                rulesProvider: adClickAttributionRulesProvider,
-                                tld: tld,
-                                eventReporting: attributionEvents,
-                                errorReporting: attributionDebugEvents,
-                                log: OSLog.attribution)
-    }
-    
-    private let attributionEvents = EventMapping<AdClickAttributionEvents> { event, _, parameters, _ in
+
+    let attributionEvents: EventMapping<AdClickAttributionEvents>? = .init { event, _, parameters, _ in
         let domainEvent: Pixel.Event
         switch event {
         case .adAttributionDetected:
@@ -158,7 +162,7 @@ final class ContentBlocking {
         Pixel.fire(domainEvent, withAdditionalParameters: parameters ?? [:])
     }
     
-    private let attributionDebugEvents = EventMapping<AdClickAttributionDebugEvents> { event, _, _, _ in
+    let attributionDebugEvents: EventMapping<AdClickAttributionDebugEvents>? = .init { event, _, _, _ in
         let domainEvent: Pixel.Event.Debug
         switch event {
         case .adAttributionCompilationFailedForAttributedRulesList:
@@ -188,10 +192,12 @@ final class ContentBlocking {
     }
 }
 
-protocol ContentBlockerRulesManagerProtocol: AnyObject {
+protocol ContentBlockerRulesManagerProtocol: CompiledRuleListsSource {
     var updatesPublisher: AnyPublisher<ContentBlockerRulesManager.UpdateEvent, Never> { get }
     var currentRules: [ContentBlockerRulesManager.Rules] { get }
+    func scheduleCompilation() -> ContentBlockerRulesManager.CompletionToken
 }
+
 extension ContentBlockerRulesManager: ContentBlockerRulesManagerProtocol {}
 
 final class ContentBlockingRulesCache: ContentBlockerRulesCaching {
@@ -201,6 +207,14 @@ final class ContentBlockingRulesCache: ContentBlockerRulesCaching {
 
     var contentRulesCacheInterval: TimeInterval {
         7 * 24 * 3600
+    }
+
+}
+
+extension AppContentBlocking: ContentBlockingProtocol {
+
+    var contentBlockingAssetsPublisher: AnyPublisher<UserContentUpdating.NewContent, Never> {
+        self.userContentUpdating.userContentBlockingAssets
     }
 
 }

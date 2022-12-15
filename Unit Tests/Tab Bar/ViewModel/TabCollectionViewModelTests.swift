@@ -221,22 +221,12 @@ final class TabCollectionViewModelTests: XCTestCase {
 
     // MARK: - Insert
 
-    func testWhenInsertChildAndParentIsNil_ThenNoChildIsInserted() {
-        let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
-
-        let tab = Tab()
-        tabCollectionViewModel.insertChild(tab: tab, selected: false)
-
-        XCTAssert(tab !== tabCollectionViewModel.tabViewModel(at: 0)?.tab)
-        XCTAssert(tabCollectionViewModel.tabCollection.tabs.count == 1)
-    }
-
     func testWhenInsertChildAndParentIsntPartOfTheTabCollection_ThenNoChildIsInserted() {
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
 
         let parentTab = Tab()
         let tab = Tab(content: .none, parentTab: parentTab)
-        tabCollectionViewModel.insertChild(tab: tab, selected: false)
+        tabCollectionViewModel.insert(tab, selected: false)
 
         XCTAssert(tab !== tabCollectionViewModel.tabViewModel(at: 0)?.tab)
         XCTAssert(tabCollectionViewModel.tabCollection.tabs.count == 1)
@@ -249,7 +239,7 @@ final class TabCollectionViewModelTests: XCTestCase {
         tabCollectionViewModel.append(tab: parentTab)
 
         let tab = Tab(parentTab: parentTab)
-        tabCollectionViewModel.insertChild(tab: tab, selected: false)
+        tabCollectionViewModel.insert(tab, selected: false)
 
         XCTAssert(tab === tabCollectionViewModel.tabViewModel(at: 2)?.tab)
     }
@@ -259,14 +249,14 @@ final class TabCollectionViewModelTests: XCTestCase {
         tabCollectionViewModel.appendNewTab()
 
         let parentTab = Tab()
-        tabCollectionViewModel.insert(tab: parentTab, at: .unpinned(1), selected: true)
+        tabCollectionViewModel.insert(parentTab, at: .unpinned(1), selected: true)
 
-        tabCollectionViewModel.insertChild(tab: Tab(parentTab: parentTab), selected: false)
-        tabCollectionViewModel.insertChild(tab: Tab(parentTab: parentTab), selected: false)
-        tabCollectionViewModel.insertChild(tab: Tab(parentTab: parentTab), selected: false)
+        tabCollectionViewModel.insert(Tab(parentTab: parentTab), selected: false)
+        tabCollectionViewModel.insert(Tab(parentTab: parentTab), selected: false)
+        tabCollectionViewModel.insert(Tab(parentTab: parentTab), selected: false)
 
         let tab = Tab(parentTab: parentTab)
-        tabCollectionViewModel.insertChild(tab: tab, selected: true)
+        tabCollectionViewModel.insert(tab, selected: true)
 
         XCTAssert(tab === tabCollectionViewModel.tabViewModel(at: 5)?.tab)
     }
@@ -276,10 +266,10 @@ final class TabCollectionViewModelTests: XCTestCase {
         tabCollectionViewModel.appendNewTab()
 
         let parentTab = Tab()
-        tabCollectionViewModel.insert(tab: parentTab, at: .unpinned(1), selected: true)
+        tabCollectionViewModel.insert(parentTab, at: .unpinned(1), selected: true)
 
         let tab = Tab(parentTab: parentTab)
-        tabCollectionViewModel.insertChild(tab: tab, selected: false)
+        tabCollectionViewModel.insert(tab, selected: false)
 
         XCTAssert(tab === tabCollectionViewModel.tabViewModel(at: 2)?.tab)
     }

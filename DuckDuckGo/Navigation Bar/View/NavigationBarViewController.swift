@@ -186,7 +186,7 @@ final class NavigationBarViewController: NSViewController {
 
     private func openNewChildTab(with url: URL) {
         let tab = Tab(content: .url(url), parentTab: tabCollectionViewModel.selectedTabViewModel?.tab, shouldLoadInBackground: true)
-        tabCollectionViewModel.insertChild(tab: tab, selected: false)
+        tabCollectionViewModel.insert(tab, selected: false)
     }
 
     @IBAction func refreshAction(_ sender: NSButton) {
@@ -532,14 +532,13 @@ final class NavigationBarViewController: NSViewController {
     }
 
     private func subscribeToCredentialsToSave() {
-        credentialsToSaveCancellable = tabCollectionViewModel.selectedTabViewModel?.$autofillDataToSave
+        credentialsToSaveCancellable = tabCollectionViewModel.selectedTabViewModel?.tab.autofillDataToSavePublisher
             .receive(on: DispatchQueue.main)
-            .sink(receiveValue: { [weak self] in
-                if let data = $0 {
-                    self?.promptToSaveAutofillData(data)
-                    self?.tabCollectionViewModel.selectedTabViewModel?.autofillDataToSave = nil
-                }
-            })
+            .sink { [weak self] data in
+                guard let self, let data else { return }
+                self.promptToSaveAutofillData(data)
+                self.tabCollectionViewModel.selectedTabViewModel?.tab.resetAutofillData()
+            }
     }
 
     private func promptToSaveAutofillData(_ data: AutofillData) {

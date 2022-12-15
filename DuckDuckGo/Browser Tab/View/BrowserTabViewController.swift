@@ -23,10 +23,6 @@ import Combine
 import SwiftUI
 import BrowserServicesKit
 
-protocol BrowserTabViewControllerClickDelegate: AnyObject {
-    func browserTabViewController(_ browserTabViewController: BrowserTabViewController, didClickAtPoint: CGPoint)
-}
-
 final class BrowserTabViewController: NSViewController {
 
     @IBOutlet weak var errorView: NSView!
@@ -42,7 +38,10 @@ final class BrowserTabViewController: NSViewController {
 
     private let tabCollectionViewModel: TabCollectionViewModel
     private var tabContentCancellable: AnyCancellable?
+    private var userDialogsCancellable: AnyCancellable?
+    private var activeUserDialogCancellable: ModalSheetCancellable?
     private var errorViewStateCancellable: AnyCancellable?
+    private var hoverLinkCancellable: AnyCancellable?
     private var pinnedTabsDelegatesCancellable: AnyCancellable?
     private var keyWindowSelectedTabCancellable: AnyCancellable?
     private var cancellables = Set<AnyCancellable>()
@@ -118,7 +117,9 @@ final class BrowserTabViewController: NSViewController {
                 self.showTabContent(of: selectedTabViewModel)
                 self.subscribeToErrorViewState()
                 self.subscribeToTabContent(of: selectedTabViewModel)
+                self.subscribeToHoveredLink(of: selectedTabViewModel)
                 self.showCookieConsentPopoverIfNecessary(selectedTabViewModel)
+                self.subscribeToUserDialogs(of: selectedTabViewModel)
             }
             .store(in: &cancellables)
     }
@@ -135,21 +136,23 @@ final class BrowserTabViewController: NSViewController {
 
     private func subscribeToTabs() {
         tabCollectionViewModel.tabCollection.$tabs
-            .sink { [weak self] tabs in
-                for tab in tabs where tab.delegate !== self {
-                    tab.delegate = self
-                }
-            }
+            .sink(receiveValue: setDelegate())
             .store(in: &cancellables)
     }
 
     private func subscribeToPinnedTabs() {
         pinnedTabsDelegatesCancellable = tabCollectionViewModel.pinnedTabsCollection?.$tabs
-            .sink { [weak self] tabs in
-                for tab in tabs where tab.delegate !== self {
-                    tab.delegate = self
-                }
+            .sink(receiveValue: setDelegate())
+    }
+
+    private func setDelegate() -> ([Tab]) -> Void {
+        { [weak self] (tabs: [Tab]) in
+            guard let self else { return }
+            for tab in tabs {
+                tab.setDelegate(self)
+                tab.autofill?.setDelegate(self)
             }
+        }
     }
 
     private func removeWebViewFromHierarchy(webView: WebView? = nil,
@@ -190,7 +193,6 @@ final class BrowserTabViewController: NSViewController {
         func displayWebView(of tabViewModel: TabViewModel) {
             let newWebView = tabViewModel.tab.webView
             cleanUpRemoteWebViewIfNeeded(newWebView)
-            newWebView.uiDelegate = self
             webView = newWebView
 
             addWebViewToViewHierarchy(newWebView)
@@ -251,12 +253,24 @@ final class BrowserTabViewController: NSViewController {
             }
     }
 
+    func subscribeToUserDialogs(of tabViewModel: TabViewModel?) {
+        userDialogsCancellable = tabViewModel?.tab.$userInteractionDialog.sink { [weak self] dialog in
+            self?.show(dialog)
+        }
+    }
+
     private func subscribeToErrorViewState() {
         errorViewStateCancellable = tabViewModel?.$errorViewState.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.displayErrorView(
                 self?.tabViewModel?.errorViewState.isVisible ?? false,
                 message: self?.tabViewModel?.errorViewState.message ?? UserText.unknownErrorMessage
             )
+        }
+    }
+
+    func subscribeToHoveredLink(of tabViewModel: TabViewModel?) {
+        hoverLinkCancellable = tabViewModel?.tab.hoveredLinkPublisher.sink { [weak self] in
+            self?.scheduleHoverLabelUpdatesForUrl($0)
         }
     }
 
@@ -292,8 +306,8 @@ final class BrowserTabViewController: NSViewController {
         // shouldn't open New Tabs in PopUp window
         guard view.window?.isPopUpWindow == false else {
             // Prefer Tab's Parent
-            if let parentTab = tabCollectionViewModel.selectedTabViewModel?.tab.parentTab, parentTab.delegate !== self {
-                parentTab.delegate?.tab(parentTab, requestedNewTabWith: content, selected: true)
+            if let parentTab = tabCollectionViewModel.selectedTabViewModel?.tab.parentTab {
+                parentTab.openChild(with: content, of: .tab(selected: true))
                 parentTab.webView.window?.makeKeyAndOrderFront(nil)
                 // Act as default URL Handler if no Parent
             } else {
@@ -313,7 +327,7 @@ final class BrowserTabViewController: NSViewController {
                       webViewFrame: view.frame)
 
         if parentTab != nil {
-            tabCollectionViewModel.insertChild(tab: tab, selected: selected)
+            tabCollectionViewModel.insert(tab, after: parentTab, selected: selected)
         } else {
             tabCollectionViewModel.append(tab: tab, selected: selected)
         }
@@ -330,8 +344,8 @@ final class BrowserTabViewController: NSViewController {
     private func removeAllTabContent(includingWebView: Bool = true) {
         self.homePageView.removeFromSuperview()
         transientTabContentViewController?.removeCompletely()
-        preferencesViewController.removeCompletely()
-        bookmarksViewController.removeCompletely()
+        preferencesViewController?.removeCompletely()
+        bookmarksViewController?.removeCompletely()
         if includingWebView {
             self.removeWebViewFromHierarchy()
         }
@@ -362,10 +376,11 @@ final class BrowserTabViewController: NSViewController {
         switch tabViewModel?.tab.content {
         case .bookmarks:
             removeAllTabContent()
-            showTabContentController(bookmarksViewController)
+            showTabContentController(bookmarksViewControllerCreatingIfNeeded())
 
         case let .preferences(pane):
             removeAllTabContent()
+            let preferencesViewController = preferencesViewControllerCreatingIfNeeded()
             if let pane = pane, preferencesViewController.model.selectedPane != pane {
                 preferencesViewController.model.selectPane(pane)
             }
@@ -409,62 +424,55 @@ final class BrowserTabViewController: NSViewController {
 
     // MARK: - Preferences
 
-    private(set) lazy var preferencesViewController: PreferencesViewController = {
-        let viewController = PreferencesViewController()
-        viewController.delegate = self
-
-        return viewController
-    }()
+    var preferencesViewController: PreferencesViewController?
+    private func preferencesViewControllerCreatingIfNeeded() -> PreferencesViewController {
+        return preferencesViewController ?? {
+            let preferencesViewController = PreferencesViewController()
+            preferencesViewController.delegate = self
+            self.preferencesViewController = preferencesViewController
+            return preferencesViewController
+        }()
+    }
 
     // MARK: - Bookmarks
 
-    private(set) lazy var bookmarksViewController: BookmarkManagementSplitViewController = {
-        let viewController = BookmarkManagementSplitViewController.create()
-        viewController.delegate = self
+    var bookmarksViewController: BookmarkManagementSplitViewController?
+    private func bookmarksViewControllerCreatingIfNeeded() -> BookmarkManagementSplitViewController {
+        return bookmarksViewController ?? {
+            let bookmarksViewController = BookmarkManagementSplitViewController.create()
+            bookmarksViewController.delegate = self
+            self.bookmarksViewController = bookmarksViewController
+            return bookmarksViewController
+        }()
+    }
 
-        return viewController
-    }()
-
-    private var _contentOverlayPopover: ContentOverlayPopover?
-    public var contentOverlayPopover: ContentOverlayPopover {
-        guard let overlay = _contentOverlayPopover else {
-            let overlayPopover = ContentOverlayPopover(currentTabView: view)
+    private var contentOverlayPopover: ContentOverlayPopover?
+    private func contentOverlayPopoverCreatingIfNeeded() -> ContentOverlayPopover {
+        return contentOverlayPopover ?? {
+            let overlayPopover = ContentOverlayPopover(currentTabView: self.view)
+            self.contentOverlayPopover = overlayPopover
             WindowControllersManager.shared.stateChanged
-                .sink { [weak self] _ in
-                    self?._contentOverlayPopover?.websiteAutofillUserScriptCloseOverlay(nil)
-                }.store(in: &cancellables)
-            _contentOverlayPopover = overlayPopover
+                .sink { [weak overlayPopover] _ in
+                    overlayPopover?.websiteAutofillUserScriptCloseOverlay(nil)
+                }.store(in: &self.cancellables)
             return overlayPopover
-        }
-        return overlay
-    }
-
-    @objc(_webView:printFrame:)
-    func webView(_ webView: WKWebView, printFrame handle: Any) {
-        webView.tab?.print(frame: handle)
-    }
-
-    @available(macOS 12, *)
-    @objc(_webView:printFrame:pdfFirstPageSize:completionHandler:)
-    func webView(_ webView: WKWebView, printFrame handle: Any, pdfFirstPageSize size: CGSize, completionHandler: () -> Void) {
-        self.webView(webView, printFrame: handle)
-        completionHandler()
+        }()
     }
 
 }
 
 extension BrowserTabViewController: ContentOverlayUserScriptDelegate {
     public func websiteAutofillUserScriptCloseOverlay(_ websiteAutofillUserScript: WebsiteAutofillUserScript?) {
-        contentOverlayPopover.websiteAutofillUserScriptCloseOverlay(websiteAutofillUserScript)
+        contentOverlayPopoverCreatingIfNeeded().websiteAutofillUserScriptCloseOverlay(websiteAutofillUserScript)
     }
     public func websiteAutofillUserScript(_ websiteAutofillUserScript: WebsiteAutofillUserScript,
                                           willDisplayOverlayAtClick: NSPoint?,
                                           serializedInputContext: String,
                                           inputPosition: CGRect) {
-        contentOverlayPopover.websiteAutofillUserScript(websiteAutofillUserScript,
-                                                        willDisplayOverlayAtClick: willDisplayOverlayAtClick,
-                                                        serializedInputContext: serializedInputContext,
-                                                        inputPosition: inputPosition)
+        contentOverlayPopoverCreatingIfNeeded().websiteAutofillUserScript(websiteAutofillUserScript,
+                                                                          willDisplayOverlayAtClick: willDisplayOverlayAtClick,
+                                                                          serializedInputContext: serializedInputContext,
+                                                                          inputPosition: inputPosition)
     }
 }
 
@@ -485,44 +493,15 @@ extension BrowserTabViewController: TabDelegate {
         }
     }
 
-    func tab(_ tab: Tab, requestedOpenExternalURL url: URL, forUserEnteredURL userEntered: Bool) {
-
-        let searchForExternalUrl = { [weak tab] in
-            // Redirect after handing WebView.url update after cancelling the request
-            DispatchQueue.main.async {
-                tab?.update(url: URL.makeSearchUrl(from: url.absoluteString), userEntered: false)
-            }
-        }
-
+    func tab(_ tab: Tab, requestedOpenExternalURL url: URL, forUserEnteredURL userEntered: Bool) -> Bool {
         // Another way of detecting whether an app is installed to handle a protocol is described in Asana:
         // https://app.asana.com/0/1201037661562251/1202055908401751/f
         guard NSWorkspace.shared.urlForApplication(toOpen: url) != nil else {
-            if userEntered {
-                searchForExternalUrl()
-            }
-            return
+            return false
         }
         self.view.makeMeFirstResponder()
 
-        let permissionType = PermissionType.externalScheme(scheme: url.scheme ?? "")
-
-        tab.permissions.permissions([permissionType],
-                                    requestedForDomain: webView?.url?.host,
-                                    url: url) { [weak self, weak tab] granted in
-            guard granted, let tab = tab else {
-                if userEntered {
-                    searchForExternalUrl()
-                }
-                return
-            }
-
-            self?.tab(tab, openExternalURL: url, touchingPermissionType: permissionType)
-        }
-    }
-
-    private func tab(_ tab: Tab, openExternalURL url: URL, touchingPermissionType permissionType: PermissionType) {
-        NSWorkspace.shared.open(url)
-        tab.permissions.permissions[permissionType].externalSchemeOpened()
+        return true
     }
 
     func tabPageDOMLoaded(_ tab: Tab) {
@@ -543,8 +522,15 @@ extension BrowserTabViewController: TabDelegate {
         }
     }
 
-    func tab(_ tab: Tab, requestedNewTabWith content: Tab.TabContent, selected: Bool) {
-        openNewTab(with: content, parentTab: tab, selected: selected, canBeClosedWithBack: selected == true)
+    func tab(_ parentTab: Tab, createdChild childTab: Tab, of kind: NewWindowPolicy) {
+        switch kind {
+        case .popup(size: let windowContentSize):
+            WindowsManager.openPopUpWindow(with: childTab, contentSize: windowContentSize)
+        case .window(active: let active):
+            WindowsManager.openNewWindow(with: childTab, showWindow: active)
+        case .tab(selected: let selected):
+            self.tabCollectionViewModel.insert(childTab, after: parentTab, selected: selected)
+        }
     }
 
     func closeTab(_ tab: Tab) {
@@ -576,10 +562,6 @@ extension BrowserTabViewController: TabDelegate {
                                                             persistence: .forSession))
 
         }
-    }
-
-    func tab(_ tab: Tab, didChangeHoverLink url: URL?) {
-        scheduleHoverLabelUpdatesForUrl(url)
     }
 
     func windowDidBecomeKey() {
@@ -623,16 +605,117 @@ extension BrowserTabViewController: TabDelegate {
             DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: item)
         }
     }
-}
 
-extension BrowserTabViewController: FileDownloadManagerDelegate {
+    func tab(_ tab: Tab, requestedSaveAutofillData autofillData: AutofillData) {
+        tabViewModel?.autofillDataToSave = autofillData
+    }
 
-    func chooseDestination(suggestedFilename: String?, directoryURL: URL?, fileTypes: [UTType], callback: @escaping (URL?, UTType?) -> Void) {
+    // MARK: - Dialogs
+
+    fileprivate func show(_ dialog: Tab.UserDialog?) {
+        switch dialog?.dialog {
+        case .basicAuthenticationChallenge(let query):
+            activeUserDialogCancellable = showBasicAuthenticationChallenge(with: query)
+        case .jsDialog(.alert(let query)):
+            activeUserDialogCancellable = showAlert(with: query)
+        case .jsDialog(.confirm(let query)):
+            activeUserDialogCancellable = showConfirmDialog(with: query)
+        case .jsDialog(.textInput(let query)):
+            activeUserDialogCancellable = showTextInput(with: query)
+        case .savePanel(let query):
+            activeUserDialogCancellable = showSavePanel(with: query)
+        case .openPanel(let query):
+            activeUserDialogCancellable = showOpenPanel(with: query)
+        case .print(let query):
+            activeUserDialogCancellable = runPrintOperation(with: query)
+        case .none:
+            // modal sheet will close automatcially (or switch to another Tab‘s dialog) when switching tabs
+            activeUserDialogCancellable = nil
+        }
+    }
+
+    private func showBasicAuthenticationChallenge(with request: BasicAuthDialogRequest) -> ModalSheetCancellable? {
+        guard let window = view.window else { return nil }
+
+        let alert = AuthenticationAlert(host: request.parameters.host,
+                                        isEncrypted: request.parameters.receivesCredentialSecurely)
+        alert.beginSheetModal(for: window) { [request] response in
+            // don‘t submit the query when tab is switched
+            if case .abort = response { return }
+            guard case .OK = response,
+                  !alert.usernameTextField.stringValue.isEmpty,
+                  !alert.passwordTextField.stringValue.isEmpty
+            else {
+                request.submit( (.performDefaultHandling, nil) )
+                return
+            }
+            request.submit( (.useCredential, URLCredential(user: alert.usernameTextField.stringValue,
+                                                         password: alert.passwordTextField.stringValue,
+                                                         persistence: .forSession)) )
+        }
+
+        // when subscribing to another Tab, the sheet will be temporarily closed with response == .abort on the cancellable deinit
+        return ModalSheetCancellable(ownerWindow: window, modalSheet: alert.window, condition: !request.isComplete)
+    }
+
+    private func showAlert(with request: AlertDialogRequest) -> ModalSheetCancellable? {
+        guard let window = view.window else { return nil }
+
+        let alert = NSAlert.javascriptAlert(with: request.parameters)
+        alert.beginSheetModal(for: window) { [request] response in
+            // don‘t submit the query when tab is switched
+            if case .abort = response { return }
+            request.submit()
+        }
+
+        // when subscribing to another Tab, the sheet will be temporarily closed with response == .abort on the cancellable deinit
+        return ModalSheetCancellable(ownerWindow: window, modalSheet: alert.window, condition: !request.isComplete)
+    }
+
+    func showConfirmDialog(with request: ConfirmDialogRequest) -> ModalSheetCancellable? {
+        guard let window = view.window else { return nil }
+
+        let alert = NSAlert.javascriptConfirmation(with: request.parameters)
+        alert.beginSheetModal(for: window) { [request] response in
+            // don‘t submit the query when tab is switched
+            if case .abort = response { return }
+            request.submit(response == .alertFirstButtonReturn)
+        }
+
+        // when subscribing to another Tab, the sheet will be temporarily closed with response == .abort on the cancellable deinit
+        return ModalSheetCancellable(ownerWindow: window, modalSheet: alert.window, condition: !request.isComplete)
+    }
+
+    func showTextInput(with request: TextInputDialogRequest) -> ModalSheetCancellable? {
+        guard let window = view.window else { return nil }
+
+        let alert = NSAlert.javascriptTextInput(prompt: request.parameters.prompt, defaultText: request.parameters.defaultText)
+        alert.beginSheetModal(for: window) { [request] response in
+            // don‘t submit the query when tab is switched
+            if case .abort = response { return }
+            guard let textField = alert.accessoryView as? NSTextField else {
+                assertionFailure("BrowserTabViewController: Textfield not found in alert")
+                request.submit(nil)
+                return
+            }
+            let answer = response == .alertFirstButtonReturn ? textField.stringValue : nil
+            request.submit(answer)
+        }
+
+        // when subscribing to another Tab, the sheet will be temporarily closed with response == .abort on the cancellable deinit
+        return ModalSheetCancellable(ownerWindow: window, modalSheet: alert.window, condition: !request.isComplete) { [weak alert] in
+            // save user input between tab switching
+            (alert?.accessoryView as? NSTextField).map { request.parameters.defaultText = $0.stringValue }
+        }
+    }
+
+    func showSavePanel(with request: SavePanelDialogRequest) -> ModalSheetCancellable? {
         dispatchPrecondition(condition: .onQueue(.main))
+        guard let window = view.window else { return nil }
 
-        var fileTypes = fileTypes
+        var fileTypes = request.parameters.fileTypes
         if fileTypes.isEmpty || (fileTypes.count == 1 && (fileTypes[0].fileExtension?.isEmpty ?? true)),
-           let fileExt = (suggestedFilename as NSString?)?.pathExtension,
+           let fileExt = (request.parameters.suggestedFilename as NSString?)?.pathExtension,
            let utType = UTType(fileExtension: fileExt) {
             // When no file extension is set by default generate fileType from file extension
             fileTypes.insert(utType, at: 0)
@@ -642,21 +725,89 @@ extension BrowserTabViewController: FileDownloadManagerDelegate {
             fileTypes.append(.data)
         }
 
-        let savePanel = NSSavePanel.withFileTypeChooser(fileTypes: fileTypes, suggestedFilename: suggestedFilename, directoryURL: directoryURL)
+        let savePanel = NSSavePanel.withFileTypeChooser(fileTypes: fileTypes,
+                                                        suggestedFilename: request.parameters.suggestedFilename,
+                                                        directoryURL: DownloadsPreferences().effectiveDownloadLocation)
 
-        func completionHandler(_ result: NSApplication.ModalResponse) {
-            guard case .OK = result else {
-                callback(nil, nil)
+        savePanel.beginSheetModal(for: window) { [request] response in
+            if case .abort = response {
+                // panel not closed by user but by a tab switching
+                return
+            } else if case .OK = response, let url = savePanel.url {
+                request.submit( (url, savePanel.selectedFileType) )
+            } else {
+                request.submit(nil)
+            }
+        }
+
+        // when subscribing to another Tab, the sheet will be temporarily closed with response == .abort on the cancellable deinit
+        return ModalSheetCancellable(ownerWindow: window, modalSheet: savePanel, condition: !request.isComplete)
+    }
+
+    func showOpenPanel(with request: OpenPanelDialogRequest) -> ModalSheetCancellable? {
+        guard let window = view.window else { return nil }
+
+        let openPanel = NSOpenPanel()
+        openPanel.allowsMultipleSelection = request.parameters.allowsMultipleSelection
+
+        openPanel.beginSheetModal(for: window) { [request] response in
+            // don‘t submit the query when tab is switched
+            if case .abort = response { return }
+            guard case .OK = response else {
+                request.submit(nil)
                 return
             }
-            callback(savePanel.url, savePanel.selectedFileType)
+            request.submit(openPanel.urls)
         }
 
-        if let window = self.view.window {
-            savePanel.beginSheetModal(for: window, completionHandler: completionHandler)
-        } else {
-            completionHandler(savePanel.runModal())
+        // when subscribing to another Tab, the sheet will be temporarily closed with response == .abort on the cancellable deinit
+        return ModalSheetCancellable(ownerWindow: window, modalSheet: openPanel, condition: !request.isComplete)
+    }
+
+    private class PrintContext {
+        let request: PrintDialogRequest
+        weak var printPanel: NSWindow?
+        var isAborted = false
+        init(request: PrintDialogRequest) {
+            self.request = request
         }
+    }
+    func runPrintOperation(with request: PrintDialogRequest) -> ModalSheetCancellable? {
+        guard let window = view.window else { return nil }
+
+        let printOperation = request.parameters
+        let didRunSelector = #selector(printOperationDidRun(printOperation:success:contextInfo:))
+
+        let windowSheetsBeforPrintOperation = window.sheets
+
+        let context = PrintContext(request: request)
+        let contextInfo = Unmanaged<PrintContext>.passRetained(context).toOpaque()
+
+        printOperation.runModal(for: window, delegate: self, didRun: didRunSelector, contextInfo: contextInfo)
+
+        // get the Print Panel that (hopefully) was added to the window.sheets
+        context.printPanel = Set(window.sheets).subtracting(windowSheetsBeforPrintOperation).first
+
+        // when subscribing to another Tab, the sheet will be temporarily closed with response == .abort on the cancellable deinit
+        return ModalSheetCancellable(ownerWindow: window, modalSheet: context.printPanel, returnCode: nil, condition: !context.request.isComplete) {
+            context.isAborted = true
+        }
+    }
+
+    @objc private func printOperationDidRun(printOperation: NSPrintOperation, success: Bool, contextInfo: UnsafeMutableRawPointer?) {
+        guard let contextInfo else {
+            assertionFailure("could not get query")
+            return
+        }
+        let context = Unmanaged<PrintContext>.fromOpaque(contextInfo).takeRetainedValue()
+
+        // don‘t submit the query when tab is switched
+        if context.isAborted { return }
+        if let window = view.window, let printPanel = context.printPanel, window.sheets.contains(printPanel) {
+            window.endSheet(printPanel)
+        }
+
+        context.request.submit(success)
     }
 
     func fileIconFlyAnimationOriginalRect(for downloadTask: WebKitDownloadTask) -> NSRect? {
@@ -674,301 +825,6 @@ extension BrowserTabViewController: FileDownloadManagerDelegate {
         let dockScreenRect = dockScreen.convert(globalRect)
 
         return dockScreenRect
-    }
-
-    func tab(_ tab: Tab, requestedSaveAutofillData autofillData: AutofillData) {
-        tabViewModel?.autofillDataToSave = autofillData
-    }
-
-}
-
-extension BrowserTabViewController: WKUIDelegate {
-
-    @objc(_webView:saveDataToFile:suggestedFilename:mimeType:originatingURL:)
-    func webView(_ webView: WKWebView, saveDataToFile data: Data, suggestedFilename: String, mimeType: String, originatingURL: URL) {
-        func write(to url: URL) throws {
-            let progress = Progress(totalUnitCount: 1,
-                                    fileOperationKind: .downloading,
-                                    kind: .file,
-                                    isPausable: false,
-                                    isCancellable: false,
-                                    fileURL: url)
-            progress.publish()
-            defer {
-                progress.unpublish()
-            }
-
-            try data.write(to: url)
-            progress.completedUnitCount = progress.totalUnitCount
-        }
-
-        let prefs = DownloadsPreferences()
-        if !prefs.alwaysRequestDownloadLocation,
-           let location = prefs.effectiveDownloadLocation {
-            let url = location.appendingPathComponent(suggestedFilename)
-            try? write(to: url)
-
-            return
-        }
-
-        chooseDestination(suggestedFilename: suggestedFilename,
-                          directoryURL: prefs.effectiveDownloadLocation,
-                          fileTypes: UTType(mimeType: mimeType).map { [$0] } ?? []) { url, _ in
-            guard let url = url else { return }
-            try? write(to: url)
-        }
-    }
-
-    // swiftlint:disable cyclomatic_complexity
-    // swiftlint:disable function_body_length
-    func webView(_ webView: WKWebView,
-                 createWebViewWith configuration: WKWebViewConfiguration,
-                 for navigationAction: WKNavigationAction,
-                 windowFeatures: WKWindowFeatures) -> WKWebView? {
-
-        func makeTab(parentTab: Tab, content: Tab.TabContent) -> Tab {
-            // Returned web view must be created with the specified configuration.
-            return Tab(content: content,
-                       webViewConfiguration: configuration,
-                       parentTab: parentTab,
-                       canBeClosedWithBack: true,
-                       webViewFrame: view.frame)
-        }
-        guard let parentTab = webView.tab else { return nil }
-        func nextQuery(parentTab: Tab) -> PermissionAuthorizationQuery? {
-            parentTab.permissions.authorizationQueries.first(where: { $0.permissions.contains(.popups) })
-        }
-
-        let contentSize = NSSize(width: windowFeatures.width?.intValue ?? 1024, height: windowFeatures.height?.intValue ?? 752)
-        var shouldOpenPopUp = navigationAction.isUserInitiated
-        var shouldOpenNewTab = windowFeatures.toolbarsVisibility?.boolValue == true
-        var shouldSelectNewTab = !NSApp.isCommandPressed
-
-        switch parentTab.decideNewWindowPolicy(for: navigationAction) {
-        case .newWindow:
-            shouldOpenPopUp = true
-            shouldOpenNewTab = false
-        case .newTab(selected: let selected):
-            shouldOpenPopUp = true
-            shouldOpenNewTab = true
-            shouldSelectNewTab = selected
-        case .cancel:
-            return nil
-        case .none:
-            break
-        }
-
-        if !shouldOpenPopUp {
-            let url = navigationAction.request.url
-            parentTab.permissions.permissions(.popups, requestedForDomain: webView.url?.host, url: url) { [weak parentTab] granted in
-
-                guard let parentTab = parentTab else { return }
-
-                switch (granted, shouldOpenPopUp) {
-                case (true, false):
-                    // callback called synchronously - will return webView for the request
-                    shouldOpenPopUp = true
-                case (true, true):
-                    // called asynchronously
-                    guard let url = navigationAction.request.url else { return }
-                    let tab = makeTab(parentTab: parentTab, content: .url(url))
-                    WindowsManager.openPopUpWindow(with: tab, contentSize: contentSize)
-
-                    parentTab.permissions.permissions.popups.popupOpened(nextQuery: nextQuery(parentTab: parentTab))
-
-                case (false, _):
-                    return
-                }
-            }
-        }
-        guard shouldOpenPopUp else {
-            shouldOpenPopUp = true // if granted asynchronously
-            return nil
-        }
-
-        let tab = makeTab(parentTab: parentTab, content: .none)
-        if shouldOpenNewTab {
-            tabCollectionViewModel.insertChild(tab: tab, selected: shouldSelectNewTab)
-        } else if windowFeatures.toolbarsVisibility?.boolValue == true {
-            WindowsManager.openNewWindow(with: tab, contentSize: contentSize)
-        } else {
-            WindowsManager.openPopUpWindow(with: tab, contentSize: contentSize)
-        }
-        parentTab.permissions.permissions.popups.popupOpened(nextQuery: nextQuery(parentTab: parentTab))
-
-        // WebKit loads the request in the returned web view.
-        return tab.webView
-    }
-    // swiftlint:enable cyclomatic_complexity
-    // swiftlint:enable function_body_length
-
-    @objc(_webView:checkUserMediaPermissionForURL:mainFrameURL:frameIdentifier:decisionHandler:)
-    func webView(_ webView: WKWebView,
-                 checkUserMediaPermissionFor url: URL,
-                 mainFrameURL: URL,
-                 frameIdentifier frame: UInt,
-                 decisionHandler: @escaping (String, Bool) -> Void) {
-        webView.tab?.permissions.checkUserMediaPermission(for: url, mainFrameURL: mainFrameURL, decisionHandler: decisionHandler)
-            ?? /* Tab deallocated: */ {
-                decisionHandler("", false)
-            }()
-    }
-
-    // https://github.com/WebKit/WebKit/blob/995f6b1595611c934e742a4f3a9af2e678bc6b8d/Source/WebKit/UIProcess/API/Cocoa/WKUIDelegate.h#L147
-    @objc(webView:requestMediaCapturePermissionForOrigin:initiatedByFrame:type:decisionHandler:)
-    @available(macOS 12, *)
-    func webView(_ webView: WKWebView,
-                 requestMediaCapturePermissionFor origin: WKSecurityOrigin,
-                 initiatedByFrame frame: WKFrameInfo,
-                 type: WKMediaCaptureType,
-                 decisionHandler: @escaping (WKPermissionDecision) -> Void) {
-        guard let permissions = [PermissionType](devices: type) else {
-            assertionFailure("Could not decode PermissionType")
-            decisionHandler(.deny)
-            return
-        }
-
-        webView.tab?.permissions.permissions(permissions, requestedForDomain: origin.host) { granted in
-            decisionHandler(granted ? .grant : .deny)
-        } ?? /* Tab deallocated: */ {
-            decisionHandler(.deny)
-        }()
-    }
-
-    // https://github.com/WebKit/WebKit/blob/9d7278159234e0bfa3d27909a19e695928f3b31e/Source/WebKit/UIProcess/API/Cocoa/WKUIDelegatePrivate.h#L126
-    @objc(_webView:requestUserMediaAuthorizationForDevices:url:mainFrameURL:decisionHandler:)
-    func webView(_ webView: WKWebView,
-                 requestUserMediaAuthorizationFor devices: _WKCaptureDevices,
-                 url: URL,
-                 mainFrameURL: URL,
-                 decisionHandler: @escaping (Bool) -> Void) {
-        guard let permissions = [PermissionType](devices: devices) else {
-            decisionHandler(false)
-            return
-        }
-
-        webView.tab?.permissions.permissions(permissions, requestedForDomain: url.host, decisionHandler: decisionHandler)
-            ?? /* Tab deallocated: */ {
-                decisionHandler(false)
-            }()
-    }
-
-    @objc(_webView:mediaCaptureStateDidChange:)
-    func webView(_ webView: WKWebView, mediaCaptureStateDidChange state: _WKMediaCaptureStateDeprecated) {
-        webView.tab?.permissions.mediaCaptureStateDidChange()
-    }
-
-    // https://github.com/WebKit/WebKit/blob/9d7278159234e0bfa3d27909a19e695928f3b31e/Source/WebKit/UIProcess/API/Cocoa/WKUIDelegatePrivate.h#L131
-    @objc(_webView:requestGeolocationPermissionForFrame:decisionHandler:)
-    func webView(_ webView: WKWebView, requestGeolocationPermissionFor frame: WKFrameInfo, decisionHandler: @escaping (Bool) -> Void) {
-        webView.tab?.permissions.permissions(.geolocation, requestedForDomain: frame.request.url?.host, decisionHandler: decisionHandler)
-            ?? /* Tab deallocated: */ {
-                decisionHandler(false)
-            }()
-    }
-
-    // https://github.com/WebKit/WebKit/blob/9d7278159234e0bfa3d27909a19e695928f3b31e/Source/WebKit/UIProcess/API/Cocoa/WKUIDelegatePrivate.h#L132
-    @objc(_webView:requestGeolocationPermissionForOrigin:initiatedByFrame:decisionHandler:)
-    @available(macOS 12, *)
-    func webView(_ webView: WKWebView,
-                 requestGeolocationPermissionFor origin: WKSecurityOrigin,
-                 initiatedBy frame: WKFrameInfo,
-                 decisionHandler: @escaping (WKPermissionDecision) -> Void) {
-        webView.tab?.permissions.permissions(.geolocation, requestedForDomain: frame.request.url?.host) { granted in
-            decisionHandler(granted ? .grant : .deny)
-        } ?? /* Tab deallocated: */ {
-            decisionHandler(.deny)
-        }()
-    }
-
-    func webView(_ webView: WKWebView,
-                 runOpenPanelWith parameters: WKOpenPanelParameters,
-                 initiatedByFrame frame: WKFrameInfo,
-                 completionHandler: @escaping ([URL]?) -> Void) {
-
-        guard let window = view.window else {
-            os_log("%s: Window is nil", type: .error, className)
-            completionHandler(nil)
-            return
-        }
-
-        let openPanel = NSOpenPanel()
-        openPanel.allowsMultipleSelection = parameters.allowsMultipleSelection
-
-        openPanel.beginSheetModal(for: window) { response in
-            if response == NSApplication.ModalResponse.OK {
-                completionHandler(openPanel.urls)
-            } else {
-                completionHandler(nil)
-            }
-        }
-    }
-
-    func webView(_ webView: WKWebView,
-                 runJavaScriptAlertPanelWithMessage message: String,
-                 initiatedByFrame frame: WKFrameInfo,
-                 completionHandler: @escaping () -> Void) {
-
-        guard webView === self.webView, let window = view.window else {
-            os_log("%s: Could not display JS alert panel", type: .error, className)
-            completionHandler()
-            return
-        }
-
-        let alert = NSAlert.javascriptAlert(with: message)
-        alert.beginSheetModal(for: window) { _ in
-            completionHandler()
-        }
-    }
-
-    func webView(_ webView: WKWebView,
-                 runJavaScriptConfirmPanelWithMessage message: String,
-                 initiatedByFrame frame: WKFrameInfo,
-                 completionHandler: @escaping (Bool) -> Void) {
-
-        guard webView === self.webView, let window = view.window else {
-            os_log("%s: Could not display JS confirmation panel", type: .error, className)
-            completionHandler(false)
-            return
-        }
-
-        let alert = NSAlert.javascriptConfirmation(with: message)
-        alert.beginSheetModal(for: window) { response in
-            completionHandler(response == .alertFirstButtonReturn)
-        }
-    }
-
-    func webView(_ webView: WKWebView,
-                 runJavaScriptTextInputPanelWithPrompt prompt: String,
-                 defaultText: String?,
-                 initiatedByFrame frame: WKFrameInfo,
-                 completionHandler: @escaping (String?) -> Void) {
-
-        guard webView === self.webView, let window = view.window else {
-            os_log("%s: Could not display JS text input panel", type: .error, className)
-            completionHandler(nil)
-            return
-        }
-
-        let alert = NSAlert.javascriptTextInput(prompt: prompt, defaultText: defaultText)
-        alert.beginSheetModal(for: window) { response in
-            guard let textField = alert.accessoryView as? NSTextField else {
-                os_log("BrowserTabViewController: Textfield not found in alert", type: .error)
-                completionHandler(nil)
-                return
-            }
-            let answer = response == .alertFirstButtonReturn ? textField.stringValue : nil
-            completionHandler(answer)
-        }
-    }
-
-    func webViewDidClose(_ webView: WKWebView) {
-        guard let webView = webView as? WebView else {
-            os_log("BrowserTabViewController: Unknown instance of WKWebView", type: .error)
-            return
-        }
-
-        tabCollectionViewModel.remove(ownerOf: webView)
     }
 
 }
@@ -1050,7 +906,7 @@ extension BrowserTabViewController {
 
     func mouseDown(with event: NSEvent) -> NSEvent? {
         guard event.window === self.view.window else { return event }
-        tabViewModel?.tab.browserTabViewController(self, didClickAtPoint: event.locationInWindow)
+        tabViewModel?.tab.autofill?.didClick(at: event.locationInWindow)
         return event
     }
 }

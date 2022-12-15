@@ -162,7 +162,7 @@ final class MoreOptionsMenu: NSMenu {
     }
 
     @objc func findInPage(_ sender: NSMenuItem) {
-        tabCollectionViewModel.selectedTabViewModel?.findInPage.show()
+        tabCollectionViewModel.selectedTabViewModel?.showFindInPage()
     }
 
     @objc func doPrint(_ sender: NSMenuItem) {
@@ -306,7 +306,7 @@ final class EmailOptionsButtonSubMenu: NSMenu {
     }
 
     @objc func turnOnEmailAction(_ sender: NSMenuItem) {
-        let tab = Tab(content: .url(EmailUrls().emailProtectionLink))
+        let tab = Tab(content: .url(EmailUrls().emailProtectionLink), shouldLoadInBackground: true)
         tabCollectionViewModel.append(tab: tab)
     }
 
