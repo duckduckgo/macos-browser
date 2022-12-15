@@ -66,11 +66,11 @@ final class JSAlertController: NSViewController {
         super.viewDidLoad()
         presentData()
 
-        alertView.layer?.backgroundColor = CGColor(red: 123, green: 123, blue: 123, alpha: 1.0)
-        alertView.alphaValue = 0.0
+        NSAppearance.withAppAppearance {
+            alertView.layer?.backgroundColor = NSColor.backgroundSecondaryColor.cgColor
+        }
         alertView.layer?.cornerRadius = 10.0
         alertView.applyDropShadow()
-        backgroundView.alphaValue = 0.0
         backgroundView.layer?.backgroundColor = CGColor(gray: 0.0, alpha: 0.2)
         print("Scroll text inset: \(messageText.textContainerInset)")
         messageText.textContainer?.lineFragmentPadding = 0.0
