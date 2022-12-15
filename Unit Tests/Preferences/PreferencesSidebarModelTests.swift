@@ -29,6 +29,11 @@ final class PreferencesSidebarModelTests: XCTestCase {
         cancellables.removeAll()
     }
 
+    // swiftlint:disable:next identifier_name
+    private func PreferencesSidebarModel(loadSections: [PreferencesSection]? = nil, tabSwitcherTabs: [Tab.TabContent] = Tab.TabContent.displayableTabTypes) -> DuckDuckGo_Privacy_Browser.PreferencesSidebarModel {
+        return DuckDuckGo_Privacy_Browser.PreferencesSidebarModel(loadSections: { loadSections ?? PreferencesSection.defaultSections(includingPrivatePlayer: false) }, tabSwitcherTabs: tabSwitcherTabs, privacyConfigurationManager: MockPrivacyConfigurationManager())
+    }
+
     func testWhenInitializedThenFirstPaneInFirstSectionIsSelected() throws {
         let sections: [PreferencesSection] = [.init(id: .regularPreferencePanes, panes: [.appearance, .downloads, .autofill])]
         let model = PreferencesSidebarModel(loadSections: sections)

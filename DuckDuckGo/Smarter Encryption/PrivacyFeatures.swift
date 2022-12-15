@@ -20,9 +20,32 @@ import Foundation
 
 import BrowserServicesKit
 
-public final class PrivacyFeatures {
-    
-    public static let httpsUpgradeStore = AppHTTPSUpgradeStore()
-    public static let httpsUpgrade = HTTPSUpgrade(store: httpsUpgradeStore, privacyManager: ContentBlocking.shared.privacyConfigurationManager)
-    
+protocol PrivacyFeaturesProtocol {
+    var contentBlocking: AnyContentBlocking { get }
+
+    var httpsUpgradeStore: any HTTPSUpgradeStore { get }
+    var httpsUpgrade: HTTPSUpgrade { get }
+}
+typealias AnyPrivacyFeatures = any PrivacyFeaturesProtocol
+
+// refactor: var PrivacyFeatures to be removed, PrivacyFeaturesProtocol to be renamed to PrivacyFeatures
+// PrivacyFeatures to be passed to init methods as `some PrivacyFeatures`
+// swiftlint:disable:next identifier_name
+var PrivacyFeatures: AnyPrivacyFeatures {
+    AppPrivacyFeatures.shared
+}
+
+final class AppPrivacyFeatures: PrivacyFeaturesProtocol {
+    static var shared: AnyPrivacyFeatures!
+
+    let contentBlocking: AnyContentBlocking
+    let httpsUpgradeStore: any HTTPSUpgradeStore
+    let httpsUpgrade: HTTPSUpgrade
+
+    init(contentBlocking: AnyContentBlocking, httpsUpgradeStore: HTTPSUpgradeStore) {
+        self.contentBlocking = contentBlocking
+        self.httpsUpgradeStore = httpsUpgradeStore
+        self.httpsUpgrade = HTTPSUpgrade(store: httpsUpgradeStore, privacyManager: contentBlocking.privacyConfigurationManager)
+    }
+
 }

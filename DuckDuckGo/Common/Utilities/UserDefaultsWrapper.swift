@@ -124,7 +124,7 @@ public struct UserDefaultsWrapper<T> {
             return defaultValue
         }
         set {
-            if (newValue as? OptionalProtocol)?.isNil == true {
+            if (newValue as? AnyOptional)?.isNil == true {
                 UserDefaults.standard.removeObject(forKey: key.rawValue)
             } else {
                 UserDefaults.standard.set(newValue, forKey: key.rawValue)

@@ -24,15 +24,13 @@ import BrowserServicesKit
 @NSApplicationMain
 final class AppDelegate: NSObject, NSApplicationDelegate {
 
-    static var isRunningTests: Bool {
-        #if DEBUG
-        ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
-        #else
-        return false
-        #endif
-    }
+#if DEBUG
+    static var isRunningTests: Bool = ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
+#else
+    static var isRunningTests: Bool { false }
+#endif
 
-    #if DEBUG
+#if DEBUG
     let disableCVDisplayLinkLogs: Void = {
         // Disable CVDisplayLink logs
         CFPreferencesSetValue("cv_note" as CFString,
@@ -42,7 +40,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                               kCFPreferencesAnyHost)
         CFPreferencesSynchronize("com.apple.corevideo" as CFString, kCFPreferencesCurrentUser, kCFPreferencesAnyHost)
     }()
-    #endif
+#endif
 
     let urlEventHandler = URLEventHandler()
 
@@ -61,27 +59,40 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationWillFinishLaunching(_ notification: Notification) {
         if !Self.isRunningTests {
-            #if DEBUG
+#if DEBUG
             Pixel.setUp(dryRun: true)
-            #else
+#else
             Pixel.setUp()
-            #endif
+#endif
 
             Database.shared.loadStore { _, error in
                 guard let error = error else { return }
-                
+
                 switch error {
                 case CoreDataDatabase.Error.containerLocationCouldNotBePrepared(let underlyingError):
                     Pixel.fire(.debug(event: .dbContainerInitializationError, error: underlyingError))
                 default:
                     Pixel.fire(.debug(event: .dbInitializationError, error: error))
                 }
-                
+
                 // Give Pixel a chance to be sent, but not too long
                 Thread.sleep(forTimeInterval: 1)
                 fatalError("Could not load DB: \(error.localizedDescription)")
             }
         }
+
+#if DEBUG
+        func mock<T>(_ className: String) -> T {
+            ((NSClassFromString(className) as? NSObject.Type)!.init() as? T)!
+        }
+        AppPrivacyFeatures.shared = AppDelegate.isRunningTests
+            // runtime mock-replacement for Unit Tests, to be redone when we‘ll be doing Dependency Injection
+            ? AppPrivacyFeatures(contentBlocking: mock("ContentBlockingMock"), httpsUpgradeStore: mock("HTTPSUpgradeStoreMock"))
+            : AppPrivacyFeatures(contentBlocking: AppContentBlocking(), httpsUpgradeStore: AppHTTPSUpgradeStore())
+#else
+        AppPrivacyFeatures.shared = AppPrivacyFeatures(contentBlocking: AppContentBlocking(),
+                                                       httpsUpgradeStore: AppHTTPSUpgradeStore())
+#endif
 
         do {
             let encryptionKey = Self.isRunningTests ? nil : try keyStore.readKey()

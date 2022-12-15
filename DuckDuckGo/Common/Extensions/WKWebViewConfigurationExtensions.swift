@@ -22,10 +22,7 @@ import BrowserServicesKit
 
 extension WKWebViewConfiguration {
 
-    func applyStandardConfiguration() {
-#if DEBUG
-        guard !AppDelegate.isRunningTests else { return }
-#endif
+    func applyStandardConfiguration(contentBlocking: some ContentBlockingProtocol) {
 
         allowsAirPlayForMediaPlayback = true
         if #available(macOS 12.3, *) {
@@ -43,22 +40,17 @@ extension WKWebViewConfiguration {
             preferences.javaScriptCanOpenWindowsAutomatically = false
         }
         preferences.isFraudulentWebsiteWarningEnabled = false
-        
+
         if urlSchemeHandler(forURLScheme: PrivatePlayer.privatePlayerScheme) == nil {
             setURLSchemeHandler(PrivatePlayerSchemeHandler(), forURLScheme: PrivatePlayer.privatePlayerScheme)
         }
 
-        self.userContentController = UserContentController()
+        let userContentController = UserContentController(assetsPublisher: contentBlocking.contentBlockingAssetsPublisher,
+                                                          privacyConfigurationManager: contentBlocking.privacyConfigurationManager)
+
+        self.userContentController = userContentController
         self.processPool.geolocationProvider = GeolocationProvider(processPool: self.processPool)
+        self.processPool.setDownloadDelegateIfNeeded(using: LegacyWebKitDownloadDelegate.init)
      }
-
-}
-
-extension UserContentController {
-
-    convenience init(privacyConfigurationManager: PrivacyConfigurationManager = ContentBlocking.shared.privacyConfigurationManager) {
-        self.init(assetsPublisher: ContentBlocking.shared.userContentUpdating.userContentBlockingAssets,
-                  privacyConfigurationManager: privacyConfigurationManager)
-    }
 
 }

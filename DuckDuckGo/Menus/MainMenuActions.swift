@@ -302,7 +302,7 @@ extension MainViewController {
             return
         }
 
-        selectedTabViewModel.tab.webView.zoomLevel = 1.0
+        selectedTabViewModel.tab.webView.resetZoomLevel()
     }
 
     @IBAction func toggleDownloads(_ sender: Any) {
@@ -535,7 +535,7 @@ extension MainViewController {
     // MARK: - Edit
 
     @IBAction func findInPage(_ sender: Any?) {
-        tabCollectionViewModel.selectedTabViewModel?.startFindInPage()
+        tabCollectionViewModel.selectedTabViewModel?.showFindInPage()
     }
 
     @IBAction func findInPageNext(_ sender: Any?) {

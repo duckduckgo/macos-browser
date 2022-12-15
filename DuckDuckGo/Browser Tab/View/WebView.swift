@@ -35,8 +35,8 @@ final class WebView: WKWebView {
 
     // MARK: - Zoom
 
-    static private let maxZoomLevel: CGFloat = 3.0
-    static private let minZoomLevel: CGFloat = 0.5
+    static let maxZoomLevel: CGFloat = 3.0
+    static let minZoomLevel: CGFloat = 0.5
     static private let zoomLevelStep: CGFloat = 0.1
 
     var zoomLevel: CGFloat {
@@ -47,16 +47,17 @@ final class WebView: WKWebView {
             return magnification
         }
         set {
+            let cappedValue = min(Self.maxZoomLevel, max(Self.minZoomLevel, newValue))
             if #available(macOS 11.0, *) {
-                pageZoom = newValue
+                pageZoom = cappedValue
             } else {
-                magnification = newValue
+                magnification = cappedValue
             }
         }
     }
 
     var canZoomToActualSize: Bool {
-        self.window != nil && self.zoomLevel != 1.0
+        self.window != nil && (self.zoomLevel != 1.0 || self.magnification != 1.0)
     }
 
     var canZoomIn: Bool {
@@ -65,6 +66,11 @@ final class WebView: WKWebView {
 
     var canZoomOut: Bool {
         self.window != nil && self.zoomLevel > Self.minZoomLevel
+    }
+
+    func resetZoomLevel() {
+        zoomLevel = 1.0
+        magnification = 1.0
     }
 
     func zoomIn() {
