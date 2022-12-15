@@ -19,7 +19,7 @@
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 import Combine
-import class BrowserServicesKit.CoreDataDatabase
+import class Persistence.CoreDataDatabase
 
 final class HistoryStoreTests: XCTestCase {
 
