@@ -41,7 +41,7 @@ final class TabCollectionTests: XCTestCase {
         let tabCollection = TabCollection()
         let tab = Tab()
 
-        tabCollection.insert(tab: tab, at: -1)
+        tabCollection.insert(tab, at: -1)
         XCTAssertEqual(tabCollection.tabs.count, 0)
         XCTAssertFalse(tabCollection.tabs.contains(tab))
     }
@@ -50,11 +50,11 @@ final class TabCollectionTests: XCTestCase {
         let tabCollection = TabCollection()
 
         let tab1 = Tab()
-        tabCollection.insert(tab: tab1, at: 0)
+        tabCollection.insert(tab1, at: 0)
         XCTAssertEqual(tabCollection.tabs[0], tab1)
 
         let tab2 = Tab()
-        tabCollection.insert(tab: tab2, at: 0)
+        tabCollection.insert(tab2, at: 0)
         XCTAssertEqual(tabCollection.tabs[0], tab2)
         XCTAssertEqual(tabCollection.tabs[1], tab1)
 
@@ -70,7 +70,7 @@ final class TabCollectionTests: XCTestCase {
         XCTAssertEqual(tabCollection.tabs.count, 1)
         XCTAssert(tabCollection.tabs.contains(tab))
 
-        XCTAssertFalse(tabCollection.remove(at: 1))
+        XCTAssertFalse(tabCollection.removeTab(at: 1))
         XCTAssertEqual(tabCollection.tabs.count, 1)
         XCTAssert(tabCollection.tabs.contains(tab))
     }
@@ -85,7 +85,7 @@ final class TabCollectionTests: XCTestCase {
         let tab3 = Tab()
         tabCollection.append(tab: tab3)
 
-        XCTAssert(tabCollection.remove(at: 0))
+        XCTAssert(tabCollection.removeTab(at: 0))
 
         XCTAssertEqual(tabCollection.tabs[0], tab2)
         XCTAssertEqual(tabCollection.tabs[1], tab3)

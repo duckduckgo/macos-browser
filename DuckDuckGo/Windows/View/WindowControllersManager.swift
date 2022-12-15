@@ -146,7 +146,7 @@ extension WindowControllersManager {
             } else if let tab = tabCollectionViewModel.selectedTabViewModel?.tab, !newTab {
                 tab.setContent(url.map { .url($0) } ?? .homePage)
             } else {
-                let newTab = Tab(content: url.map { .url($0) } ?? .homePage)
+                let newTab = Tab(content: url.map { .url($0) } ?? .homePage, shouldLoadInBackground: true)
                 newTab.setContent(url.map { .url($0) } ?? .homePage)
                 tabCollectionViewModel.append(tab: newTab)
             }
@@ -182,4 +182,10 @@ extension WindowControllersManager {
         windowController.window?.orderFront(nil)
     }
 
+}
+
+extension Tab {
+    var isPinned: Bool {
+        return self.pinnedTabsManager.isTabPinned(self)
+    }
 }

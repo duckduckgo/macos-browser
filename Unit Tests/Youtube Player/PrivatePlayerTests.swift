@@ -21,7 +21,7 @@ import BrowserServicesKit
 import Combine
 @testable import DuckDuckGo_Privacy_Browser
 
-private class MockPrivacyConfiguration: PrivacyConfiguration {
+class MockPrivacyConfiguration: PrivacyConfiguration {
     var identifier: String = "MockPrivacyConfiguration"
     var userUnprotectedDomains: [String] = []
     var tempUnprotectedDomains: [String] = []
@@ -39,7 +39,8 @@ private class MockPrivacyConfiguration: PrivacyConfiguration {
     func userDisabledProtection(forDomain: String) {}
 }
 
-private class MockPrivacyConfigurationManager: PrivacyConfigurationManaging {
+@objc(MockPrivacyConfigurationManager)
+class MockPrivacyConfigurationManager: NSObject, PrivacyConfigurationManaging {
     var embeddedConfigData: BrowserServicesKit.PrivacyConfigurationManager.ConfigurationData {
         fatalError("not implemented")
     }

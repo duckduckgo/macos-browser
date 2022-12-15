@@ -56,9 +56,11 @@ final class HistoryStoringMock: HistoryStoring {
     }
 
     var removeVisitsCalled = false
+    var removeVisitsArray = [Visit]()
     var removeVisitsResult: Result<Void, Error>?
     func removeVisits(_ visits: [Visit]) -> Future<Void, Error> {
         removeVisitsCalled = true
+        removeVisitsArray = visits
         return Future { [weak self] promise in
             guard let removeVisitsResult = self?.removeVisitsResult else {
                 promise(.failure(HistoryStoringMockError.defaultError))

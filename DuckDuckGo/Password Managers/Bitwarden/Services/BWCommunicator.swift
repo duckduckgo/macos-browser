@@ -64,17 +64,12 @@ final class BWCommunicator: BWCommunication {
         let outHandle = outputPipe.fileHandleForReading
         outHandle.readabilityHandler = receiveData(_:)
 
-        let errorPipe = Pipe()
-        let errorHandle = errorPipe.fileHandleForReading
-        errorHandle.readabilityHandler = receiveErrorData(_:)
-
         let inputPipe = Pipe()
         let inputHandle = inputPipe.fileHandleForWriting
 
         process.executableURL = URL(fileURLWithPath: Self.appPath)
         process.arguments = ["chrome-extension://bitwarden"]
         process.standardOutput = outputPipe
-        process.standardError = errorPipe
         process.standardInput = inputPipe
         process.terminationHandler = processDidTerminate(_:)
 
@@ -166,13 +161,6 @@ final class BWCommunicator: BWCommunication {
                 self.delegate?.bitwardenCommunicator(self, didReceiveMessageData: messageData)
             }
         } while availableData.count >= 2 /*EOF*/
-    }
-
-    private func receiveErrorData(_ fileHandle: FileHandle) {
-        // Stderr is too verbose. Uncomment if necessary
-        // if let stderrOutput = String(data: fileHandle.availableData, encoding: .utf8) {
-        //     os_log("Stderr output:\n %s", log: .bitwarden, type: .error, stderrOutput)
-        // }
     }
 
     private func fromByteArray<T>(_ value: [UInt8], _: T.Type) -> T {

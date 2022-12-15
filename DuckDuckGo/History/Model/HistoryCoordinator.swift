@@ -242,11 +242,13 @@ final class HistoryCoordinator: HistoryCoordinating {
 
     private func removeVisits(_ visits: [Visit],
                               completionHandler: ((Error?) -> Void)? = nil) {
+        var entriesToRemove = [HistoryEntry]()
+        
         // Remove from the local memory
         visits.forEach { visit in
             if let historyEntry = visit.historyEntry {
                 historyEntry.visits.remove(visit)
-
+                
                 if historyEntry.visits.count > 0 {
                     if let newLastVisit = historyEntry.visits.map({ $0.date }).max() {
                         historyEntry.lastVisit = newLastVisit
@@ -255,7 +257,7 @@ final class HistoryCoordinator: HistoryCoordinating {
                         assertionFailure("No history entry")
                     }
                 } else {
-                    removeEntries([historyEntry])
+                    entriesToRemove.append(historyEntry)
                 }
             } else {
                 assertionFailure("No history entry")
@@ -265,11 +267,12 @@ final class HistoryCoordinator: HistoryCoordinating {
         // Remove from the storage
         historyStoring.removeVisits(visits)
             .receive(on: DispatchQueue.main)
-            .sink(receiveCompletion: { completion in
+            .sink(receiveCompletion: { [weak self] completion in
                 switch completion {
                 case .finished:
                     os_log("Visits removed successfully", log: .history)
-                    completionHandler?(nil)
+                    // Remove entries with no remaining visits
+                    self?.removeEntries(entriesToRemove, completionHandler: completionHandler)
                 case .failure(let error):
                     assertionFailure("Removal failed")
                     os_log("Removal failed: %s", log: .history, type: .error, error.localizedDescription)
