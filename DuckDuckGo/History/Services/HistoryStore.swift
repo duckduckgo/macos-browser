@@ -32,9 +32,9 @@ protocol HistoryStoring {
 
 final class HistoryStore: HistoryStoring {
 
-    private let context: NSManagedObjectContext
-
-    init(context: NSManagedObjectContext = Database.shared.makeContext(concurrencyType: .privateQueueConcurrencyType, name: "History")) {
+    init() {}
+    
+    init(context: NSManagedObjectContext) {
         self.context = context
     }
 
@@ -42,6 +42,8 @@ final class HistoryStore: HistoryStoring {
         case storeDeallocated
         case savingFailed
     }
+    
+    private lazy var context = Database.shared.makeContext(concurrencyType: .privateQueueConcurrencyType, name: "History")
 
     func removeEntries(_ entries: [HistoryEntry]) -> Future<Void, Error> {
         return Future { [weak self] promise in
