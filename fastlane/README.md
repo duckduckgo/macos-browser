@@ -23,6 +23,14 @@ For _fastlane_ installation instructions, see [Installing _fastlane_](https://do
 
 
 
+### mac sync_signing_dev
+
+```sh
+[bundle exec] fastlane mac sync_signing_dev
+```
+
+
+
 ### mac release
 
 ```sh

@@ -30,6 +30,16 @@ platform :mac do
     )
   end
 
+  lane :sync_signing_dev do
+    sync_code_signing(
+      type: "development",
+      additional_cert_types: [],
+      app_identifier: "com.duckduckgo.mobile.ios.*",
+      api_key: get_api_key,
+      generate_apple_certs: true
+    )
+  end
+
   lane :release do
     sync_signing
 
