@@ -40,21 +40,21 @@ final class JSAlertController: NSViewController {
     @IBOutlet var okButton: NSButton!
     @IBOutlet var cancelButton: NSButton!
 
-    let viewModel: JSAlertViewModel
+    private let viewModel: JSAlertViewModel
 
     private var isBlockingCheckboxOn: Bool {
         return blockingCheckbox.state == .on
     }
 
-    static func create(_ viewModel: JSAlertViewModel) -> JSAlertController {
+    static func create(_ query: JSAlertQuery) -> JSAlertController {
         let instance = NSStoryboard(name: Constants.storyboardName, bundle: nil).instantiateInitialController { coder in
-            return JSAlertController(viewModel: viewModel, coder: coder)
+            return JSAlertController(query: query, coder: coder)
         }
         return instance!
     }
 
-    init?(viewModel: JSAlertViewModel, coder: NSCoder) {
-        self.viewModel = viewModel
+    init?(query: JSAlertQuery, coder: NSCoder) {
+        self.viewModel = JSAlertViewModel(query: query)
         super.init(coder: coder)
     }
 

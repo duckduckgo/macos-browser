@@ -55,7 +55,7 @@ enum JSAlertQuery {
     case confirm(ConfirmDialogRequest)
     case textInput(TextInputDialogRequest)
     case alert(AlertDialogRequest)
-    
+
     func cancel() {
         switch self {
         case .alert(let request):

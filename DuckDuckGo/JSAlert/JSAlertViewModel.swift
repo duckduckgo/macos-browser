@@ -20,11 +20,11 @@ import Foundation
 
 final class JSAlertViewModel {
     private let query: JSAlertQuery
-    
+
     init(query: JSAlertQuery) {
         self.query = query
     }
-    
+
     var isCancelButtonHidden: Bool {
         switch query {
         case .alert:
@@ -33,7 +33,7 @@ final class JSAlertViewModel {
             return false
         }
     }
-    
+
     var isTextFieldHidden: Bool {
         switch query {
         case .alert, .confirm:
@@ -42,35 +42,35 @@ final class JSAlertViewModel {
             return false
         }
     }
-    
+
     var isBlockingCheckboxHidden: Bool {
         return !query.parameters.hasDomainShownAlert
     }
-    
+
     var okButtonText: String {
         UserText.ok
     }
-    
+
     var cancelButtonText: String {
         UserText.cancel
     }
-    
+
     var checkboxText: String {
         UserText.alertSuppressCheckboxTitle
     }
-    
+
     var titleText: String {
         UserText.alertTitle(from: query.parameters.domain)
     }
-    
+
     var messageText: String {
         query.parameters.prompt
     }
-    
+
     var textFieldDefaultText: String {
         query.parameters.defaultInputText ?? ""
     }
-    
+
     func confirm(text: String, shouldBlockAlerts: Bool) {
         switch query {
         case .alert(let request):
@@ -81,7 +81,7 @@ final class JSAlertViewModel {
             request.submit(.init(completionArgument: text, shouldBlockNext: shouldBlockAlerts))
         }
     }
-    
+
     func cancel() {
         query.cancel()
     }
