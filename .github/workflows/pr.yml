@@ -65,7 +65,6 @@ jobs:
       uses: webfactory/ssh-agent@v0.7.0
       with:
         ssh-private-key: |
-          ${{ secrets.SSH_PRIVATE_KEY_FASTLANE_MATCH }}
           ${{ secrets.SSH_PRIVATE_KEY_FIND_IN_PAGE }}
           ${{ secrets.SSH_PRIVATE_KEY_PRIVACY_DASHBOARD }}
 
@@ -76,26 +75,6 @@ jobs:
 
     - name: Select Xcode
       run: sudo xcode-select -s /Applications/Xcode_14.1.app/Contents/Developer
-
-    - name: Sync signing
-      env:
-        APPLE_API_KEY_BASE64: ${{ secrets.APPLE_API_KEY_BASE64 }}
-        APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
-        APPLE_API_KEY_ISSUER: ${{ secrets.APPLE_API_KEY_ISSUER }}
-        KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
-        MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
-      run: |
-        # set up temporary keychain
-        KEYCHAIN_NAME=app-signing.keychain-db
-        KEYCHAIN_PATH="${GITHUB_WORKSPACE}/${KEYCHAIN_NAME}"
-        security create-keychain -p "${KEYCHAIN_PASSWORD}" "${KEYCHAIN_PATH}"
-        security set-keychain-settings -lut 21600 "${KEYCHAIN_PATH}"
-        security unlock-keychain -p "${KEYCHAIN_PASSWORD}" "${KEYCHAIN_PATH}"
-
-        bundle install
-        bundle exec fastlane sync_signing_dev \
-          keychain_name:"${KEYCHAIN_NAME}" \
-          keychain_password:"${KEYCHAIN_PASSWORD}"
 
     - name: Build and test
       run: |
