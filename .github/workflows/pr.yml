@@ -78,7 +78,7 @@ jobs:
 
     - name: Build and test
       run: |
-        patch -p1 < "${{ matrix.flavor }}.patch"
+        patch -p1 < "scripts/assets/${{ matrix.flavor }}.patch"
         set -o pipefail && xcodebuild test \
           -scheme "${{ matrix.scheme }}" \
           -configuration "CI" \
