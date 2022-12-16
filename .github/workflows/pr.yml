@@ -2,7 +2,7 @@ name: PR Checks
 
 on: 
   push:
-    branches: [ develop, "release/**" ]
+    branches: [ develop, "release/**", "dominik/appstore-fastlane" ]
   pull_request:
     branches: [ develop, "release/**" ]
 
@@ -56,10 +56,6 @@ jobs:
             flavor: Non-Sandbox
           - scheme: DuckDuckGo Privacy Browser App Store
             flavor: Sandbox
-          - configuration: CI
-            flavor: Non-Sandbox
-          - configuration: CI_Sandbox_Debug
-            flavor: Sandbox
 
     runs-on: macos-12
     timeout-minutes: 30
@@ -69,6 +65,7 @@ jobs:
       uses: webfactory/ssh-agent@v0.7.0
       with:
         ssh-private-key: |
+          ${{ secrets.SSH_PRIVATE_KEY_FASTLANE_MATCH }}
           ${{ secrets.SSH_PRIVATE_KEY_FIND_IN_PAGE }}
           ${{ secrets.SSH_PRIVATE_KEY_PRIVACY_DASHBOARD }}
 
@@ -80,11 +77,14 @@ jobs:
     - name: Select Xcode
       run: sudo xcode-select -s /Applications/Xcode_14.1.app/Contents/Developer
 
+    - name: Sync signing
+      run: fastlane sync_signing_dev
+
     - name: Build and test
       run: |
         set -o pipefail && xcodebuild test \
           -scheme "${{ matrix.scheme }}" \
-          -configuration "${{ matrix.configuration }}" \
+          -configuration "CI" \
           ENABLE_TESTABILITY=true \
           | xcpretty -r junit -o unittests-${{ matrix.flavor }}.xml
 
