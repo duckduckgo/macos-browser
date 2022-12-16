@@ -50,12 +50,12 @@ jobs:
 
     strategy:
       matrix:
-        flavor: [ "Sandbox" ] #, "Non-Sandbox" ]
+        flavor: [ "Non-Sandbox" ]
         include:
-#          - scheme: DuckDuckGo Privacy Browser
-#            flavor: Non-Sandbox
-          - scheme: DuckDuckGo Privacy Browser App Store
-            flavor: Sandbox
+          - scheme: DuckDuckGo Privacy Browser
+            flavor: Non-Sandbox
+#          - scheme: DuckDuckGo Privacy Browser App Store
+#            flavor: Sandbox
 
     runs-on: macos-12
     timeout-minutes: 30
