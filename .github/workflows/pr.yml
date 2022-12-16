@@ -50,10 +50,10 @@ jobs:
 
     strategy:
       matrix:
-        flavor: [ "Sandbox", "Non-Sandbox" ]
+        flavor: [ "Sandbox" ] #, "Non-Sandbox" ]
         include:
-          - scheme: DuckDuckGo Privacy Browser
-            flavor: Non-Sandbox
+#          - scheme: DuckDuckGo Privacy Browser
+#            flavor: Non-Sandbox
           - scheme: DuckDuckGo Privacy Browser App Store
             flavor: Sandbox
 
