@@ -78,6 +78,11 @@ jobs:
       run: sudo xcode-select -s /Applications/Xcode_14.1.app/Contents/Developer
 
     - name: Sync signing
+      env:
+        APPLE_API_KEY_BASE64: ${{ secrets.APPLE_API_KEY_BASE64 }}
+        APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+        APPLE_API_KEY_ISSUER: ${{ secrets.APPLE_API_KEY_ISSUER }}
+        MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
       run: |
         bundle install
         bundle exec fastlane sync_signing_dev
