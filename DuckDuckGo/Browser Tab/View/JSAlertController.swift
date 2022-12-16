@@ -22,9 +22,9 @@ import AppKit
 final class JSAlertController: NSViewController {
 
     private enum Constants {
+        static let storyboardName = "JSAlert"
         static let appearAnimationDuration = 0.2
         static let dismissAnimationDuration = 0.3
-        static let storyboardName = "JSAlert"
     }
 
     @IBOutlet var scrollViewHeight: NSLayoutConstraint!
@@ -73,7 +73,6 @@ final class JSAlertController: NSViewController {
         backgroundView.layer?.backgroundColor = CGColor(gray: 0.0, alpha: 0.2)
         print("Scroll text inset: \(messageText.textContainerInset)")
         messageText.textContainer?.lineFragmentPadding = 0.0
-        messageText.font = .systemFont(ofSize: 13)
         messageText.isEditable = false
 
         verticalStackView.setCustomSpacing(14.0, after: blockingCheckbox)
@@ -99,42 +98,117 @@ final class JSAlertController: NSViewController {
         }
     }
 
-    func animateIn(_ completion: @escaping () -> Void) {
+    override func viewDidLayout() {
+        super.viewDidLayout()
+
+        if messageText.textSize.height <= scrollView.frame.height {
+            scrollView.verticalScrollElasticity = .none
+        } else {
+            scrollView.verticalScrollElasticity = .automatic
+        }
+    }
+
+    @IBAction func okAction(_ sender: NSButton) {
+        view.window?.endEditing(for: nil)
+        viewModel.confirm(text: textField.stringValue, shouldBlockAlerts: isBlockingCheckboxOn)
+    }
+
+    @IBAction func cancelAction(_ sender: Any?) {
+        view.window?.endEditing(for: nil)
+        viewModel.cancel()
+    }
+
+    func dismiss(_ completion: @escaping () -> Void) {
+        animateOut {
+            completion()
+        }
+    }
+
+    private func presentData() {
+        okButton.title = viewModel.okButtonText
+        cancelButton.title = viewModel.cancelButtonText
+        titleText.stringValue = viewModel.titleText
+        messageText.string = viewModel.messageText
+
+        cancelButton.isHidden = viewModel.isCancelButtonHidden
+        messageText.sizeToFit()
+        scrollViewHeight.constant = messageText.textSize.height + 4
+
+        textField.isHidden = viewModel.isTextFieldHidden
+        blockingCheckbox.isHidden = viewModel.isBlockingCheckboxHidden
+        let scrollViewSpacing = viewModel.isTextFieldHidden ? verticalStackView.spacing : 4
+        verticalStackView.setCustomSpacing(scrollViewSpacing, after: scrollView)
+        textField.stringValue = viewModel.textFieldDefaultText
+        blockingCheckbox.title = viewModel.checkboxText
+    }
+
+    private func animateIn(_ completion: @escaping () -> Void) {
+        animate(
+            transform: Animation(fromValue: CATransform3DMakeScale(0.9, 0.9, 1), toValue: CATransform3DIdentity),
+            backgroundOpacity: Animation(fromValue: 0.0, toValue: 1.0),
+            alertOpacity: Animation(fromValue: 0.75, toValue: 1.0),
+            duration: Constants.appearAnimationDuration,
+            completion: completion
+        )
+    }
+
+    private func animateOut(_ completion: @escaping () -> Void) {
+        animate(
+            transform: Animation(fromValue: CATransform3DIdentity, toValue: CATransform3DMakeScale(0.9, 0.9, 1)),
+            backgroundOpacity: Animation(fromValue: 1.0, toValue: 0.0),
+            alertOpacity: Animation(fromValue: 1.0, toValue: 0.0),
+            duration: Constants.dismissAnimationDuration,
+            completion: completion
+        )
+    }
+
+    private struct Animation<Value> {
+        let fromValue: Value
+        let toValue: Value
+    }
+
+    private func animate(
+        transform: Animation<CATransform3D>,
+        backgroundOpacity: Animation<Float>,
+        alertOpacity: Animation<Float>,
+        duration: CFTimeInterval,
+        completion: @escaping () -> Void
+    ) {
         let layer = alertView.layer!
         setAlertAnchorPoint(anchorPoint: CGPoint(x: 0.5, y: 0.5))
         CATransaction.setCompletionBlock(completion)
 
         CATransaction.begin()
 
-        alertView.layer?.transform = CATransform3DIdentity
-        alertView.layer?.opacity = 1.0
-        backgroundView.layer?.opacity = 1.0
+        alertView.layer?.transform = transform.toValue
+        alertView.layer?.opacity = alertOpacity.toValue
+        backgroundView.layer?.opacity = backgroundOpacity.toValue
 
         let scaleAnimation = CABasicAnimation(keyPath: "transform")
-        scaleAnimation.fromValue = CATransform3DMakeScale(0.9, 0.9, 1)
-        scaleAnimation.toValue = CATransform3DIdentity
+        scaleAnimation.fromValue = transform.fromValue
+        scaleAnimation.toValue = transform.toValue
 
         let alertOpacity = CABasicAnimation(keyPath: "opacity")
-        alertOpacity.fromValue = 0.75
-        alertOpacity.toValue = 1.0
+        alertOpacity.fromValue = alertOpacity.fromValue
+        alertOpacity.toValue = alertOpacity.toValue
 
         let group = CAAnimationGroup()
-        group.duration = 0.2
+        group.duration = Constants.appearAnimationDuration
         group.timingFunction = CAMediaTimingFunction(name: .easeIn)
         group.animations = [scaleAnimation, alertOpacity]
 
         layer.add(group, forKey: "scaleAndOpacity")
 
         let backgroundOpacity = CABasicAnimation(keyPath: "opacity")
-        backgroundOpacity.fromValue = 0.0
-        backgroundOpacity.toValue = 1.0
+        backgroundOpacity.fromValue = backgroundOpacity.fromValue
+        backgroundOpacity.toValue = backgroundOpacity.toValue
 
         backgroundView.layer?.add(backgroundOpacity, forKey: "opacity")
 
         CATransaction.commit()
     }
 
-    func setAlertAnchorPoint(anchorPoint: CGPoint) {
+    private func setAlertAnchorPoint(anchorPoint: CGPoint) {
         let initialNP = CGPoint(
             x: alertView.bounds.size.width * anchorPoint.x,
             y: alertView.bounds.size.height * anchorPoint.y
@@ -157,84 +231,6 @@ final class JSAlertController: NSViewController {
 
         alertView.layer!.position = position
         alertView.layer!.anchorPoint = anchorPoint
-    }
-
-    func dismiss(_ completion: @escaping () -> Void) {
-        animateOut {
-            completion()
-        }
-    }
-
-    private func animateOut(_ completion: @escaping () -> Void) {
-        CATransaction.setCompletionBlock(completion)
-        let layer = alertView.layer!
-        layer.removeAllAnimations()
-
-        CATransaction.begin()
-        alertView.layer?.transform = CATransform3DMakeScale(0.9, 0.9, 1)
-        alertView.layer?.opacity = 0.0
-        backgroundView.layer?.opacity = 0.0
-
-        let scaleAnimation = CABasicAnimation(keyPath: "transform")
-        scaleAnimation.fromValue = CATransform3DIdentity
-        scaleAnimation.toValue = CATransform3DMakeScale(0.9, 0.9, 1)
-
-        let alphaAnimation = CABasicAnimation(keyPath: "opacity")
-        alphaAnimation.fromValue = 1.0
-        alphaAnimation.toValue = 0.0
-
-        let group = CAAnimationGroup()
-        group.duration = 0.2
-        group.timingFunction = CAMediaTimingFunction(name: .easeIn)
-        group.animations = [scaleAnimation, alphaAnimation]
-
-        layer.add(group, forKey: "scaleAndAlpha")
-
-        let backgroundOpacity = CABasicAnimation(keyPath: "opacity")
-        backgroundOpacity.fromValue = 1.0
-        backgroundOpacity.toValue = 0.0
-
-        backgroundView.layer?.add(backgroundOpacity, forKey: "opacity")
-
-        CATransaction.commit()
-    }
-
-    private func presentData() {
-        okButton.title = viewModel.okButtonText
-        cancelButton.title = viewModel.cancelButtonText
-        titleText.stringValue = viewModel.titleText
-        messageText.string = viewModel.messageText
-
-        cancelButton.isHidden = viewModel.isCancelButtonHidden
-        messageText.sizeToFit()
-        scrollViewHeight.constant = messageText.textSize.height + 4
-
-        textField.isHidden = viewModel.isTextFieldHidden
-        blockingCheckbox.isHidden = viewModel.isBlockingCheckboxHidden
-        let scrollViewSpacing = viewModel.isTextFieldHidden ? verticalStackView.spacing : 4
-        verticalStackView.setCustomSpacing(scrollViewSpacing, after: scrollView)
-        textField.stringValue = viewModel.textFieldDefaultText
-        blockingCheckbox.title = viewModel.checkboxText
-    }
-
-    override func viewDidLayout() {
-        super.viewDidLayout()
-
-        if messageText.textSize.height <= scrollView.frame.height {
-            scrollView.verticalScrollElasticity = .none
-        } else {
-            scrollView.verticalScrollElasticity = .automatic
-        }
-    }
-
-    @IBAction func okAction(_ sender: NSButton) {
-        view.window?.endEditing(for: nil)
-        viewModel.confirm(text: textField.stringValue, shouldBlockAlerts: isBlockingCheckboxOn)
-    }
-
-    @IBAction func cancelAction(_ sender: NSButton) {
-        view.window?.endEditing(for: nil)
-        viewModel.cancel()
     }
 }
 
