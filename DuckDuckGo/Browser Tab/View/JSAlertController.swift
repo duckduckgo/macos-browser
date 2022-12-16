@@ -85,7 +85,10 @@ final class JSAlertController: NSViewController {
 
     override func viewDidAppear() {
         super.viewDidAppear()
-        // hide container view
+
+        if let okButtonCell = okButton.cell as? NSButtonCell {
+            view.window?.defaultButtonCell = okButtonCell
+        }
 
         alertView.alphaValue = 1.0
         backgroundView.alphaValue = 1.0
@@ -116,6 +119,10 @@ final class JSAlertController: NSViewController {
     @IBAction func cancelAction(_ sender: Any?) {
         view.window?.endEditing(for: nil)
         viewModel.cancel()
+    }
+
+    override func cancelOperation(_ sender: Any?) {
+        cancelAction(sender)
     }
 
     func dismiss(_ completion: @escaping () -> Void) {
