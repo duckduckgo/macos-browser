@@ -87,7 +87,7 @@ final class JSAlertViewModel {
     }
 }
 
-extension JSAlertQuery {
+fileprivate extension JSAlertQuery {
     var parameters: JSAlertParameters {
         switch self {
         case .alert(let request):
@@ -96,17 +96,6 @@ extension JSAlertQuery {
             return request.parameters
         case .textInput(let request):
             return request.parameters
-        }
-    }
-    
-    func cancel() {
-        switch self {
-        case .alert(let request):
-            return request.submit(.init(shouldBlockNext: false))
-        case .confirm(let request):
-            return request.submit(.init(completionArgument: false, shouldBlockNext: false))
-        case .textInput(let request):
-            return request.submit(.init(completionArgument: nil, shouldBlockNext: false))
         }
     }
 }

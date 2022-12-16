@@ -55,6 +55,17 @@ enum JSAlertQuery {
     case confirm(ConfirmDialogRequest)
     case textInput(TextInputDialogRequest)
     case alert(AlertDialogRequest)
+    
+    func cancel() {
+        switch self {
+        case .alert(let request):
+            return request.submit(.init(shouldBlockNext: false))
+        case .confirm(let request):
+            return request.submit(.init(completionArgument: false, shouldBlockNext: false))
+        case .textInput(let request):
+            return request.submit(.init(completionArgument: nil, shouldBlockNext: false))
+        }
+    }
 }
 
 extension Tab {
