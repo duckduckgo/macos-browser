@@ -78,7 +78,7 @@ jobs:
       run: sudo xcode-select -s /Applications/Xcode_14.1.app/Contents/Developer
 
     - name: Sync signing
-      run: fastlane sync_signing_dev
+      run: bundle exec fastlane sync_signing_dev
 
     - name: Build and test
       run: |
