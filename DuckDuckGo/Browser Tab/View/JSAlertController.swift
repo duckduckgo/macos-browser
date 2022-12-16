@@ -271,19 +271,19 @@ final class JSAlertViewModel {
     }
 
     var okButtonText: String {
-        "OK"
+        UserText.ok
     }
 
     var cancelButtonText: String {
-        "Cancel"
+        UserText.cancel
     }
 
     var checkboxText: String {
-        "Suppress additional alerts until you reload the page"
+        UserText.alertSuppressCheckboxTitle
     }
 
     var titleText: String {
-        "A message from \(query.parameters.domain):"
+        UserText.alertTitle(from: query.parameters.domain)
     }
 
     var messageText: String {
