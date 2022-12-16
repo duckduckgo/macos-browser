@@ -1,5 +1,5 @@
 //
-//  NSImage+NetworkProtection.swift
+//  Image+NetworkProtection.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -16,10 +16,10 @@
 //  limitations under the License.
 //
 
-import AppKit
+import SwiftUI
 
-extension NSImage {
-    convenience init?(_ networkProtectionAsset: NetworkProtectionAsset) {
-        self.init(named: networkProtectionAsset.rawValue)
+extension Image {
+    init(_ networkProtectionAsset: NetworkProtectionAsset) {
+        self.init(networkProtectionAsset.rawValue)
     }
 }

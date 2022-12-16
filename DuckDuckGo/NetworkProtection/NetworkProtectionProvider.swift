@@ -24,8 +24,18 @@ import NetworkProtection
 
 final class NetworkProtectionProvider {
 
-    typealias StatusChangeHandler = (NEVPNStatus) -> Void
+    typealias StatusChangeHandler = (ConnectionStatus) -> Void
     typealias ConfigChangeHandler = () -> Void
+
+    // MARK: - Connection Status
+
+    enum ConnectionStatus {
+        case disconnected
+        case disconnecting(connectedDate: Date, serverAddress: String)
+        case connected(connectedDate: Date, serverAddress: String)
+        case connecting
+        case unknown
+    }
 
     // MARK: - Errors & Logging
 
@@ -34,7 +44,7 @@ final class NetworkProtectionProvider {
     }
 
     enum StatusChangeError: Error {
-        case couldNotRetrieveStatusFromNotification
+        case couldNotRetrieveSessionFromNotification
     }
 
     /// The logger that this object will use for errors that are handled by this class.
@@ -81,7 +91,7 @@ final class NetworkProtectionProvider {
         get async {
             guard let tunnelManager = internalTunnelManager else {
                 let tunnelManager = await loadTunnelManager()
-                self.internalTunnelManager = tunnelManager
+                internalTunnelManager = tunnelManager
                 return tunnelManager
             }
 
@@ -97,7 +107,7 @@ final class NetworkProtectionProvider {
         guard let tunnelManager = await tunnelManager else {
             let tunnelManager = NETunnelProviderManager()
             try await setupAndSave(tunnelManager)
-            self.internalTunnelManager = tunnelManager
+            internalTunnelManager = tunnelManager
             return tunnelManager
         }
 
@@ -106,7 +116,7 @@ final class NetworkProtectionProvider {
     }
 
     private func setupAndSave(_ tunnelManager: NETunnelProviderManager) async throws {
-        try await self.setup(tunnelManager)
+        try await setup(tunnelManager)
         try await tunnelManager.saveToPreferences()
         try await tunnelManager.loadFromPreferences()
     }
@@ -126,6 +136,11 @@ final class NetworkProtectionProvider {
         self.notificationCenter = notificationCenter
 
         startObservingNotifications()
+
+        Task {
+            // Make sure the tunnel is loaded
+            _ = await tunnelManager
+        }
     }
 
     deinit {
@@ -145,7 +160,6 @@ final class NetworkProtectionProvider {
         }
 
         configChangeObserverToken = notificationCenter.addObserver(forName: .NEVPNConfigurationChange, object: nil, queue: nil) { [weak self] _ in
-
             guard let self = self else {
                 return
             }
@@ -161,17 +175,7 @@ final class NetworkProtectionProvider {
         }
 
         statusChangeObserverToken = notificationCenter.addObserver(forName: .NEVPNStatusDidChange, object: nil, queue: nil) { [weak self] notification in
-
-            guard let self = self else {
-                return
-            }
-
-            guard let status = (notification.object as? NETunnelProviderSession)?.status else {
-                self.logger.log(StatusChangeError.couldNotRetrieveStatusFromNotification)
-                return
-            }
-
-            self.onStatusChange?(status)
+            self?.handleStatusChangeNotification(notification)
         }
     }
 
@@ -196,6 +200,40 @@ final class NetworkProtectionProvider {
 
         notificationCenter.removeObserver(token)
         statusChangeObserverToken = nil
+    }
+
+    // MARK: - Notifications: Handling
+
+    private func handleStatusChangeNotification(_ notification: Notification) {
+        guard let session = (notification.object as? NETunnelProviderSession) else {
+            self.logger.log(StatusChangeError.couldNotRetrieveSessionFromNotification)
+            return
+        }
+
+        Task { [weak self] in
+            guard let self = self else {
+                return
+            }
+
+            do {
+                try await self.handleStatusChange(in: session)
+            } catch {
+                self.logger.log(error)
+            }
+        }
+    }
+
+    private func handleStatusChange(in session: NETunnelProviderSession) async throws {
+        /// Some situations can cause the connection status in the session's manager to be invalid.
+        /// This just means we need to reload the manager from preferences.  That will trigger another status change
+        /// notification that will provide a valid connection status.
+        guard session.manager.connection.status != .invalid else {
+            try await session.manager.loadFromPreferences()
+            return
+        }
+
+        let status = self.connectionStatus(from: session)
+        self.onStatusChange?(status)
     }
 
     // MARK: - Tunnel Configuration
@@ -293,5 +331,39 @@ final class NetworkProtectionProvider {
         default:
             break
         }
+    }
+
+    // MARK: - Connection Status
+
+    private func connectionStatus(from session: NETunnelProviderSession) -> ConnectionStatus {
+        let internalStatus = session.status
+        let status: ConnectionStatus
+
+        switch internalStatus {
+        case .connected:
+            // In theory when the connection has been established, the date should be set.  But in a worst-case
+            // scenario where for some reason the date is missing, we're going to just use Date() as the connection
+            // has just started and it's a decent aproximation.
+            let connectedDate = session.connectedDate ?? Date()
+            let serverAddress = session.manager.protocolConfiguration?.serverAddress ?? UserText.networkProtectionServerAddressUnknown
+
+            status = .connected(connectedDate: connectedDate, serverAddress: serverAddress)
+        case .connecting, .reasserting:
+            status = .connecting
+        case .disconnected, .invalid:
+            status = .disconnected
+        case .disconnecting:
+            // In theory when the connection has been established, the date should be set.  But in a worst-case
+            // scenario where for some reason the date is missing, we're going to just use Date() as the connection
+            // has just started and it's a decent aproximation.
+            let connectedDate = session.connectedDate ?? Date()
+            let serverAddress = session.manager.protocolConfiguration?.serverAddress ?? UserText.networkProtectionServerAddressUnknown
+
+            status = .disconnecting(connectedDate: connectedDate, serverAddress: serverAddress)
+        @unknown default:
+            status = .unknown
+        }
+
+        return status
     }
 }

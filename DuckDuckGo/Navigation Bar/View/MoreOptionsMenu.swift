@@ -20,6 +20,7 @@ import Cocoa
 import os.log
 import WebKit
 import BrowserServicesKit
+import SwiftUI
 
 protocol OptionsButtonMenuDelegate: AnyObject {
     
@@ -30,6 +31,7 @@ protocol OptionsButtonMenuDelegate: AnyObject {
     func optionsButtonMenuRequestedBookmarkImportInterface(_ menu: NSMenu)
     func optionsButtonMenuRequestedLoginsPopover(_ menu: NSMenu, selectedCategory: SecureVaultSorting.Category)
     func optionsButtonMenuRequestedOpenExternalPasswordManager(_ menu: NSMenu)
+    func optionsButtonMenuRequestedNetworkProtectionPopover(_ menu: NSMenu)
     func optionsButtonMenuRequestedDownloadsPopover(_ menu: NSMenu)
     func optionsButtonMenuRequestedPrint(_ menu: NSMenu)
 
@@ -87,9 +89,9 @@ final class MoreOptionsMenu: NSMenu {
             .withImage(NSImage(named: "OptionsButtonMenuEmail"))
             .withSubmenu(EmailOptionsButtonSubMenu(tabCollectionViewModel: tabCollectionViewModel, emailManager: emailManager))
 
-        addItem(withTitle: UserText.networkProtection, action: nil, keyEquivalent: "")
-            .withImage(.NetworkProtection.moreOptionsIcon)
-            .withSubmenu(NetworkProtectionMenu())
+        addItem(withTitle: UserText.networkProtection, action: #selector(showNetworkProtectionStatus(_:)), keyEquivalent: "")
+            .targetting(self)
+            .withImage(.init(.vpnIcon))
 
         addItem(NSMenuItem.separator())
 
@@ -99,6 +101,10 @@ final class MoreOptionsMenu: NSMenu {
             .targetting(self)
             .withImage(NSImage(named: "Preferences"))
         addItem(preferencesItem)
+    }
+
+    @objc func showNetworkProtectionStatus(_ sender: NSMenuItem) {
+        actionDelegate?.optionsButtonMenuRequestedNetworkProtectionPopover(self)
     }
 
     @objc func newTab(_ sender: NSMenuItem) {

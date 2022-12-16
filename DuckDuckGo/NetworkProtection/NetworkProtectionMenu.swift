@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import AppKit
 import Foundation
 
 protocol NetworkProtectionMenuProtocol: NSMenu {}
@@ -79,17 +80,7 @@ final class NetworkProtectionMenu: NSMenu, NetworkProtectionMenuProtocol {
 
     private func connectionMenuItem() async -> NSMenuItem {
         let menuItem: NSMenuItem
-        let isConnected: Bool
-
-        do {
-            isConnected = try await networkProtection.isConnected()
-        } catch {
-            // We'll log an error but we'll also react as if the tunnel was not connected, so that users
-            // can attempt to connect (and maybe who knows, make things work well again?), and not be completely
-            // stuck by a non-working UI.
-            logger.log(error)
-            isConnected = false
-        }
+        let isConnected  = await networkProtection.isConnected()
 
         if isConnected {
             menuItem = NSMenuItem()

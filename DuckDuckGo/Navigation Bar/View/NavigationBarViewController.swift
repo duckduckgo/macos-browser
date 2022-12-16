@@ -35,6 +35,7 @@ final class NavigationBarViewController: NSViewController {
     @IBOutlet weak var bookmarkListButton: MouseOverButton!
     @IBOutlet weak var passwordManagementButton: MouseOverButton!
     @IBOutlet weak var downloadsButton: MouseOverButton!
+    @IBOutlet weak var networkProtectionButton: MouseOverButton!
     @IBOutlet weak var navigationButtons: NSView!
     @IBOutlet weak var addressBarContainer: NSView!
     @IBOutlet weak var daxLogo: NSImageView!
@@ -61,6 +62,7 @@ final class NavigationBarViewController: NSViewController {
     var addressBarViewController: AddressBarViewController?
 
     private var tabCollectionViewModel: TabCollectionViewModel
+    private let networkProtectionButtonModel: NetworkProtectionNavBarButtonModel
 
     // swiftlint:disable weak_delegate
     private let goBackButtonMenuDelegate: NavigationButtonMenuDelegate
@@ -79,6 +81,7 @@ final class NavigationBarViewController: NSViewController {
     private var pinnedViewsNotificationCancellable: AnyCancellable?
     private var navigationButtonsCancellables = Set<AnyCancellable>()
     private var downloadsCancellables = Set<AnyCancellable>()
+    private var networkProtectionCancellable: AnyCancellable?
 
     required init?(coder: NSCoder) {
         fatalError("NavigationBarViewController: Bad initializer")
@@ -86,6 +89,8 @@ final class NavigationBarViewController: NSViewController {
 
     init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel) {
         self.tabCollectionViewModel = tabCollectionViewModel
+        self.networkProtectionButtonModel = NetworkProtectionNavBarButtonModel(popovers: popovers)
+
         goBackButtonMenuDelegate = NavigationButtonMenuDelegate(buttonType: .back, tabCollectionViewModel: tabCollectionViewModel)
         goForwardButtonMenuDelegate = NavigationButtonMenuDelegate(buttonType: .forward, tabCollectionViewModel: tabCollectionViewModel)
         super.init(coder: coder)
@@ -114,6 +119,9 @@ final class NavigationBarViewController: NSViewController {
         downloadsButton.sendAction(on: .leftMouseDown)
         
         optionsButton.toolTip = UserText.applicationMenuTooltip
+        networkProtectionButton.toolTip = UserText.networkProtectionButtonTooltip
+
+        setupNetworkProtectionButton()
         
         #if DEBUG || REVIEW
         addDebugNotificationListeners()
@@ -214,6 +222,10 @@ final class NavigationBarViewController: NSViewController {
 
     @IBAction func passwordManagementButtonAction(_ sender: NSButton) {
         popovers.passwordManagementButtonPressed(usingView: passwordManagementButton, withDelegate: self)
+    }
+
+    @IBAction func networkProtectionButtonAction(_ sender: NSButton) {
+        popovers.toggleNetworkProtectionPopover(usingView: networkProtectionButton, withDelegate: networkProtectionButtonModel)
     }
 
     @IBAction func downloadsButtonAction(_ sender: NSButton) {
@@ -648,6 +660,15 @@ extension NavigationBarViewController: NSMenuDelegate {
         LocalPinningManager.shared.togglePinning(for: .downloads)
     }
 
+    // MARK: - Network Protection
+
+    private func setupNetworkProtectionButton() {
+        networkProtectionCancellable = networkProtectionButtonModel.$showButton
+            .receive(on: RunLoop.main)
+            .sink { [weak self] show in
+                self?.networkProtectionButton.isHidden = !show
+        }
+    }
 }
 
 extension NavigationBarViewController: OptionsButtonMenuDelegate {
@@ -685,6 +706,11 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
                                                withDelegate: self)
     }
 
+    func optionsButtonMenuRequestedNetworkProtectionPopover(_ menu: NSMenu) {
+        popovers.showNetworkProtectionPopover(usingView: networkProtectionButton,
+                                              withDelegate: networkProtectionButtonModel)
+    }
+
     func optionsButtonMenuRequestedDownloadsPopover(_ menu: NSMenu) {
         toggleDownloadsPopover(keepButtonVisible: false)
     }
@@ -694,6 +720,8 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
     }
 
 }
+
+// MARK: - NSPopoverDelegate
 
 extension NavigationBarViewController: NSPopoverDelegate {
 

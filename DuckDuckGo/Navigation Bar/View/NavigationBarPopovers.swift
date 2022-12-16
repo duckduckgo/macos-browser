@@ -32,6 +32,7 @@ final class NavigationBarPopovers {
     private(set) var savePaymentMethodPopover: SavePaymentMethodPopover?
     private(set) var passwordManagementPopover: PasswordManagementPopover?
     private(set) var downloadsPopover: DownloadsPopover?
+    private(set) var networkProtectionPopover: NetworkProtectionPopover?
 
     var passwordManagementDomain: String? {
         didSet {
@@ -55,6 +56,11 @@ final class NavigationBarPopovers {
         passwordManagementPopover?.isShown ?? false
     }
 
+    @MainActor
+    var isNetworkProtectionPopoverShown: Bool {
+        networkProtectionPopover?.isShown ?? false
+    }
+
     var bookmarkListPopoverShown: Bool {
         bookmarkListPopover?.isShown ?? false
     }
@@ -72,6 +78,15 @@ final class NavigationBarPopovers {
             passwordManagementPopover?.close()
         } else {
             showPasswordManagementPopover(selectedCategory: nil, usingView: view, withDelegate: delegate)
+        }
+    }
+
+    func toggleNetworkProtectionPopover(usingView view: NSView, withDelegate delegate: NSPopoverDelegate) {
+        if let networkProtectionPopover = networkProtectionPopover,
+           networkProtectionPopover.isShown {
+            networkProtectionPopover.close()
+        } else {
+            showNetworkProtectionPopover(usingView: view, withDelegate: delegate)
         }
     }
 
@@ -225,7 +240,17 @@ final class NavigationBarPopovers {
 
     private func show(popover: NSPopover, usingView view: NSView, preferredEdge edge: NSRectEdge = .minY) {
         view.isHidden = false
+
         popover.show(relativeTo: view.bounds.insetFromLineOfDeath(), of: view, preferredEdge: edge)
     }
 
+    // MARK: - Network Protection
+
+    func showNetworkProtectionPopover(usingView view: NSView, withDelegate delegate: NSPopoverDelegate) {
+        let popover = NetworkProtectionPopover()
+        popover.delegate = delegate
+
+        networkProtectionPopover = popover
+        show(popover: popover, usingView: view, preferredEdge: .maxY)
+    }
 }

@@ -34,7 +34,7 @@ final class NetworkProtectionStatusBarMenu {
     init(menu: NetworkProtectionMenuProtocol = NetworkProtectionMenu(), statusItem: NSStatusItem? = nil) {
         self.statusItem = statusItem ?? NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         self.statusItem.menu = menu
-        self.statusItem.button?.image = .NetworkProtection.statusBarMenuIcon
+        self.statusItem.button?.image = .init(.vpnIcon)
         self.statusItem.isVisible = false
     }
 

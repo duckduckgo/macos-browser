@@ -1,5 +1,5 @@
 //
-//  NSImage+NetworkProtection.swift
+//  NetworkProtectionPopover.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -17,9 +17,28 @@
 //
 
 import AppKit
+import SwiftUI
 
-extension NSImage {
-    convenience init?(_ networkProtectionAsset: NetworkProtectionAsset) {
-        self.init(named: networkProtectionAsset.rawValue)
+final class NetworkProtectionPopover: NSPopover {
+
+    override init() {
+        super.init()
+
+        self.animates = false
+        self.behavior = .semitransient
+
+        setupContentController()
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    private func setupContentController() {
+        let model = NetworkProtectionStatusView.Model()
+        let view = NetworkProtectionStatusView(model: model)
+        let controller = NSHostingController(rootView: view)
+
+        contentViewController = controller
     }
 }
