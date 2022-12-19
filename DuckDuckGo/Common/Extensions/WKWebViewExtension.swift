@@ -128,11 +128,15 @@ extension WKWebView {
     }
     
     func stopAllMediaPlayback() {
-        guard self.responds(to: #selector(_stopAllMediaPlayback)) else {
-            assertionFailure("WKWebView does not respond to _stopAllMediaPlayback")
-            return
+        if #available(macOS 12.0, *) {
+            pauseAllMediaPlayback()
+        } else {
+            guard self.responds(to: #selector(_stopAllMediaPlayback)) else {
+                assertionFailure("WKWebView does not respond to _stopAllMediaPlayback")
+                return
+            }
+            self._stopAllMediaPlayback()
         }
-        self._stopAllMediaPlayback()
     }
     
     func setPermissions(_ permissions: [PermissionType], muted: Bool) {
