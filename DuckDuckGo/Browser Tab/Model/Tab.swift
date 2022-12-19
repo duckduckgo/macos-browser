@@ -26,6 +26,7 @@ import BrowserServicesKit
 import TrackerRadarKit
 import ContentBlocking
 import UserScript
+import Common
 import PrivacyDashboard
 
 protocol TabDelegate: ContentOverlayUserScriptDelegate {

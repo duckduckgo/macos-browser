@@ -20,6 +20,7 @@ import Cocoa
 import Combine
 import os.log
 import BrowserServicesKit
+import Persistence
 
 @NSApplicationMain
 final class AppDelegate: NSObject, NSApplicationDelegate {
