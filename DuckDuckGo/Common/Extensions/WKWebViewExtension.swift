@@ -120,11 +120,16 @@ extension WKWebView {
     }
 
     func stopMediaCapture() {
-        guard self.responds(to: #selector(_stopMediaCapture)) else {
-            assertionFailure("WKWebView does not respond to _stopMediaCapture")
-            return
+        if #available(macOS 12.0, *) {
+            setCameraCaptureState(.none)
+            setMicrophoneCaptureState(.none)
+        } else {
+            guard self.responds(to: #selector(_stopMediaCapture)) else {
+                assertionFailure("WKWebView does not respond to _stopMediaCapture")
+                return
+            }
+            self._stopMediaCapture()
         }
-        self._stopMediaCapture()
     }
     
     func stopAllMediaPlayback() {
