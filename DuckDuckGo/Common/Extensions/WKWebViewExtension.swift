@@ -212,9 +212,9 @@ extension WKWebView {
     }
     
     func printOperation(with printInfo: NSPrintInfo = .shared, for frame: Any?) -> NSPrintOperation? {
-        if let frame = frame,
-           self.responds(to: #selector(WKWebView._printOperation(with:forFrame:))) {
-            return self._printOperation(with: printInfo, forFrame: frame)
+        let printInfoWithFrame = NSSelectorFromString(Selector.printOperationWithPrintInfoForFrame)
+        if let frame = frame, responds(to: printInfoWithFrame) {
+            return self.perform(printInfoWithFrame, with: printInfo, with: frame)?.takeUnretainedValue() as? NSPrintOperation
         }
 
         if #available(macOS 11.0, *) {
@@ -231,15 +231,23 @@ extension WKWebView {
             
             return self.printOperation(with: printInfo)
         }
-
+#if APPSTORE
+        return nil // never gets here
+#else
         guard self.responds(to: #selector(WKWebView._printOperation(with:))) else { return nil }
 
         return self._printOperation(with: printInfo)
+#endif
     }
 
     var fullScreenPlaceholderView: NSView? {
-        guard self.responds(to: #selector(WKWebView._fullScreenPlaceholderView)) else { return nil }
-        return self._fullScreenPlaceholderView()
+        guard self.responds(to: NSSelectorFromString(Selector.fullScreenPlaceholderView)) else { return nil }
+        return self.value(forKey: Selector.fullScreenPlaceholderView) as? NSView
+    }
+
+    private enum Selector {
+        static let fullScreenPlaceholderView = "_fullScreenPlaceholderView"
+        static let printOperationWithPrintInfoForFrame = "_printOperationWithPrintInfo:forFrame:"
     }
 
 }
