@@ -55,6 +55,7 @@ final class DefaultConfigurationDownloader: ConfigurationDownloading {
         case urlSessionError(error: Swift.Error)
         case noEtagInResponse
         case invalidResponse
+        case invalidData
         case savingData
         case savingEtag
 
@@ -68,15 +69,18 @@ final class DefaultConfigurationDownloader: ConfigurationDownloading {
     }
 
     let storage: ConfigurationStoring
+    let validator: ConfigurationValidating
     let dataTaskProvider: DataTaskProviding
 
     private var cancellables = Set<AnyCancellable>()
     private let deliveryQueue: DispatchQueue
 
     init(storage: ConfigurationStoring = DefaultConfigurationStorage.shared,
+         validator: ConfigurationValidating = ConfigurationValidator(),
          dataTaskProvider: DataTaskProviding = SharedURLSessionDataTaskProvider(),
          deliveryQueue: DispatchQueue) {
         self.storage = storage
+        self.validator = validator
         self.dataTaskProvider = dataTaskProvider
         self.deliveryQueue = deliveryQueue
     }
@@ -111,6 +115,7 @@ final class DefaultConfigurationDownloader: ConfigurationDownloading {
                         throw Error.noEtagInResponse
                     }
 
+                    try self.validator.validate(result.data, for: config)
                     try self.storage.saveData(result.data, for: config)
                     try self.storage.saveEtag(etag, for: config)
 
