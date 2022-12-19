@@ -31,10 +31,10 @@ For _fastlane_ installation instructions, see [Installing _fastlane_](https://do
 
 
 
-### mac release
+### mac release_testflight
 
 ```sh
-[bundle exec] fastlane mac release
+[bundle exec] fastlane mac release_testflight
 ```
 
 

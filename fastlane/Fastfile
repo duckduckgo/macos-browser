@@ -42,13 +42,17 @@ platform :mac do
     )
   end
 
-  lane :release do
+  lane :release_testflight do
     sync_signing
 
-    gym(
+    build_app(
       export_method: "app-store",
       scheme: "DuckDuckGo Privacy Browser App Store",
       export_options: "scripts/assets/AppStoreExportOptions.plist"
+    )
+
+    upload_to_testflight(
+      api_key: get_api_key
     )
 
     # deliver(
