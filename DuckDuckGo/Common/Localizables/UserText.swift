@@ -674,7 +674,6 @@ struct UserText {
     static let passwordManagerLockedStatus = NSLocalizedString("autofill.manager.status.locked", value: "Locked", comment: "Locked status for password manager")
     static let passwordManagerUnlockedStatus = NSLocalizedString("autofill.manager.status.unlocked", value: "Unlocked", comment: "Unlocked status for password manager")
     
-    static let alertSuppressCheckboxTitle = NSLocalizedString("alert.checkbox", value: "Suppress additional alerts until you reload the page", comment: "Checkbox for suppressing additional JS alerts")
     static func alertTitle(from domain: String) -> String {
         let localized = NSLocalizedString("alert.title", value: "A message from %@", comment: "Title formatted with presenting domain")
         return String(format: localized, domain)

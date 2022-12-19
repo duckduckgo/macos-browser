@@ -35,15 +35,10 @@ final class JSAlertController: NSViewController {
     @IBOutlet var scrollView: NSScrollView!
     @IBOutlet var messageText: NSTextView!
     @IBOutlet var textField: NSTextField!
-    @IBOutlet var blockingCheckbox: NSButton!
     @IBOutlet var okButton: NSButton!
     @IBOutlet var cancelButton: NSButton!
 
     private let viewModel: JSAlertViewModel
-
-    private var isBlockingCheckboxOn: Bool {
-        return blockingCheckbox.state == .on
-    }
 
     static func create(_ query: JSAlertQuery) -> JSAlertController {
         let instance = NSStoryboard(name: Constants.storyboardName, bundle: nil).instantiateInitialController { coder in
@@ -73,8 +68,6 @@ final class JSAlertController: NSViewController {
         print("Scroll text inset: \(messageText.textContainerInset)")
         messageText.textContainer?.lineFragmentPadding = 0.0
         messageText.isEditable = false
-
-        verticalStackView.setCustomSpacing(14.0, after: blockingCheckbox)
     }
 
     override func viewWillAppear() {
@@ -112,7 +105,7 @@ final class JSAlertController: NSViewController {
 
     @IBAction func okAction(_ sender: NSButton) {
         view.window?.endEditing(for: nil)
-        viewModel.confirm(text: textField.stringValue, shouldBlockAlerts: isBlockingCheckboxOn)
+        viewModel.confirm(text: textField.stringValue)
     }
 
     @IBAction func cancelAction(_ sender: Any?) {
@@ -141,11 +134,9 @@ final class JSAlertController: NSViewController {
         scrollViewHeight.constant = messageText.textSize.height + 4
 
         textField.isHidden = viewModel.isTextFieldHidden
-        blockingCheckbox.isHidden = viewModel.isBlockingCheckboxHidden
         let scrollViewSpacing = viewModel.isTextFieldHidden ? verticalStackView.spacing : 4
         verticalStackView.setCustomSpacing(scrollViewSpacing, after: scrollView)
         textField.stringValue = viewModel.textFieldDefaultText
-        blockingCheckbox.title = viewModel.checkboxText
     }
 
     private func animateIn(_ completion: @escaping () -> Void) {

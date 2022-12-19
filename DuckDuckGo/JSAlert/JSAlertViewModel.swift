@@ -43,20 +43,12 @@ final class JSAlertViewModel {
         }
     }
 
-    var isBlockingCheckboxHidden: Bool {
-        return !query.parameters.hasDomainShownAlert
-    }
-
     var okButtonText: String {
         UserText.ok
     }
 
     var cancelButtonText: String {
         UserText.cancel
-    }
-
-    var checkboxText: String {
-        UserText.alertSuppressCheckboxTitle
     }
 
     var titleText: String {
@@ -71,14 +63,14 @@ final class JSAlertViewModel {
         query.parameters.defaultInputText ?? ""
     }
 
-    func confirm(text: String, shouldBlockAlerts: Bool) {
+    func confirm(text: String) {
         switch query {
         case .alert(let request):
-            request.submit(.init(shouldBlockNext: shouldBlockAlerts))
+            request.submit()
         case .confirm(let request):
-            request.submit(.init(completionArgument: true, shouldBlockNext: shouldBlockAlerts))
+            request.submit(true)
         case .textInput(let request):
-            request.submit(.init(completionArgument: text, shouldBlockNext: shouldBlockAlerts))
+            request.submit(text)
         }
     }
 

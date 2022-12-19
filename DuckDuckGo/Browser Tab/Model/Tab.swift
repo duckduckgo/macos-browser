@@ -394,7 +394,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                 historyCoordinating.commitChanges(url: oldUrl)
             }
             error = nil
-            alertHandlingState = .notShown
             userInteractionDialog = nil
             Task {
                 await reloadIfNeeded(shouldLoadInBackground: true)
@@ -595,7 +594,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     }
 
     func reload() {
-        alertHandlingState = .notShown
         userInteractionDialog = nil
         currentDownload = nil
         if let error = error, let failingUrl = error.failingUrl {
@@ -997,21 +995,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                                 allowlisted: isAllowlisted,
                                 denylisted: false)
     }
-
-    // MARK: - Alerts
-
-    enum AlertHandlingState {
-        case notShown, shown, blocked
-
-        var hasShown: Bool {
-            switch self {
-            case .notShown: return false
-            case .shown, .blocked: return true
-            }
-        }
-    }
-
-    var alertHandlingState = AlertHandlingState.notShown
 }
 
 extension Tab: UserContentControllerDelegate {

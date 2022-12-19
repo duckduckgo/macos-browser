@@ -25,29 +25,16 @@ struct SavePanelParameters {
 }
 
 struct JSAlertParameters {
-    let hasDomainShownAlert: Bool
     let domain: String
     let prompt: String
     let defaultInputText: String?
 }
 
-struct JSAlertResult<JSCallbackArgument> {
-    let completionArgument: JSCallbackArgument
-    let shouldBlockNext: Bool
-}
-
-extension JSAlertResult where JSCallbackArgument == Void {
-    init(shouldBlockNext: Bool) {
-        self.shouldBlockNext = shouldBlockNext
-        completionArgument = ()
-    }
-}
-
 typealias OpenPanelDialogRequest = UserDialogRequest<WKOpenPanelParameters, [URL]?>
 typealias SavePanelDialogRequest = UserDialogRequest<SavePanelParameters, (url: URL, fileType: UTType?)?>
-typealias ConfirmDialogRequest = UserDialogRequest<JSAlertParameters, JSAlertResult<Bool>>
-typealias TextInputDialogRequest = UserDialogRequest<JSAlertParameters, JSAlertResult<String?>>
-typealias AlertDialogRequest = UserDialogRequest<JSAlertParameters, JSAlertResult<Void>>
+typealias ConfirmDialogRequest = UserDialogRequest<JSAlertParameters, Bool>
+typealias TextInputDialogRequest = UserDialogRequest<JSAlertParameters, String?>
+typealias AlertDialogRequest = UserDialogRequest<JSAlertParameters, Void>
 typealias BasicAuthDialogRequest = UserDialogRequest<URLProtectionSpace, (URLSession.AuthChallengeDisposition, URLCredential?)>
 typealias PrintDialogRequest = UserDialogRequest<NSPrintOperation, Bool>
 
@@ -59,11 +46,11 @@ enum JSAlertQuery {
     func cancel() {
         switch self {
         case .alert(let request):
-            return request.submit(.init(shouldBlockNext: false))
+            return request.submit()
         case .confirm(let request):
-            return request.submit(.init(completionArgument: false, shouldBlockNext: false))
+            return request.submit(false)
         case .textInput(let request):
-            return request.submit(.init(completionArgument: nil, shouldBlockNext: false))
+            return request.submit(nil)
         }
     }
 }
