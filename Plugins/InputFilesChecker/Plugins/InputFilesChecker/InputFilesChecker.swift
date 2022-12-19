@@ -25,7 +25,10 @@ let extraInputFiles: [TargetName: Set<InputFile>] = [
         .init("BWEncryption.m", .source),
         .init("BWEncryptionOutput.m", .source),
         .init("BWManager.swift", .source),
-        .init("UpdateController.swift", .source)
+        .init("UpdateController.swift", .source),
+        .init("LegacyWebKitDownloadDelegate.swift", .source),
+        .init("WKProcessPool+DownloadDelegate.swift", .source),
+        .init("_WKDownload+WebKitDownload.swift", .source)
     ],
 
     "Unit Tests": [
