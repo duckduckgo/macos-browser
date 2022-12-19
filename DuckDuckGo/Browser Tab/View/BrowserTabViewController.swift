@@ -456,18 +456,13 @@ final class BrowserTabViewController: NSViewController {
 
     // MARK: - Alerts
 
-    private var jsAlertController: JSAlertController?
-
     private func showAlert(with query: JSAlertQuery) -> AnyCancellable {
-        jsAlertController = JSAlertController.create(query)
-        addAndLayoutChild(self.jsAlertController!)
+        let jsAlertController = JSAlertController.create(query)
+        addAndLayoutChild(jsAlertController)
 
-        return AnyCancellable { [jsAlertController = self.jsAlertController!, weak self] in
-            jsAlertController.dismiss { [jsAlertController = jsAlertController, weak self] in
+        return AnyCancellable {
+            jsAlertController.dismiss {
                 jsAlertController.removeCompletely()
-                if self?.jsAlertController === jsAlertController {
-                    self?.jsAlertController = nil
-                }
             }
         }
     }
