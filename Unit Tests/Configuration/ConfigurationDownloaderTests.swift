@@ -33,13 +33,42 @@ final class ConfigurationDownloaderTests: XCTestCase {
         }
     }
 
+    func test_when_validate_data_fails_then_failure_returned_and_no_etag_stored() {
+        let response = HTTPURLResponse.success
+        let validationMock = MockValidation()
+        validationMock.throwError = true
+        let storageMock = MockStorage()
+
+        let networkingMock = MockNetworking(result: (Self.resultData, response))
+        let downloader = DefaultConfigurationDownloader(storage: storageMock, validator: validationMock, dataTaskProvider: networkingMock, deliveryQueue: DispatchQueue.main)
+
+        var completionResult: Subscribers.Completion<Error>?
+        downloader.download(.trackerRadar, embeddedEtag: nil).sink { completion in
+            completionResult = completion
+        } receiveValue: { _ in
+            XCTFail("expected value")
+        }.store(in: &cancellables)
+
+        XCTAssertNotNil(completionResult)
+        if case .failure = completionResult! {
+            // we good
+        } else {
+            XCTFail("completion was not expected failure")
+        }
+
+        // Data may have been stored by this point, nothing we can do about that
+        XCTAssertNil(storageMock.etag)
+        XCTAssertNil(storageMock.etagConfig)
+    }
+
     func test_when_store_etag_fails_then_failure_returned_and_no_etag_stored() {
         let response = HTTPURLResponse.success
+        let validationMock = MockValidation()
         let storageMock = MockStorage()
         storageMock.errorOnStoreEtag = true
 
         let networkingMock = MockNetworking(result: (Self.resultData, response))
-        let downloader = DefaultConfigurationDownloader(storage: storageMock, dataTaskProvider: networkingMock, deliveryQueue: DispatchQueue.main)
+        let downloader = DefaultConfigurationDownloader(storage: storageMock, validator: validationMock, dataTaskProvider: networkingMock, deliveryQueue: DispatchQueue.main)
 
         var completionResult: Subscribers.Completion<Error>?
         downloader.download(.bloomFilterBinary, embeddedEtag: nil).sink { completion in
@@ -62,11 +91,12 @@ final class ConfigurationDownloaderTests: XCTestCase {
 
     func test_when_store_data_fails_then_failure_returned_and_no_data_or_etag_stored() {
         let response = HTTPURLResponse.success
+        let validationMock = MockValidation()
         let storageMock = MockStorage()
         storageMock.errorOnStoreData = true
 
         let networkingMock = MockNetworking(result: (Self.resultData, response))
-        let downloader = DefaultConfigurationDownloader(storage: storageMock, dataTaskProvider: networkingMock, deliveryQueue: DispatchQueue.main)
+        let downloader = DefaultConfigurationDownloader(storage: storageMock, validator: validationMock, dataTaskProvider: networkingMock, deliveryQueue: DispatchQueue.main)
 
         var completionResult: Subscribers.Completion<Error>?
         downloader.download(.bloomFilterBinary, embeddedEtag: nil).sink { completion in
@@ -90,9 +120,10 @@ final class ConfigurationDownloaderTests: XCTestCase {
 
     func test_when_response_is_success_and_no_etag_then_error_returned() {
         let response = HTTPURLResponse.successNoEtag
+        let validationMock = MockValidation()
         let storageMock = MockStorage()
         let networkingMock = MockNetworking(result: (Self.resultData, response))
-        let downloader = DefaultConfigurationDownloader(storage: storageMock, dataTaskProvider: networkingMock, deliveryQueue: DispatchQueue.main)
+        let downloader = DefaultConfigurationDownloader(storage: storageMock, validator: validationMock, dataTaskProvider: networkingMock, deliveryQueue: DispatchQueue.main)
 
         var completionResult: Subscribers.Completion<Error>?
         downloader.download(.bloomFilterBinary, embeddedEtag: nil).sink { completion in
@@ -116,9 +147,10 @@ final class ConfigurationDownloaderTests: XCTestCase {
 
     func test_when_response_is_error_then_error_returned() {
         let response = HTTPURLResponse.internalServerError
+        let validationMock = MockValidation()
         let storageMock = MockStorage()
         let networkingMock = MockNetworking(result: (Self.resultData, response))
-        let downloader = DefaultConfigurationDownloader(storage: storageMock, dataTaskProvider: networkingMock, deliveryQueue: DispatchQueue.main)
+        let downloader = DefaultConfigurationDownloader(storage: storageMock, validator: validationMock, dataTaskProvider: networkingMock, deliveryQueue: DispatchQueue.main)
 
         var completionResult: Subscribers.Completion<Error>?
         downloader.download(.bloomFilterBinary, embeddedEtag: nil).sink { completion in
@@ -142,9 +174,10 @@ final class ConfigurationDownloaderTests: XCTestCase {
 
     func test_when_response_is_not_modified_and_valid_etag_then_nil_meta_returned_and_no_data_stored() {
         let response = HTTPURLResponse.notModified
+        let validationMock = MockValidation()
         let storageMock = MockStorage()
         let networkingMock = MockNetworking(result: (Self.resultData, response))
-        let downloader = DefaultConfigurationDownloader(storage: storageMock, dataTaskProvider: networkingMock, deliveryQueue: DispatchQueue.main)
+        let downloader = DefaultConfigurationDownloader(storage: storageMock, validator: validationMock, dataTaskProvider: networkingMock, deliveryQueue: DispatchQueue.main)
         var meta: ConfigurationDownloadMeta?
         downloader.download(.bloomFilterBinary, embeddedEtag: nil).sink { completion in
             if case .failure = completion {
@@ -166,12 +199,13 @@ final class ConfigurationDownloaderTests: XCTestCase {
         let requestedEtag = UUID().uuidString
 
         let response = HTTPURLResponse.success
+        let validationMock = MockValidation()
         let storageMock = MockStorage()
         storageMock.data = Data()
         storageMock.etag = requestedEtag
 
         let networkingMock = MockNetworking(result: (Self.resultData, response))
-        let downloader = DefaultConfigurationDownloader(storage: storageMock, dataTaskProvider: networkingMock, deliveryQueue: DispatchQueue.main)
+        let downloader = DefaultConfigurationDownloader(storage: storageMock, validator: validationMock, dataTaskProvider: networkingMock, deliveryQueue: DispatchQueue.main)
         _ = downloader.download(.bloomFilterSpec, embeddedEtag: nil)
 
         XCTAssertEqual(requestedEtag, networkingMock.request?.value(forHTTPHeaderField: HTTPURLResponse.ifNoneMatchHeader))
@@ -180,11 +214,12 @@ final class ConfigurationDownloaderTests: XCTestCase {
     func test_when_no_etag_stored_then_no_etag_added_to_request() {
 
         let response = HTTPURLResponse.success
+        let validationMock = MockValidation()
         let storageMock = MockStorage()
         storageMock.data = Data()
 
         let networkingMock = MockNetworking(result: (Self.resultData, response))
-        let downloader = DefaultConfigurationDownloader(storage: storageMock, dataTaskProvider: networkingMock, deliveryQueue: DispatchQueue.main)
+        let downloader = DefaultConfigurationDownloader(storage: storageMock, validator: validationMock, dataTaskProvider: networkingMock, deliveryQueue: DispatchQueue.main)
         _ = downloader.download(.bloomFilterSpec, embeddedEtag: nil)
 
         XCTAssertNil(networkingMock.request?.value(forHTTPHeaderField: HTTPURLResponse.ifNoneMatchHeader))
@@ -193,11 +228,12 @@ final class ConfigurationDownloaderTests: XCTestCase {
     func test_when_no_data_stored_then_no_etag_added_to_request() {
 
         let response = HTTPURLResponse.success
+        let validationMock = MockValidation()
         let storageMock = MockStorage()
         storageMock.etag = ""
 
         let networkingMock = MockNetworking(result: (Self.resultData, response))
-        let downloader = DefaultConfigurationDownloader(storage: storageMock, dataTaskProvider: networkingMock, deliveryQueue: DispatchQueue.main)
+        let downloader = DefaultConfigurationDownloader(storage: storageMock, validator: validationMock, dataTaskProvider: networkingMock, deliveryQueue: DispatchQueue.main)
         _ = downloader.download(.bloomFilterSpec, embeddedEtag: nil)
 
         XCTAssertNil(networkingMock.request?.value(forHTTPHeaderField: HTTPURLResponse.ifNoneMatchHeader))
@@ -208,12 +244,13 @@ final class ConfigurationDownloaderTests: XCTestCase {
         let externalEtag = UUID().uuidString
 
         let response = HTTPURLResponse.success
+        let validationMock = MockValidation()
         let storageMock = MockStorage()
         storageMock.data = Data()
         storageMock.etag = externalEtag
 
         let networkingMock = MockNetworking(result: (Self.resultData, response))
-        let downloader = DefaultConfigurationDownloader(storage: storageMock, dataTaskProvider: networkingMock, deliveryQueue: DispatchQueue.main)
+        let downloader = DefaultConfigurationDownloader(storage: storageMock, validator: validationMock, dataTaskProvider: networkingMock, deliveryQueue: DispatchQueue.main)
         _ = downloader.download(.bloomFilterSpec, embeddedEtag: embeddedEtag)
 
         XCTAssertEqual(externalEtag, networkingMock.request?.value(forHTTPHeaderField: HTTPURLResponse.ifNoneMatchHeader))
@@ -223,6 +260,7 @@ final class ConfigurationDownloaderTests: XCTestCase {
         let embeddedEtag = UUID().uuidString
 
         let response = HTTPURLResponse.success
+        let validationMock = MockValidation()
         let storageMock = MockStorage()
         let networkingMock = MockNetworking(result: (Self.resultData, response))
         let downloader = DefaultConfigurationDownloader(storage: storageMock, dataTaskProvider: networkingMock, deliveryQueue: DispatchQueue.main)
@@ -236,9 +274,10 @@ final class ConfigurationDownloaderTests: XCTestCase {
         for config in ConfigurationLocation.allCases {
 
             let response = HTTPURLResponse.success
+            let validationMock = MockValidation()
             let storageMock = MockStorage()
             let networkingMock = MockNetworking(result: (Self.resultData, response))
-            let downloader = DefaultConfigurationDownloader(storage: storageMock, dataTaskProvider: networkingMock, deliveryQueue: DispatchQueue.main)
+            let downloader = DefaultConfigurationDownloader(storage: storageMock, validator: validationMock, dataTaskProvider: networkingMock, deliveryQueue: DispatchQueue.main)
             var meta: ConfigurationDownloadMeta?
             downloader.download(config, embeddedEtag: nil).sink { completion in
                 if case .failure = completion {
@@ -280,6 +319,17 @@ final class ConfigurationDownloaderTests: XCTestCase {
             return publisher.eraseToAnyPublisher()
         }
 
+    }
+
+    class MockValidation: ConfigurationValidating {
+
+        var throwError = false
+
+        func validate(_ data: Data, for: ConfigurationLocation) throws {
+            if throwError {
+                throw DefaultConfigurationDownloader.Error.invalidPayload
+            }
+        }
     }
 
     class MockStorage: ConfigurationStoring {

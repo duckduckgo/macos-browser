@@ -37,7 +37,7 @@ struct ConfigurationValidator: ConfigurationValidating {
                 break
             }
         } catch {
-            throw DefaultConfigurationDownloader.Error.invalidData
+            throw DefaultConfigurationDownloader.Error.invalidPayload
         }
     }
 

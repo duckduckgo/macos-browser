@@ -55,7 +55,7 @@ final class DefaultConfigurationDownloader: ConfigurationDownloading {
         case urlSessionError(error: Swift.Error)
         case noEtagInResponse
         case invalidResponse
-        case invalidData
+        case invalidPayload
         case savingData
         case savingEtag
 
