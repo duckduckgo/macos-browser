@@ -195,6 +195,15 @@ extension PrivacyDashboardViewController: PrivacyDashboardControllerDelegate {
         }
         tabCollection.appendNewTab(with: .url(url), selected: true)
     }
+
+    func privacyDashboardController(_ privacyDashboardController: PrivacyDashboardController, didRequestOpenSettings target: String) {
+        guard let tabCollection = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.tabCollectionViewModel
+        else {
+            assertionFailure("could not access shared tabCollectionViewModel")
+            return
+        }
+        tabCollection.appendNewTab(with: .preferences(pane: .privacy), selected: true)
+    }
     
     func privacyDashboardController(_ privacyDashboardController: PrivacyDashboardController, didSetHeight height: Int) {
         currentContentHeight = height
