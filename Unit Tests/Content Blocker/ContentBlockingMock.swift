@@ -47,7 +47,7 @@ final class ContentBlockingMock: NSObject, ContentBlockingProtocol, AdClickAttri
     var adClickAttributionRulesProvider: AdClickAttributionRulesProviding = MockAttributionRulesProvider()
 
     var attributionEvents: EventMapping<AdClickAttributionEvents>?
-    var attributionDebugEvents: BrowserServicesKit.EventMapping<BrowserServicesKit.AdClickAttributionDebugEvents>?
+    var attributionDebugEvents: EventMapping<BrowserServicesKit.AdClickAttributionDebugEvents>?
 
 }
 
