@@ -74,16 +74,16 @@ test('hovering overlay itself', async ({ page }) => {
 
   // 3. Hover the overlay itself
   await IconOverlayPage.hoverOverlay(page).hover();
-  await expect(IconOverlayPage.hoverOverlayLink(page)).toHaveCSS('width', '80px');
+  await expect(IconOverlayPage.hoverOverlay(page)).toHaveCSS('width', '117px');
 
   // 4. Hover the thumbnail again, overlaylink to be hidden
   await IconOverlayPage.thumbnail(page, 'THUMBNAILS', 1).hover();
-  await expect(IconOverlayPage.hoverOverlayLink(page)).toHaveCSS('width', '0px');
+  await expect(IconOverlayPage.hoverOverlay(page)).toHaveCSS('width', '37px');
 
   // 5. Hovering the overlay in the playlist should NOT show the overlay link
   await IconOverlayPage.thumbnail(page, 'PLAYLIST', 1).hover();
   await expect(IconOverlayPage.hoverOverlay(page)).toBeVisible();
   await IconOverlayPage.hoverOverlay(page).hover();
-  await expect(IconOverlayPage.hoverOverlayLink(page)).toHaveCSS('width', '0px');
+  await expect(IconOverlayPage.hoverOverlay(page)).toHaveCSS('width', '37px');
 
 });
