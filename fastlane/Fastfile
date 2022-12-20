@@ -23,10 +23,13 @@ platform :mac do
   #################################################
   # Public lanes
   #################################################
-  lane :sync_signing do
+  lane :sync_signing do |options|
     sync_code_signing(
       type: "appstore",
-      api_key: get_api_key
+      api_key: get_api_key,
+      keychain_name: options[:keychain_name],
+      keychain_password: options[:keychain_password],
+      readonly: is_ci
     )
   end
 
@@ -38,7 +41,8 @@ platform :mac do
       api_key: get_api_key,
       generate_apple_certs: true,
       keychain_name: options[:keychain_name],
-      keychain_password: options[:keychain_password]
+      keychain_password: options[:keychain_password],
+      readonly: is_ci
     )
   end
 
