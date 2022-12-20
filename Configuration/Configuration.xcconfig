@@ -13,4 +13,5 @@
 //  limitations under the License.
 //
 
-#include? "Version.xcconfig"
+#include "Version.xcconfig"
+#include "ModuleName.xcconfig"

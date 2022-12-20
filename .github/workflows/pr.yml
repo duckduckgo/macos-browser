@@ -56,6 +56,10 @@ jobs:
             flavor: Non-Sandbox
           - scheme: DuckDuckGo Privacy Browser App Store
             flavor: Sandbox
+          - config_override: MODULE_NAME_APP_STORE_OVERRIDE
+            flavor: Non-Sandbox
+          - config_override: MODULE_NAME_OVERRIDE
+            flavor: Sandbox
 
     runs-on: macos-12
     timeout-minutes: 30
@@ -78,7 +82,7 @@ jobs:
 
     - name: Build and test
       run: |
-        patch -p1 < "scripts/assets/${{ matrix.flavor }}.patch"
+        echo "${{ matrix.config_override }}=Ignored" > Configuration/ModuleNameOverride.xcconfig
         set -o pipefail && xcodebuild test \
           -scheme "${{ matrix.scheme }}" \
           -configuration "CI" \

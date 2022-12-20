@@ -1845,6 +1845,9 @@
 		378205FA283C277800D1D4AA /* MainMenuTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMenuTests.swift; sourceTree = "<group>"; };
 		3783F92229432E1800BCA897 /* WebViewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewTests.swift; sourceTree = "<group>"; };
 		379DE4BC27EA31AC002CC3DE /* PreferencesAutofillView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesAutofillView.swift; sourceTree = "<group>"; };
+		37A06C2E2951EDEF008A7F83 /* Version.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Version.xcconfig; sourceTree = "<group>"; };
+		37A06C2F2951EDEF008A7F83 /* Configuration.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Configuration.xcconfig; sourceTree = "<group>"; };
+		37A06C302951F1A2008A7F83 /* ModuleName.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ModuleName.xcconfig; sourceTree = "<group>"; };
 		37A4CEB9282E992F00D75B89 /* StartupPreferences.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StartupPreferences.swift; sourceTree = "<group>"; };
 		37A803DA27FD69D300052F4C /* Data Import Resources */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "Data Import Resources"; sourceTree = "<group>"; };
 		37AFCE8027DA2CA600471A10 /* PreferencesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesViewController.swift; sourceTree = "<group>"; };
@@ -2174,7 +2177,6 @@
 		85B7184927677C2D00B4277F /* Onboarding.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Onboarding.storyboard; sourceTree = "<group>"; };
 		85B7184B27677C6500B4277F /* OnboardingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingViewController.swift; sourceTree = "<group>"; };
 		85B7184D27677CBB00B4277F /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
-		85B8757E28B903D900D39E04 /* Configuration.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Configuration.xcconfig; path = Configuration/Configuration.xcconfig; sourceTree = "<group>"; };
 		85C48CCB278D808F00D3263E /* NSAttributedStringExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSAttributedStringExtension.swift; sourceTree = "<group>"; };
 		85C48CD027908C1000D3263E /* BrowserImportMoreInfoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserImportMoreInfoViewController.swift; sourceTree = "<group>"; };
 		85C5991A27D10CF000E605B2 /* FireAnimationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FireAnimationView.swift; sourceTree = "<group>"; };
@@ -2938,6 +2940,16 @@
 				378205FA283C277800D1D4AA /* MainMenuTests.swift */,
 			);
 			path = Menus;
+			sourceTree = "<group>";
+		};
+		37A06C2D2951EDEF008A7F83 /* Configuration */ = {
+			isa = PBXGroup;
+			children = (
+				37A06C2F2951EDEF008A7F83 /* Configuration.xcconfig */,
+				37A06C302951F1A2008A7F83 /* ModuleName.xcconfig */,
+				37A06C2E2951EDEF008A7F83 /* Version.xcconfig */,
+			);
+			path = Configuration;
 			sourceTree = "<group>";
 		};
 		37BF3F12286D8A4B00BD9014 /* Pinned Tabs */ = {
@@ -3982,7 +3994,7 @@
 			isa = PBXGroup;
 			children = (
 				37D0CFAE294639DC00416B92 /* Packages */,
-				85B8757E28B903D900D39E04 /* Configuration.xcconfig */,
+				37A06C2D2951EDEF008A7F83 /* Configuration */,
 				AA68C3D62490F821001B8783 /* README.md */,
 				AA585D80248FD31100E9A3E2 /* DuckDuckGo */,
 				AA585D93248FD31400E9A3E2 /* Unit Tests */,
@@ -7539,7 +7551,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 12.3;
 				MARKETING_VERSION = "$(MARKETING_VERSION)";
 				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.mobile.ios.debug;
-				PRODUCT_MODULE_NAME = DuckDuckGo_Privacy_Browser;
+				PRODUCT_MODULE_NAME = "$(MODULE_NAME_APP_STORE)";
 				PRODUCT_NAME = "DuckDuckGo App Store";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "match Development com.duckduckgo.mobile.ios.* macos";
@@ -7579,7 +7591,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 12.3;
 				MARKETING_VERSION = "$(MARKETING_VERSION)";
 				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.mobile.ios.debug;
-				PRODUCT_MODULE_NAME = DuckDuckGo_Privacy_Browser;
+				PRODUCT_MODULE_NAME = "$(MODULE_NAME_APP_STORE)";
 				PRODUCT_NAME = "DuckDuckGo App Store";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "";
@@ -7615,7 +7627,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 12.3;
 				MARKETING_VERSION = "$(MARKETING_VERSION)";
 				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.mobile.ios;
-				PRODUCT_MODULE_NAME = DuckDuckGo_Privacy_Browser;
+				PRODUCT_MODULE_NAME = "$(MODULE_NAME_APP_STORE)";
 				PRODUCT_NAME = DuckDuckGo;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "match AppStore com.duckduckgo.mobile.ios macos";
@@ -7653,7 +7665,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 12.3;
 				MARKETING_VERSION = "$(MARKETING_VERSION)";
 				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.mobile.ios.review;
-				PRODUCT_MODULE_NAME = DuckDuckGo_Privacy_Browser;
+				PRODUCT_MODULE_NAME = "$(MODULE_NAME_APP_STORE)";
 				PRODUCT_NAME = "DuckDuckGo Review";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "Sandbox MacOS Browser Product Review";
@@ -7928,7 +7940,7 @@
 		};
 		4B1AD8B025FC322600261379 /* CI */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 85B8757E28B903D900D39E04 /* Configuration.xcconfig */;
+			baseConfigurationReference = 37A06C2F2951EDEF008A7F83 /* Configuration.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -8011,7 +8023,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MARKETING_VERSION = "$(MARKETING_VERSION)";
 				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser.debug;
-				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
+				PRODUCT_MODULE_NAME = "$(MODULE_NAME)";
 				PRODUCT_NAME = DuckDuckGo;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "FEEDBACK $(inherited)";
@@ -8138,7 +8150,7 @@
 		};
 		AA585DA2248FD31500E9A3E2 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 85B8757E28B903D900D39E04 /* Configuration.xcconfig */;
+			baseConfigurationReference = 37A06C2F2951EDEF008A7F83 /* Configuration.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -8200,7 +8212,7 @@
 		};
 		AA585DA3248FD31500E9A3E2 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 85B8757E28B903D900D39E04 /* Configuration.xcconfig */;
+			baseConfigurationReference = 37A06C2F2951EDEF008A7F83 /* Configuration.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -8275,7 +8287,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MARKETING_VERSION = "$(MARKETING_VERSION)";
 				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser.debug;
-				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
+				PRODUCT_MODULE_NAME = "$(MODULE_NAME)";
 				PRODUCT_NAME = DuckDuckGo;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "FEEDBACK $(inherited)";
 				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/DuckDuckGo/Bridging.h";
@@ -8307,7 +8319,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MARKETING_VERSION = "$(MARKETING_VERSION)";
 				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser;
-				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
+				PRODUCT_MODULE_NAME = "$(MODULE_NAME)";
 				PRODUCT_NAME = DuckDuckGo;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "MacOS Browser";
@@ -8371,7 +8383,7 @@
 		};
 		AAE814AB2716DFE8009D3531 /* Review */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 85B8757E28B903D900D39E04 /* Configuration.xcconfig */;
+			baseConfigurationReference = 37A06C2F2951EDEF008A7F83 /* Configuration.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -8449,7 +8461,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MARKETING_VERSION = "$(MARKETING_VERSION)";
 				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser.review;
-				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
+				PRODUCT_MODULE_NAME = "$(MODULE_NAME)";
 				PRODUCT_NAME = "DuckDuckGo Review";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "MacOS Browser Product Review";
