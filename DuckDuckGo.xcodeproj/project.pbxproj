@@ -380,7 +380,6 @@
 		7B9DD3EC292CF28C009504CD /* UserText+NetworkProtection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B9DD3EB292CF28C009504CD /* UserText+NetworkProtection.swift */; };
 		7B9DD3EE292CF403009504CD /* NSImage+NetworkProtection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B9DD3ED292CF403009504CD /* NSImage+NetworkProtection.swift */; };
 		7BA4727D26F01BC400EAA165 /* CoreDataTestUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292C42667104B00AD2C21 /* CoreDataTestUtilities.swift */; };
-		7BBAC9B52937A109007BEACE /* NetworkProtectionMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BBAC9B42937A109007BEACE /* NetworkProtectionMenu.swift */; };
 		7BC380D6294B5D9100F01EF8 /* NetworkProtectionPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BC380D5294B5D9100F01EF8 /* NetworkProtectionPopover.swift */; };
 		7BD60230293F8D47001C9D7D /* NetworkProtectionStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BD6022F293F8D47001C9D7D /* NetworkProtectionStatusView.swift */; };
 		7BFF45932938E2500021D1A0 /* NetworkProtectionLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BFF45922938E2500021D1A0 /* NetworkProtectionLogger.swift */; };
@@ -1311,7 +1310,6 @@
 		7B5C4E3C294A206400E42835 /* NetworkProtectionNavBarButtonModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionNavBarButtonModel.swift; sourceTree = "<group>"; };
 		7B9DD3EB292CF28C009504CD /* UserText+NetworkProtection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserText+NetworkProtection.swift"; sourceTree = "<group>"; };
 		7B9DD3ED292CF403009504CD /* NSImage+NetworkProtection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSImage+NetworkProtection.swift"; sourceTree = "<group>"; };
-		7BBAC9B42937A109007BEACE /* NetworkProtectionMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionMenu.swift; sourceTree = "<group>"; };
 		7BC380D5294B5D9100F01EF8 /* NetworkProtectionPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionPopover.swift; sourceTree = "<group>"; };
 		7BD6022F293F8D47001C9D7D /* NetworkProtectionStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionStatusView.swift; sourceTree = "<group>"; };
 		7BFF45922938E2500021D1A0 /* NetworkProtectionLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionLogger.swift; sourceTree = "<group>"; };
@@ -2750,7 +2748,6 @@
 				7B02C788292B8C8E00E677CF /* NetworkProtectionProvider.swift */,
 				7B02C7A3292B901400E677CF /* String+ArrayConversion.swift */,
 				7B53623B2936423300589DC2 /* NetworkProtectionStatusBarMenu.swift */,
-				7BBAC9B42937A109007BEACE /* NetworkProtectionMenu.swift */,
 				7BFF45922938E2500021D1A0 /* NetworkProtectionLogger.swift */,
 				7B5C4E3C294A206400E42835 /* NetworkProtectionNavBarButtonModel.swift */,
 				7BC380D5294B5D9100F01EF8 /* NetworkProtectionPopover.swift */,
@@ -5547,7 +5544,6 @@
 				4BA1A6C2258B0A1300F6F690 /* ContiguousBytesExtension.swift in Sources */,
 				37534CA8281198CD002621E7 /* AdjacentItemEnumerator.swift in Sources */,
 				4BE53374286E39F10019DBFD /* ChromiumKeychainPrompt.swift in Sources */,
-				7BBAC9B52937A109007BEACE /* NetworkProtectionMenu.swift in Sources */,
 				B6553692268440D700085A79 /* WKProcessPool+GeolocationProvider.swift in Sources */,
 				AA5C1DD1285A154E0089850C /* RecentlyClosedMenu.swift in Sources */,
 			);

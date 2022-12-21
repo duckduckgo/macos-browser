@@ -35,6 +35,10 @@ extension NetworkProtectionStatusView {
         ///
         private let logger: NetworkProtectionLogger
 
+        /// The `RunLoop` for the timer.
+        ///
+        private let runLoopMode: RunLoop.Mode?
+
         // MARK: - Feature Image
 
         var mainImageAsset: NetworkProtectionAsset {
@@ -47,6 +51,25 @@ extension NetworkProtectionStatusView {
         }
 
         // MARK: - Initialization & Deinitialization
+
+        init(networkProtection: NetworkProtectionProvider = NetworkProtectionProvider(),
+             logger: NetworkProtectionLogger = DefaultNetworkProtectionLogger(),
+             runLoopMode: RunLoop.Mode? = nil) {
+
+            self.networkProtection = networkProtection
+            self.logger = logger
+            self.runLoopMode = runLoopMode
+
+            networkProtection.onStatusChange = { [weak self] status in
+                guard let self = self else {
+                    return
+                }
+
+                Task { @MainActor in
+                    self.connectionStatus = status
+                }
+            }
+        }
 
         deinit {
             stopTimer()
@@ -61,8 +84,14 @@ extension NetworkProtectionStatusView {
 
             refreshTimeLapsed()
 
-            timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
+            let newTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
                 self.refreshTimeLapsed()
+            }
+
+            timer = newTimer
+
+            if let runLoopMode = runLoopMode {
+                RunLoop.current.add(newTimer, forMode: runLoopMode)
             }
         }
 
@@ -208,25 +237,6 @@ extension NetworkProtectionStatusView {
                 return "Los Angeles, United States"
             default:
                 return ""
-            }
-        }
-
-        // MARK: - Initializers
-
-        init(networkProtection: NetworkProtectionProvider = NetworkProtectionProvider(),
-             logger: NetworkProtectionLogger = DefaultNetworkProtectionLogger()) {
-
-            self.networkProtection = networkProtection
-            self.logger = logger
-
-            networkProtection.onStatusChange = { [weak self] status in
-                guard let self = self else {
-                    return
-                }
-
-                Task { @MainActor in
-                    self.connectionStatus = status
-                }
             }
         }
 

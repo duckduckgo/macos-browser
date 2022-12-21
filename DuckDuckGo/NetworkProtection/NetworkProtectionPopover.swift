@@ -17,6 +17,7 @@
 //
 
 import AppKit
+import Foundation
 import SwiftUI
 
 final class NetworkProtectionPopover: NSPopover {
@@ -40,5 +41,9 @@ final class NetworkProtectionPopover: NSPopover {
         let controller = NSHostingController(rootView: view)
 
         contentViewController = controller
+
+        // It's important to set the frame at least once here.  If we don't the popover
+        // fails to get the right width and the popover can exceed the screen's limits.
+        controller.view.frame = CGRect(origin: .zero, size: controller.view.intrinsicContentSize)
     }
 }

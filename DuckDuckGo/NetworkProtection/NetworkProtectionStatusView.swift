@@ -109,6 +109,12 @@ public struct NetworkProtectionStatusView: View {
     ///
     @ObservedObject var model: Model
 
+    // MARK: - Initializers
+
+    init(model: Model = Model()) {
+        self.model = model
+    }
+
     // MARK: - View Contents
 
     public var body: some View {
@@ -121,6 +127,7 @@ public struct NetworkProtectionStatusView: View {
             }
             .padding(EdgeInsets(top: 8, leading: 8, bottom: 4, trailing: 8))
         }
+        .frame(maxWidth: 400)
     }
 
     /// Title and divider

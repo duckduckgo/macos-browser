@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import SwiftUI
 
 /// Abstraction of the the Network Protection status bar menu with a simple interface.
 ///
@@ -28,14 +29,23 @@ final class NetworkProtectionStatusBarMenu {
     /// Default initializer
     ///
     /// - Parameters:
-    ///     - menu: (meant for testing) this allows us to inject our own ``NSMenu`` to make automated testing easier.
     ///     - statusItem: (meant for testing) this allows us to inject our own status `NSStatusItem` to make automated testing easier..
     ///
-    init(menu: NetworkProtectionMenuProtocol = NetworkProtectionMenu(), statusItem: NSStatusItem? = nil) {
+    init(statusItem: NSStatusItem? = nil) {
         self.statusItem = statusItem ?? NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
+
+        let item = NSMenuItem()
+        let model = NetworkProtectionStatusView.Model(runLoopMode: .eventTracking)
+        let view = NetworkProtectionStatusView(model: model)
+        let hostingView = NSHostingView(rootView: view)
+        hostingView.translatesAutoresizingMaskIntoConstraints = false
+        hostingView.autoresizesSubviews = false
+        hostingView.frame.size = hostingView.intrinsicContentSize
+        item.view = hostingView
+
+        let menu = NSMenu(items: [item])
         self.statusItem.menu = menu
         self.statusItem.button?.image = .init(.vpnIcon)
-        self.statusItem.isVisible = false
     }
 
     // MARK: - Showing & Hiding the menu

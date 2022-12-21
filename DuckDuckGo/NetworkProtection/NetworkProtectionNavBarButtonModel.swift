@@ -44,13 +44,12 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
 
     private func setupNetworkProtection() {
         networkProtection.onStatusChange = { [weak self] status in
-            guard let self = self else {
-                return
-            }
+            Task { @MainActor [weak self] in
+                guard let self = self else {
+                    return
+                }
 
-            self.status = status
-
-            Task { @MainActor in
+                self.status = status
                 self.updateVisibility()
             }
         }
