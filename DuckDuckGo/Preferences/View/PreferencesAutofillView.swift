@@ -41,7 +41,7 @@ extension Preferences {
                 model.passwordManagerSettingsChange(passwordManager: newValue)
             }
         }
-        
+
         var isAutoLockEnabledBinding: Binding<Bool> {
             .init {
                 model.isAutoLockEnabled
@@ -94,8 +94,9 @@ extension Preferences {
                     }
 
                 }
+
                 // Ask to Save:
-                
+
                 Section(spacing: 0) {
                     Text(UserText.autofillAskToSave)
                         .font(Const.Fonts.preferencePaneSectionHeader)
@@ -118,7 +119,7 @@ extension Preferences {
                 }
 
                 // Auto-Lock:
-                
+
                 Section(spacing: 0) {
                     Text(UserText.autofillAutoLock)
                         .font(Const.Fonts.preferencePaneSectionHeader)
@@ -241,17 +242,17 @@ extension Preferences {
 }
 
 private struct BitwardenStatusView: View {
-    
+
     struct ButtonValue {
         let title: String
         let action: () -> Void
     }
-    
+
     enum IconType {
         case success
         case warning
         case error
-        
+
         fileprivate var imageName: String {
             switch self {
             case .success: return "SuccessCheckmark"
@@ -260,13 +261,13 @@ private struct BitwardenStatusView: View {
             }
         }
     }
-    
+
     let iconType: IconType
     let title: String
     let buttonValue: ButtonValue?
-    
+
     var body: some View {
-        
+
         HStack {
             HStack {
                 Image(iconType.imageName)
@@ -280,12 +281,12 @@ private struct BitwardenStatusView: View {
                 RoundedRectangle(cornerRadius: 5)
                     .stroke(Color.black.opacity(0.08), lineWidth: 1)
             )
-            
+
             if let buttonValue = buttonValue {
                 Button(buttonValue.title, action: buttonValue.action)
             }
         }
-        
+
     }
-    
+
 }

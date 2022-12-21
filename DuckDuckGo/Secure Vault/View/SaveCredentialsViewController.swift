@@ -47,7 +47,7 @@ final class SaveCredentialsViewController: NSViewController {
     @IBOutlet var usernameField: NSTextField!
     @IBOutlet var hiddenPasswordField: NSSecureTextField!
     @IBOutlet var visiblePasswordField: NSTextField!
-    
+
     @IBOutlet var notNowButton: NSButton!
     @IBOutlet var saveButton: NSButton!
     @IBOutlet var updateButton: NSButton!
@@ -96,7 +96,7 @@ final class SaveCredentialsViewController: NSViewController {
     override func viewWillDisappear() {
         passwordManagerStateCancellable = nil
     }
-    
+
     /// Note that if the credentials.account.id is not nil, then we consider this an update rather than a save.
     func update(credentials: SecureVaultModels.WebsiteCredentials, automaticallySaved: Bool) {
         self.credentials = credentials
@@ -105,14 +105,14 @@ final class SaveCredentialsViewController: NSViewController {
         self.hiddenPasswordField.stringValue = String(data: credentials.password, encoding: .utf8) ?? ""
         self.visiblePasswordField.stringValue = self.hiddenPasswordField.stringValue
         self.loadFaviconForDomain(credentials.account.domain)
-        
+
         fireproofCheck.state = FireproofDomains.shared.isFireproof(fireproofDomain: credentials.account.domain) ? .on : .off
-        
+
         // Only use the non-editable state if a credential was automatically saved and it didn't already exist.
         let condition = credentials.account.id != nil && !credentials.account.username.isEmpty && automaticallySaved
         updateViewState(editable: !condition)
     }
-    
+
     private func updateViewState(editable: Bool) {
         usernameField.setEditable(editable)
         hiddenPasswordField.setEditable(editable)
@@ -131,7 +131,7 @@ final class SaveCredentialsViewController: NSViewController {
 
             titleLabel.isHidden = passwordManagerCoordinator.isEnabled
             passwordManagerTitle.isHidden = !passwordManagerCoordinator.isEnabled || passwordManagerCoordinator.isLocked
-            passwordManagerAccountLabel.stringValue = "Connected to \(passwordManagerCoordinator.activeVaultEmail ?? "")" 
+            passwordManagerAccountLabel.stringValue = "Connected to \(passwordManagerCoordinator.activeVaultEmail ?? "")"
             unlockPasswordManagerTitle.isHidden = !passwordManagerCoordinator.isEnabled || !passwordManagerCoordinator.isLocked
             titleLabel.stringValue = UserText.pmSaveCredentialsEditableTitle
             usernameField.makeMeFirstResponder()
@@ -228,11 +228,11 @@ final class SaveCredentialsViewController: NSViewController {
     @IBAction func onOpenPasswordManagerClicked(sender: Any?) {
         passwordManagerCoordinator.openPasswordManager()
     }
-    
+
     @IBAction func onEditClicked(sender: Any?) {
         updateViewState(editable: true)
     }
-    
+
     @IBAction func onDoneClicked(sender: Any?) {
         delegate?.shouldCloseSaveCredentialsViewController(self)
     }

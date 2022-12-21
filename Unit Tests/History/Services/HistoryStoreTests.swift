@@ -24,11 +24,11 @@ import class Persistence.CoreDataDatabase
 final class HistoryStoreTests: XCTestCase {
 
     private var cancellables = Set<AnyCancellable>()
-    
+
     private var context: NSManagedObjectContext!
     private var historyStore: HistoryStore!
     private var location: URL!
-    
+
     override func setUp() {
         super.setUp()
         let model = CoreDataDatabase.loadModel(from: .main, named: "History")!
@@ -42,7 +42,7 @@ final class HistoryStoreTests: XCTestCase {
         context = database.makeContext(concurrencyType: .mainQueueConcurrencyType)
         historyStore = HistoryStore(context: context)
     }
-    
+
     override func tearDownWithError() throws {
         try FileManager.default.removeItem(at: location)
         context = nil
@@ -82,7 +82,7 @@ final class HistoryStoreTests: XCTestCase {
                                            visits: [])
         let savingExpectation = self.expectation(description: "Saving")
         save(entry: newHistoryEntry, expectation: savingExpectation)
-        
+
         var toBeDeleted: [HistoryEntry] = []
         for i in 0..<150 {
             let identifier = UUID()
@@ -128,7 +128,7 @@ final class HistoryStoreTests: XCTestCase {
         }
 
         removeEntriesAndWait(toBeDeleted)
-        
+
         context.performAndWait {
             let request = DuckDuckGo_Privacy_Browser.HistoryEntryManagedObject.fetchRequest()
             do {
@@ -140,7 +140,7 @@ final class HistoryStoreTests: XCTestCase {
             }
         }
     }
-    
+
     func removeEntriesAndWait(_ entries: [HistoryEntry], file: StaticString = #file, line: UInt = #line) {
         let loadingExpectation = self.expectation(description: "Loading")
         historyStore.removeEntries(entries)
@@ -157,7 +157,7 @@ final class HistoryStoreTests: XCTestCase {
 
         waitForExpectations(timeout: 1, handler: nil)
     }
-    
+
     func testWhenRemoveEntriesIsCalled_visitsCascadeDelete() {
         var toBeDeleted = [Visit]()
         for j in 0..<10 {
@@ -166,9 +166,9 @@ final class HistoryStoreTests: XCTestCase {
             toBeDeleted.append(visit)
         }
         let history = saveNewHistoryEntry(including: toBeDeleted, lastVisit: toBeDeleted.last!.date)
-        
+
         removeEntriesAndWait([history])
-        
+
         context.performAndWait {
             let request = DuckDuckGo_Privacy_Browser.VisitManagedObject.fetchRequest()
             do {
@@ -179,7 +179,7 @@ final class HistoryStoreTests: XCTestCase {
             }
         }
     }
-    
+
     func testWhenRemoveVisitsIsCalled_ThenVisitsMustBeCleaned() {
         let visitDate = Date(timeIntervalSince1970: 1234)
         let toBeKept = Visit(date: visitDate)
@@ -193,7 +193,7 @@ final class HistoryStoreTests: XCTestCase {
             let history = self.saveNewHistoryEntry(including: visits, lastVisit: visits.last!.date)
             historiesToPreventFromDeallocation.append(history)
         }
-        
+
         for _ in 0..<3 {
             var visits = [Visit]()
             for j in 0..<50 {
@@ -221,7 +221,7 @@ final class HistoryStoreTests: XCTestCase {
 
             waitForExpectations(timeout: 1, handler: nil)
         }
-        
+
         context.performAndWait {
             let request = DuckDuckGo_Privacy_Browser.VisitManagedObject.fetchRequest()
             do {
@@ -234,11 +234,11 @@ final class HistoryStoreTests: XCTestCase {
             }
         }
     }
-    
+
     func testWhenCleanOldIsCalled_ThenFollowingSaveShouldSucceed() {
         let oldVisitDate = Date(timeIntervalSince1970: 0)
         let newVisitDate = Date(timeIntervalSince1970: 12345)
-        
+
         let oldVisit = Visit(date: oldVisitDate)
         let newVisit = Visit(date: newVisitDate)
 
@@ -246,7 +246,7 @@ final class HistoryStoreTests: XCTestCase {
         saveNewHistoryEntry(including: [oldVisit, newVisit],
                             lastVisit: newVisitDate,
                             expectation: firstSavingExpectation)
-        
+
         cleanOldAndWait(cleanUntil: Date(timeIntervalSince1970: 1)) { history in
             XCTAssertEqual(history.count, 1)
             for entry in history {
@@ -259,14 +259,14 @@ final class HistoryStoreTests: XCTestCase {
         saveNewHistoryEntry(including: [oldVisit, newVisit],
                             lastVisit: newVisitDate,
                             expectation: secondSavingExpectation)
-        
+
         waitForExpectations(timeout: 2, handler: nil)
     }
-    
+
     func testWhenRemoveVisitsIsCalled_ThenFollowingSaveShouldSucceed() {
         let oldVisitDate = Date(timeIntervalSince1970: 0)
         let newVisitDate = Date(timeIntervalSince1970: 12345)
-        
+
         let oldVisit = Visit(date: oldVisitDate)
         let newVisit = Visit(date: newVisitDate)
 
@@ -291,19 +291,19 @@ final class HistoryStoreTests: XCTestCase {
                 .store(in: &cancellables)
             waitForExpectations(timeout: 2, handler: nil)
         }
-        
+
         let secondSavingExpectation = self.expectation(description: "Saving")
         saveNewHistoryEntry(including: [oldVisit, newVisit],
                             lastVisit: newVisitDate,
                             expectation: secondSavingExpectation)
-        
+
         waitForExpectations(timeout: 2, handler: nil)
     }
-    
+
     func testWhenRemoveEntriesIsCalled_ThenFollowingSaveShouldSucceed() {
         let oldVisitDate = Date(timeIntervalSince1970: 0)
         let newVisitDate = Date(timeIntervalSince1970: 12345)
-        
+
         let oldVisit = Visit(date: oldVisitDate)
         let newVisit = Visit(date: newVisitDate)
 
@@ -311,17 +311,17 @@ final class HistoryStoreTests: XCTestCase {
         let historyEntry = saveNewHistoryEntry(including: [oldVisit, newVisit],
                                                lastVisit: newVisitDate,
                                                expectation: firstSavingExpectation)
-        
+
         removeEntriesAndWait([historyEntry])
-        
+
         let secondSavingExpectation = self.expectation(description: "Saving")
         saveNewHistoryEntry(including: [oldVisit, newVisit],
                             lastVisit: newVisitDate,
                             expectation: secondSavingExpectation)
-        
+
         waitForExpectations(timeout: 2, handler: nil)
     }
-    
+
     private func cleanOldAndWait(cleanUntil date: Date, assertion: @escaping (History) -> Void, file: StaticString = #file, line: UInt = #line) {
         let loadingExpectation = self.expectation(description: "Loading")
         historyStore.cleanOld(until: date)
@@ -338,7 +338,7 @@ final class HistoryStoreTests: XCTestCase {
 
         waitForExpectations(timeout: 2, handler: nil)
     }
-    
+
     @discardableResult
     private func saveNewHistoryEntry(including visits: [Visit], lastVisit: Date, expectation: XCTestExpectation? = nil, file: StaticString = #file, line: UInt = #line) -> HistoryEntry {
         let historyEntry = HistoryEntry(identifier: UUID(),

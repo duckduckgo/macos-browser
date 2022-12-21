@@ -103,7 +103,7 @@ final class AutofillPreferences: AutofillPreferencesPersistor {
 
     @UserDefaultsWrapper(key: .askToSavePaymentMethods, defaultValue: true)
     var askToSavePaymentMethods: Bool
-    
+
     var passwordManager: PasswordManager {
         get {
             if NSApp.isSandboxed {

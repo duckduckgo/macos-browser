@@ -21,7 +21,7 @@ import Foundation
 enum BookmarkImportSource: Equatable {
     case duckduckgoWebKit
     case thirdPartyBrowser(DataImport.Source)
-    
+
     var importSourceName: String {
         switch self {
         case .duckduckgoWebKit: return UserText.importBookmarksHTML

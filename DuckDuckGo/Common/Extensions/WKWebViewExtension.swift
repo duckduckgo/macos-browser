@@ -131,7 +131,7 @@ extension WKWebView {
             self._stopMediaCapture()
         }
     }
-    
+
     func stopAllMediaPlayback() {
         if #available(macOS 12.0, *) {
             pauseAllMediaPlayback()
@@ -143,7 +143,7 @@ extension WKWebView {
             self._stopAllMediaPlayback()
         }
     }
-    
+
     func setPermissions(_ permissions: [PermissionType], muted: Bool) {
         for permission in permissions {
             switch permission {
@@ -219,7 +219,7 @@ extension WKWebView {
             return self.instancesRespond(to: #selector(WKWebView._printOperation(with:)))
         }
     }
-    
+
     func printOperation(with printInfo: NSPrintInfo = .shared, for frame: Any?) -> NSPrintOperation? {
         let printInfoWithFrame = NSSelectorFromString(Selector.printOperationWithPrintInfoForFrame)
         if let frame = frame, responds(to: printInfoWithFrame) {
@@ -237,7 +237,7 @@ extension WKWebView {
             printInfo.topMargin = 0
             printInfo.bottomMargin = 0
             printInfo.scalingFactor = 0.95
-            
+
             return self.printOperation(with: printInfo)
         }
 #if APPSTORE

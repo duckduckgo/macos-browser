@@ -21,7 +21,7 @@ import Foundation
 struct AppVersion {
 
     static let shared = AppVersion()
-    
+
     private let bundle: Bundle
 
     init(bundle: Bundle = .main) {
@@ -35,7 +35,7 @@ struct AppVersion {
     var identifier: String {
         return bundle.object(forInfoDictionaryKey: Bundle.Keys.identifier) as? String ?? ""
     }
-    
+
     var majorVersionNumber: String {
         return String(versionNumber.split(separator: ".").first ?? "")
     }
@@ -47,5 +47,5 @@ struct AppVersion {
     var buildNumber: String {
         return bundle.object(forInfoDictionaryKey: Bundle.Keys.buildNumber) as? String ?? ""
     }
-    
+
 }

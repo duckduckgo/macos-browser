@@ -24,14 +24,12 @@ final class FileStoreMock: NSObject, FileStore {
     private var _fileStorage = [String: Data]()
     private let fileStorageLock = NSLock()
     @objc dynamic var storage: [String: Data] {
-        // swiftlint:disable implicit_getter
         get {
             fileStorageLock.lock()
             defer { fileStorageLock.unlock() }
 
             return _fileStorage
         }
-        // swiftlint:enable implicit_getter
         _modify {
             fileStorageLock.lock()
             defer {
@@ -41,18 +39,16 @@ final class FileStoreMock: NSObject, FileStore {
             yield &_fileStorage
         }
     }
-    
+
     private var _directoryStorage = [String: [String]]()
     private let directoryStorageLock = NSLock()
     @objc dynamic var directoryStorage: [String: [String]] {
-        // swiftlint:disable implicit_getter
         get {
             directoryStorageLock.lock()
             defer { directoryStorageLock.unlock() }
 
             return _directoryStorage
         }
-        // swiftlint:enable implicit_getter
         _modify {
             directoryStorageLock.lock()
             defer {
@@ -93,7 +89,7 @@ final class FileStoreMock: NSObject, FileStore {
     func directoryContents(at path: String) throws -> [String] {
         return directoryStorage[path] ?? []
     }
-    
+
     func remove(fileAtURL url: URL) {
         storage[url.lastPathComponent] = nil
     }

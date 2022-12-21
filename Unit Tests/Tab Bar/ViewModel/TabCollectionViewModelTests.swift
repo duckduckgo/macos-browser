@@ -368,29 +368,6 @@ final class TabCollectionViewModelTests: XCTestCase {
         XCTAssertEqual(tabCollectionViewModel.selectedTabViewModel?.tab, childTab1)
     }
 
-    func testWhenOwnerOfWebviewIsRemovedThenAllOtherTabsRemained() {
-        let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
-
-        tabCollectionViewModel.appendNewTab()
-        tabCollectionViewModel.appendNewTab()
-        let lastTabViewModel = tabCollectionViewModel.tabViewModel(at: tabCollectionViewModel.tabCollection.tabs.count - 1)!
-
-        tabCollectionViewModel.remove(ownerOf: lastTabViewModel.tab.webView)
-
-        XCTAssertFalse(tabCollectionViewModel.tabCollection.tabs.contains(lastTabViewModel.tab))
-        XCTAssert(tabCollectionViewModel.tabCollection.tabs.count == 2)
-    }
-
-    func testWhenOwnerOfWebviewIsNotInTabCollectionThenNoTabIsRemoved() {
-        let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
-        let originalCount = tabCollectionViewModel.tabCollection.tabs.count
-        let tab = Tab()
-
-        tabCollectionViewModel.remove(ownerOf: tab.webView)
-
-        XCTAssertEqual(tabCollectionViewModel.tabCollection.tabs.count, originalCount)
-    }
-
     func testRemoveSelected() {
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
 

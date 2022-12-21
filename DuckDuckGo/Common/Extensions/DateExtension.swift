@@ -24,7 +24,7 @@ extension Date {
         let name: String
         let index: Int
     }
-    
+
     var components: DateComponents {
         return Calendar.current.dateComponents([.day, .year, .month], from: self)
     }

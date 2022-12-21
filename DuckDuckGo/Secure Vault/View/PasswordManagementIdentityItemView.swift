@@ -108,70 +108,70 @@ private struct IdentificationView: View {
                     .padding(.bottom, 5)
 
                 HStack {
-                    
+
                     // Way too much code duplication in here, but this view may be altered a fair bit in 2022, and I'm
                     // out of time to fix it up before the end of 2021, so it's staying this way for a bit. Sorry!
                     if Locale.current.dateComponentOrder == .dayMonthYear {
                         NSPopUpButtonView<Int?>(selection: $model.birthdayDay, viewCreator: {
                             let button = NSPopUpButton()
-                            
+
                             let item = button.menu?.addItem(withTitle: UserText.pmDay, action: nil, keyEquivalent: "")
                             item?.representedObject = nil
-                            
+
                             for date in Date.daysInMonth {
                                 let item = button.menu?.addItem(withTitle: String(date), action: nil, keyEquivalent: "")
                                 item?.representedObject = date
                             }
-                            
+
                             return button
                         })
 
                         NSPopUpButtonView<Int?>(selection: $model.birthdayMonth, viewCreator: {
                             let button = NSPopUpButton()
-                            
+
                             let item = button.menu?.addItem(withTitle: UserText.pmMonth, action: nil, keyEquivalent: "")
                             item?.representedObject = nil
-                            
+
                             for date in Date.monthsWithIndex {
                                 let item = button.menu?.addItem(withTitle: date.name, action: nil, keyEquivalent: "")
                                 item?.representedObject = date.index
                             }
-                            
+
                             return button
                         })
                     } else {
                         NSPopUpButtonView<Int?>(selection: $model.birthdayMonth, viewCreator: {
                             let button = NSPopUpButton()
-                            
+
                             let item = button.menu?.addItem(withTitle: UserText.pmMonth, action: nil, keyEquivalent: "")
                             item?.representedObject = nil
-                            
+
                             for date in Date.monthsWithIndex {
                                 let item = button.menu?.addItem(withTitle: date.name, action: nil, keyEquivalent: "")
                                 item?.representedObject = date.index
                             }
-                            
+
                             return button
                         })
 
                         NSPopUpButtonView<Int?>(selection: $model.birthdayDay, viewCreator: {
                             let button = NSPopUpButton()
-                            
+
                             let item = button.menu?.addItem(withTitle: UserText.pmDay, action: nil, keyEquivalent: "")
                             item?.representedObject = nil
-                            
+
                             for date in Date.daysInMonth {
                                 let item = button.menu?.addItem(withTitle: String(date), action: nil, keyEquivalent: "")
                                 item?.representedObject = date
                             }
-                            
+
                             return button
                         })
                     }
-                    
+
                     NSPopUpButtonView<Int?>(selection: $model.birthdayYear, viewCreator: {
                         let button = NSPopUpButton()
-                        
+
                         let item = button.menu?.addItem(withTitle: UserText.pmYear, action: nil, keyEquivalent: "")
                         item?.representedObject = nil
 
@@ -179,7 +179,7 @@ private struct IdentificationView: View {
                             let item = button.menu?.addItem(withTitle: String(date), action: nil, keyEquivalent: "")
                             item?.representedObject = date
                         }
-                        
+
                         return button
                     })
 
@@ -235,19 +235,19 @@ private struct AddressView: View {
 
                 NSPopUpButtonView<String>(selection: $model.addressCountryCode, viewCreator: {
                     let button = NSPopUpButton()
-                    
+
                     let item = button.menu?.addItem(withTitle: "-", action: nil, keyEquivalent: "")
                     item?.representedObject = ""
-                    
+
                     for country in CountryList.countries {
                         let item = button.menu?.addItem(withTitle: country.name, action: nil, keyEquivalent: "")
                         item?.representedObject = country.countryCode
                     }
-                    
+
                     return button
                 })
                 .padding(.bottom, 5)
-                
+
             } else if !model.addressCountryCode.isEmpty {
                 Text("Country")
                     .bold()

@@ -243,12 +243,12 @@ final class HistoryCoordinator: HistoryCoordinating {
     private func removeVisits(_ visits: [Visit],
                               completionHandler: ((Error?) -> Void)? = nil) {
         var entriesToRemove = [HistoryEntry]()
-        
+
         // Remove from the local memory
         visits.forEach { visit in
             if let historyEntry = visit.historyEntry {
                 historyEntry.visits.remove(visit)
-                
+
                 if historyEntry.visits.count > 0 {
                     if let newLastVisit = historyEntry.visits.map({ $0.date }).max() {
                         historyEntry.lastVisit = newLastVisit
@@ -311,7 +311,7 @@ final class HistoryCoordinator: HistoryCoordinating {
             return
         }
         entry.visits.forEach { $0.savingState = .saved }
-        
+
         historyStoring.save(entry: entryCopy)
             .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { completion in

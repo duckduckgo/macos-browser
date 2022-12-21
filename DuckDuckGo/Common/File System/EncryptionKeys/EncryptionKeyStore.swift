@@ -26,7 +26,7 @@ enum EncryptionKeyStoreError: Error {
 }
 
 final class EncryptionKeyStore: EncryptionKeyStoring {
-    
+
     enum Constants {
 #if APPSTORE
         static let encryptionKeyAccount = "com.duckduckgo.mobile.ios"

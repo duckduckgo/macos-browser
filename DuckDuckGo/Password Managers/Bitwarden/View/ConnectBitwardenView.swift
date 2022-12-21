@@ -20,7 +20,7 @@ import Foundation
 import SwiftUI
 
 struct ConnectBitwardenView: View {
-    
+
     private enum Constants {
         static let headerPadding = 20.0
         static let bodyPadding = 20.0
@@ -36,17 +36,17 @@ struct ConnectBitwardenView: View {
             headerHeight + 2 * Constants.headerPadding + viewHeight + 4 * Constants.bodyPadding + spacerHeight + buttonsHeight
         }
     }
-    
+
     @EnvironmentObject var viewModel: ConnectBitwardenViewModel
-    
+
     let sizeChanged: (CGFloat) -> Void
-    
+
     @State var viewSize: ViewSize = .init() {
         didSet {
             sizeChanged(viewSize.totalHeight)
         }
     }
-    
+
     var body: some View {
         VStack {
             VStack(spacing: Constants.bodyPadding) {
@@ -58,7 +58,7 @@ struct ConnectBitwardenView: View {
                             }
                         }
                     )
-                
+
                 bodyView(for: viewModel.viewState)
                     .frame(maxWidth: .infinity)
                     .background(
@@ -70,7 +70,7 @@ struct ConnectBitwardenView: View {
                     )
             }
             .padding(Constants.headerPadding)
-            
+
             Spacer()
                 .background(
                 GeometryReader { proxy in
@@ -79,7 +79,7 @@ struct ConnectBitwardenView: View {
                     }
                 }
             )
-            
+
             ButtonsView()
                 .background(
                     GeometryReader { proxy in
@@ -90,7 +90,7 @@ struct ConnectBitwardenView: View {
                 )
         }
     }
-    
+
     @ViewBuilder private func bodyView(for state: ConnectBitwardenViewModel.ViewState) -> some View {
         switch viewModel.viewState {
         case .disclaimer: ConnectToBitwardenDisclaimerView()
@@ -102,81 +102,81 @@ struct ConnectBitwardenView: View {
         case .connectedToBitwarden: ConnectedToBitwardenView()
         }
     }
-    
+
 }
 
 struct BitwardenTitleView: View {
-    
+
     var body: some View {
-        
+
         HStack(spacing: 10) {
             Image("BitwardenLogo")
                 .resizable()
                 .frame(width: 32, height: 32)
-            
+
             Text(UserText.connectToBitwarden)
                 .font(.system(size: 18, weight: .semibold))
-            
+
             Spacer()
         }
 
     }
-    
+
 }
 
 private struct ConnectToBitwardenDisclaimerView: View {
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text(UserText.connectToBitwardenDescription)
-            
+
             Text(UserText.connectToBitwardenPrivacy)
                 .font(.system(size: 13, weight: .bold))
                 .padding(.top, 10)
-            
+
             HStack {
                 Image("BitwardenLock")
                 Text(UserText.bitwardenCommunicationInfo)
             }
-            
+
             HStack {
                 Image("BitwardenClock")
                 Text(UserText.bitwardenHistoryInfo)
             }
         }
     }
-    
+
 }
 
 private struct BitwardenInstallationDetectionView: View {
-    
+
     @EnvironmentObject var viewModel: ConnectBitwardenViewModel
-    
+
     let bitwardenDetected: Bool
     let bitwardenNeedsUpdate: Bool
-    
+
     var body: some View {
 
         VStack(alignment: .leading, spacing: 10) {
             Text(UserText.installBitwarden)
                 .font(.system(size: 13, weight: .bold))
-            
+
             HStack {
                 NumberedBadge(value: 1)
 
                 Text(UserText.installBitwardenInfo)
-                
+
                 Spacer()
             }
-            
+
             HStack {
                 NumberedBadge(value: 2)
-                
+
                 Text(UserText.afterBitwardenInstallationInfo)
-                
+
                 Spacer()
             }
-            
+
             Button(action: {
                 viewModel.process(action: .openBitwardenProductPage)
             }, label: {
@@ -184,7 +184,7 @@ private struct BitwardenInstallationDetectionView: View {
             })
             .buttonStyle(PlainButtonStyle())
             .frame(width: 156, height: 40)
-            
+
             if bitwardenDetected {
                 if bitwardenNeedsUpdate {
                     HStack {
@@ -201,7 +201,7 @@ private struct BitwardenInstallationDetectionView: View {
             } else {
                 HStack {
                     ActivityIndicator(isAnimating: .constant(true), style: .spinning)
-                    
+
                     Text(UserText.lookingForBitwarden)
                 }
             }
@@ -209,20 +209,20 @@ private struct BitwardenInstallationDetectionView: View {
         .frame(maxWidth: .infinity)
 
     }
-    
+
 }
 
 private struct ConnectToBitwardenView: View {
-    
+
     @EnvironmentObject var viewModel: ConnectBitwardenViewModel
-    
+
     let canConnect: Bool
 
     var body: some View {
         VStack(alignment: .leading, spacing: 15) {
             Text(UserText.allowIntegration)
                 .font(.system(size: 13, weight: .bold))
-            
+
             HStack {
                 NumberedBadge(value: 1)
                 Text(UserText.openBitwardenAndLogInOrUnlock)
@@ -237,37 +237,37 @@ private struct ConnectToBitwardenView: View {
             }
 
             Spacer().frame(height: 2)
-            
+
             HStack {
                 NumberedBadge(value: 2)
                 Text(UserText.selectBitwardenPreferences)
                 Spacer()
             }
-            
+
             HStack {
                 NumberedBadge(value: 3)
                 Text(UserText.scrollToFindAppSettings)
                 Spacer()
             }
-            
+
             HStack {
                 NumberedBadge(value: 4)
                 Text(UserText.checkAllowIntegration)
                 Spacer()
             }
-            
+
             Image("BitwardenSettingsIllustration")
-            
+
             if canConnect {
                 HStack {
                     Image("SuccessCheckmark")
-                    
+
                     Text(UserText.bitwardenIsReadyToConnect)
-                    
+
                     Spacer()
                 }
             } else {
-                
+
                 HStack {
                     ActivityIndicator(isAnimating: .constant(true), style: .spinning)
                         .frame(maxWidth: 8, maxHeight: 8)
@@ -277,35 +277,35 @@ private struct ConnectToBitwardenView: View {
             }
         }
     }
-    
+
 }
 
 private struct ConnectedToBitwardenView: View {
 
     var body: some View {
         VStack(alignment: .leading) {
-            
+
             Text(UserText.bitwardenIntegrationComplete)
                 .font(.system(size: 13, weight: .bold))
-            
+
             HStack {
                 Image("SuccessCheckmark")
 
                 Text(UserText.bitwardenIntegrationCompleteInfo)
-                
+
                 Spacer()
             }
 
         }
         .frame(maxWidth: .infinity)
     }
-    
+
 }
 
 // MARK: - Reusable Views
 
 private struct NumberedBadge: View {
-    
+
     let value: Int
 
     var body: some View {
@@ -317,26 +317,26 @@ private struct NumberedBadge: View {
         }
         .frame(width: 20, height: 20)
     }
-    
+
 }
 
 private struct ButtonsView: View {
-    
+
     @EnvironmentObject var viewModel: ConnectBitwardenViewModel
-    
+
     var body: some View {
-        
+
         Divider()
-        
+
         HStack {
             Spacer()
-            
+
             if viewModel.viewState.cancelButtonVisible {
                 Button(UserText.cancel) {
                     viewModel.process(action: .cancel)
                 }
             }
-            
+
             if #available(macOS 11.0, *) {
                 Button(viewModel.viewState.confirmButtonTitle) {
                     viewModel.process(action: .confirm)
@@ -352,13 +352,13 @@ private struct ButtonsView: View {
         }
         .padding([.trailing, .bottom], 16)
         .padding(.top, 10)
-        
+
     }
-    
+
 }
 
 struct ActivityIndicator: NSViewRepresentable {
-    
+
     @Binding var isAnimating: Bool
 
     let style: NSProgressIndicator.Style
@@ -377,5 +377,5 @@ struct ActivityIndicator: NSViewRepresentable {
             nsView.stopAnimation(nil)
         }
     }
-    
+
 }

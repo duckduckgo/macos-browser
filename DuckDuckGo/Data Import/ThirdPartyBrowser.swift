@@ -86,7 +86,7 @@ enum ThirdPartyBrowser: CaseIterable {
 
         return NSWorkspace.shared.icon(forFile: applicationPath)
     }
-    
+
     /// Used when specific apps are not installed, but still need to be displayed in the list.
     /// Browsers are hidden when not installed, so this only applies to password managers.
     var fallbackApplicationIcon: NSImage? {
@@ -145,10 +145,10 @@ enum ThirdPartyBrowser: CaseIterable {
             $0.forceTerminate()
         }
     }
-    
+
     func browserProfiles(supportDirectoryURL: URL? = nil) -> DataImport.BrowserProfileList? {
         let applicationSupportURL = supportDirectoryURL ?? URL.nonSandboxApplicationSupportDirectoryURL
-        
+
         guard let profilePath = profilesDirectory(applicationSupportURL: applicationSupportURL),
               let potentialProfileURLs = try? FileManager.default.contentsOfDirectory(at: profilePath,
                                                                                       includingPropertiesForKeys: nil,

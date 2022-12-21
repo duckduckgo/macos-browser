@@ -35,11 +35,11 @@ internal class SafariDataImporter: DataImporter {
         _ = openPanel.runModal()
         return openPanel.urls.first
     }
-    
+
     static private var safariDataDirectoryURL: URL {
         return URL.nonSandboxLibraryDirectoryURL.appendingPathComponent("Safari/")
     }
-    
+
     static private var bookmarksFileURL: URL {
         return safariDataDirectoryURL.appendingPathComponent("Bookmarks.plist")
     }
@@ -67,7 +67,7 @@ internal class SafariDataImporter: DataImporter {
 
             let faviconsReader = SafariFaviconsReader(safariDataDirectoryURL: Self.safariDataDirectoryURL)
             let faviconsResult = faviconsReader.readFavicons()
-            
+
             switch faviconsResult {
             case .success(let faviconsByURL):
                 for (pageURLString, fetchedFavicons) in faviconsByURL {
@@ -84,7 +84,7 @@ internal class SafariDataImporter: DataImporter {
                         faviconManager.handleFavicons(favicons, documentUrl: pageURL)
                     }
                 }
-                
+
             case .failure:
                 Pixel.fire(.faviconImportFailed(source: .safari))
             }

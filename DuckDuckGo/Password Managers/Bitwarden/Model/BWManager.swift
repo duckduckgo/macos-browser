@@ -499,7 +499,7 @@ final class BWManager: BWManagement, ObservableObject {
 
         return "2.\(encryptedData.iv.base64EncodedString())|\(encryptedData.data.base64EncodedString())|\(encryptedData.hmac.base64EncodedString())"
     }
-    
+
     // MARK: - Encryption
 
     lazy var encryption = BWEncryption()

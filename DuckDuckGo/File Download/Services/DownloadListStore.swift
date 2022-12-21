@@ -142,7 +142,7 @@ final class DownloadListStore: DownloadListStoring {
 
     func save(_ item: DownloadListItem, completionHandler: ((Error?) -> Void)?) {
         guard let context = self.context else { return }
-        
+
         func mainQueueCompletion(_ error: Error?) {
             guard completionHandler != nil else { return }
             DispatchQueue.main.async {

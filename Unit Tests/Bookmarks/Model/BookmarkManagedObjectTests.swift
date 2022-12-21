@@ -26,7 +26,7 @@ class BookmarkManagedObjectTests: XCTestCase {
         let container = CoreData.bookmarkContainer()
         let context = container.viewContext
         let parent = createTestRootFolderManagedObject(in: context)
-        
+
         createTestBookmarkManagedObject(in: context, parent: parent)
 
         XCTAssertNoThrow(try context.save())
@@ -134,7 +134,7 @@ class BookmarkManagedObjectTests: XCTestCase {
         bottomLevelFolder.addToChildren(topLevelFolder)
         XCTAssertThrowsError(try context.save())
     }
-    
+
     func testWhenSavingBookmark_AndBookmarkDoesNotHaveParentFolder_ThenSavingFails() {
         let container = CoreData.bookmarkContainer()
         let context = container.viewContext
@@ -152,7 +152,7 @@ class BookmarkManagedObjectTests: XCTestCase {
             XCTAssertEqual(error as? BookmarkManagedObject.BookmarkError, BookmarkManagedObject.BookmarkError.mustExistInsideRootFolder)
         }
     }
-    
+
     func testWhenSavingFolder_AndFolderDoesNotHaveParentFolder_ThenSavingFails() {
         let container = CoreData.bookmarkContainer()
         let context = container.viewContext

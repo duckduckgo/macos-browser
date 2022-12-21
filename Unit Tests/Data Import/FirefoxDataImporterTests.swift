@@ -21,30 +21,30 @@ import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 class FirefoxDataImporterTests: XCTestCase {
-    
+
     func testWhenImportingWithoutAnyDataTypes_ThenSummaryIsEmpty() async {
         let loginImporter = MockLoginImporter()
         let faviconManager = FaviconManagerMock()
         let bookmarkImporter = MockBookmarkImporter(importBookmarks: { _, _ in .init(successful: 0, duplicates: 0, failed: 0) })
         let importer = FirefoxDataImporter(loginImporter: loginImporter, bookmarkImporter: bookmarkImporter, faviconManager: faviconManager)
-        
+
         let summary = await importer.importData(types: [], from: .init(profileURL: resourceURL()))
-        
+
         if case let .success(summary) = summary {
             XCTAssert(summary.isEmpty)
         } else {
             XCTFail("Received failure unexpectedly")
         }
     }
-    
+
     func testWhenImportingBookmarks_AndBookmarkImportSucceeds_ThenSummaryIsPopulated() async {
         let loginImporter = MockLoginImporter()
         let faviconManager = FaviconManagerMock()
         let bookmarkImporter = MockBookmarkImporter(importBookmarks: { _, _ in .init(successful: 1, duplicates: 2, failed: 3) })
         let importer = FirefoxDataImporter(loginImporter: loginImporter, bookmarkImporter: bookmarkImporter, faviconManager: faviconManager)
-        
+
         let summary = await importer.importData(types: [.bookmarks], from: .init(profileURL: resourceURL()))
-        
+
         if case let .success(summary) = summary {
             XCTAssertEqual(summary.bookmarksResult?.successful, 1)
             XCTAssertEqual(summary.bookmarksResult?.duplicates, 2)
@@ -61,16 +61,16 @@ class FirefoxDataImporterTests: XCTestCase {
         let bookmarkImporter = MockBookmarkImporter(throwableError: DataImportError.bookmarks(.cannotAccessCoreData),
                                                     importBookmarks: { _, _ in .init(successful: 0, duplicates: 0, failed: 0) })
         let importer = FirefoxDataImporter(loginImporter: loginImporter, bookmarkImporter: bookmarkImporter, faviconManager: faviconManager)
-        
+
         let summary = await importer.importData(types: [.bookmarks], from: .init(profileURL: resourceURL()))
-        
+
         if case let .failure(error) = summary {
             XCTAssertEqual(error, .bookmarks(.cannotReadFile))
         } else {
             XCTFail("Received summary unexpectedly")
         }
     }
-    
+
     private func resourceURL() -> URL {
         let bundle = Bundle(for: FirefoxBookmarksReaderTests.self)
         return bundle.resourceURL!.appendingPathComponent("Data Import Resources/Test Firefox Data")

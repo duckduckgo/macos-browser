@@ -21,22 +21,22 @@ import Combine
 import SwiftUI
 
 final class ConnectBitwardenViewController: NSViewController {
-    
+
     private let defaultSize = CGSize(width: 550, height: 280)
     private let viewModel = ConnectBitwardenViewModel(bitwardenManager: BWManager.shared)
-    
+
     var setupFlowCancellationHandler: (() -> Void)?
-    
+
     private var heightConstraint: NSLayoutConstraint?
-    
+
     public override func loadView() {
         view = NSView(frame: NSRect(origin: CGPoint.zero, size: defaultSize))
     }
-    
+
     public override func viewDidLoad() {
         super.viewDidLoad()
         viewModel.delegate = self
-        
+
         let connectBitwardenView = ConnectBitwardenView { newHeight in
             self.updateViewHeight(height: newHeight)
         }
@@ -44,10 +44,10 @@ final class ConnectBitwardenViewController: NSViewController {
         let hostingView = NSHostingView(rootView: connectBitwardenView.environmentObject(self.viewModel))
         hostingView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(hostingView)
-        
+
         let heightConstraint = hostingView.heightAnchor.constraint(equalToConstant: defaultSize.height)
         self.heightConstraint = heightConstraint
-        
+
         NSLayoutConstraint.activate([
             heightConstraint,
             hostingView.widthAnchor.constraint(equalToConstant: defaultSize.width),
@@ -57,15 +57,15 @@ final class ConnectBitwardenViewController: NSViewController {
             hostingView.rightAnchor.constraint(equalTo: view.rightAnchor)
         ])
     }
-    
+
     private func updateViewHeight(height: CGFloat) {
         heightConstraint?.constant = height
     }
-    
+
 }
 
 extension ConnectBitwardenViewController: ConnectBitwardenViewModelDelegate {
-    
+
     func connectBitwardenViewModelDismissedView(_ viewModel: ConnectBitwardenViewModel, canceled: Bool) {
         if canceled {
             setupFlowCancellationHandler?()
@@ -73,5 +73,5 @@ extension ConnectBitwardenViewController: ConnectBitwardenViewModelDelegate {
 
         dismiss()
     }
-    
+
 }

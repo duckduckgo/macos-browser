@@ -23,7 +23,7 @@ struct CountryList {
     struct Country: Identifiable {
         let id: String
         let name: String
-        
+
         var countryCode: String {
             return id
         }

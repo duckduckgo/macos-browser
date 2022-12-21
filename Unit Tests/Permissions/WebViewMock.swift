@@ -145,11 +145,11 @@ final class WebViewMock: WKWebView {
 }
 
 @objc final class WKSecurityOriginMock: WKSecurityOrigin {
-    var _protocol: String! // swiftlint:disable:this identifier_name
+    var _protocol: String!
     override var `protocol`: String { _protocol }
-    var _host: String! // swiftlint:disable:this identifier_name
+    var _host: String!
     override var host: String { _host }
-    var _port: Int! // swiftlint:disable:this identifier_name
+    var _port: Int!
     override var port: Int { _port }
 
     internal func setURL(_ url: URL) {
@@ -167,13 +167,13 @@ final class WebViewMock: WKWebView {
 }
 
 final class WKFrameInfoMock: WKFrameInfo {
-    var _isMainFrame: Bool! // swiftlint:disable:this identifier_name
+    var _isMainFrame: Bool!
     override var isMainFrame: Bool { _isMainFrame }
-    var _request: URLRequest! // swiftlint:disable:this identifier_name
+    var _request: URLRequest!
     override var request: URLRequest { _request }
-    var _securityOrigin: WKSecurityOrigin! // swiftlint:disable:this identifier_name
+    var _securityOrigin: WKSecurityOrigin!
     override var securityOrigin: WKSecurityOrigin { _securityOrigin }
-    weak var _webView: WKWebView? // swiftlint:disable:this identifier_name
+    weak var _webView: WKWebView?
     override var webView: WKWebView? { _webView }
 
     init(webView: WKWebView, securityOrigin: WKSecurityOrigin, request: URLRequest, isMainFrame: Bool) {
