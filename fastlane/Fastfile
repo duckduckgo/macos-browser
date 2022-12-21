@@ -20,57 +20,49 @@ UPGRADABLE_EMBEDDED_FILES = [
 default_platform(:mac)
 
 platform :mac do
+  before_all do
+    setup_ci if is_ci
+  end
+
   #################################################
   # Public lanes
   #################################################
-  lane :sync_signing do |options|
-    sync_code_signing(
-      type: "appstore",
-      api_key: get_api_key,
-      keychain_name: options[:keychain_name],
-      keychain_password: options[:keychain_password],
-      readonly: is_ci
-    )
+
+  desc 'Fetches and updates certificates and provisioning profiles for App Store distribution'
+  lane :sync_signing do
+    do_sync_signing
   end
 
-  lane :sync_signing_dev do |options|
-    sync_code_signing(
-      type: "development",
-      additional_cert_types: [],
-      app_identifier: "com.duckduckgo.mobile.ios.*",
-      api_key: get_api_key,
-      generate_apple_certs: true,
-      keychain_name: options[:keychain_name],
-      keychain_password: options[:keychain_password],
-      readonly: is_ci
-    )
+  desc 'Fetches and updates certificates and provisioning profiles for development'
+  lane :sync_signing_dev do
+    do_sync_signing
   end
 
+  desc 'Makes App Store release build and uploads it to TestFlight'
   lane :release_testflight do
-    sync_signing
-
-    build_app(
-      export_method: "app-store",
-      scheme: "DuckDuckGo Privacy Browser App Store",
-      export_options: "scripts/assets/AppStoreExportOptions.plist"
-    )
+    build_release
 
     upload_to_testflight(
       api_key: get_api_key
     )
+  end
 
-    # deliver(
-    #   submit_for_review: false,
-    #   automatic_release: false,
-    #   phased_release: true,
-    #   force: true,
-    #   skip_screenshots: true,
-    #   precheck_include_in_app_purchases: false,
-    #   submission_information: {
-    #      add_id_info_uses_idfa: false
-    #   }
-    # )
+  desc 'Makes App Store release build and uploads it to App Store Connect'
+  lane :release_appstore do
+    build_release
 
+    deliver(
+      api_key: get_api_key,
+      submit_for_review: false,
+      automatic_release: false,
+      phased_release: true,
+      force: true,
+      skip_screenshots: true,
+      precheck_include_in_app_purchases: false,
+      submission_information: {
+         add_id_info_uses_idfa: false
+      }
+    )
   end
 
   # Executes the release preparation work in the repository
@@ -110,6 +102,28 @@ platform :mac do
     else
       nil
     end
+  end
+
+  private_lane :do_sync_signing do
+    sync_code_signing(
+      api_key: get_api_key,
+      readonly: is_ci
+    )
+  end
+
+  # Ensures that the local repository is in good shape for the release:
+  #
+  # - Checks out the default branch
+  # - Ensures git status is clean
+  #
+  private_lane :build_release do
+    sync_signing
+
+    build_app(
+      export_method: "app-store",
+      scheme: "DuckDuckGo Privacy Browser App Store",
+      export_options: "scripts/assets/AppStoreExportOptions.plist"
+    )
   end
 
   # Ensures that the local repository is in good shape for the release:
