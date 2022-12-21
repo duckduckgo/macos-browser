@@ -439,7 +439,10 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     var userInteractionDialog: UserDialog? {
         didSet {
             guard let request = userInteractionDialog?.request else { return }
-            request.addCompletionHandler { [weak self, weak request] _ in
+            request.addCompletionHandler { [weak self, weak request] result in
+                // This check prevents a deadlock that can occur when accessing `userInteractionDialog` while the user dialog is being deinitialized.
+                if case let .failure(failure) = result, failure == .deinitialized { return }
+
                 if self?.userInteractionDialog?.request === request {
                     self?.userInteractionDialog = nil
                 }
