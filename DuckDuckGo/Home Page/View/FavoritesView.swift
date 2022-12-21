@@ -302,7 +302,7 @@ struct Favorite: View {
     // Maintain separate copies of bookmark metadata required by the view, in order to ensure that SwiftUI re-renders correctly.
     private let bookmarkTitle: String
     private let bookmarkURL: URL
-    
+
     init(bookmark: Bookmark) {
         self.bookmark = bookmark
         self.bookmarkTitle = bookmark.title
