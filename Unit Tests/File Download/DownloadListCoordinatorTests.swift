@@ -60,7 +60,7 @@ final class DownloadListCoordinatorTests: XCTestCase {
         }
     }
 
-    func setUpCoordinatorAndAddDownload() -> (WKDownloadMock, WebKitDownloadTask, UUID) { // swiftlint:disable:this large_tuple
+    func setUpCoordinatorAndAddDownload() -> (WKDownloadMock, WebKitDownloadTask, UUID) {
         setUpCoordinator()
         let download = WKDownloadMock()
         let task = WebKitDownloadTask(download: download, promptForLocation: false, destinationURL: destURL, tempURL: tempURL)
@@ -407,7 +407,7 @@ final class DownloadListCoordinatorTests: XCTestCase {
         }
 
         coordinator.cleanupInactiveDownloads()
-        
+
         waitForExpectations(timeout: 1)
         XCTAssertTrue(coordinator.hasActiveDownloads)
         XCTAssertEqual(coordinator.downloads(sortedBy: \.modified, ascending: true).count, 1)

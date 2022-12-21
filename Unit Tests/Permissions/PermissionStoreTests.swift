@@ -98,7 +98,7 @@ final class PermissionStoreTests: XCTestCase {
         store.clear(except: [stored1, stored2, stored3]) { [store] error in
             XCTAssertNil(error)
 
-            let permissions = try! store.loadPermissions() // swiftlint:disable:this force_try
+            let permissions = try! store.loadPermissions()
 
             XCTAssertEqual(permissions, [.init(permission: StoredPermission(id: stored1.id, decision: .allow),
                                                domain: "duckduckgo.com",

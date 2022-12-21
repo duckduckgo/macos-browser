@@ -836,6 +836,7 @@
 		B6DB3AF6278EA0130024C5C4 /* BundleExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6106B9D26A565DA0013B453 /* BundleExtension.swift */; };
 		B6DB3CF926A00E2D00D459B7 /* AVCaptureDevice+SwizzledAuthState.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6DB3CF826A00E2D00D459B7 /* AVCaptureDevice+SwizzledAuthState.swift */; };
 		B6DB3CFB26A17CB800D459B7 /* PermissionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6DB3CFA26A17CB800D459B7 /* PermissionModel.swift */; };
+		B6E319382953446000DD3BCF /* Assertions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6E319372953446000DD3BCF /* Assertions.swift */; };
 		B6E61EE3263AC0C8004E11AB /* FileManagerExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6E61EE2263AC0C8004E11AB /* FileManagerExtension.swift */; };
 		B6E61EE8263ACE16004E11AB /* UTType.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6E61EE7263ACE16004E11AB /* UTType.swift */; };
 		B6F1C80B2761C45400334924 /* LocalUnprotectedDomains.swift in Sources */ = {isa = PBXBuildFile; fileRef = 336B39E22726B4B700C417D3 /* LocalUnprotectedDomains.swift */; };
@@ -1725,6 +1726,7 @@
 		B6DB3AEE278D5C370024C5C4 /* URLSessionExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSessionExtension.swift; sourceTree = "<group>"; };
 		B6DB3CF826A00E2D00D459B7 /* AVCaptureDevice+SwizzledAuthState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AVCaptureDevice+SwizzledAuthState.swift"; sourceTree = "<group>"; };
 		B6DB3CFA26A17CB800D459B7 /* PermissionModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionModel.swift; sourceTree = "<group>"; };
+		B6E319372953446000DD3BCF /* Assertions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Assertions.swift; sourceTree = "<group>"; };
 		B6E61EE2263AC0C8004E11AB /* FileManagerExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileManagerExtension.swift; sourceTree = "<group>"; };
 		B6E61EE7263ACE16004E11AB /* UTType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UTType.swift; sourceTree = "<group>"; };
 		B6F41030264D2B23003DA42C /* ProgressExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressExtension.swift; sourceTree = "<group>"; };
@@ -2525,6 +2527,7 @@
 			isa = PBXGroup;
 			children = (
 				37534CA62811988E002621E7 /* AdjacentItemEnumerator.swift */,
+				B6E319372953446000DD3BCF /* Assertions.swift */,
 				4BB6CE5E26B77ED000EC5860 /* Cryptography.swift */,
 				4BB88B5A25B7BA50006F6B06 /* Instruments.swift */,
 				B6AAAC2C260330580029438D /* PublishedAfter.swift */,
@@ -4736,7 +4739,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/zsh;
-			shellScript = "if [[ -n \"$CI\" ]]; then\n    echo \"Skipping SwiftLint run in CI\"\n    exit 0\nfi\n\n# Add brew into PATH\nif [[ -f /opt/homebrew/bin/brew ]]; then\n    eval $(/opt/homebrew/bin/brew shellenv)\nfi\n\nif which swiftlint >/dev/null; then\n   if [ \"$CONFIGURATION\" = \"Release\" ]; then\n       swiftlint lint --strict\n       if [ $? -ne 0 ]; then\n           echo \"error: SwiftLint validation failed.\"\n           exit 1\n       fi\n   else\n       swiftlint lint\n   fi\nelse\n   echo \"error: SwiftLint not installed. Install using \\`brew install swiftlint\\`\"\n   exit 1\nfi\n";
+			shellScript = "if [[ -n \"$CI\" ]]; then\n    echo \"Skipping SwiftLint run in CI\"\n    exit 0\nfi\n\n# Add brew into PATH\nif [[ -f /opt/homebrew/bin/brew ]]; then\n   eval $(/opt/homebrew/bin/brew shellenv)\nfi\n\nrun_swiftlint_for_modified_files () {\n    TEST_FILES=\"\"\n    CODE_FILES=\"\"\n\n    # collect staged and unstaged files and replace spaces in filenames with #001\n    for FILE_NAME in $({ git diff --name-only & git diff --cached --name-only; }  | tr ' ' '\\001' | tr '\\n ' ' ')\n    do\n        echo \"handling $FILE_NAME\"\n        # collect .swift files separately for Unit Tests and Code Files\n        if [[ \"${FILE_NAME##*.}\" == \"swift\" ]]; then\n            if [[ \"$FILE_NAME\" == *\"Tests/\"* ]]; then\n                TEST_FILES+=\" \\\"${FILE_NAME}\\\"\"\n            else\n                CODE_FILES+=\" \\\"${FILE_NAME}\\\"\"\n            fi\n        fi\n    done\n\n    if [ -n \"${CODE_FILES}\" ]; then\n        # replace  back #001 with space and feed to swiftlint\n        echo \"${CODE_FILES}\"  | tr '\\001' ' ' | xargs swiftlint lint\n    fi\n    if [ -n \"${TEST_FILES}\" ]; then\n        echo \"${TEST_FILES}\" | tr '\\001' ' ' | xargs swiftlint lint --config .swiftlint.tests.yml\n    fi\n}\n\nif which swiftlint >/dev/null; then\n    if [ \"$CONFIGURATION\" = \"Release\" ]; then\n        swiftlint lint --strict\n        if [ $? -ne 0 ]; then\n            echo \"error: SwiftLint validation failed.\"\n            exit 1\n        fi\n    else\n        run_swiftlint_for_modified_files\n    fi\nelse\n    echo \"error: SwiftLint not installed. Install using \\`brew install swiftlint\\`\"\n    exit 1\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -5277,6 +5280,7 @@
 				B643BF1427ABF772000BACEC /* NSWorkspaceExtension.swift in Sources */,
 				B6C00ECB292F839D009C73A6 /* AutofillTabExtension.swift in Sources */,
 				4B677439255DBEB800025BD8 /* AppHTTPSUpgradeStore.swift in Sources */,
+				B6E319382953446000DD3BCF /* Assertions.swift in Sources */,
 				AAB549DF25DAB8F80058460B /* BookmarkViewModel.swift in Sources */,
 				85707F28276A34D900DC0649 /* DaxSpeech.swift in Sources */,
 				31F28C5328C8EECA00119F70 /* PrivatePlayerSchemeHandler.swift in Sources */,

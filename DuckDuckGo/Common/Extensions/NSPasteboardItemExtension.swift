@@ -19,18 +19,18 @@
 import Foundation
 
 extension NSPasteboardItem {
-    
+
     var bookmarkEntityUUID: UUID? {
         if let bookmark = propertyList(forType: BookmarkPasteboardWriter.bookmarkUTIInternalType) as? PasteboardAttributes,
            let bookmarkID = bookmark[PasteboardBookmark.Key.id] {
             return UUID(uuidString: bookmarkID)
         }
-        
+
         if let folder = propertyList(forType: FolderPasteboardWriter.folderUTIInternalType) as? PasteboardAttributes,
            let folderID = folder[PasteboardFolder.Key.id] {
             return UUID(uuidString: folderID)
         }
-        
+
         return nil
     }
 
@@ -38,10 +38,10 @@ extension NSPasteboardItem {
         guard let urlString = string(forType: .URL), let url = URL(string: urlString) else {
             return nil
         }
-        
+
         // WKWebView pasteboard items include the name of the link under the `public.url-name` type.
         let name = string(forType: NSPasteboard.PasteboardType(rawValue: "public.url-name"))
         return (title: name, url: url)
     }
-    
+
 }

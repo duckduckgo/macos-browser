@@ -22,7 +22,6 @@ import os.log
 
 protocol PermissionManagerProtocol: AnyObject {
 
-    // swiftlint:disable:next large_tuple
     typealias PublishedPermission = (domain: String, permissionType: PermissionType, decision: PersistedPermissionDecision)
     var permissionPublisher: AnyPublisher<PublishedPermission, Never> { get }
 
@@ -109,7 +108,7 @@ final class PermissionManager: PermissionManagerProtocol {
         }
         store.clear(except: permissions.values.reduce(into: [StoredPermission](), {
             $0.append(contentsOf: $1.values)
-        }), completionHandler: { _ in 
+        }), completionHandler: { _ in
             completion()
         })
     }

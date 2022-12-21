@@ -53,7 +53,7 @@ struct Favorites: View {
     }
 
 }
-    
+
 struct FavoritesGrid: View {
 
     @EnvironmentObject var model: HomePage.Models.FavoritesModel
@@ -207,13 +207,13 @@ struct FavoritesGrid: View {
         return row
     }
 }
-    
+
 fileprivate struct FavoritesGridAddButton: View {
-    
+
     @EnvironmentObject var model: HomePage.Models.FavoritesModel
 
     var body: some View {
-        
+
         ZStack(alignment: .top) {
             FavoriteTemplate(title: UserText.addFavorite, domain: nil)
             ZStack {
@@ -225,15 +225,15 @@ fileprivate struct FavoritesGridAddButton: View {
         .link {
             model.addNew()
         }
-        
+
     }
-    
+
 }
-    
+
 fileprivate struct FavoritesGridGhostButton: View {
-    
+
     var body: some View {
-        
+
         VStack {
             RoundedRectangle(cornerRadius: 12)
                 .stroke(Color("HomeFavoritesGhostColor"), style: StrokeStyle(lineWidth: 1.5, dash: [4.0, 2.0]))
@@ -241,9 +241,9 @@ fileprivate struct FavoritesGridGhostButton: View {
             Spacer()
         }
         .frame(width: FavoritesGrid.GridDimensions.itemWidth, height: FavoritesGrid.GridDimensions.itemHeight)
-        
+
     }
-    
+
 }
 
 struct FavoriteTemplate: View {
@@ -281,7 +281,7 @@ struct FavoriteTemplate: View {
         .frame(maxWidth: FavoritesGrid.GridDimensions.itemWidth)
         .onHover { isHovering in
             self.isHovering = isHovering
-            
+
             if isHovering {
                 NSCursor.pointingHand.push()
             } else {

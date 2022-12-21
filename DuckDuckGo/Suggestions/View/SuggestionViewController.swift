@@ -71,7 +71,7 @@ final class SuggestionViewController: NSViewController {
 
         self.view.window!.isOpaque = false
         self.view.window!.backgroundColor = .clear
-        
+
         addMonitors()
         tableView.rowHeight = suggestionContainerViewModel.isHomePage ? 34 : 28
     }
@@ -199,7 +199,7 @@ final class SuggestionViewController: NSViewController {
         if delegate?.shouldCloseSuggestionWindow(forMouseEvent: event) ?? true {
             closeWindow()
         }
-        
+
         return event
     }
 

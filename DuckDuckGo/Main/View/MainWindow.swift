@@ -63,7 +63,7 @@ final class MainWindow: NSWindow {
             // Send it after the first responder has been set on the super class so that window.firstResponder matches correctly
             postFirstResponderNotification(with: responder)
         }
-        
+
         return super.makeFirstResponder(responder)
     }
 

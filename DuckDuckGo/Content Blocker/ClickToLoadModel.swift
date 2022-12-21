@@ -39,7 +39,7 @@ struct ClickToLoadModel {
         let image = "data:image/" + (fileExt == "svg" ? "svg+xml" : fileExt) + ";base64," + base64String
         return image
     }
-    
+
     static let getImage: [String: String] = {
         return [
             "dax.png": Self.loadFile(name: "dax.png")!,

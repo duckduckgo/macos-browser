@@ -67,7 +67,7 @@ final class MainMenu: NSMenu {
     @IBOutlet weak var bookmarkThisPageMenuItem: NSMenuItem?
     @IBOutlet weak var favoritesMenuItem: NSMenuItem?
     @IBOutlet weak var favoriteThisPageMenuItem: NSMenuItem?
-    
+
     @IBOutlet weak var toggleBookmarksBarMenuItem: NSMenuItem?
     @IBOutlet weak var toggleAutofillShortcutMenuItem: NSMenuItem?
     @IBOutlet weak var toggleBookmarksShortcutMenuItem: NSMenuItem?
@@ -240,7 +240,7 @@ final class MainMenu: NSMenu {
         toggleBookmarksBarMenuItem?.title = title
         bookmarksMenuToggleBookmarksBarMenuItem?.title = title
     }
-    
+
     private func updateShortcutMenuItems() {
         toggleAutofillShortcutMenuItem?.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .autofill)
         toggleBookmarksShortcutMenuItem?.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .bookmarks)
