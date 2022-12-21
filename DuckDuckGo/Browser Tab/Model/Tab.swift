@@ -1167,7 +1167,7 @@ extension Tab: WKNavigationDelegate {
 
         let isLinkActivated = webView === sourceWebView
             && !isRedirect
-            && navigationAction.navigationType == .linkActivated
+            && (navigationAction.navigationType == .linkActivated || navigationAction.isUserInitiated)
 
         let isNavigatingAwayFromPinnedTab: Bool = {
             let isNavigatingToAnotherDomain = navigationAction.request.url?.host != url?.host
