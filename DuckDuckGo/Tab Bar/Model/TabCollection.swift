@@ -18,7 +18,6 @@
 
 import Foundation
 import Combine
-import os.log
 
 final class TabCollection: NSObject {
 
@@ -37,7 +36,7 @@ final class TabCollection: NSObject {
     @discardableResult
     func insert(_ tab: Tab, at index: Int) -> Bool {
         guard index >= 0, index <= tabs.endIndex else {
-            os_log("TabCollection: Index out of bounds", type: .error)
+            assertionFailure("TabCollection: Index out of bounds")
             return false
         }
 
@@ -47,7 +46,7 @@ final class TabCollection: NSObject {
 
     func removeTab(at index: Int, published: Bool = true) -> Bool {
         guard tabs.indices.contains(index) else {
-            os_log("TabCollection: Index out of bounds", type: .error)
+            assertionFailure("TabCollection: Index out of bounds")
             return false
         }
 
@@ -65,7 +64,7 @@ final class TabCollection: NSObject {
         guard let tab = tabs[safe: fromIndex],
               otherCollection.insert(tab, at: toIndex)
         else {
-            os_log("TabCollection: Index out of bounds", type: .error)
+            assertionFailure("TabCollection: Index out of bounds")
             return false
         }
 
@@ -87,7 +86,7 @@ final class TabCollection: NSObject {
         guard !indexSet.contains(where: { index in
             index < 0 && index >= tabs.count
         }) else {
-            os_log("TabCollection: Index out of bounds", type: .error)
+            assertionFailure("TabCollection: Index out of bounds")
             return
         }
 
@@ -113,8 +112,8 @@ final class TabCollection: NSObject {
     }
 
     func moveTab(at index: Int, to newIndex: Int) {
-        guard index >= 0, index < tabs.count, newIndex >= 0, newIndex < tabs.count else {
-            os_log("TabCollection: Index out of bounds", type: .error)
+        guard tabs.indices.contains(index), tabs.indices.contains(newIndex) else {
+            assertionFailure("TabCollection: Index out of bounds")
             return
         }
 
@@ -130,8 +129,8 @@ final class TabCollection: NSObject {
     }
 
     func replaceTab(at index: Int, with tab: Tab) {
-        guard index >= 0, index < tabs.count else {
-            os_log("TabCollection: Index out of bounds", type: .error)
+        guard tabs.indices.contains(index) else {
+            assertionFailure("TabCollection: Index out of bounds")
             return
         }
 
