@@ -24,25 +24,28 @@ struct CookieConsentAnimationView<AnimationModel>: View where AnimationModel: Co
     var body: some View {
         VStack {
             HStack {
-                Image("CookieConsentSketchMarks")
-                    .foregroundColor(Color("CookieConsentSketchMarksColor"))
-                    .opacity(animationModel.pillsOpacity)
-                    .scaleEffect(animationModel.pillsScale)
-                    .offset(x: animationModel.pillLeftSideOffset)
-                    .animation(.easeInOut(duration: animationModel.secondAnimationDuration))
+                withAnimation(.easeInOut(duration: animationModel.secondAnimationDuration)) {
+                    Image("CookieConsentSketchMarks")
+                        .foregroundColor(Color("CookieConsentSketchMarksColor"))
+                        .opacity(animationModel.pillsOpacity)
+                        .scaleEffect(animationModel.pillsScale)
+                        .offset(x: animationModel.pillLeftSideOffset)
+                }
 
-                Image("CookieConsentSketch")
-                    .opacity(animationModel.imageOpacity)
-                    .scaleEffect(animationModel.imageScale)
-                    .animation(.easeInOut(duration: animationModel.firstAnimationDuration))
+                withAnimation(.easeInOut(duration: animationModel.firstAnimationDuration)) {
+                    Image("CookieConsentSketch")
+                        .opacity(animationModel.imageOpacity)
+                        .scaleEffect(animationModel.imageScale)
+                }
 
-                Image("CookieConsentSketchMarks")
-                    .foregroundColor(Color("CookieConsentSketchMarksColor"))
-                    .rotationEffect(.degrees(180))
-                    .opacity(animationModel.pillsOpacity)
-                    .scaleEffect(animationModel.pillsScale)
-                    .offset(x: animationModel.pillRightSideOffset)
-                    .animation(.easeInOut(duration: animationModel.secondAnimationDuration))
+                withAnimation(.easeInOut(duration: animationModel.secondAnimationDuration)) {
+                    Image("CookieConsentSketchMarks")
+                        .foregroundColor(Color("CookieConsentSketchMarksColor"))
+                        .rotationEffect(.degrees(180))
+                        .opacity(animationModel.pillsOpacity)
+                        .scaleEffect(animationModel.pillsScale)
+                        .offset(x: animationModel.pillRightSideOffset)
+                }
             }
         }
     }

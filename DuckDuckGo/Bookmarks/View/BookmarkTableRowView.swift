@@ -110,10 +110,10 @@ final class BookmarkTableRowView: NSTableRowView {
     }
 
     override var interiorBackgroundStyle: NSView.BackgroundStyle {
-        if #available(macOS 11.0, *) {
-            return .normal
+        if #unavailable(macOS 11.0) {
+            return .light
         }
-        return .light
+        return .normal
     }
 
 }
