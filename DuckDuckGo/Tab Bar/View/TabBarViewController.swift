@@ -31,8 +31,8 @@ final class TabBarViewController: NSViewController {
     }
 
     @IBOutlet weak var pinnedTabsContainerView: NSView!
-    @IBOutlet weak var collectionView: TabBarCollectionView!
-    @IBOutlet weak var scrollView: TabBarScrollView!
+    @IBOutlet private weak var collectionView: TabBarCollectionView!
+    @IBOutlet private weak var scrollView: TabBarScrollView!
     @IBOutlet weak var pinnedTabsViewLeadingConstraint: NSLayoutConstraint!
     @IBOutlet weak var pinnedTabsWindowDraggingView: WindowDraggingView!
     @IBOutlet weak var rightScrollButton: MouseOverButton!
@@ -355,12 +355,14 @@ final class TabBarViewController: NSViewController {
     private var currentDraggingIndexPath: IndexPath?
 
     private func moveItemIfNeeded(at indexPath: IndexPath, to newIndexPath: IndexPath) {
-        guard newIndexPath != currentDraggingIndexPath else { return }
+        assert(indexPath == currentDraggingIndexPath)
 
         let index = indexPath.item
-        let newIndex = min(newIndexPath.item, max(tabCollectionViewModel.tabCollection.tabs.count - 1, 0))
-        let newIndexPath = IndexPath(item: newIndex)
-
+        let newIndex = newIndexPath.item
+        guard tabCollectionViewModel.tabCollection.tabs.indices.contains(newIndex) else {
+            assertionFailure("TabBarViewController: wrong index")
+            return
+        }
         guard index != newIndex else { return }
         currentDraggingIndexPath = newIndexPath
 
@@ -371,7 +373,7 @@ final class TabBarViewController: NSViewController {
     private func moveToNewWindow(indexPath: IndexPath, droppingPoint: NSPoint? = nil) {
         guard tabCollectionViewModel.tabCollection.tabs.count > 1 else { return }
         guard let tabViewModel = tabCollectionViewModel.tabViewModel(at: indexPath.item) else {
-            os_log("TabBarViewController: Failed to get tab view model", type: .error)
+            assertionFailure("TabBarViewController: Failed to get tab view model")
             return
         }
 
@@ -806,6 +808,7 @@ extension TabBarViewController: NSCollectionViewDataSource {
     }
 
     func collectionView(_ collectionView: NSCollectionView, itemForRepresentedObjectAt indexPath: IndexPath) -> NSCollectionViewItem {
+        assert(collectionView.numberOfItems(inSection: 0) == tabCollectionViewModel.tabs.count)
         let item = collectionView.makeItem(withIdentifier: TabBarViewItem.identifier, for: indexPath)
         guard let tabBarViewItem = item as? TabBarViewItem else {
             assertionFailure("TabBarViewController: Failed to get reusable TabBarViewItem instance")
@@ -853,7 +856,7 @@ extension TabBarViewController: NSCollectionViewDelegate {
                         didChangeItemsAt indexPaths: Set<IndexPath>,
                         to highlightState: NSCollectionViewItem.HighlightState) {
         guard indexPaths.count == 1, let indexPath = indexPaths.first else {
-            os_log("TabBarViewController: More than 1 item highlighted", type: .error)
+            assertionFailure("TabBarViewController: More than 1 item highlighted")
             return
         }
 
@@ -891,7 +894,7 @@ extension TabBarViewController: NSCollectionViewDelegate {
         initialDraggingIndexPaths = indexPaths
 
         guard let indexPath = indexPaths.first, indexPaths.count == 1 else {
-            os_log("TabBarViewController: More than 1 dragging index path", type: .error)
+            assertionFailure("TabBarViewController: More than 1 dragging index path")
             return
         }
         currentDraggingIndexPath = indexPath
@@ -918,12 +921,12 @@ extension TabBarViewController: NSCollectionViewDelegate {
         // Create a new window if the drop is too distant
         let frameRelativeToWindow = view.convert(view.bounds, to: nil)
         guard let frameRelativeToScreen = view.window?.convertToScreen(frameRelativeToWindow) else {
-            os_log("TabBarViewController: Conversion to the screen coordinate system failed", type: .error)
+            assertionFailure("TabBarViewController: Conversion to the screen coordinate system failed")
             return
         }
         if !screenPoint.isNearRect(frameRelativeToScreen, allowedDistance: Self.dropToOpenDistance) {
             guard let draggingIndexPath = draggingIndexPath else {
-                os_log("TabBarViewController: No current dragging index path", type: .error)
+                assertionFailure("TabBarViewController: No current dragging index path")
                 return
             }
             moveToNewWindow(indexPath: draggingIndexPath, droppingPoint: screenPoint)
@@ -942,6 +945,8 @@ extension TabBarViewController: NSCollectionViewDelegate {
             return .private
         }
 
+        // clear inter-window drag destination when dragging returns back to origin
+        TabDragAndDropManager.shared.clearDestination()
         let newIndexPath = proposedDropIndexPath.pointee as IndexPath
         moveItemIfNeeded(at: currentDraggingIndexPath, to: newIndexPath)
 
@@ -959,7 +964,7 @@ extension TabBarViewController: NSCollectionViewDelegate {
         }
 
         guard draggingIndexPaths.count == 1 else {
-            os_log("TabBarViewController: More than 1 item selected", type: .error)
+            assertionFailure("TabBarViewController: More than 1 item selected")
             return false
         }
 
@@ -995,7 +1000,7 @@ extension TabBarViewController: TabBarViewItemDelegate {
 
     func tabBarViewItemDuplicateAction(_ tabBarViewItem: TabBarViewItem) {
         guard let indexPath = collectionView.indexPath(for: tabBarViewItem) else {
-            os_log("TabBarViewController: Failed to get index path of tab bar view item", type: .error)
+            assertionFailure("TabBarViewController: Failed to get index path of tab bar view item")
             return
         }
 
@@ -1004,7 +1009,7 @@ extension TabBarViewController: TabBarViewItemDelegate {
 
     func tabBarViewItemCanBePinned(_ tabBarViewItem: TabBarViewItem) -> Bool {
         guard let indexPath = collectionView.indexPath(for: tabBarViewItem) else {
-            os_log("TabBarViewController: Failed to get index path of tab bar view item", type: .error)
+            assertionFailure("TabBarViewController: Failed to get index path of tab bar view item")
             return false
         }
 
@@ -1013,7 +1018,7 @@ extension TabBarViewController: TabBarViewItemDelegate {
 
     func tabBarViewItemPinAction(_ tabBarViewItem: TabBarViewItem) {
         guard let indexPath = collectionView.indexPath(for: tabBarViewItem) else {
-            os_log("TabBarViewController: Failed to get index path of tab bar view item", type: .error)
+            assertionFailure("TabBarViewController: Failed to get index path of tab bar view item")
             return
         }
 
@@ -1034,7 +1039,7 @@ extension TabBarViewController: TabBarViewItemDelegate {
 
     func tabBarViewItemCloseAction(_ tabBarViewItem: TabBarViewItem) {
         guard let indexPath = collectionView.indexPath(for: tabBarViewItem) else {
-            os_log("TabBarViewController: Failed to get index path of tab bar view item", type: .error)
+            assertionFailure("TabBarViewController: Failed to get index path of tab bar view item")
             return
         }
 
@@ -1045,7 +1050,7 @@ extension TabBarViewController: TabBarViewItemDelegate {
         guard let indexPath = collectionView.indexPath(for: tabBarViewItem),
               let permissions = tabCollectionViewModel.tabViewModel(at: indexPath.item)?.tab.permissions
         else {
-            os_log("TabBarViewController: Failed to get index path of tab bar view item or its permissions", type: .error)
+            assertionFailure("TabBarViewController: Failed to get index path of tab bar view item or its permissions")
             return
         }
 
@@ -1060,7 +1065,7 @@ extension TabBarViewController: TabBarViewItemDelegate {
 
     func tabBarViewItemCloseOtherAction(_ tabBarViewItem: TabBarViewItem) {
         guard let indexPath = collectionView.indexPath(for: tabBarViewItem) else {
-            os_log("TabBarViewController: Failed to get index path of tab bar view item", type: .error)
+            assertionFailure("TabBarViewController: Failed to get index path of tab bar view item")
             return
         }
 
@@ -1069,7 +1074,7 @@ extension TabBarViewController: TabBarViewItemDelegate {
 
     func tabBarViewItemCloseToTheRightAction(_ tabBarViewItem: TabBarViewItem) {
         guard let indexPath = collectionView.indexPath(for: tabBarViewItem) else {
-            os_log("TabBarViewController: Failed to get index path of tab bar view item", type: .error)
+            assertionFailure("TabBarViewController: Failed to get index path of tab bar view item")
             return
         }
 
@@ -1078,7 +1083,7 @@ extension TabBarViewController: TabBarViewItemDelegate {
 
     func tabBarViewItemMoveToNewWindowAction(_ tabBarViewItem: TabBarViewItem) {
         guard let indexPath = collectionView.indexPath(for: tabBarViewItem) else {
-            os_log("TabBarViewController: Failed to get index path of tab bar view item", type: .error)
+            assertionFailure("TabBarViewController: Failed to get index path of tab bar view item")
             return
         }
 
@@ -1089,7 +1094,7 @@ extension TabBarViewController: TabBarViewItemDelegate {
         guard let indexPath = collectionView.indexPath(for: tabBarViewItem),
               let tab = tabCollectionViewModel.tabCollection.tabs[safe: indexPath.item]
         else {
-            os_log("TabBarViewController: Failed to get tab from tab bar view item", type: .error)
+            assertionFailure("TabBarViewController: Failed to get tab from tab bar view item")
             return
         }
 
@@ -1100,7 +1105,7 @@ extension TabBarViewController: TabBarViewItemDelegate {
         guard let indexPath = collectionView.indexPath(for: tabBarViewItem),
               let tab = tabCollectionViewModel.tabCollection.tabs[safe: indexPath.item]
         else {
-            os_log("TabBarViewController: Failed to get tab from tab bar view item", type: .error)
+            assertionFailure("TabBarViewController: Failed to get tab from tab bar view item")
             return
         }
 
@@ -1109,7 +1114,7 @@ extension TabBarViewController: TabBarViewItemDelegate {
 
     func otherTabBarViewItemsState(for tabBarViewItem: TabBarViewItem) -> OtherTabBarViewItemsState {
         guard let indexPath = collectionView.indexPath(for: tabBarViewItem) else {
-            os_log("TabBarViewController: Failed to get index path of tab bar view item", type: .error)
+            assertionFailure("TabBarViewController: Failed to get index path of tab bar view item")
             return .init(hasItemsToTheLeft: false, hasItemsToTheRight: false)
         }
         return .init(hasItemsToTheLeft: indexPath.item > 0,
