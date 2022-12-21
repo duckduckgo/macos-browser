@@ -106,7 +106,7 @@ final class PasswordManagementIdentityModel: ObservableObject, PasswordManagemen
             isDirty = true
         }
     }
-    
+
     @Published var addressStreet2: String = "" {
         didSet {
             isDirty = true

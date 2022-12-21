@@ -79,7 +79,7 @@ final class DownloadViewModel {
 }
 
 extension DownloadViewModel {
-    
+
     var error: FileDownloadError? {
         guard case .failed(let error) = state else { return nil }
         return error

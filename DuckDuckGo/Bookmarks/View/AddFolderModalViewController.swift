@@ -20,10 +20,10 @@ import AppKit
 import Combine
 
 protocol AddFolderModalViewControllerDelegate: AnyObject {
-    
+
     func addFolderViewController(_ viewController: AddFolderModalViewController, addedFolderWith name: String)
     func addFolderViewController(_ viewController: AddFolderModalViewController, saved folder: BookmarkFolder)
-    
+
 }
 
 final class AddFolderModalViewController: NSViewController {

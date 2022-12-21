@@ -153,16 +153,16 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
         if contentMode == .foldersOnly, index != -1 {
             return .none
         }
-        
+
         let destinationNode = nodeForItem(item)
-        
+
         let bookmarks = PasteboardBookmark.pasteboardBookmarks(with: info.draggingPasteboard)
         let folders = PasteboardFolder.pasteboardFolders(with: info.draggingPasteboard)
 
         if let bookmarks = bookmarks, let folders = folders {
             let canMoveBookmarks = validateDrop(for: bookmarks, destination: destinationNode) == .move
             let canMoveFolders = validateDrop(for: folders, destination: destinationNode) == .move
-            
+
             // If the dragged values contain both folders and bookmarks, only validate the move if all objects can be moved.
             if canMoveBookmarks, canMoveFolders {
                 return .move
@@ -239,7 +239,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
               !draggedObjectIdentifiers.isEmpty else {
             return false
         }
-        
+
         let representedObject = (item as? BookmarkNode)?.representedObject
 
         // Handle the nil destination case:
@@ -273,7 +273,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
                     os_log("Failed to accept existing parent drop via outline view: %s", error.localizedDescription)
                 }
             }
-            
+
             return true
         } else if representedObject == nil {
             bookmarkManager.move(objectUUIDs: draggedObjectIdentifiers, toIndex: index, withinParentFolder: .root) { error in
@@ -281,7 +281,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
                     os_log("Failed to accept existing parent drop via outline view: %s", error.localizedDescription)
                 }
             }
-            
+
             return true
         } else {
             return false

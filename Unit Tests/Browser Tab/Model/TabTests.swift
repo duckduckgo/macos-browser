@@ -46,7 +46,7 @@ final class TabTests: XCTestCase {
 
         XCTAssert(tab != tab2)
     }
-    
+
 }
 
 extension Tab {

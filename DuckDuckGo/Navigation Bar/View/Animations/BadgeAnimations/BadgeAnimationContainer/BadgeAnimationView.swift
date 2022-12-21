@@ -23,13 +23,13 @@ struct BadgeAnimationView: View {
     let iconView: AnyView
     let text: String
     @State var textOffset: CGFloat = -Consts.View.textScrollerOffset
-    
+
     var body: some View {
         GeometryReader { geometry in
             ZStack {
                 ExpandableRectangle(animationModel: animationModel)
                 .frame(width: geometry.size.width, height: geometry.size.height)
-                
+
                 HStack {
                     Text(text)
                         .foregroundColor(.primary)
@@ -50,10 +50,10 @@ struct BadgeAnimationView: View {
                             }
                         })
                         .padding(.leading, geometry.size.height)
-                    
+
                     Spacer()
                 }.clipped()
-                
+
                 // Opaque view
                 HStack {
                     Rectangle()
@@ -62,7 +62,7 @@ struct BadgeAnimationView: View {
                         .frame(width: geometry.size.height - Consts.View.opaqueViewOffset, height: geometry.size.height)
                     Spacer()
                 }
-                
+
                 HStack {
                     iconView
                         .frame(width: geometry.size.height, height: geometry.size.height)
@@ -89,7 +89,7 @@ struct ExpandableRectangle: View {
                         withAnimation(.easeInOut(duration: animationModel.duration)) {
                             width = geometry.size.width - geometry.size.height
                         }
-                        
+
                     case .retracted:
                         withAnimation(.easeInOut(duration: animationModel.duration)) {
                                 width = 0
@@ -121,7 +121,7 @@ private enum Consts {
         static let opaqueViewOffset: CGFloat = 8
         static let textScrollerOffset: CGFloat = 120
     }
-    
+
     enum Colors {
         static let badgeBackgroundColor = Color("URLNotificationBadgeBackground")
     }

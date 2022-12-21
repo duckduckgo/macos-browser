@@ -24,42 +24,42 @@ private struct NSMenuItemColor {
 }
 
 final class PopUpButton: NSPopUpButton {
-    
+
     var backgroundColorCell: NSPopUpButtonBackgroundColorCell? {
         return self.cell as? NSPopUpButtonBackgroundColorCell
     }
-    
+
     init() {
         super.init(frame: .zero, pullsDown: true)
         self.cell = NSPopUpButtonBackgroundColorCell()
     }
-    
+
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
         self.cell = NSPopUpButtonBackgroundColorCell()
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     func addItem(withTitle title: String,
                  foregroundColor: NSColor?,
                  backgroundColor: NSColor) {
         self.addItem(withTitle: title)
-        
+
         let itemColor = NSMenuItemColor(foregroundColor: foregroundColor, backgroundColor: backgroundColor)
         backgroundColorCell?.colors[title] = itemColor
     }
-    
+
 }
 
 final class NSPopUpButtonBackgroundColorCell: NSPopUpButtonCell {
 
     private static let chevronsImage = NSImage(named: "PopUpButtonChevrons")!
-    
+
     fileprivate var colors: [String: NSMenuItemColor] = [:]
-    
+
     private func foregroundColor(for title: String) -> NSColor {
         if let color = colors[title]?.foregroundColor {
             return color
@@ -67,7 +67,7 @@ final class NSPopUpButtonBackgroundColorCell: NSPopUpButtonCell {
             return NSApplication.shared.effectiveAppearance.name == .aqua ? .black : .white
         }
     }
-    
+
     override func drawTitle(withFrame cellFrame: NSRect, in controlView: NSView) {
         let font = self.font ?? NSFont.systemFont(ofSize: 15)
 
@@ -80,7 +80,7 @@ final class NSPopUpButtonBackgroundColorCell: NSPopUpButtonCell {
         titleRect.origin.y += 2
         string.draw(in: titleRect)
     }
-    
+
     override func drawImage(withFrame cellFrame: NSRect, in controlView: NSView) {
         let color = foregroundColor(for: title)
         guard let tintedImage = image?.tinted(with: color) else {
@@ -89,10 +89,10 @@ final class NSPopUpButtonBackgroundColorCell: NSPopUpButtonCell {
 
         var imageRect = imageRect(forBounds: cellFrame)
         imageRect.origin.y += 1
-        
+
         tintedImage.draw(in: imageRect)
     }
-    
+
     override func drawBezel(withFrame frame: NSRect, in controlView: NSView) {
         guard let color = colors[title] else {
             return
@@ -103,14 +103,14 @@ final class NSPopUpButtonBackgroundColorCell: NSPopUpButtonCell {
         modifiedFrame.origin.x += horizontalOffset
         modifiedFrame.size.width -= horizontalOffset
         modifiedFrame.size.height -= 1
-        
+
         color.backgroundColor.setFill()
 
         let backgroundPath = NSBezierPath(roundedRect: modifiedFrame, xRadius: 5, yRadius: 5)
         backgroundPath.fill()
-        
+
         let foregroundColor = foregroundColor(for: title)
-        
+
         let tintedChevrons = Self.chevronsImage.tinted(with: foregroundColor)
         let chevronFrame = NSRect(x: frame.size.width - Self.chevronsImage.size.width - 4,
                                   y: frame.size.height / 2 - Self.chevronsImage.size.height / 2,

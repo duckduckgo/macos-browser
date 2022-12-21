@@ -520,12 +520,12 @@ final class TabCollectionViewModel: NSObject {
 
         insert(tab)
     }
-    
+
     func title(forTabWithURL url: URL) -> String? {
         let matchingTab = tabCollection.tabs.first { tab in
             tab.url == url
         }
-        
+
         return matchingTab?.title
     }
 

@@ -144,7 +144,7 @@ final class PasswordManagementViewController: NSViewController {
     }
 
     private let passwordManagerCoordinator: PasswordManagerCoordinating = PasswordManagerCoordinator.shared
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         createListView()
@@ -157,7 +157,7 @@ final class PasswordManagementViewController: NSViewController {
 
         addVaultItemButton.toolTip = UserText.addItemTooltip
         moreButton.toolTip = UserText.moreOptionsTooltip
-        
+
         addVaultItemButton.sendAction(on: .leftMouseDown)
         moreButton.sendAction(on: .leftMouseDown)
 
@@ -616,7 +616,7 @@ final class PasswordManagementViewController: NSViewController {
     }
 
     var passwordManagerSelectionCancellable: AnyCancellable?
-    
+
     // swiftlint:disable function_body_length
     private func createListView() {
         let listModel = PasswordManagementItemListModel(passwordManagerCoordinator: self.passwordManagerCoordinator) { [weak self] previousValue, newValue in
@@ -677,7 +677,7 @@ final class PasswordManagementViewController: NSViewController {
 
         self.listModel = listModel
         self.listView = NSHostingView(rootView: PasswordManagementItemListView().environmentObject(listModel))
-        
+
         passwordManagerSelectionCancellable = listModel.$externalPasswordManagerSelected
             .receive(on: DispatchQueue.main)
             .removeDuplicates()
@@ -687,16 +687,16 @@ final class PasswordManagementViewController: NSViewController {
                 }
             }
     }
-    
+
     private func displayExternalPasswordManagerView() {
         let passwordManagerView = PasswordManagementBitwardenItemView(manager: PasswordManagerCoordinator.shared) { [weak self] in
             self?.dismiss()
         }
-        
+
         let view = NSHostingView(rootView: passwordManagerView)
         replaceItemContainerChildView(with: view)
     }
-    
+
     // swiftlint:enable function_body_length
 
     private func createNewSecureVaultItemMenu() -> NSMenu {

@@ -24,7 +24,7 @@ extension EmailUrls {
     private struct Url {
         static let emailProtectionLink = "https://duckduckgo.com/email"
     }
-    
+
     private struct DevUrl {
         static let emailProtectionLink = "https://quackdev.duckduckgo.com/email"
     }

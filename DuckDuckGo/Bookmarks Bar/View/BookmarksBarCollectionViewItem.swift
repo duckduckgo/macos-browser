@@ -21,7 +21,7 @@ import Cocoa
 protocol BookmarksBarCollectionViewItemDelegate: AnyObject {
 
     func bookmarksBarCollectionViewItemClicked(_ item: BookmarksBarCollectionViewItem)
-    
+
     func bookmarksBarCollectionViewItemOpenInNewTabAction(_ item: BookmarksBarCollectionViewItem)
     func bookmarksBarCollectionViewItemOpenInNewWindowAction(_ item: BookmarksBarCollectionViewItem)
     func bookmarksBarCollectionViewItemAddToFavoritesAction(_ item: BookmarksBarCollectionViewItem)
@@ -33,7 +33,7 @@ protocol BookmarksBarCollectionViewItemDelegate: AnyObject {
 }
 
 final class BookmarksBarCollectionViewItem: NSCollectionViewItem {
-    
+
     static let identifier = NSUserInterfaceItemIdentifier(rawValue: "BookmarksBarCollectionViewItem")
 
     @IBOutlet var stackView: NSStackView!
@@ -50,11 +50,11 @@ final class BookmarksBarCollectionViewItem: NSCollectionViewItem {
             mouseClickView.delegate = self
         }
     }
-    
+
     private enum EntityType {
         case bookmark(title: String, url: URL, favicon: NSImage?, isFavorite: Bool)
         case folder(title: String)
-        
+
         var isFolder: Bool {
             switch self {
             case .bookmark: return false
@@ -65,26 +65,26 @@ final class BookmarksBarCollectionViewItem: NSCollectionViewItem {
 
     weak var delegate: BookmarksBarCollectionViewItemDelegate?
     private var entityType: EntityType?
-    
+
     /// MouseClickView is prone to sending mouseUp events without a preceding mouseDown.
     /// This tracks whether to consider a click as legitimate and use it to trigger navigation from the bookmarks bar.
     private var receivedMouseDownEvent = false
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
         configureLayer()
         createMenu()
     }
-    
+
     override func viewDidLayout() {
         super.viewDidLayout()
         mouseOverView.updateTrackingAreas()
     }
-    
+
     func updateItem(from entity: BaseBookmarkEntity) {
         self.title = entity.title
-        
+
         if let bookmark = entity as? Bookmark {
             let favicon = bookmark.favicon(.small)?.copy() as? NSImage
             favicon?.size = NSSize.faviconSize
@@ -95,14 +95,14 @@ final class BookmarksBarCollectionViewItem: NSCollectionViewItem {
         } else {
             fatalError("Could not cast bookmark subclass from entity")
         }
-        
+
         guard let entityType = entityType else {
             assertionFailure("Failed to get entity type")
             return
         }
-        
+
         self.titleLabel.stringValue = entity.title
-        
+
         switch entityType {
         case .bookmark(_, let url, let storedFavicon, _):
             let favicon = storedFavicon ?? FaviconManager.shared.getCachedFavicon(for: url.host ?? "", sizeCategory: .small)?.image
@@ -111,23 +111,23 @@ final class BookmarksBarCollectionViewItem: NSCollectionViewItem {
             faviconView.image = NSImage(named: "Folder-16")
         }
     }
-    
+
     private func configureLayer() {
         view.wantsLayer = true
         view.layer?.cornerRadius = 4.0
         view.layer?.masksToBounds = true
     }
-    
+
     private func createMenu() {
         let menu = NSMenu()
         menu.delegate = self
         view.menu = menu
     }
-    
+
 }
 
 extension BookmarksBarCollectionViewItem: MouseClickViewDelegate {
-    
+
     func mouseClickView(_ mouseClickView: MouseClickView, mouseDownEvent: NSEvent) {
         receivedMouseDownEvent = true
     }
@@ -146,14 +146,14 @@ extension BookmarksBarCollectionViewItem: MouseClickViewDelegate {
 // MARK: - NSMenu
 
 extension BookmarksBarCollectionViewItem: NSMenuDelegate {
-    
+
     func menuNeedsUpdate(_ menu: NSMenu) {
         menu.removeAllItems()
-        
+
         guard let entityType = entityType else {
             return
         }
-        
+
         switch entityType {
         case .bookmark(_, _, _, let isFavorite):
             menu.items = createBookmarkMenuItems(isFavorite: isFavorite)
@@ -161,13 +161,13 @@ extension BookmarksBarCollectionViewItem: NSMenuDelegate {
             menu.items = createFolderMenuItems()
         }
     }
-    
+
 }
 
 extension BookmarksBarCollectionViewItem {
-    
+
     // MARK: Bookmark Menu Items
-    
+
     func createBookmarkMenuItems(isFavorite: Bool) -> [NSMenuItem] {
         let items = [
             openBookmarkInNewTabMenuItem(),
@@ -180,14 +180,14 @@ extension BookmarksBarCollectionViewItem {
             copyBookmarkURLMenuItem(),
             deleteEntityMenuItem()
         ].compactMap { $0 }
-        
+
         return items
     }
-    
+
     func openBookmarkInNewTabMenuItem() -> NSMenuItem {
         return menuItem(UserText.openInNewTab, #selector(openBookmarkInNewTabMenuItemSelected(_:)))
     }
-    
+
     @objc
     func openBookmarkInNewTabMenuItemSelected(_ sender: NSMenuItem) {
         delegate?.bookmarksBarCollectionViewItemOpenInNewTabAction(self)
@@ -196,12 +196,12 @@ extension BookmarksBarCollectionViewItem {
     func openBookmarkInNewWindowMenuItem() -> NSMenuItem {
         return menuItem(UserText.openInNewWindow, #selector(openBookmarkInNewWindowMenuItemSelected(_:)))
     }
-    
+
     @objc
     func openBookmarkInNewWindowMenuItemSelected(_ sender: NSMenuItem) {
         delegate?.bookmarksBarCollectionViewItemOpenInNewWindowAction(self)
     }
-    
+
     func addToFavoritesMenuItem(isFavorite: Bool) -> NSMenuItem? {
         guard !isFavorite else {
             return nil
@@ -209,50 +209,50 @@ extension BookmarksBarCollectionViewItem {
 
         return menuItem(UserText.addToFavorites, #selector(addToFavoritesMenuItemSelected(_:)))
     }
-    
+
     @objc
     func addToFavoritesMenuItemSelected(_ sender: NSMenuItem) {
         delegate?.bookmarksBarCollectionViewItemAddToFavoritesAction(self)
     }
-    
+
     func editItem() -> NSMenuItem {
         return menuItem("Edit…", #selector(editItemSelected(_:)))
     }
-    
+
     @objc
     func editItemSelected(_ sender: NSMenuItem) {
         delegate?.bookmarksBarCollectionViewEditAction(self)
     }
-    
+
     func moveToEndMenuItem() -> NSMenuItem {
         return menuItem(UserText.bookmarksBarContextMenuMoveToEnd, #selector(moveToEndMenuItemSelected(_:)))
     }
-    
+
     @objc
     func moveToEndMenuItemSelected(_ sender: NSMenuItem) {
         delegate?.bookmarksBarCollectionViewItemMoveToEndAction(self)
     }
-    
+
     func copyBookmarkURLMenuItem() -> NSMenuItem {
         return menuItem(UserText.bookmarksBarContextMenuCopy, #selector(copyBookmarkURLMenuItemSelected(_:)))
     }
-    
+
     @objc
     func copyBookmarkURLMenuItemSelected(_ sender: NSMenuItem) {
         delegate?.bookmarksBarCollectionViewItemCopyBookmarkURLAction(self)
     }
-    
+
     func deleteEntityMenuItem() -> NSMenuItem {
         return menuItem(UserText.bookmarksBarContextMenuDelete, #selector(deleteMenuItemSelected(_:)))
     }
-    
+
     @objc
     func deleteMenuItemSelected(_ sender: NSMenuItem) {
         delegate?.bookmarksBarCollectionViewItemDeleteEntityAction(self)
     }
-    
+
     // MARK: Folder Menu Items
-    
+
     func createFolderMenuItems() -> [NSMenuItem] {
         return [
             editItem(),
@@ -261,9 +261,9 @@ extension BookmarksBarCollectionViewItem {
             deleteEntityMenuItem()
         ]
     }
-    
+
     func menuItem(_ title: String, _ action: Selector) -> NSMenuItem {
         return NSMenuItem(title: title, action: action, keyEquivalent: "")
     }
-    
+
 }

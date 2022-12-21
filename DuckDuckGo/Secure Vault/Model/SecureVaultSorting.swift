@@ -20,17 +20,17 @@ import Foundation
 import SwiftUI
 
 struct SecureVaultSorting: Equatable {
-    
+
     static let `default` = SecureVaultSorting(category: .allItems, parameter: .title, order: .ascending)
 
     enum Category: CaseIterable, Identifiable {
         var id: Category { self }
-        
+
         case allItems
         case logins
         case identities
         case cards
-        
+
         var title: String {
             switch self {
             case .allItems: return UserText.passwordManagementAllItems
@@ -39,7 +39,7 @@ struct SecureVaultSorting: Equatable {
             case .cards: return UserText.passwordManagementCreditCards
             }
         }
-        
+
         var imageName: String? {
             switch self {
             case .allItems: return nil
@@ -48,7 +48,7 @@ struct SecureVaultSorting: Equatable {
             case .cards: return "CreditCardGlyph"
             }
         }
-        
+
         var backgroundColor: NSColor {
             switch self {
             case .allItems: return NSColor(named: "SecureVaultCategoryDefaultColor")!
@@ -57,7 +57,7 @@ struct SecureVaultSorting: Equatable {
             case .cards: return NSColor(named: "CardsColor")!
             }
         }
-        
+
         var foregroundColor: NSColor? {
             switch self {
             case .allItems: return nil // Show white or black depending on system appearance
@@ -67,12 +67,12 @@ struct SecureVaultSorting: Equatable {
             }
         }
     }
-    
+
     enum SortParameter: CaseIterable {
         case title
         case dateModified
         case dateCreated
-        
+
         var title: String {
             switch self {
             case .title: return UserText.pmSortParameterTitle
@@ -87,11 +87,11 @@ struct SecureVaultSorting: Equatable {
             }
         }
     }
-    
+
     enum SortOrder: CaseIterable {
         case ascending
         case descending
-        
+
         func title(for sortDataType: SortDataType) -> String {
             switch sortDataType {
             case .string:
@@ -107,7 +107,7 @@ struct SecureVaultSorting: Equatable {
             }
         }
     }
-    
+
     enum SortDataType {
         case string
         case date

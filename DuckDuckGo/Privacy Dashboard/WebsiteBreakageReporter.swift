@@ -19,28 +19,28 @@
 import Foundation
 
 final class WebsiteBreakageReporter {
-    
+
     private weak var tabViewModel: TabViewModel?
-    
+
     public func updateTabViewModel(_ tabViewModel: TabViewModel) {
         self.tabViewModel = tabViewModel
     }
-    
+
     public func reportBreakage(category: String, description: String) {
         let websiteBreakage = makeWebsiteBreakage(category: category, description: description, currentTab: tabViewModel?.tab)
         let websiteBreakageSender = WebsiteBreakageSender()
         websiteBreakageSender.sendWebsiteBreakage(websiteBreakage)
     }
-    
+
     private func makeWebsiteBreakage(category: String, description: String, currentTab: Tab?) -> WebsiteBreakage {
         // ⚠️ To limit privacy risk, site URL is trimmed to not include query and fragment
         let currentURL = currentTab?.content.url?.trimmingQueryItemsAndFragment()?.absoluteString ?? ""
-        
+
         let blockedTrackerDomains = currentTab?.privacyInfo?.trackerInfo.trackersBlocked.compactMap { $0.domain } ?? []
         let installedSurrogates = currentTab?.privacyInfo?.trackerInfo.installedSurrogates.map {$0} ?? []
         let ampURL = currentTab?.linkProtection.lastAMPURLString ?? ""
         let urlParametersRemoved = currentTab?.linkProtection.urlParametersRemoved ?? false
-        
+
         let websiteBreakage = WebsiteBreakage(category: WebsiteBreakage.Category(rawValue: category.lowercased()),
                                               description: description,
                                               siteUrlString: currentURL,

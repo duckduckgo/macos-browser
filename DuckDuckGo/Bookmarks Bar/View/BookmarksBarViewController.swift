@@ -29,32 +29,32 @@ final class BookmarksBarViewController: NSViewController {
     private let bookmarkManager = LocalBookmarkManager.shared
     private let viewModel: BookmarksBarViewModel
     private let tabCollectionViewModel: TabCollectionViewModel
-    
+
     private var viewModelCancellable: AnyCancellable?
-    
+
     fileprivate var clipThreshold: CGFloat {
         let viewWidthWithoutClipIndicator = view.frame.width - clippedItemsIndicator.frame.minX
         return view.frame.width - viewWidthWithoutClipIndicator - 3
     }
-    
+
     init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel) {
         self.tabCollectionViewModel = tabCollectionViewModel
         self.viewModel = BookmarksBarViewModel(bookmarkManager: LocalBookmarkManager.shared, tabCollectionViewModel: tabCollectionViewModel)
 
         super.init(coder: coder)
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("TabBarViewController: Bad initializer")
     }
-    
+
     // MARK: - View Lifecycle
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
         addContextMenu()
-        
+
         viewModel.delegate = self
 
         let nib = NSNib(nibNamed: "BookmarksBarCollectionViewItem", bundle: .main)
@@ -66,31 +66,31 @@ final class BookmarksBarViewController: NSViewController {
             BookmarkPasteboardWriter.bookmarkUTIInternalType,
             FolderPasteboardWriter.folderUTIInternalType
         ])
-        
+
         bookmarksBarCollectionView.delegate = viewModel
         bookmarksBarCollectionView.dataSource = viewModel
         bookmarksBarCollectionView.collectionViewLayout = createCenteredCollectionViewLayout()
-        
+
         view.postsFrameChangedNotifications = true
     }
-    
+
     private func addContextMenu() {
         let menu = NSMenu()
         menu.delegate = self
         self.view.menu = menu
     }
-    
+
     override func viewWillAppear() {
         super.viewWillAppear()
         subscribeToEvents()
         refreshFavicons()
     }
-    
+
     override func viewDidAppear() {
         super.viewDidAppear()
         frameChangeNotification()
     }
-    
+
     private func subscribeToViewModel() {
         guard viewModelCancellable.isNil else {
             assertionFailure("Tried to subscribe to view model while it is already subscribed")
@@ -101,7 +101,7 @@ final class BookmarksBarViewController: NSViewController {
             self?.refreshClippedIndicator()
         }
     }
-    
+
     @objc
     private func frameChangeNotification() {
         // Wait until the frame change has taken effect for subviews before calculating changes to the list of items.
@@ -110,51 +110,51 @@ final class BookmarksBarViewController: NSViewController {
             self.refreshClippedIndicator()
         }
     }
-    
+
     override func removeFromParent() {
         super.removeFromParent()
         unsubscribeFromEvents()
     }
-    
+
     private func subscribeToEvents() {
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(frameChangeNotification),
                                                name: NSView.frameDidChangeNotification,
                                                object: view)
-        
+
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(refreshFavicons),
                                                name: .faviconCacheUpdated,
                                                object: nil)
-        
+
         subscribeToViewModel()
     }
-    
+
     private func unsubscribeFromEvents() {
         NotificationCenter.default.removeObserver(self, name: NSView.frameDidChangeNotification, object: nil)
         NotificationCenter.default.removeObserver(self, name: .faviconCacheUpdated, object: nil)
-        
+
         viewModelCancellable?.cancel()
         viewModelCancellable = nil
     }
-    
+
     // MARK: - Layout
-    
+
     private func createCenteredLayout(centered: Bool) -> NSCollectionLayoutSection {
         let group = NSCollectionLayoutGroup.horizontallyCentered(cellSizes: viewModel.cellSizes, centered: centered)
         return NSCollectionLayoutSection(group: group)
     }
-    
+
     func createCenteredCollectionViewLayout() -> NSCollectionViewLayout {
         return NSCollectionViewCompositionalLayout { [unowned self] _, _ in
             return createCenteredLayout(centered: viewModel.clippedItems.isEmpty)
         }
     }
-    
+
     private func refreshClippedIndicator() {
         self.clippedItemsIndicator.isHidden = viewModel.clippedItems.isEmpty
     }
-    
+
     @objc
     private func refreshFavicons() {
         bookmarksBarCollectionView.reloadData()
@@ -167,7 +167,7 @@ final class BookmarksBarViewController: NSViewController {
 
         menu.popUp(positioning: nil, at: location, in: sender)
     }
-    
+
 }
 
 extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
@@ -177,12 +177,12 @@ extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
             assertionFailure("Failed to look up index path for clicked item")
             return
         }
-        
+
         guard let entity = bookmarkManager.list?.topLevelEntities[indexPath.item] else {
             assertionFailure("Failed to get entity for clicked item")
             return
         }
-        
+
         if let bookmark = entity as? Bookmark {
             handle(action, for: bookmark)
         } else if let folder = entity as? BookmarkFolder {
@@ -191,15 +191,15 @@ extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
             assertionFailure("Failed to cast entity for clicked item")
         }
     }
-    
+
     func bookmarksBarViewModelWidthForContainer() -> CGFloat {
         return clipThreshold
     }
-    
+
     func bookmarksBarViewModelReloadedData() {
         bookmarksBarCollectionView.reloadData()
     }
-    
+
     private func handle(_ action: BookmarksBarViewModel.BookmarksBarItemAction, for bookmark: Bookmark) {
         switch action {
         case .openInNewTab:
@@ -224,7 +224,7 @@ extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
             bookmarkManager.remove(bookmark: bookmark)
         }
     }
-    
+
     private func handle(_ action: BookmarksBarViewModel.BookmarksBarItemAction, for folder: BookmarkFolder, item: BookmarksBarCollectionViewItem) {
         switch action {
         case .clickItem:
@@ -247,29 +247,29 @@ extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
             assertionFailure("Received unexpected action for bookmark folder")
         }
     }
-    
+
     private func bookmarkFolderMenu(items: [NSMenuItem]) -> NSMenu {
         let menu = NSMenu()
         menu.items = items.isEmpty ? [NSMenuItem.empty] : items
         return menu
     }
-    
+
 }
 
 // MARK: - Menu
 
 extension BookmarksBarViewController: NSMenuDelegate {
-    
+
     public func menuNeedsUpdate(_ menu: NSMenu) {
         menu.removeAllItems()
-        
+
         if PersistentAppInterfaceSettings.shared.showBookmarksBar {
             menu.addItem(withTitle: UserText.hideBookmarksBar, action: #selector(toggleBookmarksBar), keyEquivalent: "")
         } else {
             menu.addItem(withTitle: UserText.showBookmarksBar, action: #selector(toggleBookmarksBar), keyEquivalent: "")
         }
     }
-    
+
     @objc
     private func toggleBookmarksBar(_ sender: NSMenuItem) {
         PersistentAppInterfaceSettings.shared.showBookmarksBar.toggle()
@@ -284,18 +284,18 @@ extension BookmarksBarViewController: AddBookmarkModalViewControllerDelegate, Ad
     func addFolderViewController(_ viewController: AddFolderModalViewController, addedFolderWith name: String) {
         assertionFailure("Cannot add new folders to the bookmarks bar via the modal")
     }
-    
+
     func addFolderViewController(_ viewController: AddFolderModalViewController, saved folder: BookmarkFolder) {
         bookmarkManager.update(folder: folder)
     }
-    
+
     func addBookmarkViewController(_ viewController: AddBookmarkModalViewController, addedBookmarkWithTitle title: String, url: URL) {
         assertionFailure("Cannot add new bookmarks to the bookmarks bar via the modal")
     }
-    
+
     func addBookmarkViewController(_ viewController: AddBookmarkModalViewController, saved bookmark: Bookmark, newURL: URL) {
         bookmarkManager.update(bookmark: bookmark)
         _ = bookmarkManager.updateUrl(of: bookmark, to: newURL)
     }
-    
+
 }

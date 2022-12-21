@@ -181,7 +181,7 @@ final class WebCacheManagerTests: XCTestCase {
                 }
             }
         }
-        
+
         func removeData(ofTypes dataTypes: Set<String>, for records: [WKWebsiteDataRecord]) async {
             removeDataCalledCount += 1
 

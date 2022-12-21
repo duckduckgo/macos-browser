@@ -30,7 +30,7 @@ final class OnboardingViewController: NSViewController {
         // swiftlint:enable force_cast
         return controller
     }
-    
+
     @IBOutlet var backgroundImageView: NSImageView! {
         didSet {
             // NSImageView magic to improve image resizing performance.

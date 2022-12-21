@@ -97,5 +97,5 @@ final class FocusRingView: NSView {
 
         CATransaction.commit()
     }
-    
+
 }

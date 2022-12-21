@@ -203,7 +203,7 @@ extension YoutubeOverlayUserScript: WKScriptMessageHandlerWithReply {
 // MARK: - Fallback for macOS 10.15
 
 extension YoutubeOverlayUserScript: WKScriptMessageHandler {
-    
+
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         guard isMessageFromVerifiedOrigin(message) else {
             return

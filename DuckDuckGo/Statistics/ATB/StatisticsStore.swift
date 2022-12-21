@@ -29,12 +29,12 @@ protocol StatisticsStore: AnyObject {
 
     var lastAppRetentionRequestDate: Date? { get set }
     var isAppRetentionFiredToday: Bool { get }
-    
+
     var waitlistUnlocked: Bool { get set }
 
     var autoLockEnabled: Bool { get set }
     var autoLockThreshold: String? { get set }
-    
+
 }
 
 extension StatisticsStore {
@@ -51,5 +51,5 @@ extension StatisticsStore {
     var isAppRetentionFiredToday: Bool {
         Date.startOfDayToday == lastAppRetentionRequestDate.map(Calendar.current.startOfDay)
     }
-    
+
 }

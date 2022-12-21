@@ -49,7 +49,7 @@ final class AutofillPreferencesModel: ObservableObject {
             persistor.autoLockThreshold = autoLockThreshold
         }
     }
-    
+
     @Published private(set) var passwordManager: PasswordManager {
         didSet {
             persistor.passwordManager = passwordManager
@@ -91,7 +91,7 @@ final class AutofillPreferencesModel: ObservableObject {
             }
         }
     }
-    
+
     func passwordManagerSettingsChange(passwordManager: PasswordManager) {
         self.passwordManager = passwordManager
     }
@@ -120,13 +120,13 @@ final class AutofillPreferencesModel: ObservableObject {
     private var persistor: AutofillPreferencesPersistor
     private var userAuthenticator: UserAuthenticating
     private let bitwardenInstallationService: BWInstallationService
-    
+
     // MARK: - Password Manager
-    
+
     func presentBitwardenSetupFlow() {
         let connectBitwardenViewController = ConnectBitwardenViewController(nibName: nil, bundle: nil)
         let connectBitwardenWindowController = connectBitwardenViewController.wrappedInWindowController()
-        
+
         connectBitwardenViewController.setupFlowCancellationHandler = { [weak self] in
             self?.passwordManager = .duckduckgo
         }
@@ -143,7 +143,7 @@ final class AutofillPreferencesModel: ObservableObject {
             self?.isBitwardenSetupFlowPresented = false
         }
     }
-    
+
     func openBitwarden() {
         PasswordManagerCoordinator.shared.openPasswordManager()
     }
