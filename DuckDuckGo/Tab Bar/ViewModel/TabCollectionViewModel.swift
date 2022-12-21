@@ -41,7 +41,7 @@ final class TabCollectionViewModel: NSObject {
     weak var delegate: TabCollectionViewModelDelegate?
 
     /// Local tabs collection
-    private(set) var tabCollection: TabCollection
+    let tabCollection: TabCollection
 
     /// Pinned tabs collection (provided via `PinnedTabsManager` instance).
     var pinnedTabsCollection: TabCollection? {
@@ -385,6 +385,7 @@ final class TabCollectionViewModel: NSObject {
     }
 
     func moveTab(at fromIndex: Int, to otherViewModel: TabCollectionViewModel, at toIndex: Int) {
+        assert(self !== otherViewModel)
         guard changesEnabled else { return }
 
         let parentTab = tabCollection.tabs[safe: fromIndex]?.parentTab
@@ -455,18 +456,6 @@ final class TabCollectionViewModel: NSObject {
             selectUnpinnedTab(at: max(min(selectionIndex - selectionDiff, tabCollection.tabs.count - 1), 0), forceChange: forceChange)
         }
         delegate?.tabCollectionViewModelDidMultipleChanges(self)
-    }
-
-    func remove(ownerOf webView: WebView) {
-        guard changesEnabled else { return }
-
-        if let index = tabCollection.tabs.firstIndex(where: { $0.webView === webView }) {
-            remove(at: .unpinned(index))
-        } else if let index = pinnedTabsCollection?.tabs.firstIndex(where: { $0.webView === webView }) {
-            remove(at: .pinned(index))
-        } else {
-            os_log("TabCollection: Failed to get index of the tab", type: .error)
-        }
     }
 
     func removeSelected() {
