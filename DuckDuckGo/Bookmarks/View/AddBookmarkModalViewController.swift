@@ -68,7 +68,7 @@ final class AddBookmarkModalViewController: NSViewController {
         guard let url = urlTextField.stringValue.url else { return false }
 
         if originalBookmark != nil {
-            return !bookmarkTitleTextField.stringValue.isEmpty && url.isValid
+            return url.isValid
         } else {
             let isBookmarked = LocalBookmarkManager.shared.isUrlBookmarked(url: url)
             let isInputValid = !bookmarkTitleTextField.stringValue.isEmpty && url.isValid && !isBookmarked
