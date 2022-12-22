@@ -73,7 +73,11 @@ final class UserDialogRequest<Info, Output>: UserDialogRequestProtocol {
     }
 
     deinit {
-        callback?(.failure(.deinitialized))
+        guard let callback else { return }
+
+        DispatchQueue.main.async {
+            callback(.failure(.deinitialized))
+        }
     }
 
 }

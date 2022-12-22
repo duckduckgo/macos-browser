@@ -440,8 +440,8 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         didSet {
             guard let request = userInteractionDialog?.request else { return }
             request.addCompletionHandler { [weak self, weak request] _ in
-                if self?.userInteractionDialog?.request === request {
-                    self?.userInteractionDialog = nil
+                if let self, let request, self.userInteractionDialog?.request === request {
+                    self.userInteractionDialog = nil
                 }
             }
         }
