@@ -1,5 +1,5 @@
 storage_mode "git"
-git_url "git@github.com:more-duckduckgo-org/macos-fastlane-match.git"
+git_url "git@github.com:duckduckgo/Apple-certificates.git"
 git_branch "main"
 platform "macos"
 
