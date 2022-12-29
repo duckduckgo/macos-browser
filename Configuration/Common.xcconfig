@@ -13,4 +13,16 @@
 //  limitations under the License.
 //
 
-#include? "Version.xcconfig"
+#include "Version.xcconfig"
+
+GCC_PREPROCESSOR_DEFINITIONS[config=CI][arch=*][sdk=*] = DEBUG=1 CI=1 $(inherited)
+GCC_PREPROCESSOR_DEFINITIONS[config=Debug][arch=*][sdk=*] = DEBUG=1 $(inherited)
+GCC_PREPROCESSOR_DEFINITIONS[config=Review][arch=*][sdk=*] = REVIEW=1 $(inherited)
+
+MACOSX_DEPLOYMENT_TARGET = 10.15
+
+FEATURE_FLAGS = FEEDBACK
+
+SWIFT_ACTIVE_COMPILATION_CONDITIONS[arch=*][sdk=*] = $(FEATURE_FLAGS)
+SWIFT_ACTIVE_COMPILATION_CONDITIONS[config=CI][arch=*][sdk=*] = DEBUG CI $(FEATURE_FLAGS)
+SWIFT_ACTIVE_COMPILATION_CONDITIONS[config=Debug][arch=*][sdk=*] = DEBUG $(FEATURE_FLAGS)
