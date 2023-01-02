@@ -133,7 +133,7 @@ final class CoreDataStoreTests: XCTestCase {
         store.clear { [store] error in
             XCTAssertNil(error)
 
-            let fireproofed = try! store.load(into: .init(), self.load) // swiftlint:disable:this force_try
+            let fireproofed = try! store.load(into: .init(), self.load)
 
             XCTAssertEqual(fireproofed, [:])
 

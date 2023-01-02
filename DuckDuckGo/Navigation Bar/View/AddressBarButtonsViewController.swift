@@ -95,7 +95,7 @@ final class AddressBarButtonsViewController: NSViewController {
     var shieldAnimationView: AnimationView!
     var shieldDotAnimationView: AnimationView!
     @IBOutlet weak var notificationAnimationView: NavigationBarBadgeAnimationView!
-    
+
     @IBOutlet weak var permissionButtons: NSView!
     @IBOutlet weak var cameraButton: PermissionButton! {
         didSet {
@@ -169,9 +169,9 @@ final class AddressBarButtonsViewController: NSViewController {
     private var trackerAnimationTriggerCancellable: AnyCancellable?
     private var isMouseOverAnimationVisibleCancellable: AnyCancellable?
     private var privacyInfoCancellable: AnyCancellable?
-    
+
     private lazy var buttonsBadgeAnimator = NavigationBarBadgeAnimator()
-    
+
     required init?(coder: NSCoder) {
         fatalError("AddressBarButtonsViewController: Bad initializer")
     }
@@ -193,18 +193,18 @@ final class AddressBarButtonsViewController: NSViewController {
         subscribeToEffectiveAppearance()
         subscribeToIsMouseOverAnimationVisible()
         updateBookmarkButtonVisibility()
-        
+
         privacyEntryPointButton.toolTip = UserText.privacyDashboardTooltip
     }
 
     override func viewWillAppear() {
         setupButtons()
     }
-    
+
     override func viewDidAppear() {
         super.viewDidAppear()
     }
-    
+
     func showBadgeNotification(_ type: NavigationBarBadgeAnimationView.AnimationType) {
         if !isAnyShieldAnimationPlaying {
             buttonsBadgeAnimator.showNotification(withType: type,
@@ -215,7 +215,7 @@ final class AddressBarButtonsViewController: NSViewController {
                                                                                         animationType: type)
         }
     }
-    
+
     private func playBadgeAnimationIfNecessary() {
         if let queuedNotification = buttonsBadgeAnimator.queuedAnimation {
             // Add small time gap in between animations if badge animation was queued
@@ -255,7 +255,7 @@ final class AddressBarButtonsViewController: NSViewController {
     @IBAction func clearButtonAction(_ sender: Any) {
         delegate?.addressBarButtonsViewControllerClearButtonClicked(self)
     }
-    
+
     @IBAction func privacyEntryPointButtonAction(_ sender: Any) {
         if let permissionAuthorizationPopover, permissionAuthorizationPopover.isShown {
             permissionAuthorizationPopover.close()
@@ -280,7 +280,7 @@ final class AddressBarButtonsViewController: NSViewController {
         }
 
         let bookmarkPopover = bookmarkPopoverCreatingIfNeeded()
-        if bookmarkPopover.isShown {
+        if !bookmarkPopover.isShown {
             bookmarkButton.isHidden = false
             bookmarkPopover.viewController.bookmark = bookmark
             bookmarkPopover.show(relativeTo: bookmarkButton.bounds, of: bookmarkButton, preferredEdge: .maxY)
@@ -344,15 +344,15 @@ final class AddressBarButtonsViewController: NSViewController {
             privacyDashboardPopover.close()
             return
         }
-        
+
         privacyDashboardPopover.viewController.updateTabViewModel(selectedTabViewModel)
-        
+
         let positioningViewInWindow = privacyDashboardPositioningView.convert(privacyDashboardPositioningView.bounds, to: view.window?.contentView)
         privacyDashboardPopover.setPreferredMaxHeight(positioningViewInWindow.origin.y)
         privacyDashboardPopover.show(relativeTo: privacyDashboardPositioningView.bounds, of: privacyDashboardPositioningView, preferredEdge: .maxY)
 
         privacyEntryPointButton.state = .on
-                
+
         privacyInfoCancellable?.cancel()
         privacyInfoCancellable = selectedTabViewModel.tab.$privacyInfo
             .dropFirst()
@@ -475,7 +475,7 @@ final class AddressBarButtonsViewController: NSViewController {
         }
 
         permissions = [(permissionType, state)]
-        
+
         PermissionContextMenu(permissions: permissions,
                               domain: selectedTabViewModel.tab.content.url?.host ?? "",
                               delegate: self)
@@ -484,7 +484,7 @@ final class AddressBarButtonsViewController: NSViewController {
 
     private func setupButtons() {
         if view.window?.isPopUpWindow == true {
-            privacyEntryPointButton.position = .free            
+            privacyEntryPointButton.position = .free
             cameraButton.position = .free
             geolocationButton.position = .free
             popupsButton.position = .free
@@ -523,7 +523,7 @@ final class AddressBarButtonsViewController: NSViewController {
         animationViewCache[animationName] = animationView
         return animationView
     }
-    
+
     private func setupNotificationAnimationView() {
         notificationAnimationView.alphaValue = 0.0
     }
@@ -646,7 +646,7 @@ final class AddressBarButtonsViewController: NSViewController {
         }
 
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else { return }
-        
+
         if controllerMode == .editing(isUrl: false) {
             [geolocationButton, cameraButton, microphoneButton, popupsButton, externalSchemeButton].forEach {
                 $0?.buttonState = .none
@@ -841,7 +841,7 @@ final class AddressBarButtonsViewController: NSViewController {
     private func closePopover() {
         privacyDashboardPopover?.close()
     }
-    
+
     private func stopAnimations(trackerAnimations: Bool = true,
                                 shieldAnimations: Bool = true,
                                 badgeAnimations: Bool = true) {
@@ -865,7 +865,7 @@ final class AddressBarButtonsViewController: NSViewController {
             stopNotificationBadgeAnimations()
         }
     }
-    
+
     private func stopNotificationBadgeAnimations() {
         notificationAnimationView.removeAnimation()
         buttonsBadgeAnimator.queuedAnimation = nil
@@ -926,7 +926,7 @@ final class AddressBarButtonsViewController: NSViewController {
         isMouseOverAnimationVisibleCancellable = privacyEntryPointButton.$isAnimationViewVisible
             .dropFirst()
             .sink { [weak self] isAnimationViewVisible in
-   
+
                 if isAnimationViewVisible {
                     self?.stopAnimations(trackerAnimations: false, shieldAnimations: true, badgeAnimations: false)
                 } else {

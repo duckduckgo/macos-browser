@@ -89,7 +89,7 @@ final class FirefoxDataImporter: DataImporter {
                         completion(.failure(.bookmarks(.unexpectedBookmarksDatabaseFormat)))
                         return
                     }
-                    
+
                     completion(.failure(.bookmarks(error)))
                     return
                 }
@@ -101,7 +101,7 @@ final class FirefoxDataImporter: DataImporter {
 
         completion(.success(summary))
     }
-    
+
     func importData(types: [DataImport.DataType], from profile: DataImport.BrowserProfile?) async -> Result<DataImport.Summary, DataImportError> {
         return await withCheckedContinuation { continuation in
             importData(types: types, from: profile) { result in
@@ -109,11 +109,11 @@ final class FirefoxDataImporter: DataImporter {
             }
         }
     }
-    
+
     private func importFavicons(from firefoxProfileURL: URL) {
         let faviconsReader = FirefoxFaviconsReader(firefoxDataDirectoryURL: firefoxProfileURL)
         let faviconsResult = faviconsReader.readFavicons()
-        
+
         switch faviconsResult {
         case .success(let faviconsByURL):
             for (pageURLString, fetchedFavicons) in faviconsByURL {
@@ -126,11 +126,11 @@ final class FirefoxDataImporter: DataImporter {
                                 documentUrl: pageURL,
                                 dateCreated: Date())
                     }
-                    
+
                     faviconManager.handleFavicons(favicons, documentUrl: pageURL)
                 }
             }
-            
+
         case .failure:
             Pixel.fire(.faviconImportFailed(source: .firefox))
         }

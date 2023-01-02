@@ -18,7 +18,6 @@ If at any point it isn't actively being worked on/ready for review/otherwise mov
 
 **Steps to test this PR**:
 1.
-1.
 
 **Testing checklist**:
 

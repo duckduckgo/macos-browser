@@ -80,7 +80,7 @@ extension Pixel.Event {
              .adClickAttributionDetected,
              .adClickAttributionActive,
              .jsPixel:
-            
+
             return nil
         }
     }

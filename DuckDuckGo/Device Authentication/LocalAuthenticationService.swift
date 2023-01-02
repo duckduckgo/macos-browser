@@ -20,7 +20,7 @@ import Foundation
 import LocalAuthentication
 
 final class LocalAuthenticationService: DeviceAuthenticationService {
-    
+
     func authenticateDevice(reason: String, result: @escaping DeviceAuthenticationResultHandler) {
         let context = LAContext()
 
@@ -31,5 +31,5 @@ final class LocalAuthenticationService: DeviceAuthenticationService {
             }
         }
     }
-    
+
 }

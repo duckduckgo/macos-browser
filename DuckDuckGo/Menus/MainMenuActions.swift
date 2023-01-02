@@ -313,15 +313,15 @@ extension MainViewController {
     @IBAction func toggleBookmarksBar(_ sender: Any) {
         PersistentAppInterfaceSettings.shared.showBookmarksBar.toggle()
     }
-    
+
     @IBAction func toggleAutofillShortcut(_ sender: Any) {
         LocalPinningManager.shared.togglePinning(for: .autofill)
     }
-    
+
     @IBAction func toggleBookmarksShortcut(_ sender: Any) {
         LocalPinningManager.shared.togglePinning(for: .bookmarks)
     }
-    
+
     @IBAction func toggleDownloadsShortcut(_ sender: Any) {
         LocalPinningManager.shared.togglePinning(for: .downloads)
     }
@@ -625,13 +625,13 @@ extension MainViewController {
         NotificationCenter.default.post(name: .ShowSaveCredentialsPopover, object: nil)
         #endif
     }
-    
+
     @IBAction func showCredentialsSavedPopover(_ sender: Any?) {
         #if DEBUG || REVIEW
         NotificationCenter.default.post(name: .ShowCredentialsSavedPopover, object: nil)
         #endif
     }
-    
+
     @IBAction func fetchConfigurationNow(_ sender: Any?) {
         ConfigurationManager.shared.lastUpdateTime = .distantPast
         ConfigurationManager.shared.refreshIfNeeded()

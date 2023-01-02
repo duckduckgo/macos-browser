@@ -23,7 +23,7 @@ internal class ChromiumDataImporter: DataImporter {
     var processName: String {
         fatalError("Subclasses must provide their own process name")
     }
-    
+
     var source: DataImport.Source {
         fatalError("Subclasses must return a source")
     }
@@ -47,7 +47,7 @@ internal class ChromiumDataImporter: DataImporter {
     func importData(types: [DataImport.DataType],
                     from profile: DataImport.BrowserProfile?,
                     completion: @escaping (Result<DataImport.Summary, DataImportError>) -> Void) {
-        
+
         var summary = DataImport.Summary()
         let dataDirectoryURL = profile?.profileURL ?? applicationDataDirectoryURL
 
@@ -74,7 +74,7 @@ internal class ChromiumDataImporter: DataImporter {
             let bookmarkResult = bookmarkReader.readBookmarks()
 
             importFavicons(from: dataDirectoryURL)
-            
+
             switch bookmarkResult {
             case .success(let bookmarks):
                 do {
@@ -99,7 +99,7 @@ internal class ChromiumDataImporter: DataImporter {
 
         completion(.success(summary))
     }
-    
+
     func importFavicons(from dataDirectoryURL: URL) {
         let faviconsReader = ChromiumFaviconsReader(chromiumDataDirectoryURL: dataDirectoryURL)
         let faviconsResult = faviconsReader.readFavicons()
@@ -116,11 +116,11 @@ internal class ChromiumDataImporter: DataImporter {
                                 documentUrl: pageURL,
                                 dateCreated: Date())
                     }
-                    
+
                     faviconManager.handleFavicons(favicons, documentUrl: pageURL)
                 }
             }
-            
+
         case .failure:
             Pixel.fire(.faviconImportFailed(source: self.source.pixelEventSource))
         }

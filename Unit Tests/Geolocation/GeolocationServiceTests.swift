@@ -135,8 +135,6 @@ final class GeolocationServiceTests: XCTestCase {
         }
     }
 
-    // swiftlint:disable cyclomatic_complexity
-    // swiftlint:disable function_body_length
     func testWhenManySubscribedThenLocationIsPublished() {
         let location = CLLocation(latitude: 51.1, longitude: 23.4)
         struct TestError: Error {}
@@ -196,8 +194,6 @@ final class GeolocationServiceTests: XCTestCase {
             waitForExpectations(timeout: 1)
         }
     }
-    // swiftlint:enable cyclomatic_complexity
-    // swiftlint:enable function_body_length
 
     func testWhenLastSubscriberUnsubscribedThenLocationManagerStopped() {
         let c1 = service.locationPublisher.sink { _ in }

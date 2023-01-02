@@ -23,7 +23,7 @@ final class EdgeDataImporter: ChromiumDataImporter {
     override var processName: String {
         return "Microsoft Edge"
     }
-    
+
     override var source: DataImport.Source {
         return .edge
     }

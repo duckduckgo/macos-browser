@@ -21,23 +21,23 @@ import Foundation
 final class CookieConsentPopoverManager: CookieConsentPopoverDelegate {
     var completion: ((Bool) -> Void)?
     weak var currentTab: Tab?
-    
+
     private(set) var popOver: CookieConsentPopover?
-    
+
     func cookieConsentPopover(_ popOver: CookieConsentPopover, didFinishWithResult result: Bool) {
         popOver.close(animated: true) { [weak self] in
             self?.popOver = nil
             self?.currentTab = nil
         }
-        
+
         if let completion = completion {
             completion(result)
         }
     }
-    
+
     func show(on view: NSView, animated: Bool, result: ((Bool) -> Void)? = nil) {
         preparePopover()
-        
+
         guard let popOver = popOver else {
             return
         }
@@ -47,12 +47,12 @@ final class CookieConsentPopoverManager: CookieConsentPopoverDelegate {
             self.completion = result
         }
     }
-    
+
     func close(animated: Bool) {
         guard let popOver = popOver else {
             return
         }
-        
+
         popOver.close(animated: animated)
     }
 
@@ -61,11 +61,11 @@ final class CookieConsentPopoverManager: CookieConsentPopoverDelegate {
         if currentTab == nil {
             popOver = nil
         }
-        
+
         guard popOver == nil else {
             return
         }
-        
+
         popOver = CookieConsentPopover()
         popOver?.delegate = self
     }

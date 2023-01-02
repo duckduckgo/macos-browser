@@ -23,7 +23,7 @@ final class ChromeDataImporter: ChromiumDataImporter {
     override var processName: String {
         return "Chrome"
     }
-    
+
     override var source: DataImport.Source {
         return .chrome
     }

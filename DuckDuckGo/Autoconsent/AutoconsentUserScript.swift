@@ -107,13 +107,13 @@ extension AutoconsentUserScript {
         let id: String
         let code: String
     }
-    
+
     struct PopupFoundMessage: Codable {
         let type: String
         let cmp: String
         let url: String
     }
-    
+
     struct OptOutResultMessage: Codable {
         let type: String
         let cmp: String
@@ -121,7 +121,7 @@ extension AutoconsentUserScript {
         let scheduleSelfTest: Bool
         let url: String
     }
-    
+
     struct OptInResultMessage: Codable {
         let type: String
         let cmp: String
@@ -129,21 +129,21 @@ extension AutoconsentUserScript {
         let scheduleSelfTest: Bool
         let url: String
     }
-    
+
     struct SelfTestResultMessage: Codable {
         let type: String
         let cmp: String
         let result: Bool
         let url: String
     }
-    
+
     struct AutoconsentDoneMessage: Codable {
         let type: String
         let cmp: String
         let url: String
         let isCosmetic: Bool
     }
-    
+
     func decodeMessageBody<Input: Any, Target: Codable>(from message: Input) -> Target? {
         do {
             let json = try JSONSerialization.data(withJSONObject: message)
@@ -251,7 +251,7 @@ extension AutoconsentUserScript {
             ]
         ], nil)
     }
-    
+
     @MainActor
     func handleEval(message: WKScriptMessage, replyHandler: @escaping (Any?, String?) -> Void) {
         guard let messageData: EvalMessage = decodeMessageBody(from: message.body) else {
@@ -268,7 +268,7 @@ extension AutoconsentUserScript {
         }
         })();
         """
-        
+
         if let webview = message.webView {
             webview.evaluateJavaScript(script, in: message.frameInfo, in: WKContentWorld.page, completionHandler: { (result) in
                 switch result {
@@ -289,7 +289,7 @@ extension AutoconsentUserScript {
             replyHandler(nil, "missing frame target")
         }
     }
-    
+
     @MainActor
     func handlePopupFound(message: WKScriptMessage, replyHandler: @escaping (Any?, String?) -> Void) {
         guard preferences.autoconsentEnabled == nil else {
@@ -297,7 +297,7 @@ extension AutoconsentUserScript {
             replyHandler([ "type": "ok" ], nil) // this is just to prevent a Promise rejection
             return
         }
-        
+
         os_log("Prompting user about autoconsent", log: .autoconsent, type: .debug)
 
         // if it's the first time, prompt the user and trigger opt-out
@@ -313,7 +313,7 @@ extension AutoconsentUserScript {
             replyHandler(nil, "missing frame target")
         }
     }
-    
+
     @MainActor
     func handleOptOutResult(message: WKScriptMessage, replyHandler: @escaping (Any?, String?) -> Void) {
         guard let messageData: OptOutResultMessage = decodeMessageBody(from: message.body) else {
@@ -332,7 +332,7 @@ extension AutoconsentUserScript {
 
         replyHandler([ "type": "ok" ], nil) // this is just to prevent a Promise rejection
     }
-    
+
     @MainActor
     func handleAutoconsentDone(message: WKScriptMessage, replyHandler: @escaping (Any?, String?) -> Void) {
         // report a managed popup
@@ -341,13 +341,13 @@ extension AutoconsentUserScript {
             return
         }
         os_log("opt-out successful: %s", log: .autoconsent, type: .debug, String(describing: messageData))
-        
+
         guard let url = URL(string: messageData.url),
               let host = url.host else {
             replyHandler(nil, "cannot decode message")
             return
         }
-        
+
         refreshDashboardState(consentManaged: true, optoutFailed: false, selftestFailed: nil)
 
         // trigger popup once per domain
@@ -362,7 +362,7 @@ extension AutoconsentUserScript {
                 ])
             }
         }
-        
+
         replyHandler([ "type": "ok" ], nil) // this is just to prevent a Promise rejection
 
         if let selfTestWebView = selfTestWebView,
@@ -387,7 +387,7 @@ extension AutoconsentUserScript {
         selfTestWebView = nil
         selfTestFrameInfo = nil
     }
-    
+
     @MainActor
     func handleSelfTestResult(message: WKScriptMessage, replyHandler: @escaping (Any?, String?) -> Void) {
         guard let messageData: SelfTestResultMessage = decodeMessageBody(from: message.body) else {

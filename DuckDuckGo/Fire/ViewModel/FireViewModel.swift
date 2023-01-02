@@ -20,7 +20,7 @@ import WebKit
 import Combine
 
 final class FireViewModel {
-    
+
     let fire: Fire
 
     @Published var isAnimationPlaying = false

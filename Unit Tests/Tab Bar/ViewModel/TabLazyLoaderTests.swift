@@ -92,7 +92,6 @@ private final class TabLazyLoaderDataSourceMock: TabLazyLoaderDataSource {
 
 class TabLazyLoaderTests: XCTestCase {
 
-    // swiftlint:disable implicitly_unwrapped_optional
     private var dataSource: TabLazyLoaderDataSourceMock!
     var cancellables = Set<AnyCancellable>()
 

@@ -37,19 +37,19 @@ final class CookieManagedNotificationContainerView: NSView, NotificationBarViewA
         super.init(frame: frameRect)
         setupView()
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     private func setupView() {
         addSubview(hostingView)
         setupConstraints()
     }
-    
+
     private func setupConstraints() {
         hostingView.translatesAutoresizingMaskIntoConstraints = false
-        
+
         NSLayoutConstraint.activate([
             hostingView.leadingAnchor.constraint(equalTo: leadingAnchor),
             hostingView.trailingAnchor.constraint(equalTo: trailingAnchor),
@@ -57,8 +57,8 @@ final class CookieManagedNotificationContainerView: NSView, NotificationBarViewA
             hostingView.topAnchor.constraint(equalTo: topAnchor)
         ])
     }
-    
-    func startAnimation(_ completion: @escaping () -> Void) {        
+
+    func startAnimation(_ completion: @escaping () -> Void) {
         let totalDuration = (badgeAnimationModel.duration * 2) + badgeAnimationModel.secondPhaseDelay
 
         self.startCookieAnimation()
@@ -68,14 +68,14 @@ final class CookieManagedNotificationContainerView: NSView, NotificationBarViewA
             completion()
         }
     }
-    
+
     private func startBadgeAnimation() {
         badgeAnimationModel.state = .expanded
         DispatchQueue.main.asyncAfter(deadline: .now() + badgeAnimationModel.secondPhaseDelay) {
             self.badgeAnimationModel.state = .retracted
         }
     }
-    
+
     private func startCookieAnimation() {
         cookieAnimationModel.state = .firstPhase
         DispatchQueue.main.asyncAfter(deadline: .now() + cookieAnimationModel.secondPhaseDelay) {
