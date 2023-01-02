@@ -22,15 +22,18 @@ import SwiftUI
 final class CookieManagedNotificationContainerView: NSView, NotificationBarViewAnimated {
     private let cookieAnimationModel = CookieNotificationAnimationModel()
     private let badgeAnimationModel = BadgeNotificationAnimationModel()
+    let isCosmetic: Bool
     
     private lazy var hostingView: NSHostingView<CookieManagedNotificationView> = {
-        let view = NSHostingView(rootView: CookieManagedNotificationView(animationModel: cookieAnimationModel,
+        let view = NSHostingView(rootView: CookieManagedNotificationView(isCosmetic: isCosmetic,
+                                                                         animationModel: cookieAnimationModel,
                                                                          badgeAnimationModel: badgeAnimationModel))
         view.frame = bounds
         return view
     }()
-    
-    override init(frame frameRect: NSRect) {
+
+    init(frame frameRect: NSRect = .zero, isCosmetic: Bool = false) {
+        self.isCosmetic = isCosmetic
         super.init(frame: frameRect)
         setupView()
     }
