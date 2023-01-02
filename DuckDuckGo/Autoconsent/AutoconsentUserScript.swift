@@ -141,6 +141,7 @@ extension AutoconsentUserScript {
         let type: String
         let cmp: String
         let url: String
+        let isCosmetic: Bool
     }
     
     func decodeMessageBody<Input: Any, Target: Codable>(from message: Input) -> Target? {
@@ -245,6 +246,7 @@ extension AutoconsentUserScript {
                 "disabledCmps": disabledCMPs,
                 // the very first time (autoconsentEnabled = nil), make sure the popup is visible
                 "enablePrehide": preferences.autoconsentEnabled ?? false,
+                "enableCosmeticRules": true,
                 "detectRetries": 20
             ]
         ], nil)
@@ -347,7 +349,7 @@ extension AutoconsentUserScript {
         }
         
         refreshDashboardState(consentManaged: true, optoutFailed: false, selftestFailed: nil)
-        
+
         // trigger popup once per domain
         if !management.sitesNotifiedCache.contains(host) {
             os_log("bragging that we closed a popup", log: .autoconsent, type: .debug)
@@ -355,7 +357,8 @@ extension AutoconsentUserScript {
             // post popover notification on main thread
             DispatchQueue.main.async {
                 NotificationCenter.default.post(name: Constants.newSitePopupHidden, object: self, userInfo: [
-                    "topUrl": self.topUrl ?? url
+                    "topUrl": self.topUrl ?? url,
+                    "isCosmetic": messageData.isCosmetic
                 ])
             }
         }
