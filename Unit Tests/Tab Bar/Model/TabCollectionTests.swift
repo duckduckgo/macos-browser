@@ -21,6 +21,16 @@ import XCTest
 
 final class TabCollectionTests: XCTestCase {
 
+    override func setUp() {
+        customAssert = { _, _, _, _ in }
+        customAssertionFailure = { _, _, _ in }
+    }
+
+    override func tearDown() {
+        customAssert = nil
+        customAssertionFailure = nil
+    }
+
     // MARK: - Append
 
     func testWhenTabIsAppendedThenItsIndexIsLast() {
