@@ -13,11 +13,19 @@
 //  limitations under the License.
 //
 
-#include "TestsTargetsBase.xcconfig"
+#include "Common.xcconfig"
 
-ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES
+DEAD_CODE_STRIPPING = YES
 
-INFOPLIST_FILE = Unit Tests/Info.plist
-PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser.DuckDuckGoTests
+INFOPLIST_FILE = DuckDuckGo/Info.plist
 
-SWIFT_OBJC_BRIDGING_HEADER = $(SRCROOT)/Unit Tests/Common/TestsBridging.h
+PRODUCT_MODULE_NAME = $(TARGET_NAME:c99extidentifier)
+PRODUCT_NAME = $(TARGET_NAME)
+
+LD_RUNPATH_SEARCH_PATHS = $(inherited) @executable_path/../Frameworks @loader_path/../Frameworks
+
+TEST_HOST=$(BUILT_PRODUCTS_DIR)/DuckDuckGo.app/Contents/MacOS/DuckDuckGo
+BUNDLE_LOADER=$(TEST_HOST)
+
+CODE_SIGN_STYLE = Automatic
+CODE_SIGN_IDENTITY[config=CI][sdk=*] = -

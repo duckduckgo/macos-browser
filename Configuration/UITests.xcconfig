@@ -13,19 +13,19 @@
 //  limitations under the License.
 //
 
-CODE_SIGN_STYLE=Automatic
-COMBINE_HIDPI_IMAGES=YES
-DEAD_CODE_STRIPPING=YES
-DEVELOPMENT_TEAM=HKE973VLUW
-INFOPLIST_FILE=UI Tests/Info.plist
-MACOSX_DEPLOYMENT_TARGET=11.3
-PRODUCT_BUNDLE_IDENTIFIER=com.duckduckgo.UI-Tests
-PRODUCT_NAME=$(TARGET_NAME)
-SWIFT_VERSION=5.0
-TEST_TARGET_NAME=DuckDuckGo Privacy Browser
+#include "Common.xcconfig"
 
-CODE_SIGN_IDENTITY[config=CI]=-
-LD_RUNPATH_SEARCH_PATHS[config=CI]=$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks
-LD_RUNPATH_SEARCH_PATHS[config=Debug]=$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks
-LD_RUNPATH_SEARCH_PATHS[config=Release]=$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks
-LD_RUNPATH_SEARCH_PATHS[config=Review]=$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks
+CODE_SIGN_STYLE = Automatic
+CODE_SIGN_IDENTITY[config=CI] = -
+
+DEAD_CODE_STRIPPING = YES
+
+MACOSX_DEPLOYMENT_TARGET = 11.3
+
+INFOPLIST_FILE = UI Tests/Info.plist
+PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.UI-Tests
+PRODUCT_NAME = $(TARGET_NAME)
+
+TEST_TARGET_NAME = DuckDuckGo
+
+LD_RUNPATH_SEARCH_PATHS = $(inherited) @executable_path/../Frameworks @loader_path/../Frameworks
