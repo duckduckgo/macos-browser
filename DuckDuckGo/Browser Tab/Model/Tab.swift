@@ -595,6 +595,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             }
             if webView.backForwardList.backItem?.url == serpWebView?.backForwardList.currentItem?.url {
                 _ = hideSERPWebView()
+                searchPanelResults.removeAll()
             }
         }
 
@@ -622,10 +623,12 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             searchPanelNavigationDelegate = navigationDelegate
         }
 
-        if let serpWebView, serpWebView.superview == nil, let url {
+        if let serpWebView, serpWebView.superview == nil, let url, !searchPanelResults.contains(url) {
             searchPanelResults.insert(url)
             serpWebView.interactionState = webView.interactionState
-            _ = serpWebView.goBack()
+            if webView.isLoading {
+                _ = serpWebView.goBack()
+            }
             searchPanelNavigationDelegate?.url = url
         }
     }
@@ -644,7 +647,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     }
 
     func hideSERPWebView() -> Bool {
-        guard !preventHidingSearchPanel, serpWebView != nil else {
+        guard !preventHidingSearchPanel, serpWebView?.window != nil else {
             return false
         }
 
@@ -1240,13 +1243,21 @@ extension Tab: WKNavigationDelegate {
         static let ddgClientHeaderValue = "macOS"
     }
 
-    private func shouldPrepareSearchPanel(for navigationAction: WKNavigationAction) -> Bool {
+    private func shouldPrepareSearchPanel(in webView: WKWebView, for navigationAction: WKNavigationAction) -> Bool {
         guard let referer = navigationAction.request.value(forHTTPHeaderField: "Referer")?.url?.host?.droppingWwwPrefix(),
               let destination = navigationAction.request.url?.host?.droppingWwwPrefix()
         else {
             return false
         }
-        return referer == "duckduckgo.com" && destination != "duckduckgo.com"
+
+        let isNavigatingFromDDGSearch: Bool = {
+            if webView.isLoading {
+                return webView.backForwardList.backItem?.url.isDuckDuckGoSearch == true
+            }
+            return webView.url?.isDuckDuckGoSearch == true
+        }()
+
+        return isNavigatingFromDDGSearch && referer == "duckduckgo.com" && destination != "duckduckgo.com"
     }
 
     // swiftlint:disable cyclomatic_complexity
@@ -1255,7 +1266,7 @@ extension Tab: WKNavigationDelegate {
     func webView(_ webView: WKWebView,
                  decidePolicyFor navigationAction: WKNavigationAction) async -> WKNavigationActionPolicy {
 
-        if #available(macOS 12.0, *), shouldPrepareSearchPanel(for: navigationAction) {
+        if #available(macOS 12.0, *), shouldPrepareSearchPanel(in: webView, for: navigationAction) {
             prepareSERPWebView(for: navigationAction.request.url)
         }
 
