@@ -590,7 +590,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         if #available(macOS 12.0, *),
            let backURL = webView.backForwardList.backItem?.url, let currentURL = webView.url,
            backURL.isDuckDuckGoSearch || searchPanelResults.contains(currentURL) {
-            if prepareAndShowSERPWebView() {
+            if showSERPWebView() {
                 return
             }
             if webView.backForwardList.backItem?.url == serpWebView?.backForwardList.currentItem?.url {
@@ -602,7 +602,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     }
 
     @available(macOS 12.0, *)
-    fileprivate func prepareAndShowSERPWebView() -> Bool {
+    fileprivate func prepareSERPWebView(for url: URL?) {
         if serpWebView == nil {
             serpWebView = WebView(frame: .zero, configuration: WKWebViewConfiguration())
             serpWebView?.allowsLinkPreview = false
@@ -622,15 +622,21 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             searchPanelNavigationDelegate = navigationDelegate
         }
 
-        if let serpWebView, serpWebView.superview == nil, let url = webView.url {
+        if let serpWebView, serpWebView.superview == nil, let url {
             searchPanelResults.insert(url)
-            if let searchPanelInteractionState {
-                serpWebView.interactionState = searchPanelInteractionState
-            } else {
-                serpWebView.interactionState = webView.interactionState
-                _ = serpWebView.goBack()
-            }
+            serpWebView.interactionState = webView.interactionState
+            _ = serpWebView.goBack()
             searchPanelNavigationDelegate?.url = url
+        }
+    }
+
+    @available(macOS 12.0, *)
+    fileprivate func showSERPWebView() -> Bool {
+        guard let serpWebView else {
+            return false
+        }
+
+        if serpWebView.superview == nil {
             delegate?.tabDidRequestSearchResults(self)
             return true
         }
@@ -643,8 +649,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         }
 
         delegate?.tabDidCloseSearchResults(self)
-        serpWebView = nil
-        searchPanelUserScript = nil
         return true
     }
 
@@ -1236,11 +1240,24 @@ extension Tab: WKNavigationDelegate {
         static let ddgClientHeaderValue = "macOS"
     }
 
+    private func shouldPrepareSearchPanel(for navigationAction: WKNavigationAction) -> Bool {
+        guard let referer = navigationAction.request.value(forHTTPHeaderField: "Referer")?.url?.host?.droppingWwwPrefix(),
+              let destination = navigationAction.request.url?.host?.droppingWwwPrefix()
+        else {
+            return false
+        }
+        return referer == "duckduckgo.com" && destination != "duckduckgo.com"
+    }
+
     // swiftlint:disable cyclomatic_complexity
     // swiftlint:disable function_body_length
     @MainActor
     func webView(_ webView: WKWebView,
                  decidePolicyFor navigationAction: WKNavigationAction) async -> WKNavigationActionPolicy {
+
+        if #available(macOS 12.0, *), shouldPrepareSearchPanel(for: navigationAction) {
+            prepareSERPWebView(for: navigationAction.request.url)
+        }
 
         if let policy = privatePlayer.decidePolicy(for: navigationAction, in: self) {
             return policy
