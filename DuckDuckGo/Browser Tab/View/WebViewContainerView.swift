@@ -111,8 +111,8 @@ final class WebViewContainerView: NSView {
         serpWebView.autoresizingMask = [.height]
 
         var frame = bounds
-        frame.size.width = 720
-        frame.origin.x = -720
+        frame.size.width = 520
+        frame.origin.x = -520
         serpWebView.frame = frame
         addSubview(serpWebView, positioned: .below, relativeTo: webView)
         addSubview(darkShadowView, positioned: .below, relativeTo: webView)
@@ -122,7 +122,7 @@ final class WebViewContainerView: NSView {
             context.duration = 0.3
             context.allowsImplicitAnimation = true
 
-            webView.frame.origin.x += 720
+            webView.frame.origin.x += 520
             serpWebView.frame.origin.x = 0
             darkShadowView.frame = webView.frame
             lightShadowView.frame = webView.frame
@@ -145,7 +145,7 @@ final class WebViewContainerView: NSView {
             context.duration = 0.3
             context.allowsImplicitAnimation = true
 
-            serpWebView.frame.origin.x -= 720
+            serpWebView.frame.origin.x -= 520
             webView.frame = bounds
             darkShadowView.alphaValue = 0
             lightShadowView.alphaValue = 0
@@ -209,7 +209,7 @@ final class WebViewContainerView: NSView {
         super.layout()
 
         if needsCustomLayout {
-            webView.frame.origin.x = 720
+            webView.frame.origin.x = 520
             darkShadowView.frame = webView.frame
             lightShadowView.frame = webView.frame
         }
