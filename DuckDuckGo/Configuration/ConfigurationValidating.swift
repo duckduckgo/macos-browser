@@ -42,7 +42,7 @@ struct ConfigurationValidator: ConfigurationValidating {
     }
 
     private func validatePrivacyConfiguration(with data: Data) throws {
-        _ = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
+        _ = try PrivacyConfigurationData(data: data)
     }
 
     private func validateTrackerDataSet(with data: Data) throws {
