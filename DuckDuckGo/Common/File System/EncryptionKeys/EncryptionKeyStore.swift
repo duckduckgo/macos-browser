@@ -26,7 +26,7 @@ enum EncryptionKeyStoreError: Error {
 }
 
 final class EncryptionKeyStore: EncryptionKeyStoring {
-    
+
     enum Constants {
         static let encryptionKeyAccount = "com.duckduckgo.macos.browser"
         static let encryptionKeyService = "DuckDuckGo Privacy Browser Data Encryption Key"

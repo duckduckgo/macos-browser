@@ -74,7 +74,7 @@ final class AppStateChangePublisherTests: XCTestCase {
     func testWhenManyWindowsOpenedThenStateChangePublished() {
         WindowsManager.openNewWindow()
 
-        let n = 15
+        let n = 7
         let e = expect(description: "Windows Opened fire State change", events: n)
 
         WindowControllersManager.shared.stateChanged

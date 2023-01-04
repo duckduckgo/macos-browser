@@ -24,6 +24,12 @@ protocol AutofillPreferencesPersistor {
     var askToSaveUsernamesAndPasswords: Bool { get set }
     var askToSaveAddresses: Bool { get set }
     var askToSavePaymentMethods: Bool { get set }
+    var passwordManager: PasswordManager { get set }
+}
+
+enum PasswordManager: String, CaseIterable {
+    case duckduckgo
+    case bitwarden
 }
 
 enum AutofillAutoLockThreshold: String, CaseIterable {
@@ -97,6 +103,19 @@ final class AutofillPreferences: AutofillPreferencesPersistor {
 
     @UserDefaultsWrapper(key: .askToSavePaymentMethods, defaultValue: true)
     var askToSavePaymentMethods: Bool
+
+    var passwordManager: PasswordManager {
+        get {
+            return PasswordManager(rawValue: selectedPasswordManager) ?? .duckduckgo
+        }
+
+        set {
+            selectedPasswordManager = newValue.rawValue
+        }
+    }
+
+    @UserDefaultsWrapper(key: .selectedPasswordManager, defaultValue: PasswordManager.duckduckgo.rawValue)
+    private var selectedPasswordManager: String
 
     private var statisticsStore: StatisticsStore {
         return injectedDependencyStore ?? defaultDependencyStore

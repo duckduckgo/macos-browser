@@ -46,7 +46,7 @@ final class MockSecureVault: SecureVault {
     }
 
     func storeWebsiteCredentials(_ credentials: SecureVaultModels.WebsiteCredentials) throws -> Int64 {
-        let accountID = credentials.account.id!
+        let accountID = Int64(credentials.account.id!)!
         storedCredentials[accountID] = credentials
 
         return accountID
@@ -106,11 +106,11 @@ final class MockSecureVault: SecureVault {
     func deleteCreditCardFor(cardId: Int64) throws {
         storedCards = storedCards.filter { $0.id != cardId }
     }
-    
+
     func existingIdentityForAutofill(matching proposedIdentity: SecureVaultModels.Identity) throws -> SecureVaultModels.Identity? {
         return nil
     }
-    
+
     func existingCardForAutofill(matching proposedCard: SecureVaultModels.CreditCard) throws -> SecureVaultModels.CreditCard? {
         return nil
     }

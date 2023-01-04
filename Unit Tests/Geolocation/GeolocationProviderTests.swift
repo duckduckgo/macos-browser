@@ -23,7 +23,6 @@ import CoreLocation
 import WebKit
 @testable import DuckDuckGo_Privacy_Browser
 
-// swiftlint:disable function_body_length
 final class GeolocationProviderTests: XCTestCase {
 
     let geolocationServiceMock = GeolocationServiceMock()
@@ -279,15 +278,12 @@ final class GeolocationProviderTests: XCTestCase {
             }
         }
 
-        // swiftlint:disable identifier_name
         let e1_1 = expectation(description: "location1 received in webView1")
         let e1_2 = expectation(description: "location1 received in webView2")
         let e2_1 = expectation(description: "location2 received in webView1")
         let e2_2 = expectation(description: "location2 received in webView2")
-        // swiftlint:enable identifier_name
 
         geolocationHandler = { [webView1=webView!] webView, body in
-            // swiftlint:disable empty_enum_arguments
             switch (webView, try Response(body)) {
             case (webView1, Response(location1.removingAltitude())):
                 e1_1.fulfill()
@@ -300,7 +296,6 @@ final class GeolocationProviderTests: XCTestCase {
             default:
                 XCTFail("Unexpected result")
             }
-            // swiftlint:enable empty_enum_arguments
         }
 
         webView.loadHTMLString(Self.watchPosition(), baseURL: .duckDuckGo)
@@ -405,14 +400,11 @@ final class GeolocationProviderTests: XCTestCase {
             }
         }
 
-        // swiftlint:disable identifier_name
         let e1_1 = expectation(description: "location1 received in webView1")
         let e1_2 = expectation(description: "location1 received in webView2")
         let e2_1 = expectation(description: "location2 received in webView1")
-        // swiftlint:enable identifier_name
 
         geolocationHandler = { [webView1=webView!] webView, body in
-            // swiftlint:disable empty_enum_arguments
             switch (webView, try Response(body)) {
             case (webView1, Response(location1.removingAltitude())):
                 e1_1.fulfill()
@@ -425,7 +417,6 @@ final class GeolocationProviderTests: XCTestCase {
             default:
                 XCTFail("Unexpected result")
             }
-            // swiftlint:enable empty_enum_arguments
         }
 
         webView.loadHTMLString(Self.watchPosition(), baseURL: .duckDuckGo)
@@ -553,7 +544,7 @@ final class GeolocationProviderTests: XCTestCase {
         webView.loadHTMLString(Self.getCurrentPosition, baseURL: .duckDuckGo)
         NSApp.activate(ignoringOtherApps: true)
         webView.window?.orderFrontRegardless()
-        
+
         waitForExpectations(timeout: 5)
     }
 
@@ -657,7 +648,6 @@ final class GeolocationProviderTests: XCTestCase {
     }
 
 }
-// swiftlint:enable function_body_length
 
 extension GeolocationProviderTests: WKUIDelegate {
     @objc(_webView:requestGeolocationPermissionForFrame:decisionHandler:)
@@ -679,7 +669,7 @@ extension GeolocationProviderTests: WKScriptMessageHandler {
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         let webView = webViews.first(where: { $0.configuration.userContentController === userContentController })!
         XCTAssertNoThrow(try geolocationHandler?(webView, message.body))
-        
+
     }
 }
 

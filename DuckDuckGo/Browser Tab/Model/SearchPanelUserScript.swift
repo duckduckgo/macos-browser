@@ -17,6 +17,7 @@
 //
 
 import BrowserServicesKit
+import UserScript
 import WebKit
 
 protocol SearchPanelUserScriptDelegate: AnyObject {

@@ -21,29 +21,23 @@ import Foundation
 final class GrammarFeaturesManager {
 
     // Please see initialize() method of WebView in Source/WebKit/mac/WebView/WebView.mm
-    enum Feature {
+    private enum Feature {
         case continuousSpellChecking
         case grammarChecking
         case autocorrection
 
-        var webKitPreferenceKeys: [WebKitPreferenceKey] {
+        var webKitPreferenceKey: WebKitPreferenceKey {
             switch self {
-            case .continuousSpellChecking: return [.WebContinuousSpellCheckingEnabled]
-            case .grammarChecking: return [.WebGrammarCheckingEnabled]
-            case .autocorrection: return [
-                .WebAutomaticSpellingCorrectionEnabled,
-                .WebAutomaticTextReplacementEnabled,
-                .WebAutomaticQuoteSubstitutionEnabled,
-                .WebAutomaticLinkDetectionEnabled,
-                .WebAutomaticDashSubstitutionEnabled
-            ]
+            case .continuousSpellChecking: return .WebContinuousSpellCheckingEnabled
+            case .grammarChecking: return .WebGrammarCheckingEnabled
+            case .autocorrection: return .WebAutomaticSpellingCorrectionEnabled
             }
         }
     }
 
     // swiftlint:disable identifier_name
     // Please see Source/WebKit/mac/WebView/WebPreferenceKeysPrivate.h for more info
-    enum WebKitPreferenceKey: String {
+    private enum WebKitPreferenceKey: String {
         // Continuous spell checking
         case WebContinuousSpellCheckingEnabled
 
@@ -52,18 +46,14 @@ final class GrammarFeaturesManager {
 
         // Autocorrection
         case WebAutomaticSpellingCorrectionEnabled
-        case WebAutomaticTextReplacementEnabled
-        case WebAutomaticQuoteSubstitutionEnabled
-        case WebAutomaticLinkDetectionEnabled
-        case WebAutomaticDashSubstitutionEnabled
     }
     // swiftlint:enable identifier_name
 
     @UserDefaultsWrapper(key: .spellingCheckEnabledOnce, defaultValue: false)
-    var spellingCheckEnabledOnce: Bool
+    private var spellingCheckEnabledOnce: Bool
 
     @UserDefaultsWrapper(key: .grammarCheckEnabledOnce, defaultValue: false)
-    var grammarCheckEnabledOnce: Bool
+    private var grammarCheckEnabledOnce: Bool
 
     func manage() {
 
@@ -72,17 +62,13 @@ final class GrammarFeaturesManager {
                 return
             }
 
-            for key in feature.webKitPreferenceKeys {
-                UserDefaults.standard.setValue(true, forKey: key.rawValue)
-            }
+            UserDefaults.standard.setValue(true, forKey: feature.webKitPreferenceKey.rawValue)
 
             alreadyEnabledOnce = true
         }
 
         func disableFeature(_ feature: Feature) {
-            for key in feature.webKitPreferenceKeys {
-                UserDefaults.standard.setValue(false, forKey: key.rawValue)
-            }
+            UserDefaults.standard.setValue(false, forKey: feature.webKitPreferenceKey.rawValue)
         }
 
         enableFeatureOnce(.continuousSpellChecking, alreadyEnabledOnce: &spellingCheckEnabledOnce)

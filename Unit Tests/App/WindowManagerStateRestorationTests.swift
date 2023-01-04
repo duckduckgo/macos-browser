@@ -53,20 +53,21 @@ final class WindowManagerStateRestorationTests: XCTestCase {
 
     // MARK: -
 
-    // swiftlint:disable:next function_body_length
     func testWindowManagerStateRestoration() throws {
         let tabs1 = [
             Tab(content: .url(URL(string: "https://duckduckgo.com")!),
                 title: "DDG",
                 error: nil,
                 sessionStateData: "data".data(using: .utf8)!,
-                interactionStateData: "data".data(using: .utf8)!),
+                interactionStateData: "data".data(using: .utf8)!,
+                shouldLoadInBackground: false),
             Tab(),
             Tab(content: .url(URL(string: "https://duckduckgo.com/?q=search&t=osx&ia=web")!),
                 title: "DDG search",
                 error: nil,
                 sessionStateData: "data 2".data(using: .utf8)!,
-                interactionStateData: "data 2".data(using: .utf8)!)
+                interactionStateData: "data 2".data(using: .utf8)!,
+                shouldLoadInBackground: false)
         ]
         let tabs2 = [
             Tab(),
@@ -75,7 +76,8 @@ final class WindowManagerStateRestorationTests: XCTestCase {
                 title: "DDG search",
                 error: nil,
                 sessionStateData: "data 3".data(using: .utf8)!,
-                interactionStateData: "data 3".data(using: .utf8)!)
+                interactionStateData: "data 3".data(using: .utf8)!,
+                shouldLoadInBackground: false)
         ]
         let pinnedTabs = [
             Tab(content: .url(URL(string: "https://duck.com")!)),
@@ -84,7 +86,8 @@ final class WindowManagerStateRestorationTests: XCTestCase {
                 title: "DDG search",
                 error: nil,
                 sessionStateData: "data 4".data(using: .utf8)!,
-                interactionStateData: "data 4".data(using: .utf8)!)
+                interactionStateData: "data 4".data(using: .utf8)!,
+                shouldLoadInBackground: false)
         ]
 
         WindowControllersManager.shared.pinnedTabsManager.setUp(with: .init(tabs: pinnedTabs))

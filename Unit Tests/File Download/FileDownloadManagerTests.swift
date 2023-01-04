@@ -136,7 +136,7 @@ final class FileDownloadManagerTests: XCTestCase {
     func testWhenRequiredByPreferencesThenDownloadLocationChooserIsCalled() {
         preferences.alwaysRequestDownloadLocation = true
         let downloadsURL = fm.temporaryDirectory
-        preferences.selectedDownloadLocation = downloadsURL
+        preferences.lastUsedCustomDownloadLocation = downloadsURL
 
         let localURL = downloadsURL.appendingPathComponent(testFile)
         let e1 = expectation(description: "chooseDestinationCallback called")

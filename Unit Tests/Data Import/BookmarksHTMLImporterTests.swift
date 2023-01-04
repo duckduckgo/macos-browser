@@ -93,13 +93,11 @@ final class BookmarksHTMLImporterTests: XCTestCase {
     }
 
     func testWhenInvalidBookmarksFileIsLoadedThenBookmarksImportReturnsFailure() {
-        let importExpectation = expectation(description: "Import Bookmarks")
-        importExpectation.isInverted = true
         let completionExpectation = expectation(description: "Import Bookmarks Completion")
         let expectedImportResult = BookmarkImportResult(successful: 0, duplicates: 0, failed: 0)
 
         underlyingBookmarkImporter.importBookmarks = { (_, _) in
-            importExpectation.fulfill()
+            XCTFail("unexpected import success")
             return expectedImportResult
         }
 

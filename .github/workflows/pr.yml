@@ -2,9 +2,9 @@ name: PR Checks
 
 on: 
   push:
-    branches: [ develop ]
+    branches: [ develop, "release/**" ]
   pull_request:
-    branches: [ develop ]
+    branches: [ develop, "release/**" ]
 
 
 jobs:
@@ -20,15 +20,10 @@ jobs:
     - name: Check out the code
       uses: actions/checkout@v3
 
-    - name: Fetch PR's target branch
-      run: git fetch --no-tags --prune --depth=1 origin ${{ github.base_ref }}
-
     - name: Run SwiftLint on files changed in the PR
-      uses: ayoy/action-swiftlint@3.2.2
+      uses: norio-nomura/action-swiftlint@3.2.1
       with:
         args: --strict --force-exclude
-      env:
-        DIFF_BASE: ${{ github.base_ref }}
 
   shellcheck:
 
@@ -58,7 +53,7 @@ jobs:
 
     steps:
     - name: Register SSH keys for submodules access
-      uses: webfactory/ssh-agent@v0.5.4
+      uses: webfactory/ssh-agent@v0.7.0
       with:
         ssh-private-key: |
           ${{ secrets.SSH_PRIVATE_KEY_FIND_IN_PAGE }}
@@ -69,8 +64,8 @@ jobs:
       with:
         submodules: recursive
 
-    - name: Select Xcode 14.0
-      run: sudo xcode-select -s /Applications/Xcode_14.0.app/Contents/Developer
+    - name: Select Xcode
+      run: sudo xcode-select -s /Applications/Xcode_14.1.app/Contents/Developer
 
     - name: Build and test
       run: |
@@ -86,3 +81,21 @@ jobs:
       with:
         report_paths: unittests.xml
 
+  verify-autoconsent-bundle:
+    name: 'Verify autoconsent bundle'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: 'npm'
+      - name: Build bundle
+        run: |
+          npm ci
+          npm run rebuild-autoconsent
+      - name: Verify clean tree
+        run: |
+          git update-index --refresh 
+          git diff-index --quiet HEAD --

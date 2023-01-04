@@ -13,11 +13,13 @@
     "strict": true,
     "noImplicitAny": false,
     "strictNullChecks": true,
-    "maxNodeModuleJsDepth": 0
+    "maxNodeModuleJsDepth": 0,
+    "useDefineForClassFields": true
   },
   "include": [
     "youtube-inject.js",
     "types.d.ts",
+    "node_modules/@duckduckgo/content-scope-utils/lib"
   ],
   "exclude": [
   ]

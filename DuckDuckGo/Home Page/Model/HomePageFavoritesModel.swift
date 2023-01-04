@@ -20,7 +20,7 @@ import Foundation
 
 extension HomePage.Models {
 
-    enum FavoriteType {
+    enum FavoriteType: Equatable {
 
         case bookmark(Bookmark)
         case addButton
@@ -28,7 +28,7 @@ extension HomePage.Models {
 
     }
 
-    struct FavoriteModel {
+    struct FavoriteModel: Identifiable, Equatable {
 
         let id: UUID
         let favoriteType: FavoriteType
@@ -43,12 +43,13 @@ extension HomePage.Models {
 
         }
 
-        @UserDefaultsWrapper(key: .homePageShowAllFavorites, defaultValue: false)
+        @UserDefaultsWrapper(key: .homePageShowAllFavorites, defaultValue: true)
         private static var showAllFavoritesSetting: Bool
 
         @Published var showAllFavorites: Bool {
             didSet {
                 Self.showAllFavoritesSetting = showAllFavorites
+                updateVisibleModels()
             }
         }
 
@@ -60,31 +61,44 @@ extension HomePage.Models {
                 let lastRowCount = favorites.count % HomePage.favoritesPerRow
                 let missing = lastRowCount > 0 ? HomePage.favoritesPerRow - lastRowCount : 0
 
-                (0 ..< missing).forEach { _ in 
+                (0 ..< missing).forEach { _ in
                     favorites.append(FavoriteModel(id: UUID(), favoriteType: .ghostButton))
                 }
 
-                self.rows = favorites.chunked(into: HomePage.favoritesPerRow)
+                models = favorites
             }
         }
 
+        @Published var models: [FavoriteModel] = [] {
+            didSet {
+                updateVisibleModels()
+            }
+        }
+
+        @Published private(set) var visibleModels: [FavoriteModel] = []
+
+        @available(macOS, obsoleted: 12.0, message: "Use visibleModels and LazyVGrid instead")
         @Published private(set) var rows: [[FavoriteModel]] = []
 
         let open: (Bookmark, OpenTarget) -> Void
         let removeFavorite: (Bookmark) -> Void
         let deleteBookmark: (Bookmark) -> Void
         let addEdit: (Bookmark?) -> Void
+        let moveFavorite: (Bookmark, Int) -> Void
 
         init(open: @escaping (Bookmark, OpenTarget) -> Void,
              removeFavorite: @escaping (Bookmark) -> Void,
              deleteBookmark: @escaping (Bookmark) -> Void,
-             addEdit: @escaping (Bookmark?) -> Void) {
+             addEdit: @escaping (Bookmark?) -> Void,
+             moveFavorite: @escaping (Bookmark, Int) -> Void
+        ) {
 
             self.showAllFavorites = Self.showAllFavoritesSetting
             self.open = open
             self.removeFavorite = removeFavorite
             self.deleteBookmark = deleteBookmark
             self.addEdit = addEdit
+            self.moveFavorite = moveFavorite
         }
 
         func openInNewTab(_ bookmark: Bookmark) {
@@ -106,6 +120,14 @@ extension HomePage.Models {
         func addNew() {
             addEdit(nil)
         }
+
+        private func updateVisibleModels() {
+            if #available(macOS 12.0, *) {
+                visibleModels = showAllFavorites ? models : Array(models.prefix(HomePage.favoritesRowCountWhenCollapsed * HomePage.favoritesPerRow))
+            } else {
+                rows = models.chunked(into: HomePage.favoritesPerRow)
+            }
+        }
     }
-    
+
 }

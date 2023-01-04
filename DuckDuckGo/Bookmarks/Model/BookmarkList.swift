@@ -21,13 +21,13 @@ import BrowserServicesKit
 import os.log
 
 struct BookmarkList {
-    
+
     struct IdentifiableBookmark: Equatable, BrowserServicesKit.Bookmark {
         let id: UUID
         let url: URL
         let title: String
         let isFavorite: Bool
-        
+
         init(from bookmark: Bookmark) {
             self.id = bookmark.id
             self.url = bookmark.url
@@ -51,29 +51,24 @@ struct BookmarkList {
             guard let array = itemsDict[favoriteBookmark.url] else {
                 return nil
             }
-            
+
             return array.first(where: { $0.id == favoriteBookmark.id })
         }
-        
+
         return bookmarks
     }
 
-    init(entities: [BaseBookmarkEntity] = [], topLevelEntities: [BaseBookmarkEntity] = []) {
+    init(entities: [BaseBookmarkEntity] = [], topLevelEntities: [BaseBookmarkEntity] = [], favorites: [BaseBookmarkEntity] = []) {
         let bookmarks = entities.compactMap { $0 as? Bookmark }
         let keysOrdered = bookmarks.compactMap { IdentifiableBookmark(from: $0) }
-        var favoriteKeysOrdered = [IdentifiableBookmark]()
 
         var itemsDict = [URL: [Bookmark]]()
-        
+
         for bookmark in bookmarks {
             itemsDict[bookmark.url] = (itemsDict[bookmark.url] ?? []) + [bookmark]
-
-            if bookmark.isFavorite {
-                favoriteKeysOrdered.append(IdentifiableBookmark(from: bookmark))
-            }
         }
-        
-        self.favoriteBookmarksOrdered = favoriteKeysOrdered
+
+        self.favoriteBookmarksOrdered = favorites.compactMap({$0 as? Bookmark}).map(IdentifiableBookmark.init(from:))
         self.allBookmarkURLsOrdered = keysOrdered
         self.itemsDict = itemsDict
         self.topLevelEntities = topLevelEntities
@@ -95,10 +90,10 @@ struct BookmarkList {
 
     mutating func remove(_ bookmark: Bookmark) {
         allBookmarkURLsOrdered.removeAll { $0.id == bookmark.id }
-        
+
         let existingBookmarks = itemsDict[bookmark.url] ?? []
         let updatedBookmarks = existingBookmarks.filter { $0.id != bookmark.id }
-        
+
         if updatedBookmarks.isEmpty {
             itemsDict[bookmark.url] = nil
         } else {
@@ -141,16 +136,16 @@ struct BookmarkList {
 
         let newBookmark = Bookmark(from: bookmark, with: newURL)
         let newIdentifiableBookmark = IdentifiableBookmark(from: newBookmark)
-        
+
         allBookmarkURLsOrdered.remove(at: index)
         allBookmarkURLsOrdered.insert(newIdentifiableBookmark, at: index)
-        
+
         let existingBookmarks = itemsDict[bookmark.url] ?? []
         let updatedBookmarks = existingBookmarks.filter { $0.id != bookmark.id }
-        
+
         itemsDict[bookmark.url] = updatedBookmarks
         itemsDict[newURL] = (itemsDict[newURL] ?? []) + [bookmark]
-        
+
         return newBookmark
     }
 

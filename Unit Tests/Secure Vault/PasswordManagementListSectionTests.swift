@@ -22,7 +22,7 @@ import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 final class PasswordManagementListSectionTests: XCTestCase {
-    
+
     private lazy var accounts = [
         login(named: "Alfa"),
         login(named: "Alfa Two"),
@@ -52,12 +52,12 @@ final class PasswordManagementListSectionTests: XCTestCase {
         let sections = PasswordManagementListSection.sections(with: [], by: \.id, order: .ascending)
         XCTAssertTrue(sections.isEmpty)
     }
-    
+
     func testWhenSortingItemsByTitle_AndOrderIsAscending_ThenSectionsAreAlphabetical() {
         let sections = PasswordManagementListSection.sections(with: accounts, by: \.firstCharacter, order: .ascending)
         XCTAssertEqual(sections.count, 5)
         XCTAssertEqual(sections.map(\.title), ["A", "B", "C", "Y", "Z"])
-        
+
         XCTAssertEqual(sections.first!.items.map(\.title), ["Alfa", "Alfa Two"])
         XCTAssertEqual(sections.last!.items.map(\.title), ["Zulu", "Zulu Two"])
     }
@@ -72,11 +72,11 @@ final class PasswordManagementListSectionTests: XCTestCase {
         let sections = PasswordManagementListSection.sections(with: accounts, by: \.firstCharacter, order: .descending)
         XCTAssertEqual(sections.count, 5)
         XCTAssertEqual(sections.map(\.title), ["Z", "Y", "C", "B", "A"])
-        
+
         XCTAssertEqual(sections.first!.items.map(\.title), ["Zulu Two", "Zulu"])
         XCTAssertEqual(sections.last!.items.map(\.title), ["Alfa Two", "Alfa"])
     }
-    
+
     func testWhenSortingItemsByTitle_AndTitlesUseDigits_ThenOctothorpeTitleIsUsed() {
         let accounts = [
             login(named: "123"),
@@ -85,59 +85,59 @@ final class PasswordManagementListSectionTests: XCTestCase {
         ]
 
         let sections = PasswordManagementListSection.sections(with: accounts, by: \.firstCharacter, order: .ascending)
-        
+
         XCTAssertEqual(sections.count, 1)
         XCTAssertEqual(sections.first!.title, "#")
     }
-    
+
     func testWhenSortingItemsByDate_AndAllMonthsAndYearsAreTheSame_ThenOneSectionIsReturned() {
         let months = [1, 1, 1, 1, 1]
         let accounts = months.map { login(named: "Login", month: $0, year: 2000) }
         let sections = PasswordManagementListSection.sections(with: accounts, by: \.created, order: .ascending)
-        
+
         XCTAssertEqual(sections.count, 1)
         XCTAssertEqual(sections.first!.items.count, months.count)
         XCTAssertEqual(sections.first!.title, "Jan 2000")
     }
-    
+
     func testWhenSortingItemsByDate_AndMonthsAreDifferent_ThenMultipleSectionsAreReturned() {
         let months = 1...12
         let accounts = months.map { login(named: "Login", month: $0) }
         let sections = PasswordManagementListSection.sections(with: accounts, by: \.created, order: .ascending)
-        
+
         XCTAssertEqual(sections.count, 12)
-        
+
         for section in sections {
             XCTAssertEqual(section.items.count, 1)
         }
     }
-    
+
     func testWhenSortingItemsByDate_AndMonthsAreDifferent_AndThereAreMultipleYears_ThenMultipleSectionsAreReturned() {
         let months = 1...12
         let firstYearAccounts = months.map { login(named: "Login", month: $0, year: 2000) }
         let secondYearAccounts = months.map { login(named: "Login", month: $0, year: 2001) }
         let allAccounts = firstYearAccounts + secondYearAccounts
         let sections = PasswordManagementListSection.sections(with: allAccounts, by: \.created, order: .ascending)
-        
+
         XCTAssertEqual(sections.count, 24)
-        
+
         for section in sections {
             XCTAssertEqual(section.items.count, 1)
         }
     }
-    
+
     private func login(named name: String, month: Int = 1, year: Int = 2000) -> SecureVaultItem {
         let calendar = Calendar.current
         let components = DateComponents(calendar: calendar, year: year, month: month, day: 1)
         let date = calendar.date(from: components) ?? Date()
-        
-        let account = SecureVaultModels.WebsiteAccount(id: 1,
+
+        let account = SecureVaultModels.WebsiteAccount(id: "1",
                                                        title: name,
                                                        username: "Username",
                                                        domain: "\(name).com",
                                                        created: date,
                                                        lastUpdated: date)
-    
+
         return SecureVaultItem.account(account)
     }
 

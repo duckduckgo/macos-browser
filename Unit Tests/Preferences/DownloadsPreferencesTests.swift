@@ -23,7 +23,8 @@ struct DownloadsPreferencesPersistorMock: DownloadsPreferencesPersistor {
     var selectedDownloadLocation: String?
     var alwaysRequestDownloadLocation: Bool
     var defaultDownloadLocation: URL?
-    // swiftlint:disable:next identifier_name
+    var lastUsedCustomDownloadLocation: String?
+
     var _isDownloadLocationValid: (URL) -> Bool
 
     func isDownloadLocationValid(_ location: URL) -> Bool {
@@ -34,11 +35,13 @@ struct DownloadsPreferencesPersistorMock: DownloadsPreferencesPersistor {
         selectedDownloadLocation: String? = nil,
         alwaysRequestDownloadLocation: Bool = false,
         defaultDownloadLocation: URL? = FileManager.default.temporaryDirectory,
+        lastUsedCustomDownloadLocation: String? = nil,
         isDownloadLocationValid: @escaping (URL) -> Bool = { _ in true }
     ) {
         self.selectedDownloadLocation = selectedDownloadLocation
         self.alwaysRequestDownloadLocation = alwaysRequestDownloadLocation
         self.defaultDownloadLocation = defaultDownloadLocation
+        self.lastUsedCustomDownloadLocation = lastUsedCustomDownloadLocation
         self._isDownloadLocationValid = isDownloadLocationValid
     }
 }
@@ -51,6 +54,34 @@ class DownloadsPreferencesTests: XCTestCase {
         try super.setUpWithError()
 
         deleteTemporaryTestDirectory()
+    }
+
+    func testWhenAlwaysAskIsOnAndCustomLocationWasSetThenEffectiveDownloadLocationIsReturned() {
+        let testDirectory = createTemporaryTestDirectory()
+        let persistor = DownloadsPreferencesPersistorMock(selectedDownloadLocation: nil, alwaysRequestDownloadLocation: true)
+        let preferences = DownloadsPreferences(persistor: persistor)
+
+        preferences.lastUsedCustomDownloadLocation = testDirectory
+
+        XCTAssertEqual(preferences.effectiveDownloadLocation, testDirectory)
+    }
+
+    func testWhenAlwaysAskIsOnAndCustomLocationWasNotSetThenEffectiveDownloadLocationIsReturned() {
+        let persistor = DownloadsPreferencesPersistorMock(selectedDownloadLocation: nil, alwaysRequestDownloadLocation: true)
+        let preferences = DownloadsPreferences(persistor: persistor)
+
+        XCTAssertEqual(preferences.effectiveDownloadLocation, DownloadsPreferences.defaultDownloadLocation())
+    }
+
+    func testWhenAlwaysAskIsOnAndCustomLocationWasSetAndRemovedFromDiskThenEffectiveDownloadLocationIsReturned() {
+        let testDirectory = createTemporaryTestDirectory()
+        let persistor = DownloadsPreferencesPersistorMock(selectedDownloadLocation: nil, alwaysRequestDownloadLocation: true)
+        let preferences = DownloadsPreferences(persistor: persistor)
+
+        preferences.lastUsedCustomDownloadLocation = testDirectory
+        deleteTemporaryTestDirectory()
+
+        XCTAssertEqual(preferences.effectiveDownloadLocation, DownloadsPreferences.defaultDownloadLocation())
     }
 
     func testWhenSettingNilDownloadLocationThenDefaultDownloadLocationIsReturned() {

@@ -108,7 +108,7 @@ final class PermissionManager: PermissionManagerProtocol {
         }
         store.clear(except: permissions.values.reduce(into: [StoredPermission](), {
             $0.append(contentsOf: $1.values)
-        }), completionHandler: { _ in 
+        }), completionHandler: { _ in
             completion()
         })
     }

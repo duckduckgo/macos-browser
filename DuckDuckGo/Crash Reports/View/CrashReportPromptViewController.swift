@@ -54,5 +54,5 @@ final class CrashReportPromptViewController: NSViewController {
         delegate?.crashReportPromptViewController(self, userDidAllowToReport: false)
         view.window?.close()
     }
-    
+
 }

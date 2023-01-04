@@ -50,6 +50,20 @@ final class AutofillPreferencesModel: ObservableObject {
         }
     }
 
+    @Published private(set) var passwordManager: PasswordManager {
+        didSet {
+            persistor.passwordManager = passwordManager
+
+            let enabled = passwordManager == .bitwarden
+            PasswordManagerCoordinator.shared.setEnabled(enabled)
+            if enabled {
+                presentBitwardenSetupFlow()
+            }
+        }
+    }
+
+    @Published private(set) var isBitwardenSetupFlowPresented = false
+
     func authorizeAutoLockSettingsChange(
         isEnabled isAutoLockEnabledNewValue: Bool? = nil,
         threshold autoLockThresholdNewValue: AutofillAutoLockThreshold? = nil
@@ -78,24 +92,60 @@ final class AutofillPreferencesModel: ObservableObject {
         }
     }
 
+    func passwordManagerSettingsChange(passwordManager: PasswordManager) {
+        self.passwordManager = passwordManager
+    }
+
     func openImportBrowserDataWindow() {
         NSApp.sendAction(#selector(AppDelegate.openImportBrowserDataWindow(_:)), to: nil, from: nil)
     }
 
     init(
         persistor: AutofillPreferencesPersistor = AutofillPreferences(),
-        userAuthenticator: UserAuthenticating = DeviceAuthenticator.shared
+        userAuthenticator: UserAuthenticating = DeviceAuthenticator.shared,
+        bitwardenInstallationService: BWInstallationService = LocalBitwardenInstallationService()
     ) {
         self.persistor = persistor
         self.userAuthenticator = userAuthenticator
+        self.bitwardenInstallationService = bitwardenInstallationService
 
         isAutoLockEnabled = persistor.isAutoLockEnabled
         autoLockThreshold = persistor.autoLockThreshold
         askToSaveUsernamesAndPasswords = persistor.askToSaveUsernamesAndPasswords
         askToSaveAddresses = persistor.askToSaveAddresses
         askToSavePaymentMethods = persistor.askToSavePaymentMethods
+        passwordManager = persistor.passwordManager
     }
 
     private var persistor: AutofillPreferencesPersistor
     private var userAuthenticator: UserAuthenticating
+    private let bitwardenInstallationService: BWInstallationService
+
+    // MARK: - Password Manager
+
+    func presentBitwardenSetupFlow() {
+        let connectBitwardenViewController = ConnectBitwardenViewController(nibName: nil, bundle: nil)
+        let connectBitwardenWindowController = connectBitwardenViewController.wrappedInWindowController()
+
+        connectBitwardenViewController.setupFlowCancellationHandler = { [weak self] in
+            self?.passwordManager = .duckduckgo
+        }
+
+        guard let connectBitwardenWindow = connectBitwardenWindowController.window,
+              let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController
+        else {
+            assertionFailure("Privacy Preferences: Failed to present ConnectBitwardenViewController")
+            return
+        }
+
+        isBitwardenSetupFlowPresented = true
+        parentWindowController.window?.beginSheet(connectBitwardenWindow) { [weak self] _ in
+            self?.isBitwardenSetupFlowPresented = false
+        }
+    }
+
+    func openBitwarden() {
+        PasswordManagerCoordinator.shared.openPasswordManager()
+    }
+
 }

@@ -27,6 +27,7 @@ protocol AddressBarTextFieldDelegate: AnyObject {
 
 }
 
+// swiftlint:disable:next type_body_length
 final class AddressBarTextField: NSTextField {
 
     weak var addressBarTextFieldDelegate: AddressBarTextFieldDelegate?
@@ -339,7 +340,7 @@ final class AddressBarTextField: NSTextField {
 
         upgradeToHttps(url: url, completion: completion)
     }
-    
+
     private func upgradeToHttps(url: URL, completion: @escaping (URL?, Bool) -> Void) {
         Task {
             let result = await PrivacyFeatures.httpsUpgrade.upgrade(url: url)
@@ -463,7 +464,7 @@ final class AddressBarTextField: NSTextField {
 
         init?(suggestionViewModel: SuggestionViewModel) {
             switch suggestionViewModel.suggestion {
-            case .phrase(phrase: _):
+            case .phrase:
                 self = Suffix.search
             case .website(url: let url):
                 guard let host = url.root?.toString(decodePunycode: true, dropScheme: true, dropTrailingSlash: true) else {
@@ -483,7 +484,7 @@ final class AddressBarTextField: NSTextField {
                     self = .url(url)
                 }
 
-            case .unknown(value: _):
+            case .unknown:
                 self = Suffix.search
             }
         }
@@ -859,7 +860,7 @@ extension AddressBarTextField: NSTextViewDelegate {
            let pasteAndDoMenuItem = makePasteAndDoMenuItem() {
             textViewMenu.insertItem(pasteAndDoMenuItem, at: pasteMenuItemIndex + 1)
         }
-        
+
         if let insertionPoint = menuItemInsertionPoint(within: menu) {
             additionalMenuItems.reversed().forEach { item in
                 textViewMenu.insertItem(item, at: insertionPoint)
@@ -869,10 +870,10 @@ extension AddressBarTextField: NSTextViewDelegate {
                 textViewMenu.addItem(item)
             }
         }
-        
+
         return textViewMenu
     }
-    
+
     /// Returns the menu item after which new items should be added.
     /// This will be the first separator that comes after a predefined list of items: Cut, Copy, or Paste.
     ///
@@ -880,13 +881,13 @@ extension AddressBarTextField: NSTextViewDelegate {
     private func menuItemInsertionPoint(within menu: NSMenu) -> Int? {
         let preferredSelectorNames = ["cut:", "copy:", "paste:"]
         var foundPreferredSelector = false
-        
+
         for (index, item) in menu.items.enumerated() {
             if foundPreferredSelector && item.isSeparatorItem {
                 let indexAfterSeparator = index + 1
                 return menu.items.indices.contains(indexAfterSeparator) ? indexAfterSeparator : index
             }
-            
+
             if let action = item.action, preferredSelectorNames.contains(action.description) {
                 foundPreferredSelector = true
             }
@@ -944,7 +945,7 @@ extension AddressBarTextField: NSTextViewDelegate {
 
         return menuItem
     }
-    
+
     private func makeFullWebsiteAddressMenuItem() -> NSMenuItem {
         let menuItem = NSMenuItem(
             title: UserText.showFullWebsiteAddress.localizedCapitalized,
@@ -987,6 +988,20 @@ extension AddressBarTextField: NSTextViewDelegate {
 }
 
 final class AddressBarTextEditor: NSTextView {
+
+    override func mouseDown(with event: NSEvent) {
+        super.mouseDown(with: event)
+
+        guard let delegate = delegate as? AddressBarTextField else {
+            os_log("AddressBarTextEditor: unexpected kind of delegate")
+            return
+        }
+
+        if let currentSelection = selectedRanges.first as? NSRange {
+            let adjustedSelection = delegate.filterSuffix(fromSelectionRange: currentSelection, for: string)
+            setSelectedRange(adjustedSelection)
+        }
+    }
 
     override func paste(_ sender: Any?) {
         guard let delegate = delegate as? AddressBarTextField else {

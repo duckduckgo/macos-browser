@@ -23,17 +23,18 @@ extension NSMenuItem {
     static var empty: NSMenuItem {
         return NSMenuItem(title: UserText.bookmarksBarFolderEmpty, action: nil, target: nil, keyEquivalent: "")
     }
-    
-    convenience init(title string: String, action selector: Selector?, target: AnyObject?, keyEquivalent charCode: String) {
+
+    convenience init(title string: String, action selector: Selector?, target: AnyObject?, keyEquivalent charCode: String = "", representedObject: Any? = nil) {
         self.init(title: string, action: selector, keyEquivalent: charCode)
         self.target = target
+        self.representedObject = representedObject
     }
 
     convenience init(action selector: Selector?) {
         self.init()
         self.action = selector
     }
-    
+
     convenience init(bookmarkViewModel: BookmarkViewModel) {
         self.init()
 

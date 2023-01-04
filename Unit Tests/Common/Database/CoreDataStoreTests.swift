@@ -24,7 +24,7 @@ final class CoreDataStoreTests: XCTestCase {
 
     let container = CoreData.coreDataStoreTestsContainer()
     typealias Store = CoreDataStore<TestManagedObject>
-    lazy var store = Store(context: container.viewContext, tableName: "TestDataModel")
+    lazy var store = Store(context: container.newBackgroundContext(), tableName: "TestDataModel")
 
     private func load(into result: inout [CoreDataTestStruct: NSManagedObjectID],
                       idValue: Store.IDValueTuple) throws {
@@ -133,7 +133,7 @@ final class CoreDataStoreTests: XCTestCase {
         store.clear { [store] error in
             XCTAssertNil(error)
 
-            let fireproofed = try! store.load(into: .init(), self.load) // swiftlint:disable:this force_try
+            let fireproofed = try! store.load(into: .init(), self.load)
 
             XCTAssertEqual(fireproofed, [:])
 

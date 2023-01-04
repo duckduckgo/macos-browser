@@ -21,26 +21,26 @@ import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 final class WKWebsiteDataStoreExtensionTests: XCTestCase {
-    
+
     func testWhenGettingRemovableDataTypes_ThenLocalStorageAndIndexedDBAreNotIncluded() {
         let removableTypes = WKWebsiteDataStore.safelyRemovableWebsiteDataTypes
-        
+
         XCTAssertFalse(removableTypes.contains(WKWebsiteDataTypeLocalStorage))
-        
+
         if #available(macOS 12.2, *) {
             XCTAssertFalse(removableTypes.contains(WKWebsiteDataTypeIndexedDBDatabases))
         } else {
             XCTAssertTrue(removableTypes.contains(WKWebsiteDataTypeIndexedDBDatabases))
         }
     }
-    
+
     func testWhenGettingAllWebsiteDataTypesExceptCookies_ThenLocalStorageAndIndexedDBAreIncluded() {
         let removableTypes = WKWebsiteDataStore.allWebsiteDataTypesExceptCookies
-        
+
         XCTAssertFalse(removableTypes.contains(WKWebsiteDataTypeCookies))
-        
+
         XCTAssertTrue(removableTypes.contains(WKWebsiteDataTypeLocalStorage))
         XCTAssertTrue(removableTypes.contains(WKWebsiteDataTypeIndexedDBDatabases))
     }
-    
+
 }

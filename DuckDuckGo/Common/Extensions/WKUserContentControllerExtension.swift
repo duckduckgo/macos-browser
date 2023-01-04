@@ -18,7 +18,7 @@
 
 import Cocoa
 import WebKit
-import BrowserServicesKit
+import UserScript
 
 extension WKUserContentController {
 
@@ -27,7 +27,7 @@ extension WKUserContentController {
             add(userScript, name: messageName)
         }
     }
-    
+
     func addHandler(_ userScript: UserScript) {
         for messageName in userScript.messageNames {
             if #available(macOS 11.0, *) {

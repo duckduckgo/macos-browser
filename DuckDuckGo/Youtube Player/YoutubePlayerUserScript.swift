@@ -16,20 +16,19 @@
 //  limitations under the License.
 //
 
-import Foundation
-import BrowserServicesKit
 import WebKit
+import UserScript
 
 final class YoutubePlayerUserScript: NSObject, StaticUserScript {
-    
+
     enum MessageNames: String, CaseIterable {
         case setAlwaysOpenSettingTo
     }
-    
+
     public var requiresRunInPageContentWorld: Bool {
         return true
     }
-    
+
     static var injectionTime: WKUserScriptInjectionTime { .atDocumentStart}
     static var forMainFrameOnly: Bool { true }
     static var source: String = ""
@@ -57,22 +56,22 @@ final class YoutubePlayerUserScript: NSObject, StaticUserScript {
             assertionFailure("YoutubePlayerUserScript: unexpected message name \(message.name)")
             return
         }
-        
+
         switch messageType {
         case .setAlwaysOpenSettingTo:
             handleAlwaysOpenSettings(message: message)
         }
     }
-    
+
     private func handleAlwaysOpenSettings(message: WKScriptMessage) {
         guard let alwaysOpenOnPrivatePlayer = message.body as? Bool else {
             assertionFailure("YoutubePlayerUserScript: expected Bool")
             return
         }
-        
+
         privatePlayerPreferences.privatePlayerMode = .init(alwaysOpenOnPrivatePlayer)
     }
-    
+
     func evaluateJSCall(call: String, webView: WKWebView) {
         evaluate(js: call, inWebView: webView)
     }

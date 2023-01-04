@@ -33,7 +33,7 @@ extension URLRequest {
                          forHTTPHeaderField: HeaderKey.acceptEncoding.rawValue)
 
         let userAgent = UserAgent.duckDuckGoUserAgent()
-        
+
         request.setValue(userAgent, forHTTPHeaderField: HeaderKey.userAgent.rawValue)
 
         let languages = Locale.preferredLanguages.prefix(6)

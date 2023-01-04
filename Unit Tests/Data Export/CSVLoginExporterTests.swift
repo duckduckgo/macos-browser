@@ -48,7 +48,7 @@ class CSVLoginExporterTests: XCTestCase {
         var credentials = [Int64: SecureVaultModels.WebsiteCredentials]()
 
         for identifier in identifiers {
-            let account = SecureVaultModels.WebsiteAccount(id: identifier,
+            let account = SecureVaultModels.WebsiteAccount(id: String(identifier),
                                                            title: "title-\(identifier)",
                                                            username: "user-\(identifier)",
                                                            domain: "domain-\(identifier)")

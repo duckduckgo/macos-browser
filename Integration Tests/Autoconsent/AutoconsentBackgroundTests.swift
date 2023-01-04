@@ -17,26 +17,47 @@
 //
 
 import XCTest
+import Common
+import BrowserServicesKit
+import TrackerRadarKit
 @testable import DuckDuckGo_Privacy_Browser
 
 @available(macOS 11, *)
 class AutoconsentBackgroundTests: XCTestCase {
+    // todo: mock
+    let preferences = PrivacySecurityPreferences.shared
+
     func testUserscriptIntegration() {
         // enable the feature
         let prefs = PrivacySecurityPreferences.shared
         prefs.autoconsentEnabled = true
         // setup a webview with autoconsent userscript installed
-        let autoconsentUserScript = AutoconsentUserScript(scriptSource: DefaultScriptSourceProvider(),
-                                                          config: ContentBlocking.shared.privacyConfigurationManager.privacyConfig)
+        let sourceProvider = ScriptSourceProvider(configStorage: MockStorage(),
+                                                  privacyConfigurationManager: MockPrivacyConfigurationManager(),
+                                                  privacySettings: preferences,
+                                                  contentBlockingManager: ContentBlockerRulesManagerMock(),
+                                                  trackerDataManager: TrackerDataManager(etag: DefaultConfigurationStorage.shared.loadEtag(for: .trackerRadar),
+                                                                                         data: DefaultConfigurationStorage.shared.loadData(for: .trackerRadar),
+                                                                                         embeddedDataProvider: AppTrackerDataSetProvider(),
+                                                                                         errorReporting: nil),
+
+                                                  tld: TLD())
+        let autoconsentUserScript = AutoconsentUserScript(scriptSource: sourceProvider,
+                                                          config: MockPrivacyConfigurationManager().privacyConfig)
         let configuration = WKWebViewConfiguration()
 
         configuration.userContentController.addUserScript(autoconsentUserScript.makeWKUserScript())
         configuration.userContentController.addHandler(autoconsentUserScript)
+
         let webview = WKWebView(frame: .zero, configuration: configuration)
-        let expectation = XCTestExpectation(description: "Async call")
+        let navigationDelegate = TestNavigationDelegate(e: expectation(description: "WebView Did finish navigation"))
+        webview.navigationDelegate = navigationDelegate
         let url = Bundle(for: type(of: self)).url(forResource: "autoconsent-test-page", withExtension: "html")!
         webview.loadFileURL(url, allowingReadAccessTo: url.deletingLastPathComponent())
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+        waitForExpectations(timeout: 1)
+
+        let expectation = expectation(description: "Async call")
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
             webview.evaluateJavaScript("results.results.includes('button_clicked')", in: nil, in: .page,
                                        completionHandler: { result in
                 switch result {
@@ -50,7 +71,51 @@ class AutoconsentBackgroundTests: XCTestCase {
                 expectation.fulfill()
             })
         }
-        wait(for: [expectation], timeout: 4)
+        waitForExpectations(timeout: 4)
     }
+}
+
+class MockStorage: ConfigurationStoring {
+
+    enum Error: Swift.Error {
+        case mockError
+    }
+
+    var errorOnStoreData = false
+    var errorOnStoreEtag = false
+
+    var data: Data?
+    var dataConfig: ConfigurationLocation?
+
+    var etag: String?
+    var etagConfig: ConfigurationLocation?
+
+    func loadData(for: ConfigurationLocation) -> Data? {
+        return data
+    }
+
+    func loadEtag(for: ConfigurationLocation) -> String? {
+        return etag
+    }
+
+    func saveData(_ data: Data, for config: ConfigurationLocation) throws {
+        if errorOnStoreData {
+            throw Error.mockError
+        }
+
+        self.data = data
+        self.dataConfig = config
+    }
+
+    func saveEtag(_ etag: String, for config: ConfigurationLocation) throws {
+        if errorOnStoreEtag {
+            throw Error.mockError
+        }
+
+        self.etag = etag
+        self.etagConfig = config
+    }
+
+    func log() { }
 
 }

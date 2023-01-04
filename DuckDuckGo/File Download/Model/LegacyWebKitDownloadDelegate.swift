@@ -50,22 +50,29 @@ final class LegacyWebKitDownloadDelegate: NSObject {
 // https://github.com/WebKit/webkit/blob/main/Source/WebKit/UIProcess/API/Cocoa/_WKDownloadDelegate.h
 private extension LegacyWebKitDownloadDelegate {
 
-    @objc func _downloadDidStart(_ download: WebKitDownload) {
-        guard let webView = download.webView, let url = download.originalRequest?.url else {
-            assertionFailure("WebKitDownload webView or url is nil")
-            return
-        }
-        guard let delegate = webView.navigationDelegate as? WKWebViewDownloadDelegate else {
-            assertionFailure("webView.navigationDelegate does not conform to WKWebViewDownloadDelegate")
+    // in reality we receive an instance of _WKDownload private class but we can‘t pass it to the WKNavigationDelegate without casting
+    @available(macOS 11.3, *) // objc doesn‘t care about availability
+    @objc func _downloadDidStart(_ download: WKDownload) {
+        guard let webView = download.webView, let delegate = webView.navigationDelegate, let url = download.originalRequest?.url else {
+            assertionFailure("WebKitDownload webView or delegate is nil")
             return
         }
 
         if let navigationAction = self.navigationActions[url] {
             self.navigationActions[url] = nil
-            delegate.webView(webView, navigationAction: navigationAction, didBecomeDownload: download)
+            assert(delegate.responds(to: #selector(WKNavigationDelegate.webView(_:navigationAction:didBecome:))))
+            delegate.webView?(webView, navigationAction: navigationAction, didBecome: download)
         } else if let navigationResponse = self.navigationResponses[url] {
             self.navigationResponses[url] = nil
-            delegate.webView(webView, navigationResponse: navigationResponse, didBecomeDownload: download)
+            assert(delegate.responds(to: #selector(WKNavigationDelegate.webView(_:navigationResponse:didBecome:))))
+            delegate.webView?(webView, navigationResponse: navigationResponse, didBecome: download)
+        } else {
+            let selector = NSSelectorFromString("_webView:contextMenuDidCreateDownload:")
+            guard delegate.responds(to: selector) else {
+                assertionFailure("delegate does not respond to \(selector)")
+                return
+            }
+            delegate.perform(selector, with: webView, with: download)
         }
     }
 

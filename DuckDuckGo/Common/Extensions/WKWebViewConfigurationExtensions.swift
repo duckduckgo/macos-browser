@@ -18,10 +18,12 @@
 
 import WebKit
 import Combine
+import BrowserServicesKit
 
 extension WKWebViewConfiguration {
 
-    func applyStandardConfiguration() {
+    func applyStandardConfiguration(contentBlocking: some ContentBlockingProtocol) {
+
         allowsAirPlayForMediaPlayback = true
         preferences.setValue(true, forKey: "fullScreenEnabled")
         preferences.setValue(true, forKey: "allowsPictureInPictureMediaPlayback")
@@ -34,13 +36,17 @@ extension WKWebViewConfiguration {
             preferences.javaScriptCanOpenWindowsAutomatically = false
         }
         preferences.isFraudulentWebsiteWarningEnabled = false
-        
+
         if urlSchemeHandler(forURLScheme: PrivatePlayer.privatePlayerScheme) == nil {
             setURLSchemeHandler(PrivatePlayerSchemeHandler(), forURLScheme: PrivatePlayer.privatePlayerScheme)
         }
 
-        self.userContentController = UserContentController()
+        let userContentController = UserContentController(assetsPublisher: contentBlocking.contentBlockingAssetsPublisher,
+                                                          privacyConfigurationManager: contentBlocking.privacyConfigurationManager)
+
+        self.userContentController = userContentController
         self.processPool.geolocationProvider = GeolocationProvider(processPool: self.processPool)
+        self.processPool.setDownloadDelegateIfNeeded(using: LegacyWebKitDownloadDelegate.init)
      }
 
 }

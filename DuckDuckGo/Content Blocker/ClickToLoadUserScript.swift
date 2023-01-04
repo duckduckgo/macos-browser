@@ -17,6 +17,7 @@
 //
 
 import WebKit
+import UserScript
 import BrowserServicesKit
 
 protocol ClickToLoadUserScriptDelegate: AnyObject {
@@ -83,7 +84,7 @@ final class ClickToLoadUserScript: NSObject, UserScript, WKScriptMessageHandlerW
         }
         replyHandler(image, nil)
     }
-    
+
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         assertionFailure("SHOULDN'T BE HERE!")
     }

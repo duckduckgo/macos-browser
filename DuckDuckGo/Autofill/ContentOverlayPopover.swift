@@ -21,13 +21,13 @@ import WebKit
 import BrowserServicesKit
 
 public final class ContentOverlayPopover {
-    
+
     public var zoomFactor: CGFloat?
     public weak var currentTabView: NSView?
 
     public var viewController: ContentOverlayViewController
     public var windowController: NSWindowController
-    
+
     public init(currentTabView: NSView) {
         let storyboard = NSStoryboard(name: "ContentOverlay", bundle: Bundle.main)
         viewController = storyboard.instantiateController(identifier: "ContentOverlayViewController")
@@ -36,7 +36,7 @@ public final class ContentOverlayPopover {
         windowController.window?.hasShadow = true
         windowController.window?.acceptsMouseMovedEvents = true
         windowController.window?.ignoresMouseEvents = false
-        
+
         viewController.view.wantsLayer = true
         if let layer = viewController.view.layer {
             layer.masksToBounds = true
@@ -93,8 +93,6 @@ extension ContentOverlayPopover: ContentOverlayUserScriptDelegate {
         }
         let rect = NSRect(x: x, y: y, width: rectWidth, height: inputPosition.height)
 
-        // On open initialize to default size to reduce flicker
-        viewController.requestResizeToSize(CGSize(width: 0, height: 0))
         viewController.autofillInterfaceToChild = websiteAutofillUserScript
         viewController.setType(serializedInputContext: serializedInputContext, zoomFactor: zoomFactor)
 

@@ -27,6 +27,7 @@ final class FirefoxLoginReader {
         case databaseAccessFailed
         case couldNotFindProfile
         case couldNotGetDecryptionKey
+        case couldNotFindLoginsFile
         case couldNotReadLoginsFile
         case decryptionFailed
         case failedToTemporarilyCopyFile
@@ -38,7 +39,7 @@ final class FirefoxLoginReader {
     enum DataFormat: CaseIterable {
         case version3
         case version2
-        
+
         var formatFileNames: (databaseName: String, loginFileName: String) {
             switch self {
             case .version3: return (databaseName: "key4.db", loginFileName: "logins.json")
@@ -66,7 +67,7 @@ final class FirefoxLoginReader {
 
     func readLogins(dataFormat: DataFormat?) -> Result<[ImportedLoginCredential], FirefoxLoginReader.ImportError> {
         var detectedFormat: DataFormat?
-        
+
         if let dataFormat = dataFormat {
             detectedFormat = dataFormat
         } else {
@@ -74,7 +75,7 @@ final class FirefoxLoginReader {
             for potentialFormat in DataFormat.allCases {
                 let potentialDatabaseURL = firefoxProfileURL.appendingPathComponent(potentialFormat.formatFileNames.databaseName)
                 let potentialLoginsFileURL = firefoxProfileURL.appendingPathComponent(potentialFormat.formatFileNames.loginFileName)
-                
+
                 if FileManager.default.fileExists(atPath: potentialDatabaseURL.path),
                    FileManager.default.fileExists(atPath: potentialLoginsFileURL.path) {
                     detectedFormat = potentialFormat
@@ -82,20 +83,20 @@ final class FirefoxLoginReader {
                 }
             }
         }
-        
+
         guard let detectedFormat = detectedFormat else {
-            return .failure(.couldNotReadLoginsFile)
+            return .failure(.couldNotFindLoginsFile)
         }
-        
+
         let databaseURL = firefoxProfileURL.appendingPathComponent(detectedFormat.formatFileNames.databaseName)
         let loginsFileURL = firefoxProfileURL.appendingPathComponent(detectedFormat.formatFileNames.loginFileName)
-        
+
         // If there isn't a file where logins are expected, consider it a successful import of 0 logins
         // to avoid showing an error state.
         guard FileManager.default.fileExists(atPath: loginsFileURL.path) else {
             return .success([])
         }
-        
+
         guard let logins = readLoginsFile(from: loginsFileURL.path) else {
             return .failure(.couldNotReadLoginsFile)
         }
@@ -106,7 +107,7 @@ final class FirefoxLoginReader {
         case .version2: encryptionKeyResult = keyReader.getEncryptionKey(key3DatabaseURL: databaseURL, primaryPassword: primaryPassword ?? "")
         case .version3: encryptionKeyResult = keyReader.getEncryptionKey(key4DatabaseURL: databaseURL, primaryPassword: primaryPassword ?? "")
         }
-        
+
         switch encryptionKeyResult {
         case .success(let keyData):
             let decryptedLogins = decrypt(logins: logins, with: keyData)

@@ -62,15 +62,3 @@ final class WebViewExtensionTests: XCTestCase {
     }
 
 }
-
-final class TestNavigationDelegate: NSObject, WKNavigationDelegate {
-    let e: XCTestExpectation
-
-    init(e: XCTestExpectation) {
-        self.e = e
-    }
-
-    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        e.fulfill()
-    }
-}

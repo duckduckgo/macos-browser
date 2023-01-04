@@ -19,6 +19,7 @@
 import Foundation
 import os.log
 import BrowserServicesKit
+import PrivacyDashboard
 import WebKit
 
 protocol TabDataClearing {
@@ -29,47 +30,47 @@ protocol TabDataClearing {
  Initiates cleanup of WebKit related data from Tabs:
  - Detach listeners and observers.
  - Flush WebView data by navigating to empty page.
- 
+
  Once done, remove Tab objects.
  */
 final class TabDataCleaner: NSObject, WKNavigationDelegate {
-    
+
     private var numberOfTabs = 0
     private var processedTabs = 0
-    
+
     private var completion: (() -> Void)?
-    
+
     func prepareTabsForCleanup(_ tabs: [TabViewModel],
                                completion: @escaping () -> Void) {
         guard !tabs.isEmpty else {
             completion()
             return
         }
-        
+
         assert(self.completion == nil)
         self.completion = completion
-        
+
         numberOfTabs = tabs.count
         tabs.forEach { $0.prepareForDataClearing(caller: self) }
     }
-    
+
     private func notifyIfDone() {
         if processedTabs >= numberOfTabs {
             completion?()
             completion = nil
         }
     }
-    
+
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         processedTabs += 1
-        
+
         notifyIfDone()
     }
-    
+
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
         Pixel.fire(.debug(event: .blankNavigationOnBurnFailed, error: error))
         processedTabs += 1
-        
+
         notifyIfDone()
     }
 }
@@ -80,7 +81,7 @@ final class Fire {
     static func getBurningDomain(from url: URL) -> String? {
         return url.host?.droppingWwwPrefix()
     }
-    
+
     private typealias TabCollectionsCleanupInfo = [TabCollectionViewModel: [TabCollectionViewModel.TabCleanupInfo]]
 
     let webCacheManager: WebCacheManager
@@ -93,7 +94,7 @@ final class Fire {
     let stateRestorationManager: AppStateRestorationManager?
     let recentlyClosedCoordinator: RecentlyClosedCoordinating?
     let pinnedTabsManager: PinnedTabsManager
-    
+
     let tabsCleaner = TabDataCleaner()
 
     enum BurningData {
@@ -121,7 +122,7 @@ final class Fire {
         self.faviconManagement = faviconManagement
         self.recentlyClosedCoordinator = recentlyClosedCoordinator
         self.pinnedTabsManager = pinnedTabsManager
-        
+
         if #available(macOS 11, *), autoconsentManagement == nil {
             self.autoconsentManagement = AutoconsentManagement.shared
         } else {
@@ -137,6 +138,7 @@ final class Fire {
         }
     }
 
+    // swiftlint:disable:next function_body_length
     func burnDomains(_ domains: Set<String>,
                      includingHistory: Bool = true,
                      completion: (() -> Void)? = nil) {
@@ -155,18 +157,18 @@ final class Fire {
         })
         let burningDomains = domains.union(wwwDomains)
         let collectionsCleanupInfo = tabViewModelsFor(domains: burningDomains)
-        
+
         // Prepare all Tabs that are going to be burned
         let tabsToRemove = collectionsCleanupInfo.values.flatMap { tabViewModelsCleanupInfo in
             tabViewModelsCleanupInfo.filter({ $0.action == .burn }).compactMap { $0.tabViewModel }
         }
 
         let pinnedTabsViewModels = pinnedTabViewModels(for: burningDomains)
-        
+
         tabsCleaner.prepareTabsForCleanup(tabsToRemove) {
 
             let group = DispatchGroup()
-            
+
             group.enter()
             self.burnTabsFrom(collectionViewModels: collectionsCleanupInfo,
                               relatedToDomains: burningDomains) {
@@ -214,7 +216,7 @@ final class Fire {
     func burnAll(tabCollectionViewModel: TabCollectionViewModel, completion: (() -> Void)? = nil) {
         os_log("Fire started", log: .fire)
         burningData = .all
-        
+
         burnLastSessionState()
 
         let pinnedTabsViewModels = pinnedTabViewModels()
@@ -231,7 +233,7 @@ final class Fire {
             self.burnPinnedTabs(pinnedTabsViewModels) {
                 group.leave()
             }
-            
+
             group.enter()
             self.burnHistory {
                 self.burnPermissions {
@@ -241,7 +243,7 @@ final class Fire {
                     }
                 }
             }
-            
+
             group.enter()
             self.burnWindows(exceptOwnerOf: tabCollectionViewModel) {
                 group.leave()
@@ -253,7 +255,7 @@ final class Fire {
             group.notify(queue: .main) {
                 self.burningData = nil
                 completion?()
-                
+
                 os_log("Fire finished", log: .fire)
             }
         }
@@ -282,14 +284,14 @@ final class Fire {
             self.burnDomains(domains, includingHistory: false, completion: completion)
         }
     }
-    
+
     // MARK: - Tabs
-    
+
     private func allTabViewModels() -> [TabViewModel] {
         var allTabViewModels = [TabViewModel] ()
         for window in windowControllerManager.mainWindowControllers {
             let tabCollectionViewModel = window.mainViewController.tabCollectionViewModel
-            
+
             allTabViewModels.append(contentsOf: tabCollectionViewModel.tabViewModels.values)
         }
         return allTabViewModels
@@ -402,7 +404,7 @@ final class Fire {
             completion()
         }
     }
-    
+
     // MARK: - Autoconsent visit cache
 
     private func burnAutoconsentCache() {
@@ -473,12 +475,12 @@ extension Fire {
 }
 
 fileprivate extension TabCollectionViewModel {
-    
+
     struct TabCleanupInfo {
         let tabViewModel: TabViewModel
         let action: Tab.FireAction
     }
-    
+
     // Burns data related to domains from the collection of tabs
     func clearData(_ cleanupInfo: [TabCleanupInfo], forDomains domains: Set<String>) {
         // Go one by one and execute the fire action
@@ -491,7 +493,7 @@ fileprivate extension TabCollectionViewModel {
             switch tabCleanupInfo.action {
             case .none: continue
             case .replace:
-                
+
                 let tab = Tab(content: tabCleanupInfo.tabViewModel.tab.content, shouldLoadInBackground: true)
                 replaceTab(at: .unpinned(tabIndex), with: tab, forceChange: true)
             case .burn:

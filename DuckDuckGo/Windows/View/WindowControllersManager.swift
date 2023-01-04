@@ -50,16 +50,16 @@ final class WindowControllersManager: WindowControllersManagerProtocol {
             }
         }
     }
-    
+
     private var mainWindowController: MainWindowController? {
         return mainWindowControllers.first(where: {
             let isMain = $0.window?.isMainWindow ?? false
             let hasMainChildWindow = $0.window?.childWindows?.contains { $0.isMainWindow } ?? false
-            
+
             return $0.window?.isPopUpWindow == false && (isMain || hasMainChildWindow)
         })
     }
-    
+
     var selectedTab: Tab? {
         return mainWindowController?.mainViewController.tabCollectionViewModel.selectedTab
     }
@@ -128,7 +128,7 @@ extension WindowControllersManager {
             show(url: bookmark.url)
         }
     }
-    
+
     func show(url: URL?, newTab: Bool = false) {
 
         func show(url: URL?, in windowController: MainWindowController) {
@@ -146,7 +146,7 @@ extension WindowControllersManager {
             } else if let tab = tabCollectionViewModel.selectedTabViewModel?.tab, !newTab {
                 tab.setContent(url.map { .url($0) } ?? .homePage)
             } else {
-                let newTab = Tab(content: url.map { .url($0) } ?? .homePage)
+                let newTab = Tab(content: url.map { .url($0) } ?? .homePage, shouldLoadInBackground: true)
                 newTab.setContent(url.map { .url($0) } ?? .homePage)
                 tabCollectionViewModel.append(tab: newTab)
             }
@@ -184,55 +184,8 @@ extension WindowControllersManager {
 
 }
 
-// MARK: - ApplicationDockMenu
-
-extension WindowControllersManager: ApplicationDockMenuDataSource {
-
-    func numberOfWindowMenuItems(in applicationDockMenu: ApplicationDockMenu) -> Int {
-        return mainWindowControllers.count
+extension Tab {
+    var isPinned: Bool {
+        return self.pinnedTabsManager.isTabPinned(self)
     }
-
-    func applicationDockMenu(_ applicationDockMenu: ApplicationDockMenu, windowTitleFor windowMenuItemIndex: Int) -> String {
-        guard windowMenuItemIndex >= 0, windowMenuItemIndex < mainWindowControllers.count else {
-            os_log("WindowControllersManager: Index out of bounds", type: .error)
-            return "-"
-        }
-
-        let windowController = mainWindowControllers[windowMenuItemIndex]
-        let mainViewController = windowController.mainViewController
-        guard let selectedTabViewModel = mainViewController.tabCollectionViewModel.selectedTabViewModel else {
-            os_log("WindowControllersManager: Cannot get selected tab view model", type: .error)
-            return "-"
-        }
-
-        return selectedTabViewModel.title
-    }
-
-    func indexOfSelectedWindowMenuItem(in applicationDockMenu: ApplicationDockMenu) -> Int? {
-        guard let lastKeyMainWindowController = lastKeyMainWindowController else {
-            os_log("WindowControllersManager: Last key main window controller property is nil", type: .error)
-            return nil
-        }
-
-        return mainWindowControllers.firstIndex(of: lastKeyMainWindowController)
-    }
-
-}
-
-extension WindowControllersManager: ApplicationDockMenuDelegate {
-
-    func applicationDockMenu(_ applicationDockMenu: ApplicationDockMenu, selectWindowWith index: Int) {
-        guard index >= 0, index < mainWindowControllers.count else {
-            os_log("WindowControllersManager: Index out of bounds", type: .error)
-            return
-        }
-
-        let windowController = mainWindowControllers[index]
-
-        if !NSApp.isActive {
-            NSApp.activate(ignoringOtherApps: true)
-        }
-        windowController.window?.makeKeyAndOrderFront(self)
-    }
-
 }

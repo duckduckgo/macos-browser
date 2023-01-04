@@ -74,7 +74,7 @@ final class TabViewModel {
 
     @Published private(set) var title: String = UserText.tabHomeTitle
     @Published private(set) var favicon: NSImage?
-    @Published private(set) var findInPage: FindInPageModel = FindInPageModel()
+    var findInPage: FindInPageModel? { tab.findInPage?.model }
 
     @Published private(set) var usedPermissions = Permissions()
     @Published private(set) var permissionAuthorizationQuery: PermissionAuthorizationQuery?
@@ -151,7 +151,7 @@ final class TabViewModel {
         tab.permissions.$authorizationQuery.assign(to: \.permissionAuthorizationQuery, onWeaklyHeld: self)
             .store(in: &cancellables)
     }
-    
+
     private func subscribeToAppearancePreferences() {
         appearancePreferences.$showFullURL.dropFirst().sink { [weak self] newValue in
             guard let self = self, let url = self.tabURL, let host = self.tabHostURL else { return }
@@ -180,11 +180,11 @@ final class TabViewModel {
     private func updateCanBeBookmarked() {
         canBeBookmarked = tab.content.url ?? .blankPage != .blankPage
     }
-    
+
     private var tabURL: URL? {
         return tab.content.url ?? tab.parentTab?.content.url
     }
-    
+
     private var tabHostURL: URL? {
         return tabURL?.root
     }
@@ -226,7 +226,7 @@ final class TabViewModel {
 
         updatePassiveAddressBarString(showURL: appearancePreferences.showFullURL, url: url, hostURL: hostURL)
     }
-    
+
     private func updatePassiveAddressBarString(showURL: Bool, url: URL, hostURL: URL) {
         if showURL {
             passiveAddressBarString = url.toString(decodePunycode: true, dropScheme: false, dropTrailingSlash: true)
@@ -297,7 +297,7 @@ final class TabViewModel {
     private var trackerAnimationTimer: Timer?
 
     private func sendAnimationTrigger() {
-        if self.tab.trackerInfo?.trackersBlocked.count ?? 0 > 0 {
+        if self.tab.privacyInfo?.trackerInfo.trackersBlocked.count ?? 0 > 0 {
             self.trackersAnimationTriggerPublisher.send()
         }
     }
@@ -306,23 +306,20 @@ final class TabViewModel {
 
 extension TabViewModel {
 
-    func startFindInPage() {
-        tab.findInPage = findInPage
-        findInPage.show()
+    func showFindInPage() {
+        tab.findInPage?.show(with: tab.webView)
     }
 
     func closeFindInPage() {
-        guard findInPage.visible else { return }
-        tab.findDone()
-        findInPage.hide()
+        tab.findInPage?.close()
     }
 
     func findInPageNext() {
-        tab.findNext()
+        tab.findInPage?.findNext()
     }
 
     func findInPagePrevious() {
-        tab.findPrevious()
+        tab.findInPage?.findPrevious()
     }
 
 }

@@ -26,10 +26,10 @@ final class AutofillPreferencesPersistorMock: AutofillPreferencesPersistor {
     var askToSaveUsernamesAndPasswords: Bool = true
     var askToSaveAddresses: Bool = true
     var askToSavePaymentMethods: Bool = true
+    var passwordManager: PasswordManager = .duckduckgo
 }
 
 final class UserAuthenticatorMock: UserAuthenticating {
-    // swiftlint:disable:next identifier_name
     var _authenticateUser: (DeviceAuthenticator.AuthenticationReason) -> DeviceAuthenticationResult = { _ in return .success }
 
     func authenticateUser(reason: DeviceAuthenticator.AuthenticationReason, result: @escaping (DeviceAuthenticationResult) -> Void) {

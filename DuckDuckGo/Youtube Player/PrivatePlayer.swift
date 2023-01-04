@@ -84,7 +84,7 @@ final class PrivatePlayer {
 
     init(
         preferences: PrivatePlayerPreferences = .shared,
-        privacyConfigurationManager: PrivacyConfigurationManaging & AnyObject = ContentBlocking.shared.privacyConfigurationManager
+        privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager
     ) {
         self.preferences = preferences
         isFeatureEnabled = privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .duckPlayer)
@@ -95,6 +95,7 @@ final class PrivatePlayer {
             .map { [weak privacyConfigurationManager] in
                 privacyConfigurationManager?.privacyConfig.isEnabled(featureKey: .duckPlayer) == true
             }
+            .receive(on: DispatchQueue.main)
             .assign(to: \.isFeatureEnabled, onWeaklyHeld: self)
     }
 
@@ -131,10 +132,11 @@ extension PrivatePlayer {
 
             // When the feature is disabled but the webView still gets a Private Player URL,
             // convert it back to a regular YouTube video URL.
-            if navigationAction.request.url?.isPrivatePlayer == true,
+            if navigationAction.request.url?.isPrivatePlayerScheme == true,
                 let (videoID, timestamp) = navigationAction.request.url?.youtubeVideoParams {
 
                 tab.webView.load(.youtube(videoID, timestamp: timestamp))
+                return .cancel
             }
             return nil
         }
@@ -206,6 +208,12 @@ extension PrivatePlayer {
             return nil
         }
         return .privatePlayer
+    }
+
+    func image(for bookmark: Bookmark) -> NSImage? {
+        // Bookmarks to Duck Player pages retain duck:// URL even when Duck Player is disabled,
+        // so we keep the Duck Player favicon even if Duck Player is currently disabled
+        return bookmark.url.isPrivatePlayerScheme ? .privatePlayer : nil
     }
 
     func domainForRecentlyVisitedSite(with url: URL) -> String? {
@@ -353,3 +361,35 @@ extension PrivatePlayer {
         return true
     }
 }
+
+#if DEBUG
+
+final class PrivatePlayerPreferencesPersistorMock: PrivatePlayerPreferencesPersistor {
+    var privatePlayerMode: PrivatePlayerMode
+    var youtubeOverlayInteracted: Bool
+
+    init(privatePlayerMode: PrivatePlayerMode = .alwaysAsk, youtubeOverlayInteracted: Bool = false) {
+        self.privatePlayerMode = privatePlayerMode
+        self.youtubeOverlayInteracted = youtubeOverlayInteracted
+    }
+}
+
+extension PrivatePlayer {
+
+    static func mock(withMode mode: PrivatePlayerMode = .enabled) -> PrivatePlayer {
+        let preferencesPersistor = PrivatePlayerPreferencesPersistorMock(privatePlayerMode: mode, youtubeOverlayInteracted: true)
+        let preferences = PrivatePlayerPreferences(persistor: preferencesPersistor)
+        // runtime mock-replacement for Unit Tests, to be redone when we‘ll be doing Dependency Injection
+        let privacyConfigurationManager = ((NSClassFromString("MockPrivacyConfigurationManager") as? NSObject.Type)!.init() as? PrivacyConfigurationManaging)!
+        return PrivatePlayer(preferences: preferences, privacyConfigurationManager: privacyConfigurationManager)
+    }
+
+}
+
+#else
+
+extension PrivatePlayer {
+    static func mock(withMode mode: PrivatePlayerMode = .enabled) -> PrivatePlayer { fatalError() }
+}
+
+#endif

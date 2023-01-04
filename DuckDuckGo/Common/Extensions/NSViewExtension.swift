@@ -29,14 +29,11 @@ extension NSView {
     }
 
     func addAndLayout(_ subView: NSView) {
-        subView.translatesAutoresizingMaskIntoConstraints = false
+        subView.frame = bounds
+        subView.autoresizingMask = [.height, .width]
+        subView.translatesAutoresizingMaskIntoConstraints = true
         addSubview(subView)
-
-        subView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
-        subView.topAnchor.constraint(equalTo: topAnchor).isActive = true
-        subView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
-        subView.widthAnchor.constraint(equalTo: widthAnchor).isActive = true
-    }
+   }
 
     func wrappedInContainer(padding: CGFloat = 0) -> NSView {
         return wrappedInContainer(padding: NSEdgeInsets(top: padding, left: padding, bottom: padding, right: padding))
@@ -134,7 +131,7 @@ extension NSView {
             return locationInView
         }
     }
-    
+
     func imageRepresentation() -> NSImage {
         let imageRepresentation = bitmapImageRepForCachingDisplay(in: bounds)!
         cacheDisplay(in: bounds, to: imageRepresentation)

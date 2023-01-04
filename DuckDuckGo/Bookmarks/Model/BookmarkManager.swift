@@ -40,6 +40,7 @@ protocol BookmarkManager: AnyObject {
     func update(objectsWithUUIDs uuids: [UUID], update: @escaping (BaseBookmarkEntity) -> Void, completion: @escaping (Error?) -> Void)
     func canMoveObjectWithUUID(objectUUID uuid: UUID, to parent: BookmarkFolder) -> Bool
     func move(objectUUIDs: [UUID], toIndex: Int?, withinParentFolder: ParentFolderType, completion: @escaping (Error?) -> Void)
+    func moveFavorites(with objectUUIDs: [UUID], toIndex: Int?, completion: @escaping (Error?) -> Void)
     func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarkImportResult
 
     // Wrapper definition in a protocol is not supported yet
@@ -80,7 +81,14 @@ final class LocalBookmarkManager: BookmarkManager {
                     return
                 }
 
-                self?.list = BookmarkList(entities: bookmarks, topLevelEntities: topLevelEntities)
+                self?.bookmarkStore.loadAll(type: .favorites) { [weak self] (favorites, error) in
+                    guard error == nil, let favorites = favorites else {
+                        os_log("LocalBookmarkManager: Failed to fetch favorites.", type: .error)
+                        return
+                    }
+
+                    self?.list = BookmarkList(entities: bookmarks, topLevelEntities: topLevelEntities, favorites: favorites)
+                }
             }
         }
     }
@@ -106,7 +114,7 @@ final class LocalBookmarkManager: BookmarkManager {
     @discardableResult func makeBookmark(for url: URL, title: String, isFavorite: Bool) -> Bookmark? {
         makeBookmark(for: url, title: title, isFavorite: isFavorite, index: nil, parent: nil)
     }
-    
+
     @discardableResult func makeBookmark(for url: URL, title: String, isFavorite: Bool, index: Int? = nil, parent: BookmarkFolder? = nil) -> Bookmark? {
         guard list != nil else { return nil }
 
@@ -153,7 +161,7 @@ final class LocalBookmarkManager: BookmarkManager {
             self?.loadBookmarks()
         }
     }
-    
+
     func remove(objectsWithUUIDs uuids: [UUID]) {
         bookmarkStore.remove(objectsWithUUIDs: uuids) { [weak self] _, _ in
             self?.loadBookmarks()
@@ -214,7 +222,7 @@ final class LocalBookmarkManager: BookmarkManager {
     func add(bookmark: Bookmark, to parent: BookmarkFolder?, completion: @escaping (Error?) -> Void) {
         add(objectsWithUUIDs: [bookmark.id], to: parent, completion: completion)
     }
-    
+
     func add(objectsWithUUIDs uuids: [UUID], to parent: BookmarkFolder?, completion: @escaping (Error?) -> Void) {
         bookmarkStore.add(objectsWithUUIDs: uuids, to: parent) { [weak self] error in
             self?.loadBookmarks()
@@ -228,18 +236,25 @@ final class LocalBookmarkManager: BookmarkManager {
             completion(error)
         }
     }
-    
+
     func canMoveObjectWithUUID(objectUUID uuid: UUID, to parent: BookmarkFolder) -> Bool {
         return bookmarkStore.canMoveObjectWithUUID(objectUUID: uuid, to: parent)
     }
-    
+
     func move(objectUUIDs: [UUID], toIndex index: Int?, withinParentFolder parent: ParentFolderType, completion: @escaping (Error?) -> Void) {
         bookmarkStore.move(objectUUIDs: objectUUIDs, toIndex: index, withinParentFolder: parent) { [weak self] error in
             self?.loadBookmarks()
             completion(error)
         }
     }
-    
+
+    func moveFavorites(with objectUUIDs: [UUID], toIndex index: Int?, completion: @escaping (Error?) -> Void) {
+        bookmarkStore.moveFavorites(with: objectUUIDs, toIndex: index) { [weak self] error in
+            self?.loadBookmarks()
+            completion(error)
+        }
+    }
+
     // MARK: - Favicons
 
     private func favicon(for host: String?) -> NSImage? {
@@ -258,14 +273,14 @@ final class LocalBookmarkManager: BookmarkManager {
 
         return results
     }
-    
+
     // MARK: - Debugging
-    
+
     func resetBookmarks() {
         guard let store = bookmarkStore as? LocalBookmarkStore else {
             return
         }
-            
+
         store.resetBookmarks()
         loadBookmarks()
     }

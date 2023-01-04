@@ -30,12 +30,12 @@ class VariantManagerTests: XCTestCase {
     ]
 
     func testWhenVariantIsExcludedThenItIsNotInVariantList() {
-        
+
         let subject = DefaultVariantManager(variants: testVariants, storage: MockStatisticsStore(), rng: MockVariantRNG(returnValue: 500))
         XCTAssertTrue(!subject.isSupported(feature: .dummy))
-        
+
     }
-    
+
     func testWhenCurrentVariantSupportsFeatureThenIsSupportedReturnsTrue() {
 
         let testVariants = [
@@ -57,17 +57,17 @@ class VariantManagerTests: XCTestCase {
         mockStore.atb = "atb"
         mockStore.appRetentionAtb = "aatb"
         mockStore.searchRetentionAtb = "satb"
-        
+
         for i in 0 ..< 100 {
-            
+
             let subject = DefaultVariantManager(variants: testVariants, storage: mockStore, rng: MockVariantRNG(returnValue: i))
             subject.assignVariantIfNeeded { _ in  }
             XCTAssertNotEqual("mt", subject.currentVariant?.name)
 
         }
-        
+
     }
-    
+
     func testWhenExistingUserThenAssignIfNeededDoesNothing() {
 
         let mockStore = MockStatisticsStore()
@@ -145,5 +145,5 @@ struct MockVariantRNG: VariantRNG {
     func nextInt(upperBound: Int) -> Int {
         return returnValue
     }
-    
+
 }

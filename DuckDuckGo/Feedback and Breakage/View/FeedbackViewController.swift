@@ -64,7 +64,7 @@ final class FeedbackViewController: NSViewController {
 
     @IBOutlet weak var thankYouView: NSView!
     private var cancellables = Set<AnyCancellable>()
-    
+
     private var browserFeedbackConstraint: NSLayoutConstraint?
     private var browserFeedbackBreakageConstraint: NSLayoutConstraint?
 
@@ -85,10 +85,10 @@ final class FeedbackViewController: NSViewController {
         super.viewDidLoad()
         setContentViewHeight(Constants.defaultContentHeight, animated: false)
         setupTextViews()
-        
+
         browserFeedbackConstraint = browserFeedbackView.topAnchor.constraint(equalTo: optionPopUpButton.bottomAnchor, constant: 8)
         browserFeedbackBreakageConstraint = browserFeedbackView.topAnchor.constraint(equalTo: websiteBreakageView.bottomAnchor)
-        
+
         browserFeedbackConstraint?.isActive = true
     }
 
@@ -193,7 +193,7 @@ final class FeedbackViewController: NSViewController {
             pickOptionMenuItem.isEnabled = true
             return
         }
-        
+
         browserFeedbackView.isHidden = false
 
         let contentHeight: CGFloat
@@ -259,7 +259,7 @@ final class FeedbackViewController: NSViewController {
             browserFeedbackDescriptionLabel.stringValue = UserText.feedbackOtherDescription
         }
     }
-    
+
     private func updateBrowserFeedbackDisclaimerLabel(for formOption: FormOption) {
         switch formOption {
         case .websiteBreakage:
@@ -299,15 +299,15 @@ final class FeedbackViewController: NSViewController {
         switch selectedFormOption {
         case .feedback: assertionFailure("Wrong method executed")
         case .websiteBreakage:
-            let blockedTrackerDomains = currentTab?.trackerInfo?.trackersBlocked.compactMap { $0.domain } ?? []
-            let installedSurrogates = currentTab?.trackerInfo?.installedSurrogates.map {$0} ?? []
+            let blockedTrackerDomains = currentTab?.privacyInfo?.trackerInfo.trackersBlocked.compactMap { $0.domain } ?? []
+            let installedSurrogates = currentTab?.privacyInfo?.trackerInfo.installedSurrogates.map {$0} ?? []
             let ampURL = currentTab?.linkProtection.lastAMPURLString ?? ""
             let urlParametersRemoved = currentTab?.linkProtection.urlParametersRemoved ?? false
             let websiteBreakage = WebsiteBreakage(category: selectedWebsiteBreakageCategory,
                                                   description: browserFeedbackTextView.string,
                                                   siteUrlString: urlTextField.stringValue,
                                                   osVersion: "\(ProcessInfo.processInfo.operatingSystemVersion)",
-                                                  upgradedHttps: currentTab?.connectionUpgradedTo != nil,
+                                                  upgradedHttps: currentTab?.privacyInfo?.connectionUpgradedTo != nil,
                                                   tdsETag: ContentBlocking.shared.contentBlockingManager.currentRules.first?.etag,
                                                   blockedTrackerDomains: blockedTrackerDomains,
                                                   installedSurrogates: installedSurrogates,
@@ -364,7 +364,7 @@ extension FeedbackViewController: NSTextViewDelegate {
 
 }
 
-private extension URL {
+extension URL {
 
     func trimmingQueryItemsAndFragment() -> URL? {
         var components = URLComponents(url: self, resolvingAgainstBaseURL: true)

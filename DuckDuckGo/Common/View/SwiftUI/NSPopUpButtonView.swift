@@ -20,27 +20,27 @@ import AppKit
 import SwiftUI
 
 struct NSPopUpButtonView<ItemType>: NSViewRepresentable where ItemType: Equatable {
-    
+
     typealias NSViewType = NSPopUpButton
 
     @Binding var selection: ItemType
 
     var viewCreator: () -> NSPopUpButton
-    
+
     func makeNSView(context: NSViewRepresentableContext<NSPopUpButtonView>) -> NSPopUpButton {
         let newPopupButton = viewCreator()
         setPopUpFromSelection(newPopupButton, selection: selection)
-        
+
         newPopupButton.target = context.coordinator
         newPopupButton.action = #selector(Coordinator.dropdownItemSelected(_:))
 
         return newPopupButton
     }
-    
+
     func updateNSView(_ nsView: NSPopUpButton, context: NSViewRepresentableContext<NSPopUpButtonView>) {
         setPopUpFromSelection(nsView, selection: selection)
     }
-    
+
     func setPopUpFromSelection(_ button: NSPopUpButton, selection: ItemType) {
         let itemsList = button.itemArray
         let matchedMenuItem = itemsList.filter { ($0.representedObject as? ItemType) == selection }.first
@@ -49,19 +49,19 @@ struct NSPopUpButtonView<ItemType>: NSViewRepresentable where ItemType: Equatabl
             button.select(matchedMenuItem)
         }
     }
-    
+
     func makeCoordinator() -> Coordinator {
         return Coordinator(self)
     }
-    
+
     final class Coordinator: NSObject {
         var parent: NSPopUpButtonView!
-        
+
         init(_ parent: NSPopUpButtonView) {
             super.init()
             self.parent = parent
         }
-        
+
         @objc func dropdownItemSelected(_ sender: NSPopUpButton) {
             guard let selectedItem = sender.selectedItem else {
                 assertionFailure()

@@ -34,11 +34,20 @@ final class RecentlyVisitedModel: ObservableObject {
     @UserDefaultsWrapper(key: .homePageShowPagesOnHover, defaultValue: false)
     private static var showPagesOnHoverSetting: Bool
 
+    @UserDefaultsWrapper(key: .homePageShowRecentlyVisited, defaultValue: true)
+    private static var showRecentlyVisitedSetting: Bool
+
     @Published var numberOfTrackersBlocked = 0
     @Published var recentSites = [RecentlyVisitedSiteModel]()
     @Published var showPagesOnHover: Bool {
         didSet {
             Self.showPagesOnHoverSetting = showPagesOnHover
+        }
+    }
+
+    @Published var showRecentlyVisited: Bool {
+        didSet {
+            Self.showRecentlyVisitedSetting = showRecentlyVisited
         }
     }
 
@@ -49,6 +58,7 @@ final class RecentlyVisitedModel: ObservableObject {
         self.open = open
         self.fire = fire
         showPagesOnHover = Self.showPagesOnHoverSetting
+        showRecentlyVisited = Self.showRecentlyVisitedSetting
     }
 
     func refreshWithHistory(_ history: [HistoryEntry]) {
@@ -146,14 +156,23 @@ final class RecentlyVisitedSiteModel: ObservableObject {
     let maxPageListSize = 10
 
     let domain: String
-    
+
     var url: URL? {
         return baseURL ?? domain.url
     }
-    
-    private let baseURL: URL?
 
-    @Published var isRealDomain: Bool = true
+    var domainToDisplay: String {
+        domainPlaceholder ?? domain
+    }
+
+    var isRealDomain: Bool {
+        domainPlaceholder == nil
+    }
+
+    private let baseURL: URL?
+    private let domainPlaceholder: String?
+    private let privatePlayer: PrivatePlayer
+
     @Published var isFavorite: Bool
     @Published var isFireproof: Bool
     @Published var blockedEntities = [String]()
@@ -167,18 +186,17 @@ final class RecentlyVisitedSiteModel: ObservableObject {
 
     init?(originalURL: URL,
           bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
-          fireproofDomains: FireproofDomains = FireproofDomains.shared) {
+          fireproofDomains: FireproofDomains = FireproofDomains.shared,
+          privatePlayer: PrivatePlayer = PrivatePlayer.shared) {
         guard let domain = originalURL.host?.droppingWwwPrefix() else {
             return nil
         }
 
-        if let privatePlayer = PrivatePlayer.shared.domainForRecentlyVisitedSite(with: originalURL) {
-            self.domain = privatePlayer
-            isRealDomain = false
-        } else {
-            self.domain = domain
-        }
-        
+        self.privatePlayer = privatePlayer
+
+        self.domain = domain
+        self.domainPlaceholder = privatePlayer.domainForRecentlyVisitedSite(with: originalURL)
+
         var components = URLComponents()
         components.scheme = originalURL.scheme
         components.host = originalURL.host
@@ -227,7 +245,7 @@ final class RecentlyVisitedSiteModel: ObservableObject {
                     urlsToRemove.append($0.url)
                 }
 
-            } else if let displayTitle = PrivatePlayer.shared.title(for: $0) {
+            } else if let displayTitle = privatePlayer.title(for: $0) {
 
                 $0.displayTitle = displayTitle
 
@@ -252,7 +270,7 @@ final class RecentlyVisitedSiteModel: ObservableObject {
         pages = pages.filter { !urlsToRemove.contains($0.url) }
     }
 
-    func fixEntities(_ contentBlocking: ContentBlocking = ContentBlocking.shared) {
+    func fixEntities(_ contentBlocking: AnyContentBlocking = ContentBlocking.shared) {
         blockedEntities = blockedEntities.filter { !$0.isEmpty }.sorted(by: { l, r in
             contentBlocking.prevalenceForEntity(named: l) > contentBlocking.prevalenceForEntity(named: r)
         })
@@ -262,7 +280,7 @@ final class RecentlyVisitedSiteModel: ObservableObject {
         return entityDisplayName(entityName).slugfiscated()
     }
 
-    func entityDisplayName(_ entityName: String, _ contentBlocking: ContentBlocking = ContentBlocking.shared) -> String {
+    func entityDisplayName(_ entityName: String, _ contentBlocking: AnyContentBlocking = ContentBlocking.shared) -> String {
         return contentBlocking.displayNameForEntity(named: entityName)
     }
 
@@ -270,7 +288,7 @@ final class RecentlyVisitedSiteModel: ObservableObject {
 
 }
 
-extension ContentBlocking {
+extension ContentBlockingProtocol {
 
     func prevalenceForEntity(named entityName: String) -> Double {
         return trackerDataManager.trackerData.entities[entityName]?.prevalence ?? 0.0

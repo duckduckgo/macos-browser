@@ -99,6 +99,7 @@ class DeviceAuthenticatorTests: XCTestCase {
         preferences.isAutoLockEnabled = true
         preferences.autoLockThreshold = .fifteenMinutes
 
+        DeviceAuthenticator.Constants.intervalBetweenIdleChecks = 0.1
         let deviceAuthenticator = DeviceAuthenticator(idleStateProvider: idleStateProvider,
                                                       authenticationService: authenticationService,
                                                       autofillPreferences: preferences)
@@ -108,7 +109,7 @@ class DeviceAuthenticatorTests: XCTestCase {
         XCTAssertFalse(deviceAuthenticator.requiresAuthentication)
 
         let expectation = expectation(description: "Wait for the authenticator to become locked")
-        let result = XCTWaiter.wait(for: [expectation], timeout: 1.5)
+        let result = XCTWaiter.wait(for: [expectation], timeout: 0.2)
 
         if result == .timedOut {
             XCTAssertTrue(deviceAuthenticator.requiresAuthentication)
@@ -135,7 +136,7 @@ class DeviceAuthenticatorTests: XCTestCase {
         XCTAssertFalse(deviceAuthenticator.requiresAuthentication)
 
         let expectation = expectation(description: "Wait for the authenticator to become locked")
-        let result = XCTWaiter.wait(for: [expectation], timeout: 1.5)
+        let result = XCTWaiter.wait(for: [expectation], timeout: 0.2)
 
         if result == .timedOut {
             XCTAssertFalse(deviceAuthenticator.requiresAuthentication)

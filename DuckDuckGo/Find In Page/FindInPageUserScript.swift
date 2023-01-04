@@ -17,7 +17,7 @@
 //
 
 import WebKit
-import BrowserServicesKit
+import UserScript
 
 final class FindInPageUserScript: NSObject, StaticUserScript {
 
@@ -35,30 +35,6 @@ final class FindInPageUserScript: NSObject, StaticUserScript {
         let currentResult = dict["currentResult"] as? Int
         let totalResults = dict["totalResults"] as? Int
         model?.update(currentSelection: currentResult, matchesFound: totalResults)
-    }
-
-    func find(text: String, inWebView webView: WKWebView) {
-        evaluate(js: "window.__firefox__.find('\(text.replacingOccurrences(of: "'", with: "\\\'"))')", inWebView: webView)
-    }
-
-    func done(withWebView webView: WKWebView) {
-        evaluate(js: "window.__firefox__.findDone()", inWebView: webView)
-    }
-
-    func next(withWebView webView: WKWebView) {
-        evaluate(js: "window.__firefox__.findNext()", inWebView: webView)
-    }
-
-    func previous(withWebView webView: WKWebView) {
-        evaluate(js: "window.__firefox__.findPrevious()", inWebView: webView)
-    }
-
-    private func evaluate(js: String, inWebView webView: WKWebView) {
-        if #available(macOS 11.0, *) {
-            webView.evaluateJavaScript(js, in: nil, in: WKContentWorld.defaultClient)
-        } else {
-            webView.evaluateJavaScript(js)
-        }
     }
 
 }

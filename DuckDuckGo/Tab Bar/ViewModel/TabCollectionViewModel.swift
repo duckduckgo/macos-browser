@@ -41,7 +41,7 @@ final class TabCollectionViewModel: NSObject {
     weak var delegate: TabCollectionViewModelDelegate?
 
     /// Local tabs collection
-    private(set) var tabCollection: TabCollection
+    let tabCollection: TabCollection
 
     /// Pinned tabs collection (provided via `PinnedTabsManager` instance).
     var pinnedTabsCollection: TabCollection? {
@@ -234,7 +234,7 @@ final class TabCollectionViewModel: NSObject {
         if selectDisplayableTabIfPresent(content) {
             return
         }
-        append(tab: Tab(content: content), selected: selected, forceChange: forceChange)
+        append(tab: Tab(content: content, shouldLoadInBackground: true), selected: selected, forceChange: forceChange)
     }
 
     func append(tab: Tab, selected: Bool = true, forceChange: Bool = false) {
@@ -266,14 +266,14 @@ final class TabCollectionViewModel: NSObject {
         delegate?.tabCollectionViewModelDidMultipleChanges(self)
     }
 
-    func insert(tab: Tab, at index: TabIndex = .unpinned(0), selected: Bool = true) {
+    func insert(_ tab: Tab, at index: TabIndex, selected: Bool = true) {
         guard changesEnabled else { return }
         guard let tabCollection = tabCollection(for: index) else {
             os_log("TabCollectionViewModel: Tab collection for index %s not found", type: .error, String(describing: index))
             return
         }
 
-        tabCollection.insert(tab: tab, at: index.item)
+        tabCollection.insert(tab, at: index.item)
         if selected {
             select(at: index)
         }
@@ -286,9 +286,9 @@ final class TabCollectionViewModel: NSObject {
         }
     }
 
-    func insertChild(tab: Tab, selected: Bool) {
+    func insert(_ tab: Tab, after parentTab: Tab?, selected: Bool) {
         guard changesEnabled else { return }
-        guard let parentTab = tab.parentTab,
+        guard let parentTab = parentTab ?? tab.parentTab,
               let parentTabIndex = indexInAllTabs(of: parentTab) else {
             os_log("TabCollection: No parent tab", type: .error)
             return
@@ -297,7 +297,15 @@ final class TabCollectionViewModel: NSObject {
         // Insert at the end of the child tabs
         var newIndex = parentTabIndex.isPinnedTab ? 0 : parentTabIndex.item + 1
         while tabCollection.tabs[safe: newIndex]?.parentTab === parentTab { newIndex += 1 }
-        insert(tab: tab, at: .unpinned(newIndex), selected: selected)
+        insert(tab, at: .unpinned(newIndex), selected: selected)
+    }
+
+    func insert(_ tab: Tab, selected: Bool = true) {
+        if let parentTab = tab.parentTab {
+            self.insert(tab, after: parentTab, selected: selected)
+        } else {
+            self.insert(tab, at: .unpinned(0))
+        }
     }
 
     // MARK: - Removal
@@ -315,7 +323,7 @@ final class TabCollectionViewModel: NSObject {
         guard changesEnabled else { return }
 
         let parentTab = tabCollection.tabs[safe: index]?.parentTab
-        guard tabCollection.remove(at: index, published: published) else { return }
+        guard tabCollection.removeTab(at: index, published: published) else { return }
 
         didRemoveTab(at: .unpinned(index), withParent: parentTab)
     }
@@ -377,6 +385,7 @@ final class TabCollectionViewModel: NSObject {
     }
 
     func moveTab(at fromIndex: Int, to otherViewModel: TabCollectionViewModel, at toIndex: Int) {
+        assert(self !== otherViewModel)
         guard changesEnabled else { return }
 
         let parentTab = tabCollection.tabs[safe: fromIndex]?.parentTab
@@ -418,7 +427,7 @@ final class TabCollectionViewModel: NSObject {
     func removeAllTabsAndAppendNew(forceChange: Bool = false) {
         guard changesEnabled || forceChange else { return }
 
-        tabCollection.removeAll(andAppend: Tab(content: .homePage))
+        tabCollection.removeAll(andAppend: Tab(content: .homePage, shouldLoadInBackground: false))
         selectUnpinnedTab(at: 0, forceChange: forceChange)
 
         delegate?.tabCollectionViewModelDidMultipleChanges(self)
@@ -433,7 +442,7 @@ final class TabCollectionViewModel: NSObject {
 
         tabCollection.removeTabs(at: indexSet)
         if tabCollection.tabs.isEmpty {
-            tabCollection.append(tab: Tab(content: .homePage))
+            tabCollection.append(tab: Tab(content: .homePage, shouldLoadInBackground: false))
             selectUnpinnedTab(at: 0, forceChange: forceChange)
         } else {
             let selectionDiff = indexSet.reduce(0) { result, index in
@@ -447,18 +456,6 @@ final class TabCollectionViewModel: NSObject {
             selectUnpinnedTab(at: max(min(selectionIndex - selectionDiff, tabCollection.tabs.count - 1), 0), forceChange: forceChange)
         }
         delegate?.tabCollectionViewModelDidMultipleChanges(self)
-    }
-
-    func remove(ownerOf webView: WebView) {
-        guard changesEnabled else { return }
-
-        if let index = tabCollection.tabs.firstIndex(where: { $0.webView === webView }) {
-            remove(at: .unpinned(index))
-        } else if let index = pinnedTabsCollection?.tabs.firstIndex(where: { $0.webView === webView }) {
-            remove(at: .pinned(index))
-        } else {
-            os_log("TabCollection: Failed to get index of the tab", type: .error)
-        }
     }
 
     func removeSelected() {
@@ -482,10 +479,10 @@ final class TabCollectionViewModel: NSObject {
             return
         }
 
-        let tabCopy = Tab(content: tab.content, favicon: tab.favicon, sessionStateData: tab.sessionStateData)
+        let tabCopy = Tab(content: tab.content, favicon: tab.favicon, sessionStateData: tab.sessionStateData, shouldLoadInBackground: true)
         let newIndex = tabIndex.makeNext()
 
-        tabCollection(for: tabIndex)?.insert(tab: tabCopy, at: newIndex.item)
+        tabCollection(for: tabIndex)?.insert(tabCopy, at: newIndex.item)
         select(at: newIndex)
 
         if newIndex.isUnpinnedTab {
@@ -521,14 +518,14 @@ final class TabCollectionViewModel: NSObject {
             return
         }
 
-        insert(tab: tab)
+        insert(tab)
     }
-    
+
     func title(forTabWithURL url: URL) -> String? {
         let matchingTab = tabCollection.tabs.first { tab in
             tab.url == url
         }
-        
+
         return matchingTab?.title
     }
 

@@ -31,7 +31,7 @@ protocol PixelDataStore {
     func set(_ value: String, forKey: String, completionHandler: ((Error?) -> Void)?)
 
     func removeValue(forKey key: String, completionHandler: ((Error?) -> Void)?)
-    
+
 }
 
 extension PixelDataStore {
@@ -83,17 +83,20 @@ final class LocalPixelDataStore<T: NSManagedObject>: PixelDataStore {
     private func loadAll() -> [String: NSObject] {
         let fetchRequest = PixelData.fetchRequest() as NSFetchRequest<PixelData>
         var dict = [String: NSObject]()
-        do {
-            let result = try context.fetch(fetchRequest)
-            for item in result {
-                guard let record = item.valueRepresentation() else {
-                    assertionFailure("LocalPixelDataStore: could not load PixelDataRecord")
-                    continue
-                }
 
-                dict[record.key] = record.value
+        context.performAndWait { [context] in
+            do {
+                let result = try context.fetch(fetchRequest)
+                for item in result {
+                    guard let record = item.valueRepresentation() else {
+                        assertionFailure("LocalPixelDataStore: could not load PixelDataRecord")
+                        continue
+                    }
+
+                    dict[record.key] = record.value
+                }
+            } catch {
             }
-        } catch {
         }
         return dict
     }
@@ -185,7 +188,7 @@ final class LocalPixelDataStore<T: NSManagedObject>: PixelDataStore {
                 let deletedObjects = result?.result as? [NSManagedObjectID] ?? []
                 let changes: [AnyHashable: Any] = [NSDeletedObjectsKey: deletedObjects]
                 NSManagedObjectContext.mergeChanges(fromRemoteContextSave: changes, into: [context])
-                
+
                 mainQueueCompletion(nil)
             } catch {
                 mainQueueCompletion(error)

@@ -44,10 +44,13 @@ public struct UserDefaultsWrapper<T> {
         case loginDetectionEnabled = "fireproofing.login-detection-enabled"
         case gpcEnabled = "preferences.gpc-enabled"
         case selectedDownloadLocationKey = "preferences.download-location"
+        case lastUsedCustomDownloadLocation = "preferences.custom-last-used-download-location"
         case alwaysRequestDownloadLocationKey = "preferences.download-location.always-request"
         case autoconsentEnabled = "preferences.autoconsent-enabled"
         case privatePlayerMode = "preferences.duck-player"
         case youtubeOverlayInteracted = "preferences.youtube-overlay-interacted"
+
+        case selectedPasswordManager = "preferences.autofill.selected-password-manager"
 
         case askToSaveUsernamesAndPasswords = "preferences.ask-to-save.usernames-passwords"
         case askToSaveAddresses = "preferences.ask-to-save.addresses"
@@ -80,13 +83,14 @@ public struct UserDefaultsWrapper<T> {
         case homePageShowPagesOnHover = "home.page.show.pages.on.hover"
         case homePageShowAllFavorites = "home.page.show.all.favorites"
         case homePageShowPageTitles = "home.page.show.page.titles"
+        case homePageShowRecentlyVisited = "home.page.show.recently.visited"
 
         case appIsRelaunchingAutomatically = "app-relaunching-automatically"
 
         case historyV5toV6Migration = "history.v5.to.v6.migration.2"
 
         case showBookmarksBar = "bookmarks.bar.show"
-        
+
         case pinnedViews = "pinning.pinned-views"
 
         case lastDatabaseFactoryFailurePixelDate = "last.database.factory.failure.pixel.date"
@@ -120,7 +124,7 @@ public struct UserDefaultsWrapper<T> {
             return defaultValue
         }
         set {
-            if (newValue as? OptionalProtocol)?.isNil == true {
+            if (newValue as? AnyOptional)?.isNil == true {
                 UserDefaults.standard.removeObject(forKey: key.rawValue)
             } else {
                 UserDefaults.standard.set(newValue, forKey: key.rawValue)

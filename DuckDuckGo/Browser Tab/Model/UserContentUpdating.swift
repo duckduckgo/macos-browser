@@ -18,18 +18,16 @@
 
 import Foundation
 import Combine
+import Common
 import BrowserServicesKit
+import UserScript
 
 final class UserContentUpdating {
 
-    struct NewContent {
+    struct NewContent: UserContentControllerNewContent {
         let rulesUpdate: ContentBlockerRulesManager.UpdateEvent
         let sourceProvider: ScriptSourceProviding
-
-        fileprivate init(rulesUpdate: ContentBlockerRulesManager.UpdateEvent, sourceProvider: ScriptSourceProviding) {
-            self.rulesUpdate = rulesUpdate
-            self.sourceProvider = sourceProvider
-        }
+        var makeUserScripts: (ScriptSourceProviding) -> UserScripts { return UserScripts.init(with:) }
     }
 
     @Published private var bufferedValue: NewContent?
@@ -38,15 +36,19 @@ final class UserContentUpdating {
     private(set) var userContentBlockingAssets: AnyPublisher<UserContentUpdating.NewContent, Never>!
 
     init(contentBlockerRulesManager: ContentBlockerRulesManagerProtocol,
-         privacyConfigurationManager: PrivacyConfigurationManager = ContentBlocking.shared.privacyConfigurationManager,
-         configStorage: ConfigurationStoring = DefaultConfigurationStorage.shared,
-         privacySecurityPreferences: PrivacySecurityPreferences = PrivacySecurityPreferences.shared) {
+         privacyConfigurationManager: PrivacyConfigurationManaging,
+         trackerDataManager: TrackerDataManager,
+         configStorage: ConfigurationStoring,
+         privacySecurityPreferences: PrivacySecurityPreferences,
+         tld: TLD) {
 
         let makeValue: (ContentBlockerRulesManager.UpdateEvent) -> NewContent = { rulesUpdate in
-            let sourceProvider = DefaultScriptSourceProvider(configStorage: configStorage,
-                                                             privacyConfigurationManager: privacyConfigurationManager,
-                                                             privacySettings: privacySecurityPreferences,
-                                                             contentBlockingManager: contentBlockerRulesManager)
+            let sourceProvider = ScriptSourceProvider(configStorage: configStorage,
+                                                      privacyConfigurationManager: privacyConfigurationManager,
+                                                      privacySettings: privacySecurityPreferences,
+                                                      contentBlockingManager: contentBlockerRulesManager,
+                                                      trackerDataManager: trackerDataManager,
+                                                      tld: tld)
             return NewContent(rulesUpdate: rulesUpdate, sourceProvider: sourceProvider)
         }
 

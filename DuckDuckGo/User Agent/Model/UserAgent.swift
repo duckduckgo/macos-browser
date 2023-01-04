@@ -67,7 +67,7 @@ enum UserAgent {
         // use default WKWebView user agent for duckduckgo domain to remove CTA
         regex("https://duckduckgo\\.com/.*"): UserAgent.webViewDefault
     ]
-    
+
     static func duckDuckGoUserAgent(appVersion: String = AppVersion.shared.versionNumber,
                                     appID: String = AppVersion.shared.identifier,
                                     systemVersion: String = ProcessInfo.processInfo.operatingSystemVersionString) -> String {
@@ -79,10 +79,8 @@ enum UserAgent {
             return Self.default
         }
 
-        for (regex, userAgent) in domainUserAgents {
-            if absoluteString.matches(regex) {
-                return userAgent
-            }
+        if let userAgent = domainUserAgents.first(where: { (regex, _) in absoluteString.matches(regex) })?.value {
+            return userAgent
         }
 
         return Self.default

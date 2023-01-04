@@ -89,7 +89,7 @@ final class FirefoxBookmarksReader {
             return .failure(.unexpectedBookmarksDatabaseFormat)
         }
     }
-    
+
     fileprivate class DatabaseBookmarks {
         let topLevelFolders: [FolderRow]
         let foldersByParent: [Int: [FolderRow]]
@@ -118,7 +118,7 @@ final class FirefoxBookmarksReader {
 
     fileprivate struct BookmarkRow: FetchableRecord {
         let id: Int
-        let title: String
+        let title: String?
         let url: String
         let parent: Int
 
@@ -146,7 +146,7 @@ final class FirefoxBookmarksReader {
 
         let unfiledFolder = ImportedBookmarks.BookmarkOrFolder(name: "other", type: "folder", urlString: nil, children: unfiledBookmarksAndFolders)
         let folders = ImportedBookmarks.TopLevelFolders(bookmarkBar: toolbarFolder, otherBookmarks: unfiledFolder)
-        
+
         return ImportedBookmarks(topLevelFolders: folders)
     }
 
@@ -196,8 +196,6 @@ final class FirefoxBookmarksReader {
             moz_bookmarks.fk = moz_places.id
         WHERE
             moz_bookmarks.type = 1
-        AND
-            moz_bookmarks.title IS NOT NULL
         ;
         """
     }
@@ -234,7 +232,7 @@ extension ImportedBookmarks.BookmarkOrFolder {
     }
 
     fileprivate static func from(bookmarkRow: FirefoxBookmarksReader.BookmarkRow) -> ImportedBookmarks.BookmarkOrFolder {
-        return ImportedBookmarks.BookmarkOrFolder(name: bookmarkRow.title, type: "bookmark", urlString: bookmarkRow.url, children: nil)
+        return ImportedBookmarks.BookmarkOrFolder(name: bookmarkRow.title ?? "", type: "bookmark", urlString: bookmarkRow.url, children: nil)
     }
 
 }

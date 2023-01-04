@@ -32,7 +32,7 @@ final class FindInPageViewController: NSViewController {
 
     weak var delegate: FindInPageDelegate?
 
-    @Published var model: FindInPageModel? 
+    @Published var model: FindInPageModel?
 
     @IBOutlet weak var closeButton: NSButton!
     @IBOutlet weak var textField: NSTextField!
@@ -50,7 +50,7 @@ final class FindInPageViewController: NSViewController {
         listenForTextFieldResponderNotifications()
         subscribeToModelChanges()
         updateFieldStates()
-        
+
         closeButton.toolTip = UserText.findInPageCloseTooltip
         nextButton.toolTip = UserText.findInPageNextTooltip
         previousButton.toolTip = UserText.findInPagePreviousTooltip
@@ -122,7 +122,7 @@ final class FindInPageViewController: NSViewController {
         guard let model = model else { return }
         statusField.stringValue = String(format: UserText.findInPage, model.currentSelection, model.matchesFound)
     }
-    
+
     private func updateView(firstResponder: Bool) {
         focusRingView.updateView(stroke: firstResponder)
     }
@@ -157,7 +157,7 @@ extension FindInPageViewController {
 extension FindInPageViewController: NSTextFieldDelegate {
 
     func controlTextDidChange(_ obj: Notification) {
-        model?.update(text: textField.stringValue)
+        model?.find(textField.stringValue)
     }
 
 }

@@ -56,19 +56,19 @@ final class ColorView: NSView {
             layer?.borderWidth = borderWidth
         }
     }
-    
+
     @IBInspectable var interceptClickEvents: Bool = false
 
     func setupView() {
         self.wantsLayer = true
     }
-    
+
     override func updateLayer() {
         super.updateLayer()
         layer?.backgroundColor = backgroundColor?.cgColor
         layer?.borderColor = borderColor?.cgColor
     }
-    
+
     // MARK: - Click Event Interception
 
     override func mouseDown(with event: NSEvent) {
@@ -76,13 +76,13 @@ final class ColorView: NSView {
             super.mouseDown(with: event)
         }
     }
-    
+
     override func mouseUp(with event: NSEvent) {
         if !interceptClickEvents {
             super.mouseUp(with: event)
         }
     }
-    
+
     override func mouseDragged(with event: NSEvent) {
         if !interceptClickEvents {
             super.mouseDragged(with: event)

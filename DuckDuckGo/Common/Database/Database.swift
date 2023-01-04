@@ -19,13 +19,14 @@
 import Foundation
 import CoreData
 import BrowserServicesKit
+import Persistence
 
 final class Database {
-    
+
     fileprivate struct Constants {
         static let databaseName = "Database"
     }
-    
+
     static let shared: CoreDataDatabase = {
         let (database, error) = makeDatabase()
         if database == nil {
@@ -56,11 +57,7 @@ final class Database {
         }
 
 #if DEBUG
-        if AppDelegate.isRunningTests {
-            let keyStoreMockClass = (NSClassFromString("EncryptionKeyStoreMock") as? NSObject.Type)!
-            let keyStoreMock = (keyStoreMockClass.init() as? EncryptionKeyStoring)!
-            return makeDatabase(keyStore: keyStoreMock)
-        }
+        assert(!AppDelegate.isRunningTests, "Use CoreData.---Container() methods for testing purposes")
 #endif
 
         return makeDatabase(keyStore: EncryptionKeyStore(generator: EncryptionKeyGenerator()))

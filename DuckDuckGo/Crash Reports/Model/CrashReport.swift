@@ -19,7 +19,7 @@
 import Foundation
 
 protocol CrashReport {
-    
+
     static var fileExtension: String { get }
 
     var url: URL { get }
@@ -43,8 +43,8 @@ struct LegacyCrashReport: CrashReport {
         try? String(contentsOf: url)
             .components(separatedBy: "\n")
             .filter({ line in
-                for headerItemToFilter in Self.headerItemsToFilter {
-                    if line.hasPrefix(headerItemToFilter) { return false }
+                for headerItemToFilter in Self.headerItemsToFilter where line.hasPrefix(headerItemToFilter) {
+                    return false
                 }
                 return true
             })
@@ -58,7 +58,7 @@ struct LegacyCrashReport: CrashReport {
 }
 
 struct JSONCrashReport: CrashReport {
-    
+
     static let fileExtension = "ips"
 
     static let headerItemsToFilter = [
@@ -68,12 +68,12 @@ struct JSONCrashReport: CrashReport {
     ]
 
     let url: URL
-    
+
     var content: String? {
         guard var fileContents = try? String(contentsOf: url) else {
             return nil
         }
-        
+
         for itemToFilter in Self.headerItemsToFilter {
             let patternToReplace = "\"\(itemToFilter)\"\\s*:\\s*\"[^\"]*\""
             let redactedKeyValuePair = "\"\(itemToFilter)\":\"<removed>\""
@@ -82,10 +82,10 @@ struct JSONCrashReport: CrashReport {
                                                              with: redactedKeyValuePair,
                                                              options: .regularExpression)
         }
-        
+
         return fileContents
     }
-    
+
     var contentData: Data? {
         content?.data(using: .utf8)
     }

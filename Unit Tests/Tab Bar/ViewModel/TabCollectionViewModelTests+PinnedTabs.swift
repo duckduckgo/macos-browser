@@ -116,7 +116,7 @@ extension TabCollectionViewModelTests {
         let parentPinnedTab = tabCollectionViewModel.pinnedTabsManager!.tabCollection.tabs[0]
 
         let tab = Tab(parentTab: parentPinnedTab)
-        tabCollectionViewModel.insertChild(tab: tab, selected: false)
+        tabCollectionViewModel.insert(tab, selected: false)
 
         XCTAssertEqual(tabCollectionViewModel.tabCollection.tabs.count, 2)
         XCTAssertIdentical(tab, tabCollectionViewModel.tabViewModel(at: 0)?.tab)
@@ -128,12 +128,12 @@ extension TabCollectionViewModelTests {
 
         let parentPinnedTab = tabCollectionViewModel.pinnedTabsManager!.tabCollection.tabs[0]
 
-        tabCollectionViewModel.insertChild(tab: Tab(parentTab: parentPinnedTab), selected: false)
-        tabCollectionViewModel.insertChild(tab: Tab(parentTab: parentPinnedTab), selected: false)
-        tabCollectionViewModel.insertChild(tab: Tab(parentTab: parentPinnedTab), selected: false)
+        tabCollectionViewModel.insert(Tab(parentTab: parentPinnedTab), selected: false)
+        tabCollectionViewModel.insert(Tab(parentTab: parentPinnedTab), selected: false)
+        tabCollectionViewModel.insert(Tab(parentTab: parentPinnedTab), selected: false)
 
         let tab = Tab(parentTab: parentPinnedTab)
-        tabCollectionViewModel.insertChild(tab: tab, selected: true)
+        tabCollectionViewModel.insert(tab, selected: true)
 
         XCTAssertIdentical(tab, tabCollectionViewModel.tabViewModel(at: 3)?.tab)
     }
@@ -227,19 +227,6 @@ extension TabCollectionViewModelTests {
         XCTAssertEqual(tabCollectionViewModel.selectionIndex, .pinned(0))
     }
 
-    func test_WithPinnedTabs_WhenPinnedOwnerOfWebviewIsRemovedThenAllOtherTabsRemained() {
-        let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModelWithPinnedTab()
-
-        tabCollectionViewModel.appendNewTab()
-        tabCollectionViewModel.appendNewTab()
-        let pinnedTabViewModel = tabCollectionViewModel.pinnedTabsManager!.tabViewModel(at: 0)!
-
-        tabCollectionViewModel.remove(ownerOf: pinnedTabViewModel.tab.webView)
-
-        XCTAssertFalse(tabCollectionViewModel.pinnedTabsCollection!.tabs.contains(pinnedTabViewModel.tab))
-        XCTAssertTrue(tabCollectionViewModel.pinnedTabsCollection!.tabs.isEmpty)
-    }
-
     func test_WithPinnedTabs_RemoveSelected() {
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModelWithPinnedTab()
         tabCollectionViewModel.appendNewTab()
@@ -301,6 +288,6 @@ fileprivate extension TabCollectionViewModel {
     }
 
     func appendPinnedTab() {
-        pinnedTabsManager?.tabCollection.append(tab: .init(content: .url("https://duck.com".url!)))
+        pinnedTabsManager?.tabCollection.append(tab: .init(content: .url("https://duck.com".url!), shouldLoadInBackground: false))
     }
 }
