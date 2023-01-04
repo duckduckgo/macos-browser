@@ -19,11 +19,11 @@
 import AppKit
 
 struct ChromePreferences: Codable {
-    
+
     struct ChromeProfile: Codable {
         let name: String
     }
-    
+
     let profile: ChromeProfile
-    
+
 }

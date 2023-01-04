@@ -102,7 +102,7 @@ final class SuggestionContainerViewModel {
             selectedSuggestionViewModel = nil
         }
     }
-    
+
     func suggestionViewModel(at index: Int) -> SuggestionViewModel? {
         let items = suggestionContainer.result?.all ?? []
 
@@ -165,5 +165,5 @@ final class SuggestionContainerViewModel {
         let newIndex = max(0, selectionIndex - 1)
         select(at: newIndex)
     }
-    
+
 }

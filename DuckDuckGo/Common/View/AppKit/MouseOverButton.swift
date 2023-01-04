@@ -27,7 +27,7 @@ internal class MouseOverButton: NSButton {
             updateLayer()
         }
     }
-    
+
     @IBInspectable var mouseOverColor: NSColor? {
         didSet {
             updateLayer()

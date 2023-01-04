@@ -24,7 +24,7 @@ protocol NotificationBarViewAnimated: NSView {
 
 final class NavigationBarBadgeAnimationView: NSView {
     var animatedView: NotificationBarViewAnimated?
-    
+
     enum AnimationType {
         case cookieManaged
     }
@@ -36,27 +36,27 @@ final class NavigationBarBadgeAnimationView: NSView {
         case .cookieManaged:
             viewToAnimate = CookieManagedNotificationContainerView()
         }
-        
+
         addSubview(viewToAnimate)
         animatedView = viewToAnimate
         setupConstraints()
     }
-    
+
     func startAnimation(completion: @escaping () -> Void) {
          self.animatedView?.startAnimation(completion)
     }
-    
+
     func removeAnimation() {
         animatedView?.removeFromSuperview()
     }
-    
+
     private func setupConstraints() {
         guard let animatedView = animatedView else {
             return
         }
 
         animatedView.translatesAutoresizingMaskIntoConstraints = false
-        
+
         NSLayoutConstraint.activate([
             animatedView.leadingAnchor.constraint(equalTo: leadingAnchor),
             animatedView.trailingAnchor.constraint(equalTo: trailingAnchor),

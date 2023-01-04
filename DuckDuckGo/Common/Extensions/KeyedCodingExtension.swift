@@ -25,7 +25,7 @@ struct JSONCodingKeys: CodingKey {
     init?(stringValue: String) {
         self.stringValue = stringValue
     }
-    
+
     init?(intValue: Int) {
         self.init(stringValue: "\(intValue)")
         self.intValue = intValue
@@ -148,7 +148,7 @@ extension KeyedEncodingContainer {
             }
         }
     }
-    
+
     mutating func encodeIfPresent(_ value: [Any]?, forKey key: KeyedEncodingContainer<K>.Key) throws {
         guard let safeValue = value else {
             return
@@ -176,7 +176,7 @@ extension UnkeyedEncodingContainer {
             try self.encodeIfPresent(dict)
         }
     }
-    
+
     mutating func encodeIfPresent(_ value: [String: Any]) throws {
         var container = self.nestedContainer(keyedBy: JSONCodingKeys.self)
         for item in value {

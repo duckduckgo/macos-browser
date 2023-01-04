@@ -67,7 +67,7 @@ extension BookmarkManagedObject {
         try validateThatFolderHierarchyHasNoCycles()
         try validateFavoritesFolder()
     }
-    
+
     func validateThatEntitiesExistInsideTheRootFolder() throws {
         if parentFolder == nil, ![UUID.rootBookmarkFolderUUID, .favoritesFolderUUID].contains(id) {
             throw BookmarkError.mustExistInsideRootFolder

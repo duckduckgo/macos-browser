@@ -168,7 +168,7 @@ final class RecentlyVisitedSiteModel: ObservableObject {
     var isRealDomain: Bool {
         domainPlaceholder == nil
     }
-    
+
     private let baseURL: URL?
     private let domainPlaceholder: String?
     private let privatePlayer: PrivatePlayer

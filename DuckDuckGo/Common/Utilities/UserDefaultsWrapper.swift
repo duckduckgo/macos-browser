@@ -90,7 +90,7 @@ public struct UserDefaultsWrapper<T> {
         case historyV5toV6Migration = "history.v5.to.v6.migration.2"
 
         case showBookmarksBar = "bookmarks.bar.show"
-        
+
         case pinnedViews = "pinning.pinned-views"
 
         case lastDatabaseFactoryFailurePixelDate = "last.database.factory.failure.pixel.date"

@@ -23,7 +23,6 @@ import Combine
 import AVFoundation
 @testable import DuckDuckGo_Privacy_Browser
 
-// swiftlint:disable:next type_body_length
 final class PermissionModelTests: XCTestCase {
 
     let permissionManagerMock = PermissionManagerMock()

@@ -20,7 +20,7 @@ import Foundation
 import BrowserServicesKit
 
 extension ContentScopeFeatureToggles {
-    
+
     static let supportedFeaturesOnMacOS = ContentScopeFeatureToggles(emailProtection: true,
                                                                      credentialsAutofill: true,
                                                                      identitiesAutofill: true,

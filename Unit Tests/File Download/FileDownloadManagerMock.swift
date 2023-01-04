@@ -23,7 +23,7 @@ import Combine
 final class FileDownloadManagerMock: FileDownloadManagerProtocol {
 
     var downloads = Set<WebKitDownloadTask>()
-    
+
     var downloadAddedSubject = PassthroughSubject<WebKitDownloadTask, Never>()
     var downloadsPublisher: AnyPublisher<WebKitDownloadTask, Never> {
         downloadAddedSubject.eraseToAnyPublisher()

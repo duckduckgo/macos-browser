@@ -25,7 +25,7 @@ final class ConfigurationDownloaderTests: XCTestCase {
     static let resultData = "test".data(using: .utf8)!
 
     var cancellables = Set<AnyCancellable>()
-    
+
     func test_urls_do_not_contain_localhost() {
         for url in ConfigurationLocation.allCases {
             XCTAssertFalse(url.rawValue.contains("localhost"))

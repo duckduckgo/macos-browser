@@ -22,7 +22,7 @@ extension UserText {
 
     static let pmSaveCredentialsEditableTitle = NSLocalizedString("pm.save-credentials.editable.title", value: "Save Login?", comment: "Title for the editable Save Credentials popover")
     static let pmSaveCredentialsNonEditableTitle = NSLocalizedString("pm.save-credentials.non-editable.title", value: "New Login Saved", comment: "Title for the non-editable Save Credentials popover")
-    
+
     static let pmEmptyStateDefaultTitle = NSLocalizedString("pm.empty.default.title", value: "No Logins or Payment Methods saved yet", comment: "Label for default empty state title")
     static let pmEmptyStateDefaultDescription = NSLocalizedString("pm.empty.default.description",
                                                                   value: "If your logins are saved in another browser, you can import them into DuckDuckGo.",

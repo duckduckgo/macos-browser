@@ -53,7 +53,6 @@ final class WindowManagerStateRestorationTests: XCTestCase {
 
     // MARK: -
 
-    // swiftlint:disable:next function_body_length
     func testWindowManagerStateRestoration() throws {
         let tabs1 = [
             Tab(content: .url(URL(string: "https://duckduckgo.com")!),

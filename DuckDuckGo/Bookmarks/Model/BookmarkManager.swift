@@ -114,7 +114,7 @@ final class LocalBookmarkManager: BookmarkManager {
     @discardableResult func makeBookmark(for url: URL, title: String, isFavorite: Bool) -> Bookmark? {
         makeBookmark(for: url, title: title, isFavorite: isFavorite, index: nil, parent: nil)
     }
-    
+
     @discardableResult func makeBookmark(for url: URL, title: String, isFavorite: Bool, index: Int? = nil, parent: BookmarkFolder? = nil) -> Bookmark? {
         guard list != nil else { return nil }
 
@@ -161,7 +161,7 @@ final class LocalBookmarkManager: BookmarkManager {
             self?.loadBookmarks()
         }
     }
-    
+
     func remove(objectsWithUUIDs uuids: [UUID]) {
         bookmarkStore.remove(objectsWithUUIDs: uuids) { [weak self] _, _ in
             self?.loadBookmarks()
@@ -222,7 +222,7 @@ final class LocalBookmarkManager: BookmarkManager {
     func add(bookmark: Bookmark, to parent: BookmarkFolder?, completion: @escaping (Error?) -> Void) {
         add(objectsWithUUIDs: [bookmark.id], to: parent, completion: completion)
     }
-    
+
     func add(objectsWithUUIDs uuids: [UUID], to parent: BookmarkFolder?, completion: @escaping (Error?) -> Void) {
         bookmarkStore.add(objectsWithUUIDs: uuids, to: parent) { [weak self] error in
             self?.loadBookmarks()
@@ -236,11 +236,11 @@ final class LocalBookmarkManager: BookmarkManager {
             completion(error)
         }
     }
-    
+
     func canMoveObjectWithUUID(objectUUID uuid: UUID, to parent: BookmarkFolder) -> Bool {
         return bookmarkStore.canMoveObjectWithUUID(objectUUID: uuid, to: parent)
     }
-    
+
     func move(objectUUIDs: [UUID], toIndex index: Int?, withinParentFolder parent: ParentFolderType, completion: @escaping (Error?) -> Void) {
         bookmarkStore.move(objectUUIDs: objectUUIDs, toIndex: index, withinParentFolder: parent) { [weak self] error in
             self?.loadBookmarks()
@@ -273,14 +273,14 @@ final class LocalBookmarkManager: BookmarkManager {
 
         return results
     }
-    
+
     // MARK: - Debugging
-    
+
     func resetBookmarks() {
         guard let store = bookmarkStore as? LocalBookmarkStore else {
             return
         }
-            
+
         store.resetBookmarks()
         loadBookmarks()
     }

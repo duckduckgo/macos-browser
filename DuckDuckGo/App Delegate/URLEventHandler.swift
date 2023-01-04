@@ -25,7 +25,7 @@ final class URLEventHandler {
 
     private var didFinishLaunching = false
     private var urlsToOpen = [URL]()
-    
+
     init(handler: @escaping ((URL) -> Void) = openURL) {
         self.handler = handler
 
@@ -46,7 +46,7 @@ final class URLEventHandler {
 
             self.urlsToOpen = []
         }
-        
+
         didFinishLaunching = true
     }
 

@@ -45,7 +45,7 @@ enum ConfigurationLocation: String, CaseIterable {
     case privacyConfiguration = "https://staticcdn.duckduckgo.com/trackerblocking/config/v2/macos-config.json"
     // In archived repo, to be refactored shortly (https://staticcdn.duckduckgo.com/useragents/social_ctp_configuration.json)
     case FBConfig = "https://staticcdn.duckduckgo.com/useragents/"
-    
+
 }
 
 final class DefaultConfigurationDownloader: ConfigurationDownloading {
@@ -128,7 +128,7 @@ final class DefaultConfigurationDownloader: ConfigurationDownloading {
                     }
 
                 }) { value in
-                    
+
                     promise(.success((value)))
 
                 }.store(in: &self.cancellables)

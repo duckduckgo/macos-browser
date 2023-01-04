@@ -21,9 +21,8 @@ import XCTest
 
 class OnboardingTests: XCTestCase {
 
-    // swiftlint:disable weak_delegate
+    // swiftlint:disable:next weak_delegate
     let delegate = MockOnboardingDelegate()
-    // swiftlint:enable weak_delegate
 
     @UserDefaultsWrapper(key: .onboardingFinished, defaultValue: false)
     var onboardingFinished: Bool
