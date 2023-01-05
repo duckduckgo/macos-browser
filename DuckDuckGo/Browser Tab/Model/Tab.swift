@@ -41,6 +41,7 @@ protocol TabDelegate: ContentOverlayUserScriptDelegate {
     func closeTab(_ tab: Tab)
 
     func tabDidRequestSearchResults(_ tab: Tab)
+    func tabDidActivateSidePanelSearchResult(_ tab: Tab)
     func tabDidCloseSearchResults(_ tab: Tab)
 
     func fileIconFlyAnimationOriginalRect(for downloadTask: WebKitDownloadTask) -> NSRect?
@@ -1745,6 +1746,7 @@ extension Tab: TabDataClearing {
 
 extension Tab: SearchPanelUserScriptDelegate {
     func searchPanelUserScript(_ searchPanelUserScript: SearchPanelUserScript, didSelectSearchResult url: URL) {
+        delegate?.tabDidActivateSidePanelSearchResult(self)
         preventHidingSearchPanel = true
         searchPanelResults.insert(url)
         webView.load(url)

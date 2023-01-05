@@ -66,6 +66,10 @@ final class WebViewContainerView: NSView {
     let webView: WebView
     let swipeGestureView: SwipeGestureView
 
+    enum Const {
+        static let serpPanelWidth: CGFloat = 520
+    }
+
     private lazy var lightShadowView = {
         let view = ShadowView()
         view.autoresizingMask = [.width, .height]
@@ -111,8 +115,8 @@ final class WebViewContainerView: NSView {
         serpWebView.autoresizingMask = [.height]
 
         var frame = bounds
-        frame.size.width = 520
-        frame.origin.x = -520
+        frame.size.width = Const.serpPanelWidth
+        frame.origin.x = -Const.serpPanelWidth
         serpWebView.frame = frame
         addSubview(serpWebView, positioned: .below, relativeTo: webView)
         addSubview(darkShadowView, positioned: .below, relativeTo: webView)
@@ -122,7 +126,7 @@ final class WebViewContainerView: NSView {
             context.duration = 0.3
             context.allowsImplicitAnimation = true
 
-            webView.frame.origin.x += 520
+            webView.frame.origin.x += Const.serpPanelWidth
             serpWebView.frame.origin.x = 0
             darkShadowView.frame = webView.frame
             lightShadowView.frame = webView.frame
@@ -131,6 +135,21 @@ final class WebViewContainerView: NSView {
         }) {
             self.needsCustomLayout = true
         }
+    }
+
+    func resizeWebViewToFitScreenAndSERPPanel() {
+        let targetWidth = bounds.width - Const.serpPanelWidth
+
+        guard needsCustomLayout, webView.frame.width != targetWidth else {
+            return
+        }
+
+        NSAnimationContext.runAnimationGroup({ context in
+            context.duration = 0.3
+            context.allowsImplicitAnimation = true
+
+            webView.frame.size.width = bounds.width - Const.serpPanelWidth
+        })
     }
 
     func hideSERPWebView() {
@@ -145,7 +164,7 @@ final class WebViewContainerView: NSView {
             context.duration = 0.3
             context.allowsImplicitAnimation = true
 
-            serpWebView.frame.origin.x -= 520
+            serpWebView.frame.origin.x -= Const.serpPanelWidth
             webView.frame = bounds
             darkShadowView.alphaValue = 0
             lightShadowView.alphaValue = 0
@@ -209,7 +228,7 @@ final class WebViewContainerView: NSView {
         super.layout()
 
         if needsCustomLayout {
-            webView.frame.origin.x = 520
+            webView.frame.origin.x = Const.serpPanelWidth
             darkShadowView.frame = webView.frame
             lightShadowView.frame = webView.frame
         }

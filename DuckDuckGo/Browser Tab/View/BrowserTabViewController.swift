@@ -585,6 +585,10 @@ extension BrowserTabViewController: TabDelegate {
         }
     }
 
+    func tabDidActivateSidePanelSearchResult(_ tab: Tab) {
+        webViewContainer?.resizeWebViewToFitScreenAndSERPPanel()
+    }
+
     func tabDidCloseSearchResults(_ tab: Tab) {
         webViewContainer?.hideSERPWebView()
     }
