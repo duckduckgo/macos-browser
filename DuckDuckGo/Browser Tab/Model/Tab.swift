@@ -595,9 +595,10 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                 return
             }
             if webView.backForwardList.backItem?.url == serpWebView?.backForwardList.currentItem?.url {
-                _ = hideSERPWebView()
                 searchPanelResults.removeAll()
             }
+        } else if webView.url?.isDuckDuckGoSearch == true && webView.url == serpWebView?.url {
+            searchPanelResults.removeAll()
         }
 
         webView.goBack()
