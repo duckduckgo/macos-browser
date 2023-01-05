@@ -4,12 +4,12 @@ let createFocus = (resultId) => {
     });
 
     var focus = document.querySelector(resultId);
-    focus.setAttribute('style', 'border:2px solid #3969EF !important;padding: 12px 14px !important;');
+    focus.setAttribute('style', 'border:2px solid #3969EF !important;padding:calc(var(--px-in-rem)*5.2) 8px !important;');
 }
 
 let makeSlim = () => {
     var styles = `
-        .results--sidebar {
+        .results--sidebar, .acp__search-fill {
             display: none !important;
         }
         html, body, .site-wrapper, #links_wrapper {
@@ -21,13 +21,21 @@ let makeSlim = () => {
             border: none !important;
             box-shadow: none !important;
         }
+
+        .nav-menu--slideout:not(.is-open) {
+            opacity: 0 !important;
+        }
+
+        .set-header--floating #header_wrapper {
+            margin-top: 42px !important;
+        }
     `
 
     var styleSheet = document.createElement("style")
     styleSheet.type = "text/css"
     styleSheet.innerText = styles
     document.head.appendChild(styleSheet);
-
+    document.querySelector('html').classList.remove('is-mobile');
 }
 
 let hijackOrganicClicks = () => {
@@ -79,7 +87,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Listen for message from Native
 window.addEventListener('message', (event) => {
-    createFocus('#'+findResultIdBasedOnURL(event.data.highlightSearchResult));
+    let focusElementId = '#'+findResultIdBasedOnURL(event.data.highlightSearchResult);
+    createFocus(focusElementId);
+
+    setTimeout(function() {
+        document.querySelector(focusElementId).scrollIntoView({ block: 'center' });
+    }, 1000);
 });
 
 // Send swipeForward if swiping forward in the SERP Panel
