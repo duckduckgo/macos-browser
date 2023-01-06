@@ -1750,6 +1750,7 @@ extension Tab: SearchPanelUserScriptDelegate {
         delegate?.tabDidActivateSidePanelSearchResult(self)
         preventHidingSearchPanel = true
         searchPanelResults.insert(url)
+        webView.goBack()
         webView.load(url)
     }
 }
