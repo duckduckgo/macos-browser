@@ -591,12 +591,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         if #available(macOS 12.0, *),
            let backURL = webView.backForwardList.backItem?.url, let currentURL = webView.url,
            backURL.isDuckDuckGoSearch || searchPanelResults.contains(currentURL) {
-            if showSERPWebView() {
-                return
-            }
-            if webView.backForwardList.backItem?.url == serpWebView?.backForwardList.currentItem?.url {
-                searchPanelResults.removeAll()
-            }
+            showSERPWebView()
         } else if webView.url?.isDuckDuckGoSearch == true && webView.url == serpWebView?.url {
             searchPanelResults.removeAll()
         }
@@ -636,16 +631,14 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     }
 
     @available(macOS 12.0, *)
-    fileprivate func showSERPWebView() -> Bool {
+    fileprivate func showSERPWebView() {
         guard let serpWebView else {
-            return false
+            return
         }
 
         if serpWebView.superview == nil {
             delegate?.tabDidRequestSearchResults(self)
-            return true
         }
-        return false
     }
 
     func hideSERPWebView() -> Bool {
