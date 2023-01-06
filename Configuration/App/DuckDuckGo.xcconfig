@@ -16,7 +16,6 @@
 #include "AppTargetsBase.xcconfig"
 
 BUNDLE_IDENTIFIER_PREFIX = com.duckduckgo.macos.browser
-PRODUCT_NAME_PREFIX = DuckDuckGo
 
 CODE_SIGN_ENTITLEMENTS = DuckDuckGo/DuckDuckGo.entitlements
 CODE_SIGN_ENTITLEMENTS[config=CI] = DuckDuckGo/DuckDuckGoCI.entitlements
@@ -28,8 +27,10 @@ CODE_SIGN_IDENTITY[sdk=macosx*] = Developer ID Application
 CODE_SIGN_IDENTITY[config=Debug][sdk=macosx*] = Apple Development
 CODE_SIGN_IDENTITY[config=CI][sdk=macosx*] =
 
+PRODUCT_NAME_PREFIX = DuckDuckGo
+
 PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*] =
 PROVISIONING_PROFILE_SPECIFIER[config=Release][sdk=macosx*] = MacOS Browser
 PROVISIONING_PROFILE_SPECIFIER[config=Review][sdk=macosx*] = MacOS Browser Product Review
 
-#include? "../LocalOverrides.xcconfig"
+#include? "../../LocalOverrides.xcconfig"

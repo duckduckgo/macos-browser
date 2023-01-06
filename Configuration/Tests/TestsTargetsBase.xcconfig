@@ -13,19 +13,20 @@
 //  limitations under the License.
 //
 
-#include "Common.xcconfig"
+#include "../Common.xcconfig"
+
+BUNDLE_LOADER=$(TEST_HOST)
+
+CODE_SIGN_STYLE = Automatic
+CODE_SIGN_IDENTITY[config=CI][sdk=macosx*] =
 
 DEAD_CODE_STRIPPING = YES
 
 INFOPLIST_FILE = DuckDuckGo/Info.plist
 
+LD_RUNPATH_SEARCH_PATHS = $(inherited) @executable_path/../Frameworks @loader_path/../Frameworks
+
 PRODUCT_MODULE_NAME = $(TARGET_NAME:c99extidentifier)
 PRODUCT_NAME = $(TARGET_NAME)
 
-LD_RUNPATH_SEARCH_PATHS = $(inherited) @executable_path/../Frameworks @loader_path/../Frameworks
-
 TEST_HOST=$(BUILT_PRODUCTS_DIR)/DuckDuckGo.app/Contents/MacOS/DuckDuckGo
-BUNDLE_LOADER=$(TEST_HOST)
-
-CODE_SIGN_STYLE = Automatic
-CODE_SIGN_IDENTITY[config=CI][sdk=*] = -

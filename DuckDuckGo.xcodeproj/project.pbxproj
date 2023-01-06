@@ -2057,16 +2057,40 @@
 		378B5886295CF2A4002C0CC0 /* Configuration */ = {
 			isa = PBXGroup;
 			children = (
-				378B5888295CF2A4002C0CC0 /* Common.xcconfig */,
 				378B5887295CF2A4002C0CC0 /* Version.xcconfig */,
+				378B5888295CF2A4002C0CC0 /* Common.xcconfig */,
+				378C76D8296842FD0092E949 /* App */,
+				378C76D92968433B0092E949 /* Tests */,
+				378C76DA296843460092E949 /* UITests */,
+			);
+			path = Configuration;
+			sourceTree = "<group>";
+		};
+		378C76D8296842FD0092E949 /* App */ = {
+			isa = PBXGroup;
+			children = (
 				378B588B295CF3B9002C0CC0 /* AppTargetsBase.xcconfig */,
 				378B58CD295ECA75002C0CC0 /* DuckDuckGo.xcconfig */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		378C76D92968433B0092E949 /* Tests */ = {
+			isa = PBXGroup;
+			children = (
 				373A26962964CF0B0043FC57 /* TestsTargetsBase.xcconfig */,
 				378B588D295CF447002C0CC0 /* UnitTests.xcconfig */,
 				378B58C8295CF9A7002C0CC0 /* IntegrationTests.xcconfig */,
+			);
+			path = Tests;
+			sourceTree = "<group>";
+		};
+		378C76DA296843460092E949 /* UITests */ = {
+			isa = PBXGroup;
+			children = (
 				378B588C295CF446002C0CC0 /* UITests.xcconfig */,
 			);
-			path = Configuration;
+			path = UITests;
 			sourceTree = "<group>";
 		};
 		37BF3F12286D8A4B00BD9014 /* Pinned Tabs */ = {

@@ -13,10 +13,10 @@
 //  limitations under the License.
 //
 
-#include "Common.xcconfig"
+#include "../Common.xcconfig"
 
 CODE_SIGN_STYLE = Automatic
-CODE_SIGN_IDENTITY[config=CI] = -
+CODE_SIGN_IDENTITY[config=CI][sdk=macosx*] =
 
 DEAD_CODE_STRIPPING = YES
 
