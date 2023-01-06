@@ -47,7 +47,6 @@ let hijackOrganicClicks = () => {
             let clickedDiv = event.target.closest('.nrn-react-div');
             let url = clickedDiv?.querySelector('a[data-testid="result-title-a"]')?.getAttribute('href');
 
-            console.log('url', url);
             window.webkit.messageHandlers.selectedSearchResult.postMessage(url);
 
             let clickedResultId = clickedDiv.querySelector('article').getAttribute('id');
@@ -90,9 +89,31 @@ window.addEventListener('message', (event) => {
     let focusElementId = '#'+findResultIdBasedOnURL(event.data.highlightSearchResult);
     createFocus(focusElementId);
 
-    setTimeout(function() {
-        document.querySelector(focusElementId).scrollIntoView({ block: 'center' });
-    }, 1000);
+    let isInView = function() {
+        var myElement = document.querySelector(focusElementId);
+        var bounding = myElement.getBoundingClientRect();
+        var myElementHeight = myElement.offsetHeight;
+        var myElementWidth = myElement.offsetWidth;
+        var bounding = myElement.getBoundingClientRect();
+
+        if (bounding.top >= -myElementHeight
+            && bounding.left >= -myElementWidth
+            && bounding.right <= (window.innerWidth || document.documentElement.clientWidth) + myElementWidth
+            && bounding.bottom <= (window.innerHeight || document.documentElement.clientHeight) + myElementHeight)
+        {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    var check = setInterval(function() {
+        if (!isInView()) {
+            document.querySelector(focusElementId).scrollIntoView({ block: 'center' });
+        } else {
+            clearInterval(check);
+        }
+    });
 });
 
 // Send swipeForward if swiping forward in the SERP Panel
