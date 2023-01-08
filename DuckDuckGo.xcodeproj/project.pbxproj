@@ -421,7 +421,6 @@
 		85AC7AD927BD625000FFB69B /* HomePageAssets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 85AC7AD827BD625000FFB69B /* HomePageAssets.xcassets */; };
 		85AC7ADB27BD628400FFB69B /* HomePage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85AC7ADA27BD628400FFB69B /* HomePage.swift */; };
 		85AC7ADD27BEB6EE00FFB69B /* HomePageDefaultBrowserModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85AC7ADC27BEB6EE00FFB69B /* HomePageDefaultBrowserModel.swift */; };
-		85AE2FF224A33A2D002D507F /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85AE2FF124A33A2D002D507F /* WebKit.framework */; };
 		85B7184A27677C2D00B4277F /* Onboarding.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 85B7184927677C2D00B4277F /* Onboarding.storyboard */; };
 		85B7184C27677C6500B4277F /* OnboardingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85B7184B27677C6500B4277F /* OnboardingViewController.swift */; };
 		85B7184E27677CBB00B4277F /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85B7184D27677CBB00B4277F /* RootView.swift */; };
@@ -1782,7 +1781,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				9807F645278CA16F00E1547B /* BrowserServicesKit in Frameworks */,
-				85AE2FF224A33A2D002D507F /* WebKit.framework in Frameworks */,
 				1E950E3F2912A10D0051A99B /* ContentBlocking in Frameworks */,
 				1E950E432912A10D0051A99B /* UserScript in Frameworks */,
 				4B82E9B325B69E3E00656FE7 /* TrackerRadarKit in Frameworks */,
