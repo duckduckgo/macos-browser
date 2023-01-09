@@ -603,6 +603,7 @@ final class NavigationBarViewController: NSViewController {
         goForwardButton.isEnabled = selectedTabViewModel.canGoForward
         refreshOrStopButton.isEnabled = selectedTabViewModel.canReload || selectedTabViewModel.isLoading
         refreshOrStopButton.image = selectedTabViewModel.isLoading ? NSImage(imageLiteralResourceName: "Stop") : NSImage(imageLiteralResourceName: "Refresh")
+        refreshOrStopButton.toolTip = selectedTabViewModel.isLoading ? UserText.stopLoadingTooltip : UserText.refreshPageTooltip
     }
 }
 
