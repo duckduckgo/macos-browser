@@ -272,7 +272,7 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
         let parameters = JSAlertParameters(
             domain: frame.request.url?.host ?? "",
             prompt: prompt,
-            defaultInputText: nil
+            defaultInputText: defaultInputText
         )
         let alertQuery = queryCreator(parameters)
         let dialog = UserDialogType.jsDialog(alertQuery)
