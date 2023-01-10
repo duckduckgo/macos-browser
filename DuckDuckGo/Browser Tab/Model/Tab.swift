@@ -1052,7 +1052,7 @@ extension Tab: ContentBlockerRulesUserScriptDelegate {
     }
 
     func contentBlockerRulesUserScript(_ script: ContentBlockerRulesUserScript, detectedTracker tracker: DetectedRequest) {
-        guard let url = webView.url else { return }
+        guard let url = URL(string: tracker.pageUrl) else { return }
 
         privacyInfo?.trackerInfo.addDetectedTracker(tracker, onPageWithURL: url)
         historyCoordinating.addDetectedTracker(tracker, onURL: url)
