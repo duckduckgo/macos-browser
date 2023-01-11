@@ -1,6 +1,6 @@
 storage_mode "git"
 git_url "git@github.com:duckduckgo/Apple-certificates.git"
-git_branch "main"
+git_branch "macos"
 platform "macos"
 
 type "appstore"
