@@ -82,7 +82,8 @@ jobs:
 
     - name: Build and test
       run: |
-        echo "${{ matrix.config_override }}=Ignored" > Configuration/ModuleNameOverride.xcconfig
+        echo "${{ matrix.config_override }}=Ignored" > LocalOverrides.xcconfig
+        echo "${{ matrix.config_override }}=Ignored" > LocalOverridesAppStore.xcconfig
         set -o pipefail && xcodebuild test \
           -scheme "${{ matrix.scheme }}" \
           -configuration "CI" \

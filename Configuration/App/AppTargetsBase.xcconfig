@@ -14,6 +14,7 @@
 //
 
 #include "../Common.xcconfig"
+#include "ModuleName.xcconfig"
 
 ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon
 ASSETCATALOG_COMPILER_APPICON_NAME[config=Debug] = Icon - Debug
@@ -38,8 +39,7 @@ INFOPLIST_FILE = DuckDuckGo/Info.plist
 
 LD_RUNPATH_SEARCH_PATHS = $(inherited) @executable_path/../Frameworks
 
-PRODUCT_MODULE_NAME = $(TARGET_NAME:c99extidentifier)
 PRODUCT_NAME = $(PRODUCT_NAME_PREFIX)
-PRODUCT_NAME[config=Review] = $(PRODUCT_NAME_PREFIX) Review
+PRODUCT_NAME[config=Review][arch=*][sdk=*] = $(PRODUCT_NAME_PREFIX) Review
 
 SWIFT_OBJC_BRIDGING_HEADER = $(SRCROOT)/DuckDuckGo/Bridging.h

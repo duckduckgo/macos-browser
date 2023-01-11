@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#include? "ModuleNameOverride.xcconfig"
-
 //
 // Used when importing app module in unit tests, e.g,:
 // @testable import DuckDuckGo_Privacy_Browser
