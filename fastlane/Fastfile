@@ -122,7 +122,8 @@ platform :mac do
     build_app(
       export_method: "app-store",
       scheme: "DuckDuckGo Privacy Browser App Store",
-      export_options: "scripts/assets/AppStoreExportOptions.plist"
+      export_options: "scripts/assets/AppStoreExportOptions.plist",
+      xcargs: "RELEASE_PRODUCT_NAME_OVERRIDE=DuckDuckGo"
     )
   end
 

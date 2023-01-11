@@ -5912,6 +5912,7 @@
 		};
 		378E2798296F6D1D00FCADA2 /* Validate PRODUCT_NAME */ = {
 			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
 			files = (
 			);
