@@ -27,7 +27,6 @@ CODE_SIGN_IDENTITY[sdk=macosx*] = Developer ID Application
 CODE_SIGN_IDENTITY[config=Debug][sdk=macosx*] = Apple Development
 CODE_SIGN_IDENTITY[config=CI][sdk=macosx*] =
 
-PRODUCT_MODULE_NAME = $(MODULE_NAME)
 PRODUCT_NAME_PREFIX = DuckDuckGo
 
 PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*] =

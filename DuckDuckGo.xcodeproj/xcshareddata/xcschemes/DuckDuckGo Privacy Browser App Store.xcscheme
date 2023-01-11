@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "3706FA6A293F65D500E42796"
-               BuildableName = "DuckDuckGo.app"
+               BuildableName = "DuckDuckGo App Store.app"
                BlueprintName = "DuckDuckGo Privacy Browser App Store"
                ReferencedContainer = "container:DuckDuckGo.xcodeproj">
             </BuildableReference>
@@ -31,6 +31,20 @@
                BlueprintIdentifier = "3706FDD3293F661700E42796"
                BuildableName = "Unit Tests App Store.xctest"
                BlueprintName = "Unit Tests App Store"
+               ReferencedContainer = "container:DuckDuckGo.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "3706FE9B293F662100E42796"
+               BuildableName = "Integration Tests App Store.xctest"
+               BlueprintName = "Integration Tests App Store"
                ReferencedContainer = "container:DuckDuckGo.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -53,7 +67,13 @@
             </BuildableReference>
             <SkippedTests>
                <Test
+                  Identifier = "AutoconsentMessageProtocolTests/testEval()">
+               </Test>
+               <Test
                   Identifier = "CBRCompileTimeReporterTests">
+               </Test>
+               <Test
+                  Identifier = "PixelStoreTests/testWhenValuesAreAddedThenCallbacksAreCalled()">
                </Test>
                <Test
                   Identifier = "StatisticsLoaderTests/testWhenRefreshRetentionAtbIsPerformedForNavigationThenAppRetentionAtbRequested()">
@@ -95,7 +115,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "3706FA6A293F65D500E42796"
-            BuildableName = "DuckDuckGo.app"
+            BuildableName = "DuckDuckGo App Store.app"
             BlueprintName = "DuckDuckGo Privacy Browser App Store"
             ReferencedContainer = "container:DuckDuckGo.xcodeproj">
          </BuildableReference>
@@ -121,7 +141,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "3706FA6A293F65D500E42796"
-            BuildableName = "DuckDuckGo.app"
+            BuildableName = "DuckDuckGo App Store.app"
             BlueprintName = "DuckDuckGo Privacy Browser App Store"
             ReferencedContainer = "container:DuckDuckGo.xcodeproj">
          </BuildableReference>

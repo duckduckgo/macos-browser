@@ -32,9 +32,8 @@ ENABLE_APP_SANDBOX = YES
 
 MACOSX_DEPLOYMENT_TARGET = 12.3
 
-PRODUCT_MODULE_NAME = $(MODULE_NAME_APP_STORE)
+PRODUCT_MODULE_NAME = DuckDuckGo_Privacy_Browser
 PRODUCT_NAME_PREFIX = DuckDuckGo App Store
-PRODUCT_NAME[config=Release][arch=*][sdk=*] = DuckDuckGo
 
 PROVISIONING_PROFILE_SPECIFIER[config=Debug][sdk=macosx*] = match Development com.duckduckgo.mobile.ios.* macos
 PROVISIONING_PROFILE_SPECIFIER[config=CI][sdk=macosx*] =

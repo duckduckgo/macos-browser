@@ -21,3 +21,5 @@ INFOPLIST_FILE = Unit Tests/Info.plist
 PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser.DuckDuckGoTests
 
 SWIFT_OBJC_BRIDGING_HEADER = $(SRCROOT)/Unit Tests/Common/TestsBridging.h
+
+TEST_HOST=$(BUILT_PRODUCTS_DIR)/DuckDuckGo.app/Contents/MacOS/DuckDuckGo

@@ -17,3 +17,5 @@
 #include "../AppStore.xcconfig"
 
 PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.mobile.ios.Integration-Tests
+
+TEST_HOST=$(BUILT_PRODUCTS_DIR)/DuckDuckGo App Store.app/Contents/MacOS/DuckDuckGo App Store
