@@ -305,6 +305,9 @@ struct UserText {
 
     // MARK: - Login Import & Export
 
+    static let safariPreferences = NSLocalizedString("import.logins.safari.preferences", value: "Preferences", comment: "Title of the Safari Preferences menu (up to and including macOS 12)")
+    static let safariSettings = NSLocalizedString("import.logins.safari.settings", value: "Settings", comment: "Title of the Safari Settings menu (macOS 13 and above)")
+
     static let importLoginsCSV = NSLocalizedString("import.logins.csv.title", value: "CSV Logins File", comment: "Title text for the CSV importer")
     static let importBookmarksHTML = NSLocalizedString("import.bookmarks.html.title", value: "HTML Bookmarks File", comment: "Title text for the HTML Bookmarks importer")
     static let importBookmarksSelectHTMLFile = NSLocalizedString("import.bookmarks.select-html-file", value: "Select HTML Bookmarks File…", comment: "Button text for selecting HTML Bookmarks file")

@@ -56,6 +56,8 @@ final class FileImportViewController: NSViewController {
     @IBOutlet var lastPassInfoView: NSView!
     @IBOutlet var onePasswordInfoView: NSView!
 
+    @IBOutlet var safariSettingsTextField: NSTextField!
+
     var importSource: DataImport.Source = .csv {
         didSet {
             if oldValue != importSource {
@@ -81,7 +83,20 @@ final class FileImportViewController: NSViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        setUpSafariImportInstructions()
         renderCurrentState()
+    }
+
+    private func setUpSafariImportInstructions() {
+        let safariSettingsTitle: String = {
+            if #available(macOS 13.0, *) {
+                return UserText.safariSettings
+            } else {
+                return UserText.safariPreferences
+            }
+        }()
+
+        safariSettingsTextField.stringValue = "Safari → \(safariSettingsTitle)"
     }
 
     private func renderCurrentState() {
