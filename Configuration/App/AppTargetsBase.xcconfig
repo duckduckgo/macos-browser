@@ -14,7 +14,6 @@
 //
 
 #include "../Common.xcconfig"
-#include "ModuleName.xcconfig"
 
 ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon
 ASSETCATALOG_COMPILER_APPICON_NAME[config=Debug] = Icon - Debug

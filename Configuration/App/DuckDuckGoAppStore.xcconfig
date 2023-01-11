@@ -15,6 +15,7 @@
 
 #include "AppTargetsBase.xcconfig"
 #include "../AppStore.xcconfig"
+#include "ManualAppStoreRelease.xcconfig"
 
 BUNDLE_IDENTIFIER_PREFIX = com.duckduckgo.mobile.ios
 
@@ -34,6 +35,7 @@ MACOSX_DEPLOYMENT_TARGET = 12.3
 
 PRODUCT_MODULE_NAME = DuckDuckGo_Privacy_Browser
 PRODUCT_NAME_PREFIX = DuckDuckGo App Store
+PRODUCT_NAME[config=Release][arch=*][sdk=*] = $(RELEASE_PRODUCT_NAME_OVERRIDE:default=$(PRODUCT_NAME_PREFIX))
 
 PROVISIONING_PROFILE_SPECIFIER[config=Debug][sdk=macosx*] = match Development com.duckduckgo.mobile.ios.* macos
 PROVISIONING_PROFILE_SPECIFIER[config=CI][sdk=macosx*] =
