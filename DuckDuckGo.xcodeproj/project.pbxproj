@@ -596,7 +596,6 @@
 		3706FCA3293F65D500E42796 /* WKProcessPool+GeolocationProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6553691268440D700085A79 /* WKProcessPool+GeolocationProvider.swift */; };
 		3706FCA4293F65D500E42796 /* RecentlyClosedMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA5C1DD0285A154E0089850C /* RecentlyClosedMenu.swift */; };
 		3706FCA7293F65D500E42796 /* BrowserServicesKit in Frameworks */ = {isa = PBXBuildFile; productRef = 3706FA71293F65D500E42796 /* BrowserServicesKit */; };
-		3706FCA8293F65D500E42796 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85AE2FF124A33A2D002D507F /* WebKit.framework */; };
 		3706FCA9293F65D500E42796 /* ContentBlocking in Frameworks */ = {isa = PBXBuildFile; productRef = 3706FA76293F65D500E42796 /* ContentBlocking */; };
 		3706FCAA293F65D500E42796 /* UserScript in Frameworks */ = {isa = PBXBuildFile; productRef = 3706FA78293F65D500E42796 /* UserScript */; };
 		3706FCAB293F65D500E42796 /* TrackerRadarKit in Frameworks */ = {isa = PBXBuildFile; productRef = 3706FA6B293F65D500E42796 /* TrackerRadarKit */; };
@@ -2636,7 +2635,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				3706FCA7293F65D500E42796 /* BrowserServicesKit in Frameworks */,
-				3706FCA8293F65D500E42796 /* WebKit.framework in Frameworks */,
 				3706FCA9293F65D500E42796 /* ContentBlocking in Frameworks */,
 				3706FCAA293F65D500E42796 /* UserScript in Frameworks */,
 				3706FCAB293F65D500E42796 /* TrackerRadarKit in Frameworks */,
