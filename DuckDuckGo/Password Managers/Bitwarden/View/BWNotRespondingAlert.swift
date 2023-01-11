@@ -45,9 +45,9 @@ final class BWNotRespondingAlert: NSAlert {
         let bitwarden = runningApplications.first { runningApplication in
             runningApplication.bundleIdentifier == BWManager.bundleId
         }
-        
+
         bitwarden?.terminate()
-        
+
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
             if let url = NSWorkspace.shared.urlForApplication(withBundleIdentifier: BWManager.bundleId) {
                 let configuration = NSWorkspace.OpenConfiguration()
