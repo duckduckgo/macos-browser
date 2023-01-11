@@ -95,8 +95,11 @@ final class JSAlertController: NSViewController {
 
     override func viewDidLayout() {
         super.viewDidLayout()
+        
+        let messageHeight = messageText.textSize.height
+        scrollViewHeight.constant = messageHeight
 
-        if messageText.textSize.height <= scrollView.frame.height {
+        if messageHeight <= scrollView.frame.height {
             scrollView.verticalScrollElasticity = .none
         } else {
             scrollView.verticalScrollElasticity = .automatic
@@ -130,13 +133,12 @@ final class JSAlertController: NSViewController {
         messageText.string = viewModel.messageText
 
         cancelButton.isHidden = viewModel.isCancelButtonHidden
-        messageText.sizeToFit()
-        scrollViewHeight.constant = messageText.textSize.height + 4
 
         textField.isHidden = viewModel.isTextFieldHidden
         let scrollViewSpacing = viewModel.isTextFieldHidden ? verticalStackView.spacing : 4
         verticalStackView.setCustomSpacing(scrollViewSpacing, after: scrollView)
         textField.stringValue = viewModel.textFieldDefaultText
+        messageText.sizeToFit()
     }
 
     private func animateIn(_ completion: @escaping () -> Void) {
