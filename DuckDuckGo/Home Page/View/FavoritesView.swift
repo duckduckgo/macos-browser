@@ -299,9 +299,19 @@ struct Favorite: View {
 
     let bookmark: Bookmark
 
+    // Maintain separate copies of bookmark metadata required by the view, in order to ensure that SwiftUI re-renders correctly.
+    private let bookmarkTitle: String
+    private let bookmarkURL: URL
+
+    init(bookmark: Bookmark) {
+        self.bookmark = bookmark
+        self.bookmarkTitle = bookmark.title
+        self.bookmarkURL = bookmark.url
+    }
+
     var body: some View {
 
-        FavoriteTemplate(title: bookmark.title, domain: bookmark.url.host)
+        FavoriteTemplate(title: bookmarkTitle, domain: bookmarkURL.host)
             .link {
                 model.open(bookmark)
             }.contextMenu(ContextMenu(menuItems: {

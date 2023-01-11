@@ -224,6 +224,17 @@ extension PrivatePlayer {
         return url.isPrivatePlayer ? PrivatePlayer.commonName : nil
     }
 
+    func sharingData(for title: String, url: URL) -> (title: String, url: URL)? {
+        guard isAvailable, mode != .disabled, url.isPrivatePlayerScheme, let (videoID, timestamp) = url.youtubeVideoParams else {
+            return nil
+        }
+
+        let title = title.dropping(prefix: Self.websiteTitlePrefix)
+        let sharingURL = URL.youtube(videoID, timestamp: timestamp)
+
+        return (title, sharingURL)
+    }
+
     func title(for page: HomePage.Models.RecentlyVisitedPageModel) -> String? {
         guard isAvailable, mode != .disabled else {
             return nil

@@ -73,8 +73,9 @@ final class SharingMenu: NSMenu {
             return
         }
 
-        service.subject = tabViewModel.title
-        service.perform(withItems: [url])
+        let sharingData = PrivatePlayer.shared.sharingData(for: tabViewModel.title, url: url) ?? (tabViewModel.title, url)
+        service.subject = sharingData.title
+        service.perform(withItems: [sharingData.url])
     }
 
 }
