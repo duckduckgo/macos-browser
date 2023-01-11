@@ -29,7 +29,7 @@ final class AutofillTabExtension: TabExtension {
     }
 
     static var vaultManagerProvider: (SecureVaultManagerDelegate) -> AutofillSecureVaultDelegate = { delegate in
-        let manager = SecureVaultManager()
+        let manager = SecureVaultManager(passwordManager: PasswordManagerCoordinator.shared)
         manager.delegate = delegate
         return manager
     }
