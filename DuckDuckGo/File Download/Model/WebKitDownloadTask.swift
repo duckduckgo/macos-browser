@@ -18,6 +18,7 @@
 
 import Foundation
 import Combine
+import UniformTypeIdentifiers
 
 protocol WebKitDownloadTaskDelegate: AnyObject {
     func fileDownloadTaskNeedsDestinationURL(_ task: WebKitDownloadTask,

@@ -121,7 +121,7 @@ final class FileDownloadManagerTests: XCTestCase {
         dm.add(download, delegate: self, location: .prompt, postflight: .none)
 
         let url = URL(string: "https://duckduckgo.com/somefile.html")!
-        let response = URLResponse(url: url, mimeType: UTType.pdf.mimeType, expectedContentLength: 1, textEncodingName: "utf-8")
+        let response = URLResponse(url: url, mimeType: UTType.pdf.utType.preferredMIMEType, expectedContentLength: 1, textEncodingName: "utf-8")
         let e2 = expectation(description: "WKDownload callback called")
         download.downloadDelegate?.download(download,
                                             decideDestinationUsing: response,

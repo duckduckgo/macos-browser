@@ -16,8 +16,9 @@
 //  limitations under the License.
 //
 
-import Foundation
 import Combine
+import Foundation
+import UniformTypeIdentifiers
 
 final class DownloadViewModel {
 

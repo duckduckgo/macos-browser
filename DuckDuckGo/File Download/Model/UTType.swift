@@ -16,8 +16,18 @@
 //  limitations under the License.
 //
 
+import AppKit
 import Foundation
 import UniformTypeIdentifiers
+
+#if APPSTORE
+extension UTType {
+    var icon: NSImage {
+        NSWorkspace.shared.icon(for: self)
+    }
+}
+
+#else
 
 struct UTType: RawRepresentable, Hashable {
     static let html = UTType(rawValue: kUTTypeHTML)
@@ -31,6 +41,14 @@ struct UTType: RawRepresentable, Hashable {
         self.rawValue = rawValue
     }
 
+    init(_ identifier: String) {
+        self.rawValue = identifier as CFString
+    }
+
+    var identifier: String {
+        rawValue as String
+    }
+
     init?(mimeType: String) {
         guard let contentType = UTTypeCreatePreferredIdentifierForTag(kUTTagClassMIMEType, mimeType as CFString, nil)
         else {
@@ -39,8 +57,8 @@ struct UTType: RawRepresentable, Hashable {
         self.rawValue = contentType.takeRetainedValue()
     }
 
-    init?(fileExtension: String) {
-        guard let uti = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, fileExtension as CFString, nil)
+    init?(filenameExtension: String) {
+        guard let uti = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, filenameExtension as CFString, nil)
         else {
             return nil
         }
@@ -51,11 +69,11 @@ struct UTType: RawRepresentable, Hashable {
 
 extension UTType {
 
-    var mimeType: String? {
+    var preferredMIMEType: String? {
         UTTypeCopyPreferredTagWithClass(self.rawValue, kUTTagClassMIMEType)?.takeRetainedValue() as String?
     }
 
-    var fileExtension: String? {
+    var preferredFilenameExtension: String? {
         UTTypeCopyPreferredTagWithClass(self.rawValue, kUTTagClassFilenameExtension)?.takeRetainedValue() as String?
     }
 
@@ -63,16 +81,18 @@ extension UTType {
         UTTypeCopyDescription(self.rawValue)?.takeRetainedValue() as String?
     }
 
-    @available(OSX 11.0, *)
+    @available(macOS 11.0, *)
     private var utType: UniformTypeIdentifiers.UTType {
         UniformTypeIdentifiers.UTType(rawValue as String) ?? .plainText
     }
 
     var icon: NSImage {
-        guard #available(OSX 11.0, *) else {
+        guard #available(macOS 11.0, *) else {
             return NSWorkspace.shared.icon(forFileType: rawValue as String)
         }
         return NSWorkspace.shared.icon(for: self.utType)
     }
 
 }
+
+#endif

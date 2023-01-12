@@ -50,9 +50,9 @@ extension NSSavePanel {
 
         popup.removeAllItems()
         var selectedItem: NSMenuItem?
-        let preferredFileType = Self.preferredFileType.map(UTType.init(mimeType:))
+        let preferredFileType: UTType? = Self.preferredFileType.flatMap { UTType.init(mimeType: $0) }
         for fileType in fileTypes {
-            popup.addItem(withTitle: "\(fileType.description ?? "") (.\(fileType.fileExtension ?? ""))")
+            popup.addItem(withTitle: "\(fileType.description) (.\(fileType.preferredFilenameExtension ?? ""))")
             let item = popup.item(at: popup.numberOfItems - 1)
             item?.representedObject = fileType
 
@@ -83,18 +83,18 @@ extension NSSavePanel {
             }
             return
         }
-        if fileType.fileExtension?.isEmpty == false,
-           let mimeType = fileType.mimeType {
+        if fileType.preferredFilenameExtension?.isEmpty == false,
+           let mimeType = fileType.preferredMIMEType {
             Self.preferredFileType = mimeType
         }
         if #available(macOS 11.0, *) {
-            guard let fileExtension = fileType.fileExtension else {
+            guard let fileExtension = fileType.preferredFilenameExtension else {
                 self.allowedContentTypes = []
                 return
             }
             self.allowedContentTypes = [UniformTypeIdentifiers.UTType.init(filenameExtension: fileExtension)].compactMap { $0 }
         } else {
-            self.allowedFileTypes = [fileType.rawValue as String]
+            self.allowedFileTypes = [fileType.identifier as String]
         }
     }
 

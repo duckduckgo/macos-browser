@@ -28,6 +28,7 @@ import ContentBlocking
 import UserScript
 import Common
 import PrivacyDashboard
+import UniformTypeIdentifiers
 
 protocol TabDelegate: ContentOverlayUserScriptDelegate {
     func tabWillStartNavigation(_ tab: Tab, isUserInitiated: Bool)
@@ -496,7 +497,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         webView.getMimeType { [weak self] mimeType in
             guard let self else { return }
             let webView = self.webView
-            guard case .some(.html) = mimeType.flatMap(UTType.init(mimeType:)) else {
+            guard case .some(.html) = mimeType.flatMap({ UTType.init(mimeType: $0) }) else {
                 if let url = webView.url {
                     self.download(from: url, promptForLocation: true)
                 }

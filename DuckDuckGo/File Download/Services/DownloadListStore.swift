@@ -19,6 +19,7 @@
 import Foundation
 import CoreData
 import Combine
+import UniformTypeIdentifiers
 
 protocol DownloadListStoring {
 
@@ -212,7 +213,7 @@ extension DownloadListItem {
                   modified: modified,
                   url: url,
                   websiteURL: managedObject.websiteURLEncrypted as? URL,
-                  fileType: managedObject.fileType.map { UTType(rawValue: $0 as CFString) },
+                  fileType: managedObject.fileType.flatMap { UTType.init($0) },
                   destinationURL: managedObject.destinationURLEncrypted as? URL,
                   tempURL: managedObject.tempURLEncrypted as? URL,
                   error: (managedObject.errorEncrypted as? NSError).map(FileDownloadError.init))
@@ -234,7 +235,7 @@ extension DownloadManagedObject {
         urlEncrypted = item.url as NSURL
         websiteURLEncrypted = item.websiteURL as NSURL?
         modified = item.modified
-        fileType = item.fileType?.rawValue as String?
+        fileType = item.fileType?.identifier
         destinationURLEncrypted = item.destinationURL as NSURL?
         tempURLEncrypted = item.tempURL as NSURL?
         errorEncrypted = item.error as NSError?

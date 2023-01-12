@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import UniformTypeIdentifiers
 import WebKit
 
 // A workaround to bring WKDownload support back to macOS 11.3 (which really has WKDownload support)
@@ -120,7 +121,7 @@ extension WKWebView {
             create = { self.createPDF(withConfiguration: nil, completionHandler: $0) }
 
         case .html:
-            create = self.createWebArchiveData
+            create = self.createWebArchiveData(completionHandler:)
             transform = { data in
                 // extract HTML from WebArchive bplist
                 guard let dict = try PropertyListSerialization.propertyList(from: data, options: [], format: nil) as? [String: Any],

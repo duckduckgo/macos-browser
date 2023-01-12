@@ -19,6 +19,7 @@
 import Cocoa
 import Combine
 import os
+import UniformTypeIdentifiers
 
 protocol FileDownloadManagerProtocol: AnyObject {
     var downloads: Set<WebKitDownloadTask> { get }
@@ -144,7 +145,7 @@ extension FileDownloadManager: WebKitDownloadTaskDelegate {
         let completion: (URL?, UTType?) -> Void = { url, fileType in
             if let url = url,
                let originalRect = self.fileIconOriginalRectCallbacks[task]?(task) {
-                task.progress.flyToImage = (UTType(fileExtension: url.pathExtension) ?? fileType)?.icon
+                task.progress.flyToImage = (UTType(filenameExtension: url.pathExtension) ?? fileType)?.icon
                 task.progress.fileIconOriginalRect = originalRect
             }
 
@@ -177,7 +178,7 @@ extension FileDownloadManager: WebKitDownloadTaskDelegate {
 
         // drop known extension, it would be appended by SavePanel
         var suggestedFilename = suggestedFilename
-        if let ext = fileType?.fileExtension {
+        if let ext = fileType?.preferredFilenameExtension {
             suggestedFilename = suggestedFilename.dropping(suffix: "." + ext)
         }
 

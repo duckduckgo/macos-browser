@@ -18,6 +18,7 @@
 
 import Combine
 import Foundation
+import UniformTypeIdentifiers
 import WebKit
 
 extension Tab: WKUIDelegate, PrintingUserScriptDelegate {

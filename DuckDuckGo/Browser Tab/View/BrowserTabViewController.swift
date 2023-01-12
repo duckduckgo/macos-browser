@@ -22,6 +22,7 @@ import os.log
 import Combine
 import SwiftUI
 import BrowserServicesKit
+import UniformTypeIdentifiers
 
 final class BrowserTabViewController: NSViewController {
 
@@ -714,14 +715,14 @@ extension BrowserTabViewController: TabDelegate {
         guard let window = view.window else { return nil }
 
         var fileTypes = request.parameters.fileTypes
-        if fileTypes.isEmpty || (fileTypes.count == 1 && (fileTypes[0].fileExtension?.isEmpty ?? true)),
+        if fileTypes.isEmpty || (fileTypes.count == 1 && (fileTypes[0].preferredFilenameExtension?.isEmpty ?? true)),
            let fileExt = (request.parameters.suggestedFilename as NSString?)?.pathExtension,
-           let utType = UTType(fileExtension: fileExt) {
+           let utType = UTType(filenameExtension: fileExt) {
             // When no file extension is set by default generate fileType from file extension
             fileTypes.insert(utType, at: 0)
         }
         // allow user set any file extension
-        if fileTypes.count == 1 && !fileTypes.contains(where: { $0.fileExtension?.isEmpty ?? true }) {
+        if fileTypes.count == 1 && !fileTypes.contains(where: { $0.preferredFilenameExtension?.isEmpty ?? true }) {
             fileTypes.append(.data)
         }
 

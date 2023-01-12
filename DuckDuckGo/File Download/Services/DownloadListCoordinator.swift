@@ -19,6 +19,8 @@
 import Foundation
 import Combine
 import os.log
+import UniformTypeIdentifiers
+import WebKit
 
 private func getFirstAvailableWebView() -> WKWebView? {
     let wcm = WindowControllersManager.shared
