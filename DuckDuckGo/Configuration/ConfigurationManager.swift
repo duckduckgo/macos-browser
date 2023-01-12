@@ -119,7 +119,7 @@ final class ConfigurationManager {
                 DefaultConfigurationStorage.shared.log()
                 log()
 
-            } receiveValue: { _ in
+            } receiveValue: { value in
                 // no-op - if you want to do something more globally if any of the files were downloaded, this is the place
             }
 
