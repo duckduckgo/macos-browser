@@ -1,33 +1,33 @@
-DuckDuckGo for Mac is a free browsing app that gives you comprehensive online privacy protection. With one download, you get a private everyday Internet browser that offers seamless protection while you search and browse - plus access to free tracking protection for your email inbox, secure password management, and more.  
+DuckDuckGo for Mac is a free browsing app that gives you comprehensive online privacy protection. With one download, you get a private everyday Internet browser that offers seamless protection while you search and browse - plus access to free tracking protection for your email inbox, secure password management, and more.
  
-FEATURE HIGHLIGHTS  
-• Search Privately by Default - DuckDuckGo Private Search comes built in, so you can easily search the web without being tracked. 
+FEATURE HIGHLIGHTS
+• Search Privately by Default - DuckDuckGo Private Search comes built in, so you can easily search the web without being tracked.
 
-• Block Most Trackers Before They Load - Stay secure with our cutting-edge tracker-blocking technology. 3rd-Party Tracker Loading Protection goes above and beyond what most popular web browsers offer by default, stopping most hidden tracking scripts from loading and collecting your personal data. 
+• Block Most Trackers Before They Load - Stay secure with our cutting-edge tracker-blocking technology. 3rd-Party Tracker Loading Protection goes above and beyond what most popular web browsers offer by default, stopping most hidden tracking scripts from loading and collecting your personal data.
 
-• Enable Built-in Email Protection (Beta) – Get free Duck Addresses (@duck.com) to block most email trackers – which we’ve caught in 85% of emails – and hide your existing email address when signing up for things online, all without switching email providers. 
+• Enable Built-in Email Protection (Beta) – Get free Duck Addresses (@duck.com) to block most email trackers – which we’ve caught in 85% of emails – and hide your existing email address when signing up for things online, all without switching email providers.
 
-• Clean Up YouTube with Duck Player - Watch YouTube videos more privately on Duck Player; we’ll protect you from targeted ads and cookies with a distraction-free interface that incorporates YouTube’s strictest privacy settings for embedded video.  
+• Clean Up YouTube with Duck Player - Watch YouTube videos more privately in Duck Player. We’ll protect you from targeted ads and cookies with a distraction-free interface that incorporates YouTube’s strictest privacy settings for embedded video.
 
-• Automatically Enforce Encryption - Force many sites you visit to automatically use an encrypted (HTTPS) connection, which helps shield your data from Wi-Fi snoopers and network onlookers like your Internet provider.  
+• Automatically Enforce Encryption - Force many sites you visit to automatically use an encrypted (HTTPS) connection, which helps shield your data from Wi-Fi snoopers and network onlookers like your Internet provider.
 
-• Escape Fingerprinting – Make it harder for companies to create a unique identifier for you by blocking their attempts to combine specific information about your web browser and device settings.  
+• Escape Fingerprinting – Make it harder for companies to create a unique identifier for you by blocking their attempts to combine specific information about your web browser and device settings.
 
-• Secure Your Passwords with Bitwarden – Keep your usernames and passwords safe with DuckDuckGo’s built-in password manager, or connect your Bitwarden account for seamless password management across devices. 
+• Import Bookmarks and Passwords – Using another browser or password manager to store passwords? It’s quick and easy to bring all your login info to DuckDuckGo’s secure password manager. Bookmarks, too!
  
-We feature many protections not available on most Internet browsers (even in incognito mode), including protection from link tracking, Google AMP tracking, and more.  
+• We feature many protections not available on most Internet browsers (even in incognito mode), including protection from link tracking, Google AMP tracking, and more.
  
-EVERYDAY PRIVACY CONTROLS  
-• Hit Fire Button, Burn Data - Clear your tabs and browsing data fast with our Fire Button.  
+EVERYDAY PRIVACY CONTROLS
+• Hit Fire Button, Burn Data - Clear your tabs and browsing data fast with our Fire Button.
 
-• Banish Cookie Pop-Ups – When DuckDuckGo for Mac detects cookie consent pop-ups on sites you visit, we’ll automatically set your preferences to minimize cookies and maximize privacy every time. 
+• Banish Cookie Pop-Ups – When we detect cookie consent pop-ups on sites you visit, we’ll work in the background to automatically set your preferences, minimizing cookies and maximizing privacy -- then close the pop-ups.
 
-• Signal Your Privacy Preference with Global Privacy Control (GPC) - Built into our app, GPC intends to help you express your opt-out rights automatically by telling websites not to sell or share your personal information. Whether it can be used to enforce your legal rights (for example, current or future CCPA, GDPR requirements) depends on the laws in your jurisdiction.  
+• Signal Your Privacy Preference with Global Privacy Control (GPC) - Built into our app, GPC intends to help you express your opt-out rights automatically by telling websites not to sell or share your personal information. Whether it can be used to enforce your legal rights (for example, current or future CCPA, GDPR requirements) depends on the laws in your jurisdiction.
  
-Note about our 3rd-Party Tracker Loading Protection following DuckDuckGo ad clicks: Our 3rd-Party Tracker Protection goes above and beyond what you get in most popular browsers by default, but we’re constantly working to make it more comprehensive. Currently, if an advertiser wants to detect conversions on their own website for our private DuckDuckGo search ads, our 3rd-Party Tracker Loading Protection will not stop bat.bing.com requests from loading on the advertiser’s website following DuckDuckGo ad clicks, but those requests are stopped in all other contexts. This is because DuckDuckGo private search advertising is in partnership with Microsoft. As part of that partnership, viewing ads on DuckDuckGo is anonymous and Microsoft has committed to not profile our users’ ad clicks.  
+Note about our 3rd-Party Tracker Loading Protection following DuckDuckGo ad clicks: Our 3rd-Party Tracker Protection goes above and beyond what you get in most popular browsers by default, but we’re constantly working to make it more comprehensive. Currently, if an advertiser wants to detect conversions on their own website for our private DuckDuckGo search ads, our 3rd-Party Tracker Loading Protection will not stop bat.bing.com requests from loading on the advertiser’s website following DuckDuckGo ad clicks, but those requests are stopped in all other contexts. This is because DuckDuckGo private search advertising is in partnership with Microsoft. As part of that partnership, viewing ads on DuckDuckGo is anonymous and Microsoft has committed to not profile our users’ ad clicks.
 
-Read more about this and our free Tracking Protections at https://help.duckduckgo.com/privacy/web-tracking-protections  
+Read more about this and our free Tracking Protections at https://help.duckduckgo.com/privacy/web-tracking-protections
  
-You don't need to wait to take back your privacy. Join the millions of people using DuckDuckGo and protect many of your everyday online activities with one app. It's privacy, simplified.   
+You don't need to wait to take back your privacy. Join the millions of people using DuckDuckGo and protect many of your everyday online activities with one app. It's privacy, simplified.
 
-Privacy Policy: https://duckduckgo.com/privacy/  
+Privacy Policy: https://duckduckgo.com/privacy/
