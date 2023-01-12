@@ -74,7 +74,7 @@ jobs:
         submodules: recursive
 
     - name: Select Xcode
-      run: sudo xcode-select -s /Applications/Xcode_14.1.app/Contents/Developer
+      run: sudo xcode-select -s /Applications/Xcode_14.2.app/Contents/Developer
 
     - name: Install xcbeautify
       run: brew install xcbeautify
