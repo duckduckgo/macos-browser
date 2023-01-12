@@ -104,21 +104,22 @@ final class AutofillPreferences: AutofillPreferencesPersistor {
     @UserDefaultsWrapper(key: .askToSavePaymentMethods, defaultValue: true)
     var askToSavePaymentMethods: Bool
 
+#if APPSTORE
+    var passwordManager: PasswordManager {
+        get { return .duckduckgo }
+        set {}
+    }
+#else
     var passwordManager: PasswordManager {
         get {
-            if NSApp.isSandboxed {
-                return .duckduckgo
-            }
             return PasswordManager(rawValue: selectedPasswordManager) ?? .duckduckgo
         }
 
         set {
-            if NSApp.isSandboxed {
-                return
-            }
             selectedPasswordManager = newValue.rawValue
         }
     }
+#endif
 
     @UserDefaultsWrapper(key: .selectedPasswordManager, defaultValue: PasswordManager.duckduckgo.rawValue)
     private var selectedPasswordManager: String

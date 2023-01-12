@@ -63,37 +63,36 @@ extension Preferences {
                 Text(UserText.autofill)
                     .font(Const.Fonts.preferencePaneTitle)
 
-                if !NSApp.isSandboxed {
+#if APPSTORE
+#else
+                // Password Manager:
 
-                    // Password Manager:
-
-                    Section(spacing: 0) {
-                        Text(UserText.autofillPasswordManager)
-                            .font(Const.Fonts.preferencePaneSectionHeader)
-                            .padding(.bottom, 6)
-
-                        Picker(selection: passwordManagerBinding, content: {
-                            Text(UserText.autofillPasswordManagerDuckDuckGo).tag(PasswordManager.duckduckgo)
-
-                            Text(UserText.autofillPasswordManagerBitwarden).tag(PasswordManager.bitwarden)
-                        }, label: {})
-                        .pickerStyle(.radioGroup)
-                        .offset(x: Const.pickerHorizontalOffset)
+                Section(spacing: 0) {
+                    Text(UserText.autofillPasswordManager)
+                        .font(Const.Fonts.preferencePaneSectionHeader)
                         .padding(.bottom, 6)
 
-                        switch (model.passwordManager, model.isBitwardenSetupFlowPresented) {
-                        case (.bitwarden, false):
-                            bitwardenStatusView(for: bitwardenManager.status)
-                        case (.duckduckgo, _), (.bitwarden, true):
-                            Text(UserText.autofillPasswordManagerBitwardenDisclaimer)
-                                .font(Const.Fonts.preferencePaneCaption)
-                                .foregroundColor(Color("GreyTextColor"))
-                                .fixMultilineScrollableText()
-                                .offset(x: Const.autoLockWarningOffset)
-                        }
-                    }
+                    Picker(selection: passwordManagerBinding, content: {
+                        Text(UserText.autofillPasswordManagerDuckDuckGo).tag(PasswordManager.duckduckgo)
 
+                        Text(UserText.autofillPasswordManagerBitwarden).tag(PasswordManager.bitwarden)
+                    }, label: {})
+                    .pickerStyle(.radioGroup)
+                    .offset(x: Const.pickerHorizontalOffset)
+                    .padding(.bottom, 6)
+
+                    switch (model.passwordManager, model.isBitwardenSetupFlowPresented) {
+                    case (.bitwarden, false):
+                        bitwardenStatusView(for: bitwardenManager.status)
+                    case (.duckduckgo, _), (.bitwarden, true):
+                        Text(UserText.autofillPasswordManagerBitwardenDisclaimer)
+                            .font(Const.Fonts.preferencePaneCaption)
+                            .foregroundColor(Color("GreyTextColor"))
+                            .fixMultilineScrollableText()
+                            .offset(x: Const.autoLockWarningOffset)
+                    }
                 }
+#endif
 
                 // Ask to Save:
 

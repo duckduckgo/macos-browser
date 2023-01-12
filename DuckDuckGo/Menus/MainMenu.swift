@@ -105,10 +105,10 @@ final class MainMenu: NSMenu {
             printSeparatorItem?.removeFromParent()
         }
 
-        if NSApp.isSandboxed {
-            checkForUpdatesMenuItem?.removeFromParent()
-            checkForUpdatesSeparatorItem?.removeFromParent()
-        }
+#if APPSTORE
+        checkForUpdatesMenuItem?.removeFromParent()
+        checkForUpdatesSeparatorItem?.removeFromParent()
+#endif
 
         sharingMenu.title = shareMenuItem.title
         shareMenuItem.submenu = sharingMenu
