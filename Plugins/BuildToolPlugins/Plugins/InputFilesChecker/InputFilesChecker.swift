@@ -20,6 +20,16 @@ import Foundation
 import PackagePlugin
 import XcodeProjectPlugin
 
+/**
+ * This dictionary keeps track of input files that are not present in all targets.
+ *
+ * By default, we expect all input files to be added to all app targets or tests targets.
+ * If this is not the case, exceptions should be listed here.
+ *
+ * Add here files that are not included in all app targets or all unit tests targets.
+ * This dictionary is checked at every build and if there are files not listed there, that
+ * were otherwise not included in all app/test targets, the build will stop with an error.
+ */
 let extraInputFiles: [TargetName: Set<InputFile>] = [
     "DuckDuckGo Privacy Browser": [
         .init("BWEncryption.m", .source),
@@ -34,7 +44,9 @@ let extraInputFiles: [TargetName: Set<InputFile>] = [
     "Unit Tests": [
         .init("BWEncryptionTests.swift", .source),
         .init("WKWebViewPrivateMethodsAvailabilityTests.swift", .source)
-    ]
+    ],
+
+    "Integration Tests": []
 ]
 
 typealias TargetName = String
