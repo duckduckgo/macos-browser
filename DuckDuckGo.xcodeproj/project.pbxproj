@@ -48,6 +48,7 @@
 		1E950E412912A10D0051A99B /* PrivacyDashboard in Frameworks */ = {isa = PBXBuildFile; productRef = 1E950E402912A10D0051A99B /* PrivacyDashboard */; };
 		1E950E432912A10D0051A99B /* UserScript in Frameworks */ = {isa = PBXBuildFile; productRef = 1E950E422912A10D0051A99B /* UserScript */; };
 		3106AD76287F000600159FE5 /* CookieConsentUserPermissionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3106AD75287F000600159FE5 /* CookieConsentUserPermissionViewController.swift */; };
+		310E79BF294A19A8007C49E8 /* FireproofingReferenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 310E79BE294A19A8007C49E8 /* FireproofingReferenceTests.swift */; };
 		311B262728E73E0A00FD181A /* TabShadowConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311B262628E73E0A00FD181A /* TabShadowConfig.swift */; };
 		313AEDA1287CAD1D00E1E8F4 /* CookieConsentUserPermissionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 313AEDA0287CAD1D00E1E8F4 /* CookieConsentUserPermissionView.swift */; };
 		3154FD1428E6011A00909769 /* TabShadowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3154FD1328E6011A00909769 /* TabShadowView.swift */; };
@@ -1782,6 +1783,7 @@
 		1E7E2E9129029F9B00C01B54 /* WebsiteBreakageReporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebsiteBreakageReporter.swift; sourceTree = "<group>"; };
 		1E7E2E932902AC0E00C01B54 /* PrivacyDashboardPermissionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyDashboardPermissionHandler.swift; sourceTree = "<group>"; };
 		3106AD75287F000600159FE5 /* CookieConsentUserPermissionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieConsentUserPermissionViewController.swift; sourceTree = "<group>"; };
+		310E79BE294A19A8007C49E8 /* FireproofingReferenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FireproofingReferenceTests.swift; sourceTree = "<group>"; };
 		311B262628E73E0A00FD181A /* TabShadowConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabShadowConfig.swift; sourceTree = "<group>"; };
 		313AEDA0287CAD1D00E1E8F4 /* CookieConsentUserPermissionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieConsentUserPermissionView.swift; sourceTree = "<group>"; };
 		3154FD1328E6011A00909769 /* TabShadowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabShadowView.swift; sourceTree = "<group>"; };
@@ -2845,6 +2847,7 @@
 			children = (
 				31E163BE293A580000963C10 /* Resources */,
 				31E163B9293A56F400963C10 /* BrokenSiteReportingReferenceTests.swift */,
+				310E79BE294A19A8007C49E8 /* FireproofingReferenceTests.swift */,
 				31E163BC293A579E00963C10 /* PrivacyReferenceTestHelper.swift */,
 			);
 			path = "Privacy Reference Tests";
@@ -7425,6 +7428,7 @@
 				AA63745424C9BF9A00AB2AC4 /* SuggestionContainerTests.swift in Sources */,
 				AAC9C01524CAFBCE00AD1325 /* TabTests.swift in Sources */,
 				B69B504C2726CA2900758A2B /* MockVariantManager.swift in Sources */,
+				310E79BF294A19A8007C49E8 /* FireproofingReferenceTests.swift in Sources */,
 				B610F2EC27AA8F9400FCEBE9 /* ContentBlockerRulesManagerMock.swift in Sources */,
 				B6BBF1722744CE36004F850E /* FireproofDomainsStoreMock.swift in Sources */,
 				4BA1A6D9258C0CB300F6F690 /* DataEncryptionTests.swift in Sources */,
