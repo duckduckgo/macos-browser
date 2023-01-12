@@ -5421,7 +5421,7 @@
 			buildRules = (
 			);
 			dependencies = (
-				37D0CFBB29463A1800416B92 /* PBXTargetDependency */,
+				3799999429705E1F003318B1 /* PBXTargetDependency */,
 			);
 			name = "DuckDuckGo Privacy Browser App Store";
 			packageProductDependencies = (
@@ -5530,7 +5530,7 @@
 			buildRules = (
 			);
 			dependencies = (
-				37D0CFB1294639E800416B92 /* PBXTargetDependency */,
+				3799999229705E1A003318B1 /* PBXTargetDependency */,
 			);
 			name = "DuckDuckGo Privacy Browser";
 			packageProductDependencies = (
@@ -7522,13 +7522,13 @@
 			target = 3706FA6A293F65D500E42796 /* DuckDuckGo Privacy Browser App Store */;
 			targetProxy = 37079A94294236FA0031BB3C /* PBXContainerItemProxy */;
 		};
-		37D0CFB1294639E800416B92 /* PBXTargetDependency */ = {
+		3799999229705E1A003318B1 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			productRef = 37D0CFB0294639E800416B92 /* InputFilesChecker */;
+			productRef = 3799999129705E1A003318B1 /* InputFilesChecker */;
 		};
-		37D0CFBB29463A1800416B92 /* PBXTargetDependency */ = {
+		3799999429705E1F003318B1 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			productRef = 37D0CFBA29463A1800416B92 /* InputFilesChecker */;
+			productRef = 3799999329705E1F003318B1 /* InputFilesChecker */;
 		};
 		4B1AD8A325FC27E200261379 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -8062,11 +8062,11 @@
 			package = 3706FDD7293F661700E42796 /* XCRemoteSwiftPackageReference "OHHTTPStubs" */;
 			productName = OHHTTPStubsSwift;
 		};
-		37D0CFB0294639E800416B92 /* InputFilesChecker */ = {
+		3799999129705E1A003318B1 /* InputFilesChecker */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = "plugin:InputFilesChecker";
 		};
-		37D0CFBA29463A1800416B92 /* InputFilesChecker */ = {
+		3799999329705E1F003318B1 /* InputFilesChecker */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = "plugin:InputFilesChecker";
 		};
