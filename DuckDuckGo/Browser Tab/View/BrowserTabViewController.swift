@@ -458,12 +458,10 @@ final class BrowserTabViewController: NSViewController {
 
     private func showAlert(with query: JSAlertQuery) -> AnyCancellable {
         let jsAlertController = JSAlertController.create(query)
-        addAndLayoutChild(jsAlertController)
+        present(jsAlertController, animator: jsAlertController)
 
-        return AnyCancellable {
-            jsAlertController.dismiss {
-                jsAlertController.removeCompletely()
-            }
+        return AnyCancellable { [weak self] in
+            self?.dismiss(jsAlertController)
         }
     }
 }

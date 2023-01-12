@@ -81,16 +81,6 @@ final class JSAlertController: NSViewController {
         if let okButtonCell = okButton.cell as? NSButtonCell {
             view.window?.defaultButtonCell = okButtonCell
         }
-
-        alertView.alphaValue = 1.0
-        backgroundView.alphaValue = 1.0
-
-        // prevents initial layout bleeding into animation
-        DispatchQueue.main.async { [weak self] in
-            self?.animateIn { [weak self] in
-                self?.textField.makeMeFirstResponder()
-            }
-        }
     }
 
     override func viewDidLayout() {
@@ -120,12 +110,6 @@ final class JSAlertController: NSViewController {
         cancelAction(sender)
     }
 
-    func dismiss(_ completion: @escaping () -> Void) {
-        animateOut {
-            completion()
-        }
-    }
-
     private func presentData() {
         okButton.title = viewModel.okButtonText
         cancelButton.title = viewModel.cancelButtonText
@@ -139,6 +123,29 @@ final class JSAlertController: NSViewController {
         verticalStackView.setCustomSpacing(scrollViewSpacing, after: scrollView)
         textField.stringValue = viewModel.textFieldDefaultText
         messageText.sizeToFit()
+    }
+}
+
+extension JSAlertController: NSViewControllerPresentationAnimator {
+    func animatePresentation(of viewController: NSViewController, from fromViewController: NSViewController) {
+        guard viewController === self else { return }
+        fromViewController.addAndLayoutChild(self)
+        setAlertAnchorPoint(anchorPoint: CGPoint(x: 0.5, y: 0.5))
+        backgroundView.layer?.opacity = 0.0
+        alertView.layer?.transform = CATransform3DMakeScale(0.9, 0.9, 1)
+        alertView.layer?.opacity = 0.0
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
+            self?.animateIn { [weak self] in
+                self?.textField.makeMeFirstResponder()
+            }
+        }
+    }
+    
+    func animateDismissal(of viewController: NSViewController, from fromViewController: NSViewController) {
+        guard viewController === self else { return }
+        animateOut { [weak self] in
+            self?.removeCompletely()
+        }
     }
 
     private func animateIn(_ completion: @escaping () -> Void) {
@@ -192,7 +199,7 @@ final class JSAlertController: NSViewController {
         alertOpacity.toValue = alertOpacity.toValue
 
         let group = CAAnimationGroup()
-        group.duration = Constants.appearAnimationDuration
+        group.duration = duration
         group.timingFunction = CAMediaTimingFunction(name: .easeIn)
         group.animations = [scaleAnimation, alertOpacity]
 
