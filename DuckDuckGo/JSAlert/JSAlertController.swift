@@ -28,7 +28,8 @@ final class JSAlertController: NSViewController {
     }
 
     @IBOutlet var scrollViewHeight: NSLayoutConstraint!
-
+    @IBOutlet var alertCenterYAlignment: NSLayoutConstraint!
+    
     @IBOutlet var backgroundView: NSView!
     @IBOutlet var alertView: NSView!
     @IBOutlet var verticalStackView: NSStackView!
@@ -97,6 +98,14 @@ final class JSAlertController: NSViewController {
             scrollView.verticalScrollElasticity = .automatic
             scrollView.hasVerticalScroller = true
         }
+        
+        guard let windowContentView = view.window?.contentView else {
+            return
+        }
+        let windowCenter = CGPoint(x: windowContentView.frame.midX, y: windowContentView.frame.midY)
+        let windowPoint = windowContentView.convert(windowCenter, to: view)
+        let viewCenter = CGPoint(x: view.frame.midX, y: view.frame.midY)
+        alertCenterYAlignment.constant = viewCenter.y - windowPoint.y
     }
 
     @IBAction func okAction(_ sender: NSButton) {

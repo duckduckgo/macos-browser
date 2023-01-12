@@ -43,7 +43,7 @@
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="ClearColor"/>
-                                                            <size key="minSize" width="420" height="50"/>
+                                                            <size key="minSize" width="372" height="50"/>
                                                             <size key="maxSize" width="444" height="10000000"/>
                                                             <attributedString key="textStorage">
                                                                 <fragment content="I'm going to try and use this but I'm not sure if it's the right thing to use but hopefully I can figure that out as I go along">
@@ -145,18 +145,17 @@ Gw
                         </subviews>
                         <constraints>
                             <constraint firstItem="FkK-fl-t4d" firstAttribute="leading" secondItem="tOy-S4-hL0" secondAttribute="leading" id="5jn-My-SiT"/>
-                            <constraint firstItem="noe-j7-ZAB" firstAttribute="centerX" secondItem="FkK-fl-t4d" secondAttribute="centerX" id="8ZA-79-cpt"/>
                             <constraint firstItem="noe-j7-ZAB" firstAttribute="centerX" secondItem="tOy-S4-hL0" secondAttribute="centerX" id="GpP-25-hhY"/>
                             <constraint firstItem="noe-j7-ZAB" firstAttribute="top" relation="greaterThanOrEqual" secondItem="tOy-S4-hL0" secondAttribute="top" constant="24" id="Vkf-DI-IwV"/>
                             <constraint firstAttribute="bottom" secondItem="FkK-fl-t4d" secondAttribute="bottom" id="a9B-mu-zxk"/>
                             <constraint firstItem="FkK-fl-t4d" firstAttribute="top" secondItem="tOy-S4-hL0" secondAttribute="top" id="ekt-en-yTP"/>
-                            <constraint firstItem="noe-j7-ZAB" firstAttribute="centerY" secondItem="FkK-fl-t4d" secondAttribute="centerY" id="oXm-Ae-YHQ"/>
                             <constraint firstItem="noe-j7-ZAB" firstAttribute="centerY" secondItem="tOy-S4-hL0" secondAttribute="centerY" id="sqD-dl-ylM"/>
                             <constraint firstAttribute="trailing" secondItem="FkK-fl-t4d" secondAttribute="trailing" id="trA-FT-SdH"/>
                             <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="noe-j7-ZAB" secondAttribute="bottom" constant="24" id="wqR-jZ-szr"/>
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="alertCenterYAlignment" destination="sqD-dl-ylM" id="JtU-9L-h1w"/>
                         <outlet property="alertView" destination="noe-j7-ZAB" id="1SU-Pb-sKN"/>
                         <outlet property="backgroundView" destination="FkK-fl-t4d" id="HW4-Hb-0xy"/>
                         <outlet property="cancelButton" destination="aC8-rX-2ac" id="GjH-oJ-Fag"/>
