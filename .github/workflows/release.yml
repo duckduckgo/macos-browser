@@ -76,6 +76,9 @@ jobs:
       with:
         submodules: recursive
 
+    - name: Install xcbeautify
+      run: brew install xcbeautify
+
     - name: Install create-dmg
       if: ${{ github.event.inputs.create-dmg == true || github.event.inputs.asana-task-url }}
       run: |

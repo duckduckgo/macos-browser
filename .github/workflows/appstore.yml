@@ -40,6 +40,9 @@ jobs:
     - name: Prepare fastlane
       run: bundle install
 
+    - name: Install xcbeautify
+      run: brew install xcbeautify
+
     - name: Archive and Upload the App
       env:
         APPLE_API_KEY_BASE64: ${{ secrets.APPLE_API_KEY_BASE64 }}
