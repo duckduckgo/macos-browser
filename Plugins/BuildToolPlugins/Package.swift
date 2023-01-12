@@ -21,10 +21,9 @@
 import PackageDescription
 
 let package = Package(
-    name: "InputFilesCheckerPlugin",
+    name: "BuildToolPlugins",
     platforms: [ .macOS(.v12)],
     products: [
-        // Products define the executables and libraries a package produces, and make them visible to other packages.
       .plugin(
         name: "InputFilesChecker",
         targets: ["InputFilesChecker"]

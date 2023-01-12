@@ -1856,6 +1856,7 @@
 		378B58C8295CF9A7002C0CC0 /* IntegrationTests.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = IntegrationTests.xcconfig; sourceTree = "<group>"; };
 		378B58CD295ECA75002C0CC0 /* DuckDuckGo.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = DuckDuckGo.xcconfig; sourceTree = "<group>"; };
 		378E2799296F6FDE00FCADA2 /* ManualAppStoreRelease.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ManualAppStoreRelease.xcconfig; sourceTree = "<group>"; };
+		378E279D2970217400FCADA2 /* BuildToolPlugins */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = BuildToolPlugins; sourceTree = "<group>"; };
 		379DE4BC27EA31AC002CC3DE /* PreferencesAutofillView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesAutofillView.swift; sourceTree = "<group>"; };
 		37A4CEB9282E992F00D75B89 /* StartupPreferences.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StartupPreferences.swift; sourceTree = "<group>"; };
 		37A803DA27FD69D300052F4C /* Data Import Resources */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "Data Import Resources"; sourceTree = "<group>"; };
@@ -1887,7 +1888,6 @@
 		37CD54C627F2FDD100F1F7B9 /* PreferencesSidebarModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PreferencesSidebarModel.swift; sourceTree = "<group>"; };
 		37CD54C727F2FDD100F1F7B9 /* AppearancePreferences.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppearancePreferences.swift; sourceTree = "<group>"; };
 		37CD54C827F2FDD100F1F7B9 /* DefaultBrowserPreferences.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DefaultBrowserPreferences.swift; sourceTree = "<group>"; };
-		37D0CFAF294639DC00416B92 /* InputFilesChecker */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = InputFilesChecker; path = Plugins/InputFilesChecker; sourceTree = "<group>"; };
 		37D23779287EB8CA00BCE03B /* TabIndex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabIndex.swift; sourceTree = "<group>"; };
 		37D2377B287EBDA300BCE03B /* TabIndexTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabIndexTests.swift; sourceTree = "<group>"; };
 		37D2377F287EFEE200BCE03B /* PinnedTabsManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PinnedTabsManagerTests.swift; sourceTree = "<group>"; };
@@ -2999,6 +2999,14 @@
 			path = UITests;
 			sourceTree = "<group>";
 		};
+		378E279C2970217400FCADA2 /* Plugins */ = {
+			isa = PBXGroup;
+			children = (
+				378E279D2970217400FCADA2 /* BuildToolPlugins */,
+			);
+			path = Plugins;
+			sourceTree = "<group>";
+		};
 		37BF3F12286D8A4B00BD9014 /* Pinned Tabs */ = {
 			isa = PBXGroup;
 			children = (
@@ -3035,14 +3043,6 @@
 				37CD54C527F2FDD100F1F7B9 /* AboutModel.swift */,
 			);
 			path = Model;
-			sourceTree = "<group>";
-		};
-		37D0CFAE294639DC00416B92 /* Packages */ = {
-			isa = PBXGroup;
-			children = (
-				37D0CFAF294639DC00416B92 /* InputFilesChecker */,
-			);
-			name = Packages;
 			sourceTree = "<group>";
 		};
 		37D2377D287EFEB300BCE03B /* Model */ = {
@@ -4041,7 +4041,7 @@
 		AA585D75248FD31100E9A3E2 = {
 			isa = PBXGroup;
 			children = (
-				37D0CFAE294639DC00416B92 /* Packages */,
+				378E279C2970217400FCADA2 /* Plugins */,
 				378B5886295CF2A4002C0CC0 /* Configuration */,
 				AA68C3D62490F821001B8783 /* README.md */,
 				AA585D80248FD31100E9A3E2 /* DuckDuckGo */,
