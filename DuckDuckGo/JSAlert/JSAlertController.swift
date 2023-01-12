@@ -24,7 +24,7 @@ final class JSAlertController: NSViewController {
         static let storyboardName = "JSAlert"
         static let appearAnimationDuration = 0.2
         static let dismissAnimationDuration = 0.3
-        static let scrollViewToTextfieldSpacing = 8
+        static let scrollViewToTextfieldSpacing = 8.0
     }
 
     @IBOutlet var scrollViewHeight: NSLayoutConstraint!
@@ -92,8 +92,10 @@ final class JSAlertController: NSViewController {
 
         if messageHeight <= scrollView.frame.height {
             scrollView.verticalScrollElasticity = .none
+            scrollView.hasVerticalScroller = false
         } else {
             scrollView.verticalScrollElasticity = .automatic
+            scrollView.hasVerticalScroller = true
         }
     }
 
@@ -120,7 +122,7 @@ final class JSAlertController: NSViewController {
         cancelButton.isHidden = viewModel.isCancelButtonHidden
 
         textField.isHidden = viewModel.isTextFieldHidden
-        let scrollViewSpacing = viewModel.isTextFieldHidden ? verticalStackView.spacing : scrollViewToTextfieldSpacing
+        let scrollViewSpacing = viewModel.isTextFieldHidden ? verticalStackView.spacing : Constants.scrollViewToTextfieldSpacing
         verticalStackView.setCustomSpacing(scrollViewSpacing, after: scrollView)
         textField.stringValue = viewModel.textFieldDefaultText
         messageText.sizeToFit()
