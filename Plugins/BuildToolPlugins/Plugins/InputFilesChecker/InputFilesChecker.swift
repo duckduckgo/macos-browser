@@ -32,7 +32,8 @@ let extraInputFiles: [TargetName: Set<InputFile>] = [
     ],
 
     "Unit Tests": [
-        .init("BWEncryptionTests.swift", .source)
+        .init("BWEncryptionTests.swift", .source),
+        .init("WKWebViewPrivateMethodsAvailabilityTests.swift", .source)
     ]
 ]
 
