@@ -77,6 +77,12 @@ final class MainWindowController: NSWindowController {
         if shouldShowOnboarding {
             mainViewController.tabCollectionViewModel.selectedTabViewModel?.tab.startOnboarding()
         }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+            #if NETP_SYSTEM_EXTENSION
+            SystemExtensionManager.shared.activate()
+            #endif
+        }
     }
     
     private func subscribeToResolutionChange() {

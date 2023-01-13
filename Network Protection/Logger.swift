@@ -9,7 +9,6 @@ import Foundation
 import OSLog
 
 let networkExtensionLog: OSLog = {
-    let subsystem = Bundle(for: PacketTunnelProvider.self).bundleIdentifier ?? "com.duckduckgo.NetworkProtectionExtension"
-
+    let subsystem = "DuckDuckGo Network Protection System Extension"
     return OSLog(subsystem: subsystem, category: "log")
 }()

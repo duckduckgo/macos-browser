@@ -21,7 +21,7 @@
 	<array>
 		<string>packet-tunnel-provider</string>
 	</array>
-	<key>com.apple.security.network.client</key>
+	<key>com.apple.developer.system-extension.install</key>
 	<true/>
 </dict>
 </plist>

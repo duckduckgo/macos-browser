@@ -21,6 +21,7 @@ import SwiftUI
 import OSLog
 import NetworkExtension
 import NetworkProtection
+import SystemExtensions
 
 final class NetworkProtectionProvider {
 
@@ -41,10 +42,6 @@ final class NetworkProtectionProvider {
 
     enum QuickConfigLoadingError: Error {
         case quickConfigFilePathEnvVarMissing
-    }
-
-    enum StatusChangeError: Error {
-        case couldNotRetrieveSessionFromNotification
     }
 
     /// The logger that this object will use for errors that are handled by this class.
@@ -78,6 +75,9 @@ final class NetworkProtectionProvider {
     /// The environment variable that holds the path to the WG quick configuration file that will be used for the tunnel.
     ///
     static let quickConfigFilePathEnvironmentVariable = "NETP_QUICK_CONFIG_FILE_PATH"
+
+    /// The path of the WG quick configuration file that is used when the environment variable is not present.
+    static let defaultConfigFilePath = "~/NetworkProtection.conf"
 
     /// The actual storage for our tunnel manager.
     ///
@@ -205,8 +205,7 @@ final class NetworkProtectionProvider {
     // MARK: - Notifications: Handling
 
     private func handleStatusChangeNotification(_ notification: Notification) {
-        guard let session = (notification.object as? NETunnelProviderSession) else {
-            self.logger.log(StatusChangeError.couldNotRetrieveSessionFromNotification)
+        guard let session = managedSession(from: notification) else {
             return
         }
 
@@ -236,20 +235,40 @@ final class NetworkProtectionProvider {
         self.onStatusChange?(status)
     }
 
+    /// Retrieves a session that we are managing.  When we're running as a system extension we'll get notifications
+    /// for all VPN connections in the system, so we just want to follow the notifications for the connections we own.
+    ///
+    private func managedSession(from notification: Notification) -> NETunnelProviderSession? {
+        guard let session = (notification.object as? NETunnelProviderSession),
+              session.manager.protocolConfiguration is NETunnelProviderProtocol else {
+            return nil
+        }
+
+        return session
+
+    }
+
     // MARK: - Tunnel Configuration
 
     /// Loads the tunnel configuration from the filesystem.
     ///
     private func loadTunnelConfiguration() throws -> TunnelConfiguration {
-        guard let quickConfigFile = ProcessInfo.processInfo.environment[Self.quickConfigFilePathEnvironmentVariable] else {
+        let resolvedDefaultPath = NSString(string: Self.defaultConfigFilePath).expandingTildeInPath
+
+        if let quickConfigFile = ProcessInfo.processInfo.environment[Self.quickConfigFilePathEnvironmentVariable] {
+            let quickConfig = try String(contentsOfFile: quickConfigFile)
+            let configuration = try TunnelConfiguration(fromWgQuickConfig: quickConfig)
+            configuration.name = "DuckDuckGo Network Protection Configuration"
+
+            return configuration
+        } else if let defaultQuickConfig = try? String(contentsOfFile: resolvedDefaultPath) {
+            let configuration = try TunnelConfiguration(fromWgQuickConfig: defaultQuickConfig)
+            configuration.name = "DuckDuckGo Network Protection Configuration"
+
+            return configuration
+        } else {
             throw QuickConfigLoadingError.quickConfigFilePathEnvVarMissing
         }
-
-        let quickConfig = try String(contentsOfFile: quickConfigFile)
-
-        let configuration = try TunnelConfiguration(fromWgQuickConfig: quickConfig)
-        configuration.name = "DuckDuckGo Network Protection Configuration"
-        return configuration
     }
 
     /// Reloads the tunnel manager from preferences.

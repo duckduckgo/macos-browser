@@ -16,6 +16,11 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         }
     }()
 
+    override init() {
+        os_log("🔵 Initializing NetP packet tunnel provider", log: networkExtensionLog, type: .error)
+        super.init()
+    }
+
     override func startTunnel(options: [String: NSObject]?, completionHandler: @escaping (Error?) -> Void) {
         let activationAttemptId = options?["activationAttemptId"] as? String
 

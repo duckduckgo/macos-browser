@@ -29,13 +29,19 @@ extension NETunnelProviderProtocol {
             return nil
         }
 
+        #if NETP_SYSTEM_EXTENSION
+        providerBundleIdentifier = "\(Bundle(for: NetworkProtectionProvider.self).bundleIdentifier!).extension"
+        #else
         providerBundleIdentifier = "\(Bundle(for: NetworkProtectionProvider.self).bundleIdentifier!).network-extension"
-        passwordReference = Keychain.makeReference(containing: tunnelConfiguration.asWgQuickConfig(), called: name, previouslyReferencedBy: old?.passwordReference)
-        if passwordReference == nil {
+        #endif
+
+        //passwordReference = Keychain.makeReference(containing: tunnelConfiguration.asWgQuickConfig(), called: name, previouslyReferencedBy: old?.passwordReference)
+        /*if passwordReference == nil {
             return nil
-        }
+        }*/
         #if os(macOS)
-        providerConfiguration = ["UID": getuid()]
+        providerConfiguration = ["UID": getuid(),
+                                 "WgQuickConfig": tunnelConfiguration.asWgQuickConfig()]
         #endif
 
         let endpoints = tunnelConfiguration.peers.compactMap { $0.endpoint }
