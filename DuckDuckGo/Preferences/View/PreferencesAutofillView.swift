@@ -63,8 +63,7 @@ extension Preferences {
                 Text(UserText.autofill)
                     .font(Const.Fonts.preferencePaneTitle)
 
-#if APPSTORE
-#else
+#if !APPSTORE
                 // Password Manager:
 
                 Section(spacing: 0) {

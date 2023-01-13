@@ -29,8 +29,7 @@ extension AppDelegate {
     // MARK: - DuckDuckGo
 
     @IBAction func checkForUpdates(_ sender: Any?) {
-#if APPSTORE
-#else
+#if !APPSTORE
         updateController.checkForUpdates(sender)
 #endif
     }

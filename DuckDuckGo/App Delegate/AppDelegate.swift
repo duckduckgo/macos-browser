@@ -51,8 +51,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var grammarFeaturesManager = GrammarFeaturesManager()
     private let crashReporter = CrashReporter()
 
-#if APPSTORE
-#else
+#if !APPSTORE
     let updateController = UpdateController()
 #endif
 
@@ -103,8 +102,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             fileStore = EncryptedFileStore()
         }
         stateRestorationManager = AppStateRestorationManager(fileStore: fileStore)
-#if APPSTORE
-#else
+#if !APPSTORE
         stateRestorationManager.subscribeToAutomaticAppRelaunching(using: updateController.willRelaunchAppPublisher)
 #endif
     }

@@ -50,8 +50,7 @@ extension WKWebViewConfiguration {
 
         self.userContentController = userContentController
         self.processPool.geolocationProvider = GeolocationProvider(processPool: self.processPool)
-#if APPSTORE
-#else
+#if !APPSTORE
         self.processPool.setDownloadDelegateIfNeeded(using: LegacyWebKitDownloadDelegate.init)
 #endif
      }

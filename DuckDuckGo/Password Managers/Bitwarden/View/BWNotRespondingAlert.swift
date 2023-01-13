@@ -39,8 +39,7 @@ final class BWNotRespondingAlert: NSAlert {
     }
 
     private func restartBitwarden() {
-#if APPSTORE
-#else
+#if !APPSTORE
         let runningApplications = NSWorkspace.shared.runningApplications
         let bitwarden = runningApplications.first { runningApplication in
             runningApplication.bundleIdentifier == BWManager.bundleId
