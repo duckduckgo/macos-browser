@@ -24,7 +24,7 @@ protocol AddFolderModalViewControllerDelegate: AnyObject {
     func addFolderViewController(_ viewController: AddFolderModalViewController, addedFolderWith name: String)
     func addFolderViewController(_ viewController: AddFolderModalViewController, saved folder: BookmarkFolder)
     func addFolderViewControllerWillClose()
-    
+
 }
 
 extension AddFolderModalViewControllerDelegate {

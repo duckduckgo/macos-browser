@@ -121,7 +121,7 @@ final class BookmarkListViewController: NSViewController {
         let newBookmarkViewController = AddBookmarkModalViewController.create()
         newBookmarkViewController.currentTabWebsite = currentTabWebsite
         newBookmarkViewController.delegate = self
-        
+
         delegate?.popover(shouldPreventClosure: true)
         beginSheetFromMainWindow(newBookmarkViewController)
     }
@@ -225,11 +225,11 @@ extension BookmarkListViewController: AddBookmarkModalViewControllerDelegate, Ad
         bookmarkManager.update(bookmark: bookmark)
         _ = bookmarkManager.updateUrl(of: bookmark, to: newURL)
     }
-    
+
     func addBookmarkViewControllerWillClose() {
         delegate?.popover(shouldPreventClosure: false)
     }
-    
+
     func addFolderViewController(_ viewController: AddFolderModalViewController, addedFolderWith name: String) {
         bookmarkManager.makeFolder(for: name, parent: nil)
     }
@@ -237,7 +237,7 @@ extension BookmarkListViewController: AddBookmarkModalViewControllerDelegate, Ad
     func addFolderViewController(_ viewController: AddFolderModalViewController, saved folder: BookmarkFolder) {
         bookmarkManager.update(folder: folder)
     }
-    
+
     func addFolderViewControllerWillClose() {
         delegate?.popover(shouldPreventClosure: false)
     }
@@ -418,7 +418,7 @@ extension BookmarkListPopover: BookmarkListViewControllerDelegate {
     func popoverShouldClose(_ bookmarkListViewController: BookmarkListViewController) {
         close()
     }
-    
+
     func popover(shouldPreventClosure: Bool) {
         behavior = shouldPreventClosure ? .applicationDefined : .transient
     }

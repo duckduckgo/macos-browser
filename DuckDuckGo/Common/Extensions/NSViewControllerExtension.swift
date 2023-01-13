@@ -50,7 +50,7 @@ extension NSViewController {
             view.window?.beginSheet(windowSheet, completionHandler: handler)
         }
     }
-    
+
     func beginSheetFromMainWindow(_ viewController: NSViewController) {
         let newWindowController = viewController.wrappedInWindowController()
         guard let newWindow = newWindowController.window,
