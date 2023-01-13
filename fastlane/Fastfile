@@ -29,13 +29,13 @@ platform :mac do
   #################################################
 
   desc 'Fetches and updates certificates and provisioning profiles for App Store distribution'
-  lane :sync_signing do
-    do_sync_signing
+  lane :sync_signing do |options|
+    do_sync_signing(options)
   end
 
   desc 'Fetches and updates certificates and provisioning profiles for development'
-  lane :sync_signing_dev do
-    do_sync_signing
+  lane :sync_signing_dev do |options|
+    do_sync_signing(options)
   end
 
   desc 'Makes App Store release build and uploads it to TestFlight'
@@ -104,9 +104,10 @@ platform :mac do
     end
   end
 
-  private_lane :do_sync_signing do
+  private_lane :do_sync_signing do |options|
     sync_code_signing(
       api_key: get_api_key,
+      username: options[:username],
       readonly: is_ci
     )
   end
