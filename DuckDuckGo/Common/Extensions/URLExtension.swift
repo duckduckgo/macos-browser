@@ -32,6 +32,9 @@ extension URL {
 
     // MARK: - Local
 
+    /**
+     * Returns a URL pointing to `${HOME}/Library`, regardless of whether the app is sandboxed or not.
+     */
     static var nonSandboxLibraryDirectoryURL: URL {
         guard NSApp.isSandboxed else {
             return FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask).first!
@@ -39,6 +42,9 @@ extension URL {
         return FileManager.default.homeDirectoryForCurrentUser.deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
     }
 
+    /**
+     * Returns a URL pointing to `${HOME}/Library/Application Support`, regardless of whether the app is sandboxed or not.
+     */
     static var nonSandboxApplicationSupportDirectoryURL: URL {
         guard NSApp.isSandboxed else {
             return FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
