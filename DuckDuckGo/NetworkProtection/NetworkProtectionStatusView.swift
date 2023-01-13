@@ -181,7 +181,19 @@ public struct NetworkProtectionStatusView: View {
             Text(UserText.networkProtectionStatusViewBetaWarning)
                 .opacity(Opacity.content)
                 .fixedSize()
-                .padding([.bottom], 18)
+
+            Divider()
+                .padding([.top, .bottom], 18)
+
+            Button {
+                model.shareFeedback()
+            } label: {
+                Text("Share Feedback")
+                    .applyLabelAttributes()
+                    .fixedSize()
+                    .padding([.bottom], 18)
+            }
+            .buttonStyle(PlainButtonStyle())
         }
         .padding(EdgeInsets(top: 12, leading: 8, bottom: 0, trailing: 8))
     }

@@ -267,5 +267,14 @@ extension NetworkProtectionStatusView {
                 }
             }
         }
+
+        // MARK: - Feedback Sharing
+
+        /// This method provides the standard logic for handling the user's request to share feedback about NetP.
+        /// 
+        func shareFeedback() {
+            let feedbackFormURL = URL(string: "https://form.asana.com/?k=_wNLt6YcT5ILpQjDuW0Mxw&d=137249556945")!
+            NSWorkspace.shared.open(feedbackFormURL)
+        }
     }
 }
