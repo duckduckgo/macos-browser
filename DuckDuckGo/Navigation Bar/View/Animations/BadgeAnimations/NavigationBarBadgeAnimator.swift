@@ -22,12 +22,12 @@ final class NavigationBarBadgeAnimator: NSObject {
     var queuedAnimation: QueueData?
     private var animationID: UUID?
     private(set) var isAnimating = false
-    
+
     struct QueueData {
         var selectedTab: Tab?
         var animationType: NavigationBarBadgeAnimationView.AnimationType
     }
-    
+
     private enum ButtonsFade {
         case start
         case end
@@ -37,18 +37,18 @@ final class NavigationBarBadgeAnimator: NSObject {
                           buttonsContainer: NSView,
                           and notificationBadgeContainer: NavigationBarBadgeAnimationView) {
         queuedAnimation = nil
-        
+
         isAnimating = true
 
         let newAnimationID = UUID()
         self.animationID = newAnimationID
-        
+
         notificationBadgeContainer.prepareAnimation(.cookieManaged)
-        
+
         animateButtonsFade(.start,
                            buttonsContainer: buttonsContainer,
                            notificationBadgeContainer: notificationBadgeContainer) {
-            
+
             notificationBadgeContainer.startAnimation { [weak self] in
                 if self?.animationID == newAnimationID {
                     self?.animateButtonsFade(.end,
@@ -60,12 +60,12 @@ final class NavigationBarBadgeAnimator: NSObject {
             }
         }
     }
-    
+
     private func animateButtonsFade(_ fadeType: ButtonsFade,
                                     buttonsContainer: NSView,
                                     notificationBadgeContainer: NavigationBarBadgeAnimationView,
                                     completionHandler: @escaping (() -> Void)) {
-        
+
         let animationDuration: CGFloat = 0.25
 
         NSAnimationContext.runAnimationGroup { context in

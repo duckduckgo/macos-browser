@@ -87,7 +87,7 @@ extension UserDialogRequest where Info == Void {
     convenience init(callback: @escaping Callback) {
         self.init((), callback: callback)
     }
-    
+
 }
 
 extension UserDialogRequest where Output == Void {

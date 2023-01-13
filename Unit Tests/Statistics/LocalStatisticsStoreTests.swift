@@ -25,30 +25,30 @@ class LocalStatisticsStoreTests: XCTestCase {
         super.setUp()
         UserDefaultsWrapper<Any>.clearAll()
     }
-    
+
     override func tearDown() {
         super.tearDown()
         UserDefaultsWrapper<Any>.clearAll()
     }
-    
+
     func testWhenCallingHasInstallStatistics_AndATBExists_ThenItReturnsTrue() {
         let pixelStore = PixelStoreMock()
         let store = LocalStatisticsStore(pixelDataStore: pixelStore)
         store.atb = "atb"
-        
+
         XCTAssertTrue(store.hasInstallStatistics)
         XCTAssertTrue(store.hasCurrentOrDeprecatedInstallStatistics)
     }
-    
+
     func testWhenCallingHasInstallStatistics_AndLegacyATBExists_ThenItReturnsTrue() {
         let pixelStore = PixelStoreMock()
         let store = LocalStatisticsStore(pixelDataStore: pixelStore)
         pixelStore.set("atb", forKey: "statistics.atb.key")
-        
+
         XCTAssertFalse(store.hasInstallStatistics)
         XCTAssertTrue(store.hasCurrentOrDeprecatedInstallStatistics)
     }
-    
+
     func testWaitlistUnlocked() {
         let pixelStore = PixelStoreMock()
         let store = LocalStatisticsStore(pixelDataStore: pixelStore)
@@ -57,50 +57,50 @@ class LocalStatisticsStoreTests: XCTestCase {
         store.waitlistUnlocked = true
         XCTAssertTrue(store.waitlistUnlocked)
         XCTAssertEqual(pixelStore.data.count, 1)
-        
+
         store.waitlistUnlocked = false
         XCTAssertFalse(store.waitlistUnlocked)
         XCTAssertEqual(pixelStore.data.count, 0)
     }
-    
+
     // Legacy Statistics:
 
     func testWhenInitializingTheLocalStatisticsStore_ThenLegacyStatisticsAreCleared() {
         var legacyStore = LocalStatisticsStore.LegacyStatisticsStore()
         legacyStore.atb = "atb"
-        
+
         XCTAssertNotNil(legacyStore.atb)
         XCTAssertFalse(legacyStore.legacyStatisticsStoreDataCleared)
-        
+
         let pixelStore = PixelStoreMock()
         _ = LocalStatisticsStore(pixelDataStore: pixelStore)
-        
+
         XCTAssertNil(legacyStore.atb)
         XCTAssertTrue(legacyStore.legacyStatisticsStoreDataCleared)
     }
-    
+
     func testWhenClearingATBData_AndATBDataExists_ThenLegacyStatisticsStoreDataClearedIsTrue() {
         var legacyStore = LocalStatisticsStore.LegacyStatisticsStore()
         legacyStore.atb = "atb"
         legacyStore.clear()
-        
+
         XCTAssertTrue(legacyStore.legacyStatisticsStoreDataCleared)
     }
-    
+
     func testWhenClearingATBData_AndATBDataDoesNotExist_ThenLegacyStatisticsStoreDataClearedIsFalse() {
         var legacyStore = LocalStatisticsStore.LegacyStatisticsStore()
         legacyStore.clear()
-        
+
         XCTAssertFalse(legacyStore.legacyStatisticsStoreDataCleared)
     }
-    
+
     func testWhenClearingATBData_AndATBDataExists_AndClearIsCalledMultipleTimes_ThenLegacyStatisticsStoreDataClearedIsTrue() {
         var legacyStore = LocalStatisticsStore.LegacyStatisticsStore()
         legacyStore.installDate = Date()
         legacyStore.clear()
         legacyStore.clear()
         legacyStore.clear()
-        
+
         XCTAssertTrue(legacyStore.legacyStatisticsStoreDataCleared)
     }
 

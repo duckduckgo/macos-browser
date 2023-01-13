@@ -21,7 +21,7 @@ import SwiftUI
 struct CookieManagedNotificationView: View {
     @ObservedObject var animationModel: CookieNotificationAnimationModel
     var badgeAnimationModel: BadgeNotificationAnimationModel
-    
+
     var body: some View {
         BadgeAnimationView(animationModel: badgeAnimationModel,
                            iconView: AnyView(CookieAnimationView(animationModel: animationModel)),
@@ -31,10 +31,10 @@ struct CookieManagedNotificationView: View {
 
 struct CookieAnimationView: View {
     @ObservedObject var animationModel: CookieNotificationAnimationModel
-    
+
     @State private var cookieAlpha: CGFloat = 1
     @State private var bittenCookieAlpha: CGFloat = 0
-    
+
     var body: some View {
         Group {
             ZStack(alignment: .center) {
@@ -43,23 +43,23 @@ struct CookieAnimationView: View {
                         .resizable()
                         .foregroundColor(.primary)
                         .opacity(cookieAlpha)
-                    
+
                     Image("CookieBite")
                         .resizable()
                         .foregroundColor(.primary)
                         .opacity(bittenCookieAlpha)
-                    
+
                     InnerExpandingCircle(animationModel: animationModel)
                     OuterExpandingCircle(animationModel: animationModel)
                 }
                 .frame(width: Consts.Layout.cookieSize,
                        height: Consts.Layout.cookieSize)
-                
+
                 DotGroupView(animationModel: animationModel,
                              circleCount: Consts.Count.circle)
                     .frame(width: Consts.Layout.dotsGroupSize,
                            height: Consts.Layout.dotsGroupSize)
-                
+
             }
         }.frame(width: Consts.Layout.dotsGroupSize * 1.6,
                 height: Consts.Layout.dotsGroupSize * 1.6)
@@ -80,15 +80,15 @@ struct CookieAnimationView: View {
 private struct DotGroupView: View {
     var animationModel: CookieNotificationAnimationModel
     let circleCount: Int
-    
+
     private func degreesOffset(for index: Int) -> Double {
         return Double(((360 / circleCount) * index) + Int.random(in: 0..<Consts.Layout.randomDegreesOffset))
     }
-    
+
     var body: some View {
         Group {
             GeometryReader { geo in
-                
+
                 ForEach(0..<self.circleCount, id: \.self) { i in
                     ZStack {
                         DotView(animationModel: animationModel,
@@ -165,7 +165,7 @@ private struct DotView: View {
     @State private var opacity: CGFloat = 0
     @State private var isContracted = true
     @State private var expandedOffset: CGFloat = -1
-    
+
     var body: some View {
         Circle()
             .fill(Color.blue)
@@ -193,11 +193,11 @@ private struct DotView: View {
                 }
             })
     }
-    
+
     private func xPositionWithGeometry(_ proxy: GeometryProxy, isContracted: Bool) -> CGFloat {
         return isContracted ? proxy.size.width/2 : size/2 + expandedOffset
     }
-    
+
     private func yPositionWithGeometry(_ proxy: GeometryProxy, isContracted: Bool) -> CGFloat {
         return isContracted ? proxy.size.height/2 : size/2  + expandedOffset
     }
@@ -212,19 +212,19 @@ struct CookieManagedNotificationView_Previews: PreviewProvider {
 }
 
 private enum Consts {
-    
+
     enum Colors {
         static let badgeBackgroundColor = Color("URLNotificationBadgeBackground")
     }
-    
+
     enum CookieAnimation {
         static let innerExpandingCircleScale1 = 1.0
         static let innerExpandingCircleScale2 = 1.4
-        
+
         static let outerExpandingCircleScale1 = 1.2
         static let outerExpandingCircleScale2 = 1.8
     }
-    
+
     enum BadgeAnimation {
         static let duration: CGFloat = 0.8
         static let secondPhaseDelay = 3.0
@@ -237,7 +237,7 @@ private enum Consts {
         static let dotSize: CGFloat = 3
         static let cornerRadius: CGFloat = 5
     }
-    
+
     enum Count {
         static let circle = 5
     }

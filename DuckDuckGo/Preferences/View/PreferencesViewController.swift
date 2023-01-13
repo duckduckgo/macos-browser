@@ -23,8 +23,8 @@ import Combine
 final class PreferencesViewController: NSViewController {
 
     weak var delegate: BrowserTabSelectionDelegate?
-    
-    let model = PreferencesSidebarModel()
+
+    let model = PreferencesSidebarModel(includePrivatePlayer: PrivatePlayer.shared.isAvailable)
     private var selectedTabIndexCancellable: AnyCancellable?
     private var selectedPreferencePaneCancellable: AnyCancellable?
 

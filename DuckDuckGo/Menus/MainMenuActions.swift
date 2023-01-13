@@ -290,7 +290,7 @@ extension MainViewController {
             return
         }
 
-        selectedTabViewModel.tab.webView.zoomLevel = 1.0
+        selectedTabViewModel.tab.webView.resetZoomLevel()
     }
 
     @IBAction func toggleDownloads(_ sender: Any) {
@@ -313,15 +313,15 @@ extension MainViewController {
     @IBAction func toggleBookmarksBar(_ sender: Any) {
         PersistentAppInterfaceSettings.shared.showBookmarksBar.toggle()
     }
-    
+
     @IBAction func toggleAutofillShortcut(_ sender: Any) {
         LocalPinningManager.shared.togglePinning(for: .autofill)
     }
-    
+
     @IBAction func toggleBookmarksShortcut(_ sender: Any) {
         LocalPinningManager.shared.togglePinning(for: .bookmarks)
     }
-    
+
     @IBAction func toggleDownloadsShortcut(_ sender: Any) {
         LocalPinningManager.shared.togglePinning(for: .downloads)
     }
@@ -523,7 +523,7 @@ extension MainViewController {
     // MARK: - Edit
 
     @IBAction func findInPage(_ sender: Any?) {
-        tabCollectionViewModel.selectedTabViewModel?.startFindInPage()
+        tabCollectionViewModel.selectedTabViewModel?.showFindInPage()
     }
 
     @IBAction func findInPageNext(_ sender: Any?) {
@@ -625,13 +625,13 @@ extension MainViewController {
         NotificationCenter.default.post(name: .ShowSaveCredentialsPopover, object: nil)
         #endif
     }
-    
+
     @IBAction func showCredentialsSavedPopover(_ sender: Any?) {
         #if DEBUG || REVIEW
         NotificationCenter.default.post(name: .ShowCredentialsSavedPopover, object: nil)
         #endif
     }
-    
+
     @IBAction func fetchConfigurationNow(_ sender: Any?) {
         ConfigurationManager.shared.lastUpdateTime = .distantPast
         ConfigurationManager.shared.refreshIfNeeded()

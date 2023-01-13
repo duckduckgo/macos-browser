@@ -78,7 +78,7 @@ final class CLLocationManagerMock: CLLocationManager {
             }
         }
     }
-    
+
     override var location: CLLocation? {
         currentLocation
     }

@@ -168,7 +168,7 @@ final class RecentlyVisitedSiteModel: ObservableObject {
     var isRealDomain: Bool {
         domainPlaceholder == nil
     }
-    
+
     private let baseURL: URL?
     private let domainPlaceholder: String?
     private let privatePlayer: PrivatePlayer
@@ -270,7 +270,7 @@ final class RecentlyVisitedSiteModel: ObservableObject {
         pages = pages.filter { !urlsToRemove.contains($0.url) }
     }
 
-    func fixEntities(_ contentBlocking: ContentBlocking = ContentBlocking.shared) {
+    func fixEntities(_ contentBlocking: AnyContentBlocking = ContentBlocking.shared) {
         blockedEntities = blockedEntities.filter { !$0.isEmpty }.sorted(by: { l, r in
             contentBlocking.prevalenceForEntity(named: l) > contentBlocking.prevalenceForEntity(named: r)
         })
@@ -280,7 +280,7 @@ final class RecentlyVisitedSiteModel: ObservableObject {
         return entityDisplayName(entityName).slugfiscated()
     }
 
-    func entityDisplayName(_ entityName: String, _ contentBlocking: ContentBlocking = ContentBlocking.shared) -> String {
+    func entityDisplayName(_ entityName: String, _ contentBlocking: AnyContentBlocking = ContentBlocking.shared) -> String {
         return contentBlocking.displayNameForEntity(named: entityName)
     }
 
@@ -288,7 +288,7 @@ final class RecentlyVisitedSiteModel: ObservableObject {
 
 }
 
-extension ContentBlocking {
+extension ContentBlockingProtocol {
 
     func prevalenceForEntity(named entityName: String) -> Double {
         return trackerDataManager.trackerData.entities[entityName]?.prevalence ?? 0.0

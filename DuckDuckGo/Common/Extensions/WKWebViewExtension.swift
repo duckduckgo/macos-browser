@@ -126,7 +126,7 @@ extension WKWebView {
         }
         self._stopMediaCapture()
     }
-    
+
     func stopAllMediaPlayback() {
         guard self.responds(to: #selector(_stopAllMediaPlayback)) else {
             assertionFailure("WKWebView does not respond to _stopAllMediaPlayback")
@@ -134,7 +134,7 @@ extension WKWebView {
         }
         self._stopAllMediaPlayback()
     }
-    
+
     func setPermissions(_ permissions: [PermissionType], muted: Bool) {
         for permission in permissions {
             switch permission {
@@ -192,6 +192,11 @@ extension WKWebView {
         }
     }
 
+    func loadInNewWindow(_ url: URL) {
+        let urlEnc = "'\(url.absoluteString.escapedJavaScriptString())'"
+        self.evaluateJavaScript("window.open(\(urlEnc), '_blank', 'noopener, noreferrer')")
+    }
+
     func getMimeType(callback: @escaping (String?) -> Void) {
         self.evaluateJavaScript("document.contentType") { (result, _) in
             callback(result as? String)
@@ -205,7 +210,7 @@ extension WKWebView {
             return self.instancesRespond(to: #selector(WKWebView._printOperation(with:)))
         }
     }
-    
+
     func printOperation(with printInfo: NSPrintInfo = .shared, for frame: Any?) -> NSPrintOperation? {
         if let frame = frame,
            self.responds(to: #selector(WKWebView._printOperation(with:forFrame:))) {
@@ -223,7 +228,7 @@ extension WKWebView {
             printInfo.topMargin = 0
             printInfo.bottomMargin = 0
             printInfo.scalingFactor = 0.95
-            
+
             return self.printOperation(with: printInfo)
         }
 

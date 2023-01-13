@@ -24,7 +24,7 @@ extension NSPasteboard {
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString(string, forType: .string)
     }
-    
+
     func copy(url: URL) {
         let url = url as NSURL
 

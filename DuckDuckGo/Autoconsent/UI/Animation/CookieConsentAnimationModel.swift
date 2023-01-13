@@ -33,18 +33,18 @@ protocol CookieConsentAnimation: ObservableObject {
 }
 
 final class CookieConsentAnimationModel: CookieConsentAnimation {
-    
+
     private enum Animation {
         struct AnimationValue {
             let begin: CGFloat
             let end: CGFloat
         }
-        
+
         enum Image {
             static let opacity = AnimationValue(begin: 0, end: 1)
             static let scale = AnimationValue(begin: 0, end: 1)
         }
-        
+
         enum Pills {
             static let opacity = AnimationValue(begin: 0, end: 1)
             static let scale = AnimationValue(begin: 0, end: 1)
@@ -52,32 +52,32 @@ final class CookieConsentAnimationModel: CookieConsentAnimation {
             static let rightSideOffset = AnimationValue(begin: -30, end: 0)
         }
     }
-    
+
     let firstAnimationDuration: CGFloat = 0.35
     let secondAnimationDuration: CGFloat = 0.3
-    
+
     @Published var imageOpacity = Animation.Image.opacity.begin
     @Published var imageScale = Animation.Image.scale.begin
     @Published var pillsOpacity = Animation.Pills.opacity.begin
     @Published var pillsScale = Animation.Pills.scale.begin
     @Published var pillLeftSideOffset = Animation.Pills.leftSideOffset.begin
     @Published var pillRightSideOffset = Animation.Pills.rightSideOffset.begin
-    
+
     private func updateDataForFirstAnimation() {
         imageOpacity = Animation.Image.opacity.end
         imageScale = Animation.Image.scale.end
     }
-    
+
     private func updateDataForSecondAnimation() {
         pillsOpacity = Animation.Pills.opacity.end
         pillsScale = Animation.Pills.scale.end
         pillRightSideOffset = Animation.Pills.rightSideOffset.end
         pillLeftSideOffset = Animation.Pills.leftSideOffset.end
     }
-    
+
     func startAnimation() {
         updateDataForFirstAnimation()
-        
+
         DispatchQueue.main.asyncAfter(deadline: .now() + (firstAnimationDuration) / 2) {
             self.updateDataForSecondAnimation()
         }

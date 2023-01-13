@@ -122,34 +122,34 @@ private struct BorderView: View {
     let isSelected: Bool
     let cornerRadius: CGFloat
     let size: CGFloat
-    
+
     private var borderColor: Color {
         isSelected ? Color(TabShadowConfig.colorName) : .clear
     }
-    
+
     private var bottomLineColor: Color {
         isSelected ? Color("InterfaceBackgroundColor") : Color(TabShadowConfig.colorName)
     }
-    
+
     private var cornerPixelsColor: Color {
         isSelected ? .clear : bottomLineColor
     }
-    
+
     var body: some View {
         ZStack {
             CustomRoundedCornersShape(inset: 0, tl: cornerRadius, tr: cornerRadius, bl: 0, br: 0)
                 .strokeBorder(borderColor, lineWidth: size)
-            
+
             VStack {
                 Spacer()
                 HStack {
                     Spacer().frame(width: 1, height: size, alignment: .leading)
                         .background(cornerPixelsColor)
-                    
+
                     Rectangle()
                         .fill(bottomLineColor)
                         .frame(height: size, alignment: .leading)
-                    
+
                     Spacer().frame(width: 1, height: size, alignment: .trailing)
                         .background(cornerPixelsColor)
                 }

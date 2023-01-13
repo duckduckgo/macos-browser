@@ -125,9 +125,9 @@ final class LocalBitwardenInstallationService: BWInstallationService {
     private func getModificationDate(for dataFileURL: URL) -> Date? {
         return try? FileManager.default.attributesOfItem(atPath: dataFileURL.path)[FileAttributeKey.modificationDate] as? Date
     }
-    
+
     func openBitwarden() {
         NSWorkspace.shared.open(bundleUrl)
     }
-    
+
 }

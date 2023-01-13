@@ -21,52 +21,44 @@ import XCTest
 
 class RecentlyVisitedSiteModelTests: XCTestCase {
 
+    private func RecentlyVisitedSiteModel(originalURL: URL, privatePlayer: PrivatePlayerMode = .disabled) -> HomePage.Models.RecentlyVisitedSiteModel? {
+        HomePage.Models.RecentlyVisitedSiteModel(originalURL: originalURL, bookmarkManager: LocalBookmarkManager(bookmarkStore: BookmarkStoreMock(), faviconManagement: FaviconManagerMock()), fireproofDomains: FireproofDomains(store: FireproofDomainsStoreMock()), privatePlayer: .mock(withMode: privatePlayer))
+    }
+
     func testWhenOriginalURLIsHTTPS_ThenModelURLIsHTTPS() {
         assertModelWithURL(URL(string: "https://example.com")!, matches: URL(string: "https://example.com")!, expectedDomain: "example.com")
     }
-    
+
     func testWhenOriginalURLIsHTTP_ThenModelURLIsHTTP() {
         assertModelWithURL(URL(string: "http://example.com")!, matches: URL(string: "http://example.com")!, expectedDomain: "example.com")
     }
-    
+
     func testWhenOriginalURLContainsAdditionalInformation_ThenModelURLOnlyUsesSchemeAndHost() {
         assertModelWithURL(URL(string: "http://example.com/path?test=true#fragment")!, matches: URL(string: "http://example.com")!, expectedDomain: "example.com")
         assertModelWithURL(URL(string: "https://example.com/path?test=true#fragment")!, matches: URL(string: "https://example.com")!, expectedDomain: "example.com")
     }
-    
+
     func testWhenOriginalURLContainsWWW_ThenDomainDoesNotIncludeIt() {
         assertModelWithURL(URL(string: "http://www.example.com")!, matches: URL(string: "http://www.example.com")!, expectedDomain: "example.com")
     }
 
     func testWhenPrivatePlayerIsEnabled_ThenPrivatePlayerURLSetsDomainPlaceholder() {
-        let model = HomePage.Models.RecentlyVisitedSiteModel(
-            originalURL: .effectivePrivatePlayer("abcde12345"),
-            privatePlayer: .mock(withMode: .enabled)
-        )
+        let model = RecentlyVisitedSiteModel(originalURL: .effectivePrivatePlayer("abcde12345"), privatePlayer: .enabled)
         XCTAssertEqual(model?.isRealDomain, false)
         XCTAssertEqual(model?.domainToDisplay, PrivatePlayer.commonName)
     }
 
     func testWhenPrivatePlayerIsDisabled_ThenPrivatePlayerURLDoesNotSetDomainPlaceholder() {
         let url = URL.effectivePrivatePlayer("abcde12345")
-        let model = HomePage.Models.RecentlyVisitedSiteModel(originalURL: url, privatePlayer: .mock(withMode: .disabled))
+        let model = RecentlyVisitedSiteModel(originalURL: url)
         XCTAssertEqual(model?.isRealDomain, true)
         XCTAssertEqual(model?.domainToDisplay, model?.domain)
     }
 
     private func assertModelWithURL(_ url: URL, matches expectedURL: URL, expectedDomain: String) {
-        let model = HomePage.Models.RecentlyVisitedSiteModel(originalURL: url)
+        let model = RecentlyVisitedSiteModel(originalURL: url)
         XCTAssertEqual(model?.isRealDomain, true)
         XCTAssertEqual(model?.domain, expectedDomain)
         XCTAssertEqual(model?.url, expectedURL)
-    }
-}
-
-private extension PrivatePlayer {
-
-    static func mock(withMode mode: PrivatePlayerMode = .enabled) -> PrivatePlayer {
-        let preferencesPersistor = PrivatePlayerPreferencesPersistorMock(privatePlayerMode: mode, youtubeOverlayInteracted: true)
-        let preferences = PrivatePlayerPreferences(persistor: preferencesPersistor)
-        return PrivatePlayer(preferences: preferences)
     }
 }

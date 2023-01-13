@@ -27,7 +27,7 @@ final class BadgeNotificationAnimationModel: ObservableObject {
         self.duration = duration
         self.secondPhaseDelay = secondPhaseDelay
     }
-    
+
     enum AnimationState {
         case unstarted
         case expanded

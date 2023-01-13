@@ -18,17 +18,27 @@
 
 import XCTest
 import WebKit
+import Common
 import TrackerRadarKit
 import BrowserServicesKit
 @testable import DuckDuckGo_Privacy_Browser
 
 class ContentBlockingUpdatingTests: XCTestCase {
+    // todo: mock
     let preferences = PrivacySecurityPreferences.shared
     let rulesManager = ContentBlockerRulesManagerMock()
     var updating: UserContentUpdating!
 
     override func setUp() {
-        updating = UserContentUpdating(contentBlockerRulesManager: rulesManager, privacySecurityPreferences: preferences)
+        updating = UserContentUpdating(contentBlockerRulesManager: rulesManager,
+                                       privacyConfigurationManager: MockPrivacyConfigurationManager(),
+                                       trackerDataManager: TrackerDataManager(etag: DefaultConfigurationStorage.shared.loadEtag(for: .trackerRadar),
+                                                                                                                                              data: DefaultConfigurationStorage.shared.loadData(for: .trackerRadar),
+                                                                                                                                              embeddedDataProvider: AppTrackerDataSetProvider(),
+                                                                                                                                              errorReporting: nil),
+                                       configStorage: ConfigurationDownloaderTests.MockStorage(),
+                                       privacySecurityPreferences: preferences,
+                                       tld: TLD())
     }
 
     override static func setUp() {
@@ -167,11 +177,11 @@ class ContentBlockingUpdatingTests: XCTestCase {
 }
 
 extension UserContentControllerNewContent {
-    
+
     func rules(withName name: String) -> WKContentRuleList? {
         rulesUpdate.rules.first(where: { $0.name == name})?.rulesList
     }
-    
+
     var isValid: Bool {
         return rules(withName: "test") != nil
     }

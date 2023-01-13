@@ -90,7 +90,7 @@ public struct UserDefaultsWrapper<T> {
         case historyV5toV6Migration = "history.v5.to.v6.migration.2"
 
         case showBookmarksBar = "bookmarks.bar.show"
-        
+
         case pinnedViews = "pinning.pinned-views"
 
         case lastDatabaseFactoryFailurePixelDate = "last.database.factory.failure.pixel.date"
@@ -124,7 +124,7 @@ public struct UserDefaultsWrapper<T> {
             return defaultValue
         }
         set {
-            if (newValue as? OptionalProtocol)?.isNil == true {
+            if (newValue as? AnyOptional)?.isNil == true {
                 UserDefaults.standard.removeObject(forKey: key.rawValue)
             } else {
                 UserDefaults.standard.set(newValue, forKey: key.rawValue)

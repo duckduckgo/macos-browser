@@ -20,7 +20,12 @@ import Combine
 import Foundation
 import WebKit
 
-extension Tab: WKUIDelegate {
+extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
+
+    // "protected" delegate property
+    private var delegate: TabDelegate? {
+        self.value(forKeyPath: Tab.objcDelegateKeyPath) as? TabDelegate
+    }
 
     @objc(_webView:saveDataToFile:suggestedFilename:mimeType:originatingURL:)
     func webView(_ webView: WKWebView, saveDataToFile data: Data, suggestedFilename: String, mimeType: String, originatingURL: URL) {
@@ -65,11 +70,11 @@ extension Tab: WKUIDelegate {
                  completionHandler: @escaping (WKWebView?) -> Void) {
 
         let newWindowPolicy: NavigationDecision? = {
-            // Are we handling custom Context Menu actions (see ContextMenuManager?)
-            if let newWindowPolicy = contextMenuManager.decideNewWindowPolicy(for: navigationAction) {
+            // Are we handling custom Context Menu navigation action? (see ContextMenuManager)
+            if let newWindowPolicy = self.contextMenuManager?.decideNewWindowPolicy(for: navigationAction) {
                 return newWindowPolicy
             }
-            
+
             return nil
         }()
         switch newWindowPolicy {
@@ -115,7 +120,7 @@ extension Tab: WKUIDelegate {
 
         guard let delegate else { return nil }
 
-        let tab = Tab(content: .none, webViewConfiguration: configuration, parentTab: self, shouldLoadInBackground: false, webViewFrame: webView.superview?.bounds ?? .zero)
+        let tab = Tab(content: .none, webViewConfiguration: configuration, parentTab: self, shouldLoadInBackground: false, canBeClosedWithBack: kind.isSelectedTab, webViewFrame: webView.superview?.bounds ?? .zero)
         delegate.tab(self, createdChild: tab, of: kind)
 
         let webView = tab.webView
@@ -250,8 +255,8 @@ extension Tab: WKUIDelegate {
         delegate?.closeTab(self)
     }
 
-    func print(frame: Any? = nil, completionHandler: ((Bool) -> Void)? = nil) {
-        guard let printOperation = webView.printOperation(for: frame) else { return }
+    func runPrintOperation(for frameHandle: Any?, in webView: WKWebView, completionHandler: ((Bool) -> Void)? = nil) {
+        guard let printOperation = webView.printOperation(for: frameHandle) else { return }
 
         if printOperation.view?.frame.isEmpty == true {
             printOperation.view?.frame = webView.bounds
@@ -264,15 +269,17 @@ extension Tab: WKUIDelegate {
     }
 
     @objc(_webView:printFrame:)
-    func webView(_ webView: WKWebView, printFrame handle: Any) {
-        self.print(frame: handle)
+    func webView(_ webView: WKWebView, printFrame frameHandle: Any) {
+        self.runPrintOperation(for: frameHandle, in: webView)
     }
 
-    @available(macOS 12, *)
     @objc(_webView:printFrame:pdfFirstPageSize:completionHandler:)
-    func webView(_ webView: WKWebView, printFrame handle: Any, pdfFirstPageSize size: CGSize, completionHandler: () -> Void) {
-        self.webView(webView, printFrame: handle)
-        completionHandler()
+    func webView(_ webView: WKWebView, printFrame frameHandle: Any, pdfFirstPageSize size: CGSize, completionHandler: @escaping () -> Void) {
+        self.runPrintOperation(for: frameHandle, in: webView) { _ in completionHandler() }
+    }
+
+    func print() {
+        self.runPrintOperation(for: nil, in: self.webView)
     }
 
 }

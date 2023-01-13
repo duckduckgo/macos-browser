@@ -16,21 +16,33 @@
 //  limitations under the License.
 //
 
+import BrowserServicesKit
+import Common
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 @available(macOS 11, *)
 class AutoconsentMessageProtocolTests: XCTestCase {
+
     let userScript = AutoconsentUserScript(
-        scriptSource: DefaultScriptSourceProvider(),
-        config: ContentBlocking.shared.privacyConfigurationManager.privacyConfig
+        scriptSource: ScriptSourceProvider(configStorage: ConfigurationDownloaderTests.MockStorage(),
+                                           privacyConfigurationManager: MockPrivacyConfigurationManager(),
+                                           privacySettings: PrivacySecurityPreferences.shared, // todo: mock
+                                           contentBlockingManager: ContentBlockerRulesManagerMock(),
+                                           trackerDataManager: TrackerDataManager(etag: DefaultConfigurationStorage.shared.loadEtag(for: .trackerRadar),
+                                                                                  data: DefaultConfigurationStorage.shared.loadData(for: .trackerRadar),
+                                                                                  embeddedDataProvider: AppTrackerDataSetProvider(),
+                                                                                  errorReporting: nil),
+
+                                           tld: TLD()),
+        config: MockPrivacyConfiguration()
     )
-    
+
     override func setUp() {
         super.setUp()
         PrivacySecurityPreferences.shared.autoconsentEnabled = true
     }
-    
+
     func replyToJson(msg: Any) -> String {
         let jsonData = try? JSONSerialization.data(withJSONObject: msg, options: .sortedKeys)
         return String(data: jsonData!, encoding: .ascii)!
@@ -54,7 +66,7 @@ class AutoconsentMessageProtocolTests: XCTestCase {
         )
         waitForExpectations(timeout: 1.0)
     }
-    
+
     @MainActor
     func testInitResponds() {
         let expect = expectation(description: "tt")
@@ -73,7 +85,7 @@ class AutoconsentMessageProtocolTests: XCTestCase {
                     XCTFail("Could not parse init response")
                     return
                 }
-                
+
                 XCTAssertEqual(dict["type"] as? String, "initResp")
                 XCTAssertEqual(config["autoAction"] as? String, "optOut")
             },
@@ -81,7 +93,7 @@ class AutoconsentMessageProtocolTests: XCTestCase {
         )
         waitForExpectations(timeout: 1.0)
     }
-    
+
     @MainActor
     func testEval() {
         let message = MockWKScriptMessage(name: "eval", body: [
@@ -99,9 +111,9 @@ class AutoconsentMessageProtocolTests: XCTestCase {
             },
             message: message
         )
-        waitForExpectations(timeout: 1.0)
+        waitForExpectations(timeout: 5.0)
     }
-    
+
     @MainActor
     func testPopupFoundNoPromptIfEnabled() {
         let expect = expectation(description: "tt")
@@ -125,15 +137,15 @@ class AutoconsentMessageProtocolTests: XCTestCase {
 
 @available(macOS 11, *)
 class MockWKScriptMessage: WKScriptMessage {
-    
+
     let mockedName: String
     let mockedBody: Any
     let mockedWebView: WKWebView?
-    
+
     override var name: String {
         return mockedName
     }
-    
+
     override var body: Any {
         return mockedBody
     }
@@ -141,7 +153,7 @@ class MockWKScriptMessage: WKScriptMessage {
     override var webView: WKWebView? {
         return mockedWebView
     }
-    
+
     init(name: String, body: Any, webView: WKWebView? = nil) {
         self.mockedName = name
         self.mockedBody = body

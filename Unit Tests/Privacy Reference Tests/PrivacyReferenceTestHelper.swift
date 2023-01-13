@@ -26,36 +26,36 @@ struct PrivacyReferenceTestHelper {
         case unknownFile
         case invalidFileContents
     }
-    
+
     func data(for path: String, in bundle: Bundle) throws -> Data {
         let url = bundle.resourceURL!.appendingPathComponent(path)
         let path = url.path
         return try Data(contentsOf: URL(fileURLWithPath: path), options: .mappedIfSafe)
     }
-    
+
     func decodeResource<T: Decodable>(_ path: String, from bundle: Bundle) -> T {
         do {
             let data = try data(for: path, in: bundle)
             let jsonResult = try JSONDecoder().decode(T.self, from: data)
             return jsonResult
-            
+
         } catch {
             fatalError("Can't decode \(path) - Error \(error.localizedDescription)")
         }
     }
-    
+
     func privacyConfigurationData(withConfigPath path: String, bundle: Bundle) -> PrivacyConfigurationData {
         guard let configData = try? data(for: path, in: bundle) else {
             fatalError("Can't decode \(path)")
         }
-        
+
         guard let json = try? JSONSerialization.jsonObject(with: configData, options: []) as? [String: Any] else {
             fatalError("Can't decode \(path)")
         }
-        
+
         return PrivacyConfigurationData(json: json)
     }
-        
+
     func privacyConfiguration(withData data: PrivacyConfigurationData) -> PrivacyConfiguration {
         let domain = MockDomainsProtectionStore()
         return AppPrivacyConfiguration(data: data, identifier: UUID().uuidString, localProtection: domain)

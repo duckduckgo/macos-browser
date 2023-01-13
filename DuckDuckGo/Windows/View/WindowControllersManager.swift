@@ -50,16 +50,16 @@ final class WindowControllersManager: WindowControllersManagerProtocol {
             }
         }
     }
-    
+
     private var mainWindowController: MainWindowController? {
         return mainWindowControllers.first(where: {
             let isMain = $0.window?.isMainWindow ?? false
             let hasMainChildWindow = $0.window?.childWindows?.contains { $0.isMainWindow } ?? false
-            
+
             return $0.window?.isPopUpWindow == false && (isMain || hasMainChildWindow)
         })
     }
-    
+
     var selectedTab: Tab? {
         return mainWindowController?.mainViewController.tabCollectionViewModel.selectedTab
     }
@@ -128,7 +128,7 @@ extension WindowControllersManager {
             show(url: bookmark.url)
         }
     }
-    
+
     func show(url: URL?, newTab: Bool = false) {
 
         func show(url: URL?, in windowController: MainWindowController) {
@@ -182,4 +182,10 @@ extension WindowControllersManager {
         windowController.window?.orderFront(nil)
     }
 
+}
+
+extension Tab {
+    var isPinned: Bool {
+        return self.pinnedTabsManager.isTabPinned(self)
+    }
 }

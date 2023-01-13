@@ -154,9 +154,9 @@ final class ConfigurationManager {
 
         let configEtag = DefaultConfigurationStorage.shared.loadEtag(for: .privacyConfiguration)
         let configData = DefaultConfigurationStorage.shared.loadData(for: .privacyConfiguration)
-        ContentBlocking.shared.privacyConfigurationManager.reload(etag: configEtag, data: configData)
+        _=ContentBlocking.shared.privacyConfigurationManager.reload(etag: configEtag, data: configData)
 
-        ContentBlocking.shared.contentBlockingManager.scheduleCompilation()
+        _=ContentBlocking.shared.contentBlockingManager.scheduleCompilation()
     }
 
     private func updateBloomFilter() throws {

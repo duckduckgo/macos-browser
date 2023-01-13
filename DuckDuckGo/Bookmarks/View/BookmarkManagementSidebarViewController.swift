@@ -32,7 +32,7 @@ final class BookmarkManagementSidebarViewController: NSViewController {
         case empty
         case folder(BookmarkFolder)
         case favorites
-        
+
         var selectedFolderUUID: UUID? {
             switch self {
             case .folder(let folder): return folder.id
@@ -226,7 +226,7 @@ extension BookmarkManagementSidebarViewController: FolderMenuItemSelectors {
             assertionFailure("Failed to retrieve Bookmark from Rename Folder context menu item")
             return
         }
-        
+
         let addFolderViewController = AddFolderModalViewController.create()
         addFolderViewController.delegate = self
         addFolderViewController.edit(folder: folder)
@@ -241,14 +241,14 @@ extension BookmarkManagementSidebarViewController: FolderMenuItemSelectors {
 
         LocalBookmarkManager.shared.remove(folder: folder)
     }
-    
+
     func openInNewTabs(_ sender: NSMenuItem) {
         guard let tabCollection = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.tabCollectionViewModel,
               let children = (sender.representedObject as? BookmarkFolder)?.children else {
             assertionFailure("Cannot open in new tabs")
             return
         }
-        
+
         let tabs = children.compactMap { $0 as? Bookmark }.map { Tab(content: .url($0.url), shouldLoadInBackground: true) }
         tabCollection.append(tabs: tabs)
     }

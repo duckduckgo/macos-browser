@@ -35,7 +35,7 @@ final class WindowDraggingView: NSView {
             super.mouseDown(with: event)
             return
         }
-        
+
         mouseDownSubject.send(event)
 
         if event.clickCount == 2 {

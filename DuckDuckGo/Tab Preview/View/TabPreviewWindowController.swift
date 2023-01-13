@@ -44,7 +44,7 @@ final class TabPreviewWindowController: NSWindowController {
 
     override func windowDidLoad() {
         super.windowDidLoad()
-    
+
         window?.animationBehavior = .utilityWindow
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(suggestionWindowOpenNotification(_:)),

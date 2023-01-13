@@ -340,7 +340,7 @@ final class AddressBarTextField: NSTextField {
 
         upgradeToHttps(url: url, completion: completion)
     }
-    
+
     private func upgradeToHttps(url: URL, completion: @escaping (URL?, Bool) -> Void) {
         Task {
             let result = await PrivacyFeatures.httpsUpgrade.upgrade(url: url)
@@ -860,7 +860,7 @@ extension AddressBarTextField: NSTextViewDelegate {
            let pasteAndDoMenuItem = makePasteAndDoMenuItem() {
             textViewMenu.insertItem(pasteAndDoMenuItem, at: pasteMenuItemIndex + 1)
         }
-        
+
         if let insertionPoint = menuItemInsertionPoint(within: menu) {
             additionalMenuItems.reversed().forEach { item in
                 textViewMenu.insertItem(item, at: insertionPoint)
@@ -870,10 +870,10 @@ extension AddressBarTextField: NSTextViewDelegate {
                 textViewMenu.addItem(item)
             }
         }
-        
+
         return textViewMenu
     }
-    
+
     /// Returns the menu item after which new items should be added.
     /// This will be the first separator that comes after a predefined list of items: Cut, Copy, or Paste.
     ///
@@ -881,13 +881,13 @@ extension AddressBarTextField: NSTextViewDelegate {
     private func menuItemInsertionPoint(within menu: NSMenu) -> Int? {
         let preferredSelectorNames = ["cut:", "copy:", "paste:"]
         var foundPreferredSelector = false
-        
+
         for (index, item) in menu.items.enumerated() {
             if foundPreferredSelector && item.isSeparatorItem {
                 let indexAfterSeparator = index + 1
                 return menu.items.indices.contains(indexAfterSeparator) ? indexAfterSeparator : index
             }
-            
+
             if let action = item.action, preferredSelectorNames.contains(action.description) {
                 foundPreferredSelector = true
             }
@@ -945,7 +945,7 @@ extension AddressBarTextField: NSTextViewDelegate {
 
         return menuItem
     }
-    
+
     private func makeFullWebsiteAddressMenuItem() -> NSMenuItem {
         let menuItem = NSMenuItem(
             title: UserText.showFullWebsiteAddress.localizedCapitalized,

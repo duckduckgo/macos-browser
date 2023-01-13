@@ -21,39 +21,39 @@ import Combine
 import BrowserServicesKit
 
 final class ContentBlockingRulesUpdateObserver {
-    
+
     @Published public private(set) var pendingUpdates = [String: String]()
-    
+
     public private(set) weak var tabViewModel: TabViewModel?
     private var onPendingUpdates: (() -> Void)?
     private var rulesRecompilationCancellable: AnyCancellable?
-        
+
     public func updateTabViewModel(_ tabViewModel: TabViewModel, onPendingUpdates: @escaping () -> Void) {
         rulesRecompilationCancellable?.cancel()
         rulesRecompilationCancellable = nil
-        
+
         self.tabViewModel = tabViewModel
         self.onPendingUpdates = onPendingUpdates
-        
-        bindContentBlockingRulesRecompilation(publisher: ContentBlocking.shared.userContentUpdating.userContentBlockingAssets)
+
+        bindContentBlockingRulesRecompilation(publisher: (ContentBlocking.shared as? AppContentBlocking)!.userContentUpdating.userContentBlockingAssets)
     }
-    
+
     public func didStartCompilation(for domain: String, token: ContentBlockerRulesManager.CompletionToken ) {
         pendingUpdates[token] = domain
         onPendingUpdates?()
     }
-    
+
     private func bindContentBlockingRulesRecompilation<Pub: Publisher>(publisher: Pub)
     where Pub.Output == UserContentUpdating.NewContent, Pub.Failure == Never {
-        
+
         rulesRecompilationCancellable = publisher
             .compactMap(\.nonEmptyCompletionTokens)
             .receive(on: RunLoop.main)
             .sink { [weak self] completionTokens in
                 dispatchPrecondition(condition: .onQueue(.main))
-                
+
                 guard let self = self, !self.pendingUpdates.isEmpty else { return }
-                
+
                 var didUpdate = false
                 for token in completionTokens {
                     // swiftlint:disable:next for_where
@@ -61,7 +61,7 @@ final class ContentBlockingRulesUpdateObserver {
                         didUpdate = true
                     }
                 }
-                
+
                 if didUpdate {
                     self.tabViewModel?.reload()
                     self.onPendingUpdates?()
