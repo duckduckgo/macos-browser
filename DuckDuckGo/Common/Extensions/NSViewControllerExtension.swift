@@ -50,6 +50,17 @@ extension NSViewController {
             view.window?.beginSheet(windowSheet, completionHandler: handler)
         }
     }
+    
+    func beginSheetFromMainWindow(_ viewController: NSViewController) {
+        let newWindowController = viewController.wrappedInWindowController()
+        guard let newWindow = newWindowController.window,
+              let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController
+        else {
+            assertionFailure("Failed to present \(viewController)")
+            return
+        }
+        parentWindowController.window?.beginSheet(newWindow)
+    }
 
     func dismiss() {
         guard let window = view.window else {
