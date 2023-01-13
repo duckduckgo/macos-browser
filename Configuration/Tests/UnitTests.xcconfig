@@ -13,4 +13,11 @@
 //  limitations under the License.
 //
 
-#include? "Version.xcconfig"
+#include "TestsTargetsBase.xcconfig"
+
+ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES
+
+INFOPLIST_FILE = Unit Tests/Info.plist
+PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser.DuckDuckGoTests
+
+SWIFT_OBJC_BRIDGING_HEADER = $(SRCROOT)/Unit Tests/Common/TestsBridging.h

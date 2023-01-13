@@ -259,7 +259,7 @@ fileprivate extension NavigationBarViewController {
     var controlsForUserPrevention: [NSControl?] {
         return [goBackButton,
                 goForwardButton,
-                refreshButton,
+                refreshOrStopButton,
                 optionsButton,
                 bookmarkListButton,
                 passwordManagementButton,

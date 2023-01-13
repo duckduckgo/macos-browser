@@ -30,7 +30,7 @@ final class NavigationBarViewController: NSViewController {
     @IBOutlet weak var mouseOverView: MouseOverView!
     @IBOutlet weak var goBackButton: NSButton!
     @IBOutlet weak var goForwardButton: NSButton!
-    @IBOutlet weak var refreshButton: NSButton!
+    @IBOutlet weak var refreshOrStopButton: NSButton!
     @IBOutlet weak var optionsButton: NSButton!
     @IBOutlet weak var bookmarkListButton: MouseOverButton!
     @IBOutlet weak var passwordManagementButton: MouseOverButton!
@@ -77,7 +77,7 @@ final class NavigationBarViewController: NSViewController {
     private var credentialsToSaveCancellable: AnyCancellable?
     private var passwordManagerNotificationCancellable: AnyCancellable?
     private var pinnedViewsNotificationCancellable: AnyCancellable?
-    private var navigationButtonsCancellables = Set<AnyCancellable>()
+    private var navigationButtonsCancellable: AnyCancellable?
     private var downloadsCancellables = Set<AnyCancellable>()
 
     required init?(coder: NSCoder) {
@@ -115,9 +115,9 @@ final class NavigationBarViewController: NSViewController {
 
         optionsButton.toolTip = UserText.applicationMenuTooltip
 
-        #if DEBUG || REVIEW
+#if DEBUG || REVIEW
         addDebugNotificationListeners()
-        #endif
+#endif
     }
 
     override func viewWillAppear() {
@@ -128,7 +128,7 @@ final class NavigationBarViewController: NSViewController {
         if view.window?.isPopUpWindow == true {
             goBackButton.isHidden = true
             goForwardButton.isHidden = true
-            refreshButton.isHidden = true
+            refreshOrStopButton.isHidden = true
             optionsButton.isHidden = true
             addressBarTopConstraint.constant = 0
             addressBarBottomConstraint.constant = 0
@@ -189,13 +189,17 @@ final class NavigationBarViewController: NSViewController {
         tabCollectionViewModel.insert(tab, selected: false)
     }
 
-    @IBAction func refreshAction(_ sender: NSButton) {
+    @IBAction func refreshOrStopAction(_ sender: NSButton) {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             os_log("%s: Selected tab view model is nil", type: .error, className)
             return
         }
 
-        selectedTabViewModel.reload()
+        if selectedTabViewModel.isLoading {
+            selectedTabViewModel.tab.stopLoading()
+        } else {
+            selectedTabViewModel.reload()
+        }
     }
 
     @IBAction func optionsButtonAction(_ sender: NSButton) {
@@ -305,10 +309,11 @@ final class NavigationBarViewController: NSViewController {
             else { return }
             DispatchQueue.main.async { [weak self] in
                 guard let self = self,
-                      self.tabCollectionViewModel.selectedTabViewModel?.tab.url == topUrl else {
-                          // if the tab is not active, don't show the popup
-                          return
-                      }
+                      self.tabCollectionViewModel.selectedTabViewModel?.tab.url == topUrl
+                else {
+                    // if the tab is not active, don't show the popup
+                    return
+                }
                 self.addressBarViewController?.addressBarButtonsViewController?.showBadgeNotification(.cookieManaged)
             }
         }
@@ -334,7 +339,7 @@ final class NavigationBarViewController: NSViewController {
 
         goBackButton.toolTip = UserText.navigateBackTooltip
         goForwardButton.toolTip = UserText.navigateForwardTooltip
-        refreshButton.toolTip = UserText.refreshPageTooltip
+        refreshOrStopButton.toolTip = UserText.refreshPageTooltip
     }
 
     private func subscribeToSelectedTabViewModel() {
@@ -566,25 +571,26 @@ final class NavigationBarViewController: NSViewController {
     }
 
     private func subscribeToNavigationActionFlags() {
-        navigationButtonsCancellables.forEach { $0.cancel() }
-        navigationButtonsCancellables.removeAll()
+        navigationButtonsCancellable = nil
 
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             goBackButton.isEnabled = false
             goForwardButton.isEnabled = false
+            refreshOrStopButton.isEnabled = false
             return
         }
-        selectedTabViewModel.$canGoBack.receive(on: DispatchQueue.main).sink { [weak self] _ in
-            self?.updateNavigationButtons()
-        } .store(in: &navigationButtonsCancellables)
 
-        selectedTabViewModel.$canGoForward.receive(on: DispatchQueue.main).sink { [weak self] _ in
+        navigationButtonsCancellable = Publishers.MergeMany(
+            selectedTabViewModel.$canGoBack.removeDuplicates(),
+            selectedTabViewModel.$canGoForward.removeDuplicates(),
+            selectedTabViewModel.$canReload.removeDuplicates(),
+            selectedTabViewModel.$isLoading.removeDuplicates()
+        )
+        .asVoid()
+        .receive(on: DispatchQueue.main)
+        .sink { [weak self] in
             self?.updateNavigationButtons()
-        } .store(in: &navigationButtonsCancellables)
-
-        selectedTabViewModel.$canReload.receive(on: DispatchQueue.main).sink { [weak self] _ in
-            self?.updateNavigationButtons()
-        } .store(in: &navigationButtonsCancellables)
+        }
     }
 
     private func updateNavigationButtons() {
@@ -595,9 +601,10 @@ final class NavigationBarViewController: NSViewController {
 
         goBackButton.isEnabled = selectedTabViewModel.canGoBack
         goForwardButton.isEnabled = selectedTabViewModel.canGoForward
-        refreshButton.isEnabled = selectedTabViewModel.canReload
+        refreshOrStopButton.isEnabled = selectedTabViewModel.canReload || selectedTabViewModel.isLoading
+        refreshOrStopButton.image = selectedTabViewModel.isLoading ? NSImage(imageLiteralResourceName: "Stop") : NSImage(imageLiteralResourceName: "Refresh")
+        refreshOrStopButton.toolTip = selectedTabViewModel.isLoading ? UserText.stopLoadingTooltip : UserText.refreshPageTooltip
     }
-
 }
 
 extension NavigationBarViewController: MouseOverViewDelegate {
