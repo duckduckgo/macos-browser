@@ -120,13 +120,13 @@ final class BookmarkListViewController: NSViewController {
         let newBookmarkViewController = AddBookmarkModalViewController.create()
         newBookmarkViewController.currentTabWebsite = currentTabWebsite
         newBookmarkViewController.delegate = self
-        presentAsModalWindow(newBookmarkViewController)
+        beginSheetFromMainWindow(newBookmarkViewController)
     }
 
     @IBAction func newFolderButtonClicked(_ sender: AnyObject) {
         let newFolderViewController = AddFolderModalViewController.create()
         newFolderViewController.delegate = self
-        presentAsModalWindow(newFolderViewController)
+        beginSheetFromMainWindow(newFolderViewController)
     }
 
     @IBAction func openManagementInterface(_ sender: NSButton) {
@@ -352,7 +352,7 @@ extension BookmarkListViewController: FolderMenuItemSelectors {
         let addFolderViewController = AddFolderModalViewController.create()
         addFolderViewController.delegate = self
         addFolderViewController.edit(folder: folder)
-        presentAsModalWindow(addFolderViewController)
+        beginSheetFromMainWindow(addFolderViewController)
     }
 
     func deleteFolder(_ sender: NSMenuItem) {
