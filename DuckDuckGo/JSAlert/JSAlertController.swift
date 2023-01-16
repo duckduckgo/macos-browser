@@ -29,7 +29,7 @@ final class JSAlertController: NSViewController {
 
     @IBOutlet var scrollViewHeight: NSLayoutConstraint!
     @IBOutlet var alertCenterYAlignment: NSLayoutConstraint!
-    
+
     @IBOutlet var backgroundView: NSView!
     @IBOutlet var alertView: NSView!
     @IBOutlet var verticalStackView: NSStackView!
@@ -67,7 +67,7 @@ final class JSAlertController: NSViewController {
         alertView.layer?.cornerRadius = 10.0
         alertView.applyDropShadow()
         backgroundView.layer?.backgroundColor = CGColor(gray: 0.0, alpha: 0.2)
-        
+
         messageText.textContainer?.lineFragmentPadding = 0.0
         messageText.isEditable = false
     }
@@ -87,7 +87,7 @@ final class JSAlertController: NSViewController {
 
     override func viewDidLayout() {
         super.viewDidLayout()
-        
+
         let messageHeight = messageText.textSize.height
         scrollViewHeight.constant = messageHeight
 
@@ -98,7 +98,7 @@ final class JSAlertController: NSViewController {
             scrollView.verticalScrollElasticity = .automatic
             scrollView.hasVerticalScroller = true
         }
-        
+
         guard let windowContentView = view.window?.contentView else {
             return
         }
@@ -110,11 +110,13 @@ final class JSAlertController: NSViewController {
 
     @IBAction func okAction(_ sender: NSButton) {
         view.window?.endEditing(for: nil)
+        textField.resignFirstResponder()
         viewModel.confirm(text: textField.stringValue)
     }
 
     @IBAction func cancelAction(_ sender: Any?) {
         view.window?.endEditing(for: nil)
+        textField.resignFirstResponder()
         viewModel.cancel()
     }
 
@@ -148,11 +150,12 @@ extension JSAlertController: NSViewControllerPresentationAnimator {
         alertView.layer?.opacity = 0.0
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
             self?.animateIn { [weak self] in
-                self?.textField.makeMeFirstResponder()
+                // self?.textField.makeMeFirstResponder()
+                self?.okButton.makeMeFirstResponder()
             }
         }
     }
-    
+
     func animateDismissal(of viewController: NSViewController, from fromViewController: NSViewController) {
         guard viewController === self else { return }
         animateOut { [weak self] in
