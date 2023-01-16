@@ -78,7 +78,7 @@
                                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                 </textFieldCell>
                                             </textField>
-                                            <stackView distribution="fillEqually" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="8jY-yL-rjW" userLabel="Push Buttons Stack View">
+                                            <stackView distribution="fillEqually" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" verticalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="8jY-yL-rjW" userLabel="Push Buttons Stack View">
                                                 <rect key="frame" x="0.0" y="4" width="420" height="28"/>
                                                 <subviews>
                                                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="aC8-rX-2ac">
@@ -148,12 +148,12 @@ DQ
                         <constraints>
                             <constraint firstItem="FkK-fl-t4d" firstAttribute="leading" secondItem="tOy-S4-hL0" secondAttribute="leading" id="5jn-My-SiT"/>
                             <constraint firstItem="noe-j7-ZAB" firstAttribute="centerX" secondItem="tOy-S4-hL0" secondAttribute="centerX" id="GpP-25-hhY"/>
-                            <constraint firstItem="noe-j7-ZAB" firstAttribute="top" relation="greaterThanOrEqual" secondItem="tOy-S4-hL0" secondAttribute="top" constant="24" id="Vkf-DI-IwV"/>
+                            <constraint firstItem="noe-j7-ZAB" firstAttribute="top" relation="greaterThanOrEqual" secondItem="tOy-S4-hL0" secondAttribute="top" constant="12" id="Vkf-DI-IwV"/>
                             <constraint firstAttribute="bottom" secondItem="FkK-fl-t4d" secondAttribute="bottom" id="a9B-mu-zxk"/>
                             <constraint firstItem="FkK-fl-t4d" firstAttribute="top" secondItem="tOy-S4-hL0" secondAttribute="top" id="ekt-en-yTP"/>
-                            <constraint firstItem="noe-j7-ZAB" firstAttribute="centerY" secondItem="tOy-S4-hL0" secondAttribute="centerY" id="sqD-dl-ylM"/>
+                            <constraint firstItem="noe-j7-ZAB" firstAttribute="centerY" secondItem="tOy-S4-hL0" secondAttribute="centerY" priority="250" id="sqD-dl-ylM"/>
                             <constraint firstAttribute="trailing" secondItem="FkK-fl-t4d" secondAttribute="trailing" id="trA-FT-SdH"/>
-                            <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="noe-j7-ZAB" secondAttribute="bottom" constant="24" id="wqR-jZ-szr"/>
+                            <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="noe-j7-ZAB" secondAttribute="bottom" constant="12" id="wqR-jZ-szr"/>
                         </constraints>
                     </view>
                     <connections>
