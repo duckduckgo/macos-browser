@@ -110,13 +110,11 @@ final class JSAlertController: NSViewController {
 
     @IBAction func okAction(_ sender: NSButton) {
         view.window?.endEditing(for: nil)
-        textField.resignFirstResponder()
         viewModel.confirm(text: textField.stringValue)
     }
 
     @IBAction func cancelAction(_ sender: Any?) {
         view.window?.endEditing(for: nil)
-        textField.resignFirstResponder()
         viewModel.cancel()
     }
 
@@ -150,8 +148,7 @@ extension JSAlertController: NSViewControllerPresentationAnimator {
         alertView.layer?.opacity = 0.0
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
             self?.animateIn { [weak self] in
-                // self?.textField.makeMeFirstResponder()
-                self?.okButton.makeMeFirstResponder()
+                self?.textField.makeMeFirstResponder()
             }
         }
     }
