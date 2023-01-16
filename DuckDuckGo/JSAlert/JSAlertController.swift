@@ -23,8 +23,8 @@ final class JSAlertController: NSViewController {
 
     private enum Constants {
         static let storyboardName = "JSAlert"
-        static let appearAnimationDuration = 0.2
-        static let dismissAnimationDuration = 0.3
+        static let appearAnimationDuration = 0.05
+        static let dismissAnimationDuration = 0.1
         static let scrollViewToTextfieldSpacing = 8.0
     }
 
@@ -141,7 +141,7 @@ extension JSAlertController: NSViewControllerPresentationAnimator {
         fromViewController.addAndLayoutChild(self)
         setAlertAnchorPoint(anchorPoint: CGPoint(x: 0.5, y: 0.5))
         backgroundView.layer?.opacity = 0.0
-        alertView.layer?.transform = CATransform3DMakeScale(0.9, 0.9, 1)
+        alertView.layer?.transform = CATransform3DMakeScale(0.95, 0.95, 1)
         alertView.layer?.opacity = 0.0
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
             self?.animateIn { [weak self] in
@@ -159,7 +159,7 @@ extension JSAlertController: NSViewControllerPresentationAnimator {
 
     private func animateIn(_ completion: @escaping () -> Void) {
         animate(
-            transform: Animation(fromValue: CATransform3DMakeScale(0.9, 0.9, 1), toValue: CATransform3DIdentity),
+            transform: Animation(fromValue: CATransform3DMakeScale(0.95, 0.95, 1), toValue: CATransform3DIdentity),
             backgroundOpacity: Animation(fromValue: 0.0, toValue: 1.0),
             alertOpacity: Animation(fromValue: 0.75, toValue: 1.0),
             duration: Constants.appearAnimationDuration,
@@ -169,7 +169,7 @@ extension JSAlertController: NSViewControllerPresentationAnimator {
 
     private func animateOut(_ completion: @escaping () -> Void) {
         animate(
-            transform: Animation(fromValue: CATransform3DIdentity, toValue: CATransform3DMakeScale(0.9, 0.9, 1)),
+            transform: Animation(fromValue: CATransform3DIdentity, toValue: CATransform3DMakeScale(0.95, 0.95, 1)),
             backgroundOpacity: Animation(fromValue: 1.0, toValue: 0.0),
             alertOpacity: Animation(fromValue: 1.0, toValue: 0.0),
             duration: Constants.dismissAnimationDuration,
