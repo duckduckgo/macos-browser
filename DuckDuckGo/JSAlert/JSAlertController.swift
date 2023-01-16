@@ -17,6 +17,7 @@
 //
 
 import AppKit
+import Combine
 
 final class JSAlertController: NSViewController {
 
@@ -26,6 +27,8 @@ final class JSAlertController: NSViewController {
         static let dismissAnimationDuration = 0.3
         static let scrollViewToTextfieldSpacing = 8.0
     }
+    
+    var appearanceCancellable: AnyCancellable?
 
     @IBOutlet var scrollViewHeight: NSLayoutConstraint!
     @IBOutlet var alertCenterYAlignment: NSLayoutConstraint!
@@ -61,8 +64,10 @@ final class JSAlertController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        NSAppearance.withAppAppearance {
-            alertView.layer?.backgroundColor = NSColor.panelBackgroundColor.cgColor
+        appearanceCancellable = NSApp.publisher(for: \.effectiveAppearance).receive(on: DispatchQueue.main).sink { [weak self] _ in
+            NSAppearance.withAppAppearance {
+                self?.alertView.layer?.backgroundColor = NSColor.panelBackgroundColor.cgColor
+            }
         }
         alertView.layer?.cornerRadius = 10.0
         alertView.applyDropShadow()
