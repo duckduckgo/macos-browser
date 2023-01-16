@@ -106,12 +106,12 @@ final class JSAlertController: NSViewController {
     }
 
     @IBAction func okAction(_ sender: NSButton) {
-        view.window?.endEditing(for: nil)
+        dehighlightTextField()
         viewModel.confirm(text: textField.stringValue)
     }
 
     @IBAction func cancelAction(_ sender: Any?) {
-        view.window?.endEditing(for: nil)
+        dehighlightTextField()
         viewModel.cancel()
     }
 
@@ -132,6 +132,11 @@ final class JSAlertController: NSViewController {
         verticalStackView.setCustomSpacing(scrollViewSpacing, after: scrollView)
         textField.stringValue = viewModel.textFieldDefaultText
         messageText.sizeToFit()
+    }
+    
+    private func dehighlightTextField() {
+        view.window?.endEditing(for: nil)
+        textField.focusRingType = .none // prevents dodgy animation out
     }
 }
 
