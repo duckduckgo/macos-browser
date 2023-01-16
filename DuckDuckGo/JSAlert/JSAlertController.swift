@@ -27,7 +27,7 @@ final class JSAlertController: NSViewController {
         static let dismissAnimationDuration = 0.3
         static let scrollViewToTextfieldSpacing = 8.0
     }
-    
+
     var appearanceCancellable: AnyCancellable?
 
     @IBOutlet var scrollViewHeight: NSLayoutConstraint!
@@ -80,14 +80,6 @@ final class JSAlertController: NSViewController {
     override func viewWillAppear() {
         super.viewWillAppear()
         presentData()
-    }
-
-    override func viewDidAppear() {
-        super.viewDidAppear()
-
-        if let okButtonCell = okButton.cell as? NSButtonCell {
-            view.window?.defaultButtonCell = okButtonCell
-        }
     }
 
     override func viewDidLayout() {

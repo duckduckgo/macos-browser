@@ -99,8 +99,10 @@ Gw
                                                         <buttonCell key="cell" type="push" title="Ok" bezelStyle="rounded" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="O9l-tZ-1vx" userLabel="OK">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                             <font key="font" metaFont="system"/>
+                                                            <string key="keyEquivalent" base64-UTF8="YES">
+DQ
+</string>
                                                         </buttonCell>
-                                                        <color key="bezelColor" name="AccentColor"/>
                                                         <connections>
                                                             <action selector="okAction:" target="bU7-R8-ocO" id="vJH-EV-296"/>
                                                         </connections>
@@ -174,9 +176,6 @@ Gw
         </scene>
     </scenes>
     <resources>
-        <namedColor name="AccentColor">
-            <color red="0.0" green="0.46000000000000002" blue="0.89000000000000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-        </namedColor>
         <namedColor name="ClearColor">
             <color red="1" green="1" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
