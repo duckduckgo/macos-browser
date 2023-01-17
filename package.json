@@ -18,6 +18,6 @@
     "rollup-plugin-terser": "^7.0.2"
   },
   "dependencies": {
-    "@duckduckgo/autoconsent": "^3.0.4"
+    "@duckduckgo/autoconsent": "^4.1.0"
   }
 }
