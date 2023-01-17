@@ -1,7 +1,4 @@
-//
-//  EmailUrlExtensions.swift
-//
-//  Copyright © 2021 DuckDuckGo. All rights reserved.
+//  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,21 +13,10 @@
 //  limitations under the License.
 //
 
-import Foundation
-import BrowserServicesKit
+#include "TestsTargetsBase.xcconfig"
 
-extension EmailUrls {
+MACOSX_DEPLOYMENT_TARGET = 11.1
 
-    private struct Url {
-        static let emailProtectionLink = "https://duckduckgo.com/email"
-    }
+INFOPLIST_FILE = Integration Tests/Info.plist
+PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.Integration-Tests
 
-    var emailProtectionLink: URL {
-        return URL(string: Url.emailProtectionLink)!
-    }
-
-    func isDuckDuckGoEmailProtection(url: URL) -> Bool {
-        return url.absoluteString.starts(with: Url.emailProtectionLink)
-    }
-
-}
