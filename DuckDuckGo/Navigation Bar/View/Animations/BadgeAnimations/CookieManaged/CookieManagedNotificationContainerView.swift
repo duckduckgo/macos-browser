@@ -23,7 +23,7 @@ final class CookieManagedNotificationContainerView: NSView, NotificationBarViewA
     private let cookieAnimationModel = CookieNotificationAnimationModel()
     private let badgeAnimationModel = BadgeNotificationAnimationModel()
     let isCosmetic: Bool
-    
+
     private lazy var hostingView: NSHostingView<CookieManagedNotificationView> = {
         let view = NSHostingView(rootView: CookieManagedNotificationView(isCosmetic: isCosmetic,
                                                                          animationModel: cookieAnimationModel,

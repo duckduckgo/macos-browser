@@ -308,7 +308,7 @@ final class NavigationBarViewController: NSViewController {
                   let topUrl = sender.userInfo?["topUrl"] as? URL,
                   let isCosmetic = sender.userInfo?["isCosmetic"] as? Bool
             else { return }
-            
+
             DispatchQueue.main.async { [weak self] in
                 guard let self = self,
                       self.tabCollectionViewModel.selectedTabViewModel?.tab.url == topUrl
