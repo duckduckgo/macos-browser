@@ -18,6 +18,7 @@
 
 import AppKit
 import Combine
+import Carbon.HIToolbox
 
 final class JSAlertController: NSViewController {
 
@@ -97,6 +98,18 @@ final class JSAlertController: NSViewController {
         super.viewDidDisappear()
         // Defensive action in case of erroneous failure to deinit
         cancellables.removeAll()
+    }
+
+    override func keyDown(with event: NSEvent) {
+        switch Int(event.keyCode) {
+        case kVK_Escape:
+            if viewModel.isCancelButtonHidden {
+                cancelAction(self)
+            }
+        default:
+            break
+        }
+        super.keyDown(with: event)
     }
 
     override func viewDidLayout() {
