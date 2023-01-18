@@ -157,7 +157,7 @@ final class JSAlertController: NSViewController {
         messageTextView.string = viewModel.messageText
 
         cancelButton.isHidden = viewModel.isCancelButtonHidden
-
+        scrollView.isHidden = viewModel.isMessageScrollViewHidden
         inputTextField.isHidden = viewModel.isTextFieldHidden
         let scrollViewSpacing = viewModel.isTextFieldHidden ? verticalStackView.spacing : Constants.scrollViewToTextfieldSpacing
         verticalStackView.setCustomSpacing(scrollViewSpacing, after: scrollView)

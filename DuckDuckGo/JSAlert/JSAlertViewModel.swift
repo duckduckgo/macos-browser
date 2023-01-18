@@ -43,6 +43,10 @@ final class JSAlertViewModel {
         }
     }
 
+    var isMessageScrollViewHidden: Bool {
+        return query.parameters.prompt.count == 0
+    }
+
     var okButtonText: String {
         UserText.ok
     }

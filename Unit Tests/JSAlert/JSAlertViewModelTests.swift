@@ -32,7 +32,7 @@ final class JSAlertViewModelTests: XCTestCase {
             XCTAssertEqual(viewModel.isCancelButtonHidden, param.result, "Expected isCancelButtonHidden for \(param.type) to equal \(param.result)")
         }
     }
-    
+
     func testIsTextFieldHidden() {
         let params: [JSAlertQuery.TestParameters] = [
             .init(type: .testAlert(), result: true),
@@ -45,7 +45,20 @@ final class JSAlertViewModelTests: XCTestCase {
             XCTAssertEqual(viewModel.isTextFieldHidden, param.result, "Expected isTextFieldHidden for \(param.type) to equal \(param.result)")
         }
     }
-    
+
+    func testIsMessageTextViewHidden() {
+        let params: [JSAlertQuery.TestParameters] = [
+            .init(type: .testAlert(parameters: .testData(prompt: "adskdsadjsab")), result: false),
+            .init(type: .testConfirm(parameters: .testData(prompt: "")), result: true),
+            .init(type: .testConfirm(parameters: .testData(prompt: "a")), result: false)
+        ]
+
+        for param in params {
+            let viewModel = JSAlertViewModel(query: param.type)
+            XCTAssertEqual(viewModel.isMessageScrollViewHidden, param.result, "Expected isTextFieldHidden for \(param.type) to equal \(param.result)")
+        }
+    }
+
     func testTitleText() {
         let params: [JSAlertQuery.TestParameters] = [
             .init(type: .testAlert(parameters: .testData(domain: "duckduckgo.com")), result: "A message from duckduckgo.com"),
@@ -58,7 +71,7 @@ final class JSAlertViewModelTests: XCTestCase {
             XCTAssertEqual(viewModel.titleText, param.result, "Expected messageText for \(param.type) to equal \(param.result)")
         }
     }
-    
+
     func testMessageText() {
         let params: [JSAlertQuery.TestParameters] = [
             .init(type: .testAlert(parameters: .testData(prompt: "This is a prompt")), result: "This is a prompt"),
@@ -71,7 +84,7 @@ final class JSAlertViewModelTests: XCTestCase {
             XCTAssertEqual(viewModel.messageText, param.result, "Expected messageText for \(param.type) to equal \(param.result)")
         }
     }
-    
+
     func testTextFieldDefaultText() {
         let params: [JSAlertQuery.TestParameters] = [
             .init(type: .testAlert(parameters: .testData(defaultInputText: "")), result: ""),
@@ -84,7 +97,7 @@ final class JSAlertViewModelTests: XCTestCase {
             XCTAssertEqual(viewModel.textFieldDefaultText, param.result, "Expected textFieldDefaultText for \(param.type) to equal \(param.result)")
         }
     }
-    
+
     func testConfirmAlertDialog() {
         var wasCalled = false
         let query = JSAlertQuery.testAlert { _ in
@@ -94,7 +107,7 @@ final class JSAlertViewModelTests: XCTestCase {
         viewModel.confirm(text: "")
         XCTAssert(wasCalled, "Expected completion to be called")
     }
-    
+
     func testConfirmConfirmDialog() {
         var didConfirm = false
         let anotherQuery = JSAlertQuery.testConfirm { result in
@@ -104,20 +117,20 @@ final class JSAlertViewModelTests: XCTestCase {
         anotherViewModel.confirm(text: "")
         XCTAssert(didConfirm, "Expected didConfirm value to be true")
     }
-    
+
     func testConfirmTextInputDialog() {
         var text: String? = ""
         let anotherQuery = JSAlertQuery.testTextInput { result in
             text = try? result.get()
         }
         let anotherViewModel = JSAlertViewModel(query: anotherQuery)
-        
+
         let expectedText = "expected"
         anotherViewModel.confirm(text: expectedText)
-        
+
         XCTAssertEqual(text, expectedText, "Expected text value to be \(expectedText)")
     }
-    
+
     func testCancelAlertDialog() {
         var wasCalled = false
         let query = JSAlertQuery.testAlert { _ in
@@ -127,7 +140,7 @@ final class JSAlertViewModelTests: XCTestCase {
         viewModel.cancel()
         XCTAssert(wasCalled, "Expected completion to be called")
     }
-    
+
     func testCancelConfirmDialog() {
         var didConfirm: Bool?
         let anotherQuery = JSAlertQuery.testConfirm { result in
@@ -138,10 +151,10 @@ final class JSAlertViewModelTests: XCTestCase {
         }
         let anotherViewModel = JSAlertViewModel(query: anotherQuery)
         anotherViewModel.cancel()
-        
+
         XCTAssertEqual(didConfirm, false)
     }
-    
+
     func testCancelTextInputDialog() {
         var text: String? = ""
         let anotherQuery = JSAlertQuery.testTextInput { result in
@@ -152,7 +165,7 @@ final class JSAlertViewModelTests: XCTestCase {
         }
         let anotherViewModel = JSAlertViewModel(query: anotherQuery)
         anotherViewModel.cancel()
-        
+
         XCTAssertNil(text)
     }
 }
@@ -168,15 +181,15 @@ fileprivate extension JSAlertQuery {
         let type: JSAlertQuery
         let result: Result
     }
-    
+
     static func testAlert(parameters: JSAlertParameters = .testData(), callback: @escaping AlertDialogRequest.Callback = { _ in }) -> Self {
         .alert(AlertDialogRequest(parameters, callback: callback))
     }
-    
+
     static func testConfirm(parameters: JSAlertParameters = .testData(), callback: @escaping ConfirmDialogRequest.Callback = { _ in }) -> Self {
         .confirm(ConfirmDialogRequest(parameters, callback: callback))
     }
-    
+
     static func testTextInput(parameters: JSAlertParameters = .testData(), callback: @escaping TextInputDialogRequest.Callback = { _ in }) -> Self {
         .textInput(TextInputDialogRequest(parameters, callback: callback))
     }
