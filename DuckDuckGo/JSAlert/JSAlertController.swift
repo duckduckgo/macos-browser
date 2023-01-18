@@ -175,7 +175,6 @@ extension JSAlertController: NSViewControllerPresentationAnimator {
     func animatePresentation(of viewController: NSViewController, from fromViewController: NSViewController) {
         guard viewController === self else { return }
         fromViewController.addAndLayoutChild(self)
-        setAlertAnchorPoint(anchorPoint: CGPoint(x: 0.5, y: 0.5))
         backgroundView.layer?.opacity = 0.0
         alertView.layer?.transform = CATransform3DMakeScale(0.95, 0.95, 1)
         alertView.layer?.opacity = 0.0
@@ -197,6 +196,7 @@ extension JSAlertController: NSViewControllerPresentationAnimator {
     }
 
     private func animateIn(_ completion: @escaping () -> Void) {
+        setAlertAnchorPoint(anchorPoint: CGPoint(x: 0.5, y: 0.5))
         animate(
             transform: Animation(fromValue: CATransform3DMakeScale(0.95, 0.95, 1), toValue: CATransform3DIdentity),
             backgroundOpacity: Animation(fromValue: 0.0, toValue: 1.0),
@@ -228,10 +228,7 @@ extension JSAlertController: NSViewControllerPresentationAnimator {
         duration: CFTimeInterval,
         completion: @escaping () -> Void
     ) {
-        let layer = alertView.layer!
-        setAlertAnchorPoint(anchorPoint: CGPoint(x: 0.5, y: 0.5))
         CATransaction.setCompletionBlock(completion)
-
         CATransaction.begin()
 
         alertView.layer?.transform = transform.toValue
@@ -251,7 +248,7 @@ extension JSAlertController: NSViewControllerPresentationAnimator {
         group.timingFunction = CAMediaTimingFunction(name: .easeIn)
         group.animations = [scaleAnimation, alertOpacity]
 
-        layer.add(group, forKey: "scaleAndOpacity")
+        alertView.layer?.add(group, forKey: "scaleAndOpacity")
 
         let backgroundOpacity = CABasicAnimation(keyPath: "opacity")
         backgroundOpacity.fromValue = backgroundOpacity.fromValue

@@ -36,9 +36,8 @@ extension NSTextView {
     }
 
     var textSize: NSSize {
-        guard
-            let container = textContainer,
-            let manager = container.layoutManager else {
+        guard let container = textContainer,
+              let manager = container.layoutManager else {
 
             return .zero
         }
