@@ -15,7 +15,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="600" height="401"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <customView wantsLayer="YES" translatesAutoresizingMaskIntoConstraints="NO" id="FkK-fl-t4d" userLabel="Background View">
+                            <customView wantsLayer="YES" translatesAutoresizingMaskIntoConstraints="NO" id="FkK-fl-t4d" userLabel="Background View" customClass="AlertBackgroundView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="0.0" width="600" height="401"/>
                             </customView>
                             <customView wantsLayer="YES" translatesAutoresizingMaskIntoConstraints="NO" id="noe-j7-ZAB" userLabel="Alert">

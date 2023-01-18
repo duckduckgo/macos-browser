@@ -33,7 +33,7 @@ final class JSAlertController: NSViewController {
     @IBOutlet var scrollViewHeight: NSLayoutConstraint!
     @IBOutlet var alertCenterYAlignment: NSLayoutConstraint!
 
-    @IBOutlet var backgroundView: NSView!
+    @IBOutlet var backgroundView: AlertBackgroundView!
     @IBOutlet var alertView: NSView!
     @IBOutlet var verticalStackView: NSStackView!
     @IBOutlet var titleText: NSTextField!
@@ -252,5 +252,11 @@ extension JSAlertController: NSViewControllerPresentationAnimator {
 
         alertView.layer!.position = position
         alertView.layer!.anchorPoint = anchorPoint
+    }
+}
+
+final class AlertBackgroundView: NSView {
+    override func mouseDown(with event: NSEvent) {
+        // Prevents interaction with UI behind backgroundView
     }
 }
