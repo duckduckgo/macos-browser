@@ -67,7 +67,7 @@ final class JSAlertController: NSViewController {
 
         NSApp.publisher(for: \.effectiveAppearance).receive(on: DispatchQueue.main).sink { [weak self] _ in
             NSAppearance.withAppAppearance {
-                self?.alertView.layer?.backgroundColor = NSColor.panelBackgroundColor.cgColor
+                self?.alertView.layer?.backgroundColor = NSColor.dialogPanelBackgroundColor.cgColor
             }
         }.store(in: &cancellables)
         alertView.layer?.cornerRadius = 10.0
