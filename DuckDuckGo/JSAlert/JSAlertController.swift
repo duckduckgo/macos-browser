@@ -165,7 +165,7 @@ final class JSAlertController: NSViewController {
         messageTextView.sizeToFit()
         scrollView.contentInsets = NSEdgeInsetsZero
     }
-    
+
     private func dehighlightTextField() {
         view.window?.endEditing(for: nil)
         inputTextField.focusRingType = .none // prevents dodgy animation out
@@ -197,7 +197,7 @@ extension JSAlertController: NSViewControllerPresentationAnimator {
     }
 
     private func animateIn(_ completion: @escaping () -> Void) {
-        setAlertAnchorPoint(anchorPoint: CGPoint(x: 0.5, y: 0.5))
+        setAlertAnchorPoint()
         animate(
             transform: Animation(fromValue: Constants.initialTransformScale, toValue: CATransform3DIdentity),
             backgroundOpacity: Animation(fromValue: 0.0, toValue: 1.0),
@@ -260,20 +260,31 @@ extension JSAlertController: NSViewControllerPresentationAnimator {
         CATransaction.commit()
     }
 
-    private func setAlertAnchorPoint(anchorPoint: CGPoint) {
-        let initialNP = CGPoint(
-            x: alertView.bounds.size.width * anchorPoint.x,
-            y: alertView.bounds.size.height * anchorPoint.y
+    /*
+     Explained here: https://stackoverflow.com/a/1971723.
+     Anchor point is set to the center so the scale animation appears to "zoom in"
+     (similar to system alerts) and not from one corner. Because the position is relative
+     to the anchorPoint of the layer, changing that anchorPoint while maintaining the same
+     position moves the layer. In order to prevent this movement, you need to adjust the layer's
+     position to account for the new anchorPoint.
+     */
+    private func setAlertAnchorPoint() {
+        let anchorPoint = CGPoint(x: 0.5, y: 0.5)
+        guard let alertViewLayer = alertView.layer else { return }
+
+        let initialNewPoint = CGPoint(
+            x: alertView.bounds.midX,
+            y: alertView.bounds.midY
         )
-        let initialOP = CGPoint(
-            x: alertView.bounds.size.width * alertView.layer!.anchorPoint.x,
-            y: alertView.bounds.size.height * alertView.layer!.anchorPoint.y
+        let initialOldPoint = CGPoint(
+            x: alertView.bounds.size.width * alertViewLayer.anchorPoint.x,
+            y: alertView.bounds.size.height * alertViewLayer.anchorPoint.y
         )
 
-        let newPoint = initialNP.applying(CATransform3DGetAffineTransform(alertView.layer!.transform))
-        let oldPoint = initialOP.applying(CATransform3DGetAffineTransform(alertView.layer!.transform))
+        let newPoint = initialNewPoint.applying(CATransform3DGetAffineTransform(alertViewLayer.transform))
+        let oldPoint = initialOldPoint.applying(CATransform3DGetAffineTransform(alertViewLayer.transform))
 
-        var position = alertView.layer!.position
+        var position = alertViewLayer.position
 
         position.x -= oldPoint.x
         position.x += newPoint.x
@@ -281,8 +292,8 @@ extension JSAlertController: NSViewControllerPresentationAnimator {
         position.y -= oldPoint.y
         position.y += newPoint.y
 
-        alertView.layer!.position = position
-        alertView.layer!.anchorPoint = anchorPoint
+        alertView.layer?.position = position
+        alertView.layer?.anchorPoint = anchorPoint
     }
 }
 
