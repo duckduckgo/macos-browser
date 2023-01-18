@@ -28,7 +28,7 @@ final class JSAlertController: NSViewController {
         static let scrollViewToTextfieldSpacing = 8.0
     }
 
-    var appearanceCancellable: AnyCancellable?
+    var cancellables: Set<AnyCancellable> = []
 
     @IBOutlet var scrollViewHeight: NSLayoutConstraint!
     @IBOutlet var alertCenterYAlignment: NSLayoutConstraint!
@@ -64,11 +64,11 @@ final class JSAlertController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        appearanceCancellable = NSApp.publisher(for: \.effectiveAppearance).receive(on: DispatchQueue.main).sink { [weak self] _ in
+        NSApp.publisher(for: \.effectiveAppearance).receive(on: DispatchQueue.main).sink { [weak self] _ in
             NSAppearance.withAppAppearance {
                 self?.alertView.layer?.backgroundColor = NSColor.panelBackgroundColor.cgColor
             }
-        }
+        }.store(in: &cancellables)
         alertView.layer?.cornerRadius = 10.0
         alertView.applyDropShadow()
         backgroundView.layer?.backgroundColor = CGColor(gray: 0.0, alpha: 0.2)
@@ -80,6 +80,23 @@ final class JSAlertController: NSViewController {
     override func viewWillAppear() {
         super.viewWillAppear()
         presentData()
+    }
+
+    override func viewDidAppear() {
+        super.viewDidAppear()
+        view.makeMeFirstResponder()
+        // Needed to handle key presses after AddressBar resigns first responder
+        view.window?.publisher(for: \.firstResponder).sink(receiveValue: { [weak self] firstResponder in
+            if firstResponder is WebView {
+                self?.view.makeMeFirstResponder()
+            }
+        }).store(in: &cancellables)
+    }
+
+    override func viewDidDisappear() {
+        super.viewDidDisappear()
+        // Defensive action in case of erroneous failure to deinit
+        cancellables.removeAll()
     }
 
     override func viewDidLayout() {
