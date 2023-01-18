@@ -23,14 +23,6 @@ For _fastlane_ installation instructions, see [Installing _fastlane_](https://do
 
 Fetches and updates certificates and provisioning profiles for App Store distribution
 
-### mac sync_signing_dev
-
-```sh
-[bundle exec] fastlane mac sync_signing_dev
-```
-
-Fetches and updates certificates and provisioning profiles for development
-
 ### mac release_testflight
 
 ```sh
@@ -46,6 +38,14 @@ Makes App Store release build and uploads it to TestFlight
 ```
 
 Makes App Store release build and uploads it to App Store Connect
+
+### mac upload_metadata
+
+```sh
+[bundle exec] fastlane mac upload_metadata
+```
+
+Updates App Store metadata
 
 ### mac code_freeze
 

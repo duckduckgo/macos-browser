@@ -1,3 +1,3 @@
 source 'https://rubygems.org'
 
-gem 'fastlane', :git => "https://github.com/ayoy/fastlane.git", :tag => "2.211.0_upload_metadata_fix"
+gem 'fastlane', '~> 2.211'

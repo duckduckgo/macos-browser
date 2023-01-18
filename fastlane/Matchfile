@@ -8,11 +8,4 @@ app_identifier "com.duckduckgo.mobile.ios"
 additional_cert_types ["mac_installer_distribution"]
 generate_apple_certs false
 
-for_lane :sync_signing_dev do
-  type "development"
-  app_identifier "com.duckduckgo.mobile.ios.*"
-  additional_cert_types []
-  generate_apple_certs true
-end
-
 # The docs are available on https://docs.fastlane.tools/actions/match
