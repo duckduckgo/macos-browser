@@ -151,7 +151,10 @@ extension JSAlertController: NSViewControllerPresentationAnimator {
         alertView.layer?.opacity = 0.0
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
             self?.animateIn { [weak self] in
-                self?.textField.makeMeFirstResponder()
+                guard let self else { return }
+                if !self.viewModel.isTextFieldHidden {
+                    self.textField.makeMeFirstResponder()
+                }
             }
         }
     }
