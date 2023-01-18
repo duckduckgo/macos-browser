@@ -97,7 +97,7 @@ final class OnboardingViewModel: ObservableObject {
     func skipTyping() {
         skipTypingRequested = true
     }
-    
+
     func onboardingReshown() {
         if onboardingFinished {
             typingDisabled = true

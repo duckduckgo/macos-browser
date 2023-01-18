@@ -26,11 +26,9 @@ class MainMenuTests: XCTestCase {
 
     @Published var isInInitialState = true
 
-    // swiftlint:disable implicitly_unwrapped_optional
     var lastSessionMenuItem: NSMenuItem!
     var lastTabMenuItem: NSMenuItem!
     var manager: ReopenMenuItemKeyEquivalentManager!
-    // swiftlint:enable implicitly_unwrapped_optional
 
     override func setUpWithError() throws {
         isInInitialState = true

@@ -78,7 +78,7 @@ final class AddBookmarkModalViewController: NSViewController {
     }
 
     weak var delegate: AddBookmarkModalViewControllerDelegate?
-    
+
     private var originalBookmark: Bookmark?
 
     override func viewDidLoad() {
@@ -92,7 +92,7 @@ final class AddBookmarkModalViewController: NSViewController {
         super.viewWillAppear()
         applyModalWindowStyleIfNeeded()
     }
-    
+
     func edit(bookmark: Bookmark) {
         self.originalBookmark = bookmark
     }
@@ -105,7 +105,7 @@ final class AddBookmarkModalViewController: NSViewController {
         guard let url = urlTextField.stringValue.url else {
             return
         }
-        
+
         if let bookmark = originalBookmark {
             bookmark.title = bookmarkTitleTextField.stringValue
             delegate?.addBookmarkViewController(self, saved: bookmark, newURL: url)
@@ -128,13 +128,13 @@ final class AddBookmarkModalViewController: NSViewController {
 
         updateAddButton()
     }
-    
+
     private func updateWithExistingBookmark() {
         if let originalBookmark = originalBookmark {
             titleTextField.stringValue = UserText.updateBookmark
             bookmarkTitleTextField.stringValue = originalBookmark.title
             urlTextField.stringValue = originalBookmark.url.absoluteString
-            
+
             addButton.title = UserText.save
         }
     }

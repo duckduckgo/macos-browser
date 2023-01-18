@@ -27,15 +27,15 @@ class TabBarTests: XCTestCase {
 
     func testWhenClickingAddTab_ThenTabsOpen() throws {
         let app = XCUIApplication()
-        
+
         let tabbarviewitemElementsQuery = app.windows.collectionViews.otherElements.containing(.group, identifier: "TabBarViewItem")
         // click on add tab button twice
         tabbarviewitemElementsQuery.children(matching: .group).element(boundBy: 1).children(matching: .button).element.click()
         tabbarviewitemElementsQuery.children(matching: .group).element(boundBy: 2).children(matching: .button).element.click()
-        
+
         let tabs = app.windows.collectionViews.otherElements.containing(.group, identifier: "TabBarViewItem").children(matching: .group)
             .matching(identifier: "TabBarViewItem")
-        
+
         XCTAssertEqual(tabs.count, 3)
     }
 

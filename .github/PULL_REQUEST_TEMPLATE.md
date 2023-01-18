@@ -18,13 +18,13 @@ If at any point it isn't actively being worked on/ready for review/otherwise mov
 
 **Steps to test this PR**:
 1.
-1.
 
 **Testing checklist**:
 
 * [ ] Test with Release configuration
 * [ ] Test proper deallocation of tabs
 * [ ] Make sure committed submodule changes are desired
+* [ ] Make sure configuration is changed only in xcconfig files, not in the Xcode project file directly
 
 ---
 ###### Internal references:

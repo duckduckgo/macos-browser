@@ -26,6 +26,7 @@ import BrowserServicesKit
 import TrackerRadarKit
 import ContentBlocking
 import UserScript
+import Common
 import PrivacyDashboard
 
 protocol TabDelegate: ContentOverlayUserScriptDelegate {
@@ -147,15 +148,11 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         }
     }
     private struct ExtensionDependencies: TabExtensionDependencies {
-        var userScriptsPublisher: AnyPublisher<UserScripts?, Never>
-        var contentBlocking: ContentBlockingProtocol
-        var adClickAttributionDependencies: AdClickAttributionDependencies
-        var privacyInfoPublisher: AnyPublisher<PrivacyDashboard.PrivacyInfo?, Never>
-        var inheritedAttribution: BrowserServicesKit.AdClickAttributionLogic.State?
-        var userContentControllerProvider: UserContentControllerProvider
+        let privacyFeatures: PrivacyFeaturesProtocol
+        let historyCoordinating: HistoryCoordinating
     }
 
-    // "protected" delegate property for extensions usage 
+    // "protected" delegate property for extensions usage
     private weak var delegate: TabDelegate?
     @objc private var objcDelegate: Any? { delegate }
     static var objcDelegateKeyPath: String { #keyPath(objcDelegate) }
@@ -192,6 +189,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                      pinnedTabsManager: PinnedTabsManager = WindowControllersManager.shared.pinnedTabsManager,
                      privatePlayer: PrivatePlayer? = nil,
                      cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter? = ContentBlockingAssetsCompilationTimeReporter.shared,
+                     extensionsBuilder: TabExtensionsBuilderProtocol = TabExtensionsBuilder.default,
                      localHistory: Set<String> = Set<String>(),
                      title: String? = nil,
                      favicon: NSImage? = nil,
@@ -216,6 +214,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                   pinnedTabsManager: pinnedTabsManager,
                   privacyFeatures: PrivacyFeatures,
                   privatePlayer: privatePlayer,
+                  extensionsBuilder: extensionsBuilder,
                   cbaTimeReporter: cbaTimeReporter,
                   localHistory: localHistory,
                   title: title,
@@ -230,6 +229,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                   webViewFrame: webViewFrame)
     }
 
+    // swiftlint:disable:next function_body_length
     init(content: TabContent,
          faviconManagement: FaviconManagement,
          webCacheManager: WebCacheManager,
@@ -238,6 +238,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
          pinnedTabsManager: PinnedTabsManager,
          privacyFeatures: some PrivacyFeaturesProtocol,
          privatePlayer: PrivatePlayer,
+         extensionsBuilder: TabExtensionsBuilderProtocol,
          cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter?,
          localHistory: Set<String>,
          title: String?,
@@ -287,11 +288,16 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             .eraseToAnyPublisher()
 
         var userContentControllerProvider: UserContentControllerProvider?
-        self.extensions = .builder().build(with: ExtensionDependencies(userScriptsPublisher: userScriptsPublisher,
-                                                                       contentBlocking: privacyFeatures.contentBlocking,
-                                                                       adClickAttributionDependencies: privacyFeatures.contentBlocking,
-                                                                       privacyInfoPublisher: _privacyInfo.projectedValue.eraseToAnyPublisher(),
-                                                                       userContentControllerProvider: {  userContentControllerProvider?() }))
+        self.extensions = extensionsBuilder
+            .build(with: (tabIdentifier: instrumentation.currentTabIdentifier,
+                          userScriptsPublisher: userScriptsPublisher,
+                          inheritedAttribution: parentTab?.adClickAttribution?.currentAttributionState,
+                          userContentControllerProvider: {  userContentControllerProvider?() },
+                          permissionModel: permissions,
+                          privacyInfoPublisher: _privacyInfo.projectedValue.eraseToAnyPublisher()
+                         ),
+                   dependencies: ExtensionDependencies(privacyFeatures: privacyFeatures,
+                                                       historyCoordinating: historyCoordinating))
 
         super.init()
 
@@ -396,7 +402,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             if let title = content.title {
                 self.title = title
             }
-            
+
         }
     }
 
@@ -422,7 +428,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             }
         }
     }
-    
+
     var lastSelectedAt: Date?
 
     @Published var title: String?
@@ -446,8 +452,8 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         didSet {
             guard let request = userInteractionDialog?.request else { return }
             request.addCompletionHandler { [weak self, weak request] _ in
-                if self?.userInteractionDialog?.request === request {
-                    self?.userInteractionDialog = nil
+                if let self, let request, self.userInteractionDialog?.request === request {
+                    self.userInteractionDialog = nil
                 }
             }
         }
@@ -480,7 +486,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         self.sessionStateData = (try? webView.sessionStateData())
         return self.sessionStateData
     }
-    
+
     @available(macOS 12, *)
     func getActualInteractionStateData() -> Data? {
         if let interactionStateData = interactionStateData {
@@ -488,9 +494,9 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         }
 
         guard webView.url != nil else { return nil }
-        
+
         self.interactionStateData = (webView.interactionState as? Data)
-        
+
         return self.interactionStateData
     }
 
@@ -669,7 +675,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         }()
         if shouldLoadURL(url, shouldLoadInBackground: shouldLoadInBackground) {
             let didRestore: Bool
-            
+
             if #available(macOS 12.0, *) {
                 didRestore = restoreInteractionStateDataIfNeeded() || restoreSessionStateDataIfNeeded()
             } else {
@@ -748,10 +754,10 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                 os_log("Tab:setupWebView could not restore session state %s", "\(error)")
             }
         }
-        
+
         return didRestore
     }
-    
+
     @MainActor
     @available(macOS 12, *)
     private func restoreInteractionStateDataIfNeeded() -> Bool {
@@ -760,11 +766,11 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             if contentURL.isFileURL {
                 _ = webView.loadFileURL(contentURL, allowingReadAccessTo: URL(fileURLWithPath: "/"))
             }
-            
+
             webView.interactionState = interactionStateData
             didRestore = true
         }
-        
+
         return didRestore
     }
 
@@ -869,7 +875,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     }
 
     // MARK: - Youtube Player
-    
+
     private weak var youtubeOverlayScript: YoutubeOverlayUserScript?
     private weak var youtubePlayerScript: YoutubePlayerUserScript?
     private var youtubePlayerCancellables: Set<AnyCancellable> = []
@@ -924,7 +930,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             youtubePlayerScript?.isEnabled = false
         }
     }
-    
+
     // MARK: - Dashboard Info
     @Published private(set) var privacyInfo: PrivacyInfo?
     private var previousPrivacyInfosByURL: [String: PrivacyInfo] = [:]
@@ -942,18 +948,18 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             privacyInfo = nil
         }
     }
-    
+
     private func makePrivacyInfo(url: URL) -> PrivacyInfo? {
         guard let host = url.host else { return nil }
-        
+
         let entity = contentBlocking.trackerDataManager.trackerData.findEntity(forHost: host)
-        
+
         privacyInfo = PrivacyInfo(url: url,
                                   parentEntity: entity,
                                   protectionStatus: makeProtectionStatus(for: host))
-        
+
         previousPrivacyInfosByURL[url.absoluteString] = privacyInfo
-        
+
         return privacyInfo
     }
     
@@ -973,19 +979,19 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         guard let upgradedUrl else { return }
         privacyInfo?.connectionUpgradedTo = upgradedUrl
     }
-    
+
     private func makeProtectionStatus(for host: String) -> ProtectionStatus {
         let config = contentBlocking.privacyConfigurationManager.privacyConfig
-        
+
         let isTempUnprotected = config.isTempUnprotected(domain: host)
         let isAllowlisted = config.isUserUnprotected(domain: host)
-        
+
         var enabledFeatures: [String] = []
-        
+
         if !config.isInExceptionList(domain: host, forFeature: .contentBlocking) {
             enabledFeatures.append(PrivacyFeature.contentBlocking.rawValue)
         }
-        
+
         return ProtectionStatus(unprotectedTemporary: isTempUnprotected,
                                 enabledFeatures: enabledFeatures,
                                 allowlisted: isAllowlisted,
@@ -1049,10 +1055,10 @@ extension Tab: ContentBlockerRulesUserScriptDelegate {
     func contentBlockerRulesUserScriptShouldProcessCTLTrackers(_ script: ContentBlockerRulesUserScript) -> Bool {
         return fbBlockingEnabled
     }
-    
+
     func contentBlockerRulesUserScript(_ script: ContentBlockerRulesUserScript, detectedTracker tracker: DetectedRequest) {
-        guard let url = webView.url else { return }
-        
+        guard let url = URL(string: tracker.pageUrl) else { return }
+
         privacyInfo?.trackerInfo.addDetectedTracker(tracker, onPageWithURL: url)
         historyCoordinating.addDetectedTracker(tracker, onURL: url)
     }
@@ -1060,7 +1066,7 @@ extension Tab: ContentBlockerRulesUserScriptDelegate {
     func contentBlockerRulesUserScript(_ script: ContentBlockerRulesUserScript, detectedThirdPartyRequest request: DetectedRequest) {
         privacyInfo?.trackerInfo.add(detectedThirdPartyRequest: request)
     }
-    
+
 }
 
 extension HistoryCoordinating {
@@ -1099,10 +1105,10 @@ extension Tab: SurrogatesUserScriptDelegate {
 
     func surrogatesUserScript(_ script: SurrogatesUserScript, detectedTracker tracker: DetectedRequest, withSurrogate host: String) {
         guard let url = webView.url else { return }
-        
+
         privacyInfo?.trackerInfo.addInstalledSurrogateHost(host, for: tracker, onPageWithURL: url)
         privacyInfo?.trackerInfo.addDetectedTracker(tracker, onPageWithURL: url)
-        
+
         historyCoordinating.addDetectedTracker(tracker, onURL: url)
     }
 }
@@ -1165,7 +1171,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         let shouldSelectNewTab = NSApp.isShiftPressed || (isNavigatingAwayFromPinnedTab && !navigationAction.navigationType.isMiddleButtonClick && !NSApp.isCommandPressed)
 
         didGoBackForward = navigationAction.navigationType.isBackForward
-        
+
         // This check needs to happen before GPC checks. Otherwise the navigation type may be rewritten to `.other`
         // which would skip link rewrites.
         if !navigationAction.navigationType.isBackForward {
@@ -1215,7 +1221,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
                 self.webView.frozenCanGoForward = nil
                 self.webView.frozenCanGoBack = nil
                 return .cancel
-                
+
             } else if !navigationAction.navigationType.isBackForward,
                       !isRequestingNewTab,
                       let request = GPCRequestFactory().requestForGPC(basedOn: navigationAction.request,
@@ -1271,12 +1277,12 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
                 }
             }
         }
-        
+
         if navigationAction.isForMainFrame,
            navigationAction.url.isDuckDuckGo,
            navigationAction.request.value(forHTTPHeaderField: Constants.ddgClientHeaderKey) == nil,
            !navigationAction.navigationType.isBackForward {
-            
+
             var request = navigationAction.request
             request.setValue(Constants.ddgClientHeaderValue, forHTTPHeaderField: Constants.ddgClientHeaderKey)
             _ = webView.load(request)
@@ -1379,7 +1385,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
     @MainActor
     func decidePolicy(for navigationResponse: NavigationResponse, currentNavigation: Navigation?) async -> NavigationResponsePolicy? {
         userEnteredUrl = false // subsequent requests will be navigations
-        
+
         let isSuccessfulResponse = (navigationResponse.response as? HTTPURLResponse)?.validateStatusCode(statusCode: 200..<300) == nil
 
         if !navigationResponse.canShowMIMEType || navigationResponse.shouldDownload {
@@ -1399,11 +1405,11 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
                 }
             }
         }
-        
+
         if navigationResponse.isForMainFrame && isSuccessfulResponse {
             self.adClickAttribution?.detection.on2XXResponse(url: webView.url)
         }
-        
+
         await self.adClickAttribution?.logic.onProvisionalNavigation()
 
         return .next
@@ -1498,7 +1504,7 @@ extension Tab: AutoconsentUserScriptDelegate {
     func autoconsentUserScript(consentStatus: CookieConsentInfo) {
         self.privacyInfo?.cookieConsentManaged = consentStatus
     }
-    
+
     func autoconsentUserScriptPromptUserForConsent(_ result: @escaping (Bool) -> Void) {
         delegate?.tab(self, promptUserForCookieConsent: result)
     }

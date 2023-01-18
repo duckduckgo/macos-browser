@@ -57,7 +57,7 @@ final class DefaultConfigurationStorage: ConfigurationStoring {
 
     @UserDefaultsWrapper(key: .configStorageSurrogatesEtag, defaultValue: nil)
     private var surrogatesEtag: String?
-    
+
     @UserDefaultsWrapper(key: .configStoragePrivacyConfigurationEtag, defaultValue: nil)
     private var privacyConfigurationEtag: String?
 
@@ -82,7 +82,7 @@ final class DefaultConfigurationStorage: ConfigurationStoring {
 
         case .trackerRadar:
             return trackerRadarEtag
-            
+
         case .privacyConfiguration:
             return privacyConfigurationEtag
 
@@ -107,7 +107,7 @@ final class DefaultConfigurationStorage: ConfigurationStoring {
 
         case .trackerRadar:
             trackerRadarEtag = etag
-            
+
         case .privacyConfiguration:
             privacyConfigurationEtag = etag
 

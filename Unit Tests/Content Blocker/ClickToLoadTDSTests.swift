@@ -22,9 +22,9 @@ import BrowserServicesKit
 @testable import DuckDuckGo_Privacy_Browser
 
 class ClickToLoadTDSTests: XCTestCase {
-    
+
     func testEnsureClickToLoadTDSCompiles() throws {
-        
+
         let tds = ContentBlockerRulesLists.fbTrackerDataSet
         let builder = ContentBlockerRulesBuilder(trackerData: tds)
 
@@ -38,22 +38,22 @@ class ClickToLoadTDSTests: XCTestCase {
         let identifier = UUID().uuidString
 
         let compiled = expectation(description: "Rules compiled")
-        
+
         WKContentRuleListStore.default().compileContentRuleList(forIdentifier: identifier,
                                                                 encodedContentRuleList: ruleList) { result, error in
             XCTAssertNotNil(result)
             XCTAssertNil(error)
             compiled.fulfill()
                     }
-        
+
         wait(for: [compiled], timeout: 30.0)
-        
+
         let removed = expectation(description: "Rules removed")
-        
+
         WKContentRuleListStore.default().removeContentRuleList(forIdentifier: identifier) { _ in
             removed.fulfill()
         }
-        
+
         wait(for: [removed], timeout: 5.0)
     }
 }

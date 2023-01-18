@@ -87,7 +87,11 @@ final class UserDialogRequest<Info, Output>: UserDialogRequestProtocol {
     }
 
     deinit {
-        callback?(.failure(.deinitialized))
+        guard let callback else { return }
+
+        DispatchQueue.main.async {
+            callback(.failure(.deinitialized))
+        }
     }
 
 }
@@ -97,7 +101,7 @@ extension UserDialogRequest where Info == Void {
     convenience init(callback: @escaping Callback) {
         self.init((), callback: callback)
     }
-    
+
 }
 
 extension UserDialogRequest where Output == Void {

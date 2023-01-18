@@ -412,7 +412,7 @@ final class DataImportViewController: NSViewController {
                 action: error.actionType.pixelEventAction,
                 source: viewState.selectedImportSource.pixelEventSource
             )
-            
+
             Pixel.fire(pixel, withAdditionalParameters: error.errorType.errorParameters)
 
             let alert = NSAlert.importFailedAlert(source: viewState.selectedImportSource, linkDelegate: self)
@@ -501,20 +501,20 @@ extension DataImportViewController: RequestFilePermissionViewControllerDelegate 
 }
 
 extension DataImportViewController: NSTextViewDelegate {
-    
+
     func textView(_ textView: NSTextView, clickedOnLink link: Any, at charIndex: Int) -> Bool {
         guard let sheet = view.window?.attachedSheet else {
             return false
         }
-        
+
         view.window?.endSheet(sheet)
         dismiss()
-        
+
         FeedbackPresenter.presentFeedbackForm()
-        
+
         return true
     }
-    
+
 }
 
 extension NSPopUpButton {

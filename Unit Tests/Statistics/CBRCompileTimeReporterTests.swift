@@ -239,7 +239,7 @@ class CBRCompileTimeReporterTests: XCTestCase {
             }
         }
         XCTAssertNil(tab1)
-        
+
     }
 
 }

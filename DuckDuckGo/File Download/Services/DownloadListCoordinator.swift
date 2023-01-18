@@ -111,7 +111,7 @@ final class DownloadListCoordinator {
         }
         // skip already known task: it's already subscribed
         guard downloadTaskCancellables[task] == nil else { return }
-        
+
         let item = item ?? DownloadListItem(task: task)
 
         task.$location

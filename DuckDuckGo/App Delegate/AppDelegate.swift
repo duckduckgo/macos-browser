@@ -20,6 +20,7 @@ import Cocoa
 import Combine
 import os.log
 import BrowserServicesKit
+import Persistence
 
 @NSApplicationMain
 final class AppDelegate: NSObject, NSApplicationDelegate {
@@ -86,7 +87,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             ? AppPrivacyFeatures(contentBlocking: mock("ContentBlockingMock"), httpsUpgradeStore: mock("HTTPSUpgradeStoreMock"))
             : AppPrivacyFeatures(contentBlocking: AppContentBlocking(), httpsUpgradeStore: AppHTTPSUpgradeStore())
 #else
-        PrivacyFeatures.shared = AppPrivacyFeatures(contentBlocking: AppContentBlocking())
+        AppPrivacyFeatures.shared = AppPrivacyFeatures(contentBlocking: AppContentBlocking(),
+                                                       httpsUpgradeStore: AppHTTPSUpgradeStore())
 #endif
 
         do {

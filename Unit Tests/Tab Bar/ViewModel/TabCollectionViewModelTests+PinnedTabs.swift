@@ -227,19 +227,6 @@ extension TabCollectionViewModelTests {
         XCTAssertEqual(tabCollectionViewModel.selectionIndex, .pinned(0))
     }
 
-    func test_WithPinnedTabs_WhenPinnedOwnerOfWebviewIsRemovedThenAllOtherTabsRemained() {
-        let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModelWithPinnedTab()
-
-        tabCollectionViewModel.appendNewTab()
-        tabCollectionViewModel.appendNewTab()
-        let pinnedTabViewModel = tabCollectionViewModel.pinnedTabsManager!.tabViewModel(at: 0)!
-
-        tabCollectionViewModel.remove(ownerOf: pinnedTabViewModel.tab.webView)
-
-        XCTAssertFalse(tabCollectionViewModel.pinnedTabsCollection!.tabs.contains(pinnedTabViewModel.tab))
-        XCTAssertTrue(tabCollectionViewModel.pinnedTabsCollection!.tabs.isEmpty)
-    }
-
     func test_WithPinnedTabs_RemoveSelected() {
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModelWithPinnedTab()
         tabCollectionViewModel.appendNewTab()

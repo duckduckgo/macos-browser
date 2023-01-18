@@ -73,7 +73,7 @@ extension NSViewController {
         removeFromParent()
         view.removeFromSuperview()
     }
-    
+
     func withoutAnimation(_ closure: () -> Void) {
         CATransaction.begin()
         CATransaction.setDisableActions(true)

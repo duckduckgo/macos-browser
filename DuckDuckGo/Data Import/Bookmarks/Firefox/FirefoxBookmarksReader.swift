@@ -89,7 +89,7 @@ final class FirefoxBookmarksReader {
             return .failure(.unexpectedBookmarksDatabaseFormat)
         }
     }
-    
+
     fileprivate class DatabaseBookmarks {
         let topLevelFolders: [FolderRow]
         let foldersByParent: [Int: [FolderRow]]
@@ -146,7 +146,7 @@ final class FirefoxBookmarksReader {
 
         let unfiledFolder = ImportedBookmarks.BookmarkOrFolder(name: "other", type: "folder", urlString: nil, children: unfiledBookmarksAndFolders)
         let folders = ImportedBookmarks.TopLevelFolders(bookmarkBar: toolbarFolder, otherBookmarks: unfiledFolder)
-        
+
         return ImportedBookmarks(topLevelFolders: folders)
     }
 
