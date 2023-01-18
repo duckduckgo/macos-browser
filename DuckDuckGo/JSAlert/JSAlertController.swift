@@ -37,10 +37,10 @@ final class JSAlertController: NSViewController {
     @IBOutlet var backgroundView: AlertBackgroundView!
     @IBOutlet var alertView: NSView!
     @IBOutlet var verticalStackView: NSStackView!
-    @IBOutlet var titleText: NSTextField!
+    @IBOutlet var titleTextField: NSTextField!
     @IBOutlet var scrollView: NSScrollView!
-    @IBOutlet var messageText: NSTextView!
-    @IBOutlet var textField: NSTextField!
+    @IBOutlet var messageTextView: NSTextView!
+    @IBOutlet var inputTextField: NSTextField!
     @IBOutlet var okButton: NSButton!
     @IBOutlet var cancelButton: NSButton!
 
@@ -74,8 +74,8 @@ final class JSAlertController: NSViewController {
         alertView.applyDropShadow()
         backgroundView.layer?.backgroundColor = CGColor(gray: 0.0, alpha: 0.2)
 
-        messageText.textContainer?.lineFragmentPadding = 0.0
-        messageText.isEditable = false
+        messageTextView.textContainer?.lineFragmentPadding = 0.0
+        messageTextView.isEditable = false
     }
 
     override func viewWillAppear() {
@@ -115,7 +115,7 @@ final class JSAlertController: NSViewController {
     override func viewDidLayout() {
         super.viewDidLayout()
 
-        let messageHeight = messageText.textSize.height
+        let messageHeight = messageTextView.textSize.height
         scrollViewHeight.constant = messageHeight
 
         if messageHeight <= scrollView.frame.height {
@@ -137,7 +137,7 @@ final class JSAlertController: NSViewController {
 
     @IBAction func okAction(_ sender: NSButton) {
         dehighlightTextField()
-        viewModel.confirm(text: textField.stringValue)
+        viewModel.confirm(text: inputTextField.stringValue)
     }
 
     @IBAction func cancelAction(_ sender: Any?) {
@@ -152,22 +152,22 @@ final class JSAlertController: NSViewController {
     private func presentData() {
         okButton.title = viewModel.okButtonText
         cancelButton.title = viewModel.cancelButtonText
-        titleText.stringValue = viewModel.titleText
-        messageText.string = viewModel.messageText
+        titleTextField.stringValue = viewModel.titleText
+        messageTextView.string = viewModel.messageText
 
         cancelButton.isHidden = viewModel.isCancelButtonHidden
 
-        textField.isHidden = viewModel.isTextFieldHidden
+        inputTextField.isHidden = viewModel.isTextFieldHidden
         let scrollViewSpacing = viewModel.isTextFieldHidden ? verticalStackView.spacing : Constants.scrollViewToTextfieldSpacing
         verticalStackView.setCustomSpacing(scrollViewSpacing, after: scrollView)
-        textField.stringValue = viewModel.textFieldDefaultText
-        messageText.sizeToFit()
+        inputTextField.stringValue = viewModel.textFieldDefaultText
+        messageTextView.sizeToFit()
         scrollView.contentInsets = NSEdgeInsetsZero
     }
     
     private func dehighlightTextField() {
         view.window?.endEditing(for: nil)
-        textField.focusRingType = .none // prevents dodgy animation out
+        inputTextField.focusRingType = .none // prevents dodgy animation out
     }
 }
 
@@ -182,7 +182,7 @@ extension JSAlertController: NSViewControllerPresentationAnimator {
             self?.animateIn { [weak self] in
                 guard let self else { return }
                 if !self.viewModel.isTextFieldHidden {
-                    self.textField.makeMeFirstResponder()
+                    self.inputTextField.makeMeFirstResponder()
                 }
             }
         }

@@ -161,12 +161,12 @@ DQ
                         <outlet property="alertView" destination="noe-j7-ZAB" id="1SU-Pb-sKN"/>
                         <outlet property="backgroundView" destination="FkK-fl-t4d" id="HW4-Hb-0xy"/>
                         <outlet property="cancelButton" destination="aC8-rX-2ac" id="GjH-oJ-Fag"/>
-                        <outlet property="messageText" destination="I2t-vk-rnv" id="geF-um-7Mk"/>
+                        <outlet property="inputTextField" destination="c5C-SO-hh3" id="QCT-OF-YTc"/>
+                        <outlet property="messageTextView" destination="I2t-vk-rnv" id="z2H-vZ-OOx"/>
                         <outlet property="okButton" destination="QXr-Qh-2zl" id="IBk-Bz-Arw"/>
                         <outlet property="scrollView" destination="wPe-go-2pG" id="SNQ-vx-yPU"/>
                         <outlet property="scrollViewHeight" destination="ZMu-9R-afE" id="wqI-1r-ffj"/>
-                        <outlet property="textField" destination="c5C-SO-hh3" id="jdv-uD-ci9"/>
-                        <outlet property="titleText" destination="5Pw-96-1If" id="Bfm-zP-CEY"/>
+                        <outlet property="titleTextField" destination="5Pw-96-1If" id="urW-L7-wCc"/>
                         <outlet property="verticalStackView" destination="BYu-y3-Dei" id="RLM-2n-aBj"/>
                     </connections>
                 </viewController>
