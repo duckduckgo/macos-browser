@@ -104,6 +104,9 @@ extension Pixel {
         case adClickAttributionDetected
         case adClickAttributionActive
 
+        case emailEnabled
+        case emailDisabled
+
         case jsPixel(_ pixel: AutofillUserScript.JSPixel)
 
         case debug(event: Debug, error: Error? = nil)
@@ -245,6 +248,12 @@ extension Pixel.Event {
 
         case .adClickAttributionActive:
             return "m_mac_ad_click_active"
+
+        case .emailEnabled:
+            return "m_mac_email_enabled"
+
+        case .emailDisabled:
+            return "m_mac_email_disabled"
 
         case .jsPixel(pixel: let pixel):
             return "m_mac_\(pixel.pixelName)"

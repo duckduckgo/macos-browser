@@ -79,6 +79,8 @@ extension Pixel.Event {
              .ampBlockingRulesCompilationFailed,
              .adClickAttributionDetected,
              .adClickAttributionActive,
+             .emailEnabled,
+             .emailDisabled,
              .jsPixel:
 
             return nil

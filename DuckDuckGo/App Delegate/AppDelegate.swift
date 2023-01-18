@@ -188,11 +188,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     @objc private func emailDidSignInNotification(_ notification: Notification) {
-        print("Signed in")
+        Pixel.fire(.emailEnabled)
     }
 
     @objc private func emailDidSignOutNotification(_ notification: Notification) {
-        print("Signed out")
+        Pixel.fire(.emailDisabled)
     }
 
 }
