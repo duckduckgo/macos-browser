@@ -27,6 +27,7 @@ final class JSAlertController: NSViewController {
         static let appearAnimationDuration = 0.05
         static let dismissAnimationDuration = 0.1
         static let scrollViewToTextfieldSpacing = 8.0
+        static let initialTransformScale = CATransform3DMakeScale(0.95, 0.95, 1)
     }
 
     var cancellables: Set<AnyCancellable> = []
@@ -198,7 +199,7 @@ extension JSAlertController: NSViewControllerPresentationAnimator {
     private func animateIn(_ completion: @escaping () -> Void) {
         setAlertAnchorPoint(anchorPoint: CGPoint(x: 0.5, y: 0.5))
         animate(
-            transform: Animation(fromValue: CATransform3DMakeScale(0.95, 0.95, 1), toValue: CATransform3DIdentity),
+            transform: Animation(fromValue: Constants.initialTransformScale, toValue: CATransform3DIdentity),
             backgroundOpacity: Animation(fromValue: 0.0, toValue: 1.0),
             alertOpacity: Animation(fromValue: 0.75, toValue: 1.0),
             duration: Constants.appearAnimationDuration,
@@ -208,7 +209,7 @@ extension JSAlertController: NSViewControllerPresentationAnimator {
 
     private func animateOut(_ completion: @escaping () -> Void) {
         animate(
-            transform: Animation(fromValue: CATransform3DIdentity, toValue: CATransform3DMakeScale(0.95, 0.95, 1)),
+            transform: Animation(fromValue: CATransform3DIdentity, toValue: Constants.initialTransformScale),
             backgroundOpacity: Animation(fromValue: 1.0, toValue: 0.0),
             alertOpacity: Animation(fromValue: 1.0, toValue: 0.0),
             duration: Constants.dismissAnimationDuration,
