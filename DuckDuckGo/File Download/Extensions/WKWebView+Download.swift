@@ -16,7 +16,8 @@
 //  limitations under the License.
 //
 
-import BrowserServicesKit
+import Foundation
+import Navigation
 import WebKit
 
 // A workaround to bring WKDownload support back to macOS 11.3 (which really has WKDownload support)

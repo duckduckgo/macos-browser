@@ -16,9 +16,9 @@
 //  limitations under the License.
 //
 
-import BrowserServicesKit
-import Foundation
 import Combine
+import Foundation
+import Navigation
 import os.log
 
 private func getFirstAvailableWebView() -> WKWebView? {

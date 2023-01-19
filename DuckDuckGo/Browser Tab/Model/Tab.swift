@@ -23,6 +23,7 @@ import WebKit
 import os
 import Combine
 import BrowserServicesKit
+import Navigation
 import TrackerRadarKit
 import ContentBlocking
 import UserScript
@@ -152,15 +153,9 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         let historyCoordinating: HistoryCoordinating
     }
 
-    // "protected" delegate property for extensions usage
-    private weak var delegate: TabDelegate?
-    @objc private var objcDelegate: Any? { delegate }
-    static var objcDelegateKeyPath: String { #keyPath(objcDelegate) }
+    fileprivate weak var delegate: TabDelegate?
     func setDelegate(_ delegate: TabDelegate) { self.delegate = delegate }
 
-    // "protected" navigationDelegate property for extensions usage
-    static var objcNavigationDelegateKeyPath: String { #keyPath(objcNavigationDelegate) }
-    @objc private var objcNavigationDelegate: Any? { navigationDelegate }
     private let navigationDelegate = DistributedNavigationDelegate(logger: .navigation)
 
     private let cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter?
@@ -962,7 +957,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
         return privacyInfo
     }
-    
+
     private func resetConnectionUpgradedTo(navigationAction: NavigationAction) {
         let isOnUpgradedPage = navigationAction.url == privacyInfo?.connectionUpgradedTo
         if navigationAction.isForMainFrame && !isOnUpgradedPage {
@@ -1531,4 +1526,15 @@ extension Tab: TabDataClearing {
         webView.navigationDelegate = caller
         webView.load(URL(string: "about:blank")!)
     }
+}
+
+// "protected" properties meant to access otherwise private properties from Tab extensions
+extension Tab {
+
+    static var objcDelegateKeyPath: String { #keyPath(objcDelegate) }
+    @objc private var objcDelegate: Any? { delegate }
+
+    static var objcNavigationDelegateKeyPath: String { #keyPath(objcNavigationDelegate) }
+    @objc private var objcNavigationDelegate: Any? { navigationDelegate }
+
 }

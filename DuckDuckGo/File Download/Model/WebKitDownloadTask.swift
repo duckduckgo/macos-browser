@@ -16,7 +16,7 @@
 //  limitations under the License.
 //
 
-import BrowserServicesKit
+import Navigation
 import Combine
 import Foundation
 import WebKit
@@ -94,7 +94,9 @@ final class WebKitDownloadTask: NSObject, ProgressReporting {
         self.postflight = postflight
         super.init()
 
-        download.perform(#selector(Port/* why not? */.setDelegate(_:)), with: self)
+        // Conformance of 'WebKitDownloadTask' to 'WKDownloadDelegate' is only available in macOS 11.3 or newer
+        // to suppress this warning we call `WebKitDownload.setDelegate:` using `NSPort.setDelegate:` selector, because why not?
+        download.perform(#selector(Port.setDelegate(_:)), with: self)
 
         progress.fileOperationKind = .downloading
         progress.kind = .file

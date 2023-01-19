@@ -16,8 +16,8 @@
 //  limitations under the License.
 //
 
-import BrowserServicesKit
 import Foundation
+import Navigation
 import WebKit
 
 final class LegacyWebKitDownloadDelegate: NSObject {

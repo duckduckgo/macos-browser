@@ -16,10 +16,11 @@
 //  limitations under the License.
 //
 
-import Foundation
-import Combine
-import WebKit
 import BrowserServicesKit
+import Combine
+import Foundation
+import Navigation
+import WebKit
 
 extension NSImage {
     static let privatePlayer: NSImage = #imageLiteral(resourceName: "PrivatePlayer")
