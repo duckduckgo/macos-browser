@@ -17,6 +17,7 @@
 //
 
 import AppKit
+import Combine
 import Foundation
 
 /// Model for managing the NetP button in the Nav Bar.
@@ -24,14 +25,16 @@ import Foundation
 final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
 
     private let networkProtection: NetworkProtectionProvider
-    private var status: NetworkProtectionProvider.ConnectionStatus = .disconnected
+    private var status: NetworkProtectionConnectionStatus = .disconnected
     private let popovers: NavigationBarPopovers
+
+    private var statusChangeCancellable: AnyCancellable?
 
     @Published var showButton: Bool = false
 
     // MARK: - Initialization
 
-    init(popovers: NavigationBarPopovers, networkProtection: NetworkProtectionProvider = NetworkProtectionProvider()) {
+    init(popovers: NavigationBarPopovers, networkProtection: NetworkProtectionProvider = DefaultNetworkProtectionProvider()) {
         self.networkProtection = networkProtection
         self.popovers = popovers
 
@@ -43,7 +46,7 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
     // MARK: - Setup & updates
 
     private func setupNetworkProtection() {
-        networkProtection.onStatusChange = { [weak self] status in
+        statusChangeCancellable = networkProtection.statusChangePublisher.sink { status in
             Task { @MainActor [weak self] in
                 guard let self = self else {
                     return

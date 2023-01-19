@@ -17,26 +17,51 @@
 //
 
 import Foundation
+import Combine
 import SwiftUI
 import OSLog
 import NetworkExtension
 import NetworkProtection
 import SystemExtensions
 
-final class NetworkProtectionProvider {
+enum NetworkProtectionConnectionStatus {
+    case disconnected
+    case disconnecting(connectedDate: Date, serverAddress: String)
+    case connected(connectedDate: Date, serverAddress: String)
+    case connecting
+    case unknown
+}
 
-    typealias StatusChangeHandler = (ConnectionStatus) -> Void
-    typealias ConfigChangeHandler = () -> Void
+typealias NetworkProtectionStatusChangeHandler = (NetworkProtectionConnectionStatus) -> Void
+typealias NetworkProtectionConfigChangeHandler = () -> Void
 
-    // MARK: - Connection Status
+protocol NetworkProtectionProvider {
 
-    enum ConnectionStatus {
-        case disconnected
-        case disconnecting(connectedDate: Date, serverAddress: String)
-        case connected(connectedDate: Date, serverAddress: String)
-        case connecting
-        case unknown
-    }
+    // MARK: - Polling Connection State
+
+    /// Queries Network Protection to know if its VPN is connected.
+    ///
+    /// - Returns: `true` if the VPN is connected, connecting or reasserting, and `false` otherwise.
+    ///
+    func isConnected() async -> Bool
+
+    // MARK: - Starting & Stopping the VPN
+
+    /// Starts the VPN connection used for Network Protection
+    ///
+    func start() async throws
+
+    /// Stops the VPN connection used for Network Protection
+    ///
+    func stop() async throws
+
+    // MARK: - Config & Status Change Publishers
+
+    var configChangePublisher: CurrentValueSubject<Void, Never> { get }
+    var statusChangePublisher: CurrentValueSubject<NetworkProtectionConnectionStatus, Never> { get }
+}
+
+final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
 
     // MARK: - Errors & Logging
 
@@ -62,13 +87,8 @@ final class NetworkProtectionProvider {
     ///
     private var configChangeObserverToken: NSObjectProtocol?
 
-    /// Callback for VPN configuration changes.
-    ///
-    var onConfigChange: ConfigChangeHandler?
-
-    /// Callback for VPN status changes.
-    ///
-    var onStatusChange: StatusChangeHandler?
+    let configChangePublisher = CurrentValueSubject<Void, Never>(())
+    let statusChangePublisher = CurrentValueSubject<NetworkProtectionConnectionStatus, Never>(.unknown)
 
     // MARK: - VPN Tunnel & Configuration
 
@@ -166,7 +186,7 @@ final class NetworkProtectionProvider {
             }
 
             self.internalTunnelManager = manager
-            self.onConfigChange?()
+            self.configChangePublisher.send(())
         }
     }
 
@@ -233,7 +253,7 @@ final class NetworkProtectionProvider {
         }
 
         let status = self.connectionStatus(from: session)
-        self.onStatusChange?(status)
+        statusChangePublisher.send(status)
     }
 
     /// Retrieves a session that we are managing.  When we're running as a system extension we'll get notifications
@@ -354,9 +374,9 @@ final class NetworkProtectionProvider {
 
     // MARK: - Connection Status
 
-    private func connectionStatus(from session: NETunnelProviderSession) -> ConnectionStatus {
+    private func connectionStatus(from session: NETunnelProviderSession) -> NetworkProtectionConnectionStatus {
         let internalStatus = session.status
-        let status: ConnectionStatus
+        let status: NetworkProtectionConnectionStatus
 
         switch internalStatus {
         case .connected:

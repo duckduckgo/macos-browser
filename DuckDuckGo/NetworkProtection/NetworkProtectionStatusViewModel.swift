@@ -17,6 +17,7 @@
 //
 
 import SwiftUI
+import Combine
 import NetworkExtension
 
 /// This view can be shown from any location where we want the user to be able to interact with NetP.
@@ -39,6 +40,8 @@ extension NetworkProtectionStatusView {
         ///
         private let runLoopMode: RunLoop.Mode?
 
+        private var statusChangeCancellable: AnyCancellable?
+
         // MARK: - Feature Image
 
         var mainImageAsset: NetworkProtectionAsset {
@@ -52,15 +55,20 @@ extension NetworkProtectionStatusView {
 
         // MARK: - Initialization & Deinitialization
 
-        init(networkProtection: NetworkProtectionProvider = NetworkProtectionProvider(),
+        init(networkProtection: NetworkProtectionProvider = DefaultNetworkProtectionProvider(),
              logger: NetworkProtectionLogger = DefaultNetworkProtectionLogger(),
-             runLoopMode: RunLoop.Mode? = nil) {
+             runLoopMode: RunLoop.Mode? = nil,
+             initialStatus: NetworkProtectionConnectionStatus = .disconnected) {
 
             self.networkProtection = networkProtection
             self.logger = logger
             self.runLoopMode = runLoopMode
+            self.connectionStatus = networkProtection.statusChangePublisher.value
 
-            networkProtection.onStatusChange = { [weak self] status in
+            // Particularly useful when unit testing with an initial status of our choosing.
+            refreshInternalIsRunning()
+
+            statusChangeCancellable = networkProtection.statusChangePublisher.sink { [weak self] status in
                 guard let self = self else {
                     return
                 }
@@ -77,7 +85,7 @@ extension NetworkProtectionStatusView {
 
         // MARK: - ON/OFF Toggle
 
-        func startTimer() {
+        private func startTimer() {
             guard timer == nil else {
                 return
             }
@@ -95,7 +103,7 @@ extension NetworkProtectionStatusView {
             }
         }
 
-        func stopTimer() {
+        private func stopTimer() {
             timer?.invalidate()
             timer = nil
         }
@@ -113,7 +121,6 @@ extension NetworkProtectionStatusView {
             }
         }
 
-        @MainActor
         private func refreshInternalIsRunning() {
             switch connectionStatus {
             case .connected:
@@ -148,14 +155,13 @@ extension NetworkProtectionStatusView {
 
         // MARK: - Status
 
-        weak var timer: Timer?
+        private weak var timer: Timer?
 
         @Published
-        private var connectionStatus: NetworkProtectionProvider.ConnectionStatus = .disconnected {
+        private var connectionStatus: NetworkProtectionConnectionStatus = .disconnected {
             didSet {
-                Task { @MainActor in
-                    refreshInternalIsRunning()
-                }
+                refreshInternalIsRunning()
+                refreshTimeLapsed()
             }
         }
 

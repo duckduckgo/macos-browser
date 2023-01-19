@@ -30,9 +30,9 @@ extension NETunnelProviderProtocol {
         }
 
         #if NETP_SYSTEM_EXTENSION
-        providerBundleIdentifier = "\(Bundle(for: NetworkProtectionProvider.self).bundleIdentifier!).extension"
+        providerBundleIdentifier = "\(Bundle(for: DefaultNetworkProtectionProvider.self).bundleIdentifier!).extension"
         #else
-        providerBundleIdentifier = "\(Bundle(for: NetworkProtectionProvider.self).bundleIdentifier!).network-extension"
+        providerBundleIdentifier = "\(Bundle(for: DefaultNetworkProtectionProvider.self).bundleIdentifier!).network-extension"
         #endif
 
         //passwordReference = Keychain.makeReference(containing: tunnelConfiguration.asWgQuickConfig(), called: name, previouslyReferencedBy: old?.passwordReference)

@@ -95,7 +95,6 @@ final class BrokenSiteReportingReferenceTests: XCTestCase {
             }
         }
     }
-
 }
 
 // MARK: - BrokenSiteReportingTestData
