@@ -85,6 +85,11 @@ private enum Opacity {
 }
 
 fileprivate extension View {
+    func applyTimerAttributes() -> some View {
+        opacity(Opacity.content)
+            .font(.NetworkProtection.content.monospacedDigit())
+    }
+
     func applyContentAttributes() -> some View {
         opacity(Opacity.content)
             .font(.NetworkProtection.content)
@@ -225,8 +230,7 @@ public struct NetworkProtectionStatusView: View {
 
                 Text(model.connectionStatusDescription)
                     .opacity(Opacity.content)
-                    .font(.NetworkProtection.content)
-                    .frame(alignment: .trailing)
+                    .applyTimerAttributes()
                     .fixedSize()
 
                 Spacer()
