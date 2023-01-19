@@ -6,7 +6,7 @@ on:
       destination:
         description: "Upload destination (TestFlight or App Store)"
         required: true
-        default: testflight
+        default: appstore
         type: choice
         options:
         - testflight
