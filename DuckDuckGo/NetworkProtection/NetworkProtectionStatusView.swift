@@ -59,6 +59,7 @@ struct PopoverHeightFixer<Content: View>: View {
                     }
                 }
             })
+            .background(VisualEffectView(material: .windowBackground, blendingMode: .behindWindow).edgesIgnoringSafeArea(.all))
     }
 }
 
@@ -81,6 +82,7 @@ fileprivate extension Font {
 private enum Opacity {
     static let content = Double(0.58)
     static let label = Double(0.84)
+    static let link = Double(1)
     static let title = Double(1)
 }
 
@@ -92,6 +94,11 @@ fileprivate extension View {
 
     func applyContentAttributes() -> some View {
         opacity(Opacity.content)
+            .font(.NetworkProtection.content)
+    }
+
+    func applyLinkAttributes() -> some View {
+        opacity(Opacity.link)
             .font(.NetworkProtection.content)
     }
 
@@ -132,7 +139,7 @@ public struct NetworkProtectionStatusView: View {
             }
             .padding(EdgeInsets(top: 8, leading: 8, bottom: 4, trailing: 8))
         }
-        .frame(maxWidth: 400)
+        .frame(maxWidth: 369)
     }
 
     /// Title and divider
@@ -187,18 +194,22 @@ public struct NetworkProtectionStatusView: View {
                 .opacity(Opacity.content)
                 .fixedSize()
 
-            Divider()
-                .padding([.top, .bottom], 18)
-
-            Button {
-                model.shareFeedback()
-            } label: {
-                Text("Share Feedback")
-                    .applyLabelAttributes()
+            HStack(spacing: 0) {
+                Text(UserText.networkProtectionStatusViewShareFeedbackPrefix)
+                    .applyContentAttributes()
                     .fixedSize()
-                    .padding([.bottom], 18)
+
+                TextButton(UserText.networkProtectionStatusViewShareFeedback) {
+                    model.shareFeedback()
+                }.applyLinkAttributes()
+                    .fixedSize()
+                    .buttonStyle(PlainButtonStyle())
+
+                Text(UserText.networkProtectionStatusViewShareFeedbackSuffix)
+                    .applyContentAttributes()
+                    .fixedSize()
             }
-            .buttonStyle(PlainButtonStyle())
+            .padding([.bottom], 18)
         }
         .padding(EdgeInsets(top: 12, leading: 8, bottom: 0, trailing: 8))
     }
@@ -206,7 +217,7 @@ public struct NetworkProtectionStatusView: View {
     /// Connection status: server IP address and location
     ///
     private func statusView() -> some View {
-        VStack(spacing: 0) {
+        VStack(alignment: .leading, spacing: 0) {
             Text(UserText.networkProtectionStatusViewConnDetails)
                 .font(.NetworkProtection.sectionHeader)
                 .padding(.bottom, 18)

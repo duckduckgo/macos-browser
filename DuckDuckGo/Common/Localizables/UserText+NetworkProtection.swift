@@ -46,6 +46,9 @@ extension UserText {
     static let networkProtectionStatusViewFeatureOff = NSLocalizedString("network.protection.status.view.feature.on", value: "Network Protection is OFF", comment: "Text shown in NetworkProtection's status view when NetP is OFF.")
     static let networkProtectionStatusViewFeatureOn = NSLocalizedString("network.protection.status.view.feature.on", value: "Network Protection is ON", comment: "Text shown in NetworkProtection's status view when NetP is ON.")
     static let networkProtectionStatusViewTimerZero = "00:00:00"
+    static let networkProtectionStatusViewShareFeedbackPrefix = NSLocalizedString("network.protection.status.view.share.feedback.prefix", value: "Help us improve and ", comment: "Text shown in NetworkProtection's status view before 'share feedback'")
+    static let networkProtectionStatusViewShareFeedbackSuffix = NSLocalizedString("network.protection.status.view.share.feedback.suffix", value: ".", comment: "Text shown in NetworkProtection's status view after 'share feedback'")
+    static let networkProtectionStatusViewShareFeedback = NSLocalizedString("network.protection.status.view.share.feedback", value: "share feedback", comment: "Text shown in NetworkProtection's status view in a link that allows users to share feedback")
 
     // MARK: - Navigation Bar
 

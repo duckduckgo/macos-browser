@@ -159,12 +159,13 @@ final class NetworkProtectionProvider {
             return
         }
 
-        configChangeObserverToken = notificationCenter.addObserver(forName: .NEVPNConfigurationChange, object: nil, queue: nil) { [weak self] _ in
-            guard let self = self else {
+        configChangeObserverToken = notificationCenter.addObserver(forName: .NEVPNConfigurationChange, object: nil, queue: nil) { [weak self] notification in
+            guard let self = self,
+                let manager = notification.object as? NETunnelProviderManager else {
                 return
             }
 
-            self.reloadTunnelManager()
+            self.internalTunnelManager = manager
             self.onConfigChange?()
         }
     }
@@ -322,7 +323,6 @@ final class NetworkProtectionProvider {
     /// Starts the VPN connection used for Network Protection
     ///
     func start() async throws {
-        // let tunnelManager = try await tunnelManager
         let tunnelManager = try await loadOrMakeTunnelManager()
 
         switch tunnelManager.connection.status {

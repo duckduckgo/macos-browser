@@ -1058,6 +1058,8 @@
 		7BA4727D26F01BC400EAA165 /* CoreDataTestUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292C42667104B00AD2C21 /* CoreDataTestUtilities.swift */; };
 		7BC380D6294B5D9100F01EF8 /* NetworkProtectionPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BC380D5294B5D9100F01EF8 /* NetworkProtectionPopover.swift */; };
 		7BCD65C329781B8900172423 /* Font+MonospacedDigits.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BCD65C229781B8900172423 /* Font+MonospacedDigits.swift */; };
+		7BCD65C82978340D00172423 /* VisualEffectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BCD65C72978340D00172423 /* VisualEffectView.swift */; };
+		7BCD65C92978353400172423 /* VisualEffectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BCD65C72978340D00172423 /* VisualEffectView.swift */; };
 		7BD60230293F8D47001C9D7D /* NetworkProtectionStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BD6022F293F8D47001C9D7D /* NetworkProtectionStatusView.swift */; };
 		7BFF45932938E2500021D1A0 /* NetworkProtectionLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BFF45922938E2500021D1A0 /* NetworkProtectionLogger.swift */; };
 		85012B0229133F9F003D0DCC /* NavigationBarPopovers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85012B0129133F9F003D0DCC /* NavigationBarPopovers.swift */; };
@@ -2015,6 +2017,7 @@
 		7BA59B2129705CEB00FBC9E9 /* DuckDuckGo_NetP_SysEx_Debug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = DuckDuckGo_NetP_SysEx_Debug.entitlements; sourceTree = "<group>"; };
 		7BC380D5294B5D9100F01EF8 /* NetworkProtectionPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionPopover.swift; sourceTree = "<group>"; };
 		7BCD65C229781B8900172423 /* Font+MonospacedDigits.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Font+MonospacedDigits.swift"; sourceTree = "<group>"; };
+		7BCD65C72978340D00172423 /* VisualEffectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisualEffectView.swift; sourceTree = "<group>"; };
 		7BD6022F293F8D47001C9D7D /* NetworkProtectionStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionStatusView.swift; sourceTree = "<group>"; };
 		7BFF45922938E2500021D1A0 /* NetworkProtectionLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionLogger.swift; sourceTree = "<group>"; };
 		85012B0129133F9F003D0DCC /* NavigationBarPopovers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationBarPopovers.swift; sourceTree = "<group>"; };
@@ -3501,6 +3504,7 @@
 		7B02C787292B8C6E00E677CF /* NetworkProtection */ = {
 			isa = PBXGroup;
 			children = (
+				7BCD65C6297833E300172423 /* SwiftUIReusable */,
 				7B9DD3EF292CF6F6009504CD /* Extensions */,
 				7B5C4E34294888D000E42835 /* NetworkProtection.xcassets */,
 				7B02C79F292B8FB800E677CF /* Keychain.swift */,
@@ -3555,6 +3559,14 @@
 				7B02C7A1292B8FFA00E677CF /* TunnelConfiguration+WgQuickConfig.swift */,
 			);
 			path = Extensions;
+			sourceTree = "<group>";
+		};
+		7BCD65C6297833E300172423 /* SwiftUIReusable */ = {
+			isa = PBXGroup;
+			children = (
+				7BCD65C72978340D00172423 /* VisualEffectView.swift */,
+			);
+			path = SwiftUIReusable;
 			sourceTree = "<group>";
 		};
 		853014D425E6709500FB8205 /* Support */ = {
@@ -6133,6 +6145,7 @@
 				4BD8CCC42954021000AAD74A /* MouseClickView.swift in Sources */,
 				4BD8CCC52954021000AAD74A /* AVCaptureDevice+SwizzledAuthState.swift in Sources */,
 				4BD8CCC62954021000AAD74A /* VisitMenuItem.swift in Sources */,
+				7BCD65C92978353400172423 /* VisualEffectView.swift in Sources */,
 				4BD8CCC72954021000AAD74A /* EncryptionKeyStore.swift in Sources */,
 				4BD8CCC82954021000AAD74A /* TabExtensionsBuilder.swift in Sources */,
 				4BD8CCC92954021000AAD74A /* CookieConsentPopoverManager.swift in Sources */,
@@ -6743,6 +6756,7 @@
 				B693954D26F04BEB0015B914 /* MouseClickView.swift in Sources */,
 				B6DB3CF926A00E2D00D459B7 /* AVCaptureDevice+SwizzledAuthState.swift in Sources */,
 				AAAB9116288EB46B00A057A9 /* VisitMenuItem.swift in Sources */,
+				7BCD65C82978340D00172423 /* VisualEffectView.swift in Sources */,
 				4BA1A6BD258B082300F6F690 /* EncryptionKeyStore.swift in Sources */,
 				B6C00ED7292FB4B4009C73A6 /* TabExtensionsBuilder.swift in Sources */,
 				31B9226C288054D5001F55B7 /* CookieConsentPopoverManager.swift in Sources */,

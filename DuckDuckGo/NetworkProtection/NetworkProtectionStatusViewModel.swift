@@ -102,7 +102,8 @@ extension NetworkProtectionStatusView {
 
         /// Whether NetP is actually running.
         ///
-        @Published private var internalIsRunning = false {
+        @Published
+        private var internalIsRunning = false {
             didSet {
                 if internalIsRunning {
                     startTimer()
@@ -115,15 +116,18 @@ extension NetworkProtectionStatusView {
         @MainActor
         private func refreshInternalIsRunning() {
             switch connectionStatus {
-            case .connected, .disconnecting:
+            case .connected:
                 internalIsRunning = true
-            default:
+            case .disconnected:
                 internalIsRunning = false
+            default:
+                break
             }
         }
 
         /// Convenience binding to be able to both query and toggle NetP.
         ///
+        @MainActor
         var isRunning: Binding<Bool> {
             .init {
                 self.internalIsRunning
@@ -146,7 +150,8 @@ extension NetworkProtectionStatusView {
 
         weak var timer: Timer?
 
-        @Published private var connectionStatus: NetworkProtectionProvider.ConnectionStatus = .disconnected {
+        @Published
+        private var connectionStatus: NetworkProtectionProvider.ConnectionStatus = .disconnected {
             didSet {
                 Task { @MainActor in
                     refreshInternalIsRunning()
@@ -176,7 +181,7 @@ extension NetworkProtectionStatusView {
         var connectionStatusDescription: String {
             switch connectionStatus {
             case .connected:
-                return "\(UserText.networkProtectionStatusConnected) - \(timeLapsed)"
+                return "\(UserText.networkProtectionStatusConnected) · \(timeLapsed)"
             case .connecting:
                 return UserText.networkProtectionStatusConnecting
             case .disconnected:
