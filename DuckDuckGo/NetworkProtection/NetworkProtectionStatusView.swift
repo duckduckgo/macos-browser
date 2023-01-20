@@ -240,7 +240,6 @@ public struct NetworkProtectionStatusView: View {
                 Spacer(minLength: 16)
 
                 Text(model.connectionStatusDescription)
-                    .opacity(Opacity.content)
                     .applyTimerAttributes()
                     .fixedSize()
 
