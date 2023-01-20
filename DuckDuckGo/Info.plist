@@ -87,9 +87,11 @@
 	<key>SUEnableAutomaticChecks</key>
 	<true/>
 	<key>SUFeedURL</key>
-	<string>https://staticcdn.duckduckgo.com/macos-desktop-browser/appcast.xml</string>
+	<string>https://staticcdn.duckduckgo.com/macos-desktop-browser/appcast2.xml</string>
 	<key>SUScheduledCheckInterval</key>
 	<integer>10800</integer>
+	<key>SUPublicEDKey</key>
+	<string>ZaO/DNMzMPBldh40b5xVrpNBmqRkuGY0BNRCUng2qRo=</string>
 	<key>ViewBridgeService</key>
 	<false/>
 	<key>ITSAppUsesNonExemptEncryption</key>

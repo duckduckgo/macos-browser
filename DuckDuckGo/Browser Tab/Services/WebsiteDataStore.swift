@@ -29,9 +29,9 @@ public protocol HTTPCookieStore {
 protocol WebsiteDataStore {
     var cookieStore: HTTPCookieStore? { get }
 
-    func dataRecords(ofTypes dataTypes: Set<String>) async -> [WKWebsiteDataRecord]
-    func removeData(ofTypes dataTypes: Set<String>, modifiedSince date: Date) async
-    func removeData(ofTypes dataTypes: Set<String>, for records: [WKWebsiteDataRecord]) async
+    @MainActor func dataRecords(ofTypes dataTypes: Set<String>) async -> [WKWebsiteDataRecord]
+    @MainActor func removeData(ofTypes dataTypes: Set<String>, modifiedSince date: Date) async
+    @MainActor func removeData(ofTypes dataTypes: Set<String>, for records: [WKWebsiteDataRecord]) async
 }
 
 internal class WebCacheManager {

@@ -91,8 +91,15 @@ final class FireproofingReferenceTests: XCTestCase {
             if let cookie = testCookie {
                 await dataStore.cookieStore?.deleteCookie(cookie)
             }
-            DispatchQueue.main.async {
+
+            DispatchQueue.main.async { [weak self] in
                 onTestExecuted.fulfill()
+
+                guard let self = self else {
+                    XCTFail("\(#function): Failed to unwrap self")
+                    return
+                }
+
                 self.runReferenceTests(onTestExecuted: onTestExecuted)
             }
         }

@@ -21,13 +21,8 @@ import Foundation
 extension NSException {
 
     struct Error: Swift.Error, LocalizedError, CustomDebugStringConvertible {
-        let errorDescription: String?
+        let errorDescription: String
         let debugDescription: String
-
-        init(exception: NSException) {
-            errorDescription = exception.description
-            debugDescription = exception.debugDescription
-        }
     }
 
     static func `catch`<T>(_ closure: () throws -> T) throws -> T {
@@ -44,7 +39,7 @@ extension NSException {
         } else if case .failure(let error) = result {
             throw error
         } else if let exception = exception {
-            throw Error(exception: exception)
+            throw Error(errorDescription: exception.description, debugDescription: exception.debugDescription)
         } else {
             fatalError("NSException.catch: invalid flow")
         }
