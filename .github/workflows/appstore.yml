@@ -25,8 +25,8 @@ jobs:
       if: github.event.inputs.destination == 'appstore'
       run: |
         case "${{ github.ref }}" in
-          release/*) ;;
-          hotfix/*) ;;
+          refs/heads/release/*) ;;
+          refs/heads/hotfix/*) ;;
           *) echo "👎 Not a release or hotfix branch"; exit 1 ;;
         esac
 
