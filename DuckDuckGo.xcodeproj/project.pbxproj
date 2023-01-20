@@ -546,7 +546,6 @@
 		AA8EDF2424923E980071C2E8 /* URLExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA8EDF2324923E980071C2E8 /* URLExtension.swift */; };
 		AA8EDF2724923EC70071C2E8 /* StringExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA8EDF2624923EC70071C2E8 /* StringExtension.swift */; };
 		AA91F83927076F1900771A0D /* PrivacyIconViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA91F83827076F1900771A0D /* PrivacyIconViewModelTests.swift */; };
-		AA92126F25ACCB1100600CD4 /* ErrorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA92126E25ACCB1100600CD4 /* ErrorExtension.swift */; };
 		AA92127725ADA07900600CD4 /* WKWebViewExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA92127625ADA07900600CD4 /* WKWebViewExtension.swift */; };
 		AA97BF4625135DD30014931A /* ApplicationDockMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA97BF4525135DD30014931A /* ApplicationDockMenu.swift */; };
 		AA9C362825518C44004B1BA3 /* WebsiteDataStoreMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA9C362725518C44004B1BA3 /* WebsiteDataStoreMock.swift */; };
@@ -1447,7 +1446,6 @@
 		AA8EDF2324923E980071C2E8 /* URLExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLExtension.swift; sourceTree = "<group>"; };
 		AA8EDF2624923EC70071C2E8 /* StringExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringExtension.swift; sourceTree = "<group>"; };
 		AA91F83827076F1900771A0D /* PrivacyIconViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyIconViewModelTests.swift; sourceTree = "<group>"; };
-		AA92126E25ACCB1100600CD4 /* ErrorExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorExtension.swift; sourceTree = "<group>"; };
 		AA92127625ADA07900600CD4 /* WKWebViewExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WKWebViewExtension.swift; sourceTree = "<group>"; };
 		AA97BF4525135DD30014931A /* ApplicationDockMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplicationDockMenu.swift; sourceTree = "<group>"; };
 		AA9C362725518C44004B1BA3 /* WebsiteDataStoreMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebsiteDataStoreMock.swift; sourceTree = "<group>"; };
@@ -3951,7 +3949,6 @@
 				B6A9E46F26146A250067D1B9 /* DateExtension.swift */,
 				B6040855274B830F00680351 /* DictionaryExtension.swift */,
 				B63D467025BFA6C100874977 /* DispatchQueueExtensions.swift */,
-				AA92126E25ACCB1100600CD4 /* ErrorExtension.swift */,
 				B6E61EE2263AC0C8004E11AB /* FileManagerExtension.swift */,
 				B634DBE6293C98C500C3C99E /* FutureExtension.swift */,
 				AAECA41F24EEA4AC00EFA63A /* IndexPathExtension.swift */,
@@ -5218,7 +5215,6 @@
 				4BE5336C286912D40019DBFD /* BookmarksBarCollectionViewItem.swift in Sources */,
 				B6C0B23926E742610031CB7F /* FileDownloadError.swift in Sources */,
 				85589EA027BFE60E0038AD11 /* MoreOrLessView.swift in Sources */,
-				AA92126F25ACCB1100600CD4 /* ErrorExtension.swift in Sources */,
 				B6A9E47026146A250067D1B9 /* DateExtension.swift in Sources */,
 				AAE7527A263B046100B973F8 /* History.xcdatamodeld in Sources */,
 				B6BDD9EE29406DFA00F68088 /* WKFrameInfoExtension.swift in Sources */,
@@ -5876,7 +5872,7 @@
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
 				kind = revision;
-				revision = 43d8d76e2d7df233cc1ee16b3775f4c4e3d7de56;
+				revision = 0663c4531ecd4dd0626080500b07bb0ae650f982;
 			};
 		};
 		AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
