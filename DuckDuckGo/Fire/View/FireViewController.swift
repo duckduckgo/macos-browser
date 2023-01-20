@@ -17,7 +17,7 @@
 //
 
 import Cocoa
-import Lottie
+@preconcurrency import Lottie
 import Combine
 
 final class FireViewController: NSViewController {

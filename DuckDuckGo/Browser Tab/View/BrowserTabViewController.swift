@@ -404,7 +404,7 @@ final class BrowserTabViewController: NSViewController {
             view.addAndLayout(homePageView)
 
         default:
-            break
+            removeAllTabContent()
         }
     }
 
