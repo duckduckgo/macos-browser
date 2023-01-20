@@ -291,10 +291,17 @@ final class EmailOptionsButtonSubMenu: NSMenu {
         assert(emailManager.requestDelegate != nil, "No requestDelegate on emailManager")
 
         emailManager.getAliasIfNeededAndConsume { [weak self] alias, error in
-            guard let alias = alias, let address = self?.emailManager.emailAddressFor(alias) else {
+            guard let self = self, let alias = alias else {
                 assertionFailure(error?.localizedDescription ?? "Unexpected email error")
                 return
             }
+
+            let address = self.emailManager.emailAddressFor(alias)
+            let pixelParameters = self.emailManager.emailPixelParameters
+            self.emailManager.updateLastUseDate()
+
+            Pixel.fire(.emailUserCreatedAlias, withAdditionalParameters: pixelParameters)
+
             NSPasteboard.general.clearContents()
             NSPasteboard.general.setString(address, forType: .string)
             NotificationCenter.default.post(name: NSNotification.Name.privateEmailCopiedToClipboard, object: nil)

@@ -30,6 +30,9 @@ extension Pixel {
         static let underlyingErrorDesc = "ud"
         static let underlyingErrorSQLiteCode = "sqlrc"
         static let underlyingErrorSQLiteExtendedCode = "sqlerc"
+
+        static let emailCohort = "cohort"
+        static let emailLastUsed = "duck_address_last_used"
     }
 
     enum Values {
@@ -81,6 +84,9 @@ extension Pixel.Event {
              .adClickAttributionActive,
              .emailEnabled,
              .emailDisabled,
+             .emailUserCreatedAlias,
+             .emailUserPressedUseAlias,
+             .emailUserPressedUseAddress,
              .jsPixel:
 
             return nil

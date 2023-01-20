@@ -106,6 +106,9 @@ extension Pixel {
 
         case emailEnabled
         case emailDisabled
+        case emailUserPressedUseAddress
+        case emailUserPressedUseAlias
+        case emailUserCreatedAlias
 
         case jsPixel(_ pixel: AutofillUserScript.JSPixel)
 
@@ -249,14 +252,20 @@ extension Pixel.Event {
         case .adClickAttributionActive:
             return "m_mac_ad_click_active"
 
-        case .emailEnabled:
-            return "m_mac_email_enabled"
+        // Deliberately omit the `m_mac_` prefix in order to format these pixels the same way as other platforms
+        case .emailEnabled: return "email_enabled_macos_desktop"
+        case .emailDisabled: return "email_disabled_macos_desktop"
+        case .emailUserPressedUseAddress: return "email_filled_main_macos_desktop"
+        case .emailUserPressedUseAlias: return "email_filled_random_macos_desktop"
+        case .emailUserCreatedAlias: return "email_generated_button_macos_desktop"
 
-        case .emailDisabled:
-            return "m_mac_email_disabled"
-
-        case .jsPixel(pixel: let pixel):
-            return "m_mac_\(pixel.pixelName)"
+        case .jsPixel(let pixel):
+            // Email pixels deliberately avoid using the `m_mac_` prefix.
+            if pixel.isEmailPixel {
+                return "\(pixel.pixelName)_macos_desktop"
+            } else {
+                return "m_mac_\(pixel.pixelName)"
+            }
         }
     }
 }
