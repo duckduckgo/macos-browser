@@ -167,8 +167,7 @@ final class JSAlertController: NSViewController {
 }
 
 extension JSAlertController: NSViewControllerPresentationAnimator {
-    func animatePresentation(of viewController: NSViewController, from fromViewController: NSViewController) {
-        guard viewController === self else { return }
+    func animatePresentation(of _: NSViewController, from fromViewController: NSViewController) {
         fromViewController.addAndLayoutChild(self)
         backgroundView.layer?.opacity = 0.0
         alertView.layer?.transform = Constants.initialTransformScale
@@ -185,8 +184,7 @@ extension JSAlertController: NSViewControllerPresentationAnimator {
         }
     }
 
-    func animateDismissal(of viewController: NSViewController, from fromViewController: NSViewController) {
-        guard viewController === self else { return }
+    func animateDismissal(of _: NSViewController, from _: NSViewController) {
         animateOut { [weak self] in
             self?.removeCompletely()
         }
