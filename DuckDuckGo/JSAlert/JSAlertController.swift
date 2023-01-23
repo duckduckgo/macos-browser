@@ -179,6 +179,8 @@ extension JSAlertController: NSViewControllerPresentationAnimator {
         backgroundView.layer?.opacity = 0.0
         alertView.layer?.transform = Constants.initialTransformScale
         alertView.layer?.opacity = 0.0
+
+        // This delayed dispatch seems to be necessary to allow the animation to be visible. Without, the view just suddenly appears into view which is quite jarring.
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
             self?.animateIn { [weak self] in
                 guard let self else { return }
