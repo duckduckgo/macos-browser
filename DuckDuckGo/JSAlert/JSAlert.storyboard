@@ -15,8 +15,14 @@
                         <rect key="frame" x="0.0" y="0.0" width="600" height="401"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <customView wantsLayer="YES" translatesAutoresizingMaskIntoConstraints="NO" id="FkK-fl-t4d" userLabel="Background View" customClass="AlertBackgroundView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                            <customView wantsLayer="YES" translatesAutoresizingMaskIntoConstraints="NO" id="FkK-fl-t4d" userLabel="Background View" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="0.0" width="600" height="401"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="interceptClickEvents" value="YES"/>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
+                                        <color key="value" name="AlertBackgroundOverlayColor"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
                             </customView>
                             <customView wantsLayer="YES" translatesAutoresizingMaskIntoConstraints="NO" id="noe-j7-ZAB" userLabel="Alert">
                                 <rect key="frame" x="70" y="68" width="460" height="265"/>
@@ -176,6 +182,9 @@ DQ
         </scene>
     </scenes>
     <resources>
+        <namedColor name="AlertBackgroundOverlayColor">
+            <color white="0.0" alpha="0.20000000000000001" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </namedColor>
         <namedColor name="ClearColor">
             <color red="1" green="1" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
