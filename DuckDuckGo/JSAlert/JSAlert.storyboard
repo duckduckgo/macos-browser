@@ -24,7 +24,7 @@
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                             </customView>
-                            <customView wantsLayer="YES" translatesAutoresizingMaskIntoConstraints="NO" id="noe-j7-ZAB" userLabel="Alert">
+                            <customView wantsLayer="YES" translatesAutoresizingMaskIntoConstraints="NO" id="noe-j7-ZAB" userLabel="Alert" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                 <rect key="frame" x="70" y="68" width="460" height="265"/>
                                 <subviews>
                                     <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="32" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="BYu-y3-Dei">
@@ -149,6 +149,11 @@ DQ
                                     <constraint firstItem="BYu-y3-Dei" firstAttribute="leading" secondItem="noe-j7-ZAB" secondAttribute="leading" constant="20" id="EeQ-Da-kcr"/>
                                     <constraint firstItem="BYu-y3-Dei" firstAttribute="top" secondItem="noe-j7-ZAB" secondAttribute="top" constant="20" symbolic="YES" id="TEu-Rw-SUE"/>
                                 </constraints>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
+                                        <color key="value" name="DialogPanelBackground"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
                             </customView>
                         </subviews>
                         <constraints>
@@ -187,6 +192,9 @@ DQ
         </namedColor>
         <namedColor name="ClearColor">
             <color red="1" green="1" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="DialogPanelBackground">
+            <color red="0.99199998378753662" green="0.99199998378753662" blue="0.99199998378753662" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
         </namedColor>
     </resources>
 </document>

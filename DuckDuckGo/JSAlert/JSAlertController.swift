@@ -36,7 +36,7 @@ final class JSAlertController: NSViewController {
     @IBOutlet var alertCenterYAlignment: NSLayoutConstraint!
 
     @IBOutlet var backgroundView: ColorView!
-    @IBOutlet var alertView: NSView!
+    @IBOutlet var alertView: ColorView!
     @IBOutlet var verticalStackView: NSStackView!
     @IBOutlet var titleTextField: NSTextField!
     @IBOutlet var scrollView: NSScrollView!
@@ -65,12 +65,6 @@ final class JSAlertController: NSViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        NSApp.publisher(for: \.effectiveAppearance).receive(on: DispatchQueue.main).sink { [weak self] _ in
-            NSAppearance.withAppAppearance {
-                self?.alertView.layer?.backgroundColor = NSColor.dialogPanelBackgroundColor.cgColor
-            }
-        }.store(in: &cancellables)
         alertView.layer?.cornerRadius = 10.0
         alertView.applyDropShadow()
 
