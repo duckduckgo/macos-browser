@@ -177,7 +177,7 @@ extension JSAlertController: NSViewControllerPresentationAnimator {
         guard viewController === self else { return }
         fromViewController.addAndLayoutChild(self)
         backgroundView.layer?.opacity = 0.0
-        alertView.layer?.transform = CATransform3DMakeScale(0.95, 0.95, 1)
+        alertView.layer?.transform = Constants.initialTransformScale
         alertView.layer?.opacity = 0.0
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
             self?.animateIn { [weak self] in
