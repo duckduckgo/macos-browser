@@ -106,6 +106,7 @@ final class JSAlertController: NSViewController {
             if viewModel.isCancelButtonHidden {
                 cancelAction(self)
             }
+            return
         default:
             break
         }
