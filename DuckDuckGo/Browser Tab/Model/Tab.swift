@@ -1367,9 +1367,10 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
     private func invalidateBackItemIfNeeded(for navigationAction: NavigationAction) {
         // Cancelled & Upgraded Client Redirect URL leaves wrong backForwardList record
         // https://app.asana.com/0/inbox/1199237043628108/1201280322539473/1201353436736961
-        guard case .redirect(let redirect) = navigationAction.navigationType,
-              case .client(delay: 0) = redirect.type,
-              redirect.history.last?.fromHistoryItemIdentity != webView.backForwardList.currentItem?.identity
+        guard case .redirect(.client(delay: 0)) = navigationAction.navigationType,
+              // initial NavigationAction BackForwardListItem is not the Current Item (new item was pushed during navigation)
+              let fromHistoryItemIdentity = navigationAction.fromHistoryItemIdentity,
+              fromHistoryItemIdentity != webView.backForwardList.currentItem?.identity
         else { return }
 
         self.webView.goBack()
