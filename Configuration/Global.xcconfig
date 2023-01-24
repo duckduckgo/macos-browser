@@ -88,3 +88,5 @@ SWIFT_OPTIMIZATION_LEVEL[config=Debug][arch=*][sdk=*] = -Onone
 SWIFT_COMPILATION_MODE = wholemodule
 SWIFT_COMPILATION_MODE[config=CI][arch=*][sdk=*] =
 SWIFT_COMPILATION_MODE[config=Debug][arch=*][sdk=*] =
+
+SWIFT_STRICT_CONCURRENCY = targeted;
