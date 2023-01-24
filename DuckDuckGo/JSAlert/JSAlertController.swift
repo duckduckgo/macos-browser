@@ -99,8 +99,8 @@ final class JSAlertController: NSViewController {
         case kVK_Escape:
             if viewModel.isCancelButtonHidden {
                 cancelAction(self)
+                return
             }
-            return
         default:
             break
         }
