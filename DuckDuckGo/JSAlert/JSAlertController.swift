@@ -157,7 +157,7 @@ final class JSAlertController: NSViewController {
         verticalStackView.setCustomSpacing(scrollViewSpacing, after: scrollView)
         inputTextField.stringValue = viewModel.textFieldDefaultText
         messageTextView.sizeToFit()
-        scrollView.contentInsets = NSEdgeInsetsZero
+        scrollView.contentView.scroll(to: .zero)
     }
 
     private func dehighlightTextField() {
