@@ -128,6 +128,8 @@ final class BookmarkListViewController: NSViewController {
 
     @IBAction func newFolderButtonClicked(_ sender: AnyObject) {
         let newFolderViewController = AddFolderModalViewController.create()
+        newFolderViewController.delegate = self
+        
         delegate?.popover(shouldPreventClosure: true)
         beginSheetFromMainWindow(newFolderViewController)
     }
