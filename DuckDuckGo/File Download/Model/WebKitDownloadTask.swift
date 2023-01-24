@@ -81,11 +81,7 @@ final class WebKitDownloadTask: NSObject, ProgressReporting {
         download.webView
     }
 
-    init(download: WebKitDownload,
-         promptForLocation: Bool,
-         destinationURL: URL?,
-         tempURL: URL?,
-         postflight: FileDownloadManager.PostflightAction? = .none) {
+    init(download: WebKitDownload, promptForLocation: Bool, destinationURL: URL?, tempURL: URL?, postflight: FileDownloadManager.PostflightAction? = .none) {
 
         self.download = download
         self.progress = Progress(totalUnitCount: -1)
@@ -94,9 +90,7 @@ final class WebKitDownloadTask: NSObject, ProgressReporting {
         self.postflight = postflight
         super.init()
 
-        // Conformance of 'WebKitDownloadTask' to 'WKDownloadDelegate' is only available in macOS 11.3 or newer
-        // to suppress this warning we call `WebKitDownload.setDelegate:` using `NSPort.setDelegate:` selector, because why not?
-        download.perform(#selector(Port.setDelegate(_:)), with: self)
+        download.delegate = self
 
         progress.fileOperationKind = .downloading
         progress.kind = .file
@@ -220,8 +214,9 @@ final class WebKitDownloadTask: NSObject, ProgressReporting {
 
 }
 
-@available(macOS 11.3, *)
-extension WebKitDownloadTask: WebKitDownloadDelegate {
+extension WebKitDownloadTask: WebKitDownloadDelegate {}
+@available(macOS 11.3, *) // objc does‘t care about availability
+@objc extension WebKitDownloadTask {
 
     func download(_: WKDownload,
                   decideDestinationUsing response: URLResponse,
