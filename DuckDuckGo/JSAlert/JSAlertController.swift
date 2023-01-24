@@ -156,7 +156,7 @@ final class JSAlertController: NSViewController {
         let scrollViewSpacing = viewModel.isTextFieldHidden ? verticalStackView.spacing : Constants.scrollViewToTextfieldSpacing
         verticalStackView.setCustomSpacing(scrollViewSpacing, after: scrollView)
         inputTextField.stringValue = viewModel.textFieldDefaultText
-        messageTextView.sizeToFit()
+        messageTextView.layoutSubtreeIfNeeded()
         scrollView.contentView.scroll(to: .zero)
     }
 
