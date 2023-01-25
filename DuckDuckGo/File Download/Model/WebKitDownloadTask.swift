@@ -175,7 +175,9 @@ final class WebKitDownloadTask: NSObject, ProgressReporting {
             }
             return
         }
-        download.cancel()
+        download.cancel { [weak self] _ in
+            self?.downloadDidFail(with: URLError(.cancelled), resumeData: nil)
+        }
     }
 
     private func finish(with result: Result<URL, FileDownloadError>) {
@@ -204,6 +206,14 @@ final class WebKitDownloadTask: NSObject, ProgressReporting {
         self.delegate?.fileDownloadTask(self, didFinishWith: result)
         self.fulfill = nil
         fulfill(result)
+    }
+
+    private func downloadDidFail(with error: Error, resumeData: Data?) {
+        if resumeData == nil,
+           let tempURL = location.tempURL {
+            try? FileManager.default.removeItem(at: tempURL)
+        }
+        self.finish(with: .failure(.failedToCompleteDownloadTask(underlyingError: error, resumeData: resumeData)))
     }
 
     deinit {
@@ -285,11 +295,7 @@ extension WebKitDownloadTask: WebKitDownloadDelegate {}
     }
 
     func download(_: WKDownload, didFailWithError error: Error, resumeData: Data?) {
-        if resumeData == nil,
-           let tempURL = location.tempURL {
-            try? FileManager.default.removeItem(at: tempURL)
-        }
-        self.finish(with: .failure(.failedToCompleteDownloadTask(underlyingError: error, resumeData: resumeData)))
+        downloadDidFail(with: error, resumeData: resumeData)
     }
 
     func download(_: WKDownload, didReceiveDataWithLength length: UInt64) {

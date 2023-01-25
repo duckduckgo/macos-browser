@@ -83,10 +83,6 @@ private extension LegacyWebKitDownloadDelegate {
         download.delegate?.downloadDidFinish?(download)
     }
 
-    @objc func _downloadDidCancel(_ download: WKDownload) {
-        download.delegate?.download?(download, didFailWithError: URLError(.cancelled), resumeData: nil)
-    }
-
     @objc func _download(_ download: WKDownload, didFailWithError error: Error) {
         download.delegate?.download?(download, didFailWithError: error, resumeData: nil)
     }

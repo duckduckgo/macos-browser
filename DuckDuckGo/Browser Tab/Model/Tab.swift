@@ -1388,6 +1388,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
             if navigationResponse.isForMainFrame {
                 guard currentDownload != navigationResponse.url else {
                     // prevent download twice
+                    // FIXME: cancelled on the 2-nd try of user-entered download URL
                     return .cancel
                 }
                 currentDownload = navigationResponse.url
