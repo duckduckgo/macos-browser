@@ -206,7 +206,7 @@ extension AutoconsentUserScript {
 
         if !url.isHttp && !url.isHttps
             // bundled test page is served from file://
-            && !(AppDelegate.isRunningTests && url.path.hasSuffix("/autoconsent-test-page.html")) {
+            && !(AppDelegate.isRunningTests && (url.path.hasSuffix("/autoconsent-test-page.html") || url.path.hasSuffix("/autoconsent-test-page-banner.html"))) {
 
             // ignore special schemes
             os_log("Ignoring special URL scheme: %s", log: .autoconsent, type: .debug, messageData.url)

@@ -861,6 +861,7 @@
 		F4A6198C283CFFBB007F2080 /* ContentScopeFeatureFlagging.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4A6198B283CFFBB007F2080 /* ContentScopeFeatureFlagging.swift */; };
 		FD23FD2B28816606007F6985 /* AutoconsentMessageProtocolTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD23FD2A28816606007F6985 /* AutoconsentMessageProtocolTests.swift */; };
 		FD23FD2D2886A81D007F6985 /* AutoconsentManagement.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD23FD2C2886A81D007F6985 /* AutoconsentManagement.swift */; };
+		FD5F069F29812B1000C016B0 /* autoconsent-test-page-banner.html in Resources */ = {isa = PBXBuildFile; fileRef = FD5F069E29812B1000C016B0 /* autoconsent-test-page-banner.html */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -1759,6 +1760,7 @@
 		F4A6198B283CFFBB007F2080 /* ContentScopeFeatureFlagging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentScopeFeatureFlagging.swift; sourceTree = "<group>"; };
 		FD23FD2A28816606007F6985 /* AutoconsentMessageProtocolTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AutoconsentMessageProtocolTests.swift; path = "Unit Tests/Autoconsent/AutoconsentMessageProtocolTests.swift"; sourceTree = SOURCE_ROOT; };
 		FD23FD2C2886A81D007F6985 /* AutoconsentManagement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoconsentManagement.swift; sourceTree = "<group>"; };
+		FD5F069E29812B1000C016B0 /* autoconsent-test-page-banner.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = "autoconsent-test-page-banner.html"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -4170,6 +4172,7 @@
 				B31055CD27A1BA44001AC618 /* AutoconsentBackgroundTests.swift */,
 				B3FB198D27BC013C00513DC1 /* autoconsent-test-page.html */,
 				B3FB198F27BC015600513DC1 /* autoconsent-test.js */,
+				FD5F069E29812B1000C016B0 /* autoconsent-test-page-banner.html */,
 			);
 			name = Autoconsent;
 			sourceTree = "<group>";
@@ -4643,6 +4646,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FD5F069F29812B1000C016B0 /* autoconsent-test-page-banner.html in Resources */,
 				B3FB199027BC015600513DC1 /* autoconsent-test.js in Resources */,
 				B3FB198E27BC013C00513DC1 /* autoconsent-test-page.html in Resources */,
 			);
