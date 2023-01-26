@@ -37,7 +37,7 @@ struct CookieConsentUserPermissionView<AnimationModel>: View where AnimationMode
             .frame(width: Consts.Layout.outerContainerWidth)
         }
         .padding(Consts.Layout.containerPadding)
-        .background(Color("CookieConsentPanelBackground"))
+        .background(Color("DialogPanelBackground"))
         .cornerRadius(Consts.Layout.containerCornerRadius)
         .overlay(
             RoundedRectangle(cornerRadius: Consts.Layout.containerCornerRadius)

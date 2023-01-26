@@ -223,20 +223,32 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
     }
 
     func webView(_ webView: WKWebView, runJavaScriptAlertPanelWithMessage message: String, initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping () -> Void) {
-        let dialog = UserDialogType.jsDialog(.alert(.init(message) { _ in
-            completionHandler()
-        }))
-        userInteractionDialog = UserDialog(sender: .page(domain: frame.request.url?.host), dialog: dialog)
+        createAlertDialog(initiatedByFrame: frame, prompt: message) { parameters in
+            .alert(.init(parameters, callback: { result in
+                switch result {
+                case .failure:
+                    completionHandler()
+                case .success:
+                    completionHandler()
+                }
+            }))
+        }
     }
 
     func webView(_ webView: WKWebView,
                  runJavaScriptConfirmPanelWithMessage message: String,
                  initiatedByFrame frame: WKFrameInfo,
                  completionHandler: @escaping (Bool) -> Void) {
-        let dialog = UserDialogType.jsDialog(.confirm(.init(message) { result in
-            completionHandler((try? result.get()) ?? false)
-        }))
-        userInteractionDialog = UserDialog(sender: .page(domain: frame.request.url?.host), dialog: dialog)
+        createAlertDialog(initiatedByFrame: frame, prompt: message) { parameters in
+            .confirm(.init(parameters, callback: { result in
+                switch result {
+                case .failure:
+                    completionHandler(false)
+                case .success(let alertResult):
+                    completionHandler(alertResult)
+                }
+            }))
+        }
     }
 
     func webView(_ webView: WKWebView,
@@ -244,10 +256,26 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
                  defaultText: String?,
                  initiatedByFrame frame: WKFrameInfo,
                  completionHandler: @escaping (String?) -> Void) {
+        createAlertDialog(initiatedByFrame: frame, prompt: prompt, defaultInputText: defaultText) { parameters in
+            .textInput(.init(parameters, callback: { result in
+                switch result {
+                case .failure:
+                    completionHandler(nil)
+                case .success(let alertResult):
+                    completionHandler(alertResult)
+                }
+            }))
+        }
+    }
 
-        let dialog = UserDialogType.jsDialog(.textInput(.init( (prompt: prompt, defaultText: defaultText) ) { result in
-            completionHandler(try? result.get())
-        }))
+    private func createAlertDialog(initiatedByFrame frame: WKFrameInfo, prompt: String, defaultInputText: String? = nil, queryCreator: (JSAlertParameters) -> JSAlertQuery) {
+        let parameters = JSAlertParameters(
+            domain: frame.request.url?.host ?? "",
+            prompt: prompt,
+            defaultInputText: defaultInputText
+        )
+        let alertQuery = queryCreator(parameters)
+        let dialog = UserDialogType.jsDialog(alertQuery)
         userInteractionDialog = UserDialog(sender: .page(domain: frame.request.url?.host), dialog: dialog)
     }
 
