@@ -25,7 +25,11 @@ extension WKWebViewConfiguration {
     func applyStandardConfiguration(contentBlocking: some ContentBlockingProtocol) {
 
         allowsAirPlayForMediaPlayback = true
-        preferences.setValue(true, forKey: "fullScreenEnabled")
+        if #available(macOS 12.3, *) {
+            preferences.isElementFullscreenEnabled = true
+        } else {
+            preferences.setValue(true, forKey: "fullScreenEnabled")
+        }
         preferences.setValue(true, forKey: "allowsPictureInPictureMediaPlayback")
         preferences.setValue(true, forKey: "developerExtrasEnabled")
         preferences.setValue(false, forKey: "backspaceKeyNavigationEnabled")
@@ -46,7 +50,9 @@ extension WKWebViewConfiguration {
 
         self.userContentController = userContentController
         self.processPool.geolocationProvider = GeolocationProvider(processPool: self.processPool)
+#if !APPSTORE
         self.processPool.setDownloadDelegateIfNeeded(using: LegacyWebKitDownloadDelegate.init)
+#endif
      }
 
 }

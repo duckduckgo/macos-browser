@@ -64,3 +64,4 @@ excluded:
   - Unit Tests
   - Integration Tests
   - UI Tests
+  - vendor

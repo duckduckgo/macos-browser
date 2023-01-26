@@ -1,1 +1,1 @@
-{"channel":"${MM_USER_HANDLE}","username":"GitHub Actions","text":"**Notarized macOS app `${RELEASE_TYPE}` build is ready** :goose_honk_tada: | [:github: Workflow run summary](${WORKFLOW_URL})${ASANA_LINK}","icon_url":"https://pbs.twimg.com/profile_images/1452668733533601802/uSn3mxSe_400x400.jpg"}
+{"channel":"${MM_USER_HANDLE}","username":"GitHub Actions","text":"**Notarized macOS app `${RELEASE_TYPE}` build is ready** :goose_honk_tada: | [:github: Workflow run summary](${WORKFLOW_URL})${ASANA_LINK}","icon_url":"https://duckduckgo.com/assets/logo_header.v108.svg"}
