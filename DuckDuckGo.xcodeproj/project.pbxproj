@@ -1705,6 +1705,7 @@
 		FD23FD2B28816606007F6985 /* AutoconsentMessageProtocolTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD23FD2A28816606007F6985 /* AutoconsentMessageProtocolTests.swift */; };
 		FD23FD2D2886A81D007F6985 /* AutoconsentManagement.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD23FD2C2886A81D007F6985 /* AutoconsentManagement.swift */; };
 		FD5F069F29812B1000C016B0 /* autoconsent-test-page-banner.html in Resources */ = {isa = PBXBuildFile; fileRef = FD5F069E29812B1000C016B0 /* autoconsent-test-page-banner.html */; };
+		FD656F7C298289070051085B /* autoconsent-test-page-banner.html in Resources */ = {isa = PBXBuildFile; fileRef = FD5F069E29812B1000C016B0 /* autoconsent-test-page-banner.html */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -5741,6 +5742,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FD656F7C298289070051085B /* autoconsent-test-page-banner.html in Resources */,
 				3706FEA9293F662100E42796 /* autoconsent-test.js in Resources */,
 				3706FEAA293F662100E42796 /* autoconsent-test-page.html in Resources */,
 			);
