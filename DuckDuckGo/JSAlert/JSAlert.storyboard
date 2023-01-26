@@ -45,11 +45,11 @@
                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                     <subviews>
                                                         <textView importsGraphics="NO" richText="NO" verticallyResizable="YES" findStyle="bar" spellingCorrection="YES" smartInsertDelete="YES" id="I2t-vk-rnv">
-                                                            <rect key="frame" x="24" y="73" width="372" height="50"/>
+                                                            <rect key="frame" x="24" y="73" width="420" height="50"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="ClearColor"/>
-                                                            <size key="minSize" width="372" height="50"/>
+                                                            <size key="minSize" width="420" height="50"/>
                                                             <size key="maxSize" width="444" height="10000000"/>
                                                             <attributedString key="textStorage">
                                                                 <fragment content="Some reasonably long default text that wraps onto a second line">
@@ -188,7 +188,7 @@ DQ
     </scenes>
     <resources>
         <namedColor name="AlertBackgroundOverlayColor">
-            <color white="0.0" alpha="0.20000000000000001" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+            <color white="0.0" alpha="0.20000000298023224" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </namedColor>
         <namedColor name="ClearColor">
             <color red="1" green="1" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
