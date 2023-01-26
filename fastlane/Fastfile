@@ -189,6 +189,22 @@ platform :mac do
     new_version
   end
 
+  desc 'Increment build number based on version in App Store Connect'
+  private_lane :set_app_store_build_number do |options|
+    build_number = latest_testflight_build_number(
+      version: options[:version],
+      app_identifier: "com.duckduckgo.mobile.ios",
+      initial_build_number: -1,
+      platform: "osx",
+      username: options[:username]
+    ) + 1
+    Dir.chdir("..") do
+      File.open("Configuration/AppStoreBuildNumber.xcconfig", "wt") do |f|
+        f.puts "CURRENT_PROJECT_VERSION = #{build_number}"
+      end
+    end
+  end
+
   # Checks out a new branch from the current commit and pushes it
   #
   # @option [String] version (default: nil) Marketing version string
