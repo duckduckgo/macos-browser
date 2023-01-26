@@ -22,6 +22,7 @@ import Combine
 protocol BookmarkListViewControllerDelegate: AnyObject {
 
     func popoverShouldClose(_ bookmarkListViewController: BookmarkListViewController)
+    func popover(shouldPreventClosure: Bool)
 
 }
 
@@ -120,13 +121,17 @@ final class BookmarkListViewController: NSViewController {
         let newBookmarkViewController = AddBookmarkModalViewController.create()
         newBookmarkViewController.currentTabWebsite = currentTabWebsite
         newBookmarkViewController.delegate = self
-        presentAsModalWindow(newBookmarkViewController)
+
+        delegate?.popover(shouldPreventClosure: true)
+        beginSheetFromMainWindow(newBookmarkViewController)
     }
 
     @IBAction func newFolderButtonClicked(_ sender: AnyObject) {
         let newFolderViewController = AddFolderModalViewController.create()
         newFolderViewController.delegate = self
-        presentAsModalWindow(newFolderViewController)
+
+        delegate?.popover(shouldPreventClosure: true)
+        beginSheetFromMainWindow(newFolderViewController)
     }
 
     @IBAction func openManagementInterface(_ sender: NSButton) {
@@ -223,6 +228,10 @@ extension BookmarkListViewController: AddBookmarkModalViewControllerDelegate, Ad
         _ = bookmarkManager.updateUrl(of: bookmark, to: newURL)
     }
 
+    func addBookmarkViewControllerWillClose() {
+        delegate?.popover(shouldPreventClosure: false)
+    }
+
     func addFolderViewController(_ viewController: AddFolderModalViewController, addedFolderWith name: String) {
         bookmarkManager.makeFolder(for: name, parent: nil)
     }
@@ -231,6 +240,9 @@ extension BookmarkListViewController: AddBookmarkModalViewControllerDelegate, Ad
         bookmarkManager.update(folder: folder)
     }
 
+    func addFolderViewControllerWillClose() {
+        delegate?.popover(shouldPreventClosure: false)
+    }
 }
 
 // MARK: - Menu Item Selectors
@@ -348,11 +360,9 @@ extension BookmarkListViewController: FolderMenuItemSelectors {
             assertionFailure("Failed to retrieve Bookmark from Rename Folder context menu item")
             return
         }
-
         let addFolderViewController = AddFolderModalViewController.create()
-        addFolderViewController.delegate = self
         addFolderViewController.edit(folder: folder)
-        presentAsModalWindow(addFolderViewController)
+        beginSheetFromMainWindow(addFolderViewController)
     }
 
     func deleteFolder(_ sender: NSMenuItem) {
@@ -409,6 +419,10 @@ extension BookmarkListPopover: BookmarkListViewControllerDelegate {
 
     func popoverShouldClose(_ bookmarkListViewController: BookmarkListViewController) {
         close()
+    }
+
+    func popover(shouldPreventClosure: Bool) {
+        behavior = shouldPreventClosure ? .applicationDefined : .transient
     }
 
 }
