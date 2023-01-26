@@ -28,7 +28,6 @@ internal class SafariDataImporter: DataImporter {
         let openPanel = NSOpenPanel()
         openPanel.directoryURL = safariDataDirectoryURL
         openPanel.message = UserText.bookmarkImportSafariRequestPermissionButtonTitle
-        openPanel.allowedFileTypes = nil
         openPanel.allowsOtherFileTypes = false
         openPanel.canChooseFiles = false
         openPanel.canChooseDirectories = true
@@ -38,8 +37,7 @@ internal class SafariDataImporter: DataImporter {
     }
 
     static private var safariDataDirectoryURL: URL {
-        let applicationSupport = FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask).first!
-        return applicationSupport.appendingPathComponent("Safari/")
+        return URL.nonSandboxLibraryDirectoryURL.appendingPathComponent("Safari/")
     }
 
     static private var bookmarksFileURL: URL {
