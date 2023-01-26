@@ -215,7 +215,7 @@ extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
             let addBookmarkViewController = AddBookmarkModalViewController.create()
             addBookmarkViewController.delegate = self
             addBookmarkViewController.edit(bookmark: bookmark)
-            presentAsModalWindow(addBookmarkViewController)
+            beginSheet(addBookmarkViewController)
         case .moveToEnd:
             bookmarkManager.move(objectUUIDs: [bookmark.id], toIndex: nil, withinParentFolder: .root) { _ in }
         case .copyURL:
@@ -238,7 +238,7 @@ extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
             let addFolderViewController = AddFolderModalViewController.create()
             addFolderViewController.delegate = self
             addFolderViewController.edit(folder: folder)
-            presentAsModalWindow(addFolderViewController)
+            beginSheet(addFolderViewController)
         case .moveToEnd:
             bookmarkManager.move(objectUUIDs: [folder.id], toIndex: nil, withinParentFolder: .root) { _ in }
         case .deleteEntity:

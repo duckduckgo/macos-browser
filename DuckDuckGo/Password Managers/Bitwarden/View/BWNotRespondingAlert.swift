@@ -39,6 +39,7 @@ final class BWNotRespondingAlert: NSAlert {
     }
 
     private func restartBitwarden() {
+#if !APPSTORE
         let runningApplications = NSWorkspace.shared.runningApplications
         let bitwarden = runningApplications.first { runningApplication in
             runningApplication.bundleIdentifier == BWManager.bundleId
@@ -47,8 +48,13 @@ final class BWNotRespondingAlert: NSAlert {
         bitwarden?.terminate()
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-            NSWorkspace.shared.launchApplication(BWManager.applicationName)
+            if let url = NSWorkspace.shared.urlForApplication(withBundleIdentifier: BWManager.bundleId) {
+                let configuration = NSWorkspace.OpenConfiguration()
+                configuration.activates = true
+                NSWorkspace.shared.openApplication(at: url, configuration: configuration)
+            }
         }
+#endif
     }
 
 }

@@ -40,7 +40,7 @@ final class MainWindow: NSWindow {
     // To avoid beep sounds, this keyDown method catches events that go through the
     // responder chain when no other responders process it
     override func keyDown(with event: NSEvent) {
-        return
+        super.performKeyEquivalent(with: event)
     }
 
     private func setupWindow() {

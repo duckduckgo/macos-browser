@@ -24,11 +24,17 @@ struct SavePanelParameters {
     let fileTypes: [UTType]
 }
 
+struct JSAlertParameters {
+    let domain: String
+    let prompt: String
+    let defaultInputText: String?
+}
+
 typealias OpenPanelDialogRequest = UserDialogRequest<WKOpenPanelParameters, [URL]?>
 typealias SavePanelDialogRequest = UserDialogRequest<SavePanelParameters, (url: URL, fileType: UTType?)?>
-typealias ConfirmDialogRequest = UserDialogRequest<String, Bool>
-typealias TextInputDialogRequest = UserDialogRequest<(prompt: String, defaultText: String?), String?>
-typealias AlertDialogRequest = UserDialogRequest<String, Void>
+typealias ConfirmDialogRequest = UserDialogRequest<JSAlertParameters, Bool>
+typealias TextInputDialogRequest = UserDialogRequest<JSAlertParameters, String?>
+typealias AlertDialogRequest = UserDialogRequest<JSAlertParameters, Void>
 typealias BasicAuthDialogRequest = UserDialogRequest<URLProtectionSpace, (URLSession.AuthChallengeDisposition, URLCredential?)>
 typealias PrintDialogRequest = UserDialogRequest<NSPrintOperation, Bool>
 
@@ -36,6 +42,17 @@ enum JSAlertQuery {
     case confirm(ConfirmDialogRequest)
     case textInput(TextInputDialogRequest)
     case alert(AlertDialogRequest)
+
+    func cancel() {
+        switch self {
+        case .alert(let request):
+            return request.submit()
+        case .confirm(let request):
+            return request.submit(false)
+        case .textInput(let request):
+            return request.submit(nil)
+        }
+    }
 }
 
 extension Tab {

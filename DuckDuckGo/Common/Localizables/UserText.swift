@@ -673,5 +673,10 @@ struct UserText {
 
     static let passwordManagerLockedStatus = NSLocalizedString("autofill.manager.status.locked", value: "Locked", comment: "Locked status for password manager")
     static let passwordManagerUnlockedStatus = NSLocalizedString("autofill.manager.status.unlocked", value: "Unlocked", comment: "Unlocked status for password manager")
+    
+    static func alertTitle(from domain: String) -> String {
+        let localized = NSLocalizedString("alert.title", value: "A message from %@", comment: "Title formatted with presenting domain")
+        return String(format: localized, domain)
+    }
 }
 

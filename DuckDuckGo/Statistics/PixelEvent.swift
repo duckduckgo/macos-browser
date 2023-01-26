@@ -198,6 +198,8 @@ extension Pixel {
             case bitwardenSendingOfMessageFailed
             case bitwardenSharedKeyInjectionFailed
 
+            case updaterAborted
+
         }
 
     }
@@ -430,6 +432,9 @@ extension Pixel.Event.Debug {
             return "bitwarden_sending_of_message_failed"
         case .bitwardenSharedKeyInjectionFailed:
             return "bitwarden_shared_key_injection_failed"
+
+        case .updaterAborted:
+            return "updater_aborted"
         }
     }
 }

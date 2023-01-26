@@ -607,7 +607,7 @@ extension BookmarkManagementDetailViewController: FolderMenuItemSelectors {
         let addFolderViewController = AddFolderModalViewController.create()
         addFolderViewController.delegate = self
         addFolderViewController.edit(folder: folder)
-        presentAsModalWindow(addFolderViewController)
+        beginSheet(addFolderViewController)
     }
 
     func deleteFolder(_ sender: NSMenuItem) {

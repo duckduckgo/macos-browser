@@ -50,7 +50,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private(set) var stateRestorationManager: AppStateRestorationManager!
     private var grammarFeaturesManager = GrammarFeaturesManager()
     private let crashReporter = CrashReporter()
+
+#if !APPSTORE
     let updateController = UpdateController()
+#endif
 
     var appUsageActivityMonitor: AppUsageActivityMonitor?
 
@@ -99,7 +102,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             fileStore = EncryptedFileStore()
         }
         stateRestorationManager = AppStateRestorationManager(fileStore: fileStore)
+#if !APPSTORE
         stateRestorationManager.subscribeToAutomaticAppRelaunching(using: updateController.willRelaunchAppPublisher)
+#endif
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {

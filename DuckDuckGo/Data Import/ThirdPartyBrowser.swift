@@ -101,7 +101,15 @@ enum ThirdPartyBrowser: CaseIterable {
     // Firefox Nightly build.
     private var applicationPath: String? {
         for bundleID in bundleIdentifiers.all {
-            if let path = NSWorkspace.shared.absolutePathForApplication(withBundleIdentifier: bundleID) {
+            let path: String? = {
+                if #available(macOS 11.0, *) {
+                    return NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleID)?.path
+                } else {
+                    return NSWorkspace.shared.absolutePathForApplication(withBundleIdentifier: bundleID)
+                }
+            }()
+
+            if let path = path {
                 return path
             }
         }
@@ -139,7 +147,7 @@ enum ThirdPartyBrowser: CaseIterable {
     }
 
     func browserProfiles(supportDirectoryURL: URL? = nil) -> DataImport.BrowserProfileList? {
-        let applicationSupportURL = supportDirectoryURL ?? FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
+        let applicationSupportURL = supportDirectoryURL ?? URL.nonSandboxApplicationSupportDirectoryURL
 
         guard let profilePath = profilesDirectory(applicationSupportURL: applicationSupportURL),
               let potentialProfileURLs = try? FileManager.default.contentsOfDirectory(at: profilePath,
@@ -176,9 +184,7 @@ enum ThirdPartyBrowser: CaseIterable {
         case .chrome: return applicationSupportURL.appendingPathComponent("Google/Chrome/")
         case .edge: return applicationSupportURL.appendingPathComponent("Microsoft Edge/")
         case .firefox: return applicationSupportURL.appendingPathComponent("Firefox/Profiles/")
-        case .safari:
-            let safariDataDirectory = FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask)[0]
-            return safariDataDirectory.appendingPathComponent("Safari")
+        case .safari: return URL.nonSandboxLibraryDirectoryURL.appendingPathComponent("Safari/")
         case .lastPass, .onePassword: return nil
         }
     }

@@ -68,11 +68,13 @@ final class MoreOptionsMenu: NSMenu {
         #if FEEDBACK
 
         addItem(withTitle: "Send Feedback", action: #selector(AppDelegate.openFeedback(_:)), keyEquivalent: "")
+        #if !APPSTORE
             .withImage(NSImage(named: "BetaLabel"))
+        #endif // !APPSTORE
 
         addItem(NSMenuItem.separator())
 
-        #endif
+        #endif // FEEDBACK
 
         addWindowItems()
 
