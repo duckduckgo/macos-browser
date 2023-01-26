@@ -63,6 +63,7 @@ extension Preferences {
                 Text(UserText.autofill)
                     .font(Const.Fonts.preferencePaneTitle)
 
+#if !APPSTORE
                 // Password Manager:
 
                 Section(spacing: 0) {
@@ -90,6 +91,7 @@ extension Preferences {
                             .offset(x: Const.autoLockWarningOffset)
                     }
                 }
+#endif
 
                 // Ask to Save:
 

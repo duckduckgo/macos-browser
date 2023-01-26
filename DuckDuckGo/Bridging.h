@@ -7,9 +7,12 @@
 
 #import "WKWebView+Private.h"
 #import "NSException+Catch.h"
-#import "_WKDownload.h"
-#import "WKProcessPool+Private.h"
 #import "WKNavigationAction+Private.h"
 
 #import "WKGeolocationProvider.h"
+
+#ifndef APPSTORE
+#import "_WKDownload.h"
+#import "WKProcessPool+Private.h"
 #import "BWEncryption.h"
+#endif

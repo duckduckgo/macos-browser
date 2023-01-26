@@ -29,17 +29,10 @@ final class WindowManagerStateRestorationTests: XCTestCase {
     }
 
     func isTab(_ a: Tab, equalTo b: Tab) -> Bool {
-        if #available(macOS 12.0, *) {
-            return a.url == b.url
-                && a.title == b.title
-                && a.interactionStateData == b.interactionStateData
-                && a.webView.configuration.websiteDataStore.isPersistent == b.webView.configuration.websiteDataStore.isPersistent
-        } else {
-            return a.url == b.url
-                && a.title == b.title
-                && a.sessionStateData == b.sessionStateData
-                && a.webView.configuration.websiteDataStore.isPersistent == b.webView.configuration.websiteDataStore.isPersistent
-        }
+        a.url == b.url
+        && a.title == b.title
+        && a.interactionStateData == b.interactionStateData
+        && a.webView.configuration.websiteDataStore.isPersistent == b.webView.configuration.websiteDataStore.isPersistent
     }
 
     func areTabsEqual(_ a: [Tab], _ b: [Tab]) -> Bool {
@@ -58,14 +51,12 @@ final class WindowManagerStateRestorationTests: XCTestCase {
             Tab(content: .url(URL(string: "https://duckduckgo.com")!),
                 title: "DDG",
                 error: nil,
-                sessionStateData: "data".data(using: .utf8)!,
                 interactionStateData: "data".data(using: .utf8)!,
                 shouldLoadInBackground: false),
             Tab(),
             Tab(content: .url(URL(string: "https://duckduckgo.com/?q=search&t=osx&ia=web")!),
                 title: "DDG search",
                 error: nil,
-                sessionStateData: "data 2".data(using: .utf8)!,
                 interactionStateData: "data 2".data(using: .utf8)!,
                 shouldLoadInBackground: false)
         ]
@@ -75,7 +66,6 @@ final class WindowManagerStateRestorationTests: XCTestCase {
             Tab(content: .url(URL(string: "https://duckduckgo.com/?q=another_search&t=osx&ia=web")!),
                 title: "DDG search",
                 error: nil,
-                sessionStateData: "data 3".data(using: .utf8)!,
                 interactionStateData: "data 3".data(using: .utf8)!,
                 shouldLoadInBackground: false)
         ]
@@ -85,7 +75,6 @@ final class WindowManagerStateRestorationTests: XCTestCase {
             Tab(content: .url(URL(string: "https://duckduckgo.com/?q=search_in_pinned_tab&t=osx&ia=web")!),
                 title: "DDG search",
                 error: nil,
-                sessionStateData: "data 4".data(using: .utf8)!,
                 interactionStateData: "data 4".data(using: .utf8)!,
                 shouldLoadInBackground: false)
         ]
