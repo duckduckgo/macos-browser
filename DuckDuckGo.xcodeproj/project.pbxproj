@@ -7979,7 +7979,7 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				branch = "muodov/cosmetic-cpm";
+				branch = 43.1.0;
 				kind = branch;
 			};
 		};
