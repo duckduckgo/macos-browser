@@ -138,6 +138,19 @@ platform :mac do
     end
   end
 
+  private_lane :get_username do |options|
+    if options[:username]
+      options[:username]
+    elsif is_ci
+      nil # don't make assumptions in CI
+    else
+      git_user_email = Action.sh("git", "config", "user.email").chomp
+      if git_user_email.end_with? "@duckduckgo.com"
+        git_user_email
+      end
+    end
+  end
+
   # Synchronizes certificates and provisioning profiles for App Store distribution.
   #
   # - runs in read-only mode in CI.
@@ -145,7 +158,7 @@ platform :mac do
   private_lane :do_sync_signing do |options|
     sync_code_signing(
       api_key: get_api_key,
-      username: options[:username],
+      username: get_username(options),
       readonly: is_ci
     )
   end
@@ -209,7 +222,7 @@ platform :mac do
       app_identifier: "com.duckduckgo.mobile.ios",
       initial_build_number: -1,
       platform: "osx",
-      username: options[:username]
+      username: get_username(options)
     ) + 1
   end
 
