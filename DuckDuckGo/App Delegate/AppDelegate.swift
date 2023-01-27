@@ -141,6 +141,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         urlEventHandler.applicationDidFinishLaunching()
 
+        subscribeToEmailProtectionStatusNotifications()
+
         UserDefaultsWrapper<Any>.clearRemovedKeys()
     }
 
@@ -177,6 +179,25 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func applyPreferredTheme() {
         let appearancePreferences = AppearancePreferences()
         appearancePreferences.updateUserInterfaceStyle()
+    }
+
+    private func subscribeToEmailProtectionStatusNotifications() {
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(emailDidSignInNotification(_:)),
+                                               name: .emailDidSignIn,
+                                               object: nil)
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(emailDidSignOutNotification(_:)),
+                                               name: .emailDidSignOut,
+                                               object: nil)
+    }
+
+    @objc private func emailDidSignInNotification(_ notification: Notification) {
+        Pixel.fire(.emailEnabled)
+    }
+
+    @objc private func emailDidSignOutNotification(_ notification: Notification) {
+        Pixel.fire(.emailDisabled)
     }
 
 }

@@ -147,11 +147,12 @@ extension URL {
         return URL(string: Self.atb)!
     }
 
-    static func searchAtb(atbWithVariant: String, setAtb: String) -> URL {
+    static func searchAtb(atbWithVariant: String, setAtb: String, isSignedIntoEmailProtection: Bool) -> URL {
         return Self.initialAtb
             .appendingParameters([
                 DuckDuckGoParameters.ATB.atb: atbWithVariant,
-                DuckDuckGoParameters.ATB.setAtb: setAtb
+                DuckDuckGoParameters.ATB.setAtb: setAtb,
+                DuckDuckGoParameters.ATB.email: isSignedIntoEmailProtection ? "1" : "0"
             ])
     }
 
@@ -319,6 +320,7 @@ extension URL {
             static let atb = "atb"
             static let setAtb = "set_atb"
             static let activityType = "at"
+            static let email = "email"
 
             static let appUsageValue = "app_use"
         }

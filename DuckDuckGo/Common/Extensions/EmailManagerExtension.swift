@@ -1,7 +1,7 @@
 //
-//  PixelEventTests.swift
+//  EmailManagerExtension.swift
 //
-//  Copyright © 2022 DuckDuckGo. All rights reserved.
+//  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,17 +16,21 @@
 //  limitations under the License.
 //
 
-import XCTest
-@testable import BrowserServicesKit
-@testable import DuckDuckGo_Privacy_Browser
+import Foundation
+import BrowserServicesKit
 
-final class PixelEventTests: XCTestCase {
+extension EmailManager {
 
-    func testWhenFormattingJSPixel_ThenJSPixelIncludesPixelName() throws {
-        let pixel = AutofillUserScript.JSPixel(pixelName: "pixel_name", pixelParameters: nil)
-        let event = Pixel.Event.jsPixel(pixel)
+    var emailPixelParameters: [String: String] {
+        var pixelParameters: [String: String] = [:]
 
-        XCTAssertEqual(event.name, "m_mac_pixel_name")
+        if let cohort = self.cohort {
+            pixelParameters[Pixel.Parameters.emailCohort] = cohort
+        }
+
+        pixelParameters[Pixel.Parameters.emailLastUsed] = self.lastUseDate
+
+        return pixelParameters
     }
 
 }
