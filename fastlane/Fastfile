@@ -9,7 +9,9 @@ DEFAULT_BRANCH = 'develop'
 RELEASE_BRANCH = 'release'
 PROJECT_ROOT_FOLDER = File.dirname(File.expand_path(__dir__))
 VERSION_CONFIG_PATH = File.join(PROJECT_ROOT_FOLDER, 'Configuration/Version.xcconfig')
+APP_STORE_BUILD_NUMBER_CONFIG_PATH = File.join(PROJECT_ROOT_FOLDER, 'Configuration/AppStoreBuildNumber.xcconfig')
 VERSION_CONFIG_DEFINITION = 'MARKETING_VERSION'
+BUILD_NUMBER_CONFIG_DEFINITION = 'CURRENT_PROJECT_VERSION'
 UPGRADABLE_EMBEDDED_FILES = [
   'DuckDuckGo/Content Blocker/AppTrackerDataSetProvider.swift',
   'DuckDuckGo/Content Blocker/trackerData.json',
@@ -105,9 +107,13 @@ platform :mac do
   lane :code_freeze do |options|
     macos_codefreeze_prechecks
     new_version = validate_new_version(options)
+    app_store_build_number = get_app_store_build_number(options)
     macos_create_release_branch(version: new_version)
     macos_update_embedded_files
-    macos_update_version_config(version: new_version)
+    macos_update_version_and_build_number_config(
+      version: new_version,
+      build_number: app_store_build_number
+    )
   end
 
   #################################################
@@ -184,25 +190,27 @@ platform :mac do
     unless UI.confirm(
       "Current version is #{current_version}.\nNew version is #{new_version}.\nDo you want to continue?"
     )
-      UI.abort_with_message!('Aborted by user.')
+    UI.abort_with_message!('Aborted by user.')
     end
     new_version
   end
 
+  # Checks TestFlight for the latest build number for a given version,
+  # increments it and sets locally.
+  #
+  # @option [String] version Marketing version string
+  # @option [String] username Apple ID to be used to connect to TestFlight
+  #
   desc 'Increment build number based on version in App Store Connect'
-  private_lane :set_app_store_build_number do |options|
-    build_number = latest_testflight_build_number(
+  private_lane :get_app_store_build_number do |options|
+    latest_testflight_build_number(
+      api_key: get_api_key,
       version: options[:version],
       app_identifier: "com.duckduckgo.mobile.ios",
       initial_build_number: -1,
       platform: "osx",
       username: options[:username]
     ) + 1
-    Dir.chdir("..") do
-      File.open("Configuration/AppStoreBuildNumber.xcconfig", "wt") do |f|
-        f.puts "CURRENT_PROJECT_VERSION = #{build_number}"
-      end
-    end
   end
 
   # Checks out a new branch from the current commit and pushes it
@@ -259,10 +267,18 @@ platform :mac do
   #
   # @option [String] version (default: nil) Marketing version string
   #
-  private_lane :macos_update_version_config do |options|
+  private_lane :macos_update_version_and_build_number_config do |options|
     version = options[:version]
+    build_number = options[:build_number]
     File.write(VERSION_CONFIG_PATH, "#{VERSION_CONFIG_DEFINITION} = #{version}\n")
-    git_commit(path: VERSION_CONFIG_PATH, message: "Version Bump to #{version}")
+    File.write(APP_STORE_BUILD_NUMBER_CONFIG_PATH, "#{BUILD_NUMBER_CONFIG_DEFINITION} = #{build_number}\n")
+    git_commit(
+      path: [
+        VERSION_CONFIG_PATH,
+        APP_STORE_BUILD_NUMBER_CONFIG_PATH
+      ],
+      message: "Bump version to #{version} (#{build_number})"
+    )
     sh('git', 'push')
   end
 
