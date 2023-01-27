@@ -55,14 +55,6 @@ Updates App Store metadata
 
 Executes the release preparation work in the repository
 
-### mac set_app_store_build_number
-
-```sh
-[bundle exec] fastlane mac set_app_store_build_number
-```
-
-Increment build number based on version in App Store Connect
-
 ----
 
 This README.md is auto-generated and will be re-generated every time [_fastlane_](https://fastlane.tools) is run.
