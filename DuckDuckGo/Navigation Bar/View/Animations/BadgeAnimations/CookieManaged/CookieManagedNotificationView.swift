@@ -19,13 +19,15 @@
 import SwiftUI
 
 struct CookieManagedNotificationView: View {
+    var isCosmetic: Bool
+
     @ObservedObject var animationModel: CookieNotificationAnimationModel
     var badgeAnimationModel: BadgeNotificationAnimationModel
 
     var body: some View {
         BadgeAnimationView(animationModel: badgeAnimationModel,
                            iconView: AnyView(CookieAnimationView(animationModel: animationModel)),
-                           text: UserText.cookiesManagedNotification)
+                           text: isCosmetic ? UserText.cookiePopupHiddenNotification : UserText.cookiePopupManagedNotification)
     }
 }
 
@@ -205,7 +207,8 @@ private struct DotView: View {
 
 struct CookieManagedNotificationView_Previews: PreviewProvider {
     static var previews: some View {
-        CookieManagedNotificationView(animationModel: CookieNotificationAnimationModel(),
+        CookieManagedNotificationView(isCosmetic: false,
+                                      animationModel: CookieNotificationAnimationModel(),
                                       badgeAnimationModel: BadgeNotificationAnimationModel())
             .frame(width: 148, height: 32)
     }

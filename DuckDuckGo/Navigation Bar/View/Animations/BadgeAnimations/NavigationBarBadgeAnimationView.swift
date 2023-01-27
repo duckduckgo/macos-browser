@@ -26,15 +26,18 @@ final class NavigationBarBadgeAnimationView: NSView {
     var animatedView: NotificationBarViewAnimated?
 
     enum AnimationType {
-        case cookieManaged
+        case cookiePopupManaged
+        case cookiePopupHidden
     }
 
     func prepareAnimation(_ type: AnimationType) {
         removeAnimation()
         let viewToAnimate: NotificationBarViewAnimated
         switch type {
-        case .cookieManaged:
-            viewToAnimate = CookieManagedNotificationContainerView()
+        case .cookiePopupHidden:
+            viewToAnimate = CookieManagedNotificationContainerView(isCosmetic: true)
+        case .cookiePopupManaged:
+            viewToAnimate = CookieManagedNotificationContainerView(isCosmetic: false)
         }
 
         addSubview(viewToAnimate)
