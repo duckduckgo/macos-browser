@@ -122,6 +122,10 @@ extension NSColor {
         NSColor(named: "EditingPanelColor")!
     }
 
+    static var dialogPanelBackgroundColor: NSColor {
+        NSColor(named: "DialogPanelBackground")!
+    }
+
     static let bookmarkFilledTint = NSColor(named: "BookmarkFilledTint")!
 
     static let bookmarkRepresentingColor1 = NSColor(named: "BookmarkRepresentingColor1")!

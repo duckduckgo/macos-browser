@@ -35,4 +35,15 @@ extension NSTextView {
         self.textContainer?.textView?.alignment = .center
     }
 
+    var textSize: NSSize {
+        guard let container = textContainer,
+              let manager = container.layoutManager else {
+
+            return .zero
+        }
+
+        manager.ensureLayout(for: container)
+
+        return manager.usedRect(for: container).size
+    }
 }

@@ -1,13 +1,29 @@
+#!/bin/bash
 
-if [ "$1" == "debug" ]; then
-  echo "removing com.duckduckgo.macos.browser.$1"
-elif [ "$1" == "review" ]; then
-  echo "removing com.duckduckgo.macos.browser.$1"
-else 
-  echo "usage: clean-app debug|review"
-  exit 1
-fi 
+bundle_id=
 
-defaults delete com.duckduckgo.macos.browser.$1
-rm -rf ~/Library/Containers/com.duckduckgo.macos.browser.$1
+case "$1" in
+	debug)
+		bundle_id="com.duckduckgo.macos.browser.debug"
+		;;
+	review)
+		bundle_id="com.duckduckgo.macos.browser.review"
+		;;
+	debug-appstore)
+		bundle_id="com.duckduckgo.mobile.ios.debug"
+		;;
+	review-appstore)
+		bundle_id="com.duckduckgo.mobile.ios.review"
+		;;
+	*)
+		echo "usage: clean-app debug|review|debug-appstore|review-appstore"
+		exit 1
+		;;
+esac
 
+printf '%s' "Removing data for ${bundle_id}..."
+
+defaults delete "${bundle_id}"
+rm -rf "${HOME}/Library/Containers/${bundle_id}"
+
+echo " Done."

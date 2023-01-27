@@ -89,4 +89,15 @@ final class ColorView: NSView {
         }
     }
 
+    override func rightMouseDown(with event: NSEvent) {
+        if !interceptClickEvents {
+            super.rightMouseDown(with: event)
+        }
+    }
+
+    override func otherMouseDown(with event: NSEvent) {
+        if !interceptClickEvents {
+            super.otherMouseDown(with: event)
+        }
+    }
 }
