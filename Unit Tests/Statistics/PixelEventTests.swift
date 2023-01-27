@@ -23,7 +23,7 @@ import XCTest
 final class PixelEventTests: XCTestCase {
 
     func testWhenFormattingJSPixel_ThenJSPixelIncludesPixelName() throws {
-        let pixel = AutofillUserScript.JSPixel(pixelName: "pixel_name")
+        let pixel = AutofillUserScript.JSPixel(pixelName: "pixel_name", pixelParameters: nil)
         let event = Pixel.Event.jsPixel(pixel)
 
         XCTAssertEqual(event.name, "m_mac_pixel_name")
