@@ -316,9 +316,7 @@ final class NavigationBarViewController: NSViewController {
                     // if the tab is not active, don't show the popup
                     return
                 }
-                let animationType = isCosmetic ?
-                                        NavigationBarBadgeAnimationView.AnimationType.cookiePopupHidden :
-                                        NavigationBarBadgeAnimationView.AnimationType.cookiePopupManaged
+                let animationType: NavigationBarBadgeAnimationView.AnimationType = isCosmetic ? .cookiePopupHidden : .cookiePopupManaged
                 self.addressBarViewController?.addressBarButtonsViewController?.showBadgeNotification(animationType)
             }
         }
