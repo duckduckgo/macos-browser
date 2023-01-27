@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1674213639915,
+    "version": 1674773827532,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -182,11 +182,15 @@
             "exceptions": [],
             "settings": {
                 "Facebook": {
-                    "clicksBeforeSimpleVersion": 3
+                    "clicksBeforeSimpleVersion": 3,
+                    "ruleActions": [
+                        "block-ctl-fb"
+                    ],
+                    "state": "disabled"
                 }
             },
             "state": "enabled",
-            "hash": "180991e8c05ff1722771c58e955e4026"
+            "hash": "7ec3e0ef1b5fa8ff30102dfb524418c4"
         },
         "contentBlocking": {
             "state": "enabled",
@@ -263,6 +267,10 @@
                 {
                     "domain": "metro.co.uk",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/592"
+                },
+                {
+                    "domain": "blick.ch",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/592"
                 }
             ],
             "settings": {
@@ -300,8 +308,20 @@
                         "type": "closest-empty"
                     },
                     {
+                        "selector": ".taboolaHeight",
+                        "type": "hide"
+                    },
+                    {
                         "selector": ".adHolder",
                         "type": "closest-empty"
+                    },
+                    {
+                        "selector": ".adplaceholder",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".ad-placeholder",
+                        "type": "hide-empty"
                     },
                     {
                         "selector": "[class*='ad_unit']",
@@ -313,6 +333,26 @@
                     },
                     {
                         "selector": "[class*='ad-content']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[class*='ad-slot_']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".ad-block",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".adBox",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".adunitContainer",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".apexAd",
                         "type": "hide-empty"
                     },
                     {
@@ -328,7 +368,23 @@
                         "type": "closest-empty"
                     },
                     {
+                        "selector": ".leaderboard_wrapper",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".ad-banner-container",
+                        "type": "hide-empty"
+                    },
+                    {
                         "selector": "[class*='bannerAd']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".banner-placeholder",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".header-ad-slot",
                         "type": "hide-empty"
                     },
                     {
@@ -360,8 +416,20 @@
                         "type": "closest-empty"
                     },
                     {
+                        "selector": ".ad-current",
+                        "type": "hide-empty"
+                    },
+                    {
                         "selector": ".advertisement",
                         "type": "closest-empty"
+                    },
+                    {
+                        "selector": "[class*='advert-']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[id*='advert-']",
+                        "type": "hide-empty"
                     },
                     {
                         "selector": ".ad-slot",
@@ -384,6 +452,10 @@
                         "type": "closest-empty"
                     },
                     {
+                        "selector": "[class*='ad-zone']",
+                        "type": "hide-empty"
+                    },
+                    {
                         "selector": "[data-adunitpath]",
                         "type": "closest-empty"
                     },
@@ -404,16 +476,31 @@
                         "type": "hide-empty"
                     },
                     {
+                        "selector": ".arc-ad-wrapper",
+                        "type": "hide-empty"
+                    },
+                    {
                         "selector": ".bordeaux-slot",
                         "type": "closest-empty"
+                    },
+                    {
+                        "selector": ".rightAd",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".sponsored-slot",
+                        "type": "hide-empty"
                     }
                 ],
                 "adLabelStrings": [
                     "advertisement",
                     "advertisment",
                     "advertisementclose",
+                    "advertisementcontinue reading the main story",
                     "advertisement\ncontinue reading the main story",
+                    "advertisement\n\ncontinue reading the main story",
                     "advertisement - scroll to continue",
+                    "advertisement · scroll to continue",
                     "advertising",
                     "advertising\nskip ad",
                     "advertising\nskip ad\nskip ad\nskip ad",
@@ -484,6 +571,15 @@
                             {
                                 "selector": ".arc_ad",
                                 "type": "closest-empty"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "carandclassic.com",
+                        "rules": [
+                            {
+                                "selector": "[id*='advert-']",
+                                "type": "override"
                             }
                         ]
                     },
@@ -563,6 +659,15 @@
                         ]
                     },
                     {
+                        "domain": "essentiallysports.com",
+                        "rules": [
+                            {
+                                "selector": ".es-ad-space-container",
+                                "type": "hide-empty"
+                            }
+                        ]
+                    },
+                    {
                         "domain": "fandom.com",
                         "rules": [
                             {
@@ -621,6 +726,14 @@
                             {
                                 "selector": ".ad-cls",
                                 "type": "hide-empty"
+                            },
+                            {
+                                "selector": "._3JJMX",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": ".paisa-wrapper",
+                                "type": "hide-empty"
                             }
                         ]
                     },
@@ -642,6 +755,19 @@
                             },
                             {
                                 "selector": "[class*='styles__ad']",
+                                "type": "hide-empty"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "livemint.com",
+                        "rules": [
+                            {
+                                "selector": "#adfreeDeskSpace",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": "#dekBudgetAd",
                                 "type": "hide-empty"
                             }
                         ]
@@ -669,6 +795,15 @@
                         ]
                     },
                     {
+                        "domain": "mirror.co.uk",
+                        "rules": [
+                            {
+                                "selector": "#comments-standalone-mpu",
+                                "type": "hide-empty"
+                            }
+                        ]
+                    },
+                    {
                         "domain": "nbcsports.com",
                         "rules": [
                             {
@@ -677,6 +812,43 @@
                             },
                             {
                                 "selector": "#nbcsports-leaderboard",
+                                "type": "hide-empty"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "nytimes.com",
+                        "rules": [
+                            {
+                                "selector": "#top-wrapper",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": "#bottom-wrapper",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": "#mid1-wrapper",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": "#mid2-wrapper",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": "#mid3-wrapper",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": "#mktg-wrapper",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": ".e1xxpj0j1",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": "[id*='story-ad']",
                                 "type": "hide-empty"
                             }
                         ]
@@ -718,6 +890,15 @@
                         ]
                     },
                     {
+                        "domain": "scmp.com",
+                        "rules": [
+                            {
+                                "selector": "[class*='ad-slot-container']",
+                                "type": "hide-empty"
+                            }
+                        ]
+                    },
+                    {
                         "domain": "si.com",
                         "rules": [
                             {
@@ -749,6 +930,15 @@
                         ]
                     },
                     {
+                        "domain": "thingiverse.com",
+                        "rules": [
+                            {
+                                "selector": "[class*='AdCard__leaderboard']",
+                                "type": "hide-empty"
+                            }
+                        ]
+                    },
+                    {
                         "domain": "tripadvisor.com",
                         "rules": [
                             {
@@ -762,6 +952,23 @@
                         "rules": [
                             {
                                 "selector": ".model-base-bnr",
+                                "type": "hide"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "vice.com",
+                        "rules": [
+                            {
+                                "selector": ".adph",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": ".vice-ad__container",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": ".fixed-slot",
                                 "type": "hide"
                             }
                         ]
@@ -915,7 +1122,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "713823f7d7e219814cb96e879736f4d3"
+            "hash": "783c73d88967936790232d4073c7924f"
         },
         "fingerprintingAudio": {
             "state": "disabled",
@@ -1081,6 +1288,10 @@
                     "reason": "Example URL: https://www.allegiantair.com/seating-checking-boarding; Clicking the 'show details' button in the FAQ sections does nothing."
                 },
                 {
+                    "domain": "costco.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/644"
+                },
+                {
                     "domain": "web.whatsapp.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/620"
                 }
@@ -1094,7 +1305,7 @@
                     "privacy-test-pages.glitch.me"
                 ]
             },
-            "hash": "3de82150dfc3949a3a9fd23d38e74649"
+            "hash": "4d1b636f1a6bc56bdaf40e3d71ffd583"
         },
         "https": {
             "state": "enabled",
@@ -1463,6 +1674,13 @@
                                     "2000mules.com"
                                 ],
                                 "reason": "Loading percentage hits 100% and the site does not proceed to display usual content."
+                            },
+                            {
+                                "rule": "challenges.cloudflare.com",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/641"
                             }
                         ]
                     },
@@ -4354,7 +4572,7 @@
                 }
             },
             "exceptions": [],
-            "hash": "dd5ead95b10e52c31be5d2be808f7bac"
+            "hash": "33b3ad83b25d53e79a6075427a73eab5"
         },
         "trackingCookies1p": {
             "settings": {
