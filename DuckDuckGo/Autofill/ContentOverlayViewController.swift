@@ -254,12 +254,15 @@ extension ContentOverlayViewController: SecureVaultManagerDelegate {
 
     public func secureVaultManager(_: BrowserServicesKit.SecureVaultManager, didReceivePixel pixel: AutofillUserScript.JSPixel) {
         if pixel.isEmailPixel {
-            let pixelParameters = self.emailManager.emailPixelParameters
+            let emailParameters = self.emailManager.emailPixelParameters
+            let additionalPixelParameters = pixel.pixelParameters ?? [:]
+            let pixelParameters = emailParameters.merging(additionalPixelParameters) { (first, _) in first }
+
             self.emailManager.updateLastUseDate()
 
             Pixel.fire(.jsPixel(pixel), withAdditionalParameters: pixelParameters)
         } else {
-            Pixel.fire(.jsPixel(pixel))
+            Pixel.fire(.jsPixel(pixel), withAdditionalParameters: pixel.pixelParameters)
         }
     }
 
