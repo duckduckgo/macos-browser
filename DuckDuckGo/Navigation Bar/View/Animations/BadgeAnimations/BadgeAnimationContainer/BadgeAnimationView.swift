@@ -69,7 +69,21 @@ struct BadgeAnimationView: View {
                     Spacer()
                 }
             }
+        }.frame(width: viewWidth)
+    }
+
+    private var viewWidth: CGFloat {
+        let fontWidth: CGFloat
+        if #available(macOS 11.0, *) {
+            fontWidth = text.width(withFont: NSFont.preferredFont(forTextStyle: .body))
+        } else {
+            fontWidth = text.width(withFont: NSFont.systemFont(ofSize: NSFont.systemFontSize))
         }
+
+        let iconSize: CGFloat = 32
+        let margins: CGFloat = 4
+
+        return fontWidth + iconSize + margins
     }
 }
 
@@ -124,5 +138,12 @@ private enum Consts {
 
     enum Colors {
         static let badgeBackgroundColor = Color("URLNotificationBadgeBackground")
+    }
+}
+
+private extension String {
+    func width(withFont font: NSFont) -> CGFloat {
+        let fontAttributes = [NSAttributedString.Key.font: font]
+        return self.size(withAttributes: fontAttributes).width
     }
 }

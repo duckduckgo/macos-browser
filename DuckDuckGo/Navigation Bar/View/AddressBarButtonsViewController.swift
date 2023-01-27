@@ -207,7 +207,7 @@ final class AddressBarButtonsViewController: NSViewController {
 
     func showBadgeNotification(_ type: NavigationBarBadgeAnimationView.AnimationType) {
         if !isAnyShieldAnimationPlaying {
-            buttonsBadgeAnimator.showNotification(withType: .cookieManaged,
+            buttonsBadgeAnimator.showNotification(withType: type,
                                                   buttonsContainer: buttonsContainer,
                                                   and: notificationAnimationView)
         } else {
