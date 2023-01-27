@@ -1379,6 +1379,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         return .next
     }
 
+    @MainActor
     func didStart(_ navigation: Navigation) {
         delegate?.tabDidStartNavigation(self)
         userInteractionDialog = nil
@@ -1409,6 +1410,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
 
     func navigation(_ navigation: Navigation, didFailWith error: WKError, isProvisioned: Bool) {
         if isProvisioned {
+            // TODO handle session restoration failures
             self.error = error
         }
 
