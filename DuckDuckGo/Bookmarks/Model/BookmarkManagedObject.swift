@@ -47,17 +47,6 @@ extension BookmarkManagedObject {
         try validate()
     }
 
-    static func createFavoritesFolder(in context: NSManagedObjectContext) -> NSManagedObject {
-        let managedObject = NSEntityDescription.insertNewObject(forEntityName: BookmarkManagedObject.className(), into: context)
-
-        managedObject.setValue(UUID.favoritesFolderUUID, forKey: "id")
-        managedObject.setValue("Favorites Folder" as NSString, forKey: "titleEncrypted")
-        managedObject.setValue(true, forKey: "isFolder")
-        managedObject.setValue(NSDate.now, forKey: "dateAdded")
-
-        return managedObject
-    }
-
     // MARK: - Private
 
     func validate() throws {
@@ -69,9 +58,9 @@ extension BookmarkManagedObject {
     }
 
     func validateThatEntitiesExistInsideTheRootFolder() throws {
-        if parentFolder == nil, ![UUID.rootBookmarkFolderUUID, .favoritesFolderUUID].contains(id) {
-            throw BookmarkError.mustExistInsideRootFolder
-        }
+//        if parentFolder == nil, ![Book.rootBookmarkFolderUUID, .favoritesFolderUUID].contains(id) {
+//            throw BookmarkError.mustExistInsideRootFolder
+//        }
     }
 
     func validateBookmarkURLRequirement() throws {
@@ -81,9 +70,9 @@ extension BookmarkManagedObject {
     }
 
     func validateFavoritesFolder() throws {
-        if let favoritesFolderID = favoritesFolder?.id, favoritesFolderID != .favoritesFolderUUID {
-            throw BookmarkError.invalidFavoritesFolder
-        }
+//        if let favoritesFolderID = favoritesFolder?.id, favoritesFolderID != .favoritesFolderUUID {
+//            throw BookmarkError.invalidFavoritesFolder
+//        }
     }
 
     func validateThatFoldersDoNotHaveURLs() throws {

@@ -88,7 +88,7 @@ struct PasteboardFolder: Hashable {
     private let folderName: String
 
     init(folder: BookmarkFolder) {
-        self.folderID = folder.id.uuidString
+        self.folderID = folder.id
         self.folderName = folder.title
     }
 

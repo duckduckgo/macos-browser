@@ -89,7 +89,10 @@ final class BookmarksBarCollectionViewItem: NSCollectionViewItem {
             let favicon = bookmark.favicon(.small)?.copy() as? NSImage
             favicon?.size = NSSize.faviconSize
 
-            self.entityType = .bookmark(title: bookmark.title, url: bookmark.url, favicon: favicon, isFavorite: bookmark.isFavorite)
+            self.entityType = .bookmark(title: bookmark.title,
+                                        url: bookmark.urlObject ?? URL(string: "https://duckduckgo.com")!, //TODO: error, tweak this
+                                        favicon: favicon,
+                                        isFavorite: bookmark.isFavorite)
         } else if let folder = entity as? BookmarkFolder {
             self.entityType = .folder(title: folder.title)
         } else {

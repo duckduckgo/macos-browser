@@ -30,7 +30,7 @@ class BookmarkOutlineViewDataSourceTests: XCTestCase {
         let notification = Notification(name: NSOutlineView.itemDidExpandNotification, object: nil, userInfo: ["NSObject": mockFolderNode])
         dataSource.outlineViewItemDidExpand(notification)
 
-        XCTAssertEqual(dataSource.expandedNodes, [mockFolder.id])
+        XCTAssertEqual(dataSource.expandedNodesIDs, [mockFolder.id])
     }
 
     func testWhenOutlineViewCollapsesItem_ThenTheObjectIDIsRemovedFromExpandedItems() {
@@ -42,12 +42,12 @@ class BookmarkOutlineViewDataSourceTests: XCTestCase {
         let expandNotification = Notification(name: NSOutlineView.itemDidExpandNotification, object: nil, userInfo: ["NSObject": mockFolderNode])
         dataSource.outlineViewItemDidExpand(expandNotification)
 
-        XCTAssertEqual(dataSource.expandedNodes, [mockFolder.id])
+        XCTAssertEqual(dataSource.expandedNodesIDs, [mockFolder.id])
 
         let collapseNotification = Notification(name: NSOutlineView.itemDidCollapseNotification, object: nil, userInfo: ["NSObject": mockFolderNode])
         dataSource.outlineViewItemDidCollapse(collapseNotification)
 
-        XCTAssertEqual(dataSource.expandedNodes, [])
+        XCTAssertEqual(dataSource.expandedNodesIDs, [])
     }
 
     func testWhenGettingPasteboardWriterForItem_AndItemIsBookmarkEntity_ThenWriterIsReturned() {

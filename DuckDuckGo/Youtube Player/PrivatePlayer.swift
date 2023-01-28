@@ -213,7 +213,7 @@ extension PrivatePlayer {
     func image(for bookmark: Bookmark) -> NSImage? {
         // Bookmarks to Duck Player pages retain duck:// URL even when Duck Player is disabled,
         // so we keep the Duck Player favicon even if Duck Player is currently disabled
-        return bookmark.url.isPrivatePlayerScheme ? .privatePlayer : nil
+        return (bookmark.urlObject?.isPrivatePlayerScheme ?? false) ? .privatePlayer : nil
     }
 
     func domainForRecentlyVisitedSite(with url: URL) -> String? {

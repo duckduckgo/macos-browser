@@ -21,6 +21,7 @@ import Combine
 import os.log
 import BrowserServicesKit
 import Persistence
+import Bookmarks
 
 @NSApplicationMain
 final class AppDelegate: NSObject, NSApplicationDelegate {
@@ -75,6 +76,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 // Give Pixel a chance to be sent, but not too long
                 Thread.sleep(forTimeInterval: 1)
                 fatalError("Could not load DB: \(error.localizedDescription)")
+            }
+
+            BookmarkDatabase.shared.db.loadStore { context, error in
+                guard let context = context else {
+                    print("- Error: \(error)")
+                    return
+                }
+
+                BookmarkUtils.prepareFoldersStructure(in: context)
+                if context.hasChanges {
+                    try? context.save()
+                }
             }
         }
 

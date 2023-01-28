@@ -110,8 +110,8 @@ extension BaseBookmarkEntity: PasteboardWriting {
     private let bookmarkTitle: String
 
     init(bookmark: Bookmark) {
-        self.bookmarkID = bookmark.id.uuidString
-        self.bookmarkURL = bookmark.url.absoluteString
+        self.bookmarkID = bookmark.id
+        self.bookmarkURL = bookmark.url
         self.bookmarkTitle = bookmark.title
     }
 

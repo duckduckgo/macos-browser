@@ -133,7 +133,7 @@ final class AddBookmarkModalViewController: NSViewController {
         if let originalBookmark = originalBookmark {
             titleTextField.stringValue = UserText.updateBookmark
             bookmarkTitleTextField.stringValue = originalBookmark.title
-            urlTextField.stringValue = originalBookmark.url.absoluteString
+            urlTextField.stringValue = originalBookmark.url
 
             addButton.title = UserText.save
         }

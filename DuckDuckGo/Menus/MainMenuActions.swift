@@ -118,12 +118,13 @@ extension AppDelegate {
             return
         }
 
-        guard let bookmark = menuItem.representedObject as? Bookmark else {
+        guard let bookmark = menuItem.representedObject as? Bookmark,
+        let url = bookmark.urlObject else {
             assertionFailure("Unexpected type of menuItem.representedObject: \(type(of: menuItem.representedObject))")
             return
         }
 
-        let tab = Tab(content: .url(bookmark.url), shouldLoadInBackground: true)
+        let tab = Tab(content: .url(url), shouldLoadInBackground: true)
         WindowsManager.openNewWindow(with: tab)
     }
 
@@ -446,7 +447,7 @@ extension MainViewController {
             return
         }
 
-        let tabs = models.compactMap { $0.entity as? Bookmark }.map { Tab(content: .url($0.url), shouldLoadInBackground: true) }
+        let tabs = models.compactMap { ($0.entity as? Bookmark)?.urlObject }.map { Tab(content: .url($0), shouldLoadInBackground: true) }
         tabCollectionViewModel.append(tabs: tabs)
     }
 

@@ -173,7 +173,7 @@ extension Pixel.Event {
 
         init(url: URL?, bookmarkManager: BookmarkManager = LocalBookmarkManager.shared) {
             guard let url = url,
-                  let bookmark = bookmarkManager.getBookmark(for: url) else {
+                  let bookmark = bookmarkManager.getBookmark(forUrl: url.absoluteString) else {
                 self = .website
                 return
             }
