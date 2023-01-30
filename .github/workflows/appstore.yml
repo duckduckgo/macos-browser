@@ -50,6 +50,7 @@ jobs:
       run: bundle install
 
     - name: Install xcbeautify
+      continue-on-error: true
       run: brew install xcbeautify
 
     - name: Archive and Upload the App
