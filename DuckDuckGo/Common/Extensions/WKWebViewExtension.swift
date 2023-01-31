@@ -250,9 +250,8 @@ extension WKWebView {
     }
 
     var fullScreenPlaceholderView: NSView? {
-        _fullScreenPlaceholderView()
-//        guard self.responds(to: NSSelectorFromString(Selector.fullScreenPlaceholderView)) else { return nil }
-//        return self.value(forKey: Selector.fullScreenPlaceholderView) as? NSView
+        guard self.responds(to: NSSelectorFromString(Selector.fullScreenPlaceholderView)) else { return nil }
+        return self.value(forKey: Selector.fullScreenPlaceholderView) as? NSView
     }
 
     private enum Selector {
