@@ -32,6 +32,11 @@ final class ChromiumLoginReader {
         case failedToTemporarilyCopyDatabase
     }
 
+    enum LoginDataFileName: String, CaseIterable {
+        case loginData = "Login Data"
+        case loginDataForAccount = "Login Data for Account"
+    }
+
     private let chromiumLocalLoginDirectoryURL: URL
     private let chromiumGoogleAccountLoginDirectoryURL: URL
     private let processName: String
@@ -46,8 +51,8 @@ final class ChromiumLoginReader {
          processName: String,
          decryptionKey: String? = nil,
          decryptionKeyPrompt: ChromiumKeychainPrompting = ChromiumKeychainPrompt()) {
-        self.chromiumLocalLoginDirectoryURL = chromiumDataDirectoryURL.appendingPathComponent("/Login Data")
-        self.chromiumGoogleAccountLoginDirectoryURL = chromiumDataDirectoryURL.appendingPathComponent("/Login Data For Account")
+        self.chromiumLocalLoginDirectoryURL = chromiumDataDirectoryURL.appendingPathComponent(LoginDataFileName.loginData.rawValue)
+        self.chromiumGoogleAccountLoginDirectoryURL = chromiumDataDirectoryURL.appendingPathComponent(LoginDataFileName.loginDataForAccount.rawValue)
         self.processName = processName
         self.decryptionKey = decryptionKey
         self.decryptionKeyPrompt = decryptionKeyPrompt
