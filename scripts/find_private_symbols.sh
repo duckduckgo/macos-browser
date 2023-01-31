@@ -62,7 +62,7 @@ find_private_objc_selectors() {
 		| sed -n -e 's/^.*__TEXT:__objc_methname://' \
 			-e '/^__swift_objectForKeyedSubscript/d' \
 			-e '/^_/P' \
-		| uniq | sort
+		| sort | uniq
 }
 
 main() {
