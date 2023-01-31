@@ -386,6 +386,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                 historyCoordinating.commitChanges(url: oldUrl)
             }
             error = nil
+            userInteractionDialog = nil
             Task {
                 await reloadIfNeeded(shouldLoadInBackground: true)
             }
@@ -559,6 +560,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         if privatePlayer.goBackSkippingLastItemIfNeeded(for: webView) {
             return
         }
+        userInteractionDialog = nil
         webView.goBack()
     }
 
@@ -576,6 +578,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     }
 
     func reload() {
+        userInteractionDialog = nil
         currentDownload = nil
         if let error = error, let failingUrl = error.failingUrl {
             webView.load(failingUrl)
@@ -960,7 +963,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                                 allowlisted: isAllowlisted,
                                 denylisted: false)
     }
-
 }
 
 extension Tab: UserContentControllerDelegate {

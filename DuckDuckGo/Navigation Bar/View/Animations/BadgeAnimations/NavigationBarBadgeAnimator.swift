@@ -43,7 +43,7 @@ final class NavigationBarBadgeAnimator: NSObject {
         let newAnimationID = UUID()
         self.animationID = newAnimationID
 
-        notificationBadgeContainer.prepareAnimation(.cookieManaged)
+        notificationBadgeContainer.prepareAnimation(type)
 
         animateButtonsFade(.start,
                            buttonsContainer: buttonsContainer,

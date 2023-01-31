@@ -305,8 +305,10 @@ final class NavigationBarViewController: NSViewController {
     @objc private func showAutoconsentFeedback(_ sender: Notification) {
         if #available(macOS 11, *) {
             guard view.window?.isKeyWindow == true,
-                  let topUrl = sender.userInfo?["topUrl"] as? URL
+                  let topUrl = sender.userInfo?["topUrl"] as? URL,
+                  let isCosmetic = sender.userInfo?["isCosmetic"] as? Bool
             else { return }
+
             DispatchQueue.main.async { [weak self] in
                 guard let self = self,
                       self.tabCollectionViewModel.selectedTabViewModel?.tab.url == topUrl
@@ -314,7 +316,8 @@ final class NavigationBarViewController: NSViewController {
                     // if the tab is not active, don't show the popup
                     return
                 }
-                self.addressBarViewController?.addressBarButtonsViewController?.showBadgeNotification(.cookieManaged)
+                let animationType: NavigationBarBadgeAnimationView.AnimationType = isCosmetic ? .cookiePopupHidden : .cookiePopupManaged
+                self.addressBarViewController?.addressBarButtonsViewController?.showBadgeNotification(animationType)
             }
         }
     }
