@@ -54,6 +54,10 @@ check_binary_architectures() {
 }
 
 find_private_objc_selectors() {
+	# 1. List pointers to Obj-C selectors and their names.
+	# 2. Filter out name.
+	# 3. Remove __swift_objectForKeyedSubscript.
+	# 4. Print only selectors starting with and underscore.
 	otool -v -s __DATA __objc_selrefs "${app_binary}" \
 		| sed -n -e 's/^.*__TEXT:__objc_methname://' \
 			-e '/^__swift_objectForKeyedSubscript/d' \
