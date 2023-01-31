@@ -1347,7 +1347,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
     }
 
     @MainActor
-    func decidePolicy(for navigationResponse: NavigationResponse, currentNavigation: Navigation?) async -> NavigationResponsePolicy? {
+    func decidePolicy(for navigationResponse: NavigationResponse) async -> NavigationResponsePolicy? {
         userEnteredUrl = false // subsequent requests will be navigations
 
         let isSuccessfulResponse = (navigationResponse.response as? HTTPURLResponse)?.validateStatusCode(statusCode: 200..<300) == nil
@@ -1365,7 +1365,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
                 // register the navigationResponse for legacy _WKDownload to be called back on the Tab
                 // further download will be passed to webView:navigationResponse:didBecomeDownload:
                 return .download(navigationResponse.url, using: webView) {  [weak self] download in
-                    self?.navigationResponse(navigationResponse, didBecome: download, currentNavigation: currentNavigation)
+                    self?.navigationResponse(navigationResponse, didBecome: download)
                 }
             }
         }
@@ -1425,7 +1425,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         FileDownloadManager.shared.add(download, delegate: self, location: .auto, postflight: .none)
     }
 
-    func navigationResponse(_ navigationResponse: NavigationResponse, didBecome download: WebKitDownload, currentNavigation: Navigation?) {
+    func navigationResponse(_ navigationResponse: NavigationResponse, didBecome download: WebKitDownload) {
         FileDownloadManager.shared.add(download, delegate: self, location: .auto, postflight: .none)
 
         // Note this can result in tabs being left open, e.g. download button on this page:
