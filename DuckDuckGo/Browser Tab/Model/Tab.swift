@@ -1411,10 +1411,8 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
     }
 
     @MainActor
-    func navigation(_ navigation: Navigation, didFailWith error: WKError, isProvisional: Bool) {
-
-        if isProvisional {
-            // TODO handle session restoration failures
+    func navigation(_ navigation: Navigation, didFailWith error: WKError) {
+        if navigation.isCurrent {
             self.error = error
         }
 
@@ -1443,8 +1441,8 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         }
     }
 
-    func webContentProcessDidTerminate(currentNavigation: Navigation?) {
-        Pixel.fire(.debug(event: .webKitDidTerminate))
+    func webContentProcessDidTerminate(with reason: WKProcessTerminationReason?) {
+        Pixel.fire(.debug(event: .webKitDidTerminate, error: NSError(domain: "WKProcessTerminated", code: reason?.rawValue ?? -1)))
     }
 
 }
