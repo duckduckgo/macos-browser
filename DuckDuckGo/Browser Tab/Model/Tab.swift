@@ -1142,7 +1142,7 @@ extension Tab: WKNavigationDelegate {
         let isNavigatingAwayFromPinnedTab: Bool = {
             let isNavigatingToAnotherDomain = navigationAction.request.url?.host != url?.host
             let isPinned = pinnedTabsManager.isTabPinned(self)
-            return isLinkActivated && isPinned && isNavigatingToAnotherDomain
+            return isLinkActivated && isPinned && isNavigatingToAnotherDomain && navigationAction.isTargetingMainFrame
         }()
 
         let isMiddleButtonClicked = navigationAction.buttonNumber == Constants.webkitMiddleClick
