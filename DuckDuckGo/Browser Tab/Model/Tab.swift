@@ -1410,8 +1410,10 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         StatisticsLoader.shared.refreshRetentionAtb(isSearch: navigation.url.isDuckDuckGoSearch)
     }
 
-    func navigation(_ navigation: Navigation, didFailWith error: WKError, isProvisioned: Bool) {
-        if isProvisioned {
+    @MainActor
+    func navigation(_ navigation: Navigation, didFailWith error: WKError, isProvisional: Bool) {
+
+        if isProvisional {
             // TODO handle session restoration failures
             self.error = error
         }
