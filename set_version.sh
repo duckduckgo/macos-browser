@@ -10,5 +10,5 @@ if [[ -z "${version_number}" ]]; then
    exit 1
 fi
 
-printf 'MARKETING_VERSION = %s' "${version_number}" > Configuration/Version.xcconfig
+printf 'APP_VERSION = %s' "${version_number}" > Configuration/Version.xcconfig
 printf 'CURRENT_PROJECT_VERSION = %s' "${build_number}" > Configuration/AppStoreBuildNumber.xcconfig
