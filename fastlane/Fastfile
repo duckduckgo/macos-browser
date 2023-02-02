@@ -68,7 +68,7 @@ platform :mac do
   lane :release_appstore do |options|
     build_release(options)
 
-    deliver(common_deliver_arguments.merge(options))
+    deliver(common_deliver_arguments(options))
 
     begin
       upload_metadata(options)
@@ -92,7 +92,7 @@ platform :mac do
   #
   desc 'Updates App Store metadata'
   lane :upload_metadata do |options|
-    deliver(common_deliver_arguments.merge(options).merge({
+    deliver(common_deliver_arguments(options).merge({
       skip_binary_upload: true,
       skip_metadata: false
     }))
@@ -365,8 +365,8 @@ Do you want to continue?}
     user_version
   end
 
-  def common_deliver_arguments
-    {
+  def common_deliver_arguments(options)
+    args = {
       api_key: get_api_key,
       submit_for_review: false,
       automatic_release: false,
@@ -378,6 +378,11 @@ Do you want to continue?}
       submission_information: {
          add_id_info_uses_idfa: false
       }
-    }
+    }.merge(options)
+
+    unless args.has_key? :username
+      args[:username] = get_username(options)
+    end
+    args
   end
 end
