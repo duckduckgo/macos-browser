@@ -52,6 +52,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var grammarFeaturesManager = GrammarFeaturesManager()
     private let crashReporter = CrashReporter()
     private(set) var internalUserDecider: InternalUserDeciding!
+    private var appIconChanger: AppIconChanger!
 
 #if !APPSTORE
     var updateController: UpdateController!
@@ -112,9 +113,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         updateController = UpdateController(internalUserDecider: internalUserDecider)
         stateRestorationManager.subscribeToAutomaticAppRelaunching(using: updateController.willRelaunchAppPublisher)
 #endif
-        //!TODO: Icon changer. Subscribed to isInternal
-        let iconChanger = AppIconChanger()
-        iconChanger.change()
+
+        appIconChanger = AppIconChanger(internalUserDecider: internalUserDecider)
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {

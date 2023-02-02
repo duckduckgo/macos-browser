@@ -21,6 +21,7 @@ import Foundation
 protocol InternalUserDeciding {
 
     var isInternalUser: Bool { get }
+    var isInternalUserPublisher: Published<Bool>.Publisher { get }
 
     func markUserAsInternalIfNeeded(forUrl url: URL?, response: HTTPURLResponse?)
 
@@ -33,14 +34,24 @@ final class InternalUserDecider {
     init(store: InternalUserDeciderStoring) {
         self.store = store
 
-        didVerifyInternalUser = (try? store.load()) ?? false
+#if DEBUG || REVIEW
+        isInternalUser = true
+#else
+        isInternalUser = (try? store.load()) ?? false
+#endif
     }
 
     private var store: InternalUserDeciderStoring
-    private var didVerifyInternalUser: Bool {
+
+    @Published private(set) var isInternalUser: Bool {
         didSet {
-            if oldValue != didVerifyInternalUser {
-                try? store.save(isInternal: didVerifyInternalUser)
+            // Optimisation below prevents from 2 unnecesary events:
+            // 1) Rewriting the file with the same value
+            // 2) Also from initial saving of the false value to the disk
+            // which is unnecessary since it is the default value.
+            // It makes the load of the app faster
+            if oldValue != isInternalUser {
+                try? store.save(isInternal: isInternalUser)
             }
         }
     }
@@ -49,12 +60,8 @@ final class InternalUserDecider {
 
 extension InternalUserDecider: InternalUserDeciding {
 
-    var isInternalUser: Bool {
-//TODO Uncomment
-//#if DEBUG
-//        return true
-//#endif
-        return didVerifyInternalUser
+    var isInternalUserPublisher: Published<Bool>.Publisher {
+        $isInternalUser
     }
 
     func markUserAsInternalIfNeeded(forUrl url: URL?, response: HTTPURLResponse?) {
@@ -66,11 +73,14 @@ extension InternalUserDecider: InternalUserDeciding {
            url.host == Self.internalUserVerificationURLHost,
            let statusCode = response?.statusCode,
            statusCode == 200 {
-            didVerifyInternalUser = true
+            isInternalUser = true
             return
         }
 
-        didVerifyInternalUser = false
+        // Do not publish value if not necessary
+        if isInternalUser != false {
+            isInternalUser = false
+        }
     }
 
 }

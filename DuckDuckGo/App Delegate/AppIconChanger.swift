@@ -17,16 +17,40 @@
 //
 
 import Cocoa
+import Combine
 
 final class AppIconChanger {
 
-    enum Icons {
-        
+    init(internalUserDecider: InternalUserDeciding) {
+        subscribeToIsInternal(internalUserDecider)
     }
 
-    func change() {
-        let icon = NSImage(named: "InternalIcon")//NSImage(named: "Icon - Test")
+    enum Icons: String {
+        case internalChannelIcon = "InternalChannelIcon"
+    }
+
+    func updateIcon(isInternalChannel: Bool) {
+#if DEBUG || REVIEW
+        return
+#else
+        let icon: NSImage?
+        if isInternalChannel {
+            icon = NSImage(named: Icons.internalChannelIcon.rawValue)
+        } else {
+            icon = nil
+        }
+
         NSApplication.shared.applicationIconImage = icon
+#endif
+    }
+
+    private var isInternalCancellable: AnyCancellable?
+
+    private func subscribeToIsInternal(_ internalUserDecider: InternalUserDeciding) {
+        isInternalCancellable = internalUserDecider.isInternalUserPublisher
+            .sink { [weak self] isInternal in
+                self?.updateIcon(isInternalChannel: isInternal)
+            }
     }
 
 }
