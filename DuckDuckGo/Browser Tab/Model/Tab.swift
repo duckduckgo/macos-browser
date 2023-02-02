@@ -159,6 +159,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     func setDelegate(_ delegate: TabDelegate) { self.delegate = delegate }
 
     private let cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter?
+    private let internalUserDecider: InternalUserDeciding?
     let pinnedTabsManager: PinnedTabsManager
     private let privatePlayer: PrivatePlayer
     private let privacyFeatures: AnyPrivacyFeatures
@@ -200,6 +201,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
         let privatePlayer = privatePlayer
             ?? (AppDelegate.isRunningTests ? PrivatePlayer.mock(withMode: .enabled) : PrivatePlayer.shared)
+        let internalUserDecider = (NSApp.delegate as? AppDelegate)?.internalUserDecider
 
         self.init(content: content,
                   faviconManagement: faviconManagement,
@@ -211,6 +213,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                   privatePlayer: privatePlayer,
                   extensionsBuilder: extensionsBuilder,
                   cbaTimeReporter: cbaTimeReporter,
+                  internalUserDecider: internalUserDecider,
                   localHistory: localHistory,
                   title: title,
                   error: error,
@@ -235,6 +238,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
          privatePlayer: PrivatePlayer,
          extensionsBuilder: TabExtensionsBuilderProtocol,
          cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter?,
+         internalUserDecider: InternalUserDeciding?,
          localHistory: Set<String>,
          title: String?,
          error: Error?,
@@ -255,6 +259,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         self.privacyFeatures = privacyFeatures
         self.privatePlayer = privatePlayer
         self.cbaTimeReporter = cbaTimeReporter
+        self.internalUserDecider = internalUserDecider
         self.localHistory = localHistory
         self.title = title
         self.error = error
@@ -835,6 +840,9 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         if let host = url.host, !host.isEmpty {
             localHistory.insert(host.droppingWwwPrefix())
         }
+
+        // Mark internal users
+        
     }
 
     func updateVisitTitle(_ title: String, url: URL) {
@@ -1377,6 +1385,9 @@ extension Tab: WKNavigationDelegate {
         userEnteredUrl = false // subsequent requests will be navigations
 
         let isSuccessfulResponse = (navigationResponse.response as? HTTPURLResponse)?.validateStatusCode(statusCode: 200..<300) == nil
+
+        internalUserDecider?.markUserAsInternalIfNeeded(forUrl: webView.url,
+                                                        response: navigationResponse.response as? HTTPURLResponse)
 
         if !navigationResponse.canShowMIMEType || navigationResponse.shouldDownload {
             if navigationResponse.isForMainFrame {
