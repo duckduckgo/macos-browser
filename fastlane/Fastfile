@@ -10,11 +10,8 @@ RELEASE_BRANCH = 'release'
 PROJECT_ROOT_FOLDER = File.dirname(File.expand_path(__dir__))
 VERSION_CONFIG_PATH = File.join(PROJECT_ROOT_FOLDER, 'Configuration/Version.xcconfig')
 APP_STORE_BUILD_NUMBER_CONFIG_PATH = File.join(PROJECT_ROOT_FOLDER, 'Configuration/AppStoreBuildNumber.xcconfig')
-DMG_VERSION_CONFIG_DEFINITION = 'DMG_APP_VERSION'
-APP_STORE_VERSION_CONFIG_DEFINITION = 'APP_STORE_APP_VERSION'
+VERSION_CONFIG_DEFINITION = 'APP_VERSION'
 BUILD_NUMBER_CONFIG_DEFINITION = 'CURRENT_PROJECT_VERSION'
-APP_STORE_TO_DMG_MINOR_VERSION_NUMBER_DIFF = -32
-APP_STORE_TO_DMG_MAJOR_VERSION_NUMBER_DIFF = 1
 UPGRADABLE_EMBEDDED_FILES = [
   'DuckDuckGo/Content Blocker/AppTrackerDataSetProvider.swift',
   'DuckDuckGo/Content Blocker/trackerData.json',
@@ -109,13 +106,12 @@ platform :mac do
   desc 'Executes the release preparation work in the repository'
   lane :code_freeze do |options|
     macos_codefreeze_prechecks
-    new_versions = validate_new_version(options)
+    new_version = validate_new_version(options)
     app_store_build_number = increment_app_store_build_number(options)
-    macos_create_release_branch(version: new_versions[:dmg])
+    macos_create_release_branch(version: new_version)
     macos_update_embedded_files
     macos_update_version_and_build_number_config(
-      version: new_versions[:dmg],
-      app_store_version: new_versions[:app_store],
+      version: new_version,
       build_number: app_store_build_number
     )
   end
@@ -204,15 +200,12 @@ platform :mac do
     current_version = macos_current_version
     user_version = format_user_version(options[:version])
     new_version = user_version.nil? ? macos_bump_patch_version(current_version) : user_version
-    new_app_store_version = macos_compute_app_store_version(new_version)
-    unless UI.confirm %{
-Current version is #{current_version}.
-New version is #{new_version}.
-New App Store version is #{new_app_store_version}.
-Do you want to continue?}
-      UI.abort_with_message!('Aborted by user.')
+    unless UI.confirm(
+      "Current version is #{current_version}.\nNew version is #{new_version}.\nDo you want to continue?"
+    )
+    UI.abort_with_message!('Aborted by user.')
     end
-    { :dmg => new_version, :app_store => new_app_store_version }
+    new_version
   end
 
   # Checks current build number and increments it by 1.
@@ -278,9 +271,8 @@ Do you want to continue?}
   #
   private_lane :macos_update_version_and_build_number_config do |options|
     version = options[:version]
-    app_store_version = options[:app_store_version]
     build_number = options[:build_number]
-    File.write(VERSION_CONFIG_PATH, "#{DMG_VERSION_CONFIG_DEFINITION} = #{version}\n#{APP_STORE_VERSION_CONFIG_DEFINITION} = #{app_store_version}")
+    File.write(VERSION_CONFIG_PATH, "#{VERSION_CONFIG_DEFINITION} = #{version}\n")
     File.write(APP_STORE_BUILD_NUMBER_CONFIG_PATH, "#{BUILD_NUMBER_CONFIG_DEFINITION} = #{build_number}\n")
     git_commit(
       path: [
@@ -316,7 +308,7 @@ Do you want to continue?}
 
     file_data = File.read(VERSION_CONFIG_PATH).split("\n")
     file_data.each do |line|
-      current_version = line.split('=')[1].strip if line.start_with?(DMG_VERSION_CONFIG_DEFINITION)
+      current_version = line.split('=')[1].strip if line.start_with?(VERSION_CONFIG_DEFINITION)
     end
 
     current_version
@@ -331,20 +323,6 @@ Do you want to continue?}
     current_version_array = current_version.split('.')
     new_patch_number = current_version_array[2].to_i + 1
     "#{current_version_array[0]}.#{current_version_array[1]}.#{new_patch_number}"
-  end
-
-  # Calculates App Store version for the DMG version passed as argument.
-  #
-  # @param [String] DMG version
-  # @return [String] App Store version corresponding to the DMG version.
-  #
-  def macos_compute_app_store_version(dmg_version)
-    dmg_version_array = dmg_version.split('.').map(&:to_i)
-    [
-      dmg_version_array[0] + APP_STORE_TO_DMG_MAJOR_VERSION_NUMBER_DIFF,
-      dmg_version_array[1] + APP_STORE_TO_DMG_MINOR_VERSION_NUMBER_DIFF,
-      dmg_version_array[2]
-    ].join('.')
   end
 
   # Formats the version provided by the user to be Major.Minor.Patch
