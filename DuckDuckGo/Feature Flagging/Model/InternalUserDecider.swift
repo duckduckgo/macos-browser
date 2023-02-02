@@ -50,10 +50,10 @@ final class InternalUserDecider {
     @Published private(set) var isInternalUser: Bool {
         didSet {
             // Optimisation below prevents from 2 unnecesary events:
-            // 1) Rewriting the file with the same value
+            // 1) Rewriting of the file with the same value
             // 2) Also from initial saving of the false value to the disk
             // which is unnecessary since it is the default value.
-            // It makes the load of the app faster
+            // It helps to load the app for majority of users (external) faster
             if oldValue != isInternalUser {
                 try? store.save(isInternal: isInternalUser)
             }
