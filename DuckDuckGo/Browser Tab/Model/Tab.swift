@@ -1128,7 +1128,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         let isNavigatingAwayFromPinnedTab: Bool = {
             let isNavigatingToAnotherDomain = navigationAction.url.host != url?.host
             let isPinned = pinnedTabsManager.isTabPinned(self)
-            return isLinkActivated && isPinned && isNavigatingToAnotherDomain
+            return isLinkActivated && isPinned && isNavigatingToAnotherDomain && navigationAction.isForMainFrame
         }()
 
         // to be modularized later on, see https://app.asana.com/0/0/1203268245242140/f

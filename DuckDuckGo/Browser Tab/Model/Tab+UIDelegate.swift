@@ -84,7 +84,8 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
             completionHandler(self.createWebView(from: webView, with: configuration, for: navigationAction, of: targetKind))
             return
         // action doesn‘t require Popup Permission as it‘s user-initiated
-        case .none where navigationAction.isUserInitiated:
+        // - TODO this also opens a new window when a popup ad is shown on click simultaneously with the main frame navigation
+        case .none where navigationAction.isUserInitiated == true:
             // try to guess popup kind from provided windowFeatures
             let shouldSelectNewTab = !NSApp.isCommandPressed // this is actually not correct, to be fixed later
             let targetKind = NewWindowPolicy(windowFeatures, shouldSelectNewTab: shouldSelectNewTab)

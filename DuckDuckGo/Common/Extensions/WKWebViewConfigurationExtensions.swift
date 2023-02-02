@@ -33,12 +33,7 @@ extension WKWebViewConfiguration {
         preferences.setValue(true, forKey: "allowsPictureInPictureMediaPlayback")
         preferences.setValue(true, forKey: "developerExtrasEnabled")
         preferences.setValue(false, forKey: "backspaceKeyNavigationEnabled")
-        if WKNavigationAction.supportsIsUserInitiated {
-            preferences.javaScriptCanOpenWindowsAutomatically = true
-        } else {
-            assertionFailure("WKNavigationAction does not respond to _isUserInitiated")
-            preferences.javaScriptCanOpenWindowsAutomatically = false
-        }
+        preferences.javaScriptCanOpenWindowsAutomatically = true
         preferences.isFraudulentWebsiteWarningEnabled = false
 
         if urlSchemeHandler(forURLScheme: PrivatePlayer.privatePlayerScheme) == nil {
