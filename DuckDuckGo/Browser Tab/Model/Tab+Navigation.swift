@@ -33,7 +33,8 @@ extension Tab: NavigationResponder {
             .weak(self)
 
         )
-        navigationDelegate.registerCustomDelegateMethodHandler(.weak(self), for: #selector(webView(_:contextMenuDidCreate:)))
+        navigationDelegate
+            .registerCustomDelegateMethodHandler(.weak(self), forSelectorNamed: "_webView:contextMenuDidCreateDownload:")
     }
 
 }
