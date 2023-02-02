@@ -35,7 +35,11 @@ final class InternalUserDecider {
         self.store = store
 
 #if DEBUG || REVIEW
-        isInternalUser = true
+        if AppDelegate.isRunningTests {
+            isInternalUser = (try? store.load()) ?? false
+        } else {
+            isInternalUser = true
+        }
 #else
         isInternalUser = (try? store.load()) ?? false
 #endif
