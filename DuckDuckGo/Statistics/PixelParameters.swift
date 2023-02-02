@@ -23,6 +23,7 @@ extension Pixel {
         static let test = "test"
         static let appVersion = "appVersion"
 
+        static let keychainFieldName = "fieldName"
         static let errorCode = "e"
         static let errorDesc = "d"
         static let errorCount = "c"
@@ -64,6 +65,51 @@ extension Pixel.Event {
 
             return params
 
+        case .networkProtectionKeychainErrorFailedToCastKeychainValueToData(let field):
+            return [Pixel.Parameters.keychainFieldName: field]
+
+        case .networkProtectionKeychainReadError(let field, let status):
+            return [
+                Pixel.Parameters.keychainFieldName: field,
+                Pixel.Parameters.errorCode: String(status)
+            ]
+
+        case .networkProtectionKeychainWriteError(let field, let status):
+            return [
+                Pixel.Parameters.keychainFieldName: field,
+                Pixel.Parameters.errorCode: String(status)
+            ]
+
+        case .networkProtectionKeychainDeleteError(let field, let status):
+            return [
+                Pixel.Parameters.keychainFieldName: field,
+                Pixel.Parameters.errorCode: String(status)
+            ]
+
+        case .networkProtectionServerListStoreFailedToWriteServerList(let error):
+            return error.pixelParameters
+
+        case .networkProtectionServerListStoreFailedToReadServerList(let error):
+            return error.pixelParameters
+
+        case .networkProtectionUnhandledError(let function, let line, let error):
+            var parameters = error.pixelParameters
+            parameters["function"] = function
+            parameters["line"] = String(line)
+            return parameters
+
+        case .networkProtectionTunnelConfigurationNoServerRegistrationInfo,
+             .networkProtectionTunnelConfigurationCouldNotSelectClosestServer,
+             .networkProtectionTunnelConfigurationCouldNotGetPeerPublicKey,
+             .networkProtectionTunnelConfigurationCouldNotGetPeerHostName,
+             .networkProtectionTunnelConfigurationCouldNotGetInterfaceAddressRange,
+             .networkProtectionClientFailedToParseServerListResponse,
+             .networkProtectionClientFailedToEncodeRegisterKeyRequest,
+             .networkProtectionClientFailedToParseRegisteredServersResponse,
+             .networkProtectionServerListStoreFailedToEncodeServerList:
+
+            return nil
+
         // Don't use default to force new items to be thought about
         case .burn,
              .crash,
@@ -83,6 +129,32 @@ extension Pixel.Event {
             
             return nil
         }
+    }
+
+}
+
+fileprivate extension Error {
+
+    var pixelParameters: [String: String] {
+        var parameters = [String: String]()
+        let nsError = self as NSError
+
+        parameters[Pixel.Parameters.errorCode] = "\(nsError.code)"
+        parameters[Pixel.Parameters.errorDesc] = nsError.domain
+        if let underlyingError = nsError.userInfo["NSUnderlyingError"] as? NSError {
+            parameters[Pixel.Parameters.underlyingErrorCode] = "\(underlyingError.code)"
+            parameters[Pixel.Parameters.underlyingErrorDesc] = underlyingError.domain
+        }
+
+        if let sqlErrorCode = nsError.userInfo["SQLiteResultCode"] as? NSNumber {
+            parameters[Pixel.Parameters.underlyingErrorSQLiteCode] = "\(sqlErrorCode.intValue)"
+        }
+
+        if let sqlExtendedErrorCode = nsError.userInfo["SQLiteExtendedResultCode"] as? NSNumber {
+            parameters[Pixel.Parameters.underlyingErrorSQLiteExtendedCode] = "\(sqlExtendedErrorCode.intValue)"
+        }
+
+        return parameters
     }
 
 }

@@ -118,4 +118,19 @@ extension NSAlert {
         alert.addButton(withTitle: UserText.ok)
         return alert
     }
+
+    static func resetNetworkProtectionAlert() -> NSAlert {
+        let alert = NSAlert()
+        alert.messageText = "Reset Network Protection?"
+        alert.informativeText = """
+        This will remove your stored network configuration (including private key) and disable the VPN.
+
+        You can re-enable the VPN from the Network Protection view.
+        """
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: "Reset")
+        alert.addButton(withTitle: UserText.cancel)
+        return alert
+    }
+
 }

@@ -55,7 +55,7 @@ extension NetworkProtectionStatusView {
 
         // MARK: - Initialization & Deinitialization
 
-        init(networkProtection: NetworkProtectionProvider = DefaultNetworkProtectionProvider(),
+        init(networkProtection: NetworkProtectionProvider = DefaultNetworkProtectionProvider(subscribeToDebugNotifications: false),
              logger: NetworkProtectionLogger = DefaultNetworkProtectionLogger(),
              runLoopMode: RunLoop.Mode? = nil,
              initialStatus: NetworkProtectionConnectionStatus = .disconnected) {
@@ -92,8 +92,8 @@ extension NetworkProtectionStatusView {
 
             refreshTimeLapsed()
 
-            let newTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
-                self.refreshTimeLapsed()
+            let newTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
+                self?.refreshTimeLapsed()
             }
 
             timer = newTimer
@@ -172,9 +172,9 @@ extension NetworkProtectionStatusView {
 
         private func refreshTimeLapsed() {
             switch connectionStatus {
-            case .connected(let connectedDate, _):
+            case .connected(let connectedDate, _, _):
                 timeLapsed = timeLapsedString(since: connectedDate)
-            case .disconnecting(let connectedDate, _):
+            case .disconnecting(let connectedDate, _, _):
                 timeLapsed = timeLapsedString(since: connectedDate)
             default:
                 timeLapsed = UserText.networkProtectionStatusViewTimerZero
@@ -190,7 +190,7 @@ extension NetworkProtectionStatusView {
                 return "\(UserText.networkProtectionStatusConnected) · \(timeLapsed)"
             case .connecting:
                 return UserText.networkProtectionStatusConnecting
-            case .disconnected:
+            case .disconnected, .notConfigured:
                 return UserText.networkProtectionStatusDisconnected
             case .disconnecting:
                 return UserText.networkProtectionStatusDisconnecting
@@ -233,9 +233,9 @@ extension NetworkProtectionStatusView {
 
         var serverAddress: String {
             switch connectionStatus {
-            case .connected(_, let serverAddress):
+            case .connected(_, let serverAddress, _):
                 return serverAddress
-            case .disconnecting(_, let serverAddress):
+            case .disconnecting(_, let serverAddress, _):
                 return serverAddress
             default:
                 return ""
@@ -244,8 +244,10 @@ extension NetworkProtectionStatusView {
 
         var serverLocation: String {
             switch connectionStatus {
-            case .connected, .disconnecting:
-                return "Los Angeles, United States"
+            case .connected(_, _, let serverLocation):
+                return serverLocation
+            case .disconnecting(_, _, let serverLocation):
+                return serverLocation
             default:
                 return ""
             }

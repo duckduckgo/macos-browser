@@ -36,6 +36,7 @@ extension TunnelConfiguration {
         case multipleEntriesForKey(String)
     }
 
+    // swiftlint:disable:next cyclomatic_complexity function_body_length
     convenience init(fromWgQuickConfig wgQuickConfig: String, called name: String? = nil) throws {
         var interfaceConfiguration: InterfaceConfiguration?
         var peerConfigurations = [PeerConfiguration]()
@@ -165,6 +166,7 @@ extension TunnelConfiguration {
         return output
     }
 
+    // swiftlint:disable:next cyclomatic_complexity
     private static func collate(interfaceAttributes attributes: [String: String]) throws -> InterfaceConfiguration {
         guard let privateKeyString = attributes["privatekey"] else {
             throw ParseError.interfaceHasNoPrivateKey
@@ -211,6 +213,7 @@ extension TunnelConfiguration {
         return interface
     }
 
+    // swiftlint:disable:next cyclomatic_complexity
     private static func collate(peerAttributes attributes: [String: String]) throws -> PeerConfiguration {
         guard let publicKeyString = attributes["publickey"] else {
             throw ParseError.peerHasNoPublicKey

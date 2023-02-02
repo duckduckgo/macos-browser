@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "4BD8CBC92954021000AAD74A"
-               BuildableName = "DuckDuckGo (System Extension).app"
+               BuildableName = "DuckDuckGo.app"
                BlueprintName = "DuckDuckGo Privacy Browser (System Extension)"
                ReferencedContainer = "container:DuckDuckGo.xcodeproj">
             </BuildableReference>
@@ -45,7 +45,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "4BD8CBC92954021000AAD74A"
-            BuildableName = "DuckDuckGo (System Extension).app"
+            BuildableName = "DuckDuckGo.app"
             BlueprintName = "DuckDuckGo Privacy Browser (System Extension)"
             ReferencedContainer = "container:DuckDuckGo.xcodeproj">
          </BuildableReference>
@@ -62,7 +62,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "4BD8CBC92954021000AAD74A"
-            BuildableName = "DuckDuckGo (System Extension).app"
+            BuildableName = "DuckDuckGo.app"
             BlueprintName = "DuckDuckGo Privacy Browser (System Extension)"
             ReferencedContainer = "container:DuckDuckGo.xcodeproj">
          </BuildableReference>

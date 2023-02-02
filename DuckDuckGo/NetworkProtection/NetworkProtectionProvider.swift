@@ -20,14 +20,17 @@ import Foundation
 import Combine
 import SwiftUI
 import OSLog
+import BrowserServicesKit
 import NetworkExtension
 import NetworkProtection
 import SystemExtensions
+import Common
 
 enum NetworkProtectionConnectionStatus {
+    case notConfigured
     case disconnected
-    case disconnecting(connectedDate: Date, serverAddress: String)
-    case connected(connectedDate: Date, serverAddress: String)
+    case disconnecting(connectedDate: Date, serverAddress: String, serverLocation: String)
+    case connected(connectedDate: Date, serverAddress: String, serverLocation: String)
     case connecting
     case unknown
 }
@@ -72,6 +75,13 @@ final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
     /// The logger that this object will use for errors that are handled by this class.
     ///
     private let logger: NetworkProtectionLogger
+
+    /// Handles registration of the current device with the Network Protection backend.
+    /// The manager is also responsible to maintaining the current known list of backend servers, and allowing the user to pick which one they connect to.
+    /// 
+    private let deviceManager: NetworkProtectionDeviceManagement
+
+    private let selectedServerStore: NetworkProtectionSelectedServerStore
 
     // MARK: - Notifications & Observers
 
@@ -141,7 +151,15 @@ final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
         try await tunnelManager.loadFromPreferences()
     }
 
-    // MARK: - Initialization & deinitialization
+    // MARK: - Initialization & Deinitialization
+
+    convenience init(subscribeToDebugNotifications: Bool = false) {
+        self.init(notificationCenter: .default,
+                  subscribeToDebugNotifications: subscribeToDebugNotifications,
+                  deviceManager: NetworkProtectionDeviceManager(errorEvents: Self.networkProtectionDebugEvents),
+                  selectedServerStore: NetworkProtectionSelectedServerUserDefaultsStore(),
+                  logger: DefaultNetworkProtectionLogger())
+    }
 
     /// Default initializer
     ///
@@ -149,17 +167,27 @@ final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
     ///         - notificationCenter: (meant for testing) the notification center that this object will use.
     ///         - logger: (meant for testing) the logger that this object will use.
     ///
-    init(notificationCenter: NotificationCenter = .default,
-         logger: NetworkProtectionLogger = DefaultNetworkProtectionLogger()) {
+    init(notificationCenter: NotificationCenter,
+         subscribeToDebugNotifications: Bool,
+         deviceManager: NetworkProtectionDeviceManagement,
+         selectedServerStore: NetworkProtectionSelectedServerStore,
+         logger: NetworkProtectionLogger) {
 
         self.logger = logger
+        self.deviceManager = deviceManager
+        self.selectedServerStore = selectedServerStore
         self.notificationCenter = notificationCenter
 
-        startObservingNotifications()
+        startObservingNotifications(subscribeToDebugNotifications: subscribeToDebugNotifications)
 
         Task {
             // Make sure the tunnel is loaded
             _ = await tunnelManager
+
+            // Check whether the VPN has been configured
+            if NEVPNManager.shared().connection.status == .invalid {
+                statusChangePublisher.send(.notConfigured)
+            }
         }
     }
 
@@ -169,9 +197,14 @@ final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
 
     // MARK: - Observing VPN Notifications
 
-    private func startObservingNotifications() {
+    private func startObservingNotifications(subscribeToDebugNotifications: Bool) {
         startObservingVPNConfigChanges()
         startObservingVPNStatusChanges()
+
+        if subscribeToDebugNotifications {
+            startObservingExtensionResetNotifications()
+            startObservingServerSelectionChanges()
+        }
     }
 
     private func startObservingVPNConfigChanges() {
@@ -200,9 +233,26 @@ final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
         }
     }
 
+    private func startObservingExtensionResetNotifications() {
+        notificationCenter.addObserver(self,
+                                       selector: #selector(resetExtensionNotification),
+                                       name: .NetworkProtectionDebugResetExtension,
+                                       object: nil)
+    }
+
+    private func startObservingServerSelectionChanges() {
+        notificationCenter.addObserver(self,
+                                       selector: #selector(serverSelectionChangedNotification),
+                                       name: .NetworkProtectionEndpointSelectionChanged,
+                                       object: nil)
+    }
+
     private func stopObservingNotifications() {
         stopObservingVPNConfigChanges()
         stopObservingVPNStatusChanges()
+
+        notificationCenter.removeObserver(self, name: .NetworkProtectionDebugResetExtension, object: nil)
+        notificationCenter.removeObserver(self, name: .NetworkProtectionEndpointSelectionChanged, object: nil)
     }
 
     private func stopObservingVPNConfigChanges() {
@@ -221,6 +271,59 @@ final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
 
         notificationCenter.removeObserver(token)
         statusChangeObserverToken = nil
+    }
+
+    // MARK: - Error Reporting
+
+    static let networkProtectionDebugEvents: EventMapping<NetworkProtectionError>? = .init { event, _, _, _ in
+        let domainEvent: Pixel.Event
+
+        switch event {
+        case .noServerRegistrationInfo:
+            domainEvent = .networkProtectionTunnelConfigurationNoServerRegistrationInfo
+        case .couldNotSelectClosestServer:
+            domainEvent = .networkProtectionTunnelConfigurationCouldNotSelectClosestServer
+        case .couldNotGetPeerPublicKey:
+            domainEvent = .networkProtectionTunnelConfigurationCouldNotGetPeerPublicKey
+        case .couldNotGetPeerHostName:
+            domainEvent = .networkProtectionTunnelConfigurationCouldNotGetPeerHostName
+        case .couldNotGetInterfaceAddressRange:
+            domainEvent = .networkProtectionTunnelConfigurationCouldNotGetInterfaceAddressRange
+
+        case .failedToFetchServerList:
+            return
+        case .failedToParseServerListResponse:
+            domainEvent = .networkProtectionClientFailedToParseServerListResponse
+        case .failedToEncodeRegisterKeyRequest:
+            domainEvent = .networkProtectionClientFailedToEncodeRegisterKeyRequest
+        case .failedToFetchRegisteredServers:
+            return
+        case .failedToParseRegisteredServersResponse:
+            domainEvent = .networkProtectionClientFailedToParseRegisteredServersResponse
+
+        case .failedToEncodeServerList:
+            domainEvent = .networkProtectionServerListStoreFailedToEncodeServerList
+        case .failedToWriteServerList(let eventError):
+            domainEvent = .networkProtectionServerListStoreFailedToWriteServerList(error: eventError)
+        case .noServerListFound:
+            return
+        case .failedToReadServerList(let eventError):
+            domainEvent = .networkProtectionServerListStoreFailedToReadServerList(error: eventError)
+
+        case .failedToCastKeychainValueToData(let field):
+            domainEvent = .networkProtectionKeychainErrorFailedToCastKeychainValueToData(field: field)
+        case .keychainReadError(let field, let status):
+            domainEvent = .networkProtectionKeychainReadError(field: field, status: status)
+        case .keychainWriteError(let field, let status):
+            domainEvent = .networkProtectionKeychainWriteError(field: field, status: status)
+        case .keychainDeleteError(let field, let status):
+            domainEvent = .networkProtectionKeychainDeleteError(field: field, status: status)
+
+        case .unhandledError(function: let function, line: let line, error: let error):
+            domainEvent = .networkProtectionUnhandledError(function: function, line: line, error: error)
+        }
+
+        Pixel.fire(domainEvent, includeAppVersionParameter: true)
     }
 
     // MARK: - Notifications: Handling
@@ -269,11 +372,39 @@ final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
 
     }
 
+    @objc private func resetExtensionNotification(_ notification: Notification) {
+        os_log("Received reset extension notification", log: .networkProtection)
+
+        Task { @MainActor in
+            try? await stop()
+            try? await internalTunnelManager?.removeFromPreferences()
+        }
+    }
+
+    /// Signals the Network Protection provider that the preferred server selection changed.
+    ///
+    /// Because the Network Protection feature caches its tunnel configuration in the Keychain, this function works by stopping the tunnel, removing the Keychain state, waiting briefly to allow the system
+    /// to acknowledge that the VPN is no longer running, and then restarting the tunnel.
+    ///
+    /// - Note: The user's PrivateKey, if it exists, is **not** removed. Instead, the app will ensure that the new server has been registered with that key and register it if it hasn't.
+    @objc private func serverSelectionChangedNotification(_ notification: Notification) {
+        os_log("Received server selection change notification", log: .networkProtection)
+
+        Task { @MainActor in
+            try? await stop()
+
+            NetworkProtectionKeychain.deleteReferences()
+            try? await Task.sleep(nanoseconds: UInt64(1 * 1_000_000_000))
+
+            try? await start()
+        }
+    }
+
     // MARK: - Tunnel Configuration
 
     /// Loads the tunnel configuration from the filesystem.
     ///
-    private func loadTunnelConfiguration() throws -> TunnelConfiguration {
+    private func loadTunnelConfiguration() throws -> TunnelConfiguration? {
         let resolvedDefaultPath = NSString(string: Self.defaultConfigFilePath).expandingTildeInPath
 
         if let quickConfigFile = ProcessInfo.processInfo.environment[Self.quickConfigFilePathEnvironmentVariable] {
@@ -287,9 +418,9 @@ final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
             configuration.name = "DuckDuckGo Network Protection Configuration"
 
             return configuration
-        } else {
-            throw QuickConfigLoadingError.quickConfigFilePathEnvVarMissing
         }
+
+        return nil
     }
 
     /// Reloads the tunnel manager from preferences.
@@ -309,14 +440,35 @@ final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
             tunnelManager.localizedDescription = UserText.networkProtectionTunnelName
         }
 
-        guard let protocolConfiguration = tunnelManager.protocolConfiguration as? NETunnelProviderProtocol,
-              protocolConfiguration.verifyConfigurationReference() else {
-
-            let tunnelConfiguration = try loadTunnelConfiguration()
-
-            tunnelManager.protocolConfiguration = await NETunnelProviderProtocol(tunnelConfiguration: tunnelConfiguration, previouslyFrom: tunnelManager.protocolConfiguration)
+        if let protocolConfiguration = tunnelManager.protocolConfiguration as? NETunnelProviderProtocol,
+           protocolConfiguration.verifyConfigurationReference() {
             return
         }
+
+        if let debugTunnelConfiguration = try loadTunnelConfiguration() {
+            os_log("Loading tunnel configuration from Debug path", log: .networkProtection)
+
+            tunnelManager.protocolConfiguration = await NETunnelProviderProtocol(tunnelConfiguration: debugTunnelConfiguration,
+                                                                                 previouslyFrom: tunnelManager.protocolConfiguration)
+        } else {
+            let preferredServerName = selectedServerStore.selectedServer.stringValue
+
+            guard let configurationResult = await deviceManager.generateTunnelConfiguration(preferredServerName: preferredServerName) else {
+                assertionFailure("Failed to generate tunnel configuration")
+                return
+            }
+
+            let serverLocation = configurationResult.1.serverLocation
+            selectedServerStore.mostRecentlyConnectedServerLocation = serverLocation
+            os_log("Generated tunnel configuration for server at location: %{public}s (preferred server is %{public}s)",
+                   log: .networkProtection,
+                   serverLocation,
+                   preferredServerName ?? "Automatic")
+
+            tunnelManager.protocolConfiguration = await NETunnelProviderProtocol(tunnelConfiguration: configurationResult.0,
+                                                                                 previouslyFrom: tunnelManager.protocolConfiguration)
+        }
+
     }
 
     // MARK: - Connection Status Querying
@@ -382,11 +534,15 @@ final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
         case .connected:
             // In theory when the connection has been established, the date should be set.  But in a worst-case
             // scenario where for some reason the date is missing, we're going to just use Date() as the connection
-            // has just started and it's a decent aproximation.
+            // has just started and it's a decent approximation.
             let connectedDate = session.connectedDate ?? Date()
             let serverAddress = session.manager.protocolConfiguration?.serverAddress ?? UserText.networkProtectionServerAddressUnknown
 
-            status = .connected(connectedDate: connectedDate, serverAddress: serverAddress)
+            if let serverLocation = selectedServerStore.mostRecentlyConnectedServerLocation {
+                status = .connected(connectedDate: connectedDate, serverAddress: serverAddress, serverLocation: serverLocation)
+            } else {
+                status = .connected(connectedDate: connectedDate, serverAddress: serverAddress, serverLocation: "Unknown Server Location")
+            }
         case .connecting, .reasserting:
             status = .connecting
         case .disconnected, .invalid:
@@ -394,11 +550,15 @@ final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
         case .disconnecting:
             // In theory when the connection has been established, the date should be set.  But in a worst-case
             // scenario where for some reason the date is missing, we're going to just use Date() as the connection
-            // has just started and it's a decent aproximation.
+            // has just started and it's a decent approximation.
             let connectedDate = session.connectedDate ?? Date()
             let serverAddress = session.manager.protocolConfiguration?.serverAddress ?? UserText.networkProtectionServerAddressUnknown
 
-            status = .disconnecting(connectedDate: connectedDate, serverAddress: serverAddress)
+            if let serverLocation = selectedServerStore.mostRecentlyConnectedServerLocation {
+                status = .disconnecting(connectedDate: connectedDate, serverAddress: serverAddress, serverLocation: serverLocation)
+            } else {
+                status = .disconnecting(connectedDate: connectedDate, serverAddress: serverAddress, serverLocation: "Unknown Server Location")
+            }
         @unknown default:
             status = .unknown
         }

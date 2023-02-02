@@ -5,6 +5,7 @@ import Foundation
 import os.log
 
 extension FileManager {
+
     static var appGroupId: String? {
         #if os(iOS)
         let appGroupIdInfoDictionaryKey = "com.wireguard.ios.app_group_id"
@@ -15,15 +16,18 @@ extension FileManager {
         #endif
         return Bundle.main.object(forInfoDictionaryKey: appGroupIdInfoDictionaryKey) as? String
     }
+
     private static var sharedFolderURL: URL? {
         guard let appGroupId = FileManager.appGroupId else {
-            os_log("Cannot obtain app group ID from bundle", log: networkExtensionLog, type: .error)
+            os_log("Cannot obtain app group ID from bundle", log: .networkProtection, type: .error)
             return nil
         }
+
         guard let sharedFolderURL = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroupId) else {
-            os_log("Cannot obtain shared folder URL", log: networkExtensionLog, type: .error)
+            os_log("Cannot obtain shared folder URL", log: .networkProtection, type: .error)
             return nil
         }
+
         return sharedFolderURL
     }
 
@@ -43,4 +47,5 @@ extension FileManager {
         }
         return true
     }
+
 }

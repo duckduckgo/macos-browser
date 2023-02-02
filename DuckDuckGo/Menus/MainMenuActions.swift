@@ -19,6 +19,7 @@
 import Cocoa
 import os.log
 import BrowserServicesKit
+import NetworkProtection
 
 // Actions are sent to objects of responder chain
 
@@ -637,6 +638,46 @@ extension MainViewController {
         ConfigurationManager.shared.refreshIfNeeded()
     }
 
+    @IBAction func resetNetworkProtectionState(_ sender: Any?) {
+        guard let window = view.window else {
+            assertionFailure("No window")
+            return
+        }
+
+        let alert = NSAlert.resetNetworkProtectionAlert()
+        alert.beginSheetModal(for: window, completionHandler: { response in
+            guard case .alertFirstButtonReturn = response else {
+                return
+            }
+
+            let serverCache = NetworkProtectionServerListFileSystemStore()
+            try? serverCache.removeServerList()
+
+            let selectedServerStore = NetworkProtectionSelectedServerUserDefaultsStore()
+            selectedServerStore.reset()
+
+            NetworkProtectionKeychain.deleteReferences()
+
+            NotificationCenter.default.post(name: .NetworkProtectionDebugResetExtension, object: nil)
+        })
+    }
+
+    @IBAction func networkProtectionPreferredServerLocationChanged(_ sender: Any?) {
+        guard let title = (sender as? NSMenuItem)?.title else {
+            assertionFailure("\(#function): Failed to cast sender to NSMenuItem")
+            return
+        }
+
+        let serverSelectionStore = NetworkProtectionSelectedServerUserDefaultsStore()
+
+        if title == "Automatic" {
+            serverSelectionStore.selectedServer = .automatic
+        } else {
+            let titleComponents = title.components(separatedBy: " ")
+            serverSelectionStore.selectedServer = .endpoint(titleComponents.first!)
+        }
+    }
+
     // MARK: - Developer Tools
 
     @IBAction func toggleDeveloperTools(_ sender: Any?) {
@@ -747,6 +788,23 @@ extension MainViewController: NSMenuItemValidation {
         case #selector(MainViewController.toggleDownloads(_:)):
             let isDownloadsPopoverShown = self.navigationBarViewController.isDownloadsPopoverShown
             menuItem.title = isDownloadsPopoverShown ? UserText.closeDownloads : UserText.openDownloads
+
+            return true
+
+        // Network Protection Server Location
+        case #selector(MainViewController.networkProtectionPreferredServerLocationChanged(_:)):
+            let serverSelectionStore = NetworkProtectionSelectedServerUserDefaultsStore()
+
+            switch menuItem.title {
+            case "Automatic":
+                menuItem.state = (serverSelectionStore.selectedServer == SelectedNetworkProtectionServer.automatic) ? .on : .off
+            default:
+                if case let .endpoint(endpoint) = serverSelectionStore.selectedServer {
+                    menuItem.state = (menuItem.title.hasPrefix("\(endpoint) ")) ? .on : .off
+                } else {
+                    menuItem.state = .off
+                }
+            }
 
             return true
 

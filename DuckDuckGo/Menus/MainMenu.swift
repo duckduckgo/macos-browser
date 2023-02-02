@@ -20,6 +20,7 @@ import Cocoa
 import os.log
 import Combine
 import WebKit
+import NetworkProtection
 
 final class MainMenu: NSMenu {
 
@@ -76,7 +77,7 @@ final class MainMenu: NSMenu {
     // MARK: - Debug
     @IBOutlet weak var debugMenuItem: NSMenuItem? {
         didSet {
-            #if !DEBUG && !REVIEW
+            #if !DEBUG && !REVIEW && !NETP
             if let item = debugMenuItem {
                 removeItem(item)
             }
@@ -84,10 +85,14 @@ final class MainMenu: NSMenu {
         }
     }
 
+    @IBOutlet weak var networkProtectionPreferredServerLocationItem: NSMenuItem?
+
     // MARK: - Help
     @IBOutlet weak var helpMenuItem: NSMenuItem?
     @IBOutlet weak var helpSeparatorMenuItem: NSMenuItem?
     @IBOutlet weak var sendFeedbackMenuItem: NSMenuItem?
+
+    // MARK: - Lifecycle
 
     let sharingMenu = SharingMenu()
 
@@ -110,6 +115,7 @@ final class MainMenu: NSMenu {
 
         updateBookmarksBarMenuItem()
         updateShortcutMenuItems()
+        updateNetworkProtectionServerListMenuItems()
     }
 
     private func setup() {
@@ -245,6 +251,32 @@ final class MainMenu: NSMenu {
         toggleAutofillShortcutMenuItem?.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .autofill)
         toggleBookmarksShortcutMenuItem?.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .bookmarks)
         toggleDownloadsShortcutMenuItem?.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .downloads)
+    }
+
+    private func updateNetworkProtectionServerListMenuItems() {
+        guard let submenu = networkProtectionPreferredServerLocationItem?.submenu, let automaticItem = submenu.items.first else {
+            assertionFailure("\(#function): Failed to get submenu")
+            return
+        }
+
+        let networkProtectionServerStore = NetworkProtectionServerListFileSystemStore()
+        let servers = (try? networkProtectionServerStore.storedNetworkProtectionServerList()) ?? []
+
+        if servers.isEmpty {
+            submenu.items = [automaticItem]
+        } else {
+            submenu.items = [automaticItem, NSMenuItem.separator()] + servers.map({ server in
+                let title: String
+
+                if server.isRegistered {
+                    title = "\(server.serverInfo.name) (\(server.serverInfo.serverLocation) – Public Key Registered)"
+                } else {
+                    title = "\(server.serverInfo.name) (\(server.serverInfo.serverLocation))"
+                }
+
+                return NSMenuItem(title: title, action: automaticItem.action, keyEquivalent: "")
+            })
+        }
     }
 
 }

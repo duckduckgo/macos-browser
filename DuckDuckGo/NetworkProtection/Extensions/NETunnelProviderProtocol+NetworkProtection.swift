@@ -31,20 +31,27 @@ extension NETunnelProviderProtocol {
 
         #if NETP_SYSTEM_EXTENSION
         providerBundleIdentifier = "\(Bundle(for: DefaultNetworkProtectionProvider.self).bundleIdentifier!).extension"
+        passwordReference = NetworkProtectionKeychain.makeReference(containing: tunnelConfiguration.asWgQuickConfig(),
+                                                                    useSystemKeychain: true,
+                                                                    called: name,
+                                                                    previouslyReferencedBy: old?.passwordReference)
         #else
         providerBundleIdentifier = "\(Bundle(for: DefaultNetworkProtectionProvider.self).bundleIdentifier!).network-extension"
+        passwordReference = NetworkProtectionKeychain.makeReference(containing: tunnelConfiguration.asWgQuickConfig(),
+                                                                    useSystemKeychain: false,
+                                                                    called: name,
+                                                                    previouslyReferencedBy: old?.passwordReference)
         #endif
 
-        //passwordReference = Keychain.makeReference(containing: tunnelConfiguration.asWgQuickConfig(), called: name, previouslyReferencedBy: old?.passwordReference)
-        /*if passwordReference == nil {
+        if passwordReference == nil {
             return nil
-        }*/
+        }
+
         #if os(macOS)
-        providerConfiguration = ["UID": getuid(),
-                                 "WgQuickConfig": tunnelConfiguration.asWgQuickConfig()]
+        providerConfiguration = ["UID": getuid(), "WgQuickConfig": tunnelConfiguration.asWgQuickConfig()]
         #endif
 
-        let endpoints = tunnelConfiguration.peers.compactMap { $0.endpoint }
+        let endpoints = tunnelConfiguration.peers.compactMap(\.endpoint)
         if endpoints.count == 1 {
             serverAddress = endpoints[0].stringRepresentation
         } else if endpoints.isEmpty {
@@ -56,60 +63,16 @@ extension NETunnelProviderProtocol {
 
     func destroyConfigurationReference() {
         guard let ref = passwordReference else { return }
-        Keychain.deleteReference(called: ref)
+        NetworkProtectionKeychain.deleteReference(called: ref)
     }
 
     func verifyConfigurationReference() -> Bool {
-        guard let ref = passwordReference else { return false }
-        return Keychain.verifyReference(called: ref)
+        guard let ref = passwordReference else {
+            return false
+        }
+
+        let result = NetworkProtectionKeychain.verifyReference(called: ref)
+        return result
     }
 
-    @discardableResult
-    func migrateConfigurationIfNeeded(called name: String) -> Bool {
-        /* This is how we did things before we switched to putting items
-         * in the keychain. But it's still useful to keep the migration
-         * around so that .mobileconfig files are easier.
-         */
-        if let oldConfig = providerConfiguration?["WgQuickConfig"] as? String {
-            #if os(macOS)
-            providerConfiguration = ["UID": getuid()]
-            #elseif os(iOS)
-            providerConfiguration = nil
-            #else
-            #error("Unimplemented")
-            #endif
-            guard passwordReference == nil else { return true }
-            //wg_log(.info, message: "Migrating tunnel configuration '\(name)'")
-            passwordReference = Keychain.makeReference(containing: oldConfig, called: name)
-            return true
-        }
-        #if os(macOS)
-        if passwordReference != nil && providerConfiguration?["UID"] == nil && verifyConfigurationReference() {
-            providerConfiguration = ["UID": getuid()]
-            return true
-        }
-        #elseif os(iOS)
-        if #available(iOS 15, *) {
-            /* Update the stored reference from the old iOS 14 one to the canonical iOS 15 one.
-             * The iOS 14 ones are 96 bits, while the iOS 15 ones are 160 bits. We do this so
-             * that we can have fast set exclusion in deleteReferences safely. */
-            if passwordReference != nil && passwordReference!.count == 12 {
-                var result: CFTypeRef?
-                let ret = SecItemCopyMatching([kSecValuePersistentRef: passwordReference!,
-                                               kSecReturnPersistentRef: true] as CFDictionary,
-                                               &result)
-                if ret != errSecSuccess || result == nil {
-                    return false
-                }
-                guard let newReference = result as? Data else { return false }
-                if !newReference.elementsEqual(passwordReference!) {
-                    wg_log(.info, message: "Migrating iOS 14-style keychain reference to iOS 15-style keychain reference for '\(name)'")
-                    passwordReference = newReference
-                    return true
-                }
-            }
-        }
-        #endif
-        return false
-    }
 }

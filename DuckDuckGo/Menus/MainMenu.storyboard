@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="21225" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="21507" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21225"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21507"/>
     </dependencies>
     <scenes>
         <!--Application-->
@@ -725,7 +725,7 @@ CQ
                                                             <action selector="resetPinnedTabs:" target="Ady-hI-5gd" id="4iv-wI-8wp"/>
                                                         </connections>
                                                     </menuItem>
-                                                    <menuItem title="Reset Youtube Overlay Interactions" id="tTd-ZO-0Zx">
+                                                    <menuItem title="Reset YouTube Overlay Interactions" id="tTd-ZO-0Zx">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                         <connections>
                                                             <action selector="resetPrivatePlayerOverlayInteractions:" target="Ady-hI-5gd" id="Tr1-yK-ayF"/>
@@ -753,15 +753,42 @@ CQ
                                                 </items>
                                             </menu>
                                         </menuItem>
-                                        <menuItem title="Configuration" id="Vu8-iE-7RS">
+                                        <menuItem title="Remote Configuration" id="Vu8-iE-7RS">
                                             <modifierMask key="keyEquivalentModifierMask"/>
-                                            <menu key="submenu" title="Configuration" id="z0p-D5-iYh">
+                                            <menu key="submenu" title="Remote Configuration" id="z0p-D5-iYh">
                                                 <items>
-                                                    <menuItem title="Fetch configuration now" id="ZB2-SK-OqK" userLabel="Fetch configuration now">
+                                                    <menuItem title="Fetch Configuration Now" id="ZB2-SK-OqK" userLabel="Fetch configuration now">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                         <connections>
                                                             <action selector="fetchConfigurationNow:" target="Ady-hI-5gd" id="31i-Lv-4r5"/>
                                                         </connections>
+                                                    </menuItem>
+                                                </items>
+                                            </menu>
+                                        </menuItem>
+                                        <menuItem title="Network Protection" id="Dt6-sj-4hn">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <menu key="submenu" title="Network Protection" id="Rah-lS-gno">
+                                                <items>
+                                                    <menuItem title="Reset Network Protection State" id="p4h-oC-tpw">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="resetNetworkProtectionState:" target="Ady-hI-5gd" id="mIO-RZ-oSp"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                    <menuItem isSeparatorItem="YES" id="FSc-gX-vGh"/>
+                                                    <menuItem title="Preferred Server Location" id="Zh6-DO-H1c">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <menu key="submenu" title="Preferred Server Location" id="jbT-17-qgW">
+                                                            <items>
+                                                                <menuItem title="Automatic" id="0j8-SE-pRP">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    <connections>
+                                                                        <action selector="networkProtectionPreferredServerLocationChanged:" target="Ady-hI-5gd" id="ALW-mP-ewV"/>
+                                                                    </connections>
+                                                                </menuItem>
+                                                            </items>
+                                                        </menu>
                                                     </menuItem>
                                                 </items>
                                             </menu>
@@ -818,6 +845,7 @@ CQ
                             <outlet property="importBookmarksMenuItem" destination="tNX-Bv-yM3" id="NI1-on-lCU"/>
                             <outlet property="importBrowserDataMenuItem" destination="gTV-od-6G5" id="2R0-Pa-qG4"/>
                             <outlet property="manageBookmarksMenuItem" destination="BaO-sP-wbQ" id="rn7-HX-04s"/>
+                            <outlet property="networkProtectionPreferredServerLocationItem" destination="Zh6-DO-H1c" id="Vkl-vJ-LJY"/>
                             <outlet property="newTabMenuItem" destination="9qI-62-tsd" id="6SI-rG-P34"/>
                             <outlet property="newWindowMenuItem" destination="Was-JA-tGl" id="uyQ-qR-DFk"/>
                             <outlet property="openLocationMenuItem" destination="xnU-dQ-JR1" id="DYS-Dt-ydU"/>

@@ -7,7 +7,8 @@ disabled_rules:
   - unused_setter_value
   - line_length
   - type_name
-  - todo # Temporarily disabled for NetP work - once NetP is complete, this can be re-enabled
+  - todo # Temporarily disabled for NetP work
+  - file_header # Temporarily disabled for NetP work
 
 opt_in_rules:
   - file_header

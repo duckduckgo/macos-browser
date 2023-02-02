@@ -105,6 +105,27 @@ extension Pixel {
         case adClickAttributionActive
         
         case jsPixel(_ pixel: AutofillUserScript.JSPixel)
+
+        case networkProtectionTunnelConfigurationNoServerRegistrationInfo
+        case networkProtectionTunnelConfigurationCouldNotSelectClosestServer
+        case networkProtectionTunnelConfigurationCouldNotGetPeerPublicKey
+        case networkProtectionTunnelConfigurationCouldNotGetPeerHostName
+        case networkProtectionTunnelConfigurationCouldNotGetInterfaceAddressRange
+
+        case networkProtectionClientFailedToParseServerListResponse
+        case networkProtectionClientFailedToEncodeRegisterKeyRequest
+        case networkProtectionClientFailedToParseRegisteredServersResponse
+
+        case networkProtectionServerListStoreFailedToEncodeServerList
+        case networkProtectionServerListStoreFailedToWriteServerList(error: Error)
+        case networkProtectionServerListStoreFailedToReadServerList(error: Error)
+
+        case networkProtectionKeychainErrorFailedToCastKeychainValueToData(field: String)
+        case networkProtectionKeychainReadError(field: String, status: Int32)
+        case networkProtectionKeychainWriteError(field: String, status: Int32)
+        case networkProtectionKeychainDeleteError(field: String, status: Int32)
+
+        case networkProtectionUnhandledError(function: String, line: Int, error: Error)
         
         case debug(event: Debug, error: Error? = nil)
 
@@ -248,6 +269,54 @@ extension Pixel.Event {
             
         case .jsPixel(pixel: let pixel):
             return "m_mac_\(pixel.pixelName)"
+
+        case .networkProtectionTunnelConfigurationNoServerRegistrationInfo:
+            return "m_mac_netp_tunnel_config_error_no_server_registration_info"
+
+        case .networkProtectionTunnelConfigurationCouldNotSelectClosestServer:
+            return "m_mac_netp_tunnel_config_error_could_not_select_closest_server"
+
+        case .networkProtectionTunnelConfigurationCouldNotGetPeerPublicKey:
+            return "m_mac_netp_tunnel_config_error_could_not_get_peer_public_key"
+
+        case .networkProtectionTunnelConfigurationCouldNotGetPeerHostName:
+            return "m_mac_netp_tunnel_config_error_could_not_get_peer_host_name"
+
+        case .networkProtectionTunnelConfigurationCouldNotGetInterfaceAddressRange:
+            return "m_mac_netp_tunnel_config_error_could_not_get_interface_address_range"
+
+        case .networkProtectionClientFailedToParseServerListResponse:
+            return "m_mac_netp_backend_api_error_parsing_server_list_response_failed"
+
+        case .networkProtectionClientFailedToEncodeRegisterKeyRequest:
+            return "m_mac_netp_backend_api_error_encoding_register_request_body_failed"
+
+        case .networkProtectionClientFailedToParseRegisteredServersResponse:
+            return "m_mac_netp_backend_api_error_parsing_device_registration_response_failed"
+
+        case .networkProtectionServerListStoreFailedToEncodeServerList:
+            return "m_mac_netp_storage_error_failed_to_encode_server_list"
+
+        case .networkProtectionServerListStoreFailedToWriteServerList:
+            return "m_mac_netp_storage_error_server_list_file_system_write_failed"
+
+        case .networkProtectionServerListStoreFailedToReadServerList:
+            return "m_mac_netp_storage_error_server_list_file_system_read_failed"
+
+        case .networkProtectionKeychainErrorFailedToCastKeychainValueToData:
+            return "m_mac_netp_keychain_error_failed_to_cast_keychain_value_to_data"
+
+        case .networkProtectionKeychainReadError:
+            return "m_mac_netp_keychain_error_read_failed"
+
+        case .networkProtectionKeychainWriteError:
+            return "m_mac_netp_keychain_error_write_failed"
+
+        case .networkProtectionKeychainDeleteError:
+            return "m_mac_netp_keychain_error_delete_failed"
+
+        case .networkProtectionUnhandledError:
+            return "m_mac_netp_unhandled_error"
         }
     }
 }
