@@ -131,7 +131,7 @@ extension NSPopUpButton {
     fileprivate func displayBrowserProfiles(profiles: [DataImport.BrowserProfile], defaultProfile: DataImport.BrowserProfile?) {
         removeAllItems()
 
-        let validProfiles = profiles.filter { $0.hasLoginData }
+        let validProfiles = profiles.filter { $0.hasBrowserData }
 
         var selectedSourceIndex: Int?
 

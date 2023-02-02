@@ -948,6 +948,7 @@
 		3793FDD829535EBA00A2E28F /* Assertions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6E319372953446000DD3BCF /* Assertions.swift */; };
 		379DE4BD27EA31AC002CC3DE /* PreferencesAutofillView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379DE4BC27EA31AC002CC3DE /* PreferencesAutofillView.swift */; };
 		37A4CEBA282E992F00D75B89 /* StartupPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A4CEB9282E992F00D75B89 /* StartupPreferences.swift */; };
+		37A5E2F0298AA1B20047046B /* Persistence in Frameworks */ = {isa = PBXBuildFile; productRef = 37A5E2EF298AA1B20047046B /* Persistence */; };
 		37A803DB27FD69D300052F4C /* Data Import Resources in Resources */ = {isa = PBXBuildFile; fileRef = 37A803DA27FD69D300052F4C /* Data Import Resources */; };
 		37AFCE8127DA2CA600471A10 /* PreferencesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AFCE8027DA2CA600471A10 /* PreferencesViewController.swift */; };
 		37AFCE8527DA2D3900471A10 /* PreferencesSidebar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AFCE8427DA2D3900471A10 /* PreferencesSidebar.swift */; };
@@ -2650,6 +2651,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				37A5E2F0298AA1B20047046B /* Persistence in Frameworks */,
 				3706FCA7293F65D500E42796 /* BrowserServicesKit in Frameworks */,
 				3706FCA9293F65D500E42796 /* ContentBlocking in Frameworks */,
 				3706FCAA293F65D500E42796 /* UserScript in Frameworks */,
@@ -5469,6 +5471,7 @@
 				3706FA76293F65D500E42796 /* ContentBlocking */,
 				3706FA77293F65D500E42796 /* PrivacyDashboard */,
 				3706FA78293F65D500E42796 /* UserScript */,
+				37A5E2EF298AA1B20047046B /* Persistence */,
 			);
 			productName = DuckDuckGo;
 			productReference = 3706FD05293F65D500E42796 /* DuckDuckGo App Store.app */;
@@ -8118,6 +8121,11 @@
 		3799999329705E1F003318B1 /* InputFilesChecker */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = "plugin:InputFilesChecker";
+		};
+		37A5E2EF298AA1B20047046B /* Persistence */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = Persistence;
 		};
 		4B82E9B225B69E3E00656FE7 /* TrackerRadarKit */ = {
 			isa = XCSwiftPackageProductDependency;

@@ -67,21 +67,20 @@ final class FirefoxLoginReader {
 
     func readLogins(dataFormat: DataFormat?) -> Result<[ImportedLoginCredential], FirefoxLoginReader.ImportError> {
         var detectedFormat: DataFormat?
+        var foundKeyDatabaseWithoutLoginFile = false
 
         if let dataFormat = dataFormat {
             detectedFormat = dataFormat
         } else {
-            // Check whether a particular data format can be inferred from the existence of files on disk:
-            for potentialFormat in DataFormat.allCases {
-                let potentialDatabaseURL = firefoxProfileURL.appendingPathComponent(potentialFormat.formatFileNames.databaseName)
-                let potentialLoginsFileURL = firefoxProfileURL.appendingPathComponent(potentialFormat.formatFileNames.loginFileName)
+            let detectionResult = detectLoginFormat(withProfileURL: firefoxProfileURL)
+            detectedFormat = detectionResult.dataFormat
+            foundKeyDatabaseWithoutLoginFile = detectionResult.foundKeyDatabaseButNoLoginsFile
+        }
 
-                if FileManager.default.fileExists(atPath: potentialDatabaseURL.path),
-                   FileManager.default.fileExists(atPath: potentialLoginsFileURL.path) {
-                    detectedFormat = potentialFormat
-                    break
-                }
-            }
+        // There's a legitimate case where the key database exists, but there's no logins file. This happens when the user has never
+        // saved a login. To avoid showing them an error, we check for the existence of the SQLite database but no logins file.
+        if foundKeyDatabaseWithoutLoginFile {
+            return .success([])
         }
 
         guard let detectedFormat = detectedFormat else {
@@ -115,6 +114,25 @@ final class FirefoxLoginReader {
         case .failure(let error):
             return .failure(error)
         }
+    }
+
+    private func detectLoginFormat(withProfileURL firefoxProfileURL: URL) -> (dataFormat: DataFormat?, foundKeyDatabaseButNoLoginsFile: Bool) {
+        var foundKeyDatabaseWithoutLoginFile = false
+
+        for potentialFormat in DataFormat.allCases {
+            let potentialDatabaseURL = firefoxProfileURL.appendingPathComponent(potentialFormat.formatFileNames.databaseName)
+            let potentialLoginsFileURL = firefoxProfileURL.appendingPathComponent(potentialFormat.formatFileNames.loginFileName)
+
+            if FileManager.default.fileExists(atPath: potentialDatabaseURL.path) {
+                if FileManager.default.fileExists(atPath: potentialLoginsFileURL.path) {
+                    return (potentialFormat, false)
+                } else {
+                    foundKeyDatabaseWithoutLoginFile = true
+                }
+            }
+        }
+
+        return (nil, foundKeyDatabaseWithoutLoginFile)
     }
 
     private func readLoginsFile(from loginsFilePath: String) -> EncryptedFirefoxLogins? {
