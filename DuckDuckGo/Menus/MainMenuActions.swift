@@ -145,7 +145,7 @@ extension AppDelegate {
 #if APPSTORE
         let options = [NSApplication.AboutPanelOptionKey.applicationName: UserText.duckDuckGoForMacAppStore]
 #else
-        let options: [NSApplication.AboutPanelOptionKey: Any] = []
+        let options: [NSApplication.AboutPanelOptionKey: Any] = [:]
 #endif
         NSApp.orderFrontStandardAboutPanel(options: options)
     }
