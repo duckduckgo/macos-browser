@@ -840,9 +840,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         if let host = url.host, !host.isEmpty {
             localHistory.insert(host.droppingWwwPrefix())
         }
-
-        // Mark internal users
-        
     }
 
     func updateVisitTitle(_ title: String, url: URL) {
