@@ -61,6 +61,7 @@ final class TabTests: XCTestCase {
     func testWhenDownloadDialogIsShowingChangingURLDoesNOTClearDialog() {
         let tab = Tab()
         tab.url = .duckDuckGo
+        DownloadsPreferences().alwaysRequestDownloadLocation = true
         tab.webView(WebViewMock(), saveDataToFile: Data(), suggestedFilename: "anything", mimeType: "application/pdf", originatingURL: .duckDuckGo)
         XCTAssertNotNil(tab.userInteractionDialog)
         tab.url = .duckDuckGoMorePrivacyInfo
