@@ -390,7 +390,8 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                 historyCoordinating.commitChanges(url: oldUrl)
             }
             error = nil
-            userInteractionDialog = nil
+            dismissPresentedAlert()
+
             Task {
                 await reloadIfNeeded(shouldLoadInBackground: true)
             }
@@ -398,7 +399,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             if let title = content.title {
                 self.title = title
             }
-
         }
     }
 
@@ -785,6 +785,15 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             await reloadIfNeeded(shouldLoadInBackground: shouldLoadInBackground)
             if !shouldLoadInBackground {
                 addHomePageToWebViewIfNeeded()
+            }
+        }
+    }
+
+    private func dismissPresentedAlert() {
+        if let userInteractionDialog {
+            switch userInteractionDialog.dialog {
+            case .jsDialog: self.userInteractionDialog = nil
+            default: break
             }
         }
     }
