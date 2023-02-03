@@ -354,6 +354,10 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         cbaTimeReporter?.tabWillClose(self.instrumentation.currentTabIdentifier)
     }
 
+#if DEBUG
+    var shouldDisableLongDecisionMakingChecks: Bool = false
+#endif
+
     // MARK: - Event Publishers
 
     let webViewDidReceiveChallengePublisher = PassthroughSubject<Void, Never>()
@@ -1190,7 +1194,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
             } else if !navigationAction.navigationType.isBackForward,
                       !isRequestingNewTab,
                       let request = GPCRequestFactory().requestForGPC(basedOn: navigationAction.request,
-                                                                      config: ContentBlocking.shared.privacyConfigurationManager.privacyConfig,
+                                                                      config: contentBlocking.privacyConfigurationManager.privacyConfig,
                                                                       gpcEnabled: PrivacySecurityPreferences.shared.gpcEnabled) {
                 self.invalidateBackItemIfNeeded(for: navigationAction)
 
@@ -1306,8 +1310,15 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
     private func prepareForContentBlocking() async {
         // Ensure Content Blocking Assets (WKContentRuleList&UserScripts) are installed
         if userContentController?.contentBlockingAssetsInstalled == false
-           && ContentBlocking.shared.privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .contentBlocking) {
+           && contentBlocking.privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .contentBlocking) {
             cbaTimeReporter?.tabWillWaitForRulesCompilation(self.instrumentation.currentTabIdentifier)
+#if DEBUG
+            shouldDisableLongDecisionMakingChecks = true
+            defer { // swiftlint:disable:this inert_defer
+                shouldDisableLongDecisionMakingChecks = false
+            }
+#endif
+
             await userContentController?.awaitContentBlockingAssetsInstalled()
             cbaTimeReporter?.reportWaitTimeForTabFinishedWaitingForRules(self.instrumentation.currentTabIdentifier)
         } else {
@@ -1323,13 +1334,14 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         setFBProtection(enabled: featureEnabled)
     }
 
-    func willStart(_ navigationAction: NavigationAction) {
+    @MainActor
+    func willStart(_ navigation: Navigation) {
         if error != nil { error = nil }
 
         externalSchemeOpenedPerPageLoad = false
-        delegate?.tabWillStartNavigation(self, isUserInitiated: navigationAction.isUserInitiated)
+        delegate?.tabWillStartNavigation(self, isUserInitiated: navigation.navigationAction.isUserInitiated)
 
-        if navigationAction.navigationType.isRedirect {
+        if navigation.navigationAction.navigationType.isRedirect {
             resetDashboardInfo()
         }
     }
@@ -1421,10 +1433,12 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         webViewDidFailNavigationPublisher.send()
     }
 
+    @MainActor
     func navigationAction(_ navigationAction: NavigationAction, didBecome download: WebKitDownload) {
         FileDownloadManager.shared.add(download, delegate: self, location: .auto, postflight: .none)
     }
 
+    @MainActor
     func navigationResponse(_ navigationResponse: NavigationResponse, didBecome download: WebKitDownload) {
         FileDownloadManager.shared.add(download, delegate: self, location: .auto, postflight: .none)
 
