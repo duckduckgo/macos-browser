@@ -25,7 +25,6 @@ struct DownloadsPreferencesPersistorMock: DownloadsPreferencesPersistor {
     var defaultDownloadLocation: URL?
     var lastUsedCustomDownloadLocation: String?
 
-    // swiftlint:disable:next identifier_name
     var _isDownloadLocationValid: (URL) -> Bool
 
     func isDownloadLocationValid(_ location: URL) -> Bool {
@@ -56,7 +55,7 @@ class DownloadsPreferencesTests: XCTestCase {
 
         deleteTemporaryTestDirectory()
     }
-  
+
     func testWhenAlwaysAskIsOnAndCustomLocationWasSetThenEffectiveDownloadLocationIsReturned() {
         let testDirectory = createTemporaryTestDirectory()
         let persistor = DownloadsPreferencesPersistorMock(selectedDownloadLocation: nil, alwaysRequestDownloadLocation: true)
@@ -66,14 +65,14 @@ class DownloadsPreferencesTests: XCTestCase {
 
         XCTAssertEqual(preferences.effectiveDownloadLocation, testDirectory)
     }
-    
+
     func testWhenAlwaysAskIsOnAndCustomLocationWasNotSetThenEffectiveDownloadLocationIsReturned() {
         let persistor = DownloadsPreferencesPersistorMock(selectedDownloadLocation: nil, alwaysRequestDownloadLocation: true)
         let preferences = DownloadsPreferences(persistor: persistor)
 
         XCTAssertEqual(preferences.effectiveDownloadLocation, DownloadsPreferences.defaultDownloadLocation())
     }
-    
+
     func testWhenAlwaysAskIsOnAndCustomLocationWasSetAndRemovedFromDiskThenEffectiveDownloadLocationIsReturned() {
         let testDirectory = createTemporaryTestDirectory()
         let persistor = DownloadsPreferencesPersistorMock(selectedDownloadLocation: nil, alwaysRequestDownloadLocation: true)
@@ -81,10 +80,10 @@ class DownloadsPreferencesTests: XCTestCase {
 
         preferences.lastUsedCustomDownloadLocation = testDirectory
         deleteTemporaryTestDirectory()
-        
+
         XCTAssertEqual(preferences.effectiveDownloadLocation, DownloadsPreferences.defaultDownloadLocation())
     }
-    
+
     func testWhenSettingNilDownloadLocationThenDefaultDownloadLocationIsReturned() {
         let testDirectory = createTemporaryTestDirectory()
         let persistor = DownloadsPreferencesPersistorMock(selectedDownloadLocation: nil)

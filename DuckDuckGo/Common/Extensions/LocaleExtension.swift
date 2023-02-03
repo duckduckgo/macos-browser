@@ -19,7 +19,7 @@
 import Foundation
 
 extension Locale {
-    
+
     enum DateComponentOrder {
         case dayMonthYear
         case monthDayYear
@@ -30,12 +30,12 @@ extension Locale {
             // Default to the North American ordering.
             return .monthDayYear
         }
-        
+
         if format.hasPrefix("d") {
             return .dayMonthYear
         } else {
             return .monthDayYear
         }
     }
-    
+
 }

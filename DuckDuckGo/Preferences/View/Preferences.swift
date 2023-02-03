@@ -21,10 +21,10 @@ import SwiftUI
 enum Preferences {
 
     struct Section<Content>: View where Content: View {
-        
+
         let spacing: CGFloat
         @ViewBuilder let content: () -> Content
-        
+
         init(spacing: CGFloat = 12, @ViewBuilder content: @escaping () -> Content) {
             self.spacing = spacing
             self.content = content

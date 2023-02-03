@@ -56,7 +56,7 @@ final class MainViewController: NSViewController {
     private var bookmarksBarIsVisible: Bool {
         return bookmarksBarViewController.parent != nil
     }
-    
+
     private var isInPopUpWindow: Bool {
         view.window?.isPopUpWindow == true
     }
@@ -92,11 +92,11 @@ final class MainViewController: NSViewController {
             navigationBarContainerView.layer?.masksToBounds = false
 
             resizeNavigationBarForHomePage(tabCollectionViewModel.selectedTabViewModel?.tab.content == .homePage, animated: false)
-            
+
             let bookmarksBarVisible = PersistentAppInterfaceSettings.shared.showBookmarksBar
             updateBookmarksBarViewVisibility(visible: bookmarksBarVisible)
         }
-        
+
         updateDividerColor()
     }
 
@@ -180,14 +180,14 @@ final class MainViewController: NSViewController {
         self.fireViewController = fireViewController
         return fireViewController
     }
-    
+
     @IBSegueAction
     func createBookmarksBar(coder: NSCoder, sender: Any?, segueIdentifier: String?) -> BookmarksBarViewController? {
         let bookmarksBarViewController = BookmarksBarViewController(coder: coder, tabCollectionViewModel: tabCollectionViewModel)
         self.bookmarksBarViewController = bookmarksBarViewController
         return bookmarksBarViewController
     }
-    
+
     private func updateBookmarksBarViewVisibility(visible: Bool) {
         let showBookmarksBar = isInPopUpWindow ? false : visible
 
@@ -202,12 +202,12 @@ final class MainViewController: NSViewController {
             bookmarksBarViewController.removeFromParent()
             bookmarksBarViewController.view.removeFromSuperview()
         }
-        
+
         bookmarksBarHeightConstraint.constant = showBookmarksBar ? 34 : 0
 
         updateDividerColor()
     }
-    
+
     private func updateDividerColor() {
         NSAppearance.withAppAppearance {
             let isHomePage = tabCollectionViewModel.selectedTabViewModel?.tab.content == .homePage
@@ -226,7 +226,7 @@ final class MainViewController: NSViewController {
             self?.subscribeToTitleChange()
         }
     }
-    
+
     private func subscribeToTitleChange() {
         guard let window = self.view.window else { return }
         windowTitleCancellable = tabCollectionViewModel.$selectedTabViewModel

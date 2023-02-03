@@ -28,7 +28,6 @@ internal class SafariDataImporter: DataImporter {
         let openPanel = NSOpenPanel()
         openPanel.directoryURL = safariDataDirectoryURL
         openPanel.message = UserText.bookmarkImportSafariRequestPermissionButtonTitle
-        openPanel.allowedFileTypes = nil
         openPanel.allowsOtherFileTypes = false
         openPanel.canChooseFiles = false
         openPanel.canChooseDirectories = true
@@ -36,12 +35,11 @@ internal class SafariDataImporter: DataImporter {
         _ = openPanel.runModal()
         return openPanel.urls.first
     }
-    
+
     static private var safariDataDirectoryURL: URL {
-        let applicationSupport = FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask).first!
-        return applicationSupport.appendingPathComponent("Safari/")
+        return URL.nonSandboxLibraryDirectoryURL.appendingPathComponent("Safari/")
     }
-    
+
     static private var bookmarksFileURL: URL {
         return safariDataDirectoryURL.appendingPathComponent("Bookmarks.plist")
     }
@@ -69,7 +67,7 @@ internal class SafariDataImporter: DataImporter {
 
             let faviconsReader = SafariFaviconsReader(safariDataDirectoryURL: Self.safariDataDirectoryURL)
             let faviconsResult = faviconsReader.readFavicons()
-            
+
             switch faviconsResult {
             case .success(let faviconsByURL):
                 for (pageURLString, fetchedFavicons) in faviconsByURL {
@@ -86,7 +84,7 @@ internal class SafariDataImporter: DataImporter {
                         faviconManager.handleFavicons(favicons, documentUrl: pageURL)
                     }
                 }
-                
+
             case .failure:
                 Pixel.fire(.faviconImportFailed(source: .safari))
             }

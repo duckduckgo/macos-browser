@@ -128,20 +128,20 @@ class StatisticsLoaderTests: XCTestCase {
 
         waitForExpectations(timeout: 1, handler: nil)
     }
-    
+
     func testWhenAppRefreshHasSuccessfulAtbRequestThenAppRetentionAtbUpdated() {
-        
+
         mockStatisticsStore.atb = "atb"
         mockStatisticsStore.appRetentionAtb = "retentionatb"
         loadSuccessfulAtbStub()
-        
+
         let expect = expectation(description: "Successful atb updates retention store")
         testee.refreshAppRetentionAtb {
             XCTAssertEqual(self.mockStatisticsStore.atb, "atb")
             XCTAssertEqual(self.mockStatisticsStore.appRetentionAtb, "v77-5")
             expect.fulfill()
         }
-        
+
         waitForExpectations(timeout: 1, handler: nil)
     }
 
@@ -159,19 +159,19 @@ class StatisticsLoaderTests: XCTestCase {
 
         waitForExpectations(timeout: 1, handler: nil)
     }
-    
+
     func testWhenAppRefreshHasUnsuccessfulAtbRequestThenSearchRetentionAtbNotUpdated() {
         mockStatisticsStore.atb = "atb"
         mockStatisticsStore.appRetentionAtb = "retentionAtb"
         loadUnsuccessfulAtbStub()
-        
+
         let expect = expectation(description: "Unsuccessful atb does not update store")
         testee.refreshAppRetentionAtb {
             XCTAssertEqual(self.mockStatisticsStore.atb, "atb")
             XCTAssertEqual(self.mockStatisticsStore.appRetentionAtb, "retentionAtb")
             expect.fulfill()
         }
-        
+
         waitForExpectations(timeout: 1, handler: nil)
     }
 
@@ -278,7 +278,7 @@ class StatisticsLoaderTests: XCTestCase {
 
         waitForExpectations(timeout: 1, handler: nil)
     }
-    
+
     func testWhenRefreshRetentionAtbIsPerformedForNonSearchAndNoInstallStatisticsExistThenAtbNotRequested() {
         loadSuccessfulUpdateAtbStub()
 

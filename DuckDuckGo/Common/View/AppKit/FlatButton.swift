@@ -24,12 +24,12 @@ import Foundation
     @IBInspectable var horizontalPadding: CGFloat = 10
     @IBInspectable var verticalPadding: CGFloat = 10
     @IBInspectable var backgroundColor: NSColor = .blue
-    
+
     override func draw(_ dirtyRect: NSRect) {
-        
+
         self.wantsLayer = true
         self.layer?.cornerRadius = cornerRadius
-        
+
         if isHighlighted {
             layer?.backgroundColor = backgroundColor.blended(withFraction: 0.2, of: .black)?.cgColor
         } else {

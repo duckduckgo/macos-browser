@@ -24,7 +24,7 @@ final class WebViewStateObserver: NSObject {
 
     weak var webView: WKWebView?
     weak var tabViewModel: TabViewModel?
-    
+
     private var isObserving = false
 
     init(webView: WKWebView,
@@ -36,7 +36,7 @@ final class WebViewStateObserver: NSObject {
         matchFlagValues()
         observe(webView: webView)
     }
-    
+
     func stopObserving() {
         guard isObserving else { return }
         webView?.removeObserver(self, forKeyPath: #keyPath(WKWebView.url))
@@ -46,7 +46,7 @@ final class WebViewStateObserver: NSObject {
         webView?.removeObserver(self, forKeyPath: #keyPath(WKWebView.title))
         webView?.removeObserver(self, forKeyPath: #keyPath(WKWebView.estimatedProgress))
         webView?.removeObserver(self, forKeyPath: #keyPath(WKWebView.serverTrust))
-        
+
         isObserving = false
     }
 
@@ -78,7 +78,7 @@ final class WebViewStateObserver: NSObject {
         webView.addObserver(self, forKeyPath: #keyPath(WKWebView.title), options: .new, context: nil)
         webView.addObserver(self, forKeyPath: #keyPath(WKWebView.estimatedProgress), options: .new, context: nil)
         webView.addObserver(self, forKeyPath: #keyPath(WKWebView.serverTrust), options: .new, context: nil)
-        
+
         isObserving = true
     }
 

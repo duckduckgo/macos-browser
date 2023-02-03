@@ -30,17 +30,17 @@ final class FirefoxFaviconsReader {
         case failedToTemporarilyCopyFile
         case unexpectedFaviconsDatabaseFormat
     }
-    
+
     final class FirefoxFavicon: FetchableRecord {
         let pageURL: String
         let iconURL: String
         let size: Int
         let imageData: Data
-        
+
         var image: NSImage? {
             NSImage(data: imageData)
         }
-        
+
         init(row: Row) {
             pageURL = row["page_url"]
             iconURL = row["icon_url"]
@@ -75,12 +75,12 @@ final class FirefoxFaviconsReader {
                 guard let favicons = try? FirefoxFavicon.fetchAll(database, sql: allFaviconsQuery()) else {
                     throw ImportError.unexpectedFaviconsDatabaseFormat
                 }
-                
+
                 return favicons
             }
-            
+
             let faviconsByURL = Dictionary(grouping: favicons, by: { $0.pageURL })
-            
+
             return .success(faviconsByURL)
         } catch {
             return .failure(.unexpectedFaviconsDatabaseFormat)

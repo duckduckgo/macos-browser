@@ -29,7 +29,9 @@ extension AppDelegate {
     // MARK: - DuckDuckGo
 
     @IBAction func checkForUpdates(_ sender: Any?) {
+#if !APPSTORE
         updateController.checkForUpdates(sender)
+#endif
     }
 
     // MARK: - File
@@ -164,7 +166,11 @@ extension AppDelegate {
             accessoryContainer.frame.size = accessoryContainer.fittingSize
 
             savePanel.accessoryView = accessoryContainer
-            savePanel.allowedFileTypes = ["csv"]
+            if #available(macOS 11.0, *) {
+                savePanel.allowedContentTypes = [.commaSeparatedText]
+            } else {
+                savePanel.allowedFileTypes = ["csv"]
+            }
 
             savePanel.beginSheetModal(for: window) { response in
                 guard response == .OK, let selectedURL = savePanel.url else { return }
@@ -188,7 +194,12 @@ extension AppDelegate {
 
         let savePanel = NSSavePanel()
         savePanel.nameFieldStringValue = "DuckDuckGo \(UserText.exportBookmarksFileNameSuffix)"
-        savePanel.allowedFileTypes = ["html"]
+
+        if #available(macOS 11.0, *) {
+            savePanel.allowedContentTypes = [.html]
+        } else {
+            savePanel.allowedFileTypes = ["html"]
+        }
 
         savePanel.beginSheetModal(for: window) { response in
             guard response == .OK, let selectedURL = savePanel.url else { return }
@@ -290,7 +301,7 @@ extension MainViewController {
             return
         }
 
-        selectedTabViewModel.tab.webView.zoomLevel = 1.0
+        selectedTabViewModel.tab.webView.resetZoomLevel()
     }
 
     @IBAction func toggleDownloads(_ sender: Any) {
@@ -313,15 +324,15 @@ extension MainViewController {
     @IBAction func toggleBookmarksBar(_ sender: Any) {
         PersistentAppInterfaceSettings.shared.showBookmarksBar.toggle()
     }
-    
+
     @IBAction func toggleAutofillShortcut(_ sender: Any) {
         LocalPinningManager.shared.togglePinning(for: .autofill)
     }
-    
+
     @IBAction func toggleBookmarksShortcut(_ sender: Any) {
         LocalPinningManager.shared.togglePinning(for: .bookmarks)
     }
-    
+
     @IBAction func toggleDownloadsShortcut(_ sender: Any) {
         LocalPinningManager.shared.togglePinning(for: .downloads)
     }
@@ -625,13 +636,13 @@ extension MainViewController {
         NotificationCenter.default.post(name: .ShowSaveCredentialsPopover, object: nil)
         #endif
     }
-    
+
     @IBAction func showCredentialsSavedPopover(_ sender: Any?) {
         #if DEBUG || REVIEW
         NotificationCenter.default.post(name: .ShowCredentialsSavedPopover, object: nil)
         #endif
     }
-    
+
     @IBAction func fetchConfigurationNow(_ sender: Any?) {
         ConfigurationManager.shared.lastUpdateTime = .distantPast
         ConfigurationManager.shared.refreshIfNeeded()

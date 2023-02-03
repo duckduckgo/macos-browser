@@ -44,28 +44,28 @@ extension EmailManagerRequestDelegate {
         }.resume()
     }
     // swiftlint:enable function_parameter_count
-    
+
     public func emailManagerKeychainAccessFailed(accessType: EmailKeychainAccessType, error: EmailKeychainAccessError) {
         var parameters = [
             "access_type": accessType.rawValue,
             "error": error.errorDescription
         ]
-        
+
         if case let .keychainLookupFailure(status) = error {
             parameters["keychain_status"] = String(status)
             parameters["keychain_operation"] = "lookup"
         }
-        
+
         if case let .keychainDeleteFailure(status) = error {
             parameters["keychain_status"] = String(status)
             parameters["keychain_operation"] = "delete"
         }
-        
+
         if case let .keychainSaveFailure(status) = error {
             parameters["keychain_status"] = String(status)
             parameters["keychain_operation"] = "save"
         }
-        
+
         Pixel.fire(.debug(event: .emailAutofillKeychainError), withAdditionalParameters: parameters)
     }
 

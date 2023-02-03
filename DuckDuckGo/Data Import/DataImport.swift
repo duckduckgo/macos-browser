@@ -110,7 +110,7 @@ enum DataImport {
         let profiles: [BrowserProfile]
 
         var validImportableProfiles: [BrowserProfile] {
-            return profiles.filter(\.hasLoginData)
+            return profiles.filter(\.hasBrowserData)
         }
 
         init(browser: ThirdPartyBrowser, profileURLs: [URL]) {
@@ -119,7 +119,10 @@ enum DataImport {
             switch browser {
             case .brave, .chrome, .edge:
                 // Chromium profiles are either named "Default", or a series of incrementing profile names, i.e. "Profile 1", "Profile 2", etc.
-                let potentialProfiles = profileURLs.map(BrowserProfile.from(profileURL:))
+                let potentialProfiles = profileURLs.map({
+                    BrowserProfile.for(browser: browser, profileURL: $0)
+                })
+
                 let filteredProfiles =  potentialProfiles.filter {
                     $0.hasNonDefaultProfileName ||
                         $0.profileName == "Default" ||
@@ -130,9 +133,13 @@ enum DataImport {
 
                 self.profiles = sortedProfiles
             case .firefox:
-                self.profiles = profileURLs.map(BrowserProfile.from(profileURL:)).sorted()
+                self.profiles = profileURLs.map({
+                    BrowserProfile.for(browser: .firefox, profileURL: $0)
+                }).sorted()
             case .safari:
-                self.profiles = profileURLs.map(BrowserProfile.from(profileURL:)).sorted()
+                self.profiles = profileURLs.map({
+                    BrowserProfile.for(browser: .safari, profileURL: $0)
+                }).sorted()
             case .lastPass, .onePassword:
                 self.profiles = []
             }
@@ -170,15 +177,17 @@ enum DataImport {
             return detectedChromePreferencesProfileName != nil
         }
 
+        private let browser: ThirdPartyBrowser
         private let fileStore: FileStore
         private let fallbackProfileName: String
         private let detectedChromePreferencesProfileName: String?
 
-        static func from(profileURL: URL) -> BrowserProfile {
-            return BrowserProfile(profileURL: profileURL)
+        static func `for`(browser: ThirdPartyBrowser, profileURL: URL) -> BrowserProfile {
+            return BrowserProfile(browser: browser, profileURL: profileURL)
         }
 
-        init(profileURL: URL, fileStore: FileStore = FileManager.default) {
+        init(browser: ThirdPartyBrowser, profileURL: URL, fileStore: FileStore = FileManager.default) {
+            self.browser = browser
             self.fileStore = fileStore
             self.profileURL = profileURL
 
@@ -186,15 +195,35 @@ enum DataImport {
             self.detectedChromePreferencesProfileName = Self.getChromeProfileName(at: profileURL, fileStore: fileStore)
         }
 
-        var hasLoginData: Bool {
+        var hasBrowserData: Bool {
             guard let profileDirectoryContents = try? fileStore.directoryContents(at: profileURL.path) else {
                 return false
             }
 
-            let hasChromiumData = profileDirectoryContents.contains("Login Data")
-            let hasFirefoxData = profileDirectoryContents.contains("key4.db") && profileDirectoryContents.contains("logins.json")
+            let profileDirectoryContentsSet = Set(profileDirectoryContents)
 
-            return hasChromiumData || hasFirefoxData
+            switch browser {
+            case .brave, .chrome, .edge:
+                let hasChromiumLogins = ChromiumLoginReader.LoginDataFileName.allCases.contains { loginFileName in
+                    return profileDirectoryContentsSet.contains(loginFileName.rawValue)
+                }
+
+                let hasChromiumBookmarks = profileDirectoryContentsSet.contains(ChromiumBookmarksReader.Constants.defaultBookmarksFileName)
+
+                return hasChromiumLogins || hasChromiumBookmarks
+            case .firefox:
+                let hasFirefoxLogins = FirefoxLoginReader.DataFormat.allCases.contains { dataFormat in
+                    let (databaseName, loginFileName) = dataFormat.formatFileNames
+
+                    return profileDirectoryContentsSet.contains(databaseName) && profileDirectoryContentsSet.contains(loginFileName)
+                }
+
+                let hasFirefoxBookmarks = profileDirectoryContentsSet.contains(FirefoxBookmarksReader.Constants.placesDatabaseName)
+
+                return hasFirefoxLogins || hasFirefoxBookmarks
+            default:
+                return false
+            }
         }
 
         private static func getDefaultProfileName(at profileURL: URL) -> String {
@@ -236,7 +265,7 @@ struct DataImportError: Error, Equatable {
         case bookmarks
         case logins
         case generic
-        
+
         var pixelEventAction: Pixel.Event.DataImportAction {
             switch self {
             case .bookmarks: return .importBookmarks
@@ -245,7 +274,7 @@ struct DataImportError: Error, Equatable {
             }
         }
     }
-    
+
     enum ImportErrorType: Equatable {
         case noFileFound
         case cannotFindFile
@@ -260,7 +289,7 @@ struct DataImportError: Error, Equatable {
         case cannotDecryptFile
         case failedToTemporarilyCopyFile
         case databaseAccessFailed
-        
+
         var stringValue: String {
             switch self {
             case .couldNotAccessKeychain: return "couldNotAccessKeychain"
@@ -278,10 +307,10 @@ struct DataImportError: Error, Equatable {
                     .databaseAccessFailed: return String(describing: self)
             }
         }
-        
+
         var errorParameters: [String: String] {
             var parameters = ["error": stringValue]
-            
+
             switch self {
             case .couldNotAccessKeychain(let status): parameters["keychainErrorCode"] = String(status)
             case .noFileFound,
@@ -297,11 +326,11 @@ struct DataImportError: Error, Equatable {
                     .failedToTemporarilyCopyFile,
                     .databaseAccessFailed: break
             }
-            
+
             return parameters
         }
     }
-    
+
     static func generic(_ errorType: ImportErrorType) -> DataImportError {
         return DataImportError(actionType: .generic, errorType: errorType)
     }
@@ -319,7 +348,7 @@ struct DataImportError: Error, Equatable {
         case .failedToTemporarilyCopyFile: return DataImportError(actionType: .bookmarks, errorType: .failedToTemporarilyCopyFile)
         }
     }
-    
+
     static func bookmarks(_ errorType: SafariBookmarksReader.ImportError) -> DataImportError {
         switch errorType {
         case .unexpectedBookmarksFileFormat: return DataImportError(actionType: .bookmarks, errorType: .cannotReadFile)
@@ -333,11 +362,11 @@ struct DataImportError: Error, Equatable {
     }
 
     // MARK: Login Error Types
-    
+
     static func logins(_ errorType: ImportErrorType) -> DataImportError {
         return DataImportError(actionType: .logins, errorType: errorType)
     }
-    
+
     static func logins(_ errorType: ChromiumLoginReader.ImportError) -> DataImportError {
         switch errorType {
         case .decryptionKeyAccessFailed(let status): return DataImportError(actionType: .logins, errorType: .couldNotAccessKeychain(status))
@@ -349,7 +378,7 @@ struct DataImportError: Error, Equatable {
         case .userDeniedKeychainPrompt: return DataImportError(actionType: .logins, errorType: .userDeniedKeychainPrompt)
         }
     }
-    
+
     let actionType: ImportErrorAction
     let errorType: ImportErrorType
 

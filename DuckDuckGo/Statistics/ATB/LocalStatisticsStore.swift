@@ -35,7 +35,7 @@ final class LocalStatisticsStore: StatisticsStore {
 
         @UserDefaultsWrapper(key: .lastAppRetentionRequestDate, defaultValue: nil)
         var lastAppRetentionRequestDate: Date?
-        
+
         /// Used to determine whether this clearing process took place. While we no longer use these values, we need to know if a user has upgraded from a
         /// version which did use them, so that they can be shephered into an unlocked waitlist state. When the waitlist feature is removed, this key can be deleted.
         @UserDefaultsWrapper(key: .legacyStatisticsStoreDataCleared, defaultValue: false)
@@ -89,7 +89,7 @@ final class LocalStatisticsStore: StatisticsStore {
     var hasInstallStatistics: Bool {
         return atb != nil
     }
-    
+
     /// There are three cases in which users can upgrade to a version which includes the Lock Screen feature:
     ///
     /// 1. Users with ATB stored in User Defaults
@@ -101,7 +101,7 @@ final class LocalStatisticsStore: StatisticsStore {
         let legacyATBWasMigrated = LegacyStatisticsStore().legacyStatisticsStoreDataCleared
         let deprecatedATB: String? = pixelDataStore.value(forKey: DeprecatedKeys.atb)
         let hasDeprecatedATB = deprecatedATB != nil
-        
+
         return hasInstallStatistics || hasDeprecatedATB || legacyATBWasMigrated
     }
 
@@ -186,7 +186,7 @@ final class LocalStatisticsStore: StatisticsStore {
             }
         }
     }
-    
+
     var waitlistUnlocked: Bool {
         get {
             guard let booleanStringValue: String = pixelDataStore.value(forKey: Keys.waitlistUnlocked) else { return false }
@@ -203,7 +203,7 @@ final class LocalStatisticsStore: StatisticsStore {
             }
         }
     }
-    
+
     var autoLockEnabled: Bool {
         get {
             guard let booleanStringValue: String = pixelDataStore.value(forKey: Keys.autoLockEnabled) else {
@@ -216,7 +216,7 @@ final class LocalStatisticsStore: StatisticsStore {
             pixelDataStore.set(booleanAsString, forKey: Keys.autoLockEnabled)
         }
     }
-    
+
     var autoLockThreshold: String? {
         get {
             pixelDataStore.value(forKey: Keys.autoLockThreshold)

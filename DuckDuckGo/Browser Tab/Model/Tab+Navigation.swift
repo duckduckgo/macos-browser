@@ -16,7 +16,7 @@
 //  limitations under the License.
 //
 
-import BrowserServicesKit
+import Navigation
 import Common
 import Foundation
 import WebKit
@@ -34,7 +34,8 @@ extension Tab: NavigationResponder {
 
             .weak(nullable: self.adClickAttribution)
         )
-        navigationDelegate.registerCustomDelegateMethodHandler(.weak(self), for: #selector(webView(_:contextMenuDidCreate:)))
+        navigationDelegate
+            .registerCustomDelegateMethodHandler(.weak(self), forSelectorNamed: "_webView:contextMenuDidCreateDownload:")
     }
 
 }

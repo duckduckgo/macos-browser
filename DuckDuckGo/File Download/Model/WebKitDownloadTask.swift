@@ -16,7 +16,7 @@
 //  limitations under the License.
 //
 
-import BrowserServicesKit
+import Navigation
 import Combine
 import Foundation
 import WebKit
@@ -81,11 +81,7 @@ final class WebKitDownloadTask: NSObject, ProgressReporting {
         download.webView
     }
 
-    init(download: WebKitDownload,
-         promptForLocation: Bool,
-         destinationURL: URL?,
-         tempURL: URL?,
-         postflight: FileDownloadManager.PostflightAction? = .none) {
+    init(download: WebKitDownload, promptForLocation: Bool, destinationURL: URL?, tempURL: URL?, postflight: FileDownloadManager.PostflightAction? = .none) {
 
         self.download = download
         self.progress = Progress(totalUnitCount: -1)
@@ -94,7 +90,7 @@ final class WebKitDownloadTask: NSObject, ProgressReporting {
         self.postflight = postflight
         super.init()
 
-        download.perform(#selector(Port/* why not? */.setDelegate(_:)), with: self)
+        download.delegate = self
 
         progress.fileOperationKind = .downloading
         progress.kind = .file
@@ -179,7 +175,9 @@ final class WebKitDownloadTask: NSObject, ProgressReporting {
             }
             return
         }
-        download.cancel()
+        download.cancel { [weak self] _ in
+            self?.downloadDidFail(with: URLError(.cancelled), resumeData: nil)
+        }
     }
 
     private func finish(with result: Result<URL, FileDownloadError>) {
@@ -210,6 +208,14 @@ final class WebKitDownloadTask: NSObject, ProgressReporting {
         fulfill(result)
     }
 
+    private func downloadDidFail(with error: Error, resumeData: Data?) {
+        if resumeData == nil,
+           let tempURL = location.tempURL {
+            try? FileManager.default.removeItem(at: tempURL)
+        }
+        self.finish(with: .failure(.failedToCompleteDownloadTask(underlyingError: error, resumeData: resumeData)))
+    }
+
     deinit {
         dispatchPrecondition(condition: .onQueue(.main))
         self.progress.unpublishIfNeeded()
@@ -218,8 +224,9 @@ final class WebKitDownloadTask: NSObject, ProgressReporting {
 
 }
 
-@available(macOS 11.3, *)
-extension WebKitDownloadTask: WebKitDownloadDelegate {
+extension WebKitDownloadTask: WebKitDownloadDelegate {}
+@available(macOS 11.3, *) // objc does‘t care about availability
+@objc extension WebKitDownloadTask {
 
     func download(_: WKDownload,
                   decideDestinationUsing response: URLResponse,
@@ -288,11 +295,7 @@ extension WebKitDownloadTask: WebKitDownloadDelegate {
     }
 
     func download(_: WKDownload, didFailWithError error: Error, resumeData: Data?) {
-        if resumeData == nil,
-           let tempURL = location.tempURL {
-            try? FileManager.default.removeItem(at: tempURL)
-        }
-        self.finish(with: .failure(.failedToCompleteDownloadTask(underlyingError: error, resumeData: resumeData)))
+        downloadDidFail(with: error, resumeData: resumeData)
     }
 
     func download(_: WKDownload, didReceiveDataWithLength length: UInt64) {

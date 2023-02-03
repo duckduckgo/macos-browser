@@ -18,14 +18,14 @@
 
 import Foundation
 import CoreData
-import BrowserServicesKit
+import Persistence
 
 final class Database {
-    
+
     fileprivate struct Constants {
         static let databaseName = "Database"
     }
-    
+
     static let shared: CoreDataDatabase = {
         let (database, error) = makeDatabase()
         if database == nil {

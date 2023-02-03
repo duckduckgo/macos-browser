@@ -68,7 +68,7 @@ enum SecureVaultItem: Equatable, Identifiable, Comparable {
             return note.title
         }
     }
-    
+
     var created: Date {
         switch self {
         case .account(let account):
@@ -144,21 +144,21 @@ enum SecureVaultItem: Equatable, Identifiable, Comparable {
             return subtitle
         }
     }
-    
+
     var firstCharacter: String {
         let defaultFirstCharacter = "#"
 
         guard let character = self.displayTitle.first else {
             return defaultFirstCharacter
         }
-        
+
         if character.isLetter {
             return character.uppercased()
         } else {
             return defaultFirstCharacter
         }
     }
-    
+
     var category: SecureVaultSorting.Category {
         switch self {
         case .account: return .logins
@@ -167,12 +167,12 @@ enum SecureVaultItem: Equatable, Identifiable, Comparable {
         case .note: return .allItems
         }
     }
-    
+
     func matches(category: SecureVaultSorting.Category) -> Bool {
         if category == .allItems {
             return true
         }
-        
+
         return self.category == category
     }
 
@@ -206,11 +206,11 @@ enum SecureVaultItem: Equatable, Identifiable, Comparable {
 /// Could maybe even abstract a bunch of this code to be more generic re-usable styled list for use elsewhere.
 final class PasswordManagementItemListModel: ObservableObject {
     let passwordManagerCoordinator: PasswordManagerCoordinating
-    
+
     enum EmptyState {
         /// Displays nothing for the empty state. Used when data is still loading, or when filtering the All Items list.
         case none
-        
+
         /// Displays an empty state which prompts the user to import data. Used when the user has no items of any type.
         case noData
         case logins
@@ -249,7 +249,7 @@ final class PasswordManagementItemListModel: ObservableObject {
             guard oldValue != sortDescriptor else {
                 return
             }
-            
+
             updateFilteredData()
             selectFirst()
         }
@@ -289,14 +289,14 @@ final class PasswordManagementItemListModel: ObservableObject {
         if let item = item, sortDescriptor.category != .allItems, item.category != sortDescriptor.category {
             sortDescriptor.category = item.category
         }
-        
+
         let previous = selected
         selected = item
-        
+
         if selected != nil {
             externalPasswordManagerSelected = false
         }
-        
+
         if notify {
             onItemSelected(previous, item)
         }
@@ -309,7 +309,7 @@ final class PasswordManagementItemListModel: ObservableObject {
             }
         }
     }
-    
+
     func selectLoginWithDomainOrFirst(domain: String, notify: Bool = true) {
         for section in displayedItems {
             if let account = section.items.first(where: { $0.websiteAccount?.domain.droppingWwwPrefix() == domain.droppingWwwPrefix() }) {
@@ -317,7 +317,7 @@ final class PasswordManagementItemListModel: ObservableObject {
                 return
             }
         }
-        
+
         selectFirst()
     }
 
@@ -378,12 +378,12 @@ final class PasswordManagementItemListModel: ObservableObject {
             selected(item: nil)
         }
     }
-    
+
     func clear() {
         update(items: [])
         filter = ""
         clearSelection()
-        
+
         // Setting items to an empty array will typically show the No Data empty state, but this call is used when
         // the popover is closed so instead there should be no empty state.
         emptyState = .none
@@ -421,18 +421,18 @@ final class PasswordManagementItemListModel: ObservableObject {
 
         return sections
     }
-    
+
     private func calculateEmptyState() {
         guard !items.isEmpty else {
             emptyState = .noData
             return
         }
-        
+
         guard displayedItems.isEmpty else {
             emptyState = .none
             return
         }
-        
+
         switch sortDescriptor.category {
         case .allItems: emptyState = .none
         case .cards: emptyState = .creditCards

@@ -29,10 +29,10 @@ extension NSAlert {
 
         let linkText = UserText.dataImportSubmitFeedback
         let informativeText = UserText.dataImportFailedBody
-        
+
         let textView = NSTextView(frame: NSRect(x: 0, y: 0, width: 250, height: 0))
         textView.applyLabelStyle()
-        
+
         let attributedString = NSMutableAttributedString(string: informativeText)
         attributedString.addLink("", toText: linkText) // The actual value of the link isn't important, we're reacting to the click via the delegate
         attributedString.addAttributes([
@@ -41,10 +41,10 @@ extension NSAlert {
         ], range: NSRange(location: 0, length: attributedString.length))
 
         textView.textStorage?.setAttributedString(attributedString)
-        
+
         textView.sizeToFit()
         textView.delegate = linkDelegate
-        
+
         alert.messageText = UserText.dataImportFailedTitle
         alert.accessoryView = textView
         alert.alertStyle = .warning

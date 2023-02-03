@@ -23,7 +23,7 @@ final class BraveDataImporter: ChromiumDataImporter {
     override var processName: String {
         return "Brave"
     }
-    
+
     override var source: DataImport.Source {
         return .brave
     }

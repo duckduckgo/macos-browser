@@ -44,13 +44,19 @@ final class ModalSheetCancellable: Cancellable {
               condition() == true
         else { return }
 
-        if let returnCode = returnCode {
-            ownerWindow.endSheet(modalSheet, returnCode: returnCode)
-        } else {
-            ownerWindow.endSheet(modalSheet)
-        }
+        DispatchQueue.main.async { [cancellationHandler, returnCode, weak ownerWindow, weak modalSheet] in
+            guard let ownerWindow, let modalSheet,
+                  ownerWindow.sheets.contains(modalSheet)
+            else { return }
 
-        cancellationHandler?()
+            if let returnCode = returnCode {
+                ownerWindow.endSheet(modalSheet, returnCode: returnCode)
+            } else {
+                ownerWindow.endSheet(modalSheet)
+            }
+
+            cancellationHandler?()
+        }
     }
 
     deinit {

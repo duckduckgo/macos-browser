@@ -1,5 +1,5 @@
 //
-//  AdClickAttribution.swift
+//  AdClickAttributionTabExtension.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -16,12 +16,13 @@
 //  limitations under the License.
 //
 
-import os.log
+import BrowserServicesKit
 import Combine
 import Common
 import ContentBlocking
 import Foundation
-import BrowserServicesKit
+import Navigation
+import os.log
 import PrivacyDashboard
 import WebKit
 
@@ -175,9 +176,10 @@ extension AdClickAttributionTabExtension: NavigationResponder {
         detection.onStartNavigation(url: navigation.url)
     }
 
-    func decidePolicy(for navigationResponse: NavigationResponse, currentNavigation: Navigation?) async -> NavigationResponsePolicy? {
-        if navigationResponse.isForMainFrame, let currentNavigation,
-           navigationResponse.httpResponse?.isSuccessful == true {
+    func decidePolicy(for navigationResponse: NavigationResponse) async -> NavigationResponsePolicy? {
+        if navigationResponse.isForMainFrame,
+           let currentNavigation = navigationResponse.mainFrameNavigation,
+           navigationResponse.isSuccessful == true {
             detection.on2XXResponse(url: currentNavigation.url)
         }
 
@@ -187,21 +189,22 @@ extension AdClickAttributionTabExtension: NavigationResponder {
     }
 
     func navigationDidFinish(_ navigation: Navigation) {
+        guard navigation.isCurrent else { return }
         detection.onDidFinishNavigation(url: navigation.url)
         logic.onDidFinishNavigation(host: navigation.url.host)
     }
 
-    func navigation(_ navigation: Navigation, didFailWith error: WKError, isProvisioned: Bool) {
+    func navigation(_ navigation: Navigation, didFailWith error: WKError) {
+        guard navigation.isCurrent else { return }
         detection.onDidFailNavigation()
     }
-    
+
 }
 
 extension AppContentBlocking: AdClickAttributionDependencies {}
 
 protocol AdClickAttributionProtocol: AnyObject, NavigationResponder {
-    var detection: AdClickAttributionDetection! { get }
-    var logic: AdClickAttributionLogic! { get }
+    var currentAttributionState: AdClickAttributionLogic.State? { get }
 }
 
 extension AdClickAttributionTabExtension: AdClickAttributionProtocol {
