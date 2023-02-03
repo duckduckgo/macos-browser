@@ -224,6 +224,22 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                   webViewFrame: webViewFrame)
     }
 
+    private let extensionController: _WKWebExtensionController = .init()
+
+    @available(macOS 13.1, *)
+    private static func loadWebExtension(for controller: _WKWebExtensionController, into configuration: WKWebViewConfiguration) throws {
+        let path = Bundle.main.path(forResource: "emoji-substitution", ofType: nil)!
+        let extensionURL = URL(fileURLWithPath: path)
+        let webExtension = try _WKWebExtension(resourceBaseURL: extensionURL)
+        let context = _WKWebExtensionContext(for: webExtension)
+        context.uniqueIdentifier = UUID().uuidString
+        let matchPattern = try _WKWebExtension.MatchPattern(string: "*://*/*")
+        context.setPermissionStatus(.grantedExplicitly, for: matchPattern, expirationDate: nil)
+
+        try controller.loadExtensionContext(context)
+        configuration._setWebExtensionController(controller)
+    }
+
     // swiftlint:disable:next function_body_length
     init(content: TabContent,
          faviconManagement: FaviconManagement,
@@ -266,6 +282,11 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         self.currentDownload = currentDownload
 
         let configuration = webViewConfiguration ?? WKWebViewConfiguration()
+
+        if #available(macOS 13.1, *) {
+            try? Self.loadWebExtension(for: extensionController, into: configuration)
+        }
+
         configuration.applyStandardConfiguration(contentBlocking: privacyFeatures.contentBlocking)
         self.webViewConfiguration = configuration
         let userContentController = configuration.userContentController as? UserContentController

@@ -1,0 +1,5 @@
+#import "_WKWebExtensionController.h"
+#import "_WKWebExtension.h"
+#import "_WKWebExtensionContext.h"
+#import "_WKWebExtensionPermission.h"
+#import "WKWebViewConfiguration+Private.h"
