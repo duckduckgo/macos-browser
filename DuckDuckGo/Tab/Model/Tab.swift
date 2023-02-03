@@ -283,6 +283,35 @@ protocol NewWindowPolicyDecisionMaker {
                   webViewSize: webViewSize)
     }
 
+#if WEBKIT_EXTENSIONS
+    @available(macOS 13.1, *)
+    private var extensionController: _WKWebExtensionController {
+        // swiftlint:disable:next force_cast
+        _extensionController as! _WKWebExtensionController
+    }
+    private var _extensionController: Any?
+
+    @available(macOS 13.1, *)
+    private static func setUpWebExtensionController(for configuration: WKWebViewConfiguration) -> _WKWebExtensionController {
+        let controller = _WKWebExtensionController()
+        configuration._setWebExtensionController(controller)
+        return controller
+    }
+
+    @available(macOS 13.1, *)
+    private static func loadWebExtension(for controller: _WKWebExtensionController) throws {
+        let path = Bundle.main.path(forResource: "emoji-substitution", ofType: nil)!
+        let extensionURL = URL(fileURLWithPath: path)
+        let webExtension = try _WKWebExtension(resourceBaseURL: extensionURL)
+        let context = _WKWebExtensionContext(for: webExtension)
+        context.uniqueIdentifier = UUID().uuidString
+        let matchPattern = try _WKWebExtension.MatchPattern(string: "*://*/*")
+        context.setPermissionStatus(.grantedExplicitly, for: matchPattern, expirationDate: nil)
+
+        try controller.loadExtensionContext(context)
+    }
+#endif
+
     @MainActor
     // swiftlint:disable:next function_body_length
     init(content: TabContent,
@@ -312,7 +341,6 @@ protocol NewWindowPolicyDecisionMaker {
          lastSelectedAt: Date?,
          webViewSize: CGSize
     ) {
-
         self.content = content
         self.faviconManagement = faviconManagement
         self.pinnedTabsManager = pinnedTabsManager
@@ -327,8 +355,16 @@ protocol NewWindowPolicyDecisionMaker {
         self.lastSelectedAt = lastSelectedAt
 
         let configuration = webViewConfiguration ?? WKWebViewConfiguration()
-        configuration.applyStandardConfiguration(contentBlocking: privacyFeatures.contentBlocking,
-                                                 burnerMode: burnerMode)
+
+#if WEBKIT_EXTENSIONS
+        var extensionController: Any?
+        // This must be done before initializing WKWebView with the configuration
+        if #available(macOS 13.1, *) {
+            extensionController = Self.setUpWebExtensionController(for: configuration)
+            _extensionController = extensionController
+        }
+#endif
+        configuration.applyStandardConfiguration(contentBlocking: privacyFeatures.contentBlocking, burnerMode: burnerMode)
         self.webViewConfiguration = configuration
         let userContentController = configuration.userContentController as? UserContentController
         assert(userContentController != nil)
@@ -338,6 +374,13 @@ protocol NewWindowPolicyDecisionMaker {
         webView.allowsLinkPreview = false
         permissions = PermissionModel(permissionManager: permissionManager,
                                       geolocationService: geolocationService)
+
+#if WEBKIT_EXTENSIONS
+        if #available(macOS 13.1, *) {
+            // swiftlint:disable:next force_try force_cast
+            try! Self.loadWebExtension(for: extensionController as! _WKWebExtensionController)
+        }
+#endif
 
         let userContentControllerPromise = Future<UserContentController, Never>.promise()
         let userScriptsPublisher = userContentControllerPromise.future

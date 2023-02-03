@@ -1,0 +1,19 @@
+#import <WebKit/_WKWebExtension.h>
+#import <WebKit/_WKWebExtensionContext.h>
+#import <WebKit/_WKWebExtensionContextPrivate.h>
+#import <WebKit/_WKWebExtensionController.h>
+#import <WebKit/_WKWebExtensionControllerConfiguration.h>
+#import <WebKit/_WKWebExtensionControllerConfigurationPrivate.h>
+#import <WebKit/_WKWebExtensionControllerDelegate.h>
+#import <WebKit/_WKWebExtensionControllerDelegatePrivate.h>
+#import <WebKit/_WKWebExtensionControllerPrivate.h>
+#import <WebKit/_WKWebExtensionMatchPattern.h>
+#import <WebKit/_WKWebExtensionMatchPatternPrivate.h>
+#import <WebKit/_WKWebExtensionPermission.h>
+#import <WebKit/_WKWebExtensionPrivate.h>
+#import <WebKit/_WKWebExtensionTab.h>
+#import <WebKit/_WKWebExtensionUtilities.h>
+#import <WebKit/_WKWebExtensionWebNavigationURLFilter.h>
+#import <WebKit/_WKWebExtensionWindow.h>
+
+#import "WKWebViewConfiguration+Private.h"

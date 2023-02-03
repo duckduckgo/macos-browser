@@ -5,6 +5,7 @@
 #import "BloomFilterWrapper.h"
 #import <db.h>
 
+#import "WebExtensions.h"
 #import "WKWebView+Private.h"
 #import "NSException+Catch.h"
 #import "WKGeolocationProvider.h"
