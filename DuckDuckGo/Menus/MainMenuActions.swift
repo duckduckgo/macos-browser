@@ -141,6 +141,15 @@ extension AppDelegate {
         WindowsManager.openNewWindow(with: tabCollectionViewModel)
     }
 
+    @IBAction func openAbout(_ sender: Any?) {
+#if APPSTORE
+        let options = [NSApplication.AboutPanelOptionKey.applicationName: UserText.duckDuckGoForMacAppStore]
+#else
+        let options: [NSApplication.AboutPanelOptionKey: Any] = [:]
+#endif
+        NSApp.orderFrontStandardAboutPanel(options: options)
+    }
+
     @IBAction func openImportBrowserDataWindow(_ sender: Any?) {
         DataImportViewController.show()
     }
