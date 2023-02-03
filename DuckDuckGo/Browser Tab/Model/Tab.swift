@@ -1352,8 +1352,6 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
     func decidePolicy(for navigationResponse: NavigationResponse) async -> NavigationResponsePolicy? {
         userEnteredUrl = false // subsequent requests will be navigations
 
-        let isSuccessfulResponse = (navigationResponse.response as? HTTPURLResponse)?.validateStatusCode(statusCode: 200..<300) == nil
-
         if !navigationResponse.canShowMIMEType || navigationResponse.shouldDownload {
             if navigationResponse.isForMainFrame {
                 guard currentDownload != navigationResponse.url else {
@@ -1363,7 +1361,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
                 currentDownload = navigationResponse.url
             }
 
-            if isSuccessfulResponse {
+            if navigationResponse.isSuccessful == true {
                 // register the navigationResponse for legacy _WKDownload to be called back on the Tab
                 // further download will be passed to webView:navigationResponse:didBecomeDownload:
                 return .download(navigationResponse.url, using: webView) {  [weak self] download in
@@ -1372,7 +1370,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
             }
         }
 
-        if navigationResponse.isForMainFrame && isSuccessfulResponse {
+        if navigationResponse.isForMainFrame && navigationResponse.isSuccessful == true {
             self.adClickAttribution?.detection.on2XXResponse(url: webView.url)
         }
 
