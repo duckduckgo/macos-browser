@@ -24,12 +24,17 @@ final class FeedbackSender {
     static let feedbackURL = URL(string: "https://duckduckgo.com/feedback.js")!
 
     func sendFeedback(_ feedback: Feedback) {
+#if APPSTORE
+        let appVersion = "\(feedback.appVersion) AppStore"
+#else
+        let appVersion = feedback.appVersion
+#endif
         let parameters = [
             "type": "app-feedback",
             "comment": feedback.comment,
             "category": feedback.category.asanaId,
             "osversion": feedback.osVersion,
-            "appversion": feedback.appVersion
+            "appversion": appVersion
         ]
 
         APIRequest.request(url: Self.feedbackURL, method: .post, parameters: parameters) { _, error in
