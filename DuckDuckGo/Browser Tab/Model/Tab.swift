@@ -284,7 +284,8 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         let configuration = webViewConfiguration ?? WKWebViewConfiguration()
 
         if #available(macOS 13.1, *) {
-            try? Self.loadWebExtension(for: extensionController, into: configuration)
+            // swiftlint:disable:next force_try
+            try! Self.loadWebExtension(for: extensionController, into: configuration)
         }
 
         configuration.applyStandardConfiguration(contentBlocking: privacyFeatures.contentBlocking)
