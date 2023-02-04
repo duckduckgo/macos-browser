@@ -287,7 +287,7 @@ extension NetworkProtectionStatusView {
         /// 
         func shareFeedback() {
             let feedbackFormURL = URL(string: "https://form.asana.com/?k=_wNLt6YcT5ILpQjDuW0Mxw&d=137249556945")!
-            NSWorkspace.shared.open(feedbackFormURL)
+            WindowControllersManager.shared.show(url: feedbackFormURL, newTab: true)
         }
     }
 }
