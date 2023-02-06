@@ -27,40 +27,40 @@ class BrowserProfileListTests: XCTestCase {
     func testWhenBrowserProfileHasURLWithNoLoginData_ThenHasLoginDataIsFalse() {
         let profileURL = profile(named: "Profile")
         let fileStore = FileStoreMock()
-        let profile = DataImport.BrowserProfile(profileURL: profileURL, fileStore: fileStore)
+        let profile = DataImport.BrowserProfile(browser: .firefox, profileURL: profileURL, fileStore: fileStore)
 
-        XCTAssertFalse(profile.hasLoginData)
+        XCTAssertFalse(profile.hasBrowserData)
     }
 
     func testWhenBrowserProfileHasURLWithChromiumLoginData_ThenHasLoginDataIsTrue() {
         let profileURL = profile(named: "Profile")
         let fileStore = FileStoreMock()
-        let profile = DataImport.BrowserProfile(profileURL: profileURL, fileStore: fileStore)
+        let profile = DataImport.BrowserProfile(browser: .chrome, profileURL: profileURL, fileStore: fileStore)
 
         fileStore.directoryStorage[profileURL.absoluteString] = ["Login Data"]
 
-        XCTAssertTrue(profile.hasLoginData)
+        XCTAssertTrue(profile.hasBrowserData)
     }
 
     func testWhenBrowserProfileHasURLWithFirefoxLoginData_ThenHasLoginDataIsTrue() {
         let profileURL = profile(named: "Profile")
         let fileStore = FileStoreMock()
-        let profile = DataImport.BrowserProfile(profileURL: profileURL, fileStore: fileStore)
+        let profile = DataImport.BrowserProfile(browser: .firefox, profileURL: profileURL, fileStore: fileStore)
 
         fileStore.directoryStorage[profileURL.absoluteString] = ["key4.db"]
-        XCTAssertFalse(profile.hasLoginData)
+        XCTAssertFalse(profile.hasBrowserData)
 
         fileStore.directoryStorage[profileURL.absoluteString] = ["logins.json"]
-        XCTAssertFalse(profile.hasLoginData)
+        XCTAssertFalse(profile.hasBrowserData)
 
         fileStore.directoryStorage[profileURL.absoluteString] = ["logins.json", "key4.db"]
-        XCTAssertTrue(profile.hasLoginData)
+        XCTAssertTrue(profile.hasBrowserData)
     }
 
     func testWhenGettingProfileName_AndProfileHasNoDetectedName_ThenTheDirectoryNameIsUsed() {
         let profileURL = profile(named: "Profile")
         let fileStore = FileStoreMock()
-        let profile = DataImport.BrowserProfile(profileURL: profileURL, fileStore: fileStore)
+        let profile = DataImport.BrowserProfile(browser: .firefox, profileURL: profileURL, fileStore: fileStore)
 
         XCTAssertEqual(profile.profileName, "Profile")
     }
@@ -78,7 +78,7 @@ class BrowserProfileListTests: XCTestCase {
         fileStore.storage["Preferences"] = chromiumPreferencesData
         fileStore.directoryStorage[profileURL.absoluteString] = ["Preferences"]
 
-        let profile = DataImport.BrowserProfile(profileURL: profileURL, fileStore: fileStore)
+        let profile = DataImport.BrowserProfile(browser: .chrome, profileURL: profileURL, fileStore: fileStore)
 
         XCTAssertEqual(profile.profileName, "ChromeProfile")
         XCTAssertTrue(profile.hasNonDefaultProfileName)
@@ -97,7 +97,7 @@ class BrowserProfileListTests: XCTestCase {
         fileStore.storage["Preferences"] = chromiumPreferencesData
         fileStore.directoryStorage[profileURL.absoluteString] = ["Preferences"]
 
-        let profile = DataImport.BrowserProfile(profileURL: profileURL, fileStore: fileStore)
+        let profile = DataImport.BrowserProfile(browser: .chrome, profileURL: profileURL, fileStore: fileStore)
 
         XCTAssertEqual(profile.profileName, "System Profile")
         XCTAssertFalse(profile.hasNonDefaultProfileName)

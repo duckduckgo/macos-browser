@@ -390,7 +390,8 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                 historyCoordinating.commitChanges(url: oldUrl)
             }
             error = nil
-            userInteractionDialog = nil
+            dismissPresentedAlert()
+
             Task {
                 await reloadIfNeeded(shouldLoadInBackground: true)
             }
@@ -398,7 +399,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             if let title = content.title {
                 self.title = title
             }
-
         }
     }
 
@@ -789,6 +789,15 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         }
     }
 
+    private func dismissPresentedAlert() {
+        if let userInteractionDialog {
+            switch userInteractionDialog.dialog {
+            case .jsDialog: self.userInteractionDialog = nil
+            default: break
+            }
+        }
+    }
+
     // MARK: - Favicon
 
     @Published var favicon: NSImage?
@@ -1137,12 +1146,12 @@ extension Tab: WKNavigationDelegate {
 
         let isLinkActivated = webView === sourceWebView
             && !isRedirect
-            && (navigationAction.navigationType == .linkActivated || navigationAction.isUserInitiated)
+            && (navigationAction.navigationType == .linkActivated || (navigationAction.navigationType == .other && navigationAction.isUserInitiated))
 
         let isNavigatingAwayFromPinnedTab: Bool = {
             let isNavigatingToAnotherDomain = navigationAction.request.url?.host != url?.host
             let isPinned = pinnedTabsManager.isTabPinned(self)
-            return isLinkActivated && isPinned && isNavigatingToAnotherDomain
+            return isLinkActivated && isPinned && isNavigatingToAnotherDomain && navigationAction.isTargetingMainFrame
         }()
 
         let isMiddleButtonClicked = navigationAction.buttonNumber == Constants.webkitMiddleClick

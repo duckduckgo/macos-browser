@@ -56,9 +56,16 @@ jobs:
             flavor: Non-Sandbox
           - scheme: DuckDuckGo Privacy Browser App Store
             flavor: Sandbox
+          - active-arch: YES
+            flavor: Non-Sandbox
+          - active-arch: NO
+            flavor: Sandbox
 
     runs-on: macos-12
     timeout-minutes: 30
+
+    outputs:
+      private-api-check-report: ${{ steps.private-api.outputs.report }}
 
     steps:
     - name: Register SSH keys for submodules access
@@ -77,15 +84,44 @@ jobs:
       run: sudo xcode-select -s /Applications/Xcode_14.1.app/Contents/Developer
 
     - name: Install xcbeautify
+      continue-on-error: true
       run: brew install xcbeautify
 
     - name: Build and test
       run: |
         set -o pipefail && xcodebuild test \
           -scheme "${{ matrix.scheme }}" \
+          -derivedDataPath "derived-data" \
           -configuration "CI" \
           ENABLE_TESTABILITY=true \
+          ONLY_ACTIVE_ARCH=${{ matrix.active-arch }} \
           | xcbeautify --report junit --report-path . --junit-report-filename unittests-${{ matrix.flavor }}.xml
+
+    - name: Check private API usage
+      id: private-api
+      run: |
+        if [[ ${{ matrix.flavor }} != "Sandbox" ]]; then
+          echo "Skipping private API usage check for ${{ matrix.flavor }} build"
+        else
+          binary_path="derived-data/Build/Products/CI/DuckDuckGo App Store.app/Contents/MacOS/DuckDuckGo App Store"
+          ./scripts/find_private_symbols.sh "${binary_path}" | tee private_api_report.txt
+
+          cat private_api_report.txt >> $GITHUB_STEP_SUMMARY
+
+          output=$(cat private_api_report.txt)
+          output="${output//$'\n'/%0A}" # step outputs can't contain newline characters
+
+          #
+          # After a non-zero exit code is returned in GHA we can't do too much,
+          # e.g. set step outputs, so the script always returns 0 and we can tell
+          # that it's a failure if there's more than 1 line in the output.
+          #
+          report_num_lines=$(wc -l < private_api_report.txt | tr -d '[:space:]')
+          if [[ $report_num_lines > 1 ]]; then
+            echo "report=${output}" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+        fi
 
     - name: Publish unit tests report
       uses: mikepenz/action-junit-report@v3
@@ -93,6 +129,14 @@ jobs:
       with:
         check_name: "Test Report: ${{ matrix.flavor }}"
         report_paths: unittests-${{ matrix.flavor }}.xml
+
+  private-api:
+    name: Private API Report
+    needs: unit-tests
+    if: ${{ success() || needs.unit-tests.outputs.private-api-check-report }}
+    uses: ./.github/workflows/private_api_report.yml
+    with:
+      report: ${{ needs.unit-tests.outputs.private-api-check-report }}
 
   verify-autoconsent-bundle:
     name: 'Verify autoconsent bundle'
