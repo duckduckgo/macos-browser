@@ -29,7 +29,9 @@ extension AppDelegate {
     // MARK: - DuckDuckGo
 
     @IBAction func checkForUpdates(_ sender: Any?) {
+#if !APPSTORE
         updateController.checkForUpdates(sender)
+#endif
     }
 
     // MARK: - File
@@ -140,6 +142,15 @@ extension AppDelegate {
         WindowsManager.openNewWindow(with: tabCollectionViewModel)
     }
 
+    @IBAction func openAbout(_ sender: Any?) {
+#if APPSTORE
+        let options = [NSApplication.AboutPanelOptionKey.applicationName: UserText.duckDuckGoForMacAppStore]
+#else
+        let options: [NSApplication.AboutPanelOptionKey: Any] = [:]
+#endif
+        NSApp.orderFrontStandardAboutPanel(options: options)
+    }
+
     @IBAction func openImportBrowserDataWindow(_ sender: Any?) {
         DataImportViewController.show()
     }
@@ -165,7 +176,11 @@ extension AppDelegate {
             accessoryContainer.frame.size = accessoryContainer.fittingSize
 
             savePanel.accessoryView = accessoryContainer
-            savePanel.allowedFileTypes = ["csv"]
+            if #available(macOS 11.0, *) {
+                savePanel.allowedContentTypes = [.commaSeparatedText]
+            } else {
+                savePanel.allowedFileTypes = ["csv"]
+            }
 
             savePanel.beginSheetModal(for: window) { response in
                 guard response == .OK, let selectedURL = savePanel.url else { return }
@@ -189,7 +204,12 @@ extension AppDelegate {
 
         let savePanel = NSSavePanel()
         savePanel.nameFieldStringValue = "DuckDuckGo \(UserText.exportBookmarksFileNameSuffix)"
-        savePanel.allowedFileTypes = ["html"]
+
+        if #available(macOS 11.0, *) {
+            savePanel.allowedContentTypes = [.html]
+        } else {
+            savePanel.allowedFileTypes = ["html"]
+        }
 
         savePanel.beginSheetModal(for: window) { response in
             guard response == .OK, let selectedURL = savePanel.url else { return }

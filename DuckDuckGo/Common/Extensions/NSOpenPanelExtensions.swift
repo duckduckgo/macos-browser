@@ -17,6 +17,7 @@
 //
 
 import AppKit
+import UniformTypeIdentifiers
 
 extension NSOpenPanel {
 
@@ -37,10 +38,14 @@ extension NSOpenPanel {
 
         panel.directoryURL = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Desktop")
         panel.canChooseFiles = true
-        panel.allowedFileTypes = [allowedExtension]
+        if #available(macOS 11.0, *) {
+            panel.allowedContentTypes = [UniformTypeIdentifiers.UTType.init(filenameExtension: allowedExtension)].compactMap { $0 }
+        } else {
+            panel.allowedFileTypes = [allowedExtension]
+        }
+
         panel.canChooseDirectories = false
 
         return panel
     }
-
 }

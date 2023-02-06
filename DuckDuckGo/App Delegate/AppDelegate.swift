@@ -51,7 +51,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private(set) var stateRestorationManager: AppStateRestorationManager!
     private var grammarFeaturesManager = GrammarFeaturesManager()
     private let crashReporter = CrashReporter()
+
+#if !APPSTORE
     let updateController = UpdateController()
+#endif
 
     var appUsageActivityMonitor: AppUsageActivityMonitor?
 
@@ -112,7 +115,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             fileStore = EncryptedFileStore()
         }
         stateRestorationManager = AppStateRestorationManager(fileStore: fileStore)
+#if !APPSTORE
         stateRestorationManager.subscribeToAutomaticAppRelaunching(using: updateController.willRelaunchAppPublisher)
+#endif
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
@@ -148,6 +153,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         crashReporter.checkForNewReports()
 
         urlEventHandler.applicationDidFinishLaunching()
+
+        subscribeToEmailProtectionStatusNotifications()
 
         UserDefaultsWrapper<Any>.clearRemovedKeys()
     }
@@ -185,6 +192,25 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func applyPreferredTheme() {
         let appearancePreferences = AppearancePreferences()
         appearancePreferences.updateUserInterfaceStyle()
+    }
+
+    private func subscribeToEmailProtectionStatusNotifications() {
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(emailDidSignInNotification(_:)),
+                                               name: .emailDidSignIn,
+                                               object: nil)
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(emailDidSignOutNotification(_:)),
+                                               name: .emailDidSignOut,
+                                               object: nil)
+    }
+
+    @objc private func emailDidSignInNotification(_ notification: Notification) {
+        Pixel.fire(.emailEnabled)
+    }
+
+    @objc private func emailDidSignOutNotification(_ notification: Notification) {
+        Pixel.fire(.emailDisabled)
     }
 
 }

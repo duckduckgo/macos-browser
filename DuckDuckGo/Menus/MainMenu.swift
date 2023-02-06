@@ -100,10 +100,20 @@ final class MainMenu: NSMenu {
     override func update() {
         super.update()
 
+        // Make sure Spotlight search is part of Help menu
+        if NSApplication.shared.helpMenu != helpMenuItem?.submenu {
+            NSApplication.shared.helpMenu = helpMenuItem?.submenu
+        }
+
         if !WKWebView.canPrint {
             printMenuItem?.removeFromParent()
             printSeparatorItem?.removeFromParent()
         }
+
+#if APPSTORE
+        checkForUpdatesMenuItem?.removeFromParent()
+        checkForUpdatesSeparatorItem?.removeFromParent()
+#endif
 
         sharingMenu.title = shareMenuItem.title
         shareMenuItem.submenu = sharingMenu

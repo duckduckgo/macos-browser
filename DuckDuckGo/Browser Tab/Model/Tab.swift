@@ -189,7 +189,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                      title: String? = nil,
                      error: Error? = nil,
                      favicon: NSImage? = nil,
-                     sessionStateData: Data? = nil,
                      interactionStateData: Data? = nil,
                      parentTab: Tab? = nil,
                      shouldLoadInBackground: Bool = false,
@@ -216,7 +215,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                   title: title,
                   error: error,
                   favicon: favicon,
-                  sessionStateData: sessionStateData,
                   interactionStateData: interactionStateData,
                   parentTab: parentTab,
                   shouldLoadInBackground: shouldLoadInBackground,
@@ -241,7 +239,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
          title: String?,
          error: Error?,
          favicon: NSImage?,
-         sessionStateData: Data?,
          interactionStateData: Data?,
          parentTab: Tab?,
          shouldLoadInBackground: Bool,
@@ -264,7 +261,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         self.favicon = favicon
         self.parentTab = parentTab
         self._canBeClosedWithBack = canBeClosedWithBack
-        self.sessionStateData = sessionStateData
         self.interactionStateData = interactionStateData
         self.lastSelectedAt = lastSelectedAt
         self.currentDownload = currentDownload
@@ -389,11 +385,13 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     @Published private(set) var content: TabContent {
         didSet {
             handleFavicon()
-            invalidateSessionStateData()
+            invalidateInteractionStateData()
             if let oldUrl = oldValue.url {
                 historyCoordinating.commitChanges(url: oldUrl)
             }
             error = nil
+            dismissPresentedAlert()
+
             Task {
                 await reloadIfNeeded(shouldLoadInBackground: true)
             }
@@ -401,7 +399,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             if let title = content.title {
                 self.title = title
             }
-
         }
     }
 
@@ -455,27 +452,12 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         return _canBeClosedWithBack
     }
 
-    @available(macOS, obsoleted: 12.0, renamed: "interactionStateData")
-    var sessionStateData: Data?
     var interactionStateData: Data?
 
-    func invalidateSessionStateData() {
-        sessionStateData = nil
+    func invalidateInteractionStateData() {
         interactionStateData = nil
     }
 
-    func getActualSessionStateData() -> Data? {
-        if let sessionStateData = sessionStateData {
-            return sessionStateData
-        }
-
-        guard webView.url != nil else { return nil }
-        // collect and cache actual SessionStateData on demand and store until invalidated
-        self.sessionStateData = (try? webView.sessionStateData())
-        return self.sessionStateData
-    }
-
-    @available(macOS 12, *)
     func getActualInteractionStateData() -> Data? {
         if let interactionStateData = interactionStateData {
             return interactionStateData
@@ -483,7 +465,11 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
         guard webView.url != nil else { return nil }
 
-        self.interactionStateData = (webView.interactionState as? Data)
+        if #available(macOS 12.0, *) {
+            self.interactionStateData = (webView.interactionState as? Data)
+        } else {
+            self.interactionStateData = try? webView.sessionStateData()
+        }
 
         return self.interactionStateData
     }
@@ -575,6 +561,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         if privatePlayer.goBackSkippingLastItemIfNeeded(for: webView) {
             return
         }
+        userInteractionDialog = nil
         webView.goBack()
     }
 
@@ -592,6 +579,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     }
 
     func reload() {
+        userInteractionDialog = nil
         currentDownload = nil
         if let error = error, let failingUrl = error.failingUrl {
             webView.load(failingUrl)
@@ -670,13 +658,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             })
         }()
         if shouldLoadURL(url, shouldLoadInBackground: shouldLoadInBackground) {
-            let didRestore: Bool
-
-            if #available(macOS 12.0, *) {
-                didRestore = restoreInteractionStateDataIfNeeded() || restoreSessionStateDataIfNeeded()
-            } else {
-                didRestore = restoreSessionStateDataIfNeeded()
-            }
+            let didRestore = restoreInteractionStateDataIfNeeded()
 
             if privatePlayer.goBackAndLoadURLIfNeeded(for: self) {
                 return
@@ -736,26 +718,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     }
 
     @MainActor
-    @available(macOS, obsoleted: 12.0, renamed: "restoreInteractionStateDataIfNeeded")
-    private func restoreSessionStateDataIfNeeded() -> Bool {
-        var didRestore: Bool = false
-        if let sessionStateData = self.sessionStateData {
-            if contentURL.isFileURL {
-                _ = webView.loadFileURL(contentURL, allowingReadAccessTo: URL(fileURLWithPath: "/"))
-            }
-            do {
-                try webView.restoreSessionState(from: sessionStateData)
-                didRestore = true
-            } catch {
-                os_log("Tab:setupWebView could not restore session state %s", "\(error)")
-            }
-        }
-
-        return didRestore
-    }
-
-    @MainActor
-    @available(macOS 12, *)
     private func restoreInteractionStateDataIfNeeded() -> Bool {
         var didRestore: Bool = false
         if let interactionStateData = self.interactionStateData {
@@ -763,8 +725,17 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                 _ = webView.loadFileURL(contentURL, allowingReadAccessTo: URL(fileURLWithPath: "/"))
             }
 
-            webView.interactionState = interactionStateData
-            didRestore = true
+            if #available(macOS 12.0, *) {
+                webView.interactionState = interactionStateData
+                didRestore = true
+            } else {
+                do {
+                    try webView.restoreSessionState(from: interactionStateData)
+                    didRestore = true
+                } catch {
+                    os_log("Tab:setupWebView could not restore session state %s", "\(error)")
+                }
+            }
         }
 
         return didRestore
@@ -814,6 +785,15 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             await reloadIfNeeded(shouldLoadInBackground: shouldLoadInBackground)
             if !shouldLoadInBackground {
                 addHomePageToWebViewIfNeeded()
+            }
+        }
+    }
+
+    private func dismissPresentedAlert() {
+        if let userInteractionDialog {
+            switch userInteractionDialog.dialog {
+            case .jsDialog: self.userInteractionDialog = nil
+            default: break
             }
         }
     }
@@ -992,7 +972,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                                 allowlisted: isAllowlisted,
                                 denylisted: false)
     }
-
 }
 
 extension Tab: UserContentControllerDelegate {
@@ -1052,7 +1031,7 @@ extension Tab: ContentBlockerRulesUserScriptDelegate {
     }
 
     func contentBlockerRulesUserScript(_ script: ContentBlockerRulesUserScript, detectedTracker tracker: DetectedRequest) {
-        guard let url = webView.url else { return }
+        guard let url = URL(string: tracker.pageUrl) else { return }
 
         privacyInfo?.trackerInfo.addDetectedTracker(tracker, onPageWithURL: url)
         historyCoordinating.addDetectedTracker(tracker, onURL: url)
@@ -1167,12 +1146,12 @@ extension Tab: WKNavigationDelegate {
 
         let isLinkActivated = webView === sourceWebView
             && !isRedirect
-            && (navigationAction.navigationType == .linkActivated || navigationAction.isUserInitiated)
+            && (navigationAction.navigationType == .linkActivated || (navigationAction.navigationType == .other && navigationAction.isUserInitiated))
 
         let isNavigatingAwayFromPinnedTab: Bool = {
             let isNavigatingToAnotherDomain = navigationAction.request.url?.host != url?.host
             let isPinned = pinnedTabsManager.isTabPinned(self)
-            return isLinkActivated && isPinned && isNavigatingToAnotherDomain
+            return isLinkActivated && isPinned && isNavigatingToAnotherDomain && navigationAction.isTargetingMainFrame
         }()
 
         let isMiddleButtonClicked = navigationAction.buttonNumber == Constants.webkitMiddleClick
@@ -1440,7 +1419,7 @@ extension Tab: WKNavigationDelegate {
         // Unnecessary assignment triggers publishing
         if error != nil { error = nil }
 
-        invalidateSessionStateData()
+        invalidateInteractionStateData()
         resetDashboardInfo()
         linkProtection.cancelOngoingExtraction()
         linkProtection.setMainFrameUrl(webView.url)
@@ -1451,7 +1430,7 @@ extension Tab: WKNavigationDelegate {
     @MainActor
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         isBeingRedirected = false
-        invalidateSessionStateData()
+        invalidateInteractionStateData()
         webViewDidFinishNavigationPublisher.send()
         if isAMPProtectionExtracting { isAMPProtectionExtracting = false }
         linkProtection.setMainFrameUrl(nil)
@@ -1466,7 +1445,7 @@ extension Tab: WKNavigationDelegate {
         //        hasError = true
 
         isBeingRedirected = false
-        invalidateSessionStateData()
+        invalidateInteractionStateData()
         linkProtection.setMainFrameUrl(nil)
         referrerTrimming.onFailedNavigation()
         self.adClickAttribution?.detection.onDidFailNavigation()

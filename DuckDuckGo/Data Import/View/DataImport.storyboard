@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="21225" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="21507" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21225"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21507"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -771,8 +771,8 @@ Gw
                                                                         </textFieldCell>
                                                                     </textField>
                                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="GhO-x5-D2b">
-                                                                        <rect key="frame" x="200" y="3" width="119" height="15"/>
-                                                                        <textFieldCell key="cell" lineBreakMode="clipping" title="Export Passwords" allowsEditingTextAttributes="YES" id="v7r-GA-A5Y">
+                                                                        <rect key="frame" x="200" y="3" width="139" height="15"/>
+                                                                        <textFieldCell key="cell" lineBreakMode="clipping" title="Export All Passwords" allowsEditingTextAttributes="YES" id="v7r-GA-A5Y">
                                                                             <font key="font" size="13" name="SFProText-Semibold"/>
                                                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -1652,6 +1652,7 @@ Gw
                         <outlet property="lastPassInfoView" destination="BKA-tg-ogp" id="XNo-RX-ghY"/>
                         <outlet property="onePasswordInfoView" destination="p9R-Ta-H50" id="2zu-0E-0ss"/>
                         <outlet property="safariInfoView" destination="EN8-1q-QQA" id="Vey-tT-Utr"/>
+                        <outlet property="safariSettingsTextField" destination="3Kn-7N-pW9" id="4w2-Qr-0mY"/>
                         <outlet property="selectFileButton" destination="A1C-Th-KJZ" id="GdO-PB-u8I"/>
                         <outlet property="selectedFileContainer" destination="BED-XT-ikD" id="95q-E3-ezP"/>
                         <outlet property="selectedFileLabel" destination="cam-am-7aM" id="puL-BB-PUx"/>

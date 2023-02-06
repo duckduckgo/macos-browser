@@ -95,7 +95,7 @@ function symbolicateCrashFile(crashFile, lines) {
 
     const binaryImagesLineIndex = lines.findIndex((l) => l.startsWith("Binary Images:"));
     let lineIndex = binaryImagesLineIndex + 1;
-    const binaryImageRegex = /\s+0x([0-9a-fA-F]+) - \s+0x[0-9a-fA-F]+.*com\.duckduckgo\.macos\.browser/;
+    const binaryImageRegex = /\s+0x([0-9a-fA-F]+) - \s+0x[0-9a-fA-F]+.*com\.duckduckgo\.(macos\.browser|mobile\.ios)/;
 
     let ddgBaseAddress;
     while (lineIndex < lines.length) {
@@ -114,7 +114,7 @@ function symbolicateCrashFile(crashFile, lines) {
     }
 
     lineIndex = 0;
-    const stackFrameRegex = /\d+\s+com.duckduckgo.macos.browser\s+(0x[0-9a-fA-F]+) (0x[0-9a-fA-F]+ \+ \d+)/;
+    const stackFrameRegex = /\d+\s+com\.duckduckgo\.(macos\.browser|mobile\.ios)\s+(0x[0-9a-fA-F]+) (0x[0-9a-fA-F]+ \+ \d+)/;
     let changes = [];
 
     while (lineIndex < binaryImagesLineIndex) {

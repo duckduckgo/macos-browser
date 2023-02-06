@@ -28,7 +28,7 @@ class FirefoxDataImporterTests: XCTestCase {
         let bookmarkImporter = MockBookmarkImporter(importBookmarks: { _, _ in .init(successful: 0, duplicates: 0, failed: 0) })
         let importer = FirefoxDataImporter(loginImporter: loginImporter, bookmarkImporter: bookmarkImporter, faviconManager: faviconManager)
 
-        let summary = await importer.importData(types: [], from: .init(profileURL: resourceURL()))
+        let summary = await importer.importData(types: [], from: .init(browser: .firefox, profileURL: resourceURL()))
 
         if case let .success(summary) = summary {
             XCTAssert(summary.isEmpty)
@@ -43,7 +43,7 @@ class FirefoxDataImporterTests: XCTestCase {
         let bookmarkImporter = MockBookmarkImporter(importBookmarks: { _, _ in .init(successful: 1, duplicates: 2, failed: 3) })
         let importer = FirefoxDataImporter(loginImporter: loginImporter, bookmarkImporter: bookmarkImporter, faviconManager: faviconManager)
 
-        let summary = await importer.importData(types: [.bookmarks], from: .init(profileURL: resourceURL()))
+        let summary = await importer.importData(types: [.bookmarks], from: .init(browser: .firefox, profileURL: resourceURL()))
 
         if case let .success(summary) = summary {
             XCTAssertEqual(summary.bookmarksResult?.successful, 1)
@@ -62,7 +62,7 @@ class FirefoxDataImporterTests: XCTestCase {
                                                     importBookmarks: { _, _ in .init(successful: 0, duplicates: 0, failed: 0) })
         let importer = FirefoxDataImporter(loginImporter: loginImporter, bookmarkImporter: bookmarkImporter, faviconManager: faviconManager)
 
-        let summary = await importer.importData(types: [.bookmarks], from: .init(profileURL: resourceURL()))
+        let summary = await importer.importData(types: [.bookmarks], from: .init(browser: .firefox, profileURL: resourceURL()))
 
         if case let .failure(error) = summary {
             XCTAssertEqual(error, .bookmarks(.cannotReadFile))

@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import BrowserServicesKit
 import os.log
 
 final class StatisticsLoader {
@@ -26,11 +27,13 @@ final class StatisticsLoader {
     static let shared = StatisticsLoader()
 
     private let statisticsStore: StatisticsStore
+    private let emailManager: EmailManager
     private let parser = AtbParser()
     private var isAppRetentionRequestInProgress = false
 
-    init(statisticsStore: StatisticsStore = LocalStatisticsStore()) {
+    init(statisticsStore: StatisticsStore = LocalStatisticsStore(), emailManager: EmailManager = EmailManager()) {
         self.statisticsStore = statisticsStore
+        self.emailManager = emailManager
     }
 
     func refreshRetentionAtb(isSearch: Bool, completion: @escaping Completion = {}) {
@@ -138,7 +141,7 @@ final class StatisticsLoader {
 
         os_log("Requesting search retention ATB", log: .atb, type: .debug)
 
-        let url = URL.searchAtb(atbWithVariant: atbWithVariant, setAtb: searchRetentionAtb)
+        let url = URL.searchAtb(atbWithVariant: atbWithVariant, setAtb: searchRetentionAtb, isSignedIntoEmailProtection: emailManager.isSignedIn)
         APIRequest.request(url: url) { response, error in
             DispatchQueue.main.async {
                 if let error = error {

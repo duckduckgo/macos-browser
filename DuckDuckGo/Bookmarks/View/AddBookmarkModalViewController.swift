@@ -23,7 +23,12 @@ protocol AddBookmarkModalViewControllerDelegate: AnyObject {
 
     func addBookmarkViewController(_ viewController: AddBookmarkModalViewController, addedBookmarkWithTitle title: String, url: URL)
     func addBookmarkViewController(_ viewController: AddBookmarkModalViewController, saved bookmark: Bookmark, newURL: URL)
+    func addBookmarkViewControllerWillClose()
 
+}
+
+extension AddBookmarkModalViewControllerDelegate {
+    func addBookmarkViewControllerWillClose() {}
 }
 
 final class AddBookmarkModalViewController: NSViewController {
@@ -98,6 +103,7 @@ final class AddBookmarkModalViewController: NSViewController {
     }
 
     @IBAction private func cancel(_ sender: NSButton) {
+        delegate?.addBookmarkViewControllerWillClose()
         dismiss()
     }
 
@@ -113,6 +119,7 @@ final class AddBookmarkModalViewController: NSViewController {
             delegate?.addBookmarkViewController(self, addedBookmarkWithTitle: bookmarkTitleTextField.stringValue, url: url)
         }
 
+        delegate?.addBookmarkViewControllerWillClose()
         dismiss()
     }
 

@@ -104,6 +104,12 @@ extension Pixel {
         case adClickAttributionDetected
         case adClickAttributionActive
 
+        case emailEnabled
+        case emailDisabled
+        case emailUserPressedUseAddress
+        case emailUserPressedUseAlias
+        case emailUserCreatedAlias
+
         case jsPixel(_ pixel: AutofillUserScript.JSPixel)
 
         case debug(event: Debug, error: Error? = nil)
@@ -192,6 +198,8 @@ extension Pixel {
             case bitwardenSendingOfMessageFailed
             case bitwardenSharedKeyInjectionFailed
 
+            case updaterAborted
+
         }
 
     }
@@ -246,8 +254,20 @@ extension Pixel.Event {
         case .adClickAttributionActive:
             return "m_mac_ad_click_active"
 
-        case .jsPixel(pixel: let pixel):
-            return "m_mac_\(pixel.pixelName)"
+        // Deliberately omit the `m_mac_` prefix in order to format these pixels the same way as other platforms
+        case .emailEnabled: return "email_enabled_macos_desktop"
+        case .emailDisabled: return "email_disabled_macos_desktop"
+        case .emailUserPressedUseAddress: return "email_filled_main_macos_desktop"
+        case .emailUserPressedUseAlias: return "email_filled_random_macos_desktop"
+        case .emailUserCreatedAlias: return "email_generated_button_macos_desktop"
+
+        case .jsPixel(let pixel):
+            // Email pixels deliberately avoid using the `m_mac_` prefix.
+            if pixel.isEmailPixel {
+                return "\(pixel.pixelName)_macos_desktop"
+            } else {
+                return "m_mac_\(pixel.pixelName)"
+            }
         }
     }
 }
@@ -412,6 +432,9 @@ extension Pixel.Event.Debug {
             return "bitwarden_sending_of_message_failed"
         case .bitwardenSharedKeyInjectionFailed:
             return "bitwarden_shared_key_injection_failed"
+
+        case .updaterAborted:
+            return "updater_aborted"
         }
     }
 }
