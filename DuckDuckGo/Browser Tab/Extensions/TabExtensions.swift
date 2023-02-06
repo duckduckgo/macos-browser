@@ -49,6 +49,11 @@ protocol TabExtension {
     associatedtype PublicProtocol
     func getPublicProtocol() -> PublicProtocol
 }
+extension TabExtension {
+    static var publicProtocolType: Any.Type {
+        PublicProtocol.self
+    }
+}
 
 // Implement these methods for Extension State Restoration
 protocol NSCodingExtension: TabExtension {
@@ -97,7 +102,7 @@ extension TabExtensionsBuilder {
         add {
             AdClickAttributionTabExtension(inheritedAttribution: args.inheritedAttribution,
                                            userContentControllerProvider: args.userContentControllerProvider,
-                                           contentBlockerRulesScriptPublisher: userScripts.map(\.?.contentBlockerRulesScript),
+                                           contentBlockerRulesScriptPublisher: userScripts.map { $0?.contentBlockerRulesScript },
                                            trackerInfoPublisher: trackerInfoPublisher,
                                            dependencies: dependencies.privacyFeatures.contentBlocking)
         }
