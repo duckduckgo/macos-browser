@@ -86,13 +86,10 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
         }]
     }
 
-    override func tearDown() async throws {
-        TestTabExtensionsBuilder.shared = .default
-        MockPrivacyConfiguration.isFeatureKeyEnabled = nil
-    }
-
     override func tearDown() {
         server.stop()
+        TestTabExtensionsBuilder.shared = .default
+        MockPrivacyConfiguration.isFeatureKeyEnabled = nil
     }
 
     // MARK: - Tests
