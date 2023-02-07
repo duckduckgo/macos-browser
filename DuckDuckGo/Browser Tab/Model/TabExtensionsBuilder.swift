@@ -165,10 +165,10 @@ struct TabExtensionBuildingBlock<T> {
 
 #else
 
-    let value: Extension
+    let value: T
 
-    init(_ makeTabExtension: @escaping () -> Extension) {
-        self.value = makeTabExtension()
+    init<Extension: TabExtension>(_ makeTabExtension: @escaping () -> Extension) where Extension.PublicProtocol == T {
+        self.value = makeTabExtension().getPublicProtocol()
     }
 
 #endif
