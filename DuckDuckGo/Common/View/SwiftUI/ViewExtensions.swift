@@ -24,7 +24,7 @@ enum ViewVisibility: CaseIterable {
     case visible, // view is fully visible
          invisible, // view is hidden but takes up space
          gone // view is fully removed from the view hierarchy
-    
+
 }
 
 extension View {

@@ -28,7 +28,7 @@ protocol SaveIdentityDelegate: AnyObject {
 }
 
 final class SaveIdentityViewController: NSViewController {
-    
+
     enum Constants {
         static let storyboardName = "PasswordManager"
         static let identifier = "SaveIdentity"
@@ -41,32 +41,32 @@ final class SaveIdentityViewController: NSViewController {
 
         return controller
     }
-    
+
     @IBOutlet private var identityStackView: NSStackView!
-    
+
     weak var delegate: SaveIdentityDelegate?
-    
+
     private var identity: SecureVaultModels.Identity?
     private var appearanceCancellable: AnyCancellable?
 
     // MARK: - Actions
-    
+
     @IBAction func onNotNowClicked(sender: NSButton) {
         self.delegate?.shouldCloseSaveIdentityViewController(self)
     }
-    
+
     @IBAction func onSaveClicked(sender: NSButton) {
         defer {
             self.delegate?.shouldCloseSaveIdentityViewController(self)
         }
-        
+
         guard var identity = identity else {
             assertionFailure("Tried to save identity, but the view controller didn't have one")
             return
         }
-        
+
         identity.title = UserText.pmDefaultIdentityAutofillTitle
-        
+
         do {
             try SecureVaultFactory.default.makeVault(errorReporter: SecureVaultErrorReporter.shared).storeIdentity(identity)
             Pixel.fire(.autofillItemSaved(kind: .identity))
@@ -74,17 +74,17 @@ final class SaveIdentityViewController: NSViewController {
             os_log("%s:%s: failed to store identity %s", type: .error, className, #function, error.localizedDescription)
         }
     }
-    
+
     @IBAction func onOpenPreferencesClicked(sender: NSButton) {
         WindowControllersManager.shared.showPreferencesTab()
         self.delegate?.shouldCloseSaveIdentityViewController(self)
     }
-    
+
     // MARK: - Public
-    
+
     func saveIdentity(_ identity: SecureVaultModels.Identity) {
         self.identity = identity
-        
+
         buildStackView(from: identity)
     }
 
@@ -95,9 +95,9 @@ final class SaveIdentityViewController: NSViewController {
 
         appearanceCancellable = view.subscribeForAppApperanceUpdates()
     }
-    
+
     // MARK: - Private
-    
+
     private func buildStackView(from identity: SecureVaultModels.Identity) {
 
         // Placeholder views are used in the Storyboard, which need to be removed before laying out the correct views.
@@ -106,23 +106,23 @@ final class SaveIdentityViewController: NSViewController {
         }
 
         identityStackView.addArrangedSubview(NSTextField.optionalLabel(titled: identity.longFormattedName))
-        
+
         identityStackView.setCustomSpacingAfterLastView(20)
-        
+
         identityStackView.addArrangedSubview(NSTextField.optionalLabel(titled: identity.addressStreet))
         identityStackView.addArrangedSubview(NSTextField.optionalLabel(titled: identity.addressStreet2))
         identityStackView.addArrangedSubview(NSTextField.optionalLabel(titled: identity.addressCity))
         identityStackView.addArrangedSubview(NSTextField.optionalLabel(titled: identity.addressProvince))
         identityStackView.addArrangedSubview(NSTextField.optionalLabel(titled: identity.addressPostalCode))
         identityStackView.addArrangedSubview(NSTextField.optionalLabel(titled: identity.addressCountryCode))
-        
+
         identityStackView.setCustomSpacingAfterLastView(20)
-        
+
         identityStackView.addArrangedSubview(NSTextField.optionalLabel(titled: identity.homePhone))
         identityStackView.addArrangedSubview(NSTextField.optionalLabel(titled: identity.mobilePhone))
-        
+
         identityStackView.setCustomSpacingAfterLastView(20)
-        
+
         identityStackView.addArrangedSubview(NSTextField.optionalLabel(titled: identity.emailAddress))
 
     }

@@ -57,7 +57,7 @@ final class CrashReportReader {
 
         return creationDate > lastCheckDate && creationDate < Date()
     }
-    
+
     private func crashReport(from url: URL) -> CrashReport? {
         switch url.pathExtension {
         case LegacyCrashReport.fileExtension: return LegacyCrashReport(url: url)

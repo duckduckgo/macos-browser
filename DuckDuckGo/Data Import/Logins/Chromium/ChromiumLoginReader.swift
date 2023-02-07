@@ -32,6 +32,11 @@ final class ChromiumLoginReader {
         case failedToTemporarilyCopyDatabase
     }
 
+    enum LoginDataFileName: String, CaseIterable {
+        case loginData = "Login Data"
+        case loginDataForAccount = "Login Data for Account"
+    }
+
     private let chromiumLocalLoginDirectoryURL: URL
     private let chromiumGoogleAccountLoginDirectoryURL: URL
     private let processName: String
@@ -46,8 +51,8 @@ final class ChromiumLoginReader {
          processName: String,
          decryptionKey: String? = nil,
          decryptionKeyPrompt: ChromiumKeychainPrompting = ChromiumKeychainPrompt()) {
-        self.chromiumLocalLoginDirectoryURL = chromiumDataDirectoryURL.appendingPathComponent("/Login Data")
-        self.chromiumGoogleAccountLoginDirectoryURL = chromiumDataDirectoryURL.appendingPathComponent("/Login Data For Account")
+        self.chromiumLocalLoginDirectoryURL = chromiumDataDirectoryURL.appendingPathComponent(LoginDataFileName.loginData.rawValue)
+        self.chromiumGoogleAccountLoginDirectoryURL = chromiumDataDirectoryURL.appendingPathComponent(LoginDataFileName.loginDataForAccount.rawValue)
         self.processName = processName
         self.decryptionKey = decryptionKey
         self.decryptionKeyPrompt = decryptionKeyPrompt
@@ -55,12 +60,12 @@ final class ChromiumLoginReader {
 
     func readLogins() -> Result<[ImportedLoginCredential], ChromiumLoginReader.ImportError> {
         let key: String
-        
+
         if let decryptionKey = decryptionKey {
             key = decryptionKey
         } else {
             let keyPromptResult = decryptionKeyPrompt.promptForChromiumPasswordKeychainAccess(processName: processName)
-            
+
             switch keyPromptResult {
             case .password(let passwordString): key = passwordString
             case .failedToDecodePasswordData: return .failure(.failedToDecodePasswordData)
@@ -68,14 +73,14 @@ final class ChromiumLoginReader {
             case .keychainError(let status): return .failure(.decryptionKeyAccessFailed(status))
             }
         }
-        
+
         guard let derivedKey = deriveKey(from: key) else {
             return .failure(.decryptionFailed)
         }
 
         return readLogins(using: derivedKey)
     }
-    
+
     private func readLogins(using key: Data) -> Result<[ImportedLoginCredential], ChromiumLoginReader.ImportError> {
         let loginFileURLs = [chromiumLocalLoginDirectoryURL, chromiumGoogleAccountLoginDirectoryURL]
             .filter { FileManager.default.fileExists(atPath: $0.path) }
@@ -88,7 +93,7 @@ final class ChromiumLoginReader {
 
         for loginFileURL in loginFileURLs {
             let result = readLoginRows(loginFileURL: loginFileURL)
-            
+
             switch result {
             case .success(let newLoginRows):
                 loginRows.merge(newLoginRows) { existingRow, newRow in
@@ -106,17 +111,17 @@ final class ChromiumLoginReader {
         let importedLogins = createImportedLoginCredentials(from: loginRows.values, decryptionKey: key)
         return .success(importedLogins)
     }
-    
+
     private func readLoginRows(loginFileURL: URL) -> Result<[ChromiumCredential.ID: ChromiumCredential], ChromiumLoginReader.ImportError> {
         let temporaryFileHandler = TemporaryFileHandler(fileURL: loginFileURL)
         defer { temporaryFileHandler.deleteTemporarilyCopiedFile() }
-        
+
         guard let temporaryDatabaseURL = try? temporaryFileHandler.copyFileToTemporaryDirectory() else {
             return .failure(.failedToTemporarilyCopyDatabase)
         }
-        
+
         var loginRows = [ChromiumCredential.ID: ChromiumCredential]()
-        
+
         do {
             let queue = try DatabaseQueue(path: temporaryDatabaseURL.path)
             var rows = [ChromiumCredential]()
@@ -142,17 +147,17 @@ final class ChromiumLoginReader {
         } catch {
             return .failure(.databaseAccessFailed)
         }
-        
+
         return .success(loginRows)
     }
-    
+
     private func createImportedLoginCredentials(from credentials: Dictionary<ChromiumCredential.ID, ChromiumCredential>.Values,
                                                 decryptionKey: Data) -> [ImportedLoginCredential] {
         return credentials.compactMap { row -> ImportedLoginCredential? in
             guard let decryptedPassword = decrypt(passwordData: row.encryptedPassword, with: decryptionKey) else {
                 return nil
             }
-            
+
             return ImportedLoginCredential(
                 url: row.url,
                 username: row.username,
@@ -160,7 +165,7 @@ final class ChromiumLoginReader {
             )
         }
     }
-    
+
     private func fetchCredentials(from database: GRDB.Database) throws -> [ChromiumCredential] {
         do {
             return try ChromiumCredential.fetchAll(database, sql: Self.sqlSelectWithPasswordTimestamp)

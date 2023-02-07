@@ -1,7 +1,4 @@
-//
-//  ErrorExtension.swift
-//
-//  Copyright © 2021 DuckDuckGo. All rights reserved.
+//  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,21 +13,13 @@
 //  limitations under the License.
 //
 
-import Foundation
+#include "TestsTargetsBase.xcconfig"
 
-extension Error {
+ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES
 
-    var failingUrl: URL? {
-        return (self as NSError).userInfo["NSErrorFailingURLKey"] as? URL
-    }
+INFOPLIST_FILE = Unit Tests/Info.plist
+PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser.DuckDuckGoTests
 
-    var isFrameLoadInterrupted: Bool {
-        let error = self as NSError
-        return error.code == 102 && error.domain == "WebKitErrorDomain"
-    }
+SWIFT_OBJC_BRIDGING_HEADER = $(SRCROOT)/Unit Tests/Common/TestsBridging.h
 
-    var isNavigationCancelled: Bool {
-        let error = self as NSError
-        return error.code == -999 && error.domain == "NSURLErrorDomain"
-    }
-}
+TEST_HOST=$(BUILT_PRODUCTS_DIR)/DuckDuckGo.app/Contents/MacOS/DuckDuckGo

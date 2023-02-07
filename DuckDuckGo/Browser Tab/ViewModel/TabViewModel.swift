@@ -158,7 +158,7 @@ final class TabViewModel {
         tab.permissions.$authorizationQuery.assign(to: \.permissionAuthorizationQuery, onWeaklyHeld: self)
             .store(in: &cancellables)
     }
-    
+
     private func subscribeToAppearancePreferences() {
         appearancePreferences.$showFullURL.dropFirst().sink { [weak self] newValue in
             guard let self = self, let url = self.tabURL, let host = self.tabHostURL else { return }
@@ -179,11 +179,11 @@ final class TabViewModel {
     private func updateCanBeBookmarked() {
         canBeBookmarked = tab.content.url ?? .blankPage != .blankPage
     }
-    
+
     private var tabURL: URL? {
         return tab.content.url ?? tab.parentTab?.content.url
     }
-    
+
     private var tabHostURL: URL? {
         return tabURL?.root
     }
@@ -225,7 +225,7 @@ final class TabViewModel {
 
         updatePassiveAddressBarString(showURL: appearancePreferences.showFullURL, url: url, hostURL: hostURL)
     }
-    
+
     private func updatePassiveAddressBarString(showURL: Bool, url: URL, hostURL: URL) {
         if showURL {
             passiveAddressBarString = url.toString(decodePunycode: true, dropScheme: false, dropTrailingSlash: true)

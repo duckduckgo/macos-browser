@@ -1,10 +1,14 @@
-#!/bin/sh
+#!/bin/bash
 
-if [ -z "$1" ]; then
-   echo Usage: ./set_version.sh NUMBER
-   echo Example: ./set_version.sh 0.28.6
-   echo Current version: `cat Configuration/Version.xcconfig | cut -d' ' -f3`
+version_number="$1"
+build_number="${2:-0}"
+
+if [[ -z "${version_number}" ]]; then
+   echo 'Usage: ./set_version.sh VERSION_NUMBER [BUILD_NUMBER=0]'
+   echo 'Example: ./set_version.sh 0.28.6 0'
+   echo "Current version: $(cut -d ' ' -f 3 <Configuration/Version.xcconfig)"
    exit 1
 fi
 
-echo "MARKETING_VERSION = $1\n" > Configuration/Version.xcconfig
+printf 'MARKETING_VERSION = %s' "${version_number}" > Configuration/Version.xcconfig
+printf 'CURRENT_PROJECT_VERSION = %s' "${build_number}" > Configuration/AppStoreBuildNumber.xcconfig

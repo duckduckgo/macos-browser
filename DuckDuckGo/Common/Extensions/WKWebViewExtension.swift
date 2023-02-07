@@ -120,21 +120,30 @@ extension WKWebView {
     }
 
     func stopMediaCapture() {
-        guard self.responds(to: #selector(_stopMediaCapture)) else {
-            assertionFailure("WKWebView does not respond to _stopMediaCapture")
-            return
+        if #available(macOS 12.0, *) {
+            setCameraCaptureState(.none)
+            setMicrophoneCaptureState(.none)
+        } else {
+            guard self.responds(to: #selector(_stopMediaCapture)) else {
+                assertionFailure("WKWebView does not respond to _stopMediaCapture")
+                return
+            }
+            self._stopMediaCapture()
         }
-        self._stopMediaCapture()
     }
-    
+
     func stopAllMediaPlayback() {
-        guard self.responds(to: #selector(_stopAllMediaPlayback)) else {
-            assertionFailure("WKWebView does not respond to _stopAllMediaPlayback")
-            return
+        if #available(macOS 12.0, *) {
+            pauseAllMediaPlayback()
+        } else {
+            guard self.responds(to: #selector(_stopAllMediaPlayback)) else {
+                assertionFailure("WKWebView does not respond to _stopAllMediaPlayback")
+                return
+            }
+            self._stopAllMediaPlayback()
         }
-        self._stopAllMediaPlayback()
     }
-    
+
     func setPermissions(_ permissions: [PermissionType], muted: Bool) {
         for permission in permissions {
             switch permission {
@@ -210,11 +219,11 @@ extension WKWebView {
             return self.instancesRespond(to: #selector(WKWebView._printOperation(with:)))
         }
     }
-    
+
     func printOperation(with printInfo: NSPrintInfo = .shared, for frame: Any?) -> NSPrintOperation? {
-        if let frame = frame,
-           self.responds(to: #selector(WKWebView._printOperation(with:forFrame:))) {
-            return self._printOperation(with: printInfo, forFrame: frame)
+        let printInfoWithFrame = NSSelectorFromString(Selector.printOperationWithPrintInfoForFrame)
+        if let frame = frame, responds(to: printInfoWithFrame) {
+            return self.perform(printInfoWithFrame, with: printInfo, with: frame)?.takeUnretainedValue() as? NSPrintOperation
         }
 
         if #available(macOS 11.0, *) {
@@ -228,18 +237,26 @@ extension WKWebView {
             printInfo.topMargin = 0
             printInfo.bottomMargin = 0
             printInfo.scalingFactor = 0.95
-            
+
             return self.printOperation(with: printInfo)
         }
-
+#if APPSTORE
+        return nil // never gets here
+#else
         guard self.responds(to: #selector(WKWebView._printOperation(with:))) else { return nil }
 
         return self._printOperation(with: printInfo)
+#endif
     }
 
     var fullScreenPlaceholderView: NSView? {
-        guard self.responds(to: #selector(WKWebView._fullScreenPlaceholderView)) else { return nil }
-        return self._fullScreenPlaceholderView()
+        guard self.responds(to: NSSelectorFromString(Selector.fullScreenPlaceholderView)) else { return nil }
+        return self.value(forKey: Selector.fullScreenPlaceholderView) as? NSView
+    }
+
+    private enum Selector {
+        static let fullScreenPlaceholderView = "_fullScreenPlaceholderView"
+        static let printOperationWithPrintInfoForFrame = "_printOperationWithPrintInfo:forFrame:"
     }
 
 }

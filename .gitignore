@@ -67,6 +67,9 @@ fastlane/Preview.html
 fastlane/screenshots/**/*.png
 fastlane/test_output
 
+# ruby
+vendor
+
 .DS_Store
 node_modules/
 

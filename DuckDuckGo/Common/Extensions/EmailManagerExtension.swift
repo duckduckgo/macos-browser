@@ -1,4 +1,7 @@
-//  Copyright © 2022 DuckDuckGo. All rights reserved.
+//
+//  EmailManagerExtension.swift
+//
+//  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -13,4 +16,21 @@
 //  limitations under the License.
 //
 
-#include? "Version.xcconfig"
+import Foundation
+import BrowserServicesKit
+
+extension EmailManager {
+
+    var emailPixelParameters: [String: String] {
+        var pixelParameters: [String: String] = [:]
+
+        if let cohort = self.cohort {
+            pixelParameters[Pixel.Parameters.emailCohort] = cohort
+        }
+
+        pixelParameters[Pixel.Parameters.emailLastUsed] = self.lastUseDate
+
+        return pixelParameters
+    }
+
+}

@@ -30,7 +30,7 @@ extension Dictionary where Key == PermissionType, Value == PermissionState {
             self[.microphone] = newValue
         }
     }
-    
+
     var camera: PermissionState? {
         get {
             self[.camera]

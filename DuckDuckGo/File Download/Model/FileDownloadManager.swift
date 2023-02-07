@@ -16,9 +16,9 @@
 //  limitations under the License.
 //
 
-import BrowserServicesKit
-import Cocoa
+import AppKit
 import Combine
+import Navigation
 import os
 
 protocol FileDownloadManagerProtocol: AnyObject {
@@ -183,7 +183,7 @@ extension FileDownloadManager: WebKitDownloadTaskDelegate {
         }
 
         locationChooser(suggestedFilename, downloadLocation, fileType.map { [$0] } ?? []) {[weak self] url, fileType in
-            
+
             if let url = url {
                 self?.preferences.lastUsedCustomDownloadLocation = url.deletingLastPathComponent()
 
@@ -192,7 +192,7 @@ extension FileDownloadManager: WebKitDownloadTaskDelegate {
                     try? FileManager.default.removeItem(at: url)
                 }
             }
-            
+
             completion(url, fileType)
         }
     }

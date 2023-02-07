@@ -1,0 +1,47 @@
+//  Copyright © 2022 DuckDuckGo. All rights reserved.
+//
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+//
+//  http://www.apache.org/licenses/LICENSE-2.0
+//
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
+//
+
+#include "../Common.xcconfig"
+
+ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon
+ASSETCATALOG_COMPILER_APPICON_NAME[config=Debug] = Icon - Debug
+ASSETCATALOG_COMPILER_APPICON_NAME[config=CI] = Icon - Debug
+ASSETCATALOG_COMPILER_APPICON_NAME[config=Review] = Icon - Review
+
+ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = GlobalAccentColor
+
+CLANG_ANALYZER_LOCALIZABILITY_EMPTY_CONTEXT = YES
+CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES
+
+CODE_SIGN_STYLE[sdk=*] = Manual
+CODE_SIGN_STYLE[config=Debug][sdk=*] = Automatic
+
+CURRENT_PROJECT_VERSION = $(MARKETING_VERSION)
+
+ENABLE_HARDENED_RUNTIME = YES
+
+PRODUCT_BUNDLE_IDENTIFIER[sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX)
+PRODUCT_BUNDLE_IDENTIFIER[config=Debug][sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX).debug
+PRODUCT_BUNDLE_IDENTIFIER[config=CI][sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX).debug
+PRODUCT_BUNDLE_IDENTIFIER[config=Review][sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX).review
+
+INFOPLIST_FILE = DuckDuckGo/Info.plist
+
+LD_RUNPATH_SEARCH_PATHS = $(inherited) @executable_path/../Frameworks
+
+PRODUCT_NAME = $(PRODUCT_NAME_PREFIX)
+PRODUCT_NAME[config=Review][arch=*][sdk=*] = $(PRODUCT_NAME_PREFIX) Review
+
+SWIFT_OBJC_BRIDGING_HEADER = $(SRCROOT)/DuckDuckGo/Bridging.h

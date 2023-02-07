@@ -41,7 +41,7 @@ final class TabCollectionViewModel: NSObject {
     weak var delegate: TabCollectionViewModelDelegate?
 
     /// Local tabs collection
-    private(set) var tabCollection: TabCollection
+    let tabCollection: TabCollection
 
     /// Pinned tabs collection (provided via `PinnedTabsManager` instance).
     var pinnedTabsCollection: TabCollection? {
@@ -385,6 +385,7 @@ final class TabCollectionViewModel: NSObject {
     }
 
     func moveTab(at fromIndex: Int, to otherViewModel: TabCollectionViewModel, at toIndex: Int) {
+        assert(self !== otherViewModel)
         guard changesEnabled else { return }
 
         let parentTab = tabCollection.tabs[safe: fromIndex]?.parentTab
@@ -457,18 +458,6 @@ final class TabCollectionViewModel: NSObject {
         delegate?.tabCollectionViewModelDidMultipleChanges(self)
     }
 
-    func remove(ownerOf webView: WebView) {
-        guard changesEnabled else { return }
-
-        if let index = tabCollection.tabs.firstIndex(where: { $0.webView === webView }) {
-            remove(at: .unpinned(index))
-        } else if let index = pinnedTabsCollection?.tabs.firstIndex(where: { $0.webView === webView }) {
-            remove(at: .pinned(index))
-        } else {
-            os_log("TabCollection: Failed to get index of the tab", type: .error)
-        }
-    }
-
     func removeSelected() {
         guard changesEnabled else { return }
 
@@ -490,7 +479,7 @@ final class TabCollectionViewModel: NSObject {
             return
         }
 
-        let tabCopy = Tab(content: tab.content, favicon: tab.favicon, sessionStateData: tab.sessionStateData, shouldLoadInBackground: true)
+        let tabCopy = Tab(content: tab.content, favicon: tab.favicon, interactionStateData: tab.interactionStateData, shouldLoadInBackground: true)
         let newIndex = tabIndex.makeNext()
 
         tabCollection(for: tabIndex)?.insert(tabCopy, at: newIndex.item)
@@ -531,12 +520,12 @@ final class TabCollectionViewModel: NSObject {
 
         insert(tab)
     }
-    
+
     func title(forTabWithURL url: URL) -> String? {
         let matchingTab = tabCollection.tabs.first { tab in
             tab.url == url
         }
-        
+
         return matchingTab?.title
     }
 

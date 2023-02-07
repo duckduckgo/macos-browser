@@ -1,5 +1,5 @@
 //
-//  AdClickAttribution.swift
+//  AdClickAttributionTabExtension.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -165,6 +165,9 @@ extension AdClickAttributionTabExtension: AdClickAttributionLogicDelegate {
 extension AppContentBlocking: AdClickAttributionDependencies {}
 
 protocol AdClickAttributionProtocol {
+    var currentAttributionState: AdClickAttributionLogic.State? { get }
+
+    // to be removed
     var detection: AdClickAttributionDetection! { get }
     var logic: AdClickAttributionLogic! { get }
 }

@@ -21,11 +21,11 @@ import SwiftUI
 struct PasswordManagementBitwardenItemView: View {
     var manager: PasswordManagerCoordinator
     let didFinish: () -> Void
-    
+
     var body: some View {
         VStack(spacing: 16) {
             Image("BitwardenLogin")
-            
+
             VStack(spacing: 2) {
                 Text(UserText.passwordManagerPopoverTitle(managerName: manager.displayName))
                 HStack (spacing: 3) {
@@ -43,7 +43,7 @@ struct PasswordManagementBitwardenItemView: View {
                     .font(.subheadline)
                     .foregroundColor(Color("BlackWhite60"))
             }
-            
+
             Button {
                 manager.openPasswordManager()
                 didFinish()
