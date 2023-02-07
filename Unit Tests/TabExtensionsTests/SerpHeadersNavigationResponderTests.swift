@@ -32,6 +32,8 @@ class SerpHeadersNavigationResponderTests: XCTestCase {
         let ddg5 = URL.aboutDuckDuckGo
         let ddg7 = URL.privacyPolicy
 
+        let not_ddg = URL(string: "https://duckduckgo.com.local/")!
+        let not_ddg2 = URL(string: "https://my.duckduckgo.com/")!
         let someUrl = URL(string: "https://youtube.com/")!
         let privacy_ddg = URL.duckDuckGoMorePrivacyInfo
         let gpc_ddg = URL.gpcLearnMore
