@@ -1479,16 +1479,6 @@ extension Tab: WKNavigationDelegate {
     @objc(webView:navigationResponse:didBecomeDownload:)
     func webView(_ webView: WKWebView, navigationResponse: WKNavigationResponse, didBecome download: WKDownload) {
         FileDownloadManager.shared.add(download, delegate: self, location: .auto, postflight: .none)
-
-        // Note this can result in tabs being left open, e.g. download button on this page:
-        // https://en.wikipedia.org/wiki/Guitar#/media/File:GuitareClassique5.png
-        // Safari closes new tabs that were opened and then create a download instantly.
-        if self.webView.backForwardList.currentItem == nil,
-           self.parentTab != nil {
-            DispatchQueue.main.async { [weak self] in
-                self?.delegate?.closeTab(self!)
-            }
-        }
     }
 
     @objc(_webView:didStartProvisionalLoadWithRequest:inFrame:)
