@@ -32,9 +32,9 @@ protocol HistoryStoring {
 
 final class HistoryStore: HistoryStoring {
 
-    private let context: NSManagedObjectContext
+    init() {}
 
-    init(context: NSManagedObjectContext = Database.shared.makeContext(concurrencyType: .privateQueueConcurrencyType, name: "History")) {
+    init(context: NSManagedObjectContext) {
         self.context = context
     }
 
@@ -42,6 +42,8 @@ final class HistoryStore: HistoryStoring {
         case storeDeallocated
         case savingFailed
     }
+
+    private lazy var context = Database.shared.makeContext(concurrencyType: .privateQueueConcurrencyType, name: "History")
 
     func removeEntries(_ entries: [HistoryEntry]) -> Future<Void, Error> {
         return Future { [weak self] promise in
@@ -89,7 +91,7 @@ final class HistoryStore: HistoryStoring {
             let deleteRequest = NSFetchRequest<HistoryEntryManagedObject>(entityName: HistoryEntryManagedObject.className())
             let predicates = identifiers.map({ NSPredicate(format: "identifier == %@", argumentArray: [$0]) })
             deleteRequest.predicate = NSCompoundPredicate(type: .or, subpredicates: predicates)
-            
+
             do {
                 let entriesToDelete = try context.fetch(deleteRequest)
                 for entry in entriesToDelete {
@@ -101,7 +103,7 @@ final class HistoryStore: HistoryStoring {
                 return .failure(error)
             }
         }
-        
+
         do {
             try context.save()
         } catch {
@@ -140,10 +142,10 @@ final class HistoryStore: HistoryStoring {
             Pixel.fire(.debug(event: .historyCleanEntriesFailed, error: error))
             return .failure(error)
         }
-        
+
         let visitDeleteRequest = NSFetchRequest<VisitManagedObject>(entityName: VisitManagedObject.className())
         visitDeleteRequest.predicate = NSPredicate(format: "date < %@", date as NSDate)
-        
+
         do {
             let itemsToBeDeleted = try context.fetch(visitDeleteRequest)
             for item in itemsToBeDeleted {
@@ -286,7 +288,7 @@ final class HistoryStore: HistoryStoring {
                 return .failure(error)
             }
         }
-        
+
         do {
             try context.save()
         } catch {
@@ -390,7 +392,7 @@ private extension Visit {
             assertionFailure("Bad type or date is nil")
             return nil
         }
-        
+
         self.init(date: date)
         savingState = .saved
     }

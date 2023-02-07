@@ -37,7 +37,7 @@ struct HoverButton: View {
          imageSize: CGFloat = 16,
          cornerRadius: CGFloat,
          action: @escaping () -> Void) {
-        
+
         self.size = size
         self.backgroundColor = backgroundColor
         self.mouseOverColor = mouseOverColor

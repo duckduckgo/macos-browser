@@ -1,5 +1,5 @@
 //
-//  AdClickAttribution.swift
+//  AdClickAttributionTabExtension.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -16,13 +16,15 @@
 //  limitations under the License.
 //
 
-import os.log
+import BrowserServicesKit
 import Combine
 import Common
 import ContentBlocking
 import Foundation
-import BrowserServicesKit
+import Navigation
+import os.log
 import PrivacyDashboard
+import TrackerRadarKit
 import WebKit
 
 protocol AdClickAttributionDependencies {
@@ -47,18 +49,48 @@ protocol UserContentControllerProtocol: AnyObject {
 }
 typealias UserContentControllerProvider = () -> UserContentControllerProtocol?
 
+protocol AdClickAttributionDetecting {
+    func onStartNavigation(url: URL?)
+    func on2XXResponse(url: URL?)
+    func onDidFinishNavigation(url: URL?)
+    func onDidFailNavigation()
+}
+extension AdClickAttributionDetection: AdClickAttributionDetecting {}
+
+protocol AdClickLogicProtocol {
+    var state: AdClickAttributionLogic.State { get }
+    var delegate: AdClickAttributionLogicDelegate? { get set }
+
+    func applyInheritedAttribution(state: AdClickAttributionLogic.State?)
+    func onRulesChanged(latestRules: [ContentBlockerRulesManager.Rules])
+    func onRequestDetected(request: DetectedRequest)
+
+    func onBackForwardNavigation(mainFrameURL: URL?)
+    func onProvisionalNavigation() async
+    func onDidFinishNavigation(host: String?, currentTime: Date)
+}
+extension AdClickAttributionLogic: AdClickLogicProtocol {}
+
+protocol ContentBlockerScriptProtocol: AnyObject {
+    var currentAdClickAttributionVendor: String? { get set }
+    var supplementaryTrackerData: [TrackerData] { get set }
+}
+extension ContentBlockerRulesUserScript: ContentBlockerScriptProtocol {}
+
 final class AdClickAttributionTabExtension: TabExtension {
 
-    private static func makeAdClickAttributionDetection(with dependencies: some AdClickAttributionDependencies) -> AdClickAttributionDetection {
-        return AdClickAttributionDetection(feature: dependencies.adClickAttribution,
-                                           tld: dependencies.tld,
-                                           eventReporting: dependencies.attributionEvents,
-                                           errorReporting: dependencies.attributionDebugEvents,
-                                           log: OSLog.attribution)
+    private static func makeAdClickAttributionDetection(with dependencies: any AdClickAttributionDependencies, delegate: AdClickAttributionLogic) -> AdClickAttributionDetection {
+        let detection = AdClickAttributionDetection(feature: dependencies.adClickAttribution,
+                                                    tld: dependencies.tld,
+                                                    eventReporting: dependencies.attributionEvents,
+                                                    errorReporting: dependencies.attributionDebugEvents,
+                                                    log: OSLog.attribution)
+        detection.delegate = delegate
+        return detection
 
     }
 
-    private static func makeAdClickAttributionLogic(with dependencies: some AdClickAttributionDependencies) -> AdClickAttributionLogic {
+    private static func makeAdClickAttributionLogic(with dependencies: any AdClickAttributionDependencies) -> AdClickAttributionLogic {
         return AdClickAttributionLogic(featureConfig: dependencies.adClickAttribution,
                                        rulesProvider: dependencies.adClickAttributionRulesProvider,
                                        tld: dependencies.tld,
@@ -67,33 +99,40 @@ final class AdClickAttributionTabExtension: TabExtension {
                                        log: OSLog.attribution)
     }
 
+    private static func makeAdClickAttribution(with dependencies: any AdClickAttributionDependencies) -> (AdClickLogicProtocol, AdClickAttributionDetecting) {
+        let logic = makeAdClickAttributionLogic(with: dependencies)
+        let detection = makeAdClickAttributionDetection(with: dependencies, delegate: logic)
+        return (logic, detection)
+    }
+
     private let dependencies: any AdClickAttributionDependencies
 
     private let userContentControllerProvider: UserContentControllerProvider
-    private weak var contentBlockerRulesScript: ContentBlockerRulesUserScript?
+    private weak var contentBlockerRulesScript: ContentBlockerScriptProtocol?
     private var cancellables = Set<AnyCancellable>()
 
-    private(set) var detection: AdClickAttributionDetection!
-    private(set) var logic: AdClickAttributionLogic!
+    private(set) var detection: AdClickAttributionDetecting
+    private(set) var logic: AdClickLogicProtocol
+    private let dateTimeProvider: () -> Date
 
-    public var currentAttributionState: AdClickAttributionLogic.State? {
+    public var currentAttributionState: AdClickAttributionLogic.State {
         logic.state
     }
 
     init(inheritedAttribution: AdClickAttributionLogic.State?,
          userContentControllerProvider: @escaping UserContentControllerProvider,
-         contentBlockerRulesScriptPublisher: some Publisher<ContentBlockerRulesUserScript?, Never>,
+         contentBlockerRulesScriptPublisher: some Publisher<(any ContentBlockerScriptProtocol)?, Never>,
          trackerInfoPublisher: some Publisher<DetectedRequest, Never>,
-         dependencies: some AdClickAttributionDependencies) {
+         dependencies: some AdClickAttributionDependencies,
+         dateTimeProvider: @escaping () -> Date = Date.init,
+         logicsProvider: (AdClickAttributionDependencies) -> (AdClickLogicProtocol, AdClickAttributionDetecting) = AdClickAttributionTabExtension.makeAdClickAttribution) {
 
         self.dependencies = dependencies
         self.userContentControllerProvider = userContentControllerProvider
+        self.dateTimeProvider = dateTimeProvider
 
-        self.detection = Self.makeAdClickAttributionDetection(with: dependencies)
-        self.logic = Self.makeAdClickAttributionLogic(with: dependencies)
-
-        logic.delegate = self
-        detection.delegate = logic
+        (self.logic, self.detection) = logicsProvider(dependencies)
+        self.logic.delegate = self
 
         if let state = inheritedAttribution {
             logic.applyInheritedAttribution(state: state)
@@ -175,9 +214,10 @@ extension AdClickAttributionTabExtension: NavigationResponder {
         detection.onStartNavigation(url: navigation.url)
     }
 
-    func decidePolicy(for navigationResponse: NavigationResponse, currentNavigation: Navigation?) async -> NavigationResponsePolicy? {
-        if navigationResponse.isForMainFrame, let currentNavigation,
-           navigationResponse.httpResponse?.isSuccessful == true {
+    func decidePolicy(for navigationResponse: NavigationResponse) async -> NavigationResponsePolicy? {
+        if navigationResponse.isForMainFrame,
+           let currentNavigation = navigationResponse.mainFrameNavigation,
+           navigationResponse.isSuccessful == true {
             detection.on2XXResponse(url: currentNavigation.url)
         }
 
@@ -187,21 +227,22 @@ extension AdClickAttributionTabExtension: NavigationResponder {
     }
 
     func navigationDidFinish(_ navigation: Navigation) {
+        guard navigation.isCurrent else { return }
         detection.onDidFinishNavigation(url: navigation.url)
-        logic.onDidFinishNavigation(host: navigation.url.host)
+        logic.onDidFinishNavigation(host: navigation.url.host, currentTime: dateTimeProvider())
     }
 
-    func navigation(_ navigation: Navigation, didFailWith error: WKError, isProvisioned: Bool) {
+    func navigation(_ navigation: Navigation, didFailWith error: WKError) {
+        guard navigation.isCurrent else { return }
         detection.onDidFailNavigation()
     }
-    
+
 }
 
 extension AppContentBlocking: AdClickAttributionDependencies {}
 
 protocol AdClickAttributionProtocol: AnyObject, NavigationResponder {
-    var detection: AdClickAttributionDetection! { get }
-    var logic: AdClickAttributionLogic! { get }
+    var currentAttributionState: AdClickAttributionLogic.State { get }
 }
 
 extension AdClickAttributionTabExtension: AdClickAttributionProtocol {

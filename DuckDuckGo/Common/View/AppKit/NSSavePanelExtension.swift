@@ -17,6 +17,7 @@
 //
 
 import AppKit
+import UniformTypeIdentifiers
 
 extension NSSavePanel {
 
@@ -75,14 +76,26 @@ extension NSSavePanel {
 
     @objc private func fileTypePopUpSelectionDidChange(_ popup: NSPopUpButton) {
         guard let fileType = popup.selectedItem?.representedObject as? UTType else {
-            self.allowedFileTypes = nil
+            if #available(macOS 11.0, *) {
+                self.allowedContentTypes = []
+            } else {
+                self.allowedFileTypes = nil
+            }
             return
         }
         if fileType.fileExtension?.isEmpty == false,
            let mimeType = fileType.mimeType {
             Self.preferredFileType = mimeType
         }
-        self.allowedFileTypes = [fileType.rawValue as String]
+        if #available(macOS 11.0, *) {
+            guard let fileExtension = fileType.fileExtension else {
+                self.allowedContentTypes = []
+                return
+            }
+            self.allowedContentTypes = [UniformTypeIdentifiers.UTType.init(filenameExtension: fileExtension)].compactMap { $0 }
+        } else {
+            self.allowedFileTypes = [fileType.rawValue as String]
+        }
     }
 
 }

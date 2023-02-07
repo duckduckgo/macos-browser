@@ -20,9 +20,13 @@ import Cocoa
 
 extension NSAppearance {
     static func withAppAppearance(_ closure: () -> Void) {
-        let previousAppearance = NSAppearance.current
-        NSAppearance.current = NSApp.effectiveAppearance
-        closure()
-        NSAppearance.current = previousAppearance
+        if #available(macOS 11.0, *) {
+            NSApp.effectiveAppearance.performAsCurrentDrawingAppearance(closure)
+        } else {
+            let previousAppearance = NSAppearance.current
+            NSAppearance.current = NSApp.effectiveAppearance
+            closure()
+            NSAppearance.current = previousAppearance
+        }
     }
 }

@@ -21,7 +21,6 @@ import XCTest
 
 class RecentlyVisitedSiteModelTests: XCTestCase {
 
-    // swiftlint:disable:next identifier_name
     private func RecentlyVisitedSiteModel(originalURL: URL, privatePlayer: PrivatePlayerMode = .disabled) -> HomePage.Models.RecentlyVisitedSiteModel? {
         HomePage.Models.RecentlyVisitedSiteModel(originalURL: originalURL, bookmarkManager: LocalBookmarkManager(bookmarkStore: BookmarkStoreMock(), faviconManagement: FaviconManagerMock()), fireproofDomains: FireproofDomains(store: FireproofDomainsStoreMock()), privatePlayer: .mock(withMode: privatePlayer))
     }
@@ -29,16 +28,16 @@ class RecentlyVisitedSiteModelTests: XCTestCase {
     func testWhenOriginalURLIsHTTPS_ThenModelURLIsHTTPS() {
         assertModelWithURL(URL(string: "https://example.com")!, matches: URL(string: "https://example.com")!, expectedDomain: "example.com")
     }
-    
+
     func testWhenOriginalURLIsHTTP_ThenModelURLIsHTTP() {
         assertModelWithURL(URL(string: "http://example.com")!, matches: URL(string: "http://example.com")!, expectedDomain: "example.com")
     }
-    
+
     func testWhenOriginalURLContainsAdditionalInformation_ThenModelURLOnlyUsesSchemeAndHost() {
         assertModelWithURL(URL(string: "http://example.com/path?test=true#fragment")!, matches: URL(string: "http://example.com")!, expectedDomain: "example.com")
         assertModelWithURL(URL(string: "https://example.com/path?test=true#fragment")!, matches: URL(string: "https://example.com")!, expectedDomain: "example.com")
     }
-    
+
     func testWhenOriginalURLContainsWWW_ThenDomainDoesNotIncludeIt() {
         assertModelWithURL(URL(string: "http://www.example.com")!, matches: URL(string: "http://www.example.com")!, expectedDomain: "example.com")
     }

@@ -21,7 +21,7 @@ import Foundation
 final class CrashReportSender {
 
     static let reportServiceUrl = URL(string: "https://duckduckgo.com/crash.js")!
-    
+
     private let session = URLSession(configuration: .ephemeral)
 
     func send(_ crashReport: CrashReport) {

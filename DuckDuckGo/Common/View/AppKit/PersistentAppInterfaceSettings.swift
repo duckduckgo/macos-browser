@@ -20,16 +20,16 @@ import Foundation
 
 /// Describes app interface settings that are changed outside of the core Settings interface, but need to be persisted between launches.
 final class PersistentAppInterfaceSettings {
-    
+
     static let shared = PersistentAppInterfaceSettings()
 
     static let showBookmarksBarSettingChanged = NSNotification.Name("ShowBookmarksBarSettingChanged")
-    
+
     @UserDefaultsWrapper(key: .showBookmarksBar, defaultValue: false)
     var showBookmarksBar: Bool {
         didSet {
             NotificationCenter.default.post(name: PersistentAppInterfaceSettings.showBookmarksBarSettingChanged, object: nil)
         }
     }
-    
+
 }

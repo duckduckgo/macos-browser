@@ -28,11 +28,22 @@ extension NSTextView {
             return nil
         }.joined(separator: "\n")
     }
-    
+
     func applyLabelStyle() {
         self.isEditable = false
         self.backgroundColor = .clear
         self.textContainer?.textView?.alignment = .center
     }
-    
+
+    var textSize: NSSize {
+        guard let container = textContainer,
+              let manager = container.layoutManager else {
+
+            return .zero
+        }
+
+        manager.ensureLayout(for: container)
+
+        return manager.usedRect(for: container).size
+    }
 }

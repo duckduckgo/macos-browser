@@ -35,26 +35,26 @@ public final class CookieConsentUserPermissionViewController: NSViewController {
         }
         return NSHostingView(rootView: permissionView)
     }()
-    
+
     public override func loadView() {
         view = NSView(frame: NSRect(origin: CGPoint.zero, size: viewSize))
     }
-    
+
     public override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         view.addSubview(consentView)
         setupConstraints()
         view.applyDropShadow()
     }
-    
+
     public func startAnimation() {
         sketchAnimationModel.startAnimation()
     }
-    
+
     private func setupConstraints() {
         consentView.translatesAutoresizingMaskIntoConstraints = false
-        
+
         NSLayoutConstraint.activate([
             consentView.heightAnchor.constraint(equalToConstant: viewSize.height),
             consentView.widthAnchor.constraint(equalToConstant: viewSize.width),

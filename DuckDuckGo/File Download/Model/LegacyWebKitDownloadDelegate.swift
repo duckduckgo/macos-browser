@@ -16,8 +16,8 @@
 //  limitations under the License.
 //
 
-import BrowserServicesKit
 import Foundation
+import Navigation
 import WebKit
 
 final class LegacyWebKitDownloadDelegate: NSObject {
@@ -81,10 +81,6 @@ private extension LegacyWebKitDownloadDelegate {
 
     @objc func _downloadDidFinish(_ download: WKDownload) {
         download.delegate?.downloadDidFinish?(download)
-    }
-
-    @objc func _downloadDidCancel(_ download: WKDownload) {
-        download.delegate?.download?(download, didFailWithError: URLError(.cancelled), resumeData: nil)
     }
 
     @objc func _download(_ download: WKDownload, didFailWithError error: Error) {

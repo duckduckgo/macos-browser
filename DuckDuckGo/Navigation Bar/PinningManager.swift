@@ -25,18 +25,18 @@ enum PinnableView: String {
 }
 
 protocol PinningManager {
-    
+
     func togglePinning(for view: PinnableView)
     func isPinned(_ view: PinnableView) -> Bool
-    
+
 }
 
 final class LocalPinningManager: PinningManager {
 
     static let shared = LocalPinningManager()
-    
+
     static let pinnedViewChangedNotificationViewTypeKey = "pinning.pinnedViewChanged.viewType"
-    
+
     @UserDefaultsWrapper(key: .pinnedViews, defaultValue: [])
     private var pinnedViewStrings: [String]
 
@@ -46,16 +46,16 @@ final class LocalPinningManager: PinningManager {
         } else {
             pinnedViewStrings.append(view.rawValue)
         }
-        
+
         NotificationCenter.default.post(name: .PinnedViewsChanged, object: nil, userInfo: [
             Self.pinnedViewChangedNotificationViewTypeKey: view.rawValue
         ])
     }
-    
+
     func isPinned(_ view: PinnableView) -> Bool {
         return pinnedViewStrings.contains(view.rawValue)
     }
-    
+
     func toggleShortcutInterfaceTitle(for view: PinnableView) -> String {
         switch view {
         case .autofill: return isPinned(.autofill) ? UserText.hideAutofillShortcut : UserText.showAutofillShortcut

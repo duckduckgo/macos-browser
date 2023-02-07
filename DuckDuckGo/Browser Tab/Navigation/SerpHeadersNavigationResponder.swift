@@ -16,7 +16,7 @@
 //  limitations under the License.
 //
 
-import BrowserServicesKit
+import Navigation
 import Foundation
 
 struct SerpHeadersNavigationResponder: NavigationResponder {
@@ -27,7 +27,7 @@ struct SerpHeadersNavigationResponder: NavigationResponder {
     }
 
     func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
-        guard navigationAction.isForMainFrame,
+        guard let mainFrame = navigationAction.mainFrameTarget,
               navigationAction.url.isDuckDuckGo,
               navigationAction.request.value(forHTTPHeaderField: Constants.ddgClientHeaderKey) == nil,
               !navigationAction.navigationType.isBackForward
@@ -38,7 +38,9 @@ struct SerpHeadersNavigationResponder: NavigationResponder {
         var request = navigationAction.request
         request.setValue(Constants.ddgClientHeaderValue, forHTTPHeaderField: Constants.ddgClientHeaderKey)
 
-        return .cancel(with: .redirect(request))
+        return .redirect(mainFrame) { navigator in
+            navigator.load(request)
+        }
     }
 
 }

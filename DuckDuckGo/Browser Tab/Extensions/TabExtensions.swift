@@ -49,6 +49,11 @@ protocol TabExtension {
     associatedtype PublicProtocol
     func getPublicProtocol() -> PublicProtocol
 }
+extension TabExtension {
+    static var publicProtocolType: Any.Type {
+        PublicProtocol.self
+    }
+}
 
 // Implement these methods for Extension State Restoration
 protocol NSCodingExtension: TabExtension {
@@ -58,16 +63,20 @@ protocol NSCodingExtension: TabExtension {
 
 // Define dependencies used to instantiate TabExtensions here:
 protocol TabExtensionDependencies {
-    var userScriptsPublisher: AnyPublisher<UserScripts?, Never> { get }
-    var contentBlocking: ContentBlockingProtocol { get }
-    var adClickAttributionDependencies: AdClickAttributionDependencies { get }
-    var privacyInfoPublisher: AnyPublisher<PrivacyInfo?, Never> { get }
-
-    var inheritedAttribution: AdClickAttributionLogic.State? { get }
-    var userContentControllerProvider: UserContentControllerProvider { get }
+    var privacyFeatures: PrivacyFeaturesProtocol { get }
+    var historyCoordinating: HistoryCoordinating { get }
 }
+// swiftlint:disable:next large_tuple
+typealias TabExtensionsBuilderArguments = (
+    tabIdentifier: UInt64,
+    userScriptsPublisher: AnyPublisher<UserScripts?, Never>,
+    inheritedAttribution: AdClickAttributionLogic.State?,
+    userContentControllerProvider: UserContentControllerProvider,
+    permissionModel: PermissionModel,
+    privacyInfoPublisher: AnyPublisher<PrivacyInfo?, Never>
+)
 
-extension AppTabExtensions {
+extension TabExtensionsBuilder {
 
     /// Instantiate `TabExtension`-s for App builds here
     /// use add { return SomeTabExtensions() } to register Tab Extensions
@@ -76,10 +85,10 @@ extension AppTabExtensions {
     /// ` let myPublishingExtension = add { MyPublishingExtension() }
     /// ` add { MyOtherExtension(with: myExtension.resultPublisher) }
     /// Note: Extensions with state restoration support should conform to `NSCodingExtension`
-    mutating func make(with dependencies: TabExtensionDependencies) {
-        let userScripts = dependencies.userScriptsPublisher
+    mutating func registerExtensions(with args: TabExtensionsBuilderArguments, dependencies: TabExtensionDependencies) {
+        let userScripts = args.userScriptsPublisher
 
-        let trackerInfoPublisher = dependencies.privacyInfoPublisher
+        let trackerInfoPublisher = args.privacyInfoPublisher
             .compactMap { $0?.$trackerInfo }
             .switchToLatest()
             .scan( (old: Set<DetectedRequest>(), new: Set<DetectedRequest>()) ) {
@@ -91,11 +100,11 @@ extension AppTabExtensions {
             .switchToLatest()
 
         add {
-            AdClickAttributionTabExtension(inheritedAttribution: dependencies.inheritedAttribution,
-                                           userContentControllerProvider: dependencies.userContentControllerProvider,
-                                           contentBlockerRulesScriptPublisher: userScripts.map(\.?.contentBlockerRulesScript),
+            AdClickAttributionTabExtension(inheritedAttribution: args.inheritedAttribution,
+                                           userContentControllerProvider: args.userContentControllerProvider,
+                                           contentBlockerRulesScriptPublisher: userScripts.map { $0?.contentBlockerRulesScript },
                                            trackerInfoPublisher: trackerInfoPublisher,
-                                           dependencies: dependencies.adClickAttributionDependencies)
+                                           dependencies: dependencies.privacyFeatures.contentBlocking)
         }
         add {
             AutofillTabExtension(autofillUserScriptPublisher: userScripts.map(\.?.autofillScript))
@@ -114,11 +123,26 @@ extension AppTabExtensions {
 }
 
 #if DEBUG
-extension TestTabExtensions {
+extension TestTabExtensionsBuilder {
 
-    /// Add `TabExtension`-s that should be loaded when running Unit Tests here
-    /// By default the Extensions won‘t be loaded
-    mutating func make(with dependencies: TabExtensionDependencies) {
+    /// Used by default for Tab instantiation if not provided in Tab(... extensionsBuilder: TestTabExtensionsBuilder([HistoryTabExtension.self])
+    static var `default` = TestTabExtensionsBuilder(overrideExtensions: TestTabExtensionsBuilder.overrideExtensions, [
+        // FindInPageTabExtension.self, HistoryTabExtension.self, ... - add TabExtensions here to be loaded by default for ALL Unit Tests
+    ])
+
+    // override Tab Extensions initialisation registered in TabExtensionsBuilder.registerExtensions for Unit Tests
+    func overrideExtensions(with args: TabExtensionsBuilderArguments, dependencies: TabExtensionDependencies) {
+        /** ```
+         let fbProtection = get(FBProtectionTabExtension.self)
+
+         let contentBlocking = override {
+         ContentBlockingTabExtension(fbBlockingEnabledProvider: fbProtection.value)
+         }
+         override {
+         HistoryTabExtension(trackersPublisher: contentBlocking.trackersPublisher)
+         }
+         ...
+         */
 
     }
 

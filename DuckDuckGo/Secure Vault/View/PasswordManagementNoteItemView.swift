@@ -29,32 +29,32 @@ struct PasswordManagementNoteItemView: View {
     @EnvironmentObject var model: PasswordManagementNoteModel
 
     var body: some View {
-        
+
         if model.note != nil {
-            
+
             ZStack(alignment: .top) {
                 Spacer()
-                
+
                 VStack(alignment: .leading, spacing: 0) {
-                    
+
                     HeaderView()
                         .padding(.bottom, 30)
-                    
+
                     TextView()
 
                     Spacer(minLength: 0)
-                    
+
                     Buttons()
-                    
+
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .padding()
-                
+
             }
             .padding(EdgeInsets(top: 10, leading: 0, bottom: 10, trailing: 10))
-            
+
         }
-        
+
     }
 
 }

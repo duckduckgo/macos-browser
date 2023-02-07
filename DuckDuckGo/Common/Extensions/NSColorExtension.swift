@@ -23,7 +23,7 @@ extension NSColor {
     static var homePageBackgroundColor: NSColor {
         NSColor(named: "HomePageBackgroundColor")!
     }
-    
+
     static var homePageSearchBarBackgroundColor: NSColor {
          return NSColor(named: "HomePageSearchBarBackgroundColor")!
      }
@@ -31,7 +31,7 @@ extension NSColor {
     static var addressBarFocusedBackgroundColor: NSColor {
         NSColor(named: "AddressBarFocusedBackgroundColor")!
     }
-    
+
     static var addressBarBackgroundColor: NSColor {
         NSColor(named: "AddressBarBackgroundColor")!
     }
@@ -43,7 +43,7 @@ extension NSColor {
     static var addressBarShadowColor: NSColor {
         NSColor(named: "AddressBarShadowColor")!
     }
-    
+
     static var addressBarSolidSeparatorColor: NSColor {
         NSColor(named: "AddressBarSolidSeparatorColor")!
     }
@@ -61,15 +61,15 @@ extension NSColor {
     static var findInPageFocusedBackgroundColor: NSColor {
         NSColor(named: "FindInPageFocusedBackgroundColor")!
     }
-    
+
     static var inactiveSearchBarBackground: NSColor {
         NSColor(named: "InactiveSearchBarBackground")!
     }
-    
+
     static var suggestionTextColor: NSColor {
         NSColor(named: "SuggestionTextColor")!
     }
-    
+
     static var suggestionIconColor: NSColor {
         NSColor(named: "SuggestionIconColor")!
     }
@@ -81,7 +81,7 @@ extension NSColor {
     static var interfaceBackgroundColor: NSColor {
         NSColor(named: "InterfaceBackgroundColor")!
     }
-    
+
     static var tabMouseOverColor: NSColor {
         NSColor(named: "TabMouseOverColor")!
     }
@@ -120,6 +120,10 @@ extension NSColor {
 
     static var editingPanelColor: NSColor {
         NSColor(named: "EditingPanelColor")!
+    }
+
+    static var dialogPanelBackgroundColor: NSColor {
+        NSColor(named: "DialogPanelBackground")!
     }
 
     static let bookmarkFilledTint = NSColor(named: "BookmarkFilledTint")!

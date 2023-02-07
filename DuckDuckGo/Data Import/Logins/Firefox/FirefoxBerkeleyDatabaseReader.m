@@ -64,23 +64,23 @@ NSString * const FirefoxBerkeleyDatabaseReaderASN1Key = @"f800000000000000000000
     DB *db = dbopen(path, O_RDONLY, O_RDONLY, DB_HASH, NULL);
     NSMutableDictionary<NSString *, NSData *> *resultDictionary = [NSMutableDictionary dictionary];
     DBT currentKeyDBT, currentDataDBT;
-    
+
     while (db->seq(db, &currentKeyDBT, &currentDataDBT, R_NEXT) == 0) {
         NSData *currentKeyData = [NSData dataWithBytes:currentKeyDBT.data length:currentKeyDBT.size];
         NSData *currentData = [NSData dataWithBytes:currentDataDBT.data length:currentDataDBT.size];
-        
+
         NSString *currentKeyHexadecimalString = [currentKeyData hexadecimalString];
         NSString *currentKeyString = [[NSString alloc] initWithData:currentKeyData encoding:NSUTF8StringEncoding];
-        
+
         if ([currentKeyHexadecimalString isEqualToString:FirefoxBerkeleyDatabaseReaderASN1Key]) {
             [resultDictionary setValue:currentData forKey:@"data"];
         } else {
             [resultDictionary setValue:currentData forKey:currentKeyString];
         }
     }
-    
+
     db->close(db);
-    
+
     return resultDictionary;
 }
 

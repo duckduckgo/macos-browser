@@ -44,7 +44,7 @@ final class APIHeaders {
             let q = 1.0 - (Double(index) * 0.1)
             return "\(language);q=\(q)"
         }.joined(separator: ", ")
-        
+
         return [
             Name.acceptEncoding: acceptEncoding,
             Name.acceptLanguage: acceptLanguage,
