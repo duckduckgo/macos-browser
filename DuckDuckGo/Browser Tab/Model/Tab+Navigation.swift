@@ -30,8 +30,9 @@ extension Tab: NavigationResponder {
 
     func setupNavigationDelegate() {
         navigationDelegate.setResponders(
-            .weak(self)
+            .weak(self),
 
+            .weak(nullable: self.adClickAttribution)
         )
         navigationDelegate
             .registerCustomDelegateMethodHandler(.weak(self), forSelectorNamed: "_webView:contextMenuDidCreateDownload:")
