@@ -49,18 +49,3 @@ extension Tab: WKNavigationDelegate {
     }
 
 }
-
-extension NavigationType {
-    static let goBackToInvalidateHistoryItem = NavigationType.custom(.init(\.goBackToInvalidateHistoryItem, true))
-    static let redirectAfterGoBack = NavigationType.custom(.init(\.redirectAfterGoBack, true))
-
-}
-extension InitialNavigationType {
-    static let redirectAfterGoBack = InitialNavigationType.custom(.init(\.redirectAfterGoBack, true))
-
-}
-
-extension UserInfo.Values {
-    var goBackToInvalidateHistoryItem: Value<Bool> { Value(default: false) { $0 ? "goBackToInvalidateHistoryItem" : "" } }
-    var redirectAfterGoBack: Value<Bool> { Value(default: false) { $0 ? "redirectAfterGoBack" : "" } }
-}

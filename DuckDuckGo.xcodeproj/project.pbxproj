@@ -1497,6 +1497,11 @@
 		B61E2CD5294346C000773D8A /* Tab+Navigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = B61E2CD4294346C000773D8A /* Tab+Navigation.swift */; };
 		B61EF3EC266F91E700B4D78F /* WKWebView+Download.swift in Sources */ = {isa = PBXBuildFile; fileRef = B61EF3EB266F91E700B4D78F /* WKWebView+Download.swift */; };
 		B61EF3F1266F922200B4D78F /* WKProcessPool+DownloadDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B61EF3F0266F922200B4D78F /* WKProcessPool+DownloadDelegate.swift */; };
+		B626A75A29921FAA00053070 /* NavigationActionPolicyExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B626A75929921FAA00053070 /* NavigationActionPolicyExtension.swift */; };
+		B626A75B29921FAA00053070 /* NavigationActionPolicyExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B626A75929921FAA00053070 /* NavigationActionPolicyExtension.swift */; };
+		B626A75C299223F400053070 /* RePublished.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6CFAA592945ADEF00CB6B11 /* RePublished.swift */; };
+		B626A7602992407D00053070 /* CancellableExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B626A75F2992407C00053070 /* CancellableExtension.swift */; };
+		B626A7612992407D00053070 /* CancellableExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B626A75F2992407C00053070 /* CancellableExtension.swift */; };
 		B62EB47C25BAD3BB005745C6 /* WKWebViewPrivateMethodsAvailabilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B62EB47B25BAD3BB005745C6 /* WKWebViewPrivateMethodsAvailabilityTests.swift */; };
 		B630793526731BC400DCEE41 /* URLSuggestedFilenameTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8553FF51257523760029327F /* URLSuggestedFilenameTests.swift */; };
 		B630793A26731F2600DCEE41 /* FileDownloadManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B630793926731F2600DCEE41 /* FileDownloadManagerTests.swift */; };
@@ -2438,6 +2443,8 @@
 		B61E2CD4294346C000773D8A /* Tab+Navigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Tab+Navigation.swift"; sourceTree = "<group>"; };
 		B61EF3EB266F91E700B4D78F /* WKWebView+Download.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WKWebView+Download.swift"; sourceTree = "<group>"; };
 		B61EF3F0266F922200B4D78F /* WKProcessPool+DownloadDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WKProcessPool+DownloadDelegate.swift"; sourceTree = "<group>"; };
+		B626A75929921FAA00053070 /* NavigationActionPolicyExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NavigationActionPolicyExtension.swift; sourceTree = "<group>"; };
+		B626A75F2992407C00053070 /* CancellableExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CancellableExtension.swift; sourceTree = "<group>"; };
 		B62EB47B25BAD3BB005745C6 /* WKWebViewPrivateMethodsAvailabilityTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WKWebViewPrivateMethodsAvailabilityTests.swift; sourceTree = "<group>"; };
 		B630793926731F2600DCEE41 /* FileDownloadManagerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileDownloadManagerTests.swift; sourceTree = "<group>"; };
 		B630794126731F5400DCEE41 /* WKDownloadMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WKDownloadMock.swift; sourceTree = "<group>"; };
@@ -4539,6 +4546,7 @@
 			isa = PBXGroup;
 			children = (
 				F4A6198B283CFFBB007F2080 /* ContentScopeFeatureFlagging.swift */,
+				B626A75929921FAA00053070 /* NavigationActionPolicyExtension.swift */,
 				B634DBE4293C944700C3C99E /* NewWindowPolicy.swift */,
 				AA9FF95824A1ECF20039E328 /* Tab.swift */,
 				B634DBE0293C8FD500C3C99E /* Tab+Dialogs.swift */,
@@ -4889,6 +4897,7 @@
 				AA61C0D12727F59B00E6B681 /* ArrayExtension.swift */,
 				AA7EB6E427E7D6DC00036718 /* AnimationView.swift */,
 				B6106B9D26A565DA0013B453 /* BundleExtension.swift */,
+				B626A75F2992407C00053070 /* CancellableExtension.swift */,
 				4BA1A6C1258B0A1300F6F690 /* ContiguousBytesExtension.swift */,
 				85AC3AF625D5DBFD00C7D2AA /* DataExtension.swift */,
 				B6A9E46F26146A250067D1B9 /* DateExtension.swift */,
@@ -6049,6 +6058,7 @@
 				3706FAA5293F65D500E42796 /* GradientView.swift in Sources */,
 				3706FAA6293F65D500E42796 /* PreferencesSidebar.swift in Sources */,
 				3706FAA7293F65D500E42796 /* NSPointExtension.swift in Sources */,
+				B626A75C299223F400053070 /* RePublished.swift in Sources */,
 				3706FAA8293F65D500E42796 /* WindowsManager.swift in Sources */,
 				3706FAAB293F65D500E42796 /* HomePageDefaultBrowserModel.swift in Sources */,
 				3706FAAC293F65D500E42796 /* CrashReporter.swift in Sources */,
@@ -6246,6 +6256,7 @@
 				3706FB62293F65D500E42796 /* CSVParser.swift in Sources */,
 				3706FB63293F65D500E42796 /* TextButton.swift in Sources */,
 				3706FB64293F65D500E42796 /* PixelDataModel.xcdatamodeld in Sources */,
+				B626A75B29921FAA00053070 /* NavigationActionPolicyExtension.swift in Sources */,
 				3706FB65293F65D500E42796 /* PrivacyDashboardWebView.swift in Sources */,
 				3706FB66293F65D500E42796 /* AppearancePreferences.swift in Sources */,
 				3706FB67293F65D500E42796 /* DownloadListCoordinator.swift in Sources */,
@@ -6395,6 +6406,7 @@
 				3706FBF6293F65D500E42796 /* Pixel.swift in Sources */,
 				3706FBF7293F65D500E42796 /* PixelEvent.swift in Sources */,
 				3706FBF8293F65D500E42796 /* TabBarFooter.swift in Sources */,
+				B626A7612992407D00053070 /* CancellableExtension.swift in Sources */,
 				3706FBF9293F65D500E42796 /* BookmarksBarCollectionViewItem.swift in Sources */,
 				3706FBFA293F65D500E42796 /* FileDownloadError.swift in Sources */,
 				3706FBFB293F65D500E42796 /* MoreOrLessView.swift in Sources */,
@@ -6993,6 +7005,7 @@
 				1DDF076328F815AD00EDFBE3 /* BWCommunicator.swift in Sources */,
 				85589E9127BFB9810038AD11 /* HomePageRecentlyVisitedModel.swift in Sources */,
 				85012B0229133F9F003D0DCC /* NavigationBarPopovers.swift in Sources */,
+				B626A7602992407D00053070 /* CancellableExtension.swift in Sources */,
 				37D23785287F4E6500BCE03B /* PinnedTabsHostingView.swift in Sources */,
 				4BB99CFE26FE191E001E4761 /* FirefoxBookmarksReader.swift in Sources */,
 				4BBC16A227C485BC00E00A38 /* DeviceIdleStateDetector.swift in Sources */,
@@ -7336,6 +7349,7 @@
 				B6A9E45B261460350067D1B9 /* APIHeaders.swift in Sources */,
 				85625996269C953C00EE44BC /* PasswordManagementViewController.swift in Sources */,
 				4BB99D0226FE191E001E4761 /* ImportedBookmarks.swift in Sources */,
+				B626A75A29921FAA00053070 /* NavigationActionPolicyExtension.swift in Sources */,
 				AA6EF9B3250785D5004754E6 /* NSMenuExtension.swift in Sources */,
 				AA7412B524D1536B00D22FE0 /* MainWindowController.swift in Sources */,
 				AA9FF95924A1ECF20039E328 /* Tab.swift in Sources */,
