@@ -32,7 +32,10 @@ extension Tab: NavigationResponder {
         navigationDelegate.setResponders(
             .weak(self),
 
-            .weak(nullable: self.adClickAttribution)
+            .weak(nullable: self.adClickAttribution),
+
+            // should be the last, for Unit Tests navigation events tracking
+            .struct(nullable: testsClosureNavigationResponder)
         )
         navigationDelegate
             .registerCustomDelegateMethodHandler(.weak(self), forSelectorNamed: "_webView:contextMenuDidCreateDownload:")
