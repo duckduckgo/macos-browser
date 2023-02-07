@@ -34,7 +34,10 @@ extension Tab: NavigationResponder {
 
             .weak(nullable: self.adClickAttribution),
 
-            .struct(SerpHeadersNavigationResponder())
+            .struct(SerpHeadersNavigationResponder()),
+
+            // should be the last, for Unit Tests navigation events tracking
+            .struct(nullable: testsClosureNavigationResponder)
         )
         navigationDelegate
             .registerCustomDelegateMethodHandler(.weak(self), forSelectorNamed: "_webView:contextMenuDidCreateDownload:")
