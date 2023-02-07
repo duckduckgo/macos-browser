@@ -20,6 +20,10 @@ import Navigation
 
 extension NavigationActionPolicy {
 
+    /// cancel+redirect Navigation Action popping last WebView Back Item
+    /// if a client-redirected navigation has been committed its BackForwardItem will stay in history
+    /// when the Navigation Action is cancelled in decidePolicyForNavigationAction:
+    /// https://app.asana.com/0/inbox/1199237043628108/1201280322539473/1201353436736961
     @MainActor
     static func redirect(_ navigationAction: NavigationAction, invalidatingBackItemIfNeededFor webView: WebView, do redirect: @escaping (Navigator) -> Void) -> NavigationActionPolicy {
         guard let mainFrame = navigationAction.mainFrameTarget else {
@@ -28,17 +32,15 @@ extension NavigationActionPolicy {
         }
         return .redirect(mainFrame) { navigator in
             // Cancelled & Upgraded Client Redirect URL leaves wrong backForwardList record
-            // https://app.asana.com/0/inbox/1199237043628108/1201280322539473/1201353436736961
+
             if case .redirect(.client(delay: 0)) = navigationAction.navigationType,
                // initial NavigationAction BackForwardListItem is not the Current Item (new item was pushed during navigation)
                let fromHistoryItemIdentity = navigationAction.redirectHistory?.last?.fromHistoryItemIdentity,
                fromHistoryItemIdentity != webView.backForwardList.currentItem?.identity {
 
-                webView.frozenCanGoBack = webView.canGoBack
-                webView.frozenCanGoForward = false
                 navigator.goBack()?.overrideResponders { _, _ in
                     // don‘t perform actual navigation, just pop the back item
-                    return .cancel
+                    .cancel
                 }
             }
 

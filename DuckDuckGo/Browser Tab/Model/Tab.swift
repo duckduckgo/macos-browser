@@ -539,18 +539,30 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     }
     private var externalSchemeOpenedPerPageLoad = false
 
-    var canGoForward: Bool {
-        webView.canGoForward
-    }
+    @Published private(set) var canGoForward: Bool = false
+    @Published private(set) var canGoBack: Bool = false
 
-    func goForward() {
-        guard canGoForward else { return }
-        shouldStoreNextVisit = false
-        webView.goForward()
-    }
+    @MainActor(unsafe)
+    private func updateCanGoBackForward(withCurrentNavigation currentNavigation: Navigation? = nil) {
+        dispatchPrecondition(condition: .onQueue(.main))
+        let currentNavigation = currentNavigation ?? navigationDelegate.currentNavigation
 
-    var canGoBack: Bool {
-        webView.canGoBack || error != nil
+        // “freeze” back-forward buttons updates when current backForwardListItem is being popped..
+        if webView.backForwardList.currentItem?.identity == currentNavigation?.navigationAction.fromHistoryItemIdentity
+            // ..or during the following developer-redirect navigation
+            || currentNavigation?.navigationAction.navigationType == .redirect(.developer) {
+            return
+        }
+
+        let canGoBack = webView.canGoBack || self.error != nil
+        let canGoForward = webView.canGoForward && self.error == nil
+
+        if canGoBack != self.canGoBack {
+            self.canGoBack = canGoBack
+        }
+        if canGoForward != self.canGoForward {
+            self.canGoForward = canGoForward
+        }
     }
 
     func goBack() {
@@ -573,6 +585,12 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         }
         userInteractionDialog = nil
         webView.goBack()
+    }
+
+    func goForward() {
+        guard canGoForward else { return }
+        shouldStoreNextVisit = false
+        webView.goForward()
     }
 
     func go(to item: WKBackForwardListItem) {
@@ -770,7 +788,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         _ = FireproofDomains.shared.toggle(domain: host)
     }
 
-    private var superviewObserver: NSKeyValueObservation?
+    private var webViewCancellables = Set<AnyCancellable>()
 
     private func setupWebView(shouldLoadInBackground: Bool) {
         webView.navigationDelegate = navigationDelegate
@@ -781,14 +799,28 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
         permissions.webView = webView
 
-        superviewObserver = webView.observe(\.superview, options: .old) { [weak self] _, change in
+        webViewCancellables.removeAll()
+
+        webView.observe(\.superview, options: .old) { [weak self] _, change in
             // if the webView is being added to superview - reload if needed
             if case .some(.none) = change.oldValue {
                 Task { @MainActor [weak self] in
                     await self?.reloadIfNeeded()
                 }
             }
-        }
+        }.store(in: &webViewCancellables)
+
+        webView.observe(\.canGoBack) { [weak self] _, _ in
+            self?.updateCanGoBackForward()
+        }.store(in: &webViewCancellables)
+
+        webView.observe(\.canGoForward) { [weak self] _, _ in
+            self?.updateCanGoBackForward()
+        }.store(in: &webViewCancellables)
+
+        navigationDelegate.$currentNavigation.sink { [weak self] navigation in
+            self?.updateCanGoBackForward(withCurrentNavigation: navigation)
+        }.store(in: &webViewCancellables)
 
         // background tab loading should start immediately
         Task { @MainActor in
@@ -1225,6 +1257,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
                 }
             }
         }
+
         if !navigationAction.url.isDuckDuckGo {
             await prepareForContentBlocking()
         }
@@ -1268,6 +1301,8 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
             self.permissions.permissions[permissionType].externalSchemeOpened()
         }
     }
+    // swiftlint:enable cyclomatic_complexity
+    // swiftlint:enable function_body_length
 
     private func urlDidUpgrade(to upgradedUrl: URL) {
         lastUpgradedURL = upgradedUrl
