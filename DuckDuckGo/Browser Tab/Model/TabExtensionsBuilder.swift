@@ -32,7 +32,7 @@ struct TabExtensionsBuilder: TabExtensionsBuilderProtocol {
 
     static var `default`: TabExtensionsBuilderProtocol {
 #if DEBUG
-        return AppDelegate.isRunningTests ? TestTabExtensionsBuilder.default : TabExtensionsBuilder()
+        return AppDelegate.isRunningTests ? TestTabExtensionsBuilder.shared : TabExtensionsBuilder()
 #else
         return TabExtensionsBuilder()
 #endif
@@ -61,7 +61,7 @@ struct TabExtensionsBuilder: TabExtensionsBuilderProtocol {
 #if DEBUG
 /// TabExtensionsBuilder loaded by default when running Tests
 /// by default loads only extensions passed in `load` argument,
-/// set default extensions to load in TestTabExtensionsBuilder.default
+/// set default extensions to load in TestTabExtensionsBuilder.shared
 /// provide overriding extensions initializers in `overrideExtensions` method using `override { .. }` calls
 final class TestTabExtensionsBuilder: TabExtensionsBuilderProtocol {
 
