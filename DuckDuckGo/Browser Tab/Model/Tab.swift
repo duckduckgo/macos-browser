@@ -159,6 +159,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     private let navigationDelegate = DistributedNavigationDelegate(logger: .navigation)
 
     private let cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter?
+    private let statisticsLoader: StatisticsLoader?
     let pinnedTabsManager: PinnedTabsManager
     private let privatePlayer: PrivatePlayer
     private let privacyFeatures: AnyPrivacyFeatures
@@ -184,6 +185,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                      pinnedTabsManager: PinnedTabsManager = WindowControllersManager.shared.pinnedTabsManager,
                      privatePlayer: PrivatePlayer? = nil,
                      cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter? = ContentBlockingAssetsCompilationTimeReporter.shared,
+                     statisticsLoader: StatisticsLoader? = nil,
                      extensionsBuilder: TabExtensionsBuilderProtocol = TabExtensionsBuilder.default,
                      localHistory: Set<String> = Set<String>(),
                      title: String? = nil,
@@ -199,6 +201,8 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
         let privatePlayer = privatePlayer
             ?? (AppDelegate.isRunningTests ? PrivatePlayer.mock(withMode: .enabled) : PrivatePlayer.shared)
+        let statisticsLoader = statisticsLoader
+        ?? (AppDelegate.isRunningTests ? nil : StatisticsLoader.shared)
 
         self.init(content: content,
                   faviconManagement: faviconManagement,
@@ -210,6 +214,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                   privatePlayer: privatePlayer,
                   extensionsBuilder: extensionsBuilder,
                   cbaTimeReporter: cbaTimeReporter,
+                  statisticsLoader: statisticsLoader,
                   localHistory: localHistory,
                   title: title,
                   favicon: favicon,
@@ -233,6 +238,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
          privatePlayer: PrivatePlayer,
          extensionsBuilder: TabExtensionsBuilderProtocol,
          cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter?,
+         statisticsLoader: StatisticsLoader?,
          localHistory: Set<String>,
          title: String?,
          favicon: NSImage?,
@@ -252,6 +258,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         self.privacyFeatures = privacyFeatures
         self.privatePlayer = privatePlayer
         self.cbaTimeReporter = cbaTimeReporter
+        self.statisticsLoader = statisticsLoader
         self.localHistory = localHistory
         self.title = title
         self.favicon = favicon
@@ -1417,7 +1424,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         self.adClickAttribution?.detection.onDidFinishNavigation(url: navigation.url)
         self.adClickAttribution?.logic.onDidFinishNavigation(host: navigation.url.host)
         setUpYoutubeScriptsIfNeeded()
-        StatisticsLoader.shared.refreshRetentionAtb(isSearch: navigation.url.isDuckDuckGoSearch)
+        statisticsLoader?.refreshRetentionAtb(isSearch: navigation.url.isDuckDuckGoSearch)
     }
 
     @MainActor

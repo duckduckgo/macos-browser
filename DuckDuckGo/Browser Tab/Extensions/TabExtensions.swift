@@ -49,6 +49,11 @@ protocol TabExtension {
     associatedtype PublicProtocol
     func getPublicProtocol() -> PublicProtocol
 }
+extension TabExtension {
+    static var publicProtocolType: Any.Type {
+        PublicProtocol.self
+    }
+}
 
 // Implement these methods for Extension State Restoration
 protocol NSCodingExtension: TabExtension {
@@ -121,7 +126,9 @@ extension TabExtensionsBuilder {
 extension TestTabExtensionsBuilder {
 
     /// Used by default for Tab instantiation if not provided in Tab(... extensionsBuilder: TestTabExtensionsBuilder([HistoryTabExtension.self])
-    static var `default` = TestTabExtensionsBuilder(overrideExtensions: TestTabExtensionsBuilder.overrideExtensions, [
+    static var shared: TestTabExtensionsBuilder = .default
+
+    static let `default` = TestTabExtensionsBuilder(overrideExtensions: TestTabExtensionsBuilder.overrideExtensions, [
         // FindInPageTabExtension.self, HistoryTabExtension.self, ... - add TabExtensions here to be loaded by default for ALL Unit Tests
     ])
 
