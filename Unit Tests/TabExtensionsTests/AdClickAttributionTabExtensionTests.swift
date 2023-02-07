@@ -67,7 +67,7 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
     let now = Date()
 
     override func setUp() {
-        TestTabExtensionsBuilder.default = TestTabExtensionsBuilder(load: [AdClickAttributionTabExtension.self]) { [unowned self] builder in { args, dependencies in
+        TestTabExtensionsBuilder.shared = TestTabExtensionsBuilder(load: [AdClickAttributionTabExtension.self]) { [unowned self] builder in { args, dependencies in
             builder.override {
                 AdClickAttributionTabExtension(inheritedAttribution: args.inheritedAttribution,
                                                userContentControllerProvider: { self.userContentController },
@@ -84,6 +84,11 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
         server.middleware = [{ [data] _ in
             return .ok(.data(data.html))
         }]
+    }
+
+    override func tearDown() async throws {
+        TestTabExtensionsBuilder.shared = .default
+        MockPrivacyConfiguration.isFeatureKeyEnabled = nil
     }
 
     override func tearDown() {
