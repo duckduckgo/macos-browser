@@ -4191,7 +4191,6 @@
 				4B59CC8A290083040058F2F6 /* Bitwarden */,
 				AA652CAB25DD820D009059CC /* Bookmarks */,
 				4B43468D285ED6BD00177407 /* Bookmarks Bar */,
-				AA92ACAE24EFE1F5005F41C9 /* Browser Tab */,
 				85F69B3A25EDE7F800978E59 /* Common */,
 				85AC3B1525D9BBFA00C7D2AA /* Configuration */,
 				4B82E9B725B6A04B00656FE7 /* Content Blocker */,
@@ -4219,6 +4218,7 @@
 				858A798626A99D9000A75A42 /* Secure Vault */,
 				B6DA440F2616C0F200DD1EC2 /* Statistics */,
 				AA63744E24C9BB4A00AB2AC4 /* Suggestions */,
+				AA92ACAE24EFE1F5005F41C9 /* Tab */,
 				AAC9C01224CAFBB700AD1325 /* Tab Bar */,
 				B6CA4822298CDC0B0067ECCE /* TabExtensionsTests */,
 				AA0877B626D515EE00B05660 /* User Agent */,
@@ -4608,7 +4608,7 @@
 			path = ViewModel;
 			sourceTree = "<group>";
 		};
-		AA92ACAE24EFE1F5005F41C9 /* Browser Tab */ = {
+		AA92ACAE24EFE1F5005F41C9 /* Tab */ = {
 			isa = PBXGroup;
 			children = (
 				B62EB47B25BAD3BB005745C6 /* WKWebViewPrivateMethodsAvailabilityTests.swift */,
@@ -4619,7 +4619,7 @@
 				AA92ACB024EFE210005F41C9 /* Model */,
 				AA9C362625518B61004B1BA3 /* Services */,
 			);
-			path = "Browser Tab";
+			path = Tab;
 			sourceTree = "<group>";
 		};
 		AA92ACAF24EFE209005F41C9 /* ViewModel */ = {
