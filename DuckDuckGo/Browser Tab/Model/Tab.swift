@@ -1398,12 +1398,6 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         referrerTrimming.onFinishNavigation()
         setUpYoutubeScriptsIfNeeded()
         statisticsLoader?.refreshRetentionAtb(isSearch: navigation.url.isDuckDuckGoSearch)
-
-        if navigation.isCurrent {
-            // Clear “frozen” back-forward buttons state on new navigation after upgrading to HTTPS or GPC from Client Redirect
-            webView.frozenCanGoForward = nil
-            webView.frozenCanGoBack = nil
-        }
     }
 
     @MainActor
@@ -1416,12 +1410,6 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         linkProtection.setMainFrameUrl(nil)
         referrerTrimming.onFailedNavigation()
         webViewDidFailNavigationPublisher.send()
-
-        if navigation.isCurrent {
-            // Clear “frozen” back-forward buttons state on new navigation after upgrading to HTTPS or GPC from Client Redirect
-            webView.frozenCanGoForward = nil
-            webView.frozenCanGoBack = nil
-        }
     }
 
     @MainActor
