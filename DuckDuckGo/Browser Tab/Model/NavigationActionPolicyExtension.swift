@@ -31,15 +31,15 @@ extension NavigationActionPolicy {
             // https://app.asana.com/0/inbox/1199237043628108/1201280322539473/1201353436736961
             if case .redirect(.client(delay: 0)) = navigationAction.navigationType,
                // initial NavigationAction BackForwardListItem is not the Current Item (new item was pushed during navigation)
-               let fromHistoryItemIdentity = navigationAction.fromHistoryItemIdentity,
+               let fromHistoryItemIdentity = navigationAction.redirectHistory?.last?.fromHistoryItemIdentity,
                fromHistoryItemIdentity != webView.backForwardList.currentItem?.identity {
 
-                navigator.goBack()?.overrideResponders { _, _ in
-                    // don‘t perform actual navigation, just pop the back item
-                        .cancel
-                }
                 webView.frozenCanGoBack = webView.canGoBack
                 webView.frozenCanGoForward = false
+                navigator.goBack()?.overrideResponders { _, _ in
+                    // don‘t perform actual navigation, just pop the back item
+                    return .cancel
+                }
             }
 
             redirect(navigator)

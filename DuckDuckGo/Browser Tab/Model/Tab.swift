@@ -1114,9 +1114,6 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
     @MainActor
     func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
         preferences.userAgent = UserAgent.for(navigationAction.url)
-        // Clear “frozen” back-forward buttons state on new navigation after upgrading to HTTPS or GPC from Client Redirect
-        webView.frozenCanGoForward = nil
-        webView.frozenCanGoBack = nil
 
         if let policy = privatePlayer.decidePolicy(for: navigationAction, in: self) {
             return policy
@@ -1366,6 +1363,12 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         referrerTrimming.onFinishNavigation()
         setUpYoutubeScriptsIfNeeded()
         statisticsLoader?.refreshRetentionAtb(isSearch: navigation.url.isDuckDuckGoSearch)
+
+        if navigation.isCurrent {
+            // Clear “frozen” back-forward buttons state on new navigation after upgrading to HTTPS or GPC from Client Redirect
+            webView.frozenCanGoForward = nil
+            webView.frozenCanGoBack = nil
+        }
     }
 
     @MainActor
@@ -1378,6 +1381,12 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         linkProtection.setMainFrameUrl(nil)
         referrerTrimming.onFailedNavigation()
         webViewDidFailNavigationPublisher.send()
+
+        if navigation.isCurrent {
+            // Clear “frozen” back-forward buttons state on new navigation after upgrading to HTTPS or GPC from Client Redirect
+            webView.frozenCanGoForward = nil
+            webView.frozenCanGoBack = nil
+        }
     }
 
     @MainActor
