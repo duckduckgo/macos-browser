@@ -100,8 +100,7 @@ final class TestTabExtensionsBuilder: TabExtensionsBuilderProtocol {
         return TabExtensions(components: components.map { $0.buildingBlock.make() })
     }
 
-    /// collect Tab Extensions instantiation blocks (`add { }` method calls)
-    /// lazy for Unit Tests builds and non-lazy in Production
+    /// override Tab Extensions instantiation blocks provided in TabExtensionsBuilder  (`override { }` method calls)
     @discardableResult
     func override<Extension: TabExtension>(_ makeTabExtension: @escaping () -> Extension) -> TabExtensionBuildingBlock<Extension.PublicProtocol> {
         let builderBlock = TabExtensionBuildingBlock(makeTabExtension)
@@ -118,6 +117,15 @@ final class TestTabExtensionsBuilder: TabExtensionsBuilderProtocol {
         loader.state = TabExtensionLazyLoader<Extension.PublicProtocol>.State.none { makeTabExtension().getPublicProtocol () }
 
         return builderBlock
+    }
+
+    /// collect Tab Extensions instantiation blocks (`add { }` method calls)
+    /// lazy for Unit Tests builds and non-lazy in Production
+    @discardableResult
+    func add<Extension: TabExtension>(_ makeTabExtension: @escaping () -> Extension) -> TabExtensionBuildingBlock<Extension.PublicProtocol> {
+        let buildingBlock = TabExtensionBuildingBlock(makeTabExtension)
+        components.append( (protocolType: Extension.PublicProtocol.self, buildingBlock: buildingBlock) )
+        return buildingBlock
     }
 
     /// use to retreive Extension Building Blocks registered during TabExtensionsBuilder.registerExtensions
