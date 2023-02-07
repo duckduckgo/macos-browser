@@ -202,7 +202,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         let privatePlayer = privatePlayer
             ?? (AppDelegate.isRunningTests ? PrivatePlayer.mock(withMode: .enabled) : PrivatePlayer.shared)
         let statisticsLoader = statisticsLoader
-        ?? (AppDelegate.isRunningTests ? nil : StatisticsLoader.shared)
+            ?? (AppDelegate.isRunningTests ? nil : StatisticsLoader.shared)
 
         self.init(content: content,
                   faviconManagement: faviconManagement,
