@@ -67,7 +67,7 @@ class SerpHeadersNavigationResponderTests: XCTestCase {
         }
     }
 
-    override func tearDown() async throws {
+    override func tearDown() {
         TestTabExtensionsBuilder.shared = .default
         MockPrivacyConfiguration.isFeatureKeyEnabled = nil
     }
