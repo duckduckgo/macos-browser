@@ -34,17 +34,27 @@ final class TabTests: XCTestCase {
     let urls = URLs()
     var server: HttpServer!
 
+    var contentBlockingMock: ContentBlockingMock!
+    var privacyFeaturesMock: AnyPrivacyFeatures!
+    var privacyConfiguration: MockPrivacyConfiguration {
+        contentBlockingMock.privacyConfigurationManager.privacyConfig as! MockPrivacyConfiguration
+    }
+
     override func setUp() {
+        contentBlockingMock = ContentBlockingMock()
+        privacyFeaturesMock = AppPrivacyFeatures(contentBlocking: contentBlockingMock, httpsUpgradeStore: HTTPSUpgradeStoreMock())
         // disable waiting for CBR compilation on navigation
-        MockPrivacyConfiguration.isFeatureKeyEnabled = { _, _ in
+        privacyConfiguration.isFeatureKeyEnabled = { _, _ in
             return false
         }
+
         server = HttpServer()
     }
 
     override func tearDown() {
         TestTabExtensionsBuilder.shared = .default
-        MockPrivacyConfiguration.isFeatureKeyEnabled = nil
+        contentBlockingMock = nil
+        privacyFeaturesMock = nil
         server.stop()
     }
 
@@ -102,7 +112,7 @@ final class TabTests: XCTestCase {
     // MARK: - Back/Forward navigation
 
     func testCanGoBack() throws {
-        let tab = Tab()
+        let tab = Tab(content: .none, privacyFeatures: privacyFeaturesMock)
 
         var eCantGoBack = expectation(description: "canGoBack: false")
         var eCanGoBack: XCTestExpectation!
@@ -170,7 +180,7 @@ final class TabTests: XCTestCase {
         var webView: DuckDuckGo_Privacy_Browser.WebView!
         var eDidFinish: XCTestExpectation!
         var eDidRedirect: XCTestExpectation!
-        TestTabExtensionsBuilder.shared = TestTabExtensionsBuilder(load: []) { [urls] builder in { _, _ in
+        let extensionsBuilder = TestTabExtensionsBuilder(load: []) { [urls] builder in { _, _ in
             builder.add {
                 TestsClosureNavigationResponderTabExtension(.init { navigationAction, _ in
                     if navigationAction.url == urls.local2 {
@@ -186,7 +196,7 @@ final class TabTests: XCTestCase {
             }
         }}
 
-        let tab = Tab()
+        let tab = Tab(content: .none, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder)
         webView = tab.webView
 
         server.middleware = [{ [urls] request in
@@ -248,7 +258,7 @@ final class TabTests: XCTestCase {
         var webView: DuckDuckGo_Privacy_Browser.WebView!
         var eDidFinish: XCTestExpectation!
         var eDidRedirect: XCTestExpectation!
-        TestTabExtensionsBuilder.shared = TestTabExtensionsBuilder(load: []) { [urls] builder in { _, _ in
+        let extensionsBuilder = TestTabExtensionsBuilder(load: []) { [urls] builder in { _, _ in
             builder.add {
                 TestsClosureNavigationResponderTabExtension(.init { navigationAction, _ in
                     if navigationAction.url == urls.local2 {
@@ -264,7 +274,7 @@ final class TabTests: XCTestCase {
             }
         }}
 
-        let tab = Tab()
+        let tab = Tab(content: .none, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder)
         webView = tab.webView
 
         server.middleware = [{ [urls] request in
