@@ -225,8 +225,12 @@ struct TabExtensions {
         self.extensions = extensions
     }
 
-    func resolve<T: TabExtension>(_: T.Type) -> T.PublicProtocol? {
+    enum NullableExtension {
+        case nullable
+    }
+    func resolve<T: TabExtension>(_: T.Type, _ isNullable: NullableExtension? = nil) -> T.PublicProtocol? {
         let tabExtension = extensions[ObjectIdentifier(T.PublicProtocol.self)]?.getPublicProtocol() as? T.PublicProtocol
+        guard isNullable != .nullable else { return tabExtension}
 #if DEBUG
         assert(AppDelegate.isRunningTests || tabExtension != nil)
 #else
@@ -235,7 +239,7 @@ struct TabExtensions {
         return tabExtension
     }
 
-    func resolve<T: TabExtension>(_: T.Type) -> T.PublicProtocol? where T.PublicProtocol == T {
+    func resolve<T: TabExtension>(_: T.Type, _ isNullable: NullableExtension? = nil) -> T.PublicProtocol? where T.PublicProtocol == T {
         fatalError("ok, please don‘t cheat")
     }
 
