@@ -59,17 +59,24 @@ class SerpHeadersNavigationResponderTests: XCTestCase {
 
     let urls = URLs()
     let data = DataSource()
+    var contentBlockingMock: ContentBlockingMock!
+    var privacyFeaturesMock: AnyPrivacyFeatures!
+    var privacyConfiguration: MockPrivacyConfiguration {
+        contentBlockingMock.privacyConfigurationManager.privacyConfig as! MockPrivacyConfiguration
+    }
 
     override func setUp() {
+        contentBlockingMock = ContentBlockingMock()
+        privacyFeaturesMock = AppPrivacyFeatures(contentBlocking: contentBlockingMock, httpsUpgradeStore: HTTPSUpgradeStoreMock())
         // disable waiting for CBR compilation on navigation
-        MockPrivacyConfiguration.isFeatureKeyEnabled = { _, _ in
+        privacyConfiguration.isFeatureKeyEnabled = { _, _ in
             return false
         }
     }
 
     override func tearDown() {
-        TestTabExtensionsBuilder.shared = .default
-        MockPrivacyConfiguration.isFeatureKeyEnabled = nil
+        contentBlockingMock = nil
+        privacyFeaturesMock = nil
     }
 
     // MARK: - Tests
@@ -77,15 +84,14 @@ class SerpHeadersNavigationResponderTests: XCTestCase {
     @MainActor
     func testOnDDGRequest_headersAdded() {
         var onNavAction: (@MainActor (NavigationAction) -> NavigationActionPolicy?)!
-        TestTabExtensionsBuilder.shared = TestTabExtensionsBuilder(load: []) { builder in { _, _ in
+        let extensionsBuilder = TestTabExtensionsBuilder(load: []) { builder in { _, _ in
             builder.add {
                 TestsClosureNavigationResponderTabExtension(.init { navigationAction, _ in
                     onNavAction(navigationAction)
                 })
             }
         }}
-
-        let tab = Tab(content: .none, shouldLoadInBackground: true)
+        let tab = Tab(content: .none, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder, shouldLoadInBackground: true)
 
         for child in Mirror(reflecting: urls).children.filter({ $0.label!.hasPrefix("ddg") }) {
             let url = child.value as! URL
@@ -104,7 +110,7 @@ class SerpHeadersNavigationResponderTests: XCTestCase {
 
             print(url)
             tab.setContent(.url(url))
-            waitForExpectations(timeout: 50)
+            waitForExpectations(timeout: 5)
             tab.stopLoading()
         }
     }
@@ -112,7 +118,7 @@ class SerpHeadersNavigationResponderTests: XCTestCase {
     @MainActor
     func testOnRegularRequest_headersNotAdded() {
         var onNavAction: (@MainActor (NavigationAction) -> NavigationActionPolicy?)!
-        TestTabExtensionsBuilder.shared = TestTabExtensionsBuilder(load: []) { builder in { _, _ in
+        let extensionsBuilder = TestTabExtensionsBuilder(load: []) { builder in { _, _ in
             builder.add {
                 TestsClosureNavigationResponderTabExtension(.init { navigationAction, _ in
                     onNavAction(navigationAction)
@@ -120,7 +126,7 @@ class SerpHeadersNavigationResponderTests: XCTestCase {
             }
         }}
 
-        let tab = Tab(content: .none, shouldLoadInBackground: true)
+        let tab = Tab(content: .none, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder, shouldLoadInBackground: true)
 
         for child in Mirror(reflecting: urls).children.filter({ !$0.label!.hasPrefix("ddg") }) {
             let url = child.value as! URL
@@ -139,7 +145,7 @@ class SerpHeadersNavigationResponderTests: XCTestCase {
 
             print(url)
             tab.setContent(.url(url))
-            waitForExpectations(timeout: 50)
+            waitForExpectations(timeout: 5)
             tab.stopLoading()
         }
     }
