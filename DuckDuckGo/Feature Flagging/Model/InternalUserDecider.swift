@@ -40,6 +40,8 @@ final class InternalUserDecider {
         } else {
             isInternalUser = true
         }
+#elseif APPSTORE
+        isInternalUser = false
 #else
         isInternalUser = (try? store.load()) ?? false
 #endif
@@ -69,6 +71,10 @@ extension InternalUserDecider: InternalUserDeciding {
     }
 
     func markUserAsInternalIfNeeded(forUrl url: URL?, response: HTTPURLResponse?) {
+#if APP_STORE
+            return
+#endif
+
         if isInternalUser { // If we're already an internal user, we don't need to do anything
             return
         }
