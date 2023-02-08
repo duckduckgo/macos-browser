@@ -1100,6 +1100,10 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         let (request, future) = BasicAuthDialogRequest.future(with: challenge.protectionSpace)
         self.userInteractionDialog = UserDialog(sender: .page(domain: challenge.protectionSpace.host), dialog: .basicAuthenticationChallenge(request))
         do {
+            shouldDisableLongDecisionMakingChecks = true
+            defer {
+                shouldDisableLongDecisionMakingChecks = false
+            }
             return try await future.get()
         } catch {
             return .cancel
