@@ -76,6 +76,29 @@ final class TabTests: XCTestCase {
         XCTAssert(tab != tab2)
     }
 
+    // MARK: - Dialogs
+
+    func testWhenAlertDialogIsShowingChangingURLClearsDialog() {
+        let tab = Tab()
+        tab.url = .duckDuckGo
+        let webViewMock = WebViewMock()
+        let frameInfo = WKFrameInfoMock(webView: webViewMock, securityOrigin: WKSecurityOriginMock.new(url: .duckDuckGo), request: URLRequest(url: .duckDuckGo), isMainFrame: true)
+        tab.webView(webViewMock, runJavaScriptAlertPanelWithMessage: "Alert", initiatedByFrame: frameInfo) { }
+        XCTAssertNotNil(tab.userInteractionDialog)
+        tab.url = .duckDuckGoMorePrivacyInfo
+        XCTAssertNil(tab.userInteractionDialog)
+    }
+
+    func testWhenDownloadDialogIsShowingChangingURLDoesNOTClearDialog() {
+        let tab = Tab()
+        tab.url = .duckDuckGo
+        DownloadsPreferences().alwaysRequestDownloadLocation = true
+        tab.webView(WebViewMock(), saveDataToFile: Data(), suggestedFilename: "anything", mimeType: "application/pdf", originatingURL: .duckDuckGo)
+        XCTAssertNotNil(tab.userInteractionDialog)
+        tab.url = .duckDuckGoMorePrivacyInfo
+        XCTAssertNotNil(tab.userInteractionDialog)
+    }
+
     // MARK: - Back/Forward navigation
 
     func testCanGoBack() throws {
