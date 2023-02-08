@@ -199,7 +199,9 @@ extension Pixel {
             case bitwardenSharedKeyInjectionFailed
 
             case updaterAborted
-
+            case userSelectedToSkipUpdate
+            case userSelectedToInstallUpdate
+            case userSelectedToDismissUpdate
         }
 
     }
@@ -435,6 +437,12 @@ extension Pixel.Event.Debug {
 
         case .updaterAborted:
             return "updater_aborted"
+        case .userSelectedToSkipUpdate:
+            return "user_selected_to_skip_update"
+        case .userSelectedToInstallUpdate:
+            return "user_selected_to_install_update"
+        case .userSelectedToDismissUpdate:
+            return "user_selected_to_dismiss_update"
         }
     }
 }
