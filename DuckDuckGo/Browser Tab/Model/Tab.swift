@@ -362,6 +362,8 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     }
 
 #if DEBUG
+    /// set this to true when Navigation-related decision making is expected to take significant time to avoid assertions
+    /// used by BSK: Navigation.DistributedNavigationDelegate
     var shouldDisableLongDecisionMakingChecks: Bool = false
 #endif
 
