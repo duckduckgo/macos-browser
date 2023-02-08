@@ -51,14 +51,7 @@ final class FileDownloadManager: FileDownloadManagerProtocol {
         downloadAddedSubject.eraseToAnyPublisher()
     }
 
-    typealias FileNameChooserCallback = (/*suggestedFilename:*/ String?,
-                                                                /*directoryURL:*/      URL?,
-                                                                /*fileTypes:*/         [UTType],
-                                                                /*completionHandler*/  @escaping (URL?, UTType?) -> Void) -> Void
-    typealias FileIconOriginalRectCallback = (WebKitDownloadTask) -> NSRect?
-
-    private var destinationChooserCallbacks = [WebKitDownloadTask: FileNameChooserCallback]()
-    private var fileIconOriginalRectCallbacks = [WebKitDownloadTask: FileIconOriginalRectCallback]()
+    private var downloadTaskDelegates = [WebKitDownloadTask: () -> FileDownloadManagerDelegate?]()
 
     enum PostflightAction {
         case reveal
@@ -101,8 +94,7 @@ final class FileDownloadManager: FileDownloadManagerProtocol {
                                       tempURL: location.tempURL,
                                       postflight: postflight)
 
-        self.destinationChooserCallbacks[task] = delegate?.chooseDestination
-        self.fileIconOriginalRectCallbacks[task] = delegate?.fileIconFlyAnimationOriginalRect
+        self.downloadTaskDelegates[task] = { [weak delegate] in delegate }
 
         downloads.insert(task)
         downloadAddedSubject.send(task)
@@ -143,22 +135,21 @@ extension FileDownloadManager: WebKitDownloadTaskDelegate {
 
         let completion: (URL?, UTType?) -> Void = { url, fileType in
             if let url = url,
-               let originalRect = self.fileIconOriginalRectCallbacks[task]?(task) {
+               let originalRect = self.downloadTaskDelegates[task]?()?.fileIconFlyAnimationOriginalRect(for: task) {
                 task.progress.flyToImage = (UTType(fileExtension: url.pathExtension) ?? fileType)?.icon
                 task.progress.fileIconOriginalRect = originalRect
             }
 
             completionHandler(url, fileType)
 
-            self.destinationChooserCallbacks[task] = nil
-            self.fileIconOriginalRectCallbacks[task] = nil
+            self.downloadTaskDelegates[task] = nil
         }
 
         let downloadLocation = preferences.effectiveDownloadLocation
         let fileType = task.suggestedFileType
 
         guard task.shouldPromptForLocation || preferences.alwaysRequestDownloadLocation,
-              let locationChooser = self.destinationChooserCallbacks[task]
+              let delegate = self.downloadTaskDelegates[task]?()
         else {
             // download to default Downloads destination
             var fileName = suggestedFilename
@@ -180,8 +171,8 @@ extension FileDownloadManager: WebKitDownloadTaskDelegate {
         if let ext = fileType?.fileExtension {
             suggestedFilename = suggestedFilename.dropping(suffix: "." + ext)
         }
-
-        locationChooser(suggestedFilename, downloadLocation, fileType.map { [$0] } ?? []) {[weak self] url, fileType in
+        let fileTypes = fileType.map { [$0] } ?? []
+        delegate.chooseDestination(suggestedFilename: suggestedFilename, directoryURL: downloadLocation, fileTypes: fileTypes) { [weak self] url, fileType in
 
             if let url = url {
                 self?.preferences.lastUsedCustomDownloadLocation = url.deletingLastPathComponent()
@@ -201,8 +192,7 @@ extension FileDownloadManager: WebKitDownloadTaskDelegate {
 
         defer {
             self.downloads.remove(task)
-            self.destinationChooserCallbacks[task] = nil
-            self.fileIconOriginalRectCallbacks[task] = nil
+            self.downloadTaskDelegates[task] = nil
         }
 
         if case .success(let url) = result {
