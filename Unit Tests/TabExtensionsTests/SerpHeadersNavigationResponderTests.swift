@@ -23,42 +23,26 @@ import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 class SerpHeadersNavigationResponderTests: XCTestCase {
-    struct URLs {
-        let ddg = URL.duckDuckGo
-        let ddgSearch = URL.makeSearchUrl(from: "some search query")
-        let ddg2 = URL.duckDuckGoEmail
-        let ddg3 = URL.duckDuckGoAutocomplete
 
-        let ddg5 = URL.aboutDuckDuckGo
-        let ddg7 = URL.privacyPolicy
+    let ddgUrls = [
+        URL.duckDuckGo,
+        URL.makeSearchUrl(from: "some search query")!,
+        URL.duckDuckGoEmail,
+        URL.duckDuckGoAutocomplete,
 
-        let not_ddg = URL(string: "https://duckduckgo.com.local/")!
-        let not_ddg2 = URL(string: "https://my.duckduckgo.com/")!
-        let someUrl = URL(string: "https://youtube.com/")!
-        let privacy_ddg = URL.duckDuckGoMorePrivacyInfo
-        let gpc_ddg = URL.gpcLearnMore
-    }
-    struct DataSource {
-        let empty = Data()
-        let html = """
-            <html>
-                <body>
-                    some data
-                    <a id="navlink" />
-                </body>
-            </html>
-        """.data(using: .utf8)!
-        let metaRedirect = """
-        <html>
-            <head>
-                <meta http-equiv="Refresh" content="0; URL=http://localhost:8084/3" />
-            </head>
-        </html>
-        """.data(using: .utf8)!
-    }
+        URL.aboutDuckDuckGo,
+        URL.privacyPolicy,
+    ]
 
-    let urls = URLs()
-    let data = DataSource()
+    let nonDdgUrls = [
+        URL(string: "https://duckduckgo.com.local/")!,
+        URL(string: "https://my.duckduckgo.com/")!,
+        URL(string: "https://youtube.com/")!,
+
+        URL.duckDuckGoMorePrivacyInfo,
+        URL.gpcLearnMore,
+    ]
+
     var contentBlockingMock: ContentBlockingMock!
     var privacyFeaturesMock: AnyPrivacyFeatures!
     var privacyConfiguration: MockPrivacyConfiguration {
@@ -93,9 +77,7 @@ class SerpHeadersNavigationResponderTests: XCTestCase {
         }}
         let tab = Tab(content: .none, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder, shouldLoadInBackground: true)
 
-        for child in Mirror(reflecting: urls).children.filter({ $0.label!.hasPrefix("ddg") }) {
-            let url = child.value as! URL
-
+        for url in ddgUrls {
             let eNavAction = expectation(description: "onNavAction for \(url.absoluteString)")
             onNavAction = { navigationAction in
                 XCTAssertEqual(navigationAction.url, url)
@@ -128,9 +110,7 @@ class SerpHeadersNavigationResponderTests: XCTestCase {
 
         let tab = Tab(content: .none, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder, shouldLoadInBackground: true)
 
-        for child in Mirror(reflecting: urls).children.filter({ !$0.label!.hasPrefix("ddg") }) {
-            let url = child.value as! URL
-
+        for url in nonDdgUrls {
             let eNavAction = expectation(description: "onNavAction for \(url.absoluteString)")
             onNavAction = { navigationAction in
                 XCTAssertEqual(navigationAction.url, url)
