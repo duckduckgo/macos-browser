@@ -28,9 +28,9 @@ class MockPrivacyConfiguration: PrivacyConfiguration {
     var trackerAllowlist: PrivacyConfigurationData.TrackerAllowlistData = [:]
 
     func exceptionsList(forFeature featureKey: PrivacyFeature) -> [String] { [] }
-    static var isFeatureKeyEnabled: ((PrivacyFeature, AppVersionProvider) -> Bool)?
+    var isFeatureKeyEnabled: ((PrivacyFeature, AppVersionProvider) -> Bool)?
     func isEnabled(featureKey: PrivacyFeature, versionProvider: AppVersionProvider) -> Bool {
-        MockPrivacyConfiguration.isFeatureKeyEnabled?(featureKey, versionProvider) ?? true
+        isFeatureKeyEnabled?(featureKey, versionProvider) ?? true
     }
     func isFeature(_ feature: PrivacyFeature, enabledForDomain: String?) -> Bool { true }
     func isProtected(domain: String?) -> Bool { true }

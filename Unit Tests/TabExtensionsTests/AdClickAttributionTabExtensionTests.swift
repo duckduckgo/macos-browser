@@ -66,8 +66,18 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
     let trackerInfoPublisher = PassthroughSubject<DetectedRequest, Never>()
     let now = Date()
 
+    var contentBlockingMock: ContentBlockingMock!
+    var privacyFeaturesMock: AnyPrivacyFeatures!
+    var privacyConfiguration: MockPrivacyConfiguration {
+        contentBlockingMock.privacyConfigurationManager.privacyConfig as! MockPrivacyConfiguration
+    }
+    var extensionsBuilder: TestTabExtensionsBuilder!
+
     override func setUp() {
-        TestTabExtensionsBuilder.shared = TestTabExtensionsBuilder(load: [AdClickAttributionTabExtension.self]) { [unowned self] builder in { args, dependencies in
+        contentBlockingMock = ContentBlockingMock()
+        privacyFeaturesMock = AppPrivacyFeatures(contentBlocking: contentBlockingMock, httpsUpgradeStore: HTTPSUpgradeStoreMock())
+
+        extensionsBuilder = TestTabExtensionsBuilder(load: [AdClickAttributionTabExtension.self]) { [unowned self] builder in { args, dependencies in
             builder.override {
                 AdClickAttributionTabExtension(inheritedAttribution: args.inheritedAttribution,
                                                userContentControllerProvider: { self.userContentController },
@@ -88,8 +98,9 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
 
     override func tearDown() {
         server.stop()
-        TestTabExtensionsBuilder.shared = .default
-        MockPrivacyConfiguration.isFeatureKeyEnabled = nil
+        extensionsBuilder = nil
+        contentBlockingMock = nil
+        privacyFeaturesMock = nil
     }
 
     // MARK: - Tests
@@ -130,18 +141,18 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
         }
         logic.onRulesChanged = { _ in }
 
-        let childTab = Tab(parentTab: parentTab)
+        let childTab = Tab(content: .none, extensionsBuilder: extensionsBuilder, parentTab: parentTab)
 
         waitForExpectations(timeout: 1)
         XCTAssertEqual(childTab.adClickAttribution?.currentAttributionState, mockAttribution.currentAttributionState)
     }
 
     func testWhenNavigationSucceeds_eventsSent() throws {
-        let tab = Tab(content: .none, shouldLoadInBackground: true)
         // disable waiting for CBR compilation on navigation
-        MockPrivacyConfiguration.isFeatureKeyEnabled = { _, _ in
+        privacyConfiguration.isFeatureKeyEnabled = { _, _ in
             return false
         }
+        let tab = Tab(content: .none, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder, shouldLoadInBackground: true)
 
         let onDetectionDidStart = expectation(description: "detection.onDidStart")
         detection.onDidStart = { [urls] url in
@@ -175,11 +186,11 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
     }
 
     func testWhenNavigationRedirects_didFinishNotCalledForRedirectedNavigation() throws {
-        let tab = Tab(content: .none, shouldLoadInBackground: true)
         // disable waiting for CBR compilation on navigation
-        MockPrivacyConfiguration.isFeatureKeyEnabled = { _, _ in
+        privacyConfiguration.isFeatureKeyEnabled = { _, _ in
             return false
         }
+        let tab = Tab(content: .none, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder, shouldLoadInBackground: true)
 
         server.middleware = [{ [data] request in
             guard request.path == "/" else { return nil}
@@ -224,11 +235,11 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
     }
 
     func testWhenNavigationFails_eventsSent() {
-        let tab = Tab(content: .none, shouldLoadInBackground: true)
         // disable waiting for CBR compilation on navigation
-        MockPrivacyConfiguration.isFeatureKeyEnabled = { _, _ in
+        privacyConfiguration.isFeatureKeyEnabled = { _, _ in
             return false
         }
+        let tab = Tab(content: .none, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder, shouldLoadInBackground: true)
 
         let onDetectionDidStart = expectation(description: "detection.onDidStart")
         detection.onDidStart = { [urls] url in
@@ -247,11 +258,11 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
     }
 
     func testOnBackForward_onBackForwardNavigationCalled() throws {
-        let tab = Tab(content: .none, shouldLoadInBackground: true)
         // disable waiting for CBR compilation on navigation
-        MockPrivacyConfiguration.isFeatureKeyEnabled = { _, _ in
+        privacyConfiguration.isFeatureKeyEnabled = { _, _ in
             return false
         }
+        let tab = Tab(content: .none, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder, shouldLoadInBackground: true)
         try server.start(8084)
 
         detection.onDidStart = { _ in }
@@ -297,10 +308,10 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
     }
 
     func testOnLogicDidRequestRulesApplication_localContentRuleListIsInstalled() {
-        let tab = Tab(content: .none, shouldLoadInBackground: true)
-        MockPrivacyConfiguration.isFeatureKeyEnabled = { feature, _ in
+        privacyConfiguration.isFeatureKeyEnabled = { feature, _ in
             return feature == .contentBlocking
         }
+        let tab = Tab(content: .none, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder, shouldLoadInBackground: true)
 
         let userScriptInstalled = expectation(description: "userScriptInstalled")
         logic.onRulesChanged = { _ in
@@ -336,10 +347,10 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
     }
 
     func testOnNilRulesApplication_supplementaryTrackerDataIsCleared() {
-        let tab = Tab(content: .none, shouldLoadInBackground: true)
-        MockPrivacyConfiguration.isFeatureKeyEnabled = { feature, _ in
+        privacyConfiguration.isFeatureKeyEnabled = { feature, _ in
             return feature == .contentBlocking
         }
+        let tab = Tab(content: .none, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder, shouldLoadInBackground: true)
 
         let userScriptInstalled = expectation(description: "userScriptInstalled")
         logic.onRulesChanged = { _ in
@@ -357,10 +368,10 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
     }
 
     func testOnRulesApplicationWithContentBlockingDisabled_localContentRuleListIsRemoved() {
-        let tab = Tab(content: .none, shouldLoadInBackground: true)
-        MockPrivacyConfiguration.isFeatureKeyEnabled = { _, _ in
+        privacyConfiguration.isFeatureKeyEnabled = { _, _ in
             return false
         }
+        let tab = Tab(content: .none, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder, shouldLoadInBackground: true)
 
         let userScriptInstalled = expectation(description: "userScriptInstalled")
         logic.onRulesChanged = { _ in
@@ -385,10 +396,10 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
     }
 
     func testOnRulesApplicationWithNilVendor_localContentRuleListIsRemoved() {
-        let tab = Tab(content: .none, shouldLoadInBackground: true)
-        MockPrivacyConfiguration.isFeatureKeyEnabled = { feature, _ in
+        privacyConfiguration.isFeatureKeyEnabled = { feature, _ in
             return feature == .contentBlocking
         }
+        let tab = Tab(content: .none, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder, shouldLoadInBackground: true)
 
         let userScriptInstalled = expectation(description: "userScriptInstalled")
         logic.onRulesChanged = { _ in
@@ -423,7 +434,7 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
     }
 
     func testOnTrackerDataupdated_onRequestDetectedIsCalled() {
-        let tab = Tab(content: .none, shouldLoadInBackground: true)
+        let tab = Tab(content: .none, extensionsBuilder: extensionsBuilder, shouldLoadInBackground: true)
 
         let mockRequest = DetectedRequest(url: "testurl.com", eTLDplus1: nil, knownTracker: nil, entity: .init(displayName: "entity", domains: nil, prevalence: 1), state: .blocked, pageUrl: "pageurl.com")
         let onRequestDetected = expectation(description: "onRequestDetected")
