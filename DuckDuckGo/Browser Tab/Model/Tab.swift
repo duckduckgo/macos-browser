@@ -1334,7 +1334,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
             cbaTimeReporter?.tabWillWaitForRulesCompilation(self.instrumentation.currentTabIdentifier)
 #if DEBUG
             shouldDisableLongDecisionMakingChecks = true
-            defer { // swiftlint:disable:this inert_defer
+            defer {
                 shouldDisableLongDecisionMakingChecks = false
             }
 #endif
