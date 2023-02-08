@@ -41,7 +41,7 @@ extension TestsClosureNavigationResponderTabExtension: TestsClosureNavigationRes
 
 private extension TabExtensions {
     var testsClosureNavigationResponderTabExtension: TestsClosureNavigationResponderTabExtensionProtocol? {
-        resolve(TestsClosureNavigationResponderTabExtension.self)
+        resolve(TestsClosureNavigationResponderTabExtension.self, .nullable)
     }
 }
 

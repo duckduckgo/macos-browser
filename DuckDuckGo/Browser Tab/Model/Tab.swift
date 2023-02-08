@@ -397,7 +397,8 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                 historyCoordinating.commitChanges(url: oldUrl)
             }
             error = nil
-            userInteractionDialog = nil
+            dismissPresentedAlert()
+
             Task {
                 await reloadIfNeeded(shouldLoadInBackground: true)
             }
@@ -405,7 +406,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             if let title = content.title {
                 self.title = title
             }
-
         }
     }
 
@@ -831,6 +831,15 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         }
     }
 
+    private func dismissPresentedAlert() {
+        if let userInteractionDialog {
+            switch userInteractionDialog.dialog {
+            case .jsDialog: self.userInteractionDialog = nil
+            default: break
+            }
+        }
+    }
+
     // MARK: - Favicon
 
     @Published var favicon: NSImage?
@@ -1127,6 +1136,10 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         let (request, future) = BasicAuthDialogRequest.future(with: challenge.protectionSpace)
         self.userInteractionDialog = UserDialog(sender: .page(domain: challenge.protectionSpace.host), dialog: .basicAuthenticationChallenge(request))
         do {
+            shouldDisableLongDecisionMakingChecks = true
+            defer {
+                shouldDisableLongDecisionMakingChecks = false
+            }
             return try await future.get()
         } catch {
             return .cancel
@@ -1156,7 +1169,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         }
 
         let isLinkActivated = !navigationAction.isTargetingNewWindow
-            && navigationAction.navigationType.isLinkActivated
+            && (navigationAction.navigationType.isLinkActivated || (navigationAction.navigationType == .other && navigationAction.isUserInitiated))
 
         let isNavigatingAwayFromPinnedTab: Bool = {
             let isNavigatingToAnotherDomain = navigationAction.url.host != url?.host

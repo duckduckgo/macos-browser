@@ -65,7 +65,7 @@ platform :mac do
   lane :release_appstore do |options|
     build_release(options)
 
-    deliver(common_deliver_arguments.merge(options))
+    deliver(common_deliver_arguments(options))
 
     begin
       upload_metadata(options)
@@ -89,7 +89,7 @@ platform :mac do
   #
   desc 'Updates App Store metadata'
   lane :upload_metadata do |options|
-    deliver(common_deliver_arguments.merge(options).merge({
+    deliver(common_deliver_arguments(options).merge({
       skip_binary_upload: true,
       skip_metadata: false
     }))
@@ -107,7 +107,7 @@ platform :mac do
   lane :code_freeze do |options|
     macos_codefreeze_prechecks
     new_version = validate_new_version(options)
-    app_store_build_number = get_app_store_build_number(options)
+    app_store_build_number = increment_app_store_build_number(options)
     macos_create_release_branch(version: new_version)
     macos_update_embedded_files
     macos_update_version_and_build_number_config(
@@ -208,22 +208,11 @@ platform :mac do
     new_version
   end
 
-  # Checks TestFlight for the latest build number for a given version,
-  # increments it and sets locally.
+  # Checks current build number and increments it by 1.
   #
-  # @option [String] version Marketing version string
-  # @option [String] username Apple ID to be used to connect to TestFlight
-  #
-  desc 'Increment build number based on version in App Store Connect'
-  private_lane :get_app_store_build_number do |options|
-    latest_testflight_build_number(
-      api_key: get_api_key,
-      version: options[:version],
-      app_identifier: "com.duckduckgo.mobile.ios",
-      initial_build_number: -1,
-      platform: "osx",
-      username: get_username(options)
-    ) + 1
+  desc 'Increment App Store build number'
+  private_lane :increment_app_store_build_number do
+    macos_current_build_number + 1
   end
 
   # Checks out a new branch from the current commit and pushes it
@@ -295,6 +284,21 @@ platform :mac do
     sh('git', 'push')
   end
 
+  # Reads App Store build number from the config file
+  #
+  # @return [String] build number read from the file, or nil in case of failure
+  #
+  def macos_current_build_number
+    current_build_number = 0
+
+    file_data = File.read(APP_STORE_BUILD_NUMBER_CONFIG_PATH).split("\n")
+    file_data.each do |line|
+      current_build_number = line.split('=')[1].strip.to_i if line.start_with?(BUILD_NUMBER_CONFIG_DEFINITION)
+    end
+
+    current_build_number
+  end
+
   # Updates version in the config file
   #
   # @return [String] version read from the file, or nil in case of failure
@@ -339,8 +343,8 @@ platform :mac do
     user_version
   end
 
-  def common_deliver_arguments
-    {
+  def common_deliver_arguments(options)
+    args = {
       api_key: get_api_key,
       submit_for_review: false,
       automatic_release: false,
@@ -352,6 +356,11 @@ platform :mac do
       submission_information: {
          add_id_info_uses_idfa: false
       }
-    }
+    }.merge(options)
+
+    unless args.has_key? :username
+      args[:username] = get_username(options)
+    end
+    args
   end
 end

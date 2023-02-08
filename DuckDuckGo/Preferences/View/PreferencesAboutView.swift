@@ -43,7 +43,11 @@ extension Preferences {
                     HStack {
                         Image("AboutPageLogo")
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("DuckDuckGo").font(.companyName)
+#if APPSTORE
+                            Text(UserText.duckDuckGoForMacAppStore).font(.companyName)
+#else
+                            Text(UserText.duckDuckGo).font(.companyName)
+#endif
                             Text(UserText.privacySimplified).font(.privacySimplified)
                             Text(UserText.versionLabel(version: model.appVersion.versionNumber, build: model.appVersion.buildNumber))
                         }
