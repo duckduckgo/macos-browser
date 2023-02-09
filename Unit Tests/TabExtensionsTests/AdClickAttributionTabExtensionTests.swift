@@ -61,7 +61,8 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
 
     let logic = MockAdClickLogic()
     let detection = MockAdClickDetection()
-    let contentBlockerRulesScript = MockContentBlockerRulesUserScript()
+    let contentBlockerRulesScriptSubj = CurrentValueSubject<ContentBlockerScriptProtocol?, Never>(nil)
+    var contentBlockerRulesScript: MockContentBlockerRulesUserScript!
     let userContentController = UserContentControllerMock()
     let trackerInfoPublisher = PassthroughSubject<DetectedRequest, Never>()
     let now = Date()
@@ -80,8 +81,8 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
         extensionsBuilder = TestTabExtensionsBuilder(load: [AdClickAttributionTabExtension.self]) { [unowned self] builder in { args, dependencies in
             builder.override {
                 AdClickAttributionTabExtension(inheritedAttribution: args.inheritedAttribution,
-                                               userContentControllerFuture: Future { $0(.success(self.userContentController)) },
-                                               contentBlockerRulesScriptPublisher: Just(self.contentBlockerRulesScript as ContentBlockerScriptProtocol?),
+                                               userContentControllerFuture: Future { fulfill in DispatchQueue.main.async { fulfill(.success(self.userContentController)) } },
+                                               contentBlockerRulesScriptPublisher: self.contentBlockerRulesScriptSubj,
                                                trackerInfoPublisher: self.trackerInfoPublisher,
                                                dependencies: dependencies.privacyFeatures.contentBlocking,
                                                dateTimeProvider: { self.now }) { _ in
@@ -96,11 +97,17 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
         }]
     }
 
+    func makeContentBlockerRulesUserScript() {
+        contentBlockerRulesScript = MockContentBlockerRulesUserScript()
+        contentBlockerRulesScriptSubj.send(contentBlockerRulesScript)
+    }
+
     override func tearDown() {
         server.stop()
         extensionsBuilder = nil
         contentBlockingMock = nil
         privacyFeaturesMock = nil
+        contentBlockerRulesScript = nil
     }
 
     // MARK: - Tests
@@ -139,8 +146,70 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
             logic.state = $0!
             onApplyInheritedAttribution.fulfill()
         }
+        let onInstallLocalContentRuleList = expectation(description: "onInstallLocalContentRuleList")
+        userContentController.onInstallLocalContentRuleList = { _, _ in
+            onInstallLocalContentRuleList.fulfill()
+        }
+        let onDisableGlobalContentRuleList = expectation(description: "onDisableGlobalContentRuleList")
+        userContentController.onDisableGlobalContentRuleList = { _ in
+            onDisableGlobalContentRuleList.fulfill()
+        }
         logic.onRulesChanged = { _ in }
 
+        let childTab = Tab(content: .none, extensionsBuilder: extensionsBuilder, parentTab: parentTab)
+        DispatchQueue.main.async {
+            self.makeContentBlockerRulesUserScript()
+        }
+
+        waitForExpectations(timeout: 1)
+        XCTAssertEqual(childTab.adClickAttribution?.currentAttributionState, mockAttribution.currentAttributionState)
+    }
+
+    func testWhenChildTabCreatedAndScriptsAlreadyLoaded_AdClickAttributionStateIsSet() {
+
+        class MockAttribution: TabExtension, AdClickAttributionProtocol {
+            private struct SessionInfoMock {
+                // Start of the attribution
+                public let attributionStartedAt = Date()
+                // Present when we leave webpage associated with the attribution
+                public let leftAttributionContextAt: Date? = nil
+            }
+
+            var currentAttributionState: BrowserServicesKit.AdClickAttributionLogic.State = {
+                let ruleListMock = NSObject()
+                let ruleList = withUnsafePointer(to: ruleListMock) { $0.withMemoryRebound(to: WKContentRuleList.self, capacity: 1) { $0 } }.pointee
+                return .activeAttribution(vendor: "a", session: unsafeBitCast(SessionInfoMock(), to: AdClickAttributionLogic.SessionInfo.self), rules: .init(name: "name", rulesList: ruleList, trackerData: .mock, encodedTrackerData: "data", etag: "etag", identifier: .mock))
+            }()
+
+            func getPublicProtocol() -> AdClickAttributionProtocol {
+                self
+            }
+        }
+        let mockAttribution = MockAttribution()
+        let mockBuilder = TestTabExtensionsBuilder(load: [AdClickAttributionTabExtension.self]) { builder in { _, _ in
+            builder.override {
+                mockAttribution
+            }
+        }}
+
+        let parentTab = Tab(content: .none, extensionsBuilder: mockBuilder, shouldLoadInBackground: true)
+
+        let onApplyInheritedAttribution = expectation(description: "onApplyInheritedAttribution")
+        /*childTab*/logic.onApplyInheritedAttribution = { [unowned logic] in
+            logic.state = $0!
+            onApplyInheritedAttribution.fulfill()
+        }
+        let onInstallLocalContentRuleList = expectation(description: "onInstallLocalContentRuleList")
+        userContentController.onInstallLocalContentRuleList = { _, _ in
+            onInstallLocalContentRuleList.fulfill()
+        }
+        let onDisableGlobalContentRuleList = expectation(description: "onDisableGlobalContentRuleList")
+        userContentController.onDisableGlobalContentRuleList = { _ in
+            onDisableGlobalContentRuleList.fulfill()
+        }
+        logic.onRulesChanged = { _ in }
+
+        makeContentBlockerRulesUserScript()
         let childTab = Tab(content: .none, extensionsBuilder: extensionsBuilder, parentTab: parentTab)
 
         waitForExpectations(timeout: 1)
@@ -153,6 +222,9 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
             return false
         }
         let tab = Tab(content: .none, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder, shouldLoadInBackground: true)
+        DispatchQueue.main.async {
+            self.makeContentBlockerRulesUserScript()
+        }
 
         let onDetectionDidStart = expectation(description: "detection.onDidStart")
         detection.onDidStart = { [urls] url in
@@ -191,6 +263,9 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
             return false
         }
         let tab = Tab(content: .none, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder, shouldLoadInBackground: true)
+        DispatchQueue.main.async {
+            self.makeContentBlockerRulesUserScript()
+        }
 
         server.middleware = [{ [data] request in
             guard request.path == "/" else { return nil}
@@ -240,6 +315,9 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
             return false
         }
         let tab = Tab(content: .none, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder, shouldLoadInBackground: true)
+        DispatchQueue.main.async {
+            self.makeContentBlockerRulesUserScript()
+        }
 
         let onDetectionDidStart = expectation(description: "detection.onDidStart")
         detection.onDidStart = { [urls] url in
@@ -263,6 +341,10 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
             return false
         }
         let tab = Tab(content: .none, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder, shouldLoadInBackground: true)
+        DispatchQueue.main.async {
+            self.makeContentBlockerRulesUserScript()
+        }
+
         try server.start(8084)
 
         detection.onDidStart = { _ in }
@@ -317,6 +399,9 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
         }
 
         let tab = Tab(content: .none, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder, shouldLoadInBackground: true)
+        DispatchQueue.main.async {
+            self.makeContentBlockerRulesUserScript()
+        }
 
         waitForExpectations(timeout: 1)
 
@@ -356,6 +441,9 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
             userScriptInstalled.fulfill()
         }
         let tab = Tab(content: .none, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder, shouldLoadInBackground: true)
+        DispatchQueue.main.async {
+            self.makeContentBlockerRulesUserScript()
+        }
 
         waitForExpectations(timeout: 1)
 
@@ -377,6 +465,9 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
             userScriptInstalled.fulfill()
         }
         let tab = Tab(content: .none, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder, shouldLoadInBackground: true)
+        DispatchQueue.main.async {
+            self.makeContentBlockerRulesUserScript()
+        }
 
         waitForExpectations(timeout: 1)
 
@@ -405,6 +496,9 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
             userScriptInstalled.fulfill()
         }
         let tab = Tab(content: .none, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder, shouldLoadInBackground: true)
+        DispatchQueue.main.async {
+            self.makeContentBlockerRulesUserScript()
+        }
 
         waitForExpectations(timeout: 1)
 
@@ -436,6 +530,9 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
 
     func testOnTrackerDataupdated_onRequestDetectedIsCalled() {
         let tab = Tab(content: .none, extensionsBuilder: extensionsBuilder, shouldLoadInBackground: true)
+        DispatchQueue.main.async {
+            self.makeContentBlockerRulesUserScript()
+        }
 
         let mockRequest = DetectedRequest(url: "testurl.com", eTLDplus1: nil, knownTracker: nil, entity: .init(displayName: "entity", domains: nil, prevalence: 1), state: .blocked, pageUrl: "pageurl.com")
         let onRequestDetected = expectation(description: "onRequestDetected")
@@ -444,7 +541,9 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
             onRequestDetected.fulfill()
         }
 
-        trackerInfoPublisher.send(mockRequest)
+        DispatchQueue.main.async {
+            self.trackerInfoPublisher.send(mockRequest)
+        }
 
         waitForExpectations(timeout: 1)
         withExtendedLifetime(tab) {}
@@ -460,6 +559,11 @@ class MockAdClickLogic: AdClickLogicProtocol {
     var onApplyInheritedAttribution: ((AdClickAttributionLogic.State?) -> Void)!
     func applyInheritedAttribution(state: AdClickAttributionLogic.State?) {
         onApplyInheritedAttribution(state)
+
+        let castedLogic = withUnsafePointer(to: self) { $0.withMemoryRebound(to: AdClickAttributionLogic.self, capacity: 1) { $0 } }.pointee
+        let ruleListMock = NSObject()
+        let ruleList = withUnsafePointer(to: ruleListMock) { $0.withMemoryRebound(to: WKContentRuleList.self, capacity: 1) { $0 } }.pointee
+        self.delegate!.attributionLogic(castedLogic, didRequestRuleApplication: .init(name: "rulesList", rulesList: ruleList, trackerData: .mock, encodedTrackerData: "etd", etag: "etag", identifier: .mock), forVendor: "vnd")
     }
 
     var onRulesChanged: (([ContentBlockerRulesManager.Rules]) -> Void)?
