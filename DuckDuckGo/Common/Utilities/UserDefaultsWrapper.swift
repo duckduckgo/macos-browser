@@ -104,48 +104,67 @@ public struct UserDefaultsWrapper<T> {
     private let defaultValue: T
     private let setIfEmpty: Bool
 
-    public init(key: Key, defaultValue: T, setIfEmpty: Bool = false) {
+    private let customUserDefaults: UserDefaults?
+
+    var defaults: UserDefaults {
+        customUserDefaults ?? Self.defaults
+    }
+
+    static var defaults: UserDefaults {
+#if DEBUG
+        if AppDelegate.isRunningTests,
+           let defaults = UserDefaults(suiteName: Bundle.main.bundleIdentifier! + ".tests") {
+            return defaults
+        }
+#endif
+        return .standard
+    }
+
+    public init(key: Key, defaultValue: T, setIfEmpty: Bool = false, defaults: UserDefaults? = nil) {
         self.key = key
         self.defaultValue = defaultValue
         self.setIfEmpty = setIfEmpty
+        self.customUserDefaults = defaults
     }
 
     public var wrappedValue: T {
         get {
-            if let storedValue = UserDefaults.standard.object(forKey: key.rawValue),
+            if let storedValue = defaults.object(forKey: key.rawValue),
                let typedValue = storedValue as? T {
                 return typedValue
             }
 
             if setIfEmpty {
-                UserDefaults.standard.set(defaultValue, forKey: key.rawValue)
+                defaults.set(defaultValue, forKey: key.rawValue)
             }
 
             return defaultValue
         }
         set {
             if (newValue as? AnyOptional)?.isNil == true {
-                UserDefaults.standard.removeObject(forKey: key.rawValue)
+                defaults.removeObject(forKey: key.rawValue)
             } else {
-                UserDefaults.standard.set(newValue, forKey: key.rawValue)
+                defaults.set(newValue, forKey: key.rawValue)
             }
         }
     }
 
     static func clearAll() {
+        let defaults = defaults
         Key.allCases.forEach { key in
-            UserDefaults.standard.removeObject(forKey: key.rawValue)
+            defaults.removeObject(forKey: key.rawValue)
         }
     }
 
     static func clearRemovedKeys() {
+        let defaults = defaults
         RemovedKeys.allCases.forEach { key in
-            UserDefaults.standard.removeObject(forKey: key.rawValue)
+            defaults.removeObject(forKey: key.rawValue)
         }
     }
 
     static func clear(_ key: Key) {
-        UserDefaults.standard.removeObject(forKey: key.rawValue)
+        defaults.removeObject(forKey: key.rawValue)
     }
 
 }
