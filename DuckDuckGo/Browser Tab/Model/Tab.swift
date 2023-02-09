@@ -366,6 +366,11 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     /// set this to true when Navigation-related decision making is expected to take significant time to avoid assertions
     /// used by BSK: Navigation.DistributedNavigationDelegate
     var shouldDisableLongDecisionMakingChecks: Bool = false
+    func disableLongDecisionMakingChecks() { shouldDisableLongDecisionMakingChecks = true }
+    func enableLongDecisionMakingChecks() { shouldDisableLongDecisionMakingChecks = false }
+#else
+    func disableLongDecisionMakingChecks() {}
+    func enableLongDecisionMakingChecks() {}
 #endif
 
     // MARK: - Event Publishers
@@ -1112,10 +1117,11 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         let (request, future) = BasicAuthDialogRequest.future(with: challenge.protectionSpace)
         self.userInteractionDialog = UserDialog(sender: .page(domain: challenge.protectionSpace.host), dialog: .basicAuthenticationChallenge(request))
         do {
-            shouldDisableLongDecisionMakingChecks = true
+            disableLongDecisionMakingChecks()
             defer {
-                shouldDisableLongDecisionMakingChecks = false
+                enableLongDecisionMakingChecks()
             }
+
             return try await future.get()
         } catch {
             return .cancel
@@ -1331,12 +1337,11 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         if userContentController?.contentBlockingAssetsInstalled == false
            && contentBlocking.privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .contentBlocking) {
             cbaTimeReporter?.tabWillWaitForRulesCompilation(self.instrumentation.currentTabIdentifier)
-#if DEBUG
-            shouldDisableLongDecisionMakingChecks = true
+
+            disableLongDecisionMakingChecks()
             defer {
-                shouldDisableLongDecisionMakingChecks = false
+                enableLongDecisionMakingChecks()
             }
-#endif
 
             await userContentController?.awaitContentBlockingAssetsInstalled()
             cbaTimeReporter?.reportWaitTimeForTabFinishedWaitingForRules(self.instrumentation.currentTabIdentifier)
