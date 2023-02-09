@@ -77,4 +77,20 @@ extension UpdateController: SPUUpdaterDelegate {
         Pixel.fire(.debug(event: .updaterAborted, error: error))
     }
 
+    func updater(_ updater: SPUUpdater,
+                 userDidMake choice: SPUUserUpdateChoice,
+                 forUpdate updateItem: SUAppcastItem,
+                 state: SPUUserUpdateState) {
+        switch choice {
+        case .skip:
+            Pixel.fire(.debug(event: .userSelectedToSkipUpdate))
+        case .install:
+            Pixel.fire(.debug(event: .userSelectedToInstallUpdate))
+        case .dismiss:
+            Pixel.fire(.debug(event: .userSelectedToDismissUpdate))
+        @unknown default:
+            break
+        }
+    }
+
 }
