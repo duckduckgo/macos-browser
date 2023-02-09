@@ -35,16 +35,8 @@ final class TabViewModel {
 
     private var webViewStateObserver: WebViewStateObserver?
 
-    @RePublished(\TabViewModel.tab.$canGoForward)
-    var canGoForward: Bool = false
-
-    @RePublished(TabViewModel.canGoBackPublisher)
-    var canGoBack: Bool = false
-    private func canGoBackPublisher() -> some Publisher<Bool, Never> {
-        tab.$canGoBack.map { [weak tab] canGoBack in
-            canGoBack || tab?.canBeClosedWithBack == true
-        }
-    }
+    @Published var canGoForward: Bool = false
+    @Published var canGoBack: Bool = false
 
     @Published private(set) var canReload: Bool = false
     @Published var canBeBookmarked: Bool = false
@@ -93,6 +85,7 @@ final class TabViewModel {
         webViewStateObserver = WebViewStateObserver(webView: tab.webView, tabViewModel: self)
 
         subscribeToUrl()
+        subscribeToCanGoBackForward()
         subscribeToTitle()
         subscribeToFavicon()
         subscribeToTabError()
@@ -111,6 +104,18 @@ final class TabViewModel {
             self?.updateCanBeBookmarked()
             self?.updateFavicon()
         } .store(in: &cancellables)
+    }
+
+    private func subscribeToCanGoBackForward() {
+        tab.$canGoBack
+            .map { [weak tab] canGoBack in
+                canGoBack || tab?.canBeClosedWithBack == true
+            }
+            .assign(to: \.canGoBack, onWeaklyHeld: self)
+            .store(in: &cancellables)
+        tab.$canGoForward
+            .assign(to: \.canGoForward, onWeaklyHeld: self)
+            .store(in: &cancellables)
     }
 
     private func subscribeToTitle() {

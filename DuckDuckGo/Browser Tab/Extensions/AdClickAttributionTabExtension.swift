@@ -47,7 +47,6 @@ protocol UserContentControllerProtocol: AnyObject {
     func removeLocalContentRuleList(withIdentifier identifier: String)
     func installLocalContentRuleList(_ ruleList: WKContentRuleList, identifier: String)
 }
-typealias UserContentControllerProvider = () -> UserContentControllerProtocol?
 
 protocol AdClickAttributionDetecting {
     func onStartNavigation(url: URL?)
@@ -57,7 +56,7 @@ protocol AdClickAttributionDetecting {
 }
 extension AdClickAttributionDetection: AdClickAttributionDetecting {}
 
-protocol AdClickLogicProtocol {
+protocol AdClickLogicProtocol: AnyObject {
     var state: AdClickAttributionLogic.State { get }
     var delegate: AdClickAttributionLogicDelegate? { get set }
 
@@ -107,20 +106,21 @@ final class AdClickAttributionTabExtension: TabExtension {
 
     private let dependencies: any AdClickAttributionDependencies
 
-    private let userContentControllerProvider: UserContentControllerProvider
+    private weak var userContentController: UserContentControllerProtocol?
     private weak var contentBlockerRulesScript: ContentBlockerScriptProtocol?
-    private var cancellables = Set<AnyCancellable>()
-
-    private(set) var detection: AdClickAttributionDetecting
-    private(set) var logic: AdClickLogicProtocol
     private let dateTimeProvider: () -> Date
+
+    private let detection: AdClickAttributionDetecting
+    private let logic: AdClickLogicProtocol
 
     public var currentAttributionState: AdClickAttributionLogic.State {
         logic.state
     }
 
+    private var cancellables = Set<AnyCancellable>()
+
     init(inheritedAttribution: AdClickAttributionLogic.State?,
-         userContentControllerProvider: @escaping UserContentControllerProvider,
+         userContentControllerFuture: Future<UserContentControllerProtocol, Never>,
          contentBlockerRulesScriptPublisher: some Publisher<(any ContentBlockerScriptProtocol)?, Never>,
          trackerInfoPublisher: some Publisher<DetectedRequest, Never>,
          dependencies: some AdClickAttributionDependencies,
@@ -128,21 +128,34 @@ final class AdClickAttributionTabExtension: TabExtension {
          logicsProvider: (AdClickAttributionDependencies) -> (AdClickLogicProtocol, AdClickAttributionDetecting) = AdClickAttributionTabExtension.makeAdClickAttribution) {
 
         self.dependencies = dependencies
-        self.userContentControllerProvider = userContentControllerProvider
         self.dateTimeProvider = dateTimeProvider
 
         (self.logic, self.detection) = logicsProvider(dependencies)
         self.logic.delegate = self
 
-        if let state = inheritedAttribution {
-            logic.applyInheritedAttribution(state: state)
+        // delay firing up until UserContentController is published
+        userContentControllerFuture.sink { [weak self] userContentController in
+            self?.delayedInitialization(with: userContentController,
+                                        inheritedAttribution: inheritedAttribution,
+                                        contentBlockerRulesScriptPublisher: contentBlockerRulesScriptPublisher,
+                                        trackerInfoPublisher: trackerInfoPublisher)
+        }.store(in: &cancellables)
+    }
+
+    private func delayedInitialization(with userContentController: UserContentControllerProtocol, inheritedAttribution: AdClickAttributionLogic.State?, contentBlockerRulesScriptPublisher: some Publisher<(any ContentBlockerScriptProtocol)?, Never>, trackerInfoPublisher: some Publisher<DetectedRequest, Never>) {
+
+        cancellables.removeAll()
+        self.userContentController = userContentController
+
+        if let inheritedAttribution {
+            logic.applyInheritedAttribution(state: inheritedAttribution)
         }
 
         contentBlockerRulesScriptPublisher
             .compactMap { $0 }
-            .receive(on: DispatchQueue.main)
             .sink { [weak self] contentBlockerRulesScript in
                 guard let self else { return }
+
                 self.contentBlockerRulesScript = contentBlockerRulesScript
                 self.logic.onRulesChanged(latestRules: self.dependencies.contentBlockingManager.currentRules)
             }
@@ -162,10 +175,8 @@ extension AdClickAttributionTabExtension: AdClickAttributionLogicDelegate {
     func attributionLogic(_ logic: AdClickAttributionLogic,
                           didRequestRuleApplication rules: ContentBlockerRulesManager.Rules?,
                           forVendor vendor: String?) {
-        guard let userContentController = userContentControllerProvider(),
-              let contentBlockerRulesScript
-        else {
-            assertionFailure("UserScripts not loaded")
+        guard let userContentController else {
+            assertionFailure("UserContentController not set")
             return
         }
 
@@ -174,12 +185,12 @@ extension AdClickAttributionTabExtension: AdClickAttributionLogicDelegate {
         guard dependencies.privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .contentBlocking)
         else {
             userContentController.removeLocalContentRuleList(withIdentifier: attributedTempListName)
-            contentBlockerRulesScript.currentAdClickAttributionVendor = nil
-            contentBlockerRulesScript.supplementaryTrackerData = []
+            contentBlockerRulesScript?.currentAdClickAttributionVendor = nil
+            contentBlockerRulesScript?.supplementaryTrackerData = []
             return
         }
 
-        contentBlockerRulesScript.currentAdClickAttributionVendor = vendor
+        contentBlockerRulesScript?.currentAdClickAttributionVendor = vendor
         if let rules = rules {
 
             let globalListName = DefaultContentBlockerRulesListsSource.Constants.trackerDataSetRulesListName
@@ -193,9 +204,9 @@ extension AdClickAttributionTabExtension: AdClickAttributionLogicDelegate {
                 try? userContentController.enableGlobalContentRuleList(withIdentifier: globalAttributionListName)
             }
 
-            contentBlockerRulesScript.supplementaryTrackerData = [rules.trackerData]
+            contentBlockerRulesScript?.supplementaryTrackerData = [rules.trackerData]
         } else {
-            contentBlockerRulesScript.supplementaryTrackerData = []
+            contentBlockerRulesScript?.supplementaryTrackerData = []
         }
     }
 
