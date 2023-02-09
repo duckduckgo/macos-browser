@@ -114,7 +114,6 @@ final class AdClickAttributionTabExtension: TabExtension {
         }
 
         contentBlockerRulesScriptPublisher
-            .dropFirst()
             .compactMap { $0 }
             .sink { [weak self] contentBlockerRulesScript in
                 guard let self else { return }
