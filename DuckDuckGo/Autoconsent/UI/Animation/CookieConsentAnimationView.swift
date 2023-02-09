@@ -24,28 +24,22 @@ struct CookieConsentAnimationView<AnimationModel>: View where AnimationModel: Co
     var body: some View {
         VStack {
             HStack {
-                withAnimation(.easeInOut(duration: animationModel.secondAnimationDuration)) {
-                    Image("CookieConsentSketchMarks")
-                        .foregroundColor(Color("CookieConsentSketchMarksColor"))
-                        .opacity(animationModel.pillsOpacity)
-                        .scaleEffect(animationModel.pillsScale)
-                        .offset(x: animationModel.pillLeftSideOffset)
-                }
+                Image("CookieConsentSketchMarks")
+                    .foregroundColor(Color("CookieConsentSketchMarksColor"))
+                    .opacity(animationModel.pillsOpacity)
+                    .scaleEffect(animationModel.pillsScale)
+                    .offset(x: animationModel.pillLeftSideOffset)
 
-                withAnimation(.easeInOut(duration: animationModel.firstAnimationDuration)) {
-                    Image("CookieConsentSketch")
-                        .opacity(animationModel.imageOpacity)
-                        .scaleEffect(animationModel.imageScale)
-                }
+                Image("CookieConsentSketch")
+                    .opacity(animationModel.imageOpacity)
+                    .scaleEffect(animationModel.imageScale)
 
-                withAnimation(.easeInOut(duration: animationModel.secondAnimationDuration)) {
-                    Image("CookieConsentSketchMarks")
-                        .foregroundColor(Color("CookieConsentSketchMarksColor"))
-                        .rotationEffect(.degrees(180))
-                        .opacity(animationModel.pillsOpacity)
-                        .scaleEffect(animationModel.pillsScale)
-                        .offset(x: animationModel.pillRightSideOffset)
-                }
+                Image("CookieConsentSketchMarks")
+                    .foregroundColor(Color("CookieConsentSketchMarksColor"))
+                    .rotationEffect(.degrees(180))
+                    .opacity(animationModel.pillsOpacity)
+                    .scaleEffect(animationModel.pillsScale)
+                    .offset(x: animationModel.pillRightSideOffset)
             }
         }
     }
