@@ -220,7 +220,7 @@ extension FileDownloadManager: WebKitDownloadTaskDelegate {
     }
 
     private func askUserToGrantAccessToDestination(_ folderUrl: URL) {
-        if FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).contains(folderUrl) {
+        if FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first?.lastPathComponent == folderUrl.lastPathComponent {
             let alert = NSAlert.noAccessToDownloads()
             if alert.runModal() != .cancel {
                 guard let preferencesLink = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_DownloadsFolder") else {
