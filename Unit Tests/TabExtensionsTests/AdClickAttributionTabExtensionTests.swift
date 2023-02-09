@@ -80,7 +80,7 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
         extensionsBuilder = TestTabExtensionsBuilder(load: [AdClickAttributionTabExtension.self]) { [unowned self] builder in { args, dependencies in
             builder.override {
                 AdClickAttributionTabExtension(inheritedAttribution: args.inheritedAttribution,
-                                               userContentControllerProvider: { self.userContentController },
+                                               userContentControllerFuture: Future { $0(.success(self.userContentController)) },
                                                contentBlockerRulesScriptPublisher: Just(self.contentBlockerRulesScript as ContentBlockerScriptProtocol?),
                                                trackerInfoPublisher: self.trackerInfoPublisher,
                                                dependencies: dependencies.privacyFeatures.contentBlocking,
@@ -311,12 +311,13 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
         privacyConfiguration.isFeatureKeyEnabled = { feature, _ in
             return feature == .contentBlocking
         }
-        let tab = Tab(content: .none, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder, shouldLoadInBackground: true)
-
         let userScriptInstalled = expectation(description: "userScriptInstalled")
         logic.onRulesChanged = { _ in
             userScriptInstalled.fulfill()
         }
+
+        let tab = Tab(content: .none, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder, shouldLoadInBackground: true)
+
         waitForExpectations(timeout: 1)
 
         let castedLogic = withUnsafePointer(to: logic) { $0.withMemoryRebound(to: AdClickAttributionLogic.self, capacity: 1) { $0 } }.pointee
@@ -350,12 +351,12 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
         privacyConfiguration.isFeatureKeyEnabled = { feature, _ in
             return feature == .contentBlocking
         }
-        let tab = Tab(content: .none, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder, shouldLoadInBackground: true)
-
         let userScriptInstalled = expectation(description: "userScriptInstalled")
         logic.onRulesChanged = { _ in
             userScriptInstalled.fulfill()
         }
+        let tab = Tab(content: .none, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder, shouldLoadInBackground: true)
+
         waitForExpectations(timeout: 1)
 
         let castedLogic = withUnsafePointer(to: logic) { $0.withMemoryRebound(to: AdClickAttributionLogic.self, capacity: 1) { $0 } }.pointee
@@ -371,12 +372,12 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
         privacyConfiguration.isFeatureKeyEnabled = { _, _ in
             return false
         }
-        let tab = Tab(content: .none, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder, shouldLoadInBackground: true)
-
         let userScriptInstalled = expectation(description: "userScriptInstalled")
         logic.onRulesChanged = { _ in
             userScriptInstalled.fulfill()
         }
+        let tab = Tab(content: .none, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder, shouldLoadInBackground: true)
+
         waitForExpectations(timeout: 1)
 
         let castedLogic = withUnsafePointer(to: logic) { $0.withMemoryRebound(to: AdClickAttributionLogic.self, capacity: 1) { $0 } }.pointee
@@ -399,12 +400,12 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
         privacyConfiguration.isFeatureKeyEnabled = { feature, _ in
             return feature == .contentBlocking
         }
-        let tab = Tab(content: .none, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder, shouldLoadInBackground: true)
-
         let userScriptInstalled = expectation(description: "userScriptInstalled")
         logic.onRulesChanged = { _ in
             userScriptInstalled.fulfill()
         }
+        let tab = Tab(content: .none, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder, shouldLoadInBackground: true)
+
         waitForExpectations(timeout: 1)
 
         let castedLogic = withUnsafePointer(to: logic) { $0.withMemoryRebound(to: AdClickAttributionLogic.self, capacity: 1) { $0 } }.pointee
