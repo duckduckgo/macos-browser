@@ -1681,7 +1681,6 @@
 		B6CA482C298CF60E0067ECCE /* Swifter in Frameworks */ = {isa = PBXBuildFile; productRef = B6CA482B298CF60E0067ECCE /* Swifter */; };
 		B6CA4830298D04690067ECCE /* MockPrivacyConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6CA482F298D04690067ECCE /* MockPrivacyConfiguration.swift */; };
 		B6CA4831298D04690067ECCE /* MockPrivacyConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6CA482F298D04690067ECCE /* MockPrivacyConfiguration.swift */; };
-		B6CA4833298D07970067ECCE /* MockPrivacyConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6CA482F298D04690067ECCE /* MockPrivacyConfiguration.swift */; };
 		B6CFAA522943725600CB6B11 /* WebKitDownloadDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6CFAA512943725600CB6B11 /* WebKitDownloadDelegate.swift */; };
 		B6CFAA5A2945ADEF00CB6B11 /* RePublished.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6CFAA592945ADEF00CB6B11 /* RePublished.swift */; };
 		B6D6A5DD2982A4CE001F5F11 /* Tab+Navigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = B61E2CD4294346C000773D8A /* Tab+Navigation.swift */; };
@@ -4221,7 +4220,7 @@
 				858A798626A99D9000A75A42 /* Secure Vault */,
 				B6DA440F2616C0F200DD1EC2 /* Statistics */,
 				AA63744E24C9BB4A00AB2AC4 /* Suggestions */,
-				AA92ACAE24EFE1F5005F41C9 /* Tab */,
+				AA92ACAE24EFE1F5005F41C9 /* Browser Tab */,
 				AAC9C01224CAFBB700AD1325 /* Tab Bar */,
 				B6CA4822298CDC0B0067ECCE /* TabExtensionsTests */,
 				AA0877B626D515EE00B05660 /* User Agent */,
@@ -4611,7 +4610,7 @@
 			path = ViewModel;
 			sourceTree = "<group>";
 		};
-		AA92ACAE24EFE1F5005F41C9 /* Tab */ = {
+		AA92ACAE24EFE1F5005F41C9 /* Browser Tab */ = {
 			isa = PBXGroup;
 			children = (
 				B62EB47B25BAD3BB005745C6 /* WKWebViewPrivateMethodsAvailabilityTests.swift */,
@@ -4622,7 +4621,7 @@
 				AA92ACB024EFE210005F41C9 /* Model */,
 				AA9C362625518B61004B1BA3 /* Services */,
 			);
-			path = Tab;
+			path = "Browser Tab";
 			sourceTree = "<group>";
 		};
 		AA92ACAF24EFE209005F41C9 /* ViewModel */ = {
