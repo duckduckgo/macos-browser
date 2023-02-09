@@ -287,12 +287,12 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             .map { $0?.userScripts as? UserScripts }
             .eraseToAnyPublisher()
 
-        var userContentControllerProvider: UserContentControllerProvider?
+        let userContentControllerPromise = Future<UserContentControllerProtocol, Never>.promise()
         self.extensions = extensionsBuilder
             .build(with: (tabIdentifier: instrumentation.currentTabIdentifier,
                           userScriptsPublisher: userScriptsPublisher,
                           inheritedAttribution: parentTab?.adClickAttribution?.currentAttributionState,
-                          userContentControllerProvider: {  userContentControllerProvider?() },
+                          userContentControllerFuture: userContentControllerPromise.future,
                           permissionModel: permissions,
                           privacyInfoPublisher: _privacyInfo.projectedValue.eraseToAnyPublisher()
                          ),
@@ -300,8 +300,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                                                        historyCoordinating: historyCoordinating))
 
         super.init()
-
-        userContentControllerProvider = { [weak self] in self?.userContentController }
+        userContentController.map(userContentControllerPromise.fulfill)
 
         setupNavigationDelegate()
         userContentController?.delegate = self
@@ -364,6 +363,8 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     }
 
 #if DEBUG
+    /// set this to true when Navigation-related decision making is expected to take significant time to avoid assertions
+    /// used by BSK: Navigation.DistributedNavigationDelegate
     var shouldDisableLongDecisionMakingChecks: Bool = false
 #endif
 
@@ -1351,7 +1352,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
             cbaTimeReporter?.tabWillWaitForRulesCompilation(self.instrumentation.currentTabIdentifier)
 #if DEBUG
             shouldDisableLongDecisionMakingChecks = true
-            defer { // swiftlint:disable:this inert_defer
+            defer {
                 shouldDisableLongDecisionMakingChecks = false
             }
 #endif
@@ -1453,16 +1454,24 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
 
     @MainActor
     func navigationResponse(_ navigationResponse: NavigationResponse, didBecome download: WebKitDownload) {
-        FileDownloadManager.shared.add(download, delegate: self, location: .auto, postflight: .none)
+        let task = FileDownloadManager.shared.add(download, delegate: self, location: .auto, postflight: .none)
 
         // Note this can result in tabs being left open, e.g. download button on this page:
         // https://en.wikipedia.org/wiki/Guitar#/media/File:GuitareClassique5.png
         // Safari closes new tabs that were opened and then create a download instantly.
         if self.webView.backForwardList.currentItem == nil,
            self.parentTab != nil {
-            DispatchQueue.main.async { [weak self] in
-                self?.delegate?.closeTab(self!)
-            }
+            var cancellable: AnyCancellable?
+            cancellable = task.didChooseDownloadLocationPublisher.sink { [weak self] completion in
+                cancellable?.cancel()
+                guard let self,
+                      case .finished = completion,
+                      self.webView.backForwardList.currentItem == nil
+                else { return }
+
+                self.delegate?.closeTab(self)
+
+            } receiveValue: { _ in }
         }
     }
 
