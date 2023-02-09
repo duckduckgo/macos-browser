@@ -282,12 +282,12 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             .map { $0?.userScripts as? UserScripts }
             .eraseToAnyPublisher()
 
-        var userContentControllerProvider: UserContentControllerProvider?
+        let userContentControllerPromise = Future<UserContentControllerProtocol, Never>.promise()
         self.extensions = extensionsBuilder
             .build(with: (tabIdentifier: instrumentation.currentTabIdentifier,
                           userScriptsPublisher: userScriptsPublisher,
                           inheritedAttribution: parentTab?.adClickAttribution?.currentAttributionState,
-                          userContentControllerProvider: {  userContentControllerProvider?() },
+                          userContentControllerFuture: userContentControllerPromise.future,
                           permissionModel: permissions,
                           privacyInfoPublisher: _privacyInfo.projectedValue.eraseToAnyPublisher()
                          ),
@@ -295,7 +295,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                                                        historyCoordinating: historyCoordinating))
 
         super.init()
-        userContentControllerProvider = { [weak self] in self?.userContentController }
+        userContentController.map(userContentControllerPromise.fulfill)
 
         userContentController?.delegate = self
         setupWebView(shouldLoadInBackground: shouldLoadInBackground)

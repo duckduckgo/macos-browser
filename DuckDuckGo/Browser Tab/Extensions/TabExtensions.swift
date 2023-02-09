@@ -66,7 +66,7 @@ typealias TabExtensionsBuilderArguments = (
     tabIdentifier: UInt64,
     userScriptsPublisher: AnyPublisher<UserScripts?, Never>,
     inheritedAttribution: AdClickAttributionLogic.State?,
-    userContentControllerProvider: UserContentControllerProvider,
+    userContentControllerFuture: Future<UserContentControllerProtocol, Never>,
     permissionModel: PermissionModel,
     privacyInfoPublisher: AnyPublisher<PrivacyInfo?, Never>
 )
@@ -96,7 +96,7 @@ extension TabExtensionsBuilder {
 
         add {
             AdClickAttributionTabExtension(inheritedAttribution: args.inheritedAttribution,
-                                           userContentControllerProvider: args.userContentControllerProvider,
+                                           userContentControllerFuture: args.userContentControllerFuture,
                                            contentBlockerRulesScriptPublisher: userScripts.map(\.?.contentBlockerRulesScript),
                                            trackerInfoPublisher: trackerInfoPublisher,
                                            dependencies: dependencies.privacyFeatures.contentBlocking)

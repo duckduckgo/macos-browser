@@ -1625,6 +1625,8 @@
 		B6A9E48426146AAB0067D1B9 /* PixelParameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A9E48326146AAB0067D1B9 /* PixelParameters.swift */; };
 		B6A9E499261474120067D1B9 /* TimedPixel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A9E498261474120067D1B9 /* TimedPixel.swift */; };
 		B6A9E4A3261475C70067D1B9 /* AppUsageActivityMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A9E4A2261475C70067D1B9 /* AppUsageActivityMonitor.swift */; };
+		B6AA64732994B43300D99CD6 /* FutureExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6AA64722994B43300D99CD6 /* FutureExtensionTests.swift */; };
+		B6AA64742994B43300D99CD6 /* FutureExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6AA64722994B43300D99CD6 /* FutureExtensionTests.swift */; };
 		B6AAAC2D260330580029438D /* PublishedAfter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6AAAC2C260330580029438D /* PublishedAfter.swift */; };
 		B6AAAC3E26048F690029438D /* RandomAccessCollectionExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6AAAC3D26048F690029438D /* RandomAccessCollectionExtension.swift */; };
 		B6AE39F129373AF200C37AA4 /* EmptyAttributionRulesProver.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6AE39F029373AF200C37AA4 /* EmptyAttributionRulesProver.swift */; };
@@ -2570,6 +2572,7 @@
 		B6A9E48326146AAB0067D1B9 /* PixelParameters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelParameters.swift; sourceTree = "<group>"; };
 		B6A9E498261474120067D1B9 /* TimedPixel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimedPixel.swift; sourceTree = "<group>"; };
 		B6A9E4A2261475C70067D1B9 /* AppUsageActivityMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppUsageActivityMonitor.swift; sourceTree = "<group>"; };
+		B6AA64722994B43300D99CD6 /* FutureExtensionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FutureExtensionTests.swift; sourceTree = "<group>"; };
 		B6AAAC2C260330580029438D /* PublishedAfter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PublishedAfter.swift; sourceTree = "<group>"; };
 		B6AAAC3D26048F690029438D /* RandomAccessCollectionExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomAccessCollectionExtension.swift; sourceTree = "<group>"; };
 		B6AE39F029373AF200C37AA4 /* EmptyAttributionRulesProver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyAttributionRulesProver.swift; sourceTree = "<group>"; };
@@ -5074,6 +5077,7 @@
 				AADE11BF26D916D70032D8A7 /* StringExtensionTests.swift */,
 				85F69B3B25EDE81F00978E59 /* URLExtensionTests.swift */,
 				4B8AD0B027A86D9200AE44D6 /* WKWebsiteDataStoreExtensionTests.swift */,
+				B6AA64722994B43300D99CD6 /* FutureExtensionTests.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -6709,6 +6713,7 @@
 				376E2D29294286B8001CD31B /* PixelEventTests.swift in Sources */,
 				3707C72B294B5D3D00682A9F /* ContentBlockingMock.swift in Sources */,
 				37716D8029707E5D00A9FC6D /* FireproofingReferenceTests.swift in Sources */,
+				B6AA64742994B43300D99CD6 /* FutureExtensionTests.swift in Sources */,
 				3706FE5C293F661700E42796 /* PrivatePlayerPreferencesTests.swift in Sources */,
 				3706FE5D293F661700E42796 /* FileSystemDSL.swift in Sources */,
 				3706FE5E293F661700E42796 /* DataImportMocks.swift in Sources */,
@@ -7486,6 +7491,7 @@
 				B610F2EC27AA8F9400FCEBE9 /* ContentBlockerRulesManagerMock.swift in Sources */,
 				B6BBF1722744CE36004F850E /* FireproofDomainsStoreMock.swift in Sources */,
 				4BA1A6D9258C0CB300F6F690 /* DataEncryptionTests.swift in Sources */,
+				B6AA64732994B43300D99CD6 /* FutureExtensionTests.swift in Sources */,
 				EA1E52B52798CF98002EC53C /* ClickToLoadModelTests.swift in Sources */,
 				B6A5A27E25B9403E00AA7ADA /* FileStoreMock.swift in Sources */,
 				1D3B1AC429378953006F4388 /* BWResponseTests.swift in Sources */,

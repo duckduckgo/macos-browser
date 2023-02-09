@@ -50,6 +50,13 @@ extension Future {
 
 extension Future where Failure == Never {
 
+    static func promise() -> (future: Future<Output, Never>, fulfill: (Output) -> Void) {
+        var fulfill: ((Result<Output, Never>) -> Void)!
+        let future = Future<Output, Never> { fulfill = $0 }
+        assert(fulfill != nil)
+        return (future, { fulfill(.success($0)) })
+    }
+
     func get() async -> Output {
         if #available(macOS 12.0, *) {
             return await self.value
