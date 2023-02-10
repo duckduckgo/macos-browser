@@ -10,11 +10,23 @@
 	<true/>
 	<key>com.apple.security.application-groups</key>
 	<array>
+		<string>$(TeamIdentifierPrefix)com.duckduckgo.macos.browser.network-protection.system-extension</string>
 		<string>$(TeamIdentifierPrefix)com.duckduckgo.macos.browser.network-protection</string>
 	</array>
 	<key>com.apple.security.network.client</key>
 	<true/>
 	<key>com.apple.security.network.server</key>
 	<true/>
+	<key>com.apple.security.temporary-exception.files.absolute-path.read-write</key>
+	<array>
+		<string>/Library/Keychains/System.keychain</string>
+		<string>/private/var/db/mds/system/mds.lock</string>
+		<string>/Library/Keychains/</string>
+		<string>/Library/Application Support/</string>
+	</array>
+	<key>keychain-access-groups</key>
+	<array>
+		<string>$(AppIdentifierPrefix)com.duckduckgo.network-protection</string>
+	</array>
 </dict>
 </plist>

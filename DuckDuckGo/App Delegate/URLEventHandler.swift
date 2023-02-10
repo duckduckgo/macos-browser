@@ -93,7 +93,21 @@ final class URLEventHandler {
     }
 
     private static func openURL(_ url: URL) {
-        WindowControllersManager.shared.show(url: url, newTab: true)
+        if url.scheme == networkProtectionScheme {
+            handleNetworkProtectionURL(url)
+        } else {
+            WindowControllersManager.shared.show(url: url, newTab: true)
+        }
+    }
+    
+    /// Handles NetP URLs
+    ///
+    private static func handleNetworkProtectionURL(_ url: URL) {
+        if url == networkProtectionShowStatusURL {
+            Task {
+                await WindowControllersManager.shared.showNetworkProtectionStatus()
+            }
+        }
     }
 
 }

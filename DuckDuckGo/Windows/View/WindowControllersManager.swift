@@ -181,7 +181,26 @@ extension WindowControllersManager {
         tabCollectionViewModel.appendNewTab(with: content)
         windowController.window?.orderFront(nil)
     }
+    
+    // MARK: - Network Protection
 
+    @MainActor
+    func showNetworkProtectionStatus(retry: Bool = false) async {
+        guard let windowController = mainWindowControllers.first else {
+            guard !retry else {
+                return
+            }
+            
+            WindowsManager.openNewWindow()
+            
+            // - TODO: not proud of this ugly hack... ideally openNewWindow() should let us know when the window is ready
+            try? await Task.sleep(nanoseconds: 500 * NSEC_PER_MSEC)
+            await showNetworkProtectionStatus(retry: true)
+            return
+        }
+        
+        windowController.mainViewController.navigationBarViewController.showNetworkProtectionStatus()
+    }
 }
 
 extension Tab {

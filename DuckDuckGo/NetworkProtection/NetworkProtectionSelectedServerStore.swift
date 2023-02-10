@@ -22,8 +22,6 @@ import NetworkProtection
 protocol NetworkProtectionSelectedServerStore: AnyObject {
 
     var selectedServer: SelectedNetworkProtectionServer { get set }
-    var mostRecentlyConnectedServerLocation: String? { get set }
-
     func reset()
 }
 
@@ -43,8 +41,9 @@ final class NetworkProtectionSelectedServerUserDefaultsStore: NetworkProtectionS
 
     private enum Constants {
         static let selectedServerKey = "network-protection.selected-server-endpoint"
-        static let mostRecentlyConnectedServerLocationKey = "network-protection.most-recently-connected-server-location"
     }
+    
+    // MARK: - Server selection
 
     /// Returns the server endpoint selected by the user. The default value is `automatic`.
     ///
@@ -66,22 +65,6 @@ final class NetworkProtectionSelectedServerUserDefaultsStore: NetworkProtectionS
             case .endpoint(let endpoint):
                 self.userDefaults.set(endpoint, forKey: Constants.selectedServerKey)
             }
-
-            NotificationCenter.default.post(name: .NetworkProtectionEndpointSelectionChanged, object: nil)
-        }
-    }
-
-    var mostRecentlyConnectedServerLocation: String? {
-        get {
-            self.userDefaults.string(forKey: Constants.mostRecentlyConnectedServerLocationKey)
-        }
-
-        set {
-            if let newValue = newValue {
-                self.userDefaults.set(newValue, forKey: Constants.mostRecentlyConnectedServerLocationKey)
-            } else {
-                self.userDefaults.removeObject(forKey: Constants.mostRecentlyConnectedServerLocationKey)
-            }
         }
     }
 
@@ -93,14 +76,6 @@ final class NetworkProtectionSelectedServerUserDefaultsStore: NetworkProtectionS
 
     func reset() {
         userDefaults.removeObject(forKey: Constants.selectedServerKey)
-        userDefaults.removeObject(forKey: Constants.mostRecentlyConnectedServerLocationKey)
     }
-
-}
-
-extension Notification.Name {
-
-    static let NetworkProtectionEndpointSelectionChanged = Notification.Name("network-protection.endpoint.selection-changed")
-    static let NetworkProtectionDebugResetExtension = Notification.Name("network-protection.debug.reset-extension")
 
 }

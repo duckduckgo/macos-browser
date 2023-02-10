@@ -9,7 +9,9 @@
 	<key>com.apple.security.app-sandbox</key>
 	<true/>
 	<key>com.apple.security.application-groups</key>
-	<array/>
+	<array>
+		<string>$(TeamIdentifierPrefix)com.duckduckgo.macos.browser.network-protection</string>
+	</array>
 	<key>com.apple.security.network.client</key>
 	<true/>
 	<key>com.apple.security.network.server</key>
@@ -17,6 +19,10 @@
 	<key>keychain-access-groups</key>
 	<array>
 		<string>$(AppIdentifierPrefix)com.duckduckgo.network-protection</string>
+	</array>
+	<key>com.apple.security.temporary-exception.mach-register.global-name</key>
+	<array>
+		<string>HKE973VLUW.com.duckduckgo.macos.browser.network-protection.debug</string>
 	</array>
 </dict>
 </plist>

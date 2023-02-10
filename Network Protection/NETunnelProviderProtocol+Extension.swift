@@ -3,6 +3,7 @@
 
 import NetworkExtension
 import NetworkProtection
+import os
 
 enum PacketTunnelProviderError: String, Error {
     case savedProtocolConfigurationIsInvalid
@@ -13,7 +14,6 @@ enum PacketTunnelProviderError: String, Error {
 }
 
 extension NETunnelProviderProtocol {
-
     func asTunnelConfiguration(called name: String? = nil) -> TunnelConfiguration? {
         if let passwordReference = passwordReference,
             let config = NetworkProtectionKeychain.openReference(called: passwordReference) {
@@ -22,7 +22,7 @@ extension NETunnelProviderProtocol {
         if let oldConfig = providerConfiguration?["WgQuickConfig"] as? String {
             return try? TunnelConfiguration(fromWgQuickConfig: oldConfig, called: name)
         }
+   
         return nil
     }
-
 }

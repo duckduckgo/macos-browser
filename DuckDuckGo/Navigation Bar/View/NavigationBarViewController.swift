@@ -82,6 +82,7 @@ final class NavigationBarViewController: NSViewController {
     private var navigationButtonsCancellables = Set<AnyCancellable>()
     private var downloadsCancellables = Set<AnyCancellable>()
     private var networkProtectionCancellable: AnyCancellable?
+    private var networkProtectionInterruptionCancellable: AnyCancellable?
 
     required init?(coder: NSCoder) {
         fatalError("NavigationBarViewController: Bad initializer")
@@ -661,6 +662,11 @@ extension NavigationBarViewController: NSMenuDelegate {
     }
 
     // MARK: - Network Protection
+    
+    func showNetworkProtectionStatus() {
+        popovers.showNetworkProtectionPopover(usingView: networkProtectionButton,
+                                              withDelegate: networkProtectionButtonModel)
+    }
 
     private func setupNetworkProtectionButton() {
         networkProtectionCancellable = networkProtectionButtonModel.$showButton
@@ -668,6 +674,12 @@ extension NavigationBarViewController: NSMenuDelegate {
             .sink { [weak self] show in
                 self?.networkProtectionButton.isHidden = !show
         }
+        
+        networkProtectionInterruptionCancellable = networkProtectionButtonModel.$buttonImage
+            .receive(on: RunLoop.main)
+            .sink { [weak self] image in
+                self?.networkProtectionButton.image = image
+            }
     }
 }
 
@@ -707,8 +719,7 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
     }
 
     func optionsButtonMenuRequestedNetworkProtectionPopover(_ menu: NSMenu) {
-        popovers.showNetworkProtectionPopover(usingView: networkProtectionButton,
-                                              withDelegate: networkProtectionButtonModel)
+        showNetworkProtectionStatus()
     }
 
     func optionsButtonMenuRequestedDownloadsPopover(_ menu: NSMenu) {

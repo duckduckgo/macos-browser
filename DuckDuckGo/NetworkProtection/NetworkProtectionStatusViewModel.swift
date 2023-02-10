@@ -32,6 +32,10 @@ extension NetworkProtectionStatusView {
         ///
         private let networkProtection: NetworkProtectionProvider
 
+        /// The NetP status reporter
+        ///
+        private let networkProtectionStatusReporter: NetworkProtectionStatusReporter
+
         /// The object that's in charge of logging errors and other information.
         ///
         private let logger: NetworkProtectionLogger
@@ -41,13 +45,21 @@ extension NetworkProtectionStatusView {
         private let runLoopMode: RunLoop.Mode?
 
         private var statusChangeCancellable: AnyCancellable?
+        private var connectivityIssuesCancellable: AnyCancellable?
+        private var serverInfoCancellable: AnyCancellable?
 
         // MARK: - Feature Image
 
         var mainImageAsset: NetworkProtectionAsset {
             switch connectionStatus {
-            case .connected, .disconnecting:
+            case .connected:
                 return .vpnEnabledImage
+            case .disconnecting:
+                if case .connected = previousConnectionStatus {
+                    return .vpnEnabledImage
+                } else {
+                    return .vpnDisabledImage
+                }
             default:
                 return .vpnDisabledImage
             }
@@ -55,26 +67,52 @@ extension NetworkProtectionStatusView {
 
         // MARK: - Initialization & Deinitialization
 
-        init(networkProtection: NetworkProtectionProvider = DefaultNetworkProtectionProvider(subscribeToDebugNotifications: false),
+        init(networkProtection: NetworkProtectionProvider = DefaultNetworkProtectionProvider(),
+             networkProtectionStatusReporter: NetworkProtectionStatusReporter = DefaultNetworkProtectionStatusReporter(),
              logger: NetworkProtectionLogger = DefaultNetworkProtectionLogger(),
              runLoopMode: RunLoop.Mode? = nil,
              initialStatus: NetworkProtectionConnectionStatus = .disconnected) {
 
             self.networkProtection = networkProtection
+            self.networkProtectionStatusReporter = networkProtectionStatusReporter
             self.logger = logger
             self.runLoopMode = runLoopMode
-            self.connectionStatus = networkProtection.statusChangePublisher.value
+            connectionStatus = networkProtectionStatusReporter.statusChangePublisher.value
+            isHavingConnectivityIssues = networkProtectionStatusReporter.connectivityIssuesPublisher.value
+            internalServerAddress = networkProtectionStatusReporter.serverInfoPublisher.value.serverAddress
+            internalServerLocation = networkProtectionStatusReporter.serverInfoPublisher.value.serverLocation
 
             // Particularly useful when unit testing with an initial status of our choosing.
             refreshInternalIsRunning()
 
-            statusChangeCancellable = networkProtection.statusChangePublisher.sink { [weak self] status in
+            statusChangeCancellable = networkProtectionStatusReporter.statusChangePublisher.sink { [weak self] status in
                 guard let self = self else {
                     return
                 }
 
                 Task { @MainActor in
                     self.connectionStatus = status
+                }
+            }
+
+            connectivityIssuesCancellable = networkProtectionStatusReporter.connectivityIssuesPublisher.sink { [weak self] isHavingConnectivityIssues in
+                guard let self = self else {
+                    return
+                }
+                
+                Task { @MainActor in
+                    self.isHavingConnectivityIssues = isHavingConnectivityIssues
+                }
+            }
+            
+            serverInfoCancellable = networkProtectionStatusReporter.serverInfoPublisher.sink { [weak self] serverInfo in
+                guard let self = self else {
+                    return
+                }
+                
+                Task { @MainActor in
+                    self.internalServerAddress = serverInfo.serverAddress
+                    self.internalServerLocation = serverInfo.serverLocation
                 }
             }
         }
@@ -153,18 +191,24 @@ extension NetworkProtectionStatusView {
             }
         }
 
-        // MARK: - Status
+        // MARK: - Status & health
 
         private weak var timer: Timer?
-
+        
+        private var previousConnectionStatus: NetworkProtectionConnectionStatus = .disconnected
+        
         @Published
         private var connectionStatus: NetworkProtectionConnectionStatus = .disconnected {
             didSet {
+                previousConnectionStatus = oldValue
                 refreshInternalIsRunning()
                 refreshTimeLapsed()
             }
         }
 
+        @Published
+        private var isHavingConnectivityIssues: Bool = false
+        
         /// The description for the current connection status.
         /// When the status is `connected` this description will also show the time lapsed since connection.
         ///
@@ -172,10 +216,10 @@ extension NetworkProtectionStatusView {
 
         private func refreshTimeLapsed() {
             switch connectionStatus {
-            case .connected(let connectedDate, _, _):
+            case .connected(let connectedDate):
                 timeLapsed = timeLapsedString(since: connectedDate)
-            case .disconnecting(let connectedDate, _, _):
-                timeLapsed = timeLapsedString(since: connectedDate)
+            case .disconnecting:
+                timeLapsed = UserText.networkProtectionStatusViewTimerZero
             default:
                 timeLapsed = UserText.networkProtectionStatusViewTimerZero
             }
@@ -188,7 +232,7 @@ extension NetworkProtectionStatusView {
             switch connectionStatus {
             case .connected:
                 return "\(UserText.networkProtectionStatusConnected) · \(timeLapsed)"
-            case .connecting:
+            case .connecting, .reasserting:
                 return UserText.networkProtectionStatusConnecting
             case .disconnected, .notConfigured:
                 return UserText.networkProtectionStatusDisconnected
@@ -196,6 +240,21 @@ extension NetworkProtectionStatusView {
                 return UserText.networkProtectionStatusDisconnecting
             case .unknown:
                 return UserText.networkProtectionStatusUnknown
+            }
+        }
+        
+        var connectionHealthWarning: String? {
+            if isHavingConnectivityIssues {
+                switch connectionStatus {
+                case .reasserting, .connecting, .connected:
+                    return UserText.networkProtectionInterruptedReconnecting
+                case .disconnecting, .disconnected:
+                    return UserText.networkProtectionInterrupted
+                default:
+                    return nil
+                }
+            } else {
+                return nil
             }
         }
 
@@ -224,32 +283,61 @@ extension NetworkProtectionStatusView {
 
         var showServerDetails: Bool {
             switch connectionStatus {
-            case .connected, .disconnecting:
+            case .connected:
                 return true
+            case .disconnecting:
+                if case .connected = previousConnectionStatus {
+                    return true
+                } else {
+                    return false
+                }
             default:
                 return false
             }
         }
+        
+        @Published
+        private var internalServerAddress: String?
+
 
         var serverAddress: String {
+            guard let internalServerAddress = internalServerAddress else {
+                return UserText.networkProtectionServerAddressUnknown
+            }
+            
             switch connectionStatus {
-            case .connected(_, let serverAddress, _):
-                return serverAddress
-            case .disconnecting(_, let serverAddress, _):
-                return serverAddress
+            case .connected:
+                return internalServerAddress
+            case .disconnecting:
+                if case .connected = previousConnectionStatus {
+                    return internalServerAddress
+                } else {
+                    return UserText.networkProtectionServerAddressUnknown
+                }
             default:
-                return ""
+                return UserText.networkProtectionServerAddressUnknown
             }
         }
+        
+        @Published
+        var internalServerLocation: String?
 
         var serverLocation: String {
+            guard let internalServerLocation = internalServerLocation else {
+                return UserText.networkProtectionServerLocationUnknown
+            }
+            
             switch connectionStatus {
-            case .connected(_, _, let serverLocation):
-                return serverLocation
-            case .disconnecting(_, _, let serverLocation):
-                return serverLocation
+            case .connected:
+                return internalServerLocation
+            case .disconnecting:
+                if case .connected = previousConnectionStatus {
+                    return internalServerLocation
+                } else {
+                    return UserText.networkProtectionServerLocationUnknown
+                }
             default:
-                return ""
+                return UserText.networkProtectionServerLocationUnknown
             }
         }
 

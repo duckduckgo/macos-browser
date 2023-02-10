@@ -30,7 +30,7 @@ final class SystemExtensionManager: NSObject, OSSystemExtensionRequestDelegate {
     private let networkProtectionLog: OSLog = OSLog(subsystem: "DuckDuckGo Network Protection App", category: "NetP")
 
     func activate() {
-        os_log("🔵 System Extension submitting request", log: networkProtectionLog, type: .error)
+        os_log("🔵 System Extension activate", log: networkProtectionLog, type: .error)
         let activationRequest = OSSystemExtensionRequest.activationRequest(forExtensionWithIdentifier: Self.bundleID, queue: .main)
         activationRequest.delegate = self
         OSSystemExtensionManager.shared.submitRequest(activationRequest)

@@ -42,7 +42,7 @@ final class NetworkProtectionPopover: NSPopover {
         let subscribeToDebugNotifications = false
         #endif
 
-        let provider = DefaultNetworkProtectionProvider(subscribeToDebugNotifications: subscribeToDebugNotifications)
+        let provider = DefaultNetworkProtectionProvider()
         let model = NetworkProtectionStatusView.Model(networkProtection: provider)
         let view = NetworkProtectionStatusView(model: model)
         let controller = NSHostingController(rootView: view)

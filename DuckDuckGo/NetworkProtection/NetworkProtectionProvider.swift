@@ -29,9 +29,10 @@ import Common
 enum NetworkProtectionConnectionStatus {
     case notConfigured
     case disconnected
-    case disconnecting(connectedDate: Date, serverAddress: String, serverLocation: String)
-    case connected(connectedDate: Date, serverAddress: String, serverLocation: String)
+    case disconnecting
+    case connected(connectedDate: Date)
     case connecting
+    case reasserting
     case unknown
 }
 
@@ -61,7 +62,6 @@ protocol NetworkProtectionProvider {
     // MARK: - Config & Status Change Publishers
 
     var configChangePublisher: CurrentValueSubject<Void, Never> { get }
-    var statusChangePublisher: CurrentValueSubject<NetworkProtectionConnectionStatus, Never> { get }
 }
 
 final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
@@ -81,25 +81,24 @@ final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
     /// 
     private let deviceManager: NetworkProtectionDeviceManagement
 
-    private let selectedServerStore: NetworkProtectionSelectedServerStore
-
     // MARK: - Notifications & Observers
 
     /// The notification center to use to observe tunnel change notifications.
     ///
     private let notificationCenter: NotificationCenter
 
-    /// The observer token for VPN status changes,
-    ///
-    private var statusChangeObserverToken: NSObjectProtocol?
-
     /// The observer token for VPN configuration changes,
     ///
     private var configChangeObserverToken: NSObjectProtocol?
 
     let configChangePublisher = CurrentValueSubject<Void, Never>(())
-    let statusChangePublisher = CurrentValueSubject<NetworkProtectionConnectionStatus, Never>(.unknown)
 
+    // MARK: - Bundle Identifiers
+    
+    var extensionBundleIdentifier: String {
+        NetworkProtectionBundle.extensionBundle().bundleIdentifier!
+    }
+    
     // MARK: - VPN Tunnel & Configuration
 
     /// The environment variable that holds the path to the WG quick configuration file that will be used for the tunnel.
@@ -150,14 +149,54 @@ final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
         try await tunnelManager.saveToPreferences()
         try await tunnelManager.loadFromPreferences()
     }
+    
+    enum ActiveSessionError: Error {
+        case couldNotLoadPreferences(error: Error)
+        case activeConnectionHasNoSession
+    }
+    
+    static func activeSession() async throws -> NETunnelProviderSession? {
+        try await withCheckedThrowingContinuation { continuation in
+            NETunnelProviderManager.loadAllFromPreferences { managers, error in
+                if let error = error {
+                    continuation.resume(throwing: ActiveSessionError.couldNotLoadPreferences(error: error))
+                    return
+                }
+                
+                Task {
+                    guard let manager = managers?.first(where: { manager in
+                        switch manager.connection.status {
+                        case .connected, .connecting, .reasserting:
+                            return true
+                        default:
+                            return false
+                        }
+                    }) else {
+                        // No active connection, this is acceptable
+                        continuation.resume(returning: nil)
+                        return
+                    }
+                    
+                    guard let session = manager.connection as? NETunnelProviderSession else {
+                        continuation.resume(returning: nil)
+                        return
+                    }
+
+                    continuation.resume(returning: session)
+                }
+            }
+        }
+    }
 
     // MARK: - Initialization & Deinitialization
 
-    convenience init(subscribeToDebugNotifications: Bool = false) {
+    convenience init() {
+        let keychainStore = NetworkProtectionKeychainStore(useSystemKeychain: NetworkProtectionBundle.usesSystemKeychain())
+        let deviceManager = NetworkProtectionDeviceManager(keyStore: keychainStore,
+                                                           errorEvents: Self.networkProtectionDebugEvents)
+        
         self.init(notificationCenter: .default,
-                  subscribeToDebugNotifications: subscribeToDebugNotifications,
-                  deviceManager: NetworkProtectionDeviceManager(errorEvents: Self.networkProtectionDebugEvents),
-                  selectedServerStore: NetworkProtectionSelectedServerUserDefaultsStore(),
+                  deviceManager: deviceManager,
                   logger: DefaultNetworkProtectionLogger())
     }
 
@@ -168,26 +207,18 @@ final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
     ///         - logger: (meant for testing) the logger that this object will use.
     ///
     init(notificationCenter: NotificationCenter,
-         subscribeToDebugNotifications: Bool,
          deviceManager: NetworkProtectionDeviceManagement,
-         selectedServerStore: NetworkProtectionSelectedServerStore,
          logger: NetworkProtectionLogger) {
 
         self.logger = logger
         self.deviceManager = deviceManager
-        self.selectedServerStore = selectedServerStore
         self.notificationCenter = notificationCenter
 
-        startObservingNotifications(subscribeToDebugNotifications: subscribeToDebugNotifications)
+        startObservingNotifications()
 
         Task {
             // Make sure the tunnel is loaded
             _ = await tunnelManager
-
-            // Check whether the VPN has been configured
-            if NEVPNManager.shared().connection.status == .invalid {
-                statusChangePublisher.send(.notConfigured)
-            }
         }
     }
 
@@ -197,14 +228,8 @@ final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
 
     // MARK: - Observing VPN Notifications
 
-    private func startObservingNotifications(subscribeToDebugNotifications: Bool) {
+    private func startObservingNotifications() {
         startObservingVPNConfigChanges()
-        startObservingVPNStatusChanges()
-
-        if subscribeToDebugNotifications {
-            startObservingExtensionResetNotifications()
-            startObservingServerSelectionChanges()
-        }
     }
 
     private func startObservingVPNConfigChanges() {
@@ -223,36 +248,8 @@ final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
         }
     }
 
-    private func startObservingVPNStatusChanges() {
-        guard statusChangeObserverToken == nil else {
-            return
-        }
-
-        statusChangeObserverToken = notificationCenter.addObserver(forName: .NEVPNStatusDidChange, object: nil, queue: nil) { [weak self] notification in
-            self?.handleStatusChangeNotification(notification)
-        }
-    }
-
-    private func startObservingExtensionResetNotifications() {
-        notificationCenter.addObserver(self,
-                                       selector: #selector(resetExtensionNotification),
-                                       name: .NetworkProtectionDebugResetExtension,
-                                       object: nil)
-    }
-
-    private func startObservingServerSelectionChanges() {
-        notificationCenter.addObserver(self,
-                                       selector: #selector(serverSelectionChangedNotification),
-                                       name: .NetworkProtectionEndpointSelectionChanged,
-                                       object: nil)
-    }
-
     private func stopObservingNotifications() {
         stopObservingVPNConfigChanges()
-        stopObservingVPNStatusChanges()
-
-        notificationCenter.removeObserver(self, name: .NetworkProtectionDebugResetExtension, object: nil)
-        notificationCenter.removeObserver(self, name: .NetworkProtectionEndpointSelectionChanged, object: nil)
     }
 
     private func stopObservingVPNConfigChanges() {
@@ -262,15 +259,6 @@ final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
 
         notificationCenter.removeObserver(token)
         configChangeObserverToken = nil
-    }
-
-    private func stopObservingVPNStatusChanges() {
-        guard let token = statusChangeObserverToken else {
-            return
-        }
-
-        notificationCenter.removeObserver(token)
-        statusChangeObserverToken = nil
     }
 
     // MARK: - Error Reporting
@@ -300,6 +288,9 @@ final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
             return
         case .failedToParseRegisteredServersResponse:
             domainEvent = .networkProtectionClientFailedToParseRegisteredServersResponse
+        case .serverListInconsistency:
+            // - TODO: not sure what to do here
+            return
 
         case .failedToEncodeServerList:
             domainEvent = .networkProtectionServerListStoreFailedToEncodeServerList
@@ -307,6 +298,9 @@ final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
             domainEvent = .networkProtectionServerListStoreFailedToWriteServerList(error: eventError)
         case .noServerListFound:
             return
+        case .couldNotCreateServerListDirectory(let _):
+            return
+            
         case .failedToReadServerList(let eventError):
             domainEvent = .networkProtectionServerListStoreFailedToReadServerList(error: eventError)
 
@@ -327,76 +321,21 @@ final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
     }
 
     // MARK: - Notifications: Handling
-
-    private func handleStatusChangeNotification(_ notification: Notification) {
-        guard let session = managedSession(from: notification) else {
-            return
-        }
-
-        Task { [weak self] in
-            guard let self = self else {
-                return
-            }
-
-            do {
-                try await self.handleStatusChange(in: session)
-            } catch {
-                self.logger.log(error)
-            }
-        }
-    }
-
-    private func handleStatusChange(in session: NETunnelProviderSession) async throws {
-        /// Some situations can cause the connection status in the session's manager to be invalid.
-        /// This just means we need to reload the manager from preferences.  That will trigger another status change
-        /// notification that will provide a valid connection status.
-        guard session.manager.connection.status != .invalid else {
-            try await session.manager.loadFromPreferences()
-            return
-        }
-
-        let status = self.connectionStatus(from: session)
-        statusChangePublisher.send(status)
-    }
-
-    /// Retrieves a session that we are managing.  When we're running as a system extension we'll get notifications
-    /// for all VPN connections in the system, so we just want to follow the notifications for the connections we own.
-    ///
-    private func managedSession(from notification: Notification) -> NETunnelProviderSession? {
-        guard let session = (notification.object as? NETunnelProviderSession),
-              session.manager.protocolConfiguration is NETunnelProviderProtocol else {
-            return nil
-        }
-
-        return session
-
-    }
+    
+    static let statusChangeQueue: OperationQueue = {
+        let queue = OperationQueue()
+        queue.maxConcurrentOperationCount = 1
+        queue.qualityOfService = .userInteractive
+        
+        return queue
+    }()
 
     @objc private func resetExtensionNotification(_ notification: Notification) {
         os_log("Received reset extension notification", log: .networkProtection)
-
+        
         Task { @MainActor in
             try? await stop()
             try? await internalTunnelManager?.removeFromPreferences()
-        }
-    }
-
-    /// Signals the Network Protection provider that the preferred server selection changed.
-    ///
-    /// Because the Network Protection feature caches its tunnel configuration in the Keychain, this function works by stopping the tunnel, removing the Keychain state, waiting briefly to allow the system
-    /// to acknowledge that the VPN is no longer running, and then restarting the tunnel.
-    ///
-    /// - Note: The user's PrivateKey, if it exists, is **not** removed. Instead, the app will ensure that the new server has been registered with that key and register it if it hasn't.
-    @objc private func serverSelectionChangedNotification(_ notification: Notification) {
-        os_log("Received server selection change notification", log: .networkProtection)
-
-        Task { @MainActor in
-            try? await stop()
-
-            NetworkProtectionKeychain.deleteReferences()
-            try? await Task.sleep(nanoseconds: UInt64(1 * 1_000_000_000))
-
-            try? await start()
         }
     }
 
@@ -432,43 +371,24 @@ final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
     /// Setups the tunnel manager if it's not set up already.
     ///
     private func setup(_ tunnelManager: NETunnelProviderManager) async throws {
-        if !tunnelManager.isEnabled {
-            tunnelManager.isEnabled = true
-        }
-
+        // 1 - If configuration exists... let it through (but what if it's broken?  the service will take care of it)
+        // 2 - If a configuration doesn't exist, fill in a dummy one (can this cause issues?)
+        
         if tunnelManager.localizedDescription == nil {
             tunnelManager.localizedDescription = UserText.networkProtectionTunnelName
         }
-
-        if let protocolConfiguration = tunnelManager.protocolConfiguration as? NETunnelProviderProtocol,
-           protocolConfiguration.verifyConfigurationReference() {
+        
+        if !tunnelManager.isEnabled {
+            tunnelManager.isEnabled = true
+        }
+        
+        guard tunnelManager.protocolConfiguration == nil else {
             return
         }
 
-        if let debugTunnelConfiguration = try loadTunnelConfiguration() {
-            os_log("Loading tunnel configuration from Debug path", log: .networkProtection)
-
-            tunnelManager.protocolConfiguration = await NETunnelProviderProtocol(tunnelConfiguration: debugTunnelConfiguration,
-                                                                                 previouslyFrom: tunnelManager.protocolConfiguration)
-        } else {
-            let preferredServerName = selectedServerStore.selectedServer.stringValue
-
-            guard let configurationResult = await deviceManager.generateTunnelConfiguration(preferredServerName: preferredServerName) else {
-                assertionFailure("Failed to generate tunnel configuration")
-                return
-            }
-
-            let serverLocation = configurationResult.1.serverLocation
-            selectedServerStore.mostRecentlyConnectedServerLocation = serverLocation
-            os_log("Generated tunnel configuration for server at location: %{public}s (preferred server is %{public}s)",
-                   log: .networkProtection,
-                   serverLocation,
-                   preferredServerName ?? "Automatic")
-
-            tunnelManager.protocolConfiguration = await NETunnelProviderProtocol(tunnelConfiguration: configurationResult.0,
-                                                                                 previouslyFrom: tunnelManager.protocolConfiguration)
-        }
-
+        let protocolConfiguration = NETunnelProviderProtocol()
+        protocolConfiguration.serverAddress = "127.0.0.1" // Dummy address... the NetP service will take care of grabbing a real server
+        tunnelManager.protocolConfiguration = protocolConfiguration
     }
 
     // MARK: - Connection Status Querying
@@ -495,6 +415,7 @@ final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
     /// Starts the VPN connection used for Network Protection
     ///
     func start() async throws {
+        NetworkProtectionAgentManager.current.enable()
         let tunnelManager = try await loadOrMakeTunnelManager()
 
         switch tunnelManager.connection.status {
@@ -502,7 +423,13 @@ final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
             reloadTunnelManager()
             try await start()
         case .disconnected, .disconnecting:
-            try tunnelManager.connection.startVPNTunnel()
+            var options = [String: NSObject]()
+            
+            if let selectedServerName = NetworkProtectionSelectedServerUserDefaultsStore().selectedServer.stringValue {
+                options["selectedServer"] = selectedServerName as NSString
+            }
+            
+            try tunnelManager.connection.startVPNTunnel(options: options)
         default:
             // Intentional no-op
             break
@@ -524,45 +451,65 @@ final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
         }
     }
 
-    // MARK: - Connection Status
+    // MARK: - Debug commands for the extension
+    
+    private let selectedServerStore = NetworkProtectionSelectedServerUserDefaultsStore()
 
-    private func connectionStatus(from session: NETunnelProviderSession) -> NetworkProtectionConnectionStatus {
-        let internalStatus = session.status
-        let status: NetworkProtectionConnectionStatus
-
-        switch internalStatus {
-        case .connected:
-            // In theory when the connection has been established, the date should be set.  But in a worst-case
-            // scenario where for some reason the date is missing, we're going to just use Date() as the connection
-            // has just started and it's a decent approximation.
-            let connectedDate = session.connectedDate ?? Date()
-            let serverAddress = session.manager.protocolConfiguration?.serverAddress ?? UserText.networkProtectionServerAddressUnknown
-
-            if let serverLocation = selectedServerStore.mostRecentlyConnectedServerLocation {
-                status = .connected(connectedDate: connectedDate, serverAddress: serverAddress, serverLocation: serverLocation)
-            } else {
-                status = .connected(connectedDate: connectedDate, serverAddress: serverAddress, serverLocation: "Unknown Server Location")
+    static func resetAllState() {
+        Task {
+            if let activeSession = try? await activeSession() {
+                try? activeSession.sendProviderMessage(Data([NetworkProtectionAppRequest.resetAllState.rawValue])) { _ in
+                    os_log("🔵 Status was reset")
+                }
             }
-        case .connecting, .reasserting:
-            status = .connecting
-        case .disconnected, .invalid:
-            status = .disconnected
-        case .disconnecting:
-            // In theory when the connection has been established, the date should be set.  But in a worst-case
-            // scenario where for some reason the date is missing, we're going to just use Date() as the connection
-            // has just started and it's a decent approximation.
-            let connectedDate = session.connectedDate ?? Date()
-            let serverAddress = session.manager.protocolConfiguration?.serverAddress ?? UserText.networkProtectionServerAddressUnknown
-
-            if let serverLocation = selectedServerStore.mostRecentlyConnectedServerLocation {
-                status = .disconnecting(connectedDate: connectedDate, serverAddress: serverAddress, serverLocation: serverLocation)
-            } else {
-                status = .disconnecting(connectedDate: connectedDate, serverAddress: serverAddress, serverLocation: "Unknown Server Location")
+            
+            // ☝️ Take care of resetting all state within the extension first, and wait half a second
+            try? await Task.sleep(nanoseconds: 500 * NSEC_PER_MSEC)
+            // 👇 And only afterwards turn off the tunnel and removing it from prefernces
+            
+            let tunnels = try? await NETunnelProviderManager.loadAllFromPreferences()
+            
+            if let tunnels = tunnels {
+                for tunnel in tunnels {
+                    tunnel.connection.stopVPNTunnel()
+                    try? await tunnel.removeFromPreferences()
+                }
             }
-        @unknown default:
-            status = .unknown
+            
+            try? await NetworkProtectionAgentManager.current.reset()
+            NetworkProtectionKeychain.deleteReferences()
+            NetworkProtectionSelectedServerUserDefaultsStore().reset()
         }
+    }
 
-        return status
+    static func setSelectedServer(selectedServer: SelectedNetworkProtectionServer) {
+        NetworkProtectionSelectedServerUserDefaultsStore().selectedServer = selectedServer
+        
+        let selectedServerName: String?
+        
+        if case .endpoint(let serverName) = selectedServer {
+            selectedServerName = serverName
+        } else {
+            selectedServerName = nil
+        }
+        
+        Task {
+            guard let activeSession = try? await activeSession() else {
+                return
+            }
+            
+            var request = Data([NetworkProtectionAppRequest.setSelectedServer.rawValue])
+             
+            if let selectedServerName = selectedServerName {
+                let serverNameData = selectedServerName.data(using: NetworkProtectionAppRequest.preferredStringEncoding)!
+                request.append(serverNameData)
+            }
+            
+            try? activeSession.sendProviderMessage(request)
+        }
+    }
+    
+    static func selectedServerName() -> String? {
+        NetworkProtectionSelectedServerUserDefaultsStore().selectedServer.stringValue
     }
 }

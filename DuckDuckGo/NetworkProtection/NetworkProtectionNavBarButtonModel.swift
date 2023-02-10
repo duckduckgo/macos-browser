@@ -25,34 +25,79 @@ import Foundation
 final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
 
     private let networkProtection: NetworkProtectionProvider
+    private let networkProtectionStatusReporter: NetworkProtectionStatusReporter
     private var status: NetworkProtectionConnectionStatus = .disconnected
     private let popovers: NavigationBarPopovers
 
+    // MARK: - Subscriptions
+    
     private var statusChangeCancellable: AnyCancellable?
+    private var interruptionCancellable: AnyCancellable?
 
-    @Published var showButton: Bool = false
+    // MARK: - Button appearance
+
+    @Published
+    private(set) var showButton = false
+    
+    @Published
+    private(set) var buttonImage = NSImage(NetworkProtectionAsset.vpnIcon)
+    
+    // MARK: - NetP State
+
+    private var isHavingConnectivityIssues = false {
+        didSet {
+           if isHavingConnectivityIssues {
+               buttonImage = NSImage(NetworkProtectionAsset.vpnIssueIcon)
+           } else {
+               buttonImage = NSImage(NetworkProtectionAsset.vpnIcon)
+           }
+        }
+    }
 
     // MARK: - Initialization
 
-    init(popovers: NavigationBarPopovers, networkProtection: NetworkProtectionProvider = DefaultNetworkProtectionProvider()) {
+    init(popovers: NavigationBarPopovers,
+         networkProtection: NetworkProtectionProvider = DefaultNetworkProtectionProvider(),
+         networkProtectionStatusReporter: NetworkProtectionStatusReporter = DefaultNetworkProtectionStatusReporter()) {
         self.networkProtection = networkProtection
+        self.networkProtectionStatusReporter = networkProtectionStatusReporter
         self.popovers = popovers
+        
+        isHavingConnectivityIssues = networkProtectionStatusReporter.connectivityIssuesPublisher.value
 
         super.init()
 
-        setupNetworkProtection()
+        setupSubscriptions()
     }
 
-    // MARK: - Setup & updates
+    // MARK: - Subscriptions
+    
+    private func setupSubscriptions() {
+        setupStatusSubscription()
+        setupInterruptionSubscription()
+    }
 
-    private func setupNetworkProtection() {
-        statusChangeCancellable = networkProtection.statusChangePublisher.sink { status in
-            Task { @MainActor [weak self] in
-                guard let self = self else {
-                    return
-                }
-
+    private func setupStatusSubscription() {
+        statusChangeCancellable = networkProtectionStatusReporter.statusChangePublisher.sink { [weak self] status in
+            guard let self = self else {
+                return
+            }
+            
+            Task { @MainActor in
                 self.status = status
+                self.updateVisibility()
+            }
+        }
+    }
+    
+    private func setupInterruptionSubscription() {
+        interruptionCancellable = networkProtectionStatusReporter.connectivityIssuesPublisher.sink { [weak self] isHavingConnectivityIssues in
+            guard let self = self else {
+                return
+            }
+            
+            Task { @MainActor in
+                self.isHavingConnectivityIssues = isHavingConnectivityIssues
                 self.updateVisibility()
             }
         }
@@ -66,8 +111,13 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
         }
 
         Task {
+            guard !isHavingConnectivityIssues else {
+                showButton = true
+                return
+            }
+            
             switch status {
-            case .connecting, .connected, .disconnecting:
+            case .connecting, .connected, .reasserting, .disconnecting:
                 showButton = true
             default:
                 showButton = false

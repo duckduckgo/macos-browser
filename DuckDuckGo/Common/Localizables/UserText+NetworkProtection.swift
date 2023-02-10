@@ -33,6 +33,7 @@ extension UserText {
     // MARK: - Connection Information
 
     static let networkProtectionServerAddressUnknown = NSLocalizedString("network.protection.server.address.unknown", value: "Unknown", comment: "When we can't tell the user the IP of the NetP server is")
+    static let networkProtectionServerLocationUnknown = NSLocalizedString("network.protection.server.location.unknown", value: "Unknown", comment: "When we can't tell the user the location of the NetP server")
 
     // MARK: - Status View
 
@@ -53,4 +54,9 @@ extension UserText {
     // MARK: - Navigation Bar
 
     static let networkProtectionButtonTooltip = NSLocalizedString("network.protection.status.button.tooltip", value: "Network Protection", comment: "The tooltip for NetP's nav bar button")
+    
+    // MARK: - Connection Issues
+    
+    static let networkProtectionInterruptedReconnecting = NSLocalizedString("network.protection.interrupted.reconnecting", value: "Your Network Protection connection was interrupted. Attempting to reconnect now...", comment: "The warning message shown in NetP's status view when the connection is interrupted and its attempting to reconnect.")
+    static let networkProtectionInterrupted = NSLocalizedString("network.protection.interrupted", value: "Network Protection was unable to connect at this time. Please try again later.", comment: "The warning message shown in NetP's status view when the connection is interrupted.")
 }

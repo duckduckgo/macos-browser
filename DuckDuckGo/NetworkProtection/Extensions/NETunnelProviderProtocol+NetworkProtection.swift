@@ -22,7 +22,7 @@ import NetworkProtection
 
 extension NETunnelProviderProtocol {
     @MainActor
-    convenience init?(tunnelConfiguration: TunnelConfiguration, previouslyFrom old: NEVPNProtocol? = nil) {
+    convenience init?(tunnelConfiguration: TunnelConfiguration, previouslyFrom old: NEVPNProtocol? = nil, extensionBundleIdentifier: String) {
         self.init()
 
         guard let name = tunnelConfiguration.name else {
@@ -30,13 +30,13 @@ extension NETunnelProviderProtocol {
         }
 
         #if NETP_SYSTEM_EXTENSION
-        providerBundleIdentifier = "\(Bundle(for: DefaultNetworkProtectionProvider.self).bundleIdentifier!).extension"
+        providerBundleIdentifier = extensionBundleIdentifier
         passwordReference = NetworkProtectionKeychain.makeReference(containing: tunnelConfiguration.asWgQuickConfig(),
                                                                     useSystemKeychain: true,
                                                                     called: name,
                                                                     previouslyReferencedBy: old?.passwordReference)
         #else
-        providerBundleIdentifier = "\(Bundle(for: DefaultNetworkProtectionProvider.self).bundleIdentifier!).network-extension"
+        providerBundleIdentifier = extensionBundleIdentifier
         passwordReference = NetworkProtectionKeychain.makeReference(containing: tunnelConfiguration.asWgQuickConfig(),
                                                                     useSystemKeychain: false,
                                                                     called: name,

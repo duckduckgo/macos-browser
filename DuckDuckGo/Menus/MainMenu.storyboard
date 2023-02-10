@@ -784,7 +784,7 @@ CQ
                                                                 <menuItem title="Automatic" id="0j8-SE-pRP">
                                                                     <modifierMask key="keyEquivalentModifierMask"/>
                                                                     <connections>
-                                                                        <action selector="networkProtectionPreferredServerLocationChanged:" target="Ady-hI-5gd" id="ALW-mP-ewV"/>
+                                                                        <action selector="networkProtectionPreferredServerChanged:" target="Ady-hI-5gd" id="3eT-N4-yyJ"/>
                                                                     </connections>
                                                                 </menuItem>
                                                             </items>

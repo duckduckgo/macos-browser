@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import Combine
 import SwiftUI
 
 /// Abstraction of the the Network Protection status bar menu with a simple interface.
@@ -24,6 +25,14 @@ import SwiftUI
 final class NetworkProtectionStatusBarMenu {
     private let statusItem: NSStatusItem
 
+    // MARK: - Connection Issues
+    
+    private let statusReporter: NetworkProtectionStatusReporter
+    
+    // MARK: - Subscriptions
+    
+    private var connectivityIssuesCancellable: AnyCancellable?
+    
     // MARK: - Initialization
 
     /// Default initializer
@@ -31,8 +40,11 @@ final class NetworkProtectionStatusBarMenu {
     /// - Parameters:
     ///     - statusItem: (meant for testing) this allows us to inject our own status `NSStatusItem` to make automated testing easier..
     ///
-    init(statusItem: NSStatusItem? = nil) {
+    init(statusItem: NSStatusItem? = nil,
+         statusReporter: NetworkProtectionStatusReporter = DefaultNetworkProtectionStatusReporter()) {
+        
         self.statusItem = statusItem ?? NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
+        self.statusReporter = statusReporter
 
         let item = NSMenuItem()
         let model = NetworkProtectionStatusView.Model(runLoopMode: .eventTracking)
@@ -46,6 +58,20 @@ final class NetworkProtectionStatusBarMenu {
         let menu = NSMenu(items: [item])
         self.statusItem.menu = menu
         self.statusItem.button?.image = .init(.vpnIcon)
+
+        subscribeToConnectionIssues()
+    }
+    
+    private func subscribeToConnectionIssues() {
+        updateMenuIcon(isHavingConnectionIssues: statusReporter.connectivityIssuesPublisher.value)
+        
+        connectivityIssuesCancellable = statusReporter.connectivityIssuesPublisher.sink { [weak self] isHavingConnectionIssues in
+            guard let self = self else {
+                return
+            }
+            
+            self.updateMenuIcon(isHavingConnectionIssues: isHavingConnectionIssues)
+        }
     }
 
     // MARK: - Showing & Hiding the menu
@@ -56,5 +82,12 @@ final class NetworkProtectionStatusBarMenu {
 
     func hide() {
         statusItem.isVisible = false
+    }
+    
+    // MARK: - Menu Icon Refresh
+
+    private func updateMenuIcon(isHavingConnectionIssues: Bool) {
+        let icon: NetworkProtectionAsset = isHavingConnectionIssues ? .vpnIssueIcon : .vpnIcon
+        self.statusItem.button?.image = .init(icon)
     }
 }

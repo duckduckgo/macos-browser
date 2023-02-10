@@ -17,6 +17,7 @@
 //
 
 import SwiftUI
+import Combine
 
 /// This view helps us fix the height of a view that's meant to be shown inside a `NSHostingView`.
 ///
@@ -28,34 +29,19 @@ import SwiftUI
 /// solution that's included.
 ///
 struct PopoverHeightFixer<Content: View>: View {
-    var collapsed: Bool
-    @State private var maxCollapsedHeight = CGFloat.infinity
-    @State private var maxExpandedHeight = CGFloat.infinity
-
-    var maxHeight: CGFloat {
-        if collapsed {
-            return maxCollapsedHeight
-        } else {
-            return maxExpandedHeight
-        }
-    }
-
+    @Binding var popoverHeight: CGFloat
     @ViewBuilder var content: () -> Content
 
     var body: some View {
         VStack(spacing: 0, content: content)
-            .frame(maxHeight: maxHeight)
+            .frame(maxHeight: popoverHeight)
             .fixedSize(horizontal: false, vertical: true)
             .background(GeometryReader { geometry in
                 /// Since .onAppear is only called once, we'll use a different view for the collapsed and expanded states.
                 /// so that the proper height is calculated for both.
-                if collapsed {
-                    Color.clear.onAppear {
-                        maxCollapsedHeight = geometry.size.height
-                    }
-                } else {
-                    Color.clear.onAppear {
-                        maxExpandedHeight = geometry.size.height
+                Color.clear.onReceive(Just(popoverHeight)) { _ in
+                    if popoverHeight == .infinity {
+                        popoverHeight = geometry.size.height
                     }
                 }
             })
@@ -120,6 +106,8 @@ public struct NetworkProtectionStatusView: View {
     /// The view model that this instance will use.
     ///
     @ObservedObject var model: Model
+    
+    @State private var popoverHeight = CGFloat.infinity
 
     // MARK: - Initializers
 
@@ -130,8 +118,17 @@ public struct NetworkProtectionStatusView: View {
     // MARK: - View Contents
 
     public var body: some View {
-        PopoverHeightFixer(collapsed: !model.showServerDetails) {
+        PopoverHeightFixer(popoverHeight: $popoverHeight) {
             headerView()
+
+            if let healthWarning = model.connectionHealthWarning {
+                connectionHealthWarningView(message: healthWarning).onAppear {
+                    popoverHeight = .infinity
+                }
+                .onDisappear {
+                    popoverHeight = .infinity
+                }
+            }
 
             VStack(spacing: 0) {
                 featureView()
@@ -152,6 +149,24 @@ public struct NetworkProtectionStatusView: View {
 
             Divider()
         }
+    }
+
+    private func connectionHealthWarningView(message: String) -> some View {
+        VStack(spacing: 0) {
+            HStack(alignment: .top, spacing: 12) {
+                Image("WarningColored")
+
+                /// Text elements in SwiftUI don't expand horizontally more than needed, so we're adding an "optional" spacer at the end so that
+                /// the alert bubble won't shrink if there's not enough text.
+                HStack(spacing: 0) {
+                    Text(message)
+                    Spacer()
+                }
+            }
+            .padding(16)
+            .background(RoundedRectangle(cornerRadius: 8).fill(Color("AlertBubbleBackground")))
+        }
+        .padding(EdgeInsets(top: 8, leading: 8, bottom: 4, trailing: 8))
     }
 
     /// Main image, feature ON/OFF and feature description
@@ -187,7 +202,12 @@ public struct NetworkProtectionStatusView: View {
                 .padding([.top, .bottom], 18)
 
             if model.showServerDetails {
-                statusView()
+                statusView().onAppear {
+                    popoverHeight = .infinity
+                }
+                .onDisappear {
+                    popoverHeight = .infinity
+                }
             }
 
             Text(UserText.networkProtectionStatusViewBetaWarning)

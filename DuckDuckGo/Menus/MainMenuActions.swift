@@ -650,32 +650,26 @@ extension MainViewController {
                 return
             }
 
-            let serverCache = NetworkProtectionServerListFileSystemStore()
-            try? serverCache.removeServerList()
-
-            let selectedServerStore = NetworkProtectionSelectedServerUserDefaultsStore()
-            selectedServerStore.reset()
-
-            NetworkProtectionKeychain.deleteReferences()
-
-            NotificationCenter.default.post(name: .NetworkProtectionDebugResetExtension, object: nil)
+            DefaultNetworkProtectionProvider.resetAllState()
         })
     }
 
-    @IBAction func networkProtectionPreferredServerLocationChanged(_ sender: Any?) {
+    @IBAction func networkProtectionPreferredServerChanged(_ sender: Any?) {
         guard let title = (sender as? NSMenuItem)?.title else {
             assertionFailure("\(#function): Failed to cast sender to NSMenuItem")
             return
         }
-
-        let serverSelectionStore = NetworkProtectionSelectedServerUserDefaultsStore()
-
+        
+        let selectedServer: SelectedNetworkProtectionServer
+        
         if title == "Automatic" {
-            serverSelectionStore.selectedServer = .automatic
+            selectedServer = .automatic
         } else {
             let titleComponents = title.components(separatedBy: " ")
-            serverSelectionStore.selectedServer = .endpoint(titleComponents.first!)
+            selectedServer = .endpoint(titleComponents.first!)
         }
+
+        DefaultNetworkProtectionProvider.setSelectedServer(selectedServer: selectedServer)
     }
 
     // MARK: - Developer Tools
@@ -699,7 +693,6 @@ extension MainViewController {
     @IBAction func showPageResources(_ sender: Any?) {
         tabCollectionViewModel.selectedTabViewModel?.tab.webView.showPageSource()
     }
-
 }
 
 extension MainViewController: NSMenuItemValidation {
@@ -791,19 +784,19 @@ extension MainViewController: NSMenuItemValidation {
 
             return true
 
-        // Network Protection Server Location
-        case #selector(MainViewController.networkProtectionPreferredServerLocationChanged(_:)):
-            let serverSelectionStore = NetworkProtectionSelectedServerUserDefaultsStore()
-
+        case #selector(MainViewController.networkProtectionPreferredServerChanged(_:)):
+            let selectedServerName = DefaultNetworkProtectionProvider.selectedServerName()
+            
             switch menuItem.title {
             case "Automatic":
-                menuItem.state = (serverSelectionStore.selectedServer == SelectedNetworkProtectionServer.automatic) ? .on : .off
+                menuItem.state = selectedServerName == nil ? .on : .off
             default:
-                if case let .endpoint(endpoint) = serverSelectionStore.selectedServer {
-                    menuItem.state = (menuItem.title.hasPrefix("\(endpoint) ")) ? .on : .off
-                } else {
+                guard let selectedServerName = selectedServerName else {
                     menuItem.state = .off
+                    break
                 }
+                
+                menuItem.state = (menuItem.title.hasPrefix("\(selectedServerName) ")) ? .on : .off
             }
 
             return true
