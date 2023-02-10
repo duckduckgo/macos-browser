@@ -203,14 +203,13 @@ extension PrivacyDashboardViewController: PrivacyDashboardControllerDelegate {
             assertionFailure("could not access shared tabCollectionViewModel")
             return
         }
-        
+
         switch target {
         case .cookiePopupManagement:
             tabCollection.appendNewTab(with: .preferences(pane: .privacy), selected: true)
         default:
             tabCollection.appendNewTab(with: .anyPreferencePane, selected: true)
         }
-        
     }
 
     func privacyDashboardController(_ privacyDashboardController: PrivacyDashboardController, didSetHeight height: Int) {
