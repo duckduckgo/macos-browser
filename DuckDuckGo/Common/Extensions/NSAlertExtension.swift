@@ -129,7 +129,7 @@ extension NSAlert {
         return alert
     }
 
-    static func noAccessToSelectedFile() -> NSAlert {
+    static func noAccessToSelectedFolder() -> NSAlert {
         let alert = NSAlert()
         alert.messageText = UserText.noAccessToSelectedFolderHeader
         alert.informativeText = UserText.noAccessToSelectedFolder

@@ -231,7 +231,7 @@ extension FileDownloadManager: WebKitDownloadTaskDelegate {
                 return
             }
         } else {
-            let alert = NSAlert.noAccessToSelectedFile()
+            let alert = NSAlert.noAccessToSelectedFolder()
             alert.runModal()
         }
     }
