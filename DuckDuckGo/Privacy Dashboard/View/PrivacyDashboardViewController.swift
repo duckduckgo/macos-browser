@@ -196,13 +196,21 @@ extension PrivacyDashboardViewController: PrivacyDashboardControllerDelegate {
         tabCollection.appendNewTab(with: .url(url), selected: true)
     }
 
-    func privacyDashboardController(_ privacyDashboardController: PrivacyDashboardController, didRequestOpenSettings target: String) {
+    func privacyDashboardController(_ privacyDashboardController: PrivacyDashboard.PrivacyDashboardController,
+                                    didRequestOpenSettings target: PrivacyDashboard.PrivacyDashboardOpenSettingsTarget) {
         guard let tabCollection = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.tabCollectionViewModel
         else {
             assertionFailure("could not access shared tabCollectionViewModel")
             return
         }
-        tabCollection.appendNewTab(with: .preferences(pane: .privacy), selected: true)
+        
+        switch target {
+        case .cookiePopupManagement:
+            tabCollection.appendNewTab(with: .preferences(pane: .privacy), selected: true)
+        default:
+            tabCollection.appendNewTab(with: .anyPreferencePane, selected: true)
+        }
+        
     }
 
     func privacyDashboardController(_ privacyDashboardController: PrivacyDashboardController, didSetHeight height: Int) {
