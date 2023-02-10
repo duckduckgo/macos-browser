@@ -45,8 +45,8 @@ read_command_line_arguments() {
 			;;
 		release)
 			app_name="DuckDuckGo"
-			scheme="DuckDuckGo Privacy Browser"
-			configuration="Release"
+			scheme="DuckDuckGo Network Protection (System Extension)"
+			configuration="NetworkProtection_SystemExtension_Release"
 			;;
 		clear-keychain)
 			clear_keychain

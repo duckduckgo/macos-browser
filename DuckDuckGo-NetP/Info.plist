@@ -95,7 +95,7 @@
 	<key>SUEnableAutomaticChecks</key>
 	<true/>
 	<key>SUFeedURL</key>
-	<string>https://staticcdn.duckduckgo.com/macos-desktop-browser/appcast.xml</string>
+	<string>https://staticcdn.duckduckgo.com/macos-desktop-browser/netp-internal-builds/appcast.xml</string>
 	<key>SUScheduledCheckInterval</key>
 	<integer>10800</integer>
 	<key>ViewBridgeService</key>
