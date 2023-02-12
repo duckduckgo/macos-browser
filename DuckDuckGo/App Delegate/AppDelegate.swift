@@ -48,12 +48,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private let keyStore = EncryptionKeyStore()
     private var fileStore: FileStore!
+
     private(set) var stateRestorationManager: AppStateRestorationManager!
     private var grammarFeaturesManager = GrammarFeaturesManager()
     private let crashReporter = CrashReporter()
+    private(set) var internalUserDecider: InternalUserDeciding!
+    private var appIconChanger: AppIconChanger!
 
 #if !APPSTORE
-    let updateController = UpdateController()
+    var updateController: UpdateController!
 #endif
 
     var appUsageActivityMonitor: AppUsageActivityMonitor?
@@ -115,9 +118,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             fileStore = EncryptedFileStore()
         }
         stateRestorationManager = AppStateRestorationManager(fileStore: fileStore)
+
+        let internalUserDeciderStore = InternalUserDeciderStore(fileStore: fileStore)
+        internalUserDecider = InternalUserDecider(store: internalUserDeciderStore)
+
 #if !APPSTORE
+        updateController = UpdateController(internalUserDecider: internalUserDecider)
         stateRestorationManager.subscribeToAutomaticAppRelaunching(using: updateController.willRelaunchAppPublisher)
 #endif
+
+        appIconChanger = AppIconChanger(internalUserDecider: internalUserDecider)
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {

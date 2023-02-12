@@ -64,15 +64,19 @@ final class CookieConsentAnimationModel: CookieConsentAnimation {
     @Published var pillRightSideOffset = Animation.Pills.rightSideOffset.begin
 
     private func updateDataForFirstAnimation() {
-        imageOpacity = Animation.Image.opacity.end
-        imageScale = Animation.Image.scale.end
+        withAnimation(.easeInOut(duration: firstAnimationDuration)) {
+            imageOpacity = Animation.Image.opacity.end
+            imageScale = Animation.Image.scale.end
+        }
     }
 
     private func updateDataForSecondAnimation() {
-        pillsOpacity = Animation.Pills.opacity.end
-        pillsScale = Animation.Pills.scale.end
-        pillRightSideOffset = Animation.Pills.rightSideOffset.end
-        pillLeftSideOffset = Animation.Pills.leftSideOffset.end
+        withAnimation(.easeInOut(duration: secondAnimationDuration)) {
+            pillsOpacity = Animation.Pills.opacity.end
+            pillsScale = Animation.Pills.scale.end
+            pillRightSideOffset = Animation.Pills.rightSideOffset.end
+            pillLeftSideOffset = Animation.Pills.leftSideOffset.end
+        }
     }
 
     func startAnimation() {

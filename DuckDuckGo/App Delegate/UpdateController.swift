@@ -22,10 +22,15 @@ import Sparkle
 
 final class UpdateController: NSObject {
 
+    enum Constants {
+        static let internalChannelName = "internal-channel"
+    }
+
     let willRelaunchAppPublisher: AnyPublisher<Void, Never>
 
-    override init() {
+    init(internalUserDecider: InternalUserDeciding) {
         willRelaunchAppPublisher = willRelaunchAppSubject.eraseToAnyPublisher()
+        self.internalUserDecider = internalUserDecider
         super.init()
 
         configureUpdater()
@@ -47,6 +52,8 @@ final class UpdateController: NSObject {
     lazy private var updater = SPUStandardUpdaterController(updaterDelegate: self, userDriverDelegate: self)
     private let willRelaunchAppSubject = PassthroughSubject<Void, Never>()
 
+    private var internalUserDecider: InternalUserDeciding
+
     private func configureUpdater() {
     // The default configuration of Sparkle updates is in Info.plist
 #if DEBUG
@@ -63,6 +70,18 @@ extension UpdateController: SPUStandardUserDriverDelegate {
 
 extension UpdateController: SPUUpdaterDelegate {
 
+    func allowedChannels(for updater: SPUUpdater) -> Set<String> {
+        guard updater == self.updater.updater else {
+            return Set()
+        }
+
+        if internalUserDecider.isInternalUser {
+            return Set([Constants.internalChannelName])
+        } else {
+            return Set()
+        }
+    }
+
     func updaterWillRelaunchApplication(_ updater: SPUUpdater) {
         willRelaunchAppSubject.send()
     }
@@ -75,6 +94,22 @@ extension UpdateController: SPUUpdaterDelegate {
         }
 
         Pixel.fire(.debug(event: .updaterAborted, error: error))
+    }
+
+    func updater(_ updater: SPUUpdater,
+                 userDidMake choice: SPUUserUpdateChoice,
+                 forUpdate updateItem: SUAppcastItem,
+                 state: SPUUserUpdateState) {
+        switch choice {
+        case .skip:
+            Pixel.fire(.debug(event: .userSelectedToSkipUpdate))
+        case .install:
+            Pixel.fire(.debug(event: .userSelectedToInstallUpdate))
+        case .dismiss:
+            Pixel.fire(.debug(event: .userSelectedToDismissUpdate))
+        @unknown default:
+            break
+        }
     }
 
 }
