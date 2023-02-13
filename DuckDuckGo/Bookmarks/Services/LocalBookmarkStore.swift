@@ -537,6 +537,7 @@ final class LocalBookmarkStore: BookmarkStore {
                 }
             } else {
                 for bookmarkManagedObject in bookmarkManagedObjects {
+                    bookmarkManagedObject.removeFromFavorites()
                     bookmarkManagedObject.addToFavorites(favoritesRoot: favoritesFolder)
                 }
             }

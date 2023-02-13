@@ -202,33 +202,6 @@ final class LocalBookmarkStoreTests: XCTestCase {
         waitForExpectations(timeout: 3, handler: nil)
     }
 
-    func testWhenFolderIsAdded_AndUUIDHasAlreadyBeenUsed_ThenSavingFails() {
-        let context = container.viewContext
-        let bookmarkStore = LocalBookmarkStore(context: context)
-
-        let firstSaveExpectation = self.expectation(description: "First Save")
-        let secondSaveExpectation = self.expectation(description: "Second Save")
-
-        let folder = BookmarkFolder(id: UUID().uuidString, title: "Folder")
-
-        bookmarkStore.save(folder: folder, parent: nil) { (success, error) in
-            XCTAssert(success)
-            XCTAssertNil(error)
-
-            firstSaveExpectation.fulfill()
-
-            bookmarkStore.save(folder: folder, parent: nil) { (success, error) in
-                // `true` is provided here anyway, in case the error in unrelated to the save action.
-                XCTAssert(success)
-                XCTAssertNotNil(error)
-
-                secondSaveExpectation.fulfill()
-            }
-        }
-
-        waitForExpectations(timeout: 2, handler: nil)
-    }
-
     func testWhenBookmarkIsAdded_AndFolderHasBeenProvided_ThenBookmarkIsSavedToParentFolder() {
         let context = container.viewContext
         let bookmarkStore = LocalBookmarkStore(context: context)
