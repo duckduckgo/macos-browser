@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1676036039006,
+    "version": 1676291238757,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -492,6 +492,8 @@
                         "type": "hide-empty"
                     }
                 ],
+                "useStrictHideStyleTag": true,
+                "styleTagExceptions": [],
                 "adLabelStrings": [
                     "advertisement",
                     "advertisment",
@@ -1122,7 +1124,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "3bf687283e5ce5d96b49c28efdd1eb40"
+            "hash": "d719a498422990f19674a5a450d300b4"
         },
         "fingerprintingAudio": {
             "state": "disabled",
@@ -1488,6 +1490,17 @@
                                     "<all>"
                                 ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/447"
+                            }
+                        ]
+                    },
+                    "akadns.net": {
+                        "rules": [
+                            {
+                                "rule": "login.fidelity.com.febsec-fidelity.com.akadns.net",
+                                "domains": [
+                                    "fidelity.com"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/677"
                             }
                         ]
                     },
@@ -1872,6 +1885,7 @@
                             {
                                 "rule": "cdn.dynamicyield.com/api/",
                                 "domains": [
+                                    "brooklinen.com",
                                     "seatosummit.com"
                                 ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/535"
@@ -2385,6 +2399,17 @@
                             }
                         ]
                     },
+                    "loggly.com": {
+                        "rules": [
+                            {
+                                "rule": "cloudfront.loggly.com/js/loggly.tracker-2.1.min.js",
+                                "domains": [
+                                    "rte.ie"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/681"
+                            }
+                        ]
+                    },
                     "lpsnmedia.net": {
                         "rules": [
                             {
@@ -2416,6 +2441,17 @@
                                     "medicare.gov"
                                 ],
                                 "reason": "Navigation bar at top of site does not display, preventing easy access to e.g., site login.,Note that this CNAMEs to iservprod.medicare.gov.edgekey.net at time of mitiagtion."
+                            }
+                        ]
+                    },
+                    "nextdoor.com": {
+                        "rules": [
+                            {
+                                "rule": "nextdoor.com",
+                                "domains": [
+                                    "nextdoor.co.uk"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/460"
                             }
                         ]
                     },
@@ -3097,6 +3133,17 @@
                                     "seattletimes.com"
                                 ],
                                 "reason": "An unskippable adwall appears which prevents interaction with the page."
+                            }
+                        ]
+                    },
+                    "fidelity.com": {
+                        "rules": [
+                            {
+                                "rule": "login.fidelity.com",
+                                "domains": [
+                                    "fidelity.com"
+                                ],
+                                "reason": "CNAME ENTRY GENERATED FROM: login.fidelity.com.febsec-fidelity.com.akadns.net"
                             }
                         ]
                     },
@@ -4766,7 +4813,7 @@
                 }
             },
             "exceptions": [],
-            "hash": "6867cd5eb1dac887cb963509cf12df8a"
+            "hash": "202592ba1360bd321fcee80ef0cba012"
         },
         "trackingCookies1p": {
             "settings": {
