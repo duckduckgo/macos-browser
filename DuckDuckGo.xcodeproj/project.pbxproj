@@ -1303,6 +1303,7 @@
 		9833913127AAA4B500DAF119 /* trackerData.json in Resources */ = {isa = PBXBuildFile; fileRef = 9833913027AAA4B500DAF119 /* trackerData.json */; };
 		9833913327AAAEEE00DAF119 /* EmbeddedTrackerDataTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9833913227AAAEEE00DAF119 /* EmbeddedTrackerDataTests.swift */; };
 		983DFB2528B67036006B7E34 /* UserContentUpdating.swift in Sources */ = {isa = PBXBuildFile; fileRef = 983DFB2428B67036006B7E34 /* UserContentUpdating.swift */; };
+		984FD3BF299ACF35007334DD /* Bookmarks in Frameworks */ = {isa = PBXBuildFile; productRef = 984FD3BE299ACF35007334DD /* Bookmarks */; };
 		987799ED299998B1005D8EB6 /* Bookmarks in Frameworks */ = {isa = PBXBuildFile; productRef = 987799EC299998B1005D8EB6 /* Bookmarks */; };
 		987799F12999993C005D8EB6 /* LegacyBookmarkStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 987799EF2999993C005D8EB6 /* LegacyBookmarkStore.swift */; };
 		987799F22999993C005D8EB6 /* LegacyBookmarkStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 987799EF2999993C005D8EB6 /* LegacyBookmarkStore.swift */; };
@@ -2689,6 +2690,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				984FD3BF299ACF35007334DD /* Bookmarks in Frameworks */,
 				37A5E2F0298AA1B20047046B /* Persistence in Frameworks */,
 				3706FCA7293F65D500E42796 /* BrowserServicesKit in Frameworks */,
 				3706FCA9293F65D500E42796 /* ContentBlocking in Frameworks */,
@@ -5564,6 +5566,7 @@
 				3706FA77293F65D500E42796 /* PrivacyDashboard */,
 				3706FA78293F65D500E42796 /* UserScript */,
 				37A5E2EF298AA1B20047046B /* Persistence */,
+				984FD3BE299ACF35007334DD /* Bookmarks */,
 			);
 			productName = DuckDuckGo;
 			productReference = 3706FD05293F65D500E42796 /* DuckDuckGo App Store.app */;
@@ -8257,6 +8260,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
 			productName = BrowserServicesKit;
+		};
+		984FD3BE299ACF35007334DD /* Bookmarks */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = Bookmarks;
 		};
 		987799EC299998B1005D8EB6 /* Bookmarks */ = {
 			isa = XCSwiftPackageProductDependency;
