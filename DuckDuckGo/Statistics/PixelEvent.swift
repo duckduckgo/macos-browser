@@ -18,6 +18,7 @@
 
 import Foundation
 import BrowserServicesKit
+import Bookmarks
 
 extension Pixel {
 
@@ -202,6 +203,26 @@ extension Pixel {
             case userSelectedToSkipUpdate
             case userSelectedToInstallUpdate
             case userSelectedToDismissUpdate
+
+            // Errors from Bookmarks Module
+            case bookmarkFolderExpected
+            case bookmarksListIndexNotMatchingBookmark
+            case bookmarksListMissingFolder
+            case editorNewParentMissing
+            case favoritesListIndexNotMatchingBookmark
+            case fetchingRootItemFailed(BookmarksModelError.ModelType)
+            case indexOutOfRange(BookmarksModelError.ModelType)
+            case saveFailed(BookmarksModelError.ModelType)
+            case missingParent(BookmarksModelError.ObjectType)
+
+            case bookmarksCouldNotLoadDatabase
+            case bookmarksCouldNotPrepareDatabase
+            case bookmarksMigrationAlreadyPerformed
+            case bookmarksMigrationFailed
+            case bookmarksMigrationCouldNotPrepareDatabase
+            case bookmarksMigrationCouldNotPrepareDatabaseOnFailedMigration
+            case bookmarksMigrationCouldNotValidateDatabase
+            case bookmarksMigrationCouldNotRemoveOldStore
         }
 
     }
@@ -443,6 +464,26 @@ extension Pixel.Event.Debug {
             return "user_selected_to_install_update"
         case .userSelectedToDismissUpdate:
             return "user_selected_to_dismiss_update"
+
+        case .bookmarkFolderExpected: return "bookmark_folder_expected"
+        case .bookmarksListIndexNotMatchingBookmark: return "bookmarks_list_index_not_matching_bookmark"
+        case .bookmarksListMissingFolder: return "bookmarks_list_missing_folder"
+        case .editorNewParentMissing: return "bookmarks_editor_new_parent_missing"
+        case .favoritesListIndexNotMatchingBookmark: return "favorites_list_index_not_matching_bookmark"
+        case .fetchingRootItemFailed(let modelType): return "bookmarks_fetching_root_item_failed_\(modelType.rawValue)"
+        case .indexOutOfRange(let modelType): return "bookmarks_index_out_of_range_\(modelType.rawValue)"
+        case .saveFailed(let modelType): return "bookmarks_view_model_save_failed_\(modelType.rawValue)"
+        case .missingParent(let objectType): return "bookmark_model_missing_parent_\(objectType.rawValue)"
+
+        case .bookmarksCouldNotLoadDatabase: return "bookmarks_could_not_load_database"
+        case .bookmarksCouldNotPrepareDatabase: return "bookmarks_could_not_prepare_database"
+        case .bookmarksMigrationAlreadyPerformed: return "bookmarks_migration_already_performed"
+        case .bookmarksMigrationFailed: return "bookmarks_migration_failed"
+        case .bookmarksMigrationCouldNotPrepareDatabase: return "bookmarks_migration_could_not_prepare_database"
+        case .bookmarksMigrationCouldNotPrepareDatabaseOnFailedMigration:
+            return "bookmarks_migration_could_not_prepare_database_on_failed_migration"
+        case .bookmarksMigrationCouldNotValidateDatabase: return "bookmarks_migration_could_not_validate_database"
+        case .bookmarksMigrationCouldNotRemoveOldStore: return "bookmarks_migration_could_not_remove_old_store"
         }
     }
 }

@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import AppKit
 
 typealias PasteboardAttributes = [String: String]
 

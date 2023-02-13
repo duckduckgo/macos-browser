@@ -61,7 +61,7 @@ class BookmarkOutlineViewDataSourceTests: XCTestCase {
         XCTAssertNotNil(writer)
 
         let writerDictionary = writer?.internalDictionary
-        XCTAssertEqual(writerDictionary?["id"], mockFolder.id.uuidString)
+        XCTAssertEqual(writerDictionary?["id"], mockFolder.id)
     }
 
     func testWhenGettingPasteboardWriterForItem_AndItemIsNotBookmarkEntity_ThenNilIsReturned() {
@@ -129,15 +129,15 @@ class BookmarkOutlineViewDataSourceTests: XCTestCase {
         let dataSource = BookmarkOutlineViewDataSource(contentMode: .foldersOnly, treeController: treeController)
         let mockDestinationNode = treeController.node(representing: mockDestinationFolder)!
 
-        let pasteboardFolder = PasteboardFolder(id: mockDestinationFolder.id.uuidString, name: "Pasteboard Folder")
+        let pasteboardFolder = PasteboardFolder(id: mockDestinationFolder.id, name: "Pasteboard Folder")
         let result = dataSource.validateDrop(for: [pasteboardFolder], destination: mockDestinationNode)
 
         XCTAssertEqual(result, .none)
     }
 
     func testWhenValidatingFolderDrop_AndDestinationIsAncestor_ThenNoneIsReturned() {
-        let childFolder = BookmarkFolder(id: UUID(), title: "Child")
-        let rootFolder = BookmarkFolder(id: UUID(), title: "Root", children: [childFolder])
+        let childFolder = BookmarkFolder(id: UUID().uuidString, title: "Child")
+        let rootFolder = BookmarkFolder(id: UUID().uuidString, title: "Root", children: [childFolder])
 
         let bookmarkStoreMock = BookmarkStoreMock()
         let faviconManagerMock = FaviconManagerMock()
@@ -152,7 +152,7 @@ class BookmarkOutlineViewDataSourceTests: XCTestCase {
         let mockDestinationNode = treeController.node(representing: childFolder)!
 
         // Simulate dragging the root folder onto the child folder:
-        let draggedFolder = PasteboardFolder(id: rootFolder.id.uuidString, name: "Root")
+        let draggedFolder = PasteboardFolder(id: rootFolder.id, name: "Root")
         let result = dataSource.validateDrop(for: [draggedFolder], destination: mockDestinationNode)
 
         XCTAssertEqual(result, .none)
@@ -176,8 +176,8 @@ class BookmarkOutlineViewDataSourceTests: XCTestCase {
 
 extension Bookmark {
 
-    static var mock: Bookmark = Bookmark(id: UUID(),
-                                         url: URL.duckDuckGo,
+    static var mock: Bookmark = Bookmark(id: UUID().uuidString,
+                                         url: URL.duckDuckGo.absoluteString,
                                          title: "Title",
                                          isFavorite: false)
 
@@ -185,6 +185,6 @@ extension Bookmark {
 
 extension BookmarkFolder {
 
-    static var mock = BookmarkFolder(id: UUID(), title: "Title")
+    static var mock = BookmarkFolder(id: UUID().uuidString, title: "Title")
 
 }

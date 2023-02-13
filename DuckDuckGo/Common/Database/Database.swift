@@ -95,3 +95,37 @@ extension NSManagedObjectContext {
         return obj
     }
 }
+
+extension Array where Element == CoreDataErrorsParser.ErrorInfo {
+
+    var errorPixelParameters: [String: String] {
+        let params: [String: String]
+        if let first = first {
+            params = ["errorCount": "\(count)",
+                      "coreDataCode": "\(first.code)",
+                      "coreDataDomain": first.domain,
+                      "coreDataEntity": first.entity ?? "empty",
+                      "coreDataAttribute": first.property ?? "empty"]
+        } else {
+            params = ["errorCount": "\(count)"]
+        }
+        return params
+    }
+}
+
+extension NSManagedObjectContext {
+
+    func save(onErrorFire event: Pixel.Event.Debug) throws {
+        do {
+            try save()
+        } catch {
+            let nsError = error as NSError
+            let processedErrors = CoreDataErrorsParser.parse(error: nsError)
+
+            Pixel.fire(.debug(event: event, error: error),
+                       withAdditionalParameters: processedErrors.errorPixelParameters)
+
+            throw error
+        }
+    }
+}

@@ -21,6 +21,10 @@ import CoreData
 
 extension BookmarkManagedObject {
 
+    public static func entity(in context: NSManagedObjectContext) -> NSEntityDescription {
+        NSEntityDescription.entity(forEntityName: "BookmarkManagedObject", in: context)!
+    }
+
     enum BookmarkError: Error {
         case mustExistInsideRootFolder
         case folderStructureHasCycle
@@ -58,9 +62,10 @@ extension BookmarkManagedObject {
     }
 
     func validateThatEntitiesExistInsideTheRootFolder() throws {
-//        if parentFolder == nil, ![Book.rootBookmarkFolderUUID, .favoritesFolderUUID].contains(id) {
-//            throw BookmarkError.mustExistInsideRootFolder
-//        }
+        if parentFolder == nil, ![UUID(uuidString: LegacyBookmarkStore.Constants.favoritesFolderUUID),
+                                  UUID(uuidString: LegacyBookmarkStore.Constants.rootFolderUUID)].contains(id) {
+            throw BookmarkError.mustExistInsideRootFolder
+        }
     }
 
     func validateBookmarkURLRequirement() throws {
@@ -70,9 +75,9 @@ extension BookmarkManagedObject {
     }
 
     func validateFavoritesFolder() throws {
-//        if let favoritesFolderID = favoritesFolder?.id, favoritesFolderID != .favoritesFolderUUID {
-//            throw BookmarkError.invalidFavoritesFolder
-//        }
+        if let favoritesFolderID = favoritesFolder?.id, favoritesFolderID != UUID(uuidString: LegacyBookmarkStore.Constants.favoritesFolderUUID) {
+            throw BookmarkError.invalidFavoritesFolder
+        }
     }
 
     func validateThatFoldersDoNotHaveURLs() throws {
