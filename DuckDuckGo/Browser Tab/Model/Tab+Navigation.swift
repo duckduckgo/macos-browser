@@ -32,7 +32,8 @@ extension Tab: NavigationResponder {
         navigationDelegate.setResponders(
             .weak(self),
 
-            // ...
+            .weak(nullable: self.adClickAttribution),
+            .struct(SerpHeadersNavigationResponder()),
 
             // should be the last, for Unit Tests navigation events tracking
             .struct(nullable: testsClosureNavigationResponder)

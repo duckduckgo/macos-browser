@@ -102,7 +102,7 @@ extension TabExtensionsBuilder {
         add {
             AdClickAttributionTabExtension(inheritedAttribution: args.inheritedAttribution,
                                            userContentControllerFuture: args.userContentControllerFuture,
-                                           contentBlockerRulesScriptPublisher: userScripts.map(\.?.contentBlockerRulesScript),
+                                           contentBlockerRulesScriptPublisher: userScripts.map { $0?.contentBlockerRulesScript },
                                            trackerInfoPublisher: trackerInfoPublisher,
                                            dependencies: dependencies.privacyFeatures.contentBlocking)
         }
