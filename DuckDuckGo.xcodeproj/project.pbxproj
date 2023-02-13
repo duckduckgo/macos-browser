@@ -1672,8 +1672,6 @@
 		B6C2C9F62760B659005B7F0A /* TestDataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = B6C2C9F42760B659005B7F0A /* TestDataModel.xcdatamodeld */; };
 		B6CA4824298CDC2E0067ECCE /* AdClickAttributionTabExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6CA4823298CDC2E0067ECCE /* AdClickAttributionTabExtensionTests.swift */; };
 		B6CA4825298CE4B70067ECCE /* AdClickAttributionTabExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6CA4823298CDC2E0067ECCE /* AdClickAttributionTabExtensionTests.swift */; };
-		B6CA482A298CF6050067ECCE /* Swifter in Frameworks */ = {isa = PBXBuildFile; productRef = B6CA4829298CF6050067ECCE /* Swifter */; };
-		B6CA482C298CF60E0067ECCE /* Swifter in Frameworks */ = {isa = PBXBuildFile; productRef = B6CA482B298CF60E0067ECCE /* Swifter */; };
 		B6CFAA522943725600CB6B11 /* WebKitDownloadDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6CFAA512943725600CB6B11 /* WebKitDownloadDelegate.swift */; };
 		B6D6A5DD2982A4CE001F5F11 /* Tab+Navigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = B61E2CD4294346C000773D8A /* Tab+Navigation.swift */; };
 		B6D6A5DE2982A5A7001F5F11 /* WebKitDownloadDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6CFAA512943725600CB6B11 /* WebKitDownloadDelegate.swift */; };
@@ -1699,6 +1697,10 @@
 		B6E61EE8263ACE16004E11AB /* UTType.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6E61EE7263ACE16004E11AB /* UTType.swift */; };
 		B6F1C80B2761C45400334924 /* LocalUnprotectedDomains.swift in Sources */ = {isa = PBXBuildFile; fileRef = 336B39E22726B4B700C417D3 /* LocalUnprotectedDomains.swift */; };
 		B6F41031264D2B23003DA42C /* ProgressExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F41030264D2B23003DA42C /* ProgressExtension.swift */; };
+		B6F56567299A414300A04298 /* WKWebViewMockingExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F56566299A414300A04298 /* WKWebViewMockingExtension.swift */; };
+		B6F56568299A414300A04298 /* WKWebViewMockingExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F56566299A414300A04298 /* WKWebViewMockingExtension.swift */; };
+		B6F56569299A414300A04298 /* WKWebViewMockingExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F56566299A414300A04298 /* WKWebViewMockingExtension.swift */; };
+		B6F5656A299A414300A04298 /* WKWebViewMockingExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F56566299A414300A04298 /* WKWebViewMockingExtension.swift */; };
 		B6FA893D269C423100588ECD /* PrivacyDashboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B6FA893C269C423100588ECD /* PrivacyDashboard.storyboard */; };
 		B6FA893F269C424500588ECD /* PrivacyDashboardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6FA893E269C424500588ECD /* PrivacyDashboardViewController.swift */; };
 		B6FA8941269C425400588ECD /* PrivacyDashboardPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6FA8940269C425400588ECD /* PrivacyDashboardPopover.swift */; };
@@ -2637,6 +2639,7 @@
 		B6E61EE2263AC0C8004E11AB /* FileManagerExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileManagerExtension.swift; sourceTree = "<group>"; };
 		B6E61EE7263ACE16004E11AB /* UTType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UTType.swift; sourceTree = "<group>"; };
 		B6F41030264D2B23003DA42C /* ProgressExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressExtension.swift; sourceTree = "<group>"; };
+		B6F56566299A414300A04298 /* WKWebViewMockingExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WKWebViewMockingExtension.swift; sourceTree = "<group>"; };
 		B6FA893C269C423100588ECD /* PrivacyDashboard.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = PrivacyDashboard.storyboard; sourceTree = "<group>"; };
 		B6FA893E269C424500588ECD /* PrivacyDashboardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyDashboardViewController.swift; sourceTree = "<group>"; };
 		B6FA8940269C425400588ECD /* PrivacyDashboardPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyDashboardPopover.swift; sourceTree = "<group>"; };
@@ -2685,7 +2688,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B6CA482C298CF60E0067ECCE /* Swifter in Frameworks */,
 				3706FE88293F661700E42796 /* OHHTTPStubs in Frameworks */,
 				3706FE89293F661700E42796 /* OHHTTPStubsSwift in Frameworks */,
 			);
@@ -2736,7 +2738,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B6CA482A298CF6050067ECCE /* Swifter in Frameworks */,
 				B6DA44172616C13800DD1EC2 /* OHHTTPStubs in Frameworks */,
 				B6DA44192616C13800DD1EC2 /* OHHTTPStubsSwift in Frameworks */,
 			);
@@ -3978,6 +3979,7 @@
 				B6AE74322609AFBB005B9B1A /* Progress */,
 				4B0511E6262CAB3700F6079C /* UserDefaultsWrapperUtilities.swift */,
 				B698E5032908011E00A746A8 /* AppKitPrivateMethodsAvailabilityTests.swift */,
+				B6F56566299A414300A04298 /* WKWebViewMockingExtension.swift */,
 				B626A76F29928C4100053070 /* MockPrivacyConfiguration.swift */,
 				B6B3E0952654DACD0040E0A2 /* UTTypeTests.swift */,
 				B693956626F352940015B914 /* TestsBridging.h */,
@@ -5529,7 +5531,6 @@
 			packageProductDependencies = (
 				3706FDD6293F661700E42796 /* OHHTTPStubs */,
 				3706FDD8293F661700E42796 /* OHHTTPStubsSwift */,
-				B6CA482B298CF60E0067ECCE /* Swifter */,
 			);
 			productName = DuckDuckGoTests;
 			productReference = 3706FE99293F661700E42796 /* Unit Tests App Store.xctest */;
@@ -5643,7 +5644,6 @@
 			packageProductDependencies = (
 				B6DA44162616C13800DD1EC2 /* OHHTTPStubs */,
 				B6DA44182616C13800DD1EC2 /* OHHTTPStubsSwift */,
-				B6CA4829298CF6050067ECCE /* Swifter */,
 			);
 			productName = DuckDuckGoTests;
 			productReference = AA585D90248FD31400E9A3E2 /* Unit Tests.xctest */;
@@ -5698,7 +5698,6 @@
 				AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */,
 				9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */,
 				1D02633128D898E1005CBB41 /* XCRemoteSwiftPackageReference "OpenSSL" */,
-				B6CA4826298CF5DC0067ECCE /* XCRemoteSwiftPackageReference "swifter" */,
 			);
 			productRefGroup = AA585D7F248FD31100E9A3E2 /* Products */;
 			projectDirPath = "";
@@ -6667,6 +6666,7 @@
 				3706FE0F293F661700E42796 /* CSVLoginExporterTests.swift in Sources */,
 				3706FE10293F661700E42796 /* TestNavigationDelegate.swift in Sources */,
 				3706FE11293F661700E42796 /* URLSuggestedFilenameTests.swift in Sources */,
+				B6F56569299A414300A04298 /* WKWebViewMockingExtension.swift in Sources */,
 				3706FE12293F661700E42796 /* StringExtensionTests.swift in Sources */,
 				3706FE13293F661700E42796 /* ConfigurationStorageTests.swift in Sources */,
 				3706FE14293F661700E42796 /* DownloadListStoreMock.swift in Sources */,
@@ -6813,6 +6813,7 @@
 				B626A77229928C6A00053070 /* MockPrivacyConfiguration.swift in Sources */,
 				3706FEA5293F662100E42796 /* CoreDataEncryptionTesting.xcdatamodeld in Sources */,
 				3706FEA6293F662100E42796 /* EncryptionKeyStoreTests.swift in Sources */,
+				B6F5656A299A414300A04298 /* WKWebViewMockingExtension.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6832,6 +6833,7 @@
 				B626A77329928C6B00053070 /* MockPrivacyConfiguration.swift in Sources */,
 				B6BDD9F62940B5B500F68088 /* ContentBlockingMock.swift in Sources */,
 				4B1AD8D525FC38DD00261379 /* EncryptionKeyStoreTests.swift in Sources */,
+				B6F56568299A414300A04298 /* WKWebViewMockingExtension.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7443,6 +7445,7 @@
 				AAC9C01E24CB6BEB00AD1325 /* TabCollectionViewModelTests.swift in Sources */,
 				B662D3DE275613BB0035D4D6 /* EncryptionKeyStoreMock.swift in Sources */,
 				1D3B1ABF29369FC8006F4388 /* BWEncryptionTests.swift in Sources */,
+				B6F56567299A414300A04298 /* WKWebViewMockingExtension.swift in Sources */,
 				37D23780287EFEE200BCE03B /* PinnedTabsManagerTests.swift in Sources */,
 				AA0877BA26D5161D00B05660 /* WebKitVersionProviderTests.swift in Sources */,
 				B69B50462726C5C200758A2B /* AtbAndVariantCleanupTests.swift in Sources */,
@@ -8081,14 +8084,6 @@
 				version = 2.3.1;
 			};
 		};
-		B6CA4826298CF5DC0067ECCE /* XCRemoteSwiftPackageReference "swifter" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/httpswift/swifter.git";
-			requirement = {
-				kind = exactVersion;
-				version = 1.5.0;
-			};
-		};
 		B6DA44152616C13800DD1EC2 /* XCRemoteSwiftPackageReference "OHHTTPStubs" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/AliSoftware/OHHTTPStubs.git";
@@ -8227,16 +8222,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
 			productName = Navigation;
-		};
-		B6CA4829298CF6050067ECCE /* Swifter */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = B6CA4826298CF5DC0067ECCE /* XCRemoteSwiftPackageReference "swifter" */;
-			productName = Swifter;
-		};
-		B6CA482B298CF60E0067ECCE /* Swifter */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = B6CA4826298CF5DC0067ECCE /* XCRemoteSwiftPackageReference "swifter" */;
-			productName = Swifter;
 		};
 		B6DA44162616C13800DD1EC2 /* OHHTTPStubs */ = {
 			isa = XCSwiftPackageProductDependency;

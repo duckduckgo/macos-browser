@@ -19,7 +19,6 @@
 import BrowserServicesKit
 import Combine
 import ContentBlocking
-import Swifter
 import TrackerRadarKit
 import WebKit
 import XCTest
@@ -28,6 +27,7 @@ import XCTest
 
 // swiftlint:disable opening_brace
 
+@available(macOS 12.0, *)
 class AdClickAttributionTabExtensionTests: XCTestCase {
     struct URLs {
         let local = URL(string: "http://localhost:8084/")!
@@ -57,7 +57,6 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
 
     let urls = URLs()
     let data = DataSource()
-    var server: HttpServer!
 
     let logic = MockAdClickLogic()
     let detection = MockAdClickDetection()
@@ -72,6 +71,8 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
     var privacyConfiguration: MockPrivacyConfiguration {
         contentBlockingMock.privacyConfigurationManager.privacyConfig as! MockPrivacyConfiguration
     }
+    var webViewConfiguration: WKWebViewConfiguration!
+    var schemeHandler: TestSchemeHandler!
     var extensionsBuilder: TestTabExtensionsBuilder!
 
     override func setUp() {
@@ -91,10 +92,16 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
             }
         }}
 
-        server = HttpServer()
-        server.middleware = [{ [data] _ in
-            return .ok(.data(data.html))
+        schemeHandler = TestSchemeHandler()
+        schemeHandler.middleware = [{ [data] _ in
+            .ok(.html(data.html.utf8String()!))
         }]
+
+        WKWebView.customHandlerSchemes = [.http, .https]
+
+        webViewConfiguration = WKWebViewConfiguration()
+        webViewConfiguration.setURLSchemeHandler(schemeHandler, forURLScheme: URL.NavigationalScheme.http.rawValue)
+        webViewConfiguration.setURLSchemeHandler(schemeHandler, forURLScheme: URL.NavigationalScheme.https.rawValue)
     }
 
     func makeContentBlockerRulesUserScript() {
@@ -103,11 +110,14 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
     }
 
     override func tearDown() {
-        server.stop()
+        WKWebView.customHandlerSchemes = []
+
         extensionsBuilder = nil
         contentBlockingMock = nil
         privacyFeaturesMock = nil
         contentBlockerRulesScript = nil
+        webViewConfiguration = nil
+        schemeHandler = nil
     }
 
     // MARK: - Tests
@@ -221,7 +231,8 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
         privacyConfiguration.isFeatureKeyEnabled = { _, _ in
             return false
         }
-        let tab = Tab(content: .none, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder, shouldLoadInBackground: true)
+
+        let tab = Tab(content: .none, webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder, shouldLoadInBackground: true)
         DispatchQueue.main.async {
             self.makeContentBlockerRulesUserScript()
         }
@@ -252,7 +263,6 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
             onLogicDidFinish.fulfill()
         }
 
-        try server.start(8084)
         tab.setContent(.url(urls.local1))
         waitForExpectations(timeout: 5)
     }
@@ -262,16 +272,16 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
         privacyConfiguration.isFeatureKeyEnabled = { _, _ in
             return false
         }
-        let tab = Tab(content: .none, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder, shouldLoadInBackground: true)
+        let tab = Tab(content: .none, webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder, shouldLoadInBackground: true)
         DispatchQueue.main.async {
             self.makeContentBlockerRulesUserScript()
         }
 
-        server.middleware = [{ [data] request in
-            guard request.path == "/" else { return nil}
-            return .ok(.data(data.metaRedirect))
+        schemeHandler.middleware = [{ [data] request in
+            guard request.url!.path == "/" else { return nil}
+            return .ok(.html(data.metaRedirect.utf8String()!))
         }, { [data] _ in
-            return .ok(.data(data.html))
+            return .ok(.html(data.html.utf8String()!))
         }]
 
         var onDetectionDidStart = expectation(description: "detection.onDidStart")
@@ -304,7 +314,6 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
             onLogicDidFinish.fulfill()
         }
 
-        try server.start(8084)
         tab.setContent(.url(urls.local))
         waitForExpectations(timeout: 5)
     }
@@ -314,7 +323,10 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
         privacyConfiguration.isFeatureKeyEnabled = { _, _ in
             return false
         }
-        let tab = Tab(content: .none, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder, shouldLoadInBackground: true)
+        schemeHandler.middleware = [{ _ in
+            return .failure(NSError(domain: NSURLErrorDomain, code: NSURLErrorCannotFindHost))
+        }]
+        let tab = Tab(content: .none, webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder, shouldLoadInBackground: true)
         DispatchQueue.main.async {
             self.makeContentBlockerRulesUserScript()
         }
@@ -340,12 +352,10 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
         privacyConfiguration.isFeatureKeyEnabled = { _, _ in
             return false
         }
-        let tab = Tab(content: .none, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder, shouldLoadInBackground: true)
+        let tab = Tab(content: .none, webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder, shouldLoadInBackground: true)
         DispatchQueue.main.async {
             self.makeContentBlockerRulesUserScript()
         }
-
-        try server.start(8084)
 
         detection.onDidStart = { _ in }
         detection.on2XXResponse = { _ in }
