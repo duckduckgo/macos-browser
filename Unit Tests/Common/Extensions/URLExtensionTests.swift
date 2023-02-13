@@ -103,4 +103,17 @@ final class URLExtensionTests: XCTestCase {
         }
     }
 
+    func testWhenMakingUrlFromSuggestionPhaseContainingColon_ThenVerifyHypertextScheme() {
+        let validUrl = URL.makeURL(fromSuggestionPhrase: "http://duckduckgo.com")
+        XCTAssert(validUrl != nil)
+        XCTAssertEqual(validUrl?.scheme, "http")
+
+        let anotherValidUrl = URL.makeURL(fromSuggestionPhrase: "duckduckgo.com")
+        XCTAssert(anotherValidUrl != nil)
+        XCTAssertNotNil(validUrl?.scheme)
+
+        let notURL = URL.makeURL(fromSuggestionPhrase: "type:pdf")
+        XCTAssertNil(notURL)
+    }
+
 }
