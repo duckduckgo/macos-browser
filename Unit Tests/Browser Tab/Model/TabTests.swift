@@ -17,12 +17,12 @@
 //
 
 import Navigation
-import Swifter
 import XCTest
 
 @testable import DuckDuckGo_Privacy_Browser
 
 // swiftlint:disable opening_brace
+@available(macOS 12.0, *)
 final class TabTests: XCTestCase {
 
     struct URLs {
@@ -32,13 +32,15 @@ final class TabTests: XCTestCase {
         let local3 = URL(string: "http://localhost:8084/3")!
     }
     let urls = URLs()
-    var server: HttpServer!
 
     var contentBlockingMock: ContentBlockingMock!
     var privacyFeaturesMock: AnyPrivacyFeatures!
     var privacyConfiguration: MockPrivacyConfiguration {
         contentBlockingMock.privacyConfigurationManager.privacyConfig as! MockPrivacyConfiguration
     }
+
+    var webViewConfiguration: WKWebViewConfiguration!
+    var schemeHandler: TestSchemeHandler!
 
     override func setUp() {
         contentBlockingMock = ContentBlockingMock()
@@ -48,14 +50,21 @@ final class TabTests: XCTestCase {
             return false
         }
 
-        server = HttpServer()
+        schemeHandler = TestSchemeHandler()
+        WKWebView.customHandlerSchemes = [.http, .https]
+
+        webViewConfiguration = WKWebViewConfiguration()
+        webViewConfiguration.setURLSchemeHandler(schemeHandler, forURLScheme: URL.NavigationalScheme.http.rawValue)
+        webViewConfiguration.setURLSchemeHandler(schemeHandler, forURLScheme: URL.NavigationalScheme.https.rawValue)
     }
 
     override func tearDown() {
         TestTabExtensionsBuilder.shared = .default
         contentBlockingMock = nil
         privacyFeaturesMock = nil
-        server.stop()
+        webViewConfiguration = nil
+        schemeHandler = nil
+        WKWebView.customHandlerSchemes = []
     }
 
     // MARK: - Tab Content
@@ -112,7 +121,7 @@ final class TabTests: XCTestCase {
     // MARK: - Back/Forward navigation
 
     func testCanGoBack() throws {
-        let tab = Tab(content: .none, privacyFeatures: privacyFeaturesMock)
+        let tab = Tab(content: .none, webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock)
 
         var eCantGoBack = expectation(description: "canGoBack: false")
         var eCanGoBack: XCTestExpectation!
@@ -142,10 +151,9 @@ final class TabTests: XCTestCase {
         // initial: false
         waitForExpectations(timeout: 0)
 
-        server.middleware = [{ _ in
-            return .ok(.html(""))
+        schemeHandler.middleware = [{ _ in
+            .ok(.html(""))
         }]
-        try server.start(8084)
 
         // after first navigation: false
         eDidFinishLoading = expectation(description: "didFinish 1")
@@ -196,11 +204,11 @@ final class TabTests: XCTestCase {
             }
         }}
 
-        let tab = Tab(content: .none, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder)
+        let tab = Tab(content: .none, webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder)
         webView = tab.webView
 
-        server.middleware = [{ [urls] request in
-            guard request.path == urls.local1.path else { return nil }
+        schemeHandler.middleware = [{ [urls] request in
+            guard request.url!.path == urls.local1.path else { return nil }
 
             return .ok(.html("""
                 <html><body><script language='JavaScript'>
@@ -210,7 +218,6 @@ final class TabTests: XCTestCase {
         }, { _ in
             return .ok(.html(""))
         }]
-        try server.start(8084)
 
         // initial page
         eDidFinish = expectation(description: "didFinish 1")
@@ -274,11 +281,11 @@ final class TabTests: XCTestCase {
             }
         }}
 
-        let tab = Tab(content: .none, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder)
+        let tab = Tab(content: .none, webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder)
         webView = tab.webView
 
-        server.middleware = [{ [urls] request in
-            guard request.path == urls.local1.path else { return nil }
+        schemeHandler.middleware = [{ [urls] request in
+            guard request.url!.path == urls.local1.path else { return nil }
 
             return .ok(.html("""
                 <html><body><script language='JavaScript'>
@@ -288,7 +295,6 @@ final class TabTests: XCTestCase {
         }, { _ in
             return .ok(.html(""))
         }]
-        try server.start(8084)
 
         // initial page
         eDidFinish = expectation(description: "didFinish 1")
