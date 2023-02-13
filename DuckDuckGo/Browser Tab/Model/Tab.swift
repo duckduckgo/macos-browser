@@ -160,6 +160,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
     private let cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter?
     private let statisticsLoader: StatisticsLoader?
+    private let internalUserDecider: InternalUserDeciding?
     let pinnedTabsManager: PinnedTabsManager
     private let privatePlayer: PrivatePlayer
     private let privacyFeatures: AnyPrivacyFeatures
@@ -205,6 +206,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         let statisticsLoader = statisticsLoader
             ?? (AppDelegate.isRunningTests ? nil : StatisticsLoader.shared)
         let privacyFeatures = privacyFeatures ?? PrivacyFeatures
+        let internalUserDecider = (NSApp.delegate as? AppDelegate)?.internalUserDecider
 
         self.init(content: content,
                   faviconManagement: faviconManagement,
@@ -217,6 +219,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                   extensionsBuilder: extensionsBuilder,
                   cbaTimeReporter: cbaTimeReporter,
                   statisticsLoader: statisticsLoader,
+                  internalUserDecider: internalUserDecider,
                   localHistory: localHistory,
                   title: title,
                   favicon: favicon,
@@ -241,6 +244,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
          extensionsBuilder: TabExtensionsBuilderProtocol,
          cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter?,
          statisticsLoader: StatisticsLoader?,
+         internalUserDecider: InternalUserDeciding?,
          localHistory: Set<String>,
          title: String?,
          favicon: NSImage?,
@@ -261,6 +265,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         self.privatePlayer = privatePlayer
         self.cbaTimeReporter = cbaTimeReporter
         self.statisticsLoader = statisticsLoader
+        self.internalUserDecider = internalUserDecider
         self.localHistory = localHistory
         self.title = title
         self.favicon = favicon
@@ -1373,6 +1378,11 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
     @MainActor
     func decidePolicy(for navigationResponse: NavigationResponse) async -> NavigationResponsePolicy? {
         userEnteredUrl = false // subsequent requests will be navigations
+
+        let isSuccessfulResponse = (navigationResponse.response as? HTTPURLResponse)?.validateStatusCode(statusCode: 200..<300) == nil
+
+        internalUserDecider?.markUserAsInternalIfNeeded(forUrl: webView.url,
+                                                        response: navigationResponse.response as? HTTPURLResponse)
 
         if !navigationResponse.canShowMIMEType || navigationResponse.shouldDownload {
             if navigationResponse.isForMainFrame {
