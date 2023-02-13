@@ -16,10 +16,49 @@
 //  limitations under the License.
 //
 
+import Navigation
+import Swifter
 import XCTest
+
 @testable import DuckDuckGo_Privacy_Browser
 
+// swiftlint:disable opening_brace
 final class TabTests: XCTestCase {
+
+    struct URLs {
+        let local = URL(string: "http://localhost:8084/")!
+        let local1 = URL(string: "http://localhost:8084/1")!
+        let local2 = URL(string: "http://localhost:8084/2")!
+        let local3 = URL(string: "http://localhost:8084/3")!
+    }
+    let urls = URLs()
+    var server: HttpServer!
+
+    var contentBlockingMock: ContentBlockingMock!
+    var privacyFeaturesMock: AnyPrivacyFeatures!
+    var privacyConfiguration: MockPrivacyConfiguration {
+        contentBlockingMock.privacyConfigurationManager.privacyConfig as! MockPrivacyConfiguration
+    }
+
+    override func setUp() {
+        contentBlockingMock = ContentBlockingMock()
+        privacyFeaturesMock = AppPrivacyFeatures(contentBlocking: contentBlockingMock, httpsUpgradeStore: HTTPSUpgradeStoreMock())
+        // disable waiting for CBR compilation on navigation
+        privacyConfiguration.isFeatureKeyEnabled = { _, _ in
+            return false
+        }
+
+        server = HttpServer()
+    }
+
+    override func tearDown() {
+        TestTabExtensionsBuilder.shared = .default
+        contentBlockingMock = nil
+        privacyFeaturesMock = nil
+        server.stop()
+    }
+
+    // MARK: - Tab Content
 
     func testWhenSettingURLThenTabTypeChangesToStandard() {
         let tab = Tab(content: .preferences(pane: .autofill))
@@ -47,6 +86,8 @@ final class TabTests: XCTestCase {
         XCTAssert(tab != tab2)
     }
 
+    // MARK: - Dialogs
+
     func testWhenAlertDialogIsShowingChangingURLClearsDialog() {
         let tab = Tab()
         tab.url = .duckDuckGo
@@ -67,6 +108,229 @@ final class TabTests: XCTestCase {
         tab.url = .duckDuckGoMorePrivacyInfo
         XCTAssertNotNil(tab.userInteractionDialog)
     }
+
+    // MARK: - Back/Forward navigation
+
+    func testCanGoBack() throws {
+        let tab = Tab(content: .none, privacyFeatures: privacyFeaturesMock)
+
+        var eCantGoBack = expectation(description: "canGoBack: false")
+        var eCanGoBack: XCTestExpectation!
+        let c = tab.$canGoBack.sink { canGoBack in
+            if canGoBack {
+                eCanGoBack.fulfill()
+            } else {
+                eCantGoBack.fulfill()
+            }
+        }
+        var eCantGoForward = expectation(description: "canGoForward: false")
+        var eCanGoForward: XCTestExpectation!
+        let c2 = tab.$canGoForward.sink { canGoForward in
+            if canGoForward {
+                eCanGoForward.fulfill()
+            } else {
+                eCantGoForward.fulfill()
+            }
+        }
+        var eDidFinishLoading = expectation(description: "isLoading: false")
+        let c3 = tab.webView.publisher(for: \.isLoading).sink { isLoading in
+            if !isLoading {
+                eDidFinishLoading.fulfill()
+            }
+        }
+
+        // initial: false
+        waitForExpectations(timeout: 0)
+
+        server.middleware = [{ _ in
+            return .ok(.html(""))
+        }]
+        try server.start(8084)
+
+        // after first navigation: false
+        eDidFinishLoading = expectation(description: "didFinish 1")
+        tab.setContent(.url(urls.local))
+        waitForExpectations(timeout: 5)
+
+        // after second navigation: true
+        eCanGoBack = expectation(description: "canGoBack: true")
+        eDidFinishLoading = expectation(description: "gb_didFinish 2")
+        tab.setContent(.url(urls.local1))
+        waitForExpectations(timeout: 5)
+
+        // after go back: false
+        eCantGoBack = expectation(description: "canGoBack: false 2")
+        eCanGoForward = expectation(description: "canGoForward: true")
+        eDidFinishLoading = expectation(description: "didFinish 3")
+        tab.goBack()
+        waitForExpectations(timeout: 5)
+
+        // after go forward: true
+        eCanGoBack = expectation(description: "canGoBack: true")
+        eCantGoForward = expectation(description: "canGoForward: false")
+        eDidFinishLoading = expectation(description: "didFinish 4")
+        tab.goForward()
+        waitForExpectations(timeout: 5)
+
+        withExtendedLifetime((c, c2, c3)) {}
+    }
+
+    @MainActor
+    func testWhenGoingBackInvalidatingBackItem_BackForwardButtonsDoNotBlink() throws {
+        var webView: DuckDuckGo_Privacy_Browser.WebView!
+        var eDidFinish: XCTestExpectation!
+        var eDidRedirect: XCTestExpectation!
+        let extensionsBuilder = TestTabExtensionsBuilder(load: []) { [urls] builder in { _, _ in
+            builder.add {
+                TestsClosureNavigationResponderTabExtension(.init { navigationAction, _ in
+                    if navigationAction.url == urls.local2 {
+                        return .redirect(navigationAction, invalidatingBackItemIfNeededFor: webView!) { navigator in
+                            eDidRedirect.fulfill()
+                            navigator.load(URLRequest(url: urls.local3))
+                        }
+                    }
+                    return .next
+                } navigationDidFinish: { _ in
+                    eDidFinish?.fulfill()
+                })
+            }
+        }}
+
+        let tab = Tab(content: .none, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder)
+        webView = tab.webView
+
+        server.middleware = [{ [urls] request in
+            guard request.path == urls.local1.path else { return nil }
+
+            return .ok(.html("""
+                <html><body><script language='JavaScript'>
+                    window.parent.location.replace("\(urls.local2.absoluteString)");
+                </script></body></html>
+            """))
+        }, { _ in
+            return .ok(.html(""))
+        }]
+        try server.start(8084)
+
+        // initial page
+        eDidFinish = expectation(description: "didFinish 1")
+        tab.setContent(.url(urls.local))
+        waitForExpectations(timeout: 5)
+
+        // load urls.local1 which will be js-redirected to urls.local2
+        // it should be .redirected with .goBack() to urls.local3
+        eDidFinish = expectation(description: "didFinish 2")
+
+        // back/forward buttons state shouldn‘t change during the redirect
+        let eCantGoBack = expectation(description: "initial canGoBack: false")
+        // canGoBack should be set once during navigation to urls.local1 and not changed
+        let eCanGoBack = expectation(description: "canGoBack -> true")
+        let c1 = tab.$canGoBack.sink { canGoBack in
+            if canGoBack {
+                eCanGoBack.fulfill()
+            } else {
+                eCantGoBack.fulfill()
+            }
+        }
+        let eCanGoForward = expectation(description: "initial canGoForward")
+        let c2 = tab.$canGoForward.sink { canGoForward in
+            XCTAssertFalse(canGoForward)
+            eCanGoForward.fulfill()
+        }
+
+        eDidRedirect = expectation(description: "did redirect")
+
+        tab.setContent(.url(urls.local1))
+        waitForExpectations(timeout: 5)
+        eDidFinish = nil
+
+        XCTAssertTrue(tab.canGoBack)
+        XCTAssertFalse(tab.canGoForward)
+        XCTAssertEqual(tab.webView.url, urls.local3)
+        XCTAssertEqual(tab.webView.backForwardList.backList.map(\.url), [urls.local])
+        XCTAssertEqual(tab.webView.backForwardList.forwardList, [])
+
+        withExtendedLifetime((c1, c2)) {}
+    }
+
+    @MainActor
+    func testWhenGoingBackInvalidatingBackItemWithExistingBackItem_BackForwardButtonsDoNotBlink() throws {
+        var webView: DuckDuckGo_Privacy_Browser.WebView!
+        var eDidFinish: XCTestExpectation!
+        var eDidRedirect: XCTestExpectation!
+        let extensionsBuilder = TestTabExtensionsBuilder(load: []) { [urls] builder in { _, _ in
+            builder.add {
+                TestsClosureNavigationResponderTabExtension(.init { navigationAction, _ in
+                    if navigationAction.url == urls.local2 {
+                        return .redirect(navigationAction, invalidatingBackItemIfNeededFor: webView!) { navigator in
+                            eDidRedirect.fulfill()
+                            navigator.load(URLRequest(url: urls.local3))
+                        }
+                    }
+                    return .next
+                } navigationDidFinish: { _ in
+                    eDidFinish?.fulfill()
+                })
+            }
+        }}
+
+        let tab = Tab(content: .none, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder)
+        webView = tab.webView
+
+        server.middleware = [{ [urls] request in
+            guard request.path == urls.local1.path else { return nil }
+
+            return .ok(.html("""
+                <html><body><script language='JavaScript'>
+                    window.parent.location.replace("\(urls.local2.absoluteString)");
+                </script></body></html>
+            """))
+        }, { _ in
+            return .ok(.html(""))
+        }]
+        try server.start(8084)
+
+        // initial page
+        eDidFinish = expectation(description: "didFinish 1")
+        tab.setContent(.url(urls.local))
+        waitForExpectations(timeout: 5)
+
+        // page 2 to make canGoBack == true
+        eDidFinish = expectation(description: "didFinish 1")
+        tab.setContent(.url(urls.local3))
+        waitForExpectations(timeout: 5)
+
+        // load urls.local1 which will be js-redirected to urls.local2
+        // it should be .redirected with .goBack() to urls.local3
+        eDidFinish = expectation(description: "didFinish 2")
+
+        // back/forward buttons state shouldn‘t change during the redirect
+        let eCanGoBack = expectation(description: "initial canGoBack: true")
+        let c1 = tab.$canGoBack.sink { canGoBack in
+            XCTAssertTrue(canGoBack)
+            eCanGoBack.fulfill()
+        }
+        let eCanGoForward = expectation(description: "initial canGoForward")
+        let c2 = tab.$canGoForward.sink { canGoForward in
+            XCTAssertFalse(canGoForward)
+            eCanGoForward.fulfill()
+        }
+
+        eDidRedirect = expectation(description: "did redirect")
+
+        tab.setContent(.url(urls.local1))
+        waitForExpectations(timeout: 5)
+        eDidFinish = nil
+
+        XCTAssertTrue(tab.canGoBack)
+        XCTAssertFalse(tab.canGoForward)
+        XCTAssertEqual(tab.webView.url, urls.local3)
+        XCTAssertEqual(tab.webView.backForwardList.backList.map(\.url), [urls.local, urls.local3])
+        XCTAssertEqual(tab.webView.backForwardList.forwardList, [])
+
+        withExtendedLifetime((c1, c2)) {}
+    }
+
 }
 
 extension Tab {
