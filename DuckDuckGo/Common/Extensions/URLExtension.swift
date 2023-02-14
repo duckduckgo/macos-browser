@@ -94,7 +94,13 @@ extension URL {
     }
 
     static func makeURL(fromSuggestionPhrase phrase: String) -> URL? {
-        guard let url = URL(trimmedAddressBarString: phrase), url.isValid else { return nil }
+        guard let url = URL(trimmedAddressBarString: phrase),
+              let scheme = url.scheme.map(NavigationalScheme.init),
+              NavigationalScheme.hypertextSchemes.contains(scheme),
+              url.isValid else {
+            return nil
+        }
+
         return url
     }
 
