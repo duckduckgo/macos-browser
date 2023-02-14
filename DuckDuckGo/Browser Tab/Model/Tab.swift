@@ -1097,9 +1097,11 @@ extension Tab: WKNavigationDelegate {
     func webView(_ webView: WKWebView,
                  didReceive challenge: URLAuthenticationChallenge,
                  completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-        webViewDidReceiveChallengePublisher.send()
 
         if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodHTTPBasic {
+            // send this event only when we're interrupting loading and show extra UI to the user
+            webViewDidReceiveChallengePublisher.send()
+
             let dialog = UserDialogType.basicAuthenticationChallenge(.init(challenge.protectionSpace) { result in
                 let (disposition, credential) = (try? result.get()) ?? (nil, nil)
                 completionHandler(disposition ?? .cancelAuthenticationChallenge, credential)
