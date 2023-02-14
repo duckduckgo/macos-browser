@@ -159,6 +159,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     func setDelegate(_ delegate: TabDelegate) { self.delegate = delegate }
 
     private let cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter?
+    private let internalUserDecider: InternalUserDeciding?
     let pinnedTabsManager: PinnedTabsManager
     private let privatePlayer: PrivatePlayer
     private let privacyFeatures: AnyPrivacyFeatures
@@ -200,6 +201,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
         let privatePlayer = privatePlayer
             ?? (AppDelegate.isRunningTests ? PrivatePlayer.mock(withMode: .enabled) : PrivatePlayer.shared)
+        let internalUserDecider = (NSApp.delegate as? AppDelegate)?.internalUserDecider
 
         self.init(content: content,
                   faviconManagement: faviconManagement,
@@ -211,6 +213,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                   privatePlayer: privatePlayer,
                   extensionsBuilder: extensionsBuilder,
                   cbaTimeReporter: cbaTimeReporter,
+                  internalUserDecider: internalUserDecider,
                   localHistory: localHistory,
                   title: title,
                   error: error,
@@ -235,6 +238,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
          privatePlayer: PrivatePlayer,
          extensionsBuilder: TabExtensionsBuilderProtocol,
          cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter?,
+         internalUserDecider: InternalUserDeciding?,
          localHistory: Set<String>,
          title: String?,
          error: Error?,
@@ -255,6 +259,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         self.privacyFeatures = privacyFeatures
         self.privatePlayer = privatePlayer
         self.cbaTimeReporter = cbaTimeReporter
+        self.internalUserDecider = internalUserDecider
         self.localHistory = localHistory
         self.title = title
         self.error = error
@@ -282,12 +287,12 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             .map { $0?.userScripts as? UserScripts }
             .eraseToAnyPublisher()
 
-        var userContentControllerProvider: UserContentControllerProvider?
+        let userContentControllerPromise = Future<UserContentControllerProtocol, Never>.promise()
         self.extensions = extensionsBuilder
             .build(with: (tabIdentifier: instrumentation.currentTabIdentifier,
                           userScriptsPublisher: userScriptsPublisher,
                           inheritedAttribution: parentTab?.adClickAttribution?.currentAttributionState,
-                          userContentControllerProvider: {  userContentControllerProvider?() },
+                          userContentControllerFuture: userContentControllerPromise.future,
                           permissionModel: permissions,
                           privacyInfoPublisher: _privacyInfo.projectedValue.eraseToAnyPublisher()
                          ),
@@ -295,7 +300,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                                                        historyCoordinating: historyCoordinating))
 
         super.init()
-        userContentControllerProvider = { [weak self] in self?.userContentController }
+        userContentController.map(userContentControllerPromise.fulfill)
 
         userContentController?.delegate = self
         setupWebView(shouldLoadInBackground: shouldLoadInBackground)
@@ -1387,6 +1392,9 @@ extension Tab: WKNavigationDelegate {
 
         let isSuccessfulResponse = (navigationResponse.response as? HTTPURLResponse)?.validateStatusCode(statusCode: 200..<300) == nil
 
+        internalUserDecider?.markUserAsInternalIfNeeded(forUrl: webView.url,
+                                                        response: navigationResponse.response as? HTTPURLResponse)
+
         if !navigationResponse.canShowMIMEType || navigationResponse.shouldDownload {
             if navigationResponse.isForMainFrame {
                 guard currentDownload != navigationResponse.response.url else {
@@ -1478,16 +1486,24 @@ extension Tab: WKNavigationDelegate {
     @available(macOS 11.3, *) // objc doesn‘t care about availability
     @objc(webView:navigationResponse:didBecomeDownload:)
     func webView(_ webView: WKWebView, navigationResponse: WKNavigationResponse, didBecome download: WKDownload) {
-        FileDownloadManager.shared.add(download, delegate: self, location: .auto, postflight: .none)
+        let task = FileDownloadManager.shared.add(download, delegate: self, location: .auto, postflight: .none)
 
         // Note this can result in tabs being left open, e.g. download button on this page:
         // https://en.wikipedia.org/wiki/Guitar#/media/File:GuitareClassique5.png
         // Safari closes new tabs that were opened and then create a download instantly.
         if self.webView.backForwardList.currentItem == nil,
            self.parentTab != nil {
-            DispatchQueue.main.async { [weak self] in
-                self?.delegate?.closeTab(self!)
-            }
+            var cancellable: AnyCancellable?
+            cancellable = task.didChooseDownloadLocationPublisher.sink { [weak self] completion in
+                cancellable?.cancel()
+                guard let self,
+                      case .finished = completion,
+                      self.webView.backForwardList.currentItem == nil
+                else { return }
+
+                self.delegate?.closeTab(self)
+
+            } receiveValue: { _ in }
         }
     }
 
