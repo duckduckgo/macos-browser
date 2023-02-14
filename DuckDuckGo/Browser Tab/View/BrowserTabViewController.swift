@@ -218,7 +218,7 @@ final class BrowserTabViewController: NSViewController {
         }
     }
 
-    func subscribeToTabContent(of tabViewModel: TabViewModel?) {
+    private func subscribeToTabContent(of tabViewModel: TabViewModel?) {
         tabContentCancellable?.cancel()
 
         guard let tabViewModel = tabViewModel else {
@@ -227,7 +227,13 @@ final class BrowserTabViewController: NSViewController {
 
         let tabContentPublisher = tabViewModel.tab.$content
             .dropFirst()
-            .removeDuplicates()
+            .removeDuplicates(by: { old, new in
+                // no need to call showTabContent if webView stays in place and only its URL changes
+                if old.isUrl && new.isUrl {
+                    return true
+                }
+                return old == new
+            })
             .receive(on: DispatchQueue.main)
 
         tabContentCancellable = tabContentPublisher
