@@ -21,7 +21,7 @@ import CoreData
 import Bookmarks
 import Persistence
 
-final class BookmarkDatabase {
+public final class BookmarkDatabase {
 
     public static let shared = BookmarkDatabase()
 
@@ -31,12 +31,12 @@ final class BookmarkDatabase {
         self.db = db
     }
 
-    static func make(location: URL) -> CoreDataDatabase {
+    public static func make(location: URL) -> CoreDataDatabase {
         let bundle = Bookmarks.bundle
         guard let model = CoreDataDatabase.loadModel(from: bundle, named: "BookmarksModel") else {
             fatalError("Failed to load model")
         }
-        
+
         return CoreDataDatabase(name: "Bookmarks",
                                 containerLocation: location,
                                 model: model)

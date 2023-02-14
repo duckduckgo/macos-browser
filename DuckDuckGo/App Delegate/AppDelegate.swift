@@ -86,13 +86,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
             BookmarkDatabase.shared.db.loadStore { context, error in
                 guard let context = context else {
-                    print("- Error: \(error)")
-                    return
+                    if let error = error {
+                        Pixel.fire(.debug(event: .bookmarksCouldNotLoadDatabase, error: error))
+                    } else {
+                        Pixel.fire(.debug(event: .bookmarksCouldNotLoadDatabase))
+                    }
+
+                    Thread.sleep(forTimeInterval: 1)
+                    fatalError("Could not create Bookmarks database stack: \(error?.localizedDescription ?? "err")")
                 }
 
-                BookmarkUtils.prepareFoldersStructure(in: context)
-                if context.hasChanges {
-                    try? context.save()
+                let legacyDB = Database.shared.makeContext(concurrencyType: .privateQueueConcurrencyType)
+                legacyDB.performAndWait {
+                    LegacyBookmarksStoreMigration.setupAndMigrate(from: legacyDB,
+                                                                  to: context)
                 }
             }
         }

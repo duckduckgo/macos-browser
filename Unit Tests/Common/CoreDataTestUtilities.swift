@@ -32,7 +32,7 @@ final class CoreData {
     }
 
     static func bookmarkContainer() -> NSPersistentContainer {
-        return createTrueInMemoryPersistentContainer(modelName: "BookmarksModel", bundle: Bookmarks.bundle)
+        return createInMemoryPersistentContainer(modelName: "BookmarksModel", bundle: Bookmarks.bundle)
     }
 
     static func permissionContainer() -> NSPersistentContainer {
@@ -113,32 +113,6 @@ final class CoreData {
         //
         // This approach is apparently the recommended choice: https://www.donnywals.com/setting-up-a-core-data-store-for-unit-tests/
         return createPersistentContainer(at: URL(fileURLWithPath: "/dev/null"), modelName: modelName, bundle: bundle)
-    }
-
-    static func createTrueInMemoryPersistentContainer(modelName: String, bundle: Bundle) -> NSPersistentContainer {
-        guard let modelURL = bundle.url(forResource: modelName, withExtension: "momd") else {
-            fatalError("Error loading model from bundle")
-        }
-
-        guard let objectModel = NSManagedObjectModel(contentsOf: modelURL) else {
-            fatalError("Error initializing object model from: \(modelURL)")
-        }
-
-        let container = TestPersistentContainer(name: modelName,
-                                                managedObjectModel: objectModel,
-                                                registeredTransformers: [])
-
-        let description = NSPersistentStoreDescription()
-        description.type = NSInMemoryStoreType
-        container.persistentStoreDescriptions = [description]
-
-        container.loadPersistentStores(completionHandler: { _, error in
-            if let error = error as NSError? {
-                fatalError("Failed to load stores: \(error), \(error.userInfo)")
-            }
-        })
-
-        return container
     }
 
 }

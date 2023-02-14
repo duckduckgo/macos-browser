@@ -216,52 +216,35 @@ public class LegacyBookmarksStoreMigration {
         case bookmark
     }
 
-    public static func migrate(from legacyStorage: CoreDataDatabase?,
-                               to context: NSManagedObjectContext) {
-        if let legacyStorage = legacyStorage {
-            // Perform migration from legacy store.
-            let source = legacyStorage.makeContext(concurrencyType: .privateQueueConcurrencyType)
-            source.performAndWait {
-                LegacyBookmarksStoreMigration.migrate(source: source,
-                                                      destination: context)
-            }
-        } else {
-            // Initialize structure if needed
-            BookmarkUtils.prepareFoldersStructure(in: context)
-            if context.hasChanges {
-                do {
-                    try context.save(onErrorFire: .bookmarksCouldNotPrepareDatabase)
-                } catch {
-                    Thread.sleep(forTimeInterval: 1)
-                    fatalError("Could not prepare Bookmarks DB structure")
-                }
-            }
-        }
-    }
-
-    private static func fetchTopLevelFolder(in context: NSManagedObjectContext) -> [BookmarkManagedObject] {
+    private static func fetchTopLevelFolders(in context: NSManagedObjectContext) -> [BookmarkManagedObject] {
 
         let fetchRequest = NSFetchRequest<BookmarkManagedObject>(entityName: "BookmarkManagedObject")
-        fetchRequest.predicate = NSPredicate(format: "%K == nil AND %K == %@",
+        fetchRequest.predicate = NSPredicate(format: "%K == nil AND %K == YES",
                                              #keyPath(BookmarkManagedObject.parentFolder),
-                                             #keyPath(BookmarkManagedObject.isFolder), true)
+                                             #keyPath(BookmarkManagedObject.isFolder))
 
         guard let results = try? context.fetch(fetchRequest) else {
             return []
         }
 
-        // In case of corruption, we can cat more than one 'root'
+        // In case of corruption, we can have more than one 'root'
         return results
     }
 
     // swiftlint:disable cyclomatic_complexity
     // swiftlint:disable function_body_length
+    public static func setupAndMigrate(from source: NSManagedObjectContext,
+                                       to destination: NSManagedObjectContext) {
 
-    private static func migrate(source: NSManagedObjectContext, destination: NSManagedObjectContext) {
+        // Fetch all 'roots' in case we had some kind of inconsistency and duplicated objects
+        let bookmarkRoots = fetchTopLevelFolders(in: source)
 
         // Do not migrate more than once
         guard BookmarkUtils.fetchRootFolder(destination) == nil else {
-            Pixel.fire(.debug(event: .bookmarksMigrationAlreadyPerformed))
+            // There should be no data left as migration has been done already
+            if !bookmarkRoots.isEmpty {
+                Pixel.fire(.debug(event: .bookmarksMigrationAlreadyPerformed))
+            }
             return
         }
 
@@ -273,9 +256,6 @@ public class LegacyBookmarksStoreMigration {
             Thread.sleep(forTimeInterval: 2)
             fatalError("Could not write to Bookmarks DB")
         }
-
-        // Fetch all 'roots' in case we had some kind of inconsistency and duplicated objects
-        let bookmarkRoots = fetchTopLevelFolder(in: source)
 
         var index = 0
         var folderMap = [NSManagedObjectID: BookmarkEntity]()
@@ -295,8 +275,6 @@ public class LegacyBookmarksStoreMigration {
 
             bookmarksToMigrate.append(contentsOf: folder.children?.array as? [BookmarkManagedObject] ?? [])
         }
-
-        var urlToBookmarkMap = [URL: BookmarkEntity]()
 
         var favoritesToAdd = [BookmarkEntity]()
         // Iterate over bookmarks to migrate
@@ -331,8 +309,6 @@ public class LegacyBookmarksStoreMigration {
                 if objectToMigrate.isFavorite {
                     favoritesToAdd.append(newBookmark)
                 }
-
-                urlToBookmarkMap[url] = newBookmark
             }
 
             index += 1
@@ -340,7 +316,7 @@ public class LegacyBookmarksStoreMigration {
 
         // Preserve the order of favorites
         if let oldFavoritesRoot = favoriteRoot,
-           let oldFavorites = oldFavoritesRoot.children?.array as? [BookmarkManagedObject] {
+           let oldFavorites = oldFavoritesRoot.favorites?.array as? [BookmarkManagedObject] {
 
             for oldFavorite in oldFavorites.reversed() {
 
@@ -349,12 +325,13 @@ public class LegacyBookmarksStoreMigration {
                     favorite.addToFavorites(favoritesRoot: newFavoritesRoot)
                     favoritesToAdd.remove(at: favoriteIndex)
                 }
-
             }
         }
 
         do {
             try destination.save(onErrorFire: .bookmarksMigrationFailed)
+
+            cleanupOldData(in: source)
         } catch {
             destination.reset()
 
@@ -369,6 +346,14 @@ public class LegacyBookmarksStoreMigration {
     }
     // swiftlint:enable cyclomatic_complexity
     // swiftlint:enable function_body_length
+
+    private static func cleanupOldData(in context: NSManagedObjectContext) {
+        let allObjects = (try? context.fetch(BookmarkManagedObject.fetchRequest())) ?? []
+
+        allObjects.forEach { context.delete($0) }
+
+        try? context.save(onErrorFire: .bookmarksMigrationCouldNotRemoveOldStore)
+    }
 
 }
 
