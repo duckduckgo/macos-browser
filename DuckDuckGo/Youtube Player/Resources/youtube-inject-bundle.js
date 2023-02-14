@@ -255,11 +255,12 @@
       return ["href", "data-size"];
     }
     attributeChangedCallback(name, oldValue, newValue) {
+      var _a, _b;
       if (name === "href") {
-        this.root.querySelector("a.ddg-play-privately").setAttribute("href", newValue);
+        (_a = this.root.querySelector("a.ddg-play-privately")) == null ? void 0 : _a.setAttribute("href", newValue);
       }
       if (name === "data-size") {
-        this.root.querySelector(".ddg-overlay").setAttribute("data-size", newValue);
+        (_b = this.root.querySelector(".ddg-overlay")) == null ? void 0 : _b.setAttribute("data-size", newValue);
       }
     }
   };
