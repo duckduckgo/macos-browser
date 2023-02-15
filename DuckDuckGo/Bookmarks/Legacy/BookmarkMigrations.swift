@@ -42,21 +42,6 @@ final class LegacyBookmarkQueries {
         return request
     }
 
-    static func favorite(with uuid: UUID) -> NSFetchRequest<BookmarkManagedObject> {
-        let request = NSFetchRequest<BookmarkManagedObject>(entityName: "BookmarkManagedObject")
-        request.predicate = NSPredicate(format: "id == %@ AND %K != nil AND %K == NO",
-                                        uuid as CVarArg,
-                                        #keyPath(BookmarkManagedObject.favoritesFolder),
-                                        #keyPath(BookmarkManagedObject.isFolder))
-        return request
-    }
-
-    static func entities(with identifiers: [UUID]) -> NSFetchRequest<BookmarkManagedObject> {
-        let request = NSFetchRequest<BookmarkManagedObject>(entityName: "BookmarkManagedObject")
-        request.predicate = NSPredicate(format: "id IN %@", identifiers)
-        return request
-    }
-
     static func topLevelEntitiesFetchRequest() -> NSFetchRequest<BookmarkManagedObject> {
         let request = NSFetchRequest<BookmarkManagedObject>(entityName: "BookmarkManagedObject")
         request.predicate = NSPredicate(format: "id != %@ AND parentFolder == nil", UUID.favoritesFolderUUID as CVarArg)
@@ -70,10 +55,6 @@ final class LegacyBookmarkQueries {
                                         #keyPath(BookmarkManagedObject.parentFolder),
                                         #keyPath(BookmarkManagedObject.isFolder))
         return request
-    }
-
-    static func bookmarksAndFoldersFetchRequest() -> NSFetchRequest<BookmarkManagedObject> {
-        return BookmarkManagedObject.fetchRequest()
     }
 }
 
@@ -172,7 +153,7 @@ struct ToLegacyStoreBookmarkMigrations {
         // 1. Create Favorites Folder if needed
         // 2. Create a relationship between all favorites and the Favorites Folder
 
-        let favoritesFolderFetchRequest = Bookmark.favoritesFolderFetchRequest()
+        let favoritesFolderFetchRequest = LegacyBookmarkQueries.favoritesFolderFetchRequest()
 
         let favoritesFetchRequest = NSFetchRequest<BookmarkManagedObject>(entityName: "BookmarkManagedObject")
         favoritesFetchRequest.predicate = NSPredicate(format: "isFolder == NO AND isFavorite == YES")

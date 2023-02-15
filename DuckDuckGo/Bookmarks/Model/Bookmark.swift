@@ -43,31 +43,6 @@ internal class BaseBookmarkEntity {
         return request
     }
 
-    // TODO: this is not really top level entities but root folder
-    static func topLevelEntitiesFetchRequest() -> NSFetchRequest<BookmarkEntity> {
-        let request = BookmarkEntity.fetchRequest()
-        request.predicate = NSPredicate(format: "%K != %@ AND %K == nil",
-                                        #keyPath(BookmarkEntity.uuid),
-                                        BookmarkEntity.Constants.favoritesFolderID,
-                                        #keyPath(BookmarkEntity.parent))
-        return request
-    }
-
-    static func favoritesFolderFetchRequest() -> NSFetchRequest<BookmarkEntity> {
-        let request = BookmarkEntity.fetchRequest()
-        request.predicate = NSPredicate(format: "%K == %@ AND %K == nil AND %K == YES",
-                                        #keyPath(BookmarkEntity.uuid),
-                                        BookmarkEntity.Constants.favoritesFolderID,
-                                        #keyPath(BookmarkEntity.parent),
-                                        #keyPath(BookmarkEntity.isFolder))
-        return request
-    }
-
-    // TODO - what about roots? Should these be included?
-    static func bookmarksAndFoldersFetchRequest() -> NSFetchRequest<BookmarkEntity> {
-        return BookmarkEntity.fetchRequest()
-    }
-
     let id: String
     var title: String
     let isFolder: Bool

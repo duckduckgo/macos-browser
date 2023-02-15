@@ -301,7 +301,6 @@ extension BookmarkListViewController: BookmarkMenuItemSelectors {
         }
         
         guard let urlObject = bookmark.urlObject else {
-            //TODO: consider handling
             return
         }
         WindowsManager.openNewWindow(with: urlObject)
@@ -343,7 +342,6 @@ extension BookmarkListViewController: BookmarkMenuItemSelectors {
     }
 
     func deleteEntities(_ sender: NSMenuItem) {
-        //TODO: validate
         guard let uuids = sender.representedObject as? [String] else {
             assertionFailure("Failed to cast menu item's represented object to UUID array")
             return

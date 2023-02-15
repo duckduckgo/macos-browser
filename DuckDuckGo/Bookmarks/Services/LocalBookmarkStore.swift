@@ -86,10 +86,8 @@ final class LocalBookmarkStore: BookmarkStore {
                 case .topLevelEntities:
                     // When fetching the top level entities, the root folder will be returned. To make things simpler for the caller, this function
                     // will return the children of the root folder, as the root folder is an implementation detail of the bookmarks store.
-                    let fetchRequest = Bookmark.topLevelEntitiesFetchRequest()
-                    fetchRequest.returnsObjectsAsFaults = false
-                    let entities = try self.context.fetch(fetchRequest)
-                    results = entities.first?.childrenArray ?? []
+                    let rootFolder = BookmarkUtils.fetchRootFolder(self.context)
+                    results = rootFolder?.childrenArray ?? []
                 case .favorites:
                     results = self.favoritesFolder?.favorites?.array as? [BookmarkEntity] ?? []
                 }
@@ -336,7 +334,7 @@ final class LocalBookmarkStore: BookmarkStore {
             } else if let root = BookmarkUtils.fetchRootFolder(self.context) {
                 parentEntity = root
             } else {
-                //TODO: error
+                Pixel.fire(.debug(event: .missingParent))
                 return
             }
 
@@ -719,7 +717,7 @@ final class LocalBookmarkStore: BookmarkStore {
     /// They appear to be disjoint from a user's actual bookmarks data, so this function removes them.
     private func removeInvalidBookmarkEntities() {
         context.performAndWait {
-            let entitiesFetchRequest = Bookmark.bookmarksAndFoldersFetchRequest()
+            let entitiesFetchRequest = BookmarkEntity.fetchRequest()
 
             do {
                 let entities = try self.context.fetch(entitiesFetchRequest)
