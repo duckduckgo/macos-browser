@@ -928,7 +928,11 @@ extension BrowserTabViewController {
     private func hideWebViewSnapshotIfNeeded() {
         if webViewSnapshot != nil {
             DispatchQueue.main.async {
-                self.setFirstResponderAfterAdding = true
+                let isWebViewFirstResponder = self.view.window?.firstResponder === self.view.window
+                // check this because if address bar was the first responder, we don't want to mess with it
+                if isWebViewFirstResponder {
+                    self.setFirstResponderAfterAdding = true
+                }
                 self.showTabContent(of: self.tabCollectionViewModel.selectedTabViewModel)
                 self.webViewSnapshot?.removeFromSuperview()
             }
