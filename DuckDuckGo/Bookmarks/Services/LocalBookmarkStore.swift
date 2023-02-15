@@ -45,6 +45,7 @@ final class LocalBookmarkStore: BookmarkStore {
         case noObjectId
         case badObjectId
         case asyncFetchFailed
+        case missingParent
     }
 
     private lazy var context = Database.shared.makeContext(concurrencyType: .privateQueueConcurrencyType, name: "Bookmark")
@@ -120,6 +121,7 @@ final class LocalBookmarkStore: BookmarkStore {
                 parentEntity = root
             } else {
                 Pixel.fire(.debug(event: .missingParent))
+                DispatchQueue.main.async { completion(false, BookmarkStoreError.missingParent) }
                 return
             }
 
@@ -147,7 +149,7 @@ final class LocalBookmarkStore: BookmarkStore {
             } catch {
                 self.context.rollback()
                 assertionFailure("LocalBookmarkStore: Saving of context failed")
-                DispatchQueue.main.async { completion(true, error) }
+                DispatchQueue.main.async { completion(false, error) }
                 return
             }
 
@@ -178,7 +180,7 @@ final class LocalBookmarkStore: BookmarkStore {
             } catch {
                 self.context.rollback()
                 assertionFailure("LocalBookmarkStore: Saving of context failed")
-                DispatchQueue.main.async { completion(true, error) }
+                DispatchQueue.main.async { completion(false, error) }
             }
 
             DispatchQueue.main.async { completion(true, nil) }
@@ -336,6 +338,7 @@ final class LocalBookmarkStore: BookmarkStore {
                 parentEntity = root
             } else {
                 Pixel.fire(.debug(event: .missingParent))
+                DispatchQueue.main.async { completion(false, BookmarkStoreError.missingParent) }
                 return
             }
 
@@ -354,7 +357,7 @@ final class LocalBookmarkStore: BookmarkStore {
                     assertionFailure("LocalBookmarkStore: Saving of context failed")
                 }
 
-                DispatchQueue.main.async { completion(true, error) }
+                DispatchQueue.main.async { completion(false, error) }
                 return
             }
 
