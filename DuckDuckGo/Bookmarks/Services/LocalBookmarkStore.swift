@@ -48,7 +48,7 @@ final class LocalBookmarkStore: BookmarkStore {
         case missingParent
     }
 
-    private lazy var context = Database.shared.makeContext(concurrencyType: .privateQueueConcurrencyType, name: "Bookmark")
+    private let context: NSManagedObjectContext
 
     /// All entities within the bookmarks store must exist under this root level folder. Because this value is used so frequently, it is cached here.
     private var rootLevelFolder: BookmarkEntity?

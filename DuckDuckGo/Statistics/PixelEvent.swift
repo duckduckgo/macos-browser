@@ -205,14 +205,6 @@ extension Pixel {
             case userSelectedToDismissUpdate
 
             // Errors from Bookmarks Module
-            case bookmarkFolderExpected
-            case bookmarksListIndexNotMatchingBookmark
-            case bookmarksListMissingFolder
-            case editorNewParentMissing
-            case favoritesListIndexNotMatchingBookmark
-            case fetchingRootItemFailed(BookmarksModelError.ModelType)
-            case indexOutOfRange(BookmarksModelError.ModelType)
-
             case missingParent
             case bookmarksSaveFailed
             case bookmarksSaveFailedOnImport
@@ -223,7 +215,6 @@ extension Pixel {
             case bookmarksMigrationFailed
             case bookmarksMigrationCouldNotPrepareDatabase
             case bookmarksMigrationCouldNotPrepareDatabaseOnFailedMigration
-            case bookmarksMigrationCouldNotValidateDatabase
             case bookmarksMigrationCouldNotRemoveOldStore
         }
 
@@ -467,14 +458,6 @@ extension Pixel.Event.Debug {
         case .userSelectedToDismissUpdate:
             return "user_selected_to_dismiss_update"
 
-        case .bookmarkFolderExpected: return "bookmark_folder_expected"
-        case .bookmarksListIndexNotMatchingBookmark: return "bookmarks_list_index_not_matching_bookmark"
-        case .bookmarksListMissingFolder: return "bookmarks_list_missing_folder"
-        case .editorNewParentMissing: return "bookmarks_editor_new_parent_missing"
-        case .favoritesListIndexNotMatchingBookmark: return "favorites_list_index_not_matching_bookmark"
-        case .fetchingRootItemFailed(let modelType): return "bookmarks_fetching_root_item_failed_\(modelType.rawValue)"
-        case .indexOutOfRange(let modelType): return "bookmarks_index_out_of_range_\(modelType.rawValue)"
-
         case .missingParent: return "bookmark_missing_parent"
         case .bookmarksSaveFailed: return "bookmarks_save_failed"
         case .bookmarksSaveFailedOnImport: return "bookmarks_save_failed_on_import"
@@ -486,7 +469,6 @@ extension Pixel.Event.Debug {
         case .bookmarksMigrationCouldNotPrepareDatabase: return "bookmarks_migration_could_not_prepare_database"
         case .bookmarksMigrationCouldNotPrepareDatabaseOnFailedMigration:
             return "bookmarks_migration_could_not_prepare_database_on_failed_migration"
-        case .bookmarksMigrationCouldNotValidateDatabase: return "bookmarks_migration_could_not_validate_database"
         case .bookmarksMigrationCouldNotRemoveOldStore: return "bookmarks_migration_could_not_remove_old_store"
         }
     }

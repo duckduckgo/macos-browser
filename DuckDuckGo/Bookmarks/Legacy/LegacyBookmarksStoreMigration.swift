@@ -1,5 +1,5 @@
 //
-//  BookmarkMigrations.swift
+//  LegacyBookmarksStoreMigration.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -69,7 +69,13 @@ public class LegacyBookmarksStoreMigration {
 
         guard let newRoot = BookmarkUtils.fetchRootFolder(destination),
               let newFavoritesRoot = BookmarkUtils.fetchFavoritesFolder(destination) else {
-            Pixel.fire(.debug(event: .bookmarksMigrationCouldNotPrepareDatabase))
+
+            if bookmarkRoots.isEmpty {
+                Pixel.fire(.debug(event: .bookmarksCouldNotPrepareDatabase))
+            } else {
+                Pixel.fire(.debug(event: .bookmarksMigrationCouldNotPrepareDatabase))
+            }
+
             Thread.sleep(forTimeInterval: 2)
             fatalError("Could not write to Bookmarks DB")
         }
@@ -169,7 +175,9 @@ public class LegacyBookmarksStoreMigration {
 
         allObjects.forEach { context.delete($0) }
 
-        try? context.save(onErrorFire: .bookmarksMigrationCouldNotRemoveOldStore)
+        if context.hasChanges {
+            try? context.save(onErrorFire: .bookmarksMigrationCouldNotRemoveOldStore)
+        }
     }
 
 }

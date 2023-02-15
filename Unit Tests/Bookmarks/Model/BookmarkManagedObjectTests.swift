@@ -79,7 +79,6 @@ class BookmarkManagedObjectTests: XCTestCase {
         let parent = createTestRootFolderManagedObject(in: context)
         let id = UUID()
 
-        BookmarkManagedObject.entity()
         let folder = BookmarkManagedObject(entity: BookmarkManagedObject.entity(in: context),
                                            insertInto: context)
 

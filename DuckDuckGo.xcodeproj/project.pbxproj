@@ -1307,8 +1307,8 @@
 		987799ED299998B1005D8EB6 /* Bookmarks in Frameworks */ = {isa = PBXBuildFile; productRef = 987799EC299998B1005D8EB6 /* Bookmarks */; };
 		987799F12999993C005D8EB6 /* LegacyBookmarkStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 987799EF2999993C005D8EB6 /* LegacyBookmarkStore.swift */; };
 		987799F22999993C005D8EB6 /* LegacyBookmarkStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 987799EF2999993C005D8EB6 /* LegacyBookmarkStore.swift */; };
-		987799F32999993C005D8EB6 /* BookmarkMigrations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 987799F02999993C005D8EB6 /* BookmarkMigrations.swift */; };
-		987799F42999993C005D8EB6 /* BookmarkMigrations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 987799F02999993C005D8EB6 /* BookmarkMigrations.swift */; };
+		987799F32999993C005D8EB6 /* LegacyBookmarksStoreMigration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 987799F02999993C005D8EB6 /* LegacyBookmarksStoreMigration.swift */; };
+		987799F42999993C005D8EB6 /* LegacyBookmarksStoreMigration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 987799F02999993C005D8EB6 /* LegacyBookmarksStoreMigration.swift */; };
 		987799F62999996B005D8EB6 /* BookmarkDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 987799F52999996B005D8EB6 /* BookmarkDatabase.swift */; };
 		987799F72999996B005D8EB6 /* BookmarkDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 987799F52999996B005D8EB6 /* BookmarkDatabase.swift */; };
 		987799F929999973005D8EB6 /* LocalBookmarkStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 987799F829999973005D8EB6 /* LocalBookmarkStore.swift */; };
@@ -2254,7 +2254,7 @@
 		9833913227AAAEEE00DAF119 /* EmbeddedTrackerDataTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmbeddedTrackerDataTests.swift; sourceTree = "<group>"; };
 		983DFB2428B67036006B7E34 /* UserContentUpdating.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserContentUpdating.swift; sourceTree = "<group>"; };
 		987799EF2999993C005D8EB6 /* LegacyBookmarkStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LegacyBookmarkStore.swift; sourceTree = "<group>"; };
-		987799F02999993C005D8EB6 /* BookmarkMigrations.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkMigrations.swift; sourceTree = "<group>"; };
+		987799F02999993C005D8EB6 /* LegacyBookmarksStoreMigration.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LegacyBookmarksStoreMigration.swift; sourceTree = "<group>"; };
 		987799F52999996B005D8EB6 /* BookmarkDatabase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkDatabase.swift; sourceTree = "<group>"; };
 		987799F829999973005D8EB6 /* LocalBookmarkStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocalBookmarkStore.swift; sourceTree = "<group>"; };
 		987799FD29999B64005D8EB6 /* Bookmark 2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Bookmark 2.xcdatamodel"; sourceTree = "<group>"; };
@@ -4043,7 +4043,7 @@
 			children = (
 				987799FC29999B64005D8EB6 /* Bookmark.xcdatamodeld */,
 				987799EF2999993C005D8EB6 /* LegacyBookmarkStore.swift */,
-				987799F02999993C005D8EB6 /* BookmarkMigrations.swift */,
+				987799F02999993C005D8EB6 /* LegacyBookmarksStoreMigration.swift */,
 			);
 			path = Legacy;
 			sourceTree = "<group>";
@@ -6355,7 +6355,7 @@
 				3706FB75293F65D500E42796 /* WebsiteBreakageSender.swift in Sources */,
 				3707C72A294B5D2900682A9F /* URLExtension.swift in Sources */,
 				3706FB76293F65D500E42796 /* ASN1Parser.swift in Sources */,
-				987799F42999993C005D8EB6 /* BookmarkMigrations.swift in Sources */,
+				987799F42999993C005D8EB6 /* LegacyBookmarksStoreMigration.swift in Sources */,
 				3706FB77293F65D500E42796 /* View+Cursor.swift in Sources */,
 				3706FB79293F65D500E42796 /* AppVersion.swift in Sources */,
 				3706FB7A293F65D500E42796 /* FileDownloadManager.swift in Sources */,
@@ -7354,7 +7354,7 @@
 				AA5C1DD3285A217F0089850C /* RecentlyClosedCacheItem.swift in Sources */,
 				B6BBF17427475B15004F850E /* PopupBlockedPopover.swift in Sources */,
 				8589063A267BCD8E00D23B0D /* SaveCredentialsPopover.swift in Sources */,
-				987799F32999993C005D8EB6 /* BookmarkMigrations.swift in Sources */,
+				987799F32999993C005D8EB6 /* LegacyBookmarksStoreMigration.swift in Sources */,
 				4B379C1527BD91E3008A968E /* QuartzIdleStateProvider.swift in Sources */,
 				37F19A6728E1B43200740DC6 /* PrivatePlayerPreferences.swift in Sources */,
 				B6C0B22E26E61CE70031CB7F /* DownloadViewModel.swift in Sources */,
