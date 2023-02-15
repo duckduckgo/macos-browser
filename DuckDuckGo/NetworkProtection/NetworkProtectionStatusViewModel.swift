@@ -299,7 +299,6 @@ extension NetworkProtectionStatusView {
         @Published
         private var internalServerAddress: String?
 
-
         var serverAddress: String {
             guard let internalServerAddress = internalServerAddress else {
                 return UserText.networkProtectionServerAddressUnknown

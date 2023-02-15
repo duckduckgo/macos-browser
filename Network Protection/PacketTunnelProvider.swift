@@ -362,7 +362,9 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
             completionHandler(PacketTunnelProviderError.couldNotStartBackend)
 
         case .invalidState:
-            fatalError()
+            os_log("🔵 Starting tunnel failed with invalid error", log: .networkProtection, type: .error)
+
+            completionHandler(PacketTunnelProviderError.invalidState)
         }
     }
     

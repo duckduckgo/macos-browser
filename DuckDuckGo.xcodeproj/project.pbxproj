@@ -10091,7 +10091,7 @@
 			repositoryURL = "git@github.com:more-duckduckgo-org/browserserviceskit-network-protection.git";
 			requirement = {
 				kind = revision;
-				revision = ab4ec32cbaadb95406357921d1460e80134826e1;
+				revision = 7be0e92f9de68abd1f32f91a3c3d476b83d5912f;
 			};
 		};
 		4BD8CBCE2954021000AAD74A /* XCRemoteSwiftPackageReference "lottie-ios" */ = {

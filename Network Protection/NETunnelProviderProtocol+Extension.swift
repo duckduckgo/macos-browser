@@ -11,6 +11,7 @@ enum PacketTunnelProviderError: String, Error {
     case couldNotStartBackend
     case couldNotDetermineFileDescriptor
     case couldNotSetNetworkSettings
+    case invalidState
 }
 
 extension NETunnelProviderProtocol {

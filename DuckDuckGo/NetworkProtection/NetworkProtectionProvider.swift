@@ -298,7 +298,7 @@ final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
             domainEvent = .networkProtectionServerListStoreFailedToWriteServerList(error: eventError)
         case .noServerListFound:
             return
-        case .couldNotCreateServerListDirectory(let _):
+        case .couldNotCreateServerListDirectory:
             return
             
         case .failedToReadServerList(let eventError):

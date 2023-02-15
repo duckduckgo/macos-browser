@@ -141,6 +141,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         UserDefaultsWrapper<Any>.clearRemovedKeys()
 
+        refreshNetworkProtectionServers()
+
         warnUserAboutApplicationPathForNetworkProtection()
         
         networkProtectionMenu.show()
@@ -179,6 +181,27 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func applyPreferredTheme() {
         let appearancePreferences = AppearancePreferences()
         appearancePreferences.updateUserInterfaceStyle()
+    }
+
+    // MARK: - Network Protection
+
+    /// Fetches a new list of Network Protection servers, and updates the existing set.
+    /// The app will treat this new list as the source of truth – any servers which are cached locally that are not in this new list will be removed from the cache.
+    private func refreshNetworkProtectionServers() {
+        Task {
+            let client = NetworkProtectionBackendClient()
+            let serversResponse = await client.getServers()
+
+            guard let servers = try? serversResponse.get() else {
+                os_log("Failed to update Network Protection servers", log: .networkProtection, type: .error)
+                return
+            }
+
+            let store = NetworkProtectionServerListFileSystemStore()
+            try store.store(serverList: servers)
+
+            os_log("Successfully updated Network Protection servers; total server count = %{public}d", log: .networkProtection, servers.count)
+        }
     }
 
     /// Warns the user if they're trying to run a NetP build outside of /Applications, but only if it's not a debug build.
