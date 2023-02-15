@@ -524,8 +524,9 @@ extension NSPopUpButton {
 
         let validSources = DataImport.Source.allCases.filter(\.canImportData)
         for source in validSources {
-            // The CSV row is at the bottom of the picker, and requires a separator above it.
-            if source == .onePassword || source == .csv {
+            // The CSV row is at the bottom of the picker, and requires a separator above it, but only if the item array isn't
+            // empty (which would happen if there are no valid sources).
+            if (source == .onePassword || source == .csv) && !itemArray.isEmpty {
 
                 let separator = NSMenuItem.separator()
                 menu?.addItem(separator)
