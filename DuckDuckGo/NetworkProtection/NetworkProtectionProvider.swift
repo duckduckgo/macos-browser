@@ -24,7 +24,6 @@ import BrowserServicesKit
 import NetworkExtension
 import NetworkProtection
 import SystemExtensions
-import Common
 
 enum NetworkProtectionConnectionStatus {
     case notConfigured
@@ -75,11 +74,10 @@ final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
     /// The logger that this object will use for errors that are handled by this class.
     ///
     private let logger: NetworkProtectionLogger
-
-    /// Handles registration of the current device with the Network Protection backend.
-    /// The manager is also responsible to maintaining the current known list of backend servers, and allowing the user to pick which one they connect to.
-    /// 
-    private let deviceManager: NetworkProtectionDeviceManagement
+    
+    /// Stores the last controller error for the purpose of updating the UI as needed..
+    ///
+    private let controllerErrorStore = NetworkProtectionControllerErrorStore()
 
     // MARK: - Notifications & Observers
 
@@ -92,12 +90,6 @@ final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
     private var configChangeObserverToken: NSObjectProtocol?
 
     let configChangePublisher = CurrentValueSubject<Void, Never>(())
-
-    // MARK: - Bundle Identifiers
-    
-    var extensionBundleIdentifier: String {
-        NetworkProtectionBundle.extensionBundle().bundleIdentifier!
-    }
     
     // MARK: - VPN Tunnel & Configuration
 
@@ -192,11 +184,8 @@ final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
 
     convenience init() {
         let keychainStore = NetworkProtectionKeychainStore(useSystemKeychain: NetworkProtectionBundle.usesSystemKeychain())
-        let deviceManager = NetworkProtectionDeviceManager(keyStore: keychainStore,
-                                                           errorEvents: Self.networkProtectionDebugEvents)
         
         self.init(notificationCenter: .default,
-                  deviceManager: deviceManager,
                   logger: DefaultNetworkProtectionLogger())
     }
 
@@ -207,11 +196,9 @@ final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
     ///         - logger: (meant for testing) the logger that this object will use.
     ///
     init(notificationCenter: NotificationCenter,
-         deviceManager: NetworkProtectionDeviceManagement,
          logger: NetworkProtectionLogger) {
 
         self.logger = logger
-        self.deviceManager = deviceManager
         self.notificationCenter = notificationCenter
 
         startObservingNotifications()
@@ -259,65 +246,6 @@ final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
 
         notificationCenter.removeObserver(token)
         configChangeObserverToken = nil
-    }
-
-    // MARK: - Error Reporting
-
-    static let networkProtectionDebugEvents: EventMapping<NetworkProtectionError>? = .init { event, _, _, _ in
-        let domainEvent: Pixel.Event
-
-        switch event {
-        case .noServerRegistrationInfo:
-            domainEvent = .networkProtectionTunnelConfigurationNoServerRegistrationInfo
-        case .couldNotSelectClosestServer:
-            domainEvent = .networkProtectionTunnelConfigurationCouldNotSelectClosestServer
-        case .couldNotGetPeerPublicKey:
-            domainEvent = .networkProtectionTunnelConfigurationCouldNotGetPeerPublicKey
-        case .couldNotGetPeerHostName:
-            domainEvent = .networkProtectionTunnelConfigurationCouldNotGetPeerHostName
-        case .couldNotGetInterfaceAddressRange:
-            domainEvent = .networkProtectionTunnelConfigurationCouldNotGetInterfaceAddressRange
-
-        case .failedToFetchServerList:
-            return
-        case .failedToParseServerListResponse:
-            domainEvent = .networkProtectionClientFailedToParseServerListResponse
-        case .failedToEncodeRegisterKeyRequest:
-            domainEvent = .networkProtectionClientFailedToEncodeRegisterKeyRequest
-        case .failedToFetchRegisteredServers:
-            return
-        case .failedToParseRegisteredServersResponse:
-            domainEvent = .networkProtectionClientFailedToParseRegisteredServersResponse
-        case .serverListInconsistency:
-            // - TODO: not sure what to do here
-            return
-
-        case .failedToEncodeServerList:
-            domainEvent = .networkProtectionServerListStoreFailedToEncodeServerList
-        case .failedToWriteServerList(let eventError):
-            domainEvent = .networkProtectionServerListStoreFailedToWriteServerList(error: eventError)
-        case .noServerListFound:
-            return
-        case .couldNotCreateServerListDirectory:
-            return
-            
-        case .failedToReadServerList(let eventError):
-            domainEvent = .networkProtectionServerListStoreFailedToReadServerList(error: eventError)
-
-        case .failedToCastKeychainValueToData(let field):
-            domainEvent = .networkProtectionKeychainErrorFailedToCastKeychainValueToData(field: field)
-        case .keychainReadError(let field, let status):
-            domainEvent = .networkProtectionKeychainReadError(field: field, status: status)
-        case .keychainWriteError(let field, let status):
-            domainEvent = .networkProtectionKeychainWriteError(field: field, status: status)
-        case .keychainDeleteError(let field, let status):
-            domainEvent = .networkProtectionKeychainDeleteError(field: field, status: status)
-
-        case .unhandledError(function: let function, line: let line, error: let error):
-            domainEvent = .networkProtectionUnhandledError(function: function, line: line, error: error)
-        }
-
-        Pixel.fire(domainEvent, includeAppVersionParameter: true)
     }
 
     // MARK: - Notifications: Handling
@@ -371,9 +299,6 @@ final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
     /// Setups the tunnel manager if it's not set up already.
     ///
     private func setup(_ tunnelManager: NETunnelProviderManager) async throws {
-        // 1 - If configuration exists... let it through (but what if it's broken?  the service will take care of it)
-        // 2 - If a configuration doesn't exist, fill in a dummy one (can this cause issues?)
-        
         if tunnelManager.localizedDescription == nil {
             tunnelManager.localizedDescription = UserText.networkProtectionTunnelName
         }
@@ -382,12 +307,9 @@ final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
             tunnelManager.isEnabled = true
         }
         
-        guard tunnelManager.protocolConfiguration == nil else {
-            return
-        }
-
         let protocolConfiguration = NETunnelProviderProtocol()
         protocolConfiguration.serverAddress = "127.0.0.1" // Dummy address... the NetP service will take care of grabbing a real server
+        protocolConfiguration.providerBundleIdentifier = NetworkProtectionBundle.extensionBundle().bundleIdentifier
         tunnelManager.protocolConfiguration = protocolConfiguration
     }
 
@@ -409,30 +331,65 @@ final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
             return false
         }
     }
+    
+    // MARK: - Ensure things are working
+    
+    /// - Returns: `true` if the system extension and the background agent were activated successfully
+    ///
+    private func ensureSystemExtensionAndAgentAreActivated() async throws -> Bool {
+        NetworkProtectionAgentManager.current.enable()
+        
+#if NETP_SYSTEM_EXTENSION
+        if case .willActivateAfterReboot = try await SystemExtensionManager.shared.activate(waitingForUserApprovalHandler: { [weak self] in
+            self?.controllerErrorStore.lastErrorMessage = "Go to Security & Privacy in System Settings to allow Network Protection to activate"
+        }) {
+            controllerErrorStore.lastErrorMessage = "Please reboot to activate Network Protection"
+            return false
+        }
+#endif
+        
+        return true
+    }
 
     // MARK: - Starting & Stopping the VPN
 
     /// Starts the VPN connection used for Network Protection
     ///
     func start() async throws {
-        NetworkProtectionAgentManager.current.enable()
-        let tunnelManager = try await loadOrMakeTunnelManager()
+        guard try await ensureSystemExtensionAndAgentAreActivated() else {
+            return
+        }
+        
+        controllerErrorStore.lastErrorMessage = nil
+        let tunnelManager: NETunnelProviderManager
+        
+        do {
+            tunnelManager = try await loadOrMakeTunnelManager()
+        } catch {
+            controllerErrorStore.lastErrorMessage = error.localizedDescription
+            throw error
+        }
 
         switch tunnelManager.connection.status {
         case .invalid:
             reloadTunnelManager()
             try await start()
-        case .disconnected, .disconnecting:
+        case .connected:
+            // Intentional no-op
+            break
+        default:
             var options = [String: NSObject]()
-            
+
             if let selectedServerName = NetworkProtectionSelectedServerUserDefaultsStore().selectedServer.stringValue {
                 options["selectedServer"] = selectedServerName as NSString
             }
-            
-            try tunnelManager.connection.startVPNTunnel(options: options)
-        default:
-            // Intentional no-op
-            break
+
+            do {
+                try tunnelManager.connection.startVPNTunnel(options: options)
+            } catch {
+                controllerErrorStore.lastErrorMessage = error.localizedDescription
+                throw error
+            }
         }
     }
 

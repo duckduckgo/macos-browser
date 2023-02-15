@@ -47,6 +47,8 @@ extension NetworkProtectionStatusView {
         private var statusChangeCancellable: AnyCancellable?
         private var connectivityIssuesCancellable: AnyCancellable?
         private var serverInfoCancellable: AnyCancellable?
+        private var tunnelErrorMessageCancellable: AnyCancellable?
+        private var controllerErrorMessageCancellable: AnyCancellable?
 
         // MARK: - Feature Image
 
@@ -81,6 +83,8 @@ extension NetworkProtectionStatusView {
             isHavingConnectivityIssues = networkProtectionStatusReporter.connectivityIssuesPublisher.value
             internalServerAddress = networkProtectionStatusReporter.serverInfoPublisher.value.serverAddress
             internalServerLocation = networkProtectionStatusReporter.serverInfoPublisher.value.serverLocation
+            lastTunnelErrorMessage = networkProtectionStatusReporter.tunnelErrorMessagePublisher.value
+            lastControllerErrorMessage = networkProtectionStatusReporter.controllerErrorMessagePublisher.value
 
             // Particularly useful when unit testing with an initial status of our choosing.
             refreshInternalIsRunning()
@@ -102,6 +106,26 @@ extension NetworkProtectionStatusView {
                 
                 Task { @MainActor in
                     self.isHavingConnectivityIssues = isHavingConnectivityIssues
+                }
+            }
+            
+            tunnelErrorMessageCancellable = networkProtectionStatusReporter.tunnelErrorMessagePublisher.sink { [weak self] errorMessage in
+                guard let self = self else {
+                    return
+                }
+                
+                Task { @MainActor in
+                    self.lastTunnelErrorMessage = errorMessage
+                }
+            }
+            
+            controllerErrorMessageCancellable = networkProtectionStatusReporter.controllerErrorMessagePublisher.sink { [weak self] errorMessage in
+                guard let self = self else {
+                    return
+                }
+                
+                Task { @MainActor in
+                    self.lastControllerErrorMessage = errorMessage
                 }
             }
             
@@ -209,6 +233,12 @@ extension NetworkProtectionStatusView {
         @Published
         private var isHavingConnectivityIssues: Bool = false
         
+        @Published
+        private var lastControllerErrorMessage: String?
+        
+        @Published
+        private var lastTunnelErrorMessage: String?
+        
         /// The description for the current connection status.
         /// When the status is `connected` this description will also show the time lapsed since connection.
         ///
@@ -243,7 +273,15 @@ extension NetworkProtectionStatusView {
             }
         }
         
-        var connectionHealthWarning: String? {
+        var issueDescription: String? {
+            if let lastControllerErrorMessage = lastControllerErrorMessage {
+                return lastControllerErrorMessage
+            }
+            
+            if let lastTunnelErrorMessage = lastTunnelErrorMessage {
+                return lastTunnelErrorMessage
+            }
+
             if isHavingConnectivityIssues {
                 switch connectionStatus {
                 case .reasserting, .connecting, .connected:

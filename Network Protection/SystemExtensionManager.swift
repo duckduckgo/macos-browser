@@ -19,45 +19,89 @@
 import Foundation
 import Cocoa
 import SystemExtensions
-import os.log
 
-final class SystemExtensionManager: NSObject, OSSystemExtensionRequestDelegate {
+final actor SystemExtensionManager: NSObject {
+    enum RequestResult {
+        case activated
+        case willActivateAfterReboot
+    }
+    
+    final class RequestDelegate: NSObject, OSSystemExtensionRequestDelegate {
+        private let waitingForUserApprovalHandler: () -> Void
+        private let completionHandler: (RequestDelegate, Result<RequestResult, Error>) -> Void
+        
+        init(waitingForUserApprovalHandler: @escaping () -> Void, completionHandler: @escaping (RequestDelegate, Result<RequestResult, Error>) -> Void) {
+            self.waitingForUserApprovalHandler = waitingForUserApprovalHandler
+            self.completionHandler = completionHandler
+        }
+        
+        func request(_ request: OSSystemExtensionRequest, actionForReplacingExtension existing: OSSystemExtensionProperties, withExtension ext: OSSystemExtensionProperties) -> OSSystemExtensionRequest.ReplacementAction {
 
+            return .replace
+        }
+
+        func requestNeedsUserApproval(_ request: OSSystemExtensionRequest) {
+            waitingForUserApprovalHandler()
+        }
+
+        func request(_ request: OSSystemExtensionRequest, didFinishWithResult result: OSSystemExtensionRequest.Result) {
+            switch result {
+            case .completed:
+                completionHandler(self, .success(.activated))
+            case .willCompleteAfterReboot:
+                completionHandler(self, .success(.willActivateAfterReboot))
+            @unknown default:
+                // Not much we can do about this, so let's assume it's a good result and not show any errors
+                completionHandler(self, .success(.activated))
+                Pixel.fire(.networkProtectionSystemExtensionUnknownActivationResult)
+            }
+        }
+
+        func request(_ request: OSSystemExtensionRequest, didFailWithError error: Error) {
+            completionHandler(self, .failure(error))
+        }
+    }
+    
     static let shared = SystemExtensionManager()
+    
+    private var bundleID: String {
+        NetworkProtectionBundle.extensionBundle().bundleIdentifier!
+    }
+    
+    private var requests = Set<RequestDelegate>()
 
-    private static let bundleID = "com.duckduckgo.macos.browser.network-protection.system-extension.extension"
+    func activate(waitingForUserApprovalHandler: @escaping () -> Void) async throws -> RequestResult {
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<RequestResult, Error>) in
+            let activationRequest = OSSystemExtensionRequest.activationRequest(forExtensionWithIdentifier: bundleID, queue: .main)
+            
+            let requestDelegate = RequestDelegate(waitingForUserApprovalHandler: waitingForUserApprovalHandler) { request, result in
+                continuation.resume(with: result)
+                
+                // Intentionally retaining self until this closure is executed
+                self.requests.remove(request)
+            }
+            activationRequest.delegate = requestDelegate
 
-    private let networkProtectionLog: OSLog = OSLog(subsystem: "DuckDuckGo Network Protection App", category: "NetP")
-
-    func activate() {
-        os_log("🔵 System Extension activate", log: networkProtectionLog, type: .error)
-        let activationRequest = OSSystemExtensionRequest.activationRequest(forExtensionWithIdentifier: Self.bundleID, queue: .main)
-        activationRequest.delegate = self
-        OSSystemExtensionManager.shared.submitRequest(activationRequest)
+            requests.insert(requestDelegate)
+            OSSystemExtensionManager.shared.submitRequest(activationRequest)
+        }
     }
 
-    func deactivate() {
-        let activationRequest = OSSystemExtensionRequest.deactivationRequest(forExtensionWithIdentifier: Self.bundleID, queue: .main)
-        activationRequest.delegate = self
-        OSSystemExtensionManager.shared.submitRequest(activationRequest)
-    }
-
-    func request(_ request: OSSystemExtensionRequest, actionForReplacingExtension existing: OSSystemExtensionProperties, withExtension ext: OSSystemExtensionProperties) -> OSSystemExtensionRequest.ReplacementAction {
-        os_log("🔵 System Extension actionForReplacingExtension %@ %@", log: networkProtectionLog, type: .error, existing, ext)
-
-        return .replace
-    }
-
-    func requestNeedsUserApproval(_ request: OSSystemExtensionRequest) {
-        os_log("🔵 System Extension needsUserApproval", log: networkProtectionLog, type: .error)
-    }
-
-    func request(_ request: OSSystemExtensionRequest, didFinishWithResult result: OSSystemExtensionRequest.Result) {
-        os_log("🔵 System Extension didFinishWithResult %{public}@", log: networkProtectionLog, type: .error, result.rawValue)
-    }
-
-    func request(_ request: OSSystemExtensionRequest, didFailWithError error: Error) {
-        os_log("🔵 System Extension didFailWithError %{public}@", log: networkProtectionLog, type: .error, error.localizedDescription)
+    func deactivate(waitingForUserApprovalHandler: @escaping () -> Void) async throws -> RequestResult {
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<RequestResult, Error>) in
+            let activationRequest = OSSystemExtensionRequest.deactivationRequest(forExtensionWithIdentifier: bundleID, queue: .main)
+            
+            let requestDelegate = RequestDelegate(waitingForUserApprovalHandler: waitingForUserApprovalHandler) { request, result in
+                continuation.resume(with: result)
+                
+                // Intentionally retaining self until this closure is executed
+                self.requests.remove(request)
+            }
+            activationRequest.delegate = requestDelegate
+            
+            requests.insert(requestDelegate)
+            OSSystemExtensionManager.shared.submitRequest(activationRequest)
+        }
     }
 
 }

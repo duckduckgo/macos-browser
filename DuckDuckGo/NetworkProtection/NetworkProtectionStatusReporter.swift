@@ -28,6 +28,8 @@ protocol NetworkProtectionStatusReporter {
     var statusChangePublisher: CurrentValueSubject<NetworkProtectionConnectionStatus, Never> { get }
     var connectivityIssuesPublisher: CurrentValueSubject<Bool, Never> { get }
     var serverInfoPublisher: CurrentValueSubject<NetworkProtectionStatusServerInfo, Never> { get }
+    var tunnelErrorMessagePublisher: CurrentValueSubject<String?, Never> { get }
+    var controllerErrorMessagePublisher: CurrentValueSubject<String?, Never> { get }
 }
 
 /// Convenience struct used to relay server info updates through a reporter.
@@ -64,6 +66,12 @@ final class DefaultNetworkProtectionStatusReporter: NetworkProtectionStatusRepor
     let statusChangePublisher = CurrentValueSubject<NetworkProtectionConnectionStatus, Never>(.unknown)
     let connectivityIssuesPublisher = CurrentValueSubject<Bool, Never>(false)
     let serverInfoPublisher = CurrentValueSubject<NetworkProtectionStatusServerInfo, Never>(.unknown)
+    let tunnelErrorMessagePublisher = CurrentValueSubject<String?, Never>(nil)
+    let controllerErrorMessagePublisher = CurrentValueSubject<String?, Never>(nil)
+    
+    // MARK: - Stores
+    
+    private let controllerErrorStore = NetworkProtectionControllerErrorStore()
     
     // MARK: - Init & deinit
     
@@ -89,6 +97,34 @@ final class DefaultNetworkProtectionStatusReporter: NetworkProtectionStatusRepor
             self?.handleStatusChangeNotification(notification)
         }
         
+        distributedNotificationCenter.addObserver(forName: .NetPTunnelErrorStatusChanged, object: nil, queue: nil) { [weak self] _ in
+            guard let self = self else {
+                return
+            }
+            
+            Task {
+                do {
+                    try await self.updateTunnelErrorMessage()
+                } catch {
+                    os_log("🔵 Error when attempting to update the tunnel error message: %{public}@", type: .error, error.localizedDescription)
+                }
+            }
+        }
+        
+        distributedNotificationCenter.addObserver(forName: .NetPControllerErrorStatusChanged, object: nil, queue: nil) { [weak self] _ in
+            guard let self = self else {
+                return
+            }
+            
+            Task {
+                do {
+                    try await self.updateControllerErrorMessage()
+                } catch {
+                    os_log("🔵 Error when attempting to update the tunnel error message: %{public}@", type: .error, error.localizedDescription)
+                }
+            }
+        }
+        
         distributedNotificationCenter.addObserver(forName: .NetPConnectivityIssuesStarted, object: nil, queue: nil, using: { [weak self] _ in
             
             self?.connectivityIssuesPublisher.send(true)
@@ -103,7 +139,7 @@ final class DefaultNetworkProtectionStatusReporter: NetworkProtectionStatusRepor
             guard let self = self else {
                 return
             }
-            
+
             Task {
                 await self.updateServerInfo()
             }
@@ -138,10 +174,46 @@ final class DefaultNetworkProtectionStatusReporter: NetworkProtectionStatusRepor
         let status = self.connectionStatus(from: session)
         statusChangePublisher.send(status)
 
+        try updateTunnelErrorMessage(session: session)
         try updateConnectivityIssues(session: session)
     }
     
-    // MARK: - Handling Connectivity Issues
+    // MARK: - Updating controller errors
+    
+    private func updateControllerErrorMessage() async throws {
+        let controllerErrorStore = NetworkProtectionControllerErrorStore()
+        controllerErrorMessagePublisher.send(controllerErrorStore.lastErrorMessage)
+    }
+    
+    // MARK: - Updating tunnel errors
+    
+    private func updateTunnelErrorMessage() async throws {
+        guard let activeSession = try await DefaultNetworkProtectionProvider.activeSession() else {
+            return
+        }
+        
+        try updateTunnelErrorMessage(session: activeSession)
+    }
+    
+    private func updateTunnelErrorMessage(session: NETunnelProviderSession) throws {
+        let request = Data([NetworkProtectionAppRequest.getLastErrorMessage.rawValue])
+        try session.sendProviderMessage(request) { [weak self] data in
+            guard let self = self else {
+                return
+            }
+            
+            guard let data = data else {
+                self.tunnelErrorMessagePublisher.send(nil)
+                return
+            }
+            
+            let errorMessage = String(data: data, encoding: NetworkProtectionAppRequest.preferredStringEncoding)
+            
+            if errorMessage != self.tunnelErrorMessagePublisher.value {
+                self.tunnelErrorMessagePublisher.send(errorMessage)
+            }
+        }
+    }
 
     /// Queries the extension for connectivity issues and updates the state locally.
     ///

@@ -1,21 +1,32 @@
 // SPDX-License-Identifier: MIT
 // Copyright © 2018-2021 WireGuard LLC. All Rights Reserved.
 
+import Common
 import Foundation
 import NetworkExtension
-import os
 import NetworkProtection
+import os
 import UserNotifications
 
 final class PacketTunnelProvider: NEPacketTunnelProvider {
     
     // MARK: - Error Handling
     
-    enum TunnelError: Error {
-        case couldNotGenerateTunnelConfiguration
-        case couldNotGenerateWireguardTunnelConfiguration
+    enum TunnelError: LocalizedError {
+        case couldNotGenerateTunnelConfiguration(internalError: Error)
         case couldNotFixConnection
-        case debugResetAllStatus
+        
+        var errorDescription: String? {
+            switch self {
+            case .couldNotGenerateTunnelConfiguration(let internalError):
+                return "Failed to generate a tunnel configuration: \(internalError.localizedDescription)"
+            default:
+                // This is probably not the most elegant error to show to a user but
+                // it's a great way to get detailed reports for those cases we haven't
+                // provided good descriptions for yet.
+                return "Tunnel error: \(String(describing: self))"
+            }
+        }
     }
     
     // MARK: - WireGuard
@@ -88,9 +99,8 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         }
     }()
     private var lastTestFailed = false
-    private let deviceManager = NetworkProtectionDeviceManager(keyStore: NetworkProtectionKeychainStore(useSystemKeychain: NetworkProtectionBundle.usesSystemKeychain()),
-                                                               errorEvents: nil)
     private let tunnelHealth = NetworkProtectionTunnelHealthStore()
+    private let controllerErrorStore = NetworkProtectionTunnelErrorStore()
 
     // MARK: - Initializers
 
@@ -100,13 +110,14 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         super.init()
         
         #if NETP_SYSTEM_EXTENSION
-        os_log("🔵 Sysex is listening")
         IPCConnection.shared.startListener()
         #endif
-    }
-    
-    deinit {
-        os_log("🔵 Sysex deinit")
+
+#if DEBUG
+        Pixel.setUp(dryRun: true)
+#else
+        Pixel.setUp()
+#endif
     }
     
     private var tunnelProviderProtocol: NETunnelProviderProtocol? {
@@ -114,9 +125,11 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
     }
 
     override func startTunnel(options: [String: NSObject]?, completionHandler: @escaping (Error?) -> Void) {
+        
         let activationAttemptId = options?["activationAttemptId"] as? String
         
         tunnelHealth.isHavingConnectivityIssues = false
+        controllerErrorStore.lastErrorMessage = nil
         
         if let serverName = options?["selectedServer"] as? String {
             selectedServerStore.selectedServer = .endpoint(serverName)
@@ -136,10 +149,17 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
             }
             
             do {
+                os_log("🔵 Generating tunnel config", log: .networkProtection, type: .info)
                 let tunnelConfiguration = try await generateTunnelConfiguration(serverSelectionMethod: serverSelectionMethod)
                 startTunnel(with: tunnelConfiguration, completionHandler: completionHandler)
+                os_log("🔵 Done generating tunnel config", log: .networkProtection, type: .info)
             } catch {
-                completionHandler(NSError(domain: NEVPNErrorDomain, code: NEVPNError.configurationReadWriteFailed.rawValue))
+                os_log("🔵 Error starting tunnel: %{public}@", log: .networkProtection, type: .info, error.localizedDescription)
+                
+                controllerErrorStore.lastErrorMessage = error.localizedDescription
+                
+                let error = NSError(domain: NEVPNErrorDomain, code: NEVPNError.configurationInvalid.rawValue)
+                completionHandler(error)
             }
         }
     }
@@ -224,11 +244,18 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
     }
     
     private func generateTunnelConfiguration(serverSelectionMethod: NetworkProtectionServerSelectionMethod) async throws -> TunnelConfiguration {
-        
+
         os_log("🔵 serverSelectionMethod %{public}@", String(describing: serverSelectionMethod))
         
-        guard let configurationResult = await deviceManager.generateTunnelConfiguration(selectionMethod: serverSelectionMethod) else {
-            throw TunnelError.couldNotGenerateTunnelConfiguration
+        let configurationResult: (TunnelConfiguration, NetworkProtectionServerInfo)
+        
+        do {
+            let deviceManager = NetworkProtectionDeviceManager(keyStore: NetworkProtectionKeychainStore(useSystemKeychain: NetworkProtectionBundle.usesSystemKeychain()),
+                                                               errorEvents: Self.networkProtectionDebugEvents)
+
+            configurationResult = try await deviceManager.generateTunnelConfiguration(selectionMethod: serverSelectionMethod)
+        } catch {
+            throw TunnelError.couldNotGenerateTunnelConfiguration(internalError: error)
         }
         
         let selectedServerInfo = configurationResult.1
@@ -257,8 +284,12 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
             NetworkProtectionKeychain.deleteReferences()
             let serverCache = NetworkProtectionServerListFileSystemStore()
             try? serverCache.removeServerList()
-            cancelTunnelWithError(TunnelError.debugResetAllStatus)
+            // This is not really an error, we received a command to reset the connection
+            cancelTunnelWithError(nil)
             completionHandler?(nil)
+        case .getLastErrorMessage:
+            let data = controllerErrorStore.lastErrorMessage?.data(using: NetworkProtectionAppRequest.preferredStringEncoding)
+            completionHandler?(data)
         case .getRuntimeConfiguration:
             adapter.getRuntimeConfiguration { settings in
                 var data: Data?
@@ -376,6 +407,67 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
 
     override func wake() {
         handleAdapterStarted()
+    }
+
+    // MARK: - Error Reporting
+
+    static let networkProtectionDebugEvents: EventMapping<NetworkProtectionError>? = .init { event, _, _, _ in
+        let domainEvent: NetworkProtectionPixelEvent
+        os_log("🔴 Start", log: .networkProtection, type: .info)
+
+        switch event {
+        case .noServerRegistrationInfo:
+            domainEvent = .networkProtectionTunnelConfigurationNoServerRegistrationInfo
+        case .couldNotSelectClosestServer:
+            domainEvent = .networkProtectionTunnelConfigurationCouldNotSelectClosestServer
+        case .couldNotGetPeerPublicKey:
+            domainEvent = .networkProtectionTunnelConfigurationCouldNotGetPeerPublicKey
+        case .couldNotGetPeerHostName:
+            domainEvent = .networkProtectionTunnelConfigurationCouldNotGetPeerHostName
+        case .couldNotGetInterfaceAddressRange:
+            domainEvent = .networkProtectionTunnelConfigurationCouldNotGetInterfaceAddressRange
+
+        case .failedToFetchServerList:
+            return
+        case .failedToParseServerListResponse:
+            domainEvent = .networkProtectionClientFailedToParseServerListResponse
+        case .failedToEncodeRegisterKeyRequest:
+            domainEvent = .networkProtectionClientFailedToEncodeRegisterKeyRequest
+        case .failedToFetchRegisteredServers:
+            return
+        case .failedToParseRegisteredServersResponse:
+            domainEvent = .networkProtectionClientFailedToParseRegisteredServersResponse
+        case .serverListInconsistency:
+            // - TODO: not sure what to do here
+            return
+
+        case .failedToEncodeServerList:
+            domainEvent = .networkProtectionServerListStoreFailedToEncodeServerList
+        case .failedToWriteServerList(let eventError):
+            domainEvent = .networkProtectionServerListStoreFailedToWriteServerList(error: eventError)
+        case .noServerListFound:
+            return
+        case .couldNotCreateServerListDirectory:
+            return
+
+        case .failedToReadServerList(let eventError):
+            domainEvent = .networkProtectionServerListStoreFailedToReadServerList(error: eventError)
+
+        case .failedToCastKeychainValueToData(let field):
+            domainEvent = .networkProtectionKeychainErrorFailedToCastKeychainValueToData(field: field)
+        case .keychainReadError(let field, let status):
+            domainEvent = .networkProtectionKeychainReadError(field: field, status: status)
+        case .keychainWriteError(let field, let status):
+            domainEvent = .networkProtectionKeychainWriteError(field: field, status: status)
+        case .keychainDeleteError(let field, let status):
+            domainEvent = .networkProtectionKeychainDeleteError(field: field, status: status)
+
+        case .unhandledError(function: let function, line: let line, error: let error):
+            domainEvent = .networkProtectionUnhandledError(function: function, line: line, error: error)
+        }
+
+        os_log("🔴 Firing pixel: %{public}@", log: .networkProtection, type: .info, String(describing: domainEvent))
+        Pixel.fire(domainEvent, includeAppVersionParameter: true)
     }
 }
 

@@ -30,7 +30,7 @@ final class APIHeaders {
         static let ifNoneMatch = "If-None-Match"
         static let moreInfo = "X-DuckDuckGo-MoreInfo"
     }
-
+    
     private let appVersion: AppVersion
 
     init(appVersion: AppVersion = AppVersion.shared) {

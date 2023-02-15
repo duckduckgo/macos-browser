@@ -22,6 +22,7 @@ import NetworkExtension
 enum NetworkProtectionAppRequest: UInt8 {
     case resetAllState = 0
     case getRuntimeConfiguration
+    case getLastErrorMessage
     case isHavingConnectivityIssues
     case setSelectedServer
     case getServerLocation

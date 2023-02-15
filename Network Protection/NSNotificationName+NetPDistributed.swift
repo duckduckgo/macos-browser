@@ -23,14 +23,20 @@ extension DistributedNotificationCenter.CenterType {
 }
 
 extension NSNotification.Name {
+
     // MARK: - Connection Issues
     
     static let NetPConnectivityIssuesStarted = NSNotification.Name("com.duckduckgo.NetPConnectivityIssuesStarted")
     static let NetPConnectivityIssuesResolved = NSNotification.Name("com.duckduckgo.NetPConnectivityIssuesResolved")
-    
+
     // MARK: - Connection Changes
-    
+
     static let NetPServerSelected = NSNotification.Name("com.duckduckgo.NetPServerSelected")
+    
+    // MARK: - Error Events
+
+    static let NetPTunnelErrorStatusChanged = Notification.Name(rawValue: "com.duckduckgo.NetPTunnelErrorStatusChanged")
+    static let NetPControllerErrorStatusChanged = Notification.Name(rawValue: "com.duckduckgo.NetPControllerErrorStatusChanged")
     
     // MARK: - networkProtectionXPCService
     

@@ -121,7 +121,7 @@ public struct NetworkProtectionStatusView: View {
         PopoverHeightFixer(popoverHeight: $popoverHeight) {
             headerView()
 
-            if let healthWarning = model.connectionHealthWarning {
+            if let healthWarning = model.issueDescription {
                 connectionHealthWarningView(message: healthWarning).onAppear {
                     popoverHeight = .infinity
                 }

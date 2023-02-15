@@ -24,22 +24,9 @@ protocol NetworkProtectionLogger {
 }
 
 final class DefaultNetworkProtectionLogger: NetworkProtectionLogger {
-
     func log(_ error: Error) {
         let format = StaticString(stringLiteral: "🔴 %{public}@")
         os_log(format, type: .error, error.localizedDescription)
-
-        let nsError = error as NSError
-
-        /// Note: `configurationReadWriteFailed` is raised when the user does not grant permission to access the system's VPN info (which we should ignore),
-        /// but the error code's description makes it sound like it could signal other issues with reading and writing the VPN configuration, which we don't want to ignore by default.
-        /// For this reason we're keeping the log but disabling the assertion for this error code.
-        ///
-        let skipAssertion = nsError.domain == NEVPNErrorDomain && nsError.code == NEVPNError.configurationReadWriteFailed.rawValue
-
-        if !skipAssertion {
-            assertionFailure(error.localizedDescription)
-        }
     }
 
 }
