@@ -35,14 +35,12 @@ final class LocalBookmarkStore: BookmarkStore {
     }
 
     private func sharedInitialization() {
-        // TODO: migration
         removeInvalidBookmarkEntities()
         cacheReadOnlyTopLevelBookmarksFolders()
     }
 
     enum BookmarkStoreError: Error {
         case storeDeallocated
-//        case insertFailed
         case noObjectId
         case badObjectId
         case asyncFetchFailed
@@ -122,7 +120,7 @@ final class LocalBookmarkStore: BookmarkStore {
             } else if let root = BookmarkUtils.fetchRootFolder(self.context) {
                 parentEntity = root
             } else {
-                //TODO: error
+                Pixel.fire(.debug(event: .missingParent))
                 return
             }
 
@@ -146,10 +144,10 @@ final class LocalBookmarkStore: BookmarkStore {
             bookmarkMO.uuid = bookmark.id
 
             do {
-                try self.context.save()
+                try self.context.save(onErrorFire: .bookmarksSaveFailed)
             } catch {
+                self.context.rollback()
                 assertionFailure("LocalBookmarkStore: Saving of context failed")
-                // TODO: pixel
                 DispatchQueue.main.async { completion(true, error) }
                 return
             }
@@ -177,8 +175,9 @@ final class LocalBookmarkStore: BookmarkStore {
             }
 
             do {
-                try self.context.save()
+                try self.context.save(onErrorFire: .bookmarksSaveFailed)
             } catch {
+                self.context.rollback()
                 assertionFailure("LocalBookmarkStore: Saving of context failed")
                 DispatchQueue.main.async { completion(true, error) }
             }
@@ -204,8 +203,9 @@ final class LocalBookmarkStore: BookmarkStore {
             bookmarkMO.update(with: bookmark, favoritesFolder: self.favoritesFolder)
 
             do {
-                try self.context.save()
+                try self.context.save(onErrorFire: .bookmarksSaveFailed)
             } catch {
+                self.context.rollback()
                 assertionFailure("LocalBookmarkStore: Saving of context failed")
             }
         }
@@ -228,8 +228,9 @@ final class LocalBookmarkStore: BookmarkStore {
             bookmarkFolderMO.update(with: folder)
 
             do {
-                try self.context.save()
+                try self.context.save(onErrorFire: .bookmarksSaveFailed)
             } catch {
+                self.context.rollback()
                 assertionFailure("LocalBookmarkStore: Saving of context failed")
             }
         }
@@ -270,8 +271,9 @@ final class LocalBookmarkStore: BookmarkStore {
             }
 
             do {
-                try self.context.save()
+                try self.context.save(onErrorFire: .bookmarksSaveFailed)
             } catch {
+                self.context.rollback()
                 assertionFailure("\(#file): Saving of context failed: \(error)")
                 DispatchQueue.main.async { completion(error) }
                 return
@@ -306,8 +308,9 @@ final class LocalBookmarkStore: BookmarkStore {
             }
 
             do {
-                try self.context.save()
+                try self.context.save(onErrorFire: .bookmarksSaveFailed)
             } catch {
+                self.context.rollback()
                 assertionFailure("\(#file): Saving of context failed")
                 DispatchQueue.main.async { completion(error) }
                 return
@@ -344,8 +347,9 @@ final class LocalBookmarkStore: BookmarkStore {
             bookmarkMO.uuid = folder.id
 
             do {
-                try self.context.save()
+                try self.context.save(onErrorFire: .bookmarksSaveFailed)
             } catch {
+                self.context.rollback()
                 // Only throw this assertion when running in debug and when unit tests are not running.
                 if !AppDelegate.isRunningTests {
                     assertionFailure("LocalBookmarkStore: Saving of context failed")
@@ -454,8 +458,9 @@ final class LocalBookmarkStore: BookmarkStore {
             }
 
             do {
-                try self.context.save()
+                try self.context.save(onErrorFire: .bookmarksSaveFailed)
             } catch {
+                self.context.rollback()
                 assertionFailure("\(#file): Saving of context failed")
                 DispatchQueue.main.async { completion(error) }
                 return
@@ -543,8 +548,9 @@ final class LocalBookmarkStore: BookmarkStore {
             }
 
             do {
-                try self.context.save()
+                try self.context.save(onErrorFire: .bookmarksSaveFailed)
             } catch {
+                self.context.rollback()
                 assertionFailure("\(#file): Saving of context failed")
                 DispatchQueue.main.async { completion(error) }
                 return
@@ -575,11 +581,12 @@ final class LocalBookmarkStore: BookmarkStore {
 
                 total += createEntitiesFromBookmarks(allFolders: allFolders, bookmarks: bookmarks, importSourceName: source.importSourceName)
 
-                try self.context.save()
+                try self.context.save(onErrorFire: .bookmarksSaveFailedOnImport)
                 let bookmarkCountAfterImport = try context.count(for: Bookmark.bookmarksFetchRequest())
 
                 total.successful = bookmarkCountAfterImport - bookmarkCountBeforeImport
             } catch {
+                self.context.rollback()
                 os_log("Failed to import bookmarks, with error: %s", log: .dataImportExport, type: .error, error.localizedDescription)
 
                 // Only throw this assertion when running in debug and when unit tests are not running.
@@ -728,8 +735,9 @@ final class LocalBookmarkStore: BookmarkStore {
                     Pixel.fire(.debug(event: .removedInvalidBookmarkManagedObjects))
                 }
 
-                try self.context.save()
+                try self.context.save(onErrorFire: .bookmarksSaveFailed)
             } catch {
+                self.context.rollback()
                 os_log("Failed to remove invalid bookmark entities", type: .error)
             }
         }

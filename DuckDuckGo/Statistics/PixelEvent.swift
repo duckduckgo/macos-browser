@@ -212,8 +212,10 @@ extension Pixel {
             case favoritesListIndexNotMatchingBookmark
             case fetchingRootItemFailed(BookmarksModelError.ModelType)
             case indexOutOfRange(BookmarksModelError.ModelType)
-            case saveFailed(BookmarksModelError.ModelType)
-            case missingParent(BookmarksModelError.ObjectType)
+
+            case missingParent
+            case bookmarksSaveFailed
+            case bookmarksSaveFailedOnImport
 
             case bookmarksCouldNotLoadDatabase
             case bookmarksCouldNotPrepareDatabase
@@ -472,8 +474,10 @@ extension Pixel.Event.Debug {
         case .favoritesListIndexNotMatchingBookmark: return "favorites_list_index_not_matching_bookmark"
         case .fetchingRootItemFailed(let modelType): return "bookmarks_fetching_root_item_failed_\(modelType.rawValue)"
         case .indexOutOfRange(let modelType): return "bookmarks_index_out_of_range_\(modelType.rawValue)"
-        case .saveFailed(let modelType): return "bookmarks_view_model_save_failed_\(modelType.rawValue)"
-        case .missingParent(let objectType): return "bookmark_model_missing_parent_\(objectType.rawValue)"
+
+        case .missingParent: return "bookmark_missing_parent"
+        case .bookmarksSaveFailed: return "bookmarks_save_failed"
+        case .bookmarksSaveFailedOnImport: return "bookmarks_save_failed_on_import"
 
         case .bookmarksCouldNotLoadDatabase: return "bookmarks_could_not_load_database"
         case .bookmarksCouldNotPrepareDatabase: return "bookmarks_could_not_prepare_database"

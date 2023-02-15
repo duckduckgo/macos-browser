@@ -203,10 +203,10 @@ extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
     private func handle(_ action: BookmarksBarViewModel.BookmarksBarItemAction, for bookmark: Bookmark) {
         switch action {
         case .openInNewTab:
-            guard let url = bookmark.urlObject else { return } //TODO: error?
+            guard let url = bookmark.urlObject else { return }
             tabCollectionViewModel.appendNewTab(with: .url(url), selected: true)
         case .openInNewWindow:
-            guard let url = bookmark.urlObject else { return } //TODO: error?
+            guard let url = bookmark.urlObject else { return }
             WindowsManager.openNewWindow(with: url)
         case .clickItem:
             WindowControllersManager.shared.open(bookmark: bookmark)
@@ -221,7 +221,7 @@ extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
         case .moveToEnd:
             bookmarkManager.move(objectUUIDs: [bookmark.id], toIndex: nil, withinParentFolder: .root) { _ in }
         case .copyURL:
-            guard let url = bookmark.urlObject else { return } //TODO: error?
+            guard let url = bookmark.urlObject else { return }
             NSPasteboard.general.copy(url: url)
         case .deleteEntity:
             bookmarkManager.remove(bookmark: bookmark)
