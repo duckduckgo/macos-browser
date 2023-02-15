@@ -91,7 +91,7 @@ jobs:
       run: echo "asana_task_url_arg=-a ${{ github.event.inputs.asana-task-url }}" >> $GITHUB_ENV
 
     - name: Select Xcode
-      run: sudo xcode-select -s /Applications/Xcode_14.1.app/Contents/Developer
+      run: sudo xcode-select -s /Applications/Xcode_$(<.xcode-version).app/Contents/Developer
 
     - name: Archive and notarize the app
       env:
