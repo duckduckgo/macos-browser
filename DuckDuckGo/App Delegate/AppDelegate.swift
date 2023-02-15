@@ -61,6 +61,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     var appUsageActivityMonitor: AppUsageActivityMonitor?
 
+    // swiftlint:disable:next function_body_length
     func applicationWillFinishLaunching(_ notification: Notification) {
         if !Self.isRunningTests {
 #if DEBUG

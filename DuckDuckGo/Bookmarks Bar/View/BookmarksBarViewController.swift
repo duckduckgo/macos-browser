@@ -200,6 +200,7 @@ extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
         bookmarksBarCollectionView.reloadData()
     }
 
+    // swiftlint:disable:next cyclomatic_complexity
     private func handle(_ action: BookmarksBarViewModel.BookmarksBarItemAction, for bookmark: Bookmark) {
         switch action {
         case .openInNewTab:

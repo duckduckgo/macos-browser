@@ -52,7 +52,7 @@ final class BookmarksBarCollectionViewItem: NSCollectionViewItem {
     }
 
     private enum EntityType {
-        case bookmark(title: String, url: URL, favicon: NSImage?, isFavorite: Bool)
+        case bookmark(title: String, url: String, favicon: NSImage?, isFavorite: Bool)
         case folder(title: String)
 
         var isFolder: Bool {
@@ -90,7 +90,7 @@ final class BookmarksBarCollectionViewItem: NSCollectionViewItem {
             favicon?.size = NSSize.faviconSize
 
             self.entityType = .bookmark(title: bookmark.title,
-                                        url: bookmark.urlObject ?? URL(string: "https://duckduckgo.com")!, //TODO: error, tweak this
+                                        url: bookmark.url,
                                         favicon: favicon,
                                         isFavorite: bookmark.isFavorite)
         } else if let folder = entity as? BookmarkFolder {
@@ -108,7 +108,8 @@ final class BookmarksBarCollectionViewItem: NSCollectionViewItem {
 
         switch entityType {
         case .bookmark(_, let url, let storedFavicon, _):
-            let favicon = storedFavicon ?? FaviconManager.shared.getCachedFavicon(for: url.host ?? "", sizeCategory: .small)?.image
+            let host = URL(string: url)?.host ?? ""
+            let favicon = storedFavicon ?? FaviconManager.shared.getCachedFavicon(for: host, sizeCategory: .small)?.image
             faviconView.image = favicon ?? NSImage(named: "Bookmark")
         case .folder:
             faviconView.image = NSImage(named: "Folder-16")
