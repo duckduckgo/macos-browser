@@ -135,7 +135,7 @@ final class Bookmark: BaseBookmarkEntity {
     let url: String
     var isFavorite: Bool
     private(set) var parentFolderUUID: String?
-    
+
     public var urlObject: URL? {
         return url.isBookmarklet() ? url.toEncodedBookmarklet() : URL(string: url)
     }

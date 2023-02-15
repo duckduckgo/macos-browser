@@ -114,7 +114,7 @@ final class LocalBookmarkManager: BookmarkManager {
     func getBookmark(for url: URL) -> Bookmark? {
         return list?[url.absoluteString]
     }
-    
+
     func getBookmark(forUrl url: String) -> Bookmark? {
         return list?[url]
     }

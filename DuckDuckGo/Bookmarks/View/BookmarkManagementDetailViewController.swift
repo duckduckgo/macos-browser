@@ -381,10 +381,8 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
             return .none
         }
 
-        for folderID in draggedFolders.map(\.id) {
-            if !bookmarkManager.canMoveObjectWithUUID(objectUUID: folderID, to: destinationFolder) {
-                return .none
-            }
+        for folderID in draggedFolders.map(\.id) where !bookmarkManager.canMoveObjectWithUUID(objectUUID: folderID, to: destinationFolder) {
+            return .none
         }
 
         let tryingToDragOntoSameFolder = draggedFolders.contains { folder in
