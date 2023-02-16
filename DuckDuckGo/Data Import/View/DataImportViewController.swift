@@ -545,14 +545,16 @@ extension NSPopUpButton {
         }
     }
 
+    /// Provides a safe way to extract the selected import source item from an `NSPopUpButton`. A pop up button can include a separator at the top, so the fallback logic of treating the first item as
+    /// selected means it's possible to get a separator as the selected import source. This function will check that the title is not empty and that the preferred index exists when checking for
+    /// the selected item, and will check subsequent items if the non-empty title condition is not met.
     fileprivate func selectedImportSourceItem(withPreferredIndex index: Int) -> NSMenuItem? {
         guard !itemArray.isEmpty, index != NSNotFound else {
             assertionFailure("Failed to select an import source item")
             return nil
         }
 
-        let itemsToConsider = itemArray[index...]
-        return itemsToConsider.first { !$0.title.isEmpty }
+        return itemArray[index...].first { !$0.title.isEmpty }
     }
 
 }
