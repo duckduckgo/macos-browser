@@ -23,10 +23,15 @@ extension EmailUrls {
 
     private struct Url {
         static let emailProtectionLink = "https://duckduckgo.com/email"
+        static let emailProtectionIncontextSignupLink = "https://abrown.duckduckgo.com/email/start-incontext"
     }
 
     var emailProtectionLink: URL {
         return URL(string: Url.emailProtectionLink)!
+    }
+
+    var emailProtectionIncontextSignupLink: URL {
+        return URL(string: Url.emailProtectionIncontextSignupLink)!
     }
 
     func isDuckDuckGoEmailProtection(url: URL) -> Bool {
