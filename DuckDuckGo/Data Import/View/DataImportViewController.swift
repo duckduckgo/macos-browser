@@ -176,10 +176,13 @@ final class DataImportViewController: NSViewController {
     }
 
     private func refreshViewState() {
-        let selectedItemIndex = importSourcePopUpButton.indexOfSelectedItem
-        let item = self.importSourcePopUpButton.selectedImportSourceItem(withPreferredIndex: selectedItemIndex)
+        guard let item = self.importSourcePopUpButton.selectedImportSourceItem(withPreferredIndex: importSourcePopUpButton.indexOfSelectedItem) else {
+            assertionFailure("Failed to get valid import source item")
+            return
+        }
+
         let validSources = DataImport.Source.allCases.filter(\.canImportData)
-        let source = validSources.first(where: { $0.importSourceName == item?.title })!
+        let source = validSources.first(where: { $0.importSourceName == item.title })!
 
         switch source {
         case .csv, .lastPass, .onePassword, .bookmarksHTML:
