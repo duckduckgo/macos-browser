@@ -1099,7 +1099,7 @@ extension Tab: WKNavigationDelegate {
                  completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
 
         if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodHTTPBasic {
-            // send this event only when we're interrupting loading and show extra UI to the user
+            // send this event only when we're interrupting loading and showing extra UI to the user
             webViewDidReceiveUserInteractiveChallengePublisher.send()
 
             let dialog = UserDialogType.basicAuthenticationChallenge(.init(challenge.protectionSpace) { result in
