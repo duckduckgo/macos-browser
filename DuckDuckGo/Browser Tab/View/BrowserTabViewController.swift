@@ -245,7 +245,7 @@ final class BrowserTabViewController: NSViewController {
                 return Publishers.Merge3(
                     tabViewModel.tab.webViewDidCommitNavigationPublisher,
                     tabViewModel.tab.webViewDidFailNavigationPublisher,
-                    tabViewModel.tab.webViewDidReceiveChallengePublisher
+                    tabViewModel.tab.webViewDidReceiveUserInteractiveChallengePublisher
                 )
                 .prefix(1)
                 .eraseToAnyPublisher()
