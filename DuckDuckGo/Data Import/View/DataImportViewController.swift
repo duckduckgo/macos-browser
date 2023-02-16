@@ -177,7 +177,7 @@ final class DataImportViewController: NSViewController {
 
     private func refreshViewState() {
         guard let item = self.importSourcePopUpButton.selectedImportSourceItem(withPreferredIndex: importSourcePopUpButton.indexOfSelectedItem) else {
-            assertionFailure("Failed to get valid import source item")
+            pixelAssertionFailure("Failed to get valid import source item")
             return
         }
 
