@@ -2,7 +2,7 @@ name: PR Checks
 
 on: 
   push:
-    branches: [ develop, "release/**" ]
+    branches: [ develop, "release/**", "dominik/optimize-gha" ]
   pull_request:
     branches: [ develop, "release/**" ]
 
@@ -60,6 +60,10 @@ jobs:
             flavor: Non-Sandbox
           - active-arch: NO
             flavor: Sandbox
+          - cache-key:
+            flavor: Non-Sandbox
+          - cache-key: sandbox-
+            flavor: Sandbox
 
     runs-on: macos-12
     timeout-minutes: 30
@@ -79,6 +83,14 @@ jobs:
       uses: actions/checkout@v3
       with:
         submodules: recursive
+
+    - name: Cache SPM
+      uses: actions/cache@v3
+      with:
+        path: derived-data/SourcePackages
+        key: ${{ runner.os }}-spm-${{ matrix.cache-key }}${{ hashFiles('DuckDuckGo.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}
+        restore-keys: |
+          ${{ runner.os }}-spm-${{ matrix.cache-key }}
 
     - name: Select Xcode
       run: sudo xcode-select -s /Applications/Xcode_$(<.xcode-version).app/Contents/Developer
