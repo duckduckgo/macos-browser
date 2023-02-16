@@ -104,11 +104,33 @@ final class BrowserTabViewController: NSViewController {
                                                selector: #selector(windowWillClose(_:)),
                                                name: NSWindow.willCloseNotification,
                                                object: self.view.window)
+
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(onDuckDuckGoEmailIncontextSignup),
+                                               name: .emailDidIncontextSignup,
+                                               object: nil)
+
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(onCloseDuckDuckGoEmailProtection),
+                                               name: .emailDidCloseEmailProtection,
+                                               object: nil)
     }
 
     @objc
     private func windowWillClose(_ notification: NSNotification) {
         self.removeWebViewFromHierarchy()
+    }
+
+    @objc
+    private func onDuckDuckGoEmailIncontextSignup(_ notification: Notification) {
+        let tab = Tab(content: .url(EmailUrls().emailProtectionIncontextSignupLink), shouldLoadInBackground: true)
+        tabCollectionViewModel.append(tab: tab)
+    }
+
+    @objc
+    private func onCloseDuckDuckGoEmailProtection(_ notification: Notification) {
+        guard let activeTab = tabCollectionViewModel.selectedTabViewModel?.tab else { return }
+        self.closeTab(activeTab)
     }
 
     private func subscribeToSelectedTabViewModel() {
