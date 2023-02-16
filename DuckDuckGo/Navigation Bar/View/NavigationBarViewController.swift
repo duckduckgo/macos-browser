@@ -61,6 +61,7 @@ final class NavigationBarViewController: NSViewController {
     var addressBarViewController: AddressBarViewController?
 
     private var tabCollectionViewModel: TabCollectionViewModel
+    private let isDisposable: Bool
 
     // swiftlint:disable weak_delegate
     private let goBackButtonMenuDelegate: NavigationButtonMenuDelegate
@@ -84,8 +85,9 @@ final class NavigationBarViewController: NSViewController {
         fatalError("NavigationBarViewController: Bad initializer")
     }
 
-    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel) {
+    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, isDisposable: Bool) {
         self.tabCollectionViewModel = tabCollectionViewModel
+        self.isDisposable = isDisposable
         goBackButtonMenuDelegate = NavigationButtonMenuDelegate(buttonType: .back, tabCollectionViewModel: tabCollectionViewModel)
         goForwardButtonMenuDelegate = NavigationButtonMenuDelegate(buttonType: .forward, tabCollectionViewModel: tabCollectionViewModel)
         super.init(coder: coder)
@@ -148,7 +150,8 @@ final class NavigationBarViewController: NSViewController {
 
     @IBSegueAction func createAddressBarViewController(_ coder: NSCoder) -> AddressBarViewController? {
         guard let addressBarViewController = AddressBarViewController(coder: coder,
-                                                                      tabCollectionViewModel: tabCollectionViewModel) else {
+                                                                      tabCollectionViewModel: tabCollectionViewModel,
+                                                                      isDisposable: isDisposable) else {
             fatalError("NavigationBarViewController: Failed to init AddressBarViewController")
         }
 
@@ -231,6 +234,10 @@ final class NavigationBarViewController: NSViewController {
         }
 
         super.mouseDown(with: event)
+    }
+
+    func setDisposable() {
+
     }
 
     func listenToPasswordManagerNotifications() {

@@ -379,7 +379,8 @@ final class TabBarViewController: NSViewController {
 
         let tab = tabViewModel.tab
         tabCollectionViewModel.remove(at: .unpinned(indexPath.item), published: false)
-        WindowsManager.openNewWindow(with: tab, droppingPoint: droppingPoint)
+        //TODO!
+        WindowsManager.openNewWindow(with: tab, isDisposable: false, droppingPoint: droppingPoint)
     }
 
     // MARK: - Mouse Monitor

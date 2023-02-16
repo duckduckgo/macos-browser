@@ -530,9 +530,11 @@ extension BrowserTabViewController: TabDelegate {
     func tab(_ parentTab: Tab, createdChild childTab: Tab, of kind: NewWindowPolicy) {
         switch kind {
         case .popup(size: let windowContentSize):
-            WindowsManager.openPopUpWindow(with: childTab, contentSize: windowContentSize)
+            //TODO!
+            WindowsManager.openPopUpWindow(with: childTab, isDisposable: false, contentSize: windowContentSize)
         case .window(active: let active):
-            WindowsManager.openNewWindow(with: childTab, showWindow: active)
+            //TODO!
+            WindowsManager.openNewWindow(with: childTab, isDisposable: false, showWindow: active)
         case .tab(selected: let selected):
             self.tabCollectionViewModel.insert(childTab, after: parentTab, selected: selected)
         }

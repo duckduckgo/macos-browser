@@ -52,6 +52,8 @@ final class TabCollectionViewModel: NSObject {
         (pinnedTabsCollection?.tabs.count ?? 0) + tabCollection.tabs.count
     }
 
+    let isDisposable: Bool
+
     var changesEnabled = true
 
     private(set) var pinnedTabsManager: PinnedTabsManager?
@@ -90,10 +92,12 @@ final class TabCollectionViewModel: NSObject {
     init(
         tabCollection: TabCollection,
         selectionIndex: Int = 0,
-        pinnedTabsManager: PinnedTabsManager? = WindowControllersManager.shared.pinnedTabsManager
+        pinnedTabsManager: PinnedTabsManager? = WindowControllersManager.shared.pinnedTabsManager,
+        isDisposable: Bool
     ) {
         self.tabCollection = tabCollection
         self.pinnedTabsManager = pinnedTabsManager
+        self.isDisposable = isDisposable
         super.init()
 
         subscribeToTabs()
@@ -105,9 +109,9 @@ final class TabCollectionViewModel: NSObject {
         self.selectionIndex = .unpinned(selectionIndex)
     }
 
-    convenience override init() {
+    convenience init(isDisposable: Bool) {
         let tabCollection = TabCollection()
-        self.init(tabCollection: tabCollection)
+        self.init(tabCollection: tabCollection, isDisposable: isDisposable)
     }
 
     func setUpLazyLoadingIfNeeded() {

@@ -165,7 +165,8 @@ final class RecentlyClosedCoordinator: RecentlyClosedCoordinating {
         } else {
             // There is no window available, create a new one
             let tab = Tab(content: recentlyClosedTab.tabContent, shouldLoadInBackground: true)
-            WindowsManager.openNewWindow(with: tab)
+            //TODO!
+            WindowsManager.openNewWindow(with: tab, isDisposable: false)
             return
         }
 
@@ -177,7 +178,8 @@ final class RecentlyClosedCoordinator: RecentlyClosedCoordinating {
         var lastKeyMainWindowController = WindowControllersManager.shared.lastKeyMainWindowController
         if lastKeyMainWindowController == nil {
             // Create a new window if none exists
-            WindowsManager.openNewWindow(with: Tab(content: .homePage, shouldLoadInBackground: true))
+            //TODO!
+            WindowsManager.openNewWindow(with: Tab(content: .homePage, shouldLoadInBackground: true), isDisposable: false)
             lastKeyMainWindowController = WindowControllersManager.shared.lastKeyMainWindowController
         }
 
@@ -197,7 +199,9 @@ final class RecentlyClosedCoordinator: RecentlyClosedCoordinating {
             let tab = Tab(content: recentlyClosedTab.tabContent, title: recentlyClosedTab.title, favicon: recentlyClosedTab.favicon, shouldLoadInBackground: false)
             tabCollection.append(tab: tab)
         }
+        //TODO!
         WindowsManager.openNewWindow(with: tabCollection,
+                                     isDisposable: false,
                                      droppingPoint: recentlyClosedWindow.droppingPoint,
                                      contentSize: recentlyClosedWindow.contentSize)
         cache.removeAll(where: { $0 === recentlyClosedWindow })

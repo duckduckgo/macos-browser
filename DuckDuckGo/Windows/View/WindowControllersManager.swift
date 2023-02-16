@@ -117,7 +117,8 @@ extension WindowControllersManager {
     /// Opens a bookmark in a tab, respecting the current modifier keys when deciding where to open the bookmark's URL.
     func open(bookmark: Bookmark) {
         if NSApplication.shared.isCommandPressed && NSApplication.shared.isShiftPressed {
-            WindowsManager.openNewWindow(with: bookmark.url)
+            //TODO!
+            WindowsManager.openNewWindow(with: bookmark.url, isDisposable: false)
         } else if mainWindowController?.mainViewController.view.window?.isPopUpWindow ?? false {
             show(url: bookmark.url, newTab: true)
         } else if NSApplication.shared.isCommandPressed {
@@ -167,9 +168,11 @@ extension WindowControllersManager {
 
         // Open a new window
         if let url = url {
-            WindowsManager.openNewWindow(with: url)
+            //TODO!
+            WindowsManager.openNewWindow(with: url, isDisposable: false)
         } else {
-            WindowsManager.openNewWindow()
+            //TODO!
+            WindowsManager.openNewWindow(isDisposable: false)
         }
     }
 

@@ -300,7 +300,8 @@ extension BookmarkListViewController: BookmarkMenuItemSelectors {
             return
         }
 
-        WindowsManager.openNewWindow(with: bookmark.url)
+        //TODO!
+        WindowsManager.openNewWindow(with: bookmark.url, isDisposable: false)
     }
 
     func toggleBookmarkAsFavorite(_ sender: NSMenuItem) {

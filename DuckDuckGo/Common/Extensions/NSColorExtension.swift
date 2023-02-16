@@ -36,6 +36,18 @@ extension NSColor {
         NSColor(named: "AddressBarBackgroundColor")!
     }
 
+    static var disposableAddressBarBackgroundColor: NSColor {
+        NSColor(named: "DisposableAddressBarBackgroundColor")!
+    }
+
+    static var disposableAddressBarFocusedBackgroundColor: NSColor {
+        NSColor(named: "DisposableAddressBarBackgroundColor")!
+    }
+
+    static var disposableAccentColor: NSColor {
+        NSColor(named: "DisposableAccentColor")!
+    }
+
     static var addressBarBorderColor: NSColor {
         NSColor(named: "AddressBarBorderColor")!
     }
@@ -64,6 +76,10 @@ extension NSColor {
 
     static var inactiveSearchBarBackground: NSColor {
         NSColor(named: "InactiveSearchBarBackground")!
+    }
+
+    static var disposableInactiveSearchBarBackground: NSColor {
+        NSColor(named: "DisposableInactiveSearchBarBackground")!
     }
 
     static var suggestionTextColor: NSColor {

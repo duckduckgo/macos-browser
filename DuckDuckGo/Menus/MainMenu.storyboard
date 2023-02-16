@@ -78,6 +78,11 @@
                                                 <action selector="newWindow:" target="Ady-hI-5gd" id="nK2-0w-B4c"/>
                                             </connections>
                                         </menuItem>
+                                        <menuItem title="New Disposable Window" keyEquivalent="N" id="fx4-EK-KRg">
+                                            <connections>
+                                                <action selector="newDisposableWindow:" target="Ady-hI-5gd" id="vLy-E3-sFd"/>
+                                            </connections>
+                                        </menuItem>
                                         <menuItem title="New Tab" keyEquivalent="t" id="9qI-62-tsd" userLabel="New Tab">
                                             <connections>
                                                 <action selector="newTab:" target="Ady-hI-5gd" id="Gnb-ML-joG"/>
@@ -817,6 +822,7 @@ CQ
                             <outlet property="importBookmarksMenuItem" destination="tNX-Bv-yM3" id="NI1-on-lCU"/>
                             <outlet property="importBrowserDataMenuItem" destination="gTV-od-6G5" id="2R0-Pa-qG4"/>
                             <outlet property="manageBookmarksMenuItem" destination="BaO-sP-wbQ" id="rn7-HX-04s"/>
+                            <outlet property="newDisposableWindowMenuItem" destination="fx4-EK-KRg" id="52V-eM-hzi"/>
                             <outlet property="newTabMenuItem" destination="9qI-62-tsd" id="6SI-rG-P34"/>
                             <outlet property="newWindowMenuItem" destination="Was-JA-tGl" id="uyQ-qR-DFk"/>
                             <outlet property="openLocationMenuItem" destination="xnU-dQ-JR1" id="DYS-Dt-ydU"/>

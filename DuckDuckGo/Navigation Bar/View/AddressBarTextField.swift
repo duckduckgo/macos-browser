@@ -35,6 +35,7 @@ final class AddressBarTextField: NSTextField {
     var tabCollectionViewModel: TabCollectionViewModel! {
         didSet {
             subscribeToSelectedTabViewModel()
+            updateAppearance()
         }
     }
 
@@ -150,6 +151,12 @@ final class AddressBarTextField: NSTextField {
         }
 
         selectedTabViewModel.lastAddressBarTextFieldValue = value
+    }
+
+    private func updateAppearance() {
+        if isDisposable {
+            appearance = NSAppearance(named: .darkAqua)
+        }
     }
 
     private func restoreValueIfPossible() {
@@ -419,7 +426,7 @@ final class AddressBarTextField: NSTextField {
 
             if let suffix = suffix {
                 let attributedString = NSMutableAttributedString(string: value.string, attributes: makeTextAttributes())
-                attributedString.append(suffix.toAttributedString(size: isHomePage ? 15 : 13))
+                attributedString.append(suffix.toAttributedString(size: isHomePage ? 15 : 13, isDisposable: isDisposable))
                 attributedStringValue = attributedString
             } else {
                 self.stringValue = value.string
@@ -433,6 +440,10 @@ final class AddressBarTextField: NSTextField {
 
     var isHomePage: Bool {
         tabCollectionViewModel.selectedTabViewModel?.tab.content == .homePage
+    }
+
+    var isDisposable: Bool {
+        tabCollectionViewModel.isDisposable
     }
 
     func makeTextAttributes() -> [NSAttributedString.Key: Any] {
@@ -494,9 +505,10 @@ final class AddressBarTextField: NSTextField {
         case url(URL)
         case title(String)
 
-        func toAttributedString(size: CGFloat) -> NSAttributedString {
+        func toAttributedString(size: CGFloat, isDisposable: Bool) -> NSAttributedString {
+            let suffixColor = isDisposable ? NSColor.disposableAccentColor : NSColor.addressBarSuffixColor
             let attrs = [NSAttributedString.Key.font: NSFont.systemFont(ofSize: size, weight: .light),
-                         .foregroundColor: NSColor.addressBarSuffixColor]
+                         .foregroundColor: suffixColor]
             return NSAttributedString(string: string, attributes: attrs)
         }
 
@@ -609,6 +621,7 @@ final class AddressBarTextField: NSTextField {
     }
 
     private func showSuggestionWindow() {
+        guard !isDisposable else { return }
         guard let window = window, let suggestionWindow = suggestionWindowController?.window else {
             os_log("AddressBarTextField: Window not available", type: .error)
             return

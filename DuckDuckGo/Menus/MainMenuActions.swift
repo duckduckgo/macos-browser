@@ -37,15 +37,22 @@ extension AppDelegate {
     // MARK: - File
 
     @IBAction func newWindow(_ sender: Any?) {
-        WindowsManager.openNewWindow()
+        //TODO!
+        WindowsManager.openNewWindow(isDisposable: false)
+    }
+
+    @IBAction func newDisposableWindow(_ sender: Any?) {
+        WindowsManager.openNewWindow(isDisposable: true)
     }
 
     @IBAction func newTab(_ sender: Any?) {
-        WindowsManager.openNewWindow()
+        //TODO!
+        WindowsManager.openNewWindow(isDisposable: false)
     }
 
     @IBAction func openLocation(_ sender: Any?) {
-        WindowsManager.openNewWindow()
+        //TODO!
+        WindowsManager.openNewWindow(isDisposable: false)
     }
 
     @IBAction func closeAllWindows(_ sender: Any?) {
@@ -75,11 +82,14 @@ extension AppDelegate {
             return
         }
 
-        WindowsManager.openNewWindow(with: Tab(content: .contentFromURL(url), shouldLoadInBackground: true))
+        //TODO!
+        WindowsManager.openNewWindow(with: Tab(content: .contentFromURL(url), shouldLoadInBackground: true), isDisposable: false)
     }
 
     @objc func clearAllHistory(_ sender: NSMenuItem) {
-        guard let window = WindowsManager.openNewWindow(with: Tab(content: .homePage, shouldLoadInBackground: false)),
+        //TODO!
+        guard let window = WindowsManager.openNewWindow(with: Tab(content: .homePage, shouldLoadInBackground: false),
+                                                        isDisposable: false),
               let windowController = window.windowController as? MainWindowController else {
             assertionFailure("No reference to main window controller")
             return
@@ -89,7 +99,9 @@ extension AppDelegate {
     }
 
     @objc func clearThisHistory(_ sender: ClearThisHistoryMenuItem) {
-        guard let window = WindowsManager.openNewWindow(with: Tab(content: .homePage, shouldLoadInBackground: false)),
+        //TODO!
+        guard let window = WindowsManager.openNewWindow(with: Tab(content: .homePage, shouldLoadInBackground: false),
+                                                        isDisposable: false),
               let windowController = window.windowController as? MainWindowController else {
             assertionFailure("No reference to main window controller")
             return
@@ -126,19 +138,24 @@ extension AppDelegate {
         }
 
         let tab = Tab(content: .url(bookmark.url), shouldLoadInBackground: true)
-        WindowsManager.openNewWindow(with: tab)
+        //TODO!
+        WindowsManager.openNewWindow(with: tab, isDisposable: false)
     }
 
     @IBAction func showManageBookmarks(_ sender: Any?) {
         let tabCollection = TabCollection(tabs: [Tab(content: .bookmarks, shouldLoadInBackground: false)])
-        let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection)
-        WindowsManager.openNewWindow(with: tabCollectionViewModel)
+        //TODO!
+        let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection, isDisposable: false)
+        //TODO!
+        WindowsManager.openNewWindow(with: tabCollectionViewModel, isDisposable: false)
     }
 
     @IBAction func openPreferences(_ sender: Any?) {
         let tabCollection = TabCollection(tabs: [Tab(content: .anyPreferencePane, shouldLoadInBackground: false)])
-        let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection)
-        WindowsManager.openNewWindow(with: tabCollectionViewModel)
+        //TODO!
+        let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection, isDisposable: false)
+        //TODO!
+        WindowsManager.openNewWindow(with: tabCollectionViewModel, isDisposable: false)
     }
 
     @IBAction func openAbout(_ sender: Any?) {
@@ -319,7 +336,8 @@ extension MainViewController {
             if let vc = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.navigationBarViewController {
                 navigationBarViewController = vc
             } else {
-                WindowsManager.openNewWindow(with: Tab(content: .homePage, shouldLoadInBackground: false))
+                //TODO!
+                WindowsManager.openNewWindow(with: Tab(content: .homePage, shouldLoadInBackground: false), isDisposable: false)
                 guard let wc = WindowControllersManager.shared.mainWindowControllers.first(where: { $0.window?.isPopUpWindow == false }) else {
                     return
                 }
@@ -509,7 +527,8 @@ extension MainViewController {
 
         let tab = selectedTabViewModel.tab
         tabCollectionViewModel.removeSelected()
-        WindowsManager.openNewWindow(with: tab)
+        //TODO!
+        WindowsManager.openNewWindow(with: tab, isDisposable: false)
     }
 
     @IBAction func pinOrUnpinTab(_ sender: Any?) {

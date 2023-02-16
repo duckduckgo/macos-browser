@@ -146,7 +146,8 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
 
         if let bookmark = entity as? Bookmark {
             if NSApplication.shared.isCommandPressed && NSApplication.shared.isShiftPressed {
-                WindowsManager.openNewWindow(with: bookmark.url)
+                //TODO!
+                WindowsManager.openNewWindow(with: bookmark.url, isDisposable: false)
             } else if NSApplication.shared.isCommandPressed {
                 WindowControllersManager.shared.show(url: bookmark.url, newTab: true)
             } else {
@@ -649,7 +650,8 @@ extension BookmarkManagementDetailViewController: BookmarkMenuItemSelectors {
             return
         }
 
-        WindowsManager.openNewWindow(with: bookmark.url)
+        //TODO!
+        WindowsManager.openNewWindow(with: bookmark.url, isDisposable: false)
     }
 
     func toggleBookmarkAsFavorite(_ sender: NSMenuItem) {

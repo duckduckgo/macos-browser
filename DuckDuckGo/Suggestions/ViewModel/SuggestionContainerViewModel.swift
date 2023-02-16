@@ -24,11 +24,13 @@ import BrowserServicesKit
 final class SuggestionContainerViewModel {
 
     var isHomePage: Bool
+    let isDisposable: Bool
     let suggestionContainer: SuggestionContainer
     private var suggestionResultCancellable: AnyCancellable?
 
-    init(isHomePage: Bool, suggestionContainer: SuggestionContainer) {
+    init(isHomePage: Bool, isDisposable: Bool, suggestionContainer: SuggestionContainer) {
         self.isHomePage = isHomePage
+        self.isDisposable = isDisposable
         self.suggestionContainer = suggestionContainer
         subscribeToSuggestionResult()
     }
@@ -87,6 +89,8 @@ final class SuggestionContainerViewModel {
         guard userStringValue.lowercased() != oldValue?.lowercased() else { return }
 
         self.isTopSuggestionSelectionExpected = userAppendedStringToTheEnd && !userStringValue.contains(" ")
+
+        guard !isDisposable else { return }
         suggestionContainer.getSuggestions(for: userStringValue)
     }
 

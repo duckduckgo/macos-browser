@@ -31,7 +31,9 @@ extension TabCollectionViewModel: NSSecureCoding {
             return nil
         }
         let index = coder.decodeIfPresent(at: NSSecureCodingKeys.selectionIndex) ?? 0
-        self.init(tabCollection: tabCollection, selectionIndex: index)
+        // Disposable tabs aren't stored
+        let isDisposable = false
+        self.init(tabCollection: tabCollection, selectionIndex: index, isDisposable: isDisposable)
     }
 
     func encode(with coder: NSCoder) {

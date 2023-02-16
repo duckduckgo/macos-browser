@@ -53,6 +53,8 @@ final class MainViewController: NSViewController {
     private var mouseNavButtonsMonitor: Any?
     private var windowTitleCancellable: AnyCancellable?
 
+    private let isDisposable: Bool
+
     private var bookmarksBarIsVisible: Bool {
         return bookmarksBarViewController.parent != nil
     }
@@ -62,12 +64,15 @@ final class MainViewController: NSViewController {
     }
 
     required init?(coder: NSCoder) {
-        self.tabCollectionViewModel = TabCollectionViewModel()
+        let isDisposable = false
+        self.tabCollectionViewModel = TabCollectionViewModel(isDisposable: isDisposable)
+        self.isDisposable = isDisposable
         super.init(coder: coder)
     }
 
-    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel) {
+    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, isDisposable: Bool) {
         self.tabCollectionViewModel = tabCollectionViewModel
+        self.isDisposable = isDisposable
         super.init(coder: coder)
     }
 
@@ -146,7 +151,7 @@ final class MainViewController: NSViewController {
 
     @IBSegueAction
     func createNavigationBarViewController(coder: NSCoder, sender: Any?, segueIdentifier: String?) -> NavigationBarViewController? {
-        guard let navigationBarViewController = NavigationBarViewController(coder: coder, tabCollectionViewModel: tabCollectionViewModel) else {
+        guard let navigationBarViewController = NavigationBarViewController(coder: coder, tabCollectionViewModel: tabCollectionViewModel, isDisposable: isDisposable) else {
             fatalError("MainViewController: Failed to init NavigationBarViewController")
         }
 

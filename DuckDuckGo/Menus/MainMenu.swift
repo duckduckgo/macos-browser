@@ -34,6 +34,7 @@ final class MainMenu: NSMenu {
 
     // MARK: - File
     @IBOutlet weak var newWindowMenuItem: NSMenuItem!
+    @IBOutlet weak var newDisposableWindowMenuItem: NSMenuItem!
     @IBOutlet weak var newTabMenuItem: NSMenuItem!
     @IBOutlet weak var openLocationMenuItem: NSMenuItem!
     @IBOutlet weak var closeWindowMenuItem: NSMenuItem!

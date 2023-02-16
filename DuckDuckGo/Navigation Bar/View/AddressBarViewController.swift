@@ -36,6 +36,7 @@ final class AddressBarViewController: NSViewController {
 
     private let tabCollectionViewModel: TabCollectionViewModel
     private let suggestionContainerViewModel: SuggestionContainerViewModel
+    private let isDisposable: Bool
 
     enum Mode: Equatable {
         case editing(isUrl: Bool)
@@ -80,11 +81,13 @@ final class AddressBarViewController: NSViewController {
         fatalError("AddressBarViewController: Bad initializer")
     }
 
-    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel) {
+    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, isDisposable: Bool) {
         self.tabCollectionViewModel = tabCollectionViewModel
         self.suggestionContainerViewModel = SuggestionContainerViewModel(
             isHomePage: tabCollectionViewModel.selectedTabViewModel?.tab.content == .homePage,
+            isDisposable: isDisposable,
             suggestionContainer: SuggestionContainer())
+        self.isDisposable = isDisposable
 
         super.init(coder: coder)
     }
@@ -100,6 +103,7 @@ final class AddressBarViewController: NSViewController {
         addressBarTextField.tabCollectionViewModel = tabCollectionViewModel
         subscribeToSelectedTabViewModel()
         registerForMouseEnteredAndExitedEvents()
+        updateAppearance()
     }
 
     override func viewWillAppear() {
@@ -172,7 +176,9 @@ final class AddressBarViewController: NSViewController {
     }
 
     @IBSegueAction func createAddressBarButtonsViewController(_ coder: NSCoder) -> AddressBarButtonsViewController? {
-        let controller = AddressBarButtonsViewController(coder: coder, tabCollectionViewModel: tabCollectionViewModel)
+        let controller = AddressBarButtonsViewController(coder: coder,
+                                                         tabCollectionViewModel: tabCollectionViewModel,
+                                                         isDisposable: isDisposable)
 
         self.addressBarButtonsViewController = controller
         controller?.delegate = self
@@ -283,8 +289,17 @@ final class AddressBarViewController: NSViewController {
         let isKey = self.view.window?.isKeyWindow ?? false
         activeOuterBorderView.alphaValue = isKey && isFirstResponder && isHomePage ? 1 : 0
 
-        activeOuterBorderView.layer?.backgroundColor = NSColor.controlAccentColor.withAlphaComponent(0.2).cgColor
-        activeBackgroundView.layer?.borderColor = NSColor.controlAccentColor.withAlphaComponent(0.8).cgColor
+        updateActiveViews()
+        refreshAddressBarAppearance(self)
+    }
+
+    private func updateActiveViews() {
+        let accentColor = isDisposable ? NSColor.disposableAccentColor : NSColor.controlAccentColor
+        activeOuterBorderView.layer?.backgroundColor = accentColor.withAlphaComponent(0.2).cgColor
+        activeBackgroundView.layer?.borderColor = isDisposable ? accentColor.cgColor : accentColor.withAlphaComponent(0.8).cgColor
+        activeBackgroundView.layer?.borderWidth = 2.0
+
+        inactiveBackgroundView.layer?.backgroundColor = isDisposable ? NSColor.disposableInactiveSearchBarBackground.cgColor : NSColor.inactiveSearchBarBackground.cgColor
     }
 
     private func updateShadowViewPresence(_ isFirstResponder: Bool) {
@@ -307,6 +322,12 @@ final class AddressBarViewController: NSViewController {
         activeOuterBorderView.isHidden = isSuggestionsWindowVisible
         activeBackgroundView.isHidden = isSuggestionsWindowVisible
         activeBackgroundViewWithSuggestions.isHidden = !isSuggestionsWindowVisible
+    }
+
+    private func updateAppearance() {
+        if isDisposable {
+            passiveTextField.appearance = NSAppearance(named: .darkAqua)
+        }
     }
 
     private func layoutShadowView() {
@@ -337,15 +358,22 @@ final class AddressBarViewController: NSViewController {
 
         NSAppearance.withAppAppearance {
             if window.isKeyWindow {
-                activeBackgroundView.layer?.borderWidth = 2.0
-                activeBackgroundView.layer?.borderColor = NSColor.controlAccentColor.withAlphaComponent(0.6).cgColor
-                activeBackgroundView.layer?.backgroundColor = NSColor.addressBarBackgroundColor.cgColor
+                updateActiveViews()
+                if isDisposable {
+                    activeBackgroundView.layer?.backgroundColor = NSColor.disposableAddressBarBackgroundColor.cgColor
+                } else {
+                    activeBackgroundView.layer?.backgroundColor = NSColor.addressBarBackgroundColor.cgColor
+                }
 
                 activeOuterBorderView.isHidden = !isHomePage
             } else {
                 activeBackgroundView.layer?.borderWidth = 0
                 activeBackgroundView.layer?.borderColor = nil
-                activeBackgroundView.layer?.backgroundColor = NSColor.inactiveSearchBarBackground.cgColor
+                if isDisposable {
+                    activeBackgroundView.layer?.backgroundColor = NSColor.disposableInactiveSearchBarBackground.cgColor
+                } else {
+                    activeBackgroundView.layer?.backgroundColor = NSColor.inactiveSearchBarBackground.cgColor
+                }
 
                 activeOuterBorderView.isHidden = true
             }

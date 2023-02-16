@@ -103,7 +103,11 @@ final class MoreOptionsMenu: NSMenu {
     }
 
     @objc func newWindow(_ sender: NSMenuItem) {
-        WindowsManager.openNewWindow()
+        WindowsManager.openNewWindow(isDisposable: false)
+    }
+
+    @objc func newDisposableWindow(_ sender: NSMenuItem) {
+        WindowsManager.openNewWindow(isDisposable: true)
     }
 
     @objc func toggleFireproofing(_ sender: NSMenuItem) {
@@ -172,7 +176,6 @@ final class MoreOptionsMenu: NSMenu {
     }
 
     private func addWindowItems() {
-
         // New Tab
         addItem(withTitle: UserText.plusButtonNewTabMenuItem, action: #selector(newTab(_:)), keyEquivalent: "t")
             .targetting(self)
@@ -183,8 +186,16 @@ final class MoreOptionsMenu: NSMenu {
             .targetting(self)
             .withImage(NSImage(named: "NewWindow"))
 
-        addItem(NSMenuItem.separator())
+        // New Disposable Window
+        let disposableWindowItem = NSMenuItem(title: UserText.newDisposableWindowMenuItem,
+                              action: #selector(newDisposableWindow(_:)),
+                              target: self)
+        disposableWindowItem.keyEquivalent = "n"
+        disposableWindowItem.keyEquivalentModifierMask = [.command, .shift]
+        disposableWindowItem.image = NSImage(named: "NewDisposableWindow")
+        addItem(disposableWindowItem)
 
+        addItem(NSMenuItem.separator())
     }
 
     private func addUtilityItems() {

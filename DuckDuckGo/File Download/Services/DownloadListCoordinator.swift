@@ -23,7 +23,8 @@ import os.log
 private func getFirstAvailableWebView() -> WKWebView? {
     let wcm = WindowControllersManager.shared
     if wcm.lastKeyMainWindowController?.mainViewController.browserTabViewController == nil {
-        WindowsManager.openNewWindow()
+        //TODO!
+        WindowsManager.openNewWindow(isDisposable: false)
     }
 
     guard let tab = wcm.lastKeyMainWindowController?.mainViewController.browserTabViewController.tabViewModel?.tab else {

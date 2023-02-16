@@ -102,6 +102,7 @@ struct UserText {
     static let shareMenuItem = NSLocalizedString("share.menu.item", value: "Share", comment: "Menu item title")
     static let printMenuItem = NSLocalizedString("print.menu.item", value: "Print…", comment: "Menu item title")
     static let newWindowMenuItem = NSLocalizedString("new.window.menu.item", value: "New Window", comment: "Menu item title")
+    static let newDisposableWindowMenuItem = NSLocalizedString("new.disposable.window.menu.item", value: "New Disposable Window", comment: "Menu item title")
 
     static let fireproofSites = NSLocalizedString("fireproof.sites", value: "Fireproof Sites", comment: "Fireproof sites list title")
     static let fireproofCheckboxTitle = NSLocalizedString("fireproof.checkbox.title", value: "Ask to Fireproof websites when signing in", comment: "Fireproof settings checkbox title")
