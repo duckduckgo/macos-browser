@@ -30,6 +30,11 @@ extension WKWebViewConfiguration {
         } else {
             preferences.setValue(true, forKey: "fullScreenEnabled")
         }
+
+        if responds(to: NSSelectorFromString("_processDisplayName")) {
+            setValue("DUCKDUCKGO-REDACTED", forKey: "processDisplayName")
+        }
+
         preferences.setValue(true, forKey: "allowsPictureInPictureMediaPlayback")
         preferences.setValue(true, forKey: "developerExtrasEnabled")
         preferences.setValue(false, forKey: "backspaceKeyNavigationEnabled")
