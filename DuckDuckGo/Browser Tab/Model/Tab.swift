@@ -363,7 +363,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
     // MARK: - Event Publishers
 
-    let webViewDidReceiveChallengePublisher = PassthroughSubject<Void, Never>()
+    let webViewDidReceiveUserInteractiveChallengePublisher = PassthroughSubject<Void, Never>()
     let webViewDidCommitNavigationPublisher = PassthroughSubject<Void, Never>()
     let webViewDidFinishNavigationPublisher = PassthroughSubject<Void, Never>()
     let webViewDidFailNavigationPublisher = PassthroughSubject<Void, Never>()
@@ -1097,9 +1097,11 @@ extension Tab: WKNavigationDelegate {
     func webView(_ webView: WKWebView,
                  didReceive challenge: URLAuthenticationChallenge,
                  completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-        webViewDidReceiveChallengePublisher.send()
 
         if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodHTTPBasic {
+            // send this event only when we're interrupting loading and showing extra UI to the user
+            webViewDidReceiveUserInteractiveChallengePublisher.send()
+
             let dialog = UserDialogType.basicAuthenticationChallenge(.init(challenge.protectionSpace) { result in
                 let (disposition, credential) = (try? result.get()) ?? (nil, nil)
                 completionHandler(disposition ?? .cancelAuthenticationChallenge, credential)
