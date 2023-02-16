@@ -32,7 +32,7 @@ extension WKWebViewConfiguration {
         }
 
         if responds(to: NSSelectorFromString("_processDisplayName")) {
-            setValue("DUCKDUCKGO-REDACTED", forKey: "processDisplayName")
+            setValue("DuckDuckGo Web Content", forKey: "processDisplayName")
         }
 
         preferences.setValue(true, forKey: "allowsPictureInPictureMediaPlayback")
