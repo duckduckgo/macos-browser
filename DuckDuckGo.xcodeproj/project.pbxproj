@@ -7879,7 +7879,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = "$(MARKETING_VERSION)";
 				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser.NetworkProtectionSystemExtension;
 				PRODUCT_NAME = "com.duckduckgo.macos.browser.network-protection.system-extension.extension";
 				SKIP_INSTALL = YES;
@@ -7912,7 +7912,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = "$(MARKETING_VERSION)";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.duckduckgo.macos.browser.network-protection.system-extension.extension";
 				PRODUCT_NAME = "com.duckduckgo.macos.browser.network-protection.system-extension.extension";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -7944,7 +7944,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = "$(MARKETING_VERSION)";
 				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser.NetworkProtectionSystemExtension;
 				PRODUCT_NAME = "com.duckduckgo.macos.browser.network-protection.system-extension.extension";
 				SKIP_INSTALL = YES;
@@ -7976,7 +7976,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = "$(MARKETING_VERSION)";
 				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser.NetworkProtectionSystemExtension;
 				PRODUCT_NAME = "com.duckduckgo.macos.browser.network-protection.system-extension.extension";
 				SKIP_INSTALL = YES;
@@ -8007,7 +8007,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = "$(MARKETING_VERSION)";
 				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser.NetworkProtectionSystemExtension;
 				PRODUCT_NAME = "com.duckduckgo.macos.browser.network-protection.system-extension.extension";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -8040,7 +8040,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = "$(MARKETING_VERSION)";
 				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser.NetworkProtectionSystemExtension;
 				PRODUCT_NAME = "com.duckduckgo.macos.browser.network-protection.system-extension.extension";
 				SKIP_INSTALL = YES;
@@ -8230,7 +8230,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = "$(MARKETING_VERSION)";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.duckduckgo.macos.browser.network-protection.system-extension.extension";
 				PRODUCT_NAME = "com.duckduckgo.macos.browser.network-protection.system-extension.extension";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -8488,7 +8488,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = "$(MARKETING_VERSION)";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.duckduckgo.macos.browser.network-protection.system-extension.extension";
 				PRODUCT_NAME = "com.duckduckgo.macos.browser.network-protection.system-extension.extension";
 				PROVISIONING_PROFILE_SPECIFIER = "";
