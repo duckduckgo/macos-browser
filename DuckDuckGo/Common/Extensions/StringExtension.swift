@@ -47,6 +47,12 @@ extension String {
             .replacingOccurrences(of: "'", with: "\\'")
     }
 
+    init(_ staticString: StaticString) {
+        self = staticString.withUTF8Buffer {
+            String(decoding: $0, as: UTF8.self)
+        }
+    }
+
     // MARK: - URL
 
     var url: URL? {
