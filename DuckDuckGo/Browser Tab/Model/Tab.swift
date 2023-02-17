@@ -159,6 +159,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     func setDelegate(_ delegate: TabDelegate) { self.delegate = delegate }
 
     private let cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter?
+    private let internalUserDecider: InternalUserDeciding?
     let pinnedTabsManager: PinnedTabsManager
     private let privatePlayer: PrivatePlayer
     private let privacyFeatures: AnyPrivacyFeatures
@@ -200,6 +201,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
         let privatePlayer = privatePlayer
             ?? (AppDelegate.isRunningTests ? PrivatePlayer.mock(withMode: .enabled) : PrivatePlayer.shared)
+        let internalUserDecider = (NSApp.delegate as? AppDelegate)?.internalUserDecider
 
         self.init(content: content,
                   faviconManagement: faviconManagement,
@@ -211,6 +213,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                   privatePlayer: privatePlayer,
                   extensionsBuilder: extensionsBuilder,
                   cbaTimeReporter: cbaTimeReporter,
+                  internalUserDecider: internalUserDecider,
                   localHistory: localHistory,
                   title: title,
                   error: error,
@@ -235,6 +238,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
          privatePlayer: PrivatePlayer,
          extensionsBuilder: TabExtensionsBuilderProtocol,
          cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter?,
+         internalUserDecider: InternalUserDeciding?,
          localHistory: Set<String>,
          title: String?,
          error: Error?,
@@ -255,6 +259,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         self.privacyFeatures = privacyFeatures
         self.privatePlayer = privatePlayer
         self.cbaTimeReporter = cbaTimeReporter
+        self.internalUserDecider = internalUserDecider
         self.localHistory = localHistory
         self.title = title
         self.error = error
@@ -282,12 +287,12 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             .map { $0?.userScripts as? UserScripts }
             .eraseToAnyPublisher()
 
-        var userContentControllerProvider: UserContentControllerProvider?
+        let userContentControllerPromise = Future<UserContentControllerProtocol, Never>.promise()
         self.extensions = extensionsBuilder
             .build(with: (tabIdentifier: instrumentation.currentTabIdentifier,
                           userScriptsPublisher: userScriptsPublisher,
                           inheritedAttribution: parentTab?.adClickAttribution?.currentAttributionState,
-                          userContentControllerProvider: {  userContentControllerProvider?() },
+                          userContentControllerFuture: userContentControllerPromise.future,
                           permissionModel: permissions,
                           privacyInfoPublisher: _privacyInfo.projectedValue.eraseToAnyPublisher()
                          ),
@@ -295,7 +300,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                                                        historyCoordinating: historyCoordinating))
 
         super.init()
-        userContentControllerProvider = { [weak self] in self?.userContentController }
+        userContentController.map(userContentControllerPromise.fulfill)
 
         userContentController?.delegate = self
         setupWebView(shouldLoadInBackground: shouldLoadInBackground)
@@ -358,7 +363,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
     // MARK: - Event Publishers
 
-    let webViewDidReceiveChallengePublisher = PassthroughSubject<Void, Never>()
+    let webViewDidReceiveUserInteractiveChallengePublisher = PassthroughSubject<Void, Never>()
     let webViewDidCommitNavigationPublisher = PassthroughSubject<Void, Never>()
     let webViewDidFinishNavigationPublisher = PassthroughSubject<Void, Never>()
     let webViewDidFailNavigationPublisher = PassthroughSubject<Void, Never>()
@@ -1092,9 +1097,11 @@ extension Tab: WKNavigationDelegate {
     func webView(_ webView: WKWebView,
                  didReceive challenge: URLAuthenticationChallenge,
                  completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-        webViewDidReceiveChallengePublisher.send()
 
         if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodHTTPBasic {
+            // send this event only when we're interrupting loading and showing extra UI to the user
+            webViewDidReceiveUserInteractiveChallengePublisher.send()
+
             let dialog = UserDialogType.basicAuthenticationChallenge(.init(challenge.protectionSpace) { result in
                 let (disposition, credential) = (try? result.get()) ?? (nil, nil)
                 completionHandler(disposition ?? .cancelAuthenticationChallenge, credential)
@@ -1386,6 +1393,9 @@ extension Tab: WKNavigationDelegate {
         userEnteredUrl = false // subsequent requests will be navigations
 
         let isSuccessfulResponse = (navigationResponse.response as? HTTPURLResponse)?.validateStatusCode(statusCode: 200..<300) == nil
+
+        internalUserDecider?.markUserAsInternalIfNeeded(forUrl: webView.url,
+                                                        response: navigationResponse.response as? HTTPURLResponse)
 
         if !navigationResponse.canShowMIMEType || navigationResponse.shouldDownload {
             if navigationResponse.isForMainFrame {

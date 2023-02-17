@@ -331,7 +331,7 @@ private extension NSMenuItem {
             if #available(macOS 13.0, *) {
                 return UserText.permissionOpenSystemSettings
             } else {
-                return UserText.permissionOpenSystemPreferences
+                return UserText.openSystemPreferences
             }
         }()
 
