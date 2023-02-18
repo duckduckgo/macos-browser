@@ -8136,7 +8136,7 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				branch = "dominik/sqlcipher-xcframework";
+				branch = "dominik/grdb-xcframework";
 				kind = branch;
 			};
 		};

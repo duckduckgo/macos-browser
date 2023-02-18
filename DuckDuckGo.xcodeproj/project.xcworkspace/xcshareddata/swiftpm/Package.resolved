@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "dominik/sqlcipher-xcframework",
-        "revision" : "f414d8fd933c75480975d04aa9e901d42259209d"
+        "branch" : "dominik/grdb-xcframework",
+        "revision" : "adce59c2e772aba2d12dda33a8940f6bb3e10f51"
       }
     },
     {
@@ -28,12 +28,12 @@
       }
     },
     {
-      "identity" : "grdb.swift",
+      "identity" : "grdb-sqlcipher",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/duckduckgo/GRDB.swift.git",
+      "location" : "https://github.com/ayoy/GRDB-SQLCipher.git",
       "state" : {
-        "branch" : "dominik/xcframework",
-        "revision" : "9734ea578e7902b016efd29825d0463d85533e56"
+        "revision" : "e08b285270bc02366e5be75c2a8ca7420de741f9",
+        "version" : "0.0.1"
       }
     },
     {
@@ -88,15 +88,6 @@
       "state" : {
         "revision" : "9d85a02fe7916caa7531847452c4933d331503a5",
         "version" : "2.3.1"
-      }
-    },
-    {
-      "identity" : "sqlcipher-xcframework",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/ayoy/SQLCipher-XCFramework.git",
-      "state" : {
-        "revision" : "ff249de6a996fa6536b9ca631e5a079b847b0a35",
-        "version" : "0.0.1"
       }
     },
     {

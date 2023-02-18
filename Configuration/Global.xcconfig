@@ -90,3 +90,5 @@ SWIFT_COMPILATION_MODE[config=CI][arch=*][sdk=*] =
 SWIFT_COMPILATION_MODE[config=Debug][arch=*][sdk=*] =
 
 SWIFT_STRICT_CONCURRENCY = targeted;
+
+OTHER_SWIFT_FLAGS = -Xfrontend -warn-long-expression-type-checking=100;
