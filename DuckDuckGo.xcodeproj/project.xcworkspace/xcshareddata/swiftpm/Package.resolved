@@ -6,7 +6,7 @@
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
         "branch" : "dominik/grdb-xcframework",
-        "revision" : "adce59c2e772aba2d12dda33a8940f6bb3e10f51"
+        "revision" : "9593639f8b5aa976d7a737c2a353d04188942bc4"
       }
     },
     {
@@ -28,12 +28,12 @@
       }
     },
     {
-      "identity" : "grdb-sqlcipher",
+      "identity" : "grdb.swift",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/ayoy/GRDB-SQLCipher.git",
+      "location" : "https://github.com/duckduckgo/GRDB.swift.git",
       "state" : {
-        "revision" : "e08b285270bc02366e5be75c2a8ca7420de741f9",
-        "version" : "0.0.1"
+        "revision" : "053d890417cdb587377156bc18f230a2caca8a51",
+        "version" : "2.1.0"
       }
     },
     {
