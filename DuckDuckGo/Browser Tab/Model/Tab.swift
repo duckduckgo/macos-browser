@@ -1191,7 +1191,7 @@ extension Tab: WKNavigationDelegate {
             }
         }
 
-        if navigationAction.request.url != URL(string: "about:blank") {
+        if navigationAction.isTargetingMainFrame {
             webView.customUserAgent = UserAgent.for(navigationAction.request.url)
         }
 
