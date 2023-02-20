@@ -107,10 +107,10 @@ public struct UserDefaultsWrapper<T> {
     private let customUserDefaults: UserDefaults?
 
     var defaults: UserDefaults {
-        customUserDefaults ?? Self.defaults
+        customUserDefaults ?? Self.sharedDefaults
     }
 
-    static var defaults: UserDefaults {
+    static var sharedDefaults: UserDefaults {
 #if DEBUG
         if AppDelegate.isRunningTests,
            let defaults = UserDefaults(suiteName: Bundle.main.bundleIdentifier! + ".tests") {
@@ -150,21 +150,21 @@ public struct UserDefaultsWrapper<T> {
     }
 
     static func clearAll() {
-        let defaults = defaults
+        let defaults = sharedDefaults
         Key.allCases.forEach { key in
             defaults.removeObject(forKey: key.rawValue)
         }
     }
 
     static func clearRemovedKeys() {
-        let defaults = defaults
+        let defaults = sharedDefaults
         RemovedKeys.allCases.forEach { key in
             defaults.removeObject(forKey: key.rawValue)
         }
     }
 
     static func clear(_ key: Key) {
-        defaults.removeObject(forKey: key.rawValue)
+        sharedDefaults.removeObject(forKey: key.rawValue)
     }
 
 }
