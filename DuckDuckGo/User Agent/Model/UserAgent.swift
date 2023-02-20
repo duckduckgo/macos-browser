@@ -82,7 +82,7 @@ enum UserAgent {
 
         // 1) Apply remote user agent configuration
         // (It looks just at the exceptions for now)
-        if isURLPartOfExceptions(url: url) {
+        if isURLPartOfExceptions(url: url, privacyConfig: privacyConfig) {
             return UserAgent.webViewDefault
         }
 
