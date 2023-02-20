@@ -48,4 +48,30 @@ final class UserAgentTests: XCTestCase {
         XCTAssertEqual(userAgent, "ddg_mac/\(appVersion) (\(appID); macOS \(systemVersion))")
     }
 
+    func testWhenURLDomainIsOnRemoteConfigurationExceptionsListThenWebKitDefaultUserAgentIsUsed() {
+        let config = MockPrivacyConfiguration()
+        config.exceptionsList = { _ in
+            [
+                "wikipedia.org",
+                "google.com"
+            ]
+        }
+
+        XCTAssertEqual(UserAgent.for("http://wikipedia.org".url, privacyConfig: config), UserAgent.webViewDefault)
+        XCTAssertEqual(UserAgent.for("https://wikipedia.org".url, privacyConfig: config), UserAgent.webViewDefault)
+        XCTAssertEqual(UserAgent.for("https://en.wikipedia.org/wiki/Duck".url, privacyConfig: config), UserAgent.webViewDefault)
+        XCTAssertEqual(UserAgent.for("https://google.com".url, privacyConfig: config), UserAgent.webViewDefault)
+        XCTAssertEqual(UserAgent.for("https://docs.google.com".url, privacyConfig: config), UserAgent.webViewDefault)
+    }
+
+    func testThatRemoteConfigurationTakesPrecedenceOverLocalConfiguration() {
+        let config = MockPrivacyConfiguration()
+
+        XCTAssertEqual(UserAgent.for("http://duckduckgo.com".url, privacyConfig: config), UserAgent.default)
+
+        config.exceptionsList = { _ in [ "duckduckgo.com" ] }
+
+        XCTAssertEqual(UserAgent.for("http://duckduckgo.com".url, privacyConfig: config), UserAgent.webViewDefault)
+    }
+
 }
