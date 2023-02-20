@@ -1191,7 +1191,9 @@ extension Tab: WKNavigationDelegate {
             }
         }
 
-        webView.customUserAgent = UserAgent.for(navigationAction.request.url)
+        if navigationAction.isTargetingMainFrame {
+            webView.customUserAgent = UserAgent.for(navigationAction.request.url)
+        }
 
         if navigationAction.isTargetingMainFrame, navigationAction.request.mainDocumentURL?.host != lastUpgradedURL?.host {
             lastUpgradedURL = nil
