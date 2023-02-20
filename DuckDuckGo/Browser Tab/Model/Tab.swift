@@ -1392,7 +1392,7 @@ extension Tab: WKNavigationDelegate {
                  decidePolicyFor navigationResponse: WKNavigationResponse) async -> WKNavigationResponsePolicy {
         userEnteredUrl = false // subsequent requests will be navigations
 
-        let isSuccessfulResponse = (navigationResponse.response as? HTTPURLResponse)?.validateStatusCode(statusCode: 200..<300) == nil
+        let isSuccessfulResponse = (navigationResponse.response as? HTTPURLResponse)?.isSuccessfulResponse ?? false
 
         internalUserDecider?.markUserAsInternalIfNeeded(forUrl: webView.url,
                                                         response: navigationResponse.response as? HTTPURLResponse)

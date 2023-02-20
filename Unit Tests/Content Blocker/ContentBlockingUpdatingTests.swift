@@ -32,8 +32,8 @@ class ContentBlockingUpdatingTests: XCTestCase {
     override func setUp() {
         updating = UserContentUpdating(contentBlockerRulesManager: rulesManager,
                                        privacyConfigurationManager: MockPrivacyConfigurationManager(),
-                                       trackerDataManager: TrackerDataManager(etag: DefaultConfigurationStorage.shared.loadEtag(for: .trackerRadar),
-                                                                                                                                              data: DefaultConfigurationStorage.shared.loadData(for: .trackerRadar),
+                                       trackerDataManager: TrackerDataManager(etag: ConfigurationStore.shared.loadEtag(for: .trackerRadar),
+                                                                                                                                              data: ConfigurationStore.shared.loadData(for: .trackerRadar),
                                                                                                                                               embeddedDataProvider: AppTrackerDataSetProvider(),
                                                                                                                                               errorReporting: nil),
                                        configStorage: ConfigurationDownloaderTests.MockStorage(),

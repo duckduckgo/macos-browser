@@ -18,20 +18,11 @@
 
 import Foundation
 import os
+import Configuration
 
-protocol ConfigurationStoring {
+final class ConfigurationStore: ConfigurationStoring {
 
-    func loadData(for: ConfigurationLocation) -> Data?
-    func loadEtag(for: ConfigurationLocation) -> String?
-    func saveData(_ data: Data, for: ConfigurationLocation) throws
-    func saveEtag(_ etag: String, for: ConfigurationLocation) throws
-    func log()
-
-}
-
-final class DefaultConfigurationStorage: ConfigurationStoring {
-
-    private static let fileLocations: [ConfigurationLocation: String] = [
+    private static let fileLocations: [Configuration: String] = [
         .bloomFilterBinary: "smarterEncryption.bin",
         .bloomFilterExcludedDomains: "smarterEncryptionExclusions.json",
         .bloomFilterSpec: "smarterEncryptionSpec.json",
@@ -41,7 +32,7 @@ final class DefaultConfigurationStorage: ConfigurationStoring {
         .FBConfig: "social_ctp_configuration.json"
     ]
 
-    static let shared = DefaultConfigurationStorage()
+    static let shared = ConfigurationStore()
 
     @UserDefaultsWrapper(key: .configStorageTrackerRadarEtag, defaultValue: nil)
     private var trackerRadarEtag: String?
@@ -66,71 +57,52 @@ final class DefaultConfigurationStorage: ConfigurationStoring {
 
     private init() { }
 
-    func loadEtag(for config: ConfigurationLocation) -> String? {
-        switch config {
-        case .bloomFilterSpec:
-            return bloomFilterSpecEtag
-
-        case .bloomFilterBinary:
-            return bloomFilterBinaryEtag
-
-        case .bloomFilterExcludedDomains:
-            return bloomFilterExcludedDomainsEtag
-
-        case .surrogates:
-            return surrogatesEtag
-
-        case .trackerRadar:
-            return trackerRadarEtag
-
-        case .privacyConfiguration:
-            return privacyConfigurationEtag
-
-        case .FBConfig:
-            return FBConfigEtag
+    func loadEtag(for configuration: Configuration) -> String? {
+        switch configuration {
+        case .bloomFilterSpec: return bloomFilterSpecEtag
+        case .bloomFilterBinary: return bloomFilterBinaryEtag
+        case .bloomFilterExcludedDomains: return bloomFilterExcludedDomainsEtag
+        case .surrogates: return surrogatesEtag
+        case .trackerRadar: return trackerRadarEtag
+        case .privacyConfiguration: return privacyConfigurationEtag
+        case .FBConfig: return FBConfigEtag
+        }
+    }
+    
+    func loadEmbeddedEtag(for configuration: Configuration) -> String? {
+        switch configuration {
+        case .trackerRadar: return AppTrackerDataSetProvider.Constants.embeddedDataETag
+        case .privacyConfiguration: return AppPrivacyConfigurationDataProvider.Constants.embeddedDataSHA
+        default: return nil
+        }
+    }
+    
+    func saveEtag(_ etag: String, for configuration: Configuration) throws {
+        switch configuration {
+        case .bloomFilterSpec: bloomFilterSpecEtag = etag
+        case .bloomFilterBinary: bloomFilterBinaryEtag = etag
+        case .bloomFilterExcludedDomains: bloomFilterExcludedDomainsEtag = etag
+        case .surrogates: surrogatesEtag = etag
+        case .trackerRadar: trackerRadarEtag = etag
+        case .privacyConfiguration: privacyConfigurationEtag = etag
+        case .FBConfig: FBConfigEtag = etag
         }
     }
 
-    func saveEtag(_ etag: String, for config: ConfigurationLocation) throws {
-        switch config {
-        case .bloomFilterSpec:
-            bloomFilterSpecEtag = etag
-
-        case .bloomFilterBinary:
-            bloomFilterBinaryEtag = etag
-
-        case .bloomFilterExcludedDomains:
-            bloomFilterExcludedDomainsEtag = etag
-
-        case .surrogates:
-            surrogatesEtag = etag
-
-        case .trackerRadar:
-            trackerRadarEtag = etag
-
-        case .privacyConfiguration:
-            privacyConfigurationEtag = etag
-
-        case .FBConfig:
-            return FBConfigEtag = etag
-        }
-    }
-
-    func loadData(for config: ConfigurationLocation) -> Data? {
+    func loadData(for config: Configuration) -> Data? {
         let file = fileUrl(for: config)
         do {
             return try Data(contentsOf: file)
         } catch {
 #if DEBUG
-        guard !AppDelegate.isRunningTests else { return nil }
+            guard !AppDelegate.isRunningTests else { return nil }
 #endif
-
             Pixel.fire(.debug(event: .trackerDataCouldNotBeLoaded, error: error))
             return nil
         }
     }
-
-    func saveData(_ data: Data, for config: ConfigurationLocation) throws {
+    
+    func saveData(_ data: Data, for config: Configuration) throws {
         let file = fileUrl(for: config)
         try data.write(to: file, options: .atomic)
     }
@@ -145,7 +117,7 @@ final class DefaultConfigurationStorage: ConfigurationStoring {
         os_log("FBConfigEtag %{public}s", log: .config, type: .default, FBConfigEtag ?? "")
     }
 
-    func fileUrl(for config: ConfigurationLocation) -> URL {
+    func fileUrl(for config: Configuration) -> URL {
         let fm = FileManager.default
 
         let dir = URL.sandboxApplicationSupportURL

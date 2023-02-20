@@ -26,7 +26,7 @@ final class ConfigurationStorageTests: XCTestCase {
         super.tearDown()
 
         for config in ConfigurationLocation.allCases {
-            let url = DefaultConfigurationStorage.shared.fileUrl(for: config)
+            let url = ConfigurationStore.shared.fileUrl(for: config)
             try? FileManager.default.removeItem(at: url)
         }
 
@@ -35,16 +35,16 @@ final class ConfigurationStorageTests: XCTestCase {
     func test_when_data_is_saved_for_config_then_it_can_be_loaded_correctly() {
         for config in ConfigurationLocation.allCases {
             let uuid = UUID().uuidString
-            try? DefaultConfigurationStorage.shared.saveData(uuid.data(using: .utf8)!, for: config)
-            XCTAssertEqual(uuid, DefaultConfigurationStorage.shared.loadData(for: config)?.utf8String())
+            try? ConfigurationStore.shared.saveData(uuid.data(using: .utf8)!, for: config)
+            XCTAssertEqual(uuid, ConfigurationStore.shared.loadData(for: config)?.utf8String())
         }
     }
 
     func test_when_etag_is_saved_for_config_then_it_can_be_loaded_correctly() {
         for config in ConfigurationLocation.allCases {
             let etag = UUID().uuidString
-            try? DefaultConfigurationStorage.shared.saveEtag(etag, for: config)
-            XCTAssertEqual(etag, DefaultConfigurationStorage.shared.loadEtag(for: config))
+            try? ConfigurationStore.shared.saveEtag(etag, for: config)
+            XCTAssertEqual(etag, ConfigurationStore.shared.loadEtag(for: config))
         }
     }
 

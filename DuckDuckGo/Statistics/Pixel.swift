@@ -18,6 +18,7 @@
 
 import Foundation
 import os.log
+import API
 
 final class Pixel {
 
@@ -53,7 +54,7 @@ final class Pixel {
         #endif
 
         var headers = headers
-        headers[APIHeaders.Name.moreInfo] = "See " + URL.duckDuckGoMorePrivacyInfo.absoluteString
+        headers[HTTPHeaderField.moreInfo] = "See " + URL.duckDuckGoMorePrivacyInfo.absoluteString
 
         guard !dryRun else {
             let params = params?.filter { key, _ in !["appVersion", "test"].contains(key) } ?? [:]
@@ -65,15 +66,13 @@ final class Pixel {
             }
             return
         }
-
-        let url = URL.pixelUrl(forPixelNamed: pixelName)
-        APIRequest.request(
-            url: url,
-            parameters: newParams,
-            allowedQueryReservedCharacters: allowedQueryReservedCharacters,
-            headers: headers,
-            callBackOnMainThread: true
-        ) { (_, error) in
+        
+        let configuration = APIRequest.Configuration(url: URL.pixelUrl(forPixelNamed: pixelName),
+                                                     queryParameters: newParams,
+                                                     allowedQueryReservedCharacters: allowedQueryReservedCharacters,
+                                                     headers: headers)
+        let request = APIRequest(configuration: configuration, urlSession: URLSession.makeSession(useMainThreadCallbackQueue: true))
+        request.fetch { (_, error) in
             onComplete(error)
         }
     }
@@ -101,7 +100,7 @@ final class Pixel {
                           includeAppVersionParameter: includeAppVersionParameter,
                           onComplete: onComplete)
     }
-
+    
 }
 
 public func pixelAssertionFailure(_ message: @autoclosure () -> String = String(), file: StaticString = #fileID, line: UInt = #line) {

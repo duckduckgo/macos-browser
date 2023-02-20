@@ -59,15 +59,15 @@ final class AppContentBlocking {
 
     // keeping whole ContentBlocking state initialization in one place to avoid races between updates publishing and rules storing
     init() {
-        let configStorage = DefaultConfigurationStorage.shared
+        let configStorage = ConfigurationStore.shared
         privacyConfigurationManager = PrivacyConfigurationManager(fetchedETag: configStorage.loadEtag(for: .privacyConfiguration),
                                                                   fetchedData: configStorage.loadData(for: .privacyConfiguration),
                                                                   embeddedDataProvider: AppPrivacyConfigurationDataProvider(),
                                                                   localProtection: LocalUnprotectedDomains.shared,
                                                                   errorReporting: Self.debugEvents)
 
-        trackerDataManager = TrackerDataManager(etag: DefaultConfigurationStorage.shared.loadEtag(for: .trackerRadar),
-                                                data: DefaultConfigurationStorage.shared.loadData(for: .trackerRadar),
+        trackerDataManager = TrackerDataManager(etag: ConfigurationStore.shared.loadEtag(for: .trackerRadar),
+                                                data: ConfigurationStore.shared.loadData(for: .trackerRadar),
                                                 embeddedDataProvider: AppTrackerDataSetProvider(),
                                                 errorReporting: Self.debugEvents)
 

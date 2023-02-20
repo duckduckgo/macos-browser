@@ -29,8 +29,8 @@ class AutoconsentMessageProtocolTests: XCTestCase {
                                            privacyConfigurationManager: MockPrivacyConfigurationManager(),
                                            privacySettings: PrivacySecurityPreferences.shared, // todo: mock
                                            contentBlockingManager: ContentBlockerRulesManagerMock(),
-                                           trackerDataManager: TrackerDataManager(etag: DefaultConfigurationStorage.shared.loadEtag(for: .trackerRadar),
-                                                                                  data: DefaultConfigurationStorage.shared.loadData(for: .trackerRadar),
+                                           trackerDataManager: TrackerDataManager(etag: ConfigurationStore.shared.loadEtag(for: .trackerRadar),
+                                                                                  data: ConfigurationStore.shared.loadData(for: .trackerRadar),
                                                                                   embeddedDataProvider: AppTrackerDataSetProvider(),
                                                                                   errorReporting: nil),
 
