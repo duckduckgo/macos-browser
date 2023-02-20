@@ -48,20 +48,27 @@ final class UserAgentTests: XCTestCase {
         XCTAssertEqual(userAgent, "ddg_mac/\(appVersion) (\(appID); macOS \(systemVersion))")
     }
 
-    func testWhenURLDomainIsOnRemoteConfigurationExceptionsListThenWebKitDefaultUserAgentIsUsed() {
+    func testWhenURLDomainIsOnWebViewDefaultListThenWebKitDefaultUserAgentIsUsed() {
         let config = MockPrivacyConfiguration()
-        config.exceptionsList = { _ in
-            [
-                "wikipedia.org",
-                "google.com"
+        config.featureSettings = [
+            "webViewDefault": [
+                [
+                    "domain": "wikipedia.org",
+                    "reason": "reason"
+                ],
+                [
+                    "domain": "google.com",
+                    "reason": "reason"
+                ]
             ]
-        }
+        ] as! [String: Any]
 
         XCTAssertEqual(UserAgent.for("http://wikipedia.org".url, privacyConfig: config), UserAgent.webViewDefault)
         XCTAssertEqual(UserAgent.for("https://wikipedia.org".url, privacyConfig: config), UserAgent.webViewDefault)
         XCTAssertEqual(UserAgent.for("https://en.wikipedia.org/wiki/Duck".url, privacyConfig: config), UserAgent.webViewDefault)
         XCTAssertEqual(UserAgent.for("https://google.com".url, privacyConfig: config), UserAgent.webViewDefault)
         XCTAssertEqual(UserAgent.for("https://docs.google.com".url, privacyConfig: config), UserAgent.webViewDefault)
+        XCTAssertNotEqual(UserAgent.for("https://duckduckgo.com".url, privacyConfig: config), UserAgent.webViewDefault)
     }
 
     func testThatRemoteConfigurationTakesPrecedenceOverLocalConfiguration() {
@@ -69,7 +76,14 @@ final class UserAgentTests: XCTestCase {
 
         XCTAssertEqual(UserAgent.for("http://duckduckgo.com".url, privacyConfig: config), UserAgent.default)
 
-        config.exceptionsList = { _ in [ "duckduckgo.com" ] }
+        config.featureSettings = [
+            "webViewDefault": [
+                [
+                    "domain": "duckduckgo.com",
+                    "reason": "reason"
+                ]
+            ]
+        ] as! [String: Any]
 
         XCTAssertEqual(UserAgent.for("http://duckduckgo.com".url, privacyConfig: config), UserAgent.webViewDefault)
     }

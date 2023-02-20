@@ -81,8 +81,8 @@ enum UserAgent {
         }
 
         // 1) Apply remote user agent configuration
-        // (It looks just at the exceptions for now)
-        if isURLPartOfExceptions(url: url, privacyConfig: privacyConfig) {
+        if privacyConfig.isEnabled(featureKey: .customUserAgent) &&
+            isURLPartOfWebviewDefaultList(url: url, privacyConfig: privacyConfig) {
             return UserAgent.webViewDefault
         }
 
@@ -96,9 +96,16 @@ enum UserAgent {
 
     // MARK: - Remote user agent configuration
 
-    static func isURLPartOfExceptions(url: URL?,
-                                      privacyConfig: PrivacyConfiguration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig) -> Bool {
-        return privacyConfig.exceptionsList(forFeature: .customUserAgent).contains(where: { domain in
+    static let webviewDefaultKey = "webViewDefault"
+    static let domainKey = "domain"
+
+    static func isURLPartOfWebviewDefaultList(url: URL?,
+                                              privacyConfig: PrivacyConfiguration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig) -> Bool {
+        let settings = privacyConfig.settings(for: .customUserAgent)
+        let webViewDefaultList = settings[webviewDefaultKey] as? [[String: String]] ?? []
+        let domains = webViewDefaultList.map { $0[domainKey] ?? "" }
+
+        return domains.contains(where: { domain in
             url?.isPart(ofDomain: domain) ?? false
         })
     }

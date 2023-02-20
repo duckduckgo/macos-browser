@@ -27,6 +27,7 @@ class MockPrivacyConfiguration: PrivacyConfiguration {
     var tempUnprotectedDomains: [String] = []
     var trackerAllowlist: PrivacyConfigurationData.TrackerAllowlistData = [:]
     var exceptionsList: (PrivacyFeature) -> [String] = { _ in [] }
+    var featureSettings: PrivacyConfigurationData.PrivacyFeature.FeatureSettings = [:]
 
     func exceptionsList(forFeature featureKey: PrivacyFeature) -> [String] { exceptionsList(featureKey) }
     func isEnabled(featureKey: PrivacyFeature, versionProvider: AppVersionProvider) -> Bool { true }
@@ -35,7 +36,7 @@ class MockPrivacyConfiguration: PrivacyConfiguration {
     func isUserUnprotected(domain: String?) -> Bool { false }
     func isTempUnprotected(domain: String?) -> Bool { false }
     func isInExceptionList(domain: String?, forFeature featureKey: PrivacyFeature) -> Bool { false }
-    func settings(for feature: PrivacyFeature) -> PrivacyConfigurationData.PrivacyFeature.FeatureSettings { [:] }
+    func settings(for feature: PrivacyFeature) -> PrivacyConfigurationData.PrivacyFeature.FeatureSettings { featureSettings }
     func userEnabledProtection(forDomain: String) {}
     func userDisabledProtection(forDomain: String) {}
 }
