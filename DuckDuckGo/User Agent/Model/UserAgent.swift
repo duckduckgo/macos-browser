@@ -60,7 +60,7 @@ enum UserAgent {
     static let `default` = UserAgent.safari
     static let webViewDefault = ""
 
-    static let domainUserAgents: KeyValuePairs<RegEx, String> = [
+    static let localUserAgentConfiguration: KeyValuePairs<RegEx, String> = [
         // use safari when serving up PDFs from duckduckgo directly
         regex("https://duckduckgo\\.com/[^?]*\\.pdf"): UserAgent.safari,
 
@@ -74,16 +74,33 @@ enum UserAgent {
         return "ddg_mac/\(appVersion) (\(appID); macOS \(systemVersion))"
     }
 
-    static func `for`(_ url: URL?) -> String {
+    static func `for`(_ url: URL?,
+                      privacyConfig: PrivacyConfiguration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig) -> String {
         guard let absoluteString = url?.absoluteString else {
             return Self.default
         }
 
-        if let userAgent = domainUserAgents.first(where: { (regex, _) in absoluteString.matches(regex) })?.value {
+        // 1) Apply remote user agent configuration
+        // (It looks just at the exceptions for now)
+        if isURLPartOfExceptions(url: url) {
+            return UserAgent.webViewDefault
+        }
+
+        // 2) Apply local user agent configuration
+        if let userAgent = localUserAgentConfiguration.first(where: { (regex, _) in absoluteString.matches(regex) })?.value {
             return userAgent
         }
 
         return Self.default
+    }
+
+    // MARK: - Remote user agent configuration
+
+    static func isURLPartOfExceptions(url: URL?,
+                                      privacyConfig: PrivacyConfiguration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig) -> Bool {
+        return privacyConfig.exceptionsList(forFeature: .customUserAgent).contains(where: { domain in
+            url?.isPart(ofDomain: domain) ?? false
+        })
     }
 
 }
