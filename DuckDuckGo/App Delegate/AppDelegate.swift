@@ -22,6 +22,7 @@ import os.log
 import BrowserServicesKit
 import Persistence
 import Configuration
+import API
 
 @NSApplicationMain
 final class AppDelegate: NSObject, NSApplicationDelegate {
@@ -121,6 +122,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         guard !Self.isRunningTests else { return }
 
+        APIHeaders.userAgent = UserAgent.duckDuckGoUserAgent()
         Configuration.setURLProvider(AppConfigurationURLProvider())
         HistoryCoordinator.shared.loadHistory()
         PrivacyFeatures.httpsUpgrade.loadDataAsync()
