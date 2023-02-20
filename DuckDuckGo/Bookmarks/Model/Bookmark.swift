@@ -76,6 +76,7 @@ internal class BaseBookmarkEntity {
     static func from(managedObject: BookmarkManagedObject, parentFolderUUID: UUID? = nil) -> BaseBookmarkEntity? {
         guard let id = managedObject.id,
               let title = managedObject.titleEncrypted as? String else {
+            Pixel.fire(.debug(event: .bookmarkDecryptionFailed))
             assertionFailure("\(#file): Failed to create BaseBookmarkEntity from BookmarkManagedObject")
             return nil
         }

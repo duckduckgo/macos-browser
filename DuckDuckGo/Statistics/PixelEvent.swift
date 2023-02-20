@@ -204,6 +204,12 @@ extension Pixel {
             case userSelectedToSkipUpdate
             case userSelectedToInstallUpdate
             case userSelectedToDismissUpdate
+
+            case faviconDecryptionFailed
+            case bookmarkDecryptionFailed
+            case downloadListItemDecryptionFailed
+            case historyEntryDecryptionFailed
+            case permissionDecryptionFailed
         }
 
     }
@@ -448,6 +454,17 @@ extension Pixel.Event.Debug {
             return "user_selected_to_install_update"
         case .userSelectedToDismissUpdate:
             return "user_selected_to_dismiss_update"
+
+        case .faviconDecryptionFailed:
+            return "favicon_decryption_failed"
+        case .bookmarkDecryptionFailed:
+            return "bookmark_decryption_failed"
+        case .downloadListItemDecryptionFailed:
+            return "download_list_item_decryption_failed"
+        case .historyEntryDecryptionFailed:
+            return "history_entry_decryption_failed"
+        case .permissionDecryptionFailed:
+            return "permission_decryption_failed"
         }
     }
 }
