@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import Navigation
 import WebKit
 
 extension WKWebView {
@@ -220,7 +221,7 @@ extension WKWebView {
         }
     }
 
-    func printOperation(with printInfo: NSPrintInfo = .shared, for frame: Any?) -> NSPrintOperation? {
+    func printOperation(with printInfo: NSPrintInfo = .shared, for frame: FrameHandle?) -> NSPrintOperation? {
         let printInfoWithFrame = NSSelectorFromString(Selector.printOperationWithPrintInfoForFrame)
         if let frame = frame, responds(to: printInfoWithFrame) {
             return self.perform(printInfoWithFrame, with: printInfo, with: frame)?.takeUnretainedValue() as? NSPrintOperation
