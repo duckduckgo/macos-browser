@@ -39,7 +39,7 @@ extension WKWebView {
         method_exchangeImplementations(originalLoad, swizzledLoad)
     }()
 
-    @objc class func swizzled_handlesURLScheme(_ urlScheme: String) -> Bool {
+    @objc dynamic private class func swizzled_handlesURLScheme(_ urlScheme: String) -> Bool {
         guard !customHandlerSchemes.contains(URL.NavigationalScheme(rawValue: urlScheme)) else { return false }
         return self.swizzled_handlesURLScheme(urlScheme) // call original
     }
