@@ -65,7 +65,10 @@ enum UserAgent {
         regex("https://duckduckgo\\.com/[^?]*\\.pdf"): UserAgent.safari,
 
         // use default WKWebView user agent for duckduckgo domain to remove CTA
-        regex("https://duckduckgo\\.com/.*"): UserAgent.webViewDefault
+        regex("https://duckduckgo\\.com/.*"): UserAgent.webViewDefault,
+
+        regex("https://www\\.blinkist\\.com/.*"): UserAgent.webViewDefault,
+        regex("https://blinkist\\.com/.*"): UserAgent.webViewDefault
     ]
 
     static func duckDuckGoUserAgent(appVersion: String = AppVersion.shared.versionNumber,
