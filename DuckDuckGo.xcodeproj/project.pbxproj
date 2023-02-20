@@ -823,7 +823,6 @@
 		3706FE63293F661700E42796 /* RecentlyClosedCoordinatorMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA7E9175286DB05D00AB6B62 /* RecentlyClosedCoordinatorMock.swift */; };
 		3706FE64293F661700E42796 /* DownloadListStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B693955C26F19CD70015B914 /* DownloadListStoreTests.swift */; };
 		3706FE65293F661700E42796 /* ContentBlockingUpdatingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B610F2E527AA388100FCEBE9 /* ContentBlockingUpdatingTests.swift */; };
-		3706FE66293F661700E42796 /* UserDefaultsWrapperUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0511E6262CAB3700F6079C /* UserDefaultsWrapperUtilities.swift */; };
 		3706FE67293F661700E42796 /* EncryptionMocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA1A6F5258C4F9600F6F690 /* EncryptionMocks.swift */; };
 		3706FE68293F661700E42796 /* PrivatePlayerURLExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376718FF28E58513003A2A15 /* PrivatePlayerURLExtensionTests.swift */; };
 		3706FE69293F661700E42796 /* UTTypeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B3E0952654DACD0040E0A2 /* UTTypeTests.swift */; };
@@ -1012,7 +1011,6 @@
 		4B0511CA262CAA5A00F6079C /* FireproofDomainsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0511B4262CAA5A00F6079C /* FireproofDomainsViewController.swift */; };
 		4B0511E1262CAA8600F6079C /* NSOpenPanelExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0511DF262CAA8600F6079C /* NSOpenPanelExtensions.swift */; };
 		4B0511E2262CAA8600F6079C /* NSViewControllerExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0511E0262CAA8600F6079C /* NSViewControllerExtension.swift */; };
-		4B0511E7262CAB3700F6079C /* UserDefaultsWrapperUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0511E6262CAB3700F6079C /* UserDefaultsWrapperUtilities.swift */; };
 		4B0A63E8289DB58E00378EF7 /* FirefoxFaviconsReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0A63E7289DB58E00378EF7 /* FirefoxFaviconsReader.swift */; };
 		4B0AACAC28BC63ED001038AC /* ChromiumFaviconsReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0AACAB28BC63ED001038AC /* ChromiumFaviconsReader.swift */; };
 		4B0AACAE28BC6FD0001038AC /* SafariFaviconsReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0AACAD28BC6FD0001038AC /* SafariFaviconsReader.swift */; };
@@ -1948,7 +1946,6 @@
 		4B0511B4262CAA5A00F6079C /* FireproofDomainsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FireproofDomainsViewController.swift; sourceTree = "<group>"; };
 		4B0511DF262CAA8600F6079C /* NSOpenPanelExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSOpenPanelExtensions.swift; sourceTree = "<group>"; };
 		4B0511E0262CAA8600F6079C /* NSViewControllerExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSViewControllerExtension.swift; sourceTree = "<group>"; };
-		4B0511E6262CAB3700F6079C /* UserDefaultsWrapperUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsWrapperUtilities.swift; sourceTree = "<group>"; };
 		4B0A63E7289DB58E00378EF7 /* FirefoxFaviconsReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirefoxFaviconsReader.swift; sourceTree = "<group>"; };
 		4B0AACAB28BC63ED001038AC /* ChromiumFaviconsReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChromiumFaviconsReader.swift; sourceTree = "<group>"; };
 		4B0AACAD28BC6FD0001038AC /* SafariFaviconsReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariFaviconsReader.swift; sourceTree = "<group>"; };
@@ -4010,7 +4007,6 @@
 				AAEC74B92642E66600C2EFBC /* Extensions */,
 				4BA1A6CE258BF58C00F6F690 /* File System */,
 				B6AE74322609AFBB005B9B1A /* Progress */,
-				4B0511E6262CAB3700F6079C /* UserDefaultsWrapperUtilities.swift */,
 				B698E5032908011E00A746A8 /* AppKitPrivateMethodsAvailabilityTests.swift */,
 				B6B3E0952654DACD0040E0A2 /* UTTypeTests.swift */,
 				B693956626F352940015B914 /* TestsBridging.h */,
@@ -6016,7 +6012,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/zsh;
-			shellScript = "if [[ -n \"$CI\" ]]; then\n    echo \"Skipping SwiftLint run in CI\"\n    exit 0\nfi\n\n# Add brew into PATH\nif [[ -f /opt/homebrew/bin/brew ]]; then\n   eval $(/opt/homebrew/bin/brew shellenv)\nfi\n\nrun_swiftlint_for_modified_files () {\n    TEST_FILES=\"\"\n    CODE_FILES=\"\"\n\n    # collect staged and unstaged files and replace spaces in filenames with #001\n    for FILE_NAME in $({ git diff --name-only & git diff --cached --name-only; }  | tr ' ' '\\001' | tr '\\n ' ' ')\n    do\n        echo \"handling $FILE_NAME\"\n        # collect .swift files separately for Unit Tests and Code Files\n        if [[ \"${FILE_NAME##*.}\" == \"swift\" ]]; then\n            if [[ \"$FILE_NAME\" == *\"Tests/\"* ]]; then\n                TEST_FILES+=\" \\\"${FILE_NAME}\\\"\"\n            else\n                CODE_FILES+=\" \\\"${FILE_NAME}\\\"\"\n            fi\n        fi\n    done\n\n    if [ -n \"${CODE_FILES}\" ]; then\n        # replace  back #001 with space and feed to swiftlint\n        echo \"${CODE_FILES}\"  | tr '\\001' ' ' | xargs swiftlint lint\n    fi\n    if [ -n \"${TEST_FILES}\" ]; then\n        echo \"${TEST_FILES}\" | tr '\\001' ' ' | xargs swiftlint lint --config .swiftlint.tests.yml\n    fi\n}\n\nif which swiftlint >/dev/null; then\n    if [ \"$CONFIGURATION\" = \"Release\" ]; then\n        swiftlint lint --strict\n        if [ $? -ne 0 ]; then\n            echo \"error: SwiftLint validation failed.\"\n            exit 1\n        fi\n    else\n        run_swiftlint_for_modified_files\n    fi\nelse\n    echo \"error: SwiftLint not installed. Install using \\`brew install swiftlint\\`\"\n    exit 1\nfi\n";
+			shellScript = "./lint.sh\n";
 		};
 		378E2798296F6D1D00FCADA2 /* Validate PRODUCT_NAME */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -6054,7 +6050,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/zsh;
-			shellScript = "if [[ -n \"$CI\" ]]; then\n    echo \"Skipping SwiftLint run in CI\"\n    exit 0\nfi\n\n# Add brew into PATH\nif [[ -f /opt/homebrew/bin/brew ]]; then\n   eval $(/opt/homebrew/bin/brew shellenv)\nfi\n\nrun_swiftlint_for_modified_files () {\n    TEST_FILES=\"\"\n    CODE_FILES=\"\"\n\n    # collect staged and unstaged files and replace spaces in filenames with #001\n    for FILE_NAME in $({ git diff --name-only & git diff --cached --name-only; }  | tr ' ' '\\001' | tr '\\n ' ' ')\n    do\n        echo \"handling $FILE_NAME\"\n        # collect .swift files separately for Unit Tests and Code Files\n        if [[ \"${FILE_NAME##*.}\" == \"swift\" ]]; then\n            if [[ \"$FILE_NAME\" == *\"Tests/\"* ]]; then\n                TEST_FILES+=\" \\\"${FILE_NAME}\\\"\"\n            else\n                CODE_FILES+=\" \\\"${FILE_NAME}\\\"\"\n            fi\n        fi\n    done\n\n    if [ -n \"${CODE_FILES}\" ]; then\n        # replace  back #001 with space and feed to swiftlint\n        echo \"${CODE_FILES}\"  | tr '\\001' ' ' | xargs swiftlint lint\n    fi\n    if [ -n \"${TEST_FILES}\" ]; then\n        echo \"${TEST_FILES}\" | tr '\\001' ' ' | xargs swiftlint lint --config .swiftlint.tests.yml\n    fi\n}\n\nif which swiftlint >/dev/null; then\n    if [ \"$CONFIGURATION\" = \"Release\" ]; then\n        swiftlint lint --strict\n        if [ $? -ne 0 ]; then\n            echo \"error: SwiftLint validation failed.\"\n            exit 1\n        fi\n    else\n        run_swiftlint_for_modified_files\n    fi\nelse\n    echo \"error: SwiftLint not installed. Install using \\`brew install swiftlint\\`\"\n    exit 1\nfi\n";
+			shellScript = "./lint.sh\n";
 		};
 		CBCCF59E299667B700C02DFE /* Assert Xcode version */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -6821,7 +6817,6 @@
 				3706FE63293F661700E42796 /* RecentlyClosedCoordinatorMock.swift in Sources */,
 				3706FE64293F661700E42796 /* DownloadListStoreTests.swift in Sources */,
 				3706FE65293F661700E42796 /* ContentBlockingUpdatingTests.swift in Sources */,
-				3706FE66293F661700E42796 /* UserDefaultsWrapperUtilities.swift in Sources */,
 				3706FE67293F661700E42796 /* EncryptionMocks.swift in Sources */,
 				3706FE68293F661700E42796 /* PrivatePlayerURLExtensionTests.swift in Sources */,
 				3706FE69293F661700E42796 /* UTTypeTests.swift in Sources */,
@@ -7635,7 +7630,6 @@
 				31E163BD293A579E00963C10 /* PrivacyReferenceTestHelper.swift in Sources */,
 				B693955D26F19CD70015B914 /* DownloadListStoreTests.swift in Sources */,
 				B610F2EB27AA8E4500FCEBE9 /* ContentBlockingUpdatingTests.swift in Sources */,
-				4B0511E7262CAB3700F6079C /* UserDefaultsWrapperUtilities.swift in Sources */,
 				4BA1A6F6258C4F9600F6F690 /* EncryptionMocks.swift in Sources */,
 				3767190028E58513003A2A15 /* PrivatePlayerURLExtensionTests.swift in Sources */,
 				B6B3E0962654DACD0040E0A2 /* UTTypeTests.swift in Sources */,
