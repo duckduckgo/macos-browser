@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1676291238757,
+    "version": 1676669300686,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -221,13 +221,17 @@
                     {
                         "domain": "digid.nl",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/issues/602"
+                    },
+                    {
+                        "domain": "tiktok.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/667"
                     }
                 ],
                 "omitVersionSites": []
             },
             "exceptions": [],
             "state": "disabled",
-            "hash": "f303f2b5c222373004029d0dd657fe56"
+            "hash": "ba20b99be18138bbd3c6008bd154735d"
         },
         "duckPlayer": {
             "exceptions": [],
@@ -1350,6 +1354,33 @@
             },
             "hash": "9439c856372a09f0cfdc9e2e0fd086fd"
         },
+        "runtimeChecks": {
+            "state": "disabled",
+            "exceptions": [],
+            "settings": {
+                "taintCheck": "enabled",
+                "matchAllDomains": "disabled",
+                "matchAllStackDomains": "enabled",
+                "overloadInstanceOf": "enabled",
+                "elementRemovalTimeout": 1000,
+                "domains": [
+                    {
+                        "domain": "preactjs.com"
+                    },
+                    {
+                        "domain": "reactjs.org"
+                    },
+                    {
+                        "domain": "browserbench.org"
+                    },
+                    {
+                        "domain": "good.third-party.site"
+                    }
+                ],
+                "stackDomains": []
+            },
+            "hash": "32be9e17c1e346de2f37bed896eb0231"
+        },
         "serviceworkerInitiatedRequests": {
             "exceptions": [],
             "state": "disabled",
@@ -2178,6 +2209,13 @@
                             },
                             {
                                 "rule": "cse.google.com/cse/element/",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/475"
+                            },
+                            {
+                                "rule": "google.com/cse/cse.js",
                                 "domains": [
                                     "<all>"
                                 ],
@@ -4813,7 +4851,7 @@
                 }
             },
             "exceptions": [],
-            "hash": "202592ba1360bd321fcee80ef0cba012"
+            "hash": "a8e5a6de6c7c15ebfbb5b3a7ed0486c7"
         },
         "trackingCookies1p": {
             "settings": {

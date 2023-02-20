@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "AA585D7D248FD31100E9A3E2"
-               BuildableName = "DuckDuckGo.app"
+               BuildableName = ".app"
                BlueprintName = "DuckDuckGo Privacy Browser"
                ReferencedContainer = "container:DuckDuckGo.xcodeproj">
             </BuildableReference>
@@ -29,7 +29,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "4B1AD89C25FC27E200261379"
-               BuildableName = "Integration Tests.xctest"
+               BuildableName = ".xctest"
                BlueprintName = "Integration Tests"
                ReferencedContainer = "container:DuckDuckGo.xcodeproj">
             </BuildableReference>
@@ -43,7 +43,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "AA585D8F248FD31400E9A3E2"
-               BuildableName = "Unit Tests.xctest"
+               BuildableName = ".xctest"
                BlueprintName = "Unit Tests"
                ReferencedContainer = "container:DuckDuckGo.xcodeproj">
             </BuildableReference>
@@ -62,7 +62,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "AA585D8F248FD31400E9A3E2"
-               BuildableName = "Unit Tests.xctest"
+               BuildableName = ".xctest"
                BlueprintName = "Unit Tests"
                ReferencedContainer = "container:DuckDuckGo.xcodeproj">
             </BuildableReference>
@@ -80,7 +80,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "7B4CE8D926F02108009134B1"
-               BuildableName = "UI Tests.xctest"
+               BuildableName = ".xctest"
                BlueprintName = "UI Tests"
                ReferencedContainer = "container:DuckDuckGo.xcodeproj">
             </BuildableReference>
@@ -103,7 +103,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "AA585D7D248FD31100E9A3E2"
-            BuildableName = "DuckDuckGo.app"
+            BuildableName = ".app"
             BlueprintName = "DuckDuckGo Privacy Browser"
             ReferencedContainer = "container:DuckDuckGo.xcodeproj">
          </BuildableReference>
@@ -120,7 +120,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "AA585D7D248FD31100E9A3E2"
-            BuildableName = "DuckDuckGo.app"
+            BuildableName = ".app"
             BlueprintName = "DuckDuckGo Privacy Browser"
             ReferencedContainer = "container:DuckDuckGo.xcodeproj">
          </BuildableReference>

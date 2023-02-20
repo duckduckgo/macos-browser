@@ -5562,6 +5562,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 3706FCFA293F65D500E42796 /* Build configuration list for PBXNativeTarget "DuckDuckGo Privacy Browser App Store" */;
 			buildPhases = (
+				CBCCF59F2996681700C02DFE /* Assert Xcode version */,
 				378E2798296F6D1D00FCADA2 /* Validate PRODUCT_NAME */,
 				3706FA79293F65D500E42796 /* Check Embedded Config URLs */,
 				3706FA7A293F65D500E42796 /* Sources */,
@@ -5674,6 +5675,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = AA585DA4248FD31500E9A3E2 /* Build configuration list for PBXNativeTarget "DuckDuckGo Privacy Browser" */;
 			buildPhases = (
+				CBCCF59E299667B700C02DFE /* Assert Xcode version */,
 				3705272528992C8A000C06A2 /* Check Embedded Config URLs */,
 				AA585D7A248FD31100E9A3E2 /* Sources */,
 				AA8EDF2824925E940071C2E8 /* Swift Lint */,
@@ -6105,6 +6107,44 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/zsh;
 			shellScript = "if [[ -n \"$CI\" ]]; then\n    echo \"Skipping SwiftLint run in CI\"\n    exit 0\nfi\n\n# Add brew into PATH\nif [[ -f /opt/homebrew/bin/brew ]]; then\n   eval $(/opt/homebrew/bin/brew shellenv)\nfi\n\nrun_swiftlint_for_modified_files () {\n    TEST_FILES=\"\"\n    CODE_FILES=\"\"\n\n    # collect staged and unstaged files and replace spaces in filenames with #001\n    for FILE_NAME in $({ git diff --name-only & git diff --cached --name-only; }  | tr ' ' '\\001' | tr '\\n ' ' ')\n    do\n        echo \"handling $FILE_NAME\"\n        # collect .swift files separately for Unit Tests and Code Files\n        if [[ \"${FILE_NAME##*.}\" == \"swift\" ]]; then\n            if [[ \"$FILE_NAME\" == *\"Tests/\"* ]]; then\n                TEST_FILES+=\" \\\"${FILE_NAME}\\\"\"\n            else\n                CODE_FILES+=\" \\\"${FILE_NAME}\\\"\"\n            fi\n        fi\n    done\n\n    if [ -n \"${CODE_FILES}\" ]; then\n        # replace  back #001 with space and feed to swiftlint\n        echo \"${CODE_FILES}\"  | tr '\\001' ' ' | xargs swiftlint lint\n    fi\n    if [ -n \"${TEST_FILES}\" ]; then\n        echo \"${TEST_FILES}\" | tr '\\001' ' ' | xargs swiftlint lint --config .swiftlint.tests.yml\n    fi\n}\n\nif which swiftlint >/dev/null; then\n    if [ \"$CONFIGURATION\" = \"Release\" ]; then\n        swiftlint lint --strict\n        if [ $? -ne 0 ]; then\n            echo \"error: SwiftLint validation failed.\"\n            exit 1\n        fi\n    else\n        run_swiftlint_for_modified_files\n    fi\nelse\n    echo \"error: SwiftLint not installed. Install using \\`brew install swiftlint\\`\"\n    exit 1\nfi\n";
+		};
+		CBCCF59E299667B700C02DFE /* Assert Xcode version */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Assert Xcode version";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/scripts/assert_xcode_version.sh\"\n";
+		};
+		CBCCF59F2996681700C02DFE /* Assert Xcode version */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Assert Xcode version";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/scripts/assert_xcode_version.sh\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -8134,8 +8174,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				kind = exactVersion;
-				version = 38.0.0;
+				kind = revision;
+				revision = 4f3695b5b598593ce3c44fe810637e3406206c19;
 			};
 		};
 		3706FDD7293F661700E42796 /* XCRemoteSwiftPackageReference "OHHTTPStubs" */ = {
@@ -8151,7 +8191,7 @@
 			repositoryURL = "https://github.com/duckduckgo/TrackerRadarKit.git";
 			requirement = {
 				kind = exactVersion;
-				version = 1.1.1;
+				version = 1.2.1;
 			};
 		};
 		85FF55C625F82E4F00E2AB99 /* XCRemoteSwiftPackageReference "lottie-ios" */ = {
@@ -8167,7 +8207,7 @@
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
 				kind = exactVersion;
-				version = 46.0.0;
+				version = 46.2.0;
 			};
 		};
 		AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
