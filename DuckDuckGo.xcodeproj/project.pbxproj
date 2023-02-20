@@ -321,7 +321,6 @@
 		3706FB75293F65D500E42796 /* WebsiteBreakageSender.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAD8078427B3F3BE00CF7703 /* WebsiteBreakageSender.swift */; };
 		3706FB76293F65D500E42796 /* ASN1Parser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B8AC93A26B48ADF00879451 /* ASN1Parser.swift */; };
 		3706FB77293F65D500E42796 /* View+Cursor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CD54B227EE509700F1F7B9 /* View+Cursor.swift */; };
-		3706FB79293F65D500E42796 /* AppVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A9E4602614608B0067D1B9 /* AppVersion.swift */; };
 		3706FB7A293F65D500E42796 /* FileDownloadManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 856C98DE257014BD00A22F1F /* FileDownloadManager.swift */; };
 		3706FB7B293F65D500E42796 /* BookmarkImport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB99CF626FE191E001E4761 /* BookmarkImport.swift */; };
 		3706FB7C293F65D500E42796 /* KeySetDictionary.swift in Sources */ = {isa = PBXBuildFile; fileRef = B68503A6279141CD00893A05 /* KeySetDictionary.swift */; };
@@ -1619,7 +1618,6 @@
 		B6A924D92664C72E001A28CA /* WebKitDownloadTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A924D82664C72D001A28CA /* WebKitDownloadTask.swift */; };
 		B6A924DE2664CA09001A28CA /* LegacyWebKitDownloadDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A924DD2664CA08001A28CA /* LegacyWebKitDownloadDelegate.swift */; };
 		B6A9E45326142B070067D1B9 /* Pixel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A9E45226142B070067D1B9 /* Pixel.swift */; };
-		B6A9E4612614608B0067D1B9 /* AppVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A9E4602614608B0067D1B9 /* AppVersion.swift */; };
 		B6A9E46B2614618A0067D1B9 /* OperatingSystemVersionExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A9E46A2614618A0067D1B9 /* OperatingSystemVersionExtension.swift */; };
 		B6A9E47026146A250067D1B9 /* DateExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A9E46F26146A250067D1B9 /* DateExtension.swift */; };
 		B6A9E47726146A570067D1B9 /* PixelEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A9E47626146A570067D1B9 /* PixelEvent.swift */; };
@@ -2571,7 +2569,6 @@
 		B6A924D82664C72D001A28CA /* WebKitDownloadTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebKitDownloadTask.swift; sourceTree = "<group>"; };
 		B6A924DD2664CA08001A28CA /* LegacyWebKitDownloadDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LegacyWebKitDownloadDelegate.swift; sourceTree = "<group>"; };
 		B6A9E45226142B070067D1B9 /* Pixel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Pixel.swift; sourceTree = "<group>"; };
-		B6A9E4602614608B0067D1B9 /* AppVersion.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppVersion.swift; sourceTree = "<group>"; };
 		B6A9E46A2614618A0067D1B9 /* OperatingSystemVersionExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OperatingSystemVersionExtension.swift; sourceTree = "<group>"; };
 		B6A9E46F26146A250067D1B9 /* DateExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateExtension.swift; sourceTree = "<group>"; };
 		B6A9E47626146A570067D1B9 /* PixelEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelEvent.swift; sourceTree = "<group>"; };
@@ -4496,7 +4493,6 @@
 		AA86491324D831B9001BABEE /* Common */ = {
 			isa = PBXGroup;
 			children = (
-				B6A9E4602614608B0067D1B9 /* AppVersion.swift */,
 				4B67743D255DBEEA00025BD8 /* Database */,
 				AADC60E92493B305008F8EF7 /* Extensions */,
 				4BA1A691258B06F600F6F690 /* File System */,
@@ -6350,7 +6346,6 @@
 				3707C72A294B5D2900682A9F /* URLExtension.swift in Sources */,
 				3706FB76293F65D500E42796 /* ASN1Parser.swift in Sources */,
 				3706FB77293F65D500E42796 /* View+Cursor.swift in Sources */,
-				3706FB79293F65D500E42796 /* AppVersion.swift in Sources */,
 				3706FB7A293F65D500E42796 /* FileDownloadManager.swift in Sources */,
 				3706FB7B293F65D500E42796 /* BookmarkImport.swift in Sources */,
 				3706FB7C293F65D500E42796 /* KeySetDictionary.swift in Sources */,
@@ -7155,7 +7150,6 @@
 				4B8AC93B26B48ADF00879451 /* ASN1Parser.swift in Sources */,
 				37CD54B327EE509700F1F7B9 /* View+Cursor.swift in Sources */,
 				B66E9DD22670EB2A00E53BB5 /* _WKDownload+WebKitDownload.swift in Sources */,
-				B6A9E4612614608B0067D1B9 /* AppVersion.swift in Sources */,
 				856C98DF257014BD00A22F1F /* FileDownloadManager.swift in Sources */,
 				4BB99CFF26FE191E001E4761 /* BookmarkImport.swift in Sources */,
 				B68503A7279141CD00893A05 /* KeySetDictionary.swift in Sources */,

@@ -121,7 +121,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         guard !Self.isRunningTests else { return }
 
-        Configuration.setUrlProvider(AppConfigurationURLProvider())
+        Configuration.setURLProvider(AppConfigurationURLProvider())
         HistoryCoordinator.shared.loadHistory()
         PrivacyFeatures.httpsUpgrade.loadDataAsync()
         LocalBookmarkManager.shared.loadBookmarks()
