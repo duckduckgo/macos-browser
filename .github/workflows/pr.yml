@@ -84,11 +84,21 @@ jobs:
       with:
         submodules: recursive
 
+    - name: Set cache key hash
+      run: |
+        has_only_tags=$(jq '[ .pins[].state | has("version") ] | all' DuckDuckGo.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved)
+        if [[ "$has_only_tags" == "true" ]]; then
+          echo "cache_key_hash=${{ hashFiles('DuckDuckGo.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}" >> $GITHUB_ENV
+        else
+          echo "Package.resolved contains dependencies specified by branch or commit, skipping cache."
+        fi
+
     - name: Cache SPM
+      if: env.cache_key_hash
       uses: actions/cache@v3
       with:
-        path: derived-data/SourcePackages
-        key: ${{ runner.os }}-spm-${{ matrix.cache-key }}${{ hashFiles('DuckDuckGo.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}
+        path: DerivedData/SourcePackages
+        key: ${{ runner.os }}-spm-${{ matrix.cache-key }}${{ env.cache_key_hash }}
         restore-keys: |
           ${{ runner.os }}-spm-${{ matrix.cache-key }}
 
@@ -103,7 +113,7 @@ jobs:
       run: |
         set -o pipefail && xcodebuild test \
           -scheme "${{ matrix.scheme }}" \
-          -derivedDataPath "derived-data" \
+          -derivedDataPath "DerivedData" \
           -configuration "CI" \
           ENABLE_TESTABILITY=true \
           ONLY_ACTIVE_ARCH=${{ matrix.active-arch }} \
@@ -115,7 +125,7 @@ jobs:
         if [[ ${{ matrix.flavor }} != "Sandbox" ]]; then
           echo "Skipping private API usage check for ${{ matrix.flavor }} build"
         else
-          binary_path="derived-data/Build/Products/CI/DuckDuckGo App Store.app/Contents/MacOS/DuckDuckGo App Store"
+          binary_path="DerivedData/Build/Products/CI/DuckDuckGo App Store.app/Contents/MacOS/DuckDuckGo App Store"
           ./scripts/find_private_symbols.sh "${binary_path}" | tee private_api_report.txt
 
           cat private_api_report.txt >> $GITHUB_STEP_SUMMARY
