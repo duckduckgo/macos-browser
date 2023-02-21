@@ -83,7 +83,7 @@ final class ConfigurationManager {
         let fetcher = ConfigurationFetcher(store: ConfigurationStore.shared)
         do {
             try await fetcher.fetch([.trackerRadar, .surrogates, .privacyConfiguration]) {
-                try self.updateTrackerBlockingDependencies()
+                self.updateTrackerBlockingDependencies()
                 self.tryAgainLater()
             }
         } catch {
@@ -140,7 +140,7 @@ final class ConfigurationManager {
         lastUpdateTime = Date(timeIntervalSinceNow: Constants.refreshPeriodSeconds - Constants.retryDelaySeconds)
     }
 
-    private func updateTrackerBlockingDependencies() throws {
+    private func updateTrackerBlockingDependencies() {
         let tdsEtag = ConfigurationStore.shared.loadEtag(for: .trackerRadar)
         let tdsData = ConfigurationStore.shared.loadData(for: .trackerRadar)
         ContentBlocking.shared.trackerDataManager.reload(etag: tdsEtag, data: tdsData)
