@@ -112,6 +112,7 @@ extension Pixel {
         case emailUserCreatedAlias
 
         case jsPixel(_ pixel: AutofillUserScript.JSPixel)
+        case duckPlayerJSPixel(_ pixel: YoutubeOverlayUserScript.JSPixel)
 
         case debug(event: Debug, error: Error? = nil)
 
@@ -291,6 +292,10 @@ extension Pixel.Event {
             } else {
                 return "m_mac_\(pixel.pixelName)"
             }
+
+        // This matches the SERP format
+        case .duckPlayerJSPixel(let pixel):
+            return "duck_player.mac.\(pixel.pixelName)"
         }
     }
 }

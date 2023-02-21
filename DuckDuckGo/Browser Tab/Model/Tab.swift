@@ -968,8 +968,10 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     private weak var youtubePlayerScript: YoutubePlayerUserScript?
     private var youtubePlayerCancellables: Set<AnyCancellable> = []
 
-    func setUpYoutubeScriptsIfNeeded() {
-        guard privatePlayer.isAvailable else {
+    private func setUpYoutubeScriptsIfNeeded(_ navigationError: Error? = nil) {
+        let nsError = error as NSError?
+        let shouldProceedDespiteError = nsError == nil || nsError?.code == NSURLErrorCancelled
+        guard privatePlayer.isAvailable, shouldProceedDespiteError  else {
             return
         }
 
@@ -984,20 +986,23 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             }
         }()
 
-        if webView.url?.host?.droppingWwwPrefix() == "youtube.com" && canPushMessagesToJS {
-            privatePlayer.$mode
-                .dropFirst()
-                .sink { [weak self] playerMode in
-                    guard let self = self else {
-                        return
-                    }
-                    let userValues = YoutubeOverlayUserScript.UserValues(
-                        privatePlayerMode: playerMode,
-                        overlayInteracted: self.privatePlayer.overlayInteracted
-                    )
-                    self.youtubeOverlayScript?.userValuesUpdated(userValues: userValues, inWebView: self.webView)
-                }
-                .store(in: &youtubePlayerCancellables)
+        if let hostname = webView.url?.host,
+           let origins = self.youtubeOverlayScript?.allowedOrigins {
+            if origins.contains(hostname) && canPushMessagesToJS {
+                privatePlayer.$mode
+                        .dropFirst()
+                        .sink { [weak self] playerMode in
+                            guard let self = self else {
+                                return
+                            }
+                            let userValues = YoutubeOverlayUserScript.UserValues(
+                                    privatePlayerMode: playerMode,
+                                    overlayInteracted: self.privatePlayer.overlayInteracted
+                            )
+                            self.youtubeOverlayScript?.userValuesUpdated(userValues: userValues, inWebView: self.webView)
+                        }
+                        .store(in: &youtubePlayerCancellables)
+            }
         }
 
         if url?.isPrivatePlayerScheme == true {
@@ -1467,6 +1472,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         invalidateInteractionStateData()
         linkProtection.setMainFrameUrl(nil)
         referrerTrimming.onFailedNavigation()
+        setUpYoutubeScriptsIfNeeded(error)
         webViewDidFailNavigationPublisher.send()
     }
 
