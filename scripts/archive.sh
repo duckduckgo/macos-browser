@@ -214,11 +214,15 @@ archive_and_export() {
 	setup_log_formatter
 
 	echo "Building and archiving the app (version ${app_version}) ..."
+
+	local derived_data="${workdir}/DerivedData"
+	rm -rf "${derived_data}"
 	
 	${filter_output} xcrun xcodebuild archive \
 		-scheme "${scheme}" \
 		-configuration "${configuration}" \
 		-archivePath "${archive}" \
+		-derivedDataPath "${derived_data}" \
 		CURRENT_PROJECT_VERSION="${app_version}" \
 		MARKETING_VERSION="${app_version}" \
 		RELEASE_PRODUCT_NAME_OVERRIDE=DuckDuckGo \
