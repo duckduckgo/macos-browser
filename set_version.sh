@@ -12,5 +12,5 @@ fi
 current_build_number=$(cut -d ' ' -f 3 <Configuration/AppStoreBuildNumber.xcconfig)
 next_build_number=$(( current_build_number + 1 ))
 
-printf 'MARKETING_VERSION = %s\n' "${version_number}" | tee Configuration/Version.xcconfig
+printf 'APP_VERSION = %s\n' "${version_number}" | tee Configuration/Version.xcconfig
 printf 'CURRENT_PROJECT_VERSION = %s\n' "${next_build_number}" | tee Configuration/AppStoreBuildNumber.xcconfig
