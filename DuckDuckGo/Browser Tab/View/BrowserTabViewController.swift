@@ -653,12 +653,12 @@ extension BrowserTabViewController: TabDelegate {
                   !alert.usernameTextField.stringValue.isEmpty,
                   !alert.passwordTextField.stringValue.isEmpty
             else {
-                request.submit( (.performDefaultHandling, nil) )
+                request.submit(nil)
                 return
             }
-            request.submit( (.useCredential, URLCredential(user: alert.usernameTextField.stringValue,
-                                                         password: alert.passwordTextField.stringValue,
-                                                         persistence: .forSession)) )
+            request.submit(.credential(URLCredential(user: alert.usernameTextField.stringValue,
+                                                     password: alert.passwordTextField.stringValue,
+                                                     persistence: .forSession)))
         }
 
         // when subscribing to another Tab, the sheet will be temporarily closed with response == .abort on the cancellable deinit

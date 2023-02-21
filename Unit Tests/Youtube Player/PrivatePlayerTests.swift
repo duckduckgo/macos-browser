@@ -21,48 +21,6 @@ import BrowserServicesKit
 import Combine
 @testable import DuckDuckGo_Privacy_Browser
 
-class MockPrivacyConfiguration: PrivacyConfiguration {
-    var identifier: String = "MockPrivacyConfiguration"
-    var userUnprotectedDomains: [String] = []
-    var tempUnprotectedDomains: [String] = []
-    var trackerAllowlist: PrivacyConfigurationData.TrackerAllowlistData = [:]
-    var exceptionsList: (PrivacyFeature) -> [String] = { _ in [] }
-    var featureSettings: PrivacyConfigurationData.PrivacyFeature.FeatureSettings = [:]
-
-    func exceptionsList(forFeature featureKey: PrivacyFeature) -> [String] { exceptionsList(featureKey) }
-    func isEnabled(featureKey: PrivacyFeature, versionProvider: AppVersionProvider) -> Bool { true }
-    func isFeature(_ feature: PrivacyFeature, enabledForDomain: String?) -> Bool { true }
-    func isProtected(domain: String?) -> Bool { true }
-    func isUserUnprotected(domain: String?) -> Bool { false }
-    func isTempUnprotected(domain: String?) -> Bool { false }
-    func isInExceptionList(domain: String?, forFeature featureKey: PrivacyFeature) -> Bool { false }
-    func settings(for feature: PrivacyFeature) -> PrivacyConfigurationData.PrivacyFeature.FeatureSettings { featureSettings }
-    func userEnabledProtection(forDomain: String) {}
-    func userDisabledProtection(forDomain: String) {}
-}
-
-@objc(MockPrivacyConfigurationManager)
-class MockPrivacyConfigurationManager: NSObject, PrivacyConfigurationManaging {
-    var embeddedConfigData: BrowserServicesKit.PrivacyConfigurationManager.ConfigurationData {
-        fatalError("not implemented")
-    }
-
-    var fetchedConfigData: BrowserServicesKit.PrivacyConfigurationManager.ConfigurationData? {
-        fatalError("not implemented")
-    }
-
-    var currentConfig: Data {
-        Data()
-    }
-
-    func reload(etag: String?, data: Data?) -> BrowserServicesKit.PrivacyConfigurationManager.ReloadResult {
-        fatalError("not implemented")
-    }
-
-    var updatesPublisher: AnyPublisher<Void, Never> = Just(()).eraseToAnyPublisher()
-    var privacyConfig: PrivacyConfiguration = MockPrivacyConfiguration()
-}
-
 final class PrivatePlayerTests: XCTestCase {
 
     var privatePlayer: PrivatePlayer!

@@ -20,6 +20,7 @@ import Foundation
 import CoreData
 import Cocoa
 import os.log
+import Persistence
 
 enum BookmarkStoreFetchPredicateType {
     case bookmarks

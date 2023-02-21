@@ -194,7 +194,6 @@ extension MainWindowController: NSWindowDelegate {
 
     func windowDidBecomeKey(_ notification: Notification) {
         mainViewController.windowDidBecomeMain()
-        mainViewController.navigationBarViewController.windowDidBecomeMain()
 
         if (notification.object as? NSWindow)?.isPopUpWindow == false {
             WindowControllersManager.shared.lastKeyMainWindowController = self

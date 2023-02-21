@@ -16,6 +16,8 @@
 //  limitations under the License.
 //
 
+import Foundation
+import Navigation
 import WebKit
 
 extension WKWebView {
@@ -146,41 +148,22 @@ extension WKWebView {
 
 }
 
-extension WKNavigationActionPolicy {
-    static func download(_ navigationAction: WKNavigationAction,
-                         using webView: WKWebView) -> WKNavigationActionPolicy {
-#if APPSTORE
-        return .download
-#else
-        webView.configuration.processPool
-            .setDownloadDelegateIfNeeded(using: LegacyWebKitDownloadDelegate.init)?
-            .registerDownloadNavigationAction(navigationAction)
-
-        if #available(macOS 11.3, *) {
-            return .download
-        }
-        // https://github.com/WebKit/WebKit/blob/9a6f03d46238213231cf27641ed1a55e1949d074/Source/WebKit/UIProcess/API/Cocoa/WKNavigationDelegate.h#L49
-        return WKNavigationActionPolicy(rawValue: Self.allow.rawValue + 1) ?? .cancel
-#endif
-    }
-
+protocol NavigationDownloadPolicy {
+    static var download: Self { get }
 }
 
-extension WKNavigationResponsePolicy {
-    static func download(_ navigationResponse: WKNavigationResponse,
-                         using webView: WKWebView) -> WKNavigationResponsePolicy {
-#if APPSTORE
-        return .download
-#else
+extension NavigationActionPolicy: NavigationDownloadPolicy {}
+extension NavigationResponsePolicy: NavigationDownloadPolicy {}
+
+extension NavigationDownloadPolicy {
+
+    static func download(_ url: URL, using webView: WKWebView, with callback: @escaping (WebKitDownload) -> Void) -> Self {
+#if !APPSTORE
         webView.configuration.processPool
             .setDownloadDelegateIfNeeded(using: LegacyWebKitDownloadDelegate.init)?
-            .registerDownloadNavigationResponse(navigationResponse)
-
-        if #available(macOS 11.3, *) {
-            return .download
-        }
-        // https://github.com/WebKit/WebKit/blob/9a6f03d46238213231cf27641ed1a55e1949d074/Source/WebKit/UIProcess/API/Cocoa/WKNavigationDelegate.h#L49
-        return WKNavigationResponsePolicy(rawValue: Self.allow.rawValue + 1) ?? .cancel
+            .registerDownloadDidStartCallback(callback, for: url)
 #endif
+        return .download
     }
+
 }

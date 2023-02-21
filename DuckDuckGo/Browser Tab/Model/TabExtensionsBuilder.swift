@@ -32,20 +32,20 @@ struct TabExtensionsBuilder: TabExtensionsBuilderProtocol {
 
     static var `default`: TabExtensionsBuilderProtocol {
 #if DEBUG
-        return AppDelegate.isRunningTests ? TestTabExtensionsBuilder.default : TabExtensionsBuilder()
+        return AppDelegate.isRunningTests ? TestTabExtensionsBuilder.shared : TabExtensionsBuilder()
 #else
         return TabExtensionsBuilder()
 #endif
     }
 
-    var components = [(type: any TabExtension.Type, buildingBlock: AnyTabExtensionBuildingBlock)]()
+    var components = [(protocolType: Any.Type, buildingBlock: any TabExtensionBuildingBlockProtocol)]()
 
     /// collect Tab Extensions instantiation blocks (`add { }` method calls)
     /// lazy for Unit Tests builds and non-lazy in Production
     @discardableResult
-    mutating func add<Extension: TabExtension>(_ makeTabExtension: @escaping () -> Extension) -> TabExtensionBuildingBlock<Extension> {
+    mutating func add<Extension: TabExtension>(_ makeTabExtension: @escaping () -> Extension) -> TabExtensionBuildingBlock<Extension.PublicProtocol> {
         let buildingBlock = TabExtensionBuildingBlock(makeTabExtension)
-        components.append( (type: Extension.self, buildingBlock: buildingBlock) )
+        components.append( (protocolType: Extension.PublicProtocol.self, buildingBlock: buildingBlock) )
         return buildingBlock
     }
 
@@ -61,10 +61,11 @@ struct TabExtensionsBuilder: TabExtensionsBuilderProtocol {
 #if DEBUG
 /// TabExtensionsBuilder loaded by default when running Tests
 /// by default loads only extensions passed in `load` argument,
-/// set default extensions to load in TestTabExtensionsBuilder.default
+/// set default extensions to load in TestTabExtensionsBuilder.shared
 /// provide overriding extensions initializers in `overrideExtensions` method using `override { .. }` calls
 final class TestTabExtensionsBuilder: TabExtensionsBuilderProtocol {
-    private var components = [(type: any TabExtension.Type, buildingBlock: AnyTabExtensionBuildingBlock)]()
+
+    private var components = [(protocolType: Any.Type, buildingBlock: (any TabExtensionBuildingBlockProtocol))]()
 
     var extensionsToLoad = [any TabExtension.Type]()
     private let overrideExtensionsFunc: (TestTabExtensionsBuilder) -> (TabExtensionsBuilderArguments, TabExtensionDependencies) -> Void
@@ -89,35 +90,47 @@ final class TestTabExtensionsBuilder: TabExtensionsBuilderProtocol {
         var builder = TabExtensionsBuilder()
         builder.registerExtensions(with: args, dependencies: dependencies)
 
-        self.components = builder.components.filter { component in extensionsToLoad.contains(where: { component.type == $0 }) }
+        self.components = builder.components.filter { component in
+            extensionsToLoad.contains(where: {
+                $0.publicProtocolType == component.protocolType
+            })
+        }
         self.overrideExtensionsFunc(self)(args, dependencies)
 
         return TabExtensions(components: components.map { $0.buildingBlock.make() })
     }
 
-    /// collect Tab Extensions instantiation blocks (`add { }` method calls)
-    /// lazy for Unit Tests builds and non-lazy in Production
+    /// override Tab Extensions instantiation blocks provided in TabExtensionsBuilder  (`override { }` method calls)
     @discardableResult
-    func override<Extension: TabExtension>(_ makeTabExtension: @escaping () -> Extension) -> TabExtensionBuildingBlock<Extension> {
+    func override<Extension: TabExtension>(_ makeTabExtension: @escaping () -> Extension) -> TabExtensionBuildingBlock<Extension.PublicProtocol> {
         let builderBlock = TabExtensionBuildingBlock(makeTabExtension)
-        guard let idx = components.firstIndex(where: { $0.type == Extension.self }) else {
-            return TabExtensionBuildingBlock {
+        guard let idx = components.firstIndex(where: { $0.protocolType == Extension.PublicProtocol.self }) else {
+            return TabExtensionBuildingBlock { () -> Extension in
                 fatalError("Trying to initialize an extension not specified in TestTabExtensionsBuilder.extensionsToLoad: \(Extension.self)")
             }
         }
-        guard case .lazy(let loader) = (components[idx].buildingBlock as? TabExtensionBuildingBlock<Extension>)?.state,
+        guard case .lazy(let loader) = (components[idx].buildingBlock as? TabExtensionBuildingBlock<Extension.PublicProtocol>)?.state,
               case .none = loader.state
         else {
-            fatalError("\(Extension.self) has been already initialized at the moment of the `override` call")
+            fatalError("\(type(of: components[idx].buildingBlock)) has been already initialized at the moment of the `override` call")
         }
-        loader.state = .none(makeTabExtension)
+        loader.state = TabExtensionLazyLoader<Extension.PublicProtocol>.State.none { makeTabExtension().getPublicProtocol () }
 
         return builderBlock
     }
 
+    /// collect Tab Extensions instantiation blocks (`add { }` method calls)
+    /// lazy for Unit Tests builds and non-lazy in Production
+    @discardableResult
+    func add<Extension: TabExtension>(_ makeTabExtension: @escaping () -> Extension) -> TabExtensionBuildingBlock<Extension.PublicProtocol> {
+        let buildingBlock = TabExtensionBuildingBlock(makeTabExtension)
+        components.append( (protocolType: Extension.PublicProtocol.self, buildingBlock: buildingBlock) )
+        return buildingBlock
+    }
+
     /// use to retreive Extension Building Blocks registered during TabExtensionsBuilder.registerExtensions
     func get<Extension: TabExtension>(_: Extension.Type) -> TabExtensionBuildingBlock<Extension> {
-        guard let buildingBlock = components.first(where: { $0.type == Extension.self })?.buildingBlock else {
+        guard let buildingBlock = components.first(where: { $0.protocolType == Extension.PublicProtocol.self })?.buildingBlock else {
             fatalError("\(Extension.self) not registered in TabExtensionsBuilder.registerExtensions")
         }
         return (buildingBlock as? TabExtensionBuildingBlock<Extension>)!
@@ -127,61 +140,62 @@ final class TestTabExtensionsBuilder: TabExtensionsBuilderProtocol {
 #endif
 
 @dynamicMemberLookup
-struct TabExtensionBuildingBlock<Extension: TabExtension> {
+struct TabExtensionBuildingBlock<T> {
 #if DEBUG
 
     fileprivate enum State {
-        case loaded(Extension)
-        case lazy(TabExtensionLazyLoader<Extension>)
+        case loaded(T)
+        case lazy(TabExtensionLazyLoader<T>)
     }
     fileprivate let state: State
-    var value: Extension {
+    var value: T {
         switch state {
         case .loaded(let value): return value
         case .lazy(let loader): return loader.value
         }
     }
 
-    init(_ makeTabExtension: @escaping () -> Extension) {
+    init<Extension: TabExtension>(_ makeTabExtension: @escaping () -> Extension) where Extension.PublicProtocol == T {
         if AppDelegate.isRunningTests {
             state = .lazy(.init(makeTabExtension))
         } else {
-            state = .loaded(makeTabExtension())
+            state = .loaded(makeTabExtension().getPublicProtocol())
         }
     }
 
 #else
 
-    let value: Extension
+    let value: T
 
-    init(_ makeTabExtension: @escaping () -> Extension) {
-        self.value = makeTabExtension()
+    init<Extension: TabExtension>(_ makeTabExtension: @escaping () -> Extension) where Extension.PublicProtocol == T {
+        self.value = makeTabExtension().getPublicProtocol()
     }
 
 #endif
 
-    subscript<T>(dynamicMember keyPath: KeyPath<Extension, T>) -> T {
+    subscript<P>(dynamicMember keyPath: KeyPath<T, P>) -> P {
         self.value[keyPath: keyPath]
     }
-}
-protocol AnyTabExtensionBuildingBlock {
-    func make() -> any TabExtension
-}
-extension TabExtensionBuildingBlock: AnyTabExtensionBuildingBlock {
+
     func make() -> any TabExtension {
-        self.value
+        return (value as? any TabExtension)!
     }
 }
 
+protocol TabExtensionBuildingBlockProtocol {
+    func make() -> any TabExtension
+}
+extension TabExtensionBuildingBlock: TabExtensionBuildingBlockProtocol {}
+
 #if DEBUG
-private final class TabExtensionLazyLoader<Extension: TabExtension> {
+private final class TabExtensionLazyLoader<T> {
     fileprivate enum State {
-        case none(() -> Extension)
-        case some(Extension)
+        case none(() -> T)
+        case some(T)
     }
     fileprivate var state: State
 
-    var value: Extension {
+    var value: T {
         if case .none(let makeTabExtension) = state {
             state = .some(makeTabExtension())
         }
@@ -189,8 +203,8 @@ private final class TabExtensionLazyLoader<Extension: TabExtension> {
         return value
     }
 
-    init(_ makeTabExtension: @escaping () -> Extension) {
-        self.state = .none(makeTabExtension)
+    init<Extension: TabExtension>(_ makeTabExtension: @escaping () -> Extension) where Extension.PublicProtocol == T {
+        self.state = .none { makeTabExtension().getPublicProtocol() }
     }
 }
 #endif
@@ -198,20 +212,25 @@ private final class TabExtensionLazyLoader<Extension: TabExtension> {
 struct TabExtensions {
     typealias ExtensionType = TabExtension
 
-    private(set) var extensions: [AnyKeyPath: any TabExtension]
+    private(set) var extensions: [ObjectIdentifier: any TabExtension]
 
     init(components: [any TabExtension]) {
-        var extensions = [AnyKeyPath: any TabExtension]()
+        var extensions = [ObjectIdentifier: any TabExtension]()
         func add<T: TabExtension>(_ tabExtension: T) {
-            assert(extensions[\T.self] == nil)
-            extensions[\T.self] = tabExtension
+            let key = ObjectIdentifier(T.PublicProtocol.self)
+            assert(extensions[key] == nil)
+            extensions[key] = tabExtension
         }
         components.forEach { add($0) }
         self.extensions = extensions
     }
 
-    func resolve<T: TabExtension>(_: T.Type) -> T.PublicProtocol? {
-        let tabExtension = (extensions[\T.self] as? T)?.getPublicProtocol()
+    enum NullableExtension {
+        case nullable
+    }
+    func resolve<T: TabExtension>(_: T.Type, _ isNullable: NullableExtension? = nil) -> T.PublicProtocol? {
+        let tabExtension = extensions[ObjectIdentifier(T.PublicProtocol.self)]?.getPublicProtocol() as? T.PublicProtocol
+        guard isNullable != .nullable else { return tabExtension}
 #if DEBUG
         assert(AppDelegate.isRunningTests || tabExtension != nil)
 #else
@@ -220,14 +239,14 @@ struct TabExtensions {
         return tabExtension
     }
 
-    func resolve<T: TabExtension>(_: T.Type) -> T.PublicProtocol? where T.PublicProtocol == T {
+    func resolve<T: TabExtension>(_: T.Type, _ isNullable: NullableExtension? = nil) -> T.PublicProtocol? where T.PublicProtocol == T {
         fatalError("ok, please don‘t cheat")
     }
 
 }
 
 extension TabExtensions: Sequence {
-    typealias Iterator = Dictionary<AnyKeyPath, ExtensionType>.Values.Iterator
+    typealias Iterator = Dictionary<ObjectIdentifier, ExtensionType>.Values.Iterator
 
     func makeIterator() -> Iterator {
         self.extensions.values.makeIterator()
