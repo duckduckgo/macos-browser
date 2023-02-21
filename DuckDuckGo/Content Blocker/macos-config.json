@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1676669300686,
+    "version": 1676930860840,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -158,6 +158,10 @@
                 {
                     "domain": "corporatefinanceinstitute.com",
                     "reason": "CMP gets incorrectly handled / repeatedly opens tabs"
+                },
+                {
+                    "domain": "kicker.de",
+                    "reason": "https://github.com/duckduckgo/autoconsent/issues/66"
                 }
             ],
             "settings": {
@@ -166,7 +170,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "659eb19df598629f1eaecbe7fa2d7f00"
+            "hash": "6ea9018a3de48904dd25d191c3640db4"
         },
         "autofill": {
             "exceptions": [
@@ -209,29 +213,48 @@
         },
         "customUserAgent": {
             "settings": {
-                "omitApplicationSites": [
+                "webViewDefault": [
                     {
-                        "domain": "thingiverse.com",
-                        "reason": "Site loads blank and does not proceed."
+                        "domain": "blinkist.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/693"
                     },
                     {
-                        "domain": "qubushotel.com",
-                        "reason": "Homepage UI elements appear squashed together, preventing interaction with the site."
+                        "domain": "help.ryanair.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/693"
                     },
                     {
-                        "domain": "digid.nl",
-                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/602"
+                        "domain": "nordaccount.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/693"
                     },
                     {
-                        "domain": "tiktok.com",
-                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/667"
+                        "domain": "openai.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/693"
+                    },
+                    {
+                        "domain": "cloudflare.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/693"
+                    },
+                    {
+                        "domain": "ancestry.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/693"
+                    },
+                    {
+                        "domain": "bookshop.org",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/693"
+                    },
+                    {
+                        "domain": "easyjet.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/693"
+                    },
+                    {
+                        "domain": "teraflex.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/693"
                     }
-                ],
-                "omitVersionSites": []
+                ]
             },
             "exceptions": [],
-            "state": "disabled",
-            "hash": "ba20b99be18138bbd3c6008bd154735d"
+            "state": "enabled",
+            "hash": "c36e7407d63ead7a9009e52146897de3"
         },
         "duckPlayer": {
             "exceptions": [],
