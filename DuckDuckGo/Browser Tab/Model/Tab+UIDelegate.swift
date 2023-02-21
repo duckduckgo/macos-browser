@@ -156,7 +156,7 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
     func webView(_ webView: WKWebView,
                  checkUserMediaPermissionFor url: URL,
                  mainFrameURL: URL,
-                 frameIdentifier frame: UInt,
+                 frameIdentifier: UInt64,
                  decisionHandler: @escaping (String, Bool) -> Void) {
         self.permissions.checkUserMediaPermission(for: url, mainFrameURL: mainFrameURL, decisionHandler: decisionHandler)
     }
@@ -286,7 +286,7 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
         delegate?.closeTab(self)
     }
 
-    func runPrintOperation(for frameHandle: Any?, in webView: WKWebView, completionHandler: ((Bool) -> Void)? = nil) {
+    func runPrintOperation(for frameHandle: FrameHandle?, in webView: WKWebView, completionHandler: ((Bool) -> Void)? = nil) {
         guard let printOperation = webView.printOperation(for: frameHandle) else { return }
 
         if printOperation.view?.frame.isEmpty == true {
@@ -300,12 +300,12 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
     }
 
     @objc(_webView:printFrame:)
-    func webView(_ webView: WKWebView, printFrame frameHandle: Any) {
+    func webView(_ webView: WKWebView, printFrame frameHandle: FrameHandle?) {
         self.runPrintOperation(for: frameHandle, in: webView)
     }
 
     @objc(_webView:printFrame:pdfFirstPageSize:completionHandler:)
-    func webView(_ webView: WKWebView, printFrame frameHandle: Any, pdfFirstPageSize size: CGSize, completionHandler: @escaping () -> Void) {
+    func webView(_ webView: WKWebView, printFrame frameHandle: FrameHandle?, pdfFirstPageSize size: CGSize, completionHandler: @escaping () -> Void) {
         self.runPrintOperation(for: frameHandle, in: webView) { _ in completionHandler() }
     }
 
