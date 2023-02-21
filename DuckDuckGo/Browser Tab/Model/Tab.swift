@@ -1173,7 +1173,6 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
     // swiftlint:disable function_body_length
     @MainActor
     func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
-        preferences.userAgent = UserAgent.for(navigationAction.url)
 
         if let policy = privatePlayer.decidePolicy(for: navigationAction, in: self) {
             return policy
@@ -1218,6 +1217,10 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
             if let navigationActionPolicy = navigationActionPolicy, navigationActionPolicy == false {
                 return .cancel
             }
+        }
+
+        if navigationAction.isForMainFrame {
+            preferences.userAgent = UserAgent.for(navigationAction.url)
         }
 
         if navigationAction.isForMainFrame, navigationAction.request.mainDocumentURL?.host != lastUpgradedURL?.host {
