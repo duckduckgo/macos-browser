@@ -22,7 +22,7 @@ import OHHTTPStubsSwift
 @testable import DuckDuckGo_Privacy_Browser
 
 class PixelTests: XCTestCase {
-    
+
     let host = "improving.duckduckgo.com"
     let testAgent = "Test Agent"
     let userAgentName = "User-Agent"
@@ -64,7 +64,7 @@ class PixelTests: XCTestCase {
 
         wait(for: [expectation], timeout: 1.0)
     }
-    
+
     func testWhenPixelFiredThenAPIHeadersAreAdded() {
         let expectation = XCTestExpectation()
 

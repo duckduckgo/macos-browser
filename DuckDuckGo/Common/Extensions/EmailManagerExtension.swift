@@ -1,7 +1,7 @@
 //
-//  WKFrameInfoExtension.swift
+//  EmailManagerExtension.swift
 //
-//  Copyright © 2022 DuckDuckGo. All rights reserved.
+//  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,17 +16,21 @@
 //  limitations under the License.
 //
 
-import WebKit
+import Foundation
+import BrowserServicesKit
 
-extension WKFrameInfo {
+extension EmailManager {
 
-    private static let _handle = "_handle"
-    var handle: Any? {
-        guard self.responds(to: NSSelectorFromString(Self._handle)) else {
-            assertionFailure("WKFrameInfo does not respond to _handle")
-            return nil
+    var emailPixelParameters: [String: String] {
+        var pixelParameters: [String: String] = [:]
+
+        if let cohort = self.cohort {
+            pixelParameters[Pixel.Parameters.emailCohort] = cohort
         }
-        return self.value(forKey: Self._handle)
+
+        pixelParameters[Pixel.Parameters.emailLastUsed] = self.lastUseDate
+
+        return pixelParameters
     }
 
 }

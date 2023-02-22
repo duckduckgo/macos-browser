@@ -138,12 +138,12 @@ final class BookmarkTableCellView: NSTableCellView, NibLoadable {
             updateTitleLabelValue()
         }
     }
-    
+
     override var draggingImageComponents: [NSDraggingImageComponent] {
         let faviconComponent = NSDraggingImageComponent(key: .icon)
         faviconComponent.contents = faviconImageView.image
         faviconComponent.frame = faviconImageView.frame
-        
+
         let labelComponent = NSDraggingImageComponent(key: .label)
         labelComponent.contents = titleLabel.imageRepresentation()
         labelComponent.frame = titleLabel.frame
@@ -182,11 +182,11 @@ final class BookmarkTableCellView: NSTableCellView, NibLoadable {
         self.entity = bookmark
 
         faviconImageView.image = bookmark.favicon(.small) ?? NSImage(named: "BookmarkDefaultFavicon")
-        
+
         if bookmark.isFavorite {
             accessoryImageView.isHidden = false
         }
-        
+
         accessoryImageView.image = bookmark.isFavorite ? Self.favoriteAccessoryViewImage : nil
         favoriteButton.image = bookmark.isFavorite ? Self.favoriteFilledAccessoryViewImage : Self.favoriteAccessoryViewImage
         primaryTitleLabelValue = bookmark.title

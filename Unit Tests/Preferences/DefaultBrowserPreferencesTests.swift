@@ -26,10 +26,8 @@ final class DefaultBrowserProviderMock: DefaultBrowserProvider {
 
     var bundleIdentifier: String = "com.duckduckgo.DefaultBrowserPreferencesTests"
     var isDefault: Bool = false
-    // swiftlint:disable identifier_name
     var _presentDefaultBrowserPrompt: () throws -> Void = {}
     var _openSystemPreferences: () -> Void = {}
-    // swiftlint:enable identifier_name
 
     func presentDefaultBrowserPrompt() throws {
         try _presentDefaultBrowserPrompt()
@@ -42,7 +40,6 @@ final class DefaultBrowserProviderMock: DefaultBrowserProvider {
 
 final class DefaultBrowserPreferencesTests: XCTestCase {
 
-    // swiftlint:disable:next implicitly_unwrapped_optional
     var provider: DefaultBrowserProviderMock!
 
     override func setUpWithError() throws {

@@ -103,3 +103,8 @@ final class Pixel {
     }
 
 }
+
+public func pixelAssertionFailure(_ message: @autoclosure () -> String = String(), file: StaticString = #fileID, line: UInt = #line) {
+    Pixel.fire(.debug(event: Pixel.Event.Debug.assertionFailure(message: message(), file: file, line: line)))
+    Swift.assertionFailure(message(), file: file, line: line)
+}

@@ -21,10 +21,6 @@ import Combine
 import ContentBlocking
 import Foundation
 
-protocol FbBlockingEnabledProvider {
-    var fbBlockingEnabled: Bool { get }
-}
-
 struct DetectedTracker {
     enum TrackerType {
         case tracker
@@ -115,5 +111,3 @@ extension Tab {
         self.contentBlockingAndSurrogates?.trackersPublisher ?? PassthroughSubject().eraseToAnyPublisher()
     }
 }
-
-extension FBProtectionTabExtension: FbBlockingEnabledProvider {}

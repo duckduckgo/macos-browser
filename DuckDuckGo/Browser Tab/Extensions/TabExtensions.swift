@@ -49,6 +49,11 @@ protocol TabExtension {
     associatedtype PublicProtocol
     func getPublicProtocol() -> PublicProtocol
 }
+extension TabExtension {
+    static var publicProtocolType: Any.Type {
+        PublicProtocol.self
+    }
+}
 
 // Implement these methods for Extension State Restoration
 protocol NSCodingExtension: TabExtension {
@@ -66,7 +71,7 @@ typealias TabExtensionsBuilderArguments = (
     tabIdentifier: UInt64,
     userScriptsPublisher: AnyPublisher<UserScripts?, Never>,
     inheritedAttribution: AdClickAttributionLogic.State?,
-    userContentControllerProvider: UserContentControllerProvider,
+    userContentControllerFuture: Future<UserContentControllerProtocol, Never>,
     permissionModel: PermissionModel,
     privacyInfoPublisher: AnyPublisher<PrivacyInfo?, Never>
 )
@@ -96,8 +101,8 @@ extension TabExtensionsBuilder {
 
         add {
             AdClickAttributionTabExtension(inheritedAttribution: args.inheritedAttribution,
-                                           userContentControllerProvider: args.userContentControllerProvider,
-                                           contentBlockerRulesScriptPublisher: userScripts.map(\.?.contentBlockerRulesScript),
+                                           userContentControllerFuture: args.userContentControllerFuture,
+                                           contentBlockerRulesScriptPublisher: userScripts.map { $0?.contentBlockerRulesScript },
                                            trackerInfoPublisher: trackerInfoPublisher,
                                            dependencies: dependencies.privacyFeatures.contentBlocking)
         }
@@ -115,7 +120,7 @@ extension TabExtensionsBuilder {
         }
         let fbProtection = add {
             FBProtectionTabExtension(privacyConfigurationManager: dependencies.privacyFeatures.contentBlocking.privacyConfigurationManager,
-                                     userContentControllerProvider: args.userContentControllerProvider,
+                                     userContentControllerFuture: args.userContentControllerFuture,
                                      clickToLoadUserScriptPublisher: userScripts.map(\.?.clickToLoadScript))
         }
 
@@ -132,7 +137,9 @@ extension TabExtensionsBuilder {
 extension TestTabExtensionsBuilder {
 
     /// Used by default for Tab instantiation if not provided in Tab(... extensionsBuilder: TestTabExtensionsBuilder([HistoryTabExtension.self])
-    static var `default` = TestTabExtensionsBuilder(overrideExtensions: TestTabExtensionsBuilder.overrideExtensions, [
+    static var shared: TestTabExtensionsBuilder = .default
+
+    static let `default` = TestTabExtensionsBuilder(overrideExtensions: TestTabExtensionsBuilder.overrideExtensions, [
         // FindInPageTabExtension.self, HistoryTabExtension.self, ... - add TabExtensions here to be loaded by default for ALL Unit Tests
     ])
 

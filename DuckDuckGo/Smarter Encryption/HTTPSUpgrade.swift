@@ -23,7 +23,7 @@ import BrowserServicesKit
 final class HTTPSUpgrade {
 
     static let shared = HTTPSUpgrade()
-    
+
     private let dataReloadLock = NSLock()
     private let store: HTTPSUpgradeStore
     private var bloomFilter: BloomFilterWrapper?
@@ -33,15 +33,15 @@ final class HTTPSUpgrade {
     }
 
     func isUpgradeable(url: URL, config: PrivacyConfiguration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig) -> Bool {
-        
+
         guard url.scheme == URL.NavigationalScheme.http.rawValue else {
             return false
         }
-        
+
         guard let host = url.host else {
             return false
         }
-        
+
         if store.shouldExcludeDomain(host) {
             return false
         }
@@ -49,30 +49,30 @@ final class HTTPSUpgrade {
         guard config.isFeature(.httpsUpgrade, enabledForDomain: host) else {
             return false
         }
-        
+
         waitForAnyReloadsToComplete()
         let isUpgradable = isInUpgradeList(host: host)
 
         return isUpgradable
     }
-    
+
     private func isInUpgradeList(host: String) -> Bool {
         guard let bloomFilter = bloomFilter else { return false }
         return bloomFilter.contains(host)
     }
-    
+
     private func waitForAnyReloadsToComplete() {
         // wait for lock (by locking and unlocking) before continuing
         dataReloadLock.lock()
         dataReloadLock.unlock()
     }
-    
+
     func loadDataAsync() {
         DispatchQueue.global(qos: .background).async {
             self.loadData()
         }
     }
-    
+
     func loadData() {
         if !dataReloadLock.try() {
             os_log("Reload already in progress", type: .debug)

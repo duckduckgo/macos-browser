@@ -16,7 +16,7 @@
 //  limitations under the License.
 //
 
-import BrowserServicesKit
+import Navigation
 import Foundation
 import Combine
 @testable import DuckDuckGo_Privacy_Browser
@@ -24,7 +24,7 @@ import Combine
 final class FileDownloadManagerMock: FileDownloadManagerProtocol {
 
     var downloads = Set<WebKitDownloadTask>()
-    
+
     var downloadAddedSubject = PassthroughSubject<WebKitDownloadTask, Never>()
     var downloadsPublisher: AnyPublisher<WebKitDownloadTask, Never> {
         downloadAddedSubject.eraseToAnyPublisher()

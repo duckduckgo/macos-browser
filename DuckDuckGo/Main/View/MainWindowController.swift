@@ -73,12 +73,12 @@ final class MainWindowController: NSWindowController {
     private func setupWindow() {
         window?.delegate = self
         window?.setFrameAutosaveName(Self.windowFrameSaveName)
-        
+
         if shouldShowOnboarding {
             mainViewController.tabCollectionViewModel.selectedTabViewModel?.tab.startOnboarding()
         }
     }
-    
+
     private func subscribeToResolutionChange() {
         NotificationCenter.default.addObserver(forName: NSApplication.didChangeScreenParametersNotification,
                                                object: NSApplication.shared,
@@ -86,11 +86,11 @@ final class MainWindowController: NSWindowController {
             self?.resizeWindowIfNeeded()
         }
     }
-    
+
     private func resizeWindowIfNeeded() {
         if let visibleWindowFrame = window?.screen?.visibleFrame,
            let windowFrame = window?.frame {
-            
+
             if windowFrame.width > visibleWindowFrame.width || windowFrame.height > visibleWindowFrame.height {
                 window?.performZoom(nil)
             }
@@ -136,7 +136,7 @@ final class MainWindowController: NSWindowController {
 
         mainViewController.tabBarViewController.fireButton.isEnabled = !prevented
         mainViewController.navigationBarViewController.controlsForUserPrevention.forEach { $0?.isEnabled = !prevented }
-        
+
         NSApplication.shared.mainMenuTyped.autoupdatingMenusForUserPrevention.forEach { $0.autoenablesItems = !prevented }
         NSApplication.shared.mainMenuTyped.menuItemsForUserPrevention.forEach { $0.isEnabled = !prevented }
 
@@ -194,7 +194,6 @@ extension MainWindowController: NSWindowDelegate {
 
     func windowDidBecomeKey(_ notification: Notification) {
         mainViewController.windowDidBecomeMain()
-        mainViewController.navigationBarViewController.windowDidBecomeMain()
 
         if (notification.object as? NSWindow)?.isPopUpWindow == false {
             WindowControllersManager.shared.lastKeyMainWindowController = self
@@ -244,7 +243,7 @@ fileprivate extension MainMenu {
             preferencesMenuItem
         ]
     }
-    
+
     var autoupdatingMenusForUserPrevention: [NSMenu] {
         return [
             preferencesMenuItem.menu,
@@ -259,7 +258,7 @@ fileprivate extension NavigationBarViewController {
     var controlsForUserPrevention: [NSControl?] {
         return [goBackButton,
                 goForwardButton,
-                refreshButton,
+                refreshOrStopButton,
                 optionsButton,
                 bookmarkListButton,
                 passwordManagementButton,

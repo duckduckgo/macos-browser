@@ -24,7 +24,7 @@ final class WebViewStateObserver: NSObject {
 
     weak var webView: WKWebView?
     weak var tabViewModel: TabViewModel?
-    
+
     private var isObserving = false
 
     init(webView: WKWebView,
@@ -36,17 +36,15 @@ final class WebViewStateObserver: NSObject {
         matchFlagValues()
         observe(webView: webView)
     }
-    
+
     func stopObserving() {
         guard isObserving else { return }
         webView?.removeObserver(self, forKeyPath: #keyPath(WKWebView.url))
-        webView?.removeObserver(self, forKeyPath: #keyPath(WKWebView.canGoBack))
-        webView?.removeObserver(self, forKeyPath: #keyPath(WKWebView.canGoForward))
         webView?.removeObserver(self, forKeyPath: #keyPath(WKWebView.isLoading))
         webView?.removeObserver(self, forKeyPath: #keyPath(WKWebView.title))
         webView?.removeObserver(self, forKeyPath: #keyPath(WKWebView.estimatedProgress))
         webView?.removeObserver(self, forKeyPath: #keyPath(WKWebView.serverTrust))
-        
+
         isObserving = false
     }
 
@@ -65,20 +63,16 @@ final class WebViewStateObserver: NSObject {
             return
         }
 
-        tabViewModel.updateCanGoBack()
-        tabViewModel.updateCanGoForward()
         tabViewModel.isWebViewLoading = webView.isLoading
     }
 
     private func observe(webView: WKWebView) {
         webView.addObserver(self, forKeyPath: #keyPath(WKWebView.url), options: .new, context: nil)
-        webView.addObserver(self, forKeyPath: #keyPath(WKWebView.canGoBack), options: .new, context: nil)
-        webView.addObserver(self, forKeyPath: #keyPath(WKWebView.canGoForward), options: .new, context: nil)
         webView.addObserver(self, forKeyPath: #keyPath(WKWebView.isLoading), options: .new, context: nil)
         webView.addObserver(self, forKeyPath: #keyPath(WKWebView.title), options: .new, context: nil)
         webView.addObserver(self, forKeyPath: #keyPath(WKWebView.estimatedProgress), options: .new, context: nil)
         webView.addObserver(self, forKeyPath: #keyPath(WKWebView.serverTrust), options: .new, context: nil)
-        
+
         isObserving = true
     }
 
@@ -93,8 +87,6 @@ final class WebViewStateObserver: NSObject {
 
         switch keyPath {
         case #keyPath(WKWebView.url): handleURLChange(in: webView, tabViewModel: tabViewModel)
-        case #keyPath(WKWebView.canGoBack): tabViewModel.updateCanGoBack()
-        case #keyPath(WKWebView.canGoForward): tabViewModel.updateCanGoForward()
         case #keyPath(WKWebView.isLoading): tabViewModel.isWebViewLoading = webView.isLoading
         case #keyPath(WKWebView.title):
             updateTitle()

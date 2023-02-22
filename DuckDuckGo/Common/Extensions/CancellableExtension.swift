@@ -1,7 +1,7 @@
 //
-//  ErrorExtension.swift
+//  CancellableExtension.swift
 //
-//  Copyright © 2021 DuckDuckGo. All rights reserved.
+//  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,21 +16,22 @@
 //  limitations under the License.
 //
 
+import Combine
 import Foundation
 
-extension Error {
+extension Cancellable {
 
-    var failingUrl: URL? {
-        return (self as NSError).userInfo["NSErrorFailingURLKey"] as? URL
+    /// Stores this cancellable instance in the specified type-erasing collection.
+    func store<C>(in collection: inout C) where C: RangeReplaceableCollection, C.Element == AnyCancellable {
+        AnyCancellable(self).store(in: &collection)
     }
 
-    var isFrameLoadInterrupted: Bool {
-        let error = self as NSError
-        return error.code == 102 && error.domain == "WebKitErrorDomain"
+}
+
+extension NSKeyValueObservation: Cancellable {
+
+    public func cancel() {
+        invalidate()
     }
 
-    var isNavigationCancelled: Bool {
-        let error = self as NSError
-        return error.code == -999 && error.domain == "NSURLErrorDomain"
-    }
 }

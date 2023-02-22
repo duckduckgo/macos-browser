@@ -22,6 +22,26 @@ import Combine
 
 final class URLExtensionTests: XCTestCase {
 
+    func testThatNonSandboxLibraryDirectoryURLReturnsTheSameValueRegardlessOfSandbox() {
+        let libraryURL = URL.nonSandboxLibraryDirectoryURL
+        var pathComponents = libraryURL.path.components(separatedBy: "/")
+        XCTAssertEqual(pathComponents.count, 4)
+
+        pathComponents[2] = "user"
+
+        XCTAssertEqual(pathComponents, ["", "Users", "user", "Library"])
+    }
+
+    func testThatNonSandboxApplicationSupportDirectoryURLReturnsTheSameValueRegardlessOfSandbox() {
+        let libraryURL = URL.nonSandboxApplicationSupportDirectoryURL
+        var pathComponents = libraryURL.path.components(separatedBy: "/")
+        XCTAssertEqual(pathComponents.count, 5)
+
+        pathComponents[2] = "user"
+
+        XCTAssertEqual(pathComponents, ["", "Users", "user", "Library", "Application Support"])
+    }
+
     func test_makeURL_from_addressBarString() {
         let data: [(string: String, expected: String)] = [
             ("https://duckduckgo.com/?q=search string with spaces", "https://duckduckgo.com/?q=search%20string%20with%20spaces"),
@@ -81,6 +101,19 @@ final class URLExtensionTests: XCTestCase {
             let url = URL.makeURL(from: string)
             XCTAssertEqual(url?.absoluteString, expected)
         }
+    }
+
+    func testWhenMakingUrlFromSuggestionPhaseContainingColon_ThenVerifyHypertextScheme() {
+        let validUrl = URL.makeURL(fromSuggestionPhrase: "http://duckduckgo.com")
+        XCTAssert(validUrl != nil)
+        XCTAssertEqual(validUrl?.scheme, "http")
+
+        let anotherValidUrl = URL.makeURL(fromSuggestionPhrase: "duckduckgo.com")
+        XCTAssert(anotherValidUrl != nil)
+        XCTAssertNotNil(validUrl?.scheme)
+
+        let notURL = URL.makeURL(fromSuggestionPhrase: "type:pdf")
+        XCTAssertNil(notURL)
     }
 
 }

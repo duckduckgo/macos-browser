@@ -24,7 +24,6 @@ import SwiftUI
 import BrowserServicesKit
 
 final class BrowserTabViewController: NSViewController {
-
     @IBOutlet weak var errorView: NSView!
     @IBOutlet weak var homePageView: NSView!
     @IBOutlet weak var errorMessageLabel: NSTextField!
@@ -39,11 +38,12 @@ final class BrowserTabViewController: NSViewController {
     private let tabCollectionViewModel: TabCollectionViewModel
     private var tabContentCancellable: AnyCancellable?
     private var userDialogsCancellable: AnyCancellable?
-    private var activeUserDialogCancellable: ModalSheetCancellable?
+    private var activeUserDialogCancellable: Cancellable?
     private var errorViewStateCancellable: AnyCancellable?
     private var hoverLinkCancellable: AnyCancellable?
     private var pinnedTabsDelegatesCancellable: AnyCancellable?
     private var keyWindowSelectedTabCancellable: AnyCancellable?
+    private var alertCancellable: AnyCancellable?
     private var cancellables = Set<AnyCancellable>()
 
     private var hoverLabelWorkItem: DispatchWorkItem?
@@ -218,7 +218,7 @@ final class BrowserTabViewController: NSViewController {
         }
     }
 
-    func subscribeToTabContent(of tabViewModel: TabViewModel?) {
+    private func subscribeToTabContent(of tabViewModel: TabViewModel?) {
         tabContentCancellable?.cancel()
 
         guard let tabViewModel = tabViewModel else {
@@ -227,7 +227,13 @@ final class BrowserTabViewController: NSViewController {
 
         let tabContentPublisher = tabViewModel.tab.$content
             .dropFirst()
-            .removeDuplicates()
+            .removeDuplicates(by: { old, new in
+                // no need to call showTabContent if webView stays in place and only its URL changes
+                if old.isUrl && new.isUrl {
+                    return true
+                }
+                return old == new
+            })
             .receive(on: DispatchQueue.main)
 
         tabContentCancellable = tabContentPublisher
@@ -239,7 +245,7 @@ final class BrowserTabViewController: NSViewController {
                 return Publishers.Merge3(
                     tabViewModel.tab.webViewDidCommitNavigationPublisher,
                     tabViewModel.tab.webViewDidFailNavigationPublisher,
-                    tabViewModel.tab.webViewDidReceiveChallengePublisher
+                    tabViewModel.tab.webViewDidReceiveUserInteractiveChallengePublisher
                 )
                 .prefix(1)
                 .eraseToAnyPublisher()
@@ -351,14 +357,9 @@ final class BrowserTabViewController: NSViewController {
         }
     }
 
-    private func showTabContentController(_ vc: NSViewController) {
-        self.addChild(vc)
-        view.addAndLayout(vc.view)
-    }
-
     private func showTransientTabContentController(_ vc: NSViewController) {
         transientTabContentViewController?.removeCompletely()
-        showTabContentController(vc)
+        addAndLayoutChild(vc)
         transientTabContentViewController = vc
     }
 
@@ -376,7 +377,7 @@ final class BrowserTabViewController: NSViewController {
         switch tabViewModel?.tab.content {
         case .bookmarks:
             removeAllTabContent()
-            showTabContentController(bookmarksViewControllerCreatingIfNeeded())
+            addAndLayoutChild(bookmarksViewControllerCreatingIfNeeded())
 
         case let .preferences(pane):
             removeAllTabContent()
@@ -384,7 +385,7 @@ final class BrowserTabViewController: NSViewController {
             if let pane = pane, preferencesViewController.model.selectedPane != pane {
                 preferencesViewController.model.selectPane(pane)
             }
-            showTabContentController(preferencesViewController)
+            addAndLayoutChild(preferencesViewController)
 
         case .onboarding:
             removeAllTabContent()
@@ -404,7 +405,7 @@ final class BrowserTabViewController: NSViewController {
             view.addAndLayout(homePageView)
 
         default:
-            break
+            removeAllTabContent()
         }
     }
 
@@ -459,6 +460,16 @@ final class BrowserTabViewController: NSViewController {
         }()
     }
 
+    // MARK: - Alerts
+
+    private func showAlert(with query: JSAlertQuery) -> AnyCancellable {
+        let jsAlertController = JSAlertController.create(query)
+        present(jsAlertController, animator: jsAlertController)
+
+        return AnyCancellable { [weak self] in
+            self?.dismiss(jsAlertController)
+        }
+    }
 }
 
 extension BrowserTabViewController: ContentOverlayUserScriptDelegate {
@@ -616,12 +627,8 @@ extension BrowserTabViewController: TabDelegate {
         switch dialog?.dialog {
         case .basicAuthenticationChallenge(let query):
             activeUserDialogCancellable = showBasicAuthenticationChallenge(with: query)
-        case .jsDialog(.alert(let query)):
+        case .jsDialog(let query):
             activeUserDialogCancellable = showAlert(with: query)
-        case .jsDialog(.confirm(let query)):
-            activeUserDialogCancellable = showConfirmDialog(with: query)
-        case .jsDialog(.textInput(let query)):
-            activeUserDialogCancellable = showTextInput(with: query)
         case .savePanel(let query):
             activeUserDialogCancellable = showSavePanel(with: query)
         case .openPanel(let query):
@@ -656,57 +663,6 @@ extension BrowserTabViewController: TabDelegate {
 
         // when subscribing to another Tab, the sheet will be temporarily closed with response == .abort on the cancellable deinit
         return ModalSheetCancellable(ownerWindow: window, modalSheet: alert.window, condition: !request.isComplete)
-    }
-
-    private func showAlert(with request: AlertDialogRequest) -> ModalSheetCancellable? {
-        guard let window = view.window else { return nil }
-
-        let alert = NSAlert.javascriptAlert(with: request.parameters)
-        alert.beginSheetModal(for: window) { [request] response in
-            // don‘t submit the query when tab is switched
-            if case .abort = response { return }
-            request.submit()
-        }
-
-        // when subscribing to another Tab, the sheet will be temporarily closed with response == .abort on the cancellable deinit
-        return ModalSheetCancellable(ownerWindow: window, modalSheet: alert.window, condition: !request.isComplete)
-    }
-
-    func showConfirmDialog(with request: ConfirmDialogRequest) -> ModalSheetCancellable? {
-        guard let window = view.window else { return nil }
-
-        let alert = NSAlert.javascriptConfirmation(with: request.parameters)
-        alert.beginSheetModal(for: window) { [request] response in
-            // don‘t submit the query when tab is switched
-            if case .abort = response { return }
-            request.submit(response == .alertFirstButtonReturn)
-        }
-
-        // when subscribing to another Tab, the sheet will be temporarily closed with response == .abort on the cancellable deinit
-        return ModalSheetCancellable(ownerWindow: window, modalSheet: alert.window, condition: !request.isComplete)
-    }
-
-    func showTextInput(with request: TextInputDialogRequest) -> ModalSheetCancellable? {
-        guard let window = view.window else { return nil }
-
-        let alert = NSAlert.javascriptTextInput(prompt: request.parameters.prompt, defaultText: request.parameters.defaultText)
-        alert.beginSheetModal(for: window) { [request] response in
-            // don‘t submit the query when tab is switched
-            if case .abort = response { return }
-            guard let textField = alert.accessoryView as? NSTextField else {
-                assertionFailure("BrowserTabViewController: Textfield not found in alert")
-                request.submit(nil)
-                return
-            }
-            let answer = response == .alertFirstButtonReturn ? textField.stringValue : nil
-            request.submit(answer)
-        }
-
-        // when subscribing to another Tab, the sheet will be temporarily closed with response == .abort on the cancellable deinit
-        return ModalSheetCancellable(ownerWindow: window, modalSheet: alert.window, condition: !request.isComplete) { [weak alert] in
-            // save user input between tab switching
-            (alert?.accessoryView as? NSTextField).map { request.parameters.defaultText = $0.stringValue }
-        }
     }
 
     func showSavePanel(with request: SavePanelDialogRequest) -> ModalSheetCancellable? {
@@ -972,6 +928,11 @@ extension BrowserTabViewController {
     private func hideWebViewSnapshotIfNeeded() {
         if webViewSnapshot != nil {
             DispatchQueue.main.async {
+                let isWebViewFirstResponder = self.view.window?.firstResponder === self.view.window
+                // check this because if address bar was the first responder, we don't want to mess with it
+                if isWebViewFirstResponder {
+                    self.setFirstResponderAfterAdding = true
+                }
                 self.showTabContent(of: self.tabCollectionViewModel.selectedTabViewModel)
                 self.webViewSnapshot?.removeFromSuperview()
             }

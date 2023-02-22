@@ -20,7 +20,7 @@ import SwiftUI
 
 struct CookieConsentAnimationView<AnimationModel>: View where AnimationModel: CookieConsentAnimation {
     @ObservedObject var animationModel: AnimationModel
-    
+
     var body: some View {
         VStack {
             HStack {
@@ -29,12 +29,10 @@ struct CookieConsentAnimationView<AnimationModel>: View where AnimationModel: Co
                     .opacity(animationModel.pillsOpacity)
                     .scaleEffect(animationModel.pillsScale)
                     .offset(x: animationModel.pillLeftSideOffset)
-                    .animation(.easeInOut(duration: animationModel.secondAnimationDuration))
 
                 Image("CookieConsentSketch")
                     .opacity(animationModel.imageOpacity)
                     .scaleEffect(animationModel.imageScale)
-                    .animation(.easeInOut(duration: animationModel.firstAnimationDuration))
 
                 Image("CookieConsentSketchMarks")
                     .foregroundColor(Color("CookieConsentSketchMarksColor"))
@@ -42,7 +40,6 @@ struct CookieConsentAnimationView<AnimationModel>: View where AnimationModel: Co
                     .opacity(animationModel.pillsOpacity)
                     .scaleEffect(animationModel.pillsScale)
                     .offset(x: animationModel.pillRightSideOffset)
-                    .animation(.easeInOut(duration: animationModel.secondAnimationDuration))
             }
         }
     }

@@ -23,7 +23,12 @@ protocol AddBookmarkModalViewControllerDelegate: AnyObject {
 
     func addBookmarkViewController(_ viewController: AddBookmarkModalViewController, addedBookmarkWithTitle title: String, url: URL)
     func addBookmarkViewController(_ viewController: AddBookmarkModalViewController, saved bookmark: Bookmark, newURL: URL)
+    func addBookmarkViewControllerWillClose()
 
+}
+
+extension AddBookmarkModalViewControllerDelegate {
+    func addBookmarkViewControllerWillClose() {}
 }
 
 final class AddBookmarkModalViewController: NSViewController {
@@ -78,7 +83,7 @@ final class AddBookmarkModalViewController: NSViewController {
     }
 
     weak var delegate: AddBookmarkModalViewControllerDelegate?
-    
+
     private var originalBookmark: Bookmark?
 
     override func viewDidLoad() {
@@ -92,12 +97,13 @@ final class AddBookmarkModalViewController: NSViewController {
         super.viewWillAppear()
         applyModalWindowStyleIfNeeded()
     }
-    
+
     func edit(bookmark: Bookmark) {
         self.originalBookmark = bookmark
     }
 
     @IBAction private func cancel(_ sender: NSButton) {
+        delegate?.addBookmarkViewControllerWillClose()
         dismiss()
     }
 
@@ -105,7 +111,7 @@ final class AddBookmarkModalViewController: NSViewController {
         guard let url = urlTextField.stringValue.url else {
             return
         }
-        
+
         if let bookmark = originalBookmark {
             bookmark.title = bookmarkTitleTextField.stringValue
             delegate?.addBookmarkViewController(self, saved: bookmark, newURL: url)
@@ -113,6 +119,7 @@ final class AddBookmarkModalViewController: NSViewController {
             delegate?.addBookmarkViewController(self, addedBookmarkWithTitle: bookmarkTitleTextField.stringValue, url: url)
         }
 
+        delegate?.addBookmarkViewControllerWillClose()
         dismiss()
     }
 
@@ -128,13 +135,13 @@ final class AddBookmarkModalViewController: NSViewController {
 
         updateAddButton()
     }
-    
+
     private func updateWithExistingBookmark() {
         if let originalBookmark = originalBookmark {
             titleTextField.stringValue = UserText.updateBookmark
             bookmarkTitleTextField.stringValue = originalBookmark.title
             urlTextField.stringValue = originalBookmark.url.absoluteString
-            
+
             addButton.title = UserText.save
         }
     }

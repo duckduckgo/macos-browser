@@ -20,6 +20,7 @@ import Foundation
 import CoreData
 import Cocoa
 import os.log
+import Persistence
 
 enum BookmarkStoreFetchPredicateType {
     case bookmarks
@@ -63,7 +64,7 @@ protocol BookmarkStore {
 
 // swiftlint:disable:next type_body_length
 final class LocalBookmarkStore: BookmarkStore {
-    
+
     enum Constants {
         static let rootFolderUUID = "87E09C05-17CB-4185-9EDF-8D1AF4312BAF"
         static let favoritesFolderUUID = "23B11CC4-EA56-4937-8EC1-15854109AE35"
@@ -77,7 +78,7 @@ final class LocalBookmarkStore: BookmarkStore {
         self.context = context
         sharedInitialization()
     }
-    
+
     private func sharedInitialization() {
         removeInvalidBookmarkEntities()
         migrateTopLevelStorageToRootLevelBookmarksFolder()
@@ -94,7 +95,7 @@ final class LocalBookmarkStore: BookmarkStore {
     }
 
     private lazy var context = Database.shared.makeContext(concurrencyType: .privateQueueConcurrencyType, name: "Bookmark")
-    
+
     /// All entities within the bookmarks store must exist under this root level folder. Because this value is used so frequently, it is cached here.
     private var rootLevelFolder: BookmarkManagedObject?
 
@@ -109,17 +110,17 @@ final class LocalBookmarkStore: BookmarkStore {
                                                  Constants.rootFolderUUID,
                                                  #keyPath(BookmarkManagedObject.parentFolder),
                                                  #keyPath(BookmarkManagedObject.isFolder))
-            
+
             let results = (try? context.fetch(fetchRequest)) ?? []
 
             guard results.count == 1 else {
                 fatalError("There shouldn't be more than one root folder")
             }
-            
+
             guard let folder = results.first else {
                 fatalError("Top level folder missing")
             }
-            
+
             self.rootLevelFolder = folder
         }
     }
@@ -149,7 +150,7 @@ final class LocalBookmarkStore: BookmarkStore {
 
             do {
                 let results: [BookmarkManagedObject]
-                
+
                 switch type {
                 case .bookmarks:
                     results = try self.context.fetch(fetchRequest)
@@ -162,7 +163,7 @@ final class LocalBookmarkStore: BookmarkStore {
                     let entities = try self.context.fetch(fetchRequest)
                     results = entities.first?.favorites?.array as? [BookmarkManagedObject] ?? []
                 }
-                
+
                 let entities: [BaseBookmarkEntity] = results.compactMap { entity in
                     BaseBookmarkEntity.from(managedObject: entity, parentFolderUUID: entity.parentFolder?.id)
                 }
@@ -200,7 +201,7 @@ final class LocalBookmarkStore: BookmarkStore {
                 let parentFetchRequest = BaseBookmarkEntity.singleEntity(with: parent.id)
                 let parentFetchRequestResults = try? self.context.fetch(parentFetchRequest)
                 let parentFolder = parentFetchRequestResults?.first
-                
+
                 if let index = index {
                     parentFolder?.mutableChildren.insert(bookmarkMO, at: index)
                 } else {
@@ -428,37 +429,37 @@ final class LocalBookmarkStore: BookmarkStore {
             DispatchQueue.main.async { completion(true, nil) }
         }
     }
-    
+
     func canMoveObjectWithUUID(objectUUID uuid: UUID, to parent: BookmarkFolder) -> Bool {
         guard uuid != parent.id else {
             // A folder cannot set itself as its parent
             return false
         }
-        
+
         // Assume true by default – the database validations will serve as a final check before any invalid state makes it into the database.
         var canMoveObject = true
-        
+
         context.performAndWait { [weak self] in
             guard let self = self else {
                 assertionFailure("Couldn't get strong self")
                 return
             }
-            
+
             let folderToMoveFetchRequest = BaseBookmarkEntity.singleEntity(with: uuid)
             let folderToMoveFetchRequestResults = try? self.context.fetch(folderToMoveFetchRequest)
-            
+
             let parentFolderFetchRequest = BaseBookmarkEntity.singleEntity(with: parent.id)
             let parentFolderFetchRequestResults = try? self.context.fetch(parentFolderFetchRequest)
-            
+
             guard let folderToMove = folderToMoveFetchRequestResults?.first as? BookmarkManagedObject,
                   let parentFolder = parentFolderFetchRequestResults?.first as? BookmarkManagedObject,
                   folderToMove.isFolder,
                   parentFolder.isFolder else {
                 return
             }
-            
+
             var currentParentFolder: BookmarkManagedObject? = parentFolder.parentFolder
-            
+
             // Check each parent and verify that the folder being moved isn't being given itself as an ancestor
             while let currentParent = currentParentFolder {
                 if currentParent.id == uuid {
@@ -472,7 +473,7 @@ final class LocalBookmarkStore: BookmarkStore {
 
         return canMoveObject
     }
-    
+
     func move(objectUUIDs: [UUID], toIndex index: Int?, withinParentFolder type: ParentFolderType, completion: @escaping (Error?) -> Void) {
         context.perform { [weak self] in
             guard let self = self else {
@@ -480,27 +481,27 @@ final class LocalBookmarkStore: BookmarkStore {
                 completion(nil)
                 return
             }
-            
+
             guard let rootFolder = self.rootLevelFolder else {
                 assertionFailure("\(#file): Failed to get root level folder")
                 completion(nil)
                 return
             }
-            
+
             // Guarantee that bookmarks are fetched in the same order as the UUIDs. In the future, this should fetch all objects at once with a
             // batch fetch request and have them sorted in the correct order.
             let bookmarkManagedObjects: [BookmarkManagedObject] = objectUUIDs.compactMap { uuid in
                 let entityFetchRequest = BaseBookmarkEntity.singleEntity(with: uuid)
                 return (try? self.context.fetch(entityFetchRequest))?.first
             }
-            
+
             let newParentFolder: BookmarkManagedObject
-            
+
             switch type {
             case .root: newParentFolder = rootFolder
             case .parent(let newParentUUID):
                 let bookmarksFetchRequest = BaseBookmarkEntity.singleEntity(with: newParentUUID)
-                
+
                 do {
                     if let fetchedParent = try self.context.fetch(bookmarksFetchRequest).first, fetchedParent.isFolder {
                         newParentFolder = fetchedParent
@@ -513,7 +514,7 @@ final class LocalBookmarkStore: BookmarkStore {
                     return
                 }
             }
-            
+
             if let index = index, index < newParentFolder.mutableChildren.count {
                 self.move(entities: bookmarkManagedObjects, to: index, within: newParentFolder)
             } else {
@@ -535,21 +536,21 @@ final class LocalBookmarkStore: BookmarkStore {
             DispatchQueue.main.async { completion(nil) }
         }
     }
-    
+
     private func move(entities bookmarkManagedObjects: [BookmarkManagedObject], to index: Int, within newParentFolder: BookmarkManagedObject) {
         var currentInsertionIndex = max(index, 0)
-        
+
         for bookmarkManagedObject in bookmarkManagedObjects {
             let movingObjectWithinSameFolder = bookmarkManagedObject.parentFolder?.id == newParentFolder.id
-            
+
             var adjustedInsertionIndex = currentInsertionIndex
-            
+
             if movingObjectWithinSameFolder, currentInsertionIndex > newParentFolder.mutableChildren.index(of: bookmarkManagedObject) {
                 adjustedInsertionIndex -= 1
             }
-            
+
             bookmarkManagedObject.parentFolder = nil
-            
+
             // Removing the bookmark from its current parent may have removed it from the collection it is about to be added to, so re-check
             // the bounds before adding it back.
             if adjustedInsertionIndex < newParentFolder.mutableChildren.count {
@@ -622,7 +623,7 @@ final class LocalBookmarkStore: BookmarkStore {
     }
 
     // MARK: - Import
-    
+
     /// Imports bookmarks into the Core Data store from an `ImportedBookmarks` object.
     /// The source is used to determine where to put bookmarks, as we want to match the source browser's structure as closely as possible.
     ///
@@ -678,7 +679,7 @@ final class LocalBookmarkStore: BookmarkStore {
     private func createEntitiesFromBookmarks(allFolders: [BookmarkManagedObject],
                                              bookmarks: ImportedBookmarks,
                                              importSourceName: String) -> BookmarkImportResult {
-        
+
         var total = BookmarkImportResult(successful: 0, duplicates: 0, failed: 0)
         var parent: BookmarkManagedObject?
 
@@ -700,12 +701,12 @@ final class LocalBookmarkStore: BookmarkStore {
                                                    parent: parent,
                                                    markBookmarksAsFavorite: false,
                                                    in: self.context)
-            
+
             total += result
         }
-        
+
         return total
-        
+
     }
 
     private func createFolder(titled title: String, in context: NSManagedObjectContext) -> BookmarkManagedObject {
@@ -740,7 +741,7 @@ final class LocalBookmarkStore: BookmarkStore {
             bookmarkManagedObject.urlEncrypted = bookmarkOrFolder.url as NSURL?
             bookmarkManagedObject.dateAdded = NSDate.now
             bookmarkManagedObject.parentFolder = parent ?? self.rootLevelFolder
-            
+
             // Bookmarks from the bookmarks bar are imported as favorites
             if bookmarkOrFolder.isDDGFavorite || (!bookmarkOrFolder.isFolder && markBookmarksAsFavorite == true) {
                 bookmarkManagedObject.favoritesFolder = favoritesFolder
@@ -771,29 +772,29 @@ final class LocalBookmarkStore: BookmarkStore {
 
         return total
     }
-    
+
     // MARK: - Migration
-    
+
     /// There is a rare issue where bookmark managed objects can end up in the database with an invalid state, that is that they are missing their title value despite being non-optional.
     /// They appear to be disjoint from a user's actual bookmarks data, so this function removes them.
     private func removeInvalidBookmarkEntities() {
         context.performAndWait {
             let entitiesFetchRequest = Bookmark.bookmarksAndFoldersFetchRequest()
-            
+
             do {
                 let entities = try self.context.fetch(entitiesFetchRequest)
-                
+
                 var deletedEntityCount = 0
-                
+
                 for entity in entities where entity.isInvalid {
                     self.context.delete(entity)
                     deletedEntityCount += 1
                 }
-                
+
                 if deletedEntityCount > 0 {
                     Pixel.fire(.debug(event: .removedInvalidBookmarkManagedObjects))
                 }
-                
+
                 try self.context.save()
             } catch {
                 os_log("Failed to remove invalid bookmark entities", type: .error)
@@ -806,19 +807,19 @@ final class LocalBookmarkStore: BookmarkStore {
             // 1. Fetch all top-level entities and check that there isn't an existing root folder
             // 2. If the root folder does not exist, create it
             // 3. Add all other top-level entities as children of the root folder
-            
+
             let rootFolderFetchRequest = Bookmark.singleEntity(with: .rootBookmarkFolderUUID)
-            
+
             let topLevelEntitiesFetchRequest = Bookmark.topLevelEntitiesFetchRequest()
             topLevelEntitiesFetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(BookmarkManagedObject.dateAdded), ascending: true)]
             topLevelEntitiesFetchRequest.returnsObjectsAsFaults = true
-            
+
             do {
                 // 0. Up front, check if a root folder exists but has been moved deeper into the hierarchy, and remove it if so:
-                
+
                 if let existingRootFolder = try self.context.fetch(rootFolderFetchRequest).first,
                    let rootFolderParent = existingRootFolder.parentFolder {
-                    
+
                     existingRootFolder.children?.forEach { child in
                         if let bookmarkEntity = child as? BookmarkManagedObject {
                             bookmarkEntity.parentFolder = rootFolderParent
@@ -826,15 +827,15 @@ final class LocalBookmarkStore: BookmarkStore {
                             assertionFailure("Tried to relocate child that was not a BookmarkManagedObject")
                         }
                     }
-                    
+
                     // Since the existing root folder's children have been relocated, delete it and let it be recreated later.
                     context.delete(existingRootFolder)
                 }
-                
+
                 // 1. Get the existing top level entities and check for a root folder:
-                
+
                 var existingTopLevelEntities = try self.context.fetch(topLevelEntitiesFetchRequest)
-                
+
                 let existingTopLevelFolderIndex = existingTopLevelEntities.firstIndex { entity in
                     entity.id == .rootBookmarkFolderUUID
                 }
@@ -845,9 +846,9 @@ final class LocalBookmarkStore: BookmarkStore {
                 }
 
                 // 2. Get or create the top level folder:
-                
+
                 let topLevelFolder: BookmarkManagedObject
-                
+
                 if let existingTopLevelFolderIndex = existingTopLevelFolderIndex {
                     topLevelFolder = existingTopLevelEntities[existingTopLevelFolderIndex]
                     existingTopLevelEntities.remove(at: existingTopLevelFolderIndex)
@@ -874,11 +875,11 @@ final class LocalBookmarkStore: BookmarkStore {
                 }
 
                 // 4. Add existing top level entities as children of the new top level folder:
-                
+
                 topLevelFolder.mutableChildren.addObjects(from: existingTopLevelEntities)
-                
+
                 // 5. Save the migration:
-                
+
                 try context.save()
             } catch {
                 Pixel.fire(.debug(event: .bookmarksStoreRootFolderMigrationFailed, error: error))
@@ -934,19 +935,19 @@ final class LocalBookmarkStore: BookmarkStore {
         context.performAndWait {
             let fetchRequest: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: BookmarkManagedObject.className())
             let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
-            
+
             do {
                 try context.execute(deleteRequest)
             } catch {
                 assertionFailure("Failed to reset bookmarks")
             }
         }
-        
+
         sharedInitialization()
     }
-    
+
     // MARK: - Concurrency
-    
+
     func loadAll(type: BookmarkStoreFetchPredicateType) async -> Result<[BaseBookmarkEntity], Error> {
         return await withCheckedContinuation { continuation in
             loadAll(type: type) { result, error in
@@ -963,7 +964,7 @@ final class LocalBookmarkStore: BookmarkStore {
             }
         }
     }
-    
+
     func save(folder: BookmarkFolder, parent: BookmarkFolder?) async -> Result<Bool, Error> {
         return await withCheckedContinuation { continuation in
             save(folder: folder, parent: parent) { result, error in
@@ -976,7 +977,7 @@ final class LocalBookmarkStore: BookmarkStore {
             }
         }
     }
-    
+
     func save(bookmark: Bookmark, parent: BookmarkFolder?, index: Int?) async -> Result<Bool, Error> {
         return await withCheckedContinuation { continuation in
             save(bookmark: bookmark, parent: parent, index: index) { result, error in
@@ -989,7 +990,7 @@ final class LocalBookmarkStore: BookmarkStore {
             }
         }
     }
-    
+
     func move(objectUUIDs: [UUID], toIndex index: Int?, withinParentFolder parent: ParentFolderType) async -> Error? {
         return await withCheckedContinuation { continuation in
             move(objectUUIDs: objectUUIDs, toIndex: index, withinParentFolder: parent) { error in
@@ -1048,7 +1049,7 @@ fileprivate extension BookmarkManagedObject {
 }
 
 extension UUID {
-    
+
     static var rootBookmarkFolderUUID: UUID {
         return UUID(uuidString: LocalBookmarkStore.Constants.rootFolderUUID)!
     }
@@ -1056,16 +1057,16 @@ extension UUID {
     static var favoritesFolderUUID: UUID {
         return UUID(uuidString: LocalBookmarkStore.Constants.favoritesFolderUUID)!
     }
-    
+
 }
 
 fileprivate extension BookmarkManagedObject {
-    
+
     var isInvalid: Bool {
         if titleEncrypted == nil {
             return true
         }
-        
+
         return false
     }
 

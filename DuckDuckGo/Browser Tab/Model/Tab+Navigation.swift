@@ -16,7 +16,7 @@
 //  limitations under the License.
 //
 
-import BrowserServicesKit
+import Navigation
 import Common
 import Foundation
 import WebKit
@@ -35,18 +35,13 @@ extension Tab: NavigationResponder {
             .weak(nullable: self.adClickAttribution),
 
             .struct(SerpHeadersNavigationResponder()),
-            .weak(nullable: self.fbProtection)
-        )
-        navigationDelegate.registerCustomDelegateMethodHandler(.weak(self), for: #selector(webView(_:contextMenuDidCreate:)))
-    }
+            .weak(nullable: self.fbProtection),
 
-    func didCancel(_ navigationAction: NavigationAction, with relatedAction: NavigationActionCancellationRelatedAction) {
-        if case .redirect(let request) = relatedAction {
-            invalidateBackItemIfNeeded(for: navigationAction)
-            DispatchQueue.main.async { [weak webView] in
-                webView?.load(request)
-            }
-        }
+            // should be the last, for Unit Tests navigation events tracking
+            .struct(nullable: testsClosureNavigationResponder)
+        )
+        navigationDelegate
+            .registerCustomDelegateMethodHandler(.weak(self), forSelectorNamed: "_webView:contextMenuDidCreateDownload:")
     }
 
 }

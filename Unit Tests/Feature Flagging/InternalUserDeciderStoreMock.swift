@@ -1,4 +1,7 @@
-//  Copyright © 2022 DuckDuckGo. All rights reserved.
+//
+//  InternalUserDeciderStoreMock.swift
+//
+//  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -13,4 +16,23 @@
 //  limitations under the License.
 //
 
-#include? "Version.xcconfig"
+import Foundation
+import Combine
+@testable import DuckDuckGo_Privacy_Browser
+
+class InternalUserDeciderStoreMock: InternalUserDeciderStoring {
+
+    var saveCalled = false
+    var isInternal = false
+    func save(isInternal: Bool) throws {
+        saveCalled = true
+        self.isInternal = isInternal
+    }
+
+    var loadCalled = false
+    func load() throws -> Bool {
+        loadCalled = true
+        return isInternal
+    }
+
+}

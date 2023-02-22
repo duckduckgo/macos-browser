@@ -270,7 +270,7 @@ final class TabBarViewItem: NSCollectionViewItem {
         layer.mask = layerMask
         return layer
     }()
-        
+
     private lazy var layerMask: CALayer = {
         let layer = CALayer()
         layer.addSublayer(leftPixelMask)
@@ -278,28 +278,28 @@ final class TabBarViewItem: NSCollectionViewItem {
         layer.addSublayer(topContentLineMask)
         return layer
     }()
-    
+
     private lazy var leftPixelMask: CALayer = {
         let layer = CALayer()
         layer.backgroundColor = NSColor.white.cgColor
         return layer
     }()
-    
+
     private lazy var rightPixelMask: CALayer = {
         let layer = CALayer()
         layer.backgroundColor = NSColor.white.cgColor
         return layer
     }()
-    
+
     private lazy var topContentLineMask: CALayer = {
         let layer = CALayer()
         layer.backgroundColor = NSColor.white.cgColor
         return layer
     }()
-    
+
     override func viewWillLayout() {
         super.viewWillLayout()
-        
+
         withoutAnimation {
             borderLayer.frame = self.view.bounds
             leftPixelMask.frame = CGRect(x: 0, y: 0, width: TabShadowConfig.dividerSize, height: TabShadowConfig.dividerSize)
@@ -307,7 +307,7 @@ final class TabBarViewItem: NSCollectionViewItem {
             topContentLineMask.frame = CGRect(x: 0, y: TabShadowConfig.dividerSize, width: borderLayer.bounds.width, height: borderLayer.bounds.height - TabShadowConfig.dividerSize)
         }
     }
-    
+
     private func updateBorderLayerColor() {
         NSAppearance.withAppAppearance {
             withoutAnimation {
@@ -315,7 +315,7 @@ final class TabBarViewItem: NSCollectionViewItem {
             }
         }
     }
-    
+
     private func setupView() {
         mouseOverView.delegate = self
         mouseClickView.delegate = self
@@ -326,7 +326,7 @@ final class TabBarViewItem: NSCollectionViewItem {
         view.layer?.masksToBounds = true
         view.layer?.addSublayer(borderLayer)
     }
-    
+
     private func clearSubscriptions() {
         cancellables.removeAll()
     }
@@ -346,9 +346,9 @@ final class TabBarViewItem: NSCollectionViewItem {
 
         faviconWrapperViewCenterConstraint.priority = titleTextField.isHidden ? .defaultHigh : .defaultLow
         faviconWrapperViewLeadingConstraint.priority = titleTextField.isHidden ? .defaultLow : .defaultHigh
-        
+
         updateBorderLayerColor()
-        
+
         if isSelected {
             borderLayer.isHidden = false
         } else {

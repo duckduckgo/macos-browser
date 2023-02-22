@@ -12,6 +12,10 @@
 		<string>MacOS Browser</string>
 		<key>com.duckduckgo.macos.browser.review</key>
 		<string>MacOS Browser Product Review</string>
+		<key>com.duckduckgo.mobile.ios</key>
+		<string>Sandbox MacOS Browser Release</string>
+		<key>com.duckduckgo.mobile.ios.review</key>
+		<string>Sandbox MacOS Browser Product Review</string>
 	</dict>
 	<key>signingCertificate</key>
 	<string></string>

@@ -32,7 +32,7 @@ struct Favorites: View {
 
     var body: some View {
 
-        if #available(macOS 11.0, *) {
+        if #available(macOS 12.0, *) {
             LazyVStack(spacing: 4) {
                 FavoritesGrid(isHovering: $isHovering)
             }
@@ -53,7 +53,7 @@ struct Favorites: View {
     }
 
 }
-    
+
 struct FavoritesGrid: View {
 
     @EnvironmentObject var model: HomePage.Models.FavoritesModel
@@ -66,7 +66,7 @@ struct FavoritesGrid: View {
 
     var body: some View {
 
-        if #available(macOS 11.0, *) {
+        if #available(macOS 12.0, *) {
             LazyVGrid(
                 columns: Array(repeating: GridItem(.fixed(GridDimensions.itemWidth), spacing: GridDimensions.horizontalSpacing), count: HomePage.favoritesPerRow),
                 spacing: GridDimensions.verticalSpacing
@@ -207,13 +207,13 @@ struct FavoritesGrid: View {
         return row
     }
 }
-    
+
 fileprivate struct FavoritesGridAddButton: View {
-    
+
     @EnvironmentObject var model: HomePage.Models.FavoritesModel
 
     var body: some View {
-        
+
         ZStack(alignment: .top) {
             FavoriteTemplate(title: UserText.addFavorite, domain: nil)
             ZStack {
@@ -225,15 +225,15 @@ fileprivate struct FavoritesGridAddButton: View {
         .link {
             model.addNew()
         }
-        
+
     }
-    
+
 }
-    
+
 fileprivate struct FavoritesGridGhostButton: View {
-    
+
     var body: some View {
-        
+
         VStack {
             RoundedRectangle(cornerRadius: 12)
                 .stroke(Color("HomeFavoritesGhostColor"), style: StrokeStyle(lineWidth: 1.5, dash: [4.0, 2.0]))
@@ -241,9 +241,9 @@ fileprivate struct FavoritesGridGhostButton: View {
             Spacer()
         }
         .frame(width: FavoritesGrid.GridDimensions.itemWidth, height: FavoritesGrid.GridDimensions.itemHeight)
-        
+
     }
-    
+
 }
 
 struct FavoriteTemplate: View {
@@ -281,7 +281,7 @@ struct FavoriteTemplate: View {
         .frame(maxWidth: FavoritesGrid.GridDimensions.itemWidth)
         .onHover { isHovering in
             self.isHovering = isHovering
-            
+
             if isHovering {
                 NSCursor.pointingHand.push()
             } else {
@@ -299,9 +299,19 @@ struct Favorite: View {
 
     let bookmark: Bookmark
 
+    // Maintain separate copies of bookmark metadata required by the view, in order to ensure that SwiftUI re-renders correctly.
+    private let bookmarkTitle: String
+    private let bookmarkURL: URL
+
+    init(bookmark: Bookmark) {
+        self.bookmark = bookmark
+        self.bookmarkTitle = bookmark.title
+        self.bookmarkURL = bookmark.url
+    }
+
     var body: some View {
 
-        FavoriteTemplate(title: bookmark.title, domain: bookmark.url.host)
+        FavoriteTemplate(title: bookmarkTitle, domain: bookmarkURL.host)
             .link {
                 model.open(bookmark)
             }.contextMenu(ContextMenu(menuItems: {

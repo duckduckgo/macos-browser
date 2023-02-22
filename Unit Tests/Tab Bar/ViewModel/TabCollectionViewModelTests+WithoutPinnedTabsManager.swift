@@ -23,6 +23,16 @@ import XCTest
 
 extension TabCollectionViewModelTests {
 
+    override func setUp() {
+        customAssert = { _, _, _, _ in }
+        customAssertionFailure = { _, _, _ in }
+    }
+
+    override func tearDown() {
+        customAssert = nil
+        customAssertionFailure = nil
+    }
+
     // MARK: - TabViewModel
 
     func test_WithoutPinnedTabsManager_WhenTabViewModelIsCalledWithIndexOutOfBoundsThenNilIsReturned() {
@@ -366,29 +376,6 @@ extension TabCollectionViewModelTests {
         tabCollectionViewModel.removeSelected()
 
         XCTAssertEqual(tabCollectionViewModel.selectedTabViewModel?.tab, childTab1)
-    }
-
-    func test_WithoutPinnedTabsManager_WhenOwnerOfWebviewIsRemovedThenAllOtherTabsRemained() {
-        let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
-
-        tabCollectionViewModel.appendNewTab()
-        tabCollectionViewModel.appendNewTab()
-        let lastTabViewModel = tabCollectionViewModel.tabViewModel(at: tabCollectionViewModel.tabCollection.tabs.count - 1)!
-
-        tabCollectionViewModel.remove(ownerOf: lastTabViewModel.tab.webView)
-
-        XCTAssertFalse(tabCollectionViewModel.tabCollection.tabs.contains(lastTabViewModel.tab))
-        XCTAssert(tabCollectionViewModel.tabCollection.tabs.count == 2)
-    }
-
-    func test_WithoutPinnedTabsManager_WhenOwnerOfWebviewIsNotInTabCollectionThenNoTabIsRemoved() {
-        let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
-        let originalCount = tabCollectionViewModel.tabCollection.tabs.count
-        let tab = Tab()
-
-        tabCollectionViewModel.remove(ownerOf: tab.webView)
-
-        XCTAssertEqual(tabCollectionViewModel.tabCollection.tabs.count, originalCount)
     }
 
     func test_WithoutPinnedTabsManager_RemoveSelected() {

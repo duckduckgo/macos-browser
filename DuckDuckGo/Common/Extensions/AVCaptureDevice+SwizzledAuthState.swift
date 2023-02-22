@@ -19,10 +19,7 @@
 import Foundation
 import AVFoundation
 
-@objc private protocol AVCaptureDevice_Swizzled {
-    static func swizzled_authorizationStatus(for mediaType: AVMediaType) -> AVAuthorizationStatus
-}
-extension AVCaptureDevice: AVCaptureDevice_Swizzled {
+extension AVCaptureDevice {
     private static var authorizationStatusForMediaType: ((AVMediaType, inout AVAuthorizationStatus) -> Void)?
     private static var isSwizzled: Bool { authorizationStatusForMediaType != nil }
 
@@ -61,8 +58,8 @@ extension AVCaptureDevice: AVCaptureDevice_Swizzled {
         self.authorizationStatusForMediaType = nil
     }
 
-    static func swizzled_authorizationStatus(for mediaType: AVMediaType) -> AVAuthorizationStatus {
-        var result = (self as AVCaptureDevice_Swizzled.Type).swizzled_authorizationStatus(for: mediaType)
+    @objc dynamic private static func swizzled_authorizationStatus(for mediaType: AVMediaType) -> AVAuthorizationStatus {
+        var result = self.swizzled_authorizationStatus(for: mediaType) // call the original
         if Thread.isMainThread,
            let authorizationStatusForMediaType = Self.authorizationStatusForMediaType {
             authorizationStatusForMediaType(mediaType, &result)

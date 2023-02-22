@@ -327,9 +327,15 @@ private extension NSMenuItem {
     }
 
     static func openSystemPreferences(for permission: PermissionType, target: PermissionContextMenu) -> NSMenuItem {
-        let item = NSMenuItem(title: UserText.permissionOpenSystemPreferences,
-                              action: #selector(PermissionContextMenu.openSystemPreferences),
-                              keyEquivalent: "")
+        let title: String = {
+            if #available(macOS 13.0, *) {
+                return UserText.permissionOpenSystemSettings
+            } else {
+                return UserText.openSystemPreferences
+            }
+        }()
+
+        let item = NSMenuItem(title: title, action: #selector(PermissionContextMenu.openSystemPreferences), keyEquivalent: "")
         item.representedObject = permission
         item.target = target
         return item

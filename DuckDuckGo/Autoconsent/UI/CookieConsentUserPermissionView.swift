@@ -37,14 +37,14 @@ struct CookieConsentUserPermissionView<AnimationModel>: View where AnimationMode
             .frame(width: Consts.Layout.outerContainerWidth)
         }
         .padding(Consts.Layout.containerPadding)
-        .background(Color("CookieConsentPanelBackground"))
+        .background(Color("DialogPanelBackground"))
         .cornerRadius(Consts.Layout.containerCornerRadius)
         .overlay(
             RoundedRectangle(cornerRadius: Consts.Layout.containerCornerRadius)
                 .stroke(colorScheme == .dark ? Consts.Colors.darkModeBorderColor : Consts.Colors.whiteModeBorderColor, lineWidth: 1)
         )
     }
-  
+
     private var daxStackView: some View {
         VStack {
             HStack {
@@ -52,28 +52,28 @@ struct CookieConsentUserPermissionView<AnimationModel>: View where AnimationMode
                     .resizable()
                     .frame(width: Consts.Layout.daxImageSize, height: Consts.Layout.daxImageSize)
                     .shadow(color: Consts.Colors.daxShadow, radius: 6, x: 0, y: 3)
-                
+
                 Spacer()
             }
         }
     }
-    
+
     private var contentView: some View {
         VStack(alignment: .leading, spacing: 24) {
             Text(UserText.autoconsentModalTitle)
                 .font(.system(size: Consts.Font.size))
                 .fontWeight(.light)
-            
+
             CookieConsentAnimationView(animationModel: sketchAnimationModel)
                 .padding(.leading, 40)
-            
+
             Text(UserText.autoconsentModalBody)
                 .fontWeight(.light)
                 .font(.system(size: Consts.Font.size))
-            
+
         }.frame(maxHeight: .infinity)
     }
-    
+
     private var buttonStack: some View {
         HStack {
             Button {
@@ -82,7 +82,7 @@ struct CookieConsentUserPermissionView<AnimationModel>: View where AnimationMode
                 Text(UserText.autoconsentModalDenyButton)
             }
             .buttonStyle(SecondaryCTAStyle())
-            
+
             Button {
                 result(true)
             } label: {
@@ -91,7 +91,7 @@ struct CookieConsentUserPermissionView<AnimationModel>: View where AnimationMode
             .buttonStyle(PrimaryCTAStyle())
         }
     }
-    
+
     func startAnimation() {
         sketchAnimationModel.startAnimation()
     }
@@ -100,7 +100,7 @@ struct CookieConsentUserPermissionView<AnimationModel>: View where AnimationMode
 struct CookieConsentUserPermissionView_Previews: PreviewProvider {
     static var previews: some View {
         let result: (Bool) -> Void = { _ in }
-        
+
         if #available(macOS 11.0, *) {
             CookieConsentUserPermissionView(sketchAnimationModel: CookieConsentAnimationMock(), result: result).preferredColorScheme(.dark)
                 .padding()
@@ -113,7 +113,7 @@ struct CookieConsentUserPermissionView_Previews: PreviewProvider {
 }
 
 private struct PrimaryCTAStyle: ButtonStyle {
-    
+
     func makeBody(configuration: Self.Configuration) -> some View {
 
         let color = configuration.isPressed ? Color("CookieConsentPrimaryButtonPressed") : Color("CookieConsentPrimaryButton")
@@ -130,13 +130,13 @@ private struct PrimaryCTAStyle: ButtonStyle {
 
 private struct SecondaryCTAStyle: ButtonStyle {
     @Environment(\.colorScheme) var colorScheme
-    
+
     func makeBody(configuration: Self.Configuration) -> some View {
-        
+
         let color = configuration.isPressed ? Color("CookieConsentSecondaryButtonPressed") : Color("CookieConsentSecondaryButton")
-        
+
         let outterShadowOpacity = colorScheme == .dark ? 0.8 : 0.0
-        
+
         configuration.label
             .font(.system(size: 13, weight: .light, design: .default))
             .foregroundColor(.primary)
@@ -147,7 +147,7 @@ private struct SecondaryCTAStyle: ButtonStyle {
                 .fill(color)
                 .shadow(color: .black.opacity(0.1), radius: 0.1, x: 0, y: 1)
                 .shadow(color: .primary.opacity(outterShadowOpacity), radius: 0.1, x: 0, y: -0.6))
-        
+
             .overlay(
                 RoundedRectangle(cornerRadius: Consts.Layout.CTACornerRadius)
                     .stroke(Color.black.opacity(0.1), lineWidth: 1))
@@ -164,7 +164,7 @@ private enum Consts {
         static let CTACornerRadius: CGFloat = 8
         static let containerPadding: CGFloat = 20
     }
-    
+
     struct Colors {
         static let darkModeBorderColor: Color = .white.opacity(0.2)
         static let whiteModeBorderColor: Color = .black.opacity(0.1)

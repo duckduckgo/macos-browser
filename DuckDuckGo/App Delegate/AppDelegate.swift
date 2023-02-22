@@ -20,6 +20,7 @@ import Cocoa
 import Combine
 import os.log
 import BrowserServicesKit
+import Persistence
 
 @NSApplicationMain
 final class AppDelegate: NSObject, NSApplicationDelegate {
@@ -46,10 +47,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private let keyStore = EncryptionKeyStore()
     private var fileStore: FileStore!
+
     private(set) var stateRestorationManager: AppStateRestorationManager!
     private var grammarFeaturesManager = GrammarFeaturesManager()
     private let crashReporter = CrashReporter()
-    let updateController = UpdateController()
+    private(set) var internalUserDecider: InternalUserDeciding!
+    private var appIconChanger: AppIconChanger!
+
+#if !APPSTORE
+    var updateController: UpdateController!
+#endif
 
     var appUsageActivityMonitor: AppUsageActivityMonitor?
 
@@ -98,7 +105,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             fileStore = EncryptedFileStore()
         }
         stateRestorationManager = AppStateRestorationManager(fileStore: fileStore)
+
+        let internalUserDeciderStore = InternalUserDeciderStore(fileStore: fileStore)
+        internalUserDecider = InternalUserDecider(store: internalUserDeciderStore)
+
+#if !APPSTORE
+        updateController = UpdateController(internalUserDecider: internalUserDecider)
         stateRestorationManager.subscribeToAutomaticAppRelaunching(using: updateController.willRelaunchAppPublisher)
+#endif
+
+        appIconChanger = AppIconChanger(internalUserDecider: internalUserDecider)
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
@@ -134,6 +150,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         crashReporter.checkForNewReports()
 
         urlEventHandler.applicationDidFinishLaunching()
+
+        subscribeToEmailProtectionStatusNotifications()
 
         UserDefaultsWrapper<Any>.clearRemovedKeys()
     }
@@ -171,6 +189,25 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func applyPreferredTheme() {
         let appearancePreferences = AppearancePreferences()
         appearancePreferences.updateUserInterfaceStyle()
+    }
+
+    private func subscribeToEmailProtectionStatusNotifications() {
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(emailDidSignInNotification(_:)),
+                                               name: .emailDidSignIn,
+                                               object: nil)
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(emailDidSignOutNotification(_:)),
+                                               name: .emailDidSignOut,
+                                               object: nil)
+    }
+
+    @objc private func emailDidSignInNotification(_ notification: Notification) {
+        Pixel.fire(.emailEnabled)
+    }
+
+    @objc private func emailDidSignOutNotification(_ notification: Notification) {
+        Pixel.fire(.emailDisabled)
     }
 
 }
