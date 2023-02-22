@@ -59,6 +59,7 @@ extension Tab: NSSecureCoding {
                   favicon: decoder.decodeIfPresent(at: NSSecureCodingKeys.favicon),
                   interactionStateData: interactionStateData,
                   shouldLoadInBackground: false,
+                  shouldLoadFromCache: true,
                   lastSelectedAt: decoder.decodeIfPresent(at: NSSecureCodingKeys.lastSelectedAt))
 
         _=self.awakeAfter(using: decoder)

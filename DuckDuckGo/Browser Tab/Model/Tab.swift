@@ -207,6 +207,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                      interactionStateData: Data? = nil,
                      parentTab: Tab? = nil,
                      shouldLoadInBackground: Bool = false,
+                     shouldLoadFromCache: Bool = false,
                      canBeClosedWithBack: Bool = false,
                      lastSelectedAt: Date? = nil,
                      webViewFrame: CGRect = .zero
@@ -238,6 +239,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                   interactionStateData: interactionStateData,
                   parentTab: parentTab,
                   shouldLoadInBackground: shouldLoadInBackground,
+                  shouldLoadFromCache: shouldLoadFromCache,
                   canBeClosedWithBack: canBeClosedWithBack,
                   lastSelectedAt: lastSelectedAt,
                   webViewFrame: webViewFrame)
@@ -263,6 +265,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
          interactionStateData: Data?,
          parentTab: Tab?,
          shouldLoadInBackground: Bool,
+         shouldLoadFromCache: Bool,
          canBeClosedWithBack: Bool,
          lastSelectedAt: Date?,
          webViewFrame: CGRect
@@ -282,7 +285,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         self.favicon = favicon
         self.parentTab = parentTab
         self._canBeClosedWithBack = canBeClosedWithBack
-        self.interactionStateData = interactionStateData
+        self.interactionState = interactionStateData.map { .data($0) } ?? (shouldLoadFromCache ? .loadCachedFromTabContent : .none)
         self.lastSelectedAt = lastSelectedAt
 
         let configuration = webViewConfiguration ?? WKWebViewConfiguration()
@@ -533,26 +536,40 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         return _canBeClosedWithBack
     }
 
-    var interactionStateData: Data?
+    private enum InteractionState {
+        case none
+        case loadCachedFromTabContent
+        case data(Data)
+
+        var data: Data? {
+            if case .data(let data) = self { return data }
+            return nil
+        }
+        var shouldLoadFromCache: Bool {
+            if case .loadCachedFromTabContent = self { return true }
+            return false
+        }
+    }
+    private var interactionState: InteractionState
 
     func invalidateInteractionStateData() {
-        interactionStateData = nil
+        interactionState = .none
     }
 
     func getActualInteractionStateData() -> Data? {
-        if let interactionStateData = interactionStateData {
+        if let interactionStateData = interactionState.data {
             return interactionStateData
         }
 
         guard webView.url != nil else { return nil }
 
         if #available(macOS 12.0, *) {
-            self.interactionStateData = (webView.interactionState as? Data)
+            self.interactionState = (webView.interactionState as? Data).map { .data($0) } ?? .none
         } else {
-            self.interactionStateData = try? webView.sessionStateData()
+            self.interactionState = (try? webView.sessionStateData()).map { .data($0) } ?? .none
         }
 
-        return self.interactionStateData
+        return self.interactionState.data
     }
 
     func saveWebContentAs() {
@@ -644,7 +661,9 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         }
 
         if webView.url == nil, let url = content.url {
-            webView.load(URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData))
+            // load from cache when called by lazy loader
+            let cachePolicy: URLRequest.CachePolicy = interactionState.shouldLoadFromCache ? .reloadIgnoringLocalCacheData : .useProtocolCachePolicy
+            webView.load(URLRequest(url: url, cachePolicy: cachePolicy))
         } else if case .privatePlayer = content, let url = content.url {
             webView.load(URLRequest(url: url))
         } else {
@@ -729,7 +748,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                 return
             }
 
-            var request = URLRequest(url: url)
+            var request = URLRequest(url: url, cachePolicy: interactionState.shouldLoadFromCache ? .returnCacheDataElseLoad : .useProtocolCachePolicy)
             if #available(macOS 12.0, *),
                content.isUserEnteredUrl {
                 request.attribution = .user
@@ -785,7 +804,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     @MainActor
     private func restoreInteractionStateDataIfNeeded() -> Bool {
         var didRestore: Bool = false
-        if let interactionStateData = self.interactionStateData {
+        if let interactionStateData = self.interactionState.data {
             if contentURL.isFileURL {
                 _ = webView.loadFileURL(contentURL, allowingReadAccessTo: URL(fileURLWithPath: "/"))
             }
