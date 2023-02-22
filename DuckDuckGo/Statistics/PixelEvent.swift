@@ -117,6 +117,8 @@ extension Pixel {
 
         enum Debug {
 
+            case assertionFailure(message: String, file: StaticString, line: UInt)
+
             case dbMakeDatabaseError
             case dbContainerInitializationError
             case dbInitializationError
@@ -292,6 +294,9 @@ extension Pixel.Event.Debug {
 
     var name: String {
         switch self {
+
+        case .assertionFailure:
+            return "assertion_failure"
 
         case .dbMakeDatabaseError:
             return "database_make_database_error"

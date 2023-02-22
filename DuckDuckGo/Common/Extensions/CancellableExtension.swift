@@ -1,7 +1,7 @@
 //
-//  WKFrameInfoExtension.swift
+//  CancellableExtension.swift
 //
-//  Copyright © 2022 DuckDuckGo. All rights reserved.
+//  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,17 +16,22 @@
 //  limitations under the License.
 //
 
-import WebKit
+import Combine
+import Foundation
 
-extension WKFrameInfo {
+extension Cancellable {
 
-    private static let _handle = "_handle"
-    var handle: Any? {
-        guard self.responds(to: NSSelectorFromString(Self._handle)) else {
-            assertionFailure("WKFrameInfo does not respond to _handle")
-            return nil
-        }
-        return self.value(forKey: Self._handle)
+    /// Stores this cancellable instance in the specified type-erasing collection.
+    func store<C>(in collection: inout C) where C: RangeReplaceableCollection, C.Element == AnyCancellable {
+        AnyCancellable(self).store(in: &collection)
+    }
+
+}
+
+extension NSKeyValueObservation: Cancellable {
+
+    public func cancel() {
+        invalidate()
     }
 
 }

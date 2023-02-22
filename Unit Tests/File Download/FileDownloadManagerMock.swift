@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import Navigation
 import Foundation
 import Combine
 @testable import DuckDuckGo_Privacy_Browser

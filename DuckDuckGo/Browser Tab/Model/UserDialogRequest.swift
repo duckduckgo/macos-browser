@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import Combine
 import Foundation
 
 enum UserDialogRequestError: Error {
@@ -48,6 +49,19 @@ final class UserDialogRequest<Info, Output>: UserDialogRequestProtocol {
     init(_ parameters: Info, callback: @escaping Callback) {
         self.parameters = parameters
         self.callback = callback
+    }
+
+    private init(_ parameters: Info) {
+        self.parameters = parameters
+        self.callback = nil
+    }
+
+    static func future(with parameters: Info) -> (request: UserDialogRequest, future: Future<Output, Failure>) {
+        let request = self.init(parameters)
+        let future = Future { promise in
+            request.callback = promise
+        }
+        return (request, future)
     }
 
     private func getDecisionHandlerOnce() -> Callback? {

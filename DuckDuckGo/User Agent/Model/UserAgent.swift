@@ -60,7 +60,7 @@ enum UserAgent {
     static let `default` = UserAgent.safari
     static let webViewDefault = ""
 
-    static let domainUserAgents: KeyValuePairs<RegEx, String> = [
+    static let localUserAgentConfiguration: KeyValuePairs<RegEx, String> = [
         // use safari when serving up PDFs from duckduckgo directly
         regex("https://duckduckgo\\.com/[^?]*\\.pdf"): UserAgent.safari,
 
@@ -74,16 +74,40 @@ enum UserAgent {
         return "ddg_mac/\(appVersion) (\(appID); macOS \(systemVersion))"
     }
 
-    static func `for`(_ url: URL?) -> String {
+    static func `for`(_ url: URL?,
+                      privacyConfig: PrivacyConfiguration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig) -> String {
         guard let absoluteString = url?.absoluteString else {
             return Self.default
         }
 
-        if let userAgent = domainUserAgents.first(where: { (regex, _) in absoluteString.matches(regex) })?.value {
+        // 1) Apply remote user agent configuration
+        if privacyConfig.isEnabled(featureKey: .customUserAgent) &&
+            isURLPartOfWebviewDefaultList(url: url, privacyConfig: privacyConfig) {
+            return UserAgent.webViewDefault
+        }
+
+        // 2) Apply local user agent configuration
+        if let userAgent = localUserAgentConfiguration.first(where: { (regex, _) in absoluteString.matches(regex) })?.value {
             return userAgent
         }
 
         return Self.default
+    }
+
+    // MARK: - Remote user agent configuration
+
+    static let webviewDefaultKey = "webViewDefault"
+    static let domainKey = "domain"
+
+    static func isURLPartOfWebviewDefaultList(url: URL?,
+                                              privacyConfig: PrivacyConfiguration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig) -> Bool {
+        let settings = privacyConfig.settings(for: .customUserAgent)
+        let webViewDefaultList = settings[webviewDefaultKey] as? [[String: String]] ?? []
+        let domains = webViewDefaultList.map { $0[domainKey] ?? "" }
+
+        return domains.contains(where: { domain in
+            url?.isPart(ofDomain: domain) ?? false
+        })
     }
 
 }

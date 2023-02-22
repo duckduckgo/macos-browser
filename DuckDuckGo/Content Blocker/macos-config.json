@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1676036039006,
+    "version": 1676930860840,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -158,6 +158,10 @@
                 {
                     "domain": "corporatefinanceinstitute.com",
                     "reason": "CMP gets incorrectly handled / repeatedly opens tabs"
+                },
+                {
+                    "domain": "kicker.de",
+                    "reason": "https://github.com/duckduckgo/autoconsent/issues/66"
                 }
             ],
             "settings": {
@@ -166,7 +170,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "659eb19df598629f1eaecbe7fa2d7f00"
+            "hash": "6ea9018a3de48904dd25d191c3640db4"
         },
         "autofill": {
             "exceptions": [
@@ -209,25 +213,48 @@
         },
         "customUserAgent": {
             "settings": {
-                "omitApplicationSites": [
+                "webViewDefault": [
                     {
-                        "domain": "thingiverse.com",
-                        "reason": "Site loads blank and does not proceed."
+                        "domain": "blinkist.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/693"
                     },
                     {
-                        "domain": "qubushotel.com",
-                        "reason": "Homepage UI elements appear squashed together, preventing interaction with the site."
+                        "domain": "help.ryanair.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/693"
                     },
                     {
-                        "domain": "digid.nl",
-                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/602"
+                        "domain": "nordaccount.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/693"
+                    },
+                    {
+                        "domain": "openai.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/693"
+                    },
+                    {
+                        "domain": "cloudflare.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/693"
+                    },
+                    {
+                        "domain": "ancestry.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/693"
+                    },
+                    {
+                        "domain": "bookshop.org",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/693"
+                    },
+                    {
+                        "domain": "easyjet.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/693"
+                    },
+                    {
+                        "domain": "teraflex.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/693"
                     }
-                ],
-                "omitVersionSites": []
+                ]
             },
             "exceptions": [],
-            "state": "disabled",
-            "hash": "f303f2b5c222373004029d0dd657fe56"
+            "state": "enabled",
+            "hash": "c36e7407d63ead7a9009e52146897de3"
         },
         "duckPlayer": {
             "exceptions": [],
@@ -492,6 +519,8 @@
                         "type": "hide-empty"
                     }
                 ],
+                "useStrictHideStyleTag": true,
+                "styleTagExceptions": [],
                 "adLabelStrings": [
                     "advertisement",
                     "advertisment",
@@ -1122,7 +1151,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "3bf687283e5ce5d96b49c28efdd1eb40"
+            "hash": "d719a498422990f19674a5a450d300b4"
         },
         "fingerprintingAudio": {
             "state": "disabled",
@@ -1348,6 +1377,33 @@
             },
             "hash": "9439c856372a09f0cfdc9e2e0fd086fd"
         },
+        "runtimeChecks": {
+            "state": "disabled",
+            "exceptions": [],
+            "settings": {
+                "taintCheck": "enabled",
+                "matchAllDomains": "disabled",
+                "matchAllStackDomains": "enabled",
+                "overloadInstanceOf": "enabled",
+                "elementRemovalTimeout": 1000,
+                "domains": [
+                    {
+                        "domain": "preactjs.com"
+                    },
+                    {
+                        "domain": "reactjs.org"
+                    },
+                    {
+                        "domain": "browserbench.org"
+                    },
+                    {
+                        "domain": "good.third-party.site"
+                    }
+                ],
+                "stackDomains": []
+            },
+            "hash": "32be9e17c1e346de2f37bed896eb0231"
+        },
         "serviceworkerInitiatedRequests": {
             "exceptions": [],
             "state": "disabled",
@@ -1488,6 +1544,17 @@
                                     "<all>"
                                 ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/447"
+                            }
+                        ]
+                    },
+                    "akadns.net": {
+                        "rules": [
+                            {
+                                "rule": "login.fidelity.com.febsec-fidelity.com.akadns.net",
+                                "domains": [
+                                    "fidelity.com"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/677"
                             }
                         ]
                     },
@@ -1872,6 +1939,7 @@
                             {
                                 "rule": "cdn.dynamicyield.com/api/",
                                 "domains": [
+                                    "brooklinen.com",
                                     "seatosummit.com"
                                 ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/535"
@@ -2170,6 +2238,13 @@
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/475"
                             },
                             {
+                                "rule": "google.com/cse/cse.js",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/475"
+                            },
+                            {
                                 "rule": "www.google.com/cse/static/",
                                 "domains": [
                                     "<all>"
@@ -2385,6 +2460,17 @@
                             }
                         ]
                     },
+                    "loggly.com": {
+                        "rules": [
+                            {
+                                "rule": "cloudfront.loggly.com/js/loggly.tracker-2.1.min.js",
+                                "domains": [
+                                    "rte.ie"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/681"
+                            }
+                        ]
+                    },
                     "lpsnmedia.net": {
                         "rules": [
                             {
@@ -2416,6 +2502,17 @@
                                     "medicare.gov"
                                 ],
                                 "reason": "Navigation bar at top of site does not display, preventing easy access to e.g., site login.,Note that this CNAMEs to iservprod.medicare.gov.edgekey.net at time of mitiagtion."
+                            }
+                        ]
+                    },
+                    "nextdoor.com": {
+                        "rules": [
+                            {
+                                "rule": "nextdoor.com",
+                                "domains": [
+                                    "nextdoor.co.uk"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/460"
                             }
                         ]
                     },
@@ -3097,6 +3194,17 @@
                                     "seattletimes.com"
                                 ],
                                 "reason": "An unskippable adwall appears which prevents interaction with the page."
+                            }
+                        ]
+                    },
+                    "fidelity.com": {
+                        "rules": [
+                            {
+                                "rule": "login.fidelity.com",
+                                "domains": [
+                                    "fidelity.com"
+                                ],
+                                "reason": "CNAME ENTRY GENERATED FROM: login.fidelity.com.febsec-fidelity.com.akadns.net"
                             }
                         ]
                     },
@@ -4766,7 +4874,7 @@
                 }
             },
             "exceptions": [],
-            "hash": "6867cd5eb1dac887cb963509cf12df8a"
+            "hash": "a8e5a6de6c7c15ebfbb5b3a7ed0486c7"
         },
         "trackingCookies1p": {
             "settings": {
