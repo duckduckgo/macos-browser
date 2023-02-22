@@ -1,7 +1,7 @@
 //
-//  WKFrameInfoExtension.swift
+//  NavigationActionExtension.swift
 //
-//  Copyright © 2022 DuckDuckGo. All rights reserved.
+//  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,17 +16,23 @@
 //  limitations under the License.
 //
 
-import WebKit
+import Navigation
 
-extension WKFrameInfo {
+extension NavigationAction {
 
-    private static let _handle = "_handle"
-    var handle: Any? {
-        guard self.responds(to: NSSelectorFromString(Self._handle)) else {
-            assertionFailure("WKFrameInfo does not respond to _handle")
-            return nil
+    var isUserEntered: Bool {
+        if #available(macOS 12.0, *),
+           case .other = navigationType,
+           case .user = request.attribution {
+            return true
+        } else if case .custom(.userEnteredUrl) = navigationType {
+            return true
         }
-        return self.value(forKey: Self._handle)
+        return false
     }
 
+}
+
+extension CustomNavigationType {
+    static let userEnteredUrl = CustomNavigationType(rawValue: "userEnteredUrl")
 }

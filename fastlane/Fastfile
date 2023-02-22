@@ -9,7 +9,9 @@ DEFAULT_BRANCH = 'develop'
 RELEASE_BRANCH = 'release'
 PROJECT_ROOT_FOLDER = File.dirname(File.expand_path(__dir__))
 VERSION_CONFIG_PATH = File.join(PROJECT_ROOT_FOLDER, 'Configuration/Version.xcconfig')
+APP_STORE_BUILD_NUMBER_CONFIG_PATH = File.join(PROJECT_ROOT_FOLDER, 'Configuration/AppStoreBuildNumber.xcconfig')
 VERSION_CONFIG_DEFINITION = 'MARKETING_VERSION'
+BUILD_NUMBER_CONFIG_DEFINITION = 'CURRENT_PROJECT_VERSION'
 UPGRADABLE_EMBEDDED_FILES = [
   'DuckDuckGo/Content Blocker/AppTrackerDataSetProvider.swift',
   'DuckDuckGo/Content Blocker/trackerData.json',
@@ -20,9 +22,78 @@ UPGRADABLE_EMBEDDED_FILES = [
 default_platform(:mac)
 
 platform :mac do
+  before_all do
+    setup_ci if is_ci
+  end
+
   #################################################
   # Public lanes
   #################################################
+
+  # Fetches and updates certificates and provisioning profiles for App Store distribution
+  #
+  # @option [String] username (default: nil) Your DDG Apple ID. Pass it to not be asked
+  #         for it a couple of times during the process.
+  #
+  desc 'Fetches and updates certificates and provisioning profiles for App Store distribution'
+  lane :sync_signing do |options|
+    do_sync_signing(options)
+  end
+
+  # Makes App Store release build and uploads it to TestFlight without managing App Store listing.
+  #
+  # @option [String] username (default: nil) Your DDG Apple ID. Pass it to not be asked
+  #         for it a couple of times during the process.
+  #
+  desc 'Makes App Store release build and uploads it to TestFlight'
+  lane :release_testflight do |options|
+    build_release(options)
+
+    upload_to_testflight(options.merge({api_key: get_api_key}))
+  end
+
+  # Makes App Store release build, uploads it to TestFlight, and prepares App Store listing for submission.
+  #
+  # - it first uploads just the build, and only then attempts uploading metadata.
+  # - since metadata upload may fail if there's an iOS submission in Pending Developer Release,
+  #   it catches upload_metadata error and prints further instructions.
+  #
+  # @option [String] username (default: nil) Your DDG Apple ID. Pass it to not be asked
+  #         for it a couple of times during the process.
+  #
+  desc 'Makes App Store release build and uploads it to App Store Connect'
+  lane :release_appstore do |options|
+    build_release(options)
+
+    deliver(common_deliver_arguments(options))
+
+    begin
+      upload_metadata(options)
+    rescue => exception
+      UI.user_error! %{Failed to upload metadata: #{exception}
+1. Your build has been successfully uploaded, it's only a problem with App Store metadata.
+2. It's possible that there is a submission for another platform (iOS) in a non-editable state
+  (e.g. Pending Developer Release, Developer Rejected, Rejected or Metadata Rejected).
+3. Before you retry, ensure that the pending iOS release is completed (Ready for Sale) or moved
+  back to "Prepare for Submission". If it can't be done at the moment and you can't wait, you'll need
+  to update metadata manually.
+4. Use upload_metadata lane to only handle metadata (without building the release and uploading a build):
+  $ bundle exec fastlane upload_metadata
+      }
+    end
+  end
+
+  # Updates App Store metadata.
+  #
+  # - Calls deliver and skips binary upload and screenshots, only handling metadata.
+  #
+  desc 'Updates App Store metadata'
+  lane :upload_metadata do |options|
+    deliver(common_deliver_arguments(options).merge({
+      skip_binary_upload: true,
+      skip_metadata: false
+    }))
+  end
 
   # Executes the release preparation work in the repository
   #
@@ -36,14 +107,75 @@ platform :mac do
   lane :code_freeze do |options|
     macos_codefreeze_prechecks
     new_version = validate_new_version(options)
+    app_store_build_number = increment_app_store_build_number(options)
     macos_create_release_branch(version: new_version)
     macos_update_embedded_files
-    macos_update_version_config(version: new_version)
+    macos_update_version_and_build_number_config(
+      version: new_version,
+      build_number: app_store_build_number
+    )
   end
 
   #################################################
   # Helper functions
   #################################################
+  private_lane :get_api_key do
+    has_api_key = [
+      "APPLE_API_KEY_ID",
+      "APPLE_API_KEY_ISSUER",
+      "APPLE_API_KEY_BASE64"
+    ].map {|x| ENV.has_key? x}.reduce(&:&)
+
+    if has_api_key
+      app_store_connect_api_key(
+        key_id: ENV["APPLE_API_KEY_ID"],
+        issuer_id: ENV["APPLE_API_KEY_ISSUER"],
+        key_content: ENV["APPLE_API_KEY_BASE64"],
+        is_key_content_base64: true
+      )
+    else
+      nil
+    end
+  end
+
+  private_lane :get_username do |options|
+    if options[:username]
+      options[:username]
+    elsif is_ci
+      nil # don't make assumptions in CI
+    else
+      git_user_email = Action.sh("git", "config", "user.email").chomp
+      if git_user_email.end_with? "@duckduckgo.com"
+        git_user_email
+      end
+    end
+  end
+
+  # Synchronizes certificates and provisioning profiles for App Store distribution.
+  #
+  # - runs in read-only mode in CI.
+  #
+  private_lane :do_sync_signing do |options|
+    sync_code_signing(
+      api_key: get_api_key,
+      username: get_username(options),
+      readonly: is_ci
+    )
+  end
+
+  # Builds the App Store release version of the app.
+  #
+  private_lane :build_release do |options|
+    sync_signing(options)
+
+    build_app(
+      export_method: "app-store",
+      scheme: "DuckDuckGo Privacy Browser App Store",
+      export_options: "scripts/assets/AppStoreExportOptions.plist",
+      xcargs: "RELEASE_PRODUCT_NAME_OVERRIDE=DuckDuckGo"
+    )
+  end
+
   # Ensures that the local repository is in good shape for the release:
   #
   # - Checks out the default branch
@@ -71,9 +203,16 @@ platform :mac do
     unless UI.confirm(
       "Current version is #{current_version}.\nNew version is #{new_version}.\nDo you want to continue?"
     )
-      UI.abort_with_message!('Aborted by user.')
+    UI.abort_with_message!('Aborted by user.')
     end
     new_version
+  end
+
+  # Checks current build number and increments it by 1.
+  #
+  desc 'Increment App Store build number'
+  private_lane :increment_app_store_build_number do
+    macos_current_build_number + 1
   end
 
   # Checks out a new branch from the current commit and pushes it
@@ -130,11 +269,34 @@ platform :mac do
   #
   # @option [String] version (default: nil) Marketing version string
   #
-  private_lane :macos_update_version_config do |options|
+  private_lane :macos_update_version_and_build_number_config do |options|
     version = options[:version]
+    build_number = options[:build_number]
     File.write(VERSION_CONFIG_PATH, "#{VERSION_CONFIG_DEFINITION} = #{version}\n")
-    git_commit(path: VERSION_CONFIG_PATH, message: "Version Bump to #{version}")
+    File.write(APP_STORE_BUILD_NUMBER_CONFIG_PATH, "#{BUILD_NUMBER_CONFIG_DEFINITION} = #{build_number}\n")
+    git_commit(
+      path: [
+        VERSION_CONFIG_PATH,
+        APP_STORE_BUILD_NUMBER_CONFIG_PATH
+      ],
+      message: "Bump version to #{version} (#{build_number})"
+    )
     sh('git', 'push')
+  end
+
+  # Reads App Store build number from the config file
+  #
+  # @return [String] build number read from the file, or nil in case of failure
+  #
+  def macos_current_build_number
+    current_build_number = 0
+
+    file_data = File.read(APP_STORE_BUILD_NUMBER_CONFIG_PATH).split("\n")
+    file_data.each do |line|
+      current_build_number = line.split('=')[1].strip.to_i if line.start_with?(BUILD_NUMBER_CONFIG_DEFINITION)
+    end
+
+    current_build_number
   end
 
   # Updates version in the config file
@@ -179,5 +341,26 @@ platform :mac do
     end
 
     user_version
+  end
+
+  def common_deliver_arguments(options)
+    args = {
+      api_key: get_api_key,
+      submit_for_review: false,
+      automatic_release: false,
+      phased_release: true,
+      force: true,
+      skip_screenshots: true,
+      skip_metadata: true,
+      precheck_include_in_app_purchases: false,
+      submission_information: {
+         add_id_info_uses_idfa: false
+      }
+    }.merge(options)
+
+    unless args.has_key? :username
+      args[:username] = get_username(options)
+    end
+    args
   end
 end

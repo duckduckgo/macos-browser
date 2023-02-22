@@ -20,52 +20,65 @@ import BrowserServicesKit
 import Combine
 import ContentBlocking
 import Foundation
-
-protocol FbBlockingEnabledProvider {
-    var fbBlockingEnabled: Bool { get }
-}
+import Navigation
 
 struct DetectedTracker {
     enum TrackerType {
-        case blockedTracker
+        case tracker
         case trackerWithSurrogate(host: String)
         case thirdPartyRequest
     }
     let request: DetectedRequest
     let type: TrackerType
-
-    var isBlockedTracker: Bool {
-        if case .blockedTracker = type { return true }
-        return false
-    }
 }
 
-final class ContentBlockingTabExtension: NSObject {
+protocol ContentBlockingAssetsInstalling: AnyObject {
+    var contentBlockingAssetsInstalled: Bool { get }
+    func awaitContentBlockingAssetsInstalled() async
+}
+extension UserContentController: ContentBlockingAssetsInstalling {}
 
-    private let tabIdentifier: UInt64
-    private let fbBlockingEnabledProvider: FbBlockingEnabledProvider
+final class ContentBlockingTabExtension: NSObject {
+    private static var idCounter: UInt64 = 0
+    private let identifier: UInt64 = {
+        defer { idCounter += 1 }
+        return ContentBlockingTabExtension.idCounter
+    }()
+
+    private weak var userContentController: ContentBlockingAssetsInstalling?
     private let cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter?
-    private let userContentControllerProvider: UserContentControllerProvider
     private let privacyConfigurationManager: PrivacyConfigurationManaging
+    private let fbBlockingEnabledProvider: FbBlockingEnabledProvider
     private var trackersSubject = PassthroughSubject<DetectedTracker, Never>()
 
     private var cancellables = Set<AnyCancellable>()
 
-    init(tabIdentifier: UInt64,
-         fbBlockingEnabledProvider: FbBlockingEnabledProvider,
-         contentBlockerRulesUserScriptPublisher: some Publisher<ContentBlockerRulesUserScript?, Never>,
-         surrogatesUserScriptPublisher: some Publisher<SurrogatesUserScript?, Never>,
-         privacyConfigurationManager: PrivacyConfigurationManaging,
-         userContentControllerProvider: @escaping UserContentControllerProvider,
-         cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter? = ContentBlockingAssetsCompilationTimeReporter.shared) {
+#if DEBUG
+    /// set this to true when Navigation-related decision making is expected to take significant time to avoid assertions
+    /// used by BSK: Navigation.DistributedNavigationDelegate
+    var shouldDisableLongDecisionMakingChecks: Bool = false
+    func disableLongDecisionMakingChecks() { shouldDisableLongDecisionMakingChecks = true }
+    func enableLongDecisionMakingChecks() { shouldDisableLongDecisionMakingChecks = false }
+#else
+    func disableLongDecisionMakingChecks() {}
+    func enableLongDecisionMakingChecks() {}
+#endif
 
-        self.tabIdentifier = tabIdentifier
+    init(fbBlockingEnabledProvider: FbBlockingEnabledProvider,
+         userContentControllerFuture: some Publisher<some ContentBlockingAssetsInstalling, Never>,
+         cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter?,
+         privacyConfigurationManager: PrivacyConfigurationManaging,
+         contentBlockerRulesUserScriptPublisher: some Publisher<ContentBlockerRulesUserScript?, Never>,
+         surrogatesUserScriptPublisher: some Publisher<SurrogatesUserScript?, Never>) {
+
         self.cbaTimeReporter = cbaTimeReporter
         self.fbBlockingEnabledProvider = fbBlockingEnabledProvider
         self.privacyConfigurationManager = privacyConfigurationManager
-        self.userContentControllerProvider = userContentControllerProvider
         super.init()
 
+        userContentControllerFuture.sink { [weak self] userContentController in
+            self?.userContentController = userContentController
+        }.store(in: &cancellables)
         contentBlockerRulesUserScriptPublisher.sink { [weak self] contentBlockerRulesUserScript in
             contentBlockerRulesUserScript?.delegate = self
         }.store(in: &cancellables)
@@ -75,7 +88,7 @@ final class ContentBlockingTabExtension: NSObject {
     }
 
     deinit {
-        cbaTimeReporter?.tabWillClose(tabIdentifier)
+        cbaTimeReporter?.tabWillClose(identifier)
     }
 
 }
@@ -92,16 +105,18 @@ extension ContentBlockingTabExtension: NavigationResponder {
 
     @MainActor
     private func prepareForContentBlocking() async {
-        guard let userContentController = userContentControllerProvider() else {
-            assertionFailure("Could not get userContentController")
-            return
-        }
         // Ensure Content Blocking Assets (WKContentRuleList&UserScripts) are installed
-        if userContentController.contentBlockingAssetsInstalled == false
+        if userContentController?.contentBlockingAssetsInstalled == false
             && privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .contentBlocking) {
-            cbaTimeReporter?.tabWillWaitForRulesCompilation(tabIdentifier)
-            await userContentController.awaitContentBlockingAssetsInstalled()
-            cbaTimeReporter?.reportWaitTimeForTabFinishedWaitingForRules(tabIdentifier)
+            cbaTimeReporter?.tabWillWaitForRulesCompilation(identifier)
+
+            disableLongDecisionMakingChecks()
+            defer {
+                enableLongDecisionMakingChecks()
+            }
+
+            await userContentController?.awaitContentBlockingAssetsInstalled()
+            cbaTimeReporter?.reportWaitTimeForTabFinishedWaitingForRules(identifier)
         } else {
             cbaTimeReporter?.reportNavigationDidNotWaitForRules()
         }
@@ -120,7 +135,7 @@ extension ContentBlockingTabExtension: ContentBlockerRulesUserScriptDelegate {
     }
 
     func contentBlockerRulesUserScript(_ script: ContentBlockerRulesUserScript, detectedTracker tracker: DetectedRequest) {
-        trackersSubject.send(DetectedTracker(request: tracker, type: .blockedTracker))
+        trackersSubject.send(DetectedTracker(request: tracker, type: .tracker))
     }
 
     func contentBlockerRulesUserScript(_ script: ContentBlockerRulesUserScript, detectedThirdPartyRequest request: DetectedRequest) {
@@ -146,6 +161,7 @@ protocol ContentBlockingExtensionProtocol: AnyObject, NavigationResponder {
 
 extension ContentBlockingTabExtension: TabExtension, ContentBlockingExtensionProtocol {
     typealias PublicProtocol = ContentBlockingExtensionProtocol
+
     func getPublicProtocol() -> PublicProtocol { self }
 
     var trackersPublisher: AnyPublisher<DetectedTracker, Never> {
@@ -164,5 +180,3 @@ extension Tab {
         self.contentBlockingAndSurrogates?.trackersPublisher ?? PassthroughSubject().eraseToAnyPublisher()
     }
 }
-
-extension FBProtectionTabExtension: FbBlockingEnabledProvider {}

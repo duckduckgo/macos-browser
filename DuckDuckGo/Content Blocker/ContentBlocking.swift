@@ -70,7 +70,7 @@ final class AppContentBlocking {
                                                 data: DefaultConfigurationStorage.shared.loadData(for: .trackerRadar),
                                                 embeddedDataProvider: AppTrackerDataSetProvider(),
                                                 errorReporting: Self.debugEvents)
-        
+
         adClickAttribution = AdClickAttributionFeature(with: privacyConfigurationManager)
 
         contentBlockerRulesSource = ContentBlockerRulesLists(trackerDataManager: trackerDataManager, adClickAttribution: adClickAttribution)
@@ -87,7 +87,7 @@ final class AppContentBlocking {
                                                   configStorage: configStorage,
                                                   privacySecurityPreferences: PrivacySecurityPreferences.shared,
                                                   tld: tld)
-        
+
         adClickAttributionRulesProvider = AdClickAttributionRulesProvider(config: adClickAttribution,
                                                                           compiledRulesSource: contentBlockingManager,
                                                                           exceptionsSource: exceptionsSource,
@@ -119,10 +119,10 @@ final class AppContentBlocking {
 
         case .privacyConfigurationCouldNotBeLoaded:
             domainEvent = .privacyConfigurationCouldNotBeLoaded
-            
+
         case .contentBlockingCompilationFailed(let listName, let component):
             let defaultTDSListName = DefaultContentBlockerRulesListsSource.Constants.trackerDataSetRulesListName
-            
+
             let listType: Pixel.Event.CompileRulesListType
             switch listName {
             case defaultTDSListName:
@@ -147,7 +147,7 @@ final class AppContentBlocking {
 
         Pixel.fire(.debug(event: domainEvent, error: error), withAdditionalParameters: parameters, onComplete: onComplete)
     }
-    
+
     // MARK: - Ad Click Attribution
 
     let attributionEvents: EventMapping<AdClickAttributionEvents>? = .init { event, _, parameters, _ in
@@ -161,7 +161,7 @@ final class AppContentBlocking {
 
         Pixel.fire(domainEvent, withAdditionalParameters: parameters ?? [:])
     }
-    
+
     let attributionDebugEvents: EventMapping<AdClickAttributionDebugEvents>? = .init { event, _, _, _ in
         let domainEvent: Pixel.Event.Debug
         switch event {

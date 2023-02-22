@@ -23,38 +23,38 @@ import PrivacyDashboard
 typealias PrivacyDashboardPermissionAuthorizationState = [(permission: PermissionType, state: PermissionAuthorizationState)]
 
 final class PrivacyDashboardPermissionHandler {
-    
+
     private weak var tabViewModel: TabViewModel?
     private var onPermissionChange: (([AllowedPermission]) -> Void)?
     private var cancellables = Set<AnyCancellable>()
-    
+
     public func updateTabViewModel(_ tabViewModel: TabViewModel, onPermissionChange: @escaping ([AllowedPermission]) -> Void) {
         cancellables.removeAll()
-        
+
         self.tabViewModel = tabViewModel
         self.onPermissionChange = onPermissionChange
-        
+
         subscribeToPermissions()
     }
-    
+
     public func setPermission(with permissionName: String, paused: Bool) {
         guard let permission = PermissionType(rawValue: permissionName) else { return }
-        
+
         tabViewModel?.tab.permissions.set([permission], muted: paused)
     }
-    
+
     public func setPermissionAuthorization(authorizationState: PermissionAuthorizationState, domain: String, permissionName: String) {
         guard let permission = PermissionType(rawValue: permissionName) else { return }
-        
+
         PermissionManager.shared.setPermission(authorizationState.persistedPermissionDecision, forDomain: domain, permissionType: permission)
     }
-    
+
     private func subscribeToPermissions() {
         tabViewModel?.$usedPermissions.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.updatePermissions()
         }.store(in: &cancellables)
     }
-    
+
     private func updatePermissions() {
         guard let usedPermissions = tabViewModel?.usedPermissions else {
             assertionFailure("PrivacyDashboardViewController: tabViewModel not set")
@@ -64,7 +64,7 @@ final class PrivacyDashboardPermissionHandler {
             onPermissionChange?([])
             return
         }
-        
+
         let authorizationState: PrivacyDashboardPermissionAuthorizationState
         authorizationState = PermissionManager.shared.persistedPermissionTypes.union(usedPermissions.keys).compactMap { permissionType in
             guard PermissionManager.shared.hasPermissionPersisted(forDomain: domain, permissionType: permissionType)
@@ -75,9 +75,9 @@ final class PrivacyDashboardPermissionHandler {
             let decision = PermissionManager.shared.permission(forDomain: domain, permissionType: permissionType)
             return (permissionType, PermissionAuthorizationState(decision: decision))
         }
-                        
+
         var allowedPermissions: [AllowedPermission] = []
-    
+
         allowedPermissions = authorizationState.map { item in
             AllowedPermission(key: item.permission.rawValue,
                               icon: item.permission.jsStyle,
@@ -88,10 +88,10 @@ final class PrivacyDashboardPermissionHandler {
                               options: makeOptions(for: item, domain: domain)
             )
         }
-        
+
         onPermissionChange?(allowedPermissions)
     }
-    
+
     private func makeOptions(for item: (permission: PermissionType, state: PermissionAuthorizationState), domain: String) -> [[String: String]] {
         return PermissionAuthorizationState.allCases.compactMap { decision -> [String: String]? in
             // don't show Permanently Allow if can't persist Granted Decision
@@ -119,7 +119,7 @@ extension PermissionType {
             return "externalScheme"
         }
     }
-    
+
     var jsTitle: String {
         switch self {
         case .camera, .microphone, .geolocation, .popups:
@@ -131,7 +131,7 @@ extension PermissionType {
 }
 
 extension PermissionAuthorizationState {
-    
+
     init(decision: PersistedPermissionDecision) {
         switch decision {
         case .ask:
@@ -142,7 +142,7 @@ extension PermissionAuthorizationState {
             self = .deny
         }
     }
-    
+
     var persistedPermissionDecision: PersistedPermissionDecision {
         switch self {
         case .ask: return .ask
@@ -150,7 +150,7 @@ extension PermissionAuthorizationState {
         case .deny: return .deny
         }
     }
-    
+
     func localizedFormat(for permission: PermissionType) -> String {
         switch (permission, self) {
         case (.popups, .ask):

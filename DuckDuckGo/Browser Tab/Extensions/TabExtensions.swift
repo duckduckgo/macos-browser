@@ -49,6 +49,11 @@ protocol TabExtension {
     associatedtype PublicProtocol
     func getPublicProtocol() -> PublicProtocol
 }
+extension TabExtension {
+    static var publicProtocolType: Any.Type {
+        PublicProtocol.self
+    }
+}
 
 // Implement these methods for Extension State Restoration
 protocol NSCodingExtension: TabExtension {
@@ -61,13 +66,14 @@ protocol TabExtensionDependencies {
     var privacyFeatures: PrivacyFeaturesProtocol { get }
     var workspace: Workspace { get }
     var historyCoordinating: HistoryCoordinating { get }
+    var cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter? { get }
 }
 // swiftlint:disable:next large_tuple
 typealias TabExtensionsBuilderArguments = (
     tabIdentifier: UInt64,
     userScriptsPublisher: AnyPublisher<UserScripts?, Never>,
     inheritedAttribution: AdClickAttributionLogic.State?,
-    userContentControllerProvider: UserContentControllerProvider,
+    userContentControllerFuture: Future<UserContentController, Never>,
     permissionModel: PermissionModel
 )
 
@@ -89,17 +95,17 @@ extension TabExtensionsBuilder {
 
         let fbProtection = add {
             FBProtectionTabExtension(privacyConfigurationManager: dependencies.privacyFeatures.contentBlocking.privacyConfigurationManager,
-                                     userContentControllerProvider: args.userContentControllerProvider,
+                                     userContentControllerFuture: args.userContentControllerFuture,
                                      clickToLoadUserScriptPublisher: userScripts.map(\.?.clickToLoadScript))
         }
 
         let contentBlocking = add {
-            ContentBlockingTabExtension(tabIdentifier: args.tabIdentifier,
-                                        fbBlockingEnabledProvider: fbProtection.value,
-                                        contentBlockerRulesUserScriptPublisher: userScripts.map(\.?.contentBlockerRulesScript),
-                                        surrogatesUserScriptPublisher: userScripts.map(\.?.surrogatesScript),
+            ContentBlockingTabExtension(fbBlockingEnabledProvider: fbProtection.value,
+                                        userContentControllerFuture: args.userContentControllerFuture,
+                                        cbaTimeReporter: dependencies.cbaTimeReporter,
                                         privacyConfigurationManager: dependencies.privacyFeatures.contentBlocking.privacyConfigurationManager,
-                                        userContentControllerProvider: args.userContentControllerProvider)
+                                        contentBlockerRulesUserScriptPublisher: userScripts.map(\.?.contentBlockerRulesScript),
+                                        surrogatesUserScriptPublisher: userScripts.map(\.?.surrogatesScript))
         }
 
         add {
@@ -111,9 +117,9 @@ extension TabExtensionsBuilder {
 
         add {
             AdClickAttributionTabExtension(inheritedAttribution: args.inheritedAttribution,
-                                           userContentControllerProvider: args.userContentControllerProvider,
-                                           contentBlockerRulesScriptPublisher: userScripts.map(\.?.contentBlockerRulesScript),
-                                           detectedTrackersPublisher: contentBlocking.trackersPublisher.compactMap { $0.isBlockedTracker ? $0.request : nil },
+                                           userContentControllerFuture: args.userContentControllerFuture,
+                                           contentBlockerRulesScriptPublisher: userScripts.map { $0?.contentBlockerRulesScript },
+                                           trackerInfoPublisher: contentBlocking.trackersPublisher.map { $0.request },
                                            dependencies: dependencies.privacyFeatures.contentBlocking)
         }
 
@@ -141,7 +147,9 @@ extension TabExtensionsBuilder {
 extension TestTabExtensionsBuilder {
 
     /// Used by default for Tab instantiation if not provided in Tab(... extensionsBuilder: TestTabExtensionsBuilder([HistoryTabExtension.self])
-    static var `default` = TestTabExtensionsBuilder(overrideExtensions: TestTabExtensionsBuilder.overrideExtensions, [
+    static var shared: TestTabExtensionsBuilder = .default
+
+    static let `default` = TestTabExtensionsBuilder(overrideExtensions: TestTabExtensionsBuilder.overrideExtensions, [
         // FindInPageTabExtension.self, HistoryTabExtension.self, ... - add TabExtensions here to be loaded by default for ALL Unit Tests
     ])
 

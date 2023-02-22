@@ -30,19 +30,19 @@ final class TabShadowView: NSView {
         super.init(coder: coder)
         setupSubviews()
     }
-    
+
     override func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
     }
-        
+
     override func updateLayer() {
         super.updateLayer()
     }
-    
+
     private func setupSubviews() {
         addSubview(shadowLine)
     }
-    
+
     override func layout() {
         super.layout()
         shadowLine.wantsLayer = true

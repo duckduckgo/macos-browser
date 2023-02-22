@@ -23,13 +23,13 @@ import XCTest
 class ThirdPartyBrowserTests: XCTestCase {
 
     private let mockApplicationSupportDirectoryName = UUID().uuidString
-    
+
     override func setUp() {
         super.setUp()
         let defaultRootDirectoryURL = FileManager.default.temporaryDirectory.appendingPathComponent(mockApplicationSupportDirectoryName)
         try? FileManager.default.removeItem(at: defaultRootDirectoryURL)
     }
-    
+
     override func tearDown() {
         super.tearDown()
         let defaultRootDirectoryURL = FileManager.default.temporaryDirectory.appendingPathComponent(mockApplicationSupportDirectoryName)
@@ -44,18 +44,18 @@ class ThirdPartyBrowserTests: XCTestCase {
         XCTAssertNotNil(ThirdPartyBrowser.browser(for: .lastPass))
         XCTAssertNotNil(ThirdPartyBrowser.browser(for: .onePassword))
         XCTAssertNotNil(ThirdPartyBrowser.browser(for: .safari))
-        
+
         XCTAssertNil(ThirdPartyBrowser.browser(for: .csv))
     }
 
     func testWhenCreatingThirdPartyBrowser_AndValidBrowserIsNotProvided_ThenThirdPartyBrowserInitializationFails() {
         XCTAssertNil(ThirdPartyBrowser.browser(for: .csv))
     }
-    
+
     func testWhenGettingBrowserProfiles_AndFirefoxProfileExists_ThenFirefoxProfileIsReturned() throws {
-        let defaultProfileName = "o20p2fk2.default"
-        let defaultReleaseProfileName = "9q0lq57x.default-release"
-        
+        let defaultProfileName = "profile.default"
+        let defaultReleaseProfileName = "profile.default-release"
+
         let mockApplicationSupportDirectory = FileSystem(rootDirectoryName: mockApplicationSupportDirectoryName) {
             Directory("Firefox") {
                 Directory("Profiles") {
@@ -63,18 +63,18 @@ class ThirdPartyBrowserTests: XCTestCase {
                         File("key4.db", contents: .copy(key4DatabaseURL()))
                         File("logins.json", contents: .copy(loginsURL()))
                     }
-                    
+
                     Directory(defaultProfileName) {
-                        File("key4.db", contents: .copy(key4DatabaseURL()))
+                        File("key3.db", contents: .copy(key4DatabaseURL()))
                         File("logins.json", contents: .copy(loginsURL()))
                     }
                 }
             }
         }
-        
+
         let mockApplicationSupportDirectoryURL = FileManager.default.temporaryDirectory.appendingPathComponent(mockApplicationSupportDirectoryName)
         try mockApplicationSupportDirectory.writeToTemporaryDirectory()
-        
+
         guard let list = ThirdPartyBrowser.firefox.browserProfiles(supportDirectoryURL: mockApplicationSupportDirectoryURL) else {
             XCTFail("Failed to get profile list")
             return
@@ -82,17 +82,48 @@ class ThirdPartyBrowserTests: XCTestCase {
 
         XCTAssertEqual(list.profiles.count, 2)
         XCTAssertEqual(list.defaultProfile?.profileName, "default-release")
-        XCTAssertTrue(list.defaultProfile?.hasLoginData ?? false)
+        XCTAssertTrue(list.profiles.allSatisfy { profile in return profile.hasBrowserData })
     }
-    
+
+    func testWhenGettingBrowserProfiles_AndFirefoxProfileOnlyHasBookmarksData_ThenFirefoxProfileIsReturned() throws {
+        let defaultReleaseProfileName = "profile.default-release"
+
+        let mockApplicationSupportDirectory = FileSystem(rootDirectoryName: mockApplicationSupportDirectoryName) {
+            Directory("Firefox") {
+                Directory("Profiles") {
+                    Directory(defaultReleaseProfileName) {
+                        File("places.sqlite", contents: .copy(bookmarksURL()))
+                    }
+                }
+            }
+        }
+
+        let mockApplicationSupportDirectoryURL = FileManager.default.temporaryDirectory.appendingPathComponent(mockApplicationSupportDirectoryName)
+        try mockApplicationSupportDirectory.writeToTemporaryDirectory()
+
+        guard let list = ThirdPartyBrowser.firefox.browserProfiles(supportDirectoryURL: mockApplicationSupportDirectoryURL) else {
+            XCTFail("Failed to get profile list")
+            return
+        }
+
+        XCTAssertEqual(list.profiles.count, 1)
+        XCTAssertEqual(list.defaultProfile?.profileName, "default-release")
+        XCTAssertTrue(list.profiles.allSatisfy { profile in return profile.hasBrowserData })
+    }
+
     private func key4DatabaseURL() -> URL {
         let bundle = Bundle(for: ThirdPartyBrowserTests.self)
         return bundle.resourceURL!.appendingPathComponent("Data Import Resources/Test Firefox Data/No Primary Password/key4.db")
     }
-    
+
     private func loginsURL() -> URL {
         let bundle = Bundle(for: ThirdPartyBrowserTests.self)
         return bundle.resourceURL!.appendingPathComponent("Data Import Resources/Test Firefox Data/No Primary Password/logins.json")
+    }
+
+    private func bookmarksURL() -> URL {
+        let bundle = Bundle(for: ThirdPartyBrowserTests.self)
+        return bundle.resourceURL!.appendingPathComponent("Data Import Resources/Test Firefox Data/places.sqlite")
     }
 
 }

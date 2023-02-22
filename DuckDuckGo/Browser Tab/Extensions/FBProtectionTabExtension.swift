@@ -19,26 +19,29 @@
 import BrowserServicesKit
 import Combine
 import Foundation
+import Navigation
 import UserScript
 
 final class FBProtectionTabExtension {
 
     private let privacyConfigurationManager: PrivacyConfigurationManaging
-    private let userContentControllerProvider: UserContentControllerProvider
+    private weak var userContentController: UserContentControllerProtocol?
 
-    private var clickToLoadUserScriptPublisherCancellable: AnyCancellable?
+    private var cancellables = Set<AnyCancellable>()
 
     var fbBlockingEnabled = true
 
     init(privacyConfigurationManager: PrivacyConfigurationManaging,
-         userContentControllerProvider: @escaping UserContentControllerProvider,
+         userContentControllerFuture: some Publisher<some UserContentControllerProtocol, Never>,
          clickToLoadUserScriptPublisher: some Publisher<ClickToLoadUserScript?, Never>) {
         self.privacyConfigurationManager = privacyConfigurationManager
-        self.userContentControllerProvider = userContentControllerProvider
 
-        clickToLoadUserScriptPublisherCancellable = clickToLoadUserScriptPublisher.sink { [weak self] clickToLoadUserScript in
+        userContentControllerFuture.sink { [weak self] userContentController in
+            self?.userContentController = userContentController
+        }.store(in: &cancellables)
+        clickToLoadUserScriptPublisher.sink { [weak self] clickToLoadUserScript in
             clickToLoadUserScript?.delegate = self
-        }
+        }.store(in: &cancellables)
     }
 
 }
@@ -56,7 +59,7 @@ extension FBProtectionTabExtension {
     @discardableResult
     private func setFBProtection(enabled: Bool) -> Bool {
         guard self.fbBlockingEnabled != enabled else { return false }
-        guard let userContentController = userContentControllerProvider() else {
+        guard let userContentController else {
             assertionFailure("Missing UserContentController")
             return false
         }
@@ -107,8 +110,11 @@ extension FBProtectionTabExtension: NavigationResponder {
 
 }
 
-protocol FBProtectionExtensionProtocol: AnyObject, NavigationResponder {
+protocol FbBlockingEnabledProvider {
+    var fbBlockingEnabled: Bool { get }
+}
 
+protocol FBProtectionExtensionProtocol: AnyObject, FbBlockingEnabledProvider, NavigationResponder {
 }
 
 extension FBProtectionTabExtension: TabExtension, FBProtectionExtensionProtocol {

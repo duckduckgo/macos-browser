@@ -16,11 +16,12 @@
 //  limitations under the License.
 //
 
+import BrowserServicesKit
 import Combine
 import Common
 import ContentBlocking
 import Foundation
-import BrowserServicesKit
+import Navigation
 import PrivacyDashboard
 
 typealias CookieConsentPromptRequest = UserDialogRequest<Void, Bool>
@@ -56,7 +57,7 @@ final class PrivacyDashboardTabExtension {
             guard let self, let url = URL(string: tracker.request.pageUrl) else { return }
 
             switch tracker.type {
-            case .blockedTracker:
+            case .tracker:
                 self.privacyInfo?.trackerInfo.addDetectedTracker(tracker.request, onPageWithURL: url)
             case .thirdPartyRequest:
                 self.privacyInfo?.trackerInfo.add(detectedThirdPartyRequest: tracker.request)
@@ -70,7 +71,7 @@ final class PrivacyDashboardTabExtension {
 }
 
 extension PrivacyDashboardTabExtension {
-    
+
     private func resetDashboardInfo(for url: URL, didGoBackForward: Bool) {
         guard url.isHypertextURL else {
             privacyInfo = nil
@@ -137,18 +138,21 @@ extension PrivacyDashboardTabExtension {
 
 extension PrivacyDashboardTabExtension: NavigationResponder {
 
+    @MainActor
     func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
         resetConnectionUpgradedTo(navigationAction: navigationAction)
 
         return .next
     }
 
-    func willStart(_ navigationAction: NavigationAction) {
-        if navigationAction.navigationType.isRedirect {
-            resetDashboardInfo(for: navigationAction.url, didGoBackForward: navigationAction.navigationType.isBackForward)
+    @MainActor
+    func willStart(_ navigation: Navigation) {
+        if navigation.navigationAction.navigationType.isRedirect {
+            resetDashboardInfo(for: navigation.url, didGoBackForward: navigation.navigationAction.navigationType.isBackForward)
         }
     }
 
+    @MainActor
     func didStart(_ navigation: Navigation) {
         resetDashboardInfo(for: navigation.url, didGoBackForward: navigation.navigationAction.navigationType.isBackForward)
     }
@@ -208,7 +212,7 @@ extension Tab {
     func setMainFrameConnectionUpgradedTo(_ upgradedUrl: URL?) {
         self.privacyDashboard?.setMainFrameConnectionUpgradedTo(upgradedUrl)
     }
-    
+
 }
 
 extension TabExtensions {

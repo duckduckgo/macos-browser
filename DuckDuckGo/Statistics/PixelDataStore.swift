@@ -31,7 +31,7 @@ protocol PixelDataStore {
     func set(_ value: String, forKey: String, completionHandler: ((Error?) -> Void)?)
 
     func removeValue(forKey key: String, completionHandler: ((Error?) -> Void)?)
-    
+
 }
 
 extension PixelDataStore {
@@ -188,7 +188,7 @@ final class LocalPixelDataStore<T: NSManagedObject>: PixelDataStore {
                 let deletedObjects = result?.result as? [NSManagedObjectID] ?? []
                 let changes: [AnyHashable: Any] = [NSDeletedObjectsKey: deletedObjects]
                 NSManagedObjectContext.mergeChanges(fromRemoteContextSave: changes, into: [context])
-                
+
                 mainQueueCompletion(nil)
             } catch {
                 mainQueueCompletion(error)

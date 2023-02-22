@@ -89,7 +89,7 @@ extension Pixel {
         }
 
         case serp
-        
+
         case dataImportFailed(action: DataImportAction, source: DataImportSource)
         case faviconImportFailed(source: DataImportSource)
 
@@ -98,17 +98,25 @@ extension Pixel {
 
         case autoconsentOptOutFailed
         case autoconsentSelfTestFailed
-        
+
         case ampBlockingRulesCompilationFailed
-        
+
         case adClickAttributionDetected
         case adClickAttributionActive
-        
+
+        case emailEnabled
+        case emailDisabled
+        case emailUserPressedUseAddress
+        case emailUserPressedUseAlias
+        case emailUserCreatedAlias
+
         case jsPixel(_ pixel: AutofillUserScript.JSPixel)
-        
+
         case debug(event: Debug, error: Error? = nil)
 
         enum Debug {
+
+            case assertionFailure(message: String, file: StaticString, line: UInt)
 
             case dbMakeDatabaseError
             case dbContainerInitializationError
@@ -134,7 +142,7 @@ extension Pixel {
             case appStateRestorationFailed
 
             case contentBlockingErrorReportingIssue
-            
+
             case contentBlockingCompilationFailed(listType: CompileRulesListType,
                                                   component: ContentBlockerDebugEvents.Component)
 
@@ -170,9 +178,9 @@ extension Pixel {
             case adAttributionLogicRequestingAttributionTimedOut
             case adAttributionLogicWrongVendorOnSuccessfulCompilation
             case adAttributionLogicWrongVendorOnFailedCompilation
-            
+
             case webKitDidTerminate
-            
+
             case removedInvalidBookmarkManagedObjects
 
             case bitwardenNotResponding
@@ -192,6 +200,10 @@ extension Pixel {
             case bitwardenSendingOfMessageFailed
             case bitwardenSharedKeyInjectionFailed
 
+            case updaterAborted
+            case userSelectedToSkipUpdate
+            case userSelectedToInstallUpdate
+            case userSelectedToDismissUpdate
         }
 
     }
@@ -212,13 +224,13 @@ extension Pixel.Event {
 
         case .compileRulesWait(onboardingShown: let onboardingShown, waitTime: let waitTime, result: let result):
             return "m_mac_cbr-wait_\(onboardingShown)_\(waitTime)_\(result)"
-            
+
         case .serp:
             return "m_mac_navigation_search"
 
         case .dataImportFailed(action: let action, source: let source):
             return "m_mac_data-import-failed_\(action)_\(source)"
-            
+
         case .faviconImportFailed(source: let source):
             return "m_mac_favicon-import-failed_\(source)"
 
@@ -236,26 +248,41 @@ extension Pixel.Event {
 
         case .autoconsentSelfTestFailed:
             return "m_mac_autoconsent_selftest_failed"
-            
+
         case .ampBlockingRulesCompilationFailed:
             return "m_mac_amp_rules_compilation_failed"
-            
+
         case .adClickAttributionDetected:
             return "m_mac_ad_click_detected"
-            
+
         case .adClickAttributionActive:
             return "m_mac_ad_click_active"
-            
-        case .jsPixel(pixel: let pixel):
-            return "m_mac_\(pixel.pixelName)"
+
+        // Deliberately omit the `m_mac_` prefix in order to format these pixels the same way as other platforms
+        case .emailEnabled: return "email_enabled_macos_desktop"
+        case .emailDisabled: return "email_disabled_macos_desktop"
+        case .emailUserPressedUseAddress: return "email_filled_main_macos_desktop"
+        case .emailUserPressedUseAlias: return "email_filled_random_macos_desktop"
+        case .emailUserCreatedAlias: return "email_generated_button_macos_desktop"
+
+        case .jsPixel(let pixel):
+            // Email pixels deliberately avoid using the `m_mac_` prefix.
+            if pixel.isEmailPixel {
+                return "\(pixel.pixelName)_macos_desktop"
+            } else {
+                return "m_mac_\(pixel.pixelName)"
+            }
         }
     }
 }
 
 extension Pixel.Event.Debug {
-    
+
     var name: String {
         switch self {
+
+        case .assertionFailure:
+            return "assertion_failure"
 
         case .dbMakeDatabaseError:
             return "database_make_database_error"
@@ -267,39 +294,39 @@ extension Pixel.Event.Debug {
             return "dbsw"
         case .dbSaveBloomFilterError:
             return "dbsb"
-            
+
         case .configurationFetchError:
             return "cfgfetch"
-            
+
         case .trackerDataParseFailed:
             return "tds_p"
         case .trackerDataReloadFailed:
             return "tds_r"
         case .trackerDataCouldNotBeLoaded:
             return "tds_l"
-            
+
         case .privacyConfigurationParseFailed:
             return "pcf_p"
         case .privacyConfigurationReloadFailed:
             return "pcf_r"
         case .privacyConfigurationCouldNotBeLoaded:
             return "pcf_l"
-            
+
         case .fileStoreWriteFailed:
             return "fswf"
         case .fileMoveToDownloadsFailed:
             return "df"
-            
+
         case .suggestionsFetchFailed:
             return "sgf"
         case .appOpenURLFailed:
             return "url"
         case .appStateRestorationFailed:
             return "srf"
-            
+
         case .contentBlockingErrorReportingIssue:
             return "content_blocking_error_reporting_issue"
-            
+
         case .contentBlockingCompilationFailed(let listType, let component):
             let componentString: String
             switch component {
@@ -315,21 +342,21 @@ extension Pixel.Event.Debug {
                 componentString = "fallback_tds"
             }
             return "content_blocking_\(listType)_compilation_error_\(componentString)"
-            
+
         case .contentBlockingCompilationTime:
             return "content_blocking_compilation_time"
-            
+
         case .secureVaultInitError:
             return "secure_vault_init_error"
         case .secureVaultError:
             return "secure_vault_error"
-            
+
         case .feedbackReportingFailed:
             return "feedback_reporting_failed"
-            
+
         case .blankNavigationOnBurnFailed:
             return "blank_navigation_on_burn_failed"
-            
+
         case .historyRemoveFailed:
             return "history_remove_failed"
         case .historyReloadFailed:
@@ -344,15 +371,15 @@ extension Pixel.Event.Debug {
             return "history_insert_visit_failed"
         case .historyRemoveVisitsFailed:
             return "history_remove_visits_failed"
-            
+
         case .emailAutofillKeychainError:
             return "email_autofill_keychain_error"
-            
+
         case .bookmarksStoreRootFolderMigrationFailed:
             return "bookmarks_store_root_folder_migration_failed"
         case .bookmarksStoreFavoritesFolderMigrationFailed:
             return "bookmarks_store_favorites_folder_migration_failed"
-            
+
         case .adAttributionCompilationFailedForAttributedRulesList:
             return "ad_attribution_compilation_failed_for_attributed_rules_list"
         case .adAttributionGlobalAttributedRulesDoNotExist:
@@ -373,10 +400,10 @@ extension Pixel.Event.Debug {
             return "ad_attribution_logic_wrong_vendor_on_successful_compilation"
         case .adAttributionLogicWrongVendorOnFailedCompilation:
             return "ad_attribution_logic_wrong_vendor_on_failed_compilation"
-            
+
         case .webKitDidTerminate:
             return "webkit_did_terminate"
-            
+
         case .removedInvalidBookmarkManagedObjects:
             return "removed_invalid_bookmark_managed_objects"
 
@@ -412,6 +439,15 @@ extension Pixel.Event.Debug {
             return "bitwarden_sending_of_message_failed"
         case .bitwardenSharedKeyInjectionFailed:
             return "bitwarden_shared_key_injection_failed"
+
+        case .updaterAborted:
+            return "updater_aborted"
+        case .userSelectedToSkipUpdate:
+            return "user_selected_to_skip_update"
+        case .userSelectedToInstallUpdate:
+            return "user_selected_to_install_update"
+        case .userSelectedToDismissUpdate:
+            return "user_selected_to_dismiss_update"
         }
     }
 }

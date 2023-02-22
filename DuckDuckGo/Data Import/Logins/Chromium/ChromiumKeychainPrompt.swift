@@ -57,5 +57,5 @@ final class ChromiumKeychainPrompt: ChromiumKeychainPrompting {
             return .keychainError(status)
         }
     }
-    
+
 }

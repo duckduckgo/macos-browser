@@ -18,6 +18,7 @@
 
 import Combine
 import Foundation
+import Navigation
 import WebKit
 
 extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
@@ -74,7 +75,7 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
             if let newWindowPolicy = self.contextMenuManager?.decideNewWindowPolicy(for: navigationAction) {
                 return newWindowPolicy
             }
-            
+
             return nil
         }()
         switch newWindowPolicy {
@@ -84,7 +85,9 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
             completionHandler(self.createWebView(from: webView, with: configuration, for: navigationAction, of: targetKind))
             return
         // action doesn‘t require Popup Permission as it‘s user-initiated
-        case .none where navigationAction.isUserInitiated:
+        // TO BE FIXED: this also opens a new window when a popup ad is shown on click simultaneously with the main frame navigation:
+        // https://app.asana.com/0/1177771139624306/1203798645462846/f
+        case .none where navigationAction.isUserInitiated == true:
             // try to guess popup kind from provided windowFeatures
             let shouldSelectNewTab = !NSApp.isCommandPressed // this is actually not correct, to be fixed later
             let targetKind = NewWindowPolicy(windowFeatures, shouldSelectNewTab: shouldSelectNewTab)
@@ -101,7 +104,7 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
 
         // Popup Permission is needed: firing an async PermissionAuthorizationQuery
         let url = navigationAction.request.url
-        let domain = navigationAction.sourceFrame.request.url?.host ?? self.url?.host
+        let domain = navigationAction.safeSourceFrame?.safeRequest?.url?.host ?? self.url?.host
         self.permissions.request([.popups], forDomain: domain, url: url).receive { [weak self] result in
             guard let self, case .success(true) = result else {
                 completionHandler(nil)
@@ -151,7 +154,7 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
     func webView(_ webView: WKWebView,
                  checkUserMediaPermissionFor url: URL,
                  mainFrameURL: URL,
-                 frameIdentifier frame: UInt,
+                 frameIdentifier: UInt64,
                  decisionHandler: @escaping (String, Bool) -> Void) {
         self.permissions.checkUserMediaPermission(for: url, mainFrameURL: mainFrameURL, decisionHandler: decisionHandler)
     }
@@ -196,7 +199,7 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
     // https://github.com/WebKit/WebKit/blob/9d7278159234e0bfa3d27909a19e695928f3b31e/Source/WebKit/UIProcess/API/Cocoa/WKUIDelegatePrivate.h#L131
     @objc(_webView:requestGeolocationPermissionForFrame:decisionHandler:)
     func webView(_ webView: WKWebView, requestGeolocationPermissionFor frame: WKFrameInfo, decisionHandler: @escaping (Bool) -> Void) {
-        self.permissions.permissions(.geolocation, requestedForDomain: frame.request.url?.host, decisionHandler: decisionHandler)
+        self.permissions.permissions(.geolocation, requestedForDomain: frame.safeRequest?.url?.host, decisionHandler: decisionHandler)
     }
 
     // https://github.com/WebKit/WebKit/blob/9d7278159234e0bfa3d27909a19e695928f3b31e/Source/WebKit/UIProcess/API/Cocoa/WKUIDelegatePrivate.h#L132
@@ -206,7 +209,7 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
                  requestGeolocationPermissionFor origin: WKSecurityOrigin,
                  initiatedBy frame: WKFrameInfo,
                  decisionHandler: @escaping (WKPermissionDecision) -> Void) {
-        self.permissions.permissions(.geolocation, requestedForDomain: frame.request.url?.host) { granted in
+        self.permissions.permissions(.geolocation, requestedForDomain: frame.safeRequest?.url?.host) { granted in
             decisionHandler(granted ? .grant : .deny)
         }
     }
@@ -215,24 +218,36 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
         let dialog = UserDialogType.openPanel(.init(parameters) { result in
             completionHandler(try? result.get())
         })
-        userInteractionDialog = UserDialog(sender: .page(domain: frame.request.url?.host), dialog: dialog)
+        userInteractionDialog = UserDialog(sender: .page(domain: frame.safeRequest?.url?.host), dialog: dialog)
     }
 
     func webView(_ webView: WKWebView, runJavaScriptAlertPanelWithMessage message: String, initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping () -> Void) {
-        let dialog = UserDialogType.jsDialog(.alert(.init(message) { _ in
-            completionHandler()
-        }))
-        userInteractionDialog = UserDialog(sender: .page(domain: frame.request.url?.host), dialog: dialog)
+        createAlertDialog(initiatedByFrame: frame, prompt: message) { parameters in
+            .alert(.init(parameters, callback: { result in
+                switch result {
+                case .failure:
+                    completionHandler()
+                case .success:
+                    completionHandler()
+                }
+            }))
+        }
     }
 
     func webView(_ webView: WKWebView,
                  runJavaScriptConfirmPanelWithMessage message: String,
                  initiatedByFrame frame: WKFrameInfo,
                  completionHandler: @escaping (Bool) -> Void) {
-        let dialog = UserDialogType.jsDialog(.confirm(.init(message) { result in
-            completionHandler((try? result.get()) ?? false)
-        }))
-        userInteractionDialog = UserDialog(sender: .page(domain: frame.request.url?.host), dialog: dialog)
+        createAlertDialog(initiatedByFrame: frame, prompt: message) { parameters in
+            .confirm(.init(parameters, callback: { result in
+                switch result {
+                case .failure:
+                    completionHandler(false)
+                case .success(let alertResult):
+                    completionHandler(alertResult)
+                }
+            }))
+        }
     }
 
     func webView(_ webView: WKWebView,
@@ -240,18 +255,34 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
                  defaultText: String?,
                  initiatedByFrame frame: WKFrameInfo,
                  completionHandler: @escaping (String?) -> Void) {
+        createAlertDialog(initiatedByFrame: frame, prompt: prompt, defaultInputText: defaultText) { parameters in
+            .textInput(.init(parameters, callback: { result in
+                switch result {
+                case .failure:
+                    completionHandler(nil)
+                case .success(let alertResult):
+                    completionHandler(alertResult)
+                }
+            }))
+        }
+    }
 
-        let dialog = UserDialogType.jsDialog(.textInput(.init( (prompt: prompt, defaultText: defaultText) ) { result in
-            completionHandler(try? result.get())
-        }))
-        userInteractionDialog = UserDialog(sender: .page(domain: frame.request.url?.host), dialog: dialog)
+    private func createAlertDialog(initiatedByFrame frame: WKFrameInfo, prompt: String, defaultInputText: String? = nil, queryCreator: (JSAlertParameters) -> JSAlertQuery) {
+        let parameters = JSAlertParameters(
+            domain: frame.safeRequest?.url?.host ?? "",
+            prompt: prompt,
+            defaultInputText: defaultInputText
+        )
+        let alertQuery = queryCreator(parameters)
+        let dialog = UserDialogType.jsDialog(alertQuery)
+        userInteractionDialog = UserDialog(sender: .page(domain: frame.safeRequest?.url?.host), dialog: dialog)
     }
 
     func webViewDidClose(_ webView: WKWebView) {
         delegate?.closeTab(self)
     }
 
-    func runPrintOperation(for frameHandle: Any?, in webView: WKWebView, completionHandler: ((Bool) -> Void)? = nil) {
+    func runPrintOperation(for frameHandle: FrameHandle?, in webView: WKWebView, completionHandler: ((Bool) -> Void)? = nil) {
         guard let printOperation = webView.printOperation(for: frameHandle) else { return }
 
         if printOperation.view?.frame.isEmpty == true {
@@ -265,12 +296,12 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
     }
 
     @objc(_webView:printFrame:)
-    func webView(_ webView: WKWebView, printFrame frameHandle: Any) {
+    func webView(_ webView: WKWebView, printFrame frameHandle: FrameHandle?) {
         self.runPrintOperation(for: frameHandle, in: webView)
     }
 
     @objc(_webView:printFrame:pdfFirstPageSize:completionHandler:)
-    func webView(_ webView: WKWebView, printFrame frameHandle: Any, pdfFirstPageSize size: CGSize, completionHandler: @escaping () -> Void) {
+    func webView(_ webView: WKWebView, printFrame frameHandle: FrameHandle?, pdfFirstPageSize size: CGSize, completionHandler: @escaping () -> Void) {
         self.runPrintOperation(for: frameHandle, in: webView) { _ in completionHandler() }
     }
 

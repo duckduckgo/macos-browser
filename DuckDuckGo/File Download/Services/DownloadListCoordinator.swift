@@ -16,9 +16,9 @@
 //  limitations under the License.
 //
 
-import BrowserServicesKit
-import Foundation
 import Combine
+import Foundation
+import Navigation
 import os.log
 
 private func getFirstAvailableWebView() -> WKWebView? {
@@ -111,7 +111,7 @@ final class DownloadListCoordinator {
         }
         // skip already known task: it's already subscribed
         guard downloadTaskCancellables[task] == nil else { return }
-        
+
         let item = item ?? DownloadListItem(task: task)
 
         task.$location

@@ -19,6 +19,7 @@
 import BrowserServicesKit
 import Combine
 import Foundation
+import Navigation
 
 final class HTTPSUpgradeTabExtension {
 
@@ -36,11 +37,13 @@ final class HTTPSUpgradeTabExtension {
 
 extension HTTPSUpgradeTabExtension: NavigationResponder {
 
+    @MainActor
     func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
         guard navigationAction.isForMainFrame else { return .next }
 
         // resetting lastUpgradedURL for new navigation or cross-domain navigation
-        if navigationAction.navigationType.isContentUpdate || navigationAction.request.mainDocumentURL?.host != lastUpgradedURL?.host {
+        if (navigationAction.navigationType == .other && !navigationAction.isUserInitiated)
+            || navigationAction.request.mainDocumentURL?.host != lastUpgradedURL?.host {
             lastUpgradedURL = nil
         }
 
@@ -51,7 +54,9 @@ extension HTTPSUpgradeTabExtension: NavigationResponder {
         lastUpgradedURL = upgradedURL
         didUpgradeToHttpsSubject.send(upgradedURL)
 
-        return .cancel(with: .redirect(URLRequest(url: upgradedURL)))
+        return .redirectInvalidatingBackItemIfNeeded(navigationAction) {
+            $0.load(URLRequest(url: upgradedURL))
+        }
     }
 
 }

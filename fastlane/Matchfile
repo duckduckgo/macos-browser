@@ -1,0 +1,11 @@
+storage_mode "git"
+git_url "git@github.com:duckduckgo/Apple-certificates.git"
+git_branch "macos"
+platform "macos"
+
+type "appstore"
+app_identifier "com.duckduckgo.mobile.ios"
+additional_cert_types ["mac_installer_distribution"]
+generate_apple_certs false
+
+# The docs are available on https://docs.fastlane.tools/actions/match

@@ -22,19 +22,30 @@ import WebKit
 
 final class WKWebViewPrivateMethodsAvailabilityTests: XCTestCase {
 
-    func testWebViewRespondsTo_sessionStateData() {
-        let webView = WebView.init(frame: CGRect(), configuration: .init())
-
-        XCTAssertNoThrow(try XCTAssertNotNil(webView.sessionStateData()))
+    func testWebViewRespondsTo_sessionStateData() throws {
+        if #available(macOS 12.0, *) {
+            throw XCTSkip("sessionStateData was replaced with interactionStateData public API in macOS 12")
+        } else {
+            let webView = WebView.init(frame: CGRect(), configuration: .init())
+            XCTAssertNoThrow(try XCTAssertNotNil(webView.sessionStateData()))
+        }
     }
 
-    func testWebViewRespondsTo_restoreFromSessionStateData() {
-        let webView = WebView(frame: CGRect(), configuration: .init())
-        XCTAssertNoThrow(try webView.restoreSessionState(from: Data()))
+    func testWebViewRespondsTo_restoreFromSessionStateData() throws {
+        if #available(macOS 12.0, *) {
+            throw XCTSkip("sessionStateData was replaced with interactionStateData public API in macOS 12")
+        } else {
+            let webView = WebView(frame: CGRect(), configuration: .init())
+            XCTAssertNoThrow(try webView.restoreSessionState(from: Data()))
+        }
     }
 
-    func testWebViewRespondsTo_createWebArchiveDataWithCompletionHandler() {
-        XCTAssertTrue(WKWebView.instancesRespond(to: #selector(WKWebView.createWebArchiveData(completionHandler:))))
+    func testWebViewRespondsTo_createWebArchiveDataWithCompletionHandler() throws {
+        if #available(macOS 11.1, *) {
+            throw XCTSkip("createWebArchiveData has been made public in macOS 11.1")
+        } else {
+            XCTAssertTrue(WKWebView.instancesRespond(to: #selector(WKWebView.createWebArchiveData(completionHandler:))))
+        }
     }
 
     func testWebViewRespondsTo_createPDFWithConfiguration() {

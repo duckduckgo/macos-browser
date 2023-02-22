@@ -1,7 +1,7 @@
 //
-//  UserDefaultsWrapperUtilities.swift
+//  CancellableExtension.swift
 //
-//  Copyright © 2021 DuckDuckGo. All rights reserved.
+//  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,15 +16,22 @@
 //  limitations under the License.
 //
 
+import Combine
 import Foundation
-@testable import DuckDuckGo_Privacy_Browser
 
-extension UserDefaultsWrapper {
+extension Cancellable {
 
-    public static func clearAll() {
-        Key.allCases.forEach { key in
-            UserDefaults.standard.removeObject(forKey: key.rawValue)
-        }
+    /// Stores this cancellable instance in the specified type-erasing collection.
+    func store<C>(in collection: inout C) where C: RangeReplaceableCollection, C.Element == AnyCancellable {
+        AnyCancellable(self).store(in: &collection)
+    }
+
+}
+
+extension NSKeyValueObservation: Cancellable {
+
+    public func cancel() {
+        invalidate()
     }
 
 }

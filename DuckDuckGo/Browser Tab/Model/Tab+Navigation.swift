@@ -16,7 +16,7 @@
 //  limitations under the License.
 //
 
-import BrowserServicesKit
+import Navigation
 import Common
 import Foundation
 import WebKit
@@ -37,22 +37,17 @@ extension Tab: NavigationResponder {
 
             .weak(nullable: self.privacyDashboard),
             .weak(nullable: self.httpsUpgrade),
-            .weak(nullable: self.contentBlockingAndSurrogates),
 
             .struct(SerpHeadersNavigationResponder()),
 
-            .weak(nullable: self.fbProtection)
-        )
-        navigationDelegate.registerCustomDelegateMethodHandler(.weak(self), for: #selector(webView(_:contextMenuDidCreate:)))
-    }
+            .weak(nullable: self.fbProtection),
+            .weak(nullable: self.contentBlockingAndSurrogates),
 
-    func didCancel(_ navigationAction: NavigationAction, with relatedAction: NavigationActionCancellationRelatedAction) {
-        if case .redirect(let request) = relatedAction {
-            invalidateBackItemIfNeeded(for: navigationAction)
-            DispatchQueue.main.async { [weak webView] in
-                webView?.load(request)
-            }
-        }
+            // should be the last, for Unit Tests navigation events tracking
+            .struct(nullable: testsClosureNavigationResponder)
+        )
+        navigationDelegate
+            .registerCustomDelegateMethodHandler(.weak(self), forSelectorNamed: "_webView:contextMenuDidCreateDownload:")
     }
 
 }
@@ -66,53 +61,4 @@ extension Tab: WKNavigationDelegate {
         FileDownloadManager.shared.add(download, delegate: self, location: location, postflight: .none)
     }
 
-}
-
-extension NavigationType {
-
-    // content-update navigation caused by Tab.setContent, URL navigation after failed session restoration,
-    // refresh on appear after error or initiated by user entering a URL (Tab.update called)
-    static func contentUpdate(userEnteredUrl: Bool) -> NavigationType {
-        .custom([.init(\.contentUpdate, true), .init(\.userEnteredUrl, userEnteredUrl)])
-    }
-
-    var isContentUpdate: Bool {
-        if case .custom(let userInfo) = self {
-            return userInfo.contentUpdate
-        }
-        return false
-    }
-    var isUserEnteredUrl: Bool {
-        if case .custom(let userInfo) = self {
-            return userInfo.userEnteredUrl
-        }
-        return false
-    }
-
-}
-extension InitialNavigationType {
-    var isContentUpdate: Bool {
-        if case .custom(let userInfo) = self {
-            return userInfo.contentUpdate
-        }
-        return false
-    }
-    var isUserEnteredUrl: Bool {
-        if case .custom(let userInfo) = self {
-            return userInfo.userEnteredUrl
-        }
-        return false
-    }
-}
-
-private extension UserInfo.Values {
-    var userEnteredUrl: Value<Bool> { Value(default: false) { $0 ? "userEnteredURL" : "" } }
-    var contentUpdate: Value<Bool> { Value(default: false) { $0 ? "contentUpdate" : "" } }
-}
-
-extension NavigationMatchingCondition {
-    var url: URL? {
-        if case .url(let url) = self { return url }
-        return nil
-    }
 }

@@ -15,7 +15,7 @@ print_usage_and_exit() {
 
 	cat <<- EOF
 	Usage:
-	  $ $(basename "$0") <review|release> [-a <asana_task_url>] [-d] [-s] [-v <version>]
+	  $ $(basename "$0") <review|release|review-appstore|release-appstore> [-a <asana_task_url>] [-d] [-s] [-v <version>]
 
 	Options:
 	 -a <asana_task_url>  Update Asana task after building the app (implies -d)
@@ -46,6 +46,16 @@ read_command_line_arguments() {
 		release)
 			app_name="DuckDuckGo"
 			scheme="DuckDuckGo Privacy Browser"
+			configuration="Release"
+			;;
+		review-appstore)
+			app_name="DuckDuckGo App Store Review"
+			scheme="Product Review Release App Store"
+			configuration="Review"
+			;;
+		release-appstore)
+			app_name="DuckDuckGo"
+			scheme="DuckDuckGo Privacy Browser App Store"
 			configuration="Release"
 			;;
 		clear-keychain)
@@ -186,31 +196,38 @@ prepare_export_options_plist() {
 	plutil -replace teamID -string "${team_id}" "${export_options_plist}"
 }
 
-check_xcpretty() {
-	if ! command -v xcpretty &> /dev/null; then
-		echo
-		echo "xcpretty not found - not prettifying Xcode logs. You can install it using 'gem install xcpretty'."
-		echo
-		xcpretty='tee'
+setup_log_formatter() {
+	if command -v xcbeautify &> /dev/null; then
+		log_formatter='xcbeautify'
+	elif command -v xcpretty &> /dev/null; then
+		log_formatter='xcpretty'
 	else
-		xcpretty='xcpretty'
+		echo
+		echo "xcbeautify and xcpretty not found - not prettifying Xcode logs. You can install xcbeautify using 'brew install xcbeautify'."
+		echo
+		log_formatter='tee'
 	fi
 }
 
 archive_and_export() {
-	local xcpretty
-	check_xcpretty
+	local log_formatter
+	setup_log_formatter
 
 	echo "Building and archiving the app (version ${app_version}) ..."
+
+	local derived_data="${workdir}/DerivedData"
+	rm -rf "${derived_data}"
 	
 	${filter_output} xcrun xcodebuild archive \
 		-scheme "${scheme}" \
 		-configuration "${configuration}" \
 		-archivePath "${archive}" \
+		-derivedDataPath "${derived_data}" \
 		CURRENT_PROJECT_VERSION="${app_version}" \
 		MARKETING_VERSION="${app_version}" \
+		RELEASE_PRODUCT_NAME_OVERRIDE=DuckDuckGo \
 		2>&1 \
-		| ${xcpretty}
+		| ${log_formatter}
 
 	echo "Exporting archive ..."
 
@@ -222,7 +239,7 @@ archive_and_export() {
 		-exportOptionsPlist "${export_options_plist}" \
 		-configuration "${configuration}" \
 		2>&1 \
-		| ${xcpretty}
+		| ${log_formatter}
 }
 
 notarize() {
