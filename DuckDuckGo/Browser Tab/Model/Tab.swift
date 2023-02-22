@@ -405,7 +405,16 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
     var isLazyLoadingInProgress = false
 
-    @Published private(set) var content: TabContent
+    @Published private(set) var content: TabContent {
+        didSet {
+            handleFavicon()
+            invalidateInteractionStateData()
+            if let oldUrl = oldValue.url {
+                historyCoordinating.commitChanges(url: oldUrl)
+            }
+            error = nil
+        }
+    }
 
     func setContent(_ newContent: TabContent) {
         guard contentChangeEnabled else { return }
@@ -425,12 +434,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         guard newContent != self.content else { return }
         self.content = newContent
 
-        handleFavicon()
-        invalidateInteractionStateData()
-        if let oldUrl = oldContent.url {
-            historyCoordinating.commitChanges(url: oldUrl)
-        }
-        error = nil
         dismissPresentedAlert()
 
         Task {
@@ -449,9 +452,43 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         self.setContent(.contentFromURL(url, userEntered: userEntered))
     }
 
+    private func handleUrlDidChange() {
+        if let url = webView.url {
+            let content = TabContent.contentFromURL(url)
+
+            if content.isUrl, !webView.isLoading {
+                self.addVisit(of: url)
+            }
+            if content != self.content {
+                self.content = content
+            }
+        }
+        self.updateTitle() // The title might not change if webView doesn't think anything is different so update title here as well
+    }
+
     var lastSelectedAt: Date?
 
     @Published var title: String?
+
+    private func handleTitleDidChange() {
+        updateTitle()
+
+        if let title = self.title, let url = webView.url {
+            historyCoordinating.updateTitleIfNeeded(title: title, url: url)
+        }
+    }
+
+    private func updateTitle() {
+        var title = webView.title?.trimmingWhitespace()
+        if title?.isEmpty ?? true {
+            title = webView.url?.host?.droppingWwwPrefix()
+        }
+
+        if title != self.title {
+            self.title = title
+        }
+    }
+
     @PublishedAfter var error: WKError? {
         didSet {
             switch error {
@@ -465,6 +502,9 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         }
     }
     let permissions: PermissionModel
+
+    @Published private(set) var isLoading: Bool = false
+    @Published private(set) var loadingProgress: Double = 0.0
 
     /// an Interactive Dialog request (alert/open/save/print) made by a page to be published and presented asynchronously
     @Published
@@ -582,6 +622,8 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
         shouldStoreNextVisit = false
 
+        // Prevent from a Player reloading loop on back navigation to
+        // YT page where the player was enabled (see comment inside)
         if privatePlayer.goBackSkippingLastItemIfNeeded(for: webView) {
             return
         }
@@ -793,6 +835,13 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             }
         }.store(in: &webViewCancellables)
 
+        webView.observe(\.url) { [weak self] _, _ in
+            self?.handleUrlDidChange()
+        }.store(in: &webViewCancellables)
+        webView.observe(\.title) { [weak self] _, _ in
+            self?.handleTitleDidChange()
+        }.store(in: &webViewCancellables)
+
         webView.observe(\.canGoBack) { [weak self] _, _ in
             self?.updateCanGoBackForward()
         }.store(in: &webViewCancellables)
@@ -800,6 +849,20 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         webView.observe(\.canGoForward) { [weak self] _, _ in
             self?.updateCanGoBackForward()
         }.store(in: &webViewCancellables)
+
+        webView.publisher(for: \.isLoading)
+            .assign(to: \.isLoading, onWeaklyHeld: self)
+            .store(in: &webViewCancellables)
+
+        webView.publisher(for: \.estimatedProgress)
+            .assign(to: \.loadingProgress, onWeaklyHeld: self)
+            .store(in: &webViewCancellables)
+
+        webView.publisher(for: \.serverTrust)
+            .sink { [weak self] serverTrust in
+                self?.privacyInfo?.serverTrust = serverTrust
+            }
+            .store(in: &webViewCancellables)
 
         navigationDelegate.$currentNavigation.sink { [weak self] navigation in
             self?.updateCanGoBackForward(withCurrentNavigation: navigation)
@@ -869,10 +932,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         if let host = url.host, !host.isEmpty {
             localHistory.insert(host.droppingWwwPrefix())
         }
-    }
-
-    func updateVisitTitle(_ title: String, url: URL) {
-        historyCoordinating.updateTitleIfNeeded(title: title, url: url)
     }
 
     // MARK: - Youtube Player
@@ -1317,6 +1376,8 @@ extension Tab: YoutubeOverlayUserScriptDelegate {
 
 extension Tab: TabDataClearing {
     func prepareForDataClearing(caller: TabDataCleaner) {
+        webViewCancellables.removeAll()
+
         webView.stopLoading()
         webView.configuration.userContentController.removeAllUserScripts()
 
