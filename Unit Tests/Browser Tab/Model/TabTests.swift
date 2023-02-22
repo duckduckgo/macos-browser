@@ -345,7 +345,7 @@ extension Tab {
             content.url
         }
         set {
-            setContent(newValue.map(TabContent.url) ?? .homePage)
+            setContent(newValue.map { TabContent.url($0) } ?? .homePage)
         }
     }
 }
