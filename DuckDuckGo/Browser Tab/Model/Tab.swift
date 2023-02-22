@@ -1197,10 +1197,11 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
     // swiftlint:enable cyclomatic_complexity
     // swiftlint:enable function_body_length
 
-    func willStart(_ navigationAction: NavigationAction) {
+    @MainActor
+    func willStart(_ navigation: Navigation) {
         if error != nil { error = nil }
 
-        delegate?.tabWillStartNavigation(self, isUserInitiated: navigationAction.isUserInitiated)
+        delegate?.tabWillStartNavigation(self, isUserInitiated: navigation.navigationAction.isUserInitiated)
     }
 
     @MainActor
