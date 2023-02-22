@@ -88,8 +88,12 @@ public class LegacyBookmarksStoreMigration {
         var favoriteRoot: BookmarkManagedObject?
 
         // Map old roots to new one, prepare list of top level bookmarks to migrate
+        guard let legacyFavoritesRootID = UUID(uuidString: LegacyBookmarkStore.Constants.favoritesFolderUUID) else {
+            return
+        }
+
         for folder in bookmarkRoots {
-            guard !folder.isFavorite else {
+            guard folder.id != legacyFavoritesRootID else {
                 favoriteRoot = folder
                 continue
             }
@@ -129,7 +133,7 @@ public class LegacyBookmarksStoreMigration {
                                                               parent: newParent,
                                                               context: destination)
 
-                if objectToMigrate.isFavorite {
+                if objectToMigrate.favoritesFolder != nil {
                     favoritesToAdd.append(newBookmark)
                 }
             }
@@ -141,7 +145,7 @@ public class LegacyBookmarksStoreMigration {
         if let oldFavoritesRoot = favoriteRoot,
            let oldFavorites = oldFavoritesRoot.favorites?.array as? [BookmarkManagedObject] {
 
-            for oldFavorite in oldFavorites.reversed() {
+            for oldFavorite in oldFavorites {
 
                 if let favoriteIndex = favoritesToAdd.firstIndex(where: { $0.title == oldFavorite.titleEncrypted as? String && $0.url == (oldFavorite.urlEncrypted as? URL)?.absoluteString}) {
                     let favorite = favoritesToAdd[favoriteIndex]
