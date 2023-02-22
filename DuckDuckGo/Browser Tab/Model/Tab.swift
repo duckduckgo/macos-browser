@@ -151,6 +151,8 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     private struct ExtensionDependencies: TabExtensionDependencies {
         let privacyFeatures: PrivacyFeaturesProtocol
         let historyCoordinating: HistoryCoordinating
+
+        var downloadManager: FileDownloadManagerProtocol
     }
 
     fileprivate weak var delegate: TabDelegate?
@@ -186,6 +188,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                      pinnedTabsManager: PinnedTabsManager = WindowControllersManager.shared.pinnedTabsManager,
                      privacyFeatures: AnyPrivacyFeatures? = nil,
                      privatePlayer: PrivatePlayer? = nil,
+                     downloadManager: FileDownloadManagerProtocol = FileDownloadManager.shared,
                      cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter? = ContentBlockingAssetsCompilationTimeReporter.shared,
                      statisticsLoader: StatisticsLoader? = nil,
                      extensionsBuilder: TabExtensionsBuilderProtocol = TabExtensionsBuilder.default,
@@ -197,7 +200,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                      shouldLoadInBackground: Bool = false,
                      canBeClosedWithBack: Bool = false,
                      lastSelectedAt: Date? = nil,
-                     currentDownload: URL? = nil,
                      webViewFrame: CGRect = .zero
     ) {
 
@@ -216,6 +218,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                   pinnedTabsManager: pinnedTabsManager,
                   privacyFeatures: privacyFeatures,
                   privatePlayer: privatePlayer,
+                  downloadManager: downloadManager,
                   extensionsBuilder: extensionsBuilder,
                   cbaTimeReporter: cbaTimeReporter,
                   statisticsLoader: statisticsLoader,
@@ -228,7 +231,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                   shouldLoadInBackground: shouldLoadInBackground,
                   canBeClosedWithBack: canBeClosedWithBack,
                   lastSelectedAt: lastSelectedAt,
-                  currentDownload: currentDownload,
                   webViewFrame: webViewFrame)
     }
 
@@ -241,6 +243,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
          pinnedTabsManager: PinnedTabsManager,
          privacyFeatures: AnyPrivacyFeatures,
          privatePlayer: PrivatePlayer,
+         downloadManager: FileDownloadManagerProtocol,
          extensionsBuilder: TabExtensionsBuilderProtocol,
          cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter?,
          statisticsLoader: StatisticsLoader?,
@@ -253,7 +256,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
          shouldLoadInBackground: Bool,
          canBeClosedWithBack: Bool,
          lastSelectedAt: Date?,
-         currentDownload: URL?,
          webViewFrame: CGRect
     ) {
 
@@ -273,7 +275,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         self._canBeClosedWithBack = canBeClosedWithBack
         self.interactionStateData = interactionStateData
         self.lastSelectedAt = lastSelectedAt
-        self.currentDownload = currentDownload
 
         let configuration = webViewConfiguration ?? WKWebViewConfiguration()
         configuration.applyStandardConfiguration(contentBlocking: privacyFeatures.contentBlocking)
@@ -299,10 +300,11 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                           inheritedAttribution: parentTab?.adClickAttribution?.currentAttributionState,
                           userContentControllerFuture: userContentControllerPromise.future,
                           permissionModel: permissions,
-                          privacyInfoPublisher: _privacyInfo.projectedValue.eraseToAnyPublisher()
-                         ),
+                          privacyInfoPublisher: _privacyInfo.projectedValue.eraseToAnyPublisher(),
+                          isChildTab: parentTab != nil),
                    dependencies: ExtensionDependencies(privacyFeatures: privacyFeatures,
-                                                       historyCoordinating: historyCoordinating))
+                                                       historyCoordinating: historyCoordinating,
+                                                       downloadManager: downloadManager))
 
         super.init()
         userContentController.map(userContentControllerPromise.fulfill)
@@ -515,33 +517,8 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         userEnteredUrl = userEntered
     }
 
-    // Used to track if an error was caused by a download navigation.
-    private(set) var currentDownload: URL?
-
-    func download(from url: URL, promptForLocation: Bool = true) {
-        webView.startDownload(URLRequest(url: url, cachePolicy: .returnCacheDataElseLoad)) { download in
-            FileDownloadManager.shared.add(download, delegate: self, location: promptForLocation ? .prompt : .auto, postflight: .none)
-        }
-    }
-
     func saveWebContentAs() {
-        webView.getMimeType { [weak self] mimeType in
-            guard let self else { return }
-            let webView = self.webView
-            guard case .some(.html) = mimeType.flatMap(UTType.init(mimeType:)) else {
-                if let url = webView.url {
-                    self.download(from: url, promptForLocation: true)
-                }
-                return
-            }
-
-            let dialog = UserDialogType.savePanel(.init(SavePanelParameters(suggestedFilename: webView.suggestedFilename,
-                                                                            fileTypes: [.html, .webArchive, .pdf])) { result in
-                guard let (url, fileType) = try? result.get() else { return }
-                webView.exportWebContent(to: url, as: fileType.flatMap(WKWebView.ContentExportType.init) ?? .html)
-            })
-            self.userInteractionDialog = UserDialog(sender: .user, dialog: dialog)
-        }
+        self.downloads?.saveWebViewContentAs(webView)
     }
 
     private let instrumentation = TabInstrumentation()
@@ -621,7 +598,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
     func reload() {
         userInteractionDialog = nil
-        currentDownload = nil
         if let error = error, let failingUrl = error.failingUrl {
             webView.load(failingUrl)
             return
@@ -698,7 +674,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                 in self?.isAMPProtectionExtracting = false
             })
         }()
-        if shouldLoadURL(url, shouldLoadInBackground: shouldLoadInBackground) {
+        if shouldReload(url, shouldLoadInBackground: shouldLoadInBackground) {
             let didRestore = restoreInteractionStateDataIfNeeded()
 
             if privatePlayer.goBackAndLoadURLIfNeeded(for: self) {
@@ -730,7 +706,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     }
 
     @MainActor
-    private func shouldLoadURL(_ url: URL, shouldLoadInBackground: Bool = false) -> Bool {
+    private func shouldReload(_ url: URL, shouldLoadInBackground: Bool) -> Bool {
         // don‘t reload in background unless shouldLoadInBackground
         guard url.isValid,
               (webView.superview != nil || shouldLoadInBackground),
@@ -1250,24 +1226,12 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
             }
         }
 
-        if navigationAction.isForMainFrame,
-           navigationAction.url != currentDownload || navigationAction.isUserInitiated {
-            currentDownload = nil
-        }
-
         self.resetConnectionUpgradedTo(navigationAction: navigationAction)
 
         if isRequestingNewTab {
             self.openChild(with: .contentFromURL(navigationAction.url), of: .tab(selected: shouldSelectNewTab))
             return .cancel
 
-        } else if navigationAction.shouldDownload
-                    || (isLinkActivated && NSApp.isOptionPressed && !NSApp.isCommandPressed) {
-            // register the navigationAction for legacy _WKDownload to be called back on the Tab
-            // further download will be passed to webView:navigationAction:didBecomeDownload:
-            return .download(navigationAction.url, using: webView) { [weak self] download in
-                self?.navigationAction(navigationAction, didBecome: download)
-            }
         }
 
         guard navigationAction.url.scheme != nil else { return .allow }
@@ -1386,24 +1350,6 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         internalUserDecider?.markUserAsInternalIfNeeded(forUrl: webView.url,
                                                         response: navigationResponse.response as? HTTPURLResponse)
 
-        if !navigationResponse.canShowMIMEType || navigationResponse.shouldDownload {
-            if navigationResponse.isForMainFrame {
-                guard currentDownload != navigationResponse.url else {
-                    // prevent download twice
-                    return .cancel
-                }
-                currentDownload = navigationResponse.url
-            }
-
-            if navigationResponse.isSuccessful == true {
-                // register the navigationResponse for legacy _WKDownload to be called back on the Tab
-                // further download will be passed to webView:navigationResponse:didBecomeDownload:
-                return .download(navigationResponse.url, using: webView) {  [weak self] download in
-                    self?.navigationResponse(navigationResponse, didBecome: download)
-                }
-            }
-        }
-
         return .next
     }
 
@@ -1445,56 +1391,8 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         webViewDidFailNavigationPublisher.send()
     }
 
-    @MainActor
-    func navigationAction(_ navigationAction: NavigationAction, didBecome download: WebKitDownload) {
-        FileDownloadManager.shared.add(download, delegate: self, location: .auto, postflight: .none)
-    }
-
-    @MainActor
-    func navigationResponse(_ navigationResponse: NavigationResponse, didBecome download: WebKitDownload) {
-        let task = FileDownloadManager.shared.add(download, delegate: self, location: .auto, postflight: .none)
-
-        // Note this can result in tabs being left open, e.g. download button on this page:
-        // https://en.wikipedia.org/wiki/Guitar#/media/File:GuitareClassique5.png
-        // Safari closes new tabs that were opened and then create a download instantly.
-        if self.webView.backForwardList.currentItem == nil,
-           self.parentTab != nil {
-            var cancellable: AnyCancellable?
-            cancellable = task.didChooseDownloadLocationPublisher.sink { [weak self] completion in
-                cancellable?.cancel()
-                guard let self,
-                      case .finished = completion,
-                      self.webView.backForwardList.currentItem == nil
-                else { return }
-
-                self.delegate?.closeTab(self)
-
-            } receiveValue: { _ in }
-        }
-    }
-
     func webContentProcessDidTerminate(with reason: WKProcessTerminationReason?) {
         Pixel.fire(.debug(event: .webKitDidTerminate, error: NSError(domain: "WKProcessTerminated", code: reason?.rawValue ?? -1)))
-    }
-
-}
-
-extension Tab: FileDownloadManagerDelegate {
-
-    func chooseDestination(suggestedFilename: String?, directoryURL: URL?, fileTypes: [UTType], callback: @escaping (URL?, UTType?) -> Void) {
-        let dialog = UserDialogType.savePanel(.init(SavePanelParameters(suggestedFilename: suggestedFilename,
-                                                                        fileTypes: fileTypes)) { result in
-            guard case let .success(.some( (url: url, fileType: fileType) )) = result else {
-                callback(nil, nil)
-                return
-            }
-            callback(url, fileType)
-        })
-        userInteractionDialog = UserDialog(sender: .user, dialog: dialog)
-    }
-
-    func fileIconFlyAnimationOriginalRect(for downloadTask: WebKitDownloadTask) -> NSRect? {
-        self.delegate?.fileIconFlyAnimationOriginalRect(for: downloadTask)
     }
 
 }

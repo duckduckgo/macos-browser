@@ -45,7 +45,7 @@ final class FileDownloadManagerTests: XCTestCase {
         preferences = DownloadsPreferences(persistor: DownloadsPreferencesPersistorMock())
         preferences.alwaysRequestDownloadLocation = false
         self.workspace = TestWorkspace()
-        self.dm = FileDownloadManager(workspace: workspace, preferences: preferences)
+        self.dm = FileDownloadManager(preferences: preferences)
         let tempDir = fm.temporaryDirectory
         for file in (try? fm.contentsOfDirectory(atPath: tempDir.path)) ?? [] where file.hasPrefix(testFile) {
             try? fm.removeItem(at: tempDir.appendingPathComponent(file))
@@ -65,7 +65,7 @@ final class FileDownloadManagerTests: XCTestCase {
         }
 
         let download = WKDownloadMock()
-        dm.add(download, delegate: nil, location: .auto, postflight: .none)
+        dm.add(download, delegate: nil, location: .auto)
 
         withExtendedLifetime(cancellable) {
             waitForExpectations(timeout: 0.3)
@@ -79,7 +79,7 @@ final class FileDownloadManagerTests: XCTestCase {
         }
 
         let download = WKDownloadMock()
-        dm.add(download, delegate: nil, location: .auto, postflight: .none)
+        dm.add(download, delegate: nil, location: .auto)
 
         struct TestError: Error {}
         download.delegate?.download!(download.asWKDownload(), didFailWithError: TestError(), resumeData: nil)
@@ -97,7 +97,7 @@ final class FileDownloadManagerTests: XCTestCase {
         }
 
         let download = WKDownloadMock()
-        dm.add(download, delegate: nil, location: .auto, postflight: .none)
+        dm.add(download, delegate: nil, location: .auto)
 
         download.delegate?.downloadDidFinish!(download.asWKDownload())
 
@@ -123,7 +123,7 @@ final class FileDownloadManagerTests: XCTestCase {
         }
 
         let download = WKDownloadMock()
-        dm.add(download, delegate: self, location: .prompt, postflight: .none)
+        dm.add(download, delegate: self, location: .prompt)
 
         let url = URL(string: "https://duckduckgo.com/somefile.html")!
         let response = URLResponse(url: url, mimeType: UTType.pdf.mimeType, expectedContentLength: 1, textEncodingName: "utf-8")
@@ -156,7 +156,7 @@ final class FileDownloadManagerTests: XCTestCase {
         }
 
         let download = WKDownloadMock()
-        dm.add(download, delegate: self, location: .auto, postflight: .none)
+        dm.add(download, delegate: self, location: .auto)
 
         let url = URL(string: "https://duckduckgo.com/somefile.html")!
         let response = URLResponse(url: url, mimeType: UTType.html.mimeType, expectedContentLength: 1, textEncodingName: "utf-8")
@@ -178,7 +178,7 @@ final class FileDownloadManagerTests: XCTestCase {
         XCTAssertTrue(fm.fileExists(atPath: localURL.path))
 
         let download = WKDownloadMock()
-        dm.add(download, delegate: self, location: .prompt, postflight: .none)
+        dm.add(download, delegate: self, location: .prompt)
         self.chooseDestination = { _, _, _, callback in
             callback(localURL, nil)
         }
@@ -199,7 +199,7 @@ final class FileDownloadManagerTests: XCTestCase {
         preferences.selectedDownloadLocation = downloadsURL
 
         let download = WKDownloadMock()
-        dm.add(download, delegate: self, location: .auto, postflight: .none)
+        dm.add(download, delegate: self, location: .auto)
         self.chooseDestination = { _, _, _, _ in
             XCTFail("Unpected chooseDestination call")
         }
@@ -218,7 +218,7 @@ final class FileDownloadManagerTests: XCTestCase {
         preferences.selectedDownloadLocation = downloadsURL
 
         let download = WKDownloadMock()
-        dm.add(download, delegate: self, location: .auto, postflight: .none)
+        dm.add(download, delegate: self, location: .auto)
         self.chooseDestination = { _, _, _, _ in
             XCTFail("Unpected chooseDestination call")
         }
@@ -241,7 +241,7 @@ final class FileDownloadManagerTests: XCTestCase {
         }
 
         let download = WKDownloadMock()
-        dm.add(download, delegate: self, location: .auto, postflight: .none)
+        dm.add(download, delegate: self, location: .auto)
 
         let e = expectation(description: "WKDownload called")
         download.delegate?.download(download.asWKDownload(), decideDestinationUsing: response, suggestedFilename: "") { url in
@@ -250,64 +250,6 @@ final class FileDownloadManagerTests: XCTestCase {
         }
 
         waitForExpectations(timeout: 0.3)
-    }
-
-    func performPostflightTest(at url: URL, with postflight: FileDownloadManager.PostflightAction?, completion: @escaping (Selector, [URL]) -> Void) {
-        let download = WKDownloadMock()
-        let task = dm.add(download, delegate: self, location: .prompt, postflight: postflight)
-        chooseDestination = { _, _, _, callback in
-            callback(url, nil)
-        }
-        self.workspace.callback = { sel, urls in
-            completion(sel, urls)
-        }
-
-        download.delegate?.download(download.asWKDownload(), decideDestinationUsing: response, suggestedFilename: "") { [fm] url in
-            fm.createFile(atPath: url!.path, contents: nil, attributes: nil)
-        }
-
-        let e = expectation(description: "WKDownload completed")
-        let cancellable = task.output.sink { completion in
-            if case .failure(let error) = completion {
-                XCTFail("download failed with \(error)")
-            }
-            e.fulfill()
-        } receiveValue: { dest in
-            XCTAssertEqual(dest, url)
-        }
-
-        download.delegate?.downloadDidFinish!(download.asWKDownload())
-
-        withExtendedLifetime(cancellable) {
-            waitForExpectations(timeout: 0.3)
-        }
-    }
-
-    func testWhenNoPostflightThenNoWorkspaceCalls() {
-        let localURL = fm.temporaryDirectory.appendingPathComponent(testFile)
-        performPostflightTest(at: localURL, with: .none) { _, _ in
-            XCTFail("Unexpected workspace call")
-        }
-    }
-
-    func testWhenPostflightIsOpenThenFileIsOpened() {
-        let localURL = fm.temporaryDirectory.appendingPathComponent(testFile)
-        let e = expectation(description: "Open File postflight called")
-        performPostflightTest(at: localURL, with: .open) { (sel, urls) in
-            XCTAssertEqual(sel, #selector(NSWorkspace.open(_:)))
-            XCTAssertEqual(urls, [localURL])
-            e.fulfill()
-        }
-    }
-
-    func testWhenPostflightIsRevealThenFileIsRevealed() {
-        let localURL = fm.temporaryDirectory.appendingPathComponent(testFile)
-        let e = expectation(description: "Open File postflight called")
-        performPostflightTest(at: localURL, with: .reveal) { (sel, urls) in
-            XCTAssertEqual(sel, #selector(NSWorkspace.activateFileViewerSelecting(_:)))
-            XCTAssertEqual(urls, [localURL])
-            e.fulfill()
-        }
     }
 
 }

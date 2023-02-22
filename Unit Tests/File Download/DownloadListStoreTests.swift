@@ -41,7 +41,8 @@ final class DownloadListStoreTests: XCTestCase {
         item.error = .failedToCompleteDownloadTask(underlyingError: NSError(domain: "test",
                                                                             code: 42,
                                                                             userInfo: [NSLocalizedDescriptionKey: "localized description"]),
-                                                   resumeData: "resumeData".data(using: .utf8)!)
+                                                   resumeData: "resumeData".data(using: .utf8)!,
+                                                   isRetryable: true)
         let secondSavingExpectation = self.expectation(description: "Saving")
         save(item, expectation: secondSavingExpectation)
 

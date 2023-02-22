@@ -207,6 +207,9 @@ extension DownloadListItem {
             return nil
         }
 
+        let error = (managedObject.errorEncrypted as? NSError).map { nsError in
+            FileDownloadError(nsError, isRetryable: managedObject.destinationURLEncrypted as? URL != nil)
+        }
         self.init(identifier: identifier,
                   added: added,
                   modified: modified,
@@ -215,7 +218,7 @@ extension DownloadListItem {
                   fileType: managedObject.fileType.map { UTType(rawValue: $0 as CFString) },
                   destinationURL: managedObject.destinationURLEncrypted as? URL,
                   tempURL: managedObject.tempURLEncrypted as? URL,
-                  error: (managedObject.errorEncrypted as? NSError).map(FileDownloadError.init))
+                  error: error)
     }
 
 }

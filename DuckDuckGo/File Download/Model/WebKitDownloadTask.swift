@@ -35,8 +35,6 @@ final class WebKitDownloadTask: NSObject, ProgressReporting {
 
     let progress: Progress
     let shouldPromptForLocation: Bool
-    /// Action that should be performed on file after it's downloaded
-    var postflight: FileDownloadManager.PostflightAction?
 
     private(set) var suggestedFilename: String?
     private(set) var suggestedFileType: UTType?
@@ -81,13 +79,12 @@ final class WebKitDownloadTask: NSObject, ProgressReporting {
         download.webView
     }
 
-    init(download: WebKitDownload, promptForLocation: Bool, destinationURL: URL?, tempURL: URL?, postflight: FileDownloadManager.PostflightAction? = .none) {
+    init(download: WebKitDownload, promptForLocation: Bool, destinationURL: URL?, tempURL: URL?) {
 
         self.download = download
         self.progress = Progress(totalUnitCount: -1)
         self.shouldPromptForLocation = promptForLocation
         self.location = .init(destinationURL: destinationURL, tempURL: tempURL)
-        self.postflight = postflight
         super.init()
 
         download.delegate = self
@@ -136,7 +133,7 @@ final class WebKitDownloadTask: NSObject, ProgressReporting {
 
         } catch {
             self.download.cancel()
-            self.finish(with: .failure(.failedToCompleteDownloadTask(underlyingError: URLError(.cancelled), resumeData: nil)))
+            self.finish(with: .failure(.failedToCompleteDownloadTask(underlyingError: URLError(.cancelled), resumeData: nil, isRetryable: false)))
             self.decideDestinationCompletionHandler?(nil)
         }
     }
@@ -213,7 +210,9 @@ final class WebKitDownloadTask: NSObject, ProgressReporting {
            let tempURL = location.tempURL {
             try? FileManager.default.removeItem(at: tempURL)
         }
-        self.finish(with: .failure(.failedToCompleteDownloadTask(underlyingError: error, resumeData: resumeData)))
+        self.finish(with: .failure(.failedToCompleteDownloadTask(underlyingError: error,
+                                                                 resumeData: resumeData,
+                                                                 isRetryable: location.destinationURL != nil)))
     }
 
     deinit {
@@ -300,25 +299,6 @@ extension WebKitDownloadTask: WebKitDownloadDelegate {}
 
     func download(_: WKDownload, didReceiveDataWithLength length: UInt64) {
         self.progress.completedUnitCount += Int64(length)
-    }
-
-}
-
-extension WebKitDownloadTask {
-
-    var didChooseDownloadLocationPublisher: AnyPublisher<URL, FileDownloadError> {
-        Publishers.Merge(
-            $location
-            // waiting for the download location to be chosen
-                .compactMap { $0.destinationURL }
-                .mapError { (_: Never) -> FileDownloadError in }
-                .eraseToAnyPublisher(),
-            // downloadTask.output Publisher will complete with an error if cancelled
-            output.eraseToAnyPublisher()
-        )
-        // complete the Publisher when the location is chosen
-        .first()
-        .eraseToAnyPublisher()
     }
 
 }

@@ -30,7 +30,6 @@ final class ContextMenuManager: NSObject {
     private var userScriptCancellable: AnyCancellable?
 
     private var onNewWindow: ((WKNavigationAction?) -> NavigationDecision)?
-    private var askForDownloadLocation: Bool?
     private var originalItems: [WKMenuItemIdentifier: NSMenuItem]?
     private var selectedText: String?
     fileprivate weak var webView: WKWebView?
@@ -48,13 +47,6 @@ final class ContextMenuManager: NSObject {
             onNewWindow = nil
         }
         return onNewWindow?(navigationAction)
-    }
-
-    func shouldAskForDownloadLocation() -> Bool? {
-        defer {
-            askForDownloadLocation = nil
-        }
-        return askForDownloadLocation
     }
 
 }
@@ -308,7 +300,6 @@ private extension ContextMenuManager {
             return
         }
 
-        askForDownloadLocation = true
         NSApp.sendAction(action, to: originalItem.target, from: originalItem)
     }
 
@@ -394,7 +385,6 @@ private extension ContextMenuManager {
             return
         }
 
-        askForDownloadLocation = true
         NSApp.sendAction(action, to: originalItem.target, from: originalItem)
     }
 
@@ -433,7 +423,6 @@ extension ContextMenuManager: ContextMenuUserScriptDelegate {
 
 protocol ContextMenuManagerProtocol: WebViewContextMenuDelegate {
     func decideNewWindowPolicy(for navigationAction: WKNavigationAction) -> NavigationDecision?
-    func shouldAskForDownloadLocation() -> Bool?
 }
 
 extension ContextMenuManager: TabExtension, ContextMenuManagerProtocol {

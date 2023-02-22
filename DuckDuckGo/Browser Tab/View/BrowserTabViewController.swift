@@ -151,6 +151,7 @@ final class BrowserTabViewController: NSViewController {
             for tab in tabs {
                 tab.setDelegate(self)
                 tab.autofill?.setDelegate(self)
+                tab.downloads?.delegate = self
             }
         }
     }
@@ -260,7 +261,18 @@ final class BrowserTabViewController: NSViewController {
     }
 
     func subscribeToUserDialogs(of tabViewModel: TabViewModel?) {
-        userDialogsCancellable = tabViewModel?.tab.$userInteractionDialog.sink { [weak self] dialog in
+        guard let tabViewModel = tabViewModel else {
+            userDialogsCancellable = nil
+            return
+        }
+
+        userDialogsCancellable = Publishers.CombineLatest(
+            // TODO: nil is published here
+            tabViewModel.tab.$userInteractionDialog,
+            tabViewModel.tab.downloads?.savePanelDialogPublisher ?? Just(nil).eraseToAnyPublisher()
+        )
+        .map { $1 ?? $0 }
+        .sink { [weak self] dialog in
             self?.show(dialog)
         }
     }
@@ -766,6 +778,10 @@ extension BrowserTabViewController: TabDelegate {
         context.request.submit(success)
     }
 
+}
+
+extension BrowserTabViewController: TabDownloadsDelegate {
+
     func fileIconFlyAnimationOriginalRect(for downloadTask: WebKitDownloadTask) -> NSRect? {
         dispatchPrecondition(condition: .onQueue(.main))
         guard let window = self.view.window,
@@ -799,19 +815,6 @@ extension BrowserTabViewController: BrowserTabSelectionDelegate {
         if case .preferences = selectedTab.content {
             selectedTab.setContent(.preferences(pane: identifier))
         }
-    }
-
-}
-
-private extension WKWebView {
-
-    var tab: Tab? {
-        guard let navigationDelegate = self.navigationDelegate else { return nil }
-        guard let tab = navigationDelegate as? Tab else {
-            assertionFailure("webView.navigationDelegate is not a Tab")
-            return nil
-        }
-        return tab
     }
 
 }
