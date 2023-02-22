@@ -32,20 +32,16 @@ final class FBProtectionTabExtension {
     var fbBlockingEnabled = true
 
     init(privacyConfigurationManager: PrivacyConfigurationManaging,
-         userContentControllerFuture: Future<UserContentControllerProtocol, Never>,
+         userContentControllerFuture: some Publisher<some UserContentControllerProtocol, Never>,
          clickToLoadUserScriptPublisher: some Publisher<ClickToLoadUserScript?, Never>) {
         self.privacyConfigurationManager = privacyConfigurationManager
 
-        userContentControllerFuture
-            .sink { [weak self] userContentController in
-                self?.userContentController = userContentController
-            }
-            .store(in: &cancellables)
-        clickToLoadUserScriptPublisher
-            .sink { [weak self] clickToLoadUserScript in
-                clickToLoadUserScript?.delegate = self
-            }
-            .store(in: &cancellables)
+        userContentControllerFuture.sink { [weak self] userContentController in
+            self?.userContentController = userContentController
+        }.store(in: &cancellables)
+        clickToLoadUserScriptPublisher.sink { [weak self] clickToLoadUserScript in
+            clickToLoadUserScript?.delegate = self
+        }.store(in: &cancellables)
     }
 
 }

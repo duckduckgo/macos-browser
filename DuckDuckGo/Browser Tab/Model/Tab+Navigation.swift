@@ -36,6 +36,7 @@ extension Tab: NavigationResponder {
 
             .struct(SerpHeadersNavigationResponder()),
             .weak(nullable: self.fbProtection),
+            .weak(nullable: self.contentBlockingAndSurrogates),
 
             // should be the last, for Unit Tests navigation events tracking
             .struct(nullable: testsClosureNavigationResponder)

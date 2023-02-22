@@ -151,6 +151,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     private struct ExtensionDependencies: TabExtensionDependencies {
         let privacyFeatures: PrivacyFeaturesProtocol
         let historyCoordinating: HistoryCoordinating
+        var cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter?
     }
 
     fileprivate weak var delegate: TabDelegate?
@@ -158,7 +159,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
     private let navigationDelegate = DistributedNavigationDelegate(logger: .navigation)
 
-    private let cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter?
     private let statisticsLoader: StatisticsLoader?
     private let internalUserDecider: InternalUserDeciding?
     let pinnedTabsManager: PinnedTabsManager
@@ -266,7 +266,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         self.pinnedTabsManager = pinnedTabsManager
         self.privacyFeatures = privacyFeatures
         self.privatePlayer = privatePlayer
-        self.cbaTimeReporter = cbaTimeReporter
         self.statisticsLoader = statisticsLoader
         self.internalUserDecider = internalUserDecider
         self.localHistory = localHistory
@@ -295,7 +294,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             .map { $0?.userScripts as? UserScripts }
             .eraseToAnyPublisher()
 
-        let userContentControllerPromise = Future<UserContentControllerProtocol, Never>.promise()
+        let userContentControllerPromise = Future<UserContentController, Never>.promise()
         self.extensions = extensionsBuilder
             .build(with: (tabIdentifier: instrumentation.currentTabIdentifier,
                           userScriptsPublisher: userScriptsPublisher,
@@ -305,7 +304,8 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                           privacyInfoPublisher: _privacyInfo.projectedValue.eraseToAnyPublisher()
                          ),
                    dependencies: ExtensionDependencies(privacyFeatures: privacyFeatures,
-                                                       historyCoordinating: historyCoordinating))
+                                                       historyCoordinating: historyCoordinating,
+                                                       cbaTimeReporter: cbaTimeReporter))
 
         super.init()
         userContentController.map(userContentControllerPromise.fulfill)
@@ -368,8 +368,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         webView.stopMediaCapture()
         webView.stopAllMediaPlayback()
         webView.fullscreenWindowController?.close()
-
-        cbaTimeReporter?.tabWillClose(self.instrumentation.currentTabIdentifier)
     }
 
 #if DEBUG
@@ -1235,10 +1233,6 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
             }
         }
 
-        if !navigationAction.url.isDuckDuckGo {
-            await prepareForContentBlocking()
-        }
-
         return .next
     }
     // swiftlint:enable cyclomatic_complexity
@@ -1282,25 +1276,6 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
     private func urlDidUpgrade(to upgradedUrl: URL) {
         lastUpgradedURL = upgradedUrl
         privacyInfo?.connectionUpgradedTo = upgradedUrl
-    }
-
-    @MainActor
-    private func prepareForContentBlocking() async {
-        // Ensure Content Blocking Assets (WKContentRuleList&UserScripts) are installed
-        if userContentController?.contentBlockingAssetsInstalled == false
-           && contentBlocking.privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .contentBlocking) {
-            cbaTimeReporter?.tabWillWaitForRulesCompilation(self.instrumentation.currentTabIdentifier)
-
-            disableLongDecisionMakingChecks()
-            defer {
-                enableLongDecisionMakingChecks()
-            }
-
-            await userContentController?.awaitContentBlockingAssetsInstalled()
-            cbaTimeReporter?.reportWaitTimeForTabFinishedWaitingForRules(self.instrumentation.currentTabIdentifier)
-        } else {
-            cbaTimeReporter?.reportNavigationDidNotWaitForRules()
-        }
     }
 
     @MainActor

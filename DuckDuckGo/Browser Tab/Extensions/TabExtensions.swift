@@ -65,13 +65,14 @@ protocol NSCodingExtension: TabExtension {
 protocol TabExtensionDependencies {
     var privacyFeatures: PrivacyFeaturesProtocol { get }
     var historyCoordinating: HistoryCoordinating { get }
+    var cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter? { get }
 }
 // swiftlint:disable:next large_tuple
 typealias TabExtensionsBuilderArguments = (
     tabIdentifier: UInt64,
     userScriptsPublisher: AnyPublisher<UserScripts?, Never>,
     inheritedAttribution: AdClickAttributionLogic.State?,
-    userContentControllerFuture: Future<UserContentControllerProtocol, Never>,
+    userContentControllerFuture: Future<UserContentController, Never>,
     permissionModel: PermissionModel,
     privacyInfoPublisher: AnyPublisher<PrivacyInfo?, Never>
 )
@@ -126,6 +127,9 @@ extension TabExtensionsBuilder {
 
         add {
             ContentBlockingTabExtension(fbBlockingEnabledProvider: fbProtection.value,
+                                        userContentControllerFuture: args.userContentControllerFuture,
+                                        cbaTimeReporter: dependencies.cbaTimeReporter,
+                                        privacyConfigurationManager: dependencies.privacyFeatures.contentBlocking.privacyConfigurationManager,
                                         contentBlockerRulesUserScriptPublisher: userScripts.map(\.?.contentBlockerRulesScript),
                                         surrogatesUserScriptPublisher: userScripts.map(\.?.surrogatesScript))
         }
