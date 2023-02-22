@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "bartek/macos-bookmark-tweaks",
-        "revision" : "9639b3728d90d610a5e4bbcf64925bd6e9a160c5"
+        "revision" : "d2d7850a5a1402036650e5900635700574cc39d1",
+        "version" : "47.0.0"
       }
     },
     {
