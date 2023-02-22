@@ -152,11 +152,11 @@ class BookmarksMigrationTests: XCTestCase {
         let fAId = makeFolder(title: "Folder A", parent: topLevelBookmarksFolder, context: context)
         let fBId = makeFolder(title: "Folder B", parent: fAId, context: context)
 
-        _ = makeFavorite(title: "Three", url: url(for: "three"), parent: fBId, favoriteRoot: topLevelFavoritesFolder, context: context)
+        _ = makeFavorite(title: "Four", url: url(for: "four"), parent: topLevelBookmarksFolder, favoriteRoot: topLevelFavoritesFolder, context: context)
 
         _ = makeFavorite(title: "Two", url: url(for: "two"), parent: fAId, favoriteRoot: topLevelFavoritesFolder, context: context)
 
-        _ = makeFavorite(title: "Four", url: url(for: "four"), parent: topLevelBookmarksFolder, favoriteRoot: topLevelFavoritesFolder, context: context)
+        _ = makeFavorite(title: "Three", url: url(for: "three"), parent: fBId, favoriteRoot: topLevelFavoritesFolder, context: context)
 
         XCTAssert((topLevelBookmarksFolder.children?.count ?? 0) > 0)
     }
