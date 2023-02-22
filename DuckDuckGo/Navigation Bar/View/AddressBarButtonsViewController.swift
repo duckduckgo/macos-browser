@@ -895,7 +895,7 @@ final class AddressBarButtonsViewController: NSViewController {
             return nil
         }
 
-        if let bookmark = bookmarkManager.getBookmark(for: url) {
+        if let bookmark = bookmarkManager.getBookmark(forUrl: url.absoluteString) {
             if setFavorite {
                 bookmark.isFavorite = true
                 bookmarkManager.update(bookmark: bookmark)
