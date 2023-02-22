@@ -28,7 +28,7 @@ final class ConfigurationStore: ConfigurationStoring {
         .bloomFilterSpec: "smarterEncryptionSpec.json",
         .surrogates: "surrogates.txt",
         .privacyConfiguration: "macos-config.json",
-        .trackerRadar: "tracker-radar.json",
+        .trackerDataSet: "tracker-radar.json",
         .FBConfig: "social_ctp_configuration.json"
     ]
 
@@ -63,27 +63,27 @@ final class ConfigurationStore: ConfigurationStoring {
         case .bloomFilterBinary: return bloomFilterBinaryEtag
         case .bloomFilterExcludedDomains: return bloomFilterExcludedDomainsEtag
         case .surrogates: return surrogatesEtag
-        case .trackerRadar: return trackerRadarEtag
+        case .trackerDataSet: return trackerRadarEtag
         case .privacyConfiguration: return privacyConfigurationEtag
         case .FBConfig: return FBConfigEtag
         }
     }
-    
+
     func loadEmbeddedEtag(for configuration: Configuration) -> String? {
         switch configuration {
-        case .trackerRadar: return AppTrackerDataSetProvider.Constants.embeddedDataETag
+        case .trackerDataSet: return AppTrackerDataSetProvider.Constants.embeddedDataETag
         case .privacyConfiguration: return AppPrivacyConfigurationDataProvider.Constants.embeddedDataSHA
         default: return nil
         }
     }
-    
+
     func saveEtag(_ etag: String, for configuration: Configuration) throws {
         switch configuration {
         case .bloomFilterSpec: bloomFilterSpecEtag = etag
         case .bloomFilterBinary: bloomFilterBinaryEtag = etag
         case .bloomFilterExcludedDomains: bloomFilterExcludedDomainsEtag = etag
         case .surrogates: surrogatesEtag = etag
-        case .trackerRadar: trackerRadarEtag = etag
+        case .trackerDataSet: trackerRadarEtag = etag
         case .privacyConfiguration: privacyConfigurationEtag = etag
         case .FBConfig: FBConfigEtag = etag
         }
@@ -101,7 +101,7 @@ final class ConfigurationStore: ConfigurationStoring {
             return nil
         }
     }
-    
+
     func saveData(_ data: Data, for config: Configuration) throws {
         let file = fileUrl(for: config)
         try data.write(to: file, options: .atomic)

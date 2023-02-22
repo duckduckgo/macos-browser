@@ -25,18 +25,18 @@ import Configuration
 final class ConfigurationManager {
 
     enum Error: Swift.Error {
-        
+
         case timeout
         case bloomFilterSpecNotFound
         case bloomFilterBinaryNotFound
         case bloomFilterPersistenceFailed
         case bloomFilterExclusionsNotFound
         case bloomFilterExclusionsPersistenceFailed
-        
+
     }
 
     enum Constants {
-        
+
         static let downloadTimeoutSeconds = 60.0 * 5
 #if DEBUG
         static let refreshPeriodSeconds = 60.0 * 2 // 2 minutes
@@ -45,7 +45,7 @@ final class ConfigurationManager {
 #endif
         static let retryDelaySeconds = 60.0 * 60 * 1 // 1 hour delay before checking again if something went wrong last time
         static let refreshCheckIntervalSeconds = 60.0 // check if we need a refresh every minute
-        
+
     }
 
     static let shared = ConfigurationManager()
@@ -79,17 +79,17 @@ final class ConfigurationManager {
     }
 
     private func refreshNow() async {
-        
+
         let fetcher = ConfigurationFetcher(store: ConfigurationStore.shared)
         do {
-            try await fetcher.fetch([.trackerRadar, .surrogates, .privacyConfiguration]) {
+            try await fetcher.fetch([.trackerDataSet, .surrogates, .privacyConfiguration]) {
                 self.updateTrackerBlockingDependencies()
                 self.tryAgainLater()
             }
         } catch {
             handleRefreshError(error)
         }
-        
+
         do {
             try await fetcher.fetch([.bloomFilterBinary, .bloomFilterSpec]) {
                 try self.updateBloomFilter()
@@ -98,7 +98,7 @@ final class ConfigurationManager {
         } catch {
             handleRefreshError(error)
         }
-        
+
         do {
             try await fetcher.fetch([.bloomFilterExcludedDomains]) {
                 try self.updateBloomFilterExclusions()
@@ -107,14 +107,14 @@ final class ConfigurationManager {
         } catch {
             handleRefreshError(error)
         }
-        
+
         ConfigurationStore.shared.log()
         log()
-        
+
     }
-    
+
     private func handleRefreshError(_ error: Swift.Error) {
-        os_log("Failed to complete configuration update %s", log: .config, type: .error, error.localizedDescription)
+        os_log("Failed to complete configuration update %@", log: .config, type: .error, error.localizedDescription)
         Pixel.fire(.debug(event: .configurationFetchError, error: error))
         tryAgainSoon()
     }
@@ -141,8 +141,8 @@ final class ConfigurationManager {
     }
 
     private func updateTrackerBlockingDependencies() {
-        let tdsEtag = ConfigurationStore.shared.loadEtag(for: .trackerRadar)
-        let tdsData = ConfigurationStore.shared.loadData(for: .trackerRadar)
+        let tdsEtag = ConfigurationStore.shared.loadEtag(for: .trackerDataSet)
+        let tdsData = ConfigurationStore.shared.loadData(for: .trackerDataSet)
         ContentBlocking.shared.trackerDataManager.reload(etag: tdsEtag, data: tdsData)
 
         let configEtag = ConfigurationStore.shared.loadEtag(for: .privacyConfiguration)

@@ -66,8 +66,8 @@ final class AppContentBlocking {
                                                                   localProtection: LocalUnprotectedDomains.shared,
                                                                   errorReporting: Self.debugEvents)
 
-        trackerDataManager = TrackerDataManager(etag: ConfigurationStore.shared.loadEtag(for: .trackerRadar),
-                                                data: ConfigurationStore.shared.loadData(for: .trackerRadar),
+        trackerDataManager = TrackerDataManager(etag: ConfigurationStore.shared.loadEtag(for: .trackerDataSet),
+                                                data: ConfigurationStore.shared.loadData(for: .trackerDataSet),
                                                 embeddedDataProvider: AppTrackerDataSetProvider(),
                                                 errorReporting: Self.debugEvents)
 
