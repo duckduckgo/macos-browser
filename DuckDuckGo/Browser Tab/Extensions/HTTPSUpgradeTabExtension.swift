@@ -37,6 +37,7 @@ final class HTTPSUpgradeTabExtension {
 
 extension HTTPSUpgradeTabExtension: NavigationResponder {
 
+    @MainActor
     func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
         guard navigationAction.isForMainFrame else { return .next }
 
