@@ -16,9 +16,9 @@
 //  limitations under the License.
 //
 
-import BrowserServicesKit
 import Combine
 import Foundation
+import Navigation
 
 protocol Workspace {
     func urlForApplication(toOpen url: URL) -> URL?
@@ -49,17 +49,21 @@ final class ExternalAppSchemeHandler {
 
 extension ExternalAppSchemeHandler: NavigationResponder {
 
+    @MainActor
     func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
         let externalUrl = navigationAction.url
         guard externalUrl.isExternalSchemeLink, let scheme = externalUrl.scheme else { return .next }
         lazy var searchUrl = URL.makeSearchUrl(from: externalUrl.absoluteString)
-        let userEnteredUrl = navigationAction.navigationType.isUserEnteredUrl
 
         // can OS open the external url?
         guard workspace.urlForApplication(toOpen: externalUrl) != nil else {
             // search if external URL can‘t be opened but entered by user
-            if userEnteredUrl, let searchUrl {
-                return .cancel(with: .redirect(URLRequest(url: searchUrl)))
+            if navigationAction.isUserEntered,
+               let searchUrl,
+               let mainFrame = navigationAction.mainFrameTarget {
+                return .redirect(mainFrame) { navigator in
+                    navigator.load(URLRequest(url: searchUrl))
+                }
             }
             return .cancel
         }
@@ -81,7 +85,7 @@ extension ExternalAppSchemeHandler: NavigationResponder {
         return .cancel
     }
 
-    func willStart(_ navigationAction: NavigationAction) {
+    func willStart(_ navigation: Navigation) {
         externalSchemeOpenedPerPageLoad = false
     }
 

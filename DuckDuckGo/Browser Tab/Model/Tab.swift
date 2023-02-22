@@ -313,7 +313,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                          ),
                    dependencies: ExtensionDependencies(privacyFeatures: privacyFeatures,
                                                        historyCoordinating: historyCoordinating,
-                                                       workspace: workspace))
+                                                       workspace: workspace,
                                                        cbaTimeReporter: cbaTimeReporter))
 
         super.init()
@@ -1201,19 +1201,6 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         if error != nil { error = nil }
 
         delegate?.tabWillStartNavigation(self, isUserInitiated: navigationAction.isUserInitiated)
-    }
-
-    func invalidateBackItemIfNeeded(for navigationAction: NavigationAction) {
-        // Cancelled & Upgraded Client Redirect URL leaves wrong backForwardList record
-        // https://app.asana.com/0/inbox/1199237043628108/1201280322539473/1201353436736961
-        guard case .redirect(let redirect) = navigationAction.navigationType,
-              case .client(delay: 0) = redirect.type,
-              redirect.history.last?.fromHistoryItemIdentity != webView.backForwardList.currentItem?.identity
-        else { return }
-
-        self.webView.goBack()
-        self.webView.frozenCanGoBack = self.webView.canGoBack
-        self.webView.frozenCanGoForward = false
     }
 
     @MainActor

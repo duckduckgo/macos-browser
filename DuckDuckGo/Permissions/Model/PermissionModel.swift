@@ -159,6 +159,7 @@ final class PermissionModel {
 
             decisionHandler(isGranted)
         }
+        // "unowned" query reference to be able to use the pointer when the callback is called on query deinit
         queryPtr = Unmanaged.passUnretained(query).toOpaque()
 
         // When Geolocation queried by a website but System Permission is denied: switch to `disabled`
