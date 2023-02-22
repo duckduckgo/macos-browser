@@ -23,8 +23,8 @@ import TrackerRadarKit
 import BrowserServicesKit
 @testable import DuckDuckGo_Privacy_Browser
 
-class ContentBlockingUpdatingTests: XCTestCase {
-    // todo: mock
+final class ContentBlockingUpdatingTests: XCTestCase {
+
     let preferences = PrivacySecurityPreferences.shared
     let rulesManager = ContentBlockerRulesManagerMock()
     var updating: UserContentUpdating!
@@ -32,11 +32,11 @@ class ContentBlockingUpdatingTests: XCTestCase {
     override func setUp() {
         updating = UserContentUpdating(contentBlockerRulesManager: rulesManager,
                                        privacyConfigurationManager: MockPrivacyConfigurationManager(),
-                                       trackerDataManager: TrackerDataManager(etag: ConfigurationStore.shared.loadEtag(for: .trackerRadar),
-                                                                                                                                              data: ConfigurationStore.shared.loadData(for: .trackerRadar),
+                                       trackerDataManager: TrackerDataManager(etag: ConfigurationStore.shared.loadEtag(for: .trackerDataSet),
+                                                                                                                                              data: ConfigurationStore.shared.loadData(for: .trackerDataSet),
                                                                                                                                               embeddedDataProvider: AppTrackerDataSetProvider(),
                                                                                                                                               errorReporting: nil),
-                                       configStorage: ConfigurationDownloaderTests.MockStorage(),
+                                       configStorage: MockConfigurationStore(),
                                        privacySecurityPreferences: preferences,
                                        tld: TLD())
     }

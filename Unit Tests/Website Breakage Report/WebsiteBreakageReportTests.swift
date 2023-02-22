@@ -17,6 +17,7 @@
 //
 
 import XCTest
+@testable import API
 @testable import DuckDuckGo_Privacy_Browser
 
 class WebsiteBreakageReportTests: XCTestCase {
@@ -100,14 +101,11 @@ class WebsiteBreakageReportTests: XCTestCase {
     }
 
     func makeURLRequest(with parameters: [String: String]) -> URLRequest {
-        APIRequest.urlRequestFor(
-            url: URL.pixelUrl(forPixelNamed: Pixel.Event.brokenSiteReport.name),
-            method: .get,
-            parameters: parameters,
-            allowedQueryReservedCharacters: WebsiteBreakageSender.allowedQueryReservedCharacters,
-            headers: [:],
-            timeoutInterval: 60
-        )
+        APIHeaders.setUserAgent("")
+        let configuration = APIRequest.Configuration(url: URL.pixelUrl(forPixelNamed: Pixel.Event.brokenSiteReport.name),
+                                                     queryParameters: parameters,
+                                                     allowedQueryReservedCharacters: WebsiteBreakageSender.allowedQueryReservedCharacters)
+        return configuration.request
     }
 }
 

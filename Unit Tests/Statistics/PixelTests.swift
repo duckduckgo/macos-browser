@@ -19,6 +19,7 @@
 import XCTest
 import OHHTTPStubs
 import OHHTTPStubsSwift
+import API
 @testable import DuckDuckGo_Privacy_Browser
 
 class PixelTests: XCTestCase {
