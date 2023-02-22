@@ -136,7 +136,7 @@ extension PrivatePlayer {
             if navigationAction.url.isPrivatePlayerScheme,
                 let (videoID, timestamp) = navigationAction.url.youtubeVideoParams {
 
-                tab.webView.load(.youtube(videoID, timestamp: timestamp))
+                tab.webView.load(URLRequest(url: .youtube(videoID, timestamp: timestamp)))
                 return .cancel
             }
             return nil
@@ -186,7 +186,7 @@ extension PrivatePlayer {
 
         // Otherwise load priate player unless it's already loaded.
         guard case .privatePlayer(let currentVideoID, _) = tab.content, currentVideoID == videoID, tab.webView.url?.isPrivatePlayer == true else {
-            tab.webView.load(.privatePlayer(videoID, timestamp: timestamp))
+            tab.webView.load(URLRequest(url: .privatePlayer(videoID, timestamp: timestamp)))
             return .cancel
         }
         return nil
@@ -348,7 +348,7 @@ extension PrivatePlayer {
         if tab.webView.canGoBack {
             _ = tab.webView.goBack()
         }
-        tab.webView.load(url)
+        tab.webView.load(URLRequest(url: url))
 
         return true
     }

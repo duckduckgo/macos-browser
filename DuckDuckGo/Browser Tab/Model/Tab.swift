@@ -51,14 +51,14 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
     enum TabContent: Equatable {
         case homePage
-        case url(URL)
+        case url(URL, userEntered: Bool = false)
         case privatePlayer(videoID: String, timestamp: String?)
         case preferences(pane: PreferencePaneIdentifier?)
         case bookmarks
         case onboarding
         case none
 
-        static func contentFromURL(_ url: URL?) -> TabContent {
+        static func contentFromURL(_ url: URL?, userEntered: Bool = false) -> TabContent {
             if url == .homePage {
                 return .homePage
             } else if url == .welcome {
@@ -70,7 +70,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             } else if let privatePlayerContent = PrivatePlayer.shared.tabContent(for: url) {
                 return privatePlayerContent
             } else {
-                return .url(url ?? .blankPage)
+                return .url(url ?? .blankPage, userEntered: userEntered)
             }
         }
 
@@ -121,7 +121,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
         var url: URL? {
             switch self {
-            case .url(let url):
+            case .url(let url, userEntered: _):
                 return url
             case .privatePlayer(let videoID, let timestamp):
                 return .privatePlayer(videoID, timestamp: timestamp)
@@ -134,6 +134,15 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             switch self {
             case .url, .privatePlayer:
                 return true
+            default:
+                return false
+            }
+        }
+
+        var isUserEnteredUrl: Bool {
+            switch self {
+            case .url(_, userEntered: let userEntered):
+                return userEntered
             default:
                 return false
             }
@@ -396,8 +405,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
     private var lastUpgradedURL: URL?
 
-    var userEnteredUrl = false
-
     var contentChangeEnabled = true
 
     var fbBlockingEnabled = true
@@ -412,44 +419,82 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                 historyCoordinating.commitChanges(url: oldUrl)
             }
             error = nil
-            dismissPresentedAlert()
-
-            Task {
-                await reloadIfNeeded(shouldLoadInBackground: true)
-            }
-
-            if let title = content.title {
-                self.title = title
-            }
         }
     }
 
-    func setContent(_ content: TabContent) {
-        guard contentChangeEnabled else {
-            return
+    func setContent(_ newContent: TabContent) {
+        guard contentChangeEnabled else { return }
+
+        let oldContent = self.content
+        let newContent: TabContent = {
+            if let newContent = privatePlayer.overrideContent(newContent, for: self) {
+                return newContent
+            }
+            if case .preferences(pane: .some) = oldContent,
+               case .preferences(pane: nil) = newContent {
+                // prevent clearing currently selected pane (for state persistence purposes)
+                return oldContent
+            }
+            return newContent
+        }()
+        guard newContent != self.content else { return }
+        self.content = newContent
+
+        dismissPresentedAlert()
+
+        Task {
+            await reloadIfNeeded(shouldLoadInBackground: true)
         }
 
-        lastUpgradedURL = nil
-
-        if let newContent = privatePlayer.overrideContent(content, for: self) {
-            self.content = newContent
-            return
+        if let title = content.title {
+            self.title = title
         }
+    }
 
-        switch (self.content, content) {
-        case (.preferences(pane: .some), .preferences(pane: nil)):
-            // prevent clearing currently selected pane (for state persistence purposes)
-            break
-        default:
-            if self.content != content {
+    func setUrl(_ url: URL?, userEntered: Bool) {
+        if url == .welcome {
+            OnboardingViewModel().restart()
+        }
+        self.setContent(.contentFromURL(url, userEntered: userEntered))
+    }
+
+    private func handleUrlDidChange() {
+        if let url = webView.url {
+            let content = TabContent.contentFromURL(url)
+
+            if content.isUrl, !webView.isLoading {
+                self.addVisit(of: url)
+            }
+            if content != self.content {
                 self.content = content
             }
         }
+        self.updateTitle() // The title might not change if webView doesn't think anything is different so update title here as well
     }
 
     var lastSelectedAt: Date?
 
     @Published var title: String?
+
+    private func handleTitleDidChange() {
+        updateTitle()
+
+        if let title = self.title, let url = webView.url {
+            historyCoordinating.updateTitleIfNeeded(title: title, url: url)
+        }
+    }
+
+    private func updateTitle() {
+        var title = webView.title?.trimmingWhitespace()
+        if title?.isEmpty ?? true {
+            title = webView.url?.host?.droppingWwwPrefix()
+        }
+
+        if title != self.title {
+            self.title = title
+        }
+    }
+
     @PublishedAfter var error: WKError? {
         didSet {
             switch error {
@@ -463,6 +508,9 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         }
     }
     let permissions: PermissionModel
+
+    @Published private(set) var isLoading: Bool = false
+    @Published private(set) var loadingProgress: Double = 0.0
 
     /// an Interactive Dialog request (alert/open/save/print) made by a page to be published and presented asynchronously
     @Published
@@ -505,16 +553,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         }
 
         return self.interactionStateData
-    }
-
-    func update(url: URL?, userEntered: Bool = true) {
-        if url == .welcome {
-            OnboardingViewModel().restart()
-        }
-        self.content = .contentFromURL(url)
-
-        // This function is called when the user has manually typed in a new address, which should reset the login detection flow.
-        userEnteredUrl = userEntered
     }
 
     func saveWebContentAs() {
@@ -570,6 +608,8 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
         shouldStoreNextVisit = false
 
+        // Prevent from a Player reloading loop on back navigation to
+        // YT page where the player was enabled (see comment inside)
         if privatePlayer.goBackSkippingLastItemIfNeeded(for: webView) {
             return
         }
@@ -599,14 +639,14 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     func reload() {
         userInteractionDialog = nil
         if let error = error, let failingUrl = error.failingUrl {
-            webView.load(failingUrl)
+            webView.load(URLRequest(url: failingUrl, cachePolicy: .reloadIgnoringLocalCacheData))
             return
         }
 
         if webView.url == nil, let url = content.url {
-            webView.load(url)
+            webView.load(URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData))
         } else if case .privatePlayer = content, let url = content.url {
-            webView.load(url)
+            webView.load(URLRequest(url: url))
         } else {
             webView.reload()
         }
@@ -660,9 +700,8 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
     @MainActor
     private func reloadIfNeeded(shouldLoadInBackground: Bool = false) async {
-        guard content.url != nil else {
-            return
-        }
+        let content = self.content
+        guard content.url != nil else { return }
 
         let url: URL = await {
             if contentURL.isFileURL {
@@ -674,6 +713,8 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                 in self?.isAMPProtectionExtracting = false
             })
         }()
+        guard content == self.content else { return }
+
         if shouldReload(url, shouldLoadInBackground: shouldLoadInBackground) {
             let didRestore = restoreInteractionStateDataIfNeeded()
 
@@ -681,20 +722,27 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                 return
             }
 
-            if !didRestore {
-                if url.isFileURL {
-                    _ = webView.loadFileURL(url, allowingReadAccessTo: URL(fileURLWithPath: "/"))
-                } else {
-                    webView.load(url)
-                }
+            guard !didRestore else { return }
+
+            if url.isFileURL {
+                _ = webView.loadFileURL(url, allowingReadAccessTo: URL(fileURLWithPath: "/"))
+                return
             }
+
+            var request = URLRequest(url: url)
+            if #available(macOS 12.0, *),
+               content.isUserEnteredUrl {
+                request.attribution = .user
+            }
+            webView.navigator(distributedNavigationDelegate: navigationDelegate)
+                .load(request, withExpectedNavigationType: content.isUserEnteredUrl ? .custom(.userEnteredUrl) : .other)
         }
     }
 
     @MainActor
     private var contentURL: URL {
         switch content {
-        case .url(let value):
+        case .url(let value, userEntered: _):
             return value
         case .privatePlayer(let videoID, let timestamp):
             return .privatePlayer(videoID, timestamp: timestamp)
@@ -761,7 +809,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     private func addHomePageToWebViewIfNeeded() {
         guard !AppDelegate.isRunningTests else { return }
         if content == .homePage && webView.url == nil {
-            webView.load(.homePage)
+            webView.load(URLRequest(url: .homePage))
         }
     }
 
@@ -799,6 +847,13 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             }
         }.store(in: &webViewCancellables)
 
+        webView.observe(\.url) { [weak self] _, _ in
+            self?.handleUrlDidChange()
+        }.store(in: &webViewCancellables)
+        webView.observe(\.title) { [weak self] _, _ in
+            self?.handleTitleDidChange()
+        }.store(in: &webViewCancellables)
+
         webView.observe(\.canGoBack) { [weak self] _, _ in
             self?.updateCanGoBackForward()
         }.store(in: &webViewCancellables)
@@ -806,6 +861,20 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         webView.observe(\.canGoForward) { [weak self] _, _ in
             self?.updateCanGoBackForward()
         }.store(in: &webViewCancellables)
+
+        webView.publisher(for: \.isLoading)
+            .assign(to: \.isLoading, onWeaklyHeld: self)
+            .store(in: &webViewCancellables)
+
+        webView.publisher(for: \.estimatedProgress)
+            .assign(to: \.loadingProgress, onWeaklyHeld: self)
+            .store(in: &webViewCancellables)
+
+        webView.publisher(for: \.serverTrust)
+            .sink { [weak self] serverTrust in
+                self?.privacyInfo?.serverTrust = serverTrust
+            }
+            .store(in: &webViewCancellables)
 
         navigationDelegate.$currentNavigation.sink { [weak self] navigation in
             self?.updateCanGoBackForward(withCurrentNavigation: navigation)
@@ -875,10 +944,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         if let host = url.host, !host.isEmpty {
             localHistory.insert(host.droppingWwwPrefix())
         }
-    }
-
-    func updateVisitTitle(_ title: String, url: URL) {
-        historyCoordinating.updateTitleIfNeeded(title: title, url: url)
     }
 
     // MARK: - Youtube Player
@@ -1187,7 +1252,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
                         if isRequestingNewTab || !navigationAction.isForMainFrame {
                             self.openChild(with: .url(url), of: .tab(selected: shouldSelectNewTab || !navigationAction.isForMainFrame))
                         } else {
-                            self.webView.load(url)
+                            self.webView.load(URLRequest(url: url))
                         }
                     })
             if let navigationActionPolicy = navigationActionPolicy, navigationActionPolicy == false {
@@ -1238,7 +1303,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
 
         if navigationAction.url.isExternalSchemeLink {
             // request if OS can handle extenrnal url
-            self.host(webView.url?.host, requestedOpenExternalURL: navigationAction.url)
+            self.host(webView.url?.host, requestedOpenExternalURL: navigationAction.url, forUserEnteredURL: navigationAction.isUserEntered)
             return .cancel
         }
 
@@ -1264,12 +1329,12 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
     // swiftlint:enable cyclomatic_complexity
     // swiftlint:enable function_body_length
 
-    private func host(_ host: String?, requestedOpenExternalURL url: URL) {
+    private func host(_ host: String?, requestedOpenExternalURL url: URL, forUserEnteredURL userEnteredUrl: Bool) {
         let searchForExternalUrl = { [weak self] in
             // Redirect after handing WebView.url update after cancelling the request
             DispatchQueue.main.async {
                 guard let self, let url = URL.makeSearchUrl(from: url.absoluteString) else { return }
-                self.update(url: url)
+                self.setUrl(url, userEntered: userEnteredUrl)
             }
         }
 
@@ -1345,8 +1410,6 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
 
     @MainActor
     func decidePolicy(for navigationResponse: NavigationResponse) async -> NavigationResponsePolicy? {
-        userEnteredUrl = false // subsequent requests will be navigations
-
         internalUserDecider?.markUserAsInternalIfNeeded(forUrl: webView.url,
                                                         response: navigationResponse.response as? HTTPURLResponse)
 
@@ -1423,11 +1486,13 @@ extension Tab: YoutubeOverlayUserScriptDelegate {
 
 extension Tab: TabDataClearing {
     func prepareForDataClearing(caller: TabDataCleaner) {
+        webViewCancellables.removeAll()
+
         webView.stopLoading()
         webView.configuration.userContentController.removeAllUserScripts()
 
         webView.navigationDelegate = caller
-        webView.load(URL(string: "about:blank")!)
+        webView.load(URLRequest(url: .blankPage))
     }
 }
 

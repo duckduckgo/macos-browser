@@ -38,7 +38,7 @@ final class AddBookmarkModalViewController: NSViewController {
         let title: String?
 
         init?(_ tab: Tab) {
-            guard case let .url(url) = tab.content else {
+            guard case let .url(url, userEntered: _) = tab.content else {
                 return nil
             }
             self.url = url

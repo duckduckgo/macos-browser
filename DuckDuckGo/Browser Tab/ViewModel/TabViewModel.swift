@@ -33,14 +33,11 @@ final class TabViewModel {
     private let appearancePreferences: AppearancePreferences
     private var cancellables = Set<AnyCancellable>()
 
-    private var webViewStateObserver: WebViewStateObserver?
-
     @Published var canGoForward: Bool = false
     @Published var canGoBack: Bool = false
 
     @Published private(set) var canReload: Bool = false
     @Published var canBeBookmarked: Bool = false
-    @Published var isWebViewLoading: Bool = false
     @Published var isLoading: Bool = false {
         willSet {
             if newValue {
@@ -82,8 +79,6 @@ final class TabViewModel {
         self.tab = tab
         self.appearancePreferences = appearancePreferences
 
-        webViewStateObserver = WebViewStateObserver(webView: tab.webView, tabViewModel: self)
-
         subscribeToUrl()
         subscribeToCanGoBackForward()
         subscribeToTitle()
@@ -92,8 +87,11 @@ final class TabViewModel {
         subscribeToPermissions()
         subscribeToAppearancePreferences()
         subscribeToWebViewDidFinishNavigation()
-        $isWebViewLoading.combineLatest(tab.$isAMPProtectionExtracting) { $0 || $1 }
+        tab.$isLoading.combineLatest(tab.$isAMPProtectionExtracting) { $0 || $1 }
             .assign(to: \.isLoading, onWeaklyHeld: self)
+            .store(in: &cancellables)
+        tab.$loadingProgress
+            .assign(to: \.progress, onWeaklyHeld: self)
             .store(in: &cancellables)
     }
 
@@ -255,10 +253,13 @@ final class TabViewModel {
         case .onboarding:
             title = UserText.tabOnboardingTitle
         case .url, .none, .privatePlayer:
-            if let title = tab.title {
+            if let title = tab.title?.trimmingWhitespace(),
+               !title.isEmpty {
                 self.title = title
+            } else if let host = tab.url?.host?.droppingWwwPrefix() {
+                self.title = host
             } else {
-                title = addressBarString
+                self.title = addressBarString
             }
         }
     }
@@ -331,8 +332,6 @@ extension TabViewModel {
 extension TabViewModel: TabDataClearing {
 
     func prepareForDataClearing(caller: TabDataCleaner) {
-        webViewStateObserver?.stopObserving()
-
         tab.prepareForDataClearing(caller: caller)
     }
 
