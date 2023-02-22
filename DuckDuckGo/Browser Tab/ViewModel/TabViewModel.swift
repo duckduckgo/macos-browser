@@ -35,8 +35,9 @@ final class TabViewModel {
 
     private var webViewStateObserver: WebViewStateObserver?
 
-    @Published private(set) var canGoForward: Bool = false
-    @Published private(set) var canGoBack: Bool = false
+    @Published var canGoForward: Bool = false
+    @Published var canGoBack: Bool = false
+
     @Published private(set) var canReload: Bool = false
     @Published var canBeBookmarked: Bool = false
     @Published var isWebViewLoading: Bool = false
@@ -58,8 +59,6 @@ final class TabViewModel {
             updateAddressBarStrings()
             updateTitle()
             updateFavicon()
-            updateCanGoBack()
-            updateCanGoForward()
         }
     }
 
@@ -86,6 +85,7 @@ final class TabViewModel {
         webViewStateObserver = WebViewStateObserver(webView: tab.webView, tabViewModel: self)
 
         subscribeToUrl()
+        subscribeToCanGoBackForward()
         subscribeToTitle()
         subscribeToFavicon()
         subscribeToTabError()
@@ -104,6 +104,18 @@ final class TabViewModel {
             self?.updateCanBeBookmarked()
             self?.updateFavicon()
         } .store(in: &cancellables)
+    }
+
+    private func subscribeToCanGoBackForward() {
+        tab.$canGoBack
+            .map { [weak tab] canGoBack in
+                canGoBack || tab?.canBeClosedWithBack == true
+            }
+            .assign(to: \.canGoBack, onWeaklyHeld: self)
+            .store(in: &cancellables)
+        tab.$canGoForward
+            .assign(to: \.canGoForward, onWeaklyHeld: self)
+            .store(in: &cancellables)
     }
 
     private func subscribeToTitle() {
@@ -151,7 +163,7 @@ final class TabViewModel {
         tab.permissions.$authorizationQuery.assign(to: \.permissionAuthorizationQuery, onWeaklyHeld: self)
             .store(in: &cancellables)
     }
-    
+
     private func subscribeToAppearancePreferences() {
         appearancePreferences.$showFullURL.dropFirst().sink { [weak self] newValue in
             guard let self = self, let url = self.tabURL, let host = self.tabHostURL else { return }
@@ -160,7 +172,7 @@ final class TabViewModel {
     }
 
     private func subscribeToWebViewDidFinishNavigation() {
-        tab.webViewDidFinishNavigationPublisher.sink { [weak self] _ in
+        tab.webViewDidFinishNavigationPublisher.sink { [weak self] in
             self?.sendAnimationTrigger()
         }.store(in: &cancellables)
     }
@@ -169,22 +181,14 @@ final class TabViewModel {
         canReload = tab.content.url ?? .blankPage != .blankPage
     }
 
-    func updateCanGoBack() {
-        canGoBack = tab.canGoBack || tab.canBeClosedWithBack || tab.error != nil
-    }
-
-    func updateCanGoForward() {
-        canGoForward = tab.canGoForward && tab.error == nil
-    }
-
     private func updateCanBeBookmarked() {
         canBeBookmarked = tab.content.url ?? .blankPage != .blankPage
     }
-    
+
     private var tabURL: URL? {
         return tab.content.url ?? tab.parentTab?.content.url
     }
-    
+
     private var tabHostURL: URL? {
         return tabURL?.root
     }
@@ -226,7 +230,7 @@ final class TabViewModel {
 
         updatePassiveAddressBarString(showURL: appearancePreferences.showFullURL, url: url, hostURL: hostURL)
     }
-    
+
     private func updatePassiveAddressBarString(showURL: Bool, url: URL, hostURL: URL) {
         if showURL {
             passiveAddressBarString = url.toString(decodePunycode: true, dropScheme: false, dropTrailingSlash: true)

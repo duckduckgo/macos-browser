@@ -22,37 +22,37 @@ import os.log
 import AppKit
 
 protocol ConnectBitwardenViewModelDelegate: AnyObject {
-    
+
     func connectBitwardenViewModelDismissedView(_ viewModel: ConnectBitwardenViewModel, canceled: Bool)
-    
+
 }
 
 final class ConnectBitwardenViewModel: ObservableObject {
-    
+
     enum ViewState {
-        
+
         // Initial state:
         case disclaimer
-        
+
         // Bitwarden installation:
         case lookingForBitwarden
         case oldVersion
         case bitwardenFound
-        
+
         // Bitwarden connection:
         case waitingForConnectionPermission
         case connectToBitwarden
-        
+
         // Final state:
         case connectedToBitwarden
-        
+
         var canContinue: Bool {
             switch self {
             case .lookingForBitwarden, .oldVersion, .waitingForConnectionPermission: return false
             default: return true
             }
         }
-        
+
         var confirmButtonTitle: String {
             switch self {
             case .disclaimer, .lookingForBitwarden, .oldVersion, .bitwardenFound: return "Next"
@@ -60,31 +60,31 @@ final class ConnectBitwardenViewModel: ObservableObject {
             case .connectedToBitwarden: return "OK"
             }
         }
-        
+
         var cancelButtonVisible: Bool {
             return self != .connectedToBitwarden
         }
-        
+
     }
-    
+
     enum ViewAction {
         case cancel
         case confirm
         case openBitwarden
         case openBitwardenProductPage
     }
-    
+
     private enum Constants {
         static let bitwardenAppStoreURL = URL(string: "macappstores://apps.apple.com/app/bitwarden/id1352778147")!
     }
-    
+
     weak var delegate: ConnectBitwardenViewModelDelegate?
-    
+
     @Published private(set) var viewState: ViewState = .disclaimer
     @Published private(set) var error: Error?
 
     private let bitwardenManager: BWManagement
-    
+
     private var bitwardenManagerStatusCancellable: AnyCancellable?
 
     init(bitwardenManager: BWManagement) {
@@ -138,13 +138,13 @@ final class ConnectBitwardenViewModel: ObservableObject {
             } else if viewState == .disclaimer {
                 viewState = .lookingForBitwarden
             }
-            
+
         case .cancel:
             delegate?.connectBitwardenViewModelDismissedView(self, canceled: true)
-            
+
         case .openBitwarden:
             bitwardenManager.openBitwarden()
-            
+
         case .openBitwardenProductPage:
             NSWorkspace.shared.open(Constants.bitwardenAppStoreURL)
         }

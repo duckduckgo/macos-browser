@@ -31,7 +31,7 @@ final class SuggestionContainer {
     private let loading: SuggestionLoading
 
     private var latestQuery: Query?
-    
+
     fileprivate let suggestionsURLSession = URLSession(configuration: .ephemeral)
 
     init(suggestionLoading: SuggestionLoading, historyCoordinating: HistoryCoordinating, bookmarkManager: BookmarkManager) {

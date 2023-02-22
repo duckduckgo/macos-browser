@@ -1,7 +1,7 @@
 //
-//  ErrorExtension.swift
+//  EmailManagerExtension.swift
 //
-//  Copyright © 2021 DuckDuckGo. All rights reserved.
+//  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -17,20 +17,20 @@
 //
 
 import Foundation
+import BrowserServicesKit
 
-extension Error {
+extension EmailManager {
 
-    var failingUrl: URL? {
-        return (self as NSError).userInfo["NSErrorFailingURLKey"] as? URL
+    var emailPixelParameters: [String: String] {
+        var pixelParameters: [String: String] = [:]
+
+        if let cohort = self.cohort {
+            pixelParameters[Pixel.Parameters.emailCohort] = cohort
+        }
+
+        pixelParameters[Pixel.Parameters.emailLastUsed] = self.lastUseDate
+
+        return pixelParameters
     }
 
-    var isFrameLoadInterrupted: Bool {
-        let error = self as NSError
-        return error.code == 102 && error.domain == "WebKitErrorDomain"
-    }
-
-    var isNavigationCancelled: Bool {
-        let error = self as NSError
-        return error.code == -999 && error.domain == "NSURLErrorDomain"
-    }
 }

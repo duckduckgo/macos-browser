@@ -27,7 +27,7 @@ protocol FaviconManagement {
     func loadFavicons()
 
     func handleFaviconLinks(_ faviconLinks: [FaviconUserScript.FaviconLink], documentUrl: URL, completion: @escaping (Favicon?) -> Void)
-    
+
     func handleFavicons(_ favicons: [Favicon], documentUrl: URL)
 
     func getCachedFavicon(for documentUrl: URL, sizeCategory: Favicon.SizeCategory) -> Favicon?
@@ -45,7 +45,7 @@ final class FaviconManager: FaviconManagement {
     static let shared = FaviconManager()
 
     private lazy var store: FaviconStoring = FaviconStore()
-    
+
     private let faviconURLSession = URLSession(configuration: .ephemeral)
 
     @Published var faviconsLoaded = false
@@ -101,7 +101,7 @@ final class FaviconManager: FaviconManagement {
 
                     return nil
                 }
-            
+
             let favicon = self.handleFaviconReferenceCacheInsertion(documentURL: documentUrl,
                                                                     cachedFavicons: cachedFavicons,
                                                                     newFavicons: newFavicons)
@@ -109,13 +109,13 @@ final class FaviconManager: FaviconManagement {
             completion(favicon)
         }
     }
-    
+
     func handleFavicons(_ newFavicons: [Favicon], documentUrl: URL) {
         // Insert new favicons to cache
         newFavicons.forEach { newFavicon in
             self.imageCache.insert(newFavicon)
         }
-        
+
         let faviconLinks = newFavicons.map(\.url)
 
         // Pick most suitable favicons
@@ -126,10 +126,10 @@ final class FaviconManager: FaviconManagement {
 
             return nil
         }
-        
+
         handleFaviconReferenceCacheInsertion(documentURL: documentUrl, cachedFavicons: cachedFavicons, newFavicons: newFavicons)
     }
-    
+
     @discardableResult
     private func handleFaviconReferenceCacheInsertion(documentURL: URL, cachedFavicons: [Favicon], newFavicons: [Favicon]) -> Favicon? {
         let noFaviconPickedYet = self.referenceCache.getFaviconUrl(for: documentURL, sizeCategory: .small) == nil

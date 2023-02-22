@@ -67,5 +67,5 @@ class AtbAndVariantCleanupTests: XCTestCase {
         XCTAssertEqual(Constants.variant, mockStorage.variant)
 
     }
-    
+
 }

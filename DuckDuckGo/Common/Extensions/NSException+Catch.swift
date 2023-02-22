@@ -20,20 +20,9 @@ import Foundation
 
 extension NSException {
 
-    final class Error: NSError, LocalizedError {
-
-        init(exception: NSException) {
-            super.init(domain: exception.name.rawValue, code: -1, userInfo: [
-                "NSException": exception,
-                NSLocalizedDescriptionKey: exception.description,
-                NSDebugDescriptionErrorKey: exception.debugDescription,
-                NSLocalizedFailureReasonErrorKey: exception.reason ?? ""
-            ])
-
-        }
-        required init?(coder: NSCoder) {
-            super.init(coder: coder)
-        }
+    struct Error: Swift.Error, LocalizedError, CustomDebugStringConvertible {
+        let errorDescription: String
+        let debugDescription: String
     }
 
     static func `catch`<T>(_ closure: () throws -> T) throws -> T {
@@ -50,7 +39,7 @@ extension NSException {
         } else if case .failure(let error) = result {
             throw error
         } else if let exception = exception {
-            throw Error(exception: exception)
+            throw Error(errorDescription: exception.description, debugDescription: exception.debugDescription)
         } else {
             fatalError("NSException.catch: invalid flow")
         }

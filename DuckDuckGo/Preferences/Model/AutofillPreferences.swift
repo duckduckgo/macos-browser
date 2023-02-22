@@ -103,7 +103,13 @@ final class AutofillPreferences: AutofillPreferencesPersistor {
 
     @UserDefaultsWrapper(key: .askToSavePaymentMethods, defaultValue: true)
     var askToSavePaymentMethods: Bool
-    
+
+#if APPSTORE
+    var passwordManager: PasswordManager {
+        get { return .duckduckgo }
+        set {}
+    }
+#else
     var passwordManager: PasswordManager {
         get {
             return PasswordManager(rawValue: selectedPasswordManager) ?? .duckduckgo
@@ -113,6 +119,7 @@ final class AutofillPreferences: AutofillPreferencesPersistor {
             selectedPasswordManager = newValue.rawValue
         }
     }
+#endif
 
     @UserDefaultsWrapper(key: .selectedPasswordManager, defaultValue: PasswordManager.duckduckgo.rawValue)
     private var selectedPasswordManager: String

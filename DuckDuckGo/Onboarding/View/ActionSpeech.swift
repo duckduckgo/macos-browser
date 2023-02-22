@@ -36,7 +36,7 @@ struct ActionSpeech: View {
                     typingFinished = true
                 }
             }
-            
+
             HStack(spacing: 12) {
 
                 Button(UserText.onboardingNotNowButton) {

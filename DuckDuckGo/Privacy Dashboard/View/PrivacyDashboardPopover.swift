@@ -48,7 +48,7 @@ final class PrivacyDashboardPopover: NSPopover {
         contentViewController = controller
     }
     // swiftlint:enable force_cast
-    
+
     func setPreferredMaxHeight(_ height: CGFloat) {
         viewController.setPreferredMaxHeight(height - 40) // Account for popover arrow height
     }

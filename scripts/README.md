@@ -1,6 +1,7 @@
 # Scripts
 
 * [archive.sh](#archivesh-create-notarized-application-build)
+* [find-private-symbols.sh](#find-private-symbolssh-check-a-binary-for-private-api-usage)
 * [sparkle-sandbox.sh](#sparkle-sandboxsh-test-automatic-updates-via-sparkle-locally)
 * [update-embedded.sh](#update-embeddedsh-update-embedded-tracker-data-set-and-privacy-config)
 
@@ -70,6 +71,31 @@ To make a release build and a DMG:
 Display all available parameters:
 
     $ ./scripts/archive.sh -h
+
+
+## `find-private-symbols.sh`: Check a binary for private API usage
+
+This script checks a compiled app binary for references to private Obj-C selectors.
+_Private_ is defined by _starting with an underscore_. It uses `otool` to retrieve
+Obj-C selector pointers from the binary (see [this SO answer](https://stackoverflow.com/a/15829049)
+for a bit more info). Results are then filtered and formatted and if there are any
+selectors on the list that start with an underscore, the check fails
+and outputs an error message.
+
+### Requirements
+
+No 3rd party software is required to run the script. It uses built-in
+macOS toolchain utilities: lipo and otool.
+
+### Usage
+
+The check should work for any release build, but for debug builds it only works when
+the binary is compiled for both x86_64 and arm64 architectures, hence by default
+this is checked. The check can be skipped with a `-f` flag.
+
+To check for private API symbols in the app:
+
+    $ ./scripts/find_private_symbols.sh DuckDuckGo.app/Contents/MacOS/DuckDuckGo
 
 
 ## `sparkle-sandbox.sh`: Test automatic updates via Sparkle locally

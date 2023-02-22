@@ -21,28 +21,28 @@ import Combine
 @testable import DuckDuckGo_Privacy_Browser
 
 final class TemporaryFileHandlerTests: XCTestCase {
-    
+
     func testWhenPassingAValidPathToTheTemporaryFileHandler_ThenTheFileIsCopied_AndDeletedAfterTheHandlerIsComplete() throws {
         let handler = TemporaryFileHandler(fileURL: loginDatabaseURL())
         var temporaryFileURL: URL?
-        
+
         try handler.withTemporaryFile { url in
             temporaryFileURL = url
             XCTAssertTrue(url.path.contains(NSTemporaryDirectory()))
             XCTAssertTrue(FileManager.default.fileExists(atPath: url.path))
             XCTAssertEqual(url.pathExtension, "db")
         }
-        
+
         if let temporaryFileURL = temporaryFileURL {
             XCTAssertFalse(FileManager.default.fileExists(atPath: temporaryFileURL.path))
         } else {
             XCTFail("Did not get temporary file URL")
         }
     }
-    
+
     private func loginDatabaseURL() -> URL {
         let bundle = Bundle(for: TemporaryFileHandlerTests.self)
         return bundle.resourceURL!.appendingPathComponent("Data Import Resources/Test Firefox Data/No Primary Password/key4.db")
     }
-    
+
 }

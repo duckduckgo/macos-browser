@@ -54,7 +54,7 @@ enum PermissionState: Equatable {
         if case .denied = self { return true }
         return false
     }
-    
+
 }
 
 extension Optional where Wrapped == PermissionState {

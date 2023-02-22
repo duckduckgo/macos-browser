@@ -16,10 +16,11 @@
 //  limitations under the License.
 //
 
-import Foundation
-import Combine
-import WebKit
 import BrowserServicesKit
+import Combine
+import Foundation
+import Navigation
+import WebKit
 
 extension NSImage {
     static let privatePlayer: NSImage = #imageLiteral(resourceName: "PrivatePlayer")
@@ -135,7 +136,7 @@ extension PrivatePlayer {
             if navigationAction.url.isPrivatePlayerScheme,
                 let (videoID, timestamp) = navigationAction.url.youtubeVideoParams {
 
-                tab.webView.load(.youtube(videoID, timestamp: timestamp))
+                tab.webView.load(URLRequest(url: .youtube(videoID, timestamp: timestamp)))
                 return .cancel
             }
             return nil
@@ -185,7 +186,7 @@ extension PrivatePlayer {
 
         // Otherwise load priate player unless it's already loaded.
         guard case .privatePlayer(let currentVideoID, _) = tab.content, currentVideoID == videoID, tab.webView.url?.isPrivatePlayer == true else {
-            tab.webView.load(.privatePlayer(videoID, timestamp: timestamp))
+            tab.webView.load(URLRequest(url: .privatePlayer(videoID, timestamp: timestamp)))
             return .cancel
         }
         return nil
@@ -226,6 +227,17 @@ extension PrivatePlayer {
         }
 
         return url.isPrivatePlayer ? PrivatePlayer.commonName : nil
+    }
+
+    func sharingData(for title: String, url: URL) -> (title: String, url: URL)? {
+        guard isAvailable, mode != .disabled, url.isPrivatePlayerScheme, let (videoID, timestamp) = url.youtubeVideoParams else {
+            return nil
+        }
+
+        let title = title.dropping(prefix: Self.websiteTitlePrefix)
+        let sharingURL = URL.youtube(videoID, timestamp: timestamp)
+
+        return (title, sharingURL)
     }
 
     func title(for page: HomePage.Models.RecentlyVisitedPageModel) -> String? {
@@ -336,7 +348,7 @@ extension PrivatePlayer {
         if tab.webView.canGoBack {
             _ = tab.webView.goBack()
         }
-        tab.webView.load(url)
+        tab.webView.load(URLRequest(url: url))
 
         return true
     }

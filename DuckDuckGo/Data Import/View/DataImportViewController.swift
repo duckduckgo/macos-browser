@@ -176,7 +176,11 @@ final class DataImportViewController: NSViewController {
     }
 
     private func refreshViewState() {
-        let item = self.importSourcePopUpButton.itemArray[importSourcePopUpButton.indexOfSelectedItem]
+        guard let item = self.importSourcePopUpButton.selectedImportSourceItem(withPreferredIndex: importSourcePopUpButton.indexOfSelectedItem) else {
+            pixelAssertionFailure("Failed to get valid import source item")
+            return
+        }
+
         let validSources = DataImport.Source.allCases.filter(\.canImportData)
         let source = validSources.first(where: { $0.importSourceName == item.title })!
 
@@ -412,7 +416,7 @@ final class DataImportViewController: NSViewController {
                 action: error.actionType.pixelEventAction,
                 source: viewState.selectedImportSource.pixelEventSource
             )
-            
+
             Pixel.fire(pixel, withAdditionalParameters: error.errorType.errorParameters)
 
             let alert = NSAlert.importFailedAlert(source: viewState.selectedImportSource, linkDelegate: self)
@@ -501,20 +505,20 @@ extension DataImportViewController: RequestFilePermissionViewControllerDelegate 
 }
 
 extension DataImportViewController: NSTextViewDelegate {
-    
+
     func textView(_ textView: NSTextView, clickedOnLink link: Any, at charIndex: Int) -> Bool {
         guard let sheet = view.window?.attachedSheet else {
             return false
         }
-        
+
         view.window?.endSheet(sheet)
         dismiss()
-        
+
         FeedbackPresenter.presentFeedbackForm()
-        
+
         return true
     }
-    
+
 }
 
 extension NSPopUpButton {
@@ -524,8 +528,9 @@ extension NSPopUpButton {
 
         let validSources = DataImport.Source.allCases.filter(\.canImportData)
         for source in validSources {
-            // The CSV row is at the bottom of the picker, and requires a separator above it.
-            if source == .onePassword || source == .csv {
+            // The CSV row is at the bottom of the picker, and requires a separator above it, but only if the item array isn't
+            // empty (which would happen if there are no valid sources).
+            if (source == .onePassword || source == .csv) && !itemArray.isEmpty {
 
                 let separator = NSMenuItem.separator()
                 menu?.addItem(separator)
@@ -538,6 +543,18 @@ extension NSPopUpButton {
         if let preferredSource = DataImport.Source.preferredSources.first(where: { validSources.contains($0) }) {
             selectItem(withTitle: preferredSource.importSourceName)
         }
+    }
+
+    /// Provides a safe way to extract the selected import source item from an `NSPopUpButton`. A pop up button can include a separator at the top, so the fallback logic of treating the first item as
+    /// selected means it's possible to get a separator as the selected import source. This function will check that the title is not empty and that the preferred index exists when checking for
+    /// the selected item, and will check subsequent items if the non-empty title condition is not met.
+    fileprivate func selectedImportSourceItem(withPreferredIndex index: Int) -> NSMenuItem? {
+        guard !itemArray.isEmpty, index != NSNotFound else {
+            assertionFailure("Failed to select an import source item")
+            return nil
+        }
+
+        return itemArray[index...].first { !$0.title.isEmpty }
     }
 
 }

@@ -64,7 +64,7 @@ final class FeedbackViewController: NSViewController {
 
     @IBOutlet weak var thankYouView: NSView!
     private var cancellables = Set<AnyCancellable>()
-    
+
     private var browserFeedbackConstraint: NSLayoutConstraint?
     private var browserFeedbackBreakageConstraint: NSLayoutConstraint?
 
@@ -85,10 +85,10 @@ final class FeedbackViewController: NSViewController {
         super.viewDidLoad()
         setContentViewHeight(Constants.defaultContentHeight, animated: false)
         setupTextViews()
-        
+
         browserFeedbackConstraint = browserFeedbackView.topAnchor.constraint(equalTo: optionPopUpButton.bottomAnchor, constant: 8)
         browserFeedbackBreakageConstraint = browserFeedbackView.topAnchor.constraint(equalTo: websiteBreakageView.bottomAnchor)
-        
+
         browserFeedbackConstraint?.isActive = true
     }
 
@@ -193,7 +193,7 @@ final class FeedbackViewController: NSViewController {
             pickOptionMenuItem.isEnabled = true
             return
         }
-        
+
         browserFeedbackView.isHidden = false
 
         let contentHeight: CGFloat
@@ -259,7 +259,7 @@ final class FeedbackViewController: NSViewController {
             browserFeedbackDescriptionLabel.stringValue = UserText.feedbackOtherDescription
         }
     }
-    
+
     private func updateBrowserFeedbackDisclaimerLabel(for formOption: FormOption) {
         switch formOption {
         case .websiteBreakage:

@@ -17,7 +17,6 @@
 //
 
 import Foundation
-import os.log
 
 /// Responsible for handling drag and drop of tabs between windows
 final class TabDragAndDropManager {
@@ -33,19 +32,23 @@ final class TabDragAndDropManager {
 
     private var sourceUnit: Unit?
     private var destinationUnit: Unit?
-    private(set) var isDropRequested: Bool = false
 
     func setSource(tabCollectionViewModel: TabCollectionViewModel, indexPath: IndexPath) {
         sourceUnit = .init(tabCollectionViewModel: tabCollectionViewModel, indexPath: indexPath)
     }
 
     func setDestination(tabCollectionViewModel: TabCollectionViewModel, indexPath: IndexPath) {
-        isDropRequested = true
+        // ignore dragged objects from other apps
+        guard sourceUnit != nil else { return }
         destinationUnit = .init(tabCollectionViewModel: tabCollectionViewModel, indexPath: indexPath)
     }
 
+    func clearDestination() {
+        destinationUnit = nil
+    }
+
     func performDragAndDropIfNeeded() -> Bool {
-        if isDropRequested {
+        if destinationUnit != nil {
             performDragAndDrop()
             clear()
             return true
@@ -55,34 +58,22 @@ final class TabDragAndDropManager {
         }
     }
 
-    func dropToPinTabIfNeeded() -> Bool {
-        guard let sourceUnit = sourceUnit,
-              let sourceTabCollectionViewModel = sourceUnit.tabCollectionViewModel
-        else {
-            os_log("TabDragAndDropManager: Missing data to perform drop to pin", type: .error)
-            return false
-        }
-        sourceTabCollectionViewModel.pinTab(at: sourceUnit.indexPath.item)
-        return true
-    }
-
     private func performDragAndDrop() {
         guard let sourceUnit = sourceUnit, let destinationUnit = destinationUnit,
               let sourceTabCollectionViewModel = sourceUnit.tabCollectionViewModel,
               let destinationTabCollectionViewModel = destinationUnit.tabCollectionViewModel
         else {
-            os_log("TabDragAndDropManager: Missing data to perform drag and drop", type: .error)
+            assertionFailure("TabDragAndDropManager: Missing data to perform drag and drop")
             return
         }
-        let newIndex = min(destinationUnit.indexPath.item + 1, destinationTabCollectionViewModel.tabCollection.tabs.count)
 
+        let newIndex = min(destinationUnit.indexPath.item + 1, destinationTabCollectionViewModel.tabCollection.tabs.count)
         sourceTabCollectionViewModel.moveTab(at: sourceUnit.indexPath.item, to: destinationTabCollectionViewModel, at: newIndex)
     }
 
-    func clear() {
+    private func clear() {
         sourceUnit = nil
         destinationUnit = nil
-        isDropRequested = false
     }
 
 }

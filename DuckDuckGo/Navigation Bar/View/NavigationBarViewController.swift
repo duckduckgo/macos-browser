@@ -30,7 +30,7 @@ final class NavigationBarViewController: NSViewController {
     @IBOutlet weak var mouseOverView: MouseOverView!
     @IBOutlet weak var goBackButton: NSButton!
     @IBOutlet weak var goForwardButton: NSButton!
-    @IBOutlet weak var refreshButton: NSButton!
+    @IBOutlet weak var refreshOrStopButton: NSButton!
     @IBOutlet weak var optionsButton: NSButton!
     @IBOutlet weak var bookmarkListButton: MouseOverButton!
     @IBOutlet weak var passwordManagementButton: MouseOverButton!
@@ -112,12 +112,12 @@ final class NavigationBarViewController: NSViewController {
         optionsButton.sendAction(on: .leftMouseDown)
         bookmarkListButton.sendAction(on: .leftMouseDown)
         downloadsButton.sendAction(on: .leftMouseDown)
-        
+
         optionsButton.toolTip = UserText.applicationMenuTooltip
-        
-        #if DEBUG || REVIEW
+
+#if DEBUG || REVIEW
         addDebugNotificationListeners()
-        #endif
+#endif
     }
 
     override func viewWillAppear() {
@@ -128,7 +128,7 @@ final class NavigationBarViewController: NSViewController {
         if view.window?.isPopUpWindow == true {
             goBackButton.isHidden = true
             goForwardButton.isHidden = true
-            refreshButton.isHidden = true
+            refreshOrStopButton.isHidden = true
             optionsButton.isHidden = true
             addressBarTopConstraint.constant = 0
             addressBarBottomConstraint.constant = 0
@@ -140,10 +140,6 @@ final class NavigationBarViewController: NSViewController {
                 .leading: .leading(multiplier: 1.0, const: 72)
             ]))
         }
-    }
-
-    func windowDidBecomeMain() {
-        updateNavigationButtons()
     }
 
     @IBSegueAction func createAddressBarViewController(_ coder: NSCoder) -> AddressBarViewController? {
@@ -163,6 +159,8 @@ final class NavigationBarViewController: NSViewController {
         }
 
         if NSApp.isCommandPressed,
+           // don‘t open a new tab when the window is cmd-clicked in background
+           sender.window?.isKeyWindow == true && NSApp.isActive,
            let backItem = selectedTabViewModel.tab.webView.backForwardList.backItem {
             openNewChildTab(with: backItem.url)
         } else {
@@ -177,6 +175,8 @@ final class NavigationBarViewController: NSViewController {
         }
 
         if NSApp.isCommandPressed,
+           // don‘t open a new tab when the window is cmd-clicked in background
+           sender.window?.isKeyWindow == true && NSApp.isActive,
            let forwardItem = selectedTabViewModel.tab.webView.backForwardList.forwardItem {
             openNewChildTab(with: forwardItem.url)
         } else {
@@ -189,17 +189,21 @@ final class NavigationBarViewController: NSViewController {
         tabCollectionViewModel.insert(tab, selected: false)
     }
 
-    @IBAction func refreshAction(_ sender: NSButton) {
+    @IBAction func refreshOrStopAction(_ sender: NSButton) {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             os_log("%s: Selected tab view model is nil", type: .error, className)
             return
         }
 
-        selectedTabViewModel.reload()
+        if selectedTabViewModel.isLoading {
+            selectedTabViewModel.tab.stopLoading()
+        } else {
+            selectedTabViewModel.reload()
+        }
     }
 
     @IBAction func optionsButtonAction(_ sender: NSButton) {
-        
+
         let menu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
                                    passwordManagerCoordinator: PasswordManagerCoordinator.shared)
         menu.actionDelegate = self
@@ -225,22 +229,22 @@ final class NavigationBarViewController: NSViewController {
             NSMenu.popUpContextMenu(menu, with: event, for: view)
             return
         }
-        
+
         super.mouseDown(with: event)
     }
-    
+
     func listenToPasswordManagerNotifications() {
         passwordManagerNotificationCancellable = NotificationCenter.default.publisher(for: .PasswordManagerChanged).sink { [weak self] _ in
             self?.updatePasswordManagementButton()
         }
     }
-    
+
     func listenToPinningManagerNotifications() {
         pinnedViewsNotificationCancellable = NotificationCenter.default.publisher(for: .PinnedViewsChanged).sink { [weak self] notification in
             guard let self = self else {
                 return
             }
-            
+
             if let userInfo = notification.userInfo as? [String: Any],
                let viewType = userInfo[LocalPinningManager.pinnedViewChangedNotificationViewTypeKey] as? String,
                let view = PinnableView(rawValue: viewType) {
@@ -301,15 +305,19 @@ final class NavigationBarViewController: NSViewController {
     @objc private func showAutoconsentFeedback(_ sender: Notification) {
         if #available(macOS 11, *) {
             guard view.window?.isKeyWindow == true,
-                  let topUrl = sender.userInfo?["topUrl"] as? URL
+                  let topUrl = sender.userInfo?["topUrl"] as? URL,
+                  let isCosmetic = sender.userInfo?["isCosmetic"] as? Bool
             else { return }
+
             DispatchQueue.main.async { [weak self] in
                 guard let self = self,
-                      self.tabCollectionViewModel.selectedTabViewModel?.tab.url == topUrl else {
-                          // if the tab is not active, don't show the popup
-                          return
-                      }
-                self.addressBarViewController?.addressBarButtonsViewController?.showBadgeNotification(.cookieManaged)                
+                      self.tabCollectionViewModel.selectedTabViewModel?.tab.url == topUrl
+                else {
+                    // if the tab is not active, don't show the popup
+                    return
+                }
+                let animationType: NavigationBarBadgeAnimationView.AnimationType = isCosmetic ? .cookiePopupHidden : .cookiePopupManaged
+                self.addressBarViewController?.addressBarButtonsViewController?.showBadgeNotification(animationType)
             }
         }
     }
@@ -331,10 +339,10 @@ final class NavigationBarViewController: NSViewController {
         let forwardButtonMenu = NSMenu()
         forwardButtonMenu.delegate = goForwardButtonMenuDelegate
         goForwardButton.menu = forwardButtonMenu
-        
+
         goBackButton.toolTip = UserText.navigateBackTooltip
         goForwardButton.toolTip = UserText.navigateForwardTooltip
-        refreshButton.toolTip = UserText.refreshPageTooltip
+        refreshOrStopButton.toolTip = UserText.refreshPageTooltip
     }
 
     private func subscribeToSelectedTabViewModel() {
@@ -414,7 +422,7 @@ final class NavigationBarViewController: NSViewController {
             .assign(to: \.progress, onWeaklyHeld: downloadsProgressView)
             .store(in: &downloadsCancellables)
     }
-    
+
     private func addContextMenu() {
         let menu = NSMenu()
         menu.delegate = self
@@ -425,10 +433,10 @@ final class NavigationBarViewController: NSViewController {
         let menu = NSMenu()
         let title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .autofill)
         menu.addItem(withTitle: title, action: #selector(toggleAutofillPanelPinning), keyEquivalent: "")
-        
+
         passwordManagementButton.menu = menu
         passwordManagementButton.toolTip = UserText.autofillShortcutTooltip
-        
+
         let url = tabCollectionViewModel.selectedTabViewModel?.tab.content.url
 
         passwordManagementButton.image = NSImage(named: "PasswordManagement")
@@ -459,10 +467,10 @@ final class NavigationBarViewController: NSViewController {
         let menu = NSMenu()
         let title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .downloads)
         menu.addItem(withTitle: title, action: #selector(toggleDownloadsPanelPinning(_:)), keyEquivalent: "")
-        
+
         downloadsButton.menu = menu
         downloadsButton.toolTip = UserText.downloadsShortcutTooltip
-        
+
         if LocalPinningManager.shared.isPinned(.downloads) {
             downloadsButton.isHidden = false
             return
@@ -476,7 +484,7 @@ final class NavigationBarViewController: NSViewController {
 
         if !downloadsButton.isHidden { setDownloadButtonHidingTimer() }
         downloadsButton.isMouseDown = popovers.isDownloadsPopoverShown
-        
+
         // If the user has selected Hide Downloads from the navigation bar context menu, and no downloads are active, then force it to be hidden
         // even if the timer is active.
         if updatingFromPinnedViewsNotification {
@@ -512,7 +520,7 @@ final class NavigationBarViewController: NSViewController {
         if LocalPinningManager.shared.isPinned(.downloads) ||
             DownloadListCoordinator.shared.hasActiveDownloads ||
             popovers.isDownloadsPopoverShown { return }
-        
+
         downloadsButton.isHidden = true
     }
 
@@ -520,10 +528,10 @@ final class NavigationBarViewController: NSViewController {
         let menu = NSMenu()
         let title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .bookmarks)
         menu.addItem(withTitle: title, action: #selector(toggleBookmarksPanelPinning(_:)), keyEquivalent: "")
-        
+
         bookmarkListButton.menu = menu
         bookmarkListButton.toolTip = UserText.bookmarksShortcutTooltip
-        
+
         if LocalPinningManager.shared.isPinned(.bookmarks) {
             bookmarkListButton.isHidden = false
         } else {
@@ -566,36 +574,34 @@ final class NavigationBarViewController: NSViewController {
     }
 
     private func subscribeToNavigationActionFlags() {
-        navigationButtonsCancellables.forEach { $0.cancel() }
         navigationButtonsCancellables.removeAll()
+        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else { return }
 
-        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            goBackButton.isEnabled = false
-            goForwardButton.isEnabled = false
-            return
-        }
-        selectedTabViewModel.$canGoBack.receive(on: DispatchQueue.main).sink { [weak self] _ in
-            self?.updateNavigationButtons()
-        } .store(in: &navigationButtonsCancellables)
+        selectedTabViewModel.$canGoBack
+            .removeDuplicates()
+            .assign(to: \.isEnabled, onWeaklyHeld: goBackButton)
+            .store(in: &navigationButtonsCancellables)
 
-        selectedTabViewModel.$canGoForward.receive(on: DispatchQueue.main).sink { [weak self] _ in
-            self?.updateNavigationButtons()
-        } .store(in: &navigationButtonsCancellables)
+        selectedTabViewModel.$canGoForward
+            .removeDuplicates()
+            .assign(to: \.isEnabled, onWeaklyHeld: goForwardButton)
+            .store(in: &navigationButtonsCancellables)
 
-        selectedTabViewModel.$canReload.receive(on: DispatchQueue.main).sink { [weak self] _ in
-            self?.updateNavigationButtons()
-        } .store(in: &navigationButtonsCancellables)
-    }
+        Publishers.CombineLatest(selectedTabViewModel.$canReload, selectedTabViewModel.$isLoading)
+            .map({
+                $0.canReload || $0.isLoading
+            } as ((canReload: Bool, isLoading: Bool)) -> Bool)
+            .removeDuplicates()
+            .assign(to: \.isEnabled, onWeaklyHeld: refreshOrStopButton)
+            .store(in: &navigationButtonsCancellables)
 
-    private func updateNavigationButtons() {
-        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("%s: Selected tab view model is nil", type: .error, className)
-            return
-        }
-
-        goBackButton.isEnabled = selectedTabViewModel.canGoBack
-        goForwardButton.isEnabled = selectedTabViewModel.canGoForward
-        refreshButton.isEnabled = selectedTabViewModel.canReload
+        selectedTabViewModel.$isLoading
+            .removeDuplicates()
+            .sink { [weak refreshOrStopButton] isLoading in
+                refreshOrStopButton?.image = isLoading ? NSImage(named: "Stop") : NSImage(named: "Refresh")
+                refreshOrStopButton?.toolTip = isLoading ? UserText.stopLoadingTooltip : UserText.refreshPageTooltip
+            }
+            .store(in: &navigationButtonsCancellables)
     }
 
 }
@@ -609,15 +615,15 @@ extension NavigationBarViewController: MouseOverViewDelegate {
 }
 
 extension NavigationBarViewController: NSMenuDelegate {
-    
+
     public func menuNeedsUpdate(_ menu: NSMenu) {
         menu.removeAllItems()
-        
+
         let bookmarksBarTitle = PersistentAppInterfaceSettings.shared.showBookmarksBar ? UserText.hideBookmarksBar : UserText.showBookmarksBar
         menu.addItem(withTitle: bookmarksBarTitle, action: #selector(toggleBookmarksBar), keyEquivalent: "B")
-        
+
         menu.addItem(NSMenuItem.separator())
-        
+
         let autofillTitle = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .autofill)
         menu.addItem(withTitle: autofillTitle, action: #selector(toggleAutofillPanelPinning), keyEquivalent: "A")
 
@@ -627,22 +633,22 @@ extension NavigationBarViewController: NSMenuDelegate {
         let downloadsTitle = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .downloads)
         menu.addItem(withTitle: downloadsTitle, action: #selector(toggleDownloadsPanelPinning), keyEquivalent: "J")
     }
-    
+
     @objc
     private func toggleBookmarksBar(_ sender: NSMenuItem) {
         PersistentAppInterfaceSettings.shared.showBookmarksBar.toggle()
     }
-    
+
     @objc
     private func toggleAutofillPanelPinning(_ sender: NSMenuItem) {
         LocalPinningManager.shared.togglePinning(for: .autofill)
     }
-    
+
     @objc
     private func toggleBookmarksPanelPinning(_ sender: NSMenuItem) {
         LocalPinningManager.shared.togglePinning(for: .bookmarks)
     }
-    
+
     @objc
     private func toggleDownloadsPanelPinning(_ sender: NSMenuItem) {
         LocalPinningManager.shared.togglePinning(for: .downloads)
@@ -670,11 +676,11 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
     func optionsButtonMenuRequestedToggleBookmarksBar(_ menu: NSMenu) {
         PersistentAppInterfaceSettings.shared.showBookmarksBar.toggle()
     }
-    
+
     func optionsButtonMenuRequestedBookmarkManagementInterface(_ menu: NSMenu) {
         WindowControllersManager.shared.showBookmarksTab()
     }
-    
+
     func optionsButtonMenuRequestedBookmarkImportInterface(_ menu: NSMenu) {
         DataImportViewController.show()
     }
@@ -732,12 +738,12 @@ extension NavigationBarViewController: DownloadsViewControllerDelegate {
 
 #if DEBUG || REVIEW
 extension NavigationBarViewController {
-    
+
     fileprivate func addDebugNotificationListeners() {
         NotificationCenter.default.addObserver(forName: .ShowSaveCredentialsPopover, object: nil, queue: .main) { [weak self] _ in
             self?.showMockSaveCredentialsPopover()
         }
-        
+
         NotificationCenter.default.addObserver(forName: .ShowCredentialsSavedPopover, object: nil, queue: .main) { [weak self] _ in
             self?.showMockCredentialsSavedPopover()
         }
@@ -751,7 +757,7 @@ extension NavigationBarViewController {
                                         usingView: passwordManagementButton,
                                         withDelegate: self)
     }
-    
+
     fileprivate func showMockCredentialsSavedPopover() {
         let account = SecureVaultModels.WebsiteAccount(title: nil, username: "example-username", domain: "example.com")
         let mockCredentials = SecureVaultModels.WebsiteCredentials(account: account, password: "password".data(using: .utf8)!)
@@ -761,6 +767,6 @@ extension NavigationBarViewController {
                                         usingView: passwordManagementButton,
                                         withDelegate: self)
     }
-    
+
 }
 #endif

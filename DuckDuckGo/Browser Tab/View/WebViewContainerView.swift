@@ -32,7 +32,7 @@ final class WebViewContainerView: NSView {
     init(webView: WebView, frame: NSRect) {
         self.webView = webView
         super.init(frame: frame)
-        
+
         self.autoresizingMask = [.width, .height]
         webView.translatesAutoresizingMaskIntoConstraints = true
 
@@ -42,7 +42,7 @@ final class WebViewContainerView: NSView {
         displayedView.autoresizingMask = [.width, .height]
         self.addSubview(displayedView)
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }

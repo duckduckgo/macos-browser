@@ -19,60 +19,60 @@
 import Foundation
 
 final class TemporaryFileHandler {
-    
+
     enum FileHandlerError: Error {
         case noFileFound
         case failedToCopyFile
     }
-    
+
     let fileURL: URL
     let temporaryFileURL: URL
-    
+
     init(fileURL: URL) {
         self.fileURL = fileURL
-        
+
         let temporaryDirectoryURL = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
         let fileExtension = fileURL.pathExtension
         let newFileName = UUID().uuidString
         let finalTemporaryFileURL = temporaryDirectoryURL.appendingPathComponent(newFileName).appendingPathExtension(fileExtension)
-        
+
         self.temporaryFileURL = finalTemporaryFileURL
     }
-    
+
     deinit {
         deleteTemporarilyCopiedFile()
     }
-    
+
     func withTemporaryFile<T>(_ closure: (URL) -> T) throws -> T {
         let temporaryFileURL = try copyFileToTemporaryDirectory()
         defer { deleteTemporarilyCopiedFile() }
         return closure(temporaryFileURL)
     }
-    
+
     func copyFileToTemporaryDirectory() throws -> URL {
         let fileManager = FileManager.default
-        
+
         guard fileManager.fileExists(atPath: fileURL.path) else {
             throw FileHandlerError.noFileFound
         }
-        
+
         do {
             try fileManager.copyItem(at: fileURL, to: temporaryFileURL)
         } catch {
             throw FileHandlerError.failedToCopyFile
         }
-        
+
         return temporaryFileURL
     }
-    
+
     func deleteTemporarilyCopiedFile() {
         try? FileManager.default.removeItem(at: temporaryFileURL)
     }
-    
+
 }
 
 extension URL {
-        
+
     func withTemporaryFile<T>(_ closure: (URL) -> T) throws -> T {
         let handler = TemporaryFileHandler(fileURL: self)
         return try handler.withTemporaryFile(closure)

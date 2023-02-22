@@ -67,7 +67,7 @@ final class MainMenu: NSMenu {
     @IBOutlet weak var bookmarkThisPageMenuItem: NSMenuItem?
     @IBOutlet weak var favoritesMenuItem: NSMenuItem?
     @IBOutlet weak var favoriteThisPageMenuItem: NSMenuItem?
-    
+
     @IBOutlet weak var toggleBookmarksBarMenuItem: NSMenuItem?
     @IBOutlet weak var toggleAutofillShortcutMenuItem: NSMenuItem?
     @IBOutlet weak var toggleBookmarksShortcutMenuItem: NSMenuItem?
@@ -100,10 +100,20 @@ final class MainMenu: NSMenu {
     override func update() {
         super.update()
 
+        // Make sure Spotlight search is part of Help menu
+        if NSApplication.shared.helpMenu != helpMenuItem?.submenu {
+            NSApplication.shared.helpMenu = helpMenuItem?.submenu
+        }
+
         if !WKWebView.canPrint {
             printMenuItem?.removeFromParent()
             printSeparatorItem?.removeFromParent()
         }
+
+#if APPSTORE
+        checkForUpdatesMenuItem?.removeFromParent()
+        checkForUpdatesSeparatorItem?.removeFromParent()
+#endif
 
         sharingMenu.title = shareMenuItem.title
         shareMenuItem.submenu = sharingMenu
@@ -240,7 +250,7 @@ final class MainMenu: NSMenu {
         toggleBookmarksBarMenuItem?.title = title
         bookmarksMenuToggleBookmarksBarMenuItem?.title = title
     }
-    
+
     private func updateShortcutMenuItems() {
         toggleAutofillShortcutMenuItem?.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .autofill)
         toggleBookmarksShortcutMenuItem?.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .bookmarks)

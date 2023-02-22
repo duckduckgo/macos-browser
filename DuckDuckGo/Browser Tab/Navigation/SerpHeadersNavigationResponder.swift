@@ -16,29 +16,32 @@
 //  limitations under the License.
 //
 
-import BrowserServicesKit
+import Navigation
 import Foundation
 
 struct SerpHeadersNavigationResponder: NavigationResponder {
 
-    struct Constants {
-        static let ddgClientHeaderKey = "X-DuckDuckGo-Client"
-        static let ddgClientHeaderValue = "macOS"
-    }
+    static let headers = [
+        "X-DuckDuckGo-Client": "macOS"
+    ]
 
     func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
-        guard navigationAction.isForMainFrame,
+        guard let mainFrame = navigationAction.mainFrameTarget,
               navigationAction.url.isDuckDuckGo,
-              navigationAction.request.value(forHTTPHeaderField: Constants.ddgClientHeaderKey) == nil,
+              Self.headers.contains(where: { navigationAction.request.value(forHTTPHeaderField: $0.key) == nil }),
               !navigationAction.navigationType.isBackForward
         else {
             return .next
         }
 
         var request = navigationAction.request
-        request.setValue(Constants.ddgClientHeaderValue, forHTTPHeaderField: Constants.ddgClientHeaderKey)
+        for (key, value) in Self.headers {
+            request.setValue(value, forHTTPHeaderField: key)
+        }
 
-        return .cancel(with: .redirect(request))
+        return .redirect(mainFrame) { navigator in
+            navigator.load(request)
+        }
     }
 
 }

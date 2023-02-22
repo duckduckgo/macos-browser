@@ -44,7 +44,7 @@ extension OSLog {
     static var pixel: OSLog {
         Logging.pixelLoggingEnabled ? Logging.pixelLog : .disabled
     }
-    
+
     static var autoconsent: OSLog {
         Logging.autoconsentLoggingEnabled ? Logging.autoconsentLog : .disabled
     }
@@ -56,7 +56,7 @@ extension OSLog {
     static var favicons: OSLog {
         Logging.faviconLoggingEnabled ? Logging.faviconLog : .disabled
     }
-    
+
     static var autoLock: OSLog {
         Logging.autoLockLoggingEnabled ? Logging.autoLockLog : .disabled
     }
@@ -64,7 +64,7 @@ extension OSLog {
     static var tabLazyLoading: OSLog {
         Logging.tabLazyLoaderLoggingEnabled ? Logging.tabLazyLoaderLog : .disabled
     }
-    
+
     static var bookmarks: OSLog {
         Logging.bookmarksLoggingEnabled ? Logging.bookmarksLog : .disabled
     }
@@ -76,7 +76,7 @@ extension OSLog {
     static var attribution: OSLog {
         Logging.attributionLoggingEnabled ? Logging.attributionLog : .disabled
     }
-    
+
     static var atb: OSLog {
         Logging.atbLoggingEnabled ? Logging.atbLog : .disabled
     }
@@ -91,7 +91,7 @@ struct Logging {
 
     fileprivate static let atbLoggingEnabled = false
     fileprivate static let atbLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "ATB")
-    
+
     fileprivate static let configLoggingEnabled = false
     fileprivate static let configLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Configuration Downloading")
 
@@ -115,7 +115,7 @@ struct Logging {
 
     fileprivate static let faviconLoggingEnabled = false
     fileprivate static let faviconLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Favicons")
-    
+
     fileprivate static let autoLockLoggingEnabled = false
     fileprivate static let autoLockLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Auto-Lock")
 
@@ -124,17 +124,17 @@ struct Logging {
 
     fileprivate static let autoconsentLoggingEnabled = false
     fileprivate static let autoconsentLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Autoconsent")
-    
+
     fileprivate static let bookmarksLoggingEnabled = false
     fileprivate static let bookmarksLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Bookmarks")
-    
+
     fileprivate static let attributionLoggingEnabled = false
     fileprivate static let attributionLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Ad Attribution")
 
     fileprivate static let bitwardenLoggingEnabled = false
     fileprivate static let bitwardenLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Bitwarden")
 
-    fileprivate static let navigationLoggingEnabled = true
+    fileprivate static let navigationLoggingEnabled = false
     fileprivate static let navigationLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Navigation")
 
 }

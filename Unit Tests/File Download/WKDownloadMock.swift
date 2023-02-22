@@ -16,7 +16,7 @@
 //  limitations under the License.
 //
 
-import BrowserServicesKit
+import Navigation
 import WebKit
 @testable import DuckDuckGo_Privacy_Browser
 

@@ -21,46 +21,6 @@ import BrowserServicesKit
 import Combine
 @testable import DuckDuckGo_Privacy_Browser
 
-class MockPrivacyConfiguration: PrivacyConfiguration {
-    var identifier: String = "MockPrivacyConfiguration"
-    var userUnprotectedDomains: [String] = []
-    var tempUnprotectedDomains: [String] = []
-    var trackerAllowlist: PrivacyConfigurationData.TrackerAllowlistData = [:]
-
-    func exceptionsList(forFeature featureKey: PrivacyFeature) -> [String] { [] }
-    func isEnabled(featureKey: PrivacyFeature, versionProvider: AppVersionProvider) -> Bool { true }
-    func isFeature(_ feature: PrivacyFeature, enabledForDomain: String?) -> Bool { true }
-    func isProtected(domain: String?) -> Bool { true }
-    func isUserUnprotected(domain: String?) -> Bool { false }
-    func isTempUnprotected(domain: String?) -> Bool { false }
-    func isInExceptionList(domain: String?, forFeature featureKey: PrivacyFeature) -> Bool { false }
-    func settings(for feature: PrivacyFeature) -> PrivacyConfigurationData.PrivacyFeature.FeatureSettings { [:] }
-    func userEnabledProtection(forDomain: String) {}
-    func userDisabledProtection(forDomain: String) {}
-}
-
-@objc(MockPrivacyConfigurationManager)
-class MockPrivacyConfigurationManager: NSObject, PrivacyConfigurationManaging {
-    var embeddedConfigData: BrowserServicesKit.PrivacyConfigurationManager.ConfigurationData {
-        fatalError("not implemented")
-    }
-
-    var fetchedConfigData: BrowserServicesKit.PrivacyConfigurationManager.ConfigurationData? {
-        fatalError("not implemented")
-    }
-
-    var currentConfig: Data {
-        Data()
-    }
-
-    func reload(etag: String?, data: Data?) -> BrowserServicesKit.PrivacyConfigurationManager.ReloadResult {
-        fatalError("not implemented")
-    }
-
-    var updatesPublisher: AnyPublisher<Void, Never> = Just(()).eraseToAnyPublisher()
-    var privacyConfig: PrivacyConfiguration = MockPrivacyConfiguration()
-}
-
 final class PrivatePlayerTests: XCTestCase {
 
     var privatePlayer: PrivatePlayer!
@@ -131,6 +91,16 @@ final class PrivatePlayerTests: XCTestCase {
 
         privatePlayer.mode = .alwaysAsk
         XCTAssertNil(privatePlayer.tabContent(for: .youtube("12345678", timestamp: "10m")))
+    }
+
+    func testThatSharingDataStripsDuckPlayerPrefixFromTitleAndReturnsYoutubeURL() {
+        let sharingData = privatePlayer.sharingData(for: "Duck Player - sample video", url: "duck://player/12345678?t=10".url!)
+        XCTAssertEqual(sharingData?.title, "sample video")
+        XCTAssertEqual(sharingData?.url, URL.youtube("12345678", timestamp: "10"))
+    }
+
+    func testThatSharingDataForNonPrivatePlayerURLReturnsNil() {
+        XCTAssertNil(privatePlayer.sharingData(for: "Wikipedia", url: "https://wikipedia.org".url!))
     }
 
     func testThatTitleForRecentlyVisitedPageIsGeneratedForPrivatePlayerFeedItems() {
