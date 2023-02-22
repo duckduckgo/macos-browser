@@ -30,8 +30,6 @@ final class DownloadsTabExtension: NSObject {
 
     private let downloadManager: FileDownloadManagerProtocol
     private let isChildTab: Bool
-    // Used to cancel re-download on session restoration
-    private var currentDownload: URL?
 
     @Published
     private var savePanelDialogRequest: SavePanelDialogRequest? {
@@ -77,33 +75,10 @@ final class DownloadsTabExtension: NSObject {
 
 }
 
-extension DownloadsTabExtension: NSCodingExtension {
-
-    private enum NSSecureCodingKeys {
-        static let currentDownload = "currentDownload"
-    }
-
-    func awakeAfter(using decoder: NSCoder) {
-        currentDownload = decoder.decodeObject(of: NSURL.self, forKey: NSSecureCodingKeys.currentDownload) as? URL
-    }
-
-    func encode(using coder: NSCoder) {
-        coder.encode(currentDownload, forKey: NSSecureCodingKeys.currentDownload)
-    }
-
-}
-
 extension DownloadsTabExtension: NavigationResponder {
 
     @MainActor
     func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
-        if navigationAction.isForMainFrame,
-           // TODO: check cache policy instead
-           navigationAction.url != currentDownload || navigationAction.isUserInitiated || navigationAction.navigationType == .reload {
-
-            currentDownload = nil
-        }
-
         if navigationAction.shouldDownload
             // to be modularized later, modifiers should be collected on click (and key down!) event and passed as .custom NavigationType
             || (navigationAction.navigationType.isLinkActivated && NSApp.isOptionPressed && !NSApp.isCommandPressed) {
@@ -121,14 +96,9 @@ extension DownloadsTabExtension: NavigationResponder {
         else {
             return .next
         }
-
-        if navigationResponse.isForMainFrame {
-            // TODO: check cache policy instead
-            guard currentDownload != navigationResponse.url else {
-                // prevent download twice
-                return .cancel
-            }
-            currentDownload = navigationResponse.url
+        // prevent download twice for session restoration/tab reopening requests
+        guard !navigationResponse.isForMainFrame || navigationResponse.mainFrameNavigation?.request.cachePolicy != .returnCacheDataElseLoad else {
+            return .cancel
         }
 
         return .download
