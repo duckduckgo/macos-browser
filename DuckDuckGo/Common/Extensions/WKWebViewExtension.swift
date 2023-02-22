@@ -244,6 +244,11 @@ extension WKWebView {
         return self.value(forKey: Selector.fullScreenPlaceholderView) as? NSView
     }
 
+    func removeFocusFromWebView() {
+        guard self.window?.firstResponder === self else { return }
+        self.superview?.makeMeFirstResponder()
+    }
+
     private enum Selector {
         static let fullScreenPlaceholderView = "_fullScreenPlaceholderView"
         static let printOperationWithPrintInfoForFrame = "_printOperationWithPrintInfo:forFrame:"

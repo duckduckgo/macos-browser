@@ -31,7 +31,6 @@ final class ExternalAppSchemeHandler {
     private let permissionModel: PermissionModelProtocol
 
     private var externalSchemeOpenedPerPageLoad = false
-    private var removeFirstResponderRequestSubject = PassthroughSubject<Void, Never>()
 
     init(workspace: Workspace, permissionModel: PermissionModelProtocol) {
         self.workspace = workspace
@@ -64,7 +63,7 @@ extension ExternalAppSchemeHandler: NavigationResponder {
         // Another way of detecting whether an app is installed to handle a protocol is described in Asana:
         // https://app.asana.com/0/1201037661562251/1202055908401751/f
         // removing First Responder focus from the WebView to make the page think the app was opened
-        self.removeFirstResponderRequestSubject.send( () )
+        navigationAction.targetFrame?.webView?.removeFocusFromWebView()
 
         let permissionType = PermissionType.externalScheme(scheme: scheme)
         let domain = navigationAction.sourceFrame.securityOrigin.host
@@ -85,24 +84,14 @@ extension ExternalAppSchemeHandler: NavigationResponder {
 }
 
 protocol ExternalSchemeHandlerProtocol: AnyObject, NavigationResponder {
-    var removeFirstResponderRequestPublisher: AnyPublisher<Void, Never> { get }
 }
 extension ExternalAppSchemeHandler: TabExtension, ExternalSchemeHandlerProtocol {
     func getPublicProtocol() -> ExternalSchemeHandlerProtocol { self }
 
-    var removeFirstResponderRequestPublisher: AnyPublisher<Void, Never> {
-        removeFirstResponderRequestSubject.eraseToAnyPublisher()
-    }
 }
 
 extension TabExtensions {
     var externalAppSchemeHandler: ExternalSchemeHandlerProtocol? {
         resolve(ExternalAppSchemeHandler.self)
-    }
-}
-
-extension Tab {
-    var removeFirstResponderRequestPublisher: AnyPublisher<Void, Never> {
-        self.externalAppSchemeHandler?.removeFirstResponderRequestPublisher ?? PassthroughSubject().eraseToAnyPublisher()
     }
 }

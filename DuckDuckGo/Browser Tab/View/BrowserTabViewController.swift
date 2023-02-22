@@ -39,7 +39,6 @@ final class BrowserTabViewController: NSViewController {
     private var tabContentCancellable: AnyCancellable?
     private var userDialogsCancellable: AnyCancellable?
     private var cookieConsentCancellable: AnyCancellable?
-    private var removeFirstResponderRequestCancellable: AnyCancellable?
     private var activeUserDialogCancellable: Cancellable?
     private var errorViewStateCancellable: AnyCancellable?
     private var hoverLinkCancellable: AnyCancellable?
@@ -123,7 +122,6 @@ final class BrowserTabViewController: NSViewController {
                 self.showCookieConsentPopoverIfNecessary(selectedTabViewModel)
                 self.subscribeToUserDialogs(of: selectedTabViewModel)
                 self.subscribeToCookieConsentPrompt(of: selectedTabViewModel)
-                self.subscribeToRemoveFirstResponderRequest(of: selectedTabViewModel)
             }
             .store(in: &cancellables)
     }
@@ -279,12 +277,6 @@ final class BrowserTabViewController: NSViewController {
         }
     }
 
-    private func subscribeToRemoveFirstResponderRequest(of tabViewModel: TabViewModel?) {
-        removeFirstResponderRequestCancellable = tabViewModel?.tab.removeFirstResponderRequestPublisher.sink { [weak self] in
-            self?.removeFirstResponderFocusFromWebView()
-        }
-    }
-
     private func subscribeToErrorViewState() {
         errorViewStateCancellable = tabViewModel?.$errorViewState.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.displayErrorView(
@@ -319,10 +311,6 @@ final class BrowserTabViewController: NSViewController {
         DispatchQueue.main.async { [weak self] in
             self?.makeWebViewFirstResponder()
         }
-    }
-
-    private func removeFirstResponderFocusFromWebView() {
-        self.view.makeMeFirstResponder()
     }
 
     private func displayErrorView(_ shown: Bool, message: String) {
