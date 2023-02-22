@@ -20,13 +20,6 @@ import Combine
 import Foundation
 import Navigation
 
-protocol Workspace {
-    func urlForApplication(toOpen url: URL) -> URL?
-    @discardableResult
-    func open(_ url: URL) -> Bool
-}
-extension NSWorkspace: Workspace {}
-
 protocol PermissionModelProtocol {
     func permissions(_ permissions: [PermissionType], requestedForDomain domain: String?, url: URL?, decisionHandler: @escaping (Bool) -> Void)
 }
