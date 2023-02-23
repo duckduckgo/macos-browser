@@ -50,7 +50,7 @@ extension ExternalAppSchemeHandler: NavigationResponder {
         // can OS open the external url?
         guard workspace.urlForApplication(toOpen: externalUrl) != nil else {
             // search if external URL can‘t be opened but entered by user
-            if navigationAction.isUserEntered,
+            if navigationAction.isUserEnteredUrl,
                let searchUrl,
                let mainFrame = navigationAction.mainFrameTarget {
                 return .redirect(mainFrame) { navigator in

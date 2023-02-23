@@ -303,10 +303,11 @@ struct Favorite: View {
     private let bookmarkTitle: String
     private let bookmarkURL: URL
 
-    init(bookmark: Bookmark) {
+    init?(bookmark: Bookmark) {
+        guard let urlObject = bookmark.urlObject else { return nil }
         self.bookmark = bookmark
         self.bookmarkTitle = bookmark.title
-        self.bookmarkURL = bookmark.url
+        self.bookmarkURL = urlObject
     }
 
     var body: some View {

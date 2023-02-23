@@ -494,7 +494,7 @@ fileprivate extension TabCollectionViewModel {
             case .none: continue
             case .replace:
 
-                let tab = Tab(content: tabCleanupInfo.tabViewModel.tab.content, shouldLoadInBackground: true)
+                let tab = Tab(content: tabCleanupInfo.tabViewModel.tab.content, shouldLoadInBackground: true, shouldLoadFromCache: true)
                 replaceTab(at: .unpinned(tabIndex), with: tab, forceChange: true)
             case .burn:
                 toRemove.insert(tabIndex)
@@ -522,7 +522,7 @@ fileprivate extension TabCollectionViewModel {
             case .none: continue
             case .replace, .burn:
                 // Burning does not ever close pinned tabs, so treat burning as replacing
-                let tab = Tab(content: tabCleanupInfo.tabViewModel.tab.content, shouldLoadInBackground: true)
+                let tab = Tab(content: tabCleanupInfo.tabViewModel.tab.content, shouldLoadInBackground: true, shouldLoadFromCache: true)
                 replaceTab(at: .pinned(tabIndex), with: tab, forceChange: true)
             }
         }

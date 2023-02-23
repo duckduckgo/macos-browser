@@ -51,7 +51,7 @@ final class BookmarkStoreMock: BookmarkStore {
     var removeCalled = false
     var removeSuccess = true
     var removeError: Error?
-    func remove(objectsWithUUIDs uuids: [UUID], completion: @escaping (Bool, Error?) -> Void) {
+    func remove(objectsWithUUIDs uuids: [String], completion: @escaping (Bool, Error?) -> Void) {
         removeCalled = true
 
         // For the purpose of the mock, only remove bookmarks if `removeSuccess` is true.
@@ -77,12 +77,12 @@ final class BookmarkStoreMock: BookmarkStore {
     }
 
     var addChildCalled = false
-    func add(objectsWithUUIDs: [UUID], to parent: BookmarkFolder?, completion: @escaping (Error?) -> Void) {
+    func add(objectsWithUUIDs: [String], to parent: BookmarkFolder?, completion: @escaping (Error?) -> Void) {
         addChildCalled = true
     }
 
     var updateObjectsCalled = false
-    func update(objectsWithUUIDs uuids: [UUID], update: @escaping (BaseBookmarkEntity) -> Void, completion: @escaping (Error?) -> Void) {
+    func update(objectsWithUUIDs uuids: [String], update: @escaping (BaseBookmarkEntity) -> Void, completion: @escaping (Error?) -> Void) {
         updateObjectsCalled = true
     }
 
@@ -93,18 +93,18 @@ final class BookmarkStoreMock: BookmarkStore {
     }
 
     var canMoveObjectWithUUIDCalled = false
-    func canMoveObjectWithUUID(objectUUID uuid: UUID, to parent: BookmarkFolder) -> Bool {
+    func canMoveObjectWithUUID(objectUUID uuid: String, to parent: BookmarkFolder) -> Bool {
         canMoveObjectWithUUIDCalled = true
         return true
     }
 
     var moveObjectUUIDCalled = false
-    func move(objectUUIDs: [UUID], toIndex: Int?, withinParentFolder: DuckDuckGo_Privacy_Browser.ParentFolderType, completion: @escaping (Error?) -> Void) {
+    func move(objectUUIDs: [String], toIndex: Int?, withinParentFolder: DuckDuckGo_Privacy_Browser.ParentFolderType, completion: @escaping (Error?) -> Void) {
         moveObjectUUIDCalled = true
     }
 
     var updateFavoriteIndexCalled = false
-    func moveFavorites(with objectUUIDs: [UUID], toIndex: Int?, completion: @escaping (Error?) -> Void) {
+    func moveFavorites(with objectUUIDs: [String], toIndex: Int?, completion: @escaping (Error?) -> Void) {
         updateFavoriteIndexCalled = true
     }
 

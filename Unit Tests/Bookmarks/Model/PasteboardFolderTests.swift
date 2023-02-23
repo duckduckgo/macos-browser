@@ -23,7 +23,7 @@ class PasteboardFolderTests: XCTestCase {
 
     func testWhenInitializingPasteboardBookmarkFromValidDictionary_ThenPasteboardBookmarkIsCreated() {
         let uuid = UUID()
-        let folder = BookmarkFolder(id: uuid, title: "Example")
+        let folder = BookmarkFolder(id: uuid.uuidString, title: "Example")
         let writer = FolderPasteboardWriter(folder: folder)
         let pasteboardFolder = PasteboardFolder(dictionary: writer.internalDictionary)
 
@@ -38,7 +38,7 @@ class PasteboardFolderTests: XCTestCase {
     }
 
     func testWhenInitializingPasteboardBookmarkFromValidPasteboardItem_ThenPasteboardBookmarkIsCreated() {
-        let folder = BookmarkFolder(id: UUID(), title: "Example")
+        let folder = BookmarkFolder(id: UUID().uuidString, title: "Example")
         let writer = FolderPasteboardWriter(folder: folder)
         let type = FolderPasteboardWriter.folderUTIInternalType
 
@@ -57,7 +57,7 @@ class PasteboardFolderTests: XCTestCase {
     }
 
     func testWhenGettingWritableTypesForBookmarkPasteboardWriter_ThenTypesIncludeInternalBookmarkType() {
-        let folder = BookmarkFolder(id: UUID(), title: "Example")
+        let folder = BookmarkFolder(id: UUID().uuidString, title: "Example")
         let writer = FolderPasteboardWriter(folder: folder)
 
         let pasteboard = NSPasteboard(name: NSPasteboard.Name(rawValue: "Test Pasteboard"))
@@ -66,7 +66,7 @@ class PasteboardFolderTests: XCTestCase {
     }
 
     func testWhenGettingPropertyListForSystemTypes_ThenBookmarkURLIsReturned() {
-        let folder = BookmarkFolder(id: UUID(), title: "Example")
+        let folder = BookmarkFolder(id: UUID().uuidString, title: "Example")
         let writer = FolderPasteboardWriter(folder: folder)
 
         guard let stringPropertyList = writer.pasteboardPropertyList(forType: .string) as? String else {
@@ -78,7 +78,7 @@ class PasteboardFolderTests: XCTestCase {
     }
 
     func testWhenGettingPropertyListForInternalBookmarkType_ThenBookmarkDictionaryIsReturned() {
-        let folder = BookmarkFolder(id: UUID(), title: "Example")
+        let folder = BookmarkFolder(id: UUID().uuidString, title: "Example")
         let writer = FolderPasteboardWriter(folder: folder)
         let type = FolderPasteboardWriter.folderUTIInternalType
 
@@ -91,7 +91,7 @@ class PasteboardFolderTests: XCTestCase {
     }
 
     func testWhenGettingPropertyListForUnsupportedValue_ThenNilIsReturned() {
-        let folder = BookmarkFolder(id: UUID(), title: "Example")
+        let folder = BookmarkFolder(id: UUID().uuidString, title: "Example")
         let writer = FolderPasteboardWriter(folder: folder)
 
         // Test a handful of unsupported types to assert that they're nil:

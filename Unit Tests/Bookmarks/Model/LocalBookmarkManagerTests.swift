@@ -44,8 +44,8 @@ final class LocalBookmarkManagerTests: XCTestCase {
         bookmarkStoreMock.bookmarks = [Bookmark.aBookmark]
         bookmarkManager.loadBookmarks()
 
-        XCTAssert(bookmarkManager.isUrlBookmarked(url: Bookmark.aBookmark.url))
-        XCTAssertNotNil(bookmarkManager.getBookmark(for: Bookmark.aBookmark.url))
+        XCTAssert(bookmarkManager.isUrlBookmarked(url: Bookmark.aBookmark.urlObject!))
+        XCTAssertNotNil(bookmarkManager.getBookmark(for: Bookmark.aBookmark.urlObject!))
         XCTAssert(bookmarkStoreMock.loadAllCalled)
         XCTAssert(bookmarkManager.list!.bookmarks().count > 0)
     }
@@ -67,7 +67,7 @@ final class LocalBookmarkManagerTests: XCTestCase {
         let (bookmarkManager, bookmarkStoreMock) = LocalBookmarkManager.aManager
         let bookmark = bookmarkManager.makeBookmark(for: URL.duckDuckGo, title: "Title", isFavorite: false)!
 
-        XCTAssert(bookmarkManager.isUrlBookmarked(url: bookmark.url))
+        XCTAssert(bookmarkManager.isUrlBookmarked(url: bookmark.urlObject!))
         XCTAssert(bookmarkStoreMock.saveBookmarkCalled)
     }
 
@@ -77,7 +77,7 @@ final class LocalBookmarkManagerTests: XCTestCase {
         bookmarkStoreMock.saveBookmarkSuccess = false
         let bookmark = bookmarkManager.makeBookmark(for: URL.duckDuckGo, title: "Title", isFavorite: false)!
 
-        XCTAssertFalse(bookmarkManager.isUrlBookmarked(url: bookmark.url))
+        XCTAssertFalse(bookmarkManager.isUrlBookmarked(url: bookmark.urlObject!))
         XCTAssert(bookmarkStoreMock.saveBookmarkCalled)
     }
 
@@ -94,7 +94,7 @@ final class LocalBookmarkManagerTests: XCTestCase {
 
         bookmarkManager.remove(bookmark: bookmark)
 
-        XCTAssertFalse(bookmarkManager.isUrlBookmarked(url: bookmark.url))
+        XCTAssertFalse(bookmarkManager.isUrlBookmarked(url: bookmark.urlObject!))
         XCTAssert(bookmarkStoreMock.saveBookmarkCalled)
         XCTAssert(bookmarkStoreMock.removeCalled)
     }
@@ -107,7 +107,7 @@ final class LocalBookmarkManagerTests: XCTestCase {
         bookmarkStoreMock.removeError = BookmarkManagerError.somethingReallyBad
         bookmarkManager.remove(bookmark: bookmark)
 
-        XCTAssert(bookmarkManager.isUrlBookmarked(url: bookmark.url))
+        XCTAssert(bookmarkManager.isUrlBookmarked(url: bookmark.urlObject!))
         XCTAssert(bookmarkStoreMock.saveBookmarkCalled)
         XCTAssert(bookmarkStoreMock.removeCalled)
     }
@@ -117,7 +117,7 @@ final class LocalBookmarkManagerTests: XCTestCase {
 
         bookmarkManager.remove(bookmark: Bookmark.aBookmark)
 
-        XCTAssertFalse(bookmarkManager.isUrlBookmarked(url: Bookmark.aBookmark.url))
+        XCTAssertFalse(bookmarkManager.isUrlBookmarked(url: Bookmark.aBookmark.urlObject!))
         XCTAssertFalse(bookmarkStoreMock.removeCalled)
     }
 
@@ -127,7 +127,7 @@ final class LocalBookmarkManagerTests: XCTestCase {
         bookmarkManager.update(bookmark: Bookmark.aBookmark)
         let updateUrlResult = bookmarkManager.updateUrl(of: Bookmark.aBookmark, to: URL.duckDuckGoAutocomplete)
 
-        XCTAssertFalse(bookmarkManager.isUrlBookmarked(url: Bookmark.aBookmark.url))
+        XCTAssertFalse(bookmarkManager.isUrlBookmarked(url: Bookmark.aBookmark.urlObject!))
         XCTAssertFalse(bookmarkStoreMock.updateBookmarkCalled)
         XCTAssertNil(updateUrlResult)
     }
@@ -139,7 +139,7 @@ final class LocalBookmarkManagerTests: XCTestCase {
         bookmark.isFavorite = !bookmark.isFavorite
         bookmarkManager.update(bookmark: bookmark)
 
-        XCTAssert(bookmarkManager.isUrlBookmarked(url: bookmark.url))
+        XCTAssert(bookmarkManager.isUrlBookmarked(url: bookmark.urlObject!))
         XCTAssert(bookmarkStoreMock.updateBookmarkCalled)
     }
 
@@ -150,8 +150,8 @@ final class LocalBookmarkManagerTests: XCTestCase {
         let newURL = URL.duckDuckGoAutocomplete
         let newBookmark = bookmarkManager.updateUrl(of: bookmark, to: newURL)
 
-        XCTAssertFalse(bookmarkManager.isUrlBookmarked(url: bookmark.url))
-        XCTAssert(bookmarkManager.isUrlBookmarked(url: newBookmark!.url))
+        XCTAssertFalse(bookmarkManager.isUrlBookmarked(url: bookmark.urlObject!))
+        XCTAssert(bookmarkManager.isUrlBookmarked(url: newBookmark!.urlObject!))
         XCTAssert(bookmarkManager.isUrlBookmarked(url: newURL))
         XCTAssert(bookmarkStoreMock.updateBookmarkCalled)
     }
@@ -175,8 +175,8 @@ fileprivate extension LocalBookmarkManager {
 
 fileprivate extension Bookmark {
 
-    static var aBookmark: Bookmark = Bookmark(id: UUID(),
-                                              url: URL.duckDuckGo,
+    static var aBookmark: Bookmark = Bookmark(id: UUID().uuidString,
+                                              url: URL.duckDuckGo.absoluteString,
                                               title: "Title",
                                               isFavorite: false)
 

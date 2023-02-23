@@ -88,8 +88,8 @@ class BookmarkSidebarTreeControllerTests: XCTestCase {
         let faviconManagerMock = FaviconManagerMock()
         let bookmarkManager = LocalBookmarkManager(bookmarkStore: bookmarkStoreMock, faviconManagement: faviconManagerMock)
 
-        let childFolder = BookmarkFolder(id: UUID(), title: "Child")
-        let rootFolder = BookmarkFolder(id: UUID(), title: "Root", children: [childFolder])
+        let childFolder = BookmarkFolder(id: UUID().uuidString, title: "Child")
+        let rootFolder = BookmarkFolder(id: UUID().uuidString, title: "Root", children: [childFolder])
 
         bookmarkStoreMock.bookmarks = [rootFolder]
         bookmarkManager.loadBookmarks()
