@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "autofill/anya/subdomains-url-changes",
-        "revision" : "51047827e66840ef9aff86ab9f5856c9a27c0bb0"
+        "branch" : "autofill/anya/subdomains-sorting",
+        "revision" : "d0b943639da20f31546b658335bc2bf2bc5971ca"
       }
     },
     {
