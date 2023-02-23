@@ -667,8 +667,11 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             return
         }
 
-        if webView.url == nil, let url = content.url {
-            webView.load(URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData))
+        if webView.url == nil, content.url != nil {
+            // load from cache or interactionStateData when called by lazy loader
+            Task { @MainActor [weak self] in
+                await self?.reloadIfNeeded(shouldLoadInBackground: true)
+            }
         } else if case .privatePlayer = content, let url = content.url {
             webView.load(URLRequest(url: url))
         } else {
