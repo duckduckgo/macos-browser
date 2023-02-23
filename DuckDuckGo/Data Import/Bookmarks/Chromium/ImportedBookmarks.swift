@@ -48,11 +48,6 @@ struct ImportedBookmarks: Decodable {
             return type == "folder"
         }
 
-        // There's no guarantee that imported bookmarks will have a URL, this is used to filter them out during import
-        var isInvalidBookmark: Bool {
-            return !isFolder && url == nil
-        }
-
         fileprivate var numberOfBookmarks: Int {
             if isFolder {
                 return (children ?? []).reduce(0, { $0 + $1.numberOfBookmarks })

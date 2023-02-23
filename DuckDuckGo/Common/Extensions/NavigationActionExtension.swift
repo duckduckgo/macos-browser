@@ -20,7 +20,7 @@ import Navigation
 
 extension NavigationAction {
 
-    var isUserEntered: Bool {
+    var isUserEnteredUrl: Bool {
         if #available(macOS 12.0, *),
            case .other = navigationType,
            case .user = request.attribution {

@@ -23,14 +23,16 @@ import os.log
 struct BookmarkList {
 
     struct IdentifiableBookmark: Equatable, BrowserServicesKit.Bookmark {
-        let id: UUID
-        let url: URL
+        let id: String
+        let url: String
+        let urlObject: URL?
         let title: String
         let isFavorite: Bool
 
         init(from bookmark: Bookmark) {
             self.id = bookmark.id
             self.url = bookmark.url
+            self.urlObject = URL(string: bookmark.url)
             self.title = bookmark.title
             self.isFavorite = bookmark.isFavorite
         }
@@ -40,7 +42,7 @@ struct BookmarkList {
 
     private(set) var allBookmarkURLsOrdered: [IdentifiableBookmark]
     private var favoriteBookmarksOrdered: [IdentifiableBookmark]
-    private var itemsDict: [URL: [Bookmark]]
+    private var itemsDict: [String: [Bookmark]]
 
     var totalBookmarks: Int {
         return allBookmarkURLsOrdered.count
@@ -62,7 +64,7 @@ struct BookmarkList {
         let bookmarks = entities.compactMap { $0 as? Bookmark }
         let keysOrdered = bookmarks.compactMap { IdentifiableBookmark(from: $0) }
 
-        var itemsDict = [URL: [Bookmark]]()
+        var itemsDict = [String: [Bookmark]]()
 
         for bookmark in bookmarks {
             itemsDict[bookmark.url] = (itemsDict[bookmark.url] ?? []) + [bookmark]
@@ -84,7 +86,7 @@ struct BookmarkList {
         itemsDict[bookmark.url] = (itemsDict[bookmark.url] ?? []) + [bookmark]
     }
 
-    subscript(url: URL) -> Bookmark? {
+    subscript(url: String) -> Bookmark? {
         return itemsDict[url]?.first
     }
 
@@ -122,7 +124,7 @@ struct BookmarkList {
         }
     }
 
-    mutating func updateUrl(of bookmark: Bookmark, to newURL: URL) -> Bookmark? {
+    mutating func updateUrl(of bookmark: Bookmark, to newURL: String) -> Bookmark? {
         guard !bookmark.isFolder else { return nil }
 
         guard itemsDict[newURL] == nil else {

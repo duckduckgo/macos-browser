@@ -50,7 +50,7 @@ final class AddEditFavoriteViewController: NSViewController {
             bookmark.title = newTitle
             bookmarkManager.update(bookmark: bookmark)
 
-            if let newUrl = newUrl, newUrl != bookmark.url {
+            if let newUrl = newUrl, newUrl.absoluteString != bookmark.url {
                 bookmarkManager.updateUrl(of: bookmark, to: newUrl)
             }
         }
@@ -66,7 +66,7 @@ final class AddEditFavoriteViewController: NSViewController {
             update(bookmark: bookmark, newTitle: newTitle, newUrl: newUrl)
         } else {
             // Saving
-            if let bookmark = bookmarkManager.getBookmark(for: newUrl) {
+            if let bookmark = bookmarkManager.getBookmark(forUrl: newUrl.absoluteString) {
                 update(bookmark: bookmark, newTitle: newTitle)
             } else {
                 bookmarkManager.makeBookmark(for: newUrl, title: newTitle, isFavorite: true)
@@ -78,7 +78,7 @@ final class AddEditFavoriteViewController: NSViewController {
     func edit(bookmark: Bookmark) {
         originalBookmark = bookmark
         titleInputTextField.stringValue = bookmark.title
-        urlInputTextField.stringValue = bookmark.url.absoluteString
+        urlInputTextField.stringValue = bookmark.url
 
         headerTextField.stringValue = UserText.editFavorite
         confirmButton.title = UserText.save
@@ -102,7 +102,7 @@ final class AddEditFavoriteViewController: NSViewController {
         let isBookmarked = bookmarkManager.isUrlBookmarked(url: url)
         let isInputValid = !titleInputTextField.stringValue.isEmpty &&
             url.isValid &&
-            (!isBookmarked || url == originalBookmark?.url)
+        (!isBookmarked || url.absoluteString == originalBookmark?.url)
         return isInputValid
     }
 
