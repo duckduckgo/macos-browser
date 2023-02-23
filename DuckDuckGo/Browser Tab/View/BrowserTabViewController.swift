@@ -267,7 +267,6 @@ final class BrowserTabViewController: NSViewController {
         }
 
         userDialogsCancellable = Publishers.CombineLatest(
-            // TODO: nil is published here
             tabViewModel.tab.$userInteractionDialog,
             tabViewModel.tab.downloads?.savePanelDialogPublisher ?? Just(nil).eraseToAnyPublisher()
         )
