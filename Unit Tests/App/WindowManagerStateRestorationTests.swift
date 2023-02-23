@@ -31,7 +31,7 @@ final class WindowManagerStateRestorationTests: XCTestCase {
     func isTab(_ a: Tab, equalTo b: Tab) -> Bool {
         a.url == b.url
         && a.title == b.title
-        && a.interactionStateData == b.interactionStateData
+        && a.getActualInteractionStateData() == b.getActualInteractionStateData()
         && a.webView.configuration.websiteDataStore.isPersistent == b.webView.configuration.websiteDataStore.isPersistent
     }
 

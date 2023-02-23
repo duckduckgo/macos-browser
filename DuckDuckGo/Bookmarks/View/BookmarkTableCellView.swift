@@ -22,7 +22,7 @@ import Foundation
 
     func bookmarkTableCellViewRequestedMenu(_ sender: NSButton, cell: BookmarkTableCellView)
     func bookmarkTableCellViewToggledFavorite(cell: BookmarkTableCellView)
-    func bookmarkTableCellView(_ cellView: BookmarkTableCellView, updatedBookmarkWithUUID uuid: UUID, newTitle: String, newUrl: String)
+    func bookmarkTableCellView(_ cellView: BookmarkTableCellView, updatedBookmarkWithUUID uuid: String, newTitle: String, newUrl: String)
 
 }
 
@@ -190,8 +190,8 @@ final class BookmarkTableCellView: NSTableCellView, NibLoadable {
         accessoryImageView.image = bookmark.isFavorite ? Self.favoriteAccessoryViewImage : nil
         favoriteButton.image = bookmark.isFavorite ? Self.favoriteFilledAccessoryViewImage : Self.favoriteAccessoryViewImage
         primaryTitleLabelValue = bookmark.title
-        tertiaryTitleLabelValue = bookmark.url.absoluteString
-        bookmarkURLLabel.stringValue = bookmark.url.absoluteString
+        tertiaryTitleLabelValue = bookmark.url
+        bookmarkURLLabel.stringValue = bookmark.url
     }
 
     func update(from folder: BookmarkFolder) {
@@ -251,7 +251,7 @@ final class BookmarkTableCellView: NSTableCellView, NibLoadable {
         titleLabelBottomConstraint.priority = .required
 
         if let editedBookmark = self.entity as? Bookmark,
-           titleLabel.stringValue != editedBookmark.title || bookmarkURLLabel.stringValue != editedBookmark.url.absoluteString {
+           titleLabel.stringValue != editedBookmark.title || bookmarkURLLabel.stringValue != editedBookmark.url {
             delegate?.bookmarkTableCellView(self,
                                             updatedBookmarkWithUUID: editedBookmark.id,
                                             newTitle: titleLabel.stringValue,
