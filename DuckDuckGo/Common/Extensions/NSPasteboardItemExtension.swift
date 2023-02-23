@@ -20,15 +20,15 @@ import Foundation
 
 extension NSPasteboardItem {
 
-    var bookmarkEntityUUID: UUID? {
+    var bookmarkEntityUUID: String? {
         if let bookmark = propertyList(forType: BookmarkPasteboardWriter.bookmarkUTIInternalType) as? PasteboardAttributes,
            let bookmarkID = bookmark[PasteboardBookmark.Key.id] {
-            return UUID(uuidString: bookmarkID)
+            return bookmarkID
         }
 
         if let folder = propertyList(forType: FolderPasteboardWriter.folderUTIInternalType) as? PasteboardAttributes,
            let folderID = folder[PasteboardFolder.Key.id] {
-            return UUID(uuidString: folderID)
+            return folderID
         }
 
         return nil
