@@ -22,8 +22,9 @@ import CoreData
 
 class BookmarkManagedObjectTests: XCTestCase {
 
+    let container = CoreData.legacyBookmarkContainer()
+
     func testWhenSavingBookmarksWithValidData_ThenSavingIsSuccessful() {
-        let container = CoreData.bookmarkContainer()
         let context = container.viewContext
         let parent = createTestRootFolderManagedObject(in: context)
 
@@ -33,7 +34,6 @@ class BookmarkManagedObjectTests: XCTestCase {
     }
 
     func testWhenSavingFoldersWithValidData_ThenSavingIsSuccessful() {
-        let container = CoreData.bookmarkContainer()
         let context = container.viewContext
         let parent = createTestRootFolderManagedObject(in: context)
 
@@ -43,7 +43,6 @@ class BookmarkManagedObjectTests: XCTestCase {
     }
 
     func testWhenSavingWithDuplicateUUID_ThenSavingFails() {
-        let container = CoreData.bookmarkContainer()
         let context = container.viewContext
         let parent = createTestRootFolderManagedObject(in: context)
         let id = UUID()
@@ -56,12 +55,12 @@ class BookmarkManagedObjectTests: XCTestCase {
     }
 
     func testWhenSavingBookmarkWithoutURL_ThenSavingFails() {
-        let container = CoreData.bookmarkContainer()
         let context = container.viewContext
         let parent = createTestRootFolderManagedObject(in: context)
         let id = UUID()
 
-        let bookmark = BookmarkManagedObject(context: context)
+        let bookmark = BookmarkManagedObject(entity: BookmarkManagedObject.entity(in: context),
+                                             insertInto: context)
 
         bookmark.id = id
         bookmark.urlEncrypted = nil
@@ -76,12 +75,12 @@ class BookmarkManagedObjectTests: XCTestCase {
     }
 
     func testWhenSavingFolder_AndFolderHasURL_ThenSavingFails() {
-        let container = CoreData.bookmarkContainer()
         let context = container.viewContext
         let parent = createTestRootFolderManagedObject(in: context)
         let id = UUID()
 
-        let folder = BookmarkManagedObject(context: context)
+        let folder = BookmarkManagedObject(entity: BookmarkManagedObject.entity(in: context),
+                                           insertInto: context)
 
         folder.id = id
         folder.urlEncrypted = URL(string: "https://example.com")! as NSObject
@@ -96,11 +95,11 @@ class BookmarkManagedObjectTests: XCTestCase {
     }
 
     func testWhenSavingFolders_AndTheParentFolderIsTheSameAsTheFolder_ThenSavingFails() {
-        let container = CoreData.bookmarkContainer()
         let context = container.viewContext
         let id = UUID()
 
-        let folder = BookmarkManagedObject(context: context)
+        let folder = BookmarkManagedObject(entity: BookmarkManagedObject.entity(in: context),
+                                           insertInto: context)
         folder.id = id
         folder.titleEncrypted = "Folder" as NSObject
         folder.isFolder = true
@@ -113,7 +112,6 @@ class BookmarkManagedObjectTests: XCTestCase {
     }
 
     func testWhenSavingFolders_AndFolderContainsAncestorAsChild_ThenSavingFails() {
-        let container = CoreData.bookmarkContainer()
         let context = container.viewContext
         let parent = createTestRootFolderManagedObject(in: context)
 
@@ -136,11 +134,11 @@ class BookmarkManagedObjectTests: XCTestCase {
     }
 
     func testWhenSavingBookmark_AndBookmarkDoesNotHaveParentFolder_ThenSavingFails() {
-        let container = CoreData.bookmarkContainer()
         let context = container.viewContext
         let id = UUID()
 
-        let bookmark = BookmarkManagedObject(context: context)
+        let bookmark = BookmarkManagedObject(entity: BookmarkManagedObject.entity(in: context),
+                                             insertInto: context)
 
         bookmark.id = id
         bookmark.urlEncrypted = URL(string: "https://example.com")! as NSObject
@@ -154,11 +152,11 @@ class BookmarkManagedObjectTests: XCTestCase {
     }
 
     func testWhenSavingFolder_AndFolderDoesNotHaveParentFolder_ThenSavingFails() {
-        let container = CoreData.bookmarkContainer()
         let context = container.viewContext
         let id = UUID()
 
-        let folder = BookmarkManagedObject(context: context)
+        let folder = BookmarkManagedObject(entity: BookmarkManagedObject.entity(in: context),
+                                           insertInto: context)
 
         folder.id = id
         folder.titleEncrypted = "Folder" as NSObject
@@ -171,13 +169,13 @@ class BookmarkManagedObjectTests: XCTestCase {
     }
 
     func testWhenSavingBookmark_AndBookmarkHasInvalidFavoritesFolder_ThenSavingFails() {
-        let container = CoreData.bookmarkContainer()
         let context = container.viewContext
         let rootFolder = createTestRootFolderManagedObject(in: context)
         let otherFolder = createTestFolderManagedObject(in: context, parent: rootFolder)
         let id = UUID()
 
-        let bookmark = BookmarkManagedObject(context: context)
+        let bookmark = BookmarkManagedObject(entity: BookmarkManagedObject.entity(in: context),
+                                             insertInto: context)
 
         bookmark.id = id
         bookmark.urlEncrypted = URL(string: "https://example.com")! as NSObject
@@ -195,9 +193,10 @@ class BookmarkManagedObjectTests: XCTestCase {
 
     @discardableResult
     private func createTestRootFolderManagedObject(in context: NSManagedObjectContext) -> BookmarkManagedObject {
-        let folder = BookmarkManagedObject(context: context)
+        let folder = BookmarkManagedObject(entity: BookmarkManagedObject.entity(in: context),
+                                           insertInto: context)
 
-        folder.id = UUID.rootBookmarkFolderUUID
+        folder.id = UUID(uuidString: LegacyBookmarkStore.Constants.rootFolderUUID)
         folder.titleEncrypted = "RootFolder" as NSObject
         folder.isFolder = true
         folder.dateAdded = NSDate.now
@@ -209,7 +208,8 @@ class BookmarkManagedObjectTests: XCTestCase {
     private func createTestBookmarkManagedObject(with id: UUID = UUID(),
                                                  in context: NSManagedObjectContext,
                                                  parent: BookmarkManagedObject) -> BookmarkManagedObject {
-        let bookmark = BookmarkManagedObject(context: context)
+        let bookmark = BookmarkManagedObject(entity: BookmarkManagedObject.entity(in: context),
+                                             insertInto: context)
 
         bookmark.id = id
         bookmark.urlEncrypted = URL(string: "https://example.com")! as NSObject
@@ -225,7 +225,8 @@ class BookmarkManagedObjectTests: XCTestCase {
     private func createTestFolderManagedObject(with id: UUID = UUID(),
                                                in context: NSManagedObjectContext,
                                                parent: BookmarkManagedObject) -> BookmarkManagedObject {
-        let folder = BookmarkManagedObject(context: context)
+        let folder = BookmarkManagedObject(entity: BookmarkManagedObject.entity(in: context),
+                                           insertInto: context)
 
         folder.id = id
         folder.titleEncrypted = "Folder" as NSObject

@@ -135,7 +135,8 @@ final class HomePageViewController: NSViewController {
 
     func createFavoritesModel() -> HomePage.Models.FavoritesModel {
         return .init(open: { [weak self] bookmark, target in
-            self?.openUrl(bookmark.url, target: target)
+            guard let urlObject = bookmark.urlObject else { return }
+            self?.openUrl(urlObject, target: target)
         }, removeFavorite: { [weak self] bookmark in
             bookmark.isFavorite = !bookmark.isFavorite
             self?.bookmarkManager.update(bookmark: bookmark)
