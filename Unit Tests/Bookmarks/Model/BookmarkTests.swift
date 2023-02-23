@@ -17,29 +17,42 @@
 //
 
 import XCTest
+import Bookmarks
 @testable import DuckDuckGo_Privacy_Browser
 
 class BookmarkTests: XCTestCase {
 
-    func testWhenInitializingBaseBookmarkEntityFromBookmarkManagedObject_ThenBookmarkIsCreated() {
-        let container = CoreData.bookmarkContainer()
-        let context = container.viewContext
+    var rootFolder: BookmarkEntity!
+    var context: NSManagedObjectContext!
 
-        let bookmarkManagedObject = createBookmark(titled: "Bookmark", url: URL(string: "https://example.com/")!, in: context)
+    override func setUp() {
+        super.setUp()
+
+        let container = CoreData.bookmarkContainer()
+        context = container.viewContext
+
+        BookmarkUtils.prepareFoldersStructure(in: context)
+        rootFolder = BookmarkUtils.fetchRootFolder(context)
+    }
+
+    func testWhenInitializingBaseBookmarkEntityFromBookmarkManagedObject_ThenBookmarkIsCreated() {
+
+        let bookmarkManagedObject = BookmarkEntity.makeBookmark(title: "Bookmark",
+                                                                url: "https://example.com/",
+                                                                parent: rootFolder,
+                                                                context: context)
         guard let bookmark = BaseBookmarkEntity.from(managedObject: bookmarkManagedObject) as? Bookmark else {
             XCTFail("Failed to create Bookmark from managed object")
             return
         }
 
         XCTAssertEqual(bookmark.title, "Bookmark")
-        XCTAssertEqual(bookmark.url, URL(string: "https://example.com/")!)
+        XCTAssertEqual(bookmark.url, "https://example.com/")
     }
 
     func testWhenInitializingBaseBookmarkEntityFromBookmarkManagedObject_AndBookmarkIsFolder_ThenFolderIsCreated() {
-        let container = CoreData.bookmarkContainer()
-        let context = container.viewContext
+        let folderManagedObject = BookmarkEntity.makeFolder(title: "Folder", parent: rootFolder, context: context)
 
-        let folderManagedObject = createFolder(titled: "Folder", in: context)
         guard let folder = BaseBookmarkEntity.from(managedObject: folderManagedObject) as? BookmarkFolder else {
             XCTFail("Failed to create Folder from managed object")
             return
@@ -49,12 +62,15 @@ class BookmarkTests: XCTestCase {
     }
 
     func testWhenInitializingBaseBookmarkEntityWithFolder_AndFolderHasChildren_ThenChildrenArrayIsPopulated() {
-        let container = CoreData.bookmarkContainer()
-        let context = container.viewContext
 
-        let bookmarkManagedObject = createBookmark(titled: "Bookmark", url: URL(string: "https://example.com/")!, in: context)
-        let folderManagedObject = createFolder(titled: "Folder", in: context)
-        folderManagedObject.addToChildren(bookmarkManagedObject)
+        let folderManagedObject = BookmarkEntity.makeFolder(title: "Folder",
+                                                            parent: rootFolder,
+                                                            context: context)
+
+        let bookmarkManagedObject = BookmarkEntity.makeBookmark(title: "Bookmark",
+                                                                url: "https://example.com/",
+                                                                parent: folderManagedObject,
+                                                                context: context)
 
         guard let folder = BaseBookmarkEntity.from(managedObject: folderManagedObject) as? BookmarkFolder else {
             XCTFail("Failed to create Folder from managed object")
@@ -69,28 +85,6 @@ class BookmarkTests: XCTestCase {
 
         let childBookmark = folder.children.first as? Bookmark
         XCTAssertEqual(childBookmark?.parentFolderUUID, folder.id)
-    }
-
-    func createBookmark(titled title: String, url: URL, in context: NSManagedObjectContext) -> BookmarkManagedObject {
-        let managedObject = BookmarkManagedObject(context: context)
-
-        managedObject.id = UUID()
-        managedObject.dateAdded = NSDate.now
-        managedObject.titleEncrypted = title as NSString
-        managedObject.urlEncrypted = url as NSURL
-
-        return managedObject
-    }
-
-    func createFolder(titled title: String, in context: NSManagedObjectContext) -> BookmarkManagedObject {
-        let managedObject = BookmarkManagedObject(context: context)
-
-        managedObject.id = UUID()
-        managedObject.dateAdded = NSDate.now
-        managedObject.isFolder = true
-        managedObject.titleEncrypted = title as NSString
-
-        return managedObject
     }
 
 }
