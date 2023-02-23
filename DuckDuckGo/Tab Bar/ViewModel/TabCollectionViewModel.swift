@@ -427,7 +427,7 @@ final class TabCollectionViewModel: NSObject {
     func removeAllTabsAndAppendNew(forceChange: Bool = false) {
         guard changesEnabled || forceChange else { return }
 
-        tabCollection.removeAll(andAppend: Tab(content: .homePage, shouldLoadInBackground: false))
+        tabCollection.removeAll(andAppend: Tab(content: .homePage))
         selectUnpinnedTab(at: 0, forceChange: forceChange)
 
         delegate?.tabCollectionViewModelDidMultipleChanges(self)
@@ -442,7 +442,7 @@ final class TabCollectionViewModel: NSObject {
 
         tabCollection.removeTabs(at: indexSet)
         if tabCollection.tabs.isEmpty {
-            tabCollection.append(tab: Tab(content: .homePage, shouldLoadInBackground: false))
+            tabCollection.append(tab: Tab(content: .homePage))
             selectUnpinnedTab(at: 0, forceChange: forceChange)
         } else {
             let selectionDiff = indexSet.reduce(0) { result, index in
@@ -479,7 +479,7 @@ final class TabCollectionViewModel: NSObject {
             return
         }
 
-        let tabCopy = Tab(content: tab.content, favicon: tab.favicon, interactionStateData: tab.interactionStateData, shouldLoadInBackground: true)
+        let tabCopy = Tab(content: tab.content, favicon: tab.favicon, interactionStateData: tab.getActualInteractionStateData(), shouldLoadInBackground: true, shouldLoadFromCache: true)
         let newIndex = tabIndex.makeNext()
 
         tabCollection(for: tabIndex)?.insert(tabCopy, at: newIndex.item)
