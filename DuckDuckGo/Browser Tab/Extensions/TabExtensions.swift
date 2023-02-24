@@ -75,6 +75,7 @@ typealias TabExtensionsBuilderArguments = (
     userScriptsPublisher: AnyPublisher<UserScripts?, Never>,
     inheritedAttribution: AdClickAttributionLogic.State?,
     userContentControllerFuture: Future<UserContentController, Never>,
+    webViewFuture: Future<WKWebView, Never>,
     permissionModel: PermissionModel,
     isChildTab: Bool
 )
