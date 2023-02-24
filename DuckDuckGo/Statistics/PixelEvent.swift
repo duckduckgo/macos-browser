@@ -206,7 +206,6 @@ extension Pixel {
             case userSelectedToDismissUpdate
 
             case faviconDecryptionFailed
-            case bookmarkDecryptionFailed
             case downloadListItemDecryptionFailed
             case historyEntryDecryptionFailed
             case permissionDecryptionFailed
@@ -457,8 +456,6 @@ extension Pixel.Event.Debug {
 
         case .faviconDecryptionFailed:
             return "favicon_decryption_failed"
-        case .bookmarkDecryptionFailed:
-            return "bookmark_decryption_failed"
         case .downloadListItemDecryptionFailed:
             return "download_list_item_decryption_failed"
         case .historyEntryDecryptionFailed:
