@@ -38,6 +38,7 @@ final class BrowserTabViewController: NSViewController {
     private let tabCollectionViewModel: TabCollectionViewModel
     private var tabContentCancellable: AnyCancellable?
     private var userDialogsCancellable: AnyCancellable?
+    private var cookieConsentCancellable: AnyCancellable?
     private var activeUserDialogCancellable: Cancellable?
     private var errorViewStateCancellable: AnyCancellable?
     private var hoverLinkCancellable: AnyCancellable?
@@ -120,6 +121,7 @@ final class BrowserTabViewController: NSViewController {
                 self.subscribeToHoveredLink(of: selectedTabViewModel)
                 self.showCookieConsentPopoverIfNecessary(selectedTabViewModel)
                 self.subscribeToUserDialogs(of: selectedTabViewModel)
+                self.subscribeToCookieConsentPrompt(of: selectedTabViewModel)
             }
             .store(in: &cancellables)
     }
@@ -273,6 +275,16 @@ final class BrowserTabViewController: NSViewController {
         .map { $1 ?? $0 }
         .sink { [weak self] dialog in
             self?.show(dialog)
+        }
+    }
+
+    private func subscribeToCookieConsentPrompt(of tabViewModel: TabViewModel?) {
+        cookieConsentCancellable = tabViewModel?.tab.cookieConsentPromptRequestPublisher.sink { [weak self, weak tab=tabViewModel?.tab] request in
+            guard let self, let tab, let request else { return }
+            self.cookieConsentPopoverManager.show(on: self.view, animated: true) { result in
+                request.submit(result)
+            }
+            self.cookieConsentPopoverManager.currentTab = tab
         }
     }
 
@@ -500,11 +512,6 @@ extension BrowserTabViewController: ContentOverlayUserScriptDelegate {
 
 extension BrowserTabViewController: TabDelegate {
 
-    func tab(_ tab: Tab, promptUserForCookieConsent result: @escaping (Bool) -> Void) {
-        cookieConsentPopoverManager.show(on: view, animated: true, result: result)
-        cookieConsentPopoverManager.currentTab = tab
-    }
-
     func tabWillStartNavigation(_ tab: Tab, isUserInitiated: Bool) {
         if isUserInitiated,
            let window = self.view.window,
@@ -513,17 +520,6 @@ extension BrowserTabViewController: TabDelegate {
 
             window.makeKeyAndOrderFront(nil)
         }
-    }
-
-    func tab(_ tab: Tab, requestedOpenExternalURL url: URL, forUserEnteredURL userEntered: Bool) -> Bool {
-        // Another way of detecting whether an app is installed to handle a protocol is described in Asana:
-        // https://app.asana.com/0/1201037661562251/1202055908401751/f
-        guard NSWorkspace.shared.urlForApplication(toOpen: url) != nil else {
-            return false
-        }
-        self.view.makeMeFirstResponder()
-
-        return true
     }
 
     func tabPageDOMLoaded(_ tab: Tab) {

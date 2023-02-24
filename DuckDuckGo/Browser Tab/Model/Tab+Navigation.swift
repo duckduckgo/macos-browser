@@ -31,11 +31,19 @@ extension Tab: NavigationResponder {
     func setupNavigationDelegate() {
         navigationDelegate.setResponders(
             .weak(self),
+            .weak(nullable: self.externalAppSchemeHandler),
 
             .weak(nullable: self.downloads),
 
             .weak(nullable: self.adClickAttribution),
+
+            .weak(nullable: self.privacyDashboard),
+            .weak(nullable: self.httpsUpgrade),
+
             .struct(SerpHeadersNavigationResponder()),
+
+            .weak(nullable: self.fbProtection),
+            .weak(nullable: self.contentBlockingAndSurrogates),
 
             // should be the last, for Unit Tests navigation events tracking
             .struct(nullable: testsClosureNavigationResponder)

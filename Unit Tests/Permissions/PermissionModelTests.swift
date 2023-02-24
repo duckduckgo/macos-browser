@@ -299,7 +299,7 @@ final class PermissionModelTests: XCTestCase {
         XCTAssertEqual(model.permissions, [:])
     }
 
-    func testWhenExternalSchemePermissionQueryIsResetThenItDoesNotTriggerDecisionHandler() {
+    func testWhenExternalSchemePermissionQueryIsResetThenItTriggersDecisionHandler() {
         let c = model.$authorizationQuery.sink {
             if $0 != nil {
                 self.model!.tabDidStartNavigation()
@@ -307,8 +307,7 @@ final class PermissionModelTests: XCTestCase {
         }
 
         let e = expectation(description: "Permission granted")
-        e.isInverted = true
-        model.permissions([.externalScheme(scheme: "mailto")], requestedForDomain: "test@example.com") { _ in
+        model.permissions([.externalScheme(scheme: "mailto")], requestedForDomain: "test@example.com") { (_: Bool) in
             e.fulfill()
         }
 
@@ -749,7 +748,6 @@ final class PermissionModelTests: XCTestCase {
         permissionManagerMock.setPermission(.allow, forDomain: URL.duckDuckGo.host!, permissionType: .externalScheme(scheme: "asdf"))
 
         webView.urlValue = URL.duckDuckGo
-        model.permissions.popups.popupOpened(nextQuery: nil)
         model.revoke(.popups)
 
         XCTAssertEqual(permissionManagerMock.permission(forDomain: URL.duckDuckGo.host!, permissionType: .popups),
@@ -765,8 +763,6 @@ final class PermissionModelTests: XCTestCase {
         permissionManagerMock.setPermission(.allow, forDomain: URL.duckDuckGo.host!, permissionType: .externalScheme(scheme: "sdfg"))
 
         webView.urlValue = URL.duckDuckGo
-        model.permissions[.externalScheme(scheme: "asdf")].externalSchemeOpened()
-        model.permissions[.externalScheme(scheme: "sdfg")].externalSchemeOpened()
 
         model.revoke(.externalScheme(scheme: "asdf"))
 
