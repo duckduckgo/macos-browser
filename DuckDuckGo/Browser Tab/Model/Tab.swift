@@ -307,11 +307,13 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             .eraseToAnyPublisher()
 
         let userContentControllerPromise = Future<UserContentController, Never>.promise()
+        let webViewPromise = Future<WKWebView, Never>.promise()
         self.extensions = extensionsBuilder
             .build(with: (tabIdentifier: instrumentation.currentTabIdentifier,
                           userScriptsPublisher: userScriptsPublisher,
                           inheritedAttribution: parentTab?.adClickAttribution?.currentAttributionState,
                           userContentControllerFuture: userContentControllerPromise.future,
+                          webViewFuture: webViewPromise.future,
                           permissionModel: permissions,
                           isChildTab: parentTab != nil),
                    dependencies: ExtensionDependencies(privacyFeatures: privacyFeatures,
@@ -326,6 +328,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         setupNavigationDelegate()
         userContentController?.delegate = self
         setupWebView(shouldLoadInBackground: shouldLoadInBackground)
+        webViewPromise.fulfill(webView)
 
         if favicon == nil {
             handleFavicon()
