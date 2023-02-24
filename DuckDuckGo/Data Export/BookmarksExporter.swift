@@ -71,9 +71,9 @@ extension BookmarksExporter {
         </HTML>
         """
 
-        static func bookmark(level: Int, title: String, url: URL, isFavorite: Bool = false) -> String {
+        static func bookmark(level: Int, title: String, url: String, isFavorite: Bool = false) -> String {
             """
-            \(String.indent(by: level))<DT><A HREF="\(url.absoluteString)"\(isFavorite ? " duckduckgo:favorite=\"true\"" : "")>\(title)</A>
+            \(String.indent(by: level))<DT><A HREF="\(url)"\(isFavorite ? " duckduckgo:favorite=\"true\"" : "")>\(title)</A>
 
             """
         }

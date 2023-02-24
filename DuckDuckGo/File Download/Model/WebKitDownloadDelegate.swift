@@ -16,33 +16,11 @@
 //  limitations under the License.
 //
 
-import Foundation
+import WebKit
 
-@objc enum WebKitDownloadRedirectPolicy: Int {
-    case cancel
-    case allow
-}
+@available(macOS 11.3, *)
+@objc protocol WebKitDownloadDelegate: WKDownloadDelegate {
 
-@objc protocol WebKitDownloadDelegate: AnyObject {
-
-    func download(_ download: WebKitDownload,
-                  decideDestinationUsing response: URLResponse?,
-                  suggestedFilename: String,
-                  completionHandler: @escaping (URL?) -> Void)
-
-    func download(_ download: WebKitDownload,
-                  willPerformHTTPRedirection response: HTTPURLResponse,
-                  newRequest request: URLRequest,
-                  decisionHandler: @escaping (WebKitDownloadRedirectPolicy) -> Void)
-
-    func download(_ download: WebKitDownload,
-                  didReceive challenge: URLAuthenticationChallenge,
-                  completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void)
-
-    func downloadDidFinish(_ download: WebKitDownload)
-
-    func download(_ download: WebKitDownload, didFailWithError error: Error, resumeData: Data?)
-
-    func download(_ download: WebKitDownload, didReceiveData length: UInt64)
+    func download(_ download: WKDownload, didReceiveDataWithLength length: UInt64)
 
 }

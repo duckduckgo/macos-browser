@@ -31,7 +31,7 @@ final class WindowManagerStateRestorationTests: XCTestCase {
     func isTab(_ a: Tab, equalTo b: Tab) -> Bool {
         a.url == b.url
         && a.title == b.title
-        && a.interactionStateData == b.interactionStateData
+        && a.getActualInteractionStateData() == b.getActualInteractionStateData()
         && a.webView.configuration.websiteDataStore.isPersistent == b.webView.configuration.websiteDataStore.isPersistent
     }
 
@@ -50,13 +50,11 @@ final class WindowManagerStateRestorationTests: XCTestCase {
         let tabs1 = [
             Tab(content: .url(URL(string: "https://duckduckgo.com")!),
                 title: "DDG",
-                error: nil,
                 interactionStateData: "data".data(using: .utf8)!,
                 shouldLoadInBackground: false),
             Tab(),
             Tab(content: .url(URL(string: "https://duckduckgo.com/?q=search&t=osx&ia=web")!),
                 title: "DDG search",
-                error: nil,
                 interactionStateData: "data 2".data(using: .utf8)!,
                 shouldLoadInBackground: false)
         ]
@@ -65,7 +63,6 @@ final class WindowManagerStateRestorationTests: XCTestCase {
             Tab(),
             Tab(content: .url(URL(string: "https://duckduckgo.com/?q=another_search&t=osx&ia=web")!),
                 title: "DDG search",
-                error: nil,
                 interactionStateData: "data 3".data(using: .utf8)!,
                 shouldLoadInBackground: false)
         ]
@@ -74,7 +71,6 @@ final class WindowManagerStateRestorationTests: XCTestCase {
             Tab(content: .url(URL(string: "https://wikipedia.org")!)),
             Tab(content: .url(URL(string: "https://duckduckgo.com/?q=search_in_pinned_tab&t=osx&ia=web")!),
                 title: "DDG search",
-                error: nil,
                 interactionStateData: "data 4".data(using: .utf8)!,
                 shouldLoadInBackground: false)
         ]

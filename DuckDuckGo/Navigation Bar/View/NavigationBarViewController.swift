@@ -77,7 +77,7 @@ final class NavigationBarViewController: NSViewController {
     private var credentialsToSaveCancellable: AnyCancellable?
     private var passwordManagerNotificationCancellable: AnyCancellable?
     private var pinnedViewsNotificationCancellable: AnyCancellable?
-    private var navigationButtonsCancellable: AnyCancellable?
+    private var navigationButtonsCancellables = Set<AnyCancellable>()
     private var downloadsCancellables = Set<AnyCancellable>()
 
     required init?(coder: NSCoder) {
@@ -142,10 +142,6 @@ final class NavigationBarViewController: NSViewController {
         }
     }
 
-    func windowDidBecomeMain() {
-        updateNavigationButtons()
-    }
-
     @IBSegueAction func createAddressBarViewController(_ coder: NSCoder) -> AddressBarViewController? {
         guard let addressBarViewController = AddressBarViewController(coder: coder,
                                                                       tabCollectionViewModel: tabCollectionViewModel) else {
@@ -163,6 +159,8 @@ final class NavigationBarViewController: NSViewController {
         }
 
         if NSApp.isCommandPressed,
+           // don‘t open a new tab when the window is cmd-clicked in background
+           sender.window?.isKeyWindow == true && NSApp.isActive,
            let backItem = selectedTabViewModel.tab.webView.backForwardList.backItem {
             openNewChildTab(with: backItem.url)
         } else {
@@ -177,6 +175,8 @@ final class NavigationBarViewController: NSViewController {
         }
 
         if NSApp.isCommandPressed,
+           // don‘t open a new tab when the window is cmd-clicked in background
+           sender.window?.isKeyWindow == true && NSApp.isActive,
            let forwardItem = selectedTabViewModel.tab.webView.backForwardList.forwardItem {
             openNewChildTab(with: forwardItem.url)
         } else {
@@ -574,40 +574,36 @@ final class NavigationBarViewController: NSViewController {
     }
 
     private func subscribeToNavigationActionFlags() {
-        navigationButtonsCancellable = nil
+        navigationButtonsCancellables.removeAll()
+        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else { return }
 
-        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            goBackButton.isEnabled = false
-            goForwardButton.isEnabled = false
-            refreshOrStopButton.isEnabled = false
-            return
-        }
+        selectedTabViewModel.$canGoBack
+            .removeDuplicates()
+            .assign(to: \.isEnabled, onWeaklyHeld: goBackButton)
+            .store(in: &navigationButtonsCancellables)
 
-        navigationButtonsCancellable = Publishers.MergeMany(
-            selectedTabViewModel.$canGoBack.removeDuplicates(),
-            selectedTabViewModel.$canGoForward.removeDuplicates(),
-            selectedTabViewModel.$canReload.removeDuplicates(),
-            selectedTabViewModel.$isLoading.removeDuplicates()
-        )
-        .asVoid()
-        .receive(on: DispatchQueue.main)
-        .sink { [weak self] in
-            self?.updateNavigationButtons()
-        }
+        selectedTabViewModel.$canGoForward
+            .removeDuplicates()
+            .assign(to: \.isEnabled, onWeaklyHeld: goForwardButton)
+            .store(in: &navigationButtonsCancellables)
+
+        Publishers.CombineLatest(selectedTabViewModel.$canReload, selectedTabViewModel.$isLoading)
+            .map({
+                $0.canReload || $0.isLoading
+            } as ((canReload: Bool, isLoading: Bool)) -> Bool)
+            .removeDuplicates()
+            .assign(to: \.isEnabled, onWeaklyHeld: refreshOrStopButton)
+            .store(in: &navigationButtonsCancellables)
+
+        selectedTabViewModel.$isLoading
+            .removeDuplicates()
+            .sink { [weak refreshOrStopButton] isLoading in
+                refreshOrStopButton?.image = isLoading ? NSImage(named: "Stop") : NSImage(named: "Refresh")
+                refreshOrStopButton?.toolTip = isLoading ? UserText.stopLoadingTooltip : UserText.refreshPageTooltip
+            }
+            .store(in: &navigationButtonsCancellables)
     }
 
-    private func updateNavigationButtons() {
-        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("%s: Selected tab view model is nil", type: .error, className)
-            return
-        }
-
-        goBackButton.isEnabled = selectedTabViewModel.canGoBack
-        goForwardButton.isEnabled = selectedTabViewModel.canGoForward
-        refreshOrStopButton.isEnabled = selectedTabViewModel.canReload || selectedTabViewModel.isLoading
-        refreshOrStopButton.image = selectedTabViewModel.isLoading ? NSImage(imageLiteralResourceName: "Stop") : NSImage(imageLiteralResourceName: "Refresh")
-        refreshOrStopButton.toolTip = selectedTabViewModel.isLoading ? UserText.stopLoadingTooltip : UserText.refreshPageTooltip
-    }
 }
 
 extension NavigationBarViewController: MouseOverViewDelegate {

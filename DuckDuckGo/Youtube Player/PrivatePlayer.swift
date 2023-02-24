@@ -16,10 +16,11 @@
 //  limitations under the License.
 //
 
-import Foundation
-import Combine
-import WebKit
 import BrowserServicesKit
+import Combine
+import Foundation
+import Navigation
+import WebKit
 
 extension NSImage {
     static let privatePlayer: NSImage = #imageLiteral(resourceName: "PrivatePlayer")
@@ -127,32 +128,34 @@ final class PrivatePlayer {
 
 extension PrivatePlayer {
 
-    func decidePolicy(for navigationAction: WKNavigationAction, in tab: Tab) -> WKNavigationActionPolicy? {
+    func decidePolicy(for navigationAction: NavigationAction, in tab: Tab) -> NavigationActionPolicy? {
         guard isAvailable, mode != .disabled else {
 
             // When the feature is disabled but the webView still gets a Private Player URL,
             // convert it back to a regular YouTube video URL.
-            if navigationAction.request.url?.isPrivatePlayerScheme == true,
-                let (videoID, timestamp) = navigationAction.request.url?.youtubeVideoParams {
+            if navigationAction.url.isPrivatePlayerScheme,
+                let (videoID, timestamp) = navigationAction.url.youtubeVideoParams {
 
-                tab.webView.load(.youtube(videoID, timestamp: timestamp))
+                tab.webView.load(URLRequest(url: .youtube(videoID, timestamp: timestamp)))
                 return .cancel
             }
             return nil
         }
 
         // Don't allow loading Private Player HTML directly
-        if navigationAction.request.url?.path == YoutubePlayerNavigationHandler.htmlTemplatePath {
+        if navigationAction.url.path == YoutubePlayerNavigationHandler.htmlTemplatePath {
             return .cancel
         }
 
         // Always allow loading Private Player URLs (local HTML)
-        if navigationAction.request.url?.isPrivatePlayerScheme == true {
+        if navigationAction.url.isPrivatePlayerScheme {
             return .allow
         }
 
         // We only care about YouTube video URLs loaded into main frame or within a Private Player
-        guard navigationAction.isTargetingMainFrame || tab.content.isPrivatePlayer, navigationAction.request.url?.isYoutubeVideo == true else {
+        guard navigationAction.isForMainFrame || tab.content.isPrivatePlayer,
+              navigationAction.url.isYoutubeVideo
+        else {
             return nil
         }
 
@@ -167,10 +170,12 @@ extension PrivatePlayer {
             return .cancel
         }
 
-        let didSelectRecommendationFromPrivatePlayer = tab.content.isPrivatePlayer && navigationAction.request.url?.isYoutubeVideoRecommendation == true
+        let didSelectRecommendationFromPrivatePlayer = tab.content.isPrivatePlayer && navigationAction.url.isYoutubeVideoRecommendation
 
         // Recommendations must always be opened in Private Player.
-        guard alwaysOpenInPrivatePlayer || didSelectRecommendationFromPrivatePlayer, let (videoID, timestamp) = navigationAction.request.url?.youtubeVideoParams else {
+        guard alwaysOpenInPrivatePlayer || didSelectRecommendationFromPrivatePlayer,
+              let (videoID, timestamp) = navigationAction.url.youtubeVideoParams
+        else {
             return nil
         }
 
@@ -181,14 +186,14 @@ extension PrivatePlayer {
 
         // Otherwise load priate player unless it's already loaded.
         guard case .privatePlayer(let currentVideoID, _) = tab.content, currentVideoID == videoID, tab.webView.url?.isPrivatePlayer == true else {
-            tab.webView.load(.privatePlayer(videoID, timestamp: timestamp))
+            tab.webView.load(URLRequest(url: .privatePlayer(videoID, timestamp: timestamp)))
             return .cancel
         }
         return nil
     }
 
-    private func isGoingBackFromPrivatePlayerToYoutubeVideo(for navigationAction: WKNavigationAction, in tab: Tab) -> Bool {
-        guard navigationAction.navigationType == .backForward,
+    private func isGoingBackFromPrivatePlayerToYoutubeVideo(for navigationAction: NavigationAction, in tab: Tab) -> Bool {
+        guard navigationAction.navigationType.isBackForward,
               let url = tab.webView.backForwardList.currentItem?.url,
               let forwardURL = tab.webView.backForwardList.forwardItem?.url
         else {
@@ -213,7 +218,7 @@ extension PrivatePlayer {
     func image(for bookmark: Bookmark) -> NSImage? {
         // Bookmarks to Duck Player pages retain duck:// URL even when Duck Player is disabled,
         // so we keep the Duck Player favicon even if Duck Player is currently disabled
-        return bookmark.url.isPrivatePlayerScheme ? .privatePlayer : nil
+        return (bookmark.urlObject?.isPrivatePlayerScheme ?? false) ? .privatePlayer : nil
     }
 
     func domainForRecentlyVisitedSite(with url: URL) -> String? {
@@ -343,7 +348,7 @@ extension PrivatePlayer {
         if tab.webView.canGoBack {
             _ = tab.webView.goBack()
         }
-        tab.webView.load(url)
+        tab.webView.load(URLRequest(url: url))
 
         return true
     }
