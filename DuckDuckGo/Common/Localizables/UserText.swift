@@ -263,6 +263,7 @@ struct UserText {
     static let settings = NSLocalizedString("settings", value: "Settings", comment: "Menu item for opening settings")
 
     static let general = NSLocalizedString("preferences.general", value: "General", comment: "Show general preferences")
+    static let sync = NSLocalizedString("preferences.sync", value: "Sync", comment: "Show sync preferences")
     static let defaultBrowser = NSLocalizedString("preferences.default-browser", value: "Default Browser", comment: "Show default browser preferences")
     static let appearance = NSLocalizedString("preferences.appearance", value: "Appearance", comment: "Show appearance preferences")
     static let privacy = NSLocalizedString("preferences.privacy", value: "Privacy", comment: "Show privacy browser preferences")
@@ -306,6 +307,12 @@ struct UserText {
     }
 
     static let privacyPolicy = NSLocalizedString("preferences.about.privacy-policy", value: "Privacy Policy", comment: "Link to privacy policy page")
+
+    // MARK: - Sync
+
+    static let syncSetupExplanation = NSLocalizedString("preferences.sync.setup-explanation", value: "Sync your bookmarks across your devices and save an encrypted backup on DuckDuckGo’s servers.", comment: "Sync setup explanation")
+    static let turnOnSync = NSLocalizedString("preferences.sync.turn-on", value: "Turn on Sync...", comment: "Enable sync button caption")
+    static let recoverSyncedData = NSLocalizedString("preferences.sync.recover", value: "Recover synced data with backup code", comment: "Caption for a button to recover synced data")
 
     // MARK: - Login Import & Export
 

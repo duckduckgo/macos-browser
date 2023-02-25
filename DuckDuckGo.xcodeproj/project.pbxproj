@@ -939,6 +939,8 @@
 		376E2D282942843D001CD31B /* privacy-reference-tests in Resources */ = {isa = PBXBuildFile; fileRef = 31E163BF293A581900963C10 /* privacy-reference-tests */; };
 		376E2D29294286B8001CD31B /* PixelEventTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BC2621C293996410087A482 /* PixelEventTests.swift */; };
 		37716D8029707E5D00A9FC6D /* FireproofingReferenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 310E79BE294A19A8007C49E8 /* FireproofingReferenceTests.swift */; };
+		3775912A29AAC41400E26367 /* PreferencesSyncView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3775912929AAC41400E26367 /* PreferencesSyncView.swift */; };
+		3775912B29AAC41400E26367 /* PreferencesSyncView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3775912929AAC41400E26367 /* PreferencesSyncView.swift */; };
 		3776582D27F71652009A6B35 /* WebsiteBreakageReportTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3776582C27F71652009A6B35 /* WebsiteBreakageReportTests.swift */; };
 		3776582F27F82E62009A6B35 /* AutofillPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3776582E27F82E62009A6B35 /* AutofillPreferences.swift */; };
 		3776583127F8325B009A6B35 /* AutofillPreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3776583027F8325B009A6B35 /* AutofillPreferencesTests.swift */; };
@@ -1895,6 +1897,7 @@
 		376CC8B4296EB630006B63A7 /* AppStore.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = AppStore.xcconfig; sourceTree = "<group>"; };
 		376CC8B5296EBA8F006B63A7 /* AppStoreBuildNumber.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = AppStoreBuildNumber.xcconfig; sourceTree = "<group>"; };
 		37717E66296B5A20002FAEDF /* Global.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Global.xcconfig; sourceTree = "<group>"; };
+		3775912929AAC41400E26367 /* PreferencesSyncView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesSyncView.swift; sourceTree = "<group>"; };
 		3776582C27F71652009A6B35 /* WebsiteBreakageReportTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebsiteBreakageReportTests.swift; sourceTree = "<group>"; };
 		3776582E27F82E62009A6B35 /* AutofillPreferences.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AutofillPreferences.swift; sourceTree = "<group>"; };
 		3776583027F8325B009A6B35 /* AutofillPreferencesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutofillPreferencesTests.swift; sourceTree = "<group>"; };
@@ -3243,6 +3246,7 @@
 				37AFCE8627DA334800471A10 /* PreferencesRootView.swift */,
 				37AFCE8427DA2D3900471A10 /* PreferencesSidebar.swift */,
 				37AFCE8A27DB69BC00471A10 /* PreferencesGeneralView.swift */,
+				3775912929AAC41400E26367 /* PreferencesSyncView.swift */,
 				37D2771427E870D4003365FD /* PreferencesAppearanceView.swift */,
 				37CC53EB27E8A4D10028713D /* PreferencesPrivacyView.swift */,
 				37F19A6428E1B3FB00740DC6 /* PreferencesPrivatePlayerView.swift */,
@@ -6395,6 +6399,7 @@
 				3706FB50293F65D500E42796 /* SafariFaviconsReader.swift in Sources */,
 				3706FB51293F65D500E42796 /* NSScreenExtension.swift in Sources */,
 				3706FB52293F65D500E42796 /* NSBezierPathExtension.swift in Sources */,
+				3775912B29AAC41400E26367 /* PreferencesSyncView.swift in Sources */,
 				3706FB53293F65D500E42796 /* WebsiteDataStore.swift in Sources */,
 				3706FB54293F65D500E42796 /* PermissionContextMenu.swift in Sources */,
 				3706FB55293F65D500E42796 /* ContextMenuUserScript.swift in Sources */,
@@ -7347,6 +7352,7 @@
 				AA61C0D22727F59B00E6B681 /* ArrayExtension.swift in Sources */,
 				AAC30A2C268F1ECD00D2D9CD /* CrashReportSender.swift in Sources */,
 				373A1AB02842C4EA00586521 /* BookmarkHTMLImporter.swift in Sources */,
+				3775912A29AAC41400E26367 /* PreferencesSyncView.swift in Sources */,
 				31C3CE0228EDC1E70002C24A /* CustomRoundedCornersShape.swift in Sources */,
 				4B8D9062276D1D880078DB17 /* LocaleExtension.swift in Sources */,
 				4BE4005527CF3F19007D3161 /* SavePaymentMethodViewController.swift in Sources */,

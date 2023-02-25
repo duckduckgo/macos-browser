@@ -44,6 +44,8 @@ extension Preferences {
                             switch model.selectedPane {
                             case .general:
                                 GeneralView(defaultBrowserModel: DefaultBrowserPreferences(), startupModel: StartupPreferences())
+                            case .sync:
+                                SyncView()
                             case .appearance:
                                 AppearanceView(model: .shared)
                             case .privacy:
