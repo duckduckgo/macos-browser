@@ -67,6 +67,11 @@ struct SyncNewDeviceView: View {
 
 private struct CopyPasteButtonStyle: ButtonStyle {
     @Environment(\.colorScheme) var colorScheme
+    let verticalPadding: CGFloat
+
+    init(verticalPadding: CGFloat = 6.0) {
+        self.verticalPadding = verticalPadding
+    }
 
     func makeBody(configuration: Self.Configuration) -> some View {
 
@@ -76,7 +81,7 @@ private struct CopyPasteButtonStyle: ButtonStyle {
 
         configuration.label
             .padding(.horizontal, 12)
-            .padding(.vertical, 6)
+            .padding(.vertical, verticalPadding)
             .background(
                 RoundedRectangle(cornerRadius: 5, style: .continuous)
                     .fill(color)
@@ -108,13 +113,14 @@ private struct ShowCodeView: View {
                     }
 
                     VStack {
-                        Text("ABCD EFGH IJKL")
+                        SyncKeyView(text: model.syncKey)
 
                         Spacer()
 
                         HStack {
                             Spacer()
                             Button {
+                                NSPasteboard.general.clearContents()
                                 NSPasteboard.general.setString(model.syncKey, forType: .string)
                             } label: {
                                 HStack {
@@ -142,19 +148,61 @@ private struct EnterCodeView: View {
                 Text(UserText.syncNewDeviceEnterCodeInstructions)
                     .multilineTextAlignment(.center)
 
-                Spacer()
+                Outline {
+                    SyncKeyView(text: model.syncKey)
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 10)
+                }
+                .frame(maxWidth: 244)
 
                 Button {
-                    print("paste")
+                    if let string = NSPasteboard.general.string(forType: .string) {
+                        model.syncKey = string
+                    }
                 } label: {
                     HStack {
                         Image("Paste")
                         Text(UserText.pasteFromClipboard)
                     }
                 }
-                .buttonStyle(CopyPasteButtonStyle())
+                .buttonStyle(CopyPasteButtonStyle(verticalPadding: 8.0))
             }
             .padding(20)
         }
+    }
+}
+
+struct SyncKeyView: View {
+    let text: String
+
+    var body: some View {
+        VStack(spacing: 6) {
+            ForEach(Array(paddedText.prefix(64)).chunked(into: 16)) { rowChunk in
+                HStack {
+                    Text(String(rowChunk[0..<4]))
+                        .font(.system(size: 15, weight: .semibold).monospaced())
+                    Spacer()
+                    Text(String(rowChunk[4..<8]))
+                        .font(.system(size: 15, weight: .semibold).monospaced())
+                    Spacer()
+                    Text(String(rowChunk[8..<12]))
+                        .font(.system(size: 15, weight: .semibold).monospaced())
+                    Spacer()
+                    Text(String(rowChunk[12..<16]))
+                        .font(.system(size: 15, weight: .semibold).monospaced())
+                }
+                .frame(maxWidth: .infinity)
+            }
+        }
+    }
+
+    private var paddedText: String {
+        text.count > 64 ? String(text.prefix(63) + "…") : String(text.padding(toLength: 64, withPad: " ", startingAt: 0))
+    }
+}
+
+extension Array: Identifiable where Element == Character {
+    public var id: String {
+        String(self)
     }
 }
