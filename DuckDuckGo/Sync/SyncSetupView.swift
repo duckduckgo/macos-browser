@@ -29,6 +29,8 @@ struct SyncSetupView: View {
             SyncAnotherDeviceView().environmentObject(model)
         case .syncNewDevice:
             SyncNewDeviceView().environmentObject(model)
+        case .deviceSynced:
+            SyncSetupCompleteView().environmentObject(model)
         default:
             EmptyView()
         }

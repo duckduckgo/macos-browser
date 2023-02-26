@@ -343,6 +343,10 @@ struct UserText {
     static let syncNewDeviceShowCodeInstructions = NSLocalizedString("prefrences.sync.sync-new-device-show-code-instructions", value: "Go to Settings > Sync in the DuckDuckGo App on a different device and select Scan or Manually Enter Code to sync.", comment: "Instructions for adding a new device to sync")
     static let syncNewDeviceEnterCodeInstructions = NSLocalizedString("prefrences.sync.sync-new-device-enter-code-instructions", value: "Enter the code on your Recovery PDF, or another synced device, to recover your synced data.", comment: "Instructions for adding a new device to sync")
 
+    static let deviceSynced = NSLocalizedString("prefrences.sync.device-synced", value: "Device Synced!", comment: "Sync setup dialog title")
+    static let deviceSyncedExplanation = NSLocalizedString("prefrences.sync.device-synced-explanation", value: "Your bookmarks are now syncing with this device.", comment: "Sync setup completion confirmation")
+
+
     // MARK: - Login Import & Export
 
     static let safariPreferences = NSLocalizedString("import.logins.safari.preferences", value: "Preferences", comment: "Title of the Safari Preferences menu (up to and including macOS 12)")

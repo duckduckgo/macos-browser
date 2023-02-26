@@ -164,7 +164,7 @@ struct Outline<Content>: View where Content: View {
     }
 }
 
-private struct SyncPreferencesRow<ImageContent, CenterContent, RightContent>: View where ImageContent: View, CenterContent: View, RightContent: View {
+struct SyncPreferencesRow<ImageContent, CenterContent, RightContent>: View where ImageContent: View, CenterContent: View, RightContent: View {
     @ViewBuilder let imageContent: () -> ImageContent
     @ViewBuilder let centerContent: () -> CenterContent
     @ViewBuilder let rightContent: () -> RightContent
@@ -249,7 +249,7 @@ private struct SyncedDevicesView: View {
     }
 }
 
-private struct SyncedDeviceIcon: View {
+struct SyncedDeviceIcon: View {
     var kind: SyncedDevice.Kind
 
     var image: NSImage {

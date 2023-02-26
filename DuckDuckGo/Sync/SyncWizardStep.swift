@@ -45,8 +45,8 @@ struct SyncWizardStep<Content, Buttons>: View where Content: View, Buttons: View
             }
             .padding(.horizontal, 20)
         }
-        .padding(.vertical, 16)
-        .frame(minWidth: 360, minHeight: 314)
+        .padding(.vertical, spacing)
+        .frame(minWidth: 360, minHeight: 298, idealHeight: 314)
 
     }
 }

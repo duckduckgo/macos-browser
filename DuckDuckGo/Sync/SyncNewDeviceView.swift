@@ -56,7 +56,7 @@ struct SyncNewDeviceView: View {
                     model.onCancel()
                 }
                 Button(UserText.submit) {
-                    print("submit")
+                    model.flowState = .deviceSynced
                 }
                 .buttonStyle(.borderedProminent)
             }
