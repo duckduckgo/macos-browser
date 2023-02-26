@@ -89,8 +89,8 @@ extension Preferences {
     }
 }
 
-private struct SyncStatusView: View {
-    @EnvironmentObject var model: SyncPreferences
+private struct Outline<Content>: View where Content: View {
+    @ViewBuilder let content: () -> Content
 
     var body: some View {
         ZStack {
@@ -99,16 +99,54 @@ private struct SyncStatusView: View {
             RoundedRectangle(cornerRadius: 8)
                 .fill(Color(nsColor: .quaternaryLabelColor))
 
-            HStack(spacing: 12) {
+            content()
+        }
+    }
+}
+
+private struct SyncPreferencesRow<ImageContent, CenterContent, RightContent>: View where ImageContent: View, CenterContent: View, RightContent: View {
+    @ViewBuilder let imageContent: () -> ImageContent
+    @ViewBuilder let centerContent: () -> CenterContent
+    @ViewBuilder let rightContent: () -> RightContent
+
+    init(
+        imageContent: @escaping () -> ImageContent,
+        centerContent: @escaping () -> CenterContent,
+        rightContent: @escaping () -> RightContent = { EmptyView() }
+    ) {
+        self.imageContent = imageContent
+        self.centerContent = centerContent
+        self.rightContent = rightContent
+    }
+
+    var body: some View {
+        HStack(spacing: 12) {
+            imageContent()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: 24, height: 24)
+            centerContent()
+            Spacer()
+            rightContent()
+        }
+        .padding(.horizontal, 10)
+        .frame(minHeight: 40)
+    }
+}
+
+private struct SyncStatusView: View {
+    @EnvironmentObject var model: SyncPreferences
+
+    var body: some View {
+        Outline {
+            SyncPreferencesRow {
                 Image("SolidCheckmark")
+            } centerContent: {
                 Text(UserText.syncConnected)
-                Spacer()
+            } rightContent: {
                 Button(UserText.turnOffSync) {
                     model.isEnabled = false
                 }
             }
-            .padding(.horizontal, 10)
-            .frame(minHeight: 40)
         }
     }
 }
@@ -117,11 +155,7 @@ private struct SyncedDevicesView: View {
     @EnvironmentObject var model: SyncPreferences
 
     var body: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: 8)
-                .stroke(Color(nsColor: .tertiaryLabelColor), lineWidth: 1)
-            RoundedRectangle(cornerRadius: 8)
-                .fill(Color(nsColor: .quaternaryLabelColor))
+        Outline {
 
             VStack(spacing: 0) {
                 ForEach(model.syncedDevices) { device in
@@ -131,24 +165,26 @@ private struct SyncedDevicesView: View {
                             .frame(height: 1)
                             .padding(.init(top: 0, leading: 10, bottom: 0, trailing: 10))
                     }
-                    ZStack {
-                        HStack(spacing: 12) {
+
+                    if device.isCurrent {
+                        SyncPreferencesRow {
                             SyncedDeviceIcon(kind: device.kind)
+                        } centerContent: {
                             Text(device.name)
-
-                            Spacer()
-
-                            if device.isCurrent {
-                                Button(UserText.currentDeviceDetails) {
-                                    print("details")
-                                }
+                        } rightContent: {
+                            Button(UserText.currentDeviceDetails) {
+                                print("details")
                             }
                         }
-                        .padding(10)
+                    } else {
+                        SyncPreferencesRow {
+                            SyncedDeviceIcon(kind: device.kind)
+                        } centerContent: {
+                            Text(device.name)
+                        }
                     }
                 }
             }
-
         }
     }
 }
@@ -174,5 +210,12 @@ private struct SyncedDeviceIcon: View {
             Image(nsImage: image)
                 .aspectRatio(contentMode: .fit)
         }
+    }
+}
+
+private struct SyncNewDeviceView: View {
+
+    var body: some View {
+        EmptyView()
     }
 }

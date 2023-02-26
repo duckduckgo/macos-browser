@@ -24,8 +24,12 @@ final class SyncPreferences: ObservableObject {
 
     @Published var syncedDevices: [SyncedDevice] = [
         .init(kind: .current, name: "Work Laptop", id: UUID().uuidString),
-        .init(kind: .mobile, name: "Dave's iPhone 14", id: UUID().uuidString)
+        .init(kind: .mobile, name: "Dave's iPhone 14", id: UUID().uuidString),
+        .init(kind: .desktop, name: "Home Laptop", id: UUID().uuidString),
+        .init(kind: .desktop, name: "Home Desktop", id: UUID().uuidString)
     ]
+
+    @Published var syncKey: String = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOA3P8bDu3/wqUk1nng5ZIyUgcQUZmYaFz2Rb8emgJNI test-sync-key"
 }
 
 struct SyncedDevice: Identifiable {
