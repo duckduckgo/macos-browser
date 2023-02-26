@@ -28,6 +28,15 @@
       }
     },
     {
+      "identity" : "efqrcode",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/EFPrefix/EFQRCode.git",
+      "state" : {
+        "revision" : "bebbd09eaf28243ec576f6d53cbf9cc5b10eaffb",
+        "version" : "6.2.1"
+      }
+    },
+    {
       "identity" : "grdb.swift",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/GRDB.swift.git",
@@ -97,6 +106,15 @@
       "state" : {
         "revision" : "6b2aa2748a7881eebb9f84fb10c01293e15b52ca",
         "version" : "0.5.0"
+      }
+    },
+    {
+      "identity" : "swift_qrcodejs",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ApolloZhu/swift_qrcodejs.git",
+      "state" : {
+        "revision" : "374dc7f7b9e76c6aeb393f6a84590c6d387e1ecb",
+        "version" : "2.2.2"
       }
     },
     {

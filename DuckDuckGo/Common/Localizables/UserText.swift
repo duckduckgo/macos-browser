@@ -313,11 +313,17 @@ struct UserText {
     static let syncSetupExplanation = NSLocalizedString("preferences.sync.setup-explanation", value: "Sync your bookmarks across your devices and save an encrypted backup on DuckDuckGo’s servers.", comment: "Sync setup explanation")
     static let turnOnSync = NSLocalizedString("preferences.sync.turn-on", value: "Turn on Sync...", comment: "Enable sync button caption")
     static let turnOffSync = NSLocalizedString("preferences.sync.turn-off", value: "Turn off Sync...", comment: "Disable sync button caption")
+    static let turnOffAndDeleteServerData = NSLocalizedString("preferences.sync.turn-off-and-delete-data", value: "Turn Off and Delete Server Data", comment: "Disable and delete data sync button caption")
     static let recoverSyncedData = NSLocalizedString("preferences.sync.recover", value: "Recover synced data with backup code", comment: "Caption for a button to recover synced data")
     static let syncConnected = NSLocalizedString("preferences.sync.connected", value: "Connected", comment: "Sync state")
     static let syncedDevices = NSLocalizedString("preferences.sync.synced-devices", value: "Synced Devices", comment: "Settings section title")
     static let syncNewDevice = NSLocalizedString("preferences.sync.sync-new-device", value: "Sync New Device", comment: "Settings section title")
     static let currentDeviceDetails = NSLocalizedString("preferences.sync.current-device-details", value: "Details...", comment: "Sync Settings device details button")
+    static let syncNewDeviceInstructions = NSLocalizedString("prefrences.sync.sync-new-device-instructions", value: "Go to Settings > Sync in the DuckDuckGo App on a different device and scan the image on the left to connect instantly.", comment: "Instructions for adding a new device to sync")
+    static let showOrEnterCode = NSLocalizedString("prefrences.sync.show-or-enter-code", value: "Show or Enter Code", comment: "Button caption in Sync's add new device screen")
+    static let recovery = NSLocalizedString("prefrences.sync.recovery", value: "Recovery", comment: "Sync settings section title")
+    static let recoveryInstructions = NSLocalizedString("prefrences.sync.recovery-instructions", value: "If you lose your device, you will need this recovery code to restore your synced data.", comment: "Instructions on how to restore synced data")
+    static let saveRecoveryPDF = NSLocalizedString("prefrences.sync.save-recovery-pdf", value: "Save Recovery PDF", comment: "Caption for a button to save Sync recovery PDF")
 
     // MARK: - Login Import & Export
 

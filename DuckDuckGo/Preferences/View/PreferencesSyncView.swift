@@ -17,6 +17,7 @@
 //
 
 import SwiftUI
+import EFQRCode
 
 extension Preferences {
 
@@ -85,8 +86,67 @@ extension Preferences {
                 SyncedDevicesView()
                     .environmentObject(model)
             }
+
+            Section {
+                Text(UserText.syncNewDevice)
+                    .font(Const.Fonts.preferencePaneSectionHeader)
+
+                SyncNewDeviceView()
+                    .environmentObject(model)
+            }
+
+            Section {
+                Text(UserText.recovery)
+                    .font(Const.Fonts.preferencePaneSectionHeader)
+
+                HStack(alignment: .top, spacing: 12) {
+                    Text(UserText.recoveryInstructions)
+                        .fixMultilineScrollableText()
+                    Spacer()
+                    Button(UserText.saveRecoveryPDF) {
+                        print("save recovery PDF")
+                    }
+                }
+                Button(UserText.turnOffAndDeleteServerData) {
+                    print("turn off and delete server data")
+                }
+            }
         }
     }
+
+    struct SyncNewDeviceView: View {
+        @EnvironmentObject var model: SyncPreferences
+
+        var body: some View {
+            Outline {
+                HStack(alignment: .top, spacing: 20) {
+                    if let image = EFQRCode.generate(for: model.syncKey, size: .init(width: 192, height: 192), backgroundColor: .clear) {
+                        Image(nsImage: .init(cgImage: image, size: .init(width: 192, height: 192)))
+                    } else {
+                        EmptyView()
+                            .frame(width: 192, height: 192)
+                    }
+
+                    VStack {
+                        Text(UserText.syncNewDeviceInstructions)
+                            .fixMultilineScrollableText()
+
+                        Spacer()
+
+                        HStack {
+                            Spacer()
+                            TextButton(UserText.showOrEnterCode) {
+                                print("show or enter code")
+                            }
+                        }
+                    }
+                    .frame(maxHeight: .infinity)
+                }
+                .padding(20)
+            }
+        }
+    }
+
 }
 
 private struct Outline<Content>: View where Content: View {
@@ -210,12 +270,5 @@ private struct SyncedDeviceIcon: View {
             Image(nsImage: image)
                 .aspectRatio(contentMode: .fit)
         }
-    }
-}
-
-private struct SyncNewDeviceView: View {
-
-    var body: some View {
-        EmptyView()
     }
 }
