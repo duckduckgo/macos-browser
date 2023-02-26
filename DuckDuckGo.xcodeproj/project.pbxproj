@@ -921,6 +921,8 @@
 		371E141927E92E42009E3B5B /* MultilineScrollableTextFix.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371E141827E92E42009E3B5B /* MultilineScrollableTextFix.swift */; };
 		372AD54D29AC09AF00DE827B /* SyncSetupCompleteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 372AD54C29AC09AF00DE827B /* SyncSetupCompleteView.swift */; };
 		372AD54E29AC09AF00DE827B /* SyncSetupCompleteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 372AD54C29AC09AF00DE827B /* SyncSetupCompleteView.swift */; };
+		372AD55029AC10EC00DE827B /* SaveRecoveryPDFView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 372AD54F29AC10EC00DE827B /* SaveRecoveryPDFView.swift */; };
+		372AD55129AC10EC00DE827B /* SaveRecoveryPDFView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 372AD54F29AC10EC00DE827B /* SaveRecoveryPDFView.swift */; };
 		373A1AA8283ED1B900586521 /* BookmarkHTMLReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373A1AA7283ED1B900586521 /* BookmarkHTMLReader.swift */; };
 		373A1AAA283ED86C00586521 /* BookmarksHTMLReaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373A1AA9283ED86C00586521 /* BookmarksHTMLReaderTests.swift */; };
 		373A1AB02842C4EA00586521 /* BookmarkHTMLImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373A1AAF2842C4EA00586521 /* BookmarkHTMLImporter.swift */; };
@@ -1900,6 +1902,7 @@
 		371C0A2827E33EDC0070591F /* FeedbackPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackPresenter.swift; sourceTree = "<group>"; };
 		371E141827E92E42009E3B5B /* MultilineScrollableTextFix.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultilineScrollableTextFix.swift; sourceTree = "<group>"; };
 		372AD54C29AC09AF00DE827B /* SyncSetupCompleteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncSetupCompleteView.swift; sourceTree = "<group>"; };
+		372AD54F29AC10EC00DE827B /* SaveRecoveryPDFView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveRecoveryPDFView.swift; sourceTree = "<group>"; };
 		373A1AA7283ED1B900586521 /* BookmarkHTMLReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkHTMLReader.swift; sourceTree = "<group>"; };
 		373A1AA9283ED86C00586521 /* BookmarksHTMLReaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksHTMLReaderTests.swift; sourceTree = "<group>"; };
 		373A1AAF2842C4EA00586521 /* BookmarkHTMLImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkHTMLImporter.swift; sourceTree = "<group>"; };
@@ -3095,6 +3098,7 @@
 				3775914129ABBBF500E26367 /* SyncAnotherDeviceView.swift */,
 				3775914729ABC03700E26367 /* SyncNewDeviceView.swift */,
 				372AD54C29AC09AF00DE827B /* SyncSetupCompleteView.swift */,
+				372AD54F29AC10EC00DE827B /* SaveRecoveryPDFView.swift */,
 			);
 			path = Sync;
 			sourceTree = "<group>";
@@ -6521,6 +6525,7 @@
 				3706FB8E293F65D500E42796 /* FirefoxEncryptionKeyReader.swift in Sources */,
 				3706FB8F293F65D500E42796 /* BookmarkManagementSplitViewController.swift in Sources */,
 				3706FB90293F65D500E42796 /* CookieManagedNotificationContainerView.swift in Sources */,
+				372AD55129AC10EC00DE827B /* SaveRecoveryPDFView.swift in Sources */,
 				3706FB91293F65D500E42796 /* FileManagerExtension.swift in Sources */,
 				3706FB92293F65D500E42796 /* PermissionModel.swift in Sources */,
 				3706FB93293F65D500E42796 /* PasteboardFolder.swift in Sources */,
@@ -7364,6 +7369,7 @@
 				85707F2A276A35FE00DC0649 /* ActionSpeech.swift in Sources */,
 				8585B63826D6E66C00C1416F /* ButtonStyles.swift in Sources */,
 				4B0511BD262CAA5A00F6079C /* PrivacySecurityPreferences.swift in Sources */,
+				372AD55029AC10EC00DE827B /* SaveRecoveryPDFView.swift in Sources */,
 				B6BE9FAA293F7955006363C6 /* ModalSheetCancellable.swift in Sources */,
 				B6830963274CDEC7004B46BB /* FireproofDomainsStore.swift in Sources */,
 				1E7E2E942902AC0E00C01B54 /* PrivacyDashboardPermissionHandler.swift in Sources */,

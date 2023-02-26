@@ -33,7 +33,7 @@ struct SyncWizardStep<Content, Buttons>: View where Content: View, Buttons: View
     var body: some View {
         VStack(spacing: spacing) {
             content()
-                .padding(.horizontal, 20)
+                .padding(.horizontal, 20.0)
 
             Rectangle()
                 .frame(height: 1)
@@ -43,9 +43,9 @@ struct SyncWizardStep<Content, Buttons>: View where Content: View, Buttons: View
                 Spacer()
                 buttons()
             }
-            .padding(.horizontal, 20)
+            .padding(.horizontal, 20.0)
         }
-        .padding(.vertical, spacing)
+        .padding(.vertical, 16.0)
         .frame(minWidth: 360, minHeight: 298, idealHeight: 314)
 
     }

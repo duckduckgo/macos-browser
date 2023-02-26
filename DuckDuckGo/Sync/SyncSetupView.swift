@@ -31,8 +31,8 @@ struct SyncSetupView: View {
             SyncNewDeviceView().environmentObject(model)
         case .deviceSynced:
             SyncSetupCompleteView().environmentObject(model)
-        default:
-            EmptyView()
+        case .saveRecoveryPDF:
+            SaveRecoveryPDFView().environmentObject(model)
         }
     }
 }

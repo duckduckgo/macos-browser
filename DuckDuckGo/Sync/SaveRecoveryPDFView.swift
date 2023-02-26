@@ -1,5 +1,5 @@
 //
-//  SyncSetupCompleteView.swift
+//  SaveRecoveryPDFView.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -18,7 +18,7 @@
 
 import SwiftUI
 
-struct SyncSetupCompleteView: View {
+struct SaveRecoveryPDFView: View {
     @EnvironmentObject var model: SyncSetupViewModel
 
     var device: SyncedDevice {
@@ -26,27 +26,26 @@ struct SyncSetupCompleteView: View {
     }
 
     var body: some View {
-        SyncWizardStep(spacing: 20.0) {
-            VStack(spacing: 20) {
-                Image("SyncSetupComplete")
-                Text(UserText.deviceSynced)
+        SyncWizardStep {
+            VStack(spacing: 20.0) {
+                Image("SyncRecoveryPDF")
+                Text(UserText.saveRecoveryPDF)
                     .font(.system(size: 17, weight: .bold))
-                Text(UserText.deviceSyncedExplanation)
+                Text(UserText.recoveryPDFExplanation1)
                     .multilineTextAlignment(.center)
-
-                Outline {
-                    SyncPreferencesRow {
-                        SyncedDeviceIcon(kind: device.kind)
-                    } centerContent: {
-                        Text(device.name)
-                    }
-                }
+                Text(UserText.recoveryPDFExplanation2)
+                    .multilineTextAlignment(.center)
             }
         } buttons: {
-            Button(UserText.next) {
-                model.flowState = .saveRecoveryPDF
+            Button(UserText.notNow) {
+                model.onCancel()
             }
+            Button(UserText.saveRecoveryPDF) {
+                model.preferences.isEnabled = true
+                model.onCancel()
+            }
+            .buttonStyle(.borderedProminent)
         }
-        .frame(width: 360, height: 298)
+        .frame(height: 314)
     }
 }
