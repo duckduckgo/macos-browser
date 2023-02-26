@@ -28,6 +28,9 @@ struct UserText {
     static let notNow = NSLocalizedString("notnow", value: "Not Now", comment: "Not Now button")
     static let open = NSLocalizedString("open", value: "Open", comment: "Open button")
     static let save = NSLocalizedString("save", value: "Save", comment: "Save button")
+    static let copy = NSLocalizedString("copy", value: "Copy", comment: "Copy button")
+    static let submit = NSLocalizedString("submit", value: "Submit", comment: "Submit button")
+    static let pasteFromClipboard = NSLocalizedString("paste-from-clipboard", value: "Paste from Clipboard", comment: "Paste button")
     static let edit = NSLocalizedString("edit", value: "Edit", comment: "Edit button")
     static let deleteBookmark = NSLocalizedString("delete-bookmark", value: "Delete Bookmark", comment: "Delete Bookmark button")
     static let removeFavorite = NSLocalizedString("remove-favorite", value: "Remove Favorite", comment: "Remove Favorite button")
@@ -311,7 +314,8 @@ struct UserText {
     // MARK: - Sync
 
     static let syncSetupExplanation = NSLocalizedString("preferences.sync.setup-explanation", value: "Sync your bookmarks across your devices and save an encrypted backup on DuckDuckGo’s servers.", comment: "Sync setup explanation")
-    static let turnOnSync = NSLocalizedString("preferences.sync.turn-on", value: "Turn on Sync...", comment: "Enable sync button caption")
+    static let turnOnSync = NSLocalizedString("preferences.sync.turn-on", value: "Turn on Sync", comment: "Enable sync button caption")
+    static let turnOnSyncWithEllipsis = NSLocalizedString("preferences.sync.turn-on-ellipsis", value: "Turn on Sync...", comment: "Enable sync button caption")
     static let turnOffSync = NSLocalizedString("preferences.sync.turn-off", value: "Turn off Sync...", comment: "Disable sync button caption")
     static let turnOffAndDeleteServerData = NSLocalizedString("preferences.sync.turn-off-and-delete-data", value: "Turn Off and Delete Server Data", comment: "Disable and delete data sync button caption")
     static let recoverSyncedData = NSLocalizedString("preferences.sync.recover", value: "Recover synced data with backup code", comment: "Caption for a button to recover synced data")
@@ -324,6 +328,20 @@ struct UserText {
     static let recovery = NSLocalizedString("prefrences.sync.recovery", value: "Recovery", comment: "Sync settings section title")
     static let recoveryInstructions = NSLocalizedString("prefrences.sync.recovery-instructions", value: "If you lose your device, you will need this recovery code to restore your synced data.", comment: "Instructions on how to restore synced data")
     static let saveRecoveryPDF = NSLocalizedString("prefrences.sync.save-recovery-pdf", value: "Save Recovery PDF", comment: "Caption for a button to save Sync recovery PDF")
+
+    static let turnOnSyncQuestion = NSLocalizedString("preferences.sync.turn-on-question", value: "Turn on Sync?", comment: "Sync setup dialog title")
+    static let turnOnSyncExplanation1 = NSLocalizedString("preferences.sync.turn-on-explanation1", value: "This will save an encrypted backup of your bookmarks on DuckDuckGo’s servers, which can be synced with your other devices.", comment: "Sync setup dialog content")
+    static let turnOnSyncExplanation2 = NSLocalizedString("preferences.sync.turn-on-explanation2", value: "The decryption key is stored on your device and cannot be read by DuckDuckGo.", comment: "Sync setup dialog content")
+
+    static let syncAnotherDeviceTitle = NSLocalizedString("preferences.sync.sync-another-device-question", value: "Sync Another Device?", comment: "Sync setup dialog title")
+    static let syncAnotherDeviceExplanation1 = NSLocalizedString("preferences.sync.sync-another-device-explanation1", value: "Your bookmarks will be backed up! Would you like to sync with another device now?", comment: "Sync setup dialog content")
+    static let syncAnotherDeviceExplanation2 = NSLocalizedString("preferences.sync.sync-another-device-explanation2", value: "If you’ve already set up Sync on another device, this will allow you to combine bookmarks from both devices into a single backup.", comment: "Sync setup dialog content")
+    static let syncAnotherDevice = NSLocalizedString("preferences.sync.sync-another-device", value: "Sync Another Device", comment: "Button caption")
+
+    static let showCode = NSLocalizedString("prefrences.sync.show-code", value: "Show Code", comment: "Button caption in Sync's add new device screen")
+    static let enterCode = NSLocalizedString("prefrences.sync.enter-code", value: "Enter Code", comment: "Button caption in Sync's add new device screen")
+    static let syncNewDeviceShowCodeInstructions = NSLocalizedString("prefrences.sync.sync-new-device-show-code-instructions", value: "Go to Settings > Sync in the DuckDuckGo App on a different device and select Scan or Manually Enter Code to sync.", comment: "Instructions for adding a new device to sync")
+    static let syncNewDeviceEnterCodeInstructions = NSLocalizedString("prefrences.sync.sync-new-device-enter-code-instructions", value: "Enter the code on your Recovery PDF, or another synced device, to recover your synced data.", comment: "Instructions for adding a new device to sync")
 
     // MARK: - Login Import & Export
 

@@ -49,8 +49,8 @@ extension Preferences {
                     Text(UserText.syncSetupExplanation)
                         .fixMultilineScrollableText()
                     Spacer()
-                    Button(UserText.turnOnSync) {
-                        model.isEnabled = true
+                    Button(UserText.turnOnSyncWithEllipsis) {
+                        model.presentEnableSyncDialog()
                     }
                 }
             }
@@ -120,7 +120,7 @@ extension Preferences {
         var body: some View {
             Outline {
                 HStack(alignment: .top, spacing: 20) {
-                    if let image = EFQRCode.generate(for: model.syncKey, size: .init(width: 192, height: 192), backgroundColor: .clear) {
+                    if let image = EFQRCode.generate(for: model.syncKey, size: .init(width: 192, height: 192), backgroundColor: .clear, foregroundColor: NSColor(named: "BlackWhite100")!.cgColor) {
                         Image(nsImage: .init(cgImage: image, size: .init(width: 192, height: 192)))
                     } else {
                         EmptyView()
@@ -149,7 +149,7 @@ extension Preferences {
 
 }
 
-private struct Outline<Content>: View where Content: View {
+struct Outline<Content>: View where Content: View {
     @ViewBuilder let content: () -> Content
 
     var body: some View {

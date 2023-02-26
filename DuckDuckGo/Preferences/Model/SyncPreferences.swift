@@ -20,7 +20,7 @@ import Foundation
 
 final class SyncPreferences: ObservableObject {
 
-    @Published var isEnabled: Bool = true
+    @Published var isEnabled: Bool = false
 
     @Published var syncedDevices: [SyncedDevice] = [
         .init(kind: .current, name: "Work Laptop", id: UUID().uuidString),
@@ -29,7 +29,20 @@ final class SyncPreferences: ObservableObject {
         .init(kind: .desktop, name: "Home Desktop", id: UUID().uuidString)
     ]
 
-    @Published var syncKey: String = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOA3P8bDu3/wqUk1nng5ZIyUgcQUZmYaFz2Rb8emgJNI test-sync-key"
+    @Published var syncKey: String = "c3NoLWVkMjU1MTkgQUFBQUMzTnphQzFsWkRJMU5URTVBQUFBSU9BM1A4YkR1My93cVVrMW5uZzVaSXlVZ2NRVVptWWFGejJSYjhlbWdKTkkgdGVzdC1zeW5jLWtleQ=="
+
+    func presentEnableSyncDialog() {
+        let enableSyncWindowController = SyncSetupViewController.create(with: self).wrappedInWindowController()
+
+        guard let enableSyncWindow = enableSyncWindowController.window,
+              let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController
+        else {
+            assertionFailure("Sync: Failed to present EnableSyncViewController")
+            return
+        }
+
+        parentWindowController.window?.beginSheet(enableSyncWindow)
+    }
 }
 
 struct SyncedDevice: Identifiable {
