@@ -312,7 +312,12 @@ struct UserText {
 
     static let syncSetupExplanation = NSLocalizedString("preferences.sync.setup-explanation", value: "Sync your bookmarks across your devices and save an encrypted backup on DuckDuckGo’s servers.", comment: "Sync setup explanation")
     static let turnOnSync = NSLocalizedString("preferences.sync.turn-on", value: "Turn on Sync...", comment: "Enable sync button caption")
+    static let turnOffSync = NSLocalizedString("preferences.sync.turn-off", value: "Turn off Sync...", comment: "Disable sync button caption")
     static let recoverSyncedData = NSLocalizedString("preferences.sync.recover", value: "Recover synced data with backup code", comment: "Caption for a button to recover synced data")
+    static let syncConnected = NSLocalizedString("preferences.sync.connected", value: "Connected", comment: "Sync state")
+    static let syncedDevices = NSLocalizedString("preferences.sync.synced-devices", value: "Synced Devices", comment: "Settings section title")
+    static let syncNewDevice = NSLocalizedString("preferences.sync.sync-new-device", value: "Sync New Device", comment: "Settings section title")
+    static let currentDeviceDetails = NSLocalizedString("preferences.sync.current-device-details", value: "Details...", comment: "Sync Settings device details button")
 
     // MARK: - Login Import & Export
 
