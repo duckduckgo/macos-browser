@@ -27,6 +27,7 @@ enum DataImport {
         case edge
         case firefox
         case safari
+        case onePassword8
         case onePassword7
         case lastPass
         case csv
@@ -50,6 +51,8 @@ enum DataImport {
                 return "LastPass"
             case .onePassword7:
                 return "1Password 7"
+            case .onePassword8:
+                return "1Password"
             case .csv:
                 return UserText.importLoginsCSV
             case .bookmarksHTML:
@@ -73,7 +76,8 @@ enum DataImport {
             case .edge: return .edge
             case .firefox: return .firefox
             case .safari: return .safari
-            case .onePassword7: return .onePassword
+            case .onePassword7: return .onePassword7
+            case .onePassword8: return .onePassword8
             case .lastPass: return .lastPass
             case .csv: return .csv
             case .bookmarksHTML: return .bookmarksHTML
@@ -141,7 +145,7 @@ enum DataImport {
                 self.profiles = profileURLs.map({
                     BrowserProfile.for(browser: .safari, profileURL: $0)
                 }).sorted()
-            case .lastPass, .onePassword7:
+            case .lastPass, .onePassword7, .onePassword8:
                 self.profiles = []
             }
         }
@@ -156,7 +160,7 @@ enum DataImport {
                 return profiles.first { $0.profileName == "Default" } ?? profiles.first
             case .firefox:
                 return profiles.first { $0.profileName == "default-release" } ?? profiles.first
-            case .safari, .lastPass, .onePassword7:
+            case .safari, .lastPass, .onePassword7, .onePassword8:
                 return nil
             }
         }

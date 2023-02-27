@@ -54,7 +54,8 @@ final class FileImportViewController: NSViewController {
 
     @IBOutlet var safariInfoView: NSView!
     @IBOutlet var lastPassInfoView: NSView!
-    @IBOutlet var onePasswordInfoView: NSView!
+    @IBOutlet var onePassword7InfoView: NSView!
+    @IBOutlet var onePassword8InfoView: NSView!
 
     @IBOutlet var safariSettingsTextField: NSTextField!
 
@@ -110,19 +111,29 @@ final class FileImportViewController: NSViewController {
             descriptionLabel.isHidden = true
             safariInfoView.isHidden = false
             lastPassInfoView.isHidden = true
-            onePasswordInfoView.isHidden = true
+            onePassword7InfoView.isHidden = true
+            onePassword8InfoView.isHidden = true
             selectFileButton.title = UserText.importLoginsSelectSafariCSVFile
         case .onePassword7:
             descriptionLabel.isHidden = true
             safariInfoView.isHidden = true
             lastPassInfoView.isHidden = true
-            onePasswordInfoView.isHidden = false
+            onePassword7InfoView.isHidden = false
+            onePassword8InfoView.isHidden = true
+            selectFileButton.title = UserText.importLoginsSelect1PasswordCSVFile
+        case .onePassword8:
+            descriptionLabel.isHidden = true
+            safariInfoView.isHidden = true
+            lastPassInfoView.isHidden = true
+            onePassword7InfoView.isHidden = true
+            onePassword8InfoView.isHidden = false
             selectFileButton.title = UserText.importLoginsSelect1PasswordCSVFile
         case .lastPass:
             descriptionLabel.isHidden = true
             safariInfoView.isHidden = true
             lastPassInfoView.isHidden = false
-            onePasswordInfoView.isHidden = true
+            onePassword7InfoView.isHidden = true
+            onePassword8InfoView.isHidden = true
             selectFileButton.title = UserText.importLoginsSelectLastPassCSVFile
 
         case .brave, .chrome, .edge, .firefox:
@@ -132,13 +143,15 @@ final class FileImportViewController: NSViewController {
             descriptionLabel.isHidden = false
             safariInfoView.isHidden = true
             lastPassInfoView.isHidden = true
-            onePasswordInfoView.isHidden = true
+            onePassword7InfoView.isHidden = true
+            onePassword8InfoView.isHidden = true
             selectFileButton.title = UserText.importLoginsSelectCSVFile
         case .bookmarksHTML:
             descriptionLabel.isHidden = true
             safariInfoView.isHidden = true
             lastPassInfoView.isHidden = true
-            onePasswordInfoView.isHidden = true
+            onePassword7InfoView.isHidden = true
+            onePassword8InfoView.isHidden = true
             selectFileButton.title = UserText.importBookmarksSelectHTMLFile
         }
     }

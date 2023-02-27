@@ -43,6 +43,7 @@ class ThirdPartyBrowserTests: XCTestCase {
         XCTAssertNotNil(ThirdPartyBrowser.browser(for: .firefox))
         XCTAssertNotNil(ThirdPartyBrowser.browser(for: .lastPass))
         XCTAssertNotNil(ThirdPartyBrowser.browser(for: .onePassword7))
+        XCTAssertNotNil(ThirdPartyBrowser.browser(for: .onePassword8))
         XCTAssertNotNil(ThirdPartyBrowser.browser(for: .safari))
 
         XCTAssertNil(ThirdPartyBrowser.browser(for: .csv))

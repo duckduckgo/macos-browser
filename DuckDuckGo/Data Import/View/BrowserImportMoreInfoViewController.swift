@@ -55,7 +55,7 @@ final class BrowserImportMoreInfoViewController: NSViewController {
         case .firefox:
             label.stringValue = UserText.importFromFirefoxMoreInfo
 
-        case .safari, .csv, .lastPass, .onePassword7, .bookmarksHTML:
+        case .safari, .csv, .lastPass, .onePassword7, .onePassword8, .bookmarksHTML:
             fatalError("Unsupported source for more info")
         }
     }

@@ -37,6 +37,7 @@ enum ThirdPartyBrowser: CaseIterable {
     case safari
     case lastPass
     case onePassword7
+    case onePassword8
 
     static var installedBrowsers: [ThirdPartyBrowser] {
         return allCases.filter(\.isInstalled)
@@ -51,6 +52,7 @@ enum ThirdPartyBrowser: CaseIterable {
         case .safari: return .safari
         case .lastPass: return .lastPass
         case .onePassword7: return .onePassword7
+        case .onePassword8: return .onePassword8
         case .csv: return nil
         case .bookmarksHTML: return nil
         }
@@ -75,6 +77,7 @@ enum ThirdPartyBrowser: CaseIterable {
         case .firefox: return .firefox
         case .safari: return .safari
         case .onePassword7: return .onePassword7
+        case .onePassword8: return .onePassword8
         case .lastPass: return .lastPass
         }
     }
@@ -129,9 +132,9 @@ enum ThirdPartyBrowser: CaseIterable {
         case .safari: return BundleIdentifiers(productionBundleID: "com.apple.safari", relatedBundleIDs: [])
         case .onePassword7: return BundleIdentifiers(productionBundleID: "com.agilebits.onepassword7", relatedBundleIDs: [
             "com.agilebits.onepassword",
-            "com.agilebits.onepassword4",
-            "com.1password.1password"
+            "com.agilebits.onepassword4"
         ])
+        case .onePassword8: return BundleIdentifiers(productionBundleID: "com.1password.1password", relatedBundleIDs: [])
         case .lastPass: return BundleIdentifiers(productionBundleID: "com.lastpass.lastpassmacdesktop", relatedBundleIDs: [
             "com.lastpass.lastpass"
         ])
@@ -185,7 +188,7 @@ enum ThirdPartyBrowser: CaseIterable {
         case .edge: return applicationSupportURL.appendingPathComponent("Microsoft Edge/")
         case .firefox: return applicationSupportURL.appendingPathComponent("Firefox/Profiles/")
         case .safari: return URL.nonSandboxLibraryDirectoryURL.appendingPathComponent("Safari/")
-        case .lastPass, .onePassword7: return nil
+        case .lastPass, .onePassword7, .onePassword8: return nil
         }
     }
 
