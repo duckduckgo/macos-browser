@@ -58,7 +58,7 @@ struct SyncNewDeviceView: View {
                 Button(UserText.submit) {
                     model.flowState = .deviceSynced
                 }
-                .buttonStyle(.borderedProminent)
+                .buttonStyle(DefaultActionButtonStyle(enabled: true))
             }
         }
         .frame(width: 480, height: 432)
@@ -75,7 +75,7 @@ private struct CopyPasteButtonStyle: ButtonStyle {
 
     func makeBody(configuration: Self.Configuration) -> some View {
 
-        let color = configuration.isPressed ? Color(nsColor: NSColor.windowBackgroundColor) : Color(nsColor: NSColor.controlColor)
+        let color: Color = configuration.isPressed ? Color(NSColor.windowBackgroundColor) : Color(NSColor.controlColor)
 
         let outerShadowOpacity = colorScheme == .dark ? 0.8 : 0.0
 
@@ -180,16 +180,16 @@ struct SyncKeyView: View {
             ForEach(Array(paddedText.prefix(64)).chunked(into: 16)) { rowChunk in
                 HStack {
                     Text(String(rowChunk[0..<4]))
-                        .font(.system(size: 15, weight: .semibold).monospaced())
+                        .font(monospaceFont)
                     Spacer()
                     Text(String(rowChunk[4..<8]))
-                        .font(.system(size: 15, weight: .semibold).monospaced())
+                        .font(monospaceFont)
                     Spacer()
                     Text(String(rowChunk[8..<12]))
-                        .font(.system(size: 15, weight: .semibold).monospaced())
+                        .font(monospaceFont)
                     Spacer()
                     Text(String(rowChunk[12..<16]))
-                        .font(.system(size: 15, weight: .semibold).monospaced())
+                        .font(monospaceFont)
                 }
                 .frame(maxWidth: .infinity)
             }
@@ -198,6 +198,13 @@ struct SyncKeyView: View {
 
     private var paddedText: String {
         text.count > 64 ? String(text.prefix(63) + "…") : String(text.padding(toLength: 64, withPad: " ", startingAt: 0))
+    }
+
+    private var monospaceFont: Font {
+        if #available(macOS 12.0, *) {
+            return .system(size: 15, weight: .semibold).monospaced()
+        }
+        return Font.custom("SF Mono", size: 15).weight(.semibold)
     }
 }
 

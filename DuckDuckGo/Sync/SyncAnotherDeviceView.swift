@@ -39,7 +39,8 @@ struct SyncAnotherDeviceView: View {
             Button(UserText.syncAnotherDevice) {
                 model.flowState = .syncNewDevice
             }
-            .buttonStyle(.borderedProminent)
+            .buttonStyle(DefaultActionButtonStyle(enabled: true))
         }
+        .frame(width: 360, height: 314)
     }
 }

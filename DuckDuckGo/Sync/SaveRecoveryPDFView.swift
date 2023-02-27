@@ -44,7 +44,7 @@ struct SaveRecoveryPDFView: View {
                 model.preferences.isEnabled = true
                 model.onCancel()
             }
-            .buttonStyle(.borderedProminent)
+            .buttonStyle(DefaultActionButtonStyle(enabled: true))
         }
         .frame(height: 314)
     }

@@ -31,13 +31,15 @@ struct SyncWizardStep<Content, Buttons>: View where Content: View, Buttons: View
     }
 
     var body: some View {
-        VStack(spacing: spacing) {
+        VStack(spacing: 0) {
             content()
                 .padding(.horizontal, 20.0)
+                .padding(.bottom, spacing)
 
             Rectangle()
                 .frame(height: 1)
-                .foregroundStyle(SeparatorShapeStyle())
+                .foregroundColor(Color(NSColor.separatorColor))
+                .padding(.bottom, 16.0)
 
             HStack {
                 Spacer()
@@ -45,7 +47,8 @@ struct SyncWizardStep<Content, Buttons>: View where Content: View, Buttons: View
             }
             .padding(.horizontal, 20.0)
         }
-        .padding(.vertical, 16.0)
+        .padding(.top, spacing)
+        .padding(.bottom, 16.0)
         .frame(minWidth: 360, minHeight: 298, idealHeight: 314)
 
     }
