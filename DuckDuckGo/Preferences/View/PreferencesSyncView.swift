@@ -149,9 +149,9 @@ struct Outline<Content>: View where Content: View {
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 8)
-                .stroke(Color(NSColor.tertiaryLabelColor), lineWidth: 1)
+                .stroke(Color("BlackWhite10"), lineWidth: 1)
             RoundedRectangle(cornerRadius: 8)
-                .fill(Color(NSColor.quaternaryLabelColor))
+                .fill(Color("BlackWhite1"))
 
             content()
         }
@@ -215,7 +215,7 @@ private struct SyncedDevicesView: View {
                 ForEach(model.syncedDevices) { device in
                     if !device.isCurrent {
                         Rectangle()
-                            .fill(Color(NSColor.quaternaryLabelColor))
+                            .fill(Color("BlackWhite10"))
                             .frame(height: 1)
                             .padding(.init(top: 0, leading: 10, bottom: 0, trailing: 10))
                     }
@@ -258,7 +258,7 @@ struct SyncedDeviceIcon: View {
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 4)
-                .fill(Color(NSColor.tertiaryLabelColor))
+                .fill(Color("BlackWhite100").opacity(0.06))
                 .frame(width: 24, height: 24)
 
             Image(nsImage: image)
