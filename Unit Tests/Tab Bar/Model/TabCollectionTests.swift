@@ -106,11 +106,12 @@ final class TabCollectionTests: XCTestCase {
 
         let tabCollection = TabCollection()
 
+        // TODO: override history extension here
         let tab1 = Tab()
         tabCollection.append(tab: tab1)
         let tab2 = Tab()
         tabCollection.append(tab: tab2)
-        tab2.addVisit(of: url)
+        tab2.history.addVisit(of: url)
 
         tabCollection.removeAll()
         XCTAssert(tabCollection.localHistoryOfRemovedTabs.contains(url.host!))
