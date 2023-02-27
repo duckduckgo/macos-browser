@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-// swiftlint:disable file_length
-
 import BrowserServicesKit
 import Combine
 import Common
@@ -667,25 +665,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         }
     }
 
-    private static let debugEvents = EventMapping<AMPProtectionDebugEvents> { event, _, _, _ in
-        switch event {
-        case .ampBlockingRulesCompilationFailed:
-            Pixel.fire(.ampBlockingRulesCompilationFailed)
-        }
-    }
-
-    lazy var linkProtection: LinkProtection = {
-        LinkProtection(privacyManager: contentBlocking.privacyConfigurationManager,
-                       contentBlockingManager: contentBlocking.contentBlockingManager,
-                       errorReporting: Self.debugEvents)
-    }()
-
-    lazy var referrerTrimming: ReferrerTrimming = {
-        ReferrerTrimming(privacyManager: contentBlocking.privacyConfigurationManager,
-                         contentBlockingManager: contentBlocking.contentBlockingManager,
-                         tld: contentBlocking.tld)
-    }()
-
     @MainActor
     private func reloadIfNeeded(shouldLoadInBackground: Bool = false) async {
         let content = self.content
@@ -1097,8 +1076,6 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         webViewDidCommitNavigationPublisher.send()
     }
 
-    // swiftlint:disable cyclomatic_complexity
-    // swiftlint:disable function_body_length
     @MainActor
     func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
         // allow local file navigations
@@ -1119,69 +1096,19 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
 
         // to be modularized later on, see https://app.asana.com/0/0/1203268245242140/f
         let isRequestingNewTab = (isLinkActivated && NSApp.isCommandPressed) || navigationAction.navigationType.isMiddleButtonClick || isNavigatingAwayFromPinnedTab
-        let shouldSelectNewTab = NSApp.isShiftPressed || (isNavigatingAwayFromPinnedTab && !navigationAction.navigationType.isMiddleButtonClick && !NSApp.isCommandPressed)
-
-        // This check needs to happen before GPC checks. Otherwise the navigation type may be rewritten to `.other`
-        // which would skip link rewrites.
-        if !navigationAction.navigationType.isBackForward {
-            let navigationActionPolicy = await linkProtection
-                .requestTrackingLinkRewrite(
-                    initiatingURL: webView.url,
-                    destinationURL: navigationAction.url,
-                    onStartExtracting: { if !isRequestingNewTab { isAMPProtectionExtracting = true }},
-                    onFinishExtracting: { [weak self] in self?.isAMPProtectionExtracting = false },
-                    onLinkRewrite: { [weak self] url in
-                        guard let self = self else { return }
-                        if isRequestingNewTab || !navigationAction.isForMainFrame {
-                            self.openChild(with: .url(url), of: .tab(selected: shouldSelectNewTab || !navigationAction.isForMainFrame))
-                        } else {
-                            self.webView.load(URLRequest(url: url))
-                        }
-                    })
-            if let navigationActionPolicy = navigationActionPolicy, navigationActionPolicy == false {
-                return .cancel
-            }
+        if isRequestingNewTab {
+            let shouldSelectNewTab = NSApp.isShiftPressed || (isNavigatingAwayFromPinnedTab && !navigationAction.navigationType.isMiddleButtonClick && !NSApp.isCommandPressed)
+            self.openChild(with: .contentFromURL(navigationAction.url), of: .tab(selected: shouldSelectNewTab))
+            return .cancel
         }
 
         if navigationAction.isForMainFrame {
             preferences.userAgent = UserAgent.for(navigationAction.url)
         }
-
-        if navigationAction.isForMainFrame, !navigationAction.navigationType.isBackForward {
-            if let newRequest = referrerTrimming.trimReferrer(for: navigationAction.request, originUrl: navigationAction.sourceFrame.url) {
-                if isRequestingNewTab {
-                    self.openChild(with: newRequest.url.map { .contentFromURL($0) } ?? .none, of: .tab(selected: shouldSelectNewTab))
-                } else {
-                    _ = webView.load(newRequest)
-                }
-                return .cancel
-            }
-        }
-
-        if navigationAction.isForMainFrame,
-           !navigationAction.navigationType.isBackForward,
-           !isRequestingNewTab,
-           let request = GPCRequestFactory().requestForGPC(basedOn: navigationAction.request,
-                                                           config: contentBlocking.privacyConfigurationManager.privacyConfig,
-                                                           gpcEnabled: PrivacySecurityPreferences.shared.gpcEnabled) {
-
-            return .redirectInvalidatingBackItemIfNeeded(navigationAction) {
-                $0.load(request)
-            }
-        }
-
-        if isRequestingNewTab {
-            self.openChild(with: .contentFromURL(navigationAction.url), of: .tab(selected: shouldSelectNewTab))
-            return .cancel
-
-        }
-
         guard navigationAction.url.scheme != nil else { return .allow }
 
         return .next
     }
-    // swiftlint:enable cyclomatic_complexity
-    // swiftlint:enable function_body_length
 
     @MainActor
     func willStart(_ navigation: Navigation) {
@@ -1207,9 +1134,6 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         if error != nil { error = nil }
 
         invalidateInteractionStateData()
-        linkProtection.cancelOngoingExtraction()
-        linkProtection.setMainFrameUrl(navigation.url)
-        referrerTrimming.onBeginNavigation(to: navigation.url)
     }
 
     @MainActor
@@ -1217,8 +1141,6 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         invalidateInteractionStateData()
         webViewDidFinishNavigationPublisher.send()
         if isAMPProtectionExtracting { isAMPProtectionExtracting = false }
-        linkProtection.setMainFrameUrl(nil)
-        referrerTrimming.onFinishNavigation()
         setUpYoutubeScriptsIfNeeded()
         statisticsLoader?.refreshRetentionAtb(isSearch: navigation.url.isDuckDuckGoSearch)
     }
@@ -1230,8 +1152,6 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         }
 
         invalidateInteractionStateData()
-        linkProtection.setMainFrameUrl(nil)
-        referrerTrimming.onFailedNavigation()
         webViewDidFailNavigationPublisher.send()
     }
 

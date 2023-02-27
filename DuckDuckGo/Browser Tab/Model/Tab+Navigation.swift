@@ -31,19 +31,28 @@ extension Tab: NavigationResponder {
     func setupNavigationDelegate() {
         navigationDelegate.setResponders(
             .weak(self),
+            // open external scheme link in another app
             .weak(nullable: self.externalAppSchemeHandler),
+
+            // tracking link rewrite, referrer trimming, global privacy control
+            .weak(nullable: self.navigationProtection),
 
             .weak(nullable: self.downloads),
 
             .weak(nullable: self.adClickAttribution),
 
+            // update blocked trackers info
             .weak(nullable: self.privacyDashboard),
+            // upgrade to HTTPS
             .weak(nullable: self.httpsUpgrade),
 
+            // add extra headers to SERP requests
             .struct(SerpHeadersNavigationResponder()),
 
-            .weak(nullable: self.fbProtection),
+            // ensure Content Blocking Rules are applied before navigation
             .weak(nullable: self.contentBlockingAndSurrogates),
+            // update click-to-load state
+            .weak(nullable: self.fbProtection),
 
             // should be the last, for Unit Tests navigation events tracking
             .struct(nullable: testsClosureNavigationResponder)
