@@ -17,6 +17,7 @@
 //
 
 import SwiftUI
+import Combine
 
 final class SyncSetupViewModel: ObservableObject {
     enum FlowState {
@@ -24,6 +25,7 @@ final class SyncSetupViewModel: ObservableObject {
     }
 
     @Published var flowState: FlowState = .enableSync
+    @Published var shouldDisableSubmitButton: Bool
 
     let preferences: SyncPreferences
     let onCancel: () -> Void
@@ -31,5 +33,17 @@ final class SyncSetupViewModel: ObservableObject {
     init(preferences: SyncPreferences, onCancel: @escaping () -> Void) {
         self.preferences = preferences
         self.onCancel = onCancel
+        self.shouldDisableSubmitButton = true
+
+        shouldDisableSubmitButtonCancellable = preferences.$remoteSyncKey
+            .map { key in
+                guard let key else {
+                    return true
+                }
+                return key.isEmpty
+            }
+            .assign(to: \.shouldDisableSubmitButton, onWeaklyHeld: self)
     }
+
+    private var shouldDisableSubmitButtonCancellable: AnyCancellable?
 }

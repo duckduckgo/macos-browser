@@ -57,11 +57,13 @@ struct SyncNewDeviceView: View {
                 Button(UserText.submit) {
                     model.flowState = .deviceSynced
                 }
-                .buttonStyle(DefaultActionButtonStyle(enabled: true))
+                .buttonStyle(DefaultActionButtonStyle(enabled: !model.shouldDisableSubmitButton))
+                .disabled(model.shouldDisableSubmitButton)
             }
         }
         .frame(width: 480, height: 432)
     }
+
 }
 
 private struct CopyPasteButtonStyle: ButtonStyle {
@@ -202,6 +204,6 @@ struct SyncKeyView: View {
 
 extension Array: Identifiable where Element == Character {
     public var id: String {
-        String(self)
+        UUID().uuidString
     }
 }
