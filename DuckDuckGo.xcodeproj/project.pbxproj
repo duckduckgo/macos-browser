@@ -923,6 +923,8 @@
 		372AD54E29AC09AF00DE827B /* SyncSetupCompleteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 372AD54C29AC09AF00DE827B /* SyncSetupCompleteView.swift */; };
 		372AD55029AC10EC00DE827B /* SaveRecoveryPDFView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 372AD54F29AC10EC00DE827B /* SaveRecoveryPDFView.swift */; };
 		372AD55129AC10EC00DE827B /* SaveRecoveryPDFView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 372AD54F29AC10EC00DE827B /* SaveRecoveryPDFView.swift */; };
+		372AD55329ACBD0A00DE827B /* QRCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 372AD55229ACBD0A00DE827B /* QRCodeView.swift */; };
+		372AD55429ACBD0A00DE827B /* QRCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 372AD55229ACBD0A00DE827B /* QRCodeView.swift */; };
 		373A1AA8283ED1B900586521 /* BookmarkHTMLReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373A1AA7283ED1B900586521 /* BookmarkHTMLReader.swift */; };
 		373A1AAA283ED86C00586521 /* BookmarksHTMLReaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373A1AA9283ED86C00586521 /* BookmarksHTMLReaderTests.swift */; };
 		373A1AB02842C4EA00586521 /* BookmarkHTMLImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373A1AAF2842C4EA00586521 /* BookmarkHTMLImporter.swift */; };
@@ -947,8 +949,6 @@
 		3775912B29AAC41400E26367 /* PreferencesSyncView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3775912929AAC41400E26367 /* PreferencesSyncView.swift */; };
 		3775912D29AAC72700E26367 /* SyncPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3775912C29AAC72700E26367 /* SyncPreferences.swift */; };
 		3775912E29AAC72700E26367 /* SyncPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3775912C29AAC72700E26367 /* SyncPreferences.swift */; };
-		3775913129AB68FC00E26367 /* EFQRCode in Frameworks */ = {isa = PBXBuildFile; productRef = 3775913029AB68FC00E26367 /* EFQRCode */; };
-		3775913329AB690B00E26367 /* EFQRCode in Frameworks */ = {isa = PBXBuildFile; productRef = 3775913229AB690B00E26367 /* EFQRCode */; };
 		3775913629AB9A1C00E26367 /* SyncSetupViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3775913529AB9A1C00E26367 /* SyncSetupViewController.swift */; };
 		3775913729AB9A1C00E26367 /* SyncSetupViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3775913529AB9A1C00E26367 /* SyncSetupViewController.swift */; };
 		3775913929AB9C3B00E26367 /* EnableSyncView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3775913829AB9C3B00E26367 /* EnableSyncView.swift */; };
@@ -1903,6 +1903,7 @@
 		371E141827E92E42009E3B5B /* MultilineScrollableTextFix.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultilineScrollableTextFix.swift; sourceTree = "<group>"; };
 		372AD54C29AC09AF00DE827B /* SyncSetupCompleteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncSetupCompleteView.swift; sourceTree = "<group>"; };
 		372AD54F29AC10EC00DE827B /* SaveRecoveryPDFView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveRecoveryPDFView.swift; sourceTree = "<group>"; };
+		372AD55229ACBD0A00DE827B /* QRCodeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCodeView.swift; sourceTree = "<group>"; };
 		373A1AA7283ED1B900586521 /* BookmarkHTMLReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkHTMLReader.swift; sourceTree = "<group>"; };
 		373A1AA9283ED86C00586521 /* BookmarksHTMLReaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksHTMLReaderTests.swift; sourceTree = "<group>"; };
 		373A1AAF2842C4EA00586521 /* BookmarkHTMLImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkHTMLImporter.swift; sourceTree = "<group>"; };
@@ -2742,7 +2743,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3775913329AB690B00E26367 /* EFQRCode in Frameworks */,
 				984FD3BF299ACF35007334DD /* Bookmarks in Frameworks */,
 				37A5E2F0298AA1B20047046B /* Persistence in Frameworks */,
 				3706FCA7293F65D500E42796 /* BrowserServicesKit in Frameworks */,
@@ -2792,7 +2792,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3775913129AB68FC00E26367 /* EFQRCode in Frameworks */,
 				9807F645278CA16F00E1547B /* BrowserServicesKit in Frameworks */,
 				987799ED299998B1005D8EB6 /* Bookmarks in Frameworks */,
 				1E950E3F2912A10D0051A99B /* ContentBlocking in Frameworks */,
@@ -3099,6 +3098,7 @@
 				3775914729ABC03700E26367 /* SyncNewDeviceView.swift */,
 				372AD54C29AC09AF00DE827B /* SyncSetupCompleteView.swift */,
 				372AD54F29AC10EC00DE827B /* SaveRecoveryPDFView.swift */,
+				372AD55229ACBD0A00DE827B /* QRCodeView.swift */,
 			);
 			path = Sync;
 			sourceTree = "<group>";
@@ -5665,7 +5665,6 @@
 				37A5E2EF298AA1B20047046B /* Persistence */,
 				37F44A5E298C17830025E7FE /* Navigation */,
 				984FD3BE299ACF35007334DD /* Bookmarks */,
-				3775913229AB690B00E26367 /* EFQRCode */,
 			);
 			productName = DuckDuckGo;
 			productReference = 3706FD05293F65D500E42796 /* DuckDuckGo App Store.app */;
@@ -5781,7 +5780,6 @@
 				98A50963294B691800D10880 /* Persistence */,
 				B6B77BE7297973D4001E68A1 /* Navigation */,
 				987799EC299998B1005D8EB6 /* Bookmarks */,
-				3775913029AB68FC00E26367 /* EFQRCode */,
 			);
 			productName = DuckDuckGo;
 			productReference = AA585D7E248FD31100E9A3E2 /* DuckDuckGo.app */;
@@ -5858,7 +5856,6 @@
 				AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */,
 				9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */,
 				1D02633128D898E1005CBB41 /* XCRemoteSwiftPackageReference "OpenSSL" */,
-				3775912F29AB68FC00E26367 /* XCRemoteSwiftPackageReference "EFQRCode" */,
 			);
 			productRefGroup = AA585D7F248FD31100E9A3E2 /* Products */;
 			projectDirPath = "";
@@ -6338,6 +6335,7 @@
 				3706FAE2293F65D500E42796 /* SequenceExtensions.swift in Sources */,
 				3706FAE3293F65D500E42796 /* ChromiumDataImporter.swift in Sources */,
 				3706FAE5293F65D500E42796 /* WKBackForwardListItemViewModel.swift in Sources */,
+				372AD55429ACBD0A00DE827B /* QRCodeView.swift in Sources */,
 				3706FAE6293F65D500E42796 /* BWNotRespondingAlert.swift in Sources */,
 				3706FAE7293F65D500E42796 /* DebugUserScript.swift in Sources */,
 				3706FAE8293F65D500E42796 /* RecentlyClosedTab.swift in Sources */,
@@ -7418,6 +7416,7 @@
 				AA585D84248FD31100E9A3E2 /* BrowserTabViewController.swift in Sources */,
 				85707F22276A32B600DC0649 /* CallToAction.swift in Sources */,
 				B693954B26F04BEB0015B914 /* MouseOverView.swift in Sources */,
+				372AD55329ACBD0A00DE827B /* QRCodeView.swift in Sources */,
 				AAE7527C263B056C00B973F8 /* HistoryStore.swift in Sources */,
 				372AD54D29AC09AF00DE827B /* SyncSetupCompleteView.swift in Sources */,
 				AAE246F32709EF3B00BEEAEE /* FirePopoverCollectionViewItem.swift in Sources */,
@@ -8293,14 +8292,6 @@
 				version = 9.1.0;
 			};
 		};
-		3775912F29AB68FC00E26367 /* XCRemoteSwiftPackageReference "EFQRCode" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/EFPrefix/EFQRCode.git";
-			requirement = {
-				kind = exactVersion;
-				version = 6.2.1;
-			};
-		};
 		4B82E9B125B69E3E00656FE7 /* XCRemoteSwiftPackageReference "TrackerRadarKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/TrackerRadarKit.git";
@@ -8413,16 +8404,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 3706FDD7293F661700E42796 /* XCRemoteSwiftPackageReference "OHHTTPStubs" */;
 			productName = OHHTTPStubsSwift;
-		};
-		3775913029AB68FC00E26367 /* EFQRCode */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 3775912F29AB68FC00E26367 /* XCRemoteSwiftPackageReference "EFQRCode" */;
-			productName = EFQRCode;
-		};
-		3775913229AB690B00E26367 /* EFQRCode */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 3775912F29AB68FC00E26367 /* XCRemoteSwiftPackageReference "EFQRCode" */;
-			productName = EFQRCode;
 		};
 		3799999129705E1A003318B1 /* InputFilesChecker */ = {
 			isa = XCSwiftPackageProductDependency;

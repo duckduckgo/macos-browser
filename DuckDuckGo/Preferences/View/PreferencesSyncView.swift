@@ -17,7 +17,6 @@
 //
 
 import SwiftUI
-import EFQRCode
 
 extension Preferences {
 
@@ -120,12 +119,7 @@ extension Preferences {
         var body: some View {
             Outline {
                 HStack(alignment: .top, spacing: 20) {
-                    if let image = EFQRCode.generate(for: model.syncKey, size: .init(width: 192, height: 192), backgroundColor: .clear, foregroundColor: NSColor(named: "BlackWhite100")!.cgColor) {
-                        Image(nsImage: .init(cgImage: image, size: .init(width: 192, height: 192)))
-                    } else {
-                        EmptyView()
-                            .frame(width: 192, height: 192)
-                    }
+                    QRCode(string: model.syncKey, size: .init(width: 192, height: 192))
 
                     VStack {
                         Text(UserText.syncNewDeviceInstructions)

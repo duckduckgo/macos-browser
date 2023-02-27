@@ -17,7 +17,6 @@
 //
 
 import SwiftUI
-import EFQRCode
 
 struct SyncNewDeviceView: View {
     @EnvironmentObject var model: SyncSetupViewModel
@@ -105,12 +104,7 @@ private struct ShowCodeView: View {
                     .multilineTextAlignment(.center)
 
                 HStack(alignment: .top, spacing: 20) {
-                    if let image = EFQRCode.generate(for: model.syncKey, size: .init(width: 164, height: 164), backgroundColor: .clear, foregroundColor: NSColor(named: "BlackWhite100")!.cgColor) {
-                        Image(nsImage: .init(cgImage: image, size: .init(width: 164, height: 164)))
-                    } else {
-                        EmptyView()
-                            .frame(width: 192, height: 192)
-                    }
+                    QRCode(string: model.syncKey, size: .init(width: 164, height: 164))
 
                     VStack {
                         SyncKeyView(text: model.syncKey)
@@ -149,16 +143,14 @@ private struct EnterCodeView: View {
                     .multilineTextAlignment(.center)
 
                 Outline {
-                    SyncKeyView(text: model.syncKey)
+                    SyncKeyView(text: model.remoteSyncKey ?? "")
                         .padding(.horizontal, 20)
                         .padding(.vertical, 10)
                 }
                 .frame(maxWidth: 244)
 
                 Button {
-                    if let string = NSPasteboard.general.string(forType: .string) {
-                        model.syncKey = string
-                    }
+                    model.remoteSyncKey = NSPasteboard.general.string(forType: .string)
                 } label: {
                     HStack {
                         Image("Paste")

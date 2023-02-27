@@ -24,12 +24,11 @@ final class SyncPreferences: ObservableObject {
 
     @Published var syncedDevices: [SyncedDevice] = [
         .init(kind: .current, name: "Work Laptop", id: UUID().uuidString),
-        .init(kind: .mobile, name: "Dave's iPhone 14", id: UUID().uuidString),
-        .init(kind: .desktop, name: "Home Laptop", id: UUID().uuidString),
-        .init(kind: .desktop, name: "Home Desktop", id: UUID().uuidString)
+        .init(kind: .mobile, name: "Dave's iPhone 14", id: UUID().uuidString)
     ]
 
     @Published var syncKey: String = "c3NoLWVkMjU1MTkgQUFBQUMzTnphQzFsWkRJMU5URTVBQUFBSU9BM1A4YkR1My93cVVrMW5uZzVaSXlVZ2NRVVptWWFGejJSYjhlbWdKTkkgdGVzdC1zeW5jLWtleQ=="
+    @Published var remoteSyncKey: String? = nil
 
     func presentEnableSyncDialog() {
         let enableSyncWindowController = SyncSetupViewController.create(with: self).wrappedInWindowController()
