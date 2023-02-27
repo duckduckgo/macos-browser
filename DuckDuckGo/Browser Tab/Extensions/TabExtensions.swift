@@ -140,6 +140,10 @@ extension TabExtensionsBuilder {
         add {
             ExternalAppSchemeHandler(workspace: dependencies.workspace, permissionModel: args.permissionModel)
         }
+
+        add {
+            ReaderModeTabExtension(userScriptPublisher: userScripts.compactMap { $0?.readerModeUserScript }, webViewPublisher: args.webViewFuture)
+        }
     }
 
 }

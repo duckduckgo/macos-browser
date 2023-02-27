@@ -40,6 +40,8 @@ final class UserScripts: UserScriptsProvider {
     let youtubeOverlayScript: YoutubeOverlayUserScript?
     let youtubePlayerUserScript: YoutubePlayerUserScript?
 
+    let readerModeUserScript = ReaderModeUserScript()
+
     init(with sourceProvider: ScriptSourceProviding) {
         clickToLoadScript = ClickToLoadUserScript(scriptSourceProvider: sourceProvider)
         contentBlockerRulesScript = ContentBlockerRulesUserScript(configuration: sourceProvider.contentBlockerRulesConfig!)
@@ -89,7 +91,8 @@ final class UserScripts: UserScriptsProvider {
         hoverUserScript,
         clickToLoadScript,
         contentScopeUserScript,
-        autofillScript
+        autofillScript,
+        readerModeUserScript
     ]
 
     lazy var scripts = userScripts.map { $0.makeWKUserScript() }

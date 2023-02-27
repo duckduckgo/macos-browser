@@ -31,6 +31,8 @@ extension Tab: NavigationResponder {
     func setupNavigationDelegate() {
         navigationDelegate.setResponders(
             .weak(self),
+            .weak(nullable: self.readerMode),
+
             .weak(nullable: self.externalAppSchemeHandler),
 
             .weak(nullable: self.adClickAttribution),

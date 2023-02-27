@@ -35,6 +35,7 @@ final class NavigationBarViewController: NSViewController {
     @IBOutlet weak var bookmarkListButton: MouseOverButton!
     @IBOutlet weak var passwordManagementButton: MouseOverButton!
     @IBOutlet weak var downloadsButton: MouseOverButton!
+    @IBOutlet weak var readerModeButton: MouseOverButton!
     @IBOutlet weak var navigationButtons: NSView!
     @IBOutlet weak var addressBarContainer: NSView!
     @IBOutlet weak var daxLogo: NSImageView!
@@ -224,6 +225,10 @@ final class NavigationBarViewController: NSViewController {
         toggleDownloadsPopover(keepButtonVisible: false)
     }
 
+    @IBAction func readerModeButtonAction(_ sender: NSButton) {
+        tabCollectionViewModel.selectedTabViewModel?.tab.readerMode?.activateReaderMode()
+    }
+
     override func mouseDown(with event: NSEvent) {
         if let menu = view.menu, NSEvent.isContextClick(event) {
             NSMenu.popUpContextMenu(menu, with: event, for: view)
@@ -358,6 +363,13 @@ final class NavigationBarViewController: NSViewController {
             .receive(on: DispatchQueue.main)
             .sink(receiveValue: { [weak self] _ in
                 self?.updatePasswordManagementButton()
+            })
+    }
+    var readerModeCancellable: AnyCancellable?
+    private func subscribeToReaderMode() {
+        readerModeCancellable = tabCollectionViewModel.selectedTabViewModel?.tab.readerMode?.readerModeStatePublisher
+            .sink(receiveValue: { [weak self] state in
+                self?.readerModeButton.isHidden = state != .available
             })
     }
 

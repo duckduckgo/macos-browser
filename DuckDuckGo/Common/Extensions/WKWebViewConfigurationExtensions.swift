@@ -39,6 +39,9 @@ extension WKWebViewConfiguration {
         if urlSchemeHandler(forURLScheme: PrivatePlayer.privatePlayerScheme) == nil {
             setURLSchemeHandler(PrivatePlayerSchemeHandler(), forURLScheme: PrivatePlayer.privatePlayerScheme)
         }
+        if urlSchemeHandler(forURLScheme: ReaderModeSchemeHandler.readerModeScheme) == nil {
+            setURLSchemeHandler(ReaderModeSchemeHandler(), forURLScheme: ReaderModeSchemeHandler.readerModeScheme)
+        }
 
         let userContentController = UserContentController(assetsPublisher: contentBlocking.contentBlockingAssetsPublisher,
                                                           privacyConfigurationManager: contentBlocking.privacyConfigurationManager)

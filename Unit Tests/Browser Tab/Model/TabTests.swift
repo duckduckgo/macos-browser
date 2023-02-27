@@ -333,6 +333,51 @@ final class TabTests: XCTestCase {
         withExtendedLifetime((c1, c2)) {}
     }
 
+    @MainActor
+    func testReaderMode() {
+        var eDidFinish: XCTestExpectation!
+        let extensionsBuilder = TestTabExtensionsBuilder(load: [ReaderModeTabExtension.self]) { builder in { _, _ in
+            builder.add {
+                TestsClosureNavigationResponderTabExtension(.init(navigationDidFinish: { _ in
+                    eDidFinish?.fulfill()
+                }))
+            }
+        } }
+
+        schemeHandler.middleware = [{ _ in
+            return try! .ok(.data(Data(contentsOf: Bundle(for: Self.self).url(forResource: "readerTest", withExtension: "html")!),
+                                  mime: "text/html"))
+        }]
+
+        let tab = Tab(content: .none, webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder)
+        contentBlockingMock.contentBlockingAssetsSubject.send(.init(rulesUpdate: .init(rules: [], changes: [:], completionTokens: []), sourceProvider: DefaultScriptSourceProvider()))
+
+        let eReaderModeUnvailable = expectation(description: "reader mode unavailable")
+        let eReaderModeAvailable = expectation(description: "reader mode available")
+        var eReaderModeActive: XCTestExpectation!
+        let c = tab.readerMode!.readerModeStatePublisher.sink { state in
+            switch state {
+            case .unavailable:
+                eReaderModeUnvailable.fulfill()
+            case .available:
+                eReaderModeAvailable.fulfill()
+            case .active:
+                eReaderModeActive.fulfill()
+            }
+        }
+
+        eDidFinish = expectation(description: "onDidFinish")
+        tab.setContent(.url(urls.local1))
+        waitForExpectations(timeout: 5)
+
+        eDidFinish = expectation(description: "onDidFinish readerMode")
+        eReaderModeActive = expectation(description: "reader mode active")
+        tab.readerMode!.activateReaderMode()
+        waitForExpectations(timeout: 5)
+
+        withExtendedLifetime(c, {})
+    }
+
 }
 
 extension Tab {
