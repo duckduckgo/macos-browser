@@ -75,6 +75,8 @@ protocol TabExtensionDependencies {
 
 typealias TabExtensionsBuilderArguments = (
     tabIdentifier: UInt64,
+    contentPublisher: AnyPublisher<Tab.TabContent, Never>,
+    titlePublisher: AnyPublisher<String?, Never>,
     userScriptsPublisher: AnyPublisher<UserScripts?, Never>,
     inheritedAttribution: AdClickAttributionLogic.State?,
     userContentControllerFuture: Future<UserContentController, Never>,
@@ -148,6 +150,12 @@ extension TabExtensionsBuilder {
 
         add {
             DownloadsTabExtension(downloadManager: dependencies.downloadManager, isChildTab: args.isChildTab)
+        }
+        add {
+            HistoryTabExtension(historyCoordinating: dependencies.historyCoordinating,
+                                trackersPublisher: contentBlocking.trackersPublisher,
+                                urlPublisher: args.contentPublisher.map { content in content.isUrl ? content.url : nil },
+                                titlePublisher: args.titlePublisher)
         }
         add {
             ExternalAppSchemeHandler(workspace: dependencies.workspace, permissionModel: args.permissionModel)

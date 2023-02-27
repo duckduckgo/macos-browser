@@ -23,7 +23,6 @@ import ContentBlocking
 import Foundation
 import Navigation
 import os.log
-import TrackerRadarKit
 import UserScript
 import WebKit
 
@@ -171,9 +170,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     private let privacyFeatures: AnyPrivacyFeatures
     private var contentBlocking: AnyContentBlocking { privacyFeatures.contentBlocking }
 
-    // to be wiped out later
-    private var detectedTrackersCancellables: AnyCancellable?
-
     private let webViewConfiguration: WKWebViewConfiguration
 
     private var extensions: TabExtensions
@@ -199,7 +195,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                      cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter? = ContentBlockingAssetsCompilationTimeReporter.shared,
                      statisticsLoader: StatisticsLoader? = nil,
                      extensionsBuilder: TabExtensionsBuilderProtocol = TabExtensionsBuilder.default,
-                     localHistory: Set<String> = Set<String>(),
                      title: String? = nil,
                      favicon: NSImage? = nil,
                      interactionStateData: Data? = nil,
@@ -232,7 +227,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                   cbaTimeReporter: cbaTimeReporter,
                   statisticsLoader: statisticsLoader,
                   internalUserDecider: internalUserDecider,
-                  localHistory: localHistory,
                   title: title,
                   favicon: favicon,
                   interactionStateData: interactionStateData,
@@ -259,7 +253,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
          cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter?,
          statisticsLoader: StatisticsLoader?,
          internalUserDecider: InternalUserDeciding?,
-         localHistory: Set<String>,
          title: String?,
          favicon: NSImage?,
          interactionStateData: Data?,
@@ -273,13 +266,11 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
         self.content = content
         self.faviconManagement = faviconManagement
-        self.historyCoordinating = historyCoordinating
         self.pinnedTabsManager = pinnedTabsManager
         self.privacyFeatures = privacyFeatures
         self.privatePlayer = privatePlayer
         self.statisticsLoader = statisticsLoader
         self.internalUserDecider = internalUserDecider
-        self.localHistory = localHistory
         self.title = title
         self.favicon = favicon
         self.parentTab = parentTab
@@ -308,6 +299,8 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         let webViewPromise = Future<WKWebView, Never>.promise()
         self.extensions = extensionsBuilder
             .build(with: (tabIdentifier: instrumentation.currentTabIdentifier,
+                          contentPublisher: _content.projectedValue.eraseToAnyPublisher(),
+                          titlePublisher: _title.projectedValue.eraseToAnyPublisher(),
                           userScriptsPublisher: userScriptsPublisher,
                           inheritedAttribution: parentTab?.adClickAttribution?.currentAttributionState,
                           userContentControllerFuture: userContentControllerPromise.future,
@@ -336,8 +329,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                                                selector: #selector(onDuckDuckGoEmailSignOut),
                                                name: .emailDidSignOut,
                                                object: nil)
-
-        self.subscribeToDetectedTrackers()
     }
 
     override func awakeAfter(using decoder: NSCoder) -> Any? {
@@ -375,9 +366,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     }
 
     func cleanUpBeforeClosing() {
-        if content.isUrl, let url = webView.url {
-            historyCoordinating.commitChanges(url: url)
-        }
         webView.stopLoading()
         webView.stopMediaCapture()
         webView.stopAllMediaPlayback()
@@ -417,9 +405,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         didSet {
             handleFavicon()
             invalidateInteractionStateData()
-            if let oldUrl = oldValue.url {
-                historyCoordinating.commitChanges(url: oldUrl)
-            }
             error = nil
         }
     }
@@ -464,9 +449,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         if let url = webView.url {
             let content = TabContent.contentFromURL(url)
 
-            if content.isUrl, !webView.isLoading {
-                self.addVisit(of: url)
-            }
             if content != self.content {
                 self.content = content
             }
@@ -477,14 +459,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     var lastSelectedAt: Date?
 
     @Published var title: String?
-
-    private func handleTitleDidChange() {
-        updateTitle()
-
-        if let title = self.title, let url = webView.url {
-            historyCoordinating.updateTitleIfNeeded(title: title, url: url)
-        }
-    }
 
     private func updateTitle() {
         var title = webView.title?.trimmingWhitespace()
@@ -497,18 +471,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         }
     }
 
-    @PublishedAfter var error: WKError? {
-        didSet {
-            switch error {
-            case .some(URLError.notConnectedToInternet),
-                 .some(URLError.networkConnectionLost):
-                guard let failingUrl = error?.failingUrl else { break }
-                historyCoordinating.markFailedToLoadUrl(failingUrl)
-            default:
-                break
-            }
-        }
-    }
+    @PublishedAfter var error: WKError?
     let permissions: PermissionModel
 
     @Published private(set) var isLoading: Bool = false
@@ -616,8 +579,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             return
         }
 
-        shouldStoreNextVisit = false
-
         // Prevent from a Player reloading loop on back navigation to
         // YT page where the player was enabled (see comment inside)
         if privatePlayer.goBackSkippingLastItemIfNeeded(for: webView) {
@@ -629,12 +590,10 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
     func goForward() {
         guard canGoForward else { return }
-        shouldStoreNextVisit = false
         webView.goForward()
     }
 
     func go(to item: WKBackForwardListItem) {
-        shouldStoreNextVisit = false
         webView.go(to: item)
     }
 
@@ -818,7 +777,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             self?.handleUrlDidChange()
         }.store(in: &webViewCancellables)
         webView.observe(\.title) { [weak self] _, _ in
-            self?.handleTitleDidChange()
+            self?.updateTitle()
         }.store(in: &webViewCancellables)
 
         webView.observe(\.canGoBack) { [weak self] _, _ in
@@ -889,27 +848,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             }
         } else {
             favicon = nil
-        }
-    }
-
-    // MARK: - Global & Local History
-
-    private var historyCoordinating: HistoryCoordinating
-    private var shouldStoreNextVisit = true
-    private(set) var localHistory: Set<String>
-
-    func addVisit(of url: URL) {
-        guard shouldStoreNextVisit else {
-            shouldStoreNextVisit = true
-            return
-        }
-
-        // Add to global history
-        historyCoordinating.addVisit(of: url)
-
-        // Add to local history
-        if let host = url.host, !host.isEmpty {
-            localHistory.insert(host.droppingWwwPrefix())
         }
     }
 
@@ -1012,39 +950,6 @@ extension Tab: FaviconUserScriptDelegate {
 
 }
 
-extension Tab {
-    // ContentBlockerRulesUserScriptDelegate & ClickToLoadUserScriptDelegate
-    // to be refactored to TabExtensions later
-    func subscribeToDetectedTrackers() {
-        detectedTrackersCancellables = self.trackersPublisher.sink { [weak self] tracker in
-            guard let self, let url = self.webView.url else { return }
-
-            switch tracker.type {
-            case .tracker:
-                self.historyCoordinating.addDetectedTracker(tracker.request, onURL: url)
-            case .trackerWithSurrogate:
-                self.historyCoordinating.addDetectedTracker(tracker.request, onURL: url)
-            case .thirdPartyRequest:
-                break
-            }
-        }
-    }
-
-}
-
-extension HistoryCoordinating {
-
-    func addDetectedTracker(_ tracker: DetectedRequest, onURL url: URL) {
-        trackerFound(on: url)
-
-        guard tracker.isBlocked,
-              let entityName = tracker.entityName else { return }
-
-        addBlockedTracker(entityName: entityName, on: url)
-    }
-
-}
-
 extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
 
     @MainActor
@@ -1070,9 +975,6 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
 
     @MainActor
     func didCommit(_ navigation: Navigation) {
-        if content.isUrl, navigation.url == content.url {
-            addVisit(of: navigation.url)
-        }
         webViewDidCommitNavigationPublisher.send()
     }
 

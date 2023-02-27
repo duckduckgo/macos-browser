@@ -53,6 +53,8 @@ extension Tab: NavigationResponder {
             .weak(nullable: self.contentBlockingAndSurrogates),
             // update click-to-load state
             .weak(nullable: self.fbProtection),
+            // browsing history
+            .weak(nullable: self.history),
 
             // should be the last, for Unit Tests navigation events tracking
             .struct(nullable: testsClosureNavigationResponder)

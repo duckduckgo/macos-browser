@@ -31,7 +31,6 @@ extension Tab: NSSecureCoding {
         static let favicon = "icon"
         static let tabType = "tabType"
         static let preferencePane = "preferencePane"
-        static let visitedDomains = "visitedDomains"
         static let lastSelectedAt = "lastSelectedAt"
     }
 
@@ -49,12 +48,9 @@ extension Tab: NSSecureCoding {
               let content = TabContent(type: tabType, url: url, videoID: videoID, timestamp: videoTimestamp, preferencePane: preferencePane)
         else { return nil }
 
-        let visitedDomains = decoder.decodeObject(of: [NSArray.self, NSString.self], forKey: NSSecureCodingKeys.visitedDomains) as? [String] ?? []
-
         let interactionStateData: Data? = decoder.decodeIfPresent(at: NSSecureCodingKeys.interactionStateData) ?? decoder.decodeIfPresent(at: NSSecureCodingKeys.sessionStateData)
 
         self.init(content: content,
-                  localHistory: Set(visitedDomains),
                   title: decoder.decodeIfPresent(at: NSSecureCodingKeys.title),
                   favicon: decoder.decodeIfPresent(at: NSSecureCodingKeys.favicon),
                   interactionStateData: interactionStateData,
@@ -69,7 +65,6 @@ extension Tab: NSSecureCoding {
         guard webView.configuration.websiteDataStore.isPersistent == true else { return }
 
         content.url.map(coder.encode(forKey: NSSecureCodingKeys.url))
-        coder.encode(Array(localHistory), forKey: NSSecureCodingKeys.visitedDomains)
         title.map(coder.encode(forKey: NSSecureCodingKeys.title))
         favicon.map(coder.encode(forKey: NSSecureCodingKeys.favicon))
 
