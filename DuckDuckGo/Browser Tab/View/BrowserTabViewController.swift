@@ -331,35 +331,20 @@ final class BrowserTabViewController: NSViewController {
         homePageView.isHidden = shown
     }
 
-    func openNewTab(with content: Tab.TabContent, parentTab: Tab? = nil, selected: Bool = false, canBeClosedWithBack: Bool = false) {
-        // shouldn't open New Tabs in PopUp window
-        guard view.window?.isPopUpWindow == false else {
-            // Prefer Tab's Parent
-            if let parentTab = tabCollectionViewModel.selectedTabViewModel?.tab.parentTab {
-                parentTab.openChild(with: content, of: .tab(selected: true))
-                parentTab.webView.window?.makeKeyAndOrderFront(nil)
-                // Act as default URL Handler if no Parent
-            } else {
-                WindowControllersManager.shared.showTab(with: content)
-            }
-            return
-        }
-
+    func openNewTab(with content: Tab.TabContent) {
         guard tabCollectionViewModel.selectDisplayableTabIfPresent(content) == false else {
             return
         }
 
-        let tab = Tab(content: content,
-                      parentTab: parentTab,
-                      shouldLoadInBackground: true,
-                      canBeClosedWithBack: canBeClosedWithBack,
-                      webViewFrame: view.frame)
-
-        if parentTab != nil {
-            tabCollectionViewModel.insert(tab, after: parentTab, selected: selected)
-        } else {
-            tabCollectionViewModel.append(tab: tab, selected: selected)
+        // shouldn't open New Tabs in PopUp window
+        if view.window?.isPopUpWindow ?? true {
+            // Prefer Tab's Parent
+            WindowControllersManager.shared.showTab(with: content)
+            return
         }
+
+        let tab = Tab(content: content, shouldLoadInBackground: true, webViewFrame: view.frame)
+        tabCollectionViewModel.append(tab: tab, selected: true)
     }
 
     // MARK: - Browser Tabs

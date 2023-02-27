@@ -114,6 +114,10 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
     }
 
     private func newWindowPolicy(for navigationAction: WKNavigationAction) -> NavigationDecision? {
+        if let newWindowPolicy = self.decideNewWindowPolicy(for: navigationAction) {
+            return newWindowPolicy
+        }
+
         // Are we handling custom Context Menu navigation action or link click with a hotkey?
         for handler in self.newWindowPolicyDecisionMakers ?? [] {
             guard let newWindowPolicy = handler.decideNewWindowPolicy(for: navigationAction) else { continue }

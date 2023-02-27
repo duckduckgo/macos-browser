@@ -167,6 +167,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
     private let navigationDelegate = DistributedNavigationDelegate(logger: .navigation)
     private var newWindowPolicyDecisionMakers: [NewWindowPolicyDecisionMaker]?
+    private var onNewWindow: ((WKNavigationAction?) -> NavigationDecision)?
 
     private let statisticsLoader: StatisticsLoader?
     private let internalUserDecider: InternalUserDeciding?
@@ -352,13 +353,11 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         }
     }
 
-    func openChild(with url: TabContent, of kind: NewWindowPolicy) {
-        guard let delegate else {
-            assertionFailure("no delegate set")
-            return
+    func openChild(with url: URL, of kind: NewWindowPolicy) {
+        self.onNewWindow = { _ in
+            .allow(kind)
         }
-        let tab = Tab(content: content, parentTab: self, shouldLoadInBackground: true, canBeClosedWithBack: kind.isSelectedTab)
-        delegate.tab(self, createdChild: tab, of: kind)
+        webView.loadInNewWindow(url)
     }
 
     @objc func onDuckDuckGoEmailSignOut(_ notification: Notification) {
@@ -1054,15 +1053,25 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
 
 }
 
+extension Tab: NewWindowPolicyDecisionMaker {
+
+    func decideNewWindowPolicy(for navigationAction: WKNavigationAction) -> NavigationDecision? {
+        defer {
+            onNewWindow = nil
+        }
+        return onNewWindow?(navigationAction)
+    }
+
+}
+
 extension Tab: YoutubeOverlayUserScriptDelegate {
     func youtubeOverlayUserScriptDidRequestDuckPlayer(with url: URL) {
-        let content = Tab.TabContent.contentFromURL(url)
         let isRequestingNewTab = NSApp.isCommandPressed
         if isRequestingNewTab {
             let shouldSelectNewTab = NSApp.isShiftPressed
-            self.openChild(with: content, of: .tab(selected: shouldSelectNewTab))
+            openChild(with: url, of: .tab(selected: shouldSelectNewTab))
         } else {
-            setContent(content)
+            setUrl(url, userEntered: false)
         }
     }
 }
