@@ -36,7 +36,7 @@ enum ThirdPartyBrowser: CaseIterable {
     case firefox
     case safari
     case lastPass
-    case onePassword
+    case onePassword7
 
     static var installedBrowsers: [ThirdPartyBrowser] {
         return allCases.filter(\.isInstalled)
@@ -50,7 +50,7 @@ enum ThirdPartyBrowser: CaseIterable {
         case .firefox: return .firefox
         case .safari: return .safari
         case .lastPass: return .lastPass
-        case .onePassword: return .onePassword
+        case .onePassword7: return .onePassword7
         case .csv: return nil
         case .bookmarksHTML: return nil
         }
@@ -74,7 +74,7 @@ enum ThirdPartyBrowser: CaseIterable {
         case .edge: return .edge
         case .firefox: return .firefox
         case .safari: return .safari
-        case .onePassword: return .onePassword
+        case .onePassword7: return .onePassword7
         case .lastPass: return .lastPass
         }
     }
@@ -92,7 +92,7 @@ enum ThirdPartyBrowser: CaseIterable {
     var fallbackApplicationIcon: NSImage? {
         switch self {
         case .lastPass: return NSImage(named: "LastPassIcon")
-        case .onePassword: return NSImage(named: "1PasswordIcon")
+        case .onePassword7: return NSImage(named: "1PasswordIcon")
         default: return nil
         }
     }
@@ -127,7 +127,7 @@ enum ThirdPartyBrowser: CaseIterable {
             "org.mozilla.firefoxdeveloperedition"
         ])
         case .safari: return BundleIdentifiers(productionBundleID: "com.apple.safari", relatedBundleIDs: [])
-        case .onePassword: return BundleIdentifiers(productionBundleID: "com.agilebits.onepassword7", relatedBundleIDs: [
+        case .onePassword7: return BundleIdentifiers(productionBundleID: "com.agilebits.onepassword7", relatedBundleIDs: [
             "com.agilebits.onepassword",
             "com.agilebits.onepassword4",
             "com.1password.1password"
@@ -185,7 +185,7 @@ enum ThirdPartyBrowser: CaseIterable {
         case .edge: return applicationSupportURL.appendingPathComponent("Microsoft Edge/")
         case .firefox: return applicationSupportURL.appendingPathComponent("Firefox/Profiles/")
         case .safari: return URL.nonSandboxLibraryDirectoryURL.appendingPathComponent("Safari/")
-        case .lastPass, .onePassword: return nil
+        case .lastPass, .onePassword7: return nil
         }
     }
 

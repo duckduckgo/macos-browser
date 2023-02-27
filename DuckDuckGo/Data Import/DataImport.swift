@@ -27,7 +27,7 @@ enum DataImport {
         case edge
         case firefox
         case safari
-        case onePassword
+        case onePassword7
         case lastPass
         case csv
         case bookmarksHTML
@@ -48,8 +48,8 @@ enum DataImport {
                 return "Safari"
             case .lastPass:
                 return "LastPass"
-            case .onePassword:
-                return "1Password"
+            case .onePassword7:
+                return "1Password 7"
             case .csv:
                 return UserText.importLoginsCSV
             case .bookmarksHTML:
@@ -62,7 +62,8 @@ enum DataImport {
         }
 
         var canImportData: Bool {
-            return (ThirdPartyBrowser.browser(for: self)?.isInstalled ?? false) || [.csv, .onePassword, .lastPass, .bookmarksHTML].contains(self)
+            let isInstalled = (ThirdPartyBrowser.browser(for: self)?.isInstalled ?? false)
+            return isInstalled || [.csv, .onePassword7, .lastPass, .bookmarksHTML].contains(self)
         }
 
         var pixelEventSource: Pixel.Event.DataImportSource {
@@ -72,7 +73,7 @@ enum DataImport {
             case .edge: return .edge
             case .firefox: return .firefox
             case .safari: return .safari
-            case .onePassword: return .onePassword
+            case .onePassword7: return .onePassword
             case .lastPass: return .lastPass
             case .csv: return .csv
             case .bookmarksHTML: return .bookmarksHTML
@@ -140,7 +141,7 @@ enum DataImport {
                 self.profiles = profileURLs.map({
                     BrowserProfile.for(browser: .safari, profileURL: $0)
                 }).sorted()
-            case .lastPass, .onePassword:
+            case .lastPass, .onePassword7:
                 self.profiles = []
             }
         }
@@ -155,7 +156,7 @@ enum DataImport {
                 return profiles.first { $0.profileName == "Default" } ?? profiles.first
             case .firefox:
                 return profiles.first { $0.profileName == "default-release" } ?? profiles.first
-            case .safari, .lastPass, .onePassword:
+            case .safari, .lastPass, .onePassword7:
                 return nil
             }
         }

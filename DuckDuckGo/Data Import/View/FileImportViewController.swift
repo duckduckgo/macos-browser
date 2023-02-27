@@ -112,7 +112,7 @@ final class FileImportViewController: NSViewController {
             lastPassInfoView.isHidden = true
             onePasswordInfoView.isHidden = true
             selectFileButton.title = UserText.importLoginsSelectSafariCSVFile
-        case .onePassword:
+        case .onePassword7:
             descriptionLabel.isHidden = true
             safariInfoView.isHidden = true
             lastPassInfoView.isHidden = true
@@ -195,7 +195,7 @@ final class FileImportViewController: NSViewController {
                 switch importSource {
                 case .bookmarksHTML:
                     delegate?.fileImportViewController(self, didSelectBookmarksFileWithURL: selectedURL)
-                case .csv, .onePassword, .lastPass, .safari:
+                case .csv, .onePassword7, .lastPass, .safari:
                     delegate?.fileImportViewController(self, didSelectCSVFileWithURL: selectedURL)
                 default:
                     break

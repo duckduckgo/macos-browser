@@ -68,7 +68,7 @@ final class CSVImporter: DataImporter {
 
         init?(source: DataImport.Source) {
             switch source {
-            case .onePassword:
+            case .onePassword7:
                 self.init(titleIndex: 3, urlIndex: 5, usernameIndex: 6, passwordIndex: 2, maximumIndex: 7)
             case .lastPass, .firefox, .edge, .chrome, .brave, .safari, .csv, .bookmarksHTML:
                 return nil
