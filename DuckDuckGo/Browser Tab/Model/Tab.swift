@@ -38,6 +38,10 @@ protocol TabDelegate: ContentOverlayUserScriptDelegate {
 
 }
 
+protocol NewWindowPolicyDecisionMaker {
+    func decideNewWindowPolicy(for navigationAction: WKNavigationAction) -> NavigationDecision?
+}
+
 // swiftlint:disable type_body_length
 @dynamicMemberLookup
 final class Tab: NSObject, Identifiable, ObservableObject {
@@ -162,6 +166,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     func setDelegate(_ delegate: TabDelegate) { self.delegate = delegate }
 
     private let navigationDelegate = DistributedNavigationDelegate(logger: .navigation)
+    private var newWindowPolicyDecisionMakers: [NewWindowPolicyDecisionMaker]?
 
     private let statisticsLoader: StatisticsLoader?
     private let internalUserDecider: InternalUserDeciding?
@@ -297,8 +302,10 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
         let userContentControllerPromise = Future<UserContentController, Never>.promise()
         let webViewPromise = Future<WKWebView, Never>.promise()
+        var tabGetter: () -> Tab? = { nil }
         self.extensions = extensionsBuilder
             .build(with: (tabIdentifier: instrumentation.currentTabIdentifier,
+                          isTabPinned: { tabGetter().map { tab in pinnedTabsManager.isTabPinned(tab) } ?? false },
                           contentPublisher: _content.projectedValue.eraseToAnyPublisher(),
                           titlePublisher: _title.projectedValue.eraseToAnyPublisher(),
                           userScriptsPublisher: userScriptsPublisher,
@@ -314,6 +321,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                                                        cbaTimeReporter: cbaTimeReporter))
 
         super.init()
+        tabGetter = { [weak self] in self }
         userContentController.map(userContentControllerPromise.fulfill)
 
         setupNavigationDelegate()
@@ -344,7 +352,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         }
     }
 
-    func openChild(with content: TabContent, of kind: NewWindowPolicy) {
+    func openChild(with url: TabContent, of kind: NewWindowPolicy) {
         guard let delegate else {
             assertionFailure("no delegate set")
             return
@@ -987,23 +995,6 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
             return policy
         }
 
-        let isLinkActivated = !navigationAction.isTargetingNewWindow
-            && (navigationAction.navigationType.isLinkActivated || (navigationAction.navigationType == .other && navigationAction.isUserInitiated))
-
-        let isNavigatingAwayFromPinnedTab: Bool = {
-            let isNavigatingToAnotherDomain = navigationAction.url.host != url?.host
-            let isPinned = pinnedTabsManager.isTabPinned(self)
-            return isLinkActivated && isPinned && isNavigatingToAnotherDomain && navigationAction.isForMainFrame
-        }()
-
-        // to be modularized later on, see https://app.asana.com/0/0/1203268245242140/f
-        let isRequestingNewTab = (isLinkActivated && NSApp.isCommandPressed) || navigationAction.navigationType.isMiddleButtonClick || isNavigatingAwayFromPinnedTab
-        if isRequestingNewTab {
-            let shouldSelectNewTab = NSApp.isShiftPressed || (isNavigatingAwayFromPinnedTab && !navigationAction.navigationType.isMiddleButtonClick && !NSApp.isCommandPressed)
-            self.openChild(with: .contentFromURL(navigationAction.url), of: .tab(selected: shouldSelectNewTab))
-            return .cancel
-        }
-
         if navigationAction.isForMainFrame {
             preferences.userAgent = UserAgent.for(navigationAction.url)
         }
@@ -1096,5 +1087,18 @@ extension Tab {
 
     static var objcNavigationDelegateKeyPath: String { #keyPath(objcNavigationDelegate) }
     @objc private var objcNavigationDelegate: Any? { navigationDelegate }
+
+    static var objcNewWindowPolicyDecisionMakersKeyPath: String { #keyPath(objcNewWindowPolicyDecisionMakers) }
+    @objc private var objcNewWindowPolicyDecisionMakers: Any? {
+        get {
+            newWindowPolicyDecisionMakers
+        }
+        set {
+            newWindowPolicyDecisionMakers = newValue as? [NewWindowPolicyDecisionMaker] ?? {
+                assertionFailure("\(String(describing: newValue)) is not [NewWindowPolicyDecisionMaker]")
+                return nil
+            }()
+        }
+    }
 
 }

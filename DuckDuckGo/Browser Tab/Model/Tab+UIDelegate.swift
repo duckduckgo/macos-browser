@@ -25,7 +25,12 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
 
     // "protected" delegate property
     private var delegate: TabDelegate? {
-        self.value(forKeyPath: Tab.objcDelegateKeyPath) as? TabDelegate
+        self.value(forKey: Tab.objcDelegateKeyPath) as? TabDelegate
+    }
+
+    // "protected" newWindowPolicyDecisionMakers
+    private var newWindowPolicyDecisionMakers: [NewWindowPolicyDecisionMaker]? {
+        self.value(forKey: Tab.objcNewWindowPolicyDecisionMakersKeyPath) as? [NewWindowPolicyDecisionMaker]
     }
 
     @objc(_webView:saveDataToFile:suggestedFilename:mimeType:originatingURL:)
@@ -70,15 +75,7 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
                  windowFeatures: WKWindowFeatures,
                  completionHandler: @escaping (WKWebView?) -> Void) {
 
-        let newWindowPolicy: NavigationDecision? = {
-            // Are we handling custom Context Menu navigation action? (see ContextMenuManager)
-            if let newWindowPolicy = self.contextMenuManager?.decideNewWindowPolicy(for: navigationAction) {
-                return newWindowPolicy
-            }
-
-            return nil
-        }()
-        switch newWindowPolicy {
+        switch newWindowPolicy(for: navigationAction) {
         // popup kind is known, action doesn‘t require Popup Permission
         case .allow(let targetKind):
             // proceed to web view creation
@@ -114,6 +111,16 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
 
             completionHandler(webView)
         }
+    }
+
+    private func newWindowPolicy(for navigationAction: WKNavigationAction) -> NavigationDecision? {
+        // Are we handling custom Context Menu navigation action or link click with a hotkey?
+        for handler in self.newWindowPolicyDecisionMakers ?? [] {
+            guard let newWindowPolicy = handler.decideNewWindowPolicy(for: navigationAction) else { continue }
+            return newWindowPolicy
+        }
+
+        return nil
     }
 
     /// create a new Tab returning its WebView to a createWebViewWithConfiguration callback
