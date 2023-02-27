@@ -27,7 +27,7 @@ protocol FileDownloadManagerProtocol: AnyObject {
 
     @discardableResult
     func add(_ download: WebKitDownload,
-             delegate: FileDownloadManagerDelegate?,
+             delegate: DownloadTaskDelegate?,
              location: FileDownloadManager.DownloadLocationPreference) -> WebKitDownloadTask
 
     func cancelAll(waitUntilDone: Bool)
@@ -42,10 +42,16 @@ extension FileDownloadManagerProtocol {
 
 }
 
+protocol FileDownloadManagerDelegate: AnyObject {
+    func askUserToGrantAccessToDestination(_ folderUrl: URL)
+}
+
 final class FileDownloadManager: FileDownloadManagerProtocol {
 
     static let shared = FileDownloadManager()
     private let preferences: DownloadsPreferences
+
+    weak var delegate: FileDownloadManagerDelegate?
 
     init(preferences: DownloadsPreferences = .init()) {
         self.preferences = preferences
@@ -57,7 +63,7 @@ final class FileDownloadManager: FileDownloadManagerProtocol {
         downloadAddedSubject.eraseToAnyPublisher()
     }
 
-    private var downloadTaskDelegates = [WebKitDownloadTask: () -> FileDownloadManagerDelegate?]()
+    private var downloadTaskDelegates = [WebKitDownloadTask: () -> DownloadTaskDelegate?]()
 
     enum DownloadLocationPreference: Equatable {
         case auto
@@ -83,7 +89,7 @@ final class FileDownloadManager: FileDownloadManagerProtocol {
     }
 
     @discardableResult
-    func add(_ download: WebKitDownload, delegate: FileDownloadManagerDelegate?, location: DownloadLocationPreference) -> WebKitDownloadTask {
+    func add(_ download: WebKitDownload, delegate: DownloadTaskDelegate?, location: DownloadLocationPreference) -> WebKitDownloadTask {
         dispatchPrecondition(condition: .onQueue(.main))
 
         let task = WebKitDownloadTask(download: download,
@@ -155,17 +161,22 @@ extension FileDownloadManager: WebKitDownloadTaskDelegate {
               let delegate = self.downloadTaskDelegates[task]?()
         else {
             // download to default Downloads destination
-            var fileName = suggestedFilename
-            if fileName.isEmpty {
-                fileName = .uniqueFilename(for: fileType)
-            }
-            if let url = downloadLocation?.appendingPathComponent(fileName) {
-                completion(url, fileType)
-            } else {
+            let fileName = suggestedFilename.isEmpty ? .uniqueFilename(for: fileType) : suggestedFilename
+
+            guard let url = downloadLocation?.appendingPathComponent(fileName) else {
                 os_log("Failed to access Downloads folder")
                 Pixel.fire(.debug(event: .fileMoveToDownloadsFailed, error: CocoaError(.fileWriteUnknown)))
                 completion(nil, nil)
+                return
             }
+
+            // Make sure the app has an access to destination
+            guard self.verifyAccessToDestinationFolder(url.deletingLastPathComponent()) else {
+                completion(nil, nil)
+                return
+            }
+
+            completion(url, fileType)
             return
         }
 
@@ -176,18 +187,33 @@ extension FileDownloadManager: WebKitDownloadTaskDelegate {
         }
         let fileTypes = fileType.map { [$0] } ?? []
         delegate.chooseDestination(suggestedFilename: suggestedFilename, directoryURL: downloadLocation, fileTypes: fileTypes) { [weak self] url, fileType in
+            guard let self, let url else {
+                completion(nil, nil)
+                return
+            }
 
-            if let url = url {
-                self?.preferences.lastUsedCustomDownloadLocation = url.deletingLastPathComponent()
+            self.preferences.lastUsedCustomDownloadLocation = url.deletingLastPathComponent()
 
-                if FileManager.default.fileExists(atPath: url.path) {
-                    // if SavePanel points to an existing location that means overwrite was chosen
-                    try? FileManager.default.removeItem(at: url)
-                }
+            if FileManager.default.fileExists(atPath: url.path) {
+                // if SavePanel points to an existing location that means overwrite was chosen
+                try? FileManager.default.removeItem(at: url)
             }
 
             completion(url, fileType)
         }
+    }
+
+    private func verifyAccessToDestinationFolder(_ folderUrl: URL) -> Bool {
+        let folderPath = folderUrl.relativePath
+        let c = open(folderPath, O_RDONLY)
+        let hasAccess = c != -1
+        close(c)
+
+        if !hasAccess {
+            delegate?.askUserToGrantAccessToDestination(folderUrl)
+        }
+
+        return hasAccess
     }
 
     func fileDownloadTask(_ task: WebKitDownloadTask, didFinishWith result: Result<URL, FileDownloadError>) {
@@ -206,7 +232,7 @@ extension FileDownloadManager: WebKitDownloadTaskDelegate {
 
 }
 
-protocol FileDownloadManagerDelegate: AnyObject {
+protocol DownloadTaskDelegate: AnyObject {
 
     func chooseDestination(suggestedFilename: String?, directoryURL: URL?, fileTypes: [UTType], callback: @escaping (URL?, UTType?) -> Void)
     func fileIconFlyAnimationOriginalRect(for downloadTask: WebKitDownloadTask) -> NSRect?

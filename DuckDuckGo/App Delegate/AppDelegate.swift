@@ -24,7 +24,7 @@ import Persistence
 import Bookmarks
 
 @NSApplicationMain
-final class AppDelegate: NSObject, NSApplicationDelegate {
+final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDelegate {
 
 #if DEBUG
     static var isRunningTests: Bool = ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
@@ -146,6 +146,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         LocalBookmarkManager.shared.loadBookmarks()
         FaviconManager.shared.loadFavicons()
         ConfigurationManager.shared.start()
+        FileDownloadManager.shared.delegate = self
         _ = DownloadListCoordinator.shared
         _ = RecentlyClosedCoordinator.shared
 
@@ -189,6 +190,23 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         stateRestorationManager?.applicationWillTerminate()
 
         return .terminateNow
+    }
+
+    func askUserToGrantAccessToDestination(_ folderUrl: URL) {
+        if FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first?.lastPathComponent == folderUrl.lastPathComponent {
+            let alert = NSAlert.noAccessToDownloads()
+            if alert.runModal() != .cancel {
+                guard let preferencesLink = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_DownloadsFolder") else {
+                    assertionFailure("Can't initialize preferences link")
+                    return
+                }
+                NSWorkspace.shared.open(preferencesLink)
+                return
+            }
+        } else {
+            let alert = NSAlert.noAccessToSelectedFolder()
+            alert.runModal()
+        }
     }
 
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {

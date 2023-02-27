@@ -141,7 +141,7 @@ extension DownloadsTabExtension: NavigationResponder {
     }
 
     func enqueueDownload(_ download: WebKitDownload, withNavigationAction navigationAction: NavigationAction?) {
-        let task = FileDownloadManager.shared.add(download, delegate: self, location: .auto)
+        let task = downloadManager.add(download, delegate: self, location: .auto)
 
         // If the download has started from a popup Tab - close it after starting the download
         // e.g. download button on this page:
@@ -180,7 +180,7 @@ extension DownloadsTabExtension: WKNavigationDelegate {
 
 }
 
-extension DownloadsTabExtension: FileDownloadManagerDelegate {
+extension DownloadsTabExtension: DownloadTaskDelegate {
 
     func chooseDestination(suggestedFilename: String?, directoryURL: URL?, fileTypes: [UTType], callback: @escaping (URL?, UTType?) -> Void) {
         savePanelDialogRequest = SavePanelDialogRequest(SavePanelParameters(suggestedFilename: suggestedFilename, fileTypes: fileTypes)) { [weak self] result in
@@ -199,7 +199,7 @@ extension DownloadsTabExtension: FileDownloadManagerDelegate {
 
 }
 
-protocol DownloadsTabExtensionProtocol: AnyObject, NavigationResponder, FileDownloadManagerDelegate {
+protocol DownloadsTabExtensionProtocol: AnyObject, NavigationResponder, DownloadTaskDelegate {
     var delegate: TabDownloadsDelegate? { get set }
     var savePanelDialogPublisher: AnyPublisher<Tab.UserDialog?, Never> { get }
 
@@ -222,21 +222,10 @@ extension TabExtensions {
     }
 }
 
-extension WebKitDownloadTask {
+extension Tab {
 
-    var didChooseDownloadLocationPublisher: AnyPublisher<URL, FileDownloadError> {
-        Publishers.Merge(
-            $location
-                // waiting for the download location to be chosen
-                .compactMap { $0.destinationURL }
-                .mapError { (_: Never) -> FileDownloadError in }
-                .eraseToAnyPublisher(),
-            // downloadTask.output Publisher will complete with an error if cancelled
-            output.eraseToAnyPublisher()
-        )
-        // complete the Publisher when the location is chosen
-        .first()
-        .eraseToAnyPublisher()
+    func saveWebContentAs() {
+        self.downloads?.saveWebViewContentAs(webView)
     }
 
 }

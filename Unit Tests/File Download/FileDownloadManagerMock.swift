@@ -31,10 +31,10 @@ final class FileDownloadManagerMock: FileDownloadManagerProtocol {
     }
 
     var addDownloadBlock: ((WebKitDownload,
-                            FileDownloadManagerDelegate?,
+                            DownloadTaskDelegate?,
                             FileDownloadManager.DownloadLocationPreference) -> WebKitDownloadTask)?
     func add(_ download: WebKitDownload,
-             delegate: FileDownloadManagerDelegate?,
+             delegate: DownloadTaskDelegate?,
              location: FileDownloadManager.DownloadLocationPreference) -> WebKitDownloadTask {
         addDownloadBlock!(download, delegate, location)
     }

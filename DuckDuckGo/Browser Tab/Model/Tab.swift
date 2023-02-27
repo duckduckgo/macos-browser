@@ -41,8 +41,6 @@ protocol TabDelegate: ContentOverlayUserScriptDelegate {
     func tabPageDOMLoaded(_ tab: Tab)
     func closeTab(_ tab: Tab)
 
-    func fileIconFlyAnimationOriginalRect(for downloadTask: WebKitDownloadTask) -> NSRect?
-
 }
 
 // swiftlint:disable type_body_length
@@ -573,10 +571,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         }
 
         return self.interactionState.data
-    }
-
-    func saveWebContentAs() {
-        self.downloads?.saveWebViewContentAs(webView)
     }
 
     private let instrumentation = TabInstrumentation()

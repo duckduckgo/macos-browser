@@ -255,7 +255,7 @@ final class FileDownloadManagerTests: XCTestCase {
 }
 
 @available(macOS 11.3, *)
-extension FileDownloadManagerTests: FileDownloadManagerDelegate {
+extension FileDownloadManagerTests: DownloadTaskDelegate {
     func chooseDestination(suggestedFilename: String?, directoryURL: URL?, fileTypes: [UTType], callback: @escaping (URL?, UTType?) -> Void) {
         self.chooseDestination?(suggestedFilename, directoryURL, fileTypes, callback)
     }
