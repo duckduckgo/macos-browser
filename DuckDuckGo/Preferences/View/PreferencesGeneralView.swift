@@ -57,6 +57,15 @@ extension Preferences {
                     ToggleMenuItem(title: UserText.reopenAllWindowsFromLastSession, isOn: $startupModel.restorePreviousSession)
                 }
 
+                Section {
+                    Text("Crash Reporting URL")
+                        .font(Const.Fonts.preferencePaneSectionHeader)
+                    HStack {
+                        Text("Send crash reports to this URL:")
+                        TextField("Type URL here", text: $startupModel.crashReportingURLString)
+                    }
+                }
+
             }
         }
     }

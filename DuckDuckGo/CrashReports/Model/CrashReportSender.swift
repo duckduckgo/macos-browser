@@ -29,7 +29,8 @@ final class CrashReportSender {
             assertionFailure("CrashReportSender: Can't get the content of the crash report")
             return
         }
-        var request = URLRequest(url: Self.reportServiceUrl)
+        let startupPreferences = StartupPreferences()
+        var request = URLRequest(url: startupPreferences.crashReportingURLString.url!)
         request.setValue("text/plain", forHTTPHeaderField: "Content-Type")
         request.setValue("ddg_mac", forHTTPHeaderField: "User-Agent")
         request.httpMethod = "POST"

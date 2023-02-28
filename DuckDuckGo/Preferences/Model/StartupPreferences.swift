@@ -20,11 +20,15 @@ import Foundation
 
 protocol StartupPreferencesPersistor {
     var restorePreviousSession: Bool { get set }
+    var crashReportingURLString: String { get set }
 }
 
 struct StartupPreferencesUserDefaultsPersistor: StartupPreferencesPersistor {
     @UserDefaultsWrapper(key: .restorePreviousSession, defaultValue: false)
     var restorePreviousSession: Bool
+
+    @UserDefaultsWrapper(key: .crashReportingURLString, defaultValue: "https://duckduckgo.com/crash.js")
+    var crashReportingURLString: String
 }
 
 final class StartupPreferences: ObservableObject {
@@ -35,9 +39,16 @@ final class StartupPreferences: ObservableObject {
         }
     }
 
+    @Published var crashReportingURLString: String = "" {
+        didSet {
+            persistor.crashReportingURLString = crashReportingURLString
+        }
+    }
+
     init(persistor: StartupPreferencesPersistor = StartupPreferencesUserDefaultsPersistor()) {
         self.persistor = persistor
         restorePreviousSession = persistor.restorePreviousSession
+        crashReportingURLString = persistor.crashReportingURLString
     }
 
     private var persistor: StartupPreferencesPersistor

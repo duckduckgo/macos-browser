@@ -63,6 +63,7 @@ public struct UserDefaultsWrapper<T> {
         case fireInfoPresentedOnce = "fire.info.presented.once"
 
         case restorePreviousSession = "preferences.startup.restore-previous-session"
+        case crashReportingURLString = "preferences.startup.crash-reporting-url-string"
         case currentThemeName = "com.duckduckgo.macos.currentThemeNameKey"
         case showFullURL = "preferences.appearance.show-full-url"
         case showAutocompleteSuggestions = "preferences.appearance.show-autocomplete-suggestions"
