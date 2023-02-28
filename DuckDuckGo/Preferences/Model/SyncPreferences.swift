@@ -28,7 +28,7 @@ final class SyncPreferences: ObservableObject {
     ]
 
     @Published var syncKey: String = "c3NoLWVkMjU1MTkgQUFBQUMzTnphQzFsWkRJMU5URTVBQUFBSU9BM1A4YkR1My93cVVrMW5uZzVaSXlVZ2NRVVptWWFGejJSYjhlbWdKTkkgdGVzdC1zeW5jLWtleQ=="
-    @Published var remoteSyncKey: String? = nil
+    @Published var remoteSyncKey: String?
 
     func presentEnableSyncDialog() {
         let enableSyncWindowController = SyncSetupViewController.create(with: self).wrappedInWindowController()
