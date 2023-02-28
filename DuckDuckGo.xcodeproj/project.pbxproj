@@ -46,6 +46,8 @@
 		1D69C553291302F200B75945 /* BWVault.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D69C552291302F200B75945 /* BWVault.swift */; };
 		1D77921828FDC54C00BE0210 /* FaviconReferenceCacheTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D77921728FDC54C00BE0210 /* FaviconReferenceCacheTests.swift */; };
 		1D77921A28FDC79800BE0210 /* FaviconStoringMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D77921928FDC79800BE0210 /* FaviconStoringMock.swift */; };
+		1DCFBC8A29ADF32B00313531 /* DisposableHomePageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DCFBC8929ADF32B00313531 /* DisposableHomePageView.swift */; };
+		1DCFBC8B29ADF32B00313531 /* DisposableHomePageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DCFBC8929ADF32B00313531 /* DisposableHomePageView.swift */; };
 		1DDF076328F815AD00EDFBE3 /* BWCommunicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DDF075D28F815AD00EDFBE3 /* BWCommunicator.swift */; };
 		1DDF076428F815AD00EDFBE3 /* BWManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DDF075E28F815AD00EDFBE3 /* BWManager.swift */; };
 		1DE03424298BC7EA00CAB3D7 /* InternalUserDeciderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D12F2DF298BC58B009A65FD /* InternalUserDeciderTests.swift */; };
@@ -1803,6 +1805,7 @@
 		1D77921728FDC54C00BE0210 /* FaviconReferenceCacheTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaviconReferenceCacheTests.swift; sourceTree = "<group>"; };
 		1D77921928FDC79800BE0210 /* FaviconStoringMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaviconStoringMock.swift; sourceTree = "<group>"; };
 		1D77921C28FFF27C00BE0210 /* RunningApplicationCheck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunningApplicationCheck.swift; sourceTree = "<group>"; };
+		1DCFBC8929ADF32B00313531 /* DisposableHomePageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisposableHomePageView.swift; sourceTree = "<group>"; };
 		1DDF075C28F815AD00EDFBE3 /* BWCredential.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BWCredential.swift; sourceTree = "<group>"; };
 		1DDF075D28F815AD00EDFBE3 /* BWCommunicator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BWCommunicator.swift; sourceTree = "<group>"; };
 		1DDF075E28F815AD00EDFBE3 /* BWManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BWManager.swift; sourceTree = "<group>"; };
@@ -5037,6 +5040,7 @@
 				85589E7B27BBB8630038AD11 /* HomePage.storyboard */,
 				85AC7AD827BD625000FFB69B /* HomePageAssets.xcassets */,
 				85589E7C27BBB8630038AD11 /* HomePageView.swift */,
+				1DCFBC8929ADF32B00313531 /* DisposableHomePageView.swift */,
 				85589E7D27BBB8630038AD11 /* HomePageViewController.swift */,
 				857FFEBF27D239DC00415E7A /* HyperLink.swift */,
 				85589E9F27BFE60E0038AD11 /* MoreOrLessView.swift */,
@@ -6466,6 +6470,7 @@
 				4B9754EC2984300100D7B834 /* EmailManagerExtension.swift in Sources */,
 				3706FC04293F65D500E42796 /* PreferencesPrivacyView.swift in Sources */,
 				3706FC05293F65D500E42796 /* NSPasteboardExtension.swift in Sources */,
+				1DCFBC8B29ADF32B00313531 /* DisposableHomePageView.swift in Sources */,
 				3706FC06293F65D500E42796 /* OnboardingViewModel.swift in Sources */,
 				3706FC07293F65D500E42796 /* ScriptSourceProviding.swift in Sources */,
 				3706FC08293F65D500E42796 /* CoreDataBookmarkImporter.swift in Sources */,
@@ -7305,6 +7310,7 @@
 				1D43EB36292ACE690065E5D6 /* ApplicationVersionReader.swift in Sources */,
 				4BD18F01283F0BC500058124 /* BookmarksBarViewController.swift in Sources */,
 				379DE4BD27EA31AC002CC3DE /* PreferencesAutofillView.swift in Sources */,
+				1DCFBC8A29ADF32B00313531 /* DisposableHomePageView.swift in Sources */,
 				858A797F26A79EAA00A75A42 /* UserText+PasswordManager.swift in Sources */,
 				B693954E26F04BEB0015B914 /* ProgressView.swift in Sources */,
 				B69B503C2726A12500758A2B /* StatisticsStore.swift in Sources */,

@@ -64,7 +64,7 @@ final class HomePageViewController: NSViewController {
 
         refreshModels()
 
-        let rootView = HomePage.Views.RootView()
+        let rootView = HomePage.Views.RootView(isDisposable: tabCollectionViewModel.isDisposable)
             .environmentObject(favoritesModel)
             .environmentObject(defaultBrowserModel)
             .environmentObject(recentlyVisitedModel)

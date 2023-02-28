@@ -688,5 +688,9 @@ struct UserText {
     static let noAccessToDownloadsFolder = NSLocalizedString("no.access.to.downloads.folder", value: "Grant access in Security & Privacy preferences in System Settings.", comment: "Alert presented to user if the app doesn't have rights to access Downloads folder")
     static let noAccessToSelectedFolderHeader = NSLocalizedString("no.access.to.selected.folder.header", value: "DuckDuckGo needs permission to access selected folder", comment: "Header of the alert dialog informing user about failed download")
     static let noAccessToSelectedFolder = NSLocalizedString("no.access.to.selected.folder", value: "Grant access to the location of download.", comment: "Alert presented to user if the app doesn't have rights to access selected folder")
+
+    static let disposableWindowHeader = NSLocalizedString("disposable.window.header", value: "Disposable Window", comment: "Header shown on the hompage of the disposable window")
+    static let disposableWindowDescription = NSLocalizedString("disposable.window.description", value: "All of the activity in this window is temporary and DuckDuckGo\n won't save history, cookies, or site data.\n\nData collected in this window is cleared when you close all\n disposable windows or quit the application.", comment: "")
+
 }
 
