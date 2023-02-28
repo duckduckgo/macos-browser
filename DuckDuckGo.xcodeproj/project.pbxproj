@@ -1572,6 +1572,7 @@
 		B66260E129AC6EBD00E9E3EE /* HistoryTabExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B66260DF29AC6EBD00E9E3EE /* HistoryTabExtension.swift */; };
 		B66260E629ACAE4B00E9E3EE /* NavigationHotkeyHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = B66260E529ACAE4B00E9E3EE /* NavigationHotkeyHandler.swift */; };
 		B66260E729ACAE4B00E9E3EE /* NavigationHotkeyHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = B66260E529ACAE4B00E9E3EE /* NavigationHotkeyHandler.swift */; };
+		B66260E829ACD0C900E9E3EE /* DuckPlayerTabExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C416A6294A4AE500C4F2E7 /* DuckPlayerTabExtension.swift */; };
 		B662D3D92755D7AD0035D4D6 /* PixelStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B662D3D82755D7AD0035D4D6 /* PixelStoreTests.swift */; };
 		B662D3DE275613BB0035D4D6 /* EncryptionKeyStoreMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B662D3DD275613BB0035D4D6 /* EncryptionKeyStoreMock.swift */; };
 		B662D3DF275616FF0035D4D6 /* EncryptionKeyStoreMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B662D3DD275613BB0035D4D6 /* EncryptionKeyStoreMock.swift */; };
@@ -1709,6 +1710,7 @@
 		B6C0B24626E9CB190031CB7F /* RunLoopExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C0B24526E9CB190031CB7F /* RunLoopExtensionTests.swift */; };
 		B6C2C9EF276081AB005B7F0A /* DeallocationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C2C9EE276081AB005B7F0A /* DeallocationTests.swift */; };
 		B6C2C9F62760B659005B7F0A /* TestDataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = B6C2C9F42760B659005B7F0A /* TestDataModel.xcdatamodeld */; };
+		B6C416A7294A4AE500C4F2E7 /* DuckPlayerTabExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C416A6294A4AE500C4F2E7 /* DuckPlayerTabExtension.swift */; };
 		B6CA4824298CDC2E0067ECCE /* AdClickAttributionTabExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6CA4823298CDC2E0067ECCE /* AdClickAttributionTabExtensionTests.swift */; };
 		B6CA4825298CE4B70067ECCE /* AdClickAttributionTabExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6CA4823298CDC2E0067ECCE /* AdClickAttributionTabExtensionTests.swift */; };
 		B6CFAA522943725600CB6B11 /* WebKitDownloadDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6CFAA512943725600CB6B11 /* WebKitDownloadDelegate.swift */; };
@@ -2681,6 +2683,7 @@
 		B6C0B24526E9CB190031CB7F /* RunLoopExtensionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RunLoopExtensionTests.swift; sourceTree = "<group>"; };
 		B6C2C9EE276081AB005B7F0A /* DeallocationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeallocationTests.swift; sourceTree = "<group>"; };
 		B6C2C9F52760B659005B7F0A /* Permissions.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Permissions.xcdatamodel; sourceTree = "<group>"; };
+		B6C416A6294A4AE500C4F2E7 /* DuckPlayerTabExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuckPlayerTabExtension.swift; sourceTree = "<group>"; };
 		B6CA4823298CDC2E0067ECCE /* AdClickAttributionTabExtensionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdClickAttributionTabExtensionTests.swift; sourceTree = "<group>"; };
 		B6CA482F298D04690067ECCE /* MockPrivacyConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockPrivacyConfiguration.swift; sourceTree = "<group>"; };
 		B6CF78E2267B0A1900CD4F13 /* WKNavigationAction+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "WKNavigationAction+Private.h"; sourceTree = "<group>"; };
@@ -5309,6 +5312,7 @@
 				B6D574B12947224C008ED1B6 /* ContentBlockingTabExtension.swift */,
 				B6DA06E32913ECEE00225DE2 /* ContextMenuManager.swift */,
 				B6685E4129A61C460043D2EE /* DownloadsTabExtension.swift */,
+				B6C416A6294A4AE500C4F2E7 /* DuckPlayerTabExtension.swift */,
 				B6D574B329472253008ED1B6 /* FBProtectionTabExtension.swift */,
 				B6C00ECC292F89D9009C73A6 /* FindInPageTabExtension.swift */,
 				B66260DF29AC6EBD00E9E3EE /* HistoryTabExtension.swift */,
@@ -6538,6 +6542,7 @@
 				3706FBA7293F65D500E42796 /* EncryptedValueTransformer.swift in Sources */,
 				3706FBA8293F65D500E42796 /* PasteboardBookmark.swift in Sources */,
 				3706FBA9293F65D500E42796 /* PinnedTabsManager.swift in Sources */,
+				B66260E829ACD0C900E9E3EE /* DuckPlayerTabExtension.swift in Sources */,
 				3706FBAA293F65D500E42796 /* HoverUserScript.swift in Sources */,
 				3706FBAC293F65D500E42796 /* MainMenuActions.swift in Sources */,
 				3706FBAE293F65D500E42796 /* DataImport.swift in Sources */,
@@ -7307,6 +7312,7 @@
 				4B9292D42667123700AD2C21 /* BookmarkListViewController.swift in Sources */,
 				4B723E0D26B0006100E14D75 /* SecureVaultLoginImporter.swift in Sources */,
 				4B9292D32667123700AD2C21 /* AddBookmarkModalViewController.swift in Sources */,
+				B6C416A7294A4AE500C4F2E7 /* DuckPlayerTabExtension.swift in Sources */,
 				AA5C1DD5285C780C0089850C /* RecentlyClosedCoordinator.swift in Sources */,
 				AA88D14B252A557100980B4E /* URLRequestExtension.swift in Sources */,
 				AA6197C6276B3168008396F0 /* FaviconHostReference.swift in Sources */,

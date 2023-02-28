@@ -402,7 +402,7 @@ final class BrowserTabViewController: NSViewController {
             }
             showTransientTabContentController(OnboardingViewController.create(withDelegate: self))
 
-        case .url, .privatePlayer:
+        case .url:
             if shouldReplaceWebView(for: tabViewModel) {
                 removeAllTabContent(includingWebView: true)
                 changeWebView(tabViewModel: tabViewModel)

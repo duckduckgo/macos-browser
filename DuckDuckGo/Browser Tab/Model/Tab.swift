@@ -49,7 +49,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     enum TabContent: Equatable {
         case homePage
         case url(URL, userEntered: Bool = false)
-        case privatePlayer(videoID: String, timestamp: String?)
         case preferences(pane: PreferencePaneIdentifier?)
         case bookmarks
         case onboarding
@@ -64,8 +63,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                 return .anyPreferencePane
             } else if let preferencePane = url.flatMap(PreferencePaneIdentifier.init(url:)) {
                 return .preferences(pane: preferencePane)
-            } else if let privatePlayerContent = PrivatePlayer.shared.tabContent(for: url) {
-                return privatePlayerContent
             } else {
                 return .url(url ?? .blankPage, userEntered: userEntered)
             }
@@ -109,7 +106,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
         var title: String? {
             switch self {
-            case .url, .homePage, .privatePlayer, .none: return nil
+            case .url, .homePage, .none: return nil
             case .preferences: return UserText.tabPreferencesTitle
             case .bookmarks: return UserText.tabBookmarksTitle
             case .onboarding: return UserText.tabOnboardingTitle
@@ -117,19 +114,39 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         }
 
         var url: URL? {
+            userEditableUrl
+        }
+        var userEditableUrl: URL? {
+            switch self {
+            case .url(let url, userEntered: _) where !(url.isPrivatePlayer || url.isPrivatePlayerScheme):
+                return url
+            default:
+                return nil
+            }
+        }
+
+        var urlForWebView: URL? {
             switch self {
             case .url(let url, userEntered: _):
                 return url
-            case .privatePlayer(let videoID, let timestamp):
-                return .privatePlayer(videoID, timestamp: timestamp)
-            default:
+            case .homePage:
+                return .homePage
+            case .preferences(pane: .some(let pane)):
+                return .preferencePane(pane)
+            case .preferences(pane: .none):
+                return .preferences
+            case .bookmarks:
+                return .blankPage
+            case .onboarding:
+                return .welcome
+            case .none:
                 return nil
             }
         }
 
         var isUrl: Bool {
             switch self {
-            case .url, .privatePlayer:
+            case .url:
                 return true
             default:
                 return false
@@ -144,15 +161,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                 return false
             }
         }
-
-        var isPrivatePlayer: Bool {
-            switch self {
-            case .privatePlayer:
-                return true
-            default:
-                return false
-            }
-        }
     }
     private struct ExtensionDependencies: TabExtensionDependencies {
         let privacyFeatures: PrivacyFeaturesProtocol
@@ -160,6 +168,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         var downloadManager: FileDownloadManagerProtocol
         var workspace: Workspace
         var cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter?
+        let privatePlayer: PrivatePlayer
     }
 
     fileprivate weak var delegate: TabDelegate?
@@ -172,9 +181,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     private let statisticsLoader: StatisticsLoader?
     private let internalUserDecider: InternalUserDeciding?
     let pinnedTabsManager: PinnedTabsManager
-    private let privatePlayer: PrivatePlayer
-    private let privacyFeatures: AnyPrivacyFeatures
-    private var contentBlocking: AnyContentBlocking { privacyFeatures.contentBlocking }
 
     private let webViewConfiguration: WKWebViewConfiguration
 
@@ -273,8 +279,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         self.content = content
         self.faviconManagement = faviconManagement
         self.pinnedTabsManager = pinnedTabsManager
-        self.privacyFeatures = privacyFeatures
-        self.privatePlayer = privatePlayer
         self.statisticsLoader = statisticsLoader
         self.internalUserDecider = internalUserDecider
         self.title = title
@@ -319,7 +323,8 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                                                        historyCoordinating: historyCoordinating,
                                                        downloadManager: downloadManager,
                                                        workspace: workspace,
-                                                       cbaTimeReporter: cbaTimeReporter))
+                                                       cbaTimeReporter: cbaTimeReporter,
+                                                       privatePlayer: privatePlayer))
 
         super.init()
         tabGetter = { [weak self] in self }
@@ -421,9 +426,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
         let oldContent = self.content
         let newContent: TabContent = {
-            if let newContent = privatePlayer.overrideContent(newContent, for: self) {
-                return newContent
-            }
             if case .preferences(pane: .some) = oldContent,
                case .preferences(pane: nil) = newContent {
                 // prevent clearing currently selected pane (for state persistence purposes)
@@ -586,12 +588,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             return
         }
 
-        // Prevent from a Player reloading loop on back navigation to
-        // YT page where the player was enabled (see comment inside)
-        if privatePlayer.goBackSkippingLastItemIfNeeded(for: webView) {
-            return
-        }
-        userInteractionDialog = nil
         webView.goBack()
     }
 
@@ -619,13 +615,11 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             return
         }
 
-        if webView.url == nil, content.url != nil {
+        if webView.url == nil, content.isUrl {
             // load from cache or interactionStateData when called by lazy loader
             Task { @MainActor [weak self] in
                 await self?.reloadIfNeeded(shouldLoadInBackground: true)
             }
-        } else if case .privatePlayer = content, let url = content.url {
-            webView.load(URLRequest(url: url))
         } else {
             webView.reload()
         }
@@ -634,7 +628,8 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     @MainActor
     private func reloadIfNeeded(shouldLoadInBackground: Bool = false) async {
         let content = self.content
-        guard content.url != nil else { return }
+        guard let contentURL = content.urlForWebView,
+              contentURL.scheme.map(URL.NavigationalScheme.init) != .about else { return }
 
         let url: URL = await {
             if contentURL.isFileURL {
@@ -646,14 +641,10 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                 in self?.isAMPProtectionExtracting = false
             })
         }()
-        guard content == self.content else { return }
+        guard content == self.content else { return } // content should still match after await
 
         if shouldReload(url, shouldLoadInBackground: shouldLoadInBackground) {
             let didRestore = restoreInteractionStateDataIfNeeded()
-
-            if privatePlayer.goBackAndLoadURLIfNeeded(for: self) {
-                return
-            }
 
             guard !didRestore else { return }
 
@@ -673,32 +664,14 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     }
 
     @MainActor
-    private var contentURL: URL {
-        switch content {
-        case .url(let value, userEntered: _):
-            return value
-        case .privatePlayer(let videoID, let timestamp):
-            return .privatePlayer(videoID, timestamp: timestamp)
-        case .homePage:
-            return .homePage
-        default:
-            return .blankPage
-        }
-    }
-
-    @MainActor
     private func shouldReload(_ url: URL, shouldLoadInBackground: Bool) -> Bool {
         // don‘t reload in background unless shouldLoadInBackground
         guard url.isValid,
               (webView.superview != nil || shouldLoadInBackground),
               // don‘t reload when already loaded
               webView.url != url,
-              webView.url != content.url
+              webView.url != (content.isUrl ? content.urlForWebView : nil)
         else {
-            return false
-        }
-
-        if privatePlayer.shouldSkipLoadingURL(for: self) {
             return false
         }
 
@@ -719,8 +692,8 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     private func restoreInteractionStateDataIfNeeded() -> Bool {
         var didRestore: Bool = false
         if let interactionStateData = self.interactionState.data {
-            if contentURL.isFileURL {
-                _ = webView.loadFileURL(contentURL, allowingReadAccessTo: URL(fileURLWithPath: "/"))
+            if let url = content.urlForWebView, url.isFileURL {
+                _ = webView.loadFileURL(url, allowingReadAccessTo: URL(fileURLWithPath: "/"))
             }
 
             if #available(macOS 12.0, *) {
@@ -751,7 +724,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     }
 
     func requestFireproofToggle() {
-        guard let url = content.url,
+        guard let url = content.userEditableUrl,
               let host = url.host
         else { return }
 
@@ -837,17 +810,17 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     let faviconManagement: FaviconManagement
 
     private func handleFavicon() {
-        if content.isPrivatePlayer {
+        guard content.isUrl, let url = content.urlForWebView else {
+            favicon = nil
+            return
+        }
+
+        if url.isPrivatePlayer || url.isPrivatePlayerScheme {
             favicon = .privatePlayer
             return
         }
 
         guard faviconManagement.areFaviconsLoaded else { return }
-
-        guard content.isUrl, let url = content.url else {
-            favicon = nil
-            return
-        }
 
         if let cachedFavicon = faviconManagement.getCachedFavicon(for: url, sizeCategory: .small)?.image {
             if cachedFavicon != favicon {
@@ -855,63 +828,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             }
         } else {
             favicon = nil
-        }
-    }
-
-    // MARK: - Youtube Player
-
-    private weak var youtubeOverlayScript: YoutubeOverlayUserScript?
-    private weak var youtubePlayerScript: YoutubePlayerUserScript?
-    private var youtubePlayerCancellables: Set<AnyCancellable> = []
-
-    func setUpYoutubeScriptsIfNeeded() {
-        guard privatePlayer.isAvailable else {
-            return
-        }
-
-        youtubePlayerCancellables.removeAll()
-
-        // only send push updates on macOS 11+ where it's safe to call window.* messages in the browser
-        let canPushMessagesToJS: Bool = {
-            if #available(macOS 11, *) {
-                return true
-            } else {
-                return false
-            }
-        }()
-
-        if webView.url?.host?.droppingWwwPrefix() == "youtube.com" && canPushMessagesToJS {
-            privatePlayer.$mode
-                .dropFirst()
-                .sink { [weak self] playerMode in
-                    guard let self = self else {
-                        return
-                    }
-                    let userValues = YoutubeOverlayUserScript.UserValues(
-                        privatePlayerMode: playerMode,
-                        overlayInteracted: self.privatePlayer.overlayInteracted
-                    )
-                    self.youtubeOverlayScript?.userValuesUpdated(userValues: userValues, inWebView: self.webView)
-                }
-                .store(in: &youtubePlayerCancellables)
-        }
-
-        if url?.isPrivatePlayerScheme == true {
-            youtubePlayerScript?.isEnabled = true
-
-            if canPushMessagesToJS {
-                privatePlayer.$mode
-                    .map { $0 == .enabled }
-                    .sink { [weak self] shouldAlwaysOpenPrivatePlayer in
-                        guard let self = self else {
-                            return
-                        }
-                        self.youtubePlayerScript?.setAlwaysOpenInPrivatePlayer(shouldAlwaysOpenPrivatePlayer, inWebView: self.webView)
-                    }
-                    .store(in: &youtubePlayerCancellables)
-            }
-        } else {
-            youtubePlayerScript?.isEnabled = false
         }
     }
 
@@ -926,10 +842,6 @@ extension Tab: UserContentControllerDelegate {
         userScripts.faviconScript.delegate = self
         userScripts.pageObserverScript.delegate = self
         userScripts.printingUserScript.delegate = self
-        youtubeOverlayScript = userScripts.youtubeOverlayScript
-        youtubeOverlayScript?.delegate = self
-        youtubePlayerScript = userScripts.youtubePlayerUserScript
-        setUpYoutubeScriptsIfNeeded()
     }
 
 }
@@ -990,10 +902,6 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         // allow local file navigations
         if navigationAction.url.isFileURL { return .allow }
 
-        if let policy = privatePlayer.decidePolicy(for: navigationAction, in: self) {
-            return policy
-        }
-
         if navigationAction.isForMainFrame {
             preferences.userAgent = UserAgent.for(navigationAction.url)
         }
@@ -1033,7 +941,6 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         invalidateInteractionStateData()
         webViewDidFinishNavigationPublisher.send()
         if isAMPProtectionExtracting { isAMPProtectionExtracting = false }
-        setUpYoutubeScriptsIfNeeded()
         statisticsLoader?.refreshRetentionAtb(isSearch: navigation.url.isDuckDuckGoSearch)
     }
 
@@ -1062,18 +969,6 @@ extension Tab: NewWindowPolicyDecisionMaker {
         return onNewWindow?(navigationAction)
     }
 
-}
-
-extension Tab: YoutubeOverlayUserScriptDelegate {
-    func youtubeOverlayUserScriptDidRequestDuckPlayer(with url: URL) {
-        let isRequestingNewTab = NSApp.isCommandPressed
-        if isRequestingNewTab {
-            let shouldSelectNewTab = NSApp.isShiftPressed
-            openChild(with: url, of: .tab(selected: shouldSelectNewTab))
-        } else {
-            setUrl(url, userEntered: false)
-        }
-    }
 }
 
 extension Tab: TabDataClearing {

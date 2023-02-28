@@ -64,7 +64,7 @@ extension Tab: NSSecureCoding {
     func encode(with coder: NSCoder) {
         guard webView.configuration.websiteDataStore.isPersistent == true else { return }
 
-        content.url.map(coder.encode(forKey: NSSecureCodingKeys.url))
+        content.urlForWebView.map(coder.encode(forKey: NSSecureCodingKeys.url))
         title.map(coder.encode(forKey: NSSecureCodingKeys.title))
         favicon.map(coder.encode(forKey: NSSecureCodingKeys.favicon))
 
@@ -72,10 +72,6 @@ extension Tab: NSSecureCoding {
 
         coder.encode(content.type.rawValue, forKey: NSSecureCodingKeys.tabType)
         lastSelectedAt.map(coder.encode(forKey: NSSecureCodingKeys.lastSelectedAt))
-
-        if let videoID = content.videoID {
-            coder.encode(videoID, forKey: NSSecureCodingKeys.videoID)
-        }
 
         if let pane = content.preferencePane {
             coder.encode(pane.rawValue, forKey: NSSecureCodingKeys.preferencePane)
@@ -112,7 +108,7 @@ private extension Tab.TabContent {
             self = .onboarding
         case .privatePlayer:
             guard let videoID = videoID else { return nil }
-            self = .privatePlayer(videoID: videoID, timestamp: timestamp)
+            self = .url(.privatePlayer(videoID, timestamp: timestamp))
         }
     }
 
@@ -123,7 +119,6 @@ private extension Tab.TabContent {
         case .bookmarks: return .bookmarks
         case .preferences: return .preferences
         case .onboarding: return .onboarding
-        case .privatePlayer: return .privatePlayer
         case .none: return .homePage
         }
     }
@@ -137,12 +132,4 @@ private extension Tab.TabContent {
         }
     }
 
-    var videoID: String? {
-        switch self {
-        case let .privatePlayer(videoID, _):
-            return videoID
-        default:
-            return nil
-        }
-    }
 }

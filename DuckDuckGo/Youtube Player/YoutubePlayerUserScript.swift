@@ -41,12 +41,6 @@ final class YoutubePlayerUserScript: NSObject, StaticUserScript {
         privatePlayerPreferences = preferences
     }
 
-    func setAlwaysOpenInPrivatePlayer(_ enabled: Bool, inWebView webView: WKWebView) {
-        let value = enabled ? "true" : "false"
-        let js = "window.postMessage({ alwaysOpenSetting: \(value) });"
-        evaluate(js: js, inWebView: webView)
-    }
-
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         guard isEnabled else {
             return
@@ -70,18 +64,6 @@ final class YoutubePlayerUserScript: NSObject, StaticUserScript {
         }
 
         privatePlayerPreferences.privatePlayerMode = .init(alwaysOpenOnPrivatePlayer)
-    }
-
-    func evaluateJSCall(call: String, webView: WKWebView) {
-        evaluate(js: call, inWebView: webView)
-    }
-
-    private func evaluate(js: String, inWebView webView: WKWebView) {
-        if #available(macOS 11.0, *) {
-            webView.evaluateJavaScript(js, in: nil, in: WKContentWorld.defaultClient)
-        } else {
-            webView.evaluateJavaScript(js)
-        }
     }
 
     private let privatePlayerPreferences: PrivatePlayerPreferences

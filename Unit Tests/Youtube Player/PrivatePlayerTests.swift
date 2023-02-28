@@ -64,35 +64,6 @@ final class PrivatePlayerTests: XCTestCase {
         XCTAssertNil(privatePlayer.domainForRecentlyVisitedSite(with: "https://duck.com".url!))
     }
 
-    func testThatTabContentReturnsNilIfDisabled() {
-        privatePlayer.mode = .disabled
-        XCTAssertNil(privatePlayer.tabContent(for: .privatePlayer("12345678")))
-
-        privatePlayer.mode = .alwaysAsk
-        XCTAssertEqual(privatePlayer.tabContent(for: .privatePlayer("12345678")), .privatePlayer(videoID: "12345678", timestamp: nil))
-
-        privatePlayer.mode = .enabled
-        XCTAssertEqual(privatePlayer.tabContent(for: .privatePlayer("12345678")), .privatePlayer(videoID: "12345678", timestamp: nil))
-    }
-
-    func testThatTabContentContainsTimestampIfTimestampIsInTheURL() {
-        privatePlayer.mode = .enabled
-        XCTAssertEqual(privatePlayer.tabContent(for: .privatePlayer("12345678", timestamp: "10m")), .privatePlayer(videoID: "12345678", timestamp: "10m"))
-    }
-
-    func testThatTabContentReturnsPrivatePlayerURLForYoutubeNocookieURL() {
-        privatePlayer.mode = .alwaysAsk
-        XCTAssertEqual(privatePlayer.tabContent(for: .youtubeNoCookie("12345678", timestamp: "10m")), .privatePlayer(videoID: "12345678", timestamp: "10m"))
-    }
-
-    func testThatTabContentReturnsPrivatePlayerURLForYoutubeVideoURLOnlyInEnabledState() {
-        privatePlayer.mode = .enabled
-        XCTAssertEqual(privatePlayer.tabContent(for: .youtube("12345678", timestamp: "10m")), .privatePlayer(videoID: "12345678", timestamp: "10m"))
-
-        privatePlayer.mode = .alwaysAsk
-        XCTAssertNil(privatePlayer.tabContent(for: .youtube("12345678", timestamp: "10m")))
-    }
-
     func testThatSharingDataStripsDuckPlayerPrefixFromTitleAndReturnsYoutubeURL() {
         let sharingData = privatePlayer.sharingData(for: "Duck Player - sample video", url: "duck://player/12345678?t=10".url!)
         XCTAssertEqual(sharingData?.title, "sample video")

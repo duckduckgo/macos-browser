@@ -42,16 +42,19 @@ extension Tab: NavigationResponder {
         navigationDelegate.setResponders(
             .weak(nullable: self.navigationHotkeyHandler),
 
-            .weak(self),
+                .weak(self),
+
+            // Duck Player overlay navigations handling
+            .weak(nullable: self.duckPlayer),
             // open external scheme link in another app
             .weak(nullable: self.externalAppSchemeHandler),
 
             // tracking link rewrite, referrer trimming, global privacy control
             .weak(nullable: self.navigationProtection),
 
-            .weak(nullable: self.downloads),
+                .weak(nullable: self.downloads),
 
-            .weak(nullable: self.adClickAttribution),
+                .weak(nullable: self.adClickAttribution),
 
             // update blocked trackers info
             .weak(nullable: self.privacyDashboard),
@@ -74,7 +77,8 @@ extension Tab: NavigationResponder {
 
         newWindowPolicyDecisionMakers = [NewWindowPolicyDecisionMaker?](arrayLiteral:
             self.contextMenuManager,
-            self.navigationHotkeyHandler
+            self.navigationHotkeyHandler,
+            self.duckPlayer
         ).compactMap { $0 }
 
         if let downloadsExtension = self.downloads {
