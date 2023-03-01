@@ -344,12 +344,9 @@ private extension ContextMenuManager {
         }
 
         onNewWindow = { navigationAction in
-            guard let url = navigationAction?.request.url as NSURL? else { return .cancel }
+            guard let url = navigationAction?.request.url else { return .cancel }
 
-            let pasteboard = NSPasteboard.general
-            pasteboard.declareTypes([.URL], owner: nil)
-            url.write(to: pasteboard)
-            pasteboard.setString(url.absoluteString ?? "", forType: .string)
+            NSPasteboard.general.copy(url)
 
             return .cancel
         }
@@ -410,9 +407,8 @@ private extension ContextMenuManager {
 
         onNewWindow = { navigationAction in
             guard let url = navigationAction?.request.url else { return .cancel }
-            NSPasteboard.general.clearContents()
-            NSPasteboard.general.setString(url.absoluteString, forType: .string)
-            NSPasteboard.general.setString(url.absoluteString, forType: .URL)
+
+            NSPasteboard.general.copy(url)
 
             return .cancel
         }

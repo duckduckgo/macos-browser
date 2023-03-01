@@ -173,7 +173,7 @@ final class PasswordManagementIdentityModel: ObservableObject, PasswordManagemen
     }
 
     func copy(_ value: String) {
-        NSPasteboard.copy(value)
+        NSPasteboard.general.copy(value)
     }
 
     func createNew() {
