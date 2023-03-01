@@ -35,7 +35,6 @@ final class TabBarCollectionView: NSCollectionView {
         registerForDraggedTypes([.URL, .fileURL])
         // Enable dragging items within and into our CollectionView.
         setDraggingSourceOperationMask([.private], forLocal: true)
-        setDraggingSourceOperationMask([.copy], forLocal: false)
     }
 
     override func selectItems(at indexPaths: Set<IndexPath>, scrollPosition: NSCollectionView.ScrollPosition) {
