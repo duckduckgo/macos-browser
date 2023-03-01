@@ -161,7 +161,9 @@ extension FileDownloadManager: WebKitDownloadTaskDelegate {
             if let url = downloadLocation?.appendingPathComponent(fileName) {
                 // Make sure the app has an access to destination
                 let folderUrl = url.deletingLastPathComponent()
-                guard self.verifyAccessToDestinationFolder(folderUrl) else {
+                guard self.verifyAccessToDestinationFolder(folderUrl,
+                                                           destinationRequested: preferences.alwaysRequestDownloadLocation,
+                                                           isAppStoreBuild: AppDelegate.isAppStoreBuild) else {
                     completion(nil, nil)
                     return
                 }
@@ -190,7 +192,9 @@ extension FileDownloadManager: WebKitDownloadTaskDelegate {
             if let url = url {
                 // Make sure the app has an access to destination
                 let folderUrl = url.deletingLastPathComponent()
-                guard self.verifyAccessToDestinationFolder(folderUrl) else {
+                guard self.verifyAccessToDestinationFolder(folderUrl,
+                                                           destinationRequested: self.preferences.alwaysRequestDownloadLocation,
+                                                           isAppStoreBuild: AppDelegate.isAppStoreBuild) else {
                     completion(nil, nil)
                     return
                 }
@@ -207,7 +211,9 @@ extension FileDownloadManager: WebKitDownloadTaskDelegate {
         }
     }
 
-    private func verifyAccessToDestinationFolder(_ folderUrl: URL) -> Bool {
+    private func verifyAccessToDestinationFolder(_ folderUrl: URL, destinationRequested: Bool, isAppStoreBuild: Bool) -> Bool {
+        if destinationRequested && isAppStoreBuild { return true }
+
         let folderPath = folderUrl.relativePath
         let c = open(folderPath, O_RDONLY)
         let hasAccess = c != -1
