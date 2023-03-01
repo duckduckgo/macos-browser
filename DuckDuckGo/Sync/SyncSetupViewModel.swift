@@ -27,23 +27,38 @@ final class SyncSetupViewModel: ObservableObject {
     @Published var flowState: FlowState = .enableSync
     @Published var shouldDisableSubmitButton: Bool
 
-    let preferences: SyncPreferences
+    @Published var shouldShowErrorMessage: Bool = false
+    @Published var errorMessage: String?
+
+    let syncService: SyncService
     let onCancel: () -> Void
 
-    init(preferences: SyncPreferences, onCancel: @escaping () -> Void) {
-        self.preferences = preferences
+    init(syncService: SyncService, onCancel: @escaping () -> Void) {
+        self.syncService = syncService
         self.onCancel = onCancel
         self.shouldDisableSubmitButton = true
-
-        shouldDisableSubmitButtonCancellable = preferences.$remoteSyncKey
-            .map { key in
-                guard let key else {
-                    return true
-                }
-                return key.isEmpty
-            }
-            .assign(to: \.shouldDisableSubmitButton, onWeaklyHeld: self)
     }
 
+    func turnOnSync() {
+        Task { @MainActor in
+            do {
+                try await syncService.sync.createAccount(deviceName: ProcessInfo.processInfo.hostName)
+                flowState = .syncAnotherDevice
+            } catch {
+                errorMessage = String(describing: error)
+                shouldShowErrorMessage = true
+            }
+        }
+    }
+
+    func cancelFlow() {
+        onCancel()
+        flowState = .enableSync
+    }
+
+    // MARK: - Temporary
+    @Published var remoteSyncKey: String?
+
+    // MARK: -
     private var shouldDisableSubmitButtonCancellable: AnyCancellable?
 }

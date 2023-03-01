@@ -21,12 +21,12 @@ import SwiftUI
 
 final class SyncSetupViewController: NSViewController {
 
-    static func create(with preferences: SyncPreferences) -> SyncSetupViewController {
-        return SyncSetupViewController(preferences)
+    static func create(with syncService: SyncService) -> SyncSetupViewController {
+        return SyncSetupViewController(syncService)
     }
 
-    init(_ syncPreferences: SyncPreferences) {
-        self.syncPreferences = syncPreferences
+    init(_ syncService: SyncService) {
+        self.syncService = syncService
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -34,19 +34,16 @@ final class SyncSetupViewController: NSViewController {
         fatalError("init(coder:) has not been implemented")
     }
 
-    private let syncPreferences: SyncPreferences
+    private let syncService: SyncService
 
-    private lazy var viewModel: SyncSetupViewModel = {
-        SyncSetupViewModel(preferences: syncPreferences) { [weak self] in
+    override func loadView() {
+        let viewModel = SyncSetupViewModel(syncService: syncService) { [weak self] in
             guard let window = self?.view.window, let sheetParent = window.sheetParent else {
                 assertionFailure("window or sheet parent not present")
                 return
             }
             sheetParent.endSheet(window)
         }
-    }()
-
-    override func loadView() {
         let enableSyncView = SyncSetupView(model: viewModel)
         view = NSHostingView(rootView: enableSyncView)
     }

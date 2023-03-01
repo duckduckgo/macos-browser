@@ -17,36 +17,36 @@
 //
 
 import SwiftUI
-
-struct SyncSetupCompleteView: View {
-    @EnvironmentObject var model: SyncSetupViewModel
-
-    var device: SyncedDevice {
-        model.preferences.syncedDevices.last!
-    }
-
-    var body: some View {
-        SyncWizardStep(spacing: 20.0) {
-            VStack(spacing: 20) {
-                Image("SyncSetupComplete")
-                Text(UserText.deviceSynced)
-                    .font(.system(size: 17, weight: .bold))
-                Text(UserText.deviceSyncedExplanation)
-                    .multilineTextAlignment(.center)
-
-                Outline {
-                    SyncPreferencesRow {
-                        SyncedDeviceIcon(kind: device.kind)
-                    } centerContent: {
-                        Text(device.name)
-                    }
-                }
-            }
-        } buttons: {
-            Button(UserText.next) {
-                model.flowState = .saveRecoveryPDF
-            }
-        }
-        .frame(width: 360, height: 298)
-    }
-}
+//
+//struct SyncSetupCompleteView: View {
+//    @EnvironmentObject var model: SyncSetupViewModel
+//
+//    var device: SyncedDevice {
+//        .init(kind: .mobile, name: "Dave's iPhone 14", id: UUID().uuidString)
+//    }
+//
+//    var body: some View {
+//        SyncWizardStep(spacing: 20.0) {
+//            VStack(spacing: 20) {
+//                Image("SyncSetupComplete")
+//                Text(UserText.deviceSynced)
+//                    .font(.system(size: 17, weight: .bold))
+//                Text(UserText.deviceSyncedExplanation)
+//                    .multilineTextAlignment(.center)
+//
+//                Outline {
+//                    SyncPreferencesRow {
+//                        SyncedDeviceIcon(kind: device.kind)
+//                    } centerContent: {
+//                        Text(device.name)
+//                    }
+//                }
+//            }
+//        } buttons: {
+//            Button(UserText.next) {
+//                model.flowState = .saveRecoveryPDF
+//            }
+//        }
+//        .frame(width: 360, height: 298)
+//    }
+//}

@@ -22,6 +22,7 @@ import os.log
 import BrowserServicesKit
 import Persistence
 import Bookmarks
+import DDGSync
 
 @NSApplicationMain
 final class AppDelegate: NSObject, NSApplicationDelegate {
@@ -136,6 +137,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 #endif
 
         appIconChanger = AppIconChanger(internalUserDecider: internalUserDecider)
+        SyncService.shared = .init()
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {

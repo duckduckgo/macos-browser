@@ -34,7 +34,7 @@ struct SyncAnotherDeviceView: View {
             }
         } buttons: {
             Button(UserText.notNow) {
-                model.onCancel()
+                model.cancelFlow()
             }
             Button(UserText.syncAnotherDevice) {
                 model.flowState = .syncNewDevice

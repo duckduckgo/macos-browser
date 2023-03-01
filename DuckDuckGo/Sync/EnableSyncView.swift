@@ -37,10 +37,13 @@ struct EnableSyncView: View {
                 model.onCancel()
             }
             Button(UserText.turnOnSync) {
-                model.flowState = .syncAnotherDevice
+                model.turnOnSync()
             }
             .buttonStyle(DefaultActionButtonStyle(enabled: true))
         }
         .frame(width: 360, height: 314)
+        .alert(isPresented: $model.shouldShowErrorMessage) {
+            Alert(title: Text("Unable to turn on Sync"), message: Text(model.errorMessage ?? "An error occurred"), dismissButton: .default(Text(UserText.ok)))
+        }
     }
 }

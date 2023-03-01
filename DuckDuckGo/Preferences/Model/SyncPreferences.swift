@@ -17,21 +17,30 @@
 //
 
 import Foundation
+import DDGSync
+import Combine
 
 final class SyncPreferences: ObservableObject {
 
-    @Published var isEnabled: Bool = false
+    @Published private(set) var isSyncEnabled: Bool = false
 
-    @Published var syncedDevices: [SyncedDevice] = [
-        .init(kind: .current, name: "Work Laptop", id: UUID().uuidString),
-        .init(kind: .mobile, name: "Dave's iPhone 14", id: UUID().uuidString)
-    ]
+    @Published var syncKey: String
 
-    @Published var syncKey: String = "c3NoLWVkMjU1MTkgQUFBQUMzTnphQzFsWkRJMU5URTVBQUFBSU9BM1A4YkR1My93cVVrMW5uZzVaSXlVZ2NRVVptWWFGejJSYjhlbWdKTkkgdGVzdC1zeW5jLWtleQ=="
-    @Published var remoteSyncKey: String?
+    @Published var shouldShowErrorMessage: Bool = false
+    @Published var errorMessage: String?
+
+    init(syncService: SyncService = .shared) {
+        self.syncService = syncService
+        self.isSyncEnabled = syncService.sync.isAuthenticated
+        self.syncKey = syncService.sync.recoveryCode.flatMap { String(bytes: $0, encoding: .utf8) } ?? ""
+
+        isSyncEnabledCancellable = syncService.sync.isAuthenticatedPublisher
+            .receive(on: DispatchQueue.main)
+            .assign(to: \.isSyncEnabled, onWeaklyHeld: self)
+    }
 
     func presentEnableSyncDialog() {
-        let enableSyncWindowController = SyncSetupViewController.create(with: self).wrappedInWindowController()
+        let enableSyncWindowController = SyncSetupViewController.create(with: syncService).wrappedInWindowController()
 
         guard let enableSyncWindow = enableSyncWindowController.window,
               let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController
@@ -42,6 +51,20 @@ final class SyncPreferences: ObservableObject {
 
         parentWindowController.window?.beginSheet(enableSyncWindow)
     }
+
+    func turnOffSync() {
+        Task { @MainActor in
+            do {
+                try await syncService.sync.disconnect()
+            } catch {
+                errorMessage = String(describing: error)
+                shouldShowErrorMessage = true
+            }
+        }
+    }
+
+    private let syncService: SyncService
+    private var isSyncEnabledCancellable: AnyCancellable?
 }
 
 struct SyncedDevice: Identifiable {

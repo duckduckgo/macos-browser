@@ -28,13 +28,16 @@ extension Preferences {
                 Text(UserText.sync)
                     .font(Const.Fonts.preferencePaneTitle)
 
-                if model.isEnabled {
+                if model.isSyncEnabled {
                     SyncEnabledView()
                         .environmentObject(model)
                 } else {
                     SyncSetupView()
                         .environmentObject(model)
                 }
+            }
+            .alert(isPresented: $model.shouldShowErrorMessage) {
+                Alert(title: Text("Unable to turn on Sync"), message: Text(model.errorMessage ?? "An error occurred"), dismissButton: .default(Text(UserText.ok)))
             }
         }
     }
@@ -78,68 +81,68 @@ extension Preferences {
                 SyncStatusView()
                     .environmentObject(model)
             }
-            Section {
-                Text(UserText.syncedDevices)
-                    .font(Const.Fonts.preferencePaneSectionHeader)
-
-                SyncedDevicesView()
-                    .environmentObject(model)
-            }
-
-            Section {
-                Text(UserText.syncNewDevice)
-                    .font(Const.Fonts.preferencePaneSectionHeader)
-
-                SyncNewDeviceView()
-                    .environmentObject(model)
-            }
-
-            Section {
-                Text(UserText.recovery)
-                    .font(Const.Fonts.preferencePaneSectionHeader)
-
-                HStack(alignment: .top, spacing: 12) {
-                    Text(UserText.recoveryInstructions)
-                        .fixMultilineScrollableText()
-                    Spacer()
-                    Button(UserText.saveRecoveryPDF) {
-                        print("save recovery PDF")
-                    }
-                }
-                Button(UserText.turnOffAndDeleteServerData) {
-                    print("turn off and delete server data")
-                }
-            }
+//            Section {
+//                Text(UserText.syncedDevices)
+//                    .font(Const.Fonts.preferencePaneSectionHeader)
+//
+//                SyncedDevicesView()
+//                    .environmentObject(model)
+//            }
+//
+//            Section {
+//                Text(UserText.syncNewDevice)
+//                    .font(Const.Fonts.preferencePaneSectionHeader)
+//
+//                SyncNewDeviceView()
+//                    .environmentObject(model)
+//            }
+//
+//            Section {
+//                Text(UserText.recovery)
+//                    .font(Const.Fonts.preferencePaneSectionHeader)
+//
+//                HStack(alignment: .top, spacing: 12) {
+//                    Text(UserText.recoveryInstructions)
+//                        .fixMultilineScrollableText()
+//                    Spacer()
+//                    Button(UserText.saveRecoveryPDF) {
+//                        print("save recovery PDF")
+//                    }
+//                }
+//                Button(UserText.turnOffAndDeleteServerData) {
+//                    print("turn off and delete server data")
+//                }
+//            }
         }
     }
 
-    struct SyncNewDeviceView: View {
-        @EnvironmentObject var model: SyncPreferences
-
-        var body: some View {
-            Outline {
-                HStack(alignment: .top, spacing: 20) {
-                    QRCode(string: model.syncKey, size: .init(width: 192, height: 192))
-
-                    VStack {
-                        Text(UserText.syncNewDeviceInstructions)
-                            .fixMultilineScrollableText()
-
-                        Spacer()
-
-                        HStack {
-                            Spacer()
-                            TextButton(UserText.showOrEnterCode) {
-                                print("show or enter code")
-                            }
-                        }
-                    }
-                    .frame(maxHeight: .infinity)
-                }
-                .padding(20)
-            }
-        }
-    }
+//    struct SyncNewDeviceView: View {
+//        @EnvironmentObject var model: SyncPreferences
+//
+//        var body: some View {
+//            Outline {
+//                HStack(alignment: .top, spacing: 20) {
+//                    QRCode(string: model.syncKey, size: .init(width: 192, height: 192))
+//
+//                    VStack {
+//                        Text(UserText.syncNewDeviceInstructions)
+//                            .fixMultilineScrollableText()
+//
+//                        Spacer()
+//
+//                        HStack {
+//                            Spacer()
+//                            TextButton(UserText.showOrEnterCode) {
+//                                print("show or enter code")
+//                            }
+//                        }
+//                    }
+//                    .frame(maxHeight: .infinity)
+//                }
+//                .padding(20)
+//            }
+//        }
+//    }
 
 }
 
@@ -198,71 +201,71 @@ private struct SyncStatusView: View {
                 Text(UserText.syncConnected)
             } rightContent: {
                 Button(UserText.turnOffSync) {
-                    model.isEnabled = false
+                    model.turnOffSync()
                 }
             }
         }
     }
 }
-
-private struct SyncedDevicesView: View {
-    @EnvironmentObject var model: SyncPreferences
-
-    var body: some View {
-        Outline {
-
-            VStack(spacing: 0) {
-                ForEach(model.syncedDevices) { device in
-                    if !device.isCurrent {
-                        Rectangle()
-                            .fill(Color("BlackWhite10"))
-                            .frame(height: 1)
-                            .padding(.init(top: 0, leading: 10, bottom: 0, trailing: 10))
-                    }
-
-                    if device.isCurrent {
-                        SyncPreferencesRow {
-                            SyncedDeviceIcon(kind: device.kind)
-                        } centerContent: {
-                            Text(device.name)
-                        } rightContent: {
-                            Button(UserText.currentDeviceDetails) {
-                                print("details")
-                            }
-                        }
-                    } else {
-                        SyncPreferencesRow {
-                            SyncedDeviceIcon(kind: device.kind)
-                        } centerContent: {
-                            Text(device.name)
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-struct SyncedDeviceIcon: View {
-    var kind: SyncedDevice.Kind
-
-    var image: NSImage {
-        switch kind {
-        case .current, .desktop:
-            return NSImage(imageLiteralResourceName: "SyncedDeviceDesktop")
-        case .mobile:
-            return NSImage(imageLiteralResourceName: "SyncedDeviceMobile")
-        }
-    }
-
-    var body: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: 4)
-                .fill(Color("BlackWhite100").opacity(0.06))
-                .frame(width: 24, height: 24)
-
-            Image(nsImage: image)
-                .aspectRatio(contentMode: .fit)
-        }
-    }
-}
+//
+//private struct SyncedDevicesView: View {
+//    @EnvironmentObject var model: SyncPreferences
+//
+//    var body: some View {
+//        Outline {
+//
+//            VStack(spacing: 0) {
+//                ForEach(model.syncedDevices) { device in
+//                    if !device.isCurrent {
+//                        Rectangle()
+//                            .fill(Color("BlackWhite10"))
+//                            .frame(height: 1)
+//                            .padding(.init(top: 0, leading: 10, bottom: 0, trailing: 10))
+//                    }
+//
+//                    if device.isCurrent {
+//                        SyncPreferencesRow {
+//                            SyncedDeviceIcon(kind: device.kind)
+//                        } centerContent: {
+//                            Text(device.name)
+//                        } rightContent: {
+//                            Button(UserText.currentDeviceDetails) {
+//                                print("details")
+//                            }
+//                        }
+//                    } else {
+//                        SyncPreferencesRow {
+//                            SyncedDeviceIcon(kind: device.kind)
+//                        } centerContent: {
+//                            Text(device.name)
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//    }
+//}
+//
+//struct SyncedDeviceIcon: View {
+//    var kind: SyncedDevice.Kind
+//
+//    var image: NSImage {
+//        switch kind {
+//        case .current, .desktop:
+//            return NSImage(imageLiteralResourceName: "SyncedDeviceDesktop")
+//        case .mobile:
+//            return NSImage(imageLiteralResourceName: "SyncedDeviceMobile")
+//        }
+//    }
+//
+//    var body: some View {
+//        ZStack {
+//            RoundedRectangle(cornerRadius: 4)
+//                .fill(Color("BlackWhite100").opacity(0.06))
+//                .frame(width: 24, height: 24)
+//
+//            Image(nsImage: image)
+//                .aspectRatio(contentMode: .fit)
+//        }
+//    }
+//}

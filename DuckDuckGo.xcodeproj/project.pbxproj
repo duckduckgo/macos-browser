@@ -927,6 +927,8 @@
 		372AD55429ACBD0A00DE827B /* QRCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 372AD55229ACBD0A00DE827B /* QRCodeView.swift */; };
 		3739326529AE4B39009346AE /* DDGSync in Frameworks */ = {isa = PBXBuildFile; productRef = 3739326429AE4B39009346AE /* DDGSync */; };
 		3739326729AE4B42009346AE /* DDGSync in Frameworks */ = {isa = PBXBuildFile; productRef = 3739326629AE4B42009346AE /* DDGSync */; };
+		3739326929AF5045009346AE /* SyncService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3739326829AF5045009346AE /* SyncService.swift */; };
+		3739326A29AF5045009346AE /* SyncService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3739326829AF5045009346AE /* SyncService.swift */; };
 		373A1AA8283ED1B900586521 /* BookmarkHTMLReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373A1AA7283ED1B900586521 /* BookmarkHTMLReader.swift */; };
 		373A1AAA283ED86C00586521 /* BookmarksHTMLReaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373A1AA9283ED86C00586521 /* BookmarksHTMLReaderTests.swift */; };
 		373A1AB02842C4EA00586521 /* BookmarkHTMLImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373A1AAF2842C4EA00586521 /* BookmarkHTMLImporter.swift */; };
@@ -1906,6 +1908,7 @@
 		372AD54C29AC09AF00DE827B /* SyncSetupCompleteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncSetupCompleteView.swift; sourceTree = "<group>"; };
 		372AD54F29AC10EC00DE827B /* SaveRecoveryPDFView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveRecoveryPDFView.swift; sourceTree = "<group>"; };
 		372AD55229ACBD0A00DE827B /* QRCodeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCodeView.swift; sourceTree = "<group>"; };
+		3739326829AF5045009346AE /* SyncService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncService.swift; sourceTree = "<group>"; };
 		373A1AA7283ED1B900586521 /* BookmarkHTMLReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkHTMLReader.swift; sourceTree = "<group>"; };
 		373A1AA9283ED86C00586521 /* BookmarksHTMLReaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksHTMLReaderTests.swift; sourceTree = "<group>"; };
 		373A1AAF2842C4EA00586521 /* BookmarkHTMLImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkHTMLImporter.swift; sourceTree = "<group>"; };
@@ -3093,16 +3096,17 @@
 		3775913429AB99DA00E26367 /* Sync */ = {
 			isa = PBXGroup;
 			children = (
-				3775913529AB9A1C00E26367 /* SyncSetupViewController.swift */,
-				3775913B29ABB78300E26367 /* SyncSetupView.swift */,
 				3775913E29ABB79200E26367 /* SyncSetupViewModel.swift */,
+				3775913529AB9A1C00E26367 /* SyncSetupViewController.swift */,
 				3775914429ABBC0800E26367 /* SyncWizardStep.swift */,
+				3775913B29ABB78300E26367 /* SyncSetupView.swift */,
 				3775913829AB9C3B00E26367 /* EnableSyncView.swift */,
 				3775914129ABBBF500E26367 /* SyncAnotherDeviceView.swift */,
 				3775914729ABC03700E26367 /* SyncNewDeviceView.swift */,
 				372AD54C29AC09AF00DE827B /* SyncSetupCompleteView.swift */,
 				372AD54F29AC10EC00DE827B /* SaveRecoveryPDFView.swift */,
 				372AD55229ACBD0A00DE827B /* QRCodeView.swift */,
+				3739326829AF5045009346AE /* SyncService.swift */,
 			);
 			path = Sync;
 			sourceTree = "<group>";
@@ -6465,6 +6469,7 @@
 				3706FB54293F65D500E42796 /* PermissionContextMenu.swift in Sources */,
 				3706FB55293F65D500E42796 /* ContextMenuUserScript.swift in Sources */,
 				3706FB56293F65D500E42796 /* NSSavePanelExtension.swift in Sources */,
+				3739326A29AF5045009346AE /* SyncService.swift in Sources */,
 				3706FB57293F65D500E42796 /* AppPrivacyConfigurationDataProvider.swift in Sources */,
 				3706FB58293F65D500E42796 /* LinkButton.swift in Sources */,
 				3706FB59293F65D500E42796 /* TemporaryFileHandler.swift in Sources */,
@@ -7345,6 +7350,7 @@
 				85480FBB25D181CB009424E3 /* ConfigurationDownloading.swift in Sources */,
 				AAEEC6A927088ADB008445F7 /* FireCoordinator.swift in Sources */,
 				B655369B268442EE00085A79 /* GeolocationProvider.swift in Sources */,
+				3739326929AF5045009346AE /* SyncService.swift in Sources */,
 				3775914829ABC03700E26367 /* SyncNewDeviceView.swift in Sources */,
 				B6C0B23C26E87D900031CB7F /* NSAlert+ActiveDownloadsTermination.swift in Sources */,
 				AAECA42024EEA4AC00EFA63A /* IndexPathExtension.swift in Sources */,
@@ -8318,7 +8324,7 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				branch = "brindy/ddg-sync";
+				branch = "dominik/ddg-sync";
 				kind = branch;
 			};
 		};
