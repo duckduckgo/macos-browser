@@ -102,8 +102,13 @@ extension ContextMenuManager {
             assertionFailure("WKMenuItemIdentifierOpenLinkInNewWindow item not found")
             return
         }
+        // insert Add Link to Bookmarks
         menu.insertItem(self.addLinkToBookmarksMenuItem(from: openLinkInNewWindowItem), at: index)
         menu.replaceItem(at: index + 1, with: self.copyLinkMenuItem(withTitle: copyLinkItem.title, from: openLinkInNewWindowItem))
+
+        // insert Separator and Copy (selection) items
+        menu.insertItem(.separator(), at: index + 2)
+        menu.insertItem(self.copySelectionMenuItem(), at: index + 3)
     }
 
     private func handleCopyImageItem(_ item: NSMenuItem, at index: Int, in menu: NSMenu) {
@@ -202,6 +207,10 @@ private extension ContextMenuManager {
         makeMenuItem(withTitle: title, action: #selector(copyLink), from: openLinkItem, with: .openLinkInNewWindow)
     }
 
+    func copySelectionMenuItem() -> NSMenuItem {
+        NSMenuItem(title: UserText.copySelection, action: #selector(copySelection), target: self)
+    }
+
     func copyImageAddressMenuItem(from item: NSMenuItem) -> NSMenuItem {
         makeMenuItem(withTitle: UserText.copyImageAddress, action: #selector(copyImageAddress), from: item, with: .openImageInNewWindow, keyEquivalent: "")
     }
@@ -254,6 +263,15 @@ private extension ContextMenuManager {
             .allow(.tab(selected: true))
         }
         webView.loadInNewWindow(url)
+    }
+
+    func copySelection(_ sender: NSMenuItem) {
+        guard let selectedText else {
+            assertionFailure("Failed to get selected text")
+            return
+        }
+
+        NSPasteboard.general.copy(selectedText)
     }
 
     func openLinkInNewTab(_ sender: NSMenuItem) {
