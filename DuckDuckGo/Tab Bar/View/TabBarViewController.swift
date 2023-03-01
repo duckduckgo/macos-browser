@@ -937,6 +937,13 @@ extension TabBarViewController: NSCollectionViewDelegate {
                         validateDrop draggingInfo: NSDraggingInfo,
                         proposedIndexPath proposedDropIndexPath: AutoreleasingUnsafeMutablePointer<NSIndexPath>,
                         dropOperation proposedDropOperation: UnsafeMutablePointer<NSCollectionView.DropOperation>) -> NSDragOperation {
+        guard draggingInfo.draggingSourceOperationMask == .private else {
+            guard draggingInfo.draggingPasteboard.url != nil else {
+                return .none
+            }
+            return .copy
+        }
+
         guard let currentDraggingIndexPath = currentDraggingIndexPath else {
             TabDragAndDropManager.shared.setDestination(tabCollectionViewModel: tabCollectionViewModel,
                                                         indexPath: proposedDropIndexPath.pointee as IndexPath)
@@ -958,6 +965,15 @@ extension TabBarViewController: NSCollectionViewDelegate {
                         acceptDrop draggingInfo: NSDraggingInfo,
                         indexPath: IndexPath,
                         dropOperation: NSCollectionView.DropOperation) -> Bool {
+        guard draggingInfo.draggingSourceOperationMask == .private else {
+            guard let url = draggingInfo.draggingPasteboard.url else {
+                return false
+            }
+            let newIndex = min(indexPath.item + 1, tabCollectionViewModel.tabCollection.tabs.count)
+            tabCollectionViewModel.insert(Tab(content: .url(url)), at: .unpinned(newIndex), selected: true)
+            return true
+        }
+
         guard let draggingIndexPaths = initialDraggingIndexPaths else {
             // Droping from another TabBarViewController
             return true
