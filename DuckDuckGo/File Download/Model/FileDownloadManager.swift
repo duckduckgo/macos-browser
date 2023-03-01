@@ -163,7 +163,7 @@ extension FileDownloadManager: WebKitDownloadTaskDelegate {
                 let folderUrl = url.deletingLastPathComponent()
                 guard self.verifyAccessToDestinationFolder(folderUrl,
                                                            destinationRequested: preferences.alwaysRequestDownloadLocation,
-                                                           isAppStoreBuild: AppDelegate.isAppStoreBuild) else {
+                                                           isSandboxed: NSApp.isSandboxed) else {
                     completion(nil, nil)
                     return
                 }
@@ -194,7 +194,7 @@ extension FileDownloadManager: WebKitDownloadTaskDelegate {
                 let folderUrl = url.deletingLastPathComponent()
                 guard self.verifyAccessToDestinationFolder(folderUrl,
                                                            destinationRequested: self.preferences.alwaysRequestDownloadLocation,
-                                                           isAppStoreBuild: AppDelegate.isAppStoreBuild) else {
+                                                           isSandboxed: NSApp.isSandboxed) else {
                     completion(nil, nil)
                     return
                 }
@@ -211,8 +211,8 @@ extension FileDownloadManager: WebKitDownloadTaskDelegate {
         }
     }
 
-    private func verifyAccessToDestinationFolder(_ folderUrl: URL, destinationRequested: Bool, isAppStoreBuild: Bool) -> Bool {
-        if destinationRequested && isAppStoreBuild { return true }
+    private func verifyAccessToDestinationFolder(_ folderUrl: URL, destinationRequested: Bool, isSandboxed: Bool) -> Bool {
+        if destinationRequested && isSandboxed { return true }
 
         let folderPath = folderUrl.relativePath
         let c = open(folderPath, O_RDONLY)

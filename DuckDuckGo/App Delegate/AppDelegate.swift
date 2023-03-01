@@ -32,12 +32,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     static var isRunningTests: Bool { false }
 #endif
 
-#if APPSTORE
-    static var isAppStoreBuild = true
-#else
-    static var isAppStoreBuild = false
-#endif
-
 #if DEBUG
     let disableCVDisplayLinkLogs: Void = {
         // Disable CVDisplayLink logs
