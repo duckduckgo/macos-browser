@@ -36,13 +36,11 @@ final class NetworkProtectionUNNotificationsPresenter: NSObject, NetworkProtecti
         self.userNotificationCenter = userNotificationCenter
         
         super.init()
-        
-        setup()
     }
     
     // MARK: - Setup
     
-    private func setup() {
+    func requestAuthorization() {
         userNotificationCenter.delegate = self
         requestAlertAuthorization()
     }

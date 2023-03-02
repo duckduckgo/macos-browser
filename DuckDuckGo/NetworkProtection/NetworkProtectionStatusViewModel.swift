@@ -185,9 +185,17 @@ extension NetworkProtectionStatusView {
 
         private func refreshInternalIsRunning() {
             switch connectionStatus {
-            case .connected:
+            case .connected, .connecting, .reasserting:
+                guard internalIsRunning == false else {
+                    return
+                }
+                
                 internalIsRunning = true
-            case .disconnected:
+            case .disconnected, .disconnecting:
+                guard internalIsRunning == true else {
+                    return
+                }
+                
                 internalIsRunning = false
             default:
                 break

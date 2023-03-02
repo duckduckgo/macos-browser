@@ -52,7 +52,7 @@ final class IPCConnection: NSObject {
     }
 
     /// This method is called by the app to register with the provider running in the system extension.
-    func register(withExtension bundle: Bundle, delegate: AppCommunication, completionHandler: @escaping (Bool) -> Void) {
+    func register(machServiceName: String, delegate: AppCommunication, completionHandler: @escaping (Bool) -> Void) {
 
         self.delegate = delegate
 
@@ -62,7 +62,6 @@ final class IPCConnection: NSObject {
             return
         }
 
-        let machServiceName = NetworkProtectionExtensionMachService.serviceName()
         os_log("🔵 Mach service name: %{public}@", machServiceName)
         let newConnection = NSXPCConnection(machServiceName: machServiceName, options: [])
 

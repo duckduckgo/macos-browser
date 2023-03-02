@@ -334,31 +334,37 @@ final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
     
     // MARK: - Ensure things are working
     
+#if NETP_SYSTEM_EXTENSION
     /// - Returns: `true` if the system extension and the background agent were activated successfully
     ///
     private func ensureSystemExtensionAndAgentAreActivated() async throws -> Bool {
+        #if DEBUG
+        try? await NetworkProtectionAgentManager.current.reset()
+        #else
         NetworkProtectionAgentManager.current.enable()
+        #endif
         
-#if NETP_SYSTEM_EXTENSION
         if case .willActivateAfterReboot = try await SystemExtensionManager.shared.activate(waitingForUserApprovalHandler: { [weak self] in
             self?.controllerErrorStore.lastErrorMessage = "Go to Security & Privacy in System Settings to allow Network Protection to activate"
         }) {
             controllerErrorStore.lastErrorMessage = "Please reboot to activate Network Protection"
             return false
         }
-#endif
         
         return true
     }
+#endif
 
     // MARK: - Starting & Stopping the VPN
 
     /// Starts the VPN connection used for Network Protection
     ///
     func start() async throws {
+#if NETP_SYSTEM_EXTENSION
         guard try await ensureSystemExtensionAndAgentAreActivated() else {
             return
         }
+#endif
         
         controllerErrorStore.lastErrorMessage = nil
         let tunnelManager: NETunnelProviderManager
