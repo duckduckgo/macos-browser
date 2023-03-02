@@ -21,19 +21,6 @@ import SwiftUI
 
 final class SyncSetupViewController: NSViewController {
 
-    static func create(with syncPreferences: SyncPreferences) -> SyncSetupViewController {
-        let viewController = SyncSetupViewController(syncPreferences)
-        syncPreferences.onCancel = { [weak viewController] in
-            guard let window = viewController?.view.window, let sheetParent = window.sheetParent else {
-                assertionFailure("window or sheet parent not present")
-                return
-            }
-            sheetParent.endSheet(window)
-        }
-
-        return viewController
-    }
-
     init(_ syncPreferences: SyncPreferences) {
         self.syncPreferences = syncPreferences
         super.init(nibName: nil, bundle: nil)

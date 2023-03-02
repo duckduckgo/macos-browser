@@ -79,9 +79,10 @@ final class SyncPreferences: ObservableObject {
 
     init(syncService: SyncService = .shared) {
         self.syncService = syncService
+        self.shouldDisableSubmitButton = true
+
         self.isSyncEnabled = syncService.sync.isAuthenticated
         self.account = syncService.sync.account
-        self.shouldDisableSubmitButton = true
 
         if let account = self.account {
             devices = [.init(account)]
@@ -108,30 +109,12 @@ final class SyncPreferences: ObservableObject {
 
     func presentEnableSyncDialog() {
         flowState = .enableSync
-        let enableSyncWindowController = SyncSetupViewController.create(with: self).wrappedInWindowController()
-
-        guard let enableSyncWindow = enableSyncWindowController.window,
-              let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController
-        else {
-            assertionFailure("Sync: Failed to present EnableSyncViewController")
-            return
-        }
-
-        parentWindowController.window?.beginSheet(enableSyncWindow)
+        presentDialog()
     }
 
     func presentRecoverSyncAccountDialog() {
         flowState = .recoverAccount
-        let enableSyncWindowController = SyncSetupViewController.create(with: self).wrappedInWindowController()
-
-        guard let enableSyncWindow = enableSyncWindowController.window,
-              let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController
-        else {
-            assertionFailure("Sync: Failed to present EnableSyncViewController")
-            return
-        }
-
-        parentWindowController.window?.beginSheet(enableSyncWindow)
+        presentDialog()
     }
 
     func turnOnSync() {
@@ -172,6 +155,29 @@ final class SyncPreferences: ObservableObject {
 
     func cancelFlow() {
         flowState = nil
+    }
+
+    // MARK: -
+
+    private func presentDialog() {
+        let syncWindowController = SyncSetupViewController(self).wrappedInWindowController()
+
+        guard let syncWindow = syncWindowController.window,
+              let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController
+        else {
+            assertionFailure("Sync: Failed to present SyncSetupViewController")
+            return
+        }
+
+        onCancel = { [weak syncWindowController] in
+            guard let window = syncWindowController?.window, let sheetParent = window.sheetParent else {
+                assertionFailure("window or sheet parent not present")
+                return
+            }
+            sheetParent.endSheet(window)
+        }
+
+        parentWindowController.window?.beginSheet(syncWindow)
     }
 
     private let syncService: SyncService
