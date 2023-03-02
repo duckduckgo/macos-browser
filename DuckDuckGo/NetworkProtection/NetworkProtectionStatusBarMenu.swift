@@ -25,13 +25,10 @@ import SwiftUI
 final class NetworkProtectionStatusBarMenu {
     private let statusItem: NSStatusItem
 
-    // MARK: - Connection Issues
+    // MARK: - NetP Icon publisher
     
-    private let statusReporter: NetworkProtectionStatusReporter
-    
-    // MARK: - Subscriptions
-    
-    private var connectivityIssuesCancellable: AnyCancellable?
+    private let iconPublisher: NetworkProtectionIconPublisher
+    private var iconPublisherCancellable: AnyCancellable?
     
     // MARK: - Initialization
 
@@ -44,7 +41,7 @@ final class NetworkProtectionStatusBarMenu {
          statusReporter: NetworkProtectionStatusReporter = DefaultNetworkProtectionStatusReporter()) {
         
         self.statusItem = statusItem ?? NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
-        self.statusReporter = statusReporter
+        self.iconPublisher = NetworkProtectionIconPublisher(statusReporter: statusReporter)
 
         let item = NSMenuItem()
         let model = NetworkProtectionStatusView.Model(runLoopMode: .eventTracking)
@@ -54,23 +51,17 @@ final class NetworkProtectionStatusBarMenu {
         hostingView.autoresizesSubviews = false
         hostingView.frame.size = hostingView.intrinsicContentSize
         item.view = hostingView
-
+        
         let menu = NSMenu(items: [item])
         self.statusItem.menu = menu
-        self.statusItem.button?.image = .init(.vpnIcon)
-
-        subscribeToConnectionIssues()
+        self.statusItem.button?.image = .init(iconPublisher.icon)
+        
+        subscribeToIconUpdates()
     }
     
-    private func subscribeToConnectionIssues() {
-        updateMenuIcon(isHavingConnectionIssues: statusReporter.connectivityIssuesPublisher.value)
-        
-        connectivityIssuesCancellable = statusReporter.connectivityIssuesPublisher.sink { [weak self] isHavingConnectionIssues in
-            guard let self = self else {
-                return
-            }
-            
-            self.updateMenuIcon(isHavingConnectionIssues: isHavingConnectionIssues)
+    private func subscribeToIconUpdates() {
+        iconPublisherCancellable = iconPublisher.$icon.sink { [weak self] icon in
+            self?.statusItem.button?.image = .init(icon)
         }
     }
 
@@ -82,12 +73,5 @@ final class NetworkProtectionStatusBarMenu {
 
     func hide() {
         statusItem.isVisible = false
-    }
-    
-    // MARK: - Menu Icon Refresh
-
-    private func updateMenuIcon(isHavingConnectionIssues: Bool) {
-        let icon: NetworkProtectionAsset = isHavingConnectionIssues ? .vpnIssueIcon : .vpnIcon
-        self.statusItem.button?.image = .init(icon)
     }
 }

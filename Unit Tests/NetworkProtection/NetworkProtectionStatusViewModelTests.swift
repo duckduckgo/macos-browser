@@ -24,6 +24,31 @@ import XCTest
 
 class NetworkProtectionStatusViewModelTests: XCTestCase {
 
+    private class MockStatusReporter: NetworkProtectionStatusReporter {
+        static let defaultServerInfo = NetworkProtectionStatusServerInfo(
+            serverLocation: "New York, USA",
+            serverAddress: "127.0.0.1")
+
+        var statusChangePublisher: CurrentValueSubject<NetworkProtectionConnectionStatus, Never>
+        var connectivityIssuesPublisher: CurrentValueSubject<Bool, Never>
+        var serverInfoPublisher: CurrentValueSubject<NetworkProtectionStatusServerInfo, Never>
+        var tunnelErrorMessagePublisher: CurrentValueSubject<String?, Never>
+        var controllerErrorMessagePublisher: CurrentValueSubject<String?, Never>
+
+        init(status: NetworkProtectionConnectionStatus,
+             isHavingConnectivityIssues: Bool = false,
+             serverInfo: NetworkProtectionStatusServerInfo = MockStatusReporter.defaultServerInfo,
+             tunnelErrorMessage: String? = nil,
+             controllerErrorMessage: String? = nil) {
+            
+            statusChangePublisher = CurrentValueSubject<NetworkProtectionConnectionStatus, Never>(status)
+            connectivityIssuesPublisher = CurrentValueSubject<Bool, Never>(isHavingConnectivityIssues)
+            serverInfoPublisher = CurrentValueSubject<NetworkProtectionStatusServerInfo, Never>(serverInfo)
+            tunnelErrorMessagePublisher = CurrentValueSubject<String?, Never>(tunnelErrorMessage)
+            controllerErrorMessagePublisher = CurrentValueSubject<String?, Never>(controllerErrorMessage)
+        }
+    }
+    
     // MARK: - Testing Support
 
     /// Mock  class to aid in testing
@@ -33,10 +58,6 @@ class NetworkProtectionStatusViewModelTests: XCTestCase {
 
         var startCallback: (() -> Void)?
         var stopCallback: (() -> Void)?
-
-        init(initialStatus: NetworkProtectionConnectionStatus = .unknown) {
-            statusChangePublisher = CurrentValueSubject<NetworkProtectionConnectionStatus, Never>(initialStatus)
-        }
 
         func isConnected() async -> Bool {
             connected
@@ -49,9 +70,6 @@ class NetworkProtectionStatusViewModelTests: XCTestCase {
         func stop() async throws {
             stopCallback?()
         }
-
-        let configChangePublisher = CurrentValueSubject<Void, Never>(())
-        let statusChangePublisher: CurrentValueSubject<NetworkProtectionConnectionStatus, Never>
     }
 
     // MARK: - Tests
@@ -60,7 +78,10 @@ class NetworkProtectionStatusViewModelTests: XCTestCase {
     ///
     func testProperInitialization() async throws {
         let networkProtection = MockNetworkProtection()
-        let model = NetworkProtectionStatusView.Model(networkProtection: networkProtection)
+        let statusReporter = MockStatusReporter(status: .unknown)
+        let model = NetworkProtectionStatusView.Model(
+            networkProtection: networkProtection,
+            networkProtectionStatusReporter: statusReporter)
 
         let isRunning = await model.isRunning.wrappedValue
         XCTAssertFalse(isRunning)
@@ -73,8 +94,11 @@ class NetworkProtectionStatusViewModelTests: XCTestCase {
     /// We expect the model to properly reflect the disconnected status.
     ///
     func testProperlyReflectsStatusDisconnected() async throws {
-        let networkProtection = MockNetworkProtection(initialStatus: .disconnected)
-        let model = NetworkProtectionStatusView.Model(networkProtection: networkProtection)
+        let networkProtection = MockNetworkProtection()
+        let statusReporter = MockStatusReporter(status: .disconnected)
+        let model = NetworkProtectionStatusView.Model(
+            networkProtection: networkProtection,
+            networkProtectionStatusReporter: statusReporter)
 
         let isRunning = await model.isRunning.wrappedValue
         XCTAssertFalse(isRunning)
@@ -84,33 +108,39 @@ class NetworkProtectionStatusViewModelTests: XCTestCase {
         XCTAssertFalse(model.showServerDetails)
     }
 
-    /// We expect the model to properly reflect the connected status.
+    /// We expect the model to properly reflect the disconnecting status.
     ///
     func testProperlyReflectsStatusDisconnecting() async throws {
-        let mockServerIP = "127.0.0.1"
-        let mockDate = Date().addingTimeInterval(-59)
-        let mockDateString = "00:00:59"
-
-        let networkProtection = MockNetworkProtection(initialStatus: .disconnecting(connectedDate: mockDate, serverAddress: mockServerIP))
-        let model = NetworkProtectionStatusView.Model(networkProtection: networkProtection)
+        let networkProtection = MockNetworkProtection()
+        let statusReporter = MockStatusReporter(status: .disconnecting)
+        let model = NetworkProtectionStatusView.Model(
+            networkProtection: networkProtection,
+            networkProtectionStatusReporter: statusReporter)
 
         XCTAssertEqual(model.connectionStatusDescription, UserText.networkProtectionStatusDisconnecting)
-        XCTAssertEqual(model.timeLapsed, mockDateString)
+        XCTAssertEqual(model.timeLapsed, UserText.networkProtectionStatusViewTimerZero)
         XCTAssertEqual(model.featureStatusDescription, UserText.networkProtectionStatusViewFeatureOn)
-        XCTAssertTrue(model.showServerDetails)
-        XCTAssertEqual(model.serverAddress, mockServerIP)
-        XCTAssertEqual(model.serverLocation, "Los Angeles, United States")
+        XCTAssertFalse(model.showServerDetails)
+        XCTAssertEqual(model.serverAddress, "Unknown")
+        XCTAssertEqual(model.serverLocation, "Unknown")
     }
 
     /// We expect the model to properly reflect the connected status.
     ///
     func testProperlyReflectsStatusConnected() async throws {
+        let mockServerLocation = "Los Angeles, United States"
         let mockServerIP = "127.0.0.1"
         let mockDate = Date().addingTimeInterval(-59)
         let mockDateString = "00:00:59"
 
-        let networkProtection = MockNetworkProtection(initialStatus: .connected(connectedDate: mockDate, serverAddress: mockServerIP))
-        let model = NetworkProtectionStatusView.Model(networkProtection: networkProtection)
+        let networkProtection = MockNetworkProtection()
+        let serverInfo = NetworkProtectionStatusServerInfo(
+            serverLocation: mockServerLocation,
+            serverAddress: mockServerIP)
+        let statusReporter = MockStatusReporter(status: .connected(connectedDate: mockDate), serverInfo: serverInfo)
+        let model = NetworkProtectionStatusView.Model(
+            networkProtection: networkProtection,
+            networkProtectionStatusReporter: statusReporter)
 
         let isRunning = await model.isRunning.wrappedValue
         XCTAssertTrue(isRunning)
@@ -119,14 +149,17 @@ class NetworkProtectionStatusViewModelTests: XCTestCase {
         XCTAssertEqual(model.featureStatusDescription, UserText.networkProtectionStatusViewFeatureOn)
         XCTAssertTrue(model.showServerDetails)
         XCTAssertEqual(model.serverAddress, mockServerIP)
-        XCTAssertEqual(model.serverLocation, "Los Angeles, United States")
+        XCTAssertEqual(model.serverLocation, mockServerLocation)
     }
 
     /// We expect the model to properly reflect the connecting status.
     ///
     func testProperlyReflectsStatusConnecting() async throws {
-        let networkProtection = MockNetworkProtection(initialStatus: .connecting)
-        let model = NetworkProtectionStatusView.Model(networkProtection: networkProtection)
+        let networkProtection = MockNetworkProtection()
+        let statusReporter = MockStatusReporter(status: .connecting)
+        let model = NetworkProtectionStatusView.Model(
+            networkProtection: networkProtection,
+            networkProtectionStatusReporter: statusReporter)
 
         XCTAssertEqual(model.connectionStatusDescription, UserText.networkProtectionStatusConnecting)
         XCTAssertEqual(model.timeLapsed, UserText.networkProtectionStatusViewTimerZero)
@@ -138,7 +171,8 @@ class NetworkProtectionStatusViewModelTests: XCTestCase {
     ///
     func testStartsNetworkProtection() async throws {
         let networkProtection = MockNetworkProtection()
-        let model = NetworkProtectionStatusView.Model(networkProtection: networkProtection)
+        let model = NetworkProtectionStatusView.Model(
+            networkProtection: networkProtection)
         let networkProtectionWasStarted = expectation(description: "The model started network protection when appropriate")
 
         networkProtection.startCallback = {
@@ -156,10 +190,20 @@ class NetworkProtectionStatusViewModelTests: XCTestCase {
     /// We expect that setting the model's `isRunning` to `false`, will stop network protection.
     ///
     func testStopsNetworkProtection() async throws {
+        let mockDate = Date().addingTimeInterval(-59)
+        let mockServerLocation = "Los Angeles, United States"
         let mockServerIP = "127.0.0.1"
 
-        let networkProtection = MockNetworkProtection(initialStatus: .connected(connectedDate: Date(), serverAddress: mockServerIP))
-        let model = NetworkProtectionStatusView.Model(networkProtection: networkProtection)
+        let networkProtection = MockNetworkProtection()
+        let serverInfo = NetworkProtectionStatusServerInfo(
+            serverLocation: mockServerLocation,
+            serverAddress: mockServerIP)
+        let statusReporter = MockStatusReporter(
+            status: .connected(connectedDate: mockDate),
+            serverInfo: serverInfo)
+        let model = NetworkProtectionStatusView.Model(
+            networkProtection: networkProtection,
+            networkProtectionStatusReporter: statusReporter)
 
         let networkProtectionWasStopped = expectation(description: "The model stopped network protection when appropriate")
 

@@ -27,5 +27,6 @@ class NetworkProtectionAssetsTests: XCTestCase {
         XCTAssertEqual(NetworkProtectionAsset.vpnDisabledImage.rawValue, "VPN-Disabled-128")
         XCTAssertEqual(NetworkProtectionAsset.vpnEnabledImage.rawValue, "VPN-128")
         XCTAssertEqual(NetworkProtectionAsset.vpnIcon.rawValue, "VPN-16")
+        XCTAssertEqual(NetworkProtectionAsset.vpnDisabledIcon.rawValue, "Web")
     }
 }

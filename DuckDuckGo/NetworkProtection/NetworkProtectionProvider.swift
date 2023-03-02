@@ -57,10 +57,6 @@ protocol NetworkProtectionProvider {
     /// Stops the VPN connection used for Network Protection
     ///
     func stop() async throws
-
-    // MARK: - Config & Status Change Publishers
-
-    var configChangePublisher: CurrentValueSubject<Void, Never> { get }
 }
 
 final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
@@ -88,8 +84,6 @@ final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
     /// The observer token for VPN configuration changes,
     ///
     private var configChangeObserverToken: NSObjectProtocol?
-
-    let configChangePublisher = CurrentValueSubject<Void, Never>(())
     
     // MARK: - VPN Tunnel & Configuration
 
@@ -182,9 +176,7 @@ final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
 
     // MARK: - Initialization & Deinitialization
 
-    convenience init() {
-        let keychainStore = NetworkProtectionKeychainStore(useSystemKeychain: NetworkProtectionBundle.usesSystemKeychain())
-        
+    convenience init() {        
         self.init(notificationCenter: .default,
                   logger: DefaultNetworkProtectionLogger())
     }
@@ -231,7 +223,6 @@ final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
             }
 
             self.internalTunnelManager = manager
-            self.configChangePublisher.send(())
         }
     }
 

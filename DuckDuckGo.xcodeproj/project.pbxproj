@@ -1116,6 +1116,8 @@
 		7BA4727D26F01BC400EAA165 /* CoreDataTestUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292C42667104B00AD2C21 /* CoreDataTestUtilities.swift */; };
 		7BC380D6294B5D9100F01EF8 /* NetworkProtectionPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BC380D5294B5D9100F01EF8 /* NetworkProtectionPopover.swift */; };
 		7BC753AF299B879000867965 /* NetworkProtectionControllerErrorStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BC753AE299B879000867965 /* NetworkProtectionControllerErrorStore.swift */; };
+		7BCBD53E299E354500AF2D43 /* NetworkProtectionIconPublisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BCBD53D299E354500AF2D43 /* NetworkProtectionIconPublisher.swift */; };
+		7BCBD53F299E5D3400AF2D43 /* NetworkProtectionIconPublisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BCBD53D299E354500AF2D43 /* NetworkProtectionIconPublisher.swift */; };
 		7BCD65C329781B8900172423 /* Font+MonospacedDigits.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BCD65C229781B8900172423 /* Font+MonospacedDigits.swift */; };
 		7BCD65C82978340D00172423 /* VisualEffectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BCD65C72978340D00172423 /* VisualEffectView.swift */; };
 		7BCD65C92978353400172423 /* VisualEffectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BCD65C72978340D00172423 /* VisualEffectView.swift */; };
@@ -2150,6 +2152,7 @@
 		7BA59B2129705CEB00FBC9E9 /* DuckDuckGo_NetP_SysEx_Debug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = DuckDuckGo_NetP_SysEx_Debug.entitlements; sourceTree = "<group>"; };
 		7BC380D5294B5D9100F01EF8 /* NetworkProtectionPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionPopover.swift; sourceTree = "<group>"; };
 		7BC753AE299B879000867965 /* NetworkProtectionControllerErrorStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionControllerErrorStore.swift; sourceTree = "<group>"; };
+		7BCBD53D299E354500AF2D43 /* NetworkProtectionIconPublisher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionIconPublisher.swift; sourceTree = "<group>"; };
 		7BCD65C229781B8900172423 /* Font+MonospacedDigits.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Font+MonospacedDigits.swift"; sourceTree = "<group>"; };
 		7BCD65C72978340D00172423 /* VisualEffectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisualEffectView.swift; sourceTree = "<group>"; };
 		7BD1B0AC2992F21A00E80365 /* NetworkProtectionBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionBundle.swift; sourceTree = "<group>"; };
@@ -3673,6 +3676,7 @@
 				7BC753AE299B879000867965 /* NetworkProtectionControllerErrorStore.swift */,
 				7BA24A9329905C8300AED325 /* NetworkProtectionStatusReporter.swift */,
 				7B02C7A3292B901400E677CF /* String+ArrayConversion.swift */,
+				7BCBD53D299E354500AF2D43 /* NetworkProtectionIconPublisher.swift */,
 				7B53623B2936423300589DC2 /* NetworkProtectionStatusBarMenu.swift */,
 				7BFF45922938E2500021D1A0 /* NetworkProtectionLogger.swift */,
 				7B5C4E3C294A206400E42835 /* NetworkProtectionNavBarButtonModel.swift */,
@@ -6205,6 +6209,7 @@
 				4BD8CC0E2954021000AAD74A /* BWRequest.swift in Sources */,
 				4BD8CC0F2954021000AAD74A /* WKWebViewConfigurationExtensions.swift in Sources */,
 				4BD8CC102954021000AAD74A /* HomePageDefaultBrowserModel.swift in Sources */,
+				7BCBD53F299E5D3400AF2D43 /* NetworkProtectionIconPublisher.swift in Sources */,
 				4BD8CC112954021000AAD74A /* CrashReporter.swift in Sources */,
 				4BD8CC122954021000AAD74A /* BadgeNotificationAnimationModel.swift in Sources */,
 				4BD8CC132954021000AAD74A /* HyperLink.swift in Sources */,
@@ -6858,6 +6863,7 @@
 				1D43EB3A292B63B00065E5D6 /* BWRequest.swift in Sources */,
 				B68458CD25C7EB9000DC17B6 /* WKWebViewConfigurationExtensions.swift in Sources */,
 				85AC7ADD27BEB6EE00FFB69B /* HomePageDefaultBrowserModel.swift in Sources */,
+				7BCBD53E299E354500AF2D43 /* NetworkProtectionIconPublisher.swift in Sources */,
 				AAC30A26268DFEE200D2D9CD /* CrashReporter.swift in Sources */,
 				3184AC6D288F29D800C35E4B /* BadgeNotificationAnimationModel.swift in Sources */,
 				857FFEC027D239DC00415E7A /* HyperLink.swift in Sources */,

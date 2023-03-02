@@ -72,13 +72,13 @@ extension NetworkProtectionStatusView {
         init(networkProtection: NetworkProtectionProvider = DefaultNetworkProtectionProvider(),
              networkProtectionStatusReporter: NetworkProtectionStatusReporter = DefaultNetworkProtectionStatusReporter(),
              logger: NetworkProtectionLogger = DefaultNetworkProtectionLogger(),
-             runLoopMode: RunLoop.Mode? = nil,
-             initialStatus: NetworkProtectionConnectionStatus = .disconnected) {
+             runLoopMode: RunLoop.Mode? = nil) {
 
             self.networkProtection = networkProtection
             self.networkProtectionStatusReporter = networkProtectionStatusReporter
             self.logger = logger
             self.runLoopMode = runLoopMode
+            
             connectionStatus = networkProtectionStatusReporter.statusChangePublisher.value
             isHavingConnectivityIssues = networkProtectionStatusReporter.connectivityIssuesPublisher.value
             internalServerAddress = networkProtectionStatusReporter.serverInfoPublisher.value.serverAddress

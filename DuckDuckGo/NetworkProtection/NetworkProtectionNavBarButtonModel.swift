@@ -33,6 +33,11 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
     
     private var statusChangeCancellable: AnyCancellable?
     private var interruptionCancellable: AnyCancellable?
+    
+    // MARK: - NetP Icon publisher
+    
+    private let iconPublisher: NetworkProtectionIconPublisher
+    private var iconPublisherCancellable: AnyCancellable?
 
     // MARK: - Button appearance
 
@@ -40,19 +45,11 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
     private(set) var showButton = false
     
     @Published
-    private(set) var buttonImage = NSImage(NetworkProtectionAsset.vpnIcon)
+    private(set) var buttonImage: NSImage?
     
     // MARK: - NetP State
 
-    private var isHavingConnectivityIssues = false {
-        didSet {
-           if isHavingConnectivityIssues {
-               buttonImage = NSImage(NetworkProtectionAsset.vpnIssueIcon)
-           } else {
-               buttonImage = NSImage(NetworkProtectionAsset.vpnIcon)
-           }
-        }
-    }
+    private var isHavingConnectivityIssues = false
 
     // MARK: - Initialization
 
@@ -61,9 +58,11 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
          networkProtectionStatusReporter: NetworkProtectionStatusReporter = DefaultNetworkProtectionStatusReporter()) {
         self.networkProtection = networkProtection
         self.networkProtectionStatusReporter = networkProtectionStatusReporter
+        self.iconPublisher = NetworkProtectionIconPublisher(statusReporter: networkProtectionStatusReporter)
         self.popovers = popovers
         
         isHavingConnectivityIssues = networkProtectionStatusReporter.connectivityIssuesPublisher.value
+        buttonImage = .init(iconPublisher.icon)
 
         super.init()
 
@@ -73,8 +72,15 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
     // MARK: - Subscriptions
     
     private func setupSubscriptions() {
+        setupIconSubscription()
         setupStatusSubscription()
         setupInterruptionSubscription()
+    }
+    
+    private func setupIconSubscription() {
+        iconPublisherCancellable = iconPublisher.$icon.sink { [weak self] icon in
+            self?.buttonImage = .init(icon)
+        }
     }
 
     private func setupStatusSubscription() {
