@@ -30,12 +30,15 @@ final class CopyHandler: NSObject {
         }
 
         let selectedText = editor.selectedText
+
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString(selectedText, forType: .string)
 
-        if let urlString = URL(trimmedAddressBarString: selectedText.trimmingWhitespace())?.absoluteString,
-            urlString == selectedText {
-            NSPasteboard.general.setString(urlString, forType: .URL)
+        if let url = URL(trimmedAddressBarString: selectedText.trimmingWhitespace()) {
+            NSPasteboard.general.copy(url, withString: selectedText)
+        } else {
+            NSPasteboard.general.copy(selectedText)
         }
     }
+
 }

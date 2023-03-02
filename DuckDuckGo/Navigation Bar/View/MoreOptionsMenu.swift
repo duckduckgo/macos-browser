@@ -304,8 +304,7 @@ final class EmailOptionsButtonSubMenu: NSMenu {
 
             Pixel.fire(.emailUserCreatedAlias, withAdditionalParameters: pixelParameters)
 
-            NSPasteboard.general.clearContents()
-            NSPasteboard.general.setString(address, forType: .string)
+            NSPasteboard.general.copy(address)
             NotificationCenter.default.post(name: NSNotification.Name.privateEmailCopiedToClipboard, object: nil)
         }
     }
