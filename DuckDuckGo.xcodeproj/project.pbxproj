@@ -959,8 +959,6 @@
 		3775913A29AB9C3B00E26367 /* EnableSyncView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3775913829AB9C3B00E26367 /* EnableSyncView.swift */; };
 		3775913C29ABB78300E26367 /* SyncSetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3775913B29ABB78300E26367 /* SyncSetupView.swift */; };
 		3775913D29ABB78300E26367 /* SyncSetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3775913B29ABB78300E26367 /* SyncSetupView.swift */; };
-		3775913F29ABB79200E26367 /* SyncSetupViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3775913E29ABB79200E26367 /* SyncSetupViewModel.swift */; };
-		3775914029ABB79200E26367 /* SyncSetupViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3775913E29ABB79200E26367 /* SyncSetupViewModel.swift */; };
 		3775914229ABBBF500E26367 /* SyncAnotherDeviceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3775914129ABBBF500E26367 /* SyncAnotherDeviceView.swift */; };
 		3775914329ABBBF500E26367 /* SyncAnotherDeviceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3775914129ABBBF500E26367 /* SyncAnotherDeviceView.swift */; };
 		3775914529ABBC0800E26367 /* SyncWizardStep.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3775914429ABBC0800E26367 /* SyncWizardStep.swift */; };
@@ -1017,6 +1015,8 @@
 		37F19A6528E1B3FB00740DC6 /* PreferencesPrivatePlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F19A6428E1B3FB00740DC6 /* PreferencesPrivatePlayerView.swift */; };
 		37F19A6728E1B43200740DC6 /* PrivatePlayerPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F19A6628E1B43200740DC6 /* PrivatePlayerPreferences.swift */; };
 		37F19A6A28E2F2D000740DC6 /* PrivatePlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F19A6928E2F2D000740DC6 /* PrivatePlayer.swift */; };
+		37F2625B29B0FD75002F450F /* RecoverAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F2625A29B0FD75002F450F /* RecoverAccountView.swift */; };
+		37F2625C29B0FD75002F450F /* RecoverAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F2625A29B0FD75002F450F /* RecoverAccountView.swift */; };
 		37F44A5F298C17830025E7FE /* Navigation in Frameworks */ = {isa = PBXBuildFile; productRef = 37F44A5E298C17830025E7FE /* Navigation */; };
 		4B0135CE2729F1AA00D54834 /* NSPasteboardExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0135CD2729F1AA00D54834 /* NSPasteboardExtension.swift */; };
 		4B02198925E05FAC00ED7DEA /* FireproofingURLExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B02197F25E05FAC00ED7DEA /* FireproofingURLExtensions.swift */; };
@@ -1932,7 +1932,6 @@
 		3775913529AB9A1C00E26367 /* SyncSetupViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncSetupViewController.swift; sourceTree = "<group>"; };
 		3775913829AB9C3B00E26367 /* EnableSyncView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnableSyncView.swift; sourceTree = "<group>"; };
 		3775913B29ABB78300E26367 /* SyncSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncSetupView.swift; sourceTree = "<group>"; };
-		3775913E29ABB79200E26367 /* SyncSetupViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncSetupViewModel.swift; sourceTree = "<group>"; };
 		3775914129ABBBF500E26367 /* SyncAnotherDeviceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncAnotherDeviceView.swift; sourceTree = "<group>"; };
 		3775914429ABBC0800E26367 /* SyncWizardStep.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncWizardStep.swift; sourceTree = "<group>"; };
 		3775914729ABC03700E26367 /* SyncNewDeviceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncNewDeviceView.swift; sourceTree = "<group>"; };
@@ -1998,6 +1997,7 @@
 		37F19A6428E1B3FB00740DC6 /* PreferencesPrivatePlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesPrivatePlayerView.swift; sourceTree = "<group>"; };
 		37F19A6628E1B43200740DC6 /* PrivatePlayerPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivatePlayerPreferences.swift; sourceTree = "<group>"; };
 		37F19A6928E2F2D000740DC6 /* PrivatePlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivatePlayer.swift; sourceTree = "<group>"; };
+		37F2625A29B0FD75002F450F /* RecoverAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecoverAccountView.swift; sourceTree = "<group>"; };
 		4B0135CD2729F1AA00D54834 /* NSPasteboardExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSPasteboardExtension.swift; sourceTree = "<group>"; };
 		4B02197F25E05FAC00ED7DEA /* FireproofingURLExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FireproofingURLExtensions.swift; sourceTree = "<group>"; };
 		4B02198125E05FAC00ED7DEA /* FireproofDomains.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FireproofDomains.swift; sourceTree = "<group>"; };
@@ -3096,13 +3096,13 @@
 		3775913429AB99DA00E26367 /* Sync */ = {
 			isa = PBXGroup;
 			children = (
-				3775913E29ABB79200E26367 /* SyncSetupViewModel.swift */,
 				3775913529AB9A1C00E26367 /* SyncSetupViewController.swift */,
 				3775914429ABBC0800E26367 /* SyncWizardStep.swift */,
 				3775913B29ABB78300E26367 /* SyncSetupView.swift */,
 				3775913829AB9C3B00E26367 /* EnableSyncView.swift */,
 				3775914129ABBBF500E26367 /* SyncAnotherDeviceView.swift */,
 				3775914729ABC03700E26367 /* SyncNewDeviceView.swift */,
+				37F2625A29B0FD75002F450F /* RecoverAccountView.swift */,
 				372AD54C29AC09AF00DE827B /* SyncSetupCompleteView.swift */,
 				372AD54F29AC10EC00DE827B /* SaveRecoveryPDFView.swift */,
 				372AD55229ACBD0A00DE827B /* QRCodeView.swift */,
@@ -6313,7 +6313,6 @@
 				3706FAC2293F65D500E42796 /* FaviconSelector.swift in Sources */,
 				3706FAC3293F65D500E42796 /* AddEditFavoriteViewController.swift in Sources */,
 				3706FAC4293F65D500E42796 /* PrintingUserScript.swift in Sources */,
-				3775914029ABB79200E26367 /* SyncSetupViewModel.swift in Sources */,
 				3706FEBF293F6EFF00E42796 /* BWError.swift in Sources */,
 				3706FAC6293F65D500E42796 /* ConnectBitwardenViewController.swift in Sources */,
 				3706FAC8293F65D500E42796 /* AppTrackerDataSetProvider.swift in Sources */,
@@ -6539,6 +6538,7 @@
 				3706FB92293F65D500E42796 /* PermissionModel.swift in Sources */,
 				3706FB93293F65D500E42796 /* PasteboardFolder.swift in Sources */,
 				3706FB94293F65D500E42796 /* CookieManagedNotificationView.swift in Sources */,
+				37F2625C29B0FD75002F450F /* RecoverAccountView.swift in Sources */,
 				3706FB95293F65D500E42796 /* PermissionType.swift in Sources */,
 				3706FB96293F65D500E42796 /* RecentlyClosedWindow.swift in Sources */,
 				3775913A29AB9C3B00E26367 /* EnableSyncView.swift in Sources */,
@@ -7220,6 +7220,7 @@
 				B684592225C93BE000DC17B6 /* Publisher.asVoid.swift in Sources */,
 				AAA0CC33252F181A0079BC96 /* NavigationButtonMenuDelegate.swift in Sources */,
 				AAC30A2A268E239100D2D9CD /* CrashReport.swift in Sources */,
+				37F2625B29B0FD75002F450F /* RecoverAccountView.swift in Sources */,
 				37CC53F427E8D4620028713D /* NSPathControlView.swift in Sources */,
 				1D36E65B298ACD2900AA485D /* AppIconChanger.swift in Sources */,
 				98779A0029999B64005D8EB6 /* Bookmark.xcdatamodeld in Sources */,
@@ -7248,7 +7249,6 @@
 				1D36E653298A851E00AA485D /* InternalUserDecider.swift in Sources */,
 				1D36E658298AA3BA00AA485D /* InternalUserDeciderStore.swift in Sources */,
 				B634DBE5293C944700C3C99E /* NewWindowPolicy.swift in Sources */,
-				3775913F29ABB79200E26367 /* SyncSetupViewModel.swift in Sources */,
 				31CF3432288B0B1B0087244B /* NavigationBarBadgeAnimator.swift in Sources */,
 				858A798526A8BB5D00A75A42 /* NSTextViewExtension.swift in Sources */,
 				B634DBE7293C98C500C3C99E /* FutureExtension.swift in Sources */,
