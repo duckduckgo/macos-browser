@@ -472,7 +472,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             }
             if case .url(let newUrl, userEntered: _) = content,
                case .url(newUrl, userEntered: _) = self.content {
-                // ignore equel urls but userEntered != false
+                // ignore when urls are equal but userEntered value is nil as it comes from the WebView url updated event
             } else if content != self.content {
                 self.content = content
             }
@@ -790,14 +790,18 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                 .appendResponder(navigationDidFail: { [weak self] navigation, error in
                     // redirect to SERP for non-valid domains entered by user
                     // https://app.asana.com/0/1177771139624306/1204041033469842/f
-                    if navigation.isCurrent,
-                       case .url(_, userEntered: .some(let userEnteredValue)) = content,
-                       error._nsError.domain == NSURLErrorDomain,
-                       error.errorCode == NSURLErrorCannotFindHost,
-                       let url = URL.makeSearchUrl(from: userEnteredValue) {
+                    guard let self,
+                          navigation.isCurrent,
+                          error._nsError.domain == NSURLErrorDomain,
+                          error.errorCode == NSURLErrorCannotFindHost,
+                          case .url(_, userEntered: .some(let userEnteredValue)) = content,
+                          // if user-entered value actually had the scheme - don‘t search
+                          !userEnteredValue.hasPrefix((url.scheme.map(URL.NavigationalScheme.init) ?? .http).separated()),
+                          // if url had a valid top level domain - don‘t search
+                          self.contentBlocking.tld.domain(url.host) == nil,
+                          let url = URL.makeSearchUrl(from: userEnteredValue) else { return }
 
-                        self?.setUrl(url, userEntered: userEnteredValue)
-                    }
+                    self.setUrl(url, userEntered: userEnteredValue)
                 })
         }
     }
