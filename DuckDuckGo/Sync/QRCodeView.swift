@@ -44,9 +44,17 @@ struct QRCode: View {
         qrCodeFilter.setValue(data, forKey: "inputMessage")
         qrCodeFilter.setValue("H", forKey: "inputCorrectionLevel")
 
-        let scale: CGFloat = NSScreen.main?.backingScaleFactor ?? 2.0
+
+        guard let naturalSize = qrCodeFilter.outputImage?.extent.width else {
+            assertionFailure("Failed to generate qr code")
+            return qrImage
+        }
+
+        let scale = size.width / naturalSize
+
         let transform = CGAffineTransform(scaleX: scale, y: scale)
         guard let outputImage = qrCodeFilter.outputImage?.transformed(by: transform) else {
+            assertionFailure("transformation failed")
             return qrImage
         }
 

@@ -48,36 +48,67 @@ struct SyncDevice: Identifiable {
 }
 
 final class SyncPreferences: ObservableObject {
+    enum FlowState {
+        case enableSync, recoverAccount, syncAnotherDevice, syncNewDevice, deviceSynced, saveRecoveryPDF
+    }
+
+    @Published var flowState: FlowState? {
+        didSet {
+            if flowState == nil && oldValue != nil {
+                onCancel()
+            }
+        }
+    }
+    @Published var shouldDisableSubmitButton: Bool
 
     @Published private(set) var isSyncEnabled: Bool = false
 
     @Published var account: SyncAccount?
+    @Published var recoveryKey: String = "" {
+        didSet {
+            shouldDisableSubmitButton = recoveryKey.isEmpty
+        }
+    }
 
     @Published var shouldShowErrorMessage: Bool = false
     @Published var errorMessage: String?
 
     @Published var devices: [SyncDevice] = []
 
+    var onCancel: () -> Void = {}
+
     init(syncService: SyncService = .shared) {
         self.syncService = syncService
         self.isSyncEnabled = syncService.sync.isAuthenticated
         self.account = syncService.sync.account
+        self.shouldDisableSubmitButton = true
+
+        if let account = self.account {
+            devices = [.init(account)]
+        } else {
+            devices = []
+        }
 
         isSyncEnabledCancellable = syncService.sync.isAuthenticatedPublisher
+            .removeDuplicates()
             .receive(on: DispatchQueue.main)
-            .sink(receiveValue: { [weak self, weak syncService] isAuthenticates in
-                self?.isSyncEnabled = isAuthenticates
+            .sink(receiveValue: { [weak self, weak syncService] isAuthenticated in
+                self?.isSyncEnabled = isAuthenticated
                 self?.account = syncService?.sync.account
                 if let account = self?.account {
                     self?.devices = [.init(account)]
                 } else {
                     self?.devices = []
                 }
+                if let code = self?.account?.recoveryCode {
+                    print(code)
+                }
             })
     }
 
     func presentEnableSyncDialog() {
-        let enableSyncWindowController = SyncSetupViewController.create(with: syncService).wrappedInWindowController()
+        flowState = .enableSync
+        let enableSyncWindowController = SyncSetupViewController.create(with: self).wrappedInWindowController()
 
         guard let enableSyncWindow = enableSyncWindowController.window,
               let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController
@@ -89,6 +120,45 @@ final class SyncPreferences: ObservableObject {
         parentWindowController.window?.beginSheet(enableSyncWindow)
     }
 
+    func presentRecoverSyncAccountDialog() {
+        flowState = .recoverAccount
+        let enableSyncWindowController = SyncSetupViewController.create(with: self).wrappedInWindowController()
+
+        guard let enableSyncWindow = enableSyncWindowController.window,
+              let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController
+        else {
+            assertionFailure("Sync: Failed to present EnableSyncViewController")
+            return
+        }
+
+        parentWindowController.window?.beginSheet(enableSyncWindow)
+    }
+
+    func turnOnSync() {
+        Task { @MainActor in
+            do {
+                try await syncService.sync.createAccount(deviceName: ProcessInfo.processInfo.hostName)
+                flowState = .syncAnotherDevice
+            } catch {
+                errorMessage = String(describing: error)
+                shouldShowErrorMessage = true
+            }
+        }
+    }
+
+    func recoverDevice() {
+        Task { @MainActor in
+            do {
+                try await syncService.sync.login(recoveryKey: recoveryKey, deviceName: ProcessInfo.processInfo.hostName)
+                recoveryKey = ""
+                cancelFlow()
+            } catch {
+                errorMessage = String(describing: error)
+                shouldShowErrorMessage = true
+            }
+        }
+    }
+
     func turnOffSync() {
         Task { @MainActor in
             do {
@@ -98,6 +168,10 @@ final class SyncPreferences: ObservableObject {
                 shouldShowErrorMessage = true
             }
         }
+    }
+
+    func cancelFlow() {
+        flowState = nil
     }
 
     private let syncService: SyncService

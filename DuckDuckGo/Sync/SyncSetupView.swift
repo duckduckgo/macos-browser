@@ -19,14 +19,23 @@
 import SwiftUI
 
 struct SyncSetupView: View {
-    @ObservedObject var model: SyncSetupViewModel
+    @ObservedObject var model: SyncPreferences
 
     var body: some View {
+        content
+            .alert(isPresented: $model.shouldShowErrorMessage) {
+                Alert(title: Text("Unable to turn on Sync"), message: Text(model.errorMessage ?? "An error occurred"), dismissButton: .default(Text(UserText.ok)))
+            }
+    }
+
+    @ViewBuilder var content: some View {
         switch model.flowState {
         case .enableSync:
             EnableSyncView().environmentObject(model)
         case .syncAnotherDevice:
             SyncAnotherDeviceView().environmentObject(model)
+        case .recoverAccount:
+            RecoverAccountView().environmentObject(model)
 //        case .syncNewDevice:
 //            SyncNewDeviceView().environmentObject(model)
 //        case .deviceSynced:
@@ -34,7 +43,7 @@ struct SyncSetupView: View {
 //        case .saveRecoveryPDF:
 //            SaveRecoveryPDFView().environmentObject(model)
         default:
-            EmptyView()
+            Text("WTF")
         }
     }
 }

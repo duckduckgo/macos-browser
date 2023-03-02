@@ -65,37 +65,37 @@ import SwiftUI
 //    }
 //
 //}
-//
-//private struct CopyPasteButtonStyle: ButtonStyle {
-//    @Environment(\.colorScheme) var colorScheme
-//    let verticalPadding: CGFloat
-//
-//    init(verticalPadding: CGFloat = 6.0) {
-//        self.verticalPadding = verticalPadding
-//    }
-//
-//    func makeBody(configuration: Self.Configuration) -> some View {
-//
-//        let color: Color = configuration.isPressed ? Color(NSColor.windowBackgroundColor) : Color(NSColor.controlColor)
-//
-//        let outerShadowOpacity = colorScheme == .dark ? 0.8 : 0.0
-//
-//        configuration.label
-//            .padding(.horizontal, 12)
-//            .padding(.vertical, verticalPadding)
-//            .background(
-//                RoundedRectangle(cornerRadius: 5, style: .continuous)
-//                    .fill(color)
-//                    .shadow(color: .black.opacity(0.1), radius: 0.1, x: 0, y: 1)
-//                    .shadow(color: .primary.opacity(outerShadowOpacity), radius: 0.1, x: 0, y: -0.6)
-//            )
-//            .overlay(
-//                RoundedRectangle(cornerRadius: 5)
-//                    .stroke(Color.black.opacity(0.1), lineWidth: 1)
-//            )
-//    }
-//}
-//
+
+private struct CopyPasteButtonStyle: ButtonStyle {
+    @Environment(\.colorScheme) var colorScheme
+    let verticalPadding: CGFloat
+
+    init(verticalPadding: CGFloat = 6.0) {
+        self.verticalPadding = verticalPadding
+    }
+
+    func makeBody(configuration: Self.Configuration) -> some View {
+
+        let color: Color = configuration.isPressed ? Color(NSColor.windowBackgroundColor) : Color(NSColor.controlColor)
+
+        let outerShadowOpacity = colorScheme == .dark ? 0.8 : 0.0
+
+        configuration.label
+            .padding(.horizontal, 12)
+            .padding(.vertical, verticalPadding)
+            .background(
+                RoundedRectangle(cornerRadius: 5, style: .continuous)
+                    .fill(color)
+                    .shadow(color: .black.opacity(0.1), radius: 0.1, x: 0, y: 1)
+                    .shadow(color: .primary.opacity(outerShadowOpacity), radius: 0.1, x: 0, y: -0.6)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 5)
+                    .stroke(Color.black.opacity(0.1), lineWidth: 1)
+            )
+    }
+}
+
 //private struct ShowCodeView: View {
 //    @EnvironmentObject var model: SyncPreferences
 //
@@ -134,38 +134,40 @@ import SwiftUI
 //        }
 //    }
 //}
-//
-//private struct EnterCodeView: View {
-//    @EnvironmentObject var model: SyncPreferences
-//
-//    var body: some View {
-//        Outline {
-//            VStack(spacing: 20) {
-//                Text(UserText.syncNewDeviceEnterCodeInstructions)
-//                    .multilineTextAlignment(.center)
-//
-//                Outline {
-//                    SyncKeyView(text: model.remoteSyncKey ?? "")
-//                        .padding(.horizontal, 20)
-//                        .padding(.vertical, 10)
-//                }
-//                .frame(maxWidth: 244)
-//
-//                Button {
-//                    model.remoteSyncKey = NSPasteboard.general.string(forType: .string)
-//                } label: {
-//                    HStack {
-//                        Image("Paste")
-//                        Text(UserText.pasteFromClipboard)
-//                    }
-//                }
-//                .buttonStyle(CopyPasteButtonStyle(verticalPadding: 8.0))
-//            }
-//            .padding(20)
-//        }
-//    }
-//}
-//
+
+private struct EnterCodeView: View {
+    @EnvironmentObject var model: SyncPreferences
+
+    var body: some View {
+        Outline {
+            VStack(spacing: 20) {
+                Text(UserText.syncNewDeviceEnterCodeInstructions)
+                    .multilineTextAlignment(.center)
+
+                Outline {
+                    SyncKeyView(text: model.recoveryKey)
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 10)
+                }
+                .frame(maxWidth: 244)
+
+                Button {
+                    if let key = NSPasteboard.general.string(forType: .string) {
+                        model.recoveryKey = key
+                    }
+                } label: {
+                    HStack {
+                        Image("Paste")
+                        Text(UserText.pasteFromClipboard)
+                    }
+                }
+                .buttonStyle(CopyPasteButtonStyle(verticalPadding: 8.0))
+            }
+            .padding(20)
+        }
+    }
+}
+
 //struct SyncKeyView: View {
 //    let text: String
 //

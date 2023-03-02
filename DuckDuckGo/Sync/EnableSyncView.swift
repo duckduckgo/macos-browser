@@ -19,7 +19,7 @@
 import SwiftUI
 
 struct EnableSyncView: View {
-    @EnvironmentObject var model: SyncSetupViewModel
+    @EnvironmentObject var model: SyncPreferences
 
     var body: some View {
         SyncWizardStep {
@@ -34,7 +34,7 @@ struct EnableSyncView: View {
             }
         } buttons: {
             Button(UserText.cancel) {
-                model.onCancel()
+                model.cancelFlow()
             }
             Button(UserText.turnOnSync) {
                 model.turnOnSync()
@@ -42,8 +42,5 @@ struct EnableSyncView: View {
             .buttonStyle(DefaultActionButtonStyle(enabled: true))
         }
         .frame(width: 360, height: 314)
-        .alert(isPresented: $model.shouldShowErrorMessage) {
-            Alert(title: Text("Unable to turn on Sync"), message: Text(model.errorMessage ?? "An error occurred"), dismissButton: .default(Text(UserText.ok)))
-        }
     }
 }

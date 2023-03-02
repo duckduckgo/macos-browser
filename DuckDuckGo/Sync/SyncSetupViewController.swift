@@ -21,12 +21,21 @@ import SwiftUI
 
 final class SyncSetupViewController: NSViewController {
 
-    static func create(with syncService: SyncService) -> SyncSetupViewController {
-        return SyncSetupViewController(syncService)
+    static func create(with syncPreferences: SyncPreferences) -> SyncSetupViewController {
+        let viewController = SyncSetupViewController(syncPreferences)
+        syncPreferences.onCancel = { [weak viewController] in
+            guard let window = viewController?.view.window, let sheetParent = window.sheetParent else {
+                assertionFailure("window or sheet parent not present")
+                return
+            }
+            sheetParent.endSheet(window)
+        }
+
+        return viewController
     }
 
-    init(_ syncService: SyncService) {
-        self.syncService = syncService
+    init(_ syncPreferences: SyncPreferences) {
+        self.syncPreferences = syncPreferences
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -34,17 +43,15 @@ final class SyncSetupViewController: NSViewController {
         fatalError("init(coder:) has not been implemented")
     }
 
-    private let syncService: SyncService
+    private weak var syncPreferences: SyncPreferences?
 
     override func loadView() {
-        let viewModel = SyncSetupViewModel(syncService: syncService) { [weak self] in
-            guard let window = self?.view.window, let sheetParent = window.sheetParent else {
-                assertionFailure("window or sheet parent not present")
-                return
-            }
-            sheetParent.endSheet(window)
+        guard let syncPreferences else {
+            assertionFailure("SyncPreferences was deallocated")
+            view = NSView()
+            return
         }
-        let enableSyncView = SyncSetupView(model: viewModel)
+        let enableSyncView = SyncSetupView(model: syncPreferences)
         view = NSHostingView(rootView: enableSyncView)
     }
 

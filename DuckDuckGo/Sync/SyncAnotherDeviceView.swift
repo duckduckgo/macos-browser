@@ -19,7 +19,7 @@
 import SwiftUI
 
 struct SyncAnotherDeviceView: View {
-    @EnvironmentObject var model: SyncSetupViewModel
+    @EnvironmentObject var model: SyncPreferences
 
     var body: some View {
         SyncWizardStep {

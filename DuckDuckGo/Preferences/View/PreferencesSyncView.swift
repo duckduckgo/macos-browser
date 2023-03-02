@@ -67,7 +67,7 @@ extension Preferences {
 
             Section {
                 TextButton(UserText.recoverSyncedData) {
-                    print("recover")
+                    model.presentRecoverSyncAccountDialog()
                 }
             }
         }
@@ -89,60 +89,63 @@ extension Preferences {
                     .environmentObject(model)
             }
 
-//            Section {
-//                Text(UserText.syncNewDevice)
-//                    .font(Const.Fonts.preferencePaneSectionHeader)
-//
-//                SyncNewDeviceView()
-//                    .environmentObject(model)
-//            }
-//
-//            Section {
-//                Text(UserText.recovery)
-//                    .font(Const.Fonts.preferencePaneSectionHeader)
-//
-//                HStack(alignment: .top, spacing: 12) {
-//                    Text(UserText.recoveryInstructions)
-//                        .fixMultilineScrollableText()
-//                    Spacer()
-//                    Button(UserText.saveRecoveryPDF) {
-//                        print("save recovery PDF")
-//                    }
-//                }
-//                Button(UserText.turnOffAndDeleteServerData) {
-//                    print("turn off and delete server data")
-//                }
-//            }
+            Section {
+                Text(UserText.syncNewDevice)
+                    .font(Const.Fonts.preferencePaneSectionHeader)
+
+                SyncNewDeviceView()
+                    .environmentObject(model)
+            }
+
+            Section {
+                Text(UserText.recovery)
+                    .font(Const.Fonts.preferencePaneSectionHeader)
+
+                HStack(alignment: .top, spacing: 12) {
+                    Text(UserText.recoveryInstructions)
+                        .fixMultilineScrollableText()
+                    Spacer()
+                    Button(UserText.saveRecoveryPDF) {
+                        print("save recovery PDF")
+                    }
+                }
+            }
+
+            Section {
+                Button(UserText.turnOffAndDeleteServerData) {
+                    print("turn off and delete server data")
+                }
+            }
         }
     }
 
-//    struct SyncNewDeviceView: View {
-//        @EnvironmentObject var model: SyncPreferences
-//
-//        var body: some View {
-//            Outline {
-//                HStack(alignment: .top, spacing: 20) {
-//                    QRCode(string: model.syncKey, size: .init(width: 192, height: 192))
-//
-//                    VStack {
-//                        Text(UserText.syncNewDeviceInstructions)
-//                            .fixMultilineScrollableText()
-//
-//                        Spacer()
-//
-//                        HStack {
-//                            Spacer()
-//                            TextButton(UserText.showOrEnterCode) {
-//                                print("show or enter code")
-//                            }
-//                        }
-//                    }
-//                    .frame(maxHeight: .infinity)
-//                }
-//                .padding(20)
-//            }
-//        }
-//    }
+    struct SyncNewDeviceView: View {
+        @EnvironmentObject var model: SyncPreferences
+
+        var body: some View {
+            Outline {
+                HStack(alignment: .top, spacing: 20) {
+                    QRCode(string: model.account?.recoveryCode ?? "", size: .init(width: 192, height: 192))
+
+                    VStack {
+                        Text(UserText.syncNewDeviceInstructions)
+                            .fixMultilineScrollableText()
+
+                        Spacer()
+
+                        HStack {
+                            Spacer()
+                            TextButton(UserText.showOrEnterCode) {
+                                print("show or enter code")
+                            }
+                        }
+                    }
+                    .frame(maxHeight: .infinity)
+                }
+                .padding(20)
+            }
+        }
+    }
 
 }
 
