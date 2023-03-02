@@ -70,12 +70,16 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
                  windowFeatures: WKWindowFeatures,
                  completionHandler: @escaping (WKWebView?) -> Void) {
 
+        let sourceUrl = navigationAction.safeSourceFrame?.safeRequest?.url ?? self.url ?? .empty
         let newWindowPolicy: NavigationDecision? = {
             // Are we handling custom Context Menu navigation action? (see ContextMenuManager)
             if let newWindowPolicy = self.contextMenuManager?.decideNewWindowPolicy(for: navigationAction) {
                 return newWindowPolicy
             }
-
+            // allow popups opened from an empty window console
+            if sourceUrl.isEmpty || sourceUrl.scheme == URL.NavigationalScheme.about.rawValue {
+                return .allow(.tab(selected: true))
+            }
             return nil
         }()
         switch newWindowPolicy {
