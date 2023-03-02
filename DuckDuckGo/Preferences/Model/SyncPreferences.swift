@@ -63,16 +63,9 @@ final class SyncPreferences: ObservableObject {
             }
         }
     }
-    @Published var shouldDisableSubmitButton: Bool
 
     @Published var account: SyncAccount?
     @Published var devices: [SyncDevice] = []
-
-    @Published var recoveryKey: String = "" {
-        didSet {
-            shouldDisableSubmitButton = recoveryKey.isEmpty
-        }
-    }
 
     @Published var shouldShowErrorMessage: Bool = false
     @Published var errorMessage: String?
@@ -80,7 +73,6 @@ final class SyncPreferences: ObservableObject {
 
     init(syncService: SyncService = .shared) {
         self.syncService = syncService
-        self.shouldDisableSubmitButton = true
         updateValues()
 
         isSyncEnabledCancellable = syncService.sync.isAuthenticatedPublisher
@@ -99,6 +91,9 @@ final class SyncPreferences: ObservableObject {
             devices = [.init(account)]
         } else {
             devices = []
+        }
+        if let code = account?.recoveryCode {
+            print(code)
         }
     }
 
@@ -124,11 +119,10 @@ final class SyncPreferences: ObservableObject {
         }
     }
 
-    func recoverDevice() {
+    func recoverDevice(using recoveryCode: String) {
         Task { @MainActor in
             do {
-                try await syncService.sync.login(recoveryKey: recoveryKey, deviceName: ProcessInfo.processInfo.hostName)
-                recoveryKey = ""
+                try await syncService.sync.login(recoveryKey: recoveryCode, deviceName: ProcessInfo.processInfo.hostName)
                 endFlow()
             } catch {
                 errorMessage = String(describing: error)

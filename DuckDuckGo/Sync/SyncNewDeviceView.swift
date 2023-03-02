@@ -135,39 +135,6 @@ private struct CopyPasteButtonStyle: ButtonStyle {
 //    }
 //}
 
-private struct EnterCodeView: View {
-    @EnvironmentObject var model: SyncPreferences
-
-    var body: some View {
-        Outline {
-            VStack(spacing: 20) {
-                Text(UserText.syncNewDeviceEnterCodeInstructions)
-                    .multilineTextAlignment(.center)
-
-                Outline {
-                    SyncKeyView(text: model.recoveryKey)
-                        .padding(.horizontal, 20)
-                        .padding(.vertical, 10)
-                }
-                .frame(maxWidth: 244)
-
-                Button {
-                    if let key = NSPasteboard.general.string(forType: .string) {
-                        model.recoveryKey = key
-                    }
-                } label: {
-                    HStack {
-                        Image("Paste")
-                        Text(UserText.pasteFromClipboard)
-                    }
-                }
-                .buttonStyle(CopyPasteButtonStyle(verticalPadding: 8.0))
-            }
-            .padding(20)
-        }
-    }
-}
-
 //struct SyncKeyView: View {
 //    let text: String
 //

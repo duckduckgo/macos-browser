@@ -20,23 +20,26 @@ import SwiftUI
 
 struct RecoverAccountView: View {
     @EnvironmentObject var model: SyncPreferences
+    @ObservedObject var recoveryCodeModel = RecoveryCodeViewModel()
 
     var body: some View {
         SyncWizardStep(spacing: 20.0) {
             Text(UserText.recoverSyncedDataTitle)
                 .font(.system(size: 17, weight: .bold))
 
-            EnterCodeView().environmentObject(model)
+            EnterCodeView()
+                .environmentObject(model)
+                .environmentObject(recoveryCodeModel)
 
         } buttons: {
             Button(UserText.cancel) {
                 model.endFlow()
             }
             Button(UserText.submit) {
-                model.recoverDevice()
+                model.recoverDevice(using: recoveryCodeModel.recoveryCode)
             }
-            .buttonStyle(DefaultActionButtonStyle(enabled: !model.shouldDisableSubmitButton))
-            .disabled(model.shouldDisableSubmitButton)
+            .buttonStyle(DefaultActionButtonStyle(enabled: !recoveryCodeModel.shouldDisableSubmitButton))
+            .disabled(recoveryCodeModel.shouldDisableSubmitButton)
         }
         .frame(width: 480, height: 432)
     }
@@ -73,8 +76,9 @@ private struct CopyPasteButtonStyle: ButtonStyle {
     }
 }
 
-private struct EnterCodeView: View {
+struct EnterCodeView: View {
     @EnvironmentObject var model: SyncPreferences
+    @EnvironmentObject var recoveryCodeModel: RecoveryCodeViewModel
 
     var body: some View {
         Outline {
@@ -83,14 +87,14 @@ private struct EnterCodeView: View {
                     .multilineTextAlignment(.center)
 
                 Outline {
-                    SyncKeyView(text: model.recoveryKey)
+                    SyncKeyView(text: recoveryCodeModel.recoveryCode)
                         .padding(.horizontal, 20)
                         .padding(.vertical, 10)
                 }
                 .frame(maxWidth: 244)
 
                 Button {
-                    model.recoveryKey = NSPasteboard.general.string(forType: .string) ?? ""
+                    recoveryCodeModel.recoveryCode = NSPasteboard.general.string(forType: .string) ?? ""
                 } label: {
                     HStack {
                         Image("Paste")
