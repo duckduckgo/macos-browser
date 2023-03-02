@@ -81,6 +81,7 @@ extension Preferences {
                 SyncStatusView()
                     .environmentObject(model)
             }
+
             Section {
                 Text(UserText.syncedDevices)
                     .font(Const.Fonts.preferencePaneSectionHeader)
@@ -229,7 +230,12 @@ private struct SyncedDevicesView: View {
                         SyncPreferencesRow {
                             SyncedDeviceIcon(kind: device.kind)
                         } centerContent: {
-                            Text(device.name)
+                            HStack {
+                                Text(device.name)
+                                Text("(\(UserText.thisDevice))")
+                                    .foregroundColor(Color(NSColor.secondaryLabelColor))
+                                Spacer()
+                            }
                         } rightContent: {
                             Button(UserText.currentDeviceDetails) {
                                 print("details")
