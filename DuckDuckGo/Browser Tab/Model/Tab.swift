@@ -51,14 +51,14 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
     enum TabContent: Equatable {
         case homePage
-        case url(URL, userEntered: Bool = false)
+        case url(URL, userEntered: String? = nil)
         case privatePlayer(videoID: String, timestamp: String?)
         case preferences(pane: PreferencePaneIdentifier?)
         case bookmarks
         case onboarding
         case none
 
-        static func contentFromURL(_ url: URL?, userEntered: Bool = false) -> TabContent {
+        static func contentFromURL(_ url: URL?, userEntered: String? = nil) -> TabContent {
             if url == .homePage {
                 return .homePage
             } else if url == .welcome {
@@ -139,13 +139,17 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             }
         }
 
-        var isUserEnteredUrl: Bool {
+        var userEnteredValue: String? {
             switch self {
-            case .url(_, userEntered: let userEntered):
-                return userEntered
+            case .url(_, userEntered: let userEnteredValue):
+                return userEnteredValue
             default:
-                return false
+                return nil
             }
+        }
+
+        var isUserEnteredUrl: Bool {
+            userEnteredValue != nil
         }
 
         var isPrivatePlayer: Bool {
@@ -452,7 +456,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         }
     }
 
-    func setUrl(_ url: URL?, userEntered: Bool) {
+    func setUrl(_ url: URL?, userEntered: String?) {
         if url == .welcome {
             OnboardingViewModel().restart()
         }
@@ -466,7 +470,10 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             if content.isUrl, !webView.isLoading {
                 self.addVisit(of: url)
             }
-            if content != self.content {
+            if case .url(let newUrl, userEntered: _) = content,
+               case .url(newUrl, userEntered: _) = self.content {
+                // ignore equel urls but userEntered != false
+            } else if content != self.content {
                 self.content = content
             }
         }
@@ -779,7 +786,19 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                 request.attribution = .user
             }
             webView.navigator(distributedNavigationDelegate: navigationDelegate)
-                .load(request, withExpectedNavigationType: content.isUserEnteredUrl ? .custom(.userEnteredUrl) : .other)
+                .load(request, withExpectedNavigationType: content.isUserEnteredUrl ? .custom(.userEnteredUrl) : .other)?
+                .appendResponder(navigationDidFail: { [weak self] navigation, error in
+                    // redirect to SERP for non-valid domains entered by user
+                    // https://app.asana.com/0/1177771139624306/1204041033469842/f
+                    if navigation.isCurrent,
+                       case .url(_, userEntered: .some(let userEnteredValue)) = content,
+                       error._nsError.domain == NSURLErrorDomain,
+                       error.errorCode == NSURLErrorCannotFindHost,
+                       let url = URL.makeSearchUrl(from: userEnteredValue) {
+
+                        self?.setUrl(url, userEntered: userEnteredValue)
+                    }
+                })
         }
     }
 
@@ -1359,7 +1378,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
 
         if navigationAction.url.isExternalSchemeLink {
             // request if OS can handle extenrnal url
-            self.host(webView.url?.host, requestedOpenExternalURL: navigationAction.url, forUserEnteredURL: navigationAction.isUserEnteredUrl)
+            self.host(webView.url?.host, requestedOpenExternalURL: navigationAction.url, forUserEnteredValue: self.content.userEnteredValue)
             return .cancel
         }
 
@@ -1385,30 +1404,30 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
     // swiftlint:enable cyclomatic_complexity
     // swiftlint:enable function_body_length
 
-    private func host(_ host: String?, requestedOpenExternalURL url: URL, forUserEnteredURL userEnteredUrl: Bool) {
-        let searchForExternalUrl = { [weak self] in
+    private func host(_ host: String?, requestedOpenExternalURL url: URL, forUserEnteredValue userEnteredValue: String?) {
+        let searchForEnteredValue = { [weak self] (userEnteredValue: String) in
             // Redirect after handing WebView.url update after cancelling the request
             DispatchQueue.main.async {
-                guard let self, let url = URL.makeSearchUrl(from: url.absoluteString) else { return }
-                self.setUrl(url, userEntered: userEnteredUrl)
+                guard let self, let url = URL.makeSearchUrl(from: userEnteredValue) else { return }
+                self.setUrl(url, userEntered: userEnteredValue)
             }
         }
 
-        guard self.delegate?.tab(self, requestedOpenExternalURL: url, forUserEnteredURL: userEnteredUrl) == true else {
+        guard self.delegate?.tab(self, requestedOpenExternalURL: url, forUserEnteredURL: userEnteredValue != nil) == true else {
             // search if external URL can‘t be opened but entered by user
-            if userEnteredUrl {
-                searchForExternalUrl()
+            if let userEnteredValue {
+                searchForEnteredValue(userEnteredValue)
             }
             return
         }
 
         let permissionType = PermissionType.externalScheme(scheme: url.scheme ?? "")
 
-        permissions.permissions([permissionType], requestedForDomain: host, url: url) { [weak self, userEnteredUrl] granted in
+        permissions.permissions([permissionType], requestedForDomain: host, url: url) { [weak self] granted in
             guard granted, let self else {
                 // search if denied but entered by user
-                if userEnteredUrl {
-                    searchForExternalUrl()
+                if let userEnteredValue {
+                    searchForEnteredValue(userEnteredValue)
                 }
                 return
             }
