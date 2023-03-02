@@ -29,6 +29,7 @@ struct UserText {
     static let open = NSLocalizedString("open", value: "Open", comment: "Open button")
     static let save = NSLocalizedString("save", value: "Save", comment: "Save button")
     static let edit = NSLocalizedString("edit", value: "Edit", comment: "Edit button")
+    static let copySelection = NSLocalizedString("copy-selection", value: "Copy", comment: "Copy selection menu item")
     static let deleteBookmark = NSLocalizedString("delete-bookmark", value: "Delete Bookmark", comment: "Delete Bookmark button")
     static let removeFavorite = NSLocalizedString("remove-favorite", value: "Remove Favorite", comment: "Remove Favorite button")
     static let quit = NSLocalizedString("quit", value: "Quit", comment: "Quit button")

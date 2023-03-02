@@ -120,7 +120,7 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
     }
 
     func copy(_ value: String) {
-        NSPasteboard.copy(value)
+        NSPasteboard.general.copy(value)
     }
 
     func save() {

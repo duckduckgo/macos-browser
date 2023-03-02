@@ -112,7 +112,7 @@ final class PasswordManagementCreditCardModel: ObservableObject, PasswordManagem
     }
 
     func copy(_ value: String) {
-        NSPasteboard.copy(value)
+        NSPasteboard.general.copy(value)
     }
 
     func createNew() {
