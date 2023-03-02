@@ -326,7 +326,8 @@ final class EmailOptionsButtonSubMenu: NSMenu {
     }
 
     @objc func turnOnEmailAction(_ sender: NSMenuItem) {
-        let tab = Tab(content: .url(EmailUrls().emailProtectionLink), shouldLoadInBackground: true)
+        //TODO!
+        let tab = Tab(content: .url(EmailUrls().emailProtectionLink), shouldLoadInBackground: true, isDisposable: false)
         tabCollectionViewModel.append(tab: tab)
     }
 

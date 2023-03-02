@@ -149,7 +149,8 @@ extension WindowControllersManager {
             } else if let tab = tabCollectionViewModel.selectedTabViewModel?.tab, !newTab {
                 tab.setContent(url.map { .url($0) } ?? .homePage)
             } else {
-                let newTab = Tab(content: url.map { .url($0) } ?? .homePage, shouldLoadInBackground: true)
+                //TODO!
+                let newTab = Tab(content: url.map { .url($0) } ?? .homePage, shouldLoadInBackground: true, isDisposable: false)
                 newTab.setContent(url.map { .url($0) } ?? .homePage)
                 tabCollectionViewModel.append(tab: newTab)
             }

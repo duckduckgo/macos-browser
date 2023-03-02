@@ -55,12 +55,14 @@ extension Tab: NSSecureCoding {
 
         let interactionStateData: Data? = decoder.decodeIfPresent(at: NSSecureCodingKeys.interactionStateData) ?? decoder.decodeIfPresent(at: NSSecureCodingKeys.sessionStateData)
 
+        //TODO!
         self.init(content: content,
                   localHistory: Set(visitedDomains),
                   title: decoder.decodeIfPresent(at: NSSecureCodingKeys.title),
                   favicon: decoder.decodeIfPresent(at: NSSecureCodingKeys.favicon),
                   interactionStateData: interactionStateData,
                   shouldLoadInBackground: false,
+                  isDisposable: false,
                   shouldLoadFromCache: true,
                   lastSelectedAt: decoder.decodeIfPresent(at: NSSecureCodingKeys.lastSelectedAt),
                   currentDownload: currentDownload)

@@ -238,7 +238,7 @@ final class TabCollectionViewModel: NSObject {
         if selectDisplayableTabIfPresent(content) {
             return
         }
-        append(tab: Tab(content: content, shouldLoadInBackground: true), selected: selected, forceChange: forceChange)
+        append(tab: Tab(content: content, shouldLoadInBackground: true, isDisposable: isDisposable), selected: selected, forceChange: forceChange)
     }
 
     func append(tab: Tab, selected: Bool = true, forceChange: Bool = false) {
@@ -431,7 +431,8 @@ final class TabCollectionViewModel: NSObject {
     func removeAllTabsAndAppendNew(forceChange: Bool = false) {
         guard changesEnabled || forceChange else { return }
 
-        tabCollection.removeAll(andAppend: Tab(content: .homePage))
+        //TODO!
+        tabCollection.removeAll(andAppend: Tab(content: .homePage, isDisposable: false))
         selectUnpinnedTab(at: 0, forceChange: forceChange)
 
         delegate?.tabCollectionViewModelDidMultipleChanges(self)
@@ -446,7 +447,8 @@ final class TabCollectionViewModel: NSObject {
 
         tabCollection.removeTabs(at: indexSet)
         if tabCollection.tabs.isEmpty {
-            tabCollection.append(tab: Tab(content: .homePage))
+            //TODO!
+            tabCollection.append(tab: Tab(content: .homePage, isDisposable: false))
             selectUnpinnedTab(at: 0, forceChange: forceChange)
         } else {
             let selectionDiff = indexSet.reduce(0) { result, index in
@@ -483,7 +485,8 @@ final class TabCollectionViewModel: NSObject {
             return
         }
 
-        let tabCopy = Tab(content: tab.content, favicon: tab.favicon, interactionStateData: tab.getActualInteractionStateData(), shouldLoadInBackground: true, shouldLoadFromCache: true)
+        //TODO!
+        let tabCopy = Tab(content: tab.content, favicon: tab.favicon, interactionStateData: tab.getActualInteractionStateData(), shouldLoadInBackground: true, isDisposable: false, shouldLoadFromCache: true)
         let newIndex = tabIndex.makeNext()
 
         tabCollection(for: tabIndex)?.insert(tabCopy, at: newIndex.item)

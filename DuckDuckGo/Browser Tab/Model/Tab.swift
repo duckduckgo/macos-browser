@@ -204,6 +204,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                      interactionStateData: Data? = nil,
                      parentTab: Tab? = nil,
                      shouldLoadInBackground: Bool = false,
+                     isDisposable: Bool,
                      shouldLoadFromCache: Bool = false,
                      canBeClosedWithBack: Bool = false,
                      lastSelectedAt: Date? = nil,
@@ -236,6 +237,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                   interactionStateData: interactionStateData,
                   parentTab: parentTab,
                   shouldLoadInBackground: shouldLoadInBackground,
+                  isDisposable: isDisposable,
                   shouldLoadFromCache: shouldLoadFromCache,
                   canBeClosedWithBack: canBeClosedWithBack,
                   lastSelectedAt: lastSelectedAt,
@@ -262,6 +264,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
          interactionStateData: Data?,
          parentTab: Tab?,
          shouldLoadInBackground: Bool,
+         isDisposable: Bool,
          shouldLoadFromCache: Bool,
          canBeClosedWithBack: Bool,
          lastSelectedAt: Date?,
@@ -282,6 +285,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         self.title = title
         self.favicon = favicon
         self.parentTab = parentTab
+        self.isDisposable = isDisposable
         self._canBeClosedWithBack = canBeClosedWithBack
         self.interactionState = interactionStateData.map { .data($0) } ?? (shouldLoadFromCache ? .loadCachedFromTabContent : .none)
         self.lastSelectedAt = lastSelectedAt
@@ -351,7 +355,8 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             assertionFailure("no delegate set")
             return
         }
-        let tab = Tab(content: content, parentTab: self, shouldLoadInBackground: true, canBeClosedWithBack: kind.isSelectedTab)
+        //TODO!
+        let tab = Tab(content: content, parentTab: self, shouldLoadInBackground: true, isDisposable: false, canBeClosedWithBack: kind.isSelectedTab)
         delegate.tab(self, createdChild: tab, of: kind)
     }
 
@@ -411,6 +416,8 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     var fbBlockingEnabled = true
 
     var isLazyLoadingInProgress = false
+
+    let isDisposable: Bool
 
     @Published private(set) var content: TabContent {
         didSet {
@@ -976,6 +983,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     private(set) var localHistory: Set<String>
 
     func addVisit(of url: URL) {
+        guard !isDisposable else { return }
         guard shouldStoreNextVisit else {
             shouldStoreNextVisit = true
             return

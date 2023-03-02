@@ -485,7 +485,8 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
             return
         }
 
-        let tabs = bookmarks.compactMap { $0.urlObject }.map { Tab(content: .url($0), shouldLoadInBackground: true) }
+        //TODO!
+        let tabs = bookmarks.compactMap { $0.urlObject }.map { Tab(content: .url($0), shouldLoadInBackground: true, isDisposable: false) }
         tabCollection.append(tabs: tabs)
     }
 

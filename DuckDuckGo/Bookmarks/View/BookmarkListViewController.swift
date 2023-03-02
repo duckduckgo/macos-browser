@@ -384,7 +384,8 @@ extension BookmarkListViewController: FolderMenuItemSelectors {
             return
         }
 
-        let tabs = children.compactMap { ($0 as? Bookmark)?.urlObject }.map { Tab(content: .url($0), shouldLoadInBackground: true) }
+        //TODO!
+        let tabs = children.compactMap { ($0 as? Bookmark)?.urlObject }.map { Tab(content: .url($0), shouldLoadInBackground: true, isDisposable: false) }
         tabCollection.append(tabs: tabs)
     }
 
