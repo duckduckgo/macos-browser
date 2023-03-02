@@ -19,6 +19,7 @@
 // swiftlint:disable file_length
 
 import Cocoa
+import Common
 import WebKit
 import os
 import Combine
@@ -27,7 +28,6 @@ import Navigation
 import TrackerRadarKit
 import ContentBlocking
 import UserScript
-import Common
 import PrivacyDashboard
 
 protocol TabDelegate: ContentOverlayUserScriptDelegate {
@@ -427,24 +427,33 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         guard contentChangeEnabled else { return }
 
         let oldContent = self.content
-        let newContent: TabContent = {
+        let (newContent, credential) = { () -> (TabContent, URLCredential?) in
+
             if let newContent = privatePlayer.overrideContent(newContent, for: self) {
-                return newContent
+                return (newContent, nil)
             }
             if case .preferences(pane: .some) = oldContent,
                case .preferences(pane: nil) = newContent {
                 // prevent clearing currently selected pane (for state persistence purposes)
-                return oldContent
+                return (oldContent, nil)
             }
-            return newContent
+
+            // when navigating to a URL with basic auth username/password, cache it and redirect to a trimmed URL
+            if case .url(let url, userEntered: let userEntered) = newContent,
+               let credential = url.basicAuthCredential {
+
+                return (.url(url.removingBasicAuthCredential(), userEntered: userEntered), credential)
+            }
+
+            return (newContent, nil)
         }()
-        guard newContent != self.content else { return }
+        guard newContent != self.content || credential != nil else { return }
         self.content = newContent
 
         dismissPresentedAlert()
 
         Task {
-            await reloadIfNeeded(shouldLoadInBackground: true)
+            await reloadIfNeeded(shouldLoadInBackground: true, credential: credential)
         }
 
         if let title = content.title {
@@ -743,7 +752,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     }()
 
     @MainActor
-    private func reloadIfNeeded(shouldLoadInBackground: Bool = false) async {
+    private func reloadIfNeeded(shouldLoadInBackground: Bool = false, credential: URLCredential? = nil) async {
         let content = self.content
         guard content.url != nil else { return }
 
@@ -759,7 +768,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         }()
         guard content == self.content else { return }
 
-        if shouldLoadURL(url, shouldLoadInBackground: shouldLoadInBackground) {
+        if shouldLoadURL(url, shouldLoadInBackground: shouldLoadInBackground) || credential != nil {
             let didRestore = restoreInteractionStateDataIfNeeded()
 
             if privatePlayer.goBackAndLoadURLIfNeeded(for: self) {
@@ -778,8 +787,10 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                content.isUserEnteredUrl {
                 request.attribution = .user
             }
-            webView.navigator(distributedNavigationDelegate: navigationDelegate)
-                .load(request, withExpectedNavigationType: content.isUserEnteredUrl ? .custom(.userEnteredUrl) : .other)
+            let navigation = webView.navigator(distributedNavigationDelegate: navigationDelegate)
+                .load(request, withExpectedNavigationType: content.isUserEnteredUrl ? .custom(.userEnteredUrl) : .other)?
+                // when navigating to a URL with basic auth username/password, cache it and redirect to a trimmed URL
+                .usingBasicAuthCredential(credential, for: url)
         }
     }
 
@@ -1258,6 +1269,17 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
     // swiftlint:disable function_body_length
     @MainActor
     func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
+
+        // when navigating to a URL with basic auth username/password, cache it and redirect to a trimmed URL
+        if let mainFrame = navigationAction.mainFrameTarget,
+           let credential = navigationAction.url.basicAuthCredential {
+
+            return .redirect(mainFrame) { navigator in
+                var request = navigationAction.request
+                request.url = navigationAction.url.removingBasicAuthCredential()
+                navigator.load(request)?.usingBasicAuthCredential(credential, for: request.url!)
+            }
+        }
 
         if let policy = privatePlayer.decidePolicy(for: navigationAction, in: self) {
             return policy
