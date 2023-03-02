@@ -923,6 +923,7 @@ extension TabBarViewController: NSCollectionViewDelegate {
         if case .private = operation {
             // Perform the drag and drop between multiple windows
             TabDragAndDropManager.shared.performDragAndDropIfNeeded()
+            return
         }
         // dropping not on a tab bar
         guard case .none = operation else { return }
