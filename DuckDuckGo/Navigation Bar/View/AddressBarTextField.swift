@@ -284,7 +284,7 @@ final class AddressBarTextField: NSTextField {
         if selectedTabViewModel.tab.content.url == url {
             selectedTabViewModel.reload()
         } else {
-            selectedTabViewModel.tab.update(url: url)
+            selectedTabViewModel.tab.setUrl(url, userEntered: true)
         }
 
         self.window?.makeFirstResponder(nil)
@@ -685,7 +685,7 @@ final class AddressBarTextField: NSTextField {
                   return
               }
 
-        tabCollectionViewModel.selectedTabViewModel?.tab.update(url: url)
+        tabCollectionViewModel.selectedTabViewModel?.tab.setUrl(url, userEntered: true)
     }
 
     @objc private func pasteAndSearch(_ menuItem: NSMenuItem) {
@@ -695,7 +695,7 @@ final class AddressBarTextField: NSTextField {
                   return
               }
 
-        tabCollectionViewModel.selectedTabViewModel?.tab.update(url: searchURL)
+        tabCollectionViewModel.selectedTabViewModel?.tab.setUrl(searchURL, userEntered: true)
     }
 
     @objc private func toggleAutocomplete(_ menuItem: NSMenuItem) {

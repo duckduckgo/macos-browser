@@ -1,7 +1,7 @@
 //
-//  ErrorExtension.swift
+//  NavigationActionExtension.swift
 //
-//  Copyright © 2021 DuckDuckGo. All rights reserved.
+//  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,21 +16,23 @@
 //  limitations under the License.
 //
 
-import Foundation
+import Navigation
 
-extension Error {
+extension NavigationAction {
 
-    var failingUrl: URL? {
-        return (self as NSError).userInfo["NSErrorFailingURLKey"] as? URL
+    var isUserEnteredUrl: Bool {
+        if #available(macOS 12.0, *),
+           case .other = navigationType,
+           case .user = request.attribution {
+            return true
+        } else if case .custom(.userEnteredUrl) = navigationType {
+            return true
+        }
+        return false
     }
 
-    var isFrameLoadInterrupted: Bool {
-        let error = self as NSError
-        return error.code == 102 && error.domain == "WebKitErrorDomain"
-    }
+}
 
-    var isNavigationCancelled: Bool {
-        let error = self as NSError
-        return error.code == -999 && error.domain == "NSURLErrorDomain"
-    }
+extension CustomNavigationType {
+    static let userEnteredUrl = CustomNavigationType(rawValue: "userEnteredUrl")
 }

@@ -120,7 +120,7 @@ final class TabViewModelTests: XCTestCase {
         let titleExpectation = expectation(description: "Title")
 
         tabViewModel.$title.debounce(for: 0.1, scheduler: RunLoop.main).sink { title in
-            XCTAssertEqual(title, tabViewModel.addressBarString)
+            XCTAssertEqual(title, URL.duckDuckGo.host!)
             titleExpectation.fulfill()
         } .store(in: &cancellables)
         waitForExpectations(timeout: 1, handler: nil)

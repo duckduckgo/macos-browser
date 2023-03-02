@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1676036039006,
+    "version": 1677228487157,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -158,6 +158,10 @@
                 {
                     "domain": "corporatefinanceinstitute.com",
                     "reason": "CMP gets incorrectly handled / repeatedly opens tabs"
+                },
+                {
+                    "domain": "kicker.de",
+                    "reason": "https://github.com/duckduckgo/autoconsent/issues/66"
                 }
             ],
             "settings": {
@@ -166,17 +170,21 @@
                 ]
             },
             "state": "enabled",
-            "hash": "659eb19df598629f1eaecbe7fa2d7f00"
+            "hash": "6ea9018a3de48904dd25d191c3640db4"
         },
         "autofill": {
             "exceptions": [
                 {
                     "domain": "containerstore.com",
                     "reason": "Generally poor UX - no username saved on signup, prompts for Duck address on 'forgot password'."
+                },
+                {
+                    "domain": "roll20.net",
+                    "reason": "Performance issue for too many fields."
                 }
             ],
             "state": "enabled",
-            "hash": "cdb6aeccec0eb59ae554f3fd75d336cc"
+            "hash": "59c4bd9b8cee343c81da98bfe5d77928"
         },
         "clickToPlay": {
             "exceptions": [],
@@ -209,25 +217,11 @@
         },
         "customUserAgent": {
             "settings": {
-                "omitApplicationSites": [
-                    {
-                        "domain": "thingiverse.com",
-                        "reason": "Site loads blank and does not proceed."
-                    },
-                    {
-                        "domain": "qubushotel.com",
-                        "reason": "Homepage UI elements appear squashed together, preventing interaction with the site."
-                    },
-                    {
-                        "domain": "digid.nl",
-                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/602"
-                    }
-                ],
-                "omitVersionSites": []
+                "webViewDefault": []
             },
             "exceptions": [],
-            "state": "disabled",
-            "hash": "f303f2b5c222373004029d0dd657fe56"
+            "state": "enabled",
+            "hash": "20fac626eb5a1753e359c96cc29dc9c3"
         },
         "duckPlayer": {
             "exceptions": [],
@@ -274,6 +268,10 @@
                 },
                 {
                     "domain": "blick.ch",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/592"
+                },
+                {
+                    "domain": "wunderground.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/592"
                 }
             ],
@@ -492,6 +490,8 @@
                         "type": "hide-empty"
                     }
                 ],
+                "useStrictHideStyleTag": true,
+                "styleTagExceptions": [],
                 "adLabelStrings": [
                     "advertisement",
                     "advertisment",
@@ -1122,7 +1122,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "3bf687283e5ce5d96b49c28efdd1eb40"
+            "hash": "fd99f6021f8a1e802f6fa4ee96f3614e"
         },
         "fingerprintingAudio": {
             "state": "disabled",
@@ -1292,6 +1292,10 @@
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/644"
                 },
                 {
+                    "domain": "duluthtrading.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/700"
+                },
+                {
                     "domain": "web.whatsapp.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/620"
                 }
@@ -1305,7 +1309,7 @@
                     "privacy-test-pages.glitch.me"
                 ]
             },
-            "hash": "4d1b636f1a6bc56bdaf40e3d71ffd583"
+            "hash": "470c77b05c99b8f0986cc40422a59c91"
         },
         "https": {
             "state": "enabled",
@@ -1347,6 +1351,33 @@
                 "windowInMs": 0
             },
             "hash": "9439c856372a09f0cfdc9e2e0fd086fd"
+        },
+        "runtimeChecks": {
+            "state": "disabled",
+            "exceptions": [],
+            "settings": {
+                "taintCheck": "enabled",
+                "matchAllDomains": "disabled",
+                "matchAllStackDomains": "enabled",
+                "overloadInstanceOf": "enabled",
+                "elementRemovalTimeout": 1000,
+                "domains": [
+                    {
+                        "domain": "preactjs.com"
+                    },
+                    {
+                        "domain": "reactjs.org"
+                    },
+                    {
+                        "domain": "browserbench.org"
+                    },
+                    {
+                        "domain": "good.third-party.site"
+                    }
+                ],
+                "stackDomains": []
+            },
+            "hash": "32be9e17c1e346de2f37bed896eb0231"
         },
         "serviceworkerInitiatedRequests": {
             "exceptions": [],
@@ -1488,6 +1519,17 @@
                                     "<all>"
                                 ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/447"
+                            }
+                        ]
+                    },
+                    "akadns.net": {
+                        "rules": [
+                            {
+                                "rule": "login.fidelity.com.febsec-fidelity.com.akadns.net",
+                                "domains": [
+                                    "fidelity.com"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/677"
                             }
                         ]
                     },
@@ -1864,6 +1906,13 @@
                                     "wunderground.com"
                                 ],
                                 "reason": "ah.nl - 'Bonus offer' elements do not render and are not clickable.,wunderground.com - Video element does not display."
+                            },
+                            {
+                                "rule": "securepubads.g.doubleclick.net/pagead/ppub_config",
+                                "domains": [
+                                    "weather.com"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/415"
                             }
                         ]
                     },
@@ -1872,6 +1921,7 @@
                             {
                                 "rule": "cdn.dynamicyield.com/api/",
                                 "domains": [
+                                    "brooklinen.com",
                                     "seatosummit.com"
                                 ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/535"
@@ -2170,6 +2220,13 @@
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/475"
                             },
                             {
+                                "rule": "google.com/cse/cse.js",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/475"
+                            },
+                            {
                                 "rule": "www.google.com/cse/static/",
                                 "domains": [
                                     "<all>"
@@ -2385,6 +2442,17 @@
                             }
                         ]
                     },
+                    "loggly.com": {
+                        "rules": [
+                            {
+                                "rule": "cloudfront.loggly.com/js/loggly.tracker-2.1.min.js",
+                                "domains": [
+                                    "rte.ie"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/681"
+                            }
+                        ]
+                    },
                     "lpsnmedia.net": {
                         "rules": [
                             {
@@ -2416,6 +2484,17 @@
                                     "medicare.gov"
                                 ],
                                 "reason": "Navigation bar at top of site does not display, preventing easy access to e.g., site login.,Note that this CNAMEs to iservprod.medicare.gov.edgekey.net at time of mitiagtion."
+                            }
+                        ]
+                    },
+                    "nextdoor.com": {
+                        "rules": [
+                            {
+                                "rule": "nextdoor.com",
+                                "domains": [
+                                    "nextdoor.co.uk"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/460"
                             }
                         ]
                     },
@@ -3097,6 +3176,17 @@
                                     "seattletimes.com"
                                 ],
                                 "reason": "An unskippable adwall appears which prevents interaction with the page."
+                            }
+                        ]
+                    },
+                    "fidelity.com": {
+                        "rules": [
+                            {
+                                "rule": "login.fidelity.com",
+                                "domains": [
+                                    "fidelity.com"
+                                ],
+                                "reason": "CNAME ENTRY GENERATED FROM: login.fidelity.com.febsec-fidelity.com.akadns.net"
                             }
                         ]
                     },
@@ -4766,7 +4856,7 @@
                 }
             },
             "exceptions": [],
-            "hash": "6867cd5eb1dac887cb963509cf12df8a"
+            "hash": "155f930cd84f8ec37c35a3c9e29df9e1"
         },
         "trackingCookies1p": {
             "settings": {

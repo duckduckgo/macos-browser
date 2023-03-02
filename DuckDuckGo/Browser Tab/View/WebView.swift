@@ -83,19 +83,6 @@ final class WebView: WKWebView {
         self.zoomLevel = max(self.zoomLevel - Self.zoomLevelStep, Self.minZoomLevel)
     }
 
-    // MARK: - Back/Forward Navigation
-
-    var frozenCanGoBack: Bool?
-    var frozenCanGoForward: Bool?
-
-    override var canGoBack: Bool {
-        frozenCanGoBack ?? super.canGoBack
-    }
-
-    override var canGoForward: Bool {
-        frozenCanGoForward ?? super.canGoForward
-    }
-
     // MARK: - Menu
 
     override func willOpenMenu(_ menu: NSMenu, with event: NSEvent) {

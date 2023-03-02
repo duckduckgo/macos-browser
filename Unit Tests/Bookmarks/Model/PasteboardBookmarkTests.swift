@@ -22,19 +22,19 @@ import XCTest
 class PasteboardBookmarkTests: XCTestCase {
 
     func testWhenInitializingPasteboardBookmarkFromValidDictionary_ThenPasteboardBookmarkIsCreated() {
-        let uuid = UUID()
-        let bookmark = Bookmark(id: uuid, url: URL(string: "https://example.com")!, title: "Example", isFavorite: false)
+        let uuid = UUID().uuidString
+        let bookmark = Bookmark(id: uuid, url: "https://example.com", title: "Example", isFavorite: false)
         let writer = BookmarkPasteboardWriter(bookmark: bookmark)
         let pasteboardBookmark = PasteboardBookmark(dictionary: writer.internalDictionary)
 
         XCTAssertNotNil(pasteboardBookmark)
-        XCTAssertEqual(pasteboardBookmark?.id, uuid.uuidString)
+        XCTAssertEqual(pasteboardBookmark?.id, uuid)
         XCTAssertEqual(pasteboardBookmark?.url, "https://example.com")
         XCTAssertEqual(pasteboardBookmark?.title, "Example")
     }
 
     func testWhenInitializingPasteboardBookmarkFromValidPasteboardItem_ThenPasteboardBookmarkIsCreated() {
-        let bookmark = Bookmark(id: UUID(), url: URL(string: "https://example.com")!, title: "Example", isFavorite: false)
+        let bookmark = Bookmark(id: UUID().uuidString, url: "https://example.com", title: "Example", isFavorite: false)
         let writer = BookmarkPasteboardWriter(bookmark: bookmark)
         let type = BookmarkPasteboardWriter.bookmarkUTIInternalType
 
@@ -45,7 +45,7 @@ class PasteboardBookmarkTests: XCTestCase {
     }
 
     func testWhenGettingWritableTypesForBookmarkPasteboardWriter_ThenTypesIncludeInternalBookmarkType() {
-        let bookmark = Bookmark(id: UUID(), url: URL(string: "https://example.com")!, title: "Example", isFavorite: false)
+        let bookmark = Bookmark(id: UUID().uuidString, url: "https://example.com", title: "Example", isFavorite: false)
         let writer = BookmarkPasteboardWriter(bookmark: bookmark)
 
         let pasteboard = NSPasteboard(name: NSPasteboard.Name(rawValue: "Test Pasteboard"))
@@ -54,7 +54,7 @@ class PasteboardBookmarkTests: XCTestCase {
     }
 
     func testWhenGettingPropertyListForSystemTypes_ThenBookmarkURLIsReturned() {
-        let bookmark = Bookmark(id: UUID(), url: URL(string: "https://example.com")!, title: "Example", isFavorite: false)
+        let bookmark = Bookmark(id: UUID().uuidString, url: "https://example.com", title: "Example", isFavorite: false)
         let writer = BookmarkPasteboardWriter(bookmark: bookmark)
 
         guard let stringPropertyList = writer.pasteboardPropertyList(forType: .string) as? String else {
@@ -73,7 +73,7 @@ class PasteboardBookmarkTests: XCTestCase {
     }
 
     func testWhenGettingPropertyListForInternalBookmarkType_ThenBookmarkDictionaryIsReturned() {
-        let bookmark = Bookmark(id: UUID(), url: URL(string: "https://example.com")!, title: "Example", isFavorite: false)
+        let bookmark = Bookmark(id: UUID().uuidString, url: "https://example.com", title: "Example", isFavorite: false)
         let writer = BookmarkPasteboardWriter(bookmark: bookmark)
         let type = BookmarkPasteboardWriter.bookmarkUTIInternalType
 
@@ -86,7 +86,7 @@ class PasteboardBookmarkTests: XCTestCase {
     }
 
     func testWhenGettingPropertyListForUnsupportedValue_ThenNilIsReturned() {
-        let bookmark = Bookmark(id: UUID(), url: URL(string: "https://example.com")!, title: "Example", isFavorite: false)
+        let bookmark = Bookmark(id: UUID().uuidString, url: "https://example.com", title: "Example", isFavorite: false)
         let writer = BookmarkPasteboardWriter(bookmark: bookmark)
 
         // Test a handful of unsupported types to assert that they're nil:

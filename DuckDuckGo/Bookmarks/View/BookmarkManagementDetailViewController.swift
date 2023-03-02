@@ -27,7 +27,7 @@ protocol BookmarkManagementDetailViewControllerDelegate: AnyObject {
 }
 
 private struct EditedBookmarkMetadata {
-    let uuid: UUID
+    let uuid: String
     let index: Int
 }
 
@@ -144,14 +144,14 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
             return
         }
 
-        if let bookmark = entity as? Bookmark {
+        if let url = (entity as? Bookmark)?.urlObject {
             if NSApplication.shared.isCommandPressed && NSApplication.shared.isShiftPressed {
                 //TODO!
-                WindowsManager.openNewWindow(with: bookmark.url, isDisposable: false)
+                WindowsManager.openNewWindow(with: url, isDisposable: false)
             } else if NSApplication.shared.isCommandPressed {
-                WindowControllersManager.shared.show(url: bookmark.url, newTab: true)
+                WindowControllersManager.shared.show(url: url, newTab: true)
             } else {
-                WindowControllersManager.shared.show(url: bookmark.url, newTab: true)
+                WindowControllersManager.shared.show(url: url, newTab: true)
             }
         } else if let folder = entity as? BookmarkFolder {
             resetSelections()
@@ -382,19 +382,12 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
             return .none
         }
 
-        for folderID in draggedFolders.map(\.id) {
-            guard let folderUUID = UUID(uuidString: folderID) else {
-                assertionFailure("Failed to convert UUID string to UUID")
-                return .none
-            }
-
-            if !bookmarkManager.canMoveObjectWithUUID(objectUUID: folderUUID, to: destinationFolder) {
-                return .none
-            }
+        for folderID in draggedFolders.map(\.id) where !bookmarkManager.canMoveObjectWithUUID(objectUUID: folderID, to: destinationFolder) {
+            return .none
         }
 
         let tryingToDragOntoSameFolder = draggedFolders.contains { folder in
-            return folder.id == destination.id.uuidString
+            return folder.id == destination.id
         }
 
         if tryingToDragOntoSameFolder {
@@ -416,7 +409,7 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
         } else if let currentFolderUUID = selectionState.selectedFolderUUID {
             LocalBookmarkManager.shared.move(objectUUIDs: draggedItemIdentifiers,
                                              toIndex: row,
-                                             withinParentFolder: .parent(currentFolderUUID)) { _ in }
+                                             withinParentFolder: .parent(uuid: currentFolderUUID)) { _ in }
             return true
         } else {
             if selectionState == .favorites {
@@ -492,7 +485,7 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
             return
         }
 
-        let tabs = bookmarks.map { Tab(content: .url($0.url), shouldLoadInBackground: true) }
+        let tabs = bookmarks.compactMap { $0.urlObject }.map { Tab(content: .url($0), shouldLoadInBackground: true) }
         tabCollection.append(tabs: tabs)
     }
 
@@ -534,7 +527,7 @@ extension BookmarkManagementDetailViewController: BookmarkTableCellViewDelegate 
         LocalBookmarkManager.shared.update(bookmark: bookmark)
     }
 
-    func bookmarkTableCellView(_ cell: BookmarkTableCellView, updatedBookmarkWithUUID uuid: UUID, newTitle: String, newUrl: String) {
+    func bookmarkTableCellView(_ cell: BookmarkTableCellView, updatedBookmarkWithUUID uuid: String, newTitle: String, newUrl: String) {
         let row = tableView.row(for: cell)
 
         guard let bookmark = fetchEntity(at: row) as? Bookmark, bookmark.id == editingBookmarkIndex?.uuid else {
@@ -544,7 +537,7 @@ extension BookmarkManagementDetailViewController: BookmarkTableCellViewDelegate 
         bookmark.title = newTitle.isEmpty ? bookmark.title : newTitle
         bookmarkManager.update(bookmark: bookmark)
 
-        if let newURL = newUrl.url, newURL != bookmark.url {
+        if let newURL = newUrl.url, newURL.absoluteString != bookmark.url {
             _ = bookmarkManager.updateUrl(of: bookmark, to: newURL)
         }
     }
@@ -636,22 +629,24 @@ extension BookmarkManagementDetailViewController: FolderMenuItemSelectors {
 extension BookmarkManagementDetailViewController: BookmarkMenuItemSelectors {
 
     func openBookmarkInNewTab(_ sender: NSMenuItem) {
-        guard let bookmark = sender.representedObject as? Bookmark else {
+        guard let bookmark = sender.representedObject as? Bookmark,
+        let url = bookmark.urlObject else {
             assertionFailure("Failed to cast menu represented object to Bookmark")
             return
         }
 
-        WindowControllersManager.shared.show(url: bookmark.url, newTab: true)
+        WindowControllersManager.shared.show(url: url, newTab: true)
     }
 
     func openBookmarkInNewWindow(_ sender: NSMenuItem) {
-        guard let bookmark = sender.representedObject as? Bookmark else {
+        guard let bookmark = sender.representedObject as? Bookmark,
+        let url = bookmark.urlObject else {
             assertionFailure("Failed to cast menu represented object to Bookmark")
             return
         }
 
         //TODO!
-        WindowsManager.openNewWindow(with: bookmark.url, isDisposable: false)
+        WindowsManager.openNewWindow(with: url, isDisposable: false)
     }
 
     func toggleBookmarkAsFavorite(_ sender: NSMenuItem) {
@@ -678,7 +673,7 @@ extension BookmarkManagementDetailViewController: BookmarkMenuItemSelectors {
     }
 
     func copyBookmark(_ sender: NSMenuItem) {
-        guard let bookmark = sender.representedObject as? Bookmark, let bookmarkURL = bookmark.url as NSURL? else {
+        guard let bookmark = sender.representedObject as? Bookmark, let bookmarkURL = bookmark.urlObject as NSURL? else {
             assertionFailure("Failed to cast menu represented object to Bookmark")
             return
         }
@@ -699,9 +694,9 @@ extension BookmarkManagementDetailViewController: BookmarkMenuItemSelectors {
     }
 
     func deleteEntities(_ sender: NSMenuItem) {
-        let uuids: [UUID]
+        let uuids: [String]
 
-        if let array = sender.representedObject as? [UUID] {
+        if let array = sender.representedObject as? [String] {
             uuids = array
         } else if let objects = sender.representedObject as? [BaseBookmarkEntity] {
             uuids = objects.map(\.id)

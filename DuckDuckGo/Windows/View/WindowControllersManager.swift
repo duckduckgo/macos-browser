@@ -116,17 +116,19 @@ extension WindowControllersManager {
 
     /// Opens a bookmark in a tab, respecting the current modifier keys when deciding where to open the bookmark's URL.
     func open(bookmark: Bookmark) {
+        guard let url = bookmark.urlObject else { return }
+
         if NSApplication.shared.isCommandPressed && NSApplication.shared.isShiftPressed {
             //TODO!
-            WindowsManager.openNewWindow(with: bookmark.url, isDisposable: false)
+            WindowsManager.openNewWindow(with: url, isDisposable: false)
         } else if mainWindowController?.mainViewController.view.window?.isPopUpWindow ?? false {
-            show(url: bookmark.url, newTab: true)
+            show(url: url, newTab: true)
         } else if NSApplication.shared.isCommandPressed {
-            mainWindowController?.mainViewController.tabCollectionViewModel.appendNewTab(with: .url(bookmark.url), selected: false)
+            mainWindowController?.mainViewController.tabCollectionViewModel.appendNewTab(with: .url(url), selected: false)
         } else if selectedTab?.isPinned ?? false { // When selecting a bookmark with a pinned tab active, always open the URL in a new tab
-            show(url: bookmark.url, newTab: true)
+            show(url: url, newTab: true)
         } else {
-            show(url: bookmark.url)
+            show(url: url)
         }
     }
 

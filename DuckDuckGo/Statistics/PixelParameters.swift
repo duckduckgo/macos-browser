@@ -33,6 +33,10 @@ extension Pixel {
 
         static let emailCohort = "cohort"
         static let emailLastUsed = "duck_address_last_used"
+
+        static let assertionMessage = "message"
+        static let assertionFile = "file"
+        static let assertionLine = "line"
     }
 
     enum Values {
@@ -45,8 +49,14 @@ extension Pixel.Event {
 
     var parameters: [String: String]? {
         switch self {
-        case .debug(event: _, error: let error):
+        case .debug(event: let debugEvent, error: let error):
             var params = [String: String]()
+
+            if case let .assertionFailure(message, file, line) = debugEvent {
+                params[Pixel.Parameters.assertionMessage] = message
+                params[Pixel.Parameters.assertionFile] = String(file)
+                params[Pixel.Parameters.assertionLine] = String(line)
+            }
 
             if let error = error {
                 let nsError = error as NSError

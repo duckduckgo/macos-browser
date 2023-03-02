@@ -38,7 +38,7 @@ final class AddBookmarkModalViewController: NSViewController {
         let title: String?
 
         init?(_ tab: Tab) {
-            guard case let .url(url) = tab.content else {
+            guard case let .url(url, userEntered: _) = tab.content else {
                 return nil
             }
             self.url = url
@@ -140,7 +140,7 @@ final class AddBookmarkModalViewController: NSViewController {
         if let originalBookmark = originalBookmark {
             titleTextField.stringValue = UserText.updateBookmark
             bookmarkTitleTextField.stringValue = originalBookmark.title
-            urlTextField.stringValue = originalBookmark.url.absoluteString
+            urlTextField.stringValue = originalBookmark.url
 
             addButton.title = UserText.save
         }

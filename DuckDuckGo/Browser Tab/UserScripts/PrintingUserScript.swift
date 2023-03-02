@@ -16,12 +16,13 @@
 //  limitations under the License.
 //
 
+import Navigation
 import WebKit
 import UserScript
 
 public protocol PrintingUserScriptDelegate: AnyObject {
 
-    func runPrintOperation(for frameHandle: Any?, in webView: WKWebView, completionHandler: ((Bool) -> Void)?)
+    func runPrintOperation(for frameHandle: FrameHandle?, in webView: WKWebView, completionHandler: ((Bool) -> Void)?)
 
 }
 

@@ -21,6 +21,7 @@ import Combine
 import os.log
 import BrowserServicesKit
 import Persistence
+import Bookmarks
 
 @NSApplicationMain
 final class AppDelegate: NSObject, NSApplicationDelegate {
@@ -60,6 +61,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     var appUsageActivityMonitor: AppUsageActivityMonitor?
 
+    // swiftlint:disable:next function_body_length
     func applicationWillFinishLaunching(_ notification: Notification) {
         if !Self.isRunningTests {
 #if DEBUG
@@ -81,6 +83,25 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 // Give Pixel a chance to be sent, but not too long
                 Thread.sleep(forTimeInterval: 1)
                 fatalError("Could not load DB: \(error.localizedDescription)")
+            }
+
+            BookmarkDatabase.shared.db.loadStore { context, error in
+                guard let context = context else {
+                    if let error = error {
+                        Pixel.fire(.debug(event: .bookmarksCouldNotLoadDatabase, error: error))
+                    } else {
+                        Pixel.fire(.debug(event: .bookmarksCouldNotLoadDatabase))
+                    }
+
+                    Thread.sleep(forTimeInterval: 1)
+                    fatalError("Could not create Bookmarks database stack: \(error?.localizedDescription ?? "err")")
+                }
+
+                let legacyDB = Database.shared.makeContext(concurrencyType: .privateQueueConcurrencyType)
+                legacyDB.performAndWait {
+                    LegacyBookmarksStoreMigration.setupAndMigrate(from: legacyDB,
+                                                                  to: context)
+                }
             }
         }
 

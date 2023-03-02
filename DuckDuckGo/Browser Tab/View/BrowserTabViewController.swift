@@ -218,7 +218,7 @@ final class BrowserTabViewController: NSViewController {
         }
     }
 
-    func subscribeToTabContent(of tabViewModel: TabViewModel?) {
+    private func subscribeToTabContent(of tabViewModel: TabViewModel?) {
         tabContentCancellable?.cancel()
 
         guard let tabViewModel = tabViewModel else {
@@ -227,7 +227,13 @@ final class BrowserTabViewController: NSViewController {
 
         let tabContentPublisher = tabViewModel.tab.$content
             .dropFirst()
-            .removeDuplicates()
+            .removeDuplicates(by: { old, new in
+                // no need to call showTabContent if webView stays in place and only its URL changes
+                if old.isUrl && new.isUrl {
+                    return true
+                }
+                return old == new
+            })
             .receive(on: DispatchQueue.main)
 
         tabContentCancellable = tabContentPublisher
@@ -239,7 +245,7 @@ final class BrowserTabViewController: NSViewController {
                 return Publishers.Merge3(
                     tabViewModel.tab.webViewDidCommitNavigationPublisher,
                     tabViewModel.tab.webViewDidFailNavigationPublisher,
-                    tabViewModel.tab.webViewDidReceiveChallengePublisher
+                    tabViewModel.tab.webViewDidReceiveUserInteractiveChallengePublisher
                 )
                 .prefix(1)
                 .eraseToAnyPublisher()
@@ -649,12 +655,12 @@ extension BrowserTabViewController: TabDelegate {
                   !alert.usernameTextField.stringValue.isEmpty,
                   !alert.passwordTextField.stringValue.isEmpty
             else {
-                request.submit( (.performDefaultHandling, nil) )
+                request.submit(nil)
                 return
             }
-            request.submit( (.useCredential, URLCredential(user: alert.usernameTextField.stringValue,
-                                                         password: alert.passwordTextField.stringValue,
-                                                         persistence: .forSession)) )
+            request.submit(.credential(URLCredential(user: alert.usernameTextField.stringValue,
+                                                     password: alert.passwordTextField.stringValue,
+                                                     persistence: .forSession)))
         }
 
         // when subscribing to another Tab, the sheet will be temporarily closed with response == .abort on the cancellable deinit
@@ -924,6 +930,11 @@ extension BrowserTabViewController {
     private func hideWebViewSnapshotIfNeeded() {
         if webViewSnapshot != nil {
             DispatchQueue.main.async {
+                let isWebViewFirstResponder = self.view.window?.firstResponder === self.view.window
+                // check this because if address bar was the first responder, we don't want to mess with it
+                if isWebViewFirstResponder {
+                    self.setFirstResponderAfterAdding = true
+                }
                 self.showTabContent(of: self.tabCollectionViewModel.selectedTabViewModel)
                 self.webViewSnapshot?.removeFromSuperview()
             }

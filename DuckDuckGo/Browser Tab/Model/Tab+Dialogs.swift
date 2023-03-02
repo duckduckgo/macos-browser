@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import Navigation
 import WebKit
 
 struct SavePanelParameters {
@@ -35,7 +36,7 @@ typealias SavePanelDialogRequest = UserDialogRequest<SavePanelParameters, (url: 
 typealias ConfirmDialogRequest = UserDialogRequest<JSAlertParameters, Bool>
 typealias TextInputDialogRequest = UserDialogRequest<JSAlertParameters, String?>
 typealias AlertDialogRequest = UserDialogRequest<JSAlertParameters, Void>
-typealias BasicAuthDialogRequest = UserDialogRequest<URLProtectionSpace, (URLSession.AuthChallengeDisposition, URLCredential?)>
+typealias BasicAuthDialogRequest = UserDialogRequest<URLProtectionSpace, AuthChallengeDisposition?>
 typealias PrintDialogRequest = UserDialogRequest<NSPrintOperation, Bool>
 
 enum JSAlertQuery {

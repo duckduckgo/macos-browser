@@ -34,6 +34,11 @@ final class FileDownloadManagerTests: XCTestCase {
     var chooseDestination: ((String?, URL?, [UTType], (URL?, UTType?) -> Void) -> Void)?
     var fileIconFlyAnimationOriginalRect: ((WebKitDownloadTask) -> NSRect?)?
 
+    let response = URLResponse(url: .duckDuckGo,
+                               mimeType: "text/html",
+                               expectedContentLength: 150,
+                               textEncodingName: nil)
+
     override func setUp() {
         defaults = UserDefaults(suiteName: testGroupName)!
         defaults.removePersistentDomain(forName: testGroupName)
@@ -77,7 +82,7 @@ final class FileDownloadManagerTests: XCTestCase {
         dm.add(download, delegate: nil, location: .auto, postflight: .none)
 
         struct TestError: Error {}
-        download.downloadDelegate?.download(download, didFailWithError: TestError(), resumeData: nil)
+        download.delegate?.download!(download.asWKDownload(), didFailWithError: TestError(), resumeData: nil)
 
         withExtendedLifetime(cancellable) {
             waitForExpectations(timeout: 0.3)
@@ -94,7 +99,7 @@ final class FileDownloadManagerTests: XCTestCase {
         let download = WKDownloadMock()
         dm.add(download, delegate: nil, location: .auto, postflight: .none)
 
-        download.downloadDelegate?.downloadDidFinish(download)
+        download.delegate?.downloadDidFinish!(download.asWKDownload())
 
         withExtendedLifetime(cancellable) {
             waitForExpectations(timeout: 0.3)
@@ -123,9 +128,9 @@ final class FileDownloadManagerTests: XCTestCase {
         let url = URL(string: "https://duckduckgo.com/somefile.html")!
         let response = URLResponse(url: url, mimeType: UTType.pdf.mimeType, expectedContentLength: 1, textEncodingName: "utf-8")
         let e2 = expectation(description: "WKDownload callback called")
-        download.downloadDelegate?.download(download,
-                                            decideDestinationUsing: response,
-                                            suggestedFilename: "suggested.filename") { url in
+        download.delegate?.download(download.asWKDownload(),
+                                    decideDestinationUsing: response,
+                                    suggestedFilename: "suggested.filename") { url in
             XCTAssertNil(url)
             e2.fulfill()
         }
@@ -156,9 +161,9 @@ final class FileDownloadManagerTests: XCTestCase {
         let url = URL(string: "https://duckduckgo.com/somefile.html")!
         let response = URLResponse(url: url, mimeType: UTType.html.mimeType, expectedContentLength: 1, textEncodingName: "utf-8")
         let e2 = expectation(description: "WKDownload callback called")
-        download.downloadDelegate?.download(download,
-                                            decideDestinationUsing: response,
-                                            suggestedFilename: "suggested.filename") { url in
+        download.delegate?.download(download.asWKDownload(),
+                                    decideDestinationUsing: response,
+                                    suggestedFilename: "suggested.filename") { url in
             dispatchPrecondition(condition: .onQueue(.main))
             XCTAssertEqual(url, localURL.appendingPathExtension(WebKitDownloadTask.downloadExtension))
             e2.fulfill()
@@ -179,7 +184,7 @@ final class FileDownloadManagerTests: XCTestCase {
         }
 
         let e = expectation(description: "WKDownload called")
-        download.downloadDelegate?.download(download, decideDestinationUsing: nil, suggestedFilename: "suggested.filename") { url in
+        download.delegate?.download(download.asWKDownload(), decideDestinationUsing: response, suggestedFilename: "suggested.filename") { url in
             XCTAssertEqual(url, localURL.appendingPathExtension(WebKitDownloadTask.downloadExtension))
             e.fulfill()
         }
@@ -200,7 +205,7 @@ final class FileDownloadManagerTests: XCTestCase {
         }
 
         let e = expectation(description: "WKDownload called")
-        download.downloadDelegate?.download(download, decideDestinationUsing: nil, suggestedFilename: testFile) { [testFile] url in
+        download.delegate?.download(download.asWKDownload(), decideDestinationUsing: response, suggestedFilename: testFile) { [testFile] url in
             XCTAssertEqual(url, downloadsURL.appendingPathComponent(testFile).appendingPathExtension(WebKitDownloadTask.downloadExtension))
             e.fulfill()
         }
@@ -219,10 +224,10 @@ final class FileDownloadManagerTests: XCTestCase {
         }
 
         let e = expectation(description: "WKDownload called")
-        download.downloadDelegate?.download(download, decideDestinationUsing: nil, suggestedFilename: "") { url in
+        download.delegate?.download(download.asWKDownload(), decideDestinationUsing: response, suggestedFilename: "") { url in
             XCTAssertEqual(url?.pathExtension, WebKitDownloadTask.downloadExtension)
             XCTAssertTrue(url?.lastPathComponent.count ?? 0 > WebKitDownloadTask.downloadExtension.count + 1)
-            XCTAssertEqual(url?.deletingLastPathComponent(), downloadsURL)
+            XCTAssertEqual(url?.deletingLastPathComponent().path, downloadsURL.path)
             e.fulfill()
         }
 
@@ -239,7 +244,7 @@ final class FileDownloadManagerTests: XCTestCase {
         dm.add(download, delegate: self, location: .auto, postflight: .none)
 
         let e = expectation(description: "WKDownload called")
-        download.downloadDelegate?.download(download, decideDestinationUsing: nil, suggestedFilename: "") { url in
+        download.delegate?.download(download.asWKDownload(), decideDestinationUsing: response, suggestedFilename: "") { url in
             XCTAssertNil(url)
             e.fulfill()
         }
@@ -257,7 +262,7 @@ final class FileDownloadManagerTests: XCTestCase {
             completion(sel, urls)
         }
 
-        download.downloadDelegate?.download(download, decideDestinationUsing: nil, suggestedFilename: "") { [fm] url in
+        download.delegate?.download(download.asWKDownload(), decideDestinationUsing: response, suggestedFilename: "") { [fm] url in
             fm.createFile(atPath: url!.path, contents: nil, attributes: nil)
         }
 
@@ -271,7 +276,7 @@ final class FileDownloadManagerTests: XCTestCase {
             XCTAssertEqual(dest, url)
         }
 
-        download.downloadDelegate?.downloadDidFinish(download)
+        download.delegate?.downloadDidFinish!(download.asWKDownload())
 
         withExtendedLifetime(cancellable) {
             waitForExpectations(timeout: 0.3)

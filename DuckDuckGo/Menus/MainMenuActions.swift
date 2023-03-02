@@ -88,8 +88,7 @@ extension AppDelegate {
 
     @objc func clearAllHistory(_ sender: NSMenuItem) {
         //TODO!
-        guard let window = WindowsManager.openNewWindow(with: Tab(content: .homePage, shouldLoadInBackground: false),
-                                                        isDisposable: false),
+        guard let window = WindowsManager.openNewWindow(with: Tab(content: .homePage), isDisposable: false),
               let windowController = window.windowController as? MainWindowController else {
             assertionFailure("No reference to main window controller")
             return
@@ -100,8 +99,7 @@ extension AppDelegate {
 
     @objc func clearThisHistory(_ sender: ClearThisHistoryMenuItem) {
         //TODO!
-        guard let window = WindowsManager.openNewWindow(with: Tab(content: .homePage, shouldLoadInBackground: false),
-                                                        isDisposable: false),
+        guard let window = WindowsManager.openNewWindow(with: Tab(content: .homePage), isDisposable: false),
               let windowController = window.windowController as? MainWindowController else {
             assertionFailure("No reference to main window controller")
             return
@@ -132,29 +130,29 @@ extension AppDelegate {
             return
         }
 
-        guard let bookmark = menuItem.representedObject as? Bookmark else {
+        guard let bookmark = menuItem.representedObject as? Bookmark,
+        let url = bookmark.urlObject else {
             assertionFailure("Unexpected type of menuItem.representedObject: \(type(of: menuItem.representedObject))")
             return
         }
 
-        let tab = Tab(content: .url(bookmark.url), shouldLoadInBackground: true)
+        let tab = Tab(content: .url(url), shouldLoadInBackground: true)
         //TODO!
         WindowsManager.openNewWindow(with: tab, isDisposable: false)
     }
 
     @IBAction func showManageBookmarks(_ sender: Any?) {
-        let tabCollection = TabCollection(tabs: [Tab(content: .bookmarks, shouldLoadInBackground: false)])
+        let tabCollection = TabCollection(tabs: [Tab(content: .bookmarks)])
         //TODO!
         let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection, isDisposable: false)
-        //TODO!
+
         WindowsManager.openNewWindow(with: tabCollectionViewModel, isDisposable: false)
     }
 
     @IBAction func openPreferences(_ sender: Any?) {
-        let tabCollection = TabCollection(tabs: [Tab(content: .anyPreferencePane, shouldLoadInBackground: false)])
+        let tabCollection = TabCollection(tabs: [Tab(content: .anyPreferencePane)])
         //TODO!
         let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection, isDisposable: false)
-        //TODO!
         WindowsManager.openNewWindow(with: tabCollectionViewModel, isDisposable: false)
     }
 
@@ -274,7 +272,7 @@ extension MainViewController {
         // (this is in line with Safari behavior)
         if isHandlingKeyDownEvent, tabCollectionViewModel.selectionIndex?.isPinnedTab == true {
             if tabCollectionViewModel.tabCollection.tabs.isEmpty {
-                tabCollectionViewModel.append(tab: Tab(content: .homePage, shouldLoadInBackground: false), selected: true)
+                tabCollectionViewModel.append(tab: Tab(content: .homePage), selected: true)
             } else {
                 tabCollectionViewModel.select(at: .unpinned(0))
             }
@@ -337,7 +335,7 @@ extension MainViewController {
                 navigationBarViewController = vc
             } else {
                 //TODO!
-                WindowsManager.openNewWindow(with: Tab(content: .homePage, shouldLoadInBackground: false), isDisposable: false)
+                WindowsManager.openNewWindow(with: Tab(content: .homePage), isDisposable: false)
                 guard let wc = WindowControllersManager.shared.mainWindowControllers.first(where: { $0.window?.isPopUpWindow == false }) else {
                     return
                 }
@@ -484,7 +482,7 @@ extension MainViewController {
             return
         }
 
-        let tabs = models.compactMap { $0.entity as? Bookmark }.map { Tab(content: .url($0.url), shouldLoadInBackground: true) }
+        let tabs = models.compactMap { ($0.entity as? Bookmark)?.urlObject }.map { Tab(content: .url($0), shouldLoadInBackground: true) }
         tabCollectionViewModel.append(tabs: tabs)
     }
 
