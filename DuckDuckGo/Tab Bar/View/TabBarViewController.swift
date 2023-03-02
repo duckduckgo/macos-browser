@@ -148,6 +148,10 @@ final class TabBarViewController: NSViewController {
     }
 
     private func setupFireButton() {
+        if tabCollectionViewModel.isDisposable {
+            fireButton.isHidden = true
+            return
+        }
         fireButton.toolTip = UserText.clearBrowsingHistoryTooltip
         fireButton.animationNames = MouseOverAnimationButton.AnimationNames(aqua: "flame-mouse-over", dark: "dark-flame-mouse-over")
     }
