@@ -311,6 +311,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         let userContentControllerPromise = Future<UserContentControllerProtocol, Never>.promise()
         self.extensions = extensionsBuilder
             .build(with: (tabIdentifier: instrumentation.currentTabIdentifier,
+                          contentPublisher: _content.projectedValue.eraseToAnyPublisher(),
                           userScriptsPublisher: userScriptsPublisher,
                           inheritedAttribution: parentTab?.adClickAttribution?.currentAttributionState,
                           userContentControllerFuture: userContentControllerPromise.future,
@@ -786,23 +787,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                 request.attribution = .user
             }
             webView.navigator(distributedNavigationDelegate: navigationDelegate)
-                .load(request, withExpectedNavigationType: content.isUserEnteredUrl ? .custom(.userEnteredUrl) : .other)?
-                .appendResponder(navigationDidFail: { [weak self] navigation, error in
-                    // redirect to SERP for non-valid domains entered by user
-                    // https://app.asana.com/0/1177771139624306/1204041033469842/f
-                    guard let self,
-                          navigation.isCurrent,
-                          error._nsError.domain == NSURLErrorDomain,
-                          error.errorCode == NSURLErrorCannotFindHost,
-                          case .url(_, userEntered: .some(let userEnteredValue)) = content,
-                          // if user-entered value actually had the scheme - don‘t search
-                          !userEnteredValue.hasPrefix((url.scheme.map(URL.NavigationalScheme.init) ?? .http).separated()),
-                          // if url had a valid top level domain - don‘t search
-                          self.contentBlocking.tld.domain(url.host) == nil,
-                          let url = URL.makeSearchUrl(from: userEnteredValue) else { return }
-
-                    self.setUrl(url, userEntered: userEnteredValue)
-                })
+                .load(request, withExpectedNavigationType: content.isUserEnteredUrl ? .custom(.userEnteredUrl) : .other)
         }
     }
 

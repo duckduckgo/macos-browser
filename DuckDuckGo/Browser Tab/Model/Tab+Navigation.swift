@@ -35,6 +35,9 @@ extension Tab: NavigationResponder {
             .weak(nullable: self.adClickAttribution),
             .struct(SerpHeadersNavigationResponder()),
 
+            // redirect to SERP for non-valid domains entered by user
+            .weak(nullable: self.searchForNonexistentDomains),
+
             // should be the last, for Unit Tests navigation events tracking
             .struct(nullable: testsClosureNavigationResponder)
         )
