@@ -107,8 +107,10 @@ extension ContextMenuManager {
         menu.replaceItem(at: index + 1, with: self.copyLinkMenuItem(withTitle: copyLinkItem.title, from: openLinkInNewWindowItem))
 
         // insert Separator and Copy (selection) items
-        menu.insertItem(.separator(), at: index + 2)
-        menu.insertItem(self.copySelectionMenuItem(), at: index + 3)
+        if selectedText?.isEmpty == false {
+            menu.insertItem(.separator(), at: index + 2)
+            menu.insertItem(self.copySelectionMenuItem(), at: index + 3)
+        }
     }
 
     private func handleCopyImageItem(_ item: NSMenuItem, at index: Int, in menu: NSMenu) {
