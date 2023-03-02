@@ -20,23 +20,60 @@ import Foundation
 import DDGSync
 import Combine
 
+struct SyncDevice: Identifiable {
+
+    enum Kind: Equatable {
+        case current, desktop, mobile
+    }
+
+    let kind: Kind
+    let name: String
+    let id: String
+
+    var isCurrent: Bool {
+        kind == .current
+    }
+
+    init(_ account: SyncAccount) {
+        self.name = account.deviceName
+        self.id = account.deviceId
+        self.kind = .current
+    }
+
+    init(_ device: RegisteredDevice) {
+        self.name = device.name
+        self.id = device.id
+        self.kind = .mobile
+    }
+}
+
 final class SyncPreferences: ObservableObject {
 
     @Published private(set) var isSyncEnabled: Bool = false
 
-    @Published var syncKey: String
+    @Published var account: SyncAccount?
 
     @Published var shouldShowErrorMessage: Bool = false
     @Published var errorMessage: String?
 
+    @Published var devices: [SyncDevice] = []
+
     init(syncService: SyncService = .shared) {
         self.syncService = syncService
         self.isSyncEnabled = syncService.sync.isAuthenticated
-        self.syncKey = syncService.sync.recoveryCode.flatMap { String(bytes: $0, encoding: .utf8) } ?? ""
+        self.account = syncService.sync.account
 
         isSyncEnabledCancellable = syncService.sync.isAuthenticatedPublisher
             .receive(on: DispatchQueue.main)
-            .assign(to: \.isSyncEnabled, onWeaklyHeld: self)
+            .sink(receiveValue: { [weak self, weak syncService] isAuthenticates in
+                self?.isSyncEnabled = isAuthenticates
+                self?.account = syncService?.sync.account
+                if let account = self?.account {
+                    self?.devices = [.init(account)]
+                } else {
+                    self?.devices = []
+                }
+            })
     }
 
     func presentEnableSyncDialog() {
@@ -65,19 +102,4 @@ final class SyncPreferences: ObservableObject {
 
     private let syncService: SyncService
     private var isSyncEnabledCancellable: AnyCancellable?
-}
-
-struct SyncedDevice: Identifiable {
-
-    enum Kind: Equatable {
-        case current, desktop, mobile
-    }
-
-    let kind: Kind
-    let name: String
-    let id: String
-
-    var isCurrent: Bool {
-        kind == .current
-    }
 }
