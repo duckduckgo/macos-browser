@@ -52,18 +52,22 @@ final class SyncPreferences: ObservableObject {
         case enableSync, recoverAccount, syncAnotherDevice, syncNewDevice, deviceSynced, saveRecoveryPDF
     }
 
+    var isSyncEnabled: Bool {
+        account != nil
+    }
+
     @Published var flowState: FlowState? {
         didSet {
             if flowState == nil && oldValue != nil {
-                onCancel()
+                onEndFlow()
             }
         }
     }
     @Published var shouldDisableSubmitButton: Bool
 
-    @Published private(set) var isSyncEnabled: Bool = false
-
     @Published var account: SyncAccount?
+    @Published var devices: [SyncDevice] = []
+
     @Published var recoveryKey: String = "" {
         didSet {
             shouldDisableSubmitButton = recoveryKey.isEmpty
@@ -73,38 +77,29 @@ final class SyncPreferences: ObservableObject {
     @Published var shouldShowErrorMessage: Bool = false
     @Published var errorMessage: String?
 
-    @Published var devices: [SyncDevice] = []
-
-    var onCancel: () -> Void = {}
 
     init(syncService: SyncService = .shared) {
         self.syncService = syncService
         self.shouldDisableSubmitButton = true
+        updateValues()
 
-        self.isSyncEnabled = syncService.sync.isAuthenticated
-        self.account = syncService.sync.account
+        isSyncEnabledCancellable = syncService.sync.isAuthenticatedPublisher
+            .removeDuplicates()
+            .asVoid()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self]  in
+                self?.updateValues()
+            }
+    }
 
-        if let account = self.account {
+    private func updateValues() {
+        account = syncService.sync.account
+
+        if let account {
             devices = [.init(account)]
         } else {
             devices = []
         }
-
-        isSyncEnabledCancellable = syncService.sync.isAuthenticatedPublisher
-            .removeDuplicates()
-            .receive(on: DispatchQueue.main)
-            .sink(receiveValue: { [weak self, weak syncService] isAuthenticated in
-                self?.isSyncEnabled = isAuthenticated
-                self?.account = syncService?.sync.account
-                if let account = self?.account {
-                    self?.devices = [.init(account)]
-                } else {
-                    self?.devices = []
-                }
-                if let code = self?.account?.recoveryCode {
-                    print(code)
-                }
-            })
     }
 
     func presentEnableSyncDialog() {
@@ -134,7 +129,7 @@ final class SyncPreferences: ObservableObject {
             do {
                 try await syncService.sync.login(recoveryKey: recoveryKey, deviceName: ProcessInfo.processInfo.hostName)
                 recoveryKey = ""
-                cancelFlow()
+                endFlow()
             } catch {
                 errorMessage = String(describing: error)
                 shouldShowErrorMessage = true
@@ -153,14 +148,15 @@ final class SyncPreferences: ObservableObject {
         }
     }
 
-    func cancelFlow() {
+    func endFlow() {
         flowState = nil
     }
 
     // MARK: -
 
     private func presentDialog() {
-        let syncWindowController = SyncSetupViewController(self).wrappedInWindowController()
+        let syncViewController = SyncSetupViewController(self)
+        let syncWindowController = syncViewController.wrappedInWindowController()
 
         guard let syncWindow = syncWindowController.window,
               let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController
@@ -169,8 +165,8 @@ final class SyncPreferences: ObservableObject {
             return
         }
 
-        onCancel = { [weak syncWindowController] in
-            guard let window = syncWindowController?.window, let sheetParent = window.sheetParent else {
+        onEndFlow = {
+            guard let window = syncWindowController.window, let sheetParent = window.sheetParent else {
                 assertionFailure("window or sheet parent not present")
                 return
             }
@@ -179,6 +175,8 @@ final class SyncPreferences: ObservableObject {
 
         parentWindowController.window?.beginSheet(syncWindow)
     }
+
+    private var onEndFlow: () -> Void = {}
 
     private let syncService: SyncService
     private var isSyncEnabledCancellable: AnyCancellable?

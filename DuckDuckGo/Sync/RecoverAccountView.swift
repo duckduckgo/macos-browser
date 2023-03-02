@@ -30,7 +30,7 @@ struct RecoverAccountView: View {
 
         } buttons: {
             Button(UserText.cancel) {
-                model.cancelFlow()
+                model.endFlow()
             }
             Button(UserText.submit) {
                 model.recoverDevice()

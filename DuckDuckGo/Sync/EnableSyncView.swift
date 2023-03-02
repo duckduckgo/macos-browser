@@ -34,7 +34,7 @@ struct EnableSyncView: View {
             }
         } buttons: {
             Button(UserText.cancel) {
-                model.cancelFlow()
+                model.endFlow()
             }
             Button(UserText.turnOnSync) {
                 model.turnOnSync()
