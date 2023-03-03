@@ -51,7 +51,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
     enum TabContent: Equatable {
         case homePage
-        case url(URL, userEntered: Bool = false)
+        case url(URL, credential: URLCredential? = nil, userEntered: Bool = false)
         case privatePlayer(videoID: String, timestamp: String?)
         case preferences(pane: PreferencePaneIdentifier?)
         case bookmarks
@@ -69,6 +69,9 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                 return .preferences(pane: preferencePane)
             } else if let privatePlayerContent = PrivatePlayer.shared.tabContent(for: url) {
                 return privatePlayerContent
+            } else if let url, let credential = url.basicAuthCredential {
+                // when navigating to a URL with basic auth username/password, cache it and redirect to a trimmed URL
+                return .url(url.removingBasicAuthCredential(), credential: credential, userEntered: userEntered)
             } else {
                 return .url(url ?? .blankPage, userEntered: userEntered)
             }
@@ -121,7 +124,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
         var url: URL? {
             switch self {
-            case .url(let url, userEntered: _):
+            case .url(let url, credential: _, userEntered: _):
                 return url
             case .privatePlayer(let videoID, let timestamp):
                 return .privatePlayer(videoID, timestamp: timestamp)
@@ -141,7 +144,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
         var isUserEnteredUrl: Bool {
             switch self {
-            case .url(_, userEntered: let userEntered):
+            case .url(_, credential: _, userEntered: let userEntered):
                 return userEntered
             default:
                 return false
@@ -427,33 +430,24 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         guard contentChangeEnabled else { return }
 
         let oldContent = self.content
-        let (newContent, credential) = { () -> (TabContent, URLCredential?) in
-
+        let newContent: TabContent = {
             if let newContent = privatePlayer.overrideContent(newContent, for: self) {
-                return (newContent, nil)
+                return newContent
             }
             if case .preferences(pane: .some) = oldContent,
                case .preferences(pane: nil) = newContent {
                 // prevent clearing currently selected pane (for state persistence purposes)
-                return (oldContent, nil)
+                return oldContent
             }
-
-            // when navigating to a URL with basic auth username/password, cache it and redirect to a trimmed URL
-            if case .url(let url, userEntered: let userEntered) = newContent,
-               let credential = url.basicAuthCredential {
-
-                return (.url(url.removingBasicAuthCredential(), userEntered: userEntered), credential)
-            }
-
-            return (newContent, nil)
+            return newContent
         }()
-        guard newContent != self.content || credential != nil else { return }
+        guard newContent != self.content else { return }
         self.content = newContent
 
         dismissPresentedAlert()
 
         Task {
-            await reloadIfNeeded(shouldLoadInBackground: true, credential: credential)
+            await reloadIfNeeded(shouldLoadInBackground: true)
         }
 
         if let title = content.title {
@@ -475,7 +469,9 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             if content.isUrl, !webView.isLoading {
                 self.addVisit(of: url)
             }
-            if content != self.content {
+            if self.content.isUrl, self.content.url == url {
+                // ignore content updates when tab.content has userEntered or credential set but equal url
+            } else if content != self.content {
                 self.content = content
             }
         }
@@ -752,7 +748,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     }()
 
     @MainActor
-    private func reloadIfNeeded(shouldLoadInBackground: Bool = false, credential: URLCredential? = nil) async {
+    private func reloadIfNeeded(shouldLoadInBackground: Bool = false) async {
         let content = self.content
         guard content.url != nil else { return }
 
@@ -768,7 +764,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         }()
         guard content == self.content else { return }
 
-        if shouldLoadURL(url, shouldLoadInBackground: shouldLoadInBackground) || credential != nil {
+        if shouldLoadURL(url, shouldLoadInBackground: shouldLoadInBackground) {
             let didRestore = restoreInteractionStateDataIfNeeded()
 
             if privatePlayer.goBackAndLoadURLIfNeeded(for: self) {
@@ -787,17 +783,15 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                content.isUserEnteredUrl {
                 request.attribution = .user
             }
-            let navigation = webView.navigator(distributedNavigationDelegate: navigationDelegate)
-                .load(request, withExpectedNavigationType: content.isUserEnteredUrl ? .custom(.userEnteredUrl) : .other)?
-                // when navigating to a URL with basic auth username/password, cache it and redirect to a trimmed URL
-                .usingBasicAuthCredential(credential, for: url)
+            webView.navigator(distributedNavigationDelegate: navigationDelegate)
+                .load(request, withExpectedNavigationType: content.isUserEnteredUrl ? .custom(.userEnteredUrl) : .other)
         }
     }
 
     @MainActor
     private var contentURL: URL {
         switch content {
-        case .url(let value, userEntered: _):
+        case .url(let value, credential: _, userEntered: _):
             return value
         case .privatePlayer(let videoID, let timestamp):
             return .privatePlayer(videoID, timestamp: timestamp)
@@ -1243,6 +1237,15 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         // send this event only when we're interrupting loading and showing extra UI to the user
         webViewDidReceiveUserInteractiveChallengePublisher.send()
 
+        // when navigating to a URL with basic auth username/password, cache it and redirect to a trimmed URL
+        if case .url(let url, .some(let credential), userEntered: let userEntered) = content,
+           url.matches(challenge.protectionSpace),
+           challenge.previousFailureCount == 0 {
+
+            self.content = .url(url, userEntered: userEntered)
+            return .credential(credential)
+        }
+
         let (request, future) = BasicAuthDialogRequest.future(with: challenge.protectionSpace)
         self.userInteractionDialog = UserDialog(sender: .page(domain: challenge.protectionSpace.host), dialog: .basicAuthenticationChallenge(request))
         do {
@@ -1276,8 +1279,11 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
 
             return .redirect(mainFrame) { navigator in
                 var request = navigationAction.request
-                request.url = navigationAction.url.removingBasicAuthCredential()
-                navigator.load(request)?.usingBasicAuthCredential(credential, for: request.url!)
+                // credential is removed from the URL and set to TabContent to be used on next Challenge
+                self.content = .url(navigationAction.url.removingBasicAuthCredential(), credential: credential, userEntered: false)
+                // reload URL without credentials
+                request.url = self.content.url!
+                navigator.load(request)
             }
         }
 
