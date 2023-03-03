@@ -857,7 +857,7 @@ extension AddressBarTextField: NSTextViewDelegate {
         ]
 
         if let pasteMenuItemIndex = pasteMenuItemIndex(within: menu),
-           let pasteAndDoMenuItem = makePasteAndDoMenuItem() {
+           let pasteAndDoMenuItem = makePasteAndGoMenuItem() {
             textViewMenu.insertItem(pasteAndDoMenuItem, at: pasteMenuItemIndex + 1)
         }
 
@@ -973,7 +973,7 @@ extension AddressBarTextField: NSTextViewDelegate {
         )
     }
 
-    private func makePasteAndDoMenuItem() -> NSMenuItem? {
+    private func makePasteAndGoMenuItem() -> NSMenuItem? {
         if let trimmedPasteboardString = NSPasteboard.general.string(forType: .string)?.trimmingWhitespace(),
            trimmedPasteboardString.count > 0 {
             if URL(trimmedAddressBarString: trimmedPasteboardString) != nil {
