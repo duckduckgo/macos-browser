@@ -52,7 +52,7 @@ final class URLEventHandlerTests: XCTestCase {
     }
 
     func testWhenFilePassedOnLaunchThenFileOpenedAfterAppDidFinishLaunching() {
-        let filepath = FileManager.default.temporaryDirectory(appropriateFor: nil).appendingPathComponent("testres.html").path
+        let filepath = FileManager.default.temporaryDirectory.appendingPathComponent("testres.html").path
         FileManager.default.createFile(atPath: filepath, contents: nil, attributes: nil)
         var handlerCalled: XCTestExpectation!
         let listener = URLEventHandler { url in

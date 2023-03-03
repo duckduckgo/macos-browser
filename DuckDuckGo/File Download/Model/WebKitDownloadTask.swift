@@ -147,7 +147,7 @@ final class WebKitDownloadTask: NSObject, ProgressReporting {
 
         // create temp file and move to Downloads folder with .duckload extension increasing index if needed
         let fm = FileManager.default
-        let tempURL = fm.temporaryDirectory(appropriateFor: localURL).appendingPathComponent(.uniqueFilename())
+        let tempURL = fm.temporaryDirectory.appendingPathComponent(.uniqueFilename())
         do {
             guard fm.createFile(atPath: tempURL.path, contents: nil, attributes: nil) else {
                 throw CocoaError(.fileWriteNoPermission)
