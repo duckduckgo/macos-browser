@@ -164,12 +164,12 @@ final class RecentlyClosedCoordinator: RecentlyClosedCoordinating {
 
         } else {
             // There is no window available, create a new one
-            let tab = Tab(content: recentlyClosedTab.tabContent, shouldLoadInBackground: true, shouldLoadFromCache: true)
+            let tab = Tab(content: recentlyClosedTab.tabContent, interactionStateData: recentlyClosedTab.interactionData, shouldLoadInBackground: true, shouldLoadFromCache: true)
             WindowsManager.openNewWindow(with: tab)
             return
         }
 
-        let tab = Tab(content: recentlyClosedTab.tabContent, shouldLoadInBackground: true, shouldLoadFromCache: true)
+        let tab = Tab(content: recentlyClosedTab.tabContent, interactionStateData: recentlyClosedTab.interactionData, shouldLoadInBackground: true, shouldLoadFromCache: true)
         tabCollectionViewModel.insert(tab, at: .unpinned(tabIndex), selected: true)
     }
 
@@ -185,7 +185,7 @@ final class RecentlyClosedCoordinator: RecentlyClosedCoordinating {
             return
         }
 
-        let tab = Tab(content: recentlyClosedTab.tabContent, shouldLoadInBackground: true, shouldLoadFromCache: true)
+        let tab = Tab(content: recentlyClosedTab.tabContent, interactionStateData: recentlyClosedTab.interactionData, shouldLoadInBackground: true, shouldLoadFromCache: true)
         let tabIndex = min(recentlyClosedTab.index.item, windowControllerManager.pinnedTabsManager.tabCollection.tabs.count)
 
         tabCollectionViewModel.insert(tab, at: .pinned(tabIndex), selected: true)
@@ -233,6 +233,7 @@ private extension RecentlyClosedTab {
         self.init(tabContent: tab.content,
                   favicon: tab.favicon,
                   title: tab.title,
+                  interactionData: tab.getActualInteractionStateData(),
                   originalTabCollection: originalTabCollection,
                   index: tabIndex)
     }
