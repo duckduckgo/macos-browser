@@ -507,13 +507,13 @@ Gw
             <objects>
                 <viewController storyboardIdentifier="FileImportViewController" id="Meg-M8-8oL" userLabel="File Import View Controller" customClass="FileImportViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" translatesAutoresizingMaskIntoConstraints="NO" id="n2z-bE-Ka8">
-                        <rect key="frame" x="0.0" y="0.0" width="512" height="1065"/>
+                        <rect key="frame" x="0.0" y="0.0" width="512" height="1049"/>
                         <subviews>
                             <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="20" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" horizontalHuggingPriority="249" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="HLb-Dw-Y0O">
-                                <rect key="frame" x="20" y="3" width="472" height="1059"/>
+                                <rect key="frame" x="20" y="3" width="472" height="1043"/>
                                 <subviews>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="qiB-A6-LS4">
-                                        <rect key="frame" x="-2" y="1044" width="112" height="15"/>
+                                        <rect key="frame" x="-2" y="1028" width="112" height="15"/>
                                         <textFieldCell key="cell" alignment="left" title="Description Label" id="SpT-id-yTr">
                                             <font key="font" size="13" name="SFProText-Regular"/>
                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -521,7 +521,7 @@ Gw
                                         </textFieldCell>
                                     </textField>
                                     <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="16" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="EN8-1q-QQA">
-                                        <rect key="frame" x="0.0" y="828" width="469" height="196"/>
+                                        <rect key="frame" x="0.0" y="812" width="469" height="196"/>
                                         <subviews>
                                             <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="6" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Kin-jC-41p">
                                                 <rect key="frame" x="0.0" y="159" width="469" height="37"/>
@@ -887,7 +887,7 @@ Gw
                                         </customSpacing>
                                     </stackView>
                                     <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="16" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="BKA-tg-ogp" userLabel="LastPass Info View">
-                                        <rect key="frame" x="0.0" y="594" width="472" height="214"/>
+                                        <rect key="frame" x="0.0" y="578" width="472" height="214"/>
                                         <subviews>
                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="0eU-q7-pCD">
                                                 <rect key="frame" x="-2" y="199" width="292" height="15"/>
@@ -1203,7 +1203,7 @@ Gw
                                         </customSpacing>
                                     </stackView>
                                     <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="16" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="p9R-Ta-H50" userLabel="1Password 7 Info View">
-                                        <rect key="frame" x="0.0" y="344" width="472" height="230"/>
+                                        <rect key="frame" x="0.0" y="328" width="472" height="230"/>
                                         <subviews>
                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="QIm-OA-zFu">
                                                 <rect key="frame" x="-2" y="215" width="314" height="15"/>
@@ -1568,10 +1568,10 @@ Gw
                                         </customSpacing>
                                     </stackView>
                                     <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="16" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="N72-5P-3dY" userLabel="1Password 8 Info View">
-                                        <rect key="frame" x="0.0" y="94" width="472" height="230"/>
+                                        <rect key="frame" x="0.0" y="94" width="472" height="214"/>
                                         <subviews>
                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="U2e-4E-Lf0">
-                                                <rect key="frame" x="-2" y="215" width="303" height="15"/>
+                                                <rect key="frame" x="-2" y="199" width="303" height="15"/>
                                                 <textFieldCell key="cell" alignment="left" title="Step 1: Export your passwords from 1Password" id="74V-e5-TOc">
                                                     <font key="font" size="13" name="SFProText-Semibold"/>
                                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -1579,13 +1579,13 @@ Gw
                                                 </textFieldCell>
                                             </textField>
                                             <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="24" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="I2m-UN-yiB">
-                                                <rect key="frame" x="0.0" y="0.0" width="472" height="199"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="472" height="183"/>
                                                 <subviews>
                                                     <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="EBb-W0-lgj">
-                                                        <rect key="frame" x="0.0" y="39" width="472" height="160"/>
+                                                        <rect key="frame" x="0.0" y="39" width="472" height="144"/>
                                                         <subviews>
                                                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="rDK-Nd-3FM" userLabel="1">
-                                                                <rect key="frame" x="0.0" y="140" width="469" height="20"/>
+                                                                <rect key="frame" x="0.0" y="124" width="469" height="20"/>
                                                                 <subviews>
                                                                     <box boxType="custom" borderType="none" borderWidth="0.0" cornerRadius="10" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="0CU-8N-veN">
                                                                         <rect key="frame" x="0.0" y="0.0" width="20" height="20"/>
@@ -1614,7 +1614,7 @@ Gw
                                                                         <color key="fillColor" name="GlobalBackgroundColor"/>
                                                                     </box>
                                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="uKM-ZM-ity">
-                                                                        <rect key="frame" x="22" y="3" width="176" height="15"/>
+                                                                        <rect key="frame" x="22" y="3" width="441" height="15"/>
                                                                         <textFieldCell key="cell" lineBreakMode="clipping" title="Open and unlock 1Password" allowsEditingTextAttributes="YES" id="cec-o8-a6j">
                                                                             <font key="font" size="13" name="SFProText-Regular"/>
                                                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -1623,7 +1623,7 @@ Gw
                                                                     </textField>
                                                                 </subviews>
                                                                 <constraints>
-                                                                    <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="uKM-ZM-ity" secondAttribute="trailing" constant="8" id="1qZ-9G-V72"/>
+                                                                    <constraint firstAttribute="trailing" secondItem="uKM-ZM-ity" secondAttribute="trailing" constant="8" id="1qZ-9G-V72"/>
                                                                     <constraint firstItem="0CU-8N-veN" firstAttribute="top" secondItem="rDK-Nd-3FM" secondAttribute="top" id="5P4-6x-BhR"/>
                                                                     <constraint firstItem="uKM-ZM-ity" firstAttribute="leading" secondItem="0CU-8N-veN" secondAttribute="trailing" constant="4" id="9o4-1P-mBm"/>
                                                                     <constraint firstAttribute="bottom" secondItem="0CU-8N-veN" secondAttribute="bottom" id="FtP-0X-S58"/>
@@ -1631,65 +1631,18 @@ Gw
                                                                     <constraint firstItem="0CU-8N-veN" firstAttribute="leading" secondItem="rDK-Nd-3FM" secondAttribute="leading" id="Wcv-wE-aa4"/>
                                                                 </constraints>
                                                             </customView>
-                                                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="YX5-F4-K2m" userLabel="2">
-                                                                <rect key="frame" x="0.0" y="112" width="472" height="20"/>
-                                                                <subviews>
-                                                                    <box boxType="custom" borderType="none" borderWidth="0.0" cornerRadius="10" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="eVg-Ri-J6R">
-                                                                        <rect key="frame" x="0.0" y="0.0" width="20" height="20"/>
-                                                                        <view key="contentView" id="WNe-5V-AuI">
-                                                                            <rect key="frame" x="0.0" y="0.0" width="20" height="20"/>
-                                                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                                                            <subviews>
-                                                                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="kcQ-5V-n83">
-                                                                                    <rect key="frame" x="4" y="3" width="13" height="15"/>
-                                                                                    <textFieldCell key="cell" lineBreakMode="clipping" title="2" id="eeH-bP-Y3c">
-                                                                                        <font key="font" size="13" name="SFProText-Semibold"/>
-                                                                                        <color key="textColor" name="OnboardingActionButtonColor"/>
-                                                                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                                                    </textFieldCell>
-                                                                                </textField>
-                                                                            </subviews>
-                                                                            <constraints>
-                                                                                <constraint firstItem="kcQ-5V-n83" firstAttribute="centerX" secondItem="WNe-5V-AuI" secondAttribute="centerX" id="4Rb-UK-51x"/>
-                                                                                <constraint firstItem="kcQ-5V-n83" firstAttribute="centerY" secondItem="WNe-5V-AuI" secondAttribute="centerY" id="jRZ-ml-mCj"/>
-                                                                            </constraints>
-                                                                        </view>
-                                                                        <constraints>
-                                                                            <constraint firstAttribute="width" constant="20" id="EuH-72-hYi"/>
-                                                                            <constraint firstAttribute="height" constant="20" id="tsu-2W-rm9"/>
-                                                                        </constraints>
-                                                                        <color key="fillColor" name="GlobalBackgroundColor"/>
-                                                                    </box>
-                                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="K2H-m3-HBK">
-                                                                        <rect key="frame" x="22" y="3" width="444" height="15"/>
-                                                                        <textFieldCell key="cell" lineBreakMode="clipping" title="Select the vault you want to Export (You cannot export from “All Vaults.”)" allowsEditingTextAttributes="YES" id="QxD-KP-NFv">
-                                                                            <font key="font" size="13" name="SFProText-Regular"/>
-                                                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                                        </textFieldCell>
-                                                                    </textField>
-                                                                </subviews>
-                                                                <constraints>
-                                                                    <constraint firstItem="K2H-m3-HBK" firstAttribute="centerY" secondItem="YX5-F4-K2m" secondAttribute="centerY" id="LYJ-y3-C5v"/>
-                                                                    <constraint firstAttribute="bottom" secondItem="eVg-Ri-J6R" secondAttribute="bottom" id="QyT-G1-Kjk"/>
-                                                                    <constraint firstItem="K2H-m3-HBK" firstAttribute="leading" secondItem="eVg-Ri-J6R" secondAttribute="trailing" constant="4" id="jmV-g5-6on"/>
-                                                                    <constraint firstAttribute="trailing" secondItem="K2H-m3-HBK" secondAttribute="trailing" constant="8" id="k4T-EM-cY3"/>
-                                                                    <constraint firstItem="eVg-Ri-J6R" firstAttribute="top" secondItem="YX5-F4-K2m" secondAttribute="top" id="saL-6q-Ha4"/>
-                                                                    <constraint firstItem="eVg-Ri-J6R" firstAttribute="leading" secondItem="YX5-F4-K2m" secondAttribute="leading" id="yy2-20-6VW"/>
-                                                                </constraints>
-                                                            </customView>
-                                                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="glR-ni-P9g" userLabel="3">
-                                                                <rect key="frame" x="0.0" y="84" width="469" height="20"/>
+                                                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="glR-ni-P9g" userLabel="2">
+                                                                <rect key="frame" x="0.0" y="84" width="472" height="32"/>
                                                                 <subviews>
                                                                     <box boxType="custom" borderType="none" borderWidth="0.0" cornerRadius="10" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="jYr-y7-z6U">
-                                                                        <rect key="frame" x="0.0" y="0.0" width="20" height="20"/>
+                                                                        <rect key="frame" x="0.0" y="12" width="20" height="20"/>
                                                                         <view key="contentView" id="faC-RL-5iP">
                                                                             <rect key="frame" x="0.0" y="0.0" width="20" height="20"/>
                                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                             <subviews>
                                                                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1gh-2W-NA5">
                                                                                     <rect key="frame" x="4" y="3" width="13" height="15"/>
-                                                                                    <textFieldCell key="cell" lineBreakMode="clipping" title="3" id="k8l-JZ-a7T">
+                                                                                    <textFieldCell key="cell" lineBreakMode="clipping" title="2" id="k8l-JZ-a7T">
                                                                                         <font key="font" size="13" name="SFProText-Semibold"/>
                                                                                         <color key="textColor" name="OnboardingActionButtonColor"/>
                                                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -1707,25 +1660,9 @@ Gw
                                                                         </constraints>
                                                                         <color key="fillColor" name="GlobalBackgroundColor"/>
                                                                     </box>
-                                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="igt-na-Ktl">
-                                                                        <rect key="frame" x="22" y="3" width="43" height="15"/>
-                                                                        <textFieldCell key="cell" lineBreakMode="clipping" title="Select" allowsEditingTextAttributes="YES" id="VaF-gD-dNj">
-                                                                            <font key="font" size="13" name="SFProText-Regular"/>
-                                                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                                        </textFieldCell>
-                                                                    </textField>
-                                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="QzO-h9-eMA">
-                                                                        <rect key="frame" x="64" y="3" width="124" height="15"/>
-                                                                        <textFieldCell key="cell" lineBreakMode="clipping" title="File → Export → All" allowsEditingTextAttributes="YES" id="SDT-Bk-tcW">
-                                                                            <font key="font" size="13" name="SFProText-Semibold"/>
-                                                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                                        </textFieldCell>
-                                                                    </textField>
-                                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="bNW-Nx-Mmn">
-                                                                        <rect key="frame" x="187" y="3" width="156" height="15"/>
-                                                                        <textFieldCell key="cell" lineBreakMode="clipping" title="Items from the Menu Bar" allowsEditingTextAttributes="YES" id="Qa7-G0-gjm">
+                                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" verticalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="bNW-Nx-Mmn">
+                                                                        <rect key="frame" x="22" y="0.0" width="444" height="30"/>
+                                                                        <textFieldCell key="cell" title="Select File → Export from the menu Bar and choose the account you want to export" allowsEditingTextAttributes="YES" id="Qa7-G0-gjm">
                                                                             <font key="font" size="13" name="SFProText-Regular"/>
                                                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -1733,19 +1670,15 @@ Gw
                                                                     </textField>
                                                                 </subviews>
                                                                 <constraints>
-                                                                    <constraint firstItem="QzO-h9-eMA" firstAttribute="leading" secondItem="igt-na-Ktl" secondAttribute="trailing" constant="3" id="4Gn-wA-PY6"/>
-                                                                    <constraint firstItem="igt-na-Ktl" firstAttribute="leading" secondItem="jYr-y7-z6U" secondAttribute="trailing" constant="4" id="5ec-2b-Wdz"/>
-                                                                    <constraint firstItem="QzO-h9-eMA" firstAttribute="centerY" secondItem="glR-ni-P9g" secondAttribute="centerY" id="9lq-C6-Ifb"/>
-                                                                    <constraint firstItem="bNW-Nx-Mmn" firstAttribute="leading" secondItem="QzO-h9-eMA" secondAttribute="trailing" constant="3" id="FDi-HS-pY1"/>
+                                                                    <constraint firstAttribute="bottom" secondItem="bNW-Nx-Mmn" secondAttribute="bottom" id="CNR-Se-fiL"/>
+                                                                    <constraint firstItem="bNW-Nx-Mmn" firstAttribute="top" secondItem="glR-ni-P9g" secondAttribute="top" constant="2" id="DBU-Ll-5vY"/>
                                                                     <constraint firstItem="jYr-y7-z6U" firstAttribute="leading" secondItem="glR-ni-P9g" secondAttribute="leading" id="Lds-Fl-9Nx"/>
                                                                     <constraint firstItem="jYr-y7-z6U" firstAttribute="top" secondItem="glR-ni-P9g" secondAttribute="top" id="azf-WY-1W1"/>
-                                                                    <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="bNW-Nx-Mmn" secondAttribute="trailing" constant="8" id="bd1-ye-noW"/>
-                                                                    <constraint firstItem="bNW-Nx-Mmn" firstAttribute="centerY" secondItem="glR-ni-P9g" secondAttribute="centerY" id="fIU-82-8Uh"/>
-                                                                    <constraint firstItem="igt-na-Ktl" firstAttribute="centerY" secondItem="glR-ni-P9g" secondAttribute="centerY" id="jKE-Gc-Xqs"/>
-                                                                    <constraint firstAttribute="bottom" secondItem="jYr-y7-z6U" secondAttribute="bottom" id="wmF-iB-aZy"/>
+                                                                    <constraint firstAttribute="trailing" secondItem="bNW-Nx-Mmn" secondAttribute="trailing" constant="8" id="bd1-ye-noW"/>
+                                                                    <constraint firstItem="bNW-Nx-Mmn" firstAttribute="leading" secondItem="jYr-y7-z6U" secondAttribute="trailing" constant="4" id="ug0-ti-xZL"/>
                                                                 </constraints>
                                                             </customView>
-                                                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="O5D-WD-CuF" userLabel="4">
+                                                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="O5D-WD-CuF" userLabel="3">
                                                                 <rect key="frame" x="0.0" y="56" width="469" height="20"/>
                                                                 <subviews>
                                                                     <box boxType="custom" borderType="none" borderWidth="0.0" cornerRadius="10" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="4TK-Ap-Yot">
@@ -1756,7 +1689,7 @@ Gw
                                                                             <subviews>
                                                                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Kfb-MI-XMG">
                                                                                     <rect key="frame" x="4" y="3" width="13" height="15"/>
-                                                                                    <textFieldCell key="cell" lineBreakMode="clipping" title="4" id="StQ-dc-ifG">
+                                                                                    <textFieldCell key="cell" lineBreakMode="clipping" title="3" id="StQ-dc-ifG">
                                                                                         <font key="font" size="13" name="SFProText-Semibold"/>
                                                                                         <color key="textColor" name="OnboardingActionButtonColor"/>
                                                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -1775,8 +1708,8 @@ Gw
                                                                         <color key="fillColor" name="GlobalBackgroundColor"/>
                                                                     </box>
                                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="mqe-uO-jVo">
-                                                                        <rect key="frame" x="22" y="3" width="313" height="15"/>
-                                                                        <textFieldCell key="cell" lineBreakMode="clipping" title="Enter your 1Password master or account password" allowsEditingTextAttributes="YES" id="8Zr-xa-YEq">
+                                                                        <rect key="frame" x="22" y="3" width="251" height="15"/>
+                                                                        <textFieldCell key="cell" lineBreakMode="clipping" title="Enter your 1Password account password" allowsEditingTextAttributes="YES" id="8Zr-xa-YEq">
                                                                             <font key="font" size="13" name="SFProText-Regular"/>
                                                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -1792,7 +1725,7 @@ Gw
                                                                     <constraint firstAttribute="bottom" secondItem="4TK-Ap-Yot" secondAttribute="bottom" id="vaA-lK-nWL"/>
                                                                 </constraints>
                                                             </customView>
-                                                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="DYC-kI-AC1" userLabel="5">
+                                                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="DYC-kI-AC1" userLabel="4">
                                                                 <rect key="frame" x="0.0" y="28" width="469" height="20"/>
                                                                 <subviews>
                                                                     <box boxType="custom" borderType="none" borderWidth="0.0" cornerRadius="10" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="Z5D-Zd-iKr">
@@ -1803,7 +1736,7 @@ Gw
                                                                             <subviews>
                                                                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="oEv-f9-Yg7">
                                                                                     <rect key="frame" x="4" y="3" width="13" height="15"/>
-                                                                                    <textFieldCell key="cell" lineBreakMode="clipping" title="5" id="rZO-iO-2oj">
+                                                                                    <textFieldCell key="cell" lineBreakMode="clipping" title="4" id="rZO-iO-2oj">
                                                                                         <font key="font" size="13" name="SFProText-Semibold"/>
                                                                                         <color key="textColor" name="OnboardingActionButtonColor"/>
                                                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -1822,8 +1755,8 @@ Gw
                                                                         <color key="fillColor" name="GlobalBackgroundColor"/>
                                                                     </box>
                                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="efy-8F-JlL">
-                                                                        <rect key="frame" x="22" y="3" width="282" height="15"/>
-                                                                        <textFieldCell key="cell" lineBreakMode="clipping" title="Select the File Format: iCloud Keychain (.csv)" allowsEditingTextAttributes="YES" id="mza-lY-WhN">
+                                                                        <rect key="frame" x="22" y="3" width="351" height="15"/>
+                                                                        <textFieldCell key="cell" lineBreakMode="clipping" title="Select the File Format: CSV (Logins and Passwords only)" allowsEditingTextAttributes="YES" id="mza-lY-WhN">
                                                                             <font key="font" size="13" name="SFProText-Regular"/>
                                                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -1839,18 +1772,18 @@ Gw
                                                                     <constraint firstItem="efy-8F-JlL" firstAttribute="centerY" secondItem="DYC-kI-AC1" secondAttribute="centerY" id="x9K-6H-Uef"/>
                                                                 </constraints>
                                                             </customView>
-                                                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="4a3-Uo-XCx" userLabel="6">
+                                                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="gKF-ak-4AT" userLabel="5">
                                                                 <rect key="frame" x="0.0" y="0.0" width="469" height="20"/>
                                                                 <subviews>
-                                                                    <box boxType="custom" borderType="none" borderWidth="0.0" cornerRadius="10" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="7fb-wZ-8iL">
+                                                                    <box boxType="custom" borderType="none" borderWidth="0.0" cornerRadius="10" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="S96-pz-qre">
                                                                         <rect key="frame" x="0.0" y="0.0" width="20" height="20"/>
-                                                                        <view key="contentView" id="5by-QD-w96">
+                                                                        <view key="contentView" id="sBm-wj-qlB">
                                                                             <rect key="frame" x="0.0" y="0.0" width="20" height="20"/>
                                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                             <subviews>
-                                                                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="LpG-lt-2pL">
+                                                                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="iAj-Yd-Yss">
                                                                                     <rect key="frame" x="4" y="3" width="13" height="15"/>
-                                                                                    <textFieldCell key="cell" lineBreakMode="clipping" title="6" id="4va-q1-5u0">
+                                                                                    <textFieldCell key="cell" lineBreakMode="clipping" title="5" id="oJe-3H-p47">
                                                                                         <font key="font" size="13" name="SFProText-Semibold"/>
                                                                                         <color key="textColor" name="OnboardingActionButtonColor"/>
                                                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -1858,19 +1791,19 @@ Gw
                                                                                 </textField>
                                                                             </subviews>
                                                                             <constraints>
-                                                                                <constraint firstItem="LpG-lt-2pL" firstAttribute="centerY" secondItem="5by-QD-w96" secondAttribute="centerY" id="Rgl-gQ-KTT"/>
-                                                                                <constraint firstItem="LpG-lt-2pL" firstAttribute="centerX" secondItem="5by-QD-w96" secondAttribute="centerX" id="b0J-nQ-ntP"/>
+                                                                                <constraint firstItem="iAj-Yd-Yss" firstAttribute="centerY" secondItem="sBm-wj-qlB" secondAttribute="centerY" id="AaV-SE-5ET"/>
+                                                                                <constraint firstItem="iAj-Yd-Yss" firstAttribute="centerX" secondItem="sBm-wj-qlB" secondAttribute="centerX" id="Eze-Dv-qTu"/>
                                                                             </constraints>
                                                                         </view>
                                                                         <constraints>
-                                                                            <constraint firstAttribute="height" constant="20" id="QYV-wB-FSR"/>
-                                                                            <constraint firstAttribute="width" constant="20" id="YmW-Oe-gQI"/>
+                                                                            <constraint firstAttribute="width" constant="20" id="GuA-M1-7xz"/>
+                                                                            <constraint firstAttribute="height" constant="20" id="RjK-Wv-XiV"/>
                                                                         </constraints>
                                                                         <color key="fillColor" name="GlobalBackgroundColor"/>
                                                                     </box>
-                                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="hMO-NC-qQL">
-                                                                        <rect key="frame" x="22" y="3" width="181" height="15"/>
-                                                                        <textFieldCell key="cell" lineBreakMode="clipping" title="Save the file to your Desktop" allowsEditingTextAttributes="YES" id="Rrc-RY-eJW">
+                                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="4UV-Aw-rk2">
+                                                                        <rect key="frame" x="22" y="3" width="315" height="15"/>
+                                                                        <textFieldCell key="cell" lineBreakMode="clipping" title="Click Export Data and save the file to your Desktop" allowsEditingTextAttributes="YES" id="Yb2-Yy-CrG">
                                                                             <font key="font" size="13" name="SFProText-Regular"/>
                                                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -1878,12 +1811,12 @@ Gw
                                                                     </textField>
                                                                 </subviews>
                                                                 <constraints>
-                                                                    <constraint firstItem="hMO-NC-qQL" firstAttribute="centerY" secondItem="4a3-Uo-XCx" secondAttribute="centerY" id="GtF-cw-hYf"/>
-                                                                    <constraint firstAttribute="bottom" secondItem="7fb-wZ-8iL" secondAttribute="bottom" id="RZp-s2-NuF"/>
-                                                                    <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="hMO-NC-qQL" secondAttribute="trailing" constant="8" id="V5G-ul-69v"/>
-                                                                    <constraint firstItem="hMO-NC-qQL" firstAttribute="leading" secondItem="7fb-wZ-8iL" secondAttribute="trailing" constant="4" id="Yi6-CI-aOn"/>
-                                                                    <constraint firstItem="7fb-wZ-8iL" firstAttribute="leading" secondItem="4a3-Uo-XCx" secondAttribute="leading" id="nYq-Lf-RsP"/>
-                                                                    <constraint firstItem="7fb-wZ-8iL" firstAttribute="top" secondItem="4a3-Uo-XCx" secondAttribute="top" id="vNQ-sF-qbk"/>
+                                                                    <constraint firstItem="S96-pz-qre" firstAttribute="top" secondItem="gKF-ak-4AT" secondAttribute="top" id="F77-U0-uvo"/>
+                                                                    <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="4UV-Aw-rk2" secondAttribute="trailing" constant="8" id="JUj-5W-Ysz"/>
+                                                                    <constraint firstItem="S96-pz-qre" firstAttribute="leading" secondItem="gKF-ak-4AT" secondAttribute="leading" id="Npb-Fn-sEo"/>
+                                                                    <constraint firstItem="4UV-Aw-rk2" firstAttribute="centerY" secondItem="gKF-ak-4AT" secondAttribute="centerY" id="TzQ-Yf-VQW"/>
+                                                                    <constraint firstAttribute="bottom" secondItem="S96-pz-qre" secondAttribute="bottom" id="cet-TR-nOK"/>
+                                                                    <constraint firstItem="4UV-Aw-rk2" firstAttribute="leading" secondItem="S96-pz-qre" secondAttribute="trailing" constant="4" id="s0M-mI-0f6"/>
                                                                 </constraints>
                                                             </customView>
                                                         </subviews>
@@ -1893,10 +1826,8 @@ Gw
                                                             <integer value="1000"/>
                                                             <integer value="1000"/>
                                                             <integer value="1000"/>
-                                                            <integer value="1000"/>
                                                         </visibilityPriorities>
                                                         <customSpacing>
-                                                            <real value="3.4028234663852886e+38"/>
                                                             <real value="3.4028234663852886e+38"/>
                                                             <real value="3.4028234663852886e+38"/>
                                                             <real value="3.4028234663852886e+38"/>
