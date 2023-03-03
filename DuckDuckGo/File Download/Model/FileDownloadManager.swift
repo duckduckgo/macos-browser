@@ -130,6 +130,7 @@ final class FileDownloadManager: FileDownloadManagerProtocol {
 extension FileDownloadManager: WebKitDownloadTaskDelegate {
 
     // swiftlint:disable:next function_body_length
+    // swiftlint:disable:next cyclomatic_complexity
     func fileDownloadTaskNeedsDestinationURL(_ task: WebKitDownloadTask,
                                              suggestedFilename: String,
                                              completionHandler: @escaping (URL?, UTType?) -> Void) {
