@@ -122,7 +122,7 @@ final class FileSystemDSLTests: XCTestCase {
 
     func testWhenPersistingFile_AndFileContentsAreCopied_ThenTheFileContentsAreCorrect() throws {
         let bundle = Bundle(for: FileSystemDSLTests.self)
-        let bundleFileURL = bundle.resourceURL!.appendingPathComponent("Data Import Resources/Test Firefox Data/No Primary Password/key4.db")
+        let bundleFileURL = bundle.resourceURL!.appendingPathComponent("DataImportResources/TestFirefoxData/No Primary Password/key4.db")
 
         let structure = FileSystem(rootDirectoryName: rootDirectoryName) {
             File("key4.db", contents: .copy(bundleFileURL))

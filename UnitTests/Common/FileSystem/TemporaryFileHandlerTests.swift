@@ -42,7 +42,7 @@ final class TemporaryFileHandlerTests: XCTestCase {
 
     private func loginDatabaseURL() -> URL {
         let bundle = Bundle(for: TemporaryFileHandlerTests.self)
-        return bundle.resourceURL!.appendingPathComponent("Data Import Resources/Test Firefox Data/No Primary Password/key4.db")
+        return bundle.resourceURL!.appendingPathComponent("DataImportResources/TestFirefoxData/No Primary Password/key4.db")
     }
 
 }

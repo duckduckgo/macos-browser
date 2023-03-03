@@ -30,7 +30,7 @@ private struct ChromiumLoginStore {
     var databaseDirectoryURL: URL {
         let bundle = Bundle(for: ChromiumLoginReaderTests.self)
         return bundle.resourceURL!
-            .appendingPathComponent("Data Import Resources/Test Chrome Data")
+            .appendingPathComponent("DataImportResources/TestChromeData")
             .appendingPathComponent(directory)
     }
 }

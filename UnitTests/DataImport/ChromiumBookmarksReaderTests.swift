@@ -1,5 +1,5 @@
 //
-//  FirefoxBookmarksReaderTests.swift
+//  ChromiumBookmarksReaderTests.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -20,10 +20,10 @@ import Foundation
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-class FirefoxBookmarksReaderTests: XCTestCase {
+class ChromiumBookmarksReaderTests: XCTestCase {
 
     func testImportingBookmarks() {
-        let bookmarksReader = FirefoxBookmarksReader(firefoxDataDirectoryURL: resourceURL())
+        let bookmarksReader = ChromiumBookmarksReader(chromiumDataDirectoryURL: resourceURL())
         let bookmarks = bookmarksReader.readBookmarks()
 
         guard case let .success(bookmarks) = bookmarks else {
@@ -33,15 +33,11 @@ class FirefoxBookmarksReaderTests: XCTestCase {
 
         XCTAssertEqual(bookmarks.topLevelFolders.bookmarkBar.type, "folder")
         XCTAssertEqual(bookmarks.topLevelFolders.otherBookmarks.type, "folder")
-
-        XCTAssertTrue(bookmarks.topLevelFolders.bookmarkBar.children!.contains(where: { bookmark in
-            bookmark.url?.absoluteString == "https://duckduckgo.com/"
-        }))
     }
 
     private func resourceURL() -> URL {
-        let bundle = Bundle(for: FirefoxBookmarksReaderTests.self)
-        return bundle.resourceURL!.appendingPathComponent("Data Import Resources/Test Firefox Data")
+        let bundle = Bundle(for: ChromiumBookmarksReaderTests.self)
+        return bundle.resourceURL!.appendingPathComponent("DataImportResources/TestChromeData")
     }
 
 }

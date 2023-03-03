@@ -33,7 +33,7 @@ final class BookmarksHTMLImporterTests: XCTestCase {
     func bookmarksFileURL(_ name: String) -> URL {
         let bundle = Bundle(for: ChromiumLoginReaderTests.self)
         return bundle.resourceURL!
-            .appendingPathComponent("Data Import Resources/Test Bookmarks Data")
+            .appendingPathComponent("DataImportResources/TestBookmarksData")
             .appendingPathComponent(name)
     }
 

@@ -73,6 +73,6 @@ class FirefoxDataImporterTests: XCTestCase {
 
     private func resourceURL() -> URL {
         let bundle = Bundle(for: FirefoxBookmarksReaderTests.self)
-        return bundle.resourceURL!.appendingPathComponent("Data Import Resources/Test Firefox Data")
+        return bundle.resourceURL!.appendingPathComponent("DataImportResources/TestFirefoxData")
     }
 }

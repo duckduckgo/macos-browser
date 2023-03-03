@@ -272,12 +272,12 @@ class FirefoxLoginReaderTests: XCTestCase {
 
     private func resourcesURLWithPassword() -> URL {
         let bundle = Bundle(for: FirefoxLoginReaderTests.self)
-        return bundle.resourceURL!.appendingPathComponent("Data Import Resources/Test Firefox Data/Primary Password")
+        return bundle.resourceURL!.appendingPathComponent("DataImportResources/TestFirefoxData/Primary Password")
     }
 
     private func resourcesURLWithoutPassword() -> URL {
         let bundle = Bundle(for: FirefoxLoginReaderTests.self)
-        return bundle.resourceURL!.appendingPathComponent("Data Import Resources/Test Firefox Data/No Primary Password")
+        return bundle.resourceURL!.appendingPathComponent("DataImportResources/TestFirefoxData/No Primary Password")
     }
 
 }

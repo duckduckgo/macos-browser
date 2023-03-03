@@ -61,7 +61,7 @@ final class InternalUserDeciderTests: XCTestCase {
 
     func testWhenInitialized_ThenStoreLoadCalled() {
         let store = InternalUserDeciderStoreMock()
-        let _ = InternalUserDecider(store: store)
+        _ = InternalUserDecider(store: store)
 
         XCTAssert(store.loadCalled)
     }

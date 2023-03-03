@@ -1,7 +1,7 @@
 //
-//  SafariBookmarksReaderTests.swift
+//  FirefoxFaviconsReaderTests.swift
 //
-//  Copyright © 2021 DuckDuckGo. All rights reserved.
+//  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -20,24 +20,23 @@ import Foundation
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-class SafariBookmarksReaderTests: XCTestCase {
+class FirefoxFaviconsReaderTests: XCTestCase {
 
-    func testImportingBookmarks() {
-        let bookmarksReader = SafariBookmarksReader(safariBookmarksFileURL: bookmarksFileURL())
-        let bookmarks = bookmarksReader.readBookmarks()
+    func testReadingFavicons() {
+        let faviconsReader = FirefoxFaviconsReader(firefoxDataDirectoryURL: resourceURL())
+        let favicons = faviconsReader.readFavicons()
 
-        guard case let .success(bookmarks) = bookmarks else {
+        guard case let .success(favicons) = favicons else {
             XCTFail("Failed to decode bookmarks")
             return
         }
 
-        XCTAssertEqual(bookmarks.topLevelFolders.bookmarkBar.type, "folder")
-        XCTAssertEqual(bookmarks.topLevelFolders.otherBookmarks.type, "folder")
+        XCTAssertEqual(favicons.count, 3)
     }
 
-    private func bookmarksFileURL() -> URL {
+    private func resourceURL() -> URL {
         let bundle = Bundle(for: FirefoxBookmarksReaderTests.self)
-        return bundle.resourceURL!.appendingPathComponent("Data Import Resources/Test Safari Data/Bookmarks.plist")
+        return bundle.resourceURL!.appendingPathComponent("DataImportResources/TestFirefoxData")
     }
 
 }

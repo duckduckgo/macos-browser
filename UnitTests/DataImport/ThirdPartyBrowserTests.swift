@@ -113,17 +113,17 @@ class ThirdPartyBrowserTests: XCTestCase {
 
     private func key4DatabaseURL() -> URL {
         let bundle = Bundle(for: ThirdPartyBrowserTests.self)
-        return bundle.resourceURL!.appendingPathComponent("Data Import Resources/Test Firefox Data/No Primary Password/key4.db")
+        return bundle.resourceURL!.appendingPathComponent("DataImportResources/TestFirefoxData/No Primary Password/key4.db")
     }
 
     private func loginsURL() -> URL {
         let bundle = Bundle(for: ThirdPartyBrowserTests.self)
-        return bundle.resourceURL!.appendingPathComponent("Data Import Resources/Test Firefox Data/No Primary Password/logins.json")
+        return bundle.resourceURL!.appendingPathComponent("DataImportResources/TestFirefoxData/No Primary Password/logins.json")
     }
 
     private func bookmarksURL() -> URL {
         let bundle = Bundle(for: ThirdPartyBrowserTests.self)
-        return bundle.resourceURL!.appendingPathComponent("Data Import Resources/Test Firefox Data/places.sqlite")
+        return bundle.resourceURL!.appendingPathComponent("DataImportResources/TestFirefoxData/places.sqlite")
     }
 
 }

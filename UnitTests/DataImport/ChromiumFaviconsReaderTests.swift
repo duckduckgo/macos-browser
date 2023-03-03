@@ -36,7 +36,7 @@ class ChromiumFaviconsReaderTests: XCTestCase {
 
     private func resourceURL() -> URL {
         let bundle = Bundle(for: ChromiumBookmarksReaderTests.self)
-        return bundle.resourceURL!.appendingPathComponent("Data Import Resources/Test Chrome Data")
+        return bundle.resourceURL!.appendingPathComponent("DataImportResources/TestChromeData")
     }
 
 }
