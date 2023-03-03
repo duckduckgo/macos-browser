@@ -177,12 +177,20 @@ extension FileDownloadManager: WebKitDownloadTaskDelegate {
             return
         }
 
-        // drop known extension, it would be appended by SavePanel
-        var suggestedFilename = suggestedFilename
-        if let ext = fileType?.fileExtension {
-            suggestedFilename = suggestedFilename.dropping(suffix: "." + ext)
+        var fileTypes = [UTType]()
+        let fileExtension = (suggestedFilename as NSString).pathExtension
+        // add file type from file extension first
+        if !fileExtension.isEmpty,
+           let utType = UTType(fileExtension: fileExtension),
+           fileType != utType {
+
+            fileTypes = [utType]
         }
-        let fileTypes = fileType.map { [$0] } ?? []
+        // append file type from mime
+        if let fileType {
+            fileTypes.append(fileType)
+        }
+
         delegate.chooseDestination(suggestedFilename: suggestedFilename, directoryURL: downloadLocation, fileTypes: fileTypes) { [weak self] url, fileType in
             guard let self = self else {
                 completion(nil, nil)

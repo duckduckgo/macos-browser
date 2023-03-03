@@ -669,21 +669,9 @@ extension BrowserTabViewController: TabDelegate {
         dispatchPrecondition(condition: .onQueue(.main))
         guard let window = view.window else { return nil }
 
-        var fileTypes = request.parameters.fileTypes
-        if fileTypes.isEmpty || (fileTypes.count == 1 && (fileTypes[0].fileExtension?.isEmpty ?? true)),
-           let fileExt = (request.parameters.suggestedFilename as NSString?)?.pathExtension,
-           let utType = UTType(fileExtension: fileExt) {
-            // When no file extension is set by default generate fileType from file extension
-            fileTypes.insert(utType, at: 0)
-        }
-        // allow user set any file extension
-        if fileTypes.count == 1 && !fileTypes.contains(where: { $0.fileExtension?.isEmpty ?? true }) {
-            fileTypes.append(.data)
-        }
-
-        let savePanel = NSSavePanel.withFileTypeChooser(fileTypes: fileTypes,
-                                                        suggestedFilename: request.parameters.suggestedFilename,
-                                                        directoryURL: DownloadsPreferences().effectiveDownloadLocation)
+        let savePanel = NSSavePanel.savePanelWithFileTypeChooser(fileTypes: request.parameters.fileTypes,
+                                                                 suggestedFilename: request.parameters.suggestedFilename,
+                                                                 directoryURL: DownloadsPreferences().effectiveDownloadLocation)
 
         savePanel.beginSheetModal(for: window) { [request] response in
             if case .abort = response {
