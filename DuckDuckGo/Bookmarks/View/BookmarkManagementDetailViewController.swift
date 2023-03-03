@@ -671,15 +671,12 @@ extension BookmarkManagementDetailViewController: BookmarkMenuItemSelectors {
     }
 
     func copyBookmark(_ sender: NSMenuItem) {
-        guard let bookmark = sender.representedObject as? Bookmark, let bookmarkURL = bookmark.urlObject as NSURL? else {
+        guard let bookmark = sender.representedObject as? Bookmark else {
             assertionFailure("Failed to cast menu represented object to Bookmark")
             return
         }
 
-        let pasteboard = NSPasteboard.general
-        pasteboard.declareTypes([.URL], owner: nil)
-        bookmarkURL.write(to: pasteboard)
-        pasteboard.setString(bookmarkURL.absoluteString ?? "", forType: .string)
+        bookmark.copyUrlToPasteboard()
     }
 
     func deleteBookmark(_ sender: NSMenuItem) {
