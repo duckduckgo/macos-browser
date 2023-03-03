@@ -49,7 +49,6 @@ extension NSSavePanel {
                 item?.representedObject = fileType
             }
         }
-        savePanel.isExtensionHidden = false
 
         if let suggestedFilename {
             savePanel.nameFieldStringValue = suggestedFilename

@@ -187,7 +187,8 @@ extension FileDownloadManager: WebKitDownloadTaskDelegate {
             fileTypes = [utType]
         }
         // append file type from mime
-        if let fileType {
+        if let fileType,
+           fileType.fileExtension != nil || fileTypes.isEmpty {
             fileTypes.append(fileType)
         }
 
