@@ -57,6 +57,8 @@ public class LegacyBookmarksStoreMigration {
             // There should be no data left as migration has been done already
             if !bookmarkRoots.isEmpty {
                 Pixel.fire(.debug(event: .bookmarksMigrationAlreadyPerformed))
+                
+                cleanupOldData(in: source)
             }
             return
         }
