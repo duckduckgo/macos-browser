@@ -19,6 +19,7 @@
 import Foundation
 import DDGSync
 import Combine
+import SystemConfiguration
 
 struct SyncDevice: Identifiable {
 
@@ -110,7 +111,9 @@ final class SyncPreferences: ObservableObject {
     func turnOnSync() {
         Task { @MainActor in
             do {
-                try await syncService.sync.createAccount(deviceName: ProcessInfo.processInfo.hostName)
+//                let hostname = SCDynamicStoreCopyComputerName(nil, nil) as? String ?? ProcessInfo.processInfo.hostName
+                let hostname = ProcessInfo.processInfo.hostName
+                try await syncService.sync.createAccount(deviceName: hostname)
                 flowState = .syncAnotherDevice
             } catch {
                 errorMessage = String(describing: error)
@@ -122,7 +125,9 @@ final class SyncPreferences: ObservableObject {
     func recoverDevice(using recoveryCode: String) {
         Task { @MainActor in
             do {
-                try await syncService.sync.login(recoveryKey: recoveryCode, deviceName: ProcessInfo.processInfo.hostName)
+//                let hostname = SCDynamicStoreCopyComputerName(nil, nil) as? String ?? ProcessInfo.processInfo.hostName
+                let hostname = ProcessInfo.processInfo.hostName
+                try await syncService.sync.login(recoveryKey: recoveryCode, deviceName: hostname)
                 endFlow()
             } catch {
                 errorMessage = String(describing: error)
