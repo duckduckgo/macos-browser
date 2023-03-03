@@ -76,8 +76,7 @@ typealias TabExtensionsBuilderArguments = (
     userContentControllerFuture: Future<UserContentControllerProtocol, Never>,
     webViewFuture: Future<WKWebView, Never>,
     permissionModel: PermissionModel,
-    privacyInfoPublisher: AnyPublisher<PrivacyInfo?, Never>,
-    isChildTab: Bool
+    privacyInfoPublisher: AnyPublisher<PrivacyInfo?, Never>
 )
 
 extension TabExtensionsBuilder {
@@ -124,7 +123,7 @@ extension TabExtensionsBuilder {
         }
 
         add {
-            DownloadsTabExtension(downloadManager: dependencies.downloadManager, isChildTab: args.isChildTab)
+            DownloadsTabExtension(downloadManager: dependencies.downloadManager)
         }
     }
 

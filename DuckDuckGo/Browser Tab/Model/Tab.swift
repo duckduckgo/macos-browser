@@ -312,8 +312,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                           userContentControllerFuture: userContentControllerPromise.future,
                           webViewFuture: webViewPromise.future,
                           permissionModel: permissions,
-                          privacyInfoPublisher: _privacyInfo.projectedValue.eraseToAnyPublisher(),
-                          isChildTab: parentTab != nil),
+                          privacyInfoPublisher: _privacyInfo.projectedValue.eraseToAnyPublisher()),
                    dependencies: ExtensionDependencies(privacyFeatures: privacyFeatures,
                                                        historyCoordinating: historyCoordinating,
                                                        downloadManager: downloadManager))

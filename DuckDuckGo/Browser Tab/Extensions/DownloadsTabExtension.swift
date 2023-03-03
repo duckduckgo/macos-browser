@@ -29,7 +29,6 @@ protocol TabDownloadsDelegate: AnyObject {
 final class DownloadsTabExtension: NSObject {
 
     private let downloadManager: FileDownloadManagerProtocol
-    private let isChildTab: Bool
 
     @Published
     private var savePanelDialogRequest: SavePanelDialogRequest? {
@@ -47,9 +46,8 @@ final class DownloadsTabExtension: NSObject {
 
     weak var delegate: TabDownloadsDelegate?
 
-    init(downloadManager: FileDownloadManagerProtocol, isChildTab: Bool) {
+    init(downloadManager: FileDownloadManagerProtocol) {
         self.downloadManager = downloadManager
-        self.isChildTab = isChildTab
         super.init()
     }
 
@@ -146,10 +144,12 @@ extension DownloadsTabExtension: NavigationResponder {
         // If the download has started from a popup Tab - close it after starting the download
         // e.g. download button on this page:
         // https://en.wikipedia.org/wiki/Guitar#/media/File:GuitareClassique5.png
-        guard isChildTab,
+        guard let navigationAction,
+              navigationAction.isForMainFrame,
+              navigationAction.isTargetingNewWindow,
               let webView = download.webView,
               // webView has no navigation history (downloaded navigationAction has started from an empty state)
-              (navigationAction?.redirectHistory?.first ?? navigationAction)?.fromHistoryItemIdentity == nil
+              (navigationAction.redirectHistory?.first ?? navigationAction).fromHistoryItemIdentity == nil
         else { return }
 
         self.closeWebView(webView, afterDownloadTaskHasStarted: task)
