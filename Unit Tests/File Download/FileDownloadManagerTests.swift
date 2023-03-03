@@ -116,7 +116,7 @@ final class FileDownloadManagerTests: XCTestCase {
             dispatchPrecondition(condition: .onQueue(.main))
             XCTAssertEqual(suggestedFilename, "suggested.filename")
             XCTAssertEqual(directoryURL, downloadsURL)
-            XCTAssertEqual(fileTypes, [.pdf])
+            XCTAssertEqual(fileTypes, [UTType(fileExtension: "filename")!, .pdf])
             e1.fulfill()
 
             callback(nil, nil)
@@ -149,7 +149,7 @@ final class FileDownloadManagerTests: XCTestCase {
             dispatchPrecondition(condition: .onQueue(.main))
             XCTAssertEqual(suggestedFilename, "suggested.filename")
             XCTAssertEqual(directoryURL, downloadsURL)
-            XCTAssertEqual(fileTypes, [.html])
+            XCTAssertEqual(fileTypes, [UTType(fileExtension: "filename")!, .html])
             e1.fulfill()
 
             callback(localURL, .html)
