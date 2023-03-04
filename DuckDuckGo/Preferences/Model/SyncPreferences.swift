@@ -49,7 +49,7 @@ struct SyncDevice: Identifiable {
 }
 
 final class SyncPreferences: ObservableObject {
-    enum FlowState {
+    enum FlowStep {
         case enableSync, recoverAccount, syncAnotherDevice, syncNewDevice, deviceSynced, saveRecoveryPDF
     }
 
@@ -57,9 +57,9 @@ final class SyncPreferences: ObservableObject {
         account != nil
     }
 
-    @Published var flowState: FlowState? {
+    @Published private(set) var flowStep: FlowStep? {
         didSet {
-            if flowState == nil && oldValue != nil {
+            if flowStep == nil && oldValue != nil {
                 onEndFlow()
             }
         }
@@ -70,7 +70,6 @@ final class SyncPreferences: ObservableObject {
 
     @Published var shouldShowErrorMessage: Bool = false
     @Published var errorMessage: String?
-
 
     init(syncService: SyncService = .shared) {
         self.syncService = syncService
@@ -99,13 +98,11 @@ final class SyncPreferences: ObservableObject {
     }
 
     func presentEnableSyncDialog() {
-        flowState = .enableSync
-        presentDialog()
+        presentDialog(for: .enableSync)
     }
 
     func presentRecoverSyncAccountDialog() {
-        flowState = .recoverAccount
-        presentDialog()
+        presentDialog(for: .recoverAccount)
     }
 
     func turnOnSync() {
@@ -114,7 +111,7 @@ final class SyncPreferences: ObservableObject {
 //                let hostname = SCDynamicStoreCopyComputerName(nil, nil) as? String ?? ProcessInfo.processInfo.hostName
                 let hostname = ProcessInfo.processInfo.hostName
                 try await syncService.sync.createAccount(deviceName: hostname)
-                flowState = .syncAnotherDevice
+                flowStep = .syncAnotherDevice
             } catch {
                 errorMessage = String(describing: error)
                 shouldShowErrorMessage = true
@@ -148,12 +145,13 @@ final class SyncPreferences: ObservableObject {
     }
 
     func endFlow() {
-        flowState = nil
+        flowStep = nil
     }
 
     // MARK: -
 
-    private func presentDialog() {
+    private func presentDialog(for flowStep: FlowStep) {
+        self.flowStep = flowStep
         let syncViewController = SyncSetupViewController(self)
         let syncWindowController = syncViewController.wrappedInWindowController()
 

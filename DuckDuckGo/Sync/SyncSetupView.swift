@@ -29,7 +29,7 @@ struct SyncSetupView: View {
     }
 
     @ViewBuilder var content: some View {
-        switch model.flowState {
+        switch model.flowStep {
         case .enableSync:
             EnableSyncView().environmentObject(model)
         case .syncAnotherDevice:
