@@ -6,7 +6,7 @@
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
         "branch" : "dominik/ddg-sync",
-        "revision" : "68c9aa3876bb194ca572e7b6a3d452ca2e6f5b3e"
+        "revision" : "792d2890ff4c06bba889564b95ae3c119c6e8903"
       }
     },
     {
@@ -97,6 +97,15 @@
       "state" : {
         "revision" : "6b2aa2748a7881eebb9f84fb10c01293e15b52ca",
         "version" : "0.5.0"
+      }
+    },
+    {
+      "identity" : "sync_crypto",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/duckduckgo/sync_crypto",
+      "state" : {
+        "branch" : "dominik/spm",
+        "revision" : "1555212cfd7822d536c277cd89cba4244fc75b85"
       }
     },
     {
