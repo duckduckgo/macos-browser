@@ -37,3 +37,5 @@ SWIFT_ACTIVE_COMPILATION_CONDITIONS[config=Review][arch=*][sdk=*] = REVIEW $(FEA
 
 SWIFT_VERSION = 5.0
 
+// Slow compilation hunt:
+//OTHER_SWIFT_FLAGS = $(inherited) -Xfrontend -warn-long-expression-type-checking=100 -Xfrontend -warn-long-function-bodies=100

@@ -109,8 +109,9 @@ final class DownloadsViewController: NSViewController {
     static private let maxNumberOfRows: CGFloat = 7.3
     private func updateHeight() {
         tableViewHeightConstraint?.constant = min(Self.maxNumberOfRows, CGFloat(tableView.numberOfRows)) * tableView.rowHeight
-            + (tableView.enclosingScrollView?.contentInsets.top ?? 0)
-            + (tableView.enclosingScrollView?.contentInsets.bottom ?? 0)
+        if let contentInsets = tableView.enclosingScrollView?.contentInsets {
+            tableViewHeightConstraint?.constant += contentInsets.top + contentInsets.bottom
+        }
     }
 
     // MARK: User Actions

@@ -161,7 +161,7 @@ extension WindowControllersManager {
             // If there is any open window on the current screen, open the URL in it
             ?? mainWindowControllers.first(where: { $0.window?.screen == NSScreen.main && $0.window?.isPopUpWindow == false })
             // If there is any window available, open the URL in it
-            ?? { mainWindowControllers.first?.window?.isPopUpWindow == false ? mainWindowControllers.first : nil }() {
+            ?? mainWindowControllers.first(where: { $0.window?.isPopUpWindow == false }) {
 
             show(url: url, in: windowController)
             return
