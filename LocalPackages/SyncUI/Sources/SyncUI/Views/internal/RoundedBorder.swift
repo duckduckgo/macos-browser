@@ -18,7 +18,21 @@
 
 import SwiftUI
 
-struct Outline<Content>: View where Content: View {
+public extension View {
+    func roundedBorder() -> some View {
+        modifier(RoundedBorderView())
+    }
+}
+
+struct RoundedBorderView: ViewModifier {
+    func body(content: Content) -> some View {
+        RoundedBorder {
+            content
+        }
+    }
+}
+
+struct RoundedBorder<Content>: View where Content: View {
     @ViewBuilder let content: () -> Content
 
     var body: some View {

@@ -29,9 +29,11 @@ struct DefaultActionButtonStyle: ButtonStyle {
         let labelColor = enabled ? Color.white : Color.primary.opacity(0.3)
 
         configuration.label
+            .lineLimit(1)
             .font(.custom("SFProText-Regular", size: 13))
-            .padding(.vertical, 3.5)
-            .padding(.horizontal, 12)
+            .padding(.top, 2.5)
+            .padding(.bottom, 3)
+            .padding(.horizontal, 7.5)
             .background(enabled ? enabledBackgroundColor : disabledBackgroundColor)
             .foregroundColor(labelColor)
             .cornerRadius(5)

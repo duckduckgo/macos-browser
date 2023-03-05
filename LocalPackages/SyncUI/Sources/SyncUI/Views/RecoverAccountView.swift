@@ -101,30 +101,28 @@ struct EnterCodeView<ViewModel>: View where ViewModel: RecoverAccountViewModel {
     @EnvironmentObject var recoveryCodeModel: RecoveryCodeViewModel
 
     var body: some View {
-        Outline {
-            VStack(spacing: 20) {
-                Text(UserText.syncNewDeviceEnterCodeInstructions)
-                    .multilineTextAlignment(.center)
+        VStack(spacing: 20) {
+            Text(UserText.syncNewDeviceEnterCodeInstructions)
+                .multilineTextAlignment(.center)
 
-                Outline {
-                    SyncKeyView(text: recoveryCodeModel.recoveryCode)
-                        .padding(.horizontal, 20)
-                        .padding(.vertical, 10)
-                }
+            SyncKeyView(text: recoveryCodeModel.recoveryCode)
+                .padding(.horizontal, 20)
+                .padding(.vertical, 10)
+                .roundedBorder()
                 .frame(maxWidth: 244)
 
-                Button {
-                    recoveryCodeModel.recoveryCode = NSPasteboard.general.string(forType: .string) ?? ""
-                } label: {
-                    HStack {
-                        Image("Paste")
-                        Text(UserText.pasteFromClipboard)
-                    }
+            Button {
+                recoveryCodeModel.recoveryCode = NSPasteboard.general.string(forType: .string) ?? ""
+            } label: {
+                HStack {
+                    Image("Paste")
+                    Text(UserText.pasteFromClipboard)
                 }
-                .buttonStyle(CopyPasteButtonStyle(verticalPadding: 8.0))
             }
-            .padding(20)
+            .buttonStyle(CopyPasteButtonStyle(verticalPadding: 8.0))
         }
+        .padding(20)
+        .roundedBorder()
     }
 }
 

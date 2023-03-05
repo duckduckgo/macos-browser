@@ -125,27 +125,26 @@ extension Preferences {
         @EnvironmentObject var model: SyncPreferences
 
         var body: some View {
-            Outline {
-                HStack(alignment: .top, spacing: 20) {
-                    QRCode(string: model.account?.recoveryCode ?? "", size: .init(width: 192, height: 192))
+            HStack(alignment: .top, spacing: 20) {
+                QRCode(string: model.account?.recoveryCode ?? "", size: .init(width: 192, height: 192))
 
-                    VStack {
-                        Text(UserText.syncNewDeviceInstructions)
-                            .fixMultilineScrollableText()
+                VStack {
+                    Text(UserText.syncNewDeviceInstructions)
+                        .fixMultilineScrollableText()
 
+                    Spacer()
+
+                    HStack {
                         Spacer()
-
-                        HStack {
-                            Spacer()
-                            TextButton(UserText.showOrEnterCode) {
-                                print("show or enter code")
-                            }
+                        TextButton(UserText.showOrEnterCode) {
+                            print("show or enter code")
                         }
                     }
-                    .frame(maxHeight: .infinity)
                 }
-                .padding(20)
+                .frame(maxHeight: .infinity)
             }
+            .padding(20)
+            .roundedBorder()
         }
     }
 
@@ -161,7 +160,7 @@ struct Outline<Content>: View where Content: View {
             RoundedRectangle(cornerRadius: 8)
                 .fill(Color("BlackWhite1"))
 
-            content()
+            roundedBorder()
         }
     }
 }
@@ -199,17 +198,16 @@ private struct SyncStatusView: View {
     @EnvironmentObject var model: SyncPreferences
 
     var body: some View {
-        Outline {
-            SyncPreferencesRow {
-                Image("SolidCheckmark")
-            } centerContent: {
-                Text(UserText.syncConnected)
-            } rightContent: {
-                Button(UserText.turnOffSync) {
-                    model.turnOffSync()
-                }
+        SyncPreferencesRow {
+            Image("SolidCheckmark")
+        } centerContent: {
+            Text(UserText.syncConnected)
+        } rightContent: {
+            Button(UserText.turnOffSync) {
+                model.turnOffSync()
             }
         }
+        .roundedBorder()
     }
 }
 
@@ -217,41 +215,40 @@ private struct SyncedDevicesView: View {
     @EnvironmentObject var model: SyncPreferences
 
     var body: some View {
-        Outline {
-            VStack(spacing: 0) {
-                ForEach(model.devices) { device in
-                    if !device.isCurrent {
-                        Rectangle()
-                            .fill(Color("BlackWhite10"))
-                            .frame(height: 1)
-                            .padding(.init(top: 0, leading: 10, bottom: 0, trailing: 10))
-                    }
+        VStack(spacing: 0) {
+            ForEach(model.devices) { device in
+                if !device.isCurrent {
+                    Rectangle()
+                        .fill(Color("BlackWhite10"))
+                        .frame(height: 1)
+                        .padding(.init(top: 0, leading: 10, bottom: 0, trailing: 10))
+                }
 
-                    if device.isCurrent {
-                        SyncPreferencesRow {
-                            SyncedDeviceIcon(kind: device.kind)
-                        } centerContent: {
-                            HStack {
-                                Text(device.name)
-                                Text("(\(UserText.thisDevice))")
-                                    .foregroundColor(Color(NSColor.secondaryLabelColor))
-                                Spacer()
-                            }
-                        } rightContent: {
-                            Button(UserText.currentDeviceDetails) {
-                                print("details")
-                            }
-                        }
-                    } else {
-                        SyncPreferencesRow {
-                            SyncedDeviceIcon(kind: device.kind)
-                        } centerContent: {
+                if device.isCurrent {
+                    SyncPreferencesRow {
+                        SyncedDeviceIcon(kind: device.kind)
+                    } centerContent: {
+                        HStack {
                             Text(device.name)
+                            Text("(\(UserText.thisDevice))")
+                                .foregroundColor(Color(NSColor.secondaryLabelColor))
+                            Spacer()
                         }
+                    } rightContent: {
+                        Button(UserText.currentDeviceDetails) {
+                            print("details")
+                        }
+                    }
+                } else {
+                    SyncPreferencesRow {
+                        SyncedDeviceIcon(kind: device.kind)
+                    } centerContent: {
+                        Text(device.name)
                     }
                 }
             }
         }
+        .roundedBorder()
     }
 }
 
