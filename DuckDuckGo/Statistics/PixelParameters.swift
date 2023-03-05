@@ -97,7 +97,8 @@ extension Pixel.Event {
              .emailUserCreatedAlias,
              .emailUserPressedUseAlias,
              .emailUserPressedUseAddress,
-             .jsPixel:
+             .jsPixel,
+             .duckPlayerJSPixel:
 
             return nil
         }

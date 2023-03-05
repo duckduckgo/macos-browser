@@ -28,6 +28,13 @@ export class Communications {
     async readUserValues() {
         return this.messaging.request('readUserValues', {})
     }
+
+    /**
+     * @param {string} pixelName
+     */
+    sendPixel(pixelName) {
+        this.messaging.notify('sendDuckPlayerPixel', { pixelName })
+    }
     openInDuckPlayerViaMessage(href) {
         return this.messaging.notify('openDuckPlayer', {href})
     }

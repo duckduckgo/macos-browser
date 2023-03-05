@@ -575,6 +575,7 @@
     }
     appendOverlayToPage(targetElement, params) {
       this.sideEffect(`appending ${DDGVideoOverlay.CUSTOM_TAG_NAME} to the page`, () => {
+        this.comms.sendPixel("duck_player.mac.overlay");
         const overlayElement = new DDGVideoOverlay(this.environment, params, this);
         targetElement.appendChild(overlayElement);
         return () => {
@@ -792,14 +793,15 @@
     }
   };
   function captureGlobals() {
+    var _a, _b, _c, _d, _e, _f;
     return {
       window,
-      encrypt: window.crypto.subtle.encrypt.bind(window.crypto.subtle),
-      decrypt: window.crypto.subtle.decrypt.bind(window.crypto.subtle),
-      generateKey: window.crypto.subtle.generateKey.bind(window.crypto.subtle),
-      exportKey: window.crypto.subtle.exportKey.bind(window.crypto.subtle),
-      importKey: window.crypto.subtle.importKey.bind(window.crypto.subtle),
-      getRandomValues: window.crypto.getRandomValues.bind(window.crypto),
+      encrypt: (_a = window.crypto.subtle) == null ? void 0 : _a.encrypt.bind(window.crypto.subtle),
+      decrypt: (_b = window.crypto.subtle) == null ? void 0 : _b.decrypt.bind(window.crypto.subtle),
+      generateKey: (_c = window.crypto.subtle) == null ? void 0 : _c.generateKey.bind(window.crypto.subtle),
+      exportKey: (_d = window.crypto.subtle) == null ? void 0 : _d.exportKey.bind(window.crypto.subtle),
+      importKey: (_e = window.crypto.subtle) == null ? void 0 : _e.importKey.bind(window.crypto.subtle),
+      getRandomValues: (_f = window.crypto.getRandomValues) == null ? void 0 : _f.bind(window.crypto),
       TextEncoder,
       TextDecoder,
       Uint8Array,
@@ -855,6 +857,9 @@
     }
     async readUserValues() {
       return this.messaging.request("readUserValues", {});
+    }
+    sendPixel(pixelName) {
+      this.messaging.notify("sendDuckPlayerPixel", { pixelName });
     }
     openInDuckPlayerViaMessage(href) {
       return this.messaging.notify("openDuckPlayer", { href });

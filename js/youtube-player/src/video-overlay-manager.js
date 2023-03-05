@@ -169,6 +169,7 @@ export class VideoOverlayManager {
      */
     appendOverlayToPage(targetElement, params) {
         this.sideEffect(`appending ${DDGVideoOverlay.CUSTOM_TAG_NAME} to the page`, () => {
+            this.comms.sendPixel('duck_player.mac.overlay')
             const overlayElement = new DDGVideoOverlay(this.environment, params, this)
             targetElement.appendChild(overlayElement)
 

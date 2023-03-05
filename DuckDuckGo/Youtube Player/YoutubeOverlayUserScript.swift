@@ -32,6 +32,7 @@ final class YoutubeOverlayUserScript: NSObject, UserScript, UserScriptMessageEnc
         case setUserValues
         case readUserValues
         case openDuckPlayer
+        case sendDuckPlayerPixel
     }
 
     // This conforms to https://duckduckgo.github.io/content-scope-utils/classes/Webkit_Messaging.WebkitMessagingConfig.html
@@ -132,6 +133,8 @@ final class YoutubeOverlayUserScript: NSObject, UserScript, UserScriptMessageEnc
             return handleReadUserValues
         case .openDuckPlayer:
             return handleOpenDuckPlayer
+        case .sendDuckPlayerPixel:
+            return handleSendJSPixel
         }
     }
 
@@ -210,5 +213,46 @@ extension YoutubeOverlayUserScript: WKScriptMessageHandler {
         }
 
         processEncryptedMessage(message, from: userContentController)
+    }
+}
+
+extension YoutubeOverlayUserScript {
+    public struct JSPixel: Equatable {
+        private enum DuckPlayerPixelName: String {
+            case duckPlayerOverlayShown = "duckplayer_overlay_shown"
+        }
+
+        /// The pixel name sent by the JS layer. This name does not include the platform on which it was sent.
+        private let originalPixelName: String
+        public let pixelParameters: [String: String]?
+
+        init(pixelName: String, pixelParameters: [String: String]?) {
+            self.originalPixelName = pixelName
+            self.pixelParameters = pixelParameters
+        }
+
+        public var pixelName: String {
+            switch originalPixelName {
+            case DuckPlayerPixelName.duckPlayerOverlayShown.rawValue:
+                return "duckplayer_overlay_shown"
+            default:
+                return originalPixelName
+            }
+        }
+    }
+
+    func handleSendJSPixel(_ message: UserScriptMessage, replyHandler: @escaping MessageReplyHandler) {
+        defer {
+            replyHandler(nil)
+        }
+
+        guard let body = message.messageBody as? [String: Any],
+              let pixelName = body["pixelName"] as? String else {
+            return
+        }
+
+        let pixelParameters = body["params"] as? [String: String]
+
+        Pixel.fire(.duckPlayerJSPixel(YoutubeOverlayUserScript.JSPixel(pixelName: pixelName, pixelParameters: pixelParameters)))
     }
 }
