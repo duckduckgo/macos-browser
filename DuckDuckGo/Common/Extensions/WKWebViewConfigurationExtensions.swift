@@ -22,8 +22,11 @@ import BrowserServicesKit
 
 extension WKWebViewConfiguration {
 
-    func applyStandardConfiguration(contentBlocking: some ContentBlockingProtocol) {
+    func applyStandardConfiguration(contentBlocking: some ContentBlockingProtocol, isDisposable: Bool) {
 
+        if isDisposable {
+            websiteDataStore = .nonPersistent()
+        }
         allowsAirPlayForMediaPlayback = true
         if #available(macOS 12.3, *) {
             preferences.isElementFullscreenEnabled = true
