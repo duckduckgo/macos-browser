@@ -17,19 +17,37 @@
 //
 
 import SwiftUI
-import SyncUI
 
-struct RecoverAccountView: View {
-    @EnvironmentObject var model: SyncPreferences
-    @ObservedObject var recoveryCodeModel = RecoveryCodeViewModel()
+public protocol RecoverAccountViewModel: ObservableObject {
+    associatedtype RecoverAccountViewUserText: SyncUI.RecoverAccountViewUserText
 
-    var body: some View {
+    func endFlow()
+    func recoverDevice(using recoveryCode: String)
+}
+
+public protocol RecoverAccountViewUserText {
+    static var recoverSyncedDataTitle: String { get }
+    static var cancel: String { get }
+    static var submit: String { get }
+    static var syncNewDeviceEnterCodeInstructions: String { get }
+    static var pasteFromClipboard: String { get }
+}
+
+public struct RecoverAccountView<ViewModel>: View where ViewModel: RecoverAccountViewModel {
+    typealias UserText = ViewModel.RecoverAccountViewUserText
+
+    @EnvironmentObject public var model: ViewModel
+    @EnvironmentObject public var recoveryCodeModel: RecoveryCodeViewModel
+//    @ObservedObject public var recoveryCodeModel = RecoveryCodeViewModel()
+
+    public init() {}
+
+    public var body: some View {
         SyncWizardStep(spacing: 20.0) {
             Text(UserText.recoverSyncedDataTitle)
                 .font(.system(size: 17, weight: .bold))
 
-            EnterCodeView()
-                .environmentObject(model)
+            EnterCodeView<ViewModel>()
                 .environmentObject(recoveryCodeModel)
 
         } buttons: {
@@ -77,8 +95,9 @@ private struct CopyPasteButtonStyle: ButtonStyle {
     }
 }
 
-struct EnterCodeView: View {
-    @EnvironmentObject var model: SyncPreferences
+struct EnterCodeView<ViewModel>: View where ViewModel: RecoverAccountViewModel {
+    typealias UserText = ViewModel.RecoverAccountViewUserText
+
     @EnvironmentObject var recoveryCodeModel: RecoveryCodeViewModel
 
     var body: some View {
@@ -148,5 +167,13 @@ struct SyncKeyView: View {
 extension Array: Identifiable where Element == Character {
     public var id: String {
         UUID().uuidString
+    }
+}
+
+extension Array {
+    func chunked(into size: Int) -> [[Element]] {
+        return stride(from: 0, to: count, by: size).map {
+            Array(self[$0 ..< Swift.min($0 + size, count)])
+        }
     }
 }

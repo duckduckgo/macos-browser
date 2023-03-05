@@ -19,14 +19,23 @@
 import SwiftUI
 import SyncUI
 
-extension UserText: EnableSyncViewModelUserText {}
+extension UserText: EnableSyncViewUserText {}
+extension UserText: SyncAnotherDeviceViewUserText {}
+extension UserText: RecoverAccountViewUserText {}
 
 extension SyncPreferences: EnableSyncViewModel {
-    typealias SyncUserText = UserText
+    typealias EnableSyncViewUserText = UserText
+}
+extension SyncPreferences: SyncAnotherDeviceViewModel {
+    typealias SyncAnotherDeviceViewUserText = UserText
+}
+extension SyncPreferences: RecoverAccountViewModel {
+    typealias RecoverAccountViewUserText = UserText
 }
 
 struct SyncSetupView: View {
     @ObservedObject var model: SyncPreferences
+    @ObservedObject var recoveryCodeModel = RecoveryCodeViewModel()
 
     var body: some View {
         content
@@ -40,9 +49,9 @@ struct SyncSetupView: View {
         case .enableSync:
             EnableSyncView<SyncPreferences>().environmentObject(model)
         case .syncAnotherDevice:
-            SyncAnotherDeviceView().environmentObject(model)
+            SyncAnotherDeviceView<SyncPreferences>().environmentObject(model)
         case .recoverAccount:
-            RecoverAccountView().environmentObject(model)
+            RecoverAccountView<SyncPreferences>().environmentObject(model).environmentObject(recoveryCodeModel)
 //        case .syncNewDevice:
 //            SyncNewDeviceView().environmentObject(model)
 //        case .deviceSynced:

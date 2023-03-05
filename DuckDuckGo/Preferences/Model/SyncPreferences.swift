@@ -105,6 +105,10 @@ final class SyncPreferences: ObservableObject {
         presentDialog(for: .recoverAccount)
     }
 
+    func presentSyncAnotherDeviceDialog() {
+        presentDialog(for: .syncAnotherDevice)
+    }
+
     func turnOnSync() {
         Task { @MainActor in
             do {
@@ -151,7 +155,13 @@ final class SyncPreferences: ObservableObject {
     // MARK: -
 
     private func presentDialog(for flowStep: FlowStep) {
+        let shouldBeginSheet = self.flowStep == nil
         self.flowStep = flowStep
+
+        guard shouldBeginSheet else {
+            return
+        }
+
         let syncViewController = SyncSetupViewController(self)
         let syncWindowController = syncViewController.wrappedInWindowController()
 

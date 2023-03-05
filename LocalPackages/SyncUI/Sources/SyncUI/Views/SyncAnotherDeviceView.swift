@@ -1,5 +1,5 @@
 //
-//  EnableSyncView.swift
+//  SyncAnotherDeviceView.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -18,22 +18,23 @@
 
 import SwiftUI
 
-public protocol EnableSyncViewModel: ObservableObject {
-    associatedtype SyncUserText: EnableSyncViewModelUserText
+public protocol SyncAnotherDeviceViewModel: ObservableObject {
+    associatedtype SyncAnotherDeviceViewUserText: SyncUI.SyncAnotherDeviceViewUserText
 
     func endFlow()
     func turnOnSync()
 }
 
-public protocol EnableSyncViewModelUserText {
-    static var turnOnSyncQuestion: String { get }
-    static var turnOnSyncExplanation1: String { get }
-    static var turnOnSyncExplanation2: String { get }
-    static var cancel: String { get }
-    static var turnOnSync: String { get }
+public protocol SyncAnotherDeviceViewUserText {
+    static var syncAnotherDeviceTitle: String { get }
+    static var syncAnotherDeviceExplanation1: String { get }
+    static var syncAnotherDeviceExplanation2: String { get }
+    static var notNow: String { get }
+    static var syncAnotherDevice: String { get }
 }
 
-public struct EnableSyncView<ViewModel>: View where ViewModel: EnableSyncViewModel {
+public struct SyncAnotherDeviceView<ViewModel>: View where ViewModel: SyncAnotherDeviceViewModel {
+    typealias UserText = ViewModel.SyncAnotherDeviceViewUserText
 
     @EnvironmentObject public var model: ViewModel
 
@@ -42,20 +43,21 @@ public struct EnableSyncView<ViewModel>: View where ViewModel: EnableSyncViewMod
     public var body: some View {
         SyncWizardStep {
             VStack(spacing: 20) {
-                Image("SyncTurnOnDialog")
-                Text(ViewModel.SyncUserText.turnOnSyncQuestion)
+                Image("SyncAnotherDeviceDialog")
+                Text(UserText.syncAnotherDeviceTitle)
                     .font(.system(size: 17, weight: .bold))
-                Text(ViewModel.SyncUserText.turnOnSyncExplanation1)
+                Text(UserText.syncAnotherDeviceExplanation1)
                     .multilineTextAlignment(.center)
-                Text(ViewModel.SyncUserText.turnOnSyncExplanation2)
+                Text(UserText.syncAnotherDeviceExplanation2)
                     .multilineTextAlignment(.center)
             }
         } buttons: {
-            Button(ViewModel.SyncUserText.cancel) {
+            Button(UserText.notNow) {
                 model.endFlow()
             }
-            Button(ViewModel.SyncUserText.turnOnSync) {
-                model.turnOnSync()
+            Button(UserText.syncAnotherDevice) {
+                model.endFlow()
+//                model.presentSyncAnotherDeviceDialog()
             }
             .buttonStyle(DefaultActionButtonStyle(enabled: true))
         }

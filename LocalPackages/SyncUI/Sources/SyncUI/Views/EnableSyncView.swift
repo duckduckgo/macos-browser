@@ -1,5 +1,5 @@
 //
-//  SyncAnotherDeviceView.swift
+//  EnableSyncView.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -17,29 +17,46 @@
 //
 
 import SwiftUI
-import SyncUI
 
-struct SyncAnotherDeviceView: View {
-    @EnvironmentObject var model: SyncPreferences
+public protocol EnableSyncViewModel: ObservableObject {
+    associatedtype EnableSyncViewUserText: SyncUI.EnableSyncViewUserText
 
-    var body: some View {
+    func endFlow()
+    func turnOnSync()
+}
+
+public protocol EnableSyncViewUserText {
+    static var turnOnSyncQuestion: String { get }
+    static var turnOnSyncExplanation1: String { get }
+    static var turnOnSyncExplanation2: String { get }
+    static var cancel: String { get }
+    static var turnOnSync: String { get }
+}
+
+public struct EnableSyncView<ViewModel>: View where ViewModel: EnableSyncViewModel {
+    typealias UserText = ViewModel.EnableSyncViewUserText
+
+    @EnvironmentObject public var model: ViewModel
+
+    public init() {}
+
+    public var body: some View {
         SyncWizardStep {
             VStack(spacing: 20) {
-                Image("SyncAnotherDeviceDialog")
-                Text(UserText.syncAnotherDeviceTitle)
+                Image("SyncTurnOnDialog")
+                Text(UserText.turnOnSyncQuestion)
                     .font(.system(size: 17, weight: .bold))
-                Text(UserText.syncAnotherDeviceExplanation1)
+                Text(UserText.turnOnSyncExplanation1)
                     .multilineTextAlignment(.center)
-                Text(UserText.syncAnotherDeviceExplanation2)
+                Text(UserText.turnOnSyncExplanation2)
                     .multilineTextAlignment(.center)
             }
         } buttons: {
-            Button(UserText.notNow) {
+            Button(UserText.cancel) {
                 model.endFlow()
             }
-            Button(UserText.syncAnotherDevice) {
-                model.endFlow()
-//                model.flowState = .syncNewDevice
+            Button(UserText.turnOnSync) {
+                model.turnOnSync()
             }
             .buttonStyle(DefaultActionButtonStyle(enabled: true))
         }
