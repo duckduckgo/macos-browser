@@ -19,7 +19,7 @@
 import SwiftUI
 import AppKit
 
-extension View {
+public extension View {
     /**
      * Displays `cursor` when the view is hovered.
      *

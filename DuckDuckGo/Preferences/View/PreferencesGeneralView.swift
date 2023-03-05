@@ -19,6 +19,7 @@
 import SwiftUI
 import AppKit
 import Combine
+import SwiftUIExtensions
 
 extension Preferences {
 
@@ -31,7 +32,7 @@ extension Preferences {
                 Text(UserText.general)
                     .font(Const.Fonts.preferencePaneTitle)
 
-                Section {
+                PreferencePaneSection {
                     Text(UserText.defaultBrowser)
                         .font(Const.Fonts.preferencePaneSectionHeader)
 
@@ -49,7 +50,7 @@ extension Preferences {
                     }
                 }
 
-                Section {
+                PreferencePaneSection {
                     Text(UserText.onStartup)
                         .font(Const.Fonts.preferencePaneSectionHeader)
                     Toggle(UserText.reopenAllWindowsFromLastSession, isOn: $startupModel.restorePreviousSession)

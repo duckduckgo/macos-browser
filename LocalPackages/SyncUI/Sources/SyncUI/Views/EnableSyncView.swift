@@ -17,6 +17,7 @@
 //
 
 import SwiftUI
+import SwiftUIExtensions
 
 public protocol EnableSyncViewModel: ObservableObject {
     associatedtype EnableSyncViewUserText: SyncUI.EnableSyncViewUserText

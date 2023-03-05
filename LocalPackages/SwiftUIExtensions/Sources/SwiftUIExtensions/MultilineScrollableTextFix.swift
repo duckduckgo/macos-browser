@@ -18,7 +18,7 @@
 
 import SwiftUI
 
-extension View {
+public extension View {
     /**
      * Ensures that multiline text is properly broken into lines
      * when put in scroll views.

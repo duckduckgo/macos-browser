@@ -17,6 +17,7 @@
 //
 
 import SwiftUI
+import SwiftUIExtensions
 
 extension Preferences {
 
@@ -28,7 +29,7 @@ extension Preferences {
                 Text(UserText.privacy)
                     .font(Const.Fonts.preferencePaneTitle)
 
-                Section {
+                PreferencePaneSection {
                     Text(UserText.fireproofSites)
                         .font(Const.Fonts.preferencePaneSectionHeader)
 
@@ -41,7 +42,7 @@ extension Preferences {
                     }
                 }
 
-                Section {
+                PreferencePaneSection {
                     Text(UserText.autoconsentSettingsTitle)
                         .font(Const.Fonts.preferencePaneSectionHeader)
 
@@ -52,7 +53,7 @@ extension Preferences {
                         .fixMultilineScrollableText()
                 }
 
-                Section {
+                PreferencePaneSection {
                     Text(UserText.gpcSettingsTitle)
                         .font(Const.Fonts.preferencePaneSectionHeader)
 

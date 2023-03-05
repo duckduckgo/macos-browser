@@ -17,6 +17,7 @@
 //
 
 import SwiftUI
+import SwiftUIExtensions
 
 public protocol SyncAnotherDeviceViewModel: ObservableObject {
     associatedtype SyncAnotherDeviceViewUserText: SyncUI.SyncAnotherDeviceViewUserText

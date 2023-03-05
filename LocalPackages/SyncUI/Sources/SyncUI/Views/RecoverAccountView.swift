@@ -17,6 +17,7 @@
 //
 
 import SwiftUI
+import SwiftUIExtensions
 
 public protocol RecoverAccountViewModel: ObservableObject {
     associatedtype RecoverAccountViewUserText: SyncUI.RecoverAccountViewUserText

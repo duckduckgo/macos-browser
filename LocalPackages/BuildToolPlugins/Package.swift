@@ -22,7 +22,7 @@ import PackageDescription
 
 let package = Package(
     name: "BuildToolPlugins",
-    platforms: [ .macOS(.v12)],
+    platforms: [ .macOS(.v12) ],
     products: [
       .plugin(
         name: "InputFilesChecker",

@@ -1,5 +1,5 @@
 //
-//  PreferencesSection.swift
+//  PreferencePaneSection.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -18,17 +18,17 @@
 
 import SwiftUI
 
-struct PreferencesSection<Content>: View where Content: View {
+public struct PreferencePaneSection<Content>: View where Content: View {
 
-    let spacing: CGFloat
-    @ViewBuilder let content: () -> Content
+    public let spacing: CGFloat
+    @ViewBuilder public let content: () -> Content
 
-    init(spacing: CGFloat = 12, @ViewBuilder content: @escaping () -> Content) {
+    public init(spacing: CGFloat = 12, @ViewBuilder content: @escaping () -> Content) {
         self.spacing = spacing
         self.content = content
     }
 
-    var body: some View {
+    public var body: some View {
         VStack(alignment: .leading, spacing: spacing, content: content)
             .padding(.vertical, 20)
     }

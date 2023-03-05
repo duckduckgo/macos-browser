@@ -18,17 +18,17 @@
 
 import SwiftUI
 
-struct TextButton: View {
+public struct TextButton: View {
 
-    let title: String
-    let action: () -> Void
+    public let title: String
+    public let action: () -> Void
 
-    init(_ title: String, action: @escaping () -> Void) {
+    public init(_ title: String, action: @escaping () -> Void) {
         self.title = title
         self.action = action
     }
 
-    var body: some View {
+    public var body: some View {
         Button(action: action) {
             Text(title)
                 .foregroundColor(Color("LinkBlueColor"))

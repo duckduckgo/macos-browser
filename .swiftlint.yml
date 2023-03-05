@@ -65,3 +65,4 @@ excluded:
   - Integration Tests
   - UI Tests
   - vendor
+  - LocalPackages/*/Package.swift

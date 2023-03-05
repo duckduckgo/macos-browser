@@ -17,6 +17,7 @@
 //
 
 import SwiftUI
+import SwiftUIExtensions
 
 enum Const {
     enum Fonts {
@@ -114,7 +115,7 @@ struct SyncSetupView<ViewModel>: View where ViewModel: SyncManagementViewModel {
     @EnvironmentObject var model: ViewModel
 
     var body: some View {
-        PreferencesSection {
+        PreferencePaneSection {
             HStack(alignment: .top, spacing: 12) {
                 Text(UserText.syncSetupExplanation)
                     .fixMultilineScrollableText()
@@ -125,7 +126,7 @@ struct SyncSetupView<ViewModel>: View where ViewModel: SyncManagementViewModel {
             }
         }
 
-        PreferencesSection {
+        PreferencePaneSection {
             HStack {
                 Spacer()
                 Image("SyncSetup")
@@ -133,7 +134,7 @@ struct SyncSetupView<ViewModel>: View where ViewModel: SyncManagementViewModel {
             }
         }
 
-        PreferencesSection {
+        PreferencePaneSection {
             TextButton(UserText.recoverSyncedData) {
                 model.presentRecoverSyncAccountDialog()
             }
@@ -146,12 +147,12 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: SyncManagementViewModel
     @EnvironmentObject var model: ViewModel
 
     var body: some View {
-        PreferencesSection {
+        PreferencePaneSection {
             SyncStatusView<ViewModel>()
                 .environmentObject(model)
         }
 
-        PreferencesSection {
+        PreferencePaneSection {
             Text(UserText.syncedDevices)
                 .font(Const.Fonts.preferencePaneSectionHeader)
 
@@ -159,7 +160,7 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: SyncManagementViewModel
                 .environmentObject(model)
         }
 
-        PreferencesSection {
+        PreferencePaneSection {
             Text(UserText.syncNewDevice)
                 .font(Const.Fonts.preferencePaneSectionHeader)
 
@@ -167,7 +168,7 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: SyncManagementViewModel
                 .environmentObject(model)
         }
 
-        PreferencesSection {
+        PreferencePaneSection {
             Text(UserText.recovery)
                 .font(Const.Fonts.preferencePaneSectionHeader)
 
@@ -181,7 +182,7 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: SyncManagementViewModel
             }
         }
 
-        PreferencesSection {
+        PreferencePaneSection {
             Button(UserText.turnOffAndDeleteServerData) {
                 print("turn off and delete server data")
             }
