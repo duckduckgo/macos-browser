@@ -18,25 +18,43 @@
 
 import SwiftUI
 
-struct EnableSyncView: View {
-    @EnvironmentObject var model: SyncPreferences
+public protocol EnableSyncViewModel: ObservableObject {
+    associatedtype SyncUserText: EnableSyncViewModelUserText
 
-    var body: some View {
+    func endFlow()
+    func turnOnSync()
+}
+
+public protocol EnableSyncViewModelUserText {
+    static var turnOnSyncQuestion: String { get }
+    static var turnOnSyncExplanation1: String { get }
+    static var turnOnSyncExplanation2: String { get }
+    static var cancel: String { get }
+    static var turnOnSync: String { get }
+}
+
+public struct EnableSyncView<ViewModel>: View where ViewModel: EnableSyncViewModel {
+
+    @EnvironmentObject public var model: ViewModel
+
+    public init() {}
+
+    public var body: some View {
         SyncWizardStep {
             VStack(spacing: 20) {
                 Image("SyncTurnOnDialog")
-                Text(UserText.turnOnSyncQuestion)
+                Text(ViewModel.SyncUserText.turnOnSyncQuestion)
                     .font(.system(size: 17, weight: .bold))
-                Text(UserText.turnOnSyncExplanation1)
+                Text(ViewModel.SyncUserText.turnOnSyncExplanation1)
                     .multilineTextAlignment(.center)
-                Text(UserText.turnOnSyncExplanation2)
+                Text(ViewModel.SyncUserText.turnOnSyncExplanation2)
                     .multilineTextAlignment(.center)
             }
         } buttons: {
-            Button(UserText.cancel) {
+            Button(ViewModel.SyncUserText.cancel) {
                 model.endFlow()
             }
-            Button(UserText.turnOnSync) {
+            Button(ViewModel.SyncUserText.turnOnSync) {
                 model.turnOnSync()
             }
             .buttonStyle(DefaultActionButtonStyle(enabled: true))

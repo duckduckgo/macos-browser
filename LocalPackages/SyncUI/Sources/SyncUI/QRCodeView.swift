@@ -19,15 +19,18 @@
 import SwiftUI
 import CoreImage
 
-struct QRCode: View {
+public struct QRCode: View {
     @Environment(\.colorScheme) var colorScheme
 
-    let context = CIContext()
+    public let string: String
+    public let size: CGSize
 
-    let string: String
-    let size: CGSize
+    public init(string: String, size: CGSize) {
+        self.string = string
+        self.size = size
+    }
 
-    var body: some View {
+    public var body: some View {
         Image(nsImage: generateQRCode(from: string, size: size))
             .frame(width: size.width, height: size.height)
     }
@@ -64,7 +67,7 @@ struct QRCode: View {
         ]
         let coloredImage = outputImage.applyingFilter("CIFalseColor", parameters: colorParameters)
 
-        if let image = context.createCGImage(coloredImage, from: outputImage.extent) {
+        if let image = CIContext().createCGImage(coloredImage, from: outputImage.extent) {
             qrImage = NSImage(cgImage: image, size: size)
         }
 

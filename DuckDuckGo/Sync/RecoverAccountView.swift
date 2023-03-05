@@ -17,6 +17,7 @@
 //
 
 import SwiftUI
+import SyncUI
 
 struct RecoverAccountView: View {
     @EnvironmentObject var model: SyncPreferences

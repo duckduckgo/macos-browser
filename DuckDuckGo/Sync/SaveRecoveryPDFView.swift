@@ -18,6 +18,8 @@
 
 import SwiftUI
 import DDGSync
+import SyncUI
+
 //
 //struct SaveRecoveryPDFView: View {
 //    @EnvironmentObject var model: SyncSetupViewModel

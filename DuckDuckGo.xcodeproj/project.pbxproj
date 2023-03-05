@@ -923,8 +923,6 @@
 		372AD54E29AC09AF00DE827B /* SyncSetupCompleteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 372AD54C29AC09AF00DE827B /* SyncSetupCompleteView.swift */; };
 		372AD55029AC10EC00DE827B /* SaveRecoveryPDFView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 372AD54F29AC10EC00DE827B /* SaveRecoveryPDFView.swift */; };
 		372AD55129AC10EC00DE827B /* SaveRecoveryPDFView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 372AD54F29AC10EC00DE827B /* SaveRecoveryPDFView.swift */; };
-		372AD55329ACBD0A00DE827B /* QRCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 372AD55229ACBD0A00DE827B /* QRCodeView.swift */; };
-		372AD55429ACBD0A00DE827B /* QRCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 372AD55229ACBD0A00DE827B /* QRCodeView.swift */; };
 		3739326529AE4B39009346AE /* DDGSync in Frameworks */ = {isa = PBXBuildFile; productRef = 3739326429AE4B39009346AE /* DDGSync */; };
 		3739326729AE4B42009346AE /* DDGSync in Frameworks */ = {isa = PBXBuildFile; productRef = 3739326629AE4B42009346AE /* DDGSync */; };
 		3739326929AF5045009346AE /* SyncService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3739326829AF5045009346AE /* SyncService.swift */; };
@@ -955,14 +953,10 @@
 		3775912E29AAC72700E26367 /* SyncPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3775912C29AAC72700E26367 /* SyncPreferences.swift */; };
 		3775913629AB9A1C00E26367 /* SyncSetupViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3775913529AB9A1C00E26367 /* SyncSetupViewController.swift */; };
 		3775913729AB9A1C00E26367 /* SyncSetupViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3775913529AB9A1C00E26367 /* SyncSetupViewController.swift */; };
-		3775913929AB9C3B00E26367 /* EnableSyncView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3775913829AB9C3B00E26367 /* EnableSyncView.swift */; };
-		3775913A29AB9C3B00E26367 /* EnableSyncView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3775913829AB9C3B00E26367 /* EnableSyncView.swift */; };
 		3775913C29ABB78300E26367 /* SyncSetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3775913B29ABB78300E26367 /* SyncSetupView.swift */; };
 		3775913D29ABB78300E26367 /* SyncSetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3775913B29ABB78300E26367 /* SyncSetupView.swift */; };
 		3775914229ABBBF500E26367 /* SyncAnotherDeviceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3775914129ABBBF500E26367 /* SyncAnotherDeviceView.swift */; };
 		3775914329ABBBF500E26367 /* SyncAnotherDeviceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3775914129ABBBF500E26367 /* SyncAnotherDeviceView.swift */; };
-		3775914529ABBC0800E26367 /* SyncWizardStep.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3775914429ABBC0800E26367 /* SyncWizardStep.swift */; };
-		3775914629ABBC0800E26367 /* SyncWizardStep.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3775914429ABBC0800E26367 /* SyncWizardStep.swift */; };
 		3775914829ABC03700E26367 /* SyncNewDeviceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3775914729ABC03700E26367 /* SyncNewDeviceView.swift */; };
 		3775914929ABC03700E26367 /* SyncNewDeviceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3775914729ABC03700E26367 /* SyncNewDeviceView.swift */; };
 		3776582D27F71652009A6B35 /* WebsiteBreakageReportTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3776582C27F71652009A6B35 /* WebsiteBreakageReportTests.swift */; };
@@ -984,6 +978,8 @@
 		37AFCE8B27DB69BC00471A10 /* PreferencesGeneralView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AFCE8A27DB69BC00471A10 /* PreferencesGeneralView.swift */; };
 		37AFCE9227DB8CAD00471A10 /* PreferencesAboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AFCE9127DB8CAD00471A10 /* PreferencesAboutView.swift */; };
 		37B11B3928095E6600CBB621 /* TabLazyLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B11B3828095E6600CBB621 /* TabLazyLoader.swift */; };
+		37BA812D29B3CD690053F1A3 /* SyncUI in Frameworks */ = {isa = PBXBuildFile; productRef = 37BA812C29B3CD690053F1A3 /* SyncUI */; };
+		37BA812F29B3CD6E0053F1A3 /* SyncUI in Frameworks */ = {isa = PBXBuildFile; productRef = 37BA812E29B3CD6E0053F1A3 /* SyncUI */; };
 		37BF3F14286D8A6500BD9014 /* PinnedTabsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BF3F13286D8A6500BD9014 /* PinnedTabsManager.swift */; };
 		37BF3F21286F0A7A00BD9014 /* PinnedTabsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BF3F1E286F0A7A00BD9014 /* PinnedTabsViewModel.swift */; };
 		37BF3F22286F0A7A00BD9014 /* PinnedTabsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BF3F1F286F0A7A00BD9014 /* PinnedTabsView.swift */; };
@@ -1017,8 +1013,6 @@
 		37F19A6A28E2F2D000740DC6 /* PrivatePlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F19A6928E2F2D000740DC6 /* PrivatePlayer.swift */; };
 		37F2625B29B0FD75002F450F /* RecoverAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F2625A29B0FD75002F450F /* RecoverAccountView.swift */; };
 		37F2625C29B0FD75002F450F /* RecoverAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F2625A29B0FD75002F450F /* RecoverAccountView.swift */; };
-		37F2626029B16A90002F450F /* RecoveryCodeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F2625F29B16A90002F450F /* RecoveryCodeViewModel.swift */; };
-		37F2626129B16A90002F450F /* RecoveryCodeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F2625F29B16A90002F450F /* RecoveryCodeViewModel.swift */; };
 		37F44A5F298C17830025E7FE /* Navigation in Frameworks */ = {isa = PBXBuildFile; productRef = 37F44A5E298C17830025E7FE /* Navigation */; };
 		4B0135CE2729F1AA00D54834 /* NSPasteboardExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0135CD2729F1AA00D54834 /* NSPasteboardExtension.swift */; };
 		4B02198925E05FAC00ED7DEA /* FireproofingURLExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B02197F25E05FAC00ED7DEA /* FireproofingURLExtensions.swift */; };
@@ -1909,7 +1903,6 @@
 		371E141827E92E42009E3B5B /* MultilineScrollableTextFix.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultilineScrollableTextFix.swift; sourceTree = "<group>"; };
 		372AD54C29AC09AF00DE827B /* SyncSetupCompleteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncSetupCompleteView.swift; sourceTree = "<group>"; };
 		372AD54F29AC10EC00DE827B /* SaveRecoveryPDFView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveRecoveryPDFView.swift; sourceTree = "<group>"; };
-		372AD55229ACBD0A00DE827B /* QRCodeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCodeView.swift; sourceTree = "<group>"; };
 		3739326829AF5045009346AE /* SyncService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncService.swift; sourceTree = "<group>"; };
 		373A1AA7283ED1B900586521 /* BookmarkHTMLReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkHTMLReader.swift; sourceTree = "<group>"; };
 		373A1AA9283ED86C00586521 /* BookmarksHTMLReaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksHTMLReaderTests.swift; sourceTree = "<group>"; };
@@ -1932,10 +1925,8 @@
 		3775912929AAC41400E26367 /* PreferencesSyncView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesSyncView.swift; sourceTree = "<group>"; };
 		3775912C29AAC72700E26367 /* SyncPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncPreferences.swift; sourceTree = "<group>"; };
 		3775913529AB9A1C00E26367 /* SyncSetupViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncSetupViewController.swift; sourceTree = "<group>"; };
-		3775913829AB9C3B00E26367 /* EnableSyncView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnableSyncView.swift; sourceTree = "<group>"; };
 		3775913B29ABB78300E26367 /* SyncSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncSetupView.swift; sourceTree = "<group>"; };
 		3775914129ABBBF500E26367 /* SyncAnotherDeviceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncAnotherDeviceView.swift; sourceTree = "<group>"; };
-		3775914429ABBC0800E26367 /* SyncWizardStep.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncWizardStep.swift; sourceTree = "<group>"; };
 		3775914729ABC03700E26367 /* SyncNewDeviceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncNewDeviceView.swift; sourceTree = "<group>"; };
 		3776582C27F71652009A6B35 /* WebsiteBreakageReportTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebsiteBreakageReportTests.swift; sourceTree = "<group>"; };
 		3776582E27F82E62009A6B35 /* AutofillPreferences.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AutofillPreferences.swift; sourceTree = "<group>"; };
@@ -1964,6 +1955,7 @@
 		37AFCE8A27DB69BC00471A10 /* PreferencesGeneralView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesGeneralView.swift; sourceTree = "<group>"; };
 		37AFCE9127DB8CAD00471A10 /* PreferencesAboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesAboutView.swift; sourceTree = "<group>"; };
 		37B11B3828095E6600CBB621 /* TabLazyLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabLazyLoader.swift; sourceTree = "<group>"; };
+		37BA812B29B3CB8A0053F1A3 /* SyncUI */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = SyncUI; sourceTree = "<group>"; };
 		37BF3F13286D8A6500BD9014 /* PinnedTabsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PinnedTabsManager.swift; sourceTree = "<group>"; };
 		37BF3F1E286F0A7A00BD9014 /* PinnedTabsViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PinnedTabsViewModel.swift; sourceTree = "<group>"; };
 		37BF3F1F286F0A7A00BD9014 /* PinnedTabsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PinnedTabsView.swift; sourceTree = "<group>"; };
@@ -2000,7 +1992,6 @@
 		37F19A6628E1B43200740DC6 /* PrivatePlayerPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivatePlayerPreferences.swift; sourceTree = "<group>"; };
 		37F19A6928E2F2D000740DC6 /* PrivatePlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivatePlayer.swift; sourceTree = "<group>"; };
 		37F2625A29B0FD75002F450F /* RecoverAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecoverAccountView.swift; sourceTree = "<group>"; };
-		37F2625F29B16A90002F450F /* RecoveryCodeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecoveryCodeViewModel.swift; sourceTree = "<group>"; };
 		4B0135CD2729F1AA00D54834 /* NSPasteboardExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSPasteboardExtension.swift; sourceTree = "<group>"; };
 		4B02197F25E05FAC00ED7DEA /* FireproofingURLExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FireproofingURLExtensions.swift; sourceTree = "<group>"; };
 		4B02198125E05FAC00ED7DEA /* FireproofDomains.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FireproofDomains.swift; sourceTree = "<group>"; };
@@ -2760,6 +2751,7 @@
 				3706FCAB293F65D500E42796 /* TrackerRadarKit in Frameworks */,
 				3739326529AE4B39009346AE /* DDGSync in Frameworks */,
 				3706FCAE293F65D500E42796 /* Lottie in Frameworks */,
+				37BA812F29B3CD6E0053F1A3 /* SyncUI in Frameworks */,
 				3706FCAF293F65D500E42796 /* PrivacyDashboard in Frameworks */,
 				3706FCB0293F65D500E42796 /* Common in Frameworks */,
 			);
@@ -2812,6 +2804,7 @@
 				3739326729AE4B42009346AE /* DDGSync in Frameworks */,
 				85FF55C825F82E4F00E2AB99 /* Lottie in Frameworks */,
 				1E950E412912A10D0051A99B /* PrivacyDashboard in Frameworks */,
+				37BA812D29B3CD690053F1A3 /* SyncUI in Frameworks */,
 				1E25269C28F8741A00E44DFA /* Common in Frameworks */,
 				98A50964294B691800D10880 /* Persistence in Frameworks */,
 			);
@@ -3100,17 +3093,13 @@
 			isa = PBXGroup;
 			children = (
 				3775913529AB9A1C00E26367 /* SyncSetupViewController.swift */,
-				3775914429ABBC0800E26367 /* SyncWizardStep.swift */,
 				3775913B29ABB78300E26367 /* SyncSetupView.swift */,
-				3775913829AB9C3B00E26367 /* EnableSyncView.swift */,
 				3775914129ABBBF500E26367 /* SyncAnotherDeviceView.swift */,
 				3775914729ABC03700E26367 /* SyncNewDeviceView.swift */,
 				37F2625A29B0FD75002F450F /* RecoverAccountView.swift */,
 				372AD54C29AC09AF00DE827B /* SyncSetupCompleteView.swift */,
 				372AD54F29AC10EC00DE827B /* SaveRecoveryPDFView.swift */,
-				372AD55229ACBD0A00DE827B /* QRCodeView.swift */,
 				3739326829AF5045009346AE /* SyncService.swift */,
-				37F2625F29B16A90002F450F /* RecoveryCodeViewModel.swift */,
 			);
 			path = Sync;
 			sourceTree = "<group>";
@@ -3177,12 +3166,13 @@
 			path = UITests;
 			sourceTree = "<group>";
 		};
-		378E279C2970217400FCADA2 /* Plugins */ = {
+		378E279C2970217400FCADA2 /* LocalPackages */ = {
 			isa = PBXGroup;
 			children = (
 				378E279D2970217400FCADA2 /* BuildToolPlugins */,
+				37BA812B29B3CB8A0053F1A3 /* SyncUI */,
 			);
-			path = Plugins;
+			path = LocalPackages;
 			sourceTree = "<group>";
 		};
 		37BF3F12286D8A4B00BD9014 /* Pinned Tabs */ = {
@@ -4234,7 +4224,7 @@
 		AA585D75248FD31100E9A3E2 = {
 			isa = PBXGroup;
 			children = (
-				378E279C2970217400FCADA2 /* Plugins */,
+				378E279C2970217400FCADA2 /* LocalPackages */,
 				378B5886295CF2A4002C0CC0 /* Configuration */,
 				AA68C3D62490F821001B8783 /* README.md */,
 				AA585D80248FD31100E9A3E2 /* DuckDuckGo */,
@@ -5678,6 +5668,7 @@
 				37F44A5E298C17830025E7FE /* Navigation */,
 				984FD3BE299ACF35007334DD /* Bookmarks */,
 				3739326429AE4B39009346AE /* DDGSync */,
+				37BA812E29B3CD6E0053F1A3 /* SyncUI */,
 			);
 			productName = DuckDuckGo;
 			productReference = 3706FD05293F65D500E42796 /* DuckDuckGo App Store.app */;
@@ -5794,6 +5785,7 @@
 				B6B77BE7297973D4001E68A1 /* Navigation */,
 				987799EC299998B1005D8EB6 /* Bookmarks */,
 				3739326629AE4B42009346AE /* DDGSync */,
+				37BA812C29B3CD690053F1A3 /* SyncUI */,
 			);
 			productName = DuckDuckGo;
 			productReference = AA585D7E248FD31100E9A3E2 /* DuckDuckGo.app */;
@@ -6344,12 +6336,10 @@
 				3706FADE293F65D500E42796 /* PreferencesPrivatePlayerView.swift in Sources */,
 				3706FADF293F65D500E42796 /* AddFolderModalViewController.swift in Sources */,
 				3706FAE0293F65D500E42796 /* BookmarkSidebarTreeController.swift in Sources */,
-				37F2626129B16A90002F450F /* RecoveryCodeViewModel.swift in Sources */,
 				3706FAE1293F65D500E42796 /* HomePageFavoritesModel.swift in Sources */,
 				3706FAE2293F65D500E42796 /* SequenceExtensions.swift in Sources */,
 				3706FAE3293F65D500E42796 /* ChromiumDataImporter.swift in Sources */,
 				3706FAE5293F65D500E42796 /* WKBackForwardListItemViewModel.swift in Sources */,
-				372AD55429ACBD0A00DE827B /* QRCodeView.swift in Sources */,
 				3706FAE6293F65D500E42796 /* BWNotRespondingAlert.swift in Sources */,
 				3706FAE7293F65D500E42796 /* DebugUserScript.swift in Sources */,
 				3706FAE8293F65D500E42796 /* RecentlyClosedTab.swift in Sources */,
@@ -6546,7 +6536,6 @@
 				37F2625C29B0FD75002F450F /* RecoverAccountView.swift in Sources */,
 				3706FB95293F65D500E42796 /* PermissionType.swift in Sources */,
 				3706FB96293F65D500E42796 /* RecentlyClosedWindow.swift in Sources */,
-				3775913A29AB9C3B00E26367 /* EnableSyncView.swift in Sources */,
 				3706FB97293F65D500E42796 /* ActionSpeech.swift in Sources */,
 				3706FB98293F65D500E42796 /* ButtonStyles.swift in Sources */,
 				3706FB99293F65D500E42796 /* PrivacySecurityPreferences.swift in Sources */,
@@ -6664,7 +6653,6 @@
 				4B9754EC2984300100D7B834 /* EmailManagerExtension.swift in Sources */,
 				3706FC04293F65D500E42796 /* PreferencesPrivacyView.swift in Sources */,
 				3706FC05293F65D500E42796 /* NSPasteboardExtension.swift in Sources */,
-				3775914629ABBC0800E26367 /* SyncWizardStep.swift in Sources */,
 				3706FC06293F65D500E42796 /* OnboardingViewModel.swift in Sources */,
 				3706FC07293F65D500E42796 /* ScriptSourceProviding.swift in Sources */,
 				3706FC08293F65D500E42796 /* CoreDataBookmarkImporter.swift in Sources */,
@@ -7312,7 +7300,6 @@
 				85D438B6256E7C9E00F3BAF8 /* ContextMenuUserScript.swift in Sources */,
 				B693955526F04BEC0015B914 /* NSSavePanelExtension.swift in Sources */,
 				9826B0A22747DFEB0092F683 /* AppPrivacyConfigurationDataProvider.swift in Sources */,
-				3775913929AB9C3B00E26367 /* EnableSyncView.swift in Sources */,
 				B6B1E88B26D774090062C350 /* LinkButton.swift in Sources */,
 				4BBF0915282DD40100EE1418 /* TemporaryFileHandler.swift in Sources */,
 				CB6BCDF927C6BEFF00CC76DC /* PrivacyFeatures.swift in Sources */,
@@ -7348,7 +7335,6 @@
 				4B8AC93B26B48ADF00879451 /* ASN1Parser.swift in Sources */,
 				37CD54B327EE509700F1F7B9 /* View+Cursor.swift in Sources */,
 				B66E9DD22670EB2A00E53BB5 /* _WKDownload+WebKitDownload.swift in Sources */,
-				37F2626029B16A90002F450F /* RecoveryCodeViewModel.swift in Sources */,
 				B6A9E4612614608B0067D1B9 /* AppVersion.swift in Sources */,
 				856C98DF257014BD00A22F1F /* FileDownloadManager.swift in Sources */,
 				4BB99CFF26FE191E001E4761 /* BookmarkImport.swift in Sources */,
@@ -7434,7 +7420,6 @@
 				AA585D84248FD31100E9A3E2 /* BrowserTabViewController.swift in Sources */,
 				85707F22276A32B600DC0649 /* CallToAction.swift in Sources */,
 				B693954B26F04BEB0015B914 /* MouseOverView.swift in Sources */,
-				372AD55329ACBD0A00DE827B /* QRCodeView.swift in Sources */,
 				AAE7527C263B056C00B973F8 /* HistoryStore.swift in Sources */,
 				372AD54D29AC09AF00DE827B /* SyncSetupCompleteView.swift in Sources */,
 				AAE246F32709EF3B00BEEAEE /* FirePopoverCollectionViewItem.swift in Sources */,
@@ -7523,7 +7508,6 @@
 				4BE65480271FCD4D008D1D63 /* PasswordManagementLoginModel.swift in Sources */,
 				AA9FF95B24A1EFC20039E328 /* TabViewModel.swift in Sources */,
 				AA9E9A5E25A4867200D1959D /* TabDragAndDropManager.swift in Sources */,
-				3775914529ABBC0800E26367 /* SyncWizardStep.swift in Sources */,
 				4BBD3C00285ACE090047A89D /* NSNotificationName+Favicons.swift in Sources */,
 				4B0DB5E528BD9D08007DD239 /* PinningManager.swift in Sources */,
 				B68458C025C7E9E000DC17B6 /* TabCollectionViewModel+NSSecureCoding.swift in Sources */,
@@ -8445,6 +8429,14 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
 			productName = Persistence;
+		};
+		37BA812C29B3CD690053F1A3 /* SyncUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SyncUI;
+		};
+		37BA812E29B3CD6E0053F1A3 /* SyncUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SyncUI;
 		};
 		37F44A5E298C17830025E7FE /* Navigation */ = {
 			isa = XCSwiftPackageProductDependency;

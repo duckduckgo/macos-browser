@@ -17,6 +17,13 @@
 //
 
 import SwiftUI
+import SyncUI
+
+extension UserText: EnableSyncViewModelUserText {}
+
+extension SyncPreferences: EnableSyncViewModel {
+    typealias SyncUserText = UserText
+}
 
 struct SyncSetupView: View {
     @ObservedObject var model: SyncPreferences
@@ -31,7 +38,7 @@ struct SyncSetupView: View {
     @ViewBuilder var content: some View {
         switch model.flowStep {
         case .enableSync:
-            EnableSyncView().environmentObject(model)
+            EnableSyncView<SyncPreferences>().environmentObject(model)
         case .syncAnotherDevice:
             SyncAnotherDeviceView().environmentObject(model)
         case .recoverAccount:

@@ -17,7 +17,8 @@
 //
 
 import SwiftUI
-//
+import SyncUI
+
 //struct SyncSetupCompleteView: View {
 //    @EnvironmentObject var model: SyncSetupViewModel
 //

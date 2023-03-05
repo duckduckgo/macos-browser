@@ -18,11 +18,13 @@
 
 import Combine
 
-final class RecoveryCodeViewModel: ObservableObject {
-    @Published var shouldDisableSubmitButton: Bool = true
-    @Published var recoveryCode: String = "" {
+final public class RecoveryCodeViewModel: ObservableObject {
+    @Published public var shouldDisableSubmitButton: Bool = true
+    @Published public var recoveryCode: String = "" {
         didSet {
             shouldDisableSubmitButton = recoveryCode.isEmpty
         }
     }
+
+    public init() {}
 }
