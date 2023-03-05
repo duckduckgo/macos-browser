@@ -35,7 +35,12 @@ extension SyncPreferences: RecoverAccountViewModel {
 
 struct SyncSetupView: View {
     @ObservedObject var model: SyncPreferences
-    @ObservedObject var recoveryCodeModel = RecoveryCodeViewModel()
+    @ObservedObject var recoveryCodeModel: RecoveryCodeViewModel
+
+    init(model: SyncPreferences, recoveryCodeModel: RecoveryCodeViewModel = .init()) {
+        self.model = model
+        self.recoveryCodeModel = recoveryCodeModel
+    }
 
     var body: some View {
         content
