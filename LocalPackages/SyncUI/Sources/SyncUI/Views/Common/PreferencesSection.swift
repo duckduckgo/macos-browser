@@ -1,5 +1,5 @@
 //
-//  RoundedBorder.swift
+//  PreferencesSection.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -18,31 +18,18 @@
 
 import SwiftUI
 
-public extension View {
-    func roundedBorder() -> some View {
-        modifier(RoundedBorderView())
-    }
-}
+struct PreferencesSection<Content>: View where Content: View {
 
-struct RoundedBorderView: ViewModifier {
-    func body(content: Content) -> some View {
-        RoundedBorder {
-            content
-        }
-    }
-}
-
-struct RoundedBorder<Content>: View where Content: View {
+    let spacing: CGFloat
     @ViewBuilder let content: () -> Content
 
-    var body: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: 8)
-                .stroke(Color("BlackWhite10"), lineWidth: 1)
-            RoundedRectangle(cornerRadius: 8)
-                .fill(Color("BlackWhite1"))
+    init(spacing: CGFloat = 12, @ViewBuilder content: @escaping () -> Content) {
+        self.spacing = spacing
+        self.content = content
+    }
 
-            content()
-        }
+    var body: some View {
+        VStack(alignment: .leading, spacing: spacing, content: content)
+            .padding(.vertical, 20)
     }
 }

@@ -17,6 +17,7 @@
 //
 
 import SwiftUI
+import SyncUI
 
 fileprivate extension Preferences.Const {
     static let sidebarWidth: CGFloat = 256
@@ -45,7 +46,7 @@ extension Preferences {
                             case .general:
                                 GeneralView(defaultBrowserModel: DefaultBrowserPreferences(), startupModel: StartupPreferences())
                             case .sync:
-                                SyncView(model: SyncPreferences())
+                                SyncManagementView(model: SyncPreferences())
                             case .appearance:
                                 AppearanceView(model: .shared)
                             case .privacy:

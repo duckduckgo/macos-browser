@@ -20,31 +20,15 @@ import Foundation
 import DDGSync
 import Combine
 import SystemConfiguration
+import SyncUI
 
-struct SyncDevice: Identifiable {
-
-    enum Kind: Equatable {
-        case current, desktop, mobile
-    }
-
-    let kind: Kind
-    let name: String
-    let id: String
-
-    var isCurrent: Bool {
-        kind == .current
-    }
-
+extension SyncDevice {
     init(_ account: SyncAccount) {
-        self.name = account.deviceName
-        self.id = account.deviceId
-        self.kind = .current
+        self.init(kind: .current, name: account.deviceName, id: account.deviceId)
     }
 
     init(_ device: RegisteredDevice) {
-        self.name = device.name
-        self.id = device.id
-        self.kind = .mobile
+        self.init(kind: .mobile, name: device.name, id: device.id)
     }
 }
 
@@ -73,18 +57,18 @@ final class SyncPreferences: ObservableObject {
 
     init(syncService: SyncService = .shared) {
         self.syncService = syncService
-        updateValues()
+        updateState()
 
         isSyncEnabledCancellable = syncService.sync.isAuthenticatedPublisher
             .removeDuplicates()
             .asVoid()
             .receive(on: DispatchQueue.main)
             .sink { [weak self]  in
-                self?.updateValues()
+                self?.updateState()
             }
     }
 
-    private func updateValues() {
+    private func updateState() {
         account = syncService.sync.account
 
         if let account {
@@ -187,4 +171,14 @@ final class SyncPreferences: ObservableObject {
 
     private let syncService: SyncService
     private var isSyncEnabledCancellable: AnyCancellable?
+}
+
+extension UserText: SyncManagementViewUserText {}
+
+extension SyncPreferences: SyncManagementViewModel {
+    typealias SyncManagementViewUserText = UserText
+
+    var recoveryCode: String? {
+        account?.recoveryCode
+    }
 }

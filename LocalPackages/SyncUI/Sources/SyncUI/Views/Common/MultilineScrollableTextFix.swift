@@ -1,5 +1,5 @@
 //
-//  RoundedBorder.swift
+//  MultilineScrollableTextFix.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -18,31 +18,22 @@
 
 import SwiftUI
 
-public extension View {
-    func roundedBorder() -> some View {
-        modifier(RoundedBorderView())
+extension View {
+    /**
+     * Ensures that multiline text is properly broken into lines
+     * when put in scroll views.
+     *
+     * As seen on [Stack Overflow](https://stackoverflow.com/a/70512685).
+     * Radar: FB6859124.
+     */
+    func fixMultilineScrollableText() -> some View {
+        lineLimit(nil).modifier(MultilineScrollableTextFix())
     }
 }
 
-struct RoundedBorderView: ViewModifier {
+private struct MultilineScrollableTextFix: ViewModifier {
+
     func body(content: Content) -> some View {
-        RoundedBorder {
-            content
-        }
-    }
-}
-
-struct RoundedBorder<Content>: View where Content: View {
-    @ViewBuilder let content: () -> Content
-
-    var body: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: 8)
-                .stroke(Color("BlackWhite10"), lineWidth: 1)
-            RoundedRectangle(cornerRadius: 8)
-                .fill(Color("BlackWhite1"))
-
-            content()
-        }
+        return AnyView(content.fixedSize(horizontal: false, vertical: true))
     }
 }
