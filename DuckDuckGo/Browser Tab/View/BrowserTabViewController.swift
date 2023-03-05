@@ -330,7 +330,7 @@ final class BrowserTabViewController: NSViewController {
         let tab = Tab(content: content,
                       parentTab: parentTab,
                       shouldLoadInBackground: true,
-                      isDisposable: false,
+                      isDisposable: tabCollectionViewModel.isDisposable,
                       canBeClosedWithBack: canBeClosedWithBack,
                       webViewFrame: view.frame)
 

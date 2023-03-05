@@ -25,6 +25,7 @@ final class TabViewModel {
 
     enum Favicon {
         static let home = NSImage(named: "HomeFavicon")!
+        static let disposableHome = NSImage(named: "DisposableTabFavicon")!
         static let preferences = NSImage(named: "Preferences")!
         static let bookmarks = NSImage(named: "Bookmarks")!
     }
@@ -249,7 +250,11 @@ final class TabViewModel {
         case .bookmarks:
             title = UserText.tabBookmarksTitle
         case .homePage:
-            title = UserText.tabHomeTitle
+            if tab.isDisposable {
+                title = UserText.disposableTabHomeTitle
+            } else {
+                title = UserText.tabHomeTitle
+            }
         case .onboarding:
             title = UserText.tabOnboardingTitle
         case .url, .none, .privatePlayer:
@@ -272,7 +277,11 @@ final class TabViewModel {
 
         switch tab.content {
         case .homePage:
-            favicon = Favicon.home
+            if tab.isDisposable {
+                favicon = Favicon.disposableHome
+            } else {
+                favicon = Favicon.home
+            }
             return
         case .preferences:
             favicon = Favicon.preferences
