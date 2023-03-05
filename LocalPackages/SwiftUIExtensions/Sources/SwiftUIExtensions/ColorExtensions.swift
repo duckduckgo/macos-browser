@@ -18,7 +18,7 @@
 
 import SwiftUI
 
-extension Color {
+public extension Color {
 
     init(hex: String) {
         var rgbValue: UInt64 = 0

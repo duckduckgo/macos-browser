@@ -18,19 +18,19 @@
 
 import SwiftUI
 
-struct HoverButton: View {
+public struct HoverButton: View {
 
-    let size: CGFloat
-    let backgroundColor: Color
-    let mouseOverColor: Color
-    let imageName: String
-    let imageSize: CGFloat?
-    let action: () -> Void
-    let cornerRadius: CGFloat
+    public let size: CGFloat
+    public let backgroundColor: Color
+    public let mouseOverColor: Color
+    public let imageName: String
+    public let imageSize: CGFloat?
+    public let action: () -> Void
+    public let cornerRadius: CGFloat
 
-    @State var isHovering = false
+    @State public var isHovering = false
 
-    init(size: CGFloat = 32,
+    public init(size: CGFloat = 32,
          backgroundColor: Color = Color.clear,
          mouseOverColor: Color = Color("ButtonMouseOverColor"),
          imageName: String,
@@ -47,7 +47,7 @@ struct HoverButton: View {
         self.action = action
     }
 
-    var body: some View {
+    public var body: some View {
         ZStack {
 
             RoundedRectangle(cornerRadius: cornerRadius)
@@ -73,7 +73,5 @@ struct HoverButton: View {
         }) {
             action()
         }
-
     }
-
 }

@@ -1,5 +1,5 @@
 //
-//  ViewExtensions.swift
+//  ViewVisibility.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -19,7 +19,7 @@
 import SwiftUI
 
 // https://swiftuirecipes.com/blog/how-to-hide-a-swiftui-view-visible-invisible-gone
-enum ViewVisibility: CaseIterable {
+public enum ViewVisibility: CaseIterable {
 
     case visible, // view is fully visible
          invisible, // view is hidden but takes up space
@@ -27,7 +27,7 @@ enum ViewVisibility: CaseIterable {
 
 }
 
-extension View {
+public extension View {
 
     // https://swiftuirecipes.com/blog/how-to-hide-a-swiftui-view-visible-invisible-gone
     @ViewBuilder func visibility(_ visibility: ViewVisibility) -> some View {
@@ -39,13 +39,4 @@ extension View {
             }
         }
     }
-
-    func link(onHoverChanged: ((Bool) -> Void)? = nil, clicked: @escaping () -> Void) -> some View {
-        self.onHover { over in
-            onHoverChanged?(over)
-        }.onTapGesture {
-            clicked()
-        }
-    }
-
 }
