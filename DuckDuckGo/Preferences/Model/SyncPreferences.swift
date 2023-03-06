@@ -133,6 +133,15 @@ final class SyncPreferences: ObservableObject {
     }
 
     func addAnotherDevice() {
+        presentDialog(for: .deviceSynced)
+    }
+
+    func confirmSetupComplete() {
+        presentDialog(for: .saveRecoveryPDF)
+    }
+
+    func saveRecoveryPDF() {
+        endFlow()
     }
 
     func endFlow() {

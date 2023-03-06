@@ -18,35 +18,50 @@
 
 import SwiftUI
 
-//struct SyncSetupCompleteView: View {
-//    @EnvironmentObject var model: SyncSetupViewModel
-//
-//    var device: SyncedDevice {
-//        .init(kind: .mobile, name: "Dave's iPhone 14", id: UUID().uuidString)
-//    }
-//
-//    var body: some View {
-//        SyncDialog(spacing: 20.0) {
-//            VStack(spacing: 20) {
-//                Image("SyncSetupComplete")
-//                Text(UserText.deviceSynced)
-//                    .font(.system(size: 17, weight: .bold))
-//                Text(UserText.deviceSyncedExplanation)
-//                    .multilineTextAlignment(.center)
-//
-//                Outline {
-//                    SyncPreferencesRow {
-//                        SyncedDeviceIcon(kind: device.kind)
-//                    } centerContent: {
-//                        Text(device.name)
-//                    }
-//                }
-//            }
-//        } buttons: {
-//            Button(UserText.next) {
-//                model.flowState = .saveRecoveryPDF
-//            }
-//        }
-//        .frame(width: 360, height: 298)
-//    }
-//}
+public protocol SyncSetupCompleteViewModel: ObservableObject {
+    associatedtype SyncSetupCompleteViewUserText: SyncUI.SyncSetupCompleteViewUserText
+
+    func confirmSetupComplete()
+}
+
+public protocol SyncSetupCompleteViewUserText {
+    static var deviceSynced: String { get }
+    static var deviceSyncedExplanation: String { get }
+    static var next: String { get }
+}
+
+public struct SyncSetupCompleteView<ViewModel>: View where ViewModel: SyncSetupCompleteViewModel {
+    typealias UserText = ViewModel.SyncSetupCompleteViewUserText
+
+    @EnvironmentObject public var model: ViewModel
+
+    public init() {}
+
+    var device: SyncDevice {
+        .init(kind: .mobile, name: "Dave's iPhone 14", id: UUID().uuidString)
+    }
+
+    public var body: some View {
+        SyncDialog(spacing: 20.0) {
+            VStack(spacing: 20) {
+                Image("SyncSetupComplete")
+                Text(UserText.deviceSynced)
+                    .font(.system(size: 17, weight: .bold))
+                Text(UserText.deviceSyncedExplanation)
+                    .multilineTextAlignment(.center)
+
+                SyncPreferencesRow {
+                    SyncedDeviceIcon(kind: device.kind)
+                } centerContent: {
+                    Text(device.name)
+                }
+                .roundedBorder()
+            }
+        } buttons: {
+            Button(UserText.next) {
+                model.confirmSetupComplete()
+            }
+        }
+        .frame(width: 360, height: 298)
+    }
+}

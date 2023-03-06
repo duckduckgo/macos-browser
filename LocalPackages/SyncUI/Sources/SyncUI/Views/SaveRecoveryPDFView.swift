@@ -17,35 +17,49 @@
 //
 
 import SwiftUI
+import SwiftUIExtensions
 
-//
-//struct SaveRecoveryPDFView: View {
-//    @EnvironmentObject var model: SyncSetupViewModel
-//
-//    var device: SyncedDevice {
-//        .init(kind: .mobile, name: "Dave's iPhone 14", id: UUID().uuidString)
-//    }
-//
-//    var body: some View {
-//        SyncDialog {
-//            VStack(spacing: 20.0) {
-//                Image("SyncRecoveryPDF")
-//                Text(UserText.saveRecoveryPDF)
-//                    .font(.system(size: 17, weight: .bold))
-//                Text(UserText.recoveryPDFExplanation1)
-//                    .multilineTextAlignment(.center)
-//                Text(UserText.recoveryPDFExplanation2)
-//                    .multilineTextAlignment(.center)
-//            }
-//        } buttons: {
-//            Button(UserText.notNow) {
-//                model.onCancel()
-//            }
-//            Button(UserText.saveRecoveryPDF) {
-//                model.onCancel()
-//            }
-//            .buttonStyle(DefaultActionButtonStyle(enabled: true))
-//        }
-//        .frame(height: 314)
-//    }
-//}
+public protocol SaveRecoveryPDFViewModel: ObservableObject {
+    associatedtype SaveRecoveryPDFViewUserText: SyncUI.SaveRecoveryPDFViewUserText
+
+    func endFlow()
+    func saveRecoveryPDF()
+}
+
+public protocol SaveRecoveryPDFViewUserText {
+    static var saveRecoveryPDF: String { get }
+    static var recoveryPDFExplanation1: String { get }
+    static var recoveryPDFExplanation2: String { get }
+    static var notNow: String { get }
+}
+
+public struct SaveRecoveryPDFView<ViewModel>: View where ViewModel: SaveRecoveryPDFViewModel {
+    typealias UserText = ViewModel.SaveRecoveryPDFViewUserText
+
+    @EnvironmentObject public var model: ViewModel
+
+    public init() {}
+
+    public var body: some View {
+        SyncDialog {
+            VStack(spacing: 20.0) {
+                Image("SyncRecoveryPDF")
+                Text(UserText.saveRecoveryPDF)
+                    .font(.system(size: 17, weight: .bold))
+                Text(UserText.recoveryPDFExplanation1)
+                    .multilineTextAlignment(.center)
+                Text(UserText.recoveryPDFExplanation2)
+                    .multilineTextAlignment(.center)
+            }
+        } buttons: {
+            Button(UserText.notNow) {
+                model.endFlow()
+            }
+            Button(UserText.saveRecoveryPDF) {
+                model.saveRecoveryPDF()
+            }
+            .buttonStyle(DefaultActionButtonStyle(enabled: true))
+        }
+        .frame(height: 314)
+    }
+}

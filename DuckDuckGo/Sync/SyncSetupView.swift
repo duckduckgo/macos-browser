@@ -23,6 +23,8 @@ extension UserText: EnableSyncViewUserText {}
 extension UserText: AskToSyncAnotherDeviceViewUserText {}
 extension UserText: RecoverAccountViewUserText {}
 extension UserText: SyncAnotherDeviceViewUserText {}
+extension UserText: SyncSetupCompleteViewUserText {}
+extension UserText: SaveRecoveryPDFViewUserText {}
 
 extension SyncPreferences: EnableSyncViewModel {
     typealias EnableSyncViewUserText = UserText
@@ -35,6 +37,12 @@ extension SyncPreferences: RecoverAccountViewModel {
 }
 extension SyncPreferences: SyncAnotherDeviceViewModel {
     typealias SyncAnotherDeviceViewUserText = UserText
+}
+extension SyncPreferences: SyncSetupCompleteViewModel {
+    typealias SyncSetupCompleteViewUserText = UserText
+}
+extension SyncPreferences: SaveRecoveryPDFViewModel {
+    typealias SaveRecoveryPDFViewUserText = UserText
 }
 
 struct SyncSetupView: View {
@@ -63,12 +71,12 @@ struct SyncSetupView: View {
             RecoverAccountView<SyncPreferences>().environmentObject(model).environmentObject(recoveryCodeModel)
         case .syncAnotherDevice:
             SyncAnotherDeviceView<SyncPreferences>().environmentObject(model).environmentObject(recoveryCodeModel)
-//        case .deviceSynced:
-//            SyncSetupCompleteView().environmentObject(model)
-//        case .saveRecoveryPDF:
-//            SaveRecoveryPDFView().environmentObject(model)
+        case .deviceSynced:
+            SyncSetupCompleteView<SyncPreferences>().environmentObject(model)
+        case .saveRecoveryPDF:
+            SaveRecoveryPDFView<SyncPreferences>().environmentObject(model)
         default:
-            Text("WTF")
+            EmptyView()
         }
     }
 }
