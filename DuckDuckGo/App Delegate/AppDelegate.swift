@@ -55,6 +55,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private let crashReporter = CrashReporter()
     private(set) var internalUserDecider: InternalUserDeciding!
     private var appIconChanger: AppIconChanger!
+    private(set) var syncService: DDGSyncing!
+    private(set) var syncPersistence: SyncDataPersistor!
 
 #if !APPSTORE
     var updateController: UpdateController!
@@ -137,7 +139,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 #endif
 
         appIconChanger = AppIconChanger(internalUserDecider: internalUserDecider)
-        SyncService.shared = .init()
+        syncPersistence = SyncDataPersistor()
+        syncService = DDGSync(persistence: syncPersistence)
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {

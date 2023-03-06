@@ -56,11 +56,11 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         account?.recoveryCode
     }
 
-    init(syncService: SyncService = .shared) {
+    init(syncService: DDGSyncing) {
         self.syncService = syncService
         updateState()
 
-        isSyncEnabledCancellable = syncService.sync.isAuthenticatedPublisher
+        isSyncEnabledCancellable = syncService.isAuthenticatedPublisher
             .removeDuplicates()
             .asVoid()
             .receive(on: DispatchQueue.main)
@@ -70,7 +70,7 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
     }
 
     private func updateState() {
-        account = syncService.sync.account
+        account = syncService.account
 
         if let account {
             devices = [.init(account)]
@@ -99,7 +99,7 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
             do {
 //                let hostname = SCDynamicStoreCopyComputerName(nil, nil) as? String ?? ProcessInfo.processInfo.hostName
                 let hostname = ProcessInfo.processInfo.hostName
-                try await syncService.sync.createAccount(deviceName: hostname)
+                try await syncService.createAccount(deviceName: hostname)
                 presentDialog(for: .askToSyncAnotherDevice)
             } catch {
                 errorMessage = String(describing: error)
@@ -113,7 +113,7 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
             do {
 //                let hostname = SCDynamicStoreCopyComputerName(nil, nil) as? String ?? ProcessInfo.processInfo.hostName
                 let hostname = ProcessInfo.processInfo.hostName
-                try await syncService.sync.login(recoveryKey: recoveryCode, deviceName: hostname)
+                try await syncService.login(recoveryKey: recoveryCode, deviceName: hostname)
                 endFlow()
             } catch {
                 errorMessage = String(describing: error)
@@ -125,7 +125,7 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
     func turnOffSync() {
         Task { @MainActor in
             do {
-                try await syncService.sync.disconnect()
+                try await syncService.disconnect()
             } catch {
                 errorMessage = String(describing: error)
                 shouldShowErrorMessage = true
@@ -182,6 +182,6 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
 
     private var onEndFlow: () -> Void = {}
 
-    private let syncService: SyncService
+    private let syncService: DDGSyncing
     private var isSyncEnabledCancellable: AnyCancellable?
 }

@@ -1,5 +1,5 @@
 //
-//  SyncService.swift
+//  SyncDataPersistor.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -28,15 +28,4 @@ final class SyncDataPersistor: LocalDataPersisting {
 
     func persistEvents(_ events: [SyncEvent]) async throws {
     }
-}
-
-final class SyncService {
-
-    let sync: DDGSyncing
-
-    init(sync: DDGSyncing = DDGSync(persistence: SyncDataPersistor())) {
-        self.sync = sync
-    }
-
-    static var shared: SyncService!
 }

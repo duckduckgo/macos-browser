@@ -29,13 +29,9 @@ struct PreferencesSection: Hashable, Identifiable {
             if includingPrivatePlayer {
                 panes.append(.privatePlayer)
             }
-#if DEBUG || REVIEW
-            panes.insert(.sync, at: 1)
-#else
             if (NSApp.delegate as? AppDelegate)?.internalUserDecider.isInternalUser == true {
                 panes.insert(.sync, at: 1)
             }
-#endif
             return panes
         }()
 

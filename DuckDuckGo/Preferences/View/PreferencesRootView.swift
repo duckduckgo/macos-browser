@@ -17,6 +17,7 @@
 //
 
 import SwiftUI
+import SwiftUIExtensions
 import SyncUI
 
 fileprivate extension Preferences.Const {
@@ -46,7 +47,11 @@ extension Preferences {
                             case .general:
                                 GeneralView(defaultBrowserModel: DefaultBrowserPreferences(), startupModel: StartupPreferences())
                             case .sync:
-                                SyncUI.ManagementView(model: SyncPreferences())
+                                if let syncService = (NSApp.delegate as? AppDelegate)?.syncService {
+                                    SyncUI.ManagementView(model: SyncPreferences(syncService: syncService))
+                                } else {
+                                    FailedAssertionView("Failed to initialize Sync Management View")
+                                }
                             case .appearance:
                                 AppearanceView(model: .shared)
                             case .privacy:
