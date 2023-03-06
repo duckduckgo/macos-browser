@@ -21,7 +21,7 @@
             </BuildableReference>
          </BuildActionEntry>
          <BuildActionEntry
-            buildForTesting = "YES"
+            buildForTesting = "NO"
             buildForRunning = "NO"
             buildForProfiling = "NO"
             buildForArchiving = "NO"
@@ -60,7 +60,7 @@
             ActionType = "Xcode.IDEStandardExecutionActionsCore.ExecutionActionType.ShellScriptAction">
             <ActionContent
                title = "Run Script"
-               scriptText = "killall tests-server&#10;pushd &quot;${METAL_LIBRARY_OUTPUT_DIR}&quot;&#10;&quot;${BUILT_PRODUCTS_DIR}/tests-server&quot; &amp;&#10;popd&#10;">
+               scriptText = "killall tests-server&#10;pushd &quot;${METAL_LIBRARY_OUTPUT_DIR}&quot;&#10;# &quot;${BUILT_PRODUCTS_DIR}/tests-server&quot; &amp;&#10;popd&#10;">
                <EnvironmentBuildable>
                   <BuildableReference
                      BuildableIdentifier = "primary"
@@ -83,30 +83,6 @@
          </ExecutionAction>
       </PostActions>
       <Testables>
-         <TestableReference
-            skipped = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "3706FDD3293F661700E42796"
-               BuildableName = "Unit Tests App Store.xctest"
-               BlueprintName = "Unit Tests App Store"
-               ReferencedContainer = "container:DuckDuckGo.xcodeproj">
-            </BuildableReference>
-            <SkippedTests>
-               <Test
-                  Identifier = "AutoconsentMessageProtocolTests/testEval()">
-               </Test>
-               <Test
-                  Identifier = "CBRCompileTimeReporterTests">
-               </Test>
-               <Test
-                  Identifier = "PixelStoreTests/testWhenValuesAreAddedThenCallbacksAreCalled()">
-               </Test>
-               <Test
-                  Identifier = "StatisticsLoaderTests/testWhenRefreshRetentionAtbIsPerformedForNavigationThenAppRetentionAtbRequested()">
-               </Test>
-            </SkippedTests>
-         </TestableReference>
          <TestableReference
             skipped = "NO">
             <BuildableReference
