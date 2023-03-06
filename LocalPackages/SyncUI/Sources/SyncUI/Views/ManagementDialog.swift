@@ -1,5 +1,5 @@
 //
-//  SyncManagementDialog.swift
+//  ManagementDialog.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -18,25 +18,25 @@
 
 import SwiftUI
 
-public protocol SyncManagementDialogModel: ObservableObject,
-                                           EnableSyncViewModel,
-                                           AskToSyncAnotherDeviceViewModel,
-                                           RecoverAccountViewModel,
-                                           SyncAnotherDeviceViewModel,
-                                           SyncSetupCompleteViewModel,
-                                           SaveRecoveryPDFViewModel {
+public protocol ManagementDialogModel: ObservableObject,
+                                       EnableSyncViewModel,
+                                       AskToSyncAnotherDeviceViewModel,
+                                       RecoverAccountViewModel,
+                                       SyncAnotherDeviceViewModel,
+                                       SyncSetupCompleteViewModel,
+                                       SaveRecoveryPDFViewModel {
 
-    var currentDialog: SyncManagementDialogKind? { get }
+    var currentDialog: ManagementDialogKind? { get }
 
     var shouldShowErrorMessage: Bool { get set }
     var errorMessage: String? { get }
 }
 
-public enum SyncManagementDialogKind {
+public enum ManagementDialogKind {
     case enableSync, recoverAccount, askToSyncAnotherDevice, syncAnotherDevice, deviceSynced, saveRecoveryPDF
 }
 
-public struct SyncManagementDialog<ViewModel>: View where ViewModel: SyncManagementDialogModel {
+public struct ManagementDialog<ViewModel>: View where ViewModel: ManagementDialogModel {
     @ObservedObject public var model: ViewModel
     @ObservedObject public var recoveryCodeModel: RecoveryCodeViewModel
 

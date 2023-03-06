@@ -32,13 +32,13 @@ extension SyncDevice {
     }
 }
 
-final class SyncPreferences: ObservableObject {
+final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
 
     var isSyncEnabled: Bool {
         account != nil
     }
 
-    @Published private(set) var currentDialog: SyncManagementDialogKind? {
+    @Published private(set) var currentDialog: ManagementDialogKind? {
         didSet {
             if currentDialog == nil && oldValue != nil {
                 onEndFlow()
@@ -151,7 +151,7 @@ final class SyncPreferences: ObservableObject {
 
     // MARK: -
 
-    private func presentDialog(for currentDialog: SyncManagementDialogKind) {
+    private func presentDialog(for currentDialog: ManagementDialogKind) {
         let shouldBeginSheet = self.currentDialog == nil
         self.currentDialog = currentDialog
 
@@ -165,7 +165,7 @@ final class SyncPreferences: ObservableObject {
         guard let syncWindow = syncWindowController.window,
               let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController
         else {
-            assertionFailure("Sync: Failed to present SyncSetupViewController")
+            assertionFailure("Sync: Failed to present SyncManagementDialogViewController")
             return
         }
 

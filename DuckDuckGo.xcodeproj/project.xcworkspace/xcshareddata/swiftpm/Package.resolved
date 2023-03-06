@@ -6,7 +6,7 @@
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
         "branch" : "dominik/ddg-sync",
-        "revision" : "792d2890ff4c06bba889564b95ae3c119c6e8903"
+        "revision" : "0eb7874b79a5b97aa63622910c2c486d79ac637b"
       }
     },
     {
@@ -105,7 +105,7 @@
       "location" : "https://github.com/duckduckgo/sync_crypto",
       "state" : {
         "branch" : "dominik/spm",
-        "revision" : "1555212cfd7822d536c277cd89cba4244fc75b85"
+        "revision" : "9ebf475154b205cc4b7163720c2583703227eeef"
       }
     },
     {

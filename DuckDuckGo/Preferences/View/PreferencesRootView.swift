@@ -46,7 +46,7 @@ extension Preferences {
                             case .general:
                                 GeneralView(defaultBrowserModel: DefaultBrowserPreferences(), startupModel: StartupPreferences())
                             case .sync:
-                                SyncManagementView(model: SyncPreferences())
+                                SyncUI.ManagementView(model: SyncPreferences())
                             case .appearance:
                                 AppearanceView(model: .shared)
                             case .privacy:

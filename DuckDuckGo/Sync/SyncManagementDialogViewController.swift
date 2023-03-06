@@ -20,7 +20,7 @@ import AppKit
 import SwiftUI
 import SyncUI
 
-extension SyncPreferences: SyncManagementViewModel, SyncManagementDialogModel {}
+extension SyncPreferences: ManagementDialogModel {}
 
 final class SyncManagementDialogViewController: NSViewController {
 
@@ -41,7 +41,7 @@ final class SyncManagementDialogViewController: NSViewController {
             view = NSView()
             return
         }
-        let syncManagementDialog = SyncManagementDialog(model: syncPreferences)
+        let syncManagementDialog = ManagementDialog(model: syncPreferences)
         view = NSHostingView(rootView: syncManagementDialog)
     }
 
