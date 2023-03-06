@@ -212,9 +212,9 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     ) {
 
         let privatePlayer = privatePlayer
-            ?? (AppDelegate.isRunningTests ? PrivatePlayer.mock(withMode: .enabled) : PrivatePlayer.shared)
+            ?? (NSApp.isRunningUnitTests ? PrivatePlayer.mock(withMode: .enabled) : PrivatePlayer.shared)
         let statisticsLoader = statisticsLoader
-            ?? (AppDelegate.isRunningTests ? nil : StatisticsLoader.shared)
+            ?? (NSApp.isRunningUnitTests ? nil : StatisticsLoader.shared)
         let privacyFeatures = privacyFeatures ?? PrivacyFeatures
         let internalUserDecider = (NSApp.delegate as? AppDelegate)?.internalUserDecider
 
@@ -851,7 +851,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     }
 
     private func addHomePageToWebViewIfNeeded() {
-        guard !AppDelegate.isRunningTests else { return }
+        guard !NSApp.isRunningUnitTests else { return }
         if content == .homePage && webView.url == nil {
             webView.load(URLRequest(url: .homePage))
         }

@@ -52,7 +52,7 @@ final class DownloadListStore: DownloadListStoring {
     private var context: NSManagedObjectContext? {
         if case .none = _context {
 #if DEBUG
-            if AppDelegate.isRunningTests {
+            if NSApp.isRunningUnitTests {
                 _context = .some(.none)
                 return .none
             }

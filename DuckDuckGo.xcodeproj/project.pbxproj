@@ -1554,6 +1554,8 @@
 		B63ED0E026AFE32F00A9DAD1 /* GeolocationProviderMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B63ED0DF26AFE32F00A9DAD1 /* GeolocationProviderMock.swift */; };
 		B63ED0E326B3E7FA00A9DAD1 /* CLLocationManagerMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B63ED0E226B3E7FA00A9DAD1 /* CLLocationManagerMock.swift */; };
 		B63ED0E526BB8FB900A9DAD1 /* SharingMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = B63ED0E426BB8FB900A9DAD1 /* SharingMenu.swift */; };
+		B63FCB3529B5B2680022C61A /* TestRunHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = B60C6F8029B1B4AD007BFAA8 /* TestRunHelper.swift */; };
+		B63FCB3629B5B2730022C61A /* FileManagerTempDirReplacement.swift in Sources */ = {isa = PBXBuildFile; fileRef = B60C6F8329B1BAD3007BFAA8 /* FileManagerTempDirReplacement.swift */; };
 		B642738227B65BAC0005DFD1 /* SecureVaultErrorReporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B642738127B65BAC0005DFD1 /* SecureVaultErrorReporter.swift */; };
 		B643BF1427ABF772000BACEC /* NSWorkspaceExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B643BF1327ABF772000BACEC /* NSWorkspaceExtension.swift */; };
 		B647EFBB2922584B00BA628D /* AdClickAttributionTabExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B647EFBA2922584B00BA628D /* AdClickAttributionTabExtension.swift */; };
@@ -7021,6 +7023,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				7B4CE8E726F02135009134B1 /* TabBarTests.swift in Sources */,
+				B63FCB3529B5B2680022C61A /* TestRunHelper.swift in Sources */,
+				B63FCB3629B5B2730022C61A /* FileManagerTempDirReplacement.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

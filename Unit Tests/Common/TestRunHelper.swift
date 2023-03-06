@@ -18,6 +18,7 @@
 
 import Foundation
 import XCTest
+@testable import DuckDuckGo_Privacy_Browser
 
 @objc(TestRunHelper)
 final class TestRunHelper: NSObject {
@@ -26,6 +27,9 @@ final class TestRunHelper: NSObject {
     override init() {
         super.init()
         XCTestObservationCenter.shared.addTestObserver(self)
+
+        // set NSApp.runType to appropriate test run type
+        _=NSApplication.swizzleRunTypeOnce
 
         // dedicate temporary directory for tests
         _=FileManager.swizzleTemporaryDirectoryOnce
@@ -62,6 +66,35 @@ extension TestRunHelper: XCTestObservation {
     func testCaseDidFinish(_ testCase: XCTestCase) {
         // cleanup dedicated temporary directory after each test run
         FileManager.default.cleanupTemporaryDirectory()
+    }
+
+}
+
+extension NSApplication {
+
+    static var swizzleRunTypeOnce: Void = {
+        let runTypeMethod = class_getInstanceMethod(NSApplication.self, #selector(getter: NSApplication.runType))!
+        let swizzledTunTypeMethod = class_getInstanceMethod(NSApplication.self, #selector(NSApplication.swizzled_runType))!
+
+        method_exchangeImplementations(runTypeMethod, swizzledTunTypeMethod)
+    }()
+
+    @objc dynamic func swizzled_runType() -> NSApplication.RunType {
+        RunType(bundle: Bundle(for: TestRunHelper.self))
+    }
+
+}
+
+extension NSApplication.RunType {
+
+    init(bundle: Bundle) {
+        if bundle.displayName!.hasPrefix("Unit") {
+            self = .unitTests
+        } else if bundle.displayName!.hasPrefix("Integration") {
+            self = .integrationTests
+        } else {
+            self = .uiTests
+        }
     }
 
 }
