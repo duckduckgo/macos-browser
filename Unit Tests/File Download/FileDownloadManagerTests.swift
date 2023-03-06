@@ -310,8 +310,7 @@ private extension FileManager {
         self.urlsForIn = nil
     }
 
-    @objc
-    func swizzled_urls(for directory: FileManager.SearchPathDirectory, in domainMask: FileManager.SearchPathDomainMask) -> [URL] {
+    @objc dynamic func swizzled_urls(for directory: FileManager.SearchPathDirectory, in domainMask: FileManager.SearchPathDomainMask) -> [URL] {
         Self.lock.lock()
         defer { Self.lock.unlock() }
         guard let urlsForIn = Self.urlsForIn else { return self.urls(for: directory, in: domainMask) }

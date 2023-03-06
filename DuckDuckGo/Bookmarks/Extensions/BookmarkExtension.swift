@@ -1,7 +1,7 @@
 //
-//  NSPasteboardExtension.swift
+//  BookmarkExtension.swift
 //
-//  Copyright © 2021 DuckDuckGo. All rights reserved.
+//  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -18,18 +18,14 @@
 
 import Foundation
 
-extension NSPasteboard {
+extension Bookmark {
 
-    func copy(_ string: String) {
-        clearContents()
-        setString(string, forType: .string)
-    }
-
-    func copy(_ url: URL, withString string: String? = nil) {
-        clearContents()
-        declareTypes([.URL], owner: nil)
-        (url as NSURL).write(to: self)
-        setString(string ?? url.absoluteString, forType: .string)
+    func copyUrlToPasteboard(_ pasteboard: NSPasteboard = .general) {
+        if let url = self.urlObject {
+            pasteboard.copy(url, withString: self.url)
+        } else {
+            pasteboard.copy(self.url)
+        }
     }
 
 }

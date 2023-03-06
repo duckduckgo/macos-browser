@@ -200,7 +200,6 @@ extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
         bookmarksBarCollectionView.reloadData()
     }
 
-    // swiftlint:disable:next cyclomatic_complexity
     private func handle(_ action: BookmarksBarViewModel.BookmarksBarItemAction, for bookmark: Bookmark) {
         switch action {
         case .openInNewTab:
@@ -222,8 +221,7 @@ extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
         case .moveToEnd:
             bookmarkManager.move(objectUUIDs: [bookmark.id], toIndex: nil, withinParentFolder: .root) { _ in }
         case .copyURL:
-            guard let url = bookmark.urlObject else { return }
-            NSPasteboard.general.copy(url: url)
+            bookmark.copyUrlToPasteboard()
         case .deleteEntity:
             bookmarkManager.remove(bookmark: bookmark)
         }

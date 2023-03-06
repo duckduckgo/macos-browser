@@ -131,6 +131,7 @@ final class FileDownloadManager: FileDownloadManagerProtocol {
 
 extension FileDownloadManager: WebKitDownloadTaskDelegate {
 
+    // swiftlint:disable:next function_body_length
     func fileDownloadTaskNeedsDestinationURL(_ task: WebKitDownloadTask,
                                              suggestedFilename: String,
                                              completionHandler: @escaping (URL?, UTType?) -> Void) {
@@ -171,7 +172,10 @@ extension FileDownloadManager: WebKitDownloadTaskDelegate {
             }
 
             // Make sure the app has an access to destination
-            guard self.verifyAccessToDestinationFolder(url.deletingLastPathComponent()) else {
+            let folderUrl = url.deletingLastPathComponent()
+            guard self.verifyAccessToDestinationFolder(folderUrl,
+                                                       destinationRequested: preferences.alwaysRequestDownloadLocation,
+                                                       isSandboxed: NSApp.isSandboxed) else {
                 completion(nil, nil)
                 return
             }
@@ -192,7 +196,16 @@ extension FileDownloadManager: WebKitDownloadTaskDelegate {
                 return
             }
 
-            self.preferences.lastUsedCustomDownloadLocation = url.deletingLastPathComponent()
+            let folderUrl = url.deletingLastPathComponent()
+            self.preferences.lastUsedCustomDownloadLocation = folderUrl
+
+            // Make sure the app has an access to destination
+            guard self.verifyAccessToDestinationFolder(folderUrl,
+                                                       destinationRequested: self.preferences.alwaysRequestDownloadLocation,
+                                                       isSandboxed: NSApp.isSandboxed) else {
+                completion(nil, nil)
+                return
+            }
 
             if FileManager.default.fileExists(atPath: url.path) {
                 // if SavePanel points to an existing location that means overwrite was chosen
@@ -203,7 +216,9 @@ extension FileDownloadManager: WebKitDownloadTaskDelegate {
         }
     }
 
-    private func verifyAccessToDestinationFolder(_ folderUrl: URL) -> Bool {
+    private func verifyAccessToDestinationFolder(_ folderUrl: URL, destinationRequested: Bool, isSandboxed: Bool) -> Bool {
+        if destinationRequested && isSandboxed { return true }
+
         let folderPath = folderUrl.relativePath
         let c = open(folderPath, O_RDONLY)
         let hasAccess = c != -1

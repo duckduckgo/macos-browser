@@ -35,10 +35,10 @@ final class InternalUserDecider {
         self.store = store
 
 #if DEBUG || REVIEW
-        if AppDelegate.isRunningTests {
-            isInternalUser = (try? store.load()) ?? false
-        } else {
+        if case .normal = NSApp.runType {
             isInternalUser = true
+        } else {
+            isInternalUser = (try? store.load()) ?? false
         }
 #elseif APPSTORE
         isInternalUser = false

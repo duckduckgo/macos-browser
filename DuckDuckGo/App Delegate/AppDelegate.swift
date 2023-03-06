@@ -27,12 +27,6 @@ import Bookmarks
 final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDelegate {
 
 #if DEBUG
-    static var isRunningTests: Bool = ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
-#else
-    static var isRunningTests: Bool { false }
-#endif
-
-#if DEBUG
     let disableCVDisplayLinkLogs: Void = {
         // Disable CVDisplayLink logs
         CFPreferencesSetValue("cv_note" as CFString,
@@ -63,7 +57,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
     // swiftlint:disable:next function_body_length
     func applicationWillFinishLaunching(_ notification: Notification) {
-        if !Self.isRunningTests {
+        if !NSApp.isRunningUnitTests {
 #if DEBUG
             Pixel.setUp(dryRun: true)
 #else
@@ -109,7 +103,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         func mock<T>(_ className: String) -> T {
             ((NSClassFromString(className) as? NSObject.Type)!.init() as? T)!
         }
-        AppPrivacyFeatures.shared = AppDelegate.isRunningTests
+        AppPrivacyFeatures.shared = NSApp.isRunningUnitTests
             // runtime mock-replacement for Unit Tests, to be redone when we‘ll be doing Dependency Injection
             ? AppPrivacyFeatures(contentBlocking: mock("ContentBlockingMock"), httpsUpgradeStore: mock("HTTPSUpgradeStoreMock"))
             : AppPrivacyFeatures(contentBlocking: AppContentBlocking(), httpsUpgradeStore: AppHTTPSUpgradeStore())
@@ -119,7 +113,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 #endif
 
         do {
-            let encryptionKey = Self.isRunningTests ? nil : try keyStore.readKey()
+            let encryptionKey = NSApp.isRunningUnitTests ? nil : try keyStore.readKey()
             fileStore = EncryptedFileStore(encryptionKey: encryptionKey)
         } catch {
             os_log("App Encryption Key could not be read: %s", "\(error)")
@@ -139,7 +133,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        guard !Self.isRunningTests else { return }
+        guard !NSApp.isRunningUnitTests else { return }
 
         HistoryCoordinator.shared.loadHistory()
         PrivacyFeatures.httpsUpgrade.loadDataAsync()
@@ -159,7 +153,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
         BWManager.shared.initCommunication()
 
-        if WindowsManager.windows.isEmpty {
+        if WindowsManager.windows.isEmpty,
+           case .normal = NSApp.runType {
             WindowsManager.openNewWindow(lazyLoadTabs: true)
         }
 

@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1676930860840,
+    "version": 1677228487157,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -177,10 +177,14 @@
                 {
                     "domain": "containerstore.com",
                     "reason": "Generally poor UX - no username saved on signup, prompts for Duck address on 'forgot password'."
+                },
+                {
+                    "domain": "roll20.net",
+                    "reason": "Performance issue for too many fields."
                 }
             ],
             "state": "enabled",
-            "hash": "cdb6aeccec0eb59ae554f3fd75d336cc"
+            "hash": "59c4bd9b8cee343c81da98bfe5d77928"
         },
         "clickToPlay": {
             "exceptions": [],
@@ -213,48 +217,11 @@
         },
         "customUserAgent": {
             "settings": {
-                "webViewDefault": [
-                    {
-                        "domain": "blinkist.com",
-                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/693"
-                    },
-                    {
-                        "domain": "help.ryanair.com",
-                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/693"
-                    },
-                    {
-                        "domain": "nordaccount.com",
-                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/693"
-                    },
-                    {
-                        "domain": "openai.com",
-                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/693"
-                    },
-                    {
-                        "domain": "cloudflare.com",
-                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/693"
-                    },
-                    {
-                        "domain": "ancestry.com",
-                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/693"
-                    },
-                    {
-                        "domain": "bookshop.org",
-                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/693"
-                    },
-                    {
-                        "domain": "easyjet.com",
-                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/693"
-                    },
-                    {
-                        "domain": "teraflex.com",
-                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/693"
-                    }
-                ]
+                "webViewDefault": []
             },
             "exceptions": [],
             "state": "enabled",
-            "hash": "c36e7407d63ead7a9009e52146897de3"
+            "hash": "20fac626eb5a1753e359c96cc29dc9c3"
         },
         "duckPlayer": {
             "exceptions": [],
@@ -301,6 +268,10 @@
                 },
                 {
                     "domain": "blick.ch",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/592"
+                },
+                {
+                    "domain": "wunderground.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/592"
                 }
             ],
@@ -1151,7 +1122,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "d719a498422990f19674a5a450d300b4"
+            "hash": "fd99f6021f8a1e802f6fa4ee96f3614e"
         },
         "fingerprintingAudio": {
             "state": "disabled",
@@ -1321,6 +1292,10 @@
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/644"
                 },
                 {
+                    "domain": "duluthtrading.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/700"
+                },
+                {
                     "domain": "web.whatsapp.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/620"
                 }
@@ -1334,7 +1309,7 @@
                     "privacy-test-pages.glitch.me"
                 ]
             },
-            "hash": "4d1b636f1a6bc56bdaf40e3d71ffd583"
+            "hash": "470c77b05c99b8f0986cc40422a59c91"
         },
         "https": {
             "state": "enabled",
@@ -1931,6 +1906,13 @@
                                     "wunderground.com"
                                 ],
                                 "reason": "ah.nl - 'Bonus offer' elements do not render and are not clickable.,wunderground.com - Video element does not display."
+                            },
+                            {
+                                "rule": "securepubads.g.doubleclick.net/pagead/ppub_config",
+                                "domains": [
+                                    "weather.com"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/415"
                             }
                         ]
                     },
@@ -4874,7 +4856,7 @@
                 }
             },
             "exceptions": [],
-            "hash": "a8e5a6de6c7c15ebfbb5b3a7ed0486c7"
+            "hash": "155f930cd84f8ec37c35a3c9e29df9e1"
         },
         "trackingCookies1p": {
             "settings": {

@@ -52,7 +52,7 @@ final class DownloadListStore: DownloadListStoring {
     private var context: NSManagedObjectContext? {
         if case .none = _context {
 #if DEBUG
-            if AppDelegate.isRunningTests {
+            if NSApp.isRunningUnitTests {
                 _context = .some(.none)
                 return .none
             }
@@ -203,6 +203,7 @@ extension DownloadListItem {
               let modified = managedObject.modified,
               let url = managedObject.urlEncrypted as? URL
         else {
+            Pixel.fire(.debug(event: .downloadListItemDecryptionFailed))
             assertionFailure("DownloadListItem: Failed to init from ManagedObject")
             return nil
         }

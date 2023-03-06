@@ -56,7 +56,7 @@ final class Database {
         }
 
 #if DEBUG
-        assert(!AppDelegate.isRunningTests, "Use CoreData.---Container() methods for testing purposes")
+        assert(!NSApp.isRunningUnitTests, "Use CoreData.---Container() methods for testing purposes")
 #endif
 
         return makeDatabase(keyStore: EncryptionKeyStore(generator: EncryptionKeyGenerator()))

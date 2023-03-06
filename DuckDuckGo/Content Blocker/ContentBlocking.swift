@@ -96,9 +96,7 @@ final class AppContentBlocking {
     }
 
     private static let debugEvents = EventMapping<ContentBlockerDebugEvents> { event, error, parameters, onComplete in
-#if DEBUG
-        guard !AppDelegate.isRunningTests else { return }
-#endif
+        guard !NSApp.isRunningUnitTests else { return }
 
         let domainEvent: Pixel.Event.Debug
         switch event {
