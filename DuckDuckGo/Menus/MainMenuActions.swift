@@ -653,8 +653,7 @@ extension MainViewController {
     }
 
     @IBAction func fetchConfigurationNow(_ sender: Any?) {
-        ConfigurationManager.shared.lastUpdateTime = .distantPast
-        ConfigurationManager.shared.refreshIfNeeded()
+        ConfigurationManager.shared.forceRefresh()
     }
 
     // MARK: - Developer Tools

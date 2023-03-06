@@ -18,7 +18,7 @@
 
 import Foundation
 import os.log
-import API
+import Networking
 
 final class FeedbackSender {
 

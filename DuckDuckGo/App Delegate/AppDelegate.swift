@@ -22,7 +22,7 @@ import os.log
 import BrowserServicesKit
 import Persistence
 import Configuration
-import API
+import Networking
 
 @NSApplicationMain
 final class AppDelegate: NSObject, NSApplicationDelegate {
@@ -63,7 +63,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     var appUsageActivityMonitor: AppUsageActivityMonitor?
 
     func applicationWillFinishLaunching(_ notification: Notification) {
-        APIHeaders.setUserAgent(UserAgent.duckDuckGoUserAgent())
+        APIRequest.Headers.setUserAgent(UserAgent.duckDuckGoUserAgent())
         Configuration.setURLProvider(AppConfigurationURLProvider())
 
         if !Self.isRunningTests {

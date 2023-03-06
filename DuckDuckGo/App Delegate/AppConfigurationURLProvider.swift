@@ -19,7 +19,7 @@
 import Foundation
 import Configuration
 
-struct AppConfigurationURLProvider: ConfigurationURLProvider {
+struct AppConfigurationURLProvider: ConfigurationURLProviding {
 
     func url(for configuration: Configuration) -> URL {
         switch configuration {
