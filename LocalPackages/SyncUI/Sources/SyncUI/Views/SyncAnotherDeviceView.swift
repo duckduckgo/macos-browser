@@ -1,5 +1,5 @@
 //
-//  AskToSyncAnotherDeviceView.swift
+//  SyncAnotherDeviceView.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -19,48 +19,120 @@
 import SwiftUI
 import SwiftUIExtensions
 
-public protocol AskToSyncAnotherDeviceViewModel: ObservableObject {
-    associatedtype AskToSyncAnotherDeviceViewUserText: SyncUI.AskToSyncAnotherDeviceViewUserText
+public protocol SyncAnotherDeviceViewModel: ObservableObject {
+    associatedtype SyncAnotherDeviceViewUserText: SyncUI.SyncAnotherDeviceViewUserText
+
+    var recoveryCode: String? { get }
 
     func endFlow()
-    func presentSyncAnotherDeviceDialog()
+    func addAnotherDevice()
 }
 
-public protocol AskToSyncAnotherDeviceViewUserText {
-    static var syncAnotherDeviceTitle: String { get }
-    static var syncAnotherDeviceExplanation1: String { get }
-    static var syncAnotherDeviceExplanation2: String { get }
-    static var notNow: String { get }
-    static var syncAnotherDevice: String { get }
+public protocol SyncAnotherDeviceViewUserText {
+    static var syncNewDevice: String { get }
+    static var showCode: String { get }
+    static var enterCode: String { get }
+    static var cancel: String { get }
+    static var submit: String { get }
+    static var syncNewDeviceShowCodeInstructions: String { get }
+    static var syncNewDeviceEnterCodeInstructions: String { get }
+    static var copy: String { get }
+    static var pasteFromClipboard: String { get }
 }
 
-public struct AskToSyncAnotherDeviceView<ViewModel>: View where ViewModel: AskToSyncAnotherDeviceViewModel {
-    typealias UserText = ViewModel.AskToSyncAnotherDeviceViewUserText
+public struct SyncAnotherDeviceView<ViewModel>: View where ViewModel: SyncAnotherDeviceViewModel {
+    typealias UserText = ViewModel.SyncAnotherDeviceViewUserText
 
     @EnvironmentObject public var model: ViewModel
+    @EnvironmentObject public var recoveryCodeModel: RecoveryCodeViewModel
 
     public init() {}
 
+    enum Mode: Hashable {
+        case showCode, enterCode
+    }
+
+    @State var selectedMode: Mode = .showCode
+
     public var body: some View {
-        SyncDialog {
-            VStack(spacing: 20) {
-                Image("SyncAnotherDeviceDialog")
-                Text(UserText.syncAnotherDeviceTitle)
-                    .font(.system(size: 17, weight: .bold))
-                Text(UserText.syncAnotherDeviceExplanation1)
-                    .multilineTextAlignment(.center)
-                Text(UserText.syncAnotherDeviceExplanation2)
-                    .multilineTextAlignment(.center)
+        SyncDialog(spacing: 20.0) {
+            Text(UserText.syncNewDevice)
+                .font(.system(size: 17, weight: .bold))
+
+            Picker("", selection: $selectedMode) {
+                Text(UserText.showCode).tag(Mode.showCode)
+                Text(UserText.enterCode).tag(Mode.enterCode)
+            }
+            .pickerStyle(.segmented)
+
+            switch selectedMode {
+            case .showCode:
+                ShowCodeView<ViewModel>().environmentObject(model)
+            case .enterCode:
+                EnterCodeView(
+                    instructions: UserText.syncNewDeviceEnterCodeInstructions,
+                    buttonCaption: UserText.pasteFromClipboard
+                )
+                .environmentObject(recoveryCodeModel)
             }
         } buttons: {
-            Button(UserText.notNow) {
-                model.endFlow()
+            switch selectedMode {
+            case .showCode:
+                Button(UserText.cancel) {
+                    model.endFlow()
+                }
+            case .enterCode:
+                Button(UserText.cancel) {
+                    model.endFlow()
+                }
+                Button(UserText.submit) {
+                    model.addAnotherDevice()
+                }
+                .buttonStyle(DefaultActionButtonStyle(enabled: !recoveryCodeModel.shouldDisableSubmitButton))
+                .disabled(recoveryCodeModel.shouldDisableSubmitButton)
             }
-            Button(UserText.syncAnotherDevice) {
-                model.presentSyncAnotherDeviceDialog()
-            }
-            .buttonStyle(DefaultActionButtonStyle(enabled: true))
         }
-        .frame(width: 360, height: 314)
+        .frame(width: 480, height: 432)
+    }
+
+}
+
+private struct ShowCodeView<ViewModel>: View where ViewModel: SyncAnotherDeviceViewModel {
+    typealias UserText = ViewModel.SyncAnotherDeviceViewUserText
+
+    @EnvironmentObject var model: ViewModel
+
+    var body: some View {
+        VStack(spacing: 20) {
+            Text(UserText.syncNewDeviceShowCodeInstructions)
+                .multilineTextAlignment(.center)
+
+            HStack(alignment: .top, spacing: 20) {
+                QRCode(string: model.recoveryCode ?? "", size: .init(width: 164, height: 164))
+
+                VStack {
+                    SyncKeyView(text: model.recoveryCode ?? "")
+
+                    Spacer()
+
+                    HStack {
+                        Spacer()
+                        Button {
+                            NSPasteboard.general.clearContents()
+                            NSPasteboard.general.setString(model.recoveryCode ?? "", forType: .string)
+                        } label: {
+                            HStack {
+                                Image("Copy")
+                                Text(UserText.copy)
+                            }
+                        }
+                        .buttonStyle(CopyPasteButtonStyle())
+                    }
+                }
+                .frame(maxHeight: .infinity)
+            }
+        }
+        .padding(20)
+        .roundedBorder()
     }
 }

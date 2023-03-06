@@ -22,6 +22,7 @@ import SyncUI
 extension UserText: EnableSyncViewUserText {}
 extension UserText: AskToSyncAnotherDeviceViewUserText {}
 extension UserText: RecoverAccountViewUserText {}
+extension UserText: SyncAnotherDeviceViewUserText {}
 
 extension SyncPreferences: EnableSyncViewModel {
     typealias EnableSyncViewUserText = UserText
@@ -31,6 +32,9 @@ extension SyncPreferences: AskToSyncAnotherDeviceViewModel {
 }
 extension SyncPreferences: RecoverAccountViewModel {
     typealias RecoverAccountViewUserText = UserText
+}
+extension SyncPreferences: SyncAnotherDeviceViewModel {
+    typealias SyncAnotherDeviceViewUserText = UserText
 }
 
 struct SyncSetupView: View {
@@ -57,8 +61,8 @@ struct SyncSetupView: View {
             AskToSyncAnotherDeviceView<SyncPreferences>().environmentObject(model)
         case .recoverAccount:
             RecoverAccountView<SyncPreferences>().environmentObject(model).environmentObject(recoveryCodeModel)
-//        case .syncAnotherDevice:
-//            SyncAnotherDeviceView<SyncPreferences>().environmentObject(model)
+        case .syncAnotherDevice:
+            SyncAnotherDeviceView<SyncPreferences>().environmentObject(model).environmentObject(recoveryCodeModel)
 //        case .deviceSynced:
 //            SyncSetupCompleteView().environmentObject(model)
 //        case .saveRecoveryPDF:

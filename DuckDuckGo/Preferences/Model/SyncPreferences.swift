@@ -132,6 +132,9 @@ final class SyncPreferences: ObservableObject {
         }
     }
 
+    func addAnotherDevice() {
+    }
+
     func endFlow() {
         flowStep = nil
     }
