@@ -22,16 +22,16 @@ public protocol SyncSetupCompleteViewModel: ObservableObject {
     func confirmSetupComplete()
 }
 
-public struct SyncSetupCompleteView<ViewModel>: View where ViewModel: SyncSetupCompleteViewModel {
-    @EnvironmentObject public var model: ViewModel
+struct SyncSetupCompleteView<ViewModel>: View where ViewModel: SyncSetupCompleteViewModel {
+    @EnvironmentObject var model: ViewModel
 
-    public init() {}
+    init() {}
 
     var device: SyncDevice {
         .init(kind: .mobile, name: "Dave's iPhone 14", id: UUID().uuidString)
     }
 
-    public var body: some View {
+    var body: some View {
         SyncDialog(spacing: 20.0) {
             VStack(spacing: 20) {
                 Image("SyncSetupComplete")

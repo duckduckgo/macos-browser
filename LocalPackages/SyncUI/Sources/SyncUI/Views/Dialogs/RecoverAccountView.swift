@@ -24,13 +24,13 @@ public protocol RecoverAccountViewModel: ObservableObject {
     func recoverDevice(using recoveryCode: String)
 }
 
-public struct RecoverAccountView<ViewModel>: View where ViewModel: RecoverAccountViewModel {
-    @EnvironmentObject public var model: ViewModel
-    @EnvironmentObject public var recoveryCodeModel: RecoveryCodeViewModel
+struct RecoverAccountView<ViewModel>: View where ViewModel: RecoverAccountViewModel {
+    @EnvironmentObject var model: ViewModel
+    @EnvironmentObject var recoveryCodeModel: RecoveryCodeViewModel
 
-    public init() {}
+    init() {}
 
-    public var body: some View {
+    var body: some View {
         SyncDialog(spacing: 20.0) {
             Text(UserText.recoverSyncedDataTitle)
                 .font(.system(size: 17, weight: .bold))

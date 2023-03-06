@@ -24,12 +24,12 @@ public protocol EnableSyncViewModel: ObservableObject {
     func turnOnSync()
 }
 
-public struct EnableSyncView<ViewModel>: View where ViewModel: EnableSyncViewModel {
-    @EnvironmentObject public var model: ViewModel
+struct EnableSyncView<ViewModel>: View where ViewModel: EnableSyncViewModel {
+    @EnvironmentObject var model: ViewModel
 
-    public init() {}
+    init() {}
 
-    public var body: some View {
+    var body: some View {
         SyncDialog {
             VStack(spacing: 20) {
                 Image("SyncTurnOnDialog")

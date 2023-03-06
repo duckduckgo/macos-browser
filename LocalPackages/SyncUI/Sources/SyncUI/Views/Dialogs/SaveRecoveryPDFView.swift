@@ -24,12 +24,12 @@ public protocol SaveRecoveryPDFViewModel: ObservableObject {
     func saveRecoveryPDF()
 }
 
-public struct SaveRecoveryPDFView<ViewModel>: View where ViewModel: SaveRecoveryPDFViewModel {
-    @EnvironmentObject public var model: ViewModel
+struct SaveRecoveryPDFView<ViewModel>: View where ViewModel: SaveRecoveryPDFViewModel {
+    @EnvironmentObject var model: ViewModel
 
-    public init() {}
+    init() {}
 
-    public var body: some View {
+    var body: some View {
         SyncDialog {
             VStack(spacing: 20.0) {
                 Image("SyncRecoveryPDF")

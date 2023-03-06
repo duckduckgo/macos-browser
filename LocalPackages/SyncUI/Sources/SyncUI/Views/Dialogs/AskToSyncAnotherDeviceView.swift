@@ -24,13 +24,13 @@ public protocol AskToSyncAnotherDeviceViewModel: ObservableObject {
     func presentSyncAnotherDeviceDialog()
 }
 
-public struct AskToSyncAnotherDeviceView<ViewModel>: View where ViewModel: AskToSyncAnotherDeviceViewModel {
+struct AskToSyncAnotherDeviceView<ViewModel>: View where ViewModel: AskToSyncAnotherDeviceViewModel {
 
-    @EnvironmentObject public var model: ViewModel
+    @EnvironmentObject var model: ViewModel
 
-    public init() {}
+    init() {}
 
-    public var body: some View {
+    var body: some View {
         SyncDialog {
             VStack(spacing: 20) {
                 Image("SyncAnotherDeviceDialog")

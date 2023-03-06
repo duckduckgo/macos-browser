@@ -26,11 +26,11 @@ public protocol SyncAnotherDeviceViewModel: ObservableObject {
     func addAnotherDevice()
 }
 
-public struct SyncAnotherDeviceView<ViewModel>: View where ViewModel: SyncAnotherDeviceViewModel {
-    @EnvironmentObject public var model: ViewModel
-    @EnvironmentObject public var recoveryCodeModel: RecoveryCodeViewModel
+struct SyncAnotherDeviceView<ViewModel>: View where ViewModel: SyncAnotherDeviceViewModel {
+    @EnvironmentObject var model: ViewModel
+    @EnvironmentObject var recoveryCodeModel: RecoveryCodeViewModel
 
-    public init() {}
+    init() {}
 
     enum Mode: Hashable {
         case showCode, enterCode
@@ -38,7 +38,7 @@ public struct SyncAnotherDeviceView<ViewModel>: View where ViewModel: SyncAnothe
 
     @State var selectedMode: Mode = .showCode
 
-    public var body: some View {
+    var body: some View {
         SyncDialog(spacing: 20.0) {
             Text(UserText.syncNewDevice)
                 .font(.system(size: 17, weight: .bold))
