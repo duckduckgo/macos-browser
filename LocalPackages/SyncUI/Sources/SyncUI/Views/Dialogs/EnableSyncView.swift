@@ -20,23 +20,11 @@ import SwiftUI
 import SwiftUIExtensions
 
 public protocol EnableSyncViewModel: ObservableObject {
-    associatedtype EnableSyncViewUserText: SyncUI.EnableSyncViewUserText
-
     func endFlow()
     func turnOnSync()
 }
 
-public protocol EnableSyncViewUserText {
-    static var turnOnSyncQuestion: String { get }
-    static var turnOnSyncExplanation1: String { get }
-    static var turnOnSyncExplanation2: String { get }
-    static var cancel: String { get }
-    static var turnOnSync: String { get }
-}
-
 public struct EnableSyncView<ViewModel>: View where ViewModel: EnableSyncViewModel {
-    typealias UserText = ViewModel.EnableSyncViewUserText
-
     @EnvironmentObject public var model: ViewModel
 
     public init() {}

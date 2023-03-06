@@ -18,32 +18,6 @@
 
 import SwiftUI
 
-//extension UserText: EnableSyncViewUserText {}
-//extension UserText: AskToSyncAnotherDeviceViewUserText {}
-//extension UserText: RecoverAccountViewUserText {}
-//extension UserText: SyncAnotherDeviceViewUserText {}
-//extension UserText: SyncSetupCompleteViewUserText {}
-//extension UserText: SaveRecoveryPDFViewUserText {}
-//
-//extension SyncPreferences: EnableSyncViewModel {
-//    typealias EnableSyncViewUserText = UserText
-//}
-//extension SyncPreferences: AskToSyncAnotherDeviceViewModel {
-//    typealias AskToSyncAnotherDeviceViewUserText = UserText
-//}
-//extension SyncPreferences: RecoverAccountViewModel {
-//    typealias RecoverAccountViewUserText = UserText
-//}
-//extension SyncPreferences: SyncAnotherDeviceViewModel {
-//    typealias SyncAnotherDeviceViewUserText = UserText
-//}
-//extension SyncPreferences: SyncSetupCompleteViewModel {
-//    typealias SyncSetupCompleteViewUserText = UserText
-//}
-//extension SyncPreferences: SaveRecoveryPDFViewModel {
-//    typealias SaveRecoveryPDFViewUserText = UserText
-//}
-
 public protocol SyncManagementDialogModel: ObservableObject,
                                            EnableSyncViewModel,
                                            AskToSyncAnotherDeviceViewModel,
@@ -52,16 +26,10 @@ public protocol SyncManagementDialogModel: ObservableObject,
                                            SyncSetupCompleteViewModel,
                                            SaveRecoveryPDFViewModel {
 
-    associatedtype SyncManagementDialogUserText: SyncUI.SyncManagementDialogUserText
-
     var currentDialog: SyncManagementDialogKind? { get }
 
     var shouldShowErrorMessage: Bool { get set }
     var errorMessage: String? { get }
-}
-
-public protocol SyncManagementDialogUserText {
-    static var ok: String { get }
 }
 
 public enum SyncManagementDialogKind {
@@ -69,8 +37,6 @@ public enum SyncManagementDialogKind {
 }
 
 public struct SyncManagementDialog<ViewModel>: View where ViewModel: SyncManagementDialogModel {
-    typealias UserText = ViewModel.SyncManagementDialogUserText
-
     @ObservedObject public var model: ViewModel
     @ObservedObject public var recoveryCodeModel: RecoveryCodeViewModel
 

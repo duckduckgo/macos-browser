@@ -48,8 +48,6 @@ enum Const {
 }
 
 public protocol SyncManagementViewModel: ObservableObject {
-    associatedtype SyncManagementViewUserText: SyncUI.SyncManagementViewUserText
-
     var isSyncEnabled: Bool { get }
     var shouldShowErrorMessage: Bool { get set }
     var errorMessage: String? { get }
@@ -62,29 +60,7 @@ public protocol SyncManagementViewModel: ObservableObject {
     func turnOffSync()
 }
 
-public protocol SyncManagementViewUserText {
-    static var sync: String { get }
-    static var ok: String { get }
-    static var syncSetupExplanation: String { get }
-    static var turnOnSyncWithEllipsis: String { get }
-    static var recoverSyncedData: String { get }
-    static var syncedDevices: String { get }
-    static var syncNewDevice: String { get }
-    static var recovery: String { get }
-    static var recoveryInstructions: String { get }
-    static var saveRecoveryPDF: String { get }
-    static var turnOffAndDeleteServerData: String { get }
-    static var syncNewDeviceInstructions: String { get }
-    static var showOrEnterCode: String { get }
-    static var syncConnected: String { get }
-    static var turnOffSync: String { get }
-    static var thisDevice: String { get }
-    static var currentDeviceDetails: String { get }
-}
-
 public struct SyncManagementView<ViewModel>: View where ViewModel: SyncManagementViewModel {
-    typealias UserText = ViewModel.SyncManagementViewUserText
-
     @ObservedObject public var model: ViewModel
 
     public init(model: ViewModel) {
@@ -111,7 +87,6 @@ public struct SyncManagementView<ViewModel>: View where ViewModel: SyncManagemen
 }
 
 struct SyncSetupView<ViewModel>: View where ViewModel: SyncManagementViewModel {
-    typealias UserText = ViewModel.SyncManagementViewUserText
     @EnvironmentObject var model: ViewModel
 
     var body: some View {
@@ -143,7 +118,6 @@ struct SyncSetupView<ViewModel>: View where ViewModel: SyncManagementViewModel {
 }
 
 struct SyncEnabledView<ViewModel>: View where ViewModel: SyncManagementViewModel {
-    typealias UserText = ViewModel.SyncManagementViewUserText
     @EnvironmentObject var model: ViewModel
 
     var body: some View {
@@ -191,7 +165,6 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: SyncManagementViewModel
 }
 
 struct SyncNewDeviceView<ViewModel>: View where ViewModel: SyncManagementViewModel {
-    typealias UserText = ViewModel.SyncManagementViewUserText
     @EnvironmentObject var model: ViewModel
 
     var body: some View {
@@ -219,7 +192,6 @@ struct SyncNewDeviceView<ViewModel>: View where ViewModel: SyncManagementViewMod
 }
 
 private struct SyncStatusView<ViewModel>: View where ViewModel: SyncManagementViewModel {
-    typealias UserText = ViewModel.SyncManagementViewUserText
     @EnvironmentObject var model: ViewModel
 
     var body: some View {
@@ -237,7 +209,6 @@ private struct SyncStatusView<ViewModel>: View where ViewModel: SyncManagementVi
 }
 
 private struct SyncedDevicesView<ViewModel>: View where ViewModel: SyncManagementViewModel {
-    typealias UserText = ViewModel.SyncManagementViewUserText
     @EnvironmentObject var model: ViewModel
 
     var body: some View {

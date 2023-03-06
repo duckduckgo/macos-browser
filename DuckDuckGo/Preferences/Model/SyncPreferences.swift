@@ -52,6 +52,10 @@ final class SyncPreferences: ObservableObject {
     @Published var shouldShowErrorMessage: Bool = false
     @Published private(set) var errorMessage: String?
 
+    var recoveryCode: String? {
+        account?.recoveryCode
+    }
+
     init(syncService: SyncService = .shared) {
         self.syncService = syncService
         updateState()
@@ -180,14 +184,4 @@ final class SyncPreferences: ObservableObject {
 
     private let syncService: SyncService
     private var isSyncEnabledCancellable: AnyCancellable?
-}
-
-extension UserText: SyncManagementViewUserText {}
-
-extension SyncPreferences: SyncManagementViewModel {
-    typealias SyncManagementViewUserText = UserText
-
-    var recoveryCode: String? {
-        account?.recoveryCode
-    }
 }

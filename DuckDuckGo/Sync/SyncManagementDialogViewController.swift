@@ -20,24 +20,7 @@ import AppKit
 import SwiftUI
 import SyncUI
 
-extension SyncPreferences: SyncManagementDialogModel {
-    typealias SyncManagementDialogUserText = UserText
-    typealias EnableSyncViewUserText = UserText
-    typealias AskToSyncAnotherDeviceViewUserText = UserText
-    typealias RecoverAccountViewUserText = UserText
-    typealias SyncAnotherDeviceViewUserText = UserText
-    typealias SyncSetupCompleteViewUserText = UserText
-    typealias SaveRecoveryPDFViewUserText = UserText
-}
-
-extension UserText: SyncManagementDialogUserText {}
-extension UserText: EnableSyncViewUserText {}
-extension UserText: AskToSyncAnotherDeviceViewUserText {}
-extension UserText: RecoverAccountViewUserText {}
-extension UserText: SyncAnotherDeviceViewUserText {}
-extension UserText: SyncSetupCompleteViewUserText {}
-extension UserText: SaveRecoveryPDFViewUserText {}
-
+extension SyncPreferences: SyncManagementViewModel, SyncManagementDialogModel {}
 
 final class SyncManagementDialogViewController: NSViewController {
 

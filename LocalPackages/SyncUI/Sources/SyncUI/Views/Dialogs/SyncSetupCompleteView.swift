@@ -19,20 +19,10 @@
 import SwiftUI
 
 public protocol SyncSetupCompleteViewModel: ObservableObject {
-    associatedtype SyncSetupCompleteViewUserText: SyncUI.SyncSetupCompleteViewUserText
-
     func confirmSetupComplete()
 }
 
-public protocol SyncSetupCompleteViewUserText {
-    static var deviceSynced: String { get }
-    static var deviceSyncedExplanation: String { get }
-    static var next: String { get }
-}
-
 public struct SyncSetupCompleteView<ViewModel>: View where ViewModel: SyncSetupCompleteViewModel {
-    typealias UserText = ViewModel.SyncSetupCompleteViewUserText
-
     @EnvironmentObject public var model: ViewModel
 
     public init() {}

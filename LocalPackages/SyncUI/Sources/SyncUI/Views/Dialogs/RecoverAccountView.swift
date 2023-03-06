@@ -20,23 +20,11 @@ import SwiftUI
 import SwiftUIExtensions
 
 public protocol RecoverAccountViewModel: ObservableObject {
-    associatedtype RecoverAccountViewUserText: SyncUI.RecoverAccountViewUserText
-
     func endFlow()
     func recoverDevice(using recoveryCode: String)
 }
 
-public protocol RecoverAccountViewUserText {
-    static var recoverSyncedDataTitle: String { get }
-    static var cancel: String { get }
-    static var submit: String { get }
-    static var recoverSyncedDataExplanation: String { get }
-    static var pasteFromClipboard: String { get }
-}
-
 public struct RecoverAccountView<ViewModel>: View where ViewModel: RecoverAccountViewModel {
-    typealias UserText = ViewModel.RecoverAccountViewUserText
-
     @EnvironmentObject public var model: ViewModel
     @EnvironmentObject public var recoveryCodeModel: RecoveryCodeViewModel
 

@@ -20,22 +20,11 @@ import SwiftUI
 import SwiftUIExtensions
 
 public protocol SaveRecoveryPDFViewModel: ObservableObject {
-    associatedtype SaveRecoveryPDFViewUserText: SyncUI.SaveRecoveryPDFViewUserText
-
     func endFlow()
     func saveRecoveryPDF()
 }
 
-public protocol SaveRecoveryPDFViewUserText {
-    static var saveRecoveryPDF: String { get }
-    static var recoveryPDFExplanation1: String { get }
-    static var recoveryPDFExplanation2: String { get }
-    static var notNow: String { get }
-}
-
 public struct SaveRecoveryPDFView<ViewModel>: View where ViewModel: SaveRecoveryPDFViewModel {
-    typealias UserText = ViewModel.SaveRecoveryPDFViewUserText
-
     @EnvironmentObject public var model: ViewModel
 
     public init() {}

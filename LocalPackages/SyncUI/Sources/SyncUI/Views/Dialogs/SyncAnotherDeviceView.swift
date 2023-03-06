@@ -20,29 +20,13 @@ import SwiftUI
 import SwiftUIExtensions
 
 public protocol SyncAnotherDeviceViewModel: ObservableObject {
-    associatedtype SyncAnotherDeviceViewUserText: SyncUI.SyncAnotherDeviceViewUserText
-
     var recoveryCode: String? { get }
 
     func endFlow()
     func addAnotherDevice()
 }
 
-public protocol SyncAnotherDeviceViewUserText {
-    static var syncNewDevice: String { get }
-    static var showCode: String { get }
-    static var enterCode: String { get }
-    static var cancel: String { get }
-    static var submit: String { get }
-    static var syncNewDeviceShowCodeInstructions: String { get }
-    static var syncNewDeviceEnterCodeInstructions: String { get }
-    static var copy: String { get }
-    static var pasteFromClipboard: String { get }
-}
-
 public struct SyncAnotherDeviceView<ViewModel>: View where ViewModel: SyncAnotherDeviceViewModel {
-    typealias UserText = ViewModel.SyncAnotherDeviceViewUserText
-
     @EnvironmentObject public var model: ViewModel
     @EnvironmentObject public var recoveryCodeModel: RecoveryCodeViewModel
 
@@ -98,8 +82,6 @@ public struct SyncAnotherDeviceView<ViewModel>: View where ViewModel: SyncAnothe
 }
 
 private struct ShowCodeView<ViewModel>: View where ViewModel: SyncAnotherDeviceViewModel {
-    typealias UserText = ViewModel.SyncAnotherDeviceViewUserText
-
     @EnvironmentObject var model: ViewModel
 
     var body: some View {

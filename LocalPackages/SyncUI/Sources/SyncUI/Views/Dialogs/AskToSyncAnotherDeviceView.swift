@@ -20,22 +20,11 @@ import SwiftUI
 import SwiftUIExtensions
 
 public protocol AskToSyncAnotherDeviceViewModel: ObservableObject {
-    associatedtype AskToSyncAnotherDeviceViewUserText: SyncUI.AskToSyncAnotherDeviceViewUserText
-
     func endFlow()
     func presentSyncAnotherDeviceDialog()
 }
 
-public protocol AskToSyncAnotherDeviceViewUserText {
-    static var syncAnotherDeviceTitle: String { get }
-    static var syncAnotherDeviceExplanation1: String { get }
-    static var syncAnotherDeviceExplanation2: String { get }
-    static var notNow: String { get }
-    static var syncAnotherDevice: String { get }
-}
-
 public struct AskToSyncAnotherDeviceView<ViewModel>: View where ViewModel: AskToSyncAnotherDeviceViewModel {
-    typealias UserText = ViewModel.AskToSyncAnotherDeviceViewUserText
 
     @EnvironmentObject public var model: ViewModel
 
