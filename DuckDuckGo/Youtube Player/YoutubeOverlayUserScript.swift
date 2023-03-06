@@ -217,27 +217,13 @@ extension YoutubeOverlayUserScript: WKScriptMessageHandler {
 }
 
 extension YoutubeOverlayUserScript {
-    public struct JSPixel: Equatable {
-        private enum DuckPlayerPixelName: String {
-            case duckPlayerOverlayShown = "duckplayer_overlay_shown"
-        }
-
-        /// The pixel name sent by the JS layer. This name does not include the platform on which it was sent.
-        private let originalPixelName: String
-        public let pixelParameters: [String: String]?
-
-        init(pixelName: String, pixelParameters: [String: String]?) {
-            self.originalPixelName = pixelName
-            self.pixelParameters = pixelParameters
-        }
+    public enum JSPixel: String {
+        case overlay = "overlay";
+        case playUse = "play.use";
+        case playDoNotUse = "play.do_not_use";
 
         public var pixelName: String {
-            switch originalPixelName {
-            case DuckPlayerPixelName.duckPlayerOverlayShown.rawValue:
-                return "duckplayer_overlay_shown"
-            default:
-                return originalPixelName
-            }
+            self.rawValue
         }
     }
 
@@ -247,12 +233,14 @@ extension YoutubeOverlayUserScript {
         }
 
         guard let body = message.messageBody as? [String: Any],
-              let pixelName = body["pixelName"] as? String else {
+              let pixelName = body["pixelName"] as? String,
+              let knownPixel = JSPixel(rawValue: pixelName) else {
+            print("Not accepting an unknown pixel name")
             return
         }
 
         let pixelParameters = body["params"] as? [String: String]
 
-        Pixel.fire(.duckPlayerJSPixel(YoutubeOverlayUserScript.JSPixel(pixelName: pixelName, pixelParameters: pixelParameters)))
+        Pixel.fire(.duckPlayerJSPixel(knownPixel), withAdditionalParameters: pixelParameters)
     }
 }

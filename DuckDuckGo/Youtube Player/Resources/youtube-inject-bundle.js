@@ -484,166 +484,6 @@
   __publicField(DDGVideoOverlay, "CUSTOM_TAG_NAME", "ddg-video-overlay");
   customElements.define(DDGVideoOverlay.CUSTOM_TAG_NAME, DDGVideoOverlay);
 
-  // src/video-overlay-manager.js
-  var VideoOverlayManager = class {
-    constructor(userValues, environment, comms) {
-      __publicField(this, "lastVideoId", null);
-      __publicField(this, "videoPlayerIcon", null);
-      __publicField(this, "_cleanups", []);
-      this.userValues = userValues;
-      this.environment = environment;
-      this.comms = comms;
-    }
-    handleFirstPageLoad() {
-      if (!("alwaysAsk" in this.userValues.privatePlayerMode))
-        return;
-      if (this.userValues.overlayInteracted)
-        return;
-      const validParams = VideoParams.forWatchPage(this.environment.getHref());
-      if (!validParams)
-        return;
-      this.sideEffect("add css to head", () => {
-        const s = document.createElement("style");
-        s.innerText = ".html5-video-player { opacity: 0!important }";
-        document.head.appendChild(s);
-        return () => {
-          if (s.isConnected) {
-            document.head.removeChild(s);
-          }
-        };
-      });
-      this.sideEffect("wait for first video element", () => {
-        const int = setInterval(() => {
-          this.watchForVideoBeingAdded({ via: "first page load" });
-        }, 100);
-        return () => {
-          clearInterval(int);
-        };
-      });
-    }
-    addLargeOverlay(userValues, params) {
-      let playerVideo = document.querySelector("#player video"), containerElement = document.querySelector("#player .html5-video-player");
-      if (playerVideo && containerElement) {
-        this.stopVideoFromPlaying(playerVideo);
-        this.appendOverlayToPage(containerElement, params);
-      }
-    }
-    addSmallDaxOverlay(params) {
-      let containerElement = document.querySelector("#player .html5-video-player");
-      if (!containerElement) {
-        console.error("no container element");
-        return;
-      }
-      if (!this.videoPlayerIcon) {
-        this.videoPlayerIcon = new VideoPlayerIcon();
-      }
-      this.videoPlayerIcon.init(containerElement, params);
-    }
-    watchForVideoBeingAdded(opts = {}) {
-      const params = VideoParams.forWatchPage(this.environment.getHref());
-      if (!params) {
-        if (this.lastVideoId) {
-          this.removeAllOverlays();
-          this.lastVideoId = null;
-        }
-        return;
-      }
-      const conditions = [
-        opts.ignoreCache,
-        !this.lastVideoId,
-        this.lastVideoId && this.lastVideoId !== params.id
-      ];
-      if (conditions.some(Boolean)) {
-        const playerElement = document.querySelector("#player");
-        if (!playerElement) {
-          return null;
-        }
-        const userValues = this.userValues;
-        this.lastVideoId = params.id;
-        this.removeAllOverlays();
-        if ("enabled" in userValues.privatePlayerMode) {
-          this.addSmallDaxOverlay(params);
-        }
-        if ("alwaysAsk" in userValues.privatePlayerMode) {
-          if (!userValues.overlayInteracted) {
-            this.addLargeOverlay(userValues, params);
-          } else {
-            this.addSmallDaxOverlay(params);
-          }
-        }
-      }
-    }
-    appendOverlayToPage(targetElement, params) {
-      this.sideEffect(`appending ${DDGVideoOverlay.CUSTOM_TAG_NAME} to the page`, () => {
-        this.comms.sendPixel("duck_player.mac.overlay");
-        const overlayElement = new DDGVideoOverlay(this.environment, params, this);
-        targetElement.appendChild(overlayElement);
-        return () => {
-          var _a, _b;
-          const prevOverlayElement = document.querySelector(DDGVideoOverlay.CUSTOM_TAG_NAME);
-          if (prevOverlayElement) {
-            (_b = (_a = prevOverlayElement.parentNode) == null ? void 0 : _a.removeChild) == null ? void 0 : _b.call(_a, prevOverlayElement);
-          }
-        };
-      });
-    }
-    stopVideoFromPlaying(videoElement) {
-      this.sideEffect("pausing the <video> element", () => {
-        const int = setInterval(() => {
-          if (videoElement instanceof HTMLVideoElement && videoElement.isConnected) {
-            videoElement.pause();
-          }
-        }, 10);
-        return () => {
-          clearInterval(int);
-          if (videoElement == null ? void 0 : videoElement.isConnected) {
-            videoElement.play();
-          } else {
-            const video = document.querySelector("#player video");
-            if (video instanceof HTMLVideoElement) {
-              video.play();
-            }
-          }
-        };
-      });
-    }
-    userOptIn(remember, params) {
-      let privatePlayerMode = { alwaysAsk: {} };
-      if (remember) {
-        privatePlayerMode = { enabled: { name: "shane" } };
-      } else {
-      }
-      const outgoing = {
-        overlayInteracted: false,
-        privatePlayerMode
-      };
-      this.comms.setUserValues(outgoing).then(() => this.environment.setHref(params.toPrivatePlayerUrl())).catch((e) => console.error("error setting user choice", e));
-    }
-    userOptOut(remember, params) {
-      if (remember) {
-        let privatePlayerMode = { alwaysAsk: {} };
-        this.comms.setUserValues({
-          privatePlayerMode,
-          overlayInteracted: true
-        }).then((values) => this.userValues = values).then(() => this.watchForVideoBeingAdded({ ignoreCache: true, via: "userOptOut" })).catch((e) => console.error("could not set userChoice for opt-out", e));
-      } else {
-        this.removeAllOverlays();
-        this.addSmallDaxOverlay(params);
-      }
-    }
-    sideEffect(name, fn) {
-      applyEffect(name, fn, this._cleanups);
-    }
-    removeAllOverlays() {
-      execCleanups(this._cleanups);
-      this._cleanups = [];
-      if (this.videoPlayerIcon) {
-        this.videoPlayerIcon.cleanup();
-      }
-      this.videoPlayerIcon = null;
-    }
-  };
-
   // node_modules/@duckduckgo/content-scope-utils/lib/messaging/windows.js
   var WindowsMessagingTransport = class {
     constructor(config) {
@@ -858,8 +698,11 @@
     async readUserValues() {
       return this.messaging.request("readUserValues", {});
     }
-    sendPixel(pixelName) {
-      this.messaging.notify("sendDuckPlayerPixel", { pixelName });
+    sendPixel(pixel) {
+      this.messaging.notify("sendDuckPlayerPixel", {
+        pixelName: pixel.name(),
+        params: pixel.params()
+      });
     }
     openInDuckPlayerViaMessage(href) {
       return this.messaging.notify("openDuckPlayer", { href });
@@ -906,6 +749,190 @@
       return new Communications(messaging, {
         updateStrategy: opts.hasModernWebkitAPI ? "window-method" : "polling"
       });
+    }
+  };
+  var Pixel = class {
+    constructor(input) {
+      this.input = input;
+    }
+    name() {
+      return this.input.name;
+    }
+    params() {
+      switch (this.input.name) {
+        case "overlay":
+          return {};
+        case "play.use":
+        case "play.do_not_use": {
+          return { remember: this.input.remember };
+        }
+        default:
+          throw new Error("unreachable");
+      }
+    }
+  };
+
+  // src/video-overlay-manager.js
+  var VideoOverlayManager = class {
+    constructor(userValues, environment, comms) {
+      __publicField(this, "lastVideoId", null);
+      __publicField(this, "videoPlayerIcon", null);
+      __publicField(this, "_cleanups", []);
+      this.userValues = userValues;
+      this.environment = environment;
+      this.comms = comms;
+    }
+    handleFirstPageLoad() {
+      if (!("alwaysAsk" in this.userValues.privatePlayerMode))
+        return;
+      if (this.userValues.overlayInteracted)
+        return;
+      const validParams = VideoParams.forWatchPage(this.environment.getHref());
+      if (!validParams)
+        return;
+      this.sideEffect("add css to head", () => {
+        const s = document.createElement("style");
+        s.innerText = ".html5-video-player { opacity: 0!important }";
+        document.head.appendChild(s);
+        return () => {
+          if (s.isConnected) {
+            document.head.removeChild(s);
+          }
+        };
+      });
+      this.sideEffect("wait for first video element", () => {
+        const int = setInterval(() => {
+          this.watchForVideoBeingAdded({ via: "first page load" });
+        }, 100);
+        return () => {
+          clearInterval(int);
+        };
+      });
+    }
+    addLargeOverlay(userValues, params) {
+      let playerVideo = document.querySelector("#player video"), containerElement = document.querySelector("#player .html5-video-player");
+      if (playerVideo && containerElement) {
+        this.stopVideoFromPlaying(playerVideo);
+        this.appendOverlayToPage(containerElement, params);
+      }
+    }
+    addSmallDaxOverlay(params) {
+      let containerElement = document.querySelector("#player .html5-video-player");
+      if (!containerElement) {
+        console.error("no container element");
+        return;
+      }
+      if (!this.videoPlayerIcon) {
+        this.videoPlayerIcon = new VideoPlayerIcon();
+      }
+      this.videoPlayerIcon.init(containerElement, params);
+    }
+    watchForVideoBeingAdded(opts = {}) {
+      const params = VideoParams.forWatchPage(this.environment.getHref());
+      if (!params) {
+        if (this.lastVideoId) {
+          this.removeAllOverlays();
+          this.lastVideoId = null;
+        }
+        return;
+      }
+      const conditions = [
+        opts.ignoreCache,
+        !this.lastVideoId,
+        this.lastVideoId && this.lastVideoId !== params.id
+      ];
+      if (conditions.some(Boolean)) {
+        const playerElement = document.querySelector("#player");
+        if (!playerElement) {
+          return null;
+        }
+        const userValues = this.userValues;
+        this.lastVideoId = params.id;
+        this.removeAllOverlays();
+        if ("enabled" in userValues.privatePlayerMode) {
+          this.addSmallDaxOverlay(params);
+        }
+        if ("alwaysAsk" in userValues.privatePlayerMode) {
+          if (!userValues.overlayInteracted) {
+            this.addLargeOverlay(userValues, params);
+          } else {
+            this.addSmallDaxOverlay(params);
+          }
+        }
+      }
+    }
+    appendOverlayToPage(targetElement, params) {
+      this.sideEffect(`appending ${DDGVideoOverlay.CUSTOM_TAG_NAME} to the page`, () => {
+        this.comms.sendPixel(new Pixel({ name: "overlay" }));
+        const overlayElement = new DDGVideoOverlay(this.environment, params, this);
+        targetElement.appendChild(overlayElement);
+        return () => {
+          var _a, _b;
+          const prevOverlayElement = document.querySelector(DDGVideoOverlay.CUSTOM_TAG_NAME);
+          if (prevOverlayElement) {
+            (_b = (_a = prevOverlayElement.parentNode) == null ? void 0 : _a.removeChild) == null ? void 0 : _b.call(_a, prevOverlayElement);
+          }
+        };
+      });
+    }
+    stopVideoFromPlaying(videoElement) {
+      this.sideEffect("pausing the <video> element", () => {
+        const int = setInterval(() => {
+          if (videoElement instanceof HTMLVideoElement && videoElement.isConnected) {
+            videoElement.pause();
+          }
+        }, 10);
+        return () => {
+          clearInterval(int);
+          if (videoElement == null ? void 0 : videoElement.isConnected) {
+            videoElement.play();
+          } else {
+            const video = document.querySelector("#player video");
+            if (video instanceof HTMLVideoElement) {
+              video.play();
+            }
+          }
+        };
+      });
+    }
+    userOptIn(remember, params) {
+      let privatePlayerMode = { alwaysAsk: {} };
+      if (remember) {
+        this.comms.sendPixel(new Pixel({ name: "play.use", remember: "1" }));
+        privatePlayerMode = { enabled: {} };
+      } else {
+        this.comms.sendPixel(new Pixel({ name: "play.use", remember: "0" }));
+      }
+      const outgoing = {
+        overlayInteracted: false,
+        privatePlayerMode
+      };
+      this.comms.setUserValues(outgoing).then(() => this.environment.setHref(params.toPrivatePlayerUrl())).catch((e) => console.error("error setting user choice", e));
+    }
+    userOptOut(remember, params) {
+      if (remember) {
+        this.comms.sendPixel(new Pixel({ name: "play.do_not_use", remember: "1" }));
+        let privatePlayerMode = { alwaysAsk: {} };
+        this.comms.setUserValues({
+          privatePlayerMode,
+          overlayInteracted: true
+        }).then((values) => this.userValues = values).then(() => this.watchForVideoBeingAdded({ ignoreCache: true, via: "userOptOut" })).catch((e) => console.error("could not set userChoice for opt-out", e));
+      } else {
+        this.comms.sendPixel(new Pixel({ name: "play.do_not_use", remember: "0" }));
+        this.removeAllOverlays();
+        this.addSmallDaxOverlay(params);
+      }
+    }
+    sideEffect(name, fn) {
+      applyEffect(name, fn, this._cleanups);
+    }
+    removeAllOverlays() {
+      execCleanups(this._cleanups);
+      this._cleanups = [];
+      if (this.videoPlayerIcon) {
+        this.videoPlayerIcon.cleanup();
+      }
+      this.videoPlayerIcon = null;
     }
   };
 

@@ -292,8 +292,10 @@ extension Pixel.Event {
             } else {
                 return "m_mac_\(pixel.pixelName)"
             }
+
+        // This matches the SERP format
         case .duckPlayerJSPixel(let pixel):
-            return "m_mac_\(pixel.pixelName)"
+            return "duck_player.mac.\(pixel.pixelName)"
         }
     }
 }

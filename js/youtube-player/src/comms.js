@@ -30,10 +30,13 @@ export class Communications {
     }
 
     /**
-     * @param {string} pixelName
+     * @param {Pixel} pixel
      */
-    sendPixel(pixelName) {
-        this.messaging.notify('sendDuckPlayerPixel', { pixelName })
+    sendPixel(pixel) {
+        this.messaging.notify('sendDuckPlayerPixel', {
+            pixelName: pixel.name(),
+            params: pixel.params()
+        })
     }
     openInDuckPlayerViaMessage(href) {
         return this.messaging.notify('openDuckPlayer', {href})
@@ -106,3 +109,26 @@ export class Communications {
     }
 }
 
+export class Pixel {
+    /**
+     * A list of known pixels
+     * @param {{name: "overlay"} | {name: "play.use", remember: "0" | "1"} | {name: "play.do_not_use", remember: "0" | "1"}} input
+     */
+    constructor(input) {
+        this.input = input
+    }
+
+    name() {
+        return this.input.name
+    }
+    params() {
+        switch (this.input.name) {
+            case "overlay": return {}
+            case "play.use":
+            case "play.do_not_use": {
+                return { remember: this.input.remember }
+            }
+            default: throw new Error('unreachable')
+        }
+    }
+}

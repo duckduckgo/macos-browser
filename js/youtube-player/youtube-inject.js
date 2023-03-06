@@ -6,7 +6,7 @@ import {Communications} from "./src/comms";
 
 /**
  * @typedef UserValues - A way to communicate some user state
- * @property {{enabled: {name: string}} | {alwaysAsk:{}} | {disabled:{}}} privatePlayerMode - one of 3 values: 'enabled:{}', 'alwaysAsk:{}', 'disabled:{}'
+ * @property {{enabled: {}} | {alwaysAsk:{}} | {disabled:{}}} privatePlayerMode - one of 3 values: 'enabled:{}', 'alwaysAsk:{}', 'disabled:{}'
  * @property {boolean} overlayInteracted - always a boolean
  */
 
