@@ -1,5 +1,5 @@
 //
-//  SyncAnotherDeviceView.swift
+//  AskToSyncAnotherDeviceView.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -19,14 +19,14 @@
 import SwiftUI
 import SwiftUIExtensions
 
-public protocol SyncAnotherDeviceViewModel: ObservableObject {
-    associatedtype SyncAnotherDeviceViewUserText: SyncUI.SyncAnotherDeviceViewUserText
+public protocol AskToSyncAnotherDeviceViewModel: ObservableObject {
+    associatedtype AskToSyncAnotherDeviceViewUserText: SyncUI.AskToSyncAnotherDeviceViewUserText
 
     func endFlow()
-    func turnOnSync()
+    func presentSyncAnotherDeviceDialog()
 }
 
-public protocol SyncAnotherDeviceViewUserText {
+public protocol AskToSyncAnotherDeviceViewUserText {
     static var syncAnotherDeviceTitle: String { get }
     static var syncAnotherDeviceExplanation1: String { get }
     static var syncAnotherDeviceExplanation2: String { get }
@@ -34,8 +34,8 @@ public protocol SyncAnotherDeviceViewUserText {
     static var syncAnotherDevice: String { get }
 }
 
-public struct SyncAnotherDeviceView<ViewModel>: View where ViewModel: SyncAnotherDeviceViewModel {
-    typealias UserText = ViewModel.SyncAnotherDeviceViewUserText
+public struct AskToSyncAnotherDeviceView<ViewModel>: View where ViewModel: AskToSyncAnotherDeviceViewModel {
+    typealias UserText = ViewModel.AskToSyncAnotherDeviceViewUserText
 
     @EnvironmentObject public var model: ViewModel
 
@@ -57,8 +57,7 @@ public struct SyncAnotherDeviceView<ViewModel>: View where ViewModel: SyncAnothe
                 model.endFlow()
             }
             Button(UserText.syncAnotherDevice) {
-                model.endFlow()
-//                model.presentSyncAnotherDeviceDialog()
+                model.presentSyncAnotherDeviceDialog()
             }
             .buttonStyle(DefaultActionButtonStyle(enabled: true))
         }

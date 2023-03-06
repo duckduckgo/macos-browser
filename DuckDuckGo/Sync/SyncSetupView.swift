@@ -20,14 +20,14 @@ import SwiftUI
 import SyncUI
 
 extension UserText: EnableSyncViewUserText {}
-extension UserText: SyncAnotherDeviceViewUserText {}
+extension UserText: AskToSyncAnotherDeviceViewUserText {}
 extension UserText: RecoverAccountViewUserText {}
 
 extension SyncPreferences: EnableSyncViewModel {
     typealias EnableSyncViewUserText = UserText
 }
-extension SyncPreferences: SyncAnotherDeviceViewModel {
-    typealias SyncAnotherDeviceViewUserText = UserText
+extension SyncPreferences: AskToSyncAnotherDeviceViewModel {
+    typealias AskToSyncAnotherDeviceViewUserText = UserText
 }
 extension SyncPreferences: RecoverAccountViewModel {
     typealias RecoverAccountViewUserText = UserText
@@ -53,12 +53,12 @@ struct SyncSetupView: View {
         switch model.flowStep {
         case .enableSync:
             EnableSyncView<SyncPreferences>().environmentObject(model)
-        case .syncAnotherDevice:
-            SyncAnotherDeviceView<SyncPreferences>().environmentObject(model)
+        case .askToSyncAnotherDevice:
+            AskToSyncAnotherDeviceView<SyncPreferences>().environmentObject(model)
         case .recoverAccount:
             RecoverAccountView<SyncPreferences>().environmentObject(model).environmentObject(recoveryCodeModel)
-//        case .syncNewDevice:
-//            SyncNewDeviceView().environmentObject(model)
+//        case .syncAnotherDevice:
+//            SyncAnotherDeviceView<SyncPreferences>().environmentObject(model)
 //        case .deviceSynced:
 //            SyncSetupCompleteView().environmentObject(model)
 //        case .saveRecoveryPDF:

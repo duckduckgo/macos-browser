@@ -34,7 +34,7 @@ extension SyncDevice {
 
 final class SyncPreferences: ObservableObject {
     enum FlowStep {
-        case enableSync, recoverAccount, syncAnotherDevice, syncNewDevice, deviceSynced, saveRecoveryPDF
+        case enableSync, recoverAccount, askToSyncAnotherDevice, syncAnotherDevice, deviceSynced, saveRecoveryPDF
     }
 
     var isSyncEnabled: Bool {
@@ -99,7 +99,7 @@ final class SyncPreferences: ObservableObject {
 //                let hostname = SCDynamicStoreCopyComputerName(nil, nil) as? String ?? ProcessInfo.processInfo.hostName
                 let hostname = ProcessInfo.processInfo.hostName
                 try await syncService.sync.createAccount(deviceName: hostname)
-                flowStep = .syncAnotherDevice
+                presentDialog(for: .askToSyncAnotherDevice)
             } catch {
                 errorMessage = String(describing: error)
                 shouldShowErrorMessage = true
