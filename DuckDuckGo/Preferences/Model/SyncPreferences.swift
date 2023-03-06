@@ -133,7 +133,7 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         }
     }
 
-    func addAnotherDevice() {
+    func addAnotherDevice(using recoveryCode: String) {
         presentDialog(for: .deviceSynced)
     }
 

@@ -18,7 +18,7 @@
 
 import SwiftUI
 
-struct SyncSetupCompleteView<ViewModel>: View where ViewModel: SyncSetupCompleteViewModel {
+struct SyncSetupCompleteView<ViewModel>: View where ViewModel: ManagementDialogModel {
     @EnvironmentObject var model: ViewModel
 
     init() {}

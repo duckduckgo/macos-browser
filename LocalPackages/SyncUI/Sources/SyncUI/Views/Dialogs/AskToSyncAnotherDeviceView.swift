@@ -19,7 +19,7 @@
 import SwiftUI
 import SwiftUIExtensions
 
-struct AskToSyncAnotherDeviceView<ViewModel>: View where ViewModel: AskToSyncAnotherDeviceViewModel {
+struct AskToSyncAnotherDeviceView<ViewModel>: View where ViewModel: ManagementDialogModel {
 
     @EnvironmentObject var model: ViewModel
 

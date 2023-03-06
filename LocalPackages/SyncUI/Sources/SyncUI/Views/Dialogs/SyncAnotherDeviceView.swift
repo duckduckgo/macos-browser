@@ -19,7 +19,7 @@
 import SwiftUI
 import SwiftUIExtensions
 
-struct SyncAnotherDeviceView<ViewModel>: View where ViewModel: SyncAnotherDeviceViewModel {
+struct SyncAnotherDeviceView<ViewModel>: View where ViewModel: ManagementDialogModel {
     @EnvironmentObject var model: ViewModel
     @EnvironmentObject var recoveryCodeModel: RecoveryCodeViewModel
 
@@ -63,7 +63,7 @@ struct SyncAnotherDeviceView<ViewModel>: View where ViewModel: SyncAnotherDevice
                     model.endFlow()
                 }
                 Button(UserText.submit) {
-                    model.addAnotherDevice()
+                    model.addAnotherDevice(using: recoveryCodeModel.recoveryCode)
                 }
                 .buttonStyle(DefaultActionButtonStyle(enabled: !recoveryCodeModel.shouldDisableSubmitButton))
                 .disabled(recoveryCodeModel.shouldDisableSubmitButton)
@@ -74,7 +74,7 @@ struct SyncAnotherDeviceView<ViewModel>: View where ViewModel: SyncAnotherDevice
 
 }
 
-private struct ShowCodeView<ViewModel>: View where ViewModel: SyncAnotherDeviceViewModel {
+private struct ShowCodeView<ViewModel>: View where ViewModel: ManagementDialogModel {
     @EnvironmentObject var model: ViewModel
 
     var body: some View {

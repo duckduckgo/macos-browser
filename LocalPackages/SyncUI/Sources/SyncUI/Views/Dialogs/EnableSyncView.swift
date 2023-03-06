@@ -19,7 +19,7 @@
 import SwiftUI
 import SwiftUIExtensions
 
-struct EnableSyncView<ViewModel>: View where ViewModel: EnableSyncViewModel {
+struct EnableSyncView<ViewModel>: View where ViewModel: ManagementDialogModel {
     @EnvironmentObject var model: ViewModel
 
     init() {}

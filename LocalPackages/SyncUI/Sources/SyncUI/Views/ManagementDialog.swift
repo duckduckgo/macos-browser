@@ -18,20 +18,6 @@
 
 import SwiftUI
 
-public protocol ManagementDialogModel: ObservableObject,
-                                       EnableSyncViewModel,
-                                       AskToSyncAnotherDeviceViewModel,
-                                       RecoverAccountViewModel,
-                                       SyncAnotherDeviceViewModel,
-                                       SyncSetupCompleteViewModel,
-                                       SaveRecoveryPDFViewModel {
-
-    var currentDialog: ManagementDialogKind? { get }
-
-    var shouldShowErrorMessage: Bool { get set }
-    var errorMessage: String? { get }
-}
-
 public enum ManagementDialogKind {
     case enableSync, recoverAccount, askToSyncAnotherDevice, syncAnotherDevice, deviceSynced, saveRecoveryPDF
 }

@@ -1,5 +1,5 @@
 //
-//  DialogViewModels.swift
+//  ManagementDialogModels.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -18,33 +18,19 @@
 
 import Foundation
 
-public protocol EnableSyncViewModel: ObservableObject {
-    func endFlow()
-    func turnOnSync()
-}
+public protocol ManagementDialogModel: ObservableObject {
 
-public protocol RecoverAccountViewModel: ObservableObject {
-    func endFlow()
-    func recoverDevice(using recoveryCode: String)
-}
-
-public protocol SyncAnotherDeviceViewModel: ObservableObject {
+    var currentDialog: ManagementDialogKind? { get }
     var recoveryCode: String? { get }
 
-    func endFlow()
-    func addAnotherDevice()
-}
-
-public protocol AskToSyncAnotherDeviceViewModel: ObservableObject {
-    func endFlow()
+    func turnOnSync()
+    func recoverDevice(using recoveryCode: String)
     func presentSyncAnotherDeviceDialog()
-}
-
-public protocol SyncSetupCompleteViewModel: ObservableObject {
+    func addAnotherDevice(using recoveryCode: String)
     func confirmSetupComplete()
-}
-
-public protocol SaveRecoveryPDFViewModel: ObservableObject {
-    func endFlow()
     func saveRecoveryPDF()
+    func endFlow()
+
+    var shouldShowErrorMessage: Bool { get set }
+    var errorMessage: String? { get }
 }

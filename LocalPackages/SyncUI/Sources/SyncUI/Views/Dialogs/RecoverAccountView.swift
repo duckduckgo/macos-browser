@@ -19,7 +19,7 @@
 import SwiftUI
 import SwiftUIExtensions
 
-struct RecoverAccountView<ViewModel>: View where ViewModel: RecoverAccountViewModel {
+struct RecoverAccountView<ViewModel>: View where ViewModel: ManagementDialogModel {
     @EnvironmentObject var model: ViewModel
     @EnvironmentObject var recoveryCodeModel: RecoveryCodeViewModel
 

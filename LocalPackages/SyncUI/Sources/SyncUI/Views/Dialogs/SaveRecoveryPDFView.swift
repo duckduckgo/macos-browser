@@ -19,7 +19,7 @@
 import SwiftUI
 import SwiftUIExtensions
 
-struct SaveRecoveryPDFView<ViewModel>: View where ViewModel: SaveRecoveryPDFViewModel {
+struct SaveRecoveryPDFView<ViewModel>: View where ViewModel: ManagementDialogModel {
     @EnvironmentObject var model: ViewModel
 
     init() {}
