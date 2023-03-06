@@ -42,7 +42,7 @@ public struct EnableSyncView<ViewModel>: View where ViewModel: EnableSyncViewMod
     public init() {}
 
     public var body: some View {
-        SyncWizardStep {
+        SyncDialog {
             VStack(spacing: 20) {
                 Image("SyncTurnOnDialog")
                 Text(UserText.turnOnSyncQuestion)

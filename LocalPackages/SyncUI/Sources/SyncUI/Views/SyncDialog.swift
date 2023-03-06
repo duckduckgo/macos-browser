@@ -1,5 +1,5 @@
 //
-//  SyncWizardStep.swift
+//  SyncDialog.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -18,7 +18,7 @@
 
 import SwiftUI
 
-public struct SyncWizardStep<Content, Buttons>: View where Content: View, Buttons: View {
+public struct SyncDialog<Content, Buttons>: View where Content: View, Buttons: View {
 
     public let spacing: CGFloat
     @ViewBuilder public  let content: () -> Content

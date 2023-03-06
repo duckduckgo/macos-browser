@@ -1,5 +1,5 @@
 //
-//  SaveRecoveryPDFView.swift
+//  SyncSetupCompleteView.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -17,11 +17,8 @@
 //
 
 import SwiftUI
-import DDGSync
-import SyncUI
 
-//
-//struct SaveRecoveryPDFView: View {
+//struct SyncSetupCompleteView: View {
 //    @EnvironmentObject var model: SyncSetupViewModel
 //
 //    var device: SyncedDevice {
@@ -29,25 +26,27 @@ import SyncUI
 //    }
 //
 //    var body: some View {
-//        SyncWizardStep {
-//            VStack(spacing: 20.0) {
-//                Image("SyncRecoveryPDF")
-//                Text(UserText.saveRecoveryPDF)
+//        SyncDialog(spacing: 20.0) {
+//            VStack(spacing: 20) {
+//                Image("SyncSetupComplete")
+//                Text(UserText.deviceSynced)
 //                    .font(.system(size: 17, weight: .bold))
-//                Text(UserText.recoveryPDFExplanation1)
+//                Text(UserText.deviceSyncedExplanation)
 //                    .multilineTextAlignment(.center)
-//                Text(UserText.recoveryPDFExplanation2)
-//                    .multilineTextAlignment(.center)
+//
+//                Outline {
+//                    SyncPreferencesRow {
+//                        SyncedDeviceIcon(kind: device.kind)
+//                    } centerContent: {
+//                        Text(device.name)
+//                    }
+//                }
 //            }
 //        } buttons: {
-//            Button(UserText.notNow) {
-//                model.onCancel()
+//            Button(UserText.next) {
+//                model.flowState = .saveRecoveryPDF
 //            }
-//            Button(UserText.saveRecoveryPDF) {
-//                model.onCancel()
-//            }
-//            .buttonStyle(DefaultActionButtonStyle(enabled: true))
 //        }
-//        .frame(height: 314)
+//        .frame(width: 360, height: 298)
 //    }
 //}

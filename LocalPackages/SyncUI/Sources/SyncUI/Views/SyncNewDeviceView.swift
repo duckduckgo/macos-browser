@@ -17,7 +17,6 @@
 //
 
 import SwiftUI
-import SyncUI
 
 //struct SyncNewDeviceView: View {
 //    @EnvironmentObject var model: SyncSetupViewModel
@@ -29,7 +28,7 @@ import SyncUI
 //    @State var selectedMode: Mode = .showCode
 //
 //    var body: some View {
-//        SyncWizardStep(spacing: 20.0) {
+//        SyncDialog(spacing: 20.0) {
 //            Text(UserText.syncNewDevice)
 //                .font(.system(size: 17, weight: .bold))
 //

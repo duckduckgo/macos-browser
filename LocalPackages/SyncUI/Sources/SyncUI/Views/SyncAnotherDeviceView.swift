@@ -42,7 +42,7 @@ public struct SyncAnotherDeviceView<ViewModel>: View where ViewModel: SyncAnothe
     public init() {}
 
     public var body: some View {
-        SyncWizardStep {
+        SyncDialog {
             VStack(spacing: 20) {
                 Image("SyncAnotherDeviceDialog")
                 Text(UserText.syncAnotherDeviceTitle)

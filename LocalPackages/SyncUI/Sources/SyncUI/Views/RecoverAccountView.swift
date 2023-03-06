@@ -44,7 +44,7 @@ public struct RecoverAccountView<ViewModel>: View where ViewModel: RecoverAccoun
     public init() {}
 
     public var body: some View {
-        SyncWizardStep(spacing: 20.0) {
+        SyncDialog(spacing: 20.0) {
             Text(UserText.recoverSyncedDataTitle)
                 .font(.system(size: 17, weight: .bold))
 
