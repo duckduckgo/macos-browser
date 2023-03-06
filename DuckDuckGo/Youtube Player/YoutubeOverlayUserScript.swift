@@ -245,9 +245,9 @@ extension YoutubeOverlayUserScript: WKScriptMessageHandler {
 
 extension YoutubeOverlayUserScript {
     public enum JSPixel: String {
-        case overlay = "overlay";
-        case playUse = "play.use";
-        case playDoNotUse = "play.do_not_use";
+        case overlay = "overlay"
+        case playUse = "play.use"
+        case playDoNotUse = "play.do_not_use"
 
         public var pixelName: String {
             self.rawValue
