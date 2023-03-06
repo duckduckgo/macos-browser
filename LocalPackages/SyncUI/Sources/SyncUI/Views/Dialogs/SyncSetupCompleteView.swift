@@ -21,8 +21,6 @@ import SwiftUI
 struct SyncSetupCompleteView<ViewModel>: View where ViewModel: ManagementDialogModel {
     @EnvironmentObject var model: ViewModel
 
-    init() {}
-
     var device: SyncDevice {
         .init(kind: .mobile, name: "Dave's iPhone 14", id: UUID().uuidString)
     }

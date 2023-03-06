@@ -23,8 +23,6 @@ struct RecoverAccountView<ViewModel>: View where ViewModel: ManagementDialogMode
     @EnvironmentObject var model: ViewModel
     @EnvironmentObject var recoveryCodeModel: RecoveryCodeViewModel
 
-    init() {}
-
     var body: some View {
         SyncDialog(spacing: 20.0) {
             Text(UserText.recoverSyncedDataTitle)

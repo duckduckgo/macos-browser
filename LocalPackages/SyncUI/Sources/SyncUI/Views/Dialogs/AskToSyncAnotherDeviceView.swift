@@ -23,8 +23,6 @@ struct AskToSyncAnotherDeviceView<ViewModel>: View where ViewModel: ManagementDi
 
     @EnvironmentObject var model: ViewModel
 
-    init() {}
-
     var body: some View {
         SyncDialog {
             VStack(spacing: 20) {

@@ -23,8 +23,6 @@ struct SyncAnotherDeviceView<ViewModel>: View where ViewModel: ManagementDialogM
     @EnvironmentObject var model: ViewModel
     @EnvironmentObject var recoveryCodeModel: RecoveryCodeViewModel
 
-    init() {}
-
     enum Mode: Hashable {
         case showCode, enterCode
     }
