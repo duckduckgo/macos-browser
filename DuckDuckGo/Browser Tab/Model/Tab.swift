@@ -357,7 +357,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             return
         }
         //TODO!
-        let tab = Tab(content: content, parentTab: self, shouldLoadInBackground: true, isDisposable: false, canBeClosedWithBack: kind.isSelectedTab)
+        let tab = Tab(content: content, parentTab: self, shouldLoadInBackground: true, isDisposable: isDisposable, canBeClosedWithBack: kind.isSelectedTab)
         delegate.tab(self, createdChild: tab, of: kind)
     }
 

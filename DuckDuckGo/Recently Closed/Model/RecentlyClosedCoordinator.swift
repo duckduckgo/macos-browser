@@ -96,8 +96,8 @@ final class RecentlyClosedCoordinator: RecentlyClosedCoordinating {
     private(set) var cache = [RecentlyClosedCacheItem]()
 
     private func cacheTabContent(_ tab: Tab, of tabCollection: TabCollection, at tabIndex: TabIndex) {
-        guard !tab.isContentEmpty else {
-            // Don't cache empty tabs
+        guard !tab.isContentEmpty, !tab.isDisposable else {
+            // Don't cache empty tabs and disposable tabs
             return
         }
 
@@ -108,8 +108,9 @@ final class RecentlyClosedCoordinator: RecentlyClosedCoordinating {
     private func cacheWindowContent(mainWindowController: MainWindowController) {
         let tabCollection = mainWindowController.mainViewController.tabCollectionViewModel.tabCollection
         guard let first = tabCollection.tabs.first,
-              (!first.isContentEmpty || tabCollection.tabs.count > 1) else {
-            // Don't cache empty window
+              (!first.isContentEmpty || tabCollection.tabs.count > 1),
+              !mainWindowController.mainViewController.tabCollectionViewModel.isDisposable else {
+            // Don't cache empty window and disposable windows
             return
         }
 
