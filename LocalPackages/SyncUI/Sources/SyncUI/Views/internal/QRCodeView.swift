@@ -19,18 +19,18 @@
 import SwiftUI
 import CoreImage
 
-public struct QRCode: View {
+struct QRCode: View {
     @Environment(\.colorScheme) var colorScheme
 
-    public let string: String
-    public let size: CGSize
+    let string: String
+    let size: CGSize
 
-    public init(string: String, size: CGSize) {
+    init(string: String, size: CGSize) {
         self.string = string
         self.size = size
     }
 
-    public var body: some View {
+    var body: some View {
         Image(nsImage: generateQRCode(from: string, size: size))
             .frame(width: size.width, height: size.height)
     }
