@@ -78,10 +78,10 @@ final class ConfigurationManager {
     }
 
     private func refreshNow() async {
+        let fetcher = ConfigurationFetcher(store: ConfigurationStore.shared, log: .config)
 
         let updateTrackerBlockingDependenciesTask = Task {
             do {
-                let fetcher = ConfigurationFetcher(store: ConfigurationStore.shared, log: .config)
                 try await fetcher.fetch(any: [.trackerDataSet, .surrogates, .privacyConfiguration])
                 updateTrackerBlockingDependencies()
                 tryAgainLater()
@@ -92,7 +92,6 @@ final class ConfigurationManager {
 
         let updateBloomFilterTask = Task {
             do {
-                let fetcher = ConfigurationFetcher(store: ConfigurationStore.shared, log: .config)
                 try await fetcher.fetch(all: [.bloomFilterBinary, .bloomFilterSpec])
                 try updateBloomFilter()
                 tryAgainLater()
@@ -103,7 +102,6 @@ final class ConfigurationManager {
 
         let updateBloomFilterExclusionsTask = Task {
             do {
-                let fetcher = ConfigurationFetcher(store: ConfigurationStore.shared, log: .config)
                 try await fetcher.fetch(any: [.bloomFilterExcludedDomains])
                 try updateBloomFilterExclusions()
                 tryAgainLater()
