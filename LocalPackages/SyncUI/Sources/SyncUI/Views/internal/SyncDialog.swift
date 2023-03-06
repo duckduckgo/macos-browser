@@ -18,19 +18,19 @@
 
 import SwiftUI
 
-public struct SyncDialog<Content, Buttons>: View where Content: View, Buttons: View {
+struct SyncDialog<Content, Buttons>: View where Content: View, Buttons: View {
 
-    public let spacing: CGFloat
-    @ViewBuilder public  let content: () -> Content
-    @ViewBuilder public let buttons: () -> Buttons
+    let spacing: CGFloat
+    @ViewBuilder let content: () -> Content
+    @ViewBuilder let buttons: () -> Buttons
 
-    public init(spacing: CGFloat = 16.0, @ViewBuilder content: @escaping () -> Content, @ViewBuilder buttons: @escaping () -> Buttons) {
+    init(spacing: CGFloat = 16.0, @ViewBuilder content: @escaping () -> Content, @ViewBuilder buttons: @escaping () -> Buttons) {
         self.spacing = spacing
         self.content = content
         self.buttons = buttons
     }
 
-    public var body: some View {
+    var body: some View {
         VStack(spacing: 0) {
             content()
                 .padding(.horizontal, 20.0)

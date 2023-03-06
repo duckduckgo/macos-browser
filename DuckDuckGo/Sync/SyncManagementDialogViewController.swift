@@ -1,5 +1,5 @@
 //
-//  SyncSetupViewController.swift
+//  SyncManagementDialogViewController.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -18,8 +18,28 @@
 
 import AppKit
 import SwiftUI
+import SyncUI
 
-final class SyncSetupViewController: NSViewController {
+extension SyncPreferences: SyncManagementDialogModel {
+    typealias SyncManagementDialogUserText = UserText
+    typealias EnableSyncViewUserText = UserText
+    typealias AskToSyncAnotherDeviceViewUserText = UserText
+    typealias RecoverAccountViewUserText = UserText
+    typealias SyncAnotherDeviceViewUserText = UserText
+    typealias SyncSetupCompleteViewUserText = UserText
+    typealias SaveRecoveryPDFViewUserText = UserText
+}
+
+extension UserText: SyncManagementDialogUserText {}
+extension UserText: EnableSyncViewUserText {}
+extension UserText: AskToSyncAnotherDeviceViewUserText {}
+extension UserText: RecoverAccountViewUserText {}
+extension UserText: SyncAnotherDeviceViewUserText {}
+extension UserText: SyncSetupCompleteViewUserText {}
+extension UserText: SaveRecoveryPDFViewUserText {}
+
+
+final class SyncManagementDialogViewController: NSViewController {
 
     init(_ syncPreferences: SyncPreferences) {
         self.syncPreferences = syncPreferences
@@ -38,8 +58,8 @@ final class SyncSetupViewController: NSViewController {
             view = NSView()
             return
         }
-        let enableSyncView = SyncSetupView(model: syncPreferences)
-        view = NSHostingView(rootView: enableSyncView)
+        let syncManagementDialog = SyncManagementDialog(model: syncPreferences)
+        view = NSHostingView(rootView: syncManagementDialog)
     }
 
 }

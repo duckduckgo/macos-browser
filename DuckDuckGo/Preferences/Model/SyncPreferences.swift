@@ -33,17 +33,14 @@ extension SyncDevice {
 }
 
 final class SyncPreferences: ObservableObject {
-    enum FlowStep {
-        case enableSync, recoverAccount, askToSyncAnotherDevice, syncAnotherDevice, deviceSynced, saveRecoveryPDF
-    }
 
     var isSyncEnabled: Bool {
         account != nil
     }
 
-    @Published private(set) var flowStep: FlowStep? {
+    @Published private(set) var currentDialog: SyncManagementDialogKind? {
         didSet {
-            if flowStep == nil && oldValue != nil {
+            if currentDialog == nil && oldValue != nil {
                 onEndFlow()
             }
         }
@@ -53,7 +50,7 @@ final class SyncPreferences: ObservableObject {
     @Published var devices: [SyncDevice] = []
 
     @Published var shouldShowErrorMessage: Bool = false
-    @Published var errorMessage: String?
+    @Published private(set) var errorMessage: String?
 
     init(syncService: SyncService = .shared) {
         self.syncService = syncService
@@ -145,20 +142,20 @@ final class SyncPreferences: ObservableObject {
     }
 
     func endFlow() {
-        flowStep = nil
+        currentDialog = nil
     }
 
     // MARK: -
 
-    private func presentDialog(for flowStep: FlowStep) {
-        let shouldBeginSheet = self.flowStep == nil
-        self.flowStep = flowStep
+    private func presentDialog(for currentDialog: SyncManagementDialogKind) {
+        let shouldBeginSheet = self.currentDialog == nil
+        self.currentDialog = currentDialog
 
         guard shouldBeginSheet else {
             return
         }
 
-        let syncViewController = SyncSetupViewController(self)
+        let syncViewController = SyncManagementDialogViewController(self)
         let syncWindowController = syncViewController.wrappedInWindowController()
 
         guard let syncWindow = syncWindowController.window,
