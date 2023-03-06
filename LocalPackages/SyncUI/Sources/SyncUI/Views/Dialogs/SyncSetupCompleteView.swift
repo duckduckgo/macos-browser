@@ -18,10 +18,6 @@
 
 import SwiftUI
 
-public protocol SyncSetupCompleteViewModel: ObservableObject {
-    func confirmSetupComplete()
-}
-
 struct SyncSetupCompleteView<ViewModel>: View where ViewModel: SyncSetupCompleteViewModel {
     @EnvironmentObject var model: ViewModel
 

@@ -19,11 +19,6 @@
 import SwiftUI
 import SwiftUIExtensions
 
-public protocol SaveRecoveryPDFViewModel: ObservableObject {
-    func endFlow()
-    func saveRecoveryPDF()
-}
-
 struct SaveRecoveryPDFView<ViewModel>: View where ViewModel: SaveRecoveryPDFViewModel {
     @EnvironmentObject var model: ViewModel
 

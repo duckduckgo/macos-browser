@@ -19,11 +19,6 @@
 import SwiftUI
 import SwiftUIExtensions
 
-public protocol AskToSyncAnotherDeviceViewModel: ObservableObject {
-    func endFlow()
-    func presentSyncAnotherDeviceDialog()
-}
-
 struct AskToSyncAnotherDeviceView<ViewModel>: View where ViewModel: AskToSyncAnotherDeviceViewModel {
 
     @EnvironmentObject var model: ViewModel

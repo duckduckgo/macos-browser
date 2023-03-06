@@ -47,19 +47,6 @@ enum Const {
     }
 }
 
-public protocol ManagementViewModel: ObservableObject {
-    var isSyncEnabled: Bool { get }
-    var shouldShowErrorMessage: Bool { get set }
-    var errorMessage: String? { get }
-
-    var recoveryCode: String? { get }
-    var devices: [SyncDevice] { get }
-
-    func presentEnableSyncDialog()
-    func presentRecoverSyncAccountDialog()
-    func turnOffSync()
-}
-
 public struct ManagementView<ViewModel>: View where ViewModel: ManagementViewModel {
     @ObservedObject public var model: ViewModel
 

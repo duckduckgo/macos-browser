@@ -19,11 +19,6 @@
 import SwiftUI
 import SwiftUIExtensions
 
-public protocol EnableSyncViewModel: ObservableObject {
-    func endFlow()
-    func turnOnSync()
-}
-
 struct EnableSyncView<ViewModel>: View where ViewModel: EnableSyncViewModel {
     @EnvironmentObject var model: ViewModel
 

@@ -19,13 +19,6 @@
 import SwiftUI
 import SwiftUIExtensions
 
-public protocol SyncAnotherDeviceViewModel: ObservableObject {
-    var recoveryCode: String? { get }
-
-    func endFlow()
-    func addAnotherDevice()
-}
-
 struct SyncAnotherDeviceView<ViewModel>: View where ViewModel: SyncAnotherDeviceViewModel {
     @EnvironmentObject var model: ViewModel
     @EnvironmentObject var recoveryCodeModel: RecoveryCodeViewModel

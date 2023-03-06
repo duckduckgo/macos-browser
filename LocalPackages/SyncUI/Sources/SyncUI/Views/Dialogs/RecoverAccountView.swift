@@ -19,11 +19,6 @@
 import SwiftUI
 import SwiftUIExtensions
 
-public protocol RecoverAccountViewModel: ObservableObject {
-    func endFlow()
-    func recoverDevice(using recoveryCode: String)
-}
-
 struct RecoverAccountView<ViewModel>: View where ViewModel: RecoverAccountViewModel {
     @EnvironmentObject var model: ViewModel
     @EnvironmentObject var recoveryCodeModel: RecoveryCodeViewModel
