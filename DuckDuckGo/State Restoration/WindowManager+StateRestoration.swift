@@ -112,7 +112,7 @@ final class WindowManagerStateRestoration: NSObject, NSSecureCoding {
                 let rightIndex = rhs.window?.orderedIndex ?? Int.min
                 return leftIndex < rightIndex
             }
-            .map(WindowRestorationItem.init(windowController:))
+            .compactMap(WindowRestorationItem.init(windowController:))
         self.keyWindowIndex = windowControllersManager.lastKeyMainWindowController.flatMap {
             windowControllersManager.mainWindowControllers.firstIndex(of: $0)
         }
@@ -138,7 +138,12 @@ final class WindowRestorationItem: NSObject, NSSecureCoding {
     let model: TabCollectionViewModel
     let frame: NSRect
 
-    init(windowController: MainWindowController) {
+    init?(windowController: MainWindowController) {
+        guard !windowController.mainViewController.tabCollectionViewModel.isDisposable else {
+            // Don't persist disposable windows
+            return nil
+        }
+
         self.frame = windowController.window!.frame
         self.model = windowController.mainViewController.tabCollectionViewModel
     }
