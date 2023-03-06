@@ -95,6 +95,9 @@ class DownloadsIntegrationTests: XCTestCase {
     }
 
     func testWhenNavigationActionIsData_downloadStarts() {
+        var persistor = DownloadsPreferencesUserDefaultsPersistor()
+        persistor.selectedDownloadLocation = FileManager.default.temporaryDirectory.absoluteString
+
         let e = expectation(description: "download finished")
         var fileUrl: URL!
         let c = FileDownloadManager.shared.downloadsPublisher
@@ -127,7 +130,7 @@ class DownloadsIntegrationTests: XCTestCase {
             tab.webView.evaluateJavaScript(js)
         }
 
-        waitForExpectations(timeout: 50)
+        waitForExpectations(timeout: 5)
         withExtendedLifetime(c) {}
 
         XCTAssertEqual(fileUrl, FileManager.default.temporaryDirectory.appendingPathComponent("helloWorld.txt"))
