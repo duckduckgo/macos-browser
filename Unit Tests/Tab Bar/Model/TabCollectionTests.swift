@@ -110,7 +110,7 @@ final class TabCollectionTests: XCTestCase {
         tabCollection.append(tab: tab1)
         let tab2 = Tab()
         tabCollection.append(tab: tab2)
-        tab2.addVisit(of: url)
+//        tab2.addVisit(of: url)
 
         tabCollection.removeAll()
         XCTAssert(tabCollection.localHistoryOfRemovedTabs.contains(url.host!))

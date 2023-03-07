@@ -44,7 +44,7 @@ final class YoutubeOverlayUserScript: NSObject, InteractiveUserScript, UserScrip
 
     /// Values that the Frontend can use to determine the current state.
     public struct UserValues: Codable {
-        let privatePlayerMode: PrivatePlayerMode
+        let duckPlayerMode: DuckPlayerMode
         let overlayInteracted: Bool
     }
 
@@ -85,13 +85,13 @@ final class YoutubeOverlayUserScript: NSObject, InteractiveUserScript, UserScrip
     let generatedSecret: String = UUID().uuidString
 
     init(
-        preferences: PrivatePlayerPreferences = .shared,
+        preferences: DuckPlayerPreferences = .shared,
         encrypter: UserScriptEncrypter = AESGCMUserScriptEncrypter(),
         hostProvider: UserScriptHostProvider = SecurityOriginHostProvider()
     ) {
         self.hostProvider = hostProvider
         self.encrypter = encrypter
-        self.privatePlayerPreferences = preferences
+        self.duckPlayerPreferences = preferences
     }
 
     struct UserValuesNotification: Encodable {
@@ -108,7 +108,7 @@ final class YoutubeOverlayUserScript: NSObject, InteractiveUserScript, UserScrip
         evaluate(js: js)
     }
 
-    func setAlwaysOpenInPrivatePlayer(_ enabled: Bool) {
+    func setAlwaysOpenInDuckPlayer(_ enabled: Bool) {
         let value = enabled ? "true" : "false"
         let js = "window.postMessage({ alwaysOpenSetting: \(value) });"
         evaluate(js: js)
@@ -116,8 +116,8 @@ final class YoutubeOverlayUserScript: NSObject, InteractiveUserScript, UserScrip
 
     func encodeUserValues() -> String? {
         let uv = UserValues(
-                privatePlayerMode: privatePlayerPreferences.privatePlayerMode,
-                overlayInteracted: privatePlayerPreferences.youtubeOverlayInteracted
+                duckPlayerMode: duckPlayerPreferences.duckPlayerMode,
+                overlayInteracted: duckPlayerPreferences.youtubeOverlayInteracted
         )
         guard let json = try? JSONEncoder().encode(uv).utf8String() else {
             assertionFailure("YoutubeOverlayUserScript: could not convert UserValues into JSON")
@@ -152,8 +152,8 @@ final class YoutubeOverlayUserScript: NSObject, InteractiveUserScript, UserScrip
             return
         }
 
-        privatePlayerPreferences.youtubeOverlayInteracted = userValues.overlayInteracted
-        privatePlayerPreferences.privatePlayerMode = userValues.privatePlayerMode
+        duckPlayerPreferences.youtubeOverlayInteracted = userValues.overlayInteracted
+        duckPlayerPreferences.duckPlayerMode = userValues.duckPlayerMode
 
         replyHandler(encodeUserValues())
     }
@@ -186,7 +186,7 @@ final class YoutubeOverlayUserScript: NSObject, InteractiveUserScript, UserScrip
         }
     }
 
-    private let privatePlayerPreferences: PrivatePlayerPreferences
+    private let duckPlayerPreferences: DuckPlayerPreferences
 }
 
 @available(macOS 11, *)

@@ -637,8 +637,8 @@ extension MainViewController {
         tabCollectionViewModel.pinnedTabsManager?.tabCollection.removeAll()
     }
 
-    @IBAction func resetPrivatePlayerOverlayInteractions(_ sender: Any?) {
-        PrivatePlayerPreferences.shared.youtubeOverlayInteracted = false
+    @IBAction func resetDuckPlayerOverlayInteractions(_ sender: Any?) {
+        DuckPlayerPreferences.shared.youtubeOverlayInteracted = false
     }
 
     @IBAction func showSaveCredentialsPopover(_ sender: Any?) {

@@ -118,7 +118,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         }
         var userEditableUrl: URL? {
             switch self {
-            case .url(let url, userEntered: _) where !(url.isPrivatePlayer || url.isPrivatePlayerScheme):
+            case .url(let url, userEntered: _) where !(url.isDuckPlayer || url.isDuckPlayerScheme):
                 return url
             default:
                 return nil
@@ -168,7 +168,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         var downloadManager: FileDownloadManagerProtocol
         var workspace: Workspace
         var cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter?
-        let privatePlayer: PrivatePlayer
+        let duckPlayer: DuckPlayer
     }
 
     fileprivate weak var delegate: TabDelegate?
@@ -202,7 +202,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                      pinnedTabsManager: PinnedTabsManager = WindowControllersManager.shared.pinnedTabsManager,
                      workspace: Workspace = NSWorkspace.shared,
                      privacyFeatures: AnyPrivacyFeatures? = nil,
-                     privatePlayer: PrivatePlayer? = nil,
+                     duckPlayer: DuckPlayer? = nil,
                      downloadManager: FileDownloadManagerProtocol = FileDownloadManager.shared,
                      cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter? = ContentBlockingAssetsCompilationTimeReporter.shared,
                      statisticsLoader: StatisticsLoader? = nil,
@@ -218,8 +218,8 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                      webViewFrame: CGRect = .zero
     ) {
 
-        let privatePlayer = privatePlayer
-            ?? (AppDelegate.isRunningTests ? PrivatePlayer.mock(withMode: .enabled) : PrivatePlayer.shared)
+        let duckPlayer = duckPlayer
+            ?? (AppDelegate.isRunningTests ? DuckPlayer.mock(withMode: .enabled) : DuckPlayer.shared)
         let statisticsLoader = statisticsLoader
             ?? (AppDelegate.isRunningTests ? nil : StatisticsLoader.shared)
         let privacyFeatures = privacyFeatures ?? PrivacyFeatures
@@ -233,7 +233,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                   pinnedTabsManager: pinnedTabsManager,
                   workspace: workspace,
                   privacyFeatures: privacyFeatures,
-                  privatePlayer: privatePlayer,
+                  duckPlayer: duckPlayer,
                   downloadManager: downloadManager,
                   extensionsBuilder: extensionsBuilder,
                   cbaTimeReporter: cbaTimeReporter,
@@ -259,7 +259,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
          pinnedTabsManager: PinnedTabsManager,
          workspace: Workspace,
          privacyFeatures: AnyPrivacyFeatures,
-         privatePlayer: PrivatePlayer,
+         duckPlayer: DuckPlayer,
          downloadManager: FileDownloadManagerProtocol,
          extensionsBuilder: TabExtensionsBuilderProtocol,
          cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter?,
@@ -324,7 +324,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                                                        downloadManager: downloadManager,
                                                        workspace: workspace,
                                                        cbaTimeReporter: cbaTimeReporter,
-                                                       privatePlayer: privatePlayer))
+                                                       duckPlayer: duckPlayer))
 
         super.init()
         tabGetter = { [weak self] in self }
@@ -815,8 +815,8 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             return
         }
 
-        if url.isPrivatePlayer || url.isPrivatePlayerScheme {
-            favicon = .privatePlayer
+        if url.isDuckPlayer || url.isDuckPlayerScheme {
+            favicon = .duckPlayer
             return
         }
 

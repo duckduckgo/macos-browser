@@ -128,7 +128,7 @@
       this.id = id;
       this.time = time;
     }
-    toPrivatePlayerUrl() {
+    toDuckPlayerUrl() {
       const duckUrl = new URL(this.id, "https://player");
       duckUrl.protocol = "duck:";
       if (this.time) {
@@ -263,7 +263,7 @@
       overlay.setAttribute("data-size", "fixed " + IconOverlay.getThumbnailSize(videoElement));
       const href = videoElement.getAttribute("href");
       if (href) {
-        const privateUrl = (_a = VideoParams.fromPathname(href)) == null ? void 0 : _a.toPrivatePlayerUrl();
+        const privateUrl = (_a = VideoParams.fromPathname(href)) == null ? void 0 : _a.toDuckPlayerUrl();
         if (overlay && privateUrl) {
           (_b = overlay.querySelector("a")) == null ? void 0 : _b.setAttribute("href", privateUrl);
         }
@@ -329,7 +329,7 @@
       let appendOverlayToThumbnail = (videoElement2) => {
         var _a;
         if (videoElement2) {
-          const privateUrl = (_a = VideoParams.fromHref(videoElement2.href)) == null ? void 0 : _a.toPrivatePlayerUrl();
+          const privateUrl = (_a = VideoParams.fromHref(videoElement2.href)) == null ? void 0 : _a.toDuckPlayerUrl();
           const thumbSize = IconOverlay.getThumbnailSize(videoElement2);
           if (privateUrl) {
             appendElement(videoElement2, IconOverlay.create(thumbSize, privateUrl));
@@ -382,7 +382,7 @@
     }
     appendOverlay(containerElement, params) {
       this.cleanup();
-      const href = params.toPrivatePlayerUrl();
+      const href = params.toDuckPlayerUrl();
       const iconElement = IconOverlay.create("video-player", href, "hidden");
       this.sideEffect("dax \u{1F425} icon overlay", () => {
         appendElement(containerElement, iconElement);
@@ -443,7 +443,7 @@
                 </div>
             </div>
             `;
-      const href = this.params.toPrivatePlayerUrl();
+      const href = this.params.toDuckPlayerUrl();
       (_a = overlayElement.querySelector(".ddg-vpo-open")) == null ? void 0 : _a.setAttribute("href", href);
       this.appendThumbnail(overlayElement, this.params.id);
       this.setupButtonsInsideOverlay(overlayElement, this.params);
@@ -495,7 +495,7 @@
       this.comms = comms;
     }
     handleFirstPageLoad() {
-      if (!("alwaysAsk" in this.userValues.privatePlayerMode))
+      if (!("alwaysAsk" in this.userValues.duckPlayerMode))
         return;
       if (this.userValues.overlayInteracted)
         return;
@@ -561,10 +561,10 @@
         const userValues = this.userValues;
         this.lastVideoId = params.id;
         this.removeAllOverlays();
-        if ("enabled" in userValues.privatePlayerMode) {
+        if ("enabled" in userValues.duckPlayerMode) {
           this.addSmallDaxOverlay(params);
         }
-        if ("alwaysAsk" in userValues.privatePlayerMode) {
+        if ("alwaysAsk" in userValues.duckPlayerMode) {
           if (!userValues.overlayInteracted) {
             this.addLargeOverlay(userValues, params);
           } else {
@@ -607,22 +607,22 @@
       });
     }
     userOptIn(remember, params) {
-      let privatePlayerMode = { alwaysAsk: {} };
+      let duckPlayerMode = { alwaysAsk: {} };
       if (remember) {
-        privatePlayerMode = { enabled: { name: "shane" } };
+        duckPlayerMode = { enabled: { name: "shane" } };
       } else {
       }
       const outgoing = {
         overlayInteracted: false,
-        privatePlayerMode
+        duckPlayerMode
       };
-      this.comms.setUserValues(outgoing).then(() => this.environment.setHref(params.toPrivatePlayerUrl())).catch((e) => console.error("error setting user choice", e));
+      this.comms.setUserValues(outgoing).then(() => this.environment.setHref(params.toDuckPlayerUrl())).catch((e) => console.error("error setting user choice", e));
     }
     userOptOut(remember, params) {
       if (remember) {
-        let privatePlayerMode = { alwaysAsk: {} };
+        let duckPlayerMode = { alwaysAsk: {} };
         this.comms.setUserValues({
-          privatePlayerMode,
+          duckPlayerMode,
           overlayInteracted: true
         }).then((values) => this.userValues = values).then(() => this.watchForVideoBeingAdded({ ignoreCache: true, via: "userOptOut" })).catch((e) => console.error("could not set userChoice for opt-out", e));
       } else {
@@ -872,7 +872,7 @@
       }
       if (this.options.updateStrategy === "polling") {
         let timeout;
-        let prevMode = (_a = Object.keys(initialUserValues.privatePlayerMode)) == null ? void 0 : _a[0];
+        let prevMode = (_a = Object.keys(initialUserValues.duckPlayerMode)) == null ? void 0 : _a[0];
         let prevInteracted = initialUserValues.overlayInteracted;
         const poll = () => {
           clearTimeout(timeout);
@@ -880,7 +880,7 @@
             var _a2;
             try {
               const userValues = await this.readUserValues();
-              let nextMode = (_a2 = Object.keys(userValues.privatePlayerMode)) == null ? void 0 : _a2[0];
+              let nextMode = (_a2 = Object.keys(userValues.duckPlayerMode)) == null ? void 0 : _a2[0];
               let nextInteracted = userValues.overlayInteracted;
               if (nextMode !== prevMode || nextInteracted !== prevInteracted) {
                 prevMode = nextMode;
@@ -935,13 +935,13 @@
       comms.onUserValuesNotification((userValues2) => {
         videoPlayerOverlay.userValues = userValues2;
         videoPlayerOverlay.watchForVideoBeingAdded({ via: "user notification", ignoreCache: true });
-        if (userValues2.privatePlayerMode.disabled) {
+        if (userValues2.duckPlayerMode.disabled) {
           AllIconOverlays.disable();
           OpenInDuckPlayer.disable();
-        } else if (userValues2.privatePlayerMode.enabled) {
+        } else if (userValues2.duckPlayerMode.enabled) {
           AllIconOverlays.disable();
           OpenInDuckPlayer.enable();
-        } else if (userValues2.privatePlayerMode.alwaysAsk) {
+        } else if (userValues2.duckPlayerMode.alwaysAsk) {
           AllIconOverlays.enable();
           OpenInDuckPlayer.disable();
         }
@@ -1012,7 +1012,7 @@
             let overlay = element == null ? void 0 : element.querySelector(".ddg-overlay");
             const href = element == null ? void 0 : element.getAttribute("href");
             if (href) {
-              const privateUrl = (_a = VideoParams.fromPathname(href)) == null ? void 0 : _a.toPrivatePlayerUrl();
+              const privateUrl = (_a = VideoParams.fromPathname(href)) == null ? void 0 : _a.toDuckPlayerUrl();
               if (overlay && privateUrl) {
                 (_b = overlay.querySelector("a.ddg-play-privately")) == null ? void 0 : _b.setAttribute("href", privateUrl);
               }
@@ -1091,7 +1091,7 @@
                 event.stopPropagation();
                 let link = event.target.closest("a");
                 if (link) {
-                  const href = (_a = VideoParams.fromHref(link.href)) == null ? void 0 : _a.toPrivatePlayerUrl();
+                  const href = (_a = VideoParams.fromHref(link.href)) == null ? void 0 : _a.toDuckPlayerUrl();
                   comms.openInDuckPlayerViaMessage(href);
                 }
                 return false;
@@ -1125,9 +1125,9 @@
           });
         }
       };
-      if ("alwaysAsk" in userValues.privatePlayerMode) {
+      if ("alwaysAsk" in userValues.duckPlayerMode) {
         AllIconOverlays.enableOnDOMLoaded();
-      } else if ("enabled" in userValues.privatePlayerMode) {
+      } else if ("enabled" in userValues.duckPlayerMode) {
         OpenInDuckPlayer.enableOnDOMLoaded();
       }
     }

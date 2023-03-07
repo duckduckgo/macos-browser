@@ -21,8 +21,8 @@ import XCTest
 
 class RecentlyVisitedSiteModelTests: XCTestCase {
 
-    private func RecentlyVisitedSiteModel(originalURL: URL, privatePlayer: PrivatePlayerMode = .disabled) -> HomePage.Models.RecentlyVisitedSiteModel? {
-        HomePage.Models.RecentlyVisitedSiteModel(originalURL: originalURL, bookmarkManager: LocalBookmarkManager(bookmarkStore: BookmarkStoreMock(), faviconManagement: FaviconManagerMock()), fireproofDomains: FireproofDomains(store: FireproofDomainsStoreMock()), privatePlayer: .mock(withMode: privatePlayer))
+    private func RecentlyVisitedSiteModel(originalURL: URL, duckPlayer: DuckPlayerMode = .disabled) -> HomePage.Models.RecentlyVisitedSiteModel? {
+        HomePage.Models.RecentlyVisitedSiteModel(originalURL: originalURL, bookmarkManager: LocalBookmarkManager(bookmarkStore: BookmarkStoreMock(), faviconManagement: FaviconManagerMock()), fireproofDomains: FireproofDomains(store: FireproofDomainsStoreMock()), duckPlayer: .mock(withMode: duckPlayer))
     }
 
     func testWhenOriginalURLIsHTTPS_ThenModelURLIsHTTPS() {
@@ -42,14 +42,14 @@ class RecentlyVisitedSiteModelTests: XCTestCase {
         assertModelWithURL(URL(string: "http://www.example.com")!, matches: URL(string: "http://www.example.com")!, expectedDomain: "example.com")
     }
 
-    func testWhenPrivatePlayerIsEnabled_ThenPrivatePlayerURLSetsDomainPlaceholder() {
-        let model = RecentlyVisitedSiteModel(originalURL: .effectivePrivatePlayer("abcde12345"), privatePlayer: .enabled)
+    func testWhenDuckPlayerIsEnabled_ThenDuckPlayerURLSetsDomainPlaceholder() {
+        let model = RecentlyVisitedSiteModel(originalURL: .effectiveDuckPlayer("abcde12345"), duckPlayer: .enabled)
         XCTAssertEqual(model?.isRealDomain, false)
-        XCTAssertEqual(model?.domainToDisplay, PrivatePlayer.commonName)
+        XCTAssertEqual(model?.domainToDisplay, DuckPlayer.commonName)
     }
 
-    func testWhenPrivatePlayerIsDisabled_ThenPrivatePlayerURLDoesNotSetDomainPlaceholder() {
-        let url = URL.effectivePrivatePlayer("abcde12345")
+    func testWhenDuckPlayerIsDisabled_ThenDuckPlayerURLDoesNotSetDomainPlaceholder() {
+        let url = URL.effectiveDuckPlayer("abcde12345")
         let model = RecentlyVisitedSiteModel(originalURL: url)
         XCTAssertEqual(model?.isRealDomain, true)
         XCTAssertEqual(model?.domainToDisplay, model?.domain)

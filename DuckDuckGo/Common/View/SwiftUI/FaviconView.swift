@@ -34,8 +34,8 @@ struct FaviconView: View {
     }
 
     func refreshImage() {
-        if let privatePlayerImage = PrivatePlayer.shared.image(for: self) {
-            image = privatePlayerImage
+        if let duckPlayerImage = DuckPlayer.shared.image(for: self) {
+            image = duckPlayerImage
             return
         }
 

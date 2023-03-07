@@ -1,5 +1,5 @@
 //
-//  PrivatePlayer.swift
+//  DuckPlayer.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -23,14 +23,14 @@ import Navigation
 import WebKit
 
 extension NSImage {
-    static let privatePlayer: NSImage = #imageLiteral(resourceName: "PrivatePlayer")
+    static let duckPlayer: NSImage = #imageLiteral(resourceName: "DuckPlayer")
 }
 
-enum PrivatePlayerMode: Equatable, Codable {
+enum DuckPlayerMode: Equatable, Codable {
     case enabled, alwaysAsk, disabled
 
-    init(_ privatePlayerMode: Bool?) {
-        switch privatePlayerMode {
+    init(_ duckPlayerMode: Bool?) {
+        switch duckPlayerMode {
         case true:
             self = .enabled
         case false:
@@ -52,7 +52,7 @@ enum PrivatePlayerMode: Equatable, Codable {
     }
 }
 
-final class PrivatePlayer {
+final class DuckPlayer {
     static let usesSimulatedRequests: Bool = {
         if #available(macOS 12.0, *) {
             return true
@@ -61,36 +61,36 @@ final class PrivatePlayer {
         }
     }()
 
-    static let privatePlayerHost: String = {
+    static let duckPlayerHost: String = {
         if usesSimulatedRequests {
             return "www.youtube-nocookie.com"
         } else {
             return "player"
         }
     }()
-    static let privatePlayerScheme = "duck"
-    static let commonName = UserText.privatePlayer
+    static let duckPlayerScheme = "duck"
+    static let commonName = UserText.duckPlayer
 
-    static let shared = PrivatePlayer()
+    static let shared = DuckPlayer()
 
     var isAvailable: Bool {
         isFeatureEnabled
     }
 
-    @Published var mode: PrivatePlayerMode
+    @Published var mode: DuckPlayerMode
 
     var overlayInteracted: Bool {
         preferences.youtubeOverlayInteracted
     }
 
     init(
-        preferences: PrivatePlayerPreferences = .shared,
+        preferences: DuckPlayerPreferences = .shared,
         privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager
     ) {
         self.preferences = preferences
         isFeatureEnabled = privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .duckPlayer)
-        mode = preferences.privatePlayerMode
-        bindPrivatePlayerModeIfNeeded()
+        mode = preferences.duckPlayerMode
+        bindDuckPlayerModeIfNeeded()
 
         isFeatureEnabledCancellable = privacyConfigurationManager.updatesPublisher
             .map { [weak privacyConfigurationManager] in
@@ -103,19 +103,19 @@ final class PrivatePlayer {
     // MARK: - Private
 
     private static let websiteTitlePrefix = "\(commonName) - "
-    private let preferences: PrivatePlayerPreferences
+    private let preferences: DuckPlayerPreferences
 
     private var isFeatureEnabled: Bool = false {
         didSet {
-            bindPrivatePlayerModeIfNeeded()
+            bindDuckPlayerModeIfNeeded()
         }
     }
     private var modeCancellable: AnyCancellable?
     private var isFeatureEnabledCancellable: AnyCancellable?
 
-    private func bindPrivatePlayerModeIfNeeded() {
+    private func bindDuckPlayerModeIfNeeded() {
         if isFeatureEnabled {
-            modeCancellable = preferences.$privatePlayerMode
+            modeCancellable = preferences.$duckPlayerMode
                 .removeDuplicates()
                 .assign(to: \.mode, onWeaklyHeld: self)
         } else {
@@ -126,19 +126,19 @@ final class PrivatePlayer {
 
 // MARK: - Privacy Feed
 
-extension PrivatePlayer {
+extension DuckPlayer {
 
     func image(for faviconView: FaviconView) -> NSImage? {
         guard isAvailable, mode != .disabled, faviconView.domain == Self.commonName else {
             return nil
         }
-        return .privatePlayer
+        return .duckPlayer
     }
 
     func image(for bookmark: Bookmark) -> NSImage? {
         // Bookmarks to Duck Player pages retain duck:// URL even when Duck Player is disabled,
         // so we keep the Duck Player favicon even if Duck Player is currently disabled
-        return (bookmark.urlObject?.isPrivatePlayerScheme ?? false) ? .privatePlayer : nil
+        return (bookmark.urlObject?.isDuckPlayerScheme ?? false) ? .duckPlayer : nil
     }
 
     func domainForRecentlyVisitedSite(with url: URL) -> String? {
@@ -146,11 +146,11 @@ extension PrivatePlayer {
             return nil
         }
 
-        return url.isPrivatePlayer ? PrivatePlayer.commonName : nil
+        return url.isDuckPlayer ? DuckPlayer.commonName : nil
     }
 
     func sharingData(for title: String, url: URL) -> (title: String, url: URL)? {
-        guard isAvailable, mode != .disabled, url.isPrivatePlayerScheme, let (videoID, timestamp) = url.youtubeVideoParams else {
+        guard isAvailable, mode != .disabled, url.isDuckPlayerScheme, let (videoID, timestamp) = url.youtubeVideoParams else {
             return nil
         }
 
@@ -165,7 +165,7 @@ extension PrivatePlayer {
             return nil
         }
 
-        guard page.url.isPrivatePlayer || page.url.isPrivatePlayerScheme else {
+        guard page.url.isDuckPlayer || page.url.isDuckPlayerScheme else {
             return nil
         }
 
@@ -180,32 +180,32 @@ extension PrivatePlayer {
 
 #if DEBUG
 
-final class PrivatePlayerPreferencesPersistorMock: PrivatePlayerPreferencesPersistor {
-    var privatePlayerMode: PrivatePlayerMode
+final class DuckPlayerPreferencesPersistorMock: DuckPlayerPreferencesPersistor {
+    var duckPlayerMode: DuckPlayerMode
     var youtubeOverlayInteracted: Bool
 
-    init(privatePlayerMode: PrivatePlayerMode = .alwaysAsk, youtubeOverlayInteracted: Bool = false) {
-        self.privatePlayerMode = privatePlayerMode
+    init(duckPlayerMode: DuckPlayerMode = .alwaysAsk, youtubeOverlayInteracted: Bool = false) {
+        self.duckPlayerMode = duckPlayerMode
         self.youtubeOverlayInteracted = youtubeOverlayInteracted
     }
 }
 
-extension PrivatePlayer {
+extension DuckPlayer {
 
-    static func mock(withMode mode: PrivatePlayerMode = .enabled) -> PrivatePlayer {
-        let preferencesPersistor = PrivatePlayerPreferencesPersistorMock(privatePlayerMode: mode, youtubeOverlayInteracted: true)
-        let preferences = PrivatePlayerPreferences(persistor: preferencesPersistor)
+    static func mock(withMode mode: DuckPlayerMode = .enabled) -> DuckPlayer {
+        let preferencesPersistor = DuckPlayerPreferencesPersistorMock(duckPlayerMode: mode, youtubeOverlayInteracted: true)
+        let preferences = DuckPlayerPreferences(persistor: preferencesPersistor)
         // runtime mock-replacement for Unit Tests, to be redone when we‘ll be doing Dependency Injection
         let privacyConfigurationManager = ((NSClassFromString("MockPrivacyConfigurationManager") as? NSObject.Type)!.init() as? PrivacyConfigurationManaging)!
-        return PrivatePlayer(preferences: preferences, privacyConfigurationManager: privacyConfigurationManager)
+        return DuckPlayer(preferences: preferences, privacyConfigurationManager: privacyConfigurationManager)
     }
 
 }
 
 #else
 
-extension PrivatePlayer {
-    static func mock(withMode mode: PrivatePlayerMode = .enabled) -> PrivatePlayer { fatalError() }
+extension DuckPlayer {
+    static func mock(withMode mode: DuckPlayerMode = .enabled) -> DuckPlayer { fatalError() }
 }
 
 #endif

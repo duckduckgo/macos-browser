@@ -29,7 +29,7 @@ protocol YoutubeScriptsProvider {
 extension UserScripts: YoutubeScriptsProvider {}
 
 final class DuckPlayerTabExtension {
-    private let privatePlayer: PrivatePlayer
+    private let duckPlayer: DuckPlayer
     private var cancellables = Set<AnyCancellable>()
     private var youtubePlayerCancellables = Set<AnyCancellable>()
 
@@ -38,9 +38,9 @@ final class DuckPlayerTabExtension {
 
     private var shouldSelectNextNewTab: Bool?
 
-    init(privatePlayer: PrivatePlayer,
+    init(duckPlayer: DuckPlayer,
          scriptsPublisher: some Publisher<some YoutubeScriptsProvider, Never>) {
-        self.privatePlayer = privatePlayer
+        self.duckPlayer = duckPlayer
 
         scriptsPublisher.sink { [weak self] scripts in
             self?.youtubeOverlayScript = scripts.youtubeOverlayScript
@@ -53,7 +53,7 @@ final class DuckPlayerTabExtension {
 
     private func setUpYoutubeScriptsIfNeeded(for url: URL?) {
         youtubePlayerCancellables.removeAll()
-        guard privatePlayer.isAvailable else { return }
+        guard duckPlayer.isAvailable else { return }
 
         // only send push updates on macOS 11+ where it's safe to call window.* messages in the browser
         let canPushMessagesToJS: Bool = {
@@ -65,32 +65,32 @@ final class DuckPlayerTabExtension {
         }()
 
         if url?.host?.droppingWwwPrefix() == "youtube.com" && canPushMessagesToJS {
-            privatePlayer.$mode
+            duckPlayer.$mode
                 .dropFirst()
                 .sink { [weak self] playerMode in
                     guard let self = self else {
                         return
                     }
                     let userValues = YoutubeOverlayUserScript.UserValues(
-                        privatePlayerMode: playerMode,
-                        overlayInteracted: self.privatePlayer.overlayInteracted
+                        duckPlayerMode: playerMode,
+                        overlayInteracted: self.duckPlayer.overlayInteracted
                     )
                     self.youtubeOverlayScript?.userValuesUpdated(userValues: userValues)
                 }
                 .store(in: &youtubePlayerCancellables)
         }
 
-        if url?.isPrivatePlayerScheme == true {
+        if url?.isDuckPlayerScheme == true {
             youtubePlayerScript?.isEnabled = true
 
             if canPushMessagesToJS {
-                privatePlayer.$mode
+                duckPlayer.$mode
                     .map { $0 == .enabled }
-                    .sink { [weak self] shouldAlwaysOpenPrivatePlayer in
+                    .sink { [weak self] shouldAlwaysOpenDuckPlayer in
                         guard let self = self else {
                             return
                         }
-                        self.youtubeOverlayScript?.setAlwaysOpenInPrivatePlayer(shouldAlwaysOpenPrivatePlayer)
+                        self.youtubeOverlayScript?.setAlwaysOpenInDuckPlayer(shouldAlwaysOpenDuckPlayer)
                     }
                     .store(in: &youtubePlayerCancellables)
             }
@@ -136,15 +136,15 @@ extension DuckPlayerTabExtension: NavigationResponder {
     @MainActor
     func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
         // only proceed when Private Player is enabled
-        guard privatePlayer.isAvailable, privatePlayer.mode != .disabled else {
-            return decidePolicyWithDisabledPrivatePlayer(for: navigationAction)
+        guard duckPlayer.isAvailable, duckPlayer.mode != .disabled else {
+            return decidePolicyWithDisabledDuckPlayer(for: navigationAction)
         }
 
         // session restoration will try to load real www.youtube-nocookie.com url
         // we need to redirect it to custom duck:// scheme handler which will load
         // www.youtube-nocookie.com as a simulated request
         if case .sessionRestoration = navigationAction.navigationType,
-           navigationAction.url.isPrivatePlayer {
+           navigationAction.url.isDuckPlayer {
 
             guard let mainFrame = navigationAction.mainFrameTarget,
                   let (videoID, timestamp) = navigationAction.url.youtubeVideoParams else {
@@ -154,13 +154,13 @@ extension DuckPlayerTabExtension: NavigationResponder {
             return .redirect(mainFrame) { navigator in
                 // pop current backForwardList item
                 navigator.goBack()?.overrideResponders { _, _ in .cancel }
-                navigator.load(URLRequest(url: .privatePlayer(videoID, timestamp: timestamp)))
+                navigator.load(URLRequest(url: .duckPlayer(videoID, timestamp: timestamp)))
             }
         }
 
         // when in Private Player, don't reload if current URL is a Private Player target URL
         if case .reload = navigationAction.navigationType,
-           navigationAction.url.isPrivatePlayer {
+           navigationAction.url.isDuckPlayer {
             return .cancel
         }
 
@@ -170,7 +170,7 @@ extension DuckPlayerTabExtension: NavigationResponder {
         }
 
         // Always allow loading Private Player URLs (local HTML)
-        if navigationAction.url.isPrivatePlayerScheme || navigationAction.url.isPrivatePlayer {
+        if navigationAction.url.isDuckPlayerScheme || navigationAction.url.isDuckPlayer {
             return .allow
         }
 
@@ -183,10 +183,10 @@ extension DuckPlayerTabExtension: NavigationResponder {
     }
 
     @MainActor
-    func decidePolicyWithDisabledPrivatePlayer(for navigationAction: NavigationAction) -> NavigationActionPolicy? {
+    func decidePolicyWithDisabledDuckPlayer(for navigationAction: NavigationAction) -> NavigationActionPolicy? {
         // When the feature is disabled but the webView still gets a Private Player URL,
         // convert it back to a regular YouTube video URL.
-        if navigationAction.url.isPrivatePlayerScheme {
+        if navigationAction.url.isDuckPlayerScheme {
             guard let (videoID, timestamp) = navigationAction.url.youtubeVideoParams,
                   let mainFrame = navigationAction.mainFrameTarget else {
                 return .cancel
@@ -212,8 +212,8 @@ extension DuckPlayerTabExtension: NavigationResponder {
         // SERP+Video <<<< YT (redirected to DP) <- Duck Player
         //
         if case .backForward(distance: let distance) = navigationAction.navigationType, distance < 0,
-           privatePlayer.mode == .enabled,
-           navigationAction.sourceFrame.url.isPrivatePlayer,
+           duckPlayer.mode == .enabled,
+           navigationAction.sourceFrame.url.isDuckPlayer,
            navigationAction.url.youtubeVideoID == navigationAction.sourceFrame.url.youtubeVideoID,
            let mainFrame = navigationAction.mainFrameTarget {
 
@@ -224,25 +224,25 @@ extension DuckPlayerTabExtension: NavigationResponder {
 
         // “Watch in YouTube” selected
         // when currently displayed content is the Duck Player and loading a YouTube URL, don‘t override it
-        if navigationAction.targetFrame?.url.isPrivatePlayer == true,
+        if navigationAction.targetFrame?.url.isDuckPlayer == true,
            navigationAction.targetFrame?.url.youtubeVideoID == videoID {
             return .next
 
         // If this is a child tab of a Duck Player and it's loading a YouTube URL, don‘t override it
         } else if navigationAction.isTargetingNewWindow,
-                  navigationAction.sourceFrame.url.isPrivatePlayer,
+                  navigationAction.sourceFrame.url.isDuckPlayer,
                   navigationAction.sourceFrame.url.youtubeVideoID == videoID {
             return .next
         }
 
         // Redirect youtube urls to Duck Player when [Always enable] preference is set
-        if privatePlayer.mode == .enabled
+        if duckPlayer.mode == .enabled
                 // - or - recommendations must always be opened in the Duck Player
-                || (navigationAction.sourceFrame.url.isPrivatePlayer && navigationAction.url.isYoutubeVideoRecommendation),
+                || (navigationAction.sourceFrame.url.isDuckPlayer && navigationAction.url.isYoutubeVideoRecommendation),
               let mainFrame = navigationAction.mainFrameTarget {
 
             return .redirect(mainFrame) { navigator in
-                navigator.load(URLRequest(url: .privatePlayer(videoID, timestamp: timestamp)))
+                navigator.load(URLRequest(url: .duckPlayer(videoID, timestamp: timestamp)))
             }
         }
 
