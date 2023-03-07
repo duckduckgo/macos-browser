@@ -7,7 +7,7 @@ fi
 
 # Add brew into PATH
 if [[ -f /opt/homebrew/bin/brew ]]; then
-   eval $(/opt/homebrew/bin/brew shellenv)
+   eval "$(/opt/homebrew/bin/brew shellenv)"
 fi
 
 run_swiftlint_for_modified_files () {
@@ -20,7 +20,7 @@ run_swiftlint_for_modified_files () {
         # collect .swift files separately for Unit Tests and Code Files
         if [[ "${FILE_NAME##*.}" == "swift" ]]; then
             # check if file exists (replacing  back #001 with space)
-            if [ -f "`echo "${FILE_NAME}"  | tr '\001' ' '`" ]; then
+            if [ -f "$(echo "${FILE_NAME}"  | tr '\001' ' ')" ]; then
                 if [[ "$FILE_NAME" == *"Tests/"* ]]; then
                     TEST_FILES+=" \"${FILE_NAME}\""
                 else
