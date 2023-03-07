@@ -119,21 +119,10 @@ final class BrowserTabViewController: NSViewController {
                 self.subscribeToErrorViewState()
                 self.subscribeToTabContent(of: selectedTabViewModel)
                 self.subscribeToHoveredLink(of: selectedTabViewModel)
-                self.showCookieConsentPopoverIfNecessary(selectedTabViewModel)
                 self.subscribeToUserDialogs(of: selectedTabViewModel)
                 self.subscribeToCookieConsentPrompt(of: selectedTabViewModel)
             }
             .store(in: &cancellables)
-    }
-
-    private func showCookieConsentPopoverIfNecessary(_ selectedTabViewModel: TabViewModel?) {
-        if let selectedTab = selectedTabViewModel?.tab,
-           let cookiePopoverTab = cookieConsentPopoverManager.currentTab,
-           selectedTab == cookiePopoverTab {
-            cookieConsentPopoverManager.show(on: view, animated: false)
-        } else {
-            cookieConsentPopoverManager.close(animated: false)
-        }
     }
 
     private func subscribeToTabs() {
@@ -280,9 +269,12 @@ final class BrowserTabViewController: NSViewController {
 
     private func subscribeToCookieConsentPrompt(of tabViewModel: TabViewModel?) {
         cookieConsentCancellable = tabViewModel?.tab.cookieConsentPromptRequestPublisher.sink { [weak self, weak tab=tabViewModel?.tab] request in
-            guard let self, let tab, let request else { return }
-            self.cookieConsentPopoverManager.show(on: self.view, animated: true) { result in
-                request.submit(result)
+            guard let self, let tab, let request else {
+                self?.cookieConsentPopoverManager.close(animated: false)
+                return
+            }
+            self.cookieConsentPopoverManager.show(on: self.view, animated: true) { [weak request] result in
+                request?.submit(result)
             }
             self.cookieConsentPopoverManager.currentTab = tab
         }
