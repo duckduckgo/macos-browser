@@ -8238,8 +8238,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				kind = exactVersion;
-				version = 47.0.0;
+				branch = "brindy/remove-major-tracker-network";
+				kind = branch;
 			};
 		};
 		AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
