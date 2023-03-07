@@ -81,12 +81,10 @@ final class ConfigurationManager {
         let fetcher = ConfigurationFetcher(store: ConfigurationStore.shared, log: .config)
 
         let updateTrackerBlockingDependenciesTask = Task {
-            do {
-                try await fetcher.fetch(any: [.trackerDataSet, .surrogates, .privacyConfiguration])
+            let didFetchAnyTrackerBlockingDependencies = await fetchTrackerBlockingDependencies()
+            if didFetchAnyTrackerBlockingDependencies {
                 updateTrackerBlockingDependencies()
                 tryAgainLater()
-            } catch {
-                handleRefreshError(error)
             }
         }
 
@@ -102,7 +100,7 @@ final class ConfigurationManager {
 
         let updateBloomFilterExclusionsTask = Task {
             do {
-                try await fetcher.fetch(any: [.bloomFilterExcludedDomains])
+                try await fetcher.fetch(.bloomFilterExcludedDomains)
                 try updateBloomFilterExclusions()
                 tryAgainLater()
             } catch {
@@ -116,6 +114,32 @@ final class ConfigurationManager {
 
         ConfigurationStore.shared.log()
         log()
+    }
+
+    private func fetchTrackerBlockingDependencies() async -> Bool {
+        var didFetchAnyTrackerBlockingDependencies = false
+        let fetcher = ConfigurationFetcher(store: ConfigurationStore.shared, log: .config)
+
+        var tasks = [Configuration: Task<(), Swift.Error>]()
+        tasks[.trackerDataSet] = Task { try await fetcher.fetch(.trackerDataSet) }
+        tasks[.surrogates] = Task { try await fetcher.fetch(.surrogates) }
+        tasks[.privacyConfiguration] = Task { try await fetcher.fetch(.privacyConfiguration) }
+
+        for (configuration, task) in tasks {
+            do {
+                try await task.value
+                didFetchAnyTrackerBlockingDependencies = true
+            } catch {
+                os_log("Failed to complete configuration update to %@: %@",
+                       log: .config,
+                       type: .error,
+                       configuration.rawValue,
+                       error.localizedDescription)
+                tryAgainSoon()
+            }
+        }
+
+        return didFetchAnyTrackerBlockingDependencies
     }
 
     private func handleRefreshError(_ error: Swift.Error) {

@@ -39,7 +39,7 @@ final class FeedbackSender {
         ]
 
         let configuration = APIRequest.Configuration(url: Self.feedbackURL, method: .post, queryParameters: parameters)
-        let request = APIRequest(configuration: configuration, urlSession: URLSession.makeSession())
+        let request = APIRequest(configuration: configuration, urlSession: URLSession.session())
         request.fetch { _, error in
             if let error = error {
                 os_log("FeedbackSender: Failed to submit feedback %s", type: .error, error.localizedDescription)

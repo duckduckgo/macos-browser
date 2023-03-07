@@ -80,7 +80,7 @@ final class StatisticsLoader {
         os_log("Requesting install statistics", log: .atb, type: .debug)
 
         let configuration = APIRequest.Configuration(url: URL.initialAtb)
-        let request = APIRequest(configuration: configuration, urlSession: URLSession.makeSession(useMainThreadCallbackQueue: true))
+        let request = APIRequest(configuration: configuration, urlSession: URLSession.session(useMainThreadCallbackQueue: true))
         request.fetch { response, error in
             self.isAppRetentionRequestInProgress = false
             if let error = error {
@@ -110,7 +110,7 @@ final class StatisticsLoader {
         let installAtb = atb.version + (statisticsStore.variant ?? "")
         
         let configuration = APIRequest.Configuration(url: URL.exti(forAtb: installAtb))
-        let request = APIRequest(configuration: configuration, urlSession: URLSession.makeSession(useMainThreadCallbackQueue: true))
+        let request = APIRequest(configuration: configuration, urlSession: URLSession.session(useMainThreadCallbackQueue: true))
         request.fetch { _, error in
             self.isAppRetentionRequestInProgress = false
             if let error = error {
@@ -144,7 +144,7 @@ final class StatisticsLoader {
         
         let url = URL.searchAtb(atbWithVariant: atbWithVariant, setAtb: searchRetentionAtb, isSignedIntoEmailProtection: emailManager.isSignedIn)
         let configuration = APIRequest.Configuration(url: url)
-        let request = APIRequest(configuration: configuration, urlSession: URLSession.makeSession(useMainThreadCallbackQueue: true))
+        let request = APIRequest(configuration: configuration, urlSession: URLSession.session(useMainThreadCallbackQueue: true))
         request.fetch { (response, error) in
             if let error = error {
                 os_log("Search atb request failed with error %s", type: .error, error.localizedDescription)
@@ -180,7 +180,7 @@ final class StatisticsLoader {
 
         let url = URL.appRetentionAtb(atbWithVariant: atbWithVariant, setAtb: appRetentionAtb)
         let configuration = APIRequest.Configuration(url: url)
-        let request = APIRequest(configuration: configuration, urlSession: URLSession.makeSession(useMainThreadCallbackQueue: true))
+        let request = APIRequest(configuration: configuration, urlSession: URLSession.session(useMainThreadCallbackQueue: true))
         request.fetch { response, error in
             self.isAppRetentionRequestInProgress = false
             
