@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "B6EC37E729B5DA2A001ACE79"
-               BuildableName = "&quot;tests-server&quot;"
+               BuildableName = "tests-server"
                BlueprintName = "tests-server"
                ReferencedContainer = "container:DuckDuckGo.xcodeproj">
             </BuildableReference>
@@ -46,7 +46,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "B6EC37E729B5DA2A001ACE79"
-            BuildableName = "&quot;tests-server&quot;"
+            BuildableName = "tests-server"
             BlueprintName = "tests-server"
             ReferencedContainer = "container:DuckDuckGo.xcodeproj">
          </BuildableReference>
@@ -63,7 +63,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "B6EC37E729B5DA2A001ACE79"
-            BuildableName = "&quot;tests-server&quot;"
+            BuildableName = "tests-server"
             BlueprintName = "tests-server"
             ReferencedContainer = "container:DuckDuckGo.xcodeproj">
          </BuildableReference>

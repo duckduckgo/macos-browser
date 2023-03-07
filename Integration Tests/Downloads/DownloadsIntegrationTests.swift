@@ -137,6 +137,50 @@ class DownloadsIntegrationTests: XCTestCase {
         XCTAssertEqual(try? Data(contentsOf: fileUrl), data.testData)
     }
 
+    func testWhenNavigationActionIsBlob_downloadStarts() {
+        var persistor = DownloadsPreferencesUserDefaultsPersistor()
+        persistor.selectedDownloadLocation = FileManager.default.temporaryDirectory.absoluteString
+
+        let e = expectation(description: "download finished")
+        var fileUrl: URL!
+        let c = FileDownloadManager.shared.downloadsPublisher
+            .sink { task in
+                var c2: AnyCancellable!
+                c2 = task.output.sink { completion in
+                    if case .failure(let error) = completion {
+                        XCTFail("unexpected \(error)")
+                    }
+                    e.fulfill()
+                    c2.cancel()
+                    c2 = nil
+                } receiveValue: { value in
+                    fileUrl = value
+                }
+            }
+
+        let tab = tabViewModel.tab
+        tab.setUrl(.blankPage, userEntered: false)
+
+        let js = """
+        var blob = new Blob(['\(data.testData.utf8String()!)'], { type: 'application/octet-stream' });
+        var link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = "blobdload.json";
+        link.target = "_blank";
+        link.click();
+        """
+
+        DispatchQueue.main.async {
+            tab.webView.evaluateJavaScript(js)
+        }
+
+        waitForExpectations(timeout: 5)
+        withExtendedLifetime(c) {}
+
+        XCTAssertEqual(fileUrl, FileManager.default.temporaryDirectory.appendingPathComponent("blobdload.json"))
+        XCTAssertEqual(try? Data(contentsOf: fileUrl), data.testData)
+    }
+
 }
 
 private extension URL {

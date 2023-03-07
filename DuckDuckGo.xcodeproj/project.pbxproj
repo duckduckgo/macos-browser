@@ -2727,7 +2727,7 @@
 		B6E61EE2263AC0C8004E11AB /* FileManagerExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileManagerExtension.swift; sourceTree = "<group>"; };
 		B6E61EE7263ACE16004E11AB /* UTType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UTType.swift; sourceTree = "<group>"; };
 		B6EC37DD29B5D05A001ACE79 /* DownloadsIntegrationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DownloadsIntegrationTests.swift; sourceTree = "<group>"; };
-		B6EC37E829B5DA2A001ACE79 /* "tests-server" */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "\"tests-server\""; sourceTree = BUILT_PRODUCTS_DIR; };
+		B6EC37E829B5DA2A001ACE79 /* tests-server */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "tests-server"; sourceTree = BUILT_PRODUCTS_DIR; };
 		B6EC37EA29B5DA2A001ACE79 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		B6EC37FA29B6447F001ACE79 /* TestsServer.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = TestsServer.xcconfig; sourceTree = "<group>"; };
 		B6F41030264D2B23003DA42C /* ProgressExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressExtension.swift; sourceTree = "<group>"; };
@@ -4257,7 +4257,7 @@
 				3706FD05293F65D500E42796 /* DuckDuckGo App Store.app */,
 				3706FE99293F661700E42796 /* Unit Tests App Store.xctest */,
 				3706FEB2293F662100E42796 /* Integration Tests App Store.xctest */,
-				B6EC37E829B5DA2A001ACE79 /* "tests-server" */,
+				B6EC37E829B5DA2A001ACE79 /* tests-server */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -5868,7 +5868,7 @@
 				B6EC37F829B5DAD7001ACE79 /* Swifter */,
 			);
 			productName = "tests-server";
-			productReference = B6EC37E829B5DA2A001ACE79 /* "tests-server" */;
+			productReference = B6EC37E829B5DA2A001ACE79 /* tests-server */;
 			productType = "com.apple.product-type.tool";
 		};
 /* End PBXNativeTarget section */
