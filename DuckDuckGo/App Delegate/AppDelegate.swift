@@ -40,7 +40,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     let urlEventHandler = URLEventHandler()
 
+#if CI
+    private let keyStore = (NSClassFromString("MockEncryptionKeyStore") as? EncryptionKeyStoring.Type)!.init()
+#else
     private let keyStore = EncryptionKeyStore()
+#endif
     private var fileStore: FileStore!
 
     private(set) var stateRestorationManager: AppStateRestorationManager!
