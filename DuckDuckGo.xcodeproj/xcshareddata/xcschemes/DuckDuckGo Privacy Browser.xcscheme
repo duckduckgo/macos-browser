@@ -61,7 +61,7 @@
             ActionType = "Xcode.IDEStandardExecutionActionsCore.ExecutionActionType.ShellScriptAction">
             <ActionContent
                title = "Run Script"
-               scriptText = "killall tests-server&#10;# integration tests resources dir&#10;pushd &quot;${METAL_LIBRARY_OUTPUT_DIR}&quot;&#10;echo &quot;${BUILT_PRODUCTS_DIR}/tests-server&quot; &gt; /Users/mallexxx/Downloads/out &#10;&quot;${BUILT_PRODUCTS_DIR}/tests-server&quot; &amp;&#10;popd&#10;">
+               scriptText = "killall tests-server&#10;# integration tests resources dir&#10;pushd &quot;${METAL_LIBRARY_OUTPUT_DIR}&quot;&#10;&quot;${BUILT_PRODUCTS_DIR}/tests-server&quot; &amp;&#10;popd&#10;">
                <EnvironmentBuildable>
                   <BuildableReference
                      BuildableIdentifier = "primary"
@@ -93,20 +93,6 @@
                BlueprintName = "Unit Tests"
                ReferencedContainer = "container:DuckDuckGo.xcodeproj">
             </BuildableReference>
-            <SkippedTests>
-               <Test
-                  Identifier = "AutoconsentMessageProtocolTests/testEval()">
-               </Test>
-               <Test
-                  Identifier = "CBRCompileTimeReporterTests">
-               </Test>
-               <Test
-                  Identifier = "PixelStoreTests/testWhenValuesAreAddedThenCallbacksAreCalled()">
-               </Test>
-               <Test
-                  Identifier = "StatisticsLoaderTests/testWhenRefreshRetentionAtbIsPerformedForNavigationThenAppRetentionAtbRequested()">
-               </Test>
-            </SkippedTests>
          </TestableReference>
          <TestableReference
             skipped = "NO">
