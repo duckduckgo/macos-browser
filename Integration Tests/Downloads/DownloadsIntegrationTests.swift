@@ -98,9 +98,24 @@ class DownloadsIntegrationTests: XCTestCase {
         var persistor = DownloadsPreferencesUserDefaultsPersistor()
         persistor.selectedDownloadLocation = FileManager.default.temporaryDirectory.absoluteString
 
+        let tab = tabViewModel.tab
+        if case .url(.blankPage, _) = tab.content {} else {
+            let eLoadingDidFinish = expectation(description: "isLoading changes to false")
+            let c1 = tabViewModel.$isLoading
+                .scan((old: false, new: false)) { (old: $0.new, new: $1) }
+                .sink {
+                    if $0.old == true && $0.new == false {
+                        eLoadingDidFinish.fulfill()
+                    }
+                }
+            tab.setUrl(.blankPage, userEntered: false)
+            waitForExpectations(timeout: 5)
+            withExtendedLifetime(c1) {}
+        }
+
         let e = expectation(description: "download finished")
         var fileUrl: URL!
-        let c = FileDownloadManager.shared.downloadsPublisher
+        let c2 = FileDownloadManager.shared.downloadsPublisher
             .sink { task in
                 var c2: AnyCancellable!
                 c2 = task.output.sink { completion in
@@ -115,9 +130,6 @@ class DownloadsIntegrationTests: XCTestCase {
                 }
             }
 
-        let tab = tabViewModel.tab
-        tab.setUrl(.blankPage, userEntered: false)
-
         let js = """
         var link = document.createElement("a");
         link.href = 'data:application/octet-stream;charset=utf-8,\(data.testData.utf8String()!)';
@@ -125,13 +137,10 @@ class DownloadsIntegrationTests: XCTestCase {
         link.target = "_blank";
         link.click();
         """
-
-        DispatchQueue.main.async {
-            tab.webView.evaluateJavaScript(js)
-        }
+        tab.webView.evaluateJavaScript(js)
 
         waitForExpectations(timeout: 5)
-        withExtendedLifetime(c) {}
+        withExtendedLifetime(c2) {}
 
         XCTAssertEqual(fileUrl, FileManager.default.temporaryDirectory.appendingPathComponent("helloWorld.txt"))
         XCTAssertEqual(try? Data(contentsOf: fileUrl), data.testData)
@@ -141,9 +150,24 @@ class DownloadsIntegrationTests: XCTestCase {
         var persistor = DownloadsPreferencesUserDefaultsPersistor()
         persistor.selectedDownloadLocation = FileManager.default.temporaryDirectory.absoluteString
 
+        let tab = tabViewModel.tab
+        if case .url(.blankPage, _) = tab.content {} else {
+            let eLoadingDidFinish = expectation(description: "isLoading changes to false")
+            let c1 = tabViewModel.$isLoading
+                .scan((old: false, new: false)) { (old: $0.new, new: $1) }
+                .sink {
+                    if $0.old == true && $0.new == false {
+                        eLoadingDidFinish.fulfill()
+                    }
+                }
+            tab.setUrl(.blankPage, userEntered: false)
+            waitForExpectations(timeout: 5)
+            withExtendedLifetime(c1) {}
+        }
+
         let e = expectation(description: "download finished")
         var fileUrl: URL!
-        let c = FileDownloadManager.shared.downloadsPublisher
+        let c2 = FileDownloadManager.shared.downloadsPublisher
             .sink { task in
                 var c2: AnyCancellable!
                 c2 = task.output.sink { completion in
@@ -158,9 +182,6 @@ class DownloadsIntegrationTests: XCTestCase {
                 }
             }
 
-        let tab = tabViewModel.tab
-        tab.setUrl(.blankPage, userEntered: false)
-
         let js = """
         var blob = new Blob(['\(data.testData.utf8String()!)'], { type: 'application/octet-stream' });
         var link = document.createElement("a");
@@ -169,13 +190,10 @@ class DownloadsIntegrationTests: XCTestCase {
         link.target = "_blank";
         link.click();
         """
-
-        DispatchQueue.main.async {
-            tab.webView.evaluateJavaScript(js)
-        }
+        tab.webView.evaluateJavaScript(js)
 
         waitForExpectations(timeout: 5)
-        withExtendedLifetime(c) {}
+        withExtendedLifetime(c2) {}
 
         XCTAssertEqual(fileUrl, FileManager.default.temporaryDirectory.appendingPathComponent("blobdload.json"))
         XCTAssertEqual(try? Data(contentsOf: fileUrl), data.testData)
