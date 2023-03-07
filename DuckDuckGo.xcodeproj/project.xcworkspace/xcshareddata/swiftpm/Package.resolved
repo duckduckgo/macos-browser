@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "d2d7850a5a1402036650e5900635700574cc39d1",
-        "version" : "47.0.0"
+        "branch" : "jacek/unify-configuration",
+        "revision" : "351d4d9c31a2892e4ffb05d79c7374052db2eb96"
       }
     },
     {
