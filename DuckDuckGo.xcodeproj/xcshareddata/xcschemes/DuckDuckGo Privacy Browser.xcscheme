@@ -99,6 +99,16 @@
                </Test>
             </SkippedTests>
          </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "SyncUITests"
+               BuildableName = "SyncUITests"
+               BlueprintName = "SyncUITests"
+               ReferencedContainer = "container:LocalPackages/SyncUI">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction

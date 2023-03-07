@@ -47,7 +47,6 @@ struct QRCode: View {
         qrCodeFilter.setValue(data, forKey: "inputMessage")
         qrCodeFilter.setValue("H", forKey: "inputCorrectionLevel")
 
-
         guard let naturalSize = qrCodeFilter.outputImage?.extent.width else {
             assertionFailure("Failed to generate qr code")
             return qrImage
