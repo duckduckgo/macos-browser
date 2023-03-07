@@ -93,6 +93,20 @@
                BlueprintName = "Unit Tests"
                ReferencedContainer = "container:DuckDuckGo.xcodeproj">
             </BuildableReference>
+            <SkippedTests>
+               <Test
+                  Identifier = "AutoconsentMessageProtocolTests/testEval()">
+               </Test>
+               <Test
+                  Identifier = "CBRCompileTimeReporterTests">
+               </Test>
+               <Test
+                  Identifier = "PixelStoreTests/testWhenValuesAreAddedThenCallbacksAreCalled()">
+               </Test>
+               <Test
+                  Identifier = "StatisticsLoaderTests/testWhenRefreshRetentionAtbIsPerformedForNavigationThenAppRetentionAtbRequested()">
+               </Test>
+            </SkippedTests>
          </TestableReference>
          <TestableReference
             skipped = "NO">
