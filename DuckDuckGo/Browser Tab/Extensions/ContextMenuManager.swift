@@ -102,8 +102,15 @@ extension ContextMenuManager {
             assertionFailure("WKMenuItemIdentifierOpenLinkInNewWindow item not found")
             return
         }
+        // insert Add Link to Bookmarks
         menu.insertItem(self.addLinkToBookmarksMenuItem(from: openLinkInNewWindowItem), at: index)
         menu.replaceItem(at: index + 1, with: self.copyLinkMenuItem(withTitle: copyLinkItem.title, from: openLinkInNewWindowItem))
+
+        // insert Separator and Copy (selection) items
+        if selectedText?.isEmpty == false {
+            menu.insertItem(.separator(), at: index + 2)
+            menu.insertItem(self.copySelectionMenuItem(), at: index + 3)
+        }
     }
 
     private func handleCopyImageItem(_ item: NSMenuItem, at index: Int, in menu: NSMenu) {
@@ -202,6 +209,10 @@ private extension ContextMenuManager {
         makeMenuItem(withTitle: title, action: #selector(copyLink), from: openLinkItem, with: .openLinkInNewWindow)
     }
 
+    func copySelectionMenuItem() -> NSMenuItem {
+        NSMenuItem(title: UserText.copySelection, action: #selector(copySelection), target: self)
+    }
+
     func copyImageAddressMenuItem(from item: NSMenuItem) -> NSMenuItem {
         makeMenuItem(withTitle: UserText.copyImageAddress, action: #selector(copyImageAddress), from: item, with: .openImageInNewWindow, keyEquivalent: "")
     }
@@ -254,6 +265,15 @@ private extension ContextMenuManager {
             .allow(.tab(selected: true))
         }
         webView.loadInNewWindow(url)
+    }
+
+    func copySelection(_ sender: NSMenuItem) {
+        guard let selectedText else {
+            assertionFailure("Failed to get selected text")
+            return
+        }
+
+        NSPasteboard.general.copy(selectedText)
     }
 
     func openLinkInNewTab(_ sender: NSMenuItem) {
@@ -344,12 +364,9 @@ private extension ContextMenuManager {
         }
 
         onNewWindow = { navigationAction in
-            guard let url = navigationAction?.request.url as NSURL? else { return .cancel }
+            guard let url = navigationAction?.request.url else { return .cancel }
 
-            let pasteboard = NSPasteboard.general
-            pasteboard.declareTypes([.URL], owner: nil)
-            url.write(to: pasteboard)
-            pasteboard.setString(url.absoluteString ?? "", forType: .string)
+            NSPasteboard.general.copy(url)
 
             return .cancel
         }
@@ -410,9 +427,8 @@ private extension ContextMenuManager {
 
         onNewWindow = { navigationAction in
             guard let url = navigationAction?.request.url else { return .cancel }
-            NSPasteboard.general.clearContents()
-            NSPasteboard.general.setString(url.absoluteString, forType: .string)
-            NSPasteboard.general.setString(url.absoluteString, forType: .URL)
+
+            NSPasteboard.general.copy(url)
 
             return .cancel
         }

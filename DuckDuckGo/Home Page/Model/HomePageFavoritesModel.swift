@@ -30,7 +30,7 @@ extension HomePage.Models {
 
     struct FavoriteModel: Identifiable, Equatable {
 
-        let id: UUID
+        let id: String
         let favoriteType: FavoriteType
 
     }
@@ -56,13 +56,13 @@ extension HomePage.Models {
         @Published var favorites: [Bookmark] = [] {
             didSet {
                 var favorites = self.favorites.map { FavoriteModel(id: $0.id, favoriteType: .bookmark($0)) }
-                favorites.append(.init(id: UUID(), favoriteType: .addButton))
+                favorites.append(.init(id: UUID().uuidString, favoriteType: .addButton))
 
                 let lastRowCount = favorites.count % HomePage.favoritesPerRow
                 let missing = lastRowCount > 0 ? HomePage.favoritesPerRow - lastRowCount : 0
 
                 (0 ..< missing).forEach { _ in
-                    favorites.append(FavoriteModel(id: UUID(), favoriteType: .ghostButton))
+                    favorites.append(FavoriteModel(id: UUID().uuidString, favoriteType: .ghostButton))
                 }
 
                 models = favorites

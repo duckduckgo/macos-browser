@@ -104,7 +104,7 @@ final class RecentlyVisitedModel: ObservableObject {
 
     func toggleFavoriteSite(_ site: RecentlyVisitedSiteModel, bookmarkManager: BookmarkManager = LocalBookmarkManager.shared) {
         guard let url = site.domain.url else { return }
-        if let bookmark = bookmarkManager.getBookmark(for: url) {
+        if let bookmark = bookmarkManager.getBookmark(forUrl: url.absoluteString) {
             bookmark.isFavorite.toggle()
             bookmarkManager.update(bookmark: bookmark)
             site.isFavorite = bookmark.isFavorite

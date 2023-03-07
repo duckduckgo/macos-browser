@@ -16,8 +16,10 @@
 //  limitations under the License.
 //
 
-import Foundation
+import Navigation
 import Combine
+import Foundation
+import WebKit
 
 protocol WebKitDownloadTaskDelegate: AnyObject {
     func fileDownloadTaskNeedsDestinationURL(_ task: WebKitDownloadTask,
@@ -79,11 +81,7 @@ final class WebKitDownloadTask: NSObject, ProgressReporting {
         download.webView
     }
 
-    init(download: WebKitDownload,
-         promptForLocation: Bool,
-         destinationURL: URL?,
-         tempURL: URL?,
-         postflight: FileDownloadManager.PostflightAction? = .none) {
+    init(download: WebKitDownload, promptForLocation: Bool, destinationURL: URL?, tempURL: URL?, postflight: FileDownloadManager.PostflightAction? = .none) {
 
         self.download = download
         self.progress = Progress(totalUnitCount: -1)
@@ -92,7 +90,7 @@ final class WebKitDownloadTask: NSObject, ProgressReporting {
         self.postflight = postflight
         super.init()
 
-        download.downloadDelegate = self
+        download.delegate = self
 
         progress.fileOperationKind = .downloading
         progress.kind = .file
@@ -171,7 +169,15 @@ final class WebKitDownloadTask: NSObject, ProgressReporting {
     }
 
     func cancel() {
-        download.cancel()
+        guard Thread.isMainThread else {
+            DispatchQueue.main.async {
+                self.cancel()
+            }
+            return
+        }
+        download.cancel { [weak self] _ in
+            self?.downloadDidFail(with: URLError(.cancelled), resumeData: nil)
+        }
     }
 
     private func finish(with result: Result<URL, FileDownloadError>) {
@@ -202,6 +208,14 @@ final class WebKitDownloadTask: NSObject, ProgressReporting {
         fulfill(result)
     }
 
+    private func downloadDidFail(with error: Error, resumeData: Data?) {
+        if resumeData == nil,
+           let tempURL = location.tempURL {
+            try? FileManager.default.removeItem(at: tempURL)
+        }
+        self.finish(with: .failure(.failedToCompleteDownloadTask(underlyingError: error, resumeData: resumeData)))
+    }
+
     deinit {
         dispatchPrecondition(condition: .onQueue(.main))
         self.progress.unpublishIfNeeded()
@@ -210,10 +224,12 @@ final class WebKitDownloadTask: NSObject, ProgressReporting {
 
 }
 
-extension WebKitDownloadTask: WebKitDownloadDelegate {
+extension WebKitDownloadTask: WebKitDownloadDelegate {}
+@available(macOS 11.3, *) // objc does‘t care about availability
+@objc extension WebKitDownloadTask {
 
-    func download(_ download: WebKitDownload,
-                  decideDestinationUsing response: URLResponse?,
+    func download(_: WKDownload,
+                  decideDestinationUsing response: URLResponse,
                   suggestedFilename: String,
                   completionHandler: @escaping (URL?) -> Void) {
 
@@ -223,16 +239,15 @@ extension WebKitDownloadTask: WebKitDownloadDelegate {
             return
         }
 
-        if var mimeType = response?.mimeType {
+        if var mimeType = response.mimeType {
             // drop ;charset=.. from "text/plain;charset=utf-8"
             if let charsetRange = mimeType.range(of: ";charset=") {
                 mimeType = String(mimeType[..<charsetRange.lowerBound])
             }
             self.suggestedFileType = UTType(mimeType: mimeType)
         }
-        if let expectedContentLength = response?.expectedContentLength,
-           self.progress.totalUnitCount <= 0 {
-            self.progress.totalUnitCount = expectedContentLength
+        if self.progress.totalUnitCount <= 0 {
+            self.progress.totalUnitCount = response.expectedContentLength
         }
 
         self.suggestedFilename = suggestedFilename
@@ -247,14 +262,14 @@ extension WebKitDownloadTask: WebKitDownloadDelegate {
         }
     }
 
-    func download(_ download: WebKitDownload,
+    func download(_: WKDownload,
                   willPerformHTTPRedirection response: HTTPURLResponse,
                   newRequest request: URLRequest,
-                  decisionHandler: @escaping (WebKitDownloadRedirectPolicy) -> Void) {
+                  decisionHandler: @escaping (WKDownload.RedirectPolicy) -> Void) {
         decisionHandler(.allow)
     }
 
-    func download(_ download: WebKitDownload,
+    func download(_ download: WKDownload,
                   didReceive challenge: URLAuthenticationChallenge,
                   completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
         download.webView?.navigationDelegate?.webView?(download.webView!, didReceive: challenge, completionHandler: completionHandler) ?? {
@@ -262,7 +277,7 @@ extension WebKitDownloadTask: WebKitDownloadDelegate {
         }()
     }
 
-    func downloadDidFinish(_ download: WebKitDownload) {
+    func downloadDidFinish(_: WKDownload) {
         guard var destinationURL = location.destinationURL else {
             self.finish(with: .failure(.failedToMoveFileToDownloads))
             return
@@ -279,15 +294,11 @@ extension WebKitDownloadTask: WebKitDownloadDelegate {
         self.finish(with: .success(destinationURL))
     }
 
-    func download(_ download: WebKitDownload, didFailWithError error: Error, resumeData: Data?) {
-        if resumeData == nil,
-           let tempURL = location.tempURL {
-            try? FileManager.default.removeItem(at: tempURL)
-        }
-        self.finish(with: .failure(.failedToCompleteDownloadTask(underlyingError: error, resumeData: resumeData)))
+    func download(_: WKDownload, didFailWithError error: Error, resumeData: Data?) {
+        downloadDidFail(with: error, resumeData: resumeData)
     }
 
-    func download(_ download: WebKitDownload, didReceiveData length: UInt64) {
+    func download(_: WKDownload, didReceiveDataWithLength length: UInt64) {
         self.progress.completedUnitCount += Int64(length)
     }
 

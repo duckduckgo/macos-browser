@@ -1,7 +1,7 @@
 //
-//  ErrorExtension.swift
+//  BookmarkExtension.swift
 //
-//  Copyright © 2021 DuckDuckGo. All rights reserved.
+//  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -18,19 +18,14 @@
 
 import Foundation
 
-extension Error {
+extension Bookmark {
 
-    var failingUrl: URL? {
-        return (self as NSError).userInfo["NSErrorFailingURLKey"] as? URL
+    func copyUrlToPasteboard(_ pasteboard: NSPasteboard = .general) {
+        if let url = self.urlObject {
+            pasteboard.copy(url, withString: self.url)
+        } else {
+            pasteboard.copy(self.url)
+        }
     }
 
-    var isFrameLoadInterrupted: Bool {
-        let error = self as NSError
-        return error.code == 102 && error.domain == "WebKitErrorDomain"
-    }
-
-    var isNavigationCancelled: Bool {
-        let error = self as NSError
-        return error.code == -999 && error.domain == "NSURLErrorDomain"
-    }
 }

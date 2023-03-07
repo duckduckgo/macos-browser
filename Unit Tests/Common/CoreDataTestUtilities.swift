@@ -18,6 +18,7 @@
 
 import Foundation
 import CoreData
+import Bookmarks
 @testable import DuckDuckGo_Privacy_Browser
 
 final class CoreData {
@@ -26,8 +27,12 @@ final class CoreData {
         createInMemoryPersistentContainer(modelName: "History", bundle: Bundle(for: AppDelegate.self))
     }
 
-    static func bookmarkContainer() -> NSPersistentContainer {
+    static func legacyBookmarkContainer() -> NSPersistentContainer {
         return createInMemoryPersistentContainer(modelName: "Bookmark", bundle: Bundle(for: AppDelegate.self))
+    }
+
+    static func bookmarkContainer() -> NSPersistentContainer {
+        return createInMemoryPersistentContainer(modelName: "BookmarksModel", bundle: Bookmarks.bundle)
     }
 
     static func permissionContainer() -> NSPersistentContainer {

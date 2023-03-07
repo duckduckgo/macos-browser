@@ -18,6 +18,7 @@
 
 import Foundation
 import BrowserServicesKit
+import Bookmarks
 
 extension Pixel {
 
@@ -204,6 +205,24 @@ extension Pixel {
             case userSelectedToSkipUpdate
             case userSelectedToInstallUpdate
             case userSelectedToDismissUpdate
+
+            case faviconDecryptionFailed
+            case downloadListItemDecryptionFailed
+            case historyEntryDecryptionFailed
+            case permissionDecryptionFailed
+
+            // Errors from Bookmarks Module
+            case missingParent
+            case bookmarksSaveFailed
+            case bookmarksSaveFailedOnImport
+
+            case bookmarksCouldNotLoadDatabase
+            case bookmarksCouldNotPrepareDatabase
+            case bookmarksMigrationAlreadyPerformed
+            case bookmarksMigrationFailed
+            case bookmarksMigrationCouldNotPrepareDatabase
+            case bookmarksMigrationCouldNotPrepareDatabaseOnFailedMigration
+            case bookmarksMigrationCouldNotRemoveOldStore
         }
 
     }
@@ -448,6 +467,28 @@ extension Pixel.Event.Debug {
             return "user_selected_to_install_update"
         case .userSelectedToDismissUpdate:
             return "user_selected_to_dismiss_update"
+
+        case .faviconDecryptionFailed:
+            return "favicon_decryption_failed"
+        case .downloadListItemDecryptionFailed:
+            return "download_list_item_decryption_failed"
+        case .historyEntryDecryptionFailed:
+            return "history_entry_decryption_failed"
+        case .permissionDecryptionFailed:
+            return "permission_decryption_failed"
+
+        case .missingParent: return "bookmark_missing_parent"
+        case .bookmarksSaveFailed: return "bookmarks_save_failed"
+        case .bookmarksSaveFailedOnImport: return "bookmarks_save_failed_on_import"
+
+        case .bookmarksCouldNotLoadDatabase: return "bookmarks_could_not_load_database"
+        case .bookmarksCouldNotPrepareDatabase: return "bookmarks_could_not_prepare_database"
+        case .bookmarksMigrationAlreadyPerformed: return "bookmarks_migration_already_performed"
+        case .bookmarksMigrationFailed: return "bookmarks_migration_failed"
+        case .bookmarksMigrationCouldNotPrepareDatabase: return "bookmarks_migration_could_not_prepare_database"
+        case .bookmarksMigrationCouldNotPrepareDatabaseOnFailedMigration:
+            return "bookmarks_migration_could_not_prepare_database_on_failed_migration"
+        case .bookmarksMigrationCouldNotRemoveOldStore: return "bookmarks_migration_could_not_remove_old_store"
         }
     }
 }

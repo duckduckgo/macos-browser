@@ -165,7 +165,7 @@ final class BookmarkListViewController: NSViewController {
     private func expandAndRestore(selectedNodes: [BookmarkNode]) {
         treeController.visitNodes { node in
             if let objectID = (node.representedObject as? BaseBookmarkEntity)?.id {
-                if dataSource.expandedNodes.contains(objectID) {
+                if dataSource.expandedNodesIDs.contains(objectID) {
                     outlineView.expandItem(node)
                 } else {
                     outlineView.collapseItem(node)
@@ -177,7 +177,7 @@ final class BookmarkListViewController: NSViewController {
                 if pseudoFolder == PseudoFolder.bookmarks {
                     outlineView.expandItem(node)
                 } else {
-                    if dataSource.expandedNodes.contains(pseudoFolder.id) {
+                    if dataSource.expandedNodesIDs.contains(pseudoFolder.id) {
                         outlineView.expandItem(node)
                     } else {
                         outlineView.collapseItem(node)
@@ -291,7 +291,7 @@ extension BookmarkListViewController: BookmarkMenuItemSelectors {
             return
         }
 
-        WindowControllersManager.shared.show(url: bookmark.url, newTab: true)
+        WindowControllersManager.shared.show(url: bookmark.urlObject, newTab: true)
     }
 
     func openBookmarkInNewWindow(_ sender: NSMenuItem) {
@@ -300,7 +300,10 @@ extension BookmarkListViewController: BookmarkMenuItemSelectors {
             return
         }
 
-        WindowsManager.openNewWindow(with: bookmark.url)
+        guard let urlObject = bookmark.urlObject else {
+            return
+        }
+        WindowsManager.openNewWindow(with: urlObject)
     }
 
     func toggleBookmarkAsFavorite(_ sender: NSMenuItem) {
@@ -318,15 +321,11 @@ extension BookmarkListViewController: BookmarkMenuItemSelectors {
     }
 
     func copyBookmark(_ sender: NSMenuItem) {
-        guard let bookmark = sender.representedObject as? Bookmark, let bookmarkURL = bookmark.url as NSURL? else {
+        guard let bookmark = sender.representedObject as? Bookmark else {
             assertionFailure("Failed to cast menu represented object to Bookmark")
             return
         }
-
-        let pasteboard = NSPasteboard.general
-        pasteboard.declareTypes([.URL], owner: nil)
-        bookmarkURL.write(to: pasteboard)
-        pasteboard.setString(bookmarkURL.absoluteString ?? "", forType: .string)
+        bookmark.copyUrlToPasteboard()
     }
 
     func deleteBookmark(_ sender: NSMenuItem) {
@@ -339,7 +338,7 @@ extension BookmarkListViewController: BookmarkMenuItemSelectors {
     }
 
     func deleteEntities(_ sender: NSMenuItem) {
-        guard let uuids = sender.representedObject as? [UUID] else {
+        guard let uuids = sender.representedObject as? [String] else {
             assertionFailure("Failed to cast menu item's represented object to UUID array")
             return
         }
@@ -381,7 +380,7 @@ extension BookmarkListViewController: FolderMenuItemSelectors {
             return
         }
 
-        let tabs = children.compactMap { $0 as? Bookmark }.map { Tab(content: .url($0.url), shouldLoadInBackground: true) }
+        let tabs = children.compactMap { ($0 as? Bookmark)?.urlObject }.map { Tab(content: .url($0), shouldLoadInBackground: true) }
         tabCollection.append(tabs: tabs)
     }
 

@@ -16,8 +16,9 @@
 //  limitations under the License.
 //
 
-import Cocoa
+import AppKit
 import Combine
+import Navigation
 import os
 
 protocol FileDownloadManagerProtocol: AnyObject {
@@ -160,7 +161,9 @@ extension FileDownloadManager: WebKitDownloadTaskDelegate {
             if let url = downloadLocation?.appendingPathComponent(fileName) {
                 // Make sure the app has an access to destination
                 let folderUrl = url.deletingLastPathComponent()
-                guard self.verifyAccessToDestinationFolder(folderUrl) else {
+                guard self.verifyAccessToDestinationFolder(folderUrl,
+                                                           destinationRequested: preferences.alwaysRequestDownloadLocation,
+                                                           isSandboxed: NSApp.isSandboxed) else {
                     completion(nil, nil)
                     return
                 }
@@ -189,7 +192,9 @@ extension FileDownloadManager: WebKitDownloadTaskDelegate {
             if let url = url {
                 // Make sure the app has an access to destination
                 let folderUrl = url.deletingLastPathComponent()
-                guard self.verifyAccessToDestinationFolder(folderUrl) else {
+                guard self.verifyAccessToDestinationFolder(folderUrl,
+                                                           destinationRequested: self.preferences.alwaysRequestDownloadLocation,
+                                                           isSandboxed: NSApp.isSandboxed) else {
                     completion(nil, nil)
                     return
                 }
@@ -206,7 +211,9 @@ extension FileDownloadManager: WebKitDownloadTaskDelegate {
         }
     }
 
-    private func verifyAccessToDestinationFolder(_ folderUrl: URL) -> Bool {
+    private func verifyAccessToDestinationFolder(_ folderUrl: URL, destinationRequested: Bool, isSandboxed: Bool) -> Bool {
+        if destinationRequested && isSandboxed { return true }
+
         let folderPath = folderUrl.relativePath
         let c = open(folderPath, O_RDONLY)
         let hasAccess = c != -1

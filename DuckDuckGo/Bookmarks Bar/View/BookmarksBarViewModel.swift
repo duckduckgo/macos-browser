@@ -62,7 +62,7 @@ final class BookmarksBarViewModel: NSObject {
 
         init(entity: BaseBookmarkEntity) {
             self.title = entity.title
-            self.url = (entity as? Bookmark)?.url
+            self.url = (entity as? Bookmark)?.urlObject
             self.isFolder = entity.isFolder
             self.entity = entity
         }
