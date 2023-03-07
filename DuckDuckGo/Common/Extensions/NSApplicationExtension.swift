@@ -44,6 +44,7 @@ extension NSApplication {
 
     var isRunningUnitTests: Bool {
         if case .unitTests = runType { return true }
+        if case .integrationTests = runType { return true }
         return false
     }
 
