@@ -20,6 +20,8 @@ import Foundation
 import CryptoKit
 
 protocol EncryptionKeyStoring {
+    init()
+
     func store(key: SymmetricKey) throws
     func readKey() throws -> SymmetricKey
     func deleteKey() throws
