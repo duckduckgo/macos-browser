@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "d2d7850a5a1402036650e5900635700574cc39d1",
-        "version" : "47.0.0"
+        "branch" : "brindy/remove-major-tracker-network",
+        "revision" : "1ff8f3b36f1d0477060b453a9e8e5488a29b762c"
       }
     },
     {
