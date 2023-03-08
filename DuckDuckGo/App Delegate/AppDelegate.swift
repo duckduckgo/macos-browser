@@ -21,6 +21,8 @@ import Combine
 import os.log
 import BrowserServicesKit
 import Persistence
+import Configuration
+import Networking
 import Bookmarks
 
 @NSApplicationMain
@@ -61,6 +63,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
     // swiftlint:disable:next function_body_length
     func applicationWillFinishLaunching(_ notification: Notification) {
+        APIRequest.Headers.setUserAgent(UserAgent.duckDuckGoUserAgent())
+        Configuration.setURLProvider(AppConfigurationURLProvider())
+
         if !NSApp.isRunningUnitTests {
 #if DEBUG
             Pixel.setUp(dryRun: true)

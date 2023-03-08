@@ -20,6 +20,7 @@ import XCTest
 import Common
 import BrowserServicesKit
 import TrackerRadarKit
+import Configuration
 @testable import DuckDuckGo_Privacy_Browser
 
 @available(macOS 11, *)
@@ -36,8 +37,8 @@ class AutoconsentBackgroundTests: XCTestCase {
                                                   privacyConfigurationManager: MockPrivacyConfigurationManager(),
                                                   privacySettings: preferences,
                                                   contentBlockingManager: ContentBlockerRulesManagerMock(),
-                                                  trackerDataManager: TrackerDataManager(etag: DefaultConfigurationStorage.shared.loadEtag(for: .trackerRadar),
-                                                                                         data: DefaultConfigurationStorage.shared.loadData(for: .trackerRadar),
+                                                  trackerDataManager: TrackerDataManager(etag: ConfigurationStore.shared.loadEtag(for: .trackerDataSet),
+                                                                                         data: ConfigurationStore.shared.loadData(for: .trackerDataSet),
                                                                                          embeddedDataProvider: AppTrackerDataSetProvider(),
                                                                                          errorReporting: nil),
 
@@ -83,8 +84,8 @@ class AutoconsentBackgroundTests: XCTestCase {
                                                   privacyConfigurationManager: MockPrivacyConfigurationManager(),
                                                   privacySettings: preferences,
                                                   contentBlockingManager: ContentBlockerRulesManagerMock(),
-                                                  trackerDataManager: TrackerDataManager(etag: DefaultConfigurationStorage.shared.loadEtag(for: .trackerRadar),
-                                                                                         data: DefaultConfigurationStorage.shared.loadData(for: .trackerRadar),
+                                                  trackerDataManager: TrackerDataManager(etag: ConfigurationStore.shared.loadEtag(for: .trackerDataSet),
+                                                                                         data: ConfigurationStore.shared.loadData(for: .trackerDataSet),
                                                                                          embeddedDataProvider: AppTrackerDataSetProvider(),
                                                                                          errorReporting: nil),
 
@@ -132,20 +133,20 @@ class MockStorage: ConfigurationStoring {
     var errorOnStoreEtag = false
 
     var data: Data?
-    var dataConfig: ConfigurationLocation?
+    var dataConfig: Configuration?
 
     var etag: String?
-    var etagConfig: ConfigurationLocation?
+    var etagConfig: Configuration?
 
-    func loadData(for: ConfigurationLocation) -> Data? {
+    func loadData(for: Configuration) -> Data? {
         return data
     }
 
-    func loadEtag(for: ConfigurationLocation) -> String? {
+    func loadEtag(for: Configuration) -> String? {
         return etag
     }
 
-    func saveData(_ data: Data, for config: ConfigurationLocation) throws {
+    func saveData(_ data: Data, for config: Configuration) throws {
         if errorOnStoreData {
             throw Error.mockError
         }
@@ -154,7 +155,7 @@ class MockStorage: ConfigurationStoring {
         self.dataConfig = config
     }
 
-    func saveEtag(_ etag: String, for config: ConfigurationLocation) throws {
+    func saveEtag(_ etag: String, for config: Configuration) throws {
         if errorOnStoreEtag {
             throw Error.mockError
         }
@@ -164,5 +165,7 @@ class MockStorage: ConfigurationStoring {
     }
 
     func log() { }
+
+    func loadEmbeddedEtag(for configuration: Configuration) -> String? { nil }
 
 }
