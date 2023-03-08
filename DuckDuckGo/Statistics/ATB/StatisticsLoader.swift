@@ -108,7 +108,7 @@ final class StatisticsLoader {
         os_log("Requesting exti", log: .atb, type: .debug)
 
         let installAtb = atb.version + (statisticsStore.variant ?? "")
-        
+
         let configuration = APIRequest.Configuration(url: URL.exti(forAtb: installAtb))
         let request = APIRequest(configuration: configuration, urlSession: URLSession.session(useMainThreadCallbackQueue: true))
         request.fetch { _, error in
@@ -141,7 +141,7 @@ final class StatisticsLoader {
         }
 
         os_log("Requesting search retention ATB", log: .atb, type: .debug)
-        
+
         let url = URL.searchAtb(atbWithVariant: atbWithVariant, setAtb: searchRetentionAtb, isSignedIntoEmailProtection: emailManager.isSignedIn)
         let configuration = APIRequest.Configuration(url: url)
         let request = APIRequest(configuration: configuration, urlSession: URLSession.session(useMainThreadCallbackQueue: true))
@@ -151,14 +151,14 @@ final class StatisticsLoader {
                 completion()
                 return
             }
-            
+
             os_log("Search retention ATB request succeeded", log: .atb, type: .debug)
-            
+
             if let data = response?.data, let atb  = try? self.parser.convert(fromJsonData: data) {
                 self.statisticsStore.searchRetentionAtb = atb.version
                 self.storeUpdateVersionIfPresent(atb)
             }
-            
+
             completion()
         }
     }
@@ -183,25 +183,25 @@ final class StatisticsLoader {
         let request = APIRequest(configuration: configuration, urlSession: URLSession.session(useMainThreadCallbackQueue: true))
         request.fetch { response, error in
             self.isAppRetentionRequestInProgress = false
-            
+
             if let error = error {
                 os_log("App atb request failed with error %s", type: .error, error.localizedDescription)
                 completion()
                 return
             }
-            
+
             os_log("App retention ATB request succeeded", log: .atb, type: .debug)
-            
+
             if let data = response?.data, let atb  = try? self.parser.convert(fromJsonData: data) {
                 self.statisticsStore.appRetentionAtb = atb.version
                 self.statisticsStore.lastAppRetentionRequestDate = Date()
                 self.storeUpdateVersionIfPresent(atb)
             }
-            
+
             completion()
         }
     }
-    
+
     func storeUpdateVersionIfPresent(_ atb: Atb) {
         dispatchPrecondition(condition: .onQueue(.main))
 
