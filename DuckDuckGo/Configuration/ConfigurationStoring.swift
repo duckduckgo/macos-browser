@@ -121,9 +121,7 @@ final class DefaultConfigurationStorage: ConfigurationStoring {
         do {
             return try Data(contentsOf: file)
         } catch {
-#if DEBUG
-        guard !AppDelegate.isRunningTests else { return nil }
-#endif
+            guard !NSApp.isRunningUnitTests else { return nil }
 
             Pixel.fire(.debug(event: .trackerDataCouldNotBeLoaded, error: error))
             return nil

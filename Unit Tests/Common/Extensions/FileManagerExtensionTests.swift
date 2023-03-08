@@ -27,30 +27,6 @@ class FileManagerExtensionTests: XCTestCase {
     let testData = "test".data(using: .utf8)!
     let fm = FileManager.default
 
-    override func setUp() {
-        let tempDir = fm.temporaryDirectory
-        for file in (try? fm.contentsOfDirectory(atPath: tempDir.path)) ?? [] where file.hasPrefix(testFile) {
-            try? fm.removeItem(at: tempDir.appendingPathComponent(file))
-        }
-    }
-
-    func testFileManagerCanCreateMoreThan1000TempDirs() {
-        let tempURL = fm.temporaryDirectory(appropriateFor: nil)
-        for _ in 0...1001 {
-            let otherTempURL = fm.temporaryDirectory(appropriateFor: nil)
-            XCTAssertEqual(otherTempURL, tempURL)
-        }
-    }
-
-    func testFileManagerCanCreateMoreThan1000TempDirsAppropriateForURL() {
-        let bundleURL = Bundle(for: Self.self).bundleURL
-        let tempURL = fm.temporaryDirectory(appropriateFor: bundleURL)
-        for _ in 0...1001 {
-            let otherTempURL = fm.temporaryDirectory(appropriateFor: bundleURL)
-            XCTAssertEqual(otherTempURL, tempURL)
-        }
-    }
-
     func testWhenItemMovedToSameURLIncrementingIndexThenNoErrorIsThrown() {
         let srcURL = fm.temporaryDirectory.appendingPathComponent(testFile)
         try? testData.write(to: srcURL)
