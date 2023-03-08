@@ -35,19 +35,18 @@ extension SyncDevice {
 final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
 
     var isSyncEnabled: Bool {
-        account != nil
+        syncService.account != nil
     }
 
     let managementDialogModel: ManagementDialogModel
 
-    @Published private var account: SyncAccount?
     @Published var devices: [SyncDevice] = []
 
     @Published var shouldShowErrorMessage: Bool = false
     @Published private(set) var errorMessage: String?
 
     var recoveryCode: String? {
-        account?.recoveryCode
+        syncService.account?.recoveryCode
     }
 
     func presentEnableSyncDialog() {
@@ -78,7 +77,7 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
             .removeDuplicates()
             .asVoid()
             .receive(on: DispatchQueue.main)
-            .sink { [weak self]  in
+            .sink { [weak self] in
                 self?.updateState()
             }
             .store(in: &cancellables)
@@ -102,10 +101,9 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
     // MARK: - Private
 
     private func updateState() {
-        account = syncService.account
-        managementDialogModel.recoveryCode = account?.recoveryCode
+        managementDialogModel.recoveryCode = syncService.account?.recoveryCode
 
-        if let account {
+        if let account = syncService.account {
             devices = [.init(account)]
         } else {
             devices = []
