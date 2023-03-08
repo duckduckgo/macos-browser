@@ -16,15 +16,28 @@
 //  limitations under the License.
 //
 
+import Foundation
 import Combine
 
 final public class RecoveryCodeViewModel: ObservableObject {
     @Published public var shouldDisableSubmitButton: Bool = true
-    @Published public var recoveryCode: String = "" {
+    @Published public private(set) var recoveryCode: String = "" {
         didSet {
             shouldDisableSubmitButton = recoveryCode.isEmpty
         }
     }
 
+    public func setCode(_ newCode: String) {
+        if CharacterSet.base64.isSuperset(of: CharacterSet(charactersIn: newCode)) {
+            recoveryCode = newCode
+        }
+    }
+
     public init() {}
+}
+
+extension CharacterSet {
+    static var base64: CharacterSet {
+        return CharacterSet(charactersIn: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=")
+    }
 }

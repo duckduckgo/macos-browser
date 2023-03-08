@@ -37,7 +37,7 @@ struct EnterCodeView: View {
                 .frame(maxWidth: 244)
 
             Button {
-                recoveryCodeModel.recoveryCode = NSPasteboard.general.string(forType: .string)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+                recoveryCodeModel.setCode(NSPasteboard.general.string(forType: .string)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? "")
             } label: {
                 HStack {
                     Image("Paste")

@@ -29,10 +29,26 @@ final class RecoveryCodeViewModelTests: XCTestCase {
     func testWhenRecoveryCodeIsSetThenSubmitButtonIsEnabled() throws {
         let model = RecoveryCodeViewModel()
 
-        model.recoveryCode = "12345"
+        model.setCode("12345")
         XCTAssertFalse(model.shouldDisableSubmitButton)
 
-        model.recoveryCode = ""
+        model.setCode("")
         XCTAssertTrue(model.shouldDisableSubmitButton)
+    }
+
+    func testRecoveryCodeValidation() throws {
+        let model = RecoveryCodeViewModel()
+
+        XCTAssertEqual(model.recoveryCode, "")
+
+        model.setCode("12345")
+        XCTAssertEqual(model.recoveryCode, "12345")
+
+        model.setCode("Y2hhcmFjdGVycw==")
+        XCTAssertEqual(model.recoveryCode, "Y2hhcmFjdGVycw==")
+
+        model.setCode("😍")
+        XCTAssertEqual(model.recoveryCode, "Y2hhcmFjdGVycw==")
+
     }
 }
