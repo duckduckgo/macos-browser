@@ -87,7 +87,6 @@ final class YoutubeOverlayUserScript: NSObject, UserScript, UserScriptMessageEnc
 
     let allowedOrigins = [
         "www.youtube.com",
-        "use-devtesting12.duckduckgo.com",
         "duckduckgo.com"
     ]
 
@@ -262,7 +261,7 @@ extension YoutubeOverlayUserScript {
         guard let body = message.messageBody as? [String: Any],
               let pixelName = body["pixelName"] as? String,
               let knownPixel = JSPixel(rawValue: pixelName) else {
-            print("Not accepting an unknown pixel name")
+            assertionFailure("Not accepting an unknown pixel name")
             return
         }
 
