@@ -101,7 +101,7 @@ final class Pixel {
                           includeAppVersionParameter: includeAppVersionParameter,
                           onComplete: onComplete)
     }
-    
+
 }
 
 public func pixelAssertionFailure(_ message: @autoclosure () -> String = String(), file: StaticString = #fileID, line: UInt = #line) {
