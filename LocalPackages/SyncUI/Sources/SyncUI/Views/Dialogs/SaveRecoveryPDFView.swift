@@ -19,8 +19,8 @@
 import SwiftUI
 import SwiftUIExtensions
 
-struct SaveRecoveryPDFView<ViewModel>: View where ViewModel: ManagementDialogModel {
-    @EnvironmentObject var model: ViewModel
+struct SaveRecoveryPDFView: View {
+    @EnvironmentObject var model: ManagementDialogModel
 
     var body: some View {
         SyncDialog {
@@ -38,7 +38,7 @@ struct SaveRecoveryPDFView<ViewModel>: View where ViewModel: ManagementDialogMod
                 model.endFlow()
             }
             Button(UserText.saveRecoveryPDF) {
-                model.saveRecoveryPDF()
+                model.delegate?.saveRecoveryPDF()
             }
             .buttonStyle(DefaultActionButtonStyle(enabled: true))
         }

@@ -22,11 +22,11 @@ public enum ManagementDialogKind {
     case enableSync, recoverAccount, askToSyncAnotherDevice, syncAnotherDevice, deviceSynced, saveRecoveryPDF
 }
 
-public struct ManagementDialog<ViewModel>: View where ViewModel: ManagementDialogModel {
-    @ObservedObject public var model: ViewModel
+public struct ManagementDialog: View {
+    @ObservedObject public var model: ManagementDialogModel
     @ObservedObject public var recoveryCodeModel: RecoveryCodeViewModel
 
-    public init(model: ViewModel, recoveryCodeModel: RecoveryCodeViewModel = .init()) {
+    public init(model: ManagementDialogModel, recoveryCodeModel: RecoveryCodeViewModel = .init()) {
         self.model = model
         self.recoveryCodeModel = recoveryCodeModel
     }
@@ -43,21 +43,25 @@ public struct ManagementDialog<ViewModel>: View where ViewModel: ManagementDialo
     }
 
     @ViewBuilder var content: some View {
-        switch model.currentDialog {
-        case .enableSync:
-            EnableSyncView<ViewModel>().environmentObject(model)
-        case .askToSyncAnotherDevice:
-            AskToSyncAnotherDeviceView<ViewModel>().environmentObject(model)
-        case .recoverAccount:
-            RecoverAccountView<ViewModel>().environmentObject(model).environmentObject(recoveryCodeModel)
-        case .syncAnotherDevice:
-            SyncAnotherDeviceView<ViewModel>().environmentObject(model).environmentObject(recoveryCodeModel)
-        case .deviceSynced:
-            SyncSetupCompleteView<ViewModel>().environmentObject(model)
-        case .saveRecoveryPDF:
-            SaveRecoveryPDFView<ViewModel>().environmentObject(model)
-        default:
-            EmptyView()
+        Group {
+            switch model.currentDialog {
+            case .enableSync:
+                EnableSyncView()
+            case .askToSyncAnotherDevice:
+                AskToSyncAnotherDeviceView()
+            case .recoverAccount:
+                RecoverAccountView()
+            case .syncAnotherDevice:
+                SyncAnotherDeviceView()
+            case .deviceSynced:
+                SyncSetupCompleteView()
+            case .saveRecoveryPDF:
+                SaveRecoveryPDFView()
+            default:
+                EmptyView()
+            }
         }
+        .environmentObject(model)
+        .environmentObject(recoveryCodeModel)
     }
 }

@@ -16,21 +16,30 @@
 //  limitations under the License.
 //
 
-import Foundation
+import Combine
 
-public protocol ManagementDialogModel: ObservableObject {
-
-    var currentDialog: ManagementDialogKind? { get }
-    var recoveryCode: String? { get }
-
+public protocol ManagementDialogModelDelegate: AnyObject {
     func turnOnSync()
     func recoverDevice(using recoveryCode: String)
     func presentSyncAnotherDeviceDialog()
     func addAnotherDevice(using recoveryCode: String)
     func confirmSetupComplete()
     func saveRecoveryPDF()
-    func endFlow()
+}
 
-    var shouldShowErrorMessage: Bool { get set }
-    var errorMessage: String? { get }
+public final class ManagementDialogModel: ObservableObject {
+
+    @Published public var currentDialog: ManagementDialogKind?
+    public var recoveryCode: String?
+
+    @Published public var shouldShowErrorMessage: Bool = false
+    public var errorMessage: String?
+
+    public weak var delegate: ManagementDialogModelDelegate?
+
+    public init() {}
+
+    public func endFlow() {
+        currentDialog = nil
+    }
 }

@@ -18,8 +18,8 @@
 
 import SwiftUI
 
-struct SyncSetupCompleteView<ViewModel>: View where ViewModel: ManagementDialogModel {
-    @EnvironmentObject var model: ViewModel
+struct SyncSetupCompleteView: View {
+    @EnvironmentObject var model: ManagementDialogModel
 
     var device: SyncDevice {
         .init(kind: .mobile, name: "Dave's iPhone 14", id: UUID().uuidString)
@@ -43,7 +43,7 @@ struct SyncSetupCompleteView<ViewModel>: View where ViewModel: ManagementDialogM
             }
         } buttons: {
             Button(UserText.next) {
-                model.confirmSetupComplete()
+                model.delegate?.confirmSetupComplete()
             }
         }
         .frame(width: 360, height: 298)

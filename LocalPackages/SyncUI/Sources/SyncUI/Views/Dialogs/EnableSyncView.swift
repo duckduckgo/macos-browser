@@ -19,8 +19,8 @@
 import SwiftUI
 import SwiftUIExtensions
 
-struct EnableSyncView<ViewModel>: View where ViewModel: ManagementDialogModel {
-    @EnvironmentObject var model: ViewModel
+struct EnableSyncView: View {
+    @EnvironmentObject var model: ManagementDialogModel
 
     var body: some View {
         SyncDialog {
@@ -38,7 +38,7 @@ struct EnableSyncView<ViewModel>: View where ViewModel: ManagementDialogModel {
                 model.endFlow()
             }
             Button(UserText.turnOnSync) {
-                model.turnOnSync()
+                model.delegate?.turnOnSync()
             }
             .buttonStyle(DefaultActionButtonStyle(enabled: true))
         }

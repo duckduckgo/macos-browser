@@ -20,12 +20,10 @@ import AppKit
 import SwiftUI
 import SyncUI
 
-extension SyncPreferences: ManagementDialogModel {}
-
 final class SyncManagementDialogViewController: NSViewController {
 
-    init(_ syncPreferences: SyncPreferences) {
-        self.syncPreferences = syncPreferences
+    init(_ model: ManagementDialogModel) {
+        self.managementDialogModel = model
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -33,15 +31,15 @@ final class SyncManagementDialogViewController: NSViewController {
         fatalError("init(coder:) has not been implemented")
     }
 
-    private weak var syncPreferences: SyncPreferences?
+    private weak var managementDialogModel: ManagementDialogModel?
 
     override func loadView() {
-        guard let syncPreferences else {
-            assertionFailure("SyncPreferences was deallocated")
+        guard let managementDialogModel else {
+            assertionFailure("Sync ManagementDialogModel was deallocated")
             view = NSView()
             return
         }
-        let syncManagementDialog = ManagementDialog(model: syncPreferences)
+        let syncManagementDialog = ManagementDialog(model: managementDialogModel)
         view = NSHostingView(rootView: syncManagementDialog)
     }
 

@@ -19,8 +19,8 @@
 import SwiftUI
 import SwiftUIExtensions
 
-struct RecoverAccountView<ViewModel>: View where ViewModel: ManagementDialogModel {
-    @EnvironmentObject var model: ViewModel
+struct RecoverAccountView: View {
+    @EnvironmentObject var model: ManagementDialogModel
     @EnvironmentObject var recoveryCodeModel: RecoveryCodeViewModel
 
     var body: some View {
@@ -39,7 +39,7 @@ struct RecoverAccountView<ViewModel>: View where ViewModel: ManagementDialogMode
                 model.endFlow()
             }
             Button(UserText.submit) {
-                model.recoverDevice(using: recoveryCodeModel.recoveryCode)
+                model.delegate?.recoverDevice(using: recoveryCodeModel.recoveryCode)
             }
             .buttonStyle(DefaultActionButtonStyle(enabled: !recoveryCodeModel.shouldDisableSubmitButton))
             .disabled(recoveryCodeModel.shouldDisableSubmitButton)

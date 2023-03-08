@@ -39,7 +39,7 @@ struct AskToSyncAnotherDeviceView<ViewModel>: View where ViewModel: ManagementDi
                 model.endFlow()
             }
             Button(UserText.syncAnotherDevice) {
-                model.presentSyncAnotherDeviceDialog()
+                model.delegate?.presentSyncAnotherDeviceDialog()
             }
             .buttonStyle(DefaultActionButtonStyle(enabled: true))
         }

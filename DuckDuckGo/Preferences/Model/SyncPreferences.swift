@@ -38,14 +38,6 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         account != nil
     }
 
-    @Published private(set) var currentDialog: ManagementDialogKind? {
-        didSet {
-            if currentDialog == nil && oldValue != nil {
-                onEndFlow()
-            }
-        }
-    }
-
     @Published var account: SyncAccount?
     @Published var devices: [SyncDevice] = []
 
@@ -56,8 +48,12 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         account?.recoveryCode
     }
 
+    let managementDialogModel: ManagementDialogModel
+
     init(syncService: DDGSyncing) {
         self.syncService = syncService
+        self.managementDialogModel = ManagementDialogModel()
+        self.managementDialogModel.delegate = self
         updateState()
 
         isSyncEnabledCancellable = syncService.isAuthenticatedPublisher
@@ -67,10 +63,18 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
             .sink { [weak self]  in
                 self?.updateState()
             }
+
+        endFlowCancellable = managementDialogModel.$currentDialog
+            .removeDuplicates()
+            .filter { $0 == nil }
+            .sink { [weak self] _ in
+                self?.onEndFlow()
+            }
     }
 
     private func updateState() {
         account = syncService.account
+        managementDialogModel.recoveryCode = account?.recoveryCode
 
         if let account {
             devices = [.init(account)]
@@ -90,38 +94,6 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         presentDialog(for: .recoverAccount)
     }
 
-    func presentSyncAnotherDeviceDialog() {
-        presentDialog(for: .syncAnotherDevice)
-    }
-
-    func turnOnSync() {
-        Task { @MainActor in
-            do {
-//                let hostname = SCDynamicStoreCopyComputerName(nil, nil) as? String ?? ProcessInfo.processInfo.hostName
-                let hostname = ProcessInfo.processInfo.hostName
-                try await syncService.createAccount(deviceName: hostname)
-                presentDialog(for: .askToSyncAnotherDevice)
-            } catch {
-                errorMessage = String(describing: error)
-                shouldShowErrorMessage = true
-            }
-        }
-    }
-
-    func recoverDevice(using recoveryCode: String) {
-        Task { @MainActor in
-            do {
-//                let hostname = SCDynamicStoreCopyComputerName(nil, nil) as? String ?? ProcessInfo.processInfo.hostName
-                let hostname = ProcessInfo.processInfo.hostName
-                try await syncService.login(recoveryKey: recoveryCode, deviceName: hostname)
-                endFlow()
-            } catch {
-                errorMessage = String(describing: error)
-                shouldShowErrorMessage = true
-            }
-        }
-    }
-
     func turnOffSync() {
         Task { @MainActor in
             do {
@@ -133,33 +105,17 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         }
     }
 
-    func addAnotherDevice(using recoveryCode: String) {
-        presentDialog(for: .deviceSynced)
-    }
-
-    func confirmSetupComplete() {
-        presentDialog(for: .saveRecoveryPDF)
-    }
-
-    func saveRecoveryPDF() {
-        endFlow()
-    }
-
-    func endFlow() {
-        currentDialog = nil
-    }
-
     // MARK: -
 
     private func presentDialog(for currentDialog: ManagementDialogKind) {
-        let shouldBeginSheet = self.currentDialog == nil
-        self.currentDialog = currentDialog
+        let shouldBeginSheet = managementDialogModel.currentDialog == nil
+        managementDialogModel.currentDialog = currentDialog
 
         guard shouldBeginSheet else {
             return
         }
 
-        let syncViewController = SyncManagementDialogViewController(self)
+        let syncViewController = SyncManagementDialogViewController(managementDialogModel)
         let syncWindowController = syncViewController.wrappedInWindowController()
 
         guard let syncWindow = syncWindowController.window,
@@ -184,4 +140,52 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
 
     private let syncService: DDGSyncing
     private var isSyncEnabledCancellable: AnyCancellable?
+    private var endFlowCancellable: AnyCancellable?
+}
+
+extension SyncPreferences: ManagementDialogModelDelegate {
+
+    func turnOnSync() {
+        Task { @MainActor in
+            do {
+//                let hostname = SCDynamicStoreCopyComputerName(nil, nil) as? String ?? ProcessInfo.processInfo.hostName
+                let hostname = ProcessInfo.processInfo.hostName
+                try await syncService.createAccount(deviceName: hostname)
+                presentDialog(for: .askToSyncAnotherDevice)
+            } catch {
+                managementDialogModel.errorMessage = String(describing: error)
+                managementDialogModel.shouldShowErrorMessage = true
+            }
+        }
+    }
+
+    func recoverDevice(using recoveryCode: String) {
+        Task { @MainActor in
+            do {
+//                let hostname = SCDynamicStoreCopyComputerName(nil, nil) as? String ?? ProcessInfo.processInfo.hostName
+                let hostname = ProcessInfo.processInfo.hostName
+                try await syncService.login(recoveryKey: recoveryCode, deviceName: hostname)
+                managementDialogModel.endFlow()
+            } catch {
+                managementDialogModel.errorMessage = String(describing: error)
+                managementDialogModel.shouldShowErrorMessage = true
+            }
+        }
+    }
+
+    func presentSyncAnotherDeviceDialog() {
+        presentDialog(for: .syncAnotherDevice)
+    }
+
+    func addAnotherDevice(using recoveryCode: String) {
+        presentDialog(for: .deviceSynced)
+    }
+
+    func confirmSetupComplete() {
+        presentDialog(for: .saveRecoveryPDF)
+    }
+
+    func saveRecoveryPDF() {
+        managementDialogModel.endFlow()
+    }
 }

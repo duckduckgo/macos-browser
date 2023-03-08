@@ -19,8 +19,8 @@
 import SwiftUI
 import SwiftUIExtensions
 
-struct SyncAnotherDeviceView<ViewModel>: View where ViewModel: ManagementDialogModel {
-    @EnvironmentObject var model: ViewModel
+struct SyncAnotherDeviceView: View {
+    @EnvironmentObject var model: ManagementDialogModel
     @EnvironmentObject var recoveryCodeModel: RecoveryCodeViewModel
 
     enum Mode: Hashable {
@@ -42,7 +42,7 @@ struct SyncAnotherDeviceView<ViewModel>: View where ViewModel: ManagementDialogM
 
             switch selectedMode {
             case .showCode:
-                ShowCodeView<ViewModel>().environmentObject(model)
+                ShowCodeView().environmentObject(model)
             case .enterCode:
                 EnterCodeView(
                     instructions: UserText.syncNewDeviceEnterCodeInstructions,
@@ -61,7 +61,7 @@ struct SyncAnotherDeviceView<ViewModel>: View where ViewModel: ManagementDialogM
                     model.endFlow()
                 }
                 Button(UserText.submit) {
-                    model.addAnotherDevice(using: recoveryCodeModel.recoveryCode)
+                    model.delegate?.addAnotherDevice(using: recoveryCodeModel.recoveryCode)
                 }
                 .buttonStyle(DefaultActionButtonStyle(enabled: !recoveryCodeModel.shouldDisableSubmitButton))
                 .disabled(recoveryCodeModel.shouldDisableSubmitButton)
@@ -72,8 +72,8 @@ struct SyncAnotherDeviceView<ViewModel>: View where ViewModel: ManagementDialogM
 
 }
 
-private struct ShowCodeView<ViewModel>: View where ViewModel: ManagementDialogModel {
-    @EnvironmentObject var model: ViewModel
+private struct ShowCodeView: View {
+    @EnvironmentObject var model: ManagementDialogModel
 
     var body: some View {
         VStack(spacing: 20) {
