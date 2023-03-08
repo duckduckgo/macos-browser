@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import Foundation
 import Combine
 
 public protocol ManagementDialogModelDelegate: AnyObject {
@@ -33,13 +34,22 @@ public final class ManagementDialogModel: ObservableObject {
     public var recoveryCode: String?
 
     @Published public var shouldShowErrorMessage: Bool = false
-    public var errorMessage: String?
+    @Published public var errorMessage: String?
 
     public weak var delegate: ManagementDialogModelDelegate?
 
-    public init() {}
+    public init() {
+        shouldShowErrorMessageCancellable = $errorMessage
+            .map { $0 != nil }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] hasError in
+                self?.shouldShowErrorMessage = hasError
+            }
+    }
 
     public func endFlow() {
         currentDialog = nil
     }
+
+    private var shouldShowErrorMessageCancellable: AnyCancellable?
 }

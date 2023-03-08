@@ -38,7 +38,9 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         account != nil
     }
 
-    @Published var account: SyncAccount?
+    let managementDialogModel: ManagementDialogModel
+
+    @Published private var account: SyncAccount?
     @Published var devices: [SyncDevice] = []
 
     @Published var shouldShowErrorMessage: Bool = false
@@ -46,44 +48,6 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
 
     var recoveryCode: String? {
         account?.recoveryCode
-    }
-
-    let managementDialogModel: ManagementDialogModel
-
-    init(syncService: DDGSyncing) {
-        self.syncService = syncService
-        self.managementDialogModel = ManagementDialogModel()
-        self.managementDialogModel.delegate = self
-        updateState()
-
-        isSyncEnabledCancellable = syncService.isAuthenticatedPublisher
-            .removeDuplicates()
-            .asVoid()
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self]  in
-                self?.updateState()
-            }
-
-        endFlowCancellable = managementDialogModel.$currentDialog
-            .removeDuplicates()
-            .filter { $0 == nil }
-            .sink { [weak self] _ in
-                self?.onEndFlow()
-            }
-    }
-
-    private func updateState() {
-        account = syncService.account
-        managementDialogModel.recoveryCode = account?.recoveryCode
-
-        if let account {
-            devices = [.init(account)]
-        } else {
-            devices = []
-        }
-        if let code = account?.recoveryCode {
-            print(code)
-        }
     }
 
     func presentEnableSyncDialog() {
@@ -100,12 +64,53 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
                 try await syncService.disconnect()
             } catch {
                 errorMessage = String(describing: error)
-                shouldShowErrorMessage = true
             }
         }
     }
 
-    // MARK: -
+    init(syncService: DDGSyncing) {
+        self.syncService = syncService
+        self.managementDialogModel = ManagementDialogModel()
+        self.managementDialogModel.delegate = self
+        updateState()
+
+        syncService.isAuthenticatedPublisher
+            .removeDuplicates()
+            .asVoid()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self]  in
+                self?.updateState()
+            }
+            .store(in: &cancellables)
+
+        $errorMessage
+            .map { $0 != nil }
+            .receive(on: DispatchQueue.main)
+            .assign(to: \.shouldShowErrorMessage, onWeaklyHeld: self)
+            .store(in: &cancellables)
+
+        managementDialogModel.$currentDialog
+            .removeDuplicates()
+            .filter { $0 == nil }
+            .asVoid()
+            .sink { [weak self] _ in
+                self?.onEndFlow()
+            }
+            .store(in: &cancellables)
+    }
+
+    // MARK: - Private
+
+    private func updateState() {
+        account = syncService.account
+        managementDialogModel.recoveryCode = account?.recoveryCode
+
+        if let account {
+            devices = [.init(account)]
+        } else {
+            devices = []
+        }
+    }
 
     private func presentDialog(for currentDialog: ManagementDialogKind) {
         let shouldBeginSheet = managementDialogModel.currentDialog == nil
@@ -139,8 +144,7 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
     private var onEndFlow: () -> Void = {}
 
     private let syncService: DDGSyncing
-    private var isSyncEnabledCancellable: AnyCancellable?
-    private var endFlowCancellable: AnyCancellable?
+    private var cancellables = Set<AnyCancellable>()
 }
 
 extension SyncPreferences: ManagementDialogModelDelegate {
@@ -154,7 +158,6 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                 presentDialog(for: .askToSyncAnotherDevice)
             } catch {
                 managementDialogModel.errorMessage = String(describing: error)
-                managementDialogModel.shouldShowErrorMessage = true
             }
         }
     }
@@ -168,7 +171,6 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                 managementDialogModel.endFlow()
             } catch {
                 managementDialogModel.errorMessage = String(describing: error)
-                managementDialogModel.shouldShowErrorMessage = true
             }
         }
     }
