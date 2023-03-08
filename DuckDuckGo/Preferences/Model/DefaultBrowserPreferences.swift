@@ -19,6 +19,7 @@
 import Foundation
 import SwiftUI
 import Combine
+import Common
 
 protocol DefaultBrowserProvider {
     var bundleIdentifier: String { get }

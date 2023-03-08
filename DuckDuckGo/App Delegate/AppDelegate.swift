@@ -21,17 +21,13 @@ import Combine
 import os.log
 import BrowserServicesKit
 import Persistence
+import Configuration
+import Networking
 import Bookmarks
 import DDGSync
 
 @NSApplicationMain
-final class AppDelegate: NSObject, NSApplicationDelegate {
-
-#if DEBUG
-    static var isRunningTests: Bool = ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
-#else
-    static var isRunningTests: Bool { false }
-#endif
+final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDelegate {
 
 #if DEBUG
     let disableCVDisplayLinkLogs: Void = {
@@ -47,7 +43,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     let urlEventHandler = URLEventHandler()
 
+#if CI
+    private let keyStore = (NSClassFromString("MockEncryptionKeyStore") as? EncryptionKeyStoring.Type)!.init()
+#else
     private let keyStore = EncryptionKeyStore()
+#endif
     private var fileStore: FileStore!
 
     private(set) var stateRestorationManager: AppStateRestorationManager!
@@ -66,7 +66,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     // swiftlint:disable:next function_body_length
     func applicationWillFinishLaunching(_ notification: Notification) {
-        if !Self.isRunningTests {
+        APIRequest.Headers.setUserAgent(UserAgent.duckDuckGoUserAgent())
+        Configuration.setURLProvider(AppConfigurationURLProvider())
+
+        if !NSApp.isRunningUnitTests {
 #if DEBUG
             Pixel.setUp(dryRun: true)
 #else
@@ -112,7 +115,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         func mock<T>(_ className: String) -> T {
             ((NSClassFromString(className) as? NSObject.Type)!.init() as? T)!
         }
-        AppPrivacyFeatures.shared = AppDelegate.isRunningTests
+        AppPrivacyFeatures.shared = NSApp.isRunningUnitTests
             // runtime mock-replacement for Unit Tests, to be redone when we‘ll be doing Dependency Injection
             ? AppPrivacyFeatures(contentBlocking: mock("ContentBlockingMock"), httpsUpgradeStore: mock("HTTPSUpgradeStoreMock"))
             : AppPrivacyFeatures(contentBlocking: AppContentBlocking(), httpsUpgradeStore: AppHTTPSUpgradeStore())
@@ -122,7 +125,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 #endif
 
         do {
-            let encryptionKey = Self.isRunningTests ? nil : try keyStore.readKey()
+            let encryptionKey = NSApp.isRunningUnitTests ? nil : try keyStore.readKey()
             fileStore = EncryptedFileStore(encryptionKey: encryptionKey)
         } catch {
             os_log("App Encryption Key could not be read: %s", "\(error)")
@@ -144,13 +147,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        guard !Self.isRunningTests else { return }
+        guard !NSApp.isRunningUnitTests else { return }
 
         HistoryCoordinator.shared.loadHistory()
         PrivacyFeatures.httpsUpgrade.loadDataAsync()
         LocalBookmarkManager.shared.loadBookmarks()
         FaviconManager.shared.loadFavicons()
         ConfigurationManager.shared.start()
+        FileDownloadManager.shared.delegate = self
         _ = DownloadListCoordinator.shared
         _ = RecentlyClosedCoordinator.shared
 
@@ -163,7 +167,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         BWManager.shared.initCommunication()
 
-        if WindowsManager.windows.isEmpty {
+        if WindowsManager.windows.isEmpty,
+           case .normal = NSApp.runType {
             WindowsManager.openNewWindow(lazyLoadTabs: true)
         }
 
@@ -194,6 +199,23 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         stateRestorationManager?.applicationWillTerminate()
 
         return .terminateNow
+    }
+
+    func askUserToGrantAccessToDestination(_ folderUrl: URL) {
+        if FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first?.lastPathComponent == folderUrl.lastPathComponent {
+            let alert = NSAlert.noAccessToDownloads()
+            if alert.runModal() != .cancel {
+                guard let preferencesLink = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_DownloadsFolder") else {
+                    assertionFailure("Can't initialize preferences link")
+                    return
+                }
+                NSWorkspace.shared.open(preferencesLink)
+                return
+            }
+        } else {
+            let alert = NSAlert.noAccessToSelectedFolder()
+            alert.runModal()
+        }
     }
 
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {

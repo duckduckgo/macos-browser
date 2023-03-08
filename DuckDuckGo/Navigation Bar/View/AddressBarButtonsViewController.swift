@@ -537,7 +537,7 @@ final class AddressBarButtonsViewController: NSViewController {
             animationView?.removeFromSuperview()
 
             let newAnimationView: AnimationView
-            if AppDelegate.isRunningTests {
+            if NSApp.isRunningUnitTests {
                 newAnimationView = AnimationView()
             } else {
                 // For unknown reason, this caused infinite execution of various unit tests.
@@ -617,7 +617,7 @@ final class AddressBarButtonsViewController: NSViewController {
 
     private func subscribePrivacyDashboardPendingUpdates(privacyDashboardPopover: PrivacyDashboardPopover) {
         privacyDashboadPendingUpdatesCancellable?.cancel()
-        guard !AppDelegate.isRunningTests else { return }
+        guard !NSApp.isRunningUnitTests else { return }
 
         privacyDashboadPendingUpdatesCancellable = privacyDashboardPopover.viewController.rulesUpdateObserver
             .$pendingUpdates.dropFirst().receive(on: DispatchQueue.main).sink { [weak privacyDashboardPopover] _ in
@@ -746,7 +746,7 @@ final class AddressBarButtonsViewController: NSViewController {
     }
 
     private func updatePrivacyEntryPointIcon() {
-        guard !AppDelegate.isRunningTests else { return }
+        guard !NSApp.isRunningUnitTests else { return }
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             return
         }

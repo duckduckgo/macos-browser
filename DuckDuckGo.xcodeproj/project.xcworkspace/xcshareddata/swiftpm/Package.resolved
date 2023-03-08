@@ -6,7 +6,7 @@
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
         "branch" : "dominik/ddg-sync",
-        "revision" : "76b995a82c71c41d8c42ce03e0431081a8bfe0a1"
+        "revision" : "774647c2f4d91f5e0b4aad11132cbae3c67e5c7c"
       }
     },
     {
@@ -100,12 +100,21 @@
       }
     },
     {
+      "identity" : "swifter",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/httpswift/swifter.git",
+      "state" : {
+        "revision" : "9483a5d459b45c3ffd059f7b55f9638e268632fd",
+        "version" : "1.5.0"
+      }
+    },
+    {
       "identity" : "sync_crypto",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/sync_crypto",
       "state" : {
-        "branch" : "dominik/spm",
-        "revision" : "58b7256e30a5cfd8162835b2f4fa8a443d04110d"
+        "revision" : "df751674ee842d129c50a183668b033d02c2980d",
+        "version" : "0.0.1"
       }
     },
     {

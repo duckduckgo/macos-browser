@@ -65,6 +65,8 @@ protocol NSCodingExtension: TabExtension {
 protocol TabExtensionDependencies {
     var privacyFeatures: PrivacyFeaturesProtocol { get }
     var historyCoordinating: HistoryCoordinating { get }
+
+    var downloadManager: FileDownloadManagerProtocol { get }
 }
 // swiftlint:disable:next large_tuple
 typealias TabExtensionsBuilderArguments = (
@@ -72,6 +74,7 @@ typealias TabExtensionsBuilderArguments = (
     userScriptsPublisher: AnyPublisher<UserScripts?, Never>,
     inheritedAttribution: AdClickAttributionLogic.State?,
     userContentControllerFuture: Future<UserContentControllerProtocol, Never>,
+    webViewFuture: Future<WKWebView, Never>,
     permissionModel: PermissionModel,
     privacyInfoPublisher: AnyPublisher<PrivacyInfo?, Never>
 )
@@ -117,6 +120,10 @@ extension TabExtensionsBuilder {
         }
         add {
             FindInPageTabExtension(findInPageScriptPublisher: userScripts.map(\.?.findInPageScript))
+        }
+
+        add {
+            DownloadsTabExtension(downloadManager: dependencies.downloadManager)
         }
     }
 
