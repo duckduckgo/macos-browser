@@ -31,6 +31,10 @@ final class DownloadsCellView: NSTableCellView {
             return true
         }
 
+        var isRetryable: Bool {
+            guard case .downloadFailed(let error) = self, error.isRetryable else { return false }
+            return true
+        }
     }
 
     @IBOutlet var titleLabel: NSTextField!
@@ -203,7 +207,7 @@ final class DownloadsCellView: NSTableCellView {
         self.progressView.isHidden = true
 
         self.cancelButton.isHidden = true
-        self.restartButton.isHidden = false
+        self.restartButton.isHidden = !error.isRetryable
         self.revealButton.isHidden = true
 
         if case .fileRemoved = error {
@@ -258,7 +262,7 @@ extension DownloadsCellView.DownloadError: LocalizedError {
     }
 
     var errorDescription: String? {
-        guard case .downloadFailed(.failedToCompleteDownloadTask(underlyingError: let error, resumeData: _)) = self else {
+        guard case .downloadFailed(.failedToCompleteDownloadTask(underlyingError: let error, resumeData: _, _)) = self else {
             return shortDescription
         }
         return error?.localizedDescription

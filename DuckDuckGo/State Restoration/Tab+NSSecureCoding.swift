@@ -33,7 +33,6 @@ extension Tab: NSSecureCoding {
         static let preferencePane = "preferencePane"
         static let visitedDomains = "visitedDomains"
         static let lastSelectedAt = "lastSelectedAt"
-        static let currentDownload = "currentDownload"
     }
 
     static var supportsSecureCoding: Bool { true }
@@ -51,7 +50,6 @@ extension Tab: NSSecureCoding {
         else { return nil }
 
         let visitedDomains = decoder.decodeObject(of: [NSArray.self, NSString.self], forKey: NSSecureCodingKeys.visitedDomains) as? [String] ?? []
-        let currentDownload = decoder.decodeObject(of: NSURL.self, forKey: NSSecureCodingKeys.currentDownload) as? URL
 
         let interactionStateData: Data? = decoder.decodeIfPresent(at: NSSecureCodingKeys.interactionStateData) ?? decoder.decodeIfPresent(at: NSSecureCodingKeys.sessionStateData)
 
@@ -62,8 +60,7 @@ extension Tab: NSSecureCoding {
                   interactionStateData: interactionStateData,
                   shouldLoadInBackground: false,
                   shouldLoadFromCache: true,
-                  lastSelectedAt: decoder.decodeIfPresent(at: NSSecureCodingKeys.lastSelectedAt),
-                  currentDownload: currentDownload)
+                  lastSelectedAt: decoder.decodeIfPresent(at: NSSecureCodingKeys.lastSelectedAt))
 
         _=self.awakeAfter(using: decoder)
     }
@@ -80,7 +77,6 @@ extension Tab: NSSecureCoding {
 
         coder.encode(content.type.rawValue, forKey: NSSecureCodingKeys.tabType)
         lastSelectedAt.map(coder.encode(forKey: NSSecureCodingKeys.lastSelectedAt))
-        coder.encode(currentDownload, forKey: NSSecureCodingKeys.currentDownload)
 
         if let videoID = content.videoID {
             coder.encode(videoID, forKey: NSSecureCodingKeys.videoID)

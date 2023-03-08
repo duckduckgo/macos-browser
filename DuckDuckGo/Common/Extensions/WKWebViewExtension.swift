@@ -191,6 +191,10 @@ extension WKWebView {
         }
     }
 
+    func close() {
+        self.evaluateJavaScript("window.close()")
+    }
+
     func loadInNewWindow(_ url: URL) {
         let urlEnc = "'\(url.absoluteString.escapedJavaScriptString())'"
         self.evaluateJavaScript("window.open(\(urlEnc), '_blank', 'noopener, noreferrer')")

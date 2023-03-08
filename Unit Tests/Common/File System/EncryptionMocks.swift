@@ -31,7 +31,8 @@ final class MockEncryptionKeyGenerator: EncryptionKeyGenerating {
 
 }
 
-final class MockEncryptionKeyStore: EncryptionKeyStoring {
+@objc(MockEncryptionKeyStore)
+final class MockEncryptionKeyStore: NSObject, EncryptionKeyStoring {
 
     private(set) var storedKeys: [String: SymmetricKey] = [:]
     private let generator: EncryptionKeyGenerating
@@ -40,6 +41,10 @@ final class MockEncryptionKeyStore: EncryptionKeyStoring {
     init(generator: EncryptionKeyGenerating, account: String) {
         self.generator = generator
         self.account = account
+    }
+
+    override convenience init() {
+        self.init(generator: EncryptionKeyGenerator(), account: "mock-account")
     }
 
     func store(key: SymmetricKey) throws {

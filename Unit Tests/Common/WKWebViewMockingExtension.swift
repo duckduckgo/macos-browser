@@ -87,9 +87,9 @@ struct WKURLSchemeTaskHandler {
         }
     }
 
-    static func ok(code: Int = 200, _ result: OkResult) -> WKURLSchemeTaskHandler {
+    static func ok(code: Int = 200, headers: [String: String] = [:], _ result: OkResult) -> WKURLSchemeTaskHandler {
         .init { task in
-            let response = MockHTTPURLResponse(url: task.request.url!, statusCode: code, mime: result.mime, headerFields: [:])!
+            let response = MockHTTPURLResponse(url: task.request.url!, statusCode: code, mime: result.mime, headerFields: headers)!
 
             task.didReceive(response)
             task.didReceive(result.data)
