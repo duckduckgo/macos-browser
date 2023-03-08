@@ -105,7 +105,7 @@ final class HomePageViewController: NSViewController {
     }
 
     func refreshModels() {
-        guard !AppDelegate.isRunningTests else { return }
+        guard !NSApp.isRunningUnitTests else { return }
 
         refreshFavoritesModel()
         refreshRecentlyVisitedModel()
