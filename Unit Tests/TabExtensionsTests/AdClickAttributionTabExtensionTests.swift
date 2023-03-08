@@ -30,11 +30,8 @@ import XCTest
 @available(macOS 12.0, *)
 class AdClickAttributionTabExtensionTests: XCTestCase {
     struct URLs {
-        let local = URL(string: "http://localhost:8084/")!
-        let local1 = URL(string: "http://localhost:8084/1")!
-        let local2 = URL(string: "http://localhost:8084/2")!
-        let local3 = URL(string: "http://localhost:8084/3")!
-        let local4 = URL(string: "http://localhost:8084/4")!
+        let url1 = URL(string: "https://my-host.com/")!
+        let url2 = URL(string: "http://another-host.org/1")!
     }
     struct DataSource {
         let empty = Data()
@@ -45,14 +42,14 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
                     <a id="navlink" />
                 </body>
             </html>
-        """.data(using: .utf8)!
+        """.utf8data
         let metaRedirect = """
         <html>
             <head>
-                <meta http-equiv="Refresh" content="0; URL=http://localhost:8084/3" />
+                <meta http-equiv="Refresh" content="0; URL=http://another-host.org/1" />
             </head>
         </html>
-        """.data(using: .utf8)!
+        """.utf8data
     }
 
     let urls = URLs()
@@ -239,12 +236,12 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
 
         let onDetectionDidStart = expectation(description: "detection.onDidStart")
         detection.onDidStart = { [urls] url in
-            XCTAssertEqual(url, urls.local1)
+            XCTAssertEqual(url, urls.url2)
             onDetectionDidStart.fulfill()
         }
         let on2XXResponse = expectation(description: "on2XXResponse")
         detection.on2XXResponse = { [urls] url in
-            XCTAssertEqual(url, urls.local1)
+            XCTAssertEqual(url, urls.url2)
             on2XXResponse.fulfill()
         }
         let onNavigation = expectation(description: "onNavigation")
@@ -258,12 +255,12 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
             onDetectionDidFinish.fulfill()
         }
         logic.onDidFinish = { [now, urls] host, date in
-            XCTAssertEqual(host, urls.local1.host!)
+            XCTAssertEqual(host, urls.url2.host!)
             XCTAssertEqual(date, now)
             onLogicDidFinish.fulfill()
         }
 
-        tab.setContent(.url(urls.local1))
+        tab.setContent(.url(urls.url2))
         waitForExpectations(timeout: 5)
     }
 
@@ -309,12 +306,12 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
             onDetectionDidFinish.fulfill()
         }
         logic.onDidFinish = { [now, urls] host, date in
-            XCTAssertEqual(host, urls.local1.host!)
+            XCTAssertEqual(host, urls.url2.host!)
             XCTAssertEqual(date, now)
             onLogicDidFinish.fulfill()
         }
 
-        tab.setContent(.url(urls.local))
+        tab.setContent(.url(urls.url1))
         waitForExpectations(timeout: 5)
     }
 
@@ -333,7 +330,7 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
 
         let onDetectionDidStart = expectation(description: "detection.onDidStart")
         detection.onDidStart = { [urls] url in
-            XCTAssertEqual(url, urls.local1)
+            XCTAssertEqual(url, urls.url2)
             onDetectionDidStart.fulfill()
         }
 
@@ -343,7 +340,7 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
         }
 
         // skipping server.start
-        tab.setContent(.url(urls.local1))
+        tab.setContent(.url(urls.url2))
         waitForExpectations(timeout: 5)
     }
 
@@ -366,21 +363,21 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
         logic.onDidFinish = { _, _ in
             onDidFinish.fulfill()
         }
-        tab.setContent(.url(urls.local))
+        tab.setContent(.url(urls.url1))
         waitForExpectations(timeout: 5)
         onDidFinish = expectation(description: "onDidFinish 2")
-        tab.setContent(.url(urls.local1))
+        tab.setContent(.url(urls.url2))
         waitForExpectations(timeout: 5)
 
         detection.on2XXResponse = nil /*assert*/
         let onBackForward = expectation(description: "detection.onBackForward")
         logic.onBackForward = { [urls] url in
-            XCTAssertEqual(url, urls.local)
+            XCTAssertEqual(url, urls.url1)
             onBackForward.fulfill()
         }
         let onDetectionDidStart = expectation(description: "detection.onDidStart")
         detection.onDidStart = { [urls] url in
-            XCTAssertEqual(url, urls.local)
+            XCTAssertEqual(url, urls.url1)
             onDetectionDidStart.fulfill()
         }
 
@@ -390,7 +387,7 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
             onDetectionDidFinish.fulfill()
         }
         logic.onDidFinish = { [now, urls] host, date in
-            XCTAssertEqual(host, urls.local1.host!)
+            XCTAssertEqual(host, urls.url1.host!)
             XCTAssertEqual(date, now)
             onLogicDidFinish.fulfill()
         }

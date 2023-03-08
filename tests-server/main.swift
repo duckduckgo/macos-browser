@@ -21,6 +21,17 @@ import Swifter
 
 // swiftlint:disable opening_brace
 
+/**
+
+ tests-server used for Integration Tests HTTP requests mocking
+
+ run as a Pre-action for Test targets (target -> Edit scheme.. -> Test -> Pre-actions/Post-actions)
+ - current work directory: Integration Tests Resources directory, used for file lookup for requests without `data` parameter
+
+ see TestURLExtension.swift for usage example
+
+ **/
+
 let server = HttpServer()
 
 server.middleware = [{ request in
@@ -70,7 +81,7 @@ server.middleware = [{ request in
     }
 }]
 
-print("starting web server at localhost:8084")
-try server.start(8084)
+print("starting web server at localhost:8085")
+try server.start(8085)
 
 RunLoop.main.run()

@@ -24,23 +24,11 @@ import XCTest
 @available(macOS 12.0, *)
 class DownloadsIntegrationTests: XCTestCase {
 
-    struct URLs {
-        let local = URL(string: "http://localhost:8084/")!
-    }
     struct DataSource {
-        let empty = Data()
-        let testData = "HelloWorld!".data(using: .utf8)!
-        let html = """
-            <html>
-                <body>
-                    some data
-                    <a id="navlink" />
-                </body>
-            </html>
-        """.data(using: .utf8)!
-
+        let testData = "HelloWorld!".utf8data
+        let html = "<html><body>some data</body></html>".utf8data
     }
-    let urls = URLs()
+
     let data = DataSource()
     static var window: NSWindow!
     var tabViewModel: TabViewModel {
@@ -57,6 +45,7 @@ class DownloadsIntegrationTests: XCTestCase {
     }
 
     // MARK: - Tests
+    // Uses tests-server helper tool for mocking HTTP requests (see tests-server/main.swift)
 
     func testWhenShouldDownloadResponse_downloadStarts() throws {
         var persistor = DownloadsPreferencesUserDefaultsPersistor()
@@ -79,7 +68,7 @@ class DownloadsIntegrationTests: XCTestCase {
                 }
             }
 
-        let url = urls.local
+        let url = URL.testsServer
             .appendingPathComponent("fname.dat")
             .appendingTestParameters(data: data.html,
                                      headers: ["Content-Disposition": "attachment; filename=\"fname.dat\"",
@@ -199,26 +188,4 @@ class DownloadsIntegrationTests: XCTestCase {
         XCTAssertEqual(try? Data(contentsOf: fileUrl), data.testData)
     }
 
-}
-
-private extension URL {
-    func appendingTestParameters(status: Int? = nil, reason: String? = nil, data: Data? = nil, headers: [String: String]? = nil) -> URL {
-        var url = self
-        if let status {
-            url = url.appendingParameter(name: "status", value: String(status))
-        }
-        if let reason {
-            url = url.appendingParameter(name: "reason", value: reason)
-        }
-        if let headers {
-            let value = URL(string: "/")!.appendingParameters(headers).query!
-            url = url.appendingParameter(name: "headers", value: value)
-        }
-        if let dataStr = data?.utf8String() {
-            url = url.appendingParameter(name: "data", value: dataStr)
-        } else if let data {
-            url = url.appendingParameter(name: "data", value: data.base64EncodedString())
-        }
-        return url
-    }
 }
