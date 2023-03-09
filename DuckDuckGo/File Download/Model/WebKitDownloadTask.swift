@@ -29,7 +29,7 @@ protocol WebKitDownloadTaskDelegate: AnyObject {
 }
 
 /// WKDownload wrapper managing Finder File Progress and coordinating file URLs
-final class WebKitDownloadTask: NSObject, ProgressReporting {
+final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable {
 
     static let downloadExtension = "duckload"
 
