@@ -63,7 +63,7 @@ final class FireViewController: NSViewController {
         super.viewDidLoad()
 
 #if DEBUG
-        let isRunningTests = AppDelegate.isRunningTests
+        let isRunningTests = NSApp.isRunningUnitTests
 #else
         let isRunningTests = false
 #endif

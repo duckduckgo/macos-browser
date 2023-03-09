@@ -151,6 +151,7 @@ final class BrowserTabViewController: NSViewController {
             for tab in tabs {
                 tab.setDelegate(self)
                 tab.autofill?.setDelegate(self)
+                tab.downloads?.delegate = self
             }
         }
     }
@@ -260,7 +261,17 @@ final class BrowserTabViewController: NSViewController {
     }
 
     func subscribeToUserDialogs(of tabViewModel: TabViewModel?) {
-        userDialogsCancellable = tabViewModel?.tab.$userInteractionDialog.sink { [weak self] dialog in
+        guard let tabViewModel = tabViewModel else {
+            userDialogsCancellable = nil
+            return
+        }
+
+        userDialogsCancellable = Publishers.CombineLatest(
+            tabViewModel.tab.$userInteractionDialog,
+            tabViewModel.tab.downloads?.savePanelDialogPublisher ?? Just(nil).eraseToAnyPublisher()
+        )
+        .map { $1 ?? $0 }
+        .sink { [weak self] dialog in
             self?.show(dialog)
         }
     }
@@ -669,21 +680,9 @@ extension BrowserTabViewController: TabDelegate {
         dispatchPrecondition(condition: .onQueue(.main))
         guard let window = view.window else { return nil }
 
-        var fileTypes = request.parameters.fileTypes
-        if fileTypes.isEmpty || (fileTypes.count == 1 && (fileTypes[0].fileExtension?.isEmpty ?? true)),
-           let fileExt = (request.parameters.suggestedFilename as NSString?)?.pathExtension,
-           let utType = UTType(fileExtension: fileExt) {
-            // When no file extension is set by default generate fileType from file extension
-            fileTypes.insert(utType, at: 0)
-        }
-        // allow user set any file extension
-        if fileTypes.count == 1 && !fileTypes.contains(where: { $0.fileExtension?.isEmpty ?? true }) {
-            fileTypes.append(.data)
-        }
-
-        let savePanel = NSSavePanel.withFileTypeChooser(fileTypes: fileTypes,
-                                                        suggestedFilename: request.parameters.suggestedFilename,
-                                                        directoryURL: DownloadsPreferences().effectiveDownloadLocation)
+        let savePanel = NSSavePanel.savePanelWithFileTypeChooser(fileTypes: request.parameters.fileTypes,
+                                                                 suggestedFilename: request.parameters.suggestedFilename,
+                                                                 directoryURL: DownloadsPreferences().effectiveDownloadLocation)
 
         savePanel.beginSheetModal(for: window) { [request] response in
             if case .abort = response {
@@ -766,6 +765,10 @@ extension BrowserTabViewController: TabDelegate {
         context.request.submit(success)
     }
 
+}
+
+extension BrowserTabViewController: TabDownloadsDelegate {
+
     func fileIconFlyAnimationOriginalRect(for downloadTask: WebKitDownloadTask) -> NSRect? {
         dispatchPrecondition(condition: .onQueue(.main))
         guard let window = self.view.window,
@@ -799,19 +802,6 @@ extension BrowserTabViewController: BrowserTabSelectionDelegate {
         if case .preferences = selectedTab.content {
             selectedTab.setContent(.preferences(pane: identifier))
         }
-    }
-
-}
-
-private extension WKWebView {
-
-    var tab: Tab? {
-        guard let navigationDelegate = self.navigationDelegate else { return nil }
-        guard let tab = navigationDelegate as? Tab else {
-            assertionFailure("webView.navigationDelegate is not a Tab")
-            return nil
-        }
-        return tab
     }
 
 }

@@ -21,6 +21,7 @@ import Combine
 import Common
 import BrowserServicesKit
 import UserScript
+import Configuration
 
 final class UserContentUpdating {
 

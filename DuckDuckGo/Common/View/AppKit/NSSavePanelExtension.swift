@@ -21,51 +21,51 @@ import UniformTypeIdentifiers
 
 extension NSSavePanel {
 
-    static private let fileTypesPopupTag = 100
-
     private var fileTypesPopup: NSPopUpButton? {
-        self.accessoryView?.viewWithTag(Self.fileTypesPopupTag) as? NSPopUpButton
+        (self.accessoryView as? SavePanelAccessoryView)?.fileTypesPopup
     }
 
-    var selectedFileType: UTType? {
-        self.fileTypesPopup?.selectedItem?.representedObject as? UTType
+    @UserDefaultsWrapper(key: .saveAsPreferredFileType, defaultValue: [:])
+    static private var preferredFileType: [String: String]
+
+    private var defaultsKey: String {
+        fileTypesPopup?.itemArray.compactMap { ($0.representedObject as? UTType)?.mimeType }.joined(separator: ";") ?? ""
     }
 
-    @UserDefaultsWrapper(key: .saveAsPreferredFileType, defaultValue: nil)
-    static private var preferredFileType: String?
-
-    static func withFileTypeChooser(fileTypes: [UTType], suggestedFilename: String?, directoryURL: URL? = nil) -> NSSavePanel {
+    static func savePanelWithFileTypeChooser(fileTypes: [UTType], suggestedFilename: String?, directoryURL: URL? = nil) -> NSSavePanel {
         let savePanel = NSSavePanel()
 
-        guard let nib = NSNib(nibNamed: "SavePanelAccessoryView", bundle: .main) else {
-            fatalError("Could not load nib named \"SavePanel\"")
-        }
-        nib.instantiate(withOwner: savePanel, topLevelObjects: nil)
+        if !fileTypes.isEmpty {
+            let accessoryView = SavePanelAccessoryView()
+            savePanel.accessoryView = accessoryView
+            let popup = accessoryView.fileTypesPopup
 
-        guard let popup = savePanel.fileTypesPopup else {
-            fatalError("NSSavePanel: accessoryView not loaded")
-        }
-        popup.target = savePanel
-        popup.action = #selector(NSSavePanel.fileTypePopUpSelectionDidChange(_:))
+            popup.target = savePanel
+            popup.action = #selector(NSSavePanel.fileTypePopUpSelectionDidChange(_:))
 
-        popup.removeAllItems()
-        var selectedItem: NSMenuItem?
-        let preferredFileType = Self.preferredFileType.map(UTType.init(mimeType:))
-        for fileType in fileTypes {
-            popup.addItem(withTitle: "\(fileType.description ?? "") (.\(fileType.fileExtension ?? ""))")
-            let item = popup.item(at: popup.numberOfItems - 1)
-            item?.representedObject = fileType
-
-            if selectedItem == nil || fileType == preferredFileType {
-                selectedItem = item
+            for fileType in fileTypes {
+                popup.addItem(withTitle: "\(fileType.description ?? "") (.\(fileType.fileExtension ?? ""))")
+                let item = popup.item(at: popup.numberOfItems - 1)
+                item?.representedObject = fileType
             }
         }
-        popup.select(selectedItem)
-        savePanel.fileTypePopUpSelectionDidChange(popup)
 
-        if let suggestedFilename = suggestedFilename {
+        if let suggestedFilename {
             savePanel.nameFieldStringValue = suggestedFilename
         }
+
+        // select saved file type for this set of file types
+        if let fileTypesPopup = savePanel.fileTypesPopup,
+           let savedFileType = preferredFileType[savePanel.defaultsKey].map({ UTType(mimeType: $0) }),
+           let item = savePanel.fileTypesPopup?.itemArray.first(where: { $0.representedObject as? UTType == savedFileType }) {
+            fileTypesPopup.select(item)
+            savePanel.selectedFileType = savedFileType
+        } else {
+            // select first file type
+            savePanel.fileTypesPopup?.selectItem(at: 0)
+            savePanel.selectedFileType = fileTypes.first
+        }
+
         if let directoryURL = directoryURL {
             savePanel.directoryURL = directoryURL
         }
@@ -75,26 +75,46 @@ extension NSSavePanel {
     }
 
     @objc private func fileTypePopUpSelectionDidChange(_ popup: NSPopUpButton) {
-        guard let fileType = popup.selectedItem?.representedObject as? UTType else {
+        let fileType = popup.selectedItem?.representedObject as? UTType
+        self.selectedFileType = fileType
+
+        // save selected file mime type
+        if fileType?.fileExtension?.isEmpty == false,
+           let mimeType = fileType?.mimeType {
+
+            Self.preferredFileType[defaultsKey] = mimeType
+        }
+    }
+
+    private(set) var selectedFileType: UTType? {
+        get {
             if #available(macOS 11.0, *) {
-                self.allowedContentTypes = []
+                guard let contentType = self.allowedContentTypes.first else { return nil }
+                return UTType(rawValue: contentType.identifier as CFString)
             } else {
-                self.allowedFileTypes = nil
+                guard let fileType = self.allowedFileTypes?.first else { return nil }
+                return UTType(rawValue: fileType as CFString)
             }
-            return
         }
-        if fileType.fileExtension?.isEmpty == false,
-           let mimeType = fileType.mimeType {
-            Self.preferredFileType = mimeType
-        }
-        if #available(macOS 11.0, *) {
-            guard let fileExtension = fileType.fileExtension else {
-                self.allowedContentTypes = []
-                return
+        set {
+            let oldFileExtension = selectedFileType?.fileExtension
+            let setRequiredFileType = NSSelectorFromString("setRequiredFileType:")
+            if responds(to: setRequiredFileType) {
+                // 1. make sure the panel has an old extension selected so it is replaced when we change it
+                self.perform(setRequiredFileType, with: oldFileExtension)
+                // 2. use good ol' working method to replace the extension
+                self.perform(setRequiredFileType, with: newValue?.fileExtension)
+            } else { assertionFailure("NSSavePanel does not respond to setRequiredFileType:") }
+
+            // 3. now since we‘ve done what we wanted, let‘s use a designated API which isn‘t (always) working
+            // e.g. changing .xml -> .rss will change file extension, but .rss -> xml - won‘t  ¯\_(ツ)_/¯
+            if #available(macOS 11.0, *) {
+                self.allowedContentTypes = (newValue.flatMap { UniformTypeIdentifiers.UTType($0.rawValue as String) }.map { [$0] } ?? [])
+                    + [UniformTypeIdentifiers.UTType.data] // always allow any file type
+            } else {
+                self.allowedFileTypes = (newValue.map { [$0.rawValue as String] } ?? [])
+                    + [UTType.data.rawValue as String] // always allow any file type
             }
-            self.allowedContentTypes = [UniformTypeIdentifiers.UTType.init(filenameExtension: fileExtension)].compactMap { $0 }
-        } else {
-            self.allowedFileTypes = [fileType.rawValue as String]
         }
     }
 

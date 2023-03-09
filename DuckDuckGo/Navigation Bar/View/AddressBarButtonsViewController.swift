@@ -394,9 +394,10 @@ final class AddressBarButtonsViewController: NSViewController {
             permissions.microphone = selectedTabViewModel.usedPermissions.microphone
         }
 
-        PermissionContextMenu(permissions: permissions.map { ($0, $1) },
-                              domain: selectedTabViewModel.tab.content.url?.host ?? "",
-                              delegate: self)
+        let url = selectedTabViewModel.tab.content.url ?? .empty
+        let domain = url.isFileURL ? .localhost : (url.host ?? "")
+
+        PermissionContextMenu(permissions: permissions.map { ($0, $1) }, domain: domain, delegate: self)
             .popUp(positioning: nil, at: NSPoint(x: 0, y: sender.bounds.height), in: sender)
     }
 
@@ -412,9 +413,10 @@ final class AddressBarButtonsViewController: NSViewController {
             return
         }
 
-        PermissionContextMenu(permissions: [(.microphone, state)],
-                              domain: selectedTabViewModel.tab.content.url?.host ?? "",
-                              delegate: self)
+        let url = selectedTabViewModel.tab.content.url ?? .empty
+        let domain = url.isFileURL ? .localhost : (url.host ?? "")
+
+        PermissionContextMenu(permissions: [(.microphone, state)], domain: domain, delegate: self)
             .popUp(positioning: nil, at: NSPoint(x: 0, y: sender.bounds.height), in: sender)
     }
 
@@ -430,9 +432,10 @@ final class AddressBarButtonsViewController: NSViewController {
             return
         }
 
-        PermissionContextMenu(permissions: [(.geolocation, state)],
-                              domain: selectedTabViewModel.tab.content.url?.host ?? "",
-                              delegate: self)
+        let url = selectedTabViewModel.tab.content.url ?? .empty
+        let domain = url.isFileURL ? .localhost : (url.host ?? "")
+
+        PermissionContextMenu(permissions: [(.geolocation, state)], domain: domain, delegate: self)
             .popUp(positioning: nil, at: NSPoint(x: 0, y: sender.bounds.height), in: sender)
     }
 
@@ -445,17 +448,19 @@ final class AddressBarButtonsViewController: NSViewController {
         }
 
         let permissions: [(PermissionType, PermissionState)]
-        if case .requested = state {
+        let domain: String
+        if case .requested(let query) = state {
+            domain = query.domain
             permissions = selectedTabViewModel.tab.permissions.authorizationQueries.reduce(into: .init()) {
                 guard $1.permissions.contains(.popups) else { return }
                 $0.append( (.popups, .requested($1)) )
             }
         } else {
+            let url = selectedTabViewModel.tab.content.url ?? .empty
+            domain = url.isFileURL ? .localhost : (url.host ?? "")
             permissions = [(.popups, state)]
         }
-        PermissionContextMenu(permissions: permissions,
-                              domain: selectedTabViewModel.tab.content.url?.host ?? "",
-                              delegate: self)
+        PermissionContextMenu(permissions: permissions, domain: domain, delegate: self)
             .popUp(positioning: nil, at: NSPoint(x: 0, y: sender.bounds.height), in: sender)
     }
 
@@ -475,10 +480,10 @@ final class AddressBarButtonsViewController: NSViewController {
         }
 
         permissions = [(permissionType, state)]
+        let url = selectedTabViewModel.tab.content.url ?? .empty
+        let domain = url.isFileURL ? .localhost : (url.host ?? "")
 
-        PermissionContextMenu(permissions: permissions,
-                              domain: selectedTabViewModel.tab.content.url?.host ?? "",
-                              delegate: self)
+        PermissionContextMenu(permissions: permissions, domain: domain, delegate: self)
             .popUp(positioning: nil, at: NSPoint(x: 0, y: sender.bounds.height), in: sender)
     }
 
@@ -537,7 +542,7 @@ final class AddressBarButtonsViewController: NSViewController {
             animationView?.removeFromSuperview()
 
             let newAnimationView: AnimationView
-            if AppDelegate.isRunningTests {
+            if NSApp.isRunningUnitTests {
                 newAnimationView = AnimationView()
             } else {
                 // For unknown reason, this caused infinite execution of various unit tests.
@@ -617,7 +622,7 @@ final class AddressBarButtonsViewController: NSViewController {
 
     private func subscribePrivacyDashboardPendingUpdates(privacyDashboardPopover: PrivacyDashboardPopover) {
         privacyDashboadPendingUpdatesCancellable?.cancel()
-        guard !AppDelegate.isRunningTests else { return }
+        guard !NSApp.isRunningUnitTests else { return }
 
         privacyDashboadPendingUpdatesCancellable = privacyDashboardPopover.viewController.rulesUpdateObserver
             .$pendingUpdates.dropFirst().receive(on: DispatchQueue.main).sink { [weak privacyDashboardPopover] _ in
@@ -746,7 +751,7 @@ final class AddressBarButtonsViewController: NSViewController {
     }
 
     private func updatePrivacyEntryPointIcon() {
-        guard !AppDelegate.isRunningTests else { return }
+        guard !NSApp.isRunningUnitTests else { return }
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             return
         }
@@ -757,7 +762,7 @@ final class AddressBarButtonsViewController: NSViewController {
         }
 
         switch selectedTabViewModel.tab.content {
-        case .url(let url, userEntered: _):
+        case .url(let url, credential: _, userEntered: _):
             guard let host = url.host else { break }
 
             let isNotSecure = url.scheme == URL.NavigationalScheme.http.rawValue
@@ -790,7 +795,7 @@ final class AddressBarButtonsViewController: NSViewController {
               let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else { return }
 
         switch selectedTabViewModel.tab.content {
-        case .url(let url, userEntered: _):
+        case .url(let url, credential: _, userEntered: _):
             // Don't play the shield animation if mouse is over
             guard !privacyEntryPointButton.isAnimationViewVisible else {
                 break

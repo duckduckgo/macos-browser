@@ -29,14 +29,12 @@ protocol WebKitDownloadTaskDelegate: AnyObject {
 }
 
 /// WKDownload wrapper managing Finder File Progress and coordinating file URLs
-final class WebKitDownloadTask: NSObject, ProgressReporting {
+final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable {
 
     static let downloadExtension = "duckload"
 
     let progress: Progress
     let shouldPromptForLocation: Bool
-    /// Action that should be performed on file after it's downloaded
-    var postflight: FileDownloadManager.PostflightAction?
 
     private(set) var suggestedFilename: String?
     private(set) var suggestedFileType: UTType?
@@ -81,13 +79,12 @@ final class WebKitDownloadTask: NSObject, ProgressReporting {
         download.webView
     }
 
-    init(download: WebKitDownload, promptForLocation: Bool, destinationURL: URL?, tempURL: URL?, postflight: FileDownloadManager.PostflightAction? = .none) {
+    init(download: WebKitDownload, promptForLocation: Bool, destinationURL: URL?, tempURL: URL?) {
 
         self.download = download
         self.progress = Progress(totalUnitCount: -1)
         self.shouldPromptForLocation = promptForLocation
         self.location = .init(destinationURL: destinationURL, tempURL: tempURL)
-        self.postflight = postflight
         super.init()
 
         download.delegate = self
@@ -136,7 +133,7 @@ final class WebKitDownloadTask: NSObject, ProgressReporting {
 
         } catch {
             self.download.cancel()
-            self.finish(with: .failure(.failedToCompleteDownloadTask(underlyingError: URLError(.cancelled), resumeData: nil)))
+            self.finish(with: .failure(.failedToCompleteDownloadTask(underlyingError: URLError(.cancelled), resumeData: nil, isRetryable: false)))
             self.decideDestinationCompletionHandler?(nil)
         }
     }
@@ -147,7 +144,7 @@ final class WebKitDownloadTask: NSObject, ProgressReporting {
 
         // create temp file and move to Downloads folder with .duckload extension increasing index if needed
         let fm = FileManager.default
-        let tempURL = fm.temporaryDirectory(appropriateFor: localURL).appendingPathComponent(.uniqueFilename())
+        let tempURL = fm.temporaryDirectory.appendingPathComponent(.uniqueFilename())
         do {
             guard fm.createFile(atPath: tempURL.path, contents: nil, attributes: nil) else {
                 throw CocoaError(.fileWriteNoPermission)
@@ -213,7 +210,9 @@ final class WebKitDownloadTask: NSObject, ProgressReporting {
            let tempURL = location.tempURL {
             try? FileManager.default.removeItem(at: tempURL)
         }
-        self.finish(with: .failure(.failedToCompleteDownloadTask(underlyingError: error, resumeData: resumeData)))
+        self.finish(with: .failure(.failedToCompleteDownloadTask(underlyingError: error,
+                                                                 resumeData: resumeData,
+                                                                 isRetryable: location.destinationURL != nil)))
     }
 
     deinit {
@@ -248,6 +247,15 @@ extension WebKitDownloadTask: WebKitDownloadDelegate {}
         }
         if self.progress.totalUnitCount <= 0 {
             self.progress.totalUnitCount = response.expectedContentLength
+        }
+
+        var suggestedFilename = suggestedFilename
+        // sometimes suggesteFilename has an extension appended to already present URL file extension
+        // e.g. feed.xml.rss for www.domain.com/rss.xml
+        if let urlSuggestedFilename = response.url?.suggestedFilename,
+           !(urlSuggestedFilename as NSString).pathExtension.isEmpty,
+           suggestedFilename.hasPrefix(urlSuggestedFilename) {
+            suggestedFilename = urlSuggestedFilename
         }
 
         self.suggestedFilename = suggestedFilename

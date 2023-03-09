@@ -339,4 +339,50 @@ final class FutureExtensionTests: XCTestCase {
         waitForExpectations(timeout: 1)
     }
 
+    // MARK: - Publishers.First.get()
+
+    @MainActor
+    func testWhenFirstSucceeds_getFutureReceivesValue() async throws {
+
+        let subj = PassthroughSubject<Int, Never>()
+
+        let future = subj.first().promise()
+        subj.send(1)
+
+        let result = await future.get()
+        XCTAssertEqual(result, 1)
+    }
+
+    @MainActor
+    func testWhenFirstFails_getFutureThrowsError() async throws {
+
+        struct E: Error {}
+        let subj = PassthroughSubject<Int, E>()
+
+        let future = subj.first().promise()
+        subj.send(completion: .failure(E()))
+
+        do {
+            _=try await future.get()
+            XCTFail("future.get() should fail")
+        } catch {
+            XCTAssertTrue(error is E)
+        }
+    }
+
+    @MainActor
+    func testWhenFirstTimeouts_getFutureThrowsError() async throws {
+
+        let subj = PassthroughSubject<Int, Never>()
+
+        let future = subj.timeout(0.001).first().promise()
+
+        do {
+            _=try await future.get()
+            XCTFail("future.get() should timeout")
+        } catch {
+            XCTAssertTrue(error is TimeoutError)
+        }
+    }
+
 }

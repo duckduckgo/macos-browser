@@ -25,15 +25,14 @@ import XCTest
 class AutoconsentMessageProtocolTests: XCTestCase {
 
     let userScript = AutoconsentUserScript(
-        scriptSource: ScriptSourceProvider(configStorage: ConfigurationDownloaderTests.MockStorage(),
+        scriptSource: ScriptSourceProvider(configStorage: MockConfigurationStore(),
                                            privacyConfigurationManager: MockPrivacyConfigurationManager(),
                                            privacySettings: PrivacySecurityPreferences.shared, // todo: mock
                                            contentBlockingManager: ContentBlockerRulesManagerMock(),
-                                           trackerDataManager: TrackerDataManager(etag: DefaultConfigurationStorage.shared.loadEtag(for: .trackerRadar),
-                                                                                  data: DefaultConfigurationStorage.shared.loadData(for: .trackerRadar),
+                                           trackerDataManager: TrackerDataManager(etag: ConfigurationStore.shared.loadEtag(for: .trackerDataSet),
+                                                                                  data: ConfigurationStore.shared.loadData(for: .trackerDataSet),
                                                                                   embeddedDataProvider: AppTrackerDataSetProvider(),
                                                                                   errorReporting: nil),
-
                                            tld: TLD()),
         config: MockPrivacyConfiguration()
     )
