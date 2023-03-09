@@ -763,7 +763,9 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                         continuation.resume()
                     }, navigationDidFail: { _, _ in
                         continuation.resume()
-                    })
+                    }) ?? {
+                        continuation.resume()
+                    }()
             }
         }
     }
@@ -1332,7 +1334,9 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
 
         if navigationAction.url.isExternalSchemeLink {
             // request if OS can handle extenrnal url
-            self.host(webView.url?.host, requestedOpenExternalURL: navigationAction.url, forUserEnteredURL: navigationAction.isUserEnteredUrl)
+            let url = navigationAction.sourceFrame.url
+            let host = url.isFileURL ? .localhost : (url.host ?? "")
+            self.host(host, requestedOpenExternalURL: navigationAction.url, forUserEnteredURL: navigationAction.isUserEnteredUrl)
             return .cancel
         }
 
@@ -1358,7 +1362,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
     // swiftlint:enable cyclomatic_complexity
     // swiftlint:enable function_body_length
 
-    private func host(_ host: String?, requestedOpenExternalURL url: URL, forUserEnteredURL userEnteredUrl: Bool) {
+    private func host(_ host: String, requestedOpenExternalURL url: URL, forUserEnteredURL userEnteredUrl: Bool) {
         let searchForExternalUrl = { [weak self] in
             // Redirect after handing WebView.url update after cancelling the request
             DispatchQueue.main.async {
