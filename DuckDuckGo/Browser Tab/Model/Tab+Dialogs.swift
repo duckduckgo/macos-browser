@@ -66,7 +66,7 @@ extension Tab {
         case print(PrintDialogRequest)
     }
 
-    enum UserDialogSender {
+    enum UserDialogSender: Equatable {
         case user
         case page(domain: String)
     }

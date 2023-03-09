@@ -200,7 +200,7 @@ final class DownloadListCoordinatorTests: XCTestCase {
             XCTAssertEqual(item.destinationURL, self.destURL)
             XCTAssertEqual(item.tempURL, self.tempURL)
             XCTAssertNil(item.progress)
-            XCTAssertEqual(item.error, FileDownloadError.failedToCompleteDownloadTask(underlyingError: TestError(), resumeData: .resumeData))
+            XCTAssertEqual(item.error, FileDownloadError.failedToCompleteDownloadTask(underlyingError: TestError(), resumeData: .resumeData, isRetryable: true))
             XCTAssertEqual(item.error?.resumeData, .resumeData)
         }
 
@@ -232,16 +232,14 @@ final class DownloadListCoordinatorTests: XCTestCase {
         }
 
         let downloadAdded = expectation(description: "download addeed")
-        downloadManager.addDownloadBlock = { [unowned self] download, delegate, location, postflight in
+        downloadManager.addDownloadBlock = { [unowned self] download, _, location in
             downloadAdded.fulfill()
             let task = WebKitDownloadTask(download: download,
                                           promptForLocation: location == .prompt ? true : false,
                                           destinationURL: location.destinationURL,
                                           tempURL: location.tempURL)
             self.downloadManager.downloadAddedSubject.send(task)
-            XCTAssertTrue(delegate === self.coordinator)
             XCTAssertEqual(location, .preset(destinationURL: item.destinationURL!, tempURL: item.tempURL))
-            XCTAssertEqual(postflight, .none)
             return task
         }
 
@@ -286,16 +284,14 @@ final class DownloadListCoordinatorTests: XCTestCase {
         }
 
         let downloadAdded = expectation(description: "download addeed")
-        downloadManager.addDownloadBlock = { [unowned self] download, delegate, location, postflight in
+        downloadManager.addDownloadBlock = { [unowned self] download, _, location in
             downloadAdded.fulfill()
             let task = WebKitDownloadTask(download: download,
                                           promptForLocation: location == .prompt ? true : false,
                                           destinationURL: location.destinationURL,
                                           tempURL: location.tempURL)
             self.downloadManager.downloadAddedSubject.send(task)
-            XCTAssertTrue(delegate === self.coordinator)
             XCTAssertEqual(location, .preset(destinationURL: self.destURL, tempURL: self.tempURL))
-            XCTAssertEqual(postflight, .none)
             return task
         }
 
@@ -321,7 +317,7 @@ final class DownloadListCoordinatorTests: XCTestCase {
     func testWhenDownloadRestartedWithoutResumeDataThenDownloadIsStarted() {
         var item: DownloadListItem = .testFailedItem
         item.tempURL = self.tempURL
-        item.error = .failedToCompleteDownloadTask(underlyingError: TestError(), resumeData: nil)
+        item.error = .failedToCompleteDownloadTask(underlyingError: TestError(), resumeData: nil, isRetryable: false)
         store.fetchBlock = { _, completionHandler in
             completionHandler(.success([item]))
         }
@@ -339,16 +335,14 @@ final class DownloadListCoordinatorTests: XCTestCase {
         }
 
         let downloadAdded = expectation(description: "download addeed")
-        downloadManager.addDownloadBlock = { [unowned self] download, delegate, location, postflight in
+        downloadManager.addDownloadBlock = { [unowned self] download, _, location in
             downloadAdded.fulfill()
             let task = WebKitDownloadTask(download: download,
                                           promptForLocation: location == .prompt ? true : false,
                                           destinationURL: location.destinationURL,
                                           tempURL: location.tempURL)
             self.downloadManager.downloadAddedSubject.send(task)
-            XCTAssertTrue(delegate === self.coordinator)
             XCTAssertEqual(location, .preset(destinationURL: item.destinationURL!, tempURL: item.tempURL))
-            XCTAssertEqual(postflight, .none)
             return task
         }
 
@@ -452,6 +446,6 @@ private extension DownloadListItem {
                                                  fileType: .pdf,
                                                  destinationURL: URL(fileURLWithPath: "/test/file/path"),
                                                  tempURL: URL(fileURLWithPath: "/temp/file/path"),
-                                                 error: .failedToCompleteDownloadTask(underlyingError: TestError(), resumeData: .resumeData))
+                                                 error: .failedToCompleteDownloadTask(underlyingError: TestError(), resumeData: .resumeData, isRetryable: false))
 
 }

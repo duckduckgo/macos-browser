@@ -27,22 +27,33 @@ protocol FileDownloadManagerProtocol: AnyObject {
 
     @discardableResult
     func add(_ download: WebKitDownload,
-             delegate: FileDownloadManagerDelegate?,
-             location: FileDownloadManager.DownloadLocationPreference,
-             postflight: FileDownloadManager.PostflightAction?) -> WebKitDownloadTask
+             delegate: DownloadTaskDelegate?,
+             location: FileDownloadManager.DownloadLocationPreference) -> WebKitDownloadTask
 
     func cancelAll(waitUntilDone: Bool)
+}
+
+extension FileDownloadManagerProtocol {
+
+    @discardableResult
+    func add(_ download: WebKitDownload, location: FileDownloadManager.DownloadLocationPreference) -> WebKitDownloadTask {
+        add(download, delegate: nil, location: location)
+    }
+
+}
+
+protocol FileDownloadManagerDelegate: AnyObject {
+    func askUserToGrantAccessToDestination(_ folderUrl: URL)
 }
 
 final class FileDownloadManager: FileDownloadManagerProtocol {
 
     static let shared = FileDownloadManager()
-    private let workspace: NSWorkspace
     private let preferences: DownloadsPreferences
 
-    init(workspace: NSWorkspace = NSWorkspace.shared,
-         preferences: DownloadsPreferences = .init()) {
-        self.workspace = workspace
+    weak var delegate: FileDownloadManagerDelegate?
+
+    init(preferences: DownloadsPreferences = .init()) {
         self.preferences = preferences
     }
 
@@ -52,12 +63,7 @@ final class FileDownloadManager: FileDownloadManagerProtocol {
         downloadAddedSubject.eraseToAnyPublisher()
     }
 
-    private var downloadTaskDelegates = [WebKitDownloadTask: () -> FileDownloadManagerDelegate?]()
-
-    enum PostflightAction {
-        case reveal
-        case open
-    }
+    private var downloadTaskDelegates = [WebKitDownloadTask: () -> DownloadTaskDelegate?]()
 
     enum DownloadLocationPreference: Equatable {
         case auto
@@ -83,17 +89,13 @@ final class FileDownloadManager: FileDownloadManagerProtocol {
     }
 
     @discardableResult
-    func add(_ download: WebKitDownload,
-             delegate: FileDownloadManagerDelegate?,
-             location: DownloadLocationPreference,
-             postflight: PostflightAction?) -> WebKitDownloadTask {
+    func add(_ download: WebKitDownload, delegate: DownloadTaskDelegate?, location: DownloadLocationPreference) -> WebKitDownloadTask {
         dispatchPrecondition(condition: .onQueue(.main))
 
         let task = WebKitDownloadTask(download: download,
                                       promptForLocation: location.promptForLocation,
                                       destinationURL: location.destinationURL,
-                                      tempURL: location.tempURL,
-                                      postflight: postflight)
+                                      tempURL: location.tempURL)
 
         self.downloadTaskDelegates[task] = { [weak delegate] in delegate }
 
@@ -136,15 +138,21 @@ extension FileDownloadManager: WebKitDownloadTaskDelegate {
         dispatchPrecondition(condition: .onQueue(.main))
 
         let completion: (URL?, UTType?) -> Void = { url, fileType in
-            if let url = url,
-               let originalRect = self.downloadTaskDelegates[task]?()?.fileIconFlyAnimationOriginalRect(for: task) {
+            defer {
+                self.downloadTaskDelegates[task] = nil
+            }
+
+            guard let url = url else {
+                completionHandler(nil, nil)
+                return
+            }
+
+            if let originalRect = self.downloadTaskDelegates[task]?()?.fileIconFlyAnimationOriginalRect(for: task) {
                 task.progress.flyToImage = (UTType(fileExtension: url.pathExtension) ?? fileType)?.icon
                 task.progress.fileIconOriginalRect = originalRect
             }
 
             completionHandler(url, fileType)
-
-            self.downloadTaskDelegates[task] = nil
         }
 
         let downloadLocation = preferences.effectiveDownloadLocation
@@ -154,24 +162,25 @@ extension FileDownloadManager: WebKitDownloadTaskDelegate {
               let delegate = self.downloadTaskDelegates[task]?()
         else {
             // download to default Downloads destination
-            var fileName = suggestedFilename
-            if fileName.isEmpty {
-                fileName = .uniqueFilename(for: fileType)
-            }
-            if let url = downloadLocation?.appendingPathComponent(fileName) {
-                // Make sure the app has an access to destination
-                let folderUrl = url.deletingLastPathComponent()
-                guard self.verifyAccessToDestinationFolder(folderUrl) else {
-                    completion(nil, nil)
-                    return
-                }
+            let fileName = suggestedFilename.isEmpty ? .uniqueFilename(for: fileType) : suggestedFilename
 
-                completion(url, fileType)
-            } else {
+            guard let url = downloadLocation?.appendingPathComponent(fileName) else {
                 os_log("Failed to access Downloads folder")
                 Pixel.fire(.debug(event: .fileMoveToDownloadsFailed, error: CocoaError(.fileWriteUnknown)))
                 completion(nil, nil)
+                return
             }
+
+            // Make sure the app has an access to destination
+            let folderUrl = url.deletingLastPathComponent()
+            guard self.verifyAccessToDestinationFolder(folderUrl,
+                                                       destinationRequested: preferences.alwaysRequestDownloadLocation,
+                                                       isSandboxed: NSApp.isSandboxed) else {
+                completion(nil, nil)
+                return
+            }
+
+            completion(url, fileType)
             return
         }
 
@@ -182,59 +191,44 @@ extension FileDownloadManager: WebKitDownloadTaskDelegate {
         }
         let fileTypes = fileType.map { [$0] } ?? []
         delegate.chooseDestination(suggestedFilename: suggestedFilename, directoryURL: downloadLocation, fileTypes: fileTypes) { [weak self] url, fileType in
-            guard let self = self else {
+            guard let self, let url else {
                 completion(nil, nil)
                 return
             }
 
-            if let url = url {
-                // Make sure the app has an access to destination
-                let folderUrl = url.deletingLastPathComponent()
-                guard self.verifyAccessToDestinationFolder(folderUrl) else {
-                    completion(nil, nil)
-                    return
-                }
+            let folderUrl = url.deletingLastPathComponent()
+            self.preferences.lastUsedCustomDownloadLocation = folderUrl
 
-                self.preferences.lastUsedCustomDownloadLocation = folderUrl
+            // Make sure the app has an access to destination
+            guard self.verifyAccessToDestinationFolder(folderUrl,
+                                                       destinationRequested: self.preferences.alwaysRequestDownloadLocation,
+                                                       isSandboxed: NSApp.isSandboxed) else {
+                completion(nil, nil)
+                return
+            }
 
-                if FileManager.default.fileExists(atPath: url.path) {
-                    // if SavePanel points to an existing location that means overwrite was chosen
-                    try? FileManager.default.removeItem(at: url)
-                }
+            if FileManager.default.fileExists(atPath: url.path) {
+                // if SavePanel points to an existing location that means overwrite was chosen
+                try? FileManager.default.removeItem(at: url)
             }
 
             completion(url, fileType)
         }
     }
 
-    private func verifyAccessToDestinationFolder(_ folderUrl: URL) -> Bool {
+    private func verifyAccessToDestinationFolder(_ folderUrl: URL, destinationRequested: Bool, isSandboxed: Bool) -> Bool {
+        if destinationRequested && isSandboxed { return true }
+
         let folderPath = folderUrl.relativePath
         let c = open(folderPath, O_RDONLY)
         let hasAccess = c != -1
         close(c)
 
         if !hasAccess {
-            askUserToGrantAccessToDestination(folderUrl)
+            delegate?.askUserToGrantAccessToDestination(folderUrl)
         }
 
         return hasAccess
-    }
-
-    private func askUserToGrantAccessToDestination(_ folderUrl: URL) {
-        if FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first?.lastPathComponent == folderUrl.lastPathComponent {
-            let alert = NSAlert.noAccessToDownloads()
-            if alert.runModal() != .cancel {
-                guard let preferencesLink = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_DownloadsFolder") else {
-                    assertionFailure("Can't initialize preferences link")
-                    return
-                }
-                NSWorkspace.shared.open(preferencesLink)
-                return
-            }
-        } else {
-            let alert = NSAlert.noAccessToSelectedFolder()
-            alert.runModal()
-        }
     }
 
     func fileDownloadTask(_ task: WebKitDownloadTask, didFinishWith result: Result<URL, FileDownloadError>) {
@@ -248,21 +242,12 @@ extension FileDownloadManager: WebKitDownloadTaskDelegate {
         if case .success(let url) = result {
             try? url.setQuarantineAttributes(sourceURL: task.originalRequest?.url,
                                              referrerURL: task.originalRequest?.mainDocumentURL)
-
-            switch task.postflight {
-            case .open:
-                self.workspace.open(url)
-            case .reveal:
-                self.workspace.activateFileViewerSelecting([url])
-            case .none:
-                break
-            }
         }
     }
 
 }
 
-protocol FileDownloadManagerDelegate: AnyObject {
+protocol DownloadTaskDelegate: AnyObject {
 
     func chooseDestination(suggestedFilename: String?, directoryURL: URL?, fileTypes: [UTType], callback: @escaping (URL?, UTType?) -> Void)
     func fileIconFlyAnimationOriginalRect(for downloadTask: WebKitDownloadTask) -> NSRect?

@@ -25,7 +25,7 @@ final class LegacyWebKitDownloadDelegate: NSObject {
     private var downloadDidStart: (url: URL, callback: (WebKitDownload) -> Void)?
     private var responseCache = [NSObject: URLResponse]()
 
-    func registerDownloadDidStartCallback(_ callback: @escaping (WebKitDownload) -> Void, for url: URL) {
+    func registerDownloadDidStartCallback(for url: URL, callback: @escaping (WebKitDownload) -> Void) {
         self.downloadDidStart = (url, callback)
     }
 

@@ -418,66 +418,91 @@ final class TabBarViewItem: NSCollectionViewItem {
 extension TabBarViewItem: NSMenuDelegate {
 
     func menuNeedsUpdate(_ menu: NSMenu) {
+        // Initial setup
         menu.removeAllItems()
+        let otherItemsState = delegate?.otherTabBarViewItemsState(for: self) ?? .init(hasItemsToTheLeft: true,
+                                                                                      hasItemsToTheRight: true)
+        let areThereOtherTabs = otherItemsState.hasItemsToTheLeft || otherItemsState.hasItemsToTheRight
 
+        // Menu Items
+        // Section 1
+        addDuplicateMenuItem(to: menu)
+        addPinMenuItem(to: menu)
+        menu.addItem(NSMenuItem.separator())
+
+        // Section 2
+        addBookmarkMenuItem(to: menu)
+        addFireproofMenuItem(to: menu)
+        menu.addItem(NSMenuItem.separator())
+
+        // Section 3
+        addCloseMenuItem(to: menu)
+        addCloseOtherMenuItem(to: menu, areThereOtherTabs: areThereOtherTabs)
+        addCloseTabsToTheRightMenuItem(to: menu, areThereTabsToTheRight: otherItemsState.hasItemsToTheRight)
+        addMoveToNewWindowMenuItem(to: menu, areThereOtherTabs: areThereOtherTabs)
+
+    }
+
+    private func addDuplicateMenuItem(to menu: NSMenu) {
         let duplicateMenuItem = NSMenuItem(title: UserText.duplicateTab, action: #selector(duplicateAction(_:)), keyEquivalent: "")
         duplicateMenuItem.target = self
         menu.addItem(duplicateMenuItem)
+    }
 
+    private func addPinMenuItem(to menu: NSMenu) {
         let pinMenuItem = NSMenuItem(title: UserText.pinTab, action: #selector(pinAction(_:)), keyEquivalent: "")
         pinMenuItem.target = self
         pinMenuItem.isEnabled = delegate?.tabBarViewItemCanBePinned(self) ?? false
         menu.addItem(pinMenuItem)
+    }
 
-        menu.addItem(NSMenuItem.separator())
-
+    private func addBookmarkMenuItem(to menu: NSMenu) {
         let bookmarkMenuItem = NSMenuItem(title: UserText.bookmarkThisPage, action: #selector(bookmarkThisPageAction(_:)), keyEquivalent: "")
         bookmarkMenuItem.target = self
         menu.addItem(bookmarkMenuItem)
+    }
+
+    private func addFireproofMenuItem(to menu: NSMenu) {
+        var menuItem = NSMenuItem(title: UserText.fireproofSite, action: #selector(fireproofSiteAction(_:)), keyEquivalent: "")
+        menuItem.isEnabled = false
 
         if let url = currentURL, url.canFireproof {
-            let menuItem: NSMenuItem
-
             if FireproofDomains.shared.isFireproof(fireproofDomain: url.host ?? "") {
                 menuItem = NSMenuItem(title: UserText.removeFireproofing, action: #selector(removeFireproofingAction(_:)), keyEquivalent: "")
-            } else {
-                menuItem = NSMenuItem(title: UserText.fireproofSite, action: #selector(fireproofSiteAction(_:)), keyEquivalent: "")
             }
-
-            menuItem.target = self
-            menu.addItem(menuItem)
-            menu.addItem(NSMenuItem.separator())
+            menuItem.isEnabled = true
         }
+        menuItem.target = self
+        menu.addItem(menuItem)
+    }
 
+    private func addCloseMenuItem(to menu: NSMenu) {
         let closeMenuItem = NSMenuItem(title: UserText.closeTab, action: #selector(closeButtonAction(_:)), keyEquivalent: "")
         closeMenuItem.target = self
         menu.addItem(closeMenuItem)
-
-        let otherItemsState = delegate?.otherTabBarViewItemsState(for: self) ?? .init(hasItemsToTheLeft: true,
-                                                                                      hasItemsToTheRight: true)
-
-        updateWithTabsToTheSides(menu, otherItemsState)
-
-        let moveToNewWindowMenuItem = NSMenuItem(title: UserText.moveTabToNewWindow, action: #selector(moveToNewWindowAction(_:)), keyEquivalent: "")
-        moveToNewWindowMenuItem.target = self
-        menu.addItem(moveToNewWindowMenuItem)
     }
 
-    private func updateWithTabsToTheSides(_ menu: NSMenu, _ otherItemsState: OtherTabBarViewItemsState) {
-        if otherItemsState.hasItemsToTheLeft || otherItemsState.hasItemsToTheRight {
-            let closeOtherMenuItem = NSMenuItem(title: UserText.closeOtherTabs, action: #selector(closeOtherAction(_:)), keyEquivalent: "")
-            closeOtherMenuItem.target = self
-            menu.addItem(closeOtherMenuItem)
-        }
+    private func addCloseOtherMenuItem(to menu: NSMenu, areThereOtherTabs: Bool) {
+        let closeOtherMenuItem = NSMenuItem(title: UserText.closeOtherTabs, action: #selector(closeOtherAction(_:)), keyEquivalent: "")
+        closeOtherMenuItem.target = self
+        closeOtherMenuItem.isEnabled = areThereOtherTabs
+        menu.addItem(closeOtherMenuItem)
+    }
 
-        if otherItemsState.hasItemsToTheRight {
-            let closeTabsToTheRightMenuItem = NSMenuItem(title: UserText.closeTabsToTheRight,
-                                                         action: #selector(closeToTheRightAction(_:)),
-                                                         keyEquivalent: "")
-            closeTabsToTheRightMenuItem.target = self
-            menu.addItem(closeTabsToTheRightMenuItem)
-        }
+    private func addCloseTabsToTheRightMenuItem(to menu: NSMenu, areThereTabsToTheRight: Bool) {
+        let closeTabsToTheRightMenuItem = NSMenuItem(title: UserText.closeTabsToTheRight,
+                                                     action: #selector(closeToTheRightAction(_:)),
+                                                     keyEquivalent: "")
+        closeTabsToTheRightMenuItem.target = self
+        closeTabsToTheRightMenuItem.isEnabled = areThereTabsToTheRight
+        menu.addItem(closeTabsToTheRightMenuItem)
+    }
 
+    private func addMoveToNewWindowMenuItem(to menu: NSMenu, areThereOtherTabs: Bool) {
+        let moveToNewWindowMenuItem = NSMenuItem(title: UserText.moveTabToNewWindow, action: #selector(moveToNewWindowAction(_:)), keyEquivalent: "")
+        moveToNewWindowMenuItem.target = self
+        moveToNewWindowMenuItem.isEnabled = areThereOtherTabs
+        menu.addItem(moveToNewWindowMenuItem)
     }
 
 }

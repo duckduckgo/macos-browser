@@ -26,10 +26,10 @@ import XCTest
 final class TabTests: XCTestCase {
 
     struct URLs {
-        let local = URL(string: "http://localhost:8084/")!
-        let local1 = URL(string: "http://localhost:8084/1")!
-        let local2 = URL(string: "http://localhost:8084/2")!
-        let local3 = URL(string: "http://localhost:8084/3")!
+        let url = URL(string: "http://testhost.com/")!
+        let url1 = URL(string: "https://localhost/1")!
+        let url2 = URL(string: "http://something-else.biz/2")!
+        let url3 = URL(string: "https://local-domain/3")!
     }
     let urls = URLs()
 
@@ -157,13 +157,13 @@ final class TabTests: XCTestCase {
 
         // after first navigation: false
         eDidFinishLoading = expectation(description: "didFinish 1")
-        tab.setContent(.url(urls.local))
+        tab.setContent(.url(urls.url))
         waitForExpectations(timeout: 5)
 
         // after second navigation: true
         eCanGoBack = expectation(description: "canGoBack: true")
         eDidFinishLoading = expectation(description: "gb_didFinish 2")
-        tab.setContent(.url(urls.local1))
+        tab.setContent(.url(urls.url1))
         waitForExpectations(timeout: 5)
 
         // after go back: false
@@ -191,10 +191,10 @@ final class TabTests: XCTestCase {
         let extensionsBuilder = TestTabExtensionsBuilder(load: []) { [urls] builder in { _, _ in
             builder.add {
                 TestsClosureNavigationResponderTabExtension(.init { navigationAction, _ in
-                    if navigationAction.url == urls.local2 {
+                    if navigationAction.url == urls.url2 {
                         return .redirect(navigationAction, invalidatingBackItemIfNeededFor: webView!) { navigator in
                             eDidRedirect.fulfill()
-                            navigator.load(URLRequest(url: urls.local3))
+                            navigator.load(URLRequest(url: urls.url3))
                         }
                     }
                     return .next
@@ -208,11 +208,11 @@ final class TabTests: XCTestCase {
         webView = tab.webView
 
         schemeHandler.middleware = [{ [urls] request in
-            guard request.url!.path == urls.local1.path else { return nil }
+            guard request.url!.path == urls.url1.path else { return nil }
 
             return .ok(.html("""
                 <html><body><script language='JavaScript'>
-                    window.parent.location.replace("\(urls.local2.absoluteString)");
+                    window.parent.location.replace("\(urls.url2.absoluteString)");
                 </script></body></html>
             """))
         }, { _ in
@@ -221,16 +221,16 @@ final class TabTests: XCTestCase {
 
         // initial page
         eDidFinish = expectation(description: "didFinish 1")
-        tab.setContent(.url(urls.local))
+        tab.setContent(.url(urls.url))
         waitForExpectations(timeout: 5)
 
-        // load urls.local1 which will be js-redirected to urls.local2
-        // it should be .redirected with .goBack() to urls.local3
+        // load urls.url1 which will be js-redirected to urls.url2
+        // it should be .redirected with .goBack() to urls.url3
         eDidFinish = expectation(description: "didFinish 2")
 
         // back/forward buttons state shouldn‘t change during the redirect
         let eCantGoBack = expectation(description: "initial canGoBack: false")
-        // canGoBack should be set once during navigation to urls.local1 and not changed
+        // canGoBack should be set once during navigation to urls.url1 and not changed
         let eCanGoBack = expectation(description: "canGoBack -> true")
         let c1 = tab.$canGoBack.sink { canGoBack in
             if canGoBack {
@@ -247,14 +247,14 @@ final class TabTests: XCTestCase {
 
         eDidRedirect = expectation(description: "did redirect")
 
-        tab.setContent(.url(urls.local1))
+        tab.setContent(.url(urls.url1))
         waitForExpectations(timeout: 5)
         eDidFinish = nil
 
         XCTAssertTrue(tab.canGoBack)
         XCTAssertFalse(tab.canGoForward)
-        XCTAssertEqual(tab.webView.url, urls.local3)
-        XCTAssertEqual(tab.webView.backForwardList.backList.map(\.url), [urls.local])
+        XCTAssertEqual(tab.webView.url, urls.url3)
+        XCTAssertEqual(tab.webView.backForwardList.backList.map(\.url), [urls.url])
         XCTAssertEqual(tab.webView.backForwardList.forwardList, [])
 
         withExtendedLifetime((c1, c2)) {}
@@ -268,10 +268,10 @@ final class TabTests: XCTestCase {
         let extensionsBuilder = TestTabExtensionsBuilder(load: []) { [urls] builder in { _, _ in
             builder.add {
                 TestsClosureNavigationResponderTabExtension(.init { navigationAction, _ in
-                    if navigationAction.url == urls.local2 {
+                    if navigationAction.url == urls.url2 {
                         return .redirect(navigationAction, invalidatingBackItemIfNeededFor: webView!) { navigator in
                             eDidRedirect.fulfill()
-                            navigator.load(URLRequest(url: urls.local3))
+                            navigator.load(URLRequest(url: urls.url3))
                         }
                     }
                     return .next
@@ -285,11 +285,11 @@ final class TabTests: XCTestCase {
         webView = tab.webView
 
         schemeHandler.middleware = [{ [urls] request in
-            guard request.url!.path == urls.local1.path else { return nil }
+            guard request.url!.path == urls.url1.path else { return nil }
 
             return .ok(.html("""
                 <html><body><script language='JavaScript'>
-                    window.parent.location.replace("\(urls.local2.absoluteString)");
+                    window.parent.location.replace("\(urls.url2.absoluteString)");
                 </script></body></html>
             """))
         }, { _ in
@@ -298,16 +298,16 @@ final class TabTests: XCTestCase {
 
         // initial page
         eDidFinish = expectation(description: "didFinish 1")
-        tab.setContent(.url(urls.local))
+        tab.setContent(.url(urls.url))
         waitForExpectations(timeout: 5)
 
         // page 2 to make canGoBack == true
         eDidFinish = expectation(description: "didFinish 1")
-        tab.setContent(.url(urls.local3))
+        tab.setContent(.url(urls.url3))
         waitForExpectations(timeout: 5)
 
-        // load urls.local1 which will be js-redirected to urls.local2
-        // it should be .redirected with .goBack() to urls.local3
+        // load urls.url1 which will be js-redirected to urls.url2
+        // it should be .redirected with .goBack() to urls.url3
         eDidFinish = expectation(description: "didFinish 2")
 
         // back/forward buttons state shouldn‘t change during the redirect
@@ -324,14 +324,14 @@ final class TabTests: XCTestCase {
 
         eDidRedirect = expectation(description: "did redirect")
 
-        tab.setContent(.url(urls.local1))
+        tab.setContent(.url(urls.url1))
         waitForExpectations(timeout: 5)
         eDidFinish = nil
 
         XCTAssertTrue(tab.canGoBack)
         XCTAssertFalse(tab.canGoForward)
-        XCTAssertEqual(tab.webView.url, urls.local3)
-        XCTAssertEqual(tab.webView.backForwardList.backList.map(\.url), [urls.local, urls.local3])
+        XCTAssertEqual(tab.webView.url, urls.url3)
+        XCTAssertEqual(tab.webView.backForwardList.backList.map(\.url), [urls.url, urls.url3])
         XCTAssertEqual(tab.webView.backForwardList.forwardList, [])
 
         withExtendedLifetime((c1, c2)) {}

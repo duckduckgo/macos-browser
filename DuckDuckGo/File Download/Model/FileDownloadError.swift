@@ -20,13 +20,13 @@ import Foundation
 
 enum FileDownloadError: Error {
     case failedToMoveFileToDownloads
-    case failedToCompleteDownloadTask(underlyingError: Error?, resumeData: Data?)
+    case failedToCompleteDownloadTask(underlyingError: Error?, resumeData: Data?, isRetryable: Bool)
 }
 
 extension FileDownloadError {
 
     var underlyingError: Error? {
-        guard case .failedToCompleteDownloadTask(underlyingError: let error, resumeData: _) = self else { return nil }
+        guard case .failedToCompleteDownloadTask(underlyingError: let error, resumeData: _, isRetryable: _) = self else { return nil }
         return error
     }
 
@@ -35,8 +35,13 @@ extension FileDownloadError {
     }
 
     var resumeData: Data? {
-        guard case .failedToCompleteDownloadTask(underlyingError: _, resumeData: let data) = self else { return nil }
+        guard case .failedToCompleteDownloadTask(underlyingError: _, resumeData: let data, isRetryable: _) = self else { return nil }
         return data
+    }
+
+    var isRetryable: Bool {
+        guard case .failedToCompleteDownloadTask(underlyingError: _, resumeData: _, isRetryable: let isRetryable) = self else { return false }
+        return isRetryable
     }
 
 }
@@ -60,29 +65,32 @@ extension FileDownloadError: CustomNSError {
     private enum UserInfoKeys: String {
         case underlyingError
         case resumeData
+        case isRetryable
     }
 
     var errorUserInfo: [String: Any] {
         switch self {
         case .failedToMoveFileToDownloads: return [:]
-        case .failedToCompleteDownloadTask(underlyingError: let error, resumeData: let data):
+        case .failedToCompleteDownloadTask(underlyingError: let error, resumeData: let data, isRetryable: let isRetryable):
             var userInfo = [String: Any]()
             userInfo[UserInfoKeys.underlyingError.rawValue] = error
             userInfo[UserInfoKeys.resumeData.rawValue] = data
+            userInfo[UserInfoKeys.resumeData.rawValue] = data
+            userInfo[UserInfoKeys.isRetryable.rawValue] = NSNumber(value: isRetryable)
             return userInfo
         }
     }
 
-    init(_ error: NSError) {
+    init(_ error: NSError, isRetryable: Bool) {
         switch ErrorCode(rawValue: error.domain == Self.errorDomain ? error.code : -1) {
         case .failedToMoveFileToDownloads:
             self = .failedToMoveFileToDownloads
         case .failedToCompleteDownloadTask:
             let underlyingError = error.userInfo[UserInfoKeys.underlyingError.rawValue] as? Error
             let data = error.userInfo[UserInfoKeys.resumeData.rawValue] as? Data
-            self = .failedToCompleteDownloadTask(underlyingError: underlyingError, resumeData: data)
+            self = .failedToCompleteDownloadTask(underlyingError: underlyingError, resumeData: data, isRetryable: isRetryable)
         default:
-            self = .failedToCompleteDownloadTask(underlyingError: error, resumeData: nil)
+            self = .failedToCompleteDownloadTask(underlyingError: error, resumeData: nil, isRetryable: isRetryable)
         }
     }
 
@@ -93,8 +101,8 @@ extension FileDownloadError: Equatable {
     static func == (lhs: FileDownloadError, rhs: FileDownloadError) -> Bool {
         switch lhs {
         case .failedToMoveFileToDownloads: if case .failedToMoveFileToDownloads = rhs { return true }
-        case .failedToCompleteDownloadTask(underlyingError: let error1, resumeData: let data1):
-            if case .failedToCompleteDownloadTask(underlyingError: let error2, resumeData: let data2) = rhs {
+        case .failedToCompleteDownloadTask(underlyingError: let error1, resumeData: let data1, isRetryable: let isRetryable):
+            if case .failedToCompleteDownloadTask(underlyingError: let error2, resumeData: let data2, isRetryable: isRetryable) = rhs {
                 return type(of: error1) == type(of: error2) && data1?.count == data2?.count
             }
         }

@@ -171,13 +171,10 @@ final class DownloadsViewController: NSViewController {
 
     @IBAction func copyDownloadLinkAction(_ sender: Any) {
         guard let index = index(for: sender),
-              let url = viewModel.items[safe: index]?.url as NSURL?
+              let url = viewModel.items[safe: index]?.url
         else { return }
 
-        let pasteboard = NSPasteboard.general
-        pasteboard.declareTypes([.URL], owner: nil)
-        url.write(to: pasteboard)
-        pasteboard.setString(url.absoluteString ?? "", forType: .string)
+        NSPasteboard.general.copy(url)
     }
 
     @IBAction func openOriginatingWebsiteAction(_ sender: Any) {

@@ -66,7 +66,7 @@ internal class WebCacheManager {
         let fm = FileManager.default
         let cachesDir = fm.urls(for: .cachesDirectory, in: .userDomainMask).first!
             .appendingPathComponent(Bundle.main.bundleIdentifier!)
-        let tmpDir = fm.temporaryDirectory(appropriateFor: cachesDir).appendingPathComponent(UUID().uuidString)
+        let tmpDir = fm.temporaryDirectory.appendingPathComponent(UUID().uuidString)
 
         do {
             try fm.createDirectory(at: tmpDir, withIntermediateDirectories: false, attributes: nil)
@@ -96,7 +96,7 @@ internal class WebCacheManager {
         libraryURL.appendPathComponent("WebKit/\(bundleID)/WebsiteData/DeviceIdHashSalts/1")
 
         let fm = FileManager.default
-        let tmpDir = fm.temporaryDirectory(appropriateFor: libraryURL).appendingPathComponent(UUID().uuidString)
+        let tmpDir = fm.temporaryDirectory.appendingPathComponent(UUID().uuidString)
 
         do {
             try fm.createDirectory(at: tmpDir, withIntermediateDirectories: false, attributes: nil)
