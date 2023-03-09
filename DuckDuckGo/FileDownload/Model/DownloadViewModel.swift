@@ -54,7 +54,9 @@ final class DownloadViewModel {
             } else if item.error == nil, let destinationURL = item.destinationURL {
                 self = .complete(destinationURL)
             } else {
-                self = .failed(item.error ?? .failedToCompleteDownloadTask(underlyingError: URLError(.cancelled), resumeData: nil))
+                self = .failed(item.error ?? .failedToCompleteDownloadTask(underlyingError: URLError(.cancelled),
+                                                                           resumeData: nil,
+                                                                           isRetryable: item.destinationURL != nil))
             }
         }
     }

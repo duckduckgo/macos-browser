@@ -1,7 +1,7 @@
 //
-//  ApiRequestError.swift
+//  DownloadsWebViewMock.h
 //
-//  Copyright © 2017 DuckDuckGo. All rights reserved.
+//  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,8 +16,10 @@
 //  limitations under the License.
 //
 
-import Foundation
+#import <WebKit/WebKit.h>
 
-enum ApiRequestError: Error {
-    case noData
-}
+@interface DownloadsWebViewMock : WKWebView
+@property (nonatomic, copy, nullable) id _Nullable  (^startDownloadBlock)(NSURLRequest * _Nullable);
+@property (nonatomic, copy, nullable) id _Nullable  (^resumeDownloadBlock)(NSData * _Nullable);
+@end
+
