@@ -1,4 +1,3 @@
-
 //
 //  DownloadsTabExtension.swift
 //

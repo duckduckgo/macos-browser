@@ -65,3 +65,4 @@ excluded:
   - IntegrationTests
   - UITests
   - vendor
+  - DerivedData
