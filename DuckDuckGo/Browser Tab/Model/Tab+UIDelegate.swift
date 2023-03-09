@@ -63,12 +63,30 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
         userInteractionDialog = UserDialog(sender: .user, dialog: dialog)
     }
 
-    @objc(_webView:createWebViewWithConfiguration:forNavigationAction:windowFeatures:completionHandler:)
-    func webView(_ webView: WKWebView,
-                 createWebViewWith configuration: WKWebViewConfiguration,
-                 for navigationAction: WKNavigationAction,
-                 windowFeatures: WKWindowFeatures,
-                 completionHandler: @escaping (WKWebView?) -> Void) {
+    @MainActor
+    func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
+
+        var isCalledSynchronously = true
+        var synchronousResultWebView: WKWebView?
+        handleCreateWebViewRequest(from: webView, with: configuration, for: navigationAction, windowFeatures: windowFeatures) { [weak self] webView in
+            guard self != nil else { return }
+            if isCalledSynchronously {
+                synchronousResultWebView = webView
+            } else {
+                // automatic loading won‘t start for asynchronous callback as we‘ve already returned nil at this point
+                webView?.load(navigationAction.request)
+            }
+        }
+        isCalledSynchronously = false
+
+        return synchronousResultWebView
+    }
+
+    private func handleCreateWebViewRequest(from webView: WKWebView,
+                                            with configuration: WKWebViewConfiguration,
+                                            for navigationAction: WKNavigationAction,
+                                            windowFeatures: WKWindowFeatures,
+                                            completionHandler: @escaping (WKWebView?) -> Void) {
 
         let sourceUrl = navigationAction.safeSourceFrame?.safeRequest?.url ?? self.url ?? .empty
         let newWindowPolicy: NavigationDecision? = {
@@ -127,7 +145,6 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
 
     /// create a new Tab returning its WebView to a createWebViewWithConfiguration callback
     private func createWebView(from webView: WKWebView, with configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, of kind: NewWindowPolicy) -> WKWebView? {
-
         guard let delegate else { return nil }
 
         let tab = Tab(content: .none, webViewConfiguration: configuration, parentTab: self, canBeClosedWithBack: kind.isSelectedTab, webViewFrame: webView.superview?.bounds ?? .zero)
@@ -137,26 +154,6 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
 
         // WebKit automatically loads the request in the returned web view.
         return webView
-    }
-
-    /// official API callback fallback if async _webView::::completionHandler: can‘t be called for whatever reason
-    @MainActor
-    func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
-
-        var isCalledSynchronously = true
-        var synchronousResultWebView: WKWebView?
-        self.webView(webView, createWebViewWith: configuration, for: navigationAction, windowFeatures: windowFeatures) { [weak self] webView in
-            guard self != nil else { return }
-            if isCalledSynchronously {
-                synchronousResultWebView = webView
-            } else {
-                // automatic loading won‘t start for asynchronous callback as we‘ve already returned nil at this point
-                webView?.load(navigationAction.request)
-            }
-        }
-        isCalledSynchronously = false
-
-        return synchronousResultWebView
     }
 
     @objc(_webView:checkUserMediaPermissionForURL:mainFrameURL:frameIdentifier:decisionHandler:)
