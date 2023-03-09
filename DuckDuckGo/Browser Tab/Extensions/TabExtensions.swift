@@ -68,6 +68,7 @@ protocol TabExtensionDependencies {
     var historyCoordinating: HistoryCoordinating { get }
     var downloadManager: FileDownloadManagerProtocol { get }
     var cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter? { get }
+    var duckPlayer: DuckPlayer { get }
 }
 
 // swiftlint:disable large_tuple
@@ -163,6 +164,11 @@ extension TabExtensionsBuilder {
         }
         add {
             NavigationHotkeyHandler(isTabPinned: args.isTabPinned)
+        }
+
+        add {
+            DuckPlayerTabExtension(duckPlayer: dependencies.duckPlayer,
+                                   scriptsPublisher: userScripts.compactMap { $0 })
         }
     }
 

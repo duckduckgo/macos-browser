@@ -31,7 +31,16 @@ final class PrivacyDashboardTabExtension {
     private let contentBlocking: any ContentBlockingProtocol
 
     @Published private(set) var privacyInfo: PrivacyInfo?
-    @Published private(set) var cookieConsentPromptRequest: CookieConsentPromptRequest?
+    @Published private(set) var cookieConsentPromptRequest: CookieConsentPromptRequest? {
+        didSet {
+            guard let request = cookieConsentPromptRequest else { return }
+            request.addCompletionHandler { [weak self, weak request] _ in
+                if let self, let request, self.cookieConsentPromptRequest === request {
+                    self.cookieConsentPromptRequest = nil
+                }
+            }
+        }
+    }
 
     private var previousPrivacyInfosByURL: [String: PrivacyInfo] = [:]
 

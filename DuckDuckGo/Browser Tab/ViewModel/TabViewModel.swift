@@ -33,11 +33,11 @@ final class TabViewModel {
     private let appearancePreferences: AppearancePreferences
     private var cancellables = Set<AnyCancellable>()
 
-    @Published var canGoForward: Bool = false
-    @Published var canGoBack: Bool = false
+    @Published private(set) var canGoForward: Bool = false
+    @Published private(set) var canGoBack: Bool = false
 
     @Published private(set) var canReload: Bool = false
-    @Published var canBeBookmarked: Bool = false
+    @Published private(set) var canBeBookmarked: Bool = false
     @Published var isLoading: Bool = false {
         willSet {
             if newValue {
@@ -80,7 +80,7 @@ final class TabViewModel {
         self.appearancePreferences = appearancePreferences
 
         subscribeToUrl()
-        subscribeToCanGoBackForward()
+        subscribeToCanGoBackForwardAndReload()
         subscribeToTitle()
         subscribeToFavicon()
         subscribeToTabError()
@@ -97,14 +97,13 @@ final class TabViewModel {
 
     private func subscribeToUrl() {
         tab.$content.receive(on: DispatchQueue.main).sink { [weak self] _ in
-            self?.updateCanReload()
             self?.updateAddressBarStrings()
             self?.updateCanBeBookmarked()
             self?.updateFavicon()
         } .store(in: &cancellables)
     }
 
-    private func subscribeToCanGoBackForward() {
+    private func subscribeToCanGoBackForwardAndReload() {
         tab.$canGoBack
             .map { [weak tab] canGoBack in
                 canGoBack || tab?.canBeClosedWithBack == true
@@ -113,6 +112,9 @@ final class TabViewModel {
             .store(in: &cancellables)
         tab.$canGoForward
             .assign(to: \.canGoForward, onWeaklyHeld: self)
+            .store(in: &cancellables)
+        tab.$canReload
+            .assign(to: \.canReload, onWeaklyHeld: self)
             .store(in: &cancellables)
     }
 
@@ -175,10 +177,6 @@ final class TabViewModel {
         }.store(in: &cancellables)
     }
 
-    private func updateCanReload() {
-        canReload = tab.content.url ?? .blankPage != .blankPage
-    }
-
     private func updateCanBeBookmarked() {
         canBeBookmarked = tab.content.url ?? .blankPage != .blankPage
     }
@@ -199,7 +197,7 @@ final class TabViewModel {
             return
         }
 
-        guard tab.content.isUrl, !tab.content.isPrivatePlayer, let url = tabURL else {
+        guard tab.content.isUrl, let url = tabURL else {
             addressBarString = ""
             passiveAddressBarString = ""
             return
@@ -252,7 +250,7 @@ final class TabViewModel {
             title = UserText.tabHomeTitle
         case .onboarding:
             title = UserText.tabOnboardingTitle
-        case .url, .none, .privatePlayer:
+        case .url, .none:
             if let title = tab.title?.trimmingWhitespace(),
                !title.isEmpty {
                 self.title = title
@@ -280,7 +278,7 @@ final class TabViewModel {
         case .bookmarks:
             favicon = Favicon.bookmarks
             return
-        case .url, .onboarding, .privatePlayer, .none: break
+        case .url, .onboarding, .none: break
         }
 
         if let favicon = tab.favicon {

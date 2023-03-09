@@ -73,7 +73,7 @@ final class SharingMenu: NSMenu {
             return
         }
 
-        let sharingData = PrivatePlayer.shared.sharingData(for: tabViewModel.title, url: url) ?? (tabViewModel.title, url)
+        let sharingData = DuckPlayer.shared.sharingData(for: tabViewModel.title, url: url) ?? (tabViewModel.title, url)
         service.subject = sharingData.title
         service.perform(withItems: [sharingData.url])
     }

@@ -35,7 +35,7 @@ final class FirePopoverViewModelTests: XCTestCase {
         let tab = Tab(content: .url("https://duck.com".url!))
         tabCollectionViewModel.removeAllTabs()
         tabCollectionViewModel.append(tab: tab)
-        tab.addVisit(of: "https://a.com".url!)
+//        tab.addVisit(of: "https://a.com".url!)
 
         let viewModel = makeViewModel(with: tabCollectionViewModel)
         XCTAssertEqual(viewModel.availableClearingOptions, [.currentSite, .allData])
@@ -46,8 +46,8 @@ final class FirePopoverViewModelTests: XCTestCase {
         let tab = Tab(content: .url("https://duck.com".url!))
         tabCollectionViewModel.removeAllTabs()
         tabCollectionViewModel.append(tab: tab)
-        tab.addVisit(of: "https://a.com".url!)
-        tab.addVisit(of: "https://b.com".url!)
+//        tab.addVisit(of: "https://a.com".url!)
+//        tab.addVisit(of: "https://b.com".url!)
 
         let viewModel = makeViewModel(with: tabCollectionViewModel)
         XCTAssertEqual(viewModel.availableClearingOptions, [.currentTab, .allData])

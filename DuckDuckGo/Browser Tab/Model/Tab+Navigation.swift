@@ -43,6 +43,9 @@ extension Tab: NavigationResponder {
             .weak(nullable: self.navigationHotkeyHandler),
 
             .weak(self),
+
+            // Duck Player overlay navigations handling
+            .weak(nullable: self.duckPlayer),
             // open external scheme link in another app
             .weak(nullable: self.externalAppSchemeHandler),
 
@@ -74,7 +77,8 @@ extension Tab: NavigationResponder {
 
         newWindowPolicyDecisionMakers = [NewWindowPolicyDecisionMaker?](arrayLiteral:
             self.contextMenuManager,
-            self.navigationHotkeyHandler
+            self.navigationHotkeyHandler,
+            self.duckPlayer
         ).compactMap { $0 }
 
         if let downloadsExtension = self.downloads {
