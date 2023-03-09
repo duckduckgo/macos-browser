@@ -249,6 +249,15 @@ extension WebKitDownloadTask: WebKitDownloadDelegate {}
             self.progress.totalUnitCount = response.expectedContentLength
         }
 
+        var suggestedFilename = suggestedFilename
+        // sometimes suggesteFilename has an extension appended to already present URL file extension
+        // e.g. feed.xml.rss for www.domain.com/rss.xml
+        if let urlSuggestedFilename = response.url?.suggestedFilename,
+           !(urlSuggestedFilename as NSString).pathExtension.isEmpty,
+           suggestedFilename.hasPrefix(urlSuggestedFilename) {
+            suggestedFilename = urlSuggestedFilename
+        }
+
         self.suggestedFilename = suggestedFilename
         self.decideDestinationCompletionHandler = completionHandler
 
