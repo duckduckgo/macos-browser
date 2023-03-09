@@ -32,7 +32,7 @@ final class TabBarViewItemTests: XCTestCase {
         tabBarViewItem.delegate = delegate
     }
 
-    func testAllExpectedItemsAreShown() {
+    func testThatAllExpectedItemsAreShown() {
         tabBarViewItem.menuNeedsUpdate(menu)
 
         XCTAssertEqual(menu.item(at: 0)?.title, UserText.duplicateTab)
@@ -47,14 +47,14 @@ final class TabBarViewItemTests: XCTestCase {
         XCTAssertEqual(menu.item(at: 9)?.title, UserText.moveTabToNewWindow)
     }
 
-    func testWhenOneTabCloseOtherTabsItemIsDisabled() {
+    func testWhenOneTabCloseThenOtherTabsItemIsDisabled() {
         tabBarViewItem.menuNeedsUpdate(menu)
 
         let item = menu.items .first { $0.title == UserText.closeOtherTabs }
         XCTAssertFalse(item?.isEnabled ?? true)
     }
 
-    func testWhenMultipleTabsCloseOtherTabsItemIsEnabled() {
+    func testWhenMultipleTabsThenCloseOtherTabsItemIsEnabled() {
         delegate.hasItemsToTheRight = true
         tabBarViewItem.menuNeedsUpdate(menu)
 
@@ -62,14 +62,14 @@ final class TabBarViewItemTests: XCTestCase {
         XCTAssertTrue(item?.isEnabled ?? false)
     }
 
-    func testWhenOneTabMoveTabToNewWindowIsDisabled() {
+    func testWhenOneTabThenMoveTabToNewWindowIsDisabled() {
         tabBarViewItem.menuNeedsUpdate(menu)
 
         let item = menu.items .first { $0.title == UserText.moveTabToNewWindow }
         XCTAssertFalse(item?.isEnabled ?? true)
     }
 
-    func testWhenMultipleTabsMoveTabToNewWindowIsEnabled() {
+    func testWhenMultipleTabsThenMoveTabToNewWindowIsEnabled() {
         delegate.hasItemsToTheRight = true
         tabBarViewItem.menuNeedsUpdate(menu)
 
@@ -77,14 +77,14 @@ final class TabBarViewItemTests: XCTestCase {
         XCTAssertTrue(item?.isEnabled ?? false)
     }
 
-    func testWhenNoTabsToTheRightCloseTabsToTheRightIsDisabled() {
+    func testWhenNoTabsToTheRightThenCloseTabsToTheRightIsDisabled() {
         tabBarViewItem.menuNeedsUpdate(menu)
 
         let item = menu.items .first { $0.title == UserText.closeTabsToTheRight }
         XCTAssertFalse(item?.isEnabled ?? true)
     }
 
-    func testWhenTabsToTheRightCloseTabsToTheRightIsEnabled() {
+    func testWhenTabsToTheRightThenCloseTabsToTheRightIsEnabled() {
         delegate.hasItemsToTheRight = true
         tabBarViewItem.menuNeedsUpdate(menu)
 
@@ -92,14 +92,14 @@ final class TabBarViewItemTests: XCTestCase {
         XCTAssertTrue(item?.isEnabled ?? false)
     }
 
-    func testWhenNoUrlFireProofSiteItemIsDisabled() {
+    func testWhenNoUrlThenFireProofSiteItemIsDisabled() {
         tabBarViewItem.menuNeedsUpdate(menu)
 
         let item = menu.items .first { $0.title == UserText.fireproofSite }
         XCTAssertFalse(item?.isEnabled ?? true)
     }
 
-    func testWhenFireproofableUrlFireProofSiteItemIsDisabled() {
+    func testWhenFireproofableThenUrlFireProofSiteItemIsDisabled() {
         // Set up fake views for the TabBarViewItems
         let textField = NSTextField()
         let imageView = NSImageView()
