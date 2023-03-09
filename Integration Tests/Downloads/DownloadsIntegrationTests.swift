@@ -47,26 +47,12 @@ class DownloadsIntegrationTests: XCTestCase {
     // MARK: - Tests
     // Uses tests-server helper tool for mocking HTTP requests (see tests-server/main.swift)
 
-    func testWhenShouldDownloadResponse_downloadStarts() throws {
+    @MainActor
+    func testWhenShouldDownloadResponse_downloadStarts() async throws {
         var persistor = DownloadsPreferencesUserDefaultsPersistor()
         persistor.selectedDownloadLocation = FileManager.default.temporaryDirectory.absoluteString
 
-        let e = expectation(description: "download finished")
-        var fileUrl: URL!
-        let c = FileDownloadManager.shared.downloadsPublisher
-            .sink { task in
-                var c2: AnyCancellable!
-                c2 = task.output.sink { completion in
-                    if case .failure(let error) = completion {
-                        XCTFail("unexpected \(error)")
-                    }
-                    e.fulfill()
-                    c2.cancel()
-                    c2 = nil
-                } receiveValue: { value in
-                    fileUrl = value
-                }
-            }
+        let downloadTaskFuture = FileDownloadManager.shared.downloadsPublisher.timeout(5).first().promise()
 
         let url = URL.testsServer
             .appendingPathComponent("fname.dat")
@@ -74,115 +60,75 @@ class DownloadsIntegrationTests: XCTestCase {
                                      headers: ["Content-Disposition": "attachment; filename=\"fname.dat\"",
                                                "Content-Type": "text/html"])
         let tab = tabViewModel.tab
-        tab.setUrl(url, userEntered: false)
+        _=await tab.setUrl(url, userEntered: false)?.result
 
-        waitForExpectations(timeout: 15)
-        withExtendedLifetime(c) {}
+        let fileUrl = try await downloadTaskFuture.get().output
+            .timeout(1, scheduler: DispatchQueue.main) { .init(TimeoutError() as NSError, isRetryable: false) }.first().promise().get()
 
         XCTAssertEqual(fileUrl, FileManager.default.temporaryDirectory.appendingPathComponent("fname.dat"))
         XCTAssertEqual(try? Data(contentsOf: fileUrl), data.html)
     }
 
-    func testWhenNavigationActionIsData_downloadStarts() {
+    @MainActor
+    func testWhenNavigationActionIsData_downloadStarts() async throws {
         var persistor = DownloadsPreferencesUserDefaultsPersistor()
         persistor.selectedDownloadLocation = FileManager.default.temporaryDirectory.absoluteString
 
         let tab = tabViewModel.tab
-        if case .url(.blankPage, _) = tab.content {} else {
-            let eLoadingDidFinish = expectation(description: "isLoading changes to false")
-            let c1 = tabViewModel.$isLoading
-                .scan((old: false, new: false)) { (old: $0.new, new: $1) }
-                .sink {
-                    if $0.old == true && $0.new == false {
-                        eLoadingDidFinish.fulfill()
-                    }
-                }
-            tab.setUrl(.blankPage, userEntered: false)
-            waitForExpectations(timeout: 5)
-            withExtendedLifetime(c1) {}
-        }
+        // load empty page
+        let pageUrl = URL.testsServer.appendingTestParameters(data: data.html)
+        _=await tab.setUrl(pageUrl, userEntered: false)?.result
 
-        let e = expectation(description: "download finished")
-        var fileUrl: URL!
-        let c2 = FileDownloadManager.shared.downloadsPublisher
-            .sink { task in
-                var c2: AnyCancellable!
-                c2 = task.output.sink { completion in
-                    if case .failure(let error) = completion {
-                        XCTFail("unexpected \(error)")
-                    }
-                    e.fulfill()
-                    c2.cancel()
-                    c2 = nil
-                } receiveValue: { value in
-                    fileUrl = value
-                }
-            }
+        let downloadTaskFuture = FileDownloadManager.shared.downloadsPublisher.timeout(5).first().promise()
 
         let js = """
-        var link = document.createElement("a");
-        link.href = 'data:application/octet-stream;charset=utf-8,\(data.testData.utf8String()!)';
-        link.download = "helloWorld.txt";
-        link.target = "_blank";
-        link.click();
+        (function() {
+            var link = document.createElement("a");
+            link.href = 'data:application/octet-stream;charset=utf-8,\(data.testData.utf8String()!)';
+            link.download = "helloWorld.txt";
+            link.target = "_blank";
+            link.click();
+            document.body.appendChild(link);
+            return true;
+        })();
         """
-        tab.webView.evaluateJavaScript(js)
+        try! await tab.webView.evaluateJavaScript(js)
 
-        waitForExpectations(timeout: 5)
-        withExtendedLifetime(c2) {}
+        let fileUrl = try await downloadTaskFuture.get().output
+            .timeout(1, scheduler: DispatchQueue.main) { .init(TimeoutError() as NSError, isRetryable: false) }.first().promise().get()
 
         XCTAssertEqual(fileUrl, FileManager.default.temporaryDirectory.appendingPathComponent("helloWorld.txt"))
         XCTAssertEqual(try? Data(contentsOf: fileUrl), data.testData)
     }
 
-    func testWhenNavigationActionIsBlob_downloadStarts() {
+    @MainActor
+    func testWhenNavigationActionIsBlob_downloadStarts() async throws {
         var persistor = DownloadsPreferencesUserDefaultsPersistor()
         persistor.selectedDownloadLocation = FileManager.default.temporaryDirectory.absoluteString
 
         let tab = tabViewModel.tab
-        if case .url(.blankPage, _) = tab.content {} else {
-            let eLoadingDidFinish = expectation(description: "isLoading changes to false")
-            let c1 = tabViewModel.$isLoading
-                .scan((old: false, new: false)) { (old: $0.new, new: $1) }
-                .sink {
-                    if $0.old == true && $0.new == false {
-                        eLoadingDidFinish.fulfill()
-                    }
-                }
-            tab.setUrl(.blankPage, userEntered: false)
-            waitForExpectations(timeout: 5)
-            withExtendedLifetime(c1) {}
-        }
+        // load empty page
+        let pageUrl = URL.testsServer.appendingTestParameters(data: data.html)
+        _=await tab.setUrl(pageUrl, userEntered: false)?.result
 
-        let e = expectation(description: "download finished")
-        var fileUrl: URL!
-        let c2 = FileDownloadManager.shared.downloadsPublisher
-            .sink { task in
-                var c2: AnyCancellable!
-                c2 = task.output.sink { completion in
-                    if case .failure(let error) = completion {
-                        XCTFail("unexpected \(error)")
-                    }
-                    e.fulfill()
-                    c2.cancel()
-                    c2 = nil
-                } receiveValue: { value in
-                    fileUrl = value
-                }
-            }
+        let downloadTaskFuture = FileDownloadManager.shared.downloadsPublisher.timeout(5).first().promise()
 
         let js = """
-        var blob = new Blob(['\(data.testData.utf8String()!)'], { type: 'application/octet-stream' });
-        var link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = "blobdload.json";
-        link.target = "_blank";
-        link.click();
+        (function() {
+            var blob = new Blob(['\(data.testData.utf8String()!)'], { type: 'application/octet-stream' });
+            var link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = "blobdload.json";
+            link.target = "_blank";
+            link.click();
+            document.body.appendChild(link);
+            return true;
+        })();
         """
-        tab.webView.evaluateJavaScript(js)
+        try! await tab.webView.evaluateJavaScript(js)
 
-        waitForExpectations(timeout: 5)
-        withExtendedLifetime(c2) {}
+        let fileUrl = try await downloadTaskFuture.get().output
+            .timeout(1, scheduler: DispatchQueue.main) { .init(TimeoutError() as NSError, isRetryable: false) }.first().promise().get()
 
         XCTAssertEqual(fileUrl, FileManager.default.temporaryDirectory.appendingPathComponent("blobdload.json"))
         XCTAssertEqual(try? Data(contentsOf: fileUrl), data.testData)

@@ -131,7 +131,7 @@ final class FileDownloadManager: FileDownloadManagerProtocol {
 
 extension FileDownloadManager: WebKitDownloadTaskDelegate {
 
-    // swiftlint:disable:next function_body_length
+    // swiftlint:disable function_body_length
     func fileDownloadTaskNeedsDestinationURL(_ task: WebKitDownloadTask,
                                              suggestedFilename: String,
                                              completionHandler: @escaping (URL?, UTType?) -> Void) {
@@ -184,12 +184,21 @@ extension FileDownloadManager: WebKitDownloadTaskDelegate {
             return
         }
 
-        // drop known extension, it would be appended by SavePanel
-        var suggestedFilename = suggestedFilename
-        if let ext = fileType?.fileExtension {
-            suggestedFilename = suggestedFilename.dropping(suffix: "." + ext)
+        var fileTypes = [UTType]()
+        let fileExtension = (suggestedFilename as NSString).pathExtension
+        // add file type from file extension first
+        if !fileExtension.isEmpty,
+           let utType = UTType(fileExtension: fileExtension),
+           fileType != utType {
+
+            fileTypes = [utType]
         }
-        let fileTypes = fileType.map { [$0] } ?? []
+        // append file type from mime
+        if let fileType,
+           fileType.fileExtension != nil || fileTypes.isEmpty {
+            fileTypes.append(fileType)
+        }
+
         delegate.chooseDestination(suggestedFilename: suggestedFilename, directoryURL: downloadLocation, fileTypes: fileTypes) { [weak self] url, fileType in
             guard let self, let url else {
                 completion(nil, nil)
@@ -215,6 +224,8 @@ extension FileDownloadManager: WebKitDownloadTaskDelegate {
             completion(url, fileType)
         }
     }
+    // swiftlint:enable function_body_length
+    // swiftlint:enable cyclomatic_complexity
 
     private func verifyAccessToDestinationFolder(_ folderUrl: URL, destinationRequested: Bool, isSandboxed: Bool) -> Bool {
         if destinationRequested && isSandboxed { return true }

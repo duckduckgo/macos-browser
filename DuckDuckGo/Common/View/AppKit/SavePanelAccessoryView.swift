@@ -1,4 +1,6 @@
-
+//
+//  SavePanelAccessoryView.swift
+//
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +16,22 @@
 //  limitations under the License.
 //
 
-// tests-server is a command-line tool used for Integration Tests HTTP requests mocking (see tests-server/main.swift)
-#include "../Common.xcconfig"
+import AppKit
 
-PRODUCT_NAME = $(TARGET_NAME);
+final class SavePanelAccessoryView: NSView {
+    let fileTypesPopup: NSPopUpButton
+
+    init() {
+        self.fileTypesPopup = NSPopUpButton(frame: NSRect(x: 115, y: 20, width: 251, height: 25))
+
+        super.init(frame: NSRect(x: 0, y: 0, width: 480, height: 67))
+
+        self.addSubview(fileTypesPopup)
+        fileTypesPopup.removeAllItems()
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+}
