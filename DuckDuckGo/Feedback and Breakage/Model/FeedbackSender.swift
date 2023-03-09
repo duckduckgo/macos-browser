@@ -18,6 +18,7 @@
 
 import Foundation
 import os.log
+import Networking
 
 final class FeedbackSender {
 
@@ -37,7 +38,9 @@ final class FeedbackSender {
             "appversion": appVersion
         ]
 
-        APIRequest.request(url: Self.feedbackURL, method: .post, parameters: parameters) { _, error in
+        let configuration = APIRequest.Configuration(url: Self.feedbackURL, method: .post, queryParameters: parameters)
+        let request = APIRequest(configuration: configuration, urlSession: URLSession.session())
+        request.fetch { _, error in
             if let error = error {
                 os_log("FeedbackSender: Failed to submit feedback %s", type: .error, error.localizedDescription)
                 Pixel.fire(.debug(event: .feedbackReportingFailed, error: error))

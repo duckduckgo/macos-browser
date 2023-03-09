@@ -32,25 +32,19 @@ extension Tab: NavigationResponder {
         navigationDelegate.setResponders(
             .weak(self),
 
+            .weak(nullable: self.downloads),
+
             .weak(nullable: self.adClickAttribution),
             .struct(SerpHeadersNavigationResponder()),
 
             // should be the last, for Unit Tests navigation events tracking
             .struct(nullable: testsClosureNavigationResponder)
         )
-        navigationDelegate
-            .registerCustomDelegateMethodHandler(.weak(self), forSelectorNamed: "_webView:contextMenuDidCreateDownload:")
-    }
 
-}
-
-extension Tab: WKNavigationDelegate {
-
-    @objc(_webView:contextMenuDidCreateDownload:)
-    func webView(_ webView: WKWebView, contextMenuDidCreate download: WebKitDownload) {
-        let location: FileDownloadManager.DownloadLocationPreference
-            = self.contextMenuManager?.shouldAskForDownloadLocation() == false ? .auto : .prompt
-        FileDownloadManager.shared.add(download, delegate: self, location: location, postflight: .none)
+        if let downloadsExtension = self.downloads {
+            navigationDelegate
+                .registerCustomDelegateMethodHandler(.weak(downloadsExtension), forSelectorNamed: "_webView:contextMenuDidCreateDownload:")
+        }
     }
 
 }

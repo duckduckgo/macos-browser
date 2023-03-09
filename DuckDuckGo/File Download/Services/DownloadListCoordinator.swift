@@ -212,14 +212,12 @@ final class DownloadListCoordinator {
             // Important: WebKitDownloadTask (as well as WKWebView) should be deallocated on the Main Thread
             dispatchPrecondition(condition: .onQueue(.main))
             withExtendedLifetime(webView) {
-                let location: FileDownloadManager.DownloadLocationPreference
-                if let destinationURL = item.destinationURL {
-                    location = .preset(destinationURL: destinationURL, tempURL: item.tempURL)
-                } else {
-                    location = .prompt
+                guard let destinationURL = item.destinationURL else {
+                    assertionFailure("trying to restart download with destinationURL not set")
+                    return
                 }
 
-                let task = self.downloadManager.add(download, delegate: self, location: location, postflight: .none)
+                let task = self.downloadManager.add(download, location: .preset(destinationURL: destinationURL, tempURL: item.tempURL))
                 self.subscribeToDownloadTask(task, updating: item)
             }
         }
@@ -313,24 +311,6 @@ final class DownloadListCoordinator {
 
     func sync() {
         store.sync()
-    }
-
-}
-
-extension DownloadListCoordinator: FileDownloadManagerDelegate {
-
-    func chooseDestination(suggestedFilename: String?, directoryURL: URL?, fileTypes: [UTType], callback: @escaping (URL?, UTType?) -> Void) {
-        // if download canceled/failed before the choice was made show a Save Panel
-        guard let delegate = webViewProvider()?.uiDelegate as? FileDownloadManagerDelegate else {
-            assertionFailure("Could not get FileDownloadManagerDelegate")
-            callback(nil, nil)
-            return
-        }
-        delegate.chooseDestination(suggestedFilename: suggestedFilename, directoryURL: directoryURL, fileTypes: fileTypes, callback: callback)
-    }
-
-    func fileIconFlyAnimationOriginalRect(for downloadTask: WebKitDownloadTask) -> NSRect? {
-        return nil
     }
 
 }

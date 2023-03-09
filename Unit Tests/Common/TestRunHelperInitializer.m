@@ -1,7 +1,7 @@
 //
-//  ApiRequestError.swift
+//  TestRunHelperInitializer.m
 //
-//  Copyright © 2017 DuckDuckGo. All rights reserved.
+//  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,8 +16,16 @@
 //  limitations under the License.
 //
 
-import Foundation
+#import <Foundation/Foundation.h>
 
-enum ApiRequestError: Error {
-    case noData
+@interface TestRunHelperInitializer: NSObject
+@end
+
+@implementation TestRunHelperInitializer
+
+// instantiate on app loading
++ (void)load {
+    [NSClassFromString(@"TestRunHelper") sharedInstance];
 }
+
+@end

@@ -25,7 +25,7 @@ final class SecureVaultErrorReporter: SecureVaultErrorReporting {
 
     func secureVaultInitFailed(_ error: SecureVaultError) {
 #if DEBUG
-        guard !AppDelegate.isRunningTests else { return }
+        guard !NSApp.isRunningUnitTests else { return }
 #endif
         switch error {
         case .initFailed, .failedToOpenDatabase:

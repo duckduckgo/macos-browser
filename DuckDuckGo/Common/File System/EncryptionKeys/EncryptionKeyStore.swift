@@ -47,9 +47,13 @@ final class EncryptionKeyStore: EncryptionKeyStoring {
         ] as [String: Any]
     }
 
-    init(generator: EncryptionKeyGenerating = EncryptionKeyGenerator(), account: String = Constants.encryptionKeyAccount) {
+    init(generator: EncryptionKeyGenerating, account: String = Constants.encryptionKeyAccount) {
         self.generator = generator
         self.account = account
+    }
+
+    convenience init() {
+        self.init(generator: EncryptionKeyGenerator())
     }
 
     // MARK: - Keychain
