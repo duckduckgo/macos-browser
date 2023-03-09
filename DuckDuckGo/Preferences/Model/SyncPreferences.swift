@@ -28,7 +28,8 @@ extension SyncDevice {
     }
 
     init(_ device: RegisteredDevice) {
-        self.init(kind: .mobile, name: device.name, id: device.id)
+        let kind: Kind = device.type == "desktop" ? .desktop : .mobile
+        self.init(kind: kind, name: device.name, id: device.id)
     }
 }
 
@@ -150,9 +151,8 @@ extension SyncPreferences: ManagementDialogModelDelegate {
     func turnOnSync() {
         Task { @MainActor in
             do {
-//                let hostname = SCDynamicStoreCopyComputerName(nil, nil) as? String ?? ProcessInfo.processInfo.hostName
-                let hostname = ProcessInfo.processInfo.hostName
-                try await syncService.createAccount(deviceName: hostname)
+                let hostname = SCDynamicStoreCopyComputerName(nil, nil) as? String ?? ProcessInfo.processInfo.hostName
+                try await syncService.createAccount(deviceName: hostname, deviceType: "desktop")
                 presentDialog(for: .askToSyncAnotherDevice)
             } catch {
                 managementDialogModel.errorMessage = String(describing: error)
@@ -163,9 +163,8 @@ extension SyncPreferences: ManagementDialogModelDelegate {
     func recoverDevice(using recoveryCode: String) {
         Task { @MainActor in
             do {
-//                let hostname = SCDynamicStoreCopyComputerName(nil, nil) as? String ?? ProcessInfo.processInfo.hostName
-                let hostname = ProcessInfo.processInfo.hostName
-                try await syncService.login(recoveryKey: recoveryCode, deviceName: hostname)
+                let hostname = SCDynamicStoreCopyComputerName(nil, nil) as? String ?? ProcessInfo.processInfo.hostName
+                try await syncService.login(recoveryKey: recoveryCode, deviceName: hostname, deviceType: "desktop")
                 managementDialogModel.endFlow()
             } catch {
                 managementDialogModel.errorMessage = String(describing: error)
