@@ -68,7 +68,7 @@ extension Tab {
 
     enum UserDialogSender: Equatable {
         case user
-        case page(domain: String?)
+        case page(domain: String)
     }
 
     struct UserDialog {
