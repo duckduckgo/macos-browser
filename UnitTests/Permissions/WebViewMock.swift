@@ -155,7 +155,7 @@ final class WebViewMock: WKWebView {
     internal func setURL(_ url: URL) {
         self._protocol = url.scheme!
         self._host = url.host!
-        self._port = url.port ?? (url.scheme == "https" ? 443 : 80)
+        self._port = url.port ?? url.navigationalScheme?.defaultPort ?? 0
     }
 
     class func new(url: URL) -> WKSecurityOriginMock {
