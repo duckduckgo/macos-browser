@@ -1,4 +1,6 @@
-
+//
+//  PublishersExtensions.swift
+//
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +16,16 @@
 //  limitations under the License.
 //
 
-// tests-server is a command-line tool used for Integration Tests HTTP requests mocking (see tests-server/main.swift)
-#include "../Common.xcconfig"
+import Combine
+import Foundation
 
-PRODUCT_NAME = $(TARGET_NAME);
+struct TimeoutError: Error {}
+
+extension Publisher where Failure == Never {
+
+    func timeout(_ interval: DispatchQueue.SchedulerTimeType.Stride) -> Publishers.Timeout<Publishers.MapError<Self, TimeoutError>, DispatchQueue> {
+        return self.mapError { _ -> TimeoutError in }
+            .timeout(interval, scheduler: DispatchQueue.main, customError: { TimeoutError() })
+    }
+
+}

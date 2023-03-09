@@ -425,8 +425,9 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         }
     }
 
-    func setContent(_ newContent: TabContent) {
-        guard contentChangeEnabled else { return }
+    @discardableResult
+    func setContent(_ newContent: TabContent) -> Task<Void, Never>? {
+        guard contentChangeEnabled else { return nil }
 
         let oldContent = self.content
         let newContent: TabContent = {
@@ -440,25 +441,26 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             }
             return newContent
         }()
-        guard newContent != self.content else { return }
+        guard newContent != self.content else { return nil }
         self.content = newContent
 
         dismissPresentedAlert()
 
-        Task {
-            await reloadIfNeeded(shouldLoadInBackground: true)
-        }
-
         if let title = content.title {
             self.title = title
         }
+
+        return Task {
+            await reloadIfNeeded(shouldLoadInBackground: true)
+        }
     }
 
-    func setUrl(_ url: URL?, userEntered: Bool) {
+    @discardableResult
+    func setUrl(_ url: URL?, userEntered: Bool) -> Task<Void, Never>? {
         if url == .welcome {
             OnboardingViewModel().restart()
         }
-        self.setContent(.contentFromURL(url, userEntered: userEntered))
+        return self.setContent(.contentFromURL(url, userEntered: userEntered))
     }
 
     private func handleUrlDidChange() {
@@ -750,8 +752,15 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                content.isUserEnteredUrl {
                 request.attribution = .user
             }
-            webView.navigator(distributedNavigationDelegate: navigationDelegate)
-                .load(request, withExpectedNavigationType: content.isUserEnteredUrl ? .custom(.userEnteredUrl) : .other)
+            await withCheckedContinuation { continuation in
+                webView.navigator(distributedNavigationDelegate: navigationDelegate)
+                    .load(request, withExpectedNavigationType: content.isUserEnteredUrl ? .custom(.userEnteredUrl) : .other)?
+                    .appendResponder(navigationDidFinish: { _ in
+                        continuation.resume()
+                    }, navigationDidFail: { _, _ in
+                        continuation.resume()
+                    })
+            }
         }
     }
 
