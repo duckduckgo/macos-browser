@@ -19,6 +19,7 @@
 import XCTest
 import OHHTTPStubs
 import OHHTTPStubsSwift
+import Networking
 @testable import DuckDuckGo_Privacy_Browser
 
 class PixelTests: XCTestCase {
@@ -73,7 +74,7 @@ class PixelTests: XCTestCase {
             return HTTPStubsResponse(data: Data(), statusCode: 200, headers: nil)
         }
 
-        var headers = APIHeaders().defaultHeaders
+        var headers = APIRequest.Headers().default
         headers[userAgentName] = testAgent
 
         Pixel.shared!.fire(pixelNamed: "test", withHeaders: headers)

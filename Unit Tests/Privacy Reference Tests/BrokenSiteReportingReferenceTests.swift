@@ -20,6 +20,7 @@ import XCTest
 import os.log
 import BrowserServicesKit
 
+@testable import Networking
 @testable import DuckDuckGo_Privacy_Browser
 
 final class BrokenSiteReportingReferenceTests: XCTestCase {
@@ -30,14 +31,11 @@ final class BrokenSiteReportingReferenceTests: XCTestCase {
     }
 
     private func makeURLRequest(with parameters: [String: String]) -> URLRequest {
-        APIRequest.urlRequestFor(
-            url: URL.pixelUrl(forPixelNamed: Pixel.Event.brokenSiteReport.name),
-            method: .get,
-            parameters: parameters,
-            allowedQueryReservedCharacters: WebsiteBreakageSender.allowedQueryReservedCharacters,
-            headers: [:],
-            timeoutInterval: 60
-        )
+        APIRequest.Headers.setUserAgent("")
+        let configuration = APIRequest.Configuration(url: URL.pixelUrl(forPixelNamed: Pixel.Event.brokenSiteReport.name),
+                                                     queryParameters: parameters,
+                                                     allowedQueryReservedCharacters: WebsiteBreakageSender.allowedQueryReservedCharacters)
+        return configuration.request
     }
 
     func testBrokenSiteReporting() {

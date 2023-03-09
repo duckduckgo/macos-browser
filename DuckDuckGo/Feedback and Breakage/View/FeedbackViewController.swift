@@ -18,6 +18,7 @@
 
 import Cocoa
 import Combine
+import Common
 
 final class FeedbackViewController: NSViewController {
 

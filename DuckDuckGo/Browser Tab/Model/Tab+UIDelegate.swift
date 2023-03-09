@@ -70,12 +70,16 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
                  windowFeatures: WKWindowFeatures,
                  completionHandler: @escaping (WKWebView?) -> Void) {
 
+        let sourceUrl = navigationAction.safeSourceFrame?.safeRequest?.url ?? self.url ?? .empty
         let newWindowPolicy: NavigationDecision? = {
             // Are we handling custom Context Menu navigation action? (see ContextMenuManager)
             if let newWindowPolicy = self.contextMenuManager?.decideNewWindowPolicy(for: navigationAction) {
                 return newWindowPolicy
             }
-
+            // allow popups opened from an empty window console
+            if sourceUrl.isEmpty || sourceUrl.scheme == URL.NavigationalScheme.about.rawValue {
+                return .allow(.tab(selected: true))
+            }
             return nil
         }()
         switch newWindowPolicy {
@@ -102,9 +106,12 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
             break
         }
 
-        // Popup Permission is needed: firing an async PermissionAuthorizationQuery
         let url = navigationAction.request.url
-        let domain = navigationAction.safeSourceFrame?.safeRequest?.url?.host ?? self.url?.host
+        guard let domain = sourceUrl.isFileURL ? .localhost : sourceUrl.host else {
+            completionHandler(nil)
+            return
+        }
+        // Popup Permission is needed: firing an async PermissionAuthorizationQuery
         self.permissions.request([.popups], forDomain: domain, url: url).receive { [weak self] result in
             guard let self, case .success(true) = result else {
                 completionHandler(nil)
@@ -187,12 +194,14 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
                  url: URL,
                  mainFrameURL: URL,
                  decisionHandler: @escaping (Bool) -> Void) {
-        guard let permissions = [PermissionType](devices: devices) else {
+        guard let permissions = [PermissionType](devices: devices),
+              let host = url.isFileURL ? .localhost : url.host,
+              !host.isEmpty else {
             decisionHandler(false)
             return
         }
 
-        self.permissions.permissions(permissions, requestedForDomain: url.host, decisionHandler: decisionHandler)
+        self.permissions.permissions(permissions, requestedForDomain: host, decisionHandler: decisionHandler)
     }
 
     @objc(_webView:mediaCaptureStateDidChange:)
@@ -203,7 +212,9 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
     // https://github.com/WebKit/WebKit/blob/9d7278159234e0bfa3d27909a19e695928f3b31e/Source/WebKit/UIProcess/API/Cocoa/WKUIDelegatePrivate.h#L131
     @objc(_webView:requestGeolocationPermissionForFrame:decisionHandler:)
     func webView(_ webView: WKWebView, requestGeolocationPermissionFor frame: WKFrameInfo, decisionHandler: @escaping (Bool) -> Void) {
-        self.permissions.permissions(.geolocation, requestedForDomain: frame.safeRequest?.url?.host, decisionHandler: decisionHandler)
+        let url = frame.safeRequest?.url ?? .empty
+        let host = url.isFileURL ? .localhost : (url.host ?? "")
+        self.permissions.permissions(.geolocation, requestedForDomain: host, decisionHandler: decisionHandler)
     }
 
     // https://github.com/WebKit/WebKit/blob/9d7278159234e0bfa3d27909a19e695928f3b31e/Source/WebKit/UIProcess/API/Cocoa/WKUIDelegatePrivate.h#L132
@@ -213,7 +224,9 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
                  requestGeolocationPermissionFor origin: WKSecurityOrigin,
                  initiatedBy frame: WKFrameInfo,
                  decisionHandler: @escaping (WKPermissionDecision) -> Void) {
-        self.permissions.permissions(.geolocation, requestedForDomain: frame.safeRequest?.url?.host) { granted in
+        let url = frame.safeRequest?.url ?? .empty
+        let host = url.isFileURL ? .localhost : (url.host ?? "")
+        self.permissions.permissions(.geolocation, requestedForDomain: host) { granted in
             decisionHandler(granted ? .grant : .deny)
         }
     }
@@ -222,7 +235,9 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
         let dialog = UserDialogType.openPanel(.init(parameters) { result in
             completionHandler(try? result.get())
         })
-        userInteractionDialog = UserDialog(sender: .page(domain: frame.safeRequest?.url?.host), dialog: dialog)
+        let url = frame.safeRequest?.url ?? .empty
+        let host = url.isFileURL ? .localhost : (url.host ?? "")
+        userInteractionDialog = UserDialog(sender: .page(domain: host), dialog: dialog)
     }
 
     func webView(_ webView: WKWebView, runJavaScriptAlertPanelWithMessage message: String, initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping () -> Void) {
@@ -279,7 +294,9 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
         )
         let alertQuery = queryCreator(parameters)
         let dialog = UserDialogType.jsDialog(alertQuery)
-        userInteractionDialog = UserDialog(sender: .page(domain: frame.safeRequest?.url?.host), dialog: dialog)
+        let url = frame.safeRequest?.url ?? .empty
+        let host = url.isFileURL ? .localhost : (url.host ?? "")
+        userInteractionDialog = UserDialog(sender: .page(domain: host), dialog: dialog)
     }
 
     func webViewDidClose(_ webView: WKWebView) {

@@ -32,7 +32,7 @@ struct TabExtensionsBuilder: TabExtensionsBuilderProtocol {
 
     static var `default`: TabExtensionsBuilderProtocol {
 #if DEBUG
-        return AppDelegate.isRunningTests ? TestTabExtensionsBuilder.shared : TabExtensionsBuilder()
+        return NSApp.isRunningUnitTests ? TestTabExtensionsBuilder.shared : TabExtensionsBuilder()
 #else
         return TabExtensionsBuilder()
 #endif
@@ -156,7 +156,7 @@ struct TabExtensionBuildingBlock<T> {
     }
 
     init<Extension: TabExtension>(_ makeTabExtension: @escaping () -> Extension) where Extension.PublicProtocol == T {
-        if AppDelegate.isRunningTests {
+        if NSApp.isRunningUnitTests {
             state = .lazy(.init(makeTabExtension))
         } else {
             state = .loaded(makeTabExtension().getPublicProtocol())
@@ -232,7 +232,7 @@ struct TabExtensions {
         let tabExtension = extensions[ObjectIdentifier(T.PublicProtocol.self)]?.getPublicProtocol() as? T.PublicProtocol
         guard isNullable != .nullable else { return tabExtension}
 #if DEBUG
-        assert(AppDelegate.isRunningTests || tabExtension != nil)
+        assert(NSApp.isRunningUnitTests || tabExtension != nil)
 #else
         os_log("%s Tab Extension not initialised for Unit Tests, activate it in TabExtensions.swift", log: .autoconsent, type: .debug, "\(T.self)")
 #endif

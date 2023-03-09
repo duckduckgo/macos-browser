@@ -147,23 +147,3 @@ extension WKWebView {
     }
 
 }
-
-protocol NavigationDownloadPolicy {
-    static var download: Self { get }
-}
-
-extension NavigationActionPolicy: NavigationDownloadPolicy {}
-extension NavigationResponsePolicy: NavigationDownloadPolicy {}
-
-extension NavigationDownloadPolicy {
-
-    static func download(_ url: URL, using webView: WKWebView, with callback: @escaping (WebKitDownload) -> Void) -> Self {
-#if !APPSTORE
-        webView.configuration.processPool
-            .setDownloadDelegateIfNeeded(using: LegacyWebKitDownloadDelegate.init)?
-            .registerDownloadDidStartCallback(callback, for: url)
-#endif
-        return .download
-    }
-
-}
