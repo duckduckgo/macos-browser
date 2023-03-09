@@ -759,7 +759,9 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                         continuation.resume()
                     }, navigationDidFail: { _, _ in
                         continuation.resume()
-                    })
+                    }) ?? {
+                        continuation.resume()
+                    }()
             }
         }
     }
