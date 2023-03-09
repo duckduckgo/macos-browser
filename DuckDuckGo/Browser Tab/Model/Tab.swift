@@ -551,6 +551,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
     @Published private(set) var canGoForward: Bool = false
     @Published private(set) var canGoBack: Bool = false
+    @Published private(set) var canReload: Bool = false
 
     @MainActor(unsafe)
     private func updateCanGoBackForward(withCurrentNavigation currentNavigation: Navigation? = nil) {
@@ -566,12 +567,16 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
         let canGoBack = webView.canGoBack || self.error != nil
         let canGoForward = webView.canGoForward && self.error == nil
+        let canReload = (self.content.urlForWebView?.scheme ?? URL.NavigationalScheme.about.rawValue) != URL.NavigationalScheme.about.rawValue
 
         if canGoBack != self.canGoBack {
             self.canGoBack = canGoBack
         }
         if canGoForward != self.canGoForward {
             self.canGoForward = canGoForward
+        }
+        if canReload != self.canReload {
+            self.canReload = canReload
         }
     }
 

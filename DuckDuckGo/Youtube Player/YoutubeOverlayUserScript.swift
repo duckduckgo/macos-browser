@@ -44,6 +44,10 @@ final class YoutubeOverlayUserScript: NSObject, InteractiveUserScript, UserScrip
 
     /// Values that the Frontend can use to determine the current state.
     public struct UserValues: Codable {
+        enum CodingKeys: String, CodingKey {
+            case duckPlayerMode = "privatePlayerMode"
+            case overlayInteracted
+        }
         let duckPlayerMode: DuckPlayerMode
         let overlayInteracted: Bool
     }

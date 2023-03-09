@@ -42,7 +42,7 @@ extension Tab: NavigationResponder {
         navigationDelegate.setResponders(
             .weak(nullable: self.navigationHotkeyHandler),
 
-                .weak(self),
+            .weak(self),
 
             // Duck Player overlay navigations handling
             .weak(nullable: self.duckPlayer),
@@ -52,9 +52,9 @@ extension Tab: NavigationResponder {
             // tracking link rewrite, referrer trimming, global privacy control
             .weak(nullable: self.navigationProtection),
 
-                .weak(nullable: self.downloads),
+            .weak(nullable: self.downloads),
 
-                .weak(nullable: self.adClickAttribution),
+            .weak(nullable: self.adClickAttribution),
 
             // update blocked trackers info
             .weak(nullable: self.privacyDashboard),

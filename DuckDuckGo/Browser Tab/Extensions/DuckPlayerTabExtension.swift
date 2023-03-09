@@ -158,10 +158,17 @@ extension DuckPlayerTabExtension: NavigationResponder {
             }
         }
 
-        // when in Private Player, don't reload if current URL is a Private Player target URL
+        // when in Private Player, don't directly reload current URL when it‘s a Private Player target URL
         if case .reload = navigationAction.navigationType,
            navigationAction.url.isDuckPlayer {
-            return .cancel
+            guard let mainFrame = navigationAction.mainFrameTarget,
+                  let (videoID, timestamp) = navigationAction.url.youtubeVideoParams else {
+                return .cancel
+            }
+
+            return .redirect(mainFrame) { navigator in
+                navigator.load(URLRequest(url: .duckPlayer(videoID, timestamp: timestamp)))
+            }
         }
 
         // Don't allow loading Private Player HTML directly
