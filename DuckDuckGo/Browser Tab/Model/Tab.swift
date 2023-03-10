@@ -752,8 +752,12 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                content.isUserEnteredUrl {
                 request.attribution = .user
             }
-            await withCheckedContinuation { continuation in
-                webView.navigator(distributedNavigationDelegate: navigationDelegate)
+            await withCheckedContinuation { [weak self] continuation in
+                guard let self else {
+                    continuation.resume()
+                    return
+                }
+                self.webView.navigator(distributedNavigationDelegate: self.navigationDelegate)
                     .load(request, withExpectedNavigationType: content.isUserEnteredUrl ? .custom(.userEnteredUrl) : .other)?
                     .appendResponder(navigationDidFinish: { _ in
                         continuation.resume()
