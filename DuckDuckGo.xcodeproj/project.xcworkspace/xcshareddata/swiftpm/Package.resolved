@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "dominik/ddg-sync",
-        "revision" : "9678f4d333d260e64ee76e4c18dbff91c2453b92"
+        "revision" : "6d0b89aac603db08e4e51acb0a185df8c256b4eb",
+        "version" : "50.0.0"
       }
     },
     {
