@@ -20,7 +20,7 @@ import Foundation
 
 struct NoTargetsFoundError: Error {}
 
-struct ExtraFilesInconsistencyError: Error {
+struct ExtraFilesInconsistencyError: Error, CustomStringConvertible {
     var target: String
     var unexpected: [InputFile]
     var superfluous: [InputFile]
@@ -47,7 +47,7 @@ struct ExtraFilesInconsistencyError: Error {
         self.column = column
     }
 
-    var localizedDescription: String {
+    var description: String {
         var description = [String]()
         if !unexpected.isEmpty {
             let files = unexpected.map(\.fileName).joined(separator: ", ")
@@ -77,12 +77,59 @@ struct ExtraFilesInconsistencyError: Error {
     }
 }
 
+struct FileWithSpaceInPathError: Error, CustomStringConvertible {
+    var filePath: String
+
+    init(filePath: String) {
+        self.filePath = filePath
+    }
+
+    var description: String {
+        (
+            "\(filePath) contains space in its path\n" +
+            String(repeating: " ", count: filePath.utf8CString.firstIndex(of: Int8(Character(" ").asciiValue!)) ?? 0) +
+            "^~~~"
+        )
+    }
+
+}
+
+struct CombinedError: Error, CustomStringConvertible {
+
+    private var errors: [Error]
+
+    init(errors: [Error]) {
+        self.errors = errors.reduce(into: []) { (result, error) in
+            if let combinedError = error as? CombinedError {
+                result.append(contentsOf: combinedError.errors)
+            } else {
+                result.append(error)
+            }
+        }
+    }
+
+    func throwIfNonEmpty() throws {
+        if !errors.isEmpty {
+            throw self
+        }
+    }
+
+    var description: String {
+        if errors.count == 1 {
+            return (errors[0] as CustomStringConvertible).description
+        }
+        return "InputFileChecker Build Step failed with \(errors.count) errors, expand for details:\n" +
+        errors.map { ($0 as CustomStringConvertible).description }.joined(separator: "\n\n")
+    }
+
+}
+
 extension String {
     func formattedForLogBeautifier(
         _ file: StaticString = #file,
         _ line: Int = #line,
         _ column: Int = #column
     ) -> String {
-        return "\(file):\(line):\(column): error: \(self)"
+        return "error: \(self)\n\(file):\(line):\(column)"
     }
 }
