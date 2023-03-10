@@ -205,26 +205,11 @@ final class RecentlyClosedCoordinator: RecentlyClosedCoordinating {
 
     func burnCache(domains: Set<String>? = nil) {
         if let domains = domains {
-            cache.removeAll { (cacheItem) in
-                switch cacheItem {
-                case let tab as RecentlyClosedTab:
-                    return tab.contentContainsDomains(domains)
-                case let window as RecentlyClosedWindow:
-                    window.tabs.removeAll(where: { tab in
-                        tab.contentContainsDomains(domains)
-                    })
-                    if window.tabs.isEmpty { return true }
-                default:
-                    assertionFailure("Unknown type")
-                }
-
-                return false
-            }
+            cache.burn(for: domains)
         } else {
             cache.removeAll()
         }
     }
-
 }
 
 private extension RecentlyClosedTab {
@@ -237,15 +222,6 @@ private extension RecentlyClosedTab {
                   originalTabCollection: originalTabCollection,
                   index: tabIndex)
     }
-
-    func contentContainsDomains(_ domains: Set<String>) -> Bool {
-        if let host = tabContent.url?.host, domains.contains(host) {
-            return true
-        } else {
-            return false
-        }
-    }
-
 }
 
 private extension Tab {
@@ -253,5 +229,4 @@ private extension Tab {
     var isContentEmpty: Bool {
         content == .none || content == .homePage
     }
-
 }

@@ -32,7 +32,7 @@ final class RecentlyClosedTab: RecentlyClosedCacheItem {
     let tabContent: Tab.TabContent
     let favicon: NSImage?
     let title: String?
-    let interactionData: Data?
+    var interactionData: Data?
 
     weak var originalTabCollection: TabCollection?
     let index: TabIndex
