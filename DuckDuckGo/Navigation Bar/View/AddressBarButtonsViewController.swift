@@ -767,14 +767,12 @@ final class AddressBarButtonsViewController: NSViewController {
 
             let isNotSecure = url.scheme == URL.NavigationalScheme.http.rawValue
 
-            let majorTrackerThresholdPrevalence = 25.0
             let parentEntity = ContentBlocking.shared.trackerDataManager.trackerData.findEntity(forHost: host)
-            let isMajorTrackingNetwork = (parentEntity?.prevalence ?? 0.0) >= majorTrackerThresholdPrevalence
 
             let configuration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig
             let isUnprotected = configuration.isUserUnprotected(domain: host)
 
-            let isShieldDotVisible = isNotSecure || isMajorTrackingNetwork || isUnprotected
+            let isShieldDotVisible = isNotSecure || isUnprotected
 
             privacyEntryPointButton.image = isShieldDotVisible ? Self.shieldDotImage : Self.shieldImage
 
