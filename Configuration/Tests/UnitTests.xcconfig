@@ -17,9 +17,9 @@
 
 ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES
 
-INFOPLIST_FILE = Unit Tests/Info.plist
+INFOPLIST_FILE = UnitTests/Info.plist
 PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser.DuckDuckGoTests
 
-SWIFT_OBJC_BRIDGING_HEADER = $(SRCROOT)/Unit Tests/Common/TestsBridging.h
+SWIFT_OBJC_BRIDGING_HEADER = $(SRCROOT)/UnitTests/Common/TestsBridging.h
 
 TEST_HOST=$(BUILT_PRODUCTS_DIR)/DuckDuckGo.app/Contents/MacOS/DuckDuckGo

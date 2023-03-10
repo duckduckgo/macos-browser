@@ -1,4 +1,7 @@
-//  Copyright © 2022 DuckDuckGo. All rights reserved.
+//
+//  DownloadsWebViewMock.h
+//
+//  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -13,11 +16,10 @@
 //  limitations under the License.
 //
 
-#include "TestsTargetsBase.xcconfig"
+#import <WebKit/WebKit.h>
 
-MACOSX_DEPLOYMENT_TARGET = 11.1
+@interface DownloadsWebViewMock : WKWebView
+@property (nonatomic, copy, nullable) id _Nullable  (^startDownloadBlock)(NSURLRequest * _Nullable);
+@property (nonatomic, copy, nullable) id _Nullable  (^resumeDownloadBlock)(NSData * _Nullable);
+@end
 
-INFOPLIST_FILE = IntegrationTests/Info.plist
-PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.Integration-Tests
-
-TEST_HOST=$(BUILT_PRODUCTS_DIR)/DuckDuckGo.app/Contents/MacOS/DuckDuckGo

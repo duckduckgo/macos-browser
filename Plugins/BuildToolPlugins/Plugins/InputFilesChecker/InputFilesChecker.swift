@@ -100,9 +100,15 @@ struct TargetSourcesChecker: BuildToolPlugin, XcodeBuildToolPlugin {
             throw NoTargetsFoundError()
         }
 
-        try check(appTargets)
-        try check(unitTestsTargets)
-        try check(integrationTestsTargets)
+        var errors = [Error]()
+        for targets in [appTargets, unitTestsTargets, integrationTestsTargets] {
+            do {
+                try check(targets)
+            } catch {
+                errors.append(error)
+            }
+        }
+        try CombinedError(errors: errors).throwIfNonEmpty()
 
         return []
     }
@@ -115,6 +121,13 @@ struct TargetSourcesChecker: BuildToolPlugin, XcodeBuildToolPlugin {
         var commonInputFiles: Set<InputFile> = Set(targets[0].inputFiles.map(InputFile.init))
         for target in targets.dropFirst() {
             commonInputFiles.formIntersection(target.inputFiles.map(InputFile.init))
+        }
+
+        var errors = [Error]()
+
+        let filesWithSpaceInPath = targets[0].inputFiles.filter { $0.path.string.firstIndex(of: " ") != nil }
+        if !filesWithSpaceInPath.isEmpty {
+            errors.append(contentsOf: filesWithSpaceInPath.map(\.path.string).sorted().map(FileWithSpaceInPathError.init))
         }
 
         for target in targets {
@@ -132,9 +145,11 @@ struct TargetSourcesChecker: BuildToolPlugin, XcodeBuildToolPlugin {
                     unrelated: unrelatedFiles
                 )
                 print(error.localizedDescription)
-                throw error
+                errors.append(error)
             }
         }
+
+        try CombinedError(errors: errors).throwIfNonEmpty()
     }
 }
 
