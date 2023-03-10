@@ -7,7 +7,7 @@ CONFIG_URL="https://staticcdn.duckduckgo.com/trackerblocking/config/v2/macos-con
 
 # If -c is passed, then check the URLs in the Configuration files are correct.
 if [ "$1" == "-c" ]; then
-	grep http DuckDuckGo/App\ Delegate/AppConfigurationURLProvider.swift | while read -r line
+	grep http DuckDuckGo/AppDelegate/AppConfigurationURLProvider.swift | while read -r line
 	do
 		# if trimmed line begins with "case" then check the url in the line and ensure
 		# it matches the expected url.
@@ -80,8 +80,8 @@ performUpdate() {
 }
 
 performUpdate $TDS_URL \
-		"${PWD}/DuckDuckGo/Content Blocker/AppTrackerDataSetProvider.swift" \
-		"${PWD}/DuckDuckGo/Content Blocker/trackerData.json"
+		"${PWD}/DuckDuckGo/ContentBlocker/AppTrackerDataSetProvider.swift" \
+		"${PWD}/DuckDuckGo/ContentBlocker/trackerData.json"
 performUpdate $CONFIG_URL \
-		"${PWD}/DuckDuckGo/Content Blocker/AppPrivacyConfigurationDataProvider.swift" \
-		"${PWD}/DuckDuckGo/Content Blocker/macos-config.json"
+		"${PWD}/DuckDuckGo/ContentBlocker/AppPrivacyConfigurationDataProvider.swift" \
+		"${PWD}/DuckDuckGo/ContentBlocker/macos-config.json"
