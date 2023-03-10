@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1677839118579,
+    "version": 1678356649940,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -186,6 +186,25 @@
             "state": "enabled",
             "hash": "59c4bd9b8cee343c81da98bfe5d77928"
         },
+        "clickToLoad": {
+            "exceptions": [],
+            "settings": {
+                "Facebook, Inc.": {
+                    "ruleActions": [
+                        "block-ctl-fb"
+                    ],
+                    "state": "disabled"
+                },
+                "Youtube": {
+                    "ruleActions": [
+                        "block-ctl-yt"
+                    ],
+                    "state": "disabled"
+                }
+            },
+            "state": "disabled",
+            "hash": "be4a32a8303eb523dbc0efe89deaa34d"
+        },
         "clickToPlay": {
             "exceptions": [],
             "settings": {
@@ -253,10 +272,6 @@
                 {
                     "domain": "tvlistings.zap2it.com",
                     "reason": "main content hidden"
-                },
-                {
-                    "domain": "mangaread.org",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/592"
                 },
                 {
                     "domain": "manhwascan.net",
@@ -681,6 +696,15 @@
                             {
                                 "selector": "[data-block-name='ads']",
                                 "type": "closest-empty"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "dallasnews.com",
+                        "rules": [
+                            {
+                                "selector": "[data-targeting]",
+                                "type": "hide-empty"
                             }
                         ]
                     },
@@ -1300,7 +1324,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "24110634584de7ef9cabb3e26b25fc56"
+            "hash": "2aa9c39f3a7547e3e1b4452165b3a643"
         },
         "fingerprintingAudio": {
             "state": "disabled",
@@ -1342,6 +1366,10 @@
                     "reason": "When creating an account, after filling out details and going to e-mail confirmation, there is an error 'Something went wrong', and the e-mail may not be received. Clicking 'Send new code' appears successful, but after entering the code there is often another account creation error."
                 },
                 {
+                    "domain": "manulife.ca",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/499"
+                },
+                {
                     "domain": "northernrailway.co.uk",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/350"
                 },
@@ -1359,7 +1387,7 @@
                 }
             ],
             "state": "enabled",
-            "hash": "6c686d0cfa0451c69db18621438b1b0a"
+            "hash": "d748016ca8d0cfcb1b86ff428b4e4e46"
         },
         "fingerprintingHardware": {
             "settings": {
@@ -1541,6 +1569,12 @@
                 "elementRemovalTimeout": 1000,
                 "domains": [
                     {
+                        "domain": "bbc.co.uk"
+                    },
+                    {
+                        "domain": "cnn.com"
+                    },
+                    {
                         "domain": "preactjs.com"
                     },
                     {
@@ -1555,7 +1589,7 @@
                 ],
                 "stackDomains": []
             },
-            "hash": "32be9e17c1e346de2f37bed896eb0231"
+            "hash": "61745729a56f4733364f9987f2b29e3e"
         },
         "serviceworkerInitiatedRequests": {
             "exceptions": [],
@@ -2100,6 +2134,7 @@
                                 "rule": "cdn.dynamicyield.com/api/",
                                 "domains": [
                                     "brooklinen.com",
+                                    "carters.com",
                                     "seatosummit.com"
                                 ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/535"
@@ -2129,6 +2164,17 @@
                                     "nintendo.com"
                                 ],
                                 "reason": "CNAME version of nintendo.com exception"
+                            }
+                        ]
+                    },
+                    "edgesuite.net": {
+                        "rules": [
+                            {
+                                "rule": "sky.com.edgesuite.net/assets/sky_common.js",
+                                "domains": [
+                                    "sky.com"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/342"
                             }
                         ]
                     },
@@ -3056,17 +3102,6 @@
                                     "<all>"
                                 ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/712"
-                            }
-                        ]
-                    },
-                    "sky.com": {
-                        "rules": [
-                            {
-                                "rule": "accounts.sky.com/assets/sky_common.js",
-                                "domains": [
-                                    "sky.com"
-                                ],
-                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/342"
                             }
                         ]
                     },
@@ -4051,6 +4086,24 @@
                                     "aliexpress.us"
                                 ],
                                 "reason": "CNAME ENTRY GENERATED FROM: alicdn.com.edgekey.net"
+                            }
+                        ]
+                    },
+                    "sky.com": {
+                        "rules": [
+                            {
+                                "rule": "accounts.sky.com/assets/sky_common.js",
+                                "domains": [
+                                    "sky.com"
+                                ],
+                                "reason": "CNAME ENTRY GENERATED FROM: sky.com.edgesuite.net"
+                            },
+                            {
+                                "rule": "skyid.sky.com/assets/sky_common.js",
+                                "domains": [
+                                    "sky.com"
+                                ],
+                                "reason": "CNAME ENTRY GENERATED FROM: sky.com.edgesuite.net"
                             }
                         ]
                     },
@@ -5044,7 +5097,7 @@
                 }
             },
             "exceptions": [],
-            "hash": "5ddc69b8fa4a3f7190153e1f5af16554"
+            "hash": "9d83e1d99351e220b89c35a0ba216bc6"
         },
         "trackingCookies1p": {
             "settings": {
