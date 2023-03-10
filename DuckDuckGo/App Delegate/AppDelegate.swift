@@ -186,7 +186,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     // MARK: - Network Protection
 
     /// Fetches a new list of Network Protection servers, and updates the existing set.
-    /// The app will treat this new list as the source of truth – any servers which are cached locally that are not in this new list will be removed from the cache.
     private func refreshNetworkProtectionServers() {
         Task {
             let client = NetworkProtectionBackendClient()

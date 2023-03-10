@@ -246,18 +246,20 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
     private func generateTunnelConfiguration(serverSelectionMethod: NetworkProtectionServerSelectionMethod) async throws -> TunnelConfiguration {
 
         os_log("🔵 serverSelectionMethod %{public}@", String(describing: serverSelectionMethod))
-        
+
         let configurationResult: (TunnelConfiguration, NetworkProtectionServerInfo)
-        
+
         do {
-            let deviceManager = NetworkProtectionDeviceManager(keyStore: NetworkProtectionKeychainStore(useSystemKeychain: NetworkProtectionBundle.usesSystemKeychain()),
-                                                               errorEvents: Self.networkProtectionDebugEvents)
+            let keyStore = NetworkProtectionKeychainStore(useSystemKeychain: NetworkProtectionBundle.usesSystemKeychain(),
+                                                          errorEvents: networkProtectionDebugEvents)
+            let deviceManager = NetworkProtectionDeviceManager(keyStore: keyStore,
+                                                               errorEvents: networkProtectionDebugEvents)
 
             configurationResult = try await deviceManager.generateTunnelConfiguration(selectionMethod: serverSelectionMethod)
         } catch {
             throw TunnelError.couldNotGenerateTunnelConfiguration(internalError: error)
         }
-        
+
         let selectedServerInfo = configurationResult.1
         self.lastSelectedServerInfo = selectedServerInfo
 
@@ -411,9 +413,18 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
 
     // MARK: - Error Reporting
 
-    static let networkProtectionDebugEvents: EventMapping<NetworkProtectionError>? = .init { event, _, _, _ in
+    private lazy var networkProtectionDebugEvents: EventMapping<NetworkProtectionError>? = .init { event, _, _, _ in
         let domainEvent: NetworkProtectionPixelEvent
-        os_log("🔴 Start", log: .networkProtection, type: .info)
+
+#if DEBUG
+        // Makes sure we see the assertion failure in the yellow NetP alert.
+        self.controllerErrorStore.lastErrorMessage = "[Debug] Error event: \(event.localizedDescription)"
+
+        guard !event.asserts else {
+            assertionFailure(event.localizedDescription)
+            return
+        }
+#endif
 
         switch event {
         case .noServerRegistrationInfo:
@@ -441,6 +452,8 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
             // - TODO: not sure what to do here
             return
 
+        // NetworkProtectionServerListStoreError
+            
         case .failedToEncodeServerList:
             domainEvent = .networkProtectionServerListStoreFailedToEncodeServerList
         case .failedToWriteServerList(let eventError):
