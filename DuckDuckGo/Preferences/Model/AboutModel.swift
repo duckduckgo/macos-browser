@@ -17,6 +17,7 @@
 //
 
 import SwiftUI
+import Common
 
 final class AboutModel: ObservableObject {
     let appVersion = AppVersion()
