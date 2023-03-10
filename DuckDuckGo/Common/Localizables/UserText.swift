@@ -28,6 +28,9 @@ struct UserText {
     static let notNow = NSLocalizedString("notnow", value: "Not Now", comment: "Not Now button")
     static let open = NSLocalizedString("open", value: "Open", comment: "Open button")
     static let save = NSLocalizedString("save", value: "Save", comment: "Save button")
+    static let copy = NSLocalizedString("copy", value: "Copy", comment: "Copy button")
+    static let submit = NSLocalizedString("submit", value: "Submit", comment: "Submit button")
+    static let pasteFromClipboard = NSLocalizedString("paste-from-clipboard", value: "Paste from Clipboard", comment: "Paste button")
     static let edit = NSLocalizedString("edit", value: "Edit", comment: "Edit button")
     static let copySelection = NSLocalizedString("copy-selection", value: "Copy", comment: "Copy selection menu item")
     static let deleteBookmark = NSLocalizedString("delete-bookmark", value: "Delete Bookmark", comment: "Delete Bookmark button")
@@ -264,6 +267,7 @@ struct UserText {
     static let settings = NSLocalizedString("settings", value: "Settings", comment: "Menu item for opening settings")
 
     static let general = NSLocalizedString("preferences.general", value: "General", comment: "Show general preferences")
+    static let sync = NSLocalizedString("preferences.sync", value: "Sync", comment: "Show sync preferences")
     static let defaultBrowser = NSLocalizedString("preferences.default-browser", value: "Default Browser", comment: "Show default browser preferences")
     static let appearance = NSLocalizedString("preferences.appearance", value: "Appearance", comment: "Show appearance preferences")
     static let privacy = NSLocalizedString("preferences.privacy", value: "Privacy", comment: "Show privacy browser preferences")

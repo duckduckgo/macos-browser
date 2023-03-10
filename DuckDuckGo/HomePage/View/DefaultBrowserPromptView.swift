@@ -17,6 +17,7 @@
 //
 
 import SwiftUI
+import SwiftUIExtensions
 
 struct DefaultBrowserPrompt: View {
 

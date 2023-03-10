@@ -17,6 +17,7 @@
 //
 
 import SwiftUI
+import SwiftUIExtensions
 
 extension Preferences {
 
@@ -87,14 +88,14 @@ extension Preferences {
                 Text(UserText.appearance)
                     .font(Const.Fonts.preferencePaneTitle)
 
-                Section {
+                PreferencePaneSection {
                     Text(UserText.theme)
                         .font(Const.Fonts.preferencePaneSectionHeader)
                     ThemePicker()
                         .environmentObject(model)
                 }
 
-                Section {
+                PreferencePaneSection {
                     Text(UserText.addressBar)
                         .font(Const.Fonts.preferencePaneSectionHeader)
                     Toggle(UserText.showFullWebsiteAddress, isOn: $model.showFullURL)
