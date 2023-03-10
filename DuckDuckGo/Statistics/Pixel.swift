@@ -18,6 +18,8 @@
 
 import Foundation
 import os.log
+import Networking
+import Common
 
 final class Pixel {
 
@@ -41,7 +43,7 @@ final class Pixel {
               withAdditionalParameters params: [String: String]? = nil,
               allowedQueryReservedCharacters: CharacterSet? = nil,
               includeAppVersionParameter: Bool = true,
-              withHeaders headers: HTTPHeaders = APIHeaders().defaultHeaders,
+              withHeaders headers: HTTPHeaders = APIRequest.Headers().default,
               onComplete: @escaping (Error?) -> Void = {_ in }) {
 
         var newParams = params ?? [:]
@@ -53,7 +55,7 @@ final class Pixel {
         #endif
 
         var headers = headers
-        headers[APIHeaders.Name.moreInfo] = "See " + URL.duckDuckGoMorePrivacyInfo.absoluteString
+        headers[APIRequest.HTTPHeaderField.moreInfo] = "See " + URL.duckDuckGoMorePrivacyInfo.absoluteString
 
         guard !dryRun else {
             let params = params?.filter { key, _ in !["appVersion", "test"].contains(key) } ?? [:]
@@ -66,14 +68,12 @@ final class Pixel {
             return
         }
 
-        let url = URL.pixelUrl(forPixelNamed: pixelName)
-        APIRequest.request(
-            url: url,
-            parameters: newParams,
-            allowedQueryReservedCharacters: allowedQueryReservedCharacters,
-            headers: headers,
-            callBackOnMainThread: true
-        ) { (_, error) in
+        let configuration = APIRequest.Configuration(url: URL.pixelUrl(forPixelNamed: pixelName),
+                                                     queryParameters: newParams,
+                                                     allowedQueryReservedCharacters: allowedQueryReservedCharacters,
+                                                     headers: headers)
+        let request = APIRequest(configuration: configuration, urlSession: URLSession.session(useMainThreadCallbackQueue: true))
+        request.fetch { (_, error) in
             onComplete(error)
         }
     }
