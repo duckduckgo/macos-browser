@@ -18,6 +18,7 @@
 
 #import "BWEncryption.h"
 #import "os/log.h"
+#import "DuckDuckGo_Privacy_Browser-Swift.h"
 
 #define KEY_LENGTH      2048
 #define PUB_EXP         65537
@@ -147,10 +148,7 @@
     NSData *hmacData = [self computeHmac:encryptedData iv:ivData];
 
     // Wrap into EncryptionOutput structure
-    BWEncryptionOutput *encryptionOutputObject = [[BWEncryptionOutput alloc] init];
-    encryptionOutputObject.iv = ivData;
-    encryptionOutputObject.data = encryptedData;
-    encryptionOutputObject.hmac = hmacData;
+    BWEncryptionOutput *encryptionOutputObject = [[BWEncryptionOutput alloc] initWithIV:ivData data:encryptedData hmac:hmacData];
     return encryptionOutputObject;
 }
 
