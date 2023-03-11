@@ -19,7 +19,7 @@
 import BrowserServicesKit
 
 extension HTTPSBloomFilterSpecification {
-   
+
     static func copy(storedSpecification specification: HTTPSStoredBloomFilterSpecification?) -> HTTPSBloomFilterSpecification? {
         guard let specification = specification else { return nil }
         return HTTPSBloomFilterSpecification(bitCount: Int(specification.bitCount),
@@ -27,5 +27,5 @@ extension HTTPSBloomFilterSpecification {
                                              totalEntries: Int(specification.totalEntries),
                                              sha256: specification.sha256!)
     }
-    
+
 }

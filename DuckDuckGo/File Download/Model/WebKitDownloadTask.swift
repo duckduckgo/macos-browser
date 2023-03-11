@@ -292,3 +292,22 @@ extension WebKitDownloadTask: WebKitDownloadDelegate {
     }
 
 }
+
+extension WebKitDownloadTask {
+
+    var didChooseDownloadLocationPublisher: AnyPublisher<URL, FileDownloadError> {
+        Publishers.Merge(
+            $location
+            // waiting for the download location to be chosen
+                .compactMap { $0.destinationURL }
+                .mapError { (_: Never) -> FileDownloadError in }
+                .eraseToAnyPublisher(),
+            // downloadTask.output Publisher will complete with an error if cancelled
+            output.eraseToAnyPublisher()
+        )
+        // complete the Publisher when the location is chosen
+        .first()
+        .eraseToAnyPublisher()
+    }
+
+}

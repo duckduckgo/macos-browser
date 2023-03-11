@@ -27,5 +27,5 @@ extension String {
             .map { $0.idnaEncoded ?? $0 }
             .joined(separator: ".")
     }
-    
+
 }

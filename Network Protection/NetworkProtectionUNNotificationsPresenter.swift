@@ -28,47 +28,47 @@ final class NetworkProtectionUNNotificationsPresenter: NSObject, NetworkProtecti
     private static let threadIdentifier = "com.duckduckgo.NetworkProtectionNotificationsManager.threadIdentifier"
 
     private let userNotificationCenter: UNUserNotificationCenter
-    
+
     private let appLauncher = NetworkProtectionAppLauncher()
-    
+
     init(userNotificationCenter: UNUserNotificationCenter = .current()) {
-        
+
         self.userNotificationCenter = userNotificationCenter
-        
+
         super.init()
     }
-    
+
     // MARK: - Setup
-    
+
     func requestAuthorization() {
         userNotificationCenter.delegate = self
         requestAlertAuthorization()
     }
-    
+
     // MARK: - Notification Utility methods
-    
+
     private func requestAlertAuthorization(completionHandler: ((Bool) -> Void)? = nil) {
         let options: UNAuthorizationOptions = .alert
-        
+
         userNotificationCenter.requestAuthorization(options: options) { authorized, _ in
             completionHandler?(authorized)
         }
     }
-    
+
     private func notificationContent(title: String, subtitle: String) -> UNNotificationContent {
         let content = UNMutableNotificationContent()
         content.threadIdentifier = Self.threadIdentifier
         content.title = title
         content.subtitle = subtitle
-        
+
         if #available(macOS 12, *) {
             content.interruptionLevel = .timeSensitive
             content.relevanceScore = 0
         }
-        
+
         return content
     }
-    
+
     // MARK: - Presenting user notifications
 
     func showReconnectedNotification() {
@@ -91,7 +91,7 @@ final class NetworkProtectionUNNotificationsPresenter: NSObject, NetworkProtecti
 
     private func showNotification(_ content: UNNotificationContent) {
         let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: .none)
-        
+
         requestAlertAuthorization { authorized in
             guard authorized else {
                 return
@@ -105,15 +105,15 @@ final class NetworkProtectionUNNotificationsPresenter: NSObject, NetworkProtecti
 extension NetworkProtectionUNNotificationsPresenter: UNUserNotificationCenterDelegate {
 
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification) async -> UNNotificationPresentationOptions {
-        
+
         if #available(macOS 11, *) {
             return .banner
         } else {
             return .alert
         }
     }
-    
-    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse) async {            
+
+    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse) async {
         appLauncher.showNetPStatusInApp()
     }
 }

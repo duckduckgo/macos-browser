@@ -21,8 +21,11 @@ import Combine
 import os.log
 import BrowserServicesKit
 import Persistence
-import NetworkProtection
 import ServiceManagement
+
+#if NETP
+import NetworkProtection
+#endif
 
 @NSApplicationMain
 final class AppDelegate: NSObject, NSApplicationDelegate {
@@ -49,14 +52,23 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private let keyStore = EncryptionKeyStore()
     private var fileStore: FileStore!
+
     private(set) var stateRestorationManager: AppStateRestorationManager!
     private var grammarFeaturesManager = GrammarFeaturesManager()
     private let crashReporter = CrashReporter()
-    let updateController = UpdateController()
+    private(set) var internalUserDecider: InternalUserDeciding!
+    private var appIconChanger: AppIconChanger!
+
+#if NETP
     private var networkProtectionMenu = NetworkProtectionStatusBarMenu()
+#endif
+
+#if !APPSTORE
+    var updateController: UpdateController!
+#endif
 
     var appUsageActivityMonitor: AppUsageActivityMonitor?
-    
+
     func applicationWillFinishLaunching(_ notification: Notification) {
         if !Self.isRunningTests {
 #if DEBUG
@@ -102,7 +114,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             fileStore = EncryptedFileStore()
         }
         stateRestorationManager = AppStateRestorationManager(fileStore: fileStore)
+
+        let internalUserDeciderStore = InternalUserDeciderStore(fileStore: fileStore)
+        internalUserDecider = InternalUserDecider(store: internalUserDeciderStore)
+
+#if !APPSTORE
+        updateController = UpdateController(internalUserDecider: internalUserDecider)
         stateRestorationManager.subscribeToAutomaticAppRelaunching(using: updateController.willRelaunchAppPublisher)
+#endif
+
+        appIconChanger = AppIconChanger(internalUserDecider: internalUserDecider)
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
@@ -139,13 +160,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         urlEventHandler.applicationDidFinishLaunching()
 
+        subscribeToEmailProtectionStatusNotifications()
+
         UserDefaultsWrapper<Any>.clearRemovedKeys()
 
+#if NETP
         refreshNetworkProtectionServers()
-
         warnUserAboutApplicationPathForNetworkProtection()
-        
         networkProtectionMenu.show()
+#endif
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
@@ -185,6 +208,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     // MARK: - Network Protection
 
+#if NETP
     /// Fetches a new list of Network Protection servers, and updates the existing set.
     private func refreshNetworkProtectionServers() {
         Task {
@@ -219,6 +243,27 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
         #endif
     }
+#endif
+
+    private func subscribeToEmailProtectionStatusNotifications() {
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(emailDidSignInNotification(_:)),
+                                               name: .emailDidSignIn,
+                                               object: nil)
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(emailDidSignOutNotification(_:)),
+                                               name: .emailDidSignOut,
+                                               object: nil)
+    }
+
+    @objc private func emailDidSignInNotification(_ notification: Notification) {
+        Pixel.fire(.emailEnabled)
+    }
+
+    @objc private func emailDidSignOutNotification(_ notification: Notification) {
+        Pixel.fire(.emailDisabled)
+    }
+
 }
 
 extension AppDelegate: AppUsageActivityMonitorDelegate {

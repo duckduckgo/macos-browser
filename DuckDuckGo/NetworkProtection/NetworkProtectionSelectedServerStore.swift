@@ -42,7 +42,7 @@ final class NetworkProtectionSelectedServerUserDefaultsStore: NetworkProtectionS
     private enum Constants {
         static let selectedServerKey = "network-protection.selected-server-endpoint"
     }
-    
+
     // MARK: - Server selection
 
     /// Returns the server endpoint selected by the user. The default value is `automatic`.

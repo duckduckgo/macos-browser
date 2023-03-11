@@ -20,50 +20,50 @@ import Foundation
 import Combine
 
 final class NetworkProtectionIconPublisher {
-    
+
     @Published
     var icon: NetworkProtectionAsset = .vpnDisabledIcon
-    
+
     // MARK: - Connection Issues
-    
+
     private let statusReporter: NetworkProtectionStatusReporter
-    
+
     // MARK: - Subscriptions
-    
+
     private var statusChangeCancellable: AnyCancellable?
     private var connectivityIssuesCancellable: AnyCancellable?
-    
+
     init(statusReporter: NetworkProtectionStatusReporter = DefaultNetworkProtectionStatusReporter()) {
         self.statusReporter = statusReporter
-        
+
         updateMenuIcon()
         subscribeToConnectionStatusChanges()
         subscribeToConnectionIssues()
     }
-    
+
     // MARK: - Subscribing to NetP updates
-    
+
     private func subscribeToConnectionStatusChanges() {
         statusChangeCancellable = statusReporter.statusChangePublisher.sink { [weak self] _ in
             self?.updateMenuIcon()
         }
     }
-    
+
     private func subscribeToConnectionIssues() {
         connectivityIssuesCancellable = statusReporter.connectivityIssuesPublisher.sink { [weak self] _ in
             self?.updateMenuIcon()
         }
     }
-    
+
     // MARK: - Menu Icon logic
-    
+
     /// Resolves the correct icon to show, based on the current NetP status.
     ///
     private func menuIcon() -> NetworkProtectionAsset {
         guard !statusReporter.connectivityIssuesPublisher.value else {
             return .vpnIssueIcon
         }
-        
+
         switch statusReporter.statusChangePublisher.value {
         case .connected:
             return .vpnIcon
@@ -71,7 +71,7 @@ final class NetworkProtectionIconPublisher {
             return .vpnDisabledIcon
         }
     }
-    
+
     /// Updates the icon to the correct one based on NetP's status.
     ///
     private func updateMenuIcon() {

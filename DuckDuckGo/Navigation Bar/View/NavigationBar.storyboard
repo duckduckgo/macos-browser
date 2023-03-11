@@ -99,7 +99,7 @@
                                             </userDefinedRuntimeAttribute>
                                         </userDefinedRuntimeAttributes>
                                         <connections>
-                                            <action selector="refreshAction:" target="o2v-eH-jTI" id="fvt-FO-lLj"/>
+                                            <action selector="refreshOrStopAction:" target="o2v-eH-jTI" id="r58-Y3-DNb"/>
                                         </connections>
                                     </button>
                                 </subviews>
@@ -336,7 +336,7 @@
                         <outlet property="networkProtectionButton" destination="iKf-yR-au9" id="HWJ-gT-EXa"/>
                         <outlet property="optionsButton" destination="iIF-Ky-unr" id="vvZ-mm-idv"/>
                         <outlet property="passwordManagementButton" destination="1nW-I1-nut" id="wDs-oE-b7d"/>
-                        <outlet property="refreshButton" destination="B2U-XM-Vo0" id="BUY-sH-cf0"/>
+                        <outlet property="refreshOrStopButton" destination="B2U-XM-Vo0" id="EaI-Kz-Qwi"/>
                     </connections>
                 </viewController>
                 <customObject id="wkT-Td-n7D" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
@@ -557,11 +557,11 @@
                                     <constraint firstAttribute="width" constant="100" id="CQO-D3-iVT"/>
                                 </constraints>
                             </customView>
-                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="1qw-sL-vFK" userLabel="NotificationAnimationView" customClass="NavigationBarBadgeAnimationView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="2" y="3" width="150" height="28"/>
+                            <customView placeholderIntrinsicWidth="50" placeholderIntrinsicHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="1qw-sL-vFK" userLabel="NotificationAnimationView" customClass="NavigationBarBadgeAnimationView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                <rect key="frame" x="2" y="3" width="50" height="28"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="28" id="KJD-Tz-wTu"/>
-                                    <constraint firstAttribute="width" constant="150" id="bfq-Cs-mcP"/>
+                                    <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="50" id="bfq-Cs-mcP"/>
                                 </constraints>
                             </customView>
                             <button hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="taC-vG-1fV" customClass="AddressBarButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">

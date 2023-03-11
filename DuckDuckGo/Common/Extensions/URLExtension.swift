@@ -32,7 +32,30 @@ extension URL {
 
     // MARK: - Local
 
+    /**
+     * Returns a URL pointing to `${HOME}/Library`, regardless of whether the app is sandboxed or not.
+     */
+    static var nonSandboxLibraryDirectoryURL: URL {
+        guard NSApp.isSandboxed else {
+            return FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask).first!
+        }
+        return FileManager.default.homeDirectoryForCurrentUser.deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+    }
+
+    /**
+     * Returns a URL pointing to `${HOME}/Library/Application Support`, regardless of whether the app is sandboxed or not.
+     */
+    static var nonSandboxApplicationSupportDirectoryURL: URL {
+        guard NSApp.isSandboxed else {
+            return FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
+        }
+        return nonSandboxLibraryDirectoryURL.appendingPathComponent("Application Support")
+    }
+
     static var sandboxApplicationSupportURL: URL {
+        if NSApp.isSandboxed {
+            return FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
+        }
         let sandboxPathComponent = "Containers/\(Bundle.main.bundleIdentifier!)/Data/Library/Application Support/"
         let libraryURL = FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask).first!
         return libraryURL.appendingPathComponent(sandboxPathComponent)
@@ -71,7 +94,13 @@ extension URL {
     }
 
     static func makeURL(fromSuggestionPhrase phrase: String) -> URL? {
-        guard let url = URL(trimmedAddressBarString: phrase), url.isValid else { return nil }
+        guard let url = URL(trimmedAddressBarString: phrase),
+              let scheme = url.scheme.map(NavigationalScheme.init),
+              NavigationalScheme.hypertextSchemes.contains(scheme),
+              url.isValid else {
+            return nil
+        }
+
         return url
     }
 
@@ -95,6 +124,18 @@ extension URL {
         return Self.preferences.appendingPathComponent(pane.rawValue)
     }
 
+    // MARK: Pixel
+
+    static let pixelBase = ProcessInfo.processInfo.environment["PIXEL_BASE_URL", default: "https://improving.duckduckgo.com"]
+
+    static func pixelUrl(forPixelNamed pixelName: String) -> URL {
+        let urlString = "\(Self.pixelBase)/t/\(pixelName)"
+        let url = URL(string: urlString)!
+        // url = url.addParameter(name: \"atb\", value: statisticsStore.atbWithVariant ?? \"\")")
+        // https://app.asana.com/0/1177771139624306/1199951074455863/f
+        return url
+    }
+
     // MARK: ATB
 
     static var devMode: String {
@@ -112,11 +153,12 @@ extension URL {
         return URL(string: Self.atb)!
     }
 
-    static func searchAtb(atbWithVariant: String, setAtb: String) -> URL {
+    static func searchAtb(atbWithVariant: String, setAtb: String, isSignedIntoEmailProtection: Bool) -> URL {
         return Self.initialAtb
             .appendingParameters([
                 DuckDuckGoParameters.ATB.atb: atbWithVariant,
-                DuckDuckGoParameters.ATB.setAtb: setAtb
+                DuckDuckGoParameters.ATB.setAtb: setAtb,
+                DuckDuckGoParameters.ATB.email: isSignedIntoEmailProtection ? "1" : "0"
             ])
     }
 
@@ -261,6 +303,8 @@ extension URL {
 
     static var duckDuckGoEmail = URL(string: "https://duckduckgo.com/email-protection")!
 
+    static var duckDuckGoMorePrivacyInfo = URL(string: "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/atb/")!
+
     var isDuckDuckGo: Bool {
         absoluteString.starts(with: Self.duckDuckGo.absoluteString)
     }
@@ -282,6 +326,7 @@ extension URL {
             static let atb = "atb"
             static let setAtb = "set_atb"
             static let activityType = "at"
+            static let email = "email"
 
             static let appUsageValue = "app_use"
         }

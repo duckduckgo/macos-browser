@@ -63,5 +63,5 @@ final class GradientView: NSView {
     private func setupView() {
         self.wantsLayer = true
     }
-    
+
 }

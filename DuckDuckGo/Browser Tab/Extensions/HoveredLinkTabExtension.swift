@@ -44,7 +44,7 @@ protocol HoveredLinksProtocol {
 
 extension HoveredLinkTabExtension: HoveredLinksProtocol {
     func getPublicProtocol() -> HoveredLinksProtocol { self }
-    
+
     var hoveredLinkPublisher: AnyPublisher<URL?, Never> {
         hoveredLinkSubject.eraseToAnyPublisher()
     }

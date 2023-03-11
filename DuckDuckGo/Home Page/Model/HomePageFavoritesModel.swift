@@ -61,7 +61,7 @@ extension HomePage.Models {
                 let lastRowCount = favorites.count % HomePage.favoritesPerRow
                 let missing = lastRowCount > 0 ? HomePage.favoritesPerRow - lastRowCount : 0
 
-                (0 ..< missing).forEach { _ in 
+                (0 ..< missing).forEach { _ in
                     favorites.append(FavoriteModel(id: UUID(), favoriteType: .ghostButton))
                 }
 
@@ -77,7 +77,6 @@ extension HomePage.Models {
 
         @Published private(set) var visibleModels: [FavoriteModel] = []
 
-        @available(macOS, obsoleted: 12.0, message: "Use visibleModels and LazyVGrid instead")
         @Published private(set) var rows: [[FavoriteModel]] = []
 
         let open: (Bookmark, OpenTarget) -> Void
@@ -129,5 +128,5 @@ extension HomePage.Models {
             }
         }
     }
-    
+
 }

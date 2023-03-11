@@ -39,7 +39,7 @@ final class NetworkProtectionTunnelErrorStore {
         get {
             userDefaults.string(forKey: Self.lastErrorMessageKey)
         }
-        
+
         set {
             userDefaults.set(newValue, forKey: Self.lastErrorMessageKey)
             postLastErrorMessageChangedNotification()

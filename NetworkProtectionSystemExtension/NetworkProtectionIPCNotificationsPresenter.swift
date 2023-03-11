@@ -27,11 +27,11 @@ import AppIntents
 ///
 final class NetworkProtectionIPCNotificationsPresenter: NetworkProtectionNotificationsPresenter {
     private let ipcConnection: IPCConnection
-    
+
     init(ipcConnection: IPCConnection = .shared) {
         self.ipcConnection = ipcConnection
     }
-    
+
     // MARK: - Presenting user notifications
 
     func showReconnectedNotification() {

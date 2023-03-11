@@ -46,7 +46,7 @@ final class PasswordManagementPopover: NSPopover {
     func select(category: SecureVaultSorting.Category?) {
         viewController.select(category: category)
     }
-    
+
     private func setupContentController() {
         let controller = PasswordManagementViewController.create()
         contentViewController = controller
@@ -61,7 +61,7 @@ extension PasswordManagementPopover: NSPopoverDelegate {
                                                                                   object: nil,
                                                                                   queue: OperationQueue.main) { [weak self] _ in
             guard let self = self, self.isShown else { return }
-            
+
             if !DeviceAuthenticator.shared.isAuthenticating {
                 self.close()
             }

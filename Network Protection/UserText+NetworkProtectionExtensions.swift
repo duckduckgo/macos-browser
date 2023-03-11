@@ -19,15 +19,15 @@
 import Foundation
 
 final class UserText {
-    
+
     // MARK: - Network Protection Notifications
-    
+
     static let networkProtectionConnectionSuccessNotificationTitle = NSLocalizedString("network.protection.success.notification.title", value: "Network Protection is On", comment: "The title of the connection shown when Network Protection reconnects successfully")
     static let networkProtectionConnectionSuccessNotificationSubtitle = NSLocalizedString("network.protection.success.notification.subtitle", value: "Your location and online activity are protected.", comment: "The subtitle of the connection shown when Network Protection reconnects successfully")
-    
+
     static let networkProtectionConnectionInterruptedNotificationTitle = NSLocalizedString("network.protection.interrupted.notification.title", value: "Network Protection was interrupted", comment: "The title of the connection shown when Network Protection's connection is interrupted")
     static let networkProtectionConnectionInterruptedNotificationSubtitle = NSLocalizedString("network.protection.interrupted.notification.subtitle", value: "Attempting to reconnect now...", comment: "The subtitle of the connection shown when Network Protection's connection is interrupted")
-    
+
     static let networkProtectionConnectionFailureNotificationTitle = NSLocalizedString("network.protection.failure.notification.title", value: "Network Protection failed to connect", comment: "The title of the connection shown when Network Protection fails to reconnect")
     static let networkProtectionConnectionFailureNotificationSubtitle = NSLocalizedString("network.protection.failure.notification.subtitle", value: "Unable to connect at this time. Please try again later.", comment: "The subtitle of the connection shown when Network Protection fails to reconnect")
 }

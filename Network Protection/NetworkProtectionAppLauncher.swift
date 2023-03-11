@@ -31,17 +31,17 @@ final class NetworkProtectionAppLauncher {
         let parentBundlePath = "../../../"
 #endif
         let url: URL
-        
+
         if #available(macOS 13, *) {
             url = URL(filePath: parentBundlePath, relativeTo: Bundle.main.bundleURL)
         } else {
             url = URL(fileURLWithPath: parentBundlePath, relativeTo: Bundle.main.bundleURL)
         }
-        
+
         let configuration = NSWorkspace.OpenConfiguration()
         configuration.activates = true
         configuration.allowsRunningApplicationSubstitution = false
-        
+
         Task {
             do {
                 try await NSWorkspace.shared.open([networkProtectionShowStatusURL], withApplicationAt: url, configuration: configuration)

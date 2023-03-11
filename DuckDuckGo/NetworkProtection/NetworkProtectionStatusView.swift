@@ -106,7 +106,7 @@ public struct NetworkProtectionStatusView: View {
     /// The view model that this instance will use.
     ///
     @ObservedObject var model: Model
-    
+
     @State private var popoverHeight = CGFloat.infinity
 
     // MARK: - Initializers

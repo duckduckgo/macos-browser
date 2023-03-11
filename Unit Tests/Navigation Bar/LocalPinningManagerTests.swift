@@ -25,47 +25,47 @@ final class LocalPinningManagerTests: XCTestCase {
         super.setUp()
         UserDefaultsWrapper<Any>.clearAll()
     }
-    
+
     override func tearDown() {
         super.tearDown()
         UserDefaultsWrapper<Any>.clearAll()
     }
-    
+
     func testWhenTogglingPinningForAView_AndViewIsNotPinned_ThenViewBecomesPinned() {
         let manager = LocalPinningManager()
-        
+
         XCTAssertFalse(manager.isPinned(.autofill))
         XCTAssertFalse(manager.isPinned(.bookmarks))
-        
+
         manager.togglePinning(for: .autofill)
-        
+
         XCTAssertTrue(manager.isPinned(.autofill))
         XCTAssertFalse(manager.isPinned(.bookmarks))
     }
-    
+
     func testWhenTogglingPinningForAView_AndViewIsAlreadyPinned_ThenViewBecomesUnpinned() {
         let manager = LocalPinningManager()
-        
+
         XCTAssertFalse(manager.isPinned(.autofill))
         XCTAssertFalse(manager.isPinned(.bookmarks))
-        
+
         manager.togglePinning(for: .autofill)
-        
+
         XCTAssertTrue(manager.isPinned(.autofill))
         XCTAssertFalse(manager.isPinned(.bookmarks))
-        
+
         manager.togglePinning(for: .autofill)
-        
+
         XCTAssertFalse(manager.isPinned(.autofill))
         XCTAssertFalse(manager.isPinned(.bookmarks))
     }
- 
+
     func testWhenChangingPinnedViews_ThenNotificationIsPosted() {
         expectation(forNotification: .PinnedViewsChanged, object: nil)
-        
+
         let manager = LocalPinningManager()
         manager.togglePinning(for: .autofill)
-        
+
         waitForExpectations(timeout: 1.0)
     }
 

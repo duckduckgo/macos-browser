@@ -50,16 +50,16 @@ final class WindowControllersManager: WindowControllersManagerProtocol {
             }
         }
     }
-    
+
     private var mainWindowController: MainWindowController? {
         return mainWindowControllers.first(where: {
             let isMain = $0.window?.isMainWindow ?? false
             let hasMainChildWindow = $0.window?.childWindows?.contains { $0.isMainWindow } ?? false
-            
+
             return $0.window?.isPopUpWindow == false && (isMain || hasMainChildWindow)
         })
     }
-    
+
     var selectedTab: Tab? {
         return mainWindowController?.mainViewController.tabCollectionViewModel.selectedTab
     }
@@ -128,7 +128,7 @@ extension WindowControllersManager {
             show(url: bookmark.url)
         }
     }
-    
+
     func show(url: URL?, newTab: Bool = false) {
 
         func show(url: URL?, in windowController: MainWindowController) {
@@ -181,7 +181,7 @@ extension WindowControllersManager {
         tabCollectionViewModel.appendNewTab(with: content)
         windowController.window?.orderFront(nil)
     }
-    
+
     // MARK: - Network Protection
 
     @MainActor
@@ -190,15 +190,15 @@ extension WindowControllersManager {
             guard !retry else {
                 return
             }
-            
+
             WindowsManager.openNewWindow()
-            
+
             // - TODO: not proud of this ugly hack... ideally openNewWindow() should let us know when the window is ready
             try? await Task.sleep(nanoseconds: 500 * NSEC_PER_MSEC)
             await showNetworkProtectionStatus(retry: true)
             return
         }
-        
+
         windowController.mainViewController.navigationBarViewController.showNetworkProtectionStatus()
     }
 }

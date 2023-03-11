@@ -25,16 +25,16 @@ final actor SystemExtensionManager: NSObject {
         case activated
         case willActivateAfterReboot
     }
-    
+
     final class RequestDelegate: NSObject, OSSystemExtensionRequestDelegate {
         private let waitingForUserApprovalHandler: () -> Void
         private let completionHandler: (RequestDelegate, Result<RequestResult, Error>) -> Void
-        
+
         init(waitingForUserApprovalHandler: @escaping () -> Void, completionHandler: @escaping (RequestDelegate, Result<RequestResult, Error>) -> Void) {
             self.waitingForUserApprovalHandler = waitingForUserApprovalHandler
             self.completionHandler = completionHandler
         }
-        
+
         func request(_ request: OSSystemExtensionRequest, actionForReplacingExtension existing: OSSystemExtensionProperties, withExtension ext: OSSystemExtensionProperties) -> OSSystemExtensionRequest.ReplacementAction {
 
             return .replace
@@ -61,22 +61,22 @@ final actor SystemExtensionManager: NSObject {
             completionHandler(self, .failure(error))
         }
     }
-    
+
     static let shared = SystemExtensionManager()
-    
+
     private var bundleID: String {
         NetworkProtectionBundle.extensionBundle().bundleIdentifier!
     }
-    
+
     private var requests = Set<RequestDelegate>()
 
     func activate(waitingForUserApprovalHandler: @escaping () -> Void) async throws -> RequestResult {
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<RequestResult, Error>) in
             let activationRequest = OSSystemExtensionRequest.activationRequest(forExtensionWithIdentifier: bundleID, queue: .main)
-            
+
             let requestDelegate = RequestDelegate(waitingForUserApprovalHandler: waitingForUserApprovalHandler) { request, result in
                 continuation.resume(with: result)
-                
+
                 // Intentionally retaining self until this closure is executed
                 self.requests.remove(request)
             }
@@ -90,15 +90,15 @@ final actor SystemExtensionManager: NSObject {
     func deactivate(waitingForUserApprovalHandler: @escaping () -> Void) async throws -> RequestResult {
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<RequestResult, Error>) in
             let activationRequest = OSSystemExtensionRequest.deactivationRequest(forExtensionWithIdentifier: bundleID, queue: .main)
-            
+
             let requestDelegate = RequestDelegate(waitingForUserApprovalHandler: waitingForUserApprovalHandler) { request, result in
                 continuation.resume(with: result)
-                
+
                 // Intentionally retaining self until this closure is executed
                 self.requests.remove(request)
             }
             activationRequest.delegate = requestDelegate
-            
+
             requests.insert(requestDelegate)
             OSSystemExtensionManager.shared.submitRequest(activationRequest)
         }

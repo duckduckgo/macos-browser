@@ -36,19 +36,19 @@ final class NetworkProtectionTunnelHealthStore {
         get {
             userDefaults.bool(forKey: Self.isHavingConnectivityIssuesKey)
         }
-        
+
         set {
             guard newValue != userDefaults.bool(forKey: Self.isHavingConnectivityIssuesKey) else {
                 return
             }
-            
+
             userDefaults.set(newValue, forKey: Self.isHavingConnectivityIssuesKey)
             postIssueChangeNotification(newValue: newValue)
         }
     }
 
     // MARK: - Posting Issue Notifications
-    
+
     private func postIssueChangeNotification(newValue: Bool) {
         if newValue {
             distributedNotificationCenter.postNotificationName(.NetPConnectivityIssuesStarted, object: nil, userInfo: nil, options: [.deliverImmediately, .postToAllSessions])

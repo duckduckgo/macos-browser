@@ -26,10 +26,10 @@ final class NetworkProtectionStatusBarMenu {
     private let statusItem: NSStatusItem
 
     // MARK: - NetP Icon publisher
-    
+
     private let iconPublisher: NetworkProtectionIconPublisher
     private var iconPublisherCancellable: AnyCancellable?
-    
+
     // MARK: - Initialization
 
     /// Default initializer
@@ -39,7 +39,7 @@ final class NetworkProtectionStatusBarMenu {
     ///
     init(statusItem: NSStatusItem? = nil,
          statusReporter: NetworkProtectionStatusReporter = DefaultNetworkProtectionStatusReporter()) {
-        
+
         self.statusItem = statusItem ?? NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         self.iconPublisher = NetworkProtectionIconPublisher(statusReporter: statusReporter)
 
@@ -51,14 +51,14 @@ final class NetworkProtectionStatusBarMenu {
         hostingView.autoresizesSubviews = false
         hostingView.frame.size = hostingView.intrinsicContentSize
         item.view = hostingView
-        
+
         let menu = NSMenu(items: [item])
         self.statusItem.menu = menu
         self.statusItem.button?.image = .init(iconPublisher.icon)
-        
+
         subscribeToIconUpdates()
     }
-    
+
     private func subscribeToIconUpdates() {
         iconPublisherCancellable = iconPublisher.$icon.sink { [weak self] icon in
             self?.statusItem.button?.image = .init(icon)

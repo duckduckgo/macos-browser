@@ -19,7 +19,7 @@
 import AppKit
 
 struct BookmarkViewModel {
- 
+
     let entity: BaseBookmarkEntity
 
     var menuTitle: String {
@@ -45,7 +45,7 @@ struct BookmarkViewModel {
         if let bookmark = entity as? Bookmark {
             let favicon = bookmark.favicon(.small)?.copy() as? NSImage
             favicon?.size = NSSize.faviconSize
-            
+
             return favicon ?? NSImage(named: "BookmarkDefaultFavicon")
         } else if entity is BookmarkFolder {
             return NSImage(named: "Folder")
@@ -70,7 +70,7 @@ struct BookmarkViewModel {
         guard let bookmark = entity as? Bookmark else {
             preconditionFailure("\(#file): Attempted to provide representing color for non-Bookmark")
         }
-        
+
         let index = bookmark.url.absoluteString.count % Self.representingColors.count
         return Self.representingColors[index]
     }

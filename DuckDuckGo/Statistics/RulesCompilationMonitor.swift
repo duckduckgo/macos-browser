@@ -58,7 +58,7 @@ final class AbstractContentBlockingAssetsCompilationTimeReporter<Caller: Hashabl
         // report only once
         isFinished = true
         completionHandler(nil)
-        
+
         // This is temporarily disabled:
         //
         // Pixel.fire(.compileRulesWait(onboardingShown: self.onboardingShown, waitTime: waitTime, result: result),

@@ -22,14 +22,19 @@ import Sparkle
 
 final class UpdateController: NSObject {
 
+    enum Constants {
+        static let internalChannelName = "internal-channel"
+    }
+
     let willRelaunchAppPublisher: AnyPublisher<Void, Never>
 
-    override init() {
+    init(internalUserDecider: InternalUserDeciding) {
         willRelaunchAppPublisher = willRelaunchAppSubject.eraseToAnyPublisher()
+        self.internalUserDecider = internalUserDecider
         super.init()
 
         configureUpdater()
-        
+
         // TODO (NetP): The Network Protection builds do not support automatic updates.
         // This function should be removed once Network Protection has been merged into the upstream repo.
         configureUpdaterForNetworkProtection()
@@ -48,26 +53,72 @@ final class UpdateController: NSObject {
 
     // MARK: - Private
 
+    lazy private var updater = SPUStandardUpdaterController(updaterDelegate: self, userDriverDelegate: self)
+    private let willRelaunchAppSubject = PassthroughSubject<Void, Never>()
+
+    private var internalUserDecider: InternalUserDeciding
+
     private func configureUpdater() {
-        updater.delegate = self
     // The default configuration of Sparkle updates is in Info.plist
 #if DEBUG
-        updater.automaticallyChecksForUpdates = false
-        updater.updateCheckInterval = 0
+        updater.updater.automaticallyChecksForUpdates = false
+        updater.updater.updateCheckInterval = 0
 #endif
     }
-    
+
     private func configureUpdaterForNetworkProtection() {
-        updater.automaticallyChecksForUpdates = false
-        updater.updateCheckInterval = 0
+        updater.updater.automaticallyChecksForUpdates = false
+        updater.updater.updateCheckInterval = 0
     }
 
-    private let updater = SUUpdater()
-    private let willRelaunchAppSubject = PassthroughSubject<Void, Never>()
 }
 
-extension UpdateController: SUUpdaterDelegate {
-    func updaterWillRelaunchApplication(_ updater: SUUpdater) {
+extension UpdateController: SPUStandardUserDriverDelegate {
+
+}
+
+extension UpdateController: SPUUpdaterDelegate {
+
+    func allowedChannels(for updater: SPUUpdater) -> Set<String> {
+        guard updater == self.updater.updater else {
+            return Set()
+        }
+
+        if internalUserDecider.isInternalUser {
+            return Set([Constants.internalChannelName])
+        } else {
+            return Set()
+        }
+    }
+
+    func updaterWillRelaunchApplication(_ updater: SPUUpdater) {
         willRelaunchAppSubject.send()
     }
+
+    func updater(_ updater: SPUUpdater, didAbortWithError error: Error) {
+        let errorCode = (error as NSError).code
+        guard ![Int(Sparkle.SUError.noUpdateError.rawValue),
+                Int(Sparkle.SUError.installationCanceledError.rawValue)].contains(errorCode) else {
+            return
+        }
+
+        Pixel.fire(.debug(event: .updaterAborted, error: error))
+    }
+
+    func updater(_ updater: SPUUpdater,
+                 userDidMake choice: SPUUserUpdateChoice,
+                 forUpdate updateItem: SUAppcastItem,
+                 state: SPUUserUpdateState) {
+        switch choice {
+        case .skip:
+            Pixel.fire(.debug(event: .userSelectedToSkipUpdate))
+        case .install:
+            Pixel.fire(.debug(event: .userSelectedToInstallUpdate))
+        case .dismiss:
+            Pixel.fire(.debug(event: .userSelectedToDismissUpdate))
+        @unknown default:
+            break
+        }
+    }
+
 }

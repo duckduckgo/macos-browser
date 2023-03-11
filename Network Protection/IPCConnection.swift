@@ -30,7 +30,7 @@ enum FlowInfoKey: String {
 final class IPCConnection: NSObject {
 
     private var distributedNotificationCenter = DistributedNotificationCenter.forType(.networkProtection)
-    
+
     // MARK: Properties
 
     var listener: NSXPCListener?
@@ -47,7 +47,7 @@ final class IPCConnection: NSObject {
         newListener.delegate = self
         newListener.resume()
         listener = newListener
-        
+
         distributedNotificationCenter.postNotificationName(.NetPIPCListenerStarted, object: nil, userInfo: nil, options: [.deliverImmediately, .postToAllSessions])
     }
 
@@ -71,7 +71,7 @@ final class IPCConnection: NSObject {
 
         // The remote object is the provider's IPCConnection instance.
         newConnection.remoteObjectInterface = NSXPCInterface(with: ProviderCommunication.self)
-        
+
         newConnection.invalidationHandler = {
             self.currentConnection = nil
         }
@@ -94,7 +94,7 @@ final class IPCConnection: NSObject {
 
         providerProxy.register(completionHandler)
     }
-    
+
     func test() {
         guard let connection = currentConnection else {
             os_log("🔵 The app isn't registered for the IPCConnection")
@@ -110,7 +110,7 @@ final class IPCConnection: NSObject {
 
         appProxy.reconnected()
     }
-    
+
     func reconnected() {
         guard let connection = currentConnection else {
             os_log("🔵 The app isn't registered for the IPCConnection")
@@ -127,7 +127,7 @@ final class IPCConnection: NSObject {
 
         appProxy.reconnected()
     }
-    
+
     func reconnecting() {
         guard let connection = currentConnection else {
             os_log("🔵 The app isn't registered for the IPCConnection")
@@ -145,7 +145,7 @@ final class IPCConnection: NSObject {
         os_log("🔵 IPC requesting proxy reconnecting notification")
         appProxy.reconnecting()
     }
-    
+
     func connectionFailure() {
         guard let connection = currentConnection else {
             os_log("🔵 The app isn't registered for the IPCConnection")
@@ -170,7 +170,7 @@ extension IPCConnection: NSXPCListenerDelegate {
 
     func listener(_ listener: NSXPCListener, shouldAcceptNewConnection newConnection: NSXPCConnection) -> Bool {
         os_log("🔵 New connection")
-        
+
         // The exported object is this IPCConnection instance.
         newConnection.exportedInterface = NSXPCInterface(with: ProviderCommunication.self)
         newConnection.exportedObject = self

@@ -19,7 +19,7 @@
 import AppKit
 
 final class DownloadsPopover: NSPopover {
-    
+
     override init() {
         super.init()
 

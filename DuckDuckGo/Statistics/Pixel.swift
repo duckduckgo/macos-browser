@@ -17,22 +17,7 @@
 //
 
 import Foundation
-import BrowserServicesKit
 import os.log
-
-extension URL {
-    static var duckDuckGoMorePrivacyInfo = URL(string: "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/atb/")!
-    
-    static let pixelBase = ProcessInfo.processInfo.environment["PIXEL_BASE_URL", default: "https://improving.duckduckgo.com"]
-    
-    static func pixelUrl(forPixelNamed pixelName: String) -> URL {
-        let urlString = "\(Self.pixelBase)/t/\(pixelName)"
-        let url = URL(string: urlString)!
-        // url = url.addParameter(name: \"atb\", value: statisticsStore.atbWithVariant ?? \"\")")
-        // https://app.asana.com/0/1177771139624306/1199951074455863/f
-        return url
-    }
-}
 
 final class Pixel {
 
@@ -91,6 +76,30 @@ final class Pixel {
         ) { (_, error) in
             onComplete(error)
         }
+    }
+
+    static func fire(_ event: Pixel.Event,
+                     withAdditionalParameters parameters: [String: String]? = nil,
+                     allowedQueryReservedCharacters: CharacterSet? = nil,
+                     includeAppVersionParameter: Bool = true,
+                     onComplete: @escaping (Error?) -> Void = {_ in }) {
+        let newParams: [String: String]?
+        switch (event.parameters, parameters) {
+        case (.some(let parameters), .none):
+            newParams = parameters
+        case (.none, .some(let parameters)):
+            newParams = parameters
+        case (.some(let params1), .some(let params2)):
+            newParams = params1.merging(params2) { $1 }
+        case (.none, .none):
+            newParams = nil
+        }
+
+        Self.shared?.fire(pixelNamed: event.name,
+                          withAdditionalParameters: newParams,
+                          allowedQueryReservedCharacters: allowedQueryReservedCharacters,
+                          includeAppVersionParameter: includeAppVersionParameter,
+                          onComplete: onComplete)
     }
 
 }

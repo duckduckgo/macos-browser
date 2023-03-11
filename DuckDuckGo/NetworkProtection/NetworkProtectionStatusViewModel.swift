@@ -78,7 +78,7 @@ extension NetworkProtectionStatusView {
             self.networkProtectionStatusReporter = networkProtectionStatusReporter
             self.logger = logger
             self.runLoopMode = runLoopMode
-            
+
             connectionStatus = networkProtectionStatusReporter.statusChangePublisher.value
             isHavingConnectivityIssues = networkProtectionStatusReporter.connectivityIssuesPublisher.value
             internalServerAddress = networkProtectionStatusReporter.serverInfoPublisher.value.serverAddress
@@ -89,6 +89,20 @@ extension NetworkProtectionStatusView {
             // Particularly useful when unit testing with an initial status of our choosing.
             refreshInternalIsRunning()
 
+            subscribeToStatusChanges()
+            subscribeToConnectivityIssues()
+            subscribeToTunnelErrorMessages()
+            subscribeToControllerErrorMessages()
+            subscribeToServerInfoChanges()
+        }
+
+        deinit {
+            stopTimer()
+        }
+
+        // MARK: - Subscriptions
+
+        private func subscribeToStatusChanges() {
             statusChangeCancellable = networkProtectionStatusReporter.statusChangePublisher.sink { [weak self] status in
                 guard let self = self else {
                     return
@@ -98,51 +112,55 @@ extension NetworkProtectionStatusView {
                     self.connectionStatus = status
                 }
             }
+        }
 
+        private func subscribeToConnectivityIssues() {
             connectivityIssuesCancellable = networkProtectionStatusReporter.connectivityIssuesPublisher.sink { [weak self] isHavingConnectivityIssues in
                 guard let self = self else {
                     return
                 }
-                
+
                 Task { @MainActor in
                     self.isHavingConnectivityIssues = isHavingConnectivityIssues
                 }
             }
-            
+        }
+
+        private func subscribeToTunnelErrorMessages() {
             tunnelErrorMessageCancellable = networkProtectionStatusReporter.tunnelErrorMessagePublisher.sink { [weak self] errorMessage in
                 guard let self = self else {
                     return
                 }
-                
+
                 Task { @MainActor in
                     self.lastTunnelErrorMessage = errorMessage
                 }
             }
-            
+        }
+
+        private func subscribeToControllerErrorMessages() {
             controllerErrorMessageCancellable = networkProtectionStatusReporter.controllerErrorMessagePublisher.sink { [weak self] errorMessage in
                 guard let self = self else {
                     return
                 }
-                
+
                 Task { @MainActor in
                     self.lastControllerErrorMessage = errorMessage
                 }
             }
-            
+        }
+
+        private func subscribeToServerInfoChanges() {
             serverInfoCancellable = networkProtectionStatusReporter.serverInfoPublisher.sink { [weak self] serverInfo in
                 guard let self = self else {
                     return
                 }
-                
+
                 Task { @MainActor in
                     self.internalServerAddress = serverInfo.serverAddress
                     self.internalServerLocation = serverInfo.serverLocation
                 }
             }
-        }
-
-        deinit {
-            stopTimer()
         }
 
         // MARK: - ON/OFF Toggle
@@ -189,13 +207,13 @@ extension NetworkProtectionStatusView {
                 guard internalIsRunning == false else {
                     return
                 }
-                
+
                 internalIsRunning = true
             case .disconnected, .disconnecting:
                 guard internalIsRunning == true else {
                     return
                 }
-                
+
                 internalIsRunning = false
             default:
                 break
@@ -226,9 +244,9 @@ extension NetworkProtectionStatusView {
         // MARK: - Status & health
 
         private weak var timer: Timer?
-        
+
         private var previousConnectionStatus: NetworkProtectionConnectionStatus = .disconnected
-        
+
         @Published
         private var connectionStatus: NetworkProtectionConnectionStatus = .disconnected {
             didSet {
@@ -240,13 +258,13 @@ extension NetworkProtectionStatusView {
 
         @Published
         private var isHavingConnectivityIssues: Bool = false
-        
+
         @Published
         private var lastControllerErrorMessage: String?
-        
+
         @Published
         private var lastTunnelErrorMessage: String?
-        
+
         /// The description for the current connection status.
         /// When the status is `connected` this description will also show the time lapsed since connection.
         ///
@@ -280,12 +298,12 @@ extension NetworkProtectionStatusView {
                 return UserText.networkProtectionStatusUnknown
             }
         }
-        
+
         var issueDescription: String? {
             if let lastControllerErrorMessage = lastControllerErrorMessage {
                 return lastControllerErrorMessage
             }
-            
+
             if let lastTunnelErrorMessage = lastTunnelErrorMessage {
                 return lastTunnelErrorMessage
             }
@@ -341,7 +359,7 @@ extension NetworkProtectionStatusView {
                 return false
             }
         }
-        
+
         @Published
         private var internalServerAddress: String?
 
@@ -349,7 +367,7 @@ extension NetworkProtectionStatusView {
             guard let internalServerAddress = internalServerAddress else {
                 return UserText.networkProtectionServerAddressUnknown
             }
-            
+
             switch connectionStatus {
             case .connected:
                 return internalServerAddress
@@ -363,7 +381,7 @@ extension NetworkProtectionStatusView {
                 return UserText.networkProtectionServerAddressUnknown
             }
         }
-        
+
         @Published
         var internalServerLocation: String?
 
@@ -371,7 +389,7 @@ extension NetworkProtectionStatusView {
             guard let internalServerLocation = internalServerLocation else {
                 return UserText.networkProtectionServerLocationUnknown
             }
-            
+
             switch connectionStatus {
             case .connected:
                 return internalServerLocation
@@ -417,7 +435,7 @@ extension NetworkProtectionStatusView {
         // MARK: - Feedback Sharing
 
         private static let feedbackFormURL = URL(string: "https://form.asana.com/?k=_wNLt6YcT5ILpQjDuW0Mxw&d=137249556945")!
-        
+
         /// This method provides the standard logic for handling the user's request to share feedback about NetP.
         /// 
         func shareFeedback() {

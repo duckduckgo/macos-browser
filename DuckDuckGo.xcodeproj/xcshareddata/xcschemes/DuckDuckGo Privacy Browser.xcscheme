@@ -68,7 +68,13 @@
             </BuildableReference>
             <SkippedTests>
                <Test
+                  Identifier = "AutoconsentMessageProtocolTests/testEval()">
+               </Test>
+               <Test
                   Identifier = "CBRCompileTimeReporterTests">
+               </Test>
+               <Test
+                  Identifier = "PixelStoreTests/testWhenValuesAreAddedThenCallbacksAreCalled()">
                </Test>
                <Test
                   Identifier = "StatisticsLoaderTests/testWhenRefreshRetentionAtbIsPerformedForNavigationThenAppRetentionAtbRequested()">

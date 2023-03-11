@@ -91,13 +91,13 @@ final class BookmarkStoreMock: BookmarkStore {
         importBookmarksCalled = true
         return BookmarkImportResult(successful: 0, duplicates: 0, failed: 0)
     }
-    
+
     var canMoveObjectWithUUIDCalled = false
     func canMoveObjectWithUUID(objectUUID uuid: UUID, to parent: BookmarkFolder) -> Bool {
         canMoveObjectWithUUIDCalled = true
         return true
     }
-    
+
     var moveObjectUUIDCalled = false
     func move(objectUUIDs: [UUID], toIndex: Int?, withinParentFolder: DuckDuckGo_Privacy_Browser.ParentFolderType, completion: @escaping (Error?) -> Void) {
         moveObjectUUIDCalled = true

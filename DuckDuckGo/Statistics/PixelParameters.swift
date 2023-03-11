@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-import Foundation
-
 extension Pixel {
 
     enum Parameters {
@@ -25,7 +23,6 @@ extension Pixel {
         static let test = "test"
         static let appVersion = "appVersion"
 
-        static let keychainFieldName = "fieldName"
         static let errorCode = "e"
         static let errorDesc = "d"
         static let errorCount = "c"
@@ -33,35 +30,68 @@ extension Pixel {
         static let underlyingErrorDesc = "ud"
         static let underlyingErrorSQLiteCode = "sqlrc"
         static let underlyingErrorSQLiteExtendedCode = "sqlerc"
+
+        static let emailCohort = "cohort"
+        static let emailLastUsed = "duck_address_last_used"
     }
 
     enum Values {
         static let test = "1"
     }
+
 }
 
-extension Error {
+extension Pixel.Event {
 
-    var pixelParameters: [String: String] {
-        var parameters = [String: String]()
-        let nsError = self as NSError
+    var parameters: [String: String]? {
+        switch self {
+        case .debug(event: _, error: let error):
+            var params = [String: String]()
 
-        parameters[Pixel.Parameters.errorCode] = "\(nsError.code)"
-        parameters[Pixel.Parameters.errorDesc] = nsError.domain
-        if let underlyingError = nsError.userInfo["NSUnderlyingError"] as? NSError {
-            parameters[Pixel.Parameters.underlyingErrorCode] = "\(underlyingError.code)"
-            parameters[Pixel.Parameters.underlyingErrorDesc] = underlyingError.domain
+            if let error = error {
+                let nsError = error as NSError
+
+                params[Pixel.Parameters.errorCode] = "\(nsError.code)"
+                params[Pixel.Parameters.errorDesc] = nsError.domain
+                if let underlyingError = nsError.userInfo["NSUnderlyingError"] as? NSError {
+                    params[Pixel.Parameters.underlyingErrorCode] = "\(underlyingError.code)"
+                    params[Pixel.Parameters.underlyingErrorDesc] = underlyingError.domain
+                }
+                if let sqlErrorCode = nsError.userInfo["SQLiteResultCode"] as? NSNumber {
+                    params[Pixel.Parameters.underlyingErrorSQLiteCode] = "\(sqlErrorCode.intValue)"
+                }
+                if let sqlExtendedErrorCode = nsError.userInfo["SQLiteExtendedResultCode"] as? NSNumber {
+                    params[Pixel.Parameters.underlyingErrorSQLiteExtendedCode] = "\(sqlExtendedErrorCode.intValue)"
+                }
+            }
+
+            return params
+
+        // Don't use default to force new items to be thought about
+        case .burn,
+             .crash,
+             .brokenSiteReport,
+             .compileRulesWait,
+             .serp,
+             .dataImportFailed,
+             .faviconImportFailed,
+             .formAutofilled,
+             .autofillItemSaved,
+             .autoconsentOptOutFailed,
+             .autoconsentSelfTestFailed,
+             .ampBlockingRulesCompilationFailed,
+             .adClickAttributionDetected,
+             .adClickAttributionActive,
+             .emailEnabled,
+             .emailDisabled,
+             .emailUserCreatedAlias,
+             .emailUserPressedUseAlias,
+             .emailUserPressedUseAddress,
+             .jsPixel,
+             .networkProtectionSystemExtensionUnknownActivationResult:
+
+            return nil
         }
-
-        if let sqlErrorCode = nsError.userInfo["SQLiteResultCode"] as? NSNumber {
-            parameters[Pixel.Parameters.underlyingErrorSQLiteCode] = "\(sqlErrorCode.intValue)"
-        }
-
-        if let sqlExtendedErrorCode = nsError.userInfo["SQLiteExtendedResultCode"] as? NSNumber {
-            parameters[Pixel.Parameters.underlyingErrorSQLiteExtendedCode] = "\(sqlExtendedErrorCode.intValue)"
-        }
-
-        return parameters
     }
 
 }

@@ -24,11 +24,11 @@ import BrowserServicesKit
 
 final class BrokenSiteReportingReferenceTests: XCTestCase {
     private let testHelper = PrivacyReferenceTestHelper()
-    
+
     private enum Resource {
         static let tests = "privacy-reference-tests/broken-site-reporting/tests.json"
     }
-    
+
     private func makeURLRequest(with parameters: [String: String]) -> URLRequest {
         APIRequest.urlRequestFor(
             url: URL.pixelUrl(forPixelNamed: Pixel.Event.brokenSiteReport.name),
@@ -49,11 +49,11 @@ final class BrokenSiteReportingReferenceTests: XCTestCase {
                 os_log("Skipping test, ignore platform for [%s]", type: .info, test.name)
                 continue
             }
-            
+
             os_log("Testing [%s]", type: .info, test.name)
-            
+
             let category = WebsiteBreakage.Category(rawValue: test.category)
-            
+
             let breakage = WebsiteBreakage(category: category,
                                            description: nil,
                                            siteUrlString: test.siteURL,
@@ -66,31 +66,31 @@ final class BrokenSiteReportingReferenceTests: XCTestCase {
                                            ampURL: "",
                                            urlParametersRemoved: false,
                                            manufacturer: test.manufacturer ?? "")
-            
+
             let request = makeURLRequest(with: breakage.requestParameters)
-            
+
             guard let requestURL = request.url else {
                 XCTFail("Couldn't create request URL")
                 return
             }
-            
+
             let absoluteURL = requestURL.absoluteString
-            
+
             if test.expectReportURLPrefix.count > 0 {
                 XCTAssertTrue(requestURL.absoluteString.contains(test.expectReportURLPrefix), "Prefix [\(test.expectReportURLPrefix)] not found")
             }
-            
+
             for param in test.expectReportURLParams {
                 let pattern = "[?&]\(param.name)=\(param.value)[&$]?"
-                
+
                 guard let regex = try? NSRegularExpression(pattern: pattern,
                                                            options: []) else {
                     XCTFail("Couldn't create regex")
                     return
                 }
-                
+
                 let match = regex.matches(in: absoluteURL, range: NSRange(location: 0, length: absoluteURL.count))
-                
+
                 XCTAssertEqual(match.count, 1, "Param [\(param.name)] with value [\(param.value)] not found in [\(absoluteURL)]")
             }
         }

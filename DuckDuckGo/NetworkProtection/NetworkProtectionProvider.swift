@@ -70,7 +70,7 @@ final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
     /// The logger that this object will use for errors that are handled by this class.
     ///
     private let logger: NetworkProtectionLogger
-    
+
     /// Stores the last controller error for the purpose of updating the UI as needed..
     ///
     private let controllerErrorStore = NetworkProtectionControllerErrorStore()
@@ -84,7 +84,7 @@ final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
     /// The observer token for VPN configuration changes,
     ///
     private var configChangeObserverToken: NSObjectProtocol?
-    
+
     // MARK: - VPN Tunnel & Configuration
 
     /// The environment variable that holds the path to the WG quick configuration file that will be used for the tunnel.
@@ -135,12 +135,12 @@ final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
         try await tunnelManager.saveToPreferences()
         try await tunnelManager.loadFromPreferences()
     }
-    
+
     enum ActiveSessionError: Error {
         case couldNotLoadPreferences(error: Error)
         case activeConnectionHasNoSession
     }
-    
+
     static func activeSession() async throws -> NETunnelProviderSession? {
         try await withCheckedThrowingContinuation { continuation in
             NETunnelProviderManager.loadAllFromPreferences { managers, error in
@@ -148,7 +148,7 @@ final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
                     continuation.resume(throwing: ActiveSessionError.couldNotLoadPreferences(error: error))
                     return
                 }
-                
+
                 Task {
                     guard let manager = managers?.first(where: { manager in
                         switch manager.connection.status {
@@ -162,7 +162,7 @@ final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
                         continuation.resume(returning: nil)
                         return
                     }
-                    
+
                     guard let session = manager.connection as? NETunnelProviderSession else {
                         continuation.resume(returning: nil)
                         return
@@ -176,7 +176,7 @@ final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
 
     // MARK: - Initialization & Deinitialization
 
-    convenience init() {        
+    convenience init() {
         self.init(notificationCenter: .default,
                   logger: DefaultNetworkProtectionLogger())
     }
@@ -240,18 +240,18 @@ final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
     }
 
     // MARK: - Notifications: Handling
-    
+
     static let statusChangeQueue: OperationQueue = {
         let queue = OperationQueue()
         queue.maxConcurrentOperationCount = 1
         queue.qualityOfService = .userInteractive
-        
+
         return queue
     }()
 
     @objc private func resetExtensionNotification(_ notification: Notification) {
         os_log("Received reset extension notification", log: .networkProtection)
-        
+
         Task { @MainActor in
             try? await stop()
             try? await internalTunnelManager?.removeFromPreferences()
@@ -293,11 +293,11 @@ final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
         if tunnelManager.localizedDescription == nil {
             tunnelManager.localizedDescription = UserText.networkProtectionTunnelName
         }
-        
+
         if !tunnelManager.isEnabled {
             tunnelManager.isEnabled = true
         }
-        
+
         let protocolConfiguration = NETunnelProviderProtocol()
         protocolConfiguration.serverAddress = "127.0.0.1" // Dummy address... the NetP service will take care of grabbing a real server
         protocolConfiguration.providerBundleIdentifier = NetworkProtectionBundle.extensionBundle().bundleIdentifier
@@ -322,9 +322,9 @@ final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
             return false
         }
     }
-    
+
     // MARK: - Ensure things are working
-    
+
 #if NETP_SYSTEM_EXTENSION
     /// - Returns: `true` if the system extension and the background agent were activated successfully
     ///
@@ -332,16 +332,17 @@ final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
         #if DEBUG
         try? await NetworkProtectionAgentManager.current.reset()
         #else
+
         NetworkProtectionAgentManager.current.enable()
         #endif
-        
+
         if case .willActivateAfterReboot = try await SystemExtensionManager.shared.activate(waitingForUserApprovalHandler: { [weak self] in
             self?.controllerErrorStore.lastErrorMessage = "Go to Security & Privacy in System Settings to allow Network Protection to activate"
         }) {
             controllerErrorStore.lastErrorMessage = "Please reboot to activate Network Protection"
             return false
         }
-        
+
         return true
     }
 #endif
@@ -356,10 +357,10 @@ final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
             return
         }
 #endif
-        
+
         controllerErrorStore.lastErrorMessage = nil
         let tunnelManager: NETunnelProviderManager
-        
+
         do {
             tunnelManager = try await loadOrMakeTunnelManager()
         } catch {
@@ -406,7 +407,7 @@ final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
     }
 
     // MARK: - Debug commands for the extension
-    
+
     private let selectedServerStore = NetworkProtectionSelectedServerUserDefaultsStore()
 
     static func resetAllState() {
@@ -416,21 +417,23 @@ final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
                     os_log("🔵 Status was reset")
                 }
             }
-            
+
             // ☝️ Take care of resetting all state within the extension first, and wait half a second
             try? await Task.sleep(nanoseconds: 500 * NSEC_PER_MSEC)
             // 👇 And only afterwards turn off the tunnel and removing it from prefernces
-            
+
             let tunnels = try? await NETunnelProviderManager.loadAllFromPreferences()
-            
+
             if let tunnels = tunnels {
                 for tunnel in tunnels {
                     tunnel.connection.stopVPNTunnel()
                     try? await tunnel.removeFromPreferences()
                 }
             }
-            
+
+#if NETP_SYSTEM_EXTENSION
             try? await NetworkProtectionAgentManager.current.reset()
+#endif
             NetworkProtectionKeychain.deleteReferences()
             NetworkProtectionSelectedServerUserDefaultsStore().reset()
         }
@@ -438,31 +441,31 @@ final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
 
     static func setSelectedServer(selectedServer: SelectedNetworkProtectionServer) {
         NetworkProtectionSelectedServerUserDefaultsStore().selectedServer = selectedServer
-        
+
         let selectedServerName: String?
-        
+
         if case .endpoint(let serverName) = selectedServer {
             selectedServerName = serverName
         } else {
             selectedServerName = nil
         }
-        
+
         Task {
             guard let activeSession = try? await activeSession() else {
                 return
             }
-            
+
             var request = Data([NetworkProtectionAppRequest.setSelectedServer.rawValue])
-             
+
             if let selectedServerName = selectedServerName {
                 let serverNameData = selectedServerName.data(using: NetworkProtectionAppRequest.preferredStringEncoding)!
                 request.append(serverNameData)
             }
-            
+
             try? activeSession.sendProviderMessage(request)
         }
     }
-    
+
     static func selectedServerName() -> String? {
         NetworkProtectionSelectedServerUserDefaultsStore().selectedServer.stringValue
     }

@@ -30,12 +30,12 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
     private let popovers: NavigationBarPopovers
 
     // MARK: - Subscriptions
-    
+
     private var statusChangeCancellable: AnyCancellable?
     private var interruptionCancellable: AnyCancellable?
-    
+
     // MARK: - NetP Icon publisher
-    
+
     private let iconPublisher: NetworkProtectionIconPublisher
     private var iconPublisherCancellable: AnyCancellable?
 
@@ -43,10 +43,10 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
 
     @Published
     private(set) var showButton = false
-    
+
     @Published
     private(set) var buttonImage: NSImage?
-    
+
     // MARK: - NetP State
 
     private var isHavingConnectivityIssues = false
@@ -60,7 +60,7 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
         self.networkProtectionStatusReporter = networkProtectionStatusReporter
         self.iconPublisher = NetworkProtectionIconPublisher(statusReporter: networkProtectionStatusReporter)
         self.popovers = popovers
-        
+
         isHavingConnectivityIssues = networkProtectionStatusReporter.connectivityIssuesPublisher.value
         buttonImage = .init(iconPublisher.icon)
 
@@ -70,13 +70,13 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
     }
 
     // MARK: - Subscriptions
-    
+
     private func setupSubscriptions() {
         setupIconSubscription()
         setupStatusSubscription()
         setupInterruptionSubscription()
     }
-    
+
     private func setupIconSubscription() {
         iconPublisherCancellable = iconPublisher.$icon.sink { [weak self] icon in
             self?.buttonImage = .init(icon)
@@ -88,20 +88,20 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
             guard let self = self else {
                 return
             }
-            
+
             Task { @MainActor in
                 self.status = status
                 self.updateVisibility()
             }
         }
     }
-    
+
     private func setupInterruptionSubscription() {
         interruptionCancellable = networkProtectionStatusReporter.connectivityIssuesPublisher.sink { [weak self] isHavingConnectivityIssues in
             guard let self = self else {
                 return
             }
-            
+
             Task { @MainActor in
                 self.isHavingConnectivityIssues = isHavingConnectivityIssues
                 self.updateVisibility()
@@ -121,7 +121,7 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
                 showButton = true
                 return
             }
-            
+
             switch status {
             case .connecting, .connected, .reasserting, .disconnecting:
                 showButton = true

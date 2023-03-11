@@ -144,4 +144,22 @@ extension NSAlert {
         return alert
     }
 
+    static func noAccessToDownloads() -> NSAlert {
+        let alert = NSAlert()
+        alert.messageText = UserText.noAccessToDownloadsFolderHeader
+        alert.informativeText = UserText.noAccessToDownloadsFolder
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: UserText.openSystemPreferences)
+        alert.addButton(withTitle: UserText.cancel)
+        return alert
+    }
+
+    static func noAccessToSelectedFolder() -> NSAlert {
+        let alert = NSAlert()
+        alert.messageText = UserText.noAccessToSelectedFolderHeader
+        alert.informativeText = UserText.noAccessToSelectedFolder
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: UserText.cancel)
+        return alert
+    }
 }

@@ -32,7 +32,10 @@ final class NavigationBarPopovers {
     private(set) var savePaymentMethodPopover: SavePaymentMethodPopover?
     private(set) var passwordManagementPopover: PasswordManagementPopover?
     private(set) var downloadsPopover: DownloadsPopover?
+
+#if NETP
     private(set) var networkProtectionPopover: NetworkProtectionPopover?
+#endif
 
     var passwordManagementDomain: String? {
         didSet {
@@ -56,10 +59,12 @@ final class NavigationBarPopovers {
         passwordManagementPopover?.isShown ?? false
     }
 
+#if NETP
     @MainActor
     var isNetworkProtectionPopoverShown: Bool {
         networkProtectionPopover?.isShown ?? false
     }
+#endif
 
     var bookmarkListPopoverShown: Bool {
         bookmarkListPopover?.isShown ?? false
@@ -81,6 +86,7 @@ final class NavigationBarPopovers {
         }
     }
 
+#if NETP
     func toggleNetworkProtectionPopover(usingView view: NSView, withDelegate delegate: NSPopoverDelegate) {
         if let networkProtectionPopover = networkProtectionPopover,
            networkProtectionPopover.isShown {
@@ -89,6 +95,7 @@ final class NavigationBarPopovers {
             showNetworkProtectionPopover(usingView: view, withDelegate: delegate)
         }
     }
+#endif
 
     func toggleDownloadsPopover(usingView view: NSView, popoverDelegate: NSPopoverDelegate, downloadsDelegate: DownloadsViewControllerDelegate) {
 
@@ -246,6 +253,7 @@ final class NavigationBarPopovers {
 
     // MARK: - Network Protection
 
+#if NETP
     func showNetworkProtectionPopover(usingView view: NSView, withDelegate delegate: NSPopoverDelegate) {
         let popover = NetworkProtectionPopover()
         popover.delegate = delegate
@@ -253,4 +261,5 @@ final class NavigationBarPopovers {
         networkProtectionPopover = popover
         show(popover: popover, usingView: view, preferredEdge: .maxY)
     }
+#endif
 }

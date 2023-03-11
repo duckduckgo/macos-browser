@@ -23,7 +23,7 @@ extension NETunnelProviderProtocol {
         if let oldConfig = providerConfiguration?["WgQuickConfig"] as? String {
             return try? TunnelConfiguration(fromWgQuickConfig: oldConfig, called: name)
         }
-   
+
         return nil
     }
 }

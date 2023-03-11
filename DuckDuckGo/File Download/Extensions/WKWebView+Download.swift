@@ -18,28 +18,14 @@
 
 import WebKit
 
-// A workaround to bring WKDownload support back to macOS 11.3 (which really has WKDownload support)
-private protocol WKWebView_macOS_11_3 {
-    func startDownload(using request: URLRequest, completionHandler: @escaping (WebKitDownload) -> Void)
-    func resumeDownload(from data: Data, completionHandler: @escaping (WebKitDownload) -> Void)
-}
-
-@available(macOS 11.3, *)
-extension WKWebView: WKWebView_macOS_11_3 {
-    func startDownload(using request: URLRequest, completionHandler: @escaping (WebKitDownload) -> Void) {
-        self.startDownload(using: request) { (download: WKDownload) in completionHandler(download) }
-    }
-
-    func resumeDownload(from data: Data, completionHandler: @escaping (WebKitDownload) -> Void) {
-        return resumeDownload(fromResumeData: data) { (download: WKDownload) in completionHandler(download) }
-    }
-}
-
 extension WKWebView {
 
     func startDownload(_ request: URLRequest, completionHandler: @escaping (WebKitDownload) -> Void) {
+#if APPSTORE
+        startDownload(using: request, completionHandler: completionHandler)
+#else
         if #available(macOS 11.3, *) {
-            (self as WKWebView_macOS_11_3).startDownload(using: request, completionHandler: completionHandler)
+            startDownload(using: request, completionHandler: completionHandler)
         } else if configuration.processPool.responds(to: #selector(WKProcessPool._downloadURLRequest(_:websiteDataStore:originatingWebView:))) {
             configuration.processPool.setDownloadDelegateIfNeeded(using: LegacyWebKitDownloadDelegate.init)
             let download = configuration.processPool._downloadURLRequest(request,
@@ -49,12 +35,16 @@ extension WKWebView {
         } else {
             assertionFailure("WKProcessPool does not respond to _downloadURLRequest:websiteDataStore:originatingWebView:")
         }
+#endif
     }
 
     func resumeDownload(from resumeData: Data, to localURL: URL, completionHandler: @escaping (WebKitDownload) -> Void) throws {
+#if APPSTORE
+        resumeDownload(fromResumeData: resumeData, completionHandler: completionHandler)
+#else
         try NSException.catch {
             if #available(macOS 11.3, *) {
-                (self as WKWebView_macOS_11_3).resumeDownload(from: resumeData, completionHandler: completionHandler)
+                resumeDownload(fromResumeData: resumeData, completionHandler: completionHandler)
             } else if configuration.processPool.responds(to:
               #selector(WKProcessPool._resumeDownload(from:websiteDataStore:path:originatingWebView:))) {
                 let download = configuration.processPool._resumeDownload(from: resumeData,
@@ -66,6 +56,7 @@ extension WKWebView {
                 assertionFailure("WKProcessPool does not respond to _resumeDownloadFromData:websiteDataStore:path:originatingWebView:")
             }
         }
+#endif
     }
 
     var suggestedFilename: String? {
@@ -156,27 +147,40 @@ extension WKWebView {
 }
 
 extension WKNavigationActionPolicy {
-    // https://github.com/WebKit/WebKit/blob/9a6f03d46238213231cf27641ed1a55e1949d074/Source/WebKit/UIProcess/API/Cocoa/WKNavigationDelegate.h#L49
-    private static let download = WKNavigationActionPolicy(rawValue: Self.allow.rawValue + 1) ?? .cancel
-
     static func download(_ navigationAction: WKNavigationAction,
                          using webView: WKWebView) -> WKNavigationActionPolicy {
+#if APPSTORE
+        return .download
+#else
         webView.configuration.processPool
             .setDownloadDelegateIfNeeded(using: LegacyWebKitDownloadDelegate.init)?
             .registerDownloadNavigationAction(navigationAction)
-        return .download
+
+        if #available(macOS 11.3, *) {
+            return .download
+        }
+        // https://github.com/WebKit/WebKit/blob/9a6f03d46238213231cf27641ed1a55e1949d074/Source/WebKit/UIProcess/API/Cocoa/WKNavigationDelegate.h#L49
+        return WKNavigationActionPolicy(rawValue: Self.allow.rawValue + 1) ?? .cancel
+#endif
     }
 
 }
 
 extension WKNavigationResponsePolicy {
-    private static let download = WKNavigationResponsePolicy(rawValue: Self.allow.rawValue + 1) ?? .cancel
-
     static func download(_ navigationResponse: WKNavigationResponse,
                          using webView: WKWebView) -> WKNavigationResponsePolicy {
+#if APPSTORE
+        return .download
+#else
         webView.configuration.processPool
             .setDownloadDelegateIfNeeded(using: LegacyWebKitDownloadDelegate.init)?
             .registerDownloadNavigationResponse(navigationResponse)
-        return .download
+
+        if #available(macOS 11.3, *) {
+            return .download
+        }
+        // https://github.com/WebKit/WebKit/blob/9a6f03d46238213231cf27641ed1a55e1949d074/Source/WebKit/UIProcess/API/Cocoa/WKNavigationDelegate.h#L49
+        return WKNavigationResponsePolicy(rawValue: Self.allow.rawValue + 1) ?? .cancel
+#endif
     }
 }

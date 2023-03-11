@@ -1,5 +1,4 @@
 disabled_rules:
-  - trailing_whitespace
   - no_space_in_method_call
   - multiple_closures_with_trailing_closure
   - block_based_kvo
@@ -9,6 +8,8 @@ disabled_rules:
   - type_name
   - todo # Temporarily disabled for NetP work
   - file_header # Temporarily disabled for NetP work
+  - implicit_getter
+  - function_parameter_count
 
 opt_in_rules:
   - file_header
@@ -16,7 +17,6 @@ opt_in_rules:
 custom_rules:
   explicit_non_final_class:
     included: ".*\\.swift"
-    excluded: ".*Tests\\.swift"
     name: "Implicitly non-final class"
     regex: "^\\s*(class) (?!func|var)"
     capture_group: 0
@@ -37,6 +37,9 @@ type_body_length:
   error: 500
 nesting:
   type_level: 2
+large_tuple:
+  warning: 4
+  error: 5
 file_header:
   required_pattern: |
                     \/\/
@@ -60,4 +63,7 @@ file_header:
 # General Config
 excluded:
   - DuckDuckGo/Common/Localizables/UserText.swift
-
+  - Unit Tests
+  - Integration Tests
+  - UI Tests
+  - vendor

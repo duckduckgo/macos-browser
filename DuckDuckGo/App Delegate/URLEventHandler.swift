@@ -25,7 +25,7 @@ final class URLEventHandler {
 
     private var didFinishLaunching = false
     private var urlsToOpen = [URL]()
-    
+
     init(handler: @escaping ((URL) -> Void) = openURL) {
         self.handler = handler
 
@@ -46,7 +46,7 @@ final class URLEventHandler {
 
             self.urlsToOpen = []
         }
-        
+
         didFinishLaunching = true
     }
 
@@ -92,6 +92,11 @@ final class URLEventHandler {
         }
     }
 
+#if !NETP
+    private static func openURL(_ url: URL) {
+        WindowControllersManager.shared.show(url: url, newTab: true)
+    }
+#else
     private static func openURL(_ url: URL) {
         if url.scheme == networkProtectionScheme {
             handleNetworkProtectionURL(url)
@@ -99,7 +104,7 @@ final class URLEventHandler {
             WindowControllersManager.shared.show(url: url, newTab: true)
         }
     }
-    
+
     /// Handles NetP URLs
     ///
     private static func handleNetworkProtectionURL(_ url: URL) {
@@ -109,5 +114,5 @@ final class URLEventHandler {
             }
         }
     }
-
+#endif
 }

@@ -38,7 +38,7 @@ final class NetworkProtectionControllerErrorStore {
         get {
             userDefaults.string(forKey: Self.lastErrorMessageKey)
         }
-        
+
         set {
             userDefaults.set(newValue, forKey: Self.lastErrorMessageKey)
             postLastErrorMessageChangedNotification()

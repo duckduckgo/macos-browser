@@ -25,9 +25,13 @@ final class ChromiumBookmarksReader {
         case bookmarksFileDecodingFailed
     }
 
+    enum Constants {
+        static let defaultBookmarksFileName = "Bookmarks"
+    }
+
     private let chromiumBookmarksFileURL: URL
 
-    init(chromiumDataDirectoryURL: URL, bookmarksFileName: String = "Bookmarks") {
+    init(chromiumDataDirectoryURL: URL, bookmarksFileName: String = Constants.defaultBookmarksFileName) {
         self.chromiumBookmarksFileURL = chromiumDataDirectoryURL.appendingPathComponent(bookmarksFileName)
     }
 

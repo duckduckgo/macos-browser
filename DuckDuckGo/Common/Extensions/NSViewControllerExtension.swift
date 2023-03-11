@@ -51,6 +51,17 @@ extension NSViewController {
         }
     }
 
+    func beginSheetFromMainWindow(_ viewController: NSViewController) {
+        let newWindowController = viewController.wrappedInWindowController()
+        guard let newWindow = newWindowController.window,
+              let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController
+        else {
+            assertionFailure("Failed to present \(viewController)")
+            return
+        }
+        parentWindowController.window?.beginSheet(newWindow)
+    }
+
     func dismiss() {
         guard let window = view.window else {
             assertionFailure("\(#file): Failed to get the view's window")
@@ -68,12 +79,17 @@ extension NSViewController {
         }
     }
 
+    func addAndLayoutChild(_ vc: NSViewController) {
+        self.addChild(vc)
+        view.addAndLayout(vc.view)
+    }
+
     func removeCompletely() {
         guard parent != nil else { return }
         removeFromParent()
         view.removeFromSuperview()
     }
-    
+
     func withoutAnimation(_ closure: () -> Void) {
         CATransaction.begin()
         CATransaction.setDisableActions(true)

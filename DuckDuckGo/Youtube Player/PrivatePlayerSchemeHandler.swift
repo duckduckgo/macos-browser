@@ -46,6 +46,6 @@ final class PrivatePlayerSchemeHandler: NSObject, WKURLSchemeHandler {
             urlSchemeTask.didFinish()
         }
     }
-    
+
     func webView(_ webView: WKWebView, stop urlSchemeTask: WKURLSchemeTask) {}
 }

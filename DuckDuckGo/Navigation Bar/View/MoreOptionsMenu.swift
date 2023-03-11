@@ -23,7 +23,7 @@ import BrowserServicesKit
 import SwiftUI
 
 protocol OptionsButtonMenuDelegate: AnyObject {
-    
+
     func optionsButtonMenuRequestedBookmarkThisPage(_ sender: NSMenuItem)
     func optionsButtonMenuRequestedBookmarkPopover(_ menu: NSMenu)
     func optionsButtonMenuRequestedToggleBookmarksBar(_ menu: NSMenu)
@@ -44,23 +44,23 @@ final class MoreOptionsMenu: NSMenu {
     private let tabCollectionViewModel: TabCollectionViewModel
     private let emailManager: EmailManager
     private let passwordManagerCoordinator: PasswordManagerCoordinating
-    
+
     required init(coder: NSCoder) {
         fatalError("MoreOptionsMenu: Bad initializer")
     }
-    
+
     init(tabCollectionViewModel: TabCollectionViewModel,
          emailManager: EmailManager = EmailManager(),
          passwordManagerCoordinator: PasswordManagerCoordinator) {
-        
+
         self.tabCollectionViewModel = tabCollectionViewModel
         self.emailManager = emailManager
         self.passwordManagerCoordinator = passwordManagerCoordinator
 
         super.init(title: "")
-        
+
         self.emailManager.requestDelegate = self
-        
+
         setupMenuItems()
     }
 
@@ -71,11 +71,13 @@ final class MoreOptionsMenu: NSMenu {
         #if FEEDBACK
 
         addItem(withTitle: "Send Feedback", action: #selector(AppDelegate.openFeedback(_:)), keyEquivalent: "")
+        #if !APPSTORE
             .withImage(NSImage(named: "BetaLabel"))
+        #endif // !APPSTORE
 
         addItem(NSMenuItem.separator())
 
-        #endif
+        #endif // FEEDBACK
 
         addWindowItems()
 
@@ -89,9 +91,11 @@ final class MoreOptionsMenu: NSMenu {
             .withImage(NSImage(named: "OptionsButtonMenuEmail"))
             .withSubmenu(EmailOptionsButtonSubMenu(tabCollectionViewModel: tabCollectionViewModel, emailManager: emailManager))
 
+#if NETP
         addItem(withTitle: UserText.networkProtection, action: #selector(showNetworkProtectionStatus(_:)), keyEquivalent: "")
             .targetting(self)
             .withImage(.init(.vpnIcon))
+#endif
 
         addItem(NSMenuItem.separator())
 
@@ -127,19 +131,19 @@ final class MoreOptionsMenu: NSMenu {
     @objc func bookmarkPage(_ sender: NSMenuItem) {
         actionDelegate?.optionsButtonMenuRequestedBookmarkThisPage(sender)
     }
-    
+
     @objc func openBookmarks(_ sender: NSMenuItem) {
         actionDelegate?.optionsButtonMenuRequestedBookmarkPopover(self)
     }
-    
+
     @objc func openBookmarksManagementInterface(_ sender: NSMenuItem) {
         actionDelegate?.optionsButtonMenuRequestedBookmarkManagementInterface(self)
     }
-    
+
     @objc func toggleBookmarksBar(_ sender: NSMenuItem) {
         actionDelegate?.optionsButtonMenuRequestedToggleBookmarksBar(self)
     }
-    
+
     @objc func openBookmarkImportInterface(_ sender: NSMenuItem) {
         actionDelegate?.optionsButtonMenuRequestedBookmarkImportInterface(self)
     }
@@ -155,7 +159,7 @@ final class MoreOptionsMenu: NSMenu {
     @objc func openAutofillWithLogins(_ sender: NSMenuItem) {
         actionDelegate?.optionsButtonMenuRequestedLoginsPopover(self, selectedCategory: .logins)
     }
-    
+
     @objc func openExternalPasswordManager(_ sender: NSMenuItem) {
         actionDelegate?.optionsButtonMenuRequestedOpenExternalPasswordManager(self)
     }
@@ -198,7 +202,7 @@ final class MoreOptionsMenu: NSMenu {
 
     private func addUtilityItems() {
         let bookmarksSubMenu = BookmarksSubMenu(targetting: self, tabCollectionViewModel: tabCollectionViewModel)
-        
+
         addItem(withTitle: UserText.bookmarks, action: #selector(openBookmarks), keyEquivalent: "")
             .targetting(self)
             .withImage(NSImage(named: "Bookmarks"))
@@ -302,10 +306,17 @@ final class EmailOptionsButtonSubMenu: NSMenu {
         assert(emailManager.requestDelegate != nil, "No requestDelegate on emailManager")
 
         emailManager.getAliasIfNeededAndConsume { [weak self] alias, error in
-            guard let alias = alias, let address = self?.emailManager.emailAddressFor(alias) else {
+            guard let self = self, let alias = alias else {
                 assertionFailure(error?.localizedDescription ?? "Unexpected email error")
                 return
             }
+
+            let address = self.emailManager.emailAddressFor(alias)
+            let pixelParameters = self.emailManager.emailPixelParameters
+            self.emailManager.updateLastUseDate()
+
+            Pixel.fire(.emailUserCreatedAlias, withAdditionalParameters: pixelParameters)
+
             NSPasteboard.general.clearContents()
             NSPasteboard.general.setString(address, forType: .string)
             NotificationCenter.default.post(name: NSNotification.Name.privateEmailCopiedToClipboard, object: nil)
@@ -363,7 +374,7 @@ final class ZoomSubMenu: NSMenu {
 }
 
 final class BookmarksSubMenu: NSMenu {
-    
+
     init(targetting target: AnyObject, tabCollectionViewModel: TabCollectionViewModel) {
         super.init(title: UserText.passwordManagement)
         self.autoenablesItems = false
@@ -380,42 +391,42 @@ final class BookmarksSubMenu: NSMenu {
             .targetting(target)
 
         bookmarkPageItem.isEnabled = tabCollectionViewModel.selectedTabViewModel?.canBeBookmarked == true
-        
+
         addItem(NSMenuItem.separator())
-        
+
         addItem(withTitle: UserText.bookmarksShowToolbarPanel, action: #selector(MoreOptionsMenu.openBookmarks(_:)), keyEquivalent: "")
             .targetting(target)
 
         addItem(NSMenuItem.separator())
-        
+
         if let favorites = LocalBookmarkManager.shared.list?.favoriteBookmarks {
             let favoriteViewModels = favorites.compactMap(BookmarkViewModel.init(entity:))
             let potentialItems = bookmarkMenuItems(from: favoriteViewModels)
-            
+
             let favoriteMenuItems = potentialItems.isEmpty ? [NSMenuItem.empty] : potentialItems
-            
+
             let favoritesItem = addItem(withTitle: UserText.favorites, action: nil, keyEquivalent: "")
             favoritesItem.submenu = NSMenu(items: favoriteMenuItems)
             favoritesItem.image = NSImage(named: "Favorite")
-            
+
             addItem(NSMenuItem.separator())
         }
-        
+
         guard let entities = LocalBookmarkManager.shared.list?.topLevelEntities else {
             return
         }
-        
+
         let bookmarkViewModels = entities.compactMap(BookmarkViewModel.init(entity:))
         let menuItems = bookmarkMenuItems(from: bookmarkViewModels, topLevel: true)
-        
+
         self.items.append(contentsOf: menuItems)
-        
+
         addItem(NSMenuItem.separator())
 
         addItem(withTitle: UserText.importBrowserData, action: #selector(MoreOptionsMenu.openBookmarkImportInterface(_:)), keyEquivalent: "")
             .targetting(target)
     }
-    
+
     private func bookmarkMenuItems(from bookmarkViewModels: [BookmarkViewModel], topLevel: Bool = true) -> [NSMenuItem] {
         var menuItems = [NSMenuItem]()
 
@@ -446,7 +457,7 @@ final class BookmarksSubMenu: NSMenu {
 
         return menuItems
     }
-    
+
 }
 
 final class LoginsSubMenu: NSMenu {
@@ -470,7 +481,7 @@ final class LoginsSubMenu: NSMenu {
 
         let autofillSelector: Selector
         let autofillTitle: String
-        
+
         if passwordManagerCoordinator.isEnabled {
             autofillSelector = #selector(MoreOptionsMenu.openExternalPasswordManager)
             autofillTitle = "\(UserText.passwordManagementLogins) (\(UserText.openIn(value: passwordManagerCoordinator.displayName)))"
@@ -478,7 +489,7 @@ final class LoginsSubMenu: NSMenu {
             autofillSelector = #selector(MoreOptionsMenu.openAutofillWithLogins)
             autofillTitle = UserText.passwordManagementLogins
         }
-        
+
         addItem(withTitle: autofillTitle, action: autofillSelector, keyEquivalent: "")
             .targetting(target)
             .withImage(NSImage(named: "LoginGlyph"))
@@ -513,7 +524,7 @@ extension NSMenuItem {
         self.submenu = submenu
         return self
     }
-    
+
     @discardableResult
     func withModifierMask(_ mask: NSEvent.ModifierFlags) -> NSMenuItem {
         self.keyEquivalentModifierMask = mask

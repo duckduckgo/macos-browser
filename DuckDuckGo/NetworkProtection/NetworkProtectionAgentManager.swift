@@ -21,10 +21,18 @@ import ServiceManagement
 /// Takes care of enabling and disabling the NetP agent app.
 /// 
 final class NetworkProtectionAgentManager {
-    private static let agentBundleID = "HKE973VLUW.com.duckduckgo.macos.browser.network-protection.notifications" as CFString
+    // private static let agentBundleID = "HKE973VLUW.com.duckduckgo.macos.browser.network-protection.notifications" as CFString
     private static let resetDelay = 200
     static let current = NetworkProtectionAgentManager()
-    
+
+    static var agentBundleID: CFString {
+#if DEBUG
+        "HKE973VLUW.com.duckduckgo.macos.browser.network-protection.notifications" as CFString
+#else
+        "HKE973VLUW.com.duckduckgo.macos.browser.network-protection.notifications.debug" as CFString
+#endif
+    }
+
 #if NETP_SYSTEM_EXTENSION
     func enable() {
         SMLoginItemSetEnabled(Self.agentBundleID, true)
@@ -35,7 +43,7 @@ final class NetworkProtectionAgentManager {
         // if we decide to have the agent also handle the NetP status bar menu item.
     }
 #endif
-    
+
 #if NETP_SYSTEM_EXTENSION
     func disable() {
         SMLoginItemSetEnabled(Self.agentBundleID, false)

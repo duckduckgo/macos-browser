@@ -27,7 +27,7 @@ enum NetworkProtectionAppRequest: UInt8 {
     case setSelectedServer
     case getServerLocation
     case getServerAddress
-    
+
     static let preferredStringEncoding = String.Encoding.utf16
 }
 

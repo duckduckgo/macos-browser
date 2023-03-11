@@ -6,16 +6,17 @@ import Foundation
 import NetworkExtension
 import NetworkProtection
 import os
+import PixelKit
 import UserNotifications
 
 final class PacketTunnelProvider: NEPacketTunnelProvider {
-    
+
     // MARK: - Error Handling
-    
+
     enum TunnelError: LocalizedError {
         case couldNotGenerateTunnelConfiguration(internalError: Error)
         case couldNotFixConnection
-        
+
         var errorDescription: String? {
             switch self {
             case .couldNotGenerateTunnelConfiguration(let internalError):
@@ -28,9 +29,9 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
             }
         }
     }
-    
+
     // MARK: - WireGuard
-    
+
     private lazy var adapter: WireGuardAdapter = {
         WireGuardAdapter(with: self) { logLevel, message in
             if logLevel == .error {
@@ -40,21 +41,21 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
             }
         }
     }()
-    
+
     // MARK: - Distributed Notifications
-    
+
     private var distributedNotificationCenter = DistributedNotificationCenter.forType(.networkProtection)
-    
+
     // MARK: - Server Selection
 
     let selectedServerStore = NetworkProtectionSelectedServerUserDefaultsStore()
-    
+
     var lastSelectedServerInfo: NetworkProtectionServerInfo? {
         didSet {
             guard lastSelectedServerInfo != nil else {
                 return
             }
-            
+
             distributedNotificationCenter.postNotificationName(.NetPServerSelected, object: nil, userInfo: nil, options: [.deliverImmediately, .postToAllSessions])
         }
     }
@@ -76,7 +77,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
             guard let self = self else {
                 return
             }
-            
+
             switch result {
             case .connected:
                 self.tunnelHealth.isHavingConnectivityIssues = false
@@ -86,7 +87,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
                 self.reasserting = false
             case .disconnected(let failureCount):
                 self.tunnelHealth.isHavingConnectivityIssues = true
-                
+
                 if failureCount == 1 {
                     self.notificationsPresenter.showReconnectingNotification()
                     self.reasserting = true
@@ -106,35 +107,57 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
 
     override init() {
         os_log("🔵 Initializing NetP packet tunnel provider", log: .networkProtection, type: .error)
-        
+
         super.init()
-        
+
         #if NETP_SYSTEM_EXTENSION
         IPCConnection.shared.startListener()
         #endif
-
-#if DEBUG
-        Pixel.setUp(dryRun: true)
-#else
-        Pixel.setUp()
-#endif
     }
-    
+
+    private func setupPixels(userAgent: String, baseURL: String) {
+        let dryRun: Bool
+#if DEBUG
+        dryRun = true
+#else
+        dryRun = false
+#endif
+
+        Pixel.setUp(dryRun: dryRun, userAgent: userAgent, log: .networkProtection) { (pixelName: String, headers: [String: String], parameters: [String: String], allowedQueryReservedCharacters: CharacterSet?, callBackOnMainThread: Bool, onComplete: @escaping (Error?) -> Void) in
+
+            let url = URL.pixelUrl(forPixelNamed: pixelName)
+            APIRequest.request(
+                url: url,
+                parameters: parameters,
+                allowedQueryReservedCharacters: allowedQueryReservedCharacters,
+                headers: headers,
+                callBackOnMainThread: callBackOnMainThread
+            ) { (_, error) in
+                onComplete(error)
+            }
+        }
+    }
+
     private var tunnelProviderProtocol: NETunnelProviderProtocol? {
         protocolConfiguration as? NETunnelProviderProtocol
     }
 
     override func startTunnel(options: [String: NSObject]?, completionHandler: @escaping (Error?) -> Void) {
-        
         let activationAttemptId = options?["activationAttemptId"] as? String
-        
+
+        if let userAgent = options?["userAgent"] as? String,
+           let pixelBaseURL = options?["pixelBaseURL"] as? String {
+
+            setupPixels(userAgent: userAgent, baseURL: pixelBaseURL)
+        }
+
         tunnelHealth.isHavingConnectivityIssues = false
         controllerErrorStore.lastErrorMessage = nil
-        
+
         if let serverName = options?["selectedServer"] as? String {
             selectedServerStore.selectedServer = .endpoint(serverName)
         }
-        
+
         os_log("🔵 Starting tunnel from the %{public}@", log: .networkProtection, type: .info, activationAttemptId == nil ? "OS directly, rather than the app" : "app")
         // - TODO: We could also add other conditions for updating the server, such as an expiration timestamp.
 
@@ -147,7 +170,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
             case .endpoint(let serverName):
                 serverSelectionMethod = .preferredServer(serverName: serverName)
             }
-            
+
             do {
                 os_log("🔵 Generating tunnel config", log: .networkProtection, type: .info)
                 let tunnelConfiguration = try await generateTunnelConfiguration(serverSelectionMethod: serverSelectionMethod)
@@ -155,27 +178,27 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
                 os_log("🔵 Done generating tunnel config", log: .networkProtection, type: .info)
             } catch {
                 os_log("🔵 Error starting tunnel: %{public}@", log: .networkProtection, type: .info, error.localizedDescription)
-                
+
                 controllerErrorStore.lastErrorMessage = error.localizedDescription
-                
+
                 let error = NSError(domain: NEVPNErrorDomain, code: NEVPNError.configurationInvalid.rawValue)
                 completionHandler(error)
             }
         }
     }
-    
+
     private func startTunnel(with tunnelConfiguration: TunnelConfiguration, completionHandler: @escaping (Error?) -> Void) {
         adapter.start(tunnelConfiguration: tunnelConfiguration) { error in
             if let error = error {
                 self.handle(wireGuardAdapterError: error, completionHandler: completionHandler)
                 return
             }
-            
+
             self.handleAdapterStarted()
             completionHandler(nil)
         }
     }
-    
+
     override func stopTunnel(with reason: NEProviderStopReason, completionHandler: @escaping () -> Void) {
         os_log("🔵 Stopping tunnel", log: .networkProtection, type: .info)
 
@@ -197,7 +220,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
             #endif
         }
     }
-    
+
     /// Do not cancel, directly... call this method so that the adapter and tester are stopped too.
     private func stopTunnel(with stopError: Error) {
         self.connectionTester.stop()
@@ -205,25 +228,25 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
             if let error = error {
                 os_log("🔵 Error while stopping adapter: %{public}@", log: .networkProtection, type: .info, error.localizedDescription)
             }
-            
+
             self.cancelTunnelWithError(stopError)
         }
     }
-    
+
     /// Intentionally not async, so that we won't lock whoever called this method.  This method will race against the tester
     /// to see if it can fix the connection before the next failure.
     ///
     private func fixTunnel() {
         Task {
             let serverSelectionMethod: NetworkProtectionServerSelectionMethod
-            
+
             if let lastServerName = lastSelectedServerInfo?.name {
                 serverSelectionMethod = .avoidServer(serverName: lastServerName)
             } else {
                 assertionFailure("We should not have a situation where the VPN is trying to fix the tunnel and there's no previous server info")
                 serverSelectionMethod = .automatic
             }
-            
+
             do {
                 try await updateTunnelConfiguration(serverSelectionMethod: serverSelectionMethod)
             } catch {
@@ -231,10 +254,10 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
             }
         }
     }
-    
+
     private func updateTunnelConfiguration(serverSelectionMethod: NetworkProtectionServerSelectionMethod) async throws {
         let tunnelConfiguration = try await generateTunnelConfiguration(serverSelectionMethod: serverSelectionMethod)
-        
+
         self.adapter.update(tunnelConfiguration: tunnelConfiguration) { error in
             if let error = error {
                 os_log("🔵 Failed to update the configuration: %{public}@", type: .error, error.localizedDescription)
@@ -242,7 +265,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
             }
         }
     }
-    
+
     private func generateTunnelConfiguration(serverSelectionMethod: NetworkProtectionServerSelectionMethod) async throws -> TunnelConfiguration {
 
         os_log("🔵 serverSelectionMethod %{public}@", String(describing: serverSelectionMethod))
@@ -267,9 +290,9 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
                log: .networkProtection,
                selectedServerInfo.serverLocation,
                selectedServerInfo.name)
-        
+
         let tunnelConfiguration = configurationResult.0
-        
+
         return tunnelConfiguration
     }
 
@@ -280,97 +303,125 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
             completionHandler?(nil)
             return
         }
-        
+
         switch request {
         case .resetAllState:
-            NetworkProtectionKeychain.deleteReferences()
-            let serverCache = NetworkProtectionServerListFileSystemStore()
-            try? serverCache.removeServerList()
-            // This is not really an error, we received a command to reset the connection
-            cancelTunnelWithError(nil)
-            completionHandler?(nil)
+            handleResetAllState(messageData, completionHandler: completionHandler)
         case .getLastErrorMessage:
-            let data = controllerErrorStore.lastErrorMessage?.data(using: NetworkProtectionAppRequest.preferredStringEncoding)
-            completionHandler?(data)
+            handleGetLastErrorMessage(messageData, completionHandler: completionHandler)
         case .getRuntimeConfiguration:
-            adapter.getRuntimeConfiguration { settings in
-                var data: Data?
-                if let settings = settings {
-                    data = settings.data(using: .utf8)!
-                }
-                completionHandler?(data)
-            }
+            handleGetRuntimeConfiguration(messageData, completionHandler: completionHandler)
         case .isHavingConnectivityIssues:
-            let data = Data([tunnelHealth.isHavingConnectivityIssues ? 1 : 0])
-            completionHandler?(data)
+            handleIsHavingConnectivityIssues(messageData, completionHandler: completionHandler)
         case .setSelectedServer:
-            Task {
-                let remainingData = messageData.suffix(messageData.count - 1)
-                
-                guard remainingData.count > 0 else {
-                    if case .endpoint = selectedServerStore.selectedServer {
-                        selectedServerStore.selectedServer = .automatic
-                        try? await updateTunnelConfiguration(serverSelectionMethod: .automatic)
-                    }
-                    completionHandler?(nil)
-                    return
-                }
-                
-                guard let serverName = String(data: remainingData, encoding: NetworkProtectionAppRequest.preferredStringEncoding) else {
-                    
-                    if case .endpoint = selectedServerStore.selectedServer {
-                        selectedServerStore.selectedServer = .automatic
-                        try? await updateTunnelConfiguration(serverSelectionMethod: .automatic)
-                    }
-                    completionHandler?(nil)
-                    return
-                }
-                
-                guard selectedServerStore.selectedServer.stringValue != serverName else {
-                    completionHandler?(nil)
-                    return
-                }
-                
-                selectedServerStore.selectedServer = .endpoint(serverName)
-                try? await updateTunnelConfiguration(serverSelectionMethod: .preferredServer(serverName: serverName))
-            }
+            handleSetSelectedServer(messageData, completionHandler: completionHandler)
         case .getServerLocation:
-            guard let serverLocation = lastSelectedServerInfo?.serverLocation else {
-                completionHandler?(nil)
-                return
-            }
-            
-            completionHandler?(serverLocation.data(using: NetworkProtectionAppRequest.preferredStringEncoding))
+            handleGetServerLocation(messageData, completionHandler: completionHandler)
         case .getServerAddress:
-            guard let serverAddress = lastSelectedServerInfo?.serverAddresses.first else {
-                completionHandler?(nil)
-                return
-            }
-            
-            completionHandler?(serverAddress.data(using: NetworkProtectionAppRequest.preferredStringEncoding))
+            handleGetServerAddress(messageData, completionHandler: completionHandler)
         }
     }
-    
+
+    private func handleResetAllState(_ messageData: Data, completionHandler: ((Data?) -> Void)? = nil) {
+        NetworkProtectionKeychain.deleteReferences()
+        let serverCache = NetworkProtectionServerListFileSystemStore()
+        try? serverCache.removeServerList()
+        // This is not really an error, we received a command to reset the connection
+        cancelTunnelWithError(nil)
+        completionHandler?(nil)
+    }
+
+    private func handleGetLastErrorMessage(_ messageData: Data, completionHandler: ((Data?) -> Void)? = nil) {
+        let data = controllerErrorStore.lastErrorMessage?.data(using: NetworkProtectionAppRequest.preferredStringEncoding)
+        completionHandler?(data)
+    }
+
+    private func handleGetRuntimeConfiguration(_ messageData: Data, completionHandler: ((Data?) -> Void)? = nil) {
+        adapter.getRuntimeConfiguration { settings in
+            var data: Data?
+            if let settings = settings {
+                data = settings.data(using: .utf8)!
+            }
+            completionHandler?(data)
+        }
+    }
+
+    private func handleIsHavingConnectivityIssues(_ messageData: Data, completionHandler: ((Data?) -> Void)? = nil) {
+        let data = Data([tunnelHealth.isHavingConnectivityIssues ? 1 : 0])
+        completionHandler?(data)
+    }
+
+    private func handleSetSelectedServer(_ messageData: Data, completionHandler: ((Data?) -> Void)? = nil) {
+        Task {
+            let remainingData = messageData.suffix(messageData.count - 1)
+
+            guard remainingData.count > 0 else {
+                if case .endpoint = selectedServerStore.selectedServer {
+                    selectedServerStore.selectedServer = .automatic
+                    try? await updateTunnelConfiguration(serverSelectionMethod: .automatic)
+                }
+                completionHandler?(nil)
+                return
+            }
+
+            guard let serverName = String(data: remainingData, encoding: NetworkProtectionAppRequest.preferredStringEncoding) else {
+
+                if case .endpoint = selectedServerStore.selectedServer {
+                    selectedServerStore.selectedServer = .automatic
+                    try? await updateTunnelConfiguration(serverSelectionMethod: .automatic)
+                }
+                completionHandler?(nil)
+                return
+            }
+
+            guard selectedServerStore.selectedServer.stringValue != serverName else {
+                completionHandler?(nil)
+                return
+            }
+
+            selectedServerStore.selectedServer = .endpoint(serverName)
+            try? await updateTunnelConfiguration(serverSelectionMethod: .preferredServer(serverName: serverName))
+        }
+    }
+
+    private func handleGetServerLocation(_ messageData: Data, completionHandler: ((Data?) -> Void)? = nil) {
+        guard let serverLocation = lastSelectedServerInfo?.serverLocation else {
+            completionHandler?(nil)
+            return
+        }
+
+        completionHandler?(serverLocation.data(using: NetworkProtectionAppRequest.preferredStringEncoding))
+    }
+
+    private func handleGetServerAddress(_ messageData: Data, completionHandler: ((Data?) -> Void)? = nil) {
+        guard let serverAddress = lastSelectedServerInfo?.serverAddresses.first else {
+            completionHandler?(nil)
+            return
+        }
+
+        completionHandler?(serverAddress.data(using: NetworkProtectionAppRequest.preferredStringEncoding))
+    }
+
     // MARK: - Adapter start completion handling
-    
+
     private var testerStartRetryTimer: DispatchSourceTimer?
-    
+
     /// Called when the adapter reports that the tunnel was successfully started.
     ///
     private func handleAdapterStarted() {
         os_log("🔵 Tunnel interface is %{public}@", log: .networkProtection, type: .info, adapter.interfaceName ?? "unknown")
-        
+
         if let interfaceName = adapter.interfaceName {
             connectionTester.start(tunnelIfName: interfaceName)
         } else {
             os_log("🔵 Error: the VPN connection tester could not be started since we could not retrieve the tunnel interface name", log: .networkProtection, type: .error)
         }
     }
-    
+
     /// Called when the adapter reports that the tunnel failed to start with an error.
     ///
     private func handle(wireGuardAdapterError error: WireGuardAdapterError, completionHandler: @escaping (Error?) -> Void) {
-        
+
         switch error {
         case .cannotLocateTunnelFileDescriptor:
             os_log("🔵 Starting tunnel failed: could not determine file descriptor", log: .networkProtection, type: .error)
@@ -400,9 +451,9 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
             completionHandler(PacketTunnelProviderError.invalidState)
         }
     }
-    
+
     // MARK: - Computer sleeping
-    
+
     override func sleep(completionHandler: @escaping () -> Void) {
         connectionTester.stop()
     }

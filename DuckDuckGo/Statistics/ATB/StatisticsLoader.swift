@@ -17,20 +17,23 @@
 //
 
 import Foundation
+import BrowserServicesKit
 import os.log
 
 final class StatisticsLoader {
-    
+
     typealias Completion =  (() -> Void)
-    
+
     static let shared = StatisticsLoader()
-    
+
     private let statisticsStore: StatisticsStore
+    private let emailManager: EmailManager
     private let parser = AtbParser()
     private var isAppRetentionRequestInProgress = false
-    
-    init(statisticsStore: StatisticsStore = LocalStatisticsStore()) {
+
+    init(statisticsStore: StatisticsStore = LocalStatisticsStore(), emailManager: EmailManager = EmailManager()) {
         self.statisticsStore = statisticsStore
+        self.emailManager = emailManager
     }
 
     func refreshRetentionAtb(isSearch: Bool, completion: @escaping Completion = {}) {
@@ -66,7 +69,7 @@ final class StatisticsLoader {
 
         requestInstallStatistics(completion: completion)
     }
-    
+
     private func requestInstallStatistics(completion: @escaping Completion = {}) {
         dispatchPrecondition(condition: .onQueue(.main))
 
@@ -74,7 +77,7 @@ final class StatisticsLoader {
         isAppRetentionRequestInProgress = true
 
         os_log("Requesting install statistics", log: .atb, type: .debug)
-        
+
         APIRequest.request(url: URL.initialAtb) { response, error in
             DispatchQueue.main.async {
                 self.isAppRetentionRequestInProgress = false
@@ -85,7 +88,7 @@ final class StatisticsLoader {
                 }
 
                 os_log("Install statistics request succeeded", log: .atb, type: .debug)
-                
+
                 if let data = response?.data, let atb  = try? self.parser.convert(fromJsonData: data) {
                     self.requestExti(atb: atb, completion: completion)
                 } else {
@@ -94,7 +97,7 @@ final class StatisticsLoader {
             }
         }
     }
-    
+
     private func requestExti(atb: Atb, completion: @escaping Completion = {}) {
         dispatchPrecondition(condition: .onQueue(.main))
 
@@ -102,7 +105,7 @@ final class StatisticsLoader {
         self.isAppRetentionRequestInProgress = true
 
         os_log("Requesting exti", log: .atb, type: .debug)
-        
+
         let installAtb = atb.version + (statisticsStore.variant ?? "")
         let url = URL.exti(forAtb: installAtb)
         APIRequest.request(url: url) { _, error in
@@ -113,7 +116,7 @@ final class StatisticsLoader {
                     completion()
                     return
                 }
-                
+
                 os_log("Exti request succeeded", log: .atb, type: .debug)
 
                 assert(self.statisticsStore.atb == nil)
@@ -125,7 +128,7 @@ final class StatisticsLoader {
             }
         }
     }
-    
+
     func refreshSearchRetentionAtb(completion: @escaping Completion = {}) {
         dispatchPrecondition(condition: .onQueue(.main))
 
@@ -135,10 +138,10 @@ final class StatisticsLoader {
             requestInstallStatistics(completion: completion)
             return
         }
-        
+
         os_log("Requesting search retention ATB", log: .atb, type: .debug)
 
-        let url = URL.searchAtb(atbWithVariant: atbWithVariant, setAtb: searchRetentionAtb)
+        let url = URL.searchAtb(atbWithVariant: atbWithVariant, setAtb: searchRetentionAtb, isSignedIntoEmailProtection: emailManager.isSignedIn)
         APIRequest.request(url: url) { response, error in
             DispatchQueue.main.async {
                 if let error = error {
@@ -146,19 +149,19 @@ final class StatisticsLoader {
                     completion()
                     return
                 }
-                
+
                 os_log("Search retention ATB request succeeded", log: .atb, type: .debug)
-                
+
                 if let data = response?.data, let atb  = try? self.parser.convert(fromJsonData: data) {
                     self.statisticsStore.searchRetentionAtb = atb.version
                     self.storeUpdateVersionIfPresent(atb)
                 }
-                
+
                 completion()
             }
         }
     }
-    
+
     func refreshAppRetentionAtb(completion: @escaping Completion = {}) {
         dispatchPrecondition(condition: .onQueue(.main))
 
@@ -171,9 +174,9 @@ final class StatisticsLoader {
         }
 
         os_log("Requesting app retention ATB", log: .atb, type: .debug)
-        
+
         isAppRetentionRequestInProgress = true
-        
+
         let url = URL.appRetentionAtb(atbWithVariant: atbWithVariant, setAtb: appRetentionAtb)
         APIRequest.request(url: url) { response, error in
             DispatchQueue.main.async {
@@ -186,7 +189,7 @@ final class StatisticsLoader {
                 }
 
                 os_log("App retention ATB request succeeded", log: .atb, type: .debug)
-                
+
                 if let data = response?.data, let atb  = try? self.parser.convert(fromJsonData: data) {
                     self.statisticsStore.appRetentionAtb = atb.version
                     self.statisticsStore.lastAppRetentionRequestDate = Date()
@@ -200,7 +203,7 @@ final class StatisticsLoader {
 
     func storeUpdateVersionIfPresent(_ atb: Atb) {
         dispatchPrecondition(condition: .onQueue(.main))
-        
+
         if let updateVersion = atb.updateVersion {
             statisticsStore.atb = updateVersion
         }

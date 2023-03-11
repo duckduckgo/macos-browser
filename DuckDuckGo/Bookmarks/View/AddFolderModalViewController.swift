@@ -20,10 +20,15 @@ import AppKit
 import Combine
 
 protocol AddFolderModalViewControllerDelegate: AnyObject {
-    
+
     func addFolderViewController(_ viewController: AddFolderModalViewController, addedFolderWith name: String)
     func addFolderViewController(_ viewController: AddFolderModalViewController, saved folder: BookmarkFolder)
-    
+    func addFolderViewControllerWillClose()
+
+}
+
+extension AddFolderModalViewControllerDelegate {
+    func addFolderViewControllerWillClose() {}
 }
 
 final class AddFolderModalViewController: NSViewController {
@@ -75,6 +80,7 @@ final class AddFolderModalViewController: NSViewController {
     }
 
     @IBAction private func cancel(_ sender: NSButton) {
+        delegate?.addFolderViewControllerWillClose()
         dismiss()
     }
 
@@ -88,6 +94,7 @@ final class AddFolderModalViewController: NSViewController {
             delegate?.addFolderViewController(self, addedFolderWith: folderNameTextField.stringValue)
         }
 
+        delegate?.addFolderViewControllerWillClose()
         dismiss()
     }
 

@@ -17,6 +17,25 @@
 //
 
 import Foundation
+import PixelKit
+
+extension Pixel {
+
+    enum Parameters {
+        static let duration = "duration"
+        static let test = "test"
+        static let appVersion = "appVersion"
+
+        static let keychainFieldName = "fieldName"
+        static let errorCode = "e"
+        static let errorDesc = "d"
+        static let errorCount = "c"
+    }
+
+    enum Values {
+        static let test = "1"
+    }
+}
 
 extension Pixel {
     static func fire(_ event: NetworkProtectionPixelEvent,
@@ -35,14 +54,15 @@ extension Pixel {
         case (.none, .none):
             newParams = nil
         }
-        
+
         let appVersion = AppVersion(bundle: NetworkProtectionBundle.mainAppBundle())
-        
+
         Pixel.shared?.fire(pixelNamed: event.name,
+                           withHeaders: APIHeaders(appVersion: appVersion).defaultHeaders,
                            withAdditionalParameters: newParams,
+                           appVersion: appVersion.versionNumber,
                            allowedQueryReservedCharacters: allowedQueryReservedCharacters,
                            includeAppVersionParameter: includeAppVersionParameter,
-                           withHeaders: APIHeaders(appVersion: appVersion).defaultHeaders,
                            onComplete: onComplete)
     }
 }
@@ -68,7 +88,7 @@ enum NetworkProtectionPixelEvent {
     case networkProtectionKeychainDeleteError(field: String, status: Int32)
 
     case networkProtectionUnhandledError(function: String, line: Int, error: Error)
-    
+
     var name: String {
         switch self {
         case .networkProtectionTunnelConfigurationNoServerRegistrationInfo:
@@ -120,7 +140,7 @@ enum NetworkProtectionPixelEvent {
             return "m_mac_netp_unhandled_error"
         }
     }
-    
+
     var parameters: [String: String]? {
         switch self {
         case .networkProtectionKeychainErrorFailedToCastKeychainValueToData(let field):

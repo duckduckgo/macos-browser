@@ -28,7 +28,7 @@ protocol SavePaymentMethodDelegate: AnyObject {
 }
 
 final class SavePaymentMethodViewController: NSViewController {
-    
+
     enum Constants {
         static let storyboardName = "PasswordManager"
         static let identifier = "SavePaymentMethod"
@@ -41,46 +41,46 @@ final class SavePaymentMethodViewController: NSViewController {
 
         return controller
     }
-    
+
     @IBOutlet var cardDetailsLabel: NSTextField!
     @IBOutlet var cardExpirationLabel: NSTextField!
-    
+
     weak var delegate: SavePaymentMethodDelegate?
-    
+
     private var paymentMethod: SecureVaultModels.CreditCard?
     private var appearanceCancellable: AnyCancellable?
 
     // MARK: - Public
-    
+
     func savePaymentMethod(_ paymentMethod: SecureVaultModels.CreditCard) {
         self.paymentMethod = paymentMethod
-        
+
         let type = CreditCardValidation.type(for: paymentMethod.cardNumber)
         cardDetailsLabel.stringValue = "\(type.displayName) ••••\(paymentMethod.cardSuffix)"
-        
+
         if let expirationMonth = paymentMethod.expirationMonth, let expirationYear = paymentMethod.expirationYear {
             cardExpirationLabel.stringValue = "\(expirationMonth)/\(expirationYear)"
         } else {
             cardExpirationLabel.stringValue = ""
         }
     }
-    
+
     // MARK: - Actions
-    
+
     @IBAction func onNotNowClicked(sender: NSButton) {
         self.delegate?.shouldCloseSavePaymentMethodViewController(self)
     }
-    
+
     @IBAction func onSaveClicked(sender: NSButton) {
         defer {
             self.delegate?.shouldCloseSavePaymentMethodViewController(self)
         }
-        
+
         guard var paymentMethod = paymentMethod else {
             assertionFailure("Tried to save payment method, but the view controller didn't have one")
             return
         }
-        
+
         paymentMethod.title = CreditCardValidation.type(for: paymentMethod.cardNumber).displayName
 
         do {
@@ -89,7 +89,7 @@ final class SavePaymentMethodViewController: NSViewController {
             os_log("%s:%s: failed to store payment method %s", type: .error, className, #function, error.localizedDescription)
         }
     }
-    
+
     @IBAction func onOpenPreferencesClicked(sender: NSButton) {
         WindowControllersManager.shared.showPreferencesTab()
         self.delegate?.shouldCloseSavePaymentMethodViewController(self)
