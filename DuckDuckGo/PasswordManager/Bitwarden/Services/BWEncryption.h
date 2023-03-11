@@ -19,7 +19,8 @@
 #import <Foundation/Foundation.h>
 #import <OpenSSL/OpenSSL.h>
 #import <CommonCrypto/CommonHMAC.h>
-#import "BWEncryptionOutput.h"
+
+@class BWEncryptionOutput;
 
 NS_ASSUME_NONNULL_BEGIN
 

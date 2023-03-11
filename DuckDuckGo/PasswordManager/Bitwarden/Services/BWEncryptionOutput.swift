@@ -1,7 +1,7 @@
 //
-//  EncryptionOutput.h
+//  BWEncryption.swift
 //
-//  Copyright © 2022 DuckDuckGo. All rights reserved.
+//  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,16 +16,19 @@
 //  limitations under the License.
 //
 
-#import <Foundation/Foundation.h>
+import Foundation
 
-NS_ASSUME_NONNULL_BEGIN
+final class BWEncryptionOutput: NSObject {
 
-@interface BWEncryptionOutput : NSObject
+    let iv: Data
+    let data: Data
+    let hmac: Data
 
-@property (nonatomic, strong) NSData* iv;
-@property (nonatomic, strong) NSData* data;
-@property (nonatomic, strong) NSData* hmac;
+    @objc(initWithIV:data:hmac:)
+    init(iv: Data, data: Data, hmac: Data) {
+        self.iv = iv
+        self.data = data
+        self.hmac = hmac
+    }
 
-@end
-
-NS_ASSUME_NONNULL_END
+}
