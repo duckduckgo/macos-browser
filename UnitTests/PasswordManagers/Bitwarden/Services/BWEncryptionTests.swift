@@ -51,7 +51,7 @@ final class BWEncryptionTests: XCTestCase {
 
         XCTAssertNotNil(encryptionOutput)
 
-        let decryptionOutput = encryption.decryptData(encryptionOutput!.data, andIv: encryptionOutput!.iv)
+        let decryptionOutput = encryption.decryptData(encryptionOutput!.data, withIV: encryptionOutput!.iv)
 
         XCTAssertEqual(data, decryptionOutput)
 

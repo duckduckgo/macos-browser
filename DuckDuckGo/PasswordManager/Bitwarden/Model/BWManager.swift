@@ -280,14 +280,14 @@ final class BWManager: BWManagement, ObservableObject {
         }
 
         // Compare HMAC
-        let ourHmac = encryption.computeHmac(data, iv: ivData)
+        let ourHmac = encryption.computeHmac(for: data, withIV: ivData)
         guard ourHmac == hmac else {
             Pixel.fire(.debug(event: .bitwardenHmacComparisonFailed))
             logOrAssertionFailure("BWManager: HMAC comparison failed")
             return
         }
 
-        let decryptedData = encryption.decryptData(data, andIv: ivData)
+        let decryptedData = encryption.decryptData(data, withIV: ivData)
         guard decryptedData.count > 0 else {
             Pixel.fire(.debug(event: .bitwardenDecryptionFailed))
             status = .error(error: .decryptionOfDataFailed)
@@ -493,7 +493,7 @@ final class BWManager: BWManagement, ObservableObject {
 
 #if DEBUG
         // Verify encryption
-        let decryptedData = encryption.decryptData(encryptedData.data, andIv: encryptedData.iv)
+        let decryptedData = encryption.decryptData(encryptedData.data, withIV: encryptedData.iv)
         assert(decryptedData.utf8String() != nil)
 #endif
 

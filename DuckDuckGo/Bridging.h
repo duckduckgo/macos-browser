@@ -14,5 +14,4 @@
 #ifndef APPSTORE
 #import "_WKDownload.h"
 #import "WKProcessPool+Private.h"
-#import "BWEncryption.h"
 #endif

@@ -32,8 +32,8 @@ import XcodeProjectPlugin
  */
 let extraInputFiles: [TargetName: Set<InputFile>] = [
     "DuckDuckGo Privacy Browser": [
-        .init("BWEncryption.m", .source),
         .init("BWEncryptionOutput.swift", .source),
+        .init("BWEncryption.swift", .source),
         .init("BWManager.swift", .source),
         .init("UpdateController.swift", .source),
         .init("LegacyWebKitDownloadDelegate.swift", .source),
