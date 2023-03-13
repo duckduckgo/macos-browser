@@ -1488,6 +1488,8 @@
 		B603971229B9D67E00902A34 /* PublishersExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B603970F29B9D67E00902A34 /* PublishersExtensions.swift */; };
 		B603971329B9D67E00902A34 /* PublishersExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B603970F29B9D67E00902A34 /* PublishersExtensions.swift */; };
 		B603971B29BA084C00902A34 /* JSAlertController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE339227291BDEFD009F62C1 /* JSAlertController.swift */; };
+		B603972C29BEDF2100902A34 /* ExpectedNavigationExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B603972B29BEDF2100902A34 /* ExpectedNavigationExtension.swift */; };
+		B603972D29BEDF2100902A34 /* ExpectedNavigationExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B603972B29BEDF2100902A34 /* ExpectedNavigationExtension.swift */; };
 		B6040856274B830F00680351 /* DictionaryExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6040855274B830F00680351 /* DictionaryExtension.swift */; };
 		B604085C274B8FBA00680351 /* UnprotectedDomains.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = B604085A274B8CA300680351 /* UnprotectedDomains.xcdatamodeld */; };
 		B6085D062743905F00A9C456 /* CoreDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6085D052743905F00A9C456 /* CoreDataStore.swift */; };
@@ -2509,6 +2511,7 @@
 		B3FB198D27BC013C00513DC1 /* autoconsent-test-page.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = "autoconsent-test-page.html"; sourceTree = "<group>"; };
 		B3FB198F27BC015600513DC1 /* autoconsent-test.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "autoconsent-test.js"; sourceTree = "<group>"; };
 		B603970F29B9D67E00902A34 /* PublishersExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PublishersExtensions.swift; sourceTree = "<group>"; };
+		B603972B29BEDF2100902A34 /* ExpectedNavigationExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpectedNavigationExtension.swift; sourceTree = "<group>"; };
 		B6040855274B830F00680351 /* DictionaryExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionaryExtension.swift; sourceTree = "<group>"; };
 		B604085B274B8CA400680351 /* Permissions.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Permissions.xcdatamodel; sourceTree = "<group>"; };
 		B6085D052743905F00A9C456 /* CoreDataStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataStore.swift; sourceTree = "<group>"; };
@@ -3356,11 +3359,11 @@
 		4B1AD89E25FC27E200261379 /* IntegrationTests */ = {
 			isa = PBXGroup;
 			children = (
+				B603972A29BEDF0F00902A34 /* Common */,
 				B31055CC27A1BA39001AC618 /* Autoconsent */,
 				B6EC37DC29B5D05A001ACE79 /* Downloads */,
 				4B1AD91625FC46FB00261379 /* CoreDataEncryptionTests.swift */,
 				4BA1A6EA258C288C00F6F690 /* EncryptionKeyStoreTests.swift */,
-				B6EC37FB29B83E99001ACE79 /* TestsURLExtension.swift */,
 				4B1AD8A125FC27E200261379 /* Info.plist */,
 			);
 			path = IntegrationTests;
@@ -5313,6 +5316,15 @@
 			name = Autoconsent;
 			sourceTree = "<group>";
 		};
+		B603972A29BEDF0F00902A34 /* Common */ = {
+			isa = PBXGroup;
+			children = (
+				B6EC37FB29B83E99001ACE79 /* TestsURLExtension.swift */,
+				B603972B29BEDF2100902A34 /* ExpectedNavigationExtension.swift */,
+			);
+			path = Common;
+			sourceTree = "<group>";
+		};
 		B6040859274B8C5200680351 /* UnprotectedDomains */ = {
 			isa = PBXGroup;
 			children = (
@@ -7102,6 +7114,7 @@
 				B626A77229928C6A00053070 /* MockPrivacyConfiguration.swift in Sources */,
 				3706FEA5293F662100E42796 /* CoreDataEncryptionTesting.xcdatamodeld in Sources */,
 				B60C6F8729B1CAB2007BFAA8 /* TestRunHelper.swift in Sources */,
+				B603972D29BEDF2100902A34 /* ExpectedNavigationExtension.swift in Sources */,
 				3706FEA6293F662100E42796 /* EncryptionKeyStoreTests.swift in Sources */,
 				B6F5656A299A414300A04298 /* WKWebViewMockingExtension.swift in Sources */,
 			);
@@ -7128,6 +7141,7 @@
 				B626A77329928C6B00053070 /* MockPrivacyConfiguration.swift in Sources */,
 				B6BDD9F62940B5B500F68088 /* ContentBlockingMock.swift in Sources */,
 				B60C6F8629B1CAB0007BFAA8 /* TestRunHelper.swift in Sources */,
+				B603972C29BEDF2100902A34 /* ExpectedNavigationExtension.swift in Sources */,
 				4B1AD8D525FC38DD00261379 /* EncryptionKeyStoreTests.swift in Sources */,
 				B6F56568299A414300A04298 /* WKWebViewMockingExtension.swift in Sources */,
 			);
