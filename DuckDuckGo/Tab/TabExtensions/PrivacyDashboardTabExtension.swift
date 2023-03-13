@@ -115,11 +115,6 @@ extension PrivacyDashboardTabExtension {
         }
     }
 
-    private func setConnectionUpgradedTo(_ upgradedUrl: URL, navigationAction: NavigationAction) {
-        guard navigationAction.isForMainFrame else { return }
-        privacyInfo?.connectionUpgradedTo = upgradedUrl
-    }
-
     public func setMainFrameConnectionUpgradedTo(_ upgradedUrl: URL?) {
         guard let upgradedUrl else { return }
         privacyInfo?.connectionUpgradedTo = upgradedUrl
