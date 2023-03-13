@@ -369,19 +369,26 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
     deinit {
         cleanUpBeforeClosing()
-        webView.configuration.userContentController.removeAllUserScripts()
     }
 
     func cleanUpBeforeClosing() {
-        if content.isUrl, let url = webView.url {
-            historyCoordinating.commitChanges(url: url)
-        }
-        webView.stopLoading()
-        webView.stopMediaCapture()
-        webView.stopAllMediaPlayback()
-        webView.fullscreenWindowController?.close()
+        let job = { [content, webView, identifier=instrumentation.currentTabIdentifier, historyCoordinating, cbaTimeReporter] in
+            if content.isUrl, let url = webView.url {
+                historyCoordinating.commitChanges(url: url)
+            }
+            webView.stopLoading()
+            webView.stopMediaCapture()
+            webView.stopAllMediaPlayback()
+            webView.fullscreenWindowController?.close()
 
-        cbaTimeReporter?.tabWillClose(self.instrumentation.currentTabIdentifier)
+            cbaTimeReporter?.tabWillClose(identifier)
+            webView.configuration.userContentController.removeAllUserScripts()
+        }
+        guard Thread.isMainThread else {
+            DispatchQueue.main.async(execute: job)
+            return
+        }
+        job()
     }
 
 #if DEBUG
@@ -429,7 +436,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     }
 
     @discardableResult
-    func setContent(_ newContent: TabContent) -> Task<Void, Never>? {
+    func setContent(_ newContent: TabContent) -> Task<ExpectedNavigation?, Never>? {
         guard contentChangeEnabled else { return nil }
 
         let oldContent = self.content
@@ -459,7 +466,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     }
 
     @discardableResult
-    func setUrl(_ url: URL?, userEntered: Bool) -> Task<Void, Never>? {
+    func setUrl(_ url: URL?, userEntered: Bool) -> Task<ExpectedNavigation?, Never>? {
         if url == .welcome {
             OnboardingViewModel().restart()
         }
@@ -722,9 +729,10 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     }()
 
     @MainActor
-    private func reloadIfNeeded(shouldLoadInBackground: Bool = false) async {
+    @discardableResult
+    private func reloadIfNeeded(shouldLoadInBackground: Bool = false) async -> ExpectedNavigation? {
         let content = self.content
-        guard content.url != nil else { return }
+        guard content.url != nil else { return nil }
 
         let url: URL = await {
             if contentURL.isFileURL {
@@ -736,20 +744,20 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                 in self?.isAMPProtectionExtracting = false
             })
         }()
-        guard content == self.content else { return }
+        guard content == self.content else { return nil }
 
         if shouldReload(url, shouldLoadInBackground: shouldLoadInBackground) {
             let didRestore = restoreInteractionStateDataIfNeeded()
 
             if privatePlayer.goBackAndLoadURLIfNeeded(for: self) {
-                return
+                return nil
             }
 
-            guard !didRestore else { return }
+            guard !didRestore else { return nil }
 
             if url.isFileURL {
-                _ = webView.loadFileURL(url, allowingReadAccessTo: URL(fileURLWithPath: "/"))
-                return
+                return webView.navigator(distributedNavigationDelegate: navigationDelegate)
+                    .loadFileURL(url, allowingReadAccessTo: URL(fileURLWithPath: "/"), withExpectedNavigationType: content.isUserEnteredUrl ? .custom(.userEnteredUrl) : .other)
             }
 
             var request = URLRequest(url: url, cachePolicy: interactionState.shouldLoadFromCache ? .returnCacheDataElseLoad : .useProtocolCachePolicy)
@@ -757,18 +765,10 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                content.isUserEnteredUrl {
                 request.attribution = .user
             }
-            await withCheckedContinuation { continuation in
-                webView.navigator(distributedNavigationDelegate: navigationDelegate)
-                    .load(request, withExpectedNavigationType: content.isUserEnteredUrl ? .custom(.userEnteredUrl) : .other)?
-                    .appendResponder(navigationDidFinish: { _ in
-                        continuation.resume()
-                    }, navigationDidFail: { _, _ in
-                        continuation.resume()
-                    }) ?? {
-                        continuation.resume()
-                    }()
-            }
+            return webView.navigator(distributedNavigationDelegate: navigationDelegate)
+                .load(request, withExpectedNavigationType: content.isUserEnteredUrl ? .custom(.userEnteredUrl) : .other)
         }
+        return nil
     }
 
     @MainActor
