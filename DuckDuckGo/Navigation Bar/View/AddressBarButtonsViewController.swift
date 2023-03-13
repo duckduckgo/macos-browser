@@ -381,6 +381,7 @@ final class AddressBarButtonsViewController: NSViewController {
         updatePrivacyEntryPoint()
         updateImageButton()
         updatePermissionButtons()
+        updateBookmarkButtonVisibility()
     }
 
     @IBAction func cameraButtonAction(_ sender: NSButton) {
