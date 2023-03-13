@@ -293,8 +293,20 @@ extension URL {
         return URL(string: "https://duckduckgo.com/about")!
     }
 
+    static var webTrackingProtection: URL {
+        return URL(string: "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/")!
+    }
+
+    static var cookieConsentPopUpManagement: URL {
+        return URL(string: "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#cookie-consent-pop-up-management")!
+    }
+
     static var gpcLearnMore: URL {
         return URL(string: "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/gpc/")!
+    }
+
+    static var theFireButton: URL {
+        return URL(string: "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#the-fire-button")!
     }
 
     static var privacyPolicy: URL {

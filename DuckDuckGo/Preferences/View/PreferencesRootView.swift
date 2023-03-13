@@ -22,7 +22,7 @@ import SyncUI
 
 fileprivate extension Preferences.Const {
     static let sidebarWidth: CGFloat = 256
-    static let paneContentWidth: CGFloat = 512
+    static let paneContentWidth: CGFloat = 612
     static let panePaddingHorizontal: CGFloat = 48
     static let panePaddingVertical: CGFloat = 40
 }
