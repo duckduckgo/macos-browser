@@ -49,7 +49,6 @@ class HTTPSUpgradeIntegrationTests: XCTestCase {
     }
 
     // MARK: - Tests
-    // Uses tests-server helper tool for mocking HTTP requests (see tests-server/main.swift)
 
     @MainActor
     func testHttpsUpgrade() async throws {
@@ -60,8 +59,6 @@ class HTTPSUpgradeIntegrationTests: XCTestCase {
 
         let tabViewModel = self.tabViewModel
         let tab = tabViewModel.tab
-
-        _=await tab.setUrl(.blankPage, userEntered: false)?.value?.result
 
         _=await tab.setUrl(url, userEntered: false)?.value?.result
 
@@ -120,8 +117,6 @@ class HTTPSUpgradeIntegrationTests: XCTestCase {
 
         let tabViewModel = self.tabViewModel
         let tab = tabViewModel.tab
-
-        _=await tab.setUrl(.blankPage, userEntered: false)?.value?.result
 
         _=await tab.setUrl(url, userEntered: false)?.value?.result
 

@@ -44,7 +44,6 @@ class PrivacyDashboardIntegrationTests: XCTestCase {
     }
 
     // MARK: - Tests
-    // Uses tests-server helper tool for mocking HTTP requests (see tests-server/main.swift)
 
     @MainActor
     func testWhenTrackerDetected_trackerInfoUpdated() async throws {
