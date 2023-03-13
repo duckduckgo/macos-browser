@@ -376,7 +376,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     }
 
     func cleanUpBeforeClosing() {
-        let job = { [content, webView, identifier=instrumentation.currentTabIdentifier, historyCoordinating, cbaTimeReporter] in
+        let job = { [content, webView, historyCoordinating] in
             if content.isUrl, let url = webView.url {
                 historyCoordinating.commitChanges(url: url)
             }
