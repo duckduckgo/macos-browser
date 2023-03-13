@@ -11814,7 +11814,7 @@
 			repositoryURL = "https://github.com/duckduckgo/TrackerRadarKit.git";
 			requirement = {
 				kind = revision;
-				revision = 2fe5b26fd356e3b81fb967ae8e600fd062ca7655;
+				revision = b01176bccceed114feabd58e753e62ef325e19e8;
 			};
 		};
 		3706FA6E293F65D500E42796 /* XCRemoteSwiftPackageReference "lottie-ios" */ = {

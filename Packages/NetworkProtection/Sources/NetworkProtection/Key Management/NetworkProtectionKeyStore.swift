@@ -60,20 +60,25 @@ public class NetworkProtectionKeychainStore: NetworkProtectionKeyStore {
 
     struct Constants {
         static let defaultServiceName = "DuckDuckGo Network Protection Private Key"
-        static let privateKeyName = "DuckDuckGo Network Protection Private Key"
+    }
+    
+    enum UserDefaultKeys {
+        static let currentPublicKey = "com.duckduckgo.network-protection.NetworkProtectionKeychainStore.UserDefaultKeys.currentPublicKeyBase64"
     }
 
     private let serviceName: String
     private let useSystemKeychain: Bool
+    private let userDefaults: UserDefaults
     private let errorEvents: EventMapping<NetworkProtectionError>?
 
-    public convenience init(useSystemKeychain: Bool, errorEvents: EventMapping<NetworkProtectionError>?) {
-        self.init(serviceName: Constants.defaultServiceName, useSystemKeychain: useSystemKeychain, errorEvents: errorEvents)
-    }
+    public init(serviceName: String? = nil,
+         useSystemKeychain: Bool,
+         userDefaults: UserDefaults = .standard,
+         errorEvents: EventMapping<NetworkProtectionError>?) {
 
-    init(serviceName: String, useSystemKeychain: Bool, errorEvents: EventMapping<NetworkProtectionError>?) {
-        self.serviceName = serviceName
+        self.serviceName = serviceName ?? Constants.defaultServiceName
         self.useSystemKeychain = useSystemKeychain
+        self.userDefaults = userDefaults
         self.errorEvents = errorEvents
     }
 
@@ -81,9 +86,13 @@ public class NetworkProtectionKeychainStore: NetworkProtectionKeyStore {
 
     /// Retrieves the stored private key without generating one if it doesn't exist.
     ///
-    public func storedPrivateKey() throws -> PrivateKey? {        
+    public func storedPrivateKey() throws -> PrivateKey? {
+        guard let currentPublicKey = currentPublicKey else {
+            return nil
+        }
+        
         do {
-            guard let data = try readData(named: Constants.privateKeyName) else {
+            guard let data = try readData(named: currentPublicKey) else {
                 return nil
             }
 
@@ -103,11 +112,13 @@ public class NetworkProtectionKeychainStore: NetworkProtectionKeyStore {
             handle(error)
             // Intentionally not re-throwing
         }
-
+        
         let generatedKey = PrivateKey()
+        let base64PublicKey = generatedKey.publicKey.base64Key
+        currentPublicKey = base64PublicKey
         
         do {
-            try writeData(generatedKey.rawValue, named: Constants.privateKeyName)
+            try writeData(generatedKey.rawValue, named: base64PublicKey)
         } catch {
             handle(error)
             // Intentionally not re-throwing
@@ -120,7 +131,12 @@ public class NetworkProtectionKeychainStore: NetworkProtectionKeyStore {
     ///
     public func resetCurrentKey() {
         do {
-            try deleteEntry(named: Constants.privateKeyName)
+            guard let currentPublicKey = currentPublicKey else {
+                return
+            }
+            
+            try deleteEntry(named: currentPublicKey)
+            self.currentPublicKey = nil
         } catch {
             handle(error)
             // Intentionally not re-throwing
@@ -182,6 +198,26 @@ public class NetworkProtectionKeychainStore: NetworkProtectionKeyStore {
             kSecAttrSynchronizable: false,
             kSecAttrAccount: name
         ] as [String: Any]
+    }
+    
+    // MARK: - UserDefaults
+    
+    /// The currently used public key.
+    ///
+    /// The key is stored in base64 representation.
+    ///
+    private var currentPublicKey: String? {
+        get {
+            guard let base64Key = userDefaults.string(forKey: UserDefaultKeys.currentPublicKey) else {
+                return nil
+            }
+            
+            return PublicKey(base64Key: base64Key)?.base64Key
+        }
+        
+        set {
+            userDefaults.set(newValue, forKey: UserDefaultKeys.currentPublicKey)
+        }
     }
     
     // MARK: - EventMapping
