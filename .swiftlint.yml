@@ -63,6 +63,8 @@ excluded:
   - DuckDuckGo/Common/Localizables/UserText.swift
   - UnitTests
   - IntegrationTests
+  - LocalPackages/*/Package.swift
+  - release
   - UITests
   - vendor
   - DerivedData

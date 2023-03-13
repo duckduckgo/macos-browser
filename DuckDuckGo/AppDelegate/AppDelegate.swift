@@ -24,6 +24,7 @@ import Persistence
 import Configuration
 import Networking
 import Bookmarks
+import DDGSync
 
 @NSApplicationMain
 final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDelegate {
@@ -54,6 +55,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     private let crashReporter = CrashReporter()
     private(set) var internalUserDecider: InternalUserDeciding!
     private var appIconChanger: AppIconChanger!
+    private(set) var syncService: DDGSyncing!
+    private(set) var syncPersistence: SyncDataPersistor!
 
 #if !APPSTORE
     var updateController: UpdateController!
@@ -139,6 +142,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 #endif
 
         appIconChanger = AppIconChanger(internalUserDecider: internalUserDecider)
+        syncPersistence = SyncDataPersistor()
+        syncService = DDGSync(persistence: syncPersistence)
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {

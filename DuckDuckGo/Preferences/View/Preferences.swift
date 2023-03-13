@@ -20,22 +20,6 @@ import SwiftUI
 
 enum Preferences {
 
-    struct Section<Content>: View where Content: View {
-
-        let spacing: CGFloat
-        @ViewBuilder let content: () -> Content
-
-        init(spacing: CGFloat = 12, @ViewBuilder content: @escaping () -> Content) {
-            self.spacing = spacing
-            self.content = content
-        }
-
-        var body: some View {
-            VStack(alignment: .leading, spacing: spacing, content: content)
-                .padding(.vertical, 20)
-        }
-    }
-
     enum Const {
 
         static let pickerHorizontalOffset: CGFloat = {
