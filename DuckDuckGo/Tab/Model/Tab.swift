@@ -18,17 +18,16 @@
 
 // swiftlint:disable file_length
 
-import Cocoa
-import Common
-import WebKit
-import os
-import Combine
 import BrowserServicesKit
-import Navigation
-import TrackerRadarKit
+import Combine
+import Common
 import ContentBlocking
+import Foundation
+import Navigation
+import os.log
+import TrackerRadarKit
 import UserScript
-import PrivacyDashboard
+import WebKit
 
 protocol TabDelegate: ContentOverlayUserScriptDelegate {
     func tabWillStartNavigation(_ tab: Tab, isUserInitiated: Bool)
@@ -36,7 +35,6 @@ protocol TabDelegate: ContentOverlayUserScriptDelegate {
     func tab(_ tab: Tab, createdChild childTab: Tab, of kind: NewWindowPolicy)
 
     func tab(_ tab: Tab, requestedOpenExternalURL url: URL, forUserEnteredURL userEntered: Bool) -> Bool
-    func tab(_ tab: Tab, promptUserForCookieConsent result: @escaping (Bool) -> Void)
 
     func tabPageDOMLoaded(_ tab: Tab)
     func closeTab(_ tab: Tab)
@@ -315,7 +313,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                           inheritedAttribution: parentTab?.adClickAttribution?.currentAttributionState,
                           userContentControllerFuture: userContentControllerPromise.future,
                           permissionModel: permissions,
-                          privacyInfoPublisher: _privacyInfo.projectedValue.eraseToAnyPublisher(),
                           webViewFuture: webViewPromise.future),
                    dependencies: ExtensionDependencies(privacyFeatures: privacyFeatures,
                                                        historyCoordinating: historyCoordinating,
@@ -418,8 +415,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     // MARK: - Properties
 
     let webView: WebView
-
-    private var lastUpgradedURL: URL?
 
     var contentChangeEnabled = true
 
@@ -588,11 +583,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     }
 
     private let instrumentation = TabInstrumentation()
-    private enum FrameLoadState {
-        case provisional
-        case committed
-        case finished
-    }
     private var externalSchemeOpenedPerPageLoad = false
 
     @Published private(set) var canGoForward: Bool = false
@@ -1009,67 +999,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         }
     }
 
-    // MARK: - Dashboard Info
-    @Published private(set) var privacyInfo: PrivacyInfo?
-    private var previousPrivacyInfosByURL: [String: PrivacyInfo] = [:]
-    private var didGoBackForward: Bool = false
-
-    private func resetDashboardInfo() {
-        if let url = content.url {
-            if didGoBackForward, let privacyInfo = previousPrivacyInfosByURL[url.absoluteString] {
-                self.privacyInfo = privacyInfo
-                didGoBackForward = false
-            } else {
-                privacyInfo = makePrivacyInfo(url: url)
-            }
-        } else {
-            privacyInfo = nil
-        }
-    }
-
-    private func makePrivacyInfo(url: URL) -> PrivacyInfo? {
-        guard let host = url.host else { return nil }
-
-        let entity = contentBlocking.trackerDataManager.trackerData.findEntity(forHost: host)
-
-        privacyInfo = PrivacyInfo(url: url,
-                                  parentEntity: entity,
-                                  protectionStatus: makeProtectionStatus(for: host))
-
-        previousPrivacyInfosByURL[url.absoluteString] = privacyInfo
-
-        return privacyInfo
-    }
-
-    private func resetConnectionUpgradedTo(navigationAction: NavigationAction) {
-        let isOnUpgradedPage = navigationAction.url == privacyInfo?.connectionUpgradedTo
-        if navigationAction.isForMainFrame && !isOnUpgradedPage {
-            privacyInfo?.connectionUpgradedTo = nil
-        }
-    }
-
-    public func setMainFrameConnectionUpgradedTo(_ upgradedUrl: URL?) {
-        guard let upgradedUrl else { return }
-        privacyInfo?.connectionUpgradedTo = upgradedUrl
-    }
-
-    private func makeProtectionStatus(for host: String) -> ProtectionStatus {
-        let config = contentBlocking.privacyConfigurationManager.privacyConfig
-
-        let isTempUnprotected = config.isTempUnprotected(domain: host)
-        let isAllowlisted = config.isUserUnprotected(domain: host)
-
-        var enabledFeatures: [String] = []
-
-        if !config.isInExceptionList(domain: host, forFeature: .contentBlocking) {
-            enabledFeatures.append(PrivacyFeature.contentBlocking.rawValue)
-        }
-
-        return ProtectionStatus(unprotectedTemporary: isTempUnprotected,
-                                enabledFeatures: enabledFeatures,
-                                allowlisted: isAllowlisted,
-                                denylisted: false)
-    }
 }
 
 extension Tab: UserContentControllerDelegate {
@@ -1081,9 +1010,6 @@ extension Tab: UserContentControllerDelegate {
         userScripts.faviconScript.delegate = self
         userScripts.pageObserverScript.delegate = self
         userScripts.printingUserScript.delegate = self
-        if #available(macOS 11, *) {
-            userScripts.autoconsentUserScript?.delegate = self
-        }
         youtubeOverlayScript = userScripts.youtubeOverlayScript
         youtubeOverlayScript?.delegate = self
         youtubePlayerScript = userScripts.youtubePlayerUserScript
@@ -1124,18 +1050,11 @@ extension Tab {
 
             switch tracker.type {
             case .tracker:
-                self.privacyInfo?.trackerInfo.addDetectedTracker(tracker.request, onPageWithURL: url)
                 self.historyCoordinating.addDetectedTracker(tracker.request, onURL: url)
-
+            case .trackerWithSurrogate:
+                self.historyCoordinating.addDetectedTracker(tracker.request, onURL: url)
             case .thirdPartyRequest:
-                self.privacyInfo?.trackerInfo.add(detectedThirdPartyRequest: tracker.request)
-
-            case .trackerWithSurrogate(host: let host):
-                self.privacyInfo?.trackerInfo.addInstalledSurrogateHost(host, for: tracker.request, onPageWithURL: url)
-                self.privacyInfo?.trackerInfo.addDetectedTracker(tracker.request, onPageWithURL: url)
-
-                self.historyCoordinating.addDetectedTracker(tracker.request, onURL: url)
-
+                break
             }
         }
     }
@@ -1199,6 +1118,8 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
     // swiftlint:disable function_body_length
     @MainActor
     func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
+        // allow local file navigations
+        if navigationAction.url.isFileURL { return .allow }
 
         // when navigating to a URL with basic auth username/password, cache it and redirect to a trimmed URL
         if let mainFrame = navigationAction.mainFrameTarget,
@@ -1218,10 +1139,6 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
             return policy
         }
 
-        if navigationAction.url.isFileURL {
-            return .allow
-        }
-
         let isLinkActivated = !navigationAction.isTargetingNewWindow
             && (navigationAction.navigationType.isLinkActivated || (navigationAction.navigationType == .other && navigationAction.isUserInitiated))
 
@@ -1234,8 +1151,6 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         // to be modularized later on, see https://app.asana.com/0/0/1203268245242140/f
         let isRequestingNewTab = (isLinkActivated && NSApp.isCommandPressed) || navigationAction.navigationType.isMiddleButtonClick || isNavigatingAwayFromPinnedTab
         let shouldSelectNewTab = NSApp.isShiftPressed || (isNavigatingAwayFromPinnedTab && !navigationAction.navigationType.isMiddleButtonClick && !NSApp.isCommandPressed)
-
-        didGoBackForward = navigationAction.navigationType.isBackForward
 
         // This check needs to happen before GPC checks. Otherwise the navigation type may be rewritten to `.other`
         // which would skip link rewrites.
@@ -1263,10 +1178,6 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
             preferences.userAgent = UserAgent.for(navigationAction.url)
         }
 
-        if navigationAction.isForMainFrame, navigationAction.request.mainDocumentURL?.host != lastUpgradedURL?.host {
-            lastUpgradedURL = nil
-        }
-
         if navigationAction.isForMainFrame, !navigationAction.navigationType.isBackForward {
             if let newRequest = referrerTrimming.trimReferrer(for: navigationAction.request, originUrl: navigationAction.sourceFrame.url) {
                 if isRequestingNewTab {
@@ -1285,12 +1196,10 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
                                                            config: contentBlocking.privacyConfigurationManager.privacyConfig,
                                                            gpcEnabled: PrivacySecurityPreferences.shared.gpcEnabled) {
 
-            return .redirect(navigationAction, invalidatingBackItemIfNeededFor: webView) {
+            return .redirectInvalidatingBackItemIfNeeded(navigationAction) {
                 $0.load(request)
             }
         }
-
-        self.resetConnectionUpgradedTo(navigationAction: navigationAction)
 
         if isRequestingNewTab {
             self.openChild(with: .contentFromURL(navigationAction.url), of: .tab(selected: shouldSelectNewTab))
@@ -1306,17 +1215,6 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
             let host = url.isFileURL ? .localhost : (url.host ?? "")
             self.host(host, requestedOpenExternalURL: navigationAction.url, forUserEnteredURL: navigationAction.isUserEnteredUrl)
             return .cancel
-        }
-
-        if navigationAction.isForMainFrame,
-           case .success(let upgradedURL) = await privacyFeatures.httpsUpgrade.upgrade(url: navigationAction.url) {
-
-            if lastUpgradedURL != upgradedURL {
-                urlDidUpgrade(to: upgradedURL)
-                return .redirect(navigationAction, invalidatingBackItemIfNeededFor: webView) {
-                    $0.load(URLRequest(url: upgradedURL))
-                }
-            }
         }
 
         return .next
@@ -1359,21 +1257,12 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
     // swiftlint:enable cyclomatic_complexity
     // swiftlint:enable function_body_length
 
-    private func urlDidUpgrade(to upgradedUrl: URL) {
-        lastUpgradedURL = upgradedUrl
-        privacyInfo?.connectionUpgradedTo = upgradedUrl
-    }
-
     @MainActor
     func willStart(_ navigation: Navigation) {
         if error != nil { error = nil }
 
         externalSchemeOpenedPerPageLoad = false
         delegate?.tabWillStartNavigation(self, isUserInitiated: navigation.navigationAction.isUserInitiated)
-
-        if navigation.navigationAction.navigationType.isRedirect {
-            resetDashboardInfo()
-        }
     }
 
     @MainActor
@@ -1393,7 +1282,6 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         if error != nil { error = nil }
 
         invalidateInteractionStateData()
-        resetDashboardInfo()
         linkProtection.cancelOngoingExtraction()
         linkProtection.setMainFrameUrl(navigation.url)
         referrerTrimming.onBeginNavigation(to: navigation.url)
@@ -1426,17 +1314,6 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         Pixel.fire(.debug(event: .webKitDidTerminate, error: NSError(domain: "WKProcessTerminated", code: reason?.rawValue ?? -1)))
     }
 
-}
-
-@available(macOS 11, *)
-extension Tab: AutoconsentUserScriptDelegate {
-    func autoconsentUserScript(consentStatus: CookieConsentInfo) {
-        self.privacyInfo?.cookieConsentManaged = consentStatus
-    }
-
-    func autoconsentUserScriptPromptUserForConsent(_ result: @escaping (Bool) -> Void) {
-        delegate?.tab(self, promptUserForCookieConsent: result)
-    }
 }
 
 extension Tab: YoutubeOverlayUserScriptDelegate {

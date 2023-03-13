@@ -36,7 +36,11 @@ extension Tab: NavigationResponder {
 
             .weak(nullable: self.adClickAttribution),
 
+            .weak(nullable: self.privacyDashboard),
+            .weak(nullable: self.httpsUpgrade),
+
             .struct(SerpHeadersNavigationResponder()),
+
             .weak(nullable: self.fbProtection),
             .weak(nullable: self.contentBlockingAndSurrogates),
 

@@ -38,6 +38,7 @@ final class BrowserTabViewController: NSViewController {
     private let tabCollectionViewModel: TabCollectionViewModel
     private var tabContentCancellable: AnyCancellable?
     private var userDialogsCancellable: AnyCancellable?
+    private var cookieConsentCancellable: AnyCancellable?
     private var activeUserDialogCancellable: Cancellable?
     private var errorViewStateCancellable: AnyCancellable?
     private var hoverLinkCancellable: AnyCancellable?
@@ -118,20 +119,10 @@ final class BrowserTabViewController: NSViewController {
                 self.subscribeToErrorViewState()
                 self.subscribeToTabContent(of: selectedTabViewModel)
                 self.subscribeToHoveredLink(of: selectedTabViewModel)
-                self.showCookieConsentPopoverIfNecessary(selectedTabViewModel)
                 self.subscribeToUserDialogs(of: selectedTabViewModel)
+                self.subscribeToCookieConsentPrompt(of: selectedTabViewModel)
             }
             .store(in: &cancellables)
-    }
-
-    private func showCookieConsentPopoverIfNecessary(_ selectedTabViewModel: TabViewModel?) {
-        if let selectedTab = selectedTabViewModel?.tab,
-           let cookiePopoverTab = cookieConsentPopoverManager.currentTab,
-           selectedTab == cookiePopoverTab {
-            cookieConsentPopoverManager.show(on: view, animated: false)
-        } else {
-            cookieConsentPopoverManager.close(animated: false)
-        }
     }
 
     private func subscribeToTabs() {
@@ -260,7 +251,7 @@ final class BrowserTabViewController: NSViewController {
             }
     }
 
-    func subscribeToUserDialogs(of tabViewModel: TabViewModel?) {
+    private func subscribeToUserDialogs(of tabViewModel: TabViewModel?) {
         guard let tabViewModel = tabViewModel else {
             userDialogsCancellable = nil
             return
@@ -273,6 +264,19 @@ final class BrowserTabViewController: NSViewController {
         .map { $1 ?? $0 }
         .sink { [weak self] dialog in
             self?.show(dialog)
+        }
+    }
+
+    private func subscribeToCookieConsentPrompt(of tabViewModel: TabViewModel?) {
+        cookieConsentCancellable = tabViewModel?.tab.cookieConsentPromptRequestPublisher.sink { [weak self, weak tab=tabViewModel?.tab] request in
+            guard let self, let tab, let request else {
+                self?.cookieConsentPopoverManager.close(animated: false)
+                return
+            }
+            self.cookieConsentPopoverManager.show(on: self.view, animated: true) { [weak request] result in
+                request?.submit(result)
+            }
+            self.cookieConsentPopoverManager.currentTab = tab
         }
     }
 
@@ -499,11 +503,6 @@ extension BrowserTabViewController: ContentOverlayUserScriptDelegate {
 }
 
 extension BrowserTabViewController: TabDelegate {
-
-    func tab(_ tab: Tab, promptUserForCookieConsent result: @escaping (Bool) -> Void) {
-        cookieConsentPopoverManager.show(on: view, animated: true, result: result)
-        cookieConsentPopoverManager.currentTab = tab
-    }
 
     func tabWillStartNavigation(_ tab: Tab, isUserInitiated: Bool) {
         if isUserInitiated,

@@ -640,7 +640,6 @@ extension ContentBlockerRulesIdentifier {
 }
 
 class UserContentControllerMock: UserContentControllerProtocol {
-
     var contentBlockingAssetsInstalled: Bool { true }
 
     var onEnableGlobalContentRuleList: ((String) -> Void)!
