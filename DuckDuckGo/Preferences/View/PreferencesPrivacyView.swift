@@ -66,6 +66,7 @@ extension Preferences {
                 PreferencePaneSection {
                     TextMenuItemHeader(text: UserText.gpcSettingsTitle)
                     ToggleMenuItem(title: UserText.gpcCheckboxTitle, isOn: $model.isGPCEnabled)
+                    TextMenuItemCaption(text: UserText.gpcExplanation)
                     TextButton(UserText.learnMore) {
                         model.openURL(.gpcLearnMore)
                     }

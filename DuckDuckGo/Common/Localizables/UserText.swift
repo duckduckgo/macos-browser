@@ -109,7 +109,7 @@ struct UserText {
 
     static let fireproofSites = NSLocalizedString("fireproof.sites", value: "Fireproof Sites", comment: "Fireproof sites list title")
     static let fireproofCheckboxTitle = NSLocalizedString("fireproof.checkbox.title", value: "Ask to Fireproof websites when signing in", comment: "Fireproof settings checkbox title")
-    static let fireproofExplanation = NSLocalizedString("fireproof.explanation", value: "Cookies won’t be deleted for Fireproof Sites, even after using the Fire Button.", comment: "Fireproofing mechanism explanation")
+    static let fireproofExplanation = NSLocalizedString("fireproof.explanation", value: "When you Fireproof a site, you will remain signed in after using the Fire Button.", comment: "Fireproofing mechanism explanation")
     static let manageFireproofSites = NSLocalizedString("fireproof.manage-sites", value: "Manage Fireproof Sites...", comment: "Fireproof settings button caption")
 
     static let fireDialogFireproofSites = NSLocalizedString("fire.dialog.fireproof.sites", value: "Fireproof sites won't be cleared", comment: "Category of domains in fire button dialog")
@@ -159,7 +159,7 @@ struct UserText {
 
     static let gpcSettingsTitle = NSLocalizedString("gpc.title", value: "Global Privacy Control (GPC)", comment: "GPC settings title")
     static let gpcCheckboxTitle = NSLocalizedString("gpc.checkbox.title", value: "Enable Global Privacy Control", comment: "GPC settings checkbox title")
-    static let gpcExplanation = NSLocalizedString("gpc.explanation", value: "When enabled, your browser signals a preference for privacy to all websites.", comment: "GPC explanation in settings")
+    static let gpcExplanation = NSLocalizedString("gpc.explanation", value: "Tells participating websites not to sell or share your data.", comment: "GPC explanation in settings")
     static let learnMore = NSLocalizedString("learnmore.link", value: "Learn More", comment: "Learn More link")
 
     static let autofillPasswordManager = NSLocalizedString("autofill.password-manager", value: "Password Manager", comment: "Autofill settings section title")
