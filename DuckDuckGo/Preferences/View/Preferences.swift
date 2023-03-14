@@ -107,7 +107,7 @@ enum Preferences {
         let text: String
 
         var body: some View {
-            Text(UserText.autofillPasswordManagerBitwardenDisclaimer)
+            Text(text)
                 .font(Const.Fonts.preferencePaneDisclaimer)
                 .foregroundColor(Color("GreyTextColor"))
                 .fixMultilineScrollableText()
