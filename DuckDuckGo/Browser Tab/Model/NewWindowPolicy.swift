@@ -20,13 +20,14 @@ import Foundation
 import WebKit
 
 enum NewWindowPolicy {
-    case tab(selected: Bool)
+    case tab(selected: Bool, disposable: Bool)
     case popup(size: CGSize)
-    case window(active: Bool)
+    case window(active: Bool, disposable: Bool)
 
-    init(_ windowFeatures: WKWindowFeatures, shouldSelectNewTab: Bool = false) {
+    init(_ windowFeatures: WKWindowFeatures, shouldSelectNewTab: Bool = false, isDisposable: Bool) {
         if windowFeatures.toolbarsVisibility?.boolValue == true {
-            self = .tab(selected: shouldSelectNewTab)
+            self = .tab(selected: shouldSelectNewTab,
+                        disposable: isDisposable)
         } else {
             self = .popup(size: windowFeatures.windowContentSize)
         }
@@ -37,7 +38,7 @@ enum NewWindowPolicy {
         return false
     }
     var isSelectedTab: Bool {
-        if case .tab(selected: true) = self { return true }
+        if case .tab(selected: true, disposable: _) = self { return true }
         return false
     }
 

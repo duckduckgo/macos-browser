@@ -1303,7 +1303,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
                     onLinkRewrite: { [weak self] url in
                         guard let self = self else { return }
                         if isRequestingNewTab || !navigationAction.isForMainFrame {
-                            self.openChild(with: .url(url), of: .tab(selected: shouldSelectNewTab || !navigationAction.isForMainFrame))
+                            self.openChild(with: .url(url), of: .tab(selected: shouldSelectNewTab || !navigationAction.isForMainFrame, disposable: self.isDisposable))
                         } else {
                             self.webView.load(URLRequest(url: url))
                         }
@@ -1324,7 +1324,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         if navigationAction.isForMainFrame, !navigationAction.navigationType.isBackForward {
             if let newRequest = referrerTrimming.trimReferrer(for: navigationAction.request, originUrl: navigationAction.sourceFrame.url) {
                 if isRequestingNewTab {
-                    self.openChild(with: newRequest.url.map { .contentFromURL($0) } ?? .none, of: .tab(selected: shouldSelectNewTab))
+                    self.openChild(with: newRequest.url.map { .contentFromURL($0) } ?? .none, of: .tab(selected: shouldSelectNewTab, disposable: self.isDisposable))
                 } else {
                     _ = webView.load(newRequest)
                 }
@@ -1352,7 +1352,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         self.resetConnectionUpgradedTo(navigationAction: navigationAction)
 
         if isRequestingNewTab {
-            self.openChild(with: .contentFromURL(navigationAction.url), of: .tab(selected: shouldSelectNewTab))
+            self.openChild(with: .contentFromURL(navigationAction.url), of: .tab(selected: shouldSelectNewTab, disposable: isDisposable))
             return .cancel
 
         } else if navigationAction.shouldDownload
@@ -1608,7 +1608,7 @@ extension Tab: YoutubeOverlayUserScriptDelegate {
         let isRequestingNewTab = NSApp.isCommandPressed
         if isRequestingNewTab {
             let shouldSelectNewTab = NSApp.isShiftPressed
-            self.openChild(with: content, of: .tab(selected: shouldSelectNewTab))
+            openChild(with: content, of: .tab(selected: shouldSelectNewTab, disposable: isDisposable))
         } else {
             setContent(content)
         }

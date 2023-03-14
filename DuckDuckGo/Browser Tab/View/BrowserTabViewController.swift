@@ -313,7 +313,8 @@ final class BrowserTabViewController: NSViewController {
         guard view.window?.isPopUpWindow == false else {
             // Prefer Tab's Parent
             if let parentTab = tabCollectionViewModel.selectedTabViewModel?.tab.parentTab {
-                parentTab.openChild(with: content, of: .tab(selected: true))
+                parentTab.openChild(with: content, of: .tab(selected: true,
+                                                            disposable: tabCollectionViewModel.isDisposable))
                 parentTab.webView.window?.makeKeyAndOrderFront(nil)
                 // Act as default URL Handler if no Parent
             } else {
@@ -540,10 +541,11 @@ extension BrowserTabViewController: TabDelegate {
         case .popup(size: let windowContentSize):
             //TODO!
             WindowsManager.openPopUpWindow(with: childTab, isDisposable: false, contentSize: windowContentSize)
-        case .window(active: let active):
+        case .window(active: let active, let isDisposable):
             //TODO!
-            WindowsManager.openNewWindow(with: childTab, isDisposable: false, showWindow: active)
-        case .tab(selected: let selected):
+            WindowsManager.openNewWindow(with: childTab, isDisposable: isDisposable, showWindow: active)
+        case .tab(selected: let selected, let isDisposable):
+            //TODO! assert isDisposable
             self.tabCollectionViewModel.insert(childTab, after: parentTab, selected: selected)
         }
     }

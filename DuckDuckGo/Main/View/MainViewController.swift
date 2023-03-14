@@ -42,6 +42,7 @@ final class MainViewController: NSViewController {
     private(set) var bookmarksBarViewController: BookmarksBarViewController!
 
     let tabCollectionViewModel: TabCollectionViewModel
+    let isDisposable: Bool
 
     private var selectedTabViewModelCancellable: AnyCancellable?
     private var bookmarksBarVisibilityChangedCancellable: AnyCancellable?
@@ -52,8 +53,6 @@ final class MainViewController: NSViewController {
     private var keyDownMonitor: Any?
     private var mouseNavButtonsMonitor: Any?
     private var windowTitleCancellable: AnyCancellable?
-
-    private let isDisposable: Bool
 
     private var bookmarksBarIsVisible: Bool {
         return bookmarksBarViewController.parent != nil

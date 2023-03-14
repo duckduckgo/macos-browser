@@ -90,7 +90,7 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
         case .none where navigationAction.isUserInitiated == true:
             // try to guess popup kind from provided windowFeatures
             let shouldSelectNewTab = !NSApp.isCommandPressed // this is actually not correct, to be fixed later
-            let targetKind = NewWindowPolicy(windowFeatures, shouldSelectNewTab: shouldSelectNewTab)
+            let targetKind = NewWindowPolicy(windowFeatures, shouldSelectNewTab: shouldSelectNewTab, isDisposable: isDisposable)
             // proceed to web view creation
             completionHandler(self.createWebView(from: webView, with: configuration, for: navigationAction, of: targetKind))
             return

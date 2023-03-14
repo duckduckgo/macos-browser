@@ -77,20 +77,26 @@ extension ContextMenuManager {
         .openFrameInNewWindow: handleOpenFrameInNewWindowItem
     ]
 
+    private var isCurrentWindowDisposable: Bool {
+        (webView?.window?.windowController as? MainWindowController)?.mainViewController.isDisposable ?? false
+    }
+
     private func handleOpenLinkItem(_ item: NSMenuItem, at index: Int, in menu: NSMenu) {
         guard let openLinkInNewWindowItem = originalItems?[.openLinkInNewWindow] else {
             assertionFailure("WKMenuItemIdentifierOpenLinkInNewWindow item not found")
             return
         }
-        menu.replaceItem(at: index, with: self.openLinkInNewTabMenuItem(from: openLinkInNewWindowItem))
+
+        menu.replaceItem(at: index, with: self.openLinkInNewTabMenuItem(from: openLinkInNewWindowItem,
+                                                                            makeDisposable: isCurrentWindowDisposable))
     }
 
     private func handleOpenLinkInNewWindowItem(_ item: NSMenuItem, at index: Int, in menu: NSMenu) {
-        menu.replaceItem(at: index, with: self.openLinkInNewWindowMenuItem(from: item))
+        menu.replaceItem(at: index, with: self.openLinkInNewWindowMenuItem(from: item, makeDisposable: isCurrentWindowDisposable))
     }
 
     private func handleOpenFrameInNewWindowItem(_ item: NSMenuItem, at index: Int, in menu: NSMenu) {
-        menu.replaceItem(at: index, with: self.openFrameInNewWindowMenuItem(from: item))
+        menu.replaceItem(at: index, with: self.openFrameInNewWindowMenuItem(from: item, makeDisposable: isCurrentWindowDisposable))
     }
 
     private func handleDownloadLinkedFileItem(_ item: NSMenuItem, at index: Int, in menu: NSMenu) {
@@ -117,8 +123,8 @@ extension ContextMenuManager {
     }
 
     private func handleOpenImageInNewWindowItem(_ item: NSMenuItem, at index: Int, in menu: NSMenu) {
-        menu.insertItem(self.openImageInNewTabMenuItem(from: item), at: index)
-        menu.replaceItem(at: index + 1, with: self.openImageInNewWindowMenuItem(from: item))
+        menu.insertItem(self.openImageInNewTabMenuItem(from: item, makeDisposable: isCurrentWindowDisposable), at: index)
+        menu.replaceItem(at: index + 1, with: self.openImageInNewWindowMenuItem(from: item, makeDisposable: isCurrentWindowDisposable))
     }
 
     private func handleDownloadImageItem(_ item: NSMenuItem, at index: Int, in menu: NSMenu) {
@@ -126,7 +132,7 @@ extension ContextMenuManager {
     }
 
     private func handleSearchWebItem(_ item: NSMenuItem, at index: Int, in menu: NSMenu) {
-        menu.replaceItem(at: index, with: self.searchMenuItem())
+        menu.replaceItem(at: index, with: self.searchMenuItem(makeDisposable: isCurrentWindowDisposable))
     }
 
     private func handleReloadItem(_ item: NSMenuItem, at index: Int, in menu: NSMenu) {
@@ -144,12 +150,12 @@ extension ContextMenuManager: WebViewContextMenuDelegate {
             }
         }
 
+        self.webView = webView
+
         for (index, item) in menu.items.enumerated().reversed() {
             guard let identifier = item.identifier.flatMap(WKMenuItemIdentifier.init) else { continue }
             Self.menuItemHandlers[identifier]?(self)(item, index, menu)
         }
-
-        self.webView = webView
     }
 
     func webView(_ webView: WebView, didCloseContextMenu menu: NSMenu, with event: NSEvent?) {
@@ -163,8 +169,10 @@ extension ContextMenuManager: WebViewContextMenuDelegate {
 // MARK: - Make Context Menu Items
 private extension ContextMenuManager {
 
-    func openLinkInNewTabMenuItem(from item: NSMenuItem) -> NSMenuItem {
-        makeMenuItem(withTitle: UserText.openLinkInNewTab, action: #selector(openLinkInNewTab), from: item, with: .openLinkInNewWindow)
+    func openLinkInNewTabMenuItem(from item: NSMenuItem, makeDisposable: Bool) -> NSMenuItem {
+        let title = makeDisposable ? UserText.openLinkInNewDisposableTab : UserText.openLinkInNewTab
+        let action = makeDisposable ? #selector(openLinkInNewDisposableTab) : #selector(openLinkInNewTab)
+        return makeMenuItem(withTitle: title, action: action, from: item, with: .openLinkInNewWindow)
     }
 
     func addLinkToBookmarksMenuItem(from item: NSMenuItem) -> NSMenuItem {
@@ -175,12 +183,16 @@ private extension ContextMenuManager {
         NSMenuItem(title: UserText.bookmarkPage, action: #selector(MainViewController.bookmarkThisPage), target: nil, keyEquivalent: "")
     }
 
-    func openLinkInNewWindowMenuItem(from item: NSMenuItem) -> NSMenuItem {
-        makeMenuItem(withTitle: item.title, action: #selector(openLinkInNewWindow), from: item, with: .openLinkInNewWindow)
+    func openLinkInNewWindowMenuItem(from item: NSMenuItem, makeDisposable: Bool) -> NSMenuItem {
+        let title = makeDisposable ? UserText.openLinkInNewDisposableWindow : item.title
+        let action = makeDisposable ? #selector(openLinkInNewDisposableWindow) : #selector(openLinkInNewWindow)
+        return makeMenuItem(withTitle: title, action: action, from: item, with: .openLinkInNewWindow)
     }
 
-    func openFrameInNewWindowMenuItem(from item: NSMenuItem) -> NSMenuItem {
-        makeMenuItem(withTitle: item.title, action: #selector(openFrameInNewWindow), from: item, with: .openFrameInNewWindow)
+    func openFrameInNewWindowMenuItem(from item: NSMenuItem, makeDisposable: Bool) -> NSMenuItem {
+        let title = makeDisposable ? UserText.openFrameInNewDisposableWindow : item.title
+        let action = makeDisposable ? #selector(openFrameInNewDisposableWindow) : #selector(openFrameInNewWindow)
+        return makeMenuItem(withTitle: title, action: action, from: item, with: .openFrameInNewWindow)
     }
 
     private func downloadMenuItemTitle(for item: NSMenuItem) -> String {
@@ -206,20 +218,25 @@ private extension ContextMenuManager {
         makeMenuItem(withTitle: UserText.copyImageAddress, action: #selector(copyImageAddress), from: item, with: .openImageInNewWindow, keyEquivalent: "")
     }
 
-    func openImageInNewTabMenuItem(from item: NSMenuItem) -> NSMenuItem {
-        makeMenuItem(withTitle: UserText.openImageInNewTab, action: #selector(openImageInNewTab), from: item, with: .openImageInNewWindow, keyEquivalent: "")
+    func openImageInNewTabMenuItem(from item: NSMenuItem, makeDisposable: Bool) -> NSMenuItem {
+        let title = makeDisposable ? UserText.openImageInNewDisposableTab : UserText.openImageInNewTab
+        let action = makeDisposable ? #selector(openImageInNewDisposableTab) : #selector(openImageInNewTab)
+        return makeMenuItem(withTitle: title, action: action, from: item, with: .openImageInNewWindow, keyEquivalent: "")
     }
 
-    func openImageInNewWindowMenuItem(from item: NSMenuItem) -> NSMenuItem {
-        makeMenuItem(withTitle: item.title, action: #selector(openImageInNewWindow), from: item, with: .openImageInNewWindow)
+    func openImageInNewWindowMenuItem(from item: NSMenuItem, makeDisposable: Bool) -> NSMenuItem {
+        let title = makeDisposable ? UserText.openImageInNewDisposableWindow : item.title
+        let action = makeDisposable ? #selector(openImageInNewDisposableWindow) : #selector(openImageInNewWindow)
+        return makeMenuItem(withTitle: title, action: action, from: item, with: .openImageInNewWindow)
     }
 
     func downloadImageMenuItem(from item: NSMenuItem) -> NSMenuItem {
         makeMenuItem(withTitle: UserText.saveImageAs, action: #selector(saveImageAs), from: item, with: .downloadImage)
     }
 
-    func searchMenuItem() -> NSMenuItem {
-        NSMenuItem(title: UserText.searchWithDuckDuckGo, action: #selector(search), target: self)
+    func searchMenuItem(makeDisposable: Bool) -> NSMenuItem {
+        let action = makeDisposable ? #selector(searchInDisposable) : #selector(search)
+        return NSMenuItem(title: UserText.searchWithDuckDuckGo, action: action, target: self)
     }
 
     private func makeMenuItem(withTitle title: String, action: Selector, from item: NSMenuItem, with identifier: WKMenuItemIdentifier, keyEquivalent: String? = nil) -> NSMenuItem {
@@ -242,6 +259,14 @@ private extension ContextMenuManager {
 @objc extension ContextMenuManager {
 
     func search(_ sender: NSMenuItem) {
+        searchCommon(sender, disposable: false)
+    }
+
+    func searchInDisposable(_ sender: NSMenuItem) {
+        searchCommon(sender, disposable: true)
+    }
+
+    private func searchCommon(_ sender: NSMenuItem, disposable: Bool) {
         guard let selectedText,
               let url = URL.makeSearchUrl(from: selectedText),
               let webView
@@ -251,12 +276,20 @@ private extension ContextMenuManager {
         }
 
         self.onNewWindow = { _ in
-            .allow(.tab(selected: true))
+                .allow(.tab(selected: true, disposable: disposable))
         }
         webView.loadInNewWindow(url)
     }
 
     func openLinkInNewTab(_ sender: NSMenuItem) {
+        openLinkInNewTabCommon(sender, disposable: false)
+    }
+
+    func openLinkInNewDisposableTab(_ sender: NSMenuItem) {
+        openLinkInNewTabCommon(sender, disposable: true)
+    }
+
+    private func openLinkInNewTabCommon(_ sender: NSMenuItem, disposable: Bool) {
         guard let originalItem = sender.representedObject as? NSMenuItem,
               let identifier = originalItem.identifier.map(WKMenuItemIdentifier.init),
               identifier == .openLinkInNewWindow,
@@ -266,11 +299,19 @@ private extension ContextMenuManager {
             return
         }
 
-        onNewWindow = { _ in .allow(.tab(selected: false)) }
+        onNewWindow = { _ in .allow(.tab(selected: false, disposable: disposable)) }
         NSApp.sendAction(action, to: originalItem.target, from: originalItem)
     }
 
     func openLinkInNewWindow(_ sender: NSMenuItem) {
+        openLinkInNewWindowCommon(sender, disposable: false)
+    }
+
+    func openLinkInNewDisposableWindow(_ sender: NSMenuItem) {
+        openLinkInNewWindowCommon(sender, disposable: true)
+    }
+
+    private func openLinkInNewWindowCommon(_ sender: NSMenuItem, disposable: Bool) {
         guard let originalItem = sender.representedObject as? NSMenuItem,
               let identifier = originalItem.identifier.map(WKMenuItemIdentifier.init),
               identifier == .openLinkInNewWindow,
@@ -280,11 +321,19 @@ private extension ContextMenuManager {
             return
         }
 
-        onNewWindow = { _ in .allow(.window(active: true)) }
+        onNewWindow = { _ in .allow(.window(active: true, disposable: disposable)) }
         NSApp.sendAction(action, to: originalItem.target, from: originalItem)
     }
 
     func openFrameInNewWindow(_ sender: NSMenuItem) {
+        openFrameInNewWindowCommon(sender, disposable: false)
+    }
+
+    func openFrameInNewDisposableWindow(_ sender: NSMenuItem) {
+        openFrameInNewWindowCommon(sender, disposable: true)
+    }
+
+    private func openFrameInNewWindowCommon(_ sender: NSMenuItem, disposable: Bool) {
         guard let originalItem = sender.representedObject as? NSMenuItem,
               let identifier = originalItem.identifier.map(WKMenuItemIdentifier.init),
               identifier == .openFrameInNewWindow,
@@ -294,7 +343,7 @@ private extension ContextMenuManager {
             return
         }
 
-        onNewWindow = { _ in .allow(.window(active: true)) }
+        onNewWindow = { _ in .allow(.window(active: true, disposable: disposable)) }
         NSApp.sendAction(action, to: originalItem.target, from: originalItem)
     }
 
@@ -357,6 +406,14 @@ private extension ContextMenuManager {
     }
 
     func openImageInNewTab(_ sender: NSMenuItem) {
+        openImageInNewTabCommon(sender, disposable: false)
+    }
+
+    func openImageInNewDisposableTab(_ sender: NSMenuItem) {
+        openImageInNewTabCommon(sender, disposable: true)
+    }
+
+    func openImageInNewTabCommon(_ sender: NSMenuItem, disposable: Bool) {
         guard let originalItem = sender.representedObject as? NSMenuItem,
               let identifier = originalItem.identifier.map(WKMenuItemIdentifier.init),
               identifier == .openImageInNewWindow,
@@ -366,11 +423,19 @@ private extension ContextMenuManager {
             return
         }
 
-        onNewWindow = { _ in .allow(.tab(selected: true)) }
+        onNewWindow = { _ in .allow(.tab(selected: true, disposable: disposable)) }
         NSApp.sendAction(action, to: originalItem.target, from: originalItem)
     }
 
     func openImageInNewWindow(_ sender: NSMenuItem) {
+        openImageInNewWindowCommon(sender, disposable: false)
+    }
+
+    func openImageInNewDisposableWindow(_ sender: NSMenuItem) {
+        openImageInNewWindowCommon(sender, disposable: true)
+    }
+
+    func openImageInNewWindowCommon(_ sender: NSMenuItem, disposable: Bool) {
         guard let originalItem = sender.representedObject as? NSMenuItem,
               let identifier = originalItem.identifier.map(WKMenuItemIdentifier.init),
               identifier == .openImageInNewWindow,
@@ -380,7 +445,7 @@ private extension ContextMenuManager {
             return
         }
 
-        onNewWindow = { _ in .allow(.window(active: true)) }
+        onNewWindow = { _ in .allow(.window(active: true, disposable: disposable)) }
         NSApp.sendAction(action, to: originalItem.target, from: originalItem)
     }
 

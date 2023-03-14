@@ -85,7 +85,12 @@ struct UserText {
     static let reloadPage = NSLocalizedString("reload.page", value: "Reload Page", comment: "Context menu item")
 
     static let openLinkInNewTab = NSLocalizedString("open.link.in.new.tab", value: "Open Link in New Tab", comment: "Context menu item")
+    static let openLinkInNewDisposableTab = NSLocalizedString("open.link.in.new.disposable.tab", value: "Open Link in New Disposable Tab", comment: "Context menu item")
+    static let openLinkInNewDisposableWindow = NSLocalizedString("open.link.in.new.disposable.window", value: "Open Link in New Disposable Window", comment: "Context menu item")
     static let openImageInNewTab = NSLocalizedString("open.image.in.new.tab", value: "Open Image in New Tab", comment: "Context menu item")
+    static let openImageInNewDisposableTab = NSLocalizedString("open.image.in.new.disposable.tab", value: "Open Image in New Disposable Tab", comment: "Context menu item")
+    static let openImageInNewDisposableWindow = NSLocalizedString("open.image.in.new.disposable.window", value: "Open Image in New Disposable Window", comment: "Context menu item")
+    static let openFrameInNewDisposableWindow = NSLocalizedString("open.frame.in.new.disposable.window", value: "Open Frame in New Disposable Window", comment: "Context menu item")
     static let copyImageAddress = NSLocalizedString("copy.image.address", value: "Copy Image Address", comment: "Context menu item")
     static let saveImageAs = NSLocalizedString("save.image.as", value: "Save Image As…", comment: "Context menu item")
     static let downloadLinkedFileAs = NSLocalizedString("save.image.as", value: "Download Linked File As…", comment: "Context menu item")
