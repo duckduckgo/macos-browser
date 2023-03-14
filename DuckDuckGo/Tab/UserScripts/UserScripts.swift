@@ -35,6 +35,7 @@ final class UserScripts: UserScriptsProvider {
     let contentBlockerRulesScript: ContentBlockerRulesUserScript
     let surrogatesScript: SurrogatesUserScript
     let contentScopeUserScript: ContentScopeUserScript
+    let contentScopeUserScriptIsolated: ContentScopeUserScriptIsolated
     let autofillScript: WebsiteAutofillUserScript
     let autoconsentUserScript: UserScriptWithAutoconsent?
     let youtubeOverlayScript: YoutubeOverlayUserScript?
@@ -50,6 +51,7 @@ final class UserScripts: UserScriptsProvider {
                                                 sessionKey: sessionKey,
                                                 featureToggles: ContentScopeFeatureToggles.supportedFeaturesOnMacOS)
         contentScopeUserScript = ContentScopeUserScript(sourceProvider.privacyConfigurationManager, properties: prefs)
+        contentScopeUserScriptIsolated = ContentScopeUserScriptIsolated(sourceProvider.privacyConfigurationManager, properties: prefs)
         autofillScript = WebsiteAutofillUserScript(scriptSourceProvider: sourceProvider.autofillSourceProvider!)
         if #available(macOS 11, *) {
             autoconsentUserScript = AutoconsentUserScript(scriptSource: sourceProvider,
@@ -89,6 +91,7 @@ final class UserScripts: UserScriptsProvider {
         hoverUserScript,
         clickToLoadScript,
         contentScopeUserScript,
+        contentScopeUserScriptIsolated,
         autofillScript
     ]
 
