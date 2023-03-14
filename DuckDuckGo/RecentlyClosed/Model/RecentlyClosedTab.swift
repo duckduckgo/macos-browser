@@ -20,17 +20,19 @@ import Foundation
 
 final class RecentlyClosedTab: RecentlyClosedCacheItem {
 
-    init(tabContent: Tab.TabContent, favicon: NSImage?, title: String?, originalTabCollection: TabCollection? = nil, index: TabIndex) {
+    init(tabContent: Tab.TabContent, favicon: NSImage?, title: String?, interactionData: Data? = nil, originalTabCollection: TabCollection? = nil, index: TabIndex) {
         self.tabContent = tabContent
         self.favicon = favicon
         self.title = title
         self.originalTabCollection = originalTabCollection
         self.index = index
+        self.interactionData = interactionData
     }
 
     let tabContent: Tab.TabContent
     let favicon: NSImage?
     let title: String?
+    var interactionData: Data?
 
     weak var originalTabCollection: TabCollection?
     let index: TabIndex
