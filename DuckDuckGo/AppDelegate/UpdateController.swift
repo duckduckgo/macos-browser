@@ -49,13 +49,15 @@ final class UpdateController: NSObject {
 
     // MARK: - Private
 
-    lazy private var updater = SPUStandardUpdaterController(updaterDelegate: self, userDriverDelegate: self)
+    private var updater: SPUStandardUpdaterController!
     private let willRelaunchAppSubject = PassthroughSubject<Void, Never>()
 
     private var internalUserDecider: InternalUserDeciding
 
     private func configureUpdater() {
     // The default configuration of Sparkle updates is in Info.plist
+    updater = SPUStandardUpdaterController(updaterDelegate: self, userDriverDelegate: self)
+
 #if DEBUG
         updater.updater.automaticallyChecksForUpdates = false
         updater.updater.updateCheckInterval = 0
