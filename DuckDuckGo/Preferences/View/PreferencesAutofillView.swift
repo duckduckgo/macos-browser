@@ -89,7 +89,7 @@ extension Preferences {
 
                 // SECTION 2: Ask to Save:
                 PreferencePaneSection {
-                    TextMenuTitle(text: UserText.autofillAskToSave)
+                    TextMenuItemHeader(text: UserText.autofillAskToSave)
                     VStack(alignment: .leading, spacing: 6) {
                         ToggleMenuItem(title: UserText.autofillUsernamesAndPasswords, isOn: $model.askToSaveUsernamesAndPasswords)
                         ToggleMenuItem(title: UserText.autofillAddresses, isOn: $model.askToSaveAddresses)
