@@ -79,6 +79,7 @@ enum NetworkProtectionPixelEvent {
     case networkProtectionClientFailedToParseRegisteredServersResponse
 
     case networkProtectionServerListStoreFailedToEncodeServerList
+    case networkProtectionServerListStoreFailedToDecodeServerList
     case networkProtectionServerListStoreFailedToWriteServerList(error: Error)
     case networkProtectionServerListStoreFailedToReadServerList(error: Error)
 
@@ -117,6 +118,9 @@ enum NetworkProtectionPixelEvent {
 
         case .networkProtectionServerListStoreFailedToEncodeServerList:
             return "m_mac_netp_storage_error_failed_to_encode_server_list"
+
+        case .networkProtectionServerListStoreFailedToDecodeServerList:
+            return "m_mac_netp_storage_error_failed_to_decode_server_list"
 
         case .networkProtectionServerListStoreFailedToWriteServerList:
             return "m_mac_netp_storage_error_server_list_file_system_write_failed"
@@ -184,7 +188,8 @@ enum NetworkProtectionPixelEvent {
              .networkProtectionClientFailedToParseServerListResponse,
              .networkProtectionClientFailedToEncodeRegisterKeyRequest,
              .networkProtectionClientFailedToParseRegisteredServersResponse,
-             .networkProtectionServerListStoreFailedToEncodeServerList:
+             .networkProtectionServerListStoreFailedToEncodeServerList,
+             .networkProtectionServerListStoreFailedToDecodeServerList:
 
             return nil
         }

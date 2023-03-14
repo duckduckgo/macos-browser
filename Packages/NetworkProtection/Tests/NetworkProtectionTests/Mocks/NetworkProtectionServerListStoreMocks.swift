@@ -30,7 +30,7 @@ final class NetworkProtectionServerListStoreMock: NetworkProtectionServerListSto
 
     func storedNetworkProtectionServerList() throws -> [NetworkProtectionServer] {
         guard let list = self.serverList else {
-            throw NetworkProtectionServerListStoreError.noServerListFound
+            throw NetworkProtectionError.noServerListFound
         }
 
         return list

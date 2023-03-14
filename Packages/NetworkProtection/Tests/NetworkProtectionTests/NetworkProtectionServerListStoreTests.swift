@@ -24,7 +24,7 @@ final class NetworkProtectionServerListStoreTests: XCTestCase {
 
     func testWhenStoringList_ThenListCanBeSuccessfullyFetched() {
         let temporaryURL = temporaryFileURL()
-        let store = NetworkProtectionServerListFileSystemStore(fileURL: temporaryURL)
+        let store = NetworkProtectionServerListFileSystemStore(fileURL: temporaryURL, errorEvents: nil)
 
         let storedServers = [NetworkProtectionServer.mockBaseServer]
         XCTAssertNoThrow(try store.store(serverList: storedServers))
@@ -35,7 +35,7 @@ final class NetworkProtectionServerListStoreTests: XCTestCase {
 
     func testWhenRemovingServerList_ThenServerListCanNoLongerBeFetched() {
         let temporaryURL = temporaryFileURL()
-        let store = NetworkProtectionServerListFileSystemStore(fileURL: temporaryURL)
+        let store = NetworkProtectionServerListFileSystemStore(fileURL: temporaryURL, errorEvents: nil)
 
         let storedServers = [NetworkProtectionServer.mockBaseServer]
         XCTAssertNoThrow(try store.store(serverList: storedServers))
@@ -51,7 +51,7 @@ final class NetworkProtectionServerListStoreTests: XCTestCase {
 
     func testWhenStoringNewServerList_AndExistingListHasRegisteredServers_ThenRegistrationStatusPersists_AndVacantServersAreRemoved() throws {
         let temporaryURL = temporaryFileURL()
-        let store = NetworkProtectionServerListFileSystemStore(fileURL: temporaryURL)
+        let store = NetworkProtectionServerListFileSystemStore(fileURL: temporaryURL, errorEvents: nil)
 
         let existingList: [NetworkProtectionServer] = [.registeredServer(named: "A"), .baseServer(named: "B")]
         try store.store(serverList: existingList)
@@ -65,7 +65,7 @@ final class NetworkProtectionServerListStoreTests: XCTestCase {
 
     func testWhenUpdatingRegisteredServer_AndServerExistsInList_ThenServerIsUpdated() throws {
         let temporaryURL = temporaryFileURL()
-        let store = NetworkProtectionServerListFileSystemStore(fileURL: temporaryURL)
+        let store = NetworkProtectionServerListFileSystemStore(fileURL: temporaryURL, errorEvents: nil)
 
         let existingList: [NetworkProtectionServer] = [.registeredServer(named: "C"), .baseServer(named: "B"), .baseServer(named: "A")]
         try store.store(serverList: existingList)
@@ -79,7 +79,7 @@ final class NetworkProtectionServerListStoreTests: XCTestCase {
 
     func testWhenUpdatingRegisteredServers_AndServerDoesNotExistInList_ThenServerIsAddedToList() throws {
         let temporaryURL = temporaryFileURL()
-        let store = NetworkProtectionServerListFileSystemStore(fileURL: temporaryURL)
+        let store = NetworkProtectionServerListFileSystemStore(fileURL: temporaryURL, errorEvents: nil)
 
         let firstList: [NetworkProtectionServer] = [.baseServer(named: "A")]
         try store.store(serverList: firstList)

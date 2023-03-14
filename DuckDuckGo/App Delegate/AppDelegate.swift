@@ -220,7 +220,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 return
             }
 
-            let store = NetworkProtectionServerListFileSystemStore()
+            let store = NetworkProtectionServerListFileSystemStore(errorEvents: nil)
             try store.store(serverList: servers)
 
             os_log("Successfully updated Network Protection servers; total server count = %{public}d", log: .networkProtection, servers.count)

@@ -276,7 +276,7 @@ final class MainMenu: NSMenu {
             return
         }
 
-        let networkProtectionServerStore = NetworkProtectionServerListFileSystemStore()
+        let networkProtectionServerStore = NetworkProtectionServerListFileSystemStore(errorEvents: nil)
         let servers = (try? networkProtectionServerStore.storedNetworkProtectionServerList()) ?? []
 
         if servers.isEmpty {

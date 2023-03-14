@@ -22,11 +22,11 @@ import XCTest
 
 final class NetworkProtectionDeviceManagerTests: XCTestCase {
 
-    func testDeviceManager() async {
+    func testDeviceManager() async throws {
         let server = NetworkProtectionServer.mockRegisteredServer
         let keyStore = NetworkProtectionKeyStoreMock()
         let temporaryURL = temporaryFileURL()
-        let serverListStore = NetworkProtectionServerListFileSystemStore(fileURL: temporaryURL)
+        let serverListStore = NetworkProtectionServerListFileSystemStore(fileURL: temporaryURL, errorEvents: nil)
         let networkClient = NetworkProtectionMockClient(
             getServersReturnValue: .success([server]),
             registerServersReturnValue: .success([server])
@@ -39,7 +39,7 @@ final class NetworkProtectionDeviceManagerTests: XCTestCase {
             errorEvents: nil
         )
 
-        let configuration = await manager.generateTunnelConfiguration(preferredServerName: nil)
+        let configuration = try await manager.generateTunnelConfiguration(selectionMethod: .automatic)
 
         // Check that the device manager created a private key
         XCTAssertTrue((try? keyStore.storedPrivateKey()) != nil)
@@ -47,15 +47,15 @@ final class NetworkProtectionDeviceManagerTests: XCTestCase {
         // Check that the server list store was given a server list
         XCTAssertEqual((try? serverListStore.storedNetworkProtectionServerList()), [.mockRegisteredServer])
 
-        XCTAssertEqual(configuration?.0.interface.privateKey, try? keyStore.storedPrivateKey())
+        XCTAssertEqual(configuration.0.interface.privateKey, try? keyStore.storedPrivateKey())
     }
 
-    func testWhenGeneratingTunnelConfig_AndNoServersAreStored_ThenPrivateKeyIsCreated_AndRegisterEndpointIsCalled() async {
+    func testWhenGeneratingTunnelConfig_AndNoServersAreStored_ThenPrivateKeyIsCreated_AndRegisterEndpointIsCalled() async throws {
         let server = NetworkProtectionServer.mockBaseServer
         let registeredServer = NetworkProtectionServer.mockRegisteredServer
         let keyStore = NetworkProtectionKeyStoreMock()
         let temporaryURL = temporaryFileURL()
-        let serverListStore = NetworkProtectionServerListFileSystemStore(fileURL: temporaryURL)
+        let serverListStore = NetworkProtectionServerListFileSystemStore(fileURL: temporaryURL, errorEvents: nil)
         let networkClient = NetworkProtectionMockClient(
             getServersReturnValue: .success([server]),
             registerServersReturnValue: .success([registeredServer])
@@ -69,11 +69,11 @@ final class NetworkProtectionDeviceManagerTests: XCTestCase {
         )
 
         XCTAssertNil(try? keyStore.storedPrivateKey())
-        XCTAssertEqual(try? serverListStore.storedNetworkProtectionServerList(), nil)
+        XCTAssertEqual(try? serverListStore.storedNetworkProtectionServerList(), [])
         XCTAssertFalse(networkClient.getServersCalled)
         XCTAssertFalse(networkClient.registerCalled)
 
-        _ = await manager.generateTunnelConfiguration(preferredServerName: nil)
+        _ = try await manager.generateTunnelConfiguration(selectionMethod: .automatic)
 
         XCTAssertNotNil(try? keyStore.storedPrivateKey())
         XCTAssertEqual(try? serverListStore.storedNetworkProtectionServerList(), [registeredServer])
@@ -84,10 +84,10 @@ final class NetworkProtectionDeviceManagerTests: XCTestCase {
     func testWhenGeneratingTunnelConfig_AndRegisteredServerIsFound_ThenRegisterEndpointIsNotCalled() async throws {
         let server = NetworkProtectionServer.mockRegisteredServer
         let keyStore = NetworkProtectionKeyStoreMock()
-        _ = try keyStore.generateAndStorePrivateKey()
+        _ = keyStore.currentPrivateKey()
 
         let temporaryURL = temporaryFileURL()
-        let serverListStore = NetworkProtectionServerListFileSystemStore(fileURL: temporaryURL)
+        let serverListStore = NetworkProtectionServerListFileSystemStore(fileURL: temporaryURL, errorEvents: nil)
         try serverListStore.store(serverList: [server])
 
         let networkClient = NetworkProtectionMockClient(
@@ -107,7 +107,7 @@ final class NetworkProtectionDeviceManagerTests: XCTestCase {
         XCTAssertFalse(networkClient.getServersCalled)
         XCTAssertFalse(networkClient.registerCalled)
 
-        _ = await manager.generateTunnelConfiguration(preferredServerName: nil)
+        _ = try await manager.generateTunnelConfiguration(selectionMethod: .automatic)
 
         XCTAssertNotNil(try? keyStore.storedPrivateKey())
         XCTAssertEqual(try? serverListStore.storedNetworkProtectionServerList(), [server])
@@ -119,7 +119,7 @@ final class NetworkProtectionDeviceManagerTests: XCTestCase {
         let server = NetworkProtectionServer.mockRegisteredServer
         let keyStore = NetworkProtectionKeyStoreMock()
         let temporaryURL = temporaryFileURL()
-        let serverListStore = NetworkProtectionServerListFileSystemStore(fileURL: temporaryURL)
+        let serverListStore = NetworkProtectionServerListFileSystemStore(fileURL: temporaryURL, errorEvents: nil)
         let networkClient = NetworkProtectionMockClient(
             getServersReturnValue: .success([]),
             registerServersReturnValue: .success([server])
@@ -144,7 +144,7 @@ final class NetworkProtectionDeviceManagerTests: XCTestCase {
         XCTAssertTrue(manager.closestServer(from: servers, timeZone: TimeZone(abbreviation: "PST")!)!.serverName.hasPrefix("egress.usw"))
         XCTAssertTrue(manager.closestServer(from: servers, timeZone: TimeZone(abbreviation: "PDT")!)!.serverName.hasPrefix("egress.usw"))
         XCTAssertTrue(manager.closestServer(from: servers, timeZone: TimeZone(abbreviation: "MST")!)!.serverName.hasPrefix("egress.usw"))
-        XCTAssertTrue(manager.closestServer(from: servers, timeZone: TimeZone(abbreviation: "MDT")!)!.serverName.hasPrefix("egress.usw"))
+        XCTAssertTrue(manager.closestServer(from: servers, timeZone: TimeZone(abbreviation: "MDT")!)!.serverName.hasPrefix("egress.use"))
         XCTAssertTrue(manager.closestServer(from: servers, timeZone: TimeZone(abbreviation: "CST")!)!.serverName.hasPrefix("egress.use"))
         XCTAssertTrue(manager.closestServer(from: servers, timeZone: TimeZone(abbreviation: "CDT")!)!.serverName.hasPrefix("egress.use"))
         XCTAssertTrue(manager.closestServer(from: servers, timeZone: TimeZone(abbreviation: "EST")!)!.serverName.hasPrefix("egress.use"))
@@ -157,7 +157,7 @@ final class NetworkProtectionDeviceManagerTests: XCTestCase {
         let server = NetworkProtectionServer.mockRegisteredServer
         let keyStore = NetworkProtectionKeyStoreMock()
         let temporaryURL = temporaryFileURL()
-        let serverListStore = NetworkProtectionServerListFileSystemStore(fileURL: temporaryURL)
+        let serverListStore = NetworkProtectionServerListFileSystemStore(fileURL: temporaryURL, errorEvents: nil)
         let networkClient = NetworkProtectionMockClient(
             getServersReturnValue: .success([]),
             registerServersReturnValue: .success([server])

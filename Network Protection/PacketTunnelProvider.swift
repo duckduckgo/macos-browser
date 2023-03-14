@@ -324,7 +324,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
 
     private func handleResetAllState(_ messageData: Data, completionHandler: ((Data?) -> Void)? = nil) {
         NetworkProtectionKeychain.deleteReferences()
-        let serverCache = NetworkProtectionServerListFileSystemStore()
+        let serverCache = NetworkProtectionServerListFileSystemStore(errorEvents: nil)
         try? serverCache.removeServerList()
         // This is not really an error, we received a command to reset the connection
         cancelTunnelWithError(nil)
@@ -504,9 +504,11 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
             return
 
         // NetworkProtectionServerListStoreError
-            
+
         case .failedToEncodeServerList:
             domainEvent = .networkProtectionServerListStoreFailedToEncodeServerList
+        case .failedToDecodeServerList:
+            domainEvent = .networkProtectionServerListStoreFailedToDecodeServerList
         case .failedToWriteServerList(let eventError):
             domainEvent = .networkProtectionServerListStoreFailedToWriteServerList(error: eventError)
         case .noServerListFound:

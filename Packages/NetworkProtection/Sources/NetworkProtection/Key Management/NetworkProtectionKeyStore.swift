@@ -22,7 +22,7 @@ import Foundation
 import os
 
 public protocol NetworkProtectionKeyStore {
-    
+
     /// Obtain the current private key.
     ///
     func currentPrivateKey() -> PrivateKey
@@ -35,7 +35,7 @@ public protocol NetworkProtectionKeyStore {
     /// Resets the current private key so a new one will be generated when requested.
     ///
     func resetCurrentKey()
-    
+
 }
 
 enum NetworkProtectionKeychainStoreError: Error, NetworkProtectionErrorConvertible {
@@ -61,7 +61,7 @@ public class NetworkProtectionKeychainStore: NetworkProtectionKeyStore {
     struct Constants {
         static let defaultServiceName = "DuckDuckGo Network Protection Private Key"
     }
-    
+
     enum UserDefaultKeys {
         static let currentPublicKey = "com.duckduckgo.network-protection.NetworkProtectionKeychainStore.UserDefaultKeys.currentPublicKeyBase64"
     }
@@ -90,7 +90,7 @@ public class NetworkProtectionKeychainStore: NetworkProtectionKeyStore {
         guard let currentPublicKey = currentPublicKey else {
             return nil
         }
-        
+
         do {
             guard let data = try readData(named: currentPublicKey) else {
                 return nil
@@ -112,11 +112,11 @@ public class NetworkProtectionKeychainStore: NetworkProtectionKeyStore {
             handle(error)
             // Intentionally not re-throwing
         }
-        
+
         let generatedKey = PrivateKey()
         let base64PublicKey = generatedKey.publicKey.base64Key
         currentPublicKey = base64PublicKey
-        
+
         do {
             try writeData(generatedKey.rawValue, named: base64PublicKey)
         } catch {
@@ -134,7 +134,7 @@ public class NetworkProtectionKeychainStore: NetworkProtectionKeyStore {
             guard let currentPublicKey = currentPublicKey else {
                 return
             }
-            
+
             try deleteEntry(named: currentPublicKey)
             self.currentPublicKey = nil
         } catch {
@@ -148,7 +148,7 @@ public class NetworkProtectionKeychainStore: NetworkProtectionKeyStore {
     private func readData(named name: String) throws -> Data? {
         var query = defaultAttributesForEntry(named: name)
         query[kSecReturnData as String] = true
-        
+
         var item: CFTypeRef?
 
         let status = SecItemCopyMatching(query as CFDictionary, &item)
@@ -191,7 +191,7 @@ public class NetworkProtectionKeychainStore: NetworkProtectionKeyStore {
         }
     }
 
-    private func defaultAttributesForEntry(named name: String) -> [String: Any] {        
+    private func defaultAttributesForEntry(named name: String) -> [String: Any] {
         return [
             kSecClass: kSecClassGenericPassword,
             kSecUseDataProtectionKeychain: !useSystemKeychain,
@@ -199,9 +199,9 @@ public class NetworkProtectionKeychainStore: NetworkProtectionKeyStore {
             kSecAttrAccount: name
         ] as [String: Any]
     }
-    
+
     // MARK: - UserDefaults
-    
+
     /// The currently used public key.
     ///
     /// The key is stored in base64 representation.
@@ -211,24 +211,24 @@ public class NetworkProtectionKeychainStore: NetworkProtectionKeyStore {
             guard let base64Key = userDefaults.string(forKey: UserDefaultKeys.currentPublicKey) else {
                 return nil
             }
-            
+
             return PublicKey(base64Key: base64Key)?.base64Key
         }
-        
+
         set {
             userDefaults.set(newValue, forKey: UserDefaultKeys.currentPublicKey)
         }
     }
-    
+
     // MARK: - EventMapping
-    
+
     private func handle(_ error: Error) {
         guard let error = error as? NetworkProtectionKeychainStoreError else {
             assertionFailure("Failed to cast Network Protection Keychain store error")
             errorEvents?.fire(NetworkProtectionError.unhandledError(function: #function, line: #line, error: error))
             return
         }
-        
+
         errorEvents?.fire(error.networkProtectionError)
     }
 }

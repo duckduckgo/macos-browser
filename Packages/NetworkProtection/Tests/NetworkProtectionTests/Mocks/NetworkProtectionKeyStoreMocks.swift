@@ -23,7 +23,7 @@ final class NetworkProtectionKeyStoreMock: NetworkProtectionKeyStore {
 
     var storedKey: PrivateKey?
 
-    func generateAndStorePrivateKey() throws -> PrivateKey {
+    func currentPrivateKey() -> PrivateKey {
         if let existingKey = self.storedKey {
             return existingKey
         } else {
@@ -37,7 +37,7 @@ final class NetworkProtectionKeyStoreMock: NetworkProtectionKeyStore {
         return storedKey
     }
 
-    func deleteStoredPrivateKey() throws {
+    func resetCurrentKey() {
         self.storedKey = nil
     }
 

@@ -20,11 +20,11 @@
 import Foundation
 
 public protocol NetworkProtectionClient {
-    
+
     func getServers() async -> Result<[NetworkProtectionServer], NetworkProtectionClientError>
     func register(publicKey: PublicKey,
                   withServer: NetworkProtectionServerInfo) async -> Result<[NetworkProtectionServer], NetworkProtectionClientError>
-    
+
 }
 
 public enum NetworkProtectionClientError: Error, NetworkProtectionErrorConvertible {
@@ -48,7 +48,7 @@ public enum NetworkProtectionClientError: Error, NetworkProtectionErrorConvertib
 struct RegisterKeyRequestBody: Encodable {
     let publicKey: String
     let server: String
-    
+
     init(publicKey: PublicKey, server: String ) {
         self.publicKey = publicKey.base64Key
         self.server = server
@@ -56,19 +56,19 @@ struct RegisterKeyRequestBody: Encodable {
 }
 
 public final class NetworkProtectionBackendClient: NetworkProtectionClient {
-    
+
     enum Constants {
         static let developmentEndpoint = URL(string: "https://on-dev.goduckgo.com")!
     }
-    
+
     var serversURL: URL {
         Constants.developmentEndpoint.appending("/servers")
     }
-    
+
     var registerKeyURL: URL {
         Constants.developmentEndpoint.appending("/register")
     }
-    
+
     public init() {}
 
     public func getServers() async -> Result<[NetworkProtectionServer], NetworkProtectionClientError> {
@@ -80,7 +80,7 @@ public final class NetworkProtectionBackendClient: NetworkProtectionClient {
         } catch {
             return .failure(NetworkProtectionClientError.failedToFetchServerList)
         }
-        
+
         do {
             let decodedServers = try JSONDecoder().decode([NetworkProtectionServer].self, from: downloadedData)
             return .success(decodedServers)
@@ -88,7 +88,7 @@ public final class NetworkProtectionBackendClient: NetworkProtectionClient {
             return .failure(NetworkProtectionClientError.failedToParseServerListResponse(error))
         }
     }
-    
+
     public func register(publicKey: PublicKey,
                          withServer server: NetworkProtectionServerInfo) async -> Result<[NetworkProtectionServer], NetworkProtectionClientError> {
         let requestBody = RegisterKeyRequestBody(publicKey: publicKey, server: server.name)
@@ -99,7 +99,7 @@ public final class NetworkProtectionBackendClient: NetworkProtectionClient {
         } catch {
             return .failure(NetworkProtectionClientError.failedToEncodeRegisterKeyRequest)
         }
-        
+
         var request = URLRequest(url: registerKeyURL)
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
         request.httpMethod = "POST"
@@ -122,11 +122,11 @@ public final class NetworkProtectionBackendClient: NetworkProtectionClient {
         }
 
     }
-    
+
 }
 
 extension URL {
-    
+
     func appending(_ path: String) -> URL {
         if #available(macOS 13.0, *) {
             return appending(path: path)
@@ -134,5 +134,5 @@ extension URL {
             return appendingPathComponent(path)
         }
     }
-    
+
 }

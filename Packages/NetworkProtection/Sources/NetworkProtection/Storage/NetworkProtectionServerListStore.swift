@@ -40,6 +40,7 @@ public protocol NetworkProtectionServerListStore {
 
 public enum NetworkProtectionServerListStoreError: Error, NetworkProtectionErrorConvertible {
     case failedToEncodeServerList(Error)
+    case failedToDecodeServerList(Error)
     case failedToWriteServerList(Error)
     case couldNotCreateServerListDirectory(Error)
     case failedToReadServerList(Error)
@@ -47,6 +48,7 @@ public enum NetworkProtectionServerListStoreError: Error, NetworkProtectionError
     var networkProtectionError: NetworkProtectionError {
         switch self {
         case .failedToEncodeServerList(let error): return .failedToEncodeServerList(error)
+        case .failedToDecodeServerList(let error): return .failedToDecodeServerList(error)
         case .failedToWriteServerList(let error): return .failedToWriteServerList(error)
         case .couldNotCreateServerListDirectory(let error): return .couldNotCreateServerListDirectory(error)
         case .failedToReadServerList(let error): return .failedToReadServerList(error)
@@ -66,10 +68,11 @@ public class NetworkProtectionServerListFileSystemStore: NetworkProtectionServer
     }
 
     private let fileURL: URL
+    private let errorEvents: EventMapping<NetworkProtectionError>?
 
-    public convenience init() {
+    public convenience init(errorEvents: EventMapping<NetworkProtectionError>?) {
         let fileURL: URL
-        
+
         do {
 #if NETP_SYSTEM_EXTENSION
             fileURL = try FileManager.default.url(for: .applicationSupportDirectory, in: .localDomainMask, appropriateFor: nil, create: true)
@@ -80,12 +83,14 @@ public class NetworkProtectionServerListFileSystemStore: NetworkProtectionServer
             // - TODO: consider having a pixel here
             fatalError()
         }
-        
-        self.init(fileURL: fileURL.appending(Constants.defaultFileDir).appendingPathComponent(Constants.defaultFileName, isDirectory: false))
+
+        self.init(fileURL: fileURL.appending(Constants.defaultFileDir).appendingPathComponent(Constants.defaultFileName, isDirectory: false),
+                  errorEvents: errorEvents)
     }
 
-    init(fileURL: URL) {
+    init(fileURL: URL, errorEvents: EventMapping<NetworkProtectionError>?) {
         self.fileURL = fileURL
+        self.errorEvents = errorEvents
     }
 
     public func store(serverList: [NetworkProtectionServer]) throws {
@@ -95,8 +100,12 @@ public class NetworkProtectionServerListFileSystemStore: NetworkProtectionServer
 
         do {
             existingServerList = try storedNetworkProtectionServerList()
-        } catch {
-            throw error
+        } catch let error as NetworkProtectionServerListStoreError {
+            errorEvents?.fire(error.networkProtectionError)
+            // Intentionally not rethrowing, as this may mean our stored server list structure is stale
+            // This method can continue executing and provide a working user experience
+
+            existingServerList = []
         }
 
         // 2. Iterate over existing servers, and for those registered then update the new servers' registration info
@@ -164,7 +173,7 @@ public class NetworkProtectionServerListFileSystemStore: NetworkProtectionServer
             return try JSONDecoder().decode([NetworkProtectionServer].self, from: data)
         } catch {
             try removeServerList()
-            return []
+            throw NetworkProtectionServerListStoreError.failedToDecodeServerList(error)
         }
     }
 
@@ -186,13 +195,13 @@ public class NetworkProtectionServerListFileSystemStore: NetworkProtectionServer
         }
 
         let directory = fileURL.deletingLastPathComponent()
-            
+
         do {
             try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         } catch {
             throw NetworkProtectionServerListStoreError.couldNotCreateServerListDirectory(error)
         }
-        
+
         do {
             try serializedJSONData.write(to: fileURL, options: [.atomic])
         } catch {

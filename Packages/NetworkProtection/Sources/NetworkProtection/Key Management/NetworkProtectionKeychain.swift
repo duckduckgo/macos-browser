@@ -7,7 +7,7 @@ import OSLog
 
 public final class NetworkProtectionKeychain {
 
-    public static func openReference(called ref: Data) -> String? {        
+    public static func openReference(called ref: Data) -> String? {
         let query: [CFString: Any] = [
             kSecValuePersistentRef: ref,
             kSecReturnData: true
