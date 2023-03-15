@@ -19,10 +19,21 @@
 import Foundation
 import CryptoKit
 
-enum EncryptionKeyStoreError: Error {
-    case storageFailed
-    case readFailed
-    case deletionFailed
+enum EncryptionKeyStoreError: Error, ErrorWithParameters {
+    case storageFailed(OSStatus)
+    case readFailed(OSStatus)
+    case deletionFailed(OSStatus)
+
+    var errorParameters: [String: String] {
+        switch self {
+        case .storageFailed(let status):
+            return [Pixel.Parameters.keychainErrorCode: "\(status)"]
+        case .readFailed(let status):
+            return [Pixel.Parameters.keychainErrorCode: "\(status)"]
+        case .deletionFailed(let status):
+            return [Pixel.Parameters.keychainErrorCode: "\(status)"]
+        }
+    }
 }
 
 final class EncryptionKeyStore: EncryptionKeyStoring {
@@ -67,7 +78,7 @@ final class EncryptionKeyStore: EncryptionKeyStoring {
         let status = SecItemAdd(query as CFDictionary, nil)
 
         guard status == errSecSuccess else {
-            throw EncryptionKeyStoreError.storageFailed
+            throw EncryptionKeyStoreError.storageFailed(status)
         }
     }
 
@@ -83,10 +94,12 @@ final class EncryptionKeyStore: EncryptionKeyStoring {
     }
 
     func deleteKey() throws {
-        switch SecItemDelete(defaultKeychainQueryAttributes as CFDictionary) {
+        let status = SecItemDelete(defaultKeychainQueryAttributes as CFDictionary)
+
+        switch status {
         case errSecItemNotFound, errSecSuccess: break
         default:
-            throw EncryptionKeyStoreError.deletionFailed
+            throw EncryptionKeyStoreError.deletionFailed(status)
         }
     }
 
@@ -97,18 +110,19 @@ final class EncryptionKeyStore: EncryptionKeyStoring {
         query[kSecReturnData as String] = true
 
         var item: CFTypeRef?
+        let status = SecItemCopyMatching(query as CFDictionary, &item)
 
-        switch SecItemCopyMatching(query as CFDictionary, &item) {
+        switch status {
         case errSecSuccess:
             guard let data = item as? Data else {
-                throw EncryptionKeyStoreError.readFailed
+                throw EncryptionKeyStoreError.readFailed(status)
             }
 
             return SymmetricKey(data: data)
         case errSecItemNotFound:
             return nil
         default:
-            throw EncryptionKeyStoreError.readFailed
+            throw EncryptionKeyStoreError.readFailed(status)
         }
     }
 
