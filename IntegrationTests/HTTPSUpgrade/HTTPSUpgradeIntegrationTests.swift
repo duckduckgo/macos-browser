@@ -24,24 +24,28 @@ import XCTest
 @available(macOS 12.0, *)
 class HTTPSUpgradeIntegrationTests: XCTestCase {
 
-    static var window: NSWindow!
+    var window: NSWindow!
 
     var mainViewController: MainViewController {
-        (Self.window.contentViewController as! MainViewController)
+        (window.contentViewController as! MainViewController)
     }
 
     var tabViewModel: TabViewModel {
         mainViewController.browserTabViewController.tabViewModel!
     }
 
-    override class func setUp() {
+    @MainActor
+    override func setUp() async throws {
         // disable GPC redirects
         PrivacySecurityPreferences.shared.gpcEnabled = false
 
         window = WindowsManager.openNewWindow(with: .none)!
+
+        XCTAssertTrue(AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.privacyConfig.isFeature(.httpsUpgrade, enabledForDomain: "privacy-test-pages.glitch.me"))
+        await ConfigurationManager.shared.refreshIfNeeded()?.value
     }
 
-    override class func tearDown() {
+    override func tearDown() {
         window.close()
         window = nil
 
@@ -56,6 +60,9 @@ class HTTPSUpgradeIntegrationTests: XCTestCase {
         persistor.selectedDownloadLocation = FileManager.default.temporaryDirectory.absoluteString
 
         let url = URL(string: "http://privacy-test-pages.glitch.me/privacy-protections/https-upgrades/")!
+        let upgradableUrl = URL(string: "http://good.third-party.site/privacy-protections/https-upgrades/frame.html")!
+        let upgradedUrl = try? await AppPrivacyFeatures.shared.httpsUpgrade.upgrade(url: upgradableUrl).get()
+        XCTAssertEqual(upgradedUrl, upgradableUrl.toHttps()!, "URL not upgraded")
 
         let tabViewModel = self.tabViewModel
         let tab = tabViewModel.tab
@@ -103,9 +110,8 @@ class HTTPSUpgradeIntegrationTests: XCTestCase {
         let results = try JSONDecoder().decode(Results.self, from: Data(contentsOf: fileUrl))
         let upgradeNavigation = results.results.first(where: { $0.id == "upgrade-navigation" })
 
-        let expectedUrl = URL(string: "https://good.third-party.site/privacy-protections/https-upgrades/frame.html")!
         XCTAssertNotNil(upgradeNavigation)
-        XCTAssertEqual(upgradeNavigation?.value, expectedUrl)
+        XCTAssertEqual(upgradeNavigation?.value, upgradedUrl)
     }
 
     @MainActor
