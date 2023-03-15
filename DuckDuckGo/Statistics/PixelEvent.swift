@@ -206,6 +206,11 @@ extension Pixel {
             case userSelectedToInstallUpdate
             case userSelectedToDismissUpdate
 
+            case faviconDecryptionFailed
+            case downloadListItemDecryptionFailed
+            case historyEntryDecryptionFailed
+            case permissionDecryptionFailed
+
             // Errors from Bookmarks Module
             case missingParent
             case bookmarksSaveFailed
@@ -462,6 +467,15 @@ extension Pixel.Event.Debug {
             return "user_selected_to_install_update"
         case .userSelectedToDismissUpdate:
             return "user_selected_to_dismiss_update"
+
+        case .faviconDecryptionFailed:
+            return "favicon_decryption_failed"
+        case .downloadListItemDecryptionFailed:
+            return "download_list_item_decryption_failed"
+        case .historyEntryDecryptionFailed:
+            return "history_entry_decryption_failed"
+        case .permissionDecryptionFailed:
+            return "permission_decryption_failed"
 
         case .missingParent: return "bookmark_missing_parent"
         case .bookmarksSaveFailed: return "bookmarks_save_failed"
