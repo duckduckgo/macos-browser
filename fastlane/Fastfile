@@ -13,10 +13,10 @@ APP_STORE_BUILD_NUMBER_CONFIG_PATH = File.join(PROJECT_ROOT_FOLDER, 'Configurati
 VERSION_CONFIG_DEFINITION = 'MARKETING_VERSION'
 BUILD_NUMBER_CONFIG_DEFINITION = 'CURRENT_PROJECT_VERSION'
 UPGRADABLE_EMBEDDED_FILES = [
-  'DuckDuckGo/Content Blocker/AppTrackerDataSetProvider.swift',
-  'DuckDuckGo/Content Blocker/trackerData.json',
-  'DuckDuckGo/Content Blocker/AppPrivacyConfigurationDataProvider.swift',
-  'DuckDuckGo/Content Blocker/macos-config.json'
+  'DuckDuckGo/ContentBlocker/AppTrackerDataSetProvider.swift',
+  'DuckDuckGo/ContentBlocker/trackerData.json',
+  'DuckDuckGo/ContentBlocker/AppPrivacyConfigurationDataProvider.swift',
+  'DuckDuckGo/ContentBlocker/macos-config.json'
 ].freeze
 
 default_platform(:mac)

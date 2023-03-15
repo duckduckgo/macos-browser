@@ -17,6 +17,7 @@
 //
 
 import SwiftUI
+import SwiftUIExtensions
 
 extension Preferences {
 
@@ -36,7 +37,7 @@ extension Preferences {
                 Text(UserText.privatePlayer)
                     .font(Const.Fonts.preferencePaneTitle)
 
-                Section {
+                PreferencePaneSection {
 
                     Picker(selection: privatePlayerModeBinding, content: {
                         Text(UserText.privatePlayerAlwaysOpenInPlayer)

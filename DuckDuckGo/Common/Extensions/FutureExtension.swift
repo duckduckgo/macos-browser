@@ -70,3 +70,23 @@ extension Future where Failure == Never {
     }
 
 }
+
+extension Publishers.First {
+
+    func promise() -> Future<Output, Failure> {
+        return Future { fulfill in
+            var cancellable: AnyCancellable?
+            cancellable = self.sink { completion in
+                withExtendedLifetime(cancellable) {
+                    if case .failure(let error) = completion {
+                        fulfill(.failure(error))
+                    }
+                    cancellable = nil
+                }
+            } receiveValue: { output in
+                fulfill(.success(output))
+            }
+        }
+    }
+
+}

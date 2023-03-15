@@ -353,7 +353,7 @@ final class LocalBookmarkStore: BookmarkStore {
             } catch {
                 self.context.rollback()
                 // Only throw this assertion when running in debug and when unit tests are not running.
-                if !AppDelegate.isRunningTests {
+                if !NSApp.isRunningUnitTests {
                     assertionFailure("LocalBookmarkStore: Saving of context failed")
                 }
 
@@ -592,7 +592,7 @@ final class LocalBookmarkStore: BookmarkStore {
                 os_log("Failed to import bookmarks, with error: %s", log: .dataImportExport, type: .error, error.localizedDescription)
 
                 // Only throw this assertion when running in debug and when unit tests are not running.
-                if !AppDelegate.isRunningTests {
+                if !NSApp.isRunningUnitTests {
                     assertionFailure("LocalBookmarkStore: Saving of context failed, error: \(error.localizedDescription)")
                 }
             }
