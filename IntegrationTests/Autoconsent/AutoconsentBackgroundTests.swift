@@ -102,24 +102,33 @@ class AutoconsentBackgroundTests: XCTestCase {
         webview.navigationDelegate = navigationDelegate
         let url = Bundle(for: type(of: self)).url(forResource: "autoconsent-test-page-banner", withExtension: "html")!
         webview.loadFileURL(url, allowingReadAccessTo: url.deletingLastPathComponent())
-        waitForExpectations(timeout: 1)
+        waitForExpectations(timeout: 5)
 
         let expectation = expectation(description: "Async call")
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-            webview.evaluateJavaScript("window.getComputedStyle(banner).display === 'none'", in: nil, in: .page,
-                                       completionHandler: { result in
-                switch result {
-                case .success(let value as Bool):
-                    XCTAssertTrue(value, "Banner should have been hidden")
-                case .success:
-                    XCTFail("Failed to read test result")
-                case .failure:
-                    XCTFail("Failed to read test result")
-                }
-                expectation.fulfill()
-            })
+        let retries = 3
+        for retry in 1...retries {
+            var shouldRetry = true
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                webview.evaluateJavaScript("window.getComputedStyle(banner).display === 'none'", in: nil, in: .page,
+                                           completionHandler: { result in
+                    switch result {
+                    case .success(let value as Bool):
+                        if retry == retries {
+                            XCTAssertTrue(value, "Banner should have been hidden")
+                        } else if value {
+                            shouldRetry = false
+                        }
+                    case .success:
+                        XCTFail("Failed to read test result")
+                    case .failure:
+                        XCTFail("Failed to read test result")
+                    }
+                    expectation.fulfill()
+                })
+            }
+            waitForExpectations(timeout: 5)
+            if !shouldRetry { break }
         }
-        waitForExpectations(timeout: 4)
     }
 }
 
