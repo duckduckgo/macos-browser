@@ -158,6 +158,14 @@ final class BrowserTabViewController: NSViewController {
 
     private func removeWebViewFromHierarchy(webView: WebView? = nil,
                                             container: NSView? = nil) {
+
+        func removeWebInspectorFromHierarchy(container: NSView) {
+            // Fixes the issue of web inspector unintentionally detaching from the parent view to a standalone window
+            for subview in container.subviews where subview.className.contains("WKInspector") {
+                subview.removeFromSuperview()
+            }
+        }
+
         guard let webView = webView ?? self.webView,
               let container = container ?? self.webViewContainer
         else { return }
@@ -167,6 +175,9 @@ final class BrowserTabViewController: NSViewController {
         }
 
         if webView.window === view.window {
+            if webView.isInspectorShown {
+                removeWebInspectorFromHierarchy(container: container)
+            }
             container.removeFromSuperview()
         }
         if self.webViewContainer === container {
