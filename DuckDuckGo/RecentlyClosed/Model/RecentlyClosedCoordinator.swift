@@ -164,12 +164,12 @@ final class RecentlyClosedCoordinator: RecentlyClosedCoordinating {
 
         } else {
             // There is no window available, create a new one
-            let tab = Tab(content: recentlyClosedTab.tabContent, shouldLoadInBackground: true, shouldLoadFromCache: true)
+            let tab = Tab(content: recentlyClosedTab.tabContent, interactionStateData: recentlyClosedTab.interactionData, shouldLoadInBackground: true, shouldLoadFromCache: true)
             WindowsManager.openNewWindow(with: tab)
             return
         }
 
-        let tab = Tab(content: recentlyClosedTab.tabContent, shouldLoadInBackground: true, shouldLoadFromCache: true)
+        let tab = Tab(content: recentlyClosedTab.tabContent, interactionStateData: recentlyClosedTab.interactionData, shouldLoadInBackground: true, shouldLoadFromCache: true)
         tabCollectionViewModel.insert(tab, at: .unpinned(tabIndex), selected: true)
     }
 
@@ -185,7 +185,7 @@ final class RecentlyClosedCoordinator: RecentlyClosedCoordinating {
             return
         }
 
-        let tab = Tab(content: recentlyClosedTab.tabContent, shouldLoadInBackground: true, shouldLoadFromCache: true)
+        let tab = Tab(content: recentlyClosedTab.tabContent, interactionStateData: recentlyClosedTab.interactionData, shouldLoadInBackground: true, shouldLoadFromCache: true)
         let tabIndex = min(recentlyClosedTab.index.item, windowControllerManager.pinnedTabsManager.tabCollection.tabs.count)
 
         tabCollectionViewModel.insert(tab, at: .pinned(tabIndex), selected: true)
@@ -205,26 +205,11 @@ final class RecentlyClosedCoordinator: RecentlyClosedCoordinating {
 
     func burnCache(domains: Set<String>? = nil) {
         if let domains = domains {
-            cache.removeAll { (cacheItem) in
-                switch cacheItem {
-                case let tab as RecentlyClosedTab:
-                    return tab.contentContainsDomains(domains)
-                case let window as RecentlyClosedWindow:
-                    window.tabs.removeAll(where: { tab in
-                        tab.contentContainsDomains(domains)
-                    })
-                    if window.tabs.isEmpty { return true }
-                default:
-                    assertionFailure("Unknown type")
-                }
-
-                return false
-            }
+            cache.burn(for: domains)
         } else {
             cache.removeAll()
         }
     }
-
 }
 
 private extension RecentlyClosedTab {
@@ -233,18 +218,10 @@ private extension RecentlyClosedTab {
         self.init(tabContent: tab.content,
                   favicon: tab.favicon,
                   title: tab.title,
+                  interactionData: tab.getActualInteractionStateData(),
                   originalTabCollection: originalTabCollection,
                   index: tabIndex)
     }
-
-    func contentContainsDomains(_ domains: Set<String>) -> Bool {
-        if let host = tabContent.url?.host, domains.contains(host) {
-            return true
-        } else {
-            return false
-        }
-    }
-
 }
 
 private extension Tab {
@@ -252,5 +229,4 @@ private extension Tab {
     var isContentEmpty: Bool {
         content == .none || content == .homePage
     }
-
 }

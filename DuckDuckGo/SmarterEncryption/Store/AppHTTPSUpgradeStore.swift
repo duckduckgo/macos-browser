@@ -26,6 +26,22 @@ extension HTTPSExcludedDomain: Managed {}
 
 public final class AppHTTPSUpgradeStore: HTTPSUpgradeStore {
 
+    public enum Error: Swift.Error {
+
+        case specMismatch
+        case saveError(Swift.Error)
+
+        public var errorDescription: String? {
+            switch self {
+            case .specMismatch:
+                return "The spec and the data do not match."
+            case .saveError(let error):
+                return "Error occurred while saving data: \(error.localizedDescription)"
+            }
+        }
+
+    }
+
     private struct Resource {
         static var bloomFilter: URL {
             return URL.sandboxApplicationSupportURL.appendingPathComponent("HttpsBloomFilter.bin")
@@ -40,73 +56,98 @@ public final class AppHTTPSUpgradeStore: HTTPSUpgradeStore {
 
     private struct EmbeddedBloomData {
         let specification: HTTPSBloomFilterSpecification
-        let bloomFilter: Data
         let excludedDomains: [String]
     }
 
-    private let context = Database.shared.makeContext(concurrencyType: .privateQueueConcurrencyType, name: "HTTPSUpgrade")
+    init() {}
 
-    private var hasBloomFilterData: Bool {
-        return (try? Resource.bloomFilter.checkResourceIsReachable()) ?? false
+    init(context: NSManagedObjectContext) {
+        self.context = context
     }
 
-    public var bloomFilter: BloomFilterWrapper? {
-        let storedSpecification = hasBloomFilterData ? bloomFilterSpecification : loadEmbeddedData()?.specification
-        guard let specification = storedSpecification else { return nil }
-        return BloomFilterWrapper(fromPath: Resource.bloomFilter.path,
-                                  withBitCount: Int32(specification.bitCount),
-                                  andTotalItems: Int32(specification.totalEntries))
+    private lazy var context = Database.shared.makeContext(concurrencyType: .privateQueueConcurrencyType, name: "HTTPSUpgrade")
+
+    private var storedBloomFilterDataHash: String? {
+        return try? Data(contentsOf: Resource.bloomFilter).sha256
     }
 
-    public var bloomFilterSpecification: HTTPSBloomFilterSpecification? {
+    public func loadBloomFilter() -> (wrapper: BloomFilterWrapper, specification: HTTPSBloomFilterSpecification)? {
+        let specification: HTTPSBloomFilterSpecification
+        if let storedBloomFilterSpecification = self.loadStoredBloomFilterSpecification(),
+           storedBloomFilterSpecification.sha256 == storedBloomFilterDataHash {
+            specification = storedBloomFilterSpecification
+        } else {
+            do {
+                // writes data to Resource.bloomFilter
+                let embeddedData = try loadAndPersistEmbeddedData()
+                specification = embeddedData.specification
+            } catch {
+                assertionFailure("Could not load embedded BloomFilter data: \(error)")
+                return nil
+            }
+        }
+
+        assert(specification == loadStoredBloomFilterSpecification())
+        assert(specification.sha256 == storedBloomFilterDataHash)
+        return (
+            BloomFilterWrapper(fromPath: Resource.bloomFilter.path,
+                               withBitCount: Int32(specification.bitCount),
+                               andTotalItems: Int32(specification.totalEntries)),
+            specification
+        )
+    }
+
+    func loadStoredBloomFilterSpecification() -> HTTPSBloomFilterSpecification? {
         var specification: HTTPSBloomFilterSpecification?
         context.performAndWait {
             let request: NSFetchRequest<HTTPSStoredBloomFilterSpecification> = HTTPSStoredBloomFilterSpecification.fetchRequest()
-            guard let result = try? request.execute() else { return }
-            guard let storedSpecification = HTTPSBloomFilterSpecification.copy(storedSpecification: result.first) else { return }
-            guard storedSpecification.bitCount > 0, storedSpecification.totalEntries > 0 else { return }
+            guard let result = (try? request.execute())?.first else { return }
+            guard let storedSpecification = HTTPSBloomFilterSpecification.copy(storedSpecification: result) else {
+                assertionFailure("could not initialize HTTPSBloomFilterSpecification from Managed")
+                return
+            }
+            guard storedSpecification.bitCount > 0, storedSpecification.totalEntries > 0 else {
+                assertionFailure("total entries or bit count == 0")
+                return
+            }
             specification = storedSpecification
         }
-        return specification ?? loadEmbeddedData()?.specification
+        return specification
     }
 
-    private func loadEmbeddedData() -> EmbeddedBloomData? {
+    private func loadAndPersistEmbeddedData() throws -> EmbeddedBloomData {
         os_log("Loading embedded https data")
-        guard let specificationData = try? Data(contentsOf: EmbeddedResource.bloomSpecification),
-              let specification = try? JSONDecoder().decode(HTTPSBloomFilterSpecification.self, from: specificationData),
-              let bloomData = try? Data(contentsOf: EmbeddedResource.bloomFilter),
-              let excludedDomainsData = try? Data(contentsOf: EmbeddedResource.excludedDomains),
-              let excludedDomains = try? JSONDecoder().decode(HTTPSExcludedDomains.self, from: excludedDomainsData)
-        else {
-            return nil
-        }
-        persistBloomFilter(specification: specification, data: bloomData)
-        persistExcludedDomains(excludedDomains.data)
-        return EmbeddedBloomData(specification: specification, bloomFilter: bloomData, excludedDomains: excludedDomains.data)
+        let specificationData = try Data(contentsOf: EmbeddedResource.bloomSpecification)
+        let specification = try JSONDecoder().decode(HTTPSBloomFilterSpecification.self, from: specificationData)
+        let bloomData = try Data(contentsOf: EmbeddedResource.bloomFilter)
+        let excludedDomainsData = try Data(contentsOf: EmbeddedResource.excludedDomains)
+        let excludedDomains = try JSONDecoder().decode(HTTPSExcludedDomains.self, from: excludedDomainsData)
+
+        try persistBloomFilter(specification: specification, data: bloomData)
+        try persistExcludedDomains(excludedDomains.data)
+
+        return EmbeddedBloomData(specification: specification, excludedDomains: excludedDomains.data)
     }
 
-    @discardableResult func persistBloomFilter(specification: HTTPSBloomFilterSpecification, data: Data) -> Bool {
-        guard data.sha256 == specification.sha256 else { return false }
-        guard persistBloomFilter(data: data) else { return false }
-        persistBloomFilterSpecification(specification)
-        return true
+    func persistBloomFilter(specification: HTTPSBloomFilterSpecification, data: Data) throws {
+        guard data.sha256 == specification.sha256 else {
+            assertionFailure("bloom filter sha256 \(data.sha256) does not match \(specification.sha256)")
+            throw Error.specMismatch
+        }
+        try persistBloomFilter(data: data)
+        try persistBloomFilterSpecification(specification)
     }
 
-    private func persistBloomFilter(data: Data) -> Bool {
-        do {
-            try data.write(to: Resource.bloomFilter, options: .atomic)
-            return true
-        } catch _ {
-            return false
-        }
+    private func persistBloomFilter(data: Data) throws {
+        try data.write(to: Resource.bloomFilter, options: .atomic)
     }
 
     private func deleteBloomFilter() {
         try? FileManager.default.removeItem(at: Resource.bloomFilter)
     }
 
-    func persistBloomFilterSpecification(_ specification: HTTPSBloomFilterSpecification) {
-
+    func persistBloomFilterSpecification(_ specification: HTTPSBloomFilterSpecification) throws {
+        var saveError: Swift.Error?
         context.performAndWait {
             deleteBloomFilterSpecification()
 
@@ -120,7 +161,11 @@ public final class AppHTTPSUpgradeStore: HTTPSUpgradeStore {
                 try context.save()
             } catch {
                 Pixel.fire(.debug(event: .dbSaveBloomFilterError, error: error))
+                saveError = error
             }
+        }
+        if let saveError {
+            throw Error.saveError(saveError)
         }
     }
 
@@ -141,8 +186,8 @@ public final class AppHTTPSUpgradeStore: HTTPSUpgradeStore {
         return result
     }
 
-    @discardableResult public func persistExcludedDomains(_ domains: [String]) -> Bool {
-        var result = true
+    public func persistExcludedDomains(_ domains: [String]) throws {
+        var saveError: Swift.Error?
         context.performAndWait {
             deleteExcludedDomains()
 
@@ -153,11 +198,14 @@ public final class AppHTTPSUpgradeStore: HTTPSUpgradeStore {
             do {
                 try context.save()
             } catch {
+                assertionFailure("Could not persist ExcludedDomains")
                 Pixel.fire(.debug(event: .dbSaveExcludedHTTPSDomainsError, error: error))
-                result = false
+                saveError = error
             }
         }
-        return result
+        if let saveError {
+            throw Error.saveError(saveError)
+        }
     }
 
     private func deleteExcludedDomains() {
@@ -171,4 +219,5 @@ public final class AppHTTPSUpgradeStore: HTTPSUpgradeStore {
         deleteBloomFilter()
         deleteExcludedDomains()
     }
+
 }
