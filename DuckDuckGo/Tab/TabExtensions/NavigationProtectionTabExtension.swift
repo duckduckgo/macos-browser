@@ -46,9 +46,6 @@ final class NavigationProtectionTabExtension {
                          tld: contentBlocking.tld)
     }()
 
-    @MainActor
-    @Published var isAMPProtectionExtracting: Bool = false
-
     init(contentBlocking: AnyContentBlocking) {
         self.contentBlocking = contentBlocking
 
@@ -66,26 +63,25 @@ extension NavigationProtectionTabExtension: NavigationResponder {
               navigationAction.isForMainFrame
         else { return .next }
 
-        let rewrittenTrackingLinkUrl = await linkProtection.requestTrackingLinkRewrite(initiatingURL: navigationAction.sourceFrame.url,
-                                                                                       destinationURL: navigationAction.url,
-                                                                                       updateIsExtracting: { self.isAMPProtectionExtracting = $0 })
+        var request = navigationAction.request
+
+        // getCleanURL for user or ui-initiated navigations
+        // https://app.asana.com/0/0/1203538050625396/f
+        if [.custom(.userEnteredUrl), .custom(.tabContentUpdate)].contains(navigationAction.navigationType) {
+            request.url = await linkProtection.getCleanURL(from: request.url!, onStartExtracting: {}, onFinishExtracting: {})
+        }
         guard !Task.isCancelled else { return .cancel }
 
-        if let rewrittenTrackingLinkUrl {
-            return .redirectInvalidatingBackItemIfNeeded(navigationAction) {
-                $0.load(URLRequest(url: rewrittenTrackingLinkUrl))
-            }
-        }
+        request.url = await linkProtection.requestTrackingLinkRewrite(initiatingURL: navigationAction.sourceFrame.url, destinationURL: request.url!) ?? request.url
+        guard !Task.isCancelled else { return .cancel }
 
-        if let request = referrerTrimming.trimReferrer(for: navigationAction.request, originUrl: navigationAction.sourceFrame.url) {
-            return .redirectInvalidatingBackItemIfNeeded(navigationAction) {
-                $0.load(request)
-            }
-        }
+        request = referrerTrimming.trimReferrer(for: request, originUrl: navigationAction.sourceFrame.url) ?? request
 
-        if let request = GPCRequestFactory().requestForGPC(basedOn: navigationAction.request,
-                                                           config: contentBlocking.privacyConfigurationManager.privacyConfig,
-                                                           gpcEnabled: PrivacySecurityPreferences.shared.gpcEnabled) {
+        request = GPCRequestFactory().requestForGPC(basedOn: request,
+                                                    config: contentBlocking.privacyConfigurationManager.privacyConfig,
+                                                    gpcEnabled: PrivacySecurityPreferences.shared.gpcEnabled) ?? request
+
+        if request != navigationAction.request {
             return .redirectInvalidatingBackItemIfNeeded(navigationAction) {
                 $0.load(request)
             }
@@ -103,9 +99,6 @@ extension NavigationProtectionTabExtension: NavigationResponder {
 
     @MainActor
     func navigationDidFinish(_ navigation: Navigation) {
-        if isAMPProtectionExtracting {
-            isAMPProtectionExtracting = false
-        }
         linkProtection.setMainFrameUrl(nil)
         referrerTrimming.onFinishNavigation()
     }
@@ -123,15 +116,10 @@ extension LinkProtection {
 
     @MainActor
     public func requestTrackingLinkRewrite(initiatingURL: URL?,
-                                           destinationURL: URL,
-                                           updateIsExtracting: @escaping (Bool) -> Void) async -> URL? {
+                                           destinationURL: URL) async -> URL? {
         await withCheckedContinuation { continuation in
             let didRewriteLink = {
-                requestTrackingLinkRewrite(initiatingURL: initiatingURL, destinationURL: destinationURL, onStartExtracting: {
-                    updateIsExtracting(true)
-                }) {
-                    updateIsExtracting(false)
-                } onLinkRewrite: { url in
+                requestTrackingLinkRewrite(initiatingURL: initiatingURL, destinationURL: destinationURL, onStartExtracting: {}, onFinishExtracting: {}) { url in
                     continuation.resume(returning: url) // <---
                 } policyDecisionHandler: { allowNavigationAction in
                     if allowNavigationAction {
@@ -150,25 +138,9 @@ extension LinkProtection {
 
 protocol NavigationProtectionExtensionProtocol: AnyObject, NavigationResponder {
     var linkProtection: LinkProtection { get }
-    var isAMPProtectionExtractingPublisher: AnyPublisher<Bool, Never> { get }
-    func getCleanURL(from url: URL) async -> URL
 }
 extension NavigationProtectionTabExtension: TabExtension, NavigationProtectionExtensionProtocol {
     func getPublicProtocol() -> NavigationProtectionExtensionProtocol { self }
-
-    var isAMPProtectionExtractingPublisher: AnyPublisher<Bool, Never> {
-        $isAMPProtectionExtracting.eraseToAnyPublisher()
-    }
-
-    @MainActor
-    public func getCleanURL(from url: URL) async -> URL {
-        await linkProtection.getCleanURL(from: url, onStartExtracting: {
-            isAMPProtectionExtracting = true
-        }, onFinishExtracting: { [self /*async holds us*/] in
-            self.isAMPProtectionExtracting = false
-        })
-    }
-
 }
 extension TabExtensions {
     var navigationProtection: NavigationProtectionExtensionProtocol? {
@@ -179,8 +151,5 @@ extension TabExtensions {
 extension Tab {
     var linkProtection: LinkProtection {
         self.navigationProtection!.linkProtection
-    }
-    var isAMPProtectionExtractingPublisher: AnyPublisher<Bool, Never> {
-        self.navigationProtection?.isAMPProtectionExtractingPublisher ?? Just(false).eraseToAnyPublisher()
     }
 }

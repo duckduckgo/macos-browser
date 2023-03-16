@@ -419,9 +419,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     let webViewDidFinishNavigationPublisher = PassthroughSubject<Void, Never>()
     let webViewDidFailNavigationPublisher = PassthroughSubject<Void, Never>()
 
-    @MainActor
-    @Published var isAMPProtectionExtracting: Bool = false
-
     // MARK: - Properties
 
     let webView: WebView
@@ -694,16 +691,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         let content = self.content
         guard content.url != nil else { return nil }
 
-        let url: URL = await {
-            if contentURL.isFileURL {
-                return contentURL
-            }
-            return await linkProtection.getCleanURL(from: contentURL, onStartExtracting: {
-                isAMPProtectionExtracting = true
-            }, onFinishExtracting: { [weak self]
-                in self?.isAMPProtectionExtracting = false
-            })
-        }()
+        let url = contentURL
         guard content == self.content else { return nil }
 
         if shouldReload(url, shouldLoadInBackground: shouldLoadInBackground) {
@@ -715,9 +703,18 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
             guard !didRestore else { return nil }
 
+            let navigationType: NavigationType
+            if content.isUserEnteredUrl {
+                navigationType = .custom(.userEnteredUrl)
+            } else if interactionState.shouldLoadFromCache {
+                navigationType = .sessionRestoration
+            } else {
+                navigationType = .custom(.tabContentUpdate)
+            }
+
             if url.isFileURL {
                 return webView.navigator(distributedNavigationDelegate: navigationDelegate)
-                    .loadFileURL(url, allowingReadAccessTo: URL(fileURLWithPath: "/"), withExpectedNavigationType: content.isUserEnteredUrl ? .custom(.userEnteredUrl) : .other)
+                    .loadFileURL(url, allowingReadAccessTo: URL(fileURLWithPath: "/"), withExpectedNavigationType: navigationType)
             }
 
             var request = URLRequest(url: url, cachePolicy: interactionState.shouldLoadFromCache ? .returnCacheDataElseLoad : .useProtocolCachePolicy)
@@ -726,9 +723,9 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                 request.attribution = .user
             }
             invalidateInteractionStateData()
-            
+
             return webView.navigator(distributedNavigationDelegate: navigationDelegate)
-                .load(request, withExpectedNavigationType: content.isUserEnteredUrl ? .custom(.userEnteredUrl) : .other)
+                .load(request, withExpectedNavigationType: navigationType)
         }
         return nil
     }
@@ -1191,7 +1188,6 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
     func navigationDidFinish(_ navigation: Navigation) {
         invalidateInteractionStateData()
         webViewDidFinishNavigationPublisher.send()
-        if isAMPProtectionExtracting { isAMPProtectionExtracting = false }
         setUpYoutubeScriptsIfNeeded()
         statisticsLoader?.refreshRetentionAtb(isSearch: navigation.url.isDuckDuckGoSearch)
     }
