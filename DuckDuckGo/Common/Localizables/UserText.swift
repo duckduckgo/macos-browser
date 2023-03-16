@@ -234,6 +234,10 @@ struct UserText {
     static let externalSchemePermissionAuthorizationFormat = NSLocalizedString("permission.authorization.externalScheme.format",
                                                                                value: "“%@” would like to open this link in %@",
                                                                                comment: "Popover asking for domain %@ to open link in External App (%@)")
+    static let externalSchemePermissionAuthorizationNoDomainFormat = NSLocalizedString("permission.authorization.externalScheme.empty.format",
+                                                                                       value: "Open this link in %@?",
+                                                                                       comment: "Popover asking to open link in External App (%@)")
+    static let permissionAlwaysAllowOnDomainCheckbox = NSLocalizedString("dashboard.permission.allow.on", value: "Always allow on", comment: "Permission Popover 'Always allow on' (for domainName) checkbox")
 
     static let permissionMicrophone = NSLocalizedString("permission.microphone", value: "Microphone", comment: "Microphone input media device name")
     static let permissionCamera = NSLocalizedString("permission.camera", value: "Camera", comment: "Camera input media device name")

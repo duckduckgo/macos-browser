@@ -302,7 +302,7 @@ final class PermissionModel {
     /// The decisionHandler will be called synchronously if there‘s a permanent (stored) permission granted or denied
     /// If no permanent decision is stored a new AuthorizationQuery will be initialized and published via $authorizationQuery
     func permissions(_ permissions: [PermissionType], requestedForDomain domain: String, url: URL? = nil, decisionHandler: @escaping (Bool) -> Void) {
-        guard !domain.isEmpty, !permissions.isEmpty else {
+        guard !permissions.isEmpty else {
             assertionFailure("Unexpected permissions/domain")
             decisionHandler(false)
             return

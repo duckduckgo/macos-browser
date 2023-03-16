@@ -31,6 +31,8 @@ final class AddressBarViewController: NSViewController {
     @IBOutlet var activeBackgroundViewWithSuggestions: NSView!
     @IBOutlet var progressIndicator: ProgressView!
     @IBOutlet var passiveTextFieldMinXConstraint: NSLayoutConstraint!
+    @IBOutlet var activeTextFieldMinXConstraint: NSLayoutConstraint!
+    private static let defaultActiveTextFieldMinX: CGFloat = 40
 
     private(set) var addressBarButtonsViewController: AddressBarButtonsViewController?
 
@@ -253,7 +255,13 @@ final class AddressBarViewController: NSViewController {
 
     private func subscribeToButtonsWidth() {
         addressBarButtonsViewController!.$buttonsWidth
-            .assign(to: \.constant, onWeaklyHeld: passiveTextFieldMinXConstraint)
+            .sink { [weak self] value in
+                guard let self else { return }
+                self.passiveTextFieldMinXConstraint.constant = value
+                // adjust min-x to passive text field when “Search or enter” placeholder is displayed (to prevent placeholder overlapping buttons)
+                self.activeTextFieldMinXConstraint.constant = (!self.isFirstResponder || self.mode.isEditing)
+                    ? value : Self.defaultActiveTextFieldMinX
+            }
             .store(in: &cancellables)
     }
 

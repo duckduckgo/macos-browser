@@ -63,12 +63,14 @@ extension ExternalAppSchemeHandler: NavigationResponder {
         // Another way of detecting whether an app is installed to handle a protocol is described in Asana:
         // https://app.asana.com/0/1201037661562251/1202055908401751/f
         // removing First Responder focus from the WebView to make the page think the app was opened
+        // make the web view First Responder first if it‘s not
+        navigationAction.targetFrame?.webView?.makeMeFirstResponder()
         navigationAction.targetFrame?.webView?.removeFocusFromWebView()
 
         let permissionType = PermissionType.externalScheme(scheme: scheme)
-        let domain = navigationAction.sourceFrame.securityOrigin.host
-
-        permissionModel.permissions([permissionType], requestedForDomain: domain, url: externalUrl) { isGranted in
+        // use domain from the url for user-entered app schemes, otherwise use current website domain
+        let domain = navigationAction.isUserEnteredUrl ? navigationAction.url.host ?? "" : navigationAction.sourceFrame.securityOrigin.host
+        permissionModel.permissions([permissionType], requestedForDomain: domain, url: externalUrl) { [workspace] isGranted in
             if isGranted {
                 NSWorkspace.shared.open(externalUrl)
             }
