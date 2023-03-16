@@ -597,15 +597,21 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     @Published private(set) var canGoForward: Bool = false
     @Published private(set) var canGoBack: Bool = false
 
+    private func updateCanGoBackForward() {
+        updateCanGoBackForward(withCurrentNavigation: navigationDelegate.currentNavigation)
+    }
+
+    // published $currentNavigation emits nil before actual currentNavigation property is set to nil, that‘s why default `= nil` argument can‘t be used here
     @MainActor(unsafe)
-    private func updateCanGoBackForward(withCurrentNavigation currentNavigation: Navigation? = nil) {
+    private func updateCanGoBackForward(withCurrentNavigation currentNavigation: Navigation?) {
         dispatchPrecondition(condition: .onQueue(.main))
-        let currentNavigation = currentNavigation ?? navigationDelegate.currentNavigation
 
         // “freeze” back-forward buttons updates when current backForwardListItem is being popped..
-        if webView.backForwardList.currentItem?.identity == currentNavigation?.navigationAction.fromHistoryItemIdentity
-            // ..or during the following developer-redirect navigation
-            || currentNavigation?.navigationAction.navigationType == .redirect(.developer) {
+        if webView.canGoForward
+            // coming back to the same backForwardList item from where started
+            && (webView.backForwardList.currentItem?.identity == currentNavigation?.navigationAction.fromHistoryItemIdentity
+                // ..or during the following developer-redirect navigation
+                || currentNavigation?.navigationAction.navigationType == .redirect(.developer)) {
             return
         }
 
