@@ -72,7 +72,7 @@ extension ExternalAppSchemeHandler: NavigationResponder {
         let domain = navigationAction.isUserEnteredUrl ? navigationAction.url.host ?? "" : navigationAction.sourceFrame.securityOrigin.host
         permissionModel.permissions([permissionType], requestedForDomain: domain, url: externalUrl) { [workspace] isGranted in
             if isGranted {
-                NSWorkspace.shared.open(externalUrl)
+                workspace.open(externalUrl)
             }
         }
 

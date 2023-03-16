@@ -1500,6 +1500,12 @@
 		B603973D29BF1D7D00902A34 /* AutoconsentIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B603973B29BF1D7D00902A34 /* AutoconsentIntegrationTests.swift */; };
 		B603974B29C1A0CC00902A34 /* AppHTTPSUpgradeStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B603974A29C1A0CC00902A34 /* AppHTTPSUpgradeStoreTests.swift */; };
 		B603974C29C1A0CC00902A34 /* AppHTTPSUpgradeStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B603974A29C1A0CC00902A34 /* AppHTTPSUpgradeStoreTests.swift */; };
+		B603974E29C1F93600902A34 /* TabPermissionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B603974D29C1F93600902A34 /* TabPermissionsTests.swift */; };
+		B603974F29C1F93600902A34 /* TabPermissionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B603974D29C1F93600902A34 /* TabPermissionsTests.swift */; };
+		B603975029C1FF5F00902A34 /* TestsURLExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6EC37FB29B83E99001ACE79 /* TestsURLExtension.swift */; };
+		B603975129C1FF6000902A34 /* TestsURLExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6EC37FB29B83E99001ACE79 /* TestsURLExtension.swift */; };
+		B603975229C1FFAD00902A34 /* ExpectedNavigationExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B603972B29BEDF2100902A34 /* ExpectedNavigationExtension.swift */; };
+		B603975329C1FFAE00902A34 /* ExpectedNavigationExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B603972B29BEDF2100902A34 /* ExpectedNavigationExtension.swift */; };
 		B6040856274B830F00680351 /* DictionaryExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6040855274B830F00680351 /* DictionaryExtension.swift */; };
 		B604085C274B8FBA00680351 /* UnprotectedDomains.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = B604085A274B8CA300680351 /* UnprotectedDomains.xcdatamodeld */; };
 		B6085D062743905F00A9C456 /* CoreDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6085D052743905F00A9C456 /* CoreDataStore.swift */; };
@@ -2539,6 +2545,7 @@
 		B603973729BF0EBE00902A34 /* PrivacyDashboardIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyDashboardIntegrationTests.swift; sourceTree = "<group>"; };
 		B603973B29BF1D7D00902A34 /* AutoconsentIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoconsentIntegrationTests.swift; sourceTree = "<group>"; };
 		B603974A29C1A0CC00902A34 /* AppHTTPSUpgradeStoreTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppHTTPSUpgradeStoreTests.swift; sourceTree = "<group>"; };
+		B603974D29C1F93600902A34 /* TabPermissionsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabPermissionsTests.swift; sourceTree = "<group>"; };
 		B6040855274B830F00680351 /* DictionaryExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionaryExtension.swift; sourceTree = "<group>"; };
 		B604085B274B8CA400680351 /* Permissions.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Permissions.xcdatamodel; sourceTree = "<group>"; };
 		B6085D052743905F00A9C456 /* CoreDataStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataStore.swift; sourceTree = "<group>"; };
@@ -4175,6 +4182,7 @@
 				B6AE74322609AFBB005B9B1A /* Progress */,
 				B698E5032908011E00A746A8 /* AppKitPrivateMethodsAvailabilityTests.swift */,
 				B6F56566299A414300A04298 /* WKWebViewMockingExtension.swift */,
+				B603972B29BEDF2100902A34 /* ExpectedNavigationExtension.swift */,
 				B603970F29B9D67E00902A34 /* PublishersExtensions.swift */,
 				B626A76F29928C4100053070 /* MockPrivacyConfiguration.swift */,
 				B6B3E0952654DACD0040E0A2 /* UTTypeTests.swift */,
@@ -5359,7 +5367,6 @@
 			isa = PBXGroup;
 			children = (
 				B6EC37FB29B83E99001ACE79 /* TestsURLExtension.swift */,
-				B603972B29BEDF2100902A34 /* ExpectedNavigationExtension.swift */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -5401,6 +5408,7 @@
 				B63ED0DB26AE7B1E00A9DAD1 /* WebViewMock.swift */,
 				B63ED0DD26AFD9A300A9DAD1 /* AVCaptureDeviceMock.swift */,
 				B63ED0DF26AFE32F00A9DAD1 /* GeolocationProviderMock.swift */,
+				B603974D29C1F93600902A34 /* TabPermissionsTests.swift */,
 			);
 			path = Permissions;
 			sourceTree = "<group>";
@@ -7003,6 +7011,7 @@
 				3706FDFC293F661700E42796 /* PasswordManagementItemModelTests.swift in Sources */,
 				3706FDFD293F661700E42796 /* PasswordManagerCoordinatingMock.swift in Sources */,
 				3706FDFE293F661700E42796 /* FaviconReferenceCacheTests.swift in Sources */,
+				B603974F29C1F93600902A34 /* TabPermissionsTests.swift in Sources */,
 				3706FDFF293F661700E42796 /* AutoconsentMessageProtocolTests.swift in Sources */,
 				3706FE00293F661700E42796 /* FaviconStoringMock.swift in Sources */,
 				3706FE01293F661700E42796 /* PixelStoreMock.swift in Sources */,
@@ -7044,6 +7053,7 @@
 				3706FE23293F661700E42796 /* SuggestionLoadingMock.swift in Sources */,
 				3706FE24293F661700E42796 /* PasteboardFolderTests.swift in Sources */,
 				B603971229B9D67E00902A34 /* PublishersExtensions.swift in Sources */,
+				B603975129C1FF6000902A34 /* TestsURLExtension.swift in Sources */,
 				3706FE25293F661700E42796 /* CoreDataTestUtilities.swift in Sources */,
 				3706FE26293F661700E42796 /* TemporaryFileCreator.swift in Sources */,
 				3706FE27293F661700E42796 /* AppPrivacyConfigurationTests.swift in Sources */,
@@ -7156,6 +7166,7 @@
 				B6AA64752995164700D99CD6 /* MockPrivacyConfiguration.swift in Sources */,
 				3706FE83293F661700E42796 /* AutofillPreferencesModelTests.swift in Sources */,
 				3706FE84293F661700E42796 /* TabCollectionViewModelTests+PinnedTabs.swift in Sources */,
+				B603975229C1FFAD00902A34 /* ExpectedNavigationExtension.swift in Sources */,
 				3706FE85293F661700E42796 /* BWRequestTests.swift in Sources */,
 				3706FE86293F661700E42796 /* FileDownloadManagerTests.swift in Sources */,
 			);
@@ -7880,6 +7891,7 @@
 				4B723E0926B0003E00E14D75 /* CSVLoginExporterTests.swift in Sources */,
 				B6DA06E12913AEDC00225DE2 /* TestNavigationDelegate.swift in Sources */,
 				B630793526731BC400DCEE41 /* URLSuggestedFilenameTests.swift in Sources */,
+				B603974E29C1F93600902A34 /* TabPermissionsTests.swift in Sources */,
 				AADE11C026D916D70032D8A7 /* StringExtensionTests.swift in Sources */,
 				85AC3B4925DAC9BD00C7D2AA /* ConfigurationStorageTests.swift in Sources */,
 				B693956126F1C1BC0015B914 /* DownloadListStoreMock.swift in Sources */,
@@ -7931,7 +7943,9 @@
 				B6BBF1722744CE36004F850E /* FireproofDomainsStoreMock.swift in Sources */,
 				4BA1A6D9258C0CB300F6F690 /* DataEncryptionTests.swift in Sources */,
 				B6AA64732994B43300D99CD6 /* FutureExtensionTests.swift in Sources */,
+				B603975329C1FFAE00902A34 /* ExpectedNavigationExtension.swift in Sources */,
 				EA1E52B52798CF98002EC53C /* ClickToLoadModelTests.swift in Sources */,
+				B603975029C1FF5F00902A34 /* TestsURLExtension.swift in Sources */,
 				B6A5A27E25B9403E00AA7ADA /* FileStoreMock.swift in Sources */,
 				B6AA64762995164900D99CD6 /* MockPrivacyConfiguration.swift in Sources */,
 				1D3B1AC429378953006F4388 /* BWResponseTests.swift in Sources */,
