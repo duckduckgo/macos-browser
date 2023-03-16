@@ -91,7 +91,7 @@ final class ConfigurationManager {
         let updateBloomFilterTask = Task {
             do {
                 try await fetcher.fetch(all: [.bloomFilterBinary, .bloomFilterSpec])
-                try updateBloomFilter()
+                try await updateBloomFilter()
                 tryAgainLater()
             } catch {
                 handleRefreshError(error)
@@ -101,7 +101,7 @@ final class ConfigurationManager {
         let updateBloomFilterExclusionsTask = Task {
             do {
                 try await fetcher.fetch(.bloomFilterExcludedDomains)
-                try updateBloomFilterExclusions()
+                try await updateBloomFilterExclusions()
                 tryAgainLater()
             } catch {
                 handleRefreshError(error)
@@ -148,12 +148,13 @@ final class ConfigurationManager {
         tryAgainSoon()
     }
 
-    public func refreshIfNeeded() {
+    @discardableResult
+    public func refreshIfNeeded() -> Task<Void, Never>? {
         guard isReadyToRefresh else {
             os_log("Configuration refresh is not needed at this time", log: .config, type: .debug)
-            return
+            return nil
         }
-        Task {
+        return Task {
             await refreshNow()
         }
     }
@@ -183,7 +184,7 @@ final class ConfigurationManager {
         ContentBlocking.shared.contentBlockingManager.scheduleCompilation()
     }
 
-    private func updateBloomFilter() throws {
+    private func updateBloomFilter() async throws {
         guard let specData = ConfigurationStore.shared.loadData(for: .bloomFilterSpec) else {
             throw Error.bloomFilterSpecNotFound
         }
@@ -191,21 +192,25 @@ final class ConfigurationManager {
             throw Error.bloomFilterBinaryNotFound
         }
         let spec = try JSONDecoder().decode(HTTPSBloomFilterSpecification.self, from: specData)
-        guard AppHTTPSUpgradeStore().persistBloomFilter(specification: spec, data: bloomFilterData) else {
+        do {
+            try AppHTTPSUpgradeStore().persistBloomFilter(specification: spec, data: bloomFilterData)
+        } catch {
             throw Error.bloomFilterPersistenceFailed
         }
-        PrivacyFeatures.httpsUpgrade.loadData()
+        await PrivacyFeatures.httpsUpgrade.loadData()
     }
 
-    private func updateBloomFilterExclusions() throws {
+    private func updateBloomFilterExclusions() async throws {
         guard let bloomFilterExclusions = ConfigurationStore.shared.loadData(for: .bloomFilterExcludedDomains) else {
             throw Error.bloomFilterExclusionsNotFound
         }
         let excludedDomains = try JSONDecoder().decode(HTTPSExcludedDomains.self, from: bloomFilterExclusions).data
-        guard AppHTTPSUpgradeStore().persistExcludedDomains(excludedDomains) else {
+        do {
+            try AppHTTPSUpgradeStore().persistExcludedDomains(excludedDomains)
+        } catch {
             throw Error.bloomFilterExclusionsPersistenceFailed
         }
-        PrivacyFeatures.httpsUpgrade.loadData()
+        await PrivacyFeatures.httpsUpgrade.loadData()
     }
 
 }

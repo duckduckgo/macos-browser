@@ -21,11 +21,12 @@ import BrowserServicesKit
 extension HTTPSBloomFilterSpecification {
 
     static func copy(storedSpecification specification: HTTPSStoredBloomFilterSpecification?) -> HTTPSBloomFilterSpecification? {
-        guard let specification = specification else { return nil }
+        guard let specification = specification,
+              let sha256 = specification.sha256 else { return nil }
         return HTTPSBloomFilterSpecification(bitCount: Int(specification.bitCount),
                                              errorRate: specification.errorRate,
                                              totalEntries: Int(specification.totalEntries),
-                                             sha256: specification.sha256!)
+                                             sha256: sha256)
     }
 
 }

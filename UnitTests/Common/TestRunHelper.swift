@@ -33,6 +33,7 @@ final class TestRunHelper: NSObject {
 
         // dedicate temporary directory for tests
         _=FileManager.swizzleTemporaryDirectoryOnce
+        FileManager.default.cleanupTemporaryDirectory()
 
         // add code to be run on Unit Tests startup here...
 
@@ -47,7 +48,9 @@ extension TestRunHelper: XCTestObservation {
     }
 
     func testBundleDidFinish(_ testBundle: Bundle) {
-
+        if case .integrationTests = NSApp.runType {
+            FileManager.default.cleanupTemporaryDirectory()
+        }
     }
 
     func testSuiteWillStart(_ testSuite: XCTestSuite) {
@@ -59,13 +62,17 @@ extension TestRunHelper: XCTestObservation {
     }
 
     func testCaseWillStart(_ testCase: XCTestCase) {
-        // cleanup dedicated temporary directory before each test run
-        FileManager.default.cleanupTemporaryDirectory()
+        if case .unitTests = NSApp.runType {
+            // cleanup dedicated temporary directory before each test run
+            FileManager.default.cleanupTemporaryDirectory()
+        }
     }
 
     func testCaseDidFinish(_ testCase: XCTestCase) {
-        // cleanup dedicated temporary directory after each test run
-        FileManager.default.cleanupTemporaryDirectory()
+        if case .unitTests = NSApp.runType {
+            // cleanup dedicated temporary directory after each test run
+            FileManager.default.cleanupTemporaryDirectory()
+        }
     }
 
 }
