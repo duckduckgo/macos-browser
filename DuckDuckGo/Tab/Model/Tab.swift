@@ -745,6 +745,8 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                content.isUserEnteredUrl {
                 request.attribution = .user
             }
+            invalidateInteractionStateData()
+            
             return webView.navigator(distributedNavigationDelegate: navigationDelegate)
                 .load(request, withExpectedNavigationType: content.isUserEnteredUrl ? .custom(.userEnteredUrl) : .other)
         }
@@ -806,17 +808,17 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
         if #available(macOS 12.0, *) {
             webView.interactionState = interactionStateData
-            return true
         } else {
             do {
                 try webView.restoreSessionState(from: interactionStateData)
-                return true
             } catch {
                 os_log("Tab:setupWebView could not restore session state %s", "\(error)")
+                return false
             }
         }
+        invalidateInteractionStateData()
 
-        return false
+        return true
     }
 
     private func addHomePageToWebViewIfNeeded() {

@@ -311,6 +311,176 @@ final class TabPermissionsTests: XCTestCase {
         withExtendedLifetime(c) {}
     }
 
+    @MainActor
+    func testWhenExternalAppNotFound_AppIsNotOpened() async throws {
+        let extensionsBuilder = TestTabExtensionsBuilder(load: [ExternalAppSchemeHandler.self])
+        let workspace = WorkspaceMock()
+        let tab = Tab(content: .none, webViewConfiguration: webViewConfiguration, workspace: workspace, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder)
+
+        schemeHandler.middleware = [{ _ in
+            return .ok(.html(""))
+        }]
+
+        _=await tab.setUrl(urls.url, userEntered: true)?.value?.result
+
+        workspace.appUrl = nil
+
+        let externalUrl = URL(string: "testextapp://openapp?arg=1")!
+
+        workspace.onOpen = { _ in
+            XCTFail("Unexpected Workspace.open")
+            return false
+        }
+
+        let c = tab.permissions.$authorizationQuery.sink { query in
+            guard let query else { return }
+            XCTFail("Unexpected permissions query \(query)")
+        }
+
+        let result = await tab.setUrl(externalUrl, userEntered: false)?.value?.result
+
+        guard case .failure(let error) = result else {
+            XCTFail("unexpected result \(String(describing: result))")
+            return
+        }
+
+        XCTAssertTrue(error is ExpectedNavigation.DidCancelError)
+        XCTAssertNil((error as? ExpectedNavigation.DidCancelError)?.expectedNavigations)
+        withExtendedLifetime(c) {}
+    }
+
+    @MainActor
+    func testWhenExternalAppNotFoundForUserEnteredUrl_SearchIsDone() async throws {
+        let extensionsBuilder = TestTabExtensionsBuilder(load: [ExternalAppSchemeHandler.self])
+        let workspace = WorkspaceMock()
+        let tab = Tab(content: .none, webViewConfiguration: webViewConfiguration, workspace: workspace, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder)
+
+        schemeHandler.middleware = [{ _ in
+            return .ok(.html(""))
+        }]
+
+        _=await tab.setUrl(urls.url, userEntered: true)?.value?.result
+
+        workspace.appUrl = nil
+
+        let externalUrl = URL(string: "testextapp://openapp?arg=1")!
+
+        workspace.onOpen = { _ in
+            XCTFail("Unexpected Workspace.open")
+            return false
+        }
+
+        let c = tab.permissions.$authorizationQuery.sink { query in
+            guard let query else { return }
+            XCTFail("Unexpected permissions query \(query)")
+        }
+
+        let result = await tab.setUrl(externalUrl, userEntered: true)?.value?.result
+
+        guard case .failure(let error) = result,
+              let error = error as? ExpectedNavigation.DidCancelError,
+              let navigation = error.expectedNavigations?.first else {
+            XCTFail("unexpected result \(String(describing: result))")
+            return
+        }
+
+        _=await navigation.result
+        XCTAssertEqual(tab.content, .contentFromURL(URL.makeSearchUrl(from: externalUrl.absoluteString), userEntered: false))
+
+        withExtendedLifetime(c) {}
+    }
+
+    @MainActor
+    func testWhenSessionIsRestored_externalAppIsNotOpened() {
+        var eDidCancel: XCTestExpectation!
+        let extensionsBuilder = TestTabExtensionsBuilder(load: [ExternalAppSchemeHandler.self]) { builder in { _, _ in
+            builder.add {
+                TestsClosureNavigationResponderTabExtension(.init { _, _ in
+                    .next
+                } didCancel: { _, _ in
+                    eDidCancel.fulfill()
+                } navigationDidFinish: { nav in
+                    XCTFail("unexpected navigationDidFinish \(nav)")
+                } navigationDidFail: { nav, error in
+                    XCTFail("unexpected navigationDidFail \(nav) with \(error)")
+                })
+            }
+        }}
+
+        let workspace = WorkspaceMock()
+        workspace.appUrl = Bundle.main.bundleURL
+        let externalUrl = URL(string: "testextapp://openapp?arg=1")!
+
+        eDidCancel = expectation(description: "didCancel external app should be called")
+
+        // shouldn‘t open external app when restoring session from interaction state
+        let tab = Tab(content: .url(externalUrl), webViewConfiguration: webViewConfiguration, workspace: workspace, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder, shouldLoadInBackground: true, shouldLoadFromCache: true)
+
+        var c = tab.permissions.$authorizationQuery.sink { query in
+            guard let query else { return }
+            XCTFail("Unexpected permissions query \(query)")
+        }
+
+        waitForExpectations(timeout: 1)
+
+        let permissionRequest = expectation(description: "Permission requested")
+        c = tab.permissions.$authorizationQuery.sink { query in
+            guard let query else { return }
+            guard query.permissions == [.externalScheme(scheme: "testextapp")] else {
+                XCTFail("Unexpected permissions query \(query.permissions)")
+                return
+            }
+            permissionRequest.fulfill()
+        }
+        eDidCancel = expectation(description: "didCancel external app should be called")
+
+        // but should open auth query on reload
+        tab.reload()
+
+        waitForExpectations(timeout: 100)
+
+        withExtendedLifetime(c) {}
+    }
+
+    let externalAppInteractionStateData = Data([0x00, 0x00, 0x00, 0x02]) + """
+        <?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+        <plist version="1.0">
+        <dict>
+        <key>IsAppInitiated</key>
+        <true/>
+        <key>RenderTreeSize</key>
+        <integer>3</integer>
+        <key>SessionHistory</key>
+        <dict>
+        <key>SessionHistoryCurrentIndex</key>
+        <integer>0</integer>
+        <key>SessionHistoryEntries</key>
+        <array>
+            <dict>
+                <key>SessionHistoryEntryData</key>
+                <data>
+                AAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAeLI8QbDyBQAA
+                AAAAAAAAAP////8AAAAAd7I8QbDyBQD/////AAAAAAAA
+                AAAAAAAAAAAAAP////8=
+                </data>
+                <key>SessionHistoryEntryOriginalURL</key>
+                <string>testextapp://openapp?arg=1</string>
+                <key>SessionHistoryEntryShouldOpenExternalURLsPolicyKey</key>
+                <integer>1</integer>
+                <key>SessionHistoryEntryTitle</key>
+                <string></string>
+                <key>SessionHistoryEntryURL</key>
+                <string>testextapp://openapp?arg=1</string>
+            </dict>
+        </array>
+        <key>SessionHistoryVersion</key>
+        <integer>1</integer>
+        </dict>
+        </dict>
+        </plist>
+    """.utf8data
+
 }
 
 final class WorkspaceMock: Workspace {
