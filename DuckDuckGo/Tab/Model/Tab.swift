@@ -305,7 +305,8 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
         webView = WebView(frame: webViewFrame, configuration: configuration)
         webView.allowsLinkPreview = false
-        permissions = PermissionModel()
+        permissions = PermissionModel(permissionManager: permissionManager,
+                                      geolocationService: geolocationService)
 
         let userScriptsPublisher = _userContentController.projectedValue
             .compactMap { $0?.$contentBlockingAssets }
