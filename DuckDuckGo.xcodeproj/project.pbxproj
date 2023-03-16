@@ -1550,6 +1550,8 @@
 		B626A76E29928B1600053070 /* TestsClosureNavigationResponder.swift in Sources */ = {isa = PBXBuildFile; fileRef = B626A76C29928B1600053070 /* TestsClosureNavigationResponder.swift */; };
 		B626A77229928C6A00053070 /* MockPrivacyConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = B626A76F29928C4100053070 /* MockPrivacyConfiguration.swift */; };
 		B626A77329928C6B00053070 /* MockPrivacyConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = B626A76F29928C4100053070 /* MockPrivacyConfiguration.swift */; };
+		B62A233C29C322BC00D22475 /* NavigationProtectionIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B62A233B29C322BC00D22475 /* NavigationProtectionIntegrationTests.swift */; };
+		B62A233D29C322BC00D22475 /* NavigationProtectionIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B62A233B29C322BC00D22475 /* NavigationProtectionIntegrationTests.swift */; };
 		B62EB47C25BAD3BB005745C6 /* WKWebViewPrivateMethodsAvailabilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B62EB47B25BAD3BB005745C6 /* WKWebViewPrivateMethodsAvailabilityTests.swift */; };
 		B630793526731BC400DCEE41 /* URLSuggestedFilenameTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8553FF51257523760029327F /* URLSuggestedFilenameTests.swift */; };
 		B630793A26731F2600DCEE41 /* FileDownloadManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B630793926731F2600DCEE41 /* FileDownloadManagerTests.swift */; };
@@ -2577,6 +2579,7 @@
 		B626A7632992506A00053070 /* SerpHeadersNavigationResponderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SerpHeadersNavigationResponderTests.swift; sourceTree = "<group>"; };
 		B626A76C29928B1600053070 /* TestsClosureNavigationResponder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestsClosureNavigationResponder.swift; sourceTree = "<group>"; };
 		B626A76F29928C4100053070 /* MockPrivacyConfiguration.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockPrivacyConfiguration.swift; sourceTree = "<group>"; };
+		B62A233B29C322BC00D22475 /* NavigationProtectionIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationProtectionIntegrationTests.swift; sourceTree = "<group>"; };
 		B62EB47B25BAD3BB005745C6 /* WKWebViewPrivateMethodsAvailabilityTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WKWebViewPrivateMethodsAvailabilityTests.swift; sourceTree = "<group>"; };
 		B630793926731F2600DCEE41 /* FileDownloadManagerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileDownloadManagerTests.swift; sourceTree = "<group>"; };
 		B630794126731F5400DCEE41 /* WKDownloadMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WKDownloadMock.swift; sourceTree = "<group>"; };
@@ -3406,6 +3409,7 @@
 				B31055CC27A1BA39001AC618 /* Autoconsent */,
 				B6EC37DC29B5D05A001ACE79 /* Downloads */,
 				B603973229BEF84900902A34 /* HTTPSUpgrade */,
+				B62A233A29C322A000D22475 /* NavigationProtection */,
 				B603973629BF0E9400902A34 /* PrivacyDashboard */,
 				4B1AD91625FC46FB00261379 /* CoreDataEncryptionTests.swift */,
 				4BA1A6EA258C288C00F6F690 /* EncryptionKeyStoreTests.swift */,
@@ -5430,6 +5434,14 @@
 			path = Extensions;
 			sourceTree = "<group>";
 		};
+		B62A233A29C322A000D22475 /* NavigationProtection */ = {
+			isa = PBXGroup;
+			children = (
+				B62A233B29C322BC00D22475 /* NavigationProtectionIntegrationTests.swift */,
+			);
+			path = NavigationProtection;
+			sourceTree = "<group>";
+		};
 		B647EFB32922539400BA628D /* TabExtensions */ = {
 			isa = PBXGroup;
 			children = (
@@ -5438,7 +5450,6 @@
 				B6C00ECA292F839D009C73A6 /* AutofillTabExtension.swift */,
 				B6D574B12947224C008ED1B6 /* ContentBlockingTabExtension.swift */,
 				B6DA06E32913ECEE00225DE2 /* ContextMenuManager.swift */,
-				B6685E4129A61C460043D2EE /* DownloadsTabExtension.swift */,
 				B6D574B329472253008ED1B6 /* FBProtectionTabExtension.swift */,
 				B6685E4129A61C460043D2EE /* DownloadsTabExtension.swift */,
 				B6C00ECC292F89D9009C73A6 /* FindInPageTabExtension.swift */,
@@ -7185,6 +7196,7 @@
 				B603971329B9D67E00902A34 /* PublishersExtensions.swift in Sources */,
 				3706FE9F293F662100E42796 /* EncryptionKeyStoreMock.swift in Sources */,
 				3706FEA0293F662100E42796 /* EncryptionMocks.swift in Sources */,
+				B62A233D29C322BC00D22475 /* NavigationProtectionIntegrationTests.swift in Sources */,
 				3706FEA1293F662100E42796 /* TestNavigationDelegate.swift in Sources */,
 				B6EC37DF29B5D05A001ACE79 /* DownloadsIntegrationTests.swift in Sources */,
 				3707C730294B5D5C00682A9F /* PrivatePlayerTests.swift in Sources */,
@@ -7215,6 +7227,7 @@
 				B603971129B9D67E00902A34 /* PublishersExtensions.swift in Sources */,
 				B6AE39F629374B8E00C37AA4 /* ContentBlockerRulesManagerMock.swift in Sources */,
 				B662D3DF275616FF0035D4D6 /* EncryptionKeyStoreMock.swift in Sources */,
+				B62A233C29C322BC00D22475 /* NavigationProtectionIntegrationTests.swift in Sources */,
 				B6AE39F729374B9900C37AA4 /* PrivatePlayerTests.swift in Sources */,
 				B6EC37DE29B5D05A001ACE79 /* DownloadsIntegrationTests.swift in Sources */,
 				4B1AD8E225FC390B00261379 /* EncryptionMocks.swift in Sources */,

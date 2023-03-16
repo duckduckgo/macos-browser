@@ -25,7 +25,7 @@ import WebKit
 
 final class NavigationProtectionTabExtension {
 
-    let contentBlocking: AnyContentBlocking
+    private let contentBlocking: AnyContentBlocking
 
     private static let debugEvents = EventMapping<AMPProtectionDebugEvents> { event, _, _, _ in
         switch event {
@@ -51,6 +51,11 @@ final class NavigationProtectionTabExtension {
 
     }
 
+    private func resetNavigation() {
+        linkProtection.setMainFrameUrl(nil)
+        referrerTrimming.onFinishNavigation()
+    }
+
 }
 
 extension NavigationProtectionTabExtension: NavigationResponder {
@@ -63,23 +68,40 @@ extension NavigationProtectionTabExtension: NavigationResponder {
               navigationAction.isForMainFrame
         else { return .next }
 
+        // IMPORTANT: WebView navigationDidFinish event may race with Client Redirect NavigationAction
+        // that‘s why it‘s been standardized to delay navigationDidFinish until decidePolicy(for:navigationAction) is handled
+        // (see DistributedNavigationDelegate.webView(_:willPerformClientRedirectTo:delay:) method
+        // when client redirect happens ReferrerTrimming.state should be `idle`, that‘s why we‘re resetting it here
+        if case .redirect(.client) = navigationAction.navigationType {
+            resetNavigation()
+        }
+
         var request = navigationAction.request
 
         // getCleanURL for user or ui-initiated navigations
         // https://app.asana.com/0/0/1203538050625396/f
         if [.custom(.userEnteredUrl), .custom(.tabContentUpdate)].contains(navigationAction.navigationType) {
-            request.url = await linkProtection.getCleanURL(from: request.url!, onStartExtracting: {}, onFinishExtracting: {})
+            let cleanUrl = await linkProtection.getCleanURL(from: request.url!, onStartExtracting: {}, onFinishExtracting: {})
+            if cleanUrl != request.url {
+                request.url = cleanUrl
+            }
         }
         guard !Task.isCancelled else { return .cancel }
 
-        request.url = await linkProtection.requestTrackingLinkRewrite(initiatingURL: navigationAction.sourceFrame.url, destinationURL: request.url!) ?? request.url
+        if let url = await linkProtection.requestTrackingLinkRewrite(initiatingURL: navigationAction.sourceFrame.url, destinationURL: request.url!) {
+            request.url = url
+        }
         guard !Task.isCancelled else { return .cancel }
 
-        request = referrerTrimming.trimReferrer(for: request, originUrl: navigationAction.sourceFrame.url) ?? request
+        if let newRequest = referrerTrimming.trimReferrer(for: request, originUrl: navigationAction.sourceFrame.url) {
+            request = newRequest
+        }
 
-        request = GPCRequestFactory().requestForGPC(basedOn: request,
-                                                    config: contentBlocking.privacyConfigurationManager.privacyConfig,
-                                                    gpcEnabled: PrivacySecurityPreferences.shared.gpcEnabled) ?? request
+        if let newRequest = GPCRequestFactory().requestForGPC(basedOn: request,
+                                                              config: contentBlocking.privacyConfigurationManager.privacyConfig,
+                                                              gpcEnabled: PrivacySecurityPreferences.shared.gpcEnabled) {
+            request = newRequest
+        }
 
         if request != navigationAction.request {
             return .redirectInvalidatingBackItemIfNeeded(navigationAction) {
@@ -99,15 +121,13 @@ extension NavigationProtectionTabExtension: NavigationResponder {
 
     @MainActor
     func navigationDidFinish(_ navigation: Navigation) {
-        linkProtection.setMainFrameUrl(nil)
-        referrerTrimming.onFinishNavigation()
+        resetNavigation()
     }
 
     @MainActor
     func navigation(_ navigation: Navigation, didFailWith error: WKError) {
         guard navigation.isCurrent else { return }
-        linkProtection.setMainFrameUrl(nil)
-        referrerTrimming.onFailedNavigation()
+        resetNavigation()
     }
 
 }
