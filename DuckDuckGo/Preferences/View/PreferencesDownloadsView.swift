@@ -17,6 +17,7 @@
 //
 
 import SwiftUI
+import SwiftUIExtensions
 
 extension Preferences {
 
@@ -28,7 +29,7 @@ extension Preferences {
                 Text(UserText.downloads)
                     .font(Const.Fonts.preferencePaneTitle)
 
-                Section {
+                PreferencePaneSection {
                     Text(UserText.downloadsLocation)
                         .font(Const.Fonts.preferencePaneSectionHeader)
 
