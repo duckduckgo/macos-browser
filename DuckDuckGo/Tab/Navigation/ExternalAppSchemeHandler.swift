@@ -45,6 +45,11 @@ extension ExternalAppSchemeHandler: NavigationResponder {
     func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
         let externalUrl = navigationAction.url
         guard externalUrl.isExternalSchemeLink, let scheme = externalUrl.scheme else { return .next }
+        // prevent opening twice for session restoration/tab reopening requests
+        guard navigationAction.request.cachePolicy != .returnCacheDataElseLoad else {
+            return .cancel
+        }
+
         lazy var searchUrl = URL.makeSearchUrl(from: externalUrl.absoluteString)
 
         // can OS open the external url?
