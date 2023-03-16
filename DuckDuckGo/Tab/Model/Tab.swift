@@ -293,7 +293,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         self.favicon = favicon
         self.parentTab = parentTab
         self._canBeClosedWithBack = canBeClosedWithBack
-        self.interactionState = interactionStateData.map { .data($0) } ?? (shouldLoadFromCache ? .loadCachedFromTabContent : .none)
+        self.interactionState = (interactionStateData != nil || shouldLoadFromCache) ? .loadCachedFromTabContent(interactionStateData) : .none
         self.lastSelectedAt = lastSelectedAt
 
         let configuration = webViewConfiguration ?? WKWebViewConfiguration()
@@ -559,12 +559,18 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
     private enum InteractionState {
         case none
-        case loadCachedFromTabContent
-        case data(Data)
+        case loadCachedFromTabContent(Data?)
+        case webViewProvided(Data)
 
         var data: Data? {
-            if case .data(let data) = self { return data }
-            return nil
+            switch self {
+            case .none:
+                return nil
+            case .loadCachedFromTabContent(let data):
+                return data
+            case .webViewProvided(let data):
+                return data
+            }
         }
         var shouldLoadFromCache: Bool {
             if case .loadCachedFromTabContent = self { return true }
@@ -585,9 +591,9 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         guard webView.url != nil else { return nil }
 
         if #available(macOS 12.0, *) {
-            self.interactionState = (webView.interactionState as? Data).map { .data($0) } ?? .none
+            self.interactionState = (webView.interactionState as? Data).map { .webViewProvided($0) } ?? .none
         } else {
-            self.interactionState = (try? webView.sessionStateData()).map { .data($0) } ?? .none
+            self.interactionState = (try? webView.sessionStateData()).map { .webViewProvided($0) } ?? .none
         }
 
         return self.interactionState.data
@@ -790,26 +796,27 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
     @MainActor
     private func restoreInteractionStateDataIfNeeded() -> Bool {
-        var didRestore: Bool = false
-        if let interactionStateData = self.interactionState.data {
-            if contentURL.isFileURL {
-                _ = webView.loadFileURL(contentURL, allowingReadAccessTo: URL(fileURLWithPath: "/"))
-            }
+        // only restore session from interactionStateData passed to Tab.init
+        guard case .loadCachedFromTabContent(.some(let interactionStateData)) = self.interactionState else { return false }
 
-            if #available(macOS 12.0, *) {
-                webView.interactionState = interactionStateData
-                didRestore = true
-            } else {
-                do {
-                    try webView.restoreSessionState(from: interactionStateData)
-                    didRestore = true
-                } catch {
-                    os_log("Tab:setupWebView could not restore session state %s", "\(error)")
-                }
+        if contentURL.isFileURL {
+            // request file system access before restoration
+            _ = webView.loadFileURL(contentURL, allowingReadAccessTo: URL(fileURLWithPath: "/"))
+        }
+
+        if #available(macOS 12.0, *) {
+            webView.interactionState = interactionStateData
+            return true
+        } else {
+            do {
+                try webView.restoreSessionState(from: interactionStateData)
+                return true
+            } catch {
+                os_log("Tab:setupWebView could not restore session state %s", "\(error)")
             }
         }
 
-        return didRestore
+        return false
     }
 
     private func addHomePageToWebViewIfNeeded() {
