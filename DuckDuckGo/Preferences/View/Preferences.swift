@@ -103,17 +103,6 @@ enum Preferences {
         }
     }
 
-    struct TextMenuItemDisclaimer: View {
-        let text: String
-
-        var body: some View {
-            Text(text)
-                .font(Const.Fonts.preferencePaneDisclaimer)
-                .foregroundColor(Color("GreyTextColor"))
-                .fixMultilineScrollableText()
-        }
-    }
-
     struct ToggleMenuItem: View {
         let title: String
         let isOn: Binding<Bool>

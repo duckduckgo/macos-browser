@@ -76,13 +76,12 @@ extension Preferences {
                         }, label: {})
                         .pickerStyle(.radioGroup)
                         .offset(x: Const.pickerHorizontalOffset)
-                        switch (model.passwordManager, model.isBitwardenSetupFlowPresented) {
-                        case (.bitwarden, false):
+                        if model.passwordManager == .bitwarden && !model.isBitwardenSetupFlowPresented {
                             bitwardenStatusView(for: bitwardenManager.status)
-                        case (.duckduckgo, _), (.bitwarden, true):
-                            TextMenuItemDisclaimer(text: UserText.autofillPasswordManagerBitwardenDisclaimer)
-                                .offset(x: Const.autoLockWarningOffset)
                         }
+                    }
+                    Button(UserText.importBrowserData) {
+                        model.openImportBrowserDataWindow()
                     }
                 }
 #endif
@@ -102,35 +101,26 @@ extension Preferences {
 
                 PreferencePaneSection {
                     TextMenuItemHeader(text: UserText.autofillAutoLock)
-                    VStack(alignment: .leading, spacing: 6) {
-                        Picker(selection: isAutoLockEnabledBinding, content: {
-                            HStack {
-                                Text(UserText.autofillLockWhenIdle)
-                                NSPopUpButtonView(selection: autoLockThresholdBinding) {
-                                    let button = NSPopUpButton()
-                                    button.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+                    Picker(selection: isAutoLockEnabledBinding, content: {
+                        HStack {
+                            Text(UserText.autofillLockWhenIdle)
+                            NSPopUpButtonView(selection: autoLockThresholdBinding) {
+                                let button = NSPopUpButton()
+                                button.setContentHuggingPriority(.defaultHigh, for: .horizontal)
 
-                                    for threshold in AutofillAutoLockThreshold.allCases {
-                                        let item = button.menu?.addItem(withTitle: threshold.title, action: nil, keyEquivalent: "")
-                                        item?.representedObject = threshold
-                                    }
-                                    return button
+                                for threshold in AutofillAutoLockThreshold.allCases {
+                                    let item = button.menu?.addItem(withTitle: threshold.title, action: nil, keyEquivalent: "")
+                                    item?.representedObject = threshold
                                 }
-                                .disabled(!model.isAutoLockEnabled)
-                            }.tag(true)
-                            Text(UserText.autofillNeverLock).tag(false)
-                        }, label: {})
-                        .pickerStyle(.radioGroup)
-                        .offset(x: Const.pickerHorizontalOffset)
-                        TextMenuItemDisclaimer(text: UserText.autofillNeverLockWarning)
-                            .offset(x: Const.autoLockWarningOffset)
-                    }
-                }
-
-                PreferencePaneSection {
-                    Button(UserText.importBrowserData) {
-                        model.openImportBrowserDataWindow()
-                    }
+                                return button
+                            }
+                            .disabled(!model.isAutoLockEnabled)
+                        }.tag(true)
+                        Text(UserText.autofillNeverLock).tag(false)
+                    }, label: {})
+                    .pickerStyle(.radioGroup)
+                    .offset(x: Const.pickerHorizontalOffset)
+                    TextMenuItemCaption(text: UserText.autofillNeverLockWarning)
                 }
             }
         }

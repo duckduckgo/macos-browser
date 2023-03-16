@@ -33,9 +33,11 @@ extension Preferences {
                 // SECTION 1: Web Tracking Protection Section
                 PreferencePaneSection {
                     TextMenuItemHeader(text: UserText.webTrackingProtectionSettingsTitle)
-                    TextMenuItemCaption(text: UserText.webTrackingProtectionExplenation)
-                    TextButton(UserText.learnMore) {
-                        model.openURL(.webTrackingProtection)
+                    VStack(alignment: .leading, spacing: 6) {
+                        TextMenuItemCaption(text: UserText.webTrackingProtectionExplenation)
+                        TextButton(UserText.learnMore) {
+                            model.openURL(.webTrackingProtection)
+                        }
                     }
                 }
 
@@ -43,9 +45,11 @@ extension Preferences {
                 PreferencePaneSection {
                     TextMenuItemHeader(text: UserText.autoconsentSettingsTitle)
                     ToggleMenuItem(title: UserText.autoconsentCheckboxTitle, isOn: $model.isAutoconsentEnabled)
-                    TextMenuItemCaption(text: UserText.autoconsentExplanation)
-                    TextButton(UserText.learnMore) {
-                        model.openURL(.cookieConsentPopUpManagement)
+                    VStack(alignment: .leading, spacing: 6) {
+                        TextMenuItemCaption(text: UserText.autoconsentExplanation)
+                        TextButton(UserText.learnMore) {
+                            model.openURL(.cookieConsentPopUpManagement)
+                        }
                     }
                 }
 
@@ -53,9 +57,11 @@ extension Preferences {
                 PreferencePaneSection {
                     TextMenuItemHeader(text: UserText.fireproofSites)
                     ToggleMenuItem(title: UserText.fireproofCheckboxTitle, isOn: $model.isLoginDetectionEnabled)
-                    TextMenuItemCaption(text: UserText.fireproofExplanation)
-                    TextButton(UserText.learnMore) {
-                        model.openURL(.theFireButton)
+                    VStack(alignment: .leading, spacing: 6) {
+                        TextMenuItemCaption(text: UserText.fireproofExplanation)
+                        TextButton(UserText.learnMore) {
+                            model.openURL(.theFireButton)
+                        }
                     }
                     Button(UserText.manageFireproofSites) {
                         model.presentManageFireproofSitesDialog()
@@ -66,9 +72,11 @@ extension Preferences {
                 PreferencePaneSection {
                     TextMenuItemHeader(text: UserText.gpcSettingsTitle)
                     ToggleMenuItem(title: UserText.gpcCheckboxTitle, isOn: $model.isGPCEnabled)
-                    TextMenuItemCaption(text: UserText.gpcExplanation)
-                    TextButton(UserText.learnMore) {
-                        model.openURL(.gpcLearnMore)
+                    VStack(alignment: .leading, spacing: 6) {
+                        TextMenuItemCaption(text: UserText.gpcExplanation)
+                        TextButton(UserText.learnMore) {
+                            model.openURL(.gpcLearnMore)
+                        }
                     }
                 }
             }

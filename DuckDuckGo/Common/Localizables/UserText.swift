@@ -178,7 +178,7 @@ struct UserText {
     static let autofillAutoLock = NSLocalizedString("autofill.auto-lock", value: "Auto-lock", comment: "Autofill settings section title")
     static let autofillLockWhenIdle = NSLocalizedString("autofill.lock-when-idle", value: "Lock Autofill after computer is idle for", comment: "Autofill auto-lock setting")
     static let autofillNeverLock = NSLocalizedString("autofill.never-lock", value: "Never lock Autofill", comment: "Autofill auto-lock setting")
-    static let autofillNeverLockWarning = NSLocalizedString("autofill.never-lock-warning", value: "Anyone with access to your device will be able to use and modify your Autofill data.", comment: "Autofill disabled auto-lock warning")
+    static let autofillNeverLockWarning = NSLocalizedString("autofill.never-lock-warning", value: "Anyone with access to your device will be able to use and modify your Autofill data if not locked.", comment: "Autofill disabled auto-lock warning")
 
     static let downloadsLocation = NSLocalizedString("downloads.location", value: "Location", comment: "Downloads directory location")
     static let downloadsAlwaysAsk = NSLocalizedString("downloads.always-ask", value: "Always ask where to save files", comment: "Downloads preferences checkbox")
