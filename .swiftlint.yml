@@ -61,7 +61,10 @@ file_header:
 # General Config
 excluded:
   - DuckDuckGo/Common/Localizables/UserText.swift
-  - Unit Tests
-  - Integration Tests
-  - UI Tests
+  - UnitTests
+  - IntegrationTests
+  - LocalPackages/*/Package.swift
+  - release
+  - UITests
   - vendor
+  - DerivedData

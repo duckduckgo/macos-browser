@@ -28,7 +28,11 @@ struct UserText {
     static let notNow = NSLocalizedString("notnow", value: "Not Now", comment: "Not Now button")
     static let open = NSLocalizedString("open", value: "Open", comment: "Open button")
     static let save = NSLocalizedString("save", value: "Save", comment: "Save button")
+    static let copy = NSLocalizedString("copy", value: "Copy", comment: "Copy button")
+    static let submit = NSLocalizedString("submit", value: "Submit", comment: "Submit button")
+    static let pasteFromClipboard = NSLocalizedString("paste-from-clipboard", value: "Paste from Clipboard", comment: "Paste button")
     static let edit = NSLocalizedString("edit", value: "Edit", comment: "Edit button")
+    static let copySelection = NSLocalizedString("copy-selection", value: "Copy", comment: "Copy selection menu item")
     static let deleteBookmark = NSLocalizedString("delete-bookmark", value: "Delete Bookmark", comment: "Delete Bookmark button")
     static let removeFavorite = NSLocalizedString("remove-favorite", value: "Remove Favorite", comment: "Remove Favorite button")
     static let quit = NSLocalizedString("quit", value: "Quit", comment: "Quit button")
@@ -230,6 +234,10 @@ struct UserText {
     static let externalSchemePermissionAuthorizationFormat = NSLocalizedString("permission.authorization.externalScheme.format",
                                                                                value: "“%@” would like to open this link in %@",
                                                                                comment: "Popover asking for domain %@ to open link in External App (%@)")
+    static let externalSchemePermissionAuthorizationNoDomainFormat = NSLocalizedString("permission.authorization.externalScheme.empty.format",
+                                                                                       value: "Open this link in %@?",
+                                                                                       comment: "Popover asking to open link in External App (%@)")
+    static let permissionAlwaysAllowOnDomainCheckbox = NSLocalizedString("dashboard.permission.allow.on", value: "Always allow on", comment: "Permission Popover 'Always allow on' (for domainName) checkbox")
 
     static let permissionMicrophone = NSLocalizedString("permission.microphone", value: "Microphone", comment: "Microphone input media device name")
     static let permissionCamera = NSLocalizedString("permission.camera", value: "Camera", comment: "Camera input media device name")
@@ -263,6 +271,7 @@ struct UserText {
     static let settings = NSLocalizedString("settings", value: "Settings", comment: "Menu item for opening settings")
 
     static let general = NSLocalizedString("preferences.general", value: "General", comment: "Show general preferences")
+    static let sync = NSLocalizedString("preferences.sync", value: "Sync", comment: "Show sync preferences")
     static let defaultBrowser = NSLocalizedString("preferences.default-browser", value: "Default Browser", comment: "Show default browser preferences")
     static let appearance = NSLocalizedString("preferences.appearance", value: "Appearance", comment: "Show appearance preferences")
     static let privacy = NSLocalizedString("preferences.privacy", value: "Privacy", comment: "Show privacy browser preferences")
@@ -596,7 +605,8 @@ struct UserText {
     static let lookingForBitwarden = NSLocalizedString("looking.for.bitwarden", value: "Bitwarden not installed...", comment: "Setup of the integration with Bitwarden app")
     static let allowIntegration = NSLocalizedString("allow.integration", value: "Allow Integration with DuckDuckGo", comment: "Setup of the integration with Bitwarden app")
     static let openBitwardenAndLogInOrUnlock = NSLocalizedString("open.bitwarden.and.log.in.or.unlock", value: "Open Bitwarden and Log in or Unlock your vault.", comment: "Setup of the integration with Bitwarden app")
-    static let selectBitwardenPreferences = NSLocalizedString("select.bitwarden.preferences", value: "Select Bitwarden → Preferences from the Mac menu bar.", comment: "Setup of the integration with Bitwarden app")
+    static let selectBitwardenPreferences = NSLocalizedString("select.bitwarden.preferences", value: "Select Bitwarden → Preferences from the Mac menu bar.", comment: "Setup of the integration with Bitwarden app (up to and including macOS 12)")
+    static let selectBitwardenSettings = NSLocalizedString("select.bitwarden.settings", value: "Select Bitwarden → Settings from the Mac menu bar.", comment: "Setup of the integration with Bitwarden app (macOS 13 and above)")
     static let scrollToFindAppSettings = NSLocalizedString("scroll.to.find.app.settings", value: "Scroll to find the App Settings (All Accounts) section.", comment: "Setup of the integration with Bitwarden app")
     static let checkAllowIntegration = NSLocalizedString("check.allow.integration", value: "Check Allow integration with DuckDuckGo.", comment: "Setup of the integration with Bitwarden app")
     static let openBitwarden = NSLocalizedString("open.bitwarden", value: "Open Bitwarden", comment: "Button to open Bitwarden app")

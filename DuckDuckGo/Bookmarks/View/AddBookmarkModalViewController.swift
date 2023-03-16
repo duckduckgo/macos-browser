@@ -38,7 +38,7 @@ final class AddBookmarkModalViewController: NSViewController {
         let title: String?
 
         init?(_ tab: Tab) {
-            guard case let .url(url, userEntered: _) = tab.content else {
+            guard case let .url(url, credential: _, userEntered: _) = tab.content else {
                 return nil
             }
             self.url = url
@@ -75,8 +75,7 @@ final class AddBookmarkModalViewController: NSViewController {
         if originalBookmark != nil {
             return !bookmarkTitleTextField.stringValue.isEmpty && url.isValid
         } else {
-            let isBookmarked = LocalBookmarkManager.shared.isUrlBookmarked(url: url)
-            let isInputValid = !bookmarkTitleTextField.stringValue.isEmpty && url.isValid && !isBookmarked
+            let isInputValid = !bookmarkTitleTextField.stringValue.isEmpty && url.isValid
 
             return isInputValid
         }
