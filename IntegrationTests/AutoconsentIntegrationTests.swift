@@ -52,26 +52,23 @@ class AutoconsentIntegrationTests: XCTestCase {
     // MARK: - Tests
 
     @MainActor
-    func testAutoconsent() async throws {
+    func testWhenAutoconsentEnabled_cookieConsentManaged() async throws {
+        // enable the feature
         PrivacySecurityPreferences.shared.autoconsentEnabled = true
         let url = URL(string: "http://privacy-test-pages.glitch.me/features/autoconsent/")!
 
-        let tabViewModel = self.tabViewModel
-        let tab = tabViewModel.tab
+        let tab = self.tabViewModel.tab
 
         _=await tab.setUrl(url, userEntered: false)?.value?.result
 
-        // expect connectionUpgradedTo to be published
+        // expect cookieConsentManaged to be published
         let cookieConsentManagedPromise = tab.privacyInfoPublisher
             .compactMap {
                 $0?.$cookieConsentManaged
             }
             .switchToLatest()
-            .filter {
-                $0?.isConsentManaged == true
-            }
-            .map {
-                $0!.isConsentManaged
+            .compactMap {
+                $0?.isConsentManaged == true ? true : nil
             }
             .timeout(5)
             .first()
@@ -83,11 +80,11 @@ class AutoconsentIntegrationTests: XCTestCase {
 
     @MainActor
     func testWhenAutoconsentDisabled_promptIsDisplayed() async throws {
+        // reset the feature setting
         PrivacySecurityPreferences.shared.autoconsentEnabled = nil
         let url = URL(string: "http://privacy-test-pages.glitch.me/features/autoconsent/")!
 
-        let tabViewModel = self.tabViewModel
-        let tab = tabViewModel.tab
+        let tab = self.tabViewModel.tab
 
         _=await tab.setUrl(url, userEntered: false)?.value?.result
 
@@ -111,12 +108,46 @@ class AutoconsentIntegrationTests: XCTestCase {
         XCTAssertTrue(mainViewController.view.window!.childWindows?.first?.contentViewController is CookieConsentUserPermissionViewController)
     }
 
+    @MainActor
+    func testCosmeticRule_whenFakeCookieBannerIsDisplayed_bannerIsHidden() async throws {
+        // enable the feature
+        PrivacySecurityPreferences.shared.autoconsentEnabled = true
+        let url = URL(string: "http://privacy-test-pages.glitch.me/features/autoconsent/banner.html")!
+
+        let tab = self.tabViewModel.tab
+
+        _=await tab.setUrl(url, userEntered: false)?.value?.result
+
+        // expect `cosmetic` to be published
+        let cookieConsentManagedPromise = tab.privacyInfoPublisher
+            .compactMap {
+                $0?.$cookieConsentManaged
+            }
+            .switchToLatest()
+            .compactMap {
+                $0?.isCosmeticRuleApplied == true ? true : nil
+            }
+            .timeout(5)
+            .first()
+            .promise()
+
+        let cookieConsentManaged = try await cookieConsentManagedPromise.value
+        XCTAssertTrue(cookieConsentManaged)
+
+        let isBannerHidden = try await tab.webView.evaluateJavaScript("window.getComputedStyle(banner).display === 'none'") as? Bool
+        XCTAssertTrue(isBannerHidden == true)
+    }
+
 }
 
 private extension CookieConsentInfo {
 
     var isConsentManaged: Bool {
-        try! (JSONSerialization.jsonObject(with: JSONEncoder().encode(self)) as! [String: Any])["consentManaged"] as! Bool
+        Mirror(reflecting: self).children.first(where: { $0.label == "consentManaged" })?.value as! Bool
+    }
+
+    var isCosmeticRuleApplied: Bool {
+        Mirror(reflecting: self).children.first(where: { $0.label == "cosmetic" })?.value as! Bool
     }
 
 }
