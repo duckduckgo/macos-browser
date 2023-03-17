@@ -752,7 +752,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                 request.attribution = .user
             }
             invalidateInteractionStateData()
-            
+
             return webView.navigator(distributedNavigationDelegate: navigationDelegate)
                 .load(request, withExpectedNavigationType: content.isUserEnteredUrl ? .custom(.userEnteredUrl) : .other)
         }
