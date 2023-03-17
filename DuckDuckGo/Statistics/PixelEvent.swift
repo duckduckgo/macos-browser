@@ -494,7 +494,7 @@ extension Pixel.Event.Debug {
             return "bookmarks_migration_could_not_prepare_database_on_failed_migration"
         case .bookmarksMigrationCouldNotRemoveOldStore: return "bookmarks_migration_could_not_remove_old_store"
 
-        case .invalidPayload(let configuration): return "m_d_\(configuration.rawValue)_invalid_payload"
+        case .invalidPayload(let configuration): return "m_d_\(configuration.rawValue)_invalid_payload".lowercased()
 
         }
     }
