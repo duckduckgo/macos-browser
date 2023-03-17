@@ -31,23 +31,35 @@ final class FirePopoverViewModelTests: XCTestCase {
     }
 
     func testWhenThereIsOneTabWithOneVisitedURLThenClearingOptionsContainsCurrentSite() {
+        let extensionBuilder = TestTabExtensionsBuilder(load: [HistoryTabExtensionMock.self]) { builder in { _, _ in
+            builder.override {
+                HistoryTabExtensionMock()
+            }
+        }}
+
         let tabCollectionViewModel = TabCollectionViewModel()
-        let tab = Tab(content: .url("https://duck.com".url!))
+        let tab = Tab(content: .url("https://duck.com".url!), extensionsBuilder: extensionBuilder)
         tabCollectionViewModel.removeAllTabs()
         tabCollectionViewModel.append(tab: tab)
-        tab.addVisit(of: "https://a.com".url!)
+        (tab.history as! HistoryTabExtensionMock).localHistory.insert("a.com")
 
         let viewModel = makeViewModel(with: tabCollectionViewModel)
         XCTAssertEqual(viewModel.availableClearingOptions, [.currentSite, .allData])
     }
 
     func testWhenThereIsOneTabWithMoreThanOneVisitedURLThenClearingOptionsContainsCurrentTab() {
+        let extensionBuilder = TestTabExtensionsBuilder(load: [HistoryTabExtensionMock.self]) { builder in { _, _ in
+            builder.override {
+                HistoryTabExtensionMock()
+            }
+        }}
+
         let tabCollectionViewModel = TabCollectionViewModel()
-        let tab = Tab(content: .url("https://duck.com".url!))
+        let tab = Tab(content: .url("https://duck.com".url!), extensionsBuilder: extensionBuilder)
         tabCollectionViewModel.removeAllTabs()
         tabCollectionViewModel.append(tab: tab)
-        tab.addVisit(of: "https://a.com".url!)
-        tab.addVisit(of: "https://b.com".url!)
+        (tab.history as! HistoryTabExtensionMock).localHistory.insert("a.com")
+        (tab.history as! HistoryTabExtensionMock).localHistory.insert("b.com")
 
         let viewModel = makeViewModel(with: tabCollectionViewModel)
         XCTAssertEqual(viewModel.availableClearingOptions, [.currentTab, .allData])
