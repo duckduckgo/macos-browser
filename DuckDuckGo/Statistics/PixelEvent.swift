@@ -412,7 +412,7 @@ extension Pixel.Event.Debug {
         case .adAttributionLogicUnexpectedStateOnRulesCompiled:
             return "ad_attribution_logic_unexpected_state_on_rules_compiled"
         case .adAttributionLogicUnexpectedStateOnInheritedAttribution:
-            return "ad_attribution_logic_unexpected_state_on_inherited_attribution"
+            return "ad_attribution_logic_unexpected_state_on_inherited_attribution_2"
         case .adAttributionLogicUnexpectedStateOnRulesCompilationFailed:
             return "ad_attribution_logic_unexpected_state_on_rules_compilation_failed"
         case .adAttributionDetectionInvalidDomainInParameter:
