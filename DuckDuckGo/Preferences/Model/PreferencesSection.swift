@@ -29,6 +29,9 @@ struct PreferencesSection: Hashable, Identifiable {
             if includingDuckPlayer {
                 panes.append(.duckPlayer)
             }
+            if (NSApp.delegate as? AppDelegate)?.internalUserDecider.isInternalUser == true {
+                panes.insert(.sync, at: 1)
+            }
             return panes
         }()
 
@@ -46,6 +49,7 @@ enum PreferencesSectionIdentifier: Hashable, CaseIterable {
 
 enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
     case general
+    case sync
     case appearance
     case privacy
     case autofill
@@ -67,6 +71,8 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
         switch self {
         case .general:
             return UserText.general
+        case .sync:
+            return UserText.sync
         case .appearance:
             return UserText.appearance
         case .privacy:
@@ -86,6 +92,8 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
         switch self {
         case .general:
             return "Rocket"
+        case .sync:
+            return "Sync"
         case .appearance:
             return "Appearance"
         case .privacy:

@@ -17,6 +17,8 @@
 //
 
 import SwiftUI
+import SwiftUIExtensions
+import SyncUI
 
 fileprivate extension Preferences.Const {
     static let sidebarWidth: CGFloat = 256
@@ -44,6 +46,12 @@ extension Preferences {
                             switch model.selectedPane {
                             case .general:
                                 GeneralView(defaultBrowserModel: DefaultBrowserPreferences(), startupModel: StartupPreferences())
+                            case .sync:
+                                if let syncService = (NSApp.delegate as? AppDelegate)?.syncService {
+                                    SyncUI.ManagementView(model: SyncPreferences(syncService: syncService))
+                                } else {
+                                    FailedAssertionView("Failed to initialize Sync Management View")
+                                }
                             case .appearance:
                                 AppearanceView(model: .shared)
                             case .privacy:

@@ -112,12 +112,14 @@ public struct UserDefaultsWrapper<T> {
 
     static var sharedDefaults: UserDefaults {
 #if DEBUG
-        if AppDelegate.isRunningTests,
-           let defaults = UserDefaults(suiteName: Bundle.main.bundleIdentifier! + ".tests") {
-            return defaults
+        if case .normal = NSApp.runType {
+            return .standard
+        } else {
+            return UserDefaults(suiteName: Bundle.main.bundleIdentifier! + "." + NSApp.runType.description)!
         }
-#endif
+#else
         return .standard
+#endif
     }
 
     public init(key: Key, defaultValue: T, setIfEmpty: Bool = false, defaults: UserDefaults? = nil) {

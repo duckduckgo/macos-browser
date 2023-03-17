@@ -145,7 +145,12 @@ final class Bookmark: BaseBookmarkEntity {
         if let duckPlayerFavicon = DuckPlayer.shared.image(for: self) {
             return duckPlayerFavicon
         }
-        return faviconManagement.getCachedFavicon(for: url, sizeCategory: sizeCategory)?.image
+
+        if let url = urlObject {
+            return faviconManagement.getCachedFavicon(for: url, sizeCategory: sizeCategory)?.image
+        } else {
+            return faviconManagement.getCachedFavicon(for: url, sizeCategory: sizeCategory)?.image
+        }
     }
 
     init(id: String,
