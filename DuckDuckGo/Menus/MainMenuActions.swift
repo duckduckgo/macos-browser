@@ -331,8 +331,16 @@ extension MainViewController {
         navigationBarViewController?.toggleDownloadsPopover(keepButtonVisible: false)
     }
 
-    @IBAction func toggleBookmarksBar(_ sender: Any) {
+    @IBAction func toggleBookmarksBarFromMenu(_ sender: Any) {
+        let usingKeyboardShortcut = NSApp.currentEvent?.type == .keyDown
+
         PersistentAppInterfaceSettings.shared.showBookmarksBar.toggle()
+
+        if PersistentAppInterfaceSettings.shared.showBookmarksBar {
+            Pixel.fire(.bookmarksBarEnabled(usingKeyboardShortcut ? .keyboardShortcut : .menuBar))
+        } else {
+            Pixel.fire(.bookmarksBarDisabled(usingKeyboardShortcut ? .keyboardShortcut : .menuBar))
+        }
     }
 
     @IBAction func toggleAutofillShortcut(_ sender: Any) {
@@ -654,8 +662,7 @@ extension MainViewController {
     }
 
     @IBAction func fetchConfigurationNow(_ sender: Any?) {
-        ConfigurationManager.shared.lastUpdateTime = .distantPast
-        ConfigurationManager.shared.refreshIfNeeded()
+        ConfigurationManager.shared.forceRefresh()
     }
 
     // MARK: - Developer Tools

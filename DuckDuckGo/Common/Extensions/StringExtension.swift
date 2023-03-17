@@ -53,6 +53,10 @@ extension String {
         }
     }
 
+    var utf8data: Data {
+        data(using: .utf8)!
+    }
+
     // MARK: - URL
 
     var url: URL? {

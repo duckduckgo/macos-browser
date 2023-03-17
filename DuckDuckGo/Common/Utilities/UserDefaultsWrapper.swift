@@ -90,6 +90,7 @@ public struct UserDefaultsWrapper<T> {
         case historyV5toV6Migration = "history.v5.to.v6.migration.2"
 
         case showBookmarksBar = "bookmarks.bar.show"
+        case lastBookmarksBarUsagePixelSendDate = "bookmarks.bar.last-usage-pixel-send-date"
 
         case pinnedViews = "pinning.pinned-views"
 
@@ -112,12 +113,14 @@ public struct UserDefaultsWrapper<T> {
 
     static var sharedDefaults: UserDefaults {
 #if DEBUG
-        if AppDelegate.isRunningTests,
-           let defaults = UserDefaults(suiteName: Bundle.main.bundleIdentifier! + ".tests") {
-            return defaults
+        if case .normal = NSApp.runType {
+            return .standard
+        } else {
+            return UserDefaults(suiteName: Bundle.main.bundleIdentifier! + "." + NSApp.runType.description)!
         }
-#endif
+#else
         return .standard
+#endif
     }
 
     public init(key: Key, defaultValue: T, setIfEmpty: Bool = false, defaults: UserDefaults? = nil) {
