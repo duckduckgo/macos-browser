@@ -6,7 +6,7 @@
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
         "branch" : "autofill/anya/subdomains-sorting",
-        "revision" : "d0b943639da20f31546b658335bc2bf2bc5971ca"
+        "revision" : "148137450bfb0aa6f78e7e555626c210e8672def"
       }
     },
     {
@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/content-scope-scripts",
       "state" : {
-        "revision" : "801b7f23476f797c6eaa72b070e6c80abb82801a",
-        "version" : "4.4.4"
+        "revision" : "ed10de3485f454ca59259266a0b3942bd21b43db",
+        "version" : "3.4.1"
       }
     },
     {
