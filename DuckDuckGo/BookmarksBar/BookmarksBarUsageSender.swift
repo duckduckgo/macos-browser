@@ -28,10 +28,13 @@ struct BookmarksBarUsageSender {
     @UserDefaultsWrapper(key: .spellingCheckEnabledOnce, defaultValue: .distantPast)
     private static var lastBookmarksBarUsagePixelSendDate: Date
 
-    static func sendBookmarksBarUsagePixel(currentDate: Date = Date(), previousDate: Date = lastBookmarksBarUsagePixelSendDate) {
+    @discardableResult
+    static func sendBookmarksBarUsagePixel(currentDate: Date = Date(), previousDate: Date = lastBookmarksBarUsagePixelSendDate) -> Bool {
         guard !NSCalendar.current.isDate(currentDate, inSameDayAs: lastBookmarksBarUsagePixelSendDate) else {
-            return
+            return false
         }
+
+        lastBookmarksBarUsagePixelSendDate = currentDate
 
         if PersistentAppInterfaceSettings.shared.showBookmarksBar {
             Pixel.fire(.bookmarksBarActive)
@@ -39,7 +42,7 @@ struct BookmarksBarUsageSender {
             Pixel.fire(.bookmarksBarInactive)
         }
 
-        lastBookmarksBarUsagePixelSendDate = currentDate
+        return true
     }
 
 }
