@@ -127,6 +127,7 @@ class AutoconsentIntegrationTests: XCTestCase {
             .compactMap {
                 $0?.isCosmeticRuleApplied == true ? true : nil
             }
+            .receive(on: DispatchQueue.main)
             .timeout(5)
             .first()
             .promise()
