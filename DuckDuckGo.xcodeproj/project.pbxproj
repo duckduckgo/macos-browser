@@ -1073,6 +1073,8 @@
 		4B7A60A1273E0BE400BBDFEB /* WKWebsiteDataStoreExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B7A60A0273E0BE400BBDFEB /* WKWebsiteDataStoreExtension.swift */; };
 		4B7A94B429C16294000C7D4C /* ErrorWithParameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B7A94B329C16294000C7D4C /* ErrorWithParameters.swift */; };
 		4B7A94B529C16294000C7D4C /* ErrorWithParameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B7A94B329C16294000C7D4C /* ErrorWithParameters.swift */; };
+		4B7A94B729C4380E000C7D4C /* BookmarksBarUsageSender.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B7A94B629C4380E000C7D4C /* BookmarksBarUsageSender.swift */; };
+		4B7A94B829C439ED000C7D4C /* BookmarksBarUsageSender.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B7A94B629C4380E000C7D4C /* BookmarksBarUsageSender.swift */; };
 		4B82E9B325B69E3E00656FE7 /* TrackerRadarKit in Frameworks */ = {isa = PBXBuildFile; productRef = 4B82E9B225B69E3E00656FE7 /* TrackerRadarKit */; };
 		4B85A48028821CC500FC4C39 /* NSPasteboardItemExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B85A47F28821CC500FC4C39 /* NSPasteboardItemExtension.swift */; };
 		4B8A4DFF27C83B29005F40E8 /* SaveIdentityViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B8A4DFE27C83B29005F40E8 /* SaveIdentityViewController.swift */; };
@@ -2104,6 +2106,7 @@
 		4B7A57CE279A4EF300B1C70E /* ChromePreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChromePreferences.swift; sourceTree = "<group>"; };
 		4B7A60A0273E0BE400BBDFEB /* WKWebsiteDataStoreExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WKWebsiteDataStoreExtension.swift; sourceTree = "<group>"; };
 		4B7A94B329C16294000C7D4C /* ErrorWithParameters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorWithParameters.swift; sourceTree = "<group>"; };
+		4B7A94B629C4380E000C7D4C /* BookmarksBarUsageSender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksBarUsageSender.swift; sourceTree = "<group>"; };
 		4B85A47F28821CC500FC4C39 /* NSPasteboardItemExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSPasteboardItemExtension.swift; sourceTree = "<group>"; };
 		4B8A4DFE27C83B29005F40E8 /* SaveIdentityViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveIdentityViewController.swift; sourceTree = "<group>"; };
 		4B8A4E0027C8447E005F40E8 /* SaveIdentityPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveIdentityPopover.swift; sourceTree = "<group>"; };
@@ -3824,6 +3827,7 @@
 			isa = PBXGroup;
 			children = (
 				4BD18F02283F0F1000058124 /* View */,
+				4B7A94B629C4380E000C7D4C /* BookmarksBarUsageSender.swift */,
 			);
 			path = BookmarksBar;
 			sourceTree = "<group>";
@@ -6593,6 +6597,7 @@
 				987799F42999993C005D8EB6 /* LegacyBookmarksStoreMigration.swift in Sources */,
 				3706FB79293F65D500E42796 /* (null) in Sources */,
 				3706FB77293F65D500E42796 /* (null) in Sources */,
+				4B7A94B829C439ED000C7D4C /* BookmarksBarUsageSender.swift in Sources */,
 				3706FB7A293F65D500E42796 /* FileDownloadManager.swift in Sources */,
 				3706FB7B293F65D500E42796 /* BookmarkImport.swift in Sources */,
 				3706FB7C293F65D500E42796 /* KeySetDictionary.swift in Sources */,
@@ -7537,6 +7542,7 @@
 				4BB88B5B25B7BA50006F6B06 /* Instruments.swift in Sources */,
 				9812D895276CEDA5004B6181 /* ContentBlockerRulesLists.swift in Sources */,
 				4B0511E2262CAA8600F6079C /* NSViewControllerExtension.swift in Sources */,
+				4B7A94B729C4380E000C7D4C /* BookmarksBarUsageSender.swift in Sources */,
 				F44C130225C2DA0400426E3E /* NSAppearanceExtension.swift in Sources */,
 				4B3B8490297A0E1000A384BD /* EmailManagerExtension.swift in Sources */,
 				B64C84F1269310120048FEBE /* PermissionManager.swift in Sources */,
