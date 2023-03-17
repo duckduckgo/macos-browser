@@ -344,6 +344,7 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
         waitForExpectations(timeout: 5)
     }
 
+    @MainActor
     func testOnBackForward_onBackForwardNavigationCalled() throws {
         // disable waiting for CBR compilation on navigation
         privacyConfiguration.isFeatureKeyEnabled = { _, _ in

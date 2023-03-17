@@ -358,9 +358,10 @@ extension PrivatePlayer {
 
 extension PrivatePlayer {
 
-    func goBackSkippingLastItemIfNeeded(for webView: WKWebView) -> Bool {
+    @MainActor
+    func goBackSkippingLastItemIfNeeded(for webView: WKWebView) -> ExpectedNavigation? {
         guard isAvailable, mode == .enabled, webView.url?.isPrivatePlayer == true else {
-            return false
+            return nil
         }
 
         let backList = webView.backForwardList.backList
@@ -370,11 +371,10 @@ extension PrivatePlayer {
            backURL.youtubeVideoID == webView.url?.youtubeVideoID,
            let penultimateBackItem = backList[safe: backList.count - 2]
         else {
-            return false
+            return nil
         }
 
-        webView.go(to: penultimateBackItem)
-        return true
+        return webView.navigator()?.go(to: penultimateBackItem, withExpectedNavigationType: .backForward(distance: -2))
     }
 }
 

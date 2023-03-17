@@ -70,6 +70,7 @@ extension NavigationButtonMenuDelegate: NSMenuDelegate {
         return true
     }
 
+    @MainActor
     @objc func menuItemAction(_ sender: NSMenuItem) {
         let index = sender.tag
         let (listItems, currentIndex) = self.listItems

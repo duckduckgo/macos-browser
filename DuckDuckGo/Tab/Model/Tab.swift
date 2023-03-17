@@ -36,7 +36,6 @@ protocol TabDelegate: ContentOverlayUserScriptDelegate {
 
 }
 
-// swiftlint:disable file_length
 // swiftlint:disable type_body_length
 @dynamicMemberLookup
 final class Tab: NSObject, Identifiable, ObservableObject {
@@ -586,31 +585,34 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         }
     }
 
-    func goBack() {
+    @MainActor
+    @discardableResult
+    func goBack() -> ExpectedNavigation? {
         guard canGoBack else {
             if canBeClosedWithBack {
                 delegate?.closeTab(self)
             }
-            return
+            return nil
         }
 
         guard error == nil else {
-            webView.reload()
-            return
+            return webView.navigator()?.reload(withExpectedNavigationType: .reload)
         }
 
         // Prevent from a Player reloading loop on back navigation to
         // YT page where the player was enabled (see comment inside)
-        if privatePlayer.goBackSkippingLastItemIfNeeded(for: webView) {
-            return
+        if let navigation = privatePlayer.goBackSkippingLastItemIfNeeded(for: webView) {
+            return navigation
         }
         userInteractionDialog = nil
-        webView.goBack()
+        return webView.navigator()?.goBack(withExpectedNavigationType: .backForward(distance: -1))
     }
 
-    func goForward() {
-        guard canGoForward else { return }
-        webView.goForward()
+    @MainActor
+    @discardableResult
+    func goForward() -> ExpectedNavigation? {
+        guard canGoForward else { return nil }
+        return webView.navigator()?.goForward(withExpectedNavigationType: .backForward(distance: 1))
     }
 
     func go(to item: WKBackForwardListItem) {

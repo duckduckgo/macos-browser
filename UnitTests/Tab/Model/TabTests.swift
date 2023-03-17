@@ -120,6 +120,7 @@ final class TabTests: XCTestCase {
 
     // MARK: - Back/Forward navigation
 
+    @MainActor
     func testCanGoBack() throws {
         let tab = Tab(content: .none, webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock)
 

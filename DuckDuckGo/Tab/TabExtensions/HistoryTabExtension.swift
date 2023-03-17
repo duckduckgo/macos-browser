@@ -35,7 +35,6 @@ final class HistoryTabExtension: NSObject {
             historyCoordinating.commitChanges(url: oldValue)
         }
         didSet {
-            // todo if same-document navigation
             visitState = .expected
         }
     }
