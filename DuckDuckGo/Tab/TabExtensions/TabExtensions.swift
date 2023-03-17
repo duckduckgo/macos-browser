@@ -68,6 +68,7 @@ protocol TabExtensionDependencies {
     var historyCoordinating: HistoryCoordinating { get }
     var downloadManager: FileDownloadManagerProtocol { get }
     var cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter? { get }
+    var duckPlayer: DuckPlayer { get }
 }
 
 // swiftlint:disable large_tuple
@@ -75,6 +76,7 @@ protocol TabExtensionDependencies {
 
 typealias TabExtensionsBuilderArguments = (
     tabIdentifier: UInt64,
+    isTabPinned: () -> Bool,
     contentPublisher: AnyPublisher<Tab.TabContent, Never>,
     titlePublisher: AnyPublisher<String?, Never>,
     userScriptsPublisher: AnyPublisher<UserScripts?, Never>,
@@ -158,6 +160,14 @@ extension TabExtensionsBuilder {
         }
         add {
             ExternalAppSchemeHandler(workspace: dependencies.workspace, permissionModel: args.permissionModel)
+        }
+        add {
+            NavigationHotkeyHandler(isTabPinned: args.isTabPinned)
+        }
+
+        add {
+            DuckPlayerTabExtension(duckPlayer: dependencies.duckPlayer,
+                                   scriptsPublisher: userScripts.compactMap { $0 })
         }
     }
 

@@ -74,8 +74,8 @@ final class WKBackForwardListItemViewModel {
             return NSImage(named: "HomeFavicon")
         }
 
-        if backForwardListItem.url?.isPrivatePlayer == true {
-            return .privatePlayer
+        if backForwardListItem.url?.isDuckPlayer == true {
+            return .duckPlayer
         }
 
         if let url = backForwardListItem.url,
