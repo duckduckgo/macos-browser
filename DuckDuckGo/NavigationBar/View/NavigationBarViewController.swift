@@ -332,6 +332,12 @@ final class NavigationBarViewController: NSViewController {
         popovers.toggleDownloadsPopover(usingView: downloadsButton, popoverDelegate: self, downloadsDelegate: self)
     }
 
+    func showPasswordManagerPopover(selectedCategory: SecureVaultSorting.Category?) {
+        popovers.showPasswordManagementPopover(selectedCategory: selectedCategory,
+                                               usingView: passwordManagementButton,
+                                               withDelegate: self)
+    }
+
     private func setupNavigationButtonMenus() {
         let backButtonMenu = NSMenu()
         backButtonMenu.delegate = goBackButtonMenuDelegate
