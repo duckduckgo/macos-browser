@@ -29,6 +29,10 @@ public struct NetworkProtectionServer: Codable, Equatable {
         return registeredPublicKey != nil && allowedIPs != nil
     }
 
+    public func isRegistered(with publicKey: PublicKey) -> Bool {
+        return registeredPublicKey == publicKey.base64Key && allowedIPs != nil
+    }
+
     public var serverName: String {
         return serverInfo.name
     }
@@ -41,7 +45,8 @@ public struct NetworkProtectionServer: Codable, Equatable {
     public let allowedIPs: [String]?
 
     /// The last date at which registration took place. This may be used to determine whether a key needs to be refreshed.
-    public var registrationDate: Date = Date()
+    public var registrationDate = Date()
+    public let expirationDate: Date?
 
     public let serverInfo: NetworkProtectionServerInfo
 
@@ -51,6 +56,14 @@ public struct NetworkProtectionServer: Codable, Equatable {
         case registeredPublicKey = "publicKey"
         case allowedIPs
         case serverInfo = "server"
+        case expirationDate = "expiresAt"
+    }
+
+    init(registeredPublicKey: String?, allowedIPs: [String]?, serverInfo: NetworkProtectionServerInfo, expirationDate: Date?) {
+        self.registeredPublicKey = registeredPublicKey
+        self.allowedIPs = allowedIPs
+        self.expirationDate = expirationDate
+        self.serverInfo = serverInfo
     }
 
     public static func == (lhs: Self, rhs: Self) -> Bool {

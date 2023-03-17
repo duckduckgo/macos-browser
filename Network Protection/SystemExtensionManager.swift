@@ -70,7 +70,7 @@ final actor SystemExtensionManager: NSObject {
 
     private var requests = Set<RequestDelegate>()
 
-    func activate(waitingForUserApprovalHandler: @escaping () -> Void) async throws -> RequestResult {
+    func activate(waitingForUserApprovalHandler: @Sendable @escaping () -> Void) async throws -> RequestResult {
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<RequestResult, Error>) in
             let activationRequest = OSSystemExtensionRequest.activationRequest(forExtensionWithIdentifier: bundleID, queue: .main)
 
@@ -87,7 +87,7 @@ final actor SystemExtensionManager: NSObject {
         }
     }
 
-    func deactivate(waitingForUserApprovalHandler: @escaping () -> Void) async throws -> RequestResult {
+    func deactivate(waitingForUserApprovalHandler: @Sendable @escaping () -> Void) async throws -> RequestResult {
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<RequestResult, Error>) in
             let activationRequest = OSSystemExtensionRequest.deactivationRequest(forExtensionWithIdentifier: bundleID, queue: .main)
 

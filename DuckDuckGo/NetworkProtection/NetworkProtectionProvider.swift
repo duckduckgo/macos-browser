@@ -136,42 +136,20 @@ final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
         try await tunnelManager.loadFromPreferences()
     }
 
-    enum ActiveSessionError: Error {
-        case couldNotLoadPreferences(error: Error)
-        case activeConnectionHasNoSession
-    }
-
     static func activeSession() async throws -> NETunnelProviderSession? {
-        try await withCheckedThrowingContinuation { continuation in
-            NETunnelProviderManager.loadAllFromPreferences { managers, error in
-                if let error = error {
-                    continuation.resume(throwing: ActiveSessionError.couldNotLoadPreferences(error: error))
-                    return
-                }
+        let managers = try await NETunnelProviderManager.loadAllFromPreferences()
 
-                Task {
-                    guard let manager = managers?.first(where: { manager in
-                        switch manager.connection.status {
-                        case .connected, .connecting, .reasserting:
-                            return true
-                        default:
-                            return false
-                        }
-                    }) else {
-                        // No active connection, this is acceptable
-                        continuation.resume(returning: nil)
-                        return
-                    }
-
-                    guard let session = manager.connection as? NETunnelProviderSession else {
-                        continuation.resume(returning: nil)
-                        return
-                    }
-
-                    continuation.resume(returning: session)
-                }
-            }
+        guard let manager = managers.first else {
+            // No active connection, this is acceptable
+            return nil
         }
+
+        guard let session = manager.connection as? NETunnelProviderSession else {
+            // The active connection is not running, so there's no session, this is acceptable
+            return nil
+        }
+
+        return session
     }
 
     // MARK: - Initialization & Deinitialization
@@ -412,9 +390,10 @@ final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
 
     static func resetAllState() {
         Task {
+
             if let activeSession = try? await activeSession() {
                 try? activeSession.sendProviderMessage(Data([NetworkProtectionAppRequest.resetAllState.rawValue])) { _ in
-                    os_log("🔵 Status was reset")
+                    os_log("Status was reset in the extension", log: .networkProtection)
                 }
             }
 
@@ -434,7 +413,6 @@ final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
 #if NETP_SYSTEM_EXTENSION
             try? await NetworkProtectionAgentManager.current.reset()
 #endif
-            NetworkProtectionKeychain.deleteReferences()
             NetworkProtectionSelectedServerUserDefaultsStore().reset()
         }
     }

@@ -42,9 +42,9 @@ extension NetworkProtectionServerInfo {
                                                            port: 443,
                                                            attributes: .init(city: "City", country: "Country", timezoneOffset: 0))
 
-    static func named(_ name: String) -> Self {
+    static func make(named name: String, withPublicKey publicKey: String = "") -> Self {
         NetworkProtectionServerInfo(name: name,
-                                    publicKey: "ovn9RpzUuvQ4XLQt6B3RKuEXGIxa5QpTnehjduZlcSE=",
+                                    publicKey: publicKey,
                                     hostNames: ["duckduckgo.com"],
                                     ips: ["192.168.1.1"],
                                     port: 443,
@@ -55,21 +55,24 @@ extension NetworkProtectionServerInfo {
 
 extension NetworkProtectionServer {
 
-    static let mockBaseServer = NetworkProtectionServer(registeredPublicKey: nil, allowedIPs: nil, serverInfo: .mock)
+    static let mockBaseServer = NetworkProtectionServer(registeredPublicKey: nil, allowedIPs: nil, serverInfo: .mock, expirationDate: nil)
     static let mockRegisteredServer = NetworkProtectionServer(registeredPublicKey: "ovn9RpzUuvQ4XLQt6B3RKuEXGIxa5QpTnehjduZlcSE=",
                                                               allowedIPs: ["0.0.0.0/0", "::/0"],
-                                                              serverInfo: .mock)
+                                                              serverInfo: .mock,
+                                                              expirationDate: Date().addingTimeInterval(TimeInterval(60 * 60 * 24)))
 
-    static func baseServer(named name: String) -> Self {
-        return NetworkProtectionServer(registeredPublicKey: nil,
+    static func baseServer(named name: String, withPublicKey publicKey: String = "ovn9RpzUuvQ4XLQt6B3RKuEXGIxa5QpTnehjduZlcSE=") -> Self {
+        return NetworkProtectionServer(registeredPublicKey: publicKey,
                                        allowedIPs: nil,
-                                       serverInfo: .named(name))
+                                       serverInfo: .make(named: name, withPublicKey: publicKey),
+                                       expirationDate: Date().addingTimeInterval(TimeInterval(60 * 60 * 24)))
     }
 
-    static func registeredServer(named name: String) -> Self {
-        return NetworkProtectionServer(registeredPublicKey: "ovn9RpzUuvQ4XLQt6B3RKuEXGIxa5QpTnehjduZlcSE=",
+    static func registeredServer(named name: String, withPublicKey publicKey: String = "ovn9RpzUuvQ4XLQt6B3RKuEXGIxa5QpTnehjduZlcSE=") -> Self {
+        return NetworkProtectionServer(registeredPublicKey: publicKey,
                                        allowedIPs: ["0.0.0.0/0", "::/0"],
-                                       serverInfo: .named(name))
+                                       serverInfo: .make(named: name, withPublicKey: publicKey),
+                                       expirationDate: Date().addingTimeInterval(TimeInterval(60 * 60 * 24)))
     }
 
 }

@@ -120,7 +120,8 @@ public class NetworkProtectionServerListFileSystemStore: NetworkProtectionServer
             serverListMap[existingServer.serverName] = NetworkProtectionServer(
                 registeredPublicKey: existingServer.registeredPublicKey,
                 allowedIPs: existingServer.allowedIPs,
-                serverInfo: incomingServer.serverInfo
+                serverInfo: incomingServer.serverInfo,
+                expirationDate: incomingServer.expirationDate
             )
         }
 

@@ -297,8 +297,6 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
     }
 
     override func handleAppMessage(_ messageData: Data, completionHandler: ((Data?) -> Void)? = nil) {
-        os_log("🔵 App message received ", log: .networkProtection, type: .info)
-
         guard let request = NetworkProtectionAppRequest(rawValue: messageData[0]) else {
             completionHandler?(nil)
             return
@@ -323,7 +321,9 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
     }
 
     private func handleResetAllState(_ messageData: Data, completionHandler: ((Data?) -> Void)? = nil) {
-        NetworkProtectionKeychain.deleteReferences()
+        let keyStore = NetworkProtectionKeychainStore(useSystemKeychain: NetworkProtectionBundle.usesSystemKeychain(), errorEvents: nil)
+        keyStore.resetCurrentKeyPair()
+
         let serverCache = NetworkProtectionServerListFileSystemStore(errorEvents: nil)
         try? serverCache.removeServerList()
         // This is not really an error, we received a command to reset the connection
@@ -403,8 +403,6 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
     }
 
     // MARK: - Adapter start completion handling
-
-    private var testerStartRetryTimer: DispatchSourceTimer?
 
     /// Called when the adapter reports that the tunnel was successfully started.
     ///
@@ -525,8 +523,8 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
             domainEvent = .networkProtectionKeychainReadError(field: field, status: status)
         case .keychainWriteError(let field, let status):
             domainEvent = .networkProtectionKeychainWriteError(field: field, status: status)
-        case .keychainDeleteError(let field, let status):
-            domainEvent = .networkProtectionKeychainDeleteError(field: field, status: status)
+        case .keychainDeleteError(let status):
+            domainEvent = .networkProtectionKeychainDeleteError(status: status)
 
         case .unhandledError(function: let function, line: let line, error: let error):
             domainEvent = .networkProtectionUnhandledError(function: function, line: line, error: error)

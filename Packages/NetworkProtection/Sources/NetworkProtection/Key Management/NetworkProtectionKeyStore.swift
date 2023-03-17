@@ -23,33 +23,36 @@ import os
 
 public protocol NetworkProtectionKeyStore {
 
-    /// Obtain the current private key.
+    /// Obtain the current `KeyPair`.
     ///
-    func currentPrivateKey() -> PrivateKey
+    func currentKeyPair() -> KeyPair
 
-    /// Retrieves an existing stored private key.
+    /// Updates the current `KeyPair` to have the specified expiration date
     ///
-    /// - Throws: NetworkProtectionKeychainStoreError
-    func storedPrivateKey() throws -> PrivateKey?
-
-    /// Resets the current private key so a new one will be generated when requested.
+    /// - Parameters:
+    ///     - newExpirationDate: the new expiration date for the keypair
     ///
-    func resetCurrentKey()
+    /// - Returns: a new keypair with the specified updates
+    ///
+    func updateCurrentKeyPair(newExpirationDate: Date) -> KeyPair
 
+    /// Resets the current `KeyPair` so a new one will be generated when requested.
+    ///
+    func resetCurrentKeyPair()
 }
 
 enum NetworkProtectionKeychainStoreError: Error, NetworkProtectionErrorConvertible {
     case failedToCastKeychainValueToData(field: String)
     case keychainReadError(field: String, status: Int32)
     case keychainWriteError(field: String, status: Int32)
-    case keychainDeleteError(field: String, status: Int32)
+    case keychainDeleteError(status: Int32)
 
     var networkProtectionError: NetworkProtectionError {
         switch self {
         case .failedToCastKeychainValueToData(let field): return .failedToCastKeychainValueToData(field: field)
         case .keychainReadError(let field, let status): return .keychainReadError(field: field, status: status)
         case .keychainWriteError(let field, let status): return .keychainWriteError(field: field, status: status)
-        case .keychainDeleteError(let field, let status): return .keychainDeleteError(field: field, status: status)
+        case .keychainDeleteError(let status): return .keychainDeleteError(status: status)
         }
     }
 }
@@ -63,6 +66,7 @@ public class NetworkProtectionKeychainStore: NetworkProtectionKeyStore {
     }
 
     enum UserDefaultKeys {
+        static let expirationDate = "com.duckduckgo.network-protection.KeyPair.UserDefaultKeys.expirationDate"
         static let currentPublicKey = "com.duckduckgo.network-protection.NetworkProtectionKeychainStore.UserDefaultKeys.currentPublicKeyBase64"
     }
 
@@ -70,11 +74,14 @@ public class NetworkProtectionKeychainStore: NetworkProtectionKeyStore {
     private let useSystemKeychain: Bool
     private let userDefaults: UserDefaults
     private let errorEvents: EventMapping<NetworkProtectionError>?
+    
+    private static let defaultExpirationTimeInterval = TimeInterval(60 * 60 * 24)
+    private static let minimumExpirationTimeInterval = TimeInterval(60 * 60)
 
     public init(serviceName: String? = nil,
-         useSystemKeychain: Bool,
-         userDefaults: UserDefaults = .standard,
-         errorEvents: EventMapping<NetworkProtectionError>?) {
+                useSystemKeychain: Bool,
+                userDefaults: UserDefaults = .standard,
+                errorEvents: EventMapping<NetworkProtectionError>?) {
 
         self.serviceName = serviceName ?? Constants.defaultServiceName
         self.useSystemKeychain = useSystemKeychain
@@ -86,7 +93,7 @@ public class NetworkProtectionKeychainStore: NetworkProtectionKeyStore {
 
     /// Retrieves the stored private key without generating one if it doesn't exist.
     ///
-    public func storedPrivateKey() throws -> PrivateKey? {
+    private func storedPrivateKey() throws -> PrivateKey? {
         guard let currentPublicKey = currentPublicKey else {
             return nil
         }
@@ -103,7 +110,20 @@ public class NetworkProtectionKeychainStore: NetworkProtectionKeyStore {
         }
     }
 
-    public func currentPrivateKey() -> PrivateKey {
+    public func currentKeyPair() -> KeyPair {
+        guard let currentExpirationDate = currentExpirationDate,
+              currentExpirationDate >= Date().addingTimeInterval(Self.minimumExpirationTimeInterval) else {
+
+            let expirationDate = Date().addingTimeInterval(Self.defaultExpirationTimeInterval)
+            currentExpirationDate = expirationDate
+
+            return KeyPair(privateKey: newCurrentPrivateKey(), expirationDate: expirationDate)
+        }
+
+        return KeyPair(privateKey: currentPrivateKey(), expirationDate: currentExpirationDate)
+    }
+
+    private func currentPrivateKey() -> PrivateKey {
         do {
             if let existingkey = try storedPrivateKey() {
                 return existingkey
@@ -113,6 +133,10 @@ public class NetworkProtectionKeychainStore: NetworkProtectionKeyStore {
             // Intentionally not re-throwing
         }
 
+        return newCurrentPrivateKey()
+    }
+
+    private func newCurrentPrivateKey() -> PrivateKey {
         let generatedKey = PrivateKey()
         let base64PublicKey = generatedKey.publicKey.base64Key
         currentPublicKey = base64PublicKey
@@ -127,16 +151,19 @@ public class NetworkProtectionKeychainStore: NetworkProtectionKeyStore {
         return generatedKey
     }
 
-    /// Resets the current key, so that a new one will be generated the next time it's retrieved.
-    ///
-    public func resetCurrentKey() {
-        do {
-            guard let currentPublicKey = currentPublicKey else {
-                return
-            }
+    public func updateCurrentKeyPair(newExpirationDate: Date) -> KeyPair {
+        currentExpirationDate = newExpirationDate
+        return currentKeyPair()
+    }
 
-            try deleteEntry(named: currentPublicKey)
+    public func resetCurrentKeyPair() {
+        do {
+            /// Besides resetting the current keyPair we'll remove all keychain entries associated with our service, since only one keychain entry
+            /// should exist at once.
+            try deleteAllEntries()
+
             self.currentPublicKey = nil
+            self.currentExpirationDate = nil
         } catch {
             handle(error)
             // Intentionally not re-throwing
@@ -146,7 +173,8 @@ public class NetworkProtectionKeychainStore: NetworkProtectionKeyStore {
     // MARK: - Keychain Interaction
 
     private func readData(named name: String) throws -> Data? {
-        var query = defaultAttributesForEntry(named: name)
+        var query = defaultAttributes()
+        query[kSecAttrAccount as String] = name
         query[kSecReturnData as String] = true
 
         var item: CFTypeRef?
@@ -168,7 +196,8 @@ public class NetworkProtectionKeychainStore: NetworkProtectionKeyStore {
     }
 
     private func writeData(_ data: Data, named name: String) throws {
-        var query = defaultAttributesForEntry(named: name)
+        var query = defaultAttributes()
+        query[kSecAttrAccount as String] = name
         query[kSecAttrService as String] = serviceName
         query[kSecAttrAccessible as String] = kSecAttrAccessibleWhenUnlocked
         query[kSecValueData as String] = data
@@ -180,27 +209,39 @@ public class NetworkProtectionKeychainStore: NetworkProtectionKeyStore {
         }
     }
 
-    private func deleteEntry(named name: String) throws {
-        let query = defaultAttributesForEntry(named: name)
+    private func deleteAllEntries() throws {
+        var query = defaultAttributes()
+        query[kSecAttrService as String] = serviceName
+        query[kSecMatchLimit as String] = kSecMatchLimitAll
 
         let status = SecItemDelete(query as CFDictionary)
         switch status {
-        case errSecItemNotFound, errSecSuccess: break
+        case errSecItemNotFound, errSecSuccess:
+            break
         default:
-            throw NetworkProtectionKeychainStoreError.keychainDeleteError(field: name, status: status)
+            throw NetworkProtectionKeychainStoreError.keychainDeleteError(status: status)
         }
     }
 
-    private func defaultAttributesForEntry(named name: String) -> [String: Any] {
+    private func defaultAttributes() -> [String: Any] {
         return [
             kSecClass: kSecClassGenericPassword,
             kSecUseDataProtectionKeychain: !useSystemKeychain,
-            kSecAttrSynchronizable: false,
-            kSecAttrAccount: name
+            kSecAttrSynchronizable: false
         ] as [String: Any]
     }
 
     // MARK: - UserDefaults
+
+    var currentExpirationDate: Date? {
+        get {
+            return userDefaults.object(forKey: UserDefaultKeys.expirationDate) as? Date
+        }
+
+        set {
+            userDefaults.set(newValue, forKey: UserDefaultKeys.expirationDate)
+        }
+    }
 
     /// The currently used public key.
     ///

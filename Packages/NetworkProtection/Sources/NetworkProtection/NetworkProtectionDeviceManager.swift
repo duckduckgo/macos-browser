@@ -65,7 +65,7 @@ public enum NetworkProtectionError: LocalizedError {
     case failedToCastKeychainValueToData(field: String)
     case keychainReadError(field: String, status: Int32)
     case keychainWriteError(field: String, status: Int32)
-    case keychainDeleteError(field: String, status: Int32)
+    case keychainDeleteError(status: Int32)
 
     // Unhandled error
     case unhandledError(function: String, line: Int, error: Error)
@@ -140,7 +140,6 @@ public actor NetworkProtectionDeviceManager: NetworkProtectionDeviceManagement {
     /// 3. If the key already existed, look up the stored set of backend servers and check if the preferred server is registered. If not, register it, and return the tunnel configuration + server info.
     public func generateTunnelConfiguration(selectionMethod: NetworkProtectionServerSelectionMethod) async throws -> (TunnelConfiguration, NetworkProtectionServerInfo) {
 
-        let privateKey = keyStore.currentPrivateKey()
         let servers: [NetworkProtectionServer]
 
         do {
@@ -169,8 +168,11 @@ public actor NetworkProtectionDeviceManager: NetworkProtectionDeviceManagement {
             throw NetworkProtectionError.couldNotSelectClosestServer
         }
 
-        if !selectedServer.isRegistered {
-            let registeredServersResult = await networkClient.register(publicKey: privateKey.publicKey, withServer: selectedServer.serverInfo)
+        var keyPair = keyStore.currentKeyPair()
+
+        if !selectedServer.isRegistered(with: keyPair.publicKey) {
+            let registeredServersResult = await networkClient.register(publicKey: keyPair.publicKey, withServer: selectedServer.serverInfo)
+
             let registeredServers: [NetworkProtectionServer]
 
             switch registeredServersResult {
@@ -187,6 +189,15 @@ public actor NetworkProtectionDeviceManager: NetworkProtectionDeviceManagement {
                 }
 
                 selectedServer = registeredServer
+
+                // We should not need this IF condition here, because we know registered servers will give us an expiration date,
+                // but since the structure we're currently using makes the expiration date optional we need to have it.
+                // - TODO: consider changing our server structure to not allow a missing expiration date here
+                if let serverExpirationDate = selectedServer.expirationDate {
+                    if keyPair.expirationDate > serverExpirationDate {
+                        keyPair = keyStore.updateCurrentKeyPair(newExpirationDate: serverExpirationDate)
+                    }
+                }
             case .failure(let error):
                 errorEvents?.fire(error.networkProtectionError)
                 throw error
@@ -206,7 +217,7 @@ public actor NetworkProtectionDeviceManager: NetworkProtectionDeviceManagement {
         }
 
         do {
-            let configuration = try tunnelConfiguration(interfacePrivateKey: privateKey, server: selectedServer)
+            let configuration = try tunnelConfiguration(interfacePrivateKey: keyPair.privateKey, server: selectedServer)
             return (configuration, selectedServer.serverInfo)
         } catch let error as NetworkProtectionError {
             errorEvents?.fire(error)

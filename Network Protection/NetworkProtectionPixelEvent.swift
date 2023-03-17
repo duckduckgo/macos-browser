@@ -86,7 +86,7 @@ enum NetworkProtectionPixelEvent {
     case networkProtectionKeychainErrorFailedToCastKeychainValueToData(field: String)
     case networkProtectionKeychainReadError(field: String, status: Int32)
     case networkProtectionKeychainWriteError(field: String, status: Int32)
-    case networkProtectionKeychainDeleteError(field: String, status: Int32)
+    case networkProtectionKeychainDeleteError(status: Int32)
 
     case networkProtectionUnhandledError(function: String, line: Int, error: Error)
 
@@ -118,6 +118,9 @@ enum NetworkProtectionPixelEvent {
 
         case .networkProtectionServerListStoreFailedToEncodeServerList:
             return "m_mac_netp_storage_error_failed_to_encode_server_list"
+
+        case .networkProtectionServerListStoreFailedToDecodeServerList:
+            return "m_mac_netp_storage_error_failed_to_decode_server_list"
 
         case .networkProtectionServerListStoreFailedToDecodeServerList:
             return "m_mac_netp_storage_error_failed_to_decode_server_list"
@@ -162,9 +165,8 @@ enum NetworkProtectionPixelEvent {
                 Pixel.Parameters.errorCode: String(status)
             ]
 
-        case .networkProtectionKeychainDeleteError(let field, let status):
+        case .networkProtectionKeychainDeleteError(let status):
             return [
-                Pixel.Parameters.keychainFieldName: field,
                 Pixel.Parameters.errorCode: String(status)
             ]
 

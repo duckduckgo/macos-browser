@@ -61,6 +61,10 @@ public final class NetworkProtectionBackendClient: NetworkProtectionClient {
         static let developmentEndpoint = URL(string: "https://on-dev.goduckgo.com")!
     }
 
+    private enum DecoderError: Error {
+        case failedToDecode(key: String)
+    }
+
     var serversURL: URL {
         Constants.developmentEndpoint.appending("/servers")
     }
@@ -68,6 +72,25 @@ public final class NetworkProtectionBackendClient: NetworkProtectionClient {
     var registerKeyURL: URL {
         Constants.developmentEndpoint.appending("/register")
     }
+
+    private let decoder: JSONDecoder = {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withFullDate, .withFullTime, .withFractionalSeconds]
+
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .custom({ decoder in
+            let container = try decoder.singleValueContainer()
+            let dateString = try container.decode(String.self)
+
+            guard let date = formatter.date(from: dateString) else {
+                throw DecoderError.failedToDecode(key: container.codingPath.last?.stringValue ?? String(describing: container.codingPath))
+            }
+
+            return date
+        })
+
+        return decoder
+    }()
 
     public init() {}
 
@@ -82,7 +105,7 @@ public final class NetworkProtectionBackendClient: NetworkProtectionClient {
         }
 
         do {
-            let decodedServers = try JSONDecoder().decode([NetworkProtectionServer].self, from: downloadedData)
+            let decodedServers = try decoder.decode([NetworkProtectionServer].self, from: downloadedData)
             return .success(decodedServers)
         } catch {
             return .failure(NetworkProtectionClientError.failedToParseServerListResponse(error))
@@ -115,7 +138,7 @@ public final class NetworkProtectionBackendClient: NetworkProtectionClient {
         }
 
         do {
-            let decodedServers = try JSONDecoder().decode([NetworkProtectionServer].self, from: responseData)
+            let decodedServers = try decoder.decode([NetworkProtectionServer].self, from: responseData)
             return .success(decodedServers)
         } catch {
             return .failure(NetworkProtectionClientError.failedToParseRegisteredServersResponse(error))

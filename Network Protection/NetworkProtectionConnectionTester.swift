@@ -61,10 +61,6 @@ final class NetworkProtectionConnectionTester {
     ///
     private let connectionTimeout = 5
 
-    // MARK: - Retry Timer
-
-    private var retryTimer: DispatchSourceTimer?
-
     // MARK: - Test result handling
 
     private var failureCount = 0

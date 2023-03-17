@@ -21,24 +21,33 @@ import Foundation
 
 final class NetworkProtectionKeyStoreMock: NetworkProtectionKeyStore {
 
-    var storedKey: PrivateKey?
+    var keyPair: KeyPair?
 
-    func currentPrivateKey() -> PrivateKey {
-        if let existingKey = self.storedKey {
-            return existingKey
+    // MARK: - NetworkProtectionKeyStore
+
+    func currentKeyPair() -> NetworkProtection.KeyPair {
+        if let keyPair = self.keyPair {
+            return keyPair
         } else {
-            let newKey = PrivateKey()
-            self.storedKey = newKey
-            return newKey
+            let keyPair = KeyPair(privateKey: PrivateKey(), expirationDate: Date().addingTimeInterval(TimeInterval(24 * 60 * 60)))
+            self.keyPair = keyPair
+            return keyPair
         }
     }
 
+    func updateCurrentKeyPair(newExpirationDate: Date) -> NetworkProtection.KeyPair {
+        let keyPair = KeyPair(privateKey: keyPair?.privateKey ?? PrivateKey(), expirationDate: newExpirationDate)
+        self.keyPair = keyPair
+        return keyPair
+    }
+
+    func resetCurrentKeyPair() {
+        self.keyPair = nil
+    }
+
+    // MARK: - Storage
+
     func storedPrivateKey() throws -> PrivateKey? {
-        return storedKey
+        return keyPair?.privateKey
     }
-
-    func resetCurrentKey() {
-        self.storedKey = nil
-    }
-
 }

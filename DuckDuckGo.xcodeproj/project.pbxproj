@@ -7369,6 +7369,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				7B42F00529C4D66E001EC05C /* PBXTargetDependency */,
 			);
 			name = NetworkProtectionSystemExtension;
 			packageProductDependencies = (
@@ -7464,6 +7465,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				7B42F00729C4D675001EC05C /* PBXTargetDependency */,
 			);
 			name = NetworkProtectionAppExtension;
 			packageProductDependencies = (
@@ -11207,6 +11209,14 @@
 			target = 7B2CAC0229A93077004C23BA /* NetworkProtectionSystemExtension */;
 			targetProxy = 7B2CAC0C29A93078004C23BA /* PBXContainerItemProxy */;
 		};
+		7B42F00529C4D66E001EC05C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = 7B42F00429C4D66E001EC05C /* NetworkProtection */;
+		};
+		7B42F00729C4D675001EC05C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = 7B42F00629C4D675001EC05C /* NetworkProtection */;
+		};
 		7B48D032299E6DCB0098A496 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			productRef = 3799999129705E1A003318B1 /* InputFilesChecker */;
@@ -12048,6 +12058,14 @@
 		7B374875299EA96500568220 /* PixelKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = PixelKit;
+		};
+		7B42F00429C4D66E001EC05C /* NetworkProtection */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = NetworkProtection;
+		};
+		7B42F00629C4D675001EC05C /* NetworkProtection */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = NetworkProtection;
 		};
 		7B48D033299E6DCB0098A496 /* TrackerRadarKit */ = {
 			isa = XCSwiftPackageProductDependency;
