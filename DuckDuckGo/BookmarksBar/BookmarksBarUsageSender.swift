@@ -25,7 +25,7 @@ import Foundation
 /// - Note: This is a temporary pixel, which should be removed no later than April 14 2023.
 struct BookmarksBarUsageSender {
 
-    @UserDefaultsWrapper(key: .spellingCheckEnabledOnce, defaultValue: .distantPast)
+    @UserDefaultsWrapper(key: .lastBookmarksBarUsagePixelSendDate, defaultValue: .distantPast)
     private static var lastBookmarksBarUsagePixelSendDate: Date
 
     @discardableResult
