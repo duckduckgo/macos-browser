@@ -107,7 +107,7 @@ struct Logging {
     fileprivate static let dataImportExportLoggingEnabled = false
     fileprivate static let dataImportExportLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Data Import/Export")
 
-    fileprivate static let pixelLoggingEnabled = true
+    fileprivate static let pixelLoggingEnabled = false
     fileprivate static let pixelLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Pixel")
 
     fileprivate static let contentBlockingLoggingEnabled = false
