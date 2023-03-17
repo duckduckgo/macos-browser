@@ -30,7 +30,7 @@ struct BookmarksBarUsageSender {
 
     @discardableResult
     static func sendBookmarksBarUsagePixel(currentDate: Date = Date(), previousDate: Date = lastBookmarksBarUsagePixelSendDate) -> Bool {
-        guard !NSCalendar.current.isDate(currentDate, inSameDayAs: lastBookmarksBarUsagePixelSendDate) else {
+        guard !NSCalendar.current.isDate(currentDate, inSameDayAs: previousDate) else {
             return false
         }
 
