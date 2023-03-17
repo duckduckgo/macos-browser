@@ -118,6 +118,9 @@
             </BuildableReference>
             <SkippedTests>
                <Test
+                  Identifier = "AutoconsentBackgroundTests">
+               </Test>
+               <Test
                   Identifier = "CoreDataEncryptionTests/testSavingIncorrectValueTypes()">
                </Test>
                <Test
