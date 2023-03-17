@@ -97,7 +97,6 @@ final class PermissionAuthorizationViewController: NSViewController {
                                                        query.permissions.localizedDescription.lowercased())
         case .externalScheme where query.domain.isEmpty:
             self.descriptionLabel.stringValue = String(format: UserText.externalSchemePermissionAuthorizationNoDomainFormat,
-                                                       query.domain,
                                                        query.permissions.localizedDescription)
         case .externalScheme:
             self.descriptionLabel.stringValue = String(format: UserText.externalSchemePermissionAuthorizationFormat,

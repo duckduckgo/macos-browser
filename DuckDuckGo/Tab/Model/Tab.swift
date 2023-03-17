@@ -1157,6 +1157,8 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
 
         return .next
     }
+    // swiftlint:enable cyclomatic_complexity
+    // swiftlint:enable function_body_length
 
     @MainActor
     func willStart(_ navigation: Navigation) {
