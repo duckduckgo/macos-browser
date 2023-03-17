@@ -256,11 +256,7 @@ final class AddressBarViewController: NSViewController {
     private func subscribeToButtonsWidth() {
         addressBarButtonsViewController!.$buttonsWidth
             .sink { [weak self] value in
-                guard let self else { return }
-                self.passiveTextFieldMinXConstraint.constant = value
-                // adjust min-x to passive text field when “Search or enter” placeholder is displayed (to prevent placeholder overlapping buttons)
-                self.activeTextFieldMinXConstraint.constant = (!self.isFirstResponder || self.mode.isEditing)
-                    ? value : Self.defaultActiveTextFieldMinX
+                self?.layoutTextFields(withMinX: value)
             }
             .store(in: &cancellables)
     }
@@ -358,6 +354,13 @@ final class AddressBarViewController: NSViewController {
                 activeOuterBorderView.isHidden = true
             }
         }
+    }
+
+    private func layoutTextFields(withMinX minX: CGFloat) {
+        self.passiveTextFieldMinXConstraint.constant = minX
+        // adjust min-x to passive text field when “Search or enter” placeholder is displayed (to prevent placeholder overlapping buttons)
+        self.activeTextFieldMinXConstraint.constant = (!self.isFirstResponder || self.mode.isEditing)
+            ? minX : Self.defaultActiveTextFieldMinX
     }
 
 }

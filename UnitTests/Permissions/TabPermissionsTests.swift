@@ -437,49 +437,10 @@ final class TabPermissionsTests: XCTestCase {
         // but should open auth query on reload
         tab.reload()
 
-        waitForExpectations(timeout: 100)
+        waitForExpectations(timeout: 2)
 
         withExtendedLifetime(c) {}
     }
-
-    let externalAppInteractionStateData = Data([0x00, 0x00, 0x00, 0x02]) + """
-        <?xml version="1.0" encoding="UTF-8"?>
-        <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-        <plist version="1.0">
-        <dict>
-        <key>IsAppInitiated</key>
-        <true/>
-        <key>RenderTreeSize</key>
-        <integer>3</integer>
-        <key>SessionHistory</key>
-        <dict>
-        <key>SessionHistoryCurrentIndex</key>
-        <integer>0</integer>
-        <key>SessionHistoryEntries</key>
-        <array>
-            <dict>
-                <key>SessionHistoryEntryData</key>
-                <data>
-                AAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAeLI8QbDyBQAA
-                AAAAAAAAAP////8AAAAAd7I8QbDyBQD/////AAAAAAAA
-                AAAAAAAAAAAAAP////8=
-                </data>
-                <key>SessionHistoryEntryOriginalURL</key>
-                <string>testextapp://openapp?arg=1</string>
-                <key>SessionHistoryEntryShouldOpenExternalURLsPolicyKey</key>
-                <integer>1</integer>
-                <key>SessionHistoryEntryTitle</key>
-                <string></string>
-                <key>SessionHistoryEntryURL</key>
-                <string>testextapp://openapp?arg=1</string>
-            </dict>
-        </array>
-        <key>SessionHistoryVersion</key>
-        <integer>1</integer>
-        </dict>
-        </dict>
-        </plist>
-    """.utf8data
 
 }
 
