@@ -386,7 +386,7 @@
                                         <menuItem isSeparatorItem="YES" id="hB3-LF-h0Y"/>
                                         <menuItem title="Show Bookmarks Bar" keyEquivalent="B" id="z3f-ie-l71">
                                             <connections>
-                                                <action selector="toggleBookmarksBar:" target="Ady-hI-5gd" id="nVa-wD-QtY"/>
+                                                <action selector="toggleBookmarksBarFromMenu:" target="Ady-hI-5gd" id="dCK-ha-Oqf"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem title="Show Downloads" keyEquivalent="j" id="qWL-J6-S8r">
@@ -523,11 +523,7 @@
                                                 <action selector="showManageBookmarks:" target="Ady-hI-5gd" id="meV-V2-zJ2"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem title="Toggle Bookmarks Bar" keyEquivalent="B" id="SwH-Sh-zIJ">
-                                            <connections>
-                                                <action selector="toggleBookmarksBar:" target="Ady-hI-5gd" id="EkG-vj-emY"/>
-                                            </connections>
-                                        </menuItem>
+                                        <menuItem title="Toggle Bookmarks Bar" keyEquivalent="B" id="SwH-Sh-zIJ"/>
                                         <menuItem isSeparatorItem="YES" id="aPG-H0-BrG"/>
                                         <menuItem title="Import Bookmarks and Passwords..." id="tNX-Bv-yM3" userLabel="Import Bookmarks...">
                                             <modifierMask key="keyEquivalentModifierMask"/>
