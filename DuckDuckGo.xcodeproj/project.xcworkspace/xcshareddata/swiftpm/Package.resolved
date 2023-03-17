@@ -6,7 +6,7 @@
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
         "branch" : "autofill/anya/subdomains-sorting",
-        "revision" : "148137450bfb0aa6f78e7e555626c210e8672def"
+        "revision" : "a1264b7022b3918b512dfa2ccd4fa12be5755bb8"
       }
     },
     {
@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/content-scope-scripts",
       "state" : {
-        "revision" : "ed10de3485f454ca59259266a0b3942bd21b43db",
-        "version" : "3.4.1"
+        "revision" : "801b7f23476f797c6eaa72b070e6c80abb82801a",
+        "version" : "4.4.4"
       }
     },
     {
@@ -120,7 +120,7 @@
     {
       "identity" : "trackerradarkit",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/duckduckgo/TrackerRadarKit",
+      "location" : "https://github.com/duckduckgo/TrackerRadarKit.git",
       "state" : {
         "revision" : "4684440d03304e7638a2c8086895367e90987463",
         "version" : "1.2.1"
