@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "bartek/fix-attribution-pixel",
-        "revision" : "8e720de675fc7416dc77b31eda77c07744e02471"
+        "revision" : "489387e2d911f6418b909e488e7e2b364c86f919",
+        "version" : "51.1.1"
       }
     },
     {
