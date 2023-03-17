@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "jacek/invalid-payload-pixel",
-        "revision" : "62365f14c7da87aea06da36635a48dc6a168c0ea"
+        "revision" : "489387e2d911f6418b909e488e7e2b364c86f919",
+        "version" : "51.1.1"
       }
     },
     {
