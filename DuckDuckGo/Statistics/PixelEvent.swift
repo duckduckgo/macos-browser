@@ -19,6 +19,7 @@
 import Foundation
 import BrowserServicesKit
 import Bookmarks
+import Configuration
 
 extension Pixel {
 
@@ -223,6 +224,9 @@ extension Pixel {
             case bookmarksMigrationCouldNotPrepareDatabase
             case bookmarksMigrationCouldNotPrepareDatabaseOnFailedMigration
             case bookmarksMigrationCouldNotRemoveOldStore
+
+            case invalidPayload(Configuration)
+
         }
 
     }
@@ -489,6 +493,9 @@ extension Pixel.Event.Debug {
         case .bookmarksMigrationCouldNotPrepareDatabaseOnFailedMigration:
             return "bookmarks_migration_could_not_prepare_database_on_failed_migration"
         case .bookmarksMigrationCouldNotRemoveOldStore: return "bookmarks_migration_could_not_remove_old_store"
+
+        case .invalidPayload(let configuration): return "m_d_\(configuration.rawValue)_invalid_payload"
+
         }
     }
 }
