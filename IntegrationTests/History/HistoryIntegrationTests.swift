@@ -47,6 +47,7 @@ class HistoryIntegrationTests: XCTestCase {
     override func tearDown() {
         window?.close()
         window = nil
+        PrivacySecurityPreferences.shared.gpcEnabled = true
     }
 
     // MARK: - Tests
@@ -97,6 +98,50 @@ class HistoryIntegrationTests: XCTestCase {
     }
 
     @MainActor
+    func testWhenSameDocumentNavigation_historyEntryTitleUpdated() async throws {
+        let tab = Tab(content: .homePage)
+        window = WindowsManager.openNewWindow(with: tab)!
+
+        let html = """
+            <html>
+                <head><title>Title 1</title></head>
+                <body>
+                    <a id="link" href="#navlink" onclick="javascript:document.title='Title 2'">click me</a><br />
+                    test content<br />
+                    <a id="navlink"/><br />
+                    test content 2<br />
+                </body>
+            </html>
+        """
+
+        let urls = [
+            URL.testsServer.appendingTestParameters(data: html.utf8data),
+            URL(string: URL.testsServer.appendingTestParameters(data: html.utf8data).absoluteString + "#1")!,
+        ]
+
+        _=try await tab.setUrl(urls[0], userEntered: false)?.value?.result.get()
+
+        let titleChangedPromise = tab.$title
+            .filter { $0 == "Title 2" }
+            .receive(on: DispatchQueue.main)
+            .timeout(100, "Title 2")
+            .first()
+            .promise()
+
+        _=try await tab.webView.evaluateJavaScript("(function() { document.getElementById('link').click(); return true })()")
+        _=try await titleChangedPromise.value
+
+        XCTAssertEqual(HistoryCoordinator.shared.history?.count, 2)
+        let first = HistoryCoordinator.shared.history?.first(where: { $0.url == urls[0] })
+        XCTAssertEqual(first?.numberOfVisits, 1)
+        XCTAssertEqual(first?.title, "Title 1")
+
+        let second = HistoryCoordinator.shared.history?.first(where: { $0.url != urls[0] })
+        XCTAssertEqual(second?.numberOfVisits, 1)
+        XCTAssertEqual(second?.title, "Title 2")
+    }
+
+    @MainActor
     func testWhenNavigatingToSamePage_visitIsAdded() async throws {
         let tab = Tab(content: .homePage)
         window = WindowsManager.openNewWindow(with: tab)!
@@ -135,6 +180,62 @@ class HistoryIntegrationTests: XCTestCase {
 
         let second = HistoryCoordinator.shared.history?.first(where: { $0.url == urls[1] })
         XCTAssertEqual(second?.numberOfVisits, 1)
+    }
+
+    @MainActor
+    func testWhenScriptTrackerLoaded_trackerAddedToHistory() async throws {
+        PrivacySecurityPreferences.shared.gpcEnabled = false
+
+        let tab = Tab(content: .homePage)
+        window = WindowsManager.openNewWindow(with: tab)!
+
+        let url = URL(string: "http://privacy-test-pages.glitch.me/tracker-reporting/1major-via-script.html")!
+
+        // navigate to a regular page, tracker count should be reset to 0
+        let trackerPromise = tab.privacyInfoPublisher.compactMap { $0?.$trackerInfo }
+            .switchToLatest()
+            .filter { $0.trackersBlocked.count == 1 }
+            .map { _ in true }
+            .timeout(5)
+            .first()
+            .promise()
+
+        _=try await tab.setUrl(url, userEntered: false)?.value?.result.get()
+        _=try await trackerPromise.value
+
+        let first = HistoryCoordinator.shared.history?.first
+        XCTAssertEqual(first?.trackersFound, true)
+        XCTAssertEqual(first?.numberOfTrackersBlocked, 2)
+        XCTAssertEqual(first?.blockedTrackingEntities, ["Google Ads (Google)"])
+        XCTAssertEqual(first?.numberOfVisits, 1)
+    }
+
+    @MainActor
+    func testWhenSurrogateTrackerLoaded_trackerAddedToHistory() async throws {
+        PrivacySecurityPreferences.shared.gpcEnabled = false
+
+        let tab = Tab(content: .homePage)
+        window = WindowsManager.openNewWindow(with: tab)!
+
+        let url = URL(string: "http://privacy-test-pages.glitch.me/tracker-reporting/1major-with-surrogate.html")!
+
+        // navigate to a regular page, tracker count should be reset to 0
+        let trackerPromise = tab.privacyInfoPublisher.compactMap { $0?.$trackerInfo }
+            .switchToLatest()
+            .filter { $0.trackersBlocked.count == 1 }
+            .map { _ in true }
+            .timeout(5)
+            .first()
+            .promise()
+
+        _=try await tab.setUrl(url, userEntered: false)?.value?.result.get()
+        _=try await trackerPromise.value
+
+        let first = HistoryCoordinator.shared.history?.first
+        XCTAssertEqual(first?.trackersFound, true)
+        XCTAssertEqual(first?.numberOfTrackersBlocked, 3)
+        XCTAssertEqual(first?.blockedTrackingEntities, ["Google Ads (Google)"])
+        XCTAssertEqual(first?.numberOfVisits, 1)
     }
 
 }

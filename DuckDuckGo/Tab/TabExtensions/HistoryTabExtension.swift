@@ -171,16 +171,11 @@ extension HistoryTabExtension: NavigationResponder {
         addVisit()
     }
 
-    func navigation(_: Navigation?, didSameDocumentNavigationOf navigationType: WKSameDocumentNavigationType?) {
-        // ignore back/forward same-document navigations
-        guard navigationType != .sessionStatePop else {
-            // mark navigation visit as already added to ignore following replace/anchorNavigation events
-            visitState = .added
-            return
+    func willStart(_ navigation: Navigation) {
+        if case .sameDocumentNavigation = navigation.navigationAction.navigationType {
+            self.url = navigation.navigationAction.url
+            addVisit()
         }
-        guard case .expected = visitState else { return }
-
-        addVisit()
     }
 
     @MainActor
