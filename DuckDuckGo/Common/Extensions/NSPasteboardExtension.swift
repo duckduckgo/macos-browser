@@ -20,17 +20,16 @@ import Foundation
 
 extension NSPasteboard {
 
-    static func copy(_ string: String) {
-        NSPasteboard.general.clearContents()
-        NSPasteboard.general.setString(string, forType: .string)
+    func copy(_ string: String) {
+        clearContents()
+        setString(string, forType: .string)
     }
 
-    func copy(url: URL) {
-        let url = url as NSURL
-
+    func copy(_ url: URL, withString string: String? = nil) {
+        clearContents()
         declareTypes([.URL], owner: nil)
-        url.write(to: self)
-        setString(url.absoluteString ?? "", forType: .string)
+        (url as NSURL).write(to: self)
+        setString(string ?? url.absoluteString, forType: .string)
     }
 
 }

@@ -328,11 +328,8 @@ final class PermissionModel {
     /// Request user authorization for provided PermissionTypes
     /// The decisionHandler will be called synchronously if there‘s a permanent (stored) permission granted or denied
     /// If no permanent decision is stored a new AuthorizationQuery will be initialized and published via $authorizationQuery
-    func permissions(_ permissions: [PermissionType], requestedForDomain domain: String?, url: URL? = nil, decisionHandler: @escaping (Bool) -> Void) {
-        guard let domain = domain,
-              !domain.isEmpty,
-              !permissions.isEmpty
-        else {
+    func permissions(_ permissions: [PermissionType], requestedForDomain domain: String, url: URL? = nil, decisionHandler: @escaping (Bool) -> Void) {
+        guard !domain.isEmpty, !permissions.isEmpty else {
             assertionFailure("Unexpected permissions/domain")
             decisionHandler(false)
             return
@@ -355,7 +352,7 @@ final class PermissionModel {
     /// Request user authorization for provided PermissionTypes
     /// Same as `permissions(_:requestedForDomain:url:decisionHandler:)` with a result returned using a `Future`
     /// Use `await future.get()` for async/await syntax
-    func request(_ permissions: [PermissionType], forDomain domain: String?, url: URL? = nil) -> Future<Bool, Never> {
+    func request(_ permissions: [PermissionType], forDomain domain: String, url: URL? = nil) -> Future<Bool, Never> {
         Future { fulfill in
             self.permissions(permissions, requestedForDomain: domain, url: url) { granted in
                 fulfill(.success(granted))
