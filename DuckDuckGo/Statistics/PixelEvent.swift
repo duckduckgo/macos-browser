@@ -132,6 +132,9 @@ extension Pixel {
         case bookmarksBarEnabled(_ source: BookmarksBarSource)
         case bookmarksBarDisabled(_ source: BookmarksBarSource)
 
+        case bookmarksBarActive
+        case bookmarksBarInactive
+
         case debug(event: Debug, error: Error? = nil)
 
         enum Debug {
@@ -316,6 +319,12 @@ extension Pixel.Event {
 
         case .bookmarksBarDisabled:
             return "m_mac_bookmarks_bar_disabled"
+
+        case .bookmarksBarActive:
+            return "m_mac_bookmarks_bar_active"
+
+        case .bookmarksBarInactive:
+            return "m_mac_bookmarks_bar_inactive"
         }
     }
 }

@@ -113,7 +113,9 @@ extension Pixel.Event {
              .emailUserCreatedAlias,
              .emailUserPressedUseAlias,
              .emailUserPressedUseAddress,
-             .jsPixel:
+             .jsPixel,
+             .bookmarksBarActive,
+             .bookmarksBarInactive:
 
             return nil
         }

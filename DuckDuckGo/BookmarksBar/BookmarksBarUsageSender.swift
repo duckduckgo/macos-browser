@@ -21,13 +21,25 @@ import Foundation
 /// Sends a pixel indicating whether the bookmarks bar is in use for the current day.
 /// This should be sent at the same time as the ATB check; i.e., when a search is triggered. We deliberately avoid sending pixels at launch.
 /// This should be sent at most once per day.
+///
+/// - Note: This is a temporary pixel, which should be removed no later than April 14 2023.
 struct BookmarksBarUsageSender {
 
     @UserDefaultsWrapper(key: .spellingCheckEnabledOnce, defaultValue: .distantPast)
     private static var lastBookmarksBarUsagePixelSendDate: Date
 
-    static func sendBookmarksBarUsagePixel() {
-        print("Sending")
+    static func sendBookmarksBarUsagePixel(currentDate: Date = Date(), previousDate: Date = lastBookmarksBarUsagePixelSendDate) {
+        guard !NSCalendar.current.isDate(currentDate, inSameDayAs: lastBookmarksBarUsagePixelSendDate) else {
+            return
+        }
+
+        if PersistentAppInterfaceSettings.shared.showBookmarksBar {
+            Pixel.fire(.bookmarksBarActive)
+        } else {
+            Pixel.fire(.bookmarksBarInactive)
+        }
+
+        lastBookmarksBarUsagePixelSendDate = currentDate
     }
 
 }
