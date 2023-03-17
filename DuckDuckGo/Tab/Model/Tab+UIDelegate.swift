@@ -137,8 +137,6 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
             }
             let webView = self.createWebView(from: webView, with: configuration, for: navigationAction, of: .popup(size: windowFeatures.windowContentSize))
 
-            self.permissions.permissions.popups
-                .popupOpened(nextQuery: self.permissions.authorizationQueries.first(where: { $0.permissions.contains(.popups) }))
             completionHandler(webView)
         }
     }
@@ -179,9 +177,7 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
             return
         }
 
-        self.permissions.permissions(permissions, requestedForDomain: origin.host) { granted in
-            decisionHandler(granted ? .grant : .deny)
-        }
+        self.permissions.permissions(permissions, requestedForDomain: origin.host, decisionHandler: decisionHandler)
     }
 
     // https://github.com/WebKit/WebKit/blob/9d7278159234e0bfa3d27909a19e695928f3b31e/Source/WebKit/UIProcess/API/Cocoa/WKUIDelegatePrivate.h#L126

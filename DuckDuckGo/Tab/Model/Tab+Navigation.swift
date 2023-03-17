@@ -31,6 +31,7 @@ extension Tab: NavigationResponder {
     func setupNavigationDelegate() {
         navigationDelegate.setResponders(
             .weak(self),
+            .weak(nullable: self.externalAppSchemeHandler),
 
             .weak(nullable: self.downloads),
 

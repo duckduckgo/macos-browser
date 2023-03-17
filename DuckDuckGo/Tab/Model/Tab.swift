@@ -34,8 +34,6 @@ protocol TabDelegate: ContentOverlayUserScriptDelegate {
     func tabDidStartNavigation(_ tab: Tab)
     func tab(_ tab: Tab, createdChild childTab: Tab, of kind: NewWindowPolicy)
 
-    func tab(_ tab: Tab, requestedOpenExternalURL url: URL, forUserEnteredURL userEntered: Bool) -> Bool
-
     func tabPageDOMLoaded(_ tab: Tab)
     func closeTab(_ tab: Tab)
 
@@ -159,6 +157,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     private struct ExtensionDependencies: TabExtensionDependencies {
         let privacyFeatures: PrivacyFeaturesProtocol
         let historyCoordinating: HistoryCoordinating
+        var workspace: Workspace
         var cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter?
         var downloadManager: FileDownloadManagerProtocol
     }
@@ -196,9 +195,12 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                      webViewConfiguration: WKWebViewConfiguration? = nil,
                      historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
                      pinnedTabsManager: PinnedTabsManager = WindowControllersManager.shared.pinnedTabsManager,
+                     workspace: Workspace = NSWorkspace.shared,
                      privacyFeatures: AnyPrivacyFeatures? = nil,
                      privatePlayer: PrivatePlayer? = nil,
                      downloadManager: FileDownloadManagerProtocol = FileDownloadManager.shared,
+                     permissionManager: PermissionManagerProtocol = PermissionManager.shared,
+                     geolocationService: GeolocationServiceProtocol = GeolocationService.shared,
                      cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter? = ContentBlockingAssetsCompilationTimeReporter.shared,
                      statisticsLoader: StatisticsLoader? = nil,
                      extensionsBuilder: TabExtensionsBuilderProtocol = TabExtensionsBuilder.default,
@@ -227,9 +229,12 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                   webViewConfiguration: webViewConfiguration,
                   historyCoordinating: historyCoordinating,
                   pinnedTabsManager: pinnedTabsManager,
+                  workspace: workspace,
                   privacyFeatures: privacyFeatures,
                   privatePlayer: privatePlayer,
                   downloadManager: downloadManager,
+                  permissionManager: permissionManager,
+                  geolocationService: geolocationService,
                   extensionsBuilder: extensionsBuilder,
                   cbaTimeReporter: cbaTimeReporter,
                   statisticsLoader: statisticsLoader,
@@ -253,9 +258,12 @@ final class Tab: NSObject, Identifiable, ObservableObject {
          webViewConfiguration: WKWebViewConfiguration?,
          historyCoordinating: HistoryCoordinating,
          pinnedTabsManager: PinnedTabsManager,
+         workspace: Workspace,
          privacyFeatures: AnyPrivacyFeatures,
          privatePlayer: PrivatePlayer,
          downloadManager: FileDownloadManagerProtocol,
+         permissionManager: PermissionManagerProtocol,
+         geolocationService: GeolocationServiceProtocol,
          extensionsBuilder: TabExtensionsBuilderProtocol,
          cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter?,
          statisticsLoader: StatisticsLoader?,
@@ -285,7 +293,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         self.favicon = favicon
         self.parentTab = parentTab
         self._canBeClosedWithBack = canBeClosedWithBack
-        self.interactionState = interactionStateData.map { .data($0) } ?? (shouldLoadFromCache ? .loadCachedFromTabContent : .none)
+        self.interactionState = (interactionStateData != nil || shouldLoadFromCache) ? .loadCachedFromTabContent(interactionStateData) : .none
         self.lastSelectedAt = lastSelectedAt
 
         let configuration = webViewConfiguration ?? WKWebViewConfiguration()
@@ -297,7 +305,8 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
         webView = WebView(frame: webViewFrame, configuration: configuration)
         webView.allowsLinkPreview = false
-        permissions = PermissionModel()
+        permissions = PermissionModel(permissionManager: permissionManager,
+                                      geolocationService: geolocationService)
 
         let userScriptsPublisher = _userContentController.projectedValue
             .compactMap { $0?.$contentBlockingAssets }
@@ -313,9 +322,11 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                           inheritedAttribution: parentTab?.adClickAttribution?.currentAttributionState,
                           userContentControllerFuture: userContentControllerPromise.future,
                           permissionModel: permissions,
-                          webViewFuture: webViewPromise.future),
+                          webViewFuture: webViewPromise.future
+                         ),
                    dependencies: ExtensionDependencies(privacyFeatures: privacyFeatures,
                                                        historyCoordinating: historyCoordinating,
+                                                       workspace: workspace,
                                                        cbaTimeReporter: cbaTimeReporter,
                                                        downloadManager: downloadManager))
 
@@ -548,12 +559,18 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
     private enum InteractionState {
         case none
-        case loadCachedFromTabContent
-        case data(Data)
+        case loadCachedFromTabContent(Data?)
+        case webViewProvided(Data)
 
         var data: Data? {
-            if case .data(let data) = self { return data }
-            return nil
+            switch self {
+            case .none:
+                return nil
+            case .loadCachedFromTabContent(let data):
+                return data
+            case .webViewProvided(let data):
+                return data
+            }
         }
         var shouldLoadFromCache: Bool {
             if case .loadCachedFromTabContent = self { return true }
@@ -574,16 +591,15 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         guard webView.url != nil else { return nil }
 
         if #available(macOS 12.0, *) {
-            self.interactionState = (webView.interactionState as? Data).map { .data($0) } ?? .none
+            self.interactionState = (webView.interactionState as? Data).map { .webViewProvided($0) } ?? .none
         } else {
-            self.interactionState = (try? webView.sessionStateData()).map { .data($0) } ?? .none
+            self.interactionState = (try? webView.sessionStateData()).map { .webViewProvided($0) } ?? .none
         }
 
         return self.interactionState.data
     }
 
     private let instrumentation = TabInstrumentation()
-    private var externalSchemeOpenedPerPageLoad = false
 
     @Published private(set) var canGoForward: Bool = false
     @Published private(set) var canGoBack: Bool = false
@@ -729,6 +745,8 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                content.isUserEnteredUrl {
                 request.attribution = .user
             }
+            invalidateInteractionStateData()
+            
             return webView.navigator(distributedNavigationDelegate: navigationDelegate)
                 .load(request, withExpectedNavigationType: content.isUserEnteredUrl ? .custom(.userEnteredUrl) : .other)
         }
@@ -780,26 +798,27 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
     @MainActor
     private func restoreInteractionStateDataIfNeeded() -> Bool {
-        var didRestore: Bool = false
-        if let interactionStateData = self.interactionState.data {
-            if contentURL.isFileURL {
-                _ = webView.loadFileURL(contentURL, allowingReadAccessTo: URL(fileURLWithPath: "/"))
-            }
+        // only restore session from interactionStateData passed to Tab.init
+        guard case .loadCachedFromTabContent(.some(let interactionStateData)) = self.interactionState else { return false }
 
-            if #available(macOS 12.0, *) {
-                webView.interactionState = interactionStateData
-                didRestore = true
-            } else {
-                do {
-                    try webView.restoreSessionState(from: interactionStateData)
-                    didRestore = true
-                } catch {
-                    os_log("Tab:setupWebView could not restore session state %s", "\(error)")
-                }
-            }
+        if contentURL.isFileURL {
+            // request file system access before restoration
+            _ = webView.loadFileURL(contentURL, allowingReadAccessTo: URL(fileURLWithPath: "/"))
         }
 
-        return didRestore
+        if #available(macOS 12.0, *) {
+            webView.interactionState = interactionStateData
+        } else {
+            do {
+                try webView.restoreSessionState(from: interactionStateData)
+            } catch {
+                os_log("Tab:setupWebView could not restore session state %s", "\(error)")
+                return false
+            }
+        }
+        invalidateInteractionStateData()
+
+        return true
     }
 
     private func addHomePageToWebViewIfNeeded() {
@@ -1209,50 +1228,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
 
         guard navigationAction.url.scheme != nil else { return .allow }
 
-        if navigationAction.url.isExternalSchemeLink {
-            // request if OS can handle extenrnal url
-            let url = navigationAction.sourceFrame.url
-            let host = url.isFileURL ? .localhost : (url.host ?? "")
-            self.host(host, requestedOpenExternalURL: navigationAction.url, forUserEnteredURL: navigationAction.isUserEnteredUrl)
-            return .cancel
-        }
-
         return .next
-    }
-    // swiftlint:enable cyclomatic_complexity
-    // swiftlint:enable function_body_length
-
-    private func host(_ host: String, requestedOpenExternalURL url: URL, forUserEnteredURL userEnteredUrl: Bool) {
-        let searchForExternalUrl = { [weak self] in
-            // Redirect after handing WebView.url update after cancelling the request
-            DispatchQueue.main.async {
-                guard let self, let url = URL.makeSearchUrl(from: url.absoluteString) else { return }
-                self.setUrl(url, userEntered: userEnteredUrl)
-            }
-        }
-
-        guard self.delegate?.tab(self, requestedOpenExternalURL: url, forUserEnteredURL: userEnteredUrl) == true else {
-            // search if external URL can‘t be opened but entered by user
-            if userEnteredUrl {
-                searchForExternalUrl()
-            }
-            return
-        }
-
-        let permissionType = PermissionType.externalScheme(scheme: url.scheme ?? "")
-
-        permissions.permissions([permissionType], requestedForDomain: host, url: url) { [weak self, userEnteredUrl] granted in
-            guard granted, let self else {
-                // search if denied but entered by user
-                if userEnteredUrl {
-                    searchForExternalUrl()
-                }
-                return
-            }
-            // handle opening extenral URL
-            NSWorkspace.shared.open(url)
-            self.permissions.permissions[permissionType].externalSchemeOpened()
-        }
     }
     // swiftlint:enable cyclomatic_complexity
     // swiftlint:enable function_body_length
@@ -1261,7 +1237,6 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
     func willStart(_ navigation: Navigation) {
         if error != nil { error = nil }
 
-        externalSchemeOpenedPerPageLoad = false
         delegate?.tabWillStartNavigation(self, isUserInitiated: navigation.navigationAction.isUserInitiated)
     }
 

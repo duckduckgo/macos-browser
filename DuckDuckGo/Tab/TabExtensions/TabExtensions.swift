@@ -64,6 +64,7 @@ protocol NSCodingExtension: TabExtension {
 // Define dependencies used to instantiate TabExtensions here:
 protocol TabExtensionDependencies {
     var privacyFeatures: PrivacyFeaturesProtocol { get }
+    var workspace: Workspace { get }
     var historyCoordinating: HistoryCoordinating { get }
     var cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter? { get }
     var downloadManager: FileDownloadManagerProtocol { get }
@@ -139,6 +140,9 @@ extension TabExtensionsBuilder {
 
         add {
             DownloadsTabExtension(downloadManager: dependencies.downloadManager)
+        }
+        add {
+            ExternalAppSchemeHandler(workspace: dependencies.workspace, permissionModel: args.permissionModel)
         }
     }
 

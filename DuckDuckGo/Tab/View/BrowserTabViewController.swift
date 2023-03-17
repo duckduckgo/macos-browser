@@ -514,17 +514,6 @@ extension BrowserTabViewController: TabDelegate {
         }
     }
 
-    func tab(_ tab: Tab, requestedOpenExternalURL url: URL, forUserEnteredURL userEntered: Bool) -> Bool {
-        // Another way of detecting whether an app is installed to handle a protocol is described in Asana:
-        // https://app.asana.com/0/1201037661562251/1202055908401751/f
-        guard NSWorkspace.shared.urlForApplication(toOpen: url) != nil else {
-            return false
-        }
-        self.view.makeMeFirstResponder()
-
-        return true
-    }
-
     func tabPageDOMLoaded(_ tab: Tab) {
         if tabViewModel?.tab == tab {
             tabViewModel?.isLoading = false

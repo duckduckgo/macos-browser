@@ -21,15 +21,26 @@ import Navigation
 
 extension ExpectedNavigation {
 
+    struct DidCancelError: Error {
+        let expectedNavigations: [ExpectedNavigation]?
+    }
+    struct DidBecomeDownload: Error {
+        let download: WebKitDownload
+    }
+
     @MainActor
     var result: Result<Void, Error> {
         get async {
             do {
                 try await withCheckedThrowingContinuation { continuation in
-                    self.appendResponder(navigationDidFinish: { _ in
+                    self.appendResponder(didCancel: { _, expectedNavigations in
+                        continuation.resume(throwing: DidCancelError(expectedNavigations: expectedNavigations))
+                    }, navigationDidFinish: { _ in
                         continuation.resume()
                     }, navigationDidFail: { _, error in
-                        continuation.resume(with: .failure(error))
+                        continuation.resume(throwing: error)
+                    }, navigationActionDidBecomeDownload: { _, download in
+                        continuation.resume(throwing: DidBecomeDownload(download: download))
                     })
                 }
                 return .success( () )
