@@ -72,7 +72,11 @@ extension NavigationProtectionTabExtension: NavigationResponder {
         // that‘s why it‘s been standardized to delay navigationDidFinish until decidePolicy(for:navigationAction) is handled
         // (see DistributedNavigationDelegate.webView(_:willPerformClientRedirectTo:delay:) method
         // when client redirect happens ReferrerTrimming.state should be `idle`, that‘s why we‘re resetting it here
-        if case .redirect(.client) = navigationAction.navigationType {
+        if navigationAction.navigationType.redirect?.isClient == true
+            // if otherwise newly initiated action is racing with an active navigation - also reset it
+            || [.linkActivated(isMiddleClick: false), .custom(.userEnteredUrl), .custom(.tabContentUpdate), .reload].contains(navigationAction.navigationType)
+            || navigationAction.isUserInitiated {
+
             resetNavigation()
         }
 
