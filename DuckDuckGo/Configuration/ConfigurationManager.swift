@@ -21,6 +21,7 @@ import Combine
 import os
 import BrowserServicesKit
 import Configuration
+import Common
 
 @MainActor
 final class ConfigurationManager {
@@ -58,6 +59,20 @@ final class ConfigurationManager {
     private var timerCancellable: AnyCancellable?
     private var lastRefreshCheckTime: Date = Date()
 
+    private lazy var fetcher = ConfigurationFetcher(store: ConfigurationStore.shared,
+                                                    log: .config,
+                                                    eventMapping: Self.configurationDebugEvents)
+
+    private static let configurationDebugEvents = EventMapping<ConfigurationDebugEvents> { event, error, _, _ in
+        let domainEvent: Pixel.Event.Debug
+        switch event {
+        case .invalidPayload(let configuration):
+            domainEvent = .invalidPayload(configuration)
+        }
+
+        Pixel.fire(.debug(event: domainEvent, error: error))
+    }
+
     func start() {
         os_log("Starting configuration refresh timer", log: .config, type: .debug)
         timerCancellable = Timer.publish(every: Constants.refreshCheckIntervalSeconds, on: .main, in: .default)
@@ -78,8 +93,6 @@ final class ConfigurationManager {
     }
 
     private func refreshNow() async {
-        let fetcher = ConfigurationFetcher(store: ConfigurationStore.shared, log: .config)
-
         let updateTrackerBlockingDependenciesTask = Task {
             let didFetchAnyTrackerBlockingDependencies = await fetchTrackerBlockingDependencies()
             if didFetchAnyTrackerBlockingDependencies {
@@ -118,7 +131,6 @@ final class ConfigurationManager {
 
     private func fetchTrackerBlockingDependencies() async -> Bool {
         var didFetchAnyTrackerBlockingDependencies = false
-        let fetcher = ConfigurationFetcher(store: ConfigurationStore.shared, log: .config)
 
         var tasks = [Configuration: Task<(), Swift.Error>]()
         tasks[.trackerDataSet] = Task { try await fetcher.fetch(.trackerDataSet) }

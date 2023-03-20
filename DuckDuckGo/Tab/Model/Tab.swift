@@ -1002,6 +1002,10 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         invalidateInteractionStateData()
         webViewDidFinishNavigationPublisher.send()
         statisticsLoader?.refreshRetentionAtb(isSearch: navigation.url.isDuckDuckGoSearch)
+
+        if navigation.url.isDuckDuckGoSearch {
+            BookmarksBarUsageSender.sendBookmarksBarUsagePixel()
+        }
     }
 
     @MainActor

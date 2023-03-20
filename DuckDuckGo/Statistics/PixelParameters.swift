@@ -38,6 +38,8 @@ extension Pixel {
         static let assertionMessage = "message"
         static let assertionFile = "file"
         static let assertionLine = "line"
+
+        static let source = "source"
     }
 
     enum Values {
@@ -85,6 +87,12 @@ extension Pixel.Event {
 
             return params
 
+        case .bookmarksBarEnabled(let source):
+            return [Pixel.Parameters.source: source.string]
+
+        case .bookmarksBarDisabled(let source):
+            return [Pixel.Parameters.source: source.string]
+
         // Don't use default to force new items to be thought about
         case .burn,
              .crash,
@@ -105,7 +113,9 @@ extension Pixel.Event {
              .emailUserCreatedAlias,
              .emailUserPressedUseAlias,
              .emailUserPressedUseAddress,
-             .jsPixel:
+             .jsPixel,
+             .bookmarksBarActive,
+             .bookmarksBarInactive:
 
             return nil
         }
