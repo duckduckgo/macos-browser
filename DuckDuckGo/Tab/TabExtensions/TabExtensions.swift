@@ -66,10 +66,13 @@ protocol TabExtensionDependencies {
     var privacyFeatures: PrivacyFeaturesProtocol { get }
     var workspace: Workspace { get }
     var historyCoordinating: HistoryCoordinating { get }
-    var cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter? { get }
     var downloadManager: FileDownloadManagerProtocol { get }
+    var cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter? { get }
 }
-// swiftlint:disable:next large_tuple
+
+// swiftlint:disable large_tuple
+// swiftlint:disable function_body_length
+
 typealias TabExtensionsBuilderArguments = (
     tabIdentifier: UInt64,
     userScriptsPublisher: AnyPublisher<UserScripts?, Never>,
@@ -123,6 +126,10 @@ extension TabExtensionsBuilder {
                                            contentBlockerRulesScriptPublisher: userScripts.map { $0?.contentBlockerRulesScript },
                                            trackerInfoPublisher: contentBlocking.trackersPublisher.map { $0.request },
                                            dependencies: dependencies.privacyFeatures.contentBlocking)
+        }
+
+        add {
+            NavigationProtectionTabExtension(contentBlocking: dependencies.privacyFeatures.contentBlocking)
         }
 
         add {

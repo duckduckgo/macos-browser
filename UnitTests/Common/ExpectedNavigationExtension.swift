@@ -19,14 +19,14 @@
 import Foundation
 import Navigation
 
-extension ExpectedNavigation {
+struct DidCancelError: Error {
+    let expectedNavigations: [ExpectedNavigation]?
+}
+struct DidBecomeDownload: Error {
+    let download: WebKitDownload
+}
 
-    struct DidCancelError: Error {
-        let expectedNavigations: [ExpectedNavigation]?
-    }
-    struct DidBecomeDownload: Error {
-        let download: WebKitDownload
-    }
+extension NavigationProtocol {
 
     @MainActor
     var result: Result<Void, Error> {

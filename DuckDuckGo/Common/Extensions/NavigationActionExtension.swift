@@ -35,4 +35,5 @@ extension NavigationAction {
 
 extension CustomNavigationType {
     static let userEnteredUrl = CustomNavigationType(rawValue: "userEnteredUrl")
+    static let tabContentUpdate = CustomNavigationType(rawValue: "tabContentUpdate")
 }

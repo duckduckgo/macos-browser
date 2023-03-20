@@ -344,8 +344,8 @@ final class TabPermissionsTests: XCTestCase {
             return
         }
 
-        XCTAssertTrue(error is ExpectedNavigation.DidCancelError)
-        XCTAssertNil((error as? ExpectedNavigation.DidCancelError)?.expectedNavigations)
+        XCTAssertTrue(error is DidCancelError)
+        XCTAssertNil((error as? DidCancelError)?.expectedNavigations)
         withExtendedLifetime(c) {}
     }
 
@@ -378,7 +378,7 @@ final class TabPermissionsTests: XCTestCase {
         let result = await tab.setUrl(externalUrl, userEntered: true)?.value?.result
 
         guard case .failure(let error) = result,
-              let error = error as? ExpectedNavigation.DidCancelError,
+              let error = error as? DidCancelError,
               let navigation = error.expectedNavigations?.first else {
             XCTFail("unexpected result \(String(describing: result))")
             return
