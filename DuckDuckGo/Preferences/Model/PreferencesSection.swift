@@ -23,11 +23,14 @@ struct PreferencesSection: Hashable, Identifiable {
     let id: PreferencesSectionIdentifier
     let panes: [PreferencePaneIdentifier]
 
-    static func defaultSections(includingPrivatePlayer: Bool) -> [PreferencesSection] {
+    static func defaultSections(includingDuckPlayer: Bool) -> [PreferencesSection] {
         let regularPanes: [PreferencePaneIdentifier] = {
             var panes: [PreferencePaneIdentifier] = [.general, .appearance, .privacy, .autofill, .downloads]
-            if includingPrivatePlayer {
-                panes.append(.privatePlayer)
+            if includingDuckPlayer {
+                panes.append(.duckPlayer)
+            }
+            if (NSApp.delegate as? AppDelegate)?.internalUserDecider.isInternalUser == true {
+                panes.insert(.sync, at: 1)
             }
             return panes
         }()
@@ -46,11 +49,12 @@ enum PreferencesSectionIdentifier: Hashable, CaseIterable {
 
 enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
     case general
+    case sync
     case appearance
     case privacy
     case autofill
     case downloads
-    case privatePlayer = "duckplayer"
+    case duckPlayer = "duckplayer"
     case about
 
     var id: Self {
@@ -67,6 +71,8 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
         switch self {
         case .general:
             return UserText.general
+        case .sync:
+            return UserText.sync
         case .appearance:
             return UserText.appearance
         case .privacy:
@@ -75,8 +81,8 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
             return UserText.autofill
         case .downloads:
             return UserText.downloads
-        case .privatePlayer:
-            return UserText.privatePlayer
+        case .duckPlayer:
+            return UserText.duckPlayer
         case .about:
             return UserText.about
         }
@@ -86,6 +92,8 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
         switch self {
         case .general:
             return "Rocket"
+        case .sync:
+            return "Sync"
         case .appearance:
             return "Appearance"
         case .privacy:
@@ -94,8 +102,8 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
             return "Autofill"
         case .downloads:
             return "DownloadsPreferences"
-        case .privatePlayer:
-            return "PrivatePlayerSettings"
+        case .duckPlayer:
+            return "DuckPlayerSettings"
         case .about:
             return "About"
         }

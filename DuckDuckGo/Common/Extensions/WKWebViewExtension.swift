@@ -191,6 +191,10 @@ extension WKWebView {
         }
     }
 
+    func close() {
+        self.evaluateJavaScript("window.close()")
+    }
+
     func loadInNewWindow(_ url: URL) {
         let urlEnc = "'\(url.absoluteString.escapedJavaScriptString())'"
         self.evaluateJavaScript("window.open(\(urlEnc), '_blank', 'noopener, noreferrer')")
@@ -242,6 +246,11 @@ extension WKWebView {
     var fullScreenPlaceholderView: NSView? {
         guard self.responds(to: NSSelectorFromString(Selector.fullScreenPlaceholderView)) else { return nil }
         return self.value(forKey: Selector.fullScreenPlaceholderView) as? NSView
+    }
+
+    func removeFocusFromWebView() {
+        guard self.window?.firstResponder === self else { return }
+        self.superview?.makeMeFirstResponder()
     }
 
     private enum Selector {

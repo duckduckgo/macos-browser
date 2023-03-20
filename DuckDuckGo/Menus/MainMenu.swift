@@ -267,7 +267,7 @@ extension MainMenu: NSMenuDelegate {
                               target: AutoreleasingUnsafeMutablePointer<AnyObject?>,
                               action: UnsafeMutablePointer<Selector?>) -> Bool {
 #if DEBUG
-        if AppDelegate.isRunningTests { return false }
+        if NSApp.isRunningUnitTests { return false }
 #endif
         sharingMenu.update()
         shareMenuItem.submenu = sharingMenu
