@@ -51,7 +51,7 @@ final class Database {
                 return (nil, error)
             }
             let mainModel = NSManagedObjectModel.mergedModel(from: [.main])!
-            let httpsUpgradeModel = AppHTTPSUpgradeStore.managedObjectModel
+            let httpsUpgradeModel = HTTPSUpgrade.managedObjectModel
 
             return (CoreDataDatabase(name: Constants.databaseName,
                                      containerLocation: containerLocation,
