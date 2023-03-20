@@ -204,10 +204,7 @@ extension AutoconsentUserScript {
             return
         }
 
-        if !url.isHttp && !url.isHttps
-            // bundled test page is served from file://
-            && !(NSApp.isRunningIntegrationTests && (url.path.hasSuffix("/autoconsent-test-page.html") || url.path.hasSuffix("/autoconsent-test-page-banner.html"))) {
-
+        guard [.http, .https].contains(url.navigationalScheme) else {
             // ignore special schemes
             os_log("Ignoring special URL scheme: %s", log: .autoconsent, type: .debug, messageData.url)
             replyHandler([ "type": "ok" ], nil) // this is just to prevent a Promise rejection

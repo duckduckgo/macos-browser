@@ -42,6 +42,10 @@ final class ContextMenuManager: NSObject {
         }
     }
 
+}
+
+extension ContextMenuManager: NewWindowPolicyDecisionMaker {
+
     func decideNewWindowPolicy(for navigationAction: WKNavigationAction) -> NavigationDecision? {
         defer {
             onNewWindow = nil
@@ -437,7 +441,7 @@ extension ContextMenuManager: ContextMenuUserScriptDelegate {
 
 // MARK: - TabExtensions
 
-protocol ContextMenuManagerProtocol: WebViewContextMenuDelegate {
+protocol ContextMenuManagerProtocol: NewWindowPolicyDecisionMaker, WebViewContextMenuDelegate {
     func decideNewWindowPolicy(for navigationAction: WKNavigationAction) -> NavigationDecision?
 }
 

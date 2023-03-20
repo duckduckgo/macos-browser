@@ -1,5 +1,5 @@
 //
-//  PrivatePlayerPreferencesTests.swift
+//  DuckPlayerPreferencesTests.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -20,38 +20,38 @@ import Foundation
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-final class PrivatePlayerPreferencesTests: XCTestCase {
+final class DuckPlayerPreferencesTests: XCTestCase {
 
     func testWhenInitializedThenItLoadsPersistedValues() throws {
-        var model = PrivatePlayerPreferences(
-            persistor: PrivatePlayerPreferencesPersistorMock(
-                privatePlayerMode: .alwaysAsk,
+        var model = DuckPlayerPreferences(
+            persistor: DuckPlayerPreferencesPersistorMock(
+                duckPlayerMode: .alwaysAsk,
                 youtubeOverlayInteracted: false
             )
         )
 
-        XCTAssertEqual(model.privatePlayerMode, .alwaysAsk)
+        XCTAssertEqual(model.duckPlayerMode, .alwaysAsk)
         XCTAssertEqual(model.youtubeOverlayInteracted, false)
 
-        model = PrivatePlayerPreferences(
-            persistor: PrivatePlayerPreferencesPersistorMock(
-                privatePlayerMode: .enabled,
+        model = DuckPlayerPreferences(
+            persistor: DuckPlayerPreferencesPersistorMock(
+                duckPlayerMode: .enabled,
                 youtubeOverlayInteracted: true
             )
         )
 
-        XCTAssertEqual(model.privatePlayerMode, .enabled)
+        XCTAssertEqual(model.duckPlayerMode, .enabled)
         XCTAssertEqual(model.youtubeOverlayInteracted, true)
     }
 
     func testWhenPropertiesAreUpdatedThenPersistedValuesAreUpdated() throws {
-        let persistor = PrivatePlayerPreferencesPersistorMock()
-        let model = PrivatePlayerPreferences(persistor: persistor)
+        let persistor = DuckPlayerPreferencesPersistorMock()
+        let model = DuckPlayerPreferences(persistor: persistor)
 
-        model.privatePlayerMode = .enabled
-        XCTAssertEqual(persistor.privatePlayerMode, .enabled)
-        model.privatePlayerMode = .disabled
-        XCTAssertEqual(persistor.privatePlayerMode, .disabled)
+        model.duckPlayerMode = .enabled
+        XCTAssertEqual(persistor.duckPlayerMode, .enabled)
+        model.duckPlayerMode = .disabled
+        XCTAssertEqual(persistor.duckPlayerMode, .disabled)
 
         model.youtubeOverlayInteracted = true
         XCTAssertEqual(persistor.youtubeOverlayInteracted, true)

@@ -37,14 +37,8 @@ final class YoutubePlayerUserScript: NSObject, StaticUserScript {
 
     var isEnabled: Bool = false
 
-    init(preferences: PrivatePlayerPreferences = .shared) {
-        privatePlayerPreferences = preferences
-    }
-
-    func setAlwaysOpenInPrivatePlayer(_ enabled: Bool, inWebView webView: WKWebView) {
-        let value = enabled ? "true" : "false"
-        let js = "window.postMessage({ alwaysOpenSetting: \(value) });"
-        evaluate(js: js, inWebView: webView)
+    init(preferences: DuckPlayerPreferences = .shared) {
+        duckPlayerPreferences = preferences
     }
 
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
@@ -64,25 +58,13 @@ final class YoutubePlayerUserScript: NSObject, StaticUserScript {
     }
 
     private func handleAlwaysOpenSettings(message: WKScriptMessage) {
-        guard let alwaysOpenOnPrivatePlayer = message.body as? Bool else {
+        guard let alwaysOpenOnDuckPlayer = message.body as? Bool else {
             assertionFailure("YoutubePlayerUserScript: expected Bool")
             return
         }
 
-        privatePlayerPreferences.privatePlayerMode = .init(alwaysOpenOnPrivatePlayer)
+        duckPlayerPreferences.duckPlayerMode = .init(alwaysOpenOnDuckPlayer)
     }
 
-    func evaluateJSCall(call: String, webView: WKWebView) {
-        evaluate(js: call, inWebView: webView)
-    }
-
-    private func evaluate(js: String, inWebView webView: WKWebView) {
-        if #available(macOS 11.0, *) {
-            webView.evaluateJavaScript(js, in: nil, in: WKContentWorld.defaultClient)
-        } else {
-            webView.evaluateJavaScript(js)
-        }
-    }
-
-    private let privatePlayerPreferences: PrivatePlayerPreferences
+    private let duckPlayerPreferences: DuckPlayerPreferences
 }
