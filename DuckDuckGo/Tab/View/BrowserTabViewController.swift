@@ -509,7 +509,7 @@ extension BrowserTabViewController: NSDraggingDestination {
               let selectedTab = tabCollectionViewModel.selectedTab,
               !selectedTab.isPinned else {
 
-            self.openNewTab(with: .url(url), selected: true)
+            self.openNewTab(with: .url(url))
             return true
         }
 
