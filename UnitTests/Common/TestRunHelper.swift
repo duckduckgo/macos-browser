@@ -35,6 +35,9 @@ final class TestRunHelper: NSObject {
         _=FileManager.swizzleTemporaryDirectoryOnce
         FileManager.default.cleanupTemporaryDirectory()
 
+        // provide extra info on failures
+        _=NSError.swizzleLocalizedDescriptionOnce
+
         // add code to be run on Unit Tests startup here...
 
     }
