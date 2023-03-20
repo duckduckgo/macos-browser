@@ -100,7 +100,7 @@ class AutoconsentIntegrationTests: XCTestCase {
         XCTAssertTrue(mainViewController.view.window!.childWindows?.first?.contentViewController is CookieConsentUserPermissionViewController)
 
         // expect cookieConsent popover to be hidden when opening a new tab
-        mainViewController.browserTabViewController.openNewTab(with: .none, selected: true)
+        mainViewController.browserTabViewController.openNewTab(with: .none)
         XCTAssertFalse(mainViewController.view.window!.childWindows?.first?.contentViewController is CookieConsentUserPermissionViewController)
 
         // switch back: popover should be reopen

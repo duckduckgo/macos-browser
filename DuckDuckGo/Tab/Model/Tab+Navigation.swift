@@ -23,14 +23,30 @@ import WebKit
 
 extension Tab: NavigationResponder {
 
-    // "protected"
+    // "protected" navigationDelegate
     private var navigationDelegate: DistributedNavigationDelegate! {
-        self.value(forKeyPath: Tab.objcNavigationDelegateKeyPath) as? DistributedNavigationDelegate
+        self.value(forKey: Tab.objcNavigationDelegateKeyPath) as? DistributedNavigationDelegate
+    }
+
+    // "protected" newWindowPolicyDecisionMakers
+    private var newWindowPolicyDecisionMakers: [NewWindowPolicyDecisionMaker]? {
+        get {
+            self.value(forKey: Tab.objcNewWindowPolicyDecisionMakersKeyPath) as? [NewWindowPolicyDecisionMaker]
+        }
+        set {
+            self.setValue(newValue, forKey: Tab.objcNewWindowPolicyDecisionMakersKeyPath)
+        }
     }
 
     func setupNavigationDelegate() {
         navigationDelegate.setResponders(
+            .weak(nullable: self.navigationHotkeyHandler),
+
             .weak(self),
+
+            // Duck Player overlay navigations handling
+            .weak(nullable: self.duckPlayer),
+
             // open external scheme link in another app
             .weak(nullable: self.externalAppSchemeHandler),
 
@@ -53,10 +69,18 @@ extension Tab: NavigationResponder {
             .weak(nullable: self.contentBlockingAndSurrogates),
             // update click-to-load state
             .weak(nullable: self.fbProtection),
+            // browsing history
+            .weak(nullable: self.history),
 
             // should be the last, for Unit Tests navigation events tracking
             .struct(nullable: testsClosureNavigationResponder)
         )
+
+        newWindowPolicyDecisionMakers = [NewWindowPolicyDecisionMaker?](arrayLiteral:
+            self.contextMenuManager,
+            self.navigationHotkeyHandler,
+            self.duckPlayer
+        ).compactMap { $0 }
 
         if let downloadsExtension = self.downloads {
             navigationDelegate

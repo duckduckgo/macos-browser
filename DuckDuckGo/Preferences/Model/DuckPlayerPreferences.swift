@@ -1,5 +1,5 @@
 //
-//  PrivatePlayerPreferences.swift
+//  DuckPlayerPreferences.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -19,16 +19,16 @@
 import Foundation
 import Combine
 
-protocol PrivatePlayerPreferencesPersistor {
-    var privatePlayerMode: PrivatePlayerMode { get set }
+protocol DuckPlayerPreferencesPersistor {
+    var duckPlayerMode: DuckPlayerMode { get set }
     var youtubeOverlayInteracted: Bool { get set }
 }
 
-struct PrivatePlayerPreferencesUserDefaultsPersistor: PrivatePlayerPreferencesPersistor {
-    var privatePlayerMode: PrivatePlayerMode = .init(UserDefaultsWrapper(key: .privatePlayerMode, defaultValue: nil).wrappedValue) {
+struct DuckPlayerPreferencesUserDefaultsPersistor: DuckPlayerPreferencesPersistor {
+    var duckPlayerMode: DuckPlayerMode = .init(UserDefaultsWrapper(key: .duckPlayerMode, defaultValue: nil).wrappedValue) {
         didSet {
-            var udWrapper = UserDefaultsWrapper(key: .privatePlayerMode, defaultValue: Bool?.none)
-            udWrapper.wrappedValue = privatePlayerMode.boolValue
+            var udWrapper = UserDefaultsWrapper(key: .duckPlayerMode, defaultValue: Bool?.none)
+            udWrapper.wrappedValue = duckPlayerMode.boolValue
         }
     }
 
@@ -36,14 +36,14 @@ struct PrivatePlayerPreferencesUserDefaultsPersistor: PrivatePlayerPreferencesPe
     var youtubeOverlayInteracted: Bool
 }
 
-final class PrivatePlayerPreferences: ObservableObject {
+final class DuckPlayerPreferences: ObservableObject {
 
-    static let shared = PrivatePlayerPreferences()
+    static let shared = DuckPlayerPreferences()
 
     @Published
-    var privatePlayerMode: PrivatePlayerMode {
+    var duckPlayerMode: DuckPlayerMode {
         didSet {
-            persistor.privatePlayerMode = privatePlayerMode
+            persistor.duckPlayerMode = duckPlayerMode
         }
     }
 
@@ -53,12 +53,12 @@ final class PrivatePlayerPreferences: ObservableObject {
         }
     }
 
-    init(persistor: PrivatePlayerPreferencesPersistor = PrivatePlayerPreferencesUserDefaultsPersistor()) {
+    init(persistor: DuckPlayerPreferencesPersistor = DuckPlayerPreferencesUserDefaultsPersistor()) {
         self.persistor = persistor
-        privatePlayerMode = persistor.privatePlayerMode
+        duckPlayerMode = persistor.duckPlayerMode
         youtubeOverlayInteracted = persistor.youtubeOverlayInteracted
     }
 
-    private var persistor: PrivatePlayerPreferencesPersistor
+    private var persistor: DuckPlayerPreferencesPersistor
     private var cancellables: Set<AnyCancellable> = []
 }

@@ -106,11 +106,17 @@ final class TabCollectionTests: XCTestCase {
 
         let tabCollection = TabCollection()
 
+        let extensionBuilder = TestTabExtensionsBuilder(load: [HistoryTabExtensionMock.self]) { builder in { _, _ in
+            builder.override {
+                HistoryTabExtensionMock()
+            }
+        }}
+
         let tab1 = Tab()
         tabCollection.append(tab: tab1)
-        let tab2 = Tab()
+        let tab2 = Tab(content: .homePage, extensionsBuilder: extensionBuilder)
         tabCollection.append(tab: tab2)
-        tab2.addVisit(of: url)
+        (tab2.history as! HistoryTabExtensionMock).localHistory.insert(url.host!)
 
         tabCollection.removeAll()
         XCTAssert(tabCollection.localHistoryOfRemovedTabs.contains(url.host!))
@@ -175,4 +181,9 @@ extension Tab {
     convenience override init() {
         self.init(content: .homePage)
     }
+}
+
+class HistoryTabExtensionMock: TabExtension, HistoryExtensionProtocol {
+    var localHistory: Set<String> = []
+    func getPublicProtocol() -> HistoryExtensionProtocol { self }
 }
