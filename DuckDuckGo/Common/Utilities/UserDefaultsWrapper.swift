@@ -47,7 +47,7 @@ public struct UserDefaultsWrapper<T> {
         case lastUsedCustomDownloadLocation = "preferences.custom-last-used-download-location"
         case alwaysRequestDownloadLocationKey = "preferences.download-location.always-request"
         case autoconsentEnabled = "preferences.autoconsent-enabled"
-        case privatePlayerMode = "preferences.duck-player"
+        case duckPlayerMode = "preferences.duck-player"
         case youtubeOverlayInteracted = "preferences.youtube-overlay-interacted"
 
         case selectedPasswordManager = "preferences.autofill.selected-password-manager"
@@ -90,6 +90,7 @@ public struct UserDefaultsWrapper<T> {
         case historyV5toV6Migration = "history.v5.to.v6.migration.2"
 
         case showBookmarksBar = "bookmarks.bar.show"
+        case lastBookmarksBarUsagePixelSendDate = "bookmarks.bar.last-usage-pixel-send-date"
 
         case pinnedViews = "pinning.pinned-views"
 

@@ -275,6 +275,12 @@ extension BookmarksBarViewController: NSMenuDelegate {
     @objc
     private func toggleBookmarksBar(_ sender: NSMenuItem) {
         PersistentAppInterfaceSettings.shared.showBookmarksBar.toggle()
+
+        if PersistentAppInterfaceSettings.shared.showBookmarksBar {
+            Pixel.fire(.bookmarksBarEnabled(.bookmarksBar))
+        } else {
+            Pixel.fire(.bookmarksBarDisabled(.bookmarksBar))
+        }
     }
 
 }

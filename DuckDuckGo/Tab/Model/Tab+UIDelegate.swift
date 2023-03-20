@@ -25,7 +25,12 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
 
     // "protected" delegate property
     private var delegate: TabDelegate? {
-        self.value(forKeyPath: Tab.objcDelegateKeyPath) as? TabDelegate
+        self.value(forKey: Tab.objcDelegateKeyPath) as? TabDelegate
+    }
+
+    // "protected" newWindowPolicyDecisionMakers
+    private var newWindowPolicyDecisionMakers: [NewWindowPolicyDecisionMaker]? {
+        self.value(forKey: Tab.objcNewWindowPolicyDecisionMakersKeyPath) as? [NewWindowPolicyDecisionMaker]
     }
 
     @objc(_webView:saveDataToFile:suggestedFilename:mimeType:originatingURL:)
@@ -88,19 +93,7 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
                                             windowFeatures: WKWindowFeatures,
                                             completionHandler: @escaping (WKWebView?) -> Void) {
 
-        let sourceUrl = navigationAction.safeSourceFrame?.safeRequest?.url ?? self.url ?? .empty
-        let newWindowPolicy: NavigationDecision? = {
-            // Are we handling custom Context Menu navigation action? (see ContextMenuManager)
-            if let newWindowPolicy = self.contextMenuManager?.decideNewWindowPolicy(for: navigationAction) {
-                return newWindowPolicy
-            }
-            // allow popups opened from an empty window console
-            if sourceUrl.isEmpty || sourceUrl.scheme == URL.NavigationalScheme.about.rawValue {
-                return .allow(.tab(selected: true))
-            }
-            return nil
-        }()
-        switch newWindowPolicy {
+        switch newWindowPolicy(for: navigationAction) {
         // popup kind is known, action doesn‘t require Popup Permission
         case .allow(let targetKind):
             // proceed to web view creation
@@ -125,6 +118,7 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
         }
 
         let url = navigationAction.request.url
+        let sourceUrl = navigationAction.safeSourceFrame?.safeRequest?.url ?? self.url ?? .empty
         guard let domain = sourceUrl.isFileURL ? .localhost : sourceUrl.host else {
             completionHandler(nil)
             return
@@ -137,10 +131,28 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
             }
             let webView = self.createWebView(from: webView, with: configuration, for: navigationAction, of: .popup(size: windowFeatures.windowContentSize))
 
-            self.permissions.permissions.popups
-                .popupOpened(nextQuery: self.permissions.authorizationQueries.first(where: { $0.permissions.contains(.popups) }))
             completionHandler(webView)
         }
+    }
+
+    private func newWindowPolicy(for navigationAction: WKNavigationAction) -> NavigationDecision? {
+        if let newWindowPolicy = self.decideNewWindowPolicy(for: navigationAction) {
+            return newWindowPolicy
+        }
+
+        // Are we handling custom Context Menu navigation action or link click with a hotkey?
+        for handler in self.newWindowPolicyDecisionMakers ?? [] {
+            guard let newWindowPolicy = handler.decideNewWindowPolicy(for: navigationAction) else { continue }
+            return newWindowPolicy
+        }
+
+        // allow popups opened from an empty window console
+        let sourceUrl = navigationAction.safeSourceFrame?.safeRequest?.url ?? self.url ?? .empty
+        if sourceUrl.isEmpty || sourceUrl.scheme == URL.NavigationalScheme.about.rawValue {
+            return .allow(.tab(selected: true))
+        }
+
+        return nil
     }
 
     /// create a new Tab returning its WebView to a createWebViewWithConfiguration callback
@@ -179,9 +191,7 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
             return
         }
 
-        self.permissions.permissions(permissions, requestedForDomain: origin.host) { granted in
-            decisionHandler(granted ? .grant : .deny)
-        }
+        self.permissions.permissions(permissions, requestedForDomain: origin.host, decisionHandler: decisionHandler)
     }
 
     // https://github.com/WebKit/WebKit/blob/9d7278159234e0bfa3d27909a19e695928f3b31e/Source/WebKit/UIProcess/API/Cocoa/WKUIDelegatePrivate.h#L126

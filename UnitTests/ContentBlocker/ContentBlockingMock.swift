@@ -42,7 +42,8 @@ final class ContentBlockingMock: NSObject, ContentBlockingProtocol, AdClickAttri
     typealias ContentBlockingManager = ContentBlockerRulesManagerMock
 
     let contentBlockingManager: ContentBlockerRulesManagerProtocol = ContentBlockerRulesManagerMock()
-    let contentBlockingAssetsPublisher = PassthroughSubject<UserContentUpdating.NewContent, Never>().eraseToAnyPublisher()
+    let contentBlockingAssetsSubject = PassthroughSubject<UserContentUpdating.NewContent, Never>()
+    var contentBlockingAssetsPublisher: AnyPublisher<UserContentUpdating.NewContent, Never> {  contentBlockingAssetsSubject.eraseToAnyPublisher() }
     let contentBlockerRulesManager = ContentBlockerRulesManagerMock()
     let privacyConfigurationManager: PrivacyConfigurationManaging = MockPrivacyConfigurationManager()
 

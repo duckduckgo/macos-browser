@@ -1,5 +1,5 @@
 //
-//  PrivatePlayerURLExtension.swift
+//  DuckPlayerURLExtension.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -25,15 +25,15 @@ extension URL {
      * Depending on the use of simulated requests, it's either the custom scheme URL
      * (without simulated requests, macOS <12), or youtube-nocookie.com URL (macOS 12 and newer).
      */
-    static func effectivePrivatePlayer(_ videoID: String, timestamp: String? = nil) -> URL {
-        if PrivatePlayer.usesSimulatedRequests {
+    static func effectiveDuckPlayer(_ videoID: String, timestamp: String? = nil) -> URL {
+        if DuckPlayer.usesSimulatedRequests {
             return .youtubeNoCookie(videoID, timestamp: timestamp)
         }
-        return .privatePlayer(videoID, timestamp: timestamp)
+        return .duckPlayer(videoID, timestamp: timestamp)
     }
 
-    static func privatePlayer(_ videoID: String, timestamp: String? = nil) -> URL {
-        let url = "\(PrivatePlayer.privatePlayerScheme)://player/\(videoID)".url!
+    static func duckPlayer(_ videoID: String, timestamp: String? = nil) -> URL {
+        let url = "\(DuckPlayer.duckPlayerScheme)://player/\(videoID)".url!
         return url.addingTimestamp(timestamp)
     }
 
@@ -47,8 +47,8 @@ extension URL {
         return url.addingTimestamp(timestamp)
     }
 
-    var isPrivatePlayerScheme: Bool {
-        scheme == PrivatePlayer.privatePlayerScheme
+    var isDuckPlayerScheme: Bool {
+        scheme == DuckPlayer.duckPlayerScheme
     }
 
     /**
@@ -57,11 +57,11 @@ extension URL {
      * When simulated requests are in use (macOS 12 and above), the Private Player Scheme URL is replaced by
      * `www.youtube-nocookie.com/embed/VIDEOID` URL. Otherwise, checks for `duck://player/` URL.
      */
-    var isPrivatePlayer: Bool {
-        if PrivatePlayer.usesSimulatedRequests {
-            return host == PrivatePlayer.privatePlayerHost && pathComponents.count == 3 && pathComponents[safe: 1] == "embed"
+    var isDuckPlayer: Bool {
+        if DuckPlayer.usesSimulatedRequests {
+            return host == DuckPlayer.duckPlayerHost && pathComponents.count == 3 && pathComponents[safe: 1] == "embed"
         } else {
-            return isPrivatePlayerScheme && host == PrivatePlayer.privatePlayerHost
+            return isDuckPlayerScheme && host == DuckPlayer.duckPlayerHost
         }
     }
 
@@ -103,7 +103,7 @@ extension URL {
 
     /// Attempts extracting video ID and timestamp from the URL. Works with all types of YouTube URLs.
     var youtubeVideoParams: (videoID: String, timestamp: String?)? {
-        if isPrivatePlayerScheme {
+        if isDuckPlayerScheme {
             guard let components = URLComponents(string: absoluteString) else {
                 return nil
             }
@@ -112,7 +112,7 @@ extension URL {
             return (unsafeVideoID.removingCharacters(in: .youtubeVideoIDNotAllowed), timestamp)
         }
 
-        if isPrivatePlayer {
+        if isDuckPlayer {
             let unsafeVideoID = lastPathComponent
             let timestamp = getParameter(named: "t")
             return (unsafeVideoID.removingCharacters(in: .youtubeVideoIDNotAllowed), timestamp)
