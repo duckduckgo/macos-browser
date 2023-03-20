@@ -46,6 +46,7 @@ extension Tab: NavigationResponder {
 
             // Duck Player overlay navigations handling
             .weak(nullable: self.duckPlayer),
+
             // open external scheme link in another app
             .weak(nullable: self.externalAppSchemeHandler),
 
