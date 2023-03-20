@@ -162,11 +162,12 @@ class NavigationProtectionIntegrationTests: XCTestCase {
         // download results
         var persistor = DownloadsPreferencesUserDefaultsPersistor()
         persistor.selectedDownloadLocation = FileManager.default.temporaryDirectory.absoluteString
-        let downloadTaskFuture = FileDownloadManager.shared.downloadsPublisher.timeout(5).first().promise()
+        // download task promise
+        let downloadTaskPromise = FileDownloadManager.shared.downloadsPublisher.timeout(5).first().promise()
         for i in 0...10 {
             do {
                 _=try await tab.webView.evaluateJavaScript("(function() { document.getElementById('download').click(); return true })()")
-                try await Task.sleep(nanoseconds: 100.asNanos)
+                try await Task.sleep(nanoseconds: 300.asNanos)
                 break
             } catch {
                 if i == 10 {
@@ -175,7 +176,8 @@ class NavigationProtectionIntegrationTests: XCTestCase {
             }
         }
 
-        let fileUrl = try await downloadTaskFuture.value.output
+        // wait for the download to complete
+        let fileUrl = try await downloadTaskPromise.value.output
             .timeout(1, scheduler: DispatchQueue.main) { .init(TimeoutError(description: "failed to download") as NSError, isRetryable: false) }.first().promise().get()
 
         // print(try! String(contentsOf: fileUrl))
