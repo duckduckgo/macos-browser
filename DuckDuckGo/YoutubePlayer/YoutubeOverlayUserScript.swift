@@ -23,10 +23,11 @@ import Common
 import UserScript
 
 protocol YoutubeOverlayUserScriptDelegate: AnyObject {
-    func youtubeOverlayUserScriptDidRequestDuckPlayer(with url: URL)
+    func youtubeOverlayUserScriptDidRequestDuckPlayer(with url: URL, in webView: WKWebView)
 }
 
-final class YoutubeOverlayUserScript: NSObject, UserScript, UserScriptMessageEncryption {
+final class YoutubeOverlayUserScript: NSObject, InteractiveUserScript, UserScriptMessageEncryption {
+    var scriptDidLoadMessageName = DidLoadMessageName()
 
     enum MessageNames: String, CaseIterable {
         case setUserValues
@@ -43,7 +44,11 @@ final class YoutubeOverlayUserScript: NSObject, UserScript, UserScriptMessageEnc
 
     /// Values that the Frontend can use to determine the current state.
     public struct UserValues: Codable {
-        let privatePlayerMode: PrivatePlayerMode
+        enum CodingKeys: String, CodingKey {
+            case duckPlayerMode = "privatePlayerMode"
+            case overlayInteracted
+        }
+        let duckPlayerMode: DuckPlayerMode
         let overlayInteracted: Bool
     }
 
@@ -55,6 +60,7 @@ final class YoutubeOverlayUserScript: NSObject, UserScript, UserScriptMessageEnc
     }
 
     weak var delegate: YoutubeOverlayUserScriptDelegate?
+    private weak var webView: WKWebView?
 
     lazy var runtimeValues: String = {
         var runtime = WebkitMessagingConfig(
@@ -83,33 +89,39 @@ final class YoutubeOverlayUserScript: NSObject, UserScript, UserScriptMessageEnc
     let generatedSecret: String = UUID().uuidString
 
     init(
-        preferences: PrivatePlayerPreferences = .shared,
+        preferences: DuckPlayerPreferences = .shared,
         encrypter: UserScriptEncrypter = AESGCMUserScriptEncrypter(),
         hostProvider: UserScriptHostProvider = SecurityOriginHostProvider()
     ) {
         self.hostProvider = hostProvider
         self.encrypter = encrypter
-        self.privatePlayerPreferences = preferences
+        self.duckPlayerPreferences = preferences
     }
 
     struct UserValuesNotification: Encodable {
         let userValuesNotification: UserValues
     }
 
-    func userValuesUpdated(userValues: UserValues, inWebView webView: WKWebView) {
+    func userValuesUpdated(userValues: UserValues) {
         let outgoing = UserValuesNotification(userValuesNotification: userValues)
         guard let json = try? JSONEncoder().encode(outgoing).utf8String() else {
             assertionFailure("YoutubeOverlayUserScript: could not convert UserValues into JSON")
             return
         }
         let js = "window.onUserValuesChanged?.(\(json));"
-        evaluate(js: js, inWebView: webView)
+        evaluate(js: js)
+    }
+
+    func setAlwaysOpenInDuckPlayer(_ enabled: Bool) {
+        let value = enabled ? "true" : "false"
+        let js = "window.postMessage({ alwaysOpenSetting: \(value) });"
+        evaluate(js: js)
     }
 
     func encodeUserValues() -> String? {
         let uv = UserValues(
-                privatePlayerMode: privatePlayerPreferences.privatePlayerMode,
-                overlayInteracted: privatePlayerPreferences.youtubeOverlayInteracted
+                duckPlayerMode: duckPlayerPreferences.duckPlayerMode,
+                overlayInteracted: duckPlayerPreferences.youtubeOverlayInteracted
         )
         guard let json = try? JSONEncoder().encode(uv).utf8String() else {
             assertionFailure("YoutubeOverlayUserScript: could not convert UserValues into JSON")
@@ -119,19 +131,16 @@ final class YoutubeOverlayUserScript: NSObject, UserScript, UserScriptMessageEnc
     }
 
     func messageHandlerFor(_ messageName: String) -> MessageHandler? {
-        guard let message = MessageNames(rawValue: messageName) else {
-            assertionFailure("YoutubeOverlayUserScript: Failed to parse User Script message: \(messageName)")
-            return nil
-        }
-
-        switch message {
-
+        switch MessageNames(rawValue: messageName) {
         case .setUserValues:
             return handleSetUserValues
         case .readUserValues:
             return handleReadUserValues
         case .openDuckPlayer:
             return handleOpenDuckPlayer
+        default:
+            assertionFailure("YoutubeOverlayUserScript: Failed to parse User Script message: \(messageName)")
+            return nil
         }
     }
 
@@ -147,8 +156,8 @@ final class YoutubeOverlayUserScript: NSObject, UserScript, UserScriptMessageEnc
             return
         }
 
-        privatePlayerPreferences.youtubeOverlayInteracted = userValues.overlayInteracted
-        privatePlayerPreferences.privatePlayerMode = userValues.privatePlayerMode
+        duckPlayerPreferences.youtubeOverlayInteracted = userValues.overlayInteracted
+        duckPlayerPreferences.duckPlayerMode = userValues.duckPlayerMode
 
         replyHandler(encodeUserValues())
     }
@@ -160,14 +169,20 @@ final class YoutubeOverlayUserScript: NSObject, UserScript, UserScriptMessageEnc
     private func handleOpenDuckPlayer(message: UserScriptMessage, _ replyHandler: @escaping MessageReplyHandler) {
         guard let dict = message.messageBody as? [String: Any],
               let href = dict["href"] as? String,
-              let url = href.url else {
+              let url = href.url,
+              let webView = message.messageWebView
+        else {
             assertionFailure("YoutubeOverlayUserScript: expected URL")
             return
         }
-        delegate?.youtubeOverlayUserScriptDidRequestDuckPlayer(with: url)
+        delegate?.youtubeOverlayUserScriptDidRequestDuckPlayer(with: url, in: webView)
     }
 
-    private func evaluate(js: String, inWebView webView: WKWebView) {
+    private func evaluate(js: String) {
+        guard let webView else {
+            assertionFailure("WebView not set")
+            return
+        }
         if #available(macOS 11.0, *) {
             webView.evaluateJavaScript(js, in: nil, in: WKContentWorld.defaultClient)
         } else {
@@ -175,7 +190,7 @@ final class YoutubeOverlayUserScript: NSObject, UserScript, UserScriptMessageEnc
         }
     }
 
-    private let privatePlayerPreferences: PrivatePlayerPreferences
+    private let duckPlayerPreferences: DuckPlayerPreferences
 }
 
 @available(macOS 11, *)
@@ -184,6 +199,9 @@ extension YoutubeOverlayUserScript: WKScriptMessageHandlerWithReply {
     func userContentController(_ userContentController: WKUserContentController,
                                didReceive message: WKScriptMessage,
                                replyHandler: @escaping (Any?, String?) -> Void) {
+        self.webView = message.webView
+        if message.name == scriptDidLoadMessageName { return }
+
         guard isMessageFromVerifiedOrigin(message) else {
             return
         }
@@ -205,6 +223,11 @@ extension YoutubeOverlayUserScript: WKScriptMessageHandlerWithReply {
 extension YoutubeOverlayUserScript: WKScriptMessageHandler {
 
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+        if message.name == scriptDidLoadMessageName {
+            self.webView = message.webView
+            return
+        }
+
         guard isMessageFromVerifiedOrigin(message) else {
             return
         }

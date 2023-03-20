@@ -100,7 +100,8 @@ class HistoryCoordinatorTests: XCTestCase {
 
     func testWhenTabChangesContent_commitHistoryIsCalled() {
         let historyCoordinatorMock = HistoryCoordinatingMock()
-        let tab = Tab(content: .url(.duckDuckGo), historyCoordinating: historyCoordinatorMock, shouldLoadInBackground: false)
+        let extensionBuilder = TestTabExtensionsBuilder(load: [HistoryTabExtensionMock.self])
+        let tab = Tab(content: .url(.duckDuckGo), historyCoordinating: historyCoordinatorMock, extensionsBuilder: extensionBuilder, shouldLoadInBackground: false)
         tab.setContent(.url(.aboutDuckDuckGo))
 
         XCTAssert(historyCoordinatorMock.commitChangesCalled)

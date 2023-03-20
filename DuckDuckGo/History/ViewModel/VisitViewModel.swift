@@ -48,8 +48,8 @@ final class VisitViewModel {
             return nil
         }
 
-        if historyEntry.url.isPrivatePlayer {
-            return .privatePlayer
+        if historyEntry.url.isDuckPlayer {
+            return .duckPlayer
         }
 
         return faviconManager.getCachedFavicon(for: historyEntry.url, sizeCategory: .small)?.image
