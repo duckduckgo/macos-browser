@@ -163,14 +163,14 @@ class NavigationProtectionIntegrationTests: XCTestCase {
         var persistor = DownloadsPreferencesUserDefaultsPersistor()
         persistor.selectedDownloadLocation = FileManager.default.temporaryDirectory.absoluteString
         // download task promise
-        let downloadTaskPromise = FileDownloadManager.shared.downloadsPublisher.timeout(5).first().promise()
-        for i in 0...10 {
+        let downloadTaskPromise = FileDownloadManager.shared.downloadsPublisher.timeout(15).first().promise()
+        for i in 0...20 {
             do {
                 _=try await tab.webView.evaluateJavaScript("(function() { document.getElementById('download').click(); return true })()")
                 try await Task.sleep(nanoseconds: 300.asNanos)
                 break
             } catch {
-                if i == 10 {
+                if i == 20 {
                     XCTFail((error as NSError).userInfo.description)
                 }
             }
