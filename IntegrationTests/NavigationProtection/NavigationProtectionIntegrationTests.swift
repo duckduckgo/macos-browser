@@ -155,7 +155,9 @@ class NavigationProtectionIntegrationTests: XCTestCase {
 
         _=try await Future<Void, Never> { promise in
             onDidFinish = { _ in
-                promise(.success( () ))
+                if tab.webView.url?.absoluteString == url.absoluteString {
+                    promise(.success( () ))
+                }
             }
         }.timeout(40, "didFinish").first().promise().value
 
@@ -163,14 +165,14 @@ class NavigationProtectionIntegrationTests: XCTestCase {
         var persistor = DownloadsPreferencesUserDefaultsPersistor()
         persistor.selectedDownloadLocation = FileManager.default.temporaryDirectory.absoluteString
         // download task promise
-        let downloadTaskPromise = FileDownloadManager.shared.downloadsPublisher.timeout(15).first().promise()
-        for i in 0...20 {
+        let downloadTaskPromise = FileDownloadManager.shared.downloadsPublisher.timeout(5).first().promise()
+        for i in 0...4 {
             do {
                 _=try await tab.webView.evaluateJavaScript("(function() { document.getElementById('download').click(); return true })()")
                 try await Task.sleep(nanoseconds: 300.asNanos)
                 break
             } catch {
-                if i == 20 {
+                if i == 4 {
                     XCTFail((error as NSError).userInfo.description)
                 }
             }
