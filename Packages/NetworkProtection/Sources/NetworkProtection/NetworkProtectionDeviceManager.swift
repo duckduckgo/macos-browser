@@ -304,7 +304,7 @@ public actor NetworkProtectionDeviceManager: NetworkProtectionDeviceManagement {
         var interface = InterfaceConfiguration(privateKey: privateKey)
 
         interface.listenPort = 51821
-        interface.dns = [DNSServer(from: "1.1.1.1")!]
+        interface.dns = [DNSServer(from: "10.11.12.1")!]
         interface.addresses = [addressRange]
 
         return interface
