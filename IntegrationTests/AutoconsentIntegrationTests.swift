@@ -108,7 +108,7 @@ class AutoconsentIntegrationTests: XCTestCase {
         XCTAssertTrue(mainViewController.view.window!.childWindows?.first?.contentViewController is CookieConsentUserPermissionViewController)
     }
 
-// https://app.asana.com/0/0/1204226452360658/f
+    // https://app.asana.com/0/0/1204226452360658/f
 //    @MainActor
 //    func testCosmeticRule_whenFakeCookieBannerIsDisplayed_bannerIsHidden() async throws {
 //        // enable the feature
@@ -139,8 +139,8 @@ class AutoconsentIntegrationTests: XCTestCase {
 //        let isBannerHidden = try await tab.webView.evaluateJavaScript("window.getComputedStyle(banner).display === 'none'") as? Bool
 //        XCTAssertTrue(isBannerHidden == true)
 //    }
-//
-//}
+
+}
 
 private extension CookieConsentInfo {
 
