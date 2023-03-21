@@ -35,11 +35,15 @@ final class NetworkProtectionConnectionTester {
         case disconnected(failureCount: Int)
     }
 
-    static let dispatchQueue = DispatchQueue(label: "com.duckduckgo.NetworkProtectionConnectionTester.queue")
+    static let connectionTestQueue = DispatchQueue(label: "com.duckduckgo.NetworkProtectionConnectionTester.connectionTestQueue")
     static let monitorQueue = DispatchQueue(label: "com.duckduckgo.NetworkProtectionConnectionTester.monitorQueue")
     static let endpoint = NWEndpoint.hostPort(host: .name("www.duckduckgo.com", nil), port: .https)
 
     private var timer: DispatchSourceTimer?
+
+    // MARK: - Dispatch Queue
+
+    private let timerQueue: DispatchQueue
 
     // MARK: - Tunnel Data
 
@@ -68,7 +72,8 @@ final class NetworkProtectionConnectionTester {
 
     // MARK: - Init & deinit
 
-    init(resultHandler: @escaping (Result) -> Void) {
+    init(timerQueue: DispatchQueue, resultHandler: @escaping (Result) -> Void) {
+        self.timerQueue = timerQueue
         self.resultHandler = resultHandler
     }
 
@@ -124,7 +129,7 @@ final class NetworkProtectionConnectionTester {
     private func scheduleTimer() {
         stopScheduledTimer()
 
-        let timer = DispatchSource.makeTimerSource()
+        let timer = DispatchSource.makeTimerSource(queue: timerQueue)
         timer.schedule(deadline: .now() + self.intervalBetweenTests, repeating: self.intervalBetweenTests)
         timer.setEventHandler { [weak self] in
             self?.testConnection()
@@ -189,7 +194,7 @@ final class NetworkProtectionConnectionTester {
             }
         }
 
-        connection.start(queue: Self.dispatchQueue)
+        connection.start(queue: Self.connectionTestQueue)
         try? await Task.sleep(nanoseconds: UInt64(connectionTimeout) * NSEC_PER_SEC)
         connection.cancel()
 

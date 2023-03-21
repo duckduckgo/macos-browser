@@ -20,10 +20,10 @@
 import Foundation
 
 public struct KeyPair {
-    let privateKey: PrivateKey
-    let expirationDate: Date
+    public let privateKey: PrivateKey
+    public let expirationDate: Date
 
-    var publicKey: PublicKey {
+    public var publicKey: PublicKey {
         privateKey.publicKey
     }
 }

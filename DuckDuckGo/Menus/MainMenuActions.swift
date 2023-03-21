@@ -695,6 +695,31 @@ extension MainViewController {
 
         DefaultNetworkProtectionProvider.setSelectedServer(selectedServer: selectedServer)
     }
+
+    @IBAction func networkProtectionExpireRegistrationKeyNow(_ sender: Any?) {
+        Task {
+            try? await DefaultNetworkProtectionProvider.expireRegistrationKeyNow()
+        }
+    }
+
+    @IBAction func networkProtectionSetRegistrationKeyValidity(_ sender: Any? ) {
+        guard let menuItem = sender as? NSMenuItem else {
+            assertionFailure("\(#function): Failed to cast sender to NSMenuItem")
+            return
+        }
+
+        // nil means automatic
+        let validity = menuItem.representedObject as? TimeInterval
+
+        Task {
+            do {
+                try await DefaultNetworkProtectionProvider.setRegistrationKeyValidity(validity)
+            } catch {
+                assertionFailure("Could not override the key validity due to an error: \(error.localizedDescription)")
+                os_log("Could not override the key validity due to an error: %{public}@", log: .networkProtection, type: .error, error.localizedDescription)
+            }
+        }
+    }
 #endif
 
     // MARK: - Developer Tools
@@ -823,6 +848,29 @@ extension MainViewController: NSMenuItemValidation {
                 }
 
                 menuItem.state = (menuItem.title.hasPrefix("\(selectedServerName) ")) ? .on : .off
+            }
+
+            return true
+
+        case #selector(MainViewController.networkProtectionExpireRegistrationKeyNow(_:)):
+            return true
+
+        case #selector(MainViewController.networkProtectionSetRegistrationKeyValidity(_:)):
+            let selectedValidity = DefaultNetworkProtectionProvider.registrationKeyValidity()
+
+            switch menuItem.title {
+            case "Automatic":
+                menuItem.state = selectedValidity == nil ? .on : .off
+            default:
+                guard let selectedValidity = selectedValidity,
+                      let menuItemValidity = menuItem.representedObject as? TimeInterval,
+                      selectedValidity == menuItemValidity else {
+
+                    menuItem.state = .off
+                    break
+                }
+
+                menuItem.state =  .on
             }
 
             return true

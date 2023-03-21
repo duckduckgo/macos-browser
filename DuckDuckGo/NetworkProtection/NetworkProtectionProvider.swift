@@ -356,8 +356,14 @@ final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
         default:
             var options = [String: NSObject]()
 
-            if let selectedServerName = NetworkProtectionSelectedServerUserDefaultsStore().selectedServer.stringValue {
+            options["activationAttemptId"] = UUID().uuidString as NSString
+
+            if let selectedServerName = Self.selectedServerName() {
                 options["selectedServer"] = selectedServerName as NSString
+            }
+
+            if let selectedKeyValidity = Self.registrationKeyValidity() {
+                options["keyValidity"] = String(selectedKeyValidity) as NSString
             }
 
             do {
@@ -442,6 +448,50 @@ final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
 
             try? activeSession.sendProviderMessage(request)
         }
+    }
+
+    static func expireRegistrationKeyNow() async throws {
+        guard let activeSession = try? await activeSession() else {
+            return
+        }
+
+        let request = Data([NetworkProtectionAppRequest.expireRegistrationKey.rawValue])
+        try? activeSession.sendProviderMessage(request)
+    }
+
+    private static let registrationKeyValidityKey = "com.duckduckgo.network-protection.DefaultNetworkProtectionProvider.registrationKeyValidityKey"
+
+    /// Retrieves the registration key validity time interval.
+    ///
+    /// - Returns: the validity time interval if it was overridden, or `nil` if NetP is using defaults.
+    ///
+    static func registrationKeyValidity() -> TimeInterval? {
+        UserDefaults.standard.object(forKey: Self.registrationKeyValidityKey) as? TimeInterval
+    }
+
+    /// Sets the registration key validity time interval.
+    ///
+    /// - Parameters:
+    ///     - validity: the default registration key validity time interval.  A `nil` value means it will be automatically
+    ///         defined by NetP using its standard configuration.
+    ///
+    static func setRegistrationKeyValidity(_ validity: TimeInterval?) async throws {
+        guard let activeSession = try await activeSession() else {
+            return
+        }
+
+        var request = Data([NetworkProtectionAppRequest.setKeyValidity.rawValue])
+
+        if let validity = validity {
+            UserDefaults.standard.set(validity, forKey: Self.registrationKeyValidityKey)
+
+            let validityData = withUnsafeBytes(of: UInt(validity).littleEndian) { Data($0) }
+            request.append(validityData)
+        } else {
+            UserDefaults.standard.removeObject(forKey: Self.registrationKeyValidityKey)
+        }
+
+        try activeSession.sendProviderMessage(request)
     }
 
     static func selectedServerName() -> String? {

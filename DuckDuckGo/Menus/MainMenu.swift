@@ -89,6 +89,7 @@ final class MainMenu: NSMenu {
     }
 
     @IBOutlet weak var networkProtectionPreferredServerLocationItem: NSMenuItem?
+    @IBOutlet weak var networkProtectionRegistrationKeyValidityMenuItem: NSMenuItem?
 
     // MARK: - Help
     @IBOutlet weak var helpMenuItem: NSMenuItem?
@@ -131,6 +132,7 @@ final class MainMenu: NSMenu {
 
 #if NETP
         updateNetworkProtectionServerListMenuItems()
+        updateNetworkProtectionRegistrationKeyValidityMenuItems()
 #endif
     }
 
@@ -293,6 +295,40 @@ final class MainMenu: NSMenu {
 
                 return NSMenuItem(title: title, action: automaticItem.action, keyEquivalent: "")
             })
+        }
+    }
+
+    private struct NetworkProtectionKeyValidityOption {
+        let title: String
+        let validity: TimeInterval
+    }
+
+    private static let networkProtectionRegistrationKeyValidityOptions: [NetworkProtectionKeyValidityOption] = [
+        .init(title: "15 seconds", validity: .seconds(15)),
+        .init(title: "30 seconds", validity: .seconds(30)),
+        .init(title: "1 minute", validity: .minutes(1)),
+        .init(title: "5 minutes", validity: .minutes(5)),
+        .init(title: "30 minutes", validity: .minutes(30)),
+        .init(title: "1 hour", validity: .hours(1))
+    ]
+
+    private func updateNetworkProtectionRegistrationKeyValidityMenuItems() {
+        guard let submenu = networkProtectionRegistrationKeyValidityMenuItem?.submenu,
+              let automaticItem = submenu.items.first else {
+
+            assertionFailure("\(#function): Failed to get submenu")
+            return
+        }
+
+        if Self.networkProtectionRegistrationKeyValidityOptions.isEmpty {
+            // Not likely to happen as it's hard-coded, but still...
+            submenu.items = [automaticItem]
+        } else {
+            submenu.items = [automaticItem, NSMenuItem.separator()] + Self.networkProtectionRegistrationKeyValidityOptions.map { option in
+                let menuItem = NSMenuItem(title: option.title, action: automaticItem.action, keyEquivalent: "")
+                menuItem.representedObject = option.validity
+                return menuItem
+            }
         }
     }
 #endif

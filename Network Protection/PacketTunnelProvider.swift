@@ -42,6 +42,10 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         }
     }()
 
+    // MARK: - Timers Support
+
+    private let timerQueue = DispatchQueue(label: "com.duckduckgo.network-protection.PacketTunnelProvider.timerQueue")
+
     // MARK: - Distributed Notifications
 
     private var distributedNotificationCenter = DistributedNotificationCenter.forType(.networkProtection)
@@ -70,10 +74,100 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
 #endif
     }()
 
-    // MARK: - Connection testing & reassertion
+    // MARK: - Registration Key
+
+    private lazy var keyStore = NetworkProtectionKeychainStore(useSystemKeychain: NetworkProtectionBundle.usesSystemKeychain(),
+                                                               errorEvents: networkProtectionDebugEvents)
+
+    /// This is for overriding the defaults.  A `nil` value means NetP will just use the defaults.
+    ///
+    private var keyValidity: TimeInterval?
+
+    private static let defaultRetryInterval = TimeInterval(60)
+
+    /// Normally we'll retry using the default interval, but since we can override the key validity interval for testing purposes
+    /// we'll retry sooner if it's been overridden with values lower than the default retry interval.
+    ///
+    /// In practical terms this means that if the validity interval is 15 secs, the retry will also be 15 secs instead of 1 minute.
+    ///
+    private var retryInterval: TimeInterval {
+        guard let keyValidity = keyValidity else {
+            return Self.defaultRetryInterval
+        }
+
+        return keyValidity > Self.defaultRetryInterval ? Self.defaultRetryInterval : keyValidity
+    }
+
+    private func resetRegistrationKey() {
+        os_log("Resetting the current registration key", log: .networkProtectionKeyManagement, type: .info)
+        keyStore.resetCurrentKeyPair()
+    }
+
+    private func rekeyIfExpired() async {
+        guard self.keyStore.currentKeyPair().expirationDate <= Date() else {
+            return
+        }
+
+        await rekey()
+    }
+
+    private func rekey() async {
+        os_log("Rekeying...", log: .networkProtectionKeyManagement, type: .info)
+        self.resetRegistrationKey()
+
+        do {
+            try await updateTunnelConfiguration(selectedServer: selectedServerStore.selectedServer, reassert: false)
+        } catch {
+            os_log("Rekey attempt failed.  This is not an error if you're using debug Key Management options: %{public}@", log: .networkProtectionKeyManagement, type: .error, String(describing: error))
+        }
+    }
+
+    private func setKeyValidity(_ interval: TimeInterval?) {
+        guard keyValidity != interval,
+            let interval = interval else {
+
+            return
+        }
+
+        let firstExpirationDate = Date().addingTimeInterval(interval)
+
+        os_log("Setting key validity to %{public}@ seconds (next expiration date %{public}@)",
+               log: .networkProtectionKeyManagement,
+               type: .info,
+               String(describing: interval),
+               String(describing: firstExpirationDate))
+        keyStore.setValidityInterval(interval)
+    }
+
+    // MARK: - Bandwidth Analyzer
+
+    private func updateBandwidthAnalyzerAndRekeyIfExpired() {
+        Task {
+            await updateBandwidthAnalyzer()
+
+            guard self.bandwidthAnalyzer.isConnectionIdle() else {
+                return
+            }
+
+            await rekeyIfExpired()
+        }
+    }
+
+    /// Updates the bandwidth analyzer with the latest data from the WireGuard Adapter
+    ///
+    private func updateBandwidthAnalyzer() async {
+        guard let (rx, tx) = try? await self.adapter.getBytesTransmitted() else {
+            self.bandwidthAnalyzer.preventIdle()
+            return
+        }
+
+        self.bandwidthAnalyzer.record(rxBytes: rx, txBytes: tx)
+    }
+
+    // MARK: - Connection tester
 
     private lazy var connectionTester: NetworkProtectionConnectionTester = {
-        NetworkProtectionConnectionTester { [weak self] result in
+        NetworkProtectionConnectionTester(timerQueue: timerQueue) { [weak self] result in
             guard let self = self else {
                 return
             }
@@ -81,12 +175,15 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
             switch result {
             case .connected:
                 self.tunnelHealth.isHavingConnectivityIssues = false
+                self.updateBandwidthAnalyzerAndRekeyIfExpired()
             case .reconnected:
                 self.tunnelHealth.isHavingConnectivityIssues = false
                 self.notificationsPresenter.showReconnectedNotification()
                 self.reasserting = false
+                self.updateBandwidthAnalyzerAndRekeyIfExpired()
             case .disconnected(let failureCount):
                 self.tunnelHealth.isHavingConnectivityIssues = true
+                self.bandwidthAnalyzer.reset()
 
                 if failureCount == 1 {
                     self.notificationsPresenter.showReconnectingNotification()
@@ -99,7 +196,9 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
             }
         }
     }()
+
     private var lastTestFailed = false
+    private let bandwidthAnalyzer = NetworkProtectionConnectionBandwidthAnalyzer()
     private let tunnelHealth = NetworkProtectionTunnelHealthStore()
     private let controllerErrorStore = NetworkProtectionTunnelErrorStore()
 
@@ -158,8 +257,18 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
             selectedServerStore.selectedServer = .endpoint(serverName)
         }
 
+        if let keyValidityString = options?["keyValidity"] as? String,
+           let keyValidity = TimeInterval(keyValidityString) {
+
+            setKeyValidity(keyValidity)
+        }
+
         os_log("🔵 Starting tunnel from the %{public}@", log: .networkProtection, type: .info, activationAttemptId == nil ? "OS directly, rather than the app" : "app")
-        // - TODO: We could also add other conditions for updating the server, such as an expiration timestamp.
+
+        startTunnel(selectedServer: selectedServerStore.selectedServer, completionHandler: completionHandler)
+    }
+
+    private func startTunnel(selectedServer: SelectedNetworkProtectionServer, completionHandler: @escaping (Error?) -> Void) {
 
         Task {
             let serverSelectionMethod: NetworkProtectionServerSelectionMethod
@@ -194,8 +303,10 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
                 return
             }
 
-            self.handleAdapterStarted()
-            completionHandler(nil)
+            Task {
+                await self.handleAdapterStarted()
+                completionHandler(nil)
+            }
         }
     }
 
@@ -255,26 +366,48 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         }
     }
 
-    private func updateTunnelConfiguration(serverSelectionMethod: NetworkProtectionServerSelectionMethod) async throws {
+    private func updateTunnelConfiguration(selectedServer: SelectedNetworkProtectionServer, reassert: Bool = true) async throws {
+        let serverSelectionMethod: NetworkProtectionServerSelectionMethod
+
+        switch selectedServerStore.selectedServer {
+        case .automatic:
+            serverSelectionMethod = .automatic
+        case .endpoint(let serverName):
+            serverSelectionMethod = .preferredServer(serverName: serverName)
+        }
+
+        try await updateTunnelConfiguration(serverSelectionMethod: serverSelectionMethod, reassert: reassert)
+    }
+
+    private func updateTunnelConfiguration(serverSelectionMethod: NetworkProtectionServerSelectionMethod, reassert: Bool = true) async throws {
         let tunnelConfiguration = try await generateTunnelConfiguration(serverSelectionMethod: serverSelectionMethod)
 
-        self.adapter.update(tunnelConfiguration: tunnelConfiguration) { error in
-            if let error = error {
-                os_log("🔵 Failed to update the configuration: %{public}@", type: .error, error.localizedDescription)
+        try await withCheckedThrowingContinuation { [weak self] (continuation: CheckedContinuation<Void, Error>) in
+            guard let self = self else {
                 return
+            }
+
+            self.adapter.update(tunnelConfiguration: tunnelConfiguration, reassert: reassert) { error in
+
+                if let error = error {
+                    os_log("🔵 Failed to update the configuration: %{public}@", type: .error, error.localizedDescription)
+                    continuation.resume(throwing: error)
+                    return
+                }
+
+                Task {
+                    await self.handleAdapterStarted()
+                    continuation.resume()
+                }
             }
         }
     }
 
     private func generateTunnelConfiguration(serverSelectionMethod: NetworkProtectionServerSelectionMethod) async throws -> TunnelConfiguration {
 
-        os_log("🔵 serverSelectionMethod %{public}@", String(describing: serverSelectionMethod))
-
         let configurationResult: (TunnelConfiguration, NetworkProtectionServerInfo)
 
         do {
-            let keyStore = NetworkProtectionKeychainStore(useSystemKeychain: NetworkProtectionBundle.usesSystemKeychain(),
-                                                          errorEvents: networkProtectionDebugEvents)
             let deviceManager = NetworkProtectionDeviceManager(keyStore: keyStore,
                                                                errorEvents: networkProtectionDebugEvents)
 
@@ -296,6 +429,8 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         return tunnelConfiguration
     }
 
+    // MARK: - App Messages
+
     override func handleAppMessage(_ messageData: Data, completionHandler: ((Data?) -> Void)? = nil) {
         guard let request = NetworkProtectionAppRequest(rawValue: messageData[0]) else {
             completionHandler?(nil)
@@ -303,8 +438,8 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         }
 
         switch request {
-        case .resetAllState:
-            handleResetAllState(messageData, completionHandler: completionHandler)
+        case .expireRegistrationKey:
+            handleExpireRegistrationKey(completionHandler: completionHandler)
         case .getLastErrorMessage:
             handleGetLastErrorMessage(messageData, completionHandler: completionHandler)
         case .getRuntimeConfiguration:
@@ -317,12 +452,24 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
             handleGetServerLocation(messageData, completionHandler: completionHandler)
         case .getServerAddress:
             handleGetServerAddress(messageData, completionHandler: completionHandler)
+        case .setKeyValidity:
+            handleSetKeyValidity(messageData, completionHandler: completionHandler)
+        case .resetAllState:
+            handleResetAllState(messageData, completionHandler: completionHandler)
+        }
+    }
+
+    // MARK: - App Messages: Handling
+
+    private func handleExpireRegistrationKey(completionHandler: ((Data?) -> Void)? = nil) {
+        Task {
+            await rekey()
+            completionHandler?(nil)
         }
     }
 
     private func handleResetAllState(_ messageData: Data, completionHandler: ((Data?) -> Void)? = nil) {
-        let keyStore = NetworkProtectionKeychainStore(useSystemKeychain: NetworkProtectionBundle.usesSystemKeychain(), errorEvents: nil)
-        keyStore.resetCurrentKeyPair()
+        resetRegistrationKey()
 
         let serverCache = NetworkProtectionServerListFileSystemStore(errorEvents: nil)
         try? serverCache.removeServerList()
@@ -402,12 +549,33 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         completionHandler?(serverAddress.data(using: NetworkProtectionAppRequest.preferredStringEncoding))
     }
 
+    private func handleSetKeyValidity(_ messageData: Data, completionHandler: ((Data?) -> Void)? = nil) {
+        Task {
+            let remainingData = messageData.suffix(messageData.count - 1)
+
+            guard remainingData.count > 0 else {
+                setKeyValidity(nil)
+                completionHandler?(nil)
+                return
+            }
+
+            let keyValidity = TimeInterval(remainingData.withUnsafeBytes {
+                $0.loadUnaligned(as: UInt.self).littleEndian
+            })
+
+            setKeyValidity(keyValidity)
+            completionHandler?(nil)
+        }
+    }
+
     // MARK: - Adapter start completion handling
 
     /// Called when the adapter reports that the tunnel was successfully started.
     ///
-    private func handleAdapterStarted() {
+    private func handleAdapterStarted() async {
         os_log("🔵 Tunnel interface is %{public}@", log: .networkProtection, type: .info, adapter.interfaceName ?? "unknown")
+
+        await rekeyIfExpired()
 
         if let interfaceName = adapter.interfaceName {
             connectionTester.start(tunnelIfName: interfaceName)
@@ -457,7 +625,9 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
     }
 
     override func wake() {
-        handleAdapterStarted()
+        Task {
+            await rekeyIfExpired()
+        }
     }
 
     // MARK: - Error Reporting

@@ -38,6 +38,22 @@ private enum State {
 public class WireGuardAdapter {
     public typealias LogHandler = (WireGuardLogLevel, String) -> Void
 
+    /// WireGuard configuration fields
+    ///
+    private enum ConfigurationFields: String {
+        case rxBytes = "rx_bytes"
+        case txBytes = "tx_bytes"
+
+        var configLinePrefix: String {
+            switch self {
+            case .rxBytes:
+                return "\(rawValue)="
+            case .txBytes:
+                return "\(rawValue)="
+            }
+        }
+    }
+
     /// Network routes monitor.
     private var networkMonitor: NWPathMonitor?
 
@@ -149,6 +165,41 @@ public class WireGuardAdapter {
 
     // MARK: - Public methods
 
+    public enum GetBytesTransmittedError: Error {
+        case couldNotObtainAdapterConfiguration
+    }
+
+    /// Retrieves the sum of all bytes read and transmitted through the WireGuard tunnel interface since the connection was established.
+    ///
+    /// - Throws: ConfigReadingError
+    /// - Returns: A pair with the sum of Rx bytes and Tx bytes since the tunnel was started.
+    ///
+    public func getBytesTransmitted() async throws -> (rx: UInt64, tx: UInt64) {
+        try await withCheckedThrowingContinuation { continuation in
+            getRuntimeConfiguration { configuration in
+                guard let configuration = configuration else {
+                    continuation.resume(throwing: GetBytesTransmittedError.couldNotObtainAdapterConfiguration)
+                    return
+                }
+
+                let lines = configuration.components(separatedBy: .newlines)
+                let bytesTransmitted = lines.reduce((rx: UInt64(0), tx: UInt64(0)), { partialResult, line in
+                    if line.hasPrefix(ConfigurationFields.rxBytes.configLinePrefix) {
+                        let additionalRx = UInt64(line.dropFirst(ConfigurationFields.rxBytes.configLinePrefix.count)) ?? 0
+                        return (partialResult.rx + additionalRx, partialResult.tx)
+                    } else if line.hasPrefix(ConfigurationFields.txBytes.configLinePrefix) {
+                        let additionalTx = UInt64(line.dropFirst("tx_bytes=".count)) ?? 0
+                        return (partialResult.rx, partialResult.tx + additionalTx)
+                    }
+
+                    return partialResult
+                })
+
+                continuation.resume(returning: bytesTransmitted)
+            }
+        }
+    }
+
     /// Returns a runtime configuration from WireGuard.
     /// - Parameter completionHandler: completion handler.
     public func getRuntimeConfiguration(completionHandler: @escaping (String?) -> Void) {
@@ -234,20 +285,26 @@ public class WireGuardAdapter {
     /// Update runtime configuration.
     /// - Parameters:
     ///   - tunnelConfiguration: tunnel configuration.
+    ///   - reassert: wether the connection should reassert or not.
     ///   - completionHandler: completion handler.
-    public func update(tunnelConfiguration: TunnelConfiguration, completionHandler: @escaping (WireGuardAdapterError?) -> Void) {
+    public func update(tunnelConfiguration: TunnelConfiguration, reassert: Bool = true, completionHandler: @escaping (WireGuardAdapterError?) -> Void) {
         workQueue.async {
             if case .stopped = self.state {
                 completionHandler(.invalidState)
                 return
             }
 
-            // Tell the system that the tunnel is going to reconnect using new WireGuard
-            // configuration.
-            // This will broadcast the `NEVPNStatusDidChange` notification to the GUI process.
-            self.packetTunnelProvider?.reasserting = true
+            if reassert {
+                // Tell the system that the tunnel is going to reconnect using new WireGuard
+                // configuration.
+                // This will broadcast the `NEVPNStatusDidChange` notification to the GUI process.
+                self.packetTunnelProvider?.reasserting = true
+            }
+
             defer {
-                self.packetTunnelProvider?.reasserting = false
+                if reassert {
+                    self.packetTunnelProvider?.reasserting = false
+                }
             }
 
             do {

@@ -27,6 +27,10 @@ public protocol NetworkProtectionKeyStore {
     ///
     func currentKeyPair() -> KeyPair
 
+    /// Sets the validity interval for keys
+    ///
+    func setValidityInterval(_ validityInterval: TimeInterval?)
+
     /// Updates the current `KeyPair` to have the specified expiration date
     ///
     /// - Parameters:
@@ -61,8 +65,9 @@ enum NetworkProtectionKeychainStoreError: Error, NetworkProtectionErrorConvertib
 /// The key is reused between servers (that is, each user currently gets a single key), though this will change in the future to periodically refresh the key.
 public class NetworkProtectionKeychainStore: NetworkProtectionKeyStore {
 
-    struct Constants {
-        static let defaultServiceName = "DuckDuckGo Network Protection Private Key"
+    struct Defaults {
+        static let serviceName = "DuckDuckGo Network Protection Private Key"
+        static let validityInterval = TimeInterval.day
     }
 
     enum UserDefaultKeys {
@@ -74,16 +79,13 @@ public class NetworkProtectionKeychainStore: NetworkProtectionKeyStore {
     private let useSystemKeychain: Bool
     private let userDefaults: UserDefaults
     private let errorEvents: EventMapping<NetworkProtectionError>?
-    
-    private static let defaultExpirationTimeInterval = TimeInterval(60 * 60 * 24)
-    private static let minimumExpirationTimeInterval = TimeInterval(60 * 60)
 
     public init(serviceName: String? = nil,
                 useSystemKeychain: Bool,
                 userDefaults: UserDefaults = .standard,
                 errorEvents: EventMapping<NetworkProtectionError>?) {
 
-        self.serviceName = serviceName ?? Constants.defaultServiceName
+        self.serviceName = serviceName ?? Defaults.serviceName
         self.useSystemKeychain = useSystemKeychain
         self.userDefaults = userDefaults
         self.errorEvents = errorEvents
@@ -91,64 +93,54 @@ public class NetworkProtectionKeychainStore: NetworkProtectionKeyStore {
 
     // MARK: - NetworkProtectionKeyStore
 
-    /// Retrieves the stored private key without generating one if it doesn't exist.
-    ///
-    private func storedPrivateKey() throws -> PrivateKey? {
-        guard let currentPublicKey = currentPublicKey else {
-            return nil
-        }
-
-        do {
-            guard let data = try readData(named: currentPublicKey) else {
-                return nil
-            }
-
-            return PrivateKey(rawValue: data)
-        } catch {
-            handle(error)
-            throw error
-        }
-    }
-
     public func currentKeyPair() -> KeyPair {
+        os_log("Querying the current key pair (publicKey: %{public}@, expirationDate: %{public}@)",
+               log: .networkProtectionKeyManagement,
+               type: .info,
+               String(describing: currentPublicKey),
+               String(describing: currentExpirationDate))
+
+        guard let currentPrivateKey = currentPrivateKey else {
+            let keyPair = newCurrentKeyPair()
+            os_log("Returning a new key pair as there's no current private key (newPublicKey: %{public}@)",
+                   log: .networkProtectionKeyManagement,
+                   type: .info,
+                   String(describing: keyPair.publicKey.base64Key))
+            return keyPair
+        }
+
         guard let currentExpirationDate = currentExpirationDate,
-              currentExpirationDate >= Date().addingTimeInterval(Self.minimumExpirationTimeInterval) else {
+              Date().addingTimeInterval(validityInterval) >= currentExpirationDate else {
 
-            let expirationDate = Date().addingTimeInterval(Self.defaultExpirationTimeInterval)
-            currentExpirationDate = expirationDate
-
-            return KeyPair(privateKey: newCurrentPrivateKey(), expirationDate: expirationDate)
+            let keyPair = newCurrentKeyPair()
+            os_log("Returning a new key pair as the expirationDate date is missing, or we're past it (now: %{public}@, expirationDate: %{public}@)",
+                   log: .networkProtectionKeyManagement,
+                   type: .info,
+                   String(describing: Date()),
+                   String(describing: currentExpirationDate))
+            return keyPair
         }
 
-        return KeyPair(privateKey: currentPrivateKey(), expirationDate: currentExpirationDate)
+        os_log("Returning an existing key pair.",
+               log: .networkProtectionKeyManagement,
+               type: .info)
+        return KeyPair(privateKey: currentPrivateKey, expirationDate: currentExpirationDate)
     }
 
-    private func currentPrivateKey() -> PrivateKey {
-        do {
-            if let existingkey = try storedPrivateKey() {
-                return existingkey
-            }
-        } catch {
-            handle(error)
-            // Intentionally not re-throwing
-        }
+    private var validityInterval = Defaults.validityInterval
 
-        return newCurrentPrivateKey()
+    public func setValidityInterval(_ validityInterval: TimeInterval?) {
+        self.validityInterval = validityInterval ?? Defaults.validityInterval
     }
 
-    private func newCurrentPrivateKey() -> PrivateKey {
-        let generatedKey = PrivateKey()
-        let base64PublicKey = generatedKey.publicKey.base64Key
-        currentPublicKey = base64PublicKey
+    private func newCurrentKeyPair() -> KeyPair {
+        let currentPrivateKey = PrivateKey()
+        let currentExpirationDate = Date().addingTimeInterval(validityInterval)
 
-        do {
-            try writeData(generatedKey.rawValue, named: base64PublicKey)
-        } catch {
-            handle(error)
-            // Intentionally not re-throwing
-        }
+        self.currentPrivateKey = currentPrivateKey
+        self.currentExpirationDate = currentExpirationDate
 
-        return generatedKey
+        return KeyPair(privateKey: currentPrivateKey, expirationDate: currentExpirationDate)
     }
 
     public func updateCurrentKeyPair(newExpirationDate: Date) -> KeyPair {
@@ -160,7 +152,7 @@ public class NetworkProtectionKeychainStore: NetworkProtectionKeyStore {
         do {
             /// Besides resetting the current keyPair we'll remove all keychain entries associated with our service, since only one keychain entry
             /// should exist at once.
-            try deleteAllEntries()
+            try deleteAllPrivateKeys()
 
             self.currentPublicKey = nil
             self.currentExpirationDate = nil
@@ -209,7 +201,7 @@ public class NetworkProtectionKeychainStore: NetworkProtectionKeyStore {
         }
     }
 
-    private func deleteAllEntries() throws {
+    private func deleteAllPrivateKeys() throws {
         var query = defaultAttributes()
         query[kSecAttrService as String] = serviceName
         query[kSecMatchLimit as String] = kSecMatchLimitAll
@@ -258,6 +250,48 @@ public class NetworkProtectionKeychainStore: NetworkProtectionKeyStore {
 
         set {
             userDefaults.set(newValue, forKey: UserDefaultKeys.currentPublicKey)
+        }
+    }
+
+    private var currentPrivateKey: PrivateKey? {
+        get {
+            guard let currentPublicKey = currentPublicKey else {
+                return nil
+            }
+
+            do {
+                guard let data = try readData(named: currentPublicKey) else {
+                    return nil
+                }
+
+                return PrivateKey(rawValue: data)
+            } catch {
+                handle(error)
+                // Intentionally not re-throwing
+            }
+
+            return nil
+        }
+
+        set {
+            do {
+                try deleteAllPrivateKeys()
+            } catch {
+                handle(error)
+                // Intentionally not re-throwing
+            }
+
+            guard let newValue = newValue else {
+                return
+            }
+
+            do {
+                currentPublicKey = newValue.publicKey.base64Key
+                try writeData(newValue.rawValue, named: newValue.publicKey.base64Key)
+            } catch {
+                handle(error)
+                // Intentionally not re-throwing
+            }
         }
     }
 
