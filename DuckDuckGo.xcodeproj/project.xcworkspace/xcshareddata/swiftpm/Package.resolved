@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "2903081e403dc67d50efff0f00c69bfc18e788cf",
-        "version" : "51.2.1"
+        "branch" : "graeme/feature-flagging-with-autofill-subfeatures",
+        "revision" : "3a8fd9f6688a39e6931dcf076fc9f0b3e50783b7"
       }
     },
     {
@@ -120,7 +120,7 @@
     {
       "identity" : "trackerradarkit",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/duckduckgo/TrackerRadarKit",
+      "location" : "https://github.com/duckduckgo/TrackerRadarKit.git",
       "state" : {
         "revision" : "4684440d03304e7638a2c8086895367e90987463",
         "version" : "1.2.1"
