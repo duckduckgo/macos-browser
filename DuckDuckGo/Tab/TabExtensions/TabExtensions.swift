@@ -167,7 +167,8 @@ extension TabExtensionsBuilder {
 
         add {
             DuckPlayerTabExtension(duckPlayer: dependencies.duckPlayer,
-                                   scriptsPublisher: userScripts.compactMap { $0 })
+                                   scriptsPublisher: userScripts.compactMap { $0 },
+                                   webViewPublisher: args.webViewFuture)
         }
     }
 
