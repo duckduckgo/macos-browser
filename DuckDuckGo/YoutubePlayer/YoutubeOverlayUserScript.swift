@@ -26,8 +26,7 @@ protocol YoutubeOverlayUserScriptDelegate: AnyObject {
     func youtubeOverlayUserScriptDidRequestDuckPlayer(with url: URL, in webView: WKWebView)
 }
 
-final class YoutubeOverlayUserScript: NSObject, InteractiveUserScript, UserScriptMessageEncryption {
-    var scriptDidLoadMessageName = DidLoadMessageName()
+final class YoutubeOverlayUserScript: NSObject, UserScript, UserScriptMessageEncryption {
 
     enum MessageNames: String, CaseIterable {
         case setUserValues
@@ -60,7 +59,7 @@ final class YoutubeOverlayUserScript: NSObject, InteractiveUserScript, UserScrip
     }
 
     weak var delegate: YoutubeOverlayUserScriptDelegate?
-    private weak var webView: WKWebView?
+    weak var webView: WKWebView?
 
     lazy var runtimeValues: String = {
         var runtime = WebkitMessagingConfig(
@@ -199,8 +198,6 @@ extension YoutubeOverlayUserScript: WKScriptMessageHandlerWithReply {
     func userContentController(_ userContentController: WKUserContentController,
                                didReceive message: WKScriptMessage,
                                replyHandler: @escaping (Any?, String?) -> Void) {
-        self.webView = message.webView
-        if message.name == scriptDidLoadMessageName { return }
 
         guard isMessageFromVerifiedOrigin(message) else {
             return
@@ -223,10 +220,6 @@ extension YoutubeOverlayUserScript: WKScriptMessageHandlerWithReply {
 extension YoutubeOverlayUserScript: WKScriptMessageHandler {
 
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-        if message.name == scriptDidLoadMessageName {
-            self.webView = message.webView
-            return
-        }
 
         guard isMessageFromVerifiedOrigin(message) else {
             return
