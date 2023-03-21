@@ -116,8 +116,6 @@ class AutoconsentIntegrationTests: XCTestCase {
 
         let tab = self.tabViewModel.tab
 
-        _=await tab.setUrl(url, userEntered: false)?.value?.result
-
         // expect `cosmetic` to be published
         let cookieConsentManagedPromise = tab.privacyInfoPublisher
             .compactMap {
@@ -131,6 +129,8 @@ class AutoconsentIntegrationTests: XCTestCase {
             .timeout(5)
             .first()
             .promise()
+
+        _=await tab.setUrl(url, userEntered: false)?.value?.result
 
         let cookieConsentManaged = try await cookieConsentManagedPromise.value
         XCTAssertTrue(cookieConsentManaged)
@@ -148,7 +148,7 @@ private extension CookieConsentInfo {
     }
 
     var isCosmeticRuleApplied: Bool {
-        Mirror(reflecting: self).children.first(where: { $0.label == "cosmetic" })?.value as! Bool
+        (Mirror(reflecting: self).children.first(where: { $0.label == "cosmetic" })?.value as? Bool) ?? false
     }
 
 }
