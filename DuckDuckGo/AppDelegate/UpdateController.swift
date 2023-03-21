@@ -19,6 +19,7 @@
 import Foundation
 import Combine
 import Sparkle
+import BrowserServicesKit
 
 final class UpdateController: NSObject {
 
@@ -28,7 +29,7 @@ final class UpdateController: NSObject {
 
     let willRelaunchAppPublisher: AnyPublisher<Void, Never>
 
-    init(internalUserDecider: InternalUserDeciding) {
+    init(internalUserDecider: InternalUserDecider) {
         willRelaunchAppPublisher = willRelaunchAppSubject.eraseToAnyPublisher()
         self.internalUserDecider = internalUserDecider
         super.init()
@@ -52,7 +53,7 @@ final class UpdateController: NSObject {
     private var updater: SPUStandardUpdaterController!
     private let willRelaunchAppSubject = PassthroughSubject<Void, Never>()
 
-    private var internalUserDecider: InternalUserDeciding
+    private var internalUserDecider: InternalUserDecider
 
     private func configureUpdater() {
     // The default configuration of Sparkle updates is in Info.plist
