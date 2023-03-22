@@ -66,7 +66,7 @@ extension Preferences {
 
                 // Autofill Content  Button
                 PreferencePaneSection {
-                    Button("View Autofill Content") {
+                    Button(UserText.autofillViewContentButton) {
                         model.showAutofillPopover()
                     }
                 }
