@@ -163,8 +163,13 @@ extension SyncPreferences: ManagementDialogModelDelegate {
     func recoverDevice(using recoveryCode: String) {
         Task { @MainActor in
             do {
+                guard let recoveryKey = try? SyncCode.decode(recoveryCode.utf8data).recovery else {
+                    managementDialogModel.errorMessage = "Invalid recovery key"
+                    return
+                }
+
                 let hostname = SCDynamicStoreCopyComputerName(nil, nil) as? String ?? ProcessInfo.processInfo.hostName
-                try await syncService.login(recoveryKey: recoveryCode, deviceName: hostname, deviceType: "desktop")
+                try await syncService.login(recoveryKey, deviceName: hostname, deviceType: "desktop")
                 managementDialogModel.endFlow()
             } catch {
                 managementDialogModel.errorMessage = String(describing: error)
