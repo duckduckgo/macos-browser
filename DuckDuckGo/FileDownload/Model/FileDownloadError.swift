@@ -23,6 +23,17 @@ enum FileDownloadError: Error {
     case failedToCompleteDownloadTask(underlyingError: Error?, resumeData: Data?, isRetryable: Bool)
 }
 
+extension FileDownloadError: LocalizedError {
+    var errorDescription: String? {
+        switch self {
+        case .failedToMoveFileToDownloads:
+            return "FileDownloadError: failedToMoveFileToDownloads"
+        case .failedToCompleteDownloadTask(underlyingError: let error, resumeData: let data, isRetryable: let isRetryable):
+            return "FileDownloadError(\(isRetryable ? "retryable\(data != nil ? "+resumeData" : "")" : "non-retryable")) underlyingError: \(error.debugDescription)"
+        }
+    }
+}
+
 extension FileDownloadError {
 
     var underlyingError: Error? {

@@ -344,6 +344,7 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
         waitForExpectations(timeout: 5)
     }
 
+    @MainActor
     func testOnBackForward_onBackForwardNavigationCalled() throws {
         // disable waiting for CBR compilation on navigation
         privacyConfiguration.isFeatureKeyEnabled = { _, _ in
@@ -640,6 +641,7 @@ extension ContentBlockerRulesIdentifier {
 }
 
 class UserContentControllerMock: UserContentControllerProtocol {
+    var contentBlockingAssetsInstalled: Bool { true }
 
     var onEnableGlobalContentRuleList: ((String) -> Void)!
     func enableGlobalContentRuleList(withIdentifier identifier: String) throws {

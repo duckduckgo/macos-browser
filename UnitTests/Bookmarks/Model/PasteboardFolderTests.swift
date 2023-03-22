@@ -50,7 +50,7 @@ class PasteboardFolderTests: XCTestCase {
 
     func testWhenInitializingPasteboardBookmarkFromInvalidPasteboardItem_ThenNilIsReturned() {
         let type = FolderPasteboardWriter.folderUTIInternalType
-        let pasteboardItem = NSPasteboardItem(pasteboardPropertyList: [], ofType: type)!
+        let pasteboardItem = NSPasteboardItem(pasteboardPropertyList: [Any](), ofType: type)!
         let pasteboardFolder = PasteboardFolder(pasteboardItem: pasteboardItem)
 
         XCTAssertNil(pasteboardFolder)

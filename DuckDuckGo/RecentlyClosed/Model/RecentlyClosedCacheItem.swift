@@ -18,4 +18,39 @@
 
 import Foundation
 
-protocol RecentlyClosedCacheItem: AnyObject {}
+protocol RecentlyClosedCacheItem: AnyObject, RecentlyClosedCacheItemBurning {}
+
+protocol RecentlyClosedCacheItemBurning {
+    func burned(for domains: Set<String>) -> Self?
+}
+
+extension RecentlyClosedTab: RecentlyClosedCacheItemBurning {
+    func burned(for domains: Set<String>) -> RecentlyClosedTab? {
+        if contentContainsDomains(domains) {
+            return nil
+        }
+        interactionData = nil
+        return self
+    }
+
+    private func contentContainsDomains(_ domains: Set<String>) -> Bool {
+        if let host = tabContent.url?.host, domains.contains(host) {
+            return true
+        } else {
+            return false
+        }
+    }
+}
+
+extension RecentlyClosedWindow: RecentlyClosedCacheItemBurning {
+    func burned(for domains: Set<String>) -> RecentlyClosedWindow? {
+        tabs = tabs.compactMap { $0.burned(for: domains) }
+        return tabs.isEmpty ? nil : self
+    }
+}
+
+extension Array where Element == RecentlyClosedCacheItem {
+    mutating func burn(for domains: Set<String>) {
+        self = compactMap { $0.burned(for: domains) }
+    }
+}

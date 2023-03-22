@@ -65,6 +65,13 @@ extension Preferences {
                 // TITLE
                 TextMenuTitle(text: UserText.autofill)
 
+                // Autofill Content  Button
+                PreferencePaneSection {
+                    Button(UserText.autofillViewContentButton) {
+                        model.showAutofillPopover()
+                    }
+                }
+
 #if !APPSTORE
                 // SECTION 1: Password Manager
                 PreferencePaneSection {

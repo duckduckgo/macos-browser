@@ -28,16 +28,16 @@ struct YoutubePlayerNavigationHandler {
         return file
     }
 
-    func makePrivatePlayerRequest(from originalRequest: URLRequest) -> URLRequest {
+    func makeDuckPlayerRequest(from originalRequest: URLRequest) -> URLRequest {
         guard let (youtubeVideoID, timestamp) = originalRequest.url?.youtubeVideoParams else {
             assertionFailure("Request should have ID")
             return originalRequest
         }
 
-        return makePrivatePlayerRequest(for: youtubeVideoID, timestamp: timestamp)
+        return makeDuckPlayerRequest(for: youtubeVideoID, timestamp: timestamp)
     }
 
-    func makePrivatePlayerRequest(for videoID: String, timestamp: String?) -> URLRequest {
+    func makeDuckPlayerRequest(for videoID: String, timestamp: String?) -> URLRequest {
         var request = URLRequest(url: .youtubeNoCookie(videoID, timestamp: timestamp))
         request.addValue("http://localhost/", forHTTPHeaderField: "Referer")
         request.httpMethod = "GET"

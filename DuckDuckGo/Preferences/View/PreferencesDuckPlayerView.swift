@@ -1,5 +1,5 @@
 //
-//  PreferencesPrivatePlayerView.swift
+//  PreferencesDuckPlayerView.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -21,14 +21,14 @@ import SwiftUIExtensions
 
 extension Preferences {
 
-    struct PrivatePlayerView: View {
-        @ObservedObject var model: PrivatePlayerPreferences
+    struct DuckPlayerView: View {
+        @ObservedObject var model: DuckPlayerPreferences
 
-        var privatePlayerModeBinding: Binding<PrivatePlayerMode> {
+        var duckPlayerModeBinding: Binding<DuckPlayerMode> {
             .init {
-                model.privatePlayerMode
+                model.duckPlayerMode
             } set: { newValue in
-                model.privatePlayerMode = newValue
+                model.duckPlayerMode = newValue
             }
         }
 
@@ -36,27 +36,27 @@ extension Preferences {
             VStack(alignment: .leading, spacing: 0) {
 
                 // TITLE
-                TextMenuTitle(text: UserText.privatePlayer)
+                TextMenuTitle(text: UserText.duckPlayer)
 
                 PreferencePaneSection {
-                    Picker(selection: privatePlayerModeBinding, content: {
-                        Text(UserText.privatePlayerAlwaysOpenInPlayer)
+                    Picker(selection: duckPlayerModeBinding, content: {
+                        Text(UserText.duckPlayerAlwaysOpenInPlayer)
                             .padding(.bottom, 4)
-                            .tag(PrivatePlayerMode.enabled)
+                            .tag(DuckPlayerMode.enabled)
 
-                        Text(UserText.privatePlayerShowPlayerButtons)
+                        Text(UserText.duckPlayerShowPlayerButtons)
                             .padding(.bottom, 4)
-                            .tag(PrivatePlayerMode.alwaysAsk)
+                            .tag(DuckPlayerMode.alwaysAsk)
 
-                        Text(UserText.privatePlayerOff)
+                        Text(UserText.duckPlayerOff)
                             .padding(.bottom, 4)
-                            .tag(PrivatePlayerMode.disabled)
+                            .tag(DuckPlayerMode.disabled)
 
                     }, label: {})
                     .pickerStyle(.radioGroup)
                     .offset(x: Const.pickerHorizontalOffset)
 
-                    TextMenuItemCaption(text: UserText.privatePlayerExplanation)
+                    TextMenuItemCaption(text: UserText.duckPlayerExplanation)
                 }
             }
         }

@@ -332,6 +332,12 @@ final class NavigationBarViewController: NSViewController {
         popovers.toggleDownloadsPopover(usingView: downloadsButton, popoverDelegate: self, downloadsDelegate: self)
     }
 
+    func showPasswordManagerPopover(selectedCategory: SecureVaultSorting.Category?) {
+        popovers.showPasswordManagementPopover(selectedCategory: selectedCategory,
+                                               usingView: passwordManagementButton,
+                                               withDelegate: self)
+    }
+
     private func setupNavigationButtonMenus() {
         let backButtonMenu = NSMenu()
         backButtonMenu.delegate = goBackButtonMenuDelegate
@@ -637,6 +643,12 @@ extension NavigationBarViewController: NSMenuDelegate {
     @objc
     private func toggleBookmarksBar(_ sender: NSMenuItem) {
         PersistentAppInterfaceSettings.shared.showBookmarksBar.toggle()
+
+        if PersistentAppInterfaceSettings.shared.showBookmarksBar {
+            Pixel.fire(.bookmarksBarEnabled(.navigationBar))
+        } else {
+            Pixel.fire(.bookmarksBarDisabled(.navigationBar))
+        }
     }
 
     @objc

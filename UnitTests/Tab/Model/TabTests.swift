@@ -120,6 +120,7 @@ final class TabTests: XCTestCase {
 
     // MARK: - Back/Forward navigation
 
+    @MainActor
     func testCanGoBack() throws {
         let tab = Tab(content: .none, webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock)
 
@@ -185,14 +186,13 @@ final class TabTests: XCTestCase {
 
     @MainActor
     func testWhenGoingBackInvalidatingBackItem_BackForwardButtonsDoNotBlink() throws {
-        var webView: DuckDuckGo_Privacy_Browser.WebView!
         var eDidFinish: XCTestExpectation!
         var eDidRedirect: XCTestExpectation!
         let extensionsBuilder = TestTabExtensionsBuilder(load: []) { [urls] builder in { _, _ in
             builder.add {
                 TestsClosureNavigationResponderTabExtension(.init { navigationAction, _ in
                     if navigationAction.url == urls.url2 {
-                        return .redirect(navigationAction, invalidatingBackItemIfNeededFor: webView!) { navigator in
+                        return .redirectInvalidatingBackItemIfNeeded(navigationAction) { navigator in
                             eDidRedirect.fulfill()
                             navigator.load(URLRequest(url: urls.url3))
                         }
@@ -205,7 +205,6 @@ final class TabTests: XCTestCase {
         }}
 
         let tab = Tab(content: .none, webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder)
-        webView = tab.webView
 
         schemeHandler.middleware = [{ [urls] request in
             guard request.url!.path == urls.url1.path else { return nil }
@@ -262,14 +261,13 @@ final class TabTests: XCTestCase {
 
     @MainActor
     func testWhenGoingBackInvalidatingBackItemWithExistingBackItem_BackForwardButtonsDoNotBlink() throws {
-        var webView: DuckDuckGo_Privacy_Browser.WebView!
         var eDidFinish: XCTestExpectation!
         var eDidRedirect: XCTestExpectation!
         let extensionsBuilder = TestTabExtensionsBuilder(load: []) { [urls] builder in { _, _ in
             builder.add {
                 TestsClosureNavigationResponderTabExtension(.init { navigationAction, _ in
                     if navigationAction.url == urls.url2 {
-                        return .redirect(navigationAction, invalidatingBackItemIfNeededFor: webView!) { navigator in
+                        return .redirectInvalidatingBackItemIfNeeded(navigationAction) { navigator in
                             eDidRedirect.fulfill()
                             navigator.load(URLRequest(url: urls.url3))
                         }
@@ -282,7 +280,6 @@ final class TabTests: XCTestCase {
         }}
 
         let tab = Tab(content: .none, webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder)
-        webView = tab.webView
 
         schemeHandler.middleware = [{ [urls] request in
             guard request.url!.path == urls.url1.path else { return nil }

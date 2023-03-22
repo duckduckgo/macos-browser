@@ -58,6 +58,8 @@ final class HomePageViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        refreshModelsOnAppBecomingActive()
+
         favoritesModel = createFavoritesModel()
         defaultBrowserModel = createDefaultBrowserModel()
         recentlyVisitedModel = createRecentlyVisitedModel()
@@ -102,6 +104,14 @@ final class HomePageViewController: NSViewController {
         super.viewWillDisappear()
 
         historyCancellable = nil
+    }
+
+    func refreshModelsOnAppBecomingActive() {
+        NotificationCenter.default
+            .publisher(for: NSApplication.didBecomeActiveNotification)
+            .sink { [weak self] _ in
+                self?.refreshModels()
+            }.store(in: &self.cancellables)
     }
 
     func refreshModels() {
@@ -158,7 +168,13 @@ final class HomePageViewController: NSViewController {
     }
 
     func refreshDefaultBrowserModel() {
-        defaultBrowserModel.isDefault = DefaultBrowserPreferences().isDefault
+        let prefs = DefaultBrowserPreferences()
+        if prefs.isDefault {
+            defaultBrowserDismissed = false
+        }
+
+        defaultBrowserModel.isDefault = prefs.isDefault
+        defaultBrowserModel.wasClosed = defaultBrowserDismissed
     }
 
     func subscribeToBookmarks() {

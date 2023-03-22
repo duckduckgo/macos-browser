@@ -30,6 +30,7 @@ extension Pixel {
         static let underlyingErrorDesc = "ud"
         static let underlyingErrorSQLiteCode = "sqlrc"
         static let underlyingErrorSQLiteExtendedCode = "sqlerc"
+        static let keychainErrorCode = "keychain_error_code"
 
         static let emailCohort = "cohort"
         static let emailLastUsed = "duck_address_last_used"
@@ -37,6 +38,8 @@ extension Pixel {
         static let assertionMessage = "message"
         static let assertionFile = "file"
         static let assertionLine = "line"
+
+        static let source = "source"
     }
 
     enum Values {
@@ -52,6 +55,10 @@ extension Pixel.Event {
         case .debug(event: let debugEvent, error: let error):
             var params = [String: String]()
 
+            if let errorWithUserInfo = error as? ErrorWithParameters {
+                params = errorWithUserInfo.errorParameters
+            }
+
             if case let .assertionFailure(message, file, line) = debugEvent {
                 params[Pixel.Parameters.assertionMessage] = message
                 params[Pixel.Parameters.assertionFile] = String(file)
@@ -63,19 +70,28 @@ extension Pixel.Event {
 
                 params[Pixel.Parameters.errorCode] = "\(nsError.code)"
                 params[Pixel.Parameters.errorDesc] = nsError.domain
+
                 if let underlyingError = nsError.userInfo["NSUnderlyingError"] as? NSError {
                     params[Pixel.Parameters.underlyingErrorCode] = "\(underlyingError.code)"
                     params[Pixel.Parameters.underlyingErrorDesc] = underlyingError.domain
                 }
+
                 if let sqlErrorCode = nsError.userInfo["SQLiteResultCode"] as? NSNumber {
                     params[Pixel.Parameters.underlyingErrorSQLiteCode] = "\(sqlErrorCode.intValue)"
                 }
+
                 if let sqlExtendedErrorCode = nsError.userInfo["SQLiteExtendedResultCode"] as? NSNumber {
                     params[Pixel.Parameters.underlyingErrorSQLiteExtendedCode] = "\(sqlExtendedErrorCode.intValue)"
                 }
             }
 
             return params
+
+        case .bookmarksBarEnabled(let source):
+            return [Pixel.Parameters.source: source.string]
+
+        case .bookmarksBarDisabled(let source):
+            return [Pixel.Parameters.source: source.string]
 
         // Don't use default to force new items to be thought about
         case .burn,
@@ -97,7 +113,9 @@ extension Pixel.Event {
              .emailUserCreatedAlias,
              .emailUserPressedUseAlias,
              .emailUserPressedUseAddress,
-             .jsPixel:
+             .jsPixel,
+             .bookmarksBarActive,
+             .bookmarksBarInactive:
 
             return nil
         }
