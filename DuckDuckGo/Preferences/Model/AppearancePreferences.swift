@@ -22,6 +22,7 @@ protocol AppearancePreferencesPersistor {
     var showFullURL: Bool { get set }
     var showAutocompleteSuggestions: Bool { get set }
     var currentThemeName: String { get set }
+    var defaultPageZoom: CGFloat { get set }
 }
 
 struct AppearancePreferencesUserDefaultsPersistor: AppearancePreferencesPersistor {
@@ -33,6 +34,9 @@ struct AppearancePreferencesUserDefaultsPersistor: AppearancePreferencesPersisto
 
     @UserDefaultsWrapper(key: .currentThemeName, defaultValue: ThemeName.systemDefault.rawValue)
     var currentThemeName: String
+
+    @UserDefaultsWrapper(key: .defaultPageZoom, defaultValue: 1.0)
+    var defaultPageZoom: CGFloat
 }
 
 enum ThemeName: String, Equatable, CaseIterable {
@@ -97,6 +101,12 @@ final class AppearancePreferences: ObservableObject {
         }
     }
 
+    @Published var defaultPageZoom: CGFloat {
+        didSet {
+            persistor.defaultPageZoom = defaultPageZoom
+        }
+    }
+
     func updateUserInterfaceStyle() {
         NSApp.appearance = currentThemeName.appearance
     }
@@ -106,6 +116,7 @@ final class AppearancePreferences: ObservableObject {
         currentThemeName = .init(rawValue: persistor.currentThemeName) ?? .systemDefault
         showFullURL = persistor.showFullURL
         showAutocompleteSuggestions = persistor.showAutocompleteSuggestions
+        defaultPageZoom =  persistor.defaultPageZoom
     }
 
     private var persistor: AppearancePreferencesPersistor
