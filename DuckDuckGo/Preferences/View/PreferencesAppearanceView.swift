@@ -124,7 +124,6 @@ extension Preferences {
     }
 
     public enum ZoomValues: CGFloat, CaseIterable {
-        case percent25 = 0.25
         case percent50 = 0.5
         case percent75 = 0.75
         case percent85 = 0.85

@@ -155,7 +155,7 @@ final class TabViewModelTests: XCTestCase {
 
     // MARK: - Zoom
 
-    func testDefaultValueForTabsWebViewIsOne() {
+    func testThatDefaultValueForTabsWebViewIsOne() {
         UserDefaultsWrapper<Any>.clearAll()
         let tabVM = TabViewModel(tab: Tab(), appearancePreferences: AppearancePreferences())
 
