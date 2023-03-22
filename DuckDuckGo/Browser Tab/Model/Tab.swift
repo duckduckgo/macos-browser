@@ -987,8 +987,8 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         }()
 
         if let hostname = webView.url?.host,
-           let origins = self.youtubeOverlayScript?.allowedOrigins {
-            if origins.contains(hostname) && canPushMessagesToJS {
+           let origins = self.youtubeOverlayScript?.allowedOrigins.isAllowed(hostname) {
+            if canPushMessagesToJS {
                 privatePlayer.$mode
                         .dropFirst()
                         .sink { [weak self] playerMode in

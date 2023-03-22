@@ -66,11 +66,15 @@ final class UserScripts: UserScriptsProvider {
             youtubePlayerUserScript = nil
         }
 
+
+        if let youtubeOverlayScript {
+            contentScopeUserScript.registerSubFeatureFor(name: .duckplayer, delegate: youtubeOverlayScript)
+        } else {
+            fatalError("guard failure handling has not been implemented")
+        }
+
         if let autoconsentUserScript = autoconsentUserScript {
             userScripts.append(autoconsentUserScript)
-        }
-        if let youtubeOverlayScript = youtubeOverlayScript {
-            userScripts.append(youtubeOverlayScript)
         }
         if let youtubePlayerUserScript = youtubePlayerUserScript {
             userScripts.append(youtubePlayerUserScript)

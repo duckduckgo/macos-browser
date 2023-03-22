@@ -21,12 +21,18 @@ import WebKit
 import os
 import Common
 import UserScript
+import BrowserServicesKit
 
 protocol YoutubeOverlayUserScriptDelegate: AnyObject {
     func youtubeOverlayUserScriptDidRequestDuckPlayer(with url: URL)
 }
 
-final class YoutubeOverlayUserScript: NSObject, UserScript, UserScriptMessageEncryption {
+final class YoutubeOverlayUserScript: NSObject, ContentScopeScriptsSubFeature {
+
+    var allowedOrigins: AllowedOrigins = .only([
+        .exact(hostname: "www.youtube.com"),
+        .exact(hostname: "duckduckgo.com"),
+    ])
 
     enum MessageNames: String, CaseIterable {
         case setUserValues
@@ -37,7 +43,6 @@ final class YoutubeOverlayUserScript: NSObject, UserScript, UserScriptMessageEnc
 
     struct YoutubeUserScriptConfig: Encodable {
         let webkitMessagingConfig: WebkitMessagingConfig
-        let allowedOrigins: [String]
     }
 
     // This conforms to https://duckduckgo.github.io/content-scope-utils/classes/Webkit_Messaging.WebkitMessagingConfig.html
@@ -62,60 +67,7 @@ final class YoutubeOverlayUserScript: NSObject, UserScript, UserScriptMessageEnc
 
     weak var delegate: YoutubeOverlayUserScriptDelegate?
 
-    lazy var userScriptConfig: String = {
-        var webkitMessagingConfig = WebkitMessagingConfig(
-            hasModernWebkitAPI: false,
-            webkitMessageHandlerNames: self.messageNames,
-            secret: generatedSecret
-        )
-
-        if #available(macOS 11.0, *) {
-            webkitMessagingConfig.hasModernWebkitAPI = true
-        }
-
-        let userScriptConfig = YoutubeUserScriptConfig(
-            webkitMessagingConfig: webkitMessagingConfig,
-            allowedOrigins: allowedOrigins
-        )
-
-        guard let json = try? JSONEncoder().encode(userScriptConfig).utf8String() else {
-            assertionFailure("YoutubeOverlayUserScript: could not convert YoutubeUserScriptConfig")
-            return ""
-        }
-        return json
-    }()
-
-    let allowedOrigins = [
-        "www.youtube.com",
-        "duckduckgo.com"
-    ]
-
-    lazy var source: String = {
-        var js = YoutubeOverlayUserScript.loadJS("youtube-inject-bundle", from: .main)
-        js = """
-             (() => {
-                const $DDGYoutubeUserScriptConfig$ = \(userScriptConfig);
-                try {
-                    \(js)
-                } catch (e) {
-                    console.error('uncaught', e);
-                }
-             })()
-             """
-        return js
-    }()
-
-    let encrypter: UserScriptEncrypter
-    let hostProvider: UserScriptHostProvider
-    let generatedSecret: String = UUID().uuidString
-
-    init(
-        preferences: PrivatePlayerPreferences = .shared,
-        encrypter: UserScriptEncrypter = AESGCMUserScriptEncrypter(),
-        hostProvider: UserScriptHostProvider = SecurityOriginHostProvider()
-    ) {
-        self.hostProvider = hostProvider
-        self.encrypter = encrypter
+    init(preferences: PrivatePlayerPreferences = .shared) {
         self.privatePlayerPreferences = preferences
     }
 
@@ -145,7 +97,7 @@ final class YoutubeOverlayUserScript: NSObject, UserScript, UserScriptMessageEnc
         return json
     }
 
-    func messageHandlerFor(_ messageName: String) -> MessageHandler? {
+    public func messageHandlerForFeature(_ messageName: String) -> MessageHandlerSubFeature? {
         guard let message = MessageNames(rawValue: messageName) else {
             assertionFailure("YoutubeOverlayUserScript: Failed to parse User Script message: \(messageName)")
             return nil
@@ -166,12 +118,8 @@ final class YoutubeOverlayUserScript: NSObject, UserScript, UserScriptMessageEnc
 
     // MARK: - Private
 
-    fileprivate func isMessageFromVerifiedOrigin(_ message: UserScriptMessage) -> Bool {
-        allowedOrigins.contains(hostProvider.hostForMessage(message))
-    }
-
-    private func handleSetUserValues(message: UserScriptMessage, _ replyHandler: @escaping MessageReplyHandler) {
-        guard let userValues: UserValues = DecodableHelper.decode(from: message.messageBody) else {
+    private func handleSetUserValues(messageBody: [String: Any], _ replyHandler: @escaping MessageReplyHandler) {
+        guard let userValues: UserValues = DecodableHelper.decode(from: messageBody) else {
             assertionFailure("YoutubeOverlayUserScript: expected JSON representation of UserValues")
             return
         }
@@ -182,12 +130,12 @@ final class YoutubeOverlayUserScript: NSObject, UserScript, UserScriptMessageEnc
         replyHandler(encodeUserValues())
     }
 
-    private func handleReadUserValues(message: UserScriptMessage, _ replyHandler: @escaping MessageReplyHandler) {
+    private func handleReadUserValues(messageBody: [String: Any], _ replyHandler: @escaping MessageReplyHandler) {
         replyHandler(encodeUserValues())
     }
 
-    private func handleOpenDuckPlayer(message: UserScriptMessage, _ replyHandler: @escaping MessageReplyHandler) {
-        guard let dict = message.messageBody as? [String: Any],
+    private func handleOpenDuckPlayer(messageBody: [String: Any], _ replyHandler: @escaping MessageReplyHandler) {
+        guard let dict = messageBody as? [String: Any],
               let href = dict["href"] as? String,
               let url = href.url else {
             assertionFailure("YoutubeOverlayUserScript: expected URL")
@@ -207,41 +155,6 @@ final class YoutubeOverlayUserScript: NSObject, UserScript, UserScriptMessageEnc
     private let privatePlayerPreferences: PrivatePlayerPreferences
 }
 
-@available(macOS 11, *)
-extension YoutubeOverlayUserScript: WKScriptMessageHandlerWithReply {
-
-    func userContentController(_ userContentController: WKUserContentController,
-                               didReceive message: WKScriptMessage,
-                               replyHandler: @escaping (Any?, String?) -> Void) {
-        guard isMessageFromVerifiedOrigin(message) else {
-            return
-        }
-
-        guard let messageHandler = messageHandlerFor(message.name) else {
-            // Unsupported message fail silently
-            return
-        }
-
-        messageHandler(message) {
-            replyHandler($0, nil)
-        }
-    }
-
-}
-
-// MARK: - Fallback for macOS 10.15
-
-extension YoutubeOverlayUserScript: WKScriptMessageHandler {
-
-    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-        guard isMessageFromVerifiedOrigin(message) else {
-            return
-        }
-
-        processEncryptedMessage(message, from: userContentController)
-    }
-}
-
 extension YoutubeOverlayUserScript {
     public enum JSPixel: String {
         case overlay = "overlay"
@@ -253,12 +166,12 @@ extension YoutubeOverlayUserScript {
         }
     }
 
-    func handleSendJSPixel(_ message: UserScriptMessage, replyHandler: @escaping MessageReplyHandler) {
+    func handleSendJSPixel(_ messageBody: [String: Any], replyHandler: @escaping MessageReplyHandler) {
         defer {
             replyHandler(nil)
         }
 
-        guard let body = message.messageBody as? [String: Any],
+        guard let body = messageBody as? [String: Any],
               let pixelName = body["pixelName"] as? String,
               let knownPixel = JSPixel(rawValue: pixelName) else {
             assertionFailure("Not accepting an unknown pixel name")
