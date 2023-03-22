@@ -355,6 +355,16 @@ final class ZoomSubMenu: NSMenu {
 
         let actualSizeItem = (NSApplication.shared.mainMenuTyped.actualSizeMenuItem?.copy() as? NSMenuItem)!
         addItem(actualSizeItem)
+
+        addItem(.separator())
+
+        let globalZoomSettingItem = NSMenuItem(title: UserText.zoomPickerTitle, action: #selector(openAppearancePreferences), keyEquivalent: "")
+            .targetting(self)
+        addItem(globalZoomSettingItem)
+    }
+
+    @objc func openAppearancePreferences(_ sender: NSMenuItem) {
+        WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .appearance)
     }
 
 }
