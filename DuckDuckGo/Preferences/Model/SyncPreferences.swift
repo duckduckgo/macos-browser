@@ -150,13 +150,14 @@ extension SyncPreferences: ManagementDialogModelDelegate {
 
     func turnOnSync() {
         Task { @MainActor in
-            do {
-                let hostname = SCDynamicStoreCopyComputerName(nil, nil) as? String ?? ProcessInfo.processInfo.hostName
-                try await syncService.createAccount(deviceName: hostname, deviceType: "desktop")
-                presentDialog(for: .askToSyncAnotherDevice)
-            } catch {
-                managementDialogModel.errorMessage = String(describing: error)
-            }
+            presentDialog(for: .askToSyncAnotherDevice)
+            // TODO handle this
+//            do {
+//                let hostname = SCDynamicStoreCopyComputerName(nil, nil) as? String ?? ProcessInfo.processInfo.hostName
+//                try await syncService.createAccount(deviceName: hostname, deviceType: "desktop")
+//            } catch {
+//                managementDialogModel.errorMessage = String(describing: error)
+//            }
         }
     }
 
