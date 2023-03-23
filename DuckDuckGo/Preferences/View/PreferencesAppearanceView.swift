@@ -111,7 +111,7 @@ extension Preferences {
                             let button = NSPopUpButton()
                             button.setContentHuggingPriority(.defaultHigh, for: .horizontal)
 
-                            for value in ZoomValues.allCases {
+                            for value in DefaultZoomValues.allCases {
                                 let item = button.menu?.addItem(withTitle: value.toString(), action: nil, keyEquivalent: "")
                                 item?.representedObject = value.rawValue
                             }
@@ -120,24 +120,6 @@ extension Preferences {
                     }
                 }
             }
-        }
-    }
-
-    public enum ZoomValues: CGFloat, CaseIterable {
-        case percent50 = 0.5
-        case percent75 = 0.75
-        case percent85 = 0.85
-        case percent100 = 1.0
-        case percent115 = 1.15
-        case percent125 = 1.25
-        case percent150 = 1.50
-        case percent200 = 2.0
-        case percent250 = 2.5
-        case percent300 = 3.0
-
-        func toString() -> String {
-            let percentage = (self.rawValue * 100).rounded()
-            return String(format: "%.0f%%", percentage)
         }
     }
 }
