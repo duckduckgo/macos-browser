@@ -25,13 +25,7 @@ final class NetworkProtectionAgentManager {
     private static let resetDelay = 200
     static let current = NetworkProtectionAgentManager()
 
-    static var agentBundleID: CFString {
-#if DEBUG
-        "HKE973VLUW.com.duckduckgo.macos.browser.network-protection.notifications" as CFString
-#else
-        "HKE973VLUW.com.duckduckgo.macos.browser.network-protection.notifications.debug" as CFString
-#endif
-    }
+    static let agentBundleID = "HKE973VLUW.com.duckduckgo.macos.browser.network-protection.notifications" as CFString
 
 #if NETP_SYSTEM_EXTENSION
     func enable() {

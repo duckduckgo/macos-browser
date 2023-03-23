@@ -417,7 +417,7 @@ final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
             }
 
 #if NETP_SYSTEM_EXTENSION
-            try? await NetworkProtectionAgentManager.current.reset()
+            NetworkProtectionAgentManager.current.disable()
 #endif
             NetworkProtectionSelectedServerUserDefaultsStore().reset()
         }
