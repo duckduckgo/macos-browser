@@ -23,11 +23,7 @@ struct AppearancePreferencesPersistorMock: AppearancePreferencesPersistor {
     var showFullURL: Bool
     var showAutocompleteSuggestions: Bool
     var currentThemeName: String
-    var defaultPageZoom: CGFloat {
-        didSet {
-            print("here: \(defaultPageZoom)")
-        }
-    }
+    var defaultPageZoom: CGFloat 
 
     init(
         showFullURL: Bool = false,
