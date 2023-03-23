@@ -153,6 +153,34 @@ final class TabViewModelTests: XCTestCase {
         waitForExpectations(timeout: 5, handler: nil)
     }
 
+    // MARK: - Zoom
+
+    func testThatDefaultValueForTabsWebViewIsOne() {
+        UserDefaultsWrapper<Any>.clearAll()
+        let tabVM = TabViewModel(tab: Tab(), appearancePreferences: AppearancePreferences())
+
+        XCTAssertEqual(tabVM.tab.webView.zoomLevel, DefaultZoomValues.percent100.rawValue)
+    }
+
+    func testWhenAppearancePreferencesZoomLevelIsSetThenTabsWebViewZoomLevelIsUpdated() {
+        UserDefaultsWrapper<Any>.clearAll()
+        let tabVM = TabViewModel(tab: Tab())
+        let randomZoomLevel = DefaultZoomValues.allCases.randomElement()!.rawValue
+        AppearancePreferences.shared.defaultPageZoom = randomZoomLevel
+
+        XCTAssertEqual(tabVM.tab.webView.zoomLevel, randomZoomLevel)
+    }
+
+    func testWhenAppearancePreferencesZoomLevelIsSetAndANewTabIsOpenThenItsWebViewHasTheLatestValueOfZoomLevel() {
+        UserDefaultsWrapper<Any>.clearAll()
+        let randomZoomLevel = DefaultZoomValues.allCases.randomElement()!.rawValue
+        AppearancePreferences.shared.defaultPageZoom = randomZoomLevel
+
+        let tabVM = TabViewModel(tab: Tab(), appearancePreferences: AppearancePreferences())
+
+        XCTAssertEqual(tabVM.tab.webView.zoomLevel, randomZoomLevel)
+    }
+
 }
 
 extension TabViewModel {

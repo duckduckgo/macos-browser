@@ -22,6 +22,7 @@ protocol AppearancePreferencesPersistor {
     var showFullURL: Bool { get set }
     var showAutocompleteSuggestions: Bool { get set }
     var currentThemeName: String { get set }
+    var defaultPageZoom: CGFloat { get set }
 }
 
 struct AppearancePreferencesUserDefaultsPersistor: AppearancePreferencesPersistor {
@@ -33,6 +34,28 @@ struct AppearancePreferencesUserDefaultsPersistor: AppearancePreferencesPersisto
 
     @UserDefaultsWrapper(key: .currentThemeName, defaultValue: ThemeName.systemDefault.rawValue)
     var currentThemeName: String
+
+    @UserDefaultsWrapper(key: .defaultPageZoom, defaultValue: DefaultZoomValues.percent100.rawValue)
+    var defaultPageZoom: CGFloat
+}
+
+enum DefaultZoomValues: CGFloat, CaseIterable {
+    case percent50 = 0.5
+    case percent75 = 0.75
+    case percent85 = 0.85
+    case percent100 = 1.0
+    case percent115 = 1.15
+    case percent125 = 1.25
+    case percent150 = 1.50
+    case percent175 = 1.75
+    case percent200 = 2.0
+    case percent250 = 2.5
+    case percent300 = 3.0
+
+    func toString() -> String {
+        let percentage = (self.rawValue * 100).rounded()
+        return String(format: "%.0f%%", percentage)
+    }
 }
 
 enum ThemeName: String, Equatable, CaseIterable {
@@ -97,6 +120,12 @@ final class AppearancePreferences: ObservableObject {
         }
     }
 
+    @Published var defaultPageZoom: CGFloat {
+        didSet {
+            persistor.defaultPageZoom = defaultPageZoom
+        }
+    }
+
     func updateUserInterfaceStyle() {
         NSApp.appearance = currentThemeName.appearance
     }
@@ -106,6 +135,7 @@ final class AppearancePreferences: ObservableObject {
         currentThemeName = .init(rawValue: persistor.currentThemeName) ?? .systemDefault
         showFullURL = persistor.showFullURL
         showAutocompleteSuggestions = persistor.showAutocompleteSuggestions
+        defaultPageZoom =  persistor.defaultPageZoom
     }
 
     private var persistor: AppearancePreferencesPersistor
