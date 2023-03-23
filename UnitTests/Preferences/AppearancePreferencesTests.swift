@@ -23,13 +23,13 @@ struct AppearancePreferencesPersistorMock: AppearancePreferencesPersistor {
     var showFullURL: Bool
     var showAutocompleteSuggestions: Bool
     var currentThemeName: String
-    var defaultPageZoom: CGFloat 
+    var defaultPageZoom: CGFloat
 
     init(
         showFullURL: Bool = false,
         showAutocompleteSuggestions: Bool = true,
         currentThemeName: String = ThemeName.systemDefault.rawValue,
-        defaultPageZoom: CGFloat = 1.0
+        defaultPageZoom: CGFloat = DefaultZoomValues.percent100.rawValue
     ) {
         self.showFullURL = showFullURL
         self.showAutocompleteSuggestions = showAutocompleteSuggestions
