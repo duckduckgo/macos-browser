@@ -28,7 +28,7 @@ public protocol NetworkProtectionClient {
 }
 
 public enum NetworkProtectionClientError: Error, NetworkProtectionErrorConvertible {
-    case failedToFetchServerList
+    case failedToFetchServerList(Error)
     case failedToParseServerListResponse(Error)
     case failedToEncodeRegisterKeyRequest
     case failedToFetchRegisteredServers
@@ -36,7 +36,7 @@ public enum NetworkProtectionClientError: Error, NetworkProtectionErrorConvertib
 
     var networkProtectionError: NetworkProtectionError {
         switch self {
-        case .failedToFetchServerList: return .failedToFetchServerList
+        case .failedToFetchServerList(let error): return .failedToFetchServerList(error)
         case .failedToParseServerListResponse(let error): return .failedToParseServerListResponse(error)
         case .failedToEncodeRegisterKeyRequest: return .failedToEncodeRegisterKeyRequest
         case .failedToFetchRegisteredServers: return .failedToFetchRegisteredServers
@@ -101,7 +101,7 @@ public final class NetworkProtectionBackendClient: NetworkProtectionClient {
             let (data, _) = try await URLSession.shared.data(from: serversURL)
             downloadedData = data
         } catch {
-            return .failure(NetworkProtectionClientError.failedToFetchServerList)
+            return .failure(NetworkProtectionClientError.failedToFetchServerList(error))
         }
 
         do {

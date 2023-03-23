@@ -46,7 +46,7 @@ public enum NetworkProtectionError: LocalizedError {
     case couldNotGetInterfaceAddressRange
 
     // Client errors
-    case failedToFetchServerList
+    case failedToFetchServerList(Error)
     case failedToParseServerListResponse(Error)
     case failedToEncodeRegisterKeyRequest
     case failedToFetchRegisteredServers
