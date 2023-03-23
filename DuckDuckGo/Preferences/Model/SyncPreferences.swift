@@ -151,20 +151,24 @@ extension SyncPreferences: ManagementDialogModelDelegate {
     func turnOnSync() {
         Task { @MainActor in
             presentDialog(for: .askToSyncAnotherDevice)
-            // TODO handle this
-//            do {
-//                let hostname = SCDynamicStoreCopyComputerName(nil, nil) as? String ?? ProcessInfo.processInfo.hostName
-//                try await syncService.createAccount(deviceName: hostname, deviceType: "desktop")
-//            } catch {
-//                managementDialogModel.errorMessage = String(describing: error)
-//            }
+        }
+    }
+
+    func dontSyncAnotherDeviceNow() {
+        Task { @MainActor in
+            do {
+                let hostname = SCDynamicStoreCopyComputerName(nil, nil) as? String ?? ProcessInfo.processInfo.hostName
+                try await syncService.createAccount(deviceName: hostname, deviceType: "desktop")
+            } catch {
+                managementDialogModel.errorMessage = String(describing: error)
+            }
         }
     }
 
     func recoverDevice(using recoveryCode: String) {
         Task { @MainActor in
             do {
-                guard let recoveryKey = try? SyncCode.decode(recoveryCode.utf8data).recovery else {
+                guard let recoveryKey = try? SyncCode.decodeBase64String(recoveryCode).recovery else {
                     managementDialogModel.errorMessage = "Invalid recovery key"
                     return
                 }
