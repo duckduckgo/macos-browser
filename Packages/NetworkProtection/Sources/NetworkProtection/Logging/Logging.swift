@@ -32,6 +32,14 @@ extension OSLog {
     public static var networkProtectionBandwidthAnalysis: OSLog {
         Logging.networkProtectionBandwidthAnalysisLoggingEnabled ? Logging.networkProtectionBandwidthAnalysis : .disabled
     }
+
+    public static var networkProtectionConnectionTesterLog: OSLog {
+        Logging.networkProtectionConnectionTesterLoggingEnabled ? Logging.networkProtectionConnectionTesterLog : .disabled
+    }
+
+    public static var networkProtectionSleepLog: OSLog {
+        Logging.networkProtectionSleepLoggingEnabled ? Logging.networkProtectionSleepLog : .disabled
+    }
 }
 
 struct Logging {
@@ -46,4 +54,10 @@ struct Logging {
 
     fileprivate static let networkProtectionBandwidthAnalysisLoggingEnabled = true
     fileprivate static let networkProtectionBandwidthAnalysis: OSLog = OSLog(subsystem: subsystem, category: "Network Protection: Bandwidth Analysis")
+
+    fileprivate static let networkProtectionConnectionTesterLoggingEnabled = true
+    fileprivate static let networkProtectionConnectionTesterLog: OSLog = OSLog(subsystem: subsystem, category: "Network Protection: Connection Tester")
+
+    fileprivate static let networkProtectionSleepLoggingEnabled = true
+    fileprivate static let networkProtectionSleepLog: OSLog = OSLog(subsystem: subsystem, category: "Network Protection: Sleep and Wake")
 }

@@ -35,11 +35,32 @@ final class NetworkProtectionConnectionTester {
         case disconnected(failureCount: Int)
     }
 
+    enum TesterError: Error {
+        case couldNotFindInterface(named: String)
+    }
+
+    /// Provides a simple mechanism to synchronize an `isRunning` flag for the tester to know if it needs to interrupt its operation.
+    /// The reason why this is necessary is that the tester may be stopped while the connection tests are already executing, in a bit
+    /// of a race condition which could result in the tester returning results when it's already stopped.
+    ///
+    private actor TimerRunCoordinator {
+        private(set) var isRunning = false
+
+        func start() {
+            isRunning = true
+        }
+
+        func stop() {
+            isRunning = false
+        }
+    }
+
     static let connectionTestQueue = DispatchQueue(label: "com.duckduckgo.NetworkProtectionConnectionTester.connectionTestQueue")
     static let monitorQueue = DispatchQueue(label: "com.duckduckgo.NetworkProtectionConnectionTester.monitorQueue")
     static let endpoint = NWEndpoint.hostPort(host: .name("www.duckduckgo.com", nil), port: .https)
 
     private var timer: DispatchSourceTimer?
+    private let timerRunCoordinator = TimerRunCoordinator()
 
     // MARK: - Dispatch Queue
 
@@ -65,6 +86,10 @@ final class NetworkProtectionConnectionTester {
     ///
     private let connectionTimeout = 5
 
+    // MARK: - Logging
+
+    private let log: OSLog
+
     // MARK: - Test result handling
 
     private var failureCount = 0
@@ -72,74 +97,98 @@ final class NetworkProtectionConnectionTester {
 
     // MARK: - Init & deinit
 
-    init(timerQueue: DispatchQueue, resultHandler: @escaping (Result) -> Void) {
+    init(timerQueue: DispatchQueue, log: OSLog, resultHandler: @escaping (Result) -> Void) {
         self.timerQueue = timerQueue
+        self.log = log
         self.resultHandler = resultHandler
     }
 
     deinit {
-        stop()
+        Task {
+            await stop()
+        }
     }
 
     // MARK: - Starting & Stopping the tester
 
-    func start(tunnelIfName: String) {
-        let monitor = NWPathMonitor()
-        monitor.pathUpdateHandler = { [weak self] path in
-            guard let self = self else {
-                return
-            }
-
-            os_log("🔵 All interfaces: %{public}@", log: .networkProtection, type: .info, String(describing: path.availableInterfaces))
-
-            guard let tunnelInterface = path.availableInterfaces.first(where: { $0.name == tunnelIfName }) else {
-                os_log("🔵 Could not find VPN interface %{public}@", log: .networkProtection, type: .error, tunnelIfName)
-                self.monitor?.cancel()
-                self.monitor = nil
-                return
-            }
-
-            self.tunnelInterface = tunnelInterface
-            self.monitor?.cancel()
-            self.monitor = nil
-
-            os_log("🔵 Scheduling timer", log: .networkProtection, type: .info)
-            self.scheduleTimer()
+    func start(tunnelIfName: String) async throws {
+        guard await !timerRunCoordinator.isRunning else {
+            os_log("Will not start the connection tester as it's already running", log: log, type: .debug)
+            return
         }
 
-        os_log("🔵 Starting monitor", log: .networkProtection, type: .error)
-        monitor.start(queue: Self.monitorQueue)
-        self.monitor = monitor
+        os_log("🟢 Starting connection tester", log: log, type: .debug)
+        let tunnelInterface = try await networkInterface(forInterfaceNamed: tunnelIfName)
+        self.tunnelInterface = tunnelInterface
+
+        await scheduleTimer()
     }
 
-    func stop() {
-        stopScheduledTimer()
+    func stop() async {
+        os_log("🔴 Stopping connection tester", log: log, type: .debug)
+        await stopScheduledTimer()
     }
 
     /// Run the test right now and schedule the next one regularly.
     /// 
-    func testImmediately() {
-        stopScheduledTimer()
+    func testImmediately() async {
+        await stopScheduledTimer()
         testConnection()
-        scheduleTimer()
+        await scheduleTimer()
+    }
+
+    // MARK: - Obtaining the interface
+
+    private func networkInterface(forInterfaceNamed interfaceName: String) async throws -> NWInterface {
+        try await withCheckedThrowingContinuation { continuation in
+            let monitor = NWPathMonitor()
+
+            monitor.pathUpdateHandler = { path in
+                os_log("All interfaces: %{public}@", log: self.log, type: .debug, String(describing: path.availableInterfaces))
+
+                guard let tunnelInterface = path.availableInterfaces.first(where: { $0.name == interfaceName }) else {
+                    os_log("Could not find VPN interface %{public}@", log: self.log, type: .error, interfaceName)
+                    monitor.cancel()
+                    monitor.pathUpdateHandler = nil
+
+                    continuation.resume(throwing: TesterError.couldNotFindInterface(named: interfaceName))
+                    return
+                }
+
+                monitor.cancel()
+                monitor.pathUpdateHandler = nil
+
+                continuation.resume(returning: tunnelInterface)
+            }
+
+            monitor.start(queue: Self.monitorQueue)
+        }
     }
 
     // MARK: - Timer scheduling
 
-    private func scheduleTimer() {
-        stopScheduledTimer()
+    private func scheduleTimer() async {
+        await stopScheduledTimer()
 
         let timer = DispatchSource.makeTimerSource(queue: timerQueue)
         timer.schedule(deadline: .now() + self.intervalBetweenTests, repeating: self.intervalBetweenTests)
         timer.setEventHandler { [weak self] in
             self?.testConnection()
         }
+
+        timer.setCancelHandler { [weak self] in
+            self?.timer = nil
+        }
+
+        await timerRunCoordinator.start()
         timer.resume()
 
         self.timer = timer
     }
 
-    private func stopScheduledTimer() {
+    private func stopScheduledTimer() async {
+        await timerRunCoordinator.stop()
+
         if let timer = timer {
             if !timer.isCancelled {
                 timer.cancel()
@@ -153,11 +202,11 @@ final class NetworkProtectionConnectionTester {
 
     func testConnection() {
         guard let tunnelInterface = tunnelInterface else {
-            os_log("🔵 No interface to test!", log: .networkProtection, type: .error)
+            os_log("No interface to test!", log: log, type: .error)
             return
         }
 
-        os_log("🔵 Testing connection", log: .networkProtection, type: .info)
+        os_log("Testing connection...", log: log, type: .debug)
 
         let vpnParameters = NWParameters.tcp
         vpnParameters.requiredInterface = tunnelInterface
@@ -174,11 +223,18 @@ final class NetworkProtectionConnectionTester {
 
             let onlyVPNIsDown = !vpnIsConnected && localIsConnected
 
+            // After completing the conection tests we check if the tester is still supposed to be running
+            // to avoid giving results when it should not be running.
+            guard await timerRunCoordinator.isRunning else {
+                os_log("Tester skipped returning results as it was stopped while running the tests", log: log, type: .info)
+                return
+            }
+
             if onlyVPNIsDown {
-                os_log("🔵 👎", log: .networkProtection, type: .info)
+                os_log("👎", log: log, type: .debug)
                 handleDisconnected()
             } else {
-                os_log("🔵 👍", log: .networkProtection, type: .info)
+                os_log("👍", log: log, type: .debug)
                 handleConnected()
             }
         }

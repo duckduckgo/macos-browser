@@ -29,6 +29,7 @@ public protocol NetworkProtectionKeyStore {
 
     /// Sets the validity interval for keys
     ///
+
     func setValidityInterval(_ validityInterval: TimeInterval?)
 
     /// Updates the current `KeyPair` to have the specified expiration date

@@ -103,8 +103,12 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         keyStore.resetCurrentKeyPair()
     }
 
+    private var isKeyExpired: Bool {
+        keyStore.currentKeyPair().expirationDate <= Date()
+    }
+
     private func rekeyIfExpired() async {
-        guard self.keyStore.currentKeyPair().expirationDate <= Date() else {
+        guard !isKeyExpired else {
             return
         }
 
@@ -167,7 +171,8 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
     // MARK: - Connection tester
 
     private lazy var connectionTester: NetworkProtectionConnectionTester = {
-        NetworkProtectionConnectionTester(timerQueue: timerQueue) { [weak self] result in
+        NetworkProtectionConnectionTester(timerQueue: timerQueue, log: .networkProtectionConnectionTesterLog) { [weak self] result in
+
             guard let self = self else {
                 return
             }
@@ -319,22 +324,27 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
                 return
             }
 
-            self.connectionTester.stop()
+            Task {
+                await self.connectionTester.stop()
 
-            completionHandler()
+                completionHandler()
 
-            #if os(macOS)
-            // HACK: This is a filthy hack to work around Apple bug 32073323 (dup'd by us as 47526107).
-            // Remove it when they finally fix this upstream and the fix has been rolled out to
-            // sufficient quantities of users.
-            exit(0)
-            #endif
+#if os(macOS)
+                // HACK: This is a filthy hack to work around Apple bug 32073323 (dup'd by us as 47526107).
+                // Remove it when they finally fix this upstream and the fix has been rolled out to
+                // sufficient quantities of users.
+                exit(0)
+#endif
+            }
         }
     }
 
     /// Do not cancel, directly... call this method so that the adapter and tester are stopped too.
     private func stopTunnel(with stopError: Error) {
-        self.connectionTester.stop()
+        Task {
+            await self.connectionTester.stop()
+        }
+
         self.adapter.stop { error in
             if let error = error {
                 os_log("🔵 Error while stopping adapter: %{public}@", log: .networkProtection, type: .info, error.localizedDescription)
@@ -573,12 +583,19 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
     /// Called when the adapter reports that the tunnel was successfully started.
     ///
     private func handleAdapterStarted() async {
+        guard !isKeyExpired else {
+            await rekey()
+            return
+        }
+
         os_log("🔵 Tunnel interface is %{public}@", log: .networkProtection, type: .info, adapter.interfaceName ?? "unknown")
 
-        await rekeyIfExpired()
-
         if let interfaceName = adapter.interfaceName {
-            connectionTester.start(tunnelIfName: interfaceName)
+            do {
+                try await connectionTester.start(tunnelIfName: interfaceName)
+            } catch {
+                os_log("🔵 Error: the VPN connection tester could not be started: %{public}@", log: .networkProtection, type: .error, error.localizedDescription)
+            }
         } else {
             os_log("🔵 Error: the VPN connection tester could not be started since we could not retrieve the tunnel interface name", log: .networkProtection, type: .error)
         }
@@ -621,12 +638,19 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
     // MARK: - Computer sleeping
 
     override func sleep(completionHandler: @escaping () -> Void) {
-        connectionTester.stop()
+        os_log("Sleep", log: .networkProtectionSleepLog, type: .info)
+
+        Task {
+            await connectionTester.stop()
+            completionHandler()
+        }
     }
 
     override func wake() {
+        os_log("Wake up", log: .networkProtectionSleepLog, type: .info)
+
         Task {
-            await rekeyIfExpired()
+            await handleAdapterStarted()
         }
     }
 
@@ -700,7 +724,6 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
             domainEvent = .networkProtectionUnhandledError(function: function, line: line, error: error)
         }
 
-        os_log("🔴 Firing pixel: %{public}@", log: .networkProtection, type: .info, String(describing: domainEvent))
         Pixel.fire(domainEvent, includeAppVersionParameter: true)
     }
 }
