@@ -29,7 +29,7 @@ final class InternalUserDeciderStore: InternalUserStoring {
 
     init(fileStore: FileStore) {
         store = fileStore
-        isInternalUser = store.load(url: Self.fileURL) // TODO: Check dependent spark logic with this change
+        isInternalUser = store.load(url: Self.fileURL)
     }
 
     var isInternalUser: Bool {
