@@ -103,7 +103,7 @@ final class AppearancePreferencesTests: XCTestCase {
 
     func testWhenZoomLevelChangedInAppearancePreferencesThenThePersisterAndUserDefaultsZoomValuesAreUpdated() {
         UserDefaultsWrapper<Any>.clearAll()
-        let randomZoomLevel = CGFloat(Float.random(in: 0.5...3.0))
+        let randomZoomLevel = DefaultZoomValues.allCases.randomElement()!.rawValue
         let persister = AppearancePreferencesUserDefaultsPersistor()
         let model = AppearancePreferences(persistor: persister)
         model.defaultPageZoom = randomZoomLevel
