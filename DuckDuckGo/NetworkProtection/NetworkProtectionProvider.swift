@@ -279,6 +279,9 @@ final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
         let protocolConfiguration = NETunnelProviderProtocol()
         protocolConfiguration.serverAddress = "127.0.0.1" // Dummy address... the NetP service will take care of grabbing a real server
         protocolConfiguration.providerBundleIdentifier = NetworkProtectionBundle.extensionBundle().bundleIdentifier
+        protocolConfiguration.providerConfiguration = [
+            NetworkProtectionOptionKey.defaultPixelHeaders.rawValue: APIHeaders().defaultHeaders,
+        ]
         tunnelManager.protocolConfiguration = protocolConfiguration
     }
 

@@ -55,12 +55,8 @@ extension Pixel {
             newParams = nil
         }
 
-        let appVersion = AppVersion(bundle: NetworkProtectionBundle.mainAppBundle())
-
         Pixel.shared?.fire(pixelNamed: event.name,
-                           withHeaders: APIHeaders(appVersion: appVersion).defaultHeaders,
                            withAdditionalParameters: newParams,
-                           appVersion: appVersion.versionNumber,
                            allowedQueryReservedCharacters: allowedQueryReservedCharacters,
                            includeAppVersionParameter: includeAppVersionParameter,
                            onComplete: onComplete)
@@ -87,6 +83,8 @@ enum NetworkProtectionPixelEvent {
     case networkProtectionKeychainReadError(field: String, status: Int32)
     case networkProtectionKeychainWriteError(field: String, status: Int32)
     case networkProtectionKeychainDeleteError(status: Int32)
+
+    case networkProtectionRekeyCompleted
 
     case networkProtectionUnhandledError(function: String, line: Int, error: Error)
 
@@ -122,9 +120,6 @@ enum NetworkProtectionPixelEvent {
         case .networkProtectionServerListStoreFailedToDecodeServerList:
             return "m_mac_netp_storage_error_failed_to_decode_server_list"
 
-        case .networkProtectionServerListStoreFailedToDecodeServerList:
-            return "m_mac_netp_storage_error_failed_to_decode_server_list"
-
         case .networkProtectionServerListStoreFailedToWriteServerList:
             return "m_mac_netp_storage_error_server_list_file_system_write_failed"
 
@@ -142,6 +137,9 @@ enum NetworkProtectionPixelEvent {
 
         case .networkProtectionKeychainDeleteError:
             return "m_mac_netp_keychain_error_delete_failed"
+
+        case .networkProtectionRekeyCompleted:
+            return "m_mac_netp_rekey_completed"
 
         case .networkProtectionUnhandledError:
             return "m_mac_netp_unhandled_error"
@@ -191,7 +189,8 @@ enum NetworkProtectionPixelEvent {
              .networkProtectionClientFailedToEncodeRegisterKeyRequest,
              .networkProtectionClientFailedToParseRegisteredServersResponse,
              .networkProtectionServerListStoreFailedToEncodeServerList,
-             .networkProtectionServerListStoreFailedToDecodeServerList:
+             .networkProtectionServerListStoreFailedToDecodeServerList,
+             .networkProtectionRekeyCompleted:
 
             return nil
         }

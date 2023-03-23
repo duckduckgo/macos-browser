@@ -48,21 +48,6 @@ public final class Pixel {
         static let moreInfo = "X-DuckDuckGo-MoreInfo"
     }
 
-    private var defaultHeaders: [String: String] {
-        let acceptEncoding = "gzip;q=1.0, compress;q=0.5"
-        let languages = Locale.preferredLanguages.prefix(6)
-        let acceptLanguage = languages.enumerated().map { index, language in
-            let q = 1.0 - (Double(index) * 0.1)
-            return "\(language);q=\(q)"
-        }.joined(separator: ", ")
-
-        return [
-            Header.acceptEncoding: acceptEncoding,
-            Header.acceptLanguage: acceptLanguage,
-            Header.userAgent: userAgent
-        ]
-    }
-
     /// A closure typealias to request sending pixels through the network.
     ///
     public typealias FireRequest = (
@@ -78,12 +63,13 @@ public final class Pixel {
     static let duckDuckGoMorePrivacyInfo = URL(string: "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/atb/")!
 
     public private(set) static var shared: Pixel?
-    private let userAgent: String
+    private let appVersion: String
+    private let defaultHeaders: [String: String]
     private let log: OSLog
     private let fireRequest: FireRequest
 
-    public static func setUp(dryRun: Bool = false, userAgent: String, log: OSLog, fireRequest: @escaping FireRequest) {
-        shared = Pixel(dryRun: dryRun, userAgent: userAgent, log: log, fireRequest: fireRequest)
+    public static func setUp(dryRun: Bool = false, appVersion: String, defaultHeaders: [String: String], log: OSLog, fireRequest: @escaping FireRequest) {
+        shared = Pixel(dryRun: dryRun, appVersion: appVersion, defaultHeaders: defaultHeaders, log: log, fireRequest: fireRequest)
     }
 
     static func tearDown() {
@@ -92,17 +78,17 @@ public final class Pixel {
 
     private var dryRun: Bool
 
-    init(dryRun: Bool, userAgent: String, log: OSLog, fireRequest: @escaping FireRequest) {
+    init(dryRun: Bool, appVersion: String, defaultHeaders: [String: String], log: OSLog, fireRequest: @escaping FireRequest) {
         self.dryRun = dryRun
-        self.userAgent = userAgent
+        self.appVersion = appVersion
+        self.defaultHeaders = defaultHeaders
         self.log = log
         self.fireRequest = fireRequest
     }
 
     public func fire(pixelNamed pixelName: String,
-                     withHeaders headers: [String: String],
+                     withHeaders headers: [String: String]? = nil,
                      withAdditionalParameters params: [String: String]? = nil,
-                     appVersion: String,
                      allowedQueryReservedCharacters: CharacterSet? = nil,
                      includeAppVersionParameter: Bool = true,
                      onComplete: @escaping (Error?) -> Void = {_ in }) {
@@ -115,7 +101,7 @@ public final class Pixel {
             newParams[Parameters.test] = Values.test
         #endif
 
-        var headers = headers
+        var headers = headers ?? defaultHeaders
         headers[Header.moreInfo] = "See " + Self.duckDuckGoMorePrivacyInfo.absoluteString
 
         guard !dryRun else {
@@ -135,22 +121,11 @@ public final class Pixel {
                     allowedQueryReservedCharacters,
                     true,
                     onComplete)
-        /*
-        APIRequest.request(
-            url: url,
-            parameters: newParams,
-            allowedQueryReservedCharacters: allowedQueryReservedCharacters,
-            headers: headers,
-            callBackOnMainThread: true
-        ) { (_, error) in
-            onComplete(error)
-        }*/
     }
 
     public static func fire(_ event: Pixel.Event,
                             withHeaders headers: [String: String],
                             withAdditionalParameters parameters: [String: String]? = nil,
-                            appVersion: String,
                             allowedQueryReservedCharacters: CharacterSet? = nil,
                             includeAppVersionParameter: Bool = true,
                             onComplete: @escaping (Error?) -> Void = {_ in }) {
@@ -169,7 +144,6 @@ public final class Pixel {
         Self.shared?.fire(pixelNamed: event.name,
                           withHeaders: headers,
                           withAdditionalParameters: newParams,
-                          appVersion: appVersion,
                           allowedQueryReservedCharacters: allowedQueryReservedCharacters,
                           includeAppVersionParameter: includeAppVersionParameter,
                           onComplete: onComplete)

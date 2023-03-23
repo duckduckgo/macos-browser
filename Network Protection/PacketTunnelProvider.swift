@@ -117,6 +117,8 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
 
     private func rekey() async {
         os_log("Rekeying...", log: .networkProtectionKeyManagement, type: .info)
+        Pixel.fire(.networkProtectionRekeyCompleted, includeAppVersionParameter: true)
+
         self.resetRegistrationKey()
 
         do {
@@ -219,7 +221,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         #endif
     }
 
-    private func setupPixels(userAgent: String, baseURL: String) {
+    private func setupPixels(defaultHeaders: [String: String]) {
         let dryRun: Bool
 #if DEBUG
         dryRun = true
@@ -227,9 +229,10 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         dryRun = false
 #endif
 
-        Pixel.setUp(dryRun: dryRun, userAgent: userAgent, log: .networkProtection) { (pixelName: String, headers: [String: String], parameters: [String: String], allowedQueryReservedCharacters: CharacterSet?, callBackOnMainThread: Bool, onComplete: @escaping (Error?) -> Void) in
+        Pixel.setUp(dryRun: dryRun, appVersion: AppVersion.shared.versionNumber, defaultHeaders: defaultHeaders, log: .networkProtectionPixel) { (pixelName: String, headers: [String: String], parameters: [String: String], allowedQueryReservedCharacters: CharacterSet?, callBackOnMainThread: Bool, onComplete: @escaping (Error?) -> Void) in
 
             let url = URL.pixelUrl(forPixelNamed: pixelName)
+
             APIRequest.request(
                 url: url,
                 parameters: parameters,
@@ -246,27 +249,65 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         protocolConfiguration as? NETunnelProviderProtocol
     }
 
+    private func load(options: [String: NSObject]?) {
+        guard let options = options else {
+            os_log("🔵 Tunnel options are not set", log: .networkProtection)
+            assertionFailure("Tunnel options are not set")
+            return
+        }
+
+        loadVendorOptions(from: options)
+        loadKeyValidity(from: options)
+        loadSelectedServer(from: options)
+    }
+
+    private func loadVendorOptions(from options: [String: AnyObject]) {
+        guard let vendorOptions = options["VendorData"] as? [String: AnyObject] else {
+            os_log("🔵 VendorData is not set", log: .networkProtection)
+            assertionFailure("VendorData is not set")
+            return
+        }
+
+        loadDefaultPixelHeaders(from: vendorOptions)
+    }
+
+    private func loadDefaultPixelHeaders(from options: [String: AnyObject]) {
+        guard let defaultPixelHeaders = options[NetworkProtectionOptionKey.defaultPixelHeaders.rawValue] as? [String: String] else {
+
+            os_log("🔵 Pixel options are not set", log: .networkProtection)
+            assertionFailure("Default pixel headers are not set")
+            return
+        }
+
+        setupPixels(defaultHeaders: defaultPixelHeaders)
+    }
+
+    private func loadKeyValidity(from options: [String: AnyObject]) {
+        guard let keyValidityString = options["keyValidity"] as? String,
+           let keyValidity = TimeInterval(keyValidityString) else {
+            return
+        }
+
+        setKeyValidity(keyValidity)
+    }
+
+    private func loadSelectedServer(from options: [String: AnyObject]) {
+        guard let serverName = options["selectedServer"] as? String else {
+            return
+        }
+
+        selectedServerStore.selectedServer = .endpoint(serverName)
+    }
+
     override func startTunnel(options: [String: NSObject]?, completionHandler: @escaping (Error?) -> Void) {
         let activationAttemptId = options?["activationAttemptId"] as? String
 
-        if let userAgent = options?["userAgent"] as? String,
-           let pixelBaseURL = options?["pixelBaseURL"] as? String {
-
-            setupPixels(userAgent: userAgent, baseURL: pixelBaseURL)
-        }
+        os_log("🔵 Will load options\n%{public}@", log: .networkProtection, type: .info, String(describing: options))
+        load(options: options)
+        os_log("🔵 Done!", log: .networkProtection, type: .info)
 
         tunnelHealth.isHavingConnectivityIssues = false
         controllerErrorStore.lastErrorMessage = nil
-
-        if let serverName = options?["selectedServer"] as? String {
-            selectedServerStore.selectedServer = .endpoint(serverName)
-        }
-
-        if let keyValidityString = options?["keyValidity"] as? String,
-           let keyValidity = TimeInterval(keyValidityString) {
-
-            setKeyValidity(keyValidity)
-        }
 
         os_log("🔵 Starting tunnel from the %{public}@", log: .networkProtection, type: .info, activationAttemptId == nil ? "OS directly, rather than the app" : "app")
 

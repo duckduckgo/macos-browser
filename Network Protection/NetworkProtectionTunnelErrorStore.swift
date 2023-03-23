@@ -49,7 +49,6 @@ final class NetworkProtectionTunnelErrorStore {
     // MARK: - Posting Notifications
 
     private func postLastErrorMessageChangedNotification() {
-        os_log("🔴 Notification posted: %{public}@", log: .networkProtection, type: .info, String(describing: lastErrorMessage))
         distributedNotificationCenter.postNotificationName(.NetPTunnelErrorStatusChanged, object: nil, userInfo: nil, options: [.deliverImmediately, .postToAllSessions])
     }
 }

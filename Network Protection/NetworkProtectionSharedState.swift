@@ -35,3 +35,7 @@ enum NetworkProtectionAppRequest: UInt8 {
 
 let networkProtectionScheme = "networkprotection"
 let networkProtectionShowStatusURL = URL(string: "networkprotection://show-status")!
+
+enum NetworkProtectionOptionKey: String {
+    case defaultPixelHeaders = "defaultPixelHeaders"
+}
