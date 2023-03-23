@@ -46,27 +46,27 @@ final class AppearancePreferencesTests: XCTestCase {
                 showFullURL: false,
                 showAutocompleteSuggestions: true,
                 currentThemeName: ThemeName.systemDefault.rawValue,
-                defaultPageZoom: 1.0
+                defaultPageZoom: DefaultZoomValues.percent100.rawValue
             )
         )
 
         XCTAssertEqual(model.showFullURL, false)
         XCTAssertEqual(model.showAutocompleteSuggestions, true)
         XCTAssertEqual(model.currentThemeName, ThemeName.systemDefault)
-        XCTAssertEqual(model.defaultPageZoom, CGFloat(1.0))
+        XCTAssertEqual(model.defaultPageZoom, DefaultZoomValues.percent100.rawValue)
 
         model = AppearancePreferences(
             persistor: AppearancePreferencesPersistorMock(
                 showFullURL: true,
                 showAutocompleteSuggestions: false,
                 currentThemeName: ThemeName.light.rawValue,
-                defaultPageZoom: 0.5
+                defaultPageZoom: DefaultZoomValues.percent50.rawValue
             )
         )
         XCTAssertEqual(model.showFullURL, true)
         XCTAssertEqual(model.showAutocompleteSuggestions, false)
         XCTAssertEqual(model.currentThemeName, ThemeName.light)
-        XCTAssertEqual(model.defaultPageZoom, CGFloat(0.5))
+        XCTAssertEqual(model.defaultPageZoom, DefaultZoomValues.percent50.rawValue)
     }
 
     func testWhenInitializedWithGarbageThenThemeIsSetToSystemDefault() throws {
@@ -109,7 +109,7 @@ final class AppearancePreferencesTests: XCTestCase {
         model.defaultPageZoom = randomZoomLevel
 
         XCTAssertEqual(persister.defaultPageZoom, randomZoomLevel)
-        let savedZoomValue = UserDefaultsWrapper(key: .defaultPageZoom, defaultValue: 1.0).wrappedValue
+        let savedZoomValue = UserDefaultsWrapper(key: .defaultPageZoom, defaultValue: DefaultZoomValues.percent100.rawValue).wrappedValue
         XCTAssertEqual(savedZoomValue, randomZoomLevel)
     }
 }

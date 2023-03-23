@@ -35,8 +35,27 @@ struct AppearancePreferencesUserDefaultsPersistor: AppearancePreferencesPersisto
     @UserDefaultsWrapper(key: .currentThemeName, defaultValue: ThemeName.systemDefault.rawValue)
     var currentThemeName: String
 
-    @UserDefaultsWrapper(key: .defaultPageZoom, defaultValue: 1.0)
+    @UserDefaultsWrapper(key: .defaultPageZoom, defaultValue: DefaultZoomValues.percent100.rawValue)
     var defaultPageZoom: CGFloat
+}
+
+enum DefaultZoomValues: CGFloat, CaseIterable {
+    case percent50 = 0.5
+    case percent75 = 0.75
+    case percent85 = 0.85
+    case percent100 = 1.0
+    case percent115 = 1.15
+    case percent125 = 1.25
+    case percent150 = 1.50
+    case percent175 = 1.75
+    case percent200 = 2.0
+    case percent250 = 2.5
+    case percent300 = 3.0
+
+    func toString() -> String {
+        let percentage = (self.rawValue * 100).rounded()
+        return String(format: "%.0f%%", percentage)
+    }
 }
 
 enum ThemeName: String, Equatable, CaseIterable {
