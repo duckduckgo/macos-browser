@@ -166,7 +166,6 @@ final class TabViewModelTests: XCTestCase {
         UserDefaultsWrapper<Any>.clearAll()
         let tabVM = TabViewModel(tab: Tab())
         let randomZoomLevel = DefaultZoomValues.allCases.randomElement()!.rawValue
-
         AppearancePreferences.shared.defaultPageZoom = randomZoomLevel
 
         XCTAssertEqual(tabVM.tab.webView.zoomLevel, randomZoomLevel)

@@ -25,7 +25,6 @@ struct AppearancePreferencesPersistorMock: AppearancePreferencesPersistor {
     var currentThemeName: String
     var defaultPageZoom: CGFloat
 
-
     init(
         showFullURL: Bool = false,
         showAutocompleteSuggestions: Bool = true,
