@@ -358,7 +358,7 @@ final class ZoomSubMenu: NSMenu {
 
         addItem(.separator())
 
-        let globalZoomSettingItem = NSMenuItem(title: UserText.zoomPickerTitle, action: #selector(openAppearancePreferences), keyEquivalent: "")
+        let globalZoomSettingItem = NSMenuItem(title: UserText.defaultZoomPageMoreOptionsItem, action: #selector(openAppearancePreferences), keyEquivalent: "")
             .targetting(self)
         addItem(globalZoomSettingItem)
     }
