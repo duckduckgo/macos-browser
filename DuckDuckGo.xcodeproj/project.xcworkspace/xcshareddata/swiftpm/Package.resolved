@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "graeme/feature-flagging-with-autofill-subfeatures",
-        "revision" : "890e4803d8c665f67eb0cba354f21cdf67a400e4"
+        "branch" : "graeme/support-internal-config-feature-state",
+        "revision" : "458d8f025dd32e69b05a6ca585d0e51b14528f87"
       }
     },
     {
