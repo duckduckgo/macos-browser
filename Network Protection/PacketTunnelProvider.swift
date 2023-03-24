@@ -117,7 +117,9 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
 
     private func rekey() async {
         os_log("Rekeying...", log: .networkProtectionKeyManagement, type: .info)
-        Pixel.fire(.networkProtectionRekeyCompleted, includeAppVersionParameter: true)
+
+        Pixel.fire(.networkProtectionActiveUser, frequency: .dailyOnly, includeAppVersionParameter: true)
+        Pixel.fire(.networkProtectionRekeyCompleted, frequency: .dailyAndContinuous, includeAppVersionParameter: true)
 
         self.resetRegistrationKey()
 
@@ -630,6 +632,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         }
 
         os_log("🔵 Tunnel interface is %{public}@", log: .networkProtection, type: .info, adapter.interfaceName ?? "unknown")
+        Pixel.fire(.networkProtectionActiveUser, frequency: .dailyOnly, includeAppVersionParameter: true)
 
         if let interfaceName = adapter.interfaceName {
             do {
@@ -722,14 +725,14 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         case .couldNotGetInterfaceAddressRange:
             domainEvent = .networkProtectionTunnelConfigurationCouldNotGetInterfaceAddressRange
 
-        case .failedToFetchServerList:
-            return
+        case .failedToFetchServerList(let eventError):
+            domainEvent = .networkProtectionClientFailedToFetchServerList(error: eventError)
         case .failedToParseServerListResponse:
             domainEvent = .networkProtectionClientFailedToParseServerListResponse
         case .failedToEncodeRegisterKeyRequest:
             domainEvent = .networkProtectionClientFailedToEncodeRegisterKeyRequest
-        case .failedToFetchRegisteredServers:
-            return
+        case .failedToFetchRegisteredServers(let eventError):
+            domainEvent = .networkProtectionClientFailedToFetchRegisteredServers(error: eventError)
         case .failedToParseRegisteredServersResponse:
             domainEvent = .networkProtectionClientFailedToParseRegisteredServersResponse
         case .serverListInconsistency:
@@ -765,7 +768,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
             domainEvent = .networkProtectionUnhandledError(function: function, line: line, error: error)
         }
 
-        Pixel.fire(domainEvent, includeAppVersionParameter: true)
+        Pixel.fire(domainEvent, frequency: .dailyAndContinuous, includeAppVersionParameter: true)
     }
 }
 

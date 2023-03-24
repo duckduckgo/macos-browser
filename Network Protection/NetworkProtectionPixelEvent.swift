@@ -39,6 +39,7 @@ extension Pixel {
 
 extension Pixel {
     static func fire(_ event: NetworkProtectionPixelEvent,
+                     frequency: PixelFrequency,
                      withAdditionalParameters parameters: [String: String]? = nil,
                      allowedQueryReservedCharacters: CharacterSet? = nil,
                      includeAppVersionParameter: Bool = true,
@@ -56,6 +57,7 @@ extension Pixel {
         }
 
         Pixel.shared?.fire(pixelNamed: event.name,
+                           frequency: frequency,
                            withAdditionalParameters: newParams,
                            allowedQueryReservedCharacters: allowedQueryReservedCharacters,
                            includeAppVersionParameter: includeAppVersionParameter,
@@ -64,14 +66,18 @@ extension Pixel {
 }
 
 enum NetworkProtectionPixelEvent {
+    case networkProtectionActiveUser
+
     case networkProtectionTunnelConfigurationNoServerRegistrationInfo
     case networkProtectionTunnelConfigurationCouldNotSelectClosestServer
     case networkProtectionTunnelConfigurationCouldNotGetPeerPublicKey
     case networkProtectionTunnelConfigurationCouldNotGetPeerHostName
     case networkProtectionTunnelConfigurationCouldNotGetInterfaceAddressRange
 
+    case networkProtectionClientFailedToFetchServerList(error: Error)
     case networkProtectionClientFailedToParseServerListResponse
     case networkProtectionClientFailedToEncodeRegisterKeyRequest
+    case networkProtectionClientFailedToFetchRegisteredServers(error: Error)
     case networkProtectionClientFailedToParseRegisteredServersResponse
 
     case networkProtectionServerListStoreFailedToEncodeServerList
@@ -90,6 +96,9 @@ enum NetworkProtectionPixelEvent {
 
     var name: String {
         switch self {
+        case .networkProtectionActiveUser:
+            return "m_mac_netp_daily_active"
+
         case .networkProtectionTunnelConfigurationNoServerRegistrationInfo:
             return "m_mac_netp_tunnel_config_error_no_server_registration_info"
 
@@ -105,11 +114,17 @@ enum NetworkProtectionPixelEvent {
         case .networkProtectionTunnelConfigurationCouldNotGetInterfaceAddressRange:
             return "m_mac_netp_tunnel_config_error_could_not_get_interface_address_range"
 
+        case .networkProtectionClientFailedToFetchServerList:
+            return "m_mac_netp_backend_api_error_failed_to_fetch_server_list"
+
         case .networkProtectionClientFailedToParseServerListResponse:
             return "m_mac_netp_backend_api_error_parsing_server_list_response_failed"
 
         case .networkProtectionClientFailedToEncodeRegisterKeyRequest:
             return "m_mac_netp_backend_api_error_encoding_register_request_body_failed"
+
+        case .networkProtectionClientFailedToFetchRegisteredServers:
+            return "m_mac_netp_backend_api_error_failed_to_fetch_registered_servers"
 
         case .networkProtectionClientFailedToParseRegisteredServersResponse:
             return "m_mac_netp_backend_api_error_parsing_device_registration_response_failed"
@@ -174,6 +189,12 @@ enum NetworkProtectionPixelEvent {
         case .networkProtectionServerListStoreFailedToReadServerList(let error):
             return error.pixelParameters
 
+        case .networkProtectionClientFailedToFetchServerList(let error):
+            return error.pixelParameters
+
+        case .networkProtectionClientFailedToFetchRegisteredServers(let error):
+            return error.pixelParameters
+
         case .networkProtectionUnhandledError(let function, let line, let error):
             var parameters = error.pixelParameters
             parameters["function"] = function
@@ -190,7 +211,8 @@ enum NetworkProtectionPixelEvent {
              .networkProtectionClientFailedToParseRegisteredServersResponse,
              .networkProtectionServerListStoreFailedToEncodeServerList,
              .networkProtectionServerListStoreFailedToDecodeServerList,
-             .networkProtectionRekeyCompleted:
+             .networkProtectionRekeyCompleted,
+             .networkProtectionActiveUser:
 
             return nil
         }

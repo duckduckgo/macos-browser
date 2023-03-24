@@ -49,7 +49,7 @@ public enum NetworkProtectionError: LocalizedError {
     case failedToFetchServerList(Error)
     case failedToParseServerListResponse(Error)
     case failedToEncodeRegisterKeyRequest
-    case failedToFetchRegisteredServers
+    case failedToFetchRegisteredServers(Error)
     case failedToParseRegisteredServersResponse(Error)
 
     // Server list store errors
