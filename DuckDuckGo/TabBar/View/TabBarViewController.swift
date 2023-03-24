@@ -628,6 +628,13 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
         updateTabMode()
         updateEmptyTabArea()
         hideTabPreview()
+        if tabMode == .overflow {
+            collectionView.scrollToEnd { _ in
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                    self.collectionView.scrollToEnd()
+                }
+            }
+        }
     }
 
     func tabCollectionViewModel(_ tabCollectionViewModel: TabCollectionViewModel,
