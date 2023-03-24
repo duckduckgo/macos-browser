@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import AppKit
 import Combine
 import NetworkExtension
 import NetworkProtection
@@ -59,6 +60,7 @@ final class DefaultNetworkProtectionStatusReporter: NetworkProtectionStatusRepor
     // MARK: - Notifications
 
     private let notificationCenter: NotificationCenter
+    private let workspaceNotificationCenter: NotificationCenter
     private let distributedNotificationCenter: DistributedNotificationCenter
 
     // MARK: - Publishers
@@ -76,10 +78,12 @@ final class DefaultNetworkProtectionStatusReporter: NetworkProtectionStatusRepor
     // MARK: - Init & deinit
 
     init(notificationCenter: NotificationCenter = .default,
+         workspaceNotificationCenter: NotificationCenter = NSWorkspace.shared.notificationCenter,
          distributedNotificationCenter: DistributedNotificationCenter = .forType(.networkProtection),
          logger: NetworkProtectionLogger = DefaultNetworkProtectionLogger()) {
 
         self.notificationCenter = notificationCenter
+        self.workspaceNotificationCenter = workspaceNotificationCenter
         self.distributedNotificationCenter = distributedNotificationCenter
         self.logger = logger
 
@@ -95,6 +99,10 @@ final class DefaultNetworkProtectionStatusReporter: NetworkProtectionStatusRepor
 
         notificationCenter.addObserver(forName: .NEVPNStatusDidChange, object: nil, queue: nil) { [weak self] notification in
             self?.handleStatusChangeNotification(notification)
+        }
+
+        workspaceNotificationCenter.addObserver(forName: NSWorkspace.didWakeNotification, object: nil, queue: nil) { [weak self] notification in
+            self?.handleDidWake(notification)
         }
 
         distributedNotificationCenter.addObserver(forName: .NetPTunnelErrorStatusChanged, object: nil, queue: nil) { [weak self] _ in
@@ -176,6 +184,22 @@ final class DefaultNetworkProtectionStatusReporter: NetworkProtectionStatusRepor
 
         try updateTunnelErrorMessage(session: session)
         try updateConnectivityIssues(session: session)
+    }
+
+    // MARK: - Waking from Sleep
+
+    private func handleDidWake(_ notification: Notification) {
+        Task {
+            do {
+                guard let session = try await DefaultNetworkProtectionProvider.activeSession() else {
+                    return
+                }
+
+                try handleStatusChange(in: session)
+            } catch {
+                logger.log(error)
+            }
+        }
     }
 
     // MARK: - Updating controller errors
