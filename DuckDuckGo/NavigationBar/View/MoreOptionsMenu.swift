@@ -368,11 +368,6 @@ final class ZoomSubMenu: NSMenu {
             .targetting(target)
         addItem(globalZoomSettingItem)
     }
-
-    @objc func openAppearancePreferences(_ sender: NSMenuItem) {
-        WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .appearance)
-    }
-
 }
 
 final class BookmarksSubMenu: NSMenu {
