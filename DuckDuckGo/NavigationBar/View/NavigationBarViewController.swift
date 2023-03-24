@@ -699,6 +699,14 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
         WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.printWebView(self)
     }
 
+    func optionsButtonMenuRequestedPreferences(_ menu: NSMenu) {
+        WindowControllersManager.shared.showPreferencesTab()
+    }
+
+    func optionsButtonMenuRequestedAppearancePreferences(_ menu: NSMenu) {
+        WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .appearance)
+    }
+
 }
 
 extension NavigationBarViewController: NSPopoverDelegate {
