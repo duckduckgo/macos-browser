@@ -11456,6 +11456,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7B13966029AA69F200865FA9 /* DuckDuckGoNetP.xcconfig */;
 			buildSettings = {
+				MARKETING_VERSION = 1.0.4;
 			};
 			name = Debug;
 		};
@@ -11463,6 +11464,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7B13966029AA69F200865FA9 /* DuckDuckGoNetP.xcconfig */;
 			buildSettings = {
+				MARKETING_VERSION = 1.0.4;
 			};
 			name = CI;
 		};
@@ -11470,6 +11472,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7B13966029AA69F200865FA9 /* DuckDuckGoNetP.xcconfig */;
 			buildSettings = {
+				MARKETING_VERSION = 1.0.4;
 			};
 			name = Release;
 		};
@@ -11477,6 +11480,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7B13966029AA69F200865FA9 /* DuckDuckGoNetP.xcconfig */;
 			buildSettings = {
+				MARKETING_VERSION = 1.0.4;
 			};
 			name = Review;
 		};
@@ -11573,6 +11577,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7B13966129AA6A3400865FA9 /* DuckDuckGoNetPAppStore.xcconfig */;
 			buildSettings = {
+				MARKETING_VERSION = 1.0.4;
 			};
 			name = Debug;
 		};
@@ -11580,6 +11585,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7B13966129AA6A3400865FA9 /* DuckDuckGoNetPAppStore.xcconfig */;
 			buildSettings = {
+				MARKETING_VERSION = 1.0.4;
 			};
 			name = CI;
 		};
@@ -11587,6 +11593,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7B13966129AA6A3400865FA9 /* DuckDuckGoNetPAppStore.xcconfig */;
 			buildSettings = {
+				MARKETING_VERSION = 1.0.4;
 			};
 			name = Release;
 		};
@@ -11594,6 +11601,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7B13966129AA6A3400865FA9 /* DuckDuckGoNetPAppStore.xcconfig */;
 			buildSettings = {
+				MARKETING_VERSION = 1.0.4;
 			};
 			name = Review;
 		};
