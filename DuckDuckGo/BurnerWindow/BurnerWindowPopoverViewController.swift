@@ -1,7 +1,7 @@
 //
-//  NSRectExtension.swift
+//  BurnerWindowPopoverViewController.swift
 //
-//  Copyright © 2021 DuckDuckGo. All rights reserved.
+//  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -18,11 +18,18 @@
 
 import Foundation
 
-extension NSRect {
+protocol BurnerWindowPopoverViewControllerDelegate: AnyObject {
 
-    // Apply an offset so that we don't get caught by the "Line of Death" https://textslashplain.com/2017/01/14/the-line-of-death/
-    func insetFromLineOfDeath() -> NSRect {
-        return insetBy(dx: 0, dy: -15)
+    func burnerWindowPopoverViewControllerDidConfirm(_ burnerWindowPopoverViewController: BurnerWindowPopoverViewController)
+
+}
+
+final class BurnerWindowPopoverViewController: NSViewController {
+
+    weak var delegate: BurnerWindowPopoverViewControllerDelegate?
+
+    @IBAction func closeAndClearButtonAction(_ sender: NSButton) {
+        delegate?.burnerWindowPopoverViewControllerDidConfirm(self)
     }
 
 }

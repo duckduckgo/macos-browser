@@ -55,6 +55,9 @@ final class TabBarViewController: NSViewController {
     private var selectionIndexCancellable: AnyCancellable?
     private var cancellables = Set<AnyCancellable>()
 
+    @IBOutlet weak var burnerWindowButton: MouseOverButton!
+    var burnerWindowPopover: BurnerWindowPopover?
+
     @IBOutlet weak var shadowView: TabShadowView!
 
     @IBOutlet weak var rightSideStackView: NSStackView!
@@ -97,6 +100,7 @@ final class TabBarViewController: NSViewController {
         setupPinnedTabsView()
         subscribeToTabModeChanges()
         setupAddTabButton()
+        setupBurnerWindowButton()
     }
 
     override func viewWillAppear() {
@@ -133,6 +137,15 @@ final class TabBarViewController: NSViewController {
         tabCollectionViewModel.appendNewTab(with: .homePage)
     }
 
+    @IBAction func burnerWindowAction(_ sender: NSButton) {
+        if !(burnerWindowPopover?.isShown ?? false) {
+            burnerWindowPopover = BurnerWindowPopover()
+            burnerWindowPopover?.showBelow(sender)
+            burnerWindowPopover?.originatingWindow = view.window
+            burnerWindowPopover?.delegate = self
+        }
+    }
+
     @IBAction func rightScrollButtonAction(_ sender: NSButton) {
         collectionView.scrollToEnd()
     }
@@ -154,6 +167,11 @@ final class TabBarViewController: NSViewController {
         }
         fireButton.toolTip = UserText.clearBrowsingHistoryTooltip
         fireButton.animationNames = MouseOverAnimationButton.AnimationNames(aqua: "flame-mouse-over", dark: "dark-flame-mouse-over")
+    }
+
+    private func setupBurnerWindowButton() {
+        burnerWindowButton.isHidden = !tabCollectionViewModel.isDisposable
+        burnerWindowButton.toolTip = UserText.burnerWindowButtonTooltip
     }
 
     private func setupPinnedTabsView() {
@@ -1124,6 +1142,14 @@ extension TabBarViewController: TabBarViewItemDelegate {
         }
         return .init(hasItemsToTheLeft: indexPath.item > 0,
                      hasItemsToTheRight: indexPath.item + 1 < tabCollectionViewModel.tabCollection.tabs.count)
+    }
+
+}
+
+extension TabBarViewController: NSPopoverDelegate {
+
+    func popoverDidClose(_ notification: Notification) {
+        self.burnerWindowPopover = nil
     }
 
 }
