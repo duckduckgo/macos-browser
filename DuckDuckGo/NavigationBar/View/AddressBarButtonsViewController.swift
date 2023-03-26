@@ -136,7 +136,6 @@ final class AddressBarButtonsViewController: NSViewController {
     @Published private(set) var buttonsWidth: CGFloat = 0
 
     private var tabCollectionViewModel: TabCollectionViewModel
-    private let isDisposable: Bool
 
     private var bookmarkManager: BookmarkManager = LocalBookmarkManager.shared
     var controllerMode: AddressBarViewController.Mode? {
@@ -179,10 +178,8 @@ final class AddressBarButtonsViewController: NSViewController {
     }
 
     init?(coder: NSCoder,
-          tabCollectionViewModel: TabCollectionViewModel,
-          isDisposable: Bool) {
+          tabCollectionViewModel: TabCollectionViewModel) {
         self.tabCollectionViewModel = tabCollectionViewModel
-        self.isDisposable = isDisposable
 
         super.init(coder: coder)
     }
@@ -199,7 +196,6 @@ final class AddressBarButtonsViewController: NSViewController {
         updateBookmarkButtonVisibility()
 
         privacyEntryPointButton.toolTip = UserText.privacyDashboardTooltip
-        updateAppearance()
     }
 
     override func viewWillAppear() {
@@ -276,12 +272,6 @@ final class AddressBarButtonsViewController: NSViewController {
         let showBookmarkButton = clearButton.isHidden && !hasEmptyAddressBar && (isMouseOverNavigationBar || bookmarkPopover?.isShown == true)
 
         bookmarkButton.isHidden = !showBookmarkButton
-    }
-
-    private func updateAppearance() {
-        if isDisposable {
-            view.appearance = NSAppearance(named: .darkAqua)
-        }
     }
 
     func openBookmarkPopover(setFavorite: Bool, accessPoint: Pixel.Event.AccessPoint) {

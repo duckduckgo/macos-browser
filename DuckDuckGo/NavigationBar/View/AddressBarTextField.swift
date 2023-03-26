@@ -35,7 +35,6 @@ final class AddressBarTextField: NSTextField {
     var tabCollectionViewModel: TabCollectionViewModel! {
         didSet {
             subscribeToSelectedTabViewModel()
-            updateAppearance()
         }
     }
 
@@ -151,12 +150,6 @@ final class AddressBarTextField: NSTextField {
         }
 
         selectedTabViewModel.lastAddressBarTextFieldValue = value
-    }
-
-    private func updateAppearance() {
-        if isDisposable {
-            appearance = NSAppearance(named: .darkAqua)
-        }
     }
 
     private func restoreValueIfPossible() {
