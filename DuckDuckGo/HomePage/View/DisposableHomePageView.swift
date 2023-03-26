@@ -25,7 +25,7 @@ extension HomePage.Views {
 
         var body: some View {
             ZStack {
-                LinearGradient(gradient: Gradient(colors: [Color.white, Color(hex: "FFA235").opacity(0.6)]), startPoint: .top, endPoint: .bottom)
+                LinearGradient(gradient: Gradient(colors: [Color.white, Color(hex: "FFA235").opacity(0.3)]), startPoint: .top, endPoint: .bottom)
                     .edgesIgnoringSafeArea(.all)
 
                 VStack(spacing: 20) {
