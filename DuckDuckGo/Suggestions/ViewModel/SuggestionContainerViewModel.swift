@@ -90,7 +90,6 @@ final class SuggestionContainerViewModel {
 
         self.isTopSuggestionSelectionExpected = userAppendedStringToTheEnd && !userStringValue.contains(" ")
 
-        guard !isDisposable else { return }
         suggestionContainer.getSuggestions(for: userStringValue)
     }
 

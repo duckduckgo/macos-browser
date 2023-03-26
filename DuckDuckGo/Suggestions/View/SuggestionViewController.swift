@@ -36,13 +36,17 @@ final class SuggestionViewController: NSViewController {
     @IBOutlet weak var pixelPerfectConstraint: NSLayoutConstraint!
 
     let suggestionContainerViewModel: SuggestionContainerViewModel
+    let isDisposable: Bool
 
     required init?(coder: NSCoder) {
         fatalError("SuggestionViewController: Bad initializer")
     }
 
-    required init?(coder: NSCoder, suggestionContainerViewModel: SuggestionContainerViewModel) {
+    required init?(coder: NSCoder,
+                   suggestionContainerViewModel: SuggestionContainerViewModel,
+                   isDisposable: Bool) {
         self.suggestionContainerViewModel = suggestionContainerViewModel
+        self.isDisposable = isDisposable
 
         super.init(coder: coder)
     }
@@ -261,6 +265,7 @@ extension SuggestionViewController: NSTableViewDelegate {
             return nil
         }
 
+        suggestionTableCellView.isDisposable = self.isDisposable
         suggestionTableCellView.display(suggestionViewModel)
         return suggestionTableCellView
     }

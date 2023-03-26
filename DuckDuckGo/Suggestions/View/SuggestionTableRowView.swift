@@ -42,6 +42,8 @@ final class SuggestionTableRowView: NSTableRowView {
         }
     }
 
+    var isDisposable: Bool = false
+
     private func setupView() {
         selectionHighlightStyle = .none
         wantsLayer = true
@@ -49,13 +51,15 @@ final class SuggestionTableRowView: NSTableRowView {
     }
 
     private func updateBackgroundColor() {
-        backgroundColor = isSelected ? .controlAccentColor : .clear
+        let accentColor: NSColor = isDisposable ? .disposableAccentColor : .controlAccentColor
+        backgroundColor = isSelected ? accentColor : .clear
     }
 
     private func updateCellView() {
         for subview in subviews {
             if let cellView = subview as? SuggestionTableCellView {
                 cellView.isSelected = isSelected
+                isDisposable = cellView.isDisposable
             }
         }
     }

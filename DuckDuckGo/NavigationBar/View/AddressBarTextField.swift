@@ -578,7 +578,8 @@ final class AddressBarTextField: NSTextField {
     private lazy var suggestionViewController: SuggestionViewController = {
         NSStoryboard.suggestion.instantiateController(identifier: "SuggestionViewController") { coder in
             let suggestionViewController = SuggestionViewController(coder: coder,
-                                                                    suggestionContainerViewModel: self.suggestionContainerViewModel!)
+                                                                    suggestionContainerViewModel: self.suggestionContainerViewModel!,
+                                                                    isDisposable: self.isDisposable)
             suggestionViewController?.delegate = self
             return suggestionViewController
         }
@@ -615,7 +616,6 @@ final class AddressBarTextField: NSTextField {
     }
 
     private func showSuggestionWindow() {
-        guard !isDisposable else { return }
         guard let window = window, let suggestionWindow = suggestionWindowController?.window else {
             os_log("AddressBarTextField: Window not available", type: .error)
             return
