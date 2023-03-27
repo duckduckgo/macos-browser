@@ -79,6 +79,12 @@ final class TabBarViewItem: NSCollectionViewItem {
         }
     }
 
+    var isDisposable: Bool = false {
+        didSet {
+            updateSubviews()
+        }
+    }
+
     @IBOutlet weak var faviconImageView: NSImageView! {
         didSet {
             faviconImageView.applyFaviconStyle()
@@ -353,6 +359,30 @@ final class TabBarViewItem: NSCollectionViewItem {
             borderLayer.isHidden = false
         } else {
             borderLayer.isHidden = true
+        }
+
+        // Adjust colors for disposable window
+        if isDisposable {
+            rightSeparatorView.backgroundColor = .burnerWindowTabSeparatorColor
+            if isSelected {
+                if faviconImageView.image === TabViewModel.Favicon.disposableHome {
+                    faviconImageView.contentTintColor = .textColor
+                } else {
+                    faviconImageView.contentTintColor = nil
+                }
+                titleTextField.textColor = .textColor
+                closeButton.normalTintColor = .buttonColor
+                permissionButton.contentTintColor = .buttonColor
+            } else {
+                if faviconImageView.image === TabViewModel.Favicon.disposableHome {
+                    faviconImageView.contentTintColor = .alternateSelectedControlTextColor
+                } else {
+                    faviconImageView.contentTintColor = nil
+                }
+                titleTextField.textColor = .alternateSelectedControlTextColor
+                closeButton.normalTintColor = .alternateSelectedControlTextColor
+                permissionButton.contentTintColor = .alternateSelectedControlTextColor
+            }
         }
     }
 

@@ -30,6 +30,8 @@ final class TabBarViewController: NSViewController {
         case buttonPadding = 4
     }
 
+    @IBOutlet weak var visualEffectBackgroundView: NSVisualEffectView!
+    @IBOutlet weak var gradientBackgroundView: GradientView!
     @IBOutlet weak var pinnedTabsContainerView: NSView!
     @IBOutlet private weak var collectionView: TabBarCollectionView!
     @IBOutlet private weak var scrollView: TabBarScrollView!
@@ -93,6 +95,7 @@ final class TabBarViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        setupBackgroundView()
         scrollView.updateScrollElasticity(with: tabMode)
         observeToScrollNotifications()
         subscribeToSelectionIndex()
@@ -158,6 +161,11 @@ final class TabBarViewController: NSViewController {
         selectionIndexCancellable = tabCollectionViewModel.$selectionIndex.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.reloadSelection()
         }
+    }
+
+    private func setupBackgroundView() {
+        visualEffectBackgroundView.isHidden = tabCollectionViewModel.isDisposable
+        gradientBackgroundView.isHidden = !tabCollectionViewModel.isDisposable
     }
 
     private func setupFireButton() {
@@ -562,6 +570,10 @@ final class TabBarViewController: NSViewController {
         addTabButton.target = self
         addTabButton.action = #selector(addButtonAction(_:))
         addTabButton.toolTip = UserText.newTabTooltip
+        if tabCollectionViewModel.isDisposable {
+            addTabButton.normalTintColor = NSColor.alternateSelectedControlTextColor
+            addTabButton.contentTintColor = NSColor.alternateSelectedControlTextColor
+        }
     }
 
     private func subscribeToTabModeChanges() {
@@ -844,6 +856,7 @@ extension TabBarViewController: NSCollectionViewDataSource {
         }
 
         tabBarViewItem.delegate = self
+        tabBarViewItem.isDisposable = tabCollectionViewModel.isDisposable
         tabBarViewItem.subscribe(to: tabViewModel, tabCollectionViewModel: tabCollectionViewModel)
 
         return tabBarViewItem
@@ -859,6 +872,9 @@ extension TabBarViewController: NSCollectionViewDataSource {
             footer.addButton?.target = self
             footer.addButton?.action = #selector(addButtonAction(_:))
             footer.toolTip = UserText.newTabTooltip
+            if tabCollectionViewModel.isDisposable {
+                footer.addButton.normalTintColor = .alternateSelectedControlTextColor
+            }
         }
 
         return view

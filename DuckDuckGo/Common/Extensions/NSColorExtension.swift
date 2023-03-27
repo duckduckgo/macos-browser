@@ -48,6 +48,10 @@ extension NSColor {
         NSColor(named: "DisposableAccentColor")!
     }
 
+    static var burnerWindowTabSeparatorColor: NSColor {
+        NSColor(named: "BurnerWindowTabSeparatorColor")!
+    }
+
     static var addressBarBorderColor: NSColor {
         NSColor(named: "AddressBarBorderColor")!
     }
