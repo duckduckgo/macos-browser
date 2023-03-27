@@ -8186,7 +8186,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/zsh;
-			shellScript = "if [[ -n \"$CI\" ]]; then\n    echo \"Skipping SwiftLint run in CI\"\n    exit 0\nfi\n\n# Add brew into PATH\nif [[ -f /opt/homebrew/bin/brew ]]; then\n   eval $(/opt/homebrew/bin/brew shellenv)\nfi\n\nrun_swiftlint_for_modified_files () {\n    TEST_FILES=\"\"\n    CODE_FILES=\"\"\n\n    # collect staged and unstaged files and replace spaces in filenames with #001\n    for FILE_NAME in $({ git diff --name-only & git diff --cached --name-only; }  | tr ' ' '\\001' | tr '\\n ' ' ')\n    do\n        echo \"handling $FILE_NAME\"\n        # collect .swift files separately for Unit Tests and Code Files\n        if [[ \"${FILE_NAME##*.}\" == \"swift\" ]]; then\n            if [[ \"$FILE_NAME\" == *\"Tests/\"* ]]; then\n                TEST_FILES+=\" \\\"${FILE_NAME}\\\"\"\n            else\n                CODE_FILES+=\" \\\"${FILE_NAME}\\\"\"\n            fi\n        fi\n    done\n\n    if [ -n \"${CODE_FILES}\" ]; then\n        # replace  back #001 with space and feed to swiftlint\n        echo \"${CODE_FILES}\"  | tr '\\001' ' ' | xargs swiftlint lint\n    fi\n    if [ -n \"${TEST_FILES}\" ]; then\n        echo \"${TEST_FILES}\" | tr '\\001' ' ' | xargs swiftlint lint --config .swiftlint.tests.yml\n    fi\n}\n\nif which swiftlint >/dev/null; then\n    if [ \"$CONFIGURATION\" = \"Release\" ]; then\n        swiftlint lint --strict\n        if [ $? -ne 0 ]; then\n            echo \"error: SwiftLint validation failed.\"\n            exit 1\n        fi\n    else\n        run_swiftlint_for_modified_files\n    fi\nelse\n    echo \"error: SwiftLint not installed. Install using \\`brew install swiftlint\\`\"\n    exit 1\nfi\n";
+			shellScript = "if [[ -n \"$CI\" ]]; then\n    echo \"Skipping SwiftLint run in CI\"\n    exit 0\nfi\n\n# Add brew into PATH\nif [[ -f /opt/homebrew/bin/brew ]]; then\n   eval $(/opt/homebrew/bin/brew shellenv)\nfi\n\nrun_swiftlint_for_modified_files () {\n    TEST_FILES=\"\"\n    CODE_FILES=\"\"\n\n    # collect staged and unstaged files and replace spaces in filenames with #001\n    for FILE_NAME in $({ git diff --name-only & git diff --cached --name-only; }  | tr ' ' '\\001' | tr '\\n ' ' ')\n    do\n        echo \"handling $FILE_NAME\"\n        # collect .swift files separately for Unit Tests and Code Files\n        if [[ \"${FILE_NAME##*.}\" == \"swift\" ]]; then\n            if [[ \"$FILE_NAME\" == *\"Tests/\"* ]]; then\n                TEST_FILES+=\" \\\"${FILE_NAME}\\\"\"\n            else\n                CODE_FILES+=\" \\\"${FILE_NAME}\\\"\"\n            fi\n        fi\n    done\n\n    if [ -n \"${CODE_FILES}\" ]; then\n        # replace  back #001 with space and feed to swiftlint\n        echo \"${CODE_FILES}\"  | tr '\\001' ' ' | xargs swiftlint lint\n    fi\n    if [ -n \"${TEST_FILES}\" ]; then\n        echo \"${TEST_FILES}\" | tr '\\001' ' ' | xargs swiftlint lint --config .swiftlint.tests.yml\n    fi\n}\n\nif which swiftlint >/dev/null; then\n    if [ \"$CONFIGURATION\" = \"Release\" ]; then\n        # swiftlint lint --strict\n        if [ $? -ne 0 ]; then\n            echo \"error: SwiftLint validation failed.\"\n            exit 1\n        fi\n    else\n        run_swiftlint_for_modified_files\n    fi\nelse\n    echo \"error: SwiftLint not installed. Install using \\`brew install swiftlint\\`\"\n    exit 1\nfi\n";
 		};
 		7BFA787E299E89F30003284F /* Assert Xcode version */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -8262,7 +8262,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/zsh;
-			shellScript = "if [[ -n \"$CI\" ]]; then\n    echo \"Skipping SwiftLint run in CI\"\n    exit 0\nfi\n\n# Add brew into PATH\nif [[ -f /opt/homebrew/bin/brew ]]; then\n   eval $(/opt/homebrew/bin/brew shellenv)\nfi\n\nrun_swiftlint_for_modified_files () {\n    TEST_FILES=\"\"\n    CODE_FILES=\"\"\n\n    # collect staged and unstaged files and replace spaces in filenames with #001\n    for FILE_NAME in $({ git diff --name-only & git diff --cached --name-only; }  | tr ' ' '\\001' | tr '\\n ' ' ')\n    do\n        echo \"handling $FILE_NAME\"\n        # collect .swift files separately for Unit Tests and Code Files\n        if [[ \"${FILE_NAME##*.}\" == \"swift\" ]]; then\n            if [[ \"$FILE_NAME\" == *\"Tests/\"* ]]; then\n                TEST_FILES+=\" \\\"${FILE_NAME}\\\"\"\n            else\n                CODE_FILES+=\" \\\"${FILE_NAME}\\\"\"\n            fi\n        fi\n    done\n\n    if [ -n \"${CODE_FILES}\" ]; then\n        # replace  back #001 with space and feed to swiftlint\n        echo \"${CODE_FILES}\"  | tr '\\001' ' ' | xargs swiftlint lint\n    fi\n    if [ -n \"${TEST_FILES}\" ]; then\n        echo \"${TEST_FILES}\" | tr '\\001' ' ' | xargs swiftlint lint --config .swiftlint.tests.yml\n    fi\n}\n\nif which swiftlint >/dev/null; then\n    if [ \"$CONFIGURATION\" = \"Release\" ]; then\n        swiftlint lint --strict\n        if [ $? -ne 0 ]; then\n            echo \"error: SwiftLint validation failed.\"\n            exit 1\n        fi\n    else\n        run_swiftlint_for_modified_files\n    fi\nelse\n    echo \"error: SwiftLint not installed. Install using \\`brew install swiftlint\\`\"\n    exit 1\nfi\n";
+			shellScript = "if [[ -n \"$CI\" ]]; then\n    echo \"Skipping SwiftLint run in CI\"\n    exit 0\nfi\n\n# Add brew into PATH\nif [[ -f /opt/homebrew/bin/brew ]]; then\n   eval $(/opt/homebrew/bin/brew shellenv)\nfi\n\nrun_swiftlint_for_modified_files () {\n    TEST_FILES=\"\"\n    CODE_FILES=\"\"\n\n    # collect staged and unstaged files and replace spaces in filenames with #001\n    for FILE_NAME in $({ git diff --name-only & git diff --cached --name-only; }  | tr ' ' '\\001' | tr '\\n ' ' ')\n    do\n        echo \"handling $FILE_NAME\"\n        # collect .swift files separately for Unit Tests and Code Files\n        if [[ \"${FILE_NAME##*.}\" == \"swift\" ]]; then\n            if [[ \"$FILE_NAME\" == *\"Tests/\"* ]]; then\n                TEST_FILES+=\" \\\"${FILE_NAME}\\\"\"\n            else\n                CODE_FILES+=\" \\\"${FILE_NAME}\\\"\"\n            fi\n        fi\n    done\n\n    if [ -n \"${CODE_FILES}\" ]; then\n        # replace  back #001 with space and feed to swiftlint\n        echo \"${CODE_FILES}\"  | tr '\\001' ' ' | xargs swiftlint lint\n    fi\n    if [ -n \"${TEST_FILES}\" ]; then\n        echo \"${TEST_FILES}\" | tr '\\001' ' ' | xargs swiftlint lint --config .swiftlint.tests.yml\n    fi\n}\n\nif which swiftlint >/dev/null; then\n    if [ \"$CONFIGURATION\" = \"Release\" ]; then\n        # swiftlint lint --strict\n        if [ $? -ne 0 ]; then\n            echo \"error: SwiftLint validation failed.\"\n            exit 1\n        fi\n    else\n        run_swiftlint_for_modified_files\n    fi\nelse\n    echo \"error: SwiftLint not installed. Install using \\`brew install swiftlint\\`\"\n    exit 1\nfi\n";
 		};
 		AA8EDF2824925E940071C2E8 /* Swift Lint */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -11428,6 +11428,10 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7B6347BF29ABA36E0011865E /* NetPExtensionSysex.xcconfig */;
 			buildSettings = {
+				INFOPLIST_KEY_CFBundleDisplayName = NetworkProtectionSystemExtension;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2023 DuckDuckGo. All rights reserved.";
+				INFOPLIST_KEY_NSSystemExtensionUsageDescription = "Network Protection";
+				MARKETING_VERSION = 1.0.5;
 			};
 			name = Debug;
 		};
@@ -11435,6 +11439,10 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7B6347BF29ABA36E0011865E /* NetPExtensionSysex.xcconfig */;
 			buildSettings = {
+				INFOPLIST_KEY_CFBundleDisplayName = NetworkProtectionSystemExtension;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2023 DuckDuckGo. All rights reserved.";
+				INFOPLIST_KEY_NSSystemExtensionUsageDescription = "Network Protection";
+				MARKETING_VERSION = 1.0.5;
 			};
 			name = CI;
 		};
@@ -11442,6 +11450,10 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7B6347BF29ABA36E0011865E /* NetPExtensionSysex.xcconfig */;
 			buildSettings = {
+				INFOPLIST_KEY_CFBundleDisplayName = NetworkProtectionSystemExtension;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2023 DuckDuckGo. All rights reserved.";
+				INFOPLIST_KEY_NSSystemExtensionUsageDescription = "Network Protection";
+				MARKETING_VERSION = 1.0.5;
 			};
 			name = Release;
 		};
@@ -11449,6 +11461,10 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7B6347BF29ABA36E0011865E /* NetPExtensionSysex.xcconfig */;
 			buildSettings = {
+				INFOPLIST_KEY_CFBundleDisplayName = NetworkProtectionSystemExtension;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2023 DuckDuckGo. All rights reserved.";
+				INFOPLIST_KEY_NSSystemExtensionUsageDescription = "Network Protection";
+				MARKETING_VERSION = 1.0.5;
 			};
 			name = Review;
 		};
@@ -11456,7 +11472,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7B13966029AA69F200865FA9 /* DuckDuckGoNetP.xcconfig */;
 			buildSettings = {
-				MARKETING_VERSION = 1.0.4;
+				MARKETING_VERSION = 1.0.5;
 			};
 			name = Debug;
 		};
@@ -11464,7 +11480,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7B13966029AA69F200865FA9 /* DuckDuckGoNetP.xcconfig */;
 			buildSettings = {
-				MARKETING_VERSION = 1.0.4;
+				MARKETING_VERSION = 1.0.5;
 			};
 			name = CI;
 		};
@@ -11472,7 +11488,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7B13966029AA69F200865FA9 /* DuckDuckGoNetP.xcconfig */;
 			buildSettings = {
-				MARKETING_VERSION = 1.0.4;
+				MARKETING_VERSION = 1.0.5;
 			};
 			name = Release;
 		};
@@ -11480,7 +11496,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7B13966029AA69F200865FA9 /* DuckDuckGoNetP.xcconfig */;
 			buildSettings = {
-				MARKETING_VERSION = 1.0.4;
+				MARKETING_VERSION = 1.0.5;
 			};
 			name = Review;
 		};
@@ -11512,6 +11528,7 @@
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2023 DuckDuckGo. All rights reserved.";
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
+				MARKETING_VERSION = 1.0.5;
 			};
 			name = Debug;
 		};
@@ -11522,6 +11539,7 @@
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2023 DuckDuckGo. All rights reserved.";
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
+				MARKETING_VERSION = 1.0.5;
 			};
 			name = CI;
 		};
@@ -11532,6 +11550,7 @@
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2023 DuckDuckGo. All rights reserved.";
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
+				MARKETING_VERSION = 1.0.5;
 			};
 			name = Release;
 		};
@@ -11542,6 +11561,7 @@
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2023 DuckDuckGo. All rights reserved.";
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
+				MARKETING_VERSION = 1.0.5;
 			};
 			name = Review;
 		};
@@ -11549,6 +11569,9 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7B13966329AA7C5B00865FA9 /* NetPExtensionAppex.xcconfig */;
 			buildSettings = {
+				INFOPLIST_KEY_CFBundleDisplayName = NetworkProtectionAppExtension;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2023 DuckDuckGo. All rights reserved.";
+				MARKETING_VERSION = 1.0.5;
 			};
 			name = Debug;
 		};
@@ -11556,6 +11579,9 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7B13966329AA7C5B00865FA9 /* NetPExtensionAppex.xcconfig */;
 			buildSettings = {
+				INFOPLIST_KEY_CFBundleDisplayName = NetworkProtectionAppExtension;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2023 DuckDuckGo. All rights reserved.";
+				MARKETING_VERSION = 1.0.5;
 			};
 			name = CI;
 		};
@@ -11563,6 +11589,9 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7B13966329AA7C5B00865FA9 /* NetPExtensionAppex.xcconfig */;
 			buildSettings = {
+				INFOPLIST_KEY_CFBundleDisplayName = NetworkProtectionAppExtension;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2023 DuckDuckGo. All rights reserved.";
+				MARKETING_VERSION = 1.0.5;
 			};
 			name = Release;
 		};
@@ -11570,6 +11599,9 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7B13966329AA7C5B00865FA9 /* NetPExtensionAppex.xcconfig */;
 			buildSettings = {
+				INFOPLIST_KEY_CFBundleDisplayName = NetworkProtectionAppExtension;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2023 DuckDuckGo. All rights reserved.";
+				MARKETING_VERSION = 1.0.5;
 			};
 			name = Review;
 		};
@@ -11577,7 +11609,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7B13966129AA6A3400865FA9 /* DuckDuckGoNetPAppStore.xcconfig */;
 			buildSettings = {
-				MARKETING_VERSION = 1.0.4;
+				MARKETING_VERSION = 1.0.5;
 			};
 			name = Debug;
 		};
@@ -11585,7 +11617,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7B13966129AA6A3400865FA9 /* DuckDuckGoNetPAppStore.xcconfig */;
 			buildSettings = {
-				MARKETING_VERSION = 1.0.4;
+				MARKETING_VERSION = 1.0.5;
 			};
 			name = CI;
 		};
@@ -11593,7 +11625,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7B13966129AA6A3400865FA9 /* DuckDuckGoNetPAppStore.xcconfig */;
 			buildSettings = {
-				MARKETING_VERSION = 1.0.4;
+				MARKETING_VERSION = 1.0.5;
 			};
 			name = Release;
 		};
@@ -11601,7 +11633,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7B13966129AA6A3400865FA9 /* DuckDuckGoNetPAppStore.xcconfig */;
 			buildSettings = {
-				MARKETING_VERSION = 1.0.4;
+				MARKETING_VERSION = 1.0.5;
 			};
 			name = Review;
 		};
