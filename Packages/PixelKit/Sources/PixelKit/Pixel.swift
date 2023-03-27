@@ -155,10 +155,11 @@ public final class Pixel {
             updatePixelLastFireDate(pixelName: pixelName)
             fireRequest(pixelName + "_d", headers, newParams, allowedQueryReservedCharacters, true, onComplete)
         case .dailyAndContinuous:
-            updatePixelLastFireDate(pixelName: pixelName)
             if !pixelHasBeenFiredToday(pixelName, dailyPixelStorage: Self.storage, calendar: self.pixelCalendar) {
                 fireRequest(pixelName + "_d", headers, newParams, allowedQueryReservedCharacters, true, { _ in })
             }
+
+            updatePixelLastFireDate(pixelName: pixelName)
 
             fireRequest(pixelName + "_c", headers, newParams, allowedQueryReservedCharacters, true, onComplete)
         }
