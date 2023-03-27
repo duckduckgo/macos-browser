@@ -131,7 +131,11 @@ public class NetworkProtectionKeychainStore: NetworkProtectionKeyStore {
     private var validityInterval = Defaults.validityInterval
 
     public func setValidityInterval(_ validityInterval: TimeInterval?) {
+        #if DEBUG
         self.validityInterval = validityInterval ?? Defaults.validityInterval
+        #else
+        // No-op
+        #endif
     }
 
     private func newCurrentKeyPair() -> KeyPair {

@@ -108,7 +108,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
     }
 
     private func rekeyIfExpired() async {
-        guard !isKeyExpired else {
+        guard isKeyExpired else {
             return
         }
 

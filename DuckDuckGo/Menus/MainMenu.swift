@@ -89,6 +89,7 @@ final class MainMenu: NSMenu {
     }
 
     @IBOutlet weak var networkProtectionPreferredServerLocationItem: NSMenuItem?
+    @IBOutlet weak var networkProtectionRegistrationKeyValidityMenuSeparatorItem: NSMenuItem?
     @IBOutlet weak var networkProtectionRegistrationKeyValidityMenuItem: NSMenuItem?
 
     // MARK: - Help
@@ -313,6 +314,7 @@ final class MainMenu: NSMenu {
     ]
 
     private func updateNetworkProtectionRegistrationKeyValidityMenuItems() {
+        #if DEBUG
         guard let submenu = networkProtectionRegistrationKeyValidityMenuItem?.submenu,
               let automaticItem = submenu.items.first else {
 
@@ -330,6 +332,16 @@ final class MainMenu: NSMenu {
                 return menuItem
             }
         }
+        #else
+        guard let separator = networkProtectionRegistrationKeyValidityMenuSeparatorItem,
+              let validityMenu = networkProtectionRegistrationKeyValidityMenuItem else {
+            assertionFailure("\(#function): Failed to get submenu")
+            return
+        }
+
+        separator.isHidden = true
+        validityMenu.isHidden = true
+        #endif
     }
 #endif
 }

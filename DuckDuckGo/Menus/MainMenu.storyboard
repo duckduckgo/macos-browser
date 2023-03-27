@@ -873,6 +873,7 @@ CQ
                             <outlet property="manageBookmarksMenuItem" destination="BaO-sP-wbQ" id="rn7-HX-04s"/>
                             <outlet property="networkProtectionPreferredServerLocationItem" destination="Zh6-DO-H1c" id="Vkl-vJ-LJY"/>
                             <outlet property="networkProtectionRegistrationKeyValidityMenuItem" destination="iPz-EO-Nv6" id="Sw3-Bt-aZt"/>
+                            <outlet property="networkProtectionRegistrationKeyValidityMenuSeparatorItem" destination="MEg-4g-gji" id="yWq-Rz-B9B"/>
                             <outlet property="newTabMenuItem" destination="9qI-62-tsd" id="6SI-rG-P34"/>
                             <outlet property="newWindowMenuItem" destination="Was-JA-tGl" id="uyQ-qR-DFk"/>
                             <outlet property="openLocationMenuItem" destination="xnU-dQ-JR1" id="DYS-Dt-ydU"/>
