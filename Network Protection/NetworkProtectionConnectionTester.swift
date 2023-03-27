@@ -104,9 +104,7 @@ final class NetworkProtectionConnectionTester {
     }
 
     deinit {
-        Task {
-            await stop()
-        }
+        cancelTimerImmediately()
     }
 
     // MARK: - Starting & Stopping the tester
@@ -189,13 +187,19 @@ final class NetworkProtectionConnectionTester {
     private func stopScheduledTimer() async {
         await timerRunCoordinator.stop()
 
-        if let timer = timer {
-            if !timer.isCancelled {
-                timer.cancel()
-            }
+        cancelTimerImmediately()
+    }
 
-            self.timer = nil
+    private func cancelTimerImmediately() {
+        guard let timer = timer else {
+            return
         }
+
+        if !timer.isCancelled {
+            timer.cancel()
+        }
+
+        self.timer = nil
     }
 
     // MARK: - Testing the connection

@@ -164,12 +164,12 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
     /// Updates the bandwidth analyzer with the latest data from the WireGuard Adapter
     ///
     private func updateBandwidthAnalyzer() async {
-        guard let (rx, tx) = try? await self.adapter.getBytesTransmitted() else {
+        guard let (rx, tx) = try? await adapter.getBytesTransmitted() else {
             self.bandwidthAnalyzer.preventIdle()
             return
         }
 
-        self.bandwidthAnalyzer.record(rxBytes: rx, txBytes: tx)
+        bandwidthAnalyzer.record(rxBytes: rx, txBytes: tx)
     }
 
     // MARK: - Connection tester
@@ -214,13 +214,17 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
     // MARK: - Initializers
 
     override init() {
-        os_log("🔵 Initializing NetP packet tunnel provider", log: .networkProtection, type: .error)
+        os_log("[+] PacketTunnelProvider", log: .networkProtectionMemoryLog, type: .debug)
 
         super.init()
 
         #if NETP_SYSTEM_EXTENSION
         IPCConnection.shared.startListener()
         #endif
+    }
+
+    deinit {
+        os_log("[-] PacketTunnelProvider", log: .networkProtectionMemoryLog, type: .debug)
     }
 
     private func setupPixels(defaultHeaders: [String: String]) {
@@ -385,7 +389,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
     /// Do not cancel, directly... call this method so that the adapter and tester are stopped too.
     private func stopTunnel(with stopError: Error) {
         Task {
-            await self.connectionTester.stop()
+            await connectionTester.stop()
         }
 
         self.adapter.stop { error in
@@ -437,6 +441,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
 
         try await withCheckedThrowingContinuation { [weak self] (continuation: CheckedContinuation<Void, Error>) in
             guard let self = self else {
+                continuation.resume()
                 return
             }
 
@@ -681,13 +686,10 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
 
     // MARK: - Computer sleeping
 
-    override func sleep(completionHandler: @escaping () -> Void) {
+    override func sleep() async {
         os_log("Sleep", log: .networkProtectionSleepLog, type: .info)
 
-        Task {
-            await connectionTester.stop()
-            completionHandler()
-        }
+        await connectionTester.stop()
     }
 
     override func wake() {
@@ -700,7 +702,12 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
 
     // MARK: - Error Reporting
 
-    private lazy var networkProtectionDebugEvents: EventMapping<NetworkProtectionError>? = .init { event, _, _, _ in
+    private lazy var networkProtectionDebugEvents: EventMapping<NetworkProtectionError>? = .init { [weak self] event, _, _, _ in
+
+        guard let self = self else {
+            return
+        }
+
         let domainEvent: NetworkProtectionPixelEvent
 
 #if DEBUG

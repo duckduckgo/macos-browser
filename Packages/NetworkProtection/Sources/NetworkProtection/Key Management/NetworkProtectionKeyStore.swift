@@ -192,7 +192,7 @@ public class NetworkProtectionKeychainStore: NetworkProtectionKeyStore {
         var query = defaultAttributes()
         query[kSecAttrAccount as String] = name
         query[kSecAttrService as String] = serviceName
-        query[kSecAttrAccessible as String] = kSecAttrAccessibleWhenUnlocked
+        query[kSecAttrAccessible as String] = kSecAttrAccessibleAfterFirstUnlock
         query[kSecValueData as String] = data
 
         let status = SecItemAdd(query as CFDictionary, nil)

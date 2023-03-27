@@ -24,7 +24,6 @@ import Foundation
 ///
 final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
 
-    private let networkProtection: NetworkProtectionProvider
     private let networkProtectionStatusReporter: NetworkProtectionStatusReporter
     private var status: NetworkProtectionConnectionStatus = .disconnected
     private let popovers: NavigationBarPopovers
@@ -54,9 +53,7 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
     // MARK: - Initialization
 
     init(popovers: NavigationBarPopovers,
-         networkProtection: NetworkProtectionProvider = DefaultNetworkProtectionProvider(),
          networkProtectionStatusReporter: NetworkProtectionStatusReporter = DefaultNetworkProtectionStatusReporter()) {
-        self.networkProtection = networkProtection
         self.networkProtectionStatusReporter = networkProtectionStatusReporter
         self.iconPublisher = NetworkProtectionIconPublisher(statusReporter: networkProtectionStatusReporter)
         self.popovers = popovers
