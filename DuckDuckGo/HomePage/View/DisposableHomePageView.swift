@@ -32,7 +32,7 @@ extension HomePage.Views {
                     Image("DisposableWindowIcon")
                         .resizable()
                         .aspectRatio(contentMode: .fit)
-                        .frame(width: 76)
+                        .frame(width: 128, height: 96)
 
                     VStack(spacing: 20) {
                         Text(UserText.disposableWindowHeader)

@@ -89,12 +89,12 @@ struct UserText {
     static let reloadPage = NSLocalizedString("reload.page", value: "Reload Page", comment: "Context menu item")
 
     static let openLinkInNewTab = NSLocalizedString("open.link.in.new.tab", value: "Open Link in New Tab", comment: "Context menu item")
-    static let openLinkInNewDisposableTab = NSLocalizedString("open.link.in.new.disposable.tab", value: "Open Link in New Disposable Tab", comment: "Context menu item")
-    static let openLinkInNewDisposableWindow = NSLocalizedString("open.link.in.new.disposable.window", value: "Open Link in New Disposable Window", comment: "Context menu item")
+    static let openLinkInNewDisposableTab = NSLocalizedString("open.link.in.new.disposable.tab", value: "Open Link in New Burner Tab", comment: "Context menu item")
+    static let openLinkInNewDisposableWindow = NSLocalizedString("open.link.in.new.disposable.window", value: "Open Link in New Burner Window", comment: "Context menu item")
     static let openImageInNewTab = NSLocalizedString("open.image.in.new.tab", value: "Open Image in New Tab", comment: "Context menu item")
-    static let openImageInNewDisposableTab = NSLocalizedString("open.image.in.new.disposable.tab", value: "Open Image in New Disposable Tab", comment: "Context menu item")
-    static let openImageInNewDisposableWindow = NSLocalizedString("open.image.in.new.disposable.window", value: "Open Image in New Disposable Window", comment: "Context menu item")
-    static let openFrameInNewDisposableWindow = NSLocalizedString("open.frame.in.new.disposable.window", value: "Open Frame in New Disposable Window", comment: "Context menu item")
+    static let openImageInNewDisposableTab = NSLocalizedString("open.image.in.new.disposable.tab", value: "Open Image in New Burner Tab", comment: "Context menu item")
+    static let openImageInNewDisposableWindow = NSLocalizedString("open.image.in.new.disposable.window", value: "Open Image in New Burner Window", comment: "Context menu item")
+    static let openFrameInNewDisposableWindow = NSLocalizedString("open.frame.in.new.disposable.window", value: "Open Frame in New Burner Window", comment: "Context menu item")
     static let copyImageAddress = NSLocalizedString("copy.image.address", value: "Copy Image Address", comment: "Context menu item")
     static let saveImageAs = NSLocalizedString("save.image.as", value: "Save Image As…", comment: "Context menu item")
     static let downloadLinkedFileAs = NSLocalizedString("save.image.as", value: "Download Linked File As…", comment: "Context menu item")
@@ -111,7 +111,7 @@ struct UserText {
     static let shareMenuItem = NSLocalizedString("share.menu.item", value: "Share", comment: "Menu item title")
     static let printMenuItem = NSLocalizedString("print.menu.item", value: "Print…", comment: "Menu item title")
     static let newWindowMenuItem = NSLocalizedString("new.window.menu.item", value: "New Window", comment: "Menu item title")
-    static let newDisposableWindowMenuItem = NSLocalizedString("new.disposable.window.menu.item", value: "New Disposable Window", comment: "Menu item title")
+    static let newDisposableWindowMenuItem = NSLocalizedString("new.disposable.window.menu.item", value: "New Burner Window", comment: "Menu item title")
 
     static let fireproofSites = NSLocalizedString("fireproof.sites", value: "Fireproof Sites", comment: "Fireproof sites list title")
     static let fireproofCheckboxTitle = NSLocalizedString("fireproof.checkbox.title", value: "Ask to Fireproof websites when signing in", comment: "Fireproof settings checkbox title")
@@ -705,9 +705,9 @@ struct UserText {
     static let noAccessToSelectedFolderHeader = NSLocalizedString("no.access.to.selected.folder.header", value: "DuckDuckGo needs permission to access selected folder", comment: "Header of the alert dialog informing user about failed download")
     static let noAccessToSelectedFolder = NSLocalizedString("no.access.to.selected.folder", value: "Grant access to the location of download.", comment: "Alert presented to user if the app doesn't have rights to access selected folder")
 
-    static let disposableWindowHeader = NSLocalizedString("disposable.window.header", value: "Disposable Window", comment: "Header shown on the hompage of the disposable window")
-    static let disposableWindowDescription = NSLocalizedString("disposable.window.description", value: "All of the activity in this window is temporary and DuckDuckGo\n won't save history, cookies, or site data.\n\nData collected in this window is cleared when you close all\n disposable windows or quit the application.", comment: "")
-    static let disposableTabHomeTitle = NSLocalizedString("disposable.tab.home.title", value: "New Disposable Tab", comment: "Tab title for disposable tab")
+    static let disposableWindowHeader = NSLocalizedString("disposable.window.header", value: "Burner Window", comment: "Header shown on the hompage of the disposable window")
+    static let disposableWindowDescription = NSLocalizedString("disposable.window.description", value: "All of the activity in this window is temporary and DuckDuckGo\n won't save history, cookies, or site data.\n\nData collected in this window is cleared when you close all\n burner windows or quit the application.", comment: "")
+    static let disposableTabHomeTitle = NSLocalizedString("disposable.tab.home.title", value: "New Burner Tab", comment: "Tab title for disposable tab")
 
 }
 
