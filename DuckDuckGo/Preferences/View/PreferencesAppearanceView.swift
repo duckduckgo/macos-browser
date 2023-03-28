@@ -112,8 +112,8 @@ extension Preferences {
                             button.setContentHuggingPriority(.defaultHigh, for: .horizontal)
 
                             for value in DefaultZoomValues.allCases {
-                                let item = button.menu?.addItem(withTitle: value.toString(), action: nil, keyEquivalent: "")
-                                item?.representedObject = value.rawValue
+                                let item = button.menu?.addItem(withTitle: value.displayString, action: nil, keyEquivalent: "")
+                                item?.representedObject = value
                             }
                             return button
                         }

@@ -35,52 +35,47 @@ final class WebView: WKWebView {
 
     // MARK: - Zoom
 
-    static let maxZoomLevel: CGFloat = 3.0
-    static let minZoomLevel: CGFloat = 0.5
-    static private let zoomLevelStep: CGFloat = 0.1
-
-    var zoomLevel: CGFloat {
+    var zoomLevel: DefaultZoomValues {
         get {
             if #available(macOS 11.0, *) {
-                return pageZoom
+                return DefaultZoomValues(rawValue: pageZoom) ?? .percent100
             }
-            return magnification
+            return DefaultZoomValues(rawValue: magnification) ?? .percent100
         }
         set {
-            let cappedValue = min(Self.maxZoomLevel, max(Self.minZoomLevel, newValue))
             if #available(macOS 11.0, *) {
-                pageZoom = cappedValue
+                pageZoom = newValue.rawValue
             } else {
-                magnification = cappedValue
+                magnification = newValue.rawValue
             }
         }
     }
 
     var canZoomToActualSize: Bool {
-        self.window != nil && (self.zoomLevel != 1.0 || self.magnification != 1.0)
+        self.window != nil && (self.zoomLevel != .percent100 || self.magnification != 1.0)
     }
 
     var canZoomIn: Bool {
-        self.window != nil && self.zoomLevel < Self.maxZoomLevel
+        self.window != nil && self.zoomLevel.index < DefaultZoomValues.allCases.count - 1
     }
 
     var canZoomOut: Bool {
-        self.window != nil && self.zoomLevel > Self.minZoomLevel
+        self.window != nil && self.zoomLevel.index > 0
     }
 
     func resetZoomLevel() {
-        zoomLevel = 1.0
-        magnification = 1.0
+        self.zoomLevel = DefaultZoomValues.percent100
+        self.magnification = DefaultZoomValues.percent100.rawValue
     }
 
     func zoomIn() {
         guard canZoomIn else { return }
-        self.zoomLevel = min(self.zoomLevel + Self.zoomLevelStep, Self.maxZoomLevel)
+        self.zoomLevel = DefaultZoomValues.allCases[self.zoomLevel.index + 1]
     }
 
     func zoomOut() {
         guard canZoomOut else { return }
-        self.zoomLevel = max(self.zoomLevel - Self.zoomLevelStep, Self.minZoomLevel)
+        self.zoomLevel = DefaultZoomValues.allCases[self.zoomLevel.index - 1]
     }
 
     // MARK: - Menu

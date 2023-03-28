@@ -52,10 +52,12 @@ enum DefaultZoomValues: CGFloat, CaseIterable {
     case percent250 = 2.5
     case percent300 = 3.0
 
-    func toString() -> String {
+    var displayString: String {
         let percentage = (self.rawValue * 100).rounded()
         return String(format: "%.0f%%", percentage)
     }
+
+    var index: Int {DefaultZoomValues.allCases.firstIndex(of: self) ?? 3}
 }
 
 enum ThemeName: String, Equatable, CaseIterable {
@@ -120,9 +122,9 @@ final class AppearancePreferences: ObservableObject {
         }
     }
 
-    @Published var defaultPageZoom: CGFloat {
+    @Published var defaultPageZoom: DefaultZoomValues {
         didSet {
-            persistor.defaultPageZoom = defaultPageZoom
+            persistor.defaultPageZoom = defaultPageZoom.rawValue
         }
     }
 
@@ -135,7 +137,7 @@ final class AppearancePreferences: ObservableObject {
         currentThemeName = .init(rawValue: persistor.currentThemeName) ?? .systemDefault
         showFullURL = persistor.showFullURL
         showAutocompleteSuggestions = persistor.showAutocompleteSuggestions
-        defaultPageZoom =  persistor.defaultPageZoom
+        defaultPageZoom =  .init(rawValue: persistor.defaultPageZoom) ?? .percent100
     }
 
     private var persistor: AppearancePreferencesPersistor
