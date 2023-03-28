@@ -92,7 +92,8 @@ extension UpdateController: SPUUpdaterDelegate {
     func updater(_ updater: SPUUpdater, didAbortWithError error: Error) {
         let errorCode = (error as NSError).code
         guard ![Int(Sparkle.SUError.noUpdateError.rawValue),
-                Int(Sparkle.SUError.installationCanceledError.rawValue)].contains(errorCode) else {
+                Int(Sparkle.SUError.installationCanceledError.rawValue),
+                Int(Sparkle.SUError.runningTranslocated.rawValue)].contains(errorCode) else {
             return
         }
 
