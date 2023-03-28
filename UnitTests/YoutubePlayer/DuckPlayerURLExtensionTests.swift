@@ -1,5 +1,5 @@
 //
-//  PrivatePlayerURLExtensionTests.swift
+//  DuckPlayerURLExtensionTests.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -19,28 +19,28 @@
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-final class PrivatePlayerURLExtensionTests: XCTestCase {
+final class DuckPlayerURLExtensionTests: XCTestCase {
 
-    func testIsPrivatePlayerScheme() {
-        XCTAssertTrue("duck:player/abcdef12345".url!.isPrivatePlayerScheme)
-        XCTAssertTrue("duck://player/abcdef12345".url!.isPrivatePlayerScheme)
-        XCTAssertTrue("duck://player/abcdef".url!.isPrivatePlayerScheme)
-        XCTAssertTrue("duck://player/12345".url!.isPrivatePlayerScheme)
-        XCTAssertFalse("http://privateplayer/abcdef12345".url!.isPrivatePlayerScheme)
-        XCTAssertFalse("https://www.youtube.com/watch?v=abcdef12345".url!.isPrivatePlayerScheme)
-        XCTAssertFalse("https://www.youtube-nocookie.com/embed/abcdef12345".url!.isPrivatePlayerScheme)
+    func testIsDuckPlayerScheme() {
+        XCTAssertTrue("duck:player/abcdef12345".url!.isDuckPlayerScheme)
+        XCTAssertTrue("duck://player/abcdef12345".url!.isDuckPlayerScheme)
+        XCTAssertTrue("duck://player/abcdef".url!.isDuckPlayerScheme)
+        XCTAssertTrue("duck://player/12345".url!.isDuckPlayerScheme)
+        XCTAssertFalse("http://duckplayer/abcdef12345".url!.isDuckPlayerScheme)
+        XCTAssertFalse("https://www.youtube.com/watch?v=abcdef12345".url!.isDuckPlayerScheme)
+        XCTAssertFalse("https://www.youtube-nocookie.com/embed/abcdef12345".url!.isDuckPlayerScheme)
     }
 
-    func testIsPrivatePlayer() {
-        XCTAssertTrue("https://www.youtube-nocookie.com/embed/abcdef12345".url!.isPrivatePlayer)
-        XCTAssertTrue("https://www.youtube-nocookie.com/embed/abcdef12345?t=23s".url!.isPrivatePlayer)
+    func testIsDuckPlayer() {
+        XCTAssertTrue("https://www.youtube-nocookie.com/embed/abcdef12345".url!.isDuckPlayer)
+        XCTAssertTrue("https://www.youtube-nocookie.com/embed/abcdef12345?t=23s".url!.isDuckPlayer)
 
-        XCTAssertFalse("https://www.youtube-nocookie.com/embed".url!.isPrivatePlayer)
-        XCTAssertFalse("https://www.youtube-nocookie.com/embed?t=23s".url!.isPrivatePlayer)
+        XCTAssertFalse("https://www.youtube-nocookie.com/embed".url!.isDuckPlayer)
+        XCTAssertFalse("https://www.youtube-nocookie.com/embed?t=23s".url!.isDuckPlayer)
 
-        XCTAssertFalse("duck://player/abcdef12345".url!.isPrivatePlayer)
-        XCTAssertFalse("https://www.youtube.com/watch?v=abcdef12345".url!.isPrivatePlayer)
-        XCTAssertFalse("https://duckduckgo.com".url!.isPrivatePlayer)
+        XCTAssertFalse("duck://player/abcdef12345".url!.isDuckPlayer)
+        XCTAssertFalse("https://www.youtube.com/watch?v=abcdef12345".url!.isDuckPlayer)
+        XCTAssertFalse("https://duckduckgo.com".url!.isDuckPlayer)
     }
 
     func testIsYoutubePlaylist() {
@@ -61,7 +61,7 @@ final class PrivatePlayerURLExtensionTests: XCTestCase {
         XCTAssertFalse("https://duckduckgo.com/watch?v=abcdef12345".url!.isYoutubeVideo)
     }
 
-    func testYoutubeVideoParamsFromPrivatePlayerURL() {
+    func testYoutubeVideoParamsFromDuckPlayerURL() {
         let params = "duck://player/abcdef12345".url!.youtubeVideoParams
         XCTAssertEqual(params?.videoID, "abcdef12345")
         XCTAssertEqual(params?.timestamp, nil)
@@ -102,16 +102,16 @@ final class PrivatePlayerURLExtensionTests: XCTestCase {
         XCTAssertNil("https://duck.com".url?.youtubeVideoID)
     }
 
-    func testPrivatePlayerURLTimestampValidation() {
-        XCTAssertEqual(URL.privatePlayer("abcdef12345", timestamp: nil).absoluteString, "duck://player/abcdef12345")
-        XCTAssertEqual(URL.privatePlayer("abcdef12345", timestamp: "23s").absoluteString, "duck://player/abcdef12345?t=23s")
-        XCTAssertEqual(URL.privatePlayer("abcdef12345", timestamp: "5m5s").absoluteString, "duck://player/abcdef12345?t=5m5s")
-        XCTAssertEqual(URL.privatePlayer("abcdef12345", timestamp: "12h400m100s").absoluteString, "duck://player/abcdef12345?t=12h400m100s")
-        XCTAssertEqual(URL.privatePlayer("abcdef12345", timestamp: "12h2s2h").absoluteString, "duck://player/abcdef12345?t=12h2s2h")
-        XCTAssertEqual(URL.privatePlayer("abcdef12345", timestamp: "5m5m5m").absoluteString, "duck://player/abcdef12345?t=5m5m5m")
+    func testDuckPlayerURLTimestampValidation() {
+        XCTAssertEqual(URL.duckPlayer("abcdef12345", timestamp: nil).absoluteString, "duck://player/abcdef12345")
+        XCTAssertEqual(URL.duckPlayer("abcdef12345", timestamp: "23s").absoluteString, "duck://player/abcdef12345?t=23s")
+        XCTAssertEqual(URL.duckPlayer("abcdef12345", timestamp: "5m5s").absoluteString, "duck://player/abcdef12345?t=5m5s")
+        XCTAssertEqual(URL.duckPlayer("abcdef12345", timestamp: "12h400m100s").absoluteString, "duck://player/abcdef12345?t=12h400m100s")
+        XCTAssertEqual(URL.duckPlayer("abcdef12345", timestamp: "12h2s2h").absoluteString, "duck://player/abcdef12345?t=12h2s2h")
+        XCTAssertEqual(URL.duckPlayer("abcdef12345", timestamp: "5m5m5m").absoluteString, "duck://player/abcdef12345?t=5m5m5m")
 
-        XCTAssertEqual(URL.privatePlayer("abcdef12345", timestamp: "5").absoluteString, "duck://player/abcdef12345?t=5")
-        XCTAssertEqual(URL.privatePlayer("abcdef12345", timestamp: "10d").absoluteString, "duck://player/abcdef12345")
+        XCTAssertEqual(URL.duckPlayer("abcdef12345", timestamp: "5").absoluteString, "duck://player/abcdef12345?t=5")
+        XCTAssertEqual(URL.duckPlayer("abcdef12345", timestamp: "10d").absoluteString, "duck://player/abcdef12345")
     }
 
     func testYoutubeURLTimestampValidation() {

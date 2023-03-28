@@ -67,10 +67,10 @@ final class TestTabExtensionsBuilder: TabExtensionsBuilderProtocol {
 
     private var components = [(protocolType: Any.Type, buildingBlock: (any TabExtensionBuildingBlockProtocol))]()
 
-    var extensionsToLoad = [any TabExtension.Type]()
+    var extensionsToLoad: [any TabExtension.Type]?
     private let overrideExtensionsFunc: (TestTabExtensionsBuilder) -> (TabExtensionsBuilderArguments, TabExtensionDependencies) -> Void
 
-    init(load extensionsToLoad: [any TabExtension.Type],
+    init(load extensionsToLoad: [any TabExtension.Type]? = nil,
          overrideExtensions: @escaping (TestTabExtensionsBuilder) -> (TabExtensionsBuilderArguments, TabExtensionDependencies) -> Void = TestTabExtensionsBuilder.overrideExtensions) {
         self.extensionsToLoad = extensionsToLoad
         self.overrideExtensionsFunc = overrideExtensions
@@ -91,9 +91,9 @@ final class TestTabExtensionsBuilder: TabExtensionsBuilderProtocol {
         builder.registerExtensions(with: args, dependencies: dependencies)
 
         self.components = builder.components.filter { component in
-            extensionsToLoad.contains(where: {
+            extensionsToLoad?.contains(where: {
                 $0.publicProtocolType == component.protocolType
-            })
+            }) ?? true
         }
         self.overrideExtensionsFunc(self)(args, dependencies)
 

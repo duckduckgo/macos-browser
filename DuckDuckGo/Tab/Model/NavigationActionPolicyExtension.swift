@@ -25,8 +25,9 @@ extension NavigationActionPolicy {
     /// when the Navigation Action is cancelled in decidePolicyForNavigationAction:
     /// https://app.asana.com/0/inbox/1199237043628108/1201280322539473/1201353436736961
     @MainActor
-    static func redirect(_ navigationAction: NavigationAction, invalidatingBackItemIfNeededFor webView: WebView, do redirect: @escaping (Navigator) -> Void) -> NavigationActionPolicy {
-        guard let mainFrame = navigationAction.mainFrameTarget else {
+    static func redirectInvalidatingBackItemIfNeeded(_ navigationAction: NavigationAction, do redirect: @escaping (Navigator) -> Void) -> NavigationActionPolicy {
+        guard let mainFrame = navigationAction.mainFrameTarget,
+              let webView = navigationAction.targetFrame?.webView else {
             assertionFailure("Trying to redirect non-main-frame NavigationAction")
             return .cancel
         }
