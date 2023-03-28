@@ -28,11 +28,15 @@ final public class RecoveryCodeViewModel: ObservableObject {
         }
     }
 
+    public func setCode(_ newCode: String) {
+        if CharacterSet.base64.isSuperset(of: CharacterSet(charactersIn: newCode)) {
+            recoveryCode = newCode
+        }
+    }
+
     func paste() {
         let code = NSPasteboard.general.string(forType: .string)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-        if CharacterSet.base64.isSuperset(of: CharacterSet(charactersIn: code)) {
-            recoveryCode = code
-        }
+        setCode(code)
     }
 
     public init() {}

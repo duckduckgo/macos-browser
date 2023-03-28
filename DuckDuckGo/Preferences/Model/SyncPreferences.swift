@@ -149,9 +149,7 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
 extension SyncPreferences: ManagementDialogModelDelegate {
 
     func turnOnSync() {
-        Task { @MainActor in
-            presentDialog(for: .askToSyncAnotherDevice)
-        }
+        presentDialog(for: .askToSyncAnotherDevice)
     }
 
     func dontSyncAnotherDeviceNow() {
