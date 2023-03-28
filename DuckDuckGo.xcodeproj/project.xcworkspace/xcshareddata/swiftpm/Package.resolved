@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "a0242680df01094a9b6a2f6acb54aa949791ec09",
-        "version" : "51.5.0"
+        "revision" : "660ce4b7390d9ca05ef945365df32f87b107dbfe",
+        "version" : "52.0.0"
       }
     },
     {

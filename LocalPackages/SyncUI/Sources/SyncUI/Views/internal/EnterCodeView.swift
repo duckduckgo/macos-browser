@@ -23,6 +23,7 @@ struct EnterCodeView: View {
     let instructions: String
     let buttonCaption: String
 
+    @EnvironmentObject var model: ManagementDialogModel
     @EnvironmentObject var recoveryCodeModel: RecoveryCodeViewModel
 
     var body: some View {
@@ -36,8 +37,12 @@ struct EnterCodeView: View {
                 .roundedBorder()
                 .frame(maxWidth: 244)
 
+            // This feels like business logic - should the models just talk directly to each other?
             Button {
-                recoveryCodeModel.setCode(NSPasteboard.general.string(forType: .string)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? "")
+                recoveryCodeModel.paste()
+                if !recoveryCodeModel.recoveryCode.isEmpty {
+                    model.delegate?.recoverDevice(using: recoveryCodeModel.recoveryCode)
+                }
             } label: {
                 HStack {
                     Image("Paste")
