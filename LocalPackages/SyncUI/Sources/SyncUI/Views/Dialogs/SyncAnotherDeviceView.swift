@@ -61,7 +61,7 @@ struct SyncAnotherDeviceView: View {
                     model.endFlow()
                 }
                 Button(UserText.submit) {
-                    model.delegate?.addAnotherDevice(using: recoveryCodeModel.recoveryCode)
+                    model.delegate?.addAnotherDevice()
                 }
                 .buttonStyle(DefaultActionButtonStyle(enabled: !recoveryCodeModel.shouldDisableSubmitButton))
                 .disabled(recoveryCodeModel.shouldDisableSubmitButton)
@@ -81,10 +81,10 @@ private struct ShowCodeView: View {
                 .multilineTextAlignment(.center)
 
             HStack(alignment: .top, spacing: 20) {
-                QRCode(string: model.recoveryCode ?? "", size: .init(width: 164, height: 164))
+                QRCode(string: model.connectCode ?? "", size: .init(width: 164, height: 164))
 
                 VStack {
-                    SyncKeyView(text: model.recoveryCode ?? "")
+                    SyncKeyView(text: model.connectCode ?? "")
 
                     Spacer()
 
@@ -92,7 +92,7 @@ private struct ShowCodeView: View {
                         Spacer()
                         Button {
                             NSPasteboard.general.clearContents()
-                            NSPasteboard.general.setString(model.recoveryCode ?? "", forType: .string)
+                            NSPasteboard.general.setString(model.connectCode ?? "", forType: .string)
                         } label: {
                             HStack {
                                 Image("Copy")
