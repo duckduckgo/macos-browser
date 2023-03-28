@@ -31,7 +31,7 @@ protocol FirefoxEncryptionKeyReading {
 final class FirefoxEncryptionKeyReader: FirefoxEncryptionKeyReading {
 
     func getEncryptionKey(key3DatabaseURL: URL, primaryPassword: String) -> Result<Data, FirefoxLoginReader.ImportError> {
-        guard let result = FirefoxBerkeleyDatabaseReader.readDatabase(key3DatabaseURL.path) else {
+        guard let result = try? FirefoxBerkeleyDatabaseReader.readDatabase(at: key3DatabaseURL.path) else {
             return .failure(.databaseAccessFailed)
         }
 

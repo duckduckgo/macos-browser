@@ -87,6 +87,10 @@ final class AddFolderModalViewController: NSViewController {
     @IBAction private func addFolder(_ sender: NSButton) {
         guard !folderNameTextField.stringValue.isEmpty else { return }
 
+        if delegate == nil {
+            pixelAssertionFailure("Failed to get delegate when adding/saving folder")
+        }
+
         if let folder = originalFolder {
             folder.title = folderNameTextField.stringValue
             delegate?.addFolderViewController(self, saved: folder)
