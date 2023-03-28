@@ -1490,8 +1490,6 @@
 		B603973929BF0EBE00902A34 /* PrivacyDashboardIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B603973729BF0EBE00902A34 /* PrivacyDashboardIntegrationTests.swift */; };
 		B603973C29BF1D7D00902A34 /* AutoconsentIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B603973B29BF1D7D00902A34 /* AutoconsentIntegrationTests.swift */; };
 		B603973D29BF1D7D00902A34 /* AutoconsentIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B603973B29BF1D7D00902A34 /* AutoconsentIntegrationTests.swift */; };
-		B603974B29C1A0CC00902A34 /* AppHTTPSUpgradeStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B603974A29C1A0CC00902A34 /* AppHTTPSUpgradeStoreTests.swift */; };
-		B603974C29C1A0CC00902A34 /* AppHTTPSUpgradeStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B603974A29C1A0CC00902A34 /* AppHTTPSUpgradeStoreTests.swift */; };
 		B603974E29C1F93600902A34 /* TabPermissionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B603974D29C1F93600902A34 /* TabPermissionsTests.swift */; };
 		B603974F29C1F93600902A34 /* TabPermissionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B603974D29C1F93600902A34 /* TabPermissionsTests.swift */; };
 		B603975029C1FF5F00902A34 /* TestsURLExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6EC37FB29B83E99001ACE79 /* TestsURLExtension.swift */; };
@@ -2548,7 +2546,6 @@
 		B603973329BEF86200902A34 /* HTTPSUpgradeIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPSUpgradeIntegrationTests.swift; sourceTree = "<group>"; };
 		B603973729BF0EBE00902A34 /* PrivacyDashboardIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyDashboardIntegrationTests.swift; sourceTree = "<group>"; };
 		B603973B29BF1D7D00902A34 /* AutoconsentIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoconsentIntegrationTests.swift; sourceTree = "<group>"; };
-		B603974A29C1A0CC00902A34 /* AppHTTPSUpgradeStoreTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppHTTPSUpgradeStoreTests.swift; sourceTree = "<group>"; };
 		B603974D29C1F93600902A34 /* TabPermissionsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabPermissionsTests.swift; sourceTree = "<group>"; };
 		B6040855274B830F00680351 /* DictionaryExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionaryExtension.swift; sourceTree = "<group>"; };
 		B604085B274B8CA400680351 /* Permissions.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Permissions.xcdatamodel; sourceTree = "<group>"; };
@@ -8576,7 +8573,7 @@
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
 				kind = revision;
-				revision = b4b1f7944d756674d25271954de98e9e775931ad;
+				revision = 4fdacf073c39f24c9e183e9875ce44ac51038cc9;
 			};
 		};
 		AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
