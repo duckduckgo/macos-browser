@@ -35,6 +35,11 @@ final public class RecoveryCodeViewModel: ObservableObject {
         }
     }
 
+    func paste() {
+        let code = NSPasteboard.general.string(forType: .string)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        setCode(code)
+    }
+
     public init() {}
 }
 

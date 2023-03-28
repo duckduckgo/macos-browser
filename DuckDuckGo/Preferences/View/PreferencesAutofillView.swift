@@ -64,9 +64,15 @@ extension Preferences {
                 Text(UserText.autofill)
                     .font(Const.Fonts.preferencePaneTitle)
 
+                // Autofill Content  Button
+                PreferencePaneSection {
+                    Button(UserText.autofillViewContentButton) {
+                        model.showAutofillPopover()
+                    }
+                }
+
 #if !APPSTORE
                 // Password Manager:
-
                 PreferencePaneSection(spacing: 0) {
                     Text(UserText.autofillPasswordManager)
                         .font(Const.Fonts.preferencePaneSectionHeader)
