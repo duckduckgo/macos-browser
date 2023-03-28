@@ -58,7 +58,7 @@ struct RegisterKeyRequestBody: Encodable {
 public final class NetworkProtectionBackendClient: NetworkProtectionClient {
 
     enum Constants {
-        static let developmentEndpoint = URL(string: "https://on-dev.goduckgo.com")!
+        static let developmentEndpoint = URL(string: "https://staging.netp.duckduckgo.com")!
     }
 
     private enum DecoderError: Error {

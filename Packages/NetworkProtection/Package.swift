@@ -39,7 +39,8 @@ let package = Package(
                 "NetworkProtection"
             ],
             resources: [
-                .copy("Resources/servers.json")
+                .copy("Resources/servers-original-endpoint.json"),
+                .copy("Resources/servers-updated-endpoint.json"),
             ]
         )
     ],

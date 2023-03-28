@@ -123,7 +123,7 @@ final class NetworkProtectionDeviceManagerTests: XCTestCase {
         XCTAssertFalse(networkClient.registerCalled)
     }
 
-    func testGettingClosestServerUsingTimeZone() async {
+    func testGettingClosestServerUsingTimeZone() async throws {
         let server = NetworkProtectionServer.mockRegisteredServer
         let keyStore = NetworkProtectionKeyStoreMock()
         let temporaryURL = temporaryFileURL()
@@ -140,7 +140,7 @@ final class NetworkProtectionDeviceManagerTests: XCTestCase {
             errorEvents: nil
         )
 
-        let servers = try! JSONDecoder().decode([NetworkProtectionServer].self, from: TestData.mockServers)
+        let servers = try JSONDecoder().decode([NetworkProtectionServer].self, from: TestData.mockServers)
 
         XCTAssertTrue(manager.closestServer(from: servers, timeZone: TimeZone(abbreviation: "PST")!)!.serverName.hasPrefix("egress.usw"))
         XCTAssertTrue(manager.closestServer(from: servers, timeZone: TimeZone(abbreviation: "PDT")!)!.serverName.hasPrefix("egress.usw"))
@@ -154,7 +154,7 @@ final class NetworkProtectionDeviceManagerTests: XCTestCase {
         XCTAssertTrue(manager.closestServer(from: servers, timeZone: TimeZone(abbreviation: "CEST")!)!.serverName.hasPrefix("egress.euw"))
     }
 
-    func testWhenGettingClosestServer_AndMultipleServersAreAvailable_ThenARandomServerIsReturnedEachTime() {
+    func testWhenGettingClosestServer_AndMultipleServersAreAvailable_ThenARandomServerIsReturnedEachTime() throws {
         let server = NetworkProtectionServer.mockRegisteredServer
         let keyStore = NetworkProtectionKeyStoreMock()
         let temporaryURL = temporaryFileURL()
@@ -171,7 +171,7 @@ final class NetworkProtectionDeviceManagerTests: XCTestCase {
             errorEvents: nil
         )
 
-        let servers = try! JSONDecoder().decode([NetworkProtectionServer].self, from: TestData.mockServers)
+        let servers = try JSONDecoder().decode([NetworkProtectionServer].self, from: TestData.mockServers)
 
         var serverNames = Set<String>()
 
@@ -182,6 +182,14 @@ final class NetworkProtectionDeviceManagerTests: XCTestCase {
         }
 
         XCTAssertEqual(serverNames, ["egress.usw.1", "egress.usw.2"])
+    }
+
+    func testDecodingServers() throws {
+        let servers1 = try JSONDecoder().decode([NetworkProtectionServer].self, from: TestData.mockServers)
+        XCTAssertEqual(servers1.count, 6)
+
+        let servers2 = try JSONDecoder().decode([NetworkProtectionServer].self, from: TestData.mockServers2)
+        XCTAssertEqual(servers2.count, 6)
     }
 
 }

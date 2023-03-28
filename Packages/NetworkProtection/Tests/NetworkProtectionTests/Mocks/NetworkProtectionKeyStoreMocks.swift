@@ -22,6 +22,7 @@ import Foundation
 final class NetworkProtectionKeyStoreMock: NetworkProtectionKeyStore {
 
     var keyPair: KeyPair?
+    var validityInterval: TimeInterval?
 
     // MARK: - NetworkProtectionKeyStore
 
@@ -43,6 +44,10 @@ final class NetworkProtectionKeyStoreMock: NetworkProtectionKeyStore {
 
     func resetCurrentKeyPair() {
         self.keyPair = nil
+    }
+
+    func setValidityInterval(_ validityInterval: TimeInterval?) {
+        self.validityInterval = validityInterval
     }
 
     // MARK: - Storage

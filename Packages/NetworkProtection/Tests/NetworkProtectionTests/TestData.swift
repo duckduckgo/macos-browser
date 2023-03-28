@@ -21,7 +21,11 @@ import Foundation
 final class TestData {
 
     static var mockServers: Data {
-        return loadData(named: "servers.json")!
+        return loadData(named: "servers-original-endpoint.json")!
+    }
+
+    static var mockServers2: Data {
+        return loadData(named: "servers-updated-endpoint.json")!
     }
 
     private static func loadData(named name: String) -> Data? {
