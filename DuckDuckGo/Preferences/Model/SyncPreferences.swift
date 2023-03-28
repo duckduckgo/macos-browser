@@ -154,12 +154,6 @@ extension SyncPreferences: ManagementDialogModelDelegate {
 
     func dontSyncAnotherDeviceNow() {
         Task { @MainActor in
-            presentDialog(for: .askToSyncAnotherDevice)
-        }
-    }
-
-    func dontSyncAnotherDeviceNow() {
-        Task { @MainActor in
             do {
                 let hostname = SCDynamicStoreCopyComputerName(nil, nil) as? String ?? ProcessInfo.processInfo.hostName
                 try await syncService.createAccount(deviceName: hostname, deviceType: "desktop")
