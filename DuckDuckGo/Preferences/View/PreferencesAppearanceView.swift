@@ -111,7 +111,7 @@ extension Preferences {
                             let button = NSPopUpButton()
                             button.setContentHuggingPriority(.defaultHigh, for: .horizontal)
 
-                            for value in DefaultZoomValues.allCases {
+                            for value in DefaultZoomValue.allCases {
                                 let item = button.menu?.addItem(withTitle: value.displayString, action: nil, keyEquivalent: "")
                                 item?.representedObject = value
                             }

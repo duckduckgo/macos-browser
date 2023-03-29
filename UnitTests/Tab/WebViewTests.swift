@@ -31,19 +31,24 @@ final class WebViewTests: XCTestCase {
         window.contentView?.addSubview(webView)
     }
 
+    override func tearDown() {
+        webView = nil
+    }
+
     func testInitialZoomLevelAndMagnification() {
-        XCTAssertEqual(webView.zoomLevel, DefaultZoomValues.percent100)
-        XCTAssertEqual(webView.magnification, 1.0)
+        XCTAssertEqual(webView.zoomLevel, DefaultZoomValue.percent100)
+        XCTAssertEqual(webView.magnification, DefaultZoomValue.percent100.rawValue)
     }
 
     func testThatZoomInIncreasesZoomLevel() {
         let zoomLevel = webView.zoomLevel
         webView.zoomIn()
         XCTAssertGreaterThan(webView.zoomLevel.rawValue, zoomLevel.rawValue)
+        XCTAssertGreaterThan(webView.magnification, zoomLevel.rawValue)
     }
 
     func testThatZoomIncreaesUsingDefaultSteps() {
-        var increasableDefaultValue = DefaultZoomValues.allCases
+        var increasableDefaultValue = DefaultZoomValue.allCases
         increasableDefaultValue.removeLast()
         let randomZoomLevel = increasableDefaultValue.randomElement()!
         webView.zoomLevel = randomZoomLevel
@@ -54,7 +59,7 @@ final class WebViewTests: XCTestCase {
     }
 
     func testThatZoomDecreasesUsingDefaultSteps() {
-        var decreasableDefaultValue = DefaultZoomValues.allCases
+        var decreasableDefaultValue = DefaultZoomValue.allCases
         decreasableDefaultValue.removeFirst()
         let randomZoomLevel = decreasableDefaultValue.randomElement()!
         webView.zoomLevel = randomZoomLevel
@@ -65,19 +70,19 @@ final class WebViewTests: XCTestCase {
     }
 
     func testThatItIsNotPossibleToZoomInFromLastDefaultValue() {
-        webView.zoomLevel = DefaultZoomValues.allCases.last!
+        webView.zoomLevel = DefaultZoomValue.allCases.last!
 
         webView.zoomIn()
 
-        XCTAssertEqual(webView.zoomLevel, DefaultZoomValues.allCases.last!)
+        XCTAssertEqual(webView.zoomLevel, DefaultZoomValue.allCases.last!)
     }
 
     func testThatItIsNotPossibleToZoomOutFromFirstDefaultValue() {
-        webView.zoomLevel = DefaultZoomValues.allCases.first!
+        webView.zoomLevel = DefaultZoomValue.allCases.first!
 
         webView.zoomOut()
 
-        XCTAssertEqual(webView.zoomLevel, DefaultZoomValues.allCases.first!)
+        XCTAssertEqual(webView.zoomLevel, DefaultZoomValue.allCases.first!)
     }
 
     func testThatZoomOutDecreasesZoomLevel() {
@@ -89,7 +94,7 @@ final class WebViewTests: XCTestCase {
     func testThatWebViewCannotBeZoomedInWhenAtMaxZoomLevel() {
         XCTAssertTrue(webView.canZoomIn)
         XCTAssertTrue(webView.canZoomOut)
-        webView.zoomLevel = DefaultZoomValues.allCases[ DefaultZoomValues.allCases.count - 1]
+        webView.zoomLevel = DefaultZoomValue.allCases[ DefaultZoomValue.allCases.count - 1]
         XCTAssertFalse(webView.canZoomIn)
         XCTAssertTrue(webView.canZoomOut)
     }
@@ -97,7 +102,7 @@ final class WebViewTests: XCTestCase {
     func testThatWebViewCannotBeZoomedOutWhenAtMaxZoomLevel() {
         XCTAssertTrue(webView.canZoomIn)
         XCTAssertTrue(webView.canZoomOut)
-        webView.zoomLevel = DefaultZoomValues.allCases[0]
+        webView.zoomLevel = DefaultZoomValue.allCases[0]
         XCTAssertTrue(webView.canZoomIn)
         XCTAssertFalse(webView.canZoomOut)
     }
@@ -112,7 +117,7 @@ final class WebViewTests: XCTestCase {
     }
 
     func testWhenMagnificationChangesThenWebViewCanBeZoomedToActualSize() {
-        webView.magnification = DefaultZoomValues.percent150.rawValue
+        webView.magnification = DefaultZoomValue.percent150.rawValue
         XCTAssertTrue(webView.canZoomToActualSize)
     }
 
@@ -122,11 +127,26 @@ final class WebViewTests: XCTestCase {
         XCTAssertTrue(webView.canZoomToActualSize)
     }
 
-    func testThatResetZoomLevelResetsZoomAndMagnification() {
-        webView.zoomLevel = .percent75
-        webView.magnification = 1.5
-        webView.resetZoomLevel()
-        XCTAssertEqual(webView.zoomLevel, .percent100)
-        XCTAssertEqual(webView.magnification, 1.0)
+    func testThatResetZoomLevelResetsZoomAndMagnifiion() {
+        let tabVM = TabViewModel(tab: Tab())
+        let randomZoomLevel = DefaultZoomValue.percent300
+        // Select Default zoom
+        AppearancePreferences.shared.defaultPageZoom = randomZoomLevel
+
+        // Zooming out
+        tabVM.tab.webView.zoomOut()
+        tabVM.tab.webView.zoomOut()
+        tabVM.tab.webView.zoomOut()
+
+        // Reset
+        tabVM.tab.webView.resetZoomLevel()
+
+        XCTAssertEqual(tabVM.tab.webView.zoomLevel, randomZoomLevel)
+        XCTAssertEqual(tabVM.tab.webView.magnification, randomZoomLevel.rawValue)
+
+        // Set new default zoom
+        AppearancePreferences.shared.defaultPageZoom = .percent75
+        XCTAssertEqual(tabVM.tab.webView.zoomLevel, .percent75)
+        XCTAssertEqual(tabVM.tab.webView.magnification, DefaultZoomValue.percent75.rawValue)
     }
 }

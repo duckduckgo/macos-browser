@@ -35,11 +35,11 @@ struct AppearancePreferencesUserDefaultsPersistor: AppearancePreferencesPersisto
     @UserDefaultsWrapper(key: .currentThemeName, defaultValue: ThemeName.systemDefault.rawValue)
     var currentThemeName: String
 
-    @UserDefaultsWrapper(key: .defaultPageZoom, defaultValue: DefaultZoomValues.percent100.rawValue)
+    @UserDefaultsWrapper(key: .defaultPageZoom, defaultValue: DefaultZoomValue.percent100.rawValue)
     var defaultPageZoom: CGFloat
 }
 
-enum DefaultZoomValues: CGFloat, CaseIterable {
+enum DefaultZoomValue: CGFloat, CaseIterable {
     case percent50 = 0.5
     case percent75 = 0.75
     case percent85 = 0.85
@@ -57,7 +57,7 @@ enum DefaultZoomValues: CGFloat, CaseIterable {
         return String(format: "%.0f%%", percentage)
     }
 
-    var index: Int {DefaultZoomValues.allCases.firstIndex(of: self) ?? 3}
+    var index: Int {DefaultZoomValue.allCases.firstIndex(of: self) ?? 3}
 }
 
 enum ThemeName: String, Equatable, CaseIterable {
@@ -122,7 +122,7 @@ final class AppearancePreferences: ObservableObject {
         }
     }
 
-    @Published var defaultPageZoom: DefaultZoomValues {
+    @Published var defaultPageZoom: DefaultZoomValue {
         didSet {
             persistor.defaultPageZoom = defaultPageZoom.rawValue
         }

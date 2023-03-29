@@ -35,16 +35,23 @@ final class WebView: WKWebView {
 
     // MARK: - Zoom
 
-    var zoomLevel: DefaultZoomValues {
+    var defaultZoomValue: DefaultZoomValue = .percent100 {
+        didSet {
+            print(defaultZoomValue)
+        }
+    }
+
+    var zoomLevel: DefaultZoomValue {
         get {
             if #available(macOS 11.0, *) {
-                return DefaultZoomValues(rawValue: pageZoom) ?? .percent100
+                return DefaultZoomValue(rawValue: pageZoom) ?? .percent100
             }
-            return DefaultZoomValues(rawValue: magnification) ?? .percent100
+            return DefaultZoomValue(rawValue: magnification) ?? .percent100
         }
         set {
             if #available(macOS 11.0, *) {
                 pageZoom = newValue.rawValue
+                magnification = newValue.rawValue
             } else {
                 magnification = newValue.rawValue
             }
@@ -56,7 +63,7 @@ final class WebView: WKWebView {
     }
 
     var canZoomIn: Bool {
-        self.window != nil && self.zoomLevel.index < DefaultZoomValues.allCases.count - 1
+        self.window != nil && self.zoomLevel.index < DefaultZoomValue.allCases.count - 1
     }
 
     var canZoomOut: Bool {
@@ -64,18 +71,17 @@ final class WebView: WKWebView {
     }
 
     func resetZoomLevel() {
-        self.zoomLevel = DefaultZoomValues.percent100
-        self.magnification = DefaultZoomValues.percent100.rawValue
+        self.zoomLevel = self.defaultZoomValue
     }
 
     func zoomIn() {
         guard canZoomIn else { return }
-        self.zoomLevel = DefaultZoomValues.allCases[self.zoomLevel.index + 1]
+        self.zoomLevel = DefaultZoomValue.allCases[self.zoomLevel.index + 1]
     }
 
     func zoomOut() {
         guard canZoomOut else { return }
-        self.zoomLevel = DefaultZoomValues.allCases[self.zoomLevel.index - 1]
+        self.zoomLevel = DefaultZoomValue.allCases[self.zoomLevel.index - 1]
     }
 
     // MARK: - Menu
