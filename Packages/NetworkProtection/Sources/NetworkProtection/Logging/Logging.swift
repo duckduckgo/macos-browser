@@ -25,24 +25,28 @@ extension OSLog {
         Logging.networkProtectionLoggingEnabled ? Logging.networkProtection : .disabled
     }
 
-    public static var networkProtectionMemoryLog: OSLog {
-        Logging.networkProtectionMemoryLoggingEnabled ? Logging.networkProtectionMemoryLog : .disabled
-    }
-
-    public static var networkProtectionPixel: OSLog {
-        Logging.networkProtectionPixelLoggingEnabled ? Logging.networkProtectionPixel : .disabled
-    }
-
-    public static var networkProtectionKeyManagement: OSLog {
-        Logging.networkProtectionKeyManagementLoggingEnabled ? Logging.networkProtectionKeyManagement : .disabled
-    }
-
     public static var networkProtectionBandwidthAnalysis: OSLog {
         Logging.networkProtectionBandwidthAnalysisLoggingEnabled ? Logging.networkProtectionBandwidthAnalysis : .disabled
     }
 
     public static var networkProtectionConnectionTesterLog: OSLog {
         Logging.networkProtectionConnectionTesterLoggingEnabled ? Logging.networkProtectionConnectionTesterLog : .disabled
+    }
+
+    public static var networkProtectionIPCLog: OSLog {
+        Logging.networkProtectionIPCLoggingEnabled ? Logging.networkProtectionIPCLog : .disabled
+    }
+
+    public static var networkProtectionKeyManagement: OSLog {
+        Logging.networkProtectionKeyManagementLoggingEnabled ? Logging.networkProtectionKeyManagement : .disabled
+    }
+
+    public static var networkProtectionMemoryLog: OSLog {
+        Logging.networkProtectionMemoryLoggingEnabled ? Logging.networkProtectionMemoryLog : .disabled
+    }
+
+    public static var networkProtectionPixel: OSLog {
+        Logging.networkProtectionPixelLoggingEnabled ? Logging.networkProtectionPixel : .disabled
     }
 
     public static var networkProtectionSleepLog: OSLog {
@@ -57,20 +61,23 @@ struct Logging {
     fileprivate static let networkProtectionLoggingEnabled = true
     fileprivate static let networkProtection: OSLog = OSLog(subsystem: subsystem, category: "Network Protection")
 
-    fileprivate static let networkProtectionMemoryLoggingEnabled = true
-    fileprivate static let networkProtectionMemoryLog: OSLog = OSLog(subsystem: subsystem, category: "Network Protection: Memory")
-
-    fileprivate static let networkProtectionPixelLoggingEnabled = true
-    fileprivate static let networkProtectionPixel: OSLog = OSLog(subsystem: subsystem, category: "Network Protection: Pixel")
-
-    fileprivate static let networkProtectionKeyManagementLoggingEnabled = true
-    fileprivate static let networkProtectionKeyManagement: OSLog = OSLog(subsystem: subsystem, category: "Network Protection: Key Management")
-
     fileprivate static let networkProtectionBandwidthAnalysisLoggingEnabled = true
     fileprivate static let networkProtectionBandwidthAnalysis: OSLog = OSLog(subsystem: subsystem, category: "Network Protection: Bandwidth Analysis")
 
     fileprivate static let networkProtectionConnectionTesterLoggingEnabled = true
     fileprivate static let networkProtectionConnectionTesterLog: OSLog = OSLog(subsystem: subsystem, category: "Network Protection: Connection Tester")
+
+    fileprivate static let networkProtectionIPCLoggingEnabled = true
+    fileprivate static let networkProtectionIPCLog: OSLog = OSLog(subsystem: subsystem, category: "Network Protection: IPC")
+
+    fileprivate static let networkProtectionKeyManagementLoggingEnabled = true
+    fileprivate static let networkProtectionKeyManagement: OSLog = OSLog(subsystem: subsystem, category: "Network Protection: Key Management")
+
+    fileprivate static let networkProtectionMemoryLoggingEnabled = true
+    fileprivate static let networkProtectionMemoryLog: OSLog = OSLog(subsystem: subsystem, category: "Network Protection: Memory")
+
+    fileprivate static let networkProtectionPixelLoggingEnabled = true
+    fileprivate static let networkProtectionPixel: OSLog = OSLog(subsystem: subsystem, category: "Network Protection: Pixel")
 
     fileprivate static let networkProtectionSleepLoggingEnabled = true
     fileprivate static let networkProtectionSleepLog: OSLog = OSLog(subsystem: subsystem, category: "Network Protection: Sleep and Wake")

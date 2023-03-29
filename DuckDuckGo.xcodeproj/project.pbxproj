@@ -1879,6 +1879,7 @@
 		7B48D2D6299E6DCB0098A496 /* clickToLoad.js in Resources */ = {isa = PBXBuildFile; fileRef = EAFAD6C92728BD1200F9DF00 /* clickToLoad.js */; };
 		7B48D2D7299E6DCB0098A496 /* findinpage.js in Resources */ = {isa = PBXBuildFile; fileRef = 336D5AEF262D8D3C0052E0C9 /* findinpage.js */; };
 		7B4CE8E726F02135009134B1 /* TabBarTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B4CE8E626F02134009134B1 /* TabBarTests.swift */; };
+		7B5F506029D2DA6C008C83E8 /* Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B5F505F29D2DA6C008C83E8 /* Logging.swift */; };
 		7B713F5C29ACF6C400A07DB1 /* BrowserServicesKit in Frameworks */ = {isa = PBXBuildFile; productRef = 7B713F5B29ACF6C400A07DB1 /* BrowserServicesKit */; };
 		7B713F5F29ACFF2D00A07DB1 /* NetworkProtectionUNNotificationsPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BFA781C299E76700003284F /* NetworkProtectionUNNotificationsPresenter.swift */; };
 		7B713F6029ACFF4300A07DB1 /* NSNotificationName+NetPDistributed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BFA7813299E76700003284F /* NSNotificationName+NetPDistributed.swift */; };
@@ -3664,6 +3665,7 @@
 		7B4CE8DA26F02108009134B1 /* UI Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "UI Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		7B4CE8DE26F02108009134B1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7B4CE8E626F02134009134B1 /* TabBarTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarTests.swift; sourceTree = "<group>"; };
+		7B5F505F29D2DA6C008C83E8 /* Logging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logging.swift; sourceTree = "<group>"; };
 		7B6347BF29ABA36E0011865E /* NetPExtensionSysex.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = NetPExtensionSysex.xcconfig; sourceTree = "<group>"; };
 		7B83057D29ABCCCE00663EAF /* DuckDuckGo Notifications.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "DuckDuckGo Notifications.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		7B83057F29ABCCCE00663EAF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -5410,6 +5412,7 @@
 			isa = PBXGroup;
 			children = (
 				7B8305AE29ABCD1C00663EAF /* main.swift */,
+				7B5F505F29D2DA6C008C83E8 /* Logging.swift */,
 				7B83057F29ABCCCE00663EAF /* AppDelegate.swift */,
 				7B83058329ABCCCF00663EAF /* Assets.xcassets */,
 				7B83058829ABCCCF00663EAF /* DuckDuckGoNotifications.entitlements */,
@@ -9782,6 +9785,7 @@
 				7B713F6629ACFF6F00A07DB1 /* NetworkProtectionSharedState.swift in Sources */,
 				7B713F6529ACFF6500A07DB1 /* NetworkProtectionNotificationsPresenter.swift in Sources */,
 				7B713F5F29ACFF2D00A07DB1 /* NetworkProtectionUNNotificationsPresenter.swift in Sources */,
+				7B5F506029D2DA6C008C83E8 /* Logging.swift in Sources */,
 				7B713F6429ACFF6000A07DB1 /* NetworkProtectionAppLauncher.swift in Sources */,
 				7B713F6229ACFF5300A07DB1 /* NetworkProtectionExtensionMachService.swift in Sources */,
 				7B713F6129ACFF4800A07DB1 /* IPCConnection.swift in Sources */,

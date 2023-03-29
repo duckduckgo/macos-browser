@@ -28,7 +28,7 @@ import AppIntents
 final class NetworkProtectionIPCNotificationsPresenter: NetworkProtectionNotificationsPresenter {
     private let ipcConnection: IPCConnection
 
-    init(ipcConnection: IPCConnection = .shared) {
+    init(ipcConnection: IPCConnection) {
         self.ipcConnection = ipcConnection
     }
 

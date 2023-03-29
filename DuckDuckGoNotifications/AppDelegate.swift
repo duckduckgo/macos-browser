@@ -24,6 +24,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private var notificationsPresenter = NetworkProtectionUNNotificationsPresenter()
     private var statusChangeObserverToken: NSObjectProtocol?
+    private let ipcConnection = IPCConnection(log: .networkProtectionIPCLoginItemLog, memoryManagementLog: .networkProtectionMemoryLog)
 
     var observer: NSKeyValueObservation?
 
@@ -58,7 +59,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     ///         started by the system extension.  This is purely for more precise logging.
     ///
     private func registerConnection(listenerStarted: Bool) {
-        IPCConnection.shared.register(machServiceName: "HKE973VLUW.com.duckduckgo.macos.browser.network-protection.system-extension", delegate: self) { success in
+        ipcConnection.register(machServiceName: "HKE973VLUW.com.duckduckgo.macos.browser.network-protection.system-extension", delegate: self) { success in
             DispatchQueue.main.async {
                 if success {
                     os_log("IPC connection with system extension succeeded")

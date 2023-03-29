@@ -66,9 +66,9 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
 
     // MARK: - User Notifications
 
-    private let notificationsPresenter: NetworkProtectionNotificationsPresenter = {
+    private lazy var notificationsPresenter: NetworkProtectionNotificationsPresenter = {
 #if NETP_SYSTEM_EXTENSION
-        NetworkProtectionIPCNotificationsPresenter()
+        NetworkProtectionIPCNotificationsPresenter(ipcConnection: self.ipcConnection)
 #else
         NetworkProtectionUNNotificationsPresenter()
 #endif
@@ -172,6 +172,10 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         bandwidthAnalyzer.record(rxBytes: rx, txBytes: tx)
     }
 
+    // MARK: - IPC
+
+    let ipcConnection = IPCConnection(log: .networkProtectionIPCLog, memoryManagementLog: .networkProtectionMemoryLog)
+
     // MARK: - Connection tester
 
     private lazy var connectionTester: NetworkProtectionConnectionTester = {
@@ -219,7 +223,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         super.init()
 
         #if NETP_SYSTEM_EXTENSION
-        IPCConnection.shared.startListener()
+        ipcConnection.startListener()
         #endif
     }
 
@@ -363,7 +367,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
     }
 
     override func stopTunnel(with reason: NEProviderStopReason, completionHandler: @escaping () -> Void) {
-        os_log("🔵 Stopping tunnel", log: .networkProtection, type: .info)
+        os_log("Stopping tunnel with reason %{public}@", log: .networkProtection, type: .info, String(describing: reason))
 
         adapter.stop { error in
             if let error = error {
@@ -375,26 +379,21 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
                 await self.connectionTester.stop()
 
                 completionHandler()
-
-#if os(macOS)
-                // HACK: This is a filthy hack to work around Apple bug 32073323 (dup'd by us as 47526107).
-                // Remove it when they finally fix this upstream and the fix has been rolled out to
-                // sufficient quantities of users.
-                exit(0)
-#endif
             }
         }
     }
 
     /// Do not cancel, directly... call this method so that the adapter and tester are stopped too.
     private func stopTunnel(with stopError: Error) {
+        os_log("Stopping tunnel with error %{public}@", log: .networkProtection, type: .info, stopError.localizedDescription)
+
         Task {
             await connectionTester.stop()
         }
 
         self.adapter.stop { error in
             if let error = error {
-                os_log("🔵 Error while stopping adapter: %{public}@", log: .networkProtection, type: .info, error.localizedDescription)
+                os_log("Error while stopping adapter: %{public}@", log: .networkProtection, type: .info, error.localizedDescription)
             }
 
             self.cancelTunnelWithError(stopError)
