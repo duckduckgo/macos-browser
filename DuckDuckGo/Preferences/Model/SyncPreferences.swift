@@ -171,8 +171,8 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                     return
                 }
 
-                let hostname = SCDynamicStoreCopyComputerName(nil, nil) as? String ?? ProcessInfo.processInfo.hostName
-                try await syncService.login(recoveryKey, deviceName: hostname, deviceType: "desktop")
+                let device = deviceInfo()
+                try await syncService.login(recoveryKey, deviceName: device.name, deviceType: device.type)
                 managementDialogModel.endFlow()
             } catch {
                 managementDialogModel.errorMessage = String(describing: error)
@@ -186,13 +186,15 @@ extension SyncPreferences: ManagementDialogModelDelegate {
             managementDialogModel.connectCode = connect.code
             presentDialog(for: .syncAnotherDevice)
 
-            let task = Task { @MainActor in
-                try await connect.connect()
+            let task = { @MainActor in
+                let device = self.deviceInfo()
+                let connection = try await connect.connect(deviceName: device.name, deviceType: device.type)
             }
 
             // TODO cancel the task if the UI closes
         } catch {
             // TODO handle this
+            print("***", error)
         }
 
     }
@@ -208,4 +210,10 @@ extension SyncPreferences: ManagementDialogModelDelegate {
     func saveRecoveryPDF() {
         managementDialogModel.endFlow()
     }
+
+    private func deviceInfo() -> (name: String, type: String) {
+        let hostname = SCDynamicStoreCopyComputerName(nil, nil) as? String ?? ProcessInfo.processInfo.hostName
+        return (name: hostname, type: "desktop")
+    }
+
 }
