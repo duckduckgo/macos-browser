@@ -75,6 +75,20 @@ final class WebViewContainerView: NSView {
         super.removeFromSuperview()
     }
 
+    // MARK: NSDraggingDestination
+
+    override func draggingEntered(_ draggingInfo: NSDraggingInfo) -> NSDragOperation {
+        return superview?.draggingEntered(draggingInfo) ?? .none
+    }
+
+    override func draggingUpdated(_ draggingInfo: NSDraggingInfo) -> NSDragOperation {
+        return superview?.draggingUpdated(draggingInfo) ?? .none
+    }
+
+    override func performDragOperation(_ draggingInfo: NSDraggingInfo) -> Bool {
+        return superview?.performDragOperation(draggingInfo) ?? false
+    }
+
 }
 
 extension WebView {

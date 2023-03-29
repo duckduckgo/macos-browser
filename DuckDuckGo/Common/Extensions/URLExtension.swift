@@ -191,6 +191,10 @@ extension URL {
         }
     }
 
+    var navigationalScheme: NavigationalScheme? {
+        self.scheme.map(NavigationalScheme.init(rawValue:))
+    }
+
     var separatedScheme: String? {
         self.scheme.map { $0 + NavigationalScheme.separator }
     }
