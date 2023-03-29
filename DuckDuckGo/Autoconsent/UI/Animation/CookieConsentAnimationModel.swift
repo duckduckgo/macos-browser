@@ -78,7 +78,6 @@ final class CookieConsentAnimationModel: CookieConsentAnimation {
             pillLeftSideOffset = Animation.Pills.leftSideOffset.end
         }
     }
-
     func startAnimation() {
         updateDataForFirstAnimation()
 
