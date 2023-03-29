@@ -36,6 +36,7 @@ struct AskToSyncAnotherDeviceView<ViewModel>: View where ViewModel: ManagementDi
             }
         } buttons: {
             Button(UserText.notNow) {
+                model.delegate?.dontSyncAnotherDeviceNow()
                 model.endFlow()
             }
             Button(UserText.syncAnotherDevice) {

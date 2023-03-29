@@ -86,6 +86,8 @@
 		31F28C5828C8EEDB00119F70 /* youtube_player_template.html in Resources */ = {isa = PBXBuildFile; fileRef = 31F28C5528C8EEDB00119F70 /* youtube_player_template.html */; };
 		31F7F2A6288AD2CA001C0D64 /* NavigationBarBadgeAnimationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31F7F2A5288AD2CA001C0D64 /* NavigationBarBadgeAnimationView.swift */; };
 		336D5B18262D8D3C0052E0C9 /* findinpage.js in Resources */ = {isa = PBXBuildFile; fileRef = 336D5AEF262D8D3C0052E0C9 /* findinpage.js */; };
+		3701C9CE29BD040C00305B15 /* FirefoxBerkeleyDatabaseReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3701C9CD29BD040900305B15 /* FirefoxBerkeleyDatabaseReader.swift */; };
+		3701C9CF29BD040C00305B15 /* FirefoxBerkeleyDatabaseReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3701C9CD29BD040900305B15 /* FirefoxBerkeleyDatabaseReader.swift */; };
 		37054FC92873301700033B6F /* PinnedTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37054FC82873301700033B6F /* PinnedTabView.swift */; };
 		37054FCE2876472D00033B6F /* WebViewSnapshotView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37054FCD2876472D00033B6F /* WebViewSnapshotView.swift */; };
 		3706FA7B293F65D500E42796 /* FaviconUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA0CC562539EBC90079BC96 /* FaviconUserScript.swift */; };
@@ -214,7 +216,6 @@
 		3706FB09293F65D500E42796 /* CrashReport.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC30A29268E239100D2D9CD /* CrashReport.swift */; };
 		3706FB0A293F65D500E42796 /* NSPathControlView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CC53F327E8D4620028713D /* NSPathControlView.swift */; };
 		3706FB0B293F65D500E42796 /* DefaultBrowserPromptView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85589E9D27BFE4500038AD11 /* DefaultBrowserPromptView.swift */; };
-		3706FB0C293F65D500E42796 /* FirefoxBerkeleyDatabaseReader.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B29759B28284DBC00187C4E /* FirefoxBerkeleyDatabaseReader.m */; };
 		3706FB0D293F65D500E42796 /* BrowserImportSummaryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B78A86A26BB3ADD0071BB16 /* BrowserImportSummaryViewController.swift */; };
 		3706FB0E293F65D500E42796 /* FaviconManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA512D1324D99D9800230283 /* FaviconManager.swift */; };
 		3706FB0F293F65D500E42796 /* ChromiumFaviconsReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0AACAB28BC63ED001038AC /* ChromiumFaviconsReader.swift */; };
@@ -1012,7 +1013,6 @@
 		4B1E6EF227AB5E5D00F51793 /* PasswordManagementItemList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B1E6EF027AB5E5D00F51793 /* PasswordManagementItemList.swift */; };
 		4B29759728281F0900187C4E /* FirefoxEncryptionKeyReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B29759628281F0900187C4E /* FirefoxEncryptionKeyReader.swift */; };
 		4B2975992828285900187C4E /* FirefoxKeyReaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B2975982828285900187C4E /* FirefoxKeyReaderTests.swift */; };
-		4B29759C28284DBC00187C4E /* FirefoxBerkeleyDatabaseReader.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B29759B28284DBC00187C4E /* FirefoxBerkeleyDatabaseReader.m */; };
 		4B2E7D6326FF9D6500D2DB17 /* PrintingUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B2E7D6226FF9D6500D2DB17 /* PrintingUserScript.swift */; };
 		4B379C1527BD91E3008A968E /* QuartzIdleStateProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B379C1427BD91E3008A968E /* QuartzIdleStateProvider.swift */; };
 		4B379C1E27BDB7FF008A968E /* DeviceAuthenticator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B379C1D27BDB7FF008A968E /* DeviceAuthenticator.swift */; };
@@ -1952,6 +1952,7 @@
 		336B39E22726B4B700C417D3 /* LocalUnprotectedDomains.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalUnprotectedDomains.swift; sourceTree = "<group>"; };
 		336D5AEF262D8D3C0052E0C9 /* findinpage.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = findinpage.js; sourceTree = "<group>"; };
 		339A6B5726A044BA00E3DAE8 /* duckduckgo-privacy-dashboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "duckduckgo-privacy-dashboard"; path = "Submodules/duckduckgo-privacy-dashboard"; sourceTree = SOURCE_ROOT; };
+		3701C9CD29BD040900305B15 /* FirefoxBerkeleyDatabaseReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirefoxBerkeleyDatabaseReader.swift; sourceTree = "<group>"; };
 		37054FC82873301700033B6F /* PinnedTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PinnedTabView.swift; sourceTree = "<group>"; };
 		37054FCD2876472D00033B6F /* WebViewSnapshotView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewSnapshotView.swift; sourceTree = "<group>"; };
 		3706FD05293F65D500E42796 /* DuckDuckGo App Store.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "DuckDuckGo App Store.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -2077,8 +2078,6 @@
 		4B1E6EF027AB5E5D00F51793 /* PasswordManagementItemList.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PasswordManagementItemList.swift; sourceTree = "<group>"; };
 		4B29759628281F0900187C4E /* FirefoxEncryptionKeyReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirefoxEncryptionKeyReader.swift; sourceTree = "<group>"; };
 		4B2975982828285900187C4E /* FirefoxKeyReaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirefoxKeyReaderTests.swift; sourceTree = "<group>"; };
-		4B29759A28284DBC00187C4E /* FirefoxBerkeleyDatabaseReader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FirefoxBerkeleyDatabaseReader.h; sourceTree = "<group>"; };
-		4B29759B28284DBC00187C4E /* FirefoxBerkeleyDatabaseReader.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FirefoxBerkeleyDatabaseReader.m; sourceTree = "<group>"; };
 		4B2E7D6226FF9D6500D2DB17 /* PrintingUserScript.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrintingUserScript.swift; sourceTree = "<group>"; };
 		4B379C1427BD91E3008A968E /* QuartzIdleStateProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuartzIdleStateProvider.swift; sourceTree = "<group>"; };
 		4B379C1D27BDB7FF008A968E /* DeviceAuthenticator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceAuthenticator.swift; sourceTree = "<group>"; };
@@ -3670,10 +3669,9 @@
 			children = (
 				4B8AC93826B48A5100879451 /* FirefoxLoginReader.swift */,
 				4B29759628281F0900187C4E /* FirefoxEncryptionKeyReader.swift */,
+				3701C9CD29BD040900305B15 /* FirefoxBerkeleyDatabaseReader.swift */,
 				4B5FF67726B602B100D42879 /* FirefoxDataImporter.swift */,
 				4B8AC93A26B48ADF00879451 /* ASN1Parser.swift */,
-				4B29759A28284DBC00187C4E /* FirefoxBerkeleyDatabaseReader.h */,
-				4B29759B28284DBC00187C4E /* FirefoxBerkeleyDatabaseReader.m */,
 			);
 			path = Firefox;
 			sourceTree = "<group>";
@@ -6548,7 +6546,6 @@
 				3706FB09293F65D500E42796 /* CrashReport.swift in Sources */,
 				3706FB0A293F65D500E42796 /* NSPathControlView.swift in Sources */,
 				3706FB0B293F65D500E42796 /* DefaultBrowserPromptView.swift in Sources */,
-				3706FB0C293F65D500E42796 /* FirefoxBerkeleyDatabaseReader.m in Sources */,
 				3706FB0D293F65D500E42796 /* BrowserImportSummaryViewController.swift in Sources */,
 				3706FB0E293F65D500E42796 /* FaviconManager.swift in Sources */,
 				3706FB0F293F65D500E42796 /* ChromiumFaviconsReader.swift in Sources */,
@@ -6936,6 +6933,7 @@
 				3706FC7B293F65D500E42796 /* PasswordManagementViewController.swift in Sources */,
 				3706FC7C293F65D500E42796 /* ImportedBookmarks.swift in Sources */,
 				3706FC7D293F65D500E42796 /* NSMenuExtension.swift in Sources */,
+				3701C9CF29BD040C00305B15 /* FirefoxBerkeleyDatabaseReader.swift in Sources */,
 				3706FC7E293F65D500E42796 /* MainWindowController.swift in Sources */,
 				3706FC7F293F65D500E42796 /* Tab.swift in Sources */,
 				3706FC81293F65D500E42796 /* DispatchQueueExtensions.swift in Sources */,
@@ -7415,7 +7413,6 @@
 				1D36E65B298ACD2900AA485D /* AppIconChanger.swift in Sources */,
 				98779A0029999B64005D8EB6 /* Bookmark.xcdatamodeld in Sources */,
 				85589E9E27BFE4500038AD11 /* DefaultBrowserPromptView.swift in Sources */,
-				4B29759C28284DBC00187C4E /* FirefoxBerkeleyDatabaseReader.m in Sources */,
 				4B78A86B26BB3ADD0071BB16 /* BrowserImportSummaryViewController.swift in Sources */,
 				AA512D1424D99D9800230283 /* FaviconManager.swift in Sources */,
 				4B0AACAC28BC63ED001038AC /* ChromiumFaviconsReader.swift in Sources */,
@@ -7446,6 +7443,7 @@
 				B6B1E88426D5EB570062C350 /* DownloadsCellView.swift in Sources */,
 				4B723E0C26B0005D00E14D75 /* FileImportSummaryViewController.swift in Sources */,
 				B6AAAC2D260330580029438D /* PublishedAfter.swift in Sources */,
+				3701C9CE29BD040C00305B15 /* FirefoxBerkeleyDatabaseReader.swift in Sources */,
 				37054FCE2876472D00033B6F /* WebViewSnapshotView.swift in Sources */,
 				4BBC16A027C4859400E00A38 /* DeviceAuthenticationService.swift in Sources */,
 				CB24F70C29A3D9CB006DCC58 /* AppConfigurationURLProvider.swift in Sources */,
@@ -8573,7 +8571,7 @@
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
 				kind = revision;
-				revision = 4fdacf073c39f24c9e183e9875ce44ac51038cc9;
+				revision = 822f8585c90606f6b7ff87e01cd4709790770c0a;
 			};
 		};
 		AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
