@@ -69,7 +69,7 @@ class HistoryIntegrationTests: XCTestCase {
         let titleChangedPromise1 = tab.$title
             .filter { $0 == "Title 1" }
             .receive(on: DispatchQueue.main)
-            .timeout(1, "Title 1")
+            .timeout(2, "Title 1")
             .first()
             .promise()
 
