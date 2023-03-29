@@ -181,22 +181,21 @@ extension SyncPreferences: ManagementDialogModelDelegate {
     }
 
     func presentSyncAnotherDeviceDialog() {
-        do {
-            let connect = try syncService.remoteConnect()
-            managementDialogModel.connectCode = connect.code
-            presentDialog(for: .syncAnotherDevice)
+        let task = Task { @MainActor in
+            do {
+                let connect = try syncService.remoteConnect()
+                managementDialogModel.connectCode = connect.code
+                presentDialog(for: .syncAnotherDevice)
 
-            let task = { @MainActor in
-                let device = self.deviceInfo()
-                let connection = try await connect.connect(deviceName: device.name, deviceType: device.type)
+                    let device = self.deviceInfo()
+                    let connection = try await connect.connect(deviceName: device.name, deviceType: device.type)
+                    self.onEndFlow()
+                // TODO cancel the task if the UI closes
+            } catch {
+                // TODO handle this
+                print("***", error)
             }
-
-            // TODO cancel the task if the UI closes
-        } catch {
-            // TODO handle this
-            print("***", error)
         }
-
     }
 
     func addAnotherDevice() {
