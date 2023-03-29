@@ -35,11 +35,7 @@ final class WebView: WKWebView {
 
     // MARK: - Zoom
 
-    var defaultZoomValue: DefaultZoomValue = .percent100 {
-        didSet {
-            print(defaultZoomValue)
-        }
-    }
+    var defaultZoomValue: DefaultZoomValue = .percent100
 
     var zoomLevel: DefaultZoomValue {
         get {
@@ -51,7 +47,6 @@ final class WebView: WKWebView {
         set {
             if #available(macOS 11.0, *) {
                 pageZoom = newValue.rawValue
-                magnification = newValue.rawValue
             } else {
                 magnification = newValue.rawValue
             }
@@ -59,7 +54,7 @@ final class WebView: WKWebView {
     }
 
     var canZoomToActualSize: Bool {
-        self.window != nil && (self.zoomLevel != .percent100 || self.magnification != 1.0)
+        return self.window != nil && (self.zoomLevel != defaultZoomValue)
     }
 
     var canZoomIn: Bool {

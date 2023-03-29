@@ -44,7 +44,6 @@ final class WebViewTests: XCTestCase {
         let zoomLevel = webView.zoomLevel
         webView.zoomIn()
         XCTAssertGreaterThan(webView.zoomLevel.rawValue, zoomLevel.rawValue)
-        XCTAssertGreaterThan(webView.magnification, zoomLevel.rawValue)
     }
 
     func testThatZoomIncreaesUsingDefaultSteps() {
@@ -117,17 +116,11 @@ final class WebViewTests: XCTestCase {
     }
 
     func testWhenMagnificationChangesThenWebViewCanBeZoomedToActualSize() {
-        webView.magnification = DefaultZoomValue.percent150.rawValue
+        webView.zoomLevel = DefaultZoomValue.percent150
         XCTAssertTrue(webView.canZoomToActualSize)
     }
 
-    func testWhenZoomLevelAndMagnificationChangeThenWebViewCanBeZoomedToActualSize() {
-        webView.zoomLevel = .percent75
-        webView.magnification = 1.5
-        XCTAssertTrue(webView.canZoomToActualSize)
-    }
-
-    func testThatResetZoomLevelResetsZoomAndMagnifiion() {
+    func testThatResetZoomLevelResetsZoom() {
         let tabVM = TabViewModel(tab: Tab())
         let randomZoomLevel = DefaultZoomValue.percent300
         // Select Default zoom
@@ -142,11 +135,9 @@ final class WebViewTests: XCTestCase {
         tabVM.tab.webView.resetZoomLevel()
 
         XCTAssertEqual(tabVM.tab.webView.zoomLevel, randomZoomLevel)
-        XCTAssertEqual(tabVM.tab.webView.magnification, randomZoomLevel.rawValue)
 
         // Set new default zoom
         AppearancePreferences.shared.defaultPageZoom = .percent75
         XCTAssertEqual(tabVM.tab.webView.zoomLevel, .percent75)
-        XCTAssertEqual(tabVM.tab.webView.magnification, DefaultZoomValue.percent75.rawValue)
     }
 }

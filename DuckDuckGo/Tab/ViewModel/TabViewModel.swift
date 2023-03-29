@@ -169,8 +169,8 @@ final class TabViewModel {
         }.store(in: &cancellables)
         appearancePreferences.$defaultPageZoom.sink { [weak self] newValue in
             guard let self = self else { return }
-            self.tab.webView.zoomLevel = newValue
             self.tab.webView.defaultZoomValue = newValue
+            self.tab.webView.zoomLevel = newValue
         }.store(in: &cancellables)
     }
 
