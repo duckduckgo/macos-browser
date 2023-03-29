@@ -32,4 +32,9 @@ extension NSPasteboard {
         setString(string ?? url.absoluteString, forType: .string)
     }
 
+    var url: URL? {
+        guard let urlString = self.string(forType: .URL) ?? self.string(forType: .fileURL) else { return nil }
+        return URL(string: urlString)
+    }
+
 }

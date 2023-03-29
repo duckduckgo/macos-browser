@@ -69,6 +69,8 @@ final class AddressBarTextField: NSTextField {
 
         allowsEditingTextAttributes = true
         super.delegate = self
+
+        registerForDraggedTypes([.string, .URL, .fileURL])
     }
 
     override func mouseDown(with event: NSEvent) {
@@ -704,6 +706,34 @@ final class AddressBarTextField: NSTextField {
 
         let shouldShowFullURL = AppearancePreferences.shared.showFullURL
         menuItem.state = shouldShowFullURL ? .on : .off
+    }
+
+    // MARK: NSDraggingDestination
+
+    override func draggingEntered(_ draggingInfo: NSDraggingInfo) -> NSDragOperation {
+        return .copy
+    }
+
+    override func draggingUpdated(_ draggingInfo: NSDraggingInfo) -> NSDragOperation {
+        return .copy
+    }
+
+    override func performDragOperation(_ draggingInfo: NSDraggingInfo) -> Bool {
+        if let url = draggingInfo.draggingPasteboard.url {
+            tabCollectionViewModel.selectedTabViewModel?.tab.setUrl(url, userEntered: true)
+
+        } else if let stringValue = draggingInfo.draggingPasteboard.string(forType: .string) {
+            self.stringValue = stringValue
+
+            window?.makeKeyAndOrderFront(self)
+            NSApp.activate(ignoringOtherApps: true)
+            self.makeMeFirstResponder()
+
+        } else {
+            return false
+        }
+
+        return true
     }
 
 }
