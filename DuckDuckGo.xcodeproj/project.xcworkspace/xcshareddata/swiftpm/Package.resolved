@@ -6,7 +6,7 @@
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
         "branch" : "graeme/feature-flagging-with-autofill-subfeatures",
-        "revision" : "890e4803d8c665f67eb0cba354f21cdf67a400e4"
+        "revision" : "02f6a8eaa82ae4ccd344e834fae32fa727e20eab"
       }
     },
     {
@@ -23,8 +23,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/duckduckgo-autofill.git",
       "state" : {
-        "revision" : "9f0c2eab4223f1f28cced4eac73e4381a8daa35e",
-        "version" : "6.3.0"
+        "revision" : "26283ffcc7ed69a6853dfeca4514a2e552da2c96",
+        "version" : "6.4.1"
       }
     },
     {
