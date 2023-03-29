@@ -245,15 +245,8 @@ extension FileDownloadManager: WebKitDownloadTaskDelegate {
     func fileDownloadTask(_ task: WebKitDownloadTask, didFinishWith result: Result<URL, FileDownloadError>) {
         dispatchPrecondition(condition: .onQueue(.main))
 
-        defer {
-            self.downloads.remove(task)
-            self.downloadTaskDelegates[task] = nil
-        }
-
-        if case .success(let url) = result {
-            try? url.setQuarantineAttributes(sourceURL: task.originalRequest?.url,
-                                             referrerURL: task.originalRequest?.mainDocumentURL)
-        }
+        self.downloads.remove(task)
+        self.downloadTaskDelegates[task] = nil
     }
 
 }
