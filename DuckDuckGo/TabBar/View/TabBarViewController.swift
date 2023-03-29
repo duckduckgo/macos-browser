@@ -745,7 +745,7 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
     }
 
     private func scrollCollectionViewToEnd() {
-        // Old frameworks are like old people. They need a special treatment
+        // Old frameworks... need a special treatment
         collectionView.scrollToEnd { _ in
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
                 self.collectionView.scrollToEnd()
