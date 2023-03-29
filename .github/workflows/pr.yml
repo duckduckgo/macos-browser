@@ -117,7 +117,6 @@ jobs:
           -configuration "CI" \
           ENABLE_TESTABILITY=true \
           ONLY_ACTIVE_ARCH=${{ matrix.active-arch }} \
-          | tee xcodebuild.log \
           | xcbeautify --report junit --report-path . --junit-report-filename unittests-${{ matrix.flavor }}.xml
 
     - name: Check private API usage
@@ -152,13 +151,6 @@ jobs:
       with:
         check_name: "Test Report: ${{ matrix.flavor }}"
         report_paths: unittests-${{ matrix.flavor }}.xml
-
-    - name: Upload failed test log
-      uses: actions/upload-artifact@v3
-      if: failure()
-      with:
-        name: xcodebuild.log
-        path: xcodebuild.log
 
   private-api:
     name: Private API Report
