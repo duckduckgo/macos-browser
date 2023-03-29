@@ -359,8 +359,12 @@ extension BookmarkListViewController: FolderMenuItemSelectors {
             assertionFailure("Failed to retrieve Bookmark from Rename Folder context menu item")
             return
         }
+
+        delegate?.popover(shouldPreventClosure: true)
+
         let addFolderViewController = AddFolderModalViewController.create()
         addFolderViewController.edit(folder: folder)
+        addFolderViewController.delegate = self
         beginSheetFromMainWindow(addFolderViewController)
     }
 

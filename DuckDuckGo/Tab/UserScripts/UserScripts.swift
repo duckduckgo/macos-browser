@@ -58,7 +58,7 @@ final class UserScripts: UserScriptsProvider {
             autoconsentUserScript = nil
         }
 
-        if PrivatePlayer.shared.isAvailable {
+        if DuckPlayer.shared.isAvailable {
             youtubeOverlayScript = YoutubeOverlayUserScript()
             youtubePlayerUserScript = YoutubePlayerUserScript()
         } else {

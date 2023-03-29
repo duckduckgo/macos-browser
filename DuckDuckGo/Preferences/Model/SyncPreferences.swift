@@ -149,11 +149,14 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
 extension SyncPreferences: ManagementDialogModelDelegate {
 
     func turnOnSync() {
+        presentDialog(for: .askToSyncAnotherDevice)
+    }
+
+    func dontSyncAnotherDeviceNow() {
         Task { @MainActor in
             do {
                 let hostname = SCDynamicStoreCopyComputerName(nil, nil) as? String ?? ProcessInfo.processInfo.hostName
                 try await syncService.createAccount(deviceName: hostname, deviceType: "desktop")
-                presentDialog(for: .askToSyncAnotherDevice)
             } catch {
                 managementDialogModel.errorMessage = String(describing: error)
             }
@@ -163,8 +166,13 @@ extension SyncPreferences: ManagementDialogModelDelegate {
     func recoverDevice(using recoveryCode: String) {
         Task { @MainActor in
             do {
+                guard let recoveryKey = try? SyncCode.decodeBase64String(recoveryCode).recovery else {
+                    managementDialogModel.errorMessage = "Invalid recovery key"
+                    return
+                }
+
                 let hostname = SCDynamicStoreCopyComputerName(nil, nil) as? String ?? ProcessInfo.processInfo.hostName
-                try await syncService.login(recoveryKey: recoveryCode, deviceName: hostname, deviceType: "desktop")
+                try await syncService.login(recoveryKey, deviceName: hostname, deviceType: "desktop")
                 managementDialogModel.endFlow()
             } catch {
                 managementDialogModel.errorMessage = String(describing: error)

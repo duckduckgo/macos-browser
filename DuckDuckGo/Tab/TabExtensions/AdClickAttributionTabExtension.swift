@@ -42,6 +42,8 @@ protocol AdClickAttributionDependencies {
 }
 
 protocol UserContentControllerProtocol: AnyObject {
+    var contentBlockingAssetsInstalled: Bool { get }
+
     func enableGlobalContentRuleList(withIdentifier identifier: String) throws
     func disableGlobalContentRuleList(withIdentifier identifier: String) throws
     func removeLocalContentRuleList(withIdentifier identifier: String)
@@ -120,7 +122,7 @@ final class AdClickAttributionTabExtension: TabExtension {
     private var cancellables = Set<AnyCancellable>()
 
     init(inheritedAttribution: AdClickAttributionLogic.State?,
-         userContentControllerFuture: Future<UserContentControllerProtocol, Never>,
+         userContentControllerFuture: some Publisher<some UserContentControllerProtocol, Never>,
          contentBlockerRulesScriptPublisher: some Publisher<(any ContentBlockerScriptProtocol)?, Never>,
          trackerInfoPublisher: some Publisher<DetectedRequest, Never>,
          dependencies: some AdClickAttributionDependencies,
