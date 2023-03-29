@@ -40,9 +40,8 @@ protocol NewWindowPolicyDecisionMaker {
     func decideNewWindowPolicy(for navigationAction: WKNavigationAction) -> NavigationDecision?
 }
 
-// swiftlint:disable type_body_length
-@dynamicMemberLookup
-final class Tab: NSObject, Identifiable, ObservableObject {
+// swiftlint:disable:next type_body_length
+@dynamicMemberLookup final class Tab: NSObject, Identifiable, ObservableObject {
 
     enum TabContent: Equatable {
         case homePage
@@ -968,8 +967,6 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
 
         return .next
     }
-    // swiftlint:enable cyclomatic_complexity
-    // swiftlint:enable function_body_length
 
     @MainActor
     func willStart(_ navigation: Navigation) {

@@ -131,7 +131,7 @@ final class FileDownloadManager: FileDownloadManagerProtocol {
 
 extension FileDownloadManager: WebKitDownloadTaskDelegate {
 
-    // swiftlint:disable function_body_length
+    // swiftlint:disable:next function_body_length
     func fileDownloadTaskNeedsDestinationURL(_ task: WebKitDownloadTask,
                                              suggestedFilename: String,
                                              completionHandler: @escaping (URL?, UTType?) -> Void) {
@@ -224,8 +224,6 @@ extension FileDownloadManager: WebKitDownloadTaskDelegate {
             completion(url, fileType)
         }
     }
-    // swiftlint:enable function_body_length
-    // swiftlint:enable cyclomatic_complexity
 
     private func verifyAccessToDestinationFolder(_ folderUrl: URL, destinationRequested: Bool, isSandboxed: Bool) -> Bool {
         if destinationRequested && isSandboxed { return true }
