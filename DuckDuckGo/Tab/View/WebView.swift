@@ -54,29 +54,29 @@ final class WebView: WKWebView {
     }
 
     var canZoomToActualSize: Bool {
-        return self.window != nil && (self.zoomLevel != defaultZoomValue)
+        window != nil && zoomLevel != defaultZoomValue
     }
 
     var canZoomIn: Bool {
-        self.window != nil && self.zoomLevel.index < DefaultZoomValue.allCases.count - 1
+        window != nil && zoomLevel.index < DefaultZoomValue.allCases.count - 1
     }
 
     var canZoomOut: Bool {
-        self.window != nil && self.zoomLevel.index > 0
+        window != nil && zoomLevel.index > 0
     }
 
     func resetZoomLevel() {
-        self.zoomLevel = self.defaultZoomValue
+        zoomLevel = defaultZoomValue
     }
 
     func zoomIn() {
         guard canZoomIn else { return }
-        self.zoomLevel = DefaultZoomValue.allCases[self.zoomLevel.index + 1]
+        zoomLevel = DefaultZoomValue.allCases[self.zoomLevel.index + 1]
     }
 
     func zoomOut() {
         guard canZoomOut else { return }
-        self.zoomLevel = DefaultZoomValue.allCases[self.zoomLevel.index - 1]
+        zoomLevel = DefaultZoomValue.allCases[self.zoomLevel.index - 1]
     }
 
     // MARK: - Menu
