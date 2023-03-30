@@ -351,34 +351,25 @@ final class TabBarViewController: NSViewController {
 
     // MARK: - Drag and Drop
 
-    private var initialDraggingIndexPaths: Set<IndexPath>?
-    private var currentDraggingIndexPath: IndexPath?
+    private func moveItemIfNeeded(to newIndex: Int) {
+        guard TabDragAndDropManager.shared.sourceUnit?.tabCollectionViewModel === tabCollectionViewModel,
+              tabCollectionViewModel.tabCollection.tabs.indices.contains(newIndex),
+              let oldIndex = TabDragAndDropManager.shared.sourceUnit?.index,
+              oldIndex != newIndex else { return }
 
-    private func moveItemIfNeeded(at indexPath: IndexPath, to newIndexPath: IndexPath) {
-        assert(indexPath == currentDraggingIndexPath)
-
-        let index = indexPath.item
-        let newIndex = newIndexPath.item
-        guard tabCollectionViewModel.tabCollection.tabs.indices.contains(newIndex) else {
-            assertionFailure("TabBarViewController: wrong index")
-            return
-        }
-        guard index != newIndex else { return }
-        currentDraggingIndexPath = newIndexPath
-
-        tabCollectionViewModel.moveTab(at: index, to: newIndex)
-        TabDragAndDropManager.shared.setSource(tabCollectionViewModel: tabCollectionViewModel, indexPath: newIndexPath)
+        tabCollectionViewModel.moveTab(at: oldIndex, to: newIndex)
+        TabDragAndDropManager.shared.setSource(tabCollectionViewModel: tabCollectionViewModel, index: newIndex)
     }
 
-    private func moveToNewWindow(indexPath: IndexPath, droppingPoint: NSPoint? = nil) {
+    private func moveToNewWindow(from index: Int, droppingPoint: NSPoint? = nil) {
         guard tabCollectionViewModel.tabCollection.tabs.count > 1 else { return }
-        guard let tabViewModel = tabCollectionViewModel.tabViewModel(at: indexPath.item) else {
+        guard let tabViewModel = tabCollectionViewModel.tabViewModel(at: index) else {
             assertionFailure("TabBarViewController: Failed to get tab view model")
             return
         }
 
         let tab = tabViewModel.tab
-        tabCollectionViewModel.remove(at: .unpinned(indexPath.item), published: false)
+        tabCollectionViewModel.remove(at: .unpinned(index), published: false)
         WindowsManager.openNewWindow(with: tab, droppingPoint: droppingPoint)
     }
 
@@ -628,6 +619,9 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
         updateTabMode()
         updateEmptyTabArea()
         hideTabPreview()
+        if tabMode == .overflow {
+            scrollCollectionViewToEnd()
+        }
     }
 
     func tabCollectionViewModel(_ tabCollectionViewModel: TabCollectionViewModel,
@@ -735,15 +729,19 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
             if selected {
                 collectionView.selectItems(at: lastIndexPathSet, scrollPosition: .centeredHorizontally)
             }
-            // Old frameworks are like old people. They need a special treatment
-            collectionView.scrollToEnd { _ in
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
-                    self.collectionView.scrollToEnd()
-                }
-            }
+            scrollCollectionViewToEnd()
         }
         updateEmptyTabArea()
         hideTabPreview()
+    }
+
+    private func scrollCollectionViewToEnd() {
+        // Old frameworks... need a special treatment
+        collectionView.scrollToEnd { _ in
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                self.collectionView.scrollToEnd()
+            }
+        }
     }
 
     // MARK: - Tab Actions
@@ -782,14 +780,12 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
 
 extension TabBarViewController: NSCollectionViewDelegateFlowLayout {
 
-    func collectionView(_ collectionView: NSCollectionView,
-                        layout collectionViewLayout: NSCollectionViewLayout,
-                        sizeForItemAt indexPath: IndexPath) -> NSSize {
+    func collectionView(_ collectionView: NSCollectionView, layout collectionViewLayout: NSCollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> NSSize {
         var isItemSelected = tabCollectionViewModel.selectionIndex == .unpinned(indexPath.item)
-
-        if let draggingOverIndexPath = currentDraggingIndexPath {
+        if TabDragAndDropManager.shared.sourceUnit?.tabCollectionViewModel === tabCollectionViewModel,
+           let draggingOverIndex = TabDragAndDropManager.shared.sourceUnit?.index {
             // Drag&drop in progress - the empty space is equal to the selected tab width
-            isItemSelected = draggingOverIndexPath == indexPath
+            isItemSelected = draggingOverIndex == indexPath.item
         }
 
         return NSSize(width: self.currentTabWidth(selected: isItemSelected), height: TabBarViewItem.Height.standard.rawValue)
@@ -877,98 +873,79 @@ extension TabBarViewController: NSCollectionViewDelegate {
         tabCollectionViewModel.tabCollection.tabs.count > 1
     }
 
-    func collectionView(_ collectionView: NSCollectionView,
-                        pasteboardWriterForItemAt indexPath: IndexPath) -> NSPasteboardWriting? {
-        if let url = tabCollectionViewModel.tabCollection.tabs[indexPath.item].content.url {
-            return url as NSURL
-        } else {
-            return URL.blankPage as NSURL
-        }
+    func collectionView(_ collectionView: NSCollectionView, pasteboardWriterForItemAt indexPath: IndexPath) -> NSPasteboardWriting? {
+        TabBarViewItemPasteboardWriter()
     }
 
-    func collectionView(_ collectionView: NSCollectionView,
-                        draggingSession session: NSDraggingSession,
-                        willBeginAt screenPoint: NSPoint,
-                        forItemsAt indexPaths: Set<IndexPath>) {
+    func collectionView(_ collectionView: NSCollectionView, draggingSession session: NSDraggingSession, willBeginAt screenPoint: NSPoint, forItemsAt indexPaths: Set<IndexPath>) {
         session.animatesToStartingPositionsOnCancelOrFail = false
-        initialDraggingIndexPaths = indexPaths
 
-        guard let indexPath = indexPaths.first, indexPaths.count == 1 else {
-            assertionFailure("TabBarViewController: More than 1 dragging index path")
-            return
-        }
-        currentDraggingIndexPath = indexPath
-        TabDragAndDropManager.shared.setSource(tabCollectionViewModel: tabCollectionViewModel, indexPath: indexPath)
+        assert(indexPaths.count == 1, "TabBarViewController: More than 1 dragging index path")
+        guard let indexPath = indexPaths.first else { return }
+
+        TabDragAndDropManager.shared.setSource(tabCollectionViewModel: tabCollectionViewModel, index: indexPath.item)
         hideTabPreview()
     }
 
-    static let dropToOpenDistance: CGFloat = 100
+    private static let dropToOpenDistance: CGFloat = 100
 
-    func collectionView(_ collectionView: NSCollectionView,
-                        draggingSession session: NSDraggingSession,
-                        endedAt screenPoint: NSPoint,
-                        dragOperation operation: NSDragOperation) {
-        let draggingIndexPath = self.currentDraggingIndexPath
-        self.initialDraggingIndexPaths = nil
-        currentDraggingIndexPath = nil
+    func collectionView(_ collectionView: NSCollectionView, validateDrop draggingInfo: NSDraggingInfo, proposedIndexPath proposedDropIndexPath: AutoreleasingUnsafeMutablePointer<NSIndexPath>, dropOperation proposedDropOperation: UnsafeMutablePointer<NSCollectionView.DropOperation>) -> NSDragOperation {
 
-        // Perform the drag and drop between multiple windows
-        if TabDragAndDropManager.shared.performDragAndDropIfNeeded() { return }
+        // allow dropping URLs or files
+        guard draggingInfo.draggingPasteboard.url == nil else { return .copy }
 
-        // Check whether the tab wasn't dropped to other app
-        guard operation != .link && operation != .copy else { return }
+        // dragging a tab
+        guard case .private = draggingInfo.draggingSourceOperationMask,
+              draggingInfo.draggingPasteboard.types == [TabBarViewItemPasteboardWriter.utiInternalType] else { return .none }
 
-        // Create a new window if the drop is too distant
-        let frameRelativeToWindow = view.convert(view.bounds, to: nil)
-        guard let frameRelativeToScreen = view.window?.convertToScreen(frameRelativeToWindow) else {
-            assertionFailure("TabBarViewController: Conversion to the screen coordinate system failed")
-            return
-        }
-        if !screenPoint.isNearRect(frameRelativeToScreen, allowedDistance: Self.dropToOpenDistance) {
-            guard let draggingIndexPath = draggingIndexPath else {
-                assertionFailure("TabBarViewController: No current dragging index path")
-                return
-            }
-            moveToNewWindow(indexPath: draggingIndexPath, droppingPoint: screenPoint)
-        }
-    }
+        // move tab within one window if needed
+        moveItemIfNeeded(to: proposedDropIndexPath.pointee.item)
 
-    func collectionView(_ collectionView: NSCollectionView,
-                        validateDrop draggingInfo: NSDraggingInfo,
-                        proposedIndexPath proposedDropIndexPath: AutoreleasingUnsafeMutablePointer<NSIndexPath>,
-                        dropOperation proposedDropOperation: UnsafeMutablePointer<NSCollectionView.DropOperation>) -> NSDragOperation {
-        guard let currentDraggingIndexPath = currentDraggingIndexPath else {
-            TabDragAndDropManager.shared.setDestination(tabCollectionViewModel: tabCollectionViewModel,
-                                                        indexPath: proposedDropIndexPath.pointee as IndexPath)
-
-            proposedDropOperation.pointee = .on
-            return .private
-        }
-
-        // clear inter-window drag destination when dragging returns back to origin
-        TabDragAndDropManager.shared.clearDestination()
-        let newIndexPath = proposedDropIndexPath.pointee as IndexPath
-        moveItemIfNeeded(at: currentDraggingIndexPath, to: newIndexPath)
-
-        proposedDropOperation.pointee = .before
         return .private
     }
 
-    func collectionView(_ collectionView: NSCollectionView,
-                        acceptDrop draggingInfo: NSDraggingInfo,
-                        indexPath: IndexPath,
-                        dropOperation: NSCollectionView.DropOperation) -> Bool {
-        guard let draggingIndexPaths = initialDraggingIndexPaths else {
-            // Droping from another TabBarViewController
+    func collectionView(_ collectionView: NSCollectionView, acceptDrop draggingInfo: NSDraggingInfo, indexPath: IndexPath, dropOperation: NSCollectionView.DropOperation) -> Bool {
+        let newIndex = min(indexPath.item + 1, tabCollectionViewModel.tabCollection.tabs.count)
+        if let url = draggingInfo.draggingPasteboard.url {
+            // dropping URL or file
+            tabCollectionViewModel.insert(Tab(content: .url(url)), at: .unpinned(newIndex), selected: true)
+
             return true
         }
 
-        guard draggingIndexPaths.count == 1 else {
-            assertionFailure("TabBarViewController: More than 1 item selected")
-            return false
-        }
+        guard case .private = draggingInfo.draggingSourceOperationMask,
+              draggingInfo.draggingPasteboard.types == [TabBarViewItemPasteboardWriter.utiInternalType] else { return false }
+
+        // update drop destination
+        TabDragAndDropManager.shared.setDestination(tabCollectionViewModel: tabCollectionViewModel, index: newIndex)
 
         return true
+    }
+
+    func collectionView(_ collectionView: NSCollectionView, draggingSession session: NSDraggingSession, endedAt screenPoint: NSPoint, dragOperation operation: NSDragOperation) {
+
+        // dropping a tab, dropping of url handled in collectionView:acceptDrop:
+        guard session.draggingPasteboard.types == [TabBarViewItemPasteboardWriter.utiInternalType] else { return }
+
+        if case .private = operation {
+            // Perform the drag and drop between multiple windows
+            TabDragAndDropManager.shared.performDragAndDropIfNeeded()
+            return
+        }
+        // dropping not on a tab bar
+        guard case .none = operation else { return }
+
+        // Create a new window if the drop is too distant
+        let frameRelativeToWindow = view.convert(view.bounds, to: nil)
+        guard TabDragAndDropManager.shared.sourceUnit?.tabCollectionViewModel === tabCollectionViewModel,
+              let sourceIndex = TabDragAndDropManager.shared.sourceUnit?.index,
+              let frameRelativeToScreen = view.window?.convertToScreen(frameRelativeToWindow),
+              !screenPoint.isNearRect(frameRelativeToScreen, allowedDistance: Self.dropToOpenDistance) else {
+            // dropped near the tab bar, do nothing
+            return
+        }
+
+        moveToNewWindow(from: sourceIndex, droppingPoint: screenPoint)
     }
 
     func collectionView(_ collectionView: NSCollectionView,
@@ -1087,7 +1064,7 @@ extension TabBarViewController: TabBarViewItemDelegate {
             return
         }
 
-        moveToNewWindow(indexPath: indexPath)
+        moveToNewWindow(from: indexPath.item)
     }
 
     func tabBarViewItemFireproofSite(_ tabBarViewItem: TabBarViewItem) {
@@ -1119,6 +1096,20 @@ extension TabBarViewController: TabBarViewItemDelegate {
         }
         return .init(hasItemsToTheLeft: indexPath.item > 0,
                      hasItemsToTheRight: indexPath.item + 1 < tabCollectionViewModel.tabCollection.tabs.count)
+    }
+
+}
+
+final class TabBarViewItemPasteboardWriter: NSObject, NSPasteboardWriting {
+
+    static let utiInternalType = NSPasteboard.PasteboardType(rawValue: "com.duckduckgo.tab.internal")
+
+    func writableTypes(for pasteboard: NSPasteboard) -> [NSPasteboard.PasteboardType] {
+        [Self.utiInternalType]
+    }
+
+    func pasteboardPropertyList(forType type: NSPasteboard.PasteboardType) -> Any? {
+        [String: Any]()
     }
 
 }
