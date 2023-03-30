@@ -46,13 +46,13 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
     enum TabContent: Equatable {
         case homePage
-        case url(URL, credential: URLCredential? = nil, userEntered: Bool = false)
+        case url(URL, credential: URLCredential? = nil, userEntered: String? = nil)
         case preferences(pane: PreferencePaneIdentifier?)
         case bookmarks
         case onboarding
         case none
 
-        static func contentFromURL(_ url: URL?, userEntered: Bool = false) -> TabContent {
+        static func contentFromURL(_ url: URL?, userEntered: String? = nil) -> TabContent {
             if url == .homePage {
                 return .homePage
             } else if url == .welcome {
@@ -154,14 +154,19 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             }
         }
 
-        var isUserEnteredUrl: Bool {
+        var userEnteredValue: String? {
             switch self {
-            case .url(_, credential: _, userEntered: let userEntered):
-                return userEntered
+            case .url(_, credential: _, userEntered: let userEnteredValue):
+                return userEnteredValue
             default:
-                return false
+                return nil
             }
         }
+
+        var isUserEnteredUrl: Bool {
+            userEnteredValue != nil
+        }
+
     }
     private struct ExtensionDependencies: TabExtensionDependencies {
         let privacyFeatures: PrivacyFeaturesProtocol
@@ -462,7 +467,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     }
 
     @discardableResult
-    func setUrl(_ url: URL?, userEntered: Bool) -> Task<ExpectedNavigation?, Never>? {
+    func setUrl(_ url: URL?, userEntered: String?) -> Task<ExpectedNavigation?, Never>? {
         if url == .welcome {
             OnboardingViewModel().restart()
         }
@@ -474,7 +479,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             let content = TabContent.contentFromURL(url)
 
             if self.content.isUrl, self.content.url == url {
-                // ignore content updates when tab.content has userEntered or credential set but equal url
+                // ignore content updates when tab.content has userEntered or credential set but equal url as it comes from the WebView url updated event
             } else if content != self.content {
                 self.content = content
             }
@@ -954,7 +959,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
             return .redirect(mainFrame) { navigator in
                 var request = navigationAction.request
                 // credential is removed from the URL and set to TabContent to be used on next Challenge
-                self.content = .url(navigationAction.url.removingBasicAuthCredential(), credential: credential, userEntered: false)
+                self.content = .url(navigationAction.url.removingBasicAuthCredential(), credential: credential, userEntered: nil)
                 // reload URL without credentials
                 request.url = self.content.url!
                 navigator.load(request)

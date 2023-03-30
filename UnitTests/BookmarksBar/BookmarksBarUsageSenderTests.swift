@@ -32,7 +32,6 @@ final class BookmarksBarUsageSenderTests: XCTestCase {
         UserDefaultsWrapper<Any>.clearAll()
     }
 
-
     func testWhenTriggeringTheUsagePixelOnTheSameDay_ThenNoPixelIsSent() {
         let didSendPixel = BookmarksBarUsageSender.sendBookmarksBarUsagePixel(currentDate: Date(), previousDate: Date())
         XCTAssertFalse(didSendPixel)

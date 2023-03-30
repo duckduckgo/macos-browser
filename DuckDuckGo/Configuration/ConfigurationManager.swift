@@ -203,26 +203,31 @@ final class ConfigurationManager {
         guard let bloomFilterData = ConfigurationStore.shared.loadData(for: .bloomFilterBinary) else {
             throw Error.bloomFilterBinaryNotFound
         }
-        let spec = try JSONDecoder().decode(HTTPSBloomFilterSpecification.self, from: specData)
-        do {
-            try AppHTTPSUpgradeStore().persistBloomFilter(specification: spec, data: bloomFilterData)
-        } catch {
-            throw Error.bloomFilterPersistenceFailed
-        }
-        await PrivacyFeatures.httpsUpgrade.loadData()
+        try await Task.detached {
+            let spec = try JSONDecoder().decode(HTTPSBloomFilterSpecification.self, from: specData)
+            do {
+                try await PrivacyFeatures.httpsUpgrade.persistBloomFilter(specification: spec, data: bloomFilterData)
+            } catch {
+                assertionFailure("persistBloomFilter failed: \(error)")
+                throw Error.bloomFilterPersistenceFailed
+            }
+            await PrivacyFeatures.httpsUpgrade.loadData()
+        }.value
     }
 
     private func updateBloomFilterExclusions() async throws {
         guard let bloomFilterExclusions = ConfigurationStore.shared.loadData(for: .bloomFilterExcludedDomains) else {
             throw Error.bloomFilterExclusionsNotFound
         }
-        let excludedDomains = try JSONDecoder().decode(HTTPSExcludedDomains.self, from: bloomFilterExclusions).data
-        do {
-            try AppHTTPSUpgradeStore().persistExcludedDomains(excludedDomains)
-        } catch {
-            throw Error.bloomFilterExclusionsPersistenceFailed
-        }
-        await PrivacyFeatures.httpsUpgrade.loadData()
+        try await Task.detached {
+            let excludedDomains = try JSONDecoder().decode(HTTPSExcludedDomains.self, from: bloomFilterExclusions).data
+            do {
+                try await PrivacyFeatures.httpsUpgrade.persistExcludedDomains(excludedDomains)
+            } catch {
+                throw Error.bloomFilterExclusionsPersistenceFailed
+            }
+            await PrivacyFeatures.httpsUpgrade.loadData()
+        }.value
     }
 
 }
