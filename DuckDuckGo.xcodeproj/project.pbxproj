@@ -8600,7 +8600,6 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-        update-bsk-with-autofill-6.4.3
 				kind = revision;
 				revision = cff2b1334b081ffaddabfebe0a5c69dee9efba0d;
 			};
