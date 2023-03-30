@@ -23,11 +23,11 @@ struct PreferencesSection: Hashable, Identifiable {
     let id: PreferencesSectionIdentifier
     let panes: [PreferencePaneIdentifier]
 
-    static func defaultSections(includingPrivatePlayer: Bool) -> [PreferencesSection] {
+    static func defaultSections(includingDuckPlayer: Bool) -> [PreferencesSection] {
         let regularPanes: [PreferencePaneIdentifier] = {
             var panes: [PreferencePaneIdentifier] = [.general, .appearance, .privacy, .autofill, .downloads]
-            if includingPrivatePlayer {
-                panes.append(.privatePlayer)
+            if includingDuckPlayer {
+                panes.append(.duckPlayer)
             }
             if (NSApp.delegate as? AppDelegate)?.internalUserDecider.isInternalUser == true {
                 panes.insert(.sync, at: 1)
@@ -54,7 +54,7 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
     case privacy
     case autofill
     case downloads
-    case privatePlayer = "duckplayer"
+    case duckPlayer = "duckplayer"
     case about
 
     var id: Self {
@@ -81,8 +81,8 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
             return UserText.autofill
         case .downloads:
             return UserText.downloads
-        case .privatePlayer:
-            return UserText.privatePlayer
+        case .duckPlayer:
+            return UserText.duckPlayer
         case .about:
             return UserText.about
         }
@@ -102,8 +102,8 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
             return "Autofill"
         case .downloads:
             return "DownloadsPreferences"
-        case .privatePlayer:
-            return "PrivatePlayerSettings"
+        case .duckPlayer:
+            return "DuckPlayerSettings"
         case .about:
             return "About"
         }

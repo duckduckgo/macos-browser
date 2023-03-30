@@ -21,6 +21,7 @@ import Combine
 import os
 import BrowserServicesKit
 import Configuration
+import Common
 
 @MainActor
 final class ConfigurationManager {
@@ -58,6 +59,20 @@ final class ConfigurationManager {
     private var timerCancellable: AnyCancellable?
     private var lastRefreshCheckTime: Date = Date()
 
+    private lazy var fetcher = ConfigurationFetcher(store: ConfigurationStore.shared,
+                                                    log: .config,
+                                                    eventMapping: Self.configurationDebugEvents)
+
+    private static let configurationDebugEvents = EventMapping<ConfigurationDebugEvents> { event, error, _, _ in
+        let domainEvent: Pixel.Event.Debug
+        switch event {
+        case .invalidPayload(let configuration):
+            domainEvent = .invalidPayload(configuration)
+        }
+
+        Pixel.fire(.debug(event: domainEvent, error: error))
+    }
+
     func start() {
         os_log("Starting configuration refresh timer", log: .config, type: .debug)
         timerCancellable = Timer.publish(every: Constants.refreshCheckIntervalSeconds, on: .main, in: .default)
@@ -78,8 +93,6 @@ final class ConfigurationManager {
     }
 
     private func refreshNow() async {
-        let fetcher = ConfigurationFetcher(store: ConfigurationStore.shared, log: .config)
-
         let updateTrackerBlockingDependenciesTask = Task {
             let didFetchAnyTrackerBlockingDependencies = await fetchTrackerBlockingDependencies()
             if didFetchAnyTrackerBlockingDependencies {
@@ -118,7 +131,6 @@ final class ConfigurationManager {
 
     private func fetchTrackerBlockingDependencies() async -> Bool {
         var didFetchAnyTrackerBlockingDependencies = false
-        let fetcher = ConfigurationFetcher(store: ConfigurationStore.shared, log: .config)
 
         var tasks = [Configuration: Task<(), Swift.Error>]()
         tasks[.trackerDataSet] = Task { try await fetcher.fetch(.trackerDataSet) }
@@ -191,26 +203,31 @@ final class ConfigurationManager {
         guard let bloomFilterData = ConfigurationStore.shared.loadData(for: .bloomFilterBinary) else {
             throw Error.bloomFilterBinaryNotFound
         }
-        let spec = try JSONDecoder().decode(HTTPSBloomFilterSpecification.self, from: specData)
-        do {
-            try AppHTTPSUpgradeStore().persistBloomFilter(specification: spec, data: bloomFilterData)
-        } catch {
-            throw Error.bloomFilterPersistenceFailed
-        }
-        await PrivacyFeatures.httpsUpgrade.loadData()
+        try await Task.detached {
+            let spec = try JSONDecoder().decode(HTTPSBloomFilterSpecification.self, from: specData)
+            do {
+                try await PrivacyFeatures.httpsUpgrade.persistBloomFilter(specification: spec, data: bloomFilterData)
+            } catch {
+                assertionFailure("persistBloomFilter failed: \(error)")
+                throw Error.bloomFilterPersistenceFailed
+            }
+            await PrivacyFeatures.httpsUpgrade.loadData()
+        }.value
     }
 
     private func updateBloomFilterExclusions() async throws {
         guard let bloomFilterExclusions = ConfigurationStore.shared.loadData(for: .bloomFilterExcludedDomains) else {
             throw Error.bloomFilterExclusionsNotFound
         }
-        let excludedDomains = try JSONDecoder().decode(HTTPSExcludedDomains.self, from: bloomFilterExclusions).data
-        do {
-            try AppHTTPSUpgradeStore().persistExcludedDomains(excludedDomains)
-        } catch {
-            throw Error.bloomFilterExclusionsPersistenceFailed
-        }
-        await PrivacyFeatures.httpsUpgrade.loadData()
+        try await Task.detached {
+            let excludedDomains = try JSONDecoder().decode(HTTPSExcludedDomains.self, from: bloomFilterExclusions).data
+            do {
+                try await PrivacyFeatures.httpsUpgrade.persistExcludedDomains(excludedDomains)
+            } catch {
+                throw Error.bloomFilterExclusionsPersistenceFailed
+            }
+            await PrivacyFeatures.httpsUpgrade.loadData()
+        }.value
     }
 
 }

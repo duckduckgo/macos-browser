@@ -100,6 +100,12 @@ final class AutofillPreferencesModel: ObservableObject {
         NSApp.sendAction(#selector(AppDelegate.openImportBrowserDataWindow(_:)), to: nil, from: nil)
     }
 
+    func showAutofillPopover() {
+        guard let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController else { return }
+        guard let navigationViewController = parentWindowController.mainViewController.navigationBarViewController else { return }
+        navigationViewController.showPasswordManagerPopover(selectedCategory: .allItems)
+    }
+
     init(
         persistor: AutofillPreferencesPersistor = AutofillPreferences(),
         userAuthenticator: UserAuthenticating = DeviceAuthenticator.shared,

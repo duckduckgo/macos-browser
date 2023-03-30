@@ -30,10 +30,15 @@ final class TestRunHelper: NSObject {
 
         // set NSApp.runType to appropriate test run type
         _=NSApplication.swizzleRunTypeOnce
+        // allow mocking NSApp.currentEvent
+        _=NSApplication.swizzleCurrentEventOnce
 
         // dedicate temporary directory for tests
         _=FileManager.swizzleTemporaryDirectoryOnce
         FileManager.default.cleanupTemporaryDirectory()
+
+        // provide extra info on failures
+        _=NSError.swizzleLocalizedDescriptionOnce
 
         // add code to be run on Unit Tests startup here...
 
@@ -66,6 +71,7 @@ extension TestRunHelper: XCTestObservation {
             // cleanup dedicated temporary directory before each test run
             FileManager.default.cleanupTemporaryDirectory()
         }
+        NSApp.swizzled_currentEvent = nil
     }
 
     func testCaseDidFinish(_ testCase: XCTestCase) {
@@ -73,21 +79,44 @@ extension TestRunHelper: XCTestObservation {
             // cleanup dedicated temporary directory after each test run
             FileManager.default.cleanupTemporaryDirectory()
         }
+        NSApp.swizzled_currentEvent = nil
     }
 
 }
 
 extension NSApplication {
 
+    // NSApp.runType - returns .unitTests or .integrationTests when running tests
+
     static var swizzleRunTypeOnce: Void = {
         let runTypeMethod = class_getInstanceMethod(NSApplication.self, #selector(getter: NSApplication.runType))!
-        let swizzledTunTypeMethod = class_getInstanceMethod(NSApplication.self, #selector(NSApplication.swizzled_runType))!
+        let swizzledRunTypeMethod = class_getInstanceMethod(NSApplication.self, #selector(NSApplication.swizzled_runType))!
 
-        method_exchangeImplementations(runTypeMethod, swizzledTunTypeMethod)
+        method_exchangeImplementations(runTypeMethod, swizzledRunTypeMethod)
     }()
 
     @objc dynamic func swizzled_runType() -> NSApplication.RunType {
         RunType(bundle: Bundle(for: TestRunHelper.self))
+    }
+
+    // allow mocking NSApp.currentEvent
+
+    static var swizzleCurrentEventOnce: Void = {
+        let curentEventMethod = class_getInstanceMethod(NSApplication.self, #selector(getter: NSApplication.currentEvent))!
+        let swizzledCurentEventMethod = class_getInstanceMethod(NSApplication.self, #selector(getter: NSApplication.swizzled_currentEvent))!
+
+        method_exchangeImplementations(curentEventMethod, swizzledCurentEventMethod)
+    }()
+
+    private static let currentEventKey = UnsafeRawPointer(bitPattern: "currentEventKey".hashValue)!
+    @objc dynamic var swizzled_currentEvent: NSEvent? {
+        get {
+            objc_getAssociatedObject(self, Self.currentEventKey) as? NSEvent
+                ?? self.swizzled_currentEvent // call original
+        }
+        set {
+            objc_setAssociatedObject(self, Self.currentEventKey, newValue, .OBJC_ASSOCIATION_RETAIN)
+        }
     }
 
 }

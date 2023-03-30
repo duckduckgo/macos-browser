@@ -69,6 +69,8 @@ final class AddressBarTextField: NSTextField {
 
         allowsEditingTextAttributes = true
         super.delegate = self
+
+        registerForDraggedTypes([.string, .URL, .fileURL])
     }
 
     override func mouseDown(with event: NSEvent) {
@@ -252,7 +254,7 @@ final class AddressBarTextField: NSTextField {
         currentEditor()?.selectAll(self)
     }
 
-    private func updateTabUrlWithUrl(_ providedUrl: URL, suggestion: Suggestion?) {
+    private func updateTabUrlWithUrl(_ providedUrl: URL, userEnteredValue: String, suggestion: Suggestion?) {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             os_log("%s: Selected tab view model is nil", type: .error, className)
             return
@@ -274,10 +276,11 @@ final class AddressBarTextField: NSTextField {
             }
         }
 
-        if selectedTabViewModel.tab.content.url == url {
+        let content = Tab.TabContent.url(url, userEntered: userEnteredValue)
+        if selectedTabViewModel.tab.content == content {
             selectedTabViewModel.reload()
         } else {
-            selectedTabViewModel.tab.setUrl(url, userEntered: true)
+            selectedTabViewModel.tab.setContent(content)
         }
 
         self.window?.makeFirstResponder(nil)
@@ -286,11 +289,11 @@ final class AddressBarTextField: NSTextField {
     private func updateTabUrl(suggestion: Suggestion?) {
         makeUrl(suggestion: suggestion,
                 stringValueWithoutSuffix: stringValueWithoutSuffix,
-                completion: { [weak self] url, isUpgraded in
+                completion: { [weak self] url, userEnteredValue, isUpgraded in
             guard let url = url else { return }
 
             if isUpgraded { self?.updateTabUpgradedToUrl(url) }
-            self?.updateTabUrlWithUrl(url, suggestion: suggestion)
+            self?.updateTabUrlWithUrl(url, userEnteredValue: userEnteredValue, suggestion: suggestion)
         })
     }
 
@@ -300,55 +303,59 @@ final class AddressBarTextField: NSTextField {
         tab?.setMainFrameConnectionUpgradedTo(url)
     }
 
-    private func openNewTabWithUrl(_ providedUrl: URL?, selected: Bool, suggestion: Suggestion?) {
+    private func openNewTabWithUrl(_ providedUrl: URL?, userEnteredValue: String, selected: Bool, suggestion: Suggestion?) {
         guard let url = providedUrl else {
             os_log("%s: Making url from address bar string failed", type: .error, className)
             return
         }
 
-        let tab = Tab(content: .url(url), shouldLoadInBackground: true)
+        let tab = Tab(content: .url(url, userEntered: userEnteredValue), shouldLoadInBackground: true)
         tabCollectionViewModel.append(tab: tab, selected: selected)
     }
 
     private func openNewTab(selected: Bool, suggestion: Suggestion?) {
         makeUrl(suggestion: suggestion,
-                stringValueWithoutSuffix: stringValueWithoutSuffix,
-                completion: { [weak self] url, isUpgraded in
-                    if isUpgraded { self?.updateTabUpgradedToUrl(url) }
-                    self?.openNewTabWithUrl(url, selected: selected, suggestion: suggestion)
-                })
+                stringValueWithoutSuffix: stringValueWithoutSuffix) { [weak self] url, userEnteredValue, isUpgraded in
+
+            if isUpgraded { self?.updateTabUpgradedToUrl(url) }
+            self?.openNewTabWithUrl(url, userEnteredValue: userEnteredValue, selected: selected, suggestion: suggestion)
+        }
     }
 
-    private func makeUrl(suggestion: Suggestion?, stringValueWithoutSuffix: String, completion: @escaping (URL?, Bool) -> Void) {
+    private func makeUrl(suggestion: Suggestion?, stringValueWithoutSuffix: String, completion: @escaping (URL?, String, Bool) -> Void) {
         let finalUrl: URL?
+        let userEnteredValue: String
         switch suggestion {
         case .bookmark(title: _, url: let url, isFavorite: _, allowedInTopHits: _),
              .historyEntry(title: _, url: let url, allowedInTopHits: _),
              .website(url: let url):
             finalUrl = url
+            userEnteredValue = url.absoluteString
         case .phrase(phrase: let phrase),
              .unknown(value: let phrase):
             finalUrl = URL.makeSearchUrl(from: phrase)
+            userEnteredValue = phrase
         case .none:
             finalUrl = URL.makeURL(from: stringValueWithoutSuffix)
+            userEnteredValue = stringValueWithoutSuffix
         }
 
         guard let url = finalUrl else {
-            completion(finalUrl, false)
+            completion(finalUrl, userEnteredValue, false)
             return
         }
 
-        upgradeToHttps(url: url, completion: completion)
+        upgradeToHttps(url: url, userEnteredValue: userEnteredValue, completion: completion)
     }
 
-    private func upgradeToHttps(url: URL, completion: @escaping (URL?, Bool) -> Void) {
+    private func upgradeToHttps(url: URL, userEnteredValue: String, completion: @escaping (URL?, String, Bool) -> Void) {
         Task {
             let result = await PrivacyFeatures.httpsUpgrade.upgrade(url: url)
             switch result {
             case let .success(upgradedUrl):
-                completion(upgradedUrl, true)
+                completion(upgradedUrl, userEnteredValue, true)
             case .failure:
-                completion(url, false)
+                completion(url, userEnteredValue, false)
             }
         }
     }
@@ -569,7 +576,7 @@ final class AddressBarTextField: NSTextField {
     }
 
     @objc dynamic private var suggestionWindowController: NSWindowController?
-    private lazy var suggestionViewController: SuggestionViewController = {
+    private(set) lazy var suggestionViewController: SuggestionViewController = {
         NSStoryboard.suggestion.instantiateController(identifier: "SuggestionViewController") { coder in
             let suggestionViewController = SuggestionViewController(coder: coder,
                                                                     suggestionContainerViewModel: self.suggestionContainerViewModel!)
@@ -666,23 +673,23 @@ final class AddressBarTextField: NSTextField {
     // MARK: - Menu Actions
 
     @objc private func pasteAndGo(_ menuItem: NSMenuItem) {
-        guard let pasteboardString = NSPasteboard.general.string(forType: .string),
-              let url = URL(trimmedAddressBarString: pasteboardString.trimmingWhitespace()) else {
-                  assertionFailure("Pasteboard doesn't contain URL")
-                  return
-              }
+        guard let pasteboardString = NSPasteboard.general.string(forType: .string)?.trimmingWhitespace(),
+              let url = URL(trimmedAddressBarString: pasteboardString) else {
+            assertionFailure("Pasteboard doesn't contain URL")
+            return
+        }
 
-        tabCollectionViewModel.selectedTabViewModel?.tab.setUrl(url, userEntered: true)
+        tabCollectionViewModel.selectedTabViewModel?.tab.setUrl(url, userEntered: pasteboardString)
     }
 
     @objc private func pasteAndSearch(_ menuItem: NSMenuItem) {
-        guard let pasteboardString = NSPasteboard.general.string(forType: .string),
+        guard let pasteboardString = NSPasteboard.general.string(forType: .string)?.trimmingWhitespace(),
               let searchURL = URL.makeSearchUrl(from: pasteboardString) else {
-                  assertionFailure("Can't create search URL from pasteboard string")
-                  return
-              }
+            assertionFailure("Can't create search URL from pasteboard string")
+            return
+        }
 
-        tabCollectionViewModel.selectedTabViewModel?.tab.setUrl(searchURL, userEntered: true)
+        tabCollectionViewModel.selectedTabViewModel?.tab.setUrl(searchURL, userEntered: pasteboardString)
     }
 
     @objc private func toggleAutocomplete(_ menuItem: NSMenuItem) {
@@ -704,6 +711,34 @@ final class AddressBarTextField: NSTextField {
 
         let shouldShowFullURL = AppearancePreferences.shared.showFullURL
         menuItem.state = shouldShowFullURL ? .on : .off
+    }
+
+    // MARK: NSDraggingDestination
+
+    override func draggingEntered(_ draggingInfo: NSDraggingInfo) -> NSDragOperation {
+        return .copy
+    }
+
+    override func draggingUpdated(_ draggingInfo: NSDraggingInfo) -> NSDragOperation {
+        return .copy
+    }
+
+    override func performDragOperation(_ draggingInfo: NSDraggingInfo) -> Bool {
+        if let url = draggingInfo.draggingPasteboard.url {
+            tabCollectionViewModel.selectedTabViewModel?.tab.setUrl(url, userEntered: draggingInfo.draggingPasteboard.string(forType: .string) ?? url.absoluteString)
+
+        } else if let stringValue = draggingInfo.draggingPasteboard.string(forType: .string) {
+            self.stringValue = stringValue
+
+            window?.makeKeyAndOrderFront(self)
+            NSApp.activate(ignoringOtherApps: true)
+            self.makeMeFirstResponder()
+
+        } else {
+            return false
+        }
+
+        return true
     }
 
 }

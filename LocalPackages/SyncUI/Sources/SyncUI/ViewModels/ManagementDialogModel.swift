@@ -21,6 +21,7 @@ import Combine
 
 public protocol ManagementDialogModelDelegate: AnyObject {
     func turnOnSync()
+    func dontSyncAnotherDeviceNow()
     func recoverDevice(using recoveryCode: String)
     func presentSyncAnotherDeviceDialog()
     func addAnotherDevice(using recoveryCode: String)

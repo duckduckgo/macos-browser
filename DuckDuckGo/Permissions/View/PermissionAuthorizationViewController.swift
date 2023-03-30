@@ -86,21 +86,25 @@ final class PermissionAuthorizationViewController: NSViewController {
               !query.permissions.isEmpty
         else { return }
 
-        let format: String
-        let permissions: String
         switch query.permissions[0] {
         case .camera, .microphone, .geolocation:
-            format = UserText.devicePermissionAuthorizationFormat
-            permissions = query.permissions.localizedDescription.lowercased()
+            self.descriptionLabel.stringValue = String(format: UserText.devicePermissionAuthorizationFormat,
+                                                       query.domain,
+                                                       query.permissions.localizedDescription.lowercased())
         case .popups:
-            format = UserText.popupWindowsPermissionAuthorizationFormat
-            permissions = query.permissions.localizedDescription.lowercased()
+            self.descriptionLabel.stringValue = String(format: UserText.popupWindowsPermissionAuthorizationFormat,
+                                                       query.domain,
+                                                       query.permissions.localizedDescription.lowercased())
+        case .externalScheme where query.domain.isEmpty:
+            self.descriptionLabel.stringValue = String(format: UserText.externalSchemePermissionAuthorizationNoDomainFormat,
+                                                       query.permissions.localizedDescription)
         case .externalScheme:
-            format = UserText.externalSchemePermissionAuthorizationFormat
-            permissions = query.permissions.localizedDescription
+            self.descriptionLabel.stringValue = String(format: UserText.externalSchemePermissionAuthorizationFormat,
+                                                       query.domain,
+                                                       query.permissions.localizedDescription)
         }
-        self.descriptionLabel.stringValue = String(format: format, query.domain, permissions)
-        self.domainNameLabel.stringValue = "“" + query.domain + "”"
+        self.alwaysAllowCheckbox.stringValue = UserText.permissionAlwaysAllowOnDomainCheckbox
+        self.domainNameLabel.stringValue = query.domain.isEmpty ? "" : "“" + query.domain + "”"
         self.alwaysAllowStackView.isHidden = !query.shouldShowAlwaysAllowCheckbox
     }
 

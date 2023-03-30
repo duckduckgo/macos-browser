@@ -42,7 +42,8 @@ final class ContentBlockingMock: NSObject, ContentBlockingProtocol, AdClickAttri
     typealias ContentBlockingManager = ContentBlockerRulesManagerMock
 
     let contentBlockingManager: ContentBlockerRulesManagerProtocol = ContentBlockerRulesManagerMock()
-    let contentBlockingAssetsPublisher = PassthroughSubject<UserContentUpdating.NewContent, Never>().eraseToAnyPublisher()
+    let contentBlockingAssetsSubject = PassthroughSubject<UserContentUpdating.NewContent, Never>()
+    var contentBlockingAssetsPublisher: AnyPublisher<UserContentUpdating.NewContent, Never> {  contentBlockingAssetsSubject.eraseToAnyPublisher() }
     let contentBlockerRulesManager = ContentBlockerRulesManagerMock()
     let privacyConfigurationManager: PrivacyConfigurationManaging = MockPrivacyConfigurationManager()
 
@@ -60,14 +61,22 @@ final class HTTPSUpgradeStoreMock: NSObject, HTTPSUpgradeStore {
     var bloomFilter: BloomFilterWrapper?
     var bloomFilterSpecification: HTTPSBloomFilterSpecification?
 
-    func loadBloomFilter() -> (wrapper: BloomFilterWrapper, specification: BrowserServicesKit.HTTPSBloomFilterSpecification)? {
+    func loadBloomFilter() -> BrowserServicesKit.BloomFilter? {
         guard let bloomFilter, let bloomFilterSpecification else { return nil }
-        return (bloomFilter, bloomFilterSpecification)
+        return .init(wrapper: bloomFilter, specification: bloomFilterSpecification)
     }
 
     var excludedDomains: [String] = []
     func hasExcludedDomain(_ domain: String) -> Bool {
         excludedDomains.contains(domain)
+    }
+
+    func persistBloomFilter(specification: BrowserServicesKit.HTTPSBloomFilterSpecification, data: Data) throws {
+        fatalError()
+    }
+
+    func persistExcludedDomains(_ domains: [String]) throws {
+        fatalError()
     }
 
 }

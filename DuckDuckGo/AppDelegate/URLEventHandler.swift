@@ -71,7 +71,8 @@ final class URLEventHandler {
     func handleFiles(_ files: [String]) {
         let urls: [URL] = files.compactMap {
             if let url = URL(string: $0),
-               ["http", "https", "file"].contains(url.scheme) {
+               let scheme = url.navigationalScheme,
+               URL.NavigationalScheme.validSchemes.contains(scheme) {
                 guard !url.isFileURL || FileManager.default.fileExists(atPath: url.path) else { return nil }
                 return url
             } else if FileManager.default.fileExists(atPath: $0) {

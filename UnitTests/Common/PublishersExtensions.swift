@@ -19,13 +19,33 @@
 import Combine
 import Foundation
 
-struct TimeoutError: Error {}
+struct TimeoutError: Error, LocalizedError {
+
+    let interval: TimeInterval?
+    let description: String?
+    let date: Date
+    let file: StaticString
+    let line: UInt
+
+    init(interval: TimeInterval? = nil, description: String? = nil, date: Date = Date(), file: StaticString = #file, line: UInt = #line) {
+        self.interval = interval
+        self.description = description
+        self.date = date
+        self.file = file
+        self.line = line
+    }
+
+    var errorDescription: String? {
+        "TimeoutError(\(date)): exceeded timeout\(interval != nil ? " of \(interval!)s" : "")\(description != nil ? " (" + description! + ")" : "") at \(file):\(line)"
+    }
+
+}
 
 extension Publisher where Failure == Never {
 
-    func timeout(_ interval: DispatchQueue.SchedulerTimeType.Stride) -> Publishers.Timeout<Publishers.MapError<Self, TimeoutError>, DispatchQueue> {
+    func timeout(_ interval: TimeInterval, _ description: String? = nil, file: StaticString = #file, line: UInt = #line) -> Publishers.Timeout<Publishers.MapError<Self, TimeoutError>, DispatchQueue> {
         return self.mapError { _ -> TimeoutError in }
-            .timeout(interval, scheduler: DispatchQueue.main, customError: { TimeoutError() })
+            .timeout(.seconds(interval), scheduler: DispatchQueue.main, customError: { TimeoutError(interval: interval, description: description, file: file, line: line) })
     }
 
 }

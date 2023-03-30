@@ -16,31 +16,28 @@
 //  limitations under the License.
 //
 
-// swiftlint:disable file_length
-
-import Cocoa
-import Common
-import WebKit
-import os
-import Combine
 import BrowserServicesKit
-import Navigation
-import TrackerRadarKit
+import Combine
+import Common
 import ContentBlocking
+import Foundation
+import Navigation
+import os.log
 import UserScript
-import PrivacyDashboard
+import WebKit
 
 protocol TabDelegate: ContentOverlayUserScriptDelegate {
     func tabWillStartNavigation(_ tab: Tab, isUserInitiated: Bool)
     func tabDidStartNavigation(_ tab: Tab)
     func tab(_ tab: Tab, createdChild childTab: Tab, of kind: NewWindowPolicy)
 
-    func tab(_ tab: Tab, requestedOpenExternalURL url: URL, forUserEnteredURL userEntered: Bool) -> Bool
-    func tab(_ tab: Tab, promptUserForCookieConsent result: @escaping (Bool) -> Void)
-
     func tabPageDOMLoaded(_ tab: Tab)
     func closeTab(_ tab: Tab)
 
+}
+
+protocol NewWindowPolicyDecisionMaker {
+    func decideNewWindowPolicy(for navigationAction: WKNavigationAction) -> NavigationDecision?
 }
 
 // swiftlint:disable type_body_length
@@ -49,14 +46,13 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
     enum TabContent: Equatable {
         case homePage
-        case url(URL, credential: URLCredential? = nil, userEntered: Bool = false)
-        case privatePlayer(videoID: String, timestamp: String?)
+        case url(URL, credential: URLCredential? = nil, userEntered: String? = nil)
         case preferences(pane: PreferencePaneIdentifier?)
         case bookmarks
         case onboarding
         case none
 
-        static func contentFromURL(_ url: URL?, userEntered: Bool = false) -> TabContent {
+        static func contentFromURL(_ url: URL?, userEntered: String? = nil) -> TabContent {
             if url == .homePage {
                 return .homePage
             } else if url == .welcome {
@@ -65,8 +61,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                 return .anyPreferencePane
             } else if let preferencePane = url.flatMap(PreferencePaneIdentifier.init(url:)) {
                 return .preferences(pane: preferencePane)
-            } else if let privatePlayerContent = PrivatePlayer.shared.tabContent(for: url) {
-                return privatePlayerContent
             } else if let url, let credential = url.basicAuthCredential {
                 // when navigating to a URL with basic auth username/password, cache it and redirect to a trimmed URL
                 return .url(url.removingBasicAuthCredential(), credential: credential, userEntered: userEntered)
@@ -113,7 +107,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
         var title: String? {
             switch self {
-            case .url, .homePage, .privatePlayer, .none: return nil
+            case .url, .homePage, .none: return nil
             case .preferences: return UserText.tabPreferencesTitle
             case .bookmarks: return UserText.tabBookmarksTitle
             case .onboarding: return UserText.tabOnboardingTitle
@@ -121,47 +115,65 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         }
 
         var url: URL? {
+            userEditableUrl
+        }
+        var userEditableUrl: URL? {
+            switch self {
+            case .url(let url, credential: _, userEntered: _) where !(url.isDuckPlayer || url.isDuckPlayerScheme):
+                return url
+            default:
+                return nil
+            }
+        }
+
+        var urlForWebView: URL? {
             switch self {
             case .url(let url, credential: _, userEntered: _):
                 return url
-            case .privatePlayer(let videoID, let timestamp):
-                return .privatePlayer(videoID, timestamp: timestamp)
-            default:
+            case .homePage:
+                return .homePage
+            case .preferences(pane: .some(let pane)):
+                return .preferencePane(pane)
+            case .preferences(pane: .none):
+                return .preferences
+            case .bookmarks:
+                return .blankPage
+            case .onboarding:
+                return .welcome
+            case .none:
                 return nil
             }
         }
 
         var isUrl: Bool {
             switch self {
-            case .url, .privatePlayer:
+            case .url:
                 return true
             default:
                 return false
+            }
+        }
+
+        var userEnteredValue: String? {
+            switch self {
+            case .url(_, credential: _, userEntered: let userEnteredValue):
+                return userEnteredValue
+            default:
+                return nil
             }
         }
 
         var isUserEnteredUrl: Bool {
-            switch self {
-            case .url(_, credential: _, userEntered: let userEntered):
-                return userEntered
-            default:
-                return false
-            }
+            userEnteredValue != nil
         }
 
-        var isPrivatePlayer: Bool {
-            switch self {
-            case .privatePlayer:
-                return true
-            default:
-                return false
-            }
-        }
     }
     private struct ExtensionDependencies: TabExtensionDependencies {
         let privacyFeatures: PrivacyFeaturesProtocol
         let historyCoordinating: HistoryCoordinating
-
+        var workspace: Workspace
+        var cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter?
+        let duckPlayer: DuckPlayer
         var downloadManager: FileDownloadManagerProtocol
     }
 
@@ -169,14 +181,12 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     func setDelegate(_ delegate: TabDelegate) { self.delegate = delegate }
 
     private let navigationDelegate = DistributedNavigationDelegate(logger: .navigation)
+    private var newWindowPolicyDecisionMakers: [NewWindowPolicyDecisionMaker]?
+    private var onNewWindow: ((WKNavigationAction?) -> NavigationDecision)?
 
-    private let cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter?
     private let statisticsLoader: StatisticsLoader?
     private let internalUserDecider: InternalUserDeciding?
     let pinnedTabsManager: PinnedTabsManager
-    private let privatePlayer: PrivatePlayer
-    private let privacyFeatures: AnyPrivacyFeatures
-    private var contentBlocking: AnyContentBlocking { privacyFeatures.contentBlocking }
 
     private let webViewConfiguration: WKWebViewConfiguration
 
@@ -196,13 +206,15 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                      webViewConfiguration: WKWebViewConfiguration? = nil,
                      historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
                      pinnedTabsManager: PinnedTabsManager = WindowControllersManager.shared.pinnedTabsManager,
+                     workspace: Workspace = NSWorkspace.shared,
                      privacyFeatures: AnyPrivacyFeatures? = nil,
-                     privatePlayer: PrivatePlayer? = nil,
+                     duckPlayer: DuckPlayer? = nil,
                      downloadManager: FileDownloadManagerProtocol = FileDownloadManager.shared,
+                     permissionManager: PermissionManagerProtocol = PermissionManager.shared,
+                     geolocationService: GeolocationServiceProtocol = GeolocationService.shared,
                      cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter? = ContentBlockingAssetsCompilationTimeReporter.shared,
                      statisticsLoader: StatisticsLoader? = nil,
                      extensionsBuilder: TabExtensionsBuilderProtocol = TabExtensionsBuilder.default,
-                     localHistory: Set<String> = Set<String>(),
                      title: String? = nil,
                      favicon: NSImage? = nil,
                      interactionStateData: Data? = nil,
@@ -214,8 +226,8 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                      webViewFrame: CGRect = .zero
     ) {
 
-        let privatePlayer = privatePlayer
-            ?? (NSApp.isRunningUnitTests ? PrivatePlayer.mock(withMode: .enabled) : PrivatePlayer.shared)
+        let duckPlayer = duckPlayer
+            ?? (NSApp.isRunningUnitTests ? DuckPlayer.mock(withMode: .enabled) : DuckPlayer.shared)
         let statisticsLoader = statisticsLoader
             ?? (NSApp.isRunningUnitTests ? nil : StatisticsLoader.shared)
         let privacyFeatures = privacyFeatures ?? PrivacyFeatures
@@ -227,14 +239,16 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                   webViewConfiguration: webViewConfiguration,
                   historyCoordinating: historyCoordinating,
                   pinnedTabsManager: pinnedTabsManager,
+                  workspace: workspace,
                   privacyFeatures: privacyFeatures,
-                  privatePlayer: privatePlayer,
+                  duckPlayer: duckPlayer,
                   downloadManager: downloadManager,
+                  permissionManager: permissionManager,
+                  geolocationService: geolocationService,
                   extensionsBuilder: extensionsBuilder,
                   cbaTimeReporter: cbaTimeReporter,
                   statisticsLoader: statisticsLoader,
                   internalUserDecider: internalUserDecider,
-                  localHistory: localHistory,
                   title: title,
                   favicon: favicon,
                   interactionStateData: interactionStateData,
@@ -253,14 +267,16 @@ final class Tab: NSObject, Identifiable, ObservableObject {
          webViewConfiguration: WKWebViewConfiguration?,
          historyCoordinating: HistoryCoordinating,
          pinnedTabsManager: PinnedTabsManager,
+         workspace: Workspace,
          privacyFeatures: AnyPrivacyFeatures,
-         privatePlayer: PrivatePlayer,
+         duckPlayer: DuckPlayer,
          downloadManager: FileDownloadManagerProtocol,
+         permissionManager: PermissionManagerProtocol,
+         geolocationService: GeolocationServiceProtocol,
          extensionsBuilder: TabExtensionsBuilderProtocol,
          cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter?,
          statisticsLoader: StatisticsLoader?,
          internalUserDecider: InternalUserDeciding?,
-         localHistory: Set<String>,
          title: String?,
          favicon: NSImage?,
          interactionStateData: Data?,
@@ -274,19 +290,14 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
         self.content = content
         self.faviconManagement = faviconManagement
-        self.historyCoordinating = historyCoordinating
         self.pinnedTabsManager = pinnedTabsManager
-        self.privacyFeatures = privacyFeatures
-        self.privatePlayer = privatePlayer
-        self.cbaTimeReporter = cbaTimeReporter
         self.statisticsLoader = statisticsLoader
         self.internalUserDecider = internalUserDecider
-        self.localHistory = localHistory
         self.title = title
         self.favicon = favicon
         self.parentTab = parentTab
         self._canBeClosedWithBack = canBeClosedWithBack
-        self.interactionState = interactionStateData.map { .data($0) } ?? (shouldLoadFromCache ? .loadCachedFromTabContent : .none)
+        self.interactionState = (interactionStateData != nil || shouldLoadFromCache) ? .loadCachedFromTabContent(interactionStateData) : .none
         self.lastSelectedAt = lastSelectedAt
 
         let configuration = webViewConfiguration ?? WKWebViewConfiguration()
@@ -298,7 +309,8 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
         webView = WebView(frame: webViewFrame, configuration: configuration)
         webView.allowsLinkPreview = false
-        permissions = PermissionModel()
+        permissions = PermissionModel(permissionManager: permissionManager,
+                                      geolocationService: geolocationService)
 
         let userScriptsPublisher = _userContentController.projectedValue
             .compactMap { $0?.$contentBlockingAssets }
@@ -306,21 +318,29 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             .map { $0?.userScripts as? UserScripts }
             .eraseToAnyPublisher()
 
-        let userContentControllerPromise = Future<UserContentControllerProtocol, Never>.promise()
+        let userContentControllerPromise = Future<UserContentController, Never>.promise()
         let webViewPromise = Future<WKWebView, Never>.promise()
+        var tabGetter: () -> Tab? = { nil }
         self.extensions = extensionsBuilder
             .build(with: (tabIdentifier: instrumentation.currentTabIdentifier,
+                          isTabPinned: { tabGetter().map { tab in pinnedTabsManager.isTabPinned(tab) } ?? false },
+                          contentPublisher: _content.projectedValue.eraseToAnyPublisher(),
+                          titlePublisher: _title.projectedValue.eraseToAnyPublisher(),
                           userScriptsPublisher: userScriptsPublisher,
                           inheritedAttribution: parentTab?.adClickAttribution?.currentAttributionState,
                           userContentControllerFuture: userContentControllerPromise.future,
-                          webViewFuture: webViewPromise.future,
                           permissionModel: permissions,
-                          privacyInfoPublisher: _privacyInfo.projectedValue.eraseToAnyPublisher()),
+                          webViewFuture: webViewPromise.future
+                         ),
                    dependencies: ExtensionDependencies(privacyFeatures: privacyFeatures,
                                                        historyCoordinating: historyCoordinating,
+                                                       workspace: workspace,
+                                                       cbaTimeReporter: cbaTimeReporter,
+                                                       duckPlayer: duckPlayer,
                                                        downloadManager: downloadManager))
 
         super.init()
+        tabGetter = { [weak self] in self }
         userContentController.map(userContentControllerPromise.fulfill)
 
         setupNavigationDelegate()
@@ -351,13 +371,11 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         }
     }
 
-    func openChild(with content: TabContent, of kind: NewWindowPolicy) {
-        guard let delegate else {
-            assertionFailure("no delegate set")
-            return
+    func openChild(with url: URL, of kind: NewWindowPolicy) {
+        self.onNewWindow = { _ in
+            .allow(kind)
         }
-        let tab = Tab(content: content, parentTab: self, shouldLoadInBackground: true, canBeClosedWithBack: kind.isSelectedTab)
-        delegate.tab(self, createdChild: tab, of: kind)
+        webView.loadInNewWindow(url)
     }
 
     @objc func onDuckDuckGoEmailSignOut(_ notification: Notification) {
@@ -372,16 +390,12 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     }
 
     func cleanUpBeforeClosing() {
-        let job = { [content, webView, identifier=instrumentation.currentTabIdentifier, historyCoordinating, cbaTimeReporter] in
-            if content.isUrl, let url = webView.url {
-                historyCoordinating.commitChanges(url: url)
-            }
+        let job = { [webView] in
             webView.stopLoading()
             webView.stopMediaCapture()
             webView.stopAllMediaPlayback()
             webView.fullscreenWindowController?.close()
 
-            cbaTimeReporter?.tabWillClose(identifier)
             webView.configuration.userContentController.removeAllUserScripts()
         }
         guard Thread.isMainThread else {
@@ -409,18 +423,11 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     let webViewDidFinishNavigationPublisher = PassthroughSubject<Void, Never>()
     let webViewDidFailNavigationPublisher = PassthroughSubject<Void, Never>()
 
-    @MainActor
-    @Published var isAMPProtectionExtracting: Bool = false
-
     // MARK: - Properties
 
     let webView: WebView
 
-    private var lastUpgradedURL: URL?
-
     var contentChangeEnabled = true
-
-    var fbBlockingEnabled = true
 
     var isLazyLoadingInProgress = false
 
@@ -428,9 +435,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         didSet {
             handleFavicon()
             invalidateInteractionStateData()
-            if let oldUrl = oldValue.url {
-                historyCoordinating.commitChanges(url: oldUrl)
-            }
             error = nil
         }
     }
@@ -441,9 +445,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
         let oldContent = self.content
         let newContent: TabContent = {
-            if let newContent = privatePlayer.overrideContent(newContent, for: self) {
-                return newContent
-            }
             if case .preferences(pane: .some) = oldContent,
                case .preferences(pane: nil) = newContent {
                 // prevent clearing currently selected pane (for state persistence purposes)
@@ -466,7 +467,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     }
 
     @discardableResult
-    func setUrl(_ url: URL?, userEntered: Bool) -> Task<ExpectedNavigation?, Never>? {
+    func setUrl(_ url: URL?, userEntered: String?) -> Task<ExpectedNavigation?, Never>? {
         if url == .welcome {
             OnboardingViewModel().restart()
         }
@@ -477,11 +478,8 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         if let url = webView.url {
             let content = TabContent.contentFromURL(url)
 
-            if content.isUrl, !webView.isLoading {
-                self.addVisit(of: url)
-            }
             if self.content.isUrl, self.content.url == url {
-                // ignore content updates when tab.content has userEntered or credential set but equal url
+                // ignore content updates when tab.content has userEntered or credential set but equal url as it comes from the WebView url updated event
             } else if content != self.content {
                 self.content = content
             }
@@ -492,14 +490,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     var lastSelectedAt: Date?
 
     @Published var title: String?
-
-    private func handleTitleDidChange() {
-        updateTitle()
-
-        if let title = self.title, let url = webView.url {
-            historyCoordinating.updateTitleIfNeeded(title: title, url: url)
-        }
-    }
 
     private func updateTitle() {
         var title = webView.title?.trimmingWhitespace()
@@ -512,18 +502,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         }
     }
 
-    @PublishedAfter var error: WKError? {
-        didSet {
-            switch error {
-            case .some(URLError.notConnectedToInternet),
-                 .some(URLError.networkConnectionLost):
-                guard let failingUrl = error?.failingUrl else { break }
-                historyCoordinating.markFailedToLoadUrl(failingUrl)
-            default:
-                break
-            }
-        }
-    }
+    @PublishedAfter var error: WKError?
     let permissions: PermissionModel
 
     @Published private(set) var isLoading: Bool = false
@@ -552,12 +531,18 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
     private enum InteractionState {
         case none
-        case loadCachedFromTabContent
-        case data(Data)
+        case loadCachedFromTabContent(Data?)
+        case webViewProvided(Data)
 
         var data: Data? {
-            if case .data(let data) = self { return data }
-            return nil
+            switch self {
+            case .none:
+                return nil
+            case .loadCachedFromTabContent(let data):
+                return data
+            case .webViewProvided(let data):
+                return data
+            }
         }
         var shouldLoadFromCache: Bool {
             if case .loadCachedFromTabContent = self { return true }
@@ -578,24 +563,19 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         guard webView.url != nil else { return nil }
 
         if #available(macOS 12.0, *) {
-            self.interactionState = (webView.interactionState as? Data).map { .data($0) } ?? .none
+            self.interactionState = (webView.interactionState as? Data).map { .webViewProvided($0) } ?? .none
         } else {
-            self.interactionState = (try? webView.sessionStateData()).map { .data($0) } ?? .none
+            self.interactionState = (try? webView.sessionStateData()).map { .webViewProvided($0) } ?? .none
         }
 
         return self.interactionState.data
     }
 
     private let instrumentation = TabInstrumentation()
-    private enum FrameLoadState {
-        case provisional
-        case committed
-        case finished
-    }
-    private var externalSchemeOpenedPerPageLoad = false
 
     @Published private(set) var canGoForward: Bool = false
     @Published private(set) var canGoBack: Bool = false
+    @Published private(set) var canReload: Bool = false
 
     private func updateCanGoBackForward() {
         updateCanGoBackForward(withCurrentNavigation: navigationDelegate.currentNavigation)
@@ -617,6 +597,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
         let canGoBack = webView.canGoBack || self.error != nil
         let canGoForward = webView.canGoForward && self.error == nil
+        let canReload = (self.content.urlForWebView?.scheme ?? URL.NavigationalScheme.about.rawValue) != URL.NavigationalScheme.about.rawValue
 
         if canGoBack != self.canGoBack {
             self.canGoBack = canGoBack
@@ -624,40 +605,37 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         if canGoForward != self.canGoForward {
             self.canGoForward = canGoForward
         }
+        if canReload != self.canReload {
+            self.canReload = canReload
+        }
     }
 
-    func goBack() {
+    @MainActor
+    @discardableResult
+    func goBack() -> ExpectedNavigation? {
         guard canGoBack else {
             if canBeClosedWithBack {
                 delegate?.closeTab(self)
             }
-            return
+            return nil
         }
 
         guard error == nil else {
-            webView.reload()
-            return
+            return webView.navigator()?.reload(withExpectedNavigationType: .reload)
         }
 
-        shouldStoreNextVisit = false
-
-        // Prevent from a Player reloading loop on back navigation to
-        // YT page where the player was enabled (see comment inside)
-        if privatePlayer.goBackSkippingLastItemIfNeeded(for: webView) {
-            return
-        }
         userInteractionDialog = nil
-        webView.goBack()
+        return webView.navigator()?.goBack(withExpectedNavigationType: .backForward(distance: -1))
     }
 
-    func goForward() {
-        guard canGoForward else { return }
-        shouldStoreNextVisit = false
-        webView.goForward()
+    @MainActor
+    @discardableResult
+    func goForward() -> ExpectedNavigation? {
+        guard canGoForward else { return nil }
+        return webView.navigator()?.goForward(withExpectedNavigationType: .backForward(distance: 1))
     }
 
     func go(to item: WKBackForwardListItem) {
-        shouldStoreNextVisit = false
         webView.go(to: item)
     }
 
@@ -676,94 +654,40 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             return
         }
 
-        if webView.url == nil, content.url != nil {
+        if webView.url == nil, content.isUrl {
             // load from cache or interactionStateData when called by lazy loader
             Task { @MainActor [weak self] in
                 await self?.reloadIfNeeded(shouldLoadInBackground: true)
             }
-        } else if case .privatePlayer = content, let url = content.url {
-            webView.load(URLRequest(url: url))
         } else {
             webView.reload()
         }
     }
 
-    @discardableResult
-    private func setFBProtection(enabled: Bool) -> Bool {
-        guard self.fbBlockingEnabled != enabled else { return false }
-        guard let userContentController = userContentController else {
-            assertionFailure("Missing UserContentController")
-            return false
-        }
-        if enabled {
-            do {
-                try userContentController.enableGlobalContentRuleList(withIdentifier: ContentBlockerRulesLists.Constants.clickToLoadRulesListName)
-            } catch {
-                assertionFailure("Missing FB List")
-                return false
-            }
-        } else {
-            do {
-                try userContentController.disableGlobalContentRuleList(withIdentifier: ContentBlockerRulesLists.Constants.clickToLoadRulesListName)
-            } catch {
-                assertionFailure("FB List was not enabled")
-                return false
-            }
-        }
-        self.fbBlockingEnabled = enabled
-
-        return true
-    }
-
-    private static let debugEvents = EventMapping<AMPProtectionDebugEvents> { event, _, _, _ in
-        switch event {
-        case .ampBlockingRulesCompilationFailed:
-            Pixel.fire(.ampBlockingRulesCompilationFailed)
-        }
-    }
-
-    lazy var linkProtection: LinkProtection = {
-        LinkProtection(privacyManager: contentBlocking.privacyConfigurationManager,
-                       contentBlockingManager: contentBlocking.contentBlockingManager,
-                       errorReporting: Self.debugEvents)
-    }()
-
-    lazy var referrerTrimming: ReferrerTrimming = {
-        ReferrerTrimming(privacyManager: contentBlocking.privacyConfigurationManager,
-                         contentBlockingManager: contentBlocking.contentBlockingManager,
-                         tld: contentBlocking.tld)
-    }()
-
     @MainActor
     @discardableResult
     private func reloadIfNeeded(shouldLoadInBackground: Bool = false) async -> ExpectedNavigation? {
         let content = self.content
-        guard content.url != nil else { return nil }
-
-        let url: URL = await {
-            if contentURL.isFileURL {
-                return contentURL
-            }
-            return await linkProtection.getCleanURL(from: contentURL, onStartExtracting: {
-                isAMPProtectionExtracting = true
-            }, onFinishExtracting: { [weak self]
-                in self?.isAMPProtectionExtracting = false
-            })
-        }()
-        guard content == self.content else { return nil }
+        guard let url = content.urlForWebView,
+              url.scheme.map(URL.NavigationalScheme.init) != .about else { return nil }
 
         if shouldReload(url, shouldLoadInBackground: shouldLoadInBackground) {
             let didRestore = restoreInteractionStateDataIfNeeded()
 
-            if privatePlayer.goBackAndLoadURLIfNeeded(for: self) {
-                return nil
-            }
-
             guard !didRestore else { return nil }
+
+            let navigationType: NavigationType
+            if content.isUserEnteredUrl {
+                navigationType = .custom(.userEnteredUrl)
+            } else if interactionState.shouldLoadFromCache {
+                navigationType = .sessionRestoration
+            } else {
+                navigationType = .custom(.tabContentUpdate)
+            }
 
             if url.isFileURL {
                 return webView.navigator(distributedNavigationDelegate: navigationDelegate)
-                    .loadFileURL(url, allowingReadAccessTo: URL(fileURLWithPath: "/"), withExpectedNavigationType: content.isUserEnteredUrl ? .custom(.userEnteredUrl) : .other)
+                    .loadFileURL(url, allowingReadAccessTo: URL(fileURLWithPath: "/"), withExpectedNavigationType: navigationType)
             }
 
             var request = URLRequest(url: url, cachePolicy: interactionState.shouldLoadFromCache ? .returnCacheDataElseLoad : .useProtocolCachePolicy)
@@ -771,24 +695,12 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                content.isUserEnteredUrl {
                 request.attribution = .user
             }
+            invalidateInteractionStateData()
+
             return webView.navigator(distributedNavigationDelegate: navigationDelegate)
-                .load(request, withExpectedNavigationType: content.isUserEnteredUrl ? .custom(.userEnteredUrl) : .other)
+                .load(request, withExpectedNavigationType: navigationType)
         }
         return nil
-    }
-
-    @MainActor
-    private var contentURL: URL {
-        switch content {
-        case .url(let value, credential: _, userEntered: _):
-            return value
-        case .privatePlayer(let videoID, let timestamp):
-            return .privatePlayer(videoID, timestamp: timestamp)
-        case .homePage:
-            return .homePage
-        default:
-            return .blankPage
-        }
     }
 
     @MainActor
@@ -798,12 +710,8 @@ final class Tab: NSObject, Identifiable, ObservableObject {
               (webView.superview != nil || shouldLoadInBackground),
               // don‘t reload when already loaded
               webView.url != url,
-              webView.url != content.url
+              webView.url != (content.isUrl ? content.urlForWebView : nil)
         else {
-            return false
-        }
-
-        if privatePlayer.shouldSkipLoadingURL(for: self) {
             return false
         }
 
@@ -822,26 +730,27 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
     @MainActor
     private func restoreInteractionStateDataIfNeeded() -> Bool {
-        var didRestore: Bool = false
-        if let interactionStateData = self.interactionState.data {
-            if contentURL.isFileURL {
-                _ = webView.loadFileURL(contentURL, allowingReadAccessTo: URL(fileURLWithPath: "/"))
-            }
+        // only restore session from interactionStateData passed to Tab.init
+        guard case .loadCachedFromTabContent(.some(let interactionStateData)) = self.interactionState else { return false }
 
-            if #available(macOS 12.0, *) {
-                webView.interactionState = interactionStateData
-                didRestore = true
-            } else {
-                do {
-                    try webView.restoreSessionState(from: interactionStateData)
-                    didRestore = true
-                } catch {
-                    os_log("Tab:setupWebView could not restore session state %s", "\(error)")
-                }
-            }
+        if let url = content.urlForWebView, url.isFileURL {
+            // request file system access before restoration
+            _ = webView.loadFileURL(url, allowingReadAccessTo: URL(fileURLWithPath: "/"))
         }
 
-        return didRestore
+        if #available(macOS 12.0, *) {
+            webView.interactionState = interactionStateData
+        } else {
+            do {
+                try webView.restoreSessionState(from: interactionStateData)
+            } catch {
+                os_log("Tab:setupWebView could not restore session state %s", "\(error)")
+                return false
+            }
+        }
+        invalidateInteractionStateData()
+
+        return true
     }
 
     private func addHomePageToWebViewIfNeeded() {
@@ -856,7 +765,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     }
 
     func requestFireproofToggle() {
-        guard let url = content.url,
+        guard let url = content.userEditableUrl,
               let host = url.host
         else { return }
 
@@ -889,7 +798,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             self?.handleUrlDidChange()
         }.store(in: &webViewCancellables)
         webView.observe(\.title) { [weak self] _, _ in
-            self?.handleTitleDidChange()
+            self?.updateTitle()
         }.store(in: &webViewCancellables)
 
         webView.observe(\.canGoBack) { [weak self] _, _ in
@@ -942,17 +851,17 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     let faviconManagement: FaviconManagement
 
     private func handleFavicon() {
-        if content.isPrivatePlayer {
-            favicon = .privatePlayer
+        guard content.isUrl, let url = content.urlForWebView else {
+            favicon = nil
+            return
+        }
+
+        if url.isDuckPlayer || url.isDuckPlayerScheme {
+            favicon = .duckPlayer
             return
         }
 
         guard faviconManagement.areFaviconsLoaded else { return }
-
-        guard content.isUrl, let url = content.url else {
-            favicon = nil
-            return
-        }
 
         if let cachedFavicon = faviconManagement.getCachedFavicon(for: url, sizeCategory: .small)?.image {
             if cachedFavicon != favicon {
@@ -963,145 +872,6 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         }
     }
 
-    // MARK: - Global & Local History
-
-    private var historyCoordinating: HistoryCoordinating
-    private var shouldStoreNextVisit = true
-    private(set) var localHistory: Set<String>
-
-    func addVisit(of url: URL) {
-        guard shouldStoreNextVisit else {
-            shouldStoreNextVisit = true
-            return
-        }
-
-        // Add to global history
-        historyCoordinating.addVisit(of: url)
-
-        // Add to local history
-        if let host = url.host, !host.isEmpty {
-            localHistory.insert(host.droppingWwwPrefix())
-        }
-    }
-
-    // MARK: - Youtube Player
-
-    private weak var youtubeOverlayScript: YoutubeOverlayUserScript?
-    private weak var youtubePlayerScript: YoutubePlayerUserScript?
-    private var youtubePlayerCancellables: Set<AnyCancellable> = []
-
-    func setUpYoutubeScriptsIfNeeded() {
-        guard privatePlayer.isAvailable else {
-            return
-        }
-
-        youtubePlayerCancellables.removeAll()
-
-        // only send push updates on macOS 11+ where it's safe to call window.* messages in the browser
-        let canPushMessagesToJS: Bool = {
-            if #available(macOS 11, *) {
-                return true
-            } else {
-                return false
-            }
-        }()
-
-        if webView.url?.host?.droppingWwwPrefix() == "youtube.com" && canPushMessagesToJS {
-            privatePlayer.$mode
-                .dropFirst()
-                .sink { [weak self] playerMode in
-                    guard let self = self else {
-                        return
-                    }
-                    let userValues = YoutubeOverlayUserScript.UserValues(
-                        privatePlayerMode: playerMode,
-                        overlayInteracted: self.privatePlayer.overlayInteracted
-                    )
-                    self.youtubeOverlayScript?.userValuesUpdated(userValues: userValues, inWebView: self.webView)
-                }
-                .store(in: &youtubePlayerCancellables)
-        }
-
-        if url?.isPrivatePlayerScheme == true {
-            youtubePlayerScript?.isEnabled = true
-
-            if canPushMessagesToJS {
-                privatePlayer.$mode
-                    .map { $0 == .enabled }
-                    .sink { [weak self] shouldAlwaysOpenPrivatePlayer in
-                        guard let self = self else {
-                            return
-                        }
-                        self.youtubePlayerScript?.setAlwaysOpenInPrivatePlayer(shouldAlwaysOpenPrivatePlayer, inWebView: self.webView)
-                    }
-                    .store(in: &youtubePlayerCancellables)
-            }
-        } else {
-            youtubePlayerScript?.isEnabled = false
-        }
-    }
-
-    // MARK: - Dashboard Info
-    @Published private(set) var privacyInfo: PrivacyInfo?
-    private var previousPrivacyInfosByURL: [String: PrivacyInfo] = [:]
-    private var didGoBackForward: Bool = false
-
-    private func resetDashboardInfo() {
-        if let url = content.url {
-            if didGoBackForward, let privacyInfo = previousPrivacyInfosByURL[url.absoluteString] {
-                self.privacyInfo = privacyInfo
-                didGoBackForward = false
-            } else {
-                privacyInfo = makePrivacyInfo(url: url)
-            }
-        } else {
-            privacyInfo = nil
-        }
-    }
-
-    private func makePrivacyInfo(url: URL) -> PrivacyInfo? {
-        guard let host = url.host else { return nil }
-
-        let entity = contentBlocking.trackerDataManager.trackerData.findEntity(forHost: host)
-
-        privacyInfo = PrivacyInfo(url: url,
-                                  parentEntity: entity,
-                                  protectionStatus: makeProtectionStatus(for: host))
-
-        previousPrivacyInfosByURL[url.absoluteString] = privacyInfo
-
-        return privacyInfo
-    }
-
-    private func resetConnectionUpgradedTo(navigationAction: NavigationAction) {
-        let isOnUpgradedPage = navigationAction.url == privacyInfo?.connectionUpgradedTo
-        if navigationAction.isForMainFrame && !isOnUpgradedPage {
-            privacyInfo?.connectionUpgradedTo = nil
-        }
-    }
-
-    public func setMainFrameConnectionUpgradedTo(_ upgradedUrl: URL?) {
-        guard let upgradedUrl else { return }
-        privacyInfo?.connectionUpgradedTo = upgradedUrl
-    }
-
-    private func makeProtectionStatus(for host: String) -> ProtectionStatus {
-        let config = contentBlocking.privacyConfigurationManager.privacyConfig
-
-        let isTempUnprotected = config.isTempUnprotected(domain: host)
-        let isAllowlisted = config.isUserUnprotected(domain: host)
-
-        var enabledFeatures: [String] = []
-
-        if !config.isInExceptionList(domain: host, forFeature: .contentBlocking) {
-            enabledFeatures.append(PrivacyFeature.contentBlocking.rawValue)
-        }
-
-        return ProtectionStatus(unprotectedTemporary: isTempUnprotected,
-                                enabledFeatures: enabledFeatures,
-                                allowlisted: isAllowlisted,
-                                denylisted: false)
-    }
 }
 
 extension Tab: UserContentControllerDelegate {
@@ -1111,18 +881,8 @@ extension Tab: UserContentControllerDelegate {
 
         userScripts.debugScript.instrumentation = instrumentation
         userScripts.faviconScript.delegate = self
-        userScripts.surrogatesScript.delegate = self
-        userScripts.contentBlockerRulesScript.delegate = self
-        userScripts.clickToLoadScript.delegate = self
         userScripts.pageObserverScript.delegate = self
         userScripts.printingUserScript.delegate = self
-        if #available(macOS 11, *) {
-            userScripts.autoconsentUserScript?.delegate = self
-        }
-        youtubeOverlayScript = userScripts.youtubeOverlayScript
-        youtubeOverlayScript?.delegate = self
-        youtubePlayerScript = userScripts.youtubePlayerUserScript
-        setUpYoutubeScriptsIfNeeded()
     }
 
 }
@@ -1148,73 +908,6 @@ extension Tab: FaviconUserScriptDelegate {
         }
     }
 
-}
-
-extension Tab: ContentBlockerRulesUserScriptDelegate {
-
-    func contentBlockerRulesUserScriptShouldProcessTrackers(_ script: ContentBlockerRulesUserScript) -> Bool {
-        return true
-    }
-
-    func contentBlockerRulesUserScriptShouldProcessCTLTrackers(_ script: ContentBlockerRulesUserScript) -> Bool {
-        return fbBlockingEnabled
-    }
-
-    func contentBlockerRulesUserScript(_ script: ContentBlockerRulesUserScript, detectedTracker tracker: DetectedRequest) {
-        guard let url = URL(string: tracker.pageUrl) else { return }
-
-        privacyInfo?.trackerInfo.addDetectedTracker(tracker, onPageWithURL: url)
-        historyCoordinating.addDetectedTracker(tracker, onURL: url)
-    }
-
-    func contentBlockerRulesUserScript(_ script: ContentBlockerRulesUserScript, detectedThirdPartyRequest request: DetectedRequest) {
-        privacyInfo?.trackerInfo.add(detectedThirdPartyRequest: request)
-    }
-
-}
-
-extension HistoryCoordinating {
-
-    func addDetectedTracker(_ tracker: DetectedRequest, onURL url: URL) {
-        trackerFound(on: url)
-
-        guard tracker.isBlocked,
-              let entityName = tracker.entityName else { return }
-
-        addBlockedTracker(entityName: entityName, on: url)
-    }
-
-}
-
-extension Tab: ClickToLoadUserScriptDelegate {
-
-    func clickToLoadUserScriptAllowFB(_ script: UserScript, replyHandler: @escaping (Bool) -> Void) {
-        guard self.fbBlockingEnabled else {
-            replyHandler(true)
-            return
-        }
-
-        if setFBProtection(enabled: false) {
-            replyHandler(true)
-        } else {
-            replyHandler(false)
-        }
-    }
-}
-
-extension Tab: SurrogatesUserScriptDelegate {
-    func surrogatesUserScriptShouldProcessTrackers(_ script: SurrogatesUserScript) -> Bool {
-        return true
-    }
-
-    func surrogatesUserScript(_ script: SurrogatesUserScript, detectedTracker tracker: DetectedRequest, withSurrogate host: String) {
-        guard let url = webView.url else { return }
-
-        privacyInfo?.trackerInfo.addInstalledSurrogateHost(host, for: tracker, onPageWithURL: url)
-        privacyInfo?.trackerInfo.addDetectedTracker(tracker, onPageWithURL: url)
-
-        historyCoordinating.addDetectedTracker(tracker, onURL: url)
-    }
 }
 
 extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
@@ -1251,16 +944,13 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
 
     @MainActor
     func didCommit(_ navigation: Navigation) {
-        if content.isUrl, navigation.url == content.url {
-            addVisit(of: navigation.url)
-        }
         webViewDidCommitNavigationPublisher.send()
     }
 
-    // swiftlint:disable cyclomatic_complexity
-    // swiftlint:disable function_body_length
     @MainActor
     func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
+        // allow local file navigations
+        if navigationAction.url.isFileURL { return .allow }
 
         // when navigating to a URL with basic auth username/password, cache it and redirect to a trimmed URL
         if let mainFrame = navigationAction.mainFrameTarget,
@@ -1269,206 +959,28 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
             return .redirect(mainFrame) { navigator in
                 var request = navigationAction.request
                 // credential is removed from the URL and set to TabContent to be used on next Challenge
-                self.content = .url(navigationAction.url.removingBasicAuthCredential(), credential: credential, userEntered: false)
+                self.content = .url(navigationAction.url.removingBasicAuthCredential(), credential: credential, userEntered: nil)
                 // reload URL without credentials
                 request.url = self.content.url!
                 navigator.load(request)
             }
         }
 
-        if let policy = privatePlayer.decidePolicy(for: navigationAction, in: self) {
-            return policy
-        }
-
-        if navigationAction.url.isFileURL {
-            return .allow
-        }
-
-        let isLinkActivated = !navigationAction.isTargetingNewWindow
-            && (navigationAction.navigationType.isLinkActivated || (navigationAction.navigationType == .other && navigationAction.isUserInitiated))
-
-        let isNavigatingAwayFromPinnedTab: Bool = {
-            let isNavigatingToAnotherDomain = navigationAction.url.host != url?.host
-            let isPinned = pinnedTabsManager.isTabPinned(self)
-            return isLinkActivated && isPinned && isNavigatingToAnotherDomain && navigationAction.isForMainFrame
-        }()
-
-        // to be modularized later on, see https://app.asana.com/0/0/1203268245242140/f
-        let isRequestingNewTab = (isLinkActivated && NSApp.isCommandPressed) || navigationAction.navigationType.isMiddleButtonClick || isNavigatingAwayFromPinnedTab
-        let shouldSelectNewTab = NSApp.isShiftPressed || (isNavigatingAwayFromPinnedTab && !navigationAction.navigationType.isMiddleButtonClick && !NSApp.isCommandPressed)
-
-        didGoBackForward = navigationAction.navigationType.isBackForward
-
-        // This check needs to happen before GPC checks. Otherwise the navigation type may be rewritten to `.other`
-        // which would skip link rewrites.
-        if !navigationAction.navigationType.isBackForward {
-            let navigationActionPolicy = await linkProtection
-                .requestTrackingLinkRewrite(
-                    initiatingURL: webView.url,
-                    destinationURL: navigationAction.url,
-                    onStartExtracting: { if !isRequestingNewTab { isAMPProtectionExtracting = true }},
-                    onFinishExtracting: { [weak self] in self?.isAMPProtectionExtracting = false },
-                    onLinkRewrite: { [weak self] url in
-                        guard let self = self else { return }
-                        if isRequestingNewTab || !navigationAction.isForMainFrame {
-                            self.openChild(with: .url(url), of: .tab(selected: shouldSelectNewTab || !navigationAction.isForMainFrame))
-                        } else {
-                            self.webView.load(URLRequest(url: url))
-                        }
-                    })
-            if let navigationActionPolicy = navigationActionPolicy, navigationActionPolicy == false {
-                return .cancel
-            }
-        }
-
         if navigationAction.isForMainFrame {
             preferences.userAgent = UserAgent.for(navigationAction.url)
         }
-
-        if navigationAction.isForMainFrame, navigationAction.request.mainDocumentURL?.host != lastUpgradedURL?.host {
-            lastUpgradedURL = nil
-        }
-
-        if navigationAction.isForMainFrame, !navigationAction.navigationType.isBackForward {
-            if let newRequest = referrerTrimming.trimReferrer(for: navigationAction.request, originUrl: navigationAction.sourceFrame.url) {
-                if isRequestingNewTab {
-                    self.openChild(with: newRequest.url.map { .contentFromURL($0) } ?? .none, of: .tab(selected: shouldSelectNewTab))
-                } else {
-                    _ = webView.load(newRequest)
-                }
-                return .cancel
-            }
-        }
-
-        if navigationAction.isForMainFrame,
-           !navigationAction.navigationType.isBackForward,
-           !isRequestingNewTab,
-           let request = GPCRequestFactory().requestForGPC(basedOn: navigationAction.request,
-                                                           config: contentBlocking.privacyConfigurationManager.privacyConfig,
-                                                           gpcEnabled: PrivacySecurityPreferences.shared.gpcEnabled) {
-
-            return .redirect(navigationAction, invalidatingBackItemIfNeededFor: webView) {
-                $0.load(request)
-            }
-        }
-
-        self.resetConnectionUpgradedTo(navigationAction: navigationAction)
-
-        if isRequestingNewTab {
-            self.openChild(with: .contentFromURL(navigationAction.url), of: .tab(selected: shouldSelectNewTab))
-            return .cancel
-
-        }
-
         guard navigationAction.url.scheme != nil else { return .allow }
-
-        if navigationAction.url.isExternalSchemeLink {
-            // request if OS can handle extenrnal url
-            let url = navigationAction.sourceFrame.url
-            let host = url.isFileURL ? .localhost : (url.host ?? "")
-            self.host(host, requestedOpenExternalURL: navigationAction.url, forUserEnteredURL: navigationAction.isUserEnteredUrl)
-            return .cancel
-        }
-
-        if navigationAction.isForMainFrame,
-           case .success(let upgradedURL) = await privacyFeatures.httpsUpgrade.upgrade(url: navigationAction.url) {
-
-            if lastUpgradedURL != upgradedURL {
-                urlDidUpgrade(to: upgradedURL)
-                return .redirect(navigationAction, invalidatingBackItemIfNeededFor: webView) {
-                    $0.load(URLRequest(url: upgradedURL))
-                }
-            }
-        }
-
-        if !navigationAction.url.isDuckDuckGo {
-            await prepareForContentBlocking()
-        }
-
-        toggleFBProtection(for: navigationAction.url)
 
         return .next
     }
     // swiftlint:enable cyclomatic_complexity
     // swiftlint:enable function_body_length
 
-    private func host(_ host: String, requestedOpenExternalURL url: URL, forUserEnteredURL userEnteredUrl: Bool) {
-        let searchForExternalUrl = { [weak self] in
-            // Redirect after handing WebView.url update after cancelling the request
-            DispatchQueue.main.async {
-                guard let self, let url = URL.makeSearchUrl(from: url.absoluteString) else { return }
-                self.setUrl(url, userEntered: userEnteredUrl)
-            }
-        }
-
-        guard self.delegate?.tab(self, requestedOpenExternalURL: url, forUserEnteredURL: userEnteredUrl) == true else {
-            // search if external URL can‘t be opened but entered by user
-            if userEnteredUrl {
-                searchForExternalUrl()
-            }
-            return
-        }
-
-        let permissionType = PermissionType.externalScheme(scheme: url.scheme ?? "")
-
-        permissions.permissions([permissionType], requestedForDomain: host, url: url) { [weak self, userEnteredUrl] granted in
-            guard granted, let self else {
-                // search if denied but entered by user
-                if userEnteredUrl {
-                    searchForExternalUrl()
-                }
-                return
-            }
-            // handle opening extenral URL
-            NSWorkspace.shared.open(url)
-            self.permissions.permissions[permissionType].externalSchemeOpened()
-        }
-    }
-    // swiftlint:enable cyclomatic_complexity
-    // swiftlint:enable function_body_length
-
-    private func urlDidUpgrade(to upgradedUrl: URL) {
-        lastUpgradedURL = upgradedUrl
-        privacyInfo?.connectionUpgradedTo = upgradedUrl
-    }
-
-    @MainActor
-    private func prepareForContentBlocking() async {
-        // Ensure Content Blocking Assets (WKContentRuleList&UserScripts) are installed
-        if userContentController?.contentBlockingAssetsInstalled == false
-           && contentBlocking.privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .contentBlocking) {
-            cbaTimeReporter?.tabWillWaitForRulesCompilation(self.instrumentation.currentTabIdentifier)
-
-            disableLongDecisionMakingChecks()
-            defer {
-                enableLongDecisionMakingChecks()
-            }
-
-            await userContentController?.awaitContentBlockingAssetsInstalled()
-            cbaTimeReporter?.reportWaitTimeForTabFinishedWaitingForRules(self.instrumentation.currentTabIdentifier)
-        } else {
-            cbaTimeReporter?.reportNavigationDidNotWaitForRules()
-        }
-    }
-
-    private func toggleFBProtection(for url: URL) {
-        // Enable/disable FBProtection only after UserScripts are installed (awaitContentBlockingAssetsInstalled)
-        let privacyConfiguration = contentBlocking.privacyConfigurationManager.privacyConfig
-
-        let featureEnabled = privacyConfiguration.isFeature(.clickToPlay, enabledForDomain: url.host)
-        setFBProtection(enabled: featureEnabled)
-    }
-
     @MainActor
     func willStart(_ navigation: Navigation) {
         if error != nil { error = nil }
 
-        externalSchemeOpenedPerPageLoad = false
         delegate?.tabWillStartNavigation(self, isUserInitiated: navigation.navigationAction.isUserInitiated)
-
-        if navigation.navigationAction.navigationType.isRedirect {
-            resetDashboardInfo()
-        }
     }
 
     @MainActor
@@ -1488,21 +1000,17 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         if error != nil { error = nil }
 
         invalidateInteractionStateData()
-        resetDashboardInfo()
-        linkProtection.cancelOngoingExtraction()
-        linkProtection.setMainFrameUrl(navigation.url)
-        referrerTrimming.onBeginNavigation(to: navigation.url)
     }
 
     @MainActor
     func navigationDidFinish(_ navigation: Navigation) {
         invalidateInteractionStateData()
         webViewDidFinishNavigationPublisher.send()
-        if isAMPProtectionExtracting { isAMPProtectionExtracting = false }
-        linkProtection.setMainFrameUrl(nil)
-        referrerTrimming.onFinishNavigation()
-        setUpYoutubeScriptsIfNeeded()
         statisticsLoader?.refreshRetentionAtb(isSearch: navigation.url.isDuckDuckGoSearch)
+
+        if navigation.url.isDuckDuckGoSearch {
+            BookmarksBarUsageSender.sendBookmarksBarUsagePixel()
+        }
     }
 
     @MainActor
@@ -1512,8 +1020,6 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         }
 
         invalidateInteractionStateData()
-        linkProtection.setMainFrameUrl(nil)
-        referrerTrimming.onFailedNavigation()
         webViewDidFailNavigationPublisher.send()
     }
 
@@ -1523,28 +1029,15 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
 
 }
 
-@available(macOS 11, *)
-extension Tab: AutoconsentUserScriptDelegate {
-    func autoconsentUserScript(consentStatus: CookieConsentInfo) {
-        self.privacyInfo?.cookieConsentManaged = consentStatus
-    }
+extension Tab: NewWindowPolicyDecisionMaker {
 
-    func autoconsentUserScriptPromptUserForConsent(_ result: @escaping (Bool) -> Void) {
-        delegate?.tab(self, promptUserForCookieConsent: result)
-    }
-}
-
-extension Tab: YoutubeOverlayUserScriptDelegate {
-    func youtubeOverlayUserScriptDidRequestDuckPlayer(with url: URL) {
-        let content = Tab.TabContent.contentFromURL(url)
-        let isRequestingNewTab = NSApp.isCommandPressed
-        if isRequestingNewTab {
-            let shouldSelectNewTab = NSApp.isShiftPressed
-            self.openChild(with: content, of: .tab(selected: shouldSelectNewTab))
-        } else {
-            setContent(content)
+    func decideNewWindowPolicy(for navigationAction: WKNavigationAction) -> NavigationDecision? {
+        defer {
+            onNewWindow = nil
         }
+        return onNewWindow?(navigationAction)
     }
+
 }
 
 extension Tab: TabDataClearing {
@@ -1567,5 +1060,18 @@ extension Tab {
 
     static var objcNavigationDelegateKeyPath: String { #keyPath(objcNavigationDelegate) }
     @objc private var objcNavigationDelegate: Any? { navigationDelegate }
+
+    static var objcNewWindowPolicyDecisionMakersKeyPath: String { #keyPath(objcNewWindowPolicyDecisionMakers) }
+    @objc private var objcNewWindowPolicyDecisionMakers: Any? {
+        get {
+            newWindowPolicyDecisionMakers
+        }
+        set {
+            newWindowPolicyDecisionMakers = newValue as? [NewWindowPolicyDecisionMaker] ?? {
+                assertionFailure("\(String(describing: newValue)) is not [NewWindowPolicyDecisionMaker]")
+                return nil
+            }()
+        }
+    }
 
 }

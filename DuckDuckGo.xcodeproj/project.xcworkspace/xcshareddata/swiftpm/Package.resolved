@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "a03e1fe2a6d124737c8b5f5bc2ed72d4d95b8803",
-        "version" : "51.0.1"
+        "revision" : "9b7cd2b689f39cf34c5430fa00dabcca4d6cf6ee",
+        "version" : "53.1.0"
       }
     },
     {
@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/content-scope-scripts",
       "state" : {
-        "revision" : "ed10de3485f454ca59259266a0b3942bd21b43db",
-        "version" : "3.4.1"
+        "revision" : "801b7f23476f797c6eaa72b070e6c80abb82801a",
+        "version" : "4.4.4"
       }
     },
     {
@@ -23,8 +23,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/duckduckgo-autofill.git",
       "state" : {
-        "revision" : "9f0c2eab4223f1f28cced4eac73e4381a8daa35e",
-        "version" : "6.3.0"
+        "revision" : "4aee97d550112ba6551e61ea8019fb1f1a2d3af7",
+        "version" : "6.4.3"
       }
     },
     {

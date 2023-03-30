@@ -171,7 +171,7 @@ final class RecentlyVisitedSiteModel: ObservableObject {
 
     private let baseURL: URL?
     private let domainPlaceholder: String?
-    private let privatePlayer: PrivatePlayer
+    private let duckPlayer: DuckPlayer
 
     @Published var isFavorite: Bool
     @Published var isFireproof: Bool
@@ -187,15 +187,15 @@ final class RecentlyVisitedSiteModel: ObservableObject {
     init?(originalURL: URL,
           bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
           fireproofDomains: FireproofDomains = FireproofDomains.shared,
-          privatePlayer: PrivatePlayer = PrivatePlayer.shared) {
+          duckPlayer: DuckPlayer = DuckPlayer.shared) {
         guard let domain = originalURL.host?.droppingWwwPrefix() else {
             return nil
         }
 
-        self.privatePlayer = privatePlayer
+        self.duckPlayer = duckPlayer
 
         self.domain = domain
-        self.domainPlaceholder = privatePlayer.domainForRecentlyVisitedSite(with: originalURL)
+        self.domainPlaceholder = duckPlayer.domainForRecentlyVisitedSite(with: originalURL)
 
         var components = URLComponents()
         components.scheme = originalURL.scheme
@@ -245,7 +245,7 @@ final class RecentlyVisitedSiteModel: ObservableObject {
                     urlsToRemove.append($0.url)
                 }
 
-            } else if let displayTitle = privatePlayer.title(for: $0) {
+            } else if let displayTitle = duckPlayer.title(for: $0) {
 
                 $0.displayTitle = displayTitle
 

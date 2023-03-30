@@ -28,8 +28,12 @@ final class SharingMenu: NSMenu {
             .tabCollectionViewModel.selectedTabViewModel?.canReload ?? false
 
         // not real sharing URL, used for generating items for NSURL
-        let services = NSSharingService.sharingServices(forItems: [URL.duckDuckGo])
-        for service in services {
+        var services = NSSharingService.sharingServices(forItems: [URL.duckDuckGo])
+        if let copyLink = NSSharingService(named: .copyLink) {
+            services.insert(copyLink, at: 0)
+        }
+        let readingListService = NSSharingService(named: .addToSafariReadingList)
+        for service in services where service != readingListService {
             let menuItem = NSMenuItem(service: service)
             menuItem.target = self
             menuItem.action = #selector(sharingItemSelected(_:))
@@ -72,8 +76,12 @@ final class SharingMenu: NSMenu {
         else {
             return
         }
+        if service == NSSharingService(named: .copyLink) {
+            NSPasteboard.general.copy(url)
+            return
+        }
 
-        let sharingData = PrivatePlayer.shared.sharingData(for: tabViewModel.title, url: url) ?? (tabViewModel.title, url)
+        let sharingData = DuckPlayer.shared.sharingData(for: tabViewModel.title, url: url) ?? (tabViewModel.title, url)
         service.subject = sharingData.title
         service.perform(withItems: [sharingData.url])
     }
@@ -114,4 +122,8 @@ private extension DescType {
 
     static let openSharingSubpane: DescType = 0x70747275
 
+}
+
+private extension NSSharingService.Name {
+    static let copyLink = NSSharingService.Name("com.apple.CloudSharingUI.CopyLink")
 }

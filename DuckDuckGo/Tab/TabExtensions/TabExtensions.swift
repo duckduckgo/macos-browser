@@ -64,19 +64,26 @@ protocol NSCodingExtension: TabExtension {
 // Define dependencies used to instantiate TabExtensions here:
 protocol TabExtensionDependencies {
     var privacyFeatures: PrivacyFeaturesProtocol { get }
+    var workspace: Workspace { get }
     var historyCoordinating: HistoryCoordinating { get }
-
     var downloadManager: FileDownloadManagerProtocol { get }
+    var cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter? { get }
+    var duckPlayer: DuckPlayer { get }
 }
-// swiftlint:disable:next large_tuple
+
+// swiftlint:disable large_tuple
+// swiftlint:disable function_body_length
+
 typealias TabExtensionsBuilderArguments = (
     tabIdentifier: UInt64,
+    isTabPinned: () -> Bool,
+    contentPublisher: AnyPublisher<Tab.TabContent, Never>,
+    titlePublisher: AnyPublisher<String?, Never>,
     userScriptsPublisher: AnyPublisher<UserScripts?, Never>,
     inheritedAttribution: AdClickAttributionLogic.State?,
-    userContentControllerFuture: Future<UserContentControllerProtocol, Never>,
-    webViewFuture: Future<WKWebView, Never>,
+    userContentControllerFuture: Future<UserContentController, Never>,
     permissionModel: PermissionModel,
-    privacyInfoPublisher: AnyPublisher<PrivacyInfo?, Never>
+    webViewFuture: Future<WKWebView, Never>
 )
 
 extension TabExtensionsBuilder {
@@ -91,24 +98,44 @@ extension TabExtensionsBuilder {
     mutating func registerExtensions(with args: TabExtensionsBuilderArguments, dependencies: TabExtensionDependencies) {
         let userScripts = args.userScriptsPublisher
 
-        let trackerInfoPublisher = args.privacyInfoPublisher
-            .compactMap { $0?.$trackerInfo }
-            .switchToLatest()
-            .scan( (old: Set<DetectedRequest>(), new: Set<DetectedRequest>()) ) {
-                ($0.new, $1.trackers)
-            }
-            .map { (old, new) in
-                new.subtracting(old).publisher
-            }
-            .switchToLatest()
+        let httpsUpgrade = add {
+            HTTPSUpgradeTabExtension(httpsUpgrade: dependencies.privacyFeatures.httpsUpgrade)
+        }
+
+        let fbProtection = add {
+            FBProtectionTabExtension(privacyConfigurationManager: dependencies.privacyFeatures.contentBlocking.privacyConfigurationManager,
+                                     userContentControllerFuture: args.userContentControllerFuture,
+                                     clickToLoadUserScriptPublisher: userScripts.map(\.?.clickToLoadScript))
+        }
+
+        let contentBlocking = add {
+            ContentBlockingTabExtension(fbBlockingEnabledProvider: fbProtection.value,
+                                        userContentControllerFuture: args.userContentControllerFuture,
+                                        cbaTimeReporter: dependencies.cbaTimeReporter,
+                                        privacyConfigurationManager: dependencies.privacyFeatures.contentBlocking.privacyConfigurationManager,
+                                        contentBlockerRulesUserScriptPublisher: userScripts.map(\.?.contentBlockerRulesScript),
+                                        surrogatesUserScriptPublisher: userScripts.map(\.?.surrogatesScript))
+        }
+
+        add {
+            PrivacyDashboardTabExtension(contentBlocking: dependencies.privacyFeatures.contentBlocking,
+                                         autoconsentUserScriptPublisher: userScripts.map(\.?.autoconsentUserScript),
+                                         didUpgradeToHttpsPublisher: httpsUpgrade.didUpgradeToHttpsPublisher,
+                                         trackersPublisher: contentBlocking.trackersPublisher)
+        }
 
         add {
             AdClickAttributionTabExtension(inheritedAttribution: args.inheritedAttribution,
                                            userContentControllerFuture: args.userContentControllerFuture,
                                            contentBlockerRulesScriptPublisher: userScripts.map { $0?.contentBlockerRulesScript },
-                                           trackerInfoPublisher: trackerInfoPublisher,
+                                           trackerInfoPublisher: contentBlocking.trackersPublisher.map { $0.request },
                                            dependencies: dependencies.privacyFeatures.contentBlocking)
         }
+
+        add {
+            NavigationProtectionTabExtension(contentBlocking: dependencies.privacyFeatures.contentBlocking)
+        }
+
         add {
             AutofillTabExtension(autofillUserScriptPublisher: userScripts.map(\.?.autofillScript))
         }
@@ -121,9 +148,29 @@ extension TabExtensionsBuilder {
         add {
             FindInPageTabExtension(findInPageScriptPublisher: userScripts.map(\.?.findInPageScript))
         }
-
         add {
             DownloadsTabExtension(downloadManager: dependencies.downloadManager)
+        }
+        add {
+            SearchNonexistentDomainNavigationResponder(tld: dependencies.privacyFeatures.contentBlocking.tld, contentPublisher: args.contentPublisher)
+        }
+        add {
+            HistoryTabExtension(historyCoordinating: dependencies.historyCoordinating,
+                                trackersPublisher: contentBlocking.trackersPublisher,
+                                urlPublisher: args.contentPublisher.map { content in content.isUrl ? content.url : nil },
+                                titlePublisher: args.titlePublisher)
+        }
+        add {
+            ExternalAppSchemeHandler(workspace: dependencies.workspace, permissionModel: args.permissionModel, contentPublisher: args.contentPublisher)
+        }
+        add {
+            NavigationHotkeyHandler(isTabPinned: args.isTabPinned)
+        }
+
+        add {
+            DuckPlayerTabExtension(duckPlayer: dependencies.duckPlayer,
+                                   scriptsPublisher: userScripts.compactMap { $0 },
+                                   webViewPublisher: args.webViewFuture)
         }
     }
 
