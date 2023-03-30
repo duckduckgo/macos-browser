@@ -128,7 +128,7 @@ class AutoconsentIntegrationTests: XCTestCase {
                 $0?.isCosmeticRuleApplied == true ? true : nil
             }
             .receive(on: DispatchQueue.main)
-            .timeout(10)
+            .timeout(5)
             .first()
             .promise()
 
