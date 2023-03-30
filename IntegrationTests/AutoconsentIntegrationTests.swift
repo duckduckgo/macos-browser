@@ -130,7 +130,7 @@ class AutoconsentIntegrationTests: XCTestCase {
             .first()
             .promise()
 
-        _=await tab.setUrl(url, userEntered: false)?.value?.result
+        _=await tab.setUrl(url, userEntered: nil)?.value?.result
 
         let cookieConsentManaged = try await cookieConsentManagedPromise.value
         XCTAssertTrue(cookieConsentManaged)
