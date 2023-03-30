@@ -576,7 +576,7 @@ final class AddressBarTextField: NSTextField {
     }
 
     @objc dynamic private var suggestionWindowController: NSWindowController?
-    private lazy var suggestionViewController: SuggestionViewController = {
+    private(set) lazy var suggestionViewController: SuggestionViewController = {
         NSStoryboard.suggestion.instantiateController(identifier: "SuggestionViewController") { coder in
             let suggestionViewController = SuggestionViewController(coder: coder,
                                                                     suggestionContainerViewModel: self.suggestionContainerViewModel!)
@@ -725,7 +725,7 @@ final class AddressBarTextField: NSTextField {
 
     override func performDragOperation(_ draggingInfo: NSDraggingInfo) -> Bool {
         if let url = draggingInfo.draggingPasteboard.url {
-            tabCollectionViewModel.selectedTabViewModel?.tab.setUrl(url, userEntered: true)
+            tabCollectionViewModel.selectedTabViewModel?.tab.setUrl(url, userEntered: draggingInfo.draggingPasteboard.string(forType: .string) ?? url.absoluteString)
 
         } else if let stringValue = draggingInfo.draggingPasteboard.string(forType: .string) {
             self.stringValue = stringValue
