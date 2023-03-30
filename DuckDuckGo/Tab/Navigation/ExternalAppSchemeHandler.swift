@@ -32,9 +32,18 @@ final class ExternalAppSchemeHandler {
 
     private var externalSchemeOpenedPerPageLoad = false
 
-    init(workspace: Workspace, permissionModel: PermissionModelProtocol) {
+    private var lastUserEnteredValue: String?
+    private var cancellable: AnyCancellable?
+
+    init(workspace: Workspace, permissionModel: PermissionModelProtocol, contentPublisher: some Publisher<Tab.TabContent, Never>) {
         self.workspace = workspace
         self.permissionModel = permissionModel
+
+        cancellable = contentPublisher.sink { [weak self] tabContent in
+            if case .url(_, credential: .none, userEntered: .some(let userEnteredValue)) = tabContent {
+                self?.lastUserEnteredValue = userEnteredValue
+            }
+        }
     }
 
 }
@@ -50,13 +59,11 @@ extension ExternalAppSchemeHandler: NavigationResponder {
             return .cancel
         }
 
-        lazy var searchUrl = URL.makeSearchUrl(from: externalUrl.absoluteString)
-
         // can OS open the external url?
         guard workspace.urlForApplication(toOpen: externalUrl) != nil else {
             // search if external URL can‘t be opened but entered by user
             if navigationAction.isUserEnteredUrl,
-               let searchUrl,
+               let searchUrl = URL.makeSearchUrl(from: lastUserEnteredValue ?? externalUrl.absoluteString),
                let mainFrame = navigationAction.mainFrameTarget {
                 return .redirect(mainFrame) { navigator in
                     navigator.load(URLRequest(url: searchUrl))
@@ -86,6 +93,15 @@ extension ExternalAppSchemeHandler: NavigationResponder {
 
     func willStart(_ navigation: Navigation) {
         externalSchemeOpenedPerPageLoad = false
+    }
+
+    func navigationDidFinish(_ navigation: Navigation) {
+        lastUserEnteredValue = nil
+    }
+
+    func navigation(_ navigation: Navigation, didFailWith error: WKError) {
+        guard navigation.isCurrent else { return }
+        lastUserEnteredValue = nil
     }
 
 }
