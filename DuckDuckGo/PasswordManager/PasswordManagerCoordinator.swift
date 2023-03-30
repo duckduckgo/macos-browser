@@ -85,6 +85,14 @@ final class PasswordManagerCoordinator: PasswordManagerCoordinating {
     }
 
     func askToUnlock(completionHandler: @escaping () -> Void) {
+        switch bitwardenManagement.status {
+        case .disabled, .notInstalled, .oldVersion, .missingHandshake, .handshakeNotApproved, .error:
+            WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .autofill)
+            return
+        default:
+            break
+        }
+
         bitwardenManagement.openBitwarden()
 
         statusCancellable = bitwardenManagement.statusPublisher
