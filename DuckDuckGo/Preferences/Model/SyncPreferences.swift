@@ -111,7 +111,7 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         }
     }
 
-    private func presentDialog(for currentDialog: ManagementDialogKind) {
+    private func presentDialog(for currentDialog: ManagementDialogKind, completionHandler handler: ((NSApplication.ModalResponse) -> Void)? = nil) {
         let shouldBeginSheet = managementDialogModel.currentDialog == nil
         managementDialogModel.currentDialog = currentDialog
 
@@ -137,7 +137,7 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
             sheetParent.endSheet(window)
         }
 
-        parentWindowController.window?.beginSheet(syncWindow)
+        parentWindowController.window?.beginSheet(syncWindow, completionHandler: handler)
     }
 
     private var onEndFlow: () -> Void = {}
@@ -148,6 +148,18 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
 
 extension SyncPreferences: ManagementDialogModelDelegate {
 
+    private func deviceInfo() -> (name: String, type: String) {
+        let hostname = SCDynamicStoreCopyComputerName(nil, nil) as? String ?? ProcessInfo.processInfo.hostName
+        return (name: hostname, type: "desktop")
+    }
+
+    @MainActor
+    private func login(_ recoveryKey: SyncCode.RecoveryKey) async throws {
+        let device = deviceInfo()
+        try await syncService.login(recoveryKey, deviceName: device.name, deviceType: device.type)
+        managementDialogModel.endFlow()
+    }
+
     func turnOnSync() {
         presentDialog(for: .askToSyncAnotherDevice)
     }
@@ -155,8 +167,8 @@ extension SyncPreferences: ManagementDialogModelDelegate {
     func dontSyncAnotherDeviceNow() {
         Task { @MainActor in
             do {
-                let hostname = SCDynamicStoreCopyComputerName(nil, nil) as? String ?? ProcessInfo.processInfo.hostName
-                try await syncService.createAccount(deviceName: hostname, deviceType: "desktop")
+                let device = deviceInfo()
+                try await syncService.createAccount(deviceName: device.name, deviceType: device.type)
             } catch {
                 managementDialogModel.errorMessage = String(describing: error)
             }
@@ -171,9 +183,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                     return
                 }
 
-                let device = deviceInfo()
-                try await syncService.login(recoveryKey, deviceName: device.name, deviceType: device.type)
-                managementDialogModel.endFlow()
+                try await login(recoveryKey)
             } catch {
                 managementDialogModel.errorMessage = String(describing: error)
             }
@@ -181,19 +191,29 @@ extension SyncPreferences: ManagementDialogModelDelegate {
     }
 
     func presentSyncAnotherDeviceDialog() {
-        let task = Task { @MainActor in
+        Task { @MainActor in
             do {
+                var running = true
                 let connect = try syncService.remoteConnect()
                 managementDialogModel.connectCode = connect.code
-                presentDialog(for: .syncAnotherDevice)
+                presentDialog(for: .syncAnotherDevice) { _ in
+                    running = false
+                }
 
-                    let device = self.deviceInfo()
-                    let connection = try await connect.connect(deviceName: device.name, deviceType: device.type)
-                    self.onEndFlow()
-                // TODO cancel the task if the UI closes
+                let device = self.deviceInfo()
+                while running {
+                    if let recoveryKey = try await connect.fetchRecoveryKey() {
+                        try await login(recoveryKey)
+                        running = false
+                    }
+
+                    if running {
+                        try await Task.sleep(nanoseconds: 5 * 1_000_000_000)
+                    }
+                }                
+                managementDialogModel.endFlow()
             } catch {
-                // TODO handle this
-                print("***", error)
+                managementDialogModel.errorMessage = String(describing: error)
             }
         }
     }
@@ -208,11 +228,6 @@ extension SyncPreferences: ManagementDialogModelDelegate {
 
     func saveRecoveryPDF() {
         managementDialogModel.endFlow()
-    }
-
-    private func deviceInfo() -> (name: String, type: String) {
-        let hostname = SCDynamicStoreCopyComputerName(nil, nil) as? String ?? ProcessInfo.processInfo.hostName
-        return (name: hostname, type: "desktop")
     }
 
 }
