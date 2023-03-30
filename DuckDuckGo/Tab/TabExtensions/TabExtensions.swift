@@ -147,9 +147,11 @@ extension TabExtensionsBuilder {
         add {
             FindInPageTabExtension(findInPageScriptPublisher: userScripts.map(\.?.findInPageScript))
         }
-
         add {
             DownloadsTabExtension(downloadManager: dependencies.downloadManager)
+        }
+        add {
+            SearchNonexistentDomainNavigationResponder(tld: dependencies.privacyFeatures.contentBlocking.tld, contentPublisher: args.contentPublisher)
         }
         add {
             HistoryTabExtension(historyCoordinating: dependencies.historyCoordinating,
@@ -158,7 +160,7 @@ extension TabExtensionsBuilder {
                                 titlePublisher: args.titlePublisher)
         }
         add {
-            ExternalAppSchemeHandler(workspace: dependencies.workspace, permissionModel: args.permissionModel)
+            ExternalAppSchemeHandler(workspace: dependencies.workspace, permissionModel: args.permissionModel, contentPublisher: args.contentPublisher)
         }
         add {
             NavigationHotkeyHandler(isTabPinned: args.isTabPinned)
