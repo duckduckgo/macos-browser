@@ -210,7 +210,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                     if running {
                         try await Task.sleep(nanoseconds: 5 * 1_000_000_000)
                     }
-                }                
+                }
                 managementDialogModel.endFlow()
             } catch {
                 managementDialogModel.errorMessage = String(describing: error)
