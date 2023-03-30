@@ -81,6 +81,8 @@ final class BrowserTabViewController: NSViewController {
         subscribeToTabs()
         subscribeToSelectedTabViewModel()
         subscribeToErrorViewState()
+
+        view.registerForDraggedTypes([.URL, .fileURL])
     }
 
     override func viewWillAppear() {
@@ -481,6 +483,40 @@ final class BrowserTabViewController: NSViewController {
             self?.dismiss(jsAlertController)
         }
     }
+
+}
+
+extension BrowserTabViewController: NSDraggingDestination {
+
+    func draggingEntered(_ draggingInfo: NSDraggingInfo) -> NSDragOperation {
+        return .copy
+    }
+
+    func draggingUpdated(_ draggingInfo: NSDraggingInfo) -> NSDragOperation {
+        guard draggingInfo.draggingPasteboard.url != nil else { return .none }
+        if let selectedTab = tabCollectionViewModel.selectedTab,
+           selectedTab.isPinned {
+            return .copy
+        }
+
+        return (NSApp.isCommandPressed || NSApp.isOptionPressed || !draggingInfo.draggingSourceOperationMask.contains(.move)) ? .copy : .move
+    }
+
+    func performDragOperation(_ draggingInfo: NSDraggingInfo) -> Bool {
+        guard let url = draggingInfo.draggingPasteboard.url else { return false }
+
+        guard !(NSApp.isCommandPressed || NSApp.isOptionPressed),
+              let selectedTab = tabCollectionViewModel.selectedTab,
+              !selectedTab.isPinned else {
+
+            self.openNewTab(with: .url(url))
+            return true
+        }
+
+        selectedTab.setContent(.url(url))
+        return true
+    }
+
 }
 
 extension BrowserTabViewController: ContentOverlayUserScriptDelegate {

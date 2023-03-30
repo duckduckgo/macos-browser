@@ -33,19 +33,30 @@ final class DuckPlayerTabExtension {
     private var cancellables = Set<AnyCancellable>()
     private var youtubePlayerCancellables = Set<AnyCancellable>()
 
+    private weak var webView: WKWebView? {
+        didSet {
+            youtubeOverlayScript?.webView = webView
+        }
+    }
     private weak var youtubeOverlayScript: YoutubeOverlayUserScript?
     private weak var youtubePlayerScript: YoutubePlayerUserScript?
 
     private var shouldSelectNextNewTab: Bool?
 
     init(duckPlayer: DuckPlayer,
-         scriptsPublisher: some Publisher<some YoutubeScriptsProvider, Never>) {
+         scriptsPublisher: some Publisher<some YoutubeScriptsProvider, Never>,
+         webViewPublisher: some Publisher<WKWebView, Never>) {
         self.duckPlayer = duckPlayer
+
+        webViewPublisher.sink { [weak self] webView in
+            self?.webView = webView
+        }.store(in: &cancellables)
 
         scriptsPublisher.sink { [weak self] scripts in
             self?.youtubeOverlayScript = scripts.youtubeOverlayScript
             self?.youtubePlayerScript = scripts.youtubePlayerUserScript
             self?.youtubeOverlayScript?.delegate = self
+            self?.youtubeOverlayScript?.webView = self?.webView
 
             self?.setUpYoutubeScriptsIfNeeded(for: nil)
         }.store(in: &cancellables)
