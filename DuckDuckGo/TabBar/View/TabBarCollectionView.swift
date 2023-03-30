@@ -32,7 +32,7 @@ final class TabBarCollectionView: NSCollectionView {
         register(nib, forItemWithIdentifier: TabBarViewItem.identifier)
 
         // Register for the dropped object types we can accept.
-        registerForDraggedTypes([.URL])
+        registerForDraggedTypes([.URL, .fileURL, TabBarViewItemPasteboardWriter.utiInternalType])
         // Enable dragging items within and into our CollectionView.
         setDraggingSourceOperationMask([.private], forLocal: true)
     }

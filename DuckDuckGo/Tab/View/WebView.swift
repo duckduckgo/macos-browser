@@ -165,4 +165,28 @@ final class WebView: WKWebView {
         return fullscreenWindowController
     }
 
+    // MARK: - NSDraggingDestination
+
+    override func draggingUpdated(_ draggingInfo: NSDraggingInfo) -> NSDragOperation {
+        if NSApp.isCommandPressed || NSApp.isOptionPressed {
+            return superview?.draggingUpdated(draggingInfo) ?? .none
+        }
+
+        let dragOperation = super.draggingUpdated(draggingInfo)
+        guard dragOperation == .none,
+              let superview else {
+            return dragOperation
+        }
+
+        return superview.draggingUpdated(draggingInfo)
+    }
+
+    override func performDragOperation(_ draggingInfo: NSDraggingInfo) -> Bool {
+        if NSApp.isCommandPressed || NSApp.isOptionPressed || super.draggingUpdated(draggingInfo) == .none {
+            return superview?.performDragOperation(draggingInfo) ?? false
+        }
+
+        return super.performDragOperation(draggingInfo)
+    }
+
 }
