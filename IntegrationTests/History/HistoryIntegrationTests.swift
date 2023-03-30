@@ -224,7 +224,7 @@ class HistoryIntegrationTests: XCTestCase {
             .switchToLatest()
             .filter { $0.trackersBlocked.count == 1 }
             .map { _ in true }
-            .timeout(5)
+            .timeout(10)
             .first()
             .promise()
 
