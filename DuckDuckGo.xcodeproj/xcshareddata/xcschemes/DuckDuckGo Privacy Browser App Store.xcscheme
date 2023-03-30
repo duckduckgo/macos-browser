@@ -84,7 +84,7 @@
       </PostActions>
       <Testables>
          <TestableReference
-            skipped = "YES">
+            skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "3706FDD3293F661700E42796"
@@ -98,9 +98,6 @@
                </Test>
                <Test
                   Identifier = "CBRCompileTimeReporterTests">
-               </Test>
-               <Test
-                  Identifier = "PixelStoreTests/testWhenValuesAreAddedThenCallbacksAreCalled()">
                </Test>
                <Test
                   Identifier = "StatisticsLoaderTests/testWhenRefreshRetentionAtbIsPerformedForNavigationThenAppRetentionAtbRequested()">
