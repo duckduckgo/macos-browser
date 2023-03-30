@@ -132,8 +132,10 @@ class AutoconsentIntegrationTests: XCTestCase {
             .first()
             .promise()
 
+        os_log("starting navigation to http://privacy-test-pages.glitch.me/features/autoconsent/banner.html")
         _=await tab.setUrl(url, userEntered: nil)?.value?.result
 
+        os_log("navigation done")
         let cookieConsentManaged = try await cookieConsentManagedPromise.value
         XCTAssertTrue(cookieConsentManaged)
 
