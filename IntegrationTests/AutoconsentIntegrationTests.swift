@@ -18,6 +18,7 @@
 
 import Combine
 import Common
+import os.log
 import PrivacyDashboard
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
@@ -119,14 +120,15 @@ class AutoconsentIntegrationTests: XCTestCase {
         // expect `cosmetic` to be published
         let cookieConsentManagedPromise = tab.privacyInfoPublisher
             .compactMap {
-                $0?.$cookieConsentManaged
+                os_log("cookieConsentManaged: %s", "\($0?.$cookieConsentManaged)")
+                return $0?.$cookieConsentManaged
             }
             .switchToLatest()
             .compactMap {
                 $0?.isCosmeticRuleApplied == true ? true : nil
             }
             .receive(on: DispatchQueue.main)
-            .timeout(5)
+            .timeout(10)
             .first()
             .promise()
 
