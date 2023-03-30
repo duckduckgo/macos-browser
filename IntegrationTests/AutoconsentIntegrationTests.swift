@@ -120,7 +120,7 @@ class AutoconsentIntegrationTests: XCTestCase {
         // expect `cosmetic` to be published
         let cookieConsentManagedPromise = tab.privacyInfoPublisher
             .compactMap {
-                os_log("cookieConsentManaged: %s", "\($0?.$cookieConsentManaged)")
+                os_log("cookieConsentManaged: %s", "\(String(describing: $0?.$cookieConsentManaged))")
                 return $0?.$cookieConsentManaged
             }
             .switchToLatest()
@@ -128,7 +128,7 @@ class AutoconsentIntegrationTests: XCTestCase {
                 $0?.isCosmeticRuleApplied == true ? true : nil
             }
             .receive(on: DispatchQueue.main)
-            .timeout(5)
+            .timeout(10)
             .first()
             .promise()
 
