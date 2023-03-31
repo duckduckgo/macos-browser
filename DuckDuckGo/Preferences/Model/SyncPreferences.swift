@@ -111,7 +111,7 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         }
     }
 
-    private func presentDialog(for currentDialog: ManagementDialogKind, completionHandler handler: ((NSApplication.ModalResponse) -> Void)? = nil) {
+    private func presentDialog(for currentDialog: ManagementDialogKind) {
         let shouldBeginSheet = managementDialogModel.currentDialog == nil
         managementDialogModel.currentDialog = currentDialog
 
@@ -130,6 +130,8 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         }
 
         onEndFlow = {
+            self.connector = nil
+
             guard let window = syncWindowController.window, let sheetParent = window.sheetParent else {
                 assertionFailure("window or sheet parent not present")
                 return
@@ -137,13 +139,14 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
             sheetParent.endSheet(window)
         }
 
-        parentWindowController.window?.beginSheet(syncWindow, completionHandler: handler)
+        parentWindowController.window?.beginSheet(syncWindow)
     }
 
     private var onEndFlow: () -> Void = {}
 
     private let syncService: DDGSyncing
     private var cancellables = Set<AnyCancellable>()
+    private var connector: RemoteConnecting?
 }
 
 extension SyncPreferences: ManagementDialogModelDelegate {
@@ -193,21 +196,17 @@ extension SyncPreferences: ManagementDialogModelDelegate {
     func presentSyncAnotherDeviceDialog() {
         Task { @MainActor in
             do {
-                var running = true
-                let connect = try syncService.remoteConnect()
-                managementDialogModel.connectCode = connect.code
-                presentDialog(for: .syncAnotherDevice) { _ in
-                    running = false
-                }
+                self.connector = try syncService.remoteConnect()
+                managementDialogModel.connectCode = connector?.code
+                presentDialog(for: .syncAnotherDevice)
 
-                let device = self.deviceInfo()
-                while running {
-                    if let recoveryKey = try await connect.fetchRecoveryKey() {
+                while connector != nil {
+                    if let recoveryKey = try await connector?.fetchRecoveryKey() {
                         try await login(recoveryKey)
-                        running = false
+                        connector = nil
                     }
 
-                    if running {
+                    if connector != nil {
                         try await Task.sleep(nanoseconds: 5 * 1_000_000_000)
                     }
                 }
