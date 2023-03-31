@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1679587503329,
+    "version": 1680251375109,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -298,6 +298,10 @@
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/592"
                 },
                 {
+                    "domain": "thechive.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/592"
+                },
+                {
                     "domain": "wunderground.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/592"
                 }
@@ -451,6 +455,10 @@
                     },
                     {
                         "selector": "#credential_picker_container",
+                        "type": "hide"
+                    },
+                    {
+                        "selector": "#credentials-picker-container",
                         "type": "hide"
                     },
                     {
@@ -880,6 +888,27 @@
                         ]
                     },
                     {
+                        "domain": "investing.com",
+                        "rules": [
+                            {
+                                "selector": ".dfpVideo",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": ".adDrawer",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": "#hpAdVideo",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": "[advertisementtext='Advertisement']",
+                                "type": "closest-empty"
+                            }
+                        ]
+                    },
+                    {
                         "domain": "leboncoin.fr",
                         "rules": [
                             {
@@ -1045,6 +1074,15 @@
                         ]
                     },
                     {
+                        "domain": "reddit.com",
+                        "rules": [
+                            {
+                                "selector": "iframe[src^='https://www.reddit.com/account/sso/one_tap/']",
+                                "type": "hide"
+                            }
+                        ]
+                    },
+                    {
                         "domain": "reuters.com",
                         "rules": [
                             {
@@ -1145,10 +1183,27 @@
                         ]
                     },
                     {
+                        "domain": "tripadvisor.ca",
+                        "rules": [
+                            {
+                                "selector": "#tripGoogleOnetapContainer",
+                                "type": "hide"
+                            },
+                            {
+                                "selector": ".mxEhR",
+                                "type": "hide"
+                            }
+                        ]
+                    },
+                    {
                         "domain": "tripadvisor.com",
                         "rules": [
                             {
                                 "selector": "#tripGoogleOnetapContainer",
+                                "type": "hide"
+                            },
+                            {
+                                "selector": ".mxEhR",
                                 "type": "hide"
                             }
                         ]
@@ -1337,7 +1392,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "3d361942a4e918aa67eb1c6b5c8ad0f3"
+            "hash": "cebed21956d04ba4130a6ec133cc4227"
         },
         "fingerprintingAudio": {
             "state": "disabled",
@@ -1365,6 +1420,14 @@
                 {
                     "domain": "amtrak.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/499"
+                },
+                {
+                    "domain": "chase.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/499"
+                },
+                {
+                    "domain": "xfinity.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/788"
                 },
                 {
                     "domain": "emirates.com",
@@ -1404,7 +1467,7 @@
                 }
             ],
             "state": "enabled",
-            "hash": "06756b6634deaeb0f50c9cbbdb591b3c"
+            "hash": "de9d2c19c4aae6e1ff07f819f1bdf12c"
         },
         "fingerprintingHardware": {
             "settings": {
@@ -1577,7 +1640,20 @@
         },
         "runtimeChecks": {
             "state": "enabled",
-            "exceptions": [],
+            "exceptions": [
+                {
+                    "domain": "ally.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/780"
+                },
+                {
+                    "domain": "stackoverflow.com",
+                    "reason": "https://github.com/duckduckgo/duckduckgo-privacy-extension/issues/1819"
+                },
+                {
+                    "domain": "stackexchange.com",
+                    "reason": "https://github.com/duckduckgo/duckduckgo-privacy-extension/issues/1819"
+                }
+            ],
             "settings": {
                 "taintCheck": "disabled",
                 "matchAllDomains": "disabled",
@@ -1628,7 +1704,7 @@
                         "domain": "youtube.com"
                     },
                     {
-                        "domain": "stackoverflow.com"
+                        "disabled_domain": "stackoverflow.com"
                     },
                     {
                         "domain": "xhamster.com"
@@ -1657,7 +1733,7 @@
                         "domain": "indeed.com"
                     },
                     {
-                        "domain": "stackexchange.com"
+                        "disabled_domain": "stackexchange.com"
                     },
                     {
                         "domain": "bangassets.com"
@@ -2077,7 +2153,7 @@
                     }
                 }
             },
-            "hash": "7d167117339c1e62876935cf1b792a78"
+            "hash": "abdfa725d51bdca0eb19913478ff641c"
         },
         "serviceworkerInitiatedRequests": {
             "exceptions": [],
@@ -2455,6 +2531,13 @@
                                     "hoyolab.com"
                                 ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/754"
+                            },
+                            {
+                                "rule": "d2s6j0ghajv79z.cloudfront.net",
+                                "domains": [
+                                    "sigalert.com"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/774"
                             }
                         ]
                     },
@@ -2466,6 +2549,17 @@
                                     "computerworld.com"
                                 ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/344"
+                            }
+                        ]
+                    },
+                    "connatix.com": {
+                        "rules": [
+                            {
+                                "rule": "connatix.com",
+                                "domains": [
+                                    "accuweather.com"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/768"
                             }
                         ]
                     },
@@ -2658,6 +2752,13 @@
                                     "nintendo.com"
                                 ],
                                 "reason": "CNAME version of nintendo.com exception"
+                            },
+                            {
+                                "rule": "cdn.agoda.net.edgekey.net/",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/771"
                             }
                         ]
                     },
@@ -3128,6 +3229,17 @@
                                     "<all>"
                                 ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/496"
+                            }
+                        ]
+                    },
+                    "kampyle.com": {
+                        "rules": [
+                            {
+                                "rule": "kampyle.com",
+                                "domains": [
+                                    "basspro.com"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/783"
                             }
                         ]
                     },
@@ -3799,6 +3911,17 @@
                             }
                         ]
                     },
+                    "viafoura.net": {
+                        "rules": [
+                            {
+                                "rule": "cdn.viafoura.net",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/763"
+                            }
+                        ]
+                    },
                     "yandex.ru": {
                         "rules": [
                             {
@@ -3939,6 +4062,17 @@
                                     "hoyolab.com"
                                 ],
                                 "reason": "CNAME ENTRY GENERATED FROM: d9k0w0y3delq8.cloudfront.net"
+                            }
+                        ]
+                    },
+                    "sigalert.com": {
+                        "rules": [
+                            {
+                                "rule": "cdn-static.sigalert.com",
+                                "domains": [
+                                    "sigalert.com"
+                                ],
+                                "reason": "CNAME ENTRY GENERATED FROM: d2s6j0ghajv79z.cloudfront.net"
                             }
                         ]
                     },
@@ -4659,6 +4793,24 @@
                                     "aliexpress.us"
                                 ],
                                 "reason": "CNAME ENTRY GENERATED FROM: alicdn.com.edgekey.net"
+                            }
+                        ]
+                    },
+                    "agoda.net": {
+                        "rules": [
+                            {
+                                "rule": "cdn0.agoda.net/",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "CNAME ENTRY GENERATED FROM: cdn.agoda.net.edgekey.net"
+                            },
+                            {
+                                "rule": "cdn6.agoda.net/",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "CNAME ENTRY GENERATED FROM: cdn.agoda.net.edgekey.net"
                             }
                         ]
                     },
@@ -5686,7 +5838,7 @@
                 }
             },
             "exceptions": [],
-            "hash": "a520be61e9e32703e3804f3720d9b25a"
+            "hash": "09b72d1b9cf087db00a07bda405087ab"
         },
         "trackingCookies1p": {
             "settings": {
