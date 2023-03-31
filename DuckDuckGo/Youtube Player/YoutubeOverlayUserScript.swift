@@ -41,11 +41,30 @@ final class YoutubeOverlayUserScript: NSObject, ContentScopeScriptsSubFeature {
         case sendDuckPlayerPixel
     }
 
+    public func messageHandlerForFeature(_ messageName: String) -> MessageHandlerSubFeature? {
+        guard let message = MessageNames(rawValue: messageName) else {
+            assertionFailure("YoutubeOverlayUserScript: Failed to parse User Script message: \(messageName)")
+            return nil
+        }
+
+        switch message {
+
+        case .setUserValues:
+            return handleSetUserValues
+        case .readUserValues:
+            return handleReadUserValues
+        case .openDuckPlayer:
+            return handleOpenDuckPlayer
+        case .sendDuckPlayerPixel:
+            return handleSendJSPixel
+        }
+    }
+
     struct YoutubeUserScriptConfig: Encodable {
         let webkitMessagingConfig: WebkitMessagingConfig
     }
-
     // This conforms to https://duckduckgo.github.io/content-scope-utils/classes/Webkit_Messaging.WebkitMessagingConfig.html
+
     struct WebkitMessagingConfig: Encodable {
         var hasModernWebkitAPI: Bool
         var webkitMessageHandlerNames: [String]
@@ -56,13 +75,6 @@ final class YoutubeOverlayUserScript: NSObject, ContentScopeScriptsSubFeature {
     public struct UserValues: Codable {
         let privatePlayerMode: PrivatePlayerMode
         let overlayInteracted: Bool
-    }
-
-    var injectionTime: WKUserScriptInjectionTime = .atDocumentStart
-    var forMainFrameOnly: Bool = true
-
-    var messageNames: [String] {
-        MessageNames.allCases.map(\.rawValue)
     }
 
     weak var delegate: YoutubeOverlayUserScriptDelegate?
@@ -95,25 +107,6 @@ final class YoutubeOverlayUserScript: NSObject, ContentScopeScriptsSubFeature {
             return ""
         }
         return json
-    }
-
-    public func messageHandlerForFeature(_ messageName: String) -> MessageHandlerSubFeature? {
-        guard let message = MessageNames(rawValue: messageName) else {
-            assertionFailure("YoutubeOverlayUserScript: Failed to parse User Script message: \(messageName)")
-            return nil
-        }
-
-        switch message {
-
-        case .setUserValues:
-            return handleSetUserValues
-        case .readUserValues:
-            return handleReadUserValues
-        case .openDuckPlayer:
-            return handleOpenDuckPlayer
-        case .sendDuckPlayerPixel:
-            return handleSendJSPixel
-        }
     }
 
     // MARK: - Private
