@@ -11435,7 +11435,6 @@
 				INFOPLIST_KEY_CFBundleDisplayName = NetworkProtectionSystemExtension;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2023 DuckDuckGo. All rights reserved.";
 				INFOPLIST_KEY_NSSystemExtensionUsageDescription = "Network Protection";
-				MARKETING_VERSION = 1.0.5;
 			};
 			name = Debug;
 		};
@@ -11446,7 +11445,6 @@
 				INFOPLIST_KEY_CFBundleDisplayName = NetworkProtectionSystemExtension;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2023 DuckDuckGo. All rights reserved.";
 				INFOPLIST_KEY_NSSystemExtensionUsageDescription = "Network Protection";
-				MARKETING_VERSION = 1.0.5;
 			};
 			name = CI;
 		};
@@ -11457,7 +11455,6 @@
 				INFOPLIST_KEY_CFBundleDisplayName = NetworkProtectionSystemExtension;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2023 DuckDuckGo. All rights reserved.";
 				INFOPLIST_KEY_NSSystemExtensionUsageDescription = "Network Protection";
-				MARKETING_VERSION = 1.0.5;
 			};
 			name = Release;
 		};
@@ -11468,7 +11465,6 @@
 				INFOPLIST_KEY_CFBundleDisplayName = NetworkProtectionSystemExtension;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2023 DuckDuckGo. All rights reserved.";
 				INFOPLIST_KEY_NSSystemExtensionUsageDescription = "Network Protection";
-				MARKETING_VERSION = 1.0.5;
 			};
 			name = Review;
 		};
@@ -11476,7 +11472,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7B13966029AA69F200865FA9 /* DuckDuckGoNetP.xcconfig */;
 			buildSettings = {
-				MARKETING_VERSION = 1.0.5;
 			};
 			name = Debug;
 		};
@@ -11484,7 +11479,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7B13966029AA69F200865FA9 /* DuckDuckGoNetP.xcconfig */;
 			buildSettings = {
-				MARKETING_VERSION = 1.0.5;
 			};
 			name = CI;
 		};
@@ -11492,7 +11486,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7B13966029AA69F200865FA9 /* DuckDuckGoNetP.xcconfig */;
 			buildSettings = {
-				MARKETING_VERSION = 1.0.5;
 			};
 			name = Release;
 		};
@@ -11500,7 +11493,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7B13966029AA69F200865FA9 /* DuckDuckGoNetP.xcconfig */;
 			buildSettings = {
-				MARKETING_VERSION = 1.0.5;
 			};
 			name = Review;
 		};
@@ -11575,7 +11567,6 @@
 			buildSettings = {
 				INFOPLIST_KEY_CFBundleDisplayName = NetworkProtectionAppExtension;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2023 DuckDuckGo. All rights reserved.";
-				MARKETING_VERSION = 1.0.5;
 			};
 			name = Debug;
 		};
@@ -11585,7 +11576,6 @@
 			buildSettings = {
 				INFOPLIST_KEY_CFBundleDisplayName = NetworkProtectionAppExtension;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2023 DuckDuckGo. All rights reserved.";
-				MARKETING_VERSION = 1.0.5;
 			};
 			name = CI;
 		};
@@ -11595,7 +11585,6 @@
 			buildSettings = {
 				INFOPLIST_KEY_CFBundleDisplayName = NetworkProtectionAppExtension;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2023 DuckDuckGo. All rights reserved.";
-				MARKETING_VERSION = 1.0.5;
 			};
 			name = Release;
 		};
@@ -11605,7 +11594,6 @@
 			buildSettings = {
 				INFOPLIST_KEY_CFBundleDisplayName = NetworkProtectionAppExtension;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2023 DuckDuckGo. All rights reserved.";
-				MARKETING_VERSION = 1.0.5;
 			};
 			name = Review;
 		};
@@ -11613,7 +11601,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7B13966129AA6A3400865FA9 /* DuckDuckGoNetPAppStore.xcconfig */;
 			buildSettings = {
-				MARKETING_VERSION = 1.0.5;
 			};
 			name = Debug;
 		};
@@ -11621,7 +11608,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7B13966129AA6A3400865FA9 /* DuckDuckGoNetPAppStore.xcconfig */;
 			buildSettings = {
-				MARKETING_VERSION = 1.0.5;
 			};
 			name = CI;
 		};
@@ -11629,7 +11615,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7B13966129AA6A3400865FA9 /* DuckDuckGoNetPAppStore.xcconfig */;
 			buildSettings = {
-				MARKETING_VERSION = 1.0.5;
 			};
 			name = Release;
 		};
@@ -11637,7 +11622,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7B13966129AA6A3400865FA9 /* DuckDuckGoNetPAppStore.xcconfig */;
 			buildSettings = {
-				MARKETING_VERSION = 1.0.5;
 			};
 			name = Review;
 		};
