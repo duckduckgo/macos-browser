@@ -35,52 +35,48 @@ final class WebView: WKWebView {
 
     // MARK: - Zoom
 
-    static let maxZoomLevel: CGFloat = 3.0
-    static let minZoomLevel: CGFloat = 0.5
-    static private let zoomLevelStep: CGFloat = 0.1
+    var defaultZoomValue: DefaultZoomValue = .percent100
 
-    var zoomLevel: CGFloat {
+    var zoomLevel: DefaultZoomValue {
         get {
             if #available(macOS 11.0, *) {
-                return pageZoom
+                return DefaultZoomValue(rawValue: pageZoom) ?? .percent100
             }
-            return magnification
+            return DefaultZoomValue(rawValue: magnification) ?? .percent100
         }
         set {
-            let cappedValue = min(Self.maxZoomLevel, max(Self.minZoomLevel, newValue))
             if #available(macOS 11.0, *) {
-                pageZoom = cappedValue
+                pageZoom = newValue.rawValue
             } else {
-                magnification = cappedValue
+                magnification = newValue.rawValue
             }
         }
     }
 
     var canZoomToActualSize: Bool {
-        self.window != nil && (self.zoomLevel != 1.0 || self.magnification != 1.0)
+        window != nil && zoomLevel != defaultZoomValue
     }
 
     var canZoomIn: Bool {
-        self.window != nil && self.zoomLevel < Self.maxZoomLevel
+        window != nil && zoomLevel.index < DefaultZoomValue.allCases.count - 1
     }
 
     var canZoomOut: Bool {
-        self.window != nil && self.zoomLevel > Self.minZoomLevel
+        window != nil && zoomLevel.index > 0
     }
 
     func resetZoomLevel() {
-        zoomLevel = 1.0
-        magnification = 1.0
+        zoomLevel = defaultZoomValue
     }
 
     func zoomIn() {
         guard canZoomIn else { return }
-        self.zoomLevel = min(self.zoomLevel + Self.zoomLevelStep, Self.maxZoomLevel)
+        zoomLevel = DefaultZoomValue.allCases[self.zoomLevel.index + 1]
     }
 
     func zoomOut() {
         guard canZoomOut else { return }
-        self.zoomLevel = max(self.zoomLevel - Self.zoomLevelStep, Self.minZoomLevel)
+        zoomLevel = DefaultZoomValue.allCases[self.zoomLevel.index - 1]
     }
 
     // MARK: - Menu

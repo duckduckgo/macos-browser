@@ -101,6 +101,24 @@ extension Preferences {
                     Toggle(UserText.showFullWebsiteAddress, isOn: $model.showFullURL)
                     Toggle(UserText.showAutocompleteSuggestions, isOn: $model.showAutocompleteSuggestions)
                 }
+
+                PreferencePaneSection {
+                    Text(UserText.zoomSettingTitle)
+                        .font(Const.Fonts.preferencePaneSectionHeader)
+                    HStack {
+                        Text(UserText.zoomPickerTitle)
+                        NSPopUpButtonView(selection: $model.defaultPageZoom) {
+                            let button = NSPopUpButton()
+                            button.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+
+                            for value in DefaultZoomValue.allCases {
+                                let item = button.menu?.addItem(withTitle: value.displayString, action: nil, keyEquivalent: "")
+                                item?.representedObject = value
+                            }
+                            return button
+                        }
+                    }
+                }
             }
         }
     }

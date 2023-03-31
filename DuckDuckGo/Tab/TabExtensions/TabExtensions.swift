@@ -71,9 +71,7 @@ protocol TabExtensionDependencies {
     var duckPlayer: DuckPlayer { get }
 }
 
-// swiftlint:disable large_tuple
-// swiftlint:disable function_body_length
-
+// swiftlint:disable:next large_tuple
 typealias TabExtensionsBuilderArguments = (
     tabIdentifier: UInt64,
     isTabPinned: () -> Bool,
@@ -86,6 +84,7 @@ typealias TabExtensionsBuilderArguments = (
     webViewFuture: Future<WKWebView, Never>
 )
 
+// swiftlint:disable function_body_length
 extension TabExtensionsBuilder {
 
     /// Instantiate `TabExtension`-s for App builds here
@@ -175,6 +174,7 @@ extension TabExtensionsBuilder {
     }
 
 }
+// swiftlint:enable function_body_length
 
 #if DEBUG
 extension TestTabExtensionsBuilder {

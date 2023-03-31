@@ -169,6 +169,11 @@ final class TabViewModel {
             guard let self = self, let url = self.tabURL, let host = self.tabHostURL else { return }
             self.updatePassiveAddressBarString(showURL: newValue, url: url, hostURL: host)
         }.store(in: &cancellables)
+        appearancePreferences.$defaultPageZoom.sink { [weak self] newValue in
+            guard let self = self else { return }
+            self.tab.webView.defaultZoomValue = newValue
+            self.tab.webView.zoomLevel = newValue
+        }.store(in: &cancellables)
     }
 
     private func subscribeToWebViewDidFinishNavigation() {
