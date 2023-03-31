@@ -53,7 +53,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     private(set) var stateRestorationManager: AppStateRestorationManager!
     private var grammarFeaturesManager = GrammarFeaturesManager()
     private let crashReporter = CrashReporter()
-    private(set) var internalUserDecider: InternalUserDeciding!
+    private(set) var internalUserDecider: InternalUserDecider!
     private var appIconChanger: AppIconChanger!
     private(set) var syncService: DDGSyncing!
     private(set) var syncPersistence: SyncDataPersistor!
@@ -133,7 +133,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         stateRestorationManager = AppStateRestorationManager(fileStore: fileStore)
 
         let internalUserDeciderStore = InternalUserDeciderStore(fileStore: fileStore)
-        internalUserDecider = InternalUserDecider(store: internalUserDeciderStore)
+        internalUserDecider = DefaultInternalUserDecider(store: internalUserDeciderStore)
 
 #if !APPSTORE
         updateController = UpdateController(internalUserDecider: internalUserDecider)
