@@ -130,6 +130,7 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         }
 
         onEndFlow = {
+            self.connector?.stopPolling()
             self.connector = nil
 
             guard let window = syncWindowController.window, let sheetParent = window.sheetParent else {
@@ -199,16 +200,11 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                 self.connector = try syncService.remoteConnect()
                 managementDialogModel.connectCode = connector?.code
                 presentDialog(for: .syncAnotherDevice)
-
-                while connector != nil {
-                    if let recoveryKey = try await connector?.fetchRecoveryKey() {
-                        try await login(recoveryKey)
-                        connector = nil
-                    }
-
-                    if connector != nil {
-                        try await Task.sleep(nanoseconds: 5 * 1_000_000_000)
-                    }
+                if let recoveryKey = try await connector?.pollForRecoveryKey() {
+                    try await login(recoveryKey)
+                } else {
+                    // Polling was likeley cancelled elsewhere (e.g. dialog closed)
+                    return
                 }
                 managementDialogModel.endFlow()
             } catch {
