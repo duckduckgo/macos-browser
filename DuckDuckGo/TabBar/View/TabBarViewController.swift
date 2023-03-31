@@ -619,6 +619,9 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
         updateTabMode()
         updateEmptyTabArea()
         hideTabPreview()
+        if tabMode == .overflow {
+            scrollCollectionViewToEnd()
+        }
     }
 
     func tabCollectionViewModel(_ tabCollectionViewModel: TabCollectionViewModel,
@@ -726,15 +729,19 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
             if selected {
                 collectionView.selectItems(at: lastIndexPathSet, scrollPosition: .centeredHorizontally)
             }
-            // Old frameworks are like old people. They need a special treatment
-            collectionView.scrollToEnd { _ in
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
-                    self.collectionView.scrollToEnd()
-                }
-            }
+            scrollCollectionViewToEnd()
         }
         updateEmptyTabArea()
         hideTabPreview()
+    }
+
+    private func scrollCollectionViewToEnd() {
+        // Old frameworks... need a special treatment
+        collectionView.scrollToEnd { _ in
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                self.collectionView.scrollToEnd()
+            }
+        }
     }
 
     // MARK: - Tab Actions

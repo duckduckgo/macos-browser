@@ -118,10 +118,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         AppPrivacyFeatures.shared = NSApp.isRunningUnitTests
             // runtime mock-replacement for Unit Tests, to be redone when we‘ll be doing Dependency Injection
             ? AppPrivacyFeatures(contentBlocking: mock("ContentBlockingMock"), httpsUpgradeStore: mock("HTTPSUpgradeStoreMock"))
-            : AppPrivacyFeatures(contentBlocking: AppContentBlocking(), httpsUpgradeStore: AppHTTPSUpgradeStore())
+            : AppPrivacyFeatures(contentBlocking: AppContentBlocking(), database: Database.shared)
 #else
-        AppPrivacyFeatures.shared = AppPrivacyFeatures(contentBlocking: AppContentBlocking(),
-                                                       httpsUpgradeStore: AppHTTPSUpgradeStore())
+        AppPrivacyFeatures.shared = AppPrivacyFeatures(contentBlocking: AppContentBlocking(), database: Database.shared)
 #endif
 
         do {

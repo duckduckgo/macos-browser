@@ -59,7 +59,7 @@ class AutoconsentIntegrationTests: XCTestCase {
 
         let tab = self.tabViewModel.tab
 
-        _=await tab.setUrl(url, userEntered: false)?.value?.result
+        _=await tab.setUrl(url, userEntered: nil)?.value?.result
 
         // expect cookieConsentManaged to be published
         let cookieConsentManagedPromise = tab.privacyInfoPublisher
@@ -86,7 +86,7 @@ class AutoconsentIntegrationTests: XCTestCase {
 
         let tab = self.tabViewModel.tab
 
-        _=await tab.setUrl(url, userEntered: false)?.value?.result
+        _=await tab.setUrl(url, userEntered: nil)?.value?.result
 
         // expect cookieConsent request to be published
         let cookieConsentPromptRequestPromise = tab.cookieConsentPromptRequestPublisher
