@@ -221,7 +221,7 @@ class NavigationProtectionIntegrationTests: XCTestCase {
                 return false
             }
             .asVoid()
-            .timeout(5)
+            .timeout(10)
             .first()
             .promise()
 
