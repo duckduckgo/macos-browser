@@ -18,10 +18,11 @@
 
 import Cocoa
 import Combine
+import BrowserServicesKit
 
 final class AppIconChanger {
 
-    init(internalUserDecider: InternalUserDeciding) {
+    init(internalUserDecider: InternalUserDecider) {
         subscribeToIsInternal(internalUserDecider)
     }
 
@@ -46,7 +47,7 @@ final class AppIconChanger {
 
     private var isInternalCancellable: AnyCancellable?
 
-    private func subscribeToIsInternal(_ internalUserDecider: InternalUserDeciding) {
+    private func subscribeToIsInternal(_ internalUserDecider: InternalUserDecider) {
         isInternalCancellable = internalUserDecider.isInternalUserPublisher
             .sink { [weak self] isInternal in
                 self?.updateIcon(isInternalChannel: isInternal)

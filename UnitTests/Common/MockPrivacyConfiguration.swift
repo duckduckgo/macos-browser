@@ -22,6 +22,12 @@ import Combine
 @testable import DuckDuckGo_Privacy_Browser
 
 class MockPrivacyConfiguration: PrivacyConfiguration {
+
+    var isSubfeatureKeyEnabled: ((any PrivacySubfeature, AppVersionProvider) -> Bool)?
+    func isSubfeatureEnabled(_ subfeature: any PrivacySubfeature, versionProvider: AppVersionProvider) -> Bool {
+        isSubfeatureKeyEnabled?(subfeature, versionProvider) ?? false
+    }
+
     var identifier: String = "MockPrivacyConfiguration"
     var userUnprotectedDomains: [String] = []
     var tempUnprotectedDomains: [String] = []

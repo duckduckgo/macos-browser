@@ -16,81 +16,17 @@
 //  limitations under the License.
 //
 
-import Foundation
-
-protocol InternalUserDeciding {
-
-    var isInternalUser: Bool { get }
-    var isInternalUserPublisher: Published<Bool>.Publisher { get }
-
-    func markUserAsInternalIfNeeded(forUrl url: URL?, response: HTTPURLResponse?)
-
-}
-
-final class InternalUserDecider {
-
-    private static let internalUserVerificationURLHost = "use-login.duckduckgo.com"
-
-    init(store: InternalUserDeciderStoring) {
-        self.store = store
-
-#if DEBUG || REVIEW
-        if case .normal = NSApp.runType {
-            isInternalUser = true
-        } else {
-            isInternalUser = (try? store.load()) ?? false
-        }
-#elseif APPSTORE
-        isInternalUser = false
-#else
-        isInternalUser = (try? store.load()) ?? false
-#endif
-    }
-
-    private var store: InternalUserDeciderStoring
-
-    @Published private(set) var isInternalUser: Bool {
-        didSet {
-            // Optimisation below prevents from 2 unnecesary events:
-            // 1) Rewriting of the file with the same value
-            // 2) Also from initial saving of the false value to the disk
-            // which is unnecessary since it is the default value.
-            // It helps to load the app for majority of users (external) faster
-            if oldValue != isInternalUser {
-                try? store.save(isInternal: isInternalUser)
-            }
-        }
-    }
-
-}
-
-extension InternalUserDecider: InternalUserDeciding {
-
-    var isInternalUserPublisher: Published<Bool>.Publisher {
-        $isInternalUser
-    }
-
-    func markUserAsInternalIfNeeded(forUrl url: URL?, response: HTTPURLResponse?) {
-#if APP_STORE
-            return
-#endif
-
-        if isInternalUser { // If we're already an internal user, we don't need to do anything
-            return
-        }
-
-        if let url = url,
-           url.host == Self.internalUserVerificationURLHost,
-           let statusCode = response?.statusCode,
-           statusCode == 200 {
-            isInternalUser = true
-            return
-        }
-
-        // Do not publish value if not necessary
-        if isInternalUser != false {
-            isInternalUser = false
-        }
-    }
-
-}
+/*
+ #if DEBUG || REVIEW
+         if AppDelegate.isRunningTests {
+             isInternalUser = (try? store.load()) ?? false
+         } else {
+             isInternalUser = true
+         }
+ #elseif APPSTORE
+         isInternalUser = false
+ #else
+         isInternalUser = (try? store.load()) ?? false
+ #endif
+     }
+ */
