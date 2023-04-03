@@ -122,7 +122,7 @@ struct Logging {
     fileprivate static let tabLazyLoaderLoggingEnabled = false
     fileprivate static let tabLazyLoaderLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Lazy Loading")
 
-    fileprivate static let autoconsentLoggingEnabled = false
+    fileprivate static let autoconsentLoggingEnabled = true
     fileprivate static let autoconsentLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Autoconsent")
 
     fileprivate static let bookmarksLoggingEnabled = false
