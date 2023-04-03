@@ -95,6 +95,9 @@ struct UserText {
     static let openImageInNewDisposableTab = NSLocalizedString("open.image.in.new.disposable.tab", value: "Open Image in New Burner Tab", comment: "Context menu item")
     static let openImageInNewDisposableWindow = NSLocalizedString("open.image.in.new.disposable.window", value: "Open Image in New Burner Window", comment: "Context menu item")
     static let openFrameInNewDisposableWindow = NSLocalizedString("open.frame.in.new.disposable.window", value: "Open Frame in New Burner Window", comment: "Context menu item")
+    static let moveTabToNewDisposableWindow = NSLocalizedString("options.menu.move.tab.to.new.disposable.window",
+                                                      value: "Move Tab to New Disposable Window",
+                                                      comment: "Context menu item")
     static let copyImageAddress = NSLocalizedString("copy.image.address", value: "Copy Image Address", comment: "Context menu item")
     static let saveImageAs = NSLocalizedString("save.image.as", value: "Save Image As…", comment: "Context menu item")
     static let downloadLinkedFileAs = NSLocalizedString("save.image.as", value: "Download Linked File As…", comment: "Context menu item")

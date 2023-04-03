@@ -400,7 +400,7 @@ final class TabBarViewController: NSViewController {
         TabDragAndDropManager.shared.setSource(tabCollectionViewModel: tabCollectionViewModel, indexPath: newIndexPath)
     }
 
-    private func moveToNewWindow(indexPath: IndexPath, droppingPoint: NSPoint? = nil) {
+    private func moveToNewWindow(indexPath: IndexPath, droppingPoint: NSPoint? = nil, disposable: Bool) {
         guard tabCollectionViewModel.tabCollection.tabs.count > 1 else { return }
         guard let tabViewModel = tabCollectionViewModel.tabViewModel(at: indexPath.item) else {
             assertionFailure("TabBarViewController: Failed to get tab view model")
@@ -409,8 +409,7 @@ final class TabBarViewController: NSViewController {
 
         let tab = tabViewModel.tab
         tabCollectionViewModel.remove(at: .unpinned(indexPath.item), published: false)
-        //TODO!
-        WindowsManager.openNewWindow(with: tab, isDisposable: false, droppingPoint: droppingPoint)
+        WindowsManager.openNewWindow(with: tab, isDisposable: disposable, droppingPoint: droppingPoint)
     }
 
     // MARK: - Mouse Monitor
@@ -968,7 +967,7 @@ extension TabBarViewController: NSCollectionViewDelegate {
                 assertionFailure("TabBarViewController: No current dragging index path")
                 return
             }
-            moveToNewWindow(indexPath: draggingIndexPath, droppingPoint: screenPoint)
+            moveToNewWindow(indexPath: draggingIndexPath, droppingPoint: screenPoint, disposable: tabCollectionViewModel.isDisposable)
         }
     }
 
@@ -1126,8 +1125,19 @@ extension TabBarViewController: TabBarViewItemDelegate {
             return
         }
 
-        moveToNewWindow(indexPath: indexPath)
+        moveToNewWindow(indexPath: indexPath, disposable: false)
     }
+
+    func tabBarViewItemMoveToNewDisposableWindowAction(_ tabBarViewItem: TabBarViewItem) {
+        guard let indexPath = collectionView.indexPath(for: tabBarViewItem) else {
+            assertionFailure("TabBarViewController: Failed to get index path of tab bar view item")
+            return
+        }
+
+        moveToNewWindow(indexPath: indexPath, disposable: true)
+    }
+
+
 
     func tabBarViewItemFireproofSite(_ tabBarViewItem: TabBarViewItem) {
         guard let indexPath = collectionView.indexPath(for: tabBarViewItem),

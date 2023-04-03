@@ -187,8 +187,7 @@ final class HomePageViewController: NSViewController {
 
     private func openUrl(_ url: URL, target: HomePage.Models.FavoritesModel.OpenTarget? = nil) {
         if target == .newWindow || NSApplication.shared.isCommandPressed && NSApplication.shared.isOptionPressed {
-            //TODO!
-            WindowsManager.openNewWindow(with: url, isDisposable: false)
+            WindowsManager.openNewWindow(with: url, isDisposable: tabCollectionViewModel.isDisposable)
             return
         }
 

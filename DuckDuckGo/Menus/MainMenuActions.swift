@@ -37,7 +37,6 @@ extension AppDelegate {
     // MARK: - File
 
     @IBAction func newWindow(_ sender: Any?) {
-        //TODO!
         WindowsManager.openNewWindow(isDisposable: false)
     }
 
@@ -46,12 +45,10 @@ extension AppDelegate {
     }
 
     @IBAction func newTab(_ sender: Any?) {
-        //TODO!
         WindowsManager.openNewWindow(isDisposable: false)
     }
 
     @IBAction func openLocation(_ sender: Any?) {
-        //TODO!
         WindowsManager.openNewWindow(isDisposable: false)
     }
 
@@ -82,12 +79,10 @@ extension AppDelegate {
             return
         }
 
-        //TODO!
         WindowsManager.openNewWindow(with: Tab(content: .contentFromURL(url), shouldLoadInBackground: true, isDisposable: false), isDisposable: false)
     }
 
     @objc func clearAllHistory(_ sender: NSMenuItem) {
-        //TODO!
         guard let window = WindowsManager.openNewWindow(with: Tab(content: .homePage, isDisposable: false), isDisposable: false),
               let windowController = window.windowController as? MainWindowController else {
             assertionFailure("No reference to main window controller")
@@ -98,7 +93,6 @@ extension AppDelegate {
     }
 
     @objc func clearThisHistory(_ sender: ClearThisHistoryMenuItem) {
-        //TODO!
         guard let window = WindowsManager.openNewWindow(with: Tab(content: .homePage, isDisposable: false), isDisposable: false),
               let windowController = window.windowController as? MainWindowController else {
             assertionFailure("No reference to main window controller")
@@ -136,13 +130,11 @@ extension AppDelegate {
             return
         }
 
-        //TODO!
         let tab = Tab(content: .url(url), shouldLoadInBackground: true, isDisposable: false)
         WindowsManager.openNewWindow(with: tab, isDisposable: false)
     }
 
     @IBAction func showManageBookmarks(_ sender: Any?) {
-        //TODO!
         let tabCollection = TabCollection(tabs: [Tab(content: .bookmarks, isDisposable: false)])
         let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection, isDisposable: false)
 
@@ -150,7 +142,6 @@ extension AppDelegate {
     }
 
     @IBAction func openPreferences(_ sender: Any?) {
-        //TODO!
         let tabCollection = TabCollection(tabs: [Tab(content: .anyPreferencePane, isDisposable: false)])
         let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection, isDisposable: false)
         WindowsManager.openNewWindow(with: tabCollectionViewModel, isDisposable: false)
@@ -272,7 +263,6 @@ extension MainViewController {
         // (this is in line with Safari behavior)
         if isHandlingKeyDownEvent, tabCollectionViewModel.selectionIndex?.isPinnedTab == true {
             if tabCollectionViewModel.tabCollection.tabs.isEmpty {
-                //TODO!
                 tabCollectionViewModel.append(tab: Tab(content: .homePage, isDisposable: false), selected: true)
             } else {
                 tabCollectionViewModel.select(at: .unpinned(0))
@@ -335,7 +325,6 @@ extension MainViewController {
             if let vc = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.navigationBarViewController {
                 navigationBarViewController = vc
             } else {
-                //TODO!
                 WindowsManager.openNewWindow(with: Tab(content: .homePage, isDisposable: false), isDisposable: false)
                 guard let wc = WindowControllersManager.shared.mainWindowControllers.first(where: { $0.window?.isPopUpWindow == false }) else {
                     return
@@ -491,8 +480,11 @@ extension MainViewController {
             return
         }
 
-        //TODO!
-        let tabs = models.compactMap { ($0.entity as? Bookmark)?.urlObject }.map { Tab(content: .url($0), shouldLoadInBackground: true, isDisposable: false) }
+        let tabs = models.compactMap { ($0.entity as? Bookmark)?.urlObject }.map {
+            Tab(content: .url($0),
+                shouldLoadInBackground: true,
+                isDisposable: tabCollectionViewModel.isDisposable)
+        }
         tabCollectionViewModel.append(tabs: tabs)
     }
 
@@ -535,8 +527,7 @@ extension MainViewController {
 
         let tab = selectedTabViewModel.tab
         tabCollectionViewModel.removeSelected()
-        //TODO!
-        WindowsManager.openNewWindow(with: tab, isDisposable: false)
+        WindowsManager.openNewWindow(with: tab, isDisposable: tabCollectionViewModel.isDisposable)
     }
 
     @IBAction func pinOrUnpinTab(_ sender: Any?) {

@@ -41,6 +41,7 @@ protocol TabBarViewItemDelegate: AnyObject {
     func tabBarViewItemPinAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemBookmarkThisPageAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemMoveToNewWindowAction(_ tabBarViewItem: TabBarViewItem)
+    func tabBarViewItemMoveToNewDisposableWindowAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemFireproofSite(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemRemoveFireproofing(_ tabBarViewItem: TabBarViewItem)
 
@@ -218,6 +219,10 @@ final class TabBarViewItem: NSCollectionViewItem {
 
     @objc func moveToNewWindowAction(_ sender: NSMenuItem) {
         delegate?.tabBarViewItemMoveToNewWindowAction(self)
+    }
+
+    @objc func moveToNewDisposableWindowAction(_ sender: NSMenuItem) {
+        delegate?.tabBarViewItemMoveToNewDisposableWindowAction(self)
     }
 
     func subscribe(to tabViewModel: TabViewModel, tabCollectionViewModel: TabCollectionViewModel) {
@@ -469,7 +474,11 @@ extension TabBarViewItem: NSMenuDelegate {
         addCloseMenuItem(to: menu)
         addCloseOtherMenuItem(to: menu, areThereOtherTabs: areThereOtherTabs)
         addCloseTabsToTheRightMenuItem(to: menu, areThereTabsToTheRight: otherItemsState.hasItemsToTheRight)
-        addMoveToNewWindowMenuItem(to: menu, areThereOtherTabs: areThereOtherTabs)
+        if isDisposable {
+            addMoveToNewDisposableWindowMenuItem(to: menu, areThereOtherTabs: areThereOtherTabs)
+        } else {
+            addMoveToNewWindowMenuItem(to: menu, areThereOtherTabs: areThereOtherTabs)
+        }
 
     }
 
@@ -533,6 +542,13 @@ extension TabBarViewItem: NSMenuDelegate {
         moveToNewWindowMenuItem.target = self
         moveToNewWindowMenuItem.isEnabled = areThereOtherTabs
         menu.addItem(moveToNewWindowMenuItem)
+    }
+
+    private func addMoveToNewDisposableWindowMenuItem(to menu: NSMenu, areThereOtherTabs: Bool) {
+        let moveToNewDisposableWindowMenuItem = NSMenuItem(title: UserText.moveTabToNewDisposableWindow, action: #selector(moveToNewDisposableWindowAction(_:)), keyEquivalent: "")
+        moveToNewDisposableWindowMenuItem.target = self
+        moveToNewDisposableWindowMenuItem.isEnabled = areThereOtherTabs
+        menu.addItem(moveToNewDisposableWindowMenuItem)
     }
 
 }

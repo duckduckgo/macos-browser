@@ -188,8 +188,7 @@ final class NavigationBarViewController: NSViewController {
     }
 
     private func openNewChildTab(with url: URL) {
-        //TODO!
-        let tab = Tab(content: .url(url), parentTab: tabCollectionViewModel.selectedTabViewModel?.tab, shouldLoadInBackground: true, isDisposable: false)
+        let tab = Tab(content: .url(url), parentTab: tabCollectionViewModel.selectedTabViewModel?.tab, shouldLoadInBackground: true, isDisposable: tabCollectionViewModel.isDisposable)
         tabCollectionViewModel.insert(tab, selected: false)
     }
 
