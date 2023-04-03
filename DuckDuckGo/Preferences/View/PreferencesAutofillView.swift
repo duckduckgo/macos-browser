@@ -129,6 +129,14 @@ extension Preferences {
                     .offset(x: Const.pickerHorizontalOffset)
                     TextMenuItemCaption(text: UserText.autofillNeverLockWarning)
                 }
+
+#if APPSTORE
+                PreferencePaneSection {
+                    Button(UserText.importBrowserData) {
+                        model.openImportBrowserDataWindow()
+                    }
+                }
+#endif
             }
         }
 

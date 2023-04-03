@@ -149,7 +149,7 @@ struct UserText {
     static let webTrackingProtectionExplenation = NSLocalizedString("web.tracking.protection.explenation", value: "DuckDuckGo automatically blocks hidden trackers as you browse the web.", comment: "feature explanation in settings")
     static let autoconsentSettingsTitle = NSLocalizedString("autoconsent.title", value: "Cookie Pop-ups", comment: "Autoconsent settings section title")
     static let autoconsentCheckboxTitle = NSLocalizedString("autoconsent.checkbox.title", value: "Automatically handle cookie pop-ups", comment: "Autoconsent settings checkbox title")
-    static let autoconsentExplanation = NSLocalizedString("autoconsent.explanation", value: "DuckDuckGo will select options that minimize cookies and hide these pop-ups for you.", comment: "Autoconsent feature explanation in settings")
+    static let autoconsentExplanation = NSLocalizedString("autoconsent.explanation", value: "DuckDuckGo will try to select the most private settings available and hide these pop-ups for you.", comment: "Autoconsent feature explanation in settings")
 
     static let duckPlayerSettingsTitle = NSLocalizedString("duck-player.title", value: "Duck Player", comment: "Private YouTube Player settings title")
     static let duckPlayerAlwaysOpenInPlayer = NSLocalizedString("duck-player.always-open-in-player", value: "Always open YouTube videos in Duck Player", comment: "Private YouTube Player option")
