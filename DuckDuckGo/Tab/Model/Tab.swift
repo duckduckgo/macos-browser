@@ -299,7 +299,12 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         self.interactionState = (interactionStateData != nil || shouldLoadFromCache) ? .loadCachedFromTabContent(interactionStateData) : .none
         self.lastSelectedAt = lastSelectedAt
 
-        let configuration = webViewConfiguration ?? WKWebViewConfiguration()
+        let configuration: WKWebViewConfiguration
+        if let webViewConfiguration, !isDisposable {
+            configuration = webViewConfiguration
+        } else {
+            configuration = WKWebViewConfiguration()
+        }
         configuration.applyStandardConfiguration(contentBlocking: privacyFeatures.contentBlocking,
                                                  isDisposable: isDisposable)
         self.webViewConfiguration = configuration

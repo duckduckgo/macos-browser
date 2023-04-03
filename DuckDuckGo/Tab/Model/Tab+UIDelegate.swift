@@ -161,7 +161,7 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
         guard let delegate else { return nil }
 
         //TODO!
-        let tab = Tab(content: .none, webViewConfiguration: configuration, parentTab: self, isDisposable: false, canBeClosedWithBack: kind.isSelectedTab, webViewFrame: webView.superview?.bounds ?? .zero)
+        let tab = Tab(content: .none, webViewConfiguration: configuration, parentTab: self, isDisposable: isDisposable, canBeClosedWithBack: kind.isSelectedTab, webViewFrame: webView.superview?.bounds ?? .zero)
         delegate.tab(self, createdChild: tab, of: kind)
 
         let webView = tab.webView
