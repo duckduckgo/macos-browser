@@ -207,7 +207,6 @@ extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
             tabCollectionViewModel.appendNewTab(with: .url(url), selected: true)
         case .openInNewWindow:
             guard let url = bookmark.urlObject else { return }
-            //TODO!
             WindowsManager.openNewWindow(with: url, isDisposable: false)
         case .clickItem:
             WindowControllersManager.shared.open(bookmark: bookmark)

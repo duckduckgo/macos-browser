@@ -302,7 +302,6 @@ extension BookmarkListViewController: BookmarkMenuItemSelectors {
         guard let urlObject = bookmark.urlObject else {
             return
         }
-        //TODO!
         WindowsManager.openNewWindow(with: urlObject, isDisposable: false)
     }
 
@@ -380,8 +379,7 @@ extension BookmarkListViewController: FolderMenuItemSelectors {
             return
         }
 
-        //TODO!
-        let tabs = children.compactMap { ($0 as? Bookmark)?.urlObject }.map { Tab(content: .url($0), shouldLoadInBackground: true, isDisposable: false) }
+        let tabs = children.compactMap { ($0 as? Bookmark)?.urlObject }.map { Tab(content: .url($0), shouldLoadInBackground: true, isDisposable: tabCollection.isDisposable) }
         tabCollection.append(tabs: tabs)
     }
 
