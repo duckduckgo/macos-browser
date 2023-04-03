@@ -92,8 +92,7 @@ final class YoutubeOverlayUserScript: NSObject, UserScript, UserScriptMessageEnc
 
     let allowedOrigins = [
         "www.youtube.com",
-        "duckduckgo.com",
-        "use-devtesting12.duckduckgo.com"
+        "duckduckgo.com"
     ]
 
     lazy var source: String = {
