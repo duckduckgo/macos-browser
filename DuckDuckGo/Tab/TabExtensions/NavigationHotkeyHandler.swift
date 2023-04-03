@@ -23,9 +23,11 @@ final class NavigationHotkeyHandler {
 
     private var onNewWindow: ((WKNavigationAction?) -> NavigationDecision)?
     private let isTabPinned: () -> Bool
+    private let isDisposable: Bool
 
-    init(isTabPinned: @escaping () -> Bool) {
+    init(isTabPinned: @escaping () -> Bool, isDisposable: Bool) {
         self.isTabPinned = isTabPinned
+        self.isDisposable = isDisposable
     }
 
 }
@@ -58,10 +60,10 @@ extension NavigationHotkeyHandler: NavigationResponder {
         let isRequestingNewTab = (isLinkActivated && NSApp.isCommandPressed) || navigationAction.navigationType.isMiddleButtonClick || isNavigatingAwayFromPinnedTab
         if isRequestingNewTab {
             let shouldSelectNewTab = NSApp.isShiftPressed || (isNavigatingAwayFromPinnedTab && !navigationAction.navigationType.isMiddleButtonClick && !NSApp.isCommandPressed)
+            let isDisposable = isDisposable
 
             self.onNewWindow = { _ in
-                //TODO!
-                return .allow(.tab(selected: shouldSelectNewTab, disposable: false))
+                return .allow(.tab(selected: shouldSelectNewTab, disposable: isDisposable))
             }
             targetFrame.webView?.loadInNewWindow(navigationAction.url)
             return .cancel

@@ -119,7 +119,6 @@ extension WindowControllersManager {
         guard let url = bookmark.urlObject else { return }
 
         if NSApplication.shared.isCommandPressed && NSApplication.shared.isShiftPressed {
-            //TODO!
             WindowsManager.openNewWindow(with: url, isDisposable: false)
         } else if mainWindowController?.mainViewController.view.window?.isPopUpWindow ?? false {
             show(url: url, newTab: true)
@@ -149,8 +148,7 @@ extension WindowControllersManager {
             } else if let tab = tabCollectionViewModel.selectedTabViewModel?.tab, !newTab {
                 tab.setContent(url.map { .url($0) } ?? .homePage)
             } else {
-                //TODO!
-                let newTab = Tab(content: url.map { .url($0) } ?? .homePage, shouldLoadInBackground: true, isDisposable: false)
+                let newTab = Tab(content: url.map { .url($0) } ?? .homePage, shouldLoadInBackground: true, isDisposable: tabCollectionViewModel.isDisposable)
                 newTab.setContent(url.map { .url($0) } ?? .homePage)
                 tabCollectionViewModel.append(tab: newTab)
             }
@@ -171,10 +169,8 @@ extension WindowControllersManager {
 
         // Open a new window
         if let url = url {
-            //TODO!
             WindowsManager.openNewWindow(with: url, isDisposable: false)
         } else {
-            //TODO!
             WindowsManager.openNewWindow(isDisposable: false)
         }
     }

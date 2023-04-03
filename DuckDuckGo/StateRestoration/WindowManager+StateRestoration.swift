@@ -50,7 +50,6 @@ extension WindowsManager {
     }
 
     private class func setUpWindow(from item: WindowRestorationItem) {
-        //TODO!
         guard let window = openNewWindow(with: item.model, isDisposable: false, showWindow: true) else { return }
         window.setContentSize(item.frame.size)
         window.setFrameOrigin(item.frame.origin)

@@ -30,6 +30,7 @@ extension UserScripts: YoutubeScriptsProvider {}
 
 final class DuckPlayerTabExtension {
     private let duckPlayer: DuckPlayer
+    private let isDisposable: Bool
     private var cancellables = Set<AnyCancellable>()
     private var youtubePlayerCancellables = Set<AnyCancellable>()
 
@@ -39,8 +40,10 @@ final class DuckPlayerTabExtension {
     private var shouldSelectNextNewTab: Bool?
 
     init(duckPlayer: DuckPlayer,
+         isDisposable: Bool,
          scriptsPublisher: some Publisher<some YoutubeScriptsProvider, Never>) {
         self.duckPlayer = duckPlayer
+        self.isDisposable = isDisposable
 
         scriptsPublisher.sink { [weak self] scripts in
             self?.youtubeOverlayScript = scripts.youtubeOverlayScript
@@ -124,8 +127,7 @@ extension DuckPlayerTabExtension: NewWindowPolicyDecisionMaker {
             defer {
                 self.shouldSelectNextNewTab = nil
             }
-            //TODO!
-            return .allow(.tab(selected: shouldSelectNextNewTab, disposable: false))
+            return .allow(.tab(selected: shouldSelectNextNewTab, disposable: isDisposable))
         }
         return nil
     }

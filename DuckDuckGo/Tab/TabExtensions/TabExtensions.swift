@@ -164,11 +164,12 @@ extension TabExtensionsBuilder {
             ExternalAppSchemeHandler(workspace: dependencies.workspace, permissionModel: args.permissionModel)
         }
         add {
-            NavigationHotkeyHandler(isTabPinned: args.isTabPinned)
+            NavigationHotkeyHandler(isTabPinned: args.isTabPinned, isDisposable: args.isTabDisposable)
         }
 
         add {
             DuckPlayerTabExtension(duckPlayer: dependencies.duckPlayer,
+                                   isDisposable: args.isTabDisposable,
                                    scriptsPublisher: userScripts.compactMap { $0 })
         }
     }

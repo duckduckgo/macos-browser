@@ -149,7 +149,6 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
         // allow popups opened from an empty window console
         let sourceUrl = navigationAction.safeSourceFrame?.safeRequest?.url ?? self.url ?? .empty
         if sourceUrl.isEmpty || sourceUrl.scheme == URL.NavigationalScheme.about.rawValue {
-            //TODO!
             return .allow(.tab(selected: true, disposable: isDisposable))
         }
 
@@ -160,7 +159,6 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
     private func createWebView(from webView: WKWebView, with configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, of kind: NewWindowPolicy) -> WKWebView? {
         guard let delegate else { return nil }
 
-        //TODO!
         let tab = Tab(content: .none, webViewConfiguration: configuration, parentTab: self, isDisposable: isDisposable, canBeClosedWithBack: kind.isSelectedTab, webViewFrame: webView.superview?.bounds ?? .zero)
         delegate.tab(self, createdChild: tab, of: kind)
 

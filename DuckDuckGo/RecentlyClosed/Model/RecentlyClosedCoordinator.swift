@@ -164,10 +164,8 @@ final class RecentlyClosedCoordinator: RecentlyClosedCoordinating {
             tabIndex = tabCollectionViewModel.tabCollection.tabs.count
 
         } else {
-            //TODO!
             // There is no window available, create a new one
             let tab = Tab(content: recentlyClosedTab.tabContent, interactionStateData: recentlyClosedTab.interactionData, shouldLoadInBackground: true, isDisposable: false, shouldLoadFromCache: true)
-            //TODO!
             WindowsManager.openNewWindow(with: tab, isDisposable: false)
             return
         }
@@ -180,7 +178,6 @@ final class RecentlyClosedCoordinator: RecentlyClosedCoordinating {
         var lastKeyMainWindowController = WindowControllersManager.shared.lastKeyMainWindowController
         if lastKeyMainWindowController == nil {
             // Create a new window if none exists
-            //TODO!
             WindowsManager.openNewWindow(with: Tab(content: .homePage, shouldLoadInBackground: true, isDisposable: false, shouldLoadFromCache: true), isDisposable: false)
             lastKeyMainWindowController = WindowControllersManager.shared.lastKeyMainWindowController
         }
@@ -189,8 +186,7 @@ final class RecentlyClosedCoordinator: RecentlyClosedCoordinating {
             return
         }
 
-        //TODO!
-        let tab = Tab(content: recentlyClosedTab.tabContent, interactionStateData: recentlyClosedTab.interactionData, shouldLoadInBackground: true, isDisposable: false, shouldLoadFromCache: true)
+        let tab = Tab(content: recentlyClosedTab.tabContent, interactionStateData: recentlyClosedTab.interactionData, shouldLoadInBackground: true, isDisposable: tabCollectionViewModel.isDisposable, shouldLoadFromCache: true)
         let tabIndex = min(recentlyClosedTab.index.item, windowControllerManager.pinnedTabsManager.tabCollection.tabs.count)
 
         tabCollectionViewModel.insert(tab, at: .pinned(tabIndex), selected: true)
@@ -199,11 +195,9 @@ final class RecentlyClosedCoordinator: RecentlyClosedCoordinating {
     private func reopenWindow(_ recentlyClosedWindow: RecentlyClosedWindow) {
         let tabCollection = TabCollection()
         recentlyClosedWindow.tabs.forEach { recentlyClosedTab in
-            //TODO!
             let tab = Tab(content: recentlyClosedTab.tabContent, title: recentlyClosedTab.title, favicon: recentlyClosedTab.favicon, shouldLoadInBackground: false, isDisposable: false, shouldLoadFromCache: true)
             tabCollection.append(tab: tab)
         }
-        //TODO!
         WindowsManager.openNewWindow(with: tabCollection,
                                      isDisposable: false,
                                      droppingPoint: recentlyClosedWindow.droppingPoint,
