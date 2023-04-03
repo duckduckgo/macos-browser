@@ -34,7 +34,6 @@ final class FireCoordinator {
             burningWindow.makeKeyAndOrderFront(nil)
             waitForOpening = false
         } else {
-            //TODO!
             burningWindow = WindowsManager.openNewWindow(isDisposable:false)!
             waitForOpening = true
         }
