@@ -585,6 +585,11 @@ final class TabCollectionViewModel: NSObject {
 
             self.removeTabViewModels(old.subtracting(new))
             self.addTabViewModels(new.subtracting(old))
+
+            // Make sure the tab is disposable if it is supposed to be
+            if newTabs.first(where: { $0.isDisposable != self.isDisposable }) != nil {
+                fatalError("Error in burner tab management")
+            }
         } .store(in: &cancellables)
     }
 
