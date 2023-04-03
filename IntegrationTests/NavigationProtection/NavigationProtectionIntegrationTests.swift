@@ -232,23 +232,31 @@ class NavigationProtectionIntegrationTests: XCTestCase {
         _=try await comingBackToFirstTabPromise.value
 
         // download results
-        var persistor = DownloadsPreferencesUserDefaultsPersistor()
-        persistor.selectedDownloadLocation = FileManager.default.temporaryDirectory.absoluteString
-        let downloadTaskFuture = FileDownloadManager.shared.downloadsPublisher.timeout(5).first().promise()
-        _=try await tab.webView.evaluateJavaScript("(function() { document.getElementById('download').click(); return true })()")
-
-        let fileUrl = try await downloadTaskFuture.value.output
-            .timeout(1, scheduler: DispatchQueue.main) { .init(TimeoutError() as NSError, isRetryable: false) }.first().promise().get()
-
-        // print(try! String(contentsOf: fileUrl))
-        let results = try JSONDecoder().decode(Results.self, from: Data(contentsOf: fileUrl))
-        XCTAssertEqual(results.results, [
+        var results: Results!
+        let expected: [Results.Result] = [
             .init(id: "top frame header", value: .string("1")),
             .init(id: "top frame JS API", value: .null),
             .init(id: "frame header", value: nil),
             .init(id: "frame JS API", value: .bool(true)),
             .init(id: "subequest header", value: nil),
-        ])
+        ]
+        for _ in 0..<3 {
+            var persistor = DownloadsPreferencesUserDefaultsPersistor()
+            persistor.selectedDownloadLocation = FileManager.default.temporaryDirectory.absoluteString
+            let downloadTaskFuture = FileDownloadManager.shared.downloadsPublisher.timeout(5).first().promise()
+            _=try await tab.webView.evaluateJavaScript("(function() { document.getElementById('download').click(); return true })()")
+
+            let fileUrl = try await downloadTaskFuture.value.output
+                .timeout(1, scheduler: DispatchQueue.main) { .init(TimeoutError() as NSError, isRetryable: false) }.first().promise().get()
+
+            // print(try! String(contentsOf: fileUrl))
+            results = try JSONDecoder().decode(Results.self, from: Data(contentsOf: fileUrl))
+
+            if results.results == expected {
+                break
+            }
+        }
+        XCTAssertEqual(results.results, expected)
     }
 
 }

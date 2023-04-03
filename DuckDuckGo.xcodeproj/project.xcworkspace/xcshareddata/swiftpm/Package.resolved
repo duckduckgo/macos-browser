@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "9b7cd2b689f39cf34c5430fa00dabcca4d6cf6ee",
-        "version" : "53.1.0"
+        "revision" : "0f0e20970a54c0fb570734111f0f15c3de4b4de8",
+        "version" : "54.0.0"
       }
     },
     {
@@ -113,8 +113,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/sync_crypto",
       "state" : {
-        "revision" : "df751674ee842d129c50a183668b033d02c2980d",
-        "version" : "0.0.1"
+        "revision" : "2ab6ab6f0f96b259c14c2de3fc948935fc16ac78",
+        "version" : "0.2.0"
       }
     },
     {
