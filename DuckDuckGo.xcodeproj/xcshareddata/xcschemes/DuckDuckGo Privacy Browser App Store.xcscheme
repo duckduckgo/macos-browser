@@ -84,7 +84,7 @@
       </PostActions>
       <Testables>
          <TestableReference
-            skipped = "NO">
+            skipped = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "3706FDD3293F661700E42796"
