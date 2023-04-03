@@ -6,7 +6,7 @@
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
         "branch" : "dominik/grdb-2.1.0",
-        "revision" : "bde79ccb7421c73aeff494eb91a7459a6d54b052"
+        "revision" : "98bc79943235c33b1237ec80b86eafba76493350"
       }
     },
     {
@@ -23,8 +23,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/duckduckgo-autofill.git",
       "state" : {
-        "revision" : "9f0c2eab4223f1f28cced4eac73e4381a8daa35e",
-        "version" : "6.3.0"
+        "revision" : "4aee97d550112ba6551e61ea8019fb1f1a2d3af7",
+        "version" : "6.4.3"
       }
     },
     {
@@ -113,8 +113,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/sync_crypto",
       "state" : {
-        "revision" : "df751674ee842d129c50a183668b033d02c2980d",
-        "version" : "0.0.1"
+        "revision" : "2ab6ab6f0f96b259c14c2de3fc948935fc16ac78",
+        "version" : "0.2.0"
       }
     },
     {

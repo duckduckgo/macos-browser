@@ -18,6 +18,7 @@
 
 import Foundation
 import Combine
+import AppKit
 
 final public class RecoveryCodeViewModel: ObservableObject {
     @Published public var shouldDisableSubmitButton: Bool = true
@@ -27,10 +28,15 @@ final public class RecoveryCodeViewModel: ObservableObject {
         }
     }
 
-    public func setCode(_ newCode: String) {
-        if CharacterSet.base64.isSuperset(of: CharacterSet(charactersIn: newCode)) {
-            recoveryCode = newCode
+    func setCode(_ code: String) {
+        if CharacterSet.base64.isSuperset(of: CharacterSet(charactersIn: code)) {
+            recoveryCode = code
         }
+    }
+
+    func paste() {
+        let code = NSPasteboard.general.string(forType: .string)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        setCode(code)
     }
 
     public init() {}

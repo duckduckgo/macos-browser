@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import BrowserServicesKit
 import Foundation
 import CoreData
 import Persistence
@@ -49,10 +50,12 @@ final class Database {
             } catch {
                 return (nil, error)
             }
+            let mainModel = NSManagedObjectModel.mergedModel(from: [.main])!
+            let httpsUpgradeModel = HTTPSUpgrade.managedObjectModel
 
             return (CoreDataDatabase(name: Constants.databaseName,
                                      containerLocation: containerLocation,
-                                     model: NSManagedObjectModel.mergedModel(from: [.main])!), nil)
+                                     model: .init(byMerging: [mainModel, httpsUpgradeModel])!), nil)
         }
 #if DEBUG
         assert(!NSApp.isRunningUnitTests, "Use CoreData.---Container() methods for testing purposes")

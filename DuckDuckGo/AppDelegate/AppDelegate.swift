@@ -53,7 +53,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     private(set) var stateRestorationManager: AppStateRestorationManager!
     private var grammarFeaturesManager = GrammarFeaturesManager()
     private let crashReporter = CrashReporter()
-    private(set) var internalUserDecider: InternalUserDeciding!
+    private(set) var internalUserDecider: InternalUserDecider!
     private var appIconChanger: AppIconChanger!
     private(set) var syncService: DDGSyncing!
     private(set) var syncPersistence: SyncDataPersistor!
@@ -118,10 +118,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         AppPrivacyFeatures.shared = NSApp.isRunningUnitTests
             // runtime mock-replacement for Unit Tests, to be redone when we‘ll be doing Dependency Injection
             ? AppPrivacyFeatures(contentBlocking: mock("ContentBlockingMock"), httpsUpgradeStore: mock("HTTPSUpgradeStoreMock"))
-            : AppPrivacyFeatures(contentBlocking: AppContentBlocking(), httpsUpgradeStore: AppHTTPSUpgradeStore())
+            : AppPrivacyFeatures(contentBlocking: AppContentBlocking(), database: Database.shared)
 #else
-        AppPrivacyFeatures.shared = AppPrivacyFeatures(contentBlocking: AppContentBlocking(),
-                                                       httpsUpgradeStore: AppHTTPSUpgradeStore())
+        AppPrivacyFeatures.shared = AppPrivacyFeatures(contentBlocking: AppContentBlocking(), database: Database.shared)
 #endif
 
         do {
@@ -134,7 +133,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         stateRestorationManager = AppStateRestorationManager(fileStore: fileStore)
 
         let internalUserDeciderStore = InternalUserDeciderStore(fileStore: fileStore)
-        internalUserDecider = InternalUserDecider(store: internalUserDeciderStore)
+        internalUserDecider = DefaultInternalUserDecider(store: internalUserDeciderStore)
 
 #if !APPSTORE
         updateController = UpdateController(internalUserDecider: internalUserDecider)
