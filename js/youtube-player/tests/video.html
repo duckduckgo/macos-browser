@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        .container {
+            width: 800px;
+            height: 600px;
+            background: blue;
+        }
+        .html5-video-player {
+            position: relative;
+        }
+        body {
+            max-width: 100%;
+        }
+        .tools {
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+<main></main>
+<template id="inner">
+    <div class="container">
+        <div id="player">
+            <div class="html5-video-player">
+                <video width="800px" height="600px"></video>
+            </div>
+        </div>
+    </div>
+</template>
+<script type="module">
+    document.querySelector('main').innerHTML = document.querySelector('template[id="inner"]').innerHTML;
+</script>
+</body>
+</html>
