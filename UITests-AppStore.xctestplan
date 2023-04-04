@@ -25,14 +25,6 @@
   },
   "testTargets" : [
     {
-      "enabled" : false,
-      "target" : {
-        "containerPath" : "container:DuckDuckGo.xcodeproj",
-        "identifier" : "7B4CE8D926F02108009134B1",
-        "name" : "UI Tests"
-      }
-    },
-    {
       "target" : {
         "containerPath" : "container:LocalPackages\/SyncUI",
         "identifier" : "SyncUITests",
