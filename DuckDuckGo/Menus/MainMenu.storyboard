@@ -816,6 +816,25 @@ CQ
                                                             </items>
                                                         </menu>
                                                     </menuItem>
+                                                    <menuItem title="Simulate Failure" id="K5h-D4-For">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <menu key="submenu" title="Simulate Failure" id="iLs-sj-2Gd">
+                                                            <items>
+                                                                <menuItem title="Enable NetP &gt; Controller Failure" id="xyA-ob-gEy">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    <connections>
+                                                                        <action selector="networkProtectionSimulateControllerFailure:" target="Ady-hI-5gd" id="7Ez-Oa-zkP"/>
+                                                                    </connections>
+                                                                </menuItem>
+                                                                <menuItem title="Enable NetP &gt; Tunnel Failure" id="kVa-n8-UNx">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    <connections>
+                                                                        <action selector="networkProtectionSimulateTunnelFailure:" target="Ady-hI-5gd" id="4Pb-oF-nwr"/>
+                                                                    </connections>
+                                                                </menuItem>
+                                                            </items>
+                                                        </menu>
+                                                    </menuItem>
                                                 </items>
                                             </menu>
                                         </menuItem>

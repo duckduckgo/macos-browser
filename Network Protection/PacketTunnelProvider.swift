@@ -16,11 +16,14 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
     enum TunnelError: LocalizedError {
         case couldNotGenerateTunnelConfiguration(internalError: Error)
         case couldNotFixConnection
+        case simulateTunnelFailureError
 
         var errorDescription: String? {
             switch self {
             case .couldNotGenerateTunnelConfiguration(let internalError):
                 return "Failed to generate a tunnel configuration: \(internalError.localizedDescription)"
+            case .simulateTunnelFailureError:
+                return "Simulated a tunnel error as requested"
             default:
                 // This is probably not the most elegant error to show to a user but
                 // it's a great way to get detailed reports for those cases we haven't
@@ -174,7 +177,9 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
 
     // MARK: - IPC
 
+#if NETP_SYSTEM_EXTENSION
     let ipcConnection = IPCConnection(log: .networkProtectionIPCLog, memoryManagementLog: .networkProtectionMemoryLog)
+#endif
 
     // MARK: - Connection tester
 
@@ -313,6 +318,13 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         let activationAttemptId = options?["activationAttemptId"] as? String
 
         os_log("🔵 Will load options\n%{public}@", log: .networkProtection, type: .info, String(describing: options))
+
+        if options?["tunnelFailureSimulation"] as? String == "true" {
+            completionHandler(TunnelError.simulateTunnelFailureError)
+            controllerErrorStore.lastErrorMessage = TunnelError.simulateTunnelFailureError.localizedDescription
+            return
+        }
+
         load(options: options)
         os_log("🔵 Done!", log: .networkProtection, type: .info)
 

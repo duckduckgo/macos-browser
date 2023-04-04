@@ -702,7 +702,7 @@ extension MainViewController {
         }
     }
 
-    @IBAction func networkProtectionSetRegistrationKeyValidity(_ sender: Any? ) {
+    @IBAction func networkProtectionSetRegistrationKeyValidity(_ sender: Any?) {
         guard let menuItem = sender as? NSMenuItem else {
             assertionFailure("\(#function): Failed to cast sender to NSMenuItem")
             return
@@ -719,6 +719,36 @@ extension MainViewController {
                 os_log("Could not override the key validity due to an error: %{public}@", log: .networkProtection, type: .error, error.localizedDescription)
             }
         }
+    }
+
+    @IBAction func networkProtectionSimulateControllerFailure(_ sender: Any?) {
+        guard let menuItem = sender as? NSMenuItem else {
+            assertionFailure("\(#function): Failed to cast sender to NSMenuItem")
+            return
+        }
+
+        if menuItem.state == .on {
+            menuItem.state = .off
+        } else {
+            menuItem.state = .on
+        }
+
+        DefaultNetworkProtectionProvider.simulationOptions.setEnabled(menuItem.state == .on, option: .controllerFailure)
+    }
+
+    @IBAction func networkProtectionSimulateTunnelFailure(_ sender: Any?) {
+        guard let menuItem = sender as? NSMenuItem else {
+            assertionFailure("\(#function): Failed to cast sender to NSMenuItem")
+            return
+        }
+
+        if menuItem.state == .on {
+            menuItem.state = .off
+        } else {
+            menuItem.state = .on
+        }
+
+        DefaultNetworkProtectionProvider.simulationOptions.setEnabled(menuItem.state == .on, option: .tunnelFailure)
     }
 #endif
 
@@ -874,6 +904,14 @@ extension MainViewController: NSMenuItemValidation {
             }
 
             return true
+        case #selector(MainViewController.networkProtectionSimulateControllerFailure(_:)):
+            menuItem.state = DefaultNetworkProtectionProvider.simulationOptions.isEnabled(.controllerFailure) ? .on : .off
+            return true
+
+        case #selector(MainViewController.networkProtectionSimulateTunnelFailure(_:)):
+            menuItem.state = DefaultNetworkProtectionProvider.simulationOptions.isEnabled(.tunnelFailure) ? .on : .off
+            return true
+
 #endif
         default:
             return true
@@ -881,7 +919,6 @@ extension MainViewController: NSMenuItemValidation {
     }
     // swiftlint:enable function_body_length
     // swiftlint:enable cyclomatic_complexity
-
 }
 
 extension AppDelegate: NSMenuItemValidation {
@@ -903,7 +940,6 @@ extension AppDelegate: NSMenuItemValidation {
             return true
         }
     }
-
 }
 
 extension MainViewController: FindInPageDelegate {

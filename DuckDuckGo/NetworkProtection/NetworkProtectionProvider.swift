@@ -61,6 +61,14 @@ protocol NetworkProtectionProvider {
 
 final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
 
+    // MARK: - Debug Helpers
+
+    /// Debug simulation options to aid with testing NetP.
+    ///
+    /// This is static because we want these options to be shared across all instances of `NetworkProtectionProvider`.
+    ///
+    static var simulationOptions = NetworkProtectionSimulationOptions()
+
     // MARK: - Errors & Logging
 
     enum QuickConfigLoadingError: Error {
@@ -330,6 +338,17 @@ final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
 
     // MARK: - Starting & Stopping the VPN
 
+    enum StartError: LocalizedError {
+        case simulateControllerFailureError
+
+        var errorDescription: String? {
+            switch self {
+            case .simulateControllerFailureError:
+                return "Simulated a controller error as requested"
+            }
+        }
+    }
+
     /// Starts the VPN connection used for Network Protection
     ///
     func start() async throws {
@@ -357,24 +376,39 @@ final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
             // Intentional no-op
             break
         default:
-            var options = [String: NSObject]()
+            try start(tunnelManager)
+        }
+    }
 
-            options["activationAttemptId"] = UUID().uuidString as NSString
+    private func start(_ tunnelManager: NETunnelProviderManager) throws {
+        var options = [String: NSObject]()
 
-            if let selectedServerName = Self.selectedServerName() {
-                options["selectedServer"] = selectedServerName as NSString
+        options["activationAttemptId"] = UUID().uuidString as NSString
+
+        if let selectedServerName = Self.selectedServerName() {
+            options["selectedServer"] = selectedServerName as NSString
+        }
+
+        if let selectedKeyValidity = Self.registrationKeyValidity() {
+            options["keyValidity"] = String(selectedKeyValidity) as NSString
+        }
+
+        if Self.simulationOptions.isEnabled(.tunnelFailure) {
+            Self.simulationOptions.setEnabled(false, option: .tunnelFailure)
+
+            options["tunnelFailureSimulation"] = "true" as NSString
+        }
+
+        do {
+            if Self.simulationOptions.isEnabled(.controllerFailure) {
+                Self.simulationOptions.setEnabled(false, option: .controllerFailure)
+                throw StartError.simulateControllerFailureError
             }
 
-            if let selectedKeyValidity = Self.registrationKeyValidity() {
-                options["keyValidity"] = String(selectedKeyValidity) as NSString
-            }
-
-            do {
-                try tunnelManager.connection.startVPNTunnel(options: options)
-            } catch {
-                controllerErrorStore.lastErrorMessage = error.localizedDescription
-                throw error
-            }
+            try tunnelManager.connection.startVPNTunnel(options: options)
+        } catch {
+            controllerErrorStore.lastErrorMessage = error.localizedDescription
+            throw error
         }
     }
 
