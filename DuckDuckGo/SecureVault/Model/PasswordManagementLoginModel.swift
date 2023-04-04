@@ -103,9 +103,22 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
             // Contains some other protocol, so don't mess with it
             return domain
         }
-
-        let noSchemeOrWWW = domain.dropping(prefix: "https://").dropping(prefix: "http://").droppingWwwPrefix()
-        return URLComponents(string: "https://\(noSchemeOrWWW)")?.host ?? ""
+        
+        var components = URLComponents(string: trimmed)
+        components?.scheme = nil
+        
+        if let port = components?.port,
+            [80, 443].contains(port) {
+            components?.port = nil
+        }
+        
+        if let host = components?.host {
+            if let port = components?.port {
+                return "\(host):\(port)"
+            }
+            return host
+        }
+        return ""
     }
 
     var lastUpdatedDate: String = ""
