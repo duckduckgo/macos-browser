@@ -89,52 +89,60 @@ extension OSLog {
 
 struct Logging {
 
-    fileprivate static let atbLoggingEnabled = false
+#if DEBG
+    private static let defaultLoggingEnabled: Bool = {
+        ProcessInfo().environment["OS_ACTIVITY_MODE"] == "debug"
+    }()
+#else
+    private static let defaultLoggingEnabled = false
+#endif
+
+    fileprivate static let atbLoggingEnabled = defaultLoggingEnabled
     fileprivate static let atbLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "ATB")
 
-    fileprivate static let configLoggingEnabled = false
+    fileprivate static let configLoggingEnabled = defaultLoggingEnabled
     fileprivate static let configLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Configuration Downloading")
 
-    fileprivate static let fireLoggingEnabled = false
+    fileprivate static let fireLoggingEnabled = defaultLoggingEnabled
     fileprivate static let fireLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Fire")
 
-    fileprivate static let passwordManagerEnabled = false
+    fileprivate static let passwordManagerEnabled = defaultLoggingEnabled
     fileprivate static let passwordManagerLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Password Manager")
 
-    fileprivate static let historyLoggingEnabled = false
+    fileprivate static let historyLoggingEnabled = defaultLoggingEnabled
     fileprivate static let historyLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "History")
 
-    fileprivate static let dataImportExportLoggingEnabled = false
+    fileprivate static let dataImportExportLoggingEnabled = defaultLoggingEnabled
     fileprivate static let dataImportExportLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Data Import/Export")
 
-    fileprivate static let pixelLoggingEnabled = false
+    fileprivate static let pixelLoggingEnabled = defaultLoggingEnabled
     fileprivate static let pixelLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Pixel")
 
-    fileprivate static let contentBlockingLoggingEnabled = false
+    fileprivate static let contentBlockingLoggingEnabled = defaultLoggingEnabled
     fileprivate static let contentBlockingLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Content Blocking")
 
-    fileprivate static let faviconLoggingEnabled = false
+    fileprivate static let faviconLoggingEnabled = defaultLoggingEnabled
     fileprivate static let faviconLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Favicons")
 
-    fileprivate static let autoLockLoggingEnabled = false
+    fileprivate static let autoLockLoggingEnabled = defaultLoggingEnabled
     fileprivate static let autoLockLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Auto-Lock")
 
-    fileprivate static let tabLazyLoaderLoggingEnabled = false
+    fileprivate static let tabLazyLoaderLoggingEnabled = defaultLoggingEnabled
     fileprivate static let tabLazyLoaderLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Lazy Loading")
 
-    fileprivate static let autoconsentLoggingEnabled = true
+    fileprivate static let autoconsentLoggingEnabled = defaultLoggingEnabled
     fileprivate static let autoconsentLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Autoconsent")
 
-    fileprivate static let bookmarksLoggingEnabled = false
+    fileprivate static let bookmarksLoggingEnabled = defaultLoggingEnabled
     fileprivate static let bookmarksLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Bookmarks")
 
-    fileprivate static let attributionLoggingEnabled = false
+    fileprivate static let attributionLoggingEnabled = defaultLoggingEnabled
     fileprivate static let attributionLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Ad Attribution")
 
-    fileprivate static let bitwardenLoggingEnabled = false
+    fileprivate static let bitwardenLoggingEnabled = defaultLoggingEnabled
     fileprivate static let bitwardenLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Bitwarden")
 
-    fileprivate static let navigationLoggingEnabled = true
+    fileprivate static let navigationLoggingEnabled = defaultLoggingEnabled
     fileprivate static let navigationLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Navigation")
 
 }

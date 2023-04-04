@@ -1,0 +1,44 @@
+{
+  "configurations" : [
+    {
+      "id" : "98472947-7B4D-44BA-BF41-AA7F52811313",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "commandLineArgumentEntries" : [
+      {
+        "argument" : "-NSConstraintBasedLayoutVisualizeMutuallyExclusiveConstraints YES"
+      },
+      {
+        "argument" : "-com.apple.CoreData.ConcurrencyDebug 1"
+      }
+    ],
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:DuckDuckGo.xcodeproj",
+      "identifier" : "AA585D7D248FD31100E9A3E2",
+      "name" : "DuckDuckGo Privacy Browser"
+    }
+  },
+  "testTargets" : [
+    {
+      "enabled" : false,
+      "target" : {
+        "containerPath" : "container:DuckDuckGo.xcodeproj",
+        "identifier" : "7B4CE8D926F02108009134B1",
+        "name" : "UI Tests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:LocalPackages\/SyncUI",
+        "identifier" : "SyncUITests",
+        "name" : "SyncUITests"
+      }
+    }
+  ],
+  "version" : 1
+}

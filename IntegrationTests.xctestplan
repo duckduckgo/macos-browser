@@ -1,0 +1,43 @@
+{
+  "configurations" : [
+    {
+      "id" : "98472947-7B4D-44BA-BF41-AA7F52811313",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "commandLineArgumentEntries" : [
+      {
+        "argument" : "-NSConstraintBasedLayoutVisualizeMutuallyExclusiveConstraints YES"
+      },
+      {
+        "argument" : "-com.apple.CoreData.ConcurrencyDebug 1"
+      }
+    ]
+  },
+  "testTargets" : [
+    {
+      "skippedTests" : [
+        "CoreDataEncryptionTests\/testSavingIncorrectValueTypes()",
+        "EncryptionKeyStoreTests"
+      ],
+      "target" : {
+        "containerPath" : "container:DuckDuckGo.xcodeproj",
+        "identifier" : "4B1AD89C25FC27E200261379",
+        "name" : "Integration Tests"
+      }
+    },
+    {
+      "enabled" : false,
+      "target" : {
+        "containerPath" : "container:LocalPackages\/SyncUI",
+        "identifier" : "SyncUITests",
+        "name" : "SyncUITests"
+      }
+    }
+  ],
+  "version" : 1
+}
