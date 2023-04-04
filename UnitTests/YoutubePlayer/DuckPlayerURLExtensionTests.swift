@@ -141,6 +141,7 @@ final class DuckPlayerURLExtensionTests: XCTestCase {
 
     func testFailingTest() {
         os_log("args: %s", ProcessInfo().arguments.debugDescription)
+        os_log("args: %s", ProcessInfo().environment.debugDescription)
         os_log("OS_ACTIVITY_MODE: %s %s", ProcessInfo().environment["OS_ACTIVITY_MODE"] ?? "<nil>")
         os_log("OS_LOG_TYPE_DEBUG: %s %s", ProcessInfo().environment["OS_LOG_TYPE_DEBUG"] ?? "<nil>")
 
