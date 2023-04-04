@@ -45,11 +45,19 @@ final class TabCollectionViewModel: NSObject {
 
     /// Pinned tabs collection (provided via `PinnedTabsManager` instance).
     var pinnedTabsCollection: TabCollection? {
-        pinnedTabsManager?.tabCollection
+        if isDisposable {
+            return nil
+        } else {
+            return pinnedTabsManager?.tabCollection
+        }
     }
 
     var allTabsCount: Int {
-        (pinnedTabsCollection?.tabs.count ?? 0) + tabCollection.tabs.count
+        if isDisposable {
+            return tabCollection.tabs.count
+        } else {
+            return (pinnedTabsCollection?.tabs.count ?? 0) + tabCollection.tabs.count
+        }
     }
 
     let isDisposable: Bool
