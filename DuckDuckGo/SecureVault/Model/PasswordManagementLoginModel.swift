@@ -104,8 +104,8 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
             return domain
         }
 
-        let noSchemeOrWWW = domain.dropping(prefix: "https://").dropping(prefix: "http://").droppingWwwPrefix()
-        return URLComponents(string: "https://\(noSchemeOrWWW)")?.host ?? ""
+        let noScheme = domain.dropping(prefix: "https://").dropping(prefix: "http://")
+        return URLComponents(string: "https://\(noScheme)")?.host ?? ""
     }
 
     var lastUpdatedDate: String = ""
@@ -163,7 +163,7 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
     private func populateViewModelFromCredentials() {
         let titleString = credentials?.account.title ?? ""
 
-        title = titleString.isEmpty ? normalizedDomain(credentials?.account.domain ?? "") : titleString
+        title = titleString
         username = credentials?.account.username ?? ""
         password = String(data: credentials?.password ?? Data(), encoding: .utf8) ?? ""
         domain = normalizedDomain(credentials?.account.domain ?? "")
