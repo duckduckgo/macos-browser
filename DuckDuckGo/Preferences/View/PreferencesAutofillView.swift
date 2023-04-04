@@ -70,6 +70,12 @@ extension Preferences {
                     Button(UserText.autofillViewContentButton) {
                         model.showAutofillPopover()
                     }
+#if APPSTORE
+                    Button(UserText.importBrowserData) {
+                        model.openImportBrowserDataWindow()
+                    }
+#endif
+
                 }
 
 #if !APPSTORE
@@ -129,14 +135,6 @@ extension Preferences {
                     .offset(x: Const.pickerHorizontalOffset)
                     TextMenuItemCaption(text: UserText.autofillNeverLockWarning)
                 }
-
-#if APPSTORE
-                PreferencePaneSection {
-                    Button(UserText.importBrowserData) {
-                        model.openImportBrowserDataWindow()
-                    }
-                }
-#endif
             }
         }
 
