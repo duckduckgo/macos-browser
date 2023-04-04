@@ -24,7 +24,7 @@ extension WKWebViewConfiguration {
 
     func applyStandardConfiguration(contentBlocking: some ContentBlockingProtocol, isDisposable: Bool) {
 
-        if isDisposable {
+        if isDisposable, websiteDataStore.isPersistent {
             websiteDataStore = .nonPersistent()
         }
         allowsAirPlayForMediaPlayback = true
