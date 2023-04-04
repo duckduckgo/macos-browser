@@ -115,7 +115,7 @@ jobs:
 
     - name: Build and test
       run: |
-        echo "Runner ${RUNNER_NAME}(${RUNNER_TRACKING_ID})
+        echo "Runner ${RUNNER_NAME}(${RUNNER_TRACKING_ID})"
         if [ $RUNNER_DEBUG ]; then export OS_ACTIVITY_MODE=debug; fi
         set -o pipefail && xcodebuild test \
           -scheme "${{ matrix.scheme }}" \
