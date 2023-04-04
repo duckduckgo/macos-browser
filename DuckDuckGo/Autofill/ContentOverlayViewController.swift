@@ -37,7 +37,9 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
     }()
 
     lazy var vaultManager: SecureVaultManager = {
-        let manager = SecureVaultManager(passwordManager: PasswordManagerCoordinator.shared)
+        let manager = SecureVaultManager(passwordManager: PasswordManagerCoordinator.shared,
+                                         includePartialAccountMatches: true,
+                                         tld: ContentBlocking.shared.tld)
         manager.delegate = self
         return manager
     }()
