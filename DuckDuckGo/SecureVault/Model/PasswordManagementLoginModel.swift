@@ -103,22 +103,9 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
             // Contains some other protocol, so don't mess with it
             return domain
         }
-        
-        var components = URLComponents(string: trimmed)
-        components?.scheme = nil
-        
-        if let port = components?.port,
-            [80, 443].contains(port) {
-            components?.port = nil
-        }
-        
-        if let host = components?.host {
-            if let port = components?.port {
-                return "\(host):\(port)"
-            }
-            return host
-        }
-        return ""
+
+        let noScheme = domain.dropping(prefix: "https://").dropping(prefix: "http://")
+        return URLComponents(string: "https://\(noSchemeOrWWW)")?.host ?? ""
     }
 
     var lastUpdatedDate: String = ""
@@ -176,7 +163,7 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
     private func populateViewModelFromCredentials() {
         let titleString = credentials?.account.title ?? ""
 
-        title = titleString
+        title = titleString.isEmpty ? normalizedDomain(credentials?.account.domain ?? "") : titleString
         username = credentials?.account.username ?? ""
         password = String(data: credentials?.password ?? Data(), encoding: .utf8) ?? ""
         domain = normalizedDomain(credentials?.account.domain ?? "")
