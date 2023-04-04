@@ -66,6 +66,7 @@ public struct UserDefaultsWrapper<T> {
         case currentThemeName = "com.duckduckgo.macos.currentThemeNameKey"
         case showFullURL = "preferences.appearance.show-full-url"
         case showAutocompleteSuggestions = "preferences.appearance.show-autocomplete-suggestions"
+        case defaultPageZoom = "preferences.appearance.default-page-zoom"
 
         // ATB
         case installDate = "statistics.installdate.key"

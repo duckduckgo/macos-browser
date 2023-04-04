@@ -65,6 +65,9 @@ extension Tab: NavigationResponder {
             // add extra headers to SERP requests
             .struct(SerpHeadersNavigationResponder()),
 
+            // redirect to SERP for non-valid domains entered by user
+            .weak(nullable: self.searchForNonexistentDomains),
+
             // ensure Content Blocking Rules are applied before navigation
             .weak(nullable: self.contentBlockingAndSurrogates),
             // update click-to-load state
