@@ -105,7 +105,7 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
         }
 
         let noScheme = domain.dropping(prefix: "https://").dropping(prefix: "http://")
-        return URLComponents(string: "https://\(noSchemeOrWWW)")?.host ?? ""
+        return URLComponents(string: "https://\(noScheme)")?.host ?? ""
     }
 
     var lastUpdatedDate: String = ""
