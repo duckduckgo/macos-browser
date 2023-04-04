@@ -55,11 +55,11 @@
       }
     },
     {
-      "identity" : "openssl",
+      "identity" : "openssl-xcframework",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/krzyzanowskim/OpenSSL",
+      "location" : "https://github.com/duckduckgo/OpenSSL-XCFramework",
       "state" : {
-        "revision" : "52db2ab9de7f78d1dea0d728fddd47fb133e25b7",
+        "revision" : "238e8f700809ff0e1cad5f906cb4c3b0f77f44f9",
         "version" : "1.1.1900"
       }
     },
