@@ -1,4 +1,4 @@
-name: Make Release Build
+name: Make Notarized DMG Release
 
 on: 
   workflow_dispatch:
@@ -11,8 +11,8 @@ on:
         options:
         - review
         - release
-        - review-appstore
-        - release-appstore
+        - review-sandbox
+        - release-sandbox
       create-dmg:
         description: "Create DMG image"
         required: true
