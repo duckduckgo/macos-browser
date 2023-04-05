@@ -38,7 +38,7 @@ enum NetworkProtectionConnectionStatus {
 typealias NetworkProtectionStatusChangeHandler = (NetworkProtectionConnectionStatus) -> Void
 typealias NetworkProtectionConfigChangeHandler = () -> Void
 
-protocol NetworkProtectionProvider {
+protocol NetworkProtectionProvider: NetworkProtection.TunnelController {
 
     // MARK: - Polling Connection State
 

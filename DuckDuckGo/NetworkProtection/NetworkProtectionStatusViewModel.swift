@@ -19,6 +19,7 @@
 import SwiftUI
 import Combine
 import NetworkExtension
+import NetworkProtection
 
 /// This view can be shown from any location where we want the user to be able to interact with NetP.
 /// This view shows status information about Network Protection, and offers a chance to toggle it ON and OFF.
@@ -30,7 +31,7 @@ extension NetworkProtectionStatusView {
     public final class Model: ObservableObject {
         /// The NetP service.
         ///
-        private let networkProtection: NetworkProtectionProvider
+        private let controller: TunnelController
 
         /// The NetP status reporter
         ///
@@ -69,12 +70,12 @@ extension NetworkProtectionStatusView {
 
         // MARK: - Initialization & Deinitialization
 
-        init(networkProtection: NetworkProtectionProvider = DefaultNetworkProtectionProvider(),
+        init(controller: TunnelController,
              networkProtectionStatusReporter: NetworkProtectionStatusReporter = DefaultNetworkProtectionStatusReporter(),
              logger: NetworkProtectionLogger = DefaultNetworkProtectionLogger(),
              runLoopMode: RunLoop.Mode? = nil) {
 
-            self.networkProtection = networkProtection
+            self.controller = controller
             self.networkProtectionStatusReporter = networkProtectionStatusReporter
             self.logger = logger
             self.runLoopMode = runLoopMode
@@ -411,7 +412,7 @@ extension NetworkProtectionStatusView {
         private func startNetworkProtection() {
             Task { @MainActor in
                 do {
-                    try await networkProtection.start()
+                    try await controller.start()
                 } catch {
                     logger.log(error)
                     refreshInternalIsRunning()
@@ -424,7 +425,7 @@ extension NetworkProtectionStatusView {
         private func stopNetworkProtection() {
             Task { @MainActor in
                 do {
-                    try await networkProtection.stop()
+                    try await controller.stop()
                 } catch {
                     logger.log(error)
                     refreshInternalIsRunning()

@@ -19,6 +19,8 @@
 import Foundation
 import Combine
 import SwiftUI
+import NetworkProtection
+import os.log
 
 /// Abstraction of the the Network Protection status bar menu with a simple interface.
 ///
@@ -44,7 +46,8 @@ final class NetworkProtectionStatusBarMenu {
         self.iconPublisher = NetworkProtectionIconPublisher(statusReporter: statusReporter)
 
         let item = NSMenuItem()
-        let model = NetworkProtectionStatusView.Model(runLoopMode: .eventTracking)
+        let model = NetworkProtectionStatusView.Model(controller: AppLaunchingController(appBundleURL: Bundle.main.bundleURL),
+                                                      runLoopMode: .eventTracking)
         let view = NetworkProtectionStatusView(model: model)
         let hostingView = NSHostingView(rootView: view)
         hostingView.translatesAutoresizingMaskIntoConstraints = false

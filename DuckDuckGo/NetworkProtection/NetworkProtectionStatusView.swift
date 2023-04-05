@@ -18,6 +18,7 @@
 
 import SwiftUI
 import Combine
+import NetworkProtection
 
 /// This view helps us fix the height of a view that's meant to be shown inside a `NSHostingView`.
 ///
@@ -111,7 +112,7 @@ public struct NetworkProtectionStatusView: View {
 
     // MARK: - Initializers
 
-    init(model: Model = Model()) {
+    init(model: Model) {
         self.model = model
     }
 
@@ -309,7 +310,24 @@ public struct NetworkProtectionStatusView: View {
 }
 
 struct NetworkProtectionStatusView_Previews: PreviewProvider {
+
+    private class PreviewController: NetworkProtection.TunnelController {
+        func isConnected() async -> Bool {
+            false
+        }
+
+        func start() async throws {
+            print("Preview controller started")
+        }
+
+        func stop() async throws {
+            print("Preview controller stopped")
+        }
+    }
+
     static var previews: some View {
-        NetworkProtectionStatusView(model: NetworkProtectionStatusView.Model())
+        let model = NetworkProtectionStatusView.Model(controller: PreviewController())
+
+        NetworkProtectionStatusView(model: model)
     }
 }

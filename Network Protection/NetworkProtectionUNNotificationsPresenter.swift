@@ -21,18 +21,19 @@ import UserNotifications
 import os
 import AppKit
 import AppIntents
+import NetworkProtection
 
 /// This class takes care of requesting the presentation of notifications using UNNotificationCenter
 ///
 final class NetworkProtectionUNNotificationsPresenter: NSObject, NetworkProtectionNotificationsPresenter {
     private static let threadIdentifier = "com.duckduckgo.NetworkProtectionNotificationsManager.threadIdentifier"
 
+    private let appLauncher: AppLauncher
     private let userNotificationCenter: UNUserNotificationCenter
 
-    private let appLauncher = NetworkProtectionAppLauncher()
+    init(mainAppURL: URL, userNotificationCenter: UNUserNotificationCenter = .current()) {
 
-    init(userNotificationCenter: UNUserNotificationCenter = .current()) {
-
+        self.appLauncher = AppLauncher(appBundleURL: mainAppURL)
         self.userNotificationCenter = userNotificationCenter
 
         super.init()
@@ -114,6 +115,7 @@ extension NetworkProtectionUNNotificationsPresenter: UNUserNotificationCenterDel
     }
 
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse) async {
-        appLauncher.showNetPStatusInApp()
+
+        await appLauncher.launchApp(withCommand: .showStatus)
     }
 }

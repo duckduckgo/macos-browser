@@ -11,7 +11,7 @@ let package = Package(
         .macOS("10.15")
     ],
     products: [
-        .library(name: "NetworkProtection", targets: ["NetworkProtection", "WireGuardC", "WireGuard"])
+        .library(name: "NetworkProtection", targets: ["NetworkProtection"])
     ],
     dependencies: [
         .package(name: "BrowserServicesKit", url: "https://github.com/duckduckgo/BrowserServicesKit", .exact("46.0.1"))
@@ -20,8 +20,8 @@ let package = Package(
         .target(
             name: "NetworkProtection",
             dependencies: [
-                "WireGuardC",
-                "WireGuard",
+                .target(name: "WireGuardC"),
+                .target(name: "WireGuard"),
                 .product(name: "Common", package: "BrowserServicesKit")
             ]
             ),
@@ -36,7 +36,7 @@ let package = Package(
         .testTarget(
             name: "NetworkProtectionTests",
             dependencies: [
-                "NetworkProtection"
+                .target(name: "NetworkProtection")
             ],
             resources: [
                 .copy("Resources/servers-original-endpoint.json"),

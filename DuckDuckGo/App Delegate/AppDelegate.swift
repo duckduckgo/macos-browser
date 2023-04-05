@@ -27,7 +27,6 @@ import ServiceManagement
 import NetworkProtection
 #endif
 
-@NSApplicationMain
 final class AppDelegate: NSObject, NSApplicationDelegate {
 
 #if DEBUG

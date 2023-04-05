@@ -22,7 +22,18 @@ import NetworkExtension
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
 
-    private var notificationsPresenter = NetworkProtectionUNNotificationsPresenter()
+    private let notificationsPresenter = {
+        let parentBundlePath = "../../../../"
+        let mainAppURL: URL
+
+        if #available(macOS 13, *) {
+            mainAppURL = URL(filePath: parentBundlePath, relativeTo: Bundle.main.bundleURL)
+        } else {
+            mainAppURL = URL(fileURLWithPath: parentBundlePath, relativeTo: Bundle.main.bundleURL)
+        }
+
+        return NetworkProtectionUNNotificationsPresenter(mainAppURL: mainAppURL)
+    }()
     private var statusChangeObserverToken: NSObjectProtocol?
     private let ipcConnection = IPCConnection(log: .networkProtectionIPCLoginItemLog, memoryManagementLog: .networkProtectionMemoryLog)
 

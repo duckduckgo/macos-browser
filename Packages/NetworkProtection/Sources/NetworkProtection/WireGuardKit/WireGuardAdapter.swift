@@ -3,7 +3,7 @@
 
 import Foundation
 import NetworkExtension
-import WireGuardC
+@_implementationOnly import WireGuardC
 import WireGuard
 import os
 

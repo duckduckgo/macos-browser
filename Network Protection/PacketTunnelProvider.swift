@@ -73,7 +73,16 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
 #if NETP_SYSTEM_EXTENSION
         NetworkProtectionIPCNotificationsPresenter(ipcConnection: self.ipcConnection)
 #else
-        NetworkProtectionUNNotificationsPresenter()
+        let parentBundlePath = "../../../"
+        let mainAppURL: URL
+
+        if #available(macOS 13, *) {
+            mainAppURL = URL(filePath: parentBundlePath, relativeTo: Bundle.main.bundleURL)
+        } else {
+            mainAppURL = URL(fileURLWithPath: parentBundlePath, relativeTo: Bundle.main.bundleURL)
+        }
+
+        return NetworkProtectionUNNotificationsPresenter(mainAppURL: mainAppURL)
 #endif
     }()
 

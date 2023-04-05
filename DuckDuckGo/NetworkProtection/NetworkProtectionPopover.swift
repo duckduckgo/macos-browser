@@ -43,7 +43,7 @@ final class NetworkProtectionPopover: NSPopover {
         #endif
 
         let provider = DefaultNetworkProtectionProvider()
-        let model = NetworkProtectionStatusView.Model(networkProtection: provider)
+        let model = NetworkProtectionStatusView.Model(controller: provider)
         let view = NetworkProtectionStatusView(model: model)
         let controller = NSHostingController(rootView: view)
 
