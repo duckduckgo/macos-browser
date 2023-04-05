@@ -77,8 +77,10 @@ final class MainMenu: NSMenu {
 
     // MARK: - Debug
 
-    let featureFlagger = DefaultFeatureFlagger(internalUserDecider: internalUserDecider,
-                                               privacyConfig: AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.privacyConfig)
+    lazy var featureFlagger: FeatureFlagger = {
+        DefaultFeatureFlagger(internalUserDecider: (NSApp.delegate as? AppDelegate)!.internalUserDecider,
+                              privacyConfig: AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.privacyConfig)
+    }()
 
     @IBOutlet weak var debugMenuItem: NSMenuItem? {
         didSet {

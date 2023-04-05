@@ -28,6 +28,7 @@ extension FeatureFlag: FeatureFlagSourceProviding {
         switch self {
         case .debugMenu:
             return .internalOnly
+        }
     }
 }
 
