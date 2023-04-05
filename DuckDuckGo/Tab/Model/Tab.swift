@@ -40,9 +40,8 @@ protocol NewWindowPolicyDecisionMaker {
     func decideNewWindowPolicy(for navigationAction: WKNavigationAction) -> NavigationDecision?
 }
 
-// swiftlint:disable type_body_length
-@dynamicMemberLookup
-final class Tab: NSObject, Identifiable, ObservableObject {
+// swiftlint:disable:next type_body_length
+@dynamicMemberLookup final class Tab: NSObject, Identifiable, ObservableObject {
 
     enum TabContent: Equatable {
         case homePage
@@ -185,7 +184,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     private var onNewWindow: ((WKNavigationAction?) -> NavigationDecision)?
 
     private let statisticsLoader: StatisticsLoader?
-    private let internalUserDecider: InternalUserDeciding?
+    private let internalUserDecider: InternalUserDecider?
     let pinnedTabsManager: PinnedTabsManager
 
     private let webViewConfiguration: WKWebViewConfiguration
@@ -276,7 +275,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
          extensionsBuilder: TabExtensionsBuilderProtocol,
          cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter?,
          statisticsLoader: StatisticsLoader?,
-         internalUserDecider: InternalUserDeciding?,
+         internalUserDecider: InternalUserDecider?,
          title: String?,
          favicon: NSImage?,
          interactionStateData: Data?,
@@ -973,8 +972,6 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
 
         return .next
     }
-    // swiftlint:enable cyclomatic_complexity
-    // swiftlint:enable function_body_length
 
     @MainActor
     func willStart(_ navigation: Navigation) {

@@ -19,20 +19,8 @@
 import Foundation
 import Combine
 @testable import DuckDuckGo_Privacy_Browser
+import BrowserServicesKit
 
-class InternalUserDeciderStoreMock: InternalUserDeciderStoring {
-
-    var saveCalled = false
-    var isInternal = false
-    func save(isInternal: Bool) throws {
-        saveCalled = true
-        self.isInternal = isInternal
-    }
-
-    var loadCalled = false
-    func load() throws -> Bool {
-        loadCalled = true
-        return isInternal
-    }
-
+class InternalUserDeciderStoreMock: InternalUserStoring {
+    var isInternalUser: Bool = false
 }

@@ -28,9 +28,9 @@ final public class RecoveryCodeViewModel: ObservableObject {
         }
     }
 
-    public func setCode(_ newCode: String) {
-        if CharacterSet.base64.isSuperset(of: CharacterSet(charactersIn: newCode)) {
-            recoveryCode = newCode
+    func setCode(_ code: String) {
+        if CharacterSet.base64.isSuperset(of: CharacterSet(charactersIn: code)) {
+            recoveryCode = code
         }
     }
 

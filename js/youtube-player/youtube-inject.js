@@ -6,11 +6,14 @@ import {Communications} from "./src/comms";
 
 /**
  * @typedef UserValues - A way to communicate some user state
- * @property {{enabled: {name: string}} | {alwaysAsk:{}} | {disabled:{}}} privatePlayerMode - one of 3 values: 'enabled:{}', 'alwaysAsk:{}', 'disabled:{}'
+ * @property {{enabled: {}} | {alwaysAsk:{}} | {disabled:{}}} privatePlayerMode - one of 3 values: 'enabled:{}', 'alwaysAsk:{}', 'disabled:{}'
  * @property {boolean} overlayInteracted - always a boolean
  */
+const userScriptConfig = $DDGYoutubeUserScriptConfig$;
 
-// const defaultEnvironment =  window.env || {
+/** @type {string[]} */
+const allowedProxyOrigins = userScriptConfig.allowedOrigins.filter(origin => !origin.endsWith('youtube.com'));
+
 const defaultEnvironment = {
     getHref() {
         return window.location.href
@@ -22,17 +25,69 @@ const defaultEnvironment = {
     setHref(href) {
         window.location.href = href;
     },
-    enabled() {
+    overlaysEnabled() {
+        if (userScriptConfig.testMode === "overlay-enabled") {
+            return true;
+        }
         return window.location.hostname === "www.youtube.com"
+    },
+    enabledProxy() {
+        return allowedProxyOrigins.includes(window.location.hostname)
+    },
+    isTestMode() {
+        return typeof userScriptConfig.testMode === "string"
+    },
+    /**
+     * @returns {boolean}
+     */
+    hasOneTimeOverride() {
+        try {
+            // #ddg-play is a hard requirement, regardless of referrer
+            if (window.location.hash !== "#ddg-play") return false
+
+            // double-check that we have something that might be a parseable URL
+            if (typeof document.referrer !== "string") return false
+            if (document.referrer.length === 0) return false; // can be empty!
+
+            const { hostname } = new URL(document.referrer);
+            const isAllowed = allowedProxyOrigins.includes(hostname)
+            return isAllowed;
+        } catch (e) {
+            if (userScriptConfig.testMode) {
+                console.log("could not evaluate hasOneTimeOverride")
+                console.error(e)
+            }
+        }
+        return false
     }
 }
 
-if (defaultEnvironment.enabled()) {
-    const macos = Communications.fromInjectedConfig(
-        // @ts-ignore
-        $WebkitMessagingConfig$
-    )
-    initWithEnvironment(defaultEnvironment, macos)
+if (defaultEnvironment.overlaysEnabled()) {
+    try {
+        const comms = Communications.fromInjectedConfig(
+            userScriptConfig.webkitMessagingConfig
+        )
+        initWithEnvironment(defaultEnvironment, comms)
+    } catch (e) {
+        if (userScriptConfig.testMode) {
+            console.log("failed to init overlays")
+            console.error(e);
+        }
+    }
+}
+
+if (defaultEnvironment.enabledProxy()) {
+    try {
+        const comms = Communications.fromInjectedConfig(
+            userScriptConfig.webkitMessagingConfig
+        )
+        comms.serpProxy();
+    } catch (e) {
+        if (userScriptConfig.testMode) {
+            console.log("failed to init proxy")
+            console.error(e);
+        }
+    }
 }
 
 /**
@@ -40,7 +95,6 @@ if (defaultEnvironment.enabled()) {
  * @param {Communications} comms - methods to communicate with a native backend
  */
 function initWithEnvironment(environment, comms) {
-
     /**
      * Entry point. Until this returns with initial user values, we cannot continue.
      */
@@ -52,7 +106,6 @@ function initWithEnvironment(environment, comms) {
      * @param {UserValues} userValues - user values are state-based things that can update
      */
     function enable(userValues) {
-
         const videoPlayerOverlay = new VideoOverlayManager(userValues, environment, comms);
         videoPlayerOverlay.handleFirstPageLoad();
 

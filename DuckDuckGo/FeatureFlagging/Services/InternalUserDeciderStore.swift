@@ -17,25 +17,11 @@
 //
 
 import Foundation
+import BrowserServicesKit
 
-protocol InternalUserDeciderStoring {
+final class InternalUserDeciderStore: InternalUserStoring {
 
-    func save(isInternal: Bool) throws
-
-    // Returns isInternal Bool value
-    func load() throws -> Bool
-
-}
-
-enum InternalUserDeciderStoreError: Error {
-
-    case savingFailed
-    case loadingFailed
-    case decodingFailed
-
-}
-
-final class InternalUserDeciderStore {
+    private let store: FileStore
 
     static var fileURL: URL {
         return URL.sandboxApplicationSupportURL.appendingPathComponent("internalUserDeciderStore")
@@ -43,31 +29,42 @@ final class InternalUserDeciderStore {
 
     init(fileStore: FileStore) {
         store = fileStore
+        isInternalUser = store.load(url: Self.fileURL)
     }
 
-    private var store: FileStore
+    var isInternalUser: Bool {
+        didSet {
+            // Optimisation below prevents from 2 unnecesary events:
+            // 1) Rewriting of the file with the same value
+            // 2) Also from initial saving of the false value to the disk
+            // which is unnecessary since it is the default value.
+            // It helps to load the app for majority of users (external) faster
+            if oldValue != isInternalUser {
+                save(isInternal: isInternalUser)
+            }
+        }
+    }
+
+    private func save(isInternal: Bool) {
+        guard store.persist(isInternal.data, url: Self.fileURL) else {
+            assertionFailure()
+            return
+        }
+    }
 }
 
-extension InternalUserDeciderStore: InternalUserDeciderStoring {
-
-    func save(isInternal: Bool) throws {
-        guard store.persist(isInternal.data, url: Self.fileURL) else {
-            throw InternalUserDeciderStoreError.savingFailed
+fileprivate extension FileStore {
+    func load(url: URL) -> Bool {
+        guard let data = loadData(at: url) else {
+            return false
         }
+
+        guard let boolValue = Bool(data: data) else {
+            return false
+        }
+
+        return boolValue
     }
-
-    func load() throws -> Bool {
-        guard let data = store.loadData(at: Self.fileURL) else {
-            throw InternalUserDeciderStoreError.loadingFailed
-        }
-
-        guard let isInternal = Bool(data: data) else {
-            throw InternalUserDeciderStoreError.decodingFailed
-        }
-
-        return isInternal
-    }
-
 }
 
 fileprivate extension Bool {
