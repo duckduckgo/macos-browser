@@ -29,14 +29,6 @@
         "identifier" : "4B1AD89C25FC27E200261379",
         "name" : "Integration Tests"
       }
-    },
-    {
-      "enabled" : false,
-      "target" : {
-        "containerPath" : "container:LocalPackages\/SyncUI",
-        "identifier" : "SyncUITests",
-        "name" : "SyncUITests"
-      }
     }
   ],
   "version" : 1
