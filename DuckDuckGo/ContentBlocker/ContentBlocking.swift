@@ -80,7 +80,7 @@ final class AppContentBlocking {
                                                             exceptionsSource: exceptionsSource,
                                                             cache: ContentBlockingRulesCache(),
                                                             errorReporting: Self.debugEvents,
-                                                            logger: OSLog.contentBlocking)
+                                                            log: .contentBlocking)
         userContentUpdating = UserContentUpdating(contentBlockerRulesManager: contentBlockingManager,
                                                   privacyConfigurationManager: privacyConfigurationManager,
                                                   trackerDataManager: trackerDataManager,
@@ -92,7 +92,8 @@ final class AppContentBlocking {
                                                                           compiledRulesSource: contentBlockingManager,
                                                                           exceptionsSource: exceptionsSource,
                                                                           errorReporting: attributionDebugEvents,
-                                                                          compilationErrorReporting: Self.debugEvents)
+                                                                          compilationErrorReporting: Self.debugEvents,
+                                                                          log: .attribution)
     }
 
     private static let debugEvents = EventMapping<ContentBlockerDebugEvents> { event, error, parameters, onComplete in

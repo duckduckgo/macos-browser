@@ -60,13 +60,13 @@ final class AppPrivacyFeatures: PrivacyFeaturesProtocol {
 
     convenience init(contentBlocking: AnyContentBlocking, database: CoreDataDatabase) {
         let bloomFilterDataURL = URL.sandboxApplicationSupportURL.appendingPathComponent("HttpsBloomFilter.bin")
-        let httpsUpgradeStore = AppHTTPSUpgradeStore(database: database, bloomFilterDataURL: bloomFilterDataURL, embeddedResources: Self.embeddedBloomFilterResources, errorEvents: Self.httpsUpgradeDebugEvents)
+        let httpsUpgradeStore = AppHTTPSUpgradeStore(database: database, bloomFilterDataURL: bloomFilterDataURL, embeddedResources: Self.embeddedBloomFilterResources, errorEvents: Self.httpsUpgradeDebugEvents, log: .httpsUpgrade)
         self.init(contentBlocking: contentBlocking, httpsUpgradeStore: httpsUpgradeStore)
     }
 
     init(contentBlocking: AnyContentBlocking, httpsUpgradeStore: HTTPSUpgradeStore) {
         self.contentBlocking = contentBlocking
-        self.httpsUpgrade = HTTPSUpgrade(store: httpsUpgradeStore, privacyManager: contentBlocking.privacyConfigurationManager)
+        self.httpsUpgrade = HTTPSUpgrade(store: httpsUpgradeStore, privacyManager: contentBlocking.privacyConfigurationManager, log: .httpsUpgrade)
     }
 
 }

@@ -60,6 +60,24 @@ struct UTType: RawRepresentable, Hashable {
         }
     }()
 
+    static let text = {
+        if let utType = UTType(fileExtension: "txt") { return utType }
+        if #available(macOS 11.0, *) {
+            return UTType(rawValue: UniformTypeIdentifiers.UTType.text.identifier as CFString)
+        } else {
+            return UTType(rawValue: kUTTypeText)
+        }
+    }()
+
+    static let log = {
+        if let utType = UTType(fileExtension: "log") { return utType }
+        if #available(macOS 11.0, *) {
+            return UTType(rawValue: UniformTypeIdentifiers.UTType.log.identifier as CFString)
+        } else {
+            return UTType(rawValue: kUTTypeLog)
+        }
+    }()
+
     var rawValue: CFString
     init(rawValue: CFString) {
         self.rawValue = rawValue
