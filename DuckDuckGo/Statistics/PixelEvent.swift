@@ -113,6 +113,7 @@ extension Pixel {
         case emailUserCreatedAlias
 
         case jsPixel(_ pixel: AutofillUserScript.JSPixel)
+        case duckPlayerJSPixel(_ pixel: YoutubeOverlayUserScript.JSPixel)
 
         enum BookmarksBarSource {
             case menuBar
@@ -317,6 +318,10 @@ extension Pixel.Event {
             } else {
                 return "m_mac_\(pixel.pixelName)"
             }
+
+        // This matches the SERP format
+        case .duckPlayerJSPixel(let pixel):
+            return "duck_player.mac.\(pixel.pixelName)"
 
         case .bookmarksBarEnabled:
             return "m_mac_bookmarks_bar_enabled"

@@ -156,6 +156,7 @@ final class TabCollectionViewModel: NSObject {
 
         let isTabCurrentlySelected = selectedTabViewModel?.tab.content.matchesDisplayableTab(content) ?? false
         if isTabCurrentlySelected {
+            selectedTabViewModel?.tab.setContent(content)
             return true
         }
 

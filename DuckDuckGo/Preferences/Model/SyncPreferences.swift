@@ -130,6 +130,9 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         }
 
         onEndFlow = {
+            self.connector?.stopPolling()
+            self.connector = nil
+
             guard let window = syncWindowController.window, let sheetParent = window.sheetParent else {
                 assertionFailure("window or sheet parent not present")
                 return
@@ -144,9 +147,22 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
 
     private let syncService: DDGSyncing
     private var cancellables = Set<AnyCancellable>()
+    private var connector: RemoteConnecting?
 }
 
 extension SyncPreferences: ManagementDialogModelDelegate {
+
+    private func deviceInfo() -> (name: String, type: String) {
+        let hostname = SCDynamicStoreCopyComputerName(nil, nil) as? String ?? ProcessInfo.processInfo.hostName
+        return (name: hostname, type: "desktop")
+    }
+
+    @MainActor
+    private func login(_ recoveryKey: SyncCode.RecoveryKey) async throws {
+        let device = deviceInfo()
+        try await syncService.login(recoveryKey, deviceName: device.name, deviceType: device.type)
+        managementDialogModel.endFlow()
+    }
 
     func turnOnSync() {
         presentDialog(for: .askToSyncAnotherDevice)
@@ -155,8 +171,8 @@ extension SyncPreferences: ManagementDialogModelDelegate {
     func dontSyncAnotherDeviceNow() {
         Task { @MainActor in
             do {
-                let hostname = SCDynamicStoreCopyComputerName(nil, nil) as? String ?? ProcessInfo.processInfo.hostName
-                try await syncService.createAccount(deviceName: hostname, deviceType: "desktop")
+                let device = deviceInfo()
+                try await syncService.createAccount(deviceName: device.name, deviceType: device.type)
             } catch {
                 managementDialogModel.errorMessage = String(describing: error)
             }
@@ -171,9 +187,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                     return
                 }
 
-                let hostname = SCDynamicStoreCopyComputerName(nil, nil) as? String ?? ProcessInfo.processInfo.hostName
-                try await syncService.login(recoveryKey, deviceName: hostname, deviceType: "desktop")
-                managementDialogModel.endFlow()
+                try await login(recoveryKey)
             } catch {
                 managementDialogModel.errorMessage = String(describing: error)
             }
@@ -181,10 +195,25 @@ extension SyncPreferences: ManagementDialogModelDelegate {
     }
 
     func presentSyncAnotherDeviceDialog() {
-        presentDialog(for: .syncAnotherDevice)
+        Task { @MainActor in
+            do {
+                self.connector = try syncService.remoteConnect()
+                managementDialogModel.connectCode = connector?.code
+                presentDialog(for: .syncAnotherDevice)
+                if let recoveryKey = try await connector?.pollForRecoveryKey() {
+                    try await login(recoveryKey)
+                } else {
+                    // Polling was likeley cancelled elsewhere (e.g. dialog closed)
+                    return
+                }
+                managementDialogModel.endFlow()
+            } catch {
+                managementDialogModel.errorMessage = String(describing: error)
+            }
+        }
     }
 
-    func addAnotherDevice(using recoveryCode: String) {
+    func addAnotherDevice() {
         presentDialog(for: .deviceSynced)
     }
 
@@ -195,4 +224,5 @@ extension SyncPreferences: ManagementDialogModelDelegate {
     func saveRecoveryPDF() {
         managementDialogModel.endFlow()
     }
+
 }
