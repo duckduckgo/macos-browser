@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import BrowserServicesKit
 import Foundation
 import CoreData
 import Persistence
@@ -38,7 +39,7 @@ final class Database {
     }()
 
     static func makeDatabase() -> (CoreDataDatabase?, Error?) {
-        func makeDatabase(keyStore: EncryptionKeyStoring) -> (CoreDataDatabase?, Error?) {
+        func makeDatabase(keyStore: EncryptionKeyStoring, containerLocation: URL) -> (CoreDataDatabase?, Error?) {
             do {
                 try EncryptedValueTransformer<NSImage>.registerTransformer(keyStore: keyStore)
                 try EncryptedValueTransformer<NSString>.registerTransformer(keyStore: keyStore)
@@ -49,17 +50,28 @@ final class Database {
             } catch {
                 return (nil, error)
             }
+            let mainModel = NSManagedObjectModel.mergedModel(from: [.main])!
+            let httpsUpgradeModel = HTTPSUpgrade.managedObjectModel
 
             return (CoreDataDatabase(name: Constants.databaseName,
-                                     containerLocation: URL.sandboxApplicationSupportURL,
-                                     model: NSManagedObjectModel.mergedModel(from: [.main])!), nil)
+                                     containerLocation: containerLocation,
+                                     model: .init(byMerging: [mainModel, httpsUpgradeModel])!), nil)
         }
-
 #if DEBUG
-        assert(!AppDelegate.isRunningTests, "Use CoreData.---Container() methods for testing purposes")
+        assert(!NSApp.isRunningUnitTests, "Use CoreData.---Container() methods for testing purposes")
 #endif
 
-        return makeDatabase(keyStore: EncryptionKeyStore(generator: EncryptionKeyGenerator()))
+        let keyStore: EncryptionKeyStoring
+        let containerLocation: URL
+#if CI
+        keyStore = (NSClassFromString("MockEncryptionKeyStore") as? EncryptionKeyStoring.Type)!.init()
+        containerLocation = FileManager.default.temporaryDirectory
+#else
+        keyStore = EncryptionKeyStore(generator: EncryptionKeyGenerator())
+        containerLocation = URL.sandboxApplicationSupportURL
+#endif
+
+        return makeDatabase(keyStore: keyStore, containerLocation: containerLocation)
     }
 
     // MARK: - Pixel

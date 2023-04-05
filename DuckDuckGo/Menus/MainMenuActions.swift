@@ -235,13 +235,13 @@ extension MainViewController {
     // MARK: - Main Menu
 
     @IBAction func openPreferences(_ sender: Any?) {
-        browserTabViewController.openNewTab(with: .anyPreferencePane, selected: true)
+        browserTabViewController.openNewTab(with: .anyPreferencePane)
     }
 
     // MARK: - File
 
     @IBAction func newTab(_ sender: Any?) {
-        browserTabViewController.openNewTab(with: .homePage, selected: true)
+        browserTabViewController.openNewTab(with: .homePage)
     }
 
     @IBAction func openLocation(_ sender: Any?) {
@@ -331,8 +331,16 @@ extension MainViewController {
         navigationBarViewController?.toggleDownloadsPopover(keepButtonVisible: false)
     }
 
-    @IBAction func toggleBookmarksBar(_ sender: Any) {
+    @IBAction func toggleBookmarksBarFromMenu(_ sender: Any) {
+        let usingKeyboardShortcut = NSApp.currentEvent?.type == .keyDown
+
         PersistentAppInterfaceSettings.shared.showBookmarksBar.toggle()
+
+        if PersistentAppInterfaceSettings.shared.showBookmarksBar {
+            Pixel.fire(.bookmarksBarEnabled(usingKeyboardShortcut ? .keyboardShortcut : .menuBar))
+        } else {
+            Pixel.fire(.bookmarksBarDisabled(usingKeyboardShortcut ? .keyboardShortcut : .menuBar))
+        }
     }
 
     @IBAction func toggleAutofillShortcut(_ sender: Any) {
@@ -369,7 +377,7 @@ extension MainViewController {
 
     @IBAction func home(_ sender: Any?) {
         guard view.window?.isPopUpWindow == false else {
-            browserTabViewController.openNewTab(with: .homePage, selected: true)
+            browserTabViewController.openNewTab(with: .homePage)
             return
         }
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
@@ -472,7 +480,7 @@ extension MainViewController {
     }
 
     @IBAction func showManageBookmarks(_ sender: Any?) {
-        browserTabViewController.openNewTab(with: .bookmarks, selected: true)
+        browserTabViewController.openNewTab(with: .bookmarks)
     }
 
     // MARK: - Window
@@ -637,8 +645,8 @@ extension MainViewController {
         tabCollectionViewModel.pinnedTabsManager?.tabCollection.removeAll()
     }
 
-    @IBAction func resetPrivatePlayerOverlayInteractions(_ sender: Any?) {
-        PrivatePlayerPreferences.shared.youtubeOverlayInteracted = false
+    @IBAction func resetDuckPlayerOverlayInteractions(_ sender: Any?) {
+        DuckPlayerPreferences.shared.youtubeOverlayInteracted = false
     }
 
     @IBAction func showSaveCredentialsPopover(_ sender: Any?) {
@@ -654,8 +662,7 @@ extension MainViewController {
     }
 
     @IBAction func fetchConfigurationNow(_ sender: Any?) {
-        ConfigurationManager.shared.lastUpdateTime = .distantPast
-        ConfigurationManager.shared.refreshIfNeeded()
+        ConfigurationManager.shared.forceRefresh()
     }
 
     // MARK: - Developer Tools

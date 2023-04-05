@@ -17,6 +17,7 @@
 //
 
 import SwiftUI
+import SwiftUIExtensions
 
 extension Preferences {
 
@@ -87,18 +88,36 @@ extension Preferences {
                 Text(UserText.appearance)
                     .font(Const.Fonts.preferencePaneTitle)
 
-                Section {
+                PreferencePaneSection {
                     Text(UserText.theme)
                         .font(Const.Fonts.preferencePaneSectionHeader)
                     ThemePicker()
                         .environmentObject(model)
                 }
 
-                Section {
+                PreferencePaneSection {
                     Text(UserText.addressBar)
                         .font(Const.Fonts.preferencePaneSectionHeader)
                     Toggle(UserText.showFullWebsiteAddress, isOn: $model.showFullURL)
                     Toggle(UserText.showAutocompleteSuggestions, isOn: $model.showAutocompleteSuggestions)
+                }
+
+                PreferencePaneSection {
+                    Text(UserText.zoomSettingTitle)
+                        .font(Const.Fonts.preferencePaneSectionHeader)
+                    HStack {
+                        Text(UserText.zoomPickerTitle)
+                        NSPopUpButtonView(selection: $model.defaultPageZoom) {
+                            let button = NSPopUpButton()
+                            button.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+
+                            for value in DefaultZoomValue.allCases {
+                                let item = button.menu?.addItem(withTitle: value.displayString, action: nil, keyEquivalent: "")
+                                item?.representedObject = value
+                            }
+                            return button
+                        }
+                    }
                 }
             }
         }

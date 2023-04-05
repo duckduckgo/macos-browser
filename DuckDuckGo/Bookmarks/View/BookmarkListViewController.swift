@@ -325,11 +325,7 @@ extension BookmarkListViewController: BookmarkMenuItemSelectors {
             assertionFailure("Failed to cast menu represented object to Bookmark")
             return
         }
-
-        let pasteboard = NSPasteboard.general
-        pasteboard.declareTypes([.URL], owner: nil)
-        (bookmark.urlObject as NSURL?)?.write(to: pasteboard)
-        pasteboard.setString(bookmark.url, forType: .string)
+        bookmark.copyUrlToPasteboard()
     }
 
     func deleteBookmark(_ sender: NSMenuItem) {
@@ -363,8 +359,12 @@ extension BookmarkListViewController: FolderMenuItemSelectors {
             assertionFailure("Failed to retrieve Bookmark from Rename Folder context menu item")
             return
         }
+
+        delegate?.popover(shouldPreventClosure: true)
+
         let addFolderViewController = AddFolderModalViewController.create()
         addFolderViewController.edit(folder: folder)
+        addFolderViewController.delegate = self
         beginSheetFromMainWindow(addFolderViewController)
     }
 

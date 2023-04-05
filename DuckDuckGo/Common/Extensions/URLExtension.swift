@@ -124,6 +124,11 @@ extension URL {
         return Self.preferences.appendingPathComponent(pane.rawValue)
     }
 
+    var isHypertextURL: Bool {
+        guard let scheme = self.scheme.map(NavigationalScheme.init(rawValue:)) else { return false }
+        return NavigationalScheme.validSchemes.contains(scheme)
+    }
+
     // MARK: Pixel
 
     static let pixelBase = ProcessInfo.processInfo.environment["PIXEL_BASE_URL", default: "https://improving.duckduckgo.com"]
@@ -184,6 +189,10 @@ extension URL {
         func separated() -> String {
             self.rawValue + "."
         }
+    }
+
+    var navigationalScheme: NavigationalScheme? {
+        self.scheme.map(NavigationalScheme.init(rawValue:))
     }
 
     var separatedScheme: String? {

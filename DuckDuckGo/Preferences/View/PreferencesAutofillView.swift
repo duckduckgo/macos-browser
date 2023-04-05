@@ -17,6 +17,7 @@
 //
 
 import SwiftUI
+import SwiftUIExtensions
 
 fileprivate extension Preferences.Const {
     static let autoLockWarningOffset: CGFloat = {
@@ -63,10 +64,16 @@ extension Preferences {
                 Text(UserText.autofill)
                     .font(Const.Fonts.preferencePaneTitle)
 
+                // Autofill Content  Button
+                PreferencePaneSection {
+                    Button(UserText.autofillViewContentButton) {
+                        model.showAutofillPopover()
+                    }
+                }
+
 #if !APPSTORE
                 // Password Manager:
-
-                Section(spacing: 0) {
+                PreferencePaneSection(spacing: 0) {
                     Text(UserText.autofillPasswordManager)
                         .font(Const.Fonts.preferencePaneSectionHeader)
                         .padding(.bottom, 6)
@@ -95,7 +102,7 @@ extension Preferences {
 
                 // Ask to Save:
 
-                Section(spacing: 0) {
+                PreferencePaneSection(spacing: 0) {
                     Text(UserText.autofillAskToSave)
                         .font(Const.Fonts.preferencePaneSectionHeader)
                         .padding(.bottom, 6)
@@ -118,7 +125,7 @@ extension Preferences {
 
                 // Auto-Lock:
 
-                Section(spacing: 0) {
+                PreferencePaneSection(spacing: 0) {
                     Text(UserText.autofillAutoLock)
                         .font(Const.Fonts.preferencePaneSectionHeader)
                         .padding(.bottom, 12)
@@ -151,7 +158,7 @@ extension Preferences {
                         .offset(x: Const.autoLockWarningOffset)
                 }
 
-                Section(spacing: 0) {
+                PreferencePaneSection(spacing: 0) {
                     Button(UserText.importBrowserData) {
                         model.openImportBrowserDataWindow()
                     }

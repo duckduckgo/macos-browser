@@ -18,7 +18,7 @@
 
 import Cocoa
 
-final class ColorView: NSView {
+internal class ColorView: NSView {
 
     required init?(coder: NSCoder) {
         super.init(coder: coder)

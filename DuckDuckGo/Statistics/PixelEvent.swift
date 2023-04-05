@@ -19,6 +19,7 @@
 import Foundation
 import BrowserServicesKit
 import Bookmarks
+import Configuration
 
 extension Pixel {
 
@@ -112,6 +113,29 @@ extension Pixel {
         case emailUserCreatedAlias
 
         case jsPixel(_ pixel: AutofillUserScript.JSPixel)
+        case duckPlayerJSPixel(_ pixel: YoutubeOverlayUserScript.JSPixel)
+
+        enum BookmarksBarSource {
+            case menuBar
+            case navigationBar
+            case bookmarksBar
+            case keyboardShortcut
+
+            var string: String {
+                switch self {
+                case .menuBar: return "menu-bar"
+                case .navigationBar: return "navigation-bar"
+                case .bookmarksBar: return "bookmarks-bar"
+                case .keyboardShortcut: return "keyboard-shortcut"
+                }
+            }
+        }
+
+        case bookmarksBarEnabled(_ source: BookmarksBarSource)
+        case bookmarksBarDisabled(_ source: BookmarksBarSource)
+
+        case bookmarksBarActive
+        case bookmarksBarInactive
 
         case debug(event: Debug, error: Error? = nil)
 
@@ -223,6 +247,9 @@ extension Pixel {
             case bookmarksMigrationCouldNotPrepareDatabase
             case bookmarksMigrationCouldNotPrepareDatabaseOnFailedMigration
             case bookmarksMigrationCouldNotRemoveOldStore
+
+            case invalidPayload(Configuration)
+
         }
 
     }
@@ -291,6 +318,22 @@ extension Pixel.Event {
             } else {
                 return "m_mac_\(pixel.pixelName)"
             }
+
+        // This matches the SERP format
+        case .duckPlayerJSPixel(let pixel):
+            return "duck_player.mac.\(pixel.pixelName)"
+
+        case .bookmarksBarEnabled:
+            return "m_mac_bookmarks_bar_enabled"
+
+        case .bookmarksBarDisabled:
+            return "m_mac_bookmarks_bar_disabled"
+
+        case .bookmarksBarActive:
+            return "m_mac_bookmarks_bar_active"
+
+        case .bookmarksBarInactive:
+            return "m_mac_bookmarks_bar_inactive"
         }
     }
 }
@@ -408,7 +451,7 @@ extension Pixel.Event.Debug {
         case .adAttributionLogicUnexpectedStateOnRulesCompiled:
             return "ad_attribution_logic_unexpected_state_on_rules_compiled"
         case .adAttributionLogicUnexpectedStateOnInheritedAttribution:
-            return "ad_attribution_logic_unexpected_state_on_inherited_attribution"
+            return "ad_attribution_logic_unexpected_state_on_inherited_attribution_2"
         case .adAttributionLogicUnexpectedStateOnRulesCompilationFailed:
             return "ad_attribution_logic_unexpected_state_on_rules_compilation_failed"
         case .adAttributionDetectionInvalidDomainInParameter:
@@ -489,6 +532,9 @@ extension Pixel.Event.Debug {
         case .bookmarksMigrationCouldNotPrepareDatabaseOnFailedMigration:
             return "bookmarks_migration_could_not_prepare_database_on_failed_migration"
         case .bookmarksMigrationCouldNotRemoveOldStore: return "bookmarks_migration_could_not_remove_old_store"
+
+        case .invalidPayload(let configuration): return "m_d_\(configuration.rawValue)_invalid_payload".lowercased()
+
         }
     }
 }

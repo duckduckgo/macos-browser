@@ -166,7 +166,6 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
             }
         }.resume()
     }
-    // swiftlint:enable function_parameter_count
 
     public func emailManagerKeychainAccessFailed(accessType: EmailKeychainAccessType, error: EmailKeychainAccessError) {
         var parameters = [
