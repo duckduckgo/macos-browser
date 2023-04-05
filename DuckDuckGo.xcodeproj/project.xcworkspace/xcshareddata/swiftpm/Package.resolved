@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "dominik/grdb-2.1.1",
-        "revision" : "4d9c472059ee409ae472bb01c4753d73ebf67a46"
+        "revision" : "ed1ff65e2038a89b0588e7df8a43fca2c3b56a51",
+        "version" : "54.1.1"
       }
     },
     {
