@@ -115,7 +115,7 @@ enum SecureVaultItem: Equatable, Identifiable, Comparable {
     var displayTitle: String {
         switch self {
         case .account(let account):
-            return ((account.title ?? "").isEmpty == true ? account.domain.droppingWwwPrefix() : account.title) ?? ""
+            return ((account.title ?? "").isEmpty == true ? account.domain : account.title) ?? ""
         case .card(let card):
             return card.title
         case .identity(let identity):
@@ -312,7 +312,7 @@ final class PasswordManagementItemListModel: ObservableObject {
 
     func selectLoginWithDomainOrFirst(domain: String, notify: Bool = true) {
         for section in displayedItems {
-            if let account = section.items.first(where: { $0.websiteAccount?.domain.droppingWwwPrefix() == domain.droppingWwwPrefix() }) {
+            if let account = section.items.first(where: { $0.websiteAccount?.domain == domain }) {
                 selected(item: account, notify: notify)
                 return
             }

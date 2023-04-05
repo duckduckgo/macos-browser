@@ -340,12 +340,12 @@ private struct HeaderView: View {
 
             if model.isNew || model.isEditing {
 
-                TextField(model.domain.droppingWwwPrefix(), text: $model.title)
+                TextField(model.domain, text: $model.title)
                     .font(.title)
 
             } else {
 
-                Text(model.title.isEmpty ? model.domain.droppingWwwPrefix() : model.title)
+                Text(model.title.isEmpty ? model.domain : model.title)
                     .font(.title)
 
             }
