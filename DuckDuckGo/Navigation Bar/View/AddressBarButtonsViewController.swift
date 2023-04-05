@@ -267,7 +267,7 @@ final class AddressBarButtonsViewController: NSViewController {
     private func updateBookmarkButtonVisibility() {
         guard view.window?.isPopUpWindow == false else { return }
 
-        let hasEmptyAddressBar = tabCollectionViewModel.selectedTabViewModel?.addressBarString.isEmpty ?? true
+        let hasEmptyAddressBar = textFieldValue?.isEmpty ?? true
         var isUrlBookmarked = false
         if let url = tabCollectionViewModel.selectedTabViewModel?.tab.content.url,
             bookmarkManager.isUrlBookmarked(url: url) {
