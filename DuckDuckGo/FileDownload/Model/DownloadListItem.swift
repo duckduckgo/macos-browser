@@ -29,6 +29,8 @@ struct DownloadListItem: Equatable {
 
     var progress: Progress?
 
+    let isDisposable: Bool
+
     var fileType: UTType? {
         didSet {
             guard fileType != oldValue else { return }

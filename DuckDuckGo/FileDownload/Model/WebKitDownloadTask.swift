@@ -35,6 +35,7 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
 
     let progress: Progress
     let shouldPromptForLocation: Bool
+    let isDisposable: Bool
 
     private(set) var suggestedFilename: String?
     private(set) var suggestedFileType: UTType?
@@ -79,12 +80,13 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
         download.webView
     }
 
-    init(download: WebKitDownload, promptForLocation: Bool, destinationURL: URL?, tempURL: URL?) {
+    init(download: WebKitDownload, promptForLocation: Bool, destinationURL: URL?, tempURL: URL?, isDisposable: Bool) {
 
         self.download = download
         self.progress = Progress(totalUnitCount: -1)
         self.shouldPromptForLocation = promptForLocation
         self.location = .init(destinationURL: destinationURL, tempURL: tempURL)
+        self.isDisposable = isDisposable
         super.init()
 
         download.delegate = self

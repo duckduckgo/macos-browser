@@ -151,7 +151,9 @@ extension TabExtensionsBuilder {
         }
 
         add {
-            DownloadsTabExtension(downloadManager: dependencies.downloadManager)
+            DownloadsTabExtension(downloadManager:
+                                    dependencies.downloadManager,
+                                  isDisposable: args.isTabDisposable)
         }
         add {
             HistoryTabExtension(isDisposable: args.isTabDisposable,

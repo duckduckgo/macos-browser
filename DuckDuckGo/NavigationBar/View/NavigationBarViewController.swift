@@ -409,12 +409,18 @@ final class NavigationBarViewController: NSViewController {
                 let shouldShowPopover = update.kind == .updated
                     && update.item.destinationURL != nil
                     && update.item.tempURL == nil
+                    && !update.item.isDisposable
                     && WindowControllersManager.shared.lastKeyMainWindowController?.window === self.downloadsButton.window
 
                 if shouldShowPopover {
                     self.popovers.showDownloadsPopoverAndAutoHide(usingView: self.downloadsButton,
                                                                   popoverDelegate: self,
                                                                   downloadsDelegate: self)
+                } else {
+                    if update.item.isDisposable {
+                        invalidateDownloadButtonHidingTimer()
+                        updateDownloadsButton(updatingFromPinnedViewsNotification: false)
+                    }
                 }
                 self.updateDownloadsButton()
             }

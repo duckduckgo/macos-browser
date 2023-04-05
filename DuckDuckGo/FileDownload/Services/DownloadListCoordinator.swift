@@ -173,6 +173,11 @@ final class DownloadListCoordinator {
         dispatchPrecondition(condition: .onQueue(.main))
 
         updateItem(withId: identifier) { item in
+            if item?.isDisposable ?? false {
+                item = nil
+                return
+            }
+
             if case .failure(let error) = result {
                 item?.error = error
             }
@@ -217,7 +222,9 @@ final class DownloadListCoordinator {
                     return
                 }
 
-                let task = self.downloadManager.add(download, location: .preset(destinationURL: destinationURL, tempURL: item.tempURL))
+                let task = self.downloadManager.add(download,
+                                                    fromDisposableWindow: item.isDisposable,
+                                                    location: .preset(destinationURL: destinationURL, tempURL: item.tempURL))
                 self.subscribeToDownloadTask(task, updating: item)
             }
         }
@@ -325,6 +332,7 @@ private extension DownloadListItem {
                   url: task.originalRequest?.url ?? .blankPage,
                   websiteURL: task.originalRequest?.mainDocumentURL,
                   progress: task.progress,
+                  isDisposable: task.isDisposable,
                   destinationURL: nil,
                   tempURL: nil,
                   error: nil)
