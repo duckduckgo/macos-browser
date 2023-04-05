@@ -291,8 +291,10 @@ final class MainMenu: NSMenu {
         let debugLoggingMenuItem = NSMenuItem(title: OSLog.isRunningInDebugEnvironment ? "Disable DEBUG level logging…" : "Enable DEBUG level logging…", action: #selector(debugLoggingMenuItemAction), target: self)
         menu.addItem(debugLoggingMenuItem)
 
-        let exportLogsMenuItem = NSMenuItem(title: "Save Logs…", action: #selector(exportLogs), target: self)
-        menu.addItem(exportLogsMenuItem)
+        if #available(macOS 12.0, *) {
+            let exportLogsMenuItem = NSMenuItem(title: "Save Logs…", action: #selector(exportLogs), target: self)
+            menu.addItem(exportLogsMenuItem)
+        }
 
         return menu
     }()
@@ -359,6 +361,7 @@ final class MainMenu: NSMenu {
         }
     }
 
+    @available(macOS 12.0, *)
     @objc private func exportLogs(_ sender: NSMenuItem) {
         let displayName = Bundle.main.displayName!.replacingOccurrences(of: " ", with: "")
 
