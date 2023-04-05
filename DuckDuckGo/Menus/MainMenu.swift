@@ -21,6 +21,7 @@ import Combine
 import os.log
 import OSLog
 import WebKit
+import BrowserServicesKit
 
 final class MainMenu: NSMenu {
 
@@ -75,11 +76,15 @@ final class MainMenu: NSMenu {
     @IBOutlet weak var toggleDownloadsShortcutMenuItem: NSMenuItem?
 
     // MARK: - Debug
+
+    let featureFlagger = DefaultFeatureFlagger(internalUserDecider: internalUserDecider,
+                                               privacyConfig: AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.privacyConfig)
+
     @IBOutlet weak var debugMenuItem: NSMenuItem? {
         didSet {
             guard let debugMenuItem else { return }
 #if !DEBUG && !REVIEW
-            guard internalUserDecider.isInternalUser else {
+            guard featureFlagger.isFeatureOn(.debugMenu) else {
                 removeItem(item)
                 self.debugMenuItem = nil
                 return
