@@ -22,6 +22,7 @@ import os
 import BrowserServicesKit
 import Configuration
 import Common
+import Networking
 
 @MainActor
 final class ConfigurationManager {
@@ -155,6 +156,12 @@ final class ConfigurationManager {
     }
 
     private func handleRefreshError(_ error: Swift.Error) {
+        // Avoid firing a configuration fetch error pixel when we received a 304 status code.
+        // A 304 status code is expected when we request the config with an ETag that matches the current remote version.
+        if case APIRequest.Error.invalidStatusCode(304) = error {
+            return
+        }
+
         os_log("Failed to complete configuration update %@", log: .config, type: .error, error.localizedDescription)
         Pixel.fire(.debug(event: .configurationFetchError, error: error))
         tryAgainSoon()

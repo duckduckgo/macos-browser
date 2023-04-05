@@ -75,20 +75,23 @@ final class DuckPlayerTabExtension {
             }
         }()
 
-        if url?.host?.droppingWwwPrefix() == "youtube.com" && canPushMessagesToJS {
-            duckPlayer.$mode
-                .dropFirst()
-                .sink { [weak self] playerMode in
-                    guard let self = self else {
-                        return
-                    }
-                    let userValues = YoutubeOverlayUserScript.UserValues(
-                        duckPlayerMode: playerMode,
-                        overlayInteracted: self.duckPlayer.overlayInteracted
-                    )
-                    self.youtubeOverlayScript?.userValuesUpdated(userValues: userValues)
-                }
-                .store(in: &youtubePlayerCancellables)
+        if let hostname = url?.host,
+           let origins = self.youtubeOverlayScript?.allowedOrigins {
+            if origins.contains(hostname) && canPushMessagesToJS {
+                duckPlayer.$mode
+                        .dropFirst()
+                        .sink { [weak self] playerMode in
+                            guard let self = self else {
+                                return
+                            }
+                            let userValues = YoutubeOverlayUserScript.UserValues(
+                                    duckPlayerMode: playerMode,
+                                    overlayInteracted: self.duckPlayer.overlayInteracted
+                            )
+                            self.youtubeOverlayScript?.userValuesUpdated(userValues: userValues)
+                        }
+                        .store(in: &youtubePlayerCancellables)
+            }
         }
 
         if url?.isDuckPlayerScheme == true {
