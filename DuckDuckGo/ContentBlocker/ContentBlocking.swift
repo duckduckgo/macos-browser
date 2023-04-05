@@ -58,13 +58,14 @@ final class AppContentBlocking {
     private let exceptionsSource: DefaultContentBlockerRulesExceptionsSource
 
     // keeping whole ContentBlocking state initialization in one place to avoid races between updates publishing and rules storing
-    init() {
+    init(internalUserDecider: InternalUserDecider) {
         let configStorage = ConfigurationStore.shared
         privacyConfigurationManager = PrivacyConfigurationManager(fetchedETag: configStorage.loadEtag(for: .privacyConfiguration),
                                                                   fetchedData: configStorage.loadData(for: .privacyConfiguration),
                                                                   embeddedDataProvider: AppPrivacyConfigurationDataProvider(),
                                                                   localProtection: LocalUnprotectedDomains.shared,
-                                                                  errorReporting: Self.debugEvents)
+                                                                  errorReporting: Self.debugEvents,
+                                                                  internalUserDecider: internalUserDecider)
 
         trackerDataManager = TrackerDataManager(etag: ConfigurationStore.shared.loadEtag(for: .trackerDataSet),
                                                 data: ConfigurationStore.shared.loadData(for: .trackerDataSet),
