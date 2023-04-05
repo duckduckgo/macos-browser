@@ -33,6 +33,7 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
     var onDirtyChanged: (Bool) -> Void
     var onSaveRequested: (SecureVaultModels.WebsiteCredentials) -> Void
     var onDeleteRequested: (SecureVaultModels.WebsiteCredentials) -> Void
+    var urlMatcher: AutofillUrlMatcher
 
     func setSecureVaultModel<Model>(_ modelObject: Model) {
         guard let modelObject = modelObject as? SecureVaultModels.WebsiteCredentials else {
@@ -97,42 +98,17 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
         }
     }
 
-    func normalizedDomain(_ domain: String) -> String {
-        let trimmed = domain.trimmingWhitespace()
-        if !trimmed.starts(with: "https://") && !trimmed.starts(with: "http://") && trimmed.contains("://") {
-            // Contains some other protocol, so don't mess with it
-            return domain
-        }
-
-        let noScheme = trimmed.dropping(prefix: "https://").dropping(prefix: "http://")
-        var components = URLComponents(string: "https://\(noScheme)")
-        components?.scheme = nil
-        
-        if let port = components?.port,
-            [80, 443].contains(port) {
-            components?.port = nil
-        }
-        
-        if let host = components?.host {
-            if let port = components?.port {
-                return "\(host):\(port)"
-            }
-            return host
-        }
-        return ""
-        
-        
-    }
-
     var lastUpdatedDate: String = ""
     var createdDate: String = ""
 
     init(onDirtyChanged: @escaping (Bool) -> Void,
          onSaveRequested: @escaping (SecureVaultModels.WebsiteCredentials) -> Void,
-         onDeleteRequested: @escaping (SecureVaultModels.WebsiteCredentials) -> Void) {
+         onDeleteRequested: @escaping (SecureVaultModels.WebsiteCredentials) -> Void,
+         urlMatcher: AutofillUrlMatcher = AutofillDomainNameUrlMatcher()) {
         self.onDirtyChanged = onDirtyChanged
         self.onSaveRequested = onSaveRequested
         self.onDeleteRequested = onDeleteRequested
+        self.urlMatcher = urlMatcher
     }
 
     func copy(_ value: String) {
@@ -143,7 +119,7 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
         guard var credentials = credentials else { return }
         credentials.account.title = title
         credentials.account.username = username
-        credentials.account.domain = normalizedDomain(domain)
+        credentials.account.domain = urlMatcher.normalizeUrlForWeb(domain)
         credentials.password = password.data(using: .utf8)! // let it crash?
         onSaveRequested(credentials)
     }
@@ -178,11 +154,10 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
 
     private func populateViewModelFromCredentials() {
         let titleString = credentials?.account.title ?? ""
-
         title = titleString
         username = credentials?.account.username ?? ""
         password = String(data: credentials?.password ?? Data(), encoding: .utf8) ?? ""
-        domain = normalizedDomain(credentials?.account.domain ?? "")
+        domain =  urlMatcher.normalizeUrlForWeb(credentials?.account.domain ?? "")
         isDirty = false
         isNew = credentials?.account.id == nil
 
