@@ -1,5 +1,5 @@
 //
-//  NSImage+NetworkProtection.swift
+//  NetworkProtectionProvider.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -25,17 +25,7 @@ import NetworkExtension
 import NetworkProtection
 import SystemExtensions
 
-enum NetworkProtectionConnectionStatus {
-    case notConfigured
-    case disconnected
-    case disconnecting
-    case connected(connectedDate: Date)
-    case connecting
-    case reasserting
-    case unknown
-}
-
-typealias NetworkProtectionStatusChangeHandler = (NetworkProtectionConnectionStatus) -> Void
+typealias NetworkProtectionStatusChangeHandler = (NetworkProtection.ConnectionStatus) -> Void
 typealias NetworkProtectionConfigChangeHandler = () -> Void
 
 protocol NetworkProtectionProvider: NetworkProtection.TunnelController {
@@ -314,16 +304,21 @@ final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
 
     // MARK: - Ensure things are working
 
+    private let loginItem = LoginItem(agentBundleID: "HKE973VLUW.com.duckduckgo.macos.browser.network-protection.notifications")
+
+    private func ensureLoginItemsAreEnabled() async throws {
+ #if DEBUG
+         try await loginItem.reset()
+ #else
+         try loginItem.enable()
+ #endif
+     }
+
 #if NETP_SYSTEM_EXTENSION
     /// - Returns: `true` if the system extension and the background agent were activated successfully
     ///
     private func ensureSystemExtensionAndAgentAreActivated() async throws -> Bool {
-        #if DEBUG
-        try? await NetworkProtectionAgentManager.current.reset()
-        #else
-
-        NetworkProtectionAgentManager.current.enable()
-        #endif
+        try await ensureLoginItemsAreEnabled()
 
         if case .willActivateAfterReboot = try await SystemExtensionManager.shared.activate(waitingForUserApprovalHandler: { [weak self] in
             self?.controllerErrorStore.lastErrorMessage = "Go to Security & Privacy in System Settings to allow Network Protection to activate"
@@ -454,7 +449,7 @@ final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
             }
 
 #if NETP_SYSTEM_EXTENSION
-            NetworkProtectionAgentManager.current.disable()
+            try? LoginItem(agentBundleID: "HKE973VLUW.com.duckduckgo.macos.browser.network-protection.notifications").disable()
 #endif
             NetworkProtectionSelectedServerUserDefaultsStore().reset()
         }

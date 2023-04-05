@@ -1,5 +1,5 @@
 //
-//  NetworkProtectionAssets.swift
+//  TextButton.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -18,12 +18,4 @@
 
 import Foundation
 
-enum NetworkProtectionAsset: String {
-    case ipAddressIcon = "IP-16"
-    case serverLocationIcon = "Server-Location-16"
-    case vpnDisabledImage = "VPN-Disabled-128"
-    case vpnEnabledImage = "VPN-128"
-    case vpnIcon = "VPN-16"
-    case vpnIssueIcon = "VPN-Issue-16"
-    case vpnDisabledIcon = "Globe-16"
-}
+// Empty file is needed to silence build warnings until we have actual tests

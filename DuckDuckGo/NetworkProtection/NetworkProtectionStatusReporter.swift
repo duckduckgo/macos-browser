@@ -26,7 +26,7 @@ import os
 /// Classes that implement this protocol are in charge of relaying status changes.
 ///
 protocol NetworkProtectionStatusReporter {
-    var statusChangePublisher: CurrentValueSubject<NetworkProtectionConnectionStatus, Never> { get }
+    var statusChangePublisher: CurrentValueSubject<NetworkProtection.ConnectionStatus, Never> { get }
     var connectivityIssuesPublisher: CurrentValueSubject<Bool, Never> { get }
     var serverInfoPublisher: CurrentValueSubject<NetworkProtectionStatusServerInfo, Never> { get }
     var tunnelErrorMessagePublisher: CurrentValueSubject<String?, Never> { get }
@@ -65,7 +65,7 @@ final class DefaultNetworkProtectionStatusReporter: NetworkProtectionStatusRepor
 
     // MARK: - Publishers
 
-    let statusChangePublisher = CurrentValueSubject<NetworkProtectionConnectionStatus, Never>(.unknown)
+    let statusChangePublisher = CurrentValueSubject<NetworkProtection.ConnectionStatus, Never>(.unknown)
     let connectivityIssuesPublisher = CurrentValueSubject<Bool, Never>(false)
     let serverInfoPublisher = CurrentValueSubject<NetworkProtectionStatusServerInfo, Never>(.unknown)
     let tunnelErrorMessagePublisher = CurrentValueSubject<String?, Never>(nil)
@@ -343,9 +343,9 @@ final class DefaultNetworkProtectionStatusReporter: NetworkProtectionStatusRepor
         session.connectedDate ?? Date()
     }
 
-    private func connectionStatus(from session: NETunnelProviderSession) -> NetworkProtectionConnectionStatus {
+    private func connectionStatus(from session: NETunnelProviderSession) -> NetworkProtection.ConnectionStatus {
         let internalStatus = session.status
-        let status: NetworkProtectionConnectionStatus
+        let status: NetworkProtection.ConnectionStatus
 
         switch internalStatus {
         case .connected:

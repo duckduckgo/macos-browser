@@ -32,7 +32,6 @@ final class NetworkProtectionUNNotificationsPresenter: NSObject, NetworkProtecti
     private let userNotificationCenter: UNUserNotificationCenter
 
     init(mainAppURL: URL, userNotificationCenter: UNUserNotificationCenter = .current()) {
-
         self.appLauncher = AppLauncher(appBundleURL: mainAppURL)
         self.userNotificationCenter = userNotificationCenter
 

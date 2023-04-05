@@ -19,6 +19,7 @@
 import SwiftUI
 import Combine
 import NetworkProtection
+import NetworkProtectionUI
 
 /// This view helps us fix the height of a view that's meant to be shown inside a `NSHostingView`.
 ///
@@ -144,7 +145,7 @@ public struct NetworkProtectionStatusView: View {
     ///
     private func headerView() -> some View {
         VStack(spacing: 0) {
-            Text(UserText.networkProtectionStatusViewTitle)
+            Text(NetPUserText.networkProtectionStatusViewTitle)
                 .applyTitleAttributes()
                 .padding(12)
 
@@ -184,7 +185,7 @@ public struct NetworkProtectionStatusView: View {
                 .applyTitleAttributes()
                 .padding([.top], 8)
 
-            Text(UserText.networkProtectionStatusViewFeatureDesc)
+            Text(NetPUserText.networkProtectionStatusViewFeatureDesc)
                 .applyContentAttributes()
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
@@ -211,22 +212,22 @@ public struct NetworkProtectionStatusView: View {
                 }
             }
 
-            Text(UserText.networkProtectionStatusViewBetaWarning)
+            Text(NetPUserText.networkProtectionStatusViewBetaWarning)
                 .opacity(Opacity.content)
                 .fixedSize()
 
             HStack(spacing: 0) {
-                Text(UserText.networkProtectionStatusViewShareFeedbackPrefix)
+                Text(NetPUserText.networkProtectionStatusViewShareFeedbackPrefix)
                     .applyContentAttributes()
                     .fixedSize()
 
-                TextButton(UserText.networkProtectionStatusViewShareFeedback) {
+                TextButton(NetPUserText.networkProtectionStatusViewShareFeedback) {
                     model.shareFeedback()
                 }.applyLinkAttributes()
                     .fixedSize()
                     .buttonStyle(PlainButtonStyle())
 
-                Text(UserText.networkProtectionStatusViewShareFeedbackSuffix)
+                Text(NetPUserText.networkProtectionStatusViewShareFeedbackSuffix)
                     .applyContentAttributes()
                     .fixedSize()
             }
@@ -239,7 +240,7 @@ public struct NetworkProtectionStatusView: View {
     ///
     private func statusView() -> some View {
         VStack(alignment: .leading, spacing: 0) {
-            Text(UserText.networkProtectionStatusViewConnDetails)
+            Text(NetPUserText.networkProtectionStatusViewConnDetails)
                 .font(.NetworkProtection.sectionHeader)
                 .padding(.bottom, 18)
 
@@ -253,7 +254,7 @@ public struct NetworkProtectionStatusView: View {
     private func featureToggle() -> some View {
         Toggle(isOn: model.isRunning) {
             HStack {
-                Text(UserText.networkProtectionStatusViewConnLabel)
+                Text(NetPUserText.networkProtectionStatusViewConnLabel)
                     .applyLabelAttributes()
                     .frame(alignment: .leading)
                     .fixedSize()
@@ -276,7 +277,7 @@ public struct NetworkProtectionStatusView: View {
             Image(.serverLocationIcon)
                 .padding([.trailing], 8)
 
-            Text(UserText.networkProtectionStatusViewLocation)
+            Text(NetPUserText.networkProtectionStatusViewLocation)
                 .opacity(Opacity.label)
                 .fixedSize()
 
@@ -294,7 +295,7 @@ public struct NetworkProtectionStatusView: View {
             Image(.ipAddressIcon)
                 .padding([.trailing], 8)
 
-            Text(UserText.networkProtectionStatusViewIPAddress)
+            Text(NetPUserText.networkProtectionStatusViewIPAddress)
                 .opacity(Opacity.label)
                 .fixedSize()
 

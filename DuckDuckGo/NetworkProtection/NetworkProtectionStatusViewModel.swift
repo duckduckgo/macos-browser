@@ -20,6 +20,7 @@ import SwiftUI
 import Combine
 import NetworkExtension
 import NetworkProtection
+import NetworkProtectionUI
 
 /// This view can be shown from any location where we want the user to be able to interact with NetP.
 /// This view shows status information about Network Protection, and offers a chance to toggle it ON and OFF.
@@ -246,10 +247,10 @@ extension NetworkProtectionStatusView {
 
         private weak var timer: Timer?
 
-        private var previousConnectionStatus: NetworkProtectionConnectionStatus = .disconnected
+        private var previousConnectionStatus: NetworkProtection.ConnectionStatus = .disconnected
 
         @Published
-        private var connectionStatus: NetworkProtectionConnectionStatus = .disconnected {
+        private var connectionStatus: NetworkProtection.ConnectionStatus = .disconnected {
             didSet {
                 previousConnectionStatus = oldValue
                 refreshInternalIsRunning()
@@ -269,16 +270,16 @@ extension NetworkProtectionStatusView {
         /// The description for the current connection status.
         /// When the status is `connected` this description will also show the time lapsed since connection.
         ///
-        @Published var timeLapsed = UserText.networkProtectionStatusViewTimerZero
+        @Published var timeLapsed = NetPUserText.networkProtectionStatusViewTimerZero
 
         private func refreshTimeLapsed() {
             switch connectionStatus {
             case .connected(let connectedDate):
                 timeLapsed = timeLapsedString(since: connectedDate)
             case .disconnecting:
-                timeLapsed = UserText.networkProtectionStatusViewTimerZero
+                timeLapsed = NetPUserText.networkProtectionStatusViewTimerZero
             default:
-                timeLapsed = UserText.networkProtectionStatusViewTimerZero
+                timeLapsed = NetPUserText.networkProtectionStatusViewTimerZero
             }
         }
 
@@ -288,15 +289,13 @@ extension NetworkProtectionStatusView {
         var connectionStatusDescription: String {
             switch connectionStatus {
             case .connected:
-                return "\(UserText.networkProtectionStatusConnected) · \(timeLapsed)"
-            case .connecting, .reasserting:
-                return UserText.networkProtectionStatusConnecting
+                return "\(NetPUserText.networkProtectionStatusConnected) · \(timeLapsed)"
+            case .connecting, .reasserting, .unknown:
+                return NetPUserText.networkProtectionStatusConnecting
             case .disconnected, .notConfigured:
-                return UserText.networkProtectionStatusDisconnected
+                return NetPUserText.networkProtectionStatusDisconnected
             case .disconnecting:
-                return UserText.networkProtectionStatusDisconnecting
-            case .unknown:
-                return UserText.networkProtectionStatusUnknown
+                return NetPUserText.networkProtectionStatusDisconnecting
             }
         }
 
@@ -312,9 +311,9 @@ extension NetworkProtectionStatusView {
             if isHavingConnectivityIssues {
                 switch connectionStatus {
                 case .reasserting, .connecting, .connected:
-                    return UserText.networkProtectionInterruptedReconnecting
+                    return NetPUserText.networkProtectionInterruptedReconnecting
                 case .disconnecting, .disconnected:
-                    return UserText.networkProtectionInterrupted
+                    return NetPUserText.networkProtectionInterrupted
                 default:
                     return nil
                 }
@@ -338,9 +337,9 @@ extension NetworkProtectionStatusView {
         var featureStatusDescription: String {
             switch connectionStatus {
             case .connected, .disconnecting:
-                return UserText.networkProtectionStatusViewFeatureOn
+                return NetPUserText.networkProtectionStatusViewFeatureOn
             default:
-                return UserText.networkProtectionStatusViewFeatureOff
+                return NetPUserText.networkProtectionStatusViewFeatureOff
             }
         }
 
@@ -366,7 +365,7 @@ extension NetworkProtectionStatusView {
 
         var serverAddress: String {
             guard let internalServerAddress = internalServerAddress else {
-                return UserText.networkProtectionServerAddressUnknown
+                return NetPUserText.networkProtectionServerAddressUnknown
             }
 
             switch connectionStatus {
@@ -376,10 +375,10 @@ extension NetworkProtectionStatusView {
                 if case .connected = previousConnectionStatus {
                     return internalServerAddress
                 } else {
-                    return UserText.networkProtectionServerAddressUnknown
+                    return NetPUserText.networkProtectionServerAddressUnknown
                 }
             default:
-                return UserText.networkProtectionServerAddressUnknown
+                return NetPUserText.networkProtectionServerAddressUnknown
             }
         }
 
@@ -388,7 +387,7 @@ extension NetworkProtectionStatusView {
 
         var serverLocation: String {
             guard let internalServerLocation = internalServerLocation else {
-                return UserText.networkProtectionServerLocationUnknown
+                return NetPUserText.networkProtectionServerLocationUnknown
             }
 
             switch connectionStatus {
@@ -398,10 +397,10 @@ extension NetworkProtectionStatusView {
                 if case .connected = previousConnectionStatus {
                     return internalServerLocation
                 } else {
-                    return UserText.networkProtectionServerLocationUnknown
+                    return NetPUserText.networkProtectionServerLocationUnknown
                 }
             default:
-                return UserText.networkProtectionServerLocationUnknown
+                return NetPUserText.networkProtectionServerLocationUnknown
             }
         }
 

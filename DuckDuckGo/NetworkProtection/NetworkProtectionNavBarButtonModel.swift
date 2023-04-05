@@ -19,13 +19,15 @@
 import AppKit
 import Combine
 import Foundation
+import NetworkProtection
+import NetworkProtectionUI
 
 /// Model for managing the NetP button in the Nav Bar.
 ///
 final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
 
     private let networkProtectionStatusReporter: NetworkProtectionStatusReporter
-    private var status: NetworkProtectionConnectionStatus = .disconnected
+    private var status: NetworkProtection.ConnectionStatus = .disconnected
     private let popovers: NavigationBarPopovers
 
     // MARK: - Subscriptions
@@ -59,7 +61,7 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
         self.popovers = popovers
 
         isHavingConnectivityIssues = networkProtectionStatusReporter.connectivityIssuesPublisher.value
-        buttonImage = .init(iconPublisher.icon)
+        buttonImage = .image(for: iconPublisher.icon)
 
         super.init()
 
@@ -76,7 +78,7 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
 
     private func setupIconSubscription() {
         iconPublisherCancellable = iconPublisher.$icon.sink { [weak self] icon in
-            self?.buttonImage = .init(icon)
+            self?.buttonImage = .image(for: icon)
         }
     }
 

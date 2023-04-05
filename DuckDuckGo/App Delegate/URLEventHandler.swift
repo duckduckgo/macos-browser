@@ -16,7 +16,9 @@
 //  limitations under the License.
 //
 
+import ApplicationServices
 import Foundation
+import NetworkProtection
 import os.log
 
 final class URLEventHandler {
@@ -108,10 +110,13 @@ final class URLEventHandler {
     /// Handles NetP URLs
     ///
     private static func handleNetworkProtectionURL(_ url: URL) {
-        if url == networkProtectionShowStatusURL {
+        switch url {
+        case AppLauncher.Command.showStatus.launchURL:
             Task {
                 await WindowControllersManager.shared.showNetworkProtectionStatus()
             }
+        default:
+            return
         }
     }
 #endif

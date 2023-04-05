@@ -20,6 +20,7 @@ import Foundation
 import Combine
 import SwiftUI
 import NetworkProtection
+import NetworkProtectionUI
 import os.log
 
 /// Abstraction of the the Network Protection status bar menu with a simple interface.
@@ -57,14 +58,14 @@ final class NetworkProtectionStatusBarMenu {
 
         let menu = NSMenu(items: [item])
         self.statusItem.menu = menu
-        self.statusItem.button?.image = .init(iconPublisher.icon)
+        self.statusItem.button?.image = .image(for: iconPublisher.icon)
 
         subscribeToIconUpdates()
     }
 
     private func subscribeToIconUpdates() {
         iconPublisherCancellable = iconPublisher.$icon.sink { [weak self] icon in
-            self?.statusItem.button?.image = .init(icon)
+            self?.statusItem.button?.image = .image(for: icon)
         }
     }
 

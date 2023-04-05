@@ -21,6 +21,7 @@ import os.log
 import WebKit
 import BrowserServicesKit
 import SwiftUI
+import NetworkProtectionUI
 
 protocol OptionsButtonMenuDelegate: AnyObject {
 
@@ -94,7 +95,7 @@ final class MoreOptionsMenu: NSMenu {
 #if NETP
         addItem(withTitle: UserText.networkProtection, action: #selector(showNetworkProtectionStatus(_:)), keyEquivalent: "")
             .targetting(self)
-            .withImage(.init(.vpnIcon))
+            .withImage(.image(for: .vpnIcon))
 #endif
 
         addItem(NSMenuItem.separator())

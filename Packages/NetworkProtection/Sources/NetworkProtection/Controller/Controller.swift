@@ -1,7 +1,7 @@
 //
-//  Image+NetworkProtection.swift
+//  Controller.swift
 //
-//  Copyright © 2022 DuckDuckGo. All rights reserved.
+//  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,10 +16,17 @@
 //  limitations under the License.
 //
 
-import SwiftUI
+import Foundation
 
-extension Image {
-    init(_ networkProtectionAsset: NetworkProtectionAsset) {
-        self.init(networkProtectionAsset.rawValue)
-    }
+public protocol Controller {
+
+    // MARK: - Starting & Stopping the VPN
+
+    /// Starts the VPN connection used for Network Protection
+    ///
+    func start() async throws
+
+    /// Stops the VPN connection used for Network Protection
+    ///
+    func stop() async throws
 }

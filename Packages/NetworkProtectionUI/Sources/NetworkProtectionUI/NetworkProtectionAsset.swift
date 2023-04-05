@@ -1,5 +1,5 @@
 //
-//  NSImage+NetworkProtection.swift
+//  NetworkProtectionAsset.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -16,10 +16,14 @@
 //  limitations under the License.
 //
 
-import AppKit
+import Foundation
 
-extension NSImage {
-    convenience init?(_ networkProtectionAsset: NetworkProtectionAsset) {
-        self.init(named: networkProtectionAsset.rawValue)
-    }
+public enum NetworkProtectionAsset: String {
+    case ipAddressIcon = "IP-16"
+    case serverLocationIcon = "Server-Location-16"
+    case vpnDisabledImage = "VPN-Disabled-128"
+    case vpnEnabledImage = "VPN-128"
+    case vpnIcon = "VPN-16"
+    case vpnIssueIcon = "VPN-Issue-16"
+    case vpnDisabledIcon = "Globe-16"
 }
