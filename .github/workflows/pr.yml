@@ -116,12 +116,6 @@ jobs:
     - name: Build and test
       run: |
         echo "Runner ${RUNNER_NAME} (${RUNNER_TRACKING_ID})"
-        if [ $RUNNER_DEBUG ]; then
-            export OS_ACTIVITY_MODE=debug
-            echo "OS_ACTIVITY_MODE: ${OS_ACTIVITY_MODE} OS_ACTIVITY_DT_MODE: ${OS_ACTIVITY_DT_MODE}"
-        else
-            echo "RUNNER_DEBUG: ${RUNNER_DEBUG}, not setting OS_ACTIVITY_MODE"
-        fi
         set -o pipefail && xcodebuild test \
           -scheme "${{ matrix.scheme }}" \
           -testPlan "${{ matrix.testplan }}${{ matrix.testplan-suffix }}" \

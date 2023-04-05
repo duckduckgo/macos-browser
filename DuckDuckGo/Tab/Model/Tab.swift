@@ -743,7 +743,7 @@ protocol NewWindowPolicyDecisionMaker {
             do {
                 try webView.restoreSessionState(from: interactionStateData)
             } catch {
-                os_log("Tab:setupWebView could not restore session state %s", "\(error)")
+                os_log("Tab:setupWebView could not restore session state %s", type: .error, "\(error)")
                 return false
             }
         }
@@ -876,7 +876,7 @@ protocol NewWindowPolicyDecisionMaker {
 extension Tab: UserContentControllerDelegate {
 
     func userContentController(_ userContentController: UserContentController, didInstallContentRuleLists contentRuleLists: [String: WKContentRuleList], userScripts: UserScriptsProvider, updateEvent: ContentBlockerRulesManager.UpdateEvent) {
-        os_log("didInstallContentRuleLists")
+        os_log("didInstallContentRuleLists", log: .contentBlocking, type: .info)
         guard let userScripts = userScripts as? UserScripts else { fatalError("Unexpected UserScripts") }
 
         userScripts.debugScript.instrumentation = instrumentation

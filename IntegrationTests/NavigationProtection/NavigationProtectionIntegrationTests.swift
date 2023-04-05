@@ -152,7 +152,7 @@ class NavigationProtectionIntegrationTests: XCTestCase {
         _=try await tab.setUrl(url, userEntered: nil)?.value?.result.get()
 
         // run test
-        _=try! await tab.webView.evaluateJavaScript("(function() { document.getElementById('start').click(); return true })()")
+        _=try await tab.webView.evaluateJavaScript("(function() { document.getElementById('start').click(); return true })()")
 
         _=try await Future<Void, Never> { promise in
             onDidFinish = { _ in
