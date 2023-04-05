@@ -115,10 +115,10 @@ struct OSLogWrapper {
 
     var wrappedValue: OSLog {
         var isEnabled = OSLog.loggingCategories.contains(category)
-#if DEBUG
-        isEnabled = isEnabled || OSLog.debugCategories.contains(category)
-#elseif CI
+#if CI
         isEnabled = true
+#elseif DEBUG
+        isEnabled = isEnabled || OSLog.debugCategories.contains(category)
 #endif
 
         return isEnabled ? OSLog(subsystem: OSLog.subsystem, category: category.rawValue) : .disabled
