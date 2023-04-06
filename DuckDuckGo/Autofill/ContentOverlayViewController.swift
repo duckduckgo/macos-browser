@@ -44,6 +44,11 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
         return manager
     }()
 
+    lazy var autofillPreferencesModel: AutofillPreferencesModel = {
+        let model = AutofillPreferencesModel()
+        return model
+    }()
+
     public override func viewDidLoad() {
         initWebView()
         addTrackingArea()
@@ -267,4 +272,7 @@ extension ContentOverlayViewController: SecureVaultManagerDelegate {
         }
     }
 
+    public func secureVaultManager(_: SecureVaultManager, didRequestPasswordManagerForDomain domain: String) {
+        autofillPreferencesModel.showAutofillPopover()
+    }
 }

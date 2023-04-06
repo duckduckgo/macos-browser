@@ -113,6 +113,9 @@ extension AutofillTabExtension: SecureVaultManagerDelegate {
         return true
     }
 
+    func secureVaultManager(_: SecureVaultManager, didRequestPasswordManagerForDomain domain: String) {
+        // no-op
+    }
 }
 
 extension AutofillType {
