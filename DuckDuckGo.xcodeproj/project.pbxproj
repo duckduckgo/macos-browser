@@ -23,8 +23,6 @@
 		1D2DC0082901679E008083A1 /* BWResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DDF076128F815AD00EDFBE3 /* BWResponse.swift */; };
 		1D2DC009290167A0008083A1 /* BWStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DDF075F28F815AD00EDFBE3 /* BWStatus.swift */; };
 		1D2DC00B290167EC008083A1 /* RunningApplicationCheck.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D77921C28FFF27C00BE0210 /* RunningApplicationCheck.swift */; };
-		1D36E653298A851E00AA485D /* InternalUserDecider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D36E652298A851E00AA485D /* InternalUserDecider.swift */; };
-		1D36E654298A851E00AA485D /* InternalUserDecider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D36E652298A851E00AA485D /* InternalUserDecider.swift */; };
 		1D36E658298AA3BA00AA485D /* InternalUserDeciderStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D36E657298AA3BA00AA485D /* InternalUserDeciderStore.swift */; };
 		1D36E659298AA3BA00AA485D /* InternalUserDeciderStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D36E657298AA3BA00AA485D /* InternalUserDeciderStore.swift */; };
 		1D36E65B298ACD2900AA485D /* AppIconChanger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D36E65A298ACD2900AA485D /* AppIconChanger.swift */; };
@@ -1903,7 +1901,6 @@
 		1D02633528D8A9A9005CBB41 /* BWEncryption.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BWEncryption.m; sourceTree = "<group>"; };
 		1D074B262909A433006E4AC3 /* PasswordManagerCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordManagerCoordinator.swift; sourceTree = "<group>"; };
 		1D12F2E1298BC660009A65FD /* InternalUserDeciderStoreMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InternalUserDeciderStoreMock.swift; sourceTree = "<group>"; };
-		1D36E652298A851E00AA485D /* InternalUserDecider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InternalUserDecider.swift; sourceTree = "<group>"; };
 		1D36E657298AA3BA00AA485D /* InternalUserDeciderStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InternalUserDeciderStore.swift; sourceTree = "<group>"; };
 		1D36E65A298ACD2900AA485D /* AppIconChanger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIconChanger.swift; sourceTree = "<group>"; };
 		1D3B1AB82934062B006F4388 /* PasswordManagerCoordinatingMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordManagerCoordinatingMock.swift; sourceTree = "<group>"; };
@@ -2959,7 +2956,6 @@
 		1D36E655298AA33400AA485D /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				1D36E652298A851E00AA485D /* InternalUserDecider.swift */,
 				EECE10E429DD77E60044D027 /* FeatureFlag.swift */,
 			);
 			path = Model;
@@ -6993,7 +6989,6 @@
 				3706FC8E293F65D500E42796 /* PinnedTabsView.swift in Sources */,
 				3706FC8F293F65D500E42796 /* FireproofInfoViewController.swift in Sources */,
 				3706FC91293F65D500E42796 /* CookieConsentAnimationView.swift in Sources */,
-				1D36E654298A851E00AA485D /* InternalUserDecider.swift in Sources */,
 				3706FC92293F65D500E42796 /* NSStoryboardExtension.swift in Sources */,
 				3706FC93293F65D500E42796 /* PreferencesViewController.swift in Sources */,
 				3706FC94293F65D500E42796 /* FireproofDomains.swift in Sources */,
@@ -7481,7 +7476,6 @@
 				1E7E2E9229029F9B00C01B54 /* WebsiteBreakageReporter.swift in Sources */,
 				37CD54C927F2FDD100F1F7B9 /* PrivacyPreferencesModel.swift in Sources */,
 				B6F1C80B2761C45400334924 /* LocalUnprotectedDomains.swift in Sources */,
-				1D36E653298A851E00AA485D /* InternalUserDecider.swift in Sources */,
 				1D36E658298AA3BA00AA485D /* InternalUserDeciderStore.swift in Sources */,
 				B634DBE5293C944700C3C99E /* NewWindowPolicy.swift in Sources */,
 				31CF3432288B0B1B0087244B /* NavigationBarBadgeAnimator.swift in Sources */,
@@ -8621,7 +8615,7 @@
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
 				kind = exactVersion;
-				version = 55.0.0;
+				version = 55.1.0;
 			};
 		};
 		AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
