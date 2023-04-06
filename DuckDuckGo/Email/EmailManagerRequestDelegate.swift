@@ -21,7 +21,7 @@ import BrowserServicesKit
 extension EmailManagerRequestDelegate {
 
     // swiftlint:disable function_parameter_count
-    func emailManager(_ emailManager: EmailManager, requested url: URL, method: String, headers: [String: String], parameters: [String: String]?, httpBody: Data?, timeoutInterval: TimeInterval) async -> Result<Data, Error> {
+    func emailManager(_ emailManager: EmailManager, requested url: URL, method: String, headers: [String: String], parameters: [String: String]?, httpBody: Data?, timeoutInterval: TimeInterval) async throws -> Data {
 
         let finalURL = url.appendingParameters(parameters ?? [:])
 
@@ -30,12 +30,7 @@ extension EmailManagerRequestDelegate {
         request.httpMethod = method
         request.httpBody = httpBody
 
-        return await withCheckedContinuation { continuation in
-            URLSession.default.dataTask(with: request) { (data, _, error) in
-                continuation.resume(returning: data.map { .success($0) } ?? .failure(error!))
-            }.resume()
-        }
-
+        return try await URLSession.default.data(for: request).0
     }
     // swiftlint:enable function_parameter_count
 

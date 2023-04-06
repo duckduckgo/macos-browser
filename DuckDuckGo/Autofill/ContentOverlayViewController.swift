@@ -152,7 +152,7 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
                              headers: [String: String],
                              parameters: [String: String]?,
                              httpBody: Data?,
-                             timeoutInterval: TimeInterval) async -> Result<Data, Error> {
+                             timeoutInterval: TimeInterval) async throws -> Data {
         let finalURL = url.appendingParameters(parameters ?? [:])
 
         var request = URLRequest(url: finalURL, timeoutInterval: timeoutInterval)
@@ -160,11 +160,7 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
         request.httpMethod = method
         request.httpBody = httpBody
 
-        return await withCheckedContinuation { continuation in
-            URLSession.shared.dataTask(with: request) { (data, _, error) in
-                continuation.resume(returning: data.map { .success($0) } ?? .failure(error!))
-            }.resume()
-        }
+        return try await URLSession.shared.data(for: request).0
     }
 
     nonisolated
