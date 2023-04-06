@@ -39,6 +39,16 @@ class CSVImporterTests: XCTestCase {
         XCTAssertEqual(logins, [ImportedLoginCredential(title: "Some Title", url: "duck.com", username: "username", password: "p4ssw0rd")])
     }
 
+    func testWhenImportingCSVFileWithHeader_AndHeaderHasBitwardenFormat_ThenHeaderRowIsExcluded() {
+        let csvFileContents = """
+        name,login_uri,login_username,login_password
+        Some Title,duck.com,username,p4ssw0rd
+        """
+
+        let logins = CSVImporter.extractLogins(from: csvFileContents)
+        XCTAssertEqual(logins, [ImportedLoginCredential(title: "Some Title", url: "duck.com", username: "username", password: "p4ssw0rd")])
+    }
+
     func testWhenImportingCSVFileWithHeader_ThenHeaderColumnPositionsAreRespected() {
         let csvFileContents = """
         Password,Title,Username,Url
