@@ -132,8 +132,29 @@ class AutoconsentIntegrationTests: XCTestCase {
 
         _=await tab.setUrl(url, userEntered: nil)?.value?.result
 
-        let cookieConsentManaged = try await cookieConsentManagedPromise.value
-        XCTAssertTrue(cookieConsentManaged == true)
+        do {
+            let cookieConsentManaged = try await cookieConsentManagedPromise.value
+            XCTAssertTrue(cookieConsentManaged == true)
+        } catch {
+            struct HTMLError: Error, LocalizedError, CustomDebugStringConvertible {
+                var html: String
+
+                var errorDescription: String? {
+                    "HTMLError:\n\(html)"
+                }
+
+                var debugDescription: String {
+                    errorDescription!
+                }
+            }
+            let html = try await tab.webView.evaluateJavaScript("document.documentElement.outerHTML") as? String
+
+            if let html {
+                throw HTMLError(html: html)
+            } else {
+                throw error
+            }
+        }
 
         let isBannerHidden = try await tab.webView.evaluateJavaScript("window.getComputedStyle(banner).display === 'none'") as? Bool
         XCTAssertTrue(isBannerHidden == true)
