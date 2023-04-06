@@ -272,7 +272,15 @@ extension ContentOverlayViewController: SecureVaultManagerDelegate {
         }
     }
 
+    public func secureVaultManager(_: SecureVaultManager, didRequestCreditCardsManagerForDomain domain: String) {
+        autofillPreferencesModel.showAutofillPopover(.cards)
+    }
+
+    public func secureVaultManager(_: SecureVaultManager, didRequestIdentitiesManagerForDomain domain: String) {
+        autofillPreferencesModel.showAutofillPopover(.identities)
+    }
+
     public func secureVaultManager(_: SecureVaultManager, didRequestPasswordManagerForDomain domain: String) {
-        autofillPreferencesModel.showAutofillPopover()
+        autofillPreferencesModel.showAutofillPopover(.logins)
     }
 }

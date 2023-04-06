@@ -113,6 +113,14 @@ extension AutofillTabExtension: SecureVaultManagerDelegate {
         return true
     }
 
+    public func secureVaultManager(_: SecureVaultManager, didRequestCreditCardsManagerForDomain domain: String) {
+        // no-op
+    }
+
+    public func secureVaultManager(_: SecureVaultManager, didRequestIdentitiesManagerForDomain domain: String) {
+        // no-op
+    }
+
     func secureVaultManager(_: SecureVaultManager, didRequestPasswordManagerForDomain domain: String) {
         // no-op
     }
