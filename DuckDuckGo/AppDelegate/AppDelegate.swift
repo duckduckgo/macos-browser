@@ -123,9 +123,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
         let internalUserDeciderStore = InternalUserDeciderStore(fileStore: fileStore)
         internalUserDecider = DefaultInternalUserDecider(store: internalUserDeciderStore)
-        featureFlagger = DefaultFeatureFlagger(internalUserDecider: internalUserDecider,
-                                               privacyConfig: AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.privacyConfig)
-        NSApp.mainMenuTyped.setup(with: featureFlagger)
 
 #if DEBUG
         func mock<T>(_ className: String) -> T {
@@ -138,6 +135,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 #else
         AppPrivacyFeatures.shared = AppPrivacyFeatures(contentBlocking: AppContentBlocking(internalUserDecider: internalUserDecider), database: Database.shared)
 #endif
+
+        featureFlagger = DefaultFeatureFlagger(internalUserDecider: internalUserDecider,
+                                               privacyConfig: AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.privacyConfig)
+        NSApp.mainMenuTyped.setup(with: featureFlagger)
 
 #if !APPSTORE
         updateController = UpdateController(internalUserDecider: internalUserDecider)
