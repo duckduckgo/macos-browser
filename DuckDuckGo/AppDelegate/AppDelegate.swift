@@ -27,6 +27,7 @@ import Bookmarks
 import DDGSync
 
 @NSApplicationMain
+@MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDelegate {
 
 #if DEBUG

@@ -23,6 +23,7 @@ import XCTest
 
 // swiftlint:disable opening_brace
 @available(macOS 12.0, *)
+@MainActor
 final class TabTests: XCTestCase {
 
     struct URLs {

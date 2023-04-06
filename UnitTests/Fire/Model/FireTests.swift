@@ -22,6 +22,7 @@ import XCTest
 import Combine
 @testable import DuckDuckGo_Privacy_Browser
 
+@MainActor
 final class FireTests: XCTestCase {
 
     var cancellables = Set<AnyCancellable>()
@@ -180,11 +181,10 @@ final class FireTests: XCTestCase {
 
 fileprivate extension TabCollectionViewModel {
 
-    static func makeTabCollectionViewModel(
-        with pinnedTabsManager: PinnedTabsManager = WindowControllersManager.shared.pinnedTabsManager
-    ) -> TabCollectionViewModel {
+    @MainActor
+    static func makeTabCollectionViewModel(with pinnedTabsManager: PinnedTabsManager? = nil) -> TabCollectionViewModel {
 
-        let tabCollectionViewModel = TabCollectionViewModel(tabCollection: .init(), pinnedTabsManager: pinnedTabsManager)
+        let tabCollectionViewModel = TabCollectionViewModel(tabCollection: .init(), pinnedTabsManager: pinnedTabsManager ?? WindowControllersManager.shared.pinnedTabsManager)
         tabCollectionViewModel.appendNewTab()
         tabCollectionViewModel.appendNewTab()
         return tabCollectionViewModel

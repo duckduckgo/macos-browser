@@ -199,12 +199,13 @@ protocol NewWindowPolicyDecisionMaker {
     @Published
     private(set) var userContentController: UserContentController?
 
+    @MainActor
     convenience init(content: TabContent,
                      faviconManagement: FaviconManagement = FaviconManager.shared,
                      webCacheManager: WebCacheManager = WebCacheManager.shared,
                      webViewConfiguration: WKWebViewConfiguration? = nil,
                      historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
-                     pinnedTabsManager: PinnedTabsManager = WindowControllersManager.shared.pinnedTabsManager,
+                     pinnedTabsManager: PinnedTabsManager? = nil,
                      workspace: Workspace = NSWorkspace.shared,
                      privacyFeatures: AnyPrivacyFeatures? = nil,
                      duckPlayer: DuckPlayer? = nil,
@@ -237,7 +238,7 @@ protocol NewWindowPolicyDecisionMaker {
                   webCacheManager: webCacheManager,
                   webViewConfiguration: webViewConfiguration,
                   historyCoordinating: historyCoordinating,
-                  pinnedTabsManager: pinnedTabsManager,
+                  pinnedTabsManager: pinnedTabsManager ?? WindowControllersManager.shared.pinnedTabsManager,
                   workspace: workspace,
                   privacyFeatures: privacyFeatures,
                   duckPlayer: duckPlayer,
@@ -259,6 +260,7 @@ protocol NewWindowPolicyDecisionMaker {
                   webViewFrame: webViewFrame)
     }
 
+    @MainActor
     // swiftlint:disable:next function_body_length
     init(content: TabContent,
          faviconManagement: FaviconManagement,
@@ -875,6 +877,7 @@ protocol NewWindowPolicyDecisionMaker {
 
 extension Tab: UserContentControllerDelegate {
 
+    @MainActor
     func userContentController(_ userContentController: UserContentController, didInstallContentRuleLists contentRuleLists: [String: WKContentRuleList], userScripts: UserScriptsProvider, updateEvent: ContentBlockerRulesManager.UpdateEvent) {
         os_log("didInstallContentRuleLists", log: .contentBlocking, type: .info)
         guard let userScripts = userScripts as? UserScripts else { fatalError("Unexpected UserScripts") }

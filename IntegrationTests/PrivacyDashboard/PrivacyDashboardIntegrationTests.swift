@@ -29,6 +29,7 @@ class PrivacyDashboardIntegrationTests: XCTestCase {
         (Self.window.contentViewController as! MainViewController).browserTabViewController.tabViewModel!
     }
 
+    @MainActor
     override class func setUp() {
         // disable GPC redirects
         PrivacySecurityPreferences.shared.gpcEnabled = false

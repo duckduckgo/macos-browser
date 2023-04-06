@@ -87,6 +87,7 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
         return synchronousResultWebView
     }
 
+    @MainActor
     private func handleCreateWebViewRequest(from webView: WKWebView,
                                             with configuration: WKWebViewConfiguration,
                                             for navigationAction: WKNavigationAction,
@@ -156,6 +157,7 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
     }
 
     /// create a new Tab returning its WebView to a createWebViewWithConfiguration callback
+    @MainActor
     private func createWebView(from webView: WKWebView, with configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, of kind: NewWindowPolicy) -> WKWebView? {
         guard let delegate else { return nil }
 

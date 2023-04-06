@@ -20,6 +20,7 @@ import XCTest
 import Combine
 @testable import DuckDuckGo_Privacy_Browser
 
+@MainActor
 final class AppStateChangePublisherTests: XCTestCase {
     var cancellables = Set<AnyCancellable>()
 
