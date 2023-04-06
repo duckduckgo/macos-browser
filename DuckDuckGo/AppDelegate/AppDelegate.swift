@@ -54,6 +54,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     private var grammarFeaturesManager = GrammarFeaturesManager()
     private let crashReporter = CrashReporter()
     private(set) var internalUserDecider: InternalUserDecider!
+    private(set) var featureFlagger: FeatureFlagger!
     private var appIconChanger: AppIconChanger!
     private(set) var syncService: DDGSyncing!
     private(set) var syncPersistence: SyncDataPersistor!
@@ -122,6 +123,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
         let internalUserDeciderStore = InternalUserDeciderStore(fileStore: fileStore)
         internalUserDecider = DefaultInternalUserDecider(store: internalUserDeciderStore)
+        featureFlagger = DefaultFeatureFlagger(internalUserDecider: internalUserDecider,
+                                               privacyConfig: AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.privacyConfig)
+        NSApp.mainMenuTyped.setup(with: featureFlagger)
 
 #if DEBUG
         func mock<T>(_ className: String) -> T {
