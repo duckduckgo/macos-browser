@@ -76,26 +76,24 @@ final class MainMenu: NSMenu {
     @IBOutlet weak var toggleDownloadsShortcutMenuItem: NSMenuItem?
 
     // MARK: - Debug
+    @IBOutlet weak var debugMenuItem: NSMenuItem?
 
-    lazy var featureFlagger: FeatureFlagger = {
-        DefaultFeatureFlagger(internalUserDecider: (NSApp.delegate as? AppDelegate)!.internalUserDecider,
-                              privacyConfig: AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.privacyConfig)
-    }()
+    private func setupDebugMenuItem(with featureFlagger: FeatureFlagger) {
+        guard let debugMenuItem else {
+            assertionFailure("debugMenuItem missing")
+            return
+        }
 
-    @IBOutlet weak var debugMenuItem: NSMenuItem? {
-        didSet {
-            guard let debugMenuItem else { return }
 #if !DEBUG && !REVIEW
-            guard featureFlagger.isFeatureOn(.debugMenu) else {
-                removeItem(item)
-                self.debugMenuItem = nil
-                return
-            }
+        guard featureFlagger.isFeatureOn(.debugMenu) else {
+            removeItem(debugMenuItem)
+            self.debugMenuItem = nil
+            return
+        }
 #endif
 
-            if debugMenuItem.submenu?.items.contains(loggingMenuItem) == false {
-                debugMenuItem.submenu!.addItem(loggingMenuItem)
-            }
+        if debugMenuItem.submenu?.items.contains(loggingMenuItem) == false {
+            debugMenuItem.submenu!.addItem(loggingMenuItem)
         }
     }
 
@@ -104,13 +102,17 @@ final class MainMenu: NSMenu {
     @IBOutlet weak var helpSeparatorMenuItem: NSMenuItem?
     @IBOutlet weak var sendFeedbackMenuItem: NSMenuItem?
 
+    private func setupHelpMenuItem() {
+#if !FEEDBACK
+        guard let sendFeedbackMenuItem else { return }
+
+        sendFeedbackMenuItem.isHidden = true
+#endif
+    }
+
     let sharingMenu = SharingMenu()
 
-    required init(coder: NSCoder) {
-        super.init(coder: coder)
-
-        setup()
-    }
+    // MARK: - Lifecycle
 
     override func update() {
         super.update()
@@ -125,11 +127,6 @@ final class MainMenu: NSMenu {
             printSeparatorItem?.removeFromParent()
         }
 
-#if APPSTORE
-        checkForUpdatesMenuItem?.removeFromParent()
-        checkForUpdatesSeparatorItem?.removeFromParent()
-#endif
-
         sharingMenu.title = shareMenuItem.title
         shareMenuItem.submenu = sharingMenu
 
@@ -138,21 +135,16 @@ final class MainMenu: NSMenu {
         updateLoggingMenuItems()
     }
 
-    private func setup() {
+    func setup(with featureFlagger: FeatureFlagger) {
         self.delegate = self
-        #if !FEEDBACK
 
-        guard let helpMenuItemSubmenu = helpMenuItem?.submenu,
-              let helpSeparatorMenuItem = helpSeparatorMenuItem,
-              let sendFeedbackMenuItem = sendFeedbackMenuItem else {
-            os_log("MainMenuManager: Failed to setup main menu", type: .error)
-            return
-        }
+#if APPSTORE
+        checkForUpdatesMenuItem?.removeFromParent()
+        checkForUpdatesSeparatorItem?.removeFromParent()
+#endif
 
-        sendFeedbackMenuItem.isHidden = true
-
-        #endif
-
+        setupHelpMenuItem()
+        setupDebugMenuItem(with: featureFlagger)
         subscribeToBookmarkList()
         subscribeToFavicons()
     }
