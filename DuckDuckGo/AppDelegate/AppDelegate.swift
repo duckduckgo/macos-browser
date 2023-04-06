@@ -112,18 +112,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
             }
         }
 
-#if DEBUG
-        func mock<T>(_ className: String) -> T {
-            ((NSClassFromString(className) as? NSObject.Type)!.init() as? T)!
-        }
-        AppPrivacyFeatures.shared = NSApp.isRunningUnitTests
-            // runtime mock-replacement for Unit Tests, to be redone when we‘ll be doing Dependency Injection
-            ? AppPrivacyFeatures(contentBlocking: mock("ContentBlockingMock"), httpsUpgradeStore: mock("HTTPSUpgradeStoreMock"))
-            : AppPrivacyFeatures(contentBlocking: AppContentBlocking(), database: Database.shared)
-#else
-        AppPrivacyFeatures.shared = AppPrivacyFeatures(contentBlocking: AppContentBlocking(), database: Database.shared)
-#endif
-
         do {
             let encryptionKey = NSApp.isRunningUnitTests ? nil : try keyStore.readKey()
             fileStore = EncryptedFileStore(encryptionKey: encryptionKey)
@@ -135,6 +123,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
         let internalUserDeciderStore = InternalUserDeciderStore(fileStore: fileStore)
         internalUserDecider = DefaultInternalUserDecider(store: internalUserDeciderStore)
+
+#if DEBUG
+        func mock<T>(_ className: String) -> T {
+            ((NSClassFromString(className) as? NSObject.Type)!.init() as? T)!
+        }
+        AppPrivacyFeatures.shared = NSApp.isRunningUnitTests
+            // runtime mock-replacement for Unit Tests, to be redone when we‘ll be doing Dependency Injection
+            ? AppPrivacyFeatures(contentBlocking: mock("ContentBlockingMock"), httpsUpgradeStore: mock("HTTPSUpgradeStoreMock"))
+            : AppPrivacyFeatures(contentBlocking: AppContentBlocking(internalUserDecider: internalUserDecider), database: Database.shared)
+#else
+        AppPrivacyFeatures.shared = AppPrivacyFeatures(contentBlocking: AppContentBlocking(internalUserDecider: internalUserDecider), database: Database.shared)
+#endif
+
         featureFlagger = DefaultFeatureFlagger(internalUserDecider: internalUserDecider,
                                                privacyConfig: AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.privacyConfig)
         NSApp.mainMenuTyped.setup(with: featureFlagger)
