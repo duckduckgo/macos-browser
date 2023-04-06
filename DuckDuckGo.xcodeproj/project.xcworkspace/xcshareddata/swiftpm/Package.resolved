@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "0f0e20970a54c0fb570734111f0f15c3de4b4de8",
-        "version" : "54.0.0"
+        "revision" : "9f6aeeb3ef44c8825a35ab61fb9e6b093ae612c5",
+        "version" : "55.0.0"
       }
     },
     {
@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/GRDB.swift.git",
       "state" : {
-        "revision" : "8eac7de76dff73dc467d5c43f9beabc61a6d6e02",
-        "version" : "2.0.0"
+        "revision" : "4475888676cfe1aabb1a35f379cd079ea692da1e",
+        "version" : "2.1.1"
       }
     },
     {
@@ -55,11 +55,11 @@
       }
     },
     {
-      "identity" : "openssl",
+      "identity" : "openssl-xcframework",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/krzyzanowskim/OpenSSL",
+      "location" : "https://github.com/duckduckgo/OpenSSL-XCFramework",
       "state" : {
-        "revision" : "52db2ab9de7f78d1dea0d728fddd47fb133e25b7",
+        "revision" : "238e8f700809ff0e1cad5f906cb4c3b0f77f44f9",
         "version" : "1.1.1900"
       }
     },

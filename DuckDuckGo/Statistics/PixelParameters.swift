@@ -114,6 +114,7 @@ extension Pixel.Event {
              .emailUserPressedUseAlias,
              .emailUserPressedUseAddress,
              .jsPixel,
+             .duckPlayerJSPixel,
              .bookmarksBarActive,
              .bookmarksBarInactive:
 
