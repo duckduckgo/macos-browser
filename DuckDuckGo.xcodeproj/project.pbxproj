@@ -1195,6 +1195,8 @@
 		5682C69429B79B57004DE3C8 /* TabBarViewItemTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5601FECC29B7973D00068905 /* TabBarViewItemTests.swift */; };
 		569277C129DDCBB500B633EF /* ContinueSetUpModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 569277C029DDCBB500B633EF /* ContinueSetUpModel.swift */; };
 		569277C229DDCBB500B633EF /* ContinueSetUpModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 569277C029DDCBB500B633EF /* ContinueSetUpModel.swift */; };
+		569277C429DEE09D00B633EF /* ContinueSetUpModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 569277C329DEE09D00B633EF /* ContinueSetUpModelTests.swift */; };
+		569277C529DEE09D00B633EF /* ContinueSetUpModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 569277C329DEE09D00B633EF /* ContinueSetUpModelTests.swift */; };
 		56D6A3D629DB2BAB0055215A /* ContinueSetUpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56D6A3D529DB2BAB0055215A /* ContinueSetUpView.swift */; };
 		56D6A3D729DB2BAB0055215A /* ContinueSetUpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56D6A3D529DB2BAB0055215A /* ContinueSetUpView.swift */; };
 		7B1E819E27C8874900FF0E60 /* ContentOverlayPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1E819B27C8874900FF0E60 /* ContentOverlayPopover.swift */; };
@@ -2267,6 +2269,7 @@
 		566B195C29CDB692007E38F4 /* MoreOptionsMenuTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreOptionsMenuTests.swift; sourceTree = "<group>"; };
 		566B196029CDB7C9007E38F4 /* CapturingOptionsButtonMenuDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapturingOptionsButtonMenuDelegate.swift; sourceTree = "<group>"; };
 		569277C029DDCBB500B633EF /* ContinueSetUpModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContinueSetUpModel.swift; sourceTree = "<group>"; };
+		569277C329DEE09D00B633EF /* ContinueSetUpModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContinueSetUpModelTests.swift; sourceTree = "<group>"; };
 		56D6A3D529DB2BAB0055215A /* ContinueSetUpView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContinueSetUpView.swift; sourceTree = "<group>"; };
 		7B1E819B27C8874900FF0E60 /* ContentOverlayPopover.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentOverlayPopover.swift; sourceTree = "<group>"; };
 		7B1E819C27C8874900FF0E60 /* ContentOverlay.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = ContentOverlay.storyboard; sourceTree = "<group>"; };
@@ -3860,6 +3863,7 @@
 			isa = PBXGroup;
 			children = (
 				4BF6961C28BE911100D402D4 /* RecentlyVisitedSiteModelTests.swift */,
+				569277C329DEE09D00B633EF /* ContinueSetUpModelTests.swift */,
 			);
 			path = HomePage;
 			sourceTree = "<group>";
@@ -7201,6 +7205,7 @@
 				3706FE73293F661700E42796 /* PermissionManagerMock.swift in Sources */,
 				3706FE74293F661700E42796 /* WebsiteDataStoreMock.swift in Sources */,
 				3706FE75293F661700E42796 /* WebsiteBreakageReportTests.swift in Sources */,
+				569277C529DEE09D00B633EF /* ContinueSetUpModelTests.swift in Sources */,
 				3706FE76293F661700E42796 /* MockSecureVault.swift in Sources */,
 				376E2D2729428353001CD31B /* BrokenSiteReportingReferenceTests.swift in Sources */,
 				3707C72F294B5D4F00682A9F /* WebViewTests.swift in Sources */,
@@ -7916,6 +7921,7 @@
 				B6DA44232616CABC00DD1EC2 /* PixelArgumentsTests.swift in Sources */,
 				AAEC74BC2642F0F800C2EFBC /* History.xcdatamodeld in Sources */,
 				37534C9E28104D9B002621E7 /* TabLazyLoaderTests.swift in Sources */,
+				569277C429DEE09D00B633EF /* ContinueSetUpModelTests.swift in Sources */,
 				85F1B0C925EF9759004792B6 /* URLEventHandlerTests.swift in Sources */,
 				4B9292BD2667103100AD2C21 /* BookmarkOutlineViewDataSourceTests.swift in Sources */,
 				4BF6961D28BE911100D402D4 /* RecentlyVisitedSiteModelTests.swift in Sources */,

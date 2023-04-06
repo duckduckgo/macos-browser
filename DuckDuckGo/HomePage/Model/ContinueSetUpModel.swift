@@ -23,12 +23,12 @@ extension HomePage.Models {
     final class ContinueSetUpModel: ObservableObject {
 
         let title = UserText.newTabSetUpSectionTitle
-        let itemWidth = GridDimensions.itemWidth
-        let itemHeight = GridDimensions.itemHeight
-        let horizontalSpacing = GridDimensions.horizontalSpacing
-        let verticalSpacing = GridDimensions.verticalSpacing
+        let itemWidth = FeaturesGridDimensions.itemWidth
+        let itemHeight = FeaturesGridDimensions.itemHeight
+        let horizontalSpacing = FeaturesGridDimensions.horizontalSpacing
+        let verticalSpacing = FeaturesGridDimensions.verticalSpacing
         let itemsPerRow = HomePage.featuresPerRow
-        let gridWidth = GridDimensions.width
+        let gridWidth = FeaturesGridDimensions.width
         let deleteActionTitle = UserText.newTabSetUpRemoveItemAction
 
         var showAllFeatures: Bool = false {
@@ -91,6 +91,7 @@ extension HomePage.Models {
             }
         }
 
+        // Still Waiting for icon assets
         var icon: NSImage {
             switch self {
             case .defaultBrowser:
@@ -107,7 +108,7 @@ extension HomePage.Models {
         }
     }
 
-    enum GridDimensions {
+    enum FeaturesGridDimensions {
         static let itemWidth: CGFloat = 160
         static let itemHeight: CGFloat = 64
         static let verticalSpacing: CGFloat = 10
