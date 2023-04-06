@@ -10,10 +10,13 @@
   },
   "scripts": {
     "test": "npm run build &&  npm run tsc",
+    "test.integration": "npm run build.root && playwright test",
+    "test.integration.headed": "npm run build.root && playwright test --headed",
     "_build": "esbuild --loader:.css=text --loader:.svg=text --bundle youtube-inject.js --target=safari11,es2021",
     "build": "npm run _build -- --outfile='dist/youtube-inject.bundle.js'",
-    "build:watch": "npm run _build -- --outfile='dist/youtube-inject.bundle.js' --watch",
+    "build.watch": "npm run _build -- --outfile='dist/youtube-inject.bundle.js' --watch",
+    "build.root": "cd ../../ && npm run build-yt && cd -",
     "tsc": "tsc",
-    "tsc:watch": "npm run tsc -- --watch"
+    "tsc.watch": "npm run tsc -- --watch"
   }
 }
