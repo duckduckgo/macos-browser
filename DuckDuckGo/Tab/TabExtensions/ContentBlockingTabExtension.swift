@@ -109,7 +109,7 @@ extension ContentBlockingTabExtension: NavigationResponder {
         // Ensure Content Blocking Assets (WKContentRuleList&UserScripts) are installed
         if userContentController?.contentBlockingAssetsInstalled == false
             && privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .contentBlocking) {
-            os_log("tabWillWaitForRulesCompilation")
+            os_log("%d: tabWillWaitForRulesCompilation", log: .contentBlocking, identifier)
             cbaTimeReporter?.tabWillWaitForRulesCompilation(identifier)
 
             disableLongDecisionMakingChecks()
@@ -118,7 +118,7 @@ extension ContentBlockingTabExtension: NavigationResponder {
             }
 
             await userContentController?.awaitContentBlockingAssetsInstalled()
-            os_log("Rules Compilation done")
+            os_log("%d: Rules Compilation done", log: .contentBlocking, identifier)
             cbaTimeReporter?.reportWaitTimeForTabFinishedWaitingForRules(identifier)
         } else {
             cbaTimeReporter?.reportNavigationDidNotWaitForRules()

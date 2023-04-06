@@ -179,7 +179,7 @@ protocol NewWindowPolicyDecisionMaker {
     fileprivate weak var delegate: TabDelegate?
     func setDelegate(_ delegate: TabDelegate) { self.delegate = delegate }
 
-    private let navigationDelegate = DistributedNavigationDelegate(logger: .navigation)
+    private let navigationDelegate = DistributedNavigationDelegate(log: .navigation)
     private var newWindowPolicyDecisionMakers: [NewWindowPolicyDecisionMaker]?
     private var onNewWindow: ((WKNavigationAction?) -> NavigationDecision)?
 

@@ -47,9 +47,9 @@ final class CSVImporter: DataImporter {
 
             for (index, value) in csvValues.enumerated() {
                 switch value.lowercased() {
-                case "url": urlPosition = index
-                case "username": usernamePosition = index
-                case "password": passwordPosition = index
+                case "url", "login_uri": urlPosition = index
+                case "username", "login_username": usernamePosition = index
+                case "password", "login_password": passwordPosition = index
                 case "title", "name": titlePosition = index
                 default: break
                 }
