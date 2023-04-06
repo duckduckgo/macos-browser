@@ -37,6 +37,9 @@ struct RootView: View {
                         Favorites()
                             .padding(.top, 72)
 
+                        ContinueSetUpView()
+                            .padding(.top, 72)
+
                         RecentlyVisited()
                             .padding(.top, 66)
                             .padding(.bottom, 16)

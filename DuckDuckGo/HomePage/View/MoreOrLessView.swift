@@ -19,19 +19,11 @@
 import SwiftUI
 extension HomePage.Views {
 
-struct MoreOrLess: View {
+    struct MoreOrLess: View {
 
-    @Binding var isExpanded: Bool
+        @Binding var isExpanded: Bool
 
-    var body: some View {
-
-        HStack(spacing: 20) {
-
-            VStack {
-                Divider()
-                    .foregroundColor(Color("HomePageMoreOrLessTextColor"))
-            }.frame(maxWidth: .infinity)
-
+        var body: some View {
             HStack {
                 Text(isExpanded ? UserText.moreOrLessCollapse : UserText.moreOrLessExpand)
                 Group {
@@ -44,21 +36,12 @@ struct MoreOrLess: View {
                 .rotationEffect(.degrees(isExpanded ? 0 : 180))
             }
             .foregroundColor(Color("HomePageMoreOrLessTextColor"))
-
-            VStack {
-                Divider()
-                    .foregroundColor(Color("HomePageMoreOrLessTextColor"))
-            }.frame(maxWidth: .infinity)
-        }
-        .font(.system(size: 11))
-        .link {
-            withAnimation {
-                isExpanded = !isExpanded
+            .font(.system(size: 11))
+            .link {
+                withAnimation {
+                    isExpanded = !isExpanded
+                }
             }
         }
-
     }
-
-}
-
 }

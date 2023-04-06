@@ -32,6 +32,7 @@ final class HomePageViewController: NSViewController {
     var favoritesModel: HomePage.Models.FavoritesModel!
     var defaultBrowserModel: HomePage.Models.DefaultBrowserModel!
     var recentlyVisitedModel: HomePage.Models.RecentlyVisitedModel!
+    var featuresModel: HomePage.Models.ContinueSetUpModel!
     var cancellables = Set<AnyCancellable>()
 
     @UserDefaultsWrapper(key: .defaultBrowserDismissed, defaultValue: false)
@@ -63,6 +64,7 @@ final class HomePageViewController: NSViewController {
         favoritesModel = createFavoritesModel()
         defaultBrowserModel = createDefaultBrowserModel()
         recentlyVisitedModel = createRecentlyVisitedModel()
+        featuresModel = createFeatureModel()
 
         refreshModels()
 
@@ -70,6 +72,7 @@ final class HomePageViewController: NSViewController {
             .environmentObject(favoritesModel)
             .environmentObject(defaultBrowserModel)
             .environmentObject(recentlyVisitedModel)
+            .environmentObject(featuresModel)
             .onTapGesture { [weak self] in
                 // Remove focus from the address bar if interacting with this view.
                 self?.view.makeMeFirstResponder()
@@ -126,6 +129,10 @@ final class HomePageViewController: NSViewController {
         return .init { [weak self] url in
             self?.openUrl(url)
         }
+    }
+
+    func createFeatureModel() -> HomePage.Models.ContinueSetUpModel {
+        return .init()
     }
 
     func createDefaultBrowserModel() -> HomePage.Models.DefaultBrowserModel {

@@ -21,45 +21,51 @@ import SwiftUIExtensions
 
 extension HomePage.Views {
 
-struct Favorites: View {
+    struct Favorites: View {
 
-    @EnvironmentObject var model: HomePage.Models.FavoritesModel
+        @EnvironmentObject var model: HomePage.Models.FavoritesModel
 
-    @State var isHovering = false
-
-    var rowIndices: Range<Int> {
-        model.showAllFavorites ? model.rows.indices : model.rows.indices.prefix(HomePage.favoritesRowCountWhenCollapsed)
-    }
-
-    var body: some View {
-
-        if #available(macOS 12.0, *) {
-            LazyVStack(spacing: 4) {
-                FavoritesGrid(isHovering: $isHovering)
+        @State var isHovering = false {
+            didSet {
+                updateMoreOrLessVisibility()
             }
-            .frame(maxWidth: .infinity)
-            .onHover { isHovering in
-                self.isHovering = isHovering
+        }
+
+        @State var moreOrLessButtonVisibility: ViewVisibility = .invisible
+
+        var rowIndices: Range<Int> {
+            model.showAllFavorites ? model.rows.indices : model.rows.indices.prefix(HomePage.favoritesRowCountWhenCollapsed)
+        }
+
+        var body: some View {
+            VStack(spacing: 20) {
+                SectionTitleView(titleText: UserText.newTabFavoriteSectionTitle, isExpanded: $model.showAllFavorites, isMoreOrLessButtonVisibility: $moreOrLessButtonVisibility)
+                if #available(macOS 12.0, *) {
+                    LazyVStack(spacing: 4) {
+                        FavoritesGrid()
+                    }
+                    .frame(maxWidth: .infinity)
+                } else {
+                    VStack(spacing: 4) {
+                        FavoritesGrid()
+                    }
+                    .frame(maxWidth: .infinity)
+                }
             }
-        } else {
-            VStack(spacing: 4) {
-                FavoritesGrid(isHovering: $isHovering)
-            }
-            .frame(maxWidth: .infinity)
             .onHover { isHovering in
                 self.isHovering = isHovering
             }
         }
 
+        private func updateMoreOrLessVisibility() {
+            let thresholdFavoritesCount = HomePage.favoritesRowCountWhenCollapsed * HomePage.favoritesPerRow
+            moreOrLessButtonVisibility = (isHovering && model.models.count > thresholdFavoritesCount) ? .visible : .invisible
+        }
     }
-
-}
 
 struct FavoritesGrid: View {
 
     @EnvironmentObject var model: HomePage.Models.FavoritesModel
-
-    @Binding var isHovering: Bool
 
     var rowIndices: Range<Int> {
         model.showAllFavorites ? model.rows.indices : model.rows.indices.prefix(HomePage.favoritesRowCountWhenCollapsed)
@@ -83,22 +89,13 @@ struct FavoritesGrid: View {
                 }
             }
         }
-
-        MoreOrLess(isExpanded: $model.showAllFavorites)
-            .padding(.top, 2)
-            .visibility(moreOrLessButtonVisibility)
-    }
-
-    var moreOrLessButtonVisibility: ViewVisibility {
-        let thresholdFavoritesCount = HomePage.favoritesRowCountWhenCollapsed * HomePage.favoritesPerRow
-        return (isHovering && model.models.count > thresholdFavoritesCount) ? .visible : .invisible
     }
 
     enum GridDimensions {
         static let itemWidth: CGFloat = 64
         static let itemHeight: CGFloat = 101
         static let verticalSpacing: CGFloat = 10
-        static let horizontalSpacing: CGFloat = 20
+        static let horizontalSpacing: CGFloat = 24
 
         static let width: CGFloat = (itemWidth + horizontalSpacing) * CGFloat(HomePage.favoritesPerRow) - horizontalSpacing
 
