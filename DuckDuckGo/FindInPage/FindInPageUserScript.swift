@@ -18,12 +18,13 @@
 
 import WebKit
 import UserScript
+import FindInPage
 
 final class FindInPageUserScript: NSObject, StaticUserScript {
 
     static var injectionTime: WKUserScriptInjectionTime { .atDocumentEnd }
     static var forMainFrameOnly: Bool { false }
-    static var source: String = FindInPageUserScript.loadJS("findinpage", from: .main)
+    static var source: String = FindInPageUserScript.loadJS("assets/findinpage", from: FindInPage.bundle)
     static var script: WKUserScript = FindInPageUserScript.makeWKUserScript()
     nonisolated var messageNames: [String] { ["findInPageHandler"] }
 

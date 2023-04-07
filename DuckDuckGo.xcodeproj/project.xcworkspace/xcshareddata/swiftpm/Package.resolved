@@ -28,6 +28,15 @@
       }
     },
     {
+      "identity" : "duckduckgo-find-in-page",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/more-duckduckgo-org/duckduckgo-find-in-page",
+      "state" : {
+        "revision" : "94b9bfc5691e315372e347596d385c2cb3966ef5",
+        "version" : "1.0.0"
+      }
+    },
+    {
       "identity" : "grdb.swift",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/GRDB.swift.git",

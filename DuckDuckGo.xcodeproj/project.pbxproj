@@ -80,7 +80,8 @@
 		31F28C5328C8EECA00119F70 /* DuckPlayerSchemeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31F28C5228C8EECA00119F70 /* DuckPlayerSchemeHandler.swift */; };
 		31F28C5828C8EEDB00119F70 /* youtube_player_template.html in Resources */ = {isa = PBXBuildFile; fileRef = 31F28C5528C8EEDB00119F70 /* youtube_player_template.html */; };
 		31F7F2A6288AD2CA001C0D64 /* NavigationBarBadgeAnimationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31F7F2A5288AD2CA001C0D64 /* NavigationBarBadgeAnimationView.swift */; };
-		336D5B18262D8D3C0052E0C9 /* findinpage.js in Resources */ = {isa = PBXBuildFile; fileRef = 336D5AEF262D8D3C0052E0C9 /* findinpage.js */; };
+		3380A2B829EEC47D00A584DA /* FindInPage in Frameworks */ = {isa = PBXBuildFile; productRef = 3380A2B729EEC47D00A584DA /* FindInPage */; };
+		33E1D02F29E03871003E1C3C /* FindInPage in Frameworks */ = {isa = PBXBuildFile; productRef = 33E1D02E29E03871003E1C3C /* FindInPage */; };
 		3701C9CE29BD040C00305B15 /* FirefoxBerkeleyDatabaseReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3701C9CD29BD040900305B15 /* FirefoxBerkeleyDatabaseReader.swift */; };
 		3701C9CF29BD040C00305B15 /* FirefoxBerkeleyDatabaseReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3701C9CD29BD040900305B15 /* FirefoxBerkeleyDatabaseReader.swift */; };
 		37054FC92873301700033B6F /* PinnedTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37054FC82873301700033B6F /* PinnedTabView.swift */; };
@@ -655,7 +656,6 @@
 		3706FCF6293F65D500E42796 /* trackers-2.json in Resources */ = {isa = PBXBuildFile; fileRef = AA3439742754D55100B241FA /* trackers-2.json */; };
 		3706FCF7293F65D500E42796 /* ProximaNova-Reg-webfont.woff2 in Resources */ = {isa = PBXBuildFile; fileRef = EAA29AE8278D2E43007070CF /* ProximaNova-Reg-webfont.woff2 */; };
 		3706FCF8293F65D500E42796 /* clickToLoad.js in Resources */ = {isa = PBXBuildFile; fileRef = EAFAD6C92728BD1200F9DF00 /* clickToLoad.js */; };
-		3706FCF9293F65D500E42796 /* findinpage.js in Resources */ = {isa = PBXBuildFile; fileRef = 336D5AEF262D8D3C0052E0C9 /* findinpage.js */; };
 		3706FDDA293F661700E42796 /* EmbeddedTrackerDataTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9833913227AAAEEE00DAF119 /* EmbeddedTrackerDataTests.swift */; };
 		3706FDDB293F661700E42796 /* AutofillPreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3776583027F8325B009A6B35 /* AutofillPreferencesTests.swift */; };
 		3706FDDC293F661700E42796 /* FileManagerExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B67C6C462654C643006C872E /* FileManagerExtensionTests.swift */; };
@@ -1954,8 +1954,6 @@
 		31F28C5528C8EEDB00119F70 /* youtube_player_template.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = youtube_player_template.html; sourceTree = "<group>"; };
 		31F7F2A5288AD2CA001C0D64 /* NavigationBarBadgeAnimationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationBarBadgeAnimationView.swift; sourceTree = "<group>"; };
 		336B39E22726B4B700C417D3 /* LocalUnprotectedDomains.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalUnprotectedDomains.swift; sourceTree = "<group>"; };
-		336D5AEF262D8D3C0052E0C9 /* findinpage.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = findinpage.js; sourceTree = "<group>"; };
-		339A6B5726A044BA00E3DAE8 /* duckduckgo-privacy-dashboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "duckduckgo-privacy-dashboard"; path = "Submodules/duckduckgo-privacy-dashboard"; sourceTree = SOURCE_ROOT; };
 		3701C9CD29BD040900305B15 /* FirefoxBerkeleyDatabaseReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirefoxBerkeleyDatabaseReader.swift; sourceTree = "<group>"; };
 		37054FC82873301700033B6F /* PinnedTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PinnedTabView.swift; sourceTree = "<group>"; };
 		37054FCD2876472D00033B6F /* WebViewSnapshotView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewSnapshotView.swift; sourceTree = "<group>"; };
@@ -2820,6 +2818,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3380A2B829EEC47D00A584DA /* FindInPage in Frameworks */,
 				984FD3BF299ACF35007334DD /* Bookmarks in Frameworks */,
 				37A5E2F0298AA1B20047046B /* Persistence in Frameworks */,
 				378F44E629B4BDEE00899924 /* SwiftUIExtensions in Frameworks */,
@@ -2876,6 +2875,7 @@
 				9807F645278CA16F00E1547B /* BrowserServicesKit in Frameworks */,
 				987799ED299998B1005D8EB6 /* Bookmarks in Frameworks */,
 				1E950E3F2912A10D0051A99B /* ContentBlocking in Frameworks */,
+				33E1D02F29E03871003E1C3C /* FindInPage in Frameworks */,
 				378F44E429B4BDE900899924 /* SwiftUIExtensions in Frameworks */,
 				1E950E432912A10D0051A99B /* UserScript in Frameworks */,
 				4B82E9B325B69E3E00656FE7 /* TrackerRadarKit in Frameworks */,
@@ -3131,23 +3131,6 @@
 				31CF3431288B0B1B0087244B /* NavigationBarBadgeAnimator.swift */,
 			);
 			path = BadgeAnimations;
-			sourceTree = "<group>";
-		};
-		336D5AEA262D8D3C0052E0C9 /* duckduckgo-find-in-page */ = {
-			isa = PBXGroup;
-			children = (
-				336D5AEE262D8D3C0052E0C9 /* dist */,
-			);
-			name = "duckduckgo-find-in-page";
-			path = "Submodules/duckduckgo-find-in-page";
-			sourceTree = SOURCE_ROOT;
-		};
-		336D5AEE262D8D3C0052E0C9 /* dist */ = {
-			isa = PBXGroup;
-			children = (
-				336D5AEF262D8D3C0052E0C9 /* findinpage.js */,
-			);
-			path = dist;
 			sourceTree = "<group>";
 		};
 		373A1AA6283ECC8000586521 /* HTML */ = {
@@ -3532,8 +3515,6 @@
 		4B677447255DBF1400025BD8 /* Submodules */ = {
 			isa = PBXGroup;
 			children = (
-				339A6B5726A044BA00E3DAE8 /* duckduckgo-privacy-dashboard */,
-				336D5AEA262D8D3C0052E0C9 /* duckduckgo-find-in-page */,
 			);
 			name = Submodules;
 			sourceTree = "<group>";
@@ -5836,6 +5817,7 @@
 				37BA812E29B3CD6E0053F1A3 /* SyncUI */,
 				378F44E529B4BDEE00899924 /* SwiftUIExtensions */,
 				B6EC37FE29B8D915001ACE79 /* Configuration */,
+				3380A2B729EEC47D00A584DA /* FindInPage */,
 			);
 			productName = DuckDuckGo;
 			productReference = 3706FD05293F65D500E42796 /* DuckDuckGo App Store.app */;
@@ -5957,6 +5939,7 @@
 				378F44E329B4BDE900899924 /* SwiftUIExtensions */,
 				371D00E029D8509400EC8598 /* OpenSSL */,
 				4B2AAAF429E70DEA0026AFC0 /* Lottie */,
+				33E1D02E29E03871003E1C3C /* FindInPage */,
 			);
 			productName = DuckDuckGo;
 			productReference = AA585D7E248FD31100E9A3E2 /* DuckDuckGo.app */;
@@ -6057,6 +6040,7 @@
 				B6EC37F529B5DAAC001ACE79 /* XCRemoteSwiftPackageReference "swifter" */,
 				371D00DF29D8509400EC8598 /* XCRemoteSwiftPackageReference "OpenSSL-XCFramework" */,
 				4B2AAAF329E70DEA0026AFC0 /* XCRemoteSwiftPackageReference "lottie-ios" */,
+				33E1D02D29E03871003E1C3C /* XCRemoteSwiftPackageReference "duckduckgo-find-in-page" */,
 			);
 			productRefGroup = AA585D7F248FD31100E9A3E2 /* Products */;
 			projectDirPath = "";
@@ -6150,7 +6134,6 @@
 				3706FCF6293F65D500E42796 /* trackers-2.json in Resources */,
 				3706FCF7293F65D500E42796 /* ProximaNova-Reg-webfont.woff2 in Resources */,
 				3706FCF8293F65D500E42796 /* clickToLoad.js in Resources */,
-				3706FCF9293F65D500E42796 /* findinpage.js in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6265,7 +6248,6 @@
 				AA34397A2754D55100B241FA /* trackers-2.json in Resources */,
 				EAA29AEA278D2E43007070CF /* ProximaNova-Reg-webfont.woff2 in Resources */,
 				EAFAD6CA2728BD1200F9DF00 /* clickToLoad.js in Resources */,
-				336D5B18262D8D3C0052E0C9 /* findinpage.js in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8542,6 +8524,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		33E1D02D29E03871003E1C3C /* XCRemoteSwiftPackageReference "duckduckgo-find-in-page" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/more-duckduckgo-org/duckduckgo-find-in-page";
+			requirement = {
+				kind = exactVersion;
+				version = 1.0.0;
+			};
+		};
 		3706FA6C293F65D500E42796 /* XCRemoteSwiftPackageReference "TrackerRadarKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/TrackerRadarKit.git";
@@ -8652,6 +8642,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
 			productName = UserScript;
+		};
+		3380A2B729EEC47D00A584DA /* FindInPage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 33E1D02D29E03871003E1C3C /* XCRemoteSwiftPackageReference "duckduckgo-find-in-page" */;
+			productName = FindInPage;
+		};
+		33E1D02E29E03871003E1C3C /* FindInPage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 33E1D02D29E03871003E1C3C /* XCRemoteSwiftPackageReference "duckduckgo-find-in-page" */;
+			productName = FindInPage;
 		};
 		3706FA6B293F65D500E42796 /* TrackerRadarKit */ = {
 			isa = XCSwiftPackageProductDependency;
