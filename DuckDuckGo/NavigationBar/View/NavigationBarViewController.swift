@@ -236,10 +236,6 @@ final class NavigationBarViewController: NSViewController {
         super.mouseDown(with: event)
     }
 
-    func setDisposable() {
-
-    }
-
     func listenToPasswordManagerNotifications() {
         passwordManagerNotificationCancellable = NotificationCenter.default.publisher(for: .PasswordManagerChanged).sink { [weak self] _ in
             self?.updatePasswordManagementButton()

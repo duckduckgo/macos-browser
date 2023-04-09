@@ -279,6 +279,10 @@ final class AddressBarViewController: NSViewController {
             .store(in: &cancellables)
     }
 
+    var accentColor: NSColor {
+        return isDisposable ? NSColor.disposableAccentColor : NSColor.controlAccentColor
+    }
+
     private func updateView() {
         let isPassiveTextFieldHidden = isFirstResponder || mode.isEditing
         addressBarTextField.alphaValue = isPassiveTextFieldHidden ? 1 : 0
@@ -291,15 +295,10 @@ final class AddressBarViewController: NSViewController {
         let isKey = self.view.window?.isKeyWindow ?? false
         activeOuterBorderView.alphaValue = isKey && isFirstResponder && isHomePage ? 1 : 0
 
-        updateActiveViews()
-        refreshAddressBarAppearance(self)
-    }
-
-    private func updateActiveViews() {
-        let accentColor = isDisposable ? NSColor.disposableAccentColor : NSColor.controlAccentColor
+        activeOuterBorderView.layer?.backgroundColor = NSColor.controlAccentColor.withAlphaComponent(0.2).cgColor
+        activeBackgroundView.layer?.borderColor = NSColor.controlAccentColor.withAlphaComponent(0.8).cgColor
         activeOuterBorderView.layer?.backgroundColor = accentColor.withAlphaComponent(0.2).cgColor
-        activeBackgroundView.layer?.borderColor = isDisposable ? accentColor.cgColor : accentColor.withAlphaComponent(0.8).cgColor
-        activeBackgroundView.layer?.borderWidth = 2.0
+        activeBackgroundView.layer?.borderColor = accentColor.withAlphaComponent(0.8).cgColor
     }
 
     private func updateShadowViewPresence(_ isFirstResponder: Bool) {
@@ -352,7 +351,8 @@ final class AddressBarViewController: NSViewController {
 
         NSAppearance.withAppAppearance {
             if window.isKeyWindow {
-                updateActiveViews()
+                activeBackgroundView.layer?.borderWidth = 2.0
+                activeBackgroundView.layer?.borderColor = accentColor.withAlphaComponent(0.6).cgColor
                 activeBackgroundView.layer?.backgroundColor = NSColor.addressBarBackgroundColor.cgColor
 
                 activeOuterBorderView.isHidden = !isHomePage
