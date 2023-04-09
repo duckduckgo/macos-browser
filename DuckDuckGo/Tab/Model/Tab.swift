@@ -196,7 +196,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     private(set) var userContentController: UserContentController?
 
     convenience init(content: TabContent,
-                     faviconManagement: FaviconManagement = FaviconManager.shared,
+                     faviconManagement: FaviconManagement? = nil,
                      webCacheManager: WebCacheManager = WebCacheManager.shared,
                      webViewConfiguration: WKWebViewConfiguration? = nil,
                      historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
@@ -228,9 +228,10 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             ?? (NSApp.isRunningUnitTests ? nil : StatisticsLoader.shared)
         let privacyFeatures = privacyFeatures ?? PrivacyFeatures
         let internalUserDecider = (NSApp.delegate as? AppDelegate)?.internalUserDecider
+        let faviconManager = faviconManagement ?? (isDisposable ? FaviconManager(cacheType: .inMemory) : FaviconManager.shared)
 
         self.init(content: content,
-                  faviconManagement: faviconManagement,
+                  faviconManagement: faviconManager,
                   webCacheManager: webCacheManager,
                   webViewConfiguration: webViewConfiguration,
                   historyCoordinating: historyCoordinating,
