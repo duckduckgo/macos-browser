@@ -131,12 +131,6 @@ extension Pixel {
             }
         }
 
-        case bookmarksBarEnabled(_ source: BookmarksBarSource)
-        case bookmarksBarDisabled(_ source: BookmarksBarSource)
-
-        case bookmarksBarActive
-        case bookmarksBarInactive
-
         case debug(event: Debug, error: Error? = nil)
 
         enum Debug {
@@ -322,18 +316,6 @@ extension Pixel.Event {
         // This matches the SERP format
         case .duckPlayerJSPixel(let pixel):
             return "duck_player.mac.\(pixel.pixelName)"
-
-        case .bookmarksBarEnabled:
-            return "m_mac_bookmarks_bar_enabled"
-
-        case .bookmarksBarDisabled:
-            return "m_mac_bookmarks_bar_disabled"
-
-        case .bookmarksBarActive:
-            return "m_mac_bookmarks_bar_active"
-
-        case .bookmarksBarInactive:
-            return "m_mac_bookmarks_bar_inactive"
         }
     }
 }
