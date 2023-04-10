@@ -52,6 +52,14 @@ extension NSColor {
         NSColor(named: "BurnerWindowTabSeparatorColor")!
     }
 
+    static var burnerWindowMouseOverColor: NSColor {
+        .alternateSelectedControlTextColor.withAlphaComponent(0.1)
+    }
+
+    static var burnerWindowMouseDownColor: NSColor {
+        .alternateSelectedControlTextColor.withAlphaComponent(0.2)
+    }
+
     static var addressBarBorderColor: NSColor {
         NSColor(named: "AddressBarBorderColor")!
     }

@@ -25,11 +25,13 @@ extension HomePage.Views {
 
         var body: some View {
             ZStack {
-                LinearGradient(gradient: Gradient(colors: [Color.white, Color(hex: "FFA235").opacity(0.3)]), startPoint: .top, endPoint: .bottom)
+                Image("BurnerWindowBackground")
+                    .resizable()
+                    .scaledToFill()
                     .edgesIgnoringSafeArea(.all)
 
                 VStack {
-                    Image("DisposableWindowIcon")
+                    Image("BurnerWindowPopoverImage")
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .frame(width: 128, height: 96)
@@ -86,6 +88,13 @@ extension HomePage.Views {
     }
 
     struct FeaturesBox: View {
+
+            @Environment(\.colorScheme) var colorScheme
+
+            private var backgroundColor: Color {
+                return colorScheme == .dark ? Color.black.opacity(0.15) : Color.white
+            }
+
             var body: some View {
                 VStack(alignment: .leading, spacing: 15) {
                     Text("In addition ")
@@ -127,7 +136,7 @@ extension HomePage.Views {
                 }
                 .padding()
                 .padding(10)
-                .background(RoundedRectangle(cornerRadius: 8).fill(Color.white))
+                .background(RoundedRectangle(cornerRadius: 8).fill(backgroundColor))
                 .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.3), lineWidth: 1))
                 .shadow(color: Color.black.opacity(0.05), radius: 2, x: 0, y: 2)
             }

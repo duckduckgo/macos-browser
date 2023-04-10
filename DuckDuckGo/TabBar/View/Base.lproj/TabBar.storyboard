@@ -360,10 +360,10 @@
         <image name="TabOverflowBack" width="16" height="16"/>
         <image name="TabOverflowForward" width="16" height="16"/>
         <namedColor name="BurnerWindowTabBarBackground1">
-            <color red="0.41999998688697815" green="0.27099999785423279" blue="0.37599998712539673" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.37647058823529411" green="0.25490196078431371" blue="0.47058823529411764" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="BurnerWindowTabBarBackground2">
-            <color red="0.37647058823529411" green="0.29411764705882354" blue="0.40000000000000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.30196078431372547" green="0.19607843137254902" blue="0.41176470588235292" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="ButtonColor">
             <color red="0.28627450980392155" green="0.28627450980392155" blue="0.28627450980392155" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>

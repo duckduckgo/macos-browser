@@ -180,6 +180,9 @@ final class TabBarViewController: NSViewController {
     private func setupBurnerWindowButton() {
         burnerWindowButton.isHidden = !tabCollectionViewModel.isDisposable
         burnerWindowButton.toolTip = UserText.burnerWindowButtonTooltip
+        burnerWindowButton.normalTintColor = .alternateSelectedControlTextColor
+        burnerWindowButton.mouseOverColor = .burnerWindowMouseOverColor
+        burnerWindowButton.mouseDownColor = .burnerWindowMouseDownColor
     }
 
     private func setupPinnedTabsView() {
@@ -570,8 +573,10 @@ final class TabBarViewController: NSViewController {
         addTabButton.action = #selector(addButtonAction(_:))
         addTabButton.toolTip = UserText.newTabTooltip
         if tabCollectionViewModel.isDisposable {
-            addTabButton.normalTintColor = NSColor.alternateSelectedControlTextColor
-            addTabButton.contentTintColor = NSColor.alternateSelectedControlTextColor
+            addTabButton.normalTintColor = .alternateSelectedControlTextColor
+            addTabButton.contentTintColor = .alternateSelectedControlTextColor
+            addTabButton.mouseOverColor = .burnerWindowMouseOverColor
+            addTabButton.mouseDownColor = .burnerWindowMouseDownColor
         }
     }
 
@@ -873,6 +878,9 @@ extension TabBarViewController: NSCollectionViewDataSource {
             footer.toolTip = UserText.newTabTooltip
             if tabCollectionViewModel.isDisposable {
                 footer.addButton.normalTintColor = .alternateSelectedControlTextColor
+                footer.addButton.contentTintColor = .alternateSelectedControlTextColor
+                footer.addButton.mouseOverColor = .burnerWindowMouseOverColor
+                footer.addButton.mouseDownColor = .burnerWindowMouseDownColor
             }
         }
 
