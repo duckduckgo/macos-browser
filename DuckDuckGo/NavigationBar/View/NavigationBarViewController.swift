@@ -414,8 +414,8 @@ final class NavigationBarViewController: NSViewController {
                                                                   downloadsDelegate: self)
                 } else {
                     if update.item.isDisposable {
-                        invalidateDownloadButtonHidingTimer()
-                        updateDownloadsButton(updatingFromPinnedViewsNotification: false)
+                        self.invalidateDownloadButtonHidingTimer()
+                        self.updateDownloadsButton(updatingFromPinnedViewsNotification: false)
                     }
                 }
                 self.updateDownloadsButton()
