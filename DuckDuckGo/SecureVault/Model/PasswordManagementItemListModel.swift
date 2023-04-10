@@ -18,6 +18,7 @@
 
 import Foundation
 import BrowserServicesKit
+import Common
 
 enum SecureVaultItem: Equatable, Identifiable, Comparable {
 
@@ -25,6 +26,14 @@ enum SecureVaultItem: Equatable, Identifiable, Comparable {
     case card(SecureVaultModels.CreditCard)
     case identity(SecureVaultModels.Identity)
     case note(SecureVaultModels.Note)
+
+    private var tld: TLD {
+        TLD()
+    }
+
+    private var websiteAccountSorter: AutofillUrlSort {
+        AutofillDomainNameUrlSort()
+    }
 
     var websiteAccount: SecureVaultModels.WebsiteAccount? {
         switch self {
@@ -148,15 +157,17 @@ enum SecureVaultItem: Equatable, Identifiable, Comparable {
     var firstCharacter: String {
         let defaultFirstCharacter = "#"
 
+        if let account = websiteAccount,
+           let firstCharacter = websiteAccountSorter.firstCharacterForGrouping(account, tld: tld)?.first,
+           firstCharacter.isLetter {
+            return firstCharacter.uppercased()
+        }
+
         guard let character = self.displayTitle.first else {
             return defaultFirstCharacter
         }
 
-        if character.isLetter {
-            return character.uppercased()
-        } else {
-            return defaultFirstCharacter
-        }
+        return character.isLetter ? character.uppercased() : defaultFirstCharacter
     }
 
     var category: SecureVaultSorting.Category {

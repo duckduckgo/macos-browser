@@ -17,6 +17,8 @@
 //
 
 import Foundation
+import BrowserServicesKit
+import Common
 
 struct PasswordManagementListSection {
 
@@ -41,6 +43,9 @@ struct PasswordManagementListSection {
     let title: String
     let items: [SecureVaultItem]
 
+    static let tld: TLD = TLD()
+    static let autofillUrlSort: AutofillUrlSort = AutofillDomainNameUrlSort()
+
     func withUpdatedItems(_ newItems: [SecureVaultItem]) -> PasswordManagementListSection {
         return PasswordManagementListSection(title: title, items: newItems)
     }
@@ -58,12 +63,36 @@ struct PasswordManagementListSection {
                 return { $0.localizedCaseInsensitiveCompare($1) == .orderedDescending }
             }
         }()
+
         let sortedKeys = itemsByFirstCharacter.keys.sorted(by: sortFunction)
 
         return sortedKeys.map { key in
             var itemsInSection = itemsByFirstCharacter[key] ?? []
-            itemsInSection.sort { lhs, rhs in sortFunction(lhs.displayTitle, rhs.displayTitle) }
+            itemsInSection.sort { lhs, rhs in
+                return (lhs.websiteAccount == nil) ? compareSecureVaultItem(lhs, rhs, order) : compareSecureVaultItemAccount(lhs, rhs, order)
+            }
             return PasswordManagementListSection(title: key, items: itemsInSection)
+        }
+    }
+
+    private static func compareSecureVaultItem(_ lhs: SecureVaultItem, _ rhs: SecureVaultItem, _ order: SecureVaultSorting.SortOrder) -> Bool {
+        switch order {
+        case .ascending:
+            return { lhs.displayTitle.localizedCaseInsensitiveCompare(rhs.displayTitle) == .orderedAscending }()
+        case .descending:
+            return { lhs.displayTitle.localizedCaseInsensitiveCompare(rhs.displayTitle) == .orderedDescending }()
+        }
+    }
+
+    private static func compareSecureVaultItemAccount(_ lhs: SecureVaultItem, _ rhs: SecureVaultItem, _ order: SecureVaultSorting.SortOrder) -> Bool {
+        guard let lhsAccount = lhs.websiteAccount, let rhsAccount = rhs.websiteAccount else {
+            return false
+        }
+        switch order {
+        case .ascending:
+            return { autofillUrlSort.compareAccountsForSortingAutofill(lhs: lhsAccount, rhs: rhsAccount, tld: tld) == .orderedAscending }()
+        case .descending:
+            return { autofillUrlSort.compareAccountsForSortingAutofill(lhs: lhsAccount, rhs: rhsAccount, tld: tld) == .orderedDescending }()
         }
     }
 
