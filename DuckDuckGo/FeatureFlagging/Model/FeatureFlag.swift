@@ -1,5 +1,5 @@
 //
-//  InternalUserDecider.swift
+//  FeatureFlag.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -16,17 +16,24 @@
 //  limitations under the License.
 //
 
-/*
- #if DEBUG || REVIEW
-         if AppDelegate.isRunningTests {
-             isInternalUser = (try? store.load()) ?? false
-         } else {
-             isInternalUser = true
-         }
- #elseif APPSTORE
-         isInternalUser = false
- #else
-         isInternalUser = (try? store.load()) ?? false
- #endif
-     }
- */
+import Foundation
+import BrowserServicesKit
+
+public enum FeatureFlag: String {
+    case debugMenu
+}
+
+extension FeatureFlag: FeatureFlagSourceProviding {
+    public var source: FeatureFlagSource {
+        switch self {
+        case .debugMenu:
+            return .internalOnly
+        }
+    }
+}
+
+extension FeatureFlagger {
+    public func isFeatureOn(_ featureFlag: FeatureFlag) -> Bool {
+        isFeatureOn(forProvider: featureFlag)
+    }
+}
