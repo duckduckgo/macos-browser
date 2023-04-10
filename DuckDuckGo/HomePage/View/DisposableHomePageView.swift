@@ -31,59 +31,42 @@ extension HomePage.Views {
                     .edgesIgnoringSafeArea(.all)
 
                 VStack {
-                    Image("BurnerWindowPopoverImage")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: 128, height: 96)
+                    HStack {
+                        Image("BurnerWindowPopoverImage")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 64, height: 48)
 
-                    Text("Burner Window")
-                        .padding(.top, 30)
-                        .font(.system(size: 36, weight: .bold))
-                        .foregroundColor(Color.primary)
+                        Text("Burner Window")
+                            .font(.system(size: 22, weight: .bold))
+                            .foregroundColor(Color.primary)
+                            .padding(.leading, -10)
+                            .padding(.top, 15)
+                    }
 
                     Description()
-                        .padding(.top, -40)
+                        .padding(.top, 3)
 
                     FeaturesBox()
-                        .padding(.top, -20)
+                        .padding(.top, 10)
                 }
                 .frame(width: 600, height: 600, alignment: .center)
+                .padding(.top, -50)
             }
         }
     }
 
     struct Description: View {
         var body: some View {
-            VStack(spacing: 5) {
-                Text("All of your windows are private by default, with:")
-                    .font(.system(size: 15))
-                    .foregroundColor(Color.primary)
-                BoldPhrases()
-            }
-            .frame(maxWidth: .infinity)
-            .padding(.horizontal, 20)
-            .cornerRadius(20)
-            .padding(.vertical, 40)
-        }
-    }
-
-    struct BoldPhrases: View {
-        var body: some View {
-            Text("Private Search")
-                .font(.system(size: 15, weight: .medium))
+            Text("Unlike other browsers, ")
+                .font(.system(size: 15))
                 .foregroundColor(Color.primary)
-                + Text(", ")
-                    .font(.system(size: 15))
-                    .foregroundColor(Color.primary)
-                + Text("Web Tracking Protection")
-                    .font(.system(size: 15, weight: .medium))
-                    .foregroundColor(Color.primary)
-                + Text(", and ")
-                    .font(.system(size: 15))
-                    .foregroundColor(Color.primary)
-                + Text("Smarter Encryption.")
-                    .font(.system(size: 15, weight: .medium))
-                    .foregroundColor(Color.primary)
+            + Text("all")
+                .font(.system(size: 15, weight: .bold))
+                .foregroundColor(Color.primary)
+            + Text(" DuckDuckGo windows are private.")
+                .font(.system(size: 15))
+                .foregroundColor(Color.primary)
         }
     }
 
@@ -97,42 +80,55 @@ extension HomePage.Views {
 
             var body: some View {
                 VStack(alignment: .leading, spacing: 15) {
-                    Text("In addition ")
-                        .font(.system(size: 15))
+                    Text("Burner Windows make it easier to:")
+                        .font(.system(size: 13, weight: .bold))
                         .foregroundColor(Color.primary)
-                    + Text("Burner Windows")
-                        .font(.system(size: 15, weight: .medium))
-                        .foregroundColor(Color.primary)
-                    + Text(" also:")
-                        .font(.system(size: 15))
-                        .foregroundColor(Color.primary)
+                        .padding(.top, -10)
 
                     HStack {
                         Image("BurnerWindowPopoverIcon1")
                             .resizable()
                             .frame(width: 16, height: 16)
-                        Text("Won't remember the pages you visit")
-                            .font(.system(size: 13))
-                            .foregroundColor(Color.primary)
-                    }.padding(.top, 10)
+                        VStack(alignment: .leading) {
+                            Text("Sign into a site with a different account.")
+                                .font(.system(size: 13))
+                                .foregroundColor(Color.primary)
+                            Text("For example a work or personal account.")
+                                .font(.system(size: 13))
+                                .foregroundColor(Color.secondary)
+                        }
+
+                    }
 
                     HStack {
                         Image("BurnerWindowPopoverIcon2")
                             .resizable()
                             .frame(width: 16, height: 16)
-                        Text("Are separate from your regular browsing session")
-                            .font(.system(size: 13))
                             .foregroundColor(Color.primary)
+                        VStack(alignment: .leading) {
+                            Text("Quickly visit a site in a signed-out state.")
+                                .font(.system(size: 13))
+                                .foregroundColor(Color.primary)
+                            Text("For example to avoid seeing recommendations.")
+                                .font(.system(size: 13))
+                                .foregroundColor(Color.secondary)
+                        }
                     }
 
+                    Divider()
+                        .frame(width: 316)
+
+                    Text("Burner Windows automatically burn data on close.\nHistory and cookies are always isolated just to the\nBurner Window.")
+                        .font(.system(size: 13))
+                        .foregroundColor(Color.primary)
+
                     HStack {
-                        Image("BurnerWindowPopoverIcon3")
-                            .resizable()
-                            .frame(width: 16, height: 16)
-                        Text("Clears your website data when closed")
+                        Text("You can always burn data using the Fire Button.")
                             .font(.system(size: 13))
                             .foregroundColor(Color.primary)
+                        Image("BurnerWindowHomepageFireIcon")
                     }
+
                 }
                 .padding()
                 .padding(10)
