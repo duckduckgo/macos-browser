@@ -172,7 +172,7 @@ final class LocalBookmarkStore: BookmarkStore {
             }
 
             for object in fetchResults {
-                self.context.delete(object)
+                object.markPendingDeletion()
             }
 
             do {
