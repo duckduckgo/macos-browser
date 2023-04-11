@@ -93,6 +93,7 @@ extension Preferences {
                             bitwardenStatusView(for: bitwardenManager.status)
                         }
                     }
+                    Spacer()
                     Button(UserText.importBrowserData) {
                         model.openImportBrowserDataWindow()
                     }
