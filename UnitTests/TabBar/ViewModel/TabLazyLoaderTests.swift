@@ -26,7 +26,7 @@ private final class TabMock: LazyLoadable {
 
     var isUrl: Bool = true
     var url: URL? = "https://example.com".url
-    var webViewFrame: CGRect = .zero
+    var webViewSize: CGSize = .zero
 
     var loadingFinishedSubject = PassthroughSubject<TabMock, Never>()
     lazy var loadingFinishedPublisher: AnyPublisher<TabMock, Never> = loadingFinishedSubject.eraseToAnyPublisher()
@@ -42,13 +42,13 @@ private final class TabMock: LazyLoadable {
     init(
         isUrl: Bool = true,
         url: URL? = "https://example.com".url,
-        webViewFrame: CGRect = .zero,
+        webViewSize: CGSize = .zero,
         reloadExpectation: XCTestExpectation? = nil,
         selectedTimestamp: Date = Date(timeIntervalSince1970: 0)
     ) {
         self.isUrl = isUrl
         self.url = url
-        self.webViewFrame = webViewFrame
+        self.webViewSize = webViewSize
         self.selectedTimestamp = selectedTimestamp
 
         isNewerClosure = { [unowned self] other in
