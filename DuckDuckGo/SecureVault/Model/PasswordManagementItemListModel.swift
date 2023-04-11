@@ -27,14 +27,6 @@ enum SecureVaultItem: Equatable, Identifiable, Comparable {
     case identity(SecureVaultModels.Identity)
     case note(SecureVaultModels.Note)
 
-    private var tld: TLD {
-        TLD()
-    }
-
-    private var websiteAccountSorter: AutofillUrlSort {
-        AutofillDomainNameUrlSort()
-    }
-
     var websiteAccount: SecureVaultModels.WebsiteAccount? {
         switch self {
         case .account(let account):
@@ -156,12 +148,6 @@ enum SecureVaultItem: Equatable, Identifiable, Comparable {
 
     var firstCharacter: String {
         let defaultFirstCharacter = "#"
-
-        if let account = websiteAccount,
-           let firstCharacter = websiteAccountSorter.firstCharacterForGrouping(account, tld: tld)?.first,
-           firstCharacter.isLetter {
-            return firstCharacter.uppercased()
-        }
 
         guard let character = self.displayTitle.first else {
             return defaultFirstCharacter
@@ -370,7 +356,7 @@ final class PasswordManagementItemListModel: ObservableObject {
 
         switch sortDescriptor.parameter {
         case .title:
-            displayedItems = PasswordManagementListSection.sections(with: itemsByCategory, by: \.firstCharacter, order: sortDescriptor.order)
+            displayedItems = PasswordManagementListSection.sectionsByTLD(with: itemsByCategory, order: sortDescriptor.order)
         case .dateCreated:
             displayedItems = PasswordManagementListSection.sections(with: itemsByCategory, by: \.created, order: sortDescriptor.order)
         case .dateModified:
