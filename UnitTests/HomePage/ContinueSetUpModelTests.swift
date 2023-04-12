@@ -51,24 +51,24 @@ final class ContinueSetUpModelTests: XCTestCase {
     }
 
     func testWhenInitialisedTheMatrixHasOnlyThreeElementsInOneRow() {
-        let expctedMatrix = HomePage.Models.FeatureType.allCases.chunked(into: HomePage.featuresPerRow)
+        let expectedMatrix = HomePage.Models.FeatureType.allCases.chunked(into: HomePage.featuresPerRow)
 
         XCTAssertEqual(vm.visibleFeaturesMatrix.count, 1)
         XCTAssertTrue(vm.visibleFeaturesMatrix[0].count <= HomePage.featuresPerRow)
-        XCTAssertEqual(vm.visibleFeaturesMatrix, [expctedMatrix[0]])
+        XCTAssertEqual(vm.visibleFeaturesMatrix, [expectedMatrix[0]])
     }
 
     func testWhenTogglingShowAllFeatureTheCorrectElementsAreVisible() {
-        let expctedMatrix = HomePage.Models.FeatureType.allCases.chunked(into: HomePage.featuresPerRow)
+        let expectedMatrix = HomePage.Models.FeatureType.allCases.chunked(into: HomePage.featuresPerRow)
 
-        vm.showAllFeatures = true
+        vm.shouldShowAllFeatures = true
 
-        XCTAssertEqual(vm.visibleFeaturesMatrix, expctedMatrix)
+        XCTAssertEqual(vm.visibleFeaturesMatrix, expectedMatrix)
 
-        vm.showAllFeatures = false
+        vm.shouldShowAllFeatures = false
 
         XCTAssertEqual(vm.visibleFeaturesMatrix.count, 1)
         XCTAssertTrue(vm.visibleFeaturesMatrix[0].count <= HomePage.featuresPerRow)
-        XCTAssertEqual(vm.visibleFeaturesMatrix, [expctedMatrix[0]])
+        XCTAssertEqual(vm.visibleFeaturesMatrix, [expectedMatrix[0]])
     }
 }

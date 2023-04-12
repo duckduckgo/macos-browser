@@ -1,5 +1,5 @@
 //
-//  HomePageExploreDucjDuckGoViewModel.swift
+//  HomePageContinueSetUpModel.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -31,9 +31,9 @@ extension HomePage.Models {
         let gridWidth = FeaturesGridDimensions.width
         let deleteActionTitle = UserText.newTabSetUpRemoveItemAction
 
-        var showAllFeatures: Bool = false {
+        var shouldShowAllFeatures: Bool = false {
             didSet {
-                visibleFeaturesMatrix = showAllFeatures ? featuresMatrix : [featuresMatrix[0]]
+                visibleFeaturesMatrix = shouldShowAllFeatures ? featuresMatrix : [featuresMatrix[0]]
             }
         }
 
@@ -44,8 +44,8 @@ extension HomePage.Models {
             visibleFeaturesMatrix = [featuresMatrix[0]]
         }
 
-        func actionTitle(for featureTye: FeatureType) -> String {
-            switch featureTye {
+        func actionTitle(for featureType: FeatureType) -> String {
+            switch featureType {
             case .defaultBrowser:
                 return UserText.newTabSetUpDefaultBrowserAction
             case .importBookmarksAndPasswords:

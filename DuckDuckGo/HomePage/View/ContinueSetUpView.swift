@@ -1,5 +1,5 @@
 //
-//  MeetTheBrowser.swift
+//  ContinueSetUpView.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -35,7 +35,7 @@ extension HomePage.Views {
 
         var body: some View {
             VStack(spacing: 20) {
-                SectionTitleView(titleText: model.title, isExpanded: $model.showAllFeatures, isMoreOrLessButtonVisibility: $moreOrLessButtonVisibility)
+                SectionTitleView(titleText: model.title, isExpanded: $model.shouldShowAllFeatures, isMoreOrLessButtonVisibility: $moreOrLessButtonVisibility)
                 if #available(macOS 12.0, *) {
                     LazyVStack(spacing: 4) {
                         FeaturesGrid()
