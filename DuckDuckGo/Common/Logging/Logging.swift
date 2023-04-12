@@ -86,6 +86,7 @@ extension OSLog {
         }
         set {
             loggingCategoriesSetting = Array(newValue)
+            enabledLoggingCategories = loggingCategories
         }
     }
 
@@ -109,7 +110,12 @@ extension ProcessInfo {
 
 extension OSLog.OSLogWrapper {
 
+    private static let enableLoggingCategoriesOnce: Void = {
+        OSLog.enabledLoggingCategories = OSLog.loggingCategories
+    }()
+
     init(_ category: OSLog.AppCategories) {
+        _=Self.enableLoggingCategoriesOnce
         self.init(rawValue: category.rawValue)
     }
 
