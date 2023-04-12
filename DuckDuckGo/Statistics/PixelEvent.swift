@@ -115,28 +115,6 @@ extension Pixel {
         case jsPixel(_ pixel: AutofillUserScript.JSPixel)
         case duckPlayerJSPixel(_ pixel: YoutubeOverlayUserScript.JSPixel)
 
-        enum BookmarksBarSource {
-            case menuBar
-            case navigationBar
-            case bookmarksBar
-            case keyboardShortcut
-
-            var string: String {
-                switch self {
-                case .menuBar: return "menu-bar"
-                case .navigationBar: return "navigation-bar"
-                case .bookmarksBar: return "bookmarks-bar"
-                case .keyboardShortcut: return "keyboard-shortcut"
-                }
-            }
-        }
-
-        case bookmarksBarEnabled(_ source: BookmarksBarSource)
-        case bookmarksBarDisabled(_ source: BookmarksBarSource)
-
-        case bookmarksBarActive
-        case bookmarksBarInactive
-
         case debug(event: Debug, error: Error? = nil)
 
         enum Debug {
@@ -322,18 +300,6 @@ extension Pixel.Event {
         // This matches the SERP format
         case .duckPlayerJSPixel(let pixel):
             return "duck_player.mac.\(pixel.pixelName)"
-
-        case .bookmarksBarEnabled:
-            return "m_mac_bookmarks_bar_enabled"
-
-        case .bookmarksBarDisabled:
-            return "m_mac_bookmarks_bar_disabled"
-
-        case .bookmarksBarActive:
-            return "m_mac_bookmarks_bar_active"
-
-        case .bookmarksBarInactive:
-            return "m_mac_bookmarks_bar_inactive"
         }
     }
 }
