@@ -56,7 +56,7 @@ final class ContinueSetUpModelTests: XCTestCase {
         XCTAssertEqual(vm.itemsPerRow, HomePage.featuresPerRow)
     }
 
-    func testDoesIsMoreOrLessButtonNeededReturnTheExpectedValue() {
+    func testIsMoreOrLessButtonNeededReturnTheExpectedValue() {
         XCTAssertTrue(vm.isMorOrLessButtonNeeded)
 
         capturingDefaultBrowserProvider.isDefault = true
@@ -77,11 +77,11 @@ final class ContinueSetUpModelTests: XCTestCase {
     func testWhenTogglingShowAllFeatureTheCorrectElementsAreVisible() {
         let expectedMatrix = HomePage.Models.FeatureType.allCases.chunked(into: HomePage.featuresPerRow)
 
-        vm.showAllFeatures = true
+        vm.shouldShowAllFeatures = true
 
         XCTAssertEqual(vm.visibleFeaturesMatrix, expectedMatrix)
 
-        vm.showAllFeatures = false
+        vm.shouldShowAllFeatures = false
 
         XCTAssertEqual(vm.visibleFeaturesMatrix.count, 1)
         XCTAssertTrue(vm.visibleFeaturesMatrix[0].count <= HomePage.featuresPerRow)
@@ -111,11 +111,11 @@ final class ContinueSetUpModelTests: XCTestCase {
         features.remove(at: defaultBrowserIdex)
         let expectedMatrix = features.chunked(into: HomePage.featuresPerRow)
 
-        vm.showAllFeatures = true
+        vm.shouldShowAllFeatures = true
 
         XCTAssertEqual(vm.visibleFeaturesMatrix, expectedMatrix)
 
-        vm.showAllFeatures = false
+        vm.shouldShowAllFeatures = false
 
         XCTAssertEqual(vm.visibleFeaturesMatrix.count, 1)
         XCTAssertTrue(vm.visibleFeaturesMatrix[0].count <= HomePage.featuresPerRow)
@@ -123,9 +123,15 @@ final class ContinueSetUpModelTests: XCTestCase {
     }
 
     func testWhenAskedToPerformActionForImportPromptThrowsThenItOpensImportWindow() {
+        let numberOfFeatures = HomePage.Models.FeatureType.allCases.count
+        vm.shouldShowAllFeatures = true
+        XCTAssertEqual(vm.visibleFeaturesMatrix.flatMap { $0 }.count, numberOfFeatures)
+
+        capturingDataImportProvider.hasUserUsedImport = true
         vm.performAction(for: .importBookmarksAndPasswords)
 
         XCTAssertTrue(capturingDataImportProvider.showImportWindowCalled)
+        XCTAssertEqual(vm.visibleFeaturesMatrix.flatMap { $0 }.count, numberOfFeatures - 1)
     }
 
     func testWhenUserHasUsedImportAndTogglingShowAllFeatureTheCorrectElementsAreVisible() {
@@ -136,24 +142,15 @@ final class ContinueSetUpModelTests: XCTestCase {
         features.remove(at: importIdex)
         let expectedMatrix = features.chunked(into: HomePage.featuresPerRow)
 
-        vm.showAllFeatures = true
+        vm.shouldShowAllFeatures = true
 
         XCTAssertEqual(vm.visibleFeaturesMatrix, expectedMatrix)
 
-        vm.showAllFeatures = false
+        vm.shouldShowAllFeatures = false
 
         XCTAssertEqual(vm.visibleFeaturesMatrix.count, 1)
         XCTAssertTrue(vm.visibleFeaturesMatrix[0].count <= HomePage.featuresPerRow)
         XCTAssertEqual(vm.visibleFeaturesMatrix, [expectedMatrix[0]])
-    }
-}
-
-class CapturingDataImportProvider: DataImportProvider {
-    var showImportWindowCalled = false
-    var hasUserUsedImport = false
-
-    func showImportWindow() {
-        showImportWindowCalled = true
     }
 }
 

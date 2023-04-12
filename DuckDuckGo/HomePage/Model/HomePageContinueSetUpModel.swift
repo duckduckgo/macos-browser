@@ -31,17 +31,30 @@ extension HomePage.Models {
         let gridWidth = FeaturesGridDimensions.width
         let deleteActionTitle = UserText.newTabSetUpRemoveItemAction
 
+        let defaultBrowserProvider: DefaultBrowserProvider
+        let dataImportProvider: DataImportProvider
+
         var shouldShowAllFeatures: Bool = false {
             didSet {
-                visibleFeaturesMatrix = shouldShowAllFeatures ? featuresMatrix : [featuresMatrix[0]]
+                updateVisibleMatrix()
             }
         }
 
-        private var featuresMatrix = FeatureType.allCases.chunked(into: HomePage.featuresPerRow)
+        var isMorOrLessButtonNeeded: Bool {
+            return featuresMatrix.count > 1
+        }
+
+        private var featuresMatrix: [[FeatureType]] = [[]] {
+            didSet {
+                updateVisibleMatrix()
+            }
+        }
         @Published var visibleFeaturesMatrix: [[FeatureType]] = [[]]
 
-        init() {
-            visibleFeaturesMatrix = [featuresMatrix[0]]
+        init(defaultBrowserProvider: DefaultBrowserProvider, dataImportProvider: DataImportProvider) {
+            self.defaultBrowserProvider = defaultBrowserProvider
+            self.dataImportProvider = dataImportProvider
+            refreshFeaturesMatrix()
         }
 
         func actionTitle(for featureType: FeatureType) -> String {
@@ -60,11 +73,54 @@ extension HomePage.Models {
         }
 
         func performAction(for featureType: FeatureType) {
-
+            switch featureType {
+            case .defaultBrowser:
+                do {
+                    try defaultBrowserProvider.presentDefaultBrowserPrompt()
+                } catch {
+                    defaultBrowserProvider.openSystemPreferences()
+                }
+            case .importBookmarksAndPasswords:
+                dataImportProvider.showImportWindow(completion: refreshFeaturesMatrix)
+            case .duckplayer:
+                print("\(featureType)")
+            case .emailProtection:
+                print("\(featureType)")
+            case .coockiePopUp:
+                print("\(featureType)")
+            }
         }
 
         func removeItem() {
 
+        }
+
+        func refreshFeaturesMatrix() {
+            var features: [FeatureType] = []
+            for feature in FeatureType.allCases {
+                switch feature {
+
+                case .defaultBrowser:
+                    if !defaultBrowserProvider.isDefault {
+                        features.append(feature)
+                    }
+                case .importBookmarksAndPasswords:
+                    if !dataImportProvider.hasUserUsedImport {
+                        features.append(feature)
+                    }
+                case .duckplayer:
+                    features.append(feature)
+                case .emailProtection:
+                    features.append(feature)
+                case .coockiePopUp:
+                    features.append(feature)
+                }
+            }
+            featuresMatrix = features.chunked(into: HomePage.featuresPerRow)
+        }
+
+        private func updateVisibleMatrix() {
+            visibleFeaturesMatrix = shouldShowAllFeatures ? featuresMatrix : [featuresMatrix[0]]
         }
 
     }
