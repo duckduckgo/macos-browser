@@ -332,8 +332,6 @@ extension MainViewController {
     }
 
     @IBAction func toggleBookmarksBarFromMenu(_ sender: Any) {
-        let usingKeyboardShortcut = NSApp.currentEvent?.type == .keyDown
-
         PersistentAppInterfaceSettings.shared.showBookmarksBar.toggle()
     }
 

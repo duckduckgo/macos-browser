@@ -115,22 +115,6 @@ extension Pixel {
         case jsPixel(_ pixel: AutofillUserScript.JSPixel)
         case duckPlayerJSPixel(_ pixel: YoutubeOverlayUserScript.JSPixel)
 
-        enum BookmarksBarSource {
-            case menuBar
-            case navigationBar
-            case bookmarksBar
-            case keyboardShortcut
-
-            var string: String {
-                switch self {
-                case .menuBar: return "menu-bar"
-                case .navigationBar: return "navigation-bar"
-                case .bookmarksBar: return "bookmarks-bar"
-                case .keyboardShortcut: return "keyboard-shortcut"
-                }
-            }
-        }
-
         case debug(event: Debug, error: Error? = nil)
 
         enum Debug {
