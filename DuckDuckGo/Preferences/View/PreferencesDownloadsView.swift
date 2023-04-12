@@ -26,13 +26,12 @@ extension Preferences {
 
         var body: some View {
             VStack(alignment: .leading, spacing: 0) {
-                Text(UserText.downloads)
-                    .font(Const.Fonts.preferencePaneTitle)
+                // TITLE
+                TextMenuTitle(text: UserText.downloads)
 
+                // SECTION 1: Location
                 PreferencePaneSection {
-                    Text(UserText.downloadsLocation)
-                        .font(Const.Fonts.preferencePaneSectionHeader)
-
+                    TextMenuItemHeader(text: UserText.downloadsLocation)
                     HStack {
                         NSPathControlView(url: model.selectedDownloadLocation)
                         Button(UserText.downloadsChangeDirectory) {
@@ -40,8 +39,7 @@ extension Preferences {
                         }
                     }
                     .disabled(model.alwaysRequestDownloadLocation)
-
-                    Toggle(UserText.downloadsAlwaysAsk, isOn: $model.alwaysRequestDownloadLocation)
+                    ToggleMenuItem(title: UserText.downloadsAlwaysAsk, isOn: $model.alwaysRequestDownloadLocation)
                 }
             }
         }
