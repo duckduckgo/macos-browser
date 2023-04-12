@@ -700,5 +700,25 @@ struct UserText {
     static let noAccessToDownloadsFolder = NSLocalizedString("no.access.to.downloads.folder", value: "Grant access in Security & Privacy preferences in System Settings.", comment: "Alert presented to user if the app doesn't have rights to access Downloads folder")
     static let noAccessToSelectedFolderHeader = NSLocalizedString("no.access.to.selected.folder.header", value: "DuckDuckGo needs permission to access selected folder", comment: "Header of the alert dialog informing user about failed download")
     static let noAccessToSelectedFolder = NSLocalizedString("no.access.to.selected.folder", value: "Grant access to the location of download.", comment: "Alert presented to user if the app doesn't have rights to access selected folder")
+
+    // MARK: New Tab
+    // Favorites
+    static let newTabFavoriteSectionTitle = NSLocalizedString("newTab.favorites.section.title", value: "Favorites", comment: "Title of the Favorites section in the home page")
+
+    // Set Up
+    static let newTabSetUpSectionTitle = NSLocalizedString("newTab.setup.section.title", value: "Continue Set Up", comment: "Title of the Set Up section in the home page")
+
+    static let newTabSetUpDefaultBrowserCardTitle = NSLocalizedString("newTab.setup.default.browser.title", value: "Switch your default browser", comment: "Title of the Default Browser card of the Set Up section in the home page")
+    static let newTabSetUpImportCardTitle = NSLocalizedString("newTab.setup.import.title", value: "Import Bookmarks & Passwords", comment: "Title of the Import card of the Set Up section in the home page")
+    static let newTabSetUpDuckPlayerCardTitle = NSLocalizedString("newTab.setup.duck.player.title", value: "Use Duck Player to watch YouTube", comment: "Title of the Duck Player card of the Set Up section in the home page")
+    static let newTabSetUpEmailProtectionCardTitle = NSLocalizedString("newTab.setup.email.protection.title", value: "Protect your email and block trackers", comment: "Title of the Email Protection card of the Set Up section in the home page")
+    static let newTabSetUpCookieManagerCardTitle = NSLocalizedString("newTab.setup.cookie.manager.title", value: "Let us handle coockie pop-ups", comment: "Title of the Cookie Manager card of the Set Up section in the home page")
+
+    static let newTabSetUpDefaultBrowserAction = NSLocalizedString("newTab.setup.default.browser.action", value: "Make Default", comment: "Action title on the action menu of the Default Browser card")
+    static let newTabSetUpImportAction = NSLocalizedString("newTab.setup.Import.action", value: "Start Import", comment: "Action title on the action menu of the Import card of the Set Up section in the home page")
+    static let newTabSetUpDuckPlayerAction = NSLocalizedString("newTab.setup.duck.player.action", value: "Visit YouTube", comment: "Action title on the action menu of the Duck Player card of the Set Up section in the home page")
+    static let newTabSetUpEmailProtectionAction = NSLocalizedString("newTab.setup.email.protection.action", value: "Enable Email Protection", comment: "Action title on the action menu of the Email Protection card of the Set Up section in the home page")
+    static let newTabSetUpCoockeManagerAction = NSLocalizedString("newTab.setup.coockie.manager.action", value: "Enable Cookie Manager", comment: "Action title on the action menu of the Coockie Manager card of the Set Up section in the home page")
+    static let newTabSetUpRemoveItemAction = NSLocalizedString("newTab.setup.remove.item", value: "Remove Item", comment: "Action title on the action menu of the set up cards card of the SetUp section in the home page to remove the item")
 }
 
