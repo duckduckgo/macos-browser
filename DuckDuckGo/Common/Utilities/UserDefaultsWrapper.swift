@@ -81,10 +81,12 @@ public struct UserDefaultsWrapper<T> {
 
         case onboardingFinished = "onboarding.finished"
 
+        // Home Page
         case homePageShowPagesOnHover = "home.page.show.pages.on.hover"
         case homePageShowAllFavorites = "home.page.show.all.favorites"
         case homePageShowPageTitles = "home.page.show.page.titles"
         case homePageShowRecentlyVisited = "home.page.show.recently.visited"
+        case homePageContinueSetUpImport = "home.page.continue.set.up.import"
 
         case appIsRelaunchingAutomatically = "app-relaunching-automatically"
 

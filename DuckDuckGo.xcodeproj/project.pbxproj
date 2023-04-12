@@ -1186,6 +1186,8 @@
 		5601FECD29B7973D00068905 /* TabBarViewItemTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5601FECC29B7973D00068905 /* TabBarViewItemTests.swift */; };
 		5603D90629B7B746007F9F01 /* MockTabViewItemDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5603D90529B7B746007F9F01 /* MockTabViewItemDelegate.swift */; };
 		5603D90729B7B746007F9F01 /* MockTabViewItemDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5603D90529B7B746007F9F01 /* MockTabViewItemDelegate.swift */; };
+		56534DED29DF252C00121467 /* CapturingDefaultBrowserProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56534DEC29DF252C00121467 /* CapturingDefaultBrowserProvider.swift */; };
+		56534DEE29DF252C00121467 /* CapturingDefaultBrowserProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56534DEC29DF252C00121467 /* CapturingDefaultBrowserProvider.swift */; };
 		566B195D29CDB692007E38F4 /* MoreOptionsMenuTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566B195C29CDB692007E38F4 /* MoreOptionsMenuTests.swift */; };
 		566B196429CDB824007E38F4 /* MoreOptionsMenuTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566B195C29CDB692007E38F4 /* MoreOptionsMenuTests.swift */; };
 		566B196529CDB828007E38F4 /* CapturingOptionsButtonMenuDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566B196029CDB7C9007E38F4 /* CapturingOptionsButtonMenuDelegate.swift */; };
@@ -2265,6 +2267,7 @@
 		4BF6961F28BEEE8B00D402D4 /* LocalPinningManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalPinningManagerTests.swift; sourceTree = "<group>"; };
 		5601FECC29B7973D00068905 /* TabBarViewItemTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarViewItemTests.swift; sourceTree = "<group>"; };
 		5603D90529B7B746007F9F01 /* MockTabViewItemDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockTabViewItemDelegate.swift; sourceTree = "<group>"; };
+		56534DEC29DF252C00121467 /* CapturingDefaultBrowserProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapturingDefaultBrowserProvider.swift; sourceTree = "<group>"; };
 		566B195C29CDB692007E38F4 /* MoreOptionsMenuTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreOptionsMenuTests.swift; sourceTree = "<group>"; };
 		566B196029CDB7C9007E38F4 /* CapturingOptionsButtonMenuDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapturingOptionsButtonMenuDelegate.swift; sourceTree = "<group>"; };
 		569277C029DDCBB500B633EF /* ContinueSetUpModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContinueSetUpModel.swift; sourceTree = "<group>"; };
@@ -3862,6 +3865,7 @@
 		4BF6961B28BE90E800D402D4 /* HomePage */ = {
 			isa = PBXGroup;
 			children = (
+				56534DEB29DF251C00121467 /* Mocks */,
 				4BF6961C28BE911100D402D4 /* RecentlyVisitedSiteModelTests.swift */,
 				569277C329DEE09D00B633EF /* ContinueSetUpModelTests.swift */,
 			);
@@ -3892,6 +3896,14 @@
 				5603D90529B7B746007F9F01 /* MockTabViewItemDelegate.swift */,
 			);
 			path = View;
+			sourceTree = "<group>";
+		};
+		56534DEB29DF251C00121467 /* Mocks */ = {
+			isa = PBXGroup;
+			children = (
+				56534DEC29DF252C00121467 /* CapturingDefaultBrowserProvider.swift */,
+			);
+			path = Mocks;
 			sourceTree = "<group>";
 		};
 		566B195F29CDB7A9007E38F4 /* Mocks */ = {
@@ -7063,6 +7075,7 @@
 				3706FDF5293F661700E42796 /* StartupPreferencesTests.swift in Sources */,
 				3706FDF6293F661700E42796 /* DuckPlayerTests.swift in Sources */,
 				3706FDF7293F661700E42796 /* WebViewExtensionTests.swift in Sources */,
+				56534DEE29DF252C00121467 /* CapturingDefaultBrowserProvider.swift in Sources */,
 				3706FDF8293F661700E42796 /* FileStoreTests.swift in Sources */,
 				5603D90729B7B746007F9F01 /* MockTabViewItemDelegate.swift in Sources */,
 				3706FDF9293F661700E42796 /* TabViewModelTests.swift in Sources */,
@@ -8031,6 +8044,7 @@
 				B603975029C1FF5F00902A34 /* TestsURLExtension.swift in Sources */,
 				B6A5A27E25B9403E00AA7ADA /* FileStoreMock.swift in Sources */,
 				B6AA64762995164900D99CD6 /* MockPrivacyConfiguration.swift in Sources */,
+				56534DED29DF252C00121467 /* CapturingDefaultBrowserProvider.swift in Sources */,
 				1D3B1AC429378953006F4388 /* BWResponseTests.swift in Sources */,
 				B693955F26F1C17F0015B914 /* DownloadListCoordinatorTests.swift in Sources */,
 				1D3B1AC22936B816006F4388 /* BWMessageIdGeneratorTests.swift in Sources */,

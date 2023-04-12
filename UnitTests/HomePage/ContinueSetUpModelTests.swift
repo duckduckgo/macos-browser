@@ -22,12 +22,18 @@ import XCTest
 final class ContinueSetUpModelTests: XCTestCase {
 
     var vm: HomePage.Models.ContinueSetUpModel!
+    var capturingDefaultBrowserProvider: CapturingDefaultBrowserProvider!
+    var capturingDataImportProvider: CapturingDataImportProvider!
 
     override func setUp() {
-        vm = HomePage.Models.ContinueSetUpModel()
+        capturingDefaultBrowserProvider = CapturingDefaultBrowserProvider()
+        capturingDataImportProvider = CapturingDataImportProvider()
+        vm = HomePage.Models.ContinueSetUpModel(defaultBrowserProvider: capturingDefaultBrowserProvider, dataImportProvider: capturingDataImportProvider)
     }
 
     override func tearDown() {
+        capturingDefaultBrowserProvider = nil
+        capturingDataImportProvider = nil
         vm = nil
     }
 
@@ -50,25 +56,109 @@ final class ContinueSetUpModelTests: XCTestCase {
         XCTAssertEqual(vm.itemsPerRow, HomePage.featuresPerRow)
     }
 
+    func testDoesIsMoreOrLessButtonNeededReturnTheExpectedValue() {
+        XCTAssertTrue(vm.isMorOrLessButtonNeeded)
+
+        capturingDefaultBrowserProvider.isDefault = true
+        capturingDataImportProvider.hasUserUsedImport = true
+        vm = HomePage.Models.ContinueSetUpModel.fixture(defaultBrowserProvider: capturingDefaultBrowserProvider, dataImportProvider: capturingDataImportProvider)
+
+        XCTAssertFalse(vm.isMorOrLessButtonNeeded)
+    }
+
     func testWhenInitialisedTheMatrixHasOnlyThreeElementsInOneRow() {
-        let expctedMatrix = HomePage.Models.FeatureType.allCases.chunked(into: HomePage.featuresPerRow)
+        let expectedMatrix = HomePage.Models.FeatureType.allCases.chunked(into: HomePage.featuresPerRow)
 
         XCTAssertEqual(vm.visibleFeaturesMatrix.count, 1)
         XCTAssertTrue(vm.visibleFeaturesMatrix[0].count <= HomePage.featuresPerRow)
-        XCTAssertEqual(vm.visibleFeaturesMatrix, [expctedMatrix[0]])
+        XCTAssertEqual(vm.visibleFeaturesMatrix, [expectedMatrix[0]])
     }
 
     func testWhenTogglingShowAllFeatureTheCorrectElementsAreVisible() {
-        let expctedMatrix = HomePage.Models.FeatureType.allCases.chunked(into: HomePage.featuresPerRow)
+        let expectedMatrix = HomePage.Models.FeatureType.allCases.chunked(into: HomePage.featuresPerRow)
 
         vm.showAllFeatures = true
 
-        XCTAssertEqual(vm.visibleFeaturesMatrix, expctedMatrix)
+        XCTAssertEqual(vm.visibleFeaturesMatrix, expectedMatrix)
 
         vm.showAllFeatures = false
 
         XCTAssertEqual(vm.visibleFeaturesMatrix.count, 1)
         XCTAssertTrue(vm.visibleFeaturesMatrix[0].count <= HomePage.featuresPerRow)
-        XCTAssertEqual(vm.visibleFeaturesMatrix, [expctedMatrix[0]])
+        XCTAssertEqual(vm.visibleFeaturesMatrix, [expectedMatrix[0]])
+    }
+
+    func testWhenAskedToPerformActionFotDefaultBrowserCardThenItPresentsTheDefaultBrowserPrompt() {
+        vm.performAction(for: .defaultBrowser)
+
+        XCTAssertTrue(capturingDefaultBrowserProvider.presentDefaultBrowserPromptCalled)
+        XCTAssertFalse(capturingDefaultBrowserProvider.openSystemPreferencesCalled)
+    }
+
+    func testWhenAskedToPerformActionForDefaultBrowserCardAndDefaultBrowserPromptThrowsThenItOpensSystemPreferences() {
+        capturingDefaultBrowserProvider.throwError = true
+        vm.performAction(for: .defaultBrowser)
+
+        XCTAssertTrue(capturingDefaultBrowserProvider.presentDefaultBrowserPromptCalled)
+        XCTAssertTrue(capturingDefaultBrowserProvider.openSystemPreferencesCalled)
+    }
+
+    func testWhenIsDefaultBrowserAndTogglingShowAllFeatureTheCorrectElementsAreVisible() {
+        capturingDefaultBrowserProvider.isDefault = true
+        var features = HomePage.Models.FeatureType.allCases
+        vm = HomePage.Models.ContinueSetUpModel.fixture(defaultBrowserProvider: capturingDefaultBrowserProvider)
+        let defaultBrowserIdex = features.firstIndex(of: .defaultBrowser)!
+        features.remove(at: defaultBrowserIdex)
+        let expectedMatrix = features.chunked(into: HomePage.featuresPerRow)
+
+        vm.showAllFeatures = true
+
+        XCTAssertEqual(vm.visibleFeaturesMatrix, expectedMatrix)
+
+        vm.showAllFeatures = false
+
+        XCTAssertEqual(vm.visibleFeaturesMatrix.count, 1)
+        XCTAssertTrue(vm.visibleFeaturesMatrix[0].count <= HomePage.featuresPerRow)
+        XCTAssertEqual(vm.visibleFeaturesMatrix, [expectedMatrix[0]])
+    }
+
+    func testWhenAskedToPerformActionForImportPromptThrowsThenItOpensImportWindow() {
+        vm.performAction(for: .importBookmarksAndPasswords)
+
+        XCTAssertTrue(capturingDataImportProvider.showImportWindowCalled)
+    }
+
+    func testWhenUserHasUsedImportAndTogglingShowAllFeatureTheCorrectElementsAreVisible() {
+        capturingDataImportProvider.hasUserUsedImport = true
+        var features = HomePage.Models.FeatureType.allCases
+        vm = HomePage.Models.ContinueSetUpModel.fixture(dataImportProvider: capturingDataImportProvider)
+        let importIdex = features.firstIndex(of: .importBookmarksAndPasswords)!
+        features.remove(at: importIdex)
+        let expectedMatrix = features.chunked(into: HomePage.featuresPerRow)
+
+        vm.showAllFeatures = true
+
+        XCTAssertEqual(vm.visibleFeaturesMatrix, expectedMatrix)
+
+        vm.showAllFeatures = false
+
+        XCTAssertEqual(vm.visibleFeaturesMatrix.count, 1)
+        XCTAssertTrue(vm.visibleFeaturesMatrix[0].count <= HomePage.featuresPerRow)
+        XCTAssertEqual(vm.visibleFeaturesMatrix, [expectedMatrix[0]])
+    }
+}
+
+class CapturingDataImportProvider: DataImportProvider {
+    var showImportWindowCalled = false
+    var hasUserUsedImport = false
+
+    func showImportWindow() {
+        showImportWindowCalled = true
+    }
+}
+
+extension HomePage.Models.ContinueSetUpModel {
+    static func fixture(defaultBrowserProvider: DefaultBrowserProvider = CapturingDefaultBrowserProvider(), dataImportProvider: DataImportProvider = CapturingDataImportProvider()) -> HomePage.Models.ContinueSetUpModel {
+        HomePage.Models.ContinueSetUpModel(defaultBrowserProvider: defaultBrowserProvider, dataImportProvider: dataImportProvider)
     }
 }

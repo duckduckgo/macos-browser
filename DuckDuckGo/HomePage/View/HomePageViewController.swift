@@ -123,6 +123,7 @@ final class HomePageViewController: NSViewController {
         refreshFavoritesModel()
         refreshRecentlyVisitedModel()
         refreshDefaultBrowserModel()
+        refreshContinueSetUpModel()
     }
 
     func createRecentlyVisitedModel() -> HomePage.Models.RecentlyVisitedModel {
@@ -132,7 +133,7 @@ final class HomePageViewController: NSViewController {
     }
 
     func createFeatureModel() -> HomePage.Models.ContinueSetUpModel {
-        return .init()
+        return .init(defaultBrowserProvider: SystemDefaultBrowserProvider(), dataImportProvider: StandardDataImportProvider())
     }
 
     func createDefaultBrowserModel() -> HomePage.Models.DefaultBrowserModel {
@@ -168,6 +169,10 @@ final class HomePageViewController: NSViewController {
 
     func refreshFavoritesModel() {
         favoritesModel.favorites = bookmarkManager.list?.favoriteBookmarks ?? []
+    }
+
+    func refreshContinueSetUpModel() {
+        featuresModel.refreshFeaturesMatrix()
     }
 
     func refreshRecentlyVisitedModel() {

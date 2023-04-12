@@ -23,6 +23,9 @@ import os.log
 
 final class DataImportViewController: NSViewController {
 
+    @UserDefaultsWrapper(key: .homePageContinueSetUpImport, defaultValue: false)
+    var successfulImportHappened: Bool
+
     enum Constants {
         static let storyboardName = "DataImport"
         static let identifier = "DataImportViewController"
@@ -377,6 +380,7 @@ final class DataImportViewController: NSViewController {
         importer.importData(types: importTypes, from: profile) { result in
             switch result {
             case .success(let summary):
+                self.successfulImportHappened = true
                 if summary.isEmpty {
                     self.dismiss()
                 } else {
@@ -557,4 +561,59 @@ extension NSPopUpButton {
         return itemArray[index...].first { !$0.title.isEmpty }
     }
 
+}
+
+extension DataImportViewController: DataImportProvider {
+    var hasUserUsedImport: Bool {
+        self.successfulImportHappened || hasUserImportedBookmarks
+    }
+
+    func showImportWindow() {
+        guard let windowController = WindowControllersManager.shared.lastKeyMainWindowController,
+              windowController.window?.isKeyWindow == true else {
+            return
+        }
+
+        windowController.mainViewController.beginSheet(self) { _ in }
+    }
+
+    private var hasUserImportedBookmarks: Bool {
+        guard let folders = LocalBookmarkManager.shared.list?.topLevelEntities else { return false }
+        for folder in folders.reversed() where folder.title.contains("Imported from") {
+            successfulImportHappened = true
+            return true
+        }
+        return false
+    }
+
+    private var hasUserImportedPasswords: Bool {
+        do {
+            let secureVault = try SecureVaultFactory.default.makeVault(errorReporter: SecureVaultErrorReporter.shared)
+            var dates: [Date] = []
+            let accountsDates = try? secureVault.accounts().map { $0.created }
+            let noteDates = try? secureVault.notes().map { $0.created }
+            let cardDates = try? secureVault.creditCards().map { $0.created }
+            if let accountsDates {
+                dates.append(contentsOf: accountsDates)
+            }
+            if let noteDates {
+                dates.append(contentsOf: noteDates)
+            }
+            if let cardDates {
+                dates.append(contentsOf: cardDates)
+            }
+            guard dates.count >= 2 else { return false }
+            let sortedDate = dates.sorted()
+            for ind in 1..<sortedDate.count - 2 {
+                let sameSecond = Calendar.current.isDate(sortedDate[ind], equalTo: sortedDate[ind - 1], toGranularity: .second)
+                if sameSecond {
+                    successfulImportHappened = true
+                    return true
+                }
+            }
+            return false
+        } catch {
+            return false
+        }
+    }
 }

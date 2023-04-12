@@ -17,6 +17,8 @@
 //
 
 import Foundation
+import Bookmarks
+import BrowserServicesKit
 
 extension HomePage.Models {
 
@@ -31,17 +33,30 @@ extension HomePage.Models {
         let gridWidth = FeaturesGridDimensions.width
         let deleteActionTitle = UserText.newTabSetUpRemoveItemAction
 
+        let defaultBrowserProvider: DefaultBrowserProvider
+        let dataImportProvider: DataImportProvider
+
         var showAllFeatures: Bool = false {
             didSet {
-                visibleFeaturesMatrix = showAllFeatures ? featuresMatrix : [featuresMatrix[0]]
+                updateVisibleMatrix()
             }
         }
 
-        private var featuresMatrix = FeatureType.allCases.chunked(into: HomePage.featuresPerRow)
+        var isMorOrLessButtonNeeded: Bool {
+            return featuresMatrix.count > 1
+        }
+
+        private var featuresMatrix: [[FeatureType]] = [[]] {
+            didSet {
+                updateVisibleMatrix()
+            }
+        }
         @Published var visibleFeaturesMatrix: [[FeatureType]] = [[]]
 
-        init() {
-            visibleFeaturesMatrix = [featuresMatrix[0]]
+        init(defaultBrowserProvider: DefaultBrowserProvider, dataImportProvider: DataImportProvider) {
+            self.defaultBrowserProvider = defaultBrowserProvider
+            self.dataImportProvider = dataImportProvider
+            refreshFeaturesMatrix()
         }
 
         func actionTitle(for featureTye: FeatureType) -> String {
@@ -60,11 +75,54 @@ extension HomePage.Models {
         }
 
         func performAction(for featureType: FeatureType) {
-
+            switch featureType {
+            case .defaultBrowser:
+                do {
+                    try defaultBrowserProvider.presentDefaultBrowserPrompt()
+                } catch {
+                    defaultBrowserProvider.openSystemPreferences()
+                }
+            case .importBookmarksAndPasswords:
+                dataImportProvider.showImportWindow()
+            case .duckplayer:
+                print("\(featureType)")
+            case .emailProtection:
+                print("\(featureType)")
+            case .coockiePopUp:
+                print("\(featureType)")
+            }
         }
 
         func removeItem() {
 
+        }
+
+        func refreshFeaturesMatrix() {
+            var features: [FeatureType] = []
+            for feature in FeatureType.allCases {
+                switch feature {
+
+                case .defaultBrowser:
+                    if !defaultBrowserProvider.isDefault {
+                        features.append(feature)
+                    }
+                case .importBookmarksAndPasswords:
+                    if !dataImportProvider.hasUserUsedImport {
+                        features.append(feature)
+                    }
+                case .duckplayer:
+                    features.append(feature)
+                case .emailProtection:
+                    features.append(feature)
+                case .coockiePopUp:
+                    features.append(feature)
+                }
+            }
+            featuresMatrix = features.chunked(into: HomePage.featuresPerRow)
+        }
+
+        private func updateVisibleMatrix() {
+            visibleFeaturesMatrix = showAllFeatures ? featuresMatrix : [featuresMatrix[0]]
         }
 
     }
@@ -120,4 +178,59 @@ extension HomePage.Models {
             (itemHeight + verticalSpacing) * CGFloat(rowCount) - verticalSpacing
         }
     }
+}
+
+protocol DataImportProvider {
+    var hasUserUsedImport: Bool { get }
+    func showImportWindow()
+}
+
+final class StandardDataImportProvider: DataImportProvider {
+    var hasUserUsedImport: Bool {
+//        return DataImportViewController.hasUserUsedImport
+        return hasUserImportedPasswords
+    }
+
+    func showImportWindow() {
+        DataImportViewController.show()
+    }
+
+    private var hasUserImportedBookmarks: Bool {
+        guard let folders = LocalBookmarkManager.shared.list?.topLevelEntities else { return false }
+        for folder in folders.reversed() where folder.title.contains("Imported from"){
+            return true
+        }
+        return false
+    }
+
+    private var hasUserImportedPasswords: Bool {
+        do {
+            let secureVault = try SecureVaultFactory.default.makeVault(errorReporter: SecureVaultErrorReporter.shared)
+            var dates: [Date] = []
+            let accountsDates = try? secureVault.accounts().map { $0.created }
+            let noteDates = try? secureVault.notes().map { $0.created }
+            let cardDates = try? secureVault.creditCards().map { $0.created }
+            if let accountsDates {
+                dates.append(contentsOf: accountsDates)
+            }
+            if let noteDates {
+                dates.append(contentsOf: noteDates)
+            }
+            if let cardDates {
+                dates.append(contentsOf: cardDates)
+            }
+            guard dates.count >= 2 else { return false }
+            let sortedDate = dates.sorted()
+            for ind in 1..<sortedDate.count - 2 {
+                let sameSecond = Calendar.current.isDate(sortedDate[ind], equalTo: sortedDate[ind - 1], toGranularity: .second)
+                if sameSecond {
+                    return true
+                }
+            }
+            return false
+        } catch {
+            return false
+        }
+    }
+
 }

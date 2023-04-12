@@ -27,7 +27,7 @@ extension HomePage.Views {
 
         @State var isHovering = false {
             didSet {
-                moreOrLessButtonVisibility = isHovering ? .visible : .invisible
+                moreOrLessButtonVisibility = isHovering && model.isMorOrLessButtonNeeded ? .visible : .invisible
             }
         }
 
