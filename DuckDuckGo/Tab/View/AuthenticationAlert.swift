@@ -52,10 +52,7 @@ final class AuthenticationAlert: NSAlert {
             self.informativeText = String(format: UserText.authAlertPlainConnectionMessageFormat, host)
         }
 
-        usernameTextField.delegate = self
         usernameTextField.nextKeyView = passwordTextField
-        passwordTextField.delegate = self
-
         loginButton = addButton(withTitle: UserText.authAlertLogInButtonTitle)
         loginButton.tag = NSApplication.ModalResponse.OK.rawValue
 
@@ -63,24 +60,5 @@ final class AuthenticationAlert: NSAlert {
         cancelButton.tag = NSApplication.ModalResponse.cancel.rawValue
 
         self.accessoryView = stackView
-
-        updateButtons()
     }
-
-    func updateButtons() {
-        loginButton.isEnabled = !usernameTextField.stringValue.isEmpty && !passwordTextField.stringValue.isEmpty
-    }
-
-}
-
-extension AuthenticationAlert: NSTextFieldDelegate {
-
-    func controlTextDidChange(_ obj: Notification) {
-        updateButtons()
-    }
-
-    func controlTextDidEndEditing(_ obj: Notification) {
-        updateButtons()
-    }
-
 }
