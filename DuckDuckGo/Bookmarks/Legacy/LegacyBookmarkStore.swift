@@ -19,7 +19,6 @@
 import Foundation
 import CoreData
 import Cocoa
-import os.log
 
 fileprivate extension UUID {
 

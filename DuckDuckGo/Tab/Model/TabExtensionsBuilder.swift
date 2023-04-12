@@ -18,7 +18,6 @@
 
 import Combine
 import Foundation
-import os.log
 
 protocol TabExtensionsBuilderProtocol {
     func build(with args: TabExtensionsBuilderArguments, dependencies: TabExtensionDependencies) -> TabExtensions

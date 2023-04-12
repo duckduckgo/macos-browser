@@ -17,8 +17,8 @@
 //
 
 import WebKit
-import os
 import BrowserServicesKit
+import Common
 import UserScript
 import PrivacyDashboard
 

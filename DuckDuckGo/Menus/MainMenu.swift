@@ -18,7 +18,6 @@
 
 import Cocoa
 import Combine
-import os.log
 import OSLog
 import WebKit
 import BrowserServicesKit
@@ -280,7 +279,7 @@ final class MainMenu: NSMenu {
         menu.addItem(NSMenuItem(title: "Disable All", action: #selector(disableAllLogsMenuItemAction), target: self))
         menu.addItem(.separator())
 
-        for category in OSLog.Categories.allCases.map(\.rawValue).sorted() {
+        for category in OSLog.AllCategories.allCases.sorted() {
             let menuItem = NSMenuItem(title: category, action: #selector(loggingMenuItemAction), target: self)
             menuItem.identifier = .init(category)
             menu.addItem(menuItem)
@@ -303,14 +302,14 @@ final class MainMenu: NSMenu {
 
         let enabledCategories = OSLog.loggingCategories
         for item in loggingMenu.items {
-            guard let category = item.identifier.flatMap({ OSLog.Categories(rawValue: $0.rawValue) }) else { continue }
+            guard let category = item.identifier.map(\.rawValue) else { continue }
 
             item.state = enabledCategories.contains(category) ? .on : .off
         }
     }
 
     @objc private func loggingMenuItemAction(_ sender: NSMenuItem) {
-        guard let category = sender.identifier.flatMap({ OSLog.Categories(rawValue: $0.rawValue) }) else { return }
+        guard let category = sender.identifier?.rawValue else { return }
 
         if case .on = sender.state {
             OSLog.loggingCategories.remove(category)
@@ -320,7 +319,7 @@ final class MainMenu: NSMenu {
     }
 
     @objc private func enableAllLogsMenuItemAction(_ sender: NSMenuItem) {
-        OSLog.loggingCategories = Set(OSLog.Categories.allCases)
+        OSLog.loggingCategories = Set(OSLog.AllCategories.allCases)
     }
 
     @objc private func disableAllLogsMenuItemAction(_ sender: NSMenuItem) {

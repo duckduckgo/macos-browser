@@ -17,8 +17,8 @@
 //
 
 import Cocoa
-import os.log
 import BrowserServicesKit
+import Common
 
 // Actions are sent to objects of responder chain
 

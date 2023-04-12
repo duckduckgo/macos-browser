@@ -19,7 +19,7 @@
 import Cocoa
 import Carbon.HIToolbox
 import Combine
-import os.log
+import Common
 
 final class MainViewController: NSViewController {
 

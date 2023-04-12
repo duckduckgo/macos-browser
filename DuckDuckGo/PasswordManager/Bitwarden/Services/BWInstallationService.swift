@@ -18,7 +18,6 @@
 
 import Foundation
 import AppKit
-import os.log
 
 enum BWInstallationState {
 

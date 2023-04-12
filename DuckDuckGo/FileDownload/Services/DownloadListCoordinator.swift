@@ -17,9 +17,9 @@
 //
 
 import Combine
+import Common
 import Foundation
 import Navigation
-import os.log
 
 private func getFirstAvailableWebView() -> WKWebView? {
     let wcm = WindowControllersManager.shared

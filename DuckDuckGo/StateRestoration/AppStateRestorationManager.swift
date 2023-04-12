@@ -18,7 +18,7 @@
 
 import Foundation
 import Combine
-import os.log
+import Common
 
 final class AppStateRestorationManager: NSObject {
     static let fileName = "persistentState"

@@ -22,7 +22,6 @@ import Common
 import ContentBlocking
 import Foundation
 import Navigation
-import os.log
 import UserScript
 import WebKit
 

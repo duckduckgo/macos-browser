@@ -16,12 +16,13 @@
 //  limitations under the License.
 //
 
+import Common
 import Foundation
-import os
+import os.log
 
 extension OSLog {
 
-    enum Categories: String, CaseIterable {
+    enum AppCategories: String, CaseIterable {
         case atb = "ATB"
         case config = "Configuration Downloading"
         case fire = "Fire"
@@ -41,11 +42,15 @@ extension OSLog {
         case navigation = "Navigation"
         case duckPlayer = "Duck Player"
     }
+    enum AllCategories {
+        static var allCases: [String] {
+            Categories.allCases.map(\.rawValue) + AppCategories.allCases.map(\.rawValue)
+        }
+    }
 
     @OSLogWrapper(.atb) static var atb
     @OSLogWrapper(.config) static var config
     @OSLogWrapper(.fire) static var fire
-    @OSLogWrapper(.passwordManager) static var passwordManager
     @OSLogWrapper(.history) static var history
     @OSLogWrapper(.dataImportExport) static var dataImportExport
     @OSLogWrapper(.pixel) static var pixel
@@ -61,12 +66,6 @@ extension OSLog {
     @OSLogWrapper(.navigation) static var navigation
     @OSLogWrapper(.duckPlayer) static var duckPlayer
 
-#if DEBUG
-    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    // To activate Logging Categories for DEBUG add categories here:
-    static var debugCategories: Set<Categories> = [ /* .navigation... */ ]
-#endif
-
     // Debug->Logging categories will only be enabled for one day
     @UserDefaultsWrapper(key: .loggingEnabledDate, defaultValue: .distantPast)
     private static var loggingEnabledDate: Date
@@ -80,13 +79,13 @@ extension OSLog {
             loggingEnabledDate = Date()
         }
     }
-    static var loggingCategories: Set<Categories> {
+    static var loggingCategories: Set<String> {
         get {
             guard isLoggingEnabledToday else { return [] }
-            return Set(loggingCategoriesSetting.compactMap(Categories.init(rawValue:)))
+            return Set(loggingCategoriesSetting)
         }
         set {
-            loggingCategoriesSetting = Array(newValue.map(\.rawValue))
+            loggingCategoriesSetting = Array(newValue)
         }
     }
 
@@ -108,24 +107,10 @@ extension ProcessInfo {
     }
 }
 
-@propertyWrapper
-struct OSLogWrapper {
+extension OSLog.OSLogWrapper {
 
-    let category: OSLog.Categories
-
-    var wrappedValue: OSLog {
-        var isEnabled = OSLog.loggingCategories.contains(category)
-#if CI
-        isEnabled = true
-#elseif DEBUG
-        isEnabled = isEnabled || OSLog.debugCategories.contains(category)
-#endif
-
-        return isEnabled ? OSLog(subsystem: OSLog.subsystem, category: category.rawValue) : .disabled
-    }
-
-    init(_ category: OSLog.Categories) {
-        self.category = category
+    init(_ category: OSLog.AppCategories) {
+        self.init(rawValue: category.rawValue)
     }
 
 }

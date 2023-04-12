@@ -18,7 +18,6 @@
 
 import Foundation
 import Combine
-import os.log
 
 protocol RecentlyClosedCoordinating: AnyObject {
 
