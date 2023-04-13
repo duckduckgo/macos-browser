@@ -182,7 +182,6 @@ extension SyncPreferences: ManagementDialogModelDelegate {
             } catch {
                 managementDialogModel.errorMessage = String(describing: error)
             }
-            isCreatingAccount = false
         }
     }
 
