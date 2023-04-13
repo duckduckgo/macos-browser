@@ -18,7 +18,7 @@
 
 import Cocoa
 import Combine
-import OSLog
+import OSLog // swiftlint:disable:this enforce_os_log_wrapper
 import WebKit
 import BrowserServicesKit
 
