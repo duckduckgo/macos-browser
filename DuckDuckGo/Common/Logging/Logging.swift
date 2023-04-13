@@ -18,7 +18,7 @@
 
 import Common
 import Foundation
-import os.log
+import os.log // swiftlint:enable:this enforce_os_log_wrapper
 
 extension OSLog {
 
