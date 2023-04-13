@@ -348,7 +348,7 @@ final class BrowserTabViewController: NSViewController {
             return
         }
 
-        let tab = Tab(content: content, shouldLoadInBackground: true, webViewFrame: view.frame)
+        let tab = Tab(content: content, shouldLoadInBackground: true, webViewSize: view.frame.size)
         tabCollectionViewModel.append(tab: tab, selected: true)
     }
 

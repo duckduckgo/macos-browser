@@ -222,7 +222,7 @@ protocol NewWindowPolicyDecisionMaker {
                      shouldLoadFromCache: Bool = false,
                      canBeClosedWithBack: Bool = false,
                      lastSelectedAt: Date? = nil,
-                     webViewFrame: CGRect = .zero
+                     webViewSize: CGSize = CGSize(width: 1024, height: 768)
     ) {
 
         let duckPlayer = duckPlayer
@@ -256,7 +256,7 @@ protocol NewWindowPolicyDecisionMaker {
                   shouldLoadFromCache: shouldLoadFromCache,
                   canBeClosedWithBack: canBeClosedWithBack,
                   lastSelectedAt: lastSelectedAt,
-                  webViewFrame: webViewFrame)
+                  webViewSize: webViewSize)
     }
 
     // swiftlint:disable:next function_body_length
@@ -284,7 +284,7 @@ protocol NewWindowPolicyDecisionMaker {
          shouldLoadFromCache: Bool,
          canBeClosedWithBack: Bool,
          lastSelectedAt: Date?,
-         webViewFrame: CGRect
+         webViewSize: CGSize
     ) {
 
         self.content = content
@@ -306,7 +306,7 @@ protocol NewWindowPolicyDecisionMaker {
         assert(userContentController != nil)
         self.userContentController = userContentController
 
-        webView = WebView(frame: webViewFrame, configuration: configuration)
+        webView = WebView(frame: CGRect(origin: .zero, size: webViewSize), configuration: configuration)
         webView.allowsLinkPreview = false
         permissions = PermissionModel(permissionManager: permissionManager,
                                       geolocationService: geolocationService)
