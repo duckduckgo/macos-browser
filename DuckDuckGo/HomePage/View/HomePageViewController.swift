@@ -133,7 +133,9 @@ final class HomePageViewController: NSViewController {
     }
 
     func createFeatureModel() -> HomePage.Models.ContinueSetUpModel {
-        return .init(defaultBrowserProvider: SystemDefaultBrowserProvider(), dataImportProvider: StandardDataImportProvider())
+        let vm = HomePage.Models.ContinueSetUpModel(defaultBrowserProvider: SystemDefaultBrowserProvider(), dataImportProvider: StandardDataImportProvider(), tabCollectionViewModel: tabCollectionViewModel, duckPlayerPreferences: DuckPlayerPreferencesUserDefaultsPersistor())
+        vm.delegate = self
+        return vm
     }
 
     func createDefaultBrowserModel() -> HomePage.Models.DefaultBrowserModel {

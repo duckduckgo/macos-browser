@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import BrowserServicesKit
 
 extension HomePage.Models {
 
@@ -30,9 +31,17 @@ extension HomePage.Models {
         let itemsPerRow = HomePage.featuresPerRow
         let gridWidth = FeaturesGridDimensions.width
         let deleteActionTitle = UserText.newTabSetUpRemoveItemAction
+        let duckPlayerURL = URL(string: "https://youtu.be/yKWIA-Pys4c")!
 
-        let defaultBrowserProvider: DefaultBrowserProvider
-        let dataImportProvider: DataImportProvider
+        private let defaultBrowserProvider: DefaultBrowserProvider
+        private let dataImportProvider: DataImportProvider
+        private let tabCollectionViewModel: TabCollectionViewModel
+        private let emailManager: EmailManager
+        private let privacyPreferences: PrivacySecurityPreferences
+        private let cookieConsentPopoverManager: CookieConsentPopoverManager
+        private let duckPlayerPreferences: DuckPlayerPreferencesPersistor
+
+        weak var delegate: ContinueSetUpVewModelDelegate?
 
         var shouldShowAllFeatures: Bool = false {
             didSet {
@@ -51,9 +60,20 @@ extension HomePage.Models {
         }
         @Published var visibleFeaturesMatrix: [[FeatureType]] = [[]]
 
-        init(defaultBrowserProvider: DefaultBrowserProvider, dataImportProvider: DataImportProvider) {
+        init(defaultBrowserProvider: DefaultBrowserProvider,
+             dataImportProvider: DataImportProvider,
+             tabCollectionViewModel: TabCollectionViewModel,
+             emailManager: EmailManager = EmailManager(),
+             privacyPreferences: PrivacySecurityPreferences = PrivacySecurityPreferences.shared,
+             cookieConsentPopoverManager: CookieConsentPopoverManager = CookieConsentPopoverManager(),
+             duckPlayerPreferences: DuckPlayerPreferencesPersistor) {
             self.defaultBrowserProvider = defaultBrowserProvider
             self.dataImportProvider = dataImportProvider
+            self.tabCollectionViewModel = tabCollectionViewModel
+            self.emailManager = emailManager
+            self.privacyPreferences = privacyPreferences
+            self.cookieConsentPopoverManager = cookieConsentPopoverManager
+            self.duckPlayerPreferences = duckPlayerPreferences
             refreshFeaturesMatrix()
         }
 
@@ -83,11 +103,16 @@ extension HomePage.Models {
             case .importBookmarksAndPasswords:
                 dataImportProvider.showImportWindow(completion: refreshFeaturesMatrix)
             case .duckplayer:
-                print("\(featureType)")
+                let tab = Tab(content: .url(duckPlayerURL), shouldLoadInBackground: true)
+                tabCollectionViewModel.append(tab: tab)
             case .emailProtection:
-                print("\(featureType)")
+                let tab = Tab(content: .url(EmailUrls().emailProtectionLink), shouldLoadInBackground: true)
+                tabCollectionViewModel.append(tab: tab)
             case .coockiePopUp:
-                print("\(featureType)")
+                delegate?.showCookieConsentPopUp(manager: cookieConsentPopoverManager, completion: { [weak self] result in
+                    self?.privacyPreferences.autoconsentEnabled = result
+                    self?.refreshFeaturesMatrix()
+                })
             }
         }
 
@@ -109,11 +134,18 @@ extension HomePage.Models {
                         features.append(feature)
                     }
                 case .duckplayer:
-                    features.append(feature)
+                    print(duckPlayerPreferences.youtubeOverlayInteracted)
+                    if !duckPlayerPreferences.youtubeOverlayInteracted {
+                        features.append(feature)
+                    }
                 case .emailProtection:
-                    features.append(feature)
+                    if !emailManager.isSignedIn {
+                        features.append(feature)
+                    }
                 case .coockiePopUp:
-                    features.append(feature)
+                    if !(privacyPreferences.autoconsentEnabled ?? false) {
+                        features.append(feature)
+                    }
                 }
             }
             featuresMatrix = features.chunked(into: HomePage.featuresPerRow)
@@ -175,5 +207,15 @@ extension HomePage.Models {
         static func height(for rowCount: Int) -> CGFloat {
             (itemHeight + verticalSpacing) * CGFloat(rowCount) - verticalSpacing
         }
+    }
+}
+
+protocol ContinueSetUpVewModelDelegate: AnyObject {
+    func showCookieConsentPopUp(manager: CookieConsentPopoverManager, completion: ((Bool) -> Void)?)
+}
+
+extension HomePageViewController: ContinueSetUpVewModelDelegate {
+    func showCookieConsentPopUp(manager: CookieConsentPopoverManager, completion: ((Bool) -> Void)?) {
+        manager.show(on: self.view, animated: true, result: completion)
     }
 }

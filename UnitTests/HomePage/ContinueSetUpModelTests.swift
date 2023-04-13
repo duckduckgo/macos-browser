@@ -18,22 +18,38 @@
 
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
+import BrowserServicesKit
 
 final class ContinueSetUpModelTests: XCTestCase {
 
     var vm: HomePage.Models.ContinueSetUpModel!
     var capturingDefaultBrowserProvider: CapturingDefaultBrowserProvider!
     var capturingDataImportProvider: CapturingDataImportProvider!
+    var tabCollectionVM: TabCollectionViewModel!
+    var emailManager: EmailManager!
+    var emailStorage: MockEmailStorage!
+    var privacyPreferences: PrivacySecurityPreferences!
+    var delegate: CapturingSetUpVewModelDelegate!
 
     override func setUp() {
+        UserDefaultsWrapper<Any>.clearAll()
         capturingDefaultBrowserProvider = CapturingDefaultBrowserProvider()
         capturingDataImportProvider = CapturingDataImportProvider()
-        vm = HomePage.Models.ContinueSetUpModel(defaultBrowserProvider: capturingDefaultBrowserProvider, dataImportProvider: capturingDataImportProvider)
+        tabCollectionVM = TabCollectionViewModel()
+        emailStorage = MockEmailStorage()
+        emailManager = EmailManager(storage: emailStorage)
+        privacyPreferences = PrivacySecurityPreferences.shared
+        delegate = CapturingSetUpVewModelDelegate()
+        vm = HomePage.Models.ContinueSetUpModel(defaultBrowserProvider: capturingDefaultBrowserProvider, dataImportProvider: capturingDataImportProvider, tabCollectionViewModel: tabCollectionVM, emailManager: emailManager, privacyPreferences: privacyPreferences)
+        vm.delegate = delegate
     }
 
     override func tearDown() {
         capturingDefaultBrowserProvider = nil
         capturingDataImportProvider = nil
+        tabCollectionVM = nil
+        emailManager = nil
+        emailStorage = nil
         vm = nil
     }
 
@@ -104,12 +120,10 @@ final class ContinueSetUpModelTests: XCTestCase {
     }
 
     func testWhenIsDefaultBrowserAndTogglingShowAllFeatureTheCorrectElementsAreVisible() {
+        let expectedMatrix = expectedFeatureMatrixWithout(type: .defaultBrowser)
+
         capturingDefaultBrowserProvider.isDefault = true
-        var features = HomePage.Models.FeatureType.allCases
         vm = HomePage.Models.ContinueSetUpModel.fixture(defaultBrowserProvider: capturingDefaultBrowserProvider)
-        let defaultBrowserIdex = features.firstIndex(of: .defaultBrowser)!
-        features.remove(at: defaultBrowserIdex)
-        let expectedMatrix = features.chunked(into: HomePage.featuresPerRow)
 
         vm.shouldShowAllFeatures = true
 
@@ -135,12 +149,10 @@ final class ContinueSetUpModelTests: XCTestCase {
     }
 
     func testWhenUserHasUsedImportAndTogglingShowAllFeatureTheCorrectElementsAreVisible() {
+        let expectedMatrix = expectedFeatureMatrixWithout(type: .importBookmarksAndPasswords)
+
         capturingDataImportProvider.hasUserUsedImport = true
-        var features = HomePage.Models.FeatureType.allCases
         vm = HomePage.Models.ContinueSetUpModel.fixture(dataImportProvider: capturingDataImportProvider)
-        let importIdex = features.firstIndex(of: .importBookmarksAndPasswords)!
-        features.remove(at: importIdex)
-        let expectedMatrix = features.chunked(into: HomePage.featuresPerRow)
 
         vm.shouldShowAllFeatures = true
 
@@ -152,10 +164,68 @@ final class ContinueSetUpModelTests: XCTestCase {
         XCTAssertTrue(vm.visibleFeaturesMatrix[0].count <= HomePage.featuresPerRow)
         XCTAssertEqual(vm.visibleFeaturesMatrix, [expectedMatrix[0]])
     }
+
+    func testWhenAskedToPerformActionForEmailProtectionThenItEmailProtectionSite() {
+        vm.performAction(for: .emailProtection)
+
+        XCTAssertEqual(tabCollectionVM.tabs[1].url, EmailUrls().emailProtectionLink)
+    }
+
+    func testWhenUserHasEmailProtectionEnabledTheCorrectElementsAreVisible() {
+        let expectedMatrix = expectedFeatureMatrixWithout(type: .emailProtection)
+
+        emailStorage.isEmailProtectionEnabled = true
+        vm = HomePage.Models.ContinueSetUpModel.fixture(emailManager: emailManager)
+
+        vm.shouldShowAllFeatures = true
+
+        XCTAssertEqual(vm.visibleFeaturesMatrix, expectedMatrix)
+
+        vm.shouldShowAllFeatures = false
+
+        XCTAssertEqual(vm.visibleFeaturesMatrix.count, 1)
+        XCTAssertTrue(vm.visibleFeaturesMatrix[0].count <= HomePage.featuresPerRow)
+        XCTAssertEqual(vm.visibleFeaturesMatrix, [expectedMatrix[0]])
+    }
+
+    func testWhenAskedToPerformActionForCookieConsentThenShowsCookiePopUp() {
+        let numberOfFeatures = HomePage.Models.FeatureType.allCases.count
+        vm.shouldShowAllFeatures = true
+        XCTAssertEqual(vm.visibleFeaturesMatrix.flatMap { $0 }.count, numberOfFeatures)
+
+        vm.performAction(for: .coockiePopUp)
+
+        XCTAssertTrue(delegate.showCookieConsentPopUpCalled)
+        XCTAssertEqual(vm.visibleFeaturesMatrix.flatMap { $0 }.count, numberOfFeatures - 1)
+    }
+
+    func testWhenUserHasCookieConsnetEnabledTheCorrectElementsAreVisible() {
+        let expectedMatrix = expectedFeatureMatrixWithout(type: .coockiePopUp)
+
+        privacyPreferences.autoconsentEnabled = true
+        vm = HomePage.Models.ContinueSetUpModel.fixture(privacyPreferences: privacyPreferences)
+
+        vm.shouldShowAllFeatures = true
+
+        XCTAssertEqual(vm.visibleFeaturesMatrix, expectedMatrix)
+
+        vm.shouldShowAllFeatures = false
+
+        XCTAssertEqual(vm.visibleFeaturesMatrix.count, 1)
+        XCTAssertTrue(vm.visibleFeaturesMatrix[0].count <= HomePage.featuresPerRow)
+        XCTAssertEqual(vm.visibleFeaturesMatrix, [expectedMatrix[0]])
+    }
+
+    private func expectedFeatureMatrixWithout(type: HomePage.Models.FeatureType) -> [[HomePage.Models.FeatureType]] {
+        var features = HomePage.Models.FeatureType.allCases
+        let indexToRemove = features.firstIndex(of: type)!
+        features.remove(at: indexToRemove)
+        return features.chunked(into: HomePage.featuresPerRow)
+    }
 }
 
 extension HomePage.Models.ContinueSetUpModel {
-    static func fixture(defaultBrowserProvider: DefaultBrowserProvider = CapturingDefaultBrowserProvider(), dataImportProvider: DataImportProvider = CapturingDataImportProvider()) -> HomePage.Models.ContinueSetUpModel {
-        HomePage.Models.ContinueSetUpModel(defaultBrowserProvider: defaultBrowserProvider, dataImportProvider: dataImportProvider)
+    static func fixture(defaultBrowserProvider: DefaultBrowserProvider = CapturingDefaultBrowserProvider(), dataImportProvider: DataImportProvider = CapturingDataImportProvider(), tabCollectionViewModel: TabCollectionViewModel = TabCollectionViewModel(), emailManager: EmailManager = EmailManager(), privacyPreferences: PrivacySecurityPreferences = PrivacySecurityPreferences.shared) -> HomePage.Models.ContinueSetUpModel {
+        HomePage.Models.ContinueSetUpModel(defaultBrowserProvider: defaultBrowserProvider, dataImportProvider: dataImportProvider, tabCollectionViewModel: tabCollectionViewModel, emailManager: emailManager, privacyPreferences: privacyPreferences)
     }
 }
