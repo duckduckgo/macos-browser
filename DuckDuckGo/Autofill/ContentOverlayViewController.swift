@@ -281,6 +281,11 @@ extension ContentOverlayViewController: SecureVaultManagerDelegate {
     }
 
     public func secureVaultManager(_: SecureVaultManager, didRequestPasswordManagerForDomain domain: String) {
-        autofillPreferencesModel.showAutofillPopover(.logins)
+        let mngr = PasswordManagerCoordinator.shared
+        if mngr.isEnabled {
+            mngr.bitwardenManagement.openBitwarden()
+        } else {
+            autofillPreferencesModel.showAutofillPopover(.logins)
+        }
     }
 }
