@@ -73,7 +73,7 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
     init(onDirtyChanged: @escaping (Bool) -> Void,
          onSaveRequested: @escaping (SecureVaultModels.WebsiteCredentials) -> Void,
          onDeleteRequested: @escaping (SecureVaultModels.WebsiteCredentials) -> Void,
-         urlMatcher: AutofillUrlMatcher = AutofillDomainNameUrlMatcher()) {        
+         urlMatcher: AutofillUrlMatcher = AutofillDomainNameUrlMatcher()) {
         self.onSaveRequested = onSaveRequested
         self.onDeleteRequested = onDeleteRequested
         self.urlMatcher = urlMatcher
