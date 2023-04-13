@@ -30,7 +30,6 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
         return dateFormatter
     } ()
 
-    var onDirtyChanged: (Bool) -> Void
     var onSaveRequested: (SecureVaultModels.WebsiteCredentials) -> Void
     var onDeleteRequested: (SecureVaultModels.WebsiteCredentials) -> Void
     var urlMatcher: AutofillUrlMatcher
@@ -57,45 +56,15 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
         }
     }
 
-    @Published var title: String = "" {
-        didSet {
-            isDirty = true
-        }
-    }
-
-    @Published var username: String = "" {
-        didSet {
-            isDirty = true
-        }
-    }
-
-    @Published var password: String = "" {
-        didSet {
-            isDirty = true
-        }
-    }
-
-    @Published var domain: String = "" {
-        didSet {
-            isDirty = true
-        }
-    }
-
-    @Published var isEditing = false {
-        didSet {
-            // Experimental change suggested by the design team to mark an item as dirty as soon as it enters the editing state.
-            if isEditing {
-                isDirty = true
-            }
-        }
-    }
-
+    @Published var title: String = ""
+    @Published var username: String = ""
+    @Published var password: String = ""
+    @Published var domain: String = ""
+    @Published var isEditing = false
     @Published var isNew = false
 
-    var isDirty = false {
-        didSet {
-            self.onDirtyChanged(isDirty)
-        }
+    var isDirty: Bool {
+        username != "" || password != "" || domain != ""
     }
 
     var lastUpdatedDate: String = ""
@@ -104,8 +73,7 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
     init(onDirtyChanged: @escaping (Bool) -> Void,
          onSaveRequested: @escaping (SecureVaultModels.WebsiteCredentials) -> Void,
          onDeleteRequested: @escaping (SecureVaultModels.WebsiteCredentials) -> Void,
-         urlMatcher: AutofillUrlMatcher = AutofillDomainNameUrlMatcher()) {
-        self.onDirtyChanged = onDirtyChanged
+         urlMatcher: AutofillUrlMatcher = AutofillDomainNameUrlMatcher()) {        
         self.onSaveRequested = onSaveRequested
         self.onDeleteRequested = onDeleteRequested
         self.urlMatcher = urlMatcher
@@ -157,8 +125,7 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
         title = titleString
         username = credentials?.account.username ?? ""
         password = String(data: credentials?.password ?? Data(), encoding: .utf8) ?? ""
-        domain =  urlMatcher.normalizeUrlForWeb(credentials?.account.domain ?? "")
-        isDirty = false
+        domain =  urlMatcher.normalizeUrlForWeb(credentials?.account.domain ?? "")        
         isNew = credentials?.account.id == nil
 
         if let date = credentials?.account.created {
