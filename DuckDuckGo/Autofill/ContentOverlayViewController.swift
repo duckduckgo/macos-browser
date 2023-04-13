@@ -37,9 +37,16 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
     }()
 
     lazy var vaultManager: SecureVaultManager = {
-        let manager = SecureVaultManager(passwordManager: PasswordManagerCoordinator.shared)
+        let manager = SecureVaultManager(passwordManager: PasswordManagerCoordinator.shared,
+                                         includePartialAccountMatches: true,
+                                         tld: ContentBlocking.shared.tld)
         manager.delegate = self
         return manager
+    }()
+
+    lazy var autofillPreferencesModel: AutofillPreferencesModel = {
+        let model = AutofillPreferencesModel()
+        return model
     }()
 
     public override func viewDidLoad() {
@@ -265,4 +272,15 @@ extension ContentOverlayViewController: SecureVaultManagerDelegate {
         }
     }
 
+    public func secureVaultManager(_: SecureVaultManager, didRequestCreditCardsManagerForDomain domain: String) {
+        autofillPreferencesModel.showAutofillPopover(.cards)
+    }
+
+    public func secureVaultManager(_: SecureVaultManager, didRequestIdentitiesManagerForDomain domain: String) {
+        autofillPreferencesModel.showAutofillPopover(.identities)
+    }
+
+    public func secureVaultManager(_: SecureVaultManager, didRequestPasswordManagerForDomain domain: String) {
+        autofillPreferencesModel.showAutofillPopover(.logins)
+    }
 }
