@@ -152,6 +152,7 @@ final class Fire {
         os_log("Fire started", log: .fire)
 
         burnLastSessionState()
+        burnDeletedBookmarks()
 
         burningData = .specificDomains(domains)
 
@@ -190,7 +191,6 @@ final class Fire {
             group.enter()
             Task {
                 await self.burnWebCache(domains: burningDomains)
-                await self.burnDeletedBookmarks()
                 group.leave()
             }
 
@@ -226,6 +226,7 @@ final class Fire {
         burningData = .all
 
         burnLastSessionState()
+        burnDeletedBookmarks()
 
         let pinnedTabsViewModels = pinnedTabViewModels()
 
@@ -235,7 +236,6 @@ final class Fire {
 
             Task {
                 await self.burnWebCache()
-                await self.burnDeletedBookmarks()
                 group.leave()
             }
 
@@ -437,11 +437,11 @@ final class Fire {
 
     // MARK: - Bookmarks cleanup
 
-    private func burnDeletedBookmarks() async {
+    private func burnDeletedBookmarks() {
         if syncService?.isAuthenticated == true {
             return
         }
-        await LocalBookmarkManager.shared.cleanUpBookmarksPendingDeletion()
+        LocalBookmarkManager.shared.cleanUpBookmarksDatabase()
     }
 }
 

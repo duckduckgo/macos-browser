@@ -58,6 +58,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     private var appIconChanger: AppIconChanger!
     private(set) var syncService: DDGSyncing!
     private(set) var syncPersistence: SyncDataPersistor!
+    private var syncStateCancellable: AnyCancellable?
 
 #if !APPSTORE
     var updateController: UpdateController!
@@ -190,11 +191,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
         UserDefaultsWrapper<Any>.clearRemovedKeys()
 
-        if !syncService.isAuthenticated {
-            Task {
-                await LocalBookmarkManager.shared.cleanUpBookmarksPendingDeletion()
+        syncStateCancellable = syncService.isAuthenticatedPublisher
+            .prepend(syncService.isAuthenticated)
+            .sink { isSyncEnabled in
+                LocalBookmarkManager.shared.updateBookmarkDatabaseCleanupSchedule(shouldEnable: !isSyncEnabled)
             }
-        }
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {

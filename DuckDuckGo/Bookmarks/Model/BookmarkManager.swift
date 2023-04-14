@@ -44,7 +44,9 @@ protocol BookmarkManager: AnyObject {
     func move(objectUUIDs: [String], toIndex: Int?, withinParentFolder: ParentFolderType, completion: @escaping (Error?) -> Void)
     func moveFavorites(with objectUUIDs: [String], toIndex: Int?, completion: @escaping (Error?) -> Void)
     func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarkImportResult
-    func cleanUpBookmarksPendingDeletion() async
+
+    func cleanUpBookmarksDatabase()
+    func updateBookmarkDatabaseCleanupSchedule(shouldEnable: Bool)
 
     // Wrapper definition in a protocol is not supported yet
     var listPublisher: Published<BookmarkList?>.Publisher { get }
@@ -68,16 +70,21 @@ final class LocalBookmarkManager: BookmarkManager {
 
     private lazy var bookmarkStore: BookmarkStore = LocalBookmarkStore(bookmarkDatabase: BookmarkDatabase.shared)
     private lazy var faviconManagement: FaviconManagement = FaviconManager.shared
+    private lazy var bookmarkDatabaseCleaner = BookmarkDatabaseCleaner(bookmarkDatabase: BookmarkDatabase.shared.db, errorEvents: BookmarksCleanupErrorHandling())
 
     // MARK: - Bookmarks
 
-    func cleanUpBookmarksPendingDeletion() async {
-        do {
-            let cleaner = BookmarkDatabaseCleaner(bookmarkDatabase: BookmarkDatabase.shared.db)
-            try await cleaner.removeBookmarksPendingDeletion()
-        } catch {
-            Pixel.fire(.debug(event: .bookmarksCleanupFailed))
+    func updateBookmarkDatabaseCleanupSchedule(shouldEnable: Bool) {
+        if shouldEnable {
+            bookmarkDatabaseCleaner.scheduleRegularCleaning()
+            bookmarkDatabaseCleaner.cleanUpDatabaseNow()
+        } else {
+            bookmarkDatabaseCleaner.cancelCleaningSchedule()
         }
+    }
+
+    func cleanUpBookmarksDatabase() {
+        bookmarkDatabaseCleaner.cleanUpDatabaseNow()
     }
 
     func loadBookmarks() {
