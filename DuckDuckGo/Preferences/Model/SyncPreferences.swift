@@ -198,6 +198,8 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                 }
 
                 try await login(recoveryKey)
+                presentDialog(for: .deviceSynced)
+
             } catch {
                 managementDialogModel.errorMessage = String(describing: error)
             }
@@ -212,20 +214,15 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                 presentDialog(for: .syncAnotherDevice)
                 if let recoveryKey = try await connector?.pollForRecoveryKey() {
                     try await login(recoveryKey)
+                    presentDialog(for: .deviceSynced)
                 } else {
                     // Polling was likeley cancelled elsewhere (e.g. dialog closed)
                     return
                 }
-                managementDialogModel.endFlow()
             } catch {
                 managementDialogModel.errorMessage = String(describing: error)
             }
         }
-    }
-
-    @MainActor
-    func addAnotherDevice() {
-        presentDialog(for: .deviceSynced)
     }
 
     @MainActor
