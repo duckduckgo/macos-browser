@@ -18,6 +18,7 @@
 
 import Combine
 import Foundation
+import AppKit
 
 protocol TabExtensionsBuilderProtocol {
     @MainActor
