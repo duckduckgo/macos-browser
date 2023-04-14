@@ -17,7 +17,6 @@
 //
 
 import Foundation
-import os.log
 
 typealias Base64EncodedString = String
 typealias MessageId = String

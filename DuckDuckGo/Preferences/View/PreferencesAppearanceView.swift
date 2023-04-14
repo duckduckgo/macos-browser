@@ -85,21 +85,22 @@ extension Preferences {
 
         var body: some View {
             VStack(alignment: .leading, spacing: 0) {
-                Text(UserText.appearance)
-                    .font(Const.Fonts.preferencePaneTitle)
 
+                // TITLE
+                TextMenuTitle(text: UserText.appearance)
+
+                // SECTION 1: Theme
                 PreferencePaneSection {
-                    Text(UserText.theme)
-                        .font(Const.Fonts.preferencePaneSectionHeader)
+                    TextMenuItemHeader(text: UserText.theme)
                     ThemePicker()
                         .environmentObject(model)
                 }
 
+                // SECTION 2: Address Bar
                 PreferencePaneSection {
-                    Text(UserText.addressBar)
-                        .font(Const.Fonts.preferencePaneSectionHeader)
-                    Toggle(UserText.showFullWebsiteAddress, isOn: $model.showFullURL)
-                    Toggle(UserText.showAutocompleteSuggestions, isOn: $model.showAutocompleteSuggestions)
+                    TextMenuItemHeader(text: UserText.addressBar)
+                    ToggleMenuItem(title: UserText.showFullWebsiteAddress, isOn: $model.showFullURL)
+                    ToggleMenuItem(title: UserText.showAutocompleteSuggestions, isOn: $model.showAutocompleteSuggestions)
                 }
 
                 PreferencePaneSection {

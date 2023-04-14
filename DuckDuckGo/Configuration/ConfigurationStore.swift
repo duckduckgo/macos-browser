@@ -16,8 +16,8 @@
 //  limitations under the License.
 //
 
+import Common
 import Foundation
-import os
 import Configuration
 
 final class ConfigurationStore: ConfigurationStoring {

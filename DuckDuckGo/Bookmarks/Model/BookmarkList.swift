@@ -18,7 +18,7 @@
 
 import Foundation
 import BrowserServicesKit
-import os.log
+import Common
 
 struct BookmarkList {
 

@@ -4,7 +4,6 @@ on:
   push:
     branches: [ develop, "release/**" ]
   pull_request:
-    branches: [ develop, "release/**" ]
 
 
 jobs:

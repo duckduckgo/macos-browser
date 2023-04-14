@@ -17,8 +17,8 @@
 //
 
 import Cocoa
-import os.log
 import Combine
+import Common
 import Lottie
 import SwiftUI
 

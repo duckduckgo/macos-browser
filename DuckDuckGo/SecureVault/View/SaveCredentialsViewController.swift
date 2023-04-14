@@ -19,7 +19,7 @@
 import AppKit
 import BrowserServicesKit
 import Combine
-import os
+import Common
 
 protocol SaveCredentialsDelegate: AnyObject {
 

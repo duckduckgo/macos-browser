@@ -20,7 +20,6 @@ import Foundation
 import CoreData
 import Bookmarks
 import Persistence
-import os.log
 
 public class LegacyBookmarksStoreMigration {
 

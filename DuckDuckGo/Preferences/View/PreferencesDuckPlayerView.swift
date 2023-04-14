@@ -34,11 +34,11 @@ extension Preferences {
 
         var body: some View {
             VStack(alignment: .leading, spacing: 0) {
-                Text(UserText.duckPlayer)
-                    .font(Const.Fonts.preferencePaneTitle)
+
+                // TITLE
+                TextMenuTitle(text: UserText.duckPlayer)
 
                 PreferencePaneSection {
-
                     Picker(selection: duckPlayerModeBinding, content: {
                         Text(UserText.duckPlayerAlwaysOpenInPlayer)
                             .padding(.bottom, 4)
@@ -56,8 +56,7 @@ extension Preferences {
                     .pickerStyle(.radioGroup)
                     .offset(x: Const.pickerHorizontalOffset)
 
-                    Text(UserText.duckPlayerExplanation)
-                        .fixMultilineScrollableText()
+                    TextMenuItemCaption(text: UserText.duckPlayerExplanation)
                 }
             }
         }

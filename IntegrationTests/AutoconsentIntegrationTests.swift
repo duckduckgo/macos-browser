@@ -18,7 +18,6 @@
 
 import Combine
 import Common
-import os.log
 import PrivacyDashboard
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
@@ -36,6 +35,7 @@ class AutoconsentIntegrationTests: XCTestCase {
         mainViewController.browserTabViewController.tabViewModel!
     }
 
+    @MainActor
     override func setUp() {
         // disable GPC redirects
         PrivacySecurityPreferences.shared.gpcEnabled = false

@@ -19,7 +19,6 @@
 import Foundation
 import AppKit
 import Combine
-import os.log
 
 final class BookmarksBarViewController: NSViewController {
 
@@ -275,12 +274,6 @@ extension BookmarksBarViewController: NSMenuDelegate {
     @objc
     private func toggleBookmarksBar(_ sender: NSMenuItem) {
         PersistentAppInterfaceSettings.shared.showBookmarksBar.toggle()
-
-        if PersistentAppInterfaceSettings.shared.showBookmarksBar {
-            Pixel.fire(.bookmarksBarEnabled(.bookmarksBar))
-        } else {
-            Pixel.fire(.bookmarksBarDisabled(.bookmarksBar))
-        }
     }
 
 }

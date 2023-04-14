@@ -18,7 +18,6 @@
 
 import Cocoa
 import WebKit
-import os.log
 
 protocol WebViewContextMenuDelegate: AnyObject {
     func webView(_ webView: WebView, willOpenContextMenu menu: NSMenu, with event: NSEvent)

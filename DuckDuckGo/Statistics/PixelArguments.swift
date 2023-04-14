@@ -135,6 +135,7 @@ extension Pixel.Event {
             self = .lessThan6
         }
 
+        @MainActor
         init() {
             let tabCount = WindowControllersManager.shared.mainWindowControllers
                 .reduce(0) { $0 + $1.mainViewController.tabCollectionViewModel.tabCollection.tabs.count }
@@ -157,6 +158,7 @@ extension Pixel.Event {
             self = .moreThan1
         }
 
+        @MainActor
         init() {
             let windowCount = WindowControllersManager.shared.mainWindowControllers.count
             self.init(windowCount)
