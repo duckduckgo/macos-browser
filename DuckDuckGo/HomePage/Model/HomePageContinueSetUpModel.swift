@@ -31,7 +31,7 @@ extension HomePage.Models {
         let itemsPerRow = HomePage.featuresPerRow
         let gridWidth = FeaturesGridDimensions.width
         let deleteActionTitle = UserText.newTabSetUpRemoveItemAction
-        let duckPlayerURL = URL(string: "https://youtu.be/yKWIA-Pys4c")!
+        let duckPlayerURL = URL(string: "https://www.youtube.com/watch?v=yKWIA-Pys4c")!
 
         private let defaultBrowserProvider: DefaultBrowserProvider
         private let dataImportProvider: DataImportProvider
@@ -51,6 +51,10 @@ extension HomePage.Models {
 
         var isMorOrLessButtonNeeded: Bool {
             return featuresMatrix.count > 1
+        }
+
+        var isThereContent: Bool {
+            return !featuresMatrix.isEmpty
         }
 
         private var featuresMatrix: [[FeatureType]] = [[]] {

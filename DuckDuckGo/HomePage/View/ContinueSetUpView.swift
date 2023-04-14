@@ -34,19 +34,23 @@ extension HomePage.Views {
         @State private var moreOrLessButtonVisibility: ViewVisibility = .invisible
 
         var body: some View {
-            VStack(spacing: 20) {
-                SectionTitleView(titleText: model.title, isExpanded: $model.shouldShowAllFeatures, isMoreOrLessButtonVisibility: $moreOrLessButtonVisibility)
-                if #available(macOS 12.0, *) {
-                    LazyVStack(spacing: 4) {
+            if model.isThereContent {
+                VStack(spacing: 20) {
+                    SectionTitleView(titleText: model.title, isExpanded: $model.shouldShowAllFeatures, isMoreOrLessButtonVisibility: $moreOrLessButtonVisibility)
+                    if #available(macOS 12.0, *) {
+                        LazyVStack(spacing: 4) {
+                            FeaturesGrid()
+                        }
+                        .frame(maxWidth: .infinity)
+                    } else {
                         FeaturesGrid()
                     }
-                    .frame(maxWidth: .infinity)
-                } else {
-                    FeaturesGrid()
                 }
-            }
-            .onHover { isHovering in
-                self.isHovering = isHovering
+                .onHover { isHovering in
+                    self.isHovering = isHovering
+                }
+            } else {
+                EmptyView()
             }
         }
 
