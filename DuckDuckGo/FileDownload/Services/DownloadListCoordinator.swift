@@ -17,9 +17,9 @@
 //
 
 import Combine
+import Common
 import Foundation
 import Navigation
-import os.log
 
 @MainActor
 private func getFirstAvailableWebView() -> WKWebView? {

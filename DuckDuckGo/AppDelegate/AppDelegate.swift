@@ -18,7 +18,7 @@
 
 import Cocoa
 import Combine
-import os.log
+import Common
 import BrowserServicesKit
 import Persistence
 import Configuration

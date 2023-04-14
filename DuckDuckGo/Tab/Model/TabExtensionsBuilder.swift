@@ -18,7 +18,6 @@
 
 import Combine
 import Foundation
-import os.log
 
 protocol TabExtensionsBuilderProtocol {
     @MainActor

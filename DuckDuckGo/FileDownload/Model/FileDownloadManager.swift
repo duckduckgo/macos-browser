@@ -18,8 +18,8 @@
 
 import AppKit
 import Combine
+import Common
 import Navigation
-import os
 
 protocol FileDownloadManagerProtocol: AnyObject {
     var downloads: Set<WebKitDownloadTask> { get }

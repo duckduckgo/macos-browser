@@ -18,7 +18,6 @@
 
 import Foundation
 import Combine
-import os.log
 
 @MainActor
 protocol RecentlyClosedCoordinating: AnyObject {

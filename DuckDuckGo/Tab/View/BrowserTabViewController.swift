@@ -18,8 +18,8 @@
 
 import Cocoa
 import WebKit
-import os.log
 import Combine
+import Common
 import SwiftUI
 import BrowserServicesKit
 

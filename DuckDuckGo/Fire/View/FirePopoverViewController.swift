@@ -18,7 +18,7 @@
 
 import Cocoa
 import Combine
-import os
+import Common
 
 protocol FirePopoverViewControllerDelegate: AnyObject {
 

@@ -17,7 +17,6 @@
 //
 
 import Foundation
-import os.log
 
 final class StatePersistenceService {
     private let fileStore: FileStore

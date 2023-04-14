@@ -16,8 +16,8 @@
 //  limitations under the License.
 //
 
+import Common
 import Foundation
-import os.log
 import BrowserServicesKit
 import PrivacyDashboard
 import WebKit

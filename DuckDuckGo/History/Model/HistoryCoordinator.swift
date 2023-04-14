@@ -17,8 +17,8 @@
 //
 
 import Foundation
-import os.log
 import Combine
+import Common
 import BrowserServicesKit
 
 typealias History = [HistoryEntry]

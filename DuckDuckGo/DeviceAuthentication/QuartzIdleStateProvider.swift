@@ -17,8 +17,8 @@
 //
 
 import Foundation
+import Common
 import CoreGraphics
-import os.log
 
 final class QuartzIdleStateProvider: DeviceIdleStateProvider {
 

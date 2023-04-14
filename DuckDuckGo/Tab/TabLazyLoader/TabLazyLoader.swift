@@ -18,7 +18,7 @@
 
 import Foundation
 import Combine
-import os
+import Common
 
 final class TabLazyLoader<DataSource: TabLazyLoaderDataSource> {
 

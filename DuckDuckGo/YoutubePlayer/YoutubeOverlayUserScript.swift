@@ -18,7 +18,6 @@
 
 import Foundation
 import WebKit
-import os
 import Common
 import UserScript
 

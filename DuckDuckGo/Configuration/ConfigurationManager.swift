@@ -18,7 +18,6 @@
 
 import Foundation
 import Combine
-import os
 import BrowserServicesKit
 import Configuration
 import Common
