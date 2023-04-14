@@ -46,6 +46,8 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
     @Published var shouldShowErrorMessage: Bool = false
     @Published private(set) var errorMessage: String?
 
+    @Published var isCreatingAccount: Bool = false
+
     var recoveryCode: String? {
         syncService.account?.recoveryCode
     }
@@ -174,6 +176,10 @@ extension SyncPreferences: ManagementDialogModelDelegate {
 
     func dontSyncAnotherDeviceNow() {
         Task { @MainActor in
+            isCreatingAccount = true
+            defer {
+                isCreatingAccount = false
+            }
             do {
                 let device = deviceInfo()
                 try await syncService.createAccount(deviceName: device.name, deviceType: device.type)

@@ -20,6 +20,7 @@ import Foundation
 
 public protocol ManagementViewModel: ObservableObject {
     var isSyncEnabled: Bool { get }
+    var isCreatingAccount: Bool { get }
     var shouldShowErrorMessage: Bool { get set }
     var errorMessage: String? { get }
 

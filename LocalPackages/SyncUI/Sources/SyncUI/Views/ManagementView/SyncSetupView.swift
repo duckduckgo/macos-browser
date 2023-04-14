@@ -28,9 +28,19 @@ struct SyncSetupView<ViewModel>: View where ViewModel: ManagementViewModel {
                 Text(UserText.syncSetupExplanation)
                     .fixMultilineScrollableText()
                 Spacer()
-                Button(UserText.turnOnSyncWithEllipsis) {
-                    model.presentEnableSyncDialog()
-                }
+                Group {
+                    if model.isCreatingAccount {
+                        if #available(macOS 11.0, *) {
+                            ProgressView()
+                        } else {
+                            EmptyView()
+                        }
+                    } else {
+                        Button(UserText.turnOnSyncWithEllipsis) {
+                            model.presentEnableSyncDialog()
+                        }
+                    }
+                }.frame(minWidth: 100)
             }
         }
 
