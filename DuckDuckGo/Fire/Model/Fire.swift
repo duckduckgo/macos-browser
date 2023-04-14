@@ -19,6 +19,7 @@
 import Foundation
 import os.log
 import BrowserServicesKit
+import DDGSync
 import PrivacyDashboard
 import WebKit
 
@@ -94,6 +95,8 @@ final class Fire {
     let stateRestorationManager: AppStateRestorationManager?
     let recentlyClosedCoordinator: RecentlyClosedCoordinating?
     let pinnedTabsManager: PinnedTabsManager
+    let bookmarkManager: BookmarkManager
+    let syncService: DDGSyncing?
 
     let tabsCleaner = TabDataCleaner()
 
@@ -112,7 +115,9 @@ final class Fire {
          autoconsentManagement: AutoconsentManagement? = nil,
          stateRestorationManager: AppStateRestorationManager? = nil,
          recentlyClosedCoordinator: RecentlyClosedCoordinating? = RecentlyClosedCoordinator.shared,
-         pinnedTabsManager: PinnedTabsManager = WindowControllersManager.shared.pinnedTabsManager
+         pinnedTabsManager: PinnedTabsManager = WindowControllersManager.shared.pinnedTabsManager,
+         bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
+         syncService: DDGSyncing? = (NSApp.delegate as? AppDelegate)?.syncService
     ) {
         self.webCacheManager = cacheManager
         self.historyCoordinating = historyCoordinating
@@ -122,6 +127,8 @@ final class Fire {
         self.faviconManagement = faviconManagement
         self.recentlyClosedCoordinator = recentlyClosedCoordinator
         self.pinnedTabsManager = pinnedTabsManager
+        self.bookmarkManager = bookmarkManager
+        self.syncService = syncService
 
         if #available(macOS 11, *), autoconsentManagement == nil {
             self.autoconsentManagement = AutoconsentManagement.shared
@@ -183,6 +190,7 @@ final class Fire {
             group.enter()
             Task {
                 await self.burnWebCache(domains: burningDomains)
+                await self.burnDeletedBookmarks()
                 group.leave()
             }
 
@@ -224,8 +232,10 @@ final class Fire {
         tabsCleaner.prepareTabsForCleanup(allTabViewModels()) {
             let group = DispatchGroup()
             group.enter()
+
             Task {
                 await self.burnWebCache()
+                await self.burnDeletedBookmarks()
                 group.leave()
             }
 
@@ -423,6 +433,15 @@ final class Fire {
 
     private func burnRecentlyClosed(domains: Set<String>? = nil) {
         recentlyClosedCoordinator?.burnCache(domains: domains)
+    }
+
+    // MARK: - Bookmarks cleanup
+
+    private func burnDeletedBookmarks() async {
+        if syncService?.isAuthenticated == true {
+            return
+        }
+        await LocalBookmarkManager.shared.cleanUpBookmarksPendingDeletion()
     }
 }
 

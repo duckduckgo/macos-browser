@@ -189,6 +189,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         subscribeToEmailProtectionStatusNotifications()
 
         UserDefaultsWrapper<Any>.clearRemovedKeys()
+
+        if !syncService.isAuthenticated {
+            Task {
+                await LocalBookmarkManager.shared.cleanUpBookmarksPendingDeletion()
+            }
+        }
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {

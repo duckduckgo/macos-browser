@@ -19,6 +19,7 @@
 import Cocoa
 import os.log
 import Combine
+import Bookmarks
 
 protocol BookmarkManager: AnyObject {
 
@@ -43,6 +44,7 @@ protocol BookmarkManager: AnyObject {
     func move(objectUUIDs: [String], toIndex: Int?, withinParentFolder: ParentFolderType, completion: @escaping (Error?) -> Void)
     func moveFavorites(with objectUUIDs: [String], toIndex: Int?, completion: @escaping (Error?) -> Void)
     func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarkImportResult
+    func cleanUpBookmarksPendingDeletion() async
 
     // Wrapper definition in a protocol is not supported yet
     var listPublisher: Published<BookmarkList?>.Publisher { get }
@@ -68,6 +70,15 @@ final class LocalBookmarkManager: BookmarkManager {
     private lazy var faviconManagement: FaviconManagement = FaviconManager.shared
 
     // MARK: - Bookmarks
+
+    func cleanUpBookmarksPendingDeletion() async {
+        do {
+            let cleaner = BookmarkDatabaseCleaner(bookmarkDatabase: BookmarkDatabase.shared.db)
+            try await cleaner.removeBookmarksPendingDeletion()
+        } catch {
+            Pixel.fire(.debug(event: .bookmarksCleanupFailed))
+        }
+    }
 
     func loadBookmarks() {
         bookmarkStore.loadAll(type: .topLevelEntities) { [weak self] (topLevelEntities, error) in
