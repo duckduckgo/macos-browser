@@ -150,6 +150,10 @@ extension HomePage.Models {
         }
 
         private func updateVisibleMatrix() {
+            guard !featuresMatrix.isEmpty else {
+                visibleFeaturesMatrix = [[]]
+                return
+            }
             visibleFeaturesMatrix = shouldShowAllFeatures ? featuresMatrix : [featuresMatrix[0]]
         }
 

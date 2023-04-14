@@ -297,6 +297,17 @@ final class ContinueSetUpModelTests: XCTestCase {
         XCTAssertEqual(vm.visibleFeaturesMatrix, [expectedMatrix[0]])
     }
 
+    func testThtatWhenIfAllFeatureActiveThenVisibleMatrixIsEmpty() {
+        capturingDefaultBrowserProvider.isDefault = true
+        emailStorage.isEmailProtectionEnabled = true
+        privacyPreferences.autoconsentEnabled = true
+        duckPlayerPreferences.youtubeOverlayUserPressedButtons = true
+        capturingDataImportProvider.hasUserUsedImport = true
+        vm = HomePage.Models.ContinueSetUpModel(defaultBrowserProvider: capturingDefaultBrowserProvider, dataImportProvider: capturingDataImportProvider, tabCollectionViewModel: tabCollectionVM, privacyPreferences: privacyPreferences, duckPlayerPreferences: duckPlayerPreferences)
+
+        XCTAssertEqual(vm.visibleFeaturesMatrix, [[]])
+    }
+
     private func expectedFeatureMatrixWithout(type: HomePage.Models.FeatureType) -> [[HomePage.Models.FeatureType]] {
         var features = HomePage.Models.FeatureType.allCases
         let indexToRemove = features.firstIndex(of: type)!
