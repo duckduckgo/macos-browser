@@ -19,7 +19,7 @@
 import Combine
 import Foundation
 import AppKit
-import os.log
+import Common
 
 protocol TabExtensionsBuilderProtocol {
     @MainActor
