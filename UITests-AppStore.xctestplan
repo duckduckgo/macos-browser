@@ -1,0 +1,36 @@
+{
+  "configurations" : [
+    {
+      "id" : "98472947-7B4D-44BA-BF41-AA7F52811313",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "commandLineArgumentEntries" : [
+      {
+        "argument" : "-NSConstraintBasedLayoutVisualizeMutuallyExclusiveConstraints YES"
+      },
+      {
+        "argument" : "-com.apple.CoreData.ConcurrencyDebug 1"
+      }
+    ],
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:DuckDuckGo.xcodeproj",
+      "identifier" : "3706FA6A293F65D500E42796",
+      "name" : "DuckDuckGo Privacy Browser App Store"
+    }
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:LocalPackages\/SyncUI",
+        "identifier" : "SyncUITests",
+        "name" : "SyncUITests"
+      }
+    }
+  ],
+  "version" : 1
+}

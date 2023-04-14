@@ -2572,6 +2572,9 @@
 		B610F2E327A8F37A00FCEBE9 /* CBRCompileTimeReporterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CBRCompileTimeReporterTests.swift; sourceTree = "<group>"; };
 		B610F2E527AA388100FCEBE9 /* ContentBlockingUpdatingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentBlockingUpdatingTests.swift; sourceTree = "<group>"; };
 		B610F2E727AA397100FCEBE9 /* ContentBlockerRulesManagerMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentBlockerRulesManagerMock.swift; sourceTree = "<group>"; };
+		B616A52429DC346300BF2B8A /* UnitTests-AppStore.xctestplan */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "UnitTests-AppStore.xctestplan"; sourceTree = "<group>"; };
+		B616A52629DC35BF00BF2B8A /* IntegrationTests-AppStore.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = "IntegrationTests-AppStore.xctestplan"; sourceTree = "<group>"; };
+		B616A52729DC43C300BF2B8A /* UITests-AppStore.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = "UITests-AppStore.xctestplan"; sourceTree = "<group>"; };
 		B61E2CD4294346C000773D8A /* Tab+Navigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Tab+Navigation.swift"; sourceTree = "<group>"; };
 		B61EF3EB266F91E700B4D78F /* WKWebView+Download.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WKWebView+Download.swift"; sourceTree = "<group>"; };
 		B61EF3F0266F922200B4D78F /* WKProcessPool+DownloadDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WKProcessPool+DownloadDelegate.swift"; sourceTree = "<group>"; };
@@ -2664,6 +2667,9 @@
 		B68C2FB127706E6A00BF2C7D /* ProcessExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessExtension.swift; sourceTree = "<group>"; };
 		B68C92C0274E3EF4002AC6B0 /* PopUpWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopUpWindow.swift; sourceTree = "<group>"; };
 		B68C92C32750EF76002AC6B0 /* PixelDataRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelDataRecord.swift; sourceTree = "<group>"; };
+		B6919C2229DC212C00FDBEB2 /* UnitTests.xctestplan */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = UnitTests.xctestplan; sourceTree = "<group>"; };
+		B6919C2429DC214400FDBEB2 /* IntegrationTests.xctestplan */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = IntegrationTests.xctestplan; sourceTree = "<group>"; };
+		B6919C2629DC214E00FDBEB2 /* UITests.xctestplan */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = UITests.xctestplan; sourceTree = "<group>"; };
 		B693953C26F04BE70015B914 /* NibLoadable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NibLoadable.swift; sourceTree = "<group>"; };
 		B693953D26F04BE70015B914 /* MouseOverView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MouseOverView.swift; sourceTree = "<group>"; };
 		B693953E26F04BE70015B914 /* FocusRingView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FocusRingView.swift; sourceTree = "<group>"; };
@@ -4324,8 +4330,14 @@
 				AA68C3D62490F821001B8783 /* README.md */,
 				AA585D80248FD31100E9A3E2 /* DuckDuckGo */,
 				AA585D93248FD31400E9A3E2 /* UnitTests */,
+				B6919C2229DC212C00FDBEB2 /* UnitTests.xctestplan */,
+				B616A52429DC346300BF2B8A /* UnitTests-AppStore.xctestplan */,
 				4B1AD89E25FC27E200261379 /* IntegrationTests */,
+				B6919C2429DC214400FDBEB2 /* IntegrationTests.xctestplan */,
+				B616A52629DC35BF00BF2B8A /* IntegrationTests-AppStore.xctestplan */,
 				7B4CE8DB26F02108009134B1 /* UITests */,
+				B6919C2629DC214E00FDBEB2 /* UITests.xctestplan */,
+				B616A52729DC43C300BF2B8A /* UITests-AppStore.xctestplan */,
 				B6EC37E929B5DA2A001ACE79 /* tests-server */,
 				AA585D7F248FD31100E9A3E2 /* Products */,
 				85AE2FF024A33A2D002D507F /* Frameworks */,
