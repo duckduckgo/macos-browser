@@ -241,7 +241,8 @@ class NavigationProtectionIntegrationTests: XCTestCase {
             .init(id: "frame JS API", value: .bool(true)),
             .init(id: "subequest header", value: nil),
         ]
-        for _ in 0..<3 {
+        // retry several times for correct results to come
+        for _ in 0..<5 {
             var persistor = DownloadsPreferencesUserDefaultsPersistor()
             persistor.selectedDownloadLocation = FileManager.default.temporaryDirectory.absoluteString
             let downloadTaskFuture = FileDownloadManager.shared.downloadsPublisher.timeout(5).first().promise()
@@ -256,6 +257,7 @@ class NavigationProtectionIntegrationTests: XCTestCase {
             if results.results == expected {
                 break
             }
+            try await Task.sleep(nanoseconds: 300.asNanos)
         }
         XCTAssertEqual(results.results, expected)
     }

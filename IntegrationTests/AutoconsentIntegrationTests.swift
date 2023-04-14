@@ -136,13 +136,13 @@ class AutoconsentIntegrationTests: XCTestCase {
             let cookieConsentManaged = try await cookieConsentManagedPromise.value
             XCTAssertTrue(cookieConsentManaged == true)
         } catch {
-            struct HTMLError: Error, LocalizedError, CustomDebugStringConvertible {
-                var html: String
+            struct ErrorWithHTML: Error, LocalizedError, CustomDebugStringConvertible {
+                let originalError: Error
+                let html: String
 
                 var errorDescription: String? {
-                    "HTMLError:\n\(html)"
+                    (originalError as CustomDebugStringConvertible).debugDescription + "\nHTML:\n\(html)"
                 }
-
                 var debugDescription: String {
                     errorDescription!
                 }
@@ -150,7 +150,7 @@ class AutoconsentIntegrationTests: XCTestCase {
             let html = try await tab.webView.evaluateJavaScript("document.documentElement.outerHTML") as? String
 
             if let html {
-                throw HTMLError(html: html)
+                throw ErrorWithHTML(originalError: error, html: html)
             } else {
                 throw error
             }
