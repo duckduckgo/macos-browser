@@ -49,7 +49,7 @@ platform :mac do
   lane :release_testflight do |options|
     build_release(options)
 
-    upload_to_testflight(options.merge({api_key: get_api_key}))
+    # upload_to_testflight(options.merge({api_key: get_api_key}))
   end
 
   # Makes App Store release build, uploads it to TestFlight, and prepares App Store listing for submission.
