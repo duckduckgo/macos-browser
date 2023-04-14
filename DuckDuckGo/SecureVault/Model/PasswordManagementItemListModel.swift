@@ -241,8 +241,11 @@ final class PasswordManagementItemListModel: ObservableObject {
         didSet {
             updateFilteredData()
             calculateEmptyState()
+            itemCount = items.count
         }
     }
+
+    @Published private(set) var itemCount: Int = 0
 
     @Published var sortDescriptor = SecureVaultSorting.default {
         didSet {
