@@ -16,10 +16,10 @@
 //  limitations under the License.
 //
 
+import Common
 import Foundation
 import SwiftUI
 import OpenSSL
-import os.log
 
 final class BWManager: BWManagement, ObservableObject {
 

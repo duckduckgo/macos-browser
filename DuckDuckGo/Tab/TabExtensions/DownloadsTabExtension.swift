@@ -182,7 +182,8 @@ extension DownloadsTabExtension: WKNavigationDelegate {
 
 extension DownloadsTabExtension: DownloadTaskDelegate {
 
-    func chooseDestination(suggestedFilename: String?, directoryURL: URL?, fileTypes: [UTType], callback: @escaping (URL?, UTType?) -> Void) {
+    @MainActor
+    func chooseDestination(suggestedFilename: String?, directoryURL: URL?, fileTypes: [UTType], callback: @escaping @MainActor (URL?, UTType?) -> Void) {
         savePanelDialogRequest = SavePanelDialogRequest(SavePanelParameters(suggestedFilename: suggestedFilename, fileTypes: fileTypes)) { [weak self] result in
             self?.savePanelDialogRequest = nil
             guard case let .success(.some( (url: url, fileType: fileType) )) = result else {

@@ -88,6 +88,8 @@ enum TabIndex: Equatable, Comparable {
 // MARK: - Tab Collection View Model index manipulation
 
 extension TabIndex {
+
+    @MainActor
     static func first(in viewModel: TabCollectionViewModel) -> TabIndex {
         if viewModel.pinnedTabsCount > 0 {
             return .pinned(0)
@@ -96,6 +98,7 @@ extension TabIndex {
         return .unpinned(0)
     }
 
+    @MainActor
     static func last(in viewModel: TabCollectionViewModel) -> TabIndex {
         if viewModel.tabsCount > 0 {
             return .unpinned(viewModel.tabsCount - 1)
@@ -104,10 +107,12 @@ extension TabIndex {
         return .pinned(viewModel.pinnedTabsCount - 1)
     }
 
+    @MainActor
     static func at(_ position: Int, in viewModel: TabCollectionViewModel) -> TabIndex {
         .pinned(position).sanitized(for: viewModel)
     }
 
+    @MainActor
     func next(in viewModel: TabCollectionViewModel) -> TabIndex {
         switch self {
         case .pinned(let index):
@@ -123,6 +128,7 @@ extension TabIndex {
         }
     }
 
+    @MainActor
     func previous(in viewModel: TabCollectionViewModel) -> TabIndex {
         switch self {
         case .pinned(let index):
@@ -138,6 +144,7 @@ extension TabIndex {
         }
     }
 
+    @MainActor
     func sanitized(for viewModel: TabCollectionViewModel) -> TabIndex {
         switch self {
         case .pinned(let index):

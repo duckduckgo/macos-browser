@@ -19,7 +19,6 @@
 import Foundation
 import WebKit
 import Combine
-import os.log
 import BrowserServicesKit
 import Common
 

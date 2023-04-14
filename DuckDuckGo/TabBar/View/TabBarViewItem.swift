@@ -17,7 +17,6 @@
 //
 
 import Cocoa
-import os.log
 import Combine
 
 struct OtherTabBarViewItemsState {

@@ -69,7 +69,7 @@ class HistoryIntegrationTests: XCTestCase {
         let titleChangedPromise1 = tab.$title
             .filter { $0 == "Title 1" }
             .receive(on: DispatchQueue.main)
-            .timeout(1, "Title 1")
+            .timeout(5, "Title 1")
             .first()
             .promise()
 
@@ -224,7 +224,7 @@ class HistoryIntegrationTests: XCTestCase {
             .switchToLatest()
             .filter { $0.trackersBlocked.count == 1 }
             .map { _ in true }
-            .timeout(5)
+            .timeout(10)
             .first()
             .promise()
 

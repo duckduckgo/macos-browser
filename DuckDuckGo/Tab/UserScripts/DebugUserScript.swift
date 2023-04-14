@@ -17,7 +17,6 @@
 //
 
 import WebKit
-import os
 import UserScript
 
 protocol TabInstrumentationProtocol: AnyObject {

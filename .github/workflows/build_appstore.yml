@@ -11,10 +11,13 @@ on:
         options:
         - testflight
         - appstore
+<<<<<<< HEAD
       asana-task-url:
         description: "Asana release task URL"
         required: false
         type: string
+=======
+>>>>>>> develop
   workflow_call:
     inputs:
       destination:
@@ -22,10 +25,13 @@ on:
         required: true
         default: appstore
         type: string
+<<<<<<< HEAD
       asana-task-url:
         description: "Asana release task URL"
         required: true
         type: string
+=======
+>>>>>>> develop
     secrets:
       SSH_PRIVATE_KEY_FASTLANE_MATCH:
         required: true
@@ -39,8 +45,11 @@ on:
         required: true
       MATCH_PASSWORD:
         required: true
+<<<<<<< HEAD
       ASANA_ACCESS_TOKEN:
         required: true
+=======
+>>>>>>> develop
       MM_HANDLES_BASE64:
         required: true
       MM_WEBHOOK_URL:
@@ -55,7 +64,10 @@ jobs:
 
     env:
       destination: ${{ github.event.inputs.destination || inputs.destination }}
+<<<<<<< HEAD
       asana-task-url: ${{ github.event.inputs.asana-task-url || inputs.asana-task-url }}
+=======
+>>>>>>> develop
 
     steps:
 

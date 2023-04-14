@@ -18,7 +18,7 @@
 
 import Cocoa
 import Combine
-import os.log
+import Common
 import BrowserServicesKit
 
 final class NavigationBarViewController: NSViewController {
@@ -643,12 +643,6 @@ extension NavigationBarViewController: NSMenuDelegate {
     @objc
     private func toggleBookmarksBar(_ sender: NSMenuItem) {
         PersistentAppInterfaceSettings.shared.showBookmarksBar.toggle()
-
-        if PersistentAppInterfaceSettings.shared.showBookmarksBar {
-            Pixel.fire(.bookmarksBarEnabled(.navigationBar))
-        } else {
-            Pixel.fire(.bookmarksBarDisabled(.navigationBar))
-        }
     }
 
     @objc

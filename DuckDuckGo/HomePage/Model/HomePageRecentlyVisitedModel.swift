@@ -53,10 +53,10 @@ final class RecentlyVisitedModel: ObservableObject {
 
     let open: (URL) -> Void
 
-    init(open: @escaping (URL) -> Void,
-         fire: Fire = FireCoordinator.fireViewModel.fire) {
+    @MainActor
+    init(open: @escaping (URL) -> Void, fire: Fire? = nil) {
         self.open = open
-        self.fire = fire
+        self.fire = fire ?? FireCoordinator.fireViewModel.fire
         showPagesOnHover = Self.showPagesOnHoverSetting
         showRecentlyVisited = Self.showRecentlyVisitedSetting
     }
@@ -96,6 +96,7 @@ final class RecentlyVisitedModel: ObservableObject {
         self.recentSites = recentSites
     }
 
+    @MainActor
     func burn(_ site: RecentlyVisitedSiteModel) {
         fire.burnDomains(Set<String>([site.domain]))
         recentSites = recentSites.filter { $0.domain != site.domain }
