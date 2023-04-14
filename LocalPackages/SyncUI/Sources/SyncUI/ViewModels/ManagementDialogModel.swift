@@ -24,7 +24,6 @@ public protocol ManagementDialogModelDelegate: AnyObject {
     func dontSyncAnotherDeviceNow()
     func recoverDevice(using recoveryCode: String)
     func presentSyncAnotherDeviceDialog()
-    func addAnotherDevice()
     func confirmSetupComplete()
     func saveRecoveryPDF()
 }

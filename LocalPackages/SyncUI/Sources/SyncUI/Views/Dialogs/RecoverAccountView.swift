@@ -23,6 +23,10 @@ struct RecoverAccountView: View {
     @EnvironmentObject var model: ManagementDialogModel
     @EnvironmentObject var recoveryCodeModel: RecoveryCodeViewModel
 
+    func submitRecoveryCode() {
+        model.delegate?.recoverDevice(using: recoveryCodeModel.recoveryCode)
+    }
+
     var body: some View {
         SyncDialog(spacing: 20.0) {
             Text(UserText.recoverSyncedDataTitle)
@@ -30,16 +34,16 @@ struct RecoverAccountView: View {
 
             EnterCodeView(
                 instructions: UserText.recoverSyncedDataExplanation,
-                buttonCaption: UserText.pasteFromClipboard
-            )
-            .environmentObject(recoveryCodeModel)
+                buttonCaption: UserText.pasteFromClipboard) {
+                    submitRecoveryCode()
+                }.environmentObject(recoveryCodeModel)
 
         } buttons: {
             Button(UserText.cancel) {
                 model.endFlow()
             }
             Button(UserText.submit) {
-                model.delegate?.recoverDevice(using: recoveryCodeModel.recoveryCode)
+                submitRecoveryCode()
             }
             .buttonStyle(DefaultActionButtonStyle(enabled: !recoveryCodeModel.shouldDisableSubmitButton))
             .disabled(recoveryCodeModel.shouldDisableSubmitButton)

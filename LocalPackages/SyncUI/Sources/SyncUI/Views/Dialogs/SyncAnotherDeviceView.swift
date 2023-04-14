@@ -29,6 +29,12 @@ struct SyncAnotherDeviceView: View {
 
     @State var selectedMode: Mode = .showCode
 
+    func submitRecoveryCode() {
+        if !recoveryCodeModel.recoveryCode.isEmpty {
+            model.delegate?.recoverDevice(using: recoveryCodeModel.recoveryCode)
+        }
+    }
+
     var body: some View {
         SyncDialog(spacing: 20.0) {
             Text(UserText.syncNewDevice)
@@ -46,9 +52,9 @@ struct SyncAnotherDeviceView: View {
             case .enterCode:
                 EnterCodeView(
                     instructions: UserText.syncNewDeviceEnterCodeInstructions,
-                    buttonCaption: UserText.pasteFromClipboard
-                )
-                .environmentObject(recoveryCodeModel)
+                    buttonCaption: UserText.pasteFromClipboard) {
+                        submitRecoveryCode()
+                    }.environmentObject(recoveryCodeModel)
             }
         } buttons: {
             switch selectedMode {
@@ -61,7 +67,7 @@ struct SyncAnotherDeviceView: View {
                     model.endFlow()
                 }
                 Button(UserText.submit) {
-                    model.delegate?.addAnotherDevice()
+                    submitRecoveryCode()
                 }
                 .buttonStyle(DefaultActionButtonStyle(enabled: !recoveryCodeModel.shouldDisableSubmitButton))
                 .disabled(recoveryCodeModel.shouldDisableSubmitButton)
