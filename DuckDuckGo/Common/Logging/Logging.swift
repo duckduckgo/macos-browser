@@ -111,7 +111,11 @@ extension ProcessInfo {
 extension OSLog.OSLogWrapper {
 
     private static let enableLoggingCategoriesOnce: Void = {
+#if CI
+        OSLog.enabledLoggingCategories = Set(OSLog.AllCategories.allCases)
+#else
         OSLog.enabledLoggingCategories = OSLog.loggingCategories
+#endif
     }()
 
     init(_ category: OSLog.AppCategories) {

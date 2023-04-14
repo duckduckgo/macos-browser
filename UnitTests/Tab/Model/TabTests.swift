@@ -187,20 +187,21 @@ final class TabTests: XCTestCase {
 
     @MainActor
     func testWhenGoingBackInvalidatingBackItem_BackForwardButtonsDoNotBlink() throws {
-        var eDidFinish: XCTestExpectation!
+        var didFinishExpectations = [String: XCTestExpectation]()
         var eDidRedirect: XCTestExpectation!
-        let extensionsBuilder = TestTabExtensionsBuilder(load: []) { [urls] builder in { _, _ in
+        let extensionsBuilder = TestTabExtensionsBuilder(load: []) { [urls, unowned self] builder in { _, _ in
             builder.add {
-                TestsClosureNavigationResponderTabExtension(.init { navigationAction, _ in
+                TestsClosureNavigationResponderTabExtension(.init { [unowned self] navigationAction, _ in
                     if navigationAction.url == urls.url2 {
                         return .redirectInvalidatingBackItemIfNeeded(navigationAction) { navigator in
                             eDidRedirect.fulfill()
+                            didFinishExpectations[urls.url3.absoluteString] = self.expectation(description: "didFinish \(urls.url3.absoluteString)")
                             navigator.load(URLRequest(url: urls.url3))
                         }
                     }
                     return .next
-                } navigationDidFinish: { _ in
-                    eDidFinish?.fulfill()
+                } navigationDidFinish: { navigation in
+                    didFinishExpectations[navigation.url.absoluteString]?.fulfill()
                 })
             }
         }}
@@ -220,13 +221,13 @@ final class TabTests: XCTestCase {
         }]
 
         // initial page
-        eDidFinish = expectation(description: "didFinish 1")
+        didFinishExpectations[urls.url.absoluteString] = expectation(description: "didFinish \(urls.url.absoluteString)")
         tab.setContent(.url(urls.url))
         waitForExpectations(timeout: 5)
 
         // load urls.url1 which will be js-redirected to urls.url2
         // it should be .redirected with .goBack() to urls.url3
-        eDidFinish = expectation(description: "didFinish 2")
+        didFinishExpectations[urls.url1.absoluteString] = expectation(description: "didFinish \(urls.url1.absoluteString)")
 
         // back/forward buttons state shouldn‘t change during the redirect
         let eCantGoBack = expectation(description: "initial canGoBack: false")
@@ -249,7 +250,8 @@ final class TabTests: XCTestCase {
 
         tab.setContent(.url(urls.url1))
         waitForExpectations(timeout: 5)
-        eDidFinish = nil
+        // "didFinish \(urls.url3.absoluteString)" expectation is set in redirect handler above
+        waitForExpectations(timeout: 5)
 
         XCTAssertTrue(tab.canGoBack)
         XCTAssertFalse(tab.canGoForward)

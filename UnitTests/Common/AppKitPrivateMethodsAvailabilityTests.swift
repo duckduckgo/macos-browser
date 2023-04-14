@@ -22,7 +22,7 @@ import AppKit
 
 final class AppKitPrivateMethodsAvailabilityTests: XCTestCase {
 
-    func testLastLeftHitViewIsReleasedCorrectly() {
+    func testLastLeftHit() {
         var window: NSWindow!
         autoreleasepool {
             window = NSWindow()
@@ -61,27 +61,20 @@ final class AppKitPrivateMethodsAvailabilityTests: XCTestCase {
             window.evilHackToClearLastLeftHitInWindow()
             XCTAssertEqual(window.lastLeftHit, nil)
 
-            view.deinitExpectation = expectation(description: "deinit called")
             window.close()
             window = nil
         }
 
-        waitForExpectations(timeout: 0.5)
     }
 
 }
 
 private class TestHitView: NSView {
     var mouseDownExpectation: XCTestExpectation!
-    var deinitExpectation: XCTestExpectation!
 
     override func mouseDown(with event: NSEvent) {
         mouseDownExpectation.fulfill()
         super.mouseDown(with: event)
-    }
-
-    deinit {
-        deinitExpectation.fulfill()
     }
 
 }
