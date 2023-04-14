@@ -124,7 +124,6 @@ extension HomePage.Models {
             var features: [FeatureType] = []
             for feature in FeatureType.allCases {
                 switch feature {
-
                 case .defaultBrowser:
                     if !defaultBrowserProvider.isDefault {
                         features.append(feature)
@@ -134,8 +133,7 @@ extension HomePage.Models {
                         features.append(feature)
                     }
                 case .duckplayer:
-                    print(duckPlayerPreferences.youtubeOverlayInteracted)
-                    if !duckPlayerPreferences.youtubeOverlayInteracted {
+                    if shouldDuckplayerCardBeVisible {
                         features.append(feature)
                     }
                 case .emailProtection:
@@ -153,6 +151,11 @@ extension HomePage.Models {
 
         private func updateVisibleMatrix() {
             visibleFeaturesMatrix = shouldShowAllFeatures ? featuresMatrix : [featuresMatrix[0]]
+        }
+
+        private var shouldDuckplayerCardBeVisible: Bool {
+            duckPlayerPreferences.duckPlayerModeBool == nil &&
+                !duckPlayerPreferences.youtubeOverlayUserPressedButtons
         }
 
     }

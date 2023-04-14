@@ -26,22 +26,26 @@ final class DuckPlayerPreferencesTests: XCTestCase {
         var model = DuckPlayerPreferences(
             persistor: DuckPlayerPreferencesPersistorMock(
                 duckPlayerMode: .alwaysAsk,
-                youtubeOverlayInteracted: false
+                youtubeOverlayInteracted: false,
+                youtubeOverlayUserPressedButtons: false
             )
         )
 
         XCTAssertEqual(model.duckPlayerMode, .alwaysAsk)
         XCTAssertEqual(model.youtubeOverlayInteracted, false)
+        XCTAssertEqual(model.youtubeOverlayUserPressedButtons, false)
 
         model = DuckPlayerPreferences(
             persistor: DuckPlayerPreferencesPersistorMock(
                 duckPlayerMode: .enabled,
-                youtubeOverlayInteracted: true
+                youtubeOverlayInteracted: true,
+                youtubeOverlayUserPressedButtons: true
             )
         )
 
         XCTAssertEqual(model.duckPlayerMode, .enabled)
         XCTAssertEqual(model.youtubeOverlayInteracted, true)
+        XCTAssertEqual(model.youtubeOverlayUserPressedButtons, true)
     }
 
     func testWhenPropertiesAreUpdatedThenPersistedValuesAreUpdated() throws {
@@ -49,13 +53,37 @@ final class DuckPlayerPreferencesTests: XCTestCase {
         let model = DuckPlayerPreferences(persistor: persistor)
 
         model.duckPlayerMode = .enabled
-        XCTAssertEqual(persistor.duckPlayerMode, .enabled)
+        XCTAssertEqual(persistor.duckPlayerModeBool, true)
         model.duckPlayerMode = .disabled
-        XCTAssertEqual(persistor.duckPlayerMode, .disabled)
+        XCTAssertEqual(persistor.duckPlayerModeBool, false)
+        model.duckPlayerMode = .alwaysAsk
+        XCTAssertEqual(persistor.duckPlayerModeBool, nil)
 
         model.youtubeOverlayInteracted = true
         XCTAssertEqual(persistor.youtubeOverlayInteracted, true)
         model.youtubeOverlayInteracted = false
         XCTAssertEqual(persistor.youtubeOverlayInteracted, false)
+
+        model.youtubeOverlayUserPressedButtons = true
+        XCTAssertEqual(persistor.youtubeOverlayUserPressedButtons, true)
+        model.youtubeOverlayUserPressedButtons = false
+        XCTAssertEqual(persistor.youtubeOverlayUserPressedButtons, false)
+    }
+
+    func testPersisterReturnsValuesFromDisk() {
+        UserDefaultsWrapper<Any>.clearAll()
+        var persister1 = DuckPlayerPreferencesUserDefaultsPersistor()
+        var persister2 = DuckPlayerPreferencesUserDefaultsPersistor()
+
+        persister2.duckPlayerModeBool = nil
+        persister1.duckPlayerModeBool = true
+        persister2.youtubeOverlayInteracted = false
+        persister1.youtubeOverlayInteracted = true
+        persister2.youtubeOverlayUserPressedButtons = false
+        persister1.youtubeOverlayUserPressedButtons = true
+
+        XCTAssertTrue(persister2.duckPlayerModeBool!)
+        XCTAssertTrue(persister2.youtubeOverlayInteracted)
+        XCTAssertTrue(persister2.youtubeOverlayUserPressedButtons)
     }
 }

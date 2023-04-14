@@ -20,20 +20,21 @@ import Foundation
 import Combine
 
 protocol DuckPlayerPreferencesPersistor {
-    var duckPlayerMode: DuckPlayerMode { get set }
+    var duckPlayerModeBool: Bool? { get set }
     var youtubeOverlayInteracted: Bool { get set }
+    var youtubeOverlayUserPressedButtons: Bool { get set }
 }
 
 struct DuckPlayerPreferencesUserDefaultsPersistor: DuckPlayerPreferencesPersistor {
-    var duckPlayerMode: DuckPlayerMode = .init(UserDefaultsWrapper(key: .duckPlayerMode, defaultValue: nil).wrappedValue) {
-        didSet {
-            var udWrapper = UserDefaultsWrapper(key: .duckPlayerMode, defaultValue: Bool?.none)
-            udWrapper.wrappedValue = duckPlayerMode.boolValue
-        }
-    }
+
+    @UserDefaultsWrapper(key: .duckPlayerMode, defaultValue: nil)
+    var duckPlayerModeBool: Bool?
 
     @UserDefaultsWrapper(key: .youtubeOverlayInteracted, defaultValue: false)
     var youtubeOverlayInteracted: Bool
+
+    @UserDefaultsWrapper(key: .youtubeOverlayButtonsUsed, defaultValue: false)
+    var youtubeOverlayUserPressedButtons: Bool
 }
 
 final class DuckPlayerPreferences: ObservableObject {
@@ -43,7 +44,7 @@ final class DuckPlayerPreferences: ObservableObject {
     @Published
     var duckPlayerMode: DuckPlayerMode {
         didSet {
-            persistor.duckPlayerMode = duckPlayerMode
+            persistor.duckPlayerModeBool = duckPlayerMode.boolValue
         }
     }
 
@@ -53,10 +54,17 @@ final class DuckPlayerPreferences: ObservableObject {
         }
     }
 
+    var youtubeOverlayUserPressedButtons: Bool {
+        didSet {
+            persistor.youtubeOverlayUserPressedButtons = youtubeOverlayUserPressedButtons
+        }
+    }
+
     init(persistor: DuckPlayerPreferencesPersistor = DuckPlayerPreferencesUserDefaultsPersistor()) {
         self.persistor = persistor
-        duckPlayerMode = persistor.duckPlayerMode
+        duckPlayerMode = .init(persistor.duckPlayerModeBool)
         youtubeOverlayInteracted = persistor.youtubeOverlayInteracted
+        youtubeOverlayUserPressedButtons = persistor.youtubeOverlayUserPressedButtons
     }
 
     private var persistor: DuckPlayerPreferencesPersistor

@@ -50,6 +50,7 @@ enum DuckPlayerMode: Equatable, Codable {
             return false
         }
     }
+
 }
 
 final class DuckPlayer {
@@ -181,12 +182,15 @@ extension DuckPlayer {
 #if DEBUG
 
 final class DuckPlayerPreferencesPersistorMock: DuckPlayerPreferencesPersistor {
-    var duckPlayerMode: DuckPlayerMode
-    var youtubeOverlayInteracted: Bool
 
-    init(duckPlayerMode: DuckPlayerMode = .alwaysAsk, youtubeOverlayInteracted: Bool = false) {
-        self.duckPlayerMode = duckPlayerMode
+    var duckPlayerModeBool: Bool?
+    var youtubeOverlayInteracted: Bool
+    var youtubeOverlayUserPressedButtons: Bool
+
+    init(duckPlayerMode: DuckPlayerMode = .alwaysAsk, youtubeOverlayInteracted: Bool = false, youtubeOverlayUserPressedButtons: Bool = false) {
+        self.duckPlayerModeBool = duckPlayerMode.boolValue
         self.youtubeOverlayInteracted = youtubeOverlayInteracted
+        self.youtubeOverlayUserPressedButtons = youtubeOverlayUserPressedButtons
     }
 }
 
