@@ -20,6 +20,7 @@ import XCTest
 import Combine
 @testable import DuckDuckGo_Privacy_Browser
 
+@MainActor
 final class TabViewModelTests: XCTestCase {
 
     var cancellables = Set<AnyCancellable>()
@@ -185,11 +186,13 @@ final class TabViewModelTests: XCTestCase {
 
 extension TabViewModel {
 
+    @MainActor
     static var aTabViewModel: TabViewModel {
         let tab = Tab()
         return TabViewModel(tab: tab)
     }
 
+    @MainActor
     static func forTabWithURL(_ url: URL) -> TabViewModel {
         let tab = Tab(content: .url(url))
         return TabViewModel(tab: tab)

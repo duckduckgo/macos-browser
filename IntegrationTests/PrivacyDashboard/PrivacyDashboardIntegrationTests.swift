@@ -29,6 +29,7 @@ class PrivacyDashboardIntegrationTests: XCTestCase {
         (Self.window.contentViewController as! MainViewController).browserTabViewController.tabViewModel!
     }
 
+    @MainActor
     override class func setUp() {
         // disable GPC redirects
         PrivacySecurityPreferences.shared.gpcEnabled = false
@@ -58,7 +59,7 @@ class PrivacyDashboardIntegrationTests: XCTestCase {
             .switchToLatest()
             .filter { $0.trackersBlocked.count > 0 }
             .map { $0.trackers.count }
-            .timeout(5)
+            .timeout(10)
             .first()
             .promise()
 
@@ -74,7 +75,7 @@ class PrivacyDashboardIntegrationTests: XCTestCase {
             .switchToLatest()
             .filter { $0.trackersBlocked.count == 0 }
             .map { $0.trackers.count }
-            .timeout(5)
+            .timeout(10)
             .first()
             .promise()
         _=await tab.setUrl(URL.testsServer, userEntered: nil)?.value?.result

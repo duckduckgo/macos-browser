@@ -20,6 +20,7 @@ import XCTest
 import Combine
 @testable import DuckDuckGo_Privacy_Browser
 
+@MainActor
 final class StateRestorationManagerTests: XCTestCase {
     private var fileStore: FileStoreMock!
     private let testFileName = "TestFile"
@@ -141,7 +142,7 @@ final class StateRestorationManagerTests: XCTestCase {
     func testStatePersistenceThrottlesWrites() {
         fileStore.delay = 0.1 // write operations will sleep for 100ms
         var counter = 0
-        let observer = fileStore.observe(\.storage) { (_, _) in
+        let observer = fileStore.publisher(for: \.storage).dropFirst().sink { _ in
             counter += 1
         }
 
@@ -161,7 +162,7 @@ final class StateRestorationManagerTests: XCTestCase {
         fileStore.delay = 0.01 // write operations will sleep for 100ms
 
         var counter = 0
-        let observer = fileStore.observe(\.storage) { (_, _) in
+        let observer = fileStore.publisher(for: \.storage).dropFirst().sink { _ in
             counter += 1
         }
 

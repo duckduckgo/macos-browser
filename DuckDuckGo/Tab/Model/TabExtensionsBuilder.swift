@@ -21,6 +21,7 @@ import Foundation
 import os.log
 
 protocol TabExtensionsBuilderProtocol {
+    @MainActor
     func build(with args: TabExtensionsBuilderArguments, dependencies: TabExtensionDependencies) -> TabExtensions
 }
 
@@ -50,6 +51,7 @@ struct TabExtensionsBuilder: TabExtensionsBuilderProtocol {
     }
 
     /// build TabExtensions struct from blocks collected above
+    @MainActor
     func build(with args: TabExtensionsBuilderArguments, dependencies: TabExtensionDependencies) -> TabExtensions {
         var builder = self
         builder.registerExtensions(with: args, dependencies: dependencies)

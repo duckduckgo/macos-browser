@@ -26,6 +26,7 @@ final class FindInPageTabExtension: TabExtension {
 
     var isVisible: Bool = false
 
+    @MainActor
     init(findInPageScriptPublisher: some Publisher<FindInPageUserScript?, Never>) {
         model = FindInPageModel()
         userScriptCancellable = findInPageScriptPublisher.sink { [weak model] findInPageScript in

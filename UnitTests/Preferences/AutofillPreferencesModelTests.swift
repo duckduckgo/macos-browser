@@ -38,6 +38,7 @@ final class UserAuthenticatorMock: UserAuthenticating {
     }
 }
 
+@MainActor
 final class AutofillPreferencesModelTests: XCTestCase {
 
     func testThatPreferencesArePersisted() throws {

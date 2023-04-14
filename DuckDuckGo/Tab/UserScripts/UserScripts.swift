@@ -21,6 +21,7 @@ import Foundation
 import BrowserServicesKit
 import UserScript
 
+@MainActor
 final class UserScripts: UserScriptsProvider {
 
     let pageObserverScript = PageObserverUserScript()
@@ -92,6 +93,21 @@ final class UserScripts: UserScriptsProvider {
         autofillScript
     ]
 
-    lazy var scripts = userScripts.map { $0.makeWKUserScript() }
+    @MainActor
+    func loadWKUserScripts() async -> [WKUserScript] {
+        return await withTaskGroup(of: WKUserScriptBox.self) { @MainActor group in
+            var wkUserScripts = [WKUserScript]()
+            userScripts.forEach { userScript in
+                group.addTask { @MainActor in
+                    await userScript.makeWKUserScript()
+                }
+            }
+            for await result in group {
+                wkUserScripts.append(result.wkUserScript)
+            }
+
+            return wkUserScripts
+        }
+    }
 
 }

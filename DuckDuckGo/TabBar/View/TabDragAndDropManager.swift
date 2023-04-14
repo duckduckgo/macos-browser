@@ -19,6 +19,7 @@
 import Foundation
 
 /// Responsible for handling drag and drop of tabs between windows
+@MainActor
 final class TabDragAndDropManager {
 
     static let shared = TabDragAndDropManager()

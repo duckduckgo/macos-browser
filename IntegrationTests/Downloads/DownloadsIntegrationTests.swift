@@ -35,6 +35,7 @@ class DownloadsIntegrationTests: XCTestCase {
         (Self.window.contentViewController as! MainViewController).browserTabViewController.tabViewModel!
     }
 
+    @MainActor
     override class func setUp() {
         window = WindowsManager.openNewWindow(with: .none)!
     }

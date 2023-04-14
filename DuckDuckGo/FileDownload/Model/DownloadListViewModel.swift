@@ -19,6 +19,7 @@
 import Foundation
 import Combine
 
+@MainActor
 final class DownloadListViewModel {
 
     private let coordinator: DownloadListCoordinator
