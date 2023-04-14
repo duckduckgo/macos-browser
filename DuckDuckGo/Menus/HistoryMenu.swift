@@ -20,6 +20,7 @@ import Cocoa
 import Combine
 import Common
 
+@MainActor
 final class HistoryMenu: NSMenu {
 
     @IBOutlet weak var recentlyClosedMenuItem: NSMenuItem?
@@ -243,10 +244,7 @@ extension HistoryMenu {
             static let modifierMask = NSEvent.ModifierFlags.command
         }
 
-        init(
-            isInInitialStatePublisher: Published<Bool>.Publisher = WindowControllersManager.shared.$isInInitialState,
-            canRestoreLastSessionState: @escaping @autoclosure () -> Bool = NSApp.canRestoreLastSessionState
-        ) {
+        init(isInInitialStatePublisher: Published<Bool>.Publisher, canRestoreLastSessionState: @escaping @autoclosure () -> Bool) {
             self.canRestoreLastSessionState = canRestoreLastSessionState
             self.isInInitialStateCancellable = isInInitialStatePublisher
                 .dropFirst()
@@ -254,6 +252,11 @@ extension HistoryMenu {
                 .sink { [weak self] isInInitialState in
                     self?.updateKeyEquivalent(isInInitialState)
                 }
+        }
+
+        @MainActor
+        convenience init() {
+            self.init(isInInitialStatePublisher: WindowControllersManager.shared.$isInInitialState, canRestoreLastSessionState: NSApp.canRestoreLastSessionState)
         }
 
         private weak var currentlyAssignedMenuItem: NSMenuItem?

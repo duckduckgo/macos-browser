@@ -42,6 +42,7 @@ extension FileDownloadManagerProtocol {
 
 }
 
+@MainActor
 protocol FileDownloadManagerDelegate: AnyObject {
     func askUserToGrantAccessToDestination(_ folderUrl: URL)
 }
@@ -131,11 +132,11 @@ final class FileDownloadManager: FileDownloadManagerProtocol {
 
 extension FileDownloadManager: WebKitDownloadTaskDelegate {
 
+    @MainActor
     // swiftlint:disable:next function_body_length
     func fileDownloadTaskNeedsDestinationURL(_ task: WebKitDownloadTask,
                                              suggestedFilename: String,
                                              completionHandler: @escaping (URL?, UTType?) -> Void) {
-        dispatchPrecondition(condition: .onQueue(.main))
 
         let completion: (URL?, UTType?) -> Void = { url, fileType in
             defer {
@@ -225,6 +226,7 @@ extension FileDownloadManager: WebKitDownloadTaskDelegate {
         }
     }
 
+    @MainActor
     private func verifyAccessToDestinationFolder(_ folderUrl: URL, destinationRequested: Bool, isSandboxed: Bool) -> Bool {
         if destinationRequested && isSandboxed { return true }
 
@@ -251,7 +253,9 @@ extension FileDownloadManager: WebKitDownloadTaskDelegate {
 
 protocol DownloadTaskDelegate: AnyObject {
 
-    func chooseDestination(suggestedFilename: String?, directoryURL: URL?, fileTypes: [UTType], callback: @escaping (URL?, UTType?) -> Void)
+    @MainActor
+    func chooseDestination(suggestedFilename: String?, directoryURL: URL?, fileTypes: [UTType], callback: @escaping @MainActor (URL?, UTType?) -> Void)
+    @MainActor
     func fileIconFlyAnimationOriginalRect(for downloadTask: WebKitDownloadTask) -> NSRect?
 
 }

@@ -34,6 +34,7 @@ final class ContextMenuManager: NSObject {
     private var selectedText: String?
     fileprivate weak var webView: WKWebView?
 
+    @MainActor
     init(contextMenuScriptPublisher: some Publisher<ContextMenuUserScript?, Never>) {
         super.init()
 

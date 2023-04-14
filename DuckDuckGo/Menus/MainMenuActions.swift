@@ -332,15 +332,7 @@ extension MainViewController {
     }
 
     @IBAction func toggleBookmarksBarFromMenu(_ sender: Any) {
-        let usingKeyboardShortcut = NSApp.currentEvent?.type == .keyDown
-
         PersistentAppInterfaceSettings.shared.showBookmarksBar.toggle()
-
-        if PersistentAppInterfaceSettings.shared.showBookmarksBar {
-            Pixel.fire(.bookmarksBarEnabled(usingKeyboardShortcut ? .keyboardShortcut : .menuBar))
-        } else {
-            Pixel.fire(.bookmarksBarDisabled(usingKeyboardShortcut ? .keyboardShortcut : .menuBar))
-        }
     }
 
     @IBAction func toggleAutofillShortcut(_ sender: Any) {

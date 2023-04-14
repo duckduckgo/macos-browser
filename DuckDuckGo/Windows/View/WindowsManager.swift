@@ -19,6 +19,7 @@
 import Cocoa
 import BrowserServicesKit
 
+@MainActor
 final class WindowsManager {
 
     class var windows: [NSWindow] {

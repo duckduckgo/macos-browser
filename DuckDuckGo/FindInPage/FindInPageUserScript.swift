@@ -25,15 +25,17 @@ final class FindInPageUserScript: NSObject, StaticUserScript {
     static var forMainFrameOnly: Bool { false }
     static var source: String = FindInPageUserScript.loadJS("findinpage", from: .main)
     static var script: WKUserScript = FindInPageUserScript.makeWKUserScript()
-    var messageNames: [String] { ["findInPageHandler"] }
+    nonisolated var messageNames: [String] { ["findInPageHandler"] }
 
     weak var model: FindInPageModel?
 
+    @MainActor(unsafe)
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         guard let dict = message.body as? [String: Any] else { return }
 
         let currentResult = dict["currentResult"] as? Int
         let totalResults = dict["totalResults"] as? Int
+
         model?.update(currentSelection: currentResult, matchesFound: totalResults)
     }
 

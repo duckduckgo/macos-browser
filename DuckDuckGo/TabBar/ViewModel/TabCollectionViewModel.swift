@@ -36,6 +36,7 @@ protocol TabCollectionViewModelDelegate: AnyObject {
 
 }
 
+@MainActor
 final class TabCollectionViewModel: NSObject {
 
     weak var delegate: TabCollectionViewModelDelegate?
@@ -90,7 +91,7 @@ final class TabCollectionViewModel: NSObject {
     init(
         tabCollection: TabCollection,
         selectionIndex: Int = 0,
-        pinnedTabsManager: PinnedTabsManager? = WindowControllersManager.shared.pinnedTabsManager
+        pinnedTabsManager: PinnedTabsManager?
     ) {
         self.tabCollection = tabCollection
         self.pinnedTabsManager = pinnedTabsManager
@@ -103,6 +104,10 @@ final class TabCollectionViewModel: NSObject {
             appendNewTab(with: .homePage)
         }
         self.selectionIndex = .unpinned(selectionIndex)
+    }
+
+    convenience init(tabCollection: TabCollection, selectionIndex: Int = 0) {
+        self.init(tabCollection: tabCollection, selectionIndex: selectionIndex, pinnedTabsManager: WindowControllersManager.shared.pinnedTabsManager)
     }
 
     convenience override init() {

@@ -39,9 +39,9 @@
     {
       "identity" : "lottie-ios",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/airbnb/lottie-ios",
+      "location" : "https://github.com/duckduckgo/lottie-ios.git",
       "state" : {
-        "revision" : "4a6058cbbdfe4f74aeae92c8bd51ad3b0de2a1ee",
+        "revision" : "abf5510e261c85ffddd29de0bca9b72592ea2bdd",
         "version" : "3.3.0"
       }
     },

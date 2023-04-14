@@ -29,12 +29,13 @@ extension Preferences {
 
         var body: some View {
             VStack(alignment: .leading, spacing: 0) {
-                Text(UserText.general)
-                    .font(Const.Fonts.preferencePaneTitle)
 
+                // TITLE
+                TextMenuTitle(text: UserText.general)
+
+                // SECTION 1: Default Browser
                 PreferencePaneSection {
-                    Text(UserText.defaultBrowser)
-                        .font(Const.Fonts.preferencePaneSectionHeader)
+                    TextMenuItemHeader(text: UserText.defaultBrowser)
 
                     HStack {
                         if defaultBrowserModel.isDefault {
@@ -50,10 +51,10 @@ extension Preferences {
                     }
                 }
 
+                // SECTION 2: On Stap
                 PreferencePaneSection {
-                    Text(UserText.onStartup)
-                        .font(Const.Fonts.preferencePaneSectionHeader)
-                    Toggle(UserText.reopenAllWindowsFromLastSession, isOn: $startupModel.restorePreviousSession)
+                    TextMenuItemHeader(text: UserText.onStartup)
+                    ToggleMenuItem(title: UserText.reopenAllWindowsFromLastSession, isOn: $startupModel.restorePreviousSession)
                 }
 
             }

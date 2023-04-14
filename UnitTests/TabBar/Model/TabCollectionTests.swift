@@ -19,6 +19,7 @@
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
+@MainActor
 final class TabCollectionTests: XCTestCase {
 
     override func setUp() {
@@ -178,6 +179,7 @@ final class TabCollectionTests: XCTestCase {
 }
 
 extension Tab {
+    @MainActor
     convenience override init() {
         self.init(content: .homePage)
     }

@@ -35,6 +35,7 @@ class AutoconsentIntegrationTests: XCTestCase {
         mainViewController.browserTabViewController.tabViewModel!
     }
 
+    @MainActor
     override func setUp() {
         // disable GPC redirects
         PrivacySecurityPreferences.shared.gpcEnabled = false

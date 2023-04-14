@@ -20,6 +20,7 @@ import Foundation
 import Combine
 import Common
 
+@MainActor
 final class AppStateRestorationManager: NSObject {
     static let fileName = "persistentState"
 
@@ -110,6 +111,7 @@ final class AppStateRestorationManager: NSObject {
         WindowControllersManager.shared.updateIsInInitialState()
     }
 
+    @MainActor
     private func restorePinnedTabs() {
         do {
             try service.restoreState(using: { coder in
@@ -123,6 +125,7 @@ final class AppStateRestorationManager: NSObject {
         }
     }
 
+    @MainActor
     private func persistAppState(sync: Bool = false) {
         service.persistState(using: WindowControllersManager.shared.encodeState(with:), sync: sync)
     }

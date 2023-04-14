@@ -18,6 +18,7 @@
 
 import Foundation
 
+@MainActor
 final class PDFSearchTextMenuItemHandler: NSObject {
 
     private static let _NSServiceEntry: AnyClass? = NSClassFromString("_NSServiceEntry")

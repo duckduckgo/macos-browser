@@ -19,15 +19,16 @@
 import Common
 import Foundation
 
+@MainActor
 final class URLEventHandler {
 
-    private let handler: ((URL) -> Void)
+    private let handler: @MainActor (URL) -> Void
 
     private var didFinishLaunching = false
     private var urlsToOpen = [URL]()
 
-    init(handler: @escaping ((URL) -> Void) = openURL) {
-        self.handler = handler
+    init(handler: ((URL) -> Void)? = nil) {
+        self.handler = handler ?? Self.openURL
 
         NSAppleEventManager.shared().setEventHandler(
             self,
@@ -87,7 +88,7 @@ final class URLEventHandler {
 
     private func handleURLs(_ urls: [URL]) {
         if didFinishLaunching {
-            urls.forEach(self.handler)
+            urls.forEach { self.handler($0) }
         } else {
             self.urlsToOpen.append(contentsOf: urls)
         }

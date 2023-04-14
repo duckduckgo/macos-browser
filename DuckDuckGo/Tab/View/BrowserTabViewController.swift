@@ -348,7 +348,7 @@ final class BrowserTabViewController: NSViewController {
             return
         }
 
-        let tab = Tab(content: content, shouldLoadInBackground: true, webViewFrame: view.frame)
+        let tab = Tab(content: content, shouldLoadInBackground: true, webViewSize: view.frame.size)
         tabCollectionViewModel.append(tab: tab, selected: true)
     }
 
@@ -592,10 +592,7 @@ extension BrowserTabViewController: TabDelegate {
 
         let alert = AuthenticationAlert(host: protectionSpace.host, isEncrypted: protectionSpace.receivesCredentialSecurely)
         alert.beginSheetModal(for: window) { response in
-            guard case .OK = response,
-                  !alert.usernameTextField.stringValue.isEmpty,
-                  !alert.passwordTextField.stringValue.isEmpty
-            else {
+            guard case .OK = response else {
                 completionHandler(.performDefaultHandling, nil)
                 return
             }
@@ -680,10 +677,7 @@ extension BrowserTabViewController: TabDelegate {
         alert.beginSheetModal(for: window) { [request] response in
             // don‘t submit the query when tab is switched
             if case .abort = response { return }
-            guard case .OK = response,
-                  !alert.usernameTextField.stringValue.isEmpty,
-                  !alert.passwordTextField.stringValue.isEmpty
-            else {
+            guard case .OK = response else {
                 request.submit(nil)
                 return
             }

@@ -21,6 +21,7 @@ import Combine
 @testable import DuckDuckGo_Privacy_Browser
 
 // MARK: - Tests for TabCollectionViewModel with PinnedTabsManager but without pinned tabs
+@MainActor
 final class TabCollectionViewModelTests: XCTestCase {
 
     // MARK: - TabViewModel
@@ -436,6 +437,7 @@ fileprivate extension TabCollectionViewModel {
 }
 
 extension Tab {
+    @MainActor
     convenience init(parentTab: Tab) {
         self.init(content: .url(.blankPage), parentTab: parentTab)
     }

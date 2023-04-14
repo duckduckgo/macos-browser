@@ -50,10 +50,12 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         syncService.account?.recoveryCode
     }
 
+    @MainActor
     func presentEnableSyncDialog() {
         presentDialog(for: .enableSync)
     }
 
+    @MainActor
     func presentRecoverSyncAccountDialog() {
         presentDialog(for: .recoverAccount)
     }
@@ -111,6 +113,7 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         }
     }
 
+    @MainActor
     private func presentDialog(for currentDialog: ManagementDialogKind) {
         let shouldBeginSheet = managementDialogModel.currentDialog == nil
         managementDialogModel.currentDialog = currentDialog
@@ -164,6 +167,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
         managementDialogModel.endFlow()
     }
 
+    @MainActor
     func turnOnSync() {
         presentDialog(for: .askToSyncAnotherDevice)
     }
@@ -213,10 +217,12 @@ extension SyncPreferences: ManagementDialogModelDelegate {
         }
     }
 
+    @MainActor
     func addAnotherDevice() {
         presentDialog(for: .deviceSynced)
     }
 
+    @MainActor
     func confirmSetupComplete() {
         presentDialog(for: .saveRecoveryPDF)
     }
