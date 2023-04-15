@@ -21,6 +21,8 @@ import DDGSync
 import Combine
 import SystemConfiguration
 import SyncUI
+import SwiftUI
+import PDFKit
 
 extension SyncDevice {
     init(_ account: SyncAccount) {
@@ -230,8 +232,73 @@ extension SyncPreferences: ManagementDialogModelDelegate {
         presentDialog(for: .saveRecoveryPDF)
     }
 
+    func newPDFLocation() -> String {
+        return "/Users/brindy/Downloads/\(UUID().uuidString).pdf"
+    }
+
+    @MainActor
     func saveRecoveryPDF() {
-        managementDialogModel.endFlow()
+
+        let dstURL = URL(fileURLWithPath: newPDFLocation())
+
+        let templateURL = SyncUI.bundle.url(forResource: "SyncPDFTemplate", withExtension: "png")!
+
+        let doc = PDFDocument()
+        let page = PDFPage()
+        doc.insert(page, at: 0)
+
+        var mediaBox: CGRect = page.bounds(for: .mediaBox)
+
+        // This is where the magic happens.  Create the drawing context on the PDF
+        let context = CGContext(dstURL as CFURL, mediaBox: &mediaBox, nil)
+
+        // UIGraphicsPushContext(context!)
+        NSGraphicsContext.saveGraphicsState()
+        NSGraphicsContext.current = .init(cgContext: context!, flipped: false)
+
+        context!.beginPDFPage(nil)
+
+        // Draws the PDF into the context
+        page.draw(with: .mediaBox, to: context!)
+
+        // TODO work out how to render ths
+        // does the position need to be adjusted for the context, seems to treat 0,0 as bottom left
+//        let view = NSHostingView(rootView: ZStack {
+//            Rectangle().foregroundColor(.red)
+//            Text("Hello world")
+//                .font(.title)
+//        }.frame(width: 800, height: 600))
+//        view.frame = CGRect(x: 0, y: 0, width: 500, height: 500)
+//        view.wantsLayer = true
+//        guard let tempParentView = NSApp.windows.first(where: { $0.isMainWindow })?.contentViewController?.view else { fatalError() }
+//        tempParentView.addSubview(view)
+
+//        DispatchQueue.main.async {
+            // Render the view
+//            context?.saveGState()
+//            let flipVertical: CGAffineTransform = CGAffineTransform(a: 1, b: 0, c: 0, d: -1, tx: 0, ty: mediaBox.size.height)
+//            context!.concatenate(flipVertical)
+//            view.layer?.render(in: context!)
+//            context?.restoreGState()
+
+            let image = NSImage(contentsOf: templateURL)
+            image?.draw(in: CGRect(x: 0, y: 0, width: 612, height: 792))
+
+            // Draw the text
+            let attributes = [
+                NSAttributedString.Key.font: NSFont.boldSystemFont(ofSize: 72)
+            ]
+            let text = "I'm a PDF!"
+            text.draw(at: CGPoint(x: 0, y: 0), withAttributes: attributes)
+
+            // Flush the data to the PDF file
+            context!.endPDFPage()
+            context?.closePDF()
+
+            // Remove the view from the screen
+//            view.removeFromSuperview()
+//        }
+
     }
 
 }

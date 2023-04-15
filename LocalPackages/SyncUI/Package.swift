@@ -19,6 +19,9 @@ let package = Package(
             name: "SyncUI",
             dependencies: [
                 .product(name: "SwiftUIExtensions", package: "SwiftUIExtensions")
+            ],
+            resources: [
+                .process("SyncPDFTemplate.png")
             ]),
         .testTarget(
             name: "SyncUITests",
