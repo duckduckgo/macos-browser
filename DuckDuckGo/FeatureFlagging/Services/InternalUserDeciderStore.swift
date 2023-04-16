@@ -29,8 +29,7 @@ final class InternalUserDeciderStore: InternalUserStoring {
 
     init(fileStore: FileStore) {
         store = fileStore
-        // isInternalUser = store.load(url: Self.fileURL)
-        isInternalUser = true
+        isInternalUser = store.load(url: Self.fileURL)
     }
 
     var isInternalUser: Bool {
