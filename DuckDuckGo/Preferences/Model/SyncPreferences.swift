@@ -245,7 +245,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
         }
 
         do {
-            try RecoveryPDFGenerator
+            try RecoveryPDFGenerator()
                 .generate(recoveryCode)
                 .write(to: URL(fileURLWithPath: newPDFLocation()))
         } catch {
