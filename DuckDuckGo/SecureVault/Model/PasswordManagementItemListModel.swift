@@ -18,6 +18,7 @@
 
 import Foundation
 import BrowserServicesKit
+import Common
 
 enum SecureVaultItem: Equatable, Identifiable, Comparable {
 
@@ -152,11 +153,7 @@ enum SecureVaultItem: Equatable, Identifiable, Comparable {
             return defaultFirstCharacter
         }
 
-        if character.isLetter {
-            return character.uppercased()
-        } else {
-            return defaultFirstCharacter
-        }
+        return character.isLetter ? character.uppercased() : defaultFirstCharacter
     }
 
     var category: SecureVaultSorting.Category {
@@ -359,7 +356,7 @@ final class PasswordManagementItemListModel: ObservableObject {
 
         switch sortDescriptor.parameter {
         case .title:
-            displayedItems = PasswordManagementListSection.sections(with: itemsByCategory, by: \.firstCharacter, order: sortDescriptor.order)
+            displayedItems = PasswordManagementListSection.sectionsByTLD(with: itemsByCategory, order: sortDescriptor.order)
         case .dateCreated:
             displayedItems = PasswordManagementListSection.sections(with: itemsByCategory, by: \.created, order: sortDescriptor.order)
         case .dateModified:
