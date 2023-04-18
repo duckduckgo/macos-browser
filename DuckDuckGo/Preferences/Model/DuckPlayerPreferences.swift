@@ -22,7 +22,7 @@ import Combine
 protocol DuckPlayerPreferencesPersistor {
     /// The persistor hadles raw Bool values, but each one translate to a DuckPlayerMode:
     /// nil = .alwaysAsk,  false = .disabled, true = .enabled
-    /// DuckPlayerMode init taked a Bool and returns the corresponding mode
+    /// DuckPlayerMode init takes a Bool and returns the corresponding mode
     var duckPlayerModeBool: Bool? { get set }
     var youtubeOverlayInteracted: Bool { get set }
     var youtubeOverlayAnyButtonPressed: Bool { get set }
