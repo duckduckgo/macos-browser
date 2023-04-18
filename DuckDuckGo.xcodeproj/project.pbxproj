@@ -895,12 +895,14 @@
 		371D00E129D8509400EC8598 /* OpenSSL in Frameworks */ = {isa = PBXBuildFile; productRef = 371D00E029D8509400EC8598 /* OpenSSL */; };
 		3739326529AE4B39009346AE /* DDGSync in Frameworks */ = {isa = PBXBuildFile; productRef = 3739326429AE4B39009346AE /* DDGSync */; };
 		3739326729AE4B42009346AE /* DDGSync in Frameworks */ = {isa = PBXBuildFile; productRef = 3739326629AE4B42009346AE /* DDGSync */; };
-		3739326929AF5045009346AE /* SyncDataPersistor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3739326829AF5045009346AE /* SyncDataPersistor.swift */; };
-		3739326A29AF5045009346AE /* SyncDataPersistor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3739326829AF5045009346AE /* SyncDataPersistor.swift */; };
+		3739326929AF5045009346AE /* SyncBookmarksProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3739326829AF5045009346AE /* SyncBookmarksProvider.swift */; };
+		3739326A29AF5045009346AE /* SyncBookmarksProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3739326829AF5045009346AE /* SyncBookmarksProvider.swift */; };
 		373A1AA8283ED1B900586521 /* BookmarkHTMLReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373A1AA7283ED1B900586521 /* BookmarkHTMLReader.swift */; };
 		373A1AAA283ED86C00586521 /* BookmarksHTMLReaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373A1AA9283ED86C00586521 /* BookmarksHTMLReaderTests.swift */; };
 		373A1AB02842C4EA00586521 /* BookmarkHTMLImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373A1AAF2842C4EA00586521 /* BookmarkHTMLImporter.swift */; };
 		373A1AB228451ED400586521 /* BookmarksHTMLImporterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373A1AB128451ED400586521 /* BookmarksHTMLImporterTests.swift */; };
+		373D9B4829EEAC1B00381FDD /* SyncMetadataDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373D9B4729EEAC1B00381FDD /* SyncMetadataDatabase.swift */; };
+		373D9B4929EEAC1B00381FDD /* SyncMetadataDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373D9B4729EEAC1B00381FDD /* SyncMetadataDatabase.swift */; };
 		37479F152891BC8300302FE2 /* TabCollectionViewModelTests+WithoutPinnedTabsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37479F142891BC8300302FE2 /* TabCollectionViewModelTests+WithoutPinnedTabsManager.swift */; };
 		374EF08329B751FC003D2E87 /* RecentlyClosedCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 374EF08229B751FC003D2E87 /* RecentlyClosedCoordinatorTests.swift */; };
 		374EF08429B7575B003D2E87 /* RecentlyClosedCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 374EF08229B751FC003D2E87 /* RecentlyClosedCoordinatorTests.swift */; };
@@ -1968,12 +1970,13 @@
 		3714B1E628EDB7FA0056C57A /* DuckPlayerPreferencesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuckPlayerPreferencesTests.swift; sourceTree = "<group>"; };
 		3714B1E828EDBAAB0056C57A /* DuckPlayerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuckPlayerTests.swift; sourceTree = "<group>"; };
 		371C0A2827E33EDC0070591F /* FeedbackPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackPresenter.swift; sourceTree = "<group>"; };
-		3739326829AF5045009346AE /* SyncDataPersistor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncDataPersistor.swift; sourceTree = "<group>"; };
+		3739326829AF5045009346AE /* SyncBookmarksProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncBookmarksProvider.swift; sourceTree = "<group>"; };
 		373A1AA7283ED1B900586521 /* BookmarkHTMLReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkHTMLReader.swift; sourceTree = "<group>"; };
 		373A1AA9283ED86C00586521 /* BookmarksHTMLReaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksHTMLReaderTests.swift; sourceTree = "<group>"; };
 		373A1AAF2842C4EA00586521 /* BookmarkHTMLImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkHTMLImporter.swift; sourceTree = "<group>"; };
 		373A1AB128451ED400586521 /* BookmarksHTMLImporterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksHTMLImporterTests.swift; sourceTree = "<group>"; };
 		373A26962964CF0B0043FC57 /* TestsTargetsBase.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = TestsTargetsBase.xcconfig; sourceTree = "<group>"; };
+		373D9B4729EEAC1B00381FDD /* SyncMetadataDatabase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncMetadataDatabase.swift; sourceTree = "<group>"; };
 		37479F142891BC8300302FE2 /* TabCollectionViewModelTests+WithoutPinnedTabsManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "TabCollectionViewModelTests+WithoutPinnedTabsManager.swift"; sourceTree = "<group>"; };
 		374EF08229B751FC003D2E87 /* RecentlyClosedCoordinatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentlyClosedCoordinatorTests.swift; sourceTree = "<group>"; };
 		37534C9D28104D9B002621E7 /* TabLazyLoaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabLazyLoaderTests.swift; sourceTree = "<group>"; };
@@ -3185,7 +3188,8 @@
 			isa = PBXGroup;
 			children = (
 				3775913529AB9A1C00E26367 /* SyncManagementDialogViewController.swift */,
-				3739326829AF5045009346AE /* SyncDataPersistor.swift */,
+				3739326829AF5045009346AE /* SyncBookmarksProvider.swift */,
+				373D9B4729EEAC1B00381FDD /* SyncMetadataDatabase.swift */,
 			);
 			path = Sync;
 			sourceTree = "<group>";
@@ -6484,6 +6488,7 @@
 				3706FAB4293F65D500E42796 /* NSPopUpButtonExtension.swift in Sources */,
 				3706FAB5293F65D500E42796 /* ConfigurationManager.swift in Sources */,
 				3706FAB6293F65D500E42796 /* YoutubePlayerUserScript.swift in Sources */,
+				373D9B4929EEAC1B00381FDD /* SyncMetadataDatabase.swift in Sources */,
 				3706FAB7293F65D500E42796 /* PixelParameters.swift in Sources */,
 				3706FAB8293F65D500E42796 /* FaviconImageCache.swift in Sources */,
 				3706FAB9293F65D500E42796 /* TabBarViewController.swift in Sources */,
@@ -6652,7 +6657,7 @@
 				3706FB54293F65D500E42796 /* PermissionContextMenu.swift in Sources */,
 				3706FB55293F65D500E42796 /* ContextMenuUserScript.swift in Sources */,
 				3706FB56293F65D500E42796 /* NSSavePanelExtension.swift in Sources */,
-				3739326A29AF5045009346AE /* SyncDataPersistor.swift in Sources */,
+				3739326A29AF5045009346AE /* SyncBookmarksProvider.swift in Sources */,
 				3706FB57293F65D500E42796 /* AppPrivacyConfigurationDataProvider.swift in Sources */,
 				3706FB58293F65D500E42796 /* LinkButton.swift in Sources */,
 				3706FB59293F65D500E42796 /* TemporaryFileHandler.swift in Sources */,
@@ -7574,7 +7579,7 @@
 				B66260E029AC6EBD00E9E3EE /* HistoryTabExtension.swift in Sources */,
 				AAEEC6A927088ADB008445F7 /* FireCoordinator.swift in Sources */,
 				B655369B268442EE00085A79 /* GeolocationProvider.swift in Sources */,
-				3739326929AF5045009346AE /* SyncDataPersistor.swift in Sources */,
+				3739326929AF5045009346AE /* SyncBookmarksProvider.swift in Sources */,
 				B6C0B23C26E87D900031CB7F /* NSAlert+ActiveDownloadsTermination.swift in Sources */,
 				AAECA42024EEA4AC00EFA63A /* IndexPathExtension.swift in Sources */,
 				4BE65478271FCD41008D1D63 /* PasswordManagementNoteItemView.swift in Sources */,
@@ -7738,6 +7743,7 @@
 				AA9E9A5E25A4867200D1959D /* TabDragAndDropManager.swift in Sources */,
 				4BBD3C00285ACE090047A89D /* NSNotificationName+Favicons.swift in Sources */,
 				4B0DB5E528BD9D08007DD239 /* PinningManager.swift in Sources */,
+				373D9B4829EEAC1B00381FDD /* SyncMetadataDatabase.swift in Sources */,
 				B68458C025C7E9E000DC17B6 /* TabCollectionViewModel+NSSecureCoding.swift in Sources */,
 				AA8EDF2724923EC70071C2E8 /* StringExtension.swift in Sources */,
 				85378DA2274E7F25007C5CBF /* EmailManagerRequestDelegate.swift in Sources */,
@@ -8608,7 +8614,7 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				branch = "dominik/bookmarks-v3";
+				branch = "dominik/sync-engine";
 				kind = branch;
 			};
 		};

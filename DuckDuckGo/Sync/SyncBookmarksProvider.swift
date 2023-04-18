@@ -19,13 +19,26 @@
 import Foundation
 import DDGSync
 
-final class SyncDataPersistor: LocalDataPersisting {
-    private(set) var bookmarksLastModified: String?
+final class SyncBookmarksProvider: DataProviding {
+    let feature: Feature = .init(name: "bookmarks")
 
-    func updateBookmarksLastModified(_ lastModified: String?) {
-        bookmarksLastModified = lastModified
+    var lastSyncTimestamp: String? {
+        get {
+            metadataStore.timestamp(forFeatureNamed: feature.name)
+        }
+        set {
+            metadataStore.updateTimestamp(newValue, forFeatureNamed: feature.name)
+        }
     }
 
-    func persistEvents(_ events: [SyncEvent]) async throws {
+    func changes(since timestamp: String?) async throws -> [Syncable] {
+        []
     }
+
+    init(metadataStore: SyncMetadataStore) {
+        self.metadataStore = metadataStore
+    }
+
+    private let metadataStore: SyncMetadataStore
+
 }

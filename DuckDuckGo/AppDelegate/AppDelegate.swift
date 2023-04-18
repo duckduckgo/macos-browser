@@ -58,7 +58,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     private(set) var featureFlagger: FeatureFlagger!
     private var appIconChanger: AppIconChanger!
     private(set) var syncService: DDGSyncing!
-    private(set) var syncPersistence: SyncDataPersistor!
+    private(set) var syncMetadata: SyncMetadataStore!
     private var syncStateCancellable: AnyCancellable?
 
 #if !APPSTORE
@@ -148,8 +148,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 #endif
 
         appIconChanger = AppIconChanger(internalUserDecider: internalUserDecider)
-        syncPersistence = SyncDataPersistor()
-        syncService = DDGSync(persistence: syncPersistence)
+        syncMetadata = LocalSyncMetadataStore(database: SyncMetadataDatabase.shared.db)
+        syncService = DDGSync(dataProviders: [SyncBookmarksProvider(metadataStore: syncMetadata)])
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
