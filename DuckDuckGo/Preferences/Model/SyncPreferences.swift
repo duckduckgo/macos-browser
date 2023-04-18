@@ -23,6 +23,7 @@ import SystemConfiguration
 import SyncUI
 import SwiftUI
 import PDFKit
+import Navigation
 
 extension SyncDevice {
     init(_ account: SyncAccount) {
@@ -232,10 +233,6 @@ extension SyncPreferences: ManagementDialogModelDelegate {
         presentDialog(for: .saveRecoveryPDF)
     }
 
-    func newPDFLocation() -> String {
-        return "/Users/brindy/Downloads/\(UUID().uuidString).pdf"
-    }
-
     @MainActor
     func saveRecoveryPDF() {
 
@@ -244,12 +241,17 @@ extension SyncPreferences: ManagementDialogModelDelegate {
             return
         }
 
-        do {
-            try RecoveryPDFGenerator()
-                .generate(recoveryCode)
-                .write(to: URL(fileURLWithPath: newPDFLocation()))
-        } catch {
-            fatalError(error.localizedDescription)
+        let data = RecoveryPDFGenerator()
+            .generate(recoveryCode)
+
+        Task { @MainActor in
+            let panel = NSSavePanel.savePanelWithFileTypeChooser(fileTypes: [.pdf], suggestedFilename: "DuckDuckGo Recovery Code.pdf")
+            let response = await panel.begin()
+
+            guard response == .OK,
+                  let location = panel.url else { return }
+
+            try data.writeFileWithProgress(to: location)
         }
 
     }
