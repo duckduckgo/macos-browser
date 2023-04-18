@@ -43,21 +43,21 @@ final class YoutubeOverlayUserScriptTests: XCTestCase {
         let message = MockMessage(messageBody: ["pixelName": YoutubeOverlayUserScript.JSPixel.playUse.rawValue])
         youtubeOverlayUserScript.handleSendJSPixel(message) { _ in }
 
-        XCTAssertTrue(persistor.youtubeOverlayUserPressedButtons)
+        XCTAssertTrue(persistor.youtubeOverlayAnyButtonPressed)
     }
 
     func testWhenHandleSendJSPixelWithForPlayDoNotUsePixelYoutubeOverlayUserPressedButtonsSetTrue() {
         let message = MockMessage(messageBody: ["pixelName": YoutubeOverlayUserScript.JSPixel.playDoNotUse.rawValue])
         youtubeOverlayUserScript.handleSendJSPixel(message) { _ in }
 
-        XCTAssertTrue(persistor.youtubeOverlayUserPressedButtons)
+        XCTAssertTrue(persistor.youtubeOverlayAnyButtonPressed)
     }
 
     func testWhenHandleSendJSPixelWithForPlayOverlayPixelYoutubeOverlayUserPressedButtonsNotSet() {
         let message = MockMessage(messageBody: ["pixelName": YoutubeOverlayUserScript.JSPixel.overlay.rawValue])
         youtubeOverlayUserScript.handleSendJSPixel(message) { _ in }
 
-        XCTAssertFalse(persistor.youtubeOverlayUserPressedButtons)
+        XCTAssertFalse(persistor.youtubeOverlayAnyButtonPressed)
     }
 
 }

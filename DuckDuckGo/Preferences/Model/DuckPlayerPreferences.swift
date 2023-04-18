@@ -22,7 +22,7 @@ import Combine
 protocol DuckPlayerPreferencesPersistor {
     var duckPlayerModeBool: Bool? { get set }
     var youtubeOverlayInteracted: Bool { get set }
-    var youtubeOverlayUserPressedButtons: Bool { get set }
+    var youtubeOverlayAnyButtonPressed: Bool { get set }
 }
 
 struct DuckPlayerPreferencesUserDefaultsPersistor: DuckPlayerPreferencesPersistor {
@@ -34,7 +34,7 @@ struct DuckPlayerPreferencesUserDefaultsPersistor: DuckPlayerPreferencesPersisto
     var youtubeOverlayInteracted: Bool
 
     @UserDefaultsWrapper(key: .youtubeOverlayButtonsUsed, defaultValue: false)
-    var youtubeOverlayUserPressedButtons: Bool
+    var youtubeOverlayAnyButtonPressed: Bool
 }
 
 final class DuckPlayerPreferences: ObservableObject {
@@ -56,7 +56,7 @@ final class DuckPlayerPreferences: ObservableObject {
 
     var youtubeOverlayUserPressedButtons: Bool {
         didSet {
-            persistor.youtubeOverlayUserPressedButtons = youtubeOverlayUserPressedButtons
+            persistor.youtubeOverlayAnyButtonPressed = youtubeOverlayUserPressedButtons
         }
     }
 
@@ -64,7 +64,7 @@ final class DuckPlayerPreferences: ObservableObject {
         self.persistor = persistor
         duckPlayerMode = .init(persistor.duckPlayerModeBool)
         youtubeOverlayInteracted = persistor.youtubeOverlayInteracted
-        youtubeOverlayUserPressedButtons = persistor.youtubeOverlayUserPressedButtons
+        youtubeOverlayUserPressedButtons = persistor.youtubeOverlayAnyButtonPressed
     }
 
     private var persistor: DuckPlayerPreferencesPersistor

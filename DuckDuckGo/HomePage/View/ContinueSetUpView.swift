@@ -27,31 +27,28 @@ extension HomePage.Views {
 
         @State var isHovering = false {
             didSet {
-                moreOrLessButtonVisibility = isHovering && model.isMorOrLessButtonNeeded ? .visible : .invisible
+                moreOrLessButtonVisibility = isHovering && model.isMoreOrLessButtonNeeded ? .visible : .invisible
             }
         }
 
         @State private var moreOrLessButtonVisibility: ViewVisibility = .invisible
 
         var body: some View {
-            if model.isThereContent {
-                VStack(spacing: 20) {
-                    SectionTitleView(titleText: model.title, isExpanded: $model.shouldShowAllFeatures, isMoreOrLessButtonVisibility: $moreOrLessButtonVisibility)
-                    if #available(macOS 12.0, *) {
-                        LazyVStack(spacing: 4) {
-                            FeaturesGrid()
-                        }
-                        .frame(maxWidth: .infinity)
-                    } else {
+            VStack(spacing: 20) {
+                SectionTitleView(titleText: model.title, isExpanded: $model.shouldShowAllFeatures, isMoreOrLessButtonVisibility: $moreOrLessButtonVisibility)
+                if #available(macOS 12.0, *) {
+                    LazyVStack(spacing: 4) {
                         FeaturesGrid()
                     }
+                    .frame(maxWidth: .infinity)
+                } else {
+                    FeaturesGrid()
                 }
-                .onHover { isHovering in
-                    self.isHovering = isHovering
-                }
-            } else {
-                EmptyView()
             }
+            .onHover { isHovering in
+                self.isHovering = isHovering
+            }
+            .visibility(model.hasContent ? .visible : .gone)
         }
 
         struct FeaturesGrid: View {

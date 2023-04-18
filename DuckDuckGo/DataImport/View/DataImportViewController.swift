@@ -23,8 +23,8 @@ import os.log
 
 final class DataImportViewController: NSViewController {
 
-    @UserDefaultsWrapper(key: .homePageContinueSetUpImport, defaultValue: false)
-    var successfulImportHappened: Bool
+    @UserDefaultsWrapper(key: .homePageContinueSetUpImport, defaultValue: nil)
+    var successfulImportHappened: Bool?
 
     enum Constants {
         static let storyboardName = "DataImport"

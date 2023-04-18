@@ -20,12 +20,12 @@ import Foundation
 import Bookmarks
 import BrowserServicesKit
 
-protocol DataImportProvider {
-    var hasUserUsedImport: Bool { get }
+protocol DataImportStatusProviding {
+    var didImport: Bool { get }
     func showImportWindow(completion: (() -> Void)?)
 }
 
-final class StandardDataImportProvider: DataImportProvider {
+final class BookmarksAndPasswordsImportStatusProvider: DataImportStatusProviding {
 
     let secureVault: SecureVault?
     let bookmarkManager: BookmarkManager
@@ -36,13 +36,16 @@ final class StandardDataImportProvider: DataImportProvider {
         self.bookmarkManager = bookmarkManager
     }
 
-    @UserDefaultsWrapper(key: .homePageContinueSetUpImport, defaultValue: false)
-    private var successfulImportHappened: Bool
+    @UserDefaultsWrapper(key: .homePageContinueSetUpImport, defaultValue: nil)
+    private var successfulImportHappened: Bool?
 
     // The successfulImportHappened boolean covers only users who start importing after this code is live.
     // To cover as much as possible users that have imported data in the past we try some hack to detect if they have imported bookmarks or passwords
-    var hasUserUsedImport: Bool {
-        return successfulImportHappened || hasUserImportedBookmarks || hasUserImportedPasswords
+    var didImport: Bool {
+        if successfulImportHappened == nil {
+            successfulImportHappened = didImportBookarks || didImportPasswords
+        }
+        return successfulImportHappened!
     }
     func showImportWindow(completion: (() -> Void)?) {
         DataImportViewController.show(completion: completion)
@@ -50,17 +53,16 @@ final class StandardDataImportProvider: DataImportProvider {
 
     // It only cover the case in which the user has imported bookmar AFTER already having some bookmarks
     // There is no way to detect whether the user has imported bookmarks as first thing
-    private var hasUserImportedBookmarks: Bool {
+    private var didImportBookarks: Bool {
         guard let folders = bookmarkManager.list?.topLevelEntities else { return false }
         for folder in folders.reversed() where folder.title.contains(UserText.bookmarkImportedFromFolder) {
-            successfulImportHappened = true
             return true
         }
         return false
     }
 
     // Checks if there are multiple passwords created at the same time which would indicate that they were created through import
-    private var hasUserImportedPasswords: Bool {
+    private var didImportPasswords: Bool {
         guard let secureVault else {
             return false
         }
@@ -75,16 +77,17 @@ final class StandardDataImportProvider: DataImportProvider {
         if let cardDates = try? secureVault.creditCards().map({ $0.created }) {
             dates.append(contentsOf: cardDates)
         }
-        if let identitiedDate = try? secureVault.identities().map({ $0.created }) {
-            dates.append(contentsOf: identitiedDate)
+        if let identitiesDates = try? secureVault.identities().map({ $0.created }) {
+            dates.append(contentsOf: identitiesDates)
         }
-        guard dates.count >= 2 else { return false }
+        guard dates.count >= 2 else {
+            return false
+        }
 
-        let sortedDate = dates.sorted()
-        for ind in 1..<sortedDate.count {
-            let sameSecond = Calendar.current.isDate(sortedDate[ind], equalTo: sortedDate[ind - 1], toGranularity: .second)
+        let sortedDates = dates.sorted()
+        for ind in 1..<sortedDates.count {
+            let sameSecond = Calendar.current.isDate(sortedDates[ind], equalTo: sortedDates[ind - 1], toGranularity: .second)
             if sameSecond {
-                successfulImportHappened = true
                 return true
             }
         }

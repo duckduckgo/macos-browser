@@ -1205,8 +1205,8 @@
 		569277C529DEE09D00B633EF /* ContinueSetUpModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 569277C329DEE09D00B633EF /* ContinueSetUpModelTests.swift */; };
 		56D145E829E6BB6300E3488A /* CapturingDataImportProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56D145E729E6BB6300E3488A /* CapturingDataImportProvider.swift */; };
 		56D145E929E6BB6300E3488A /* CapturingDataImportProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56D145E729E6BB6300E3488A /* CapturingDataImportProvider.swift */; };
-		56D145EB29E6C99B00E3488A /* DataImportProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56D145EA29E6C99B00E3488A /* DataImportProvider.swift */; };
-		56D145EC29E6C99B00E3488A /* DataImportProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56D145EA29E6C99B00E3488A /* DataImportProvider.swift */; };
+		56D145EB29E6C99B00E3488A /* DataImportStatusProviding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56D145EA29E6C99B00E3488A /* DataImportStatusProviding.swift */; };
+		56D145EC29E6C99B00E3488A /* DataImportStatusProviding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56D145EA29E6C99B00E3488A /* DataImportStatusProviding.swift */; };
 		56D145EE29E6DAD900E3488A /* DataImportProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56D145ED29E6DAD900E3488A /* DataImportProviderTests.swift */; };
 		56D145EF29E6DAD900E3488A /* DataImportProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56D145ED29E6DAD900E3488A /* DataImportProviderTests.swift */; };
 		56D145F129E6F06D00E3488A /* MockBookmarkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56D145F029E6F06D00E3488A /* MockBookmarkManager.swift */; };
@@ -2290,7 +2290,7 @@
 		569277C029DDCBB500B633EF /* HomePageContinueSetUpModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomePageContinueSetUpModel.swift; sourceTree = "<group>"; };
 		569277C329DEE09D00B633EF /* ContinueSetUpModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContinueSetUpModelTests.swift; sourceTree = "<group>"; };
 		56D145E729E6BB6300E3488A /* CapturingDataImportProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapturingDataImportProvider.swift; sourceTree = "<group>"; };
-		56D145EA29E6C99B00E3488A /* DataImportProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataImportProvider.swift; sourceTree = "<group>"; };
+		56D145EA29E6C99B00E3488A /* DataImportStatusProviding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataImportStatusProviding.swift; sourceTree = "<group>"; };
 		56D145ED29E6DAD900E3488A /* DataImportProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataImportProviderTests.swift; sourceTree = "<group>"; };
 		56D145F029E6F06D00E3488A /* MockBookmarkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockBookmarkManager.swift; sourceTree = "<group>"; };
 		56D6A3D529DB2BAB0055215A /* ContinueSetUpView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContinueSetUpView.swift; sourceTree = "<group>"; };
@@ -4023,7 +4023,7 @@
 				85AC7ADC27BEB6EE00FFB69B /* HomePageDefaultBrowserModel.swift */,
 				85589E9027BFB9810038AD11 /* HomePageRecentlyVisitedModel.swift */,
 				569277C029DDCBB500B633EF /* HomePageContinueSetUpModel.swift */,
-				56D145EA29E6C99B00E3488A /* DataImportProvider.swift */,
+				56D145EA29E6C99B00E3488A /* DataImportStatusProviding.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -6831,7 +6831,7 @@
 				3706FBC3293F65D500E42796 /* EdgeDataImporter.swift in Sources */,
 				3706FBC5293F65D500E42796 /* CallToAction.swift in Sources */,
 				3706FBC6293F65D500E42796 /* MouseOverView.swift in Sources */,
-				56D145EC29E6C99B00E3488A /* DataImportProvider.swift in Sources */,
+				56D145EC29E6C99B00E3488A /* DataImportStatusProviding.swift in Sources */,
 				3706FBC7293F65D500E42796 /* HistoryStore.swift in Sources */,
 				3706FBC8293F65D500E42796 /* FirePopoverCollectionViewItem.swift in Sources */,
 				3706FBC9293F65D500E42796 /* ArrayExtension.swift in Sources */,
@@ -7433,7 +7433,7 @@
 				AA5FA697275F90C400DCE9C9 /* FaviconImageCache.swift in Sources */,
 				1430DFF524D0580F00B8978C /* TabBarViewController.swift in Sources */,
 				4B92929B26670D2A00AD2C21 /* BookmarkOutlineViewDataSource.swift in Sources */,
-				56D145EB29E6C99B00E3488A /* DataImportProvider.swift in Sources */,
+				56D145EB29E6C99B00E3488A /* DataImportStatusProviding.swift in Sources */,
 				31D5375C291D944100407A95 /* PasswordManagementBitwardenItemView.swift in Sources */,
 				31B7C85128800A5D0049841F /* CookieConsentPopover.swift in Sources */,
 				85D885B026A590A90077C374 /* NSNotificationName+PasswordManager.swift in Sources */,

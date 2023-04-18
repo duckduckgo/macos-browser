@@ -34,7 +34,7 @@ extension HomePage.Models {
         let duckPlayerURL = URL(string: "https://www.youtube.com/watch?v=yKWIA-Pys4c")!
 
         private let defaultBrowserProvider: DefaultBrowserProvider
-        private let dataImportProvider: DataImportProvider
+        private let dataImportProvider: DataImportStatusProviding
         private let tabCollectionViewModel: TabCollectionViewModel
         private let emailManager: EmailManager
         private let privacyPreferences: PrivacySecurityPreferences
@@ -49,11 +49,11 @@ extension HomePage.Models {
             }
         }
 
-        var isMorOrLessButtonNeeded: Bool {
+        var isMoreOrLessButtonNeeded: Bool {
             return featuresMatrix.count > 1
         }
 
-        var isThereContent: Bool {
+        var hasContent: Bool {
             return !featuresMatrix.isEmpty
         }
 
@@ -65,7 +65,7 @@ extension HomePage.Models {
         @Published var visibleFeaturesMatrix: [[FeatureType]] = [[]]
 
         init(defaultBrowserProvider: DefaultBrowserProvider,
-             dataImportProvider: DataImportProvider,
+             dataImportProvider: DataImportStatusProviding,
              tabCollectionViewModel: TabCollectionViewModel,
              emailManager: EmailManager = EmailManager(),
              privacyPreferences: PrivacySecurityPreferences = PrivacySecurityPreferences.shared,
@@ -91,7 +91,7 @@ extension HomePage.Models {
                 return UserText.newTabSetUpDuckPlayerAction
             case .emailProtection:
                 return UserText.newTabSetUpEmailProtectionAction
-            case .coockiePopUp:
+            case .cookiePopUp:
                 return UserText.newTabSetUpCoockeManagerAction
             }
         }
@@ -112,7 +112,7 @@ extension HomePage.Models {
             case .emailProtection:
                 let tab = Tab(content: .url(EmailUrls().emailProtectionLink), shouldLoadInBackground: true)
                 tabCollectionViewModel.append(tab: tab)
-            case .coockiePopUp:
+            case .cookiePopUp:
                 delegate?.showCookieConsentPopUp(manager: cookieConsentPopoverManager, completion: { [weak self] result in
                     self?.privacyPreferences.autoconsentEnabled = result
                     self?.refreshFeaturesMatrix()
@@ -133,19 +133,19 @@ extension HomePage.Models {
                         features.append(feature)
                     }
                 case .importBookmarksAndPasswords:
-                    if !dataImportProvider.hasUserUsedImport {
+                    if !dataImportProvider.didImport {
                         features.append(feature)
                     }
                 case .duckplayer:
-                    if shouldDuckplayerCardBeVisible {
+                    if shouldDuckPlayerCardBeVisible {
                         features.append(feature)
                     }
                 case .emailProtection:
                     if !emailManager.isSignedIn {
                         features.append(feature)
                     }
-                case .coockiePopUp:
-                    if !(privacyPreferences.autoconsentEnabled ?? false) {
+                case .cookiePopUp:
+                    if privacyPreferences.autoconsentEnabled != true {
                         features.append(feature)
                     }
                 }
@@ -161,9 +161,9 @@ extension HomePage.Models {
             visibleFeaturesMatrix = shouldShowAllFeatures ? featuresMatrix : [featuresMatrix[0]]
         }
 
-        private var shouldDuckplayerCardBeVisible: Bool {
+        private var shouldDuckPlayerCardBeVisible: Bool {
             duckPlayerPreferences.duckPlayerModeBool == nil &&
-                !duckPlayerPreferences.youtubeOverlayUserPressedButtons
+                !duckPlayerPreferences.youtubeOverlayAnyButtonPressed
         }
 
     }
@@ -173,7 +173,7 @@ extension HomePage.Models {
         case importBookmarksAndPasswords
         case duckplayer
         case emailProtection
-        case coockiePopUp
+        case cookiePopUp
 
         var title: String {
             switch self {
@@ -185,7 +185,7 @@ extension HomePage.Models {
                 return UserText.newTabSetUpDuckPlayerCardTitle
             case .emailProtection:
                 return UserText.newTabSetUpEmailProtectionCardTitle
-            case .coockiePopUp:
+            case .cookiePopUp:
                 return UserText.newTabSetUpCookieManagerCardTitle
             }
         }
@@ -201,7 +201,7 @@ extension HomePage.Models {
                 return NSImage(named: "CookieBite")!
             case .emailProtection:
                 return NSImage(named: "CookieBite")!
-            case .coockiePopUp:
+            case .cookiePopUp:
                 return NSImage(named: "CookieBite")!
             }
         }

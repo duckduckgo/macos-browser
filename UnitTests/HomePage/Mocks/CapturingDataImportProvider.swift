@@ -19,9 +19,9 @@
 import Foundation
 @testable import DuckDuckGo_Privacy_Browser
 
-class CapturingDataImportProvider: DataImportProvider {
+class CapturingDataImportProvider: DataImportStatusProviding {
     var showImportWindowCalled = false
-    var hasUserUsedImport = false
+    var didImport = false
 
     func showImportWindow(completion: (() -> Void)?) {
         showImportWindowCalled = true

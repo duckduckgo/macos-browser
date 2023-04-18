@@ -63,7 +63,7 @@ final class ContinueSetUpModelTests: XCTestCase {
         XCTAssertEqual(vm.actionTitle(for: .importBookmarksAndPasswords), UserText.newTabSetUpImportAction)
         XCTAssertEqual(vm.actionTitle(for: .duckplayer), UserText.newTabSetUpDuckPlayerAction)
         XCTAssertEqual(vm.actionTitle(for: .emailProtection), UserText.newTabSetUpEmailProtectionAction)
-        XCTAssertEqual(vm.actionTitle(for: .coockiePopUp), UserText.newTabSetUpCoockeManagerAction)
+        XCTAssertEqual(vm.actionTitle(for: .cookiePopUp), UserText.newTabSetUpCoockeManagerAction)
     }
 
     func testModelReturnsCorrectDimensions() {
@@ -76,13 +76,13 @@ final class ContinueSetUpModelTests: XCTestCase {
     }
 
     func testIsMoreOrLessButtonNeededReturnTheExpectedValue() {
-        XCTAssertTrue(vm.isMorOrLessButtonNeeded)
+        XCTAssertTrue(vm.isMoreOrLessButtonNeeded)
 
         capturingDefaultBrowserProvider.isDefault = true
-        capturingDataImportProvider.hasUserUsedImport = true
+        capturingDataImportProvider.didImport = true
         vm = HomePage.Models.ContinueSetUpModel.fixture(defaultBrowserProvider: capturingDefaultBrowserProvider, dataImportProvider: capturingDataImportProvider)
 
-        XCTAssertFalse(vm.isMorOrLessButtonNeeded)
+        XCTAssertFalse(vm.isMoreOrLessButtonNeeded)
     }
 
     func testWhenInitialisedTheMatrixHasOnlyThreeElementsInOneRow() {
@@ -144,7 +144,7 @@ final class ContinueSetUpModelTests: XCTestCase {
         vm.shouldShowAllFeatures = true
         XCTAssertEqual(vm.visibleFeaturesMatrix.flatMap { $0 }.count, numberOfFeatures)
 
-        capturingDataImportProvider.hasUserUsedImport = true
+        capturingDataImportProvider.didImport = true
         vm.performAction(for: .importBookmarksAndPasswords)
 
         XCTAssertTrue(capturingDataImportProvider.showImportWindowCalled)
@@ -154,7 +154,7 @@ final class ContinueSetUpModelTests: XCTestCase {
     func testWhenUserHasUsedImportAndTogglingShowAllFeatureTheCorrectElementsAreVisible() {
         let expectedMatrix = expectedFeatureMatrixWithout(type: .importBookmarksAndPasswords)
 
-        capturingDataImportProvider.hasUserUsedImport = true
+        capturingDataImportProvider.didImport = true
         vm = HomePage.Models.ContinueSetUpModel.fixture(dataImportProvider: capturingDataImportProvider)
 
         vm.shouldShowAllFeatures = true
@@ -196,14 +196,14 @@ final class ContinueSetUpModelTests: XCTestCase {
         vm.shouldShowAllFeatures = true
         XCTAssertEqual(vm.visibleFeaturesMatrix.flatMap { $0 }.count, numberOfFeatures)
 
-        vm.performAction(for: .coockiePopUp)
+        vm.performAction(for: .cookiePopUp)
 
         XCTAssertTrue(delegate.showCookieConsentPopUpCalled)
         XCTAssertEqual(vm.visibleFeaturesMatrix.flatMap { $0 }.count, numberOfFeatures - 1)
     }
 
     func testWhenUserHasCookieConsnetEnabledTheCorrectElementsAreVisible() {
-        let expectedMatrix = expectedFeatureMatrixWithout(type: .coockiePopUp)
+        let expectedMatrix = expectedFeatureMatrixWithout(type: .cookiePopUp)
 
         privacyPreferences.autoconsentEnabled = true
         vm = HomePage.Models.ContinueSetUpModel.fixture(privacyPreferences: privacyPreferences)
@@ -228,7 +228,7 @@ final class ContinueSetUpModelTests: XCTestCase {
     func testWhenUserHasDuckPlayerEnabledAndOverlayButtonNotPressedTheCorrectElementsAreVisible() {
         let expectedMatrix = expectedFeatureMatrixWithout(type: .duckplayer)
 
-        duckPlayerPreferences.youtubeOverlayUserPressedButtons = false
+        duckPlayerPreferences.youtubeOverlayAnyButtonPressed = false
         duckPlayerPreferences.duckPlayerModeBool = true
         vm = HomePage.Models.ContinueSetUpModel.fixture(duckPlayerPreferences: duckPlayerPreferences)
 
@@ -246,7 +246,7 @@ final class ContinueSetUpModelTests: XCTestCase {
     func testWhenUserHasDuckPlayerDisabledAndOverlayButtonNotPressedTheCorrectElementsAreVisible() {
         let expectedMatrix = expectedFeatureMatrixWithout(type: .duckplayer)
 
-        duckPlayerPreferences.youtubeOverlayUserPressedButtons = false
+        duckPlayerPreferences.youtubeOverlayAnyButtonPressed = false
         duckPlayerPreferences.duckPlayerModeBool = false
         vm = HomePage.Models.ContinueSetUpModel.fixture(duckPlayerPreferences: duckPlayerPreferences)
 
@@ -264,7 +264,7 @@ final class ContinueSetUpModelTests: XCTestCase {
     func testWhenUserHasDuckPlayerOnAlwaysAskAndOverlayButtonNotPressedTheCorrectElementsAreVisible() {
         let expectedMatrix = HomePage.Models.FeatureType.allCases.chunked(into: HomePage.featuresPerRow)
 
-        duckPlayerPreferences.youtubeOverlayUserPressedButtons = false
+        duckPlayerPreferences.youtubeOverlayAnyButtonPressed = false
         duckPlayerPreferences.duckPlayerModeBool = nil
         vm = HomePage.Models.ContinueSetUpModel.fixture(duckPlayerPreferences: duckPlayerPreferences)
 
@@ -282,7 +282,7 @@ final class ContinueSetUpModelTests: XCTestCase {
     func testWhenUserHasDuckPlayerOnAlwaysAskAndOverlayButtonIsPressedTheCorrectElementsAreVisible() {
         let expectedMatrix = expectedFeatureMatrixWithout(type: .duckplayer)
 
-        duckPlayerPreferences.youtubeOverlayUserPressedButtons = true
+        duckPlayerPreferences.youtubeOverlayAnyButtonPressed = true
         duckPlayerPreferences.duckPlayerModeBool = nil
         vm = HomePage.Models.ContinueSetUpModel.fixture(duckPlayerPreferences: duckPlayerPreferences)
 
@@ -301,9 +301,9 @@ final class ContinueSetUpModelTests: XCTestCase {
         capturingDefaultBrowserProvider.isDefault = true
         emailStorage.isEmailProtectionEnabled = true
         privacyPreferences.autoconsentEnabled = true
-        duckPlayerPreferences.youtubeOverlayUserPressedButtons = true
-        capturingDataImportProvider.hasUserUsedImport = true
-        vm = HomePage.Models.ContinueSetUpModel(defaultBrowserProvider: capturingDefaultBrowserProvider, dataImportProvider: capturingDataImportProvider, tabCollectionViewModel: tabCollectionVM, privacyPreferences: privacyPreferences, duckPlayerPreferences: duckPlayerPreferences)
+        duckPlayerPreferences.youtubeOverlayAnyButtonPressed = true
+        capturingDataImportProvider.didImport = true
+        vm = HomePage.Models.ContinueSetUpModel(defaultBrowserProvider: capturingDefaultBrowserProvider, dataImportProvider: capturingDataImportProvider, tabCollectionViewModel: tabCollectionVM, emailManager: emailManager, privacyPreferences: privacyPreferences, duckPlayerPreferences: duckPlayerPreferences)
 
         XCTAssertEqual(vm.visibleFeaturesMatrix, [[]])
     }
@@ -317,7 +317,7 @@ final class ContinueSetUpModelTests: XCTestCase {
 }
 
 extension HomePage.Models.ContinueSetUpModel {
-    static func fixture(defaultBrowserProvider: DefaultBrowserProvider = CapturingDefaultBrowserProvider(), dataImportProvider: DataImportProvider = CapturingDataImportProvider(), tabCollectionViewModel: TabCollectionViewModel = TabCollectionViewModel(), emailManager: EmailManager = EmailManager(), privacyPreferences: PrivacySecurityPreferences = PrivacySecurityPreferences.shared, duckPlayerPreferences: DuckPlayerPreferencesPersistor = DuckPlayerPreferencesPersistorMock()) -> HomePage.Models.ContinueSetUpModel {
+    static func fixture(defaultBrowserProvider: DefaultBrowserProvider = CapturingDefaultBrowserProvider(), dataImportProvider: DataImportStatusProviding = CapturingDataImportProvider(), tabCollectionViewModel: TabCollectionViewModel = TabCollectionViewModel(), emailManager: EmailManager = EmailManager(), privacyPreferences: PrivacySecurityPreferences = PrivacySecurityPreferences.shared, duckPlayerPreferences: DuckPlayerPreferencesPersistor = DuckPlayerPreferencesPersistorMock()) -> HomePage.Models.ContinueSetUpModel {
         HomePage.Models.ContinueSetUpModel(defaultBrowserProvider: defaultBrowserProvider, dataImportProvider: dataImportProvider, tabCollectionViewModel: tabCollectionViewModel, emailManager: emailManager, privacyPreferences: privacyPreferences, duckPlayerPreferences: duckPlayerPreferences)
     }
 }
