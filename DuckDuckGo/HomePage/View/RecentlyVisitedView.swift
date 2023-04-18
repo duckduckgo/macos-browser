@@ -24,13 +24,18 @@ extension HomePage.Views {
 struct RecentlyVisited: View {
 
     @EnvironmentObject var model: HomePage.Models.RecentlyVisitedModel
+    @State var isHovering = false {
+        didSet {
+            moreOrLessButtonVisibility = isHovering ? .visible : .invisible
+        }
+    }
+    @State private var moreOrLessButtonVisibility: ViewVisibility = .invisible
 
     var body: some View {
 
-        VStack(spacing: 0) {
-            RecentlyVisitedTitle(isExpanded: $model.showRecentlyVisited)
-                .padding(.bottom, 18)
-
+        VStack(spacing: 20) {
+            SectionTitleView(titleText: UserText.newTabRecentActivitySectionTitle, isExpanded: $model.showRecentlyVisited, isMoreOrLessButtonVisibility: $moreOrLessButtonVisibility)
+            RecentlyVisitedTitle()
             Group {
                 if #available(macOS 11, *) {
                     LazyVStack(spacing: 0) {
@@ -52,7 +57,11 @@ struct RecentlyVisited: View {
             }
             .visibility(model.showRecentlyVisited ? .visible : .gone)
 
-        }.padding(.bottom, 24)
+        }
+        .padding(.bottom, 24)
+        .onHover { value in
+            isHovering = value
+        }
 
     }
 
@@ -144,7 +153,6 @@ struct RecentlyVisitedSite: View {
                 Spacer()
 
             }
-            .padding([.leading, .trailing, .top], 12)
             .visibility(site.isHidden ? .invisible : .visible)
 
             HStack(spacing: 2) {
@@ -306,8 +314,6 @@ struct RecentlyVisitedTitle: View {
 
     @EnvironmentObject var model: HomePage.Models.RecentlyVisitedModel
 
-    @Binding var isExpanded: Bool
-
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
             Image("HomeShield")
@@ -316,9 +322,9 @@ struct RecentlyVisitedTitle: View {
                 .onTapGesture(count: 2) {
                     model.showPagesOnHover.toggle()
                 }
-                .padding(.leading, isExpanded ? 5 : 0)
+                .padding(.leading, 5)
 
-            VStack(alignment: isExpanded ? .leading : .center, spacing: 6) {
+            VStack(alignment: .leading, spacing: 6) {
                 Text(UserText.homePageProtectionSummaryMessage(numberOfTrackersBlocked: model.numberOfTrackersBlocked))
                     .font(.system(size: 17, weight: .bold, design: .default))
                     .foregroundColor(Color("HomeFeedTitleColor"))
@@ -337,16 +343,7 @@ struct RecentlyVisitedTitle: View {
                 .visibility(model.recentSites.count > 0 ? .gone : .visible)
 
             Spacer()
-                .visibility(isExpanded ? .visible : .gone)
-
-            HoverButton(size: 24, imageName: "HomeArrowUp", imageSize: 16, cornerRadius: 4) {
-                withAnimation {
-                    isExpanded.toggle()
-                }
-            }.rotationEffect(.degrees(isExpanded ? 0 : 180))
-
         }
-        .padding([.leading, .trailing], 12)
     }
 
 }

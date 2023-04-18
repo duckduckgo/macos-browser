@@ -79,6 +79,10 @@ extension HomePage.Models {
 
         @Published private(set) var rows: [[FavoriteModel]] = []
 
+        var isThereContent: Bool {
+            return !favorites.isEmpty
+        }
+
         let open: (Bookmark, OpenTarget) -> Void
         let removeFavorite: (Bookmark) -> Void
         let deleteBookmark: (Bookmark) -> Void

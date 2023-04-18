@@ -703,6 +703,12 @@ struct UserText {
     static let noAccessToSelectedFolder = NSLocalizedString("no.access.to.selected.folder", value: "Grant access to the location of download.", comment: "Alert presented to user if the app doesn't have rights to access selected folder")
 
     // MARK: New Tab
+    // Context Menu
+    static let newTabBottomPopoverTitle = NSLocalizedString("newTab.bottom.popover.title", value: "Home Content", comment: "Title of the popover that appears when pressing the bottom right button")
+    static let newTabMenuItemShowFavorite = NSLocalizedString("newTab.menu.item.show.favorite", value: "Show Favorites", comment: "Title of the menu item in the home page to show/hide favorite section")
+    static let newTabMenuItemShowContinuteSetUp = NSLocalizedString("newTab.menu.item.show.continue.setup", value: "Show Make DuckDuckGo Yours", comment: "Title of the menu item in the home page to show/hide continue setup section")
+    static let newTabMenuItemShowRecentActivity = NSLocalizedString("newTab.menu.item.show.recent.activity", value: "Show Recent Activity", comment: "Title of the menu item in the home page to show/hide recent activity section")
+
     // Favorites
     static let newTabFavoriteSectionTitle = NSLocalizedString("newTab.favorites.section.title", value: "Favorites", comment: "Title of the Favorites section in the home page")
 
@@ -721,5 +727,8 @@ struct UserText {
     static let newTabSetUpEmailProtectionAction = NSLocalizedString("newTab.setup.email.protection.action", value: "Enable Email Protection", comment: "Action title on the action menu of the Email Protection card of the Set Up section in the home page")
     static let newTabSetUpCoockeManagerAction = NSLocalizedString("newTab.setup.coockie.manager.action", value: "Enable Cookie Manager", comment: "Action title on the action menu of the Coockie Manager card of the Set Up section in the home page")
     static let newTabSetUpRemoveItemAction = NSLocalizedString("newTab.setup.remove.item", value: "Remove Item", comment: "Action title on the action menu of the set up cards card of the SetUp section in the home page to remove the item")
+
+    // Recent Activity
+    static let newTabRecentActivitySectionTitle = NSLocalizedString("newTab.recent.activity.section.title", value: "Recent Activity", comment: "Title of the RecentActivity section in the home page")
 }
 

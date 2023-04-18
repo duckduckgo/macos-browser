@@ -85,9 +85,13 @@ public struct UserDefaultsWrapper<T> {
         // Home Page
         case homePageShowPagesOnHover = "home.page.show.pages.on.hover"
         case homePageShowAllFavorites = "home.page.show.all.favorites"
+        case homePageShowAllFeatures = "home.page.show.all.features"
         case homePageShowPageTitles = "home.page.show.page.titles"
         case homePageShowRecentlyVisited = "home.page.show.recently.visited"
         case homePageContinueSetUpImport = "home.page.continue.set.up.import"
+        case homePageIsFavoriteVisible = "home.page.is.favorite.visible"
+        case homePageIsContinueSetupVisible = "home.page.is.continue.setup.visible"
+        case homePageIsRecentActivityVisible = "home.page.is.recent.activity.visible"
 
         case appIsRelaunchingAutomatically = "app-relaunching-automatically"
 

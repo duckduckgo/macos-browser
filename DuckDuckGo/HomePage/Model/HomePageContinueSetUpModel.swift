@@ -43,8 +43,12 @@ extension HomePage.Models {
 
         weak var delegate: ContinueSetUpVewModelDelegate?
 
-        var shouldShowAllFeatures: Bool = false {
+        @UserDefaultsWrapper(key: .homePageShowAllFeatures, defaultValue: true)
+        private static var shouldShowAllFeaturesSetting: Bool
+
+        var shouldShowAllFeatures: Bool {
             didSet {
+                Self.shouldShowAllFeaturesSetting = shouldShowAllFeatures
                 updateVisibleMatrix()
             }
         }
@@ -78,6 +82,7 @@ extension HomePage.Models {
             self.privacyPreferences = privacyPreferences
             self.cookieConsentPopoverManager = cookieConsentPopoverManager
             self.duckPlayerPreferences = duckPlayerPreferences
+            self.shouldShowAllFeatures = Self.shouldShowAllFeaturesSetting
             refreshFeaturesMatrix()
         }
 
