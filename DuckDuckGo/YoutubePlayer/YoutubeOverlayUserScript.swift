@@ -281,6 +281,10 @@ extension YoutubeOverlayUserScript {
             return
         }
 
+        if pixelName == JSPixel.playUse.rawValue || pixelName == JSPixel.playDoNotUse.rawValue {
+            duckPlayerPreferences.youtubeOverlayUserPressedButtons = true
+        }
+
         let pixelParameters = body["params"] as? [String: String]
 
         Pixel.fire(.duckPlayerJSPixel(knownPixel), withAdditionalParameters: pixelParameters)

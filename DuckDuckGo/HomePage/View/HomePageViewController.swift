@@ -123,6 +123,7 @@ final class HomePageViewController: NSViewController {
         refreshFavoritesModel()
         refreshRecentlyVisitedModel()
         refreshDefaultBrowserModel()
+        refreshContinueSetUpModel()
     }
 
     func createRecentlyVisitedModel() -> HomePage.Models.RecentlyVisitedModel {
@@ -132,7 +133,9 @@ final class HomePageViewController: NSViewController {
     }
 
     func createFeatureModel() -> HomePage.Models.ContinueSetUpModel {
-        return .init()
+        let vm = HomePage.Models.ContinueSetUpModel(defaultBrowserProvider: SystemDefaultBrowserProvider(), dataImportProvider: BookmarksAndPasswordsImportStatusProvider(), tabCollectionViewModel: tabCollectionViewModel, duckPlayerPreferences: DuckPlayerPreferencesUserDefaultsPersistor())
+        vm.delegate = self
+        return vm
     }
 
     func createDefaultBrowserModel() -> HomePage.Models.DefaultBrowserModel {
@@ -168,6 +171,10 @@ final class HomePageViewController: NSViewController {
 
     func refreshFavoritesModel() {
         favoritesModel.favorites = bookmarkManager.list?.favoriteBookmarks ?? []
+    }
+
+    func refreshContinueSetUpModel() {
+        featuresModel.refreshFeaturesMatrix()
     }
 
     func refreshRecentlyVisitedModel() {

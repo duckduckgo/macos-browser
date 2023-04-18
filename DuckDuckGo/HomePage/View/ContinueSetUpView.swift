@@ -27,7 +27,7 @@ extension HomePage.Views {
 
         @State var isHovering = false {
             didSet {
-                moreOrLessButtonVisibility = isHovering ? .visible : .invisible
+                moreOrLessButtonVisibility = isHovering && model.isMoreOrLessButtonNeeded ? .visible : .invisible
             }
         }
 
@@ -48,6 +48,7 @@ extension HomePage.Views {
             .onHover { isHovering in
                 self.isHovering = isHovering
             }
+            .visibility(model.hasContent ? .visible : .gone)
         }
 
         struct FeaturesGrid: View {

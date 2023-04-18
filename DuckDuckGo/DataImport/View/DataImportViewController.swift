@@ -23,6 +23,9 @@ import os.log
 
 final class DataImportViewController: NSViewController {
 
+    @UserDefaultsWrapper(key: .homePageContinueSetUpImport, defaultValue: nil)
+    var successfulImportHappened: Bool?
+
     enum Constants {
         static let storyboardName = "DataImport"
         static let identifier = "DataImportViewController"
@@ -377,6 +380,7 @@ final class DataImportViewController: NSViewController {
         importer.importData(types: importTypes, from: profile) { result in
             switch result {
             case .success(let summary):
+                self.successfulImportHappened = true
                 if summary.isEmpty {
                     self.dismiss()
                 } else {

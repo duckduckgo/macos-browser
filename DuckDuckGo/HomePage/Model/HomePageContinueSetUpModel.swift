@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import BrowserServicesKit
 
 extension HomePage.Models {
 
@@ -30,18 +31,54 @@ extension HomePage.Models {
         let itemsPerRow = HomePage.featuresPerRow
         let gridWidth = FeaturesGridDimensions.width
         let deleteActionTitle = UserText.newTabSetUpRemoveItemAction
+        let duckPlayerURL = URL(string: "https://www.youtube.com/watch?v=yKWIA-Pys4c")!
+
+        private let defaultBrowserProvider: DefaultBrowserProvider
+        private let dataImportProvider: DataImportStatusProviding
+        private let tabCollectionViewModel: TabCollectionViewModel
+        private let emailManager: EmailManager
+        private let privacyPreferences: PrivacySecurityPreferences
+        private let cookieConsentPopoverManager: CookieConsentPopoverManager
+        private let duckPlayerPreferences: DuckPlayerPreferencesPersistor
+
+        weak var delegate: ContinueSetUpVewModelDelegate?
 
         var shouldShowAllFeatures: Bool = false {
             didSet {
-                visibleFeaturesMatrix = shouldShowAllFeatures ? featuresMatrix : [featuresMatrix[0]]
+                updateVisibleMatrix()
             }
         }
 
-        private var featuresMatrix = FeatureType.allCases.chunked(into: HomePage.featuresPerRow)
+        var isMoreOrLessButtonNeeded: Bool {
+            return featuresMatrix.count > 1
+        }
+
+        var hasContent: Bool {
+            return !featuresMatrix.isEmpty
+        }
+
+        private var featuresMatrix: [[FeatureType]] = [[]] {
+            didSet {
+                updateVisibleMatrix()
+            }
+        }
         @Published var visibleFeaturesMatrix: [[FeatureType]] = [[]]
 
-        init() {
-            visibleFeaturesMatrix = [featuresMatrix[0]]
+        init(defaultBrowserProvider: DefaultBrowserProvider,
+             dataImportProvider: DataImportStatusProviding,
+             tabCollectionViewModel: TabCollectionViewModel,
+             emailManager: EmailManager = EmailManager(),
+             privacyPreferences: PrivacySecurityPreferences = PrivacySecurityPreferences.shared,
+             cookieConsentPopoverManager: CookieConsentPopoverManager = CookieConsentPopoverManager(),
+             duckPlayerPreferences: DuckPlayerPreferencesPersistor) {
+            self.defaultBrowserProvider = defaultBrowserProvider
+            self.dataImportProvider = dataImportProvider
+            self.tabCollectionViewModel = tabCollectionViewModel
+            self.emailManager = emailManager
+            self.privacyPreferences = privacyPreferences
+            self.cookieConsentPopoverManager = cookieConsentPopoverManager
+            self.duckPlayerPreferences = duckPlayerPreferences
+            refreshFeaturesMatrix()
         }
 
         func actionTitle(for featureType: FeatureType) -> String {
@@ -54,17 +91,79 @@ extension HomePage.Models {
                 return UserText.newTabSetUpDuckPlayerAction
             case .emailProtection:
                 return UserText.newTabSetUpEmailProtectionAction
-            case .coockiePopUp:
+            case .cookiePopUp:
                 return UserText.newTabSetUpCoockeManagerAction
             }
         }
 
         func performAction(for featureType: FeatureType) {
-
+            switch featureType {
+            case .defaultBrowser:
+                do {
+                    try defaultBrowserProvider.presentDefaultBrowserPrompt()
+                } catch {
+                    defaultBrowserProvider.openSystemPreferences()
+                }
+            case .importBookmarksAndPasswords:
+                dataImportProvider.showImportWindow(completion: refreshFeaturesMatrix)
+            case .duckplayer:
+                let tab = Tab(content: .url(duckPlayerURL), shouldLoadInBackground: true)
+                tabCollectionViewModel.append(tab: tab)
+            case .emailProtection:
+                let tab = Tab(content: .url(EmailUrls().emailProtectionLink), shouldLoadInBackground: true)
+                tabCollectionViewModel.append(tab: tab)
+            case .cookiePopUp:
+                delegate?.showCookieConsentPopUp(manager: cookieConsentPopoverManager, completion: { [weak self] result in
+                    self?.privacyPreferences.autoconsentEnabled = result
+                    self?.refreshFeaturesMatrix()
+                })
+            }
         }
 
         func removeItem() {
 
+        }
+
+        func refreshFeaturesMatrix() {
+            var features: [FeatureType] = []
+            for feature in FeatureType.allCases {
+                switch feature {
+                case .defaultBrowser:
+                    if !defaultBrowserProvider.isDefault {
+                        features.append(feature)
+                    }
+                case .importBookmarksAndPasswords:
+                    if !dataImportProvider.didImport {
+                        features.append(feature)
+                    }
+                case .duckplayer:
+                    if shouldDuckPlayerCardBeVisible {
+                        features.append(feature)
+                    }
+                case .emailProtection:
+                    if !emailManager.isSignedIn {
+                        features.append(feature)
+                    }
+                case .cookiePopUp:
+                    if privacyPreferences.autoconsentEnabled != true {
+                        features.append(feature)
+                    }
+                }
+            }
+            featuresMatrix = features.chunked(into: HomePage.featuresPerRow)
+        }
+
+        private func updateVisibleMatrix() {
+            guard !featuresMatrix.isEmpty else {
+                visibleFeaturesMatrix = [[]]
+                return
+            }
+            visibleFeaturesMatrix = shouldShowAllFeatures ? featuresMatrix : [featuresMatrix[0]]
+        }
+
+        private var shouldDuckPlayerCardBeVisible: Bool {
+            duckPlayerPreferences.duckPlayerModeBool == nil &&
+                !duckPlayerPreferences.youtubeOverlayAnyButtonPressed
         }
 
     }
@@ -74,7 +173,7 @@ extension HomePage.Models {
         case importBookmarksAndPasswords
         case duckplayer
         case emailProtection
-        case coockiePopUp
+        case cookiePopUp
 
         var title: String {
             switch self {
@@ -86,7 +185,7 @@ extension HomePage.Models {
                 return UserText.newTabSetUpDuckPlayerCardTitle
             case .emailProtection:
                 return UserText.newTabSetUpEmailProtectionCardTitle
-            case .coockiePopUp:
+            case .cookiePopUp:
                 return UserText.newTabSetUpCookieManagerCardTitle
             }
         }
@@ -102,7 +201,7 @@ extension HomePage.Models {
                 return NSImage(named: "CookieBite")!
             case .emailProtection:
                 return NSImage(named: "CookieBite")!
-            case .coockiePopUp:
+            case .cookiePopUp:
                 return NSImage(named: "CookieBite")!
             }
         }
@@ -119,5 +218,15 @@ extension HomePage.Models {
         static func height(for rowCount: Int) -> CGFloat {
             (itemHeight + verticalSpacing) * CGFloat(rowCount) - verticalSpacing
         }
+    }
+}
+
+protocol ContinueSetUpVewModelDelegate: AnyObject {
+    func showCookieConsentPopUp(manager: CookieConsentPopoverManager, completion: ((Bool) -> Void)?)
+}
+
+extension HomePageViewController: ContinueSetUpVewModelDelegate {
+    func showCookieConsentPopUp(manager: CookieConsentPopoverManager, completion: ((Bool) -> Void)?) {
+        manager.show(on: self.view, animated: true, result: completion)
     }
 }

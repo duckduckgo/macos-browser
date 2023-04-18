@@ -49,6 +49,7 @@ public struct UserDefaultsWrapper<T> {
         case autoconsentEnabled = "preferences.autoconsent-enabled"
         case duckPlayerMode = "preferences.duck-player"
         case youtubeOverlayInteracted = "preferences.youtube-overlay-interacted"
+        case youtubeOverlayButtonsUsed = "preferences.youtube-overlay-user-used-buttons"
 
         case selectedPasswordManager = "preferences.autofill.selected-password-manager"
 
@@ -81,10 +82,12 @@ public struct UserDefaultsWrapper<T> {
 
         case onboardingFinished = "onboarding.finished"
 
+        // Home Page
         case homePageShowPagesOnHover = "home.page.show.pages.on.hover"
         case homePageShowAllFavorites = "home.page.show.all.favorites"
         case homePageShowPageTitles = "home.page.show.page.titles"
         case homePageShowRecentlyVisited = "home.page.show.recently.visited"
+        case homePageContinueSetUpImport = "home.page.continue.set.up.import"
 
         case appIsRelaunchingAutomatically = "app-relaunching-automatically"
 
