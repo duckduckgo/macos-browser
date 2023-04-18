@@ -43,7 +43,7 @@ final class BookmarksAndPasswordsImportStatusProvider: DataImportStatusProviding
     // To cover as much as possible users that have imported data in the past we try some hack to detect if they have imported bookmarks or passwords
     var didImport: Bool {
         if successfulImportHappened == nil {
-            successfulImportHappened = didImportBookarks || didImportPasswords
+            successfulImportHappened = didImportBookmarks || didImportPasswords
         }
         return successfulImportHappened!
     }
@@ -53,7 +53,7 @@ final class BookmarksAndPasswordsImportStatusProvider: DataImportStatusProviding
 
     // It only cover the case in which the user has imported bookmar AFTER already having some bookmarks
     // There is no way to detect whether the user has imported bookmarks as first thing
-    private var didImportBookarks: Bool {
+    private var didImportBookmarks: Bool {
         guard let folders = bookmarkManager.list?.topLevelEntities else { return false }
         for folder in folders.reversed() where folder.title.contains(UserText.bookmarkImportedFromFolder) {
             return true
@@ -93,5 +93,5 @@ final class BookmarksAndPasswordsImportStatusProvider: DataImportStatusProviding
         }
         return false
     }
-
+    
 }
