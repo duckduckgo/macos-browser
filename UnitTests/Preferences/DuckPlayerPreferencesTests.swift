@@ -27,7 +27,7 @@ final class DuckPlayerPreferencesTests: XCTestCase {
             persistor: DuckPlayerPreferencesPersistorMock(
                 duckPlayerMode: .alwaysAsk,
                 youtubeOverlayInteracted: false,
-                youtubeOverlayUserPressedButtons: false
+                youtubeOverlayAnyButtonPressed: false
             )
         )
 
@@ -39,7 +39,7 @@ final class DuckPlayerPreferencesTests: XCTestCase {
             persistor: DuckPlayerPreferencesPersistorMock(
                 duckPlayerMode: .enabled,
                 youtubeOverlayInteracted: true,
-                youtubeOverlayUserPressedButtons: true
+                youtubeOverlayAnyButtonPressed: true
             )
         )
 
@@ -65,9 +65,9 @@ final class DuckPlayerPreferencesTests: XCTestCase {
         XCTAssertEqual(persistor.youtubeOverlayInteracted, false)
 
         model.youtubeOverlayUserPressedButtons = true
-        XCTAssertEqual(persistor.youtubeOverlayUserPressedButtons, true)
+        XCTAssertEqual(persistor.youtubeOverlayAnyButtonPressed, true)
         model.youtubeOverlayUserPressedButtons = false
-        XCTAssertEqual(persistor.youtubeOverlayUserPressedButtons, false)
+        XCTAssertEqual(persistor.youtubeOverlayAnyButtonPressed, false)
     }
 
     func testPersisterReturnsValuesFromDisk() {
@@ -79,11 +79,11 @@ final class DuckPlayerPreferencesTests: XCTestCase {
         persister1.duckPlayerModeBool = true
         persister2.youtubeOverlayInteracted = false
         persister1.youtubeOverlayInteracted = true
-        persister2.youtubeOverlayUserPressedButtons = false
-        persister1.youtubeOverlayUserPressedButtons = true
+        persister2.youtubeOverlayAnyButtonPressed = false
+        persister1.youtubeOverlayAnyButtonPressed = true
 
         XCTAssertTrue(persister2.duckPlayerModeBool!)
         XCTAssertTrue(persister2.youtubeOverlayInteracted)
-        XCTAssertTrue(persister2.youtubeOverlayUserPressedButtons)
+        XCTAssertTrue(persister2.youtubeOverlayAnyButtonPressed)
     }
 }

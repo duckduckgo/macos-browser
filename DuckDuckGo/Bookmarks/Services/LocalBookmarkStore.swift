@@ -634,7 +634,7 @@ final class LocalBookmarkStore: BookmarkStore {
         var makeFavorties = true
         if root.children?.count != 0 {
             makeFavorties = false
-            parent = BookmarkEntity.makeFolder(title: "Imported from \(importSourceName)",
+            parent = BookmarkEntity.makeFolder(title: "\(UserText.bookmarkImportedFromFolder) \(importSourceName)",
                                                parent: root,
                                                context: context)
         }

@@ -22,7 +22,7 @@ import BrowserServicesKit
 
 final class DataImportProviderTests: XCTestCase {
 
-    var provider: DataImportProvider!
+    var provider: DataImportStatusProviding!
     var vault: MockSecureVault!
     var bookmarkManager: MockBookmarkManager!
 
@@ -64,7 +64,7 @@ final class DataImportProviderTests: XCTestCase {
         bookmarkManager = MockBookmarkManager()
         bookmarkManager.list = notImportedBookmarkList
 
-        provider = StandardDataImportProvider(secureVault: vault, bookmarkManager: bookmarkManager)
+        provider = BookmarksAndPasswordsImportStatusProvider(secureVault: vault, bookmarkManager: bookmarkManager)
     }
 
     override func tearDown() {
@@ -73,44 +73,44 @@ final class DataImportProviderTests: XCTestCase {
         provider = nil
     }
 
-    func testWhenNoImportedPasswordsAndNoBookmarksDetectableAndNoSuccessImportThenHasUserUsedImportIsFalse() {
-        XCTAssertFalse(provider.hasUserUsedImport)
+    func testWhenNoImportedPasswordsAndNoBookmarksDetectableAndNoSuccessImportThenDidImportIsFalse() {
+        XCTAssertFalse(provider.didImport)
     }
 
-    func testWhenImportedAccountsDetectedAndNoImportedBookmarksDetectableAndNoSuccessImportHasUserUsedImportIsTrue() {
+    func testWhenImportedAccountsDetectedAndNoImportedBookmarksDetectableAndNoSuccessImportDidImportIsTrue() {
         vault.storedAccounts = importedAccounts
 
-        XCTAssertTrue(provider.hasUserUsedImport)
+        XCTAssertTrue(provider.didImport)
     }
 
-    func testWhenImportedNotesetectedAndNoImportedBookmarksDetectableAndNoSuccessImportHasUserUsedImportIsTrue() {
+    func testWhenImportedNotesetectedAndNoImportedBookmarksDetectableAndNoSuccessImportThenDidImportIsTrue() {
         vault.storedNotes = importedNotes
 
-        XCTAssertTrue(provider.hasUserUsedImport)
+        XCTAssertTrue(provider.didImport)
     }
 
-    func testWhenImportedIdentitiesDetectedAndNoImportedBookmarksDetectableAndNoSuccessImportHasUserUsedImportIsTrue() {
+    func testWhenImportedIdentitiesDetectedAndNoImportedBookmarksDetectableAndNoSuccessImportThenDidImportIsTrue() {
         vault.storedIdentities = importedIdentities
 
-        XCTAssertTrue(provider.hasUserUsedImport)
+        XCTAssertTrue(provider.didImport)
     }
 
-    func testWhenImportedCardsPasswordsDetectedAndNoImportedBookmarksDetectableAndNoSuccessImportHasUserUsedImportIsTrue() {
+    func testWhenImportedCardsPasswordsDetectedAndNoImportedBookmarksDetectableAndNoSuccessImportThenDidImportIsTrue() {
         vault.storedCards = importedCards
 
-        XCTAssertTrue(provider.hasUserUsedImport)
+        XCTAssertTrue(provider.didImport)
     }
 
-    func testWhenNoImportedPasswordsDetectedAndImprotedBookmarksDetectedAndNoSuccessImportThenHasUserUsedImportIsTrue() {
+    func testWhenNoImportedPasswordsDetectedAndImprotedBookmarksDetectedAndNoSuccessImportThenDidImportIsTrue() {
         bookmarkManager.list = importedBookmarkList
 
-        XCTAssertTrue(provider.hasUserUsedImport)
+        XCTAssertTrue(provider.didImport)
     }
 
-    func testWhenNoPasswordsAndNoBookmarksDetectableAndSuccessImportHasUserUsedImportIsTrue() {
+    func testWhenNoPasswordsAndNoBookmarksDetectableAndSuccessImportThenDidImportIsTrue() {
         DataImportViewController().successfulImportHappened = true
 
-        XCTAssertTrue(provider.hasUserUsedImport)
+        XCTAssertTrue(provider.didImport)
     }
 
 }

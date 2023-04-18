@@ -83,7 +83,7 @@ struct RootView: View {
             .disabled(!favoritesModel.isThereContent)
             Toggle(UserText.newTabMenuItemShowContinuteSetUp, isOn: $model.isContinueSetUpVisible)
             .toggleStyle(.checkbox)
-            .disabled(!continueSetUpModel.isThereContent)
+            .disabled(!continueSetUpModel.hasContent)
             Toggle(UserText.newTabMenuItemShowRecentActivity, isOn: $model.isRecentActivityVisible)
             .toggleStyle(.checkbox)
         }))
@@ -121,7 +121,7 @@ struct RootView: View {
                         Text(UserText.newTabSetUpSectionTitle)
                     }
                 })
-                .disabled(!continueSetUpModel.isThereContent)
+                .disabled(!continueSetUpModel.hasContent)
                 Spacer()
             }
             HStack {

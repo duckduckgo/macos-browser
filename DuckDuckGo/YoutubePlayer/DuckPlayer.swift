@@ -185,12 +185,12 @@ final class DuckPlayerPreferencesPersistorMock: DuckPlayerPreferencesPersistor {
 
     var duckPlayerModeBool: Bool?
     var youtubeOverlayInteracted: Bool
-    var youtubeOverlayUserPressedButtons: Bool
+    var youtubeOverlayAnyButtonPressed: Bool
 
-    init(duckPlayerMode: DuckPlayerMode = .alwaysAsk, youtubeOverlayInteracted: Bool = false, youtubeOverlayUserPressedButtons: Bool = false) {
+    init(duckPlayerMode: DuckPlayerMode = .alwaysAsk, youtubeOverlayInteracted: Bool = false, youtubeOverlayAnyButtonPressed: Bool = false) {
         self.duckPlayerModeBool = duckPlayerMode.boolValue
         self.youtubeOverlayInteracted = youtubeOverlayInteracted
-        self.youtubeOverlayUserPressedButtons = youtubeOverlayUserPressedButtons
+        self.youtubeOverlayAnyButtonPressed = youtubeOverlayAnyButtonPressed
     }
 }
 
