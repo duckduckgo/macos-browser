@@ -35,35 +35,18 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
 
     @objc(_webView:saveDataToFile:suggestedFilename:mimeType:originatingURL:)
     func webView(_ webView: WKWebView, saveDataToFile data: Data, suggestedFilename: String, mimeType: String, originatingURL: URL) {
-        func write(to url: URL) throws {
-            let progress = Progress(totalUnitCount: 1,
-                                    fileOperationKind: .downloading,
-                                    kind: .file,
-                                    isPausable: false,
-                                    isCancellable: false,
-                                    fileURL: url)
-            progress.publish()
-            defer {
-                progress.unpublish()
-            }
-
-            try data.write(to: url)
-            progress.completedUnitCount = progress.totalUnitCount
-        }
-
         let prefs = DownloadsPreferences()
         if !prefs.alwaysRequestDownloadLocation,
            let location = prefs.effectiveDownloadLocation {
             let url = location.appendingPathComponent(suggestedFilename)
-            try? write(to: url)
-
+            try? data.writeFileWithProgress(to: url)
             return
         }
 
         let fileTypes = UTType(mimeType: mimeType).map { [$0] } ?? []
         let dialog = UserDialogType.savePanel(.init(SavePanelParameters(suggestedFilename: suggestedFilename, fileTypes: fileTypes)) { result in
             guard let url = (try? result.get())?.url else { return }
-            try? write(to: url)
+            try? data.writeFileWithProgress(to: url)
         })
         userInteractionDialog = UserDialog(sender: .user, dialog: dialog)
     }
