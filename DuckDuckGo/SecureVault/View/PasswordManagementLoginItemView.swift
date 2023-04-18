@@ -109,8 +109,8 @@ private struct Buttons: View {
                 Button(UserText.pmSave) {
                     model.save()
                 }
-                .disabled(!model.isDirty)
                 .buttonStyle(DefaultActionButtonStyle(enabled: model.isDirty))
+                .disabled(!model.isDirty)
 
             } else {
                 Button(UserText.pmDelete) {
@@ -147,7 +147,7 @@ private struct UsernameView: View {
 
             if model.isEditing || model.isNew {
 
-                TextField("", text: $model.username)
+                 TextField("", text: $model.username)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .padding(.bottom, interItemSpacing)
 
