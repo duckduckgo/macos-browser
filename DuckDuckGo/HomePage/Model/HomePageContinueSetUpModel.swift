@@ -32,7 +32,6 @@ extension HomePage.Models {
         let deleteActionTitle = UserText.newTabSetUpRemoveItemAction
         let duckPlayerURL = URL(string: "https://www.youtube.com/watch?v=yKWIA-Pys4c")!
 
-        private var preferencesPersistor: ContinueSetUpPreferencePersisting
         private let defaultBrowserProvider: DefaultBrowserProvider
         private let dataImportProvider: DataImportStatusProviding
         private let tabCollectionViewModel: TabCollectionViewModel
@@ -44,42 +43,27 @@ extension HomePage.Models {
 
         weak var delegate: ContinueSetUpVewModelDelegate?
 
+        @UserDefaultsWrapper(key: .homePageShowAllFeatures, defaultValue: true)
         var shouldShowAllFeatures: Bool {
             didSet {
-                preferencesPersistor.shouldShowAllFeaturesSetting = shouldShowAllFeatures
                 updateVisibleMatrix()
             }
         }
 
-        var shouldShowMakeDefaultSetting: Bool {
-            didSet {
-                preferencesPersistor.shouldShowMakeDefaultSetting = shouldShowMakeDefaultSetting
-            }
-        }
+        @UserDefaultsWrapper(key: .homePageShowMakeDefault, defaultValue: true)
+        private var shouldShowMakeDefaultSetting: Bool
 
-        var shouldShowImportSetting: Bool {
-            didSet {
-                preferencesPersistor.shouldShowImportSetting = shouldShowImportSetting
-            }
-        }
+        @UserDefaultsWrapper(key: .homePageShowImport, defaultValue: true)
+        private var shouldShowImportSetting: Bool
 
-        var shouldShowDuckPlayerSetting: Bool {
-            didSet {
-                preferencesPersistor.shouldShowDuckPlayerSetting = shouldShowDuckPlayerSetting
-            }
-        }
+        @UserDefaultsWrapper(key: .homePageShowDuckPlayer, defaultValue: true)
+        private var shouldShowDuckPlayerSetting: Bool
 
-        var shouldShowEmailProtectionSetting: Bool {
-            didSet {
-                preferencesPersistor.shouldShowEmailProtectionSetting = shouldShowEmailProtectionSetting
-            }
-        }
+        @UserDefaultsWrapper(key: .homePageShowEmailProtection, defaultValue: true)
+        private var shouldShowEmailProtectionSetting: Bool
 
-        var shouldShowCookieSetting: Bool {
-            didSet {
-                preferencesPersistor.shouldShowCookieSetting = shouldShowCookieSetting
-            }
-        }
+        @UserDefaultsWrapper(key: .homePageShowCookie, defaultValue: true)
+        private var shouldShowCookieSetting: Bool
 
         var isMoreOrLessButtonNeeded: Bool {
             return featuresMatrix.count > 1
@@ -120,8 +104,7 @@ extension HomePage.Models {
              emailManager: EmailManager = EmailManager(),
              privacyPreferences: PrivacySecurityPreferences = PrivacySecurityPreferences.shared,
              cookieConsentPopoverManager: CookieConsentPopoverManager = CookieConsentPopoverManager(),
-             duckPlayerPreferences: DuckPlayerPreferencesPersistor,
-             preferencesPersistor: ContinueSetUpPreferencePersisting = ContinueSetUpPreferenceUserDefaultsPersistor()) {
+             duckPlayerPreferences: DuckPlayerPreferencesPersistor) {
             self.defaultBrowserProvider = defaultBrowserProvider
             self.dataImportProvider = dataImportProvider
             self.tabCollectionViewModel = tabCollectionViewModel
@@ -129,13 +112,6 @@ extension HomePage.Models {
             self.privacyPreferences = privacyPreferences
             self.cookieConsentPopoverManager = cookieConsentPopoverManager
             self.duckPlayerPreferences = duckPlayerPreferences
-            self.preferencesPersistor = preferencesPersistor
-            self.shouldShowAllFeatures = preferencesPersistor.shouldShowAllFeaturesSetting
-            self.shouldShowMakeDefaultSetting = preferencesPersistor.shouldShowMakeDefaultSetting
-            self.shouldShowImportSetting = preferencesPersistor.shouldShowImportSetting
-            self.shouldShowDuckPlayerSetting = preferencesPersistor.shouldShowDuckPlayerSetting
-            self.shouldShowEmailProtectionSetting = preferencesPersistor.shouldShowEmailProtectionSetting
-            self.shouldShowCookieSetting = preferencesPersistor.shouldShowCookieSetting
             refreshFeaturesMatrix()
         }
 
@@ -322,7 +298,6 @@ extension HomePage.Models {
     }
 }
 
-
 // MARK: ContinueSetUpVewModelDelegate
 protocol ContinueSetUpVewModelDelegate: AnyObject {
     func showCookieConsentPopUp(manager: CookieConsentPopoverManager, completion: ((Bool) -> Void)?)
@@ -332,34 +307,4 @@ extension HomePageViewController: ContinueSetUpVewModelDelegate {
     func showCookieConsentPopUp(manager: CookieConsentPopoverManager, completion: ((Bool) -> Void)?) {
         manager.show(on: self.view, animated: true, type: .setUp, result: completion)
     }
-}
-
-// MARK: ContinueSetUpPreferencePersistor
-protocol ContinueSetUpPreferencePersisting {
-    var shouldShowAllFeaturesSetting: Bool { get set }
-    var shouldShowMakeDefaultSetting: Bool { get set }
-    var shouldShowImportSetting: Bool { get set }
-    var shouldShowDuckPlayerSetting: Bool { get set }
-    var shouldShowEmailProtectionSetting: Bool { get set }
-    var shouldShowCookieSetting: Bool { get set }
-}
-
-final class ContinueSetUpPreferenceUserDefaultsPersistor: ContinueSetUpPreferencePersisting {
-    @UserDefaultsWrapper(key: .homePageShowAllFeatures, defaultValue: true)
-    var shouldShowAllFeaturesSetting: Bool
-
-    @UserDefaultsWrapper(key: .homePageShowMakeDefault, defaultValue: true)
-    var shouldShowMakeDefaultSetting: Bool
-
-    @UserDefaultsWrapper(key: .homePageShowImport, defaultValue: true)
-    var shouldShowImportSetting: Bool
-
-    @UserDefaultsWrapper(key: .homePageShowDuckPlayer, defaultValue: true)
-    var shouldShowDuckPlayerSetting: Bool
-
-    @UserDefaultsWrapper(key: .homePageShowEmailProtection, defaultValue: true)
-    var shouldShowEmailProtectionSetting: Bool
-
-    @UserDefaultsWrapper(key: .homePageShowCookie, defaultValue: true)
-    var shouldShowCookieSetting: Bool
 }

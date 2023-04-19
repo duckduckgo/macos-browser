@@ -22,73 +22,105 @@ import SwiftUIExtensions
 
 extension HomePage.Views {
 
-struct RootView: View {
+    struct RootView: View {
 
-    let backgroundColor = Color("NewTabPageBackgroundColor")
-    let targetWidth: CGFloat = 482
+        let backgroundColor = Color("NewTabPageBackgroundColor")
+        let targetWidth: CGFloat = 482
 
-    @EnvironmentObject var model: HomePage.Models.HomePageRootViewModel
-    @EnvironmentObject var continueSetUpModel: HomePage.Models.ContinueSetUpModel
-    @EnvironmentObject var favoritesModel: HomePage.Models.FavoritesModel
+        @EnvironmentObject var model: HomePage.Models.HomePageRootViewModel
+        @EnvironmentObject var continueSetUpModel: HomePage.Models.ContinueSetUpModel
+        @EnvironmentObject var favoritesModel: HomePage.Models.FavoritesModel
 
-    @State private var isVisible = false
+        @State private var isHomeContentPopoverVisible = false
 
-    var body: some View {
-        ZStack(alignment: .top) {
+        var body: some View {
+            ZStack(alignment: .top) {
 
-            ScrollView {
-                VStack(spacing: 0) {
-                    Group {
-                        DefaultBrowserPrompt()
+                ScrollView {
+                    VStack(spacing: 0) {
+                        Group {
+                            DefaultBrowserPrompt()
 
-                        Favorites()
-                            .padding(.top, 72)
-                            .visibility(model.isFavouriteVisible ? .visible : .gone)
+                            Favorites()
+                                .padding(.top, 72)
+                                .visibility(model.isFavouriteVisible ? .visible : .gone)
 
-                        ContinueSetUpView()
-                            .padding(.top, 72)
-                            .visibility(model.isContinueSetUpVisible ? .visible : .gone)
+                            ContinueSetUpView()
+                                .padding(.top, 72)
+                                .visibility(model.isContinueSetUpVisible ? .visible : .gone)
 
-                        RecentlyVisited()
-                            .padding(.top, 66)
-                            .padding(.bottom, 16)
-                            .visibility(model.isRecentActivityVisible ? .visible : .gone)
+                            RecentlyVisited()
+                                .padding(.top, 66)
+                                .padding(.bottom, 16)
+                                .visibility(model.isRecentActivityVisible ? .visible : .gone)
 
+                        }
+                        .frame(width: 508)
                     }
-                    .frame(width: 508)
+                    .frame(maxWidth: .infinity)
                 }
-                .frame(maxWidth: .infinity)
-            }
-            VStack {
-                Spacer()
-                HStack {
+                VStack {
                     Spacer()
-                    IconButton(icon: NSImage(named: "OptionsMainView")!) {
-                        isVisible.toggle()
-                    }
-                    .padding()
-                    .popover(isPresented: $isVisible, content: {
-                        HomeContentPopoverView()
+                    HStack {
+                        Spacer()
+                        HomeContentButtonView(isHomeContentPopoverVisible: $isHomeContentPopoverVisible)
                             .padding()
-                    })
+                            .popover(isPresented: $isHomeContentPopoverVisible, content: {
+                                HomeContentPopoverView()
+                                    .padding()
+                            })
+                    }
                 }
+
+            }
+            .frame(maxWidth: .infinity)
+            .background(backgroundColor)
+            .contextMenu(ContextMenu(menuItems: {
+                Toggle(UserText.newTabMenuItemShowFavorite, isOn: $model.isFavouriteVisible)
+                    .toggleStyle(.checkbox)
+                    .disabled(!favoritesModel.hasContent)
+                Toggle(UserText.newTabMenuItemShowContinuteSetUp, isOn: $model.isContinueSetUpVisible)
+                    .toggleStyle(.checkbox)
+                    .disabled(!continueSetUpModel.hasContent)
+                Toggle(UserText.newTabMenuItemShowRecentActivity, isOn: $model.isRecentActivityVisible)
+                    .toggleStyle(.checkbox)
+            }))
+        }
+
+        struct HomeContentButtonView: View {
+            let defaultColor: Color = Color("NewTabPageBackgroundColor")
+            let onHoverColor: Color = Color("HomeFavoritesBackgroundColor")
+            let onSelectedColor: Color = Color("HomeFavoritesHoverColor")
+
+            @State var isHovering: Bool = false
+            @Binding var isHomeContentPopoverVisible: Bool
+
+            private var buttonBackgroundColor: Color {
+                if isHomeContentPopoverVisible {
+                    return onSelectedColor
+                }
+                if isHovering {
+                    return onHoverColor
+                }
+                return defaultColor
             }
 
+            var body: some View {
+                ZStack {
+                    Rectangle()
+                        .fill(buttonBackgroundColor)
+                        .frame(width: 28, height: 28, alignment: .bottomTrailing)
+                        .cornerRadius(3)
+                    IconButton(icon: NSImage(named: "OptionsMainView")!) {
+                        isHomeContentPopoverVisible.toggle()
+                    }
+                    .onHover { isHovering in
+                        self.isHovering = isHovering
+                    }
+                }
+            }
         }
-        .frame(maxWidth: .infinity)
-        .background(backgroundColor)
-        .contextMenu(ContextMenu(menuItems: {
-            Toggle(UserText.newTabMenuItemShowFavorite, isOn: $model.isFavouriteVisible)
-            .toggleStyle(.checkbox)
-            .disabled(!favoritesModel.hasContent)
-            Toggle(UserText.newTabMenuItemShowContinuteSetUp, isOn: $model.isContinueSetUpVisible)
-            .toggleStyle(.checkbox)
-            .disabled(!continueSetUpModel.hasContent)
-            Toggle(UserText.newTabMenuItemShowRecentActivity, isOn: $model.isRecentActivityVisible)
-            .toggleStyle(.checkbox)
-        }))
-     }
-}
+    }
 
     struct HomeContentPopoverView: View {
         @EnvironmentObject var model: HomePage.Models.HomePageRootViewModel

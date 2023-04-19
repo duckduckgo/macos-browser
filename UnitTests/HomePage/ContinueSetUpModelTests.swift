@@ -85,12 +85,10 @@ final class ContinueSetUpModelTests: XCTestCase {
         XCTAssertFalse(vm.isMoreOrLessButtonNeeded)
     }
 
-    func testWhenInitialisedTheMatrixHasOnlyThreeElementsInOneRow() {
+    func testWhenInitialisedTheMatrixHasAllElements() {
         let expectedMatrix = HomePage.Models.FeatureType.allCases.chunked(into: HomePage.featuresPerRow)
 
-        XCTAssertEqual(vm.visibleFeaturesMatrix.count, 1)
-        XCTAssertTrue(vm.visibleFeaturesMatrix[0].count <= HomePage.featuresPerRow)
-        XCTAssertEqual(vm.visibleFeaturesMatrix, [expectedMatrix[0]])
+        XCTAssertEqual(vm.visibleFeaturesMatrix, expectedMatrix)
     }
 
     func testWhenTogglingShowAllFeatureTheCorrectElementsAreVisible() {
@@ -306,6 +304,54 @@ final class ContinueSetUpModelTests: XCTestCase {
         vm = HomePage.Models.ContinueSetUpModel(defaultBrowserProvider: capturingDefaultBrowserProvider, dataImportProvider: capturingDataImportProvider, tabCollectionViewModel: tabCollectionVM, emailManager: emailManager, privacyPreferences: privacyPreferences, duckPlayerPreferences: duckPlayerPreferences)
 
         XCTAssertEqual(vm.visibleFeaturesMatrix, [[]])
+    }
+
+    func testDismissedItemsAreRemovedFromVisibleMatrixAndChoicesArePersisted() {
+        XCTAssertEqual(HomePage.Models.FeatureType.allCases.chunked(into: HomePage.featuresPerRow), vm.visibleFeaturesMatrix)
+
+        vm.removeItem(for: .defaultBrowser)
+        XCTAssertFalse(vm.visibleFeaturesMatrix.flatMap { $0 }.contains(.defaultBrowser))
+
+        vm.removeItem(for: .importBookmarksAndPasswords)
+        XCTAssertFalse(vm.visibleFeaturesMatrix.flatMap { $0 }.contains(.importBookmarksAndPasswords))
+
+        vm.removeItem(for: .duckplayer)
+        XCTAssertFalse(vm.visibleFeaturesMatrix.flatMap { $0 }.contains(.duckplayer))
+
+        vm.removeItem(for: .emailProtection)
+        XCTAssertFalse(vm.visibleFeaturesMatrix.flatMap { $0 }.contains(.emailProtection))
+
+        vm.removeItem(for: .cookiePopUp)
+        XCTAssertFalse(vm.visibleFeaturesMatrix.flatMap { $0 }.contains(.cookiePopUp))
+
+        let vm2 = HomePage.Models.ContinueSetUpModel.fixture()
+        XCTAssertTrue(vm2.visibleFeaturesMatrix.flatMap { $0 }.isEmpty)
+    }
+
+    func testShowAllFeatureUserPreferencesIsPersisted() {
+        let vm2 = HomePage.Models.ContinueSetUpModel.fixture()
+        vm2.shouldShowAllFeatures = true
+        vm.shouldShowAllFeatures = false
+
+        XCTAssertFalse(vm2.shouldShowAllFeatures)
+    }
+
+    func testAsDefaultRemoveItemButtonVisibleIsNotVisible() {
+        XCTAssertFalse(vm.isRemoveItemButtonVisible)
+    }
+
+    func testOnShortHoverRemoveItemButtonVisibleIsNotVisible() {
+        vm.isHoveringOverItem = true
+        XCTAssertFalse(vm.isRemoveItemButtonVisible)
+    }
+
+    func testOnLongHoverRemoveItemButtonVisibleIsVisible() {
+        let predicate = NSPredicate(block: { _, _ -> Bool in
+            return self.vm.isRemoveItemButtonVisible == true
+        })
+        let isRemoveItemButtonVisibleExpectation = XCTNSPredicateExpectation(predicate: predicate, object: vm)
+        vm.isHoveringOverItem = true
+        wait(for: [isRemoveItemButtonVisibleExpectation], timeout: 1.1)
     }
 
     private func expectedFeatureMatrixWithout(type: HomePage.Models.FeatureType) -> [[HomePage.Models.FeatureType]] {

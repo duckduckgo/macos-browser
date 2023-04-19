@@ -632,10 +632,12 @@ extension MainViewController {
         for noteID in notes.compactMap(\.id) {
             try? vault?.deleteNoteFor(noteId: noteID)
         }
+        UserDefaults.standard.set(false, forKey: "home.page.continue.set.up.import")
     }
 
     @IBAction func resetBookmarks(_ sender: Any?) {
         LocalBookmarkManager.shared.resetBookmarks()
+        UserDefaults.standard.set(false, forKey: "home.page.continue.set.up.import")
     }
 
     @IBAction func resetPinnedTabs(_ sender: Any?) {
@@ -646,7 +648,17 @@ extension MainViewController {
     }
 
     @IBAction func resetDuckPlayerOverlayInteractions(_ sender: Any?) {
+        DuckPlayerPreferences.shared.youtubeOverlayAnyButtonPressed = false
         DuckPlayerPreferences.shared.youtubeOverlayInteracted = false
+    }
+
+    @IBAction func resetMakeDuckDuckGoYoursUserSettings(_ sender: Any?) {
+//        let model = HomePage.Models.ContinueSetUpModel(defaultBrowserProvider: SystemDefaultBrowserProvider(), dataImportProvider: BookmarksAndPasswordsImportStatusProvider(), tabCollectionViewModel: TabCollectionViewModel(), duckPlayerPreferences: DuckPlayerPreferencesUserDefaultsPersistor())
+//        model.shouldShowCookieSetting = true
+//        model.shouldShowMakeDefaultSetting = true
+//        model.shouldShowImportSetting = true
+//        model.shouldShowDuckPlayerSetting = true
+//        model.shouldShowEmailProtectionSetting = true
     }
 
     @IBAction func showSaveCredentialsPopover(_ sender: Any?) {

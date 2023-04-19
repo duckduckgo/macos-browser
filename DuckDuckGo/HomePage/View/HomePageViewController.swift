@@ -66,7 +66,7 @@ final class HomePageViewController: NSViewController {
         defaultBrowserModel = createDefaultBrowserModel()
         recentlyVisitedModel = createRecentlyVisitedModel()
         featuresModel = createFeatureModel()
-        homePageRootViewModel = HomePage.Models.HomePageRootViewModel(continueSetUpModel: featuresModel, favoritesModel: favoritesModel)
+        homePageRootViewModel = HomePage.Models.HomePageRootViewModel()
 
         refreshModels()
 

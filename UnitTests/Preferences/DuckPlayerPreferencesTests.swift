@@ -33,7 +33,7 @@ final class DuckPlayerPreferencesTests: XCTestCase {
 
         XCTAssertEqual(model.duckPlayerMode, .alwaysAsk)
         XCTAssertEqual(model.youtubeOverlayInteracted, false)
-        XCTAssertEqual(model.youtubeOverlayUserPressedButtons, false)
+        XCTAssertEqual(model.youtubeOverlayAnyButtonPressed, false)
 
         model = DuckPlayerPreferences(
             persistor: DuckPlayerPreferencesPersistorMock(
@@ -45,7 +45,7 @@ final class DuckPlayerPreferencesTests: XCTestCase {
 
         XCTAssertEqual(model.duckPlayerMode, .enabled)
         XCTAssertEqual(model.youtubeOverlayInteracted, true)
-        XCTAssertEqual(model.youtubeOverlayUserPressedButtons, true)
+        XCTAssertEqual(model.youtubeOverlayAnyButtonPressed, true)
     }
 
     func testWhenPropertiesAreUpdatedThenPersistedValuesAreUpdated() throws {
@@ -64,9 +64,9 @@ final class DuckPlayerPreferencesTests: XCTestCase {
         model.youtubeOverlayInteracted = false
         XCTAssertEqual(persistor.youtubeOverlayInteracted, false)
 
-        model.youtubeOverlayUserPressedButtons = true
+        model.youtubeOverlayAnyButtonPressed = true
         XCTAssertEqual(persistor.youtubeOverlayAnyButtonPressed, true)
-        model.youtubeOverlayUserPressedButtons = false
+        model.youtubeOverlayAnyButtonPressed = false
         XCTAssertEqual(persistor.youtubeOverlayAnyButtonPressed, false)
     }
 

@@ -112,11 +112,17 @@ extension HomePage.Views {
                         .onHover { isHovering in
                             self.isHovering = isHovering
                         }
-                    RemoveIemButton(icon: NSImage(named: "Close")!) {
-                        model.removeItem(for: featureType)
+                    HStack {
+                        VStack {
+                            RemoveIemButton(icon: NSImage(named: "Close")!) {
+                                model.removeItem(for: featureType)
+                            }
+                            .visibility(model.isRemoveItemButtonVisible && isHovering ? .visible : .gone)
+                            .padding(-5)
+                            Spacer()
+                        }
+                        Spacer()
                     }
-                    .visibility(model.isRemoveItemButtonVisible && isHovering ? .visible : .gone)
-                    .padding(-5)
                 }
             }
         }
@@ -126,32 +132,14 @@ extension HomePage.Views {
             let action: () -> Void
 
             var body: some View {
-                Circle()
-                    .size(width: 16, height: 16)
-                    .fill(.white)
-                    .shadow(color: .gray, radius: 1, x: 0, y: 0)
-                VStack {
-                    HStack {
-                        IconButton(icon: icon, action: action)
-                        Spacer()
-                    }
-                    Spacer()
+                ZStack {
+                    Circle()
+                        .fill(.white)
+                        .frame(width: 22, height: 22)
+                        .shadow(color: .gray, radius: 1, x: 0, y: 0)
+                    IconButton(icon: icon, action: action)
                 }
-
             }
-        }
-
-        struct CircleImage: View {
-             var body: some View {
-                 // Change to your image name under Assets.xcassets
-                 Image("Close")
-                     .resizable()
-                     .clipShape(Circle())
-                     .overlay(Circle().stroke(Color.orange, lineWidth: 10))
-                     .scaledToFit()
-                     .padding()
-                     .shadow(color: .black, radius: 10, x: 0, y: 0)
-             }
         }
     }
 }

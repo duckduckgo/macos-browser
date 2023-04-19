@@ -726,6 +726,12 @@ CQ
                                                             <action selector="resetDuckPlayerOverlayInteractions:" target="Ady-hI-5gd" id="Tr1-yK-ayF"/>
                                                         </connections>
                                                     </menuItem>
+                                                    <menuItem title="Reset MakeDuckDuckYours user settings" id="mrM-bs-hSC">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="resetMakeDuckDuckGoYoursUserSettings:" target="Ady-hI-5gd" id="maa-qG-0Bx"/>
+                                                        </connections>
+                                                    </menuItem>
                                                 </items>
                                             </menu>
                                         </menuItem>
@@ -850,7 +856,7 @@ CQ
                     </items>
                 </menu>
             </objects>
-            <point key="canvasLocation" x="-215" y="-265"/>
+            <point key="canvasLocation" x="-222" y="-258"/>
         </scene>
     </scenes>
     <resources>

@@ -87,7 +87,7 @@ struct CookieConsentUserPermissionView<AnimationModel>: View where AnimationMode
             Button {
                 result(true)
             } label: {
-                Text(type == .site ? UserText.autoconsentModalConfirmButton : UserText.clear)
+                Text(type == .site ? UserText.autoconsentModalConfirmButton : UserText.autoconsentFromSetUpModalConfirmButton)
             }
             .buttonStyle(PrimaryCTAStyle())
         }

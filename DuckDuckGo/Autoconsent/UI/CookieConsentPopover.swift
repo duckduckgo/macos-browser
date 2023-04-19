@@ -40,7 +40,7 @@ public final class CookieConsentPopover {
         viewController = storyboard.instantiateController(identifier: "CookieConsentUserPermissionViewController")
         windowController = storyboard.instantiateController(identifier: "CookieConsentWindowController")
         viewController.delegate = self
-        
+
         windowController.contentViewController = viewController
         windowController.window?.acceptsMouseMovedEvents = true
         windowController.window?.ignoresMouseEvents = false
