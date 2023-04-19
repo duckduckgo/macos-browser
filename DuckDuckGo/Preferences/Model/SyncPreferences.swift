@@ -192,6 +192,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
             do {
                 let device = deviceInfo()
                 try await syncService.createAccount(deviceName: device.name, deviceType: device.type)
+                confirmSetupComplete()
             } catch {
                 managementDialogModel.errorMessage = String(describing: error)
             }
