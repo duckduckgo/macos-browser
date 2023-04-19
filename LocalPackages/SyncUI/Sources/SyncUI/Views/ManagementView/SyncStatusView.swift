@@ -28,7 +28,7 @@ struct SyncStatusView<ViewModel>: View where ViewModel: ManagementViewModel {
             Text(UserText.syncConnected)
         } rightContent: {
             Button(UserText.turnOffSync) {
-                model.turnOffSync()
+                model.presentTurnOffSyncConfirmDialog()
             }
         }
         .roundedBorder()

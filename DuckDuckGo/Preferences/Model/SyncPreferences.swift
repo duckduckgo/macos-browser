@@ -65,10 +65,16 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         presentDialog(for: .recoverAccount)
     }
 
+    @MainActor
+    func presentTurnOffSyncConfirmDialog() {
+        presentDialog(for: .turnOffSync)
+    }
+
     func turnOffSync() {
         Task { @MainActor in
             do {
                 try await syncService.disconnect()
+                managementDialogModel.endFlow()
             } catch {
                 errorMessage = String(describing: error)
             }
