@@ -18,7 +18,7 @@
 
 import Cocoa
 import Combine
-import os.log
+import Common
 import BrowserServicesKit
 import Persistence
 import Configuration
@@ -27,6 +27,7 @@ import Bookmarks
 import DDGSync
 
 @NSApplicationMain
+@MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDelegate {
 
 #if DEBUG

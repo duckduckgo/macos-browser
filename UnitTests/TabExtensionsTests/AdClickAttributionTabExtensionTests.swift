@@ -28,6 +28,7 @@ import XCTest
 // swiftlint:disable opening_brace
 
 @available(macOS 12.0, *)
+@MainActor
 class AdClickAttributionTabExtensionTests: XCTestCase {
     struct URLs {
         let url1 = URL(string: "https://my-host.com/")!

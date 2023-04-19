@@ -19,7 +19,7 @@
 import Cocoa
 import CoreData
 import Combine
-import os.log
+import Common
 
 protocol FaviconStoring {
 

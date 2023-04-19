@@ -22,6 +22,7 @@ import BrowserServicesKit
 
 extension WKWebViewConfiguration {
 
+    @MainActor
     func applyStandardConfiguration(contentBlocking: some ContentBlockingProtocol) {
 
         allowsAirPlayForMediaPlayback = true

@@ -19,7 +19,6 @@
 import Foundation
 import AppKit
 import Combine
-import os.log
 
 final class BookmarksBarViewController: NSViewController {
 

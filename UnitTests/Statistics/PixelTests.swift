@@ -39,6 +39,7 @@ class PixelTests: XCTestCase {
     }
 
     // Temporarily disabled, as this test gets caught in the Run Loop extension:
+    @MainActor
     func testWhenTimedPixelFiredThenCorrectDurationIsSet() {
         let expectation = XCTestExpectation()
 

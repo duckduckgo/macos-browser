@@ -24,9 +24,11 @@ import Configuration
 extension Pixel {
 
     enum Event {
-        case burn(repetition: Repetition = .init(key: "fire"),
-                  burnedTabs: BurnedTabs = .init(),
-                  burnedWindows: BurnedWindows = .init())
+        case burn(repetition: Repetition, burnedTabs: BurnedTabs, burnedWindows: BurnedWindows)
+        @MainActor
+        static func burn(repetition: Repetition = .init(key: "fire")) -> Event {
+            .burn(repetition: repetition, burnedTabs: .init(), burnedWindows: .init())
+        }
 
         case crash
 

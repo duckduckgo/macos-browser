@@ -22,7 +22,6 @@ import Common
 import ContentBlocking
 import Foundation
 import Navigation
-import os.log
 import PrivacyDashboard
 import TrackerRadarKit
 import WebKit

@@ -17,7 +17,7 @@
 //
 
 import Cocoa
-import os.log
+import Common
 import WebKit
 import BrowserServicesKit
 
@@ -37,6 +37,7 @@ protocol OptionsButtonMenuDelegate: AnyObject {
 
 }
 
+@MainActor
 final class MoreOptionsMenu: NSMenu {
 
     weak var actionDelegate: OptionsButtonMenuDelegate?
@@ -250,6 +251,7 @@ final class MoreOptionsMenu: NSMenu {
 
 }
 
+@MainActor
 final class EmailOptionsButtonSubMenu: NSMenu {
 
     private let tabCollectionViewModel: TabCollectionViewModel
@@ -370,6 +372,7 @@ final class ZoomSubMenu: NSMenu {
     }
 }
 
+@MainActor
 final class BookmarksSubMenu: NSMenu {
 
     init(targetting target: AnyObject, tabCollectionViewModel: TabCollectionViewModel) {

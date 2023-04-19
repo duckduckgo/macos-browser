@@ -16,10 +16,10 @@
 //  limitations under the License.
 //
 
-import Cocoa
-import os.log
-import Combine
 import Bookmarks
+import Cocoa
+import Combine
+import Common
 
 protocol BookmarkManager: AnyObject {
 

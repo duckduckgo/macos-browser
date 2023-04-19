@@ -18,8 +18,8 @@
 
 import Foundation
 import Combine
-import os.log
 
+@MainActor
 protocol RecentlyClosedCoordinating: AnyObject {
 
     var cache: [RecentlyClosedCacheItem] { get }
@@ -29,6 +29,7 @@ protocol RecentlyClosedCoordinating: AnyObject {
 
 }
 
+@MainActor
 final class RecentlyClosedCoordinator: RecentlyClosedCoordinating {
 
     static let shared = RecentlyClosedCoordinator(windowControllerManager: WindowControllersManager.shared)

@@ -20,11 +20,13 @@ import SwiftUI
 
 struct EnterCodeView: View {
 
+    @EnvironmentObject var model: ManagementDialogModel
+    @EnvironmentObject var recoveryCodeModel: RecoveryCodeViewModel
+
     let instructions: String
     let buttonCaption: String
 
-    @EnvironmentObject var model: ManagementDialogModel
-    @EnvironmentObject var recoveryCodeModel: RecoveryCodeViewModel
+    let submitRecoveryCode: () -> Void
 
     var body: some View {
         VStack(spacing: 20) {
@@ -37,12 +39,9 @@ struct EnterCodeView: View {
                 .roundedBorder()
                 .frame(maxWidth: 244)
 
-            // This feels like business logic - should the models just talk directly to each other?
             Button {
                 recoveryCodeModel.paste()
-                if !recoveryCodeModel.recoveryCode.isEmpty {
-                    model.delegate?.recoverDevice(using: recoveryCodeModel.recoveryCode)
-                }
+                submitRecoveryCode()
             } label: {
                 HStack {
                     Image("Paste")

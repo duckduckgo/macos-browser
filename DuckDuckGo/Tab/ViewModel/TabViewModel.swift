@@ -18,7 +18,6 @@
 
 import Cocoa
 import Combine
-import os.log
 import BrowserServicesKit
 
 final class TabViewModel {

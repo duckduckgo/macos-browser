@@ -16,11 +16,11 @@
 //  limitations under the License.
 //
 
+import Common
 import Foundation
 import CoreData
 import Bookmarks
 import Cocoa
-import os.log
 
 // swiftlint:disable:next type_body_length
 final class LocalBookmarkStore: BookmarkStore {

@@ -20,6 +20,7 @@ import XCTest
 import Combine
 @testable import DuckDuckGo_Privacy_Browser
 
+@MainActor
 final class DeallocationTests: XCTestCase {
     var cancellables = Set<AnyCancellable>()
 

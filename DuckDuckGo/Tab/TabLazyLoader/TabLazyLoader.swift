@@ -18,7 +18,7 @@
 
 import Foundation
 import Combine
-import os
+import Common
 
 final class TabLazyLoader<DataSource: TabLazyLoaderDataSource> {
 
@@ -254,8 +254,8 @@ final class TabLazyLoader<DataSource: TabLazyLoaderDataSource> {
         subscribeToTabLoadingFinished(tab)
         idsOfTabsSelectedOrReloadedInThisSession.insert(tab.id)
 
-        if let selectedTabWebViewFrame = dataSource.selectedTab?.webViewFrame {
-            tab.webViewFrame = selectedTabWebViewFrame
+        if let selectedTabWebViewSize = dataSource.selectedTab?.webViewSize {
+            tab.webViewSize = selectedTabWebViewSize
         }
 
         tab.isLazyLoadingInProgress = true

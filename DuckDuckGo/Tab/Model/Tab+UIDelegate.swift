@@ -35,35 +35,18 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
 
     @objc(_webView:saveDataToFile:suggestedFilename:mimeType:originatingURL:)
     func webView(_ webView: WKWebView, saveDataToFile data: Data, suggestedFilename: String, mimeType: String, originatingURL: URL) {
-        func write(to url: URL) throws {
-            let progress = Progress(totalUnitCount: 1,
-                                    fileOperationKind: .downloading,
-                                    kind: .file,
-                                    isPausable: false,
-                                    isCancellable: false,
-                                    fileURL: url)
-            progress.publish()
-            defer {
-                progress.unpublish()
-            }
-
-            try data.write(to: url)
-            progress.completedUnitCount = progress.totalUnitCount
-        }
-
         let prefs = DownloadsPreferences()
         if !prefs.alwaysRequestDownloadLocation,
            let location = prefs.effectiveDownloadLocation {
             let url = location.appendingPathComponent(suggestedFilename)
-            try? write(to: url)
-
+            try? data.writeFileWithProgress(to: url)
             return
         }
 
         let fileTypes = UTType(mimeType: mimeType).map { [$0] } ?? []
         let dialog = UserDialogType.savePanel(.init(SavePanelParameters(suggestedFilename: suggestedFilename, fileTypes: fileTypes)) { result in
             guard let url = (try? result.get())?.url else { return }
-            try? write(to: url)
+            try? data.writeFileWithProgress(to: url)
         })
         userInteractionDialog = UserDialog(sender: .user, dialog: dialog)
     }
@@ -87,6 +70,7 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
         return synchronousResultWebView
     }
 
+    @MainActor
     private func handleCreateWebViewRequest(from webView: WKWebView,
                                             with configuration: WKWebViewConfiguration,
                                             for navigationAction: WKNavigationAction,
@@ -156,10 +140,11 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
     }
 
     /// create a new Tab returning its WebView to a createWebViewWithConfiguration callback
+    @MainActor
     private func createWebView(from webView: WKWebView, with configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, of kind: NewWindowPolicy) -> WKWebView? {
         guard let delegate else { return nil }
 
-        let tab = Tab(content: .none, webViewConfiguration: configuration, parentTab: self, canBeClosedWithBack: kind.isSelectedTab, webViewFrame: webView.superview?.bounds ?? .zero)
+        let tab = Tab(content: .none, webViewConfiguration: configuration, parentTab: self, canBeClosedWithBack: kind.isSelectedTab, webViewSize: webView.superview?.bounds.size ?? .zero)
         delegate.tab(self, createdChild: tab, of: kind)
 
         let webView = tab.webView
