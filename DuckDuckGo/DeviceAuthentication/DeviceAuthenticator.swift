@@ -18,7 +18,7 @@
 
 import Foundation
 import LocalAuthentication
-import os.log
+import Common
 
 extension NSNotification.Name {
 

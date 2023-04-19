@@ -18,10 +18,10 @@
 
 import BrowserServicesKit
 import Combine
+import Common
 import ContentBlocking
 import Foundation
 import Navigation
-import os.log
 
 struct DetectedTracker {
     enum TrackerType {

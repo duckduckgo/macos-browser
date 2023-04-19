@@ -53,7 +53,7 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
                     .fixMultilineScrollableText()
                 Spacer()
                 Button(UserText.saveRecoveryPDF) {
-                    print("save recovery PDF")
+                    model.saveRecoveryPDF()
                 }
             }
         }

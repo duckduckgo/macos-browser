@@ -22,6 +22,7 @@ import Combine
 import BrowserServicesKit
 import Autofill
 
+@MainActor
 public final class ContentOverlayViewController: NSViewController, EmailManagerRequestDelegate {
 
     @IBOutlet var webView: WKWebView!
@@ -141,7 +142,7 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
         webView.window?.acceptsMouseMovedEvents = true
         webView.window?.ignoresMouseEvents = false
         webView.configuration.userContentController.addHandler(topAutofillUserScript)
-        webView.configuration.userContentController.addUserScript(topAutofillUserScript.makeWKUserScript())
+        webView.configuration.userContentController.addUserScript(topAutofillUserScript.makeWKUserScriptSync())
         self.webView = webView
         view.addAndLayout(webView)
         topAutofillUserScript.contentOverlay = self
@@ -151,29 +152,25 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
 
     // EmailManagerRequestDelegate
 
+    nonisolated
     public func emailManager(_ emailManager: EmailManager,
                              requested url: URL,
                              method: String,
                              headers: [String: String],
                              parameters: [String: String]?,
                              httpBody: Data?,
-                             timeoutInterval: TimeInterval,
-                             completion: @escaping (Data?, Error?) -> Void) {
-        let currentQueue = OperationQueue.current
-
+                             timeoutInterval: TimeInterval) async throws -> Data {
         let finalURL = url.appendingParameters(parameters ?? [:])
 
         var request = URLRequest(url: finalURL, timeoutInterval: timeoutInterval)
         request.allHTTPHeaderFields = headers
         request.httpMethod = method
         request.httpBody = httpBody
-        URLSession.shared.dataTask(with: request) { (data, _, error) in
-            currentQueue?.addOperation {
-                completion(data, error)
-            }
-        }.resume()
+
+        return try await URLSession.shared.data(for: request).0
     }
 
+    nonisolated
     public func emailManagerKeychainAccessFailed(accessType: EmailKeychainAccessType, error: EmailKeychainAccessError) {
         var parameters = [
             "access_type": accessType.rawValue,

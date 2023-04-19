@@ -20,6 +20,7 @@ import Cocoa
 
 enum FeedbackPresenter {
 
+    @MainActor
     static func presentFeedbackForm() {
         // swiftlint:disable:next force_cast
         let windowController = NSStoryboard.feedback.instantiateController(withIdentifier: "FeedbackWindowController") as! NSWindowController

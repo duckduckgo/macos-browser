@@ -17,7 +17,6 @@
 //
 
 import Foundation
-import os.log
 import BrowserServicesKit
 
 extension String {

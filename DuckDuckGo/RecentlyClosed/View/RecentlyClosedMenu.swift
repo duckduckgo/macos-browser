@@ -18,6 +18,7 @@
 
 import Foundation
 
+@MainActor
 final class RecentlyClosedMenu: NSMenu {
 
     enum Constants {

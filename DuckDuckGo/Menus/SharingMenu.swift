@@ -18,6 +18,7 @@
 
 import Cocoa
 
+@MainActor
 final class SharingMenu: NSMenu {
 
     override func update() {

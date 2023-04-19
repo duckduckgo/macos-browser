@@ -35,10 +35,12 @@ final class FireViewModel {
             .eraseToAnyPublisher()
     }
 
+    @MainActor
     init(fire: Fire) {
         self.fire = fire
     }
 
+    @MainActor
     init() {
         fire = Fire()
     }

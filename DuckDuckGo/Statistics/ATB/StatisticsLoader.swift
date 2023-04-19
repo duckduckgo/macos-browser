@@ -16,9 +16,9 @@
 //  limitations under the License.
 //
 
+import Common
 import Foundation
 import BrowserServicesKit
-import os.log
 import Networking
 
 final class StatisticsLoader {

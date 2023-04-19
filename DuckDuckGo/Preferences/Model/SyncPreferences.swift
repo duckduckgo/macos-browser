@@ -21,6 +21,9 @@ import DDGSync
 import Combine
 import SystemConfiguration
 import SyncUI
+import SwiftUI
+import PDFKit
+import Navigation
 
 extension SyncDevice {
     init(_ account: SyncAccount) {
@@ -46,14 +49,18 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
     @Published var shouldShowErrorMessage: Bool = false
     @Published private(set) var errorMessage: String?
 
+    @Published var isCreatingAccount: Bool = false
+
     var recoveryCode: String? {
         syncService.account?.recoveryCode
     }
 
+    @MainActor
     func presentEnableSyncDialog() {
         presentDialog(for: .enableSync)
     }
 
+    @MainActor
     func presentRecoverSyncAccountDialog() {
         presentDialog(for: .recoverAccount)
     }
@@ -111,6 +118,7 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         }
     }
 
+    @MainActor
     private func presentDialog(for currentDialog: ManagementDialogKind) {
         let shouldBeginSheet = managementDialogModel.currentDialog == nil
         managementDialogModel.currentDialog = currentDialog
@@ -164,12 +172,17 @@ extension SyncPreferences: ManagementDialogModelDelegate {
         managementDialogModel.endFlow()
     }
 
+    @MainActor
     func turnOnSync() {
         presentDialog(for: .askToSyncAnotherDevice)
     }
 
     func dontSyncAnotherDeviceNow() {
         Task { @MainActor in
+            isCreatingAccount = true
+            defer {
+                isCreatingAccount = false
+            }
             do {
                 let device = deviceInfo()
                 try await syncService.createAccount(deviceName: device.name, deviceType: device.type)
@@ -188,6 +201,8 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                 }
 
                 try await login(recoveryKey)
+                presentDialog(for: .deviceSynced)
+
             } catch {
                 managementDialogModel.errorMessage = String(describing: error)
             }
@@ -202,27 +217,43 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                 presentDialog(for: .syncAnotherDevice)
                 if let recoveryKey = try await connector?.pollForRecoveryKey() {
                     try await login(recoveryKey)
+                    presentDialog(for: .deviceSynced)
                 } else {
                     // Polling was likeley cancelled elsewhere (e.g. dialog closed)
                     return
                 }
-                managementDialogModel.endFlow()
             } catch {
                 managementDialogModel.errorMessage = String(describing: error)
             }
         }
     }
 
-    func addAnotherDevice() {
-        presentDialog(for: .deviceSynced)
-    }
-
+    @MainActor
     func confirmSetupComplete() {
         presentDialog(for: .saveRecoveryPDF)
     }
 
+    @MainActor
     func saveRecoveryPDF() {
-        managementDialogModel.endFlow()
+
+        guard let recoveryCode = syncService.account?.recoveryCode else {
+            assertionFailure()
+            return
+        }
+
+        let data = RecoveryPDFGenerator()
+            .generate(recoveryCode)
+
+        Task { @MainActor in
+            let panel = NSSavePanel.savePanelWithFileTypeChooser(fileTypes: [.pdf], suggestedFilename: "DuckDuckGo Recovery Code.pdf")
+            let response = await panel.begin()
+
+            guard response == .OK,
+                  let location = panel.url else { return }
+
+            try data.writeFileWithProgress(to: location)
+        }
+
     }
 
 }

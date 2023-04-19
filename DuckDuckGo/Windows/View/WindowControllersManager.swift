@@ -17,9 +17,10 @@
 //
 
 import Cocoa
-import os.log
 import Combine
+import Common
 
+@MainActor
 protocol WindowControllersManagerProtocol {
 
     var pinnedTabsManager: PinnedTabsManager { get }
@@ -32,6 +33,7 @@ protocol WindowControllersManagerProtocol {
 
 }
 
+@MainActor
 final class WindowControllersManager: WindowControllersManagerProtocol {
 
     static let shared = WindowControllersManager()

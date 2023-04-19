@@ -17,8 +17,8 @@
 //
 
 import AppKit
+import Common
 import Foundation
-import os.log
 
 final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NSOutlineViewDelegate {
 

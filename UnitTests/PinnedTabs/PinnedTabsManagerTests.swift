@@ -19,6 +19,7 @@
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
+@MainActor
 class PinnedTabsManagerTests: XCTestCase {
 
     func testInitialState() throws {
@@ -126,6 +127,7 @@ class PinnedTabsManagerTests: XCTestCase {
 }
 
 private extension Tab {
+    @MainActor
     convenience init(_ urlString: String) {
         self.init(content: .url(urlString.url!))
     }

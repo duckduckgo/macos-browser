@@ -31,7 +31,7 @@ final class FileDownloadManagerTests: XCTestCase {
     let fm = FileManager.default
     let testFile = "downloaded file"
 
-    var chooseDestination: ((String?, URL?, [UTType], (URL?, UTType?) -> Void) -> Void)?
+    var chooseDestination: (@MainActor (String?, URL?, [UTType], @MainActor (URL?, UTType?) -> Void) -> Void)?
     var fileIconFlyAnimationOriginalRect: ((WebKitDownloadTask) -> NSRect?)?
 
     let response = URLResponse(url: .duckDuckGo,
@@ -256,10 +256,13 @@ final class FileDownloadManagerTests: XCTestCase {
 
 @available(macOS 11.3, *)
 extension FileDownloadManagerTests: DownloadTaskDelegate {
-    func chooseDestination(suggestedFilename: String?, directoryURL: URL?, fileTypes: [UTType], callback: @escaping (URL?, UTType?) -> Void) {
+
+    @MainActor
+    func chooseDestination(suggestedFilename: String?, directoryURL: URL?, fileTypes: [UTType], callback: @escaping @MainActor (URL?, UTType?) -> Void) {
         self.chooseDestination?(suggestedFilename, directoryURL, fileTypes, callback)
     }
 
+    @MainActor
     func fileIconFlyAnimationOriginalRect(for downloadTask: WebKitDownloadTask) -> NSRect? {
         self.fileIconFlyAnimationOriginalRect?(downloadTask)
     }

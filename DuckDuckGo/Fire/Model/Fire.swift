@@ -16,8 +16,8 @@
 //  limitations under the License.
 //
 
+import Common
 import Foundation
-import os.log
 import BrowserServicesKit
 import PrivacyDashboard
 import WebKit
@@ -104,6 +104,7 @@ final class Fire {
 
     @Published private(set) var burningData: BurningData?
 
+    @MainActor
     init(cacheManager: WebCacheManager = WebCacheManager.shared,
          historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
          permissionManager: PermissionManagerProtocol = PermissionManager.shared,
@@ -115,6 +116,7 @@ final class Fire {
          recentlyClosedCoordinator: RecentlyClosedCoordinating? = RecentlyClosedCoordinator.shared,
          pinnedTabsManager: PinnedTabsManager = WindowControllersManager.shared.pinnedTabsManager,
          secureVaultFactory: SecureVaultFactory = SecureVaultFactory.default
+         pinnedTabsManager: PinnedTabsManager? = nil
     ) {
         self.webCacheManager = cacheManager
         self.historyCoordinating = historyCoordinating
@@ -125,6 +127,7 @@ final class Fire {
         self.recentlyClosedCoordinator = recentlyClosedCoordinator
         self.pinnedTabsManager = pinnedTabsManager
         self.secureVaultFactory = secureVaultFactory
+        self.pinnedTabsManager = pinnedTabsManager ?? WindowControllersManager.shared.pinnedTabsManager
 
         if #available(macOS 11, *), autoconsentManagement == nil {
             self.autoconsentManagement = AutoconsentManagement.shared
@@ -141,6 +144,7 @@ final class Fire {
         }
     }
 
+    @MainActor
     // swiftlint:disable:next function_body_length
     func burnDomains(_ domains: Set<String>,
                      includingHistory: Bool = true,
@@ -216,6 +220,7 @@ final class Fire {
         }
     }
 
+    @MainActor
     func burnAll(tabCollectionViewModel: TabCollectionViewModel, completion: (() -> Void)? = nil) {
         os_log("Fire started", log: .fire)
         burningData = .all
@@ -265,6 +270,7 @@ final class Fire {
     }
 
     // Burns visit passed to the method but preserves other visits of same domains
+    @MainActor
     func burnVisits(of visits: [Visit],
                     except fireproofDomains: FireproofDomains,
                     completion: (() -> Void)? = nil) {
@@ -290,6 +296,7 @@ final class Fire {
 
     // MARK: - Tabs
 
+    @MainActor
     private func allTabViewModels() -> [TabViewModel] {
         var allTabViewModels = [TabViewModel] ()
         for window in windowControllerManager.mainWindowControllers {
@@ -336,10 +343,12 @@ final class Fire {
 
     // MARK: - Downloads
 
+    @MainActor
     private func burnDownloads() {
         self.downloadListCoordinator.cleanupInactiveDownloads()
     }
 
+    @MainActor
     private func burnDownloads(of domains: Set<String>) {
         self.downloadListCoordinator.cleanupInactiveDownloads(for: domains)
     }
@@ -372,6 +381,7 @@ final class Fire {
 
     // MARK: - Windows & Tabs
 
+    @MainActor
     private func burnWindows(exceptOwnerOf tabCollectionViewModel: TabCollectionViewModel, completion: @escaping () -> Void) {
         // Close windows except the burning one
         for mainWindowController in windowControllerManager.mainWindowControllers {
@@ -430,12 +440,14 @@ final class Fire {
 
     // MARK: - Last Session State
 
+    @MainActor
     private func burnLastSessionState() {
         stateRestorationManager?.clearLastSessionState()
     }
 
     // MARK: - Burn Recently Closed
 
+    @MainActor
     private func burnRecentlyClosed(domains: Set<String>? = nil) {
         recentlyClosedCoordinator?.burnCache(domains: domains)
     }
@@ -445,6 +457,7 @@ final class Fire {
 
 extension Fire {
 
+    @MainActor
     private func pinnedTabViewModels(for domains: Set<String>? = nil) -> [TabCollectionViewModel.TabCleanupInfo] {
         guard let domains = domains else {
             return pinnedTabsManager.tabViewModels.values.map { tabViewModel in
@@ -455,6 +468,7 @@ extension Fire {
         return prepareCleanupInfo(for: pinnedTabsManager.tabViewModels, relatedToDomains: domains)
     }
 
+    @MainActor
     private func tabViewModelsFor(domains: Set<String>) -> TabCollectionsCleanupInfo {
         var collectionsCleanupInfo = TabCollectionsCleanupInfo()
         for window in windowControllerManager.mainWindowControllers {

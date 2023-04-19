@@ -22,7 +22,6 @@ import Common
 import ContentBlocking
 import Foundation
 import Navigation
-import os.log
 import UserScript
 import WebKit
 
@@ -199,12 +198,13 @@ protocol NewWindowPolicyDecisionMaker {
     @Published
     private(set) var userContentController: UserContentController?
 
+    @MainActor
     convenience init(content: TabContent,
                      faviconManagement: FaviconManagement = FaviconManager.shared,
                      webCacheManager: WebCacheManager = WebCacheManager.shared,
                      webViewConfiguration: WKWebViewConfiguration? = nil,
                      historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
-                     pinnedTabsManager: PinnedTabsManager = WindowControllersManager.shared.pinnedTabsManager,
+                     pinnedTabsManager: PinnedTabsManager? = nil,
                      workspace: Workspace = NSWorkspace.shared,
                      privacyFeatures: AnyPrivacyFeatures? = nil,
                      duckPlayer: DuckPlayer? = nil,
@@ -222,7 +222,7 @@ protocol NewWindowPolicyDecisionMaker {
                      shouldLoadFromCache: Bool = false,
                      canBeClosedWithBack: Bool = false,
                      lastSelectedAt: Date? = nil,
-                     webViewFrame: CGRect = .zero
+                     webViewSize: CGSize = CGSize(width: 1024, height: 768)
     ) {
 
         let duckPlayer = duckPlayer
@@ -237,7 +237,7 @@ protocol NewWindowPolicyDecisionMaker {
                   webCacheManager: webCacheManager,
                   webViewConfiguration: webViewConfiguration,
                   historyCoordinating: historyCoordinating,
-                  pinnedTabsManager: pinnedTabsManager,
+                  pinnedTabsManager: pinnedTabsManager ?? WindowControllersManager.shared.pinnedTabsManager,
                   workspace: workspace,
                   privacyFeatures: privacyFeatures,
                   duckPlayer: duckPlayer,
@@ -256,9 +256,10 @@ protocol NewWindowPolicyDecisionMaker {
                   shouldLoadFromCache: shouldLoadFromCache,
                   canBeClosedWithBack: canBeClosedWithBack,
                   lastSelectedAt: lastSelectedAt,
-                  webViewFrame: webViewFrame)
+                  webViewSize: webViewSize)
     }
 
+    @MainActor
     // swiftlint:disable:next function_body_length
     init(content: TabContent,
          faviconManagement: FaviconManagement,
@@ -284,7 +285,7 @@ protocol NewWindowPolicyDecisionMaker {
          shouldLoadFromCache: Bool,
          canBeClosedWithBack: Bool,
          lastSelectedAt: Date?,
-         webViewFrame: CGRect
+         webViewSize: CGSize
     ) {
 
         self.content = content
@@ -306,7 +307,7 @@ protocol NewWindowPolicyDecisionMaker {
         assert(userContentController != nil)
         self.userContentController = userContentController
 
-        webView = WebView(frame: webViewFrame, configuration: configuration)
+        webView = WebView(frame: CGRect(origin: .zero, size: webViewSize), configuration: configuration)
         webView.allowsLinkPreview = false
         permissions = PermissionModel(permissionManager: permissionManager,
                                       geolocationService: geolocationService)
@@ -875,6 +876,7 @@ protocol NewWindowPolicyDecisionMaker {
 
 extension Tab: UserContentControllerDelegate {
 
+    @MainActor
     func userContentController(_ userContentController: UserContentController, didInstallContentRuleLists contentRuleLists: [String: WKContentRuleList], userScripts: UserScriptsProvider, updateEvent: ContentBlockerRulesManager.UpdateEvent) {
         os_log("didInstallContentRuleLists", log: .contentBlocking, type: .info)
         guard let userScripts = userScripts as? UserScripts else { fatalError("Unexpected UserScripts") }
@@ -1005,10 +1007,6 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         invalidateInteractionStateData()
         webViewDidFinishNavigationPublisher.send()
         statisticsLoader?.refreshRetentionAtb(isSearch: navigation.url.isDuckDuckGoSearch)
-
-        if navigation.url.isDuckDuckGoSearch {
-            BookmarksBarUsageSender.sendBookmarksBarUsagePixel()
-        }
     }
 
     @MainActor
