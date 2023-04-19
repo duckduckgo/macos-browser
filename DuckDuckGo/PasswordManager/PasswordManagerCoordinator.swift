@@ -74,7 +74,7 @@ final class PasswordManagerCoordinator: PasswordManagerCoordinating {
 
     var statusCancellable: AnyCancellable?
 
-#if APPSTORE
+#if !APPSTORE
 
     func setEnabled(_ enabled: Bool) {
         if enabled {
@@ -227,8 +227,8 @@ final class PasswordManagerCoordinator: PasswordManagerCoordinating {
     func askToUnlock(completionHandler: @escaping () -> Void) {}
     func openPasswordManager() {}
     func accountsFor(domain: String, completion: @escaping ([BrowserServicesKit.SecureVaultModels.WebsiteAccount], Error?) -> Void) {}
-    func cachedAccountsFor(domain: String) -> [BrowserServicesKit.SecureVaultModels.WebsiteAccount] {}
-    func cachedWebsiteCredentialsFor(domain: String, username: String) -> BrowserServicesKit.SecureVaultModels.WebsiteCredentials? {}
+    func cachedAccountsFor(domain: String) -> [BrowserServicesKit.SecureVaultModels.WebsiteAccount] { return [] }
+    func cachedWebsiteCredentialsFor(domain: String, username: String) -> BrowserServicesKit.SecureVaultModels.WebsiteCredentials? { return nil }
     func websiteCredentialsFor(accountId: String, completion: @escaping (BrowserServicesKit.SecureVaultModels.WebsiteCredentials?, Error?) -> Void) {}
     func websiteCredentialsFor(domain: String, completion: @escaping ([BrowserServicesKit.SecureVaultModels.WebsiteCredentials], Error?) -> Void) {}
 
