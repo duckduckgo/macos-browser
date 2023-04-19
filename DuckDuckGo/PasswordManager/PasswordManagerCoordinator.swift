@@ -237,7 +237,6 @@ final class PasswordManagerCoordinator: PasswordManagerCoordinating {
 
 #endif
 
-
     // MARK: - Cache
 
     private func cache(credentials: [BWCredential], for url: URL) {
