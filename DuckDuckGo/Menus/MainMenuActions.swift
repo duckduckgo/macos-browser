@@ -78,7 +78,7 @@ extension AppDelegate {
         WindowsManager.openNewWindow(with: Tab(content: .contentFromURL(url), shouldLoadInBackground: true))
     }
 
-    @objc func clearAllHistory(_ sender: NSMenuItem) {
+    @IBAction func clearAllHistory(_ sender: NSMenuItem) {
         guard let window = WindowsManager.openNewWindow(with: Tab(content: .homePage)),
               let windowController = window.windowController as? MainWindowController else {
             assertionFailure("No reference to main window controller")
@@ -396,7 +396,7 @@ extension MainViewController {
         adjustFirstResponder()
     }
 
-    @objc func clearAllHistory(_ sender: NSMenuItem) {
+    @IBAction func clearAllHistory(_ sender: NSMenuItem) {
         guard let window = view.window else {
             assertionFailure("No window")
             return
