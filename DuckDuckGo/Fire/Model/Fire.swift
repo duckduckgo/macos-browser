@@ -114,9 +114,8 @@ final class Fire {
          autoconsentManagement: AutoconsentManagement? = nil,
          stateRestorationManager: AppStateRestorationManager? = nil,
          recentlyClosedCoordinator: RecentlyClosedCoordinating? = RecentlyClosedCoordinator.shared,
-         pinnedTabsManager: PinnedTabsManager = WindowControllersManager.shared.pinnedTabsManager,
+         pinnedTabsManager: PinnedTabsManager? = nil,
          secureVaultFactory: SecureVaultFactory = SecureVaultFactory.default
-         pinnedTabsManager: PinnedTabsManager? = nil
     ) {
         self.webCacheManager = cacheManager
         self.historyCoordinating = historyCoordinating
@@ -125,9 +124,8 @@ final class Fire {
         self.windowControllerManager = windowControllerManager
         self.faviconManagement = faviconManagement
         self.recentlyClosedCoordinator = recentlyClosedCoordinator
-        self.pinnedTabsManager = pinnedTabsManager
-        self.secureVaultFactory = secureVaultFactory
         self.pinnedTabsManager = pinnedTabsManager ?? WindowControllersManager.shared.pinnedTabsManager
+        self.secureVaultFactory = secureVaultFactory
 
         if #available(macOS 11, *), autoconsentManagement == nil {
             self.autoconsentManagement = AutoconsentManagement.shared
