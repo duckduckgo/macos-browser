@@ -48,12 +48,19 @@ final class TabDragAndDropManager {
     }
 
     func performDragAndDropIfNeeded() -> Bool {
+        defer {
+            clear()
+        }
+
+        guard sourceUnit?.tabCollectionViewModel?.isDisposable ==
+                destinationUnit?.tabCollectionViewModel?.isDisposable else {
+            return false
+        }
+
         if destinationUnit != nil {
             performDragAndDrop()
-            clear()
             return true
         } else {
-            clear()
             return false
         }
     }
