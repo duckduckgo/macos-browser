@@ -23,6 +23,7 @@ final class ApplicationDockMenu: NSMenu {
     init() {
         super.init(title: "")
         addItem(withTitle: UserText.newWindowMenuItem, action: #selector(AppDelegate.newWindow), keyEquivalent: "")
+        addItem(withTitle: UserText.newDisposableWindowMenuItem, action: #selector(AppDelegate.newDisposableWindow), keyEquivalent: "")
     }
 
     required init(coder: NSCoder) {
