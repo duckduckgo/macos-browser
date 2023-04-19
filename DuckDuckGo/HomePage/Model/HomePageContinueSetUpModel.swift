@@ -22,7 +22,6 @@ import BrowserServicesKit
 extension HomePage.Models {
 
     final class ContinueSetUpModel: ObservableObject {
-
         let title = UserText.newTabSetUpSectionTitle
         let itemWidth = FeaturesGridDimensions.itemWidth
         let itemHeight = FeaturesGridDimensions.itemHeight
@@ -33,6 +32,7 @@ extension HomePage.Models {
         let deleteActionTitle = UserText.newTabSetUpRemoveItemAction
         let duckPlayerURL = URL(string: "https://www.youtube.com/watch?v=yKWIA-Pys4c")!
 
+        private var preferencesPersistor: ContinueSetUpPreferencePersisting
         private let defaultBrowserProvider: DefaultBrowserProvider
         private let dataImportProvider: DataImportStatusProviding
         private let tabCollectionViewModel: TabCollectionViewModel
@@ -40,16 +40,44 @@ extension HomePage.Models {
         private let privacyPreferences: PrivacySecurityPreferences
         private let cookieConsentPopoverManager: CookieConsentPopoverManager
         private let duckPlayerPreferences: DuckPlayerPreferencesPersistor
+        private var cookiePopUpVisible = false
 
         weak var delegate: ContinueSetUpVewModelDelegate?
 
-        @UserDefaultsWrapper(key: .homePageShowAllFeatures, defaultValue: true)
-        private static var shouldShowAllFeaturesSetting: Bool
-
         var shouldShowAllFeatures: Bool {
             didSet {
-                Self.shouldShowAllFeaturesSetting = shouldShowAllFeatures
+                preferencesPersistor.shouldShowAllFeaturesSetting = shouldShowAllFeatures
                 updateVisibleMatrix()
+            }
+        }
+
+        var shouldShowMakeDefaultSetting: Bool {
+            didSet {
+                preferencesPersistor.shouldShowMakeDefaultSetting = shouldShowMakeDefaultSetting
+            }
+        }
+
+        var shouldShowImportSetting: Bool {
+            didSet {
+                preferencesPersistor.shouldShowImportSetting = shouldShowImportSetting
+            }
+        }
+
+        var shouldShowDuckPlayerSetting: Bool {
+            didSet {
+                preferencesPersistor.shouldShowDuckPlayerSetting = shouldShowDuckPlayerSetting
+            }
+        }
+
+        var shouldShowEmailProtectionSetting: Bool {
+            didSet {
+                preferencesPersistor.shouldShowEmailProtectionSetting = shouldShowEmailProtectionSetting
+            }
+        }
+
+        var shouldShowCookieSetting: Bool {
+            didSet {
+                preferencesPersistor.shouldShowCookieSetting = shouldShowCookieSetting
             }
         }
 
@@ -66,6 +94,24 @@ extension HomePage.Models {
                 updateVisibleMatrix()
             }
         }
+
+        private var showRemoveItemButtonTimer: Timer?
+
+        var isHoveringOverItem: Bool = false {
+            didSet {
+                if isHoveringOverItem {
+                    showRemoveItemButtonTimer = Timer.scheduledTimer(withTimeInterval: 0.8, repeats: false, block: { _ in
+                        self.isRemoveItemButtonVisible = true
+                    })
+                } else {
+                    showRemoveItemButtonTimer?.invalidate()
+                    isRemoveItemButtonVisible = false
+                }
+            }
+        }
+
+        @Published var isRemoveItemButtonVisible = false
+
         @Published var visibleFeaturesMatrix: [[FeatureType]] = [[]]
 
         init(defaultBrowserProvider: DefaultBrowserProvider,
@@ -74,7 +120,8 @@ extension HomePage.Models {
              emailManager: EmailManager = EmailManager(),
              privacyPreferences: PrivacySecurityPreferences = PrivacySecurityPreferences.shared,
              cookieConsentPopoverManager: CookieConsentPopoverManager = CookieConsentPopoverManager(),
-             duckPlayerPreferences: DuckPlayerPreferencesPersistor) {
+             duckPlayerPreferences: DuckPlayerPreferencesPersistor,
+             preferencesPersistor: ContinueSetUpPreferencePersisting = ContinueSetUpPreferenceUserDefaultsPersistor()) {
             self.defaultBrowserProvider = defaultBrowserProvider
             self.dataImportProvider = dataImportProvider
             self.tabCollectionViewModel = tabCollectionViewModel
@@ -82,7 +129,13 @@ extension HomePage.Models {
             self.privacyPreferences = privacyPreferences
             self.cookieConsentPopoverManager = cookieConsentPopoverManager
             self.duckPlayerPreferences = duckPlayerPreferences
-            self.shouldShowAllFeatures = Self.shouldShowAllFeaturesSetting
+            self.preferencesPersistor = preferencesPersistor
+            self.shouldShowAllFeatures = preferencesPersistor.shouldShowAllFeaturesSetting
+            self.shouldShowMakeDefaultSetting = preferencesPersistor.shouldShowMakeDefaultSetting
+            self.shouldShowImportSetting = preferencesPersistor.shouldShowImportSetting
+            self.shouldShowDuckPlayerSetting = preferencesPersistor.shouldShowDuckPlayerSetting
+            self.shouldShowEmailProtectionSetting = preferencesPersistor.shouldShowEmailProtectionSetting
+            self.shouldShowCookieSetting = preferencesPersistor.shouldShowCookieSetting
             refreshFeaturesMatrix()
         }
 
@@ -118,15 +171,34 @@ extension HomePage.Models {
                 let tab = Tab(content: .url(EmailUrls().emailProtectionLink), shouldLoadInBackground: true)
                 tabCollectionViewModel.append(tab: tab)
             case .cookiePopUp:
-                delegate?.showCookieConsentPopUp(manager: cookieConsentPopoverManager, completion: { [weak self] result in
-                    self?.privacyPreferences.autoconsentEnabled = result
-                    self?.refreshFeaturesMatrix()
-                })
+                if !cookiePopUpVisible {
+                    delegate?.showCookieConsentPopUp(manager: cookieConsentPopoverManager, completion: { [weak self] result in
+                        guard let self = self else {
+                            return
+                        }
+                        self.privacyPreferences.autoconsentEnabled = result
+                        self.refreshFeaturesMatrix()
+                        self.cookiePopUpVisible = false
+                    })
+                    cookiePopUpVisible = true
+                }
             }
         }
 
-        func removeItem() {
-
+        func removeItem(for featureType: FeatureType) {
+            switch featureType {
+            case .defaultBrowser:
+                shouldShowMakeDefaultSetting = false
+            case .importBookmarksAndPasswords:
+                shouldShowImportSetting = false
+            case .duckplayer:
+                shouldShowDuckPlayerSetting = false
+            case .emailProtection:
+                shouldShowEmailProtectionSetting = false
+            case .cookiePopUp:
+                shouldShowCookieSetting = false
+            }
+            refreshFeaturesMatrix()
         }
 
         func refreshFeaturesMatrix() {
@@ -134,11 +206,11 @@ extension HomePage.Models {
             for feature in FeatureType.allCases {
                 switch feature {
                 case .defaultBrowser:
-                    if !defaultBrowserProvider.isDefault {
+                    if shouldMakeDefaultCardBeVisible {
                         features.append(feature)
                     }
                 case .importBookmarksAndPasswords:
-                    if !dataImportProvider.didImport {
+                    if shouldImportCardBeVisible {
                         features.append(feature)
                     }
                 case .duckplayer:
@@ -146,11 +218,11 @@ extension HomePage.Models {
                         features.append(feature)
                     }
                 case .emailProtection:
-                    if !emailManager.isSignedIn {
+                    if shouldEmailProtectionCardBeVisible {
                         features.append(feature)
                     }
                 case .cookiePopUp:
-                    if privacyPreferences.autoconsentEnabled != true {
+                    if shouldCookieCardBeVisible {
                         features.append(feature)
                     }
                 }
@@ -158,6 +230,7 @@ extension HomePage.Models {
             featuresMatrix = features.chunked(into: HomePage.featuresPerRow)
         }
 
+        // Helper Functions
         private func updateVisibleMatrix() {
             guard !featuresMatrix.isEmpty else {
                 visibleFeaturesMatrix = [[]]
@@ -166,13 +239,35 @@ extension HomePage.Models {
             visibleFeaturesMatrix = shouldShowAllFeatures ? featuresMatrix : [featuresMatrix[0]]
         }
 
+        private var shouldMakeDefaultCardBeVisible: Bool {
+            shouldShowMakeDefaultSetting &&
+            !defaultBrowserProvider.isDefault
+        }
+
+        private var shouldImportCardBeVisible: Bool {
+            shouldShowImportSetting &&
+            !dataImportProvider.didImport
+        }
+
         private var shouldDuckPlayerCardBeVisible: Bool {
+            shouldShowDuckPlayerSetting &&
             duckPlayerPreferences.duckPlayerModeBool == nil &&
-                !duckPlayerPreferences.youtubeOverlayAnyButtonPressed
+            !duckPlayerPreferences.youtubeOverlayAnyButtonPressed
+        }
+
+        private var shouldEmailProtectionCardBeVisible: Bool {
+            shouldShowEmailProtectionSetting &&
+            !emailManager.isSignedIn
+        }
+
+        private var shouldCookieCardBeVisible: Bool {
+            shouldShowCookieSetting &&
+            privacyPreferences.autoconsentEnabled != true
         }
 
     }
 
+    // MARK: Feature Type
     enum FeatureType: CaseIterable {
         case defaultBrowser
         case importBookmarksAndPasswords
@@ -195,19 +290,20 @@ extension HomePage.Models {
             }
         }
 
-        // Still Waiting for icon assets
         var icon: NSImage {
+            let iconSize = NSSize(width: 28, height: 28)
+
             switch self {
             case .defaultBrowser:
-                return NSImage(named: "CookieBite")!
+                return NSImage(named: "DefaultBrowser")!.resized(to: iconSize)!
             case .importBookmarksAndPasswords:
-                return NSImage(named: "CookieBite")!
+                return NSImage(named: "Bookmark-Import-Multicolor")!.resized(to: iconSize)!
             case .duckplayer:
-                return NSImage(named: "CookieBite")!
+                return NSImage(named: "VideoPlayer-Multicolor")!.resized(to: iconSize)!
             case .emailProtection:
-                return NSImage(named: "CookieBite")!
+                return NSImage(named: "Email-Protection-Multicolor")!.resized(to: iconSize)!
             case .cookiePopUp:
-                return NSImage(named: "CookieBite")!
+                return NSImage(named: "Cookie-Multicolor")!.resized(to: iconSize)!
             }
         }
     }
@@ -226,12 +322,44 @@ extension HomePage.Models {
     }
 }
 
+
+// MARK: ContinueSetUpVewModelDelegate
 protocol ContinueSetUpVewModelDelegate: AnyObject {
     func showCookieConsentPopUp(manager: CookieConsentPopoverManager, completion: ((Bool) -> Void)?)
 }
 
 extension HomePageViewController: ContinueSetUpVewModelDelegate {
     func showCookieConsentPopUp(manager: CookieConsentPopoverManager, completion: ((Bool) -> Void)?) {
-        manager.show(on: self.view, animated: true, result: completion)
+        manager.show(on: self.view, animated: true, type: .setUp, result: completion)
     }
+}
+
+// MARK: ContinueSetUpPreferencePersistor
+protocol ContinueSetUpPreferencePersisting {
+    var shouldShowAllFeaturesSetting: Bool { get set }
+    var shouldShowMakeDefaultSetting: Bool { get set }
+    var shouldShowImportSetting: Bool { get set }
+    var shouldShowDuckPlayerSetting: Bool { get set }
+    var shouldShowEmailProtectionSetting: Bool { get set }
+    var shouldShowCookieSetting: Bool { get set }
+}
+
+final class ContinueSetUpPreferenceUserDefaultsPersistor: ContinueSetUpPreferencePersisting {
+    @UserDefaultsWrapper(key: .homePageShowAllFeatures, defaultValue: true)
+    var shouldShowAllFeaturesSetting: Bool
+
+    @UserDefaultsWrapper(key: .homePageShowMakeDefault, defaultValue: true)
+    var shouldShowMakeDefaultSetting: Bool
+
+    @UserDefaultsWrapper(key: .homePageShowImport, defaultValue: true)
+    var shouldShowImportSetting: Bool
+
+    @UserDefaultsWrapper(key: .homePageShowDuckPlayer, defaultValue: true)
+    var shouldShowDuckPlayerSetting: Bool
+
+    @UserDefaultsWrapper(key: .homePageShowEmailProtection, defaultValue: true)
+    var shouldShowEmailProtectionSetting: Bool
+
+    @UserDefaultsWrapper(key: .homePageShowCookie, defaultValue: true)
+    var shouldShowCookieSetting: Bool
 }

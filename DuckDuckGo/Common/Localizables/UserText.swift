@@ -553,10 +553,13 @@ struct UserText {
     static let cookiePopupHiddenNotification = NSLocalizedString("notification.badge.popuphidden", value: "Pop-up Hidden", comment: "Notification that appears when browser cosmetically hides a cookie popup")
 
     static let autoconsentModalTitle = NSLocalizedString("autoconsent.modal.title", value: "Looks like this site has a cookie consent pop-up 👇", comment: "Title for modal asking the user to auto manage cookies")
+    static let autoconsentFromSetUpModalTitle = NSLocalizedString("autoconsent.from.setup.modal.title", value: "Want DuckDuckGo to handle cookie pop-ups?", comment: "Title for modal asking the user to auto manage cookies")
 
     static let autoconsentModalBody = NSLocalizedString("autoconsent.modal.body", value: "Want me to handle these for you? I can try to minimize cookies, maximize privacy, and hide pop-ups like these.", comment: "Body for modal asking the user to auto manage cookies")
+    static let autoconsentFromSetUpModalBody = NSLocalizedString("autoconsent.from.setup.modal.body", value: "When we detect cookie pop-ups on sites you visit, we can try to select the most private settings available and hide popups like this", comment: "Body for modal asking the user to auto manage cookies")
 
     static let autoconsentModalConfirmButton = NSLocalizedString("autoconsent.modal.cta.confirm", value: "Manage Cookie Pop-ups", comment: "Confirm button for modal asking the user to auto manage cookies")
+    static let autoconsentFromSetUpModalConfirmButton = NSLocalizedString("autoconsent.from.setup.modal.cta.confirm", value: "Handle Pop-ups For Me", comment: "Confirm button for modal asking the user to auto manage cookies")
     static let autoconsentModalDenyButton = NSLocalizedString("autoconsent.modal.cta.deny", value: "No Thanks", comment: "Deny button for modal asking the user to auto manage cookies")
 
     static let clearAllHistoryMenuItem = NSLocalizedString("history.menu.clear.all.history", value: "Clear All History…", comment: "Menu item to clear all history")
@@ -713,20 +716,20 @@ struct UserText {
     static let newTabFavoriteSectionTitle = NSLocalizedString("newTab.favorites.section.title", value: "Favorites", comment: "Title of the Favorites section in the home page")
 
     // Set Up
-    static let newTabSetUpSectionTitle = NSLocalizedString("newTab.setup.section.title", value: "Continue Set Up", comment: "Title of the Set Up section in the home page")
+    static let newTabSetUpSectionTitle = NSLocalizedString("newTab.setup.section.title", value: "Make DuckDuckGo Yours", comment: "Title of the Set Up section in the home page")
 
-    static let newTabSetUpDefaultBrowserCardTitle = NSLocalizedString("newTab.setup.default.browser.title", value: "Switch your default browser", comment: "Title of the Default Browser card of the Set Up section in the home page")
-    static let newTabSetUpImportCardTitle = NSLocalizedString("newTab.setup.import.title", value: "Import Bookmarks & Passwords", comment: "Title of the Import card of the Set Up section in the home page")
-    static let newTabSetUpDuckPlayerCardTitle = NSLocalizedString("newTab.setup.duck.player.title", value: "Use Duck Player to watch YouTube", comment: "Title of the Duck Player card of the Set Up section in the home page")
-    static let newTabSetUpEmailProtectionCardTitle = NSLocalizedString("newTab.setup.email.protection.title", value: "Protect your email and block trackers", comment: "Title of the Email Protection card of the Set Up section in the home page")
-    static let newTabSetUpCookieManagerCardTitle = NSLocalizedString("newTab.setup.cookie.manager.title", value: "Let us handle coockie pop-ups", comment: "Title of the Cookie Manager card of the Set Up section in the home page")
+    static let newTabSetUpDefaultBrowserCardTitle = NSLocalizedString("newTab.setup.default.browser.title", value: "Make DuckDuckGo your default", comment: "Title of the Default Browser card of the Set Up section in the home page")
+    static let newTabSetUpImportCardTitle = NSLocalizedString("newTab.setup.import.title", value: "Import Bookmarks and Passwords", comment: "Title of the Import card of the Set Up section in the home page")
+    static let newTabSetUpDuckPlayerCardTitle = NSLocalizedString("newTab.setup.duck.player.title", value: "Escape targeted ads on YouTube", comment: "Title of the Duck Player card of the Set Up section in the home page")
+    static let newTabSetUpEmailProtectionCardTitle = NSLocalizedString("newTab.setup.email.protection.title", value: "Hide your email and block trackers", comment: "Title of the Email Protection card of the Set Up section in the home page")
+    static let newTabSetUpCookieManagerCardTitle = NSLocalizedString("newTab.setup.cookie.manager.title", value: "Banish annoying cookie pop-ups", comment: "Title of the Cookie Manager card of the Set Up section in the home page")
 
-    static let newTabSetUpDefaultBrowserAction = NSLocalizedString("newTab.setup.default.browser.action", value: "Make Default", comment: "Action title on the action menu of the Default Browser card")
-    static let newTabSetUpImportAction = NSLocalizedString("newTab.setup.Import.action", value: "Start Import", comment: "Action title on the action menu of the Import card of the Set Up section in the home page")
-    static let newTabSetUpDuckPlayerAction = NSLocalizedString("newTab.setup.duck.player.action", value: "Visit YouTube", comment: "Action title on the action menu of the Duck Player card of the Set Up section in the home page")
-    static let newTabSetUpEmailProtectionAction = NSLocalizedString("newTab.setup.email.protection.action", value: "Enable Email Protection", comment: "Action title on the action menu of the Email Protection card of the Set Up section in the home page")
-    static let newTabSetUpCoockeManagerAction = NSLocalizedString("newTab.setup.coockie.manager.action", value: "Enable Cookie Manager", comment: "Action title on the action menu of the Coockie Manager card of the Set Up section in the home page")
-    static let newTabSetUpRemoveItemAction = NSLocalizedString("newTab.setup.remove.item", value: "Remove Item", comment: "Action title on the action menu of the set up cards card of the SetUp section in the home page to remove the item")
+    static let newTabSetUpDefaultBrowserAction = NSLocalizedString("newTab.setup.default.browser.action", value: "Change Your Default Browser", comment: "Action title on the action menu of the Default Browser card")
+    static let newTabSetUpImportAction = NSLocalizedString("newTab.setup.Import.action", value: "Import Browser Data", comment: "Action title on the action menu of the Import card of the Set Up section in the home page")
+    static let newTabSetUpDuckPlayerAction = NSLocalizedString("newTab.setup.duck.player.action", value: "Try Duck Player on YouTube", comment: "Action title on the action menu of the Duck Player card of the Set Up section in the home page")
+    static let newTabSetUpEmailProtectionAction = NSLocalizedString("newTab.setup.email.protection.action", value: "Set Up Email Protection", comment: "Action title on the action menu of the Email Protection card of the Set Up section in the home page")
+    static let newTabSetUpCoockeManagerAction = NSLocalizedString("newTab.setup.coockie.manager.action", value: "Enable Cookie Pop-ups Management", comment: "Action title on the action menu of the Coockie Manager card of the Set Up section in the home page")
+    static let newTabSetUpRemoveItemAction = NSLocalizedString("newTab.setup.remove.item", value: "Dismiss", comment: "Action title on the action menu of the set up cards card of the SetUp section in the home page to remove the item")
 
     // Recent Activity
     static let newTabRecentActivitySectionTitle = NSLocalizedString("newTab.recent.activity.section.title", value: "Recent Activity", comment: "Title of the RecentActivity section in the home page")

@@ -93,5 +93,4 @@ final class BookmarksAndPasswordsImportStatusProvider: DataImportStatusProviding
         }
         return false
     }
-    
 }

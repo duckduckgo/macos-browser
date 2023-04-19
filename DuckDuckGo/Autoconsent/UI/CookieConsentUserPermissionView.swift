@@ -20,6 +20,7 @@ import SwiftUI
 
 struct CookieConsentUserPermissionView<AnimationModel>: View where AnimationModel: CookieConsentAnimation {
     var sketchAnimationModel: AnimationModel
+    let type: CookieConsentPopoverType
     let result: (Bool) -> Void
     @Environment(\.colorScheme) var colorScheme
 
@@ -60,14 +61,14 @@ struct CookieConsentUserPermissionView<AnimationModel>: View where AnimationMode
 
     private var contentView: some View {
         VStack(alignment: .leading, spacing: 24) {
-            Text(UserText.autoconsentModalTitle)
+            Text(type == .site ? UserText.autoconsentModalTitle : UserText.autoconsentFromSetUpModalTitle)
                 .font(.system(size: Consts.Font.size))
                 .fontWeight(.light)
 
             CookieConsentAnimationView(animationModel: sketchAnimationModel)
                 .padding(.leading, 40)
 
-            Text(UserText.autoconsentModalBody)
+            Text(type == .site ? UserText.autoconsentModalBody : UserText.autoconsentFromSetUpModalBody)
                 .fontWeight(.light)
                 .font(.system(size: Consts.Font.size))
 
@@ -86,7 +87,7 @@ struct CookieConsentUserPermissionView<AnimationModel>: View where AnimationMode
             Button {
                 result(true)
             } label: {
-                Text(UserText.autoconsentModalConfirmButton)
+                Text(type == .site ? UserText.autoconsentModalConfirmButton : UserText.clear)
             }
             .buttonStyle(PrimaryCTAStyle())
         }
@@ -102,12 +103,12 @@ struct CookieConsentUserPermissionView_Previews: PreviewProvider {
         let result: (Bool) -> Void = { _ in }
 
         if #available(macOS 11.0, *) {
-            CookieConsentUserPermissionView(sketchAnimationModel: CookieConsentAnimationMock(), result: result).preferredColorScheme(.dark)
+            CookieConsentUserPermissionView(sketchAnimationModel: CookieConsentAnimationMock(), type: .site, result: result).preferredColorScheme(.dark)
                 .padding()
-            CookieConsentUserPermissionView(sketchAnimationModel: CookieConsentAnimationMock(), result: result).preferredColorScheme(.light)
+            CookieConsentUserPermissionView(sketchAnimationModel: CookieConsentAnimationMock(), type: .site, result: result).preferredColorScheme(.light)
                 .padding()
         } else {
-            CookieConsentUserPermissionView(sketchAnimationModel: CookieConsentAnimationMock(), result: result)
+            CookieConsentUserPermissionView(sketchAnimationModel: CookieConsentAnimationMock(), type: .site, result: result)
         }
     }
 }

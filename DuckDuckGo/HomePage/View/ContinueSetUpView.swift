@@ -83,6 +83,12 @@ extension HomePage.Views {
 
             @EnvironmentObject var model: HomePage.Models.ContinueSetUpModel
 
+            @State var isHovering = false {
+                didSet {
+                    model.isHoveringOverItem = isHovering
+                }
+            }
+
             private let featureType: HomePage.Models.FeatureType
 
             init?(featureType: HomePage.Models.FeatureType) {
@@ -93,17 +99,59 @@ extension HomePage.Views {
                 let icon = {
                     Image(nsImage: featureType.icon)
                 }
-                CardTemplate(title: featureType.title, icon: icon, width: model.itemWidth, height: model.itemHeight)
-                    .contextMenu(ContextMenu(menuItems: {
-                        Button(model.actionTitle(for: featureType), action: { model.performAction(for: featureType) })
-                        Divider()
-                        Button(model.deleteActionTitle, action: { model.removeItem() })
-                    }))
-                    .onTapGesture {
-                        model.performAction(for: featureType)
+                ZStack {
+                    CardTemplate(title: featureType.title, icon: icon, width: model.itemWidth, height: model.itemHeight)
+                        .contextMenu(ContextMenu(menuItems: {
+                            Button(model.actionTitle(for: featureType), action: { model.performAction(for: featureType) })
+                            Divider()
+                            Button(model.deleteActionTitle, action: { model.removeItem(for: featureType) })
+                        }))
+                        .onTapGesture {
+                            model.performAction(for: featureType)
+                        }
+                        .onHover { isHovering in
+                            self.isHovering = isHovering
+                        }
+                    RemoveIemButton(icon: NSImage(named: "Close")!) {
+                        model.removeItem(for: featureType)
                     }
+                    .visibility(model.isRemoveItemButtonVisible && isHovering ? .visible : .gone)
+                    .padding(-5)
+                }
             }
+        }
 
+        struct RemoveIemButton: View {
+            let icon: NSImage
+            let action: () -> Void
+
+            var body: some View {
+                Circle()
+                    .size(width: 16, height: 16)
+                    .fill(.white)
+                    .shadow(color: .gray, radius: 1, x: 0, y: 0)
+                VStack {
+                    HStack {
+                        IconButton(icon: icon, action: action)
+                        Spacer()
+                    }
+                    Spacer()
+                }
+
+            }
+        }
+
+        struct CircleImage: View {
+             var body: some View {
+                 // Change to your image name under Assets.xcassets
+                 Image("Close")
+                     .resizable()
+                     .clipShape(Circle())
+                     .overlay(Circle().stroke(Color.orange, lineWidth: 10))
+                     .scaledToFit()
+                     .padding()
+                     .shadow(color: .black, radius: 10, x: 0, y: 0)
+             }
         }
     }
 }

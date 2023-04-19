@@ -27,7 +27,7 @@ struct RootView: View {
     let backgroundColor = Color("NewTabPageBackgroundColor")
     let targetWidth: CGFloat = 482
 
-    @ObservedObject var model: HomePage.Models.HomePageRootViewModel
+    @EnvironmentObject var model: HomePage.Models.HomePageRootViewModel
     @EnvironmentObject var continueSetUpModel: HomePage.Models.ContinueSetUpModel
     @EnvironmentObject var favoritesModel: HomePage.Models.FavoritesModel
 
@@ -63,12 +63,12 @@ struct RootView: View {
                 Spacer()
                 HStack {
                     Spacer()
-                    IconButton(icon: NSImage(named: "Options")!) {
+                    IconButton(icon: NSImage(named: "OptionsMainView")!) {
                         isVisible.toggle()
                     }
                     .padding()
                     .popover(isPresented: $isVisible, content: {
-                        HomeContnetPopoverView(isFavouriteVisible: $model.isFavouriteVisible, isContinueSetUpVisible: $model.isContinueSetUpVisible, isRecentActivityVisible: $model.isRecentActivityVisible)
+                        HomeContentPopoverView()
                             .padding()
                     })
                 }
@@ -80,7 +80,7 @@ struct RootView: View {
         .contextMenu(ContextMenu(menuItems: {
             Toggle(UserText.newTabMenuItemShowFavorite, isOn: $model.isFavouriteVisible)
             .toggleStyle(.checkbox)
-            .disabled(!favoritesModel.isThereContent)
+            .disabled(!favoritesModel.hasContent)
             Toggle(UserText.newTabMenuItemShowContinuteSetUp, isOn: $model.isContinueSetUpVisible)
             .toggleStyle(.checkbox)
             .disabled(!continueSetUpModel.hasContent)
@@ -90,12 +90,10 @@ struct RootView: View {
      }
 }
 
-    struct HomeContnetPopoverView: View {
+    struct HomeContentPopoverView: View {
+        @EnvironmentObject var model: HomePage.Models.HomePageRootViewModel
         @EnvironmentObject var continueSetUpModel: HomePage.Models.ContinueSetUpModel
         @EnvironmentObject var favoritesModel: HomePage.Models.FavoritesModel
-        @Binding var isFavouriteVisible: Bool
-        @Binding var isContinueSetUpVisible: Bool
-        @Binding var isRecentActivityVisible: Bool
 
         var body: some View {
             Text(UserText.newTabBottomPopoverTitle)
@@ -103,18 +101,18 @@ struct RootView: View {
                 .font(.custom("SFProText-Regular", size: 13))
             Divider()
             HStack {
-                Toggle(isOn: $isFavouriteVisible, label: {
+                Toggle(isOn: $model.isFavouriteVisible, label: {
                     HStack {
                         Image("Favorite")
                             .frame(width: 16.02, height: 16.02)
                         Text(UserText.newTabFavoriteSectionTitle)
                     }
                 })
-                .disabled(!favoritesModel.isThereContent)
+                .disabled(!favoritesModel.hasContent)
                 Spacer()
             }
             HStack {
-                Toggle(isOn: $isContinueSetUpVisible, label: {
+                Toggle(isOn: $model.isContinueSetUpVisible, label: {
                     HStack {
                         Image("RocketNoColor")
                             .frame(width: 16.02, height: 16.02)
@@ -125,7 +123,7 @@ struct RootView: View {
                 Spacer()
             }
             HStack {
-                Toggle(isOn: $isRecentActivityVisible, label: {
+                Toggle(isOn: $model.isRecentActivityVisible, label: {
                     HStack {
                         Image("Shield")
                             .frame(width: 16.02, height: 16.02)

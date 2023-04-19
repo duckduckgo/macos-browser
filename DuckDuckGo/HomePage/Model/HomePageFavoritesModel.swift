@@ -79,7 +79,7 @@ extension HomePage.Models {
 
         @Published private(set) var rows: [[FavoriteModel]] = []
 
-        var isThereContent: Bool {
+        var hasContent: Bool {
             return !favorites.isEmpty
         }
 

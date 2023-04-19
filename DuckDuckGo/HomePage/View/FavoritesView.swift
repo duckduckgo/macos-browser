@@ -55,7 +55,7 @@ extension HomePage.Views {
             .onHover { isHovering in
                 self.isHovering = isHovering
             }
-            .visibility(model.isThereContent ? .visible : .gone)
+            .visibility(model.hasContent ? .visible : .gone)
 
         }
 

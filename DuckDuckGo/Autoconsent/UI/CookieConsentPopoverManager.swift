@@ -36,8 +36,8 @@ final class CookieConsentPopoverManager: CookieConsentPopoverDelegate {
         }
     }
 
-    func show(on view: NSView, animated: Bool, result: ((Bool) -> Void)? = nil) {
-        preparePopover()
+    func show(on view: NSView, animated: Bool, type: CookieConsentPopoverType = .site, result: ((Bool) -> Void)? = nil) {
+        preparePopover(type: type)
 
         guard let popOver = popOver else {
             return
@@ -57,7 +57,7 @@ final class CookieConsentPopoverManager: CookieConsentPopoverDelegate {
         popOver.close(animated: animated)
     }
 
-    private func preparePopover() {
+    private func preparePopover(type: CookieConsentPopoverType) {
         // If the tab was closed, we want to start the animation again
         if currentTab == nil {
             popOver = nil
@@ -67,7 +67,12 @@ final class CookieConsentPopoverManager: CookieConsentPopoverDelegate {
             return
         }
 
-        popOver = CookieConsentPopover()
+        popOver = CookieConsentPopover(type: type)
         popOver?.delegate = self
     }
+}
+
+public enum CookieConsentPopoverType {
+    case site
+    case setUp
 }

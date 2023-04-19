@@ -23,9 +23,15 @@ extension HomePage.Models {
     final class HomePageRootViewModel: ObservableObject {
 
         private var homePagePreferencesPersistor: HomePagePreferencesUserDefaultsPersistor
+        private var continueSetUpModel: HomePage.Models.ContinueSetUpModel
+        private var favoritesModel: HomePage.Models.FavoritesModel
 
-        init(homePagePreferencesPersistor: HomePagePreferencesUserDefaultsPersistor = HomePagePreferencesUserDefaultsPersistor()) {
+        init(homePagePreferencesPersistor: HomePagePreferencesUserDefaultsPersistor = HomePagePreferencesUserDefaultsPersistor(),
+             continueSetUpModel: HomePage.Models.ContinueSetUpModel,
+             favoritesModel: HomePage.Models.FavoritesModel) {
             self.homePagePreferencesPersistor = homePagePreferencesPersistor
+            self.continueSetUpModel = continueSetUpModel
+            self.favoritesModel = favoritesModel
             isFavouriteVisible = homePagePreferencesPersistor.isFavouriteVisible
             isContinueSetUpVisible = homePagePreferencesPersistor.isContinueSetUpVisible
             isRecentActivityVisible = homePagePreferencesPersistor.isRecentActivityVisible
@@ -48,6 +54,7 @@ extension HomePage.Models {
                 homePagePreferencesPersistor.isRecentActivityVisible = isRecentActivityVisible
             }
         }
+
     }
 
     struct HomePagePreferencesUserDefaultsPersistor {

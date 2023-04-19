@@ -32,20 +32,21 @@ public final class CookieConsentPopover {
     public var viewController: CookieConsentUserPermissionViewController
     public var windowController: NSWindowController
     private var resizeObserver: Any?
+    let type: CookieConsentPopoverType
 
-    public init() {
+    public init(type: CookieConsentPopoverType = .site) {
+        self.type = type
         let storyboard = NSStoryboard(name: "CookieConsent", bundle: Bundle.main)
         viewController = storyboard.instantiateController(identifier: "CookieConsentUserPermissionViewController")
         windowController = storyboard.instantiateController(identifier: "CookieConsentWindowController")
-
+        viewController.delegate = self
+        
         windowController.contentViewController = viewController
         windowController.window?.acceptsMouseMovedEvents = true
         windowController.window?.ignoresMouseEvents = false
 
         viewController.view.window?.backgroundColor = .clear
         viewController.view.wantsLayer = true
-
-        viewController.delegate = self
     }
 
     public func close(animated: Bool, completion: (() -> Void)? = nil) {

@@ -57,9 +57,9 @@ final class DuckPlayerPreferences: ObservableObject {
         }
     }
 
-    var youtubeOverlayUserPressedButtons: Bool {
+    var youtubeOverlayAnyButtonPressed: Bool {
         didSet {
-            persistor.youtubeOverlayAnyButtonPressed = youtubeOverlayUserPressedButtons
+            persistor.youtubeOverlayAnyButtonPressed = youtubeOverlayAnyButtonPressed
         }
     }
 
@@ -67,7 +67,7 @@ final class DuckPlayerPreferences: ObservableObject {
         self.persistor = persistor
         duckPlayerMode = .init(persistor.duckPlayerModeBool)
         youtubeOverlayInteracted = persistor.youtubeOverlayInteracted
-        youtubeOverlayUserPressedButtons = persistor.youtubeOverlayAnyButtonPressed
+        youtubeOverlayAnyButtonPressed = persistor.youtubeOverlayAnyButtonPressed
     }
 
     private var persistor: DuckPlayerPreferencesPersistor
