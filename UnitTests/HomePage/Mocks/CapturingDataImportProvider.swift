@@ -19,7 +19,6 @@
 import Foundation
 @testable import DuckDuckGo_Privacy_Browser
 
-
 class CapturingDataImportProvider: DataImportStatusProviding {
     var showImportWindowCalled = false
     var didImport = false

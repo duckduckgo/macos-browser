@@ -653,12 +653,12 @@ extension MainViewController {
     }
 
     @IBAction func resetMakeDuckDuckGoYoursUserSettings(_ sender: Any?) {
-//        let model = HomePage.Models.ContinueSetUpModel(defaultBrowserProvider: SystemDefaultBrowserProvider(), dataImportProvider: BookmarksAndPasswordsImportStatusProvider(), tabCollectionViewModel: TabCollectionViewModel(), duckPlayerPreferences: DuckPlayerPreferencesUserDefaultsPersistor())
-//        model.shouldShowCookieSetting = true
-//        model.shouldShowMakeDefaultSetting = true
-//        model.shouldShowImportSetting = true
-//        model.shouldShowDuckPlayerSetting = true
-//        model.shouldShowEmailProtectionSetting = true
+        UserDefaults.standard.set(true, forKey: "home.page.show.all.features")
+        UserDefaults.standard.set(true, forKey: "home.page.show.make.default")
+        UserDefaults.standard.set(true, forKey: "home.page.show.import")
+        UserDefaults.standard.set(true, forKey: "home.page.show.duck.player")
+        UserDefaults.standard.set(true, forKey: "home.page.show.email.protection")
+        UserDefaults.standard.set(true, forKey: "home.page.show.cookie")
     }
 
     @IBAction func showSaveCredentialsPopover(_ sender: Any?) {
