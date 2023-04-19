@@ -74,6 +74,8 @@ final class PasswordManagerCoordinator: PasswordManagerCoordinating {
 
     var statusCancellable: AnyCancellable?
 
+#if APPSTORE
+
     func setEnabled(_ enabled: Bool) {
         if enabled {
             if !bitwardenManagement.status.isConnected {
@@ -218,6 +220,23 @@ final class PasswordManagerCoordinator: PasswordManagerCoordinating {
             }
         }
     }
+
+#else
+
+    func setEnabled(_ enabled: Bool) {}
+    func askToUnlock(completionHandler: @escaping () -> Void) {}
+    func openPasswordManager() {}
+    func accountsFor(domain: String, completion: @escaping ([BrowserServicesKit.SecureVaultModels.WebsiteAccount], Error?) -> Void) {}
+    func cachedAccountsFor(domain: String) -> [BrowserServicesKit.SecureVaultModels.WebsiteAccount] {}
+    func cachedWebsiteCredentialsFor(domain: String, username: String) -> BrowserServicesKit.SecureVaultModels.WebsiteCredentials? {}
+    func websiteCredentialsFor(accountId: String, completion: @escaping (BrowserServicesKit.SecureVaultModels.WebsiteCredentials?, Error?) -> Void) {}
+    func websiteCredentialsFor(domain: String, completion: @escaping ([BrowserServicesKit.SecureVaultModels.WebsiteCredentials], Error?) -> Void) {}
+
+    func storeWebsiteCredentials(_ credentials: SecureVaultModels.WebsiteCredentials,
+                                 completion: @escaping (Error?) -> Void) {}
+
+#endif
+
 
     // MARK: - Cache
 
