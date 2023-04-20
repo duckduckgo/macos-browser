@@ -21,6 +21,9 @@ import DDGSync
 import Combine
 import SystemConfiguration
 import SyncUI
+import SwiftUI
+import PDFKit
+import Navigation
 
 extension SyncDevice {
     init(_ account: SyncAccount) {
@@ -230,8 +233,27 @@ extension SyncPreferences: ManagementDialogModelDelegate {
         presentDialog(for: .saveRecoveryPDF)
     }
 
+    @MainActor
     func saveRecoveryPDF() {
-        managementDialogModel.endFlow()
+
+        guard let recoveryCode = syncService.account?.recoveryCode else {
+            assertionFailure()
+            return
+        }
+
+        let data = RecoveryPDFGenerator()
+            .generate(recoveryCode)
+
+        Task { @MainActor in
+            let panel = NSSavePanel.savePanelWithFileTypeChooser(fileTypes: [.pdf], suggestedFilename: "DuckDuckGo Recovery Code.pdf")
+            let response = await panel.begin()
+
+            guard response == .OK,
+                  let location = panel.url else { return }
+
+            try data.writeFileWithProgress(to: location)
+        }
+
     }
 
 }

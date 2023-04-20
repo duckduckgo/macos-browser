@@ -34,9 +34,11 @@ extension Preferences {
                     TextMenuItemHeader(text: UserText.downloadsLocation)
                     HStack {
                         NSPathControlView(url: model.selectedDownloadLocation)
+#if !APPSTORE
                         Button(UserText.downloadsChangeDirectory) {
                             model.presentDownloadDirectoryPanel()
                         }
+#endif
                     }
                     .disabled(model.alwaysRequestDownloadLocation)
                     ToggleMenuItem(title: UserText.downloadsAlwaysAsk, isOn: $model.alwaysRequestDownloadLocation)
