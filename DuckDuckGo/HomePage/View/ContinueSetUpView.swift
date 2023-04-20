@@ -138,6 +138,7 @@ extension HomePage.Views {
                         .frame(width: 22, height: 22)
                         .shadow(color: .gray, radius: 1, x: 0, y: 0)
                     IconButton(icon: icon, action: action)
+                        .foregroundColor(.black)
                 }
             }
         }
