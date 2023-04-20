@@ -194,6 +194,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
     func updateDeviceName(_ name: String) {
         Task { @MainActor in
             do {
+                self.devices = []
                 let devices = try await syncService.updateDeviceName(name)
                 mapDevices(devices)
             } catch {
