@@ -387,6 +387,8 @@ final class MainViewController: NSViewController {
             browserTabViewController.preferencesViewController?.view.makeMeFirstResponder()
         case .bookmarks:
             browserTabViewController.bookmarksViewController?.view.makeMeFirstResponder()
+        case .dataBrokerProtection:
+            browserTabViewController.preferencesViewController?.view.makeMeFirstResponder()
         case .none:
             shouldAdjustFirstResponderOnContentChange = true
         }

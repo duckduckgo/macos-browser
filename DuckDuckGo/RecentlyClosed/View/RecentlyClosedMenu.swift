@@ -73,6 +73,9 @@ private extension NSMenuItem {
         case .bookmarks:
             image = TabViewModel.Favicon.preferences
             title = UserText.tabPreferencesTitle
+        case .dataBrokerProtection:
+            image = TabViewModel.Favicon.dataBrokerProtection
+            title = UserText.tabDataBrokerProtectionTitle
         case .url:
             image = recentlyClosedTab.favicon
             image?.size = NSSize.faviconSize
@@ -81,6 +84,7 @@ private extension NSMenuItem {
             if title.count > MainMenu.Constants.maxTitleLength {
                 title = String(title.truncated(length: MainMenu.Constants.maxTitleLength))
             }
+
         case .onboarding, .none:
             return nil
         }
