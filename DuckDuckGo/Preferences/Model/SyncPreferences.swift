@@ -65,10 +65,16 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         presentDialog(for: .recoverAccount)
     }
 
+    @MainActor
+    func presentTurnOffSyncConfirmDialog() {
+        presentDialog(for: .turnOffSync)
+    }
+
     func turnOffSync() {
         Task { @MainActor in
             do {
                 try await syncService.disconnect()
+                managementDialogModel.endFlow()
             } catch {
                 errorMessage = String(describing: error)
             }
@@ -186,6 +192,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
             do {
                 let device = deviceInfo()
                 try await syncService.createAccount(deviceName: device.name, deviceType: device.type)
+                confirmSetupComplete()
             } catch {
                 managementDialogModel.errorMessage = String(describing: error)
             }

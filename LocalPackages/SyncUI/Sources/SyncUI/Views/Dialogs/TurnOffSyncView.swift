@@ -1,5 +1,5 @@
 //
-//  SaveRecoveryPDFView.swift
+//  TurnOffSyncView.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -19,30 +19,29 @@
 import SwiftUI
 import SwiftUIExtensions
 
-struct SaveRecoveryPDFView: View {
+struct TurnOffSyncView: View {
+
     @EnvironmentObject var model: ManagementDialogModel
 
     var body: some View {
         SyncDialog {
             VStack(spacing: 20.0) {
-                Image("SyncRecoveryPDF")
-                Text(UserText.saveRecoveryPDF)
+                Image("SyncRemoveDeviceDesktop")
+                Text(UserText.turnOffSyncConfirmTitle)
                     .font(.system(size: 17, weight: .bold))
-                Text(UserText.recoveryPDFExplanation1)
-                    .multilineTextAlignment(.center)
-                Text(UserText.recoveryPDFExplanation2)
+                Text(UserText.turnOffSyncConfirmMessage)
                     .multilineTextAlignment(.center)
             }
         } buttons: {
-            Button(UserText.notNow) {
+            Button(UserText.cancel) {
                 model.endFlow()
             }
-            Button(UserText.saveRecoveryPDF) {
-                model.delegate?.saveRecoveryPDF()
-                model.endFlow()
+            Button(UserText.turnOff) {
+                model.delegate?.turnOffSync()
             }
             .buttonStyle(DefaultActionButtonStyle(enabled: true))
         }
-        .frame(height: 314)
+        .frame(height: 250)
     }
+
 }
