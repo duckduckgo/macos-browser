@@ -53,7 +53,10 @@ struct ImportedLoginCredential: Equatable {
 
     // Extracts a hostname from the provided title string, via pattern matching
     private static func extractHostName(fromTitle title: String?) -> String? {
-        guard let title else { return nil }
+        guard let title,
+              title != "" else {
+            return nil
+        }
         for pattern in CommonTitlePatterns.allCases {
             guard let range = title.range(of: pattern.rawValue, options: .regularExpression),
                   range.lowerBound != range.upperBound
@@ -66,7 +69,8 @@ struct ImportedLoginCredential: Equatable {
 
     init(title: String? = nil, url: String, username: String, password: String) {
         // If the title is "equal" to the hostname, drop it
-        self.title = title == ImportedLoginCredential.extractHostName(fromTitle: title) ? nil : title
+        let hostNameFromTitle = ImportedLoginCredential.extractHostName(fromTitle: title)
+        self.title = title == hostNameFromTitle || title == "" ? nil : title
         self.url = URL(string: url)?.host ?? url // Try to use the host if possible, as the Secure Vault saves credentials using the host.
         self.username = username
         self.password = password

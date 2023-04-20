@@ -70,6 +70,7 @@ class CSVImporterTests: XCTestCase {
 
     func testWhenImportingLoginsWhichTitlePatternsMatchTheURL_ThenRemoveTheTitle() {
         let csvFileContents = """
+        ,duck.com,username,p4ssw0rd
         duck.com,duck.com,username,p4ssw0rd
         duck.com (test@duck.com),duck.com,username,p4ssw0rd
         signin.duck.com (test@duck.com.co),signin.duck.com,username,p4ssw0rd
