@@ -138,6 +138,8 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
             self.download.cancel()
             self.finish(with: .failure(.failedToCompleteDownloadTask(underlyingError: URLError(.cancelled), resumeData: nil, isRetryable: false)))
             self.decideDestinationCompletionHandler?(nil)
+
+            Pixel.fire(.debug(event: .fileGetDownloadLocationFailed, error: error))
         }
     }
 
@@ -312,6 +314,7 @@ extension WebKitDownloadTask: WebKitDownloadDelegate {}
             do {
                 destinationURL = try FileManager.default.moveItem(at: tempURL, to: destinationURL, incrementingIndexIfExists: true)
             } catch {
+                Pixel.fire(.debug(event: .fileMoveToDownloadsFailed, error: error))
                 destinationURL = tempURL
             }
         }

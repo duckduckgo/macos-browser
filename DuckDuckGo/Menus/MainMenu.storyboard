@@ -505,8 +505,18 @@
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="eoz-XM-HpQ"/>
+                                        <menuItem title="Clear All History…" enabled="NO" id="n9a-Bc-r7Z">
+                                            <string key="keyEquivalent" base64-UTF8="YES">
+CA
+</string>
+                                            <modifierMask key="keyEquivalentModifierMask" shift="YES" command="YES"/>
+                                            <connections>
+                                                <action selector="clearAllHistory:" target="Ady-hI-5gd" id="5Q8-pp-l2m"/>
+                                            </connections>
+                                        </menuItem>
                                     </items>
                                     <connections>
+                                        <outlet property="clearAllHistoryMenuItem" destination="n9a-Bc-r7Z" id="L22-xU-BaT"/>
                                         <outlet property="recentlyClosedMenuItem" destination="pWT-lm-yTC" id="bhY-MN-oMZ"/>
                                         <outlet property="reopenAllWindowsFromLastSessionMenuItem" destination="C6V-uF-uX8" id="YoX-kD-0PA"/>
                                         <outlet property="reopenLastClosedMenuItem" destination="c3l-v1-kxk" id="1OS-ma-fzm"/>
