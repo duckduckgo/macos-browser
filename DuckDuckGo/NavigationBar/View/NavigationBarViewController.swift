@@ -205,6 +205,7 @@ final class NavigationBarViewController: NSViewController {
         }
     }
 
+    // swiftlint:disable force_cast
     @IBAction func optionsButtonAction(_ sender: NSButton) {
 
         let menu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
@@ -213,6 +214,7 @@ final class NavigationBarViewController: NSViewController {
         menu.actionDelegate = self
         menu.popUp(positioning: nil, at: NSPoint(x: 0, y: sender.bounds.height + 4), in: sender)
     }
+    // swiftlint:enable force_cast
 
     @IBAction func bookmarksButtonAction(_ sender: NSButton) {
         popovers.bookmarksButtonPressed(anchorView: bookmarkListButton,
