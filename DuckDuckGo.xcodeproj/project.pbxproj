@@ -50,6 +50,8 @@
 		1D77921A28FDC79800BE0210 /* FaviconStoringMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D77921928FDC79800BE0210 /* FaviconStoringMock.swift */; };
 		1D7D5B6A29C9DED80054A4DC /* BurnerWindowPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D7D5B6929C9DED80054A4DC /* BurnerWindowPopover.swift */; };
 		1D7D5B7129CA04560054A4DC /* BurnerWindowPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D7D5B6929C9DED80054A4DC /* BurnerWindowPopover.swift */; };
+		1DB9617A29F1D06D00CF5568 /* InternalUserDeciderMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DB9617929F1D06D00CF5568 /* InternalUserDeciderMock.swift */; };
+		1DB9617B29F1D06D00CF5568 /* InternalUserDeciderMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DB9617929F1D06D00CF5568 /* InternalUserDeciderMock.swift */; };
 		1DCFBC8A29ADF32B00313531 /* DisposableHomePageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DCFBC8929ADF32B00313531 /* DisposableHomePageView.swift */; };
 		1DCFBC8B29ADF32B00313531 /* DisposableHomePageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DCFBC8929ADF32B00313531 /* DisposableHomePageView.swift */; };
 		1DDF076328F815AD00EDFBE3 /* BWCommunicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DDF075D28F815AD00EDFBE3 /* BWCommunicator.swift */; };
@@ -1930,6 +1932,7 @@
 		1D77921928FDC79800BE0210 /* FaviconStoringMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaviconStoringMock.swift; sourceTree = "<group>"; };
 		1D77921C28FFF27C00BE0210 /* RunningApplicationCheck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunningApplicationCheck.swift; sourceTree = "<group>"; };
 		1D7D5B6929C9DED80054A4DC /* BurnerWindowPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BurnerWindowPopover.swift; sourceTree = "<group>"; };
+		1DB9617929F1D06D00CF5568 /* InternalUserDeciderMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InternalUserDeciderMock.swift; sourceTree = "<group>"; };
 		1DCFBC8929ADF32B00313531 /* DisposableHomePageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisposableHomePageView.swift; sourceTree = "<group>"; };
 		1DDF075C28F815AD00EDFBE3 /* BWCredential.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BWCredential.swift; sourceTree = "<group>"; };
 		1DDF075D28F815AD00EDFBE3 /* BWCommunicator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BWCommunicator.swift; sourceTree = "<group>"; };
@@ -2949,6 +2952,7 @@
 			isa = PBXGroup;
 			children = (
 				1D12F2E1298BC660009A65FD /* InternalUserDeciderStoreMock.swift */,
+				1DB9617929F1D06D00CF5568 /* InternalUserDeciderMock.swift */,
 			);
 			path = FeatureFlagging;
 			sourceTree = "<group>";
@@ -7162,6 +7166,7 @@
 				3706FE45293F661700E42796 /* ProgressEstimationTests.swift in Sources */,
 				3706FE46293F661700E42796 /* EncryptedValueTransformerTests.swift in Sources */,
 				3706FE47293F661700E42796 /* URLExtensionTests.swift in Sources */,
+				1DB9617B29F1D06D00CF5568 /* InternalUserDeciderMock.swift in Sources */,
 				3706FE48293F661700E42796 /* PixelTests.swift in Sources */,
 				3706FE49293F661700E42796 /* BookmarkNodePathTests.swift in Sources */,
 				1DE03425298BC7F000CAB3D7 /* InternalUserDeciderStoreMock.swift in Sources */,
@@ -7920,6 +7925,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1DB9617A29F1D06D00CF5568 /* InternalUserDeciderMock.swift in Sources */,
 				9833913327AAAEEE00DAF119 /* EmbeddedTrackerDataTests.swift in Sources */,
 				3776583127F8325B009A6B35 /* AutofillPreferencesTests.swift in Sources */,
 				B67C6C472654C643006C872E /* FileManagerExtensionTests.swift in Sources */,
