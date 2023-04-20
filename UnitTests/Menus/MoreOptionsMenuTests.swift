@@ -49,16 +49,17 @@ final class MoreOptionsMenuTests: XCTestCase {
         XCTAssertTrue(moreOptionMenu.items[1].isSeparatorItem)
         XCTAssertEqual(moreOptionMenu.items[2].title, UserText.plusButtonNewTabMenuItem)
         XCTAssertEqual(moreOptionMenu.items[3].title, UserText.newWindowMenuItem)
-        XCTAssertTrue(moreOptionMenu.items[4].isSeparatorItem)
-        XCTAssertEqual(moreOptionMenu.items[5].title, UserText.zoom)
-        XCTAssertTrue(moreOptionMenu.items[6].isSeparatorItem)
-        XCTAssertEqual(moreOptionMenu.items[7].title, UserText.bookmarks)
-        XCTAssertEqual(moreOptionMenu.items[8].title, UserText.downloads)
-        XCTAssertEqual(moreOptionMenu.items[9].title, UserText.passwordManagement)
-        XCTAssertTrue(moreOptionMenu.items[10].isSeparatorItem)
-        XCTAssertEqual(moreOptionMenu.items[11].title, UserText.emailOptionsMenuItem)
-        XCTAssertTrue(moreOptionMenu.items[12].isSeparatorItem)
-        XCTAssertEqual(moreOptionMenu.items[13].title, UserText.settings)
+        XCTAssertEqual(moreOptionMenu.items[4].title, UserText.newDisposableWindowMenuItem)
+        XCTAssertTrue(moreOptionMenu.items[5].isSeparatorItem)
+        XCTAssertEqual(moreOptionMenu.items[6].title, UserText.zoom)
+        XCTAssertTrue(moreOptionMenu.items[7].isSeparatorItem)
+        XCTAssertEqual(moreOptionMenu.items[8].title, UserText.bookmarks)
+        XCTAssertEqual(moreOptionMenu.items[9].title, UserText.downloads)
+        XCTAssertEqual(moreOptionMenu.items[10].title, UserText.passwordManagement)
+        XCTAssertTrue(moreOptionMenu.items[11].isSeparatorItem)
+        XCTAssertEqual(moreOptionMenu.items[12].title, UserText.emailOptionsMenuItem)
+        XCTAssertTrue(moreOptionMenu.items[13].isSeparatorItem)
+        XCTAssertEqual(moreOptionMenu.items[14].title, UserText.settings)
     }
 
     // MARK: Zoom
@@ -78,7 +79,7 @@ final class MoreOptionsMenuTests: XCTestCase {
     // MARK: Preferences
 
     func testWhenClickingOnPreferenceMenuItemThenTheActionDelegateIsAlerted() {
-        moreOptionMenu.performActionForItem(at: 13)
+        moreOptionMenu.performActionForItem(at: 14)
 
         XCTAssertTrue(capturingActionDelegate.optionsButtonMenuRequestedPreferencesCalled)
     }
