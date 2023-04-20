@@ -114,6 +114,7 @@ final class MainMenu: NSMenu {
 
     // MARK: - Lifecycle
 
+    @MainActor
     override func update() {
         super.update()
 
@@ -125,6 +126,11 @@ final class MainMenu: NSMenu {
         if !WKWebView.canPrint {
             printMenuItem?.removeFromParent()
             printSeparatorItem?.removeFromParent()
+        }
+
+        if let appDelegate = NSApplication.shared.delegate as? AppDelegate,
+           appDelegate.internalUserDecider.isInternalUser {
+            newDisposableWindowMenuItem.isHidden = false
         }
 
         sharingMenu.title = shareMenuItem.title

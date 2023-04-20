@@ -17,13 +17,19 @@
 //
 
 import AppKit
+import BrowserServicesKit
 
 final class ApplicationDockMenu: NSMenu {
 
-    init() {
+    init(internalUserDecider: InternalUserDecider) {
         super.init(title: "")
+        // New Window
         addItem(withTitle: UserText.newWindowMenuItem, action: #selector(AppDelegate.newWindow), keyEquivalent: "")
-        addItem(withTitle: UserText.newDisposableWindowMenuItem, action: #selector(AppDelegate.newDisposableWindow), keyEquivalent: "")
+
+        // New Disposable Window
+        if internalUserDecider.isInternalUser {
+            addItem(withTitle: UserText.newDisposableWindowMenuItem, action: #selector(AppDelegate.newDisposableWindow), keyEquivalent: "")
+        }
     }
 
     required init(coder: NSCoder) {

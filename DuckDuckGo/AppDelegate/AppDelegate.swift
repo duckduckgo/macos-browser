@@ -232,7 +232,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     }
 
     func applicationDockMenu(_ sender: NSApplication) -> NSMenu? {
-        return ApplicationDockMenu()
+        return ApplicationDockMenu(internalUserDecider: internalUserDecider)
     }
 
     func application(_ sender: NSApplication, openFiles files: [String]) {

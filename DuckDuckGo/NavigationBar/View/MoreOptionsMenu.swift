@@ -45,6 +45,7 @@ final class MoreOptionsMenu: NSMenu {
     private let tabCollectionViewModel: TabCollectionViewModel
     private let emailManager: EmailManager
     private let passwordManagerCoordinator: PasswordManagerCoordinating
+    private let internalUserDecider: InternalUserDecider
 
     required init(coder: NSCoder) {
         fatalError("MoreOptionsMenu: Bad initializer")
@@ -52,11 +53,13 @@ final class MoreOptionsMenu: NSMenu {
 
     init(tabCollectionViewModel: TabCollectionViewModel,
          emailManager: EmailManager = EmailManager(),
-         passwordManagerCoordinator: PasswordManagerCoordinator) {
+         passwordManagerCoordinator: PasswordManagerCoordinator,
+         internalUserDecider: InternalUserDecider) {
 
         self.tabCollectionViewModel = tabCollectionViewModel
         self.emailManager = emailManager
         self.passwordManagerCoordinator = passwordManagerCoordinator
+        self.internalUserDecider = internalUserDecider
         super.init(title: "")
 
         self.emailManager.requestDelegate = self
@@ -194,13 +197,15 @@ final class MoreOptionsMenu: NSMenu {
             .withImage(NSImage(named: "NewWindow"))
 
         // New Disposable Window
-        let disposableWindowItem = NSMenuItem(title: UserText.newDisposableWindowMenuItem,
-                              action: #selector(newDisposableWindow(_:)),
-                              target: self)
-        disposableWindowItem.keyEquivalent = "n"
-        disposableWindowItem.keyEquivalentModifierMask = [.command, .shift]
-        disposableWindowItem.image = NSImage(named: "NewDisposableWindow")
-        addItem(disposableWindowItem)
+        if internalUserDecider.isInternalUser {
+            let disposableWindowItem = NSMenuItem(title: UserText.newDisposableWindowMenuItem,
+                                                  action: #selector(newDisposableWindow(_:)),
+                                                  target: self)
+            disposableWindowItem.keyEquivalent = "n"
+            disposableWindowItem.keyEquivalentModifierMask = [.command, .shift]
+            disposableWindowItem.image = NSImage(named: "NewDisposableWindow")
+            addItem(disposableWindowItem)
+        }
 
         addItem(NSMenuItem.separator())
     }
