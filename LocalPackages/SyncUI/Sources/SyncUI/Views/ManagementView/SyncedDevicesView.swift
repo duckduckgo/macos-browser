@@ -23,6 +23,13 @@ struct SyncedDevicesView<ViewModel>: View where ViewModel: ManagementViewModel {
 
     var body: some View {
         VStack(spacing: 0) {
+            if #available(macOS 11.0, *) {
+                if model.devices.isEmpty {
+                    ProgressView()
+                        .padding()
+                }
+            }
+
             ForEach(model.devices) { device in
                 if !device.isCurrent {
                     Rectangle()
