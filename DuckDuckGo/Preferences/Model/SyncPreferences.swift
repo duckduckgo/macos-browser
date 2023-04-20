@@ -123,16 +123,22 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         refreshDevices()
     }
 
+    @MainActor
+    private func mapDevices(_ registeredDevices: [RegisteredDevice]) {
+        guard let deviceId = syncService.account?.deviceId else { return }
+        self.devices = registeredDevices.map {
+            deviceId == $0.id ? SyncDevice(kind: .current, name: $0.name, id: $0.id) : SyncDevice($0)
+        }.sorted(by: { item, _ in
+            item.isCurrent
+        })
+    }
+
     private func refreshDevices() {
-        if let deviceId = syncService.account?.deviceId {
+        if syncService.account != nil {
             Task { @MainActor in
                 do {
                     let registeredDevices = try await syncService.fetchDevices()
-
-                    self.devices = registeredDevices.map {
-                        deviceId == $0.id ? SyncDevice(kind: .current, name: $0.name, id: $0.id) : SyncDevice($0)
-                    }
-
+                    mapDevices(registeredDevices)
                     print("devices", self.devices)
                 } catch {
                     print("error", error.localizedDescription)
@@ -184,6 +190,17 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
 }
 
 extension SyncPreferences: ManagementDialogModelDelegate {
+
+    func updateDeviceName(_ name: String) {
+        Task { @MainActor in
+            do {
+                let devices = try await syncService.updateDeviceName(name)
+                mapDevices(devices)
+            } catch {
+                managementDialogModel.errorMessage = String(describing: error)
+            }
+        }
+    }
 
     private func deviceInfo() -> (name: String, type: String) {
         let hostname = SCDynamicStoreCopyComputerName(nil, nil) as? String ?? ProcessInfo.processInfo.hostName

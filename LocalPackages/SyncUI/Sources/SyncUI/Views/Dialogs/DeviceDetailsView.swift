@@ -53,7 +53,7 @@ struct DeviceDetailsView: View {
             }
 
             Button(UserText.ok) {
-                print("ok")
+                model.delegate?.updateDeviceName(deviceName)
                 model.endFlow()
             }
             .disabled(!canSave)
