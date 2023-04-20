@@ -68,6 +68,21 @@ class CSVImporterTests: XCTestCase {
         XCTAssertEqual(logins, [ImportedLoginCredential(title: "Some Title", url: "duck.com", username: "username", password: "p4ssw0rd")])
     }
 
+    func testWhenImportingCSVLineWithTitleEmptyOrEqualToURL_ThenTitleIsRemoved() {
+        let csvFileContents = """
+        duck.com,duck.com,username,p4ssw0rd
+        duck.com (test@duck.com),duck.com,username,p4ssw0rd
+        sigin.duck.com (test@duck.com.co),signin.duck.com,username,p4ssw0rd
+        """
+
+        let logins = CSVImporter.extractLogins(from: csvFileContents)
+        XCTAssertEqual(logins, [
+            ImportedLoginCredential(title: nil, url: "duck.com", username: "username", password: "p4ssw0rd"),
+            ImportedLoginCredential(title: nil, url: "duck.com", username: "username", password: "p4ssw0rd"),
+            ImportedLoginCredential(title: nil, url: "signin.duck.com", username: "username", password: "p4ssw0rd")
+        ])
+    }
+
     func testWhenImportingCSVDataFromTheFileSystem_AndNoTitleIsIncluded_ThenLoginCredentialsAreImported() {
         let mockLoginImporter = MockLoginImporter()
         let file = "https://example.com/,username,password"

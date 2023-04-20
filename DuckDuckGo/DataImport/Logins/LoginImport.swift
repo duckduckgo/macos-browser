@@ -37,9 +37,28 @@ struct ImportedLoginCredential: Equatable {
     let url: String
     let username: String
     let password: String
+    
+    private enum CommonTitlePatterns: String, CaseIterable {
+        // "[https://]login.example.com (daniel@duck.com)" format
+        case urlUsername = #"^(?:https?:\/\/)?(?:[\w-]+\.)*([\w-]+\.[a-z]+)(?: \([^)]+\))?$"#
+    }
+
+    // Extracts a hostname from the provided title string, via pattern matching
+    private static func extractHostName(fromTitle title: String?) -> String? {
+        guard let title else { return nil }
+        for pattern in CommonTitlePatterns.allCases {
+            guard let range = title.range(of: pattern.rawValue, options: .regularExpression),
+                  range.lowerBound != range.upperBound
+            else { continue }
+            let host = String(title[range])
+            return host.isEmpty ? nil : host
+        }
+        return nil
+    }
 
     init(title: String? = nil, url: String, username: String, password: String) {
-        self.title = title
+        // If the title is "equal" to the hostname, drop it
+        self.title = title == ImportedLoginCredential.extractHostName(fromTitle: title) ? nil : title
         self.url = URL(string: url)?.host ?? url // Try to use the host if possible, as the Secure Vault saves credentials using the host.
         self.username = username
         self.password = password
