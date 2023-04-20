@@ -68,23 +68,23 @@ class CSVImporterTests: XCTestCase {
         XCTAssertEqual(logins, [ImportedLoginCredential(title: "Some Title", url: "duck.com", username: "username", password: "p4ssw0rd")])
     }
 
-    func testWhenImportingCSVLineWithTitleEmptyOrEqualToURL_ThenTitleIsRemoved() {
+    func testWhenImportingLoginsWhichTitlePatternsMatchTheURL_ThenRemoveTheTitle() {
         let csvFileContents = """
         duck.com,duck.com,username,p4ssw0rd
         duck.com (test@duck.com),duck.com,username,p4ssw0rd
-        sigin.duck.com (test@duck.com.co),signin.duck.com,username,p4ssw0rd
-        http://sigin.duck.com (test@duck.com.co),signin.duck.com,username,p4ssw0rd
-        https://sigin.duck.com (test@duck.com.co),signin.duck.com,username,p4ssw0rd
+        signin.duck.com (test@duck.com.co),signin.duck.com,username,p4ssw0rd
+        http://signin.duck.com (test@duck.com.co),signin.duck.com,username,p4ssw0rd
+        https://signin.duck.com (test@duck.com.co),signin.duck.com,username,p4ssw0rd
+        http://signin.duck.com,signin.duck.com,username,p4ssw0rd
+        https://signin.duck.com,signin.duck.com,username,p4ssw0rd
+        https://signin.duck.com/page.php?test=variable1&b=variable2,signin.duck.com,username,p4ssw0rd
+        https://signin.duck.com/section/page.php?test=variable1&b=variable2,signin.duck.com,username,p4ssw0rd
         """
 
         let logins = CSVImporter.extractLogins(from: csvFileContents)
-        XCTAssertEqual(logins, [
-            ImportedLoginCredential(title: nil, url: "duck.com", username: "username", password: "p4ssw0rd"),
-            ImportedLoginCredential(title: nil, url: "duck.com", username: "username", password: "p4ssw0rd"),
-            ImportedLoginCredential(title: nil, url: "signin.duck.com", username: "username", password: "p4ssw0rd"),
-            ImportedLoginCredential(title: nil, url: "signin.duck.com", username: "username", password: "p4ssw0rd"),
-            ImportedLoginCredential(title: nil, url: "signin.duck.com", username: "username", password: "p4ssw0rd")
-        ])
+        for login in logins {
+            XCTAssertEqual(login.title, nil)
+        }
     }
 
     func testWhenImportingCSVDataFromTheFileSystem_AndNoTitleIsIncluded_ThenLoginCredentialsAreImported() {

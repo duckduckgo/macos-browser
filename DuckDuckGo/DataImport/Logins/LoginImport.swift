@@ -39,8 +39,16 @@ struct ImportedLoginCredential: Equatable {
     let password: String
     
     private enum CommonTitlePatterns: String, CaseIterable {
-        // "[https://]login.example.com (daniel@duck.com)" format
-        case urlUsername = #"^(?:https?:\/\/)?(?:[\w-]+\.)*([\w-]+\.[a-z]+)(?: \([^)]+\))?$"#
+        /* Matches the following title patterns
+         duck.com
+         duck.com (test@duck.com)
+         signin.duck.com
+         signin.duck.com (test@duck.com.co)
+         https://signin.duck.com
+         https://signin.duck.com (test@duck.com.co)
+         https://signin.duck.com?page.php?test=variable1&b=variable2
+         https://signin.duck.com/section/page.php?test=variable1&b=variable2 */
+        case urlUsername = #"^(?:https?:\/\/)?(?:[\w-]+\.)*([\w-]+\.[a-z]+)(?:[\/?#][^\s()]*)?(?: \([^)]+\))?$"#
     }
 
     // Extracts a hostname from the provided title string, via pattern matching
