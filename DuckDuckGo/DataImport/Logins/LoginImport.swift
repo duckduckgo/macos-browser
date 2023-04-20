@@ -37,7 +37,7 @@ struct ImportedLoginCredential: Equatable {
     let url: String
     let username: String
     let password: String
-    
+
     private enum CommonTitlePatterns: String, CaseIterable {
         /* Matches the following title patterns
          duck.com
