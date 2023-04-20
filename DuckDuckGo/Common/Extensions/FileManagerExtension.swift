@@ -25,10 +25,6 @@ extension FileManager {
         return try self.perform(self.moveItem, from: srcURL, to: destURL, incrementingIndexIfExists: flag, pathExtension: pathExtension)
     }
 
-    func copyItem(at srcURL: URL, to destURL: URL, incrementingIndexIfExists flag: Bool, pathExtension: String? = nil) throws -> URL {
-        return try self.perform(self.copyItem, from: srcURL, to: destURL, incrementingIndexIfExists: flag, pathExtension: pathExtension)
-    }
-
     private func perform(_ operation: (URL, URL) throws -> Void,
                          from srcURL: URL,
                          to destURL: URL,
@@ -74,9 +70,6 @@ extension FileManager {
                     os_log("Failed to move file to Downloads folder, attempt %d", type: .error, copy)
                     throw CocoaError(.fileWriteFileExists)
                 }
-            } catch {
-                Pixel.fire(.debug(event: .fileMoveToDownloadsFailed, error: error))
-                throw error
             }
         }
         fatalError("Unexpected flow")
