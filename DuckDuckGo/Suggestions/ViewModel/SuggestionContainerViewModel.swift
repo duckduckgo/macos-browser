@@ -18,7 +18,7 @@
 
 import Foundation
 import Combine
-import os.log
+import Common
 import BrowserServicesKit
 
 final class SuggestionContainerViewModel {

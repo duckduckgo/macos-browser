@@ -29,4 +29,23 @@ final class PixelEventTests: XCTestCase {
         XCTAssertEqual(event.name, "m_mac_pixel_name")
     }
 
+    func testWhenFormattingDuckPlayerJSPixel_ThenJSPixelIncludesCorrectFormatting() throws {
+        typealias JSPixel = YoutubeOverlayUserScript.JSPixel;
+
+        let pixels = [
+            Pixel.Event.duckPlayerJSPixel(JSPixel.overlay),
+            Pixel.Event.duckPlayerJSPixel(JSPixel.playUse),
+            Pixel.Event.duckPlayerJSPixel(JSPixel.playDoNotUse),
+        ]
+
+        let expected = [
+            "duck_player.mac.overlay",
+            "duck_player.mac.play.use",
+            "duck_player.mac.play.do_not_use"
+        ]
+
+        XCTAssertEqual(pixels[0].name, expected[0])
+        XCTAssertEqual(pixels[1].name, expected[1])
+        XCTAssertEqual(pixels[2].name, expected[2])
+    }
 }

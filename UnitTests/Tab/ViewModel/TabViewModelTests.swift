@@ -20,6 +20,7 @@ import XCTest
 import Combine
 @testable import DuckDuckGo_Privacy_Browser
 
+@MainActor
 final class TabViewModelTests: XCTestCase {
 
     var cancellables = Set<AnyCancellable>()
@@ -153,15 +154,45 @@ final class TabViewModelTests: XCTestCase {
         waitForExpectations(timeout: 5, handler: nil)
     }
 
+    // MARK: - Zoom
+
+    func testThatDefaultValueForTabsWebViewIsOne() {
+        UserDefaultsWrapper<Any>.clearAll()
+        let tabVM = TabViewModel(tab: Tab(), appearancePreferences: AppearancePreferences())
+
+        XCTAssertEqual(tabVM.tab.webView.zoomLevel, DefaultZoomValue.percent100)
+    }
+
+    func testWhenAppearancePreferencesZoomLevelIsSetThenTabsWebViewZoomLevelIsUpdated() {
+        UserDefaultsWrapper<Any>.clearAll()
+        let tabVM = TabViewModel(tab: Tab())
+        let randomZoomLevel = DefaultZoomValue.allCases.randomElement()!
+        AppearancePreferences.shared.defaultPageZoom = randomZoomLevel
+
+        XCTAssertEqual(tabVM.tab.webView.zoomLevel, randomZoomLevel)
+    }
+
+    func testWhenAppearancePreferencesZoomLevelIsSetAndANewTabIsOpenThenItsWebViewHasTheLatestValueOfZoomLevel() {
+        UserDefaultsWrapper<Any>.clearAll()
+        let randomZoomLevel = DefaultZoomValue.allCases.randomElement()!
+        AppearancePreferences.shared.defaultPageZoom = randomZoomLevel
+
+        let tabVM = TabViewModel(tab: Tab(), appearancePreferences: AppearancePreferences())
+
+        XCTAssertEqual(tabVM.tab.webView.zoomLevel, randomZoomLevel)
+    }
+
 }
 
 extension TabViewModel {
 
+    @MainActor
     static var aTabViewModel: TabViewModel {
         let tab = Tab()
         return TabViewModel(tab: tab)
     }
 
+    @MainActor
     static func forTabWithURL(_ url: URL) -> TabViewModel {
         let tab = Tab(content: .url(url))
         return TabViewModel(tab: tab)

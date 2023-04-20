@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import BrowserServicesKit
 import Foundation
 import CoreData
 import Persistence
@@ -49,10 +50,12 @@ final class Database {
             } catch {
                 return (nil, error)
             }
+            let mainModel = NSManagedObjectModel.mergedModel(from: [.main])!
+            let httpsUpgradeModel = HTTPSUpgrade.managedObjectModel
 
             return (CoreDataDatabase(name: Constants.databaseName,
                                      containerLocation: containerLocation,
-                                     model: NSManagedObjectModel.mergedModel(from: [.main])!), nil)
+                                     model: .init(byMerging: [mainModel, httpsUpgradeModel])!), nil)
         }
 #if DEBUG
         assert(!NSApp.isRunningUnitTests, "Use CoreData.---Container() methods for testing purposes")
@@ -84,23 +87,6 @@ final class Database {
             lastDatabaseFactoryFailurePixelDate = Date()
             Pixel.fire(.debug(event: .dbMakeDatabaseError, error: error))
         }
-    }
-}
-
-protocol Managed: NSFetchRequestResult {
-    static var entityName: String { get }
-}
-
-extension Managed where Self: NSManagedObject {
-    static var entityName: String { return entity().name! }
-}
-
-extension NSManagedObjectContext {
-    func insertObject<A: NSManagedObject>() -> A where A: Managed {
-        guard let obj = NSEntityDescription.insertNewObject(forEntityName: A.entityName, into: self) as? A else {
-            fatalError("Wrong object type")
-        }
-        return obj
     }
 }
 

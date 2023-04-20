@@ -71,9 +71,7 @@ protocol TabExtensionDependencies {
     var duckPlayer: DuckPlayer { get }
 }
 
-// swiftlint:disable large_tuple
-// swiftlint:disable function_body_length
-
+// swiftlint:disable:next large_tuple
 typealias TabExtensionsBuilderArguments = (
     tabIdentifier: UInt64,
     isTabPinned: () -> Bool,
@@ -87,6 +85,7 @@ typealias TabExtensionsBuilderArguments = (
     webViewFuture: Future<WKWebView, Never>
 )
 
+// swiftlint:disable function_body_length
 extension TabExtensionsBuilder {
 
     /// Instantiate `TabExtension`-s for App builds here
@@ -96,6 +95,7 @@ extension TabExtensionsBuilder {
     /// ` let myPublishingExtension = add { MyPublishingExtension() }
     /// ` add { MyOtherExtension(with: myExtension.resultPublisher) }
     /// Note: Extensions with state restoration support should conform to `NSCodingExtension`
+    @MainActor
     mutating func registerExtensions(with args: TabExtensionsBuilderArguments, dependencies: TabExtensionDependencies) {
         let userScripts = args.userScriptsPublisher
 
@@ -149,11 +149,13 @@ extension TabExtensionsBuilder {
         add {
             FindInPageTabExtension(findInPageScriptPublisher: userScripts.map(\.?.findInPageScript))
         }
-
         add {
             DownloadsTabExtension(downloadManager:
                                     dependencies.downloadManager,
                                   isDisposable: args.isTabDisposable)
+        }
+        add {
+            SearchNonexistentDomainNavigationResponder(tld: dependencies.privacyFeatures.contentBlocking.tld, contentPublisher: args.contentPublisher)
         }
         add {
             HistoryTabExtension(isDisposable: args.isTabDisposable,
@@ -163,7 +165,7 @@ extension TabExtensionsBuilder {
                                 titlePublisher: args.titlePublisher)
         }
         add {
-            ExternalAppSchemeHandler(workspace: dependencies.workspace, permissionModel: args.permissionModel)
+            ExternalAppSchemeHandler(workspace: dependencies.workspace, permissionModel: args.permissionModel, contentPublisher: args.contentPublisher)
         }
         add {
             NavigationHotkeyHandler(isTabPinned: args.isTabPinned, isDisposable: args.isTabDisposable)
@@ -172,11 +174,13 @@ extension TabExtensionsBuilder {
         add {
             DuckPlayerTabExtension(duckPlayer: dependencies.duckPlayer,
                                    isDisposable: args.isTabDisposable,
-                                   scriptsPublisher: userScripts.compactMap { $0 })
+                                   scriptsPublisher: userScripts.compactMap { $0 },
+                                   webViewPublisher: args.webViewFuture)
         }
     }
 
 }
+// swiftlint:enable function_body_length
 
 #if DEBUG
 extension TestTabExtensionsBuilder {

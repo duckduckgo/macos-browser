@@ -22,8 +22,8 @@ import BrowserServicesKit
 
 extension WKWebViewConfiguration {
 
+    @MainActor
     func applyStandardConfiguration(contentBlocking: some ContentBlockingProtocol, isDisposable: Bool) {
-
         if isDisposable, websiteDataStore.isPersistent {
             websiteDataStore = .nonPersistent()
         }

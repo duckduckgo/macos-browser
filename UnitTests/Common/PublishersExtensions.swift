@@ -19,22 +19,28 @@
 import Combine
 import Foundation
 
-struct TimeoutError: Error, LocalizedError {
+struct TimeoutError: Error, LocalizedError, CustomDebugStringConvertible {
 
     let interval: TimeInterval?
     let description: String?
+    let date: Date
     let file: StaticString
     let line: UInt
 
-    init(interval: TimeInterval? = nil, description: String? = nil, file: StaticString = #file, line: UInt = #line) {
+    init(interval: TimeInterval? = nil, description: String? = nil, date: Date = Date(), file: StaticString = #file, line: UInt = #line) {
         self.interval = interval
         self.description = description
+        self.date = date
         self.file = file
         self.line = line
     }
 
     var errorDescription: String? {
-        "TimeoutError: exceeded timeout\(interval != nil ? " of \(interval!)s" : "")\(description != nil ? " (" + description! + ")" : "") at \(file):\(line)"
+        "TimeoutError(started: \(date), \(interval != nil ? "timeout: \(interval!)s, " : "")\(description != nil ? " description: " + description! : "") at \(file):\(line))"
+    }
+
+    var debugDescription: String {
+        errorDescription!
     }
 
 }

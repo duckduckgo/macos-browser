@@ -18,7 +18,7 @@
 
 import Cocoa
 import Combine
-import os.log
+import Common
 import BrowserServicesKit
 import Persistence
 import Configuration
@@ -27,6 +27,7 @@ import Bookmarks
 import DDGSync
 
 @NSApplicationMain
+@MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDelegate {
 
 #if DEBUG
@@ -53,7 +54,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     private(set) var stateRestorationManager: AppStateRestorationManager!
     private var grammarFeaturesManager = GrammarFeaturesManager()
     private let crashReporter = CrashReporter()
-    private(set) var internalUserDecider: InternalUserDeciding!
+    private(set) var internalUserDecider: InternalUserDecider!
+    private(set) var featureFlagger: FeatureFlagger!
     private var appIconChanger: AppIconChanger!
     private(set) var syncService: DDGSyncing!
     private(set) var syncPersistence: SyncDataPersistor!
@@ -111,19 +113,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
             }
         }
 
-#if DEBUG
-        func mock<T>(_ className: String) -> T {
-            ((NSClassFromString(className) as? NSObject.Type)!.init() as? T)!
-        }
-        AppPrivacyFeatures.shared = NSApp.isRunningUnitTests
-            // runtime mock-replacement for Unit Tests, to be redone when we‘ll be doing Dependency Injection
-            ? AppPrivacyFeatures(contentBlocking: mock("ContentBlockingMock"), httpsUpgradeStore: mock("HTTPSUpgradeStoreMock"))
-            : AppPrivacyFeatures(contentBlocking: AppContentBlocking(), httpsUpgradeStore: AppHTTPSUpgradeStore())
-#else
-        AppPrivacyFeatures.shared = AppPrivacyFeatures(contentBlocking: AppContentBlocking(),
-                                                       httpsUpgradeStore: AppHTTPSUpgradeStore())
-#endif
-
         do {
             let encryptionKey = NSApp.isRunningUnitTests ? nil : try keyStore.readKey()
             fileStore = EncryptedFileStore(encryptionKey: encryptionKey)
@@ -134,7 +123,23 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         stateRestorationManager = AppStateRestorationManager(fileStore: fileStore)
 
         let internalUserDeciderStore = InternalUserDeciderStore(fileStore: fileStore)
-        internalUserDecider = InternalUserDecider(store: internalUserDeciderStore)
+        internalUserDecider = DefaultInternalUserDecider(store: internalUserDeciderStore)
+
+#if DEBUG
+        func mock<T>(_ className: String) -> T {
+            ((NSClassFromString(className) as? NSObject.Type)!.init() as? T)!
+        }
+        AppPrivacyFeatures.shared = NSApp.isRunningUnitTests
+            // runtime mock-replacement for Unit Tests, to be redone when we‘ll be doing Dependency Injection
+            ? AppPrivacyFeatures(contentBlocking: mock("ContentBlockingMock"), httpsUpgradeStore: mock("HTTPSUpgradeStoreMock"))
+            : AppPrivacyFeatures(contentBlocking: AppContentBlocking(internalUserDecider: internalUserDecider), database: Database.shared)
+#else
+        AppPrivacyFeatures.shared = AppPrivacyFeatures(contentBlocking: AppContentBlocking(internalUserDecider: internalUserDecider), database: Database.shared)
+#endif
+
+        featureFlagger = DefaultFeatureFlagger(internalUserDecider: internalUserDecider,
+                                               privacyConfig: AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.privacyConfig)
+        NSApp.mainMenuTyped.setup(with: featureFlagger)
 
 #if !APPSTORE
         updateController = UpdateController(internalUserDecider: internalUserDecider)

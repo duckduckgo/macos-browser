@@ -18,8 +18,8 @@
 
 import Foundation
 import BrowserServicesKit
-import os.log
 import Combine
+import Common
 
 protocol PasswordManagerCoordinating: BrowserServicesKit.PasswordManager {
 

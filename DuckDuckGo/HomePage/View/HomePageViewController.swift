@@ -20,6 +20,7 @@ import Cocoa
 import Combine
 import SwiftUI
 
+@MainActor
 final class HomePageViewController: NSViewController {
 
     private let tabCollectionViewModel: TabCollectionViewModel
@@ -45,12 +46,12 @@ final class HomePageViewController: NSViewController {
           tabCollectionViewModel: TabCollectionViewModel,
           bookmarkManager: BookmarkManager,
           historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
-          fireViewModel: FireViewModel = FireCoordinator.fireViewModel) {
+          fireViewModel: FireViewModel? = nil) {
 
         self.tabCollectionViewModel = tabCollectionViewModel
         self.bookmarkManager = bookmarkManager
         self.historyCoordinating = historyCoordinating
-        self.fireViewModel = fireViewModel
+        self.fireViewModel = fireViewModel ?? FireCoordinator.fireViewModel
 
         super.init(coder: coder)
     }

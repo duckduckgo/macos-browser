@@ -1,7 +1,7 @@
 //
-//  FirefoxBerkeleyDatabaseReader.h
+//  FeatureFlag.swift
 //
-//  Copyright © 2022 DuckDuckGo. All rights reserved.
+//  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,14 +16,24 @@
 //  limitations under the License.
 //
 
-#import <Foundation/Foundation.h>
+import Foundation
+import BrowserServicesKit
 
-NS_ASSUME_NONNULL_BEGIN
+public enum FeatureFlag: String {
+    case debugMenu
+}
 
-@interface FirefoxBerkeleyDatabaseReader : NSObject
+extension FeatureFlag: FeatureFlagSourceProviding {
+    public var source: FeatureFlagSource {
+        switch self {
+        case .debugMenu:
+            return .internalOnly
+        }
+    }
+}
 
-+ (NSDictionary<NSString *, NSData *> * _Nullable)readDatabase:(NSString *)databasePath;
-
-@end
-
-NS_ASSUME_NONNULL_END
+extension FeatureFlagger {
+    public func isFeatureOn(_ featureFlag: FeatureFlag) -> Bool {
+        isFeatureOn(forProvider: featureFlag)
+    }
+}

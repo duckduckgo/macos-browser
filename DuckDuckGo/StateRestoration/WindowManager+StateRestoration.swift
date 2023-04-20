@@ -17,7 +17,7 @@
 //
 
 import Cocoa
-import os.log
+import Common
 
 extension WindowsManager {
 
@@ -59,6 +59,7 @@ extension WindowsManager {
 
 extension WindowControllersManager {
 
+    @MainActor
     func encodeState(with coder: NSCoder) {
         coder.encode(WindowManagerStateRestoration(windowControllersManager: self),
                      forKey: NSKeyedArchiveRootObjectKey)
@@ -103,6 +104,7 @@ final class WindowManagerStateRestoration: NSObject, NSSecureCoding {
         super.init()
     }
 
+    @MainActor
     init(windowControllersManager: WindowControllersManager) {
         self.windows = windowControllersManager.mainWindowControllers
             .filter { $0.window?.isPopUpWindow == false }
@@ -111,7 +113,7 @@ final class WindowManagerStateRestoration: NSObject, NSSecureCoding {
                 let rightIndex = rhs.window?.orderedIndex ?? Int.min
                 return leftIndex < rightIndex
             }
-            .compactMap(WindowRestorationItem.init(windowController:))
+            .compactMap { WindowRestorationItem(windowController: $0) }
         self.keyWindowIndex = windowControllersManager.lastKeyMainWindowController.flatMap {
             windowControllersManager.mainWindowControllers.firstIndex(of: $0)
         }
@@ -137,6 +139,7 @@ final class WindowRestorationItem: NSObject, NSSecureCoding {
     let model: TabCollectionViewModel
     let frame: NSRect
 
+    @MainActor
     init?(windowController: MainWindowController) {
         guard !windowController.mainViewController.tabCollectionViewModel.isDisposable else {
             // Don't persist disposable windows

@@ -22,7 +22,6 @@ import Common
 import ContentBlocking
 import Foundation
 import Navigation
-import os.log
 import UserScript
 import WebKit
 
@@ -40,19 +39,18 @@ protocol NewWindowPolicyDecisionMaker {
     func decideNewWindowPolicy(for navigationAction: WKNavigationAction) -> NavigationDecision?
 }
 
-// swiftlint:disable type_body_length
-@dynamicMemberLookup
-final class Tab: NSObject, Identifiable, ObservableObject {
+// swiftlint:disable:next type_body_length
+@dynamicMemberLookup final class Tab: NSObject, Identifiable, ObservableObject {
 
     enum TabContent: Equatable {
         case homePage
-        case url(URL, credential: URLCredential? = nil, userEntered: Bool = false)
+        case url(URL, credential: URLCredential? = nil, userEntered: String? = nil)
         case preferences(pane: PreferencePaneIdentifier?)
         case bookmarks
         case onboarding
         case none
 
-        static func contentFromURL(_ url: URL?, userEntered: Bool = false) -> TabContent {
+        static func contentFromURL(_ url: URL?, userEntered: String? = nil) -> TabContent {
             if url == .homePage {
                 return .homePage
             } else if url == .welcome {
@@ -154,14 +152,19 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             }
         }
 
-        var isUserEnteredUrl: Bool {
+        var userEnteredValue: String? {
             switch self {
-            case .url(_, credential: _, userEntered: let userEntered):
-                return userEntered
+            case .url(_, credential: _, userEntered: let userEnteredValue):
+                return userEnteredValue
             default:
-                return false
+                return nil
             }
         }
+
+        var isUserEnteredUrl: Bool {
+            userEnteredValue != nil
+        }
+
     }
     private struct ExtensionDependencies: TabExtensionDependencies {
         let privacyFeatures: PrivacyFeaturesProtocol
@@ -175,12 +178,12 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     fileprivate weak var delegate: TabDelegate?
     func setDelegate(_ delegate: TabDelegate) { self.delegate = delegate }
 
-    private let navigationDelegate = DistributedNavigationDelegate(logger: .navigation)
+    private let navigationDelegate = DistributedNavigationDelegate(log: .navigation)
     private var newWindowPolicyDecisionMakers: [NewWindowPolicyDecisionMaker]?
     private var onNewWindow: ((WKNavigationAction?) -> NavigationDecision)?
 
     private let statisticsLoader: StatisticsLoader?
-    private let internalUserDecider: InternalUserDeciding?
+    private let internalUserDecider: InternalUserDecider?
     let pinnedTabsManager: PinnedTabsManager
 
     private let webViewConfiguration: WKWebViewConfiguration
@@ -195,12 +198,13 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     @Published
     private(set) var userContentController: UserContentController?
 
+    @MainActor
     convenience init(content: TabContent,
                      faviconManagement: FaviconManagement? = nil,
                      webCacheManager: WebCacheManager = WebCacheManager.shared,
                      webViewConfiguration: WKWebViewConfiguration? = nil,
                      historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
-                     pinnedTabsManager: PinnedTabsManager = WindowControllersManager.shared.pinnedTabsManager,
+                     pinnedTabsManager: PinnedTabsManager? = nil,
                      workspace: Workspace = NSWorkspace.shared,
                      privacyFeatures: AnyPrivacyFeatures? = nil,
                      duckPlayer: DuckPlayer? = nil,
@@ -219,7 +223,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                      shouldLoadFromCache: Bool = false,
                      canBeClosedWithBack: Bool = false,
                      lastSelectedAt: Date? = nil,
-                     webViewFrame: CGRect = .zero
+                     webViewSize: CGSize = CGSize(width: 1024, height: 768)
     ) {
 
         let duckPlayer = duckPlayer
@@ -235,7 +239,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                   webCacheManager: webCacheManager,
                   webViewConfiguration: webViewConfiguration,
                   historyCoordinating: historyCoordinating,
-                  pinnedTabsManager: pinnedTabsManager,
+                  pinnedTabsManager: pinnedTabsManager ?? WindowControllersManager.shared.pinnedTabsManager,
                   workspace: workspace,
                   privacyFeatures: privacyFeatures,
                   duckPlayer: duckPlayer,
@@ -255,9 +259,10 @@ final class Tab: NSObject, Identifiable, ObservableObject {
                   shouldLoadFromCache: shouldLoadFromCache,
                   canBeClosedWithBack: canBeClosedWithBack,
                   lastSelectedAt: lastSelectedAt,
-                  webViewFrame: webViewFrame)
+                  webViewSize: webViewSize)
     }
 
+    @MainActor
     // swiftlint:disable:next function_body_length
     init(content: TabContent,
          faviconManagement: FaviconManagement,
@@ -274,7 +279,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
          extensionsBuilder: TabExtensionsBuilderProtocol,
          cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter?,
          statisticsLoader: StatisticsLoader?,
-         internalUserDecider: InternalUserDeciding?,
+         internalUserDecider: InternalUserDecider?,
          title: String?,
          favicon: NSImage?,
          interactionStateData: Data?,
@@ -284,7 +289,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
          shouldLoadFromCache: Bool,
          canBeClosedWithBack: Bool,
          lastSelectedAt: Date?,
-         webViewFrame: CGRect
+         webViewSize: CGSize
     ) {
 
         self.content = content
@@ -308,7 +313,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
         assert(userContentController != nil)
         self.userContentController = userContentController
 
-        webView = WebView(frame: webViewFrame, configuration: configuration)
+        webView = WebView(frame: CGRect(origin: .zero, size: webViewSize), configuration: configuration)
         webView.allowsLinkPreview = false
         permissions = PermissionModel(permissionManager: permissionManager,
                                       geolocationService: geolocationService)
@@ -471,7 +476,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
     }
 
     @discardableResult
-    func setUrl(_ url: URL?, userEntered: Bool) -> Task<ExpectedNavigation?, Never>? {
+    func setUrl(_ url: URL?, userEntered: String?) -> Task<ExpectedNavigation?, Never>? {
         if url == .welcome {
             OnboardingViewModel().restart()
         }
@@ -483,7 +488,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             let content = TabContent.contentFromURL(url)
 
             if self.content.isUrl, self.content.url == url {
-                // ignore content updates when tab.content has userEntered or credential set but equal url
+                // ignore content updates when tab.content has userEntered or credential set but equal url as it comes from the WebView url updated event
             } else if content != self.content {
                 self.content = content
             }
@@ -748,7 +753,7 @@ final class Tab: NSObject, Identifiable, ObservableObject {
             do {
                 try webView.restoreSessionState(from: interactionStateData)
             } catch {
-                os_log("Tab:setupWebView could not restore session state %s", "\(error)")
+                os_log("Tab:setupWebView could not restore session state %s", type: .error, "\(error)")
                 return false
             }
         }
@@ -880,7 +885,9 @@ final class Tab: NSObject, Identifiable, ObservableObject {
 
 extension Tab: UserContentControllerDelegate {
 
+    @MainActor
     func userContentController(_ userContentController: UserContentController, didInstallContentRuleLists contentRuleLists: [String: WKContentRuleList], userScripts: UserScriptsProvider, updateEvent: ContentBlockerRulesManager.UpdateEvent) {
+        os_log("didInstallContentRuleLists", log: .contentBlocking, type: .info)
         guard let userScripts = userScripts as? UserScripts else { fatalError("Unexpected UserScripts") }
 
         userScripts.debugScript.instrumentation = instrumentation
@@ -963,7 +970,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
             return .redirect(mainFrame) { navigator in
                 var request = navigationAction.request
                 // credential is removed from the URL and set to TabContent to be used on next Challenge
-                self.content = .url(navigationAction.url.removingBasicAuthCredential(), credential: credential, userEntered: false)
+                self.content = .url(navigationAction.url.removingBasicAuthCredential(), credential: credential, userEntered: nil)
                 // reload URL without credentials
                 request.url = self.content.url!
                 navigator.load(request)
@@ -977,8 +984,6 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
 
         return .next
     }
-    // swiftlint:enable cyclomatic_complexity
-    // swiftlint:enable function_body_length
 
     @MainActor
     func willStart(_ navigation: Navigation) {
@@ -1011,10 +1016,6 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         invalidateInteractionStateData()
         webViewDidFinishNavigationPublisher.send()
         statisticsLoader?.refreshRetentionAtb(isSearch: navigation.url.isDuckDuckGoSearch)
-
-        if navigation.url.isDuckDuckGoSearch {
-            BookmarksBarUsageSender.sendBookmarksBarUsagePixel()
-        }
     }
 
     @MainActor

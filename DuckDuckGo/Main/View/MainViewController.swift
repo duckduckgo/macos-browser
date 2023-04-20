@@ -19,7 +19,7 @@
 import Cocoa
 import Carbon.HIToolbox
 import Combine
-import os.log
+import Common
 
 final class MainViewController: NSViewController {
 
@@ -82,6 +82,8 @@ final class MainViewController: NSViewController {
         subscribeToSelectedTabViewModel()
         subscribeToAppSettingsNotifications()
         findInPageContainerView.applyDropShadow()
+
+        view.registerForDraggedTypes([.URL, .fileURL])
     }
 
     override func viewWillAppear() {
@@ -406,6 +408,27 @@ final class MainViewController: NSViewController {
     }
 
     private(set) var isHandlingKeyDownEvent: Bool = false
+
+}
+extension MainViewController: NSDraggingDestination {
+
+    func draggingEntered(_ draggingInfo: NSDraggingInfo) -> NSDragOperation {
+        return .copy
+    }
+
+    func draggingUpdated(_ draggingInfo: NSDraggingInfo) -> NSDragOperation {
+        guard draggingInfo.draggingPasteboard.url != nil else { return .none }
+
+        return .copy
+    }
+
+    func performDragOperation(_ draggingInfo: NSDraggingInfo) -> Bool {
+        guard let url = draggingInfo.draggingPasteboard.url else { return false }
+
+        browserTabViewController.openNewTab(with: .url(url))
+        return true
+    }
+
 }
 
 // MARK: - Mouse & Keyboard Events

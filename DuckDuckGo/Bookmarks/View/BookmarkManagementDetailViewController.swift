@@ -18,7 +18,6 @@
 
 import AppKit
 import Combine
-import os
 
 protocol BookmarkManagementDetailViewControllerDelegate: AnyObject {
 

@@ -19,7 +19,6 @@
 import Foundation
 import WebKit
 import Combine
-import os.log
 import BrowserServicesKit
 import Common
 
@@ -58,13 +57,14 @@ final class AppContentBlocking {
     private let exceptionsSource: DefaultContentBlockerRulesExceptionsSource
 
     // keeping whole ContentBlocking state initialization in one place to avoid races between updates publishing and rules storing
-    init() {
+    init(internalUserDecider: InternalUserDecider) {
         let configStorage = ConfigurationStore.shared
         privacyConfigurationManager = PrivacyConfigurationManager(fetchedETag: configStorage.loadEtag(for: .privacyConfiguration),
                                                                   fetchedData: configStorage.loadData(for: .privacyConfiguration),
                                                                   embeddedDataProvider: AppPrivacyConfigurationDataProvider(),
                                                                   localProtection: LocalUnprotectedDomains.shared,
-                                                                  errorReporting: Self.debugEvents)
+                                                                  errorReporting: Self.debugEvents,
+                                                                  internalUserDecider: internalUserDecider)
 
         trackerDataManager = TrackerDataManager(etag: ConfigurationStore.shared.loadEtag(for: .trackerDataSet),
                                                 data: ConfigurationStore.shared.loadData(for: .trackerDataSet),
@@ -80,7 +80,7 @@ final class AppContentBlocking {
                                                             exceptionsSource: exceptionsSource,
                                                             cache: ContentBlockingRulesCache(),
                                                             errorReporting: Self.debugEvents,
-                                                            logger: OSLog.contentBlocking)
+                                                            log: .contentBlocking)
         userContentUpdating = UserContentUpdating(contentBlockerRulesManager: contentBlockingManager,
                                                   privacyConfigurationManager: privacyConfigurationManager,
                                                   trackerDataManager: trackerDataManager,
@@ -92,7 +92,8 @@ final class AppContentBlocking {
                                                                           compiledRulesSource: contentBlockingManager,
                                                                           exceptionsSource: exceptionsSource,
                                                                           errorReporting: attributionDebugEvents,
-                                                                          compilationErrorReporting: Self.debugEvents)
+                                                                          compilationErrorReporting: Self.debugEvents,
+                                                                          log: .attribution)
     }
 
     private static let debugEvents = EventMapping<ContentBlockerDebugEvents> { event, error, parameters, onComplete in

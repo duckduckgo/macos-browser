@@ -29,6 +29,7 @@ class PrivacyDashboardIntegrationTests: XCTestCase {
         (Self.window.contentViewController as! MainViewController).browserTabViewController.tabViewModel!
     }
 
+    @MainActor
     override class func setUp() {
         // disable GPC redirects
         PrivacySecurityPreferences.shared.gpcEnabled = false
@@ -58,13 +59,13 @@ class PrivacyDashboardIntegrationTests: XCTestCase {
             .switchToLatest()
             .filter { $0.trackersBlocked.count > 0 }
             .map { $0.trackers.count }
-            .timeout(5)
+            .timeout(10)
             .first()
             .promise()
 
         // load the test page
         let url = URL(string: "http://privacy-test-pages.glitch.me/tracker-reporting/1major-via-script.html")!
-        _=await tab.setUrl(url, userEntered: false)?.value?.result
+        _=await tab.setUrl(url, userEntered: nil)?.value?.result
 
         let trackersCount = try await trackersCountPromise.value
         XCTAssertEqual(trackersCount, 1)
@@ -74,10 +75,10 @@ class PrivacyDashboardIntegrationTests: XCTestCase {
             .switchToLatest()
             .filter { $0.trackersBlocked.count == 0 }
             .map { $0.trackers.count }
-            .timeout(5)
+            .timeout(10)
             .first()
             .promise()
-        _=await tab.setUrl(URL.testsServer, userEntered: false)?.value?.result
+        _=await tab.setUrl(URL.testsServer, userEntered: nil)?.value?.result
 
         let trackersCount2 = try await trackersCountPromise2.value
         XCTAssertEqual(trackersCount2, 0)

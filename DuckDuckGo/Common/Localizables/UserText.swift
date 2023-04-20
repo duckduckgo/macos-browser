@@ -118,7 +118,7 @@ struct UserText {
 
     static let fireproofSites = NSLocalizedString("fireproof.sites", value: "Fireproof Sites", comment: "Fireproof sites list title")
     static let fireproofCheckboxTitle = NSLocalizedString("fireproof.checkbox.title", value: "Ask to Fireproof websites when signing in", comment: "Fireproof settings checkbox title")
-    static let fireproofExplanation = NSLocalizedString("fireproof.explanation", value: "Websites rely on cookies to keep you signed in. When you Fireproof a site, cookies won’t be erased and you'll stay signed in, even after using the Fire Button. We still block third-party trackers found on Fireproof websites.", comment: "Fireproofing mechanism explanation")
+    static let fireproofExplanation = NSLocalizedString("fireproof.explanation", value: "When you Fireproof a site, cookies won't be erased and you'll stay signed in, even after using the Fire Button.", comment: "Fireproofing mechanism explanation")
     static let manageFireproofSites = NSLocalizedString("fireproof.manage-sites", value: "Manage Fireproof Sites...", comment: "Fireproof settings button caption")
 
     static let fireDialogFireproofSites = NSLocalizedString("fire.dialog.fireproof.sites", value: "Fireproof sites won't be cleared", comment: "Category of domains in fire button dialog")
@@ -154,10 +154,11 @@ struct UserText {
     static let fireproofConfirmationMessage = NSLocalizedString("fireproof.confirmation.message",
                                                                 value: "Fireproofing this site will keep you signed in after using the Fire Button.",
                                                                 comment: "Fireproof confirmation message")
-
-    static let autoconsentSettingsTitle = NSLocalizedString("autoconsent.title", value: "Cookie Consent Pop-ups", comment: "Autoconsent settings section title")
-    static let autoconsentCheckboxTitle = NSLocalizedString("autoconsent.checkbox.title", value: "Let DuckDuckGo manage cookie consent pop-ups", comment: "Autoconsent settings checkbox title")
-    static let autoconsentExplanation = NSLocalizedString("autoconsent.explanation", value: "When DuckDuckGo detects cookie consent pop-ups on sites you visit, we can try to automatically set your cookie preferences to minimize cookies and maximize privacy, then close the pop-ups. Some sites don't provide an option to manage cookie preferences, so we can only hide pop-ups like these.", comment: "Autoconsent feature explanation in settings")
+    static let webTrackingProtectionSettingsTitle = NSLocalizedString("web.tracking.protection.title", value: "Web Tracking Protection", comment: "Web tracking protection settings section title")
+    static let webTrackingProtectionExplenation = NSLocalizedString("web.tracking.protection.explenation", value: "DuckDuckGo automatically blocks hidden trackers as you browse the web.", comment: "feature explanation in settings")
+    static let autoconsentSettingsTitle = NSLocalizedString("autoconsent.title", value: "Cookie Pop-ups", comment: "Autoconsent settings section title")
+    static let autoconsentCheckboxTitle = NSLocalizedString("autoconsent.checkbox.title", value: "Automatically handle cookie pop-ups", comment: "Autoconsent settings checkbox title")
+    static let autoconsentExplanation = NSLocalizedString("autoconsent.explanation", value: "DuckDuckGo will try to select the most private settings available and hide these pop-ups for you.", comment: "Autoconsent feature explanation in settings")
 
     static let duckPlayerSettingsTitle = NSLocalizedString("duck-player.title", value: "Duck Player", comment: "Private YouTube Player settings title")
     static let duckPlayerAlwaysOpenInPlayer = NSLocalizedString("duck-player.always-open-in-player", value: "Always open YouTube videos in Duck Player", comment: "Private YouTube Player option")
@@ -167,8 +168,8 @@ struct UserText {
 
     static let gpcSettingsTitle = NSLocalizedString("gpc.title", value: "Global Privacy Control (GPC)", comment: "GPC settings title")
     static let gpcCheckboxTitle = NSLocalizedString("gpc.checkbox.title", value: "Enable Global Privacy Control", comment: "GPC settings checkbox title")
-    static let gpcExplanation = NSLocalizedString("gpc.explanation", value: "DuckDuckGo automatically blocks many trackers. With Global Privacy Control (GPC), you can also ask participating websites to restrict selling or sharing your personal data with other companies.", comment: "GPC explanation in settings")
-    static let gpcLearnMore = NSLocalizedString("gpc.learnmore.link", value: "Learn More", comment: "Learn More link")
+    static let gpcExplanation = NSLocalizedString("gpc.explanation", value: "Tells participating websites not to sell or share your data.", comment: "GPC explanation in settings")
+    static let learnMore = NSLocalizedString("learnmore.link", value: "Learn More", comment: "Learn More link")
 
     static let autofillPasswordManager = NSLocalizedString("autofill.password-manager", value: "Password Manager", comment: "Autofill settings section title")
     static let autofillPasswordManagerDuckDuckGo = NSLocalizedString("autofill.password-manager.duckduckgo", value: "DuckDuckGo built-in password manager", comment: "Autofill password manager row title")
@@ -177,7 +178,7 @@ struct UserText {
     static let restartBitwarden = NSLocalizedString("restart.bitwarden", value: "Restart Bitwarden", comment: "Button to restart Bitwarden application")
     static let restartBitwardenInfo = NSLocalizedString("restart.bitwarden.info", value: "Bitwarden is not responding. Please restart it to initiate the communication again", comment: "")
 
-
+    static let autofillViewContentButton = NSLocalizedString("autofill.view-autofill-content",  value: "View Autofill Content…", comment: "View Autofill Content Button name in the autofill settings")
     static let autofillAskToSave = NSLocalizedString("autofill.ask-to-save", value: "Ask to Save", comment: "Autofill settings section title")
     static let autofillAskToSaveExplanation = NSLocalizedString("autofill.ask-to-save.explanation", value: "Receive prompts to save new Autofill information when filling out online forms.", comment: "Description of Autofill autosaving feature - used in settings")
     static let autofillUsernamesAndPasswords = NSLocalizedString("autofill.usernames-and-passwords", value: "Usernames and passwords", comment: "Autofill autosaved data type")
@@ -186,7 +187,7 @@ struct UserText {
     static let autofillAutoLock = NSLocalizedString("autofill.auto-lock", value: "Auto-lock", comment: "Autofill settings section title")
     static let autofillLockWhenIdle = NSLocalizedString("autofill.lock-when-idle", value: "Lock Autofill after computer is idle for", comment: "Autofill auto-lock setting")
     static let autofillNeverLock = NSLocalizedString("autofill.never-lock", value: "Never lock Autofill", comment: "Autofill auto-lock setting")
-    static let autofillNeverLockWarning = NSLocalizedString("autofill.never-lock-warning", value: "Anyone with access to your device will be able to use and modify your Autofill data.", comment: "Autofill disabled auto-lock warning")
+    static let autofillNeverLockWarning = NSLocalizedString("autofill.never-lock-warning", value: "Anyone with access to your device will be able to use and modify your Autofill data if not locked.", comment: "Autofill disabled auto-lock warning")
 
     static let downloadsLocation = NSLocalizedString("downloads.location", value: "Location", comment: "Downloads directory location")
     static let downloadsAlwaysAsk = NSLocalizedString("downloads.always-ask", value: "Always ask where to save files", comment: "Downloads preferences checkbox")
@@ -297,6 +298,9 @@ struct UserText {
     static let addressBar = NSLocalizedString("preferences.appearance.address-bar", value: "Address Bar", comment: "Theme preferences")
     static let showFullWebsiteAddress = NSLocalizedString("preferences.appearance.show-full-url", value: "Show full website address", comment: "Option to show full URL in the address bar")
     static let showAutocompleteSuggestions = NSLocalizedString("preferences.appearance.show-autocomplete-suggestions", value: "Show autocomplete suggestions", comment: "Option to show autocomplete suggestions in the address bar")
+    static let zoomSettingTitle = NSLocalizedString("preferences.appearance.zoom", value: "Zoom", comment: "Zoom settings section title")
+    static let zoomPickerTitle = NSLocalizedString("preferences.appearance.zoom-picker", value: "Default page zoom", comment: "Default page zoom picker title")
+    static let defaultZoomPageMoreOptionsItem = NSLocalizedString("more-options.zoom.default-zoom-page", value: "Change Default Page Zoom…", comment: "Default page zoom picker title")
     static let autofill = NSLocalizedString("preferences.autofill", value: "Autofill", comment: "Show Autofill preferences")
 
     static let aboutDuckDuckGo = NSLocalizedString("preferences.about.about-duckduckgo", value: "About DuckDuckGo", comment: "About screen")
@@ -557,7 +561,7 @@ struct UserText {
     static let cookiePopupManagedNotification = NSLocalizedString("notification.badge.cookiesmanaged", value: "Cookies Managed", comment: "Notification that appears when browser automatically handle cookies")
     static let cookiePopupHiddenNotification = NSLocalizedString("notification.badge.popuphidden", value: "Pop-up Hidden", comment: "Notification that appears when browser cosmetically hides a cookie popup")
 
-    static let autoconsentModalTitle = NSLocalizedString("autoconsent.modal.title", value: "Looks like this site has a cookie consent pop-up 👇", comment: "Title for modal asking the user to auto manage cookies")
+    static let autoconsentModalTitle = NSLocalizedString("autoconsent.modal.title", value: "Looks like this site has a cookie pop-up 👇", comment: "Title for modal asking the user to auto manage cookies")
 
     static let autoconsentModalBody = NSLocalizedString("autoconsent.modal.body", value: "Want me to handle these for you? I can try to minimize cookies, maximize privacy, and hide pop-ups like these.", comment: "Body for modal asking the user to auto manage cookies")
 

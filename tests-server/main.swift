@@ -19,8 +19,6 @@
 import Foundation
 import Swifter
 
-// swiftlint:disable opening_brace
-
 /**
 
  tests-server used for Integration Tests HTTP requests mocking
@@ -34,6 +32,7 @@ import Swifter
 
 let server = HttpServer()
 
+// swiftlint:disable:next opening_brace
 server.middleware = [{ request in
     let params = request.queryParams.reduce(into: [:]) { $0[$1.0] = $1.1.removingPercentEncoding }
     print(request.method, request.path, params)

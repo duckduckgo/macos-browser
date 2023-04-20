@@ -26,6 +26,7 @@ enum NavigationDecision {
     case cancel
 }
 
+@MainActor
 final class ContextMenuManager: NSObject {
     private var userScriptCancellable: AnyCancellable?
 
@@ -34,6 +35,7 @@ final class ContextMenuManager: NSObject {
     private var selectedText: String?
     fileprivate weak var webView: WKWebView?
 
+    @MainActor
     init(contextMenuScriptPublisher: some Publisher<ContextMenuUserScript?, Never>) {
         super.init()
 

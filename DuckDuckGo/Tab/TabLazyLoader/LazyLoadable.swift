@@ -24,7 +24,7 @@ protocol LazyLoadable: AnyObject, Identifiable {
     var isUrl: Bool { get }
     var url: URL? { get }
 
-    var webViewFrame: CGRect { get set }
+    var webViewSize: CGSize { get set }
     var isLazyLoadingInProgress: Bool { get set }
     var loadingFinishedPublisher: AnyPublisher<Self, Never> { get }
 
@@ -44,9 +44,9 @@ extension Tab: LazyLoadable {
             .eraseToAnyPublisher()
     }
 
-    var webViewFrame: CGRect {
-        get { webView.frame }
-        set { webView.frame = newValue }
+    var webViewSize: CGSize {
+        get { webView.frame.size }
+        set { webView.frame.size = newValue }
     }
 
     func isNewer(than other: Tab) -> Bool {

@@ -45,6 +45,8 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
         var destinationURL: URL?
         /// Temporary  (.duckload)  file URL; set to nil when download completes
         var tempURL: URL?
+        /// Item-replacement directory for the item when .duckload file could not be created
+        var itemReplacementDirectory: URL?
     }
 
     @Published private(set) var location: FileLocation {
@@ -128,10 +130,9 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
                   let completionHandler = self.decideDestinationCompletionHandler
             else { throw URLError(.cancelled) }
 
-            let downloadURL = try self.downloadURL(for: localURL)
-            self.location = .init(destinationURL: localURL, tempURL: downloadURL)
+            self.location = try self.downloadLocation(for: localURL)
 
-            completionHandler(downloadURL)
+            completionHandler(location.tempURL)
 
         } catch {
             self.download.cancel()
@@ -140,9 +141,11 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
         }
     }
 
-    private func downloadURL(for localURL: URL) throws -> URL {
+    private func downloadLocation(for localURL: URL) throws -> FileLocation {
         var downloadURL = self.location.tempURL ?? localURL.appendingPathExtension(Self.downloadExtension)
+        let downloadFilename = downloadURL.lastPathComponent
         let ext = localURL.pathExtension + (localURL.pathExtension.isEmpty ? "" : ".") + Self.downloadExtension
+        var itemReplacementDirectory: URL?
 
         // create temp file and move to Downloads folder with .duckload extension increasing index if needed
         let fm = FileManager.default
@@ -151,7 +154,14 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
             guard fm.createFile(atPath: tempURL.path, contents: nil, attributes: nil) else {
                 throw CocoaError(.fileWriteNoPermission)
             }
-            downloadURL = try fm.moveItem(at: tempURL, to: downloadURL, incrementingIndexIfExists: true, pathExtension: ext)
+            do {
+                downloadURL = try fm.moveItem(at: tempURL, to: downloadURL, incrementingIndexIfExists: true, pathExtension: ext)
+            } catch CocoaError.fileWriteNoPermission {
+                // [Sandbox] we have no access to whole directory, only to the localURL
+                // ask system for a temp directory on destination volume so we can adjust file quarantine attributes inside of it
+                itemReplacementDirectory = try fm.url(for: .itemReplacementDirectory, in: .userDomainMask, appropriateFor: localURL, create: true)
+                downloadURL = try fm.moveItem(at: tempURL, to: itemReplacementDirectory!.appendingPathComponent(downloadFilename), incrementingIndexIfExists: true)
+            }
         } catch CocoaError.fileWriteNoPermission {
             try? fm.removeItem(at: tempURL)
             downloadURL = localURL
@@ -164,7 +174,7 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
         // remove temp item and let WebKit download the file
         try? fm.removeItem(at: downloadURL)
 
-        return downloadURL
+        return .init(destinationURL: localURL, tempURL: downloadURL, itemReplacementDirectory: itemReplacementDirectory)
     }
 
     func cancel() {
@@ -211,6 +221,9 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
         if resumeData == nil,
            let tempURL = location.tempURL {
             try? FileManager.default.removeItem(at: tempURL)
+            if let itemReplacementDirectory = location.itemReplacementDirectory {
+                try? FileManager.default.removeItem(at: itemReplacementDirectory)
+            }
         }
         self.finish(with: .failure(.failedToCompleteDownloadTask(underlyingError: error,
                                                                  resumeData: resumeData,
@@ -292,6 +305,8 @@ extension WebKitDownloadTask: WebKitDownloadDelegate {}
             self.finish(with: .failure(.failedToMoveFileToDownloads))
             return
         }
+        // set quarantine attributes
+        try? (location.tempURL ?? destinationURL).setQuarantineAttributes(sourceURL: originalRequest?.url, referrerURL: originalRequest?.mainDocumentURL)
 
         if let tempURL = location.tempURL, tempURL != destinationURL {
             do {
@@ -299,6 +314,9 @@ extension WebKitDownloadTask: WebKitDownloadDelegate {}
             } catch {
                 destinationURL = tempURL
             }
+        }
+        if let itemReplacementDirectory = location.itemReplacementDirectory {
+            try? FileManager.default.removeItem(at: itemReplacementDirectory)
         }
 
         self.finish(with: .success(destinationURL))

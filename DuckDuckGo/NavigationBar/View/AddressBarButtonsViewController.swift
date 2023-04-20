@@ -18,7 +18,7 @@
 
 import Cocoa
 import Combine
-import os.log
+import Common
 import Lottie
 
 protocol AddressBarButtonsViewControllerDelegate: AnyObject {
@@ -268,8 +268,13 @@ final class AddressBarButtonsViewController: NSViewController {
     private func updateBookmarkButtonVisibility() {
         guard view.window?.isPopUpWindow == false else { return }
 
-        let hasEmptyAddressBar = tabCollectionViewModel.selectedTabViewModel?.addressBarString.isEmpty ?? true
-        let showBookmarkButton = clearButton.isHidden && !hasEmptyAddressBar && (isMouseOverNavigationBar || bookmarkPopover?.isShown == true)
+        let hasEmptyAddressBar = textFieldValue?.isEmpty ?? true
+        var isUrlBookmarked = false
+        if let url = tabCollectionViewModel.selectedTabViewModel?.tab.content.url,
+            bookmarkManager.isUrlBookmarked(url: url) {
+            isUrlBookmarked = true
+        }
+        let showBookmarkButton = clearButton.isHidden && !hasEmptyAddressBar && (isMouseOverNavigationBar || bookmarkPopover?.isShown == true || isUrlBookmarked)
 
         bookmarkButton.isHidden = !showBookmarkButton
     }
@@ -377,6 +382,7 @@ final class AddressBarButtonsViewController: NSViewController {
         updatePrivacyEntryPoint()
         updateImageButton()
         updatePermissionButtons()
+        updateBookmarkButtonVisibility()
     }
 
     @IBAction func cameraButtonAction(_ sender: NSButton) {
@@ -583,12 +589,14 @@ final class AddressBarButtonsViewController: NSViewController {
 
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             updateBookmarkButtonImage()
+            updateBookmarkButtonVisibility()
             return
         }
 
         urlCancellable = selectedTabViewModel.tab.$content.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.stopAnimations()
             self?.updateBookmarkButtonImage()
+            self?.updateBookmarkButtonVisibility()
         }
     }
 
@@ -618,6 +626,7 @@ final class AddressBarButtonsViewController: NSViewController {
     private func subscribeToBookmarkList() {
         bookmarkListCancellable = bookmarkManager.listPublisher.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.updateBookmarkButtonImage()
+            self?.updateBookmarkButtonVisibility()
         }
     }
 

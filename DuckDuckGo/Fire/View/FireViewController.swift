@@ -20,6 +20,7 @@ import Cocoa
 @preconcurrency import Lottie
 import Combine
 
+@MainActor
 final class FireViewController: NSViewController {
 
     enum Const {
@@ -48,9 +49,9 @@ final class FireViewController: NSViewController {
 
     init?(coder: NSCoder,
           tabCollectionViewModel: TabCollectionViewModel,
-          fireViewModel: FireViewModel = FireCoordinator.fireViewModel) {
+          fireViewModel: FireViewModel? = nil) {
         self.tabCollectionViewModel = tabCollectionViewModel
-        self.fireViewModel = fireViewModel
+        self.fireViewModel = fireViewModel ?? FireCoordinator.fireViewModel
 
         super.init(coder: coder)
     }

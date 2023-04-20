@@ -17,7 +17,7 @@
 //
 
 import Cocoa
-import os.log
+import Common
 import WebKit
 import BrowserServicesKit
 
@@ -32,9 +32,12 @@ protocol OptionsButtonMenuDelegate: AnyObject {
     func optionsButtonMenuRequestedOpenExternalPasswordManager(_ menu: NSMenu)
     func optionsButtonMenuRequestedDownloadsPopover(_ menu: NSMenu)
     func optionsButtonMenuRequestedPrint(_ menu: NSMenu)
+    func optionsButtonMenuRequestedPreferences(_ menu: NSMenu)
+    func optionsButtonMenuRequestedAppearancePreferences(_ menu: NSMenu)
 
 }
 
+@MainActor
 final class MoreOptionsMenu: NSMenu {
 
     weak var actionDelegate: OptionsButtonMenuDelegate?
@@ -78,7 +81,7 @@ final class MoreOptionsMenu: NSMenu {
 
         addWindowItems()
 
-        zoomMenuItem.submenu = ZoomSubMenu(tabCollectionViewModel: tabCollectionViewModel)
+        zoomMenuItem.submenu = ZoomSubMenu(targetting: self, tabCollectionViewModel: tabCollectionViewModel)
         addItem(zoomMenuItem)
         addItem(NSMenuItem.separator())
 
@@ -164,7 +167,11 @@ final class MoreOptionsMenu: NSMenu {
     }
 
     @objc func openPreferences(_ sender: NSMenuItem) {
-        WindowControllersManager.shared.showPreferencesTab()
+        actionDelegate?.optionsButtonMenuRequestedPreferences(self)
+    }
+
+    @objc func openAppearancePreferences(_ sender: NSMenuItem) {
+        actionDelegate?.optionsButtonMenuRequestedAppearancePreferences(self)
     }
 
     @objc func findInPage(_ sender: NSMenuItem) {
@@ -255,6 +262,7 @@ final class MoreOptionsMenu: NSMenu {
 
 }
 
+@MainActor
 final class EmailOptionsButtonSubMenu: NSMenu {
 
     private let tabCollectionViewModel: TabCollectionViewModel
@@ -340,17 +348,17 @@ final class EmailOptionsButtonSubMenu: NSMenu {
 
 final class ZoomSubMenu: NSMenu {
 
-    init(tabCollectionViewModel: TabCollectionViewModel) {
+    init(targetting target: AnyObject, tabCollectionViewModel: TabCollectionViewModel) {
         super.init(title: UserText.zoom)
 
-        updateMenuItems(with: tabCollectionViewModel)
+        updateMenuItems(with: tabCollectionViewModel, targetting: target)
     }
 
     required init(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
-    private func updateMenuItems(with tabCollectionViewModel: TabCollectionViewModel) {
+    private func updateMenuItems(with tabCollectionViewModel: TabCollectionViewModel, targetting target: AnyObject) {
         removeAllItems()
 
         let fullScreenItem = (NSApplication.shared.mainMenuTyped.toggleFullscreenMenuItem?.copy() as? NSMenuItem)!
@@ -366,10 +374,16 @@ final class ZoomSubMenu: NSMenu {
 
         let actualSizeItem = (NSApplication.shared.mainMenuTyped.actualSizeMenuItem?.copy() as? NSMenuItem)!
         addItem(actualSizeItem)
-    }
 
+        addItem(.separator())
+
+        let globalZoomSettingItem = NSMenuItem(title: UserText.defaultZoomPageMoreOptionsItem, action: #selector(MoreOptionsMenu.openAppearancePreferences(_:)), keyEquivalent: "")
+            .targetting(target)
+        addItem(globalZoomSettingItem)
+    }
 }
 
+@MainActor
 final class BookmarksSubMenu: NSMenu {
 
     init(targetting target: AnyObject, tabCollectionViewModel: TabCollectionViewModel) {

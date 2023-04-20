@@ -18,7 +18,7 @@
 
 import Cocoa
 import Combine
-import os.log
+import Common
 import BrowserServicesKit
 
 final class NavigationBarViewController: NSViewController {
@@ -335,6 +335,12 @@ final class NavigationBarViewController: NSViewController {
         popovers.toggleDownloadsPopover(usingView: downloadsButton, popoverDelegate: self, downloadsDelegate: self)
     }
 
+    func showPasswordManagerPopover(selectedCategory: SecureVaultSorting.Category?) {
+        popovers.showPasswordManagementPopover(selectedCategory: selectedCategory,
+                                               usingView: passwordManagementButton,
+                                               withDelegate: self)
+    }
+
     private func setupNavigationButtonMenus() {
         let backButtonMenu = NSMenu()
         backButtonMenu.delegate = goBackButtonMenuDelegate
@@ -646,12 +652,6 @@ extension NavigationBarViewController: NSMenuDelegate {
     @objc
     private func toggleBookmarksBar(_ sender: NSMenuItem) {
         PersistentAppInterfaceSettings.shared.showBookmarksBar.toggle()
-
-        if PersistentAppInterfaceSettings.shared.showBookmarksBar {
-            Pixel.fire(.bookmarksBarEnabled(.navigationBar))
-        } else {
-            Pixel.fire(.bookmarksBarDisabled(.navigationBar))
-        }
     }
 
     @objc
@@ -712,6 +712,14 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
 
     func optionsButtonMenuRequestedPrint(_ menu: NSMenu) {
         WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.printWebView(self)
+    }
+
+    func optionsButtonMenuRequestedPreferences(_ menu: NSMenu) {
+        WindowControllersManager.shared.showPreferencesTab()
+    }
+
+    func optionsButtonMenuRequestedAppearancePreferences(_ menu: NSMenu) {
+        WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .appearance)
     }
 
 }

@@ -18,7 +18,6 @@
 
 import Cocoa
 import Combine
-import os.log
 
 protocol SuggestionViewControllerDelegate: AnyObject {
 

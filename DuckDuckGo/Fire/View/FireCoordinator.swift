@@ -18,6 +18,7 @@
 
 import Cocoa
 
+@MainActor
 final class FireCoordinator {
 
     static var fireViewModel = FireViewModel()

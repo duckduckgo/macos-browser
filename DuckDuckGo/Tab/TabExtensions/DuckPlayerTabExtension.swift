@@ -34,6 +34,11 @@ final class DuckPlayerTabExtension {
     private var cancellables = Set<AnyCancellable>()
     private var youtubePlayerCancellables = Set<AnyCancellable>()
 
+    private weak var webView: WKWebView? {
+        didSet {
+            youtubeOverlayScript?.webView = webView
+        }
+    }
     private weak var youtubeOverlayScript: YoutubeOverlayUserScript?
     private weak var youtubePlayerScript: YoutubePlayerUserScript?
 
@@ -41,19 +46,28 @@ final class DuckPlayerTabExtension {
 
     init(duckPlayer: DuckPlayer,
          isDisposable: Bool,
-         scriptsPublisher: some Publisher<some YoutubeScriptsProvider, Never>) {
+         scriptsPublisher: some Publisher<some YoutubeScriptsProvider, Never>,
+         webViewPublisher: some Publisher<WKWebView, Never>) {
         self.duckPlayer = duckPlayer
         self.isDisposable = isDisposable
+
+        webViewPublisher.sink { [weak self] webView in
+            self?.webView = webView
+        }.store(in: &cancellables)
 
         scriptsPublisher.sink { [weak self] scripts in
             self?.youtubeOverlayScript = scripts.youtubeOverlayScript
             self?.youtubePlayerScript = scripts.youtubePlayerUserScript
             self?.youtubeOverlayScript?.delegate = self
+            self?.youtubeOverlayScript?.webView = self?.webView
 
-            self?.setUpYoutubeScriptsIfNeeded(for: nil)
+            DispatchQueue.main.async { [weak self] in
+                self?.setUpYoutubeScriptsIfNeeded(for: self?.webView?.url)
+            }
         }.store(in: &cancellables)
     }
 
+    @MainActor
     private func setUpYoutubeScriptsIfNeeded(for url: URL?) {
         youtubePlayerCancellables.removeAll()
         guard duckPlayer.isAvailable else { return }
@@ -67,20 +81,23 @@ final class DuckPlayerTabExtension {
             }
         }()
 
-        if url?.host?.droppingWwwPrefix() == "youtube.com" && canPushMessagesToJS {
-            duckPlayer.$mode
-                .dropFirst()
-                .sink { [weak self] playerMode in
-                    guard let self = self else {
-                        return
-                    }
-                    let userValues = YoutubeOverlayUserScript.UserValues(
-                        duckPlayerMode: playerMode,
-                        overlayInteracted: self.duckPlayer.overlayInteracted
-                    )
-                    self.youtubeOverlayScript?.userValuesUpdated(userValues: userValues)
-                }
-                .store(in: &youtubePlayerCancellables)
+        if let hostname = url?.host,
+           let origins = self.youtubeOverlayScript?.allowedOrigins {
+            if origins.contains(hostname) && canPushMessagesToJS {
+                duckPlayer.$mode
+                        .dropFirst()
+                        .sink { [weak self] playerMode in
+                            guard let self = self else {
+                                return
+                            }
+                            let userValues = YoutubeOverlayUserScript.UserValues(
+                                    duckPlayerMode: playerMode,
+                                    overlayInteracted: self.duckPlayer.overlayInteracted
+                            )
+                            self.youtubeOverlayScript?.userValuesUpdated(userValues: userValues)
+                        }
+                        .store(in: &youtubePlayerCancellables)
+            }
         }
 
         if url?.isDuckPlayerScheme == true {

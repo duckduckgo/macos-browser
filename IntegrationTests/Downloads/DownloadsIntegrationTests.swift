@@ -35,6 +35,7 @@ class DownloadsIntegrationTests: XCTestCase {
         (Self.window.contentViewController as! MainViewController).browserTabViewController.tabViewModel!
     }
 
+    @MainActor
     override class func setUp() {
         window = WindowsManager.openNewWindow(with: .none)!
     }
@@ -60,7 +61,7 @@ class DownloadsIntegrationTests: XCTestCase {
                                      headers: ["Content-Disposition": "attachment; filename=\"fname.dat\"",
                                                "Content-Type": "text/html"])
         let tab = tabViewModel.tab
-        _=await tab.setUrl(url, userEntered: false)?.value?.result
+        _=await tab.setUrl(url, userEntered: nil)?.value?.result
 
         let fileUrl = try await downloadTaskFuture.get().output
             .timeout(1, scheduler: DispatchQueue.main) { .init(TimeoutError() as NSError, isRetryable: false) }.first().promise().get()
@@ -77,7 +78,7 @@ class DownloadsIntegrationTests: XCTestCase {
         let tab = tabViewModel.tab
         // load empty page
         let pageUrl = URL.testsServer.appendingTestParameters(data: data.html)
-        _=await tab.setUrl(pageUrl, userEntered: false)?.value?.result
+        _=await tab.setUrl(pageUrl, userEntered: nil)?.value?.result
 
         let downloadTaskFuture = FileDownloadManager.shared.downloadsPublisher.timeout(5).first().promise()
 
@@ -109,7 +110,7 @@ class DownloadsIntegrationTests: XCTestCase {
         let tab = tabViewModel.tab
         // load empty page
         let pageUrl = URL.testsServer.appendingTestParameters(data: data.html)
-        _=await tab.setUrl(pageUrl, userEntered: false)?.value?.result
+        _=await tab.setUrl(pageUrl, userEntered: nil)?.value?.result
 
         let downloadTaskFuture = FileDownloadManager.shared.downloadsPublisher.timeout(5).first().promise()
 

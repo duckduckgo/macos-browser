@@ -20,10 +20,13 @@ import SwiftUI
 
 struct EnterCodeView: View {
 
+    @EnvironmentObject var model: ManagementDialogModel
+    @EnvironmentObject var recoveryCodeModel: RecoveryCodeViewModel
+
     let instructions: String
     let buttonCaption: String
 
-    @EnvironmentObject var recoveryCodeModel: RecoveryCodeViewModel
+    let submitRecoveryCode: () -> Void
 
     var body: some View {
         VStack(spacing: 20) {
@@ -37,7 +40,8 @@ struct EnterCodeView: View {
                 .frame(maxWidth: 244)
 
             Button {
-                recoveryCodeModel.setCode(NSPasteboard.general.string(forType: .string)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? "")
+                recoveryCodeModel.paste()
+                submitRecoveryCode()
             } label: {
                 HStack {
                     Image("Paste")

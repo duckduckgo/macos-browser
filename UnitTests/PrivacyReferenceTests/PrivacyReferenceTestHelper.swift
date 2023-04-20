@@ -53,6 +53,9 @@ struct PrivacyReferenceTestHelper {
 
     func privacyConfiguration(withData data: PrivacyConfigurationData) -> PrivacyConfiguration {
         let domain = MockDomainsProtectionStore()
-        return AppPrivacyConfiguration(data: data, identifier: UUID().uuidString, localProtection: domain)
+        return AppPrivacyConfiguration(data: data,
+                                       identifier: UUID().uuidString,
+                                       localProtection: domain,
+                                       internalUserDecider: DefaultInternalUserDecider(store: InternalUserDeciderStoreMock()))
     }
 }

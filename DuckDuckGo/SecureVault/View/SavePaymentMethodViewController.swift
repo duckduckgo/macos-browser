@@ -19,7 +19,7 @@
 import Foundation
 import BrowserServicesKit
 import Combine
-import os.log
+import Common
 
 protocol SavePaymentMethodDelegate: AnyObject {
 

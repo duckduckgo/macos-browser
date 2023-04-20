@@ -16,8 +16,8 @@
 //  limitations under the License.
 //
 
+import Common
 import Foundation
-import os.log
 import BrowserServicesKit
 
 extension URL.NavigationalScheme {
@@ -191,6 +191,10 @@ extension URL {
         }
     }
 
+    var navigationalScheme: NavigationalScheme? {
+        self.scheme.map(NavigationalScheme.init(rawValue:))
+    }
+
     var separatedScheme: String? {
         self.scheme.map { $0 + NavigationalScheme.separator }
     }
@@ -298,8 +302,20 @@ extension URL {
         return URL(string: "https://duckduckgo.com/about")!
     }
 
+    static var webTrackingProtection: URL {
+        return URL(string: "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/")!
+    }
+
+    static var cookieConsentPopUpManagement: URL {
+        return URL(string: "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#cookie-consent-pop-up-management")!
+    }
+
     static var gpcLearnMore: URL {
         return URL(string: "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/gpc/")!
+    }
+
+    static var theFireButton: URL {
+        return URL(string: "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#the-fire-button")!
     }
 
     static var privacyPolicy: URL {

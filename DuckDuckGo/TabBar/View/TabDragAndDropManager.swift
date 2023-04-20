@@ -19,63 +19,60 @@
 import Foundation
 
 /// Responsible for handling drag and drop of tabs between windows
+@MainActor
 final class TabDragAndDropManager {
 
     static let shared = TabDragAndDropManager()
 
     private init() { }
 
-    private struct Unit {
+    struct Unit {
         weak var tabCollectionViewModel: TabCollectionViewModel?
-        var indexPath: IndexPath
+        var index: Int
     }
 
-    private var sourceUnit: Unit?
-    private var destinationUnit: Unit?
+    private(set) var sourceUnit: Unit?
+    private(set) var destinationUnit: Unit?
 
-    func setSource(tabCollectionViewModel: TabCollectionViewModel, indexPath: IndexPath) {
-        sourceUnit = .init(tabCollectionViewModel: tabCollectionViewModel, indexPath: indexPath)
+    func setSource(tabCollectionViewModel: TabCollectionViewModel, index: Int) {
+        sourceUnit = .init(tabCollectionViewModel: tabCollectionViewModel, index: index)
     }
 
-    func setDestination(tabCollectionViewModel: TabCollectionViewModel, indexPath: IndexPath) {
+    func setDestination(tabCollectionViewModel: TabCollectionViewModel, index: Int) {
         // ignore dragged objects from other apps
         guard sourceUnit != nil else { return }
-        destinationUnit = .init(tabCollectionViewModel: tabCollectionViewModel, indexPath: indexPath)
+        destinationUnit = .init(tabCollectionViewModel: tabCollectionViewModel, index: index)
     }
 
     func clearDestination() {
         destinationUnit = nil
     }
 
+    @discardableResult
     func performDragAndDropIfNeeded() -> Bool {
-        defer {
+        if let sourceUnit = sourceUnit, let destinationUnit = destinationUnit,
+           sourceUnit.tabCollectionViewModel !== destinationUnit.tabCollectionViewModel &&
+            sourceUnit.tabCollectionViewModel?.isDisposable ==
+                    destinationUnit.tabCollectionViewModel?.isDisposable{
+
+            performDragAndDrop(from: sourceUnit, to: destinationUnit)
             clear()
-        }
-
-        guard sourceUnit?.tabCollectionViewModel?.isDisposable ==
-                destinationUnit?.tabCollectionViewModel?.isDisposable else {
-            return false
-        }
-
-        if destinationUnit != nil {
-            performDragAndDrop()
             return true
         } else {
             return false
         }
     }
 
-    private func performDragAndDrop() {
-        guard let sourceUnit = sourceUnit, let destinationUnit = destinationUnit,
-              let sourceTabCollectionViewModel = sourceUnit.tabCollectionViewModel,
+    private func performDragAndDrop(from sourceUnit: Unit, to destinationUnit: Unit) {
+        guard let sourceTabCollectionViewModel = sourceUnit.tabCollectionViewModel,
               let destinationTabCollectionViewModel = destinationUnit.tabCollectionViewModel
         else {
             assertionFailure("TabDragAndDropManager: Missing data to perform drag and drop")
             return
         }
 
-        let newIndex = min(destinationUnit.indexPath.item + 1, destinationTabCollectionViewModel.tabCollection.tabs.count)
-        sourceTabCollectionViewModel.moveTab(at: sourceUnit.indexPath.item, to: destinationTabCollectionViewModel, at: newIndex)
+        let newIndex = min(destinationUnit.index, destinationTabCollectionViewModel.tabCollection.tabs.count)
+        sourceTabCollectionViewModel.moveTab(at: sourceUnit.index, to: destinationTabCollectionViewModel, at: newIndex)
     }
 
     private func clear() {

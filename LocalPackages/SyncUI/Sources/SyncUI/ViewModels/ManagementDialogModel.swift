@@ -21,9 +21,9 @@ import Combine
 
 public protocol ManagementDialogModelDelegate: AnyObject {
     func turnOnSync()
+    func dontSyncAnotherDeviceNow()
     func recoverDevice(using recoveryCode: String)
     func presentSyncAnotherDeviceDialog()
-    func addAnotherDevice(using recoveryCode: String)
     func confirmSetupComplete()
     func saveRecoveryPDF()
 }
@@ -32,6 +32,7 @@ public final class ManagementDialogModel: ObservableObject {
 
     @Published public var currentDialog: ManagementDialogKind?
     public var recoveryCode: String?
+    public var connectCode: String?
 
     @Published public var shouldShowErrorMessage: Bool = false
     @Published public var errorMessage: String?

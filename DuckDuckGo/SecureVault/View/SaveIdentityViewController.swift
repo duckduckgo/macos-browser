@@ -19,7 +19,7 @@
 import AppKit
 import BrowserServicesKit
 import Combine
-import os.log
+import Common
 
 protocol SaveIdentityDelegate: AnyObject {
 

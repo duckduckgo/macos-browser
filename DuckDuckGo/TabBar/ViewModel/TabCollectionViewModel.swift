@@ -16,8 +16,8 @@
 //  limitations under the License.
 //
 
+import Common
 import Foundation
-import os.log
 import Combine
 
 /**
@@ -36,6 +36,7 @@ protocol TabCollectionViewModelDelegate: AnyObject {
 
 }
 
+@MainActor
 final class TabCollectionViewModel: NSObject {
 
     weak var delegate: TabCollectionViewModelDelegate?
@@ -100,7 +101,7 @@ final class TabCollectionViewModel: NSObject {
     init(
         tabCollection: TabCollection,
         selectionIndex: Int = 0,
-        pinnedTabsManager: PinnedTabsManager? = WindowControllersManager.shared.pinnedTabsManager,
+        pinnedTabsManager: PinnedTabsManager?,
         isDisposable: Bool
     ) {
         self.tabCollection = tabCollection
@@ -117,9 +118,20 @@ final class TabCollectionViewModel: NSObject {
         self.selectionIndex = .unpinned(selectionIndex)
     }
 
+    convenience init(tabCollection: TabCollection,
+                     selectionIndex: Int = 0,
+                     isDisposable: Bool) {
+        self.init(tabCollection: tabCollection,
+                  selectionIndex: selectionIndex,
+                  pinnedTabsManager: WindowControllersManager.shared.pinnedTabsManager,
+                  isDisposable: isDisposable)
+    }
+
     convenience init(isDisposable: Bool) {
         let tabCollection = TabCollection()
-        self.init(tabCollection: tabCollection, isDisposable: isDisposable)
+        self.init(tabCollection: tabCollection,
+                  pinnedTabsManager: WindowControllersManager.shared.pinnedTabsManager,
+                  isDisposable: isDisposable)
     }
 
     func setUpLazyLoadingIfNeeded() {
@@ -168,6 +180,7 @@ final class TabCollectionViewModel: NSObject {
 
         let isTabCurrentlySelected = selectedTabViewModel?.tab.content.matchesDisplayableTab(content) ?? false
         if isTabCurrentlySelected {
+            selectedTabViewModel?.tab.setContent(content)
             return true
         }
 

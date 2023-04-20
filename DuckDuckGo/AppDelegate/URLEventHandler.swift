@@ -16,18 +16,19 @@
 //  limitations under the License.
 //
 
+import Common
 import Foundation
-import os.log
 
+@MainActor
 final class URLEventHandler {
 
-    private let handler: ((URL) -> Void)
+    private let handler: @MainActor (URL) -> Void
 
     private var didFinishLaunching = false
     private var urlsToOpen = [URL]()
 
-    init(handler: @escaping ((URL) -> Void) = openURL) {
-        self.handler = handler
+    init(handler: ((URL) -> Void)? = nil) {
+        self.handler = handler ?? Self.openURL
 
         NSAppleEventManager.shared().setEventHandler(
             self,
@@ -71,7 +72,8 @@ final class URLEventHandler {
     func handleFiles(_ files: [String]) {
         let urls: [URL] = files.compactMap {
             if let url = URL(string: $0),
-               ["http", "https", "file"].contains(url.scheme) {
+               let scheme = url.navigationalScheme,
+               URL.NavigationalScheme.validSchemes.contains(scheme) {
                 guard !url.isFileURL || FileManager.default.fileExists(atPath: url.path) else { return nil }
                 return url
             } else if FileManager.default.fileExists(atPath: $0) {
@@ -86,7 +88,7 @@ final class URLEventHandler {
 
     private func handleURLs(_ urls: [URL]) {
         if didFinishLaunching {
-            urls.forEach(self.handler)
+            urls.forEach { self.handler($0) }
         } else {
             self.urlsToOpen.append(contentsOf: urls)
         }

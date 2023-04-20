@@ -85,21 +85,40 @@ extension Preferences {
 
         var body: some View {
             VStack(alignment: .leading, spacing: 0) {
-                Text(UserText.appearance)
-                    .font(Const.Fonts.preferencePaneTitle)
 
+                // TITLE
+                TextMenuTitle(text: UserText.appearance)
+
+                // SECTION 1: Theme
                 PreferencePaneSection {
-                    Text(UserText.theme)
-                        .font(Const.Fonts.preferencePaneSectionHeader)
+                    TextMenuItemHeader(text: UserText.theme)
                     ThemePicker()
                         .environmentObject(model)
                 }
 
+                // SECTION 2: Address Bar
                 PreferencePaneSection {
-                    Text(UserText.addressBar)
+                    TextMenuItemHeader(text: UserText.addressBar)
+                    ToggleMenuItem(title: UserText.showFullWebsiteAddress, isOn: $model.showFullURL)
+                    ToggleMenuItem(title: UserText.showAutocompleteSuggestions, isOn: $model.showAutocompleteSuggestions)
+                }
+
+                PreferencePaneSection {
+                    Text(UserText.zoomSettingTitle)
                         .font(Const.Fonts.preferencePaneSectionHeader)
-                    Toggle(UserText.showFullWebsiteAddress, isOn: $model.showFullURL)
-                    Toggle(UserText.showAutocompleteSuggestions, isOn: $model.showAutocompleteSuggestions)
+                    HStack {
+                        Text(UserText.zoomPickerTitle)
+                        NSPopUpButtonView(selection: $model.defaultPageZoom) {
+                            let button = NSPopUpButton()
+                            button.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+
+                            for value in DefaultZoomValue.allCases {
+                                let item = button.menu?.addItem(withTitle: value.displayString, action: nil, keyEquivalent: "")
+                                item?.representedObject = value
+                            }
+                            return button
+                        }
+                    }
                 }
             }
         }

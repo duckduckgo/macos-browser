@@ -18,10 +18,10 @@
 
 import Foundation
 import Combine
-import os
 import BrowserServicesKit
 import Configuration
 import Common
+import Networking
 
 @MainActor
 final class ConfigurationManager {
@@ -155,6 +155,12 @@ final class ConfigurationManager {
     }
 
     private func handleRefreshError(_ error: Swift.Error) {
+        // Avoid firing a configuration fetch error pixel when we received a 304 status code.
+        // A 304 status code is expected when we request the config with an ETag that matches the current remote version.
+        if case APIRequest.Error.invalidStatusCode(304) = error {
+            return
+        }
+
         os_log("Failed to complete configuration update %@", log: .config, type: .error, error.localizedDescription)
         Pixel.fire(.debug(event: .configurationFetchError, error: error))
         tryAgainSoon()
@@ -203,26 +209,31 @@ final class ConfigurationManager {
         guard let bloomFilterData = ConfigurationStore.shared.loadData(for: .bloomFilterBinary) else {
             throw Error.bloomFilterBinaryNotFound
         }
-        let spec = try JSONDecoder().decode(HTTPSBloomFilterSpecification.self, from: specData)
-        do {
-            try AppHTTPSUpgradeStore().persistBloomFilter(specification: spec, data: bloomFilterData)
-        } catch {
-            throw Error.bloomFilterPersistenceFailed
-        }
-        await PrivacyFeatures.httpsUpgrade.loadData()
+        try await Task.detached {
+            let spec = try JSONDecoder().decode(HTTPSBloomFilterSpecification.self, from: specData)
+            do {
+                try await PrivacyFeatures.httpsUpgrade.persistBloomFilter(specification: spec, data: bloomFilterData)
+            } catch {
+                assertionFailure("persistBloomFilter failed: \(error)")
+                throw Error.bloomFilterPersistenceFailed
+            }
+            await PrivacyFeatures.httpsUpgrade.loadData()
+        }.value
     }
 
     private func updateBloomFilterExclusions() async throws {
         guard let bloomFilterExclusions = ConfigurationStore.shared.loadData(for: .bloomFilterExcludedDomains) else {
             throw Error.bloomFilterExclusionsNotFound
         }
-        let excludedDomains = try JSONDecoder().decode(HTTPSExcludedDomains.self, from: bloomFilterExclusions).data
-        do {
-            try AppHTTPSUpgradeStore().persistExcludedDomains(excludedDomains)
-        } catch {
-            throw Error.bloomFilterExclusionsPersistenceFailed
-        }
-        await PrivacyFeatures.httpsUpgrade.loadData()
+        try await Task.detached {
+            let excludedDomains = try JSONDecoder().decode(HTTPSExcludedDomains.self, from: bloomFilterExclusions).data
+            do {
+                try await PrivacyFeatures.httpsUpgrade.persistExcludedDomains(excludedDomains)
+            } catch {
+                throw Error.bloomFilterExclusionsPersistenceFailed
+            }
+            await PrivacyFeatures.httpsUpgrade.loadData()
+        }.value
     }
 
 }

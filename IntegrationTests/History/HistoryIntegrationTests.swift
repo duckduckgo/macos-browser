@@ -69,11 +69,11 @@ class HistoryIntegrationTests: XCTestCase {
         let titleChangedPromise1 = tab.$title
             .filter { $0 == "Title 1" }
             .receive(on: DispatchQueue.main)
-            .timeout(1, "Title 1")
+            .timeout(5, "Title 1")
             .first()
             .promise()
 
-        _=try await tab.setUrl(url, userEntered: false)?.value?.result.get()
+        _=try await tab.setUrl(url, userEntered: nil)?.value?.result.get()
         _=try await titleChangedPromise1.value
 
         XCTAssertEqual(HistoryCoordinator.shared.history?.count, 1)
@@ -84,7 +84,7 @@ class HistoryIntegrationTests: XCTestCase {
         let titleChangedPromise2 = tab.$title
             .filter { $0 == "Title 2" }
             .receive(on: DispatchQueue.main)
-            .timeout(1, "Title 2")
+            .timeout(5, "Title 2")
             .first()
             .promise()
 
@@ -119,7 +119,7 @@ class HistoryIntegrationTests: XCTestCase {
             URL(string: URL.testsServer.appendingTestParameters(data: html.utf8data).absoluteString + "#1")!,
         ]
 
-        _=try await tab.setUrl(urls[0], userEntered: false)?.value?.result.get()
+        _=try await tab.setUrl(urls[0], userEntered: nil)?.value?.result.get()
 
         let titleChangedPromise = tab.$title
             .filter { $0 == "Title 2" }
@@ -150,9 +150,9 @@ class HistoryIntegrationTests: XCTestCase {
             URL.testsServer,
             URL.testsServer.appendingPathComponent("page1").appendingTestParameters(data: "".utf8data),
         ]
-        _=try await tab.setUrl(urls[0], userEntered: false)?.value?.result.get()
-        _=try await tab.setUrl(urls[1], userEntered: false)?.value?.result.get()
-        _=try await tab.setUrl(urls[0], userEntered: false)?.value?.result.get()
+        _=try await tab.setUrl(urls[0], userEntered: nil)?.value?.result.get()
+        _=try await tab.setUrl(urls[1], userEntered: nil)?.value?.result.get()
+        _=try await tab.setUrl(urls[0], userEntered: nil)?.value?.result.get()
 
         let first = HistoryCoordinator.shared.history?.first(where: { $0.url == urls[0] })
         XCTAssertEqual(first?.numberOfVisits, 2)
@@ -170,8 +170,8 @@ class HistoryIntegrationTests: XCTestCase {
             URL.testsServer,
             URL.testsServer.appendingPathComponent("page1").appendingTestParameters(data: "".utf8data),
         ]
-        _=try await tab.setUrl(urls[0], userEntered: false)?.value?.result.get()
-        _=try await tab.setUrl(urls[1], userEntered: false)?.value?.result.get()
+        _=try await tab.setUrl(urls[0], userEntered: nil)?.value?.result.get()
+        _=try await tab.setUrl(urls[1], userEntered: nil)?.value?.result.get()
         _=try await tab.goBack()?.result.get()
         _=try await tab.goForward()?.result.get()
 
@@ -200,7 +200,7 @@ class HistoryIntegrationTests: XCTestCase {
             .first()
             .promise()
 
-        _=try await tab.setUrl(url, userEntered: false)?.value?.result.get()
+        _=try await tab.setUrl(url, userEntered: nil)?.value?.result.get()
         _=try await trackerPromise.value
 
         let first = HistoryCoordinator.shared.history?.first
@@ -224,11 +224,11 @@ class HistoryIntegrationTests: XCTestCase {
             .switchToLatest()
             .filter { $0.trackersBlocked.count == 1 }
             .map { _ in true }
-            .timeout(5)
+            .timeout(10)
             .first()
             .promise()
 
-        _=try await tab.setUrl(url, userEntered: false)?.value?.result.get()
+        _=try await tab.setUrl(url, userEntered: nil)?.value?.result.get()
         _=try await trackerPromise.value
 
         let first = HistoryCoordinator.shared.history?.first

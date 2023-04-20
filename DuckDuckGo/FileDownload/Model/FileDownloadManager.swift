@@ -18,8 +18,8 @@
 
 import AppKit
 import Combine
+import Common
 import Navigation
-import os
 
 protocol FileDownloadManagerProtocol: AnyObject {
     var downloads: Set<WebKitDownloadTask> { get }
@@ -43,6 +43,7 @@ extension FileDownloadManagerProtocol {
 
 }
 
+@MainActor
 protocol FileDownloadManagerDelegate: AnyObject {
     func askUserToGrantAccessToDestination(_ folderUrl: URL)
 }
@@ -133,11 +134,11 @@ final class FileDownloadManager: FileDownloadManagerProtocol {
 
 extension FileDownloadManager: WebKitDownloadTaskDelegate {
 
-    // swiftlint:disable function_body_length
+    @MainActor
+    // swiftlint:disable:next function_body_length
     func fileDownloadTaskNeedsDestinationURL(_ task: WebKitDownloadTask,
                                              suggestedFilename: String,
                                              completionHandler: @escaping (URL?, UTType?) -> Void) {
-        dispatchPrecondition(condition: .onQueue(.main))
 
         let completion: (URL?, UTType?) -> Void = { url, fileType in
             defer {
@@ -226,9 +227,8 @@ extension FileDownloadManager: WebKitDownloadTaskDelegate {
             completion(url, fileType)
         }
     }
-    // swiftlint:enable function_body_length
-    // swiftlint:enable cyclomatic_complexity
 
+    @MainActor
     private func verifyAccessToDestinationFolder(_ folderUrl: URL, destinationRequested: Bool, isSandboxed: Bool) -> Bool {
         if destinationRequested && isSandboxed { return true }
 
@@ -247,22 +247,17 @@ extension FileDownloadManager: WebKitDownloadTaskDelegate {
     func fileDownloadTask(_ task: WebKitDownloadTask, didFinishWith result: Result<URL, FileDownloadError>) {
         dispatchPrecondition(condition: .onQueue(.main))
 
-        defer {
-            self.downloads.remove(task)
-            self.downloadTaskDelegates[task] = nil
-        }
-
-        if case .success(let url) = result {
-            try? url.setQuarantineAttributes(sourceURL: task.originalRequest?.url,
-                                             referrerURL: task.originalRequest?.mainDocumentURL)
-        }
+        self.downloads.remove(task)
+        self.downloadTaskDelegates[task] = nil
     }
 
 }
 
 protocol DownloadTaskDelegate: AnyObject {
 
-    func chooseDestination(suggestedFilename: String?, directoryURL: URL?, fileTypes: [UTType], callback: @escaping (URL?, UTType?) -> Void)
+    @MainActor
+    func chooseDestination(suggestedFilename: String?, directoryURL: URL?, fileTypes: [UTType], callback: @escaping @MainActor (URL?, UTType?) -> Void)
+    @MainActor
     func fileIconFlyAnimationOriginalRect(for downloadTask: WebKitDownloadTask) -> NSRect?
 
 }
