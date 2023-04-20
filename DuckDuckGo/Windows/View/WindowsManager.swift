@@ -34,7 +34,7 @@ final class WindowsManager {
 
     @discardableResult
     class func openNewWindow(with tabCollectionViewModel: TabCollectionViewModel? = nil,
-                             isDisposable: Bool,
+                             isDisposable: Bool = false,
                              droppingPoint: NSPoint? = nil,
                              contentSize: NSSize? = nil,
                              showWindow: Bool = true,
@@ -69,7 +69,7 @@ final class WindowsManager {
     }
 
     @discardableResult
-    class func openNewWindow(with tab: Tab, isDisposable: Bool, droppingPoint: NSPoint? = nil, contentSize: NSSize? = nil, showWindow: Bool = true, popUp: Bool = false) -> MainWindow? {
+    class func openNewWindow(with tab: Tab, isDisposable: Bool = false, droppingPoint: NSPoint? = nil, contentSize: NSSize? = nil, showWindow: Bool = true, popUp: Bool = false) -> MainWindow? {
         let tabCollection = TabCollection()
         tabCollection.append(tab: tab)
 

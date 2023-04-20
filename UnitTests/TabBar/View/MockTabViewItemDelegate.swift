@@ -20,6 +20,7 @@ import Foundation
 @testable import DuckDuckGo_Privacy_Browser
 
 class MockTabViewItemDelegate: TabBarViewItemDelegate {
+
     var hasItemsToTheRight = false
 
     func tabBarViewItem(_ tabBarViewItem: DuckDuckGo_Privacy_Browser.TabBarViewItem, isMouseOver: Bool) {
@@ -59,6 +60,10 @@ class MockTabViewItemDelegate: TabBarViewItemDelegate {
     }
 
     func tabBarViewItemMoveToNewWindowAction(_ tabBarViewItem: DuckDuckGo_Privacy_Browser.TabBarViewItem) {
+
+    }
+
+    func tabBarViewItemMoveToNewDisposableWindowAction(_ tabBarViewItem: DuckDuckGo_Privacy_Browser.TabBarViewItem) {
 
     }
 

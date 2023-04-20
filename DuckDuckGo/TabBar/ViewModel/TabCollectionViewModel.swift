@@ -102,7 +102,7 @@ final class TabCollectionViewModel: NSObject {
         tabCollection: TabCollection,
         selectionIndex: Int = 0,
         pinnedTabsManager: PinnedTabsManager?,
-        isDisposable: Bool
+        isDisposable: Bool = false
     ) {
         self.tabCollection = tabCollection
         self.pinnedTabsManager = pinnedTabsManager
@@ -120,14 +120,14 @@ final class TabCollectionViewModel: NSObject {
 
     convenience init(tabCollection: TabCollection,
                      selectionIndex: Int = 0,
-                     isDisposable: Bool) {
+                     isDisposable: Bool = false) {
         self.init(tabCollection: tabCollection,
                   selectionIndex: selectionIndex,
                   pinnedTabsManager: WindowControllersManager.shared.pinnedTabsManager,
                   isDisposable: isDisposable)
     }
 
-    convenience init(isDisposable: Bool) {
+    convenience init(isDisposable: Bool = false) {
         let tabCollection = TabCollection()
         self.init(tabCollection: tabCollection,
                   pinnedTabsManager: WindowControllersManager.shared.pinnedTabsManager,

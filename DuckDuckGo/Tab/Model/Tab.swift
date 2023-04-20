@@ -219,7 +219,7 @@ protocol NewWindowPolicyDecisionMaker {
                      interactionStateData: Data? = nil,
                      parentTab: Tab? = nil,
                      shouldLoadInBackground: Bool = false,
-                     isDisposable: Bool,
+                     isDisposable: Bool = false,
                      shouldLoadFromCache: Bool = false,
                      canBeClosedWithBack: Bool = false,
                      lastSelectedAt: Date? = nil,

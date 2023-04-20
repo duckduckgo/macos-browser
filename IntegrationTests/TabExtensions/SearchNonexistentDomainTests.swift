@@ -215,7 +215,7 @@ final class SearchNonexistentDomainTests: XCTestCase {
 
         let suggestionLoadingMock = SuggestionLoadingMock()
         let suggestionContainer = SuggestionContainer(suggestionLoading: suggestionLoadingMock, historyCoordinating: HistoryCoordinator.shared, bookmarkManager: LocalBookmarkManager.shared)
-        addressBar.suggestionContainerViewModel = SuggestionContainerViewModel(isHomePage: true, suggestionContainer: suggestionContainer)
+        addressBar.suggestionContainerViewModel = SuggestionContainerViewModel(isHomePage: true, isDisposable: false, suggestionContainer: suggestionContainer)
 
         suggestionContainer.getSuggestions(for: enteredString)
         suggestionLoadingMock.completion!(.init(topHits: [.website(url: url)], duckduckgoSuggestions: [], historyAndBookmarks: []), nil)
