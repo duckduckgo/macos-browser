@@ -56,6 +56,21 @@ public struct ManagementView<ViewModel>: View where ViewModel: ManagementViewMod
 
     public var body: some View {
         VStack(alignment: .leading, spacing: 0) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Work in Progress")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundColor(.black)
+
+                // swiftlint:disable line_length
+                Text("This feature is viewable to internal users only and is still being developed and tested. Currently you can create and connect accounts. Management and data syncing will be available soon. **[More Info](https://stackoverflow.com/a/67922714/73479)**")
+                    .foregroundColor(.black)
+                    .font(.system(size: 11, weight: .regular))
+                // swiftlint:enable line_length
+            }
+            .padding()
+            .background(RoundedRectangle(cornerRadius: 8).foregroundColor(.yellow))
+            .padding(.bottom, 10)
+
             Text(UserText.sync)
                 .font(Const.Fonts.preferencePaneTitle)
 

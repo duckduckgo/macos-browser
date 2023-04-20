@@ -70,6 +70,11 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         presentDialog(for: .turnOffSync)
     }
 
+    @MainActor
+    func presentDeviceDetails(_ device: SyncDevice) {
+        presentDialog(for: .deviceDetails(device))
+    }
+
     func turnOffSync() {
         Task { @MainActor in
             do {
