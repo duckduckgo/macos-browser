@@ -61,7 +61,7 @@ extension ContextMenuManager: NewWindowPolicyDecisionMaker {
 extension ContextMenuManager {
 
     /// Defines which functions will handle matching WebKit Menu Items
-    private static let menuItemHandlers: [WKMenuItemIdentifier: ((ContextMenuManager) -> (NSMenuItem, Int, NSMenu) -> Void)] = [
+    private static let menuItemHandlers: [WKMenuItemIdentifier: ((ContextMenuManager) -> @MainActor (NSMenuItem, Int, NSMenu) -> Void)] = [
         .openLink: handleOpenLinkItem,
         .openLinkInNewWindow: handleOpenLinkInNewWindowItem,
         .downloadLinkedFile: handleDownloadLinkedFileItem,

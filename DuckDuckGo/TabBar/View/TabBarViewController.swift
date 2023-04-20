@@ -1127,8 +1127,6 @@ extension TabBarViewController: TabBarViewItemDelegate {
         moveToNewWindow(from: indexPath.item, disposable: true)
     }
 
-
-
     func tabBarViewItemFireproofSite(_ tabBarViewItem: TabBarViewItem) {
         guard let indexPath = collectionView.indexPath(for: tabBarViewItem),
               let tab = tabCollectionViewModel.tabCollection.tabs[safe: indexPath.item]

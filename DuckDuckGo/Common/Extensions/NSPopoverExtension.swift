@@ -31,7 +31,7 @@ extension NSPopover {
 
         // Calculate the positioning rect
         let viewFrame = view.bounds
-        let pinPositionX = NSMidX(viewFrame)
+        let pinPositionX = viewFrame.midX
         let positioningRect = NSRect(x: pinPositionX, y: 0, width: 0, height: 0)
 
         // Show the popover
