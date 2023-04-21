@@ -511,7 +511,16 @@ protocol NewWindowPolicyDecisionMaker {
         }
     }
 
-    @PublishedAfter var error: WKError?
+    @PublishedAfter var error: WKError? {
+        didSet {
+            if error == nil || error?.isFrameLoadInterrupted == true || error?.isNavigationCancelled == true {
+                return
+            }
+            webView.stopLoading()
+            webView.stopMediaCapture()
+            webView.stopAllMediaPlayback()
+        }
+    }
     let permissions: PermissionModel
 
     @Published private(set) var isLoading: Bool = false
