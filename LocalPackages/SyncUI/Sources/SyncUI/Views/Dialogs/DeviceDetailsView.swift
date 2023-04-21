@@ -32,6 +32,12 @@ struct DeviceDetailsView: View {
         deviceName != device.name
     }
 
+    func submit() {
+        guard canSave else { return }
+        model.delegate?.updateDeviceName(deviceName)
+        model.endFlow()
+    }
+
     var body: some View {
         SyncDialog {
             VStack(spacing: 20) {
@@ -39,9 +45,9 @@ struct DeviceDetailsView: View {
                     .font(.system(size: 17, weight: .bold))
 
                 HStack {
-                    Text("Name")
+                    Text(UserText.deviceDetailsLabel)
                         .font(.system(size: 13, weight: .semibold))
-                    TextField("Device name", text: $deviceName)
+                    TextField(UserText.deviceDetailsPrompt, text: $deviceName, onCommit: submit)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                 }
                 .padding(.horizontal, 10)
@@ -54,8 +60,7 @@ struct DeviceDetailsView: View {
             }
 
             Button(UserText.ok) {
-                model.delegate?.updateDeviceName(deviceName)
-                model.endFlow()
+                submit()
             }
             .disabled(!canSave)
             .buttonStyle(DefaultActionButtonStyle(enabled: canSave))
