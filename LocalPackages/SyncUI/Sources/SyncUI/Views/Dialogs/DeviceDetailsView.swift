@@ -44,7 +44,8 @@ struct DeviceDetailsView: View {
                     TextField("Device name", text: $deviceName)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                 }
-                .padding(10)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 14.5)
                 .roundedBorder()
             }
         } buttons: {
@@ -60,7 +61,7 @@ struct DeviceDetailsView: View {
             .buttonStyle(DefaultActionButtonStyle(enabled: canSave))
 
         }
-        .frame(width: 360, height: 169)
+        .frame(width: 360, height: 178)
         .onAppear {
             deviceName = device.name
         }
