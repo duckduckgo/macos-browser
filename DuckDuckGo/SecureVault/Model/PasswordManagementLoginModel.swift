@@ -126,7 +126,7 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
         title = titleString
         username = credentials?.account.username ?? ""
         password = String(data: credentials?.password ?? Data(), encoding: .utf8) ?? ""
-        domain =  urlMatcher.normalizeUrlForWeb(credentials?.account.domain ?? "")        
+        domain =  urlMatcher.normalizeUrlForWeb(credentials?.account.domain ?? "")
         isNew = credentials?.account.id == nil
 
         if let date = credentials?.account.created {
