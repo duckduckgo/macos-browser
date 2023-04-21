@@ -39,8 +39,6 @@ extension HomePage.Views {
                 ScrollView {
                     VStack(spacing: 0) {
                         Group {
-                            DefaultBrowserPrompt()
-
                             Favorites()
                                 .padding(.top, 72)
                                 .visibility(model.isFavouriteVisible ? .visible : .gone)
