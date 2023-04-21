@@ -8602,8 +8602,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				branch = "autofill/anya/subdomain-api-updates";
-				kind = branch;
+				kind = revision;
+				revision = f42f96b7b4ab95922140460a95cadef68499c107;
 			};
 		};
 		AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
