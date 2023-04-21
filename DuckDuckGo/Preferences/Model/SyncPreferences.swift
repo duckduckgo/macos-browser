@@ -65,10 +65,16 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         presentDialog(for: .recoverAccount)
     }
 
+    @MainActor
+    func presentTurnOffSyncConfirmDialog() {
+        presentDialog(for: .turnOffSync)
+    }
+
     func turnOffSync() {
         Task { @MainActor in
             do {
                 try await syncService.disconnect()
+                managementDialogModel.endFlow()
             } catch {
                 errorMessage = String(describing: error)
             }
@@ -79,7 +85,6 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         self.syncService = syncService
         self.managementDialogModel = ManagementDialogModel()
         self.managementDialogModel.delegate = self
-        updateState()
 
         syncService.isAuthenticatedPublisher
             .removeDuplicates()
@@ -110,9 +115,24 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
 
     private func updateState() {
         managementDialogModel.recoveryCode = syncService.account?.recoveryCode
+        refreshDevices()
+    }
 
-        if let account = syncService.account {
-            devices = [.init(account)]
+    private func refreshDevices() {
+        if let deviceId = syncService.account?.deviceId {
+            Task { @MainActor in
+                do {
+                    let registeredDevices = try await syncService.fetchDevices()
+
+                    self.devices = registeredDevices.map {
+                        deviceId == $0.id ? SyncDevice(kind: .current, name: $0.name, id: $0.id) : SyncDevice($0)
+                    }
+
+                    print("devices", self.devices)
+                } catch {
+                    print("error", error.localizedDescription)
+                }
+            }
         } else {
             devices = []
         }
@@ -186,6 +206,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
             do {
                 let device = deviceInfo()
                 try await syncService.createAccount(deviceName: device.name, deviceType: device.type)
+                confirmSetupComplete()
             } catch {
                 managementDialogModel.errorMessage = String(describing: error)
             }

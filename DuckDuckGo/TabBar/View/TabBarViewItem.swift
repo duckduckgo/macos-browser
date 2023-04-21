@@ -152,6 +152,15 @@ final class TabBarViewItem: NSCollectionViewItem {
         return super.draggingImageComponents
     }
 
+    override func mouseDown(with event: NSEvent) {
+        if let menu = view.menu, NSEvent.isContextClick(event) {
+            NSMenu.popUpContextMenu(menu, with: event, for: view)
+            return
+        }
+
+        super.mouseDown(with: event)
+    }
+
     @objc func duplicateAction(_ sender: NSButton) {
         delegate?.tabBarViewItemDuplicateAction(self)
     }

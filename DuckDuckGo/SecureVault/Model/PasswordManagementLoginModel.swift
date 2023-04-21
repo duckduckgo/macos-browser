@@ -70,8 +70,7 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
     var lastUpdatedDate: String = ""
     var createdDate: String = ""
 
-    init(onDirtyChanged: @escaping (Bool) -> Void,
-         onSaveRequested: @escaping (SecureVaultModels.WebsiteCredentials) -> Void,
+    init(onSaveRequested: @escaping (SecureVaultModels.WebsiteCredentials) -> Void,
          onDeleteRequested: @escaping (SecureVaultModels.WebsiteCredentials) -> Void,
          urlMatcher: AutofillUrlMatcher = AutofillDomainNameUrlMatcher()) {
         self.onSaveRequested = onSaveRequested
