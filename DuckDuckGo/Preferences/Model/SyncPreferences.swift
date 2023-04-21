@@ -67,7 +67,14 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
 
     @MainActor
     func presentTurnOffSyncConfirmDialog() {
+        managementDialogModel.recoveryCode = "hello"
+        managementDialogModel.connectCode = "hello"
         presentDialog(for: .turnOffSync)
+    }
+
+    @MainActor
+    func presentShowOrEnterCodeDialog() {
+        presentDialog(for: .syncAnotherDevice)
     }
 
     func turnOffSync() {
