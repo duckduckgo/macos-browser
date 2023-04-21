@@ -30,7 +30,12 @@ extension HomePage.Models {
         let itemsPerRow = HomePage.featuresPerRow
         let gridWidth = FeaturesGridDimensions.width
         let deleteActionTitle = UserText.newTabSetUpRemoveItemAction
-        let duckPlayerURL = URL(string: "https://www.youtube.com/watch?v=yKWIA-Pys4c")!
+
+        let privacyConfig = AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.privacyConfig
+        var duckPlayerURL: String {
+            let duckPlayerSettings = privacyConfig.settings(for: .duckPlayer)
+            return duckPlayerSettings["tryDuckPlayerLink"] as? String ?? "https://www.youtube.com/watch?v=yKWIA-Pys4c"
+        }
 
         private let defaultBrowserProvider: DefaultBrowserProvider
         private let dataImportProvider: DataImportStatusProviding
@@ -141,8 +146,10 @@ extension HomePage.Models {
             case .importBookmarksAndPasswords:
                 dataImportProvider.showImportWindow(completion: refreshFeaturesMatrix)
             case .duckplayer:
-                let tab = Tab(content: .url(duckPlayerURL), shouldLoadInBackground: true)
-                tabCollectionViewModel.append(tab: tab)
+                if let videoUrl = URL(string: duckPlayerURL) {
+                    let tab = Tab(content: .url(videoUrl), shouldLoadInBackground: true)
+                    tabCollectionViewModel.append(tab: tab)
+                }
             case .emailProtection:
                 let tab = Tab(content: .url(EmailUrls().emailProtectionLink), shouldLoadInBackground: true)
                 tabCollectionViewModel.append(tab: tab)

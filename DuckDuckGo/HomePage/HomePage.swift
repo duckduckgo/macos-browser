@@ -74,25 +74,22 @@ extension HomePage.Views {
         @State var isHovering = false
 
         var body: some View {
-            VStack(spacing: 5) {
-                ZStack(alignment: .center) {
-                    RoundedRectangle(cornerRadius: 12)
-                        .foregroundColor(isHovering ? foregroundColorOnHover : foregroundColor)
-                    HStack {
-                        if let title {
-                            Text(title)
-                                .multilineTextAlignment(.leading)
-                                .lineLimit(2)
-                                .font(.system(size: 11))
-                                .frame(width: 100)
-                        }
-                        icon
-                            .frame(alignment: .trailing)
+            ZStack(alignment: .center) {
+                RoundedRectangle(cornerRadius: 12)
+                    .foregroundColor(isHovering ? foregroundColorOnHover : foregroundColor)
+                HStack(spacing: 10) {
+                    if let title {
+                        Text(title)
+                            .frame(width: 100, alignment: .leading)
+                            .multilineTextAlignment(.leading)
+                            .lineLimit(2)
+                            .font(.system(size: 11))
                     }
+                    icon
+                        .frame(alignment: .trailing)
                 }
-                .frame(width: width, height: height)
-                .clipped()
             }
+            .frame(width: width, height: height)
             .onHover { isHovering in
                 self.isHovering = isHovering
                 if isHovering {
@@ -100,9 +97,7 @@ extension HomePage.Views {
                 } else {
                     NSCursor.pointingHand.pop()
                 }
-
             }
         }
     }
-    
 }

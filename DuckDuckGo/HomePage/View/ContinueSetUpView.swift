@@ -109,9 +109,6 @@ extension HomePage.Views {
                         .onTapGesture {
                             model.performAction(for: featureType)
                         }
-                        .onHover { isHovering in
-                            self.isHovering = isHovering
-                        }
                     HStack {
                         VStack {
                             RemoveIemButton(icon: NSImage(named: "Close")!) {
@@ -123,6 +120,9 @@ extension HomePage.Views {
                         }
                         Spacer()
                     }
+                }
+                .onHover { isHovering in
+                    self.isHovering = isHovering
                 }
             }
         }
