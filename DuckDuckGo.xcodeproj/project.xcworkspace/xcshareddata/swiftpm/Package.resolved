@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "6e3740ebfd0c7c8f2df5af82ad729d9bad789010",
-        "version" : "55.1.0"
+        "revision" : "dc2d52b28719355baafb6a58ac6b76f3ae734553",
+        "version" : "56.1.0"
       }
     },
     {
@@ -39,9 +39,9 @@
     {
       "identity" : "lottie-ios",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/airbnb/lottie-ios",
+      "location" : "https://github.com/duckduckgo/lottie-ios.git",
       "state" : {
-        "revision" : "4a6058cbbdfe4f74aeae92c8bd51ad3b0de2a1ee",
+        "revision" : "abf5510e261c85ffddd29de0bca9b72592ea2bdd",
         "version" : "3.3.0"
       }
     },

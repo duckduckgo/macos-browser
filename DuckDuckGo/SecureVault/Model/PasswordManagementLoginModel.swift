@@ -156,6 +156,7 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
         isEditing = true
     }
 
+    @MainActor
     func openURL(_ url: URL) {
         WindowControllersManager.shared.show(url: url, newTab: true)
     }

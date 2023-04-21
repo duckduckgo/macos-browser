@@ -19,6 +19,7 @@
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
+@MainActor
 final class MoreOptionsMenuTests: XCTestCase {
 
     var tabCollectionViewModel: TabCollectionViewModel!

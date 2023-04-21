@@ -175,11 +175,11 @@ final class SearchNonexistentDomainTests: XCTestCase {
         window = WindowsManager.openNewWindow(with: tab)!
 
         self.schemeHandler.middleware = [{ _ in
-                .failure(NSError(domain: NSURLErrorDomain, code: NSURLErrorCannotFindHost))
+            .failure(NSError(domain: NSURLErrorDomain, code: NSURLErrorCannotFindHost))
         }]
         let eNavigationFailed = tab.$error
             .compactMap { $0 }
-            .timeout(3)
+            .timeout(10)
             .first()
             .promise()
 

@@ -46,14 +46,18 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
     @Published var shouldShowErrorMessage: Bool = false
     @Published private(set) var errorMessage: String?
 
+    @Published var isCreatingAccount: Bool = false
+
     var recoveryCode: String? {
         syncService.account?.recoveryCode
     }
 
+    @MainActor
     func presentEnableSyncDialog() {
         presentDialog(for: .enableSync)
     }
 
+    @MainActor
     func presentRecoverSyncAccountDialog() {
         presentDialog(for: .recoverAccount)
     }
@@ -111,6 +115,7 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         }
     }
 
+    @MainActor
     private func presentDialog(for currentDialog: ManagementDialogKind) {
         let shouldBeginSheet = managementDialogModel.currentDialog == nil
         managementDialogModel.currentDialog = currentDialog
@@ -164,12 +169,17 @@ extension SyncPreferences: ManagementDialogModelDelegate {
         managementDialogModel.endFlow()
     }
 
+    @MainActor
     func turnOnSync() {
         presentDialog(for: .askToSyncAnotherDevice)
     }
 
     func dontSyncAnotherDeviceNow() {
         Task { @MainActor in
+            isCreatingAccount = true
+            defer {
+                isCreatingAccount = false
+            }
             do {
                 let device = deviceInfo()
                 try await syncService.createAccount(deviceName: device.name, deviceType: device.type)
@@ -213,10 +223,12 @@ extension SyncPreferences: ManagementDialogModelDelegate {
         }
     }
 
+    @MainActor
     func addAnotherDevice() {
         presentDialog(for: .deviceSynced)
     }
 
+    @MainActor
     func confirmSetupComplete() {
         presentDialog(for: .saveRecoveryPDF)
     }

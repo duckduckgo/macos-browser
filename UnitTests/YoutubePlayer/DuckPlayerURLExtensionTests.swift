@@ -17,6 +17,7 @@
 //
 
 import XCTest
+import os.log
 @testable import DuckDuckGo_Privacy_Browser
 
 final class DuckPlayerURLExtensionTests: XCTestCase {
@@ -137,4 +138,5 @@ final class DuckPlayerURLExtensionTests: XCTestCase {
         XCTAssertEqual(URL.youtubeNoCookie("abcdef12345", timestamp: "5").absoluteString, "https://www.youtube-nocookie.com/embed/abcdef12345?t=5")
         XCTAssertEqual(URL.youtubeNoCookie("abcdef12345", timestamp: "10d").absoluteString, "https://www.youtube-nocookie.com/embed/abcdef12345")
     }
+
 }

@@ -17,7 +17,7 @@
 //
 
 import Cocoa
-import os.log
+import Common
 
 final class TabPreviewWindowController: NSWindowController {
 

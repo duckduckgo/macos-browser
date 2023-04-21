@@ -17,8 +17,8 @@
 //
 
 import Foundation
-import os.log
 import BrowserServicesKit
+import Common
 
 final class SuggestionContainer {
 

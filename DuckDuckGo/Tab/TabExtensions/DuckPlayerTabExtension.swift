@@ -58,10 +58,13 @@ final class DuckPlayerTabExtension {
             self?.youtubeOverlayScript?.delegate = self
             self?.youtubeOverlayScript?.webView = self?.webView
 
-            self?.setUpYoutubeScriptsIfNeeded(for: nil)
+            DispatchQueue.main.async { [weak self] in
+                self?.setUpYoutubeScriptsIfNeeded(for: self?.webView?.url)
+            }
         }.store(in: &cancellables)
     }
 
+    @MainActor
     private func setUpYoutubeScriptsIfNeeded(for url: URL?) {
         youtubePlayerCancellables.removeAll()
         guard duckPlayer.isAvailable else { return }

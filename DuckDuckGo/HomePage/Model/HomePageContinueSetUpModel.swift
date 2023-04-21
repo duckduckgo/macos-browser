@@ -135,7 +135,7 @@ extension HomePage.Models {
             }
         }
 
-        func performAction(for featureType: FeatureType) {
+        @MainActor func performAction(for featureType: FeatureType) {
             switch featureType {
             case .defaultBrowser:
                 do {
