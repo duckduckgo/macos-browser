@@ -36,7 +36,6 @@ struct HomePage {
     static let featureRowCountWhenCollapsed = 1
 }
 
-
 // MARK: ReusableViews
 extension HomePage.Views {
 

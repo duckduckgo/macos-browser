@@ -159,7 +159,7 @@ private enum Consts {
     struct Layout {
         static let outerContainerWidth: CGFloat = 490
         static let daxContainerWidth: CGFloat = 84
-        static let innerContainerHeight: CGFloat = 176
+        static let innerContainerHeight: CGFloat = 190
         static let daxImageSize: CGFloat = 64
         static let containerCornerRadius: CGFloat = 12
         static let CTACornerRadius: CGFloat = 8

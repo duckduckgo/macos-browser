@@ -184,6 +184,7 @@ extension HomePage.Models {
             refreshFeaturesMatrix()
         }
 
+        // swiftlint:disable cyclomatic_complexity
         func refreshFeaturesMatrix() {
             var features: [FeatureType] = []
             for feature in FeatureType.allCases {
@@ -212,6 +213,7 @@ extension HomePage.Models {
             }
             featuresMatrix = features.chunked(into: HomePage.featuresPerRow)
         }
+        // swiftlint:enable cyclomatic_complexity
 
         // Helper Functions
         private func updateVisibleMatrix() {
