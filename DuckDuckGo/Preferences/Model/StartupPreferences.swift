@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import Sentry
 
 protocol StartupPreferencesPersistor {
     var restorePreviousSession: Bool { get set }
@@ -35,21 +36,32 @@ final class StartupPreferences: ObservableObject {
 
     @Published var restorePreviousSession: Bool {
         didSet {
-            persistor.restorePreviousSession = restorePreviousSession
+            persistor?.restorePreviousSession = restorePreviousSession
         }
     }
 
     @Published var crashReportingURLString: String = "" {
         didSet {
-            persistor.crashReportingURLString = crashReportingURLString
+            persistor?.crashReportingURLString = crashReportingURLString
+            SentrySDK.close()
+            SentrySDK.start { [weak self] options in
+                options.dsn = self!.crashReportingURLString
+            }
         }
     }
 
-    init(persistor: StartupPreferencesPersistor = StartupPreferencesUserDefaultsPersistor()) {
-        self.persistor = persistor
-        restorePreviousSession = persistor.restorePreviousSession
-        crashReportingURLString = persistor.crashReportingURLString
+    init(persistor: StartupPreferencesPersistor? = nil) {
+        self.restorePreviousSession = false
+        self.crashReportingURLString = ""
+        Task { @MainActor in
+            // swiftlint:disable:next force_cast
+            let delegate = NSApp.delegate as! AppDelegate
+            let actualPersistor = persistor ?? delegate.startupPreferencesPersistor!
+            self.persistor = actualPersistor
+            self.restorePreviousSession = actualPersistor.restorePreviousSession
+            self.crashReportingURLString = actualPersistor.crashReportingURLString
+        }
     }
 
-    private var persistor: StartupPreferencesPersistor
+    private var persistor: StartupPreferencesPersistor?
 }

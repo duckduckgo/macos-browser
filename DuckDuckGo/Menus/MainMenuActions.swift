@@ -19,6 +19,7 @@
 import Cocoa
 import BrowserServicesKit
 import Common
+import Sentry
 
 // Actions are sent to objects of responder chain
 
@@ -606,6 +607,8 @@ extension MainViewController {
     }
 
     @IBAction func triggerFatalError(_ sender: Any?) {
+//        let error = NSError(domain: "YourErrorDomain", code: 0, userInfo: nil)
+//        SentrySDK.capture(error: error)
         fatalError("Fatal error triggered from the Debug menu")
     }
 

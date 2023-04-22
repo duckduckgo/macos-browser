@@ -25,6 +25,7 @@ import Configuration
 import Networking
 import Bookmarks
 import DDGSync
+import Sentry
 
 @NSApplicationMain
 @MainActor
@@ -59,6 +60,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     private var appIconChanger: AppIconChanger!
     private(set) var syncService: DDGSyncing!
     private(set) var syncPersistence: SyncDataPersistor!
+
+    private(set) var startupPreferencesPersistor: StartupPreferencesPersistor!
 
 #if !APPSTORE
     var updateController: UpdateController!
@@ -149,6 +152,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         appIconChanger = AppIconChanger(internalUserDecider: internalUserDecider)
         syncPersistence = SyncDataPersistor()
         syncService = DDGSync(persistence: syncPersistence)
+        startupPreferencesPersistor = StartupPreferencesUserDefaultsPersistor()
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
@@ -190,6 +194,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         subscribeToEmailProtectionStatusNotifications()
 
         UserDefaultsWrapper<Any>.clearRemovedKeys()
+
+        SentrySDK.start { [weak self] options in
+            options.dsn = self!.startupPreferencesPersistor.crashReportingURLString
+        }
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
