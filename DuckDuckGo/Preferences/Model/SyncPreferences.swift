@@ -274,7 +274,6 @@ extension SyncPreferences: ManagementDialogModelDelegate {
 
     @MainActor
     func confirmSetupComplete() {
-        syncService.scheduler.requestSyncImmediately()
         presentDialog(for: .saveRecoveryPDF)
     }
 

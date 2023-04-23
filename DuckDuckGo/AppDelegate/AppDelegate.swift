@@ -112,6 +112,22 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
                                                                   to: context)
                 }
             }
+            SyncMetadataDatabase.shared.db.loadStore { context, error in
+                guard let error = error else { return }
+
+                switch error {
+                case CoreDataDatabase.Error.containerLocationCouldNotBePrepared:
+                    break
+//                    Pixel.fire(.debug(event: .dbContainerInitializationError, error: underlyingError))
+                default:
+                    break
+//                    Pixel.fire(.debug(event: .dbInitializationError, error: error))
+                }
+
+                // Give Pixel a chance to be sent, but not too long
+                Thread.sleep(forTimeInterval: 1)
+                fatalError("Could not load DB: \(error.localizedDescription)")
+            }
         }
 
         do {

@@ -78,6 +78,7 @@ final class LocalBookmarkStore: BookmarkStore {
 
         context.perform {
             do {
+                self.context.refreshAllObjects()
                 let results: [BookmarkEntity]
 
                 switch type {
