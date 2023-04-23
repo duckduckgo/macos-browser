@@ -35,6 +35,9 @@ final class SyncBookmarksProvider: DataProviding {
         []
     }
 
+    func handleSyncResult(sent: [Syncable], received: [Syncable], timestamp: String?) async throws {
+    }
+
     init(metadataStore: SyncMetadataStore) {
         self.metadataStore = metadataStore
     }
