@@ -165,6 +165,10 @@ protocol NewWindowPolicyDecisionMaker {
             userEnteredValue != nil
         }
 
+        var displaysContentInWebView: Bool {
+            isUrl
+        }
+
     }
     private struct ExtensionDependencies: TabExtensionDependencies {
         let privacyFeatures: PrivacyFeaturesProtocol
@@ -442,6 +446,11 @@ protocol NewWindowPolicyDecisionMaker {
 
     @Published private(set) var content: TabContent {
         didSet {
+            if !content.displaysContentInWebView && oldValue.displaysContentInWebView {
+                webView.stopLoading()
+                webView.stopMediaCapture()
+                webView.stopAllMediaPlayback()
+            }
             handleFavicon()
             invalidateInteractionStateData()
             error = nil
@@ -511,7 +520,16 @@ protocol NewWindowPolicyDecisionMaker {
         }
     }
 
-    @PublishedAfter var error: WKError?
+    @PublishedAfter var error: WKError? {
+        didSet {
+            if error == nil || error?.isFrameLoadInterrupted == true || error?.isNavigationCancelled == true {
+                return
+            }
+            webView.stopLoading()
+            webView.stopMediaCapture()
+            webView.stopAllMediaPlayback()
+        }
+    }
     let permissions: PermissionModel
 
     @Published private(set) var isLoading: Bool = false

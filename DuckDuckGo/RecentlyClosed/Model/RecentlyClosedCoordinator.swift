@@ -196,7 +196,15 @@ final class RecentlyClosedCoordinator: RecentlyClosedCoordinating {
     private func reopenWindow(_ recentlyClosedWindow: RecentlyClosedWindow) {
         let tabCollection = TabCollection()
         recentlyClosedWindow.tabs.forEach { recentlyClosedTab in
-            let tab = Tab(content: recentlyClosedTab.tabContent, title: recentlyClosedTab.title, favicon: recentlyClosedTab.favicon, shouldLoadInBackground: false, isDisposable: false, shouldLoadFromCache: true)
+            let tab = Tab(
+                content: recentlyClosedTab.tabContent,
+                title: recentlyClosedTab.title,
+                favicon: recentlyClosedTab.favicon,
+                interactionStateData: recentlyClosedTab.interactionData,
+                shouldLoadInBackground: false,
+                isDisposable: false,
+                shouldLoadFromCache: true
+            )
             tabCollection.append(tab: tab)
         }
         WindowsManager.openNewWindow(with: tabCollection,
