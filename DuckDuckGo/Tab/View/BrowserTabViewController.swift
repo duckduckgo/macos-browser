@@ -385,7 +385,7 @@ final class BrowserTabViewController: NSViewController {
 
     private func showTabContent(of tabViewModel: TabViewModel?) {
         guard tabCollectionViewModel.allTabsCount > 0 else {
-            view.window?.close()
+            view.window?.performClose(self)
             return
         }
         scheduleHoverLabelUpdatesForUrl(nil)

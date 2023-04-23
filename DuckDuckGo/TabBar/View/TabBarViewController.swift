@@ -843,7 +843,6 @@ extension TabBarViewController: NSCollectionViewDataSource {
     }
 
     func collectionView(_ collectionView: NSCollectionView, itemForRepresentedObjectAt indexPath: IndexPath) -> NSCollectionViewItem {
-        assert(collectionView.numberOfItems(inSection: 0) == tabCollectionViewModel.tabs.count)
         let item = collectionView.makeItem(withIdentifier: TabBarViewItem.identifier, for: indexPath)
         guard let tabBarViewItem = item as? TabBarViewItem else {
             assertionFailure("TabBarViewController: Failed to get reusable TabBarViewItem instance")

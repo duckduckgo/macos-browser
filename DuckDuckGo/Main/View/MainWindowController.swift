@@ -123,9 +123,8 @@ final class MainWindowController: NSWindowController {
         isFirePresentationInProgressCancellable = fireViewModel.isFirePresentationInProgress
             .dropFirst()
             .removeDuplicates()
-            .sink(receiveValue: { [weak self] isFirePresentationInProgress in
+            .sink(receiveValue: { [weak self] _ in
                 guard let self else { return }
-                self.moveTabBarView(toTitlebarView: !isFirePresentationInProgress)
                 self.userInteraction(prevented: self.fireViewModel.fire.burningData != nil)
             })
     }

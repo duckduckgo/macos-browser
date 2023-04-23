@@ -78,7 +78,7 @@
                                                 <action selector="newWindow:" target="Ady-hI-5gd" id="nK2-0w-B4c"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem title="New Burner Window" hidden="YES" keyEquivalent="N" id="fx4-EK-KRg">
+                                        <menuItem title="New Burner Window" keyEquivalent="N" id="fx4-EK-KRg">
                                             <connections>
                                                 <action selector="newDisposableWindow:" target="Ady-hI-5gd" id="vLy-E3-sFd"/>
                                             </connections>

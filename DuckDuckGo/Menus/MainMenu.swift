@@ -129,8 +129,8 @@ final class MainMenu: NSMenu {
         }
 
         if let appDelegate = NSApplication.shared.delegate as? AppDelegate,
-           appDelegate.internalUserDecider.isInternalUser {
-            newDisposableWindowMenuItem.isHidden = false
+           !appDelegate.internalUserDecider.isInternalUser {
+            newDisposableWindowMenuItem.isHidden = true
         }
 
         sharingMenu.title = shareMenuItem.title
