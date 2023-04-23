@@ -17,6 +17,9 @@
 //
 
 import Foundation
+import Bookmarks
+import CoreData
+import Persistence
 import DDGSync
 
 final class SyncBookmarksProvider: DataProviding {
@@ -31,17 +34,36 @@ final class SyncBookmarksProvider: DataProviding {
         }
     }
 
-    func changes(since timestamp: String?) async throws -> [Syncable] {
-        []
+    func fetchChangedObjects() async throws -> [Syncable] {
+        await withCheckedContinuation { continuation in
+            var syncableBookmarks: [Syncable] = []
+            context.performAndWait {
+                let bookmarks = BookmarkUtils.fetchModifiedBookmarks(context)
+                syncableBookmarks = bookmarks.map(Syncable.init(bookmark:))
+            }
+            continuation.resume(with: .success(syncableBookmarks))
+        }
+    }
+
+    func fetchAllObjects() async throws -> [Syncable] {
+        try await fetchChangedObjects()
     }
 
     func handleSyncResult(sent: [Syncable], received: [Syncable], timestamp: String?) async throws {
     }
 
-    init(metadataStore: SyncMetadataStore) {
+    init(database: CoreDataDatabase, metadataStore: SyncMetadataStore) {
+        self.context = database.makeContext(concurrencyType: .privateQueueConcurrencyType)
         self.metadataStore = metadataStore
     }
 
+    private let context: NSManagedObjectContext
     private let metadataStore: SyncMetadataStore
+}
 
+extension Syncable {
+    init(bookmark: BookmarkEntity) {
+        var payload: [String: Any] = [:]
+        self.init(jsonObject: payload)
+    }
 }
