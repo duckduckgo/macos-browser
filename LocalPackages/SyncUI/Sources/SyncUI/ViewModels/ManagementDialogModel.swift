@@ -26,6 +26,8 @@ public protocol ManagementDialogModelDelegate: AnyObject {
     func presentSyncAnotherDeviceDialog()
     func confirmSetupComplete()
     func saveRecoveryPDF()
+    func turnOffSync()
+    func updateDeviceName(_ name: String)
 }
 
 public final class ManagementDialogModel: ObservableObject {

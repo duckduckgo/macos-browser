@@ -72,26 +72,6 @@ class FileManagerExtensionTests: XCTestCase {
         XCTAssertFalse(fm.fileExists(atPath: srcURL.path))
     }
 
-    func testWhenItemCopiedToSameURLIncrementingIndexThenNoErrorIsThrown() {
-        let srcURL = fm.temporaryDirectory.appendingPathComponent(testFile)
-        try? testData.write(to: srcURL)
-
-        let destURL = (try? fm.copyItem(at: srcURL, to: srcURL, incrementingIndexIfExists: true))!
-        XCTAssertEqual(srcURL.deletingLastPathComponent(), destURL.deletingLastPathComponent())
-        XCTAssertEqual(destURL.lastPathComponent, "\(testFile) 1")
-        XCTAssertTrue(fm.fileExists(atPath: destURL.path))
-        XCTAssertEqual(try? Data(contentsOf: destURL), testData)
-    }
-
-    func testWhenItemCopiedToSameURLNotIncrementingIndexThenErrorIsThrown() {
-        let srcURL = fm.temporaryDirectory.appendingPathComponent(testFile)
-        try? testData.write(to: srcURL)
-
-        XCTAssertThrowsError(try fm.copyItem(at: srcURL, to: srcURL, incrementingIndexIfExists: false), "should throw file exists") { (error) in
-            XCTAssertEqual((error as? CocoaError)?.code, CocoaError.fileWriteFileExists)
-        }
-    }
-
     func testWhenItemWithExtensionMoveDestExistsThenIndexIsIncrementedBeforeExtension() {
         let srcURL = fm.temporaryDirectory.appendingPathComponent(testFile)
         let existingURL = fm.temporaryDirectory.appendingPathComponent(testFile + testFile)

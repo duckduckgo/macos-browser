@@ -57,6 +57,7 @@ public struct DefaultActionButtonStyle: ButtonStyle {
         configuration.label
             .lineLimit(1)
             .font(.custom("SFProText-Regular", size: 13))
+            .frame(minWidth: 44) // OK buttons will match the width of "Cancel" at least in English
             .padding(.top, 2.5)
             .padding(.bottom, 3)
             .padding(.horizontal, 7.5)
