@@ -208,10 +208,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
         UserDefaultsWrapper<Any>.clearRemovedKeys()
 
-        syncStateCancellable = syncService.isAuthenticatedPublisher
-            .prepend(syncService.isAuthenticated)
-            .sink { isSyncEnabled in
-                LocalBookmarkManager.shared.updateBookmarkDatabaseCleanupSchedule(shouldEnable: !isSyncEnabled)
+        syncStateCancellable = syncService.statePublisher
+            .prepend(syncService.state)
+            .filter { [SyncState.active, .inactive].contains($0) }
+            .sink { state in
+                LocalBookmarkManager.shared.updateBookmarkDatabaseCleanupSchedule(shouldEnable: state == .inactive)
             }
     }
 
