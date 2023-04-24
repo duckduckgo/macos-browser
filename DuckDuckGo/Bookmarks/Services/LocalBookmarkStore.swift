@@ -92,7 +92,7 @@ final class LocalBookmarkStore: BookmarkStore {
                     let rootFolder = BookmarkUtils.fetchRootFolder(self.context)
                     results = rootFolder?.childrenArray ?? []
                 case .favorites:
-                    results = self.favoritesFolder?.favorites?.array as? [BookmarkEntity] ?? []
+                    results = self.favoritesFolder?.favoritesArray ?? []
                 }
 
                 let entities: [BaseBookmarkEntity] = results.compactMap { entity in
