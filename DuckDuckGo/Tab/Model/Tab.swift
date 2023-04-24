@@ -204,7 +204,7 @@ protocol NewWindowPolicyDecisionMaker {
 
     @MainActor
     convenience init(content: TabContent,
-                     faviconManagement: FaviconManagement? = nil,
+                     faviconManagement: FaviconManagement = FaviconManager.shared,
                      webCacheManager: WebCacheManager = WebCacheManager.shared,
                      webViewConfiguration: WKWebViewConfiguration? = nil,
                      historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
@@ -236,7 +236,10 @@ protocol NewWindowPolicyDecisionMaker {
             ?? (NSApp.isRunningUnitTests ? nil : StatisticsLoader.shared)
         let privacyFeatures = privacyFeatures ?? PrivacyFeatures
         let internalUserDecider = (NSApp.delegate as? AppDelegate)?.internalUserDecider
-        let faviconManager = faviconManagement ?? (isBurner ? FaviconManager(cacheType: .inMemory) : FaviconManager.shared)
+        var faviconManager = faviconManagement
+        if isBurner {
+            faviconManager = FaviconManager(cacheType: .inMemory)
+        }
 
         self.init(content: content,
                   faviconManagement: faviconManager,
