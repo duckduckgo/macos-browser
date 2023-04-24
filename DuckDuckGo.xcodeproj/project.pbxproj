@@ -75,6 +75,8 @@
 		31E163BA293A56F400963C10 /* BrokenSiteReportingReferenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31E163B9293A56F400963C10 /* BrokenSiteReportingReferenceTests.swift */; };
 		31E163BD293A579E00963C10 /* PrivacyReferenceTestHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31E163BC293A579E00963C10 /* PrivacyReferenceTestHelper.swift */; };
 		31E163C0293A581900963C10 /* privacy-reference-tests in Resources */ = {isa = PBXBuildFile; fileRef = 31E163BF293A581900963C10 /* privacy-reference-tests */; };
+		31EE359A29F72259005162E2 /* DataBrokerMessaging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31EE359929F72259005162E2 /* DataBrokerMessaging.swift */; };
+		31EE359B29F72259005162E2 /* DataBrokerMessaging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31EE359929F72259005162E2 /* DataBrokerMessaging.swift */; };
 		31F28C4F28C8EEC500119F70 /* YoutubePlayerUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31F28C4C28C8EEC500119F70 /* YoutubePlayerUserScript.swift */; };
 		31F28C5128C8EEC500119F70 /* YoutubeOverlayUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31F28C4E28C8EEC500119F70 /* YoutubeOverlayUserScript.swift */; };
 		31F28C5328C8EECA00119F70 /* DuckPlayerSchemeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31F28C5228C8EECA00119F70 /* DuckPlayerSchemeHandler.swift */; };
@@ -1948,6 +1950,9 @@
 		31E163B9293A56F400963C10 /* BrokenSiteReportingReferenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrokenSiteReportingReferenceTests.swift; sourceTree = "<group>"; };
 		31E163BC293A579E00963C10 /* PrivacyReferenceTestHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyReferenceTestHelper.swift; sourceTree = "<group>"; };
 		31E163BF293A581900963C10 /* privacy-reference-tests */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "privacy-reference-tests"; path = "Submodules/privacy-reference-tests"; sourceTree = SOURCE_ROOT; };
+		31EE359529F71C31005162E2 /* BrowserServicesKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = BrowserServicesKit; path = ../BrowserServicesKit; sourceTree = "<group>"; };
+		31EE359829F71E31005162E2 /* content-scope-scripts */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = "content-scope-scripts"; path = "../content-scope-scripts"; sourceTree = "<group>"; };
+		31EE359929F72259005162E2 /* DataBrokerMessaging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBrokerMessaging.swift; sourceTree = "<group>"; };
 		31F28C4C28C8EEC500119F70 /* YoutubePlayerUserScript.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = YoutubePlayerUserScript.swift; sourceTree = "<group>"; };
 		31F28C4E28C8EEC500119F70 /* YoutubeOverlayUserScript.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = YoutubeOverlayUserScript.swift; sourceTree = "<group>"; };
 		31F28C5228C8EECA00119F70 /* DuckPlayerSchemeHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DuckPlayerSchemeHandler.swift; sourceTree = "<group>"; };
@@ -4319,6 +4324,8 @@
 		AA585D75248FD31100E9A3E2 = {
 			isa = PBXGroup;
 			children = (
+				31EE359829F71E31005162E2 /* content-scope-scripts */,
+				31EE359529F71C31005162E2 /* BrowserServicesKit */,
 				378B5886295CF2A4002C0CC0 /* Configuration */,
 				378E279C2970217400FCADA2 /* LocalPackages */,
 				AA68C3D62490F821001B8783 /* README.md */,
@@ -5664,6 +5671,7 @@
 				856CADEF271710F400E79BB0 /* HoverUserScript.swift */,
 				4B2E7D6226FF9D6500D2DB17 /* PrintingUserScript.swift */,
 				85AC3AEE25D5CE9800C7D2AA /* UserScripts.swift */,
+				31EE359929F72259005162E2 /* DataBrokerMessaging.swift */,
 			);
 			path = UserScripts;
 			sourceTree = "<group>";
@@ -6668,6 +6676,7 @@
 				3706FB65293F65D500E42796 /* PrivacyDashboardWebView.swift in Sources */,
 				3706FB66293F65D500E42796 /* AppearancePreferences.swift in Sources */,
 				3706FB67293F65D500E42796 /* DownloadListCoordinator.swift in Sources */,
+				31EE359B29F72259005162E2 /* DataBrokerMessaging.swift in Sources */,
 				3706FB68293F65D500E42796 /* NSNotificationName+Debug.swift in Sources */,
 				3706FB69293F65D500E42796 /* NavigationBarBadgeAnimationView.swift in Sources */,
 				B603971B29BA084C00902A34 /* JSAlertController.swift in Sources */,
@@ -7420,6 +7429,7 @@
 				4B379C2227BDBA29008A968E /* LocalAuthenticationService.swift in Sources */,
 				4BB99D0326FE191E001E4761 /* SafariBookmarksReader.swift in Sources */,
 				AACF6FD626BC366D00CF09F9 /* SafariVersionReader.swift in Sources */,
+				31EE359A29F72259005162E2 /* DataBrokerMessaging.swift in Sources */,
 				4BE65485271FCD7B008D1D63 /* LoginFaviconView.swift in Sources */,
 				4B0511CA262CAA5A00F6079C /* FireproofDomainsViewController.swift in Sources */,
 				AA4D700725545EF800C3411E /* URLEventHandler.swift in Sources */,

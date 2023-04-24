@@ -49,7 +49,7 @@ final class UserScripts: UserScriptsProvider {
         let prefs = ContentScopeProperties.init(gpcEnabled: privacySettings.gpcEnabled,
                                                 sessionKey: sessionKey,
                                                 featureToggles: ContentScopeFeatureToggles.supportedFeaturesOnMacOS)
-        contentScopeUserScript = ContentScopeUserScript(sourceProvider.privacyConfigurationManager, properties: prefs)
+        contentScopeUserScript = ContentScopeUserScript(sourceProvider.privacyConfigurationManager, properties: prefs, isolated: true)
         autofillScript = WebsiteAutofillUserScript(scriptSourceProvider: sourceProvider.autofillSourceProvider!)
         if #available(macOS 11, *) {
             autoconsentUserScript = AutoconsentUserScript(scriptSource: sourceProvider,
@@ -75,6 +75,9 @@ final class UserScripts: UserScriptsProvider {
         if let youtubePlayerUserScript = youtubePlayerUserScript {
             userScripts.append(youtubePlayerUserScript)
         }
+
+        contentScopeUserScript.registerSubFeature(delegate: DataBrokerMessaging())
+
     }
 
     lazy var userScripts: [UserScript] = [
