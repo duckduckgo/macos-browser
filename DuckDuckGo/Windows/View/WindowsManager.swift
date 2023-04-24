@@ -34,7 +34,7 @@ final class WindowsManager {
 
     @discardableResult
     class func openNewWindow(with tabCollectionViewModel: TabCollectionViewModel? = nil,
-                             isDisposable: Bool = false,
+                             isBurner: Bool = false,
                              droppingPoint: NSPoint? = nil,
                              contentSize: NSSize? = nil,
                              showWindow: Bool = true,
@@ -42,7 +42,7 @@ final class WindowsManager {
                              lazyLoadTabs: Bool = false) -> MainWindow? {
         let mainWindowController = makeNewWindow(tabCollectionViewModel: tabCollectionViewModel,
                                                  popUp: popUp,
-                                                 isDisposable: isDisposable)
+                                                 isBurner: isBurner)
 
         if let droppingPoint = droppingPoint {
             mainWindowController.window?.setFrameOrigin(droppingPoint: droppingPoint)
@@ -69,61 +69,61 @@ final class WindowsManager {
     }
 
     @discardableResult
-    class func openNewWindow(with tab: Tab, isDisposable: Bool = false, droppingPoint: NSPoint? = nil, contentSize: NSSize? = nil, showWindow: Bool = true, popUp: Bool = false) -> MainWindow? {
+    class func openNewWindow(with tab: Tab, isBurner: Bool = false, droppingPoint: NSPoint? = nil, contentSize: NSSize? = nil, showWindow: Bool = true, popUp: Bool = false) -> MainWindow? {
         let tabCollection = TabCollection()
         tabCollection.append(tab: tab)
 
         let tabCollectionViewModel: TabCollectionViewModel = {
             if popUp {
-                return .init(tabCollection: tabCollection, pinnedTabsManager: nil, isDisposable: isDisposable)
+                return .init(tabCollection: tabCollection, pinnedTabsManager: nil, isBurner: isBurner)
             }
-            return .init(tabCollection: tabCollection, isDisposable: isDisposable)
+            return .init(tabCollection: tabCollection, isBurner: isBurner)
         }()
 
         return openNewWindow(with: tabCollectionViewModel,
-                             isDisposable: isDisposable,
+                             isBurner: isBurner,
                              droppingPoint: droppingPoint,
                              contentSize: contentSize,
                              showWindow: showWindow,
                              popUp: popUp)
     }
 
-    class func openNewWindow(with initialUrl: URL, isDisposable: Bool, parentTab: Tab? = nil) {
-        openNewWindow(with: Tab(content: .contentFromURL(initialUrl), parentTab: parentTab, shouldLoadInBackground: true, isDisposable: isDisposable), isDisposable: isDisposable)
+    class func openNewWindow(with initialUrl: URL, isBurner: Bool, parentTab: Tab? = nil) {
+        openNewWindow(with: Tab(content: .contentFromURL(initialUrl), parentTab: parentTab, shouldLoadInBackground: true, isBurner: isBurner), isBurner: isBurner)
     }
 
-    class func openNewWindow(with tabCollection: TabCollection, isDisposable: Bool, droppingPoint: NSPoint? = nil, contentSize: NSSize? = nil, popUp: Bool = false) {
-        let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection, isDisposable: isDisposable)
+    class func openNewWindow(with tabCollection: TabCollection, isBurner: Bool, droppingPoint: NSPoint? = nil, contentSize: NSSize? = nil, popUp: Bool = false) {
+        let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection, isBurner: isBurner)
         openNewWindow(with: tabCollectionViewModel,
-                      isDisposable: isDisposable,
+                      isBurner: isBurner,
                       droppingPoint: droppingPoint,
                       contentSize: contentSize,
                       popUp: popUp)
         tabCollectionViewModel.setUpLazyLoadingIfNeeded()
     }
 
-    class func openPopUpWindow(with tab: Tab, isDisposable: Bool, contentSize: NSSize?) {
+    class func openPopUpWindow(with tab: Tab, isBurner: Bool, contentSize: NSSize?) {
         if let mainWindowController = WindowControllersManager.shared.lastKeyMainWindowController,
            mainWindowController.window?.styleMask.contains(.fullScreen) == true,
            mainWindowController.window?.isPopUpWindow == false {
             mainWindowController.mainViewController.tabCollectionViewModel.insert(tab, selected: true)
         } else {
-            self.openNewWindow(with: tab, isDisposable: isDisposable, contentSize: contentSize, popUp: true)
+            self.openNewWindow(with: tab, isBurner: isBurner, contentSize: contentSize, popUp: true)
         }
     }
 
     private class func makeNewWindow(tabCollectionViewModel: TabCollectionViewModel? = nil,
                                      contentSize: NSSize? = nil,
                                      popUp: Bool = false,
-                                     isDisposable: Bool) -> MainWindowController {
+                                     isBurner: Bool) -> MainWindowController {
         let mainViewController: MainViewController
         do {
             mainViewController = try NSException.catch {
                 NSStoryboard(name: "Main", bundle: .main)
                     .instantiateController(identifier: .mainViewController) { coder -> MainViewController? in
-                        let model = tabCollectionViewModel ?? TabCollectionViewModel(isDisposable: isDisposable)
-                        assert(model.isDisposable == isDisposable)
-                        return MainViewController(coder: coder, tabCollectionViewModel: model, isDisposable: isDisposable)
+                        let model = tabCollectionViewModel ?? TabCollectionViewModel(isBurner: isBurner)
+                        assert(model.isBurner == isBurner)
+                        return MainViewController(coder: coder, tabCollectionViewModel: model, isBurner: isBurner)
                     }
             }
         } catch {

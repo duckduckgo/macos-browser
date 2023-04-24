@@ -140,7 +140,7 @@ extension SuggestionContainerViewModel {
     }
 
     convenience init(suggestionContainer: SuggestionContainer) {
-        self.init(isHomePage: false, isDisposable: false, suggestionContainer: suggestionContainer)
+        self.init(isHomePage: false, isBurner: false, suggestionContainer: suggestionContainer)
     }
 
 }

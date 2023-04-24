@@ -25,12 +25,12 @@ extension HomePage.Views {
 
         let backgroundColor = Color("NewTabPageBackgroundColor")
         let targetWidth: CGFloat = 482
-        let isDisposable: Bool
+        let isBurner: Bool
 
         var body: some View {
-            if isDisposable {
+            if isBurner {
 
-                DisposableHomePageView()
+                BurnerHomePageView()
 
             } else {
                 ZStack(alignment: .top) {

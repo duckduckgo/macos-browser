@@ -109,11 +109,11 @@ final class MoreOptionsMenu: NSMenu {
     }
 
     @objc func newWindow(_ sender: NSMenuItem) {
-        WindowsManager.openNewWindow(isDisposable: false)
+        WindowsManager.openNewWindow(isBurner: false)
     }
 
-    @objc func newDisposableWindow(_ sender: NSMenuItem) {
-        WindowsManager.openNewWindow(isDisposable: true)
+    @objc func newBurnerWindow(_ sender: NSMenuItem) {
+        WindowsManager.openNewWindow(isBurner: true)
     }
 
     @objc func toggleFireproofing(_ sender: NSMenuItem) {
@@ -196,15 +196,15 @@ final class MoreOptionsMenu: NSMenu {
             .targetting(self)
             .withImage(NSImage(named: "NewWindow"))
 
-        // New Disposable Window
+        // New Burner Window
         if internalUserDecider.isInternalUser {
-            let disposableWindowItem = NSMenuItem(title: UserText.newDisposableWindowMenuItem,
-                                                  action: #selector(newDisposableWindow(_:)),
+            let burnerWindowItem = NSMenuItem(title: UserText.newBurnerWindowMenuItem,
+                                                  action: #selector(newBurnerWindow(_:)),
                                                   target: self)
-            disposableWindowItem.keyEquivalent = "n"
-            disposableWindowItem.keyEquivalentModifierMask = [.command, .shift]
-            disposableWindowItem.image = NSImage(named: "NewDisposableWindow")
-            addItem(disposableWindowItem)
+            burnerWindowItem.keyEquivalent = "n"
+            burnerWindowItem.keyEquivalentModifierMask = [.command, .shift]
+            burnerWindowItem.image = NSImage(named: "NewBurnerWindow")
+            addItem(burnerWindowItem)
         }
 
         addItem(NSMenuItem.separator())
@@ -338,7 +338,7 @@ final class EmailOptionsButtonSubMenu: NSMenu {
     }
 
     @objc func turnOnEmailAction(_ sender: NSMenuItem) {
-        let tab = Tab(content: .url(EmailUrls().emailProtectionLink), shouldLoadInBackground: true, isDisposable: tabCollectionViewModel.isDisposable)
+        let tab = Tab(content: .url(EmailUrls().emailProtectionLink), shouldLoadInBackground: true, isBurner: tabCollectionViewModel.isBurner)
         tabCollectionViewModel.append(tab: tab)
     }
 

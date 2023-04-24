@@ -23,8 +23,8 @@ import BrowserServicesKit
 extension WKWebViewConfiguration {
 
     @MainActor
-    func applyStandardConfiguration(contentBlocking: some ContentBlockingProtocol, isDisposable: Bool) {
-        if isDisposable, websiteDataStore.isPersistent {
+    func applyStandardConfiguration(contentBlocking: some ContentBlockingProtocol, isBurner: Bool) {
+        if isBurner, websiteDataStore.isPersistent {
             websiteDataStore = .nonPersistent()
         }
         allowsAirPlayForMediaPlayback = true

@@ -77,7 +77,7 @@ final class TabBarViewController: NSViewController {
 
     init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel) {
         self.tabCollectionViewModel = tabCollectionViewModel
-        if !tabCollectionViewModel.isDisposable, let pinnedTabCollection = tabCollectionViewModel.pinnedTabsManager?.tabCollection {
+        if !tabCollectionViewModel.isBurner, let pinnedTabCollection = tabCollectionViewModel.pinnedTabsManager?.tabCollection {
             let pinnedTabsViewModel = PinnedTabsViewModel(collection: pinnedTabCollection)
             let pinnedTabsView = PinnedTabsView(model: pinnedTabsViewModel)
             self.pinnedTabsViewModel = pinnedTabsViewModel
@@ -164,12 +164,12 @@ final class TabBarViewController: NSViewController {
     }
 
     private func setupBackgroundView() {
-        visualEffectBackgroundView.isHidden = tabCollectionViewModel.isDisposable
-        gradientBackgroundView.isHidden = !tabCollectionViewModel.isDisposable
+        visualEffectBackgroundView.isHidden = tabCollectionViewModel.isBurner
+        gradientBackgroundView.isHidden = !tabCollectionViewModel.isBurner
     }
 
     private func setupFireButton() {
-        if tabCollectionViewModel.isDisposable {
+        if tabCollectionViewModel.isBurner {
             fireButton.isHidden = true
             return
         }
@@ -178,7 +178,7 @@ final class TabBarViewController: NSViewController {
     }
 
     private func setupBurnerWindowButton() {
-        burnerWindowButton.isHidden = !tabCollectionViewModel.isDisposable
+        burnerWindowButton.isHidden = !tabCollectionViewModel.isBurner
         burnerWindowButton.toolTip = UserText.burnerWindowButtonTooltip
         burnerWindowButton.normalTintColor = .alternateSelectedControlTextColor
         burnerWindowButton.mouseOverColor = .burnerWindowMouseOverColor
@@ -394,7 +394,7 @@ final class TabBarViewController: NSViewController {
         TabDragAndDropManager.shared.setSource(tabCollectionViewModel: tabCollectionViewModel, index: newIndex)
     }
 
-    private func moveToNewWindow(from index: Int, droppingPoint: NSPoint? = nil, disposable: Bool) {
+    private func moveToNewWindow(from index: Int, droppingPoint: NSPoint? = nil, burner: Bool) {
         guard tabCollectionViewModel.tabCollection.tabs.count > 1 else { return }
         guard let tabViewModel = tabCollectionViewModel.tabViewModel(at: index) else {
             assertionFailure("TabBarViewController: Failed to get tab view model")
@@ -403,7 +403,7 @@ final class TabBarViewController: NSViewController {
 
         let tab = tabViewModel.tab
         tabCollectionViewModel.remove(at: .unpinned(index), published: false)
-        WindowsManager.openNewWindow(with: tab, isDisposable: disposable, droppingPoint: droppingPoint)
+        WindowsManager.openNewWindow(with: tab, isBurner: burner, droppingPoint: droppingPoint)
     }
 
     // MARK: - Mouse Monitor
@@ -563,7 +563,7 @@ final class TabBarViewController: NSViewController {
         addTabButton.target = self
         addTabButton.action = #selector(addButtonAction(_:))
         addTabButton.toolTip = UserText.newTabTooltip
-        if tabCollectionViewModel.isDisposable {
+        if tabCollectionViewModel.isBurner {
             addTabButton.normalTintColor = .alternateSelectedControlTextColor
             addTabButton.contentTintColor = .alternateSelectedControlTextColor
             addTabButton.mouseOverColor = .burnerWindowMouseOverColor
@@ -855,7 +855,7 @@ extension TabBarViewController: NSCollectionViewDataSource {
         }
 
         tabBarViewItem.delegate = self
-        tabBarViewItem.isDisposable = tabCollectionViewModel.isDisposable
+        tabBarViewItem.isBurner = tabCollectionViewModel.isBurner
         tabBarViewItem.subscribe(to: tabViewModel, tabCollectionViewModel: tabCollectionViewModel)
 
         return tabBarViewItem
@@ -871,7 +871,7 @@ extension TabBarViewController: NSCollectionViewDataSource {
             footer.addButton?.target = self
             footer.addButton?.action = #selector(addButtonAction(_:))
             footer.toolTip = UserText.newTabTooltip
-            if tabCollectionViewModel.isDisposable {
+            if tabCollectionViewModel.isBurner {
                 footer.addButton.normalTintColor = .alternateSelectedControlTextColor
                 footer.addButton.contentTintColor = .alternateSelectedControlTextColor
                 footer.addButton.mouseOverColor = .burnerWindowMouseOverColor
@@ -954,7 +954,7 @@ extension TabBarViewController: NSCollectionViewDelegate {
         if let url = draggingInfo.draggingPasteboard.url {
             // dropping URL or file
             tabCollectionViewModel.insert(Tab(content: .url(url),
-                                              isDisposable: tabCollectionViewModel.isDisposable),
+                                              isBurner: tabCollectionViewModel.isBurner),
                                           at: .unpinned(newIndex),
                                           selected: true)
 
@@ -995,7 +995,7 @@ extension TabBarViewController: NSCollectionViewDelegate {
 
         moveToNewWindow(from: sourceIndex,
                         droppingPoint: screenPoint,
-                        disposable: tabCollectionViewModel.isDisposable)
+                        burner: tabCollectionViewModel.isBurner)
     }
 
     func collectionView(_ collectionView: NSCollectionView,
@@ -1114,16 +1114,16 @@ extension TabBarViewController: TabBarViewItemDelegate {
             return
         }
 
-        moveToNewWindow(from: indexPath.item, disposable: false)
+        moveToNewWindow(from: indexPath.item, burner: false)
     }
 
-    func tabBarViewItemMoveToNewDisposableWindowAction(_ tabBarViewItem: TabBarViewItem) {
+    func tabBarViewItemMoveToNewBurnerWindowAction(_ tabBarViewItem: TabBarViewItem) {
         guard let indexPath = collectionView.indexPath(for: tabBarViewItem) else {
             assertionFailure("TabBarViewController: Failed to get index path of tab bar view item")
             return
         }
 
-        moveToNewWindow(from: indexPath.item, disposable: true)
+        moveToNewWindow(from: indexPath.item, burner: true)
     }
 
     func tabBarViewItemFireproofSite(_ tabBarViewItem: TabBarViewItem) {

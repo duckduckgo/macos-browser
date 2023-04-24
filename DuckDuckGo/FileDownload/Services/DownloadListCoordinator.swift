@@ -25,7 +25,7 @@ import Navigation
 private func getFirstAvailableWebView() -> WKWebView? {
     let wcm = WindowControllersManager.shared
     if wcm.lastKeyMainWindowController?.mainViewController.browserTabViewController == nil {
-        WindowsManager.openNewWindow(isDisposable: false)
+        WindowsManager.openNewWindow(isBurner: false)
     }
 
     guard let tab = wcm.lastKeyMainWindowController?.mainViewController.browserTabViewController.tabViewModel?.tab else {
@@ -175,7 +175,7 @@ final class DownloadListCoordinator {
     @MainActor
     private func downloadTask(_ task: WebKitDownloadTask, withId identifier: UUID, completedWith result: Subscribers.Completion<FileDownloadError>) {
         updateItem(withId: identifier) { item in
-            if item?.isDisposable ?? false {
+            if item?.isBurner ?? false {
                 item = nil
                 return
             }
@@ -224,7 +224,7 @@ final class DownloadListCoordinator {
                 }
 
                 let task = self.downloadManager.add(download,
-                                                    fromDisposableWindow: item.isDisposable,
+                                                    fromBurnerWindow: item.isBurner,
                                                     location: .preset(destinationURL: destinationURL, tempURL: item.tempURL))
                 self.subscribeToDownloadTask(task, updating: item)
             }
@@ -331,7 +331,7 @@ private extension DownloadListItem {
                   url: task.originalRequest?.url ?? .blankPage,
                   websiteURL: task.originalRequest?.mainDocumentURL,
                   progress: task.progress,
-                  isDisposable: task.isDisposable,
+                  isBurner: task.isBurner,
                   destinationURL: nil,
                   tempURL: nil,
                   error: nil)

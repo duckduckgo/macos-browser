@@ -37,7 +37,7 @@ final class AddressBarViewController: NSViewController {
 
     private let tabCollectionViewModel: TabCollectionViewModel
     private let suggestionContainerViewModel: SuggestionContainerViewModel
-    private let isDisposable: Bool
+    private let isBurner: Bool
 
     enum Mode: Equatable {
         case editing(isUrl: Bool)
@@ -82,13 +82,13 @@ final class AddressBarViewController: NSViewController {
         fatalError("AddressBarViewController: Bad initializer")
     }
 
-    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, isDisposable: Bool) {
+    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, isBurner: Bool) {
         self.tabCollectionViewModel = tabCollectionViewModel
         self.suggestionContainerViewModel = SuggestionContainerViewModel(
             isHomePage: tabCollectionViewModel.selectedTabViewModel?.tab.content == .homePage,
-            isDisposable: isDisposable,
+            isBurner: isBurner,
             suggestionContainer: SuggestionContainer())
-        self.isDisposable = isDisposable
+        self.isBurner = isBurner
 
         super.init(coder: coder)
     }
@@ -279,7 +279,7 @@ final class AddressBarViewController: NSViewController {
     }
 
     var accentColor: NSColor {
-        return isDisposable ? NSColor.disposableAccentColor : NSColor.controlAccentColor
+        return isBurner ? NSColor.burnerAccentColor : NSColor.controlAccentColor
     }
 
     private func updateView() {

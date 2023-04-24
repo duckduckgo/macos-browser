@@ -61,7 +61,7 @@ final class NavigationBarViewController: NSViewController {
     var addressBarViewController: AddressBarViewController?
 
     private var tabCollectionViewModel: TabCollectionViewModel
-    private let isDisposable: Bool
+    private let isBurner: Bool
 
     // swiftlint:disable weak_delegate
     private let goBackButtonMenuDelegate: NavigationButtonMenuDelegate
@@ -85,9 +85,9 @@ final class NavigationBarViewController: NSViewController {
         fatalError("NavigationBarViewController: Bad initializer")
     }
 
-    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, isDisposable: Bool) {
+    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, isBurner: Bool) {
         self.tabCollectionViewModel = tabCollectionViewModel
-        self.isDisposable = isDisposable
+        self.isBurner = isBurner
         goBackButtonMenuDelegate = NavigationButtonMenuDelegate(buttonType: .back, tabCollectionViewModel: tabCollectionViewModel)
         goForwardButtonMenuDelegate = NavigationButtonMenuDelegate(buttonType: .forward, tabCollectionViewModel: tabCollectionViewModel)
         super.init(coder: coder)
@@ -147,7 +147,7 @@ final class NavigationBarViewController: NSViewController {
     @IBSegueAction func createAddressBarViewController(_ coder: NSCoder) -> AddressBarViewController? {
         guard let addressBarViewController = AddressBarViewController(coder: coder,
                                                                       tabCollectionViewModel: tabCollectionViewModel,
-                                                                      isDisposable: isDisposable) else {
+                                                                      isBurner: isBurner) else {
             fatalError("NavigationBarViewController: Failed to init AddressBarViewController")
         }
 
@@ -188,7 +188,7 @@ final class NavigationBarViewController: NSViewController {
     }
 
     private func openNewChildTab(with url: URL) {
-        let tab = Tab(content: .url(url), parentTab: tabCollectionViewModel.selectedTabViewModel?.tab, shouldLoadInBackground: true, isDisposable: tabCollectionViewModel.isDisposable)
+        let tab = Tab(content: .url(url), parentTab: tabCollectionViewModel.selectedTabViewModel?.tab, shouldLoadInBackground: true, isBurner: tabCollectionViewModel.isBurner)
         tabCollectionViewModel.insert(tab, selected: false)
     }
 
@@ -414,7 +414,7 @@ final class NavigationBarViewController: NSViewController {
                 let shouldShowPopover = update.kind == .updated
                     && update.item.destinationURL != nil
                     && update.item.tempURL == nil
-                    && !update.item.isDisposable
+                    && !update.item.isBurner
                     && WindowControllersManager.shared.lastKeyMainWindowController?.window === self.downloadsButton.window
 
                 if shouldShowPopover {
@@ -422,7 +422,7 @@ final class NavigationBarViewController: NSViewController {
                                                                   popoverDelegate: self,
                                                                   downloadsDelegate: self)
                 } else {
-                    if update.item.isDisposable {
+                    if update.item.isBurner {
                         self.invalidateDownloadButtonHidingTimer()
                         self.updateDownloadsButton(updatingFromPinnedViewsNotification: false)
                     }

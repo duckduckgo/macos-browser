@@ -75,7 +75,7 @@ protocol TabExtensionDependencies {
 typealias TabExtensionsBuilderArguments = (
     tabIdentifier: UInt64,
     isTabPinned: () -> Bool,
-    isTabDisposable: Bool,
+    isTabBurner: Bool,
     contentPublisher: AnyPublisher<Tab.TabContent, Never>,
     titlePublisher: AnyPublisher<String?, Never>,
     userScriptsPublisher: AnyPublisher<UserScripts?, Never>,
@@ -152,13 +152,13 @@ extension TabExtensionsBuilder {
         add {
             DownloadsTabExtension(downloadManager:
                                     dependencies.downloadManager,
-                                  isDisposable: args.isTabDisposable)
+                                  isBurner: args.isTabBurner)
         }
         add {
             SearchNonexistentDomainNavigationResponder(tld: dependencies.privacyFeatures.contentBlocking.tld, contentPublisher: args.contentPublisher)
         }
         add {
-            HistoryTabExtension(isDisposable: args.isTabDisposable,
+            HistoryTabExtension(isBurner: args.isTabBurner,
                                 historyCoordinating: dependencies.historyCoordinating,
                                 trackersPublisher: contentBlocking.trackersPublisher,
                                 urlPublisher: args.contentPublisher.map { content in content.isUrl ? content.url : nil },
@@ -168,12 +168,12 @@ extension TabExtensionsBuilder {
             ExternalAppSchemeHandler(workspace: dependencies.workspace, permissionModel: args.permissionModel, contentPublisher: args.contentPublisher)
         }
         add {
-            NavigationHotkeyHandler(isTabPinned: args.isTabPinned, isDisposable: args.isTabDisposable)
+            NavigationHotkeyHandler(isTabPinned: args.isTabPinned, isBurner: args.isTabBurner)
         }
 
         add {
             DuckPlayerTabExtension(duckPlayer: dependencies.duckPlayer,
-                                   isDisposable: args.isTabDisposable,
+                                   isBurner: args.isTabBurner,
                                    scriptsPublisher: userScripts.compactMap { $0 },
                                    webViewPublisher: args.webViewFuture)
         }

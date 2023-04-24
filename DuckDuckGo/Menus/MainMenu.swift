@@ -35,7 +35,7 @@ final class MainMenu: NSMenu {
 
     // MARK: - File
     @IBOutlet weak var newWindowMenuItem: NSMenuItem!
-    @IBOutlet weak var newDisposableWindowMenuItem: NSMenuItem!
+    @IBOutlet weak var newBurnerWindowMenuItem: NSMenuItem!
     @IBOutlet weak var newTabMenuItem: NSMenuItem!
     @IBOutlet weak var openLocationMenuItem: NSMenuItem!
     @IBOutlet weak var closeWindowMenuItem: NSMenuItem!
@@ -130,7 +130,7 @@ final class MainMenu: NSMenu {
 
         if let appDelegate = NSApplication.shared.delegate as? AppDelegate,
            !appDelegate.internalUserDecider.isInternalUser {
-            newDisposableWindowMenuItem.isHidden = true
+            newBurnerWindowMenuItem.isHidden = true
         }
 
         sharingMenu.title = shareMenuItem.title

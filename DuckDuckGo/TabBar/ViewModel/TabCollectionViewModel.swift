@@ -46,7 +46,7 @@ final class TabCollectionViewModel: NSObject {
 
     /// Pinned tabs collection (provided via `PinnedTabsManager` instance).
     var pinnedTabsCollection: TabCollection? {
-        if isDisposable {
+        if isBurner {
             return nil
         } else {
             return pinnedTabsManager?.tabCollection
@@ -54,14 +54,14 @@ final class TabCollectionViewModel: NSObject {
     }
 
     var allTabsCount: Int {
-        if isDisposable {
+        if isBurner {
             return tabCollection.tabs.count
         } else {
             return (pinnedTabsCollection?.tabs.count ?? 0) + tabCollection.tabs.count
         }
     }
 
-    let isDisposable: Bool
+    let isBurner: Bool
 
     var changesEnabled = true
 
@@ -102,11 +102,11 @@ final class TabCollectionViewModel: NSObject {
         tabCollection: TabCollection,
         selectionIndex: Int = 0,
         pinnedTabsManager: PinnedTabsManager?,
-        isDisposable: Bool = false
+        isBurner: Bool = false
     ) {
         self.tabCollection = tabCollection
         self.pinnedTabsManager = pinnedTabsManager
-        self.isDisposable = isDisposable
+        self.isBurner = isBurner
         super.init()
 
         subscribeToTabs()
@@ -120,18 +120,18 @@ final class TabCollectionViewModel: NSObject {
 
     convenience init(tabCollection: TabCollection,
                      selectionIndex: Int = 0,
-                     isDisposable: Bool = false) {
+                     isBurner: Bool = false) {
         self.init(tabCollection: tabCollection,
                   selectionIndex: selectionIndex,
                   pinnedTabsManager: WindowControllersManager.shared.pinnedTabsManager,
-                  isDisposable: isDisposable)
+                  isBurner: isBurner)
     }
 
-    convenience init(isDisposable: Bool = false) {
+    convenience init(isBurner: Bool = false) {
         let tabCollection = TabCollection()
         self.init(tabCollection: tabCollection,
                   pinnedTabsManager: WindowControllersManager.shared.pinnedTabsManager,
-                  isDisposable: isDisposable)
+                  isBurner: isBurner)
     }
 
     func setUpLazyLoadingIfNeeded() {
@@ -259,7 +259,7 @@ final class TabCollectionViewModel: NSObject {
         if selectDisplayableTabIfPresent(content) {
             return
         }
-        append(tab: Tab(content: content, shouldLoadInBackground: true, isDisposable: isDisposable), selected: selected, forceChange: forceChange)
+        append(tab: Tab(content: content, shouldLoadInBackground: true, isBurner: isBurner), selected: selected, forceChange: forceChange)
     }
 
     func append(tab: Tab, selected: Bool = true, forceChange: Bool = false) {
@@ -452,7 +452,7 @@ final class TabCollectionViewModel: NSObject {
     func removeAllTabsAndAppendNew(forceChange: Bool = false) {
         guard changesEnabled || forceChange else { return }
 
-        tabCollection.removeAll(andAppend: Tab(content: .homePage, isDisposable: isDisposable))
+        tabCollection.removeAll(andAppend: Tab(content: .homePage, isBurner: isBurner))
         selectUnpinnedTab(at: 0, forceChange: forceChange)
 
         delegate?.tabCollectionViewModelDidMultipleChanges(self)
@@ -467,7 +467,7 @@ final class TabCollectionViewModel: NSObject {
 
         tabCollection.removeTabs(at: indexSet)
         if tabCollection.tabs.isEmpty {
-            tabCollection.append(tab: Tab(content: .homePage, isDisposable: isDisposable))
+            tabCollection.append(tab: Tab(content: .homePage, isBurner: isBurner))
             selectUnpinnedTab(at: 0, forceChange: forceChange)
         } else {
             let selectionDiff = indexSet.reduce(0) { result, index in
@@ -504,7 +504,7 @@ final class TabCollectionViewModel: NSObject {
             return
         }
 
-        let tabCopy = Tab(content: tab.content, favicon: tab.favicon, interactionStateData: tab.getActualInteractionStateData(), shouldLoadInBackground: true, isDisposable: isDisposable, shouldLoadFromCache: true)
+        let tabCopy = Tab(content: tab.content, favicon: tab.favicon, interactionStateData: tab.getActualInteractionStateData(), shouldLoadInBackground: true, isBurner: isBurner, shouldLoadFromCache: true)
         let newIndex = tabIndex.makeNext()
 
         tabCollection(for: tabIndex)?.insert(tabCopy, at: newIndex.item)
@@ -604,8 +604,8 @@ final class TabCollectionViewModel: NSObject {
             self.removeTabViewModels(old.subtracting(new))
             self.addTabViewModels(new.subtracting(old))
 
-            // Make sure the tab is disposable if it is supposed to be
-            if newTabs.first(where: { $0.isDisposable != self.isDisposable }) != nil {
+            // Make sure the tab is burner if it is supposed to be
+            if newTabs.first(where: { $0.isBurner != self.isBurner }) != nil {
                 fatalError("Error in burner tab management")
             }
         } .store(in: &cancellables)

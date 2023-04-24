@@ -1,5 +1,5 @@
 //
-//  DisposableHomePageView.swift
+//  BurnerHomePageView.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -21,7 +21,7 @@ import SwiftUI
 
 extension HomePage.Views {
 
-    struct DisposableHomePageView: View {
+    struct BurnerHomePageView: View {
 
         @Environment(\.colorScheme) var colorScheme
 
@@ -44,7 +44,7 @@ extension HomePage.Views {
                             .frame(width: 64, height: 48)
                             .padding(.leading, -15)
 
-                        Text(UserText.disposableWindowHeader)
+                        Text(UserText.burnerWindowHeader)
                             .font(.system(size: 22, weight: .bold))
                             .foregroundColor(Color.primary)
                             .padding(.leading, -10)
@@ -70,7 +70,7 @@ extension HomePage.Views {
     struct Description: View {
         var body: some View {
             VStack(alignment: .leading, spacing: 15) {
-                let description1 = UserText.disposableHomepageDescription1.split(separator: " ",
+                let description1 = UserText.burnerHomepageDescription1.split(separator: " ",
                                                                                  maxSplits: 1,
                                                                                  omittingEmptySubsequences: true)
                 Text((description1.first ?? "") + " ")
@@ -80,7 +80,7 @@ extension HomePage.Views {
                     .font(.system(size: 15))
                     .foregroundColor(Color.primary)
 
-                let description2 = UserText.disposableHomepageDescription2.split(separator: " ",
+                let description2 = UserText.burnerHomepageDescription2.split(separator: " ",
                                                                                  maxSplits: 2,
                                                                                  omittingEmptySubsequences: true)
 
@@ -98,7 +98,7 @@ extension HomePage.Views {
 
             var body: some View {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text(UserText.disposableHomepageDescription3)
+                    Text(UserText.burnerHomepageDescription3)
                         .font(.system(size: 13, weight: .bold))
                         .foregroundColor(Color.primary)
 
@@ -106,7 +106,7 @@ extension HomePage.Views {
                         Image("BurnerWindowPopoverIcon1")
                             .resizable()
                             .frame(width: 16, height: 16)
-                        Text(UserText.disposableHomepageDescription4)
+                        Text(UserText.burnerHomepageDescription4)
                             .font(.system(size: 13))
                             .foregroundColor(Color.primary)
 
@@ -117,7 +117,7 @@ extension HomePage.Views {
                             .resizable()
                             .frame(width: 16, height: 16)
                             .foregroundColor(Color.primary)
-                        Text(UserText.disposableHomepageDescription5)
+                        Text(UserText.burnerHomepageDescription5)
                             .font(.system(size: 13))
                             .foregroundColor(Color.primary)
                     }

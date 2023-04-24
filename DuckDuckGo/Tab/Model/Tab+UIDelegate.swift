@@ -89,7 +89,7 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
         case .none where navigationAction.isUserInitiated == true:
             // try to guess popup kind from provided windowFeatures
             let shouldSelectNewTab = !NSApp.isCommandPressed // this is actually not correct, to be fixed later
-            let targetKind = NewWindowPolicy(windowFeatures, shouldSelectNewTab: shouldSelectNewTab, isDisposable: isDisposable)
+            let targetKind = NewWindowPolicy(windowFeatures, shouldSelectNewTab: shouldSelectNewTab, isBurner: isBurner)
             // proceed to web view creation
             completionHandler(self.createWebView(from: webView, with: configuration, for: navigationAction, of: targetKind))
             return
@@ -133,7 +133,7 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
         // allow popups opened from an empty window console
         let sourceUrl = navigationAction.safeSourceFrame?.safeRequest?.url ?? self.url ?? .empty
         if sourceUrl.isEmpty || sourceUrl.scheme == URL.NavigationalScheme.about.rawValue {
-            return .allow(.tab(selected: true, disposable: isDisposable))
+            return .allow(.tab(selected: true, burner: isBurner))
         }
 
         return nil
@@ -147,7 +147,7 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
         let tab = Tab(content: .none,
                       webViewConfiguration: configuration,
                       parentTab: self,
-                      isDisposable: isDisposable,
+                      isBurner: isBurner,
                       canBeClosedWithBack: kind.isSelectedTab,
                       webViewSize: webView.superview?.bounds.size ?? .zero)
         delegate.tab(self, createdChild: tab, of: kind)

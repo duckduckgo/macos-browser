@@ -145,7 +145,7 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
 
         if let url = (entity as? Bookmark)?.urlObject {
             if NSApplication.shared.isCommandPressed && NSApplication.shared.isShiftPressed {
-                WindowsManager.openNewWindow(with: url, isDisposable: false)
+                WindowsManager.openNewWindow(with: url, isBurner: false)
             } else if NSApplication.shared.isCommandPressed {
                 WindowControllersManager.shared.show(url: url, newTab: true)
             } else {
@@ -486,7 +486,7 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
         let tabs = bookmarks.compactMap { $0.urlObject }.map {
             Tab(content: .url($0),
                 shouldLoadInBackground: true,
-                isDisposable: tabCollection.isDisposable)
+                isBurner: tabCollection.isBurner)
         }
         tabCollection.append(tabs: tabs)
     }
@@ -647,7 +647,7 @@ extension BookmarkManagementDetailViewController: BookmarkMenuItemSelectors {
             return
         }
 
-        WindowsManager.openNewWindow(with: url, isDisposable: false)
+        WindowsManager.openNewWindow(with: url, isBurner: false)
     }
 
     func toggleBookmarkAsFavorite(_ sender: NSMenuItem) {

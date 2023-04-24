@@ -42,7 +42,7 @@ final class MainViewController: NSViewController {
     private(set) var bookmarksBarViewController: BookmarksBarViewController!
 
     let tabCollectionViewModel: TabCollectionViewModel
-    let isDisposable: Bool
+    let isBurner: Bool
 
     private var selectedTabViewModelCancellable: AnyCancellable?
     private var bookmarksBarVisibilityChangedCancellable: AnyCancellable?
@@ -63,15 +63,15 @@ final class MainViewController: NSViewController {
     }
 
     required init?(coder: NSCoder) {
-        let isDisposable = false
-        self.tabCollectionViewModel = TabCollectionViewModel(isDisposable: isDisposable)
-        self.isDisposable = isDisposable
+        let isBurner = false
+        self.tabCollectionViewModel = TabCollectionViewModel(isBurner: isBurner)
+        self.isBurner = isBurner
         super.init(coder: coder)
     }
 
-    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, isDisposable: Bool) {
+    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, isBurner: Bool) {
         self.tabCollectionViewModel = tabCollectionViewModel
-        self.isDisposable = isDisposable
+        self.isBurner = isBurner
         super.init(coder: coder)
     }
 
@@ -152,7 +152,7 @@ final class MainViewController: NSViewController {
 
     @IBSegueAction
     func createNavigationBarViewController(coder: NSCoder, sender: Any?, segueIdentifier: String?) -> NavigationBarViewController? {
-        guard let navigationBarViewController = NavigationBarViewController(coder: coder, tabCollectionViewModel: tabCollectionViewModel, isDisposable: isDisposable) else {
+        guard let navigationBarViewController = NavigationBarViewController(coder: coder, tabCollectionViewModel: tabCollectionViewModel, isBurner: isBurner) else {
             fatalError("MainViewController: Failed to init NavigationBarViewController")
         }
 

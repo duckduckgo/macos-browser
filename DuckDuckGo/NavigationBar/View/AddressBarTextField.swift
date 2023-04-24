@@ -310,7 +310,7 @@ final class AddressBarTextField: NSTextField {
 
         let tab = Tab(content: .url(url, userEntered: userEnteredValue),
                       shouldLoadInBackground: true,
-                      isDisposable: isDisposable)
+                      isBurner: isBurner)
         tabCollectionViewModel.append(tab: tab, selected: selected)
     }
 
@@ -427,7 +427,7 @@ final class AddressBarTextField: NSTextField {
 
             if let suffix = suffix {
                 let attributedString = NSMutableAttributedString(string: value.string, attributes: makeTextAttributes())
-                attributedString.append(suffix.toAttributedString(size: isHomePage ? 15 : 13, isDisposable: isDisposable))
+                attributedString.append(suffix.toAttributedString(size: isHomePage ? 15 : 13, isBurner: isBurner))
                 attributedStringValue = attributedString
             } else {
                 self.stringValue = value.string
@@ -443,8 +443,8 @@ final class AddressBarTextField: NSTextField {
         tabCollectionViewModel.selectedTabViewModel?.tab.content == .homePage
     }
 
-    var isDisposable: Bool {
-        tabCollectionViewModel.isDisposable
+    var isBurner: Bool {
+        tabCollectionViewModel.isBurner
     }
 
     func makeTextAttributes() -> [NSAttributedString.Key: Any] {
@@ -506,8 +506,8 @@ final class AddressBarTextField: NSTextField {
         case url(URL)
         case title(String)
 
-        func toAttributedString(size: CGFloat, isDisposable: Bool) -> NSAttributedString {
-            let suffixColor = isDisposable ? NSColor.disposableAccentColor : NSColor.addressBarSuffixColor
+        func toAttributedString(size: CGFloat, isBurner: Bool) -> NSAttributedString {
+            let suffixColor = isBurner ? NSColor.burnerAccentColor : NSColor.addressBarSuffixColor
             let attrs = [NSAttributedString.Key.font: NSFont.systemFont(ofSize: size, weight: .light),
                          .foregroundColor: suffixColor]
             return NSAttributedString(string: string, attributes: attrs)
@@ -586,7 +586,7 @@ final class AddressBarTextField: NSTextField {
         NSStoryboard.suggestion.instantiateController(identifier: "SuggestionViewController") { coder in
             let suggestionViewController = SuggestionViewController(coder: coder,
                                                                     suggestionContainerViewModel: self.suggestionContainerViewModel!,
-                                                                    isDisposable: self.isDisposable)
+                                                                    isBurner: self.isBurner)
             suggestionViewController?.delegate = self
             return suggestionViewController
         }

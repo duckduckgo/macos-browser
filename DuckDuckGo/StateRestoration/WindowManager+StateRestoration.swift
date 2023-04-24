@@ -50,7 +50,7 @@ extension WindowsManager {
     }
 
     private class func setUpWindow(from item: WindowRestorationItem) {
-        guard let window = openNewWindow(with: item.model, isDisposable: false, showWindow: true) else { return }
+        guard let window = openNewWindow(with: item.model, isBurner: false, showWindow: true) else { return }
         window.setContentSize(item.frame.size)
         window.setFrameOrigin(item.frame.origin)
     }
@@ -141,8 +141,8 @@ final class WindowRestorationItem: NSObject, NSSecureCoding {
 
     @MainActor
     init?(windowController: MainWindowController) {
-        guard !windowController.mainViewController.tabCollectionViewModel.isDisposable else {
-            // Don't persist disposable windows
+        guard !windowController.mainViewController.tabCollectionViewModel.isBurner else {
+            // Don't persist burner windows
             return nil
         }
 

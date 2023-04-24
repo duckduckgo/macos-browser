@@ -29,7 +29,7 @@ struct DownloadListItem: Equatable {
 
     var progress: Progress?
 
-    let isDisposable: Bool
+    let isBurner: Bool
 
     var fileType: UTType? {
         didSet {

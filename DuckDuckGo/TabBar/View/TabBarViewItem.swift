@@ -40,7 +40,7 @@ protocol TabBarViewItemDelegate: AnyObject {
     func tabBarViewItemPinAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemBookmarkThisPageAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemMoveToNewWindowAction(_ tabBarViewItem: TabBarViewItem)
-    func tabBarViewItemMoveToNewDisposableWindowAction(_ tabBarViewItem: TabBarViewItem)
+    func tabBarViewItemMoveToNewBurnerWindowAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemFireproofSite(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemRemoveFireproofing(_ tabBarViewItem: TabBarViewItem)
 
@@ -79,7 +79,7 @@ final class TabBarViewItem: NSCollectionViewItem {
         }
     }
 
-    var isDisposable: Bool = false {
+    var isBurner: Bool = false {
         didSet {
             updateSubviews()
         }
@@ -229,8 +229,8 @@ final class TabBarViewItem: NSCollectionViewItem {
         delegate?.tabBarViewItemMoveToNewWindowAction(self)
     }
 
-    @objc func moveToNewDisposableWindowAction(_ sender: NSMenuItem) {
-        delegate?.tabBarViewItemMoveToNewDisposableWindowAction(self)
+    @objc func moveToNewBurnerWindowAction(_ sender: NSMenuItem) {
+        delegate?.tabBarViewItemMoveToNewBurnerWindowAction(self)
     }
 
     func subscribe(to tabViewModel: TabViewModel, tabCollectionViewModel: TabCollectionViewModel) {
@@ -374,11 +374,11 @@ final class TabBarViewItem: NSCollectionViewItem {
             borderLayer.isHidden = true
         }
 
-        // Adjust colors for disposable window
-        if isDisposable {
+        // Adjust colors for burner window
+        if isBurner {
             rightSeparatorView.backgroundColor = .burnerWindowTabSeparatorColor
             if isSelected {
-                if faviconImageView.image === TabViewModel.Favicon.disposableHome {
+                if faviconImageView.image === TabViewModel.Favicon.burnerHome {
                     faviconImageView.contentTintColor = .textColor
                 } else {
                     faviconImageView.contentTintColor = nil
@@ -387,7 +387,7 @@ final class TabBarViewItem: NSCollectionViewItem {
                 closeButton.normalTintColor = .buttonColor
                 permissionButton.contentTintColor = .buttonColor
             } else {
-                if faviconImageView.image === TabViewModel.Favicon.disposableHome {
+                if faviconImageView.image === TabViewModel.Favicon.burnerHome {
                     faviconImageView.contentTintColor = .alternateSelectedControlTextColor
                 } else {
                     faviconImageView.contentTintColor = nil
@@ -482,8 +482,8 @@ extension TabBarViewItem: NSMenuDelegate {
         addCloseMenuItem(to: menu)
         addCloseOtherMenuItem(to: menu, areThereOtherTabs: areThereOtherTabs)
         addCloseTabsToTheRightMenuItem(to: menu, areThereTabsToTheRight: otherItemsState.hasItemsToTheRight)
-        if isDisposable {
-            addMoveToNewDisposableWindowMenuItem(to: menu, areThereOtherTabs: areThereOtherTabs)
+        if isBurner {
+            addMoveToNewBurnerWindowMenuItem(to: menu, areThereOtherTabs: areThereOtherTabs)
         } else {
             addMoveToNewWindowMenuItem(to: menu, areThereOtherTabs: areThereOtherTabs)
         }
@@ -552,11 +552,11 @@ extension TabBarViewItem: NSMenuDelegate {
         menu.addItem(moveToNewWindowMenuItem)
     }
 
-    private func addMoveToNewDisposableWindowMenuItem(to menu: NSMenu, areThereOtherTabs: Bool) {
-        let moveToNewDisposableWindowMenuItem = NSMenuItem(title: UserText.moveTabToNewDisposableWindow, action: #selector(moveToNewDisposableWindowAction(_:)), keyEquivalent: "")
-        moveToNewDisposableWindowMenuItem.target = self
-        moveToNewDisposableWindowMenuItem.isEnabled = areThereOtherTabs
-        menu.addItem(moveToNewDisposableWindowMenuItem)
+    private func addMoveToNewBurnerWindowMenuItem(to menu: NSMenu, areThereOtherTabs: Bool) {
+        let moveToNewBurnerWindowMenuItem = NSMenuItem(title: UserText.moveTabToNewBurnerWindow, action: #selector(moveToNewBurnerWindowAction(_:)), keyEquivalent: "")
+        moveToNewBurnerWindowMenuItem.target = self
+        moveToNewBurnerWindowMenuItem.isEnabled = areThereOtherTabs
+        menu.addItem(moveToNewBurnerWindowMenuItem)
     }
 
 }

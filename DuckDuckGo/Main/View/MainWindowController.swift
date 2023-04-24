@@ -226,7 +226,7 @@ extension MainWindowController: NSWindowDelegate {
 
     func windowShouldClose(_ sender: NSWindow) -> Bool {
         // Animate fire for Burner Window when closing
-        guard mainViewController.tabCollectionViewModel.isDisposable else {
+        guard mainViewController.tabCollectionViewModel.isBurner else {
             return true
         }
         Task {

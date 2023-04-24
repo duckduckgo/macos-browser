@@ -26,9 +26,9 @@ final class ApplicationDockMenu: NSMenu {
         // New Window
         addItem(withTitle: UserText.newWindowMenuItem, action: #selector(AppDelegate.newWindow), keyEquivalent: "")
 
-        // New Disposable Window
+        // New Burner Window
         if internalUserDecider.isInternalUser {
-            addItem(withTitle: UserText.newDisposableWindowMenuItem, action: #selector(AppDelegate.newDisposableWindow), keyEquivalent: "")
+            addItem(withTitle: UserText.newBurnerWindowMenuItem, action: #selector(AppDelegate.newBurnerWindow), keyEquivalent: "")
         }
     }
 

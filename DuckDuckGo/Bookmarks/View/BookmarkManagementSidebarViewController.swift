@@ -249,7 +249,7 @@ extension BookmarkManagementSidebarViewController: FolderMenuItemSelectors {
             return
         }
 
-        let tabs = children.compactMap { ($0 as? Bookmark)?.urlObject }.map { Tab(content: .url($0), shouldLoadInBackground: true, isDisposable: tabCollection.isDisposable) }
+        let tabs = children.compactMap { ($0 as? Bookmark)?.urlObject }.map { Tab(content: .url($0), shouldLoadInBackground: true, isBurner: tabCollection.isBurner) }
         tabCollection.append(tabs: tabs)
     }
 

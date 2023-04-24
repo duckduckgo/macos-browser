@@ -24,13 +24,13 @@ import BrowserServicesKit
 final class SuggestionContainerViewModel {
 
     var isHomePage: Bool
-    let isDisposable: Bool
+    let isBurner: Bool
     let suggestionContainer: SuggestionContainer
     private var suggestionResultCancellable: AnyCancellable?
 
-    init(isHomePage: Bool, isDisposable: Bool, suggestionContainer: SuggestionContainer) {
+    init(isHomePage: Bool, isBurner: Bool, suggestionContainer: SuggestionContainer) {
         self.isHomePage = isHomePage
-        self.isDisposable = isDisposable
+        self.isBurner = isBurner
         self.suggestionContainer = suggestionContainer
         subscribeToSuggestionResult()
     }

@@ -67,7 +67,7 @@ final class HomePageViewController: NSViewController {
 
         refreshModels()
 
-        let rootView = HomePage.Views.RootView(isDisposable: tabCollectionViewModel.isDisposable)
+        let rootView = HomePage.Views.RootView(isBurner: tabCollectionViewModel.isBurner)
             .environmentObject(favoritesModel)
             .environmentObject(defaultBrowserModel)
             .environmentObject(recentlyVisitedModel)
@@ -188,7 +188,7 @@ final class HomePageViewController: NSViewController {
 
     private func openUrl(_ url: URL, target: HomePage.Models.FavoritesModel.OpenTarget? = nil) {
         if target == .newWindow || NSApplication.shared.isCommandPressed && NSApplication.shared.isOptionPressed {
-            WindowsManager.openNewWindow(with: url, isDisposable: tabCollectionViewModel.isDisposable)
+            WindowsManager.openNewWindow(with: url, isBurner: tabCollectionViewModel.isBurner)
             return
         }
 

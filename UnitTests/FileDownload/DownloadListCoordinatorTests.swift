@@ -64,7 +64,7 @@ final class DownloadListCoordinatorTests: XCTestCase {
     func setUpCoordinatorAndAddDownload() -> (WKDownloadMock, WebKitDownloadTask, UUID) {
         setUpCoordinator()
         let download = WKDownloadMock()
-        let task = WebKitDownloadTask(download: download, promptForLocation: false, destinationURL: destURL, tempURL: tempURL, isDisposable: false)
+        let task = WebKitDownloadTask(download: download, promptForLocation: false, destinationURL: destURL, tempURL: tempURL, isBurner: false)
 
         let e = expectation(description: "download added")
         var id: UUID!
@@ -144,7 +144,7 @@ final class DownloadListCoordinatorTests: XCTestCase {
     func testWhenDownloadAddedThenDownloadItemIsPublished() {
         setUpCoordinator()
 
-        let task = WebKitDownloadTask(download: WKDownloadMock(), promptForLocation: false, destinationURL: destURL, tempURL: tempURL, isDisposable: false)
+        let task = WebKitDownloadTask(download: WKDownloadMock(), promptForLocation: false, destinationURL: destURL, tempURL: tempURL, isBurner: false)
 
         let e = expectation(description: "download added")
         let c = coordinator.updates.sink { [coordinator] (kind, item) in
@@ -239,7 +239,7 @@ final class DownloadListCoordinatorTests: XCTestCase {
                                           promptForLocation: location == .prompt ? true : false,
                                           destinationURL: location.destinationURL,
                                           tempURL: location.tempURL,
-                                          isDisposable: false)
+                                          isBurner: false)
             self.downloadManager.downloadAddedSubject.send(task)
             XCTAssertEqual(location, .preset(destinationURL: item.destinationURL!, tempURL: item.tempURL))
             return task
@@ -292,7 +292,7 @@ final class DownloadListCoordinatorTests: XCTestCase {
                                           promptForLocation: location == .prompt ? true : false,
                                           destinationURL: location.destinationURL,
                                           tempURL: location.tempURL,
-                                          isDisposable: false)
+                                          isBurner: false)
             self.downloadManager.downloadAddedSubject.send(task)
             XCTAssertEqual(location, .preset(destinationURL: self.destURL, tempURL: self.tempURL))
             return task
@@ -344,7 +344,7 @@ final class DownloadListCoordinatorTests: XCTestCase {
                                           promptForLocation: location == .prompt ? true : false,
                                           destinationURL: location.destinationURL,
                                           tempURL: location.tempURL,
-                                          isDisposable: false)
+                                          isBurner: false)
             self.downloadManager.downloadAddedSubject.send(task)
             XCTAssertEqual(location, .preset(destinationURL: item.destinationURL!, tempURL: item.tempURL))
             return task
@@ -447,7 +447,7 @@ private extension DownloadListItem {
                                                  url: URL(string: "https://duckduckgo.com/testdload")!,
                                                  websiteURL: URL(string: "https://duckduckgo.com"),
                                                  progress: nil,
-                                                 isDisposable: false,
+                                                 isBurner: false,
                                                  fileType: .pdf,
                                                  destinationURL: URL(fileURLWithPath: "/test/file/path"),
                                                  tempURL: URL(fileURLWithPath: "/temp/file/path"),

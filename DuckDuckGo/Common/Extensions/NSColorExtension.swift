@@ -36,16 +36,16 @@ extension NSColor {
         NSColor(named: "AddressBarBackgroundColor")!
     }
 
-    static var disposableAddressBarBackgroundColor: NSColor {
-        NSColor(named: "DisposableAddressBarBackgroundColor")!
+    static var burnerAddressBarBackgroundColor: NSColor {
+        NSColor(named: "BurnerAddressBarBackgroundColor")!
     }
 
-    static var disposableAddressBarFocusedBackgroundColor: NSColor {
-        NSColor(named: "DisposableAddressBarBackgroundColor")!
+    static var burnerAddressBarFocusedBackgroundColor: NSColor {
+        NSColor(named: "BurnerAddressBarBackgroundColor")!
     }
 
-    static var disposableAccentColor: NSColor {
-        NSColor(named: "DisposableAccentColor")!
+    static var burnerAccentColor: NSColor {
+        NSColor(named: "BurnerAccentColor")!
     }
 
     static var burnerWindowTabSeparatorColor: NSColor {
@@ -90,8 +90,8 @@ extension NSColor {
         NSColor(named: "InactiveSearchBarBackground")!
     }
 
-    static var disposableInactiveSearchBarBackground: NSColor {
-        NSColor(named: "DisposableInactiveSearchBarBackground")!
+    static var burnerInactiveSearchBarBackground: NSColor {
+        NSColor(named: "BurnerInactiveSearchBarBackground")!
     }
 
     static var suggestionTextColor: NSColor {

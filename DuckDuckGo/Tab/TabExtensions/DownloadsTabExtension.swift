@@ -29,7 +29,7 @@ protocol TabDownloadsDelegate: AnyObject {
 final class DownloadsTabExtension: NSObject {
 
     private let downloadManager: FileDownloadManagerProtocol
-    private let isDisposable: Bool
+    private let isBurner: Bool
 
     @Published
     private var savePanelDialogRequest: SavePanelDialogRequest? {
@@ -47,9 +47,9 @@ final class DownloadsTabExtension: NSObject {
 
     weak var delegate: TabDownloadsDelegate?
 
-    init(downloadManager: FileDownloadManagerProtocol, isDisposable: Bool) {
+    init(downloadManager: FileDownloadManagerProtocol, isBurner: Bool) {
         self.downloadManager = downloadManager
-        self.isDisposable = isDisposable
+        self.isBurner = isBurner
         super.init()
     }
 
@@ -60,7 +60,7 @@ final class DownloadsTabExtension: NSObject {
                 if let url = webView.url {
                     webView.startDownload(URLRequest(url: url, cachePolicy: .returnCacheDataElseLoad)) { download in
                         self.downloadManager.add(download,
-                                                 fromDisposableWindow: self.isDisposable,
+                                                 fromBurnerWindow: self.isBurner,
                                                  delegate: self, location: .prompt)
                     }
                 }
@@ -144,7 +144,7 @@ extension DownloadsTabExtension: NavigationResponder {
 
     func enqueueDownload(_ download: WebKitDownload, withNavigationAction navigationAction: NavigationAction?) {
         let task = downloadManager.add(download,
-                                       fromDisposableWindow: self.isDisposable,
+                                       fromBurnerWindow: self.isBurner,
                                        delegate: self,
                                        location: .auto)
 
@@ -183,7 +183,7 @@ extension DownloadsTabExtension: WKNavigationDelegate {
     func webView(_ webView: WKWebView, contextMenuDidCreate download: WebKitDownload) {
         // to do: url should be cleaned up before launching download
         downloadManager.add(download,
-                            fromDisposableWindow: isDisposable,
+                            fromBurnerWindow: isBurner,
                             delegate: self,
                             location: .prompt)
     }

@@ -89,14 +89,14 @@ struct UserText {
     static let reloadPage = NSLocalizedString("reload.page", value: "Reload Page", comment: "Context menu item")
 
     static let openLinkInNewTab = NSLocalizedString("open.link.in.new.tab", value: "Open Link in New Tab", comment: "Context menu item")
-    static let openLinkInNewDisposableTab = NSLocalizedString("open.link.in.new.disposable.tab", value: "Open Link in New Burner Tab", comment: "Context menu item")
-    static let openLinkInNewDisposableWindow = NSLocalizedString("open.link.in.new.disposable.window", value: "Open Link in New Burner Window", comment: "Context menu item")
+    static let openLinkInNewBurnerTab = NSLocalizedString("open.link.in.new.burner.tab", value: "Open Link in New Burner Tab", comment: "Context menu item")
+    static let openLinkInNewBurnerWindow = NSLocalizedString("open.link.in.new.burner.window", value: "Open Link in New Burner Window", comment: "Context menu item")
     static let openImageInNewTab = NSLocalizedString("open.image.in.new.tab", value: "Open Image in New Tab", comment: "Context menu item")
-    static let openImageInNewDisposableTab = NSLocalizedString("open.image.in.new.disposable.tab", value: "Open Image in New Burner Tab", comment: "Context menu item")
-    static let openImageInNewDisposableWindow = NSLocalizedString("open.image.in.new.disposable.window", value: "Open Image in New Burner Window", comment: "Context menu item")
-    static let openFrameInNewDisposableWindow = NSLocalizedString("open.frame.in.new.disposable.window", value: "Open Frame in New Burner Window", comment: "Context menu item")
-    static let moveTabToNewDisposableWindow = NSLocalizedString("options.menu.move.tab.to.new.disposable.window",
-                                                      value: "Move Tab to New Disposable Window",
+    static let openImageInNewBurnerTab = NSLocalizedString("open.image.in.new.burner.tab", value: "Open Image in New Burner Tab", comment: "Context menu item")
+    static let openImageInNewBurnerWindow = NSLocalizedString("open.image.in.new.burner.window", value: "Open Image in New Burner Window", comment: "Context menu item")
+    static let openFrameInNewBurnerWindow = NSLocalizedString("open.frame.in.new.burner.window", value: "Open Frame in New Burner Window", comment: "Context menu item")
+    static let moveTabToNewBurnerWindow = NSLocalizedString("options.menu.move.tab.to.new.burner.window",
+                                                      value: "Move Tab to New Burner Window",
                                                       comment: "Context menu item")
     static let copyImageAddress = NSLocalizedString("copy.image.address", value: "Copy Image Address", comment: "Context menu item")
     static let saveImageAs = NSLocalizedString("save.image.as", value: "Save Image As…", comment: "Context menu item")
@@ -114,7 +114,7 @@ struct UserText {
     static let shareMenuItem = NSLocalizedString("share.menu.item", value: "Share", comment: "Menu item title")
     static let printMenuItem = NSLocalizedString("print.menu.item", value: "Print…", comment: "Menu item title")
     static let newWindowMenuItem = NSLocalizedString("new.window.menu.item", value: "New Window", comment: "Menu item title")
-    static let newDisposableWindowMenuItem = NSLocalizedString("new.disposable.window.menu.item", value: "New Burner Window", comment: "Menu item title")
+    static let newBurnerWindowMenuItem = NSLocalizedString("new.burner.window.menu.item", value: "New Burner Window", comment: "Menu item title")
 
     static let fireproofSites = NSLocalizedString("fireproof.sites", value: "Fireproof Sites", comment: "Fireproof sites list title")
     static let fireproofCheckboxTitle = NSLocalizedString("fireproof.checkbox.title", value: "Ask to Fireproof websites when signing in", comment: "Fireproof settings checkbox title")
@@ -711,13 +711,13 @@ struct UserText {
     static let noAccessToSelectedFolderHeader = NSLocalizedString("no.access.to.selected.folder.header", value: "DuckDuckGo needs permission to access selected folder", comment: "Header of the alert dialog informing user about failed download")
     static let noAccessToSelectedFolder = NSLocalizedString("no.access.to.selected.folder", value: "Grant access to the location of download.", comment: "Alert presented to user if the app doesn't have rights to access selected folder")
 
-    static let disposableWindowHeader = NSLocalizedString("disposable.window.header", value: "Burner Window", comment: "Header shown on the hompage of the disposable window")
-    static let disposableTabHomeTitle = NSLocalizedString("disposable.tab.home.title", value: "New Burner Tab", comment: "Tab title for disposable tab")
-    static let disposableHomepageDescription1 = NSLocalizedString("disposable.homepage.description.1", value: "All DuckDuckGo windows block most hidden trackers so websites can't spy on you.", comment: "")
-    static let disposableHomepageDescription2 = NSLocalizedString("disposable.homepage.description.2", value: "Burner windows are temporary: they don't access existing cookies or remember websites you visit after you close the window.", comment: "")
-    static let disposableHomepageDescription3 = NSLocalizedString("disposable.homepage.description.3", value: "Burner Windows make it easier to:", comment: "")
-    static let disposableHomepageDescription4 = NSLocalizedString("disposable.homepage.description.4", value: "Sign into a site with a different account", comment: "")
-    static let disposableHomepageDescription5 = NSLocalizedString("disposable.homepage.description.5", value: "View websites without signing in", comment: "")
+    static let burnerWindowHeader = NSLocalizedString("burner.window.header", value: "Burner Window", comment: "Header shown on the hompage of the burner window")
+    static let burnerTabHomeTitle = NSLocalizedString("burner.tab.home.title", value: "New Burner Tab", comment: "Tab title for burner tab")
+    static let burnerHomepageDescription1 = NSLocalizedString("burner.homepage.description.1", value: "All DuckDuckGo windows block most hidden trackers so websites can't spy on you.", comment: "")
+    static let burnerHomepageDescription2 = NSLocalizedString("burner.homepage.description.2", value: "Burner windows are temporary: they don't access existing cookies or remember websites you visit after you close the window.", comment: "")
+    static let burnerHomepageDescription3 = NSLocalizedString("burner.homepage.description.3", value: "Burner Windows make it easier to:", comment: "")
+    static let burnerHomepageDescription4 = NSLocalizedString("burner.homepage.description.4", value: "Sign into a site with a different account", comment: "")
+    static let burnerHomepageDescription5 = NSLocalizedString("burner.homepage.description.5", value: "View websites without signing in", comment: "")
 
 
 
