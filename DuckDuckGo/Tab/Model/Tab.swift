@@ -360,6 +360,14 @@ protocol NewWindowPolicyDecisionMaker {
                                                selector: #selector(onDuckDuckGoEmailSignOut),
                                                name: .emailDidSignOut,
                                                object: nil)
+
+#if DEBUG
+        webView.onDeinit { [weak userContentController, weak self] in
+            userContentController?.assertObjectDeallocated(after: 1.0)
+            self?.assertObjectDeallocated(after: 1.0)
+        }
+#endif
+
     }
 
     override func awakeAfter(using decoder: NSCoder) -> Any? {
@@ -390,10 +398,14 @@ protocol NewWindowPolicyDecisionMaker {
     }
 
     deinit {
-        cleanUpBeforeClosing()
+        cleanUpBeforeClosing(onDeinit: true)
     }
 
     func cleanUpBeforeClosing() {
+        cleanUpBeforeClosing(onDeinit: false)
+    }
+
+    private func cleanUpBeforeClosing(onDeinit: Bool) {
         let job = { [webView] in
             webView.stopLoading()
             webView.stopMediaCapture()
@@ -401,6 +413,10 @@ protocol NewWindowPolicyDecisionMaker {
             webView.fullscreenWindowController?.close()
 
             webView.configuration.userContentController.removeAllUserScripts()
+            webView.assertObjectDeallocated(after: 4.0)
+        }
+        if !onDeinit {
+            assertObjectDeallocated(after: 4.0)
         }
         guard Thread.isMainThread else {
             DispatchQueue.main.async(execute: job)
