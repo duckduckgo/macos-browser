@@ -606,6 +606,7 @@ final class TabCollectionViewModel: NSObject {
 
             // Make sure the tab is burner if it is supposed to be
             if newTabs.first(where: { $0.isBurner != self.isBurner }) != nil {
+                Pixel.fire(.debug(event: .burnerTabMisplaced))
                 fatalError("Error in burner tab management")
             }
         } .store(in: &cancellables)
