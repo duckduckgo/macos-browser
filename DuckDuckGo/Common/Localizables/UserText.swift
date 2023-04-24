@@ -713,6 +713,15 @@ struct UserText {
 
     static let disposableWindowHeader = NSLocalizedString("disposable.window.header", value: "Burner Window", comment: "Header shown on the hompage of the disposable window")
     static let disposableTabHomeTitle = NSLocalizedString("disposable.tab.home.title", value: "New Burner Tab", comment: "Tab title for disposable tab")
+    static let disposableHomepageDescription1 = NSLocalizedString("disposable.homepage.description.1", value: "All DuckDuckGo windows block most hidden trackers so websites can't spy on you.", comment: "")
+    static let disposableHomepageDescription2 = NSLocalizedString("disposable.homepage.description.2", value: "Burner windows are temporary: they don't access existing cookies or remember websites you visit after you close the window.", comment: "")
+    static let disposableHomepageDescription3 = NSLocalizedString("disposable.homepage.description.3", value: "Burner Windows make it easier to:", comment: "")
+    static let disposableHomepageDescription4 = NSLocalizedString("disposable.homepage.description.4", value: "Sign into a site with a different account", comment: "")
+    static let disposableHomepageDescription5 = NSLocalizedString("disposable.homepage.description.5", value: "View websites without signing in", comment: "")
+
+
+
+
 
 }
 

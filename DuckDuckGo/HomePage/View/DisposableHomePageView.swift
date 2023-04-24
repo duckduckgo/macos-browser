@@ -44,7 +44,7 @@ extension HomePage.Views {
                             .frame(width: 64, height: 48)
                             .padding(.leading, -15)
 
-                        Text("Burner Window")
+                        Text(UserText.disposableWindowHeader)
                             .font(.system(size: 22, weight: .bold))
                             .foregroundColor(Color.primary)
                             .padding(.leading, -10)
@@ -70,17 +70,24 @@ extension HomePage.Views {
     struct Description: View {
         var body: some View {
             VStack(alignment: .leading, spacing: 15) {
-                Text("All" + " ")
+                let description1 = UserText.disposableHomepageDescription1.split(separator: " ",
+                                                                                 maxSplits: 1,
+                                                                                 omittingEmptySubsequences: true)
+                Text((description1.first ?? "") + " ")
                     .font(.system(size: 15, weight: .bold))
                     .foregroundColor(Color.primary)
-                + Text("DuckDuckGo windows block most hidden trackers so websites can't spy on you.")
+                + Text(description1.last ?? "")
                     .font(.system(size: 15))
                     .foregroundColor(Color.primary)
 
-                Text("Burner windows" + " ")
+                let description2 = UserText.disposableHomepageDescription2.split(separator: " ",
+                                                                                 maxSplits: 2,
+                                                                                 omittingEmptySubsequences: true)
+
+                Text((description2[safe: 0] ?? "") + " " + (description2[safe: 1] ?? "") + " ")
                     .font(.system(size: 15, weight: .bold))
                     .foregroundColor(Color.primary)
-                + Text("are temporary: they don't access existing cookies or remember websites you visit after you close the window.")
+                + Text(description2[safe: 2] ?? "")
                     .font(.system(size: 15))
                     .foregroundColor(Color.primary)
             }
@@ -91,7 +98,7 @@ extension HomePage.Views {
 
             var body: some View {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Burner Windows make it easier to:")
+                    Text(UserText.disposableHomepageDescription3)
                         .font(.system(size: 13, weight: .bold))
                         .foregroundColor(Color.primary)
 
@@ -99,7 +106,7 @@ extension HomePage.Views {
                         Image("BurnerWindowPopoverIcon1")
                             .resizable()
                             .frame(width: 16, height: 16)
-                        Text("Sign into a site with a different account")
+                        Text(UserText.disposableHomepageDescription4)
                             .font(.system(size: 13))
                             .foregroundColor(Color.primary)
 
@@ -110,7 +117,7 @@ extension HomePage.Views {
                             .resizable()
                             .frame(width: 16, height: 16)
                             .foregroundColor(Color.primary)
-                        Text("View websites without signing in")
+                        Text(UserText.disposableHomepageDescription5)
                             .font(.system(size: 13))
                             .foregroundColor(Color.primary)
                     }
