@@ -23,25 +23,19 @@ import BrowserServicesKit
 
 final class FaviconImageCache {
 
-    private let storing: FaviconStoring?
+    private let storing: FaviconStoring
 
     private var entries = [URL: Favicon]()
 
     private var cancellables = Set<AnyCancellable>()
 
-    init(faviconStoring: FaviconStoring?) {
+    init(faviconStoring: FaviconStoring) {
         storing = faviconStoring
     }
 
     private(set) var loaded = false
 
     func loadFavicons(completionHandler: ((Error?) -> Void)? = nil) {
-        guard let storing else {
-            loaded = true
-            completionHandler?(nil)
-            return
-        }
-
         storing.loadFavicons()
             .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { completion in
@@ -72,7 +66,7 @@ final class FaviconImageCache {
 
         // Save the new one
         entries[favicon.url] = favicon
-        storing?.save(favicon: favicon)
+        storing.save(favicon: favicon)
             .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { completion in
                 switch completion {
@@ -146,7 +140,7 @@ final class FaviconImageCache {
     private func removeFaviconsFromStore(_ favicons: [Favicon], completionHandler: (() -> Void)? = nil) {
         guard !favicons.isEmpty else { completionHandler?(); return }
 
-        storing?.removeFavicons(favicons)
+        storing.removeFavicons(favicons)
             .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { completion in
                 switch completion {

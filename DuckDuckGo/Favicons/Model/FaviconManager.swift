@@ -54,7 +54,7 @@ final class FaviconManager: FaviconManagement {
         case .standard:
             store = FaviconStore()
         case .inMemory:
-            store = nil
+            store = FaviconNullStore()
         }
         imageCache = FaviconImageCache(faviconStoring: store)
         referenceCache = FaviconReferenceCache(faviconStoring: store)
@@ -64,7 +64,7 @@ final class FaviconManager: FaviconManagement {
         }
     }
 
-    private var store: FaviconStoring?
+    private var store: FaviconStoring
 
     private let faviconURLSession = URLSession(configuration: .ephemeral)
 

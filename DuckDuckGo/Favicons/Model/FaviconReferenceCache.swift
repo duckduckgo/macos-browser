@@ -23,7 +23,7 @@ import BrowserServicesKit
 
 final class FaviconReferenceCache {
 
-    private let storing: FaviconStoring?
+    private let storing: FaviconStoring
 
     // References to favicon URLs for whole domains
     private var hostReferences = [String: FaviconHostReference]()
@@ -33,19 +33,13 @@ final class FaviconReferenceCache {
 
     private var cancellables = Set<AnyCancellable>()
 
-    init(faviconStoring: FaviconStoring?) {
+    init(faviconStoring: FaviconStoring) {
         storing = faviconStoring
     }
 
     private(set) var loaded = false
 
     func loadReferences(completionHandler: ((Error?) -> Void)? = nil) {
-        guard let storing else {
-            loaded = true
-            completionHandler?(nil)
-            return
-        }
-
         storing.loadFaviconReferences()
             .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { completion in
@@ -232,7 +226,7 @@ final class FaviconReferenceCache {
                                               dateCreated: Date())
         hostReferences[host] = hostReference
 
-        storing?.save(hostReference: hostReference)
+        storing.save(hostReference: hostReference)
             .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { completion in
                 switch completion {
@@ -260,7 +254,7 @@ final class FaviconReferenceCache {
 
         urlReferences[documentUrl] = urlReference
 
-        storing?.save(urlReference: urlReference)
+        storing.save(urlReference: urlReference)
             .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { completion in
                 switch completion {
@@ -289,7 +283,7 @@ final class FaviconReferenceCache {
     private func removeHostReferencesFromStore(_ hostReferences: [FaviconHostReference], completionHandler: (() -> Void)? = nil) {
         guard !hostReferences.isEmpty else { completionHandler?(); return }
 
-        storing?.remove(hostReferences: hostReferences)
+        storing.remove(hostReferences: hostReferences)
             .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { completion in
                 switch completion {
@@ -313,7 +307,7 @@ final class FaviconReferenceCache {
     private func removeUrlReferencesFromStore(_ urlReferences: [FaviconUrlReference], completionHandler: (() -> Void)? = nil) {
         guard !urlReferences.isEmpty else { completionHandler?(); return }
 
-        self.storing?.remove(urlReferences: urlReferences)
+        self.storing.remove(urlReferences: urlReferences)
             .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { completion in
                 switch completion {
