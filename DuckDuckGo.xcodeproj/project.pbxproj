@@ -1209,7 +1209,6 @@
 		7B2CAC0929A93078004C23BA /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B2CAC0829A93078004C23BA /* main.swift */; };
 		7B2CAC0E29A93078004C23BA /* com.duckduckgo.macos.browser.network-protection.system-extension.extension.systemextension in Embed System Extensions */ = {isa = PBXBuildFile; fileRef = 7B2CAC0329A93077004C23BA /* com.duckduckgo.macos.browser.network-protection.system-extension.extension.systemextension */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		7B2CAC1629A9336F004C23BA /* NetworkProtection in Frameworks */ = {isa = PBXBuildFile; productRef = 7B2CAC1529A9336F004C23BA /* NetworkProtection */; };
-		7B2CAC1829A93377004C23BA /* BrowserServicesKit in Frameworks */ = {isa = PBXBuildFile; productRef = 7B2CAC1729A93377004C23BA /* BrowserServicesKit */; };
 		7B2CAC1A29A933DF004C23BA /* NetworkProtection in Frameworks */ = {isa = PBXBuildFile; productRef = 7B2CAC1929A933DF004C23BA /* NetworkProtection */; };
 		7B2CAC1B29A9344A004C23BA /* SystemExtensionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BFA781E299E76700003284F /* SystemExtensionManager.swift */; };
 		7B374862299EA50100568220 /* NetworkProtection in Resources */ = {isa = PBXBuildFile; fileRef = 7B374861299EA50100568220 /* NetworkProtection */; };
@@ -4264,7 +4263,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7B2CAC1829A93377004C23BA /* BrowserServicesKit in Frameworks */,
 				7B2CAC1629A9336F004C23BA /* NetworkProtection in Frameworks */,
 				7BB8BA5829A94D5900D64342 /* PixelKit in Frameworks */,
 				7B2CAC0429A93077004C23BA /* NetworkExtension.framework in Frameworks */,
@@ -7378,7 +7376,6 @@
 			name = NetworkProtectionSystemExtension;
 			packageProductDependencies = (
 				7B2CAC1529A9336F004C23BA /* NetworkProtection */,
-				7B2CAC1729A93377004C23BA /* BrowserServicesKit */,
 				7BB8BA5729A94D5900D64342 /* PixelKit */,
 			);
 			productName = NetworkProtectionSystemExtension;
@@ -12067,11 +12064,6 @@
 		7B2CAC1529A9336F004C23BA /* NetworkProtection */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = NetworkProtection;
-		};
-		7B2CAC1729A93377004C23BA /* BrowserServicesKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 7BFA7B4D299E97AD0003284F /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
-			productName = BrowserServicesKit;
 		};
 		7B2CAC1929A933DF004C23BA /* NetworkProtection */ = {
 			isa = XCSwiftPackageProductDependency;
