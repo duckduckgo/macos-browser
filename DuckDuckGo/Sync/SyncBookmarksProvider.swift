@@ -42,6 +42,7 @@ final class SyncBookmarksProvider: DataProviding {
 
             var syncableBookmarks: [Syncable] = []
             context.performAndWait {
+                context.refreshAllObjects()
                 let bookmarks = BookmarkUtils.fetchModifiedBookmarks(context)
                 syncableBookmarks = bookmarks.compactMap { try? Syncable(bookmark: $0, encryptedWith: crypter) }
             }
@@ -56,6 +57,7 @@ final class SyncBookmarksProvider: DataProviding {
         return await withCheckedContinuation { continuation in
             var syncableBookmarks: [Syncable] = []
             context.performAndWait {
+                context.refreshAllObjects()
                 let fetchRequest = BookmarkEntity.fetchRequest()
                 let bookmarks = (try? context.fetch(fetchRequest)) ?? []
                 syncableBookmarks = bookmarks.compactMap { try? Syncable(bookmark: $0, encryptedWith: crypter) }
@@ -78,7 +80,7 @@ final class SyncBookmarksProvider: DataProviding {
                 let identifiers = sent.compactMap { $0.payload["id"] as? String }
                 let request = BookmarkEntity.fetchRequest()
                 request.predicate = NSPredicate(format: "%K IN %@", #keyPath(BookmarkEntity.uuid), identifiers)
-                var bookmarks = (try? context.fetch(request)) ?? []
+                let bookmarks = (try? context.fetch(request)) ?? []
                 bookmarks.forEach { $0.modifiedAt = nil }
 
                 let bookmarksPendingDeletion = BookmarkUtils.fetchBookmarksPendingDeletion(context)
@@ -88,15 +90,19 @@ final class SyncBookmarksProvider: DataProviding {
                 }
 
                 processReceivedBookmarks(received, in: context, using: crypter)
+                let insertedObjects = Array(context.insertedObjects).compactMap { $0 as? BookmarkEntity }
+                let updatedObjects = Array(context.updatedObjects).compactMap { $0 as? BookmarkEntity }
 
                 do {
+                    try context.save()
+                    (insertedObjects + updatedObjects).forEach { $0.modifiedAt = nil }
                     try context.save()
                 } catch {
                     saveError = error
                 }
             }
             if let saveError {
-                print("SAVE ERROR", saveError.localizedDescription)
+                print("SAVE ERROR", saveError)
             } else if let timestamp {
                 lastSyncTimestamp = timestamp
             }
@@ -186,6 +192,7 @@ final class SyncBookmarksProvider: DataProviding {
     init(database: CoreDataDatabase, metadataStore: SyncMetadataStore) {
         self.context = database.makeContext(concurrencyType: .privateQueueConcurrencyType)
         self.metadataStore = metadataStore
+        self.metadataStore.registerFeature(named: feature.name)
     }
 
     private let context: NSManagedObjectContext
