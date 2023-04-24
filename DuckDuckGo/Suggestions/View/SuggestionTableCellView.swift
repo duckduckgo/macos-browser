@@ -25,7 +25,7 @@ final class SuggestionTableCellView: NSTableCellView {
 
     static let textColor = NSColor.suggestionTextColor
     static let suffixColor = NSColor.addressBarSuffixColor
-    static let burnerSufficColor = NSColor.burnerAccentColor
+    static let burnerSuffixColor = NSColor.burnerAccentColor
     static let iconColor = NSColor.suggestionIconColor
     static let selectedTintColor = NSColor.selectedSuggestionTintColor
 
@@ -68,7 +68,7 @@ final class SuggestionTableCellView: NSTableCellView {
             textField?.attributedStringValue = attributedString
             textField?.textColor = Self.textColor
             if isBurner {
-                suffixTextField.textColor = Self.burnerSufficColor
+                suffixTextField.textColor = Self.burnerSuffixColor
             } else {
                 suffixTextField.textColor = Self.suffixColor
             }
