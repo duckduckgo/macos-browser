@@ -130,9 +130,6 @@
                <Test
                   Identifier = "EncryptionKeyStoreTests">
                </Test>
-               <Test
-                  Identifier = "HTTPSUpgradeIntegrationTests">
-               </Test>
             </SkippedTests>
          </TestableReference>
          <TestableReference
