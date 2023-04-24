@@ -140,4 +140,8 @@ extension NSColor {
 
     static let buttonColor: NSColor = NSColor(named: "ButtonColor")!
 
+    static var logoBackground: NSColor {
+        NSColor(named: "LogoBackgroundColor")!
+    }
+
 }

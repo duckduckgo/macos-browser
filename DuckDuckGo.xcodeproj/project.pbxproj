@@ -1784,6 +1784,10 @@
 		B6F56568299A414300A04298 /* WKWebViewMockingExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F56566299A414300A04298 /* WKWebViewMockingExtension.swift */; };
 		B6F56569299A414300A04298 /* WKWebViewMockingExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F56566299A414300A04298 /* WKWebViewMockingExtension.swift */; };
 		B6F5656A299A414300A04298 /* WKWebViewMockingExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F56566299A414300A04298 /* WKWebViewMockingExtension.swift */; };
+		B6F7127E29F6779000594A45 /* QRSharingServive.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F7127D29F6779000594A45 /* QRSharingServive.swift */; };
+		B6F7127F29F6779000594A45 /* QRSharingServive.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F7127D29F6779000594A45 /* QRSharingServive.swift */; };
+		B6F7128129F681EB00594A45 /* QuickLookUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B6F7128029F681EB00594A45 /* QuickLookUI.framework */; };
+		B6F7128229F6820A00594A45 /* QuickLookUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B6F7128029F681EB00594A45 /* QuickLookUI.framework */; };
 		B6FA893D269C423100588ECD /* PrivacyDashboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B6FA893C269C423100588ECD /* PrivacyDashboard.storyboard */; };
 		B6FA893F269C424500588ECD /* PrivacyDashboardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6FA893E269C424500588ECD /* PrivacyDashboardViewController.swift */; };
 		B6FA8941269C425400588ECD /* PrivacyDashboardPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6FA8940269C425400588ECD /* PrivacyDashboardPopover.swift */; };
@@ -2786,6 +2790,8 @@
 		B6EC37FB29B83E99001ACE79 /* TestsURLExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestsURLExtension.swift; sourceTree = "<group>"; };
 		B6F41030264D2B23003DA42C /* ProgressExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressExtension.swift; sourceTree = "<group>"; };
 		B6F56566299A414300A04298 /* WKWebViewMockingExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WKWebViewMockingExtension.swift; sourceTree = "<group>"; };
+		B6F7127D29F6779000594A45 /* QRSharingServive.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRSharingServive.swift; sourceTree = "<group>"; };
+		B6F7128029F681EB00594A45 /* QuickLookUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickLookUI.framework; path = System/Library/Frameworks/QuickLookUI.framework; sourceTree = SDKROOT; };
 		B6FA893C269C423100588ECD /* PrivacyDashboard.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = PrivacyDashboard.storyboard; sourceTree = "<group>"; };
 		B6FA893E269C424500588ECD /* PrivacyDashboardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyDashboardViewController.swift; sourceTree = "<group>"; };
 		B6FA8940269C425400588ECD /* PrivacyDashboardPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyDashboardPopover.swift; sourceTree = "<group>"; };
@@ -2820,6 +2826,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B6F7128229F6820A00594A45 /* QuickLookUI.framework in Frameworks */,
 				984FD3BF299ACF35007334DD /* Bookmarks in Frameworks */,
 				37A5E2F0298AA1B20047046B /* Persistence in Frameworks */,
 				378F44E629B4BDEE00899924 /* SwiftUIExtensions in Frameworks */,
@@ -2873,6 +2880,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B6F7128129F681EB00594A45 /* QuickLookUI.framework in Frameworks */,
 				9807F645278CA16F00E1547B /* BrowserServicesKit in Frameworks */,
 				987799ED299998B1005D8EB6 /* Bookmarks in Frameworks */,
 				1E950E3F2912A10D0051A99B /* ContentBlocking in Frameworks */,
@@ -4070,6 +4078,7 @@
 		85AE2FF024A33A2D002D507F /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				B6F7128029F681EB00594A45 /* QuickLookUI.framework */,
 				85AE2FF124A33A2D002D507F /* WebKit.framework */,
 			);
 			name = Frameworks;
@@ -4386,6 +4395,7 @@
 				B6FA893A269C414900588ECD /* PrivacyDashboard */,
 				AAC6881528626B6F00D54247 /* RecentlyClosed */,
 				85890634267B6CC500D23B0D /* SecureVault */,
+				B6F7127C29F6776B00594A45 /* Sharing */,
 				4B677422255DBEB800025BD8 /* SmarterEncryption */,
 				B68458AE25C7E75100DC17B6 /* StateRestoration */,
 				B6A9E44E26142AF90067D1B9 /* Statistics */,
@@ -4876,7 +4886,6 @@
 				85480F8925CDC360009424E3 /* MainMenu.storyboard */,
 				AA4BBA3A25C58FA200C4FB0F /* MainMenu.swift */,
 				AA6EF9B425081B4C004754E6 /* MainMenuActions.swift */,
-				B63ED0E426BB8FB900A9DAD1 /* SharingMenu.swift */,
 				AA7E919628746BCC00AB6B62 /* HistoryMenu.swift */,
 				AAAB9113288EB1D600A057A9 /* CleanThisHistoryMenuItem.swift */,
 				AAAB9115288EB46B00A057A9 /* VisitMenuItem.swift */,
@@ -5739,6 +5748,15 @@
 				B6EC37EA29B5DA2A001ACE79 /* main.swift */,
 			);
 			path = "tests-server";
+			sourceTree = "<group>";
+		};
+		B6F7127C29F6776B00594A45 /* Sharing */ = {
+			isa = PBXGroup;
+			children = (
+				B63ED0E426BB8FB900A9DAD1 /* SharingMenu.swift */,
+				B6F7127D29F6779000594A45 /* QRSharingServive.swift */,
+			);
+			path = Sharing;
 			sourceTree = "<group>";
 		};
 		B6FA893A269C414900588ECD /* PrivacyDashboard */ = {
@@ -6687,6 +6705,7 @@
 				3706FB7A293F65D500E42796 /* FileDownloadManager.swift in Sources */,
 				3706FB7B293F65D500E42796 /* BookmarkImport.swift in Sources */,
 				3706FB7C293F65D500E42796 /* KeySetDictionary.swift in Sources */,
+				B6F7127F29F6779000594A45 /* QRSharingServive.swift in Sources */,
 				3706FB7E293F65D500E42796 /* FireCoordinator.swift in Sources */,
 				3706FB7F293F65D500E42796 /* GeolocationProvider.swift in Sources */,
 				3706FB80293F65D500E42796 /* NSAlert+ActiveDownloadsTermination.swift in Sources */,
@@ -7576,6 +7595,7 @@
 				AA9E9A5625A3AE8400D1959D /* NSWindowExtension.swift in Sources */,
 				AAC5E4C725D6A6E8007F5990 /* BookmarkPopover.swift in Sources */,
 				37CC53F027E8D1440028713D /* PreferencesDownloadsView.swift in Sources */,
+				B6F7127E29F6779000594A45 /* QRSharingServive.swift in Sources */,
 				B68C2FB227706E6A00BF2C7D /* ProcessExtension.swift in Sources */,
 				B6106BA726A7BECC0013B453 /* PermissionAuthorizationQuery.swift in Sources */,
 				3171D6BA288984D00068632A /* BadgeAnimationView.swift in Sources */,
