@@ -50,7 +50,7 @@ extension WindowsManager {
     }
 
     private class func setUpWindow(from item: WindowRestorationItem) {
-        guard let window = openNewWindow(with: item.model, showWindow: true) else { return }
+        guard let window = openNewWindow(with: item.model, isBurner: false, showWindow: true) else { return }
         window.setContentSize(item.frame.size)
         window.setFrameOrigin(item.frame.origin)
     }
@@ -113,7 +113,7 @@ final class WindowManagerStateRestoration: NSObject, NSSecureCoding {
                 let rightIndex = rhs.window?.orderedIndex ?? Int.min
                 return leftIndex < rightIndex
             }
-            .map { WindowRestorationItem(windowController: $0) }
+            .compactMap { WindowRestorationItem(windowController: $0) }
         self.keyWindowIndex = windowControllersManager.lastKeyMainWindowController.flatMap {
             windowControllersManager.mainWindowControllers.firstIndex(of: $0)
         }
@@ -140,7 +140,12 @@ final class WindowRestorationItem: NSObject, NSSecureCoding {
     let frame: NSRect
 
     @MainActor
-    init(windowController: MainWindowController) {
+    init?(windowController: MainWindowController) {
+        guard !windowController.mainViewController.tabCollectionViewModel.isBurner else {
+            // Don't persist burner windows
+            return nil
+        }
+
         self.frame = windowController.window!.frame
         self.model = windowController.mainViewController.tabCollectionViewModel
     }

@@ -29,6 +29,7 @@ protocol TabDownloadsDelegate: AnyObject {
 final class DownloadsTabExtension: NSObject {
 
     private let downloadManager: FileDownloadManagerProtocol
+    private let isBurner: Bool
 
     @Published
     private var savePanelDialogRequest: SavePanelDialogRequest? {
@@ -46,8 +47,9 @@ final class DownloadsTabExtension: NSObject {
 
     weak var delegate: TabDownloadsDelegate?
 
-    init(downloadManager: FileDownloadManagerProtocol) {
+    init(downloadManager: FileDownloadManagerProtocol, isBurner: Bool) {
         self.downloadManager = downloadManager
+        self.isBurner = isBurner
         super.init()
     }
 
@@ -57,7 +59,9 @@ final class DownloadsTabExtension: NSObject {
             guard case .some(.html) = mimeType.flatMap(UTType.init(mimeType:)) else {
                 if let url = webView.url {
                     webView.startDownload(URLRequest(url: url, cachePolicy: .returnCacheDataElseLoad)) { download in
-                        self.downloadManager.add(download, delegate: self, location: .prompt)
+                        self.downloadManager.add(download,
+                                                 fromBurnerWindow: self.isBurner,
+                                                 delegate: self, location: .prompt)
                     }
                 }
                 return
@@ -139,7 +143,10 @@ extension DownloadsTabExtension: NavigationResponder {
     }
 
     func enqueueDownload(_ download: WebKitDownload, withNavigationAction navigationAction: NavigationAction?) {
-        let task = downloadManager.add(download, delegate: self, location: .auto)
+        let task = downloadManager.add(download,
+                                       fromBurnerWindow: self.isBurner,
+                                       delegate: self,
+                                       location: .auto)
 
         // If the download has started from a popup Tab - close it after starting the download
         // e.g. download button on this page:
@@ -175,7 +182,10 @@ extension DownloadsTabExtension: WKNavigationDelegate {
     @objc(_webView:contextMenuDidCreateDownload:)
     func webView(_ webView: WKWebView, contextMenuDidCreate download: WebKitDownload) {
         // to do: url should be cleaned up before launching download
-        downloadManager.add(download, delegate: self, location: .prompt)
+        downloadManager.add(download,
+                            fromBurnerWindow: isBurner,
+                            delegate: self,
+                            location: .prompt)
     }
 
 }
