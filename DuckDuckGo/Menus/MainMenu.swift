@@ -128,19 +128,16 @@ final class MainMenu: NSMenu {
             printSeparatorItem?.removeFromParent()
         }
 
-        if let appDelegate = NSApplication.shared.delegate as? AppDelegate,
-           !appDelegate.internalUserDecider.isInternalUser {
-            newBurnerWindowMenuItem.isHidden = true
-        }
-
         sharingMenu.title = shareMenuItem.title
         shareMenuItem.submenu = sharingMenu
 
         updateBookmarksBarMenuItem()
         updateShortcutMenuItems()
         updateLoggingMenuItems()
+        updateBurnerWindowMenuItem()
     }
 
+    @MainActor
     func setup(with featureFlagger: FeatureFlagger) {
         self.delegate = self
 
@@ -153,6 +150,7 @@ final class MainMenu: NSMenu {
         setupDebugMenuItem(with: featureFlagger)
         subscribeToBookmarkList()
         subscribeToFavicons()
+        updateBurnerWindowMenuItem()
     }
 
     // MARK: - Bookmarks
@@ -269,6 +267,14 @@ final class MainMenu: NSMenu {
         toggleAutofillShortcutMenuItem?.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .autofill)
         toggleBookmarksShortcutMenuItem?.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .bookmarks)
         toggleDownloadsShortcutMenuItem?.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .downloads)
+    }
+
+    @MainActor
+    private func updateBurnerWindowMenuItem() {
+        if let appDelegate = NSApplication.shared.delegate as? AppDelegate,
+           !appDelegate.internalUserDecider.isInternalUser {
+            newBurnerWindowMenuItem.isHidden = true
+        }
     }
 
     // MARK: - Logging
