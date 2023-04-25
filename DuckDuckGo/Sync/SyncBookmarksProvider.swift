@@ -34,6 +34,10 @@ final class SyncBookmarksProvider: DataProviding {
         }
     }
 
+    func prepareForFirstSync() {
+        lastSyncTimestamp = nil
+    }
+
     func fetchChangedObjects() async throws -> [Syncable] {
         // swiftlint:disable:next force_cast
         let crypter = await (NSApp.delegate as! AppDelegate).syncService.crypter
