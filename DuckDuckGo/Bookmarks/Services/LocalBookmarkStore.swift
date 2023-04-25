@@ -837,7 +837,7 @@ final class LocalBookmarkStore: BookmarkStore {
 fileprivate extension BookmarkEntity {
 
     var isInvalid: Bool {
-        if title == nil {
+        if title == nil && isPendingDeletion == false {
             return true
         }
 
