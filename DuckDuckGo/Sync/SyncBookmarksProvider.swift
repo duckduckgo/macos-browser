@@ -95,7 +95,7 @@ final class SyncBookmarksProvider: DataProviding {
 
                 processReceivedBookmarks(received, in: context, using: crypter)
                 let insertedObjects = Array(context.insertedObjects).compactMap { $0 as? BookmarkEntity }
-                let updatedObjects = Array(context.updatedObjects).compactMap { $0 as? BookmarkEntity }
+                let updatedObjects = Array(context.updatedObjects.subtracting(context.deletedObjects)).compactMap { $0 as? BookmarkEntity }
 
                 do {
                     try context.save()
