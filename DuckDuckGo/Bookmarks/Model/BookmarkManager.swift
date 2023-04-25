@@ -75,9 +75,9 @@ final class LocalBookmarkManager: BookmarkManager {
     // MARK: - Bookmarks
 
     func updateBookmarkDatabaseCleanupSchedule(shouldEnable: Bool) {
+        bookmarkDatabaseCleaner.cleanUpDatabaseNow()
         if shouldEnable {
             bookmarkDatabaseCleaner.scheduleRegularCleaning()
-            bookmarkDatabaseCleaner.cleanUpDatabaseNow()
         } else {
             bookmarkDatabaseCleaner.cancelCleaningSchedule()
         }
