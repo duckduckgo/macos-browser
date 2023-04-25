@@ -208,25 +208,28 @@ extension Syncable {
     init(bookmark: BookmarkEntity, encryptedWith crypter: Crypting) throws {
         var payload: [String: Any] = [:]
         payload["id"] = bookmark.uuid!
-        payload["title"] = try crypter.encryptAndBase64Encode(bookmark.title!)
-        if bookmark.isFolder {
-            if bookmark.uuid == BookmarkEntity.Constants.favoritesFolderID {
-                payload["folder"] = [
-                    "children": bookmark.favoritesArray.map(\.uuid)
-                ]
-            } else {
-                payload["folder"] = [
-                    "children": bookmark.childrenArray.map(\.uuid)
-                ]
-            }
-        } else {
-            payload["page"] = ["url": try crypter.encryptAndBase64Encode(bookmark.url!)]
-        }
         if bookmark.isPendingDeletion {
             payload["deleted"] = ""
-        }
-        if let modifiedAt = bookmark.modifiedAt {
-            payload["client_last_modified"] = Self.dateFormatter.string(from: modifiedAt)
+        } else {
+            if let title = bookmark.title {
+                payload["title"] = try crypter.encryptAndBase64Encode(title)
+            }
+            if bookmark.isFolder {
+                if bookmark.uuid == BookmarkEntity.Constants.favoritesFolderID {
+                    payload["folder"] = [
+                        "children": bookmark.favoritesArray.map(\.uuid)
+                    ]
+                } else {
+                    payload["folder"] = [
+                        "children": bookmark.childrenArray.map(\.uuid)
+                    ]
+                }
+            } else if let url = bookmark.url {
+                payload["page"] = ["url": try crypter.encryptAndBase64Encode(url)]
+            }
+            if let modifiedAt = bookmark.modifiedAt {
+                payload["client_last_modified"] = Self.dateFormatter.string(from: modifiedAt)
+            }
         }
         self.init(jsonObject: payload)
     }
