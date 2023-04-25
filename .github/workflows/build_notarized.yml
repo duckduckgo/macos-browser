@@ -93,9 +93,9 @@ jobs:
         RELEASE_PP_PATH=$RUNNER_TEMP/release_pp.provisionprofile
 
         # import certificate from secrets
-        echo -n "$BUILD_CERTIFICATE_BASE64" | base64 --decode --output $CERTIFICATE_PATH
-        echo -n "$REVIEW_PROVISION_PROFILE_BASE64" | base64 --decode --output $REVIEW_PP_PATH
-        echo -n "$RELEASE_PROVISION_PROFILE_BASE64" | base64 --decode --output $RELEASE_PP_PATH
+        echo -n "$BUILD_CERTIFICATE_BASE64" | base64 --decode -o $CERTIFICATE_PATH
+        echo -n "$REVIEW_PROVISION_PROFILE_BASE64" | base64 --decode -o $REVIEW_PP_PATH
+        echo -n "$RELEASE_PROVISION_PROFILE_BASE64" | base64 --decode -o $RELEASE_PP_PATH
 
         # create temporary keychain
         security create-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
@@ -164,7 +164,7 @@ jobs:
       run: |
         # import API Key from secrets
         export APPLE_API_KEY_PATH="$RUNNER_TEMP/apple_api_key.pem"
-        echo -n "$APPLE_API_KEY_BASE64" | base64 --decode --output $APPLE_API_KEY_PATH
+        echo -n "$APPLE_API_KEY_BASE64" | base64 --decode -o $APPLE_API_KEY_PATH
 
         ./scripts/archive.sh ${{ env.release-type }} \
             ${{ env.create_dmg_arg }} \
