@@ -217,6 +217,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
             }
     }
 
+    func applicationDidBecomeActive(_ notification: Notification) {
+        syncService.scheduler.notifyAppLifecycleEvent()
+    }
+
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
         if !FileDownloadManager.shared.downloads.isEmpty {
             let alert = NSAlert.activeDownloadsTerminationAlert(for: FileDownloadManager.shared.downloads)
