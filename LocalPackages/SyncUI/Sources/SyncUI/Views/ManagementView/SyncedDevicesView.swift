@@ -50,7 +50,7 @@ struct SyncedDevicesView<ViewModel>: View where ViewModel: ManagementViewModel {
                         }
                     } rightContent: {
                         Button(UserText.currentDeviceDetails) {
-                            print("details")
+                            model.presentDeviceDetails(device)
                         }
                     }
                 } else {
