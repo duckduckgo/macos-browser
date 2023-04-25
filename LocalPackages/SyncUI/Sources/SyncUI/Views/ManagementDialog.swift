@@ -21,6 +21,7 @@ import SwiftUI
 public enum ManagementDialogKind: Equatable {
     case enableSync, recoverAccount, askToSyncAnotherDevice, syncAnotherDevice, deviceSynced, saveRecoveryPDF, turnOffSync
     case deviceDetails(_ device: SyncDevice)
+    case removeDevice(_ device: SyncDevice)
 }
 
 public struct ManagementDialog: View {
@@ -62,6 +63,8 @@ public struct ManagementDialog: View {
                 TurnOffSyncView()
             case .deviceDetails(let device):
                 DeviceDetailsView(device: device)
+            case .removeDevice(let device):
+                RemoveDeviceView(device: device)
 
             default:
                 EmptyView()
