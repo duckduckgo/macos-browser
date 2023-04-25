@@ -69,7 +69,7 @@ jobs:
 
     name: Export Notarized App
 
-    runs-on: macos-12
+    runs-on: macos-13
 
     env:
       release-type: ${{ github.event.inputs.release-type || inputs.release-type }}
