@@ -19,14 +19,15 @@
 import SwiftUI
 
 struct SyncPreferencesRow<ImageContent, CenterContent, RightContent>: View where ImageContent: View, CenterContent: View, RightContent: View {
-    @ViewBuilder let imageContent: () -> ImageContent
-    @ViewBuilder let centerContent: () -> CenterContent
-    @ViewBuilder let rightContent: () -> RightContent
+    
+    let imageContent: () -> ImageContent
+    let centerContent: () -> CenterContent
+    let rightContent: () -> RightContent
 
     init(
-        imageContent: @escaping () -> ImageContent,
-        centerContent: @escaping () -> CenterContent,
-        rightContent: @escaping () -> RightContent = { EmptyView() }
+        @ViewBuilder imageContent: @escaping () -> ImageContent,
+        @ViewBuilder centerContent: @escaping () -> CenterContent,
+        @ViewBuilder rightContent: @escaping () -> RightContent = { EmptyView() }
     ) {
         self.imageContent = imageContent
         self.centerContent = centerContent

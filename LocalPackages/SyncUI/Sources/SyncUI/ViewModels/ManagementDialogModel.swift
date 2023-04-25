@@ -29,6 +29,7 @@ public protocol ManagementDialogModelDelegate: AnyObject {
     func turnOffSync()
     func updateDeviceName(_ name: String)
     func removeDevice(_ device: SyncDevice)
+    func deleteAccount()
 }
 
 public final class ManagementDialogModel: ObservableObject {
