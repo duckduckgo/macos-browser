@@ -1023,6 +1023,54 @@
 		4B1E6EEE27AB5E5100F51793 /* PasswordManagementListSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B1E6EEC27AB5E5100F51793 /* PasswordManagementListSection.swift */; };
 		4B1E6EF127AB5E5D00F51793 /* NSPopUpButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B1E6EEF27AB5E5D00F51793 /* NSPopUpButtonView.swift */; };
 		4B1E6EF227AB5E5D00F51793 /* PasswordManagementItemList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B1E6EF027AB5E5D00F51793 /* PasswordManagementItemList.swift */; };
+		4B203DCF29F60F0400CA4850 /* NetworkProtectionNavBarButtonModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0F2F45299E6B5000422AB8 /* NetworkProtectionNavBarButtonModel.swift */; };
+		4B203DD029F60F0500CA4850 /* NetworkProtectionNavBarButtonModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0F2F45299E6B5000422AB8 /* NetworkProtectionNavBarButtonModel.swift */; };
+		4B203DD129F60F0B00CA4850 /* NetworkProtectionLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0F2F5A299E6B5000422AB8 /* NetworkProtectionLogger.swift */; };
+		4B203DD229F60F0B00CA4850 /* NetworkProtectionIconPublisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BB2F92429B76E8C00671521 /* NetworkProtectionIconPublisher.swift */; };
+		4B203DD329F60F0B00CA4850 /* NetworkProtectionStatusBarMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0F2F4A299E6B5000422AB8 /* NetworkProtectionStatusBarMenu.swift */; };
+		4B203DD429F60F0B00CA4850 /* NetworkProtectionProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0F2F46299E6B5000422AB8 /* NetworkProtectionProvider.swift */; };
+		4B203DD529F60F0B00CA4850 /* NetworkProtectionControllerErrorStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0F2F48299E6B5000422AB8 /* NetworkProtectionControllerErrorStore.swift */; };
+		4B203DD629F60F0B00CA4850 /* NetworkProtectionStatusReporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0F2F59299E6B5000422AB8 /* NetworkProtectionStatusReporter.swift */; };
+		4B203DD729F60F0B00CA4850 /* NetworkProtectionSelectedServerStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0F2F56299E6B5000422AB8 /* NetworkProtectionSelectedServerStore.swift */; };
+		4B203DD829F60F0B00CA4850 /* String+ArrayConversion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0F2F54299E6B5000422AB8 /* String+ArrayConversion.swift */; };
+		4B203DD929F60F0B00CA4850 /* NetworkProtectionStatusViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0F2F55299E6B5000422AB8 /* NetworkProtectionStatusViewModel.swift */; };
+		4B203DDA29F60F0B00CA4850 /* LoginItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B3B5A6229DAE61400463DCF /* LoginItem.swift */; };
+		4B203DDC29F60F0B00CA4850 /* NetworkProtectionPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0F2F58299E6B5000422AB8 /* NetworkProtectionPopover.swift */; };
+		4B203DDD29F60F0B00CA4850 /* NetworkProtectionLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0F2F5A299E6B5000422AB8 /* NetworkProtectionLogger.swift */; };
+		4B203DDE29F60F0B00CA4850 /* NetworkProtectionIconPublisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BB2F92429B76E8C00671521 /* NetworkProtectionIconPublisher.swift */; };
+		4B203DDF29F60F0B00CA4850 /* NetworkProtectionStatusBarMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0F2F4A299E6B5000422AB8 /* NetworkProtectionStatusBarMenu.swift */; };
+		4B203DE029F60F0B00CA4850 /* NetworkProtectionProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0F2F46299E6B5000422AB8 /* NetworkProtectionProvider.swift */; };
+		4B203DE129F60F0B00CA4850 /* NetworkProtectionControllerErrorStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0F2F48299E6B5000422AB8 /* NetworkProtectionControllerErrorStore.swift */; };
+		4B203DE229F60F0B00CA4850 /* NetworkProtectionStatusReporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0F2F59299E6B5000422AB8 /* NetworkProtectionStatusReporter.swift */; };
+		4B203DE329F60F0B00CA4850 /* NetworkProtectionSelectedServerStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0F2F56299E6B5000422AB8 /* NetworkProtectionSelectedServerStore.swift */; };
+		4B203DE429F60F0B00CA4850 /* String+ArrayConversion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0F2F54299E6B5000422AB8 /* String+ArrayConversion.swift */; };
+		4B203DE529F60F0B00CA4850 /* NetworkProtectionStatusViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0F2F55299E6B5000422AB8 /* NetworkProtectionStatusViewModel.swift */; };
+		4B203DE629F60F0B00CA4850 /* LoginItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B3B5A6229DAE61400463DCF /* LoginItem.swift */; };
+		4B203DE729F60F0B00CA4850 /* NetworkProtectionStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0F2F53299E6B5000422AB8 /* NetworkProtectionStatusView.swift */; };
+		4B203DE829F60F0B00CA4850 /* NetworkProtectionPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0F2F58299E6B5000422AB8 /* NetworkProtectionPopover.swift */; };
+		4B203DE929F60F1E00CA4850 /* NSNotificationName+NetPDistributed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BFA7813299E76700003284F /* NSNotificationName+NetPDistributed.swift */; };
+		4B203DEA29F60F1E00CA4850 /* NSNotificationName+NetPDistributed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BFA7813299E76700003284F /* NSNotificationName+NetPDistributed.swift */; };
+		4B203DEB29F60F2E00CA4850 /* NetworkProtectionBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BFA781B299E76700003284F /* NetworkProtectionBundle.swift */; };
+		4B203DEC29F60F2F00CA4850 /* NetworkProtectionBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BFA781B299E76700003284F /* NetworkProtectionBundle.swift */; };
+		4B203DED29F60F3700CA4850 /* NetworkProtectionSharedState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BFA7822299E76700003284F /* NetworkProtectionSharedState.swift */; };
+		4B203DEE29F60F3700CA4850 /* NetworkProtectionSharedState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BFA7822299E76700003284F /* NetworkProtectionSharedState.swift */; };
+		4B203DEF29F60F5400CA4850 /* VisualEffectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0F2F52299E6B5000422AB8 /* VisualEffectView.swift */; };
+		4B203DF029F60F5500CA4850 /* VisualEffectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0F2F52299E6B5000422AB8 /* VisualEffectView.swift */; };
+		4B203DF129F60F5D00CA4850 /* Font+MonospacedDigits.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0F2F4D299E6B5000422AB8 /* Font+MonospacedDigits.swift */; };
+		4B203DF229F60F5D00CA4850 /* Font+MonospacedDigits.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0F2F4D299E6B5000422AB8 /* Font+MonospacedDigits.swift */; };
+		4B203DF329F60F5F00CA4850 /* NETunnelProviderProtocol+NetworkProtection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0F2F50299E6B5000422AB8 /* NETunnelProviderProtocol+NetworkProtection.swift */; };
+		4B203DF429F60F6000CA4850 /* NETunnelProviderProtocol+NetworkProtection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0F2F50299E6B5000422AB8 /* NETunnelProviderProtocol+NetworkProtection.swift */; };
+		4B203DF529F60F6300CA4850 /* TunnelConfiguration+WgQuickConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0F2F4C299E6B5000422AB8 /* TunnelConfiguration+WgQuickConfig.swift */; };
+		4B203DF629F60F6400CA4850 /* TunnelConfiguration+WgQuickConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0F2F4C299E6B5000422AB8 /* TunnelConfiguration+WgQuickConfig.swift */; };
+		4B203DF729F60F7400CA4850 /* UserText+NetworkProtection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BF0943C29A8F1FB00A2DA6E /* UserText+NetworkProtection.swift */; };
+		4B203DF929F60F7600CA4850 /* UserText+NetworkProtection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BF0943C29A8F1FB00A2DA6E /* UserText+NetworkProtection.swift */; };
+		4B203DFB29F611EB00CA4850 /* NetworkProtection in Frameworks */ = {isa = PBXBuildFile; productRef = 4B203DFA29F611EB00CA4850 /* NetworkProtection */; };
+		4B203DFD29F611EF00CA4850 /* NetworkProtectionUI in Frameworks */ = {isa = PBXBuildFile; productRef = 4B203DFC29F611EF00CA4850 /* NetworkProtectionUI */; };
+		4B203DFF29F611F300CA4850 /* NetworkProtection in Frameworks */ = {isa = PBXBuildFile; productRef = 4B203DFE29F611F300CA4850 /* NetworkProtection */; };
+		4B203E0129F611F600CA4850 /* NetworkProtectionUI in Frameworks */ = {isa = PBXBuildFile; productRef = 4B203E0029F611F600CA4850 /* NetworkProtectionUI */; };
+		4B203E0329F6125E00CA4850 /* Main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B8350C229DAB1E1000F0D41 /* Main.swift */; };
+		4B203E0429F8747B00CA4850 /* NetworkProtectionStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0F2F53299E6B5000422AB8 /* NetworkProtectionStatusView.swift */; };
+		4B203E0529F8748500CA4850 /* Main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B8350C229DAB1E1000F0D41 /* Main.swift */; };
 		4B29759728281F0900187C4E /* FirefoxEncryptionKeyReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B29759628281F0900187C4E /* FirefoxEncryptionKeyReader.swift */; };
 		4B2975992828285900187C4E /* FirefoxKeyReaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B2975982828285900187C4E /* FirefoxKeyReaderTests.swift */; };
 		4B29759C28284DBC00187C4E /* FirefoxBerkeleyDatabaseReader.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B29759B28284DBC00187C4E /* FirefoxBerkeleyDatabaseReader.m */; };
@@ -4229,6 +4277,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				7BFA7B5B299E97D50003284F /* Persistence in Frameworks */,
+				4B203DFF29F611F300CA4850 /* NetworkProtection in Frameworks */,
+				4B203E0129F611F600CA4850 /* NetworkProtectionUI in Frameworks */,
 				3706FCA7293F65D500E42796 /* BrowserServicesKit in Frameworks */,
 				3706FCA9293F65D500E42796 /* ContentBlocking in Frameworks */,
 				3706FCAA293F65D500E42796 /* UserScript in Frameworks */,
@@ -4346,10 +4396,12 @@
 				1D02633328D898E1005CBB41 /* OpenSSL in Frameworks */,
 				7BFA7B57299E97AD0003284F /* PrivacyDashboard in Frameworks */,
 				7BFA7B53299E97AD0003284F /* ContentBlocking in Frameworks */,
+				4B203DFD29F611EF00CA4850 /* NetworkProtectionUI in Frameworks */,
 				AA06B6B72672AF8100F541C5 /* Sparkle in Frameworks */,
 				7BFA7B4F299E97AD0003284F /* Bookmarks in Frameworks */,
 				85FF55C825F82E4F00E2AB99 /* Lottie in Frameworks */,
 				7BFA7B59299E97AD0003284F /* UserScript in Frameworks */,
+				4B203DFB29F611EB00CA4850 /* NetworkProtection in Frameworks */,
 				7BFA7B51299E97AD0003284F /* Common in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -7311,6 +7363,8 @@
 				3706FA77293F65D500E42796 /* PrivacyDashboard */,
 				3706FA78293F65D500E42796 /* UserScript */,
 				7BFA7B5A299E97D50003284F /* Persistence */,
+				4B203DFE29F611F300CA4850 /* NetworkProtection */,
+				4B203E0029F611F600CA4850 /* NetworkProtectionUI */,
 			);
 			productName = DuckDuckGo;
 			productReference = 3706FD05293F65D500E42796 /* DuckDuckGo App Store.app */;
@@ -7564,6 +7618,8 @@
 				7BFA7B56299E97AD0003284F /* PrivacyDashboard */,
 				7BFA7B58299E97AD0003284F /* UserScript */,
 				7B713F5B29ACF6C400A07DB1 /* BrowserServicesKit */,
+				4B203DFA29F611EB00CA4850 /* NetworkProtection */,
+				4B203DFC29F611EF00CA4850 /* NetworkProtectionUI */,
 			);
 			productName = DuckDuckGo;
 			productReference = AA585D7E248FD31100E9A3E2 /* DuckDuckGo.app */;
@@ -8369,10 +8425,12 @@
 				3706FA9A293F65D500E42796 /* PrivatePlayerURLExtension.swift in Sources */,
 				3706FA9D293F65D500E42796 /* PermissionState.swift in Sources */,
 				3706FA9E293F65D500E42796 /* ViewExtensions.swift in Sources */,
+				4B203DD829F60F0B00CA4850 /* String+ArrayConversion.swift in Sources */,
 				3707C724294B5D2900682A9F /* StringExtension.swift in Sources */,
 				3706FA9F293F65D500E42796 /* FeedbackPresenter.swift in Sources */,
 				37197EA22942441900394917 /* Tab+Dialogs.swift in Sources */,
 				3706FAA0293F65D500E42796 /* UserAgent.swift in Sources */,
+				4B203DF529F60F6300CA4850 /* TunnelConfiguration+WgQuickConfig.swift in Sources */,
 				3706FAA1293F65D500E42796 /* NSAlert+DataImport.swift in Sources */,
 				3706FAA2293F65D500E42796 /* MainWindow.swift in Sources */,
 				3707C727294B5D2900682A9F /* WKWebView+SessionState.swift in Sources */,
@@ -8390,6 +8448,7 @@
 				3706FAB0293F65D500E42796 /* BookmarkOutlineViewCell.swift in Sources */,
 				3706FAB1293F65D500E42796 /* UnprotectedDomains.xcdatamodeld in Sources */,
 				3706FAB2293F65D500E42796 /* TabInstrumentation.swift in Sources */,
+				4B203E0529F8748500CA4850 /* Main.swift in Sources */,
 				3706FAB3293F65D500E42796 /* BrowserImportViewController.swift in Sources */,
 				3706FAB4293F65D500E42796 /* NSPopUpButtonExtension.swift in Sources */,
 				3706FAB5293F65D500E42796 /* ConfigurationManager.swift in Sources */,
@@ -8420,6 +8479,7 @@
 				3706FACF293F65D500E42796 /* AddEditFavoriteWindow.swift in Sources */,
 				3706FAD1293F65D500E42796 /* VisitViewModel.swift in Sources */,
 				3706FAD2293F65D500E42796 /* Atb.swift in Sources */,
+				4B203DD929F60F0B00CA4850 /* NetworkProtectionStatusViewModel.swift in Sources */,
 				3706FAD3293F65D500E42796 /* DownloadsViewController.swift in Sources */,
 				3706FAD4293F65D500E42796 /* DataExtension.swift in Sources */,
 				3706FAD6293F65D500E42796 /* ConfigurationStoring.swift in Sources */,
@@ -8430,6 +8490,7 @@
 				3706FADA293F65D500E42796 /* CopyHandler.swift in Sources */,
 				3706FADB293F65D500E42796 /* ContentBlockingRulesUpdateObserver.swift in Sources */,
 				3706FADC293F65D500E42796 /* FirefoxLoginReader.swift in Sources */,
+				4B203DD029F60F0500CA4850 /* NetworkProtectionNavBarButtonModel.swift in Sources */,
 				3706FADD293F65D500E42796 /* AtbParser.swift in Sources */,
 				3706FADE293F65D500E42796 /* PreferencesPrivatePlayerView.swift in Sources */,
 				3706FADF293F65D500E42796 /* AddFolderModalViewController.swift in Sources */,
@@ -8443,6 +8504,7 @@
 				3706FAE8293F65D500E42796 /* RecentlyClosedTab.swift in Sources */,
 				1D36E65C298ACD2900AA485D /* AppIconChanger.swift in Sources */,
 				3706FAE9293F65D500E42796 /* PDFSearchTextMenuItemHandler.swift in Sources */,
+				4B203DF229F60F5D00CA4850 /* Font+MonospacedDigits.swift in Sources */,
 				3706FAEA293F65D500E42796 /* DataImportViewController.swift in Sources */,
 				3706FAEB293F65D500E42796 /* HistoryMenu.swift in Sources */,
 				3706FAEC293F65D500E42796 /* ContentScopeFeatureFlagging.swift in Sources */,
@@ -8466,6 +8528,9 @@
 				3706FAFA293F65D500E42796 /* CleanThisHistoryMenuItem.swift in Sources */,
 				3706FAFB293F65D500E42796 /* TimedPixel.swift in Sources */,
 				3706FAFC293F65D500E42796 /* DownloadListItem.swift in Sources */,
+				4B203E0429F8747B00CA4850 /* NetworkProtectionStatusView.swift in Sources */,
+				4B203DED29F60F3700CA4850 /* NetworkProtectionSharedState.swift in Sources */,
+				4B203DD429F60F0B00CA4850 /* NetworkProtectionProvider.swift in Sources */,
 				3706FAFD293F65D500E42796 /* DownloadsPopover.swift in Sources */,
 				3706FAFE293F65D500E42796 /* SpacerNode.swift in Sources */,
 				3706FAFF293F65D500E42796 /* UTType.swift in Sources */,
@@ -8474,6 +8539,7 @@
 				3706FB02293F65D500E42796 /* Onboarding.swift in Sources */,
 				3706FEB8293F6EFB00E42796 /* ConnectBitwardenView.swift in Sources */,
 				3706FB03293F65D500E42796 /* PopUpWindow.swift in Sources */,
+				4B203DF329F60F5F00CA4850 /* NETunnelProviderProtocol+NetworkProtection.swift in Sources */,
 				3706FB04293F65D500E42796 /* PersistentAppInterfaceSettings.swift in Sources */,
 				3706FB05293F65D500E42796 /* Favicons.xcdatamodeld in Sources */,
 				3706FB06293F65D500E42796 /* HoverButton.swift in Sources */,
@@ -8524,6 +8590,7 @@
 				3707C718294B5D0F00682A9F /* AdClickAttributionTabExtension.swift in Sources */,
 				3706FEBA293F6EFF00E42796 /* BWStatus.swift in Sources */,
 				3706FB30293F65D500E42796 /* NavigationBarPopovers.swift in Sources */,
+				4B203DD629F60F0B00CA4850 /* NetworkProtectionStatusReporter.swift in Sources */,
 				3706FB31293F65D500E42796 /* PinnedTabsHostingView.swift in Sources */,
 				3706FB32293F65D500E42796 /* FirefoxBookmarksReader.swift in Sources */,
 				3706FB33293F65D500E42796 /* DeviceIdleStateDetector.swift in Sources */,
@@ -8574,6 +8641,7 @@
 				3706FB5D293F65D500E42796 /* VisitMenuItem.swift in Sources */,
 				3706FB5E293F65D500E42796 /* EncryptionKeyStore.swift in Sources */,
 				3706FB5F293F65D500E42796 /* CookieConsentPopoverManager.swift in Sources */,
+				4B203DEF29F60F5400CA4850 /* VisualEffectView.swift in Sources */,
 				3706FB60293F65D500E42796 /* PasswordManagementIdentityItemView.swift in Sources */,
 				3706FB61293F65D500E42796 /* ProgressExtension.swift in Sources */,
 				3706FB62293F65D500E42796 /* CSVParser.swift in Sources */,
@@ -8581,6 +8649,7 @@
 				3706FB64293F65D500E42796 /* PixelDataModel.xcdatamodeld in Sources */,
 				3706FB65293F65D500E42796 /* PrivacyDashboardWebView.swift in Sources */,
 				3706FB66293F65D500E42796 /* AppearancePreferences.swift in Sources */,
+				4B203DD229F60F0B00CA4850 /* NetworkProtectionIconPublisher.swift in Sources */,
 				3706FB67293F65D500E42796 /* DownloadListCoordinator.swift in Sources */,
 				3706FB68293F65D500E42796 /* NSNotificationName+Debug.swift in Sources */,
 				3706FB69293F65D500E42796 /* NavigationBarBadgeAnimationView.swift in Sources */,
@@ -8655,6 +8724,7 @@
 				3706FBAE293F65D500E42796 /* DataImport.swift in Sources */,
 				3706FBAF293F65D500E42796 /* FireproofDomains.xcdatamodeld in Sources */,
 				3706FBB0293F65D500E42796 /* CookieConsentUserPermissionViewController.swift in Sources */,
+				4B203DD729F60F0B00CA4850 /* NetworkProtectionSelectedServerStore.swift in Sources */,
 				3706FBB1293F65D500E42796 /* HomePageView.swift in Sources */,
 				3706FBB2293F65D500E42796 /* WebKitDownloadTask.swift in Sources */,
 				3706FBB3293F65D500E42796 /* ChromiumLoginReader.swift in Sources */,
@@ -8668,6 +8738,7 @@
 				3706FBBC293F65D500E42796 /* NSViewExtension.swift in Sources */,
 				3706FBBD293F65D500E42796 /* Preferences.swift in Sources */,
 				3706FBBE293F65D500E42796 /* DownloadListViewModel.swift in Sources */,
+				4B203DEB29F60F2E00CA4850 /* NetworkProtectionBundle.swift in Sources */,
 				3706FBBF293F65D500E42796 /* BookmarkManagementDetailViewController.swift in Sources */,
 				3706FBC0293F65D500E42796 /* CSVImporter.swift in Sources */,
 				3706FBC1293F65D500E42796 /* StartupPreferences.swift in Sources */,
@@ -8700,6 +8771,7 @@
 				3706FBDE293F65D500E42796 /* EncryptionKeyStoring.swift in Sources */,
 				37197EA12942441700394917 /* Tab+UIDelegate.swift in Sources */,
 				3706FBDF293F65D500E42796 /* String+Punycode.swift in Sources */,
+				4B203DD129F60F0B00CA4850 /* NetworkProtectionLogger.swift in Sources */,
 				3706FBE0293F65D500E42796 /* NSException+Catch.m in Sources */,
 				3706FBE1293F65D500E42796 /* AppStateRestorationManager.swift in Sources */,
 				3706FBE2293F65D500E42796 /* ClickToLoadUserScript.swift in Sources */,
@@ -8751,6 +8823,7 @@
 				3706FC0C293F65D500E42796 /* NSAttributedStringExtension.swift in Sources */,
 				3706FC0D293F65D500E42796 /* AnimationView.swift in Sources */,
 				3706FC0E293F65D500E42796 /* NSRectExtension.swift in Sources */,
+				4B203DD329F60F0B00CA4850 /* NetworkProtectionStatusBarMenu.swift in Sources */,
 				3706FC0F293F65D500E42796 /* YoutubeOverlayUserScript.swift in Sources */,
 				3706FC10293F65D500E42796 /* DictionaryExtension.swift in Sources */,
 				3706FC11293F65D500E42796 /* Publishers.NestedObjectChanges.swift in Sources */,
@@ -8800,9 +8873,11 @@
 				3706FC3C293F65D500E42796 /* HistoryCoordinator.swift in Sources */,
 				3706FC3D293F65D500E42796 /* HTTPSBloomFilterSpecification.swift in Sources */,
 				3706FC3E293F65D500E42796 /* VariantManager.swift in Sources */,
+				4B203DDA29F60F0B00CA4850 /* LoginItem.swift in Sources */,
 				3706FC3F293F65D500E42796 /* ApplicationDockMenu.swift in Sources */,
 				3706FC40293F65D500E42796 /* SaveIdentityViewController.swift in Sources */,
 				3706FC41293F65D500E42796 /* FileStore.swift in Sources */,
+				4B203DDC29F60F0B00CA4850 /* NetworkProtectionPopover.swift in Sources */,
 				3706FC42293F65D500E42796 /* PixelArguments.swift in Sources */,
 				3706FC43293F65D500E42796 /* PinnedTabsViewModel.swift in Sources */,
 				3706FC44293F65D500E42796 /* BookmarkList.swift in Sources */,
@@ -8813,6 +8888,7 @@
 				3706FC49293F65D500E42796 /* RoundedSelectionRowView.swift in Sources */,
 				3706FC4A293F65D500E42796 /* LocalStatisticsStore.swift in Sources */,
 				3706FC4B293F65D500E42796 /* BackForwardListItem.swift in Sources */,
+				4B203DE929F60F1E00CA4850 /* NSNotificationName+NetPDistributed.swift in Sources */,
 				3706FC4C293F65D500E42796 /* BrowserImportMoreInfoViewController.swift in Sources */,
 				3706FC4D293F65D500E42796 /* CookieConsentUserPermissionView.swift in Sources */,
 				3707C723294B5D2900682A9F /* URLSessionExtension.swift in Sources */,
@@ -8837,6 +8913,7 @@
 				3706FEB9293F6EFF00E42796 /* BWVault.swift in Sources */,
 				3706FC60293F65D500E42796 /* TabBarCollectionView.swift in Sources */,
 				3706FC61293F65D500E42796 /* NSAlertExtension.swift in Sources */,
+				4B203DD529F60F0B00CA4850 /* NetworkProtectionControllerErrorStore.swift in Sources */,
 				3706FC62293F65D500E42796 /* ThirdPartyBrowser.swift in Sources */,
 				3706FC63293F65D500E42796 /* CircularProgressView.swift in Sources */,
 				3706FC64293F65D500E42796 /* SuggestionContainer.swift in Sources */,
@@ -8892,6 +8969,7 @@
 				3706FC96293F65D500E42796 /* HorizontallyCenteredLayout.swift in Sources */,
 				3706FC97293F65D500E42796 /* BookmarksOutlineView.swift in Sources */,
 				3706FC98293F65D500E42796 /* CountryList.swift in Sources */,
+				4B203DF729F60F7400CA4850 /* UserText+NetworkProtection.swift in Sources */,
 				3706FC99293F65D500E42796 /* PreferencesSection.swift in Sources */,
 				3706FC9A293F65D500E42796 /* AutoconsentManagement.swift in Sources */,
 				3706FC9C293F65D500E42796 /* BookmarkStore.swift in Sources */,
@@ -10434,6 +10512,7 @@
 				B6A9E45A261460350067D1B9 /* ApiRequestError.swift in Sources */,
 				AADCBF3A26F7C2CE00EF67A8 /* LottieAnimationCache.swift in Sources */,
 				37D2377A287EB8CA00BCE03B /* TabIndex.swift in Sources */,
+				4B203E0329F6125E00CA4850 /* Main.swift in Sources */,
 				37534CA3281132CB002621E7 /* TabLazyLoaderDataSource.swift in Sources */,
 				4B723E0E26B0006300E14D75 /* LoginImport.swift in Sources */,
 				85589E9627BFE25D0038AD11 /* FailedAssertionView.swift in Sources */,
@@ -10449,6 +10528,7 @@
 				B684590825C9027900DC17B6 /* AppStateChangedPublisher.swift in Sources */,
 				4B92928F26670D1700AD2C21 /* BookmarkTableCellView.swift in Sources */,
 				4B9292CF2667123700AD2C21 /* BookmarkManagementSidebarViewController.swift in Sources */,
+				4B203DE229F60F0B00CA4850 /* NetworkProtectionStatusReporter.swift in Sources */,
 				4B39AAF627D9B2C700A73FD5 /* NSStackViewExtension.swift in Sources */,
 				B637273D26CCF0C200C8CB02 /* OptionalExtension.swift in Sources */,
 				4BE65477271FCD41008D1D63 /* PasswordManagementLoginItemView.swift in Sources */,
@@ -10476,8 +10556,10 @@
 				B6C00ED5292FB21E009C73A6 /* HoveredLinkTabExtension.swift in Sources */,
 				AA5C8F5E2590EEE800748EB7 /* NSPointExtension.swift in Sources */,
 				AA6EF9AD25066F42004754E6 /* WindowsManager.swift in Sources */,
+				4B203DEE29F60F3700CA4850 /* NetworkProtectionSharedState.swift in Sources */,
 				1D43EB3A292B63B00065E5D6 /* BWRequest.swift in Sources */,
 				B68458CD25C7EB9000DC17B6 /* WKWebViewConfigurationExtensions.swift in Sources */,
+				4B203DF629F60F6400CA4850 /* TunnelConfiguration+WgQuickConfig.swift in Sources */,
 				85AC7ADD27BEB6EE00FFB69B /* HomePageDefaultBrowserModel.swift in Sources */,
 				AAC30A26268DFEE200D2D9CD /* CrashReporter.swift in Sources */,
 				3184AC6D288F29D800C35E4B /* BadgeNotificationAnimationModel.swift in Sources */,
@@ -10577,6 +10659,7 @@
 				4B29759C28284DBC00187C4E /* FirefoxBerkeleyDatabaseReader.m in Sources */,
 				4B78A86B26BB3ADD0071BB16 /* BrowserImportSummaryViewController.swift in Sources */,
 				AA512D1424D99D9800230283 /* FaviconManager.swift in Sources */,
+				4B203DE329F60F0B00CA4850 /* NetworkProtectionSelectedServerStore.swift in Sources */,
 				4B0AACAC28BC63ED001038AC /* ChromiumFaviconsReader.swift in Sources */,
 				AABEE6AB24ACA0F90043105B /* SuggestionTableRowView.swift in Sources */,
 				37CD54CB27F2FDD100F1F7B9 /* DownloadsPreferences.swift in Sources */,
@@ -10602,6 +10685,7 @@
 				858A798526A8BB5D00A75A42 /* NSTextViewExtension.swift in Sources */,
 				B634DBE7293C98C500C3C99E /* FutureExtension.swift in Sources */,
 				B634DBE3293C900000C3C99E /* UserDialogRequest.swift in Sources */,
+				4B203DEC29F60F2F00CA4850 /* NetworkProtectionBundle.swift in Sources */,
 				B6B1E88426D5EB570062C350 /* DownloadsCellView.swift in Sources */,
 				4B723E0C26B0005D00E14D75 /* FileImportSummaryViewController.swift in Sources */,
 				B6AAAC2D260330580029438D /* PublishedAfter.swift in Sources */,
@@ -10649,6 +10733,7 @@
 				B693955B26F0CE300015B914 /* WebKitDownloadDelegate.swift in Sources */,
 				4B0AACAE28BC6FD0001038AC /* SafariFaviconsReader.swift in Sources */,
 				B6B3E0E12657EA7A0040E0A2 /* NSScreenExtension.swift in Sources */,
+				4B203DE029F60F0B00CA4850 /* NetworkProtectionProvider.swift in Sources */,
 				B65E6BA026D9F10600095F96 /* NSBezierPathExtension.swift in Sources */,
 				AA6820E425502F19005ED0D5 /* WebsiteDataStore.swift in Sources */,
 				B64C852A26942AC90048FEBE /* PermissionContextMenu.swift in Sources */,
@@ -10700,6 +10785,7 @@
 				B6C0B23C26E87D900031CB7F /* NSAlert+ActiveDownloadsTermination.swift in Sources */,
 				AAECA42024EEA4AC00EFA63A /* IndexPathExtension.swift in Sources */,
 				4BE65478271FCD41008D1D63 /* PasswordManagementNoteItemView.swift in Sources */,
+				4B203DE529F60F0B00CA4850 /* NetworkProtectionStatusViewModel.swift in Sources */,
 				AA5C8F632591021700748EB7 /* NSApplicationExtension.swift in Sources */,
 				AA9E9A5625A3AE8400D1959D /* NSWindowExtension.swift in Sources */,
 				AAC5E4C725D6A6E8007F5990 /* BookmarkPopover.swift in Sources */,
@@ -10733,6 +10819,7 @@
 				AA5C8F59258FE21F00748EB7 /* NSTextFieldExtension.swift in Sources */,
 				3706FEC8293F6F7500E42796 /* BWManagement.swift in Sources */,
 				B6830961274CDE99004B46BB /* FireproofDomainsContainer.swift in Sources */,
+				4B203DDF29F60F0B00CA4850 /* NetworkProtectionStatusBarMenu.swift in Sources */,
 				B65536AE2685E17200085A79 /* GeolocationService.swift in Sources */,
 				4B02198925E05FAC00ED7DEA /* FireproofingURLExtensions.swift in Sources */,
 				7B1E819E27C8874900FF0E60 /* ContentOverlayPopover.swift in Sources */,
@@ -10747,6 +10834,7 @@
 				AA6EF9B525081B4C004754E6 /* MainMenuActions.swift in Sources */,
 				B63D466925BEB6C200874977 /* WKWebView+SessionState.swift in Sources */,
 				4B723E1226B0006E00E14D75 /* DataImport.swift in Sources */,
+				4B203DF129F60F5D00CA4850 /* Font+MonospacedDigits.swift in Sources */,
 				B6085D092743AAB600A9C456 /* FireproofDomains.xcdatamodeld in Sources */,
 				3106AD76287F000600159FE5 /* CookieConsentUserPermissionViewController.swift in Sources */,
 				85589E8227BBB8630038AD11 /* HomePageView.swift in Sources */,
@@ -10757,6 +10845,8 @@
 				4B7A57CF279A4EF300B1C70E /* ChromePreferences.swift in Sources */,
 				AA6AD95B2704B6DB00159F8A /* FirePopoverViewController.swift in Sources */,
 				4BE4005327CF3DC3007D3161 /* SavePaymentMethodPopover.swift in Sources */,
+				4B203DEA29F60F1E00CA4850 /* NSNotificationName+NetPDistributed.swift in Sources */,
+				4B203DE429F60F0B00CA4850 /* String+ArrayConversion.swift in Sources */,
 				85A0116925AF1D8900FA6A0C /* FindInPageViewController.swift in Sources */,
 				4BB6CE5F26B77ED000EC5860 /* Cryptography.swift in Sources */,
 				1D69C553291302F200B75945 /* BWVault.swift in Sources */,
@@ -10764,6 +10854,7 @@
 				37AFCE8927DA33BA00471A10 /* Preferences.swift in Sources */,
 				B6C0B23E26E8BF1F0031CB7F /* DownloadListViewModel.swift in Sources */,
 				4B9292D52667123700AD2C21 /* BookmarkManagementDetailViewController.swift in Sources */,
+				4B203DDD29F60F0B00CA4850 /* NetworkProtectionLogger.swift in Sources */,
 				4B723E1026B0006700E14D75 /* CSVImporter.swift in Sources */,
 				37A4CEBA282E992F00D75B89 /* StartupPreferences.swift in Sources */,
 				AA4BBA3B25C58FA200C4FB0F /* MainMenu.swift in Sources */,
@@ -10803,6 +10894,7 @@
 				EA0BA3A9272217E6002A0B6C /* ClickToLoadUserScript.swift in Sources */,
 				AAA892EA250A4CEF005B37B2 /* WindowControllersManager.swift in Sources */,
 				85C5991B27D10CF000E605B2 /* FireAnimationView.swift in Sources */,
+				4B203DDE29F60F0B00CA4850 /* NetworkProtectionIconPublisher.swift in Sources */,
 				AA6197C4276B314D008396F0 /* FaviconUrlReference.swift in Sources */,
 				AAC5E4C825D6A6E8007F5990 /* BookmarkPopoverViewController.swift in Sources */,
 				85CC1D7B26A05ECF0062F04E /* PasswordManagementItemListModel.swift in Sources */,
@@ -10862,13 +10954,16 @@
 				B68458C025C7E9E000DC17B6 /* TabCollectionViewModel+NSSecureCoding.swift in Sources */,
 				AA8EDF2724923EC70071C2E8 /* StringExtension.swift in Sources */,
 				85378DA2274E7F25007C5CBF /* EmailManagerRequestDelegate.swift in Sources */,
+				4B203DF429F60F6000CA4850 /* NETunnelProviderProtocol+NetworkProtection.swift in Sources */,
 				1D43EB36292ACE690065E5D6 /* ApplicationVersionReader.swift in Sources */,
+				4B203DE629F60F0B00CA4850 /* LoginItem.swift in Sources */,
 				4BD18F01283F0BC500058124 /* BookmarksBarViewController.swift in Sources */,
 				379DE4BD27EA31AC002CC3DE /* PreferencesAutofillView.swift in Sources */,
 				858A797F26A79EAA00A75A42 /* UserText+PasswordManager.swift in Sources */,
 				B693954E26F04BEB0015B914 /* ProgressView.swift in Sources */,
 				B69B503C2726A12500758A2B /* StatisticsStore.swift in Sources */,
 				4BBDEE9128FC14760092FAA6 /* BWInstallationService.swift in Sources */,
+				4B203DE829F60F0B00CA4850 /* NetworkProtectionPopover.swift in Sources */,
 				B693955426F04BEC0015B914 /* ColorView.swift in Sources */,
 				AA5C1DD3285A217F0089850C /* RecentlyClosedCacheItem.swift in Sources */,
 				B6BBF17427475B15004F850E /* PopupBlockedPopover.swift in Sources */,
@@ -10881,6 +10976,7 @@
 				85378DA0274E6F42007C5CBF /* NSNotificationName+EmailManager.swift in Sources */,
 				B693955726F04BEC0015B914 /* MouseOverButton.swift in Sources */,
 				AA61C0D02722159B00E6B681 /* FireInfoViewController.swift in Sources */,
+				4B203DF029F60F5500CA4850 /* VisualEffectView.swift in Sources */,
 				B64C85422694590B0048FEBE /* PermissionButton.swift in Sources */,
 				AAA0CC472533833C0079BC96 /* MoreOptionsMenu.swift in Sources */,
 				37BF3F24286F0AAE00BD9014 /* View+RoundedCorners.swift in Sources */,
@@ -10908,6 +11004,7 @@
 				376705AF27EB488600DD8D76 /* RoundedSelectionRowView.swift in Sources */,
 				B69B503F2726A12500758A2B /* LocalStatisticsStore.swift in Sources */,
 				B689ECD526C247DB006FB0C5 /* BackForwardListItem.swift in Sources */,
+				4B203DCF29F60F0400CA4850 /* NetworkProtectionNavBarButtonModel.swift in Sources */,
 				85C48CD127908C1000D3263E /* BrowserImportMoreInfoViewController.swift in Sources */,
 				313AEDA1287CAD1D00E1E8F4 /* CookieConsentUserPermissionView.swift in Sources */,
 				B69B50572727D16900758A2B /* AtbAndVariantCleanup.swift in Sources */,
@@ -10993,14 +11090,17 @@
 				37CD54CC27F2FDD100F1F7B9 /* PreferencesSection.swift in Sources */,
 				FD23FD2D2886A81D007F6985 /* AutoconsentManagement.swift in Sources */,
 				B6B2400E28083B49001B8F3A /* WebViewContainerView.swift in Sources */,
+				4B203DF929F60F7600CA4850 /* UserText+NetworkProtection.swift in Sources */,
 				AAC5E4D925D6A711007F5990 /* BookmarkStore.swift in Sources */,
 				B6FA893F269C424500588ECD /* PrivacyDashboardViewController.swift in Sources */,
 				37D2771527E870D4003365FD /* PreferencesAppearanceView.swift in Sources */,
+				4B203DE729F60F0B00CA4850 /* NetworkProtectionStatusView.swift in Sources */,
 				AA72D5FE25FFF94E00C77619 /* NSMenuItemExtension.swift in Sources */,
 				4BA1A6C2258B0A1300F6F690 /* ContiguousBytesExtension.swift in Sources */,
 				37534CA8281198CD002621E7 /* AdjacentItemEnumerator.swift in Sources */,
 				4BE53374286E39F10019DBFD /* ChromiumKeychainPrompt.swift in Sources */,
 				B6553692268440D700085A79 /* WKProcessPool+GeolocationProvider.swift in Sources */,
+				4B203DE129F60F0B00CA4850 /* NetworkProtectionControllerErrorStore.swift in Sources */,
 				AA5C1DD1285A154E0089850C /* RecentlyClosedMenu.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -12069,6 +12169,22 @@
 		3799999329705E1F003318B1 /* InputFilesChecker */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = "plugin:InputFilesChecker";
+		};
+		4B203DFA29F611EB00CA4850 /* NetworkProtection */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = NetworkProtection;
+		};
+		4B203DFC29F611EF00CA4850 /* NetworkProtectionUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = NetworkProtectionUI;
+		};
+		4B203DFE29F611F300CA4850 /* NetworkProtection */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = NetworkProtection;
+		};
+		4B203E0029F611F600CA4850 /* NetworkProtectionUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = NetworkProtectionUI;
 		};
 		4B82E9B225B69E3E00656FE7 /* TrackerRadarKit */ = {
 			isa = XCSwiftPackageProductDependency;

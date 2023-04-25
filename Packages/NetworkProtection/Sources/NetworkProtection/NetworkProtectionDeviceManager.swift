@@ -77,7 +77,7 @@ public enum NetworkProtectionError: LocalizedError {
         return "NetworkProtectionError.\(String(describing: self))"
     }
 
-    /// When this is true, the error will assert.  If for any reason whe need a specific error to not assert,
+    /// When this is true, the error will assert.  If for any reason we need a specific error to not assert,
     /// we can override that behaviour here.
     ///
     public var asserts: Bool {

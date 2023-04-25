@@ -19,10 +19,7 @@
 import Cocoa
 import os.log
 import BrowserServicesKit
-
-#if NETP
 import NetworkProtection
-#endif
 
 // Actions are sent to objects of responder chain
 
@@ -661,7 +658,6 @@ extension MainViewController {
         ConfigurationManager.shared.refreshIfNeeded()
     }
 
-#if NETP
     @IBAction func resetNetworkProtectionState(_ sender: Any?) {
         guard let window = view.window else {
             assertionFailure("No window")
@@ -750,7 +746,6 @@ extension MainViewController {
 
         DefaultNetworkProtectionProvider.simulationOptions.setEnabled(menuItem.state == .on, option: .tunnelFailure)
     }
-#endif
 
     // MARK: - Developer Tools
 
@@ -864,7 +859,6 @@ extension MainViewController: NSMenuItemValidation {
 
             return true
 
-#if NETP
         case #selector(MainViewController.networkProtectionPreferredServerChanged(_:)):
             let selectedServerName = DefaultNetworkProtectionProvider.selectedServerName()
 
@@ -912,7 +906,6 @@ extension MainViewController: NSMenuItemValidation {
             menuItem.state = DefaultNetworkProtectionProvider.simulationOptions.isEnabled(.tunnelFailure) ? .on : .off
             return true
 
-#endif
         default:
             return true
         }

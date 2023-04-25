@@ -22,10 +22,7 @@ import os.log
 import BrowserServicesKit
 import Persistence
 import ServiceManagement
-
-#if NETP
 import NetworkProtection
-#endif
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
 
@@ -57,10 +54,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private let crashReporter = CrashReporter()
     private(set) var internalUserDecider: InternalUserDeciding!
     private var appIconChanger: AppIconChanger!
-
-#if NETP
     private var networkProtectionMenu = NetworkProtectionStatusBarMenu()
-#endif
 
 #if !APPSTORE
     var updateController: UpdateController!
@@ -163,11 +157,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         UserDefaultsWrapper<Any>.clearRemovedKeys()
 
-#if NETP
         refreshNetworkProtectionServers()
         warnUserAboutApplicationPathForNetworkProtection()
         networkProtectionMenu.show()
-#endif
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
@@ -207,7 +199,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     // MARK: - Network Protection
 
-#if NETP
     /// Fetches a new list of Network Protection servers, and updates the existing set.
     private func refreshNetworkProtectionServers() {
         Task {
@@ -242,7 +233,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
         #endif
     }
-#endif
 
     private func subscribeToEmailProtectionStatusNotifications() {
         NotificationCenter.default.addObserver(self,

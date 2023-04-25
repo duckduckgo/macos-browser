@@ -20,10 +20,7 @@ import Cocoa
 import os.log
 import Combine
 import WebKit
-
-#if NETP
 import NetworkProtection
-#endif
 
 final class MainMenu: NSMenu {
 
@@ -131,10 +128,8 @@ final class MainMenu: NSMenu {
         updateBookmarksBarMenuItem()
         updateShortcutMenuItems()
 
-#if NETP
         updateNetworkProtectionServerListMenuItems()
         updateNetworkProtectionRegistrationKeyValidityMenuItems()
-#endif
     }
 
     private func setup() {
@@ -272,7 +267,6 @@ final class MainMenu: NSMenu {
         toggleDownloadsShortcutMenuItem?.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .downloads)
     }
 
-#if NETP
     private func updateNetworkProtectionServerListMenuItems() {
         guard let submenu = networkProtectionPreferredServerLocationItem?.submenu, let automaticItem = submenu.items.first else {
             assertionFailure("\(#function): Failed to get submenu")
@@ -343,7 +337,7 @@ final class MainMenu: NSMenu {
         validityMenu.isHidden = true
         #endif
     }
-#endif
+
 }
 
 extension MainMenu: NSMenuDelegate {
