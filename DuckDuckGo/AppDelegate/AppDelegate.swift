@@ -210,9 +210,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
         syncStateCancellable = syncService.statePublisher
             .prepend(syncService.state)
-            .filter { [SyncState.active, .inactive].contains($0) }
-            .sink { state in
-                LocalBookmarkManager.shared.updateBookmarkDatabaseCleanupSchedule(shouldEnable: state == .inactive)
+            .map { $0 == .inactive }
+            .removeDuplicates()
+            .sink { isSyncDisabled in
+                LocalBookmarkManager.shared.updateBookmarkDatabaseCleanupSchedule(shouldEnable: isSyncDisabled)
             }
     }
 
