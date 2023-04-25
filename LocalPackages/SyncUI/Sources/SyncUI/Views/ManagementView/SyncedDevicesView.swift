@@ -66,12 +66,8 @@ struct SyncedDevicesView<ViewModel>: View where ViewModel: ManagementViewModel {
                             model.presentRemoveDevice(device)
                         }
                         .visibility(hoveredDevice?.id == device.id ? .visible : .gone)
-                    }.onHover { hover in
-                        if hover {
-                            hoveredDevice = device
-                        } else {
-                            hoveredDevice = nil
-                        }
+                    }.onHover { hovering in
+                        hoveredDevice = hovering ? device : nil
                     }
                 }
             }
