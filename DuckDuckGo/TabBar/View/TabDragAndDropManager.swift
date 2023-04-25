@@ -51,13 +51,14 @@ final class TabDragAndDropManager {
     @discardableResult
     func performDragAndDropIfNeeded() -> Bool {
         if let sourceUnit = sourceUnit, let destinationUnit = destinationUnit,
-           sourceUnit.tabCollectionViewModel !== destinationUnit.tabCollectionViewModel {
+           sourceUnit.tabCollectionViewModel !== destinationUnit.tabCollectionViewModel &&
+            sourceUnit.tabCollectionViewModel?.isBurner ==
+                    destinationUnit.tabCollectionViewModel?.isBurner {
 
             performDragAndDrop(from: sourceUnit, to: destinationUnit)
             clear()
             return true
         } else {
-            clear()
             return false
         }
     }

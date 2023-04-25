@@ -35,6 +35,7 @@ final class MainMenu: NSMenu {
 
     // MARK: - File
     @IBOutlet weak var newWindowMenuItem: NSMenuItem!
+    @IBOutlet weak var newBurnerWindowMenuItem: NSMenuItem!
     @IBOutlet weak var newTabMenuItem: NSMenuItem!
     @IBOutlet weak var openLocationMenuItem: NSMenuItem!
     @IBOutlet weak var closeWindowMenuItem: NSMenuItem!
@@ -113,6 +114,7 @@ final class MainMenu: NSMenu {
 
     // MARK: - Lifecycle
 
+    @MainActor
     override func update() {
         super.update()
 
@@ -132,8 +134,10 @@ final class MainMenu: NSMenu {
         updateBookmarksBarMenuItem()
         updateShortcutMenuItems()
         updateLoggingMenuItems()
+        updateBurnerWindowMenuItem()
     }
 
+    @MainActor
     func setup(with featureFlagger: FeatureFlagger) {
         self.delegate = self
 
@@ -146,6 +150,7 @@ final class MainMenu: NSMenu {
         setupDebugMenuItem(with: featureFlagger)
         subscribeToBookmarkList()
         subscribeToFavicons()
+        updateBurnerWindowMenuItem()
     }
 
     // MARK: - Bookmarks
@@ -262,6 +267,14 @@ final class MainMenu: NSMenu {
         toggleAutofillShortcutMenuItem?.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .autofill)
         toggleBookmarksShortcutMenuItem?.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .bookmarks)
         toggleDownloadsShortcutMenuItem?.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .downloads)
+    }
+
+    @MainActor
+    private func updateBurnerWindowMenuItem() {
+        if let appDelegate = NSApplication.shared.delegate as? AppDelegate,
+           !appDelegate.internalUserDecider.isInternalUser {
+            newBurnerWindowMenuItem.isHidden = true
+        }
     }
 
     // MARK: - Logging

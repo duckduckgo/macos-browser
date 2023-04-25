@@ -20,29 +20,11 @@ import SwiftUI
 
 public extension View {
     func roundedBorder() -> some View {
-        modifier(RoundedBorderView())
-    }
-}
-
-struct RoundedBorderView: ViewModifier {
-    func body(content: Content) -> some View {
-        RoundedBorder {
-            content
-        }
-    }
-}
-
-struct RoundedBorder<Content>: View where Content: View {
-    @ViewBuilder let content: () -> Content
-
-    var body: some View {
-        ZStack {
+        background(ZStack {
             RoundedRectangle(cornerRadius: 8)
                 .stroke(Color("BlackWhite10"), lineWidth: 1)
             RoundedRectangle(cornerRadius: 8)
                 .fill(Color("BlackWhite1"))
-
-            content()
-        }
+        })
     }
 }
