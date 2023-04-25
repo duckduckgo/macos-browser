@@ -40,9 +40,10 @@ final class SyncBookmarksProvider: DataProviding {
 
         return await withCheckedContinuation { continuation in
 
+            let context = database.makeContext(concurrencyType: .privateQueueConcurrencyType)
+
             var syncableBookmarks: [Syncable] = []
             context.performAndWait {
-                context.refreshAllObjects()
                 let bookmarks = BookmarkUtils.fetchModifiedBookmarks(context)
                 syncableBookmarks = bookmarks.compactMap { try? Syncable(bookmark: $0, encryptedWith: crypter) }
             }
@@ -56,8 +57,10 @@ final class SyncBookmarksProvider: DataProviding {
 
         return await withCheckedContinuation { continuation in
             var syncableBookmarks: [Syncable] = []
+
+            let context = database.makeContext(concurrencyType: .privateQueueConcurrencyType)
+
             context.performAndWait {
-                context.refreshAllObjects()
                 let fetchRequest = BookmarkEntity.fetchRequest()
                 let bookmarks = (try? context.fetch(fetchRequest)) ?? []
                 syncableBookmarks = bookmarks.compactMap { try? Syncable(bookmark: $0, encryptedWith: crypter) }
@@ -73,8 +76,9 @@ final class SyncBookmarksProvider: DataProviding {
         await withCheckedContinuation { continuation in
             var saveError: Error?
 
-            context.performAndWait {
+            let context = database.makeContext(concurrencyType: .privateQueueConcurrencyType)
 
+            context.performAndWait {
                 // clean up sent items
 
                 let identifiers = sent.compactMap { $0.payload["id"] as? String }
@@ -190,12 +194,12 @@ final class SyncBookmarksProvider: DataProviding {
     }
 
     init(database: CoreDataDatabase, metadataStore: SyncMetadataStore) {
-        self.context = database.makeContext(concurrencyType: .privateQueueConcurrencyType)
+        self.database = database
         self.metadataStore = metadataStore
         self.metadataStore.registerFeature(named: feature.name)
     }
 
-    private let context: NSManagedObjectContext
+    private let database: CoreDataDatabase
     private let metadataStore: SyncMetadataStore
 }
 
