@@ -135,27 +135,22 @@ final class SyncBookmarksProvider: DataProviding {
 
         let bookmarks = (try? context.fetch(request)) ?? []
 
-        var existingByUUID = [String: BookmarkEntity]()
-        bookmarks.forEach { bookmark in
+        var existingByUUID: [String: BookmarkEntity] = bookmarks.reduce(into: .init()) { partialResult, bookmark in
             guard let uuid = bookmark.uuid else {
                 return
             }
-            existingByUUID[uuid] = bookmark
+            partialResult[uuid] = bookmark
         }
 
-        var processedUUIDs = [String]()
-        for bookmark in bookmarks {
-            if let syncable = received.first(where: { $0.payload["id"] as? String == bookmark.uuid }) {
-                try? bookmark.update(with: syncable, in: context, using: crypter, existing: &existingByUUID)
-                if let uuid = bookmark.uuid {
-                    processedUUIDs.append(uuid)
-                }
+        let processedUUIDs: [String] = bookmarks.reduce(into: .init()) { partialResult, bookmark in
+            guard let syncable = received.first(where: { $0.payload["id"] as? String == bookmark.uuid }) else {
+                return
+            }
+            try? bookmark.update(with: syncable, in: context, using: crypter, existing: &existingByUUID)
+            if let uuid = bookmark.uuid {
+                partialResult.append(uuid)
             }
         }
-
-        var newBookmarks = [String: BookmarkEntity]()
-
-        let childToParentMap = received.mapParentFolders()
 
         let favoritesUUIDs: Set<String> = {
             guard let favoritesFolder = received.first(where: { $0.payload["id"] as? String == BookmarkEntity.Constants.favoritesFolderID }),
@@ -167,12 +162,14 @@ final class SyncBookmarksProvider: DataProviding {
             return Set(children)
         }()
 
-        for syncable in received {
-            guard let uuid = syncable.payload["id"] as? String else {
-                continue
+        var newBookmarks = [String: BookmarkEntity]()
+
+        let validReceivedItems: [Syncable] = received.filter { syncable in
+            guard let uuid = syncable.payload["id"] as? String, syncable.payload["deleted"] == nil else {
+                return false
             }
             if processedUUIDs.contains(uuid) {
-                continue
+                return true
             }
 
             let bookmark = BookmarkEntity(context: context)
@@ -182,9 +179,12 @@ final class SyncBookmarksProvider: DataProviding {
                 bookmark.addToFavorites(favoritesRoot: favoritesFolder)
             }
             newBookmarks[uuid] = bookmark
+            return true
         }
 
-        for syncable in received {
+        let childToParentMap = received.mapParentFolders()
+
+        for syncable in validReceivedItems {
             guard let uuid = syncable.payload["id"] as? String, let bookmark = newBookmarks[uuid], let parentUUID = childToParentMap[uuid] else {
                 continue
             }
