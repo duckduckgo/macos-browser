@@ -150,7 +150,6 @@
 		3706FAC2293F65D500E42796 /* FaviconSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAEF6BC7276A081C0024DCF4 /* FaviconSelector.swift */; };
 		3706FAC3293F65D500E42796 /* AddEditFavoriteViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85589E7927BBB8620038AD11 /* AddEditFavoriteViewController.swift */; };
 		3706FAC4293F65D500E42796 /* PrintingUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B2E7D6226FF9D6500D2DB17 /* PrintingUserScript.swift */; };
-		3706FAC5293F65D500E42796 /* (null) in Sources */ = {isa = PBXBuildFile; };
 		3706FAC6293F65D500E42796 /* ConnectBitwardenViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BBDEE9028FC14760092FAA6 /* ConnectBitwardenViewController.swift */; };
 		3706FAC8293F65D500E42796 /* AppTrackerDataSetProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9833912E27AAA3CE00DAF119 /* AppTrackerDataSetProvider.swift */; };
 		3706FAC9293F65D500E42796 /* EncryptionKeyGeneration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA1A6B2258B080A00F6F690 /* EncryptionKeyGeneration.swift */; };
@@ -164,7 +163,6 @@
 		3706FAD2293F65D500E42796 /* Atb.swift in Sources */ = {isa = PBXBuildFile; fileRef = B69B50352726A11F00758A2B /* Atb.swift */; };
 		3706FAD3293F65D500E42796 /* DownloadsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B1E87F26D5DA9B0062C350 /* DownloadsViewController.swift */; };
 		3706FAD4293F65D500E42796 /* DataExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85AC3AF625D5DBFD00C7D2AA /* DataExtension.swift */; };
-		3706FAD5293F65D500E42796 /* (null) in Sources */ = {isa = PBXBuildFile; };
 		3706FAD6293F65D500E42796 /* ConfigurationStoring.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85480FCE25D1AA22009424E3 /* ConfigurationStoring.swift */; };
 		3706FAD7293F65D500E42796 /* Feedback.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA3D531A27A2F57E00074EC1 /* Feedback.swift */; };
 		3706FAD8293F65D500E42796 /* RequestFilePermissionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB99D0526FE1979001E4761 /* RequestFilePermissionViewController.swift */; };
@@ -2023,7 +2021,6 @@
 		7BFA78C5299E89F30003284F /* FaviconSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAEF6BC7276A081C0024DCF4 /* FaviconSelector.swift */; };
 		7BFA78C6299E89F30003284F /* AddEditFavoriteViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85589E7927BBB8620038AD11 /* AddEditFavoriteViewController.swift */; };
 		7BFA78C7299E89F30003284F /* PrintingUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B2E7D6226FF9D6500D2DB17 /* PrintingUserScript.swift */; };
-		7BFA78C8299E89F30003284F /* (null) in Sources */ = {isa = PBXBuildFile; };
 		7BFA78C9299E89F30003284F /* BWError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DDF076028F815AD00EDFBE3 /* BWError.swift */; };
 		7BFA78CA299E89F30003284F /* ConnectBitwardenViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BBDEE9028FC14760092FAA6 /* ConnectBitwardenViewController.swift */; };
 		7BFA78CB299E89F30003284F /* AppTrackerDataSetProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9833912E27AAA3CE00DAF119 /* AppTrackerDataSetProvider.swift */; };
@@ -2038,7 +2035,6 @@
 		7BFA78D4299E89F30003284F /* Atb.swift in Sources */ = {isa = PBXBuildFile; fileRef = B69B50352726A11F00758A2B /* Atb.swift */; };
 		7BFA78D5299E89F30003284F /* DownloadsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B1E87F26D5DA9B0062C350 /* DownloadsViewController.swift */; };
 		7BFA78D6299E89F30003284F /* DataExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85AC3AF625D5DBFD00C7D2AA /* DataExtension.swift */; };
-		7BFA78D7299E89F30003284F /* (null) in Sources */ = {isa = PBXBuildFile; };
 		7BFA78D8299E89F30003284F /* ConfigurationStoring.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85480FCE25D1AA22009424E3 /* ConfigurationStoring.swift */; };
 		7BFA78D9299E89F30003284F /* Feedback.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA3D531A27A2F57E00074EC1 /* Feedback.swift */; };
 		7BFA78DA299E89F30003284F /* WKWebViewExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA92127625ADA07900600CD4 /* WKWebViewExtension.swift */; };
@@ -3107,6 +3103,8 @@
 		B6C0B24626E9CB190031CB7F /* RunLoopExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C0B24526E9CB190031CB7F /* RunLoopExtensionTests.swift */; };
 		B6C2C9EF276081AB005B7F0A /* DeallocationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C2C9EE276081AB005B7F0A /* DeallocationTests.swift */; };
 		B6C2C9F62760B659005B7F0A /* TestDataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = B6C2C9F42760B659005B7F0A /* TestDataModel.xcdatamodeld */; };
+		B6C69E6629F15EF000BD8AED /* NetworkProtectionLatencyReporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C69E5E29F129C500BD8AED /* NetworkProtectionLatencyReporter.swift */; };
+		B6C69E6729F15EF000BD8AED /* NetworkProtectionLatencyReporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C69E5E29F129C500BD8AED /* NetworkProtectionLatencyReporter.swift */; };
 		B6CF78DE267B099C00CD4F13 /* WKNavigationActionExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6CF78DD267B099C00CD4F13 /* WKNavigationActionExtension.swift */; };
 		B6DA06E12913AEDC00225DE2 /* TestNavigationDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6DA06E02913AEDB00225DE2 /* TestNavigationDelegate.swift */; };
 		B6DA06E22913AEDC00225DE2 /* TestNavigationDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6DA06E02913AEDB00225DE2 /* TestNavigationDelegate.swift */; };
@@ -3126,6 +3124,8 @@
 		B6DB3CF926A00E2D00D459B7 /* AVCaptureDevice+SwizzledAuthState.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6DB3CF826A00E2D00D459B7 /* AVCaptureDevice+SwizzledAuthState.swift */; };
 		B6DB3CFB26A17CB800D459B7 /* PermissionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6DB3CFA26A17CB800D459B7 /* PermissionModel.swift */; };
 		B6E319382953446000DD3BCF /* Assertions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6E319372953446000DD3BCF /* Assertions.swift */; };
+		B6E4442829F79E6500CB1CB4 /* NetworkConnectionType.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6E4442729F79E6500CB1CB4 /* NetworkConnectionType.swift */; };
+		B6E4442929F79E6500CB1CB4 /* NetworkConnectionType.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6E4442729F79E6500CB1CB4 /* NetworkConnectionType.swift */; };
 		B6E61EE3263AC0C8004E11AB /* FileManagerExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6E61EE2263AC0C8004E11AB /* FileManagerExtension.swift */; };
 		B6E61EE8263ACE16004E11AB /* UTType.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6E61EE7263ACE16004E11AB /* UTType.swift */; };
 		B6F1C80B2761C45400334924 /* LocalUnprotectedDomains.swift in Sources */ = {isa = PBXBuildFile; fileRef = 336B39E22726B4B700C417D3 /* LocalUnprotectedDomains.swift */; };
@@ -4172,6 +4172,7 @@
 		B6C0B24526E9CB190031CB7F /* RunLoopExtensionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RunLoopExtensionTests.swift; sourceTree = "<group>"; };
 		B6C2C9EE276081AB005B7F0A /* DeallocationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeallocationTests.swift; sourceTree = "<group>"; };
 		B6C2C9F52760B659005B7F0A /* Permissions.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Permissions.xcdatamodel; sourceTree = "<group>"; };
+		B6C69E5E29F129C500BD8AED /* NetworkProtectionLatencyReporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionLatencyReporter.swift; sourceTree = "<group>"; };
 		B6CF78DD267B099C00CD4F13 /* WKNavigationActionExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WKNavigationActionExtension.swift; sourceTree = "<group>"; };
 		B6CF78E2267B0A1900CD4F13 /* WKNavigationAction+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "WKNavigationAction+Private.h"; sourceTree = "<group>"; };
 		B6DA06E02913AEDB00225DE2 /* TestNavigationDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestNavigationDelegate.swift; sourceTree = "<group>"; };
@@ -4188,9 +4189,13 @@
 		B6DB3CF826A00E2D00D459B7 /* AVCaptureDevice+SwizzledAuthState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AVCaptureDevice+SwizzledAuthState.swift"; sourceTree = "<group>"; };
 		B6DB3CFA26A17CB800D459B7 /* PermissionModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionModel.swift; sourceTree = "<group>"; };
 		B6E319372953446000DD3BCF /* Assertions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Assertions.swift; sourceTree = "<group>"; };
+		B6E4442729F79E6500CB1CB4 /* NetworkConnectionType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkConnectionType.swift; sourceTree = "<group>"; };
 		B6E61EE2263AC0C8004E11AB /* FileManagerExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileManagerExtension.swift; sourceTree = "<group>"; };
 		B6E61EE7263ACE16004E11AB /* UTType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UTType.swift; sourceTree = "<group>"; };
 		B6F41030264D2B23003DA42C /* ProgressExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressExtension.swift; sourceTree = "<group>"; };
+		B6F7125829F2C9AC00594A45 /* NetworkProtectionAssetsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkProtectionAssetsTests.swift; sourceTree = "<group>"; };
+		B6F7125929F2C9AC00594A45 /* NetworkProtectionStatusViewModelTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkProtectionStatusViewModelTests.swift; sourceTree = "<group>"; };
+		B6F7125A29F2C9AC00594A45 /* NetworkProtectionStatusBarMenuTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkProtectionStatusBarMenuTests.swift; sourceTree = "<group>"; };
 		B6FA893C269C423100588ECD /* PrivacyDashboard.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = PrivacyDashboard.storyboard; sourceTree = "<group>"; };
 		B6FA893E269C424500588ECD /* PrivacyDashboardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyDashboardViewController.swift; sourceTree = "<group>"; };
 		B6FA8940269C425400588ECD /* PrivacyDashboardPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyDashboardPopover.swift; sourceTree = "<group>"; };
@@ -5428,6 +5433,7 @@
 				7BFA7816299E76700003284F /* IPCConnection.swift */,
 				7BFA7821299E76700003284F /* NETunnelProviderProtocol+Extension.swift */,
 				7BFA7819299E76700003284F /* PacketTunnelProvider.swift */,
+				B6E4442729F79E6500CB1CB4 /* NetworkConnectionType.swift */,
 				7BACE46129C7847F00A8475B /* NetworkProtectionConnectionBandwidthAnalyzer.swift */,
 				7BFA7814299E76700003284F /* NetworkProtectionExtensionMachService.swift */,
 				7BFA781B299E76700003284F /* NetworkProtectionBundle.swift */,
@@ -5435,6 +5441,7 @@
 				7BFA7820299E76700003284F /* NetworkProtectionTunnelErrorStore.swift */,
 				7B1A451429C0E237003AA158 /* NetworkProtectionTimer.swift */,
 				7BFA7815299E76700003284F /* NetworkProtectionConnectionTester.swift */,
+				B6C69E5E29F129C500BD8AED /* NetworkProtectionLatencyReporter.swift */,
 				7BFA7817299E76700003284F /* NetworkProtectionNotificationsPresenter.swift */,
 				7BFA781C299E76700003284F /* NetworkProtectionUNNotificationsPresenter.swift */,
 				7BFA7822299E76700003284F /* NetworkProtectionSharedState.swift */,
@@ -5990,6 +5997,7 @@
 				EEF53E162950CEB6002D78F4 /* JSAlert */,
 				378205F9283C275E00D1D4AA /* Menus */,
 				AA91F83627076ED100771A0D /* Navigation Bar */,
+				B6F7125729F2C9AC00594A45 /* NetworkProtection */,
 				85F487B3276A8F1B003CE668 /* Onboarding */,
 				1D3B1AB7293405F5006F4388 /* PasswordManagers */,
 				B6106BA126A7BE430013B453 /* Permissions */,
@@ -7204,6 +7212,16 @@
 			path = Statistics;
 			sourceTree = "<group>";
 		};
+		B6F7125729F2C9AC00594A45 /* NetworkProtection */ = {
+			isa = PBXGroup;
+			children = (
+				B6F7125829F2C9AC00594A45 /* NetworkProtectionAssetsTests.swift */,
+				B6F7125929F2C9AC00594A45 /* NetworkProtectionStatusViewModelTests.swift */,
+				B6F7125A29F2C9AC00594A45 /* NetworkProtectionStatusBarMenuTests.swift */,
+			);
+			path = NetworkProtection;
+			sourceTree = "<group>";
+		};
 		B6FA893A269C414900588ECD /* Privacy Dashboard */ = {
 			isa = PBXGroup;
 			children = (
@@ -8390,7 +8408,6 @@
 				3706FAC2293F65D500E42796 /* FaviconSelector.swift in Sources */,
 				3706FAC3293F65D500E42796 /* AddEditFavoriteViewController.swift in Sources */,
 				3706FAC4293F65D500E42796 /* PrintingUserScript.swift in Sources */,
-				3706FAC5293F65D500E42796 /* (null) in Sources */,
 				3706FEBF293F6EFF00E42796 /* BWError.swift in Sources */,
 				3706FAC6293F65D500E42796 /* ConnectBitwardenViewController.swift in Sources */,
 				3706FAC8293F65D500E42796 /* AppTrackerDataSetProvider.swift in Sources */,
@@ -8405,7 +8422,6 @@
 				3706FAD2293F65D500E42796 /* Atb.swift in Sources */,
 				3706FAD3293F65D500E42796 /* DownloadsViewController.swift in Sources */,
 				3706FAD4293F65D500E42796 /* DataExtension.swift in Sources */,
-				3706FAD5293F65D500E42796 /* (null) in Sources */,
 				3706FAD6293F65D500E42796 /* ConfigurationStoring.swift in Sources */,
 				3706FAD7293F65D500E42796 /* Feedback.swift in Sources */,
 				3707C722294B5D2900682A9F /* WKWebViewExtension.swift in Sources */,
@@ -9121,6 +9137,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7B2CAC0929A93078004C23BA /* main.swift in Sources */,
+				B6C69E6729F15EF000BD8AED /* NetworkProtectionLatencyReporter.swift in Sources */,
 				7BB8BA5A29A94DEE00D64342 /* TunnelConfiguration+WgQuickConfig.swift in Sources */,
 				7BB8BA5629A94D2800D64342 /* Logging.swift in Sources */,
 				7BB8BA6429A94F6C00D64342 /* APIRequest.swift in Sources */,
@@ -9135,6 +9152,7 @@
 				7BB8BA6129A94F4B00D64342 /* AppVersion.swift in Sources */,
 				7BB8BA4829A94BFE00D64342 /* IPCConnection.swift in Sources */,
 				7BB8BA5E29A94E3400D64342 /* NetworkProtectionPixelEvent.swift in Sources */,
+				B6E4442929F79E6500CB1CB4 /* NetworkConnectionType.swift in Sources */,
 				7B1A451829C0E23C003AA158 /* NetworkProtectionTimer.swift in Sources */,
 				7BB8BA4A29A94C0B00D64342 /* PacketTunnelProvider.swift in Sources */,
 				7BB8BA4B29A94C1400D64342 /* NetworkProtectionExtensionMachService.swift in Sources */,
@@ -9798,11 +9816,13 @@
 				7BFA7B3F299E8D1A0003284F /* PacketTunnelProvider.swift in Sources */,
 				7BFA7B49299E8D5D0003284F /* UserText+NetworkProtectionExtensions.swift in Sources */,
 				7BACE46329C7852C00A8475B /* NetworkProtectionConnectionBandwidthAnalyzer.swift in Sources */,
+				B6C69E6629F15EF000BD8AED /* NetworkProtectionLatencyReporter.swift in Sources */,
 				7BFA7B42299E8D2E0003284F /* NetworkProtectionTunnelErrorStore.swift in Sources */,
 				7B37486D299EA60400568220 /* APIHeaders.swift in Sources */,
 				7B1A451729C0E23B003AA158 /* NetworkProtectionTimer.swift in Sources */,
 				7BFA7B43299E8D360003284F /* NetworkProtectionConnectionTester.swift in Sources */,
 				7BFA7B3B299E8CAF0003284F /* NetworkProtectionSelectedServerStore.swift in Sources */,
+				B6E4442829F79E6500CB1CB4 /* NetworkConnectionType.swift in Sources */,
 				7BFA7B47299E8D510003284F /* NetworkProtectionSharedState.swift in Sources */,
 				7BFA7B46299E8D4A0003284F /* NetworkProtectionUNNotificationsPresenter.swift in Sources */,
 				7B37486F299EA69100568220 /* BundleExtension.swift in Sources */,
@@ -9886,7 +9906,6 @@
 				7BFA78C5299E89F30003284F /* FaviconSelector.swift in Sources */,
 				7BFA78C6299E89F30003284F /* AddEditFavoriteViewController.swift in Sources */,
 				7BFA78C7299E89F30003284F /* PrintingUserScript.swift in Sources */,
-				7BFA78C8299E89F30003284F /* (null) in Sources */,
 				7BFA78C9299E89F30003284F /* BWError.swift in Sources */,
 				7BFA78CA299E89F30003284F /* ConnectBitwardenViewController.swift in Sources */,
 				7BFA78CB299E89F30003284F /* AppTrackerDataSetProvider.swift in Sources */,
@@ -9903,7 +9922,6 @@
 				7BFA78D4299E89F30003284F /* Atb.swift in Sources */,
 				7BFA78D5299E89F30003284F /* DownloadsViewController.swift in Sources */,
 				7BFA78D6299E89F30003284F /* DataExtension.swift in Sources */,
-				7BFA78D7299E89F30003284F /* (null) in Sources */,
 				7BFA78D8299E89F30003284F /* ConfigurationStoring.swift in Sources */,
 				7BFA78D9299E89F30003284F /* Feedback.swift in Sources */,
 				7BFA7B1F299E8A620003284F /* String+ArrayConversion.swift in Sources */,

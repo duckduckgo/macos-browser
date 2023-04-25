@@ -18,6 +18,7 @@
 //
 
 import Foundation
+import Network
 
 /// Represents connectivity and location information about a server. This object is retrieved from the `/servers` and `/register` endpoints.
 /// The server may have an array of hostnames, IPs, or both.
@@ -40,22 +41,9 @@ public struct NetworkProtectionServerInfo: Codable, Equatable {
     public let name: String
     public let publicKey: String
     public let hostNames: [String]
-    public let ips: [String]
-    public let port: Int
+    public let ips: [AnyIPAddress]
+    public let port: UInt16
     public let attributes: ServerAttributes
-
-    /// Calculates the total available addresses for this server.
-    public var serverAddresses: [String] {
-        let addresses = hostNames + ips
-        return addresses.map { hostname in
-            return "\(hostname):\(port)"
-        }
-    }
-
-    /// Returns the physical location of the server, if one is available. For instance, this may return "Amsterdam, NL". If location attributes are not present, this will return the server name.
-    public var serverLocation: String {
-        return "\(attributes.city), \(attributes.country.localizedUppercase)"
-    }
 
     enum CodingKeys: String, CodingKey {
         case name
@@ -64,6 +52,33 @@ public struct NetworkProtectionServerInfo: Codable, Equatable {
         case ips
         case port
         case attributes
+    }
+
+}
+
+extension NetworkProtectionServerInfo {
+
+    /// Returns the physical location of the server, if one is available. For instance, this may return "Amsterdam, NL". If location attributes are not present, this will return the server name.
+    public var serverLocation: String {
+        return "\(attributes.city), \(attributes.country.localizedUppercase)"
+    }
+
+    /// Calculates the total available addresses for this server.
+    public var endpoints: [Endpoint] {
+        let port = NWEndpoint.Port(integerLiteral: port)
+        return (hostNames.map({ NWEndpoint.Host($0) }) + ips.map(\.host)).map { Endpoint(host: $0, port: port) }
+    }
+
+    /// first available server Endpoint
+    public var endpoint: Endpoint? {
+        let port = NWEndpoint.Port(integerLiteral: port)
+        guard let host = hostNames.first.map({ NWEndpoint.Host($0) }) ?? ips.first?.host else { return nil }
+        return Endpoint(host: host, port: port)
+    }
+
+    /// first available IPv4 address
+    public var ipv4: IPv4Address? {
+        ips.lazy.compactMap(\.ipv4).first
     }
 
 }

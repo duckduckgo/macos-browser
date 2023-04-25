@@ -18,7 +18,7 @@
 
 import Foundation
 
-extension TimeInterval {
+public extension TimeInterval {
     static let day = days(1)
 
     static func seconds(_ amount: Int) -> TimeInterval {

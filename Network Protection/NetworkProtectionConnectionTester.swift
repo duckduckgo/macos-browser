@@ -93,11 +93,11 @@ final class NetworkProtectionConnectionTester {
     // MARK: - Test result handling
 
     private var failureCount = 0
-    private let resultHandler: (Result) -> Void
+    private let resultHandler: @MainActor (Result) -> Void
 
     // MARK: - Init & deinit
 
-    init(timerQueue: DispatchQueue, log: OSLog, resultHandler: @escaping (Result) -> Void) {
+    init(timerQueue: DispatchQueue, log: OSLog, resultHandler: @escaping @MainActor (Result) -> Void) {
         self.timerQueue = timerQueue
         self.log = log
         self.resultHandler = resultHandler
@@ -236,10 +236,10 @@ final class NetworkProtectionConnectionTester {
 
             if onlyVPNIsDown {
                 os_log("👎", log: log, type: .debug)
-                handleDisconnected()
+                await handleDisconnected()
             } else {
                 os_log("👍", log: log, type: .debug)
-                handleConnected()
+                await handleConnected()
             }
         }
     }
@@ -263,6 +263,7 @@ final class NetworkProtectionConnectionTester {
 
     // MARK: - Result handling
 
+    @MainActor
     private func handleConnected() {
         if failureCount == 0 {
             resultHandler(.connected)
@@ -273,6 +274,7 @@ final class NetworkProtectionConnectionTester {
         }
     }
 
+    @MainActor
     private func handleDisconnected() {
         failureCount += 1
         resultHandler(.disconnected(failureCount: failureCount))

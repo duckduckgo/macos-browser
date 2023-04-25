@@ -156,7 +156,7 @@ extension TunnelConfiguration {
                 output.append("AllowedIPs = \(allowedIPsString)\n")
             }
             if let endpoint = peer.endpoint {
-                output.append("Endpoint = \(endpoint.stringRepresentation)\n")
+                output.append("Endpoint = \(endpoint)\n")
             }
             if let persistentKeepAlive = peer.persistentKeepAlive {
                 output.append("PersistentKeepalive = \(persistentKeepAlive)\n")

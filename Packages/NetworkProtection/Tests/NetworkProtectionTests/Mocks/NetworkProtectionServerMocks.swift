@@ -19,6 +19,14 @@
 import Foundation
 @testable import NetworkProtection
 
+extension AnyIPAddress: ExpressibleByStringLiteral {
+
+    public init(stringLiteral: String) {
+        self.init(stringLiteral)!
+    }
+
+}
+
 extension NetworkProtectionServerInfo {
 
     static let mock = NetworkProtectionServerInfo(name: "Mock Server",

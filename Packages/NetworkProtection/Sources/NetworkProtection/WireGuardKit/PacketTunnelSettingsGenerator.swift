@@ -32,7 +32,7 @@ final class PacketTunnelSettingsGenerator {
             let result = resolvedEndpoint.map(Self.reresolveEndpoint)
             if case .success((_, let resolvedEndpoint)) = result {
                 if case .name = resolvedEndpoint.host { assert(false, "Endpoint is not resolved") }
-                wgSettings.append("endpoint=\(resolvedEndpoint.stringRepresentation)\n")
+                wgSettings.append("endpoint=\(resolvedEndpoint)\n")
             }
             resolutionResults.append(result)
         }
@@ -60,7 +60,7 @@ final class PacketTunnelSettingsGenerator {
             let result = resolvedEndpoint.map(Self.reresolveEndpoint)
             if case .success((_, let resolvedEndpoint)) = result {
                 if case .name = resolvedEndpoint.host { assert(false, "Endpoint is not resolved") }
-                wgSettings.append("endpoint=\(resolvedEndpoint.stringRepresentation)\n")
+                wgSettings.append("endpoint=\(resolvedEndpoint)\n")
             }
             resolutionResults.append(result)
 

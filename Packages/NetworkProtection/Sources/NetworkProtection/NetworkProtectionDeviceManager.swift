@@ -276,7 +276,7 @@ public actor NetworkProtectionDeviceManager: NetworkProtectionDeviceManagement {
             throw NetworkProtectionError.couldNotGetPeerPublicKey
         }
 
-        guard let serverAddress = server.serverInfo.serverAddresses.first, let serverEndpoint = Endpoint(from: serverAddress) else {
+        guard let serverEndpoint = server.serverInfo.endpoint else {
             throw NetworkProtectionError.couldNotGetPeerHostName
         }
 

@@ -9,6 +9,7 @@ import os
 import PixelKit
 import UserNotifications
 
+// swiftlint:disable:next type_body_length
 final class PacketTunnelProvider: NEPacketTunnelProvider {
 
     // MARK: - Error Handling
@@ -193,24 +194,26 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
     // MARK: - Connection tester
 
     private lazy var connectionTester: NetworkProtectionConnectionTester = {
-        NetworkProtectionConnectionTester(timerQueue: timerQueue, log: .networkProtectionConnectionTesterLog) { [weak self] result in
-
-            guard let self = self else {
-                return
-            }
+        NetworkProtectionConnectionTester(timerQueue: timerQueue, log: .networkProtectionConnectionTesterLog) { @MainActor [weak self] result in
+            guard let self else { return }
 
             switch result {
             case .connected:
                 self.tunnelHealth.isHavingConnectivityIssues = false
                 self.updateBandwidthAnalyzerAndRekeyIfExpired()
+                self.startLatencyReporter()
+
             case .reconnected:
                 self.tunnelHealth.isHavingConnectivityIssues = false
                 self.notificationsPresenter.showReconnectedNotification()
                 self.reasserting = false
                 self.updateBandwidthAnalyzerAndRekeyIfExpired()
+                self.startLatencyReporter()
+
             case .disconnected(let failureCount):
                 self.tunnelHealth.isHavingConnectivityIssues = true
                 self.bandwidthAnalyzer.reset()
+                self.latencyReporter.stop()
 
                 if failureCount == 1 {
                     self.notificationsPresenter.showReconnectingNotification()
@@ -224,10 +227,31 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         }
     }()
 
+    @MainActor
+    private func startLatencyReporter() {
+        guard let lastSelectedServerInfo,
+              let ip = lastSelectedServerInfo.ipv4 else {
+            assertionFailure("could not get server IPv4 address")
+            self.latencyReporter.stop()
+            return
+        }
+        if self.latencyReporter.isStarted {
+            if self.latencyReporter.currentIP == ip {
+                return
+            }
+            self.latencyReporter.stop()
+        }
+
+        self.latencyReporter.start(ip: ip) { [serverName=lastSelectedServerInfo.name] latency, networkType in
+            Pixel.fire(.networkProtectionLatency(ms: Int(latency * 1000), server: serverName, networkType: networkType), frequency: .standard)
+        }
+    }
+
     private var lastTestFailed = false
     private let bandwidthAnalyzer = NetworkProtectionConnectionBandwidthAnalyzer()
     private let tunnelHealth = NetworkProtectionTunnelHealthStore()
     private let controllerErrorStore = NetworkProtectionTunnelErrorStore()
+    private let latencyReporter = NetworkProtectionLatencyReporter(log: .networkProtection)
 
     // MARK: - Initializers
 
@@ -619,12 +643,12 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
     }
 
     private func handleGetServerAddress(_ messageData: Data, completionHandler: ((Data?) -> Void)? = nil) {
-        guard let serverAddress = lastSelectedServerInfo?.serverAddresses.first else {
+        guard let endpoint = lastSelectedServerInfo?.endpoint else {
             completionHandler?(nil)
             return
         }
 
-        completionHandler?(serverAddress.data(using: NetworkProtectionAppRequest.preferredStringEncoding))
+        completionHandler?(endpoint.description.data(using: NetworkProtectionAppRequest.preferredStringEncoding))
     }
 
     private func handleSetKeyValidity(_ messageData: Data, completionHandler: ((Data?) -> Void)? = nil) {

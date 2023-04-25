@@ -27,8 +27,9 @@ extension Endpoint: Hashable {
     }
 }
 
-extension Endpoint {
-    public var stringRepresentation: String {
+extension Endpoint: CustomStringConvertible {
+
+    public var description: String {
         switch host {
         case .name(let hostname, _):
             return "\(hostname):\(port)"
@@ -70,6 +71,7 @@ extension Endpoint {
         host = NWEndpoint.Host(hostString)
         port = endpointPort
     }
+
 }
 
 extension Endpoint {

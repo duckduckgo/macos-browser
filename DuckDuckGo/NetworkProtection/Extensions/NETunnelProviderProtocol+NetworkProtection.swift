@@ -53,7 +53,7 @@ extension NETunnelProviderProtocol {
 
         let endpoints = tunnelConfiguration.peers.compactMap(\.endpoint)
         if endpoints.count == 1 {
-            serverAddress = endpoints[0].stringRepresentation
+            serverAddress = endpoints[0].description
         } else if endpoints.isEmpty {
             serverAddress = "Unspecified"
         } else {

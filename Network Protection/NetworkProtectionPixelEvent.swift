@@ -30,6 +30,13 @@ extension Pixel {
         static let errorCode = "e"
         static let errorDesc = "d"
         static let errorCount = "c"
+
+        static let function = "function"
+        static let line = "line"
+
+        static let latency = "latency"
+        static let server = "server"
+        static let networkType = "net_type"
     }
 
     enum Values {
@@ -91,6 +98,8 @@ enum NetworkProtectionPixelEvent {
     case networkProtectionKeychainDeleteError(status: Int32)
 
     case networkProtectionRekeyCompleted
+
+    case networkProtectionLatency(ms: Int, server: String, networkType: NetworkConnectionType)
 
     case networkProtectionUnhandledError(function: String, line: Int, error: Error)
 
@@ -156,6 +165,8 @@ enum NetworkProtectionPixelEvent {
         case .networkProtectionRekeyCompleted:
             return "m_mac_netp_rekey_completed"
 
+        case .networkProtectionLatency:
+            return "m_mac_netp_latency"
         case .networkProtectionUnhandledError:
             return "m_mac_netp_unhandled_error"
         }
@@ -197,9 +208,16 @@ enum NetworkProtectionPixelEvent {
 
         case .networkProtectionUnhandledError(let function, let line, let error):
             var parameters = error.pixelParameters
-            parameters["function"] = function
-            parameters["line"] = String(line)
+            parameters[Pixel.Parameters.function] = function
+            parameters[Pixel.Parameters.line] = String(line)
             return parameters
+
+        case .networkProtectionLatency(ms: let latency, server: let server, networkType: let networkType):
+            return [
+                Pixel.Parameters.latency: String(latency),
+                Pixel.Parameters.server: server,
+                Pixel.Parameters.networkType: networkType.description
+            ]
 
         case .networkProtectionTunnelConfigurationNoServerRegistrationInfo,
              .networkProtectionTunnelConfigurationCouldNotSelectClosestServer,
