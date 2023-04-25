@@ -28,6 +28,7 @@ public protocol ManagementDialogModelDelegate: AnyObject {
     func saveRecoveryPDF()
     func turnOffSync()
     func updateDeviceName(_ name: String)
+    func removeDevice(_ device: SyncDevice)
 }
 
 public final class ManagementDialogModel: ObservableObject {

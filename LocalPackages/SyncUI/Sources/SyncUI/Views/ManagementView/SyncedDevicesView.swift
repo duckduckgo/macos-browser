@@ -19,7 +19,10 @@
 import SwiftUI
 
 struct SyncedDevicesView<ViewModel>: View where ViewModel: ManagementViewModel {
+
     @EnvironmentObject var model: ViewModel
+
+    @State var hoveredDevice: SyncDevice?
 
     var body: some View {
         VStack(spacing: 0) {
@@ -58,6 +61,17 @@ struct SyncedDevicesView<ViewModel>: View where ViewModel: ManagementViewModel {
                         SyncedDeviceIcon(kind: device.kind)
                     } centerContent: {
                         Text(device.name)
+                    } rightContent: {
+                        Button(UserText.removeDeviceButton) {
+                            model.presentRemoveDevice(device)
+                        }
+                        .visibility(hoveredDevice?.id == device.id ? .visible : .gone)
+                    }.onHover { hover in
+                        if hover {
+                            hoveredDevice = device
+                        } else {
+                            hoveredDevice = nil
+                        }
                     }
                 }
             }
