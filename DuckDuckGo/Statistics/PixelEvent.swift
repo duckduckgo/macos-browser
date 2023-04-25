@@ -24,9 +24,11 @@ import Configuration
 extension Pixel {
 
     enum Event {
-        case burn(repetition: Repetition = .init(key: "fire"),
-                  burnedTabs: BurnedTabs = .init(),
-                  burnedWindows: BurnedWindows = .init())
+        case burn(repetition: Repetition, burnedTabs: BurnedTabs, burnedWindows: BurnedWindows)
+        @MainActor
+        static func burn(repetition: Repetition = .init(key: "fire")) -> Event {
+            .burn(repetition: repetition, burnedTabs: .init(), burnedWindows: .init())
+        }
 
         case crash
 
@@ -115,28 +117,6 @@ extension Pixel {
         case jsPixel(_ pixel: AutofillUserScript.JSPixel)
         case duckPlayerJSPixel(_ pixel: YoutubeOverlayUserScript.JSPixel)
 
-        enum BookmarksBarSource {
-            case menuBar
-            case navigationBar
-            case bookmarksBar
-            case keyboardShortcut
-
-            var string: String {
-                switch self {
-                case .menuBar: return "menu-bar"
-                case .navigationBar: return "navigation-bar"
-                case .bookmarksBar: return "bookmarks-bar"
-                case .keyboardShortcut: return "keyboard-shortcut"
-                }
-            }
-        }
-
-        case bookmarksBarEnabled(_ source: BookmarksBarSource)
-        case bookmarksBarDisabled(_ source: BookmarksBarSource)
-
-        case bookmarksBarActive
-        case bookmarksBarInactive
-
         case debug(event: Debug, error: Error? = nil)
 
         enum Debug {
@@ -161,6 +141,7 @@ extension Pixel {
 
             case fileStoreWriteFailed
             case fileMoveToDownloadsFailed
+            case fileGetDownloadLocationFailed
 
             case suggestionsFetchFailed
             case appOpenURLFailed
@@ -250,6 +231,8 @@ extension Pixel {
 
             case invalidPayload(Configuration)
 
+            case burnerTabMisplaced
+
         }
 
     }
@@ -322,18 +305,6 @@ extension Pixel.Event {
         // This matches the SERP format
         case .duckPlayerJSPixel(let pixel):
             return "duck_player.mac.\(pixel.pixelName)"
-
-        case .bookmarksBarEnabled:
-            return "m_mac_bookmarks_bar_enabled"
-
-        case .bookmarksBarDisabled:
-            return "m_mac_bookmarks_bar_disabled"
-
-        case .bookmarksBarActive:
-            return "m_mac_bookmarks_bar_active"
-
-        case .bookmarksBarInactive:
-            return "m_mac_bookmarks_bar_inactive"
         }
     }
 }
@@ -378,6 +349,8 @@ extension Pixel.Event.Debug {
             return "fswf"
         case .fileMoveToDownloadsFailed:
             return "df"
+        case .fileGetDownloadLocationFailed:
+            return "dl"
 
         case .suggestionsFetchFailed:
             return "sgf"
@@ -534,6 +507,8 @@ extension Pixel.Event.Debug {
         case .bookmarksMigrationCouldNotRemoveOldStore: return "bookmarks_migration_could_not_remove_old_store"
 
         case .invalidPayload(let configuration): return "m_d_\(configuration.rawValue)_invalid_payload".lowercased()
+
+        case .burnerTabMisplaced: return "burner_tab_misplaced"
 
         }
     }

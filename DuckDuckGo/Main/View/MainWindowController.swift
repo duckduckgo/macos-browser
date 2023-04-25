@@ -17,9 +17,9 @@
 //
 
 import Cocoa
-import os.log
 import Combine
 
+@MainActor
 final class MainWindowController: NSWindowController {
 
     private static let windowFrameSaveName = "MainWindow"
@@ -35,30 +35,32 @@ final class MainWindowController: NSWindowController {
         return window?.standardWindowButton(.closeButton)?.superview
     }
 
-    init(mainViewController: MainViewController, popUp: Bool, fireViewModel: FireViewModel = FireCoordinator.fireViewModel) {
-        let makeWindow: (NSRect) -> NSWindow = popUp ? PopUpWindow.init(frame:) : MainWindow.init(frame:)
-
+    init(mainViewController: MainViewController, popUp: Bool, fireViewModel: FireViewModel? = nil) {
         let size = mainViewController.view.frame.size
         let moveToCenter = CGAffineTransform(translationX: ((NSScreen.main?.frame.width ?? 1024) - size.width) / 2,
                                              y: ((NSScreen.main?.frame.height ?? 790) - size.height) / 2)
         let frame = NSRect(origin: (NSScreen.main?.frame.origin ?? .zero).applying(moveToCenter),
                            size: size)
 
-        let window = makeWindow(frame)
+        let window = popUp ? PopUpWindow(frame: frame) : MainWindow(frame: frame)
         window.contentViewController = mainViewController
-        self.fireViewModel = fireViewModel
+        self.fireViewModel = fireViewModel ?? FireCoordinator.fireViewModel
 
         super.init(window: window)
 
         setupWindow()
         setupToolbar()
         subscribeToTrafficLightsAlpha()
-        subscribeToShouldPreventUserInteraction()
+        subscribeToIsFirePresentationInProgress()
         subscribeToResolutionChange()
     }
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
 
     private var shouldShowOnboarding: Bool {
@@ -80,14 +82,11 @@ final class MainWindowController: NSWindowController {
     }
 
     private func subscribeToResolutionChange() {
-        NotificationCenter.default.addObserver(forName: NSApplication.didChangeScreenParametersNotification,
-                                               object: NSApplication.shared,
-                                               queue: OperationQueue.main) { [weak self] _ in
-            self?.resizeWindowIfNeeded()
-        }
+        NotificationCenter.default.addObserver(self, selector: #selector(didChangeScreenParameters), name: NSApplication.didChangeScreenParametersNotification, object: NSApp)
     }
 
-    private func resizeWindowIfNeeded() {
+    @objc
+    private func didChangeScreenParameters(_ notification: NSNotification) {
         if let visibleWindowFrame = window?.screen?.visibleFrame,
            let windowFrame = window?.frame {
 
@@ -119,14 +118,14 @@ final class MainWindowController: NSWindowController {
             .assign(to: \.constant, onWeaklyHeld: tabBarViewController.pinnedTabsViewLeadingConstraint)
     }
 
-    private var shouldPreventUserInteractionCancellable: AnyCancellable?
-    private func subscribeToShouldPreventUserInteraction() {
-        shouldPreventUserInteractionCancellable = fireViewModel.shouldPreventUserInteraction
+    private var isFirePresentationInProgressCancellable: AnyCancellable?
+    private func subscribeToIsFirePresentationInProgress() {
+        isFirePresentationInProgressCancellable = fireViewModel.isFirePresentationInProgress
             .dropFirst()
             .removeDuplicates()
-            .sink(receiveValue: { [weak self] shouldPreventUserInteraction in
-                self?.moveTabBarView(toTitlebarView: !shouldPreventUserInteraction)
-                self?.userInteraction(prevented: shouldPreventUserInteraction)
+            .sink(receiveValue: { [weak self] _ in
+                guard let self else { return }
+                self.userInteraction(prevented: self.fireViewModel.fire.burningData != nil)
             })
     }
 
@@ -223,6 +222,18 @@ extension MainWindowController: NSWindowDelegate {
         DispatchQueue.main.async {
             WindowControllersManager.shared.unregister(self)
         }
+    }
+
+    func windowShouldClose(_ sender: NSWindow) -> Bool {
+        // Animate fire for Burner Window when closing
+        guard mainViewController.tabCollectionViewModel.isBurner else {
+            return true
+        }
+        Task {
+            await mainViewController.fireViewController.animateFireWhenClosing()
+            sender.close()
+        }
+        return false
     }
 
 }

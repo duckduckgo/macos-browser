@@ -17,7 +17,7 @@
 //
 
 import Cocoa
-import os.log
+import Common
 
 extension WindowsManager {
 
@@ -50,7 +50,7 @@ extension WindowsManager {
     }
 
     private class func setUpWindow(from item: WindowRestorationItem) {
-        guard let window = openNewWindow(with: item.model, showWindow: true) else { return }
+        guard let window = openNewWindow(with: item.model, isBurner: false, showWindow: true) else { return }
         window.setContentSize(item.frame.size)
         window.setFrameOrigin(item.frame.origin)
     }
@@ -59,6 +59,7 @@ extension WindowsManager {
 
 extension WindowControllersManager {
 
+    @MainActor
     func encodeState(with coder: NSCoder) {
         coder.encode(WindowManagerStateRestoration(windowControllersManager: self),
                      forKey: NSKeyedArchiveRootObjectKey)
@@ -103,6 +104,7 @@ final class WindowManagerStateRestoration: NSObject, NSSecureCoding {
         super.init()
     }
 
+    @MainActor
     init(windowControllersManager: WindowControllersManager) {
         self.windows = windowControllersManager.mainWindowControllers
             .filter { $0.window?.isPopUpWindow == false }
@@ -111,7 +113,7 @@ final class WindowManagerStateRestoration: NSObject, NSSecureCoding {
                 let rightIndex = rhs.window?.orderedIndex ?? Int.min
                 return leftIndex < rightIndex
             }
-            .map(WindowRestorationItem.init(windowController:))
+            .compactMap { WindowRestorationItem(windowController: $0) }
         self.keyWindowIndex = windowControllersManager.lastKeyMainWindowController.flatMap {
             windowControllersManager.mainWindowControllers.firstIndex(of: $0)
         }
@@ -137,7 +139,13 @@ final class WindowRestorationItem: NSObject, NSSecureCoding {
     let model: TabCollectionViewModel
     let frame: NSRect
 
-    init(windowController: MainWindowController) {
+    @MainActor
+    init?(windowController: MainWindowController) {
+        guard !windowController.mainViewController.tabCollectionViewModel.isBurner else {
+            // Don't persist burner windows
+            return nil
+        }
+
         self.frame = windowController.window!.frame
         self.model = windowController.mainViewController.tabCollectionViewModel
     }

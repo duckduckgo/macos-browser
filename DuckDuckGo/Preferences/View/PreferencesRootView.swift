@@ -22,7 +22,7 @@ import SyncUI
 
 fileprivate extension Preferences.Const {
     static let sidebarWidth: CGFloat = 256
-    static let paneContentWidth: CGFloat = 512
+    static let paneContentWidth: CGFloat = 524
     static let panePaddingHorizontal: CGFloat = 48
     static let panePaddingVertical: CGFloat = 40
 }
@@ -47,11 +47,7 @@ extension Preferences {
                             case .general:
                                 GeneralView(defaultBrowserModel: DefaultBrowserPreferences(), startupModel: StartupPreferences())
                             case .sync:
-                                if let syncService = (NSApp.delegate as? AppDelegate)?.syncService {
-                                    SyncUI.ManagementView(model: SyncPreferences(syncService: syncService))
-                                } else {
-                                    FailedAssertionView("Failed to initialize Sync Management View")
-                                }
+                                SyncView()
                             case .appearance:
                                 AppearanceView(model: .shared)
                             case .privacy:
@@ -77,6 +73,18 @@ extension Preferences {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color("InterfaceBackgroundColor"))
+        }
+    }
+
+}
+
+struct SyncView: View {
+
+    var body: some View {
+        if let syncService = (NSApp.delegate as? AppDelegate)?.syncService {
+            SyncUI.ManagementView(model: SyncPreferences(syncService: syncService))
+        } else {
+            FailedAssertionView("Failed to initialize Sync Management View")
         }
     }
 

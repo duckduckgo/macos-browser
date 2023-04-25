@@ -26,6 +26,7 @@ enum NavigationDecision {
     case cancel
 }
 
+@MainActor
 final class ContextMenuManager: NSObject {
     private var userScriptCancellable: AnyCancellable?
 
@@ -34,6 +35,7 @@ final class ContextMenuManager: NSObject {
     private var selectedText: String?
     fileprivate weak var webView: WKWebView?
 
+    @MainActor
     init(contextMenuScriptPublisher: some Publisher<ContextMenuUserScript?, Never>) {
         super.init()
 
@@ -59,7 +61,7 @@ extension ContextMenuManager: NewWindowPolicyDecisionMaker {
 extension ContextMenuManager {
 
     /// Defines which functions will handle matching WebKit Menu Items
-    private static let menuItemHandlers: [WKMenuItemIdentifier: ((ContextMenuManager) -> (NSMenuItem, Int, NSMenu) -> Void)] = [
+    private static let menuItemHandlers: [WKMenuItemIdentifier: ((ContextMenuManager) -> @MainActor (NSMenuItem, Int, NSMenu) -> Void)] = [
         .openLink: handleOpenLinkItem,
         .openLinkInNewWindow: handleOpenLinkInNewWindowItem,
         .downloadLinkedFile: handleDownloadLinkedFileItem,
@@ -73,20 +75,26 @@ extension ContextMenuManager {
         .openFrameInNewWindow: handleOpenFrameInNewWindowItem
     ]
 
+    private var isCurrentWindowBurner: Bool {
+        (webView?.window?.windowController as? MainWindowController)?.mainViewController.isBurner ?? false
+    }
+
     private func handleOpenLinkItem(_ item: NSMenuItem, at index: Int, in menu: NSMenu) {
         guard let openLinkInNewWindowItem = originalItems?[.openLinkInNewWindow] else {
             assertionFailure("WKMenuItemIdentifierOpenLinkInNewWindow item not found")
             return
         }
-        menu.replaceItem(at: index, with: self.openLinkInNewTabMenuItem(from: openLinkInNewWindowItem))
+
+        menu.replaceItem(at: index, with: self.openLinkInNewTabMenuItem(from: openLinkInNewWindowItem,
+                                                                            makeBurner: isCurrentWindowBurner))
     }
 
     private func handleOpenLinkInNewWindowItem(_ item: NSMenuItem, at index: Int, in menu: NSMenu) {
-        menu.replaceItem(at: index, with: self.openLinkInNewWindowMenuItem(from: item))
+        menu.replaceItem(at: index, with: self.openLinkInNewWindowMenuItem(from: item, makeBurner: isCurrentWindowBurner))
     }
 
     private func handleOpenFrameInNewWindowItem(_ item: NSMenuItem, at index: Int, in menu: NSMenu) {
-        menu.replaceItem(at: index, with: self.openFrameInNewWindowMenuItem(from: item))
+        menu.replaceItem(at: index, with: self.openFrameInNewWindowMenuItem(from: item, makeBurner: isCurrentWindowBurner))
     }
 
     private func handleDownloadLinkedFileItem(_ item: NSMenuItem, at index: Int, in menu: NSMenu) {
@@ -120,8 +128,8 @@ extension ContextMenuManager {
     }
 
     private func handleOpenImageInNewWindowItem(_ item: NSMenuItem, at index: Int, in menu: NSMenu) {
-        menu.insertItem(self.openImageInNewTabMenuItem(from: item), at: index)
-        menu.replaceItem(at: index + 1, with: self.openImageInNewWindowMenuItem(from: item))
+        menu.insertItem(self.openImageInNewTabMenuItem(from: item, makeBurner: isCurrentWindowBurner), at: index)
+        menu.replaceItem(at: index + 1, with: self.openImageInNewWindowMenuItem(from: item, makeBurner: isCurrentWindowBurner))
     }
 
     private func handleDownloadImageItem(_ item: NSMenuItem, at index: Int, in menu: NSMenu) {
@@ -129,7 +137,7 @@ extension ContextMenuManager {
     }
 
     private func handleSearchWebItem(_ item: NSMenuItem, at index: Int, in menu: NSMenu) {
-        menu.replaceItem(at: index, with: self.searchMenuItem())
+        menu.replaceItem(at: index, with: self.searchMenuItem(makeBurner: isCurrentWindowBurner))
     }
 
     private func handleReloadItem(_ item: NSMenuItem, at index: Int, in menu: NSMenu) {
@@ -147,12 +155,12 @@ extension ContextMenuManager: WebViewContextMenuDelegate {
             }
         }
 
+        self.webView = webView
+
         for (index, item) in menu.items.enumerated().reversed() {
             guard let identifier = item.identifier.flatMap(WKMenuItemIdentifier.init) else { continue }
             Self.menuItemHandlers[identifier]?(self)(item, index, menu)
         }
-
-        self.webView = webView
     }
 
     func webView(_ webView: WebView, didCloseContextMenu menu: NSMenu, with event: NSEvent?) {
@@ -166,8 +174,10 @@ extension ContextMenuManager: WebViewContextMenuDelegate {
 // MARK: - Make Context Menu Items
 private extension ContextMenuManager {
 
-    func openLinkInNewTabMenuItem(from item: NSMenuItem) -> NSMenuItem {
-        makeMenuItem(withTitle: UserText.openLinkInNewTab, action: #selector(openLinkInNewTab), from: item, with: .openLinkInNewWindow)
+    func openLinkInNewTabMenuItem(from item: NSMenuItem, makeBurner: Bool) -> NSMenuItem {
+        let title = makeBurner ? UserText.openLinkInNewBurnerTab : UserText.openLinkInNewTab
+        let action = makeBurner ? #selector(openLinkInNewBurnerTab) : #selector(openLinkInNewTab)
+        return makeMenuItem(withTitle: title, action: action, from: item, with: .openLinkInNewWindow)
     }
 
     func addLinkToBookmarksMenuItem(from item: NSMenuItem) -> NSMenuItem {
@@ -178,12 +188,16 @@ private extension ContextMenuManager {
         NSMenuItem(title: UserText.bookmarkPage, action: #selector(MainViewController.bookmarkThisPage), target: nil, keyEquivalent: "")
     }
 
-    func openLinkInNewWindowMenuItem(from item: NSMenuItem) -> NSMenuItem {
-        makeMenuItem(withTitle: item.title, action: #selector(openLinkInNewWindow), from: item, with: .openLinkInNewWindow)
+    func openLinkInNewWindowMenuItem(from item: NSMenuItem, makeBurner: Bool) -> NSMenuItem {
+        let title = makeBurner ? UserText.openLinkInNewBurnerWindow : item.title
+        let action = makeBurner ? #selector(openLinkInNewBurnerWindow) : #selector(openLinkInNewWindow)
+        return makeMenuItem(withTitle: title, action: action, from: item, with: .openLinkInNewWindow)
     }
 
-    func openFrameInNewWindowMenuItem(from item: NSMenuItem) -> NSMenuItem {
-        makeMenuItem(withTitle: item.title, action: #selector(openFrameInNewWindow), from: item, with: .openFrameInNewWindow)
+    func openFrameInNewWindowMenuItem(from item: NSMenuItem, makeBurner: Bool) -> NSMenuItem {
+        let title = makeBurner ? UserText.openFrameInNewBurnerWindow : item.title
+        let action = makeBurner ? #selector(openFrameInNewBurnerWindow) : #selector(openFrameInNewWindow)
+        return makeMenuItem(withTitle: title, action: action, from: item, with: .openFrameInNewWindow)
     }
 
     private func downloadMenuItemTitle(for item: NSMenuItem) -> String {
@@ -213,20 +227,25 @@ private extension ContextMenuManager {
         makeMenuItem(withTitle: UserText.copyImageAddress, action: #selector(copyImageAddress), from: item, with: .openImageInNewWindow, keyEquivalent: "")
     }
 
-    func openImageInNewTabMenuItem(from item: NSMenuItem) -> NSMenuItem {
-        makeMenuItem(withTitle: UserText.openImageInNewTab, action: #selector(openImageInNewTab), from: item, with: .openImageInNewWindow, keyEquivalent: "")
+    func openImageInNewTabMenuItem(from item: NSMenuItem, makeBurner: Bool) -> NSMenuItem {
+        let title = makeBurner ? UserText.openImageInNewBurnerTab : UserText.openImageInNewTab
+        let action = makeBurner ? #selector(openImageInNewBurnerTab) : #selector(openImageInNewTab)
+        return makeMenuItem(withTitle: title, action: action, from: item, with: .openImageInNewWindow, keyEquivalent: "")
     }
 
-    func openImageInNewWindowMenuItem(from item: NSMenuItem) -> NSMenuItem {
-        makeMenuItem(withTitle: item.title, action: #selector(openImageInNewWindow), from: item, with: .openImageInNewWindow)
+    func openImageInNewWindowMenuItem(from item: NSMenuItem, makeBurner: Bool) -> NSMenuItem {
+        let title = makeBurner ? UserText.openImageInNewBurnerWindow : item.title
+        let action = makeBurner ? #selector(openImageInNewBurnerWindow) : #selector(openImageInNewWindow)
+        return makeMenuItem(withTitle: title, action: action, from: item, with: .openImageInNewWindow)
     }
 
     func downloadImageMenuItem(from item: NSMenuItem) -> NSMenuItem {
         makeMenuItem(withTitle: UserText.saveImageAs, action: #selector(saveImageAs), from: item, with: .downloadImage)
     }
 
-    func searchMenuItem() -> NSMenuItem {
-        NSMenuItem(title: UserText.searchWithDuckDuckGo, action: #selector(search), target: self)
+    func searchMenuItem(makeBurner: Bool) -> NSMenuItem {
+        let action = makeBurner ? #selector(searchInBurner) : #selector(search)
+        return NSMenuItem(title: UserText.searchWithDuckDuckGo, action: action, target: self)
     }
 
     private func makeMenuItem(withTitle title: String, action: Selector, from item: NSMenuItem, with identifier: WKMenuItemIdentifier, keyEquivalent: String? = nil) -> NSMenuItem {
@@ -249,6 +268,14 @@ private extension ContextMenuManager {
 @objc extension ContextMenuManager {
 
     func search(_ sender: NSMenuItem) {
+        searchCommon(sender, burner: false)
+    }
+
+    func searchInBurner(_ sender: NSMenuItem) {
+        searchCommon(sender, burner: true)
+    }
+
+    private func searchCommon(_ sender: NSMenuItem, burner: Bool) {
         guard let selectedText,
               let url = URL.makeSearchUrl(from: selectedText),
               let webView
@@ -258,7 +285,7 @@ private extension ContextMenuManager {
         }
 
         self.onNewWindow = { _ in
-            .allow(.tab(selected: true))
+                .allow(.tab(selected: true, burner: burner))
         }
         webView.loadInNewWindow(url)
     }
@@ -273,6 +300,14 @@ private extension ContextMenuManager {
     }
 
     func openLinkInNewTab(_ sender: NSMenuItem) {
+        openLinkInNewTabCommon(sender, burner: false)
+    }
+
+    func openLinkInNewBurnerTab(_ sender: NSMenuItem) {
+        openLinkInNewTabCommon(sender, burner: true)
+    }
+
+    private func openLinkInNewTabCommon(_ sender: NSMenuItem, burner: Bool) {
         guard let originalItem = sender.representedObject as? NSMenuItem,
               let identifier = originalItem.identifier.map(WKMenuItemIdentifier.init),
               identifier == .openLinkInNewWindow,
@@ -282,11 +317,19 @@ private extension ContextMenuManager {
             return
         }
 
-        onNewWindow = { _ in .allow(.tab(selected: false)) }
+        onNewWindow = { _ in .allow(.tab(selected: false, burner: burner)) }
         NSApp.sendAction(action, to: originalItem.target, from: originalItem)
     }
 
     func openLinkInNewWindow(_ sender: NSMenuItem) {
+        openLinkInNewWindowCommon(sender, burner: false)
+    }
+
+    func openLinkInNewBurnerWindow(_ sender: NSMenuItem) {
+        openLinkInNewWindowCommon(sender, burner: true)
+    }
+
+    private func openLinkInNewWindowCommon(_ sender: NSMenuItem, burner: Bool) {
         guard let originalItem = sender.representedObject as? NSMenuItem,
               let identifier = originalItem.identifier.map(WKMenuItemIdentifier.init),
               identifier == .openLinkInNewWindow,
@@ -296,11 +339,19 @@ private extension ContextMenuManager {
             return
         }
 
-        onNewWindow = { _ in .allow(.window(active: true)) }
+        onNewWindow = { _ in .allow(.window(active: true, burner: burner)) }
         NSApp.sendAction(action, to: originalItem.target, from: originalItem)
     }
 
     func openFrameInNewWindow(_ sender: NSMenuItem) {
+        openFrameInNewWindowCommon(sender, burner: false)
+    }
+
+    func openFrameInNewBurnerWindow(_ sender: NSMenuItem) {
+        openFrameInNewWindowCommon(sender, burner: true)
+    }
+
+    private func openFrameInNewWindowCommon(_ sender: NSMenuItem, burner: Bool) {
         guard let originalItem = sender.representedObject as? NSMenuItem,
               let identifier = originalItem.identifier.map(WKMenuItemIdentifier.init),
               identifier == .openFrameInNewWindow,
@@ -310,7 +361,7 @@ private extension ContextMenuManager {
             return
         }
 
-        onNewWindow = { _ in .allow(.window(active: true)) }
+        onNewWindow = { _ in .allow(.window(active: true, burner: burner)) }
         NSApp.sendAction(action, to: originalItem.target, from: originalItem)
     }
 
@@ -369,6 +420,14 @@ private extension ContextMenuManager {
     }
 
     func openImageInNewTab(_ sender: NSMenuItem) {
+        openImageInNewTabCommon(sender, burner: false)
+    }
+
+    func openImageInNewBurnerTab(_ sender: NSMenuItem) {
+        openImageInNewTabCommon(sender, burner: true)
+    }
+
+    func openImageInNewTabCommon(_ sender: NSMenuItem, burner: Bool) {
         guard let originalItem = sender.representedObject as? NSMenuItem,
               let identifier = originalItem.identifier.map(WKMenuItemIdentifier.init),
               identifier == .openImageInNewWindow,
@@ -378,11 +437,19 @@ private extension ContextMenuManager {
             return
         }
 
-        onNewWindow = { _ in .allow(.tab(selected: true)) }
+        onNewWindow = { _ in .allow(.tab(selected: true, burner: burner)) }
         NSApp.sendAction(action, to: originalItem.target, from: originalItem)
     }
 
     func openImageInNewWindow(_ sender: NSMenuItem) {
+        openImageInNewWindowCommon(sender, burner: false)
+    }
+
+    func openImageInNewBurnerWindow(_ sender: NSMenuItem) {
+        openImageInNewWindowCommon(sender, burner: true)
+    }
+
+    func openImageInNewWindowCommon(_ sender: NSMenuItem, burner: Bool) {
         guard let originalItem = sender.representedObject as? NSMenuItem,
               let identifier = originalItem.identifier.map(WKMenuItemIdentifier.init),
               identifier == .openImageInNewWindow,
@@ -392,7 +459,7 @@ private extension ContextMenuManager {
             return
         }
 
-        onNewWindow = { _ in .allow(.window(active: true)) }
+        onNewWindow = { _ in .allow(.window(active: true, burner: burner)) }
         NSApp.sendAction(action, to: originalItem.target, from: originalItem)
     }
 

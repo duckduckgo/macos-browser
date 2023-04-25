@@ -31,7 +31,7 @@ final class FileDownloadManagerTests: XCTestCase {
     let fm = FileManager.default
     let testFile = "downloaded file"
 
-    var chooseDestination: ((String?, URL?, [UTType], (URL?, UTType?) -> Void) -> Void)?
+    var chooseDestination: (@MainActor (String?, URL?, [UTType], @MainActor (URL?, UTType?) -> Void) -> Void)?
     var fileIconFlyAnimationOriginalRect: ((WebKitDownloadTask) -> NSRect?)?
 
     let response = URLResponse(url: .duckDuckGo,
@@ -65,7 +65,7 @@ final class FileDownloadManagerTests: XCTestCase {
         }
 
         let download = WKDownloadMock()
-        dm.add(download, delegate: nil, location: .auto)
+        dm.add(download, fromBurnerWindow: false, delegate: nil, location: .auto)
 
         withExtendedLifetime(cancellable) {
             waitForExpectations(timeout: 0.3)
@@ -79,7 +79,7 @@ final class FileDownloadManagerTests: XCTestCase {
         }
 
         let download = WKDownloadMock()
-        dm.add(download, delegate: nil, location: .auto)
+        dm.add(download, fromBurnerWindow: false, delegate: nil, location: .auto)
 
         struct TestError: Error {}
         download.delegate?.download!(download.asWKDownload(), didFailWithError: TestError(), resumeData: nil)
@@ -97,7 +97,7 @@ final class FileDownloadManagerTests: XCTestCase {
         }
 
         let download = WKDownloadMock()
-        dm.add(download, delegate: nil, location: .auto)
+        dm.add(download, fromBurnerWindow: false, delegate: nil, location: .auto)
 
         download.delegate?.downloadDidFinish!(download.asWKDownload())
 
@@ -123,7 +123,7 @@ final class FileDownloadManagerTests: XCTestCase {
         }
 
         let download = WKDownloadMock()
-        dm.add(download, delegate: self, location: .prompt)
+        dm.add(download, fromBurnerWindow: false, delegate: self, location: .prompt)
 
         let url = URL(string: "https://duckduckgo.com/somefile.html")!
         let response = URLResponse(url: url, mimeType: UTType.pdf.mimeType, expectedContentLength: 1, textEncodingName: "utf-8")
@@ -156,7 +156,7 @@ final class FileDownloadManagerTests: XCTestCase {
         }
 
         let download = WKDownloadMock()
-        dm.add(download, delegate: self, location: .auto)
+        dm.add(download, fromBurnerWindow: false, delegate: self, location: .auto)
 
         let url = URL(string: "https://duckduckgo.com/somefile.html")!
         let response = URLResponse(url: url, mimeType: UTType.html.mimeType, expectedContentLength: 1, textEncodingName: "utf-8")
@@ -178,7 +178,7 @@ final class FileDownloadManagerTests: XCTestCase {
         XCTAssertTrue(fm.fileExists(atPath: localURL.path))
 
         let download = WKDownloadMock()
-        dm.add(download, delegate: self, location: .prompt)
+        dm.add(download, fromBurnerWindow: false, delegate: self, location: .prompt)
         self.chooseDestination = { _, _, _, callback in
             callback(localURL, nil)
         }
@@ -199,7 +199,7 @@ final class FileDownloadManagerTests: XCTestCase {
         preferences.selectedDownloadLocation = downloadsURL
 
         let download = WKDownloadMock()
-        dm.add(download, delegate: self, location: .auto)
+        dm.add(download, fromBurnerWindow: false, delegate: self, location: .auto)
         self.chooseDestination = { _, _, _, _ in
             XCTFail("Unpected chooseDestination call")
         }
@@ -218,7 +218,7 @@ final class FileDownloadManagerTests: XCTestCase {
         preferences.selectedDownloadLocation = downloadsURL
 
         let download = WKDownloadMock()
-        dm.add(download, delegate: self, location: .auto)
+        dm.add(download, fromBurnerWindow: false, delegate: self, location: .auto)
         self.chooseDestination = { _, _, _, _ in
             XCTFail("Unpected chooseDestination call")
         }
@@ -241,7 +241,7 @@ final class FileDownloadManagerTests: XCTestCase {
         }
 
         let download = WKDownloadMock()
-        dm.add(download, delegate: self, location: .auto)
+        dm.add(download, fromBurnerWindow: false, delegate: self, location: .auto)
 
         let e = expectation(description: "WKDownload called")
         download.delegate?.download(download.asWKDownload(), decideDestinationUsing: response, suggestedFilename: "") { url in
@@ -256,10 +256,13 @@ final class FileDownloadManagerTests: XCTestCase {
 
 @available(macOS 11.3, *)
 extension FileDownloadManagerTests: DownloadTaskDelegate {
-    func chooseDestination(suggestedFilename: String?, directoryURL: URL?, fileTypes: [UTType], callback: @escaping (URL?, UTType?) -> Void) {
+
+    @MainActor
+    func chooseDestination(suggestedFilename: String?, directoryURL: URL?, fileTypes: [UTType], callback: @escaping @MainActor (URL?, UTType?) -> Void) {
         self.chooseDestination?(suggestedFilename, directoryURL, fileTypes, callback)
     }
 
+    @MainActor
     func fileIconFlyAnimationOriginalRect(for downloadTask: WebKitDownloadTask) -> NSRect? {
         self.fileIconFlyAnimationOriginalRect?(downloadTask)
     }

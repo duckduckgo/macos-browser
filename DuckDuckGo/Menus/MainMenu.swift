@@ -17,9 +17,10 @@
 //
 
 import Cocoa
-import os.log
 import Combine
+import OSLog // swiftlint:disable:this enforce_os_log_wrapper
 import WebKit
+import BrowserServicesKit
 
 final class MainMenu: NSMenu {
 
@@ -34,6 +35,7 @@ final class MainMenu: NSMenu {
 
     // MARK: - File
     @IBOutlet weak var newWindowMenuItem: NSMenuItem!
+    @IBOutlet weak var newBurnerWindowMenuItem: NSMenuItem!
     @IBOutlet weak var newTabMenuItem: NSMenuItem!
     @IBOutlet weak var openLocationMenuItem: NSMenuItem!
     @IBOutlet weak var closeWindowMenuItem: NSMenuItem!
@@ -74,13 +76,24 @@ final class MainMenu: NSMenu {
     @IBOutlet weak var toggleDownloadsShortcutMenuItem: NSMenuItem?
 
     // MARK: - Debug
-    @IBOutlet weak var debugMenuItem: NSMenuItem? {
-        didSet {
-            #if !DEBUG && !REVIEW
-            if let item = debugMenuItem {
-                removeItem(item)
-            }
-            #endif
+    @IBOutlet weak var debugMenuItem: NSMenuItem?
+
+    private func setupDebugMenuItem(with featureFlagger: FeatureFlagger) {
+        guard let debugMenuItem else {
+            assertionFailure("debugMenuItem missing")
+            return
+        }
+
+#if !DEBUG && !REVIEW
+        guard featureFlagger.isFeatureOn(.debugMenu) else {
+            removeItem(debugMenuItem)
+            self.debugMenuItem = nil
+            return
+        }
+#endif
+
+        if debugMenuItem.submenu?.items.contains(loggingMenuItem) == false {
+            debugMenuItem.submenu!.addItem(loggingMenuItem)
         }
     }
 
@@ -89,14 +102,19 @@ final class MainMenu: NSMenu {
     @IBOutlet weak var helpSeparatorMenuItem: NSMenuItem?
     @IBOutlet weak var sendFeedbackMenuItem: NSMenuItem?
 
-    let sharingMenu = SharingMenu()
+    private func setupHelpMenuItem() {
+#if !FEEDBACK
+        guard let sendFeedbackMenuItem else { return }
 
-    required init(coder: NSCoder) {
-        super.init(coder: coder)
-
-        setup()
+        sendFeedbackMenuItem.isHidden = true
+#endif
     }
 
+    let sharingMenu = SharingMenu()
+
+    // MARK: - Lifecycle
+
+    @MainActor
     override func update() {
         super.update()
 
@@ -110,35 +128,29 @@ final class MainMenu: NSMenu {
             printSeparatorItem?.removeFromParent()
         }
 
-#if APPSTORE
-        checkForUpdatesMenuItem?.removeFromParent()
-        checkForUpdatesSeparatorItem?.removeFromParent()
-#endif
-
         sharingMenu.title = shareMenuItem.title
         shareMenuItem.submenu = sharingMenu
 
         updateBookmarksBarMenuItem()
         updateShortcutMenuItems()
+        updateLoggingMenuItems()
+        updateBurnerWindowMenuItem()
     }
 
-    private func setup() {
+    @MainActor
+    func setup(with featureFlagger: FeatureFlagger) {
         self.delegate = self
-        #if !FEEDBACK
 
-        guard let helpMenuItemSubmenu = helpMenuItem?.submenu,
-              let helpSeparatorMenuItem = helpSeparatorMenuItem,
-              let sendFeedbackMenuItem = sendFeedbackMenuItem else {
-            os_log("MainMenuManager: Failed to setup main menu", type: .error)
-            return
-        }
+#if APPSTORE
+        checkForUpdatesMenuItem?.removeFromParent()
+        checkForUpdatesSeparatorItem?.removeFromParent()
+#endif
 
-        sendFeedbackMenuItem.isHidden = true
-
-        #endif
-
+        setupHelpMenuItem()
+        setupDebugMenuItem(with: featureFlagger)
         subscribeToBookmarkList()
         subscribeToFavicons()
+        updateBurnerWindowMenuItem()
     }
 
     // MARK: - Bookmarks
@@ -255,6 +267,140 @@ final class MainMenu: NSMenu {
         toggleAutofillShortcutMenuItem?.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .autofill)
         toggleBookmarksShortcutMenuItem?.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .bookmarks)
         toggleDownloadsShortcutMenuItem?.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .downloads)
+    }
+
+    @MainActor
+    private func updateBurnerWindowMenuItem() {
+        if let appDelegate = NSApplication.shared.delegate as? AppDelegate,
+           !appDelegate.internalUserDecider.isInternalUser {
+            newBurnerWindowMenuItem.isHidden = true
+        }
+    }
+
+    // MARK: - Logging
+
+    private lazy var loggingMenuItem: NSMenuItem = {
+        let menuItem = NSMenuItem(title: "Logging")
+        menuItem.submenu = loggingMenu
+        return menuItem
+    }()
+
+    private lazy var loggingMenu: NSMenu = {
+        let menu = NSMenu(title: "")
+
+        menu.addItem(NSMenuItem(title: "Enable All", action: #selector(enableAllLogsMenuItemAction), target: self))
+        menu.addItem(NSMenuItem(title: "Disable All", action: #selector(disableAllLogsMenuItemAction), target: self))
+        menu.addItem(.separator())
+
+        for category in OSLog.AllCategories.allCases.sorted() {
+            let menuItem = NSMenuItem(title: category, action: #selector(loggingMenuItemAction), target: self)
+            menuItem.identifier = .init(category)
+            menu.addItem(menuItem)
+        }
+
+        menu.addItem(.separator())
+        let debugLoggingMenuItem = NSMenuItem(title: OSLog.isRunningInDebugEnvironment ? "Disable DEBUG level logging…" : "Enable DEBUG level logging…", action: #selector(debugLoggingMenuItemAction), target: self)
+        menu.addItem(debugLoggingMenuItem)
+
+        if #available(macOS 12.0, *) {
+            let exportLogsMenuItem = NSMenuItem(title: "Save Logs…", action: #selector(exportLogs), target: self)
+            menu.addItem(exportLogsMenuItem)
+        }
+
+        return menu
+    }()
+
+    private func updateLoggingMenuItems() {
+        guard debugMenuItem != nil else { return }
+
+        let enabledCategories = OSLog.loggingCategories
+        for item in loggingMenu.items {
+            guard let category = item.identifier.map(\.rawValue) else { continue }
+
+            item.state = enabledCategories.contains(category) ? .on : .off
+        }
+    }
+
+    @objc private func loggingMenuItemAction(_ sender: NSMenuItem) {
+        guard let category = sender.identifier?.rawValue else { return }
+
+        if case .on = sender.state {
+            OSLog.loggingCategories.remove(category)
+        } else {
+            OSLog.loggingCategories.insert(category)
+        }
+    }
+
+    @objc private func enableAllLogsMenuItemAction(_ sender: NSMenuItem) {
+        OSLog.loggingCategories = Set(OSLog.AllCategories.allCases)
+    }
+
+    @objc private func disableAllLogsMenuItemAction(_ sender: NSMenuItem) {
+        OSLog.loggingCategories = []
+    }
+
+    @objc private func debugLoggingMenuItemAction(_ sender: NSMenuItem) {
+#if APPSTORE
+        if !OSLog.isRunningInDebugEnvironment {
+            let alert = NSAlert()
+            alert.messageText = "Restart with DEBUG logging Enabled not supported for AppStore build"
+            alert.informativeText = """
+            Open terminal and run:
+            export \(ProcessInfo.Constants.osActivityMode)=\(ProcessInfo.Constants.debug)
+            "\(Bundle.main.executablePath!)"
+            """
+            alert.runModal()
+
+            return
+        }
+#endif
+
+        let alert = NSAlert()
+        alert.messageText = "Restart with DEBUG logging \(OSLog.isRunningInDebugEnvironment ? "Disabled" : "Enabled")?"
+        alert.addButton(withTitle: "Restart").tag = NSApplication.ModalResponse.OK.rawValue
+        alert.addButton(withTitle: "Cancel").tag = NSApplication.ModalResponse.cancel.rawValue
+        guard case .OK = alert.runModal() else { return }
+
+        let config = NSWorkspace.OpenConfiguration()
+        config.createsNewApplicationInstance = true
+        config.environment = [ProcessInfo.Constants.osActivityMode: (OSLog.isRunningInDebugEnvironment ? "" : ProcessInfo.Constants.debug)]
+
+        NSWorkspace.shared.openApplication(at: Bundle.main.bundleURL, configuration: config)
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            NSApp.terminate(nil)
+        }
+    }
+
+    @available(macOS 12.0, *)
+    @objc private func exportLogs(_ sender: NSMenuItem) {
+        let displayName = Bundle.main.displayName!.replacingOccurrences(of: " ", with: "")
+
+        let launchDate = ISO8601DateFormatter().string(from: NSRunningApplication.current.launchDate ?? Date()).replacingOccurrences(of: ":", with: "_")
+        let savePanel = NSSavePanel.savePanelWithFileTypeChooser(fileTypes: [.log, .text], suggestedFilename: "\(displayName)_\(launchDate)")
+        guard case .OK = savePanel.runModal(),
+              let url = savePanel.url else { return }
+
+        do {
+            let formatter = DateFormatter()
+            formatter.locale = Locale(identifier: "en_US_POSIX")
+            formatter.dateFormat = "yyyy-MM-dd HH:mm:ss.SSS"
+
+            let logStore = try OSLogStore(scope: .currentProcessIdentifier)
+            try logStore.getEntries()
+                .compactMap {
+                    guard let entry = $0 as? OSLogEntryLog,
+                          entry.subsystem == OSLog.subsystem else { return nil }
+                    return "\(formatter.string(from: entry.date)) [\(entry.category)] \(entry.composedMessage)"
+                }
+                .joined(separator: "\n")
+                .utf8data
+                .write(to: url)
+
+            NSWorkspace.shared.activateFileViewerSelecting([url])
+        } catch {
+            NSAlert(error: error).runModal()
+        }
     }
 
 }

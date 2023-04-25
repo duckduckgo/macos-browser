@@ -19,11 +19,12 @@
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
+@MainActor
 final class FirePopoverViewModelTests: XCTestCase {
 
     func testWhenThereIsOneTabWithNoHistoryThenClearingOptionsContainsCurrentTab() {
         let tab = Tab(content: .url("https://duck.com".url!))
-        let tabCollectionViewModel = TabCollectionViewModel(tabCollection: .init(tabs: [tab]))
+        let tabCollectionViewModel = TabCollectionViewModel(tabCollection: .init(tabs: [tab]), isBurner: false)
 
         let viewModel = makeViewModel(with: tabCollectionViewModel)
 

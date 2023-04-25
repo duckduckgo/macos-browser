@@ -39,6 +39,7 @@ struct SaveRecoveryPDFView: View {
             }
             Button(UserText.saveRecoveryPDF) {
                 model.delegate?.saveRecoveryPDF()
+                model.endFlow()
             }
             .buttonStyle(DefaultActionButtonStyle(enabled: true))
         }

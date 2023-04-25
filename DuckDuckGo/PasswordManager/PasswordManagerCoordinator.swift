@@ -18,8 +18,8 @@
 
 import Foundation
 import BrowserServicesKit
-import os.log
 import Combine
+import Common
 
 protocol PasswordManagerCoordinating: BrowserServicesKit.PasswordManager {
 
@@ -90,7 +90,7 @@ final class PasswordManagerCoordinator: PasswordManagerCoordinating {
         switch bitwardenManagement.status {
         case .disabled, .notInstalled, .oldVersion, .missingHandshake, .handshakeNotApproved, .error:
             Task {
-                WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .autofill)
+                await WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .autofill)
             }
             return
         default:

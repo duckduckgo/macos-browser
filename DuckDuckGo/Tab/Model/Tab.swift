@@ -22,7 +22,6 @@ import Common
 import ContentBlocking
 import Foundation
 import Navigation
-import os.log
 import UserScript
 import WebKit
 
@@ -166,6 +165,10 @@ protocol NewWindowPolicyDecisionMaker {
             userEnteredValue != nil
         }
 
+        var displaysContentInWebView: Bool {
+            isUrl
+        }
+
     }
     private struct ExtensionDependencies: TabExtensionDependencies {
         let privacyFeatures: PrivacyFeaturesProtocol
@@ -179,7 +182,7 @@ protocol NewWindowPolicyDecisionMaker {
     fileprivate weak var delegate: TabDelegate?
     func setDelegate(_ delegate: TabDelegate) { self.delegate = delegate }
 
-    private let navigationDelegate = DistributedNavigationDelegate(logger: .navigation)
+    private let navigationDelegate = DistributedNavigationDelegate(log: .navigation)
     private var newWindowPolicyDecisionMakers: [NewWindowPolicyDecisionMaker]?
     private var onNewWindow: ((WKNavigationAction?) -> NavigationDecision)?
 
@@ -199,12 +202,13 @@ protocol NewWindowPolicyDecisionMaker {
     @Published
     private(set) var userContentController: UserContentController?
 
+    @MainActor
     convenience init(content: TabContent,
                      faviconManagement: FaviconManagement = FaviconManager.shared,
                      webCacheManager: WebCacheManager = WebCacheManager.shared,
                      webViewConfiguration: WKWebViewConfiguration? = nil,
                      historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
-                     pinnedTabsManager: PinnedTabsManager = WindowControllersManager.shared.pinnedTabsManager,
+                     pinnedTabsManager: PinnedTabsManager? = nil,
                      workspace: Workspace = NSWorkspace.shared,
                      privacyFeatures: AnyPrivacyFeatures? = nil,
                      duckPlayer: DuckPlayer? = nil,
@@ -219,10 +223,11 @@ protocol NewWindowPolicyDecisionMaker {
                      interactionStateData: Data? = nil,
                      parentTab: Tab? = nil,
                      shouldLoadInBackground: Bool = false,
+                     isBurner: Bool = false,
                      shouldLoadFromCache: Bool = false,
                      canBeClosedWithBack: Bool = false,
                      lastSelectedAt: Date? = nil,
-                     webViewFrame: CGRect = .zero
+                     webViewSize: CGSize = CGSize(width: 1024, height: 768)
     ) {
 
         let duckPlayer = duckPlayer
@@ -231,13 +236,17 @@ protocol NewWindowPolicyDecisionMaker {
             ?? (NSApp.isRunningUnitTests ? nil : StatisticsLoader.shared)
         let privacyFeatures = privacyFeatures ?? PrivacyFeatures
         let internalUserDecider = (NSApp.delegate as? AppDelegate)?.internalUserDecider
+        var faviconManager = faviconManagement
+        if isBurner {
+            faviconManager = FaviconManager(cacheType: .inMemory)
+        }
 
         self.init(content: content,
-                  faviconManagement: faviconManagement,
+                  faviconManagement: faviconManager,
                   webCacheManager: webCacheManager,
                   webViewConfiguration: webViewConfiguration,
                   historyCoordinating: historyCoordinating,
-                  pinnedTabsManager: pinnedTabsManager,
+                  pinnedTabsManager: pinnedTabsManager ?? WindowControllersManager.shared.pinnedTabsManager,
                   workspace: workspace,
                   privacyFeatures: privacyFeatures,
                   duckPlayer: duckPlayer,
@@ -253,12 +262,14 @@ protocol NewWindowPolicyDecisionMaker {
                   interactionStateData: interactionStateData,
                   parentTab: parentTab,
                   shouldLoadInBackground: shouldLoadInBackground,
+                  isBurner: isBurner,
                   shouldLoadFromCache: shouldLoadFromCache,
                   canBeClosedWithBack: canBeClosedWithBack,
                   lastSelectedAt: lastSelectedAt,
-                  webViewFrame: webViewFrame)
+                  webViewSize: webViewSize)
     }
 
+    @MainActor
     // swiftlint:disable:next function_body_length
     init(content: TabContent,
          faviconManagement: FaviconManagement,
@@ -281,10 +292,11 @@ protocol NewWindowPolicyDecisionMaker {
          interactionStateData: Data?,
          parentTab: Tab?,
          shouldLoadInBackground: Bool,
+         isBurner: Bool,
          shouldLoadFromCache: Bool,
          canBeClosedWithBack: Bool,
          lastSelectedAt: Date?,
-         webViewFrame: CGRect
+         webViewSize: CGSize
     ) {
 
         self.content = content
@@ -295,18 +307,20 @@ protocol NewWindowPolicyDecisionMaker {
         self.title = title
         self.favicon = favicon
         self.parentTab = parentTab
+        self.isBurner = isBurner
         self._canBeClosedWithBack = canBeClosedWithBack
         self.interactionState = (interactionStateData != nil || shouldLoadFromCache) ? .loadCachedFromTabContent(interactionStateData) : .none
         self.lastSelectedAt = lastSelectedAt
 
         let configuration = webViewConfiguration ?? WKWebViewConfiguration()
-        configuration.applyStandardConfiguration(contentBlocking: privacyFeatures.contentBlocking)
+        configuration.applyStandardConfiguration(contentBlocking: privacyFeatures.contentBlocking,
+                                                 isBurner: isBurner)
         self.webViewConfiguration = configuration
         let userContentController = configuration.userContentController as? UserContentController
         assert(userContentController != nil)
         self.userContentController = userContentController
 
-        webView = WebView(frame: webViewFrame, configuration: configuration)
+        webView = WebView(frame: CGRect(origin: .zero, size: webViewSize), configuration: configuration)
         webView.allowsLinkPreview = false
         permissions = PermissionModel(permissionManager: permissionManager,
                                       geolocationService: geolocationService)
@@ -323,6 +337,7 @@ protocol NewWindowPolicyDecisionMaker {
         self.extensions = extensionsBuilder
             .build(with: (tabIdentifier: instrumentation.currentTabIdentifier,
                           isTabPinned: { tabGetter().map { tab in pinnedTabsManager.isTabPinned(tab) } ?? false },
+                          isTabBurner: isBurner,
                           contentPublisher: _content.projectedValue.eraseToAnyPublisher(),
                           titlePublisher: _title.projectedValue.eraseToAnyPublisher(),
                           userScriptsPublisher: userScriptsPublisher,
@@ -430,8 +445,15 @@ protocol NewWindowPolicyDecisionMaker {
 
     var isLazyLoadingInProgress = false
 
+    let isBurner: Bool
+
     @Published private(set) var content: TabContent {
         didSet {
+            if !content.displaysContentInWebView && oldValue.displaysContentInWebView {
+                webView.stopLoading()
+                webView.stopMediaCapture()
+                webView.stopAllMediaPlayback()
+            }
             handleFavicon()
             invalidateInteractionStateData()
             error = nil
@@ -501,7 +523,16 @@ protocol NewWindowPolicyDecisionMaker {
         }
     }
 
-    @PublishedAfter var error: WKError?
+    @PublishedAfter var error: WKError? {
+        didSet {
+            if error == nil || error?.isFrameLoadInterrupted == true || error?.isNavigationCancelled == true {
+                return
+            }
+            webView.stopLoading()
+            webView.stopMediaCapture()
+            webView.stopAllMediaPlayback()
+        }
+    }
     let permissions: PermissionModel
 
     @Published private(set) var isLoading: Bool = false
@@ -743,7 +774,7 @@ protocol NewWindowPolicyDecisionMaker {
             do {
                 try webView.restoreSessionState(from: interactionStateData)
             } catch {
-                os_log("Tab:setupWebView could not restore session state %s", "\(error)")
+                os_log("Tab:setupWebView could not restore session state %s", type: .error, "\(error)")
                 return false
             }
         }
@@ -875,7 +906,9 @@ protocol NewWindowPolicyDecisionMaker {
 
 extension Tab: UserContentControllerDelegate {
 
+    @MainActor
     func userContentController(_ userContentController: UserContentController, didInstallContentRuleLists contentRuleLists: [String: WKContentRuleList], userScripts: UserScriptsProvider, updateEvent: ContentBlockerRulesManager.UpdateEvent) {
+        os_log("didInstallContentRuleLists", log: .contentBlocking, type: .info)
         guard let userScripts = userScripts as? UserScripts else { fatalError("Unexpected UserScripts") }
 
         userScripts.debugScript.instrumentation = instrumentation
@@ -1004,10 +1037,6 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         invalidateInteractionStateData()
         webViewDidFinishNavigationPublisher.send()
         statisticsLoader?.refreshRetentionAtb(isSearch: navigation.url.isDuckDuckGoSearch)
-
-        if navigation.url.isDuckDuckGoSearch {
-            BookmarksBarUsageSender.sendBookmarksBarUsagePixel()
-        }
     }
 
     @MainActor

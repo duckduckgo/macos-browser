@@ -19,7 +19,7 @@
 import Cocoa
 import Carbon.HIToolbox
 import Combine
-import os.log
+import Common
 
 final class MainViewController: NSViewController {
 
@@ -42,6 +42,7 @@ final class MainViewController: NSViewController {
     private(set) var bookmarksBarViewController: BookmarksBarViewController!
 
     let tabCollectionViewModel: TabCollectionViewModel
+    let isBurner: Bool
 
     private var selectedTabViewModelCancellable: AnyCancellable?
     private var bookmarksBarVisibilityChangedCancellable: AnyCancellable?
@@ -62,12 +63,15 @@ final class MainViewController: NSViewController {
     }
 
     required init?(coder: NSCoder) {
-        self.tabCollectionViewModel = TabCollectionViewModel()
+        let isBurner = false
+        self.tabCollectionViewModel = TabCollectionViewModel(isBurner: isBurner)
+        self.isBurner = isBurner
         super.init(coder: coder)
     }
 
-    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel) {
+    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, isBurner: Bool) {
         self.tabCollectionViewModel = tabCollectionViewModel
+        self.isBurner = isBurner
         super.init(coder: coder)
     }
 
@@ -148,7 +152,7 @@ final class MainViewController: NSViewController {
 
     @IBSegueAction
     func createNavigationBarViewController(coder: NSCoder, sender: Any?, segueIdentifier: String?) -> NavigationBarViewController? {
-        guard let navigationBarViewController = NavigationBarViewController(coder: coder, tabCollectionViewModel: tabCollectionViewModel) else {
+        guard let navigationBarViewController = NavigationBarViewController(coder: coder, tabCollectionViewModel: tabCollectionViewModel, isBurner: isBurner) else {
             fatalError("MainViewController: Failed to init NavigationBarViewController")
         }
 

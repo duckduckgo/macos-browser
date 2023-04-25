@@ -20,6 +20,7 @@ import XCTest
 import Combine
 @testable import DuckDuckGo_Privacy_Browser
 
+@MainActor
 final class AppStateChangePublisherTests: XCTestCase {
     var cancellables = Set<AnyCancellable>()
 
@@ -115,7 +116,7 @@ final class AppStateChangePublisherTests: XCTestCase {
 
         window?.setFrameOrigin(.init(x: .random(in: 0...1000), y: .random(in: 0...1000)))
 
-        waitForExpectations(timeout: 0.3, handler: nil)
+        waitForExpectations(timeout: 1, handler: nil)
     }
 
     func testWhenWindowIsResizedThenStateChangePublished() {

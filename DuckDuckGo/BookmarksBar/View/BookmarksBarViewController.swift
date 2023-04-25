@@ -19,7 +19,6 @@
 import Foundation
 import AppKit
 import Combine
-import os.log
 
 final class BookmarksBarViewController: NSViewController {
 
@@ -207,7 +206,7 @@ extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
             tabCollectionViewModel.appendNewTab(with: .url(url), selected: true)
         case .openInNewWindow:
             guard let url = bookmark.urlObject else { return }
-            WindowsManager.openNewWindow(with: url)
+            WindowsManager.openNewWindow(with: url, isBurner: false)
         case .clickItem:
             WindowControllersManager.shared.open(bookmark: bookmark)
         case .addToFavorites:
@@ -275,12 +274,6 @@ extension BookmarksBarViewController: NSMenuDelegate {
     @objc
     private func toggleBookmarksBar(_ sender: NSMenuItem) {
         PersistentAppInterfaceSettings.shared.showBookmarksBar.toggle()
-
-        if PersistentAppInterfaceSettings.shared.showBookmarksBar {
-            Pixel.fire(.bookmarksBarEnabled(.bookmarksBar))
-        } else {
-            Pixel.fire(.bookmarksBarDisabled(.bookmarksBar))
-        }
     }
 
 }

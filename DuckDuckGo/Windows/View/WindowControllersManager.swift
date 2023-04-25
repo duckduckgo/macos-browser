@@ -17,9 +17,10 @@
 //
 
 import Cocoa
-import os.log
 import Combine
+import Common
 
+@MainActor
 protocol WindowControllersManagerProtocol {
 
     var pinnedTabsManager: PinnedTabsManager { get }
@@ -32,6 +33,7 @@ protocol WindowControllersManagerProtocol {
 
 }
 
+@MainActor
 final class WindowControllersManager: WindowControllersManagerProtocol {
 
     static let shared = WindowControllersManager()
@@ -119,7 +121,7 @@ extension WindowControllersManager {
         guard let url = bookmark.urlObject else { return }
 
         if NSApplication.shared.isCommandPressed && NSApplication.shared.isShiftPressed {
-            WindowsManager.openNewWindow(with: url)
+            WindowsManager.openNewWindow(with: url, isBurner: false)
         } else if mainWindowController?.mainViewController.view.window?.isPopUpWindow ?? false {
             show(url: url, newTab: true)
         } else if NSApplication.shared.isCommandPressed {
@@ -148,7 +150,7 @@ extension WindowControllersManager {
             } else if let tab = tabCollectionViewModel.selectedTabViewModel?.tab, !newTab {
                 tab.setContent(url.map { .url($0) } ?? .homePage)
             } else {
-                let newTab = Tab(content: url.map { .url($0) } ?? .homePage, shouldLoadInBackground: true)
+                let newTab = Tab(content: url.map { .url($0) } ?? .homePage, shouldLoadInBackground: true, isBurner: tabCollectionViewModel.isBurner)
                 newTab.setContent(url.map { .url($0) } ?? .homePage)
                 tabCollectionViewModel.append(tab: newTab)
             }
@@ -169,9 +171,9 @@ extension WindowControllersManager {
 
         // Open a new window
         if let url = url {
-            WindowsManager.openNewWindow(with: url)
+            WindowsManager.openNewWindow(with: url, isBurner: false)
         } else {
-            WindowsManager.openNewWindow()
+            WindowsManager.openNewWindow(isBurner: false)
         }
     }
 

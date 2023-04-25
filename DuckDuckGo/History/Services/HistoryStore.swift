@@ -16,10 +16,10 @@
 //  limitations under the License.
 //
 
+import Common
 import Foundation
 import CoreData
 import Combine
-import os.log
 
 protocol HistoryStoring {
 

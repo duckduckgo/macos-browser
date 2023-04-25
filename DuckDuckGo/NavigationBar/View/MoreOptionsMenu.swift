@@ -17,7 +17,7 @@
 //
 
 import Cocoa
-import os.log
+import Common
 import WebKit
 import BrowserServicesKit
 
@@ -37,6 +37,7 @@ protocol OptionsButtonMenuDelegate: AnyObject {
 
 }
 
+@MainActor
 final class MoreOptionsMenu: NSMenu {
 
     weak var actionDelegate: OptionsButtonMenuDelegate?
@@ -44,6 +45,7 @@ final class MoreOptionsMenu: NSMenu {
     private let tabCollectionViewModel: TabCollectionViewModel
     private let emailManager: EmailManager
     private let passwordManagerCoordinator: PasswordManagerCoordinating
+    private let internalUserDecider: InternalUserDecider
 
     required init(coder: NSCoder) {
         fatalError("MoreOptionsMenu: Bad initializer")
@@ -51,11 +53,13 @@ final class MoreOptionsMenu: NSMenu {
 
     init(tabCollectionViewModel: TabCollectionViewModel,
          emailManager: EmailManager = EmailManager(),
-         passwordManagerCoordinator: PasswordManagerCoordinator) {
+         passwordManagerCoordinator: PasswordManagerCoordinator,
+         internalUserDecider: InternalUserDecider) {
 
         self.tabCollectionViewModel = tabCollectionViewModel
         self.emailManager = emailManager
         self.passwordManagerCoordinator = passwordManagerCoordinator
+        self.internalUserDecider = internalUserDecider
         super.init(title: "")
 
         self.emailManager.requestDelegate = self
@@ -105,7 +109,11 @@ final class MoreOptionsMenu: NSMenu {
     }
 
     @objc func newWindow(_ sender: NSMenuItem) {
-        WindowsManager.openNewWindow()
+        WindowsManager.openNewWindow(isBurner: false)
+    }
+
+    @objc func newBurnerWindow(_ sender: NSMenuItem) {
+        WindowsManager.openNewWindow(isBurner: true)
     }
 
     @objc func toggleFireproofing(_ sender: NSMenuItem) {
@@ -178,7 +186,6 @@ final class MoreOptionsMenu: NSMenu {
     }
 
     private func addWindowItems() {
-
         // New Tab
         addItem(withTitle: UserText.plusButtonNewTabMenuItem, action: #selector(newTab(_:)), keyEquivalent: "t")
             .targetting(self)
@@ -189,8 +196,18 @@ final class MoreOptionsMenu: NSMenu {
             .targetting(self)
             .withImage(NSImage(named: "NewWindow"))
 
-        addItem(NSMenuItem.separator())
+        // New Burner Window
+        if internalUserDecider.isInternalUser {
+            let burnerWindowItem = NSMenuItem(title: UserText.newBurnerWindowMenuItem,
+                                                  action: #selector(newBurnerWindow(_:)),
+                                                  target: self)
+            burnerWindowItem.keyEquivalent = "n"
+            burnerWindowItem.keyEquivalentModifierMask = [.command, .shift]
+            burnerWindowItem.image = NSImage(named: "NewBurnerWindow")
+            addItem(burnerWindowItem)
+        }
 
+        addItem(NSMenuItem.separator())
     }
 
     private func addUtilityItems() {
@@ -250,6 +267,7 @@ final class MoreOptionsMenu: NSMenu {
 
 }
 
+@MainActor
 final class EmailOptionsButtonSubMenu: NSMenu {
 
     private let tabCollectionViewModel: TabCollectionViewModel
@@ -320,7 +338,7 @@ final class EmailOptionsButtonSubMenu: NSMenu {
     }
 
     @objc func turnOnEmailAction(_ sender: NSMenuItem) {
-        let tab = Tab(content: .url(EmailUrls().emailProtectionLink), shouldLoadInBackground: true)
+        let tab = Tab(content: .url(EmailUrls().emailProtectionLink), shouldLoadInBackground: true, isBurner: tabCollectionViewModel.isBurner)
         tabCollectionViewModel.append(tab: tab)
     }
 
@@ -370,6 +388,7 @@ final class ZoomSubMenu: NSMenu {
     }
 }
 
+@MainActor
 final class BookmarksSubMenu: NSMenu {
 
     init(targetting target: AnyObject, tabCollectionViewModel: TabCollectionViewModel) {

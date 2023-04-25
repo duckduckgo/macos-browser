@@ -18,13 +18,13 @@
 
 import Cocoa
 import Combine
-import os.log
 import BrowserServicesKit
 
 final class TabViewModel {
 
     enum Favicon {
         static let home = NSImage(named: "HomeFavicon")!
+        static let burnerHome = NSImage(named: "BurnerTabFavicon")!
         static let preferences = NSImage(named: "Preferences")!
         static let bookmarks = NSImage(named: "Bookmarks")!
     }
@@ -252,7 +252,11 @@ final class TabViewModel {
         case .bookmarks:
             title = UserText.tabBookmarksTitle
         case .homePage:
-            title = UserText.tabHomeTitle
+            if tab.isBurner {
+                title = UserText.burnerTabHomeTitle
+            } else {
+                title = UserText.tabHomeTitle
+            }
         case .onboarding:
             title = UserText.tabOnboardingTitle
         case .url, .none:
@@ -275,7 +279,11 @@ final class TabViewModel {
 
         switch tab.content {
         case .homePage:
-            favicon = Favicon.home
+            if tab.isBurner {
+                favicon = Favicon.burnerHome
+            } else {
+                favicon = Favicon.home
+            }
             return
         case .preferences:
             favicon = Favicon.preferences

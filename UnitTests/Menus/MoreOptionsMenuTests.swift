@@ -19,19 +19,22 @@
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
+@MainActor
 final class MoreOptionsMenuTests: XCTestCase {
 
     var tabCollectionViewModel: TabCollectionViewModel!
     var passwordManagerCoordinator: PasswordManagerCoordinator!
     var capturingActionDelegate: CapturingOptionsButtonMenuDelegate!
     var moreOptionMenu: MoreOptionsMenu!
+    var internalUserDecider: InternalUserDeciderMock!
 
     override func setUp() {
         super.setUp()
         tabCollectionViewModel = TabCollectionViewModel()
         passwordManagerCoordinator = PasswordManagerCoordinator()
         capturingActionDelegate = CapturingOptionsButtonMenuDelegate()
-        moreOptionMenu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel, passwordManagerCoordinator: passwordManagerCoordinator)
+        internalUserDecider = InternalUserDeciderMock()
+        moreOptionMenu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel, passwordManagerCoordinator: passwordManagerCoordinator, internalUserDecider: internalUserDecider)
         moreOptionMenu.actionDelegate = capturingActionDelegate
     }
 

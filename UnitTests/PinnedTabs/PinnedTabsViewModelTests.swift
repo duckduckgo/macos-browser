@@ -20,11 +20,13 @@ import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 extension Tab {
+    @MainActor
     convenience init(content: TabContent, parentTab: Tab? = nil) {
         self.init(content: content, parentTab: parentTab, shouldLoadInBackground: false)
     }
 }
 
+@MainActor
 class PinnedTabsViewModelTests: XCTestCase {
 
     var model: PinnedTabsViewModel!
@@ -167,6 +169,7 @@ class PinnedTabsViewModelTests: XCTestCase {
 }
 
 private extension Array where Element == Tab {
+    @MainActor
     static func urls(_ urlStrings: String ...) -> [Tab] {
         self.init(urlStrings.map({ Tab(content: .url($0.url!)) }))
     }

@@ -26,44 +26,55 @@ extension Preferences {
 
         var body: some View {
             VStack(alignment: .leading, spacing: 0) {
-                Text(UserText.privacy)
-                    .font(Const.Fonts.preferencePaneTitle)
 
+                // TITLE
+                TextMenuTitle(text: UserText.privacy)
+
+                // SECTION 1: Web Tracking Protection Section
                 PreferencePaneSection {
-                    Text(UserText.fireproofSites)
-                        .font(Const.Fonts.preferencePaneSectionHeader)
+                    TextMenuItemHeader(text: UserText.webTrackingProtectionSettingsTitle)
+                    VStack(alignment: .leading, spacing: 6) {
+                        TextMenuItemCaption(text: UserText.webTrackingProtectionExplenation)
+                        TextButton(UserText.learnMore) {
+                            model.openURL(.webTrackingProtection)
+                        }
+                    }
+                }
 
-                    Toggle(UserText.fireproofCheckboxTitle, isOn: $model.isLoginDetectionEnabled)
-                        .fixMultilineScrollableText()
-                    Text(UserText.fireproofExplanation)
-                        .fixMultilineScrollableText()
+                // SECTION 2: Cookie Consent Pop-ups
+                PreferencePaneSection {
+                    TextMenuItemHeader(text: UserText.autoconsentSettingsTitle)
+                    ToggleMenuItem(title: UserText.autoconsentCheckboxTitle, isOn: $model.isAutoconsentEnabled)
+                    VStack(alignment: .leading, spacing: 6) {
+                        TextMenuItemCaption(text: UserText.autoconsentExplanation)
+                        TextButton(UserText.learnMore) {
+                            model.openURL(.cookieConsentPopUpManagement)
+                        }
+                    }
+                }
+
+                // SECTION 3: Fireproof Site
+                PreferencePaneSection {
+                    TextMenuItemHeader(text: UserText.fireproofSites)
+                    ToggleMenuItem(title: UserText.fireproofCheckboxTitle, isOn: $model.isLoginDetectionEnabled)
+                    VStack(alignment: .leading, spacing: 6) {
+                        TextMenuItemCaption(text: UserText.fireproofExplanation)
+                        TextButton(UserText.learnMore) {
+                            model.openURL(.theFireButton)
+                        }
+                    }
                     Button(UserText.manageFireproofSites) {
                         model.presentManageFireproofSitesDialog()
                     }
                 }
 
+                // SECTION 4: Global privacy control
                 PreferencePaneSection {
-                    Text(UserText.autoconsentSettingsTitle)
-                        .font(Const.Fonts.preferencePaneSectionHeader)
-
-                    Toggle(UserText.autoconsentCheckboxTitle, isOn: $model.isAutoconsentEnabled)
-                        .fixMultilineScrollableText()
-
-                    Text(UserText.autoconsentExplanation)
-                        .fixMultilineScrollableText()
-                }
-
-                PreferencePaneSection {
-                    Text(UserText.gpcSettingsTitle)
-                        .font(Const.Fonts.preferencePaneSectionHeader)
-
-                    Toggle(UserText.gpcCheckboxTitle, isOn: $model.isGPCEnabled)
-
-                    VStack(alignment: .leading, spacing: 0) {
-                        Text(UserText.gpcExplanation)
-                            .fixMultilineScrollableText()
-
-                        TextButton(UserText.gpcLearnMore) {
+                    TextMenuItemHeader(text: UserText.gpcSettingsTitle)
+                    ToggleMenuItem(title: UserText.gpcCheckboxTitle, isOn: $model.isGPCEnabled)
+                    VStack(alignment: .leading, spacing: 6) {
+                        TextMenuItemCaption(text: UserText.gpcExplanation)
+                        TextButton(UserText.learnMore) {
                             model.openURL(.gpcLearnMore)
                         }
                     }

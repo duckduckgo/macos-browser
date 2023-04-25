@@ -50,6 +50,7 @@ final class PreferencesSidebarModel: ObservableObject {
             }
     }
 
+    @MainActor
     convenience init(
         tabSwitcherTabs: [Tab.TabContent] = Tab.TabContent.displayableTabTypes,
         privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager,

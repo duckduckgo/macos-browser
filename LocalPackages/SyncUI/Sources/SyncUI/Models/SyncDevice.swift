@@ -18,7 +18,7 @@
 
 import Foundation
 
-public struct SyncDevice: Identifiable {
+public struct SyncDevice: Identifiable, Equatable {
 
     public enum Kind: Equatable {
         case current, desktop, mobile

@@ -17,14 +17,15 @@
 //
 
 import Combine
+import Common
 import Foundation
 import Navigation
-import os.log
 
+@MainActor
 private func getFirstAvailableWebView() -> WKWebView? {
     let wcm = WindowControllersManager.shared
     if wcm.lastKeyMainWindowController?.mainViewController.browserTabViewController == nil {
-        WindowsManager.openNewWindow()
+        WindowsManager.openNewWindow(isBurner: false)
     }
 
     guard let tab = wcm.lastKeyMainWindowController?.mainViewController.browserTabViewController.tabViewModel?.tab else {
@@ -39,7 +40,7 @@ final class DownloadListCoordinator {
 
     private let store: DownloadListStoring
     private let downloadManager: FileDownloadManagerProtocol
-    private let webViewProvider: () -> WKWebView?
+    private let webViewProvider: (() -> WKWebView?)?
 
     private var items = [UUID: DownloadListItem]()
 
@@ -60,7 +61,7 @@ final class DownloadListCoordinator {
     init(store: DownloadListStoring = DownloadListStore(),
          downloadManager: FileDownloadManagerProtocol = FileDownloadManager.shared,
          clearItemsOlderThan clearDate: Date = .daysAgo(2),
-         webViewProvider: @escaping () -> WKWebView? = getFirstAvailableWebView) {
+         webViewProvider: (() -> WKWebView?)? = nil) {
 
         self.store = store
         self.downloadManager = downloadManager
@@ -93,12 +94,14 @@ final class DownloadListCoordinator {
     private func subscribeToDownloadManager() {
         assert(downloadManager.downloads.isEmpty)
         downloadsCancellable = downloadManager.downloadsPublisher
-            .receive(on: DispatchQueue.main)
             .sink { [weak self] task in
-                self?.subscribeToDownloadTask(task)
+                DispatchQueue.main.async {
+                    self?.subscribeToDownloadTask(task)
+                }
             }
     }
 
+    @MainActor(unsafe)
     private func subscribeToDownloadTask(_ task: WebKitDownloadTask, updating item: DownloadListItem? = nil) {
         dispatchPrecondition(condition: .onQueue(.main))
 
@@ -117,25 +120,25 @@ final class DownloadListCoordinator {
         task.$location
             // only add item to the dict when destination URL is set
             .filter { $0.destinationURL != nil }
-            .receive(on: DispatchQueue.main)
             .sink { [weak self] location in
-                self?.addItemOrUpdateLocation(for: item, destinationURL: location.destinationURL, tempURL: location.tempURL)
+                DispatchQueue.main.async {
+                    self?.addItemOrUpdateLocation(for: item, destinationURL: location.destinationURL, tempURL: location.tempURL)
+                }
             }
             .store(in: &self.downloadTaskCancellables[task, default: []])
 
         task.output
-            .receive(on: DispatchQueue.main)
             .sink { [weak self] completion in
-                self?.downloadTask(task, withId: item.identifier, completedWith: completion)
+                DispatchQueue.main.async {
+                    self?.downloadTask(task, withId: item.identifier, completedWith: completion)
+                }
             } receiveValue: { _ in }
             .store(in: &self.downloadTaskCancellables[task, default: []])
 
         self.subscribeToProgress(of: task)
     }
-
+    @MainActor
     private func addItemOrUpdateLocation(for initialItem: DownloadListItem, destinationURL: URL?, tempURL: URL?) {
-        dispatchPrecondition(condition: .onQueue(.main))
-
         updateItem(withId: initialItem.identifier) { item in
             if item == nil { item = initialItem }
             item!.destinationURL = destinationURL
@@ -169,10 +172,14 @@ final class DownloadListCoordinator {
             .store(in: &self.taskProgressCancellables[task, default: []])
     }
 
+    @MainActor
     private func downloadTask(_ task: WebKitDownloadTask, withId identifier: UUID, completedWith result: Subscribers.Completion<FileDownloadError>) {
-        dispatchPrecondition(condition: .onQueue(.main))
-
         updateItem(withId: identifier) { item in
+            if item?.isBurner ?? false {
+                item = nil
+                return
+            }
+
             if case .failure(let error) = result {
                 item?.error = error
             }
@@ -182,9 +189,8 @@ final class DownloadListCoordinator {
         self.downloadTaskCancellables[task] = nil
     }
 
+    @MainActor
     private func updateItem(withId identifier: UUID, mutate: (inout DownloadListItem?) -> Void) {
-        dispatchPrecondition(condition: .onQueue(.main))
-
         let original = self.items[identifier]
         var modified = original
         mutate(&modified)
@@ -217,7 +223,9 @@ final class DownloadListCoordinator {
                     return
                 }
 
-                let task = self.downloadManager.add(download, location: .preset(destinationURL: destinationURL, tempURL: item.tempURL))
+                let task = self.downloadManager.add(download,
+                                                    fromBurnerWindow: item.isBurner,
+                                                    location: .preset(destinationURL: destinationURL, tempURL: item.tempURL))
                 self.subscribeToDownloadTask(task, updating: item)
             }
         }
@@ -235,8 +243,8 @@ final class DownloadListCoordinator {
         }?.modified
     }
 
+    @MainActor
     func downloads<T: Comparable>(sortedBy keyPath: KeyPath<DownloadListItem, T>, ascending: Bool) -> [DownloadListItem] {
-        dispatchPrecondition(condition: .onQueue(.main))
         let comparator: (T, T) -> Bool = ascending ? (<) : (>)
         return items.values.sorted(by: {
             comparator($0[keyPath: keyPath], $1[keyPath: keyPath])
@@ -247,10 +255,9 @@ final class DownloadListCoordinator {
         return updatesSubject.eraseToAnyPublisher()
     }
 
+    @MainActor
     func restart(downloadWithIdentifier identifier: UUID) {
-        dispatchPrecondition(condition: .onQueue(.main))
-
-        guard let item = items[identifier], let webView = self.webViewProvider() else { return }
+        guard let item = items[identifier], let webView = (webViewProvider ?? getFirstAvailableWebView)() else { return }
         do {
             guard let resumeData = item.error?.resumeData,
                   let tempURL = item.tempURL,
@@ -269,9 +276,8 @@ final class DownloadListCoordinator {
         }
     }
 
+    @MainActor
     func cleanupInactiveDownloads() {
-        dispatchPrecondition(condition: .onQueue(.main))
-
         for (id, item) in self.items where item.progress == nil {
             self.items[id] = nil
             self.updatesSubject.send((.removed, item))
@@ -280,6 +286,7 @@ final class DownloadListCoordinator {
         store.clear()
     }
 
+    @MainActor
     func cleanupInactiveDownloads(for domains: Set<String>) {
         for (id, item) in self.items where item.progress == nil {
             if domains.contains(item.websiteURL?.host ?? "") ||
@@ -291,17 +298,16 @@ final class DownloadListCoordinator {
         }
     }
 
+    @MainActor
     func remove(downloadWithIdentifier identifier: UUID) {
-        dispatchPrecondition(condition: .onQueue(.main))
-
         updateItem(withId: identifier) { item in
             item?.progress?.cancel()
             item = nil
         }
     }
 
+    @MainActor
     func cancel(downloadWithIdentifier identifier: UUID) {
-        dispatchPrecondition(condition: .onQueue(.main))
         guard let item = self.items[identifier] else {
             assertionFailure("Item with identifier \(identifier) not found")
             return
@@ -325,6 +331,7 @@ private extension DownloadListItem {
                   url: task.originalRequest?.url ?? .blankPage,
                   websiteURL: task.originalRequest?.mainDocumentURL,
                   progress: task.progress,
+                  isBurner: task.isBurner,
                   destinationURL: nil,
                   tempURL: nil,
                   error: nil)

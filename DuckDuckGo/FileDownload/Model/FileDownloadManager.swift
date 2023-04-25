@@ -18,8 +18,8 @@
 
 import AppKit
 import Combine
+import Common
 import Navigation
-import os
 
 protocol FileDownloadManagerProtocol: AnyObject {
     var downloads: Set<WebKitDownloadTask> { get }
@@ -27,6 +27,7 @@ protocol FileDownloadManagerProtocol: AnyObject {
 
     @discardableResult
     func add(_ download: WebKitDownload,
+             fromBurnerWindow: Bool,
              delegate: DownloadTaskDelegate?,
              location: FileDownloadManager.DownloadLocationPreference) -> WebKitDownloadTask
 
@@ -36,12 +37,13 @@ protocol FileDownloadManagerProtocol: AnyObject {
 extension FileDownloadManagerProtocol {
 
     @discardableResult
-    func add(_ download: WebKitDownload, location: FileDownloadManager.DownloadLocationPreference) -> WebKitDownloadTask {
-        add(download, delegate: nil, location: location)
+    func add(_ download: WebKitDownload, fromBurnerWindow: Bool, location: FileDownloadManager.DownloadLocationPreference) -> WebKitDownloadTask {
+        add(download, fromBurnerWindow: fromBurnerWindow, delegate: nil, location: location)
     }
 
 }
 
+@MainActor
 protocol FileDownloadManagerDelegate: AnyObject {
     func askUserToGrantAccessToDestination(_ folderUrl: URL)
 }
@@ -89,13 +91,14 @@ final class FileDownloadManager: FileDownloadManagerProtocol {
     }
 
     @discardableResult
-    func add(_ download: WebKitDownload, delegate: DownloadTaskDelegate?, location: DownloadLocationPreference) -> WebKitDownloadTask {
+    func add(_ download: WebKitDownload, fromBurnerWindow: Bool, delegate: DownloadTaskDelegate?, location: DownloadLocationPreference) -> WebKitDownloadTask {
         dispatchPrecondition(condition: .onQueue(.main))
 
         let task = WebKitDownloadTask(download: download,
                                       promptForLocation: location.promptForLocation,
                                       destinationURL: location.destinationURL,
-                                      tempURL: location.tempURL)
+                                      tempURL: location.tempURL,
+                                      isBurner: fromBurnerWindow)
 
         self.downloadTaskDelegates[task] = { [weak delegate] in delegate }
 
@@ -131,11 +134,11 @@ final class FileDownloadManager: FileDownloadManagerProtocol {
 
 extension FileDownloadManager: WebKitDownloadTaskDelegate {
 
+    @MainActor
     // swiftlint:disable:next function_body_length
     func fileDownloadTaskNeedsDestinationURL(_ task: WebKitDownloadTask,
                                              suggestedFilename: String,
                                              completionHandler: @escaping (URL?, UTType?) -> Void) {
-        dispatchPrecondition(condition: .onQueue(.main))
 
         let completion: (URL?, UTType?) -> Void = { url, fileType in
             defer {
@@ -225,6 +228,7 @@ extension FileDownloadManager: WebKitDownloadTaskDelegate {
         }
     }
 
+    @MainActor
     private func verifyAccessToDestinationFolder(_ folderUrl: URL, destinationRequested: Bool, isSandboxed: Bool) -> Bool {
         if destinationRequested && isSandboxed { return true }
 
@@ -251,7 +255,9 @@ extension FileDownloadManager: WebKitDownloadTaskDelegate {
 
 protocol DownloadTaskDelegate: AnyObject {
 
-    func chooseDestination(suggestedFilename: String?, directoryURL: URL?, fileTypes: [UTType], callback: @escaping (URL?, UTType?) -> Void)
+    @MainActor
+    func chooseDestination(suggestedFilename: String?, directoryURL: URL?, fileTypes: [UTType], callback: @escaping @MainActor (URL?, UTType?) -> Void)
+    @MainActor
     func fileIconFlyAnimationOriginalRect(for downloadTask: WebKitDownloadTask) -> NSRect?
 
 }

@@ -20,6 +20,7 @@ import Cocoa
 @preconcurrency import Lottie
 import Combine
 
+@MainActor
 final class FireViewController: NSViewController {
 
     enum Const {
@@ -48,9 +49,9 @@ final class FireViewController: NSViewController {
 
     init?(coder: NSCoder,
           tabCollectionViewModel: TabCollectionViewModel,
-          fireViewModel: FireViewModel = FireCoordinator.fireViewModel) {
+          fireViewModel: FireViewModel? = nil) {
         self.tabCollectionViewModel = tabCollectionViewModel
-        self.fireViewModel = fireViewModel
+        self.fireViewModel = fireViewModel ?? FireCoordinator.fireViewModel
 
         super.init(coder: coder)
     }
@@ -77,7 +78,7 @@ final class FireViewController: NSViewController {
         super.viewWillAppear()
 
         self.view.superview?.isHidden = true
-        subscribeToShouldPreventUserInteraction()
+        subscribeToFireAnimationEvents()
         progressIndicator.startAnimation(self)
     }
 
@@ -87,11 +88,11 @@ final class FireViewController: NSViewController {
         progressIndicator.stopAnimation(self)
     }
 
-    private var shouldPreventUserInteractionCancellable: AnyCancellable?
-    private func subscribeToShouldPreventUserInteraction() {
-        shouldPreventUserInteractionCancellable = fireViewModel.shouldPreventUserInteraction
-            .sink { [weak self] shouldPreventUserInteraction in
-                self?.view.superview?.isHidden = !shouldPreventUserInteraction
+    private var fireAnimationEventsCancellable: AnyCancellable?
+    private func subscribeToFireAnimationEvents() {
+        fireAnimationEventsCancellable = fireViewModel.isFirePresentationInProgress
+            .sink { [weak self] isFirePresentationInProgress in
+                self?.view.superview?.isHidden = !isFirePresentationInProgress
             }
     }
 
@@ -136,6 +137,24 @@ final class FireViewController: NSViewController {
 
     func showDialog() {
         presentAsModalWindow(fireDialogViewController)
+    }
+
+    func animateFireWhenClosing() async {
+        await waitForFireAnimationViewIfNeeded()
+        await withUnsafeContinuation { (continuation: UnsafeContinuation<Void, Never>) in
+            progressIndicatorWrapper.isHidden = true
+            fakeFireButton.isHidden = true
+            fireViewModel.isAnimationPlaying = true
+
+            fireAnimationView?.play(toProgress: 0.63) { [weak self] _ in
+                guard let self = self else { return }
+
+                self.fireViewModel.isAnimationPlaying = false
+                self.progressIndicatorWrapper.isHidden = false
+                self.fakeFireButton.isHidden = false
+                continuation.resume()
+            } ?? continuation.resume() // Resume immediately if fireAnimationView is nil
+        }
     }
 
     @MainActor

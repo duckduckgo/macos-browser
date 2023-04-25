@@ -17,7 +17,6 @@
 //
 
 import Cocoa
-import os.log
 import Combine
 import Lottie
 
@@ -38,6 +37,7 @@ final class AddressBarViewController: NSViewController {
 
     private let tabCollectionViewModel: TabCollectionViewModel
     private let suggestionContainerViewModel: SuggestionContainerViewModel
+    private let isBurner: Bool
 
     enum Mode: Equatable {
         case editing(isUrl: Bool)
@@ -82,11 +82,13 @@ final class AddressBarViewController: NSViewController {
         fatalError("AddressBarViewController: Bad initializer")
     }
 
-    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel) {
+    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, isBurner: Bool) {
         self.tabCollectionViewModel = tabCollectionViewModel
         self.suggestionContainerViewModel = SuggestionContainerViewModel(
             isHomePage: tabCollectionViewModel.selectedTabViewModel?.tab.content == .homePage,
+            isBurner: isBurner,
             suggestionContainer: SuggestionContainer())
+        self.isBurner = isBurner
 
         super.init(coder: coder)
     }
@@ -174,7 +176,8 @@ final class AddressBarViewController: NSViewController {
     }
 
     @IBSegueAction func createAddressBarButtonsViewController(_ coder: NSCoder) -> AddressBarButtonsViewController? {
-        let controller = AddressBarButtonsViewController(coder: coder, tabCollectionViewModel: tabCollectionViewModel)
+        let controller = AddressBarButtonsViewController(coder: coder,
+                                                         tabCollectionViewModel: tabCollectionViewModel)
 
         self.addressBarButtonsViewController = controller
         controller?.delegate = self
@@ -275,6 +278,10 @@ final class AddressBarViewController: NSViewController {
             .store(in: &cancellables)
     }
 
+    var accentColor: NSColor {
+        return isBurner ? NSColor.burnerAccentColor : NSColor.controlAccentColor
+    }
+
     private func updateView() {
         let isPassiveTextFieldHidden = isFirstResponder || mode.isEditing
         addressBarTextField.alphaValue = isPassiveTextFieldHidden ? 1 : 0
@@ -289,6 +296,8 @@ final class AddressBarViewController: NSViewController {
 
         activeOuterBorderView.layer?.backgroundColor = NSColor.controlAccentColor.withAlphaComponent(0.2).cgColor
         activeBackgroundView.layer?.borderColor = NSColor.controlAccentColor.withAlphaComponent(0.8).cgColor
+        activeOuterBorderView.layer?.backgroundColor = accentColor.withAlphaComponent(0.2).cgColor
+        activeBackgroundView.layer?.borderColor = accentColor.withAlphaComponent(0.8).cgColor
     }
 
     private func updateShadowViewPresence(_ isFirstResponder: Bool) {
@@ -342,7 +351,7 @@ final class AddressBarViewController: NSViewController {
         NSAppearance.withAppAppearance {
             if window.isKeyWindow {
                 activeBackgroundView.layer?.borderWidth = 2.0
-                activeBackgroundView.layer?.borderColor = NSColor.controlAccentColor.withAlphaComponent(0.6).cgColor
+                activeBackgroundView.layer?.borderColor = accentColor.withAlphaComponent(0.6).cgColor
                 activeBackgroundView.layer?.backgroundColor = NSColor.addressBarBackgroundColor.cgColor
 
                 activeOuterBorderView.isHidden = !isHomePage

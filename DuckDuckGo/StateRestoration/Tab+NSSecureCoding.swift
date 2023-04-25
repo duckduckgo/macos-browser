@@ -36,6 +36,7 @@ extension Tab: NSSecureCoding {
 
     static var supportsSecureCoding: Bool { true }
 
+    @MainActor
     convenience init?(coder decoder: NSCoder) {
         let url: URL? = decoder.decodeIfPresent(at: NSSecureCodingKeys.url)
         let videoID: String? = decoder.decodeIfPresent(at: NSSecureCodingKeys.videoID)
@@ -55,6 +56,7 @@ extension Tab: NSSecureCoding {
                   favicon: decoder.decodeIfPresent(at: NSSecureCodingKeys.favicon),
                   interactionStateData: interactionStateData,
                   shouldLoadInBackground: false,
+                  isBurner: false,
                   shouldLoadFromCache: true,
                   lastSelectedAt: decoder.decodeIfPresent(at: NSSecureCodingKeys.lastSelectedAt))
 

@@ -17,9 +17,10 @@
 //
 
 import Cocoa
-import os.log
+import Common
 import WebKit
 
+@MainActor
 final class NavigationButtonMenuDelegate: NSObject {
 
     enum ButtonType: Equatable {

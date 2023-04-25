@@ -19,7 +19,9 @@
 import Foundation
 
 public protocol ManagementViewModel: ObservableObject {
+
     var isSyncEnabled: Bool { get }
+    var isCreatingAccount: Bool { get }
     var shouldShowErrorMessage: Bool { get set }
     var errorMessage: String? { get }
 
@@ -28,5 +30,8 @@ public protocol ManagementViewModel: ObservableObject {
 
     func presentEnableSyncDialog()
     func presentRecoverSyncAccountDialog()
-    func turnOffSync()
+    func presentTurnOffSyncConfirmDialog()
+    func presentDeviceDetails(_ device: SyncDevice)
+
+    func saveRecoveryPDF()
 }

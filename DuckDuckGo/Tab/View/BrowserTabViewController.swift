@@ -18,8 +18,8 @@
 
 import Cocoa
 import WebKit
-import os.log
 import Combine
+import Common
 import SwiftUI
 import BrowserServicesKit
 
@@ -348,7 +348,10 @@ final class BrowserTabViewController: NSViewController {
             return
         }
 
-        let tab = Tab(content: content, shouldLoadInBackground: true, webViewFrame: view.frame)
+        let tab = Tab(content: content,
+                      shouldLoadInBackground: true,
+                      isBurner: tabCollectionViewModel.isBurner,
+                      webViewSize: view.frame.size)
         tabCollectionViewModel.append(tab: tab, selected: true)
     }
 
@@ -382,7 +385,7 @@ final class BrowserTabViewController: NSViewController {
 
     private func showTabContent(of tabViewModel: TabViewModel?) {
         guard tabCollectionViewModel.allTabsCount > 0 else {
-            view.window?.close()
+            view.window?.performClose(self)
             return
         }
         scheduleHoverLabelUpdatesForUrl(nil)
@@ -567,10 +570,10 @@ extension BrowserTabViewController: TabDelegate {
     func tab(_ parentTab: Tab, createdChild childTab: Tab, of kind: NewWindowPolicy) {
         switch kind {
         case .popup(size: let windowContentSize):
-            WindowsManager.openPopUpWindow(with: childTab, contentSize: windowContentSize)
-        case .window(active: let active):
-            WindowsManager.openNewWindow(with: childTab, showWindow: active)
-        case .tab(selected: let selected):
+            WindowsManager.openPopUpWindow(with: childTab, isBurner: parentTab.isBurner, contentSize: windowContentSize)
+        case .window(active: let active, let isBurner):
+            WindowsManager.openNewWindow(with: childTab, isBurner: isBurner, showWindow: active)
+        case .tab(selected: let selected, _):
             self.tabCollectionViewModel.insert(childTab, after: parentTab, selected: selected)
         }
     }
@@ -592,10 +595,7 @@ extension BrowserTabViewController: TabDelegate {
 
         let alert = AuthenticationAlert(host: protectionSpace.host, isEncrypted: protectionSpace.receivesCredentialSecurely)
         alert.beginSheetModal(for: window) { response in
-            guard case .OK = response,
-                  !alert.usernameTextField.stringValue.isEmpty,
-                  !alert.passwordTextField.stringValue.isEmpty
-            else {
+            guard case .OK = response else {
                 completionHandler(.performDefaultHandling, nil)
                 return
             }
@@ -680,10 +680,7 @@ extension BrowserTabViewController: TabDelegate {
         alert.beginSheetModal(for: window) { [request] response in
             // don‘t submit the query when tab is switched
             if case .abort = response { return }
-            guard case .OK = response,
-                  !alert.usernameTextField.stringValue.isEmpty,
-                  !alert.passwordTextField.stringValue.isEmpty
-            else {
+            guard case .OK = response else {
                 request.submit(nil)
                 return
             }

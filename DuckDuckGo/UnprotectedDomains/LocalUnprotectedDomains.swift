@@ -15,9 +15,9 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 //
+import Common
 import Foundation
 import CoreData
-import os.log
 import BrowserServicesKit
 
 typealias UnprotectedDomainsStore = CoreDataStore<UnprotectedDomainManagedObject>

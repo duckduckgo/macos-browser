@@ -17,7 +17,6 @@
 //
 
 import Foundation
-import os.log
 
 final class StatePersistenceService {
     private let fileStore: FileStore
@@ -37,7 +36,8 @@ final class StatePersistenceService {
         lastSessionStateArchive != nil
     }
 
-    func persistState(using encoder: @escaping (NSCoder) -> Void, sync: Bool = false) {
+    @MainActor
+    func persistState(using encoder: @escaping @MainActor (NSCoder) -> Void, sync: Bool = false) {
         dispatchPrecondition(condition: .onQueue(.main))
 
         let data = archive(using: encoder)
@@ -67,7 +67,8 @@ final class StatePersistenceService {
         lastSessionStateArchive = nil
     }
 
-    func restoreState(using restore: @escaping (NSCoder) throws -> Void) throws {
+    @MainActor
+    func restoreState(using restore: @escaping @MainActor (NSCoder) throws -> Void) throws {
         guard let encryptedData = lastSessionStateArchive ?? loadStateFromFile() else {
             throw CocoaError(.fileReadNoSuchFile)
         }
@@ -76,7 +77,8 @@ final class StatePersistenceService {
 
     // MARK: - Private
 
-    private func archive(using encoder: @escaping (NSCoder) -> Void) -> Data {
+    @MainActor
+    private func archive(using encoder: @escaping @MainActor (NSCoder) -> Void) -> Data {
         let archiver = NSKeyedArchiver(requiringSecureCoding: true)
         encoder(archiver)
         return archiver.encodedData
@@ -98,7 +100,8 @@ final class StatePersistenceService {
         fileStore.loadData(at: URL.persistenceLocation(for: self.fileName), decryptIfNeeded: false)
     }
 
-    private func restoreState(from archive: Data, using restore: @escaping (NSCoder) throws -> Void) throws {
+    @MainActor
+    private func restoreState(from archive: Data, using restore: @escaping @MainActor (NSCoder) throws -> Void) throws {
         guard let data = fileStore.decrypt(archive) else {
             throw CocoaError(.fileReadNoSuchFile)
         }

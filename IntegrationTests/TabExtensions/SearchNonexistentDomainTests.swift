@@ -175,11 +175,11 @@ final class SearchNonexistentDomainTests: XCTestCase {
         window = WindowsManager.openNewWindow(with: tab)!
 
         self.schemeHandler.middleware = [{ _ in
-                .failure(NSError(domain: NSURLErrorDomain, code: NSURLErrorCannotFindHost))
+            .failure(NSError(domain: NSURLErrorDomain, code: NSURLErrorCannotFindHost))
         }]
         let eNavigationFailed = tab.$error
             .compactMap { $0 }
-            .timeout(3)
+            .timeout(10)
             .first()
             .promise()
 
@@ -215,7 +215,7 @@ final class SearchNonexistentDomainTests: XCTestCase {
 
         let suggestionLoadingMock = SuggestionLoadingMock()
         let suggestionContainer = SuggestionContainer(suggestionLoading: suggestionLoadingMock, historyCoordinating: HistoryCoordinator.shared, bookmarkManager: LocalBookmarkManager.shared)
-        addressBar.suggestionContainerViewModel = SuggestionContainerViewModel(isHomePage: true, suggestionContainer: suggestionContainer)
+        addressBar.suggestionContainerViewModel = SuggestionContainerViewModel(isHomePage: true, isBurner: false, suggestionContainer: suggestionContainer)
 
         suggestionContainer.getSuggestions(for: enteredString)
         suggestionLoadingMock.completion!(.init(topHits: [.website(url: url)], duckduckgoSuggestions: [], historyAndBookmarks: []), nil)

@@ -18,7 +18,7 @@
 
 import Cocoa
 import Combine
-import os.log
+import Common
 import BrowserServicesKit
 
 protocol AddressBarTextFieldDelegate: AnyObject {
@@ -308,7 +308,9 @@ final class AddressBarTextField: NSTextField {
             return
         }
 
-        let tab = Tab(content: .url(url, userEntered: userEnteredValue), shouldLoadInBackground: true)
+        let tab = Tab(content: .url(url, userEntered: userEnteredValue),
+                      shouldLoadInBackground: true,
+                      isBurner: isBurner)
         tabCollectionViewModel.append(tab: tab, selected: selected)
     }
 
@@ -425,7 +427,7 @@ final class AddressBarTextField: NSTextField {
 
             if let suffix = suffix {
                 let attributedString = NSMutableAttributedString(string: value.string, attributes: makeTextAttributes())
-                attributedString.append(suffix.toAttributedString(size: isHomePage ? 15 : 13))
+                attributedString.append(suffix.toAttributedString(size: isHomePage ? 15 : 13, isBurner: isBurner))
                 attributedStringValue = attributedString
             } else {
                 self.stringValue = value.string
@@ -439,6 +441,10 @@ final class AddressBarTextField: NSTextField {
 
     var isHomePage: Bool {
         tabCollectionViewModel.selectedTabViewModel?.tab.content == .homePage
+    }
+
+    var isBurner: Bool {
+        tabCollectionViewModel.isBurner
     }
 
     func makeTextAttributes() -> [NSAttributedString.Key: Any] {
@@ -500,9 +506,10 @@ final class AddressBarTextField: NSTextField {
         case url(URL)
         case title(String)
 
-        func toAttributedString(size: CGFloat) -> NSAttributedString {
+        func toAttributedString(size: CGFloat, isBurner: Bool) -> NSAttributedString {
+            let suffixColor = isBurner ? NSColor.burnerAccentColor : NSColor.addressBarSuffixColor
             let attrs = [NSAttributedString.Key.font: NSFont.systemFont(ofSize: size, weight: .light),
-                         .foregroundColor: NSColor.addressBarSuffixColor]
+                         .foregroundColor: suffixColor]
             return NSAttributedString(string: string, attributes: attrs)
         }
 
@@ -578,7 +585,8 @@ final class AddressBarTextField: NSTextField {
     private(set) lazy var suggestionViewController: SuggestionViewController = {
         NSStoryboard.suggestion.instantiateController(identifier: "SuggestionViewController") { coder in
             let suggestionViewController = SuggestionViewController(coder: coder,
-                                                                    suggestionContainerViewModel: self.suggestionContainerViewModel!)
+                                                                    suggestionContainerViewModel: self.suggestionContainerViewModel!,
+                                                                    isBurner: self.isBurner)
             suggestionViewController?.delegate = self
             return suggestionViewController
         }

@@ -75,6 +75,7 @@ protocol TabExtensionDependencies {
 typealias TabExtensionsBuilderArguments = (
     tabIdentifier: UInt64,
     isTabPinned: () -> Bool,
+    isTabBurner: Bool,
     contentPublisher: AnyPublisher<Tab.TabContent, Never>,
     titlePublisher: AnyPublisher<String?, Never>,
     userScriptsPublisher: AnyPublisher<UserScripts?, Never>,
@@ -94,6 +95,7 @@ extension TabExtensionsBuilder {
     /// ` let myPublishingExtension = add { MyPublishingExtension() }
     /// ` add { MyOtherExtension(with: myExtension.resultPublisher) }
     /// Note: Extensions with state restoration support should conform to `NSCodingExtension`
+    @MainActor
     mutating func registerExtensions(with args: TabExtensionsBuilderArguments, dependencies: TabExtensionDependencies) {
         let userScripts = args.userScriptsPublisher
 
@@ -148,13 +150,16 @@ extension TabExtensionsBuilder {
             FindInPageTabExtension(findInPageScriptPublisher: userScripts.map(\.?.findInPageScript))
         }
         add {
-            DownloadsTabExtension(downloadManager: dependencies.downloadManager)
+            DownloadsTabExtension(downloadManager:
+                                    dependencies.downloadManager,
+                                  isBurner: args.isTabBurner)
         }
         add {
             SearchNonexistentDomainNavigationResponder(tld: dependencies.privacyFeatures.contentBlocking.tld, contentPublisher: args.contentPublisher)
         }
         add {
-            HistoryTabExtension(historyCoordinating: dependencies.historyCoordinating,
+            HistoryTabExtension(isBurner: args.isTabBurner,
+                                historyCoordinating: dependencies.historyCoordinating,
                                 trackersPublisher: contentBlocking.trackersPublisher,
                                 urlPublisher: args.contentPublisher.map { content in content.isUrl ? content.url : nil },
                                 titlePublisher: args.titlePublisher)
@@ -163,11 +168,12 @@ extension TabExtensionsBuilder {
             ExternalAppSchemeHandler(workspace: dependencies.workspace, permissionModel: args.permissionModel, contentPublisher: args.contentPublisher)
         }
         add {
-            NavigationHotkeyHandler(isTabPinned: args.isTabPinned)
+            NavigationHotkeyHandler(isTabPinned: args.isTabPinned, isBurner: args.isTabBurner)
         }
 
         add {
             DuckPlayerTabExtension(duckPlayer: dependencies.duckPlayer,
+                                   isBurner: args.isTabBurner,
                                    scriptsPublisher: userScripts.compactMap { $0 },
                                    webViewPublisher: args.webViewFuture)
         }

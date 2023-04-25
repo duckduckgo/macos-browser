@@ -35,6 +35,7 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
 
     let progress: Progress
     let shouldPromptForLocation: Bool
+    let isBurner: Bool
 
     private(set) var suggestedFilename: String?
     private(set) var suggestedFileType: UTType?
@@ -81,12 +82,13 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
         download.webView
     }
 
-    init(download: WebKitDownload, promptForLocation: Bool, destinationURL: URL?, tempURL: URL?) {
+    init(download: WebKitDownload, promptForLocation: Bool, destinationURL: URL?, tempURL: URL?, isBurner: Bool) {
 
         self.download = download
         self.progress = Progress(totalUnitCount: -1)
         self.shouldPromptForLocation = promptForLocation
         self.location = .init(destinationURL: destinationURL, tempURL: tempURL)
+        self.isBurner = isBurner
         super.init()
 
         download.delegate = self
@@ -136,6 +138,8 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
             self.download.cancel()
             self.finish(with: .failure(.failedToCompleteDownloadTask(underlyingError: URLError(.cancelled), resumeData: nil, isRetryable: false)))
             self.decideDestinationCompletionHandler?(nil)
+
+            Pixel.fire(.debug(event: .fileGetDownloadLocationFailed, error: error))
         }
     }
 
@@ -310,6 +314,7 @@ extension WebKitDownloadTask: WebKitDownloadDelegate {}
             do {
                 destinationURL = try FileManager.default.moveItem(at: tempURL, to: destinationURL, incrementingIndexIfExists: true)
             } catch {
+                Pixel.fire(.debug(event: .fileMoveToDownloadsFailed, error: error))
                 destinationURL = tempURL
             }
         }

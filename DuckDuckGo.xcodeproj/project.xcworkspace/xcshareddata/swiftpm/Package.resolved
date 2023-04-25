@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "fc9ada07283575e3106e6fc5c670a96c34a86f55",
-        "version" : "54.1.0"
+        "revision" : "3eb658955a93fe5c3342b47330d53714ce230bdf",
+        "version" : "57.2.0"
       }
     },
     {
@@ -32,16 +32,16 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/GRDB.swift.git",
       "state" : {
-        "revision" : "053d890417cdb587377156bc18f230a2caca8a51",
-        "version" : "2.1.0"
+        "revision" : "4475888676cfe1aabb1a35f379cd079ea692da1e",
+        "version" : "2.1.1"
       }
     },
     {
       "identity" : "lottie-ios",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/airbnb/lottie-ios",
+      "location" : "https://github.com/duckduckgo/lottie-ios.git",
       "state" : {
-        "revision" : "4a6058cbbdfe4f74aeae92c8bd51ad3b0de2a1ee",
+        "revision" : "abf5510e261c85ffddd29de0bca9b72592ea2bdd",
         "version" : "3.3.0"
       }
     },

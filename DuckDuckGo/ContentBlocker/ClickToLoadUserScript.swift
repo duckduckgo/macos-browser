@@ -38,6 +38,7 @@ final class ClickToLoadUserScript: NSObject, UserScript, WKScriptMessageHandlerW
 
     weak var delegate: ClickToLoadUserScriptDelegate?
 
+    @MainActor
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage,
                                replyHandler: @escaping (Any?, String?) -> Void) {
         if message.name == "initClickToLoad" {

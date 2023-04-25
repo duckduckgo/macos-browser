@@ -19,6 +19,7 @@
 import Foundation
 
 /// Responsible for handling drag and drop of tabs between windows
+@MainActor
 final class TabDragAndDropManager {
 
     static let shared = TabDragAndDropManager()
@@ -50,13 +51,14 @@ final class TabDragAndDropManager {
     @discardableResult
     func performDragAndDropIfNeeded() -> Bool {
         if let sourceUnit = sourceUnit, let destinationUnit = destinationUnit,
-           sourceUnit.tabCollectionViewModel !== destinationUnit.tabCollectionViewModel {
+           sourceUnit.tabCollectionViewModel !== destinationUnit.tabCollectionViewModel &&
+            sourceUnit.tabCollectionViewModel?.isBurner ==
+                    destinationUnit.tabCollectionViewModel?.isBurner {
 
             performDragAndDrop(from: sourceUnit, to: destinationUnit)
             clear()
             return true
         } else {
-            clear()
             return false
         }
     }
