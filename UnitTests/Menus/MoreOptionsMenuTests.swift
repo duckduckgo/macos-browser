@@ -47,20 +47,21 @@ final class MoreOptionsMenuTests: XCTestCase {
     }
 
     func testThatMoreOptionMenuHasTheExpectedItems() {
-        XCTAssertEqual(moreOptionMenu.items[0].title, "Send Feedback")
-        XCTAssertTrue(moreOptionMenu.items[1].isSeparatorItem)
-        XCTAssertEqual(moreOptionMenu.items[2].title, UserText.plusButtonNewTabMenuItem)
-        XCTAssertEqual(moreOptionMenu.items[3].title, UserText.newWindowMenuItem)
-        XCTAssertTrue(moreOptionMenu.items[4].isSeparatorItem)
-        XCTAssertEqual(moreOptionMenu.items[5].title, UserText.zoom)
-        XCTAssertTrue(moreOptionMenu.items[6].isSeparatorItem)
-        XCTAssertEqual(moreOptionMenu.items[7].title, UserText.bookmarks)
-        XCTAssertEqual(moreOptionMenu.items[8].title, UserText.downloads)
-        XCTAssertEqual(moreOptionMenu.items[9].title, UserText.passwordManagement)
-        XCTAssertTrue(moreOptionMenu.items[10].isSeparatorItem)
-        XCTAssertEqual(moreOptionMenu.items[11].title, UserText.emailOptionsMenuItem)
-        XCTAssertTrue(moreOptionMenu.items[12].isSeparatorItem)
-        XCTAssertEqual(moreOptionMenu.items[13].title, UserText.settings)
+        XCTAssertEqual(moreOptionMenu.items.map { $0.isSeparatorItem ? "-" : $0.title },
+                       [ UserText.sendFeedback,
+                         "-",
+                         UserText.plusButtonNewTabMenuItem,
+                         UserText.newWindowMenuItem,
+                         "-",
+                         UserText.zoom,
+                         "-",
+                         UserText.bookmarks,
+                         UserText.downloads,
+                         UserText.passwordManagement,
+                         "-",
+                         UserText.emailOptionsMenuItem,
+                         "-",
+                         UserText.settings])
     }
 
     // MARK: Zoom
