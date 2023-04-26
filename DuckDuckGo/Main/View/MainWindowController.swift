@@ -51,7 +51,7 @@ final class MainWindowController: NSWindowController {
         setupWindow()
         setupToolbar()
         subscribeToTrafficLightsAlpha()
-        subscribeToIsFirePresentationInProgress()
+        subscribeToBurningData()
         subscribeToResolutionChange()
     }
 
@@ -118,14 +118,14 @@ final class MainWindowController: NSWindowController {
             .assign(to: \.constant, onWeaklyHeld: tabBarViewController.pinnedTabsViewLeadingConstraint)
     }
 
-    private var isFirePresentationInProgressCancellable: AnyCancellable?
-    private func subscribeToIsFirePresentationInProgress() {
-        isFirePresentationInProgressCancellable = fireViewModel.isFirePresentationInProgress
+    private var burningDataCancellable: AnyCancellable?
+    private func subscribeToBurningData() {
+        burningDataCancellable = fireViewModel.fire.$burningData
             .dropFirst()
             .removeDuplicates()
-            .sink(receiveValue: { [weak self] _ in
+            .sink(receiveValue: { [weak self] burningData in
                 guard let self else { return }
-                self.userInteraction(prevented: self.fireViewModel.fire.burningData != nil)
+                self.userInteraction(prevented: burningData != nil)
             })
     }
 
