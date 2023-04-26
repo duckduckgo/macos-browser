@@ -231,6 +231,8 @@ extension Pixel {
 
             case invalidPayload(Configuration)
 
+            case burnerTabMisplaced
+
         }
 
     }
@@ -505,6 +507,8 @@ extension Pixel.Event.Debug {
         case .bookmarksMigrationCouldNotRemoveOldStore: return "bookmarks_migration_could_not_remove_old_store"
 
         case .invalidPayload(let configuration): return "m_d_\(configuration.rawValue)_invalid_payload".lowercased()
+
+        case .burnerTabMisplaced: return "burner_tab_misplaced"
 
         }
     }

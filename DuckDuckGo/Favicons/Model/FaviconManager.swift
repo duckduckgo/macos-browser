@@ -42,9 +42,29 @@ protocol FaviconManagement {
 
 final class FaviconManager: FaviconManagement {
 
-    static let shared = FaviconManager()
+    static let shared = FaviconManager(cacheType: .standard)
 
-    private lazy var store: FaviconStoring = FaviconStore()
+    enum CacheType {
+        case standard
+        case inMemory
+    }
+
+    init(cacheType: CacheType) {
+        switch cacheType {
+        case .standard:
+            store = FaviconStore()
+        case .inMemory:
+            store = FaviconNullStore()
+        }
+        imageCache = FaviconImageCache(faviconStoring: store)
+        referenceCache = FaviconReferenceCache(faviconStoring: store)
+
+        if case .inMemory = cacheType {
+            loadFavicons()
+        }
+    }
+
+    private var store: FaviconStoring
 
     private let faviconURLSession = URLSession(configuration: .ephemeral)
 
@@ -69,8 +89,8 @@ final class FaviconManager: FaviconManagement {
 
     // MARK: - Fetching & Cache
 
-    private lazy var imageCache = FaviconImageCache(faviconStoring: store)
-    private lazy var referenceCache = FaviconReferenceCache(faviconStoring: store)
+    private var imageCache: FaviconImageCache
+    private var referenceCache: FaviconReferenceCache
 
     func handleFaviconLinks(_ faviconLinks: [FaviconUserScript.FaviconLink],
                             documentUrl: URL,

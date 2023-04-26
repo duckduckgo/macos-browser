@@ -31,7 +31,8 @@ public protocol ManagementViewModel: ObservableObject {
     func presentEnableSyncDialog()
     func presentRecoverSyncAccountDialog()
     func presentTurnOffSyncConfirmDialog()
+    func presentShowOrEnterCodeDialog()
+    func presentDeviceDetails(_ device: SyncDevice)
 
     func saveRecoveryPDF()
-
 }

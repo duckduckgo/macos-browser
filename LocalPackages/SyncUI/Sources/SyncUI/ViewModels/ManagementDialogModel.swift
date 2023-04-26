@@ -27,13 +27,13 @@ public protocol ManagementDialogModelDelegate: AnyObject {
     func confirmSetupComplete()
     func saveRecoveryPDF()
     func turnOffSync()
+    func updateDeviceName(_ name: String)
 }
 
 public final class ManagementDialogModel: ObservableObject {
 
     @Published public var currentDialog: ManagementDialogKind?
-    public var recoveryCode: String?
-    public var connectCode: String?
+    public var codeToDisplay: String?
 
     @Published public var shouldShowErrorMessage: Bool = false
     @Published public var errorMessage: String?
