@@ -249,24 +249,18 @@ final class MoreOptionsMenu: NSMenu {
 
         }
 
-        if selectedTabViewModel.canFindInPage {
-            addItem(withTitle: UserText.findInPageMenuItem, action: #selector(findInPage(_:)), keyEquivalent: "f")
-                .targetting(self)
-                .withImage(NSImage(named: "Find-Search"))
-        }
+        addItem(withTitle: UserText.findInPageMenuItem, action: selectedTabViewModel.canFindInPage ? #selector(findInPage(_:)) : nil, keyEquivalent: "f")
+            .targetting(self)
+            .withImage(NSImage(named: "Find-Search"))
 
-        if selectedTabViewModel.tab.content.sharingUrl != nil {
-            addItem(withTitle: UserText.shareMenuItem, action: nil, keyEquivalent: "")
-                .targetting(self)
-                .withImage(NSImage(named: "Share"))
-                .withSubmenu(SharingMenu())
-        }
+        addItem(withTitle: UserText.shareMenuItem, action: nil, keyEquivalent: "")
+            .targetting(self)
+            .withImage(NSImage(named: "Share"))
+            .withSubmenu(SharingMenu())
 
-        if selectedTabViewModel.canPrint {
-            addItem(withTitle: UserText.printMenuItem, action: #selector(doPrint(_:)), keyEquivalent: "")
-                .targetting(self)
-                .withImage(NSImage(named: "Print"))
-        }
+        addItem(withTitle: UserText.printMenuItem, action: selectedTabViewModel.canPrint ? #selector(doPrint(_:)) : nil, keyEquivalent: "")
+            .targetting(self)
+            .withImage(NSImage(named: "Print"))
 
         addItem(NSMenuItem.separator())
 
