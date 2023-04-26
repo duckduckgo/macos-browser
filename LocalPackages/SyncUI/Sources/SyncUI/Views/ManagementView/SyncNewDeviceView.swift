@@ -35,7 +35,7 @@ struct SyncNewDeviceView<ViewModel>: View where ViewModel: ManagementViewModel {
                 HStack {
                     Spacer()
                     TextButton(UserText.showOrEnterCode) {
-                        print("show or enter code")
+                        model.presentShowOrEnterCodeDialog()
                     }
                 }
             }
