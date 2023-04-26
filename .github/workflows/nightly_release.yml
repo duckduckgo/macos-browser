@@ -33,7 +33,7 @@ on:
 jobs:
   export-notarized-app:
 
-    name: Export Notarized App
+    name: Export Nightly Build
 
     runs-on: macos-12
 
