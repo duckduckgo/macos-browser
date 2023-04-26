@@ -564,19 +564,6 @@ extension MainViewController {
         self.tabCollectionViewModel.selectedTabViewModel?.findInPagePrevious()
     }
 
-    /// Declines handling findInPage action if there's no page loaded currently.
-    override func responds(to aSelector: Selector!) -> Bool {
-        if aSelector == #selector(findInPage(_:)) && tabCollectionViewModel.selectedTabViewModel?.tab.content.urlForWebView == nil {
-            return false
-        }
-
-        if aSelector == #selector(printWebView(_:)) && tabCollectionViewModel.selectedTabViewModel?.tab.webView.url == nil {
-            return false
-        }
-
-        return super.responds(to: aSelector)
-    }
-
     // MARK: - Printing
 
     @IBAction func printWebView(_ sender: Any?) {
@@ -749,7 +736,13 @@ extension MainViewController: NSMenuItemValidation {
         // Printing/saving
         case #selector(MainViewController.saveAs(_:)),
              #selector(MainViewController.printWebView(_:)):
-            return tabCollectionViewModel.selectedTabViewModel?.canReload == true
+            return tabCollectionViewModel.selectedTabViewModel?.canPrint == true
+
+        // Find In Page
+        case #selector(MainViewController.findInPage(_:)),
+             #selector(MainViewController.findInPageNext(_:)),
+             #selector(MainViewController.findInPagePrevious(_:)):
+            return tabCollectionViewModel.selectedTabViewModel?.canFindInPage == true
 
         // Merge all windows
         case #selector(MainViewController.mergeAllWindows(_:)):
@@ -812,15 +805,15 @@ extension AppDelegate: NSMenuItemValidation {
 
 extension MainViewController: FindInPageDelegate {
 
-    func findInPageNext(_ controller: FindInPageViewController) {
+    func findInPageNext() {
         self.tabCollectionViewModel.selectedTabViewModel?.findInPageNext()
     }
 
-    func findInPagePrevious(_ controller: FindInPageViewController) {
+    func findInPagePrevious() {
         self.tabCollectionViewModel.selectedTabViewModel?.findInPagePrevious()
     }
 
-    func findInPageDone(_ controller: FindInPageViewController) {
+    func findInPageDone() {
         self.tabCollectionViewModel.selectedTabViewModel?.closeFindInPage()
     }
 

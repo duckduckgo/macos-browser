@@ -234,7 +234,8 @@ final class MoreOptionsMenu: NSMenu {
     }
 
     private func addPageItems() {
-        guard let url = tabCollectionViewModel.selectedTabViewModel?.tab.content.urlForWebView else { return }
+        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel,
+              let url = selectedTabViewModel.tab.content.urlForWebView else { return }
 
         if url.canFireproof, let host = url.host {
 
@@ -248,18 +249,24 @@ final class MoreOptionsMenu: NSMenu {
 
         }
 
-        addItem(withTitle: UserText.findInPageMenuItem, action: #selector(findInPage(_:)), keyEquivalent: "f")
-            .targetting(self)
-            .withImage(NSImage(named: "Find-Search"))
+        if selectedTabViewModel.canFindInPage {
+            addItem(withTitle: UserText.findInPageMenuItem, action: #selector(findInPage(_:)), keyEquivalent: "f")
+                .targetting(self)
+                .withImage(NSImage(named: "Find-Search"))
+        }
 
-        addItem(withTitle: UserText.shareMenuItem, action: nil, keyEquivalent: "")
-            .targetting(self)
-            .withImage(NSImage(named: "Share"))
-            .withSubmenu(SharingMenu())
+        if selectedTabViewModel.tab.content.sharingUrl != nil {
+            addItem(withTitle: UserText.shareMenuItem, action: nil, keyEquivalent: "")
+                .targetting(self)
+                .withImage(NSImage(named: "Share"))
+                .withSubmenu(SharingMenu())
+        }
 
-        addItem(withTitle: UserText.printMenuItem, action: #selector(doPrint(_:)), keyEquivalent: "")
-            .targetting(self)
-            .withImage(NSImage(named: "Print"))
+        if selectedTabViewModel.canPrint {
+            addItem(withTitle: UserText.printMenuItem, action: #selector(doPrint(_:)), keyEquivalent: "")
+                .targetting(self)
+                .withImage(NSImage(named: "Print"))
+        }
 
         addItem(NSMenuItem.separator())
 

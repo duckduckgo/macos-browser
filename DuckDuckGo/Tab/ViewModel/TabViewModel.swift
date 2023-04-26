@@ -47,6 +47,10 @@ final class TabViewModel {
     }
     @Published var progress: Double = 0.0
 
+    var canPrint: Bool {
+        tab.content.userEditableUrl != nil
+    }
+
     struct ErrorViewState {
         var isVisible: Bool = false
         var message: String?
@@ -321,6 +325,10 @@ final class TabViewModel {
 }
 
 extension TabViewModel {
+
+    var canFindInPage: Bool {
+        tab.content.userEditableUrl != nil
+    }
 
     func showFindInPage() {
         tab.findInPage?.show(with: tab.webView)

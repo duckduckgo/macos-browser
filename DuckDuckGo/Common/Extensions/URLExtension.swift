@@ -29,7 +29,7 @@ extension URL.NavigationalScheme {
     }
 
     static var bookmarkableSchemes: [URL.NavigationalScheme] {
-        return [.http, .https, .file, .data, .duckPlayer]
+        return [.http, .https, .file, .data]
     }
 
     static var shareableSchemes: [URL.NavigationalScheme] {

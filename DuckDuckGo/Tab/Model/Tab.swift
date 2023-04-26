@@ -143,7 +143,7 @@ protocol NewWindowPolicyDecisionMaker {
                 guard let youtubeVideoParams = url.youtubeVideoParams else { return nil }
                 return .youtubeNoCookie(youtubeVideoParams.videoID, timestamp: youtubeVideoParams.timestamp)
             case .url(let url, credential: _, userEntered: _):
-                guard URL.NavigationalScheme.bookmarkableSchemes.contains(urlForWebView?.navigationalScheme ?? .about) else { return nil }
+                guard URL.NavigationalScheme.shareableSchemes.contains(urlForWebView?.navigationalScheme ?? .about) else { return nil }
                 return url
             default:
                 return nil

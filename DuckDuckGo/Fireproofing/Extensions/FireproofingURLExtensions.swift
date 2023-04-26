@@ -74,7 +74,7 @@ extension URL {
     }
 
     var canFireproof: Bool {
-        guard let host = self.host else { return false }
+        guard !isDuckPlayer, let host = self.host else { return false }
         return (host != Self.cookieDomain)
     }
 

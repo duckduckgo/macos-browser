@@ -22,9 +22,9 @@ import Combine
 
 protocol FindInPageDelegate: AnyObject {
 
-    func findInPageNext(_ controller: FindInPageViewController)
-    func findInPagePrevious(_ controller: FindInPageViewController)
-    func findInPageDone(_ controller: FindInPageViewController)
+    func findInPageNext()
+    func findInPagePrevious()
+    func findInPageDone()
 
 }
 
@@ -57,15 +57,15 @@ final class FindInPageViewController: NSViewController {
     }
 
     @IBAction func findInPageNext(_ sender: Any?) {
-        delegate?.findInPageNext(self)
+        delegate?.findInPageNext()
     }
 
     @IBAction func findInPagePrevious(_ sender: Any?) {
-        delegate?.findInPagePrevious(self)
+        delegate?.findInPagePrevious()
     }
 
     @IBAction func findInPageDone(_ sender: Any?) {
-        delegate?.findInPageDone(self)
+        delegate?.findInPageDone()
     }
 
     func control(_ control: NSControl, textView: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
@@ -78,10 +78,10 @@ final class FindInPageViewController: NSViewController {
         modifiers.remove(.capsLock)
         switch modifiers {
         case .shift:
-            delegate?.findInPagePrevious(self)
+            delegate?.findInPagePrevious()
             return true
         case []:
-            delegate?.findInPageNext(self)
+            delegate?.findInPageNext()
             return true
         default:
             return false
