@@ -42,7 +42,7 @@ jobs:
 
     env:
       release-type: review
-      create-dmg: true
+      create-dmg: false
       asana-task-url: 'https://app.asana.com/0/1201037661562251/1204480871838578/f'
 
     steps:
