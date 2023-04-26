@@ -316,13 +316,13 @@ protocol NewWindowPolicyDecisionMaker {
         permissions = PermissionModel(permissionManager: permissionManager,
                                       geolocationService: geolocationService)
 
-        let userScriptsPublisher = _userContentController.projectedValue
-            .compactMap { $0?.$contentBlockingAssets }
+        let userContentControllerPromise = Future<UserContentController, Never>.promise()
+        let userScriptsPublisher = userContentControllerPromise.future
+            .compactMap { $0.$contentBlockingAssets }
             .switchToLatest()
             .map { $0?.userScripts as? UserScripts }
             .eraseToAnyPublisher()
 
-        let userContentControllerPromise = Future<UserContentController, Never>.promise()
         let webViewPromise = Future<WKWebView, Never>.promise()
         var tabGetter: () -> Tab? = { nil }
         self.extensions = extensionsBuilder
@@ -405,21 +405,22 @@ protocol NewWindowPolicyDecisionMaker {
         cleanUpBeforeClosing(onDeinit: false)
     }
 
+    @MainActor(unsafe)
     private func cleanUpBeforeClosing(onDeinit: Bool) {
-        let job = { [webView] in
+        let job = { [webView, userContentController] in
             webView.stopLoading()
             webView.stopMediaCapture()
             webView.stopAllMediaPlayback()
             webView.fullscreenWindowController?.close()
 
-            webView.configuration.userContentController.removeAllUserScripts()
+            userContentController?.cleanUpBeforeClosing()
             webView.assertObjectDeallocated(after: 4.0)
         }
         if !onDeinit {
             assertObjectDeallocated(after: 4.0)
         }
         guard Thread.isMainThread else {
-            DispatchQueue.main.async(execute: job)
+            DispatchQueue.main.async { job() }
             return
         }
         job()
@@ -1071,11 +1072,12 @@ extension Tab: NewWindowPolicyDecisionMaker {
 }
 
 extension Tab: TabDataClearing {
+    @MainActor
     func prepareForDataClearing(caller: TabDataCleaner) {
         webViewCancellables.removeAll()
 
         webView.stopLoading()
-        webView.configuration.userContentController.removeAllUserScripts()
+        (webView.configuration.userContentController as? UserContentController)?.cleanUpBeforeClosing()
 
         webView.navigationDelegate = caller
         webView.load(URLRequest(url: .blankPage))

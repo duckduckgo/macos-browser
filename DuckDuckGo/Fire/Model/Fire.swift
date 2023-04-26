@@ -40,6 +40,7 @@ final class TabDataCleaner: NSObject, WKNavigationDelegate {
 
     private var completion: (() -> Void)?
 
+    @MainActor
     func prepareTabsForCleanup(_ tabs: [TabViewModel],
                                completion: @escaping () -> Void) {
         guard !tabs.isEmpty else {
