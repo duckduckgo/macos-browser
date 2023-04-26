@@ -19,7 +19,7 @@
 import SwiftUI
 
 struct SyncPreferencesRow<ImageContent, CenterContent, RightContent>: View where ImageContent: View, CenterContent: View, RightContent: View {
-    
+
     let imageContent: () -> ImageContent
     let centerContent: () -> CenterContent
     let rightContent: () -> RightContent
@@ -46,4 +46,5 @@ struct SyncPreferencesRow<ImageContent, CenterContent, RightContent>: View where
         .padding(.horizontal, 10)
         .frame(minHeight: 40)
     }
+
 }
