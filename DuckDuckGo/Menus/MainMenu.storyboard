@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="21507" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="21701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21507"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21701"/>
     </dependencies>
     <scenes>
         <!--Application-->
@@ -538,7 +538,11 @@ CA
                                                 <action selector="showManageBookmarks:" target="Ady-hI-5gd" id="meV-V2-zJ2"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem title="Toggle Bookmarks Bar" keyEquivalent="B" id="SwH-Sh-zIJ"/>
+                                        <menuItem title="Toggle Bookmarks Bar" keyEquivalent="B" id="SwH-Sh-zIJ">
+                                            <connections>
+                                                <action selector="toggleBookmarksBarFromMenu:" target="Ady-hI-5gd" id="K35-ch-3LK"/>
+                                            </connections>
+                                        </menuItem>
                                         <menuItem isSeparatorItem="YES" id="aPG-H0-BrG"/>
                                         <menuItem title="Import Bookmarks and Passwords..." id="tNX-Bv-yM3" userLabel="Import Bookmarks...">
                                             <modifierMask key="keyEquivalentModifierMask"/>
