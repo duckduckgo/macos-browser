@@ -83,6 +83,11 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         presentDialog(for: .deviceDetails(device))
     }
 
+    @MainActor
+    func presentRemoveDevice(_ device: SyncDevice) {
+        presentDialog(for: .removeDevice(device))
+    }
+
     func turnOffSync() {
         Task { @MainActor in
             do {
@@ -313,6 +318,19 @@ extension SyncPreferences: ManagementDialogModelDelegate {
             try data.writeFileWithProgress(to: location)
         }
 
+    }
+
+    @MainActor
+    func removeDevice(_ device: SyncDevice) {
+        Task { @MainActor in
+            do {
+                try await syncService.disconnect(deviceId: device.id)
+                managementDialogModel.endFlow()
+                refreshDevices()
+            } catch {
+                managementDialogModel.errorMessage = String(describing: error)
+            }
+        }
     }
 
 }
