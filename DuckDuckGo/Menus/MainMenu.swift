@@ -77,9 +77,10 @@ final class MainMenu: NSMenu {
     // MARK: - Debug
     @IBOutlet weak var debugMenuItem: NSMenuItem? {
         didSet {
-            #if !DEBUG && !REVIEW && !NETP
+            #if !DEBUG && !REVIEW
             if let item = debugMenuItem {
-                removeItem(item)
+                #warning("Temporarily keep the debug menu in all NetP builds. BE SURE TO REMOVE THIS BEFORE MOVING NETP INTO THE MAIN REPO.")
+                // removeItem(item)
             }
             #endif
         }
