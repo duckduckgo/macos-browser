@@ -1,8 +1,11 @@
 name: Make Nightly Release
 
 on: 
-  schedule:
-    - cron: '0 0 * * *' # Run nightly at 00:00 UTC
+  #schedule:
+  #  - cron: '0 0 * * *' # Run nightly at 00:00 UTC
+  push:
+    branches:
+      - daniel/nightly
   workflow_call:
     secrets:
       BUILD_CERTIFICATE_BASE64:
