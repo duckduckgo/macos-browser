@@ -25,6 +25,7 @@ import Configuration
 import Networking
 import Bookmarks
 import DDGSync
+import SyncDataProviders
 
 @NSApplicationMain
 @MainActor
@@ -165,7 +166,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
         appIconChanger = AppIconChanger(internalUserDecider: internalUserDecider)
         syncMetadata = LocalSyncMetadataStore(database: SyncMetadataDatabase.shared.db)
-        syncService = DDGSync(dataProviders: [SyncBookmarksProvider(database: BookmarkDatabase.shared.db, metadataStore: syncMetadata)])
+        syncService = DDGSync(dataProviders: [
+            SyncBookmarksProvider(
+                database: BookmarkDatabase.shared.db,
+                metadataStore: syncMetadata,
+                reloadBookmarksAfterSync: LocalBookmarkManager.shared.loadBookmarks
+            )
+        ])
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
