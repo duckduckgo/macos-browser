@@ -2,7 +2,7 @@ name: Make Nightly Release
 
 on: 
   schedule:
-    cron: '0 0 * * *' # Run nightly at 00:00 UTC
+    - cron: '0 0 * * *' # Run nightly at 00:00 UTC
   secrets:
       BUILD_CERTIFICATE_BASE64:
         required: true
