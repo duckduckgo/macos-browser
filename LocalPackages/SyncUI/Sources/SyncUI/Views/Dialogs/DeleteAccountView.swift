@@ -29,9 +29,9 @@ struct DeleteAccountView: View {
         SyncDialog {
             VStack(spacing: 20.0) {
                 Image("SyncRemoveDeviceDesktop")
-                Text("Delete Server Data?")
+                Text(UserText.deleteAccountTitle)
                     .font(.system(size: 17, weight: .bold))
-                Text("These devices will be disconnected and your synced data will be deleted from the server.")
+                Text(UserText.deleteAccountMessage)
                     .fixedSize(horizontal: false, vertical: true)
                     .lineLimit(nil)
                     .multilineTextAlignment(.center)
@@ -45,7 +45,7 @@ struct DeleteAccountView: View {
             Button(UserText.cancel) {
                 model.endFlow()
             }
-            Button("Delete Data") {
+            Button(UserText.deleteAccountButton) {
                 model.delegate?.deleteAccount()
             }
             .buttonStyle(DestructiveActionButtonStyle(enabled: true))
