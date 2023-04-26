@@ -32,6 +32,7 @@ public protocol ManagementViewModel: ObservableObject {
     func presentRecoverSyncAccountDialog()
     func presentTurnOffSyncConfirmDialog()
     func presentDeleteAccount()
+    func presentShowOrEnterCodeDialog()
     func presentDeviceDetails(_ device: SyncDevice)
     func presentRemoveDevice(_ device: SyncDevice)
 
