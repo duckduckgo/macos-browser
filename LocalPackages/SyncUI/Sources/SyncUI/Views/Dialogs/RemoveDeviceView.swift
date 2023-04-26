@@ -25,10 +25,14 @@ struct RemoveDeviceView: View {
 
     let device: SyncDevice
 
+    var removeImageName: String {
+        return device.kind == .mobile ? "SyncRemoveDeviceMobile" : "SyncRemoveDeviceDesktop"
+    }
+
     var body: some View {
         SyncDialog(spacing: 20.0) {
 
-            Image("SyncRemoveDeviceDesktop")
+            Image(removeImageName)
             Text(UserText.removeDeviceConfirmTitle)
                 .font(.system(size: 17, weight: .bold))
             Text(UserText.removeDeviceConfirmMessage(device.name))
