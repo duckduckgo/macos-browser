@@ -1,11 +1,8 @@
 name: Make Nightly Release
 
 on: 
-  #schedule:
-  #  - cron: '0 0 * * *' # Run nightly at 00:00 UTC
-  push:
-    branches:
-      - daniel/nightly
+  schedule:
+    - cron: '0 2 * * *' # Run nightly at 7pm ET  
   workflow_call:
     secrets:
       BUILD_CERTIFICATE_BASE64:
@@ -41,7 +38,7 @@ jobs:
     runs-on: macos-12
 
     env:
-      release-type: review
+      release-type: nightly
       create-dmg: true
       asana-task-url: 'https://app.asana.com/0/1201037661562251/1204480871838578/f'
 
@@ -138,10 +135,4 @@ jobs:
         ./scripts/archive.sh ${{ env.release-type }} \
             ${{ env.create_dmg_arg }} \
             ${{ env.asana_task_url_arg }}
-
-    - name: Upload app artifact
-      uses: actions/upload-artifact@v3
-      with:
-        name: DuckDuckGo-Nightly.app
-        path: ${{ github.workspace }}/release/DuckDuckGo-Nightly.zip
 

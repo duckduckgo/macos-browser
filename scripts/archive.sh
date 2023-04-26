@@ -15,7 +15,7 @@ print_usage_and_exit() {
 
 	cat <<- EOF
 	Usage:
-	  $ $(basename "$0") <review|release|review-sandbox|release-sandbox> [-a <asana_task_url>] [-d] [-s] [-v <version>]
+	  $ $(basename "$0") <review|release|review-sandbox|release-sandbox|nightly> [-a <asana_task_url>] [-d] [-s] [-v <version>]
 
 	Options:
 	 -a <asana_task_url>  Update Asana task after building the app (implies -d)
@@ -38,6 +38,11 @@ read_command_line_arguments() {
 	fi
 
 	case "$1" in
+		nightly)
+			app_name="DuckDuckGo Nightly"
+			scheme="Product Review Release"
+			configuration="Review"
+			;;
 		review)
 			app_name="DuckDuckGo Review"
 			scheme="Product Review Release"
