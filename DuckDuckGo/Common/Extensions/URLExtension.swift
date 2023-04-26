@@ -104,6 +104,10 @@ extension URL {
         return url
     }
 
+    static var dataBrokerProtection: URL {
+        return URL(string: "about:dbp")!
+    }
+
     static var blankPage: URL {
         return URL(string: "about:blank")!
     }

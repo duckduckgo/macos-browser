@@ -26,6 +26,7 @@ final class TabViewModel {
         static let home = NSImage(named: "HomeFavicon")!
         static let preferences = NSImage(named: "Preferences")!
         static let bookmarks = NSImage(named: "Bookmarks")!
+        static let dataBrokerProtection = NSImage(named: "DataBrokerProtection")!
     }
 
     private(set) var tab: Tab
@@ -254,6 +255,8 @@ final class TabViewModel {
             title = UserText.tabHomeTitle
         case .onboarding:
             title = UserText.tabOnboardingTitle
+        case .dataBrokerProtection:
+            title = UserText.tabDataBrokerProtectionTitle
         case .url, .none:
             if let title = tab.title?.trimmingWhitespace(),
                !title.isEmpty {
@@ -281,6 +284,9 @@ final class TabViewModel {
             return
         case .bookmarks:
             favicon = Favicon.bookmarks
+            return
+        case .dataBrokerProtection:
+            favicon = Favicon.dataBrokerProtection
             return
         case .url, .onboarding, .none: break
         }

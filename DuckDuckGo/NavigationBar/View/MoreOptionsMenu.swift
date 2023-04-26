@@ -34,6 +34,7 @@ protocol OptionsButtonMenuDelegate: AnyObject {
     func optionsButtonMenuRequestedPrint(_ menu: NSMenu)
     func optionsButtonMenuRequestedPreferences(_ menu: NSMenu)
     func optionsButtonMenuRequestedAppearancePreferences(_ menu: NSMenu)
+    func optionsButtonMenuRequestedDataBrokerProtection(_ menu: NSMenu)
 
 }
 
@@ -91,8 +92,14 @@ final class MoreOptionsMenu: NSMenu {
             .withImage(NSImage(named: "OptionsButtonMenuEmail"))
             .withSubmenu(EmailOptionsButtonSubMenu(tabCollectionViewModel: tabCollectionViewModel, emailManager: emailManager))
 
-        addItem(NSMenuItem.separator())
+        let dataBrokerProtectionItem = NSMenuItem(title: UserText.dataBrokerProtectionOptionsMenuItem,
+                                                  action: #selector(openDataBrokerProtection),
+                                                  keyEquivalent: "")
+            .targetting(self)
+            .withImage(NSImage(named: "DataBrokerProtection"))
+        addItem(dataBrokerProtectionItem)
 
+        addItem(NSMenuItem.separator())
         addPageItems()
 
         let preferencesItem = NSMenuItem(title: UserText.settings, action: #selector(openPreferences(_:)), keyEquivalent: "")
@@ -164,6 +171,10 @@ final class MoreOptionsMenu: NSMenu {
 
     @objc func openPreferences(_ sender: NSMenuItem) {
         actionDelegate?.optionsButtonMenuRequestedPreferences(self)
+    }
+
+    @objc func openDataBrokerProtection(_ sender: NSMenuItem) {
+        actionDelegate?.optionsButtonMenuRequestedDataBrokerProtection(self)
     }
 
     @objc func openAppearancePreferences(_ sender: NSMenuItem) {

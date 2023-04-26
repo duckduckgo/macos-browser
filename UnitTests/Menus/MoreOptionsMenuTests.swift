@@ -83,4 +83,10 @@ final class MoreOptionsMenuTests: XCTestCase {
         XCTAssertTrue(capturingActionDelegate.optionsButtonMenuRequestedPreferencesCalled)
     }
 
+    func testWhenClickingOnDataBrokerProtectionMenuItemThenTheActionDelegateIsAlerted() {
+        moreOptionMenu.performActionForItem(at: 12)
+
+        XCTAssertTrue(capturingActionDelegate.optionsButtonMenuRequestedDataBrokerProtectionCalled)
+    }
+
 }
