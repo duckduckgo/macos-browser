@@ -3,7 +3,8 @@ name: Make Nightly Release
 on: 
   schedule:
     - cron: '0 0 * * *' # Run nightly at 00:00 UTC
-  secrets:
+  workflow_call:
+    secrets:
       BUILD_CERTIFICATE_BASE64:
         required: true
       P12_PASSWORD:
