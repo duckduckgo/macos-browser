@@ -112,9 +112,7 @@ protocol NewWindowPolicyDecisionMaker {
             }
         }
 
-        var url: URL? {
-            userEditableUrl
-        }
+        /// URL displayed in the Address Bar and editable by user
         var userEditableUrl: URL? {
             switch self {
             case .url(let url, credential: _, userEntered: _) where !(url.isDuckPlayer || url.isDuckPlayerScheme):
@@ -124,6 +122,35 @@ protocol NewWindowPolicyDecisionMaker {
             }
         }
 
+        /// URL eligible for bookmarking
+        var bookmarkableUrl: URL? {
+            switch self {
+            case .url(let url, credential: _, userEntered: _) where (url.isDuckPlayer || url.isDuckPlayerScheme):
+                guard let youtubeVideoParams = url.youtubeVideoParams else { return nil }
+                return .duckPlayer(youtubeVideoParams.videoID, timestamp: youtubeVideoParams.timestamp)
+            case .url(let url, credential: _, userEntered: _):
+                guard URL.NavigationalScheme.bookmarkableSchemes.contains(url.navigationalScheme ?? .about) else { return nil }
+                return url
+            default:
+                return nil
+            }
+        }
+
+        /// URL eligible for sharing
+        var sharingUrl: URL? {
+            switch self {
+            case .url(let url, credential: _, userEntered: _) where (url.isDuckPlayer || url.isDuckPlayerScheme):
+                guard let youtubeVideoParams = url.youtubeVideoParams else { return nil }
+                return .youtubeNoCookie(youtubeVideoParams.videoID, timestamp: youtubeVideoParams.timestamp)
+            case .url(let url, credential: _, userEntered: _):
+                guard URL.NavigationalScheme.bookmarkableSchemes.contains(urlForWebView?.navigationalScheme ?? .about) else { return nil }
+                return url
+            default:
+                return nil
+            }
+        }
+
+        /// “real” URL used for WebView navigation
         var urlForWebView: URL? {
             switch self {
             case .url(let url, credential: _, userEntered: _):
@@ -499,7 +526,7 @@ protocol NewWindowPolicyDecisionMaker {
         if let url = webView.url {
             let content = TabContent.contentFromURL(url)
 
-            if self.content.isUrl, self.content.url == url {
+            if self.content.isUrl, self.content.urlForWebView == url {
                 // ignore content updates when tab.content has userEntered or credential set but equal url as it comes from the WebView url updated event
             } else if content != self.content {
                 self.content = content
@@ -933,7 +960,7 @@ extension Tab: FaviconUserScriptDelegate {
                            didFindFaviconLinks faviconLinks: [FaviconUserScript.FaviconLink],
                            for documentUrl: URL) {
         faviconManagement.handleFaviconLinks(faviconLinks, documentUrl: documentUrl) { favicon in
-            guard documentUrl == self.content.url, let favicon = favicon else {
+            guard documentUrl == self.content.urlForWebView, let favicon = favicon else {
                 return
             }
             self.favicon = favicon.image
@@ -990,10 +1017,10 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
 
             return .redirect(mainFrame) { navigator in
                 var request = navigationAction.request
+                request.url = navigationAction.url.removingBasicAuthCredential()
                 // credential is removed from the URL and set to TabContent to be used on next Challenge
-                self.content = .url(navigationAction.url.removingBasicAuthCredential(), credential: credential, userEntered: nil)
+                self.content = .url(request.url!, credential: credential, userEntered: nil)
                 // reload URL without credentials
-                request.url = self.content.url!
                 navigator.load(request)
             }
         }

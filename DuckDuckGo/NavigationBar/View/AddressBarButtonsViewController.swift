@@ -268,13 +268,10 @@ final class AddressBarButtonsViewController: NSViewController {
     private func updateBookmarkButtonVisibility() {
         guard view.window?.isPopUpWindow == false else { return }
 
-        let hasEmptyAddressBar = textFieldValue?.isEmpty ?? true
-        var isUrlBookmarked = false
-        if let url = tabCollectionViewModel.selectedTabViewModel?.tab.content.url,
-            bookmarkManager.isUrlBookmarked(url: url) {
-            isUrlBookmarked = true
-        }
-        let showBookmarkButton = clearButton.isHidden && !hasEmptyAddressBar && (isMouseOverNavigationBar || bookmarkPopover?.isShown == true || isUrlBookmarked)
+        let bookmarkingUrl = tabCollectionViewModel.selectedTabViewModel?.tab.content.bookmarkableUrl
+        let canBeBookmarked = bookmarkingUrl != nil && (controllerMode?.isEditing == false || clearButton.isHidden /* value non-empty */)
+        let isUrlBookmarked = canBeBookmarked && bookmarkingUrl.map(bookmarkManager.isUrlBookmarked(url:)) == true
+        let showBookmarkButton = clearButton.isHidden && canBeBookmarked && (isMouseOverNavigationBar || bookmarkPopover?.isShown == true || isUrlBookmarked)
 
         bookmarkButton.isHidden = !showBookmarkButton
     }
@@ -401,7 +398,7 @@ final class AddressBarButtonsViewController: NSViewController {
             permissions.microphone = selectedTabViewModel.usedPermissions.microphone
         }
 
-        let url = selectedTabViewModel.tab.content.url ?? .empty
+        let url = selectedTabViewModel.tab.content.urlForWebView ?? .empty
         let domain = url.isFileURL ? .localhost : (url.host ?? "")
 
         PermissionContextMenu(permissions: permissions.map { ($0, $1) }, domain: domain, delegate: self)
@@ -420,7 +417,7 @@ final class AddressBarButtonsViewController: NSViewController {
             return
         }
 
-        let url = selectedTabViewModel.tab.content.url ?? .empty
+        let url = selectedTabViewModel.tab.content.urlForWebView ?? .empty
         let domain = url.isFileURL ? .localhost : (url.host ?? "")
 
         PermissionContextMenu(permissions: [(.microphone, state)], domain: domain, delegate: self)
@@ -439,7 +436,7 @@ final class AddressBarButtonsViewController: NSViewController {
             return
         }
 
-        let url = selectedTabViewModel.tab.content.url ?? .empty
+        let url = selectedTabViewModel.tab.content.urlForWebView ?? .empty
         let domain = url.isFileURL ? .localhost : (url.host ?? "")
 
         PermissionContextMenu(permissions: [(.geolocation, state)], domain: domain, delegate: self)
@@ -463,7 +460,7 @@ final class AddressBarButtonsViewController: NSViewController {
                 $0.append( (.popups, .requested($1)) )
             }
         } else {
-            let url = selectedTabViewModel.tab.content.url ?? .empty
+            let url = selectedTabViewModel.tab.content.urlForWebView ?? .empty
             domain = url.isFileURL ? .localhost : (url.host ?? "")
             permissions = [(.popups, state)]
         }
@@ -487,7 +484,7 @@ final class AddressBarButtonsViewController: NSViewController {
         }
 
         permissions = [(permissionType, state)]
-        let url = selectedTabViewModel.tab.content.url ?? .empty
+        let url = selectedTabViewModel.tab.content.urlForWebView ?? .empty
         let domain = url.isFileURL ? .localhost : (url.host ?? "")
 
         PermissionContextMenu(permissions: permissions, domain: domain, delegate: self)
@@ -696,7 +693,7 @@ final class AddressBarButtonsViewController: NSViewController {
     }
 
     private func updateBookmarkButtonImage(isUrlBookmarked: Bool = false) {
-        if let url = tabCollectionViewModel.selectedTabViewModel?.tab.content.url,
+        if let url = tabCollectionViewModel.selectedTabViewModel?.tab.content.bookmarkableUrl,
            isUrlBookmarked || bookmarkManager.isUrlBookmarked(url: url) {
             bookmarkButton.image = Self.bookmarkFilledImage
             bookmarkButton.mouseOverTintColor = NSColor.bookmarkFilledTint
@@ -736,9 +733,9 @@ final class AddressBarButtonsViewController: NSViewController {
             return
         }
 
-        let urlScheme = selectedTabViewModel.tab.content.url?.scheme
-        let isHypertextUrl = urlScheme == "http" || urlScheme == "https"
-        let isDuckDuckGoUrl = selectedTabViewModel.tab.content.url?.isDuckDuckGoSearch ?? false
+        let navigationalScheme = selectedTabViewModel.tab.content.urlForWebView?.navigationalScheme
+        let isHypertextUrl = navigationalScheme.map(URL.NavigationalScheme.hypertextSchemes.contains) ?? false
+        let isDuckDuckGoUrl = selectedTabViewModel.tab.content.urlForWebView?.isDuckDuckGoSearch ?? false
         let isEditingMode = controllerMode?.isEditing ?? false
         let isTextFieldValueText = textFieldValue?.isText ?? false
 
@@ -895,7 +892,7 @@ final class AddressBarButtonsViewController: NSViewController {
 
     private func bookmarkForCurrentUrl(setFavorite: Bool, accessPoint: Pixel.Event.AccessPoint) -> Bookmark? {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel,
-              let url = selectedTabViewModel.tab.content.url else {
+              let url = selectedTabViewModel.tab.content.bookmarkableUrl else {
             assertionFailure("No URL for bookmarking")
             return nil
         }

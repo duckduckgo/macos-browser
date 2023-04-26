@@ -192,7 +192,7 @@ struct PinnedTabInnerView: View {
         if let favicon = model.favicon {
             Image(nsImage: favicon)
                 .resizable()
-        } else if let domain = model.content.url?.host, let firstLetter = domain.droppingWwwPrefix().capitalized.first.flatMap(String.init) {
+        } else if let domain = model.content.userEditableUrl?.host, let firstLetter = domain.droppingWwwPrefix().capitalized.first.flatMap(String.init) {
             ZStack {
                 Rectangle()
                     .foregroundColor(.forDomain(domain.droppingWwwPrefix()))

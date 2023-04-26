@@ -142,8 +142,13 @@ final class AddressBarTextField: NSTextField {
         }
 
         let addressBarString = selectedTabViewModel.addressBarString
-        let isSearch = selectedTabViewModel.tab.content.url?.isDuckDuckGoSearch ?? false
-        value = Value(stringValue: addressBarString, userTyped: false, isSearch: isSearch)
+        let urlForWebView = selectedTabViewModel.tab.content.urlForWebView
+        let isSearch = urlForWebView?.isDuckDuckGoSearch ?? false
+        if addressBarString.isEmpty, let urlForWebView {
+            value = .url(urlString: "", url: urlForWebView, userTyped: false)
+        } else {
+            value = Value(stringValue: addressBarString, userTyped: false, isSearch: isSearch)
+        }
     }
 
     private func saveValue() {
@@ -264,7 +269,7 @@ final class AddressBarTextField: NSTextField {
 
         // keep current search mode
         if url.isDuckDuckGoSearch,
-           let oldURL = selectedTabViewModel.tab.content.url,
+           let oldURL = selectedTabViewModel.tab.content.userEditableUrl,
             oldURL.isDuckDuckGoSearch {
             if let ia = oldURL.getParameter(named: URL.DuckDuckGoParameters.ia.rawValue) {
                 url = url.removingParameters(named: [URL.DuckDuckGoParameters.ia.rawValue])

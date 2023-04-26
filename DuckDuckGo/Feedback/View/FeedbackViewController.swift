@@ -71,7 +71,7 @@ final class FeedbackViewController: NSViewController {
 
     var currentTab: Tab?
     var currentTabUrl: URL? {
-        guard let url = currentTab?.content.url else {
+        guard let url = currentTab?.content.urlForWebView else {
             return nil
         }
 

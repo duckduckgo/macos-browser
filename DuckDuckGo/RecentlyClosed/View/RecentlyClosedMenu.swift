@@ -76,7 +76,7 @@ private extension NSMenuItem {
         case .url:
             image = recentlyClosedTab.favicon
             image?.size = NSSize.faviconSize
-            title = recentlyClosedTab.title ?? recentlyClosedTab.tabContent.url?.absoluteString ?? ""
+            title = recentlyClosedTab.title ?? recentlyClosedTab.tabContent.userEditableUrl?.absoluteString ?? ""
 
             if title.count > MainMenu.Constants.maxTitleLength {
                 title = String(title.truncated(length: MainMenu.Constants.maxTitleLength))

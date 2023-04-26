@@ -75,7 +75,7 @@ class NavigationProtectionIntegrationTests: XCTestCase {
         for i in 0..<itemsCount {
             print("processing", i)
             // open test page if needed
-            if tab.content.url != url {
+            if tab.content.urlForWebView != url {
                 _=try await tab.setUrl(url, userEntered: nil)?.value?.result.get()
             }
 

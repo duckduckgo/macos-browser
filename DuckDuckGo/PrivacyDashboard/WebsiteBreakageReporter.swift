@@ -34,7 +34,7 @@ final class WebsiteBreakageReporter {
 
     private func makeWebsiteBreakage(category: String, description: String, currentTab: Tab?) -> WebsiteBreakage {
         // ⚠️ To limit privacy risk, site URL is trimmed to not include query and fragment
-        let currentURL = currentTab?.content.url?.trimmingQueryItemsAndFragment()?.absoluteString ?? ""
+        let currentURL = currentTab?.content.urlForWebView?.trimmingQueryItemsAndFragment()?.absoluteString ?? ""
 
         let blockedTrackerDomains = currentTab?.privacyInfo?.trackerInfo.trackersBlocked.compactMap { $0.domain } ?? []
         let installedSurrogates = currentTab?.privacyInfo?.trackerInfo.installedSurrogates.map {$0} ?? []

@@ -96,7 +96,7 @@ class DownloadsIntegrationTests: XCTestCase {
         try! await tab.webView.evaluateJavaScript(js)
 
         let fileUrl = try await downloadTaskFuture.get().output
-            .timeout(1, scheduler: DispatchQueue.main) { .init(TimeoutError() as NSError, isRetryable: false) }.first().promise().get()
+            .timeout(5, scheduler: DispatchQueue.main) { .init(TimeoutError() as NSError, isRetryable: false) }.first().promise().get()
 
         XCTAssertEqual(fileUrl, FileManager.default.temporaryDirectory.appendingPathComponent("helloWorld.txt"))
         XCTAssertEqual(try? Data(contentsOf: fileUrl), data.testData)

@@ -60,7 +60,7 @@ final class PrivacyDashboardPermissionHandler {
             assertionFailure("PrivacyDashboardViewController: tabViewModel not set")
             return
         }
-        guard let domain = tabViewModel?.tab.content.url?.host else {
+        guard let domain = tabViewModel?.tab.content.urlForWebView?.host else {
             onPermissionChange?([])
             return
         }

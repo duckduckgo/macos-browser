@@ -234,7 +234,7 @@ final class MoreOptionsMenu: NSMenu {
     }
 
     private func addPageItems() {
-        guard let url = tabCollectionViewModel.selectedTabViewModel?.tab.content.url else { return }
+        guard let url = tabCollectionViewModel.selectedTabViewModel?.tab.content.urlForWebView else { return }
 
         if url.canFireproof, let host = url.host {
 

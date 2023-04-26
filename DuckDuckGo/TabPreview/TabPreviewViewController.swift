@@ -43,7 +43,7 @@ extension TabPreviewViewController {
         titleTextField.stringValue = tabViewModel.title
 
         // Search queries can match valid URL formats, so prevent creating a URL object from the address bar string if on a search page.
-        if !(tabViewModel.tab.content.url?.isDuckDuckGoSearch ?? false),
+        if !(tabViewModel.tab.content.urlForWebView?.isDuckDuckGoSearch ?? false),
            let url = URL(trimmedAddressBarString: tabViewModel.addressBarString),
            let punycodeDecoded = url.punycodeDecodedString {
             urlTextField.stringValue = punycodeDecoded

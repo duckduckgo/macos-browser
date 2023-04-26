@@ -183,11 +183,11 @@ final class TabViewModel {
     }
 
     private func updateCanBeBookmarked() {
-        canBeBookmarked = tab.content.url ?? .blankPage != .blankPage
+        canBeBookmarked = (tab.content.bookmarkableUrl != nil)
     }
 
     private var tabURL: URL? {
-        return tab.content.url ?? tab.parentTab?.content.url
+        return tab.content.userEditableUrl ?? tab.parentTab?.content.userEditableUrl
     }
 
     private var tabHostURL: URL? {

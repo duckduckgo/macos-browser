@@ -35,7 +35,7 @@ protocol LazyLoadable: AnyObject, Identifiable {
 extension Tab: LazyLoadable {
     var isUrl: Bool { content.isUrl }
 
-    var url: URL? { content.url }
+    var url: URL? { content.urlForWebView }
 
     var loadingFinishedPublisher: AnyPublisher<Tab, Never> {
         Publishers.Merge(webViewDidFinishNavigationPublisher, webViewDidFailNavigationPublisher)

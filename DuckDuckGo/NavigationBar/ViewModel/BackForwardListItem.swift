@@ -28,7 +28,7 @@ enum BackForwardListItem: Equatable {
         case .backForwardListItem(let item):
             return item.url
         case .goBackToCloseItem(parentTab: let tab):
-            return tab.content.url
+            return tab.content.userEditableUrl
         case .error:
             return nil
         }

@@ -339,6 +339,11 @@ final class TabTests: XCTestCase {
 
 }
 
+extension Tab.TabContent {
+    var url: URL? {
+        userEditableUrl
+    }
+}
 extension Tab {
     var url: URL? {
         get {

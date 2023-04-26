@@ -566,7 +566,7 @@ extension MainViewController {
 
     /// Declines handling findInPage action if there's no page loaded currently.
     override func responds(to aSelector: Selector!) -> Bool {
-        if aSelector == #selector(findInPage(_:)) && tabCollectionViewModel.selectedTabViewModel?.tab.content.url == nil {
+        if aSelector == #selector(findInPage(_:)) && tabCollectionViewModel.selectedTabViewModel?.tab.content.urlForWebView == nil {
             return false
         }
 

@@ -22,8 +22,18 @@ import BrowserServicesKit
 
 extension URL.NavigationalScheme {
 
+    static var duckPlayer: URL.NavigationalScheme { URL.NavigationalScheme(rawValue: DuckPlayer.duckPlayerScheme) }
+
     static var validSchemes: [URL.NavigationalScheme] {
         return [.http, .https, .file]
+    }
+
+    static var bookmarkableSchemes: [URL.NavigationalScheme] {
+        return [.http, .https, .file, .data, .duckPlayer]
+    }
+
+    static var shareableSchemes: [URL.NavigationalScheme] {
+        return [.http, .https, .file, .data]
     }
 
 }
