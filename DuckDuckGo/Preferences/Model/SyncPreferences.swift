@@ -204,6 +204,13 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
 
 extension SyncPreferences: ManagementDialogModelDelegate {
 
+    func deleteAccount() {
+        Task { @MainActor in
+            managementDialogModel.endFlow()
+            try await syncService.deleteAccount()
+        }
+    }
+
     func updateDeviceName(_ name: String) {
         Task { @MainActor in
             do {
@@ -290,6 +297,11 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                 managementDialogModel.errorMessage = String(describing: error)
             }
         }
+    }
+
+    @MainActor
+    func presentDeleteAccount() {
+        presentDialog(for: .deleteAccount(devices))
     }
 
     @MainActor
