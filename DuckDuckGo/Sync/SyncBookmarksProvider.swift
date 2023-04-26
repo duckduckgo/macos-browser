@@ -38,10 +38,7 @@ final class SyncBookmarksProvider: DataProviding {
         lastSyncTimestamp = nil
     }
 
-    func fetchChangedObjects() async throws -> [Syncable] {
-        // swiftlint:disable:next force_cast
-        let crypter = await (NSApp.delegate as! AppDelegate).syncService.crypter
-
+    func fetchChangedObjects(encryptedUsing crypter: Crypting) async throws -> [Syncable] {
         return await withCheckedContinuation { continuation in
 
             let context = database.makeContext(concurrencyType: .privateQueueConcurrencyType)
@@ -55,10 +52,7 @@ final class SyncBookmarksProvider: DataProviding {
         }
     }
 
-    func fetchAllObjects() async throws -> [Syncable] {
-        // swiftlint:disable:next force_cast
-        let crypter = await (NSApp.delegate as! AppDelegate).syncService.crypter
-
+    func fetchAllObjects(encryptedUsing crypter: Crypting) async throws -> [Syncable] {
         return await withCheckedContinuation { continuation in
             var syncableBookmarks: [Syncable] = []
 
@@ -73,10 +67,7 @@ final class SyncBookmarksProvider: DataProviding {
         }
     }
 
-    func handleSyncResult(sent: [Syncable], received: [Syncable], timestamp: String?) async {
-        // swiftlint:disable:next force_cast
-        let crypter = await (NSApp.delegate as! AppDelegate).syncService.crypter
-
+    func handleSyncResult(sent: [Syncable], received: [Syncable], timestamp: String?, crypter: Crypting) async {
         await withCheckedContinuation { continuation in
             var saveError: Error?
 
