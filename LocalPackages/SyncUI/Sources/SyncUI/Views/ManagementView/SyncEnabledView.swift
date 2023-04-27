@@ -60,7 +60,7 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
 
         PreferencePaneSection {
             Button(UserText.turnOffAndDeleteServerData) {
-                print("turn off and delete server data")
+                model.presentDeleteAccount()
             }
         }
     }

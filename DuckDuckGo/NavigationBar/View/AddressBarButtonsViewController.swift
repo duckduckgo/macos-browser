@@ -136,6 +136,7 @@ final class AddressBarButtonsViewController: NSViewController {
     @Published private(set) var buttonsWidth: CGFloat = 0
 
     private var tabCollectionViewModel: TabCollectionViewModel
+
     private var bookmarkManager: BookmarkManager = LocalBookmarkManager.shared
     var controllerMode: AddressBarViewController.Mode? {
         didSet {

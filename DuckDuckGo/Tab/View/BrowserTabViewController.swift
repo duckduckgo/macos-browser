@@ -348,7 +348,10 @@ final class BrowserTabViewController: NSViewController {
             return
         }
 
-        let tab = Tab(content: content, shouldLoadInBackground: true, webViewSize: view.frame.size)
+        let tab = Tab(content: content,
+                      shouldLoadInBackground: true,
+                      isBurner: tabCollectionViewModel.isBurner,
+                      webViewSize: view.frame.size)
         tabCollectionViewModel.append(tab: tab, selected: true)
     }
 
@@ -382,7 +385,7 @@ final class BrowserTabViewController: NSViewController {
 
     private func showTabContent(of tabViewModel: TabViewModel?) {
         guard tabCollectionViewModel.allTabsCount > 0 else {
-            view.window?.close()
+            view.window?.performClose(self)
             return
         }
         scheduleHoverLabelUpdatesForUrl(nil)
@@ -567,10 +570,10 @@ extension BrowserTabViewController: TabDelegate {
     func tab(_ parentTab: Tab, createdChild childTab: Tab, of kind: NewWindowPolicy) {
         switch kind {
         case .popup(size: let windowContentSize):
-            WindowsManager.openPopUpWindow(with: childTab, contentSize: windowContentSize)
-        case .window(active: let active):
-            WindowsManager.openNewWindow(with: childTab, showWindow: active)
-        case .tab(selected: let selected):
+            WindowsManager.openPopUpWindow(with: childTab, isBurner: parentTab.isBurner, contentSize: windowContentSize)
+        case .window(active: let active, let isBurner):
+            WindowsManager.openNewWindow(with: childTab, isBurner: isBurner, showWindow: active)
+        case .tab(selected: let selected, _):
             self.tabCollectionViewModel.insert(childTab, after: parentTab, selected: selected)
         }
     }

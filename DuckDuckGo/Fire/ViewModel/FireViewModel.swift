@@ -26,7 +26,7 @@ final class FireViewModel {
     @Published var isAnimationPlaying = false
 
     /// Publisher that emits true if burning animation or burning process is in progress
-    var shouldPreventUserInteraction: AnyPublisher<Bool, Never> {
+    var isFirePresentationInProgress: AnyPublisher<Bool, Never> {
         Publishers
             .CombineLatest($isAnimationPlaying, fire.$burningData)
             .map { (isAnimationPlaying, burningData) -> (Bool) in

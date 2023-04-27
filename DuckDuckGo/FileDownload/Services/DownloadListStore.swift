@@ -41,6 +41,8 @@ extension DownloadListStoring {
     }
 
     func save(_ entry: DownloadListItem) {
+        guard !entry.isBurner else { return }
+
         save(entry, completionHandler: nil)
     }
 
@@ -216,6 +218,7 @@ extension DownloadListItem {
                   modified: modified,
                   url: url,
                   websiteURL: managedObject.websiteURLEncrypted as? URL,
+                  isBurner: false,
                   fileType: managedObject.fileType.map { UTType(rawValue: $0 as CFString) },
                   destinationURL: managedObject.destinationURLEncrypted as? URL,
                   tempURL: managedObject.tempURLEncrypted as? URL,

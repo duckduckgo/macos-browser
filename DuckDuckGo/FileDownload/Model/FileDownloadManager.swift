@@ -27,6 +27,7 @@ protocol FileDownloadManagerProtocol: AnyObject {
 
     @discardableResult
     func add(_ download: WebKitDownload,
+             fromBurnerWindow: Bool,
              delegate: DownloadTaskDelegate?,
              location: FileDownloadManager.DownloadLocationPreference) -> WebKitDownloadTask
 
@@ -36,8 +37,8 @@ protocol FileDownloadManagerProtocol: AnyObject {
 extension FileDownloadManagerProtocol {
 
     @discardableResult
-    func add(_ download: WebKitDownload, location: FileDownloadManager.DownloadLocationPreference) -> WebKitDownloadTask {
-        add(download, delegate: nil, location: location)
+    func add(_ download: WebKitDownload, fromBurnerWindow: Bool, location: FileDownloadManager.DownloadLocationPreference) -> WebKitDownloadTask {
+        add(download, fromBurnerWindow: fromBurnerWindow, delegate: nil, location: location)
     }
 
 }
@@ -90,13 +91,14 @@ final class FileDownloadManager: FileDownloadManagerProtocol {
     }
 
     @discardableResult
-    func add(_ download: WebKitDownload, delegate: DownloadTaskDelegate?, location: DownloadLocationPreference) -> WebKitDownloadTask {
+    func add(_ download: WebKitDownload, fromBurnerWindow: Bool, delegate: DownloadTaskDelegate?, location: DownloadLocationPreference) -> WebKitDownloadTask {
         dispatchPrecondition(condition: .onQueue(.main))
 
         let task = WebKitDownloadTask(download: download,
                                       promptForLocation: location.promptForLocation,
                                       destinationURL: location.destinationURL,
-                                      tempURL: location.tempURL)
+                                      tempURL: location.tempURL,
+                                      isBurner: fromBurnerWindow)
 
         self.downloadTaskDelegates[task] = { [weak delegate] in delegate }
 
