@@ -35,7 +35,7 @@ final class FireCoordinator {
             burningWindow.makeKeyAndOrderFront(nil)
             waitForOpening = false
         } else {
-            burningWindow = WindowsManager.openNewWindow()!
+            burningWindow = WindowsManager.openNewWindow(isBurner: false)!
             waitForOpening = true
         }
 
@@ -58,9 +58,7 @@ final class FireCoordinator {
     static func showFirePopover(relativeTo positioningView: NSView, tabCollectionViewModel: TabCollectionViewModel) {
         if !(firePopover?.isShown ?? false) {
             firePopover = FirePopover(fireViewModel: fireViewModel, tabCollectionViewModel: tabCollectionViewModel)
-            firePopover?.show(relativeTo: positioningView.bounds.insetFromLineOfDeath(),
-                             of: positioningView,
-                             preferredEdge: .maxY)
+            firePopover?.showBelow(positioningView)
         }
     }
 

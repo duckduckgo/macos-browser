@@ -30,6 +30,7 @@ extension UserScripts: YoutubeScriptsProvider {}
 
 final class DuckPlayerTabExtension {
     private let duckPlayer: DuckPlayer
+    private let isBurner: Bool
     private var cancellables = Set<AnyCancellable>()
     private var youtubePlayerCancellables = Set<AnyCancellable>()
 
@@ -44,9 +45,11 @@ final class DuckPlayerTabExtension {
     private var shouldSelectNextNewTab: Bool?
 
     init(duckPlayer: DuckPlayer,
+         isBurner: Bool,
          scriptsPublisher: some Publisher<some YoutubeScriptsProvider, Never>,
          webViewPublisher: some Publisher<WKWebView, Never>) {
         self.duckPlayer = duckPlayer
+        self.isBurner = isBurner
 
         webViewPublisher.sink { [weak self] webView in
             self?.webView = webView
@@ -97,7 +100,7 @@ final class DuckPlayerTabExtension {
             }
         }
 
-        if url?.isDuckPlayerScheme == true {
+        if url?.isDuckPlayer == true {
             youtubePlayerScript?.isEnabled = true
 
             if canPushMessagesToJS {
@@ -141,7 +144,7 @@ extension DuckPlayerTabExtension: NewWindowPolicyDecisionMaker {
             defer {
                 self.shouldSelectNextNewTab = nil
             }
-            return .allow(.tab(selected: shouldSelectNextNewTab))
+            return .allow(.tab(selected: shouldSelectNextNewTab, burner: isBurner))
         }
         return nil
     }

@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1681492530681,
+    "version": 1682330125271,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -104,6 +104,10 @@
         "autoconsent": {
             "exceptions": [
                 {
+                    "domain": "autotrader.co.uk",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/326"
+                },
+                {
                     "domain": "zeitraum-moebel.de",
                     "reason": "After the cookie popup is managed and disappears, a semi-transparent overlay remains on the page which prevents further interaction with the site."
                 },
@@ -206,11 +210,12 @@
             ],
             "settings": {
                 "disabledCMPs": [
-                    "Sourcepoint-top"
+                    "Sourcepoint-top",
+                    "generic-cosmetic"
                 ]
             },
             "state": "enabled",
-            "hash": "66de1debed5c1823bde78ef5c26c0447"
+            "hash": "7adde7d4aa1b77fc92f18ec8f626f764"
         },
         "autofill": {
             "exceptions": [
@@ -294,7 +299,10 @@
         "duckPlayer": {
             "exceptions": [],
             "state": "enabled",
-            "hash": "52857469413a66e8b0c7b00de5589162"
+            "settings": {
+                "tryDuckPlayerLink": "https://www.youtube.com/watch?v=yKWIA-Pys4c"
+            },
+            "hash": "7a0636603f88c9544b1a20401ec5954d"
         },
         "elementHiding": {
             "exceptions": [
@@ -892,6 +900,15 @@
                         ]
                     },
                     {
+                        "domain": "harpygee.com",
+                        "rules": [
+                            {
+                                "selector": "#leaderboard",
+                                "type": "override"
+                            }
+                        ]
+                    },
+                    {
                         "domain": "hindustantimes.com",
                         "rules": [
                             {
@@ -1159,7 +1176,7 @@
                         "domain": "reddit.com",
                         "rules": [
                             {
-                                "selector": "iframe[src^='https://www.reddit.com/account/sso/one_tap/']",
+                                "selector": "._233XfOVq91N_ugGQDBb_OT",
                                 "type": "hide"
                             }
                         ]
@@ -1474,7 +1491,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "03311aa2b5635491ffd2a1e8b770d924"
+            "hash": "a2278ee484c43a14f6651a88015d971a"
         },
         "exceptionHandler": {
             "exceptions": [],
@@ -1749,6 +1766,10 @@
             "state": "enabled",
             "exceptions": [
                 {
+                    "domain": "natwest.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/851"
+                },
+                {
                     "domain": "ally.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/780"
                 },
@@ -1791,6 +1812,8 @@
                 "matchAllStackDomains": "disabled",
                 "overloadInstanceOf": "enabled",
                 "elementRemovalTimeout": 1000,
+                "injectGlobalStyles": "enabled",
+                "shadowDom": "enabled",
                 "domains": [
                     {
                         "domain": "bbc.co.uk"
@@ -2185,7 +2208,8 @@
                         "domain": "dr3fr5q4g2ul9.cloudfront.net"
                     },
                     {
-                        "domain": "cnn.io"
+                        "disabled_domain": "cnn.io",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/837"
                     },
                     {
                         "domain": "cams.gratis"
@@ -2284,7 +2308,7 @@
                     }
                 }
             },
-            "hash": "4fa74e721c448689364fbb4c841813af"
+            "hash": "764a01bb3f41cafb07c239bb29e62327"
         },
         "serviceworkerInitiatedRequests": {
             "exceptions": [],
@@ -2668,7 +2692,8 @@
                             {
                                 "rule": "connatix.com",
                                 "domains": [
-                                    "accuweather.com"
+                                    "accuweather.com",
+                                    "dailymail.co.uk"
                                 ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/768"
                             }
@@ -2793,48 +2818,61 @@
                             {
                                 "rule": "securepubads.g.doubleclick.net/gampad/ads",
                                 "domains": [
-                                    "ah.nl"
+                                    "ah.nl",
+                                    "rocketnews24.com"
                                 ],
-                                "reason": "'Bonus offer' elements do not render and are not clickable."
+                                "reason": "ah.nl - 'Bonus offer' elements do not render and are not clickable.,rocketnews24.com - https://github.com/duckduckgo/privacy-configuration/issues/846"
                             },
                             {
                                 "rule": "pubads.g.doubleclick.net/gampad/ads",
                                 "domains": [
                                     "nhl.com",
+                                    "rocketnews24.com",
                                     "viki.com"
                                 ],
-                                "reason": "nhl.com - Videos show a spinner and never load.,viki.com - after a video has played for a few seconds an adwall pops up. Clicking 'I've turned off my adblocker' resets the video, then after a few seconds the adwall pops up again."
+                                "reason": "nhl.com - Videos show a spinner and never load.,viki.com - after a video has played for a few seconds an adwall pops up. Clicking 'I've turned off my adblocker' resets the video, then after a few seconds the adwall pops up again.,rocketnews24.com - https://github.com/duckduckgo/privacy-configuration/issues/846"
                             },
                             {
                                 "rule": "pubads.g.doubleclick.net/ssai/event/",
                                 "domains": [
-                                    "cbssports.com"
+                                    "cbssports.com",
+                                    "rocketnews24.com"
                                 ],
-                                "reason": "Live videos do not load or render."
+                                "reason": "cbssports.com - Live videos do not load or render.,rocketnews24.com - https://github.com/duckduckgo/privacy-configuration/issues/846"
                             },
                             {
                                 "rule": "securepubads.g.doubleclick.net/tag/js/gpt.js",
                                 "domains": [
                                     "ah.nl",
+                                    "rocketnews24.com",
                                     "wunderground.com",
                                     "youmath.it"
                                 ],
-                                "reason": "ah.nl - 'Bonus offer' elements do not render and are not clickable.,wunderground.com - Video element does not display.,youmath.it - Adwall displays which prevents page interaction and resets the page view when clicked."
+                                "reason": "ah.nl - 'Bonus offer' elements do not render and are not clickable.,wunderground.com - Video element does not display.,youmath.it - Adwall displays which prevents page interaction and resets the page view when clicked.,rocketnews24.com - https://github.com/duckduckgo/privacy-configuration/issues/846"
                             },
                             {
                                 "rule": "securepubads.g.doubleclick.net/gpt/pubads_impl_",
                                 "domains": [
                                     "ah.nl",
+                                    "rocketnews24.com",
                                     "wunderground.com"
                                 ],
-                                "reason": "ah.nl - 'Bonus offer' elements do not render and are not clickable.,wunderground.com - Video element does not display."
+                                "reason": "ah.nl - 'Bonus offer' elements do not render and are not clickable.,wunderground.com - Video element does not display.,rocketnews24.com - https://github.com/duckduckgo/privacy-configuration/issues/846"
                             },
                             {
                                 "rule": "securepubads.g.doubleclick.net/pagead/ppub_config",
                                 "domains": [
+                                    "rocketnews24.com",
                                     "weather.com"
                                 ],
-                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/415"
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/415,rocketnews24.com - https://github.com/duckduckgo/privacy-configuration/issues/846"
+                            },
+                            {
+                                "rule": "doubleclick.net",
+                                "domains": [
+                                    "rocketnews24.com"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/846"
                             }
                         ]
                     },
@@ -3203,17 +3241,26 @@
                                 "domains": [
                                     "duden.de",
                                     "magicgameworld.com",
+                                    "rocketnews24.com",
                                     "youmath.it"
                                 ],
-                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/388"
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/388,rocketnews24.com - https://github.com/duckduckgo/privacy-configuration/issues/846"
                             },
                             {
                                 "rule": "tpc.googlesyndication.com/pagead/js/loader21.html",
                                 "domains": [
                                     "laprensa.hn",
+                                    "rocketnews24.com",
                                     "rumble.com"
                                 ],
-                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/388"
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/388,rocketnews24.com - https://github.com/duckduckgo/privacy-configuration/issues/846"
+                            },
+                            {
+                                "rule": "googlesyndication.com",
+                                "domains": [
+                                    "rocketnews24.com"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/846"
                             }
                         ]
                     },
@@ -4215,7 +4262,7 @@
                 }
             },
             "exceptions": [],
-            "hash": "4688178b552ef3111fc400b72c9cadfc"
+            "hash": "183d8c80601c5e17bd88c22f0db9b0d1"
         },
         "trackingCookies1p": {
             "settings": {
@@ -4281,10 +4328,6 @@
         },
         "webCompat": {
             "exceptions": [
-                {
-                    "domain": "portal.azure.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/526"
-                },
                 {
                     "domain": "lastpass.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/533"
@@ -4584,7 +4627,7 @@
                 "navigatorCredentials": "enabled",
                 "safariObject": "enabled"
             },
-            "hash": "cda2a2f836b21a1095f3c4b7cd0d1804"
+            "hash": "6f867852a633ba23d8b0e79d782c0418"
         },
         "windowsPermissionUsage": {
             "exceptions": [],

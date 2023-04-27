@@ -40,8 +40,22 @@
 		1D43EB3C292B664A0065E5D6 /* BWMessageIdGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D43EB3B292B664A0065E5D6 /* BWMessageIdGenerator.swift */; };
 		1D6216B229069BBF00386B2C /* BWKeyStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D6216B129069BBF00386B2C /* BWKeyStorage.swift */; };
 		1D69C553291302F200B75945 /* BWVault.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D69C552291302F200B75945 /* BWVault.swift */; };
+		1D6A491A29CF75290011DF74 /* BurnerWindowPopover.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1D6A491929CF75290011DF74 /* BurnerWindowPopover.storyboard */; };
+		1D6A491B29CF75290011DF74 /* BurnerWindowPopover.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1D6A491929CF75290011DF74 /* BurnerWindowPopover.storyboard */; };
+		1D6A491D29CF75530011DF74 /* BurnerWindowPopoverViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D6A491C29CF75530011DF74 /* BurnerWindowPopoverViewController.swift */; };
+		1D6A491E29CF75530011DF74 /* BurnerWindowPopoverViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D6A491C29CF75530011DF74 /* BurnerWindowPopoverViewController.swift */; };
+		1D6A492029CF7A490011DF74 /* NSPopoverExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D6A491F29CF7A490011DF74 /* NSPopoverExtension.swift */; };
+		1D6A492129CF7A490011DF74 /* NSPopoverExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D6A491F29CF7A490011DF74 /* NSPopoverExtension.swift */; };
 		1D77921828FDC54C00BE0210 /* FaviconReferenceCacheTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D77921728FDC54C00BE0210 /* FaviconReferenceCacheTests.swift */; };
 		1D77921A28FDC79800BE0210 /* FaviconStoringMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D77921928FDC79800BE0210 /* FaviconStoringMock.swift */; };
+		1D7D5B6A29C9DED80054A4DC /* BurnerWindowPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D7D5B6929C9DED80054A4DC /* BurnerWindowPopover.swift */; };
+		1D7D5B7129CA04560054A4DC /* BurnerWindowPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D7D5B6929C9DED80054A4DC /* BurnerWindowPopover.swift */; };
+		1DB9617A29F1D06D00CF5568 /* InternalUserDeciderMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DB9617929F1D06D00CF5568 /* InternalUserDeciderMock.swift */; };
+		1DB9617B29F1D06D00CF5568 /* InternalUserDeciderMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DB9617929F1D06D00CF5568 /* InternalUserDeciderMock.swift */; };
+		1DB9618229F67F6100CF5568 /* FaviconNullStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DB9617F29F67F3E00CF5568 /* FaviconNullStore.swift */; };
+		1DB9618329F67F6200CF5568 /* FaviconNullStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DB9617F29F67F3E00CF5568 /* FaviconNullStore.swift */; };
+		1DCFBC8A29ADF32B00313531 /* BurnerHomePageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DCFBC8929ADF32B00313531 /* BurnerHomePageView.swift */; };
+		1DCFBC8B29ADF32B00313531 /* BurnerHomePageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DCFBC8929ADF32B00313531 /* BurnerHomePageView.swift */; };
 		1DDF076328F815AD00EDFBE3 /* BWCommunicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DDF075D28F815AD00EDFBE3 /* BWCommunicator.swift */; };
 		1DDF076428F815AD00EDFBE3 /* BWManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DDF075E28F815AD00EDFBE3 /* BWManager.swift */; };
 		1DE03425298BC7F000CAB3D7 /* InternalUserDeciderStoreMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D12F2E1298BC660009A65FD /* InternalUserDeciderStoreMock.swift */; };
@@ -1915,9 +1929,16 @@
 		1D43EB3B292B664A0065E5D6 /* BWMessageIdGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BWMessageIdGenerator.swift; sourceTree = "<group>"; };
 		1D6216B129069BBF00386B2C /* BWKeyStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BWKeyStorage.swift; sourceTree = "<group>"; };
 		1D69C552291302F200B75945 /* BWVault.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BWVault.swift; sourceTree = "<group>"; };
+		1D6A491929CF75290011DF74 /* BurnerWindowPopover.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = BurnerWindowPopover.storyboard; sourceTree = "<group>"; };
+		1D6A491C29CF75530011DF74 /* BurnerWindowPopoverViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BurnerWindowPopoverViewController.swift; sourceTree = "<group>"; };
+		1D6A491F29CF7A490011DF74 /* NSPopoverExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSPopoverExtension.swift; sourceTree = "<group>"; };
 		1D77921728FDC54C00BE0210 /* FaviconReferenceCacheTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaviconReferenceCacheTests.swift; sourceTree = "<group>"; };
 		1D77921928FDC79800BE0210 /* FaviconStoringMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaviconStoringMock.swift; sourceTree = "<group>"; };
 		1D77921C28FFF27C00BE0210 /* RunningApplicationCheck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunningApplicationCheck.swift; sourceTree = "<group>"; };
+		1D7D5B6929C9DED80054A4DC /* BurnerWindowPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BurnerWindowPopover.swift; sourceTree = "<group>"; };
+		1DB9617929F1D06D00CF5568 /* InternalUserDeciderMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InternalUserDeciderMock.swift; sourceTree = "<group>"; };
+		1DB9617F29F67F3E00CF5568 /* FaviconNullStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaviconNullStore.swift; sourceTree = "<group>"; };
+		1DCFBC8929ADF32B00313531 /* BurnerHomePageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BurnerHomePageView.swift; sourceTree = "<group>"; };
 		1DDF075C28F815AD00EDFBE3 /* BWCredential.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BWCredential.swift; sourceTree = "<group>"; };
 		1DDF075D28F815AD00EDFBE3 /* BWCommunicator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BWCommunicator.swift; sourceTree = "<group>"; };
 		1DDF075E28F815AD00EDFBE3 /* BWManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BWManager.swift; sourceTree = "<group>"; };
@@ -2937,6 +2958,7 @@
 			isa = PBXGroup;
 			children = (
 				1D12F2E1298BC660009A65FD /* InternalUserDeciderStoreMock.swift */,
+				1DB9617929F1D06D00CF5568 /* InternalUserDeciderMock.swift */,
 			);
 			path = FeatureFlagging;
 			sourceTree = "<group>";
@@ -3040,6 +3062,16 @@
 				1D43EB35292ACE690065E5D6 /* ApplicationVersionReader.swift */,
 			);
 			path = RunningApplication;
+			sourceTree = "<group>";
+		};
+		1D7D5B6829C9DA7D0054A4DC /* BurnerWindow */ = {
+			isa = PBXGroup;
+			children = (
+				1D7D5B6929C9DED80054A4DC /* BurnerWindowPopover.swift */,
+				1D6A491C29CF75530011DF74 /* BurnerWindowPopoverViewController.swift */,
+				1D6A491929CF75290011DF74 /* BurnerWindowPopover.storyboard */,
+			);
+			path = BurnerWindow;
 			sourceTree = "<group>";
 		};
 		313AED9F287CAC5A00E1E8F4 /* UI */ = {
@@ -4359,6 +4391,7 @@
 				AA4D700525545EDE00C3411E /* AppDelegate */,
 				AAC5E4C025D6A6A9007F5990 /* Bookmarks */,
 				4BFD356E283ADE8B00CE9234 /* BookmarksBar */,
+				1D7D5B6829C9DA7D0054A4DC /* BurnerWindow */,
 				AA86491324D831B9001BABEE /* Common */,
 				85D33F1025C82E93002B91A6 /* Configuration */,
 				4B6160D125B14E5E007DE5B2 /* ContentBlocker */,
@@ -4499,6 +4532,7 @@
 			children = (
 				AA5FA69E275F948900DCE9C9 /* Favicons.xcdatamodeld */,
 				AA5FA69C275F945C00DCE9C9 /* FaviconStore.swift */,
+				1DB9617F29F67F3E00CF5568 /* FaviconNullStore.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -5186,6 +5220,7 @@
 				4B0511DF262CAA8600F6079C /* NSOpenPanelExtensions.swift */,
 				4B0135CD2729F1AA00D54834 /* NSPasteboardExtension.swift */,
 				AA5C8F5D2590EEE800748EB7 /* NSPointExtension.swift */,
+				1D6A491F29CF7A490011DF74 /* NSPopoverExtension.swift */,
 				85625999269CA0A600EE44BC /* NSRectExtension.swift */,
 				B6B3E0DC2657E9CF0040E0A2 /* NSScreenExtension.swift */,
 				AAC5E4E325D6BA9C007F5990 /* NSSizeExtension.swift */,
@@ -5252,6 +5287,7 @@
 				85589E7B27BBB8630038AD11 /* HomePage.storyboard */,
 				85AC7AD827BD625000FFB69B /* HomePageAssets.xcassets */,
 				85589E7C27BBB8630038AD11 /* HomePageView.swift */,
+				1DCFBC8929ADF32B00313531 /* BurnerHomePageView.swift */,
 				85589E7D27BBB8630038AD11 /* HomePageViewController.swift */,
 				857FFEBF27D239DC00415E7A /* HyperLink.swift */,
 				85589E9F27BFE60E0038AD11 /* MoreOrLessView.swift */,
@@ -6113,6 +6149,7 @@
 				3706FCCC293F65D500E42796 /* TabBar.storyboard in Resources */,
 				3706FCCD293F65D500E42796 /* shield-dot.json in Resources */,
 				3706FCCE293F65D500E42796 /* CookieConsent.storyboard in Resources */,
+				1D6A491B29CF75290011DF74 /* BurnerWindowPopover.storyboard in Resources */,
 				3706FCCF293F65D500E42796 /* Bookmarks.storyboard in Resources */,
 				3706FCD0293F65D500E42796 /* BookmarksBarCollectionViewItem.xib in Resources */,
 				3706FCD1293F65D500E42796 /* PrivacyDashboard.storyboard in Resources */,
@@ -6228,6 +6265,7 @@
 				AA80EC79256C46AA007083E7 /* TabBar.storyboard in Resources */,
 				AA34396D2754D4E300B241FA /* shield-dot.json in Resources */,
 				31B7C84F288008E00049841F /* CookieConsent.storyboard in Resources */,
+				1D6A491A29CF75290011DF74 /* BurnerWindowPopover.storyboard in Resources */,
 				AAC5E4C925D6A6E8007F5990 /* Bookmarks.storyboard in Resources */,
 				4BE5336B286912D40019DBFD /* BookmarksBarCollectionViewItem.xib in Resources */,
 				B6FA893D269C423100588ECD /* PrivacyDashboard.storyboard in Resources */,
@@ -6698,6 +6736,7 @@
 				3706FB81293F65D500E42796 /* IndexPathExtension.swift in Sources */,
 				B6685E3D29A602D90043D2EE /* ExternalAppSchemeHandler.swift in Sources */,
 				B6E1491029A5C30500AAFBE8 /* ContentBlockingTabExtension.swift in Sources */,
+				1D7D5B7129CA04560054A4DC /* BurnerWindowPopover.swift in Sources */,
 				3706FB82293F65D500E42796 /* PasswordManagementNoteItemView.swift in Sources */,
 				3706FEC5293F6F0600E42796 /* BWInstallationService.swift in Sources */,
 				3775912E29AAC72700E26367 /* SyncPreferences.swift in Sources */,
@@ -6758,6 +6797,7 @@
 				3706FBB2293F65D500E42796 /* WebKitDownloadTask.swift in Sources */,
 				3706FBB3293F65D500E42796 /* ChromiumLoginReader.swift in Sources */,
 				3706FBB4293F65D500E42796 /* NSAlert+PasswordManager.swift in Sources */,
+				1D6A492129CF7A490011DF74 /* NSPopoverExtension.swift in Sources */,
 				3706FBB5293F65D500E42796 /* UserContentUpdating.swift in Sources */,
 				3706FBB6293F65D500E42796 /* ChromePreferences.swift in Sources */,
 				3706FBB7293F65D500E42796 /* FirePopoverViewController.swift in Sources */,
@@ -6794,6 +6834,7 @@
 				3706FBD7293F65D500E42796 /* ContentBlockerRulesLists.swift in Sources */,
 				3706FBD8293F65D500E42796 /* NSViewControllerExtension.swift in Sources */,
 				3706FBD9293F65D500E42796 /* NSAppearanceExtension.swift in Sources */,
+				1D6A491E29CF75530011DF74 /* BurnerWindowPopoverViewController.swift in Sources */,
 				3706FBDA293F65D500E42796 /* PermissionManager.swift in Sources */,
 				3706FBDB293F65D500E42796 /* DefaultBrowserPreferences.swift in Sources */,
 				3706FBDC293F65D500E42796 /* Permissions.xcdatamodeld in Sources */,
@@ -6844,6 +6885,7 @@
 				4B9754EC2984300100D7B834 /* EmailManagerExtension.swift in Sources */,
 				3706FC04293F65D500E42796 /* PreferencesPrivacyView.swift in Sources */,
 				3706FC05293F65D500E42796 /* NSPasteboardExtension.swift in Sources */,
+				1DCFBC8B29ADF32B00313531 /* BurnerHomePageView.swift in Sources */,
 				3706FC06293F65D500E42796 /* OnboardingViewModel.swift in Sources */,
 				3706FC07293F65D500E42796 /* ScriptSourceProviding.swift in Sources */,
 				3706FC08293F65D500E42796 /* CoreDataBookmarkImporter.swift in Sources */,
@@ -6955,6 +6997,7 @@
 				3706FC6F293F65D500E42796 /* FirePopoverViewModel.swift in Sources */,
 				3706FC71293F65D500E42796 /* NSColorExtension.swift in Sources */,
 				3706FC72293F65D500E42796 /* Stored.swift in Sources */,
+				1DB9618229F67F6100CF5568 /* FaviconNullStore.swift in Sources */,
 				3706FC73293F65D500E42796 /* AddressBarButtonsViewController.swift in Sources */,
 				3706FC75293F65D500E42796 /* ChromeDataImporter.swift in Sources */,
 				3706FC76293F65D500E42796 /* PixelDataRecord.swift in Sources */,
@@ -7133,6 +7176,7 @@
 				3706FE45293F661700E42796 /* ProgressEstimationTests.swift in Sources */,
 				3706FE46293F661700E42796 /* EncryptedValueTransformerTests.swift in Sources */,
 				3706FE47293F661700E42796 /* URLExtensionTests.swift in Sources */,
+				1DB9617B29F1D06D00CF5568 /* InternalUserDeciderMock.swift in Sources */,
 				3706FE48293F661700E42796 /* PixelTests.swift in Sources */,
 				3706FE49293F661700E42796 /* BookmarkNodePathTests.swift in Sources */,
 				1DE03425298BC7F000CAB3D7 /* InternalUserDeciderStoreMock.swift in Sources */,
@@ -7370,6 +7414,7 @@
 				31B7C85128800A5D0049841F /* CookieConsentPopover.swift in Sources */,
 				85D885B026A590A90077C374 /* NSNotificationName+PasswordManager.swift in Sources */,
 				B610F2BB27A145C500FCEBE9 /* RulesCompilationMonitor.swift in Sources */,
+				1D7D5B6A29C9DED80054A4DC /* BurnerWindowPopover.swift in Sources */,
 				B6D574B429472253008ED1B6 /* FBProtectionTabExtension.swift in Sources */,
 				AAC30A28268E045400D2D9CD /* CrashReportReader.swift in Sources */,
 				85AC3B3525DA82A600C7D2AA /* DataTaskProviding.swift in Sources */,
@@ -7430,6 +7475,7 @@
 				4B0511CA262CAA5A00F6079C /* FireproofDomainsViewController.swift in Sources */,
 				AA4D700725545EF800C3411E /* URLEventHandler.swift in Sources */,
 				AA92127725ADA07900600CD4 /* WKWebViewExtension.swift in Sources */,
+				1D6A491D29CF75530011DF74 /* BurnerWindowPopoverViewController.swift in Sources */,
 				AAAB9114288EB1D600A057A9 /* CleanThisHistoryMenuItem.swift in Sources */,
 				B6A9E499261474120067D1B9 /* TimedPixel.swift in Sources */,
 				B6C0B23626E732000031CB7F /* DownloadListItem.swift in Sources */,
@@ -7447,6 +7493,7 @@
 				B684592225C93BE000DC17B6 /* Publisher.asVoid.swift in Sources */,
 				AAA0CC33252F181A0079BC96 /* NavigationButtonMenuDelegate.swift in Sources */,
 				AAC30A2A268E239100D2D9CD /* CrashReport.swift in Sources */,
+				1D6A492029CF7A490011DF74 /* NSPopoverExtension.swift in Sources */,
 				37CC53F427E8D4620028713D /* NSPathControlView.swift in Sources */,
 				B6BF5D8929470BC4006742B1 /* HTTPSUpgradeTabExtension.swift in Sources */,
 				1D36E65B298ACD2900AA485D /* AppIconChanger.swift in Sources */,
@@ -7675,6 +7722,7 @@
 				B64C853026943BC10048FEBE /* Permissions.xcdatamodeld in Sources */,
 				EE339228291BDEFD009F62C1 /* JSAlertController.swift in Sources */,
 				3775912D29AAC72700E26367 /* SyncPreferences.swift in Sources */,
+				1DB9618329F67F6200CF5568 /* FaviconNullStore.swift in Sources */,
 				B693954F26F04BEB0015B914 /* PaddedImageButton.swift in Sources */,
 				4BA1A6B8258B081600F6F690 /* EncryptionKeyStoring.swift in Sources */,
 				B65783E725F8AAFB00D8DB33 /* String+Punycode.swift in Sources */,
@@ -7744,6 +7792,7 @@
 				1D43EB36292ACE690065E5D6 /* ApplicationVersionReader.swift in Sources */,
 				4BD18F01283F0BC500058124 /* BookmarksBarViewController.swift in Sources */,
 				379DE4BD27EA31AC002CC3DE /* PreferencesAutofillView.swift in Sources */,
+				1DCFBC8A29ADF32B00313531 /* BurnerHomePageView.swift in Sources */,
 				858A797F26A79EAA00A75A42 /* UserText+PasswordManager.swift in Sources */,
 				B693954E26F04BEB0015B914 /* ProgressView.swift in Sources */,
 				B69B503C2726A12500758A2B /* StatisticsStore.swift in Sources */,
@@ -7888,6 +7937,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1DB9617A29F1D06D00CF5568 /* InternalUserDeciderMock.swift in Sources */,
 				9833913327AAAEEE00DAF119 /* EmbeddedTrackerDataTests.swift in Sources */,
 				3776583127F8325B009A6B35 /* AutofillPreferencesTests.swift in Sources */,
 				B67C6C472654C643006C872E /* FileManagerExtensionTests.swift in Sources */,

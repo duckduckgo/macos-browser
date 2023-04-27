@@ -175,7 +175,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
         if WindowsManager.windows.isEmpty,
            case .normal = NSApp.runType {
-            WindowsManager.openNewWindow(lazyLoadTabs: true)
+            WindowsManager.openNewWindow(isBurner: false, lazyLoadTabs: true)
         }
 
         grammarFeaturesManager.manage()
@@ -232,14 +232,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
         if WindowControllersManager.shared.mainWindowControllers.isEmpty {
-            WindowsManager.openNewWindow()
+            WindowsManager.openNewWindow(isBurner: false)
             return true
         }
         return true
     }
 
     func applicationDockMenu(_ sender: NSApplication) -> NSMenu? {
-        return ApplicationDockMenu()
+        return ApplicationDockMenu(internalUserDecider: internalUserDecider)
     }
 
     func application(_ sender: NSApplication, openFiles files: [String]) {

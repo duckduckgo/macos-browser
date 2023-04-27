@@ -299,11 +299,10 @@ extension BookmarkListViewController: BookmarkMenuItemSelectors {
             assertionFailure("Failed to cast menu represented object to Bookmark")
             return
         }
-
         guard let urlObject = bookmark.urlObject else {
             return
         }
-        WindowsManager.openNewWindow(with: urlObject)
+        WindowsManager.openNewWindow(with: urlObject, isBurner: false)
     }
 
     func toggleBookmarkAsFavorite(_ sender: NSMenuItem) {
@@ -384,7 +383,7 @@ extension BookmarkListViewController: FolderMenuItemSelectors {
             return
         }
 
-        let tabs = children.compactMap { ($0 as? Bookmark)?.urlObject }.map { Tab(content: .url($0), shouldLoadInBackground: true) }
+        let tabs = children.compactMap { ($0 as? Bookmark)?.urlObject }.map { Tab(content: .url($0), shouldLoadInBackground: true, isBurner: tabCollection.isBurner) }
         tabCollection.append(tabs: tabs)
     }
 
