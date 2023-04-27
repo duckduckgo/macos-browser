@@ -205,18 +205,16 @@ extension MainWindowController: NSWindowDelegate {
 
     func windowWillEnterFullScreen(_ notification: Notification) {
         mainViewController.tabBarViewController.draggingSpace.isHidden = true
+    }
 
+    func windowDidEnterFullScreen(_ notification: Notification) {
         // fix NSToolbarFullScreenWindow occurring beneath the MainWindow
         // NSApp should be active at the moment of window ordering
         // https://app.asana.com/0/1177771139624306/1203853030672990/f
         if let activeApp = NSWorkspace.shared.frontmostApplication,
            activeApp != .current {
-
-            NSApp.activate(ignoringOtherApps: true)
-
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                guard NSApp.isActive else { return }
-                activeApp.activate(options: .activateIgnoringOtherApps)
+            for window in NSApp.windows.filter({ $0.className.contains("FullScreen") }) {
+                self.window!.addChildWindow(window, ordered: .above)
             }
         }
     }
