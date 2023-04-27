@@ -97,7 +97,7 @@ final class Fire {
 
     let tabsCleaner = TabDataCleaner()
 
-    enum BurningData {
+    enum BurningData: Equatable {
         case specificDomains(_ domains: Set<String>)
         case all
     }
