@@ -51,7 +51,7 @@ final class MainWindowController: NSWindowController {
         setupWindow()
         setupToolbar()
         subscribeToTrafficLightsAlpha()
-        subscribeToShouldPreventUserInteraction()
+        subscribeToIsFirePresentationInProgress()
         subscribeToResolutionChange()
     }
 
@@ -118,14 +118,14 @@ final class MainWindowController: NSWindowController {
             .assign(to: \.constant, onWeaklyHeld: tabBarViewController.pinnedTabsViewLeadingConstraint)
     }
 
-    private var shouldPreventUserInteractionCancellable: AnyCancellable?
-    private func subscribeToShouldPreventUserInteraction() {
-        shouldPreventUserInteractionCancellable = fireViewModel.shouldPreventUserInteraction
+    private var isFirePresentationInProgressCancellable: AnyCancellable?
+    private func subscribeToIsFirePresentationInProgress() {
+        isFirePresentationInProgressCancellable = fireViewModel.isFirePresentationInProgress
             .dropFirst()
             .removeDuplicates()
-            .sink(receiveValue: { [weak self] shouldPreventUserInteraction in
-                self?.moveTabBarView(toTitlebarView: !shouldPreventUserInteraction)
-                self?.userInteraction(prevented: shouldPreventUserInteraction)
+            .sink(receiveValue: { [weak self] _ in
+                guard let self else { return }
+                self.userInteraction(prevented: self.fireViewModel.fire.burningData != nil)
             })
     }
 
@@ -222,6 +222,18 @@ extension MainWindowController: NSWindowDelegate {
         DispatchQueue.main.async {
             WindowControllersManager.shared.unregister(self)
         }
+    }
+
+    func windowShouldClose(_ sender: NSWindow) -> Bool {
+        // Animate fire for Burner Window when closing
+        guard mainViewController.tabCollectionViewModel.isBurner else {
+            return true
+        }
+        Task {
+            await mainViewController.fireViewController.animateFireWhenClosing()
+            sender.close()
+        }
+        return false
     }
 
 }

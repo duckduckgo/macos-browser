@@ -37,15 +37,19 @@ extension AppDelegate {
     // MARK: - File
 
     @IBAction func newWindow(_ sender: Any?) {
-        WindowsManager.openNewWindow()
+        WindowsManager.openNewWindow(isBurner: false)
+    }
+
+    @IBAction func newBurnerWindow(_ sender: Any?) {
+        WindowsManager.openNewWindow(isBurner: true)
     }
 
     @IBAction func newTab(_ sender: Any?) {
-        WindowsManager.openNewWindow()
+        WindowsManager.openNewWindow(isBurner: false)
     }
 
     @IBAction func openLocation(_ sender: Any?) {
-        WindowsManager.openNewWindow()
+        WindowsManager.openNewWindow(isBurner: false)
     }
 
     @IBAction func closeAllWindows(_ sender: Any?) {
@@ -75,11 +79,11 @@ extension AppDelegate {
             return
         }
 
-        WindowsManager.openNewWindow(with: Tab(content: .contentFromURL(url), shouldLoadInBackground: true))
+        WindowsManager.openNewWindow(with: Tab(content: .contentFromURL(url), shouldLoadInBackground: true, isBurner: false), isBurner: false)
     }
 
     @IBAction func clearAllHistory(_ sender: NSMenuItem) {
-        guard let window = WindowsManager.openNewWindow(with: Tab(content: .homePage)),
+        guard let window = WindowsManager.openNewWindow(with: Tab(content: .homePage, isBurner: false), isBurner: false),
               let windowController = window.windowController as? MainWindowController else {
             assertionFailure("No reference to main window controller")
             return
@@ -89,7 +93,7 @@ extension AppDelegate {
     }
 
     @objc func clearThisHistory(_ sender: ClearThisHistoryMenuItem) {
-        guard let window = WindowsManager.openNewWindow(with: Tab(content: .homePage)),
+        guard let window = WindowsManager.openNewWindow(with: Tab(content: .homePage, isBurner: false), isBurner: false),
               let windowController = window.windowController as? MainWindowController else {
             assertionFailure("No reference to main window controller")
             return
@@ -126,20 +130,21 @@ extension AppDelegate {
             return
         }
 
-        let tab = Tab(content: .url(url), shouldLoadInBackground: true)
-        WindowsManager.openNewWindow(with: tab)
+        let tab = Tab(content: .url(url), shouldLoadInBackground: true, isBurner: false)
+        WindowsManager.openNewWindow(with: tab, isBurner: false)
     }
 
     @IBAction func showManageBookmarks(_ sender: Any?) {
-        let tabCollection = TabCollection(tabs: [Tab(content: .bookmarks)])
-        let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection)
-        WindowsManager.openNewWindow(with: tabCollectionViewModel)
+        let tabCollection = TabCollection(tabs: [Tab(content: .bookmarks, isBurner: false)])
+        let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection, isBurner: false)
+
+        WindowsManager.openNewWindow(with: tabCollectionViewModel, isBurner: false)
     }
 
     @IBAction func openPreferences(_ sender: Any?) {
-        let tabCollection = TabCollection(tabs: [Tab(content: .anyPreferencePane)])
-        let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection)
-        WindowsManager.openNewWindow(with: tabCollectionViewModel)
+        let tabCollection = TabCollection(tabs: [Tab(content: .anyPreferencePane, isBurner: false)])
+        let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection, isBurner: false)
+        WindowsManager.openNewWindow(with: tabCollectionViewModel, isBurner: false)
     }
 
     @IBAction func openAbout(_ sender: Any?) {
@@ -258,7 +263,7 @@ extension MainViewController {
         // (this is in line with Safari behavior)
         if isHandlingKeyDownEvent, tabCollectionViewModel.selectionIndex?.isPinnedTab == true {
             if tabCollectionViewModel.tabCollection.tabs.isEmpty {
-                tabCollectionViewModel.append(tab: Tab(content: .homePage), selected: true)
+                tabCollectionViewModel.append(tab: Tab(content: .homePage, isBurner: false), selected: true)
             } else {
                 tabCollectionViewModel.select(at: .unpinned(0))
             }
@@ -320,7 +325,7 @@ extension MainViewController {
             if let vc = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.navigationBarViewController {
                 navigationBarViewController = vc
             } else {
-                WindowsManager.openNewWindow(with: Tab(content: .homePage))
+                WindowsManager.openNewWindow(with: Tab(content: .homePage, isBurner: false), isBurner: false)
                 guard let wc = WindowControllersManager.shared.mainWindowControllers.first(where: { $0.window?.isPopUpWindow == false }) else {
                     return
                 }
@@ -467,7 +472,11 @@ extension MainViewController {
             return
         }
 
-        let tabs = models.compactMap { ($0.entity as? Bookmark)?.urlObject }.map { Tab(content: .url($0), shouldLoadInBackground: true) }
+        let tabs = models.compactMap { ($0.entity as? Bookmark)?.urlObject }.map {
+            Tab(content: .url($0),
+                shouldLoadInBackground: true,
+                isBurner: tabCollectionViewModel.isBurner)
+        }
         tabCollectionViewModel.append(tabs: tabs)
     }
 
@@ -510,7 +519,7 @@ extension MainViewController {
 
         let tab = selectedTabViewModel.tab
         tabCollectionViewModel.removeSelected()
-        WindowsManager.openNewWindow(with: tab)
+        WindowsManager.openNewWindow(with: tab, isBurner: tabCollectionViewModel.isBurner)
     }
 
     @IBAction func pinOrUnpinTab(_ sender: Any?) {

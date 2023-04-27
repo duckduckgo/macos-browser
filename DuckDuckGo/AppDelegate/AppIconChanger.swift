@@ -31,9 +31,6 @@ final class AppIconChanger {
     }
 
     func updateIcon(isInternalChannel: Bool) {
-#if DEBUG || REVIEW
-        return
-#else
         let icon: NSImage?
         if isInternalChannel {
             icon = NSImage(named: Icons.internalChannelIcon.rawValue)
@@ -42,7 +39,6 @@ final class AppIconChanger {
         }
 
         NSApplication.shared.applicationIconImage = icon
-#endif
     }
 
     private var isInternalCancellable: AnyCancellable?
