@@ -225,7 +225,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     }
 
     func applicationDidBecomeActive(_ notification: Notification) {
-        syncService.scheduler.notifyAppLifecycleEvent()
+        // TODO: Revert when done testing
+//        syncService.scheduler.notifyAppLifecycleEvent()
+        syncService.scheduler.requestSyncImmediately()
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
