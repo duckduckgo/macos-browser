@@ -68,6 +68,33 @@ public struct DefaultActionButtonStyle: ButtonStyle {
     }
 }
 
+public struct DestructiveActionButtonStyle: ButtonStyle {
+
+    public let enabled: Bool
+
+    public init(enabled: Bool) {
+        self.enabled = enabled
+    }
+
+    public func makeBody(configuration: Self.Configuration) -> some View {
+        let enabledBackgroundColor = configuration.isPressed ? Color("PWMButtonBackground-Pressed") : Color.red
+        let disabledBackgroundColor = Color.gray.opacity(0.1)
+        let labelColor = enabled ? Color.white : Color.primary.opacity(0.3)
+
+        configuration.label
+            .lineLimit(1)
+            .font(.custom("SFProText-Regular", size: 13))
+            .frame(minWidth: 44) // OK buttons will match the width of "Cancel" at least in English
+            .padding(.top, 2.5)
+            .padding(.bottom, 3)
+            .padding(.horizontal, 7.5)
+            .background(enabled ? enabledBackgroundColor : disabledBackgroundColor)
+            .foregroundColor(labelColor)
+            .cornerRadius(5)
+
+    }
+}
+
 public struct TouchDownButtonStyle: PrimitiveButtonStyle {
 
     public init() {}
