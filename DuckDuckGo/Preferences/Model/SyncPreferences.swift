@@ -71,8 +71,21 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
     }
 
     @MainActor
+    func presentShowOrEnterCodeDialog() {
+        Task { @MainActor in
+            managementDialogModel.codeToDisplay = syncService.account?.recoveryCode
+            presentDialog(for: .syncAnotherDevice)
+        }
+    }
+
+    @MainActor
     func presentDeviceDetails(_ device: SyncDevice) {
         presentDialog(for: .deviceDetails(device))
+    }
+
+    @MainActor
+    func presentRemoveDevice(_ device: SyncDevice) {
+        presentDialog(for: .removeDevice(device))
     }
 
     func turnOffSync() {
@@ -119,7 +132,7 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
     // MARK: - Private
 
     private func updateState() {
-        managementDialogModel.recoveryCode = syncService.account?.recoveryCode
+        managementDialogModel.codeToDisplay = syncService.account?.recoveryCode
         refreshDevices()
     }
 
@@ -191,6 +204,13 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
 
 extension SyncPreferences: ManagementDialogModelDelegate {
 
+    func deleteAccount() {
+        Task { @MainActor in
+            managementDialogModel.endFlow()
+            try await syncService.deleteAccount()
+        }
+    }
+
     func updateDeviceName(_ name: String) {
         Task { @MainActor in
             do {
@@ -239,14 +259,21 @@ extension SyncPreferences: ManagementDialogModelDelegate {
     func recoverDevice(using recoveryCode: String) {
         Task { @MainActor in
             do {
-                guard let recoveryKey = try? SyncCode.decodeBase64String(recoveryCode).recovery else {
-                    managementDialogModel.errorMessage = "Invalid recovery key"
+                guard let syncCode = try? SyncCode.decodeBase64String(recoveryCode) else {
+                    managementDialogModel.errorMessage = "Invalid code"
                     return
                 }
-
-                try await login(recoveryKey)
-                presentDialog(for: .deviceSynced)
-
+                if let recoveryKey = syncCode.recovery {
+                    // This will error if the account already exists, we don't have good UI for this just now
+                    try await login(recoveryKey)
+                    presentDialog(for: .deviceSynced)
+                } else if let connectKey = syncCode.connect {
+                    // Unclear what the UX is supposed to be here given everything is happening on the other device
+                    try await syncService.transmitRecoveryKey(connectKey)
+                } else {
+                    managementDialogModel.errorMessage = "Invalid code"
+                    return
+                }
             } catch {
                 managementDialogModel.errorMessage = String(describing: error)
             }
@@ -257,7 +284,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
         Task { @MainActor in
             do {
                 self.connector = try syncService.remoteConnect()
-                managementDialogModel.connectCode = connector?.code
+                managementDialogModel.codeToDisplay = connector?.code
                 presentDialog(for: .syncAnotherDevice)
                 if let recoveryKey = try await connector?.pollForRecoveryKey() {
                     try await login(recoveryKey)
@@ -270,6 +297,11 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                 managementDialogModel.errorMessage = String(describing: error)
             }
         }
+    }
+
+    @MainActor
+    func presentDeleteAccount() {
+        presentDialog(for: .deleteAccount(devices))
     }
 
     @MainActor
@@ -298,6 +330,19 @@ extension SyncPreferences: ManagementDialogModelDelegate {
             try data.writeFileWithProgress(to: location)
         }
 
+    }
+
+    @MainActor
+    func removeDevice(_ device: SyncDevice) {
+        Task { @MainActor in
+            do {
+                try await syncService.disconnect(deviceId: device.id)
+                managementDialogModel.endFlow()
+                refreshDevices()
+            } catch {
+                managementDialogModel.errorMessage = String(describing: error)
+            }
+        }
     }
 
 }

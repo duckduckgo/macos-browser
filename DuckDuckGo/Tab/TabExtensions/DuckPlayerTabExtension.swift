@@ -100,7 +100,7 @@ final class DuckPlayerTabExtension {
             }
         }
 
-        if url?.isDuckPlayerScheme == true {
+        if url?.isDuckPlayer == true {
             youtubePlayerScript?.isEnabled = true
 
             if canPushMessagesToJS {
