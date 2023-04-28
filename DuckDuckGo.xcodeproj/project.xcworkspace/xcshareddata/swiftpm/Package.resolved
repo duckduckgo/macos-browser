@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "26c58d033ca7d2168ac392b16fdd77ee4272b631",
-        "version" : "57.4.1"
+        "branch" : "tom/burner-window-unit-tests",
+        "revision" : "aef7fa92f40183e61e5194756bf3c65e6762286c"
       }
     },
     {

@@ -123,7 +123,7 @@ final class WindowsManager {
                     .instantiateController(identifier: .mainViewController) { coder -> MainViewController? in
                         let model = tabCollectionViewModel ?? TabCollectionViewModel(isBurner: isBurner)
                         assert(model.isBurner == isBurner)
-                        return MainViewController(coder: coder, tabCollectionViewModel: model, isBurner: isBurner)
+                        return MainViewController(coder: coder, tabCollectionViewModel: model)
                     }
             }
         } catch {
