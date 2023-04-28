@@ -51,7 +51,7 @@ jobs:
 
     name: Make App Store Connect Release
 
-    runs-on: macos-12
+    runs-on: macos-13
 
     env:
       destination: ${{ github.event.inputs.destination || inputs.destination }}
