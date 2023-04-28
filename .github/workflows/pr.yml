@@ -64,7 +64,7 @@ jobs:
           - cache-key: sandbox-
             flavor: Sandbox
 
-    runs-on: macos-13
+    runs-on: macos-12
     timeout-minutes: 30
 
     outputs:
