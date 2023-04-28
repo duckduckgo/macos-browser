@@ -4716,7 +4716,6 @@
 				7BF0505629ABCFEC00BE5969 /* NetPOverrides.xcconfig */,
 				376CC8B4296EB630006B63A7 /* AppStore.xcconfig */,
 				376CC8B5296EBA8F006B63A7 /* AppStoreBuildNumber.xcconfig */,
-				7B5A581E29FAEFED00B22DDE /* Overrides */,
 				378C76D8296842FD0092E949 /* App */,
 				7B13966229AA7C2B00865FA9 /* Extensions */,
 				378C76D92968433B0092E949 /* Tests */,
@@ -5463,13 +5462,6 @@
 				7B4CE8DE26F02108009134B1 /* Info.plist */,
 			);
 			path = "UI Tests";
-			sourceTree = "<group>";
-		};
-		7B5A581E29FAEFED00B22DDE /* Overrides */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Overrides;
 			sourceTree = "<group>";
 		};
 		7B83057E29ABCCCE00663EAF /* DuckDuckGoNotifications */ = {
