@@ -290,9 +290,9 @@ extension NetworkProtectionStatusView {
             switch connectionStatus {
             case .connected:
                 return "\(NetPUserText.networkProtectionStatusConnected) · \(timeLapsed)"
-            case .connecting, .reasserting, .unknown:
+            case .connecting, .reasserting:
                 return NetPUserText.networkProtectionStatusConnecting
-            case .disconnected, .notConfigured:
+            case .disconnected, .notConfigured, .unknown:
                 return NetPUserText.networkProtectionStatusDisconnected
             case .disconnecting:
                 return NetPUserText.networkProtectionStatusDisconnecting

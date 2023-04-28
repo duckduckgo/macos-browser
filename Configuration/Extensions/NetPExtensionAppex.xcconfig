@@ -14,6 +14,7 @@
 //
 
 #include "ExtensionBase.xcconfig"
+#include "../NetPIDsAppStore.xcconfig"
 #include "../NetPOverrides.xcconfig"
 
 // Since we're using nonstandard bundle IDs we'll just define them here, but we should consider

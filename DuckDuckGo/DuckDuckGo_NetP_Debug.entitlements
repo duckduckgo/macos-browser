@@ -13,6 +13,7 @@
 	<key>com.apple.security.application-groups</key>
 	<array>
 		<string>HKE973VLUW.com.duckduckgo.network-protection</string>
+		<string>$(NETP_APP_GROUP)</string>
 	</array>
 	<key>com.apple.security.device.audio-input</key>
 	<true/>

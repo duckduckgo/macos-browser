@@ -4,7 +4,8 @@
 <dict>
 	<key>com.apple.security.application-groups</key>
 	<array>
-		<string>HKE973VLUW.com.duckduckgo.network-protection</string>
+		<string>$(TeamIdentifierPrefix)com.duckduckgo.macos.browser.network-protection</string>
+		<string>$(NETP_APP_GROUP)</string>
 	</array>
 	<key>com.apple.security.device.audio-input</key>
 	<true/>
@@ -16,10 +17,6 @@
 	</array>
 	<key>com.apple.developer.usernotifications.time-sensitive</key>
 	<true/>
-	<key>com.apple.security.application-groups</key>
-	<array>
-		<string>$(TeamIdentifierPrefix)com.duckduckgo.macos.browser.network-protection</string>
-	</array>
 	<key>keychain-access-groups</key>
 	<array>
 		<string>$(AppIdentifierPrefix)com.duckduckgo.macos.browser</string>

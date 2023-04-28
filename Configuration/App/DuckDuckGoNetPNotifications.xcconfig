@@ -14,15 +14,16 @@
 //
 
 #include "AppTargetsBase.xcconfig"
+#include "../NetPIDs.xcconfig"
 #include "../NetPOverrides.xcconfig"
 
-BUNDLE_IDENTIFIER_PREFIX = HKE973VLUW.com.duckduckgo.macos.browser.network-protection.notifications
+BUNDLE_IDENTIFIER_PREFIX = $(NOTIFICATIONS_AGENT_BUNDLE_ID)
 
 // Override AppTargetsBase.xcconfig until we resolve bundle IDs.
 PRODUCT_BUNDLE_IDENTIFIER[sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX)
 PRODUCT_BUNDLE_IDENTIFIER[config=Debug][sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX)
-PRODUCT_BUNDLE_IDENTIFIER[config=CI][sdk=*] =
-PRODUCT_BUNDLE_IDENTIFIER[config=Review][sdk=*] =
+PRODUCT_BUNDLE_IDENTIFIER[config=CI][sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX)
+PRODUCT_BUNDLE_IDENTIFIER[config=Review][sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX)
 
 INFOPLIST_FILE =
 GENERATE_INFOPLIST_FILE = YES

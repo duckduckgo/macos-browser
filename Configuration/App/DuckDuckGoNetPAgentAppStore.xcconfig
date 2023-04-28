@@ -14,38 +14,38 @@
 //
 
 #include "AppTargetsBase.xcconfig"
-#include "../AppStore.xcconfig"
-#include "ManualAppStoreRelease.xcconfig"
-#include "../NetPIDsAppStore.xcconfig"
 #include "../NetPOverrides.xcconfig"
+#include "../NetPIDsAppStore.xcconfig"
 
-BUNDLE_IDENTIFIER_PREFIX = com.duckduckgo.macos.browser.network-protection
+BUNDLE_IDENTIFIER_PREFIX = $(AGENT_BUNDLE_ID)
 
-INFOPLIST_FILE = DuckDuckGo/Info-NetP.plist
+// Override AppTargetsBase.xcconfig until we resolve bundle IDs.
+PRODUCT_BUNDLE_IDENTIFIER[sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX)
+PRODUCT_BUNDLE_IDENTIFIER[config=Debug][sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX)
+PRODUCT_BUNDLE_IDENTIFIER[config=CI][sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX)
+PRODUCT_BUNDLE_IDENTIFIER[config=Review][sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX)
+
+INFOPLIST_FILE = DuckDuckGoAgent/Info-AppStore.plist
+GENERATE_INFOPLIST_FILE = YES
+
+// Just make sure to override anything set by the AppTargetBase.xcconfig
+//CODE_SIGN_STYLE[config=Debug][sdk=*] = Manual
+//CODE_SIGN_STYLE[config=Release][sdk=*] = Manual
 
 // Left empty intentionally as we currently only support debug and release builds
 CODE_SIGN_ENTITLEMENTS[config=Review][sdk=macosx*] =
 CODE_SIGN_ENTITLEMENTS[config=CI][sdk=macosx*] =
-CODE_SIGN_ENTITLEMENTS[config=Debug][sdk=macosx*] = DuckDuckGo/DuckDuckGo_NetP_AppStore_Debug.entitlements
-CODE_SIGN_ENTITLEMENTS[config=Release][sdk=macosx*] = DuckDuckGo/DuckDuckGo_NetP_AppStore_Release.entitlements
+CODE_SIGN_ENTITLEMENTS[config=Debug][sdk=macosx*] = DuckDuckGoAgent/DuckDuckGoAgentAppStore.entitlements
+CODE_SIGN_ENTITLEMENTS[config=Release][sdk=macosx*] = DuckDuckGoAgent/DuckDuckGoAgentAppStore.entitlements
 
 CODE_SIGN_IDENTITY[sdk=macosx*] = 3rd Party Mac Developer Application
 CODE_SIGN_IDENTITY[config=Review][sdk=macosx*] = Developer ID Application
 CODE_SIGN_IDENTITY[config=Debug][sdk=macosx*] = Apple Development
 CODE_SIGN_IDENTITY[config=CI][sdk=macosx*] =
 
-ENABLE_APP_SANDBOX = YES
+PRODUCT_NAME = DuckDuckGo Agent App Store
 
-MACOSX_DEPLOYMENT_TARGET = 12.3
-
-//PRODUCT_MODULE_NAME = DuckDuckGo_Privacy_Browser
-PRODUCT_NAME_PREFIX = DuckDuckGo Network Protection App Store
-PRODUCT_NAME[config=Release][arch=*][sdk=*] = $(RELEASE_PRODUCT_NAME_OVERRIDE:default=$(PRODUCT_NAME_PREFIX))
-
-PROVISIONING_PROFILE_SPECIFIER[config=Debug][sdk=macosx*] =
-PROVISIONING_PROFILE_SPECIFIER[config=CI][sdk=macosx*] =
-PROVISIONING_PROFILE_SPECIFIER[config=Release][sdk=macosx*] = macOS Network Protection
-PROVISIONING_PROFILE_SPECIFIER[config=Review][sdk=macosx*] =
+PROVISIONING_PROFILE_SPECIFIER[config=Release][sdk=macosx*] = Mac Browser NetP Developer ID Not. (Distribution)
 
 NETP_EXTRA_FLAGS =
 
@@ -55,4 +55,8 @@ ASSETCATALOG_COMPILER_APPICON_NAME[config=Debug] = Icon - Network Protection
 ASSETCATALOG_COMPILER_APPICON_NAME[config=CI] = Icon - Network Protection
 ASSETCATALOG_COMPILER_APPICON_NAME[config=Review] = Icon - Network Protection
 
-#include? "../../LocalOverridesAppStore.xcconfig"
+ENABLE_APP_SANDBOX = YES
+SWIFT_OBJC_BRIDGING_HEADER =
+SKIP_INSTALL = YES
+
+#include? "../../LocalOverrides.xcconfig"

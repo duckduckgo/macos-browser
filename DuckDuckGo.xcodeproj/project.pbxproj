@@ -3670,6 +3670,8 @@
 		4BF4EA4F27C71F26004E57C4 /* PasswordManagementListSectionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PasswordManagementListSectionTests.swift; sourceTree = "<group>"; };
 		4BF6961C28BE911100D402D4 /* RecentlyVisitedSiteModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentlyVisitedSiteModelTests.swift; sourceTree = "<group>"; };
 		4BF6961F28BEEE8B00D402D4 /* LocalPinningManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalPinningManagerTests.swift; sourceTree = "<group>"; };
+		7B0075DB29FAF390002A9ADB /* DuckDuckGoNetPAgent.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = DuckDuckGoNetPAgent.xcconfig; sourceTree = "<group>"; };
+		7B0075DC29FAF391002A9ADB /* DuckDuckGoNetPAgentAppStore.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = DuckDuckGoNetPAgentAppStore.xcconfig; sourceTree = "<group>"; };
 		7B0F2F45299E6B5000422AB8 /* NetworkProtectionNavBarButtonModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionNavBarButtonModel.swift; sourceTree = "<group>"; };
 		7B0F2F46299E6B5000422AB8 /* NetworkProtectionProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionProvider.swift; sourceTree = "<group>"; };
 		7B0F2F48299E6B5000422AB8 /* NetworkProtectionControllerErrorStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionControllerErrorStore.swift; sourceTree = "<group>"; };
@@ -3719,6 +3721,8 @@
 		7BB8BA5429A94CD800D64342 /* NetworkProtectionSystemExtension_Debug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = NetworkProtectionSystemExtension_Debug.entitlements; sourceTree = "<group>"; };
 		7BB8BA5529A94CD900D64342 /* NetworkProtectionSystemExtension_Release.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = NetworkProtectionSystemExtension_Release.entitlements; sourceTree = "<group>"; };
 		7BB8BA5F29A94EFB00D64342 /* NetworkProtectionIPCNotificationsPresenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkProtectionIPCNotificationsPresenter.swift; sourceTree = "<group>"; };
+		7BCE24F329FAD8FD000B4065 /* NetPIDsAppStore.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = NetPIDsAppStore.xcconfig; sourceTree = "<group>"; };
+		7BCE24F429FAD8FD000B4065 /* NetPIDs.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = NetPIDs.xcconfig; sourceTree = "<group>"; };
 		7BF0505629ABCFEC00BE5969 /* NetPOverrides.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = NetPOverrides.xcconfig; sourceTree = "<group>"; };
 		7BF0943C29A8F1FB00A2DA6E /* UserText+NetworkProtection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UserText+NetworkProtection.swift"; sourceTree = "<group>"; };
 		7BF0943F29A92BE000A2DA6E /* DuckDuckGo_NetP_Release.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = DuckDuckGo_NetP_Release.entitlements; sourceTree = "<group>"; };
@@ -3745,7 +3749,7 @@
 		7BFA7822299E76700003284F /* NetworkProtectionSharedState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkProtectionSharedState.swift; sourceTree = "<group>"; };
 		7BFA7823299E76700003284F /* UserText+NetworkProtectionExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UserText+NetworkProtectionExtensions.swift"; sourceTree = "<group>"; };
 		7BFA7824299E76700003284F /* NetworkProtectionTunnelHealthStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkProtectionTunnelHealthStore.swift; sourceTree = "<group>"; };
-		7BFA7B13299E89F30003284F /* DuckDuckGo Network Protection.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "DuckDuckGo Network Protection.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		7BFA7B13299E89F30003284F /* DuckDuckGo Network Protection App Store.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "DuckDuckGo Network Protection App Store.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		85012B0129133F9F003D0DCC /* NavigationBarPopovers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationBarPopovers.swift; sourceTree = "<group>"; };
 		8511E18325F82B34002F516B /* 01_Fire_really_small.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = 01_Fire_really_small.json; sourceTree = "<group>"; };
 		853014D525E671A000FB8205 /* PageObserverUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageObserverUserScript.swift; sourceTree = "<group>"; };
@@ -4705,11 +4709,14 @@
 			isa = PBXGroup;
 			children = (
 				37717E66296B5A20002FAEDF /* Global.xcconfig */,
+				7BCE24F429FAD8FD000B4065 /* NetPIDs.xcconfig */,
+				7BCE24F329FAD8FD000B4065 /* NetPIDsAppStore.xcconfig */,
 				378B5888295CF2A4002C0CC0 /* Common.xcconfig */,
 				378B5887295CF2A4002C0CC0 /* Version.xcconfig */,
 				7BF0505629ABCFEC00BE5969 /* NetPOverrides.xcconfig */,
 				376CC8B4296EB630006B63A7 /* AppStore.xcconfig */,
 				376CC8B5296EBA8F006B63A7 /* AppStoreBuildNumber.xcconfig */,
+				7B5A581E29FAEFED00B22DDE /* Overrides */,
 				378C76D8296842FD0092E949 /* App */,
 				7B13966229AA7C2B00865FA9 /* Extensions */,
 				378C76D92968433B0092E949 /* Tests */,
@@ -4725,6 +4732,8 @@
 				378B58CD295ECA75002C0CC0 /* DuckDuckGo.xcconfig */,
 				37DD516C296EAEDC00837F27 /* DuckDuckGoAppStore.xcconfig */,
 				7B13966029AA69F200865FA9 /* DuckDuckGoNetP.xcconfig */,
+				7B0075DB29FAF390002A9ADB /* DuckDuckGoNetPAgent.xcconfig */,
+				7B0075DC29FAF391002A9ADB /* DuckDuckGoNetPAgentAppStore.xcconfig */,
 				7B13966129AA6A3400865FA9 /* DuckDuckGoNetPAppStore.xcconfig */,
 				7B8305B029ABCD4E00663EAF /* DuckDuckGoNetPNotifications.xcconfig */,
 				378E2799296F6FDE00FCADA2 /* ManualAppStoreRelease.xcconfig */,
@@ -5456,6 +5465,13 @@
 			path = "UI Tests";
 			sourceTree = "<group>";
 		};
+		7B5A581E29FAEFED00B22DDE /* Overrides */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Overrides;
+			sourceTree = "<group>";
+		};
 		7B83057E29ABCCCE00663EAF /* DuckDuckGoNotifications */ = {
 			isa = PBXGroup;
 			children = (
@@ -5945,7 +5961,7 @@
 				3706FEB2293F662100E42796 /* Integration Tests App Store.xctest */,
 				7B48D2DD299E6DCB0098A496 /* DuckDuckGo Network Protection.app */,
 				7BFA7801299E76020003284F /* NetworkProtectionAppExtension.appex */,
-				7BFA7B13299E89F30003284F /* DuckDuckGo Network Protection.app */,
+				7BFA7B13299E89F30003284F /* DuckDuckGo Network Protection App Store.app */,
 				7B2CAC0329A93077004C23BA /* com.duckduckgo.macos.browser.network-protection.system-extension.extension.systemextension */,
 				7B83057D29ABCCCE00663EAF /* DuckDuckGo Notifications.app */,
 			);
@@ -7586,7 +7602,7 @@
 				7B3B5A6829DAE79D00463DCF /* NetworkProtectionUI */,
 			);
 			productName = DuckDuckGo;
-			productReference = 7BFA7B13299E89F30003284F /* DuckDuckGo Network Protection.app */;
+			productReference = 7BFA7B13299E89F30003284F /* DuckDuckGo Network Protection App Store.app */;
 			productType = "com.apple.product-type.application";
 		};
 		AA585D7D248FD31100E9A3E2 /* DuckDuckGo Privacy Browser */ = {
