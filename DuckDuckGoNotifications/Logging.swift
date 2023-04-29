@@ -21,6 +21,10 @@ import os
 
 extension OSLog {
 
+    public static var networkProtectionLoginItemLog: OSLog {
+        Logging.networkProtectionLoginItemLoggingEnabled ? Logging.networkProtectionLoginItemLog : .disabled
+    }
+
     public static var networkProtectionIPCLoginItemLog: OSLog {
         Logging.networkProtectionIPCLoginItemLoggingEnabled ? Logging.networkProtectionIPCLoginItemLog : .disabled
     }
@@ -33,6 +37,9 @@ extension OSLog {
 struct Logging {
 
     static let subsystem = Bundle.main.bundleIdentifier ?? "DuckDuckGo"
+
+    fileprivate static let networkProtectionLoginItemLoggingEnabled = true
+    fileprivate static let networkProtectionLoginItemLog: OSLog = OSLog(subsystem: subsystem, category: "Network Protection: Login Item")
 
     fileprivate static let networkProtectionIPCLoginItemLoggingEnabled = true
     fileprivate static let networkProtectionIPCLoginItemLog: OSLog = OSLog(subsystem: subsystem, category: "Network Protection: IPC (Login Item)")

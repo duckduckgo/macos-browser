@@ -7,6 +7,7 @@ This file contains the implementation of the app <-> provider IPC connection
 
 import Foundation
 import Network
+import NetworkExtension
 import os.log
 
 /// App --> Provider IPC
@@ -19,11 +20,7 @@ import os.log
     func reconnected()
     func reconnecting()
     func connectionFailure()
-}
-
-enum FlowInfoKey: String {
-    case localPort
-    case remoteAddress
+    func statusChanged(status: NEVPNStatus)
 }
 
 /// The IPCConnection class is used by both the app and the system extension to communicate with each other
@@ -65,7 +62,7 @@ final class IPCConnection: NSObject {
         newListener.resume()
         listener = newListener
 
-        distributedNotificationCenter.postNotificationName(.NetPIPCListenerStarted, object: nil, userInfo: nil, options: [.deliverImmediately, .postToAllSessions])
+        distributedNotificationCenter.post(.ipcListenerStarted)
         os_log("Listener started", log: log, type: .debug, Self.className())
     }
 

@@ -31,7 +31,7 @@ struct TextButton: View {
     var body: some View {
         Button(action: action) {
             Text(title)
-                .foregroundColor(Color("LinkBlueColor"))
+                .foregroundColor(Color("LinkBlueColor", bundle: Bundle.module))
         }
         .buttonStyle(.plain)
         .cursor(.pointingHand)

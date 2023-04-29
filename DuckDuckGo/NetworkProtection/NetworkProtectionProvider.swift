@@ -28,28 +28,7 @@ import SystemExtensions
 typealias NetworkProtectionStatusChangeHandler = (NetworkProtection.ConnectionStatus) -> Void
 typealias NetworkProtectionConfigChangeHandler = () -> Void
 
-protocol NetworkProtectionProvider: NetworkProtection.TunnelController {
-
-    // MARK: - Polling Connection State
-
-    /// Queries Network Protection to know if its VPN is connected.
-    ///
-    /// - Returns: `true` if the VPN is connected, connecting or reasserting, and `false` otherwise.
-    ///
-    func isConnected() async -> Bool
-
-    // MARK: - Starting & Stopping the VPN
-
-    /// Starts the VPN connection used for Network Protection
-    ///
-    func start() async throws
-
-    /// Stops the VPN connection used for Network Protection
-    ///
-    func stop() async throws
-}
-
-final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
+final class DefaultNetworkProtectionProvider: NetworkProtection.TunnelController {
 
     // MARK: - Debug Helpers
 
@@ -132,22 +111,6 @@ final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
         try await setup(tunnelManager)
         try await tunnelManager.saveToPreferences()
         try await tunnelManager.loadFromPreferences()
-    }
-
-    static func activeSession() async throws -> NETunnelProviderSession? {
-        let managers = try await NETunnelProviderManager.loadAllFromPreferences()
-
-        guard let manager = managers.first else {
-            // No active connection, this is acceptable
-            return nil
-        }
-
-        guard let session = manager.connection as? NETunnelProviderSession else {
-            // The active connection is not running, so there's no session, this is acceptable
-            return nil
-        }
-
-        return session
     }
 
     // MARK: - Initialization & Deinitialization
@@ -304,22 +267,34 @@ final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
 
     // MARK: - Ensure things are working
 
-    private let loginItem = LoginItem(agentBundleID: "HKE973VLUW.com.duckduckgo.macos.browser.network-protection.notifications")
+    static let infoPlistAgentBundleID = "AGENT_BUNDLE_ID"
 
-    private func ensureLoginItemsAreEnabled() async throws {
- #if DEBUG
-         try await loginItem.reset()
- #else
-         try loginItem.enable()
- #endif
-     }
+    private static var agentBundleID: String {
+        guard let agentBundleID = Bundle.main.object(forInfoDictionaryKey: infoPlistAgentBundleID) as? String else {
+            fatalError("Make sure key \(infoPlistAgentBundleID) is defined in info.plist")
+        }
+
+        return agentBundleID
+    }
+
+    private static let agentLoginItem = LoginItem(agentBundleID: DefaultNetworkProtectionProvider.agentBundleID)
 
 #if NETP_SYSTEM_EXTENSION
+    static let infoPlistNotificationsAgentBundleID = "NOTIFICATIONS_AGENT_BUNDLE_ID"
+
+    private static var notificationsAgentBundleID: String {
+        guard let agentBundleID = Bundle.main.object(forInfoDictionaryKey: infoPlistNotificationsAgentBundleID) as? String else {
+            fatalError("Make sure key \(infoPlistAgentBundleID) is defined in info.plist")
+        }
+
+        return agentBundleID
+    }
+
+    private static let notificationsAgentLoginItem = LoginItem(agentBundleID: DefaultNetworkProtectionProvider.notificationsAgentBundleID)
+
     /// - Returns: `true` if the system extension and the background agent were activated successfully
     ///
-    private func ensureSystemExtensionAndAgentAreActivated() async throws -> Bool {
-        try await ensureLoginItemsAreEnabled()
-
+    private func ensureSystemExtensionIsActivated() async throws -> Bool {
         if case .willActivateAfterReboot = try await SystemExtensionManager.shared.activate(waitingForUserApprovalHandler: { [weak self] in
             self?.controllerErrorStore.lastErrorMessage = "Go to Security & Privacy in System Settings to allow Network Protection to activate"
         }) {
@@ -331,13 +306,40 @@ final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
     }
 #endif
 
+    private static func ensureLoginItemsAreEnabled() async {
+#if NETP_SYSTEM_EXTENSION
+        do {
+            try notificationsAgentLoginItem.enable()
+        } catch {
+            let error = StartError.couldNotEnableLoginItems(error: error)
+
+            // A failure to enable the agent should not prevent NetP from working in release builds,
+            // but we want to catch the error in debug builds.
+            assertionFailure("Could not enable the Login Items: \(error.localizedDescription)")
+        }
+#endif
+
+        do {
+            try agentLoginItem.enable()
+        } catch {
+            let error = StartError.couldNotEnableLoginItems(error: error)
+
+            // A failure to enable the agent should not prevent NetP from working in release builds,
+            // but we want to catch the error in debug builds.
+            assertionFailure("Could not enable the Login Items: \(error.localizedDescription)")
+        }
+    }
+
     // MARK: - Starting & Stopping the VPN
 
     enum StartError: LocalizedError {
+        case couldNotEnableLoginItems(error: Error)
         case simulateControllerFailureError
 
         var errorDescription: String? {
             switch self {
+            case .couldNotEnableLoginItems(let error):
+                return "Failed to enable login items: \(error.localizedDescription)"
             case .simulateControllerFailureError:
                 return "Simulated a controller error as requested"
             }
@@ -347,13 +349,16 @@ final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
     /// Starts the VPN connection used for Network Protection
     ///
     func start() async throws {
+        controllerErrorStore.lastErrorMessage = nil
+
+        await Self.ensureLoginItemsAreEnabled()
+
 #if NETP_SYSTEM_EXTENSION
-        guard try await ensureSystemExtensionAndAgentAreActivated() else {
+        guard try await ensureSystemExtensionIsActivated() else {
             return
         }
 #endif
 
-        controllerErrorStore.lastErrorMessage = nil
         let tunnelManager: NETunnelProviderManager
 
         do {
@@ -429,8 +434,8 @@ final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
     static func resetAllState() {
         Task {
 
-            if let activeSession = try? await activeSession() {
-                try? activeSession.sendProviderMessage(Data([NetworkProtectionAppRequest.resetAllState.rawValue])) { _ in
+            if let activeSession = try? await ConnectionSessionUtilities.activeSession() {
+                try? activeSession.sendProviderMessage(Data([ExtensionMessage.resetAllState.rawValue])) { _ in
                     os_log("Status was reset in the extension", log: .networkProtection)
                 }
             }
@@ -449,8 +454,9 @@ final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
             }
 
 #if NETP_SYSTEM_EXTENSION
-            try? LoginItem(agentBundleID: "HKE973VLUW.com.duckduckgo.macos.browser.network-protection.notifications").disable()
+            try? notificationsAgentLoginItem.disable()
 #endif
+            try? agentLoginItem.disable()
             NetworkProtectionSelectedServerUserDefaultsStore().reset()
         }
     }
@@ -467,14 +473,14 @@ final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
         }
 
         Task {
-            guard let activeSession = try? await activeSession() else {
+            guard let activeSession = try? await ConnectionSessionUtilities.activeSession() else {
                 return
             }
 
-            var request = Data([NetworkProtectionAppRequest.setSelectedServer.rawValue])
+            var request = Data([ExtensionMessage.setSelectedServer.rawValue])
 
             if let selectedServerName = selectedServerName {
-                let serverNameData = selectedServerName.data(using: NetworkProtectionAppRequest.preferredStringEncoding)!
+                let serverNameData = selectedServerName.data(using: ExtensionMessage.preferredStringEncoding)!
                 request.append(serverNameData)
             }
 
@@ -483,11 +489,11 @@ final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
     }
 
     static func expireRegistrationKeyNow() async throws {
-        guard let activeSession = try? await activeSession() else {
+        guard let activeSession = try? await ConnectionSessionUtilities.activeSession() else {
             return
         }
 
-        let request = Data([NetworkProtectionAppRequest.expireRegistrationKey.rawValue])
+        let request = Data([ExtensionMessage.expireRegistrationKey.rawValue])
         try? activeSession.sendProviderMessage(request)
     }
 
@@ -508,11 +514,11 @@ final class DefaultNetworkProtectionProvider: NetworkProtectionProvider {
     ///         defined by NetP using its standard configuration.
     ///
     static func setRegistrationKeyValidity(_ validity: TimeInterval?) async throws {
-        guard let activeSession = try await activeSession() else {
+        guard let activeSession = try await ConnectionSessionUtilities.activeSession() else {
             return
         }
 
-        var request = Data([NetworkProtectionAppRequest.setKeyValidity.rawValue])
+        var request = Data([ExtensionMessage.setKeyValidity.rawValue])
 
         if let validity = validity {
             UserDefaults.standard.set(validity, forKey: Self.registrationKeyValidityKey)

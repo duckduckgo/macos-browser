@@ -19,6 +19,7 @@
 import Cocoa
 import os
 import NetworkExtension
+import NetworkProtection
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
 
@@ -34,13 +35,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         return NetworkProtectionUNNotificationsPresenter(mainAppURL: mainAppURL)
     }()
-    private var statusChangeObserverToken: NSObjectProtocol?
-    private let ipcConnection = IPCConnection(log: .networkProtectionIPCLoginItemLog, memoryManagementLog: .networkProtectionMemoryLog)
 
-    var observer: NSKeyValueObservation?
+#if NETP_SYSTEM_EXTENSION
+    private let ipcConnection = IPCConnection(log: .networkProtectionIPCLoginItemLog, memoryManagementLog: .networkProtectionMemoryLog)
+#endif
+
+    private let distributedNotificationCenter = DistributedNotificationCenter.forType(.networkProtection)
+
+    // MARK: - Notifications: Observation Tokens
+
+    private var observationTokens = [NotificationToken]()
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
-        os_log("Login item running")
+        os_log("Login item finished launching", log: .networkProtectionLoginItemLog, type: .info)
 
         startObservingVPNStatusChanges()
         registerConnection(listenerStarted: false)
@@ -50,17 +57,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func startObservingVPNStatusChanges() {
         os_log("Register with sysex")
 
-        DistributedNotificationCenter.forType(.networkProtection).addObserver(forName: .NetPIPCListenerStarted, object: nil, queue: .main) { [weak self] _ in
+        observationTokens.append(distributedNotificationCenter.addObserver(for: .ipcListenerStarted, object: nil, queue: .main) { [weak self] _ in
 
             os_log("Got notification: listener started")
             self?.registerConnection(listenerStarted: true)
-        }
+        })
 
-        DistributedNotificationCenter.forType(.networkProtection).addObserver(forName: .NetPServerSelected, object: nil, queue: nil) { [weak self] _ in
+        observationTokens.append(distributedNotificationCenter.addObserver(for: .serverSelected, object: nil, queue: nil) { [weak self] _ in
 
             os_log("Got notification: listener started")
             self?.notificationsPresenter.requestAuthorization()
-        }
+        })
     }
 
     /// Registers an IPC connection with the system extension
@@ -70,6 +77,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     ///         started by the system extension.  This is purely for more precise logging.
     ///
     private func registerConnection(listenerStarted: Bool) {
+#if NETP_SYSTEM_EXTENSION
         ipcConnection.register(machServiceName: "HKE973VLUW.com.duckduckgo.macos.browser.network-protection.system-extension", delegate: self) { success in
             DispatchQueue.main.async {
                 if success {
@@ -84,6 +92,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 }
             }
         }
+#endif
     }
 
     func applicationSupportsSecureRestorableState(_ app: NSApplication) -> Bool {
@@ -91,19 +100,26 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 }
 
+#if NETP_SYSTEM_EXTENSION
 extension AppDelegate: AppCommunication {
+
     func reconnected() {
-        os_log("Presenting reconnected notification")
+        os_log("Presenting reconnected notification", log: .networkProtection, type: .info)
         notificationsPresenter.showReconnectedNotification()
     }
 
     func reconnecting() {
-        os_log("Presenting reconnecting notification")
+        os_log("Presenting reconnecting notification", log: .networkProtection, type: .info)
         notificationsPresenter.showReconnectingNotification()
     }
 
     func connectionFailure() {
-        os_log("Presenting failure notification")
+        os_log("Presenting failure notification", log: .networkProtection, type: .info)
         notificationsPresenter.showConnectionFailureNotification()
     }
+
+    func statusChanged(status: NEVPNStatus) {
+        os_log("Status changed", log: .networkProtection, type: .info)
+    }
 }
+#endif

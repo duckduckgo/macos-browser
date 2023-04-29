@@ -18,10 +18,10 @@
 
 import Cocoa
 import os.log
-import WebKit
 import BrowserServicesKit
-import SwiftUI
 import NetworkProtectionUI
+import SwiftUI
+import WebKit
 
 protocol OptionsButtonMenuDelegate: AnyObject {
 

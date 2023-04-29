@@ -44,7 +44,7 @@ CODE_SIGN_IDENTITY[config=CI][sdk=macosx*] =
 
 PRODUCT_NAME = DuckDuckGo Agent
 
-PROVISIONING_PROFILE_SPECIFIER[config=Release][sdk=macosx*] = Mac Browser NetP Developer ID Not. (Distribution)
+PROVISIONING_PROFILE_SPECIFIER[config=Release][sdk=macosx*] = macOS Network Protection Agent App (Distribution)
 
 NETP_EXTRA_FLAGS = NETP_SYSTEM_EXTENSION
 

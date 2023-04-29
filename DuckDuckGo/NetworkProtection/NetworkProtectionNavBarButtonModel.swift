@@ -55,8 +55,12 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
     // MARK: - Initialization
 
     init(popovers: NavigationBarPopovers,
-         networkProtectionStatusReporter: NetworkProtectionStatusReporter = DefaultNetworkProtectionStatusReporter()) {
-        self.networkProtectionStatusReporter = networkProtectionStatusReporter
+         statusReporter: NetworkProtectionStatusReporter? = nil) {
+
+        self.networkProtectionStatusReporter = statusReporter ?? DefaultNetworkProtectionStatusReporter(
+            statusObserver: ConnectionStatusObserverThroughSession(),
+            serverInfoObserver: ConnectionServerInfoObserverThroughSession(),
+            connectionErrorObserver: ConnectionErrorObserverThroughSession())
         self.iconPublisher = NetworkProtectionIconPublisher(statusReporter: networkProtectionStatusReporter)
         self.popovers = popovers
 
@@ -83,7 +87,7 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
     }
 
     private func setupStatusSubscription() {
-        statusChangeCancellable = networkProtectionStatusReporter.statusChangePublisher.sink { [weak self] status in
+        statusChangeCancellable = networkProtectionStatusReporter.statusPublisher.sink { [weak self] status in
             guard let self = self else {
                 return
             }

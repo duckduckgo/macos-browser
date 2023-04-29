@@ -8,8 +8,7 @@
 	<true/>
 	<key>com.apple.security.application-groups</key>
 	<array>
-		<string>$(TeamIdentifierPrefix)com.duckduckgo.macos.browser.network-protection</string>
-		<string>$(TeamIdentifierPrefix)com.duckduckgo.macos.browser.network-protection.system-extension</string>
+		<string>$(NETP_APP_GROUP)</string>
 	</array>
 </dict>
 </plist>

@@ -54,18 +54,75 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
 
     private var distributedNotificationCenter = DistributedNotificationCenter.forType(.networkProtection)
 
+    // MARK: - Status
+
+    override var reasserting: Bool {
+        get {
+            super.reasserting
+        }
+
+        set {
+            if reasserting {
+                connectionStatus = .reasserting
+            } else {
+                connectionStatus = .connected(connectedDate: Date())
+            }
+
+            super.reasserting = newValue
+        }
+    }
+
+    private var connectionStatus: ConnectionStatus = .disconnected {
+        didSet {
+            if oldValue != connectionStatus {
+                broadcastConnectionStatus()
+            }
+        }
+    }
+
+    private func broadcastConnectionStatus() {
+        let data = ConnectionStatusEncoder().encode(connectionStatus)
+        distributedNotificationCenter.post(.statusDidChange, object: data)
+    }
+
     // MARK: - Server Selection
 
     let selectedServerStore = NetworkProtectionSelectedServerUserDefaultsStore()
 
     var lastSelectedServerInfo: NetworkProtectionServerInfo? {
         didSet {
-            guard lastSelectedServerInfo != nil else {
-                return
-            }
-
-            distributedNotificationCenter.postNotificationName(.NetPServerSelected, object: nil, userInfo: nil, options: [.deliverImmediately, .postToAllSessions])
+            broadcastLastSelectedServerInfo()
         }
+    }
+
+    private func broadcastLastSelectedServerInfo() {
+        guard let serverInfo = lastSelectedServerInfo else {
+            return
+        }
+
+        let serverStatusInfo = NetworkProtectionStatusServerInfo(serverLocation: serverInfo.serverLocation, serverAddress: serverInfo.endpoint?.description)
+        let payload: String?
+
+        do {
+            let encoder = JSONEncoder()
+            let jsonData = try encoder.encode(serverStatusInfo)
+
+            payload = String(data: jsonData, encoding: .utf8)
+
+            if payload == nil {
+                os_log("Error encoding serverInfo Data to String: %{public}@", log: .networkProtection, type: .error, String(describing: jsonData))
+                // Continue anyway, we'll just update the UI to show "Unknown" server info, which is better
+                // than showing the info from the previous server.
+            }
+        } catch {
+            os_log("Error encoding serverInfo to Data: %{public}@", log: .networkProtection, type: .error, error.localizedDescription)
+            // Continue anyway, we'll just update the UI to show "Unknown" server info, which is better
+            // than showing the info from the previous server.
+            payload = nil
+        }
+
+        distributedNotificationCenter.post(.serverSelected, object: payload)
+        // Update shared userdefaults
     }
 
     // MARK: - User Notifications
@@ -253,6 +310,10 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
     private let controllerErrorStore = NetworkProtectionTunnelErrorStore()
     private let latencyReporter = NetworkProtectionLatencyReporter(log: .networkProtection)
 
+    // MARK: - Notifications: Observation Tokens
+
+    private var observationTokens = [NotificationToken]()
+
     // MARK: - Initializers
 
     override init() {
@@ -263,6 +324,14 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         #if NETP_SYSTEM_EXTENSION
         ipcConnection.startListener()
         #endif
+
+        observationTokens.append(distributedNotificationCenter.addObserver(for: .newStatusObserver, object: nil, queue: nil) { [weak self] _ in
+
+            self?.broadcastConnectionStatus()
+            self?.broadcastLastSelectedServerInfo()
+        })
+
+        connectionStatus = .disconnected
     }
 
     deinit {
@@ -348,12 +417,25 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
     }
 
     override func startTunnel(options: [String: NSObject]?, completionHandler: @escaping (Error?) -> Void) {
+        connectionStatus = .connecting
+
+        let internalCompletionHandler = { (error: Error?) in
+            if error != nil {
+                self.connectionStatus = .disconnected
+            }
+
+            completionHandler(error)
+        }
+
         let activationAttemptId = options?["activationAttemptId"] as? String
+
+        tunnelHealth.isHavingConnectivityIssues = false
+        controllerErrorStore.lastErrorMessage = nil
 
         os_log("🔵 Will load options\n%{public}@", log: .networkProtection, type: .info, String(describing: options))
 
         if options?["tunnelFailureSimulation"] as? String == "true" {
-            completionHandler(TunnelError.simulateTunnelFailureError)
+            internalCompletionHandler(TunnelError.simulateTunnelFailureError)
             controllerErrorStore.lastErrorMessage = TunnelError.simulateTunnelFailureError.localizedDescription
             return
         }
@@ -361,12 +443,9 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         load(options: options)
         os_log("🔵 Done!", log: .networkProtection, type: .info)
 
-        tunnelHealth.isHavingConnectivityIssues = false
-        controllerErrorStore.lastErrorMessage = nil
-
         os_log("🔵 Starting tunnel from the %{public}@", log: .networkProtection, type: .info, activationAttemptId == nil ? "OS directly, rather than the app" : "app")
 
-        startTunnel(selectedServer: selectedServerStore.selectedServer, completionHandler: completionHandler)
+        startTunnel(selectedServer: selectedServerStore.selectedServer, completionHandler: internalCompletionHandler)
     }
 
     private func startTunnel(selectedServer: SelectedNetworkProtectionServer, completionHandler: @escaping (Error?) -> Void) {
@@ -412,6 +491,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
     }
 
     override func stopTunnel(with reason: NEProviderStopReason, completionHandler: @escaping () -> Void) {
+        connectionStatus = .disconnecting
         os_log("Stopping tunnel with reason %{public}@", log: .networkProtection, type: .info, String(describing: reason))
 
         adapter.stop { error in
@@ -421,8 +501,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
             }
 
             Task {
-                await self.connectionTester.stop()
-
+                await self.handleAdapterStopped()
                 completionHandler()
             }
         }
@@ -430,10 +509,12 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
 
     /// Do not cancel, directly... call this method so that the adapter and tester are stopped too.
     private func stopTunnel(with stopError: Error) {
+        connectionStatus = .disconnecting
+
         os_log("Stopping tunnel with error %{public}@", log: .networkProtection, type: .info, stopError.localizedDescription)
 
         Task {
-            await connectionTester.stop()
+            await handleAdapterStopped()
         }
 
         self.adapter.stop { error in
@@ -481,6 +562,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
     }
 
     private func updateTunnelConfiguration(serverSelectionMethod: NetworkProtectionServerSelectionMethod, reassert: Bool = true) async throws {
+
         let tunnelConfiguration = try await generateTunnelConfiguration(serverSelectionMethod: serverSelectionMethod)
 
         try await withCheckedThrowingContinuation { [weak self] (continuation: CheckedContinuation<Void, Error>) in
@@ -490,7 +572,6 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
             }
 
             self.adapter.update(tunnelConfiguration: tunnelConfiguration, reassert: reassert) { error in
-
                 if let error = error {
                     os_log("🔵 Failed to update the configuration: %{public}@", type: .error, error.localizedDescription)
                     continuation.resume(throwing: error)
@@ -498,7 +579,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
                 }
 
                 Task {
-                    await self.handleAdapterStarted()
+                    await self.handleAdapterStarted(resumed: false)
                     continuation.resume()
                 }
             }
@@ -534,12 +615,12 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
     // MARK: - App Messages
 
     override func handleAppMessage(_ messageData: Data, completionHandler: ((Data?) -> Void)? = nil) {
-        guard let request = NetworkProtectionAppRequest(rawValue: messageData[0]) else {
+        guard let message = ExtensionMessage(rawValue: messageData[0]) else {
             completionHandler?(nil)
             return
         }
 
-        switch request {
+        switch message {
         case .expireRegistrationKey:
             handleExpireRegistrationKey(completionHandler: completionHandler)
         case .getLastErrorMessage:
@@ -581,7 +662,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
     }
 
     private func handleGetLastErrorMessage(_ messageData: Data, completionHandler: ((Data?) -> Void)? = nil) {
-        let data = controllerErrorStore.lastErrorMessage?.data(using: NetworkProtectionAppRequest.preferredStringEncoding)
+        let data = controllerErrorStore.lastErrorMessage?.data(using: ExtensionMessage.preferredStringEncoding)
         completionHandler?(data)
     }
 
@@ -613,7 +694,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
                 return
             }
 
-            guard let serverName = String(data: remainingData, encoding: NetworkProtectionAppRequest.preferredStringEncoding) else {
+            guard let serverName = String(data: remainingData, encoding: ExtensionMessage.preferredStringEncoding) else {
 
                 if case .endpoint = selectedServerStore.selectedServer {
                     selectedServerStore.selectedServer = .automatic
@@ -630,6 +711,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
 
             selectedServerStore.selectedServer = .endpoint(serverName)
             try? await updateTunnelConfiguration(serverSelectionMethod: .preferredServer(serverName: serverName))
+            completionHandler?(nil)
         }
     }
 
@@ -639,7 +721,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
             return
         }
 
-        completionHandler?(serverLocation.data(using: NetworkProtectionAppRequest.preferredStringEncoding))
+        completionHandler?(serverLocation.data(using: ExtensionMessage.preferredStringEncoding))
     }
 
     private func handleGetServerAddress(_ messageData: Data, completionHandler: ((Data?) -> Void)? = nil) {
@@ -648,7 +730,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
             return
         }
 
-        completionHandler?(endpoint.description.data(using: NetworkProtectionAppRequest.preferredStringEncoding))
+        completionHandler?(endpoint.description.data(using: ExtensionMessage.preferredStringEncoding))
     }
 
     private func handleSetKeyValidity(_ messageData: Data, completionHandler: ((Data?) -> Void)? = nil) {
@@ -674,7 +756,11 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
 
     /// Called when the adapter reports that the tunnel was successfully started.
     ///
-    private func handleAdapterStarted() async {
+    private func handleAdapterStarted(resumed: Bool = false) async {
+        if !resumed {
+            connectionStatus = .connected(connectedDate: Date())
+        }
+
         guard !isKeyExpired else {
             await rekey()
             return
@@ -692,6 +778,11 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         } else {
             os_log("🔵 Error: the VPN connection tester could not be started since we could not retrieve the tunnel interface name", log: .networkProtection, type: .error)
         }
+    }
+
+    private func handleAdapterStopped() async {
+        connectionStatus = .disconnected
+        await self.connectionTester.stop()
     }
 
     /// Called when the adapter reports that the tunnel failed to start with an error.
@@ -740,7 +831,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         os_log("Wake up", log: .networkProtectionSleepLog, type: .info)
 
         Task {
-            await handleAdapterStarted()
+            await handleAdapterStarted(resumed: true)
         }
     }
 

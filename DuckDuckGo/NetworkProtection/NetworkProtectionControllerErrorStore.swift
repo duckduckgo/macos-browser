@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import NetworkProtection
 
 /// This class provides a mechanism to store and announce issues when interacting with the tunnel.
 /// The reason this lass is necessry is because we need to store and share failures across different UI elements.  As an example
@@ -41,13 +42,13 @@ final class NetworkProtectionControllerErrorStore {
 
         set {
             userDefaults.set(newValue, forKey: Self.lastErrorMessageKey)
-            postLastErrorMessageChangedNotification()
+            postErrorChangedNotification(errorMessage: newValue)
         }
     }
 
     // MARK: - Posting Notifications
 
-    private func postLastErrorMessageChangedNotification() {
-        distributedNotificationCenter.postNotificationName(.NetPControllerErrorStatusChanged, object: nil, userInfo: nil, options: [.deliverImmediately, .postToAllSessions])
+    private func postErrorChangedNotification(errorMessage: String?) {
+        distributedNotificationCenter.post(.controllerErrorChanged, object: errorMessage)
     }
 }

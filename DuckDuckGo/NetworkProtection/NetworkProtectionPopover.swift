@@ -19,6 +19,8 @@
 import AppKit
 import Foundation
 import SwiftUI
+import NetworkProtection
+import NetworkProtectionUI
 
 final class NetworkProtectionPopover: NSPopover {
 
@@ -36,14 +38,14 @@ final class NetworkProtectionPopover: NSPopover {
     }
 
     private func setupContentController() {
-        #if DEBUG || NETP
-        let subscribeToDebugNotifications = true
-        #else
-        let subscribeToDebugNotifications = false
-        #endif
+        let statusReporter = DefaultNetworkProtectionStatusReporter(
+            statusObserver: ConnectionStatusObserverThroughSession(),
+            serverInfoObserver: ConnectionServerInfoObserverThroughSession(),
+            connectionErrorObserver: ConnectionErrorObserverThroughSession())
 
         let provider = DefaultNetworkProtectionProvider()
-        let model = NetworkProtectionStatusView.Model(controller: provider)
+        let model = NetworkProtectionStatusView.Model(controller: provider,
+                                                      statusReporter: statusReporter)
         let view = NetworkProtectionStatusView(model: model)
         let controller = NSHostingController(rootView: view)
 

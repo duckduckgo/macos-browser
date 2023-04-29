@@ -51,9 +51,9 @@ final class NetworkProtectionTunnelHealthStore {
 
     private func postIssueChangeNotification(newValue: Bool) {
         if newValue {
-            distributedNotificationCenter.postNotificationName(.NetPConnectivityIssuesStarted, object: nil, userInfo: nil, options: [.deliverImmediately, .postToAllSessions])
+            distributedNotificationCenter.post(.issuesStarted)
         } else {
-            distributedNotificationCenter.postNotificationName(.NetPConnectivityIssuesResolved, object: nil, userInfo: nil, options: [.deliverImmediately, .postToAllSessions])
+            distributedNotificationCenter.post(.issuesResolved)
         }
     }
 }

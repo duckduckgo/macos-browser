@@ -42,13 +42,13 @@ final class NetworkProtectionTunnelErrorStore {
 
         set {
             userDefaults.set(newValue, forKey: Self.lastErrorMessageKey)
-            postLastErrorMessageChangedNotification()
+            postLastErrorMessageChangedNotification(newValue)
         }
     }
 
     // MARK: - Posting Notifications
 
-    private func postLastErrorMessageChangedNotification() {
-        distributedNotificationCenter.postNotificationName(.NetPTunnelErrorStatusChanged, object: nil, userInfo: nil, options: [.deliverImmediately, .postToAllSessions])
+    private func postLastErrorMessageChangedNotification(_ errorMessage: String?) {
+        distributedNotificationCenter.post(.tunnelErrorChanged, object: errorMessage)
     }
 }

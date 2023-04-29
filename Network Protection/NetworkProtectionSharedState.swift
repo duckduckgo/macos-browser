@@ -19,22 +19,7 @@
 import Foundation
 import NetworkExtension
 
-enum NetworkProtectionAppRequest: UInt8 {
-    case resetAllState = 0
-    case getRuntimeConfiguration
-    case getLastErrorMessage
-    case isHavingConnectivityIssues
-    case setSelectedServer
-    case getServerLocation
-    case getServerAddress
-    case expireRegistrationKey
-    case setKeyValidity
-
-    static let preferredStringEncoding = String.Encoding.utf16
-}
-
 let networkProtectionScheme = "networkprotection"
-let networkProtectionShowStatusURL = URL(string: "networkprotection://show-status")!
 
 enum NetworkProtectionOptionKey: String {
     case defaultPixelHeaders = "defaultPixelHeaders"

@@ -33,9 +33,15 @@ final class AppMain {
         let arguments = ProcessInfo.processInfo.arguments
         var command: String?
 
-        if let defaults = UserDefaults(suiteName: "HKE973VLUW.com.duckduckgo.macos.browser.network-protection") {
-            command = defaults.string(forKey: AppLauncher.Command.userDefaultsKey)
-            defaults.removeObject(forKey: AppLauncher.Command.userDefaultsKey)
+        if let defaults = AppGroupHelper.shared.userDefaults {
+            defaults.synchronize()
+            if let argumentTimestamp = defaults.object(forKey: AppLauncher.Command.userDefaultsArgumentTimestampKey) as? Date,
+               argumentTimestamp.timeIntervalSinceNow < AppLauncher.Command.argumentTimestampExpirationThreshold {
+                command = defaults.string(forKey: AppLauncher.Command.userDefaultsArgumentKey)
+            } else {
+                command = ""
+            }
+            defaults.removeObject(forKey: AppLauncher.Command.userDefaultsArgumentKey)
         }
 
         if command == AppLauncher.Command.startVPN.asArgument || arguments.contains(AppLauncher.Command.startVPN.asArgument) {
@@ -45,12 +51,12 @@ final class AppMain {
             } catch {
                 throw LaunchError.startVPNFailed(error)
             }
-        } else if command == AppLauncher.Command.stopVPN.asArgument || arguments.contains(AppLauncher.Command.startVPN.asArgument) {
+        } else if command == AppLauncher.Command.stopVPN.asArgument || arguments.contains(AppLauncher.Command.stopVPN.asArgument) {
             do {
                 try await DefaultNetworkProtectionProvider().stop()
                 exit(0)
             } catch {
-                throw LaunchError.startVPNFailed(error)
+                throw LaunchError.stopVPNFailed(error)
             }
         }
 

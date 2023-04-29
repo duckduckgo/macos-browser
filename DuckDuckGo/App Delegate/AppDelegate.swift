@@ -54,7 +54,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private let crashReporter = CrashReporter()
     private(set) var internalUserDecider: InternalUserDeciding!
     private var appIconChanger: AppIconChanger!
-    private var networkProtectionMenu = NetworkProtectionStatusBarMenu()
 
 #if !APPSTORE
     var updateController: UpdateController!
@@ -159,7 +158,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         refreshNetworkProtectionServers()
         warnUserAboutApplicationPathForNetworkProtection()
-        networkProtectionMenu.show()
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {

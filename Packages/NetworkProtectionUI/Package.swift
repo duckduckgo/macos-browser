@@ -13,7 +13,7 @@ let package = Package(
         // Products define the executables and libraries a package produces, and make them visible to other packages.
         .library(
             name: "NetworkProtectionUI",
-            targets: ["NetworkProtectionUI"]),
+            targets: ["NetworkProtectionUI"])
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
@@ -27,10 +27,10 @@ let package = Package(
             name: "NetworkProtectionUI",
             dependencies: ["NetworkProtection"],
             resources: [
-                .process("Resources")
+                .copy("Resources/Assets.xcassets")
             ]),
         .testTarget(
             name: "NetworkProtectionUITests",
-            dependencies: ["NetworkProtectionUI"]),
+            dependencies: ["NetworkProtectionUI"])
     ]
 )

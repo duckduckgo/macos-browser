@@ -33,7 +33,7 @@ public final class AppGroupHelper {
     ///         If none is specified the default value used is `NETP_APP_GROUP`.
     ///
     public init(infoPlistKey: String = "NETP_APP_GROUP") {
-        guard let appGroup = Bundle.main.object(forInfoDictionaryKey: infoPlistKey) as? String else {   
+        guard let appGroup = Bundle.main.object(forInfoDictionaryKey: infoPlistKey) as? String else {
             fatalError("Make sure key \(infoPlistKey) is defined in info.plist")
         }
 
