@@ -116,6 +116,10 @@ extension WindowControllersManager {
         showTab(with: .preferences(pane: pane))
     }
 
+    func showDataBrokerProtectionTab() {
+        showTab(with: .dataBrokerProtection)
+    }
+
     /// Opens a bookmark in a tab, respecting the current modifier keys when deciding where to open the bookmark's URL.
     func open(bookmark: Bookmark) {
         guard let url = bookmark.urlObject else { return }

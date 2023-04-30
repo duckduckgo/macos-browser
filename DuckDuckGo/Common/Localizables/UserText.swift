@@ -62,6 +62,7 @@ struct UserText {
     static let tabBookmarksTitle = NSLocalizedString("tab.bookmarks.title", value: "Bookmarks", comment: "Tab bookmarks title")
     static let tabOnboardingTitle = NSLocalizedString("tab.onboarding.title", value: "Welcome", comment: "Tab onboarding title")
     static let tabErrorTitle = NSLocalizedString("tab.error.title", value: "Oops!", comment: "Tab error title")
+    static let tabDataBrokerProtectionTitle = NSLocalizedString("tab.dbp.title", value: "Data Broker Protection", comment: "Tab data broker protection title")
     static let openSystemPreferences = NSLocalizedString("open.preferences", value: "Open System Preferences", comment: "Open System Preferences (to re-enable permission for the App) (up to and including macOS 12")
 
     static let unknownErrorMessage = NSLocalizedString("error.unknown", value: "An unknown error has occurred", comment: "Error page subtitle")
@@ -208,6 +209,7 @@ struct UserText {
     static let bookmarksManageBookmarks = NSLocalizedString("bookmarks.manage-bookmarks", value: "Manage Bookmarks", comment: "Menu item for opening the bookmarks management interface")
 
     static let zoom = NSLocalizedString("zoom", value: "Zoom", comment: "Menu with Zooming commands")
+    static let dataBrokerProtectionOptionsMenuItem = NSLocalizedString("data-broker-protection.optionsMenu", value: "Data Broker Protection", comment: "Menu item data broker protection feature")
 
     static let emailOptionsMenuItem = NSLocalizedString("email.optionsMenu", value: "Email Protection", comment: "Menu item email feature")
     static let emailOptionsMenuCreateAddressSubItem = NSLocalizedString("email.optionsMenu.createAddress", value: "Generate Private Duck Address", comment: "Create an email alias sub menu item")

@@ -663,6 +663,11 @@ extension NavigationBarViewController: NSMenuDelegate {
 }
 
 extension NavigationBarViewController: OptionsButtonMenuDelegate {
+
+    func optionsButtonMenuRequestedDataBrokerProtection(_ menu: NSMenu) {
+        WindowControllersManager.shared.showDataBrokerProtectionTab()
+    }
+
     func optionsButtonMenuRequestedOpenExternalPasswordManager(_ menu: NSMenu) {
         BWManager.shared.openBitwarden()
     }

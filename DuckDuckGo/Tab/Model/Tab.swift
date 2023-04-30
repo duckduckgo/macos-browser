@@ -48,6 +48,7 @@ protocol NewWindowPolicyDecisionMaker {
         case preferences(pane: PreferencePaneIdentifier?)
         case bookmarks
         case onboarding
+        case dataBrokerProtection
         case none
 
         static func contentFromURL(_ url: URL?, userEntered: String? = nil) -> TabContent {
@@ -57,6 +58,8 @@ protocol NewWindowPolicyDecisionMaker {
                 return .onboarding
             } else if url == .preferences {
                 return .anyPreferencePane
+            } else if url == .dataBrokerProtection {
+                return .dataBrokerProtection
             } else if let preferencePane = url.flatMap(PreferencePaneIdentifier.init(url:)) {
                 return .preferences(pane: preferencePane)
             } else if let url, let credential = url.basicAuthCredential {
@@ -85,7 +88,7 @@ protocol NewWindowPolicyDecisionMaker {
 
         var isDisplayable: Bool {
             switch self {
-            case .preferences, .bookmarks:
+            case .preferences, .bookmarks, .dataBrokerProtection:
                 return true
             default:
                 return false
@@ -98,6 +101,8 @@ protocol NewWindowPolicyDecisionMaker {
                 return true
             case (.bookmarks, .bookmarks):
                 return true
+            case (.dataBrokerProtection, .dataBrokerProtection):
+                return true
             default:
                 return false
             }
@@ -109,6 +114,7 @@ protocol NewWindowPolicyDecisionMaker {
             case .preferences: return UserText.tabPreferencesTitle
             case .bookmarks: return UserText.tabBookmarksTitle
             case .onboarding: return UserText.tabOnboardingTitle
+            case .dataBrokerProtection: return UserText.tabDataBrokerProtectionTitle
             }
         }
 
@@ -138,6 +144,8 @@ protocol NewWindowPolicyDecisionMaker {
                 return .blankPage
             case .onboarding:
                 return .welcome
+            case .dataBrokerProtection:
+                return .dataBrokerProtection
             case .none:
                 return nil
             }
