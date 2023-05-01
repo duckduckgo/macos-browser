@@ -89,12 +89,14 @@ _asana_create_subtask() {
 	local parent_task_id="${1}"
 	local subtask_name="${2}"
 
-	local subtask_creation_response=$(curl -s -X POST \
-		-H "Authorization: Bearer ${asana_personal_access_token}" \ 
+	local subtask_creation_response
+	subtask_creation_response=$(curl -s -X POST \
+		-H "Authorization: Bearer ${asana_personal_access_token}" \
 		-H "Content-Type: application/json" "${asana_api_url}/tasks" \
 		-d "{\"data\": {\"name\": \"${subtask_name}\", \"parent\": \"${parent_task_id}\"}}")
 
-	local subtask_id=$(echo "${subtask_creation_response}" | jq '.data.gid' -r)
+	local subtask_id
+	subtask_id=$(echo "${subtask_creation_response}" | jq '.data.gid' -r)
 	local subtask_url="https://app.asana.com/0/${parent_task_id}/${subtask_id}"
 
 	echo "${subtask_url}"
