@@ -18,6 +18,8 @@
 
 import Foundation
 import BrowserServicesKit
+import NetworkProtection
+import NetworkProtectionUI
 import AppKit
 
 final class NavigationBarPopovers {
@@ -247,7 +249,13 @@ final class NavigationBarPopovers {
     // MARK: - Network Protection
 
     func showNetworkProtectionPopover(usingView view: NSView, withDelegate delegate: NSPopoverDelegate) {
-        let popover = NetworkProtectionPopover()
+        let controller = DefaultNetworkProtectionProvider()
+        let statusReporter = DefaultNetworkProtectionStatusReporter(
+            statusObserver: ConnectionStatusObserverThroughSession(),
+            serverInfoObserver: ConnectionServerInfoObserverThroughSession(),
+            connectionErrorObserver: ConnectionErrorObserverThroughSession())
+
+        let popover = NetworkProtectionPopover(controller: controller, statusReporter: statusReporter, showLaunchBrowserMenuItem: false)
         popover.delegate = delegate
 
         networkProtectionPopover = popover

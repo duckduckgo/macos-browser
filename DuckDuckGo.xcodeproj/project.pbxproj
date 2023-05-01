@@ -1030,13 +1030,11 @@
 		4B203DD729F60F0B00CA4850 /* NetworkProtectionSelectedServerStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0F2F56299E6B5000422AB8 /* NetworkProtectionSelectedServerStore.swift */; };
 		4B203DD829F60F0B00CA4850 /* String+ArrayConversion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0F2F54299E6B5000422AB8 /* String+ArrayConversion.swift */; };
 		4B203DDA29F60F0B00CA4850 /* LoginItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B3B5A6229DAE61400463DCF /* LoginItem.swift */; };
-		4B203DDC29F60F0B00CA4850 /* NetworkProtectionPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0F2F58299E6B5000422AB8 /* NetworkProtectionPopover.swift */; };
 		4B203DE029F60F0B00CA4850 /* NetworkProtectionProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0F2F46299E6B5000422AB8 /* NetworkProtectionProvider.swift */; };
 		4B203DE129F60F0B00CA4850 /* NetworkProtectionControllerErrorStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0F2F48299E6B5000422AB8 /* NetworkProtectionControllerErrorStore.swift */; };
 		4B203DE329F60F0B00CA4850 /* NetworkProtectionSelectedServerStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0F2F56299E6B5000422AB8 /* NetworkProtectionSelectedServerStore.swift */; };
 		4B203DE429F60F0B00CA4850 /* String+ArrayConversion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0F2F54299E6B5000422AB8 /* String+ArrayConversion.swift */; };
 		4B203DE629F60F0B00CA4850 /* LoginItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B3B5A6229DAE61400463DCF /* LoginItem.swift */; };
-		4B203DE829F60F0B00CA4850 /* NetworkProtectionPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0F2F58299E6B5000422AB8 /* NetworkProtectionPopover.swift */; };
 		4B203DEB29F60F2E00CA4850 /* NetworkProtectionBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BFA781B299E76700003284F /* NetworkProtectionBundle.swift */; };
 		4B203DEC29F60F2F00CA4850 /* NetworkProtectionBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BFA781B299E76700003284F /* NetworkProtectionBundle.swift */; };
 		4B203DED29F60F3700CA4850 /* NetworkProtectionSharedState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BFA7822299E76700003284F /* NetworkProtectionSharedState.swift */; };
@@ -1982,7 +1980,6 @@
 		7BFA7865299E83420003284F /* NetworkProtectionNavBarButtonModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0F2F45299E6B5000422AB8 /* NetworkProtectionNavBarButtonModel.swift */; };
 		7BFA7866299E83420003284F /* NetworkProtectionControllerErrorStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0F2F48299E6B5000422AB8 /* NetworkProtectionControllerErrorStore.swift */; };
 		7BFA7869299E83420003284F /* String+ArrayConversion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0F2F54299E6B5000422AB8 /* String+ArrayConversion.swift */; };
-		7BFA786A299E83420003284F /* NetworkProtectionPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0F2F58299E6B5000422AB8 /* NetworkProtectionPopover.swift */; };
 		7BFA786F299E83C80003284F /* NetworkProtectionBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BFA781B299E76700003284F /* NetworkProtectionBundle.swift */; };
 		7BFA7882299E89F30003284F /* FaviconUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA0CC562539EBC90079BC96 /* FaviconUserScript.swift */; };
 		7BFA7883299E89F30003284F /* ApiRequestError.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A9E457261460340067D1B9 /* ApiRequestError.swift */; };
@@ -2635,7 +2632,6 @@
 		7BFA7B1A299E8A5C0003284F /* NETunnelProviderProtocol+NetworkProtection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0F2F50299E6B5000422AB8 /* NETunnelProviderProtocol+NetworkProtection.swift */; };
 		7BFA7B1C299E8A620003284F /* NetworkProtectionControllerErrorStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0F2F48299E6B5000422AB8 /* NetworkProtectionControllerErrorStore.swift */; };
 		7BFA7B1F299E8A620003284F /* String+ArrayConversion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0F2F54299E6B5000422AB8 /* String+ArrayConversion.swift */; };
-		7BFA7B20299E8A620003284F /* NetworkProtectionPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0F2F58299E6B5000422AB8 /* NetworkProtectionPopover.swift */; };
 		7BFA7B22299E8A620003284F /* NetworkProtectionSelectedServerStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0F2F56299E6B5000422AB8 /* NetworkProtectionSelectedServerStore.swift */; };
 		7BFA7B23299E8A620003284F /* NetworkProtectionNavBarButtonModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0F2F45299E6B5000422AB8 /* NetworkProtectionNavBarButtonModel.swift */; };
 		7BFA7B27299E8A620003284F /* NetworkProtectionProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0F2F46299E6B5000422AB8 /* NetworkProtectionProvider.swift */; };
@@ -3670,7 +3666,6 @@
 		7B0F2F50299E6B5000422AB8 /* NETunnelProviderProtocol+NetworkProtection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NETunnelProviderProtocol+NetworkProtection.swift"; sourceTree = "<group>"; };
 		7B0F2F54299E6B5000422AB8 /* String+ArrayConversion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+ArrayConversion.swift"; sourceTree = "<group>"; };
 		7B0F2F56299E6B5000422AB8 /* NetworkProtectionSelectedServerStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionSelectedServerStore.swift; sourceTree = "<group>"; };
-		7B0F2F58299E6B5000422AB8 /* NetworkProtectionPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionPopover.swift; sourceTree = "<group>"; };
 		7B13966029AA69F200865FA9 /* DuckDuckGoNetP.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = DuckDuckGoNetP.xcconfig; sourceTree = "<group>"; };
 		7B13966129AA6A3400865FA9 /* DuckDuckGoNetPAppStore.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = DuckDuckGoNetPAppStore.xcconfig; sourceTree = "<group>"; };
 		7B13966329AA7C5B00865FA9 /* NetPExtensionAppex.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = NetPExtensionAppex.xcconfig; sourceTree = "<group>"; };
@@ -5389,7 +5384,6 @@
 				7B0F2F48299E6B5000422AB8 /* NetworkProtectionControllerErrorStore.swift */,
 				7B0F2F54299E6B5000422AB8 /* String+ArrayConversion.swift */,
 				7B0F2F45299E6B5000422AB8 /* NetworkProtectionNavBarButtonModel.swift */,
-				7B0F2F58299E6B5000422AB8 /* NetworkProtectionPopover.swift */,
 				7B0F2F56299E6B5000422AB8 /* NetworkProtectionSelectedServerStore.swift */,
 			);
 			path = NetworkProtection;
@@ -5471,11 +5465,11 @@
 		7B8DD1F129FB061D00BA6672 /* DuckDuckGoAgent */ = {
 			isa = PBXGroup;
 			children = (
-				7B8DD1F229FB061D00BA6672 /* DuckDuckGoAgentAppStore.entitlements */,
 				7B8DD1F329FB061D00BA6672 /* Info-AppStore.plist */,
 				7B8DD1F429FB061D00BA6672 /* Assets.xcassets */,
 				7B8DD1F529FB061D00BA6672 /* AppDelegate.swift */,
 				7B8DD1F629FB061D00BA6672 /* DuckDuckGoAgent.entitlements */,
+				7B8DD1F229FB061D00BA6672 /* DuckDuckGoAgentAppStore.entitlements */,
 				7B8DD1F729FB061D00BA6672 /* main.swift */,
 				7B8DD1F829FB061D00BA6672 /* Info.plist */,
 			);
@@ -8986,7 +8980,6 @@
 				3706FC3F293F65D500E42796 /* ApplicationDockMenu.swift in Sources */,
 				3706FC40293F65D500E42796 /* SaveIdentityViewController.swift in Sources */,
 				3706FC41293F65D500E42796 /* FileStore.swift in Sources */,
-				4B203DDC29F60F0B00CA4850 /* NetworkProtectionPopover.swift in Sources */,
 				3706FC42293F65D500E42796 /* PixelArguments.swift in Sources */,
 				3706FC43293F65D500E42796 /* PinnedTabsViewModel.swift in Sources */,
 				3706FC44293F65D500E42796 /* BookmarkList.swift in Sources */,
@@ -9821,7 +9814,6 @@
 				7B48D205299E6DCB0098A496 /* Tab+NSSecureCoding.swift in Sources */,
 				7B48D206299E6DCB0098A496 /* NSNotificationName+EmailManager.swift in Sources */,
 				7B48D207299E6DCB0098A496 /* MouseOverButton.swift in Sources */,
-				7BFA786A299E83420003284F /* NetworkProtectionPopover.swift in Sources */,
 				7B48D208299E6DCB0098A496 /* FireInfoViewController.swift in Sources */,
 				7B48D209299E6DCB0098A496 /* PermissionButton.swift in Sources */,
 				7B48D20A299E6DCB0098A496 /* MoreOptionsMenu.swift in Sources */,
@@ -10142,7 +10134,6 @@
 				7BFA78ED299E89F30003284F /* DataImportViewController.swift in Sources */,
 				7BFA78EE299E89F30003284F /* HistoryMenu.swift in Sources */,
 				7BFA78EF299E89F30003284F /* ContentScopeFeatureFlagging.swift in Sources */,
-				7BFA7B20299E8A620003284F /* NetworkProtectionPopover.swift in Sources */,
 				7BFA78F0299E89F30003284F /* OnboardingButtonStyles.swift in Sources */,
 				7BFA78F1299E89F30003284F /* SaveIdentityPopover.swift in Sources */,
 				7BFA78F2299E89F30003284F /* YoutubePlayerNavigationHandler.swift in Sources */,
@@ -11066,7 +11057,6 @@
 				B693954E26F04BEB0015B914 /* ProgressView.swift in Sources */,
 				B69B503C2726A12500758A2B /* StatisticsStore.swift in Sources */,
 				4BBDEE9128FC14760092FAA6 /* BWInstallationService.swift in Sources */,
-				4B203DE829F60F0B00CA4850 /* NetworkProtectionPopover.swift in Sources */,
 				B693955426F04BEC0015B914 /* ColorView.swift in Sources */,
 				AA5C1DD3285A217F0089850C /* RecentlyClosedCacheItem.swift in Sources */,
 				B6BBF17427475B15004F850E /* PopupBlockedPopover.swift in Sources */,

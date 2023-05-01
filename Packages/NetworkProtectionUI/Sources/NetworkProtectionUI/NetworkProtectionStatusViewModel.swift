@@ -71,15 +71,16 @@ extension NetworkProtectionStatusView {
         // MARK: - Initialization & Deinitialization
 
         public init(controller: TunnelController,
+                    showLaunchBrowserMenuItem: Bool,
                     statusReporter: NetworkProtectionStatusReporter,
                     logger: NetworkProtectionLogger = DefaultNetworkProtectionLogger(),
                     runLoopMode: RunLoop.Mode? = nil) {
 
             self.tunnelController = controller
             self.statusReporter = statusReporter
-
             self.logger = logger
             self.runLoopMode = runLoopMode
+            self.showLaunchBrowserMenuItem = showLaunchBrowserMenuItem
 
             connectionStatus = statusReporter.statusPublisher.value
             isHavingConnectivityIssues = statusReporter.connectivityIssuesPublisher.value
@@ -430,6 +431,29 @@ extension NetworkProtectionStatusView {
                     refreshInternalIsRunning()
                 }
             }
+        }
+
+        // MARK: - Launch Browser
+
+        private(set) var showLaunchBrowserMenuItem: Bool
+
+        func launchBrowser() {
+            let configuration = NSWorkspace.OpenConfiguration()
+            configuration.activates = true
+            configuration.addsToRecentItems = true
+            configuration.allowsRunningApplicationSubstitution = true
+            configuration.createsNewApplicationInstance = false
+
+            let parentBundlePath = "../../../../"
+            let mainAppURL: URL
+
+            if #available(macOS 13, *) {
+                mainAppURL = URL(filePath: parentBundlePath, relativeTo: Bundle.main.bundleURL)
+            } else {
+                mainAppURL = URL(fileURLWithPath: parentBundlePath, relativeTo: Bundle.main.bundleURL)
+            }
+
+            NSWorkspace.shared.openApplication(at: mainAppURL, configuration: configuration)
         }
 
         // MARK: - Feedback Sharing

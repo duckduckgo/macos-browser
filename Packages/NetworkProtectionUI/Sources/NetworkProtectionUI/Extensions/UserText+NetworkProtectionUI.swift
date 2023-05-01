@@ -1,5 +1,5 @@
 //
-//  NetworkProtectionStatusView.swift
+//  UserText.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -20,18 +20,13 @@ import Foundation
 
 
 final class UserText {
-    static let networkProtectionStatusViewTitle = NSLocalizedString("network.protection.status.view.title", value: "Network Protection", comment: "Title shown in NetworkProtection's status view.")
     static let networkProtectionStatusViewFeatureDesc = NSLocalizedString("network.protection.status.view.feature.description", value: "Hide your location from websites and conceal your online activity from Internet providers and others on your network.", comment: "Feature description shown in NetworkProtection's status view.")
-    static let networkProtectionStatusViewBetaWarning = NSLocalizedString("network.protection.status.view.beta.warning", value: "DuckDuckGo Network Protection is currently in beta.", comment: "Beta warning message shown in NetworkProtection's status view.")
     static let networkProtectionStatusViewConnDetails = NSLocalizedString("network.protection.status.view.connection.details", value: "Connection Details", comment: "Connection details label shown in NetworkProtection's status view.")
     static let networkProtectionStatusViewConnLabel = NSLocalizedString("network.protection.status.view.connection.label", value: "Network Protection", comment: "Connection label shown in NetworkProtection's status view.")
     static let networkProtectionStatusViewLocation = NSLocalizedString("network.protection.status.view.location", value: "Location", comment: "Location label shown in NetworkProtection's status view.")
     static let networkProtectionStatusViewIPAddress = NSLocalizedString("network.protection.status.view.ip.address", value: "IP Address", comment: "IP Address label shown in NetworkProtection's status view.")
     static let networkProtectionStatusViewFeatureOff = NSLocalizedString("network.protection.status.view.feature.on", value: "Network Protection is OFF", comment: "Text shown in NetworkProtection's status view when NetP is OFF.")
     static let networkProtectionStatusViewFeatureOn = NSLocalizedString("network.protection.status.view.feature.on", value: "Network Protection is ON", comment: "Text shown in NetworkProtection's status view when NetP is ON.")
-    static let networkProtectionStatusViewShareFeedback = NSLocalizedString("network.protection.status.view.share.feedback", value: "share feedback", comment: "Text shown in NetworkProtection's status view in a link that allows users to share feedback")
-    static let networkProtectionStatusViewShareFeedbackPrefix = NSLocalizedString("network.protection.status.view.share.feedback.prefix", value: "Help us improve and ", comment: "Text shown in NetworkProtection's status view before 'share feedback'")
-    static let networkProtectionStatusViewShareFeedbackSuffix = NSLocalizedString("network.protection.status.view.share.feedback.suffix", value: ".", comment: "Text shown in NetworkProtection's status view after 'share feedback'")
     static let networkProtectionStatusViewTimerZero = "00:00:00"
 
     // MARK: - Connection Status

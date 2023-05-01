@@ -28,6 +28,8 @@ import os.log
 public final class StatusBarMenu {
     private let statusItem: NSStatusItem
 
+    private let popover: NetworkProtectionPopover
+
     // MARK: - NetP Icon publisher
 
     private let iconPublisher: NetworkProtectionIconPublisher
@@ -51,8 +53,6 @@ public final class StatusBarMenu {
         self.statusItem = statusItem ?? NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         self.iconPublisher = NetworkProtectionIconPublisher(statusReporter: statusReporter)
 
-        let item = NSMenuItem()
-
         let parentBundlePath = "../../../../"
         let url: URL
 
@@ -62,22 +62,29 @@ public final class StatusBarMenu {
             url = URL(fileURLWithPath: parentBundlePath, relativeTo: Bundle.main.bundleURL)
         }
 
-        let model = NetworkProtectionStatusView.Model(controller: AppLaunchingController(appBundleURL: url),
-                                                      statusReporter: statusReporter,
-                                                      runLoopMode: .eventTracking)
-        let view = NetworkProtectionStatusView(model: model)
-        let hostingView = NSHostingView(rootView: view)
-        hostingView.translatesAutoresizingMaskIntoConstraints = false
-        hostingView.autoresizesSubviews = false
-        hostingView.frame.size = hostingView.intrinsicContentSize
-        item.view = hostingView
+        let controller = AppLaunchingController(appBundleURL: url)
 
-        let menu = NSMenu()
-        menu.items = [item]
-        self.statusItem.menu = menu
+        popover = NetworkProtectionPopover(controller: controller, statusReporter: statusReporter, showLaunchBrowserMenuItem: true)
+        popover.behavior = .transient
+
         self.statusItem.button?.image = .image(for: iconPublisher.icon)
+        self.statusItem.button?.target = self
+        self.statusItem.button?.action = #selector(statusBarButtonTapped)
 
         subscribeToIconUpdates()
+    }
+
+    @objc
+    private func statusBarButtonTapped() {
+        if popover.isShown {
+            popover.close()
+        } else {
+            guard let button = statusItem.button else {
+                return
+            }
+
+            popover.show(relativeTo: button.bounds, of: button, preferredEdge: .maxY)
+        }
     }
 
     private func subscribeToIconUpdates() {

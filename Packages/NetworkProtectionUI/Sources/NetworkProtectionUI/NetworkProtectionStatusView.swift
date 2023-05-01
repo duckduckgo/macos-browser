@@ -19,7 +19,6 @@
 import SwiftUI
 import Combine
 import NetworkProtection
-import NetworkProtectionUI
 
 /// This view helps us fix the height of a view that's meant to be shown inside a `NSHostingView`.
 ///
@@ -47,7 +46,6 @@ struct PopoverHeightFixer<Content: View>: View {
                     }
                 }
             })
-            .background(VisualEffectView(material: .windowBackground, blendingMode: .behindWindow).edgesIgnoringSafeArea(.all))
     }
 }
 
@@ -58,7 +56,7 @@ fileprivate extension Font {
         }
 
         static var sectionHeader: Font {
-            .system(size: 13, weight: .semibold, design: .default)
+            .system(size: 12, weight: .semibold, design: .default)
         }
 
         static var content: Font {
@@ -70,6 +68,7 @@ fileprivate extension Font {
 private enum Opacity {
     static let content = Double(0.58)
     static let label = Double(0.84)
+    static let description = Double(0.9)
     static let link = Double(1)
     static let title = Double(1)
 }
@@ -82,6 +81,11 @@ fileprivate extension View {
 
     func applyContentAttributes() -> some View {
         opacity(Opacity.content)
+            .font(.NetworkProtection.content)
+    }
+
+    func applyDescriptionAttributes() -> some View {
+        opacity(Opacity.description)
             .font(.NetworkProtection.content)
     }
 
@@ -103,6 +107,8 @@ fileprivate extension View {
 
 public struct NetworkProtectionStatusView: View {
 
+    @Environment(\.dismiss) private var dismiss
+
     // MARK: - Model
 
     /// The view model that this instance will use.
@@ -121,37 +127,39 @@ public struct NetworkProtectionStatusView: View {
 
     public var body: some View {
         PopoverHeightFixer(popoverHeight: $popoverHeight) {
-            headerView()
-
-            if let healthWarning = model.issueDescription {
-                connectionHealthWarningView(message: healthWarning).onAppear {
-                    popoverHeight = .infinity
-                }
-                .onDisappear {
-                    popoverHeight = .infinity
-                }
-            }
-
             VStack(spacing: 0) {
-                featureView()
-                detailsView()
+                if let healthWarning = model.issueDescription {
+                    connectionHealthWarningView(message: healthWarning).onAppear {
+                        popoverHeight = .infinity
+                    }
+                    .onDisappear {
+                        popoverHeight = .infinity
+                    }
+                }
+
+                headerView()
+                featureToggleRow()
+
+                Divider()
+                    .padding(EdgeInsets(top: 5, leading: 9, bottom: 5, trailing: 9))
+
+                if model.showServerDetails {
+                    connectionStatusView().onAppear {
+                        popoverHeight = .infinity
+                    }
+                    .onDisappear {
+                        popoverHeight = .infinity
+                    }
+                }
+
+                bottomMenuView()
             }
-            .padding(EdgeInsets(top: 8, leading: 8, bottom: 4, trailing: 8))
+            .padding(EdgeInsets(top: 10, leading: 5, bottom: 10, trailing: 5))
         }
-        .frame(maxWidth: 369)
+        .frame(maxWidth: 350)
     }
 
-    /// Title and divider
-    ///
-    private func headerView() -> some View {
-        VStack(spacing: 0) {
-            Text(UserText.networkProtectionStatusViewTitle)
-                .applyTitleAttributes()
-                .padding(12)
-
-            Divider()
-        }
-    }
+    // MARK: - Composite Views
 
     private func connectionHealthWarningView(message: String) -> some View {
         VStack(spacing: 0) {
@@ -173,7 +181,7 @@ public struct NetworkProtectionStatusView: View {
 
     /// Main image, feature ON/OFF and feature description
     ///
-    private func featureView() -> some View {
+    private func headerView() -> some View {
         VStack(spacing: 0) {
             HStack {
                 Spacer()
@@ -186,72 +194,59 @@ public struct NetworkProtectionStatusView: View {
                 .padding([.top], 8)
 
             Text(UserText.networkProtectionStatusViewFeatureDesc)
-                .applyContentAttributes()
+                .applyDescriptionAttributes()
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
-                .padding(EdgeInsets(top: 8, leading: 16, bottom: 10, trailing: 16))
+                .padding(EdgeInsets(top: 8, leading: 16, bottom: 16, trailing: 16))
         }
-        .padding(EdgeInsets(top: 0, leading: 5, bottom: 0, trailing: 5))
-    }
-
-    /// Details view: toggle, divider, server status view, beta warning.
-    ///
-    private func detailsView() -> some View {
-        VStack(alignment: .leading, spacing: 0) {
-            featureToggle()
-
-            Divider()
-                .padding([.top, .bottom], 18)
-
-            if model.showServerDetails {
-                statusView().onAppear {
-                    popoverHeight = .infinity
-                }
-                .onDisappear {
-                    popoverHeight = .infinity
-                }
-            }
-
-            Text(UserText.networkProtectionStatusViewBetaWarning)
-                .opacity(Opacity.content)
-                .fixedSize()
-
-            HStack(spacing: 0) {
-                Text(UserText.networkProtectionStatusViewShareFeedbackPrefix)
-                    .applyContentAttributes()
-                    .fixedSize()
-
-                TextButton(UserText.networkProtectionStatusViewShareFeedback) {
-                    model.shareFeedback()
-                }.applyLinkAttributes()
-                    .fixedSize()
-                    .buttonStyle(PlainButtonStyle())
-
-                Text(UserText.networkProtectionStatusViewShareFeedbackSuffix)
-                    .applyContentAttributes()
-                    .fixedSize()
-            }
-            .padding([.bottom], 18)
-        }
-        .padding(EdgeInsets(top: 12, leading: 8, bottom: 0, trailing: 8))
     }
 
     /// Connection status: server IP address and location
     ///
-    private func statusView() -> some View {
+    private func connectionStatusView() -> some View {
         VStack(alignment: .leading, spacing: 0) {
             Text(UserText.networkProtectionStatusViewConnDetails)
                 .font(.NetworkProtection.sectionHeader)
-                .padding(.bottom, 18)
+                .padding(EdgeInsets(top: 6, leading: 9, bottom: 6, trailing: 9))
 
-            serverLocationView()
-            serverAddressView()
+            connectionStatusRow(icon: .serverLocationIcon,
+                                title: UserText.networkProtectionStatusViewLocation,
+                                details: model.serverLocation)
+            connectionStatusRow(icon: .ipAddressIcon,
+                                title: UserText.networkProtectionStatusViewIPAddress,
+                                details: model.serverAddress)
+
+            dividerRow()
         }
     }
 
-    // MARK: - Composite Views
+    private func bottomMenuView() -> some View {
+        VStack(spacing: 0) {
 
-    private func featureToggle() -> some View {
+            MenuItemButton("Share feedback...") {
+                model.shareFeedback()
+                dismiss()
+            }
+            .padding([.leading, .trailing], 4)
+
+            if model.showLaunchBrowserMenuItem {
+                MenuItemButton("Open DuckDuckGo...") {
+                    model.launchBrowser()
+                    dismiss()
+                }
+                .padding([.leading, .trailing], 4)
+            }
+        }
+    }
+
+    // MARK: - Rows
+
+    private func dividerRow() -> some View {
+        Divider()
+            .padding(EdgeInsets(top: 5, leading: 9, bottom: 5, trailing: 9))
+    }
+
+    private func featureToggleRow() -> some View {
         Toggle(isOn: model.isRunning) {
             HStack {
                 Text(UserText.networkProtectionStatusViewConnLabel)
@@ -270,44 +265,26 @@ public struct NetworkProtectionStatusView: View {
             }
         }
         .toggleStyle(.switch)
+        .padding(EdgeInsets(top: 3, leading: 9, bottom: 3, trailing: 9))
     }
 
-    private func serverLocationView() -> some View {
+    private func connectionStatusRow(icon: NetworkProtectionAsset, title: String, details: String) -> some View {
         HStack(spacing: 0) {
-            Image(.serverLocationIcon)
+            Image(icon)
                 .padding([.trailing], 8)
 
-            Text(UserText.networkProtectionStatusViewLocation)
+            Text(title)
                 .opacity(Opacity.label)
                 .fixedSize()
 
             Spacer(minLength: 16)
 
-            Text(model.serverLocation)
+            Text(details)
                 .opacity(Opacity.content)
                 .fixedSize()
         }
-        .padding(.bottom, 18)
+        .padding(EdgeInsets(top: 6, leading: 10, bottom: 6, trailing: 9))
     }
-
-    private func serverAddressView() -> some View {
-        HStack(spacing: 0) {
-            Image(.ipAddressIcon)
-                .padding([.trailing], 8)
-
-            Text(UserText.networkProtectionStatusViewIPAddress)
-                .opacity(Opacity.label)
-                .fixedSize()
-
-            Spacer(minLength: 16)
-
-            Text(model.serverAddress)
-                .opacity(Opacity.content)
-                .fixedSize()
-        }
-        .padding(.bottom, 18)
-    }
-
 }
 
 struct NetworkProtectionStatusView_Previews: PreviewProvider {
@@ -339,6 +316,7 @@ struct NetworkProtectionStatusView_Previews: PreviewProvider {
     static var previews: some View {
         let statusReporter = PreviewNetworkProtectionStatusReporter()
         let model = NetworkProtectionStatusView.Model(controller: PreviewController(),
+                                                      showLaunchBrowserMenuItem: true,
                                                       statusReporter: statusReporter)
 
         NetworkProtectionStatusView(model: model)
