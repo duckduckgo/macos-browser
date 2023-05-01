@@ -83,6 +83,11 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         presentDialog(for: .deviceDetails(device))
     }
 
+    @MainActor
+    func presentRemoveDevice(_ device: SyncDevice) {
+        presentDialog(for: .removeDevice(device))
+    }
+
     func turnOffSync() {
         Task { @MainActor in
             do {
@@ -199,6 +204,13 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
 
 extension SyncPreferences: ManagementDialogModelDelegate {
 
+    func deleteAccount() {
+        Task { @MainActor in
+            managementDialogModel.endFlow()
+            try await syncService.deleteAccount()
+        }
+    }
+
     func updateDeviceName(_ name: String) {
         Task { @MainActor in
             do {
@@ -288,6 +300,11 @@ extension SyncPreferences: ManagementDialogModelDelegate {
     }
 
     @MainActor
+    func presentDeleteAccount() {
+        presentDialog(for: .deleteAccount(devices))
+    }
+
+    @MainActor
     func confirmSetupComplete() {
         presentDialog(for: .saveRecoveryPDF)
     }
@@ -313,6 +330,19 @@ extension SyncPreferences: ManagementDialogModelDelegate {
             try data.writeFileWithProgress(to: location)
         }
 
+    }
+
+    @MainActor
+    func removeDevice(_ device: SyncDevice) {
+        Task { @MainActor in
+            do {
+                try await syncService.disconnect(deviceId: device.id)
+                managementDialogModel.endFlow()
+                refreshDevices()
+            } catch {
+                managementDialogModel.errorMessage = String(describing: error)
+            }
+        }
     }
 
 }
