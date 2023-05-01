@@ -75,9 +75,6 @@ final class UserScripts: UserScriptsProvider {
         if let youtubePlayerUserScript = youtubePlayerUserScript {
             userScripts.append(youtubePlayerUserScript)
         }
-
-        contentScopeUserScript.registerSubFeature(delegate: DataBrokerMessaging())
-
     }
 
     lazy var userScripts: [UserScript] = [

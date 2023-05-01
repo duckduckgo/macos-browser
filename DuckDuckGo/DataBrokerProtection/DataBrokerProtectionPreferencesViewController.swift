@@ -19,6 +19,7 @@
 import Cocoa
 
 final class DataBrokerProtectionPreferencesViewController: NSViewController {
+    let handler = DataBrokerWebViewHandler()
 
     override func loadView() {
         view = NSView()
@@ -28,5 +29,14 @@ final class DataBrokerProtectionPreferencesViewController: NSViewController {
         super.viewDidLoad()
         view.wantsLayer = true
         view.layer?.backgroundColor = NSColor.red.cgColor
+
+
+    }
+
+    override func viewDidAppear() {
+        print("APPEAR")
+        super.viewDidAppear()
+        handler.test()
+
     }
 }

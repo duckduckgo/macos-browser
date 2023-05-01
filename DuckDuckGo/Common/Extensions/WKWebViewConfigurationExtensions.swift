@@ -51,4 +51,12 @@ extension WKWebViewConfiguration {
 #endif
      }
 
+    @MainActor
+    func applyDataBrokerConfiguration(contentBlocking: some ContentBlockingProtocol) {
+
+        preferences.isFraudulentWebsiteWarningEnabled = false
+
+        let userContentController = DataBrokerUserContentController(with: contentBlocking.privacyConfigurationManager)
+        self.userContentController = userContentController
+     }
 }
