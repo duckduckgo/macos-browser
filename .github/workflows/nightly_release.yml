@@ -138,6 +138,9 @@ jobs:
     - name: Select Xcode
       run: sudo xcode-select -s /Applications/Xcode_$(<.xcode-version).app/Contents/Developer
 
+    - name: Get current date
+      run: echo "CURRENT_DATE=$(date +%Y-%m-%d)" >> $GITHUB_ENV
+
     - name: Archive and notarize the app
       env:
         APPLE_API_KEY_BASE64: ${{ secrets.APPLE_API_KEY_BASE64 }}
@@ -147,9 +150,9 @@ jobs:
       run: |
         # import API Key from secrets
         export APPLE_API_KEY_PATH="$RUNNER_TEMP/apple_api_key.pem"
-        echo -n "$APPLE_API_KEY_BASE64" | base64 --decode --output $APPLE_API_KEY_PATH
+        echo -n "$APPLE_API_KEY_BASE64" | base64 --decode --output $APPLE_API_KEY_PATH        
         
         ./scripts/archive.sh ${{ env.release-type }} \
             ${{ env.create_dmg_arg }} \
-            ${{ env.asana_task_url_arg }}
-
+            ${{ env.asana_task_url_arg }} \
+            -v "nightly-$CURRENT_DATE"
