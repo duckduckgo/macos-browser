@@ -85,15 +85,23 @@ _asana_get_token() {
 	fi
 }
 
+# Create a subtask in the top of the subtasks list
 _asana_create_subtask() {
 	local parent_task_id="${1}"
 	local subtask_name="${2}"
+
+	# Get the first subtask in the parent task
+	local first_subtask_response=$(curl -s -X GET \
+		-H "Authorization: Bearer ${asana_personal_access_token}" \
+		-H "Content-Type: application/json" "${asana_api_url}/tasks/${parent_task_id}/subtasks" \
+		-d '{"limit": 1}')
+	local first_subtask_id=$(echo "${first_subtask_response}" | jq '.data[0].gid' -r)
 
 	local subtask_creation_response
 	subtask_creation_response=$(curl -s -X POST \
 		-H "Authorization: Bearer ${asana_personal_access_token}" \
 		-H "Content-Type: application/json" "${asana_api_url}/tasks" \
-		-d "{\"data\": {\"name\": \"${subtask_name}\", \"parent\": \"${parent_task_id}\"}}")
+		-d "{\"data\": {\"name\": \"${subtask_name}\", \"parent\": \"${parent_task_id}\", \"insert_before\": \"${first_subtask_id}\"}}")
 
 	local subtask_id
 	subtask_id=$(echo "${subtask_creation_response}" | jq '.data.gid' -r)
