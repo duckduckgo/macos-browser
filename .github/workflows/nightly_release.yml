@@ -152,6 +152,7 @@ jobs:
         export APPLE_API_KEY_PATH="$RUNNER_TEMP/apple_api_key.pem"
         echo -n "$APPLE_API_KEY_BASE64" | base64 --decode --output $APPLE_API_KEY_PATH        
         
+        # Archive a Review Build and upload
         ./scripts/archive.sh ${{ env.release-type }} \
             ${{ env.create_dmg_arg }} \
             ${{ env.asana_task_url_arg }} \
