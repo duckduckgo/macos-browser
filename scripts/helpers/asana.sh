@@ -91,11 +91,13 @@ _asana_create_subtask() {
 	local subtask_name="${2}"
 
 	# Get the first subtask in the parent task
-	local first_subtask_response=$(curl -s -X GET \
+	local first_subtask_response
+	first_subtask_response=$(curl -s -X GET \
 		-H "Authorization: Bearer ${asana_personal_access_token}" \
 		-H "Content-Type: application/json" "${asana_api_url}/tasks/${parent_task_id}/subtasks" \
 		-d '{"limit": 1}')
-	local first_subtask_id=$(echo "${first_subtask_response}" | jq '.data[0].gid' -r)
+	local first_subtask_id
+	first_subtask_id=$(echo "${first_subtask_response}" | jq '.data[0].gid' -r)
 
 	local subtask_creation_response
 	subtask_creation_response=$(curl -s -X POST \
