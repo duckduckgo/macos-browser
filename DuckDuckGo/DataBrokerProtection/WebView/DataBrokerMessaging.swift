@@ -20,6 +20,7 @@ import Foundation
 import BrowserServicesKit
 import Common
 import UserScript
+import WebKit
 
 struct DataBrokerMessaging: UserScriptMessagingSubFeature {
 
