@@ -3,6 +3,7 @@ name: Make Nightly Release
 on: 
   schedule:
     - cron: '0 2 * * *' # Run nightly at 7pm ET  
+  workflow_dispatch: 
   workflow_call:
     secrets:
       BUILD_CERTIFICATE_BASE64:
@@ -116,7 +117,23 @@ jobs:
 
     - name: Set Asana task URL
       if: env.asana-task-url
-      run: echo "asana_task_url_arg=-a ${{ env.asana-task-url }}" >> $GITHUB_ENV
+      env:
+        ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+      run: |
+        # Source the asana.sh script to use _asana_create_subtask function
+        source ./scripts/asana.sh
+
+        # Extract the parent task ID from the provided Asana task URL
+        parent_task_id="${{ env.asana-task-url }}"
+        parent_task_id="${parent_task_id##*/}"
+
+        # Create a subtask using the provided parent task ID and desired subtask name with the date
+        current_date=$(date +"%Y-%m-%d")
+        subtask_name="Nightly Build Export - $current_date"
+        subtask_url=$(_asana_create_subtask "$parent_task_id" "$subtask_name")
+        
+        # Set the asana_task_url_arg environment variable with the new subtask URL
+        echo "asana_task_url_arg=-a $subtask_url" >> $GITHUB_ENV
 
     - name: Select Xcode
       run: sudo xcode-select -s /Applications/Xcode_$(<.xcode-version).app/Contents/Developer
@@ -131,7 +148,7 @@ jobs:
         # import API Key from secrets
         export APPLE_API_KEY_PATH="$RUNNER_TEMP/apple_api_key.pem"
         echo -n "$APPLE_API_KEY_BASE64" | base64 --decode --output $APPLE_API_KEY_PATH
-
+        
         ./scripts/archive.sh ${{ env.release-type }} \
             ${{ env.create_dmg_arg }} \
             ${{ env.asana_task_url_arg }}

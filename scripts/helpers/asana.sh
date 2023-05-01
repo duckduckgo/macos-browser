@@ -85,6 +85,21 @@ _asana_get_token() {
 	fi
 }
 
+_asana_create_subtask() {
+	local parent_task_id="${1}"
+	local subtask_name="${2}"
+
+	local subtask_creation_response=$(curl -s -X POST \
+		-H "Authorization: Bearer ${asana_personal_access_token}" \ 
+		-H "Content-Type: application/json" "${asana_api_url}/tasks" \
+		-d "{\"data\": {\"name\": \"${subtask_name}\", \"parent\": \"${parent_task_id}\"}}")
+
+	local subtask_id=$(echo "${subtask_creation_response}" | jq '.data.gid' -r)
+	local subtask_url="https://app.asana.com/0/${parent_task_id}/${subtask_id}"
+
+	echo "${subtask_url}"
+}
+
 _asana_upload_dmg() {
 	local dmg_path=$1
 	local dmg_name
@@ -98,6 +113,26 @@ _asana_upload_dmg() {
 
 	[[ $return_code -eq 200 ]]
 }
+
+_asana_upload_dmg_to_subtask() {
+	local dmg_path=$1
+	local subtask_name="${2}"
+	local parent_task_id="${3}"
+	local subtask_url
+
+	subtask_url=$(_asana_create_subtask "${parent_task_id}" "${subtask_name}")
+	subtask_id=$(_asana_extract_task_id_from_url "${subtask_url}")
+
+	printf '%s' "Uploading DMG to Asana subtask ... "
+
+	if _asana_upload_dmg "${dmg_path}" "${subtask_id}"; then
+		echo "Done"
+		echo "Subtask URL: ${subtask_url}"
+	else
+		die "Failed to upload DMG to Asana subtask"
+	fi
+}
+
 
 _asana_upload_dsyms_zip() {
 	local dsyms_path=$1
