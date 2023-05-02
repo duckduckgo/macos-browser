@@ -41,7 +41,7 @@ final class MockSecureVault: SecureVault {
         return storedAccounts.filter { $0.domain == domain }
     }
 
-    func accountsWithPartialMatchesFor(eTLDplus1: String) throws -> [BrowserServicesKit.SecureVaultModels.WebsiteAccount] {
+    func accountsWithPartialMatchesFor(eTLDplus1: String, filterDuplicates: Bool) throws -> [BrowserServicesKit.SecureVaultModels.WebsiteAccount] {
         return storedAccounts.filter { $0.domain.contains(eTLDplus1) }
     }
 
