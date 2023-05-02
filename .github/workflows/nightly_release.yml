@@ -143,7 +143,7 @@ jobs:
         subtask_url=$(_asana_create_subtask "$parent_task_id" "$subtask_name")
         
         # Set the asana_task_url_arg environment variable with the new subtask URL
-        echo "asana_task_url_arg=-a $subtask_url" >> $GITHUB_ENV    
+        echo "asana_task_url_arg=-a $subtask_url" >> $GITHUB_ENV
 
     - name: Get current date
       run: echo "CURRENT_DATE=$(date +%Y-%m-%d)" >> $GITHUB_ENV
