@@ -50,11 +50,6 @@ jobs:
       create-dmg: false
       asana-task-url: 'https://app.asana.com/0/1201037661562251/1204480871838578/f'
 
-env:
-      release-type: ${{ github.event.inputs.release-type || inputs.release-type }}
-      create-dmg: ${{ github.event.inputs.create-dmg || inputs.create-dmg }}
-      asana-task-url: ${{ github.event.inputs.asana-task-url || inputs.asana-task-url }}
-
     steps:
 
     - name: Install Apple Developer ID Application certificate
