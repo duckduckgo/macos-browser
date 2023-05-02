@@ -121,11 +121,7 @@ jobs:
       run: |
         brew install create-dmg
         echo "create_dmg_arg=-d" >> $GITHUB_ENV
-    
-    - name: Print Asana task URL
-      run: |
-        echo "Asana task URL: ${{ env.asana_task_url_arg }}"
-    
+        
     - name: Set Asana task URL
       if: env.asana-task-url
       env:
@@ -134,7 +130,7 @@ jobs:
         # Source the asana.sh script to use _asana_create_subtask function
         source ./scripts/helpers/asana.sh
 
-        echo "Asana task URL: $asana_task_url_arg"
+        echo "Asana task URL: $asana_task_url"
         
         # Extract the parent task ID from the provided Asana task URL
         parent_task_id="${{ env.asana-task-url }}"
