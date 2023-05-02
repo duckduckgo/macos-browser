@@ -269,6 +269,8 @@ final class NavigationBarViewController: NSViewController {
                     self.updateBookmarksButton()
                 case .downloads:
                     self.updateDownloadsButton(updatingFromPinnedViewsNotification: true)
+                case .networkProtection:
+                    networkProtectionButtonModel.isPinned = LocalPinningManager.shared.isPinned(.networkProtection)
                 }
             } else {
                 assertionFailure("Failed to get changed pinned view type")
@@ -650,6 +652,9 @@ extension NavigationBarViewController: NSMenuDelegate {
 
         let downloadsTitle = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .downloads)
         menu.addItem(withTitle: downloadsTitle, action: #selector(toggleDownloadsPanelPinning), keyEquivalent: "J")
+
+        let networkProtectionTitle = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .networkProtection)
+        menu.addItem(withTitle: networkProtectionTitle, action: #selector(toggleNetworkProtectionPanelPinning), keyEquivalent: "N")
     }
 
     @objc
@@ -670,6 +675,11 @@ extension NavigationBarViewController: NSMenuDelegate {
     @objc
     private func toggleDownloadsPanelPinning(_ sender: NSMenuItem) {
         LocalPinningManager.shared.togglePinning(for: .downloads)
+    }
+
+    @objc
+    private func toggleNetworkProtectionPanelPinning(_ sender: NSMenuItem) {
+        LocalPinningManager.shared.togglePinning(for: .networkProtection)
     }
 
     // MARK: - Network Protection

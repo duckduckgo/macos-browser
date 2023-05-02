@@ -22,8 +22,10 @@ import NetworkProtection
 
 public final class NetworkProtectionIconPublisher {
 
+    private let isForStatusBar: Bool
+
     @Published
-    public var icon: NetworkProtectionAsset = .vpnDisabledIcon
+    public var icon: NetworkProtectionAsset
 
     // MARK: - Connection Issues
 
@@ -34,8 +36,10 @@ public final class NetworkProtectionIconPublisher {
     private var statusChangeCancellable: AnyCancellable?
     private var connectivityIssuesCancellable: AnyCancellable?
 
-    public init(statusReporter: NetworkProtectionStatusReporter) {
+    public init(statusReporter: NetworkProtectionStatusReporter, isForStatusBar: Bool) {
         self.statusReporter = statusReporter
+        self.isForStatusBar = isForStatusBar
+        icon = isForStatusBar ? .statusbarVPNOffIcon : .appVPNOffIcon
 
         updateMenuIcon()
         subscribeToConnectionStatusChanges()
@@ -62,14 +66,14 @@ public final class NetworkProtectionIconPublisher {
     ///
     private func menuIcon() -> NetworkProtectionAsset {
         guard !statusReporter.connectivityIssuesPublisher.value else {
-            return .vpnIssueIcon
+            return isForStatusBar ? .statusbarVPNIssueIcon : .appVPNIssueIcon
         }
 
         switch statusReporter.statusPublisher.value {
         case .connected:
-            return .vpnIcon
+            return isForStatusBar ? .statusbarVPNOnIcon : .appVPNOnIcon
         default:
-            return .vpnDisabledIcon
+            return isForStatusBar ? .statusbarVPNOffIcon : .appVPNOffIcon
         }
     }
 

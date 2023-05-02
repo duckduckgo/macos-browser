@@ -617,6 +617,9 @@ struct UserText {
     static let showDownloadsShortcut = NSLocalizedString("pinning.show-downloads-shortcut", value: "Show Downloads Shortcut", comment: "Menu item for showing the downloads shortcut")
     static let hideDownloadsShortcut = NSLocalizedString("pinning.hide-downloads-shortcut", value: "Hide Downloads Shortcut", comment: "Menu item for hiding the downloads shortcut")
 
+    static let showNetworkProtectionShortcut = NSLocalizedString("pinning.show-netp-shortcut", value: "Show Network Protection", comment: "Menu item for showing the NetP shortcut")
+    static let hideNetworkProtectionShortcut = NSLocalizedString("pinning.hide-netp-shortcut", value: "Hide Network Protection", comment: "Menu item for hiding the NetP shortcut")
+
     // MARK: - Tooltips
 
     static let autofillShortcutTooltip = NSLocalizedString("tooltip.autofill.shortcut", value: "Autofill", comment: "Tooltip for the autofill shortcut")

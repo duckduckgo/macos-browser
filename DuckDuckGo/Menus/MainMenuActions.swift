@@ -347,6 +347,10 @@ extension MainViewController {
         LocalPinningManager.shared.togglePinning(for: .downloads)
     }
 
+    @IBAction func toggleNetworkProtectionShortcut(_ sender: Any) {
+        LocalPinningManager.shared.togglePinning(for: .networkProtection)
+    }
+
     // MARK: - History
 
     @IBAction func back(_ sender: Any?) {

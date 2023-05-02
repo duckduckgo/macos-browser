@@ -42,11 +42,21 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
 
     // MARK: - Button appearance
 
+    private let pinningManager: PinningManager
+
     @Published
     private(set) var showButton = false
 
     @Published
     private(set) var buttonImage: NSImage?
+
+    var isPinned: Bool {
+        didSet {
+            Task { @MainActor in
+                updateVisibility()
+            }
+        }
+    }
 
     // MARK: - NetP State
 
@@ -55,14 +65,17 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
     // MARK: - Initialization
 
     init(popovers: NavigationBarPopovers,
+         pinningManager: PinningManager = LocalPinningManager.shared,
          statusReporter: NetworkProtectionStatusReporter? = nil) {
 
         self.networkProtectionStatusReporter = statusReporter ?? DefaultNetworkProtectionStatusReporter(
             statusObserver: ConnectionStatusObserverThroughSession(),
             serverInfoObserver: ConnectionServerInfoObserverThroughSession(),
             connectionErrorObserver: ConnectionErrorObserverThroughSession())
-        self.iconPublisher = NetworkProtectionIconPublisher(statusReporter: networkProtectionStatusReporter)
+        self.iconPublisher = NetworkProtectionIconPublisher(statusReporter: networkProtectionStatusReporter, isForStatusBar: false)
         self.popovers = popovers
+        self.pinningManager = pinningManager
+        isPinned = pinningManager.isPinned(.networkProtection)
 
         isHavingConnectivityIssues = networkProtectionStatusReporter.connectivityIssuesPublisher.value
         buttonImage = .image(for: iconPublisher.icon)
@@ -114,7 +127,8 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
 
     @MainActor
     private func updateVisibility() {
-        guard !popovers.isNetworkProtectionPopoverShown else {
+        guard !isPinned,
+              !popovers.isNetworkProtectionPopoverShown else {
             showButton = true
             return
         }
@@ -128,10 +142,26 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
             switch status {
             case .connecting, .connected, .reasserting, .disconnecting:
                 showButton = true
+
+                pinNetworkProtectionToNavBarIfNeverPinnedBefore()
             default:
                 showButton = false
             }
         }
+    }
+
+    /// We want to pin Network Protection to the navigation bar the first time it's enabled, and only
+    /// if the user hasn't toggled it manually before.
+    /// 
+    private func pinNetworkProtectionToNavBarIfNeverPinnedBefore() {
+        assert(showButton)
+
+        guard !pinningManager.wasManuallyToggled(.networkProtection),
+              !pinningManager.isPinned(.networkProtection) else {
+            return
+        }
+
+        pinningManager.togglePinning(for: .networkProtection)
     }
 }
 

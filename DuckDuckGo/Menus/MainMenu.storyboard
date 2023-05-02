@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="21507" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="21701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21507"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21701"/>
     </dependencies>
     <scenes>
         <!--Application-->
@@ -408,6 +408,11 @@
                                         <menuItem title="Show Downloads Shortcut" keyEquivalent="J" id="3II-oR-MBb">
                                             <connections>
                                                 <action selector="toggleDownloadsShortcut:" target="Ady-hI-5gd" id="ReL-VD-CSo"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Show Network Protection" keyEquivalent="N" id="UYq-tJ-SrY" userLabel="Toggle Network Protection Menu Item">
+                                            <connections>
+                                                <action selector="toggleNetworkProtectionShortcut:" target="Ady-hI-5gd" id="bgl-XJ-Gcy"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="LIc-c6-SKt"/>
@@ -908,6 +913,7 @@ CQ
                             <outlet property="toggleBookmarksShortcutMenuItem" destination="bXm-yY-7AL" id="KjP-Tc-Hwo"/>
                             <outlet property="toggleDownloadsShortcutMenuItem" destination="3II-oR-MBb" id="lBF-XY-b4Z"/>
                             <outlet property="toggleFullscreenMenuItem" destination="4J7-dP-txa" id="lyl-pp-TR0"/>
+                            <outlet property="toggleNetworkProtectionShortcutMenuItem" destination="UYq-tJ-SrY" id="9HV-Xs-n4f"/>
                             <outlet property="zoomInMenuItem" destination="lMK-tC-RJd" id="Ddo-RX-A6Z"/>
                             <outlet property="zoomOutMenuItem" destination="flw-Fc-cm6" id="1AB-0r-vvx"/>
                         </connections>

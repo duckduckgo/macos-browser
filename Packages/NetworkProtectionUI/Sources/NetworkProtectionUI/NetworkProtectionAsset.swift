@@ -24,6 +24,14 @@ public enum NetworkProtectionAsset: String {
     case vpnDisabledImage = "VPN-Disabled-128"
     case vpnEnabledImage = "VPN-128"
     case vpnIcon = "VPN-16"
-    case vpnIssueIcon = "VPN-Issue-16"
-    case vpnDisabledIcon = "Globe-16"
+
+    // App Specific
+    case appVPNOnIcon = "app-vpn-on"
+    case appVPNOffIcon = "app-vpn-off"
+    case appVPNIssueIcon = "app-vpn-issue"
+
+    // Status Bar Specific
+    case statusbarVPNOnIcon = "statusbar-vpn-on"
+    case statusbarVPNOffIcon = "statusbar-vpn-off"
+    case statusbarVPNIssueIcon = "statusbar-vpn-issue"
 }

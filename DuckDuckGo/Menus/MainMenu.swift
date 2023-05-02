@@ -73,6 +73,7 @@ final class MainMenu: NSMenu {
     @IBOutlet weak var toggleAutofillShortcutMenuItem: NSMenuItem?
     @IBOutlet weak var toggleBookmarksShortcutMenuItem: NSMenuItem?
     @IBOutlet weak var toggleDownloadsShortcutMenuItem: NSMenuItem?
+    @IBOutlet weak var toggleNetworkProtectionShortcutMenuItem: NSMenuItem?
 
     // MARK: - Debug
     @IBOutlet weak var debugMenuItem: NSMenuItem? {
@@ -266,6 +267,7 @@ final class MainMenu: NSMenu {
         toggleAutofillShortcutMenuItem?.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .autofill)
         toggleBookmarksShortcutMenuItem?.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .bookmarks)
         toggleDownloadsShortcutMenuItem?.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .downloads)
+        toggleNetworkProtectionShortcutMenuItem?.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .networkProtection)
     }
 
     private func updateNetworkProtectionServerListMenuItems() {

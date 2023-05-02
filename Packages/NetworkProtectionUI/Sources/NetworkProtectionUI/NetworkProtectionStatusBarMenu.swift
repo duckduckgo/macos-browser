@@ -51,7 +51,7 @@ public final class StatusBarMenu {
             connectionErrorObserver: ConnectionErrorObserverThroughIPC())
 
         self.statusItem = statusItem ?? NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
-        self.iconPublisher = NetworkProtectionIconPublisher(statusReporter: statusReporter)
+        self.iconPublisher = NetworkProtectionIconPublisher(statusReporter: statusReporter, isForStatusBar: true)
 
         let parentBundlePath = "../../../../"
         let url: URL

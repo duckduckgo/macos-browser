@@ -22,13 +22,14 @@ enum PinnableView: String {
     case autofill
     case bookmarks
     case downloads
+    case networkProtection
 }
 
 protocol PinningManager {
 
     func togglePinning(for view: PinnableView)
     func isPinned(_ view: PinnableView) -> Bool
-
+    func wasManuallyToggled(_ view: PinnableView) -> Bool
 }
 
 final class LocalPinningManager: PinningManager {
@@ -40,7 +41,12 @@ final class LocalPinningManager: PinningManager {
     @UserDefaultsWrapper(key: .pinnedViews, defaultValue: [])
     private var pinnedViewStrings: [String]
 
+    @UserDefaultsWrapper(key: .manuallyToggledPinnedViews, defaultValue: [])
+    private var manuallyToggledPinnedViewsStrings: [String]
+
     func togglePinning(for view: PinnableView) {
+        flagAsManuallyToggled(view)
+
         if isPinned(view) {
             pinnedViewStrings.removeAll(where: { $0 == view.rawValue })
         } else {
@@ -61,9 +67,29 @@ final class LocalPinningManager: PinningManager {
         case .autofill: return isPinned(.autofill) ? UserText.hideAutofillShortcut : UserText.showAutofillShortcut
         case .bookmarks: return isPinned(.bookmarks) ? UserText.hideBookmarksShortcut : UserText.showBookmarksShortcut
         case .downloads: return isPinned(.downloads) ? UserText.hideDownloadsShortcut : UserText.showDownloadsShortcut
+        case .networkProtection: return isPinned(.networkProtection) ? UserText.hideNetworkProtectionShortcut : UserText.showNetworkProtectionShortcut
         }
     }
 
+    // MARK: - Recording Manual Toggling
+
+    /// This method is useful for knowing if the view was manually toggled.
+    /// It's particularly useful for initializing a pin to a certain value at a certain point during the execution of code,
+    /// only if the user hasn't explicitly specified a desired state.
+    /// As an example: this is used in Network Protection for pinning the icon to the navigation bar the first time the
+    /// feature is enabled.
+    ///
+    func wasManuallyToggled(_ view: PinnableView) -> Bool {
+        manuallyToggledPinnedViewsStrings.contains(view.rawValue)
+    }
+
+    /// Flags a view as having been manually pinned / unpinned by the user.
+    ///
+    private func flagAsManuallyToggled(_ view: PinnableView) {
+        var set = Set(manuallyToggledPinnedViewsStrings)
+        set.insert(view.rawValue)
+        manuallyToggledPinnedViewsStrings = Array(set)
+    }
 }
 
 // MARK: - NSNotification
