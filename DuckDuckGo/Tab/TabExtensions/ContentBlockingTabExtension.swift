@@ -35,7 +35,7 @@ struct DetectedTracker {
 
 protocol ContentBlockingAssetsInstalling: AnyObject {
     var contentBlockingAssetsInstalled: Bool { get }
-    func awaitContentBlockingAssetsInstalled() async
+    var awaitContentBlockingAssetsInstalled: () async -> Void { get }
 }
 extension UserContentController: ContentBlockingAssetsInstalling {}
 
