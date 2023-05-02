@@ -12,7 +12,7 @@ on:
         description: 'Create Nightly Build'
         required: false 
   workflow_call:
-    secrets:
+    ecrets:
       BUILD_CERTIFICATE_BASE64:
         required: true
       P12_PASSWORD:
@@ -46,7 +46,7 @@ jobs:
     runs-on: macos-13
 
     env:
-      release-type: nightly
+      release-type: review
       create-dmg: false
       asana-task-url: 'https://app.asana.com/0/1201037661562251/1204480871838578/f'
 
