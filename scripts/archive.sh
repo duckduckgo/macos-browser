@@ -39,7 +39,7 @@ read_command_line_arguments() {
 
 	case "$1" in
 		nightly)
-			app_name="DuckDuckGo Nightly"
+			app_name="DuckDuckGo Review"
 			scheme="Product Review Release"
 			configuration="Review"
 			nightly=true
