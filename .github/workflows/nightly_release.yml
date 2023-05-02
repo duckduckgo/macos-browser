@@ -50,6 +50,11 @@ jobs:
       create-dmg: false
       asana-task-url: 'https://app.asana.com/0/1201037661562251/1204480871838578/f'
 
+env:
+      release-type: ${{ github.event.inputs.release-type || inputs.release-type }}
+      create-dmg: ${{ github.event.inputs.create-dmg || inputs.create-dmg }}
+      asana-task-url: ${{ github.event.inputs.asana-task-url || inputs.asana-task-url }}
+
     steps:
 
     - name: Install Apple Developer ID Application certificate
@@ -67,9 +72,9 @@ jobs:
         RELEASE_PP_PATH=$RUNNER_TEMP/release_pp.provisionprofile
 
         # import certificate from secrets
-        echo -n "$BUILD_CERTIFICATE_BASE64" | base64 --decode --output $CERTIFICATE_PATH
-        echo -n "$REVIEW_PROVISION_PROFILE_BASE64" | base64 --decode --output $REVIEW_PP_PATH
-        echo -n "$RELEASE_PROVISION_PROFILE_BASE64" | base64 --decode --output $RELEASE_PP_PATH
+        echo -n "$BUILD_CERTIFICATE_BASE64" | base64 --decode -o $CERTIFICATE_PATH
+        echo -n "$REVIEW_PROVISION_PROFILE_BASE64" | base64 --decode -o $REVIEW_PP_PATH
+        echo -n "$RELEASE_PROVISION_PROFILE_BASE64" | base64 --decode -o $RELEASE_PP_PATH
 
         # create temporary keychain
         security create-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
@@ -122,8 +127,9 @@ jobs:
         brew install create-dmg
         echo "create_dmg_arg=-d" >> $GITHUB_ENV
 
-    - name: Select Xcode
-      run: sudo xcode-select -s /Applications/Xcode_$(<.xcode-version).app/Contents/Developer
+    - name: Set Asana task URL
+      if: env.asana-task-url
+      run: echo "asana_task_url_arg=-a ${{ env.asana-task-url }}" >> $GITHUB_ENV
 
     - name: Set Asana task URL
       if: env.asana-task-url
