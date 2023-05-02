@@ -52,7 +52,7 @@ _asana_preflight() {
 }
 
 _asana_extract_task_id() {
-	local task_url_regex='^https://app.asana.com/[0-9]*/([0-9]*)(?:/.*)?/f$'
+	local task_url_regex='^https://app.asana.com/[0-9]/[0-9]*/([0-9]*)/f$'
 	if [[ "${asana_task_url}" =~ ${task_url_regex} ]]; then
 		echo "${BASH_REMATCH[1]}"
 	else
