@@ -91,8 +91,13 @@ _asana_create_subtask() {
 	local parent_task_url="${1}"
 	local subtask_name="${2}"
 
+	echo "Parent Task: $parent_task_url"
+	echo "Subtask name: $subtask_name"
+
 	# Extract the parent task ID from the URL using the _asana_extract_task_id function
 	local parent_task_id="$(_asana_extract_task_id "${parent_task_url}")"
+
+	echo "Parent task ID: $parent_task_id"
 
 	# Get the first subtask in the parent task
 	local first_subtask_response
@@ -103,11 +108,15 @@ _asana_create_subtask() {
 	local first_subtask_id
 	first_subtask_id=$(echo "${first_subtask_response}" | jq '.data[0].gid' -r)
 
+	echo "First Subtask ID: $first_subtask_id"
+
 	local subtask_creation_response
 	subtask_creation_response=$(curl -s -X POST \
 		-H "Authorization: Bearer ${asana_personal_access_token}" \
 		-H "Content-Type: application/json" "${asana_api_url}/tasks" \
 		-d "{\"data\": {\"name\": \"${subtask_name}\", \"parent\": \"${parent_task_id}\", \"insert_before\": \"${first_subtask_id}\"}}")
+
+	echo "Creation response: $subtask_creation_response"
 
 	local subtask_id
 	subtask_id=$(echo "${subtask_creation_response}" | jq '.data.gid' -r)
