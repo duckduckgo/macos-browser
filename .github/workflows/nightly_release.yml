@@ -50,78 +50,7 @@ jobs:
       create-dmg: false
       asana-task-url: 'https://app.asana.com/0/1201037661562251/1204480871838578/f'
 
-    steps:
-
-    - name: Install Apple Developer ID Application certificate
-      env:
-        BUILD_CERTIFICATE_BASE64: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
-        P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
-        KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
-        REVIEW_PROVISION_PROFILE_BASE64: ${{ secrets.REVIEW_PROVISION_PROFILE_BASE64 }}
-        RELEASE_PROVISION_PROFILE_BASE64: ${{ secrets.RELEASE_PROVISION_PROFILE_BASE64 }}
-      run: |
-        # create variables
-        CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
-        KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
-        REVIEW_PP_PATH=$RUNNER_TEMP/review_pp.provisionprofile
-        RELEASE_PP_PATH=$RUNNER_TEMP/release_pp.provisionprofile
-
-        # import certificate from secrets
-        echo -n "$BUILD_CERTIFICATE_BASE64" | base64 --decode -o $CERTIFICATE_PATH
-        echo -n "$REVIEW_PROVISION_PROFILE_BASE64" | base64 --decode -o $REVIEW_PP_PATH
-        echo -n "$RELEASE_PROVISION_PROFILE_BASE64" | base64 --decode -o $RELEASE_PP_PATH
-
-        # create temporary keychain
-        security create-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
-        security set-keychain-settings -lut 21600 $KEYCHAIN_PATH
-        security unlock-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
-
-        # import certificate to keychain
-        security import $CERTIFICATE_PATH -P "$P12_PASSWORD" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
-        security list-keychain -d user -s $KEYCHAIN_PATH
-
-        # apply provisioning profile
-        mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-        cp $REVIEW_PP_PATH $RELEASE_PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles
-
-    - name: Register SSH keys for submodules access
-      uses: webfactory/ssh-agent@v0.7.0
-      with:
-        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY_FIND_IN_PAGE }}
-
-    - name: Check out the code
-      uses: actions/checkout@v3
-      with:
-        submodules: recursive
-
-    - name: Set cache key hash
-      run: |
-        has_only_tags=$(jq '[ .pins[].state | has("version") ] | all' DuckDuckGo.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved)
-        if [[ "$has_only_tags" == "true" ]]; then
-          echo "cache_key_hash=${{ hashFiles('DuckDuckGo.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}" >> $GITHUB_ENV
-        else
-          echo "Package.resolved contains dependencies specified by branch or commit, skipping cache."
-        fi
-
-    - name: Cache SPM
-      if: env.cache_key_hash
-      uses: actions/cache@v3
-      with:
-        path: DerivedData/SourcePackages
-        key: ${{ runner.os }}-spm-${{ env.cache_key_hash }}
-        restore-keys: |
-          ${{ runner.os }}-spm-
-
-    - name: Install xcbeautify
-      continue-on-error: true
-      run: brew install xcbeautify
-
-    - name: Install create-dmg
-      if: ${{ env.create-dmg == true || env.asana-task-url }}
-      run: |
-        brew install create-dmg
-        echo "create_dmg_arg=-d" >> $GITHUB_ENV
-
+    steps:     
     - name: Set Asana task URL
       if: env.asana-task-url
       env:
@@ -130,14 +59,20 @@ jobs:
         # Source the asana.sh script to use _asana_create_subtask function
         source ./scripts/helpers/asana.sh
 
+        echo "Asana task URL: ${{ env.asana-task-url }}"
+        
         # Extract the parent task ID from the provided Asana task URL
-        parent_task_id="${{ env.asana-task-url }}"
-        parent_task_id="${parent_task_id##*/}"
-
+        parent_task_url="${{ env.asana-task-url }}"
+        parent_task_id="${parent_task_url##*/}"
+        
+        echo "Parent task ID: $parent_task_id"
+        
         # Create a subtask using the provided parent task ID and desired subtask name with the date
         current_date=$(date +"%Y-%m-%d")
-        subtask_name="Nightly Build Export - $current_date"
+        subtask_name="Nightly Build - $current_date"
         subtask_url=$(_asana_create_subtask "$parent_task_id" "$subtask_name")
+        
+        echo "Asana subtask URL: $subtask_url"
         
         # Set the asana_task_url_arg environment variable with the new subtask URL
         echo "asana_task_url_arg=-a $subtask_url" >> $GITHUB_ENV
@@ -145,19 +80,4 @@ jobs:
     - name: Get current date
       run: echo "CURRENT_DATE=$(date +%Y-%m-%d)" >> $GITHUB_ENV
 
-    - name: Archive and notarize the app
-      env:
-        APPLE_API_KEY_BASE64: ${{ secrets.APPLE_API_KEY_BASE64 }}
-        APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
-        APPLE_API_KEY_ISSUER: ${{ secrets.APPLE_API_KEY_ISSUER }}
-        ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
-      run: |
-        # import API Key from secrets
-        export APPLE_API_KEY_PATH="$RUNNER_TEMP/apple_api_key.pem"
-        echo -n "$APPLE_API_KEY_BASE64" | base64 --decode -o $APPLE_API_KEY_PATH
-        
-        # Archive a Review Build and upload
-        ./scripts/archive.sh ${{ env.release-type }} \
-            ${{ env.create_dmg_arg }} \
-            ${{ env.asana_task_url_arg }} \
-            -v "nightly-$CURRENT_DATE"
+      
