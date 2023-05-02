@@ -124,7 +124,7 @@ jobs:
         ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
       run: |
         # Source the asana.sh script to use _asana_create_subtask function
-        source ./scripts/asana.sh
+        source ./scripts/helpers/asana.sh
 
         # Extract the parent task ID from the provided Asana task URL
         parent_task_id="${{ env.asana-task-url }}"
