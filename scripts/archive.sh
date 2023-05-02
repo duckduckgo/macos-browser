@@ -42,6 +42,7 @@ read_command_line_arguments() {
 			app_name="DuckDuckGo Nightly"
 			scheme="Product Review Release"
 			configuration="Review"
+			nightly=true
 			;;
 		review)
 			app_name="DuckDuckGo Review"
@@ -330,10 +331,14 @@ main() {
 	archive_and_export
 	notarize
 	staple_notarized_app
-	compress_app_and_dsym
+	compress_app_and_dsym	
 
 	if [[ ${create_dmg} ]]; then
 		create_dmg
+
+		if [[ ${nightly} ]]; then
+			asana_task_id=$(asana_create_subtask "$asana_task_id" "Nightly 2023-01-01")
+		fi
 
 		if [[ ${asana_task_id} ]]; then
 			asana_update_task "${dmg_output_path}" "${output_dsym_zip_path}"

@@ -28,6 +28,13 @@ asana_update_task() {
 	_asana_close_subtasks
 }
 
+asana_create_subtask() {
+	local parent_task_url="${1}"
+	local subtask_name="${2}"
+
+	_asana_create_subtask "$parent_task_url" "$subtask_name"
+}
+
 # Private
 
 #
@@ -86,8 +93,7 @@ _asana_get_token() {
 }
 
 # Create a subtask in the top of the subtasks list
-_asana_create_subtask() {
-	_asana_get_token
+_asana_create_subtask() {	
 	local parent_task_url="${1}"
 	local subtask_name="${2}"
 
