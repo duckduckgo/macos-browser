@@ -87,8 +87,12 @@ _asana_get_token() {
 
 # Create a subtask in the top of the subtasks list
 _asana_create_subtask() {
-	local parent_task_id="${1}"
+	_asana_get_token
+	local parent_task_url="${1}"
 	local subtask_name="${2}"
+
+	# Extract the parent task ID from the URL using the _asana_extract_task_id function
+	local parent_task_id="$(_asana_extract_task_id "${parent_task_url}")"
 
 	# Get the first subtask in the parent task
 	local first_subtask_response

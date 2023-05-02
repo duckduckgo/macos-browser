@@ -59,20 +59,14 @@ jobs:
         # Source the asana.sh script to use _asana_create_subtask function
         source ./scripts/helpers/asana.sh
 
-        echo "Asana task URL: ${{ env.asana-task-url }}"
-        
-        # Extract the parent task ID from the provided Asana task URL
-        parent_task_url="${{ env.asana-task-url }}"
-        parent_task_id="${parent_task_url##*/}"
-        
-        echo "Parent task ID: $parent_task_id"
+        echo "Asana Parent task URL: ${{ env.asana-task-url }}"
         
         # Create a subtask using the provided parent task ID and desired subtask name with the date
         current_date=$(date +"%Y-%m-%d")
         subtask_name="Nightly Build - $current_date"
-        subtask_url=$(_asana_create_subtask "$parent_task_id" "$subtask_name")
+        subtask_url=$(_asana_create_subtask "$parent_task_url" "$subtask_name")
         
-        echo "Asana subtask URL: $subtask_url"
+        echo "Asana Subtask URL: ${{ env.asana-task-url }}"
         
         # Set the asana_task_url_arg environment variable with the new subtask URL
         echo "asana_task_url_arg=-a $subtask_url" >> $GITHUB_ENV
