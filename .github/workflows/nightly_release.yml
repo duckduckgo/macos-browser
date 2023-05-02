@@ -1,8 +1,11 @@
 name: Make Nightly Release
 
 on: 
-  schedule:
-    - cron: '0 2 * * *' # Run nightly at 7pm ET  
+  #schedule:
+  #  - cron: '0 2 * * *' # Run nightly at 7pm ET  
+  push:
+    branches:
+      - daniel/nightly
   workflow_dispatch: 
   workflow_call:
     secrets:
