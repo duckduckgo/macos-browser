@@ -7,6 +7,10 @@ on:
     branches:
       - daniel/nightly
   workflow_dispatch: 
+    inputs:
+      run:
+        description: 'Create Nightly Build'
+        required: false 
   workflow_call:
     secrets:
       BUILD_CERTIFICATE_BASE64:
