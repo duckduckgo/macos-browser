@@ -123,7 +123,7 @@ jobs:
         echo "create_dmg_arg=-d" >> $GITHUB_ENV
 
     - name: Select Xcode
-        run: sudo xcode-select -s /Applications/Xcode_$(<.xcode-version).app/Contents/Developer
+      run: sudo xcode-select -s /Applications/Xcode_$(<.xcode-version).app/Contents/Developer
 
     - name: Set Asana task URL
       if: env.asana-task-url
