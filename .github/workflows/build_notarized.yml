@@ -67,14 +67,14 @@ on:
 jobs:
   export-notarized-app:
 
+    name: Export Notarized App
+
+    runs-on: macos-13
+
     outputs:
       app-version: ${{ steps.archive.outputs.app-version }}
       app-name: ${{ steps.archive.outputs.app-name }}
       asana-task-id: ${{ steps.get-task-id.outputs.task-id }}
-
-    name: Export Notarized App
-
-    runs-on: macos-13
 
     env:
       release-type: ${{ github.event.inputs.release-type || inputs.release-type }}
@@ -246,7 +246,6 @@ jobs:
       app-version: ${{ needs.export-notarized-app.outputs.app-version }}
       app-name: ${{ needs.export-notarized-app.outputs.app-name }}
       asana-task-id: ${{ needs.export-notarized-app.outputs.asana-task-id }}
-      asana-task-url: ${{ github.event.inputs.asana-task-url || inputs.asana-task-url }}
       release-type: ${{ github.event.inputs.release-type || inputs.release-type }}
 
     steps:
