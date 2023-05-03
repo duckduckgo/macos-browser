@@ -143,9 +143,13 @@ jobs:
       run: brew install xcbeautify
 
     - name: Install create-dmg
-      if: ${{ env.create-dmg == true || env.asana-task-url }}
+      if: ${{ env.create-dmg || env.asana-task-url }}
       run: |
-        brew install create-dmg
+        git clone https://github.com/create-dmg/create-dmg.git
+        cd create-dmg
+        make install
+        cd -
+        # brew install create-dmg
         echo "create_dmg_arg=-d" >> $GITHUB_ENV
 
     - name: Set Asana task URL
