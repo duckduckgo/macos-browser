@@ -145,7 +145,7 @@ jobs:
     - name: Install create-dmg
       if: ${{ env.create-dmg || env.asana-task-url }}
       run: |
-        git clone https://github.com/create-dmg/create-dmg.git
+        git clone https://github.com/ayoy/create-dmg.git
         cd create-dmg
         make install
         cd -
