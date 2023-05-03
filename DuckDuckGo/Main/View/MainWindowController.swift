@@ -212,7 +212,10 @@ extension MainWindowController: NSWindowDelegate {
         // NSApp should be active at the moment of window ordering
         // https://app.asana.com/0/1177771139624306/1203853030672990/f
         if !NSApp.isActive {
-            for window in NSApp.windows where window.className.contains("FullScreen") {
+            for window in NSApp.windows {
+                guard window.className.contains("FullScreen"),
+                      window.parent == nil,
+                      window.screen == self.window!.screen else { continue }
                 self.window!.addChildWindow(window, ordered: .above)
             }
         }
