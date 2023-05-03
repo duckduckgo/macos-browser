@@ -170,6 +170,7 @@ jobs:
         export APPLE_API_KEY_PATH="$RUNNER_TEMP/apple_api_key.pem"
         echo -n "$APPLE_API_KEY_BASE64" | base64 --decode -o $APPLE_API_KEY_PATH
 
+        sqlite3 "/Users/runner/Library/Application Support/com.apple.TCC/TCC.db" "insert into access (service, client, client_type, allowed, prompt_count, indirect_object_identifier_type, indirect_object_identifier) values ('kTCCServiceAppleEvents', '/bin/bash', 1, 1, 1, 0, 'com.apple.finder')"
         ./scripts/archive.sh ${{ env.release-type }} \
             ${{ env.create_dmg_arg }} \
             ${{ env.asana_task_url_arg }}
