@@ -209,7 +209,6 @@ extension MainWindowController: NSWindowDelegate {
 
     func windowDidEnterFullScreen(_ notification: Notification) {
         // fix NSToolbarFullScreenWindow occurring beneath the MainWindow
-        // NSApp should be active at the moment of window ordering
         // https://app.asana.com/0/1177771139624306/1203853030672990/f
         if !NSApp.isActive {
             for window in NSApp.windows {
