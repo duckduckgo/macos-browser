@@ -72,8 +72,8 @@ jobs:
     runs-on: macos-13
 
     outputs:
-      app-version: ${{ steps.archive.outputs.app-version }}
-      app-name: ${{ steps.archive.outputs.app-name }}
+      app-version: ${{ steps.set-outputs.outputs.app-version }}
+      app-name: ${{ steps.set-outputs.outputs.app-name }}
       asana-task-id: ${{ steps.get-task-id.outputs.task-id }}
 
     env:
@@ -168,6 +168,9 @@ jobs:
 
         ./scripts/archive.sh ${{ env.release-type }}
 
+    - name: Set app name and version
+      id: set-outputs
+      run: |
         echo "app-version=${{ env.app-version }}" >> $GITHUB_OUTPUT
         echo "app-name=${{ env.app-name }}" >> $GITHUB_OUTPUT
 
