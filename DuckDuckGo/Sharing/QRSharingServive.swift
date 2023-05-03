@@ -16,160 +16,178 @@
 //  limitations under the License.
 //
 
-import CoreImage
+import Combine
 import Foundation
 import QuickLookUI
 
-extension String {
+final class QRSharingService: NSSharingService {
 
-    /// Creates a QR code for the current URL in the given color.
-    func qrImage(using color: NSColor) -> CIImage? {
-        return qrImage?.tinted(using: color)
+    private enum Constants {
+        static let menuIcon = NSImage(named: "QR-Icon")!
+
+        static let logo = NSImage(named: "Logo")!
+        static let logoRadiusFactor: CGFloat = 0.8
+        static let logoMargin: CGFloat = 8
+        static let logoBackgroundColor = NSColor.white
+        static let logoSizeFactor: CGFloat = 0.25
+
+        static let qrSize: Int = 500
+        static let qrCorrectionLevel: CIImage.QRCorrectionLevel? = .high
+
+        static let backgroundColor = NSColor.white
     }
-
-    /// Returns a black and white QR code for this URL.
-    var qrImage: CIImage? {
-        guard let qrFilter = CIFilter(name: "CIQRCodeGenerator"),
-              let qrData = self.data(using: String.Encoding.ascii) else { return nil }
-
-        qrFilter.setValue(qrData, forKey: "inputMessage")
-
-        let qrTransform = CGAffineTransform(scaleX: 12, y: 12)
-        return qrFilter.outputImage?.transformed(by: qrTransform)
-    }
-
-    /// Creates a QR code for the current URL in the given color.
-    func qrImage(using color: NSColor, logo: NSImage? = nil) -> CIImage? {
-        let tintedQRImage = qrImage?.tinted(using: color)
-
-        guard let logo = logo?.cgImage(forProposedRect: nil, context: nil, hints: nil) else {
-            return tintedQRImage
-        }
-
-        return tintedQRImage?.combined(with: CIImage(cgImage: logo))
-    }
-
-}
-
-extension CIImage {
-    /// Inverts the colors and creates a transparent image by converting the mask to alpha.
-    /// Input image should be black and white.
-    var transparent: CIImage? {
-        return inverted?.blackTransparent
-    }
-
-    /// Inverts the colors.
-    var inverted: CIImage? {
-        guard let invertedColorFilter = CIFilter(name: "CIColorInvert") else { return nil }
-
-        invertedColorFilter.setValue(self, forKey: "inputImage")
-        return invertedColorFilter.outputImage
-    }
-
-    /// Converts all black to transparent.
-    var blackTransparent: CIImage? {
-        guard let blackTransparentFilter = CIFilter(name: "CIMaskToAlpha") else { return nil }
-        blackTransparentFilter.setValue(self, forKey: "inputImage")
-        return blackTransparentFilter.outputImage
-    }
-
-    /// Applies the given color as a tint color.
-    func tinted(using color: NSColor) -> CIImage? {
-        guard
-            let transparentQRImage = transparent,
-            let filter = CIFilter(name: "CIMultiplyCompositing"),
-            let colorFilter = CIFilter(name: "CIConstantColorGenerator") else { return nil }
-
-        let ciColor = CIColor(color: color)
-        colorFilter.setValue(ciColor, forKey: kCIInputColorKey)
-        let colorImage = colorFilter.outputImage
-
-        filter.setValue(colorImage, forKey: kCIInputImageKey)
-        filter.setValue(transparentQRImage, forKey: kCIInputBackgroundImageKey)
-
-        return filter.outputImage!
-    }
-
-    /// Combines the current image with the given image centered.
-    func combined(with image: CIImage) -> CIImage? {
-        guard let combinedFilter = CIFilter(name: "CISourceOverCompositing") else { return nil }
-        let centerTransform = CGAffineTransform(scaleX: 0.5, y: 0.5)
-            .concatenating(CGAffineTransform(translationX: extent.midX - (image.extent.size.width / 4), y: extent.midY - (image.extent.size.height / 4)))
-        combinedFilter.setValue(image.transformed(by: centerTransform), forKey: "inputImage")
-        combinedFilter.setValue(self, forKey: "inputBackgroundImage")
-        return combinedFilter.outputImage!
-    }
-}
-
-final class QRSharingService: NSSharingService, QLPreviewPanelDataSource, QLPreviewPanelDelegate {
-
-    static let logo = NSImage(named: "Logo")!
 
     private var qrImage: NSImage?
     private var imageUrl: URL?
 
+    private var cancellables = Set<AnyCancellable>()
+
     init() {
-        super.init(title: "QR Code", image: NSImage(named: "Burn")!, alternateImage: nil) {
-            print("Share")
+        super.init(title: UserText.shareViaQRCodeMenuItem, image: Constants.menuIcon, alternateImage: nil) {}
+    }
+
+    /// Get ASCII `Data` for an array of items to share that can be represented as strings (e.g., URLs or Strings).
+    private static func data(for items: [Any]?) -> Data? {
+        guard let items else { return nil }
+
+        for item in items {
+            var string: String? {
+                switch item {
+                case let url as URL:
+                    return url.absoluteString
+                case let string as String:
+                    return string
+                default:
+                    return nil
+                }
+            }
+            if let data = string?.data(using: .nonLossyASCII) {
+                return data
+            }
         }
+
+        return nil
+    }
+
+    private static func qrCode(for items: [Any]) -> CIImage? {
+        guard let data = Self.data(for: items),
+              var qr = CIImage.qrCode(for: data, correctionLevel: Constants.qrCorrectionLevel) else { return nil }
+
+        // size of a QR “dot”
+        let qrSize = qr.extent.size.width
+
+        // scale
+        let qrScale = CGFloat(CGFloat(Constants.qrSize) / CGFloat(qrSize))
+        qr = qr.scaled(by: qrScale)
+
+        // tint
+        qr = qr.tinted(using: .logoBackgroundColor)
+
+        // extend background by 2 QR dots in each dimension
+        let backgroundExtent = qr.extent.insetBy(dx: -2 * qrScale, dy: -2 * qrScale)
+        let background = CIImage.rect(in: backgroundExtent, cornerRadius: qrScale * 2, color: Constants.backgroundColor)
+        // add background
+        qr = qr.centered(in: backgroundExtent).composited(over: background)
+
+        // add logo
+        var logo: CIImage {
+            var image = Constants.logo.ciImage
+
+            // cut Dax circle
+            let maskImage = CIImage.circle(at: image.extent.center, radius: image.extent.width * (Constants.logoRadiusFactor / 2))
+            image = image.masked(with: maskImage)
+
+            // add background
+            let backgroundExtent = CGRect(x: 0, y: 0, width: image.extent.width + Constants.logoMargin * 2, height: image.extent.width + Constants.logoMargin * 2)
+            let background = CIImage.rect(in: backgroundExtent, cornerRadius: backgroundExtent.width / 2, color: Constants.logoBackgroundColor)
+            image = image.centered(in: backgroundExtent).composited(over: background)
+
+            // scale to logoSizeInQRDots to match exact number of dots
+            let sizeInDots = CGFloat(Int(qrSize * Constants.logoSizeFactor))
+
+            image = image.scaled(by: (qrScale * sizeInDots) / image.extent.width)
+
+            return image
+        }
+        qr = logo.centered(in: qr.extent).composited(over: qr)
+
+        return qr
     }
 
     override func canPerform(withItems items: [Any]?) -> Bool {
-        items?.contains(where: { $0 is String || $0 is URL }) ?? false
+        Self.data(for: items) != nil
     }
 
     override func perform(withItems items: [Any]) {
-        guard let string = items.lazy.compactMap({ ($0 as? URL)?.absoluteString ?? ($0 as? String) }).first else { return }
+        guard let qr = Self.qrCode(for: items) else { return }
 
-        let context = CIContext(options: nil)
+        let cgImage = qr.cgImage
+        guard let data = cgImage.bitmapRepresentation(using: .png) else { return }
 
-        guard let ciImage = string.qrImage(using: .logoBackground, logo: Self.logo),
-              let cgImage = context.createCGImage(ciImage, from: ciImage.extent) else {
-            fatalError("Failed to create CGImage from CIImage")
+        let fileUrl = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString).appendingPathExtension("png")
+        do {
+            try data.write(to: fileUrl)
+        } catch {
+            return
         }
 
-        let bitmapRep = NSBitmapImageRep(cgImage: cgImage)
-        let nsImage = NSImage(size: bitmapRep.size)
-        nsImage.addRepresentation(bitmapRep)
+        self.imageUrl = fileUrl
+        self.qrImage = NSImage(cgImage: cgImage, size: NSSize(width: qr.extent.size.width / 2, height: qr.extent.size.height / 2))
 
-        let url = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString).appendingPathExtension("png")
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-            try? FileManager.default.removeItem(at: url)
-        }
+        let qlPanel: QLPreviewPanel = QLPreviewPanel.shared()
+        qlPanel.dataSource = self
+        qlPanel.delegate = self
 
-        try? bitmapRep.representation(using: .png, properties: [:])?.write(to: url)
-        self.imageUrl = url
-
-        self.qrImage = nsImage
-
-        QLPreviewPanel.shared().dataSource = self
-        QLPreviewPanel.shared().delegate = self
-
-        if QLPreviewPanel.shared().isVisible {
-            QLPreviewPanel.shared().reloadData()
+        if qlPanel.isVisible {
+            qlPanel.reloadData()
         } else {
-            QLPreviewPanel.shared().makeKeyAndOrderFront(nil)
+            qlPanel.makeKeyAndOrderFront(nil)
         }
+
+        qlPanel.publisher(for: \.delegate).dropFirst().sink { [weak self] delegate in
+            if delegate !== self {
+                self?.cleanup()
+            }
+        }.store(in: &cancellables)
+        qlPanel.publisher(for: \.isVisible).dropFirst().sink { [weak self] isVisible in
+            if !isVisible {
+                self?.cleanup()
+            }
+        }.store(in: &cancellables)
     }
+
+    private func cleanup() {
+        guard let imageUrl else { return }
+
+        if let qlPanel = QLPreviewPanel.shared(),
+           qlPanel.delegate === self,
+           qlPanel.isVisible {
+            qlPanel.orderOut(nil)
+        }
+
+        try? FileManager.default.removeItem(at: imageUrl)
+        self.imageUrl = nil
+        self.qrImage = nil
+        self.cancellables.removeAll()
+    }
+
+}
+
+extension QRSharingService: QLPreviewPanelDataSource, QLPreviewPanelDelegate {
 
     func numberOfPreviewItems(in panel: QLPreviewPanel!) -> Int {
-        return 1 // Change this number according to the number of items you want to preview
+        return imageUrl != nil ? 1 : 0
     }
 
-    // Item to preview
     func previewPanel(_ panel: QLPreviewPanel!, previewItemAt index: Int) -> QLPreviewItem! {
-        return imageUrl! as QLPreviewItem
+        return imageUrl as QLPreviewItem?
     }
 
-    // Frame for the item's icon in your view
     func previewPanel(_ panel: QLPreviewPanel!, sourceFrameOnScreenFor item: QLPreviewItem!) -> NSRect {
-        // Provide the frame of the item's icon in your view (optional)
-        return .init(origin: .zero, size: qrImage!.size)
+        return qrImage.map { NSRect(origin: .zero, size: $0.size) } ?? .zero
     }
 
-    // The view responsible for the item's icon
     func previewPanel(_ panel: QLPreviewPanel!, transitionImageFor item: QLPreviewItem!, contentRect: UnsafeMutablePointer<NSRect>!) -> Any! {
-        // Provide the image of the item's icon (optional)
         return qrImage
     }
 
