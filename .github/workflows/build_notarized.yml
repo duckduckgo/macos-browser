@@ -67,6 +67,11 @@ on:
 jobs:
   export-notarized-app:
 
+    outputs:
+      app-version: ${{ steps.archive.outputs.app-version }}
+      app-name: ${{ steps.archive.outputs.app-name }}
+      asana-task-id: ${{ steps.get-task-id.outputs.task-id }}
+
     name: Export Notarized App
 
     runs-on: macos-13
@@ -142,16 +147,6 @@ jobs:
       continue-on-error: true
       run: brew install xcbeautify
 
-    - name: Install create-dmg
-      if: ${{ env.create-dmg || env.asana-task-url }}
-      run: |
-        git clone https://github.com/ayoy/create-dmg.git
-        cd create-dmg
-        make install
-        cd -
-        # brew install create-dmg
-        echo "create_dmg_arg=-d" >> $GITHUB_ENV
-
     - name: Set Asana task URL
       if: env.asana-task-url
       run: echo "asana_task_url_arg=-a ${{ env.asana-task-url }}" >> $GITHUB_ENV
@@ -160,6 +155,7 @@ jobs:
       run: sudo xcode-select -s /Applications/Xcode_$(<.xcode-version).app/Contents/Developer
 
     - name: Archive and notarize the app
+      id: archive
       env:
         APPLE_API_KEY_BASE64: ${{ secrets.APPLE_API_KEY_BASE64 }}
         APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
@@ -170,30 +166,52 @@ jobs:
         export APPLE_API_KEY_PATH="$RUNNER_TEMP/apple_api_key.pem"
         echo -n "$APPLE_API_KEY_BASE64" | base64 --decode -o $APPLE_API_KEY_PATH
 
-        sqlite3 "/Users/runner/Library/Application Support/com.apple.TCC/TCC.db" \
-            "insert into access (service, client, client_type, auth_value, auth_reason, auth_version, indirect_object_identifier_type, indirect_object_identifier) values ('kTCCServiceAppleEvents', '/usr/libexec/sshd-keygen-wrapper', 0, 2, 4, 1, 0, 'com.apple.finder')"
-        ./scripts/archive.sh ${{ env.release-type }} \
-            ${{ env.create_dmg_arg }} \
-            ${{ env.asana_task_url_arg }}
+        ./scripts/archive.sh ${{ env.release-type }}
+
+        echo "app-version=${{ env.app-version }}" >> $GITHUB_OUTPUT
+        echo "app-name=${{ env.app-name }}" >> $GITHUB_OUTPUT
 
     - name: Upload app artifact
       uses: actions/upload-artifact@v3
       with:
-        name: DuckDuckGo-${{ env.release-type }}-${{ env.app_version }}.app
-        path: ${{ github.workspace }}/release/DuckDuckGo-${{ env.app_version }}.zip
+        name: DuckDuckGo-${{ env.release-type }}-${{ env.app-version }}.app
+        path: ${{ github.workspace }}/release/DuckDuckGo-${{ env.app-version }}.zip
 
     - name: Upload dSYMs artifact
       uses: actions/upload-artifact@v3
       with:
-        name: DuckDuckGo-${{ env.release-type }}-dSYM-${{ env.app_version }}
-        path: ${{ github.workspace }}/release/DuckDuckGo-${{ env.app_version }}-dSYM.zip
+        name: DuckDuckGo-${{ env.release-type }}-dSYM-${{ env.app-version }}
+        path: ${{ github.workspace }}/release/DuckDuckGo-${{ env.app-version }}-dSYM.zip
 
-    - name: Upload DMG artifact
+    - name: Upload DMG background
       if: env.create-dmg || env.asana-task-url
       uses: actions/upload-artifact@v3
       with:
-        name: DuckDuckGo-${{ env.release-type }}-${{ env.app_version }}.dmg
-        path: ${{ github.workspace }}/release/duckduckgo*-${{ env.app_version }}.dmg
+        name: dmg-background.png
+        path: ${{ github.workspace }}/scripts/assets/dmg-background.png
+        retention-days: 1
+
+    - name: Get Asana Task ID
+      id: get-task-id
+      if: env.asana-task-url
+      run: |
+        task_url_regex='^https://app.asana.com/[0-9]/[0-9]*/([0-9]*)/f$'
+        if [[ "${{ env.asana-task-url }}" =~ ${task_url_regex} ]]; then
+          echo "task-id=${BASH_REMATCH[1]}" >> $GITHUB_OUTPUT
+        else
+          echo "::error::Asana Task URL has incorrect format (attempted to match ${task_url_regex})."
+        fi
+
+    - name: Upload dSYMs to Asana
+      if: env.asana-task-url
+      env:
+        ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+      run: |
+        dsym_zip_path="${{ github.workspace }}/release/DuckDuckGo-${{ env.app-version }}-dSYM.zip"
+
+        curl -s "https://app.asana.com/api/1.0/tasks/${{ steps.get-task-id.outputs.task-id }}/attachments" \
+          -H "Authorization: Bearer ${{ env.ASANA_ACCESS_TOKEN }}" \
+          --form "file=@${dsym_zip_path};type=application/zip"
 
     - name: Send Mattermost message
       env:
@@ -215,3 +233,62 @@ jobs:
                 -d "$(envsubst < ./scripts/assets/release-mm-template.json)" \
                 ${{ secrets.MM_WEBHOOK_URL }}
         fi
+
+  create-dmg:
+
+    name: Create DMG
+    needs: export-notarized-app
+    if: ${{ github.event.inputs.create-dmg || inputs.create-dmg }}
+
+    runs-on: macos-12
+
+    env:
+      app-version: ${{ needs.export-notarized-app.outputs.app-version }}
+      app-name: ${{ needs.export-notarized-app.outputs.app-name }}
+      asana-task-id: ${{ needs.export-notarized-app.outputs.asana-task-id }}
+      asana-task-url: ${{ github.event.inputs.asana-task-url || inputs.asana-task-url }}
+      release-type: ${{ github.event.inputs.release-type || inputs.release-type }}
+
+    steps:
+
+    - name: Fetch app bundle
+      uses: actions/download-artifact@v3
+      with:
+        name: DuckDuckGo-${{ env.release-type }}-${{ env.app-version }}.app
+        path: ${{ github.workspace }}/dmg/${{ env.app-name }}.app
+
+    - name: Fetch DMG background
+      uses: actions/download-artifact@v3
+      with:
+        name: dmg-background.png
+        path: ${{ github.workspace }}/dmg-background.png
+  
+    - name: Install create-dmg
+      run: brew install create-dmg
+
+    - name: Create DMG
+      run: |
+        create-dmg --volname "${{ env.app-name }}" \
+            --icon "${{ env.app-name }}.app" 140 160 \
+            --background "dmg-background.png" \
+            --window-size 600 400 \
+            --icon-size 120 \
+            --app-drop-link 430 160 "duckduckgo-${{ env.app-version }}.dmg" \
+            "dmg"
+
+    - name: Upload DMG artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: DuckDuckGo-${{ env.release-type }}-${{ env.app-version }}.dmg
+        path: ${{ github.workspace }}/release/duckduckgo*-${{ env.app-version }}.dmg
+
+    - name: Upload DMG to Asana
+      if: env.asana-task-id
+      env:
+        ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+      run: |
+        dmg_path="${{ github.workspace }}/duckduckgo-${{ env.app-version }}.dmg"
+
+        curl -s "https://app.asana.com/api/1.0/tasks/${{ env.asana-task-id }}/attachments" \
+          -H "Authorization: Bearer ${{ env.ASANA_ACCESS_TOKEN }}" \
+          --form "file=@${dmg_path};type=application/zip"
