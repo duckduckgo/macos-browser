@@ -117,7 +117,6 @@ extension Pixel {
         case jsPixel(_ pixel: AutofillUserScript.JSPixel)
         case debug(event: Debug, error: Error? = nil)
 
-
         enum Debug {
 
             case assertionFailure(message: String, file: StaticString, line: UInt)
