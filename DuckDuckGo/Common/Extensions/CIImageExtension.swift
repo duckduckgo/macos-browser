@@ -57,6 +57,83 @@ extension CIImage {
         return filter.outputImage
     }
 
+    struct QRCodeParameters {
+
+        fileprivate static let iconSizeFactor: CGFloat = 0.25
+
+        var qrSizeInPixels: Int
+        var correctionLevel: QRCorrectionLevel?
+
+        var icon: CIImage?
+
+        var color: NSColor
+        var backgroundColor: NSColor
+
+        static let `default` = QRCodeParameters(qrSizeInPixels: 500,
+                                                correctionLevel: nil,
+                                                icon: nil,
+                                                color: .black,
+                                                backgroundColor: .white)
+
+        static let duckDuckGo: QRCodeParameters = {
+            let icon: CIImage = {
+                let logo = NSImage(named: "Logo")!
+                let logoRadiusFactor: CGFloat = 0.8
+                let logoMargin: CGFloat = 8
+                let logoBackgroundColor = NSColor.white
+
+                var image = logo.ciImage
+
+                // cut Dax circle
+                let maskImage = CIImage.circle(at: image.extent.center, radius: image.extent.width * (logoRadiusFactor / 2))
+                image = image.masked(with: maskImage)
+
+                // add background
+                let backgroundExtent = CGRect(x: 0, y: 0, width: image.extent.width + logoMargin * 2, height: image.extent.width + logoMargin * 2)
+                let background = CIImage.rect(in: backgroundExtent, cornerRadius: backgroundExtent.width / 2, color: logoBackgroundColor)
+                image = image.centered(in: backgroundExtent).composited(over: background)
+
+                return image
+            }()
+
+            return QRCodeParameters(qrSizeInPixels: QRCodeParameters.default.qrSizeInPixels,
+                                    correctionLevel: .high,
+                                    icon: icon,
+                                    color: .logoBackgroundColor,
+                                    backgroundColor: .white)
+        }()
+    }
+
+    static func qrCode(for data: Data, parameters: QRCodeParameters = .default) -> CIImage? {
+        guard var qr = CIImage.qrCode(for: data, correctionLevel: parameters.correctionLevel) else { return nil }
+
+        // size of the QR in “dots”
+        let qrSize = qr.extent.size.width
+
+        // scale to QR Size in Pixels
+        let qrScale = CGFloat(CGFloat(parameters.qrSizeInPixels) / CGFloat(qrSize))
+        qr = qr.scaled(by: qrScale)
+
+        // tint
+        qr = qr.tinted(using: parameters.color)
+
+        // extend background by 2 QR dots in each dimension
+        let backgroundExtent = qr.extent.insetBy(dx: -2 * qrScale, dy: -2 * qrScale)
+        let background = CIImage.rect(in: backgroundExtent, cornerRadius: qrScale * 2, color: parameters.backgroundColor)
+        // add background
+        qr = qr.centered(in: backgroundExtent).composited(over: background)
+
+        // add logo
+        if let icon = parameters.icon {
+            let sizeInDots = CGFloat(Int(qrSize * QRCodeParameters.iconSizeFactor))
+            let icon = icon.scaled(by: (qrScale * sizeInDots) / icon.extent.width)
+
+            qr = icon.centered(in: qr.extent).composited(over: qr)
+        }
+
+        return qr
+    }
+
     /// Creates a new `CIImage` by masking the current image with the specified mask image.
     func masked(with maskImage: CIImage) -> CIImage {
         let filter = CIFilter.blendWithMask()
