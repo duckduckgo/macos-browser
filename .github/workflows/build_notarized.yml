@@ -74,7 +74,6 @@ jobs:
     outputs:
       app-version: ${{ steps.set-outputs.outputs.app-version }}
       app-name: ${{ steps.set-outputs.outputs.app-name }}
-      asana-task-id: ${{ steps.get-task-id.outputs.task-id }}
 
     env:
       release-type: ${{ github.event.inputs.release-type || inputs.release-type }}
@@ -182,27 +181,13 @@ jobs:
         name: DuckDuckGo-${{ env.release-type }}-dSYM-${{ env.app-version }}
         path: ${{ github.workspace }}/release/DuckDuckGo-${{ env.app-version }}-dSYM.zip
 
-    - name: Get Asana Task ID
-      id: get-task-id
-      if: env.asana-task-url
-      run: |
-        task_url_regex='^https://app.asana.com/[0-9]/[0-9]*/([0-9]*)/f$'
-        if [[ "${{ env.asana-task-url }}" =~ ${task_url_regex} ]]; then
-          echo "task-id=${BASH_REMATCH[1]}" >> $GITHUB_OUTPUT
-        else
-          echo "::error::Asana Task URL has incorrect format (attempted to match ${task_url_regex})."
-        fi
-
     - name: Upload dSYMs to Asana
       if: env.asana-task-url
-      env:
-        ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
-      run: |
-        dsym_zip_path="${{ github.workspace }}/release/DuckDuckGo-${{ env.app-version }}-dSYM.zip"
-
-        curl -s "https://app.asana.com/api/1.0/tasks/${{ steps.get-task-id.outputs.task-id }}/attachments" \
-          -H "Authorization: Bearer ${{ env.ASANA_ACCESS_TOKEN }}" \
-          --form "file=@${dsym_zip_path};type=application/zip"
+      uses: ./.github/actions/asana-upload
+      with:
+        access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
+        file-name: ${{ github.workspace }}/release/DuckDuckGo-${{ env.app-version }}-dSYM.zip
+        task-url: ${{ env.asana-task-url }}
 
   create-dmg:
 
@@ -215,7 +200,7 @@ jobs:
     env:
       app-version: ${{ needs.export-notarized-app.outputs.app-version }}
       app-name: ${{ needs.export-notarized-app.outputs.app-name }}
-      asana-task-id: ${{ needs.export-notarized-app.outputs.asana-task-id }}
+      asana-task-url: ${{ github.event.inputs.asana-task-url || inputs.asana-task-url }}
       release-type: ${{ github.event.inputs.release-type || inputs.release-type }}
 
     steps:
@@ -224,7 +209,7 @@ jobs:
       uses: actions/download-artifact@v3
       with:
         name: DuckDuckGo-${{ env.release-type }}-${{ env.app-version }}.app
-        path: ${{ github.workspace }}/dmg/${{ env.app-name }}.app
+        path: ${{ github.workspace }}/dmg
 
     - name: Install create-dmg
       run: brew install create-dmg
@@ -249,16 +234,22 @@ jobs:
         name: DuckDuckGo-${{ env.release-type }}-${{ env.app-version }}.dmg
         path: ${{ github.workspace }}/duckduckgo*-${{ env.app-version }}.dmg
 
-    - name: Upload DMG to Asana
-      if: env.asana-task-id
+    - name: Fetch Upload to Asana action
+      if: env.asana-task-url
       env:
-        ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+        GH_TOKEN: ${{ github.token }}
       run: |
-        dmg_path="${{ github.workspace }}/duckduckgo-${{ env.app-version }}.dmg"
+        mkdir -p "${{ github.workspace }}/.github/actions/asana-upload"
+        curl -fLSs $(gh api https://api.github.com/repos/${{ github.repository }}/contents/.github/actions/asana-upload/action.yml?ref=${{ github.ref }} --jq .download_url) \
+            --output "${{ github.workspace }}/.github/actions/asana-upload/action.yml"
 
-        curl -s "https://app.asana.com/api/1.0/tasks/${{ env.asana-task-id }}/attachments" \
-          -H "Authorization: Bearer ${{ env.ASANA_ACCESS_TOKEN }}" \
-          --form "file=@${dmg_path};type=application/zip"
+    - name: Upload DMG to Asana
+      if: env.asana-task-url
+      uses: ./.github/actions/asana-upload
+      with:
+        access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
+        file-name: ${{ github.workspace }}/duckduckgo-${{ env.app-version }}.dmg
+        task-url: ${{ env.asana-task-url }}
 
   mattermost:
 
