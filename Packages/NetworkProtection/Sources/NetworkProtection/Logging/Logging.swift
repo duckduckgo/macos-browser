@@ -33,6 +33,10 @@ extension OSLog {
         Logging.networkProtectionConnectionTesterLoggingEnabled ? Logging.networkProtectionConnectionTesterLog : .disabled
     }
 
+    public static var networkProtectionDistributedNotificationsLog: OSLog {
+        Logging.networkProtectionDistributedNotificationsLoggingEnabled ? Logging.networkProtectionDistributedNotificationsLog : .disabled
+    }
+
     public static var networkProtectionIPCLog: OSLog {
         Logging.networkProtectionIPCLoggingEnabled ? Logging.networkProtectionIPCLog : .disabled
     }
@@ -47,6 +51,10 @@ extension OSLog {
 
     public static var networkProtectionPixel: OSLog {
         Logging.networkProtectionPixelLoggingEnabled ? Logging.networkProtectionPixel : .disabled
+    }
+
+    public static var networkProtectionStatusReporterLog: OSLog {
+        Logging.networkProtectionStatusReporterLoggingEnabled ? Logging.networkProtectionStatusReporterLog : .disabled
     }
 
     public static var networkProtectionSleepLog: OSLog {
@@ -67,6 +75,9 @@ struct Logging {
     fileprivate static let networkProtectionConnectionTesterLoggingEnabled = true
     fileprivate static let networkProtectionConnectionTesterLog: OSLog = OSLog(subsystem: subsystem, category: "Network Protection: Connection Tester")
 
+    fileprivate static let networkProtectionDistributedNotificationsLoggingEnabled = true
+    fileprivate static let networkProtectionDistributedNotificationsLog: OSLog = OSLog(subsystem: subsystem, category: "Network Protection: Distributed Notifications")
+
     fileprivate static let networkProtectionIPCLoggingEnabled = true
     fileprivate static let networkProtectionIPCLog: OSLog = OSLog(subsystem: subsystem, category: "Network Protection: IPC")
 
@@ -78,6 +89,9 @@ struct Logging {
 
     fileprivate static let networkProtectionPixelLoggingEnabled = true
     fileprivate static let networkProtectionPixel: OSLog = OSLog(subsystem: subsystem, category: "Network Protection: Pixel")
+
+    fileprivate static let networkProtectionStatusReporterLoggingEnabled = true
+    fileprivate static let networkProtectionStatusReporterLog: OSLog = OSLog(subsystem: subsystem, category: "Network Protection: Status Reporter")
 
     fileprivate static let networkProtectionSleepLoggingEnabled = true
     fileprivate static let networkProtectionSleepLog: OSLog = OSLog(subsystem: subsystem, category: "Network Protection: Sleep and Wake")

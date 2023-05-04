@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import os.log
 
 extension DistributedNotificationCenter.CenterType {
     public static let networkProtection = DistributedNotificationCenter.CenterType("com.duckduckgo.DistributedNotificationCenter.CenterType.networkProtection")
@@ -30,8 +31,21 @@ extension NotificationCenter {
 }
 
 extension DistributedNotificationCenter {
-    public func post(_ networkProtectionNotification: DistributedNotification, object: String? = nil) {
-        self.postNotificationName(networkProtectionNotification.name, object: object, options: [.deliverImmediately, .postToAllSessions])
+    public func post(_ networkProtectionNotification: DistributedNotification, object: String? = nil, log: OSLog = .networkProtectionDistributedNotificationsLog) {
+
+        logPost(networkProtectionNotification, object: object, log: log)
+        postNotificationName(networkProtectionNotification.name, object: object, options: [.deliverImmediately, .postToAllSessions])
+    }
+
+    // MARK: - Logging
+
+    private func logPost(_ networkProtectionNotification: DistributedNotification, object: String? = nil, log: OSLog = .networkProtectionDistributedNotificationsLog) {
+
+        if let string = object {
+            os_log("%{public}@: Distributed notification posted: %{public}@ (%{public}@)", log: log, type: .debug, String(describing: Thread.current), String(describing: networkProtectionNotification), string)
+        } else {
+            os_log("Distributed notification posted: %{public}@", log: log, type: .debug, String(describing: networkProtectionNotification))
+        }
     }
 }
 
@@ -54,7 +68,7 @@ public enum DistributedNotification: String {
     case controllerErrorChanged = "com.duckduckgo.network-protection.NetworkProtectionNotification.controllerErrorChanged"
 
     // New Status Observer
-    case newStatusObserver = "com.duckduckgo.network-protection.NetworkProtectionNotification.newStatusObserver"
+    case requestStatusUpdate = "com.duckduckgo.network-protection.NetworkProtectionNotification.requestStatusUpdate"
 
     static let preferredStringEncoding = String.Encoding.utf8
 

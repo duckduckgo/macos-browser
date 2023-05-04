@@ -41,7 +41,12 @@ public extension EnvironmentValues {
 
 public final class NetworkProtectionPopover: NSPopover {
 
+    private let statusReporter: NetworkProtectionStatusReporter
+
     public required init(controller: TunnelController, statusReporter: NetworkProtectionStatusReporter, showLaunchBrowserMenuItem: Bool) {
+
+        self.statusReporter = statusReporter
+
         super.init()
 
         self.animates = false
@@ -72,5 +77,13 @@ public final class NetworkProtectionPopover: NSPopover {
         // It's important to set the frame at least once here.  If we don't the popover
         // fails to get the right width and the popover can exceed the screen's limits.
         controller.view.frame = CGRect(origin: .zero, size: controller.view.intrinsicContentSize)
+    }
+
+    // MARK: - Forcing Status Refresh
+
+    override public func show(relativeTo positioningRect: NSRect, of positioningView: NSView, preferredEdge: NSRectEdge) {
+
+        statusReporter.forceRefresh()
+        super.show(relativeTo: positioningRect, of: positioningView, preferredEdge: preferredEdge)
     }
 }

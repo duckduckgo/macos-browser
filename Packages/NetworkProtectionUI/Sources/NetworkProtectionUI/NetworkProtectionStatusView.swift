@@ -311,6 +311,10 @@ struct NetworkProtectionStatusView_Previews: PreviewProvider {
         let serverInfoPublisher = CurrentValueSubject<NetworkProtectionStatusServerInfo, Never>(NetworkProtectionStatusServerInfo(serverLocation: "Los Angeles, USA", serverAddress: "127.0.0.1"))
         let connectionErrorPublisher = CurrentValueSubject<String?, Never>(nil)
         let controllerErrorMessagePublisher = CurrentValueSubject<String?, Never>(nil)
+
+        func forceRefresh() {
+            // No-op
+        }
     }
 
     static var previews: some View {

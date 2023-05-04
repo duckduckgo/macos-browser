@@ -62,7 +62,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         }
 
         set {
-            if reasserting {
+            if newValue {
                 connectionStatus = .reasserting
             } else {
                 connectionStatus = .connected(connectedDate: Date())
@@ -328,7 +328,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         ipcConnection.startListener()
         #endif
 
-        observationTokens.append(distributedNotificationCenter.addObserver(for: .newStatusObserver, object: nil, queue: nil) { [weak self] _ in
+        observationTokens.append(distributedNotificationCenter.addObserver(for: .requestStatusUpdate, object: nil, queue: nil) { [weak self] _ in
 
             self?.broadcastConnectionStatus()
             self?.broadcastLastSelectedServerInfo()

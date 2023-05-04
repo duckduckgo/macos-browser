@@ -42,7 +42,7 @@ public class ConnectionStatusObserverThroughSession: ConnectionStatusObserver {
 
     public init(notificationCenter: NotificationCenter = .default,
                 workspaceNotificationCenter: NotificationCenter = NSWorkspace.shared.notificationCenter,
-                log: OSLog = .networkProtection) {
+                log: OSLog = .networkProtectionStatusReporterLog) {
 
         self.notificationCenter = notificationCenter
         self.workspaceNotificationCenter = workspaceNotificationCenter
@@ -72,7 +72,7 @@ public class ConnectionStatusObserverThroughSession: ConnectionStatusObserver {
 
                 try handleStatusChange(in: session)
             } catch {
-                os_log("Failed to handle wake %{public}@", log: log, type: .error, error.localizedDescription)
+                os_log("%{public}@: failed to handle wake %{public}@", log: log, type: .error, String(describing: self), error.localizedDescription)
             }
         }
     }
@@ -85,7 +85,7 @@ public class ConnectionStatusObserverThroughSession: ConnectionStatusObserver {
         do {
             try handleStatusChange(in: session)
         } catch {
-            os_log("Failed to handle status change %{public}@", log: log, type: .error, error.localizedDescription)
+            os_log("%{public}@: Failed to handle status change %{public}@", log: log, type: .error, String(describing: self), error.localizedDescription)
         }
     }
 
@@ -124,5 +124,11 @@ public class ConnectionStatusObserverThroughSession: ConnectionStatusObserver {
         }
 
         return status
+    }
+
+    // MARK: - Logging
+
+    private func logStatusChanged(status: ConnectionStatus) {
+        os_log("%{public}@: connection status is now %{public}@", log: log, type: .debug, String(describing: self), String(describing: status))
     }
 }

@@ -51,6 +51,14 @@ extension NetworkProtectionStatusView {
         private var tunnelErrorMessageCancellable: AnyCancellable?
         private var controllerErrorMessageCancellable: AnyCancellable?
 
+        // MARK: - Dispatch Queues
+
+        private static let statusDispatchQueue = DispatchQueue(label: "com.duckduckgo.NetworkProtectionStatusView.statusDispatchQueue", qos: .userInteractive)
+        private static let connectivityIssuesDispatchQueue = DispatchQueue(label: "com.duckduckgo.NetworkProtectionStatusView.connectivityIssuesDispatchQueue", qos: .userInteractive)
+        private static let serverInfoDispatchQueue = DispatchQueue(label: "com.duckduckgo.NetworkProtectionStatusView.serverInfoDispatchQueue", qos: .userInteractive)
+        private static let tunnelErrorDispatchQueue = DispatchQueue(label: "com.duckduckgo.NetworkProtectionStatusView.tunnelErrorDispatchQueue", qos: .userInteractive)
+        private static let controllerErrorDispatchQueue = DispatchQueue(label: "com.duckduckgo.NetworkProtectionStatusView.controllerErrorDispatchQueue", qos: .userInteractive)
+
         // MARK: - Feature Image
 
         var mainImageAsset: NetworkProtectionAsset {
@@ -106,8 +114,11 @@ extension NetworkProtectionStatusView {
         // MARK: - Subscriptions
 
         private func subscribeToStatusChanges() {
-            statusChangeCancellable = statusReporter.statusPublisher.sink { [weak self] status in
-                guard let self = self else {
+            statusChangeCancellable = statusReporter.statusPublisher
+                .subscribe(on: Self.statusDispatchQueue)
+                .sink { [weak self] status in
+
+                guard let self else {
                     return
                 }
 
@@ -118,8 +129,11 @@ extension NetworkProtectionStatusView {
         }
 
         private func subscribeToConnectivityIssues() {
-            connectivityIssuesCancellable = statusReporter.connectivityIssuesPublisher.sink { [weak self] isHavingConnectivityIssues in
-                guard let self = self else {
+            connectivityIssuesCancellable = statusReporter.connectivityIssuesPublisher
+                .subscribe(on: Self.connectivityIssuesDispatchQueue)
+                .sink { [weak self] isHavingConnectivityIssues in
+
+                guard let self else {
                     return
                 }
 
@@ -130,8 +144,11 @@ extension NetworkProtectionStatusView {
         }
 
         private func subscribeToTunnelErrorMessages() {
-            tunnelErrorMessageCancellable = statusReporter.connectionErrorPublisher.sink { [weak self] errorMessage in
-                guard let self = self else {
+            tunnelErrorMessageCancellable = statusReporter.connectionErrorPublisher
+                .subscribe(on: Self.tunnelErrorDispatchQueue)
+                .sink { [weak self] errorMessage in
+
+                guard let self else {
                     return
                 }
 
@@ -142,8 +159,11 @@ extension NetworkProtectionStatusView {
         }
 
         private func subscribeToControllerErrorMessages() {
-            controllerErrorMessageCancellable = statusReporter.controllerErrorMessagePublisher.sink { [weak self] errorMessage in
-                guard let self = self else {
+            controllerErrorMessageCancellable = statusReporter.controllerErrorMessagePublisher
+                .subscribe(on: Self.controllerErrorDispatchQueue)
+                .sink { [weak self] errorMessage in
+
+                guard let self else {
                     return
                 }
 
@@ -154,8 +174,11 @@ extension NetworkProtectionStatusView {
         }
 
         private func subscribeToServerInfoChanges() {
-            serverInfoCancellable = statusReporter.serverInfoPublisher.sink { [weak self] serverInfo in
-                guard let self = self else {
+            serverInfoCancellable = statusReporter.serverInfoPublisher
+                .subscribe(on: Self.serverInfoDispatchQueue)
+                .sink { [weak self] serverInfo in
+
+                guard let self else {
                     return
                 }
 

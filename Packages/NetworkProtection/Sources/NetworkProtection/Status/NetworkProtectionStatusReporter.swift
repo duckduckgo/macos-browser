@@ -19,7 +19,7 @@
 import AppKit
 import Combine
 import NetworkExtension
-import os
+import os.log
 
 /// Classes that implement this protocol are in charge of relaying status changes.
 ///
@@ -29,6 +29,8 @@ public protocol NetworkProtectionStatusReporter {
     var serverInfoPublisher: CurrentValueSubject<NetworkProtectionStatusServerInfo, Never> { get }
     var connectionErrorPublisher: CurrentValueSubject<String?, Never> { get }
     var controllerErrorMessagePublisher: CurrentValueSubject<String?, Never> { get }
+
+    func forceRefresh()
 }
 
 /// Convenience struct used to relay server info updates through a reporter.
@@ -58,7 +60,7 @@ public final class DefaultNetworkProtectionStatusReporter: NetworkProtectionStat
 
     /// The logger that this object will use for errors that are handled by this class.
     ///
-    private let logger: NetworkProtectionLogger
+    private let log: OSLog
 
     // MARK: - Notifications
 
@@ -91,13 +93,13 @@ public final class DefaultNetworkProtectionStatusReporter: NetworkProtectionStat
                 serverInfoObserver: ConnectionServerInfoObserver,
                 connectionErrorObserver: ConnectionErrorObserver,
                 distributedNotificationCenter: DistributedNotificationCenter = .forType(.networkProtection),
-                logger: NetworkProtectionLogger = DefaultNetworkProtectionLogger()) {
+                log: OSLog = .networkProtectionStatusReporterLog) {
 
         self.statusObserver = statusObserver
         self.serverInfoObserver = serverInfoObserver
         self.connectionErrorObserver = connectionErrorObserver
         self.distributedNotificationCenter = distributedNotificationCenter
-        self.logger = logger
+        self.log = log
 
         start()
     }
@@ -110,23 +112,39 @@ public final class DefaultNetworkProtectionStatusReporter: NetworkProtectionStat
             self?.handleControllerErrorStatusChanged(notification)
         })
 
+        // swiftlint:disable unused_capture_list
         observationTokens.append(distributedNotificationCenter.addObserver(for: .issuesStarted, object: nil, queue: nil) { [weak self] _ in
 
-            self?.connectivityIssuesPublisher.send(true)
+            guard let self else { return }
+
+            logIssuesChanged(isHavingIssues: true)
+            connectivityIssuesPublisher.send(true)
         })
 
+        // swiftlint:disable unused_capture_list
         observationTokens.append(distributedNotificationCenter.addObserver(for: .issuesResolved, object: nil, queue: nil) { [weak self] _ in
 
-            self?.connectivityIssuesPublisher.send(false)
+            guard let self else { return }
+
+            logIssuesChanged(isHavingIssues: false)
+            connectivityIssuesPublisher.send(false)
         })
 
-        distributedNotificationCenter.post(.newStatusObserver)
+        forceRefresh()
+    }
+
+    // MARK: - Forcing Refreshes
+
+    public func forceRefresh() {
+        distributedNotificationCenter.post(.requestStatusUpdate)
     }
 
     // MARK: - Updating controller errors
 
     private func handleControllerErrorStatusChanged(_ notification: Notification) {
         let errorMessage = notification.object as? String
+        logErrorChanged(isShowingError: errorMessage != nil)
+
         controllerErrorMessagePublisher.send(errorMessage)
     }
 
@@ -144,11 +162,29 @@ public final class DefaultNetworkProtectionStatusReporter: NetworkProtectionStat
             // indicates whether there are connection issues or not.
             // A more appropriate solution when we have time would be to use proper encoding
             // maybe using a JSON encoder.
-            let value = data[0] == 1
+            let isHavingConnectivityIssues = data[0] == 1
 
-            if value != self.connectivityIssuesPublisher.value {
-                self.connectivityIssuesPublisher.send(value)
+            if isHavingConnectivityIssues != self.connectivityIssuesPublisher.value {
+                self.connectivityIssuesPublisher.send(isHavingConnectivityIssues)
             }
+        }
+    }
+
+    // MARK: - Logging
+
+    private func logErrorChanged(isShowingError: Bool) {
+        if isShowingError {
+            os_log("%{public}@: error message set", log: log, type: .debug, String(describing: self))
+        } else {
+            os_log("%{public}@: error message cleared", log: log, type: .debug, String(describing: self))
+        }
+    }
+
+    private func logIssuesChanged(isHavingIssues: Bool) {
+        if isHavingIssues {
+            os_log("%{public}@: issues started", log: log, type: .debug, String(describing: self))
+        } else {
+            os_log("%{public}@: issues stopped", log: log, type: .debug, String(describing: self))
         }
     }
 }
