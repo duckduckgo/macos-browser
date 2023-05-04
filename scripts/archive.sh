@@ -337,7 +337,7 @@ main() {
 		create_dmg
 
 		if [[ ${nightly} ]]; then
-			asana_task_id=$(asana_create_subtask "$asana_task_id" "Nightly 2023-01-01")
+			$(asana_create_subtask "Nightly 2023-01-01")
 		fi
 
 		if [[ ${asana_task_id} ]]; then
