@@ -208,27 +208,6 @@ jobs:
           -H "Authorization: Bearer ${{ env.ASANA_ACCESS_TOKEN }}" \
           --form "file=@${dsym_zip_path};type=application/zip"
 
-    - name: Send Mattermost message
-      env:
-        WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-        ASANA_TASK_URL: ${{ env.asana-task-url }}
-        RELEASE_TYPE: ${{ env.release-type }}
-      run: |
-        export MM_USER_HANDLE=$(base64 -d <<< ${{ secrets.MM_HANDLES_BASE64 }} | jq ".${{ github.actor }}" | tr -d '"')
-
-        if [[ -z "${MM_USER_HANDLE}" ]]; then
-            echo "Mattermost user handle not known for ${{ github.actor }}, skipping sending message"
-        else
-
-            if [[ -n "${ASANA_TASK_URL}" ]]; then
-                export ASANA_LINK=" | [:asana: Asana task](${ASANA_TASK_URL})"
-            fi
-
-            curl -s -H 'Content-type: application/json' \
-                -d "$(envsubst < ./scripts/assets/release-mm-template.json)" \
-                ${{ secrets.MM_WEBHOOK_URL }}
-        fi
-
   create-dmg:
 
     name: Create DMG
@@ -272,7 +251,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: DuckDuckGo-${{ env.release-type }}-${{ env.app-version }}.dmg
-        path: ${{ github.workspace }}/release/duckduckgo*-${{ env.app-version }}.dmg
+        path: ${{ github.workspace }}/duckduckgo*-${{ env.app-version }}.dmg
 
     - name: Upload DMG to Asana
       if: env.asana-task-id
@@ -284,3 +263,37 @@ jobs:
         curl -s "https://app.asana.com/api/1.0/tasks/${{ env.asana-task-id }}/attachments" \
           -H "Authorization: Bearer ${{ env.ASANA_ACCESS_TOKEN }}" \
           --form "file=@${dmg_path};type=application/zip"
+
+  mattermost:
+
+    name: Send Mattermost message
+
+    needs: [export-notarized-app, create-dmg]
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Send Mattermost message
+        env:
+          ASANA_TASK_URL: ${{ github.event.inputs.asana-task-url || inputs.asana-task-url }}
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TYPE: ${{ github.event.inputs.release-type || inputs.release-type }}
+          WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          curl -fLSs $(gh api https://api.github.com/repos/${{ github.repository }}/contents/scripts/assets/release-mm-template.json?ref=${{ github.ref }} --jq .download_url) \
+              --output message-template.json
+
+          export MM_USER_HANDLE=$(base64 -d <<< ${{ secrets.MM_HANDLES_BASE64 }} | jq ".${{ github.actor }}" | tr -d '"')
+
+          if [[ -z "${MM_USER_HANDLE}" ]]; then
+              echo "Mattermost user handle not known for ${{ github.actor }}, skipping sending message"
+          else
+
+              if [[ -n "${ASANA_TASK_URL}" ]]; then
+                  export ASANA_LINK=" | [:asana: Asana task](${ASANA_TASK_URL})"
+              fi
+
+              curl -s -H 'Content-type: application/json' \
+                  -d "$(envsubst < message-template.json)" \
+                  ${{ secrets.MM_WEBHOOK_URL }}
+          fi
