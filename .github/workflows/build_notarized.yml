@@ -147,10 +147,6 @@ jobs:
       continue-on-error: true
       run: brew install xcbeautify
 
-    - name: Set Asana task URL
-      if: env.asana-task-url
-      run: echo "asana_task_url_arg=-a ${{ env.asana-task-url }}" >> $GITHUB_ENV
-
     - name: Select Xcode
       run: sudo xcode-select -s /Applications/Xcode_$(<.xcode-version).app/Contents/Developer
 
