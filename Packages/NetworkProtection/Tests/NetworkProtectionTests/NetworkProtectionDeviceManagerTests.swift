@@ -21,19 +21,39 @@ import XCTest
 @testable import NetworkProtection
 
 final class NetworkProtectionDeviceManagerTests: XCTestCase {
+    var tokenStore: NetworkProtectionTokenStoreMock!
+    var keyStore: NetworkProtectionKeyStoreMock!
+    var temporaryURL: URL!
+    var serverListStore: NetworkProtectionServerListFileSystemStore!
+
+    override func setUp() {
+        super.setUp()
+        tokenStore = NetworkProtectionTokenStoreMock()
+        tokenStore.token = "initialtoken"
+        keyStore = NetworkProtectionKeyStoreMock()
+        temporaryURL = temporaryFileURL()
+        serverListStore = NetworkProtectionServerListFileSystemStore(fileURL: temporaryURL, errorEvents: nil)
+    }
+
+    override func tearDown() {
+        tokenStore = nil
+        keyStore = nil
+        temporaryURL = nil
+        serverListStore = nil
+        super.tearDown()
+    }
 
     func testDeviceManager() async {
         let server = NetworkProtectionServer.mockRegisteredServer
-        let keyStore = NetworkProtectionKeyStoreMock()
-        let temporaryURL = temporaryFileURL()
-        let serverListStore = NetworkProtectionServerListFileSystemStore(fileURL: temporaryURL, errorEvents: nil)
         let networkClient = NetworkProtectionMockClient(
             getServersReturnValue: .success([server]),
-            registerServersReturnValue: .success([server])
+            registerServersReturnValue: .success([server]),
+            redeemReturnValue: .success("IamANauthTOKEN")
         )
 
         let manager = NetworkProtectionDeviceManager(
             networkClient: networkClient,
+            tokenStore: tokenStore,
             keyStore: keyStore,
             serverListStore: serverListStore,
             errorEvents: nil
@@ -60,16 +80,15 @@ final class NetworkProtectionDeviceManagerTests: XCTestCase {
     func testWhenGeneratingTunnelConfig_AndNoServersAreStored_ThenPrivateKeyIsCreated_AndRegisterEndpointIsCalled() async {
         let server = NetworkProtectionServer.mockBaseServer
         let registeredServer = NetworkProtectionServer.mockRegisteredServer
-        let keyStore = NetworkProtectionKeyStoreMock()
-        let temporaryURL = temporaryFileURL()
-        let serverListStore = NetworkProtectionServerListFileSystemStore(fileURL: temporaryURL, errorEvents: nil)
         let networkClient = NetworkProtectionMockClient(
             getServersReturnValue: .success([server]),
-            registerServersReturnValue: .success([registeredServer])
+            registerServersReturnValue: .success([registeredServer]),
+            redeemReturnValue: .success("IamANauthTOKEN")
         )
 
         let manager = NetworkProtectionDeviceManager(
             networkClient: networkClient,
+            tokenStore: tokenStore,
             keyStore: keyStore,
             serverListStore: serverListStore,
             errorEvents: nil
@@ -89,22 +108,21 @@ final class NetworkProtectionDeviceManagerTests: XCTestCase {
     }
 
     func testWhenGeneratingTunnelConfig_AndRegisteredServerIsFound_ThenRegisterEndpointIsNotCalled() async throws {
-        let keyStore = NetworkProtectionKeyStoreMock()
         let keyPair = keyStore.currentKeyPair()
 
         let server = NetworkProtectionServer.registeredServer(named: "Some Server", withPublicKey: keyPair.publicKey.base64Key)
 
-        let temporaryURL = temporaryFileURL()
-        let serverListStore = NetworkProtectionServerListFileSystemStore(fileURL: temporaryURL, errorEvents: nil)
         try serverListStore.store(serverList: [server])
 
         let networkClient = NetworkProtectionMockClient(
             getServersReturnValue: .success([server]),
-            registerServersReturnValue: .success([server])
+            registerServersReturnValue: .success([server]),
+            redeemReturnValue: .success("IamANauthTOKEN")
         )
 
         let manager = NetworkProtectionDeviceManager(
             networkClient: networkClient,
+            tokenStore: tokenStore,
             keyStore: keyStore,
             serverListStore: serverListStore,
             errorEvents: nil
@@ -123,18 +141,70 @@ final class NetworkProtectionDeviceManagerTests: XCTestCase {
         XCTAssertFalse(networkClient.registerCalled)
     }
 
-    func testGettingClosestServerUsingTimeZone() async throws {
+    func testWhenGeneratingTunnelConfig_storedAuthTokenIsInvalidOnGettingServers_deletesToken() async {
         let server = NetworkProtectionServer.mockRegisteredServer
         let keyStore = NetworkProtectionKeyStoreMock()
         let temporaryURL = temporaryFileURL()
         let serverListStore = NetworkProtectionServerListFileSystemStore(fileURL: temporaryURL, errorEvents: nil)
         let networkClient = NetworkProtectionMockClient(
-            getServersReturnValue: .success([]),
-            registerServersReturnValue: .success([server])
+            getServersReturnValue: .failure(.invalidAuthToken),
+            registerServersReturnValue: .success([server]),
+            redeemReturnValue: .success("IamANauthTOKEN")
         )
 
         let manager = NetworkProtectionDeviceManager(
             networkClient: networkClient,
+            tokenStore: tokenStore,
+            keyStore: keyStore,
+            serverListStore: serverListStore,
+            errorEvents: nil
+        )
+
+        XCTAssertNotNil(tokenStore.token)
+
+        _ = try? await manager.generateTunnelConfiguration(selectionMethod: .automatic)
+
+        XCTAssertNil(tokenStore.token)
+    }
+
+    func testWhenGeneratingTunnelConfig_storedAuthTokenIsInvalidOnRegisteringServer_deletesToken() async {
+        let server = NetworkProtectionServer.mockRegisteredServer
+        let keyStore = NetworkProtectionKeyStoreMock()
+        let temporaryURL = temporaryFileURL()
+        let serverListStore = NetworkProtectionServerListFileSystemStore(fileURL: temporaryURL, errorEvents: nil)
+        let networkClient = NetworkProtectionMockClient(
+            getServersReturnValue: .success([server]),
+            registerServersReturnValue: .failure(.invalidAuthToken),
+            redeemReturnValue: .success("IamANauthTOKEN")
+        )
+
+        let manager = NetworkProtectionDeviceManager(
+            networkClient: networkClient,
+            tokenStore: tokenStore,
+            keyStore: keyStore,
+            serverListStore: serverListStore,
+            errorEvents: nil
+        )
+
+        XCTAssertNotNil(tokenStore.token)
+
+        _ = try? await manager.generateTunnelConfiguration(selectionMethod: .automatic)
+
+        XCTAssertNil(tokenStore.token)
+    }
+
+    func testGettingClosestServerUsingTimeZone() async throws {
+        let server = NetworkProtectionServer.mockRegisteredServer
+        let serverListStore = NetworkProtectionServerListFileSystemStore(fileURL: temporaryURL, errorEvents: nil)
+        let networkClient = NetworkProtectionMockClient(
+            getServersReturnValue: .success([]),
+            registerServersReturnValue: .success([server]),
+            redeemReturnValue: .success("IamANauthTOKEN")
+        )
+
+        let manager = NetworkProtectionDeviceManager(
+            networkClient: networkClient,
+            tokenStore: tokenStore,
             keyStore: keyStore,
             serverListStore: serverListStore,
             errorEvents: nil
@@ -161,11 +231,13 @@ final class NetworkProtectionDeviceManagerTests: XCTestCase {
         let serverListStore = NetworkProtectionServerListFileSystemStore(fileURL: temporaryURL, errorEvents: nil)
         let networkClient = NetworkProtectionMockClient(
             getServersReturnValue: .success([]),
-            registerServersReturnValue: .success([server])
+            registerServersReturnValue: .success([server]),
+            redeemReturnValue: .success("IamANauthTOKEN")
         )
 
         let manager = NetworkProtectionDeviceManager(
             networkClient: networkClient,
+            tokenStore: tokenStore,
             keyStore: keyStore,
             serverListStore: serverListStore,
             errorEvents: nil

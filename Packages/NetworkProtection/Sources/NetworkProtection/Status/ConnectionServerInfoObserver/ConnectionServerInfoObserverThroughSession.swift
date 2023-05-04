@@ -61,7 +61,6 @@ public class ConnectionServerInfoObserverThroughSession: ConnectionServerInfoObs
         })
     }
 
-
     // MARK: - Handling Notifications
 
     private func handleDidWake(_ notification: Notification) {

@@ -19,7 +19,7 @@
 import Foundation
 import Network
 
-public enum AnyIPAddress: IPAddress, Hashable, CustomDebugStringConvertible {
+public enum AnyIPAddress: IPAddress, Hashable, CustomDebugStringConvertible, @unchecked Sendable {
     /// A host specified as an IPv4 address
     case ipv4(IPv4Address)
 

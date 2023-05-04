@@ -58,6 +58,8 @@ final class DefaultNetworkProtectionProvider: NetworkProtection.TunnelController
     ///
     private let notificationCenter: NotificationCenter
 
+    private let tokenStore: NetworkProtectionTokenStore
+
     /// The observer token for VPN configuration changes,
     ///
     private var configChangeObserverToken: NSObjectProtocol?
@@ -116,7 +118,9 @@ final class DefaultNetworkProtectionProvider: NetworkProtection.TunnelController
     // MARK: - Initialization & Deinitialization
 
     convenience init() {
+        let tokenStore = NetworkProtectionKeychainTokenStore()
         self.init(notificationCenter: .default,
+                  tokenStore: tokenStore,
                   logger: DefaultNetworkProtectionLogger())
     }
 
@@ -127,10 +131,12 @@ final class DefaultNetworkProtectionProvider: NetworkProtection.TunnelController
     ///         - logger: (meant for testing) the logger that this object will use.
     ///
     init(notificationCenter: NotificationCenter,
+         tokenStore: NetworkProtectionTokenStore,
          logger: NetworkProtectionLogger) {
 
         self.logger = logger
         self.notificationCenter = notificationCenter
+        self.tokenStore = tokenStore
 
         startObservingNotifications()
 
@@ -241,7 +247,7 @@ final class DefaultNetworkProtectionProvider: NetworkProtection.TunnelController
         protocolConfiguration.serverAddress = "127.0.0.1" // Dummy address... the NetP service will take care of grabbing a real server
         protocolConfiguration.providerBundleIdentifier = NetworkProtectionBundle.extensionBundle().bundleIdentifier
         protocolConfiguration.providerConfiguration = [
-            NetworkProtectionOptionKey.defaultPixelHeaders.rawValue: APIHeaders().defaultHeaders,
+            NetworkProtectionOptionKey.defaultPixelHeaders.rawValue: APIHeaders().defaultHeaders
         ]
         tunnelManager.protocolConfiguration = protocolConfiguration
     }
@@ -384,6 +390,10 @@ final class DefaultNetworkProtectionProvider: NetworkProtection.TunnelController
         var options = [String: NSObject]()
 
         options["activationAttemptId"] = UUID().uuidString as NSString
+
+        if let authToken = tokenStore.fetchToken() {
+            options["authToken"] = authToken as NSString
+        }
 
         if let selectedServerName = Self.selectedServerName() {
             options["selectedServer"] = selectedServerName as NSString

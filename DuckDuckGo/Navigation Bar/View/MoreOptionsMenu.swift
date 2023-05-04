@@ -22,6 +22,7 @@ import BrowserServicesKit
 import NetworkProtectionUI
 import SwiftUI
 import WebKit
+import NetworkProtection
 
 protocol OptionsButtonMenuDelegate: AnyObject {
 
@@ -45,6 +46,7 @@ final class MoreOptionsMenu: NSMenu {
     private let tabCollectionViewModel: TabCollectionViewModel
     private let emailManager: EmailManager
     private let passwordManagerCoordinator: PasswordManagerCoordinating
+    private let networkProtectionFeatureVisibility: NetworkProtectionFeatureVisibility
 
     required init(coder: NSCoder) {
         fatalError("MoreOptionsMenu: Bad initializer")
@@ -52,11 +54,13 @@ final class MoreOptionsMenu: NSMenu {
 
     init(tabCollectionViewModel: TabCollectionViewModel,
          emailManager: EmailManager = EmailManager(),
-         passwordManagerCoordinator: PasswordManagerCoordinator) {
+         passwordManagerCoordinator: PasswordManagerCoordinator,
+         networkProtectionFeatureVisibility: NetworkProtectionFeatureVisibility = NetworkProtectionKeychainTokenStore()) {
 
         self.tabCollectionViewModel = tabCollectionViewModel
         self.emailManager = emailManager
         self.passwordManagerCoordinator = passwordManagerCoordinator
+        self.networkProtectionFeatureVisibility =  networkProtectionFeatureVisibility
 
         super.init(title: "")
 
@@ -92,10 +96,11 @@ final class MoreOptionsMenu: NSMenu {
             .withImage(NSImage(named: "OptionsButtonMenuEmail"))
             .withSubmenu(EmailOptionsButtonSubMenu(tabCollectionViewModel: tabCollectionViewModel, emailManager: emailManager))
 
-        // TODO: Add feature flag/invite code check
-        addItem(withTitle: UserText.networkProtection, action: #selector(showNetworkProtectionStatus(_:)), keyEquivalent: "")
-            .targetting(self)
-            .withImage(.image(for: .vpnIcon))
+        if networkProtectionFeatureVisibility.isFeatureActivated {
+            addItem(withTitle: UserText.networkProtection, action: #selector(showNetworkProtectionStatus(_:)), keyEquivalent: "")
+                .targetting(self)
+                .withImage(.image(for: .vpnIcon))
+        }
 
         addItem(NSMenuItem.separator())
 

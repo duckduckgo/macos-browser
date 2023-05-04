@@ -22,6 +22,15 @@ import XCTest
 @testable import NetworkProtection
 
 final class NetworkProtectionMockClient: NetworkProtectionClient {
+
+    var redeemReturnValue: Result<String, NetworkProtection.NetworkProtectionClientError>
+    var redeemCalled = false
+
+    func redeem(inviteCode: String) async -> Result<String, NetworkProtection.NetworkProtectionClientError> {
+        redeemCalled = true
+        return redeemReturnValue
+    }
+
     var getServersReturnValue: Result<[NetworkProtectionServer], NetworkProtectionClientError>
     var registerServersReturnValue: Result<[NetworkProtectionServer], NetworkProtectionClientError>
 
@@ -29,17 +38,20 @@ final class NetworkProtectionMockClient: NetworkProtectionClient {
     var registerCalled = false
 
     internal init(getServersReturnValue: Result<[NetworkProtectionServer], NetworkProtectionClientError>,
-                  registerServersReturnValue: Result<[NetworkProtectionServer], NetworkProtectionClientError>) {
+                  registerServersReturnValue: Result<[NetworkProtectionServer], NetworkProtectionClientError>,
+                  redeemReturnValue: Result<String, NetworkProtection.NetworkProtectionClientError>) {
         self.getServersReturnValue = getServersReturnValue
         self.registerServersReturnValue = registerServersReturnValue
+        self.redeemReturnValue = redeemReturnValue
     }
 
-    func getServers() async -> Result<[NetworkProtectionServer], NetworkProtectionClientError> {
+    func getServers(authToken: String) async -> Result<[NetworkProtectionServer], NetworkProtectionClientError> {
         getServersCalled = true
         return getServersReturnValue
     }
 
-    func register(publicKey: PublicKey,
+    func register(authToken: String,
+                  publicKey: PublicKey,
                   withServer: NetworkProtectionServerInfo) async -> Result<[NetworkProtectionServer], NetworkProtectionClientError> {
         registerCalled = true
         return registerServersReturnValue

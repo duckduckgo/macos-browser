@@ -18,7 +18,6 @@
 
 import Foundation
 
-
 final class UserText {
     static let networkProtectionStatusViewFeatureDesc = NSLocalizedString("network.protection.status.view.feature.description", value: "Hide your location from websites and conceal your online activity from Internet providers and others on your network.", comment: "Feature description shown in NetworkProtection's status view.")
     static let networkProtectionStatusViewConnDetails = NSLocalizedString("network.protection.status.view.connection.details", value: "Connection Details", comment: "Connection details label shown in NetworkProtection's status view.")

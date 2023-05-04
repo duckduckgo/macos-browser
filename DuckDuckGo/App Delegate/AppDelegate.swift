@@ -200,18 +200,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     /// Fetches a new list of Network Protection servers, and updates the existing set.
     private func refreshNetworkProtectionServers() {
         Task {
-            let client = NetworkProtectionBackendClient()
-            let serversResponse = await client.getServers()
-
-            guard let servers = try? serversResponse.get() else {
+            let serverCount: Int
+            do {
+                serverCount = try await NetworkProtectionDeviceManager.create().refreshServerList().count
+            } catch {
                 os_log("Failed to update Network Protection servers", log: .networkProtection, type: .error)
                 return
             }
 
-            let store = NetworkProtectionServerListFileSystemStore(errorEvents: nil)
-            try store.store(serverList: servers)
-
-            os_log("Successfully updated Network Protection servers; total server count = %{public}d", log: .networkProtection, servers.count)
+            os_log("Successfully updated Network Protection servers; total server count = %{public}d", log: .networkProtection, serverCount)
         }
     }
 

@@ -40,7 +40,7 @@ let package = Package(
             ],
             resources: [
                 .copy("Resources/servers-original-endpoint.json"),
-                .copy("Resources/servers-updated-endpoint.json"),
+                .copy("Resources/servers-updated-endpoint.json")
             ]
         )
     ],

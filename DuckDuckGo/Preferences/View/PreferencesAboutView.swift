@@ -49,7 +49,10 @@ extension Preferences {
                             Text(UserText.duckDuckGo).font(.companyName)
 #endif
                             Text(UserText.privacySimplified).font(.privacySimplified)
-                            Text(UserText.versionLabel(version: model.appVersion.versionNumber, build: model.appVersion.buildNumber))
+
+                            Text(UserText.versionLabel(version: model.appVersion.versionNumber, build: model.appVersion.buildNumber)).onTapGesture(count: 7) {
+                                model.displayNetPInvite()
+                            }
                         }
                     }
                     .padding(.bottom, 8)

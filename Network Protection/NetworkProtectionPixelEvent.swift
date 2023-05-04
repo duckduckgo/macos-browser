@@ -81,11 +81,16 @@ enum NetworkProtectionPixelEvent {
     case networkProtectionTunnelConfigurationCouldNotGetPeerHostName
     case networkProtectionTunnelConfigurationCouldNotGetInterfaceAddressRange
 
-    case networkProtectionClientFailedToFetchServerList(error: Error)
+    case networkProtectionClientFailedToFetchServerList(error: Error?)
     case networkProtectionClientFailedToParseServerListResponse
     case networkProtectionClientFailedToEncodeRegisterKeyRequest
-    case networkProtectionClientFailedToFetchRegisteredServers(error: Error)
+    case networkProtectionClientFailedToFetchRegisteredServers(error: Error?)
     case networkProtectionClientFailedToParseRegisteredServersResponse
+    case networkProtectionClientFailedToEncodeRedeemRequest
+    case networkProtectionClientInvalidInviteCode
+    case networkProtectionClientFailedToRedeemInviteCode(error: Error?)
+    case networkProtectionClientFailedToParseRedeemResponse(error: Error)
+    case networkProtectionClientInvalidAuthToken
 
     case networkProtectionServerListStoreFailedToEncodeServerList
     case networkProtectionServerListStoreFailedToDecodeServerList
@@ -96,6 +101,8 @@ enum NetworkProtectionPixelEvent {
     case networkProtectionKeychainReadError(field: String, status: Int32)
     case networkProtectionKeychainWriteError(field: String, status: Int32)
     case networkProtectionKeychainDeleteError(status: Int32)
+
+    case networkProtectionNoAuthTokenFoundError
 
     case networkProtectionRekeyCompleted
 
@@ -138,6 +145,21 @@ enum NetworkProtectionPixelEvent {
         case .networkProtectionClientFailedToParseRegisteredServersResponse:
             return "m_mac_netp_backend_api_error_parsing_device_registration_response_failed"
 
+        case .networkProtectionClientFailedToEncodeRedeemRequest:
+            return "m_mac_netp_backend_api_error_encoding_redeem_request_body_failed"
+
+        case .networkProtectionClientInvalidInviteCode:
+            return "m_mac_netp_backend_api_error_invalid_invite_code"
+
+        case .networkProtectionClientFailedToRedeemInviteCode:
+            return "m_mac_netp_backend_api_error_failed_to_redeem_invite_code"
+
+        case .networkProtectionClientFailedToParseRedeemResponse:
+            return "m_mac_netp_backend_api_error_parsing_redeem_response_failed"
+
+        case .networkProtectionClientInvalidAuthToken:
+            return "m_mac_netp_backend_api_error_invalid_auth_token"
+
         case .networkProtectionServerListStoreFailedToEncodeServerList:
             return "m_mac_netp_storage_error_failed_to_encode_server_list"
 
@@ -161,6 +183,9 @@ enum NetworkProtectionPixelEvent {
 
         case .networkProtectionKeychainDeleteError:
             return "m_mac_netp_keychain_error_delete_failed"
+
+        case .networkProtectionNoAuthTokenFoundError:
+            return "m_mac_netp_no_auth_token_found_error"
 
         case .networkProtectionRekeyCompleted:
             return "m_mac_netp_rekey_completed"
@@ -201,10 +226,13 @@ enum NetworkProtectionPixelEvent {
             return error.pixelParameters
 
         case .networkProtectionClientFailedToFetchServerList(let error):
-            return error.pixelParameters
+            return error?.pixelParameters
 
         case .networkProtectionClientFailedToFetchRegisteredServers(let error):
-            return error.pixelParameters
+            return error?.pixelParameters
+
+        case .networkProtectionClientFailedToRedeemInviteCode(error: let error):
+            return error?.pixelParameters
 
         case .networkProtectionUnhandledError(let function, let line, let error):
             var parameters = error.pixelParameters
@@ -227,8 +255,13 @@ enum NetworkProtectionPixelEvent {
              .networkProtectionClientFailedToParseServerListResponse,
              .networkProtectionClientFailedToEncodeRegisterKeyRequest,
              .networkProtectionClientFailedToParseRegisteredServersResponse,
+             .networkProtectionClientFailedToParseRedeemResponse,
+             .networkProtectionClientInvalidInviteCode,
+             .networkProtectionClientFailedToEncodeRedeemRequest,
+             .networkProtectionClientInvalidAuthToken,
              .networkProtectionServerListStoreFailedToEncodeServerList,
              .networkProtectionServerListStoreFailedToDecodeServerList,
+             .networkProtectionNoAuthTokenFoundError,
              .networkProtectionRekeyCompleted,
              .networkProtectionActiveUser:
 

@@ -24,9 +24,9 @@ import Network
 /// The server may have an array of hostnames, IPs, or both.
 ///
 /// - Note: The server name is used to register a public key with a given server before connecting to it.
-public struct NetworkProtectionServerInfo: Codable, Equatable {
+public struct NetworkProtectionServerInfo: Codable, Equatable, Sendable {
 
-    public struct ServerAttributes: Codable, Equatable {
+    public struct ServerAttributes: Codable, Equatable, Sendable {
         public let city: String
         public let country: String
         public let timezoneOffset: Int

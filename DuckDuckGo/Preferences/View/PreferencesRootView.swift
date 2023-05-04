@@ -55,7 +55,8 @@ extension Preferences {
                             case .privatePlayer:
                                 PrivatePlayerView(model: .shared)
                             case .about:
-                                AboutView(model: .init())
+                                let netPInvitePresenter = NetworkProtectionInvitePresenter()
+                                AboutView(model: AboutModel(netPInvitePresenter: netPInvitePresenter))
                             }
                         }
                         .frame(maxWidth: Const.paneContentWidth, maxHeight: .infinity, alignment: .topLeading)

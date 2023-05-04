@@ -46,11 +46,16 @@ public enum NetworkProtectionError: LocalizedError {
     case couldNotGetInterfaceAddressRange
 
     // Client errors
-    case failedToFetchServerList(Error)
+    case failedToFetchServerList(Error?)
     case failedToParseServerListResponse(Error)
     case failedToEncodeRegisterKeyRequest
-    case failedToFetchRegisteredServers(Error)
+    case failedToFetchRegisteredServers(Error?)
     case failedToParseRegisteredServersResponse(Error)
+    case failedToEncodeRedeemRequest
+    case invalidInviteCode
+    case failedToRedeemInviteCode(Error?)
+    case failedToParseRedeemResponse(Error)
+    case invalidAuthToken
 
     // Server list store errors
     case failedToEncodeServerList(Error)
@@ -66,6 +71,9 @@ public enum NetworkProtectionError: LocalizedError {
     case keychainReadError(field: String, status: Int32)
     case keychainWriteError(field: String, status: Int32)
     case keychainDeleteError(status: Int32)
+
+    // Auth errors
+    case noAuthTokenFound
 
     // Unhandled error
     case unhandledError(function: String, line: Int, error: Error)
@@ -87,16 +95,19 @@ public enum NetworkProtectionError: LocalizedError {
 
 public actor NetworkProtectionDeviceManager: NetworkProtectionDeviceManagement {
     private let networkClient: NetworkProtectionClient
+    private let tokenStore: NetworkProtectionTokenStore
     private let keyStore: NetworkProtectionKeyStore
     private let serverListStore: NetworkProtectionServerListStore
 
     private let errorEvents: EventMapping<NetworkProtectionError>?
 
     public init(networkClient: NetworkProtectionClient = NetworkProtectionBackendClient(),
+                tokenStore: NetworkProtectionTokenStore,
                 keyStore: NetworkProtectionKeyStore,
                 serverListStore: NetworkProtectionServerListStore? = nil,
                 errorEvents: EventMapping<NetworkProtectionError>?) {
         self.networkClient = networkClient
+        self.tokenStore = tokenStore
         self.keyStore = keyStore
         self.serverListStore = serverListStore ?? NetworkProtectionServerListFileSystemStore(errorEvents: errorEvents)
         self.errorEvents = errorEvents
@@ -105,15 +116,18 @@ public actor NetworkProtectionDeviceManager: NetworkProtectionDeviceManagement {
     /// Requests a new server list from the backend and updates it locally.
     /// This method will return the remote server list if available, or the local server list if there was a problem with the service call.
     ///
-    private func serverList() async throws -> [NetworkProtectionServer] {
-        let servers = await networkClient.getServers()
+    public func refreshServerList() async throws -> [NetworkProtectionServer] {
+        guard let token = tokenStore.fetchToken() else {
+            throw NetworkProtectionError.noAuthTokenFound
+        }
+        let servers = await networkClient.getServers(authToken: token)
         let completeServerList: [NetworkProtectionServer]
 
         switch servers {
         case .success(let serverList):
             completeServerList = serverList
         case .failure(let failure):
-            errorEvents?.fire(failure.networkProtectionError)
+            handle(clientError: failure)
             return try serverListStore.storedNetworkProtectionServerList()
         }
 
@@ -143,7 +157,7 @@ public actor NetworkProtectionDeviceManager: NetworkProtectionDeviceManagement {
         let servers: [NetworkProtectionServer]
 
         do {
-            servers = try await serverList()
+            servers = try await refreshServerList()
         } catch let error as NetworkProtectionServerListStoreError {
             errorEvents?.fire(error.networkProtectionError)
             throw error
@@ -171,7 +185,10 @@ public actor NetworkProtectionDeviceManager: NetworkProtectionDeviceManagement {
         var keyPair = keyStore.currentKeyPair()
 
         if !selectedServer.isRegistered(with: keyPair.publicKey) {
-            let registeredServersResult = await networkClient.register(publicKey: keyPair.publicKey, withServer: selectedServer.serverInfo)
+            guard let token = tokenStore.fetchToken() else {
+                throw NetworkProtectionError.noAuthTokenFound
+            }
+            let registeredServersResult = await networkClient.register(authToken: token, publicKey: keyPair.publicKey, withServer: selectedServer.serverInfo)
 
             let registeredServers: [NetworkProtectionServer]
 
@@ -199,7 +216,7 @@ public actor NetworkProtectionDeviceManager: NetworkProtectionDeviceManagement {
                     }
                 }
             case .failure(let error):
-                errorEvents?.fire(error.networkProtectionError)
+                handle(clientError: error)
                 throw error
             }
 
@@ -308,5 +325,12 @@ public actor NetworkProtectionDeviceManager: NetworkProtectionDeviceManagement {
         interface.addresses = [addressRange]
 
         return interface
+    }
+
+    private func handle(clientError: NetworkProtectionClientError) {
+        if case .invalidAuthToken = clientError {
+            tokenStore.deleteToken()
+        }
+        errorEvents?.fire(clientError.networkProtectionError)
     }
 }

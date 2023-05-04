@@ -20,6 +20,11 @@ import SwiftUI
 
 final class AboutModel: ObservableObject {
     let appVersion = AppVersion()
+    private let netPInvitePresenter: NetworkProtectionInvitePresenting
+
+    init(netPInvitePresenter: NetworkProtectionInvitePresenting) {
+        self.netPInvitePresenter = netPInvitePresenter
+    }
 
     let displayableAboutURL: String = URL.aboutDuckDuckGo
         .toString(decodePunycode: false, dropScheme: true, needsWWW: false, dropTrailingSlash: false)
@@ -30,5 +35,9 @@ final class AboutModel: ObservableObject {
 
     func openFeedbackForm() {
         FeedbackPresenter.presentFeedbackForm()
+    }
+
+    func displayNetPInvite() {
+        netPInvitePresenter.present()
     }
 }

@@ -61,7 +61,6 @@ public class ConnectionErrorObserverThroughSession: ConnectionErrorObserver {
         })
     }
 
-
     // MARK: - Handling Notifications
 
     private func handleDidWake(_ notification: Notification) {

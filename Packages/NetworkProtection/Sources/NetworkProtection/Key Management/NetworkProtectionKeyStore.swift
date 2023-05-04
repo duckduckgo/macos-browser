@@ -46,48 +46,31 @@ public protocol NetworkProtectionKeyStore {
     func resetCurrentKeyPair()
 }
 
-enum NetworkProtectionKeychainStoreError: Error, NetworkProtectionErrorConvertible {
-    case failedToCastKeychainValueToData(field: String)
-    case keychainReadError(field: String, status: Int32)
-    case keychainWriteError(field: String, status: Int32)
-    case keychainDeleteError(status: Int32)
-
-    var networkProtectionError: NetworkProtectionError {
-        switch self {
-        case .failedToCastKeychainValueToData(let field): return .failedToCastKeychainValueToData(field: field)
-        case .keychainReadError(let field, let status): return .keychainReadError(field: field, status: status)
-        case .keychainWriteError(let field, let status): return .keychainWriteError(field: field, status: status)
-        case .keychainDeleteError(let status): return .keychainDeleteError(status: status)
-        }
-    }
-}
-
 /// Generates and stores instances of a PrivateKey on behalf of the user. This key is used to derive a PublicKey which is then used for registration with the Network Protection backend servers.
 /// The key is reused between servers (that is, each user currently gets a single key), though this will change in the future to periodically refresh the key.
-public class NetworkProtectionKeychainStore: NetworkProtectionKeyStore {
+public final class NetworkProtectionKeychainKeyStore: NetworkProtectionKeyStore {
+    private let keychainStore: NetworkProtectionKeychainStore
+    private let userDefaults: UserDefaults
+    private let errorEvents: EventMapping<NetworkProtectionError>?
 
-    struct Defaults {
+    private struct Defaults {
         static let serviceName = "DuckDuckGo Network Protection Private Key"
         static let validityInterval = TimeInterval.day
     }
 
-    enum UserDefaultKeys {
+    private enum UserDefaultKeys {
         static let expirationDate = "com.duckduckgo.network-protection.KeyPair.UserDefaultKeys.expirationDate"
         static let currentPublicKey = "com.duckduckgo.network-protection.NetworkProtectionKeychainStore.UserDefaultKeys.currentPublicKeyBase64"
     }
-
-    private let serviceName: String
-    private let useSystemKeychain: Bool
-    private let userDefaults: UserDefaults
-    private let errorEvents: EventMapping<NetworkProtectionError>?
 
     public init(serviceName: String? = nil,
                 useSystemKeychain: Bool,
                 userDefaults: UserDefaults = .standard,
                 errorEvents: EventMapping<NetworkProtectionError>?) {
 
-        self.serviceName = serviceName ?? Defaults.serviceName
-        self.useSystemKeychain = useSystemKeychain
+        let keychainServiceName = serviceName ?? Defaults.serviceName
+        keychainStore = NetworkProtectionKeychainStore(serviceName: keychainServiceName,
+                                                       useSystemKeychain: useSystemKeychain)
         self.userDefaults = userDefaults
         self.errorEvents = errorEvents
     }
@@ -131,11 +114,11 @@ public class NetworkProtectionKeychainStore: NetworkProtectionKeyStore {
     private var validityInterval = Defaults.validityInterval
 
     public func setValidityInterval(_ validityInterval: TimeInterval?) {
-        #if DEBUG
+#if DEBUG
         self.validityInterval = validityInterval ?? Defaults.validityInterval
-        #else
+#else
         // No-op
-        #endif
+#endif
     }
 
     private func newCurrentKeyPair() -> KeyPair {
@@ -157,7 +140,7 @@ public class NetworkProtectionKeychainStore: NetworkProtectionKeyStore {
         do {
             /// Besides resetting the current keyPair we'll remove all keychain entries associated with our service, since only one keychain entry
             /// should exist at once.
-            try deleteAllPrivateKeys()
+            try keychainStore.deleteAll()
 
             self.currentPublicKey = nil
             self.currentExpirationDate = nil
@@ -165,67 +148,6 @@ public class NetworkProtectionKeychainStore: NetworkProtectionKeyStore {
             handle(error)
             // Intentionally not re-throwing
         }
-    }
-
-    // MARK: - Keychain Interaction
-
-    private func readData(named name: String) throws -> Data? {
-        var query = defaultAttributes()
-        query[kSecAttrAccount as String] = name
-        query[kSecReturnData as String] = true
-
-        var item: CFTypeRef?
-
-        let status = SecItemCopyMatching(query as CFDictionary, &item)
-        switch status {
-        case errSecSuccess:
-            guard let data = item as? Data else {
-                throw NetworkProtectionKeychainStoreError.failedToCastKeychainValueToData(field: name)
-            }
-
-            return data
-        case errSecItemNotFound:
-            return nil
-        default:
-            os_log("🔵 SecItemCopyMatching status %{public}@", type: .error, String(describing: status))
-            throw NetworkProtectionKeychainStoreError.keychainReadError(field: name, status: status)
-        }
-    }
-
-    private func writeData(_ data: Data, named name: String) throws {
-        var query = defaultAttributes()
-        query[kSecAttrAccount as String] = name
-        query[kSecAttrService as String] = serviceName
-        query[kSecAttrAccessible as String] = kSecAttrAccessibleAfterFirstUnlock
-        query[kSecValueData as String] = data
-
-        let status = SecItemAdd(query as CFDictionary, nil)
-
-        guard status == errSecSuccess else {
-            throw NetworkProtectionKeychainStoreError.keychainWriteError(field: name, status: status)
-        }
-    }
-
-    private func deleteAllPrivateKeys() throws {
-        var query = defaultAttributes()
-        query[kSecAttrService as String] = serviceName
-        query[kSecMatchLimit as String] = kSecMatchLimitAll
-
-        let status = SecItemDelete(query as CFDictionary)
-        switch status {
-        case errSecItemNotFound, errSecSuccess:
-            break
-        default:
-            throw NetworkProtectionKeychainStoreError.keychainDeleteError(status: status)
-        }
-    }
-
-    private func defaultAttributes() -> [String: Any] {
-        return [
-            kSecClass: kSecClassGenericPassword,
-            kSecUseDataProtectionKeychain: !useSystemKeychain,
-            kSecAttrSynchronizable: false
-        ] as [String: Any]
     }
 
     // MARK: - UserDefaults
@@ -265,7 +187,7 @@ public class NetworkProtectionKeychainStore: NetworkProtectionKeyStore {
             }
 
             do {
-                guard let data = try readData(named: currentPublicKey) else {
+                guard let data = try keychainStore.readData(named: currentPublicKey) else {
                     return nil
                 }
 
@@ -280,7 +202,7 @@ public class NetworkProtectionKeychainStore: NetworkProtectionKeyStore {
 
         set {
             do {
-                try deleteAllPrivateKeys()
+                try keychainStore.deleteAll()
             } catch {
                 handle(error)
                 // Intentionally not re-throwing
@@ -292,7 +214,7 @@ public class NetworkProtectionKeychainStore: NetworkProtectionKeyStore {
 
             do {
                 currentPublicKey = newValue.publicKey.base64Key
-                try writeData(newValue.rawValue, named: newValue.publicKey.base64Key)
+                try keychainStore.writeData(newValue.rawValue, named: newValue.publicKey.base64Key)
             } catch {
                 handle(error)
                 // Intentionally not re-throwing

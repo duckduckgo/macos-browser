@@ -21,7 +21,7 @@ import Foundation
 
 /// Represents a server returned by the backend. This value can be used to present to the user and allow them to select which server to register with.
 /// This type also tracks whether a given server has been registered with, and the timestamp at which this was most recently done.
-public struct NetworkProtectionServer: Codable, Equatable {
+public struct NetworkProtectionServer: Codable, Equatable, Sendable {
 
     // MARK: - Computed Properties
 
@@ -45,7 +45,7 @@ public struct NetworkProtectionServer: Codable, Equatable {
     public let allowedIPs: [String]?
 
     /// The last date at which registration took place. This may be used to determine whether a key needs to be refreshed.
-    public var registrationDate = Date()
+    public let registrationDate = Date()
     public let expirationDate: Date?
 
     public let serverInfo: NetworkProtectionServerInfo

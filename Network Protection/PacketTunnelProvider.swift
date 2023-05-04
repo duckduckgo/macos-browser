@@ -146,8 +146,11 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
 
     // MARK: - Registration Key
 
-    private lazy var keyStore = NetworkProtectionKeychainStore(useSystemKeychain: NetworkProtectionBundle.usesSystemKeychain(),
-                                                               errorEvents: networkProtectionDebugEvents)
+    private lazy var keyStore = NetworkProtectionKeychainKeyStore(useSystemKeychain: NetworkProtectionBundle.usesSystemKeychain(),
+                                                                  errorEvents: networkProtectionDebugEvents)
+
+    private lazy var tokenStore = NetworkProtectionKeychainTokenStore(useSystemKeychain: NetworkProtectionBundle.usesSystemKeychain(),
+                                                                      errorEvents: networkProtectionDebugEvents)
 
     /// This is for overriding the defaults.  A `nil` value means NetP will just use the defaults.
     ///
@@ -376,6 +379,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         loadVendorOptions(from: options)
         loadKeyValidity(from: options)
         loadSelectedServer(from: options)
+        loadAuthToken(from: options)
     }
 
     private func loadVendorOptions(from options: [String: AnyObject]) {
@@ -414,6 +418,14 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         }
 
         selectedServerStore.selectedServer = .endpoint(serverName)
+    }
+
+    private func loadAuthToken(from options: [String: AnyObject]) {
+        guard let authToken = options["authToken"] as? String else {
+            return
+        }
+
+        tokenStore.store(authToken)
     }
 
     override func startTunnel(options: [String: NSObject]?, completionHandler: @escaping (Error?) -> Void) {
@@ -591,7 +603,8 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         let configurationResult: (TunnelConfiguration, NetworkProtectionServerInfo)
 
         do {
-            let deviceManager = NetworkProtectionDeviceManager(keyStore: keyStore,
+            let deviceManager = NetworkProtectionDeviceManager(tokenStore: tokenStore,
+                                                               keyStore: keyStore,
                                                                errorEvents: networkProtectionDebugEvents)
 
             configurationResult = try await deviceManager.generateTunnelConfiguration(selectionMethod: serverSelectionMethod)
@@ -877,11 +890,21 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
             domainEvent = .networkProtectionClientFailedToFetchRegisteredServers(error: eventError)
         case .failedToParseRegisteredServersResponse:
             domainEvent = .networkProtectionClientFailedToParseRegisteredServersResponse
+        case .failedToEncodeRedeemRequest:
+            domainEvent = .networkProtectionClientFailedToEncodeRedeemRequest
+        case .invalidInviteCode:
+            domainEvent = .networkProtectionClientInvalidInviteCode
+        case .failedToRedeemInviteCode(let error):
+            domainEvent = .networkProtectionClientFailedToRedeemInviteCode(error: error)
+        case .failedToParseRedeemResponse(let error):
+            domainEvent = .networkProtectionClientFailedToParseRedeemResponse(error: error)
+        case .invalidAuthToken:
+            domainEvent = .networkProtectionClientInvalidAuthToken
         case .serverListInconsistency:
             // - TODO: not sure what to do here
             return
 
-        // NetworkProtectionServerListStoreError
+            // NetworkProtectionServerListStoreError
 
         case .failedToEncodeServerList:
             domainEvent = .networkProtectionServerListStoreFailedToEncodeServerList
@@ -906,11 +929,15 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         case .keychainDeleteError(let status):
             domainEvent = .networkProtectionKeychainDeleteError(status: status)
 
+        case .noAuthTokenFound:
+            domainEvent = .networkProtectionNoAuthTokenFoundError
+
         case .unhandledError(function: let function, line: let line, error: let error):
             domainEvent = .networkProtectionUnhandledError(function: function, line: line, error: error)
         }
 
         Pixel.fire(domainEvent, frequency: .dailyAndContinuous, includeAppVersionParameter: true)
+
     }
 }
 
