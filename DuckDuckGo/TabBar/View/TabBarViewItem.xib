@@ -32,9 +32,6 @@
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <customView translatesAutoresizingMaskIntoConstraints="NO" id="JSR-ZU-kmP" customClass="WindowDraggingView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                    <rect key="frame" x="0.0" y="1" width="300" height="32"/>
-                </customView>
                 <customView translatesAutoresizingMaskIntoConstraints="NO" id="A6g-eG-dOW">
                     <rect key="frame" x="8" y="5" width="24" height="24"/>
                     <subviews>
@@ -127,23 +124,19 @@
                 <constraint firstItem="DFD-8r-YGx" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" constant="32" id="4P8-mH-XGb"/>
                 <constraint firstItem="XdB-Qn-iD9" firstAttribute="centerY" secondItem="Hz6-mo-xeY" secondAttribute="centerY" id="6wl-2B-Woa"/>
                 <constraint firstAttribute="trailing" secondItem="XdB-Qn-iD9" secondAttribute="trailing" priority="900" constant="8" id="BAO-r4-OkC"/>
-                <constraint firstItem="JSR-ZU-kmP" firstAttribute="trailing" secondItem="jlg-2n-tzm" secondAttribute="trailing" id="Bez-SZ-Yg4"/>
                 <constraint firstItem="jlg-2n-tzm" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" id="DOd-Y3-APh"/>
                 <constraint firstItem="vuD-rY-Vzl" firstAttribute="centerX" secondItem="A6g-eG-dOW" secondAttribute="centerX" priority="300" id="Eoq-S2-Ah7"/>
                 <constraint firstItem="jlg-2n-tzm" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" id="IAM-jm-SbM"/>
                 <constraint firstItem="opQ-Od-dCO" firstAttribute="centerY" secondItem="Hz6-mo-xeY" secondAttribute="centerY" id="J32-aM-9m2"/>
-                <constraint firstItem="JSR-ZU-kmP" firstAttribute="top" secondItem="jlg-2n-tzm" secondAttribute="top" id="KQT-6o-Qm8"/>
                 <constraint firstAttribute="trailing" secondItem="DFD-8r-YGx" secondAttribute="trailing" constant="8" id="L7J-mr-jLh"/>
                 <constraint firstAttribute="bottom" secondItem="890-3t-v5O" secondAttribute="bottom" id="N7I-JC-tT1"/>
                 <constraint firstItem="A6g-eG-dOW" firstAttribute="centerX" secondItem="Hz6-mo-xeY" secondAttribute="centerX" priority="250" id="PF1-mZ-U4m"/>
                 <constraint firstAttribute="bottom" secondItem="vuD-rY-Vzl" secondAttribute="bottom" constant="8" id="Pgs-Ex-Cp9"/>
-                <constraint firstItem="JSR-ZU-kmP" firstAttribute="leading" secondItem="jlg-2n-tzm" secondAttribute="leading" id="Sop-c3-Re6"/>
                 <constraint firstItem="A6g-eG-dOW" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" constant="8" id="TSx-41-S2A"/>
                 <constraint firstAttribute="trailing" secondItem="opQ-Od-dCO" secondAttribute="trailing" id="WPC-fb-K22"/>
                 <constraint firstItem="A6g-eG-dOW" firstAttribute="centerY" secondItem="Hz6-mo-xeY" secondAttribute="centerY" id="aQg-CK-diJ"/>
                 <constraint firstItem="890-3t-v5O" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" id="giH-0s-4s4"/>
                 <constraint firstItem="vuD-rY-Vzl" firstAttribute="leading" secondItem="XdB-Qn-iD9" secondAttribute="trailing" constant="4" id="lqC-R5-KOi"/>
-                <constraint firstItem="JSR-ZU-kmP" firstAttribute="bottom" secondItem="jlg-2n-tzm" secondAttribute="bottom" id="nFM-wz-aHJ"/>
                 <constraint firstItem="DFD-8r-YGx" firstAttribute="centerY" secondItem="Hz6-mo-xeY" secondAttribute="centerY" id="oUc-dt-omj"/>
                 <constraint firstAttribute="trailing" secondItem="890-3t-v5O" secondAttribute="trailing" id="pJ6-DF-7Q7"/>
                 <constraint firstItem="890-3t-v5O" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" id="qFE-7M-fWu"/>
@@ -170,7 +163,6 @@
                 <outlet property="titleTextField" destination="DFD-8r-YGx" id="6mj-b0-Oq3"/>
                 <outlet property="titleTextFieldLeadingConstraint" destination="4P8-mH-XGb" id="mKz-Wl-mQJ"/>
                 <outlet property="view" destination="Hz6-mo-xeY" id="DwG-v1-cn3"/>
-                <outlet property="windowDraggingView" destination="JSR-ZU-kmP" id="fbO-Nh-ej6"/>
             </connections>
         </collectionViewItem>
     </objects>
