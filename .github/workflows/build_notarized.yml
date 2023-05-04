@@ -77,7 +77,6 @@ jobs:
 
     env:
       release-type: ${{ github.event.inputs.release-type || inputs.release-type }}
-      create-dmg: ${{ github.event.inputs.create-dmg || inputs.create-dmg }}
       asana-task-url: ${{ github.event.inputs.asana-task-url || inputs.asana-task-url }}
 
     steps:
@@ -193,7 +192,7 @@ jobs:
 
     name: Create DMG
     needs: export-notarized-app
-    if: ${{ github.event.inputs.create-dmg || inputs.create-dmg }}
+    if: ${{ github.event.inputs.create-dmg == 'true' || inputs.create-dmg == 'true' }}
 
     runs-on: macos-12
 
