@@ -258,30 +258,8 @@ extension YoutubeOverlayUserScript: WKScriptMessageHandler {
 }
 
 extension YoutubeOverlayUserScript {
-    public enum JSPixel: String {
-        case overlay = "overlay"
-        case playUse = "play.use"
-        case playDoNotUse = "play.do_not_use"
-
-        public var pixelName: String {
-            self.rawValue
-        }
-    }
-
     func handleSendJSPixel(_ message: UserScriptMessage, replyHandler: @escaping MessageReplyHandler) {
-        defer {
-            replyHandler(nil)
-        }
-
-        guard let body = message.messageBody as? [String: Any],
-              let pixelName = body["pixelName"] as? String,
-              let knownPixel = JSPixel(rawValue: pixelName) else {
-            assertionFailure("Not accepting an unknown pixel name")
-            return
-        }
-
-        let pixelParameters = body["params"] as? [String: String]
-
-        Pixel.fire(.duckPlayerJSPixel(knownPixel), withAdditionalParameters: pixelParameters)
+        // pixels no longer used
+        replyHandler(nil)
     }
 }

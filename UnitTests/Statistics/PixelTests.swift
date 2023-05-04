@@ -59,8 +59,7 @@ class PixelTests: XCTestCase {
             return HTTPStubsResponse(data: Data(), statusCode: 200, headers: nil)
         })
 
-        let store = PixelStoreMock()
-        let pixel = TimedPixel(.burn(repetition: .init(key: "fire", store: store)), time: date)
+        let pixel = TimedPixel(.crash, time: date)
 
         pixel.fire(now)
 
