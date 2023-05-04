@@ -261,6 +261,7 @@ jobs:
     name: Send Mattermost message
 
     needs: [export-notarized-app, create-dmg]
+    if: ${{ always() && (needs.export-notarized-app.result == 'success') && (needs.create-dmg.result == 'success' || needs.create-dmg.result == 'skipped') }}
 
     runs-on: ubuntu-latest
 
