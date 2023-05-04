@@ -355,9 +355,15 @@ final class DefaultNetworkProtectionProvider: NetworkProtection.TunnelController
     /// Starts the VPN connection used for Network Protection
     ///
     func start() async throws {
+        try await start(enableLoginItems: true)
+    }
+
+    func start(enableLoginItems: Bool) async throws {
         controllerErrorStore.lastErrorMessage = nil
 
-        await Self.ensureLoginItemsAreEnabled()
+        if enableLoginItems {
+            await Self.ensureLoginItemsAreEnabled()
+        }
 
 #if NETP_SYSTEM_EXTENSION
         guard try await ensureSystemExtensionIsActivated() else {

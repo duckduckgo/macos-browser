@@ -55,7 +55,7 @@ final class BWManager: BWManagement, ObservableObject {
 
     func openBitwarden() {}
 
-    func retrieveCredentials(for url: URL, completion: @escaping ([BWCredential], BWError?) -> Void) {}
+    func retrieveCredentials(for mainBundleURL: URL, completion: @escaping ([BWCredential], BWError?) -> Void) {}
     func create(credential: BWCredential, completion: @escaping (BWError?) -> Void) {}
     func update(credential: BWCredential, completion: @escaping (BWError?) -> Void) {}
 

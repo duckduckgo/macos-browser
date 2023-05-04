@@ -28,32 +28,32 @@ public final class AppLauncher {
         case startVPN
         case stopVPN
 
-        enum CommandURL: String {
-            case showStatus = "networkprotection://show-status"
-        }
-
-        public static let userDefaultsArgumentKey = "network-protection.AppLauncher.Command.userDefaultsArgumentKey"
-        public static let userDefaultsArgumentTimestampKey = "network-protection.AppLauncher.Command.userDefaultsArgumentTimestampKey"
-        public static let argumentTimestampExpirationThreshold = TimeInterval(5)
-
-        public var launchURL: URL? {
+        var commandURL: String? {
             switch self {
             case .showStatus:
-                return URL(string: CommandURL.showStatus.rawValue)!
+                return "networkprotection://show-status"
             default:
                 return nil
             }
         }
 
-        public var asArgument: String {
+        var helperAppPath: String? {
             switch self {
             case .startVPN:
-                return "--startvpn"
+                return "/Contents/Resources/startVPN.app"
             case .stopVPN:
-                return "--stopvpn"
+                return "/Contents/Resources/stopVPN.app"
             default:
-                return ""
+                return nil
             }
+        }
+
+        public var launchURL: URL? {
+            guard let commandURL else {
+                return nil
+            }
+
+            return URL(string: commandURL)!
         }
 
         var hideApp: Bool {
@@ -66,16 +66,15 @@ public final class AppLauncher {
         }
     }
 
-    private let url: URL
+    private let mainBundleURL: URL
 
     public init(appBundleURL: URL) {
-        url = appBundleURL
+        mainBundleURL = appBundleURL
     }
 
     public func launchApp(withCommand command: Command) async {
         let configuration = NSWorkspace.OpenConfiguration()
         configuration.allowsRunningApplicationSubstitution = false
-        configuration.arguments = [command.asArgument]
 
         if command.hideApp {
             configuration.activates = false
@@ -91,23 +90,10 @@ public final class AppLauncher {
 
         do {
             if let launchURL = command.launchURL {
-                try await NSWorkspace.shared.open([launchURL], withApplicationAt: url, configuration: configuration)
-            } else {
-                guard let defaults = AppGroupHelper.shared.userDefaults else {
-                    assertionFailure("Expected to obtain the app group's shared UserDefaults")
-                    return
-                }
-
-                switch command {
-                case .startVPN, .stopVPN:
-                    defaults.set(command.asArgument, forKey: AppLauncher.Command.userDefaultsArgumentKey)
-                    defaults.set(Date(), forKey: AppLauncher.Command.userDefaultsArgumentTimestampKey)
-                    defaults.synchronize()
-                default:
-                    break
-                }
-
-                try await NSWorkspace.shared.openApplication(at: url.absoluteURL, configuration: configuration)
+                try await NSWorkspace.shared.open([launchURL], withApplicationAt: mainBundleURL, configuration: configuration)
+            } else if let helperAppPath = command.helperAppPath {
+                let launchURL = mainBundleURL.appending(helperAppPath)
+                try await NSWorkspace.shared.openApplication(at: launchURL, configuration: configuration)
             }
         } catch {
             os_log("🔵 Open Application failed: %{public}@", type: .error, error.localizedDescription)

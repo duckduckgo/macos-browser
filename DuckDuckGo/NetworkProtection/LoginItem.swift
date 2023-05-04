@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import Foundation
 import ServiceManagement
 
 /// Takes care of enabling and disabling a login item.

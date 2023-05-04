@@ -21,6 +21,13 @@ import Foundation
 import os
 import NetworkProtection
 
+extension Bundle {
+    static var mainURL: URL!
+    @objc dynamic static func nonMain() -> Bundle {
+        Bundle(url: mainURL)!
+    }
+}
+
 @main
 final class AppMain {
     private enum LaunchError: Error {
@@ -31,33 +38,28 @@ final class AppMain {
 
     static func main() async throws {
         let arguments = ProcessInfo.processInfo.arguments
-        var command: String?
 
-        if let defaults = AppGroupHelper.shared.userDefaults {
-            defaults.synchronize()
-            if let argumentTimestamp = defaults.object(forKey: AppLauncher.Command.userDefaultsArgumentTimestampKey) as? Date,
-               argumentTimestamp.timeIntervalSinceNow < AppLauncher.Command.argumentTimestampExpirationThreshold {
-                command = defaults.string(forKey: AppLauncher.Command.userDefaultsArgumentKey)
-            } else {
-                command = ""
-            }
-            defaults.removeObject(forKey: AppLauncher.Command.userDefaultsArgumentKey)
-        }
+        switch (CommandLine.arguments.first! as NSString).lastPathComponent {
+        case "startVPN":
+            swizzleMainBundle()
 
-        if command == AppLauncher.Command.startVPN.asArgument || arguments.contains(AppLauncher.Command.startVPN.asArgument) {
             do {
-                try await DefaultNetworkProtectionProvider().start()
+                try await DefaultNetworkProtectionProvider().start(enableLoginItems: false)
                 exit(0)
             } catch {
                 throw LaunchError.startVPNFailed(error)
             }
-        } else if command == AppLauncher.Command.stopVPN.asArgument || arguments.contains(AppLauncher.Command.stopVPN.asArgument) {
+        case "stopVPN":
+            swizzleMainBundle()
+
             do {
                 try await DefaultNetworkProtectionProvider().stop()
                 exit(0)
             } catch {
                 throw LaunchError.stopVPNFailed(error)
             }
+        default:
+            break
         }
 
         let result = NSApplicationMain(CommandLine.argc, CommandLine.unsafeArgv)
@@ -67,7 +69,12 @@ final class AppMain {
         }
     }
 
-    private func startupArguments() -> String {
-        return ""
+    private static func swizzleMainBundle() {
+        Bundle.mainURL = URL(fileURLWithPath: CommandLine.arguments.first!).deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+
+        let m1 = class_getClassMethod(Bundle.self, #selector(getter: Bundle.main))!
+        let m2 = class_getClassMethod(Bundle.self, #selector(Bundle.nonMain))!
+
+        method_exchangeImplementations(m1, m2)
     }
 }
