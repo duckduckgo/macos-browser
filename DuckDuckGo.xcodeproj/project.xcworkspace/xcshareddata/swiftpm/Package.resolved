@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "daniel/pwdHashing",
-        "revision" : "bcdd2d30bdb7501af2f193acf3881b82aaac6049"
+        "branch" : "autofill/anya/subdomain-api-updates",
+        "revision" : "4785f2081f45dfab43850b50375f5a380e2e2836"
       }
     },
     {
