@@ -209,7 +209,11 @@ jobs:
       uses: actions/download-artifact@v3
       with:
         name: DuckDuckGo-${{ env.release-type }}-${{ env.app-version }}.app
-        path: ${{ github.workspace }}/dmg
+        path: ${{ github.workspace }}/dmg//${{ env.app-name }}.app
+
+    - name: Display structure of downloaded files
+      run: ls -R
+      working-directory: ${{ github.workspace }}/dmg
 
     - name: Install create-dmg
       run: brew install create-dmg
