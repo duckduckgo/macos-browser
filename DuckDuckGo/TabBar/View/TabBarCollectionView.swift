@@ -56,7 +56,10 @@ final class TabBarCollectionView: NSCollectionView {
             os_log("TabBarCollectionView: More than 1 item or no item highlighted", type: .error)
             return
         }
+        scroll(to: indexPath)
+    }
 
+    func scroll(to indexPath: IndexPath) {
         let rect = frameForItem(at: indexPath.item)
         animator().performBatchUpdates({
             animator().scrollToVisible(rect)
