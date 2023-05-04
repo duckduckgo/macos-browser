@@ -263,7 +263,7 @@ jobs:
       uses: actions/download-artifact@v3
       with:
         name: dmg-background.png
-        path: ${{ github.workspace }}/dmg-background.png
+        path: ${{ github.workspace }}
   
     - name: Install create-dmg
       run: brew install create-dmg
