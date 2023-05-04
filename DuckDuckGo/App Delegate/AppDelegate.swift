@@ -156,8 +156,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         UserDefaultsWrapper<Any>.clearRemovedKeys()
 
-        refreshNetworkProtectionServers()
-        warnUserAboutApplicationPathForNetworkProtection()
+        startupNetworkProtection()
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
@@ -196,6 +195,34 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     // MARK: - Network Protection
+
+    private func startupNetworkProtection() {
+        let provider = DefaultNetworkProtectionProvider()
+
+        Task {
+            if await provider.isConnected() {
+                try? await provider.stop()
+            }
+        }
+
+        resetLoginItemsIfAlreadyRunning()
+        refreshNetworkProtectionServers()
+        warnUserAboutApplicationPathForNetworkProtection()
+    }
+
+    private func resetLoginItemsIfAlreadyRunning() {
+        do {
+            try LoginItem(identifier: .vpnMenu).reset()
+        } catch {
+            os_log("Failed to reset the vpnMenu login item: %{public}@", log: .networkProtection, type: .error, error.localizedDescription)
+        }
+
+        do {
+            try LoginItem(identifier: .notificationsAgent).reset()
+        } catch {
+            os_log("Failed to reset the notificationsAgent login item: %{public}@", log: .networkProtection, type: .error, error.localizedDescription)
+        }
+    }
 
     /// Fetches a new list of Network Protection servers, and updates the existing set.
     private func refreshNetworkProtectionServers() {
@@ -247,7 +274,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     @objc private func emailDidSignOutNotification(_ notification: Notification) {
         Pixel.fire(.emailDisabled)
     }
-
 }
 
 extension AppDelegate: AppUsageActivityMonitorDelegate {

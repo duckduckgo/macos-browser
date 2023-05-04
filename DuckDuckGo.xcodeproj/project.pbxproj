@@ -1944,6 +1944,8 @@
 		7B8DD24929FB091B00BA6672 /* NetworkProtectionUI in Frameworks */ = {isa = PBXBuildFile; productRef = 7B8DD24829FB091B00BA6672 /* NetworkProtectionUI */; };
 		7B8DD24D29FB092900BA6672 /* NetworkProtectionUI in Frameworks */ = {isa = PBXBuildFile; productRef = 7B8DD24C29FB092900BA6672 /* NetworkProtectionUI */; };
 		7BA4727D26F01BC400EAA165 /* CoreDataTestUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292C42667104B00AD2C21 /* CoreDataTestUtilities.swift */; };
+		7BA5C0222A041D1200086135 /* NetworkProtection+LoginItemIdentifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BA5C0212A041D1100086135 /* NetworkProtection+LoginItemIdentifier.swift */; };
+		7BA5C0232A041DD700086135 /* NetworkProtection+LoginItemIdentifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BA5C0212A041D1100086135 /* NetworkProtection+LoginItemIdentifier.swift */; };
 		7BACE46329C7852C00A8475B /* NetworkProtectionConnectionBandwidthAnalyzer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BACE46129C7847F00A8475B /* NetworkProtectionConnectionBandwidthAnalyzer.swift */; };
 		7BACE46429C7852D00A8475B /* NetworkProtectionConnectionBandwidthAnalyzer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BACE46129C7847F00A8475B /* NetworkProtectionConnectionBandwidthAnalyzer.swift */; };
 		7BB8BA4629A94BEF00D64342 /* FileManager+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BFA781A299E76700003284F /* FileManager+Extension.swift */; };
@@ -3762,6 +3764,7 @@
 		7B8DD1F829FB061D00BA6672 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7B8DD1FD29FB066900BA6672 /* DuckDuckGo Agent.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "DuckDuckGo Agent.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		7B8DD23F29FB07FF00BA6672 /* DuckDuckGo Agent App Store.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "DuckDuckGo Agent App Store.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		7BA5C0212A041D1100086135 /* NetworkProtection+LoginItemIdentifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NetworkProtection+LoginItemIdentifier.swift"; sourceTree = "<group>"; };
 		7BACE46129C7847F00A8475B /* NetworkProtectionConnectionBandwidthAnalyzer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionConnectionBandwidthAnalyzer.swift; sourceTree = "<group>"; };
 		7BB8BA5429A94CD800D64342 /* NetworkProtectionSystemExtension_Debug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = NetworkProtectionSystemExtension_Debug.entitlements; sourceTree = "<group>"; };
 		7BB8BA5529A94CD900D64342 /* NetworkProtectionSystemExtension_Release.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = NetworkProtectionSystemExtension_Release.entitlements; sourceTree = "<group>"; };
@@ -5581,6 +5584,7 @@
 		7BFA7812299E76700003284F /* Network Protection */ = {
 			isa = PBXGroup;
 			children = (
+				7BA5C0212A041D1100086135 /* NetworkProtection+LoginItemIdentifier.swift */,
 				7BFA781A299E76700003284F /* FileManager+Extension.swift */,
 				7BFA7816299E76700003284F /* IPCConnection.swift */,
 				7BFA7821299E76700003284F /* NETunnelProviderProtocol+Extension.swift */,
@@ -9974,6 +9978,7 @@
 				7B48D1D5299E6DCB0098A496 /* History.xcdatamodeld in Sources */,
 				7B48D1D6299E6DCB0098A496 /* WKFrameInfoExtension.swift in Sources */,
 				7B48D1D7299E6DCB0098A496 /* PermissionStore.swift in Sources */,
+				7BA5C0222A041D1200086135 /* NetworkProtection+LoginItemIdentifier.swift in Sources */,
 				7B48D1D8299E6DCB0098A496 /* PrivacyIconViewModel.swift in Sources */,
 				7B48D1D9299E6DCB0098A496 /* ChromiumBookmarksReader.swift in Sources */,
 				7B48D1DA299E6DCB0098A496 /* Downloads.xcdatamodeld in Sources */,
@@ -10345,6 +10350,7 @@
 				7BFA78ED299E89F30003284F /* DataImportViewController.swift in Sources */,
 				7BFA78EE299E89F30003284F /* HistoryMenu.swift in Sources */,
 				7BFA78EF299E89F30003284F /* ContentScopeFeatureFlagging.swift in Sources */,
+				7BA5C0232A041DD700086135 /* NetworkProtection+LoginItemIdentifier.swift in Sources */,
 				7BFA78F0299E89F30003284F /* OnboardingButtonStyles.swift in Sources */,
 				7BFA78F1299E89F30003284F /* SaveIdentityPopover.swift in Sources */,
 				7BFA78F2299E89F30003284F /* YoutubePlayerNavigationHandler.swift in Sources */,

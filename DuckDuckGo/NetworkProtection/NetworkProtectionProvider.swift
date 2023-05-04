@@ -273,30 +273,10 @@ final class DefaultNetworkProtectionProvider: NetworkProtection.TunnelController
 
     // MARK: - Ensure things are working
 
-    static let infoPlistAgentBundleID = "AGENT_BUNDLE_ID"
-
-    private static var agentBundleID: String {
-        guard let agentBundleID = Bundle.main.object(forInfoDictionaryKey: infoPlistAgentBundleID) as? String else {
-            fatalError("Make sure key \(infoPlistAgentBundleID) is defined in info.plist")
-        }
-
-        return agentBundleID
-    }
-
-    private static let agentLoginItem = LoginItem(agentBundleID: DefaultNetworkProtectionProvider.agentBundleID)
+    private static let vpnMenuLoginItem = LoginItem(identifier: .vpnMenu)
 
 #if NETP_SYSTEM_EXTENSION
-    static let infoPlistNotificationsAgentBundleID = "NOTIFICATIONS_AGENT_BUNDLE_ID"
-
-    private static var notificationsAgentBundleID: String {
-        guard let agentBundleID = Bundle.main.object(forInfoDictionaryKey: infoPlistNotificationsAgentBundleID) as? String else {
-            fatalError("Make sure key \(infoPlistAgentBundleID) is defined in info.plist")
-        }
-
-        return agentBundleID
-    }
-
-    private static let notificationsAgentLoginItem = LoginItem(agentBundleID: DefaultNetworkProtectionProvider.notificationsAgentBundleID)
+    private static let notificationsAgentLoginItem = LoginItem(identifier: .notificationsAgent)
 
     /// - Returns: `true` if the system extension and the background agent were activated successfully
     ///
@@ -326,7 +306,7 @@ final class DefaultNetworkProtectionProvider: NetworkProtection.TunnelController
 #endif
 
         do {
-            try agentLoginItem.enable()
+            try vpnMenuLoginItem.enable()
         } catch {
             let error = StartError.couldNotEnableLoginItems(error: error)
 
@@ -472,7 +452,7 @@ final class DefaultNetworkProtectionProvider: NetworkProtection.TunnelController
 #if NETP_SYSTEM_EXTENSION
             try? notificationsAgentLoginItem.disable()
 #endif
-            try? agentLoginItem.disable()
+            try? vpnMenuLoginItem.disable()
             NetworkProtectionSelectedServerUserDefaultsStore().reset()
         }
     }

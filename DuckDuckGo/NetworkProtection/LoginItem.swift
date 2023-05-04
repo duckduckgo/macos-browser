@@ -19,12 +19,37 @@
 import Foundation
 import ServiceManagement
 
+/// Extensible enum for login item identifiers
+///
+struct LoginItemIdentifier: RawRepresentable {
+    /// Holds the key for the field from this target's Info.plist file that stores the string value
+    /// of the Bundle ID of the login item that this identifier represents.
+    ///
+    var rawValue: String
+
+    init(_ rawValue: String) {
+        self.rawValue = rawValue
+    }
+
+    init?(rawValue: String) {
+        self.rawValue = rawValue
+    }
+}
+
 /// Takes care of enabling and disabling a login item.
 ///
 final class LoginItem {
     private static let resetDelay = 200
 
     let agentBundleID: String
+
+    convenience init(identifier: LoginItemIdentifier) {
+        guard let agentBundleID = Bundle.main.object(forInfoDictionaryKey: identifier.rawValue) as? String else {
+            fatalError("Please make sure that this target has key \(identifier.rawValue) in its Info.plist file.")
+        }
+
+        self.init(agentBundleID: agentBundleID)
+    }
 
     init(agentBundleID: String) {
         self.agentBundleID = agentBundleID
@@ -46,15 +71,22 @@ final class LoginItem {
         }
     }
 
-    func reset() async throws {
-        try? disable()
+    func isRunning() -> Bool {
+        let workspace = NSWorkspace.shared
+        let runningApps = workspace.runningApplications
 
-        if #available(macOS 13, *) {
-            try await Task.sleep(for: .milliseconds(Self.resetDelay))
-        } else {
-            try await Task.sleep(nanoseconds: UInt64(Self.resetDelay) * NSEC_PER_MSEC)
+        for app in runningApps where app.bundleIdentifier == agentBundleID {
+            return true
         }
+        return false
+    }
 
+    /// Resets a login item.
+    ///
+    /// This call will only enable the login item if it was enabled to begin with.
+    ///
+    func reset() throws {
+        try disable()
         try enable()
     }
 }
