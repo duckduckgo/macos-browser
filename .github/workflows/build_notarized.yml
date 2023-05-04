@@ -186,14 +186,6 @@ jobs:
         name: DuckDuckGo-${{ env.release-type }}-dSYM-${{ env.app-version }}
         path: ${{ github.workspace }}/release/DuckDuckGo-${{ env.app-version }}-dSYM.zip
 
-    - name: Upload DMG background
-      if: env.create-dmg || env.asana-task-url
-      uses: actions/upload-artifact@v3
-      with:
-        name: dmg-background.png
-        path: ${{ github.workspace }}/scripts/assets/dmg-background.png
-        retention-days: 1
-
     - name: Get Asana Task ID
       id: get-task-id
       if: env.asana-task-url
@@ -259,17 +251,15 @@ jobs:
         name: DuckDuckGo-${{ env.release-type }}-${{ env.app-version }}.app
         path: ${{ github.workspace }}/dmg/${{ env.app-name }}.app
 
-    - name: Fetch DMG background
-      uses: actions/download-artifact@v3
-      with:
-        name: dmg-background.png
-        path: ${{ github.workspace }}
-  
     - name: Install create-dmg
       run: brew install create-dmg
 
     - name: Create DMG
+      env:
+        GH_TOKEN: ${{ github.token }}
       run: |
+        curl -fLSs $(gh api https://api.github.com/repos/${{ github.repository }}/contents/scripts/assets/dmg-background.png?ref=${{ github.ref }} --jq .download_url) \
+            --output dmg-background.png
         create-dmg --volname "${{ env.app-name }}" \
             --icon "${{ env.app-name }}.app" 140 160 \
             --background "dmg-background.png" \
