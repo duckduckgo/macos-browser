@@ -74,6 +74,9 @@ extension Preferences {
                     Button(UserText.importBrowserData) {
                         model.openImportBrowserDataWindow()
                     }
+                    Button(UserText.exportLogins) {
+                        model.openExportLogins()
+                    }
 #endif
 
                 }
@@ -96,6 +99,9 @@ extension Preferences {
                     Spacer()
                     Button(UserText.importBrowserData) {
                         model.openImportBrowserDataWindow()
+                    }
+                    Button(UserText.exportLogins) {
+                        model.openExportLogins()
                     }
                 }
 #endif
