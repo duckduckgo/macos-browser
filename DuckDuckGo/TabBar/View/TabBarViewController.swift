@@ -347,6 +347,7 @@ final class TabBarViewController: NSViewController {
             collectionView.animator().selectItems(at: [newSelectionIndexPath], scrollPosition: .centeredHorizontally)
         } else {
             collectionView.selectItems(at: [newSelectionIndexPath], scrollPosition: .centeredHorizontally)
+            collectionView.scrollToSelected()
         }
     }
 
@@ -659,7 +660,7 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
         updateEmptyTabArea()
         hideTabPreview()
         if tabMode == .overflow {
-            scrollCollectionViewToEnd()
+            collectionView.scroll(to: IndexPath(item: index))
         }
     }
 
@@ -820,13 +821,7 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
 extension TabBarViewController: NSCollectionViewDelegateFlowLayout {
 
     func collectionView(_ collectionView: NSCollectionView, layout collectionViewLayout: NSCollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> NSSize {
-        var isItemSelected = tabCollectionViewModel.selectionIndex == .unpinned(indexPath.item)
-        if TabDragAndDropManager.shared.sourceUnit?.tabCollectionViewModel === tabCollectionViewModel,
-           let draggingOverIndex = TabDragAndDropManager.shared.sourceUnit?.index {
-            // Drag&drop in progress - the empty space is equal to the selected tab width
-            isItemSelected = draggingOverIndex == indexPath.item
-        }
-
+        let isItemSelected = tabCollectionViewModel.selectionIndex == .unpinned(indexPath.item)
         return NSSize(width: self.currentTabWidth(selected: isItemSelected), height: TabBarViewItem.Height.standard.rawValue)
     }
 
@@ -971,9 +966,15 @@ extension TabBarViewController: NSCollectionViewDelegate {
         // dropping a tab, dropping of url handled in collectionView:acceptDrop:
         guard session.draggingPasteboard.types == [TabBarViewItemPasteboardWriter.utiInternalType] else { return }
 
+        defer {
+            TabDragAndDropManager.shared.clear()
+        }
         if case .private = operation {
             // Perform the drag and drop between multiple windows
             TabDragAndDropManager.shared.performDragAndDropIfNeeded()
+            DispatchQueue.main.async {
+                self.collectionView.scrollToSelected()
+            }
             return
         }
         // dropping not on a tab bar
