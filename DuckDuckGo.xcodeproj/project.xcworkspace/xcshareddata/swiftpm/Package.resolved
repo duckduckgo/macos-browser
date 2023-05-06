@@ -6,7 +6,7 @@
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
         "branch" : "dominik/bookmarks-v3",
-        "revision" : "9e73e8eb2cd2e5fdf4cf0abc31cf8260147c8363"
+        "revision" : "843b07d8f783b3c3af093f1592e4c5f2c405a3fb"
       }
     },
     {
@@ -23,8 +23,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/duckduckgo-autofill.git",
       "state" : {
-        "revision" : "4aee97d550112ba6551e61ea8019fb1f1a2d3af7",
-        "version" : "6.4.3"
+        "revision" : "8f403fad4f6ccf18a3900fc560f43067a527ac9f",
+        "version" : "6.5.1"
       }
     },
     {

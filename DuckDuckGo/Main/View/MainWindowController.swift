@@ -18,12 +18,14 @@
 
 import Cocoa
 import Combine
+import Common
 
 @MainActor
 final class MainWindowController: NSWindowController {
 
     private static let windowFrameSaveName = "MainWindow"
     private var fireViewModel: FireViewModel
+    private static var knownFullScreenMouseDetectionWindows = Set<NSValue>()
 
     var mainViewController: MainViewController {
         // swiftlint:disable force_cast
@@ -51,7 +53,7 @@ final class MainWindowController: NSWindowController {
         setupWindow()
         setupToolbar()
         subscribeToTrafficLightsAlpha()
-        subscribeToIsFirePresentationInProgress()
+        subscribeToBurningData()
         subscribeToResolutionChange()
     }
 
@@ -118,14 +120,14 @@ final class MainWindowController: NSWindowController {
             .assign(to: \.constant, onWeaklyHeld: tabBarViewController.pinnedTabsViewLeadingConstraint)
     }
 
-    private var isFirePresentationInProgressCancellable: AnyCancellable?
-    private func subscribeToIsFirePresentationInProgress() {
-        isFirePresentationInProgressCancellable = fireViewModel.isFirePresentationInProgress
+    private var burningDataCancellable: AnyCancellable?
+    private func subscribeToBurningData() {
+        burningDataCancellable = fireViewModel.fire.$burningData
             .dropFirst()
             .removeDuplicates()
-            .sink(receiveValue: { [weak self] _ in
+            .sink(receiveValue: { [weak self] burningData in
                 guard let self else { return }
-                self.userInteraction(prevented: self.fireViewModel.fire.burningData != nil)
+                self.userInteraction(prevented: burningData != nil)
             })
     }
 
@@ -205,6 +207,49 @@ extension MainWindowController: NSWindowDelegate {
 
     func windowWillEnterFullScreen(_ notification: Notification) {
         mainViewController.tabBarViewController.draggingSpace.isHidden = true
+    }
+
+    func windowDidEnterFullScreen(_ notification: Notification) {
+        // fix NSToolbarFullScreenWindow occurring beneath the MainWindow
+        // https://app.asana.com/0/1177771139624306/1203853030672990/f
+        // NSApp should be active at the moment of window ordering otherwise toolbar would disappear on activation
+        for window in NSApp.windows {
+            let windowValue = NSValue(nonretainedObject: window)
+
+            guard window.className.contains("NSFullScreenMouseDetectionWindow"),
+                  !Self.knownFullScreenMouseDetectionWindows.contains(windowValue),
+                  window.screen == self.window!.screen else { continue }
+
+            // keep record of NSFullScreenMouseDetectionWindow to avoid adding other‘s windows
+            Self.knownFullScreenMouseDetectionWindows.insert(windowValue)
+            window.onDeinit {
+                Self.knownFullScreenMouseDetectionWindows.remove(windowValue)
+            }
+
+            // add NSFullScreenMouseDetectionWindow as a child window to activate the app without revealing all of its windows
+            let activeApp = NSWorkspace.shared.frontmostApplication
+            if activeApp != .current {
+                self.window!.addChildWindow(window, ordered: .above)
+            }
+
+            // remove the child window and reactivate initially active app as soon as current app becomes active
+            // otherwise the fullscreen will reactivate its Space when switching to window in another Space
+            var cancellable: AnyCancellable!
+            cancellable = NSApp.isActivePublisher().dropFirst().sink { [weak self, weak window] _ in
+                withExtendedLifetime(cancellable) {
+                    if let activeApp, activeApp != .current {
+                        activeApp.activate()
+                    }
+
+                    if let self, let window, self.window?.childWindows?.contains(window) == true {
+                        self.window?.removeChildWindow(window)
+                    }
+                    cancellable = nil
+                }
+            }
+
+            break
+        }
     }
 
     func windowWillExitFullScreen(_ notification: Notification) {

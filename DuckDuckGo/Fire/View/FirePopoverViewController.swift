@@ -201,12 +201,13 @@ final class FirePopoverViewController: NSViewController {
 
     private func adjustContentHeight() {
         NSAnimationContext.runAnimationGroup { [weak self] context in
+            guard let self else { return }
             context.duration = 1/3
             context.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
-            let contentHeight = contentHeight()
-            self?.contentHeightConstraint.animator().constant = contentHeight
+            let contentHeight = self.contentHeight()
+            self.contentHeightConstraint.animator().constant = contentHeight
             if contentHeight != Constants.minimumContentHeight {
-                self?.detailsWrapperViewHeightContraint.animator().constant = contentHeight
+                self.detailsWrapperViewHeightContraint.animator().constant = contentHeight
             }
         }
     }

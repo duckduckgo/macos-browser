@@ -107,7 +107,6 @@ final class TabBarViewItemTests: XCTestCase {
         let constraints = NSLayoutConstraint()
         let button = NSButton()
         let mouseButton = MouseOverButton()
-        let windowDraggingView = WindowDraggingView()
         tabBarViewItem.titleTextField = textField
         tabBarViewItem.faviconImageView = imageView
         tabBarViewItem.faviconWrapperView = imageView
@@ -115,7 +114,6 @@ final class TabBarViewItemTests: XCTestCase {
         tabBarViewItem.permissionButton = button
         tabBarViewItem.tabLoadingPermissionLeadingConstraint = constraints
         tabBarViewItem.closeButton = mouseButton
-        tabBarViewItem.windowDraggingView = windowDraggingView
 
         // Update url
         let tab = Tab()

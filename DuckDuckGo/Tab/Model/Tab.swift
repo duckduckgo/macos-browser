@@ -325,13 +325,13 @@ protocol NewWindowPolicyDecisionMaker {
         permissions = PermissionModel(permissionManager: permissionManager,
                                       geolocationService: geolocationService)
 
-        let userScriptsPublisher = _userContentController.projectedValue
-            .compactMap { $0?.$contentBlockingAssets }
+        let userContentControllerPromise = Future<UserContentController, Never>.promise()
+        let userScriptsPublisher = userContentControllerPromise.future
+            .compactMap { $0.$contentBlockingAssets }
             .switchToLatest()
             .map { $0?.userScripts as? UserScripts }
             .eraseToAnyPublisher()
 
-        let userContentControllerPromise = Future<UserContentController, Never>.promise()
         let webViewPromise = Future<WKWebView, Never>.promise()
         var tabGetter: () -> Tab? = { nil }
         self.extensions = extensionsBuilder
@@ -370,7 +370,41 @@ protocol NewWindowPolicyDecisionMaker {
                                                selector: #selector(onDuckDuckGoEmailSignOut),
                                                name: .emailDidSignOut,
                                                object: nil)
+
+        addDeallocationChecks(for: webView)
     }
+
+#if DEBUG
+    func addDeallocationChecks(for webView: WKWebView) {
+        let processPool = webView.configuration.processPool
+        let webViewValue = NSValue(nonretainedObject: webView)
+
+        webView.onDeinit { [weak self] in
+            // Tab should deallocate with the WebView
+            self?.assertObjectDeallocated(after: 1.0)
+
+            // unregister WebView from the ProcessPool
+            processPool.webViewsUsingProcessPool.remove(webViewValue)
+
+            if processPool.webViewsUsingProcessPool.isEmpty {
+                // when the last WebView is deallocated the ProcessPool should be deallocated
+                processPool.assertObjectDeallocated(after: 1)
+                // by the moment the ProcessPool is dead all the UserContentControllers that were using it should be deallocated
+                let knownUserContentControllers = processPool.knownUserContentControllers
+                processPool.onDeinit {
+                    for controller in knownUserContentControllers {
+                        assert(controller.userContentController == nil, "\(controller) has not been deallocated")
+                    }
+                }
+            }
+        }
+        // ProcessPool will be alive while there are WebViews using it
+        processPool.webViewsUsingProcessPool.insert(webViewValue)
+        processPool.knownUserContentControllers.insert(.init(userContentController: webView.configuration.userContentController))
+    }
+#else
+    @inlinable func addDeallocationChecks(for webView: WKWebView) {}
+#endif
 
     override func awakeAfter(using decoder: NSCoder) -> Any? {
         for tabExtension in self.extensions {
@@ -400,20 +434,30 @@ protocol NewWindowPolicyDecisionMaker {
     }
 
     deinit {
-        cleanUpBeforeClosing()
+        cleanUpBeforeClosing(onDeinit: true)
     }
 
     func cleanUpBeforeClosing() {
-        let job = { [webView] in
+        cleanUpBeforeClosing(onDeinit: false)
+    }
+
+    @MainActor(unsafe)
+    private func cleanUpBeforeClosing(onDeinit: Bool) {
+        let job = { [webView, userContentController] in
             webView.stopLoading()
             webView.stopMediaCapture()
             webView.stopAllMediaPlayback()
             webView.fullscreenWindowController?.close()
 
-            webView.configuration.userContentController.removeAllUserScripts()
+            userContentController?.cleanUpBeforeClosing()
+            webView.assertObjectDeallocated(after: 4.0)
+        }
+        if !onDeinit {
+            // Tab should be deallocated shortly after burning
+            self.assertObjectDeallocated(after: 4.0)
         }
         guard Thread.isMainThread else {
-            DispatchQueue.main.async(execute: job)
+            DispatchQueue.main.async { job() }
             return
         }
         job()
@@ -1067,11 +1111,12 @@ extension Tab: NewWindowPolicyDecisionMaker {
 }
 
 extension Tab: TabDataClearing {
+    @MainActor
     func prepareForDataClearing(caller: TabDataCleaner) {
         webViewCancellables.removeAll()
 
         webView.stopLoading()
-        webView.configuration.userContentController.removeAllUserScripts()
+        (webView.configuration.userContentController as? UserContentController)?.cleanUpBeforeClosing()
 
         webView.navigationDelegate = caller
         webView.load(URLRequest(url: .blankPage))
