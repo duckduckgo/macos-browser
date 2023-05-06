@@ -41,6 +41,7 @@ final class TabDataCleaner: NSObject, WKNavigationDelegate {
 
     private var completion: (() -> Void)?
 
+    @MainActor
     func prepareTabsForCleanup(_ tabs: [TabViewModel],
                                completion: @escaping () -> Void) {
         guard !tabs.isEmpty else {
@@ -100,7 +101,7 @@ final class Fire {
 
     let tabsCleaner = TabDataCleaner()
 
-    enum BurningData {
+    enum BurningData: Equatable {
         case specificDomains(_ domains: Set<String>)
         case all
     }

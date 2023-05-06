@@ -98,7 +98,6 @@ final class TabBarViewItem: NSCollectionViewItem {
     @IBOutlet weak var rightSeparatorView: ColorView!
     @IBOutlet weak var mouseOverView: MouseOverView!
     @IBOutlet weak var mouseClickView: MouseClickView!
-    @IBOutlet weak var windowDraggingView: WindowDraggingView!
     @IBOutlet weak var faviconWrapperView: NSView!
     @IBOutlet weak var faviconWrapperViewCenterConstraint: NSLayoutConstraint!
     @IBOutlet weak var faviconWrapperViewLeadingConstraint: NSLayoutConstraint!
@@ -249,22 +248,6 @@ final class TabBarViewItem: NSCollectionViewItem {
         }.store(in: &cancellables)
 
         tabViewModel.$usedPermissions.assign(to: \.usedPermissions, onWeaklyHeld: self).store(in: &cancellables)
-
-        tabCollectionViewModel.tabCollection.$tabs.map { $0.count > 1 }
-            .assign(to: \.windowDraggingView.isHidden, onWeaklyHeld: self)
-            .store(in: &cancellables)
-
-        windowDraggingView.mouseDownPublisher
-            .compactMap { [weak tabCollectionViewModel] _ -> TabIndex? in
-                guard let tabCollectionViewModel = tabCollectionViewModel else {
-                    return nil
-                }
-                return .unpinned(0).sanitized(for: tabCollectionViewModel)
-            }
-            .sink { [weak tabCollectionViewModel] index in
-                tabCollectionViewModel?.select(at: index)
-            }
-            .store(in: &cancellables)
     }
 
     func clear() {
