@@ -311,12 +311,11 @@ final class PasswordManagementItemListModel: ObservableObject {
     }
 
     func selectLoginWithDomainOrFirst(domain: String, notify: Bool = true) {
+        let websiteAccounts = items
+            .compactMap { $0.websiteAccount }
+        let bestMatch = websiteAccounts.sortedForDomain(domain, tld: ContentBlocking.shared.tld)
         for section in displayedItems {
-            let websiteAccounts = section.items
-                .compactMap { $0.websiteAccount }
-            let websiteAccountsArray = websiteAccounts as [SecureVaultModels.WebsiteAccount]
-            let bestMatch = websiteAccounts.dedupedAndSortedForDomain(domain, tld: ContentBlocking.shared.tld).first
-            if let account = section.items.first(where: { $0.websiteAccount?.domain == bestMatch?.domain }) {
+            if let account = section.items.first(where: { $0.websiteAccount?.domain == bestMatch.first?.domain }) {
                 selected(item: account, notify: notify)
                 return
             }
