@@ -313,9 +313,13 @@ final class PasswordManagementItemListModel: ObservableObject {
     func selectLoginWithDomainOrFirst(domain: String, notify: Bool = true) {
         let websiteAccounts = items
             .compactMap { $0.websiteAccount }
-        let bestMatch = websiteAccounts.sortedForDomain(domain, tld: ContentBlocking.shared.tld)
+        let bestMatch = websiteAccounts.sortedForDomain(domain, tld: ContentBlocking.shared.tld, removeDuplicates: true)
         for section in displayedItems {
-            if let account = section.items.first(where: { $0.websiteAccount?.domain == bestMatch.first?.domain }) {
+            if let account = section.items.first(where: {
+                $0.websiteAccount?.username == bestMatch.first?.username &&
+                $0.websiteAccount?.domain == bestMatch.first?.domain &&
+                $0.websiteAccount?.signature == bestMatch.first?.signature
+            }) {
                 selected(item: account, notify: notify)
                 return
             }
