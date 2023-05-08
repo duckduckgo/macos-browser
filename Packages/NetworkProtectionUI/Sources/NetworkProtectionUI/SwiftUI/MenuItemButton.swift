@@ -42,15 +42,15 @@ struct MenuItemButton: View {
                 Text(title)
                     .foregroundColor(isHovered ? .white : .primary)
                 Spacer()
-            }.padding([.top, .bottom], 4)
-                .padding([.leading, .trailing], 4)
+            }.padding([.top, .bottom], 5)
+                .padding([.leading, .trailing], 9)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
-            RoundedRectangle(cornerRadius: 5)
-                .fill(isHovered ? Color(.controlAccentColor) : Color.clear)
+            buttonBackground()
         )
         .contentShape(Rectangle())
+        .cornerRadius(4)
         .onTapGesture {
             buttonTapped()
         }
@@ -60,6 +60,15 @@ struct MenuItemButton: View {
             }
         }
         .buttonStyle(PlainButtonStyle())
+    }
+
+    private func buttonBackground() -> some View {
+        if isHovered {
+            return AnyView(
+                VisualEffectView(material: .selection, blendingMode: .withinWindow, state: .active, isEmphasized: true))
+        } else {
+            return AnyView(Color.clear)
+        }
     }
 
     private func buttonTapped() {

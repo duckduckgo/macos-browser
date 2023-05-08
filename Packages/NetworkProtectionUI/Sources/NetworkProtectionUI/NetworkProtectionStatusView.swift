@@ -154,7 +154,7 @@ public struct NetworkProtectionStatusView: View {
 
                 bottomMenuView()
             }
-            .padding(EdgeInsets(top: 10, leading: 5, bottom: 10, trailing: 5))
+            .padding(EdgeInsets(top: 5, leading: 5, bottom: 5, trailing: 5))
         }
         .frame(maxWidth: 350)
     }
@@ -222,19 +222,16 @@ public struct NetworkProtectionStatusView: View {
 
     private func bottomMenuView() -> some View {
         VStack(spacing: 0) {
-
             MenuItemButton("Share feedback...") {
                 model.shareFeedback()
                 dismiss()
             }
-            .padding([.leading, .trailing], 4)
 
             if model.showLaunchBrowserMenuItem {
                 MenuItemButton("Open DuckDuckGo...") {
                     model.launchBrowser()
                     dismiss()
                 }
-                .padding([.leading, .trailing], 4)
             }
         }
     }
