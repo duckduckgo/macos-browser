@@ -287,7 +287,6 @@ create_dmg() {
 	mkdir -p "${dmg_dir}"
 	cp -R "${app_path}" "${dmg_dir}"
 	${filter_output} create-dmg --volname "${app_name}" \
-		--hdiutil-verbose \
 		--icon "${app_name}.app" 140 160 \
 		--background "${dmg_background}" \
 		--window-size 600 400 \
