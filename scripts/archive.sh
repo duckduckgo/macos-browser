@@ -15,7 +15,7 @@ print_usage_and_exit() {
 
 	cat <<- EOF
 	Usage:
-	  $ $(basename "$0") <review|release|review-appstore|release-appstore> [-a <asana_task_url>] [-d] [-s] [-v <version>]
+	  $ $(basename "$0") <review|release|review-sandbox|release-sandbox> [-a <asana_task_url>] [-d] [-s] [-v <version>]
 
 	Options:
 	 -a <asana_task_url>  Update Asana task after building the app (implies -d)
@@ -45,15 +45,15 @@ read_command_line_arguments() {
 			;;
 		release)
 			app_name="DuckDuckGo"
-			scheme="DuckDuckGo Network Protection (System Extension)"
-			configuration="NetworkProtection_SystemExtension_Release"
+			scheme="DuckDuckGo Privacy Browser"
+			configuration="Release"
 			;;
-		review-appstore)
+		review-sandbox)
 			app_name="DuckDuckGo App Store Review"
 			scheme="Product Review Release App Store"
 			configuration="Review"
 			;;
-		release-appstore)
+		release-sandbox)
 			app_name="DuckDuckGo"
 			scheme="DuckDuckGo Privacy Browser App Store"
 			configuration="Release"
@@ -214,11 +214,15 @@ archive_and_export() {
 	setup_log_formatter
 
 	echo "Building and archiving the app (version ${app_version}) ..."
+
+	local derived_data="${workdir}/DerivedData"
+	rm -rf "${derived_data}"
 	
 	${filter_output} xcrun xcodebuild archive \
 		-scheme "${scheme}" \
 		-configuration "${configuration}" \
 		-archivePath "${archive}" \
+		-derivedDataPath "${derived_data}" \
 		CURRENT_PROJECT_VERSION="${app_version}" \
 		MARKETING_VERSION="${app_version}" \
 		RELEASE_PRODUCT_NAME_OVERRIDE=DuckDuckGo \
@@ -293,7 +297,8 @@ create_dmg() {
 
 export_app_version_to_environment() {
 	if [[ -n "${GITHUB_ENV}" ]]; then
-		echo "app_version=${app_version}" >> "${GITHUB_ENV}"
+		echo "app-version=${app_version}" >> "${GITHUB_ENV}"
+		echo "app-name=${app_name}" >> "${GITHUB_ENV}"
 	fi
 }
 

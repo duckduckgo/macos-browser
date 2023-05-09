@@ -18,8 +18,9 @@
 
 import Cocoa
 import Combine
-import os.log
+import Common
 
+@MainActor
 final class HistoryMenu: NSMenu {
 
     @IBOutlet weak var recentlyClosedMenuItem: NSMenuItem?
@@ -33,6 +34,8 @@ final class HistoryMenu: NSMenu {
             reopenMenuItemKeyEquivalentManager.lastSessionMenuItem = reopenAllWindowsFromLastSessionMenuItem
         }
     }
+    @IBOutlet weak var clearAllHistoryMenuItem: NSMenuItem?
+    private let clearAllHistorySeparator = NSMenuItem.separator()
 
     private let historyCoordinator: HistoryCoordinating = HistoryCoordinator.shared
     private var recentlyClosedMenu: RecentlyClosedMenu?
@@ -47,7 +50,7 @@ final class HistoryMenu: NSMenu {
         clearOldVariableMenuItems()
         addRecentlyVisited()
         addHistoryGroupings()
-        addClearAllHistory()
+        addClearAllHistoryOnTheBottom()
     }
 
     private func clearOldVariableMenuItems() {
@@ -211,19 +214,17 @@ final class HistoryMenu: NSMenu {
 
     // MARK: - Clear All History
 
-    lazy var clearAllHistoryMenuItem: NSMenuItem = {
-        let menuItem = NSMenuItem(title: UserText.clearAllHistoryMenuItem,
-                                  action: #selector(AppDelegate.clearAllHistory(_:)),
-                                  keyEquivalent: "\u{08}")
-        menuItem.keyEquivalentModifierMask = NSEvent.ModifierFlags(rawValue: 1179648)
-        return menuItem
-    }()
+    private func addClearAllHistoryOnTheBottom() {
+        guard let clearAllHistoryMenuItem else {
+            return
+        }
 
-    private func addClearAllHistory() {
-        addItem(NSMenuItem.separator())
+        if clearAllHistorySeparator.menu != nil {
+            removeItem(clearAllHistorySeparator)
+        }
+        addItem(clearAllHistorySeparator)
         addItem(clearAllHistoryMenuItem)
     }
-
 }
 
 extension HistoryMenu {
@@ -243,10 +244,7 @@ extension HistoryMenu {
             static let modifierMask = NSEvent.ModifierFlags.command
         }
 
-        init(
-            isInInitialStatePublisher: Published<Bool>.Publisher = WindowControllersManager.shared.$isInInitialState,
-            canRestoreLastSessionState: @escaping @autoclosure () -> Bool = NSApp.canRestoreLastSessionState
-        ) {
+        init(isInInitialStatePublisher: Published<Bool>.Publisher, canRestoreLastSessionState: @escaping @autoclosure () -> Bool) {
             self.canRestoreLastSessionState = canRestoreLastSessionState
             self.isInInitialStateCancellable = isInInitialStatePublisher
                 .dropFirst()
@@ -254,6 +252,11 @@ extension HistoryMenu {
                 .sink { [weak self] isInInitialState in
                     self?.updateKeyEquivalent(isInInitialState)
                 }
+        }
+
+        @MainActor
+        convenience init() {
+            self.init(isInInitialStatePublisher: WindowControllersManager.shared.$isInInitialState, canRestoreLastSessionState: NSApp.canRestoreLastSessionState)
         }
 
         private weak var currentlyAssignedMenuItem: NSMenuItem?

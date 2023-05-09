@@ -14,6 +14,8 @@ disabled_rules:
   - cyclomatic_complexity
   - identifier_name
   - implicit_getter
+  - trailing_comma
+  - blanket_disable_command
 
 opt_in_rules:
   - file_header

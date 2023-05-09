@@ -153,11 +153,8 @@ extension Optional where Wrapped == PermissionState {
         case (.revoking, .active), (.revoking, .muted), (.reloading, .active), (.reloading, .muted):
             // Probably Active Camera + Microphone -> Active Camera state change, stay in Revoking state
             break
-        case (.denied, .active):
-            assertionFailure("Unexpected change of system disabled Permission")
-            fallthrough
         // Permission Activated
-        case (.none, .active), (.paused, .active), (.inactive, .active):
+        case (.none, .active), (.paused, .active), (.inactive, .active), (.denied, .active):
             self = .active
 
         case (.disabled, .muted), (.denied, .muted), (.requested, .muted):

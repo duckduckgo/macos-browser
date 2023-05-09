@@ -44,9 +44,9 @@ jobs:
       env:
         SHELLCHECK_OPTS: -x -P scripts -P scripts/helpers
 
-  unit-tests:
+  tests:
 
-    name: Unit Tests
+    name: Test
 
     strategy:
       matrix:
@@ -60,8 +60,12 @@ jobs:
             flavor: Non-Sandbox
           - active-arch: NO
             flavor: Sandbox
+          - cache-key:
+            flavor: Non-Sandbox
+          - cache-key: sandbox-
+            flavor: Sandbox
 
-    runs-on: macos-12
+    runs-on: macos-13
     timeout-minutes: 30
 
     outputs:
@@ -80,6 +84,24 @@ jobs:
       with:
         submodules: recursive
 
+    - name: Set cache key hash
+      run: |
+        has_only_tags=$(jq '[ .pins[].state | has("version") ] | all' DuckDuckGo.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved)
+        if [[ "$has_only_tags" == "true" ]]; then
+          echo "cache_key_hash=${{ hashFiles('DuckDuckGo.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}" >> $GITHUB_ENV
+        else
+          echo "Package.resolved contains dependencies specified by branch or commit, skipping cache."
+        fi
+
+    - name: Cache SPM
+      if: env.cache_key_hash
+      uses: actions/cache@v3
+      with:
+        path: DerivedData/SourcePackages
+        key: ${{ runner.os }}-spm-${{ matrix.cache-key }}${{ env.cache_key_hash }}
+        restore-keys: |
+          ${{ runner.os }}-spm-${{ matrix.cache-key }}
+
     - name: Select Xcode
       run: sudo xcode-select -s /Applications/Xcode_$(<.xcode-version).app/Contents/Developer
 
@@ -89,13 +111,16 @@ jobs:
 
     - name: Build and test
       run: |
+        echo "Runner ${RUNNER_NAME} (${RUNNER_TRACKING_ID})"
+        export OS_ACTIVITY_MODE=debug
         set -o pipefail && xcodebuild test \
           -scheme "${{ matrix.scheme }}" \
-          -derivedDataPath "derived-data" \
+          -derivedDataPath "DerivedData" \
           -configuration "CI" \
           ENABLE_TESTABILITY=true \
           ONLY_ACTIVE_ARCH=${{ matrix.active-arch }} \
-          | xcbeautify --report junit --report-path . --junit-report-filename unittests-${{ matrix.flavor }}.xml
+          | tee ${{ matrix.flavor }}-xcodebuild.log \
+          | xcbeautify --report junit --report-path . --junit-report-filename ${{ matrix.flavor }}.xml
 
     - name: Check private API usage
       id: private-api
@@ -103,7 +128,7 @@ jobs:
         if [[ ${{ matrix.flavor }} != "Sandbox" ]]; then
           echo "Skipping private API usage check for ${{ matrix.flavor }} build"
         else
-          binary_path="derived-data/Build/Products/CI/DuckDuckGo App Store.app/Contents/MacOS/DuckDuckGo App Store"
+          binary_path="DerivedData/Build/Products/CI/DuckDuckGo App Store.app/Contents/MacOS/DuckDuckGo App Store"
           ./scripts/find_private_symbols.sh "${binary_path}" | tee private_api_report.txt
 
           cat private_api_report.txt >> $GITHUB_STEP_SUMMARY
@@ -128,15 +153,22 @@ jobs:
       if: always() # always run even if the previous step fails
       with:
         check_name: "Test Report: ${{ matrix.flavor }}"
-        report_paths: unittests-${{ matrix.flavor }}.xml
+        report_paths: ${{ matrix.flavor }}.xml
+
+    - name: Upload failed test log
+      uses: actions/upload-artifact@v3
+      if: failure()
+      with:
+        name: ${{ matrix.flavor }}-xcodebuild.log
+        path: ${{ matrix.flavor }}-xcodebuild.log
 
   private-api:
     name: Private API Report
-    needs: unit-tests
-    if: ${{ success() || needs.unit-tests.outputs.private-api-check-report }}
+    needs: tests
+    if: ${{ success() || needs.tests.outputs.private-api-check-report }}
     uses: ./.github/workflows/private_api_report.yml
     with:
-      report: ${{ needs.unit-tests.outputs.private-api-check-report }}
+      report: ${{ needs.tests.outputs.private-api-check-report }}
 
   verify-autoconsent-bundle:
     name: 'Verify autoconsent bundle'

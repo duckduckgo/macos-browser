@@ -33,7 +33,7 @@ final class BookmarkManagementSidebarViewController: NSViewController {
         case folder(BookmarkFolder)
         case favorites
 
-        var selectedFolderUUID: UUID? {
+        var selectedFolderUUID: String? {
             switch self {
             case .folder(let folder): return folder.id
             default: return nil
@@ -137,7 +137,7 @@ final class BookmarkManagementSidebarViewController: NSViewController {
     private func expandAndRestore(selectedNodes: [BookmarkNode]) {
         treeController.visitNodes { node in
             if let objectID = (node.representedObject as? BaseBookmarkEntity)?.id {
-                if dataSource.expandedNodes.contains(objectID) {
+                if dataSource.expandedNodesIDs.contains(objectID) {
                     outlineView.expandItem(node)
                 } else {
                     outlineView.collapseItem(node)
@@ -249,7 +249,7 @@ extension BookmarkManagementSidebarViewController: FolderMenuItemSelectors {
             return
         }
 
-        let tabs = children.compactMap { $0 as? Bookmark }.map { Tab(content: .url($0.url), shouldLoadInBackground: true) }
+        let tabs = children.compactMap { ($0 as? Bookmark)?.urlObject }.map { Tab(content: .url($0), shouldLoadInBackground: true, isBurner: tabCollection.isBurner) }
         tabCollection.append(tabs: tabs)
     }
 

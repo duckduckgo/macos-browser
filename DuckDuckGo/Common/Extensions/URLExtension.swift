@@ -16,8 +16,8 @@
 //  limitations under the License.
 //
 
+import Common
 import Foundation
-import os.log
 import BrowserServicesKit
 
 extension URL.NavigationalScheme {
@@ -124,6 +124,11 @@ extension URL {
         return Self.preferences.appendingPathComponent(pane.rawValue)
     }
 
+    var isHypertextURL: Bool {
+        guard let scheme = self.scheme.map(NavigationalScheme.init(rawValue:)) else { return false }
+        return NavigationalScheme.validSchemes.contains(scheme)
+    }
+
     // MARK: Pixel
 
     static let pixelBase = ProcessInfo.processInfo.environment["PIXEL_BASE_URL", default: "https://improving.duckduckgo.com"]
@@ -184,6 +189,10 @@ extension URL {
         func separated() -> String {
             self.rawValue + "."
         }
+    }
+
+    var navigationalScheme: NavigationalScheme? {
+        self.scheme.map(NavigationalScheme.init(rawValue:))
     }
 
     var separatedScheme: String? {
@@ -293,8 +302,20 @@ extension URL {
         return URL(string: "https://duckduckgo.com/about")!
     }
 
+    static var webTrackingProtection: URL {
+        return URL(string: "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/")!
+    }
+
+    static var cookieConsentPopUpManagement: URL {
+        return URL(string: "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#cookie-consent-pop-up-management")!
+    }
+
     static var gpcLearnMore: URL {
         return URL(string: "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/gpc/")!
+    }
+
+    static var theFireButton: URL {
+        return URL(string: "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#the-fire-button")!
     }
 
     static var privacyPolicy: URL {

@@ -78,6 +78,11 @@
                                                 <action selector="newWindow:" target="Ady-hI-5gd" id="nK2-0w-B4c"/>
                                             </connections>
                                         </menuItem>
+                                        <menuItem title="New Burner Window" keyEquivalent="N" id="fx4-EK-KRg">
+                                            <connections>
+                                                <action selector="newBurnerWindow:" target="Ady-hI-5gd" id="vLy-E3-sFd"/>
+                                            </connections>
+                                        </menuItem>
                                         <menuItem title="New Tab" keyEquivalent="t" id="9qI-62-tsd" userLabel="New Tab">
                                             <connections>
                                                 <action selector="newTab:" target="Ady-hI-5gd" id="Gnb-ML-joG"/>
@@ -386,7 +391,7 @@
                                         <menuItem isSeparatorItem="YES" id="hB3-LF-h0Y"/>
                                         <menuItem title="Show Bookmarks Bar" keyEquivalent="B" id="z3f-ie-l71">
                                             <connections>
-                                                <action selector="toggleBookmarksBar:" target="Ady-hI-5gd" id="nVa-wD-QtY"/>
+                                                <action selector="toggleBookmarksBarFromMenu:" target="Ady-hI-5gd" id="dCK-ha-Oqf"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem title="Show Downloads" keyEquivalent="j" id="qWL-J6-S8r">
@@ -505,8 +510,18 @@
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="eoz-XM-HpQ"/>
+                                        <menuItem title="Clear All History…" enabled="NO" id="n9a-Bc-r7Z">
+                                            <string key="keyEquivalent" base64-UTF8="YES">
+CA
+</string>
+                                            <modifierMask key="keyEquivalentModifierMask" shift="YES" command="YES"/>
+                                            <connections>
+                                                <action selector="clearAllHistory:" target="Ady-hI-5gd" id="5Q8-pp-l2m"/>
+                                            </connections>
+                                        </menuItem>
                                     </items>
                                     <connections>
+                                        <outlet property="clearAllHistoryMenuItem" destination="n9a-Bc-r7Z" id="L22-xU-BaT"/>
                                         <outlet property="recentlyClosedMenuItem" destination="pWT-lm-yTC" id="bhY-MN-oMZ"/>
                                         <outlet property="reopenAllWindowsFromLastSessionMenuItem" destination="C6V-uF-uX8" id="YoX-kD-0PA"/>
                                         <outlet property="reopenLastClosedMenuItem" destination="c3l-v1-kxk" id="1OS-ma-fzm"/>
@@ -530,7 +545,7 @@
                                         </menuItem>
                                         <menuItem title="Toggle Bookmarks Bar" keyEquivalent="B" id="SwH-Sh-zIJ">
                                             <connections>
-                                                <action selector="toggleBookmarksBar:" target="Ady-hI-5gd" id="EkG-vj-emY"/>
+                                                <action selector="toggleBookmarksBarFromMenu:" target="Ady-hI-5gd" id="K35-ch-3LK"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="aPG-H0-BrG"/>
@@ -732,7 +747,7 @@ CQ
                                                     <menuItem title="Reset YouTube Overlay Interactions" id="tTd-ZO-0Zx">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                         <connections>
-                                                            <action selector="resetPrivatePlayerOverlayInteractions:" target="Ady-hI-5gd" id="Tr1-yK-ayF"/>
+                                                            <action selector="resetDuckPlayerOverlayInteractions:" target="Ady-hI-5gd" id="Tr1-yK-ayF"/>
                                                         </connections>
                                                     </menuItem>
                                                 </items>
@@ -895,7 +910,7 @@ CQ
                             <outlet property="importBookmarksMenuItem" destination="tNX-Bv-yM3" id="NI1-on-lCU"/>
                             <outlet property="importBrowserDataMenuItem" destination="gTV-od-6G5" id="2R0-Pa-qG4"/>
                             <outlet property="manageBookmarksMenuItem" destination="BaO-sP-wbQ" id="rn7-HX-04s"/>
-                            <outlet property="networkProtectionPreferredServerLocationItem" destination="Zh6-DO-H1c" id="Vkl-vJ-LJY"/>
+                            <outlet property="newBurnerWindowMenuItem" destination="fx4-EK-KRg" id="52V-eM-hzi"/>
                             <outlet property="networkProtectionRegistrationKeyValidityMenuItem" destination="iPz-EO-Nv6" id="Sw3-Bt-aZt"/>
                             <outlet property="networkProtectionRegistrationKeyValidityMenuSeparatorItem" destination="MEg-4g-gji" id="yWq-Rz-B9B"/>
                             <outlet property="newTabMenuItem" destination="9qI-62-tsd" id="6SI-rG-P34"/>
