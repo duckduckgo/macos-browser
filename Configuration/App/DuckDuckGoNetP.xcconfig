@@ -25,7 +25,7 @@ PRODUCT_BUNDLE_IDENTIFIER[config=Debug][sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX)
 PRODUCT_BUNDLE_IDENTIFIER[config=CI][sdk=*] =
 PRODUCT_BUNDLE_IDENTIFIER[config=Review][sdk=*] =
 
-INFOPLIST_FILE = DuckDuckGo/Info-NetP.plist
+INFOPLIST_FILE = DuckDuckGo/Info.plist
 
 // Just make sure to override anything set by the AppTargetBase.xcconfig
 CODE_SIGN_STYLE = Manual

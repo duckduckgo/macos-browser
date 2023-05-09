@@ -106,5 +106,11 @@
 	<false/>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<key>NOTIFICATIONS_AGENT_BUNDLE_ID</key>
+	<string>$(NOTIFICATIONS_AGENT_BUNDLE_ID)</string>
+	<key>AGENT_BUNDLE_ID</key>
+	<string>$(AGENT_BUNDLE_ID)</string>
+	<key>NETP_APP_GROUP</key>
+	<string>$(NETP_APP_GROUP)</string>
 </dict>
 </plist>

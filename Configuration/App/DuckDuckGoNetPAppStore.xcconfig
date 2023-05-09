@@ -21,7 +21,7 @@
 
 BUNDLE_IDENTIFIER_PREFIX = com.duckduckgo.macos.browser.network-protection
 
-INFOPLIST_FILE = DuckDuckGo/Info-NetP.plist
+INFOPLIST_FILE = DuckDuckGo/Info.plist
 
 // Left empty intentionally as we currently only support debug and release builds
 CODE_SIGN_ENTITLEMENTS[config=Review][sdk=macosx*] =
