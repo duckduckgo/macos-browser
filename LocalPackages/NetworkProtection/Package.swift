@@ -14,7 +14,7 @@ let package = Package(
         .library(name: "NetworkProtection", targets: ["NetworkProtection"])
     ],
     dependencies: [
-        .package(name: "BrowserServicesKit", url: "https://github.com/duckduckgo/BrowserServicesKit", .exact("46.0.1"))
+        .package(name: "BrowserServicesKit", url: "https://github.com/duckduckgo/BrowserServicesKit", .exact("57.4.4"))
     ],
     targets: [
         .target(
