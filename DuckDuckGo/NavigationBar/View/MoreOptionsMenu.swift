@@ -28,6 +28,7 @@ protocol OptionsButtonMenuDelegate: AnyObject {
     func optionsButtonMenuRequestedToggleBookmarksBar(_ menu: NSMenu)
     func optionsButtonMenuRequestedBookmarkManagementInterface(_ menu: NSMenu)
     func optionsButtonMenuRequestedBookmarkImportInterface(_ menu: NSMenu)
+    func optionsButtonMenuRequestedBookmarkExportInterface(_ menu: NSMenu)
     func optionsButtonMenuRequestedLoginsPopover(_ menu: NSMenu, selectedCategory: SecureVaultSorting.Category)
     func optionsButtonMenuRequestedOpenExternalPasswordManager(_ menu: NSMenu)
     func optionsButtonMenuRequestedDownloadsPopover(_ menu: NSMenu)
@@ -143,6 +144,10 @@ final class MoreOptionsMenu: NSMenu {
 
     @objc func openBookmarkImportInterface(_ sender: NSMenuItem) {
         actionDelegate?.optionsButtonMenuRequestedBookmarkImportInterface(self)
+    }
+
+    @objc func openBookmarkExportInterface(_ sender: NSMenuItem) {
+        actionDelegate?.optionsButtonMenuRequestedBookmarkExportInterface(self)
     }
 
     @objc func openDownloads(_ sender: NSMenuItem) {
@@ -440,6 +445,9 @@ final class BookmarksSubMenu: NSMenu {
         addItem(NSMenuItem.separator())
 
         addItem(withTitle: UserText.importBrowserData, action: #selector(MoreOptionsMenu.openBookmarkImportInterface(_:)), keyEquivalent: "")
+            .targetting(target)
+
+        addItem(withTitle: UserText.exportBookmarks, action: #selector(MoreOptionsMenu.openBookmarkExportInterface(_:)), keyEquivalent: "")
             .targetting(target)
     }
 

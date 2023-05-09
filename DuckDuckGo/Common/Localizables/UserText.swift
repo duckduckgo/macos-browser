@@ -204,9 +204,7 @@ struct UserText {
 
     static let importBrowserData = NSLocalizedString("import.browser.data", value: "Import Bookmarks and Passwords…", comment: "Opens Import Browser Data dialog")
     static let exportLogins = NSLocalizedString("export.logins.data", value: "Export Logins", comment: "Opens Export Logins Data dialog")
-    static let exportMenuItem = NSLocalizedString("export.menu.item", value: "Export", comment: "Export menu item")
-    static let exportLoginsMenuItem = NSLocalizedString("export.logins.menu.item", value: "Logins", comment: "Export logins menu item")
-    static let exportBookmarksMenuItem = NSLocalizedString("export.bookmarks.menu.item", value: "Bookmarks", comment: "Export bookmarks menu item")
+    static let exportBookmarks = NSLocalizedString("export.bookmarks.menu.item", value: "Export Bookmarks", comment: "Export bookmarks menu item")
 
     static let bookmarks = NSLocalizedString("bookmarks", value: "Bookmarks", comment: "Button for bookmarks")
     static let favorites = NSLocalizedString("favorites", value: "Favorites", comment: "Title text for the Favorites menu item")
