@@ -19,7 +19,7 @@
 import Foundation
 import WebKit
 
-final class FindInPageModel {
+final class FindInPageModel: NSObject {
 
     @Published private(set) var text: String = ""
     @Published private(set) var currentSelection: Int = 1
@@ -35,6 +35,7 @@ final class FindInPageModel {
 
     func show(with webView: WKWebView) {
         self.webView = webView
+        webView.setValue(self, forKey: "findDelegate")
         isVisible = true
     }
 
@@ -44,19 +45,23 @@ final class FindInPageModel {
 
     func find(_ text: String) {
         self.text = text
-        evaluate("window.__firefox__.find('\(text.escapedJavaScriptString())')")
+        webView?._find(text, options: [.caseInsensitive, .showFindIndicator, .showHighlight, .showOverlay, .determineMatchIndex, .wrapAround], maxCount: .max)
+//        evaluate("window.__firefox__.find('\(text.escapedJavaScriptString())')")
     }
 
     func findDone() {
-        evaluate("window.__firefox__.findDone()")
+//        evaluate("window.__firefox__.findDone()")
+        webView?.perform(NSSelectorFromString("_hideFindUI"))
     }
 
     func findNext() {
-        evaluate("window.__firefox__.findNext()")
+            webView?._find(text, options: [.caseInsensitive, .showFindIndicator, .showHighlight, .showOverlay, .determineMatchIndex], maxCount: .max)
+//        evaluate("window.__firefox__.findNext()")
     }
 
     func findPrevious() {
-        evaluate("window.__firefox__.findPrevious()")
+        webView?._find(text, options: [.caseInsensitive, .showFindIndicator, .showHighlight, .showOverlay, .determineMatchIndex, .wrapAround, .backwards], maxCount: .max)
+//        evaluate("window.__firefox__.findPrevious()")
     }
 
     private func evaluate(_ js: String) {
@@ -66,5 +71,16 @@ final class FindInPageModel {
             webView?.evaluateJavaScript(js)
         }
     }
+
+}
+
+extension FindInPageModel /* _WKFindDelegate */ {
+
+    @objc(_webView:didFindMatches:forString:withMatchIndex:)
+    func webView(_ webView: WKWebView, didFind matchesFound: Int, for string: String, withMatchIndex matchIndex: Int) {
+        Swift.print("didFindMatches:", matchesFound, "for:", string, "withMatchIndex:", matchIndex)
+        self.update(currentSelection: matchIndex, matchesFound: matchesFound)
+    }
+
 
 }
