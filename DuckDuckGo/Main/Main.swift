@@ -31,14 +31,11 @@ extension Bundle {
 @main
 final class AppMain {
     private enum LaunchError: Error {
-        case unhandled(code: Int32)
         case startVPNFailed(_ error: Error)
         case stopVPNFailed(_ error: Error)
     }
 
     static func main() async throws {
-        let arguments = ProcessInfo.processInfo.arguments
-
         switch (CommandLine.arguments.first! as NSString).lastPathComponent {
         case "startVPN":
             swizzleMainBundle()
@@ -62,19 +59,14 @@ final class AppMain {
             break
         }
 
-        let result = NSApplicationMain(CommandLine.argc, CommandLine.unsafeArgv)
-
-        if result != 0 {
-            throw LaunchError.unhandled(code: result)
-        }
+        _ = NSApplicationMain(CommandLine.argc, CommandLine.unsafeArgv)
     }
 
     private static func swizzleMainBundle() {
-        Bundle.mainURL = URL(fileURLWithPath: CommandLine.arguments.first!).deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+        Bundle.mainURL = Bundle(for: Self.self).bundleURL
 
         let m1 = class_getClassMethod(Bundle.self, #selector(getter: Bundle.main))!
         let m2 = class_getClassMethod(Bundle.self, #selector(Bundle.nonMain))!
-
         method_exchangeImplementations(m1, m2)
     }
 }

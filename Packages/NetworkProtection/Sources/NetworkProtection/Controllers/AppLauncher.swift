@@ -40,9 +40,9 @@ public final class AppLauncher {
         var helperAppPath: String? {
             switch self {
             case .startVPN:
-                return "/Contents/Resources/startVPN.app"
+                return "./Contents/Resources/startVPN.app"
             case .stopVPN:
-                return "/Contents/Resources/stopVPN.app"
+                return "./Contents/Resources/stopVPN.app"
             default:
                 return nil
             }
