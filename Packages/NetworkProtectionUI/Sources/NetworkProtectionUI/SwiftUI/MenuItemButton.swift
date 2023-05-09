@@ -20,8 +20,9 @@ import Foundation
 import SwiftUI
 
 struct MenuItemButton: View {
-    let title: String
-    let action: () -> Void
+    private let title: String
+    private let textColor: Color
+    private let action: () -> Void
 
     private let highlightAnimationStepSpeed = 0.05
 
@@ -29,8 +30,9 @@ struct MenuItemButton: View {
     @State private var animatingTap = false
     @State private var animateToOff = true
 
-    init(_ title: String, action: @escaping () -> Void) {
+    init(_ title: String, textColor: Color, action: @escaping () -> Void) {
         self.title = title
+        self.textColor = textColor
         self.action = action
     }
 
@@ -40,9 +42,9 @@ struct MenuItemButton: View {
         }) {
             HStack {
                 Text(title)
-                    .foregroundColor(isHovered ? .white : .primary)
+                    .foregroundColor(isHovered ? .white : textColor)
                 Spacer()
-            }.padding([.top, .bottom], 5)
+            }.padding([.top, .bottom], 3)
                 .padding([.leading, .trailing], 9)
         }
         .frame(maxWidth: .infinity, alignment: .leading)

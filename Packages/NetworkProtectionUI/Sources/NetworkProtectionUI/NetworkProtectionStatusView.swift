@@ -49,64 +49,128 @@ struct PopoverHeightFixer<Content: View>: View {
     }
 }
 
+private let defaultTextColor = Color("TextColor", bundle: .module)
+
 fileprivate extension Font {
     enum NetworkProtection {
-        static var title: Font {
-            .system(size: 15, weight: .semibold, design: .default)
+        static var connectionStatusDetail: Font {
+            .system(size: 13, weight: .regular, design: .default)
+        }
+
+        static var content: Font {
+            .system(size: 13, weight: .regular, design: .default)
+        }
+
+        static var description: Font {
+            .system(size: 13, weight: .regular, design: .default)
+        }
+
+        static var menu: Font {
+            .system(size: 13, weight: .regular, design: .default)
+        }
+
+        static var label: Font {
+            .system(size: 13, weight: .regular, design: .default)
         }
 
         static var sectionHeader: Font {
             .system(size: 12, weight: .semibold, design: .default)
         }
 
-        static var content: Font {
+        static var timer: Font {
             .system(size: 13, weight: .regular, design: .default)
+            .monospacedDigit()
+        }
+
+        static var title: Font {
+            .system(size: 15, weight: .semibold, design: .default)
         }
     }
 }
 
 private enum Opacity {
+    static func connectionStatusDetail(colorScheme: ColorScheme) -> Double {
+        colorScheme == .light ? Double(0.6) : Double(0.5)
+    }
+
     static let content = Double(0.58)
-    static let label = Double(0.84)
+    static let label = Double(0.9)
     static let description = Double(0.9)
+    static let menu = Double(0.9)
     static let link = Double(1)
-    static let title = Double(1)
+
+    static func sectionHeader(colorScheme: ColorScheme) -> Double {
+        colorScheme == .light ? Double(0.84) : Double(0.85)
+    }
+
+    static func timer(colorScheme: ColorScheme) -> Double {
+        colorScheme == .light ? Double(0.6) : Double(0.5)
+    }
+
+    static func title(colorScheme: ColorScheme) -> Double {
+        colorScheme == .light ? Double(0.84) : Double(0.85)
+    }
 }
 
 fileprivate extension View {
-    func applyTimerAttributes() -> some View {
-        opacity(Opacity.content)
-            .font(.NetworkProtection.content.monospacedDigit())
+    func applyConnectionStatusDetailAttributes(colorScheme: ColorScheme) -> some View {
+        opacity(Opacity.connectionStatusDetail(colorScheme: colorScheme))
+            .font(.NetworkProtection.connectionStatusDetail)
+            .foregroundColor(defaultTextColor)
     }
 
-    func applyContentAttributes() -> some View {
+    func applyContentAttributes(colorScheme: ColorScheme) -> some View {
         opacity(Opacity.content)
             .font(.NetworkProtection.content)
+            .foregroundColor(defaultTextColor)
     }
 
-    func applyDescriptionAttributes() -> some View {
+    func applyDescriptionAttributes(colorScheme: ColorScheme) -> some View {
         opacity(Opacity.description)
-            .font(.NetworkProtection.content)
+            .font(.NetworkProtection.description)
+            .foregroundColor(defaultTextColor)
     }
 
-    func applyLinkAttributes() -> some View {
+    func applyMenuAttributes() -> some View {
+        opacity(Opacity.menu)
+            .font(.NetworkProtection.menu)
+            .foregroundColor(defaultTextColor)
+    }
+
+    func applyLinkAttributes(colorScheme: ColorScheme) -> some View {
         opacity(Opacity.link)
             .font(.NetworkProtection.content)
+            .foregroundColor(defaultTextColor)
     }
 
-    func applyLabelAttributes() -> some View {
+    func applyLabelAttributes(colorScheme: ColorScheme) -> some View {
         opacity(Opacity.label)
-            .font(.NetworkProtection.content)
+            .font(.NetworkProtection.label)
+            .foregroundColor(defaultTextColor)
     }
 
-    func applyTitleAttributes() -> some View {
-        opacity(Opacity.title)
+    func applySectionHeaderAttributes(colorScheme: ColorScheme) -> some View {
+        opacity(Opacity.sectionHeader(colorScheme: colorScheme))
+            .font(.NetworkProtection.sectionHeader)
+            .foregroundColor(defaultTextColor)
+    }
+
+    func applyTimerAttributes(colorScheme: ColorScheme) -> some View {
+        opacity(Opacity.timer(colorScheme: colorScheme))
+            .font(.NetworkProtection.timer)
+            .foregroundColor(defaultTextColor)
+    }
+
+    func applyTitleAttributes(colorScheme: ColorScheme) -> some View {
+        opacity(Opacity.title(colorScheme: colorScheme))
             .font(.NetworkProtection.title)
+            .foregroundColor(defaultTextColor)
     }
 }
 
 public struct NetworkProtectionStatusView: View {
 
+    @Environment(\.colorScheme) var colorScheme
     @Environment(\.dismiss) private var dismiss
 
     // MARK: - Model
@@ -190,11 +254,11 @@ public struct NetworkProtectionStatusView: View {
             }
 
             Text(model.featureStatusDescription)
-                .applyTitleAttributes()
+                .applyTitleAttributes(colorScheme: colorScheme)
                 .padding([.top], 8)
 
             Text(UserText.networkProtectionStatusViewFeatureDesc)
-                .applyDescriptionAttributes()
+                .applyDescriptionAttributes(colorScheme: colorScheme)
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
                 .padding(EdgeInsets(top: 8, leading: 16, bottom: 16, trailing: 16))
@@ -206,7 +270,7 @@ public struct NetworkProtectionStatusView: View {
     private func connectionStatusView() -> some View {
         VStack(alignment: .leading, spacing: 0) {
             Text(UserText.networkProtectionStatusViewConnDetails)
-                .font(.NetworkProtection.sectionHeader)
+                .applySectionHeaderAttributes(colorScheme: colorScheme)
                 .padding(EdgeInsets(top: 6, leading: 9, bottom: 6, trailing: 9))
 
             connectionStatusRow(icon: .serverLocationIcon,
@@ -222,13 +286,13 @@ public struct NetworkProtectionStatusView: View {
 
     private func bottomMenuView() -> some View {
         VStack(spacing: 0) {
-            MenuItemButton("Share feedback...") {
+            MenuItemButton("Share Feedback...", textColor: defaultTextColor) {
                 model.shareFeedback()
                 dismiss()
             }
 
             if model.showLaunchBrowserMenuItem {
-                MenuItemButton("Open DuckDuckGo...") {
+                MenuItemButton("Open DuckDuckGo...", textColor: defaultTextColor) {
                     model.launchBrowser()
                     dismiss()
                 }
@@ -247,18 +311,18 @@ public struct NetworkProtectionStatusView: View {
         Toggle(isOn: model.isRunning) {
             HStack {
                 Text(UserText.networkProtectionStatusViewConnLabel)
-                    .applyLabelAttributes()
+                    .applyLabelAttributes(colorScheme: colorScheme)
                     .frame(alignment: .leading)
                     .fixedSize()
 
-                Spacer(minLength: 16)
+                Spacer(minLength: 8)
 
                 Text(model.connectionStatusDescription)
-                    .applyTimerAttributes()
+                    .applyTimerAttributes(colorScheme: colorScheme)
                     .fixedSize()
 
                 Spacer()
-                    .frame(width: 16)
+                    .frame(width: 8)
             }
         }
         .toggleStyle(.switch)
@@ -271,13 +335,13 @@ public struct NetworkProtectionStatusView: View {
                 .padding([.trailing], 8)
 
             Text(title)
-                .opacity(Opacity.label)
+                .applyLabelAttributes(colorScheme: colorScheme)
                 .fixedSize()
 
             Spacer(minLength: 16)
 
             Text(details)
-                .opacity(Opacity.content)
+                .applyConnectionStatusDetailAttributes(colorScheme: colorScheme)
                 .fixedSize()
         }
         .padding(EdgeInsets(top: 6, leading: 10, bottom: 6, trailing: 9))
