@@ -131,13 +131,7 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
         configuration.preferences.setValue(true, forKey: "developerExtrasEnabled")
 #endif
 
-        final class OverlayWebView: WKWebView {
-            public override func scrollWheel(with theEvent: NSEvent) {
-                // No-op to prevent scrolling
-            }
-        }
-
-        let webView = OverlayWebView(frame: .zero, configuration: configuration)
+        let webView = WKWebView(frame: .zero, configuration: configuration)
         webView.allowsLinkPreview = false
         webView.window?.acceptsMouseMovedEvents = true
         webView.window?.ignoresMouseEvents = false
