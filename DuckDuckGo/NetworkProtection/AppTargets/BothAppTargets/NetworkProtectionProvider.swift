@@ -346,6 +346,7 @@ final class DefaultNetworkProtectionProvider: NetworkProtection.TunnelController
         }
 
 #if NETP_SYSTEM_EXTENSION
+
         guard try await ensureSystemExtensionIsActivated() else {
             return
         }

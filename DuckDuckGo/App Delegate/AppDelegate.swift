@@ -197,17 +197,37 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     // MARK: - Network Protection
 
     private func startupNetworkProtection() {
-        let provider = DefaultNetworkProtectionProvider()
+        updateNetworkProtectionIfVersionChanged()
+        refreshNetworkProtectionServers()
+        warnUserAboutApplicationPathForNetworkProtection()
+    }
 
+    private func updateNetworkProtectionIfVersionChanged() {
+        let currentVersion = AppVersion.shared.versionNumber
+        let versionStore = NetworkProtectionLastVersionRunStore()
+        defer {
+            versionStore.lastVersionRun = currentVersion
+        }
+
+        if let lastVersionRun = versionStore.lastVersionRun,
+           lastVersionRun == currentVersion {
+
+            return
+        }
+
+        updateNetworkProtectionTunnelAndMenu()
+    }
+
+    private func updateNetworkProtectionTunnelAndMenu() {
         Task {
+            let provider = DefaultNetworkProtectionProvider()
+
             if await provider.isConnected() {
                 try? await provider.stop()
             }
         }
 
         resetLoginItemsIfAlreadyRunning()
-        refreshNetworkProtectionServers()
-        warnUserAboutApplicationPathForNetworkProtection()
     }
 
     private func resetLoginItemsIfAlreadyRunning() {
