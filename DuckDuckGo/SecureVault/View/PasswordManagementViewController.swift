@@ -53,9 +53,7 @@ final class PasswordManagementViewController: NSViewController {
     @IBOutlet var emptyStateTitle: NSTextField!
     @IBOutlet var emptyStateMessage: NSTextField!
     @IBOutlet var emptyStateButton: NSButton!
-    @IBOutlet weak var exportItem: NSMenuItem!
-    @IBOutlet weak var exportBookmarksItem: NSMenuItem!
-    @IBOutlet weak var exportLoginsItem: NSMenuItem!
+    @IBOutlet weak var exportLoginItem: NSMenuItem!
     @IBOutlet var lockScreen: NSView!
     @IBOutlet var lockScreenIconImageView: NSImageView! {
         didSet {
@@ -163,9 +161,7 @@ final class PasswordManagementViewController: NSViewController {
         addVaultItemButton.sendAction(on: .leftMouseDown)
         moreButton.sendAction(on: .leftMouseDown)
 
-        exportItem.title = UserText.exportMenuItem
-        exportLoginsItem.title = UserText.exportLoginsMenuItem
-        exportBookmarksItem.title = UserText.exportBookmarksMenuItem
+        exportLoginItem.title = UserText.exportLogins
 
         NotificationCenter.default.addObserver(forName: .deviceBecameLocked, object: nil, queue: .main) { [weak self] _ in
             self?.displayLockScreen()
@@ -267,11 +263,6 @@ final class PasswordManagementViewController: NSViewController {
     @IBAction func openExportLogins(_ sender: Any) {
         self.dismiss()
         NSApp.sendAction(#selector(AppDelegate.openExportLogins(_:)), to: nil, from: sender)
-    }
-
-    @IBAction func openExportBookmarksWindow(_ sender: Any) {
-        self.dismiss()
-        NSApp.sendAction(#selector(AppDelegate.openExportBookmarks(_:)), to: nil, from: nil)
     }
 
     @IBAction func onImportClicked(_ sender: NSButton) {
