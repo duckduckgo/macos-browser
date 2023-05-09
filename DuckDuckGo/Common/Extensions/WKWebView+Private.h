@@ -81,7 +81,7 @@ typedef NS_OPTIONS(NSUInteger, _WKFindOptions) {
 - (NSView *)_fullScreenPlaceholderView;
 
 - (void)_findString:(NSString *)string options:(_WKFindOptions)options maxCount:(NSUInteger)maxCount;
-- (void)_hideFindUIl
+- (void)_hideFindUI;
 @end
 
 NS_ASSUME_NONNULL_END
