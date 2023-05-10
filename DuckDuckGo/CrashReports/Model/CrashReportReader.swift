@@ -23,21 +23,7 @@ final class CrashReportReader {
     static let displayName = Bundle.main.displayName
 
     func getCrashReports(since lastCheckDate: Date) -> [CrashReport] {
-        let allPaths: [URL]
-        do {
-            allPaths = try FileManager.default.contentsOfDirectory(at: FileManager.diagnosticReports,
-                                                                   includingPropertiesForKeys: nil,
-                                                                   options: [])
-        } catch {
-            assertionFailure("CrashReportReader: Can't read content of diagnostic reports \(error.localizedDescription)")
-            return []
-        }
-
-        return allPaths
-            .filter({ isCrashReportPath($0) &&
-                        belongsToThisApp($0) &&
-                        isFile(at: $0, newerThan: lastCheckDate) })
-            .compactMap(crashReport(from:))
+        return []
     }
 
     private func isCrashReportPath(_ path: URL) -> Bool {

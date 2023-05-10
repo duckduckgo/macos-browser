@@ -43,9 +43,10 @@ final class StartupPreferences: ObservableObject {
     @Published var crashReportingURLString: String = "" {
         didSet {
             persistor?.crashReportingURLString = crashReportingURLString
+            let dsn = crashReportingURLString
             SentrySDK.close()
-            SentrySDK.start { [weak self] options in
-                options.dsn = self!.crashReportingURLString
+            SentrySDK.start { options in
+                options.dsn = dsn
             }
         }
     }
