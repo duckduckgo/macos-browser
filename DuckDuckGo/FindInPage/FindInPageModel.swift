@@ -19,7 +19,7 @@
 import Foundation
 import WebKit
 
-final class FindInPageModel: NSObject {
+final class FindInPageModel {
 
     @Published private(set) var text: String = ""
     @Published private(set) var currentSelection: Int?
