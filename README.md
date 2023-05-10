@@ -1,18 +1,25 @@
-# DuckDuckGo Privacy Browser for macOS
+# DuckDuckGo for macOS
+
+We are excited to engage the community in development!
+
 
 ## Building
 
-The app uses submodules, which will need to be cloned in order for the project to build:
+### Submodules
+We use submodules, so you will need to bring them into the project in order to build and run it:
 
 Run `git submodule update --init --recursive`
 
-## Schemes
+### Developer details
+If you're not part of the DuckDuckGo team, go to Signing & Capabilities to select your team and custom bundle identifier.
 
-`DuckDuckGo Privacy Browser` is the primary scheme. Use it for development, testing and releases.
-Use `Product Review Release` scheme for exporting builds for a product review or product feedback request.
-Use `Pull Request Testing with TSan` for testing a build in Release configuration before approving a pull request.
+### Dependencies
+We use Swift Package Manager for dependency management, which shouldn't require any additional set up.
 
-## Duck player
+### SwiftLint
+We use [SwifLint](https://github.com/realm/SwiftLint) for enforcing Swift style and conventions, so you'll need to [install it](https://github.com/realm/SwiftLint#installation).
+
+### Duck player
 
 To build the JS for the duck player:
 
@@ -26,3 +33,18 @@ Notes for Duck Player
 - when you 'build' the JavaScript bundle, changes to the compiled artifact `youtube-inject-bundle.js` should also be checked in when you commit.
 - if you make any changes, please run the integration tests
   - `cd js/youtube-player && npm run test.integration`
+
+## Terminology
+
+We have taken steps to update our terminology and remove words with problematic racial connotations, most notably the change to `main` branches, `allow lists`, and `blocklists`. Closed issues or PRs may contain deprecated terminology that should not be used going forward.
+
+## Contribute
+
+Please refer to [contributing](CONTRIBUTING.md).
+
+## Discuss
+
+Contact us at https://duckduckgo.com/feedback if you have feedback, questions or want to chat. You can also use the feedback form embedded within our app - to do so please go to Main Menu -> Help -> Send Feedback. 
+
+## License
+DuckDuckGo is distributed under the Apache 2.0 [license](https://github.com/duckduckgo/macos/blob/master/LICENSE.md).
