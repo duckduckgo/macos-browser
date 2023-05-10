@@ -34,6 +34,12 @@ asana_create_subtask() {
     _asana_create_subtask "${subtask_name}" ${asana_api_url}
 }
 
+asana_write_description() {	
+    local asana_api_url="https://app.asana.com/api/1.0"
+    local description=$1
+    _asana_write_description "${asana_api_url}" "${description}"
+} 
+
 # Private
 
 #
@@ -128,26 +134,32 @@ _asana_create_subtask() {
     subtask_creation_response=$(curl -s "${asana_api_url}/tasks/${asana_task_id}/subtasks" \
         -H "Authorization: Bearer ${asana_personal_access_token}" \
         -H 'Content-Type: application/json' \
-        --data "{\"data\": {\"name\": \"${subtask_name}\"}}" \
-        --request POST)
-    echo "Response: ${subtask_creation_response}"
+        --data "{\"data\": {\"name\": \"${subtask_name}\", \"insert_before\": null}}" \
+        --request POST)    
     new_subtask_id=$(echo "${subtask_creation_response}" | jq -r '.data.gid') 
 
-    # Get the first section of the tasks
-    section_id=$(curl -s "${asana_api_url}/tasks/${asana_task_id}/sections" \
-        -H "Authorization: Bearer ${asana_personal_access_token}" \
-        -H 'Content-Type: application/json' \
-        --request GET | jq -r '.data[0].gid')
-
-    # Insert the new subtask at the top of the first section
-    curl -s "${asana_api_url}/sections/${section_id}/addTask" \
-        -H "Authorization: Bearer ${asana_personal_access_token}" \
-        -H 'Content-Type: application/json' \
-        --data "{\"data\": {\"task\": \"${new_subtask_id}\", \"insert_before\": null}}" \
-        --request POST
+    die 1
 
     asana_task_id="${new_subtask_id}"
 }
+
+_asana_write_description() {	
+    local asana_api_url=$1
+    local description=$2
+
+    # Format the text as a JSON string
+    json_description=$(jq -R -s -c . <<< "$description")
+
+    payload="{\"data\": {\"notes\": ${json_description} }}"    
+
+    # Post the changes to the Asana task
+	curl -s "${asana_api_url}/tasks/${asana_task_id}" \
+	  -H "Authorization: Bearer ${asana_personal_access_token}" \
+	  -H "Content-Type: application/json" \
+	  -d "${payload}" \
+	  --request PUT
+}
+
 
 _asana_complete_task() {
 	local task_id=$1

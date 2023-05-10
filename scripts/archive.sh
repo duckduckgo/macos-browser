@@ -323,9 +323,9 @@ main() {
 	# and expects relevant environment variables to be defined.
 	# For running script locally, we're currently relying on Apple ID
 	# and application-specific password.
-	if [[ -z $CI ]]; then
-		get_developer_credentials
-	fi
+	#if [[ -z $CI ]]; then
+	#	get_developer_credentials
+	#fi
 
 	clear_working_directory
 	archive_and_export
@@ -333,7 +333,7 @@ main() {
 	staple_notarized_app
 	compress_app_and_dsym	
 
-	if [[ ${nightly} ]]; then		
+	if [[ ${nightly} ]]; then
 		asana_create_subtask "Nightly $(date +'%m-%d-%Y')"
 	fi
 
@@ -342,6 +342,11 @@ main() {
 
 		if [[ ${asana_task_id} ]]; then
 			asana_update_task "${dmg_output_path}" "${output_dsym_zip_path}"
+		fi
+
+		if [[ ${nightly} ]]; then
+			changes=$(git log --since="24 hours ago")
+			asana_write_description "Changelog: \n\n ${changes}"
 		fi
 	fi
 
