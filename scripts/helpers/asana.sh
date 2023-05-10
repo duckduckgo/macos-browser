@@ -138,8 +138,6 @@ _asana_create_subtask() {
         --request POST)    
     new_subtask_id=$(echo "${subtask_creation_response}" | jq -r '.data.gid') 
 
-    die 1
-
     asana_task_id="${new_subtask_id}"
 }
 
