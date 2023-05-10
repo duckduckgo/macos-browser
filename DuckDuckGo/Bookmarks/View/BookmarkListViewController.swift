@@ -212,20 +212,29 @@ final class BookmarkListViewController: NSViewController {
     }
 
     private func setUpManageBookmarksButton() {
-          let image = NSImage(named: "ExternalAppScheme")
-          let imageSize = image?.size ?? .zero
-          let padding = 8.0
-          let newRect = NSRect(x: 0.0, y: 0.0, width: imageSize.width + padding, height: imageSize.height)
-          image?.alignmentRect = newRect
+        // Set up image
+        let image = NSImage(named: "ExternalAppScheme")
+        let imageSize = image?.size ?? .zero
+        let padding = 6.0
+        let newRect = NSRect(x: 0.0, y: 0.0, width: imageSize.width + padding, height: imageSize.height)
+        image?.alignmentRect = newRect
 
-          manageBookmarksButton.image = image
-          manageBookmarksButton.title = UserText.bookmarksManage
-          manageBookmarksButton.toolTip = UserText.manageBookmarksTooltip
-          manageBookmarksButton.font = NSFont.systemFont(ofSize: 12)
-          manageBookmarksButton.imagePosition = .imageLeading
-          manageBookmarksButton.imageHugsTitle = true
-      }
+        // Set up button
+        manageBookmarksButton.image = image
+        manageBookmarksButton.title = UserText.bookmarksManage
+        manageBookmarksButton.toolTip = UserText.manageBookmarksTooltip
+        manageBookmarksButton.font = NSFont.systemFont(ofSize: 12)
+        manageBookmarksButton.imagePosition = .imageLeading
+        manageBookmarksButton.imageHugsTitle = true
 
+        // Set up constraints
+        let titleWidth = (CGFloat(manageBookmarksButton.title.count - 1) * 7.0 + 9)
+        let buttonWidth = imageSize.width + titleWidth + padding * 3
+        manageBookmarksButton.translatesAutoresizingMaskIntoConstraints = false
+        let widthConstraint = NSLayoutConstraint(item: manageBookmarksButton!, attribute: NSLayoutConstraint.Attribute.width, relatedBy: NSLayoutConstraint.Relation.equal, toItem: nil, attribute: NSLayoutConstraint.Attribute.notAnAttribute, multiplier: 1, constant: buttonWidth)
+        let heightConstraint = NSLayoutConstraint(item: manageBookmarksButton!, attribute: NSLayoutConstraint.Attribute.height, relatedBy: NSLayoutConstraint.Relation.equal, toItem: nil, attribute: NSLayoutConstraint.Attribute.notAnAttribute, multiplier: 1, constant: 28)
+        NSLayoutConstraint.activate([widthConstraint, heightConstraint])
+    }
 }
 
 // MARK: - Modal Delegates
