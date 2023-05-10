@@ -333,12 +333,12 @@ main() {
 	staple_notarized_app
 	compress_app_and_dsym	
 
-	if [[ ${create_dmg} ]]; then
-		create_dmg
+	if [[ ${nightly} ]]; then		
+		asana_create_subtask "Nightly $(date +'%m-%d-%Y')"
+	fi
 
-		if [[ ${nightly} ]]; then
-			$(asana_create_subtask "Nightly 2023-01-01")
-		fi
+	if [[ ${create_dmg} ]]; then
+		create_dmg		
 
 		if [[ ${asana_task_id} ]]; then
 			asana_update_task "${dmg_output_path}" "${output_dsym_zip_path}"

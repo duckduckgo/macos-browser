@@ -30,7 +30,8 @@ asana_update_task() {
 
 asana_create_subtask() {
     local subtask_name=$1
-    _asana_create_subtask "${subtask_name}"
+    local asana_api_url="https://app.asana.com/api/1.0"
+    _asana_create_subtask "${subtask_name}" ${asana_api_url}
 }
 
 # Private
@@ -120,14 +121,32 @@ _asana_upload_dsyms_zip() {
 
 _asana_create_subtask() {
     local subtask_name=$1
+    local asana_api_url=$2
 
+    echo "URL: ${asana_api_url}/tasks/${asana_task_id}/subtasks"
+    echo "Creating subtask: ${subtask_name} in ${asana_task_id}"
     subtask_creation_response=$(curl -s "${asana_api_url}/tasks/${asana_task_id}/subtasks" \
         -H "Authorization: Bearer ${asana_personal_access_token}" \
         -H 'Content-Type: application/json' \
         --data "{\"data\": {\"name\": \"${subtask_name}\"}}" \
         --request POST)
+    echo "Response: ${subtask_creation_response}"
+    new_subtask_id=$(echo "${subtask_creation_response}" | jq -r '.data.gid') 
 
-    asana_task_id=$(echo "${subtask_creation_response}" | jq -r '.data.gid')
+    # Get the first section of the tasks
+    section_id=$(curl -s "${asana_api_url}/tasks/${asana_task_id}/sections" \
+        -H "Authorization: Bearer ${asana_personal_access_token}" \
+        -H 'Content-Type: application/json' \
+        --request GET | jq -r '.data[0].gid')
+
+    # Insert the new subtask at the top of the first section
+    curl -s "${asana_api_url}/sections/${section_id}/addTask" \
+        -H "Authorization: Bearer ${asana_personal_access_token}" \
+        -H 'Content-Type: application/json' \
+        --data "{\"data\": {\"task\": \"${new_subtask_id}\", \"insert_before\": null}}" \
+        --request POST
+
+    asana_task_id="${new_subtask_id}"
 }
 
 _asana_complete_task() {
