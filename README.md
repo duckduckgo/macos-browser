@@ -47,4 +47,4 @@ Please refer to [contributing](CONTRIBUTING.md).
 Contact us at https://duckduckgo.com/feedback if you have feedback, questions or want to chat. You can also use the feedback form embedded within our app - to do so please go to Main Menu -> Help -> Send Feedback. 
 
 ## License
-DuckDuckGo is distributed under the Apache 2.0 [license](https://github.com/duckduckgo/macos/blob/master/LICENSE.md).
+DuckDuckGo is distributed under the Apache 2.0 [license](LICENSE.md).
