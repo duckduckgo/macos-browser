@@ -146,7 +146,7 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         })
     }
 
-    private func refreshDevices() {
+    func refreshDevices() {
         if syncService.account != nil {
             Task { @MainActor in
                 do {
