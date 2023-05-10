@@ -90,7 +90,8 @@ final class LocalBookmarkStore: BookmarkStore {
                     // When fetching the top level entities, the root folder will be returned. To make things simpler for the caller, this function
                     // will return the children of the root folder, as the root folder is an implementation detail of the bookmarks store.
                     let rootFolder = BookmarkUtils.fetchRootFolder(self.context)
-                    results = rootFolder?.childrenArray ?? []
+                    let orphanedEntities = BookmarkUtils.fetchOrphanedEntities(self.context)
+                    results = (rootFolder?.childrenArray ?? []) + orphanedEntities
                 case .favorites:
                     results = self.favoritesFolder?.favoritesArray ?? []
                 }

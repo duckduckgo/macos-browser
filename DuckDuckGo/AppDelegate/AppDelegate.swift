@@ -167,7 +167,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         appIconChanger = AppIconChanger(internalUserDecider: internalUserDecider)
         syncMetadata = LocalSyncMetadataStore(database: SyncMetadataDatabase.shared.db)
         syncService = DDGSync(dataProviders: [
-            SyncBookmarksProvider(
+            BookmarksProvider(
                 database: BookmarkDatabase.shared.db,
                 metadataStore: syncMetadata,
                 reloadBookmarksAfterSync: LocalBookmarkManager.shared.loadBookmarks
