@@ -323,9 +323,9 @@ main() {
 	# and expects relevant environment variables to be defined.
 	# For running script locally, we're currently relying on Apple ID
 	# and application-specific password.
-	#if [[ -z $CI ]]; then
-	#	get_developer_credentials
-	#fi
+	if [[ -z $CI ]]; then
+		get_developer_credentials
+	fi
 
 	clear_working_directory
 	archive_and_export
