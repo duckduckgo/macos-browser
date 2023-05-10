@@ -120,7 +120,11 @@ final class FindInPageViewController: NSViewController {
 
     private func rebuildStatus() {
         guard let model = model else { return }
-        statusField.stringValue = String(format: UserText.findInPage, model.currentSelection, model.matchesFound)
+        statusField.stringValue = {
+            guard let matchesFound = model.matchesFound,
+                  let currentSelection = model.currentSelection else { return "" }
+            return String(format: UserText.findInPage, currentSelection, matchesFound)
+        }()
     }
 
     private func updateView(firstResponder: Bool) {
@@ -128,9 +132,10 @@ final class FindInPageViewController: NSViewController {
     }
 
     private func updateFieldStates() {
-        statusField.isHidden = model?.text.isEmpty ?? true
-        nextButton.isEnabled = model?.matchesFound ?? 0 > 0
-        previousButton.isEnabled = model?.matchesFound ?? 0 > 0
+        guard let model else { return }
+        statusField.isHidden = model.text.isEmpty
+        nextButton.isEnabled = model.matchesFound.map { $0 > 0 } ?? true
+        previousButton.isEnabled = model.matchesFound.map { $0 > 0 } ?? true
     }
 
     private func listenForTextFieldResponderNotifications() {
