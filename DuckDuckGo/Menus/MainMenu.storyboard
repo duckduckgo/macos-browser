@@ -786,6 +786,12 @@ CQ
                                                 <action selector="triggerFatalError:" target="Ady-hI-5gd" id="pS0-iQ-TPe"/>
                                             </connections>
                                         </menuItem>
+                                        <menuItem title="Copy Encryption Key to Pasteboard" id="TxT-k5-1UW">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="seeEncryptionKey:" target="Ady-hI-5gd" id="Pt5-IB-R67"/>
+                                            </connections>
+                                        </menuItem>
                                     </items>
                                 </menu>
                             </menuItem>

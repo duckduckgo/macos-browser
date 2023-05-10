@@ -560,6 +560,16 @@ extension MainViewController {
         self.tabCollectionViewModel.selectedTabViewModel?.findInPageNext()
     }
 
+    @IBAction func seeEncryptionKey(_ sender: Any?) {
+        if let key = try? EncryptionKeyStore().readKey().withUnsafeBytes { Data($0) } {
+            let keyBase64 = key.base64EncodedString()
+            let pasteboard = NSPasteboard.general
+            pasteboard.clearContents()
+            pasteboard.setString(keyBase64, forType: .string)
+            print(keyBase64)
+        }
+    }
+
     @IBAction func findInPagePrevious(_ sender: Any?) {
         self.tabCollectionViewModel.selectedTabViewModel?.findInPagePrevious()
     }
