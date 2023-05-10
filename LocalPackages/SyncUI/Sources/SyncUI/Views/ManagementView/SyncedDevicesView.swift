@@ -22,10 +22,15 @@ struct SyncedDevicesView<ViewModel>: View where ViewModel: ManagementViewModel {
 
     @EnvironmentObject var model: ViewModel
 
+    let timer = Timer.publish(every: 10, on: .main, in: .common).autoconnect()
+
     var body: some View {
         SyncedDevicesList(devices: model.devices,
                           presentDeviceDetails: model.presentDeviceDetails,
                           presentRemoveDevice: model.presentRemoveDevice)
+        .onReceive(timer) { _ in
+            model.refreshDevices()
+        }
     }
 }
 
