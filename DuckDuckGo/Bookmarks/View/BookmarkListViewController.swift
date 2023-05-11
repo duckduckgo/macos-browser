@@ -99,7 +99,7 @@ final class BookmarkListViewController: NSViewController {
 
         newBookmarkButton.toolTip = UserText.newBookmarkTooltip
         newFolderButton.toolTip = UserText.newFolderTooltip
-        manageBookmarksButton.toolTip = UserText.manageBookmarksTooltip
+        setUpManageBookmarksButton()
     }
 
     override func viewWillAppear() {
@@ -211,6 +211,31 @@ final class BookmarkListViewController: NSViewController {
         outlineView.selectRowIndexes(indexes, byExtendingSelection: false)
     }
 
+    private func setUpManageBookmarksButton() {
+        // Set up image
+        let image = NSImage(named: "ExternalAppScheme")
+        let imageSize = image?.size ?? .zero
+        let padding = 6.0
+        let newRect = NSRect(x: 0.0, y: 0.0, width: imageSize.width + padding, height: imageSize.height)
+        image?.alignmentRect = newRect
+
+        // Set up button
+        manageBookmarksButton.image = image
+        manageBookmarksButton.title = UserText.bookmarksManage
+        manageBookmarksButton.toolTip = UserText.manageBookmarksTooltip
+        manageBookmarksButton.font = NSFont.systemFont(ofSize: 12)
+        manageBookmarksButton.imagePosition = .imageLeading
+        manageBookmarksButton.imageHugsTitle = true
+
+        // Set up constraints
+        let titleWidth = (manageBookmarksButton.title as NSString).size(withAttributes: [.font: manageBookmarksButton.font as Any]).width
+        let buttonWidth = imageSize.width + titleWidth + padding * 3
+        print(buttonWidth)
+        manageBookmarksButton.translatesAutoresizingMaskIntoConstraints = false
+        let widthConstraint = NSLayoutConstraint(item: manageBookmarksButton!, attribute: NSLayoutConstraint.Attribute.width, relatedBy: NSLayoutConstraint.Relation.equal, toItem: nil, attribute: NSLayoutConstraint.Attribute.notAnAttribute, multiplier: 1, constant: buttonWidth)
+//        let heightConstraint = NSLayoutConstraint(item: manageBookmarksButton!, attribute: NSLayoutConstraint.Attribute.height, relatedBy: NSLayoutConstraint.Relation.equal, toItem: nil, attribute: NSLayoutConstraint.Attribute.notAnAttribute, multiplier: 1, constant: 28)
+        NSLayoutConstraint.activate([widthConstraint])
+    }
 }
 
 // MARK: - Modal Delegates
