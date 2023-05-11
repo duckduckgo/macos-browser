@@ -21,45 +21,112 @@ import Foundation
 
 final class FindInPageTabExtension: TabExtension {
 
-    let model: FindInPageModel
-    private let userScriptCancellable: AnyCancellable?
+    let model = FindInPageModel()
+    private weak var webView: WebView?
+    private var cancellable: AnyCancellable?
 
-    var isVisible: Bool = false
+    private var isFindInPageActive = false
 
-    @MainActor
-    init(findInPageScriptPublisher: some Publisher<FindInPageUserScript?, Never>) {
-        model = FindInPageModel()
-        userScriptCancellable = findInPageScriptPublisher.sink { [weak model] findInPageScript in
-            findInPageScript?.model = model
+    private enum Constants {
+        static let randomString = UUID().uuidString
+        static let maxMatches: UInt = 1000
+    }
+
+    func show(with webView: WebView) {
+        self.webView = webView
+
+        model.show()
+        model.update(currentSelection: nil, matchesFound: nil)
+
+        reset { [weak self] in
+            guard let self, !self.model.text.isEmpty else { return }
+            self.find(self.model.text)
+        }
+
+        cancellable = model.$text
+            .dropFirst()
+            .debounce(for: 0.2, scheduler: RunLoop.main)
+            .sink { [weak self] text in
+                self?.textDidChange(to: text)
+            }
+    }
+
+    private func reset(completionHandler: (() -> Void)? = nil) {
+        model.update(currentSelection: nil, matchesFound: nil)
+        isFindInPageActive = false
+
+        // hide overlay and reset matchIndex
+        webView?.clearFindInPageState()
+        // search for deliberately missing string to reset current match
+        webView?.find(Constants.randomString, with: [], maxCount: 1) { _ in
+            completionHandler?()
         }
     }
 
-    func show(with webView: WKWebView) {
-        model.show(with: webView)
-        if !model.text.isEmpty {
-            model.find(model.text)
+    private func textDidChange(to string: String) {
+        if string.isEmpty {
+            reset()
+        } else {
+            var options: _WKFindOptions = [.showOverlay]
+            if isFindInPageActive {
+                options.insert(.noIndexChange) // continue search from current match index
+            }
+            find(string, with: options)
+        }
+    }
+
+    private func find(_ string: String, with options: _WKFindOptions = []) {
+        guard !string.isEmpty else { return }
+
+        let options = options.union([.caseInsensitive, .wrapAround, .showFindIndicator, .determineMatchIndex])
+        webView?.find(string, with: options, maxCount: Constants.maxMatches) { [weak self] result in
+            guard let self else { return }
+            switch result {
+            case .success(let result):
+                self.model.update(currentSelection: result.matchIndex.map { $0 + 1 }, matchesFound: result.matchesFound)
+
+                // first search _sometimes_ won‘t highlight the first match
+                // search again to ensure highlighting with noIndexChange to find the same match
+                if !self.isFindInPageActive,
+                    self.model.isVisible,
+                    result.string == self.model.text {
+
+                    self.isFindInPageActive = true
+                    self.find(string, with: [.noIndexChange, .showOverlay])
+                }
+
+            case .failure(.notFound):
+                self.webView?.clearFindInPageState()
+                self.isFindInPageActive = false
+                self.model.update(currentSelection: 0, matchesFound: 0)
+            case .failure(.cancelled):
+                break
+            }
         }
     }
 
     func close() {
         guard model.isVisible else { return }
-        model.findDone()
         model.close()
+        cancellable = nil
+        webView?.clearFindInPageState()
     }
 
     func findNext() {
-        model.findNext()
+        guard !model.text.isEmpty else { return }
+        find(model.text, with: model.isVisible ? .showOverlay : [])
     }
 
     func findPrevious() {
-        model.findPrevious()
+        guard !model.text.isEmpty else { return }
+        find(model.text, with: model.isVisible ? [.showOverlay, .backwards] : [.backwards])
     }
 
 }
 
 protocol FindInPageProtocol {
     var model: FindInPageModel { get }
-    func show(with webView: WKWebView)
+    func show(with webView: WebView)
     func close()
     func findNext()
     func findPrevious()
