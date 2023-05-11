@@ -58,7 +58,7 @@ final class FindInPageTabExtension: TabExtension {
         // hide overlay and reset matchIndex
         webView?.clearFindInPageState()
         // search for deliberately missing string to reset current match
-        webView?.find(Constants.randomString, with: [], maxCount: Constants.maxMatches) { _ in
+        webView?.find(Constants.randomString, with: [], maxCount: 1) { _ in
             completionHandler?()
         }
     }
@@ -86,7 +86,7 @@ final class FindInPageTabExtension: TabExtension {
                 self.model.update(currentSelection: result.matchIndex.map { $0 + 1 }, matchesFound: result.matchesFound)
 
                 // first search _sometimes_ won‘t highlight the first match
-                // search again with explicit parameters and noIndexChange to ensure highlighting
+                // search again to ensure highlighting with noIndexChange to find the same match
                 if !self.isFindInPageActive,
                     self.model.isVisible,
                     result.string == self.model.text {
