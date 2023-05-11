@@ -70,9 +70,18 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         presentDialog(for: .turnOffSync)
     }
 
+    var showOrEnterCodeDevicesCancellable: AnyCancellable?
+
     @MainActor
     func presentShowOrEnterCodeDialog() {
         Task { @MainActor in
+            let devicesAtStart = self.devices
+            showOrEnterCodeDevicesCancellable = self.$devices.sink { [weak self] value in
+                if devicesAtStart != value {
+                    self?.managementDialogModel.endFlow()
+                    self?.showOrEnterCodeDevicesCancellable?.cancel()
+                }
+            }
             managementDialogModel.codeToDisplay = syncService.account?.recoveryCode
             presentDialog(for: .syncAnotherDevice)
         }
@@ -184,6 +193,7 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         onEndFlow = {
             self.connector?.stopPolling()
             self.connector = nil
+            self.showOrEnterCodeDevicesCancellable?.cancel()
 
             guard let window = syncWindowController.window, let sheetParent = window.sheetParent else {
                 assertionFailure("window or sheet parent not present")
@@ -269,7 +279,21 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                     presentDialog(for: .deviceSynced)
                 } else if let connectKey = syncCode.connect {
                     // Unclear what the UX is supposed to be here given everything is happening on the other device
+                    var isNewAccount = false
+                    if syncService.account == nil {
+                        let device = deviceInfo()
+                        try await syncService.createAccount(deviceName: device.name, deviceType: device.type)
+                        isNewAccount = true
+                    }
+
                     try await syncService.transmitRecoveryKey(connectKey)
+
+                    if isNewAccount {
+                        presentDialog(for: .deviceSynced)
+                    } else {
+                        managementDialogModel.endFlow()
+                    }
+
                 } else {
                     managementDialogModel.errorMessage = "Invalid code"
                     return
