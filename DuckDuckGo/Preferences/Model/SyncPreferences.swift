@@ -217,7 +217,11 @@ extension SyncPreferences: ManagementDialogModelDelegate {
     func deleteAccount() {
         Task { @MainActor in
             managementDialogModel.endFlow()
-            try await syncService.deleteAccount()
+            do {
+                try await syncService.deleteAccount()
+            } catch {
+                managementDialogModel.errorMessage = String(describing: error)
+            }
         }
     }
 
@@ -351,7 +355,11 @@ extension SyncPreferences: ManagementDialogModelDelegate {
             guard response == .OK,
                   let location = panel.url else { return }
 
-            try data.writeFileWithProgress(to: location)
+            do {
+                try data.writeFileWithProgress(to: location)
+            } catch {
+                managementDialogModel.errorMessage = String(describing: error)
+            }
         }
 
     }
