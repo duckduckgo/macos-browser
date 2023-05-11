@@ -205,9 +205,10 @@ final class WebView: WKWebView {
             _=Self.swizzleFindStringOnce
             // receive _WKFindDelegate calls and call completion handler
             NSException.try {
-                super.setValue(self, forKey: "findDelegate")
+                self.setValue(self, forKey: "findDelegate")
             }
             if let findInPageCompletionHandler {
+                self.findInPageCompletionHandler = nil
                 findInPageCompletionHandler(.failure(.cancelled))
             }
             self.findInPageCompletionHandler = completionHandler

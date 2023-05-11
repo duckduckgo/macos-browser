@@ -134,6 +134,7 @@ final class FindInPageViewController: NSViewController {
     private func updateFieldStates() {
         guard let model else { return }
         statusField.isHidden = model.text.isEmpty
+        // enable next/prev buttons by default if current status is unknown (fallback to public find API)
         nextButton.isEnabled = model.matchesFound.map { $0 > 0 } ?? true
         previousButton.isEnabled = model.matchesFound.map { $0 > 0 } ?? true
     }
