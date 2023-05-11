@@ -97,7 +97,7 @@ extension Preferences {
                         }
                     }
                     Spacer()
-                    Button(UserText.importBrowserData) {
+                    Button(UserText.importPasswords) {
                         model.openImportBrowserDataWindow()
                     }
                     Button(UserText.exportLogins) {
