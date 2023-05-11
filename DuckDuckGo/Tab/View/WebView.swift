@@ -200,9 +200,10 @@ final class WebView: WKWebView {
     func find(_ string: String, with options: _WKFindOptions, maxCount: UInt, completionHandler: ((Result<FindResult, FindError>) -> Void)?) {
         assert(!string.isEmpty)
 
-        // redirect real WebKit calls to WKFindDelegate
+        // native WKWebView find
         if self.responds(to: Selector.findString) {
             _=Self.swizzleFindStringOnce
+            // receive _WKFindDelegate calls and call completion handler
             NSException.try {
                 super.setValue(self, forKey: "findDelegate")
             }
@@ -213,12 +214,12 @@ final class WebView: WKWebView {
             self.find(string, with: options, maxCount: maxCount)
 
         } else if #available(macOS 11.0, *) {
+            // fallback to official `findSting:`
             let config = WKFindConfiguration()
             config.backwards = options.contains(.backwards)
             config.caseSensitive = !options.contains(.caseInsensitive)
             config.wraps = options.contains(.wrapAround)
 
-            // call official `findSting:`
             self.find(string, configuration: config) { result in
                 if result.matchFound {
                     completionHandler?(.success(FindResult(string: string, matchesFound: nil, matchIndex: nil)))
