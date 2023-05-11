@@ -246,7 +246,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         appearancePreferences.updateUserInterfaceStyle()
     }
 
-<<<<<<< HEAD:DuckDuckGo/App Delegate/AppDelegate.swift
     // MARK: - Network Protection
 
     private func startupNetworkProtection() {

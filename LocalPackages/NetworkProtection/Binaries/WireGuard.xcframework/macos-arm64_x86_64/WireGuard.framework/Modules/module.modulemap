@@ -1,0 +1,8 @@
+framework module WireGuard {
+    umbrella header "wireguard.h"
+
+    link "wg-go"
+
+    export *
+    module * { export * }
+}

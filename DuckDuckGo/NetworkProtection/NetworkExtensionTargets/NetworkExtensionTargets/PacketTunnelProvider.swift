@@ -2,10 +2,10 @@
 // Copyright © 2018-2021 WireGuard LLC. All Rights Reserved.
 
 import Common
+import Networking
 import Foundation
 import NetworkExtension
 import NetworkProtection
-import os
 import PixelKit
 import UserNotifications
 
@@ -352,14 +352,10 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         Pixel.setUp(dryRun: dryRun, appVersion: AppVersion.shared.versionNumber, defaultHeaders: defaultHeaders, log: .networkProtectionPixel) { (pixelName: String, headers: [String: String], parameters: [String: String], allowedQueryReservedCharacters: CharacterSet?, callBackOnMainThread: Bool, onComplete: @escaping (Error?) -> Void) in
 
             let url = URL.pixelUrl(forPixelNamed: pixelName)
+            let configuration = APIRequest.Configuration(url: url, method: .get, queryParameters: parameters, headers: headers)
+            let request = APIRequest(configuration: configuration)
 
-            APIRequest.request(
-                url: url,
-                parameters: parameters,
-                allowedQueryReservedCharacters: allowedQueryReservedCharacters,
-                headers: headers,
-                callBackOnMainThread: callBackOnMainThread
-            ) { (_, error) in
+            request.fetch { _, error in
                 onComplete(error)
             }
         }
@@ -938,16 +934,5 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
 
         Pixel.fire(domainEvent, frequency: .dailyAndContinuous, includeAppVersionParameter: true)
 
-    }
-}
-
-extension WireGuardLogLevel {
-    var osLogLevel: OSLogType {
-        switch self {
-        case .verbose:
-            return .debug
-        case .error:
-            return .error
-        }
     }
 }
