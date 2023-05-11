@@ -197,6 +197,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     // MARK: - Network Protection
 
     private func startupNetworkProtection() {
+        let networkProtectionFeatureVisibility = NetworkProtectionKeychainTokenStore()
+
+        guard networkProtectionFeatureVisibility.isFeatureActivated else {
+            disableNetworkProtectionMenuAndNotificationsAgent()
+            return
+        }
+
         updateNetworkProtectionIfVersionChanged()
         refreshNetworkProtectionServers()
         warnUserAboutApplicationPathForNetworkProtection()
@@ -216,6 +223,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         updateNetworkProtectionTunnelAndMenu()
+    }
+
+    private func disableNetworkProtectionMenuAndNotificationsAgent() {
+        do {
+            try LoginItem(identifier: .vpnMenu).disable()
+        } catch {
+            os_log("Failed to disable the vpnMenu login item: %{public}@", log: .networkProtection, type: .error, error.localizedDescription)
+        }
+
+        do {
+            try LoginItem(identifier: .notificationsAgent).disable()
+        } catch {
+            os_log("Failed to disable the notificationsAgent login item: %{public}@", log: .networkProtection, type: .error, error.localizedDescription)
+        }
     }
 
     private func updateNetworkProtectionTunnelAndMenu() {
