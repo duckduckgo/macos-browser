@@ -160,9 +160,9 @@ final class LocalBookmarkManager: BookmarkManager {
             }
 
             self?.loadBookmarks()
+            self?.requestSync()
         }
 
-        requestSync()
         return bookmark
     }
 
