@@ -161,7 +161,6 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
                 do {
                     let registeredDevices = try await syncService.fetchDevices()
                     mapDevices(registeredDevices)
-                    print("devices", self.devices)
                 } catch {
                     print("error", error.localizedDescription)
                 }
