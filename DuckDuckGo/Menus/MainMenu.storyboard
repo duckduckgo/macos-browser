@@ -554,7 +554,7 @@ CA
                                                 <action selector="openImportBrowserDataWindow:" target="Ady-hI-5gd" id="NdE-Lt-CL5"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem title="Export Bookmarks…" id="3K6-pB-Kea">
+                                        <menuItem title="Export Bookmarks…" enabled="NO" id="3K6-pB-Kea">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
                                                 <action selector="openExportBookmarks:" target="Ady-hI-5gd" id="h3L-FO-yq9"/>

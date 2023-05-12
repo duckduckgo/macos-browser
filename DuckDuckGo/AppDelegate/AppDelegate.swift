@@ -59,6 +59,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     private var appIconChanger: AppIconChanger!
     private(set) var syncService: DDGSyncing!
     private(set) var syncPersistence: SyncDataPersistor!
+    let bookmarksManager = LocalBookmarkManager.shared
 
 #if !APPSTORE
     var updateController: UpdateController!
@@ -156,7 +157,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
         HistoryCoordinator.shared.loadHistory()
         PrivacyFeatures.httpsUpgrade.loadDataAsync()
-        LocalBookmarkManager.shared.loadBookmarks()
+        bookmarksManager.loadBookmarks()
         FaviconManager.shared.loadFavicons()
         ConfigurationManager.shared.start()
         FileDownloadManager.shared.delegate = self

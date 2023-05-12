@@ -433,7 +433,8 @@ final class BookmarksSubMenu: NSMenu {
             addItem(NSMenuItem.separator())
         }
 
-        guard let entities = LocalBookmarkManager.shared.list?.topLevelEntities else {
+        let bookmarkManager = LocalBookmarkManager.shared
+        guard let entities = bookmarkManager.list?.topLevelEntities else {
             return
         }
 
@@ -447,8 +448,10 @@ final class BookmarksSubMenu: NSMenu {
         addItem(withTitle: UserText.importBookmarks, action: #selector(MoreOptionsMenu.openBookmarkImportInterface(_:)), keyEquivalent: "")
             .targetting(target)
 
-        addItem(withTitle: UserText.exportBookmarks, action: #selector(MoreOptionsMenu.openBookmarkExportInterface(_:)), keyEquivalent: "")
-            .targetting(target)
+        let exportBookmarItem = NSMenuItem(title: UserText.exportBookmarks, action: #selector(MoreOptionsMenu.openBookmarkExportInterface(_:)), keyEquivalent: "")
+        exportBookmarItem.isEnabled = bookmarkManager.list?.totalBookmarks != 0
+        addItem(exportBookmarItem)
+
     }
 
     private func bookmarkMenuItems(from bookmarkViewModels: [BookmarkViewModel], topLevel: Bool = true) -> [NSMenuItem] {
