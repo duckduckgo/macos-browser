@@ -222,6 +222,9 @@ extension Pixel {
             case bookmarksMigrationCouldNotPrepareDatabaseOnFailedMigration
             case bookmarksMigrationCouldNotRemoveOldStore
 
+            // Errors from Sync Metadata Module
+            case syncMetadataCouldNotLoadDatabase
+
             case invalidPayload(Configuration)
 
             case burnerTabMisplaced
@@ -492,6 +495,8 @@ extension Pixel.Event.Debug {
         case .bookmarksMigrationCouldNotPrepareDatabaseOnFailedMigration:
             return "bookmarks_migration_could_not_prepare_database_on_failed_migration"
         case .bookmarksMigrationCouldNotRemoveOldStore: return "bookmarks_migration_could_not_remove_old_store"
+
+        case .syncMetadataCouldNotLoadDatabase: return "sync_metadata_could_not_load_database"
 
         case .invalidPayload(let configuration): return "m_d_\(configuration.rawValue)_invalid_payload".lowercased()
 

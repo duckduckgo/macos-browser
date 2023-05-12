@@ -114,20 +114,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
                 }
             }
             SyncMetadataDatabase.shared.db.loadStore { context, error in
-                guard let error = error else { return }
+                guard let context = context else {
+                    if let error = error {
+                        Pixel.fire(.debug(event: .syncMetadataCouldNotLoadDatabase, error: error))
+                    } else {
+                        Pixel.fire(.debug(event: .syncMetadataCouldNotLoadDatabase))
+                    }
 
-                switch error {
-                case CoreDataDatabase.Error.containerLocationCouldNotBePrepared:
-                    break
-//                    Pixel.fire(.debug(event: .dbContainerInitializationError, error: underlyingError))
-                default:
-                    break
-//                    Pixel.fire(.debug(event: .dbInitializationError, error: error))
+                    Thread.sleep(forTimeInterval: 1)
+                    fatalError("Could not create Bookmarks database stack: \(error?.localizedDescription ?? "err")")
                 }
-
-                // Give Pixel a chance to be sent, but not too long
-                Thread.sleep(forTimeInterval: 1)
-                fatalError("Could not load DB: \(error.localizedDescription)")
             }
         }
 
