@@ -714,7 +714,7 @@ Gw
                                 <rect key="frame" x="0.0" y="406" width="420" height="5"/>
                             </box>
                             <stackView distribution="fill" orientation="horizontal" alignment="centerY" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="0If-Lj-8IG">
-                                <rect key="frame" x="291" y="417" width="109" height="28"/>
+                                <rect key="frame" x="303" y="417" width="97" height="28"/>
                                 <subviews>
                                     <button translatesAutoresizingMaskIntoConstraints="NO" id="qBa-rT-8sF" userLabel="New Bookmark Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="28" height="28"/>
@@ -776,9 +776,8 @@ Gw
                                         </constraints>
                                     </box>
                                     <button translatesAutoresizingMaskIntoConstraints="NO" id="pTk-xE-OqR" userLabel="Show Management UI Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                        <rect key="frame" x="81" y="0.0" width="28" height="28"/>
+                                        <rect key="frame" x="81" y="0.0" width="16" height="28"/>
                                         <constraints>
-                                            <constraint firstAttribute="width" constant="28" id="cBD-Aw-Rsl"/>
                                             <constraint firstAttribute="height" constant="28" id="rgG-V6-CDn"/>
                                         </constraints>
                                         <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Expand" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="jdG-cU-IZR">
