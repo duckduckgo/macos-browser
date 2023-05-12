@@ -28,7 +28,6 @@ struct MenuItemButton: View {
 
     @State private var isHovered = false
     @State private var animatingTap = false
-    @State private var animateToOff = true
 
     init(_ title: String, textColor: Color, action: @escaping () -> Void) {
         self.title = title
@@ -49,7 +48,7 @@ struct MenuItemButton: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
-            buttonBackground()
+            buttonBackground(highlighted: isHovered)
         )
         .contentShape(Rectangle())
         .cornerRadius(4)
@@ -64,8 +63,8 @@ struct MenuItemButton: View {
         .buttonStyle(PlainButtonStyle())
     }
 
-    private func buttonBackground() -> some View {
-        if isHovered {
+    private func buttonBackground(highlighted: Bool) -> some View {
+        if highlighted {
             return AnyView(
                 VisualEffectView(material: .selection, blendingMode: .withinWindow, state: .active, isEmphasized: true))
         } else {
@@ -75,19 +74,13 @@ struct MenuItemButton: View {
 
     private func buttonTapped() {
         animatingTap = true
-
-        withAnimation(.easeInOut(duration: highlightAnimationStepSpeed)) {
-            isHovered = false
-        }
+        isHovered = false
 
         DispatchQueue.main.asyncAfter(deadline: .now() + highlightAnimationStepSpeed) {
-            withAnimation(.easeInOut(duration: highlightAnimationStepSpeed)) {
-                isHovered = true
-            }
+            isHovered = true
 
             DispatchQueue.main.asyncAfter(deadline: .now() + highlightAnimationStepSpeed) {
                 animatingTap = false
-                isHovered = false
                 action()
             }
         }
