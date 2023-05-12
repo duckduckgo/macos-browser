@@ -58,8 +58,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     private(set) var internalUserDecider: InternalUserDecider!
     private(set) var featureFlagger: FeatureFlagger!
     private var appIconChanger: AppIconChanger!
+    private let syncDatabase = SyncMetadataDatabase()
     private(set) var syncService: DDGSyncing!
-    private(set) var syncMetadata: SyncMetadataStore!
+    private(set) var syncMetadataStore: SyncMetadataStore!
     private var syncStateCancellable: AnyCancellable?
 
 #if !APPSTORE
@@ -113,7 +114,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
                                                                   to: context)
                 }
             }
-            SyncMetadataDatabase.shared.db.loadStore { context, error in
+            syncDatabase.db.loadStore { context, error in
                 guard let context = context else {
                     if let error = error {
                         Pixel.fire(.debug(event: .syncMetadataCouldNotLoadDatabase, error: error))
@@ -161,11 +162,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 #endif
 
         appIconChanger = AppIconChanger(internalUserDecider: internalUserDecider)
-        syncMetadata = LocalSyncMetadataStore(database: SyncMetadataDatabase.shared.db)
+        syncMetadataStore = LocalSyncMetadataStore(database: syncDatabase.db)
         syncService = DDGSync(dataProviders: [
             BookmarksProvider(
                 database: BookmarkDatabase.shared.db,
-                metadataStore: syncMetadata,
+                metadataStore: syncMetadataStore,
                 reloadBookmarksAfterSync: LocalBookmarkManager.shared.loadBookmarks
             )
         ])

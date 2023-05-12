@@ -23,8 +23,6 @@ import Persistence
 
 public final class SyncMetadataDatabase {
 
-    public static let shared = SyncMetadataDatabase()
-
     public let db: CoreDataDatabase
 
     init(db: CoreDataDatabase = make(location: URL.sandboxApplicationSupportURL)) {
