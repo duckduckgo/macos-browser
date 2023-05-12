@@ -909,10 +909,6 @@ extension TabBarViewController: NSCollectionViewDelegate {
         hideTabPreview()
     }
 
-    func collectionView(_ collectionView: NSCollectionView, canDragItemsAt indexPaths: Set<IndexPath>, with event: NSEvent) -> Bool {
-        tabCollectionViewModel.tabCollection.tabs.count > 1
-    }
-
     func collectionView(_ collectionView: NSCollectionView, pasteboardWriterForItemAt indexPath: IndexPath) -> NSPasteboardWriting? {
         TabBarViewItemPasteboardWriter()
     }

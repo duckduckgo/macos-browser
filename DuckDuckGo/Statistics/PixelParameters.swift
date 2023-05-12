@@ -86,8 +86,7 @@ extension Pixel.Event {
             return params
 
         // Don't use default to force new items to be thought about
-        case .burn,
-             .crash,
+        case .crash,
              .brokenSiteReport,
              .compileRulesWait,
              .serp,
@@ -105,8 +104,7 @@ extension Pixel.Event {
              .emailUserCreatedAlias,
              .emailUserPressedUseAlias,
              .emailUserPressedUseAddress,
-             .jsPixel,
-             .duckPlayerJSPixel:
+             .jsPixel:
 
             return nil
         }
