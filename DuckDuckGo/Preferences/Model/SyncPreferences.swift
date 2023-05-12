@@ -70,18 +70,18 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         presentDialog(for: .turnOffSync)
     }
 
-    var showOrEnterCodeDevicesCancellable: AnyCancellable?
-
     @MainActor
     func presentShowOrEnterCodeDialog() {
         Task { @MainActor in
             let devicesAtStart = self.devices
-            showOrEnterCodeDevicesCancellable = self.$devices.sink { [weak self] value in
-                if devicesAtStart != value {
+            self.$devices
+                .removeDuplicates()
+                .dropFirst()
+                .prefix(1)
+                .sink { [weak self] _ in
                     self?.managementDialogModel.endFlow()
-                    self?.showOrEnterCodeDevicesCancellable?.cancel()
-                }
-            }
+                    self?.objectWillChange.send()
+                }.store(in: &cancellables)
             managementDialogModel.codeToDisplay = syncService.account?.recoveryCode
             presentDialog(for: .syncAnotherDevice)
         }
@@ -193,7 +193,6 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         onEndFlow = {
             self.connector?.stopPolling()
             self.connector = nil
-            self.showOrEnterCodeDevicesCancellable?.cancel()
 
             guard let window = syncWindowController.window, let sheetParent = window.sheetParent else {
                 assertionFailure("window or sheet parent not present")
