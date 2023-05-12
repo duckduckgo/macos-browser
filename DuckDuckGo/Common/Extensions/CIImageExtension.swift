@@ -20,6 +20,10 @@ import CoreImage.CIFilterBuiltins
 
 extension CIImage {
 
+    static var retinaScaleFactor: CGFloat {
+        min(NSScreen.maxScaleFactor, 2) // “retina” or larger
+    }
+
     /// Generates a `CIImage` of a rounded rectangle with a specified extent and corner radius.
     static func rect(in extent: CGRect, cornerRadius: CGFloat = 0, color: NSColor? = nil) -> CIImage {
         let roundedRectFilter = CIFilter.roundedRectangleGenerator()
@@ -61,7 +65,7 @@ extension CIImage {
 
         fileprivate static let iconSizeFactor: CGFloat = 0.25
 
-        var qrSizeInPixels: Int
+        var logicalQrSize: Int
         var correctionLevel: QRCorrectionLevel?
 
         var icon: CIImage?
@@ -69,20 +73,22 @@ extension CIImage {
         var color: NSColor
         var backgroundColor: NSColor
 
-        static let `default` = QRCodeParameters(qrSizeInPixels: 500,
+        static let `default` = QRCodeParameters(logicalQrSize: 250,
                                                 correctionLevel: nil,
                                                 icon: nil,
                                                 color: .black,
                                                 backgroundColor: .white)
 
         static let duckDuckGo: QRCodeParameters = {
+            let logicalQrSize = QRCodeParameters.default.logicalQrSize
             let icon: CIImage = {
                 let logo = NSImage(named: "Logo")!
-                let logoRadiusFactor: CGFloat = 0.8
-                let logoMargin: CGFloat = 8
-                let logoBackgroundColor = NSColor.white
+                let logoRadiusFactor: CGFloat = 0.77
+                let logoMargin: CGFloat = 6
+                let logoBackgroundColor = NSColor.logoBackgroundColor
 
-                var image = logo.ciImage
+                let logoSize = NSSize(width: logicalQrSize, height: logicalQrSize).scaled(by: CIImage.retinaScaleFactor)
+                var image = logo.ciImage(with: logoSize)
 
                 // cut Dax circle
                 let maskImage = CIImage.circle(at: image.extent.center, radius: image.extent.width * (logoRadiusFactor / 2))
@@ -96,7 +102,7 @@ extension CIImage {
                 return image
             }()
 
-            return QRCodeParameters(qrSizeInPixels: QRCodeParameters.default.qrSizeInPixels,
+            return QRCodeParameters(logicalQrSize: logicalQrSize,
                                     correctionLevel: .high,
                                     icon: icon,
                                     color: .logoBackgroundColor,
@@ -111,7 +117,7 @@ extension CIImage {
         let qrSize = qr.extent.size.width
 
         // scale to QR Size in Pixels
-        let qrScale = CGFloat(CGFloat(parameters.qrSizeInPixels) / CGFloat(qrSize))
+        let qrScale = CGFloat((CGFloat(parameters.logicalQrSize) * CIImage.retinaScaleFactor) / CGFloat(qrSize))
         qr = qr.scaled(by: qrScale)
 
         // tint
@@ -190,7 +196,8 @@ extension CGImage {
     /// Returns image bitmap data with the specified file format.
     func bitmapRepresentation(using format: NSBitmapImageRep.FileType) -> Data? {
         let bitmapRep = NSBitmapImageRep(cgImage: self)
-        bitmapRep.size = NSSize(width: self.width / 2, height: self.height / 2)
+        bitmapRep.size = NSSize(width: Int(CGFloat(self.width) / CIImage.retinaScaleFactor),
+                                height: Int(CGFloat(self.height) / CIImage.retinaScaleFactor))
 
         return bitmapRep.representation(using: format, properties: [:])
     }

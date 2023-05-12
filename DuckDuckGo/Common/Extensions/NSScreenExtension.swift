@@ -24,6 +24,10 @@ extension NSScreen {
         screens.min(by: { ($0.frame.height - $0.visibleFrame.height) > ($1.frame.height - $1.visibleFrame.height) })
     }
 
+    static var maxScaleFactor: CGFloat {
+        screens.map(\.backingScaleFactor).max() ?? 2
+    }
+
     func convert(_ point: NSPoint) -> NSPoint {
         return NSPoint(x: point.x - self.frame.origin.x,
                        y: point.y - self.frame.origin.y)
