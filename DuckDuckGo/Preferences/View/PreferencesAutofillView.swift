@@ -71,7 +71,7 @@ extension Preferences {
                         model.showAutofillPopover()
                     }
 #if APPSTORE
-                    Button(UserText.importBrowserData) {
+                    Button(UserText.importPasswords) {
                         model.openImportBrowserDataWindow()
                     }
                     Button(UserText.exportLogins) {
