@@ -41,6 +41,8 @@ final class SuggestionTableRowView: NSTableRowView {
         }
     }
 
+    var isBurner: Bool = false
+
     private func setupView() {
         selectionHighlightStyle = .none
         wantsLayer = true
@@ -48,13 +50,15 @@ final class SuggestionTableRowView: NSTableRowView {
     }
 
     private func updateBackgroundColor() {
-        backgroundColor = isSelected ? .controlAccentColor : .clear
+        let accentColor: NSColor = isBurner ? .burnerAccentColor : .controlAccentColor
+        backgroundColor = isSelected ? accentColor : .clear
     }
 
     private func updateCellView() {
         for subview in subviews {
             if let cellView = subview as? SuggestionTableCellView {
                 cellView.isSelected = isSelected
+                isBurner = cellView.isBurner
             }
         }
     }

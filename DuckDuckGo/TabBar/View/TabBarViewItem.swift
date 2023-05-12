@@ -40,6 +40,7 @@ protocol TabBarViewItemDelegate: AnyObject {
     func tabBarViewItemPinAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemBookmarkThisPageAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemMoveToNewWindowAction(_ tabBarViewItem: TabBarViewItem)
+    func tabBarViewItemMoveToNewBurnerWindowAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemFireproofSite(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemRemoveFireproofing(_ tabBarViewItem: TabBarViewItem)
 
@@ -78,6 +79,12 @@ final class TabBarViewItem: NSCollectionViewItem {
         }
     }
 
+    var isBurner: Bool = false {
+        didSet {
+            updateSubviews()
+        }
+    }
+
     @IBOutlet weak var faviconImageView: NSImageView! {
         didSet {
             faviconImageView.applyFaviconStyle()
@@ -91,7 +98,6 @@ final class TabBarViewItem: NSCollectionViewItem {
     @IBOutlet weak var rightSeparatorView: ColorView!
     @IBOutlet weak var mouseOverView: MouseOverView!
     @IBOutlet weak var mouseClickView: MouseClickView!
-    @IBOutlet weak var windowDraggingView: WindowDraggingView!
     @IBOutlet weak var faviconWrapperView: NSView!
     @IBOutlet weak var faviconWrapperViewCenterConstraint: NSLayoutConstraint!
     @IBOutlet weak var faviconWrapperViewLeadingConstraint: NSLayoutConstraint!
@@ -222,6 +228,10 @@ final class TabBarViewItem: NSCollectionViewItem {
         delegate?.tabBarViewItemMoveToNewWindowAction(self)
     }
 
+    @objc func moveToNewBurnerWindowAction(_ sender: NSMenuItem) {
+        delegate?.tabBarViewItemMoveToNewBurnerWindowAction(self)
+    }
+
     func subscribe(to tabViewModel: TabViewModel, tabCollectionViewModel: TabCollectionViewModel) {
         clearSubscriptions()
 
@@ -238,22 +248,6 @@ final class TabBarViewItem: NSCollectionViewItem {
         }.store(in: &cancellables)
 
         tabViewModel.$usedPermissions.assign(to: \.usedPermissions, onWeaklyHeld: self).store(in: &cancellables)
-
-        tabCollectionViewModel.tabCollection.$tabs.map { $0.count > 1 }
-            .assign(to: \.windowDraggingView.isHidden, onWeaklyHeld: self)
-            .store(in: &cancellables)
-
-        windowDraggingView.mouseDownPublisher
-            .compactMap { [weak tabCollectionViewModel] _ -> TabIndex? in
-                guard let tabCollectionViewModel = tabCollectionViewModel else {
-                    return nil
-                }
-                return .unpinned(0).sanitized(for: tabCollectionViewModel)
-            }
-            .sink { [weak tabCollectionViewModel] index in
-                tabCollectionViewModel?.select(at: index)
-            }
-            .store(in: &cancellables)
     }
 
     func clear() {
@@ -362,6 +356,30 @@ final class TabBarViewItem: NSCollectionViewItem {
         } else {
             borderLayer.isHidden = true
         }
+
+        // Adjust colors for burner window
+        if isBurner {
+            rightSeparatorView.backgroundColor = .burnerWindowTabSeparatorColor
+            if isSelected {
+                if faviconImageView.image === TabViewModel.Favicon.burnerHome {
+                    faviconImageView.contentTintColor = .textColor
+                } else {
+                    faviconImageView.contentTintColor = nil
+                }
+                titleTextField.textColor = .textColor
+                closeButton.normalTintColor = .buttonColor
+                permissionButton.contentTintColor = .buttonColor
+            } else {
+                if faviconImageView.image === TabViewModel.Favicon.burnerHome {
+                    faviconImageView.contentTintColor = .alternateSelectedControlTextColor
+                } else {
+                    faviconImageView.contentTintColor = nil
+                }
+                titleTextField.textColor = .alternateSelectedControlTextColor
+                closeButton.normalTintColor = .alternateSelectedControlTextColor
+                permissionButton.contentTintColor = .alternateSelectedControlTextColor
+            }
+        }
     }
 
     private var usedPermissions = Permissions() {
@@ -447,7 +465,11 @@ extension TabBarViewItem: NSMenuDelegate {
         addCloseMenuItem(to: menu)
         addCloseOtherMenuItem(to: menu, areThereOtherTabs: areThereOtherTabs)
         addCloseTabsToTheRightMenuItem(to: menu, areThereTabsToTheRight: otherItemsState.hasItemsToTheRight)
-        addMoveToNewWindowMenuItem(to: menu, areThereOtherTabs: areThereOtherTabs)
+        if isBurner {
+            addMoveToNewBurnerWindowMenuItem(to: menu, areThereOtherTabs: areThereOtherTabs)
+        } else {
+            addMoveToNewWindowMenuItem(to: menu, areThereOtherTabs: areThereOtherTabs)
+        }
 
     }
 
@@ -511,6 +533,13 @@ extension TabBarViewItem: NSMenuDelegate {
         moveToNewWindowMenuItem.target = self
         moveToNewWindowMenuItem.isEnabled = areThereOtherTabs
         menu.addItem(moveToNewWindowMenuItem)
+    }
+
+    private func addMoveToNewBurnerWindowMenuItem(to menu: NSMenu, areThereOtherTabs: Bool) {
+        let moveToNewBurnerWindowMenuItem = NSMenuItem(title: UserText.moveTabToNewBurnerWindow, action: #selector(moveToNewBurnerWindowAction(_:)), keyEquivalent: "")
+        moveToNewBurnerWindowMenuItem.target = self
+        moveToNewBurnerWindowMenuItem.isEnabled = areThereOtherTabs
+        menu.addItem(moveToNewBurnerWindowMenuItem)
     }
 
 }

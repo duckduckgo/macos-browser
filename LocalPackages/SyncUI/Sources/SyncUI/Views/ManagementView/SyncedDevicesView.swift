@@ -19,50 +19,18 @@
 import SwiftUI
 
 struct SyncedDevicesView<ViewModel>: View where ViewModel: ManagementViewModel {
+
     @EnvironmentObject var model: ViewModel
 
+    let timer = Timer.publish(every: 10, on: .main, in: .common).autoconnect()
+
     var body: some View {
-        VStack(spacing: 0) {
-            if #available(macOS 11.0, *) {
-                if model.devices.isEmpty {
-                    ProgressView()
-                        .padding()
-                }
-            }
-
-            ForEach(model.devices) { device in
-                if !device.isCurrent {
-                    Rectangle()
-                        .fill(Color("BlackWhite10"))
-                        .frame(height: 1)
-                        .padding(.init(top: 0, leading: 10, bottom: 0, trailing: 10))
-                }
-
-                if device.isCurrent {
-                    SyncPreferencesRow {
-                        SyncedDeviceIcon(kind: device.kind)
-                    } centerContent: {
-                        HStack {
-                            Text(device.name)
-                            Text("(\(UserText.thisDevice))")
-                                .foregroundColor(Color(NSColor.secondaryLabelColor))
-                            Spacer()
-                        }
-                    } rightContent: {
-                        Button(UserText.currentDeviceDetails) {
-                            model.presentDeviceDetails(device)
-                        }
-                    }
-                } else {
-                    SyncPreferencesRow {
-                        SyncedDeviceIcon(kind: device.kind)
-                    } centerContent: {
-                        Text(device.name)
-                    }
-                }
-            }
+        SyncedDevicesList(devices: model.devices,
+                          presentDeviceDetails: model.presentDeviceDetails,
+                          presentRemoveDevice: model.presentRemoveDevice)
+        .onReceive(timer) { _ in
+            model.refreshDevices()
         }
-        .roundedBorder()
     }
 }
 
@@ -88,4 +56,70 @@ struct SyncedDeviceIcon: View {
                 .aspectRatio(contentMode: .fit)
         }
     }
+}
+
+struct SyncedDevicesList: View {
+
+    let devices: [SyncDevice]
+
+    @State var hoveredDevice: SyncDevice?
+
+    var presentDeviceDetails: ((SyncDevice) -> Void)?
+    var presentRemoveDevice: ((SyncDevice) -> Void)?
+
+    var body: some View {
+        VStack(spacing: 0) {
+            if #available(macOS 11.0, *) {
+                if devices.isEmpty {
+                    ProgressView()
+                        .padding()
+                }
+            }
+
+            ForEach(devices) { device in
+                if !device.isCurrent {
+                    Rectangle()
+                        .fill(Color("BlackWhite10"))
+                        .frame(height: 1)
+                        .padding(.init(top: 0, leading: 10, bottom: 0, trailing: 10))
+                }
+
+                if device.isCurrent {
+                    SyncPreferencesRow {
+                        SyncedDeviceIcon(kind: device.kind)
+                    } centerContent: {
+                        HStack {
+                            Text(device.name)
+                            Text("(\(UserText.thisDevice))")
+                                .foregroundColor(Color(NSColor.secondaryLabelColor))
+                            Spacer()
+                        }
+                    } rightContent: {
+                        if let presentDeviceDetails {
+                            Button(UserText.currentDeviceDetails) {
+                                presentDeviceDetails(device)
+                            }
+                        }
+                    }
+                } else {
+                    SyncPreferencesRow {
+                        SyncedDeviceIcon(kind: device.kind)
+                    } centerContent: {
+                        Text(device.name)
+                    } rightContent: {
+                        if let presentRemoveDevice = presentRemoveDevice {
+                            Button(UserText.removeDeviceButton) {
+                                presentRemoveDevice(device)
+                            }
+                            .visibility(hoveredDevice?.id == device.id ? .visible : .gone)
+                        }
+                    }.onHover { hovering in
+                        hoveredDevice = hovering ? device : nil
+                    }
+                }
+            }
+        }
+        .roundedBorder()
+    }
+
 }

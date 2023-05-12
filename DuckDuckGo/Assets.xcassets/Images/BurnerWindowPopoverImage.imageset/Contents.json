@@ -1,0 +1,22 @@
+{
+  "images" : [
+    {
+      "filename" : "burner-window-picto-light-96x64.pdf",
+      "idiom" : "universal"
+    },
+    {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ],
+      "filename" : "burner-window-picto-dark-96x64.pdf",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

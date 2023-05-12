@@ -87,10 +87,10 @@ private struct ShowCodeView: View {
                 .multilineTextAlignment(.center)
 
             HStack(alignment: .top, spacing: 20) {
-                QRCode(string: model.connectCode ?? "", size: .init(width: 164, height: 164))
+                QRCode(string: model.codeToDisplay ?? "", size: .init(width: 164, height: 164))
 
                 VStack {
-                    SyncKeyView(text: model.connectCode ?? "")
+                    SyncKeyView(text: model.codeToDisplay ?? "")
 
                     Spacer()
 
@@ -98,7 +98,7 @@ private struct ShowCodeView: View {
                         Spacer()
                         Button {
                             NSPasteboard.general.clearContents()
-                            NSPasteboard.general.setString(model.connectCode ?? "", forType: .string)
+                            NSPasteboard.general.setString(model.codeToDisplay ?? "", forType: .string)
                         } label: {
                             HStack {
                                 Image("Copy")
