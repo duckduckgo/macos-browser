@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "anya/rmf-asset-update",
-        "revision" : "240659fed027885118715b898637bee600f075db"
+        "revision" : "ef8b8888c8dc2ac3b34aeb4b6d242629707e9206",
+        "version" : "57.4.6"
       }
     },
     {
