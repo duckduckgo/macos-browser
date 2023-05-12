@@ -281,7 +281,6 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                     try await login(recoveryKey)
                     presentDialog(for: .deviceSynced)
                 } else if let connectKey = syncCode.connect {
-                    // Unclear what the UX is supposed to be here given everything is happening on the other device
                     var isNewAccount = false
                     if syncService.account == nil {
                         let device = deviceInfo()
