@@ -21,7 +21,7 @@ import CoreImage.CIFilterBuiltins
 extension CIImage {
 
     static var retinaScaleFactor: CGFloat {
-        max(NSScreen.maxScaleFactor, 2) // “retina” or larger
+        max(NSScreen.maxBackingScaleFactor, NSScreen.defaultBackingScaleFactor) // “retina” or larger
     }
 
     /// Generates a `CIImage` of a rounded rectangle with a specified extent and corner radius.

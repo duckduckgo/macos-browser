@@ -84,7 +84,7 @@ final class QRSharingService: NSSharingService {
         }
 
         self.imageUrl = fileUrl
-        self.qrImage = NSImage(cgImage: cgImage, size: NSSize(width: qr.extent.size.width / 2, height: qr.extent.size.height / 2))
+        self.qrImage = NSImage(cgImage: cgImage, size: qr.extent.size.scaled(by: 1 / (NSScreen.main?.backingScaleFactor ?? NSScreen.defaultBackingScaleFactor)))
 
         self.showQuickLook()
     }
