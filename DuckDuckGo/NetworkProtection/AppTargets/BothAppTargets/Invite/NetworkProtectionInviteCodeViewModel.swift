@@ -30,7 +30,13 @@ protocol NetworkProtectionInviteViewModelDelegate: AnyObject {
 
 final class NetworkProtectionInviteViewModel: ObservableObject {
     @Published var currentDialog: NetworkProtectionInviteDialogKind? = .codeEntry
-    @Published var text: String = ""
+    @Published var text: String = "" {
+        didSet {
+            if oldValue != text {
+                text = text.uppercased()
+            }
+        }
+    }
     @Published var errorText: String?
 
     private let redemptionCoordinator: NetworkProtectionCodeRedeeming
