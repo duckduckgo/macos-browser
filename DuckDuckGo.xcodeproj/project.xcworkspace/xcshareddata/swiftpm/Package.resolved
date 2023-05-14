@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "tom/burner-window-unit-tests",
-        "revision" : "aef7fa92f40183e61e5194756bf3c65e6762286c"
+        "revision" : "67585e6ff25eb33c0447e753a8ac79db52da0b4b",
+        "version" : "57.4.7"
       }
     },
     {
@@ -23,8 +23,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/duckduckgo-autofill.git",
       "state" : {
-        "revision" : "4aee97d550112ba6551e61ea8019fb1f1a2d3af7",
-        "version" : "6.4.3"
+        "revision" : "8f403fad4f6ccf18a3900fc560f43067a527ac9f",
+        "version" : "6.5.1"
       }
     },
     {
