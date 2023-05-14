@@ -24,12 +24,6 @@ import Configuration
 extension Pixel {
 
     enum Event {
-        case burn(repetition: Repetition, burnedTabs: BurnedTabs, burnedWindows: BurnedWindows)
-        @MainActor
-        static func burn(repetition: Repetition = .init(key: "fire")) -> Event {
-            .burn(repetition: repetition, burnedTabs: .init(), burnedWindows: .init())
-        }
-
         case crash
 
         case brokenSiteReport
@@ -115,8 +109,6 @@ extension Pixel {
         case emailUserCreatedAlias
 
         case jsPixel(_ pixel: AutofillUserScript.JSPixel)
-        case duckPlayerJSPixel(_ pixel: YoutubeOverlayUserScript.JSPixel)
-
         case debug(event: Debug, error: Error? = nil)
 
         enum Debug {
@@ -242,9 +234,6 @@ extension Pixel.Event {
 
     var name: String {
         switch self {
-        case .burn(repetition: let repetition, burnedTabs: let tabs, burnedWindows: let windows):
-            return "m_mac_fire-button.\(repetition)_\(tabs)_\(windows)"
-
         case .crash:
             return "m_mac_crash"
 
@@ -301,10 +290,6 @@ extension Pixel.Event {
             } else {
                 return "m_mac_\(pixel.pixelName)"
             }
-
-        // This matches the SERP format
-        case .duckPlayerJSPixel(let pixel):
-            return "duck_player.mac.\(pixel.pixelName)"
         }
     }
 }

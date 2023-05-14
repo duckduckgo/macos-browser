@@ -1054,7 +1054,7 @@ final class AddressBarTextEditor: NSTextView {
 
         // Fixes an issue when url-name instead of url is pasted
         if let urlString = NSPasteboard.general.string(forType: .URL) {
-            string = urlString
+            super.pasteAsPlainText(urlString)
             delegate.handlePastedURL()
         } else {
             super.paste(sender)
