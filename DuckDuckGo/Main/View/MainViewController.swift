@@ -69,9 +69,9 @@ final class MainViewController: NSViewController {
         super.init(coder: coder)
     }
 
-    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, isBurner: Bool) {
+    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel) {
         self.tabCollectionViewModel = tabCollectionViewModel
-        self.isBurner = isBurner
+        self.isBurner = tabCollectionViewModel.isBurner
         super.init(coder: coder)
     }
 
