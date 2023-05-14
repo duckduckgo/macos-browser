@@ -47,7 +47,7 @@ PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*] =
 PROVISIONING_PROFILE_SPECIFIER[config=Debug][sdk=macosx*] = macOS Network Protection (SysEx Development)
 PROVISIONING_PROFILE_SPECIFIER[config=Release][sdk=macosx*] = Mac Browser NetP Developer ID (Distribution)
 
-NETP_EXTRA_FLAGS = NETP_SYSTEM_EXTENSION
+NETP_EXTRA_FLAGS = NETP NETP_SYSTEM_EXTENSION
 
 // Override the icon with our custom one
 ASSETCATALOG_COMPILER_APPICON_NAME = Icon - Network Protection

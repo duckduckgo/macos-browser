@@ -22,14 +22,14 @@ import SwiftUI
 struct MenuItemButton: View {
     private let title: String
     private let textColor: Color
-    private let action: () -> Void
+    private let action: () async -> Void
 
     private let highlightAnimationStepSpeed = 0.05
 
     @State private var isHovered = false
     @State private var animatingTap = false
 
-    init(_ title: String, textColor: Color, action: @escaping () -> Void) {
+    init(_ title: String, textColor: Color, action: @escaping () async -> Void) {
         self.title = title
         self.textColor = textColor
         self.action = action
@@ -81,7 +81,10 @@ struct MenuItemButton: View {
 
             DispatchQueue.main.asyncAfter(deadline: .now() + highlightAnimationStepSpeed) {
                 animatingTap = false
-                action()
+
+                Task {
+                    await action()
+                }
             }
         }
     }

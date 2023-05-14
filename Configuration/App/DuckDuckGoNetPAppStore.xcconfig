@@ -47,7 +47,7 @@ PROVISIONING_PROFILE_SPECIFIER[config=CI][sdk=macosx*] =
 PROVISIONING_PROFILE_SPECIFIER[config=Release][sdk=macosx*] = macOS Network Protection
 PROVISIONING_PROFILE_SPECIFIER[config=Review][sdk=macosx*] =
 
-NETP_EXTRA_FLAGS =
+NETP_EXTRA_FLAGS = NETP
 
 // Override the icon with our custom one
 ASSETCATALOG_COMPILER_APPICON_NAME = Icon - Network Protection

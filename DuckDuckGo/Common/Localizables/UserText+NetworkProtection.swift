@@ -33,4 +33,8 @@ extension UserText {
     static let networkProtectionInviteFieldPrompt = NSLocalizedString("network.protection.invite.field.prompt", value: "Code", comment: "Prompt for the network protection invite code text field")
     static let networkProtectionInviteSuccessTitle = NSLocalizedString("network.protection.invite.success.title", value: "Success! You’re in.", comment: "Title for the network protection invite success view")
     static let networkProtectionInviteSuccessMessage = NSLocalizedString("network.protection.invite.success.title", value: "Hide your location from websites and conceal your online activity from Internet providers and others on your network.", comment: "Message for the network protection invite success view")
+
+    // MARK: - Navigation Bar Status View
+
+    static let networkProtectionNavBarStatusViewShareFeedback = NSLocalizedString("network.protection.navbar.status.view.share.feedback", value: "Share Feedback...", comment: "Menu item for 'Share Feedback' in the Network Protection status view that's shown in the navigation bar")
 }

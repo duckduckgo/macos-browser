@@ -146,12 +146,15 @@ public actor NetworkProtectionDeviceManager: NetworkProtectionDeviceManagement {
         return completeServerList
     }
 
+    // swiftlint:disable function_body_length
+    // swiftlint:disable cyclomatic_complexity
     /// Registers the device with the Network Protection backend.
     ///
     /// The flow for registration is as follows:
     /// 1. Look for an existing private key, and if one does not exist then generate it and store it in the Keychain
     /// 2. If the key is new, register it with all backend servers and return a tunnel configuration + its server info
     /// 3. If the key already existed, look up the stored set of backend servers and check if the preferred server is registered. If not, register it, and return the tunnel configuration + server info.
+    ///
     public func generateTunnelConfiguration(selectionMethod: NetworkProtectionServerSelectionMethod) async throws -> (TunnelConfiguration, NetworkProtectionServerInfo) {
 
         let servers: [NetworkProtectionServer]
@@ -244,6 +247,8 @@ public actor NetworkProtectionDeviceManager: NetworkProtectionDeviceManagement {
             throw error
         }
     }
+    // swiftlint:enable function_body_length
+    // swiftlint:enable cyclomatic_complexity
 
     // MARK: - Internal
 

@@ -286,14 +286,9 @@ public struct NetworkProtectionStatusView: View {
 
     private func bottomMenuView() -> some View {
         VStack(spacing: 0) {
-            MenuItemButton("Share Feedback...", textColor: defaultTextColor) {
-                model.shareFeedback()
-                dismiss()
-            }
-
-            if model.showLaunchBrowserMenuItem {
-                MenuItemButton("Open DuckDuckGo...", textColor: defaultTextColor) {
-                    model.launchBrowser()
+            ForEach(model.menuItems, id: \.name) { menuItem in
+                MenuItemButton(menuItem.name, textColor: defaultTextColor) {
+                    await menuItem.action()
                     dismiss()
                 }
             }
@@ -380,9 +375,12 @@ struct NetworkProtectionStatusView_Previews: PreviewProvider {
 
     static var previews: some View {
         let statusReporter = PreviewNetworkProtectionStatusReporter()
+        let menuItems = [
+            NetworkProtectionStatusView.Model.MenuItem(name: "Share Feedback...", action: {})
+        ]
         let model = NetworkProtectionStatusView.Model(controller: PreviewController(),
-                                                      showLaunchBrowserMenuItem: true,
-                                                      statusReporter: statusReporter)
+                                                      statusReporter: statusReporter,
+                                                      menuItems: menuItems)
 
         NetworkProtectionStatusView(model: model)
     }

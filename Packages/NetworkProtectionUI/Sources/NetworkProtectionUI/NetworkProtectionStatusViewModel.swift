@@ -29,6 +29,17 @@ extension NetworkProtectionStatusView {
     /// The view model definition for ``NetworkProtectionStatusView``
     ///
     public final class Model: ObservableObject {
+
+        public struct MenuItem {
+            let name: String
+            let action: () async -> Void
+
+            public init(name: String, action: @escaping () async -> Void) {
+                self.name = name
+                self.action = action
+            }
+        }
+
         /// The NetP service.
         ///
         private let tunnelController: TunnelController
@@ -37,9 +48,17 @@ extension NetworkProtectionStatusView {
         ///
         private let statusReporter: NetworkProtectionStatusReporter
 
+        // MARK: - Extra Menu Items
+
+        public let menuItems: [MenuItem]
+
+        // MARK: - Logging
+
         /// The object that's in charge of logging errors and other information.
         ///
         private let logger: NetworkProtectionLogger
+
+        // MARK: - Misc
 
         /// The `RunLoop` for the timer.
         ///
@@ -79,16 +98,16 @@ extension NetworkProtectionStatusView {
         // MARK: - Initialization & Deinitialization
 
         public init(controller: TunnelController,
-                    showLaunchBrowserMenuItem: Bool,
                     statusReporter: NetworkProtectionStatusReporter,
+                    menuItems: [MenuItem],
                     logger: NetworkProtectionLogger = DefaultNetworkProtectionLogger(),
                     runLoopMode: RunLoop.Mode? = nil) {
 
             self.tunnelController = controller
             self.statusReporter = statusReporter
+            self.menuItems = menuItems
             self.logger = logger
             self.runLoopMode = runLoopMode
-            self.showLaunchBrowserMenuItem = showLaunchBrowserMenuItem
 
             connectionStatus = statusReporter.statusPublisher.value
             isHavingConnectivityIssues = statusReporter.connectivityIssuesPublisher.value
@@ -454,39 +473,6 @@ extension NetworkProtectionStatusView {
                     refreshInternalIsRunning()
                 }
             }
-        }
-
-        // MARK: - Launch Browser
-
-        private(set) var showLaunchBrowserMenuItem: Bool
-
-        func launchBrowser() {
-            let configuration = NSWorkspace.OpenConfiguration()
-            configuration.activates = true
-            configuration.addsToRecentItems = true
-            configuration.allowsRunningApplicationSubstitution = true
-            configuration.createsNewApplicationInstance = false
-
-            let parentBundlePath = "../../../../"
-            let mainAppURL: URL
-
-            if #available(macOS 13, *) {
-                mainAppURL = URL(filePath: parentBundlePath, relativeTo: Bundle.main.bundleURL)
-            } else {
-                mainAppURL = URL(fileURLWithPath: parentBundlePath, relativeTo: Bundle.main.bundleURL)
-            }
-
-            NSWorkspace.shared.openApplication(at: mainAppURL, configuration: configuration)
-        }
-
-        // MARK: - Feedback Sharing
-
-        private static let feedbackFormURL = URL(string: "https://form.asana.com/?k=_wNLt6YcT5ILpQjDuW0Mxw&d=137249556945")!
-
-        /// This method provides the standard logic for handling the user's request to share feedback about NetP.
-        /// 
-        func shareFeedback() {
-            NSWorkspace.shared.open(Self.feedbackFormURL)
         }
     }
 }

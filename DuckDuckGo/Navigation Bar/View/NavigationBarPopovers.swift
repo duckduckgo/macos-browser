@@ -255,7 +255,16 @@ final class NavigationBarPopovers {
             serverInfoObserver: ConnectionServerInfoObserverThroughSession(),
             connectionErrorObserver: ConnectionErrorObserverThroughSession())
 
-        let popover = NetworkProtectionPopover(controller: controller, statusReporter: statusReporter, showLaunchBrowserMenuItem: false)
+        let menuItems = [
+            NetworkProtectionStatusView.Model.MenuItem(
+                name: UserText.networkProtectionNavBarStatusViewShareFeedback,
+                action: {
+                    let appLauncher = AppLauncher(appBundleURL: Bundle.main.bundleURL)
+                    await appLauncher.launchApp(withCommand: .shareFeedback)
+            })
+        ]
+
+        let popover = NetworkProtectionPopover(controller: controller, statusReporter: statusReporter, menuItems: menuItems)
         popover.delegate = delegate
 
         networkProtectionPopover = popover

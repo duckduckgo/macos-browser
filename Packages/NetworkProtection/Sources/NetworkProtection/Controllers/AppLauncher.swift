@@ -24,12 +24,18 @@ import os
 ///
 public final class AppLauncher {
     public enum Command: Codable {
+        case justOpen
+        case shareFeedback
         case showStatus
         case startVPN
         case stopVPN
 
         var commandURL: String? {
             switch self {
+            case .justOpen:
+                return "networkprotection://just-open"
+            case .shareFeedback:
+                return "https://form.asana.com/?k=_wNLt6YcT5ILpQjDuW0Mxw&d=137249556945"
             case .showStatus:
                 return "networkprotection://show-status"
             default:

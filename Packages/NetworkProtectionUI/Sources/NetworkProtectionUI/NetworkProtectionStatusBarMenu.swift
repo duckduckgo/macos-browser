@@ -26,8 +26,9 @@ import os.log
 /// Abstraction of the the Network Protection status bar menu with a simple interface.
 ///
 public final class StatusBarMenu {
-    private let statusItem: NSStatusItem
+    typealias MenuItem = NetworkProtectionStatusView.Model.MenuItem
 
+    private let statusItem: NSStatusItem
     private let popover: NetworkProtectionPopover
 
     // MARK: - NetP Icon publisher
@@ -54,17 +55,27 @@ public final class StatusBarMenu {
         self.iconPublisher = NetworkProtectionIconPublisher(statusReporter: statusReporter, isForStatusBar: true)
 
         let parentBundlePath = "../../../../"
-        let url: URL
+        let appBundleURL: URL
 
         if #available(macOS 13, *) {
-            url = URL(filePath: parentBundlePath, relativeTo: Bundle.main.bundleURL)
+            appBundleURL = URL(filePath: parentBundlePath, relativeTo: Bundle.main.bundleURL)
         } else {
-            url = URL(fileURLWithPath: parentBundlePath, relativeTo: Bundle.main.bundleURL)
+            appBundleURL = URL(fileURLWithPath: parentBundlePath, relativeTo: Bundle.main.bundleURL)
         }
 
-        let controller = AppLaunchingController(appBundleURL: url)
+        let appLauncher = AppLauncher(appBundleURL: appBundleURL)
+        let controller = AppLaunchingController(appLauncher: appLauncher)
 
-        popover = NetworkProtectionPopover(controller: controller, statusReporter: statusReporter, showLaunchBrowserMenuItem: true)
+        let menuItems = [
+            MenuItem(name: UserText.networkProtectionStatusMenuShareFeedback, action: {
+                await appLauncher.launchApp(withCommand: .shareFeedback)
+            }),
+            MenuItem(name: UserText.networkProtectionStatusMenuOpenDuckDuckGo, action: {
+                await appLauncher.launchApp(withCommand: .justOpen)
+            })
+        ]
+
+        popover = NetworkProtectionPopover(controller: controller, statusReporter: statusReporter, menuItems: menuItems)
         popover.behavior = .transient
 
         self.statusItem.button?.image = .image(for: iconPublisher.icon)

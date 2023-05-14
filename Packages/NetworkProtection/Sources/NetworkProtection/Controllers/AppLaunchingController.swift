@@ -21,8 +21,8 @@ import Foundation
 public final class AppLaunchingController: TunnelController {
     private let appLauncher: AppLauncher
 
-    public init(appBundleURL: URL) {
-        appLauncher = AppLauncher(appBundleURL: appBundleURL)
+    public init(appLauncher: AppLauncher) {
+        self.appLauncher = appLauncher
     }
 
     public func start() async throws {
