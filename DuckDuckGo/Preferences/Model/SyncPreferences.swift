@@ -73,15 +73,14 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
     @MainActor
     func presentShowOrEnterCodeDialog() {
         Task { @MainActor in
-            let devicesAtStart = self.devices
             self.$devices
                 .removeDuplicates()
                 .dropFirst()
                 .prefix(1)
-                .sink { [weak self] _ in
-                    self?.managementDialogModel.endFlow()
+                .sink { [weak self] value in
+                    self?.presentDialog(for: .deviceSynced(value.filter { !$0.isCurrent }))
                     self?.objectWillChange.send()
-                }.store(in: &cancellables)
+                }.store(in: &cancellables)  
             managementDialogModel.codeToDisplay = syncService.account?.recoveryCode
             presentDialog(for: .syncAnotherDevice)
         }
@@ -241,10 +240,15 @@ extension SyncPreferences: ManagementDialogModelDelegate {
     }
 
     @MainActor
-    private func login(_ recoveryKey: SyncCode.RecoveryKey) async throws {
+    private func loginAndShowPresentedDialog(_ recoveryKey: SyncCode.RecoveryKey) async throws {
         let device = deviceInfo()
-        try await syncService.login(recoveryKey, deviceName: device.name, deviceType: device.type)
+        let knownDevices = Set(self.devices.map { $0.id })
+        let devices = try await syncService.login(recoveryKey, deviceName: device.name, deviceType: device.type)
+        mapDevices(devices)
+        let syncedDevices = self.devices.filter { !knownDevices.contains($0.id) && !$0.isCurrent }
+
         managementDialogModel.endFlow()
+        presentDialog(for: .deviceSynced(syncedDevices))
     }
 
     @MainActor
@@ -277,24 +281,16 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                 }
                 if let recoveryKey = syncCode.recovery {
                     // This will error if the account already exists, we don't have good UI for this just now
-                    try await login(recoveryKey)
-                    presentDialog(for: .deviceSynced)
+                    try await loginAndShowPresentedDialog(recoveryKey)
                 } else if let connectKey = syncCode.connect {
-                    var isNewAccount = false
                     if syncService.account == nil {
                         let device = deviceInfo()
                         try await syncService.createAccount(deviceName: device.name, deviceType: device.type)
-                        isNewAccount = true
                     }
 
                     try await syncService.transmitRecoveryKey(connectKey)
 
-                    if isNewAccount {
-                        presentDialog(for: .deviceSynced)
-                    } else {
-                        managementDialogModel.endFlow()
-                    }
-
+                    // The UI will update when the devices list changes.
                 } else {
                     managementDialogModel.errorMessage = "Invalid code"
                     return
@@ -312,8 +308,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                 managementDialogModel.codeToDisplay = connector?.code
                 presentDialog(for: .syncAnotherDevice)
                 if let recoveryKey = try await connector?.pollForRecoveryKey() {
-                    try await login(recoveryKey)
-                    presentDialog(for: .deviceSynced)
+                    try await loginAndShowPresentedDialog(recoveryKey)
                 } else {
                     // Polling was likeley cancelled elsewhere (e.g. dialog closed)
                     return

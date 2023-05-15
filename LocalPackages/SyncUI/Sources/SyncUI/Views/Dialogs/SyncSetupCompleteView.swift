@@ -21,9 +21,7 @@ import SwiftUI
 struct SyncSetupCompleteView: View {
     @EnvironmentObject var model: ManagementDialogModel
 
-    var device: SyncDevice {
-        .init(kind: .mobile, name: "Dave's iPhone 14", id: UUID().uuidString)
-    }
+    let devices: [SyncDevice]
 
     var body: some View {
         SyncDialog(spacing: 20.0) {
@@ -34,12 +32,8 @@ struct SyncSetupCompleteView: View {
                 Text(UserText.deviceSyncedExplanation)
                     .multilineTextAlignment(.center)
 
-                SyncPreferencesRow {
-                    SyncedDeviceIcon(kind: device.kind)
-                } centerContent: {
-                    Text(device.name)
-                }
-                .roundedBorder()
+                SyncedDevicesList(devices: devices)
+
             }
         } buttons: {
             Button(UserText.next) {
