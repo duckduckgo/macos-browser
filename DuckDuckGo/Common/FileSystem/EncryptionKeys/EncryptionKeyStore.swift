@@ -42,9 +42,9 @@ final class EncryptionKeyStore: EncryptionKeyStoring {
 #if APPSTORE
         static let encryptionKeyAccount = "com.duckduckgo.mobile.ios"
 #else
-        static let encryptionKeyAccount = "com.duckduckgo.macos.browser"
+        static let encryptionKeyAccount = "com.duckduckgo.macos.browser2"
 #endif
-        static let encryptionKeyService = "DuckDuckGo Privacy Browser Data Encryption Key"
+        static let encryptionKeyService = "DuckDuckGo Privacy Browser Data Encryption Key2"
     }
 
     private let generator: EncryptionKeyGenerating
@@ -53,8 +53,7 @@ final class EncryptionKeyStore: EncryptionKeyStoring {
     private var defaultKeychainQueryAttributes: [String: Any] {
         return [
             kSecClass: kSecClassGenericPassword,
-            kSecAttrAccount: account,
-            kSecUseDataProtectionKeychain: true
+            kSecAttrAccount: account
         ] as [String: Any]
     }
 
@@ -69,16 +68,35 @@ final class EncryptionKeyStore: EncryptionKeyStoring {
 
     // MARK: - Keychain
 
+//    func store(key: SymmetricKey) throws {
+//        var query = defaultKeychainQueryAttributes
+//        query[kSecAttrService as String] = Constants.encryptionKeyService
+//        query[kSecAttrAccessible as String] = kSecAttrAccessibleWhenUnlocked
+//        query[kSecValueData as String] = key.dataRepresentation
+//
+//        let status = SecItemAdd(query as CFDictionary, nil)
+//
+//        guard status == errSecSuccess else {
+//            throw EncryptionKeyStoreError.storageFailed(status)
+//        }
+//    }
+
     func store(key: SymmetricKey) throws {
-        var query = defaultKeychainQueryAttributes
-        query[kSecAttrService as String] = Constants.encryptionKeyService
-        query[kSecAttrAccessible as String] = kSecAttrAccessibleWhenUnlocked
-        query[kSecValueData as String] = key.dataRepresentation
+        var attributes: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrAccount as String: account,
+            kSecValueData as String: key.dataRepresentation.base64EncodedString(),
+            kSecAttrService as String: Constants.encryptionKeyService,
+            kSecAttrAccessible as String: kSecAttrAccessibleWhenUnlocked
+        ]
 
-        let status = SecItemAdd(query as CFDictionary, nil)
+        // Add the login item to the keychain
+        let status = SecItemAdd(attributes as CFDictionary, nil)
 
-        guard status == errSecSuccess else {
-            throw EncryptionKeyStoreError.storageFailed(status)
+        if status == errSecSuccess {
+            print("Login item saved successfully.")
+        } else {
+            print("Failed to save login item with status: \(status)")
         }
     }
 
@@ -117,8 +135,16 @@ final class EncryptionKeyStore: EncryptionKeyStoring {
             guard let data = item as? Data else {
                 throw EncryptionKeyStoreError.readFailed(status)
             }
+            guard let base64String = String(data: data, encoding: .utf8) else {
+                print("Error cannot transform in string")
+                return nil
+            }
+            guard let keyData = Data(base64Encoded: base64String) else {
+                print("Error cannot transform string in data")
+                return nil
+            }
 
-            return SymmetricKey(data: data)
+            return SymmetricKey(data: keyData)
         case errSecItemNotFound:
             return nil
         default:
