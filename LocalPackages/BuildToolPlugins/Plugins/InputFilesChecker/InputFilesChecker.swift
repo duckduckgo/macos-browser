@@ -38,7 +38,8 @@ let extraInputFiles: [TargetName: Set<InputFile>] = [
         .init("UpdateController.swift", .source),
         .init("LegacyWebKitDownloadDelegate.swift", .source),
         .init("WKProcessPool+DownloadDelegate.swift", .source),
-        .init("_WKDownload+WebKitDownload.swift", .source)
+        .init("_WKDownload+WebKitDownload.swift", .source),
+        .init("com.duckduckgo.macos.browser.network-protection.system-extension.extension.systemextension", .unknown)
     ],
 
     "Unit Tests": [
