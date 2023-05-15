@@ -1065,6 +1065,8 @@
 		4B2D06582A11D19B00DE1F49 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4B2D06522A11D19B00DE1F49 /* Assets.xcassets */; };
 		4B2D065A2A11D19B00DE1F49 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B2D06552A11D19B00DE1F49 /* main.swift */; };
 		4B2D065B2A11D1FF00DE1F49 /* Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4BEC322A11B509001D9AC5 /* Logging.swift */; };
+		4B2D065E2A11D2D700DE1F49 /* DuckDuckGoNotifications.app in Embed Login Items */ = {isa = PBXBuildFile; fileRef = 4B4BEC202A11B4E2001D9AC5 /* DuckDuckGoNotifications.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		4B2D065F2A11D2D700DE1F49 /* DuckDuckGoAgent.app in Embed Login Items */ = {isa = PBXBuildFile; fileRef = 4B2D06392A11CFBB00DE1F49 /* DuckDuckGoAgent.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		4B2E7D6326FF9D6500D2DB17 /* PrintingUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B2E7D6226FF9D6500D2DB17 /* PrintingUserScript.swift */; };
 		4B379C1527BD91E3008A968E /* QuartzIdleStateProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B379C1427BD91E3008A968E /* QuartzIdleStateProvider.swift */; };
 		4B379C1E27BDB7FF008A968E /* DeviceAuthenticator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B379C1D27BDB7FF008A968E /* DeviceAuthenticator.swift */; };
@@ -2043,6 +2045,18 @@
 			name = "Embed System Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		4B2D065D2A11D2AE00DE1F49 /* Embed Login Items */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = Contents/Library/LoginItems;
+			dstSubfolderSpec = 1;
+			files = (
+				4B2D065F2A11D2D700DE1F49 /* DuckDuckGoAgent.app in Embed Login Items */,
+				4B2D065E2A11D2D700DE1F49 /* DuckDuckGoNotifications.app in Embed Login Items */,
+			);
+			name = "Embed Login Items";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		B6EC37E629B5DA2A001ACE79 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -2265,7 +2279,7 @@
 		4B2537702A11BF8B00610219 /* NetworkProtectionIPCNotificationsPresenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkProtectionIPCNotificationsPresenter.swift; sourceTree = "<group>"; };
 		4B29759628281F0900187C4E /* FirefoxEncryptionKeyReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirefoxEncryptionKeyReader.swift; sourceTree = "<group>"; };
 		4B2975982828285900187C4E /* FirefoxKeyReaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirefoxKeyReaderTests.swift; sourceTree = "<group>"; };
-		4B2D06392A11CFBB00DE1F49 /* DuckDuckGo Agent.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "DuckDuckGo Agent.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		4B2D06392A11CFBB00DE1F49 /* DuckDuckGoAgent.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DuckDuckGoAgent.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B2D06442A11CFBE00DE1F49 /* DuckDuckGoAgent.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = DuckDuckGoAgent.entitlements; sourceTree = "<group>"; };
 		4B2D064A2A11D04000DE1F49 /* DuckDuckGoNetPAppStore.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = DuckDuckGoNetPAppStore.xcconfig; sourceTree = "<group>"; };
 		4B2D064B2A11D04000DE1F49 /* DuckDuckGoNetPAgent.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = DuckDuckGoNetPAgent.xcconfig; sourceTree = "<group>"; };
@@ -2291,7 +2305,7 @@
 		4B4BEC192A11B459001D9AC5 /* NetPIDsAppStore.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = NetPIDsAppStore.xcconfig; sourceTree = "<group>"; };
 		4B4BEC1A2A11B459001D9AC5 /* NetPIDs.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = NetPIDs.xcconfig; sourceTree = "<group>"; };
 		4B4BEC1B2A11B459001D9AC5 /* NetPOverrides.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = NetPOverrides.xcconfig; sourceTree = "<group>"; };
-		4B4BEC202A11B4E2001D9AC5 /* DuckDuckGo Notifications.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "DuckDuckGo Notifications.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		4B4BEC202A11B4E2001D9AC5 /* DuckDuckGoNotifications.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DuckDuckGoNotifications.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B4BEC322A11B509001D9AC5 /* Logging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logging.swift; sourceTree = "<group>"; };
 		4B4BEC332A11B509001D9AC5 /* DuckDuckGoNotifications.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = DuckDuckGoNotifications.entitlements; sourceTree = "<group>"; };
 		4B4BEC342A11B509001D9AC5 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -4858,9 +4872,9 @@
 				3706FEB2293F662100E42796 /* Integration Tests App Store.xctest */,
 				B6EC37E829B5DA2A001ACE79 /* tests-server */,
 				4B4D603D2A0B290200BCD287 /* NetworkProtectionAppExtension.appex */,
-				4B4BEC202A11B4E2001D9AC5 /* DuckDuckGo Notifications.app */,
+				4B4BEC202A11B4E2001D9AC5 /* DuckDuckGoNotifications.app */,
 				4B25375A2A11BE7300610219 /* com.duckduckgo.macos.browser.network-protection.system-extension.extension.systemextension */,
-				4B2D06392A11CFBB00DE1F49 /* DuckDuckGo Agent.app */,
+				4B2D06392A11CFBB00DE1F49 /* DuckDuckGoAgent.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -6477,7 +6491,7 @@
 				4B2D064E2A11D0D000DE1F49 /* NetworkProtectionUI */,
 			);
 			productName = DuckDuckGoAgent;
-			productReference = 4B2D06392A11CFBB00DE1F49 /* DuckDuckGo Agent.app */;
+			productReference = 4B2D06392A11CFBB00DE1F49 /* DuckDuckGoAgent.app */;
 			productType = "com.apple.product-type.application";
 		};
 		4B4BEC1F2A11B4E2001D9AC5 /* DuckDuckGoNotifications */ = {
@@ -6498,7 +6512,7 @@
 				4B4BEC462A11B600001D9AC5 /* NetworkProtection */,
 			);
 			productName = DuckDuckGoNotifications;
-			productReference = 4B4BEC202A11B4E2001D9AC5 /* DuckDuckGo Notifications.app */;
+			productReference = 4B4BEC202A11B4E2001D9AC5 /* DuckDuckGoNotifications.app */;
 			productType = "com.apple.product-type.application";
 		};
 		4B4D603C2A0B290200BCD287 /* NetworkProtectionAppExtension */ = {
@@ -6553,6 +6567,7 @@
 				AA585D7B248FD31100E9A3E2 /* Frameworks */,
 				AA585D7C248FD31100E9A3E2 /* Resources */,
 				4B25376B2A11BE7700610219 /* Embed System Extensions */,
+				4B2D065D2A11D2AE00DE1F49 /* Embed Login Items */,
 			);
 			buildRules = (
 			);
