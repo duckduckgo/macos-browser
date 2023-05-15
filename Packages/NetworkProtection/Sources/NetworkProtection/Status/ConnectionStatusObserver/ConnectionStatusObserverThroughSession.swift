@@ -51,7 +51,14 @@ public class ConnectionStatusObserverThroughSession: ConnectionStatusObserver {
         start()
     }
 
-    func start() {
+    private func start() {
+        Task {
+            await loadInitialStatus()
+            startObservers()
+        }
+    }
+
+    private func startObservers() {
         observationTokens.append(notificationCenter.addObserver(for: .NEVPNStatusDidChange, object: nil, queue: nil) { [weak self] notification in
             self?.handleStatusChangeNotification(notification)
         })
@@ -59,6 +66,14 @@ public class ConnectionStatusObserverThroughSession: ConnectionStatusObserver {
         observationTokens.append(workspaceNotificationCenter.addObserver(for: NSWorkspace.didWakeNotification, object: nil, queue: nil) { [weak self] notification in
             self?.handleDidWake(notification)
         })
+    }
+
+    private func loadInitialStatus() async {
+        guard let session = try? await ConnectionSessionUtilities.activeSession() else {
+            return
+        }
+
+        handleStatusChange(in: session)
     }
 
     // MARK: - Handling Notifications
@@ -70,7 +85,7 @@ public class ConnectionStatusObserverThroughSession: ConnectionStatusObserver {
                     return
                 }
 
-                try handleStatusChange(in: session)
+                handleStatusChange(in: session)
             } catch {
                 os_log("%{public}@: failed to handle wake %{public}@", log: log, type: .error, String(describing: self), error.localizedDescription)
             }
@@ -82,14 +97,10 @@ public class ConnectionStatusObserverThroughSession: ConnectionStatusObserver {
             return
         }
 
-        do {
-            try handleStatusChange(in: session)
-        } catch {
-            os_log("%{public}@: Failed to handle status change %{public}@", log: log, type: .error, String(describing: self), error.localizedDescription)
-        }
+        handleStatusChange(in: session)
     }
 
-    private func handleStatusChange(in session: NETunnelProviderSession) throws {
+    private func handleStatusChange(in session: NETunnelProviderSession) {
         let status = self.connectionStatus(from: session)
         publisher.send(status)
     }
