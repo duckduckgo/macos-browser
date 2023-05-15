@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1683825973772,
+    "version": 1684132954110,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -2392,6 +2392,10 @@
                     "reason": "After filling out flight information and clicking 'Search flights', a blank page is shown for several seconds before the page redirects."
                 },
                 {
+                    "domain": "fedex.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/927"
+                },
+                {
                     "domain": "gynzykids.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/908"
                 },
@@ -2453,7 +2457,7 @@
                 }
             ],
             "state": "enabled",
-            "hash": "5b7f10de57b33f98eaa24b973822ff98"
+            "hash": "4c075ddba8002cc00985a3b97cf6814a"
         },
         "fingerprintingHardware": {
             "settings": {
@@ -2487,6 +2491,10 @@
                     "reason": "After entering login details and clicking to log in, the site shows an adwall and prevents login."
                 },
                 {
+                    "domain": "fedex.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/927"
+                },
+                {
                     "domain": "realestate.com.au",
                     "reason": "Site loads blank and does not proceed."
                 },
@@ -2500,7 +2508,7 @@
                 }
             ],
             "state": "enabled",
-            "hash": "f0e6ee95d8545c25b32d64a28dee44e2"
+            "hash": "a3562f7dffdc029972063ad15db3112f"
         },
         "fingerprintingScreenSize": {
             "settings": {
@@ -2523,6 +2531,10 @@
             },
             "exceptions": [
                 {
+                    "domain": "fedex.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/927"
+                },
+                {
                     "domain": "gamestop.com",
                     "reason": "Clicking 'add to cart' causes a spinner to load briefly, and the item doesn't get added to the cart."
                 },
@@ -2540,12 +2552,17 @@
                 }
             ],
             "state": "enabled",
-            "hash": "7d4ea2f0c3583b807e930b1397e82ba3"
+            "hash": "e1ffe29047b2f96b52fd59399b7f034b"
         },
         "fingerprintingTemporaryStorage": {
-            "exceptions": [],
+            "exceptions": [
+                {
+                    "domain": "fedex.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/927"
+                }
+            ],
             "state": "disabled",
-            "hash": "728493ef7a1488e4781656d3f9db84aa"
+            "hash": "1eef757cc0e540cea990f140a8def7cf"
         },
         "googleRejected": {
             "exceptions": [],
@@ -2618,10 +2635,14 @@
                 {
                     "domain": "canadapost-postescanada.ca",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/647"
+                },
+                {
+                    "domain": "player.vimeo.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/931"
                 }
             ],
             "state": "enabled",
-            "hash": "118f6c323fac42ad0ab7ac4c7ac8a93d"
+            "hash": "8263144efa8090aa8543dec928198e9a"
         },
         "requestFilterer": {
             "state": "disabled",
@@ -4177,6 +4198,13 @@
                     "googletagmanager.com": {
                         "rules": [
                             {
+                                "rule": "googletagmanager.com/gtag/js",
+                                "domains": [
+                                    "abril.com.br"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/929"
+                            },
+                            {
                                 "rule": "googletagmanager.com/gtm.js",
                                 "domains": [
                                     "ah.nl",
@@ -4492,14 +4520,7 @@
                     "nuance.com": {
                         "rules": [
                             {
-                                "rule": "nuance.com/media/launch",
-                                "domains": [
-                                    "<all>"
-                                ],
-                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/479"
-                            },
-                            {
-                                "rule": "nuance.com/media/sites",
+                                "rule": "nuance.com",
                                 "domains": [
                                     "<all>"
                                 ],
@@ -13495,7 +13516,7 @@
                 }
             },
             "exceptions": [],
-            "hash": "fce96ce0e3882819ed5d437c544759ba"
+            "hash": "6b8decfad7206ae05e5ba7f4a47d55cc"
         },
         "trackingCookies1p": {
             "settings": {
