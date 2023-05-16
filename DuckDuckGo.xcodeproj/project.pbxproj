@@ -8619,8 +8619,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				branch = "sabrina/add-windows-browser-download-link-privacy-config";
-				kind = branch;
+				kind = exactVersion;
+				version = 57.4.8;
 			};
 		};
 		AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
