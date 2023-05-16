@@ -21,6 +21,8 @@ import SwiftUI
 @available(macOS 12.0, *)
 struct PurchaseView: View {
 
+    public let dismissAction: () -> Void
+
     var body: some View {
         ZStack {
             closeButtonOverlay
@@ -90,7 +92,6 @@ struct PurchaseView: View {
             }
             .padding(33)
             .background(RoundedRectangle(cornerRadius: 10).foregroundColor(.black.opacity(0.12)))
-
         }
     }
 
@@ -99,7 +100,7 @@ struct PurchaseView: View {
             HStack {
                 Spacer()
                 Button {
-                    print("Close button was tapped")
+                    dismissAction()
                 } label: {
                     Image(systemName: "xmark")
                         .imageScale(.large)
@@ -125,10 +126,10 @@ struct CapsuleButton: ButtonStyle {
     }
 }
 
-@available(macOS 12.0, *)
-struct PurchaseView_Previews: PreviewProvider {
-    static var previews: some View {
-        PurchaseView()
-            .frame(width: 600, height: 600)
-    }
-}
+//@available(macOS 12.0, *)
+//struct PurchaseView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        PurchaseView()
+//            .frame(width: 600, height: 600)
+//    }
+//}

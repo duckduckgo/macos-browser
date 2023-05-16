@@ -24,19 +24,18 @@ import StoreKit
 final class PurchaseViewController: NSViewController {
 
     override func loadView() {
-
         view = NSView(frame: NSRect(x: 0, y: 0, width: 600, height: 600))
 
-        let host = NSHostingView(rootView: PurchaseView())
-        view.addAndLayout(host)
+        let purchaseView = PurchaseView { [weak self] in
+            self?.dismiss()
+        }
+
+        view.addAndLayout(NSHostingView(rootView: purchaseView))
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
-            self.dismiss()
-        }
     }
 
     override func viewDidAppear() {
