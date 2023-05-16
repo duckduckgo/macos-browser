@@ -23,12 +23,14 @@ import StoreKit
 @available(macOS 12.0, *)
 final class PurchaseViewController: NSViewController {
 
+    let model = PurchaseModel()
+
     override func loadView() {
         view = NSView(frame: NSRect(x: 0, y: 0, width: 600, height: 600))
 
-        let purchaseView = PurchaseView { [weak self] in
+        let purchaseView = PurchaseView(model: model, dismissAction: { [weak self] in
             self?.dismiss()
-        }
+        })
 
         view.addAndLayout(NSHostingView(rootView: purchaseView))
     }
@@ -36,6 +38,10 @@ final class PurchaseViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        Task {
+            let productIdentifiers = ["001", "monthly.subscription", "monthly1"]
+            self.model.products = try await Product.products(for: productIdentifiers)
+        }
     }
 
     override func viewDidAppear() {

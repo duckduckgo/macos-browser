@@ -40,6 +40,7 @@ let extraInputFiles: [TargetName: Set<InputFile>] = [
         .init("WKProcessPool+DownloadDelegate.swift", .source),
         .init("_WKDownload+WebKitDownload.swift", .source),
         .init("PurchaseView.swift", .source),
+        .init("PurchaseModel.swift", .source),
         .init("PurchaseViewController.swift", .source)
     ],
 

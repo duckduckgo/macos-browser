@@ -17,9 +17,12 @@
 //
 
 import SwiftUI
+import StoreKit
 
 @available(macOS 12.0, *)
 struct PurchaseView: View {
+
+    @ObservedObject var model: PurchaseModel
 
     public let dismissAction: () -> Void
 
@@ -27,8 +30,11 @@ struct PurchaseView: View {
         ZStack {
             closeButtonOverlay
             Spacer()
-//            SpinnerView()
-            SubscriptionsList()
+            if model.products.isEmpty {
+                SpinnerView()
+            } else {
+                subscriptionsList
+            }
         }
         .padding(.all, 16)
     }
@@ -38,39 +44,36 @@ struct PurchaseView: View {
             VStack {
                 Text("Fetching subscriptions...")
                     .font(.largeTitle)
-//                ProgressView()
                 ActivityIndicator(isAnimating: .constant(true), style: .spinning)
             }
             .padding(.all, 32)
         }
     }
 
-    struct SubscriptionsList: View {
-        var body: some View {
-            VStack {
-                Text("Subscriptions")
-                    .font(.largeTitle)
+    private var subscriptionsList: some View {
+        VStack {
+            Text("Subscriptions")
+                .font(.largeTitle)
 
-                ScrollView {
-                    VStack(spacing: 16) {
-                        SubscriptionRow()
-                        SubscriptionRow()
-                        SubscriptionRow()
-                        SubscriptionRow()
-                            .opacity(0.5)
-                            .disabled(true)
-                        SubscriptionRow()
-
+            ScrollView {
+                VStack(spacing: 16) {
+                    ForEach(model.products) { product in
+                        SubscriptionRow(product: product,
+                                        buyButtonAction: { model.buy(product) })
                     }
+                    StaticSubscriptionRow()
+                        .opacity(0.5)
+                        .disabled(true)
+                    StaticSubscriptionRow()
                 }
-
-                Spacer()
             }
-            .padding(.all, 32)
+
+            Spacer()
         }
+        .padding(.all, 32)
     }
 
-    struct SubscriptionRow: View {
+    struct StaticSubscriptionRow: View {
         var body: some View {
             HStack {
                 VStack(alignment: .leading) {
@@ -112,6 +115,41 @@ struct PurchaseView: View {
     }
 }
 
+@available(macOS 12.0, *)
+struct SubscriptionRow: View {
+
+    var product: Product
+    var buyButtonAction: () -> Void
+
+    var body: some View {
+        HStack {
+            VStack(alignment: .leading) {
+                Text(product.displayName)
+                    .font(.title)
+                Text(product.description)
+                    .font(.body)
+                Spacer()
+                Text("Price: \(product.displayPrice)")
+                    .font(.caption)
+            }
+
+            Spacer()
+
+            Button {
+                buyButtonAction()
+            } label: {
+                Text("Buy")
+            }
+            .buttonStyle(CapsuleButton())
+
+        }
+        .padding(33)
+        .background(RoundedRectangle(cornerRadius: 10).foregroundColor(.black.opacity(0.12)))
+        .disabled(product.of)
+        .opacity(product.subscription.isNil ? 0.5 : 1.0)
+    }
+}
+
 struct CapsuleButton: ButtonStyle {
 
     @ViewBuilder
@@ -123,5 +161,12 @@ struct CapsuleButton: ButtonStyle {
             .background(background)
             .foregroundColor(.white)
             .clipShape(Capsule())
+    }
+}
+
+extension String: Identifiable {
+    public typealias ID = Int
+    public var id: Int {
+        return hash
     }
 }
