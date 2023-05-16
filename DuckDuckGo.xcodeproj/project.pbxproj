@@ -1067,6 +1067,11 @@
 		4B2D065E2A11D2D700DE1F49 /* DuckDuckGoNotifications.app in Embed Login Items */ = {isa = PBXBuildFile; fileRef = 4B4BEC202A11B4E2001D9AC5 /* DuckDuckGoNotifications.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		4B2D065F2A11D2D700DE1F49 /* DuckDuckGoAgent.app in Embed Login Items */ = {isa = PBXBuildFile; fileRef = 4B2D06392A11CFBB00DE1F49 /* DuckDuckGoAgent.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		4B2D06602A12EEDA00DE1F49 /* NetworkProtectionAppExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 4B4D603D2A0B290200BCD287 /* NetworkProtectionAppExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		4B2D067A2A1333EF00DE1F49 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B2D06512A11D19B00DE1F49 /* AppDelegate.swift */; };
+		4B2D067B2A1333F700DE1F49 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B2D06552A11D19B00DE1F49 /* main.swift */; };
+		4B2D067C2A13340900DE1F49 /* Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4BEC322A11B509001D9AC5 /* Logging.swift */; };
+		4B2D067F2A1334D700DE1F49 /* NetworkProtectionUI in Frameworks */ = {isa = PBXBuildFile; productRef = 4B2D067E2A1334D700DE1F49 /* NetworkProtectionUI */; };
+		4B2D06812A13359E00DE1F49 /* DuckDuckGoAgentAppStore.app in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4B2D06692A13318400DE1F49 /* DuckDuckGoAgentAppStore.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		4B2E7D6326FF9D6500D2DB17 /* PrintingUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B2E7D6226FF9D6500D2DB17 /* PrintingUserScript.swift */; };
 		4B379C1527BD91E3008A968E /* QuartzIdleStateProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B379C1427BD91E3008A968E /* QuartzIdleStateProvider.swift */; };
 		4B379C1E27BDB7FF008A968E /* DeviceAuthenticator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B379C1D27BDB7FF008A968E /* DeviceAuthenticator.swift */; };
@@ -2075,6 +2080,16 @@
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		4B2D06802A13357700DE1F49 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = Contents/Library/LoginItems;
+			dstSubfolderSpec = 1;
+			files = (
+				4B2D06812A13359E00DE1F49 /* DuckDuckGoAgentAppStore.app in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		B6EC37E629B5DA2A001ACE79 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -2299,9 +2314,7 @@
 		4B2975982828285900187C4E /* FirefoxKeyReaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirefoxKeyReaderTests.swift; sourceTree = "<group>"; };
 		4B2D06392A11CFBB00DE1F49 /* DuckDuckGoAgent.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DuckDuckGoAgent.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B2D06442A11CFBE00DE1F49 /* DuckDuckGoAgent.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = DuckDuckGoAgent.entitlements; sourceTree = "<group>"; };
-		4B2D064A2A11D04000DE1F49 /* DuckDuckGoNetPAppStore.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = DuckDuckGoNetPAppStore.xcconfig; sourceTree = "<group>"; };
 		4B2D064B2A11D04000DE1F49 /* DuckDuckGoNetPAgent.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = DuckDuckGoNetPAgent.xcconfig; sourceTree = "<group>"; };
-		4B2D064C2A11D04000DE1F49 /* DuckDuckGoNetP.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = DuckDuckGoNetP.xcconfig; sourceTree = "<group>"; };
 		4B2D064D2A11D04000DE1F49 /* DuckDuckGoNetPAgentAppStore.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = DuckDuckGoNetPAgentAppStore.xcconfig; sourceTree = "<group>"; };
 		4B2D06502A11D19B00DE1F49 /* Info-AppStore.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Info-AppStore.plist"; sourceTree = "<group>"; };
 		4B2D06512A11D19B00DE1F49 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -2310,6 +2323,7 @@
 		4B2D06542A11D19B00DE1F49 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		4B2D06552A11D19B00DE1F49 /* main.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		4B2D06642A132F3A00DE1F49 /* NetworkProtectionAppExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = NetworkProtectionAppExtension.entitlements; path = NetworkProtectionAppExtension/NetworkProtectionAppExtension.entitlements; sourceTree = "<group>"; };
+		4B2D06692A13318400DE1F49 /* DuckDuckGoAgentAppStore.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DuckDuckGoAgentAppStore.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B2E7D6226FF9D6500D2DB17 /* PrintingUserScript.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrintingUserScript.swift; sourceTree = "<group>"; };
 		4B379C1427BD91E3008A968E /* QuartzIdleStateProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuartzIdleStateProvider.swift; sourceTree = "<group>"; };
 		4B379C1D27BDB7FF008A968E /* DeviceAuthenticator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceAuthenticator.swift; sourceTree = "<group>"; };
@@ -3173,6 +3187,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		4B2D06662A13318400DE1F49 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4B2D067F2A1334D700DE1F49 /* NetworkProtectionUI in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		4B4BEC1D2A11B4E2001D9AC5 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -3570,8 +3592,6 @@
 		378C76D8296842FD0092E949 /* App */ = {
 			isa = PBXGroup;
 			children = (
-				4B2D064C2A11D04000DE1F49 /* DuckDuckGoNetP.xcconfig */,
-				4B2D064A2A11D04000DE1F49 /* DuckDuckGoNetPAppStore.xcconfig */,
 				4B2D064B2A11D04000DE1F49 /* DuckDuckGoNetPAgent.xcconfig */,
 				4B2D064D2A11D04000DE1F49 /* DuckDuckGoNetPAgentAppStore.xcconfig */,
 				378B588B295CF3B9002C0CC0 /* AppTargetsBase.xcconfig */,
@@ -3853,9 +3873,9 @@
 		4B4D604E2A0B293C00BCD287 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				4B4D60512A0B293C00BCD287 /* ExtensionBase.xcconfig */,
 				4B4D604F2A0B293C00BCD287 /* NetPExtensionSysex.xcconfig */,
 				4B4D60502A0B293C00BCD287 /* NetPExtensionAppex.xcconfig */,
-				4B4D60512A0B293C00BCD287 /* ExtensionBase.xcconfig */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -4895,6 +4915,7 @@
 				4B4BEC202A11B4E2001D9AC5 /* DuckDuckGoNotifications.app */,
 				4B25375A2A11BE7300610219 /* com.duckduckgo.macos.browser.network-protection.system-extension.extension.systemextension */,
 				4B2D06392A11CFBB00DE1F49 /* DuckDuckGoAgent.app */,
+				4B2D06692A13318400DE1F49 /* DuckDuckGoAgentAppStore.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -6379,6 +6400,7 @@
 				3706FCA6293F65D500E42796 /* Frameworks */,
 				3706FCB1293F65D500E42796 /* Resources */,
 				4B2D06632A12EEDB00DE1F49 /* Embed Foundation Extensions */,
+				4B2D06802A13357700DE1F49 /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -6512,6 +6534,27 @@
 			);
 			productName = DuckDuckGoAgent;
 			productReference = 4B2D06392A11CFBB00DE1F49 /* DuckDuckGoAgent.app */;
+			productType = "com.apple.product-type.application";
+		};
+		4B2D06682A13318400DE1F49 /* DuckDuckGoAgentAppStore */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4B2D06752A13318600DE1F49 /* Build configuration list for PBXNativeTarget "DuckDuckGoAgentAppStore" */;
+			buildPhases = (
+				4B2D06652A13318400DE1F49 /* Sources */,
+				4B2D06662A13318400DE1F49 /* Frameworks */,
+				4B2D06672A13318400DE1F49 /* Resources */,
+				4B2D067D2A13341200DE1F49 /* ShellScript */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = DuckDuckGoAgentAppStore;
+			packageProductDependencies = (
+				4B2D067E2A1334D700DE1F49 /* NetworkProtectionUI */,
+			);
+			productName = DuckDuckGoAgentAppStore;
+			productReference = 4B2D06692A13318400DE1F49 /* DuckDuckGoAgentAppStore.app */;
 			productType = "com.apple.product-type.application";
 		};
 		4B4BEC1F2A11B4E2001D9AC5 /* DuckDuckGoNotifications */ = {
@@ -6689,6 +6732,9 @@
 						CreatedOnToolsVersion = 14.3;
 						LastSwiftMigration = 1430;
 					};
+					4B2D06682A13318400DE1F49 = {
+						CreatedOnToolsVersion = 14.3;
+					};
 					4B4BEC1F2A11B4E2001D9AC5 = {
 						CreatedOnToolsVersion = 14.3;
 					};
@@ -6745,6 +6791,7 @@
 				4B2537592A11BE7300610219 /* NetworkProtectionSystemExtension */,
 				4B4BEC1F2A11B4E2001D9AC5 /* DuckDuckGoNotifications */,
 				4B2D06382A11CFBA00DE1F49 /* DuckDuckGoAgent */,
+				4B2D06682A13318400DE1F49 /* DuckDuckGoAgentAppStore */,
 			);
 		};
 /* End PBXProject section */
@@ -6864,6 +6911,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				4B2D06582A11D19B00DE1F49 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4B2D06672A13318400DE1F49 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7057,6 +7111,23 @@
 			shellScript = "if [[ \"${CONFIGURATION}\" == \"Release\" && \"${PRODUCT_NAME}\" != \"DuckDuckGo\" ]]; then\n    echo \"PRODUCT_NAME must be equal to \\\"DuckDuckGo\\\" (is \\\"${PRODUCT_NAME}\\\")\"\n    echo \"See ManualAppStoreRelease.xcconfig for instructions.\"\n    exit 1\nfi\n";
 		};
 		4B2D065C2A11D23600DE1F49 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# We had issues where the Swift Package resources were not being added to the Agent Apps,\n# so we're manually coping them here.\n# It seems to be a known issue: https://forums.swift.org/t/swift-packages-resource-bundle-not-present-in-xcarchive-when-framework-using-said-package-is-archived/50084/2\ncp -RL \"${BUILT_PRODUCTS_DIR}\"/NetworkProtectionUI_NetworkProtectionUI.bundle \"${BUILT_PRODUCTS_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\"\n";
+		};
+		4B2D067D2A13341200DE1F49 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -8059,6 +8130,16 @@
 				4B2D065A2A11D19B00DE1F49 /* main.swift in Sources */,
 				4B2D065B2A11D1FF00DE1F49 /* Logging.swift in Sources */,
 				4B2D06572A11D19B00DE1F49 /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4B2D06652A13318400DE1F49 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4B2D067B2A1333F700DE1F49 /* main.swift in Sources */,
+				4B2D067C2A13340900DE1F49 /* Logging.swift in Sources */,
+				4B2D067A2A1333EF00DE1F49 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9268,6 +9349,38 @@
 			};
 			name = Review;
 		};
+		4B2D06762A13318600DE1F49 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 4B2D064D2A11D04000DE1F49 /* DuckDuckGoNetPAgentAppStore.xcconfig */;
+			buildSettings = {
+				INFOPLIST_KEY_LSUIElement = YES;
+			};
+			name = Debug;
+		};
+		4B2D06772A13318600DE1F49 /* CI */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 4B2D064D2A11D04000DE1F49 /* DuckDuckGoNetPAgentAppStore.xcconfig */;
+			buildSettings = {
+				INFOPLIST_KEY_LSUIElement = YES;
+			};
+			name = CI;
+		};
+		4B2D06782A13318600DE1F49 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 4B2D064D2A11D04000DE1F49 /* DuckDuckGoNetPAgentAppStore.xcconfig */;
+			buildSettings = {
+				INFOPLIST_KEY_LSUIElement = YES;
+			};
+			name = Release;
+		};
+		4B2D06792A13318600DE1F49 /* Review */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 4B2D064D2A11D04000DE1F49 /* DuckDuckGoNetPAgentAppStore.xcconfig */;
+			buildSettings = {
+				INFOPLIST_KEY_LSUIElement = YES;
+			};
+			name = Review;
+		};
 		4B4BEC2D2A11B4E3001D9AC5 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4B4BEC182A11B3EA001D9AC5 /* DuckDuckGoNetPNotifications.xcconfig */;
@@ -9542,6 +9655,17 @@
 				4B2D06472A11CFBE00DE1F49 /* CI */,
 				4B2D06482A11CFBE00DE1F49 /* Release */,
 				4B2D06492A11CFBE00DE1F49 /* Review */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4B2D06752A13318600DE1F49 /* Build configuration list for PBXNativeTarget "DuckDuckGoAgentAppStore" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4B2D06762A13318600DE1F49 /* Debug */,
+				4B2D06772A13318600DE1F49 /* CI */,
+				4B2D06782A13318600DE1F49 /* Release */,
+				4B2D06792A13318600DE1F49 /* Review */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -9847,6 +9971,10 @@
 			productName = Common;
 		};
 		4B2D064E2A11D0D000DE1F49 /* NetworkProtectionUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = NetworkProtectionUI;
+		};
+		4B2D067E2A1334D700DE1F49 /* NetworkProtectionUI */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = NetworkProtectionUI;
 		};

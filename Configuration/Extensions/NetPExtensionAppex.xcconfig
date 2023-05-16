@@ -24,7 +24,7 @@ BUNDLE_IDENTIFIER_PREFIX = com.duckduckgo.mobile.ios
 
 PRODUCT_BUNDLE_IDENTIFIER[sdk=*] =
 PRODUCT_BUNDLE_IDENTIFIER[config=CI][sdk=*] =
-PRODUCT_BUNDLE_IDENTIFIER[config=Review][sdk=*] =
+PRODUCT_BUNDLE_IDENTIFIER[config=Review][sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX).review.network-extension
 PRODUCT_BUNDLE_IDENTIFIER[config=Debug][sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX).debug.network-extension
 PRODUCT_BUNDLE_IDENTIFIER[config=Release][sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX).network-extension
 

@@ -14,8 +14,8 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "7B8DD1FC29FB066900BA6672"
-               BuildableName = "DuckDuckGo Agent.app"
+               BlueprintIdentifier = "4B2D06382A11CFBA00DE1F49"
+               BuildableName = "DuckDuckGoAgent.app"
                BlueprintName = "DuckDuckGoAgent"
                ReferencedContainer = "container:DuckDuckGo.xcodeproj">
             </BuildableReference>
@@ -43,8 +43,8 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "7B8DD1FC29FB066900BA6672"
-            BuildableName = "DuckDuckGo Agent.app"
+            BlueprintIdentifier = "4B2D06382A11CFBA00DE1F49"
+            BuildableName = "DuckDuckGoAgent.app"
             BlueprintName = "DuckDuckGoAgent"
             ReferencedContainer = "container:DuckDuckGo.xcodeproj">
          </BuildableReference>
@@ -60,8 +60,8 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "7B8DD1FC29FB066900BA6672"
-            BuildableName = "DuckDuckGo Agent.app"
+            BlueprintIdentifier = "4B2D06382A11CFBA00DE1F49"
+            BuildableName = "DuckDuckGoAgent.app"
             BlueprintName = "DuckDuckGoAgent"
             ReferencedContainer = "container:DuckDuckGo.xcodeproj">
          </BuildableReference>

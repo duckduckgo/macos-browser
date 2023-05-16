@@ -17,13 +17,13 @@
 #include "../NetPOverrides.xcconfig"
 #include "../NetPIDsAppStore.xcconfig"
 
-BUNDLE_IDENTIFIER_PREFIX = $(AGENT_BUNDLE_ID)
+BUNDLE_IDENTIFIER_PREFIX = HKE973VLUW.com.duckduckgo.macos.browser.network-protection.agent
 
 // Override AppTargetsBase.xcconfig until we resolve bundle IDs.
 PRODUCT_BUNDLE_IDENTIFIER[sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX)
-PRODUCT_BUNDLE_IDENTIFIER[config=Debug][sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX)
-PRODUCT_BUNDLE_IDENTIFIER[config=CI][sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX)
-PRODUCT_BUNDLE_IDENTIFIER[config=Review][sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX)
+PRODUCT_BUNDLE_IDENTIFIER[config=Debug][sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX).debug
+PRODUCT_BUNDLE_IDENTIFIER[config=CI][sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX).debug
+PRODUCT_BUNDLE_IDENTIFIER[config=Review][sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX).review
 
 INFOPLIST_FILE = DuckDuckGoAgent/Info-AppStore.plist
 GENERATE_INFOPLIST_FILE = YES
@@ -43,7 +43,7 @@ CODE_SIGN_IDENTITY[config=Review][sdk=macosx*] = Developer ID Application
 CODE_SIGN_IDENTITY[config=Debug][sdk=macosx*] = Apple Development
 CODE_SIGN_IDENTITY[config=CI][sdk=macosx*] =
 
-PRODUCT_NAME = DuckDuckGo Agent App Store
+PRODUCT_NAME = DuckDuckGoAgentAppStore
 
 PROVISIONING_PROFILE_SPECIFIER[config=Release][sdk=macosx*] = Mac Browser NetP Developer ID Not. (Distribution)
 

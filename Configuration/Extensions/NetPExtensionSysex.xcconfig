@@ -42,7 +42,6 @@ CODE_SIGN_ENTITLEMENTS[config=Release][sdk=macosx*] = NetworkProtectionSystemExt
 PROVISIONING_PROFILE_SPECIFIER[config=Debug][sdk=macosx*] = Mac Browser NetP Developer ID Extension
 PROVISIONING_PROFILE_SPECIFIER[config=Release][sdk=macosx*] = Mac Browser NetP Developer ID Ext. (Distribution)
 
-
 // This is necessary for the sysex validation
 INFOPLIST_KEY_NSSystemExtensionUsageDescription = Network Protection
 
