@@ -98,6 +98,12 @@ final class MoreOptionsMenu: NSMenu {
 
         addPageItems()
 
+        if #available(macOS 12.0, *) {
+            addItem(withTitle: "Purchase", action: #selector(openPurchaseView(_:)), keyEquivalent: "")
+                .targetting(self)
+                .withImage(NSImage(systemSymbolName: "creditcard", accessibilityDescription: nil))
+        }
+
         let preferencesItem = NSMenuItem(title: UserText.settings, action: #selector(openPreferences(_:)), keyEquivalent: "")
             .targetting(self)
             .withImage(NSImage(named: "Preferences"))
@@ -167,6 +173,12 @@ final class MoreOptionsMenu: NSMenu {
 
     @objc func openAutofillWithCreditCards(_ sender: NSMenuItem) {
         actionDelegate?.optionsButtonMenuRequestedLoginsPopover(self, selectedCategory: .cards)
+    }
+
+    @objc func openPurchaseView(_ sender: NSMenuItem) {
+        if #available(macOS 12.0, *) {
+            WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.presentAsSheet(PurchaseViewController())
+        }
     }
 
     @objc func openPreferences(_ sender: NSMenuItem) {
