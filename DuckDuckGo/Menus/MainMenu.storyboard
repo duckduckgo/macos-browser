@@ -130,7 +130,7 @@
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <menu key="submenu" title="Export" id="SGe-jt-1so">
                                                 <items>
-                                                    <menuItem title="Logins..." id="raM-fX-nRg">
+                                                    <menuItem title="Passwords..." id="raM-fX-nRg">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                         <connections>
                                                             <action selector="openExportLogins:" target="Ady-hI-5gd" id="MLl-kw-Su4"/>
