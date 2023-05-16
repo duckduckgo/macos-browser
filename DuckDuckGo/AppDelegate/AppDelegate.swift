@@ -115,7 +115,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
                 }
             }
             syncDatabase.db.loadStore { context, error in
-                guard let context = context else {
+                guard context != nil else {
                     if let error = error {
                         Pixel.fire(.debug(event: .syncMetadataCouldNotLoadDatabase, error: error))
                     } else {
@@ -163,13 +163,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
         appIconChanger = AppIconChanger(internalUserDecider: internalUserDecider)
         syncMetadataStore = LocalSyncMetadataStore(database: syncDatabase.db)
-        syncService = DDGSync(dataProviders: [
-            BookmarksProvider(
-                database: BookmarkDatabase.shared.db,
-                metadataStore: syncMetadataStore,
-                reloadBookmarksAfterSync: LocalBookmarkManager.shared.loadBookmarks
-            )
-        ])
+        syncService = DDGSync(
+            dataProviders: [
+                BookmarksProvider(
+                    database: BookmarkDatabase.shared.db,
+                    metadataStore: syncMetadataStore,
+                    reloadBookmarksAfterSync: LocalBookmarkManager.shared.loadBookmarks
+                )
+            ],
+            log: OSLog.sync
+        )
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
