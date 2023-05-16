@@ -216,8 +216,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
         UserDefaultsWrapper<Any>.clearRemovedKeys()
 
-        syncStateCancellable = syncService.statePublisher
-            .prepend(syncService.state)
+        syncStateCancellable = syncService.authStatePublisher
+            .prepend(syncService.authState)
             .map { $0 == .inactive }
             .removeDuplicates()
             .sink { isSyncDisabled in

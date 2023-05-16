@@ -337,11 +337,11 @@ final class LocalBookmarkManager: BookmarkManager {
 
     private func requestSync() {
         Task { @MainActor in
-            guard let syncService = (NSApp.delegate as? AppDelegate)?.syncService, syncService.state == .active else {
-                print("sync disabled, not syncing")
+            guard let syncService = (NSApp.delegate as? AppDelegate)?.syncService, syncService.authState == .active else {
+                os_log(.debug, log: OSLog.sync, "Sync disabled, not scheduling")
                 return
             }
-            print("requesting sync")
+            os_log(.debug, log: OSLog.sync, "Requesting sync")
             syncService.scheduler.notifyDataChanged()
         }
     }

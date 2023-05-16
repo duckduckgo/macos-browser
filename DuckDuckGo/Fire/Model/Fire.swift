@@ -449,7 +449,7 @@ final class Fire {
     // MARK: - Bookmarks cleanup
 
     private func burnDeletedBookmarks() {
-        if syncService?.state == .inactive {
+        if syncService?.authState == .inactive {
             LocalBookmarkManager.shared.cleanUpBookmarksDatabase()
         }
     }
