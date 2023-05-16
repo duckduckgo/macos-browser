@@ -62,6 +62,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     private(set) var syncService: DDGSyncing!
     private(set) var syncMetadataStore: SyncMetadataStore!
     private var syncStateCancellable: AnyCancellable?
+    private var bookmarksSyncErrorCancellable: AnyCancellable?
 
 #if !APPSTORE
     var updateController: UpdateController!
@@ -163,16 +164,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
         appIconChanger = AppIconChanger(internalUserDecider: internalUserDecider)
         syncMetadataStore = LocalSyncMetadataStore(database: syncDatabase.db)
-        syncService = DDGSync(
-            dataProviders: [
-                BookmarksProvider(
-                    database: BookmarkDatabase.shared.db,
-                    metadataStore: syncMetadataStore,
-                    reloadBookmarksAfterSync: LocalBookmarkManager.shared.loadBookmarks
-                )
-            ],
-            log: OSLog.sync
+        let bookmarksProvider = BookmarksProvider(
+            database: BookmarkDatabase.shared.db,
+            metadataStore: syncMetadataStore,
+            reloadBookmarksAfterSync: LocalBookmarkManager.shared.loadBookmarks
         )
+        bookmarksSyncErrorCancellable = bookmarksProvider.syncErrorPublisher
+            .sink { error in
+                os_log(.error, log: OSLog.sync, "Bookmarks Sync error: %{public}s", String(reflecting: error))
+            }
+        syncService = DDGSync(dataProviders: [bookmarksProvider], log: OSLog.sync)
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
@@ -225,9 +226,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     }
 
     func applicationDidBecomeActive(_ notification: Notification) {
-        // TODO: Revert when done testing
-//        syncService.scheduler.notifyAppLifecycleEvent()
-        syncService.scheduler.requestSyncImmediately()
+        syncService.scheduler.notifyAppLifecycleEvent()
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
