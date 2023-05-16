@@ -126,9 +126,4 @@ class ThirdPartyBrowserTests: XCTestCase {
         return bundle.resourceURL!.appendingPathComponent("DataImportResources/TestFirefoxData/places.sqlite")
     }
 
-    private func bookmarksURL() -> URL {
-        let bundle = Bundle(for: ThirdPartyBrowserTests.self)
-        return bundle.resourceURL!.appendingPathComponent("Data Import Resources/Test Firefox Data/places.sqlite")
-    }
-
 }
