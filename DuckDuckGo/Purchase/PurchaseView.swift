@@ -96,7 +96,7 @@ struct PurchaseView: View {
     }
 
     private var closeButtonOverlay: some View {
-        VStack(alignment:.trailing) {
+        VStack(alignment: .trailing) {
             HStack {
                 Spacer()
                 Button {
@@ -125,11 +125,3 @@ struct CapsuleButton: ButtonStyle {
             .clipShape(Capsule())
     }
 }
-
-//@available(macOS 12.0, *)
-//struct PurchaseView_Previews: PreviewProvider {
-//    static var previews: some View {
-//        PurchaseView()
-//            .frame(width: 600, height: 600)
-//    }
-//}
