@@ -16,6 +16,8 @@
 // Since NetP has many interactions across targets, it's convenient to make the
 // bundle IDs accessible across those targets.
 
+BUNDLE_IDENTIFIER_PREFIX = com.duckduckgo.mobile.ios
+
 AGENT_BUNDLE_ID[sdk=*] = HKE973VLUW.com.duckduckgo.macos.browser.network-protection.agent
 AGENT_BUNDLE_ID[config=Debug][sdk=*] = HKE973VLUW.com.duckduckgo.macos.browser.network-protection.agent.debug
 AGENT_BUNDLE_ID[config=CI][sdk=*] = HKE973VLUW.com.duckduckgo.macos.browser.network-protection.agent.debug

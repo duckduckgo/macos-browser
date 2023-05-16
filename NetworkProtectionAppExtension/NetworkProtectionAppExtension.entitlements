@@ -23,7 +23,7 @@
 	</array>
 	<key>keychain-access-groups</key>
 	<array>
-		<string>$(AppIdentifierPrefix)com.duckduckgo.network-protection</string>
+		<string>$(AppIdentifierPrefix)com.duckduckgo.mobile.ios</string>
 	</array>
 </dict>
 </plist>

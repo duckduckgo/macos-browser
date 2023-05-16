@@ -42,7 +42,8 @@ let extraInputFiles: [TargetName: Set<InputFile>] = [
         .init("SystemExtensionManager.swift", .source),
         .init("com.duckduckgo.macos.browser.network-protection.system-extension.extension.systemextension", .unknown),
         .init("DuckDuckGoAgent.app", .unknown),
-        .init("DuckDuckGoNotifications.app", .unknown)
+        .init("DuckDuckGoNotifications.app", .unknown),
+        .init("NetworkProtectionAppExtension.appex", .unknown)
     ],
 
     "Unit Tests": [
