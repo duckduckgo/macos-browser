@@ -80,7 +80,7 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
                 .sink { [weak self] value in
                     self?.presentDialog(for: .deviceSynced(value.filter { !$0.isCurrent }))
                     self?.objectWillChange.send()
-                }.store(in: &cancellables)  
+                }.store(in: &cancellables)
             managementDialogModel.codeToDisplay = syncService.account?.recoveryCode
             presentDialog(for: .syncAnotherDevice)
         }
