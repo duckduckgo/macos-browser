@@ -48,12 +48,6 @@ PROVISIONING_PROFILE_SPECIFIER[config=Release][sdk=macosx*] = macOS Network Prot
 
 NETP_EXTRA_FLAGS = NETP_SYSTEM_EXTENSION
 
-// Override the icon with our custom one
-ASSETCATALOG_COMPILER_APPICON_NAME = Icon - Network Protection
-ASSETCATALOG_COMPILER_APPICON_NAME[config=Debug] = Icon - Network Protection
-ASSETCATALOG_COMPILER_APPICON_NAME[config=CI] = Icon - Network Protection
-ASSETCATALOG_COMPILER_APPICON_NAME[config=Review] = Icon - Network Protection
-
 ENABLE_APP_SANDBOX = YES
 SWIFT_OBJC_BRIDGING_HEADER =
 SKIP_INSTALL = YES
