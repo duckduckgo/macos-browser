@@ -37,7 +37,7 @@ struct RecentlyVisited: View {
             SectionTitleView(titleText: UserText.newTabRecentActivitySectionTitle, isExpanded: $model.showRecentlyVisited, isMoreOrLessButtonVisibility: $moreOrLessButtonVisibility)
             RecentlyVisitedTitle()
             Group {
-                if #available(macOS 11, *) {
+                if #available(macOS 12, *) {
                     LazyVStack(spacing: 0) {
                         ForEach(model.recentSites, id: \.domain) {
                             RecentlyVisitedSite(site: $0)

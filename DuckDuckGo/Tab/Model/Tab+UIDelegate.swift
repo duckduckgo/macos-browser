@@ -35,35 +35,18 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
 
     @objc(_webView:saveDataToFile:suggestedFilename:mimeType:originatingURL:)
     func webView(_ webView: WKWebView, saveDataToFile data: Data, suggestedFilename: String, mimeType: String, originatingURL: URL) {
-        func write(to url: URL) throws {
-            let progress = Progress(totalUnitCount: 1,
-                                    fileOperationKind: .downloading,
-                                    kind: .file,
-                                    isPausable: false,
-                                    isCancellable: false,
-                                    fileURL: url)
-            progress.publish()
-            defer {
-                progress.unpublish()
-            }
-
-            try data.write(to: url)
-            progress.completedUnitCount = progress.totalUnitCount
-        }
-
         let prefs = DownloadsPreferences()
         if !prefs.alwaysRequestDownloadLocation,
            let location = prefs.effectiveDownloadLocation {
             let url = location.appendingPathComponent(suggestedFilename)
-            try? write(to: url)
-
+            try? data.writeFileWithProgress(to: url)
             return
         }
 
         let fileTypes = UTType(mimeType: mimeType).map { [$0] } ?? []
         let dialog = UserDialogType.savePanel(.init(SavePanelParameters(suggestedFilename: suggestedFilename, fileTypes: fileTypes)) { result in
             guard let url = (try? result.get())?.url else { return }
-            try? write(to: url)
+            try? data.writeFileWithProgress(to: url)
         })
         userInteractionDialog = UserDialog(sender: .user, dialog: dialog)
     }
@@ -106,7 +89,7 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
         case .none where navigationAction.isUserInitiated == true:
             // try to guess popup kind from provided windowFeatures
             let shouldSelectNewTab = !NSApp.isCommandPressed // this is actually not correct, to be fixed later
-            let targetKind = NewWindowPolicy(windowFeatures, shouldSelectNewTab: shouldSelectNewTab)
+            let targetKind = NewWindowPolicy(windowFeatures, shouldSelectNewTab: shouldSelectNewTab, isBurner: isBurner)
             // proceed to web view creation
             completionHandler(self.createWebView(from: webView, with: configuration, for: navigationAction, of: targetKind))
             return
@@ -150,7 +133,7 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
         // allow popups opened from an empty window console
         let sourceUrl = navigationAction.safeSourceFrame?.safeRequest?.url ?? self.url ?? .empty
         if sourceUrl.isEmpty || sourceUrl.scheme == URL.NavigationalScheme.about.rawValue {
-            return .allow(.tab(selected: true))
+            return .allow(.tab(selected: true, burner: isBurner))
         }
 
         return nil
@@ -161,7 +144,12 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
     private func createWebView(from webView: WKWebView, with configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, of kind: NewWindowPolicy) -> WKWebView? {
         guard let delegate else { return nil }
 
-        let tab = Tab(content: .none, webViewConfiguration: configuration, parentTab: self, canBeClosedWithBack: kind.isSelectedTab, webViewSize: webView.superview?.bounds.size ?? .zero)
+        let tab = Tab(content: .none,
+                      webViewConfiguration: configuration,
+                      parentTab: self,
+                      isBurner: isBurner,
+                      canBeClosedWithBack: kind.isSelectedTab,
+                      webViewSize: webView.superview?.bounds.size ?? .zero)
         delegate.tab(self, createdChild: tab, of: kind)
 
         let webView = tab.webView

@@ -33,7 +33,10 @@ enum UserText {
     static let syncSetupExplanation = NSLocalizedString("preferences.sync.setup-explanation", value: "Sync your bookmarks across your devices and save an encrypted backup on DuckDuckGo’s servers.", comment: "Sync setup explanation")
     static let turnOnSync = NSLocalizedString("preferences.sync.turn-on", value: "Turn on Sync", comment: "Enable sync button caption")
     static let turnOnSyncWithEllipsis = NSLocalizedString("preferences.sync.turn-on-ellipsis", value: "Turn on Sync...", comment: "Enable sync button caption")
-    static let turnOffSync = NSLocalizedString("preferences.sync.turn-off", value: "Turn off Sync...", comment: "Disable sync button caption")
+    static let turnOff = NSLocalizedString("preferences.sync.turn-off", value: "Turn Off", comment: "Turn off sync confirmation dialog button title")
+    static let turnOffSync = NSLocalizedString("preferences.sync.turn-off.ellipsis", value: "Turn off Sync...", comment: "Disable sync button caption")
+    static let turnOffSyncConfirmTitle = NSLocalizedString("preferences.sync.turn-off.confirm.title", value: "Turn Off Sync?", comment: "Turn off sync confirmation dialog title")
+    static let turnOffSyncConfirmMessage = NSLocalizedString("preferences.sync.turn-off.confirm.message", value: "This device will no longer be able to access your synced data.", comment: "Turn off sync confirmation dialog message")
     static let turnOffAndDeleteServerData = NSLocalizedString("preferences.sync.turn-off-and-delete-data", value: "Turn Off and Delete Server Data", comment: "Disable and delete data sync button caption")
     static let recoverSyncedData = NSLocalizedString("preferences.sync.recover", value: "Recover synced data with backup code", comment: "Caption for a button to recover synced data")
     static let syncConnected = NSLocalizedString("preferences.sync.connected", value: "Connected", comment: "Sync state")
@@ -41,6 +44,16 @@ enum UserText {
     static let syncNewDevice = NSLocalizedString("preferences.sync.sync-new-device", value: "Sync New Device", comment: "Settings section title")
     static let thisDevice = NSLocalizedString("preferences.sync.this-device", value: "This Device", comment: "Indicator of a current user's device on the list")
     static let currentDeviceDetails = NSLocalizedString("preferences.sync.current-device-details", value: "Details...", comment: "Sync Settings device details button")
+    static let removeDeviceButton = NSLocalizedString("preferences.sync.remove-device", value: "Remove...", comment: "Button to remove a device")
+    static let removeDeviceConfirmTitle = NSLocalizedString("preferences.sync.remove-device-title", value: "Remove Device?", comment: "Title on remove a device confirmation")
+    static let removeDeviceConfirmButton = NSLocalizedString("preferences.sync.remove-device-button", value: "Remove Device", comment: "Button to on remove a device confirmation")
+    static func removeDeviceConfirmMessage(_ deviceName: String) -> String {
+        let localized = NSLocalizedString("preferences.sync.remove-device-message",
+                                          value: "\"%@\" will no longer be able to access your synced data.",
+                                          comment: "")
+        return String(format: localized, deviceName)
+    }
+
     static let syncNewDeviceInstructions = NSLocalizedString("prefrences.sync.sync-new-device-instructions", value: "Go to Settings > Sync in the DuckDuckGo App on a different device and scan the image on the left to connect instantly.", comment: "Instructions for adding a new device to sync")
     static let showOrEnterCode = NSLocalizedString("prefrences.sync.show-or-enter-code", value: "Show or Enter Code", comment: "Button caption in Sync's add new device screen")
     static let recovery = NSLocalizedString("prefrences.sync.recovery", value: "Recovery", comment: "Sync settings section title")
@@ -69,5 +82,13 @@ enum UserText {
 
     static let recoveryPDFExplanation1 = NSLocalizedString("prefrences.sync.recovery-pdf-explanation1", value: "If you lose access to your devices, you will need the code recover your synced data. You can save this code to your device as a PDF.", comment: "Sync recovery PDF explanation")
     static let recoveryPDFExplanation2 = NSLocalizedString("prefrences.sync.recovery-pdf-explanation2", value: "Anyone with access to this code can access your synced data, so please keep it in a safe place.", comment: "Sync recovery PDF explanation")
+
+    static let deviceDetailsTitle = NSLocalizedString("prefrences.sync.device-details.title", value: "Device Details", comment: "The title of the device details dialog")
+    static let deviceDetailsLabel = NSLocalizedString("prefrences.sync.device-details.label", value: "Name", comment: "The text entry label")
+    static let deviceDetailsPrompt = NSLocalizedString("prefrences.sync.device-details.prompt", value: "Device name", comment: "The text entry prompt")
+
+    static let deleteAccountTitle = NSLocalizedString("prefrences.sync.delete-account.title", value: "Delete Server Data?", comment: "Title for delete account")
+    static let deleteAccountMessage = NSLocalizedString("prefrences.sync.delete-account.message", value: "These devices will be disconnected and your synced data will be deleted from the server.", comment: "Message for delete account")
+    static let deleteAccountButton = NSLocalizedString("prefrences.sync.delete-account.button", value: "Delete Data", comment: "Label for delete account button")
 
 }

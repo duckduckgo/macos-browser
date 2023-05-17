@@ -25,6 +25,7 @@ import Navigation
 final class HistoryTabExtension: NSObject {
 
     private let historyCoordinating: HistoryCoordinating
+    private let isBurner: Bool
 
     private(set) var localHistory = Set<String>()
     private var cancellables = Set<AnyCancellable>()
@@ -45,12 +46,14 @@ final class HistoryTabExtension: NSObject {
     }
     private var visitState: VisitState = .expected
 
-    init(historyCoordinating: HistoryCoordinating,
+    init(isBurner: Bool,
+         historyCoordinating: HistoryCoordinating,
          trackersPublisher: some Publisher<DetectedTracker, Never>,
          urlPublisher: some Publisher<URL?, Never>,
          titlePublisher: some Publisher<String?, Never>) {
 
         self.historyCoordinating = historyCoordinating
+        self.isBurner = isBurner
         super.init()
 
         trackersPublisher.sink { [weak self] tracker in
@@ -86,6 +89,8 @@ final class HistoryTabExtension: NSObject {
     }
 
     private func addVisit() {
+        guard !isBurner else { return }
+
         guard let url else {
             assertionFailure("HistoryTabExtension.state.currentUrl not set")
             return
@@ -103,11 +108,15 @@ final class HistoryTabExtension: NSObject {
     }
 
     private func updateVisitTitle(_ title: String) {
+        guard !isBurner else { return }
+
         guard let url else { return }
         historyCoordinating.updateTitleIfNeeded(title: title, url: url)
     }
 
     private func commitBeforeClosing() {
+        guard !isBurner else { return }
+
         guard let url else { return }
         historyCoordinating.commitChanges(url: url)
     }

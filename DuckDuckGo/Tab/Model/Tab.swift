@@ -165,6 +165,10 @@ protocol NewWindowPolicyDecisionMaker {
             userEnteredValue != nil
         }
 
+        var displaysContentInWebView: Bool {
+            isUrl
+        }
+
     }
     private struct ExtensionDependencies: TabExtensionDependencies {
         let privacyFeatures: PrivacyFeaturesProtocol
@@ -219,6 +223,7 @@ protocol NewWindowPolicyDecisionMaker {
                      interactionStateData: Data? = nil,
                      parentTab: Tab? = nil,
                      shouldLoadInBackground: Bool = false,
+                     isBurner: Bool = false,
                      shouldLoadFromCache: Bool = false,
                      canBeClosedWithBack: Bool = false,
                      lastSelectedAt: Date? = nil,
@@ -231,9 +236,13 @@ protocol NewWindowPolicyDecisionMaker {
             ?? (NSApp.isRunningUnitTests ? nil : StatisticsLoader.shared)
         let privacyFeatures = privacyFeatures ?? PrivacyFeatures
         let internalUserDecider = (NSApp.delegate as? AppDelegate)?.internalUserDecider
+        var faviconManager = faviconManagement
+        if isBurner {
+            faviconManager = FaviconManager(cacheType: .inMemory)
+        }
 
         self.init(content: content,
-                  faviconManagement: faviconManagement,
+                  faviconManagement: faviconManager,
                   webCacheManager: webCacheManager,
                   webViewConfiguration: webViewConfiguration,
                   historyCoordinating: historyCoordinating,
@@ -253,6 +262,7 @@ protocol NewWindowPolicyDecisionMaker {
                   interactionStateData: interactionStateData,
                   parentTab: parentTab,
                   shouldLoadInBackground: shouldLoadInBackground,
+                  isBurner: isBurner,
                   shouldLoadFromCache: shouldLoadFromCache,
                   canBeClosedWithBack: canBeClosedWithBack,
                   lastSelectedAt: lastSelectedAt,
@@ -282,6 +292,7 @@ protocol NewWindowPolicyDecisionMaker {
          interactionStateData: Data?,
          parentTab: Tab?,
          shouldLoadInBackground: Bool,
+         isBurner: Bool,
          shouldLoadFromCache: Bool,
          canBeClosedWithBack: Bool,
          lastSelectedAt: Date?,
@@ -296,12 +307,14 @@ protocol NewWindowPolicyDecisionMaker {
         self.title = title
         self.favicon = favicon
         self.parentTab = parentTab
+        self.isBurner = isBurner
         self._canBeClosedWithBack = canBeClosedWithBack
         self.interactionState = (interactionStateData != nil || shouldLoadFromCache) ? .loadCachedFromTabContent(interactionStateData) : .none
         self.lastSelectedAt = lastSelectedAt
 
         let configuration = webViewConfiguration ?? WKWebViewConfiguration()
-        configuration.applyStandardConfiguration(contentBlocking: privacyFeatures.contentBlocking)
+        configuration.applyStandardConfiguration(contentBlocking: privacyFeatures.contentBlocking,
+                                                 isBurner: isBurner)
         self.webViewConfiguration = configuration
         let userContentController = configuration.userContentController as? UserContentController
         assert(userContentController != nil)
@@ -312,18 +325,19 @@ protocol NewWindowPolicyDecisionMaker {
         permissions = PermissionModel(permissionManager: permissionManager,
                                       geolocationService: geolocationService)
 
-        let userScriptsPublisher = _userContentController.projectedValue
-            .compactMap { $0?.$contentBlockingAssets }
+        let userContentControllerPromise = Future<UserContentController, Never>.promise()
+        let userScriptsPublisher = userContentControllerPromise.future
+            .compactMap { $0.$contentBlockingAssets }
             .switchToLatest()
             .map { $0?.userScripts as? UserScripts }
             .eraseToAnyPublisher()
 
-        let userContentControllerPromise = Future<UserContentController, Never>.promise()
         let webViewPromise = Future<WKWebView, Never>.promise()
         var tabGetter: () -> Tab? = { nil }
         self.extensions = extensionsBuilder
             .build(with: (tabIdentifier: instrumentation.currentTabIdentifier,
                           isTabPinned: { tabGetter().map { tab in pinnedTabsManager.isTabPinned(tab) } ?? false },
+                          isTabBurner: isBurner,
                           contentPublisher: _content.projectedValue.eraseToAnyPublisher(),
                           titlePublisher: _title.projectedValue.eraseToAnyPublisher(),
                           userScriptsPublisher: userScriptsPublisher,
@@ -356,7 +370,41 @@ protocol NewWindowPolicyDecisionMaker {
                                                selector: #selector(onDuckDuckGoEmailSignOut),
                                                name: .emailDidSignOut,
                                                object: nil)
+
+        addDeallocationChecks(for: webView)
     }
+
+#if DEBUG
+    func addDeallocationChecks(for webView: WKWebView) {
+        let processPool = webView.configuration.processPool
+        let webViewValue = NSValue(nonretainedObject: webView)
+
+        webView.onDeinit { [weak self] in
+            // Tab should deallocate with the WebView
+            self?.assertObjectDeallocated(after: 1.0)
+
+            // unregister WebView from the ProcessPool
+            processPool.webViewsUsingProcessPool.remove(webViewValue)
+
+            if processPool.webViewsUsingProcessPool.isEmpty {
+                // when the last WebView is deallocated the ProcessPool should be deallocated
+                processPool.assertObjectDeallocated(after: 1)
+                // by the moment the ProcessPool is dead all the UserContentControllers that were using it should be deallocated
+                let knownUserContentControllers = processPool.knownUserContentControllers
+                processPool.onDeinit {
+                    for controller in knownUserContentControllers {
+                        assert(controller.userContentController == nil, "\(controller) has not been deallocated")
+                    }
+                }
+            }
+        }
+        // ProcessPool will be alive while there are WebViews using it
+        processPool.webViewsUsingProcessPool.insert(webViewValue)
+        processPool.knownUserContentControllers.insert(.init(userContentController: webView.configuration.userContentController))
+    }
+#else
+    @inlinable func addDeallocationChecks(for webView: WKWebView) {}
+#endif
 
     override func awakeAfter(using decoder: NSCoder) -> Any? {
         for tabExtension in self.extensions {
@@ -386,20 +434,30 @@ protocol NewWindowPolicyDecisionMaker {
     }
 
     deinit {
-        cleanUpBeforeClosing()
+        cleanUpBeforeClosing(onDeinit: true)
     }
 
     func cleanUpBeforeClosing() {
-        let job = { [webView] in
+        cleanUpBeforeClosing(onDeinit: false)
+    }
+
+    @MainActor(unsafe)
+    private func cleanUpBeforeClosing(onDeinit: Bool) {
+        let job = { [webView, userContentController] in
             webView.stopLoading()
             webView.stopMediaCapture()
             webView.stopAllMediaPlayback()
             webView.fullscreenWindowController?.close()
 
-            webView.configuration.userContentController.removeAllUserScripts()
+            userContentController?.cleanUpBeforeClosing()
+            webView.assertObjectDeallocated(after: 4.0)
+        }
+        if !onDeinit {
+            // Tab should be deallocated shortly after burning
+            self.assertObjectDeallocated(after: 4.0)
         }
         guard Thread.isMainThread else {
-            DispatchQueue.main.async(execute: job)
+            DispatchQueue.main.async { job() }
             return
         }
         job()
@@ -431,8 +489,15 @@ protocol NewWindowPolicyDecisionMaker {
 
     var isLazyLoadingInProgress = false
 
+    let isBurner: Bool
+
     @Published private(set) var content: TabContent {
         didSet {
+            if !content.displaysContentInWebView && oldValue.displaysContentInWebView {
+                webView.stopLoading()
+                webView.stopMediaCapture()
+                webView.stopAllMediaPlayback()
+            }
             handleFavicon()
             invalidateInteractionStateData()
             error = nil
@@ -502,7 +567,16 @@ protocol NewWindowPolicyDecisionMaker {
         }
     }
 
-    @PublishedAfter var error: WKError?
+    @PublishedAfter var error: WKError? {
+        didSet {
+            if error == nil || error?.isFrameLoadInterrupted == true || error?.isNavigationCancelled == true {
+                return
+            }
+            webView.stopLoading()
+            webView.stopMediaCapture()
+            webView.stopAllMediaPlayback()
+        }
+    }
     let permissions: PermissionModel
 
     @Published private(set) var isLoading: Bool = false
@@ -1037,11 +1111,12 @@ extension Tab: NewWindowPolicyDecisionMaker {
 }
 
 extension Tab: TabDataClearing {
+    @MainActor
     func prepareForDataClearing(caller: TabDataCleaner) {
         webViewCancellables.removeAll()
 
         webView.stopLoading()
-        webView.configuration.userContentController.removeAllUserScripts()
+        (webView.configuration.userContentController as? UserContentController)?.cleanUpBeforeClosing()
 
         webView.navigationDelegate = caller
         webView.load(URLRequest(url: .blankPage))

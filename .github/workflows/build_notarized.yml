@@ -69,11 +69,14 @@ jobs:
 
     name: Export Notarized App
 
-    runs-on: macos-12
+    runs-on: macos-13
+
+    outputs:
+      app-version: ${{ steps.set-outputs.outputs.app-version }}
+      app-name: ${{ steps.set-outputs.outputs.app-name }}
 
     env:
       release-type: ${{ github.event.inputs.release-type || inputs.release-type }}
-      create-dmg: ${{ github.event.inputs.create-dmg || inputs.create-dmg }}
       asana-task-url: ${{ github.event.inputs.asana-task-url || inputs.asana-task-url }}
 
     steps:
@@ -93,9 +96,9 @@ jobs:
         RELEASE_PP_PATH=$RUNNER_TEMP/release_pp.provisionprofile
 
         # import certificate from secrets
-        echo -n "$BUILD_CERTIFICATE_BASE64" | base64 --decode --output $CERTIFICATE_PATH
-        echo -n "$REVIEW_PROVISION_PROFILE_BASE64" | base64 --decode --output $REVIEW_PP_PATH
-        echo -n "$RELEASE_PROVISION_PROFILE_BASE64" | base64 --decode --output $RELEASE_PP_PATH
+        echo -n "$BUILD_CERTIFICATE_BASE64" | base64 --decode -o $CERTIFICATE_PATH
+        echo -n "$REVIEW_PROVISION_PROFILE_BASE64" | base64 --decode -o $REVIEW_PP_PATH
+        echo -n "$RELEASE_PROVISION_PROFILE_BASE64" | base64 --decode -o $RELEASE_PP_PATH
 
         # create temporary keychain
         security create-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
@@ -142,20 +145,11 @@ jobs:
       continue-on-error: true
       run: brew install xcbeautify
 
-    - name: Install create-dmg
-      if: ${{ env.create-dmg == true || env.asana-task-url }}
-      run: |
-        brew install create-dmg
-        echo "create_dmg_arg=-d" >> $GITHUB_ENV
-
-    - name: Set Asana task URL
-      if: env.asana-task-url
-      run: echo "asana_task_url_arg=-a ${{ env.asana-task-url }}" >> $GITHUB_ENV
-
     - name: Select Xcode
       run: sudo xcode-select -s /Applications/Xcode_$(<.xcode-version).app/Contents/Developer
 
     - name: Archive and notarize the app
+      id: archive
       env:
         APPLE_API_KEY_BASE64: ${{ secrets.APPLE_API_KEY_BASE64 }}
         APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
@@ -164,48 +158,136 @@ jobs:
       run: |
         # import API Key from secrets
         export APPLE_API_KEY_PATH="$RUNNER_TEMP/apple_api_key.pem"
-        echo -n "$APPLE_API_KEY_BASE64" | base64 --decode --output $APPLE_API_KEY_PATH
+        echo -n "$APPLE_API_KEY_BASE64" | base64 --decode -o $APPLE_API_KEY_PATH
 
-        ./scripts/archive.sh ${{ env.release-type }} \
-            ${{ env.create_dmg_arg }} \
-            ${{ env.asana_task_url_arg }}
+        ./scripts/archive.sh ${{ env.release-type }}
+
+    - name: Set app name and version
+      id: set-outputs
+      run: |
+        echo "app-version=${{ env.app-version }}" >> $GITHUB_OUTPUT
+        echo "app-name=${{ env.app-name }}" >> $GITHUB_OUTPUT
 
     - name: Upload app artifact
       uses: actions/upload-artifact@v3
       with:
-        name: DuckDuckGo-${{ env.release-type }}-${{ env.app_version }}.app
-        path: ${{ github.workspace }}/release/DuckDuckGo-${{ env.app_version }}.zip
+        name: DuckDuckGo-${{ env.release-type }}-${{ env.app-version }}.app
+        path: ${{ github.workspace }}/release/DuckDuckGo-${{ env.app-version }}.zip
 
     - name: Upload dSYMs artifact
       uses: actions/upload-artifact@v3
       with:
-        name: DuckDuckGo-${{ env.release-type }}-dSYM-${{ env.app_version }}
-        path: ${{ github.workspace }}/release/DuckDuckGo-${{ env.app_version }}-dSYM.zip
+        name: DuckDuckGo-${{ env.release-type }}-dSYM-${{ env.app-version }}
+        path: ${{ github.workspace }}/release/DuckDuckGo-${{ env.app-version }}-dSYM.zip
+
+    - name: Upload dSYMs to Asana
+      if: env.asana-task-url
+      uses: ./.github/actions/asana-upload
+      with:
+        access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
+        file-name: ${{ github.workspace }}/release/DuckDuckGo-${{ env.app-version }}-dSYM.zip
+        task-url: ${{ env.asana-task-url }}
+
+  create-dmg:
+
+    name: Create DMG
+    needs: export-notarized-app
+    if: ${{ github.event.inputs.create-dmg == true || inputs.create-dmg == true }}
+
+    # use macos-12 for creating DMGs as macos-13 beta runners can't run AppleScript: https://app.asana.com/0/0/1204523592790998/f
+    runs-on: macos-12
+
+    env:
+      app-version: ${{ needs.export-notarized-app.outputs.app-version }}
+      app-name: ${{ needs.export-notarized-app.outputs.app-name }}
+      asana-task-url: ${{ github.event.inputs.asana-task-url || inputs.asana-task-url }}
+      release-type: ${{ github.event.inputs.release-type || inputs.release-type }}
+
+    steps:
+
+    - name: Fetch app bundle
+      uses: actions/download-artifact@v3
+      with:
+        name: DuckDuckGo-${{ env.release-type }}-${{ env.app-version }}.app
+        path: ${{ github.workspace }}/dmg
+
+    - name: Extract app bundle
+      run: |
+        ditto -xk DuckDuckGo-${{ env.app-version }}.zip .
+        rm -f DuckDuckGo-${{ env.app-version }}.zip
+      working-directory: ${{ github.workspace }}/dmg
+
+    - name: Install create-dmg
+      run: brew install create-dmg
+
+    - name: Create DMG
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        curl -fLSs $(gh api https://api.github.com/repos/${{ github.repository }}/contents/scripts/assets/dmg-background.png?ref=${{ github.ref }} --jq .download_url) \
+            --output dmg-background.png
+        create-dmg --volname "${{ env.app-name }}" \
+            --icon "${{ env.app-name }}.app" 140 160 \
+            --background "dmg-background.png" \
+            --window-size 600 400 \
+            --icon-size 120 \
+            --app-drop-link 430 160 "duckduckgo-${{ env.app-version }}.dmg" \
+            "dmg"
 
     - name: Upload DMG artifact
-      if: env.create-dmg || env.asana-task-url
       uses: actions/upload-artifact@v3
       with:
-        name: DuckDuckGo-${{ env.release-type }}-${{ env.app_version }}.dmg
-        path: ${{ github.workspace }}/release/duckduckgo*-${{ env.app_version }}.dmg
+        name: DuckDuckGo-${{ env.release-type }}-${{ env.app-version }}.dmg
+        path: ${{ github.workspace }}/duckduckgo*-${{ env.app-version }}.dmg
 
-    - name: Send Mattermost message
+    - name: Fetch Upload to Asana action
+      if: env.asana-task-url
       env:
-        WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-        ASANA_TASK_URL: ${{ env.asana-task-url }}
-        RELEASE_TYPE: ${{ env.release-type }}
+        GH_TOKEN: ${{ github.token }}
       run: |
-        export MM_USER_HANDLE=$(base64 -d <<< ${{ secrets.MM_HANDLES_BASE64 }} | jq ".${{ github.actor }}" | tr -d '"')
+        mkdir -p "${{ github.workspace }}/.github/actions/asana-upload"
+        curl -fLSs $(gh api https://api.github.com/repos/${{ github.repository }}/contents/.github/actions/asana-upload/action.yml?ref=${{ github.ref }} --jq .download_url) \
+            --output "${{ github.workspace }}/.github/actions/asana-upload/action.yml"
 
-        if [[ -z "${MM_USER_HANDLE}" ]]; then
-            echo "Mattermost user handle not known for ${{ github.actor }}, skipping sending message"
-        else
+    - name: Upload DMG to Asana
+      if: env.asana-task-url
+      uses: ./.github/actions/asana-upload
+      with:
+        access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
+        file-name: ${{ github.workspace }}/duckduckgo-${{ env.app-version }}.dmg
+        task-url: ${{ env.asana-task-url }}
 
-            if [[ -n "${ASANA_TASK_URL}" ]]; then
-                export ASANA_LINK=" | [:asana: Asana task](${ASANA_TASK_URL})"
-            fi
+  mattermost:
 
-            curl -s -H 'Content-type: application/json' \
-                -d "$(envsubst < ./scripts/assets/release-mm-template.json)" \
-                ${{ secrets.MM_WEBHOOK_URL }}
-        fi
+    name: Send Mattermost message
+
+    needs: [export-notarized-app, create-dmg]
+    if: ${{ always() && (needs.export-notarized-app.result == 'success') && (needs.create-dmg.result == 'success' || needs.create-dmg.result == 'skipped') }}
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Send Mattermost message
+        env:
+          ASANA_TASK_URL: ${{ github.event.inputs.asana-task-url || inputs.asana-task-url }}
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TYPE: ${{ github.event.inputs.release-type || inputs.release-type }}
+          WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          curl -fLSs $(gh api https://api.github.com/repos/${{ github.repository }}/contents/scripts/assets/release-mm-template.json?ref=${{ github.ref }} --jq .download_url) \
+              --output message-template.json
+
+          export MM_USER_HANDLE=$(base64 -d <<< ${{ secrets.MM_HANDLES_BASE64 }} | jq ".${{ github.actor }}" | tr -d '"')
+
+          if [[ -z "${MM_USER_HANDLE}" ]]; then
+              echo "Mattermost user handle not known for ${{ github.actor }}, skipping sending message"
+          else
+
+              if [[ -n "${ASANA_TASK_URL}" ]]; then
+                  export ASANA_LINK=" | [:asana: Asana task](${ASANA_TASK_URL})"
+              fi
+
+              curl -s -H 'Content-type: application/json' \
+                  -d "$(envsubst < message-template.json)" \
+                  ${{ secrets.MM_WEBHOOK_URL }}
+          fi

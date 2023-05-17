@@ -21,6 +21,9 @@ import DDGSync
 import Combine
 import SystemConfiguration
 import SyncUI
+import SwiftUI
+import PDFKit
+import Navigation
 
 extension SyncDevice {
     init(_ account: SyncAccount) {
@@ -62,10 +65,43 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         presentDialog(for: .recoverAccount)
     }
 
+    @MainActor
+    func presentTurnOffSyncConfirmDialog() {
+        presentDialog(for: .turnOffSync)
+    }
+
+    @MainActor
+    func presentShowOrEnterCodeDialog() {
+        Task { @MainActor in
+            let devicesAtStart = self.devices
+            self.$devices
+                .removeDuplicates()
+                .dropFirst()
+                .prefix(1)
+                .sink { [weak self] _ in
+                    self?.managementDialogModel.endFlow()
+                    self?.objectWillChange.send()
+                }.store(in: &cancellables)
+            managementDialogModel.codeToDisplay = syncService.account?.recoveryCode
+            presentDialog(for: .syncAnotherDevice)
+        }
+    }
+
+    @MainActor
+    func presentDeviceDetails(_ device: SyncDevice) {
+        presentDialog(for: .deviceDetails(device))
+    }
+
+    @MainActor
+    func presentRemoveDevice(_ device: SyncDevice) {
+        presentDialog(for: .removeDevice(device))
+    }
+
     func turnOffSync() {
         Task { @MainActor in
             do {
                 try await syncService.disconnect()
+                managementDialogModel.endFlow()
             } catch {
                 errorMessage = String(describing: error)
             }
@@ -76,7 +112,6 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         self.syncService = syncService
         self.managementDialogModel = ManagementDialogModel()
         self.managementDialogModel.delegate = self
-        updateState()
 
         syncService.isAuthenticatedPublisher
             .removeDuplicates()
@@ -106,10 +141,30 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
     // MARK: - Private
 
     private func updateState() {
-        managementDialogModel.recoveryCode = syncService.account?.recoveryCode
+        managementDialogModel.codeToDisplay = syncService.account?.recoveryCode
+        refreshDevices()
+    }
 
-        if let account = syncService.account {
-            devices = [.init(account)]
+    @MainActor
+    private func mapDevices(_ registeredDevices: [RegisteredDevice]) {
+        guard let deviceId = syncService.account?.deviceId else { return }
+        self.devices = registeredDevices.map {
+            deviceId == $0.id ? SyncDevice(kind: .current, name: $0.name, id: $0.id) : SyncDevice($0)
+        }.sorted(by: { item, _ in
+            item.isCurrent
+        })
+    }
+
+    func refreshDevices() {
+        if syncService.account != nil {
+            Task { @MainActor in
+                do {
+                    let registeredDevices = try await syncService.fetchDevices()
+                    mapDevices(registeredDevices)
+                } catch {
+                    print("error", error.localizedDescription)
+                }
+            }
         } else {
             devices = []
         }
@@ -157,6 +212,29 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
 
 extension SyncPreferences: ManagementDialogModelDelegate {
 
+    func deleteAccount() {
+        Task { @MainActor in
+            managementDialogModel.endFlow()
+            do {
+                try await syncService.deleteAccount()
+            } catch {
+                managementDialogModel.errorMessage = String(describing: error)
+            }
+        }
+    }
+
+    func updateDeviceName(_ name: String) {
+        Task { @MainActor in
+            do {
+                self.devices = []
+                let devices = try await syncService.updateDeviceName(name)
+                mapDevices(devices)
+            } catch {
+                managementDialogModel.errorMessage = String(describing: error)
+            }
+        }
+    }
+
     private func deviceInfo() -> (name: String, type: String) {
         let hostname = SCDynamicStoreCopyComputerName(nil, nil) as? String ?? ProcessInfo.processInfo.hostName
         return (name: hostname, type: "desktop")
@@ -183,6 +261,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
             do {
                 let device = deviceInfo()
                 try await syncService.createAccount(deviceName: device.name, deviceType: device.type)
+                confirmSetupComplete()
             } catch {
                 managementDialogModel.errorMessage = String(describing: error)
             }
@@ -192,12 +271,34 @@ extension SyncPreferences: ManagementDialogModelDelegate {
     func recoverDevice(using recoveryCode: String) {
         Task { @MainActor in
             do {
-                guard let recoveryKey = try? SyncCode.decodeBase64String(recoveryCode).recovery else {
-                    managementDialogModel.errorMessage = "Invalid recovery key"
+                guard let syncCode = try? SyncCode.decodeBase64String(recoveryCode) else {
+                    managementDialogModel.errorMessage = "Invalid code"
                     return
                 }
+                if let recoveryKey = syncCode.recovery {
+                    // This will error if the account already exists, we don't have good UI for this just now
+                    try await login(recoveryKey)
+                    presentDialog(for: .deviceSynced)
+                } else if let connectKey = syncCode.connect {
+                    var isNewAccount = false
+                    if syncService.account == nil {
+                        let device = deviceInfo()
+                        try await syncService.createAccount(deviceName: device.name, deviceType: device.type)
+                        isNewAccount = true
+                    }
 
-                try await login(recoveryKey)
+                    try await syncService.transmitRecoveryKey(connectKey)
+
+                    if isNewAccount {
+                        presentDialog(for: .deviceSynced)
+                    } else {
+                        managementDialogModel.endFlow()
+                    }
+
+                } else {
+                    managementDialogModel.errorMessage = "Invalid code"
+                    return
+                }
             } catch {
                 managementDialogModel.errorMessage = String(describing: error)
             }
@@ -208,15 +309,15 @@ extension SyncPreferences: ManagementDialogModelDelegate {
         Task { @MainActor in
             do {
                 self.connector = try syncService.remoteConnect()
-                managementDialogModel.connectCode = connector?.code
+                managementDialogModel.codeToDisplay = connector?.code
                 presentDialog(for: .syncAnotherDevice)
                 if let recoveryKey = try await connector?.pollForRecoveryKey() {
                     try await login(recoveryKey)
+                    presentDialog(for: .deviceSynced)
                 } else {
                     // Polling was likeley cancelled elsewhere (e.g. dialog closed)
                     return
                 }
-                managementDialogModel.endFlow()
             } catch {
                 managementDialogModel.errorMessage = String(describing: error)
             }
@@ -224,8 +325,8 @@ extension SyncPreferences: ManagementDialogModelDelegate {
     }
 
     @MainActor
-    func addAnotherDevice() {
-        presentDialog(for: .deviceSynced)
+    func presentDeleteAccount() {
+        presentDialog(for: .deleteAccount(devices))
     }
 
     @MainActor
@@ -233,8 +334,44 @@ extension SyncPreferences: ManagementDialogModelDelegate {
         presentDialog(for: .saveRecoveryPDF)
     }
 
+    @MainActor
     func saveRecoveryPDF() {
-        managementDialogModel.endFlow()
+
+        guard let recoveryCode = syncService.account?.recoveryCode else {
+            assertionFailure()
+            return
+        }
+
+        let data = RecoveryPDFGenerator()
+            .generate(recoveryCode)
+
+        Task { @MainActor in
+            let panel = NSSavePanel.savePanelWithFileTypeChooser(fileTypes: [.pdf], suggestedFilename: "DuckDuckGo Recovery Code.pdf")
+            let response = await panel.begin()
+
+            guard response == .OK,
+                  let location = panel.url else { return }
+
+            do {
+                try data.writeFileWithProgress(to: location)
+            } catch {
+                managementDialogModel.errorMessage = String(describing: error)
+            }
+        }
+
+    }
+
+    @MainActor
+    func removeDevice(_ device: SyncDevice) {
+        Task { @MainActor in
+            do {
+                try await syncService.disconnect(deviceId: device.id)
+                managementDialogModel.endFlow()
+                refreshDevices()
+            } catch {
+                managementDialogModel.errorMessage = String(describing: error)
+            }
+        }
     }
 
 }

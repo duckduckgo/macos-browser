@@ -26,6 +26,7 @@ extension HomePage.Views {
 
         let backgroundColor = Color("NewTabPageBackgroundColor")
         let targetWidth: CGFloat = 482
+        let isBurner: Bool
 
         @EnvironmentObject var model: HomePage.Models.HomePageRootViewModel
         @EnvironmentObject var continueSetUpModel: HomePage.Models.ContinueSetUpModel
@@ -34,55 +35,61 @@ extension HomePage.Views {
         @State private var isHomeContentPopoverVisible = false
 
         var body: some View {
-            ZStack(alignment: .top) {
+            if isBurner {
 
-                ScrollView {
-                    VStack(spacing: 0) {
-                        Group {
-                            Favorites()
-                                .padding(.top, 72)
-                                .visibility(model.isFavouriteVisible ? .visible : .gone)
+                BurnerHomePageView()
 
-                            ContinueSetUpView()
-                                .padding(.top, 72)
-                                .visibility(model.isContinueSetUpVisible ? .visible : .gone)
+            } else {
+                ZStack(alignment: .top) {
 
-                            RecentlyVisited()
-                                .padding(.top, 66)
-                                .padding(.bottom, 16)
-                                .visibility(model.isRecentActivityVisible ? .visible : .gone)
+                    ScrollView {
+                        VStack(spacing: 0) {
+                            Group {
+                                Favorites()
+                                    .padding(.top, 72)
+                                    .visibility(model.isFavouriteVisible ? .visible : .gone)
 
+                                ContinueSetUpView()
+                                    .padding(.top, 72)
+                                    .visibility(model.isContinueSetUpVisible ? .visible : .gone)
+
+                                RecentlyVisited()
+                                    .padding(.top, 66)
+                                    .padding(.bottom, 16)
+                                    .visibility(model.isRecentActivityVisible ? .visible : .gone)
+
+                            }
+                            .frame(width: 508)
                         }
-                        .frame(width: 508)
+                        .frame(maxWidth: .infinity)
                     }
-                    .frame(maxWidth: .infinity)
-                }
-                VStack {
-                    Spacer()
-                    HStack {
+                    VStack {
                         Spacer()
-                        HomeContentButtonView(isHomeContentPopoverVisible: $isHomeContentPopoverVisible)
-                            .padding()
-                            .popover(isPresented: $isHomeContentPopoverVisible, content: {
-                                HomeContentPopoverView()
-                                    .padding()
-                            })
+                        HStack {
+                            Spacer()
+                            HomeContentButtonView(isHomeContentPopoverVisible: $isHomeContentPopoverVisible)
+                                .padding()
+                                .popover(isPresented: $isHomeContentPopoverVisible, content: {
+                                    HomeContentPopoverView()
+                                        .padding()
+                                })
+                        }
                     }
-                }
 
+                }
+                .frame(maxWidth: .infinity)
+                .background(backgroundColor)
+                .contextMenu(ContextMenu(menuItems: {
+                    Toggle(UserText.newTabMenuItemShowFavorite, isOn: $model.isFavouriteVisible)
+                        .toggleStyle(.checkbox)
+                        .disabled(!favoritesModel.hasContent)
+                    Toggle(UserText.newTabMenuItemShowContinuteSetUp, isOn: $model.isContinueSetUpVisible)
+                        .toggleStyle(.checkbox)
+                        .disabled(!continueSetUpModel.hasContent)
+                    Toggle(UserText.newTabMenuItemShowRecentActivity, isOn: $model.isRecentActivityVisible)
+                        .toggleStyle(.checkbox)
+                }))
             }
-            .frame(maxWidth: .infinity)
-            .background(backgroundColor)
-            .contextMenu(ContextMenu(menuItems: {
-                Toggle(UserText.newTabMenuItemShowFavorite, isOn: $model.isFavouriteVisible)
-                    .toggleStyle(.checkbox)
-                    .disabled(!favoritesModel.hasContent)
-                Toggle(UserText.newTabMenuItemShowContinuteSetUp, isOn: $model.isContinueSetUpVisible)
-                    .toggleStyle(.checkbox)
-                    .disabled(!continueSetUpModel.hasContent)
-                Toggle(UserText.newTabMenuItemShowRecentActivity, isOn: $model.isRecentActivityVisible)
-                    .toggleStyle(.checkbox)
-            }))
         }
 
         struct HomeContentButtonView: View {
@@ -164,5 +171,4 @@ extension HomePage.Views {
             }
         }
     }
-
 }

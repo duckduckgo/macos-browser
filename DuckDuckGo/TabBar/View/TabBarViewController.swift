@@ -30,6 +30,8 @@ final class TabBarViewController: NSViewController {
         case buttonPadding = 4
     }
 
+    @IBOutlet weak var visualEffectBackgroundView: NSVisualEffectView!
+    @IBOutlet weak var gradientBackgroundView: GradientView!
     @IBOutlet weak var pinnedTabsContainerView: NSView!
     @IBOutlet private weak var collectionView: TabBarCollectionView!
     @IBOutlet private weak var scrollView: TabBarScrollView!
@@ -55,6 +57,9 @@ final class TabBarViewController: NSViewController {
     private var selectionIndexCancellable: AnyCancellable?
     private var cancellables = Set<AnyCancellable>()
 
+    @IBOutlet weak var burnerWindowButton: MouseOverButton!
+    var burnerWindowPopover: BurnerWindowPopover?
+
     @IBOutlet weak var shadowView: TabShadowView!
 
     @IBOutlet weak var rightSideStackView: NSStackView!
@@ -72,7 +77,7 @@ final class TabBarViewController: NSViewController {
 
     init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel) {
         self.tabCollectionViewModel = tabCollectionViewModel
-        if let pinnedTabCollection = tabCollectionViewModel.pinnedTabsManager?.tabCollection {
+        if !tabCollectionViewModel.isBurner, let pinnedTabCollection = tabCollectionViewModel.pinnedTabsManager?.tabCollection {
             let pinnedTabsViewModel = PinnedTabsViewModel(collection: pinnedTabCollection)
             let pinnedTabsView = PinnedTabsView(model: pinnedTabsViewModel)
             self.pinnedTabsViewModel = pinnedTabsViewModel
@@ -90,6 +95,7 @@ final class TabBarViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        setupBackgroundView()
         scrollView.updateScrollElasticity(with: tabMode)
         observeToScrollNotifications()
         subscribeToSelectionIndex()
@@ -97,6 +103,7 @@ final class TabBarViewController: NSViewController {
         setupPinnedTabsView()
         subscribeToTabModeChanges()
         setupAddTabButton()
+        setupBurnerWindowButton()
     }
 
     override func viewWillAppear() {
@@ -133,6 +140,15 @@ final class TabBarViewController: NSViewController {
         tabCollectionViewModel.appendNewTab(with: .homePage)
     }
 
+    @IBAction func burnerWindowAction(_ sender: NSButton) {
+        if !(burnerWindowPopover?.isShown ?? false) {
+            burnerWindowPopover = BurnerWindowPopover()
+            burnerWindowPopover?.showBelow(sender)
+            burnerWindowPopover?.originatingWindow = view.window
+            burnerWindowPopover?.delegate = self
+        }
+    }
+
     @IBAction func rightScrollButtonAction(_ sender: NSButton) {
         collectionView.scrollToEnd()
     }
@@ -147,9 +163,26 @@ final class TabBarViewController: NSViewController {
         }
     }
 
+    private func setupBackgroundView() {
+        visualEffectBackgroundView.isHidden = tabCollectionViewModel.isBurner
+        gradientBackgroundView.isHidden = !tabCollectionViewModel.isBurner
+    }
+
     private func setupFireButton() {
+        if tabCollectionViewModel.isBurner {
+            fireButton.isHidden = true
+            return
+        }
         fireButton.toolTip = UserText.clearBrowsingHistoryTooltip
         fireButton.animationNames = MouseOverAnimationButton.AnimationNames(aqua: "flame-mouse-over", dark: "dark-flame-mouse-over")
+    }
+
+    private func setupBurnerWindowButton() {
+        burnerWindowButton.isHidden = !tabCollectionViewModel.isBurner
+        burnerWindowButton.toolTip = UserText.burnerWindowButtonTooltip
+        burnerWindowButton.normalTintColor = .alternateSelectedControlTextColor
+        burnerWindowButton.mouseOverColor = .burnerWindowMouseOverColor
+        burnerWindowButton.mouseDownColor = .burnerWindowMouseDownColor
     }
 
     private func setupPinnedTabsView() {
@@ -314,6 +347,7 @@ final class TabBarViewController: NSViewController {
             collectionView.animator().selectItems(at: [newSelectionIndexPath], scrollPosition: .centeredHorizontally)
         } else {
             collectionView.selectItems(at: [newSelectionIndexPath], scrollPosition: .centeredHorizontally)
+            collectionView.scrollToSelected()
         }
     }
 
@@ -361,7 +395,7 @@ final class TabBarViewController: NSViewController {
         TabDragAndDropManager.shared.setSource(tabCollectionViewModel: tabCollectionViewModel, index: newIndex)
     }
 
-    private func moveToNewWindow(from index: Int, droppingPoint: NSPoint? = nil) {
+    private func moveToNewWindow(from index: Int, droppingPoint: NSPoint? = nil, burner: Bool) {
         guard tabCollectionViewModel.tabCollection.tabs.count > 1 else { return }
         guard let tabViewModel = tabCollectionViewModel.tabViewModel(at: index) else {
             assertionFailure("TabBarViewController: Failed to get tab view model")
@@ -370,7 +404,7 @@ final class TabBarViewController: NSViewController {
 
         let tab = tabViewModel.tab
         tabCollectionViewModel.remove(at: .unpinned(index), published: false)
-        WindowsManager.openNewWindow(with: tab, droppingPoint: droppingPoint)
+        WindowsManager.openNewWindow(with: tab, isBurner: burner, droppingPoint: droppingPoint)
     }
 
     // MARK: - Mouse Monitor
@@ -530,6 +564,12 @@ final class TabBarViewController: NSViewController {
         addTabButton.target = self
         addTabButton.action = #selector(addButtonAction(_:))
         addTabButton.toolTip = UserText.newTabTooltip
+        if tabCollectionViewModel.isBurner {
+            addTabButton.normalTintColor = .alternateSelectedControlTextColor
+            addTabButton.contentTintColor = .alternateSelectedControlTextColor
+            addTabButton.mouseOverColor = .burnerWindowMouseOverColor
+            addTabButton.mouseDownColor = .burnerWindowMouseDownColor
+        }
     }
 
     private func subscribeToTabModeChanges() {
@@ -620,7 +660,7 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
         updateEmptyTabArea()
         hideTabPreview()
         if tabMode == .overflow {
-            scrollCollectionViewToEnd()
+            collectionView.scroll(to: IndexPath(item: index))
         }
     }
 
@@ -781,13 +821,7 @@ extension TabBarViewController: TabCollectionViewModelDelegate {
 extension TabBarViewController: NSCollectionViewDelegateFlowLayout {
 
     func collectionView(_ collectionView: NSCollectionView, layout collectionViewLayout: NSCollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> NSSize {
-        var isItemSelected = tabCollectionViewModel.selectionIndex == .unpinned(indexPath.item)
-        if TabDragAndDropManager.shared.sourceUnit?.tabCollectionViewModel === tabCollectionViewModel,
-           let draggingOverIndex = TabDragAndDropManager.shared.sourceUnit?.index {
-            // Drag&drop in progress - the empty space is equal to the selected tab width
-            isItemSelected = draggingOverIndex == indexPath.item
-        }
-
+        let isItemSelected = tabCollectionViewModel.selectionIndex == .unpinned(indexPath.item)
         return NSSize(width: self.currentTabWidth(selected: isItemSelected), height: TabBarViewItem.Height.standard.rawValue)
     }
 
@@ -804,7 +838,6 @@ extension TabBarViewController: NSCollectionViewDataSource {
     }
 
     func collectionView(_ collectionView: NSCollectionView, itemForRepresentedObjectAt indexPath: IndexPath) -> NSCollectionViewItem {
-        assert(collectionView.numberOfItems(inSection: 0) == tabCollectionViewModel.tabs.count)
         let item = collectionView.makeItem(withIdentifier: TabBarViewItem.identifier, for: indexPath)
         guard let tabBarViewItem = item as? TabBarViewItem else {
             assertionFailure("TabBarViewController: Failed to get reusable TabBarViewItem instance")
@@ -817,6 +850,7 @@ extension TabBarViewController: NSCollectionViewDataSource {
         }
 
         tabBarViewItem.delegate = self
+        tabBarViewItem.isBurner = tabCollectionViewModel.isBurner
         tabBarViewItem.subscribe(to: tabViewModel, tabCollectionViewModel: tabCollectionViewModel)
 
         return tabBarViewItem
@@ -832,6 +866,12 @@ extension TabBarViewController: NSCollectionViewDataSource {
             footer.addButton?.target = self
             footer.addButton?.action = #selector(addButtonAction(_:))
             footer.toolTip = UserText.newTabTooltip
+            if tabCollectionViewModel.isBurner {
+                footer.addButton.normalTintColor = .alternateSelectedControlTextColor
+                footer.addButton.contentTintColor = .alternateSelectedControlTextColor
+                footer.addButton.mouseOverColor = .burnerWindowMouseOverColor
+                footer.addButton.mouseDownColor = .burnerWindowMouseDownColor
+            }
         }
 
         return view
@@ -869,10 +909,6 @@ extension TabBarViewController: NSCollectionViewDelegate {
         hideTabPreview()
     }
 
-    func collectionView(_ collectionView: NSCollectionView, canDragItemsAt indexPaths: Set<IndexPath>, with event: NSEvent) -> Bool {
-        tabCollectionViewModel.tabCollection.tabs.count > 1
-    }
-
     func collectionView(_ collectionView: NSCollectionView, pasteboardWriterForItemAt indexPath: IndexPath) -> NSPasteboardWriting? {
         TabBarViewItemPasteboardWriter()
     }
@@ -908,7 +944,10 @@ extension TabBarViewController: NSCollectionViewDelegate {
         let newIndex = min(indexPath.item + 1, tabCollectionViewModel.tabCollection.tabs.count)
         if let url = draggingInfo.draggingPasteboard.url {
             // dropping URL or file
-            tabCollectionViewModel.insert(Tab(content: .url(url)), at: .unpinned(newIndex), selected: true)
+            tabCollectionViewModel.insert(Tab(content: .url(url),
+                                              isBurner: tabCollectionViewModel.isBurner),
+                                          at: .unpinned(newIndex),
+                                          selected: true)
 
             return true
         }
@@ -927,9 +966,15 @@ extension TabBarViewController: NSCollectionViewDelegate {
         // dropping a tab, dropping of url handled in collectionView:acceptDrop:
         guard session.draggingPasteboard.types == [TabBarViewItemPasteboardWriter.utiInternalType] else { return }
 
+        defer {
+            TabDragAndDropManager.shared.clear()
+        }
         if case .private = operation {
             // Perform the drag and drop between multiple windows
             TabDragAndDropManager.shared.performDragAndDropIfNeeded()
+            DispatchQueue.main.async {
+                self.collectionView.scrollToSelected()
+            }
             return
         }
         // dropping not on a tab bar
@@ -945,7 +990,9 @@ extension TabBarViewController: NSCollectionViewDelegate {
             return
         }
 
-        moveToNewWindow(from: sourceIndex, droppingPoint: screenPoint)
+        moveToNewWindow(from: sourceIndex,
+                        droppingPoint: screenPoint,
+                        burner: tabCollectionViewModel.isBurner)
     }
 
     func collectionView(_ collectionView: NSCollectionView,
@@ -1064,7 +1111,16 @@ extension TabBarViewController: TabBarViewItemDelegate {
             return
         }
 
-        moveToNewWindow(from: indexPath.item)
+        moveToNewWindow(from: indexPath.item, burner: false)
+    }
+
+    func tabBarViewItemMoveToNewBurnerWindowAction(_ tabBarViewItem: TabBarViewItem) {
+        guard let indexPath = collectionView.indexPath(for: tabBarViewItem) else {
+            assertionFailure("TabBarViewController: Failed to get index path of tab bar view item")
+            return
+        }
+
+        moveToNewWindow(from: indexPath.item, burner: true)
     }
 
     func tabBarViewItemFireproofSite(_ tabBarViewItem: TabBarViewItem) {
@@ -1110,6 +1166,14 @@ final class TabBarViewItemPasteboardWriter: NSObject, NSPasteboardWriting {
 
     func pasteboardPropertyList(forType type: NSPasteboard.PasteboardType) -> Any? {
         [String: Any]()
+    }
+
+}
+
+extension TabBarViewController: NSPopoverDelegate {
+
+    func popoverDidClose(_ notification: Notification) {
+        self.burnerWindowPopover = nil
     }
 
 }
