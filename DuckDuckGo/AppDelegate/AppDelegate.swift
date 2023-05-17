@@ -58,9 +58,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     private(set) var internalUserDecider: InternalUserDecider!
     private(set) var featureFlagger: FeatureFlagger!
     private var appIconChanger: AppIconChanger!
-    private let syncDatabase = SyncMetadataDatabase()
+
+    private(set) var syncDataProviders: SyncDataProviders!
     private(set) var syncService: DDGSyncing!
-    private(set) var syncMetadataStore: SyncMetadataStore!
     private var syncStateCancellable: AnyCancellable?
     private var bookmarksSyncErrorCancellable: AnyCancellable?
 
@@ -115,18 +115,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
                                                                   to: context)
                 }
             }
-            syncDatabase.db.loadStore { context, error in
-                guard context != nil else {
-                    if let error = error {
-                        Pixel.fire(.debug(event: .syncMetadataCouldNotLoadDatabase, error: error))
-                    } else {
-                        Pixel.fire(.debug(event: .syncMetadataCouldNotLoadDatabase))
-                    }
-
-                    Thread.sleep(forTimeInterval: 1)
-                    fatalError("Could not create Bookmarks database stack: \(error?.localizedDescription ?? "err")")
-                }
-            }
         }
 
         do {
@@ -163,17 +151,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 #endif
 
         appIconChanger = AppIconChanger(internalUserDecider: internalUserDecider)
-        syncMetadataStore = LocalSyncMetadataStore(database: syncDatabase.db)
-        let bookmarksProvider = BookmarksProvider(
-            database: BookmarkDatabase.shared.db,
-            metadataStore: syncMetadataStore,
-            reloadBookmarksAfterSync: LocalBookmarkManager.shared.loadBookmarks
-        )
-        bookmarksSyncErrorCancellable = bookmarksProvider.syncErrorPublisher
-            .sink { error in
-                os_log(.error, log: OSLog.sync, "Bookmarks Sync error: %{public}s", String(reflecting: error))
-            }
-        syncService = DDGSync(dataProviders: [bookmarksProvider], log: OSLog.sync)
+
+        syncDataProviders = SyncDataProviders(bookmarksDatabase: BookmarkDatabase.shared.db)
+        syncService = DDGSync(dataProvidersProvider: syncDataProviders, log: OSLog.sync)
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
