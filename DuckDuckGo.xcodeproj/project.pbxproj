@@ -916,6 +916,10 @@
 		373A1AB228451ED400586521 /* BookmarksHTMLImporterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373A1AB128451ED400586521 /* BookmarksHTMLImporterTests.swift */; };
 		373D9B4829EEAC1B00381FDD /* SyncMetadataDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373D9B4729EEAC1B00381FDD /* SyncMetadataDatabase.swift */; };
 		373D9B4929EEAC1B00381FDD /* SyncMetadataDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373D9B4729EEAC1B00381FDD /* SyncMetadataDatabase.swift */; };
+		37445F992A1566420029F789 /* SyncDataProviders.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37445F982A1566420029F789 /* SyncDataProviders.swift */; };
+		37445F9A2A1566420029F789 /* SyncDataProviders.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37445F982A1566420029F789 /* SyncDataProviders.swift */; };
+		37445F9C2A1569F00029F789 /* SyncBookmarksAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37445F9B2A1569F00029F789 /* SyncBookmarksAdapter.swift */; };
+		37445F9D2A1569F00029F789 /* SyncBookmarksAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37445F9B2A1569F00029F789 /* SyncBookmarksAdapter.swift */; };
 		37479F152891BC8300302FE2 /* TabCollectionViewModelTests+WithoutPinnedTabsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37479F142891BC8300302FE2 /* TabCollectionViewModelTests+WithoutPinnedTabsManager.swift */; };
 		374EF08329B751FC003D2E87 /* RecentlyClosedCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 374EF08229B751FC003D2E87 /* RecentlyClosedCoordinatorTests.swift */; };
 		374EF08429B7575B003D2E87 /* RecentlyClosedCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 374EF08229B751FC003D2E87 /* RecentlyClosedCoordinatorTests.swift */; };
@@ -2005,6 +2009,8 @@
 		373A1AB128451ED400586521 /* BookmarksHTMLImporterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksHTMLImporterTests.swift; sourceTree = "<group>"; };
 		373A26962964CF0B0043FC57 /* TestsTargetsBase.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = TestsTargetsBase.xcconfig; sourceTree = "<group>"; };
 		373D9B4729EEAC1B00381FDD /* SyncMetadataDatabase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncMetadataDatabase.swift; sourceTree = "<group>"; };
+		37445F982A1566420029F789 /* SyncDataProviders.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncDataProviders.swift; sourceTree = "<group>"; };
+		37445F9B2A1569F00029F789 /* SyncBookmarksAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncBookmarksAdapter.swift; sourceTree = "<group>"; };
 		37479F142891BC8300302FE2 /* TabCollectionViewModelTests+WithoutPinnedTabsManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "TabCollectionViewModelTests+WithoutPinnedTabsManager.swift"; sourceTree = "<group>"; };
 		374EF08229B751FC003D2E87 /* RecentlyClosedCoordinatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentlyClosedCoordinatorTests.swift; sourceTree = "<group>"; };
 		37534C9D28104D9B002621E7 /* TabLazyLoaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabLazyLoaderTests.swift; sourceTree = "<group>"; };
@@ -3219,6 +3225,8 @@
 			children = (
 				3775913529AB9A1C00E26367 /* SyncManagementDialogViewController.swift */,
 				373D9B4729EEAC1B00381FDD /* SyncMetadataDatabase.swift */,
+				37445F982A1566420029F789 /* SyncDataProviders.swift */,
+				37445F9B2A1569F00029F789 /* SyncBookmarksAdapter.swift */,
 			);
 			path = Sync;
 			sourceTree = "<group>";
@@ -6934,6 +6942,7 @@
 				3706FC2C293F65D500E42796 /* BookmarkHTMLReader.swift in Sources */,
 				3706FC2D293F65D500E42796 /* Tab+NSSecureCoding.swift in Sources */,
 				3706FC2E293F65D500E42796 /* NSNotificationName+EmailManager.swift in Sources */,
+				37445F9D2A1569F00029F789 /* SyncBookmarksAdapter.swift in Sources */,
 				B6685E4029A606190043D2EE /* WorkspaceProtocol.swift in Sources */,
 				3706FC2F293F65D500E42796 /* MouseOverButton.swift in Sources */,
 				3706FC30293F65D500E42796 /* FireInfoViewController.swift in Sources */,
@@ -6999,6 +7008,7 @@
 				3706FC6C293F65D500E42796 /* BookmarkViewModel.swift in Sources */,
 				3706FC6D293F65D500E42796 /* DaxSpeech.swift in Sources */,
 				3706FC6E293F65D500E42796 /* DuckPlayerSchemeHandler.swift in Sources */,
+				37445F9A2A1566420029F789 /* SyncDataProviders.swift in Sources */,
 				3706FC6F293F65D500E42796 /* FirePopoverViewModel.swift in Sources */,
 				3706FC71293F65D500E42796 /* NSColorExtension.swift in Sources */,
 				3706FC72293F65D500E42796 /* Stored.swift in Sources */,
@@ -7404,6 +7414,7 @@
 				AAC30A26268DFEE200D2D9CD /* CrashReporter.swift in Sources */,
 				3184AC6D288F29D800C35E4B /* BadgeNotificationAnimationModel.swift in Sources */,
 				857FFEC027D239DC00415E7A /* HyperLink.swift in Sources */,
+				37445F992A1566420029F789 /* SyncDataProviders.swift in Sources */,
 				4B9292A426670D2A00AD2C21 /* PasteboardWriting.swift in Sources */,
 				4B92928D26670D1700AD2C21 /* BookmarkOutlineViewCell.swift in Sources */,
 				B604085C274B8FBA00680351 /* UnprotectedDomains.xcdatamodeld in Sources */,
@@ -7856,6 +7867,7 @@
 				AAC82C60258B6CB5009B6B42 /* TabPreviewWindowController.swift in Sources */,
 				AAC5E4E425D6BA9C007F5990 /* NSSizeExtension.swift in Sources */,
 				AA6820EB25503D6A005ED0D5 /* Fire.swift in Sources */,
+				37445F9C2A1569F00029F789 /* SyncBookmarksAdapter.swift in Sources */,
 				B6AAAC3E26048F690029438D /* RandomAccessCollectionExtension.swift in Sources */,
 				4B9292AF26670F5300AD2C21 /* NSOutlineViewExtensions.swift in Sources */,
 				AA585D82248FD31100E9A3E2 /* AppDelegate.swift in Sources */,
