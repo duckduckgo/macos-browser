@@ -42,9 +42,7 @@ let extraInputFiles: [TargetName: Set<InputFile>] = [
         .init("SystemExtensionManager.swift", .source),
         .init("DuckDuckGoAgent.app", .unknown),
         .init("DuckDuckGoNotifications.app", .unknown),
-        .init("com.duckduckgo.macos.browser.network-protection.systemextension", .unknown),
-        .init("startVPN.app", .unknown),
-        .init("stopVPN.app", .unknown)
+        .init("com.duckduckgo.macos.browser.network-protection.systemextension", .unknown)
     ],
 
     "DuckDuckGo Privacy Browser App Store": [

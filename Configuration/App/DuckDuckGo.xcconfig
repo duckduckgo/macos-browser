@@ -18,6 +18,7 @@
 BUNDLE_IDENTIFIER_PREFIX = com.duckduckgo.macos.browser
 
 CODE_SIGN_ENTITLEMENTS = DuckDuckGo/DuckDuckGo.entitlements
+CODE_SIGN_ENTITLEMENTS[config=Debug][arch=*][sdk=*] = DuckDuckGo/DuckDuckGoDebug.entitlements
 CODE_SIGN_ENTITLEMENTS[config=CI][arch=*][sdk=*] = DuckDuckGo/DuckDuckGoCI.entitlements
 
 CODE_SIGN_IDENTITY[sdk=macosx*] = Developer ID Application
