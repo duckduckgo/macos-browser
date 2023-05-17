@@ -9375,6 +9375,7 @@
 			baseConfigurationReference = 378B58CD295ECA75002C0CC0 /* DuckDuckGo.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.15.4;
 			};
 			name = CI;
 		};
@@ -9382,6 +9383,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 378B588D295CF447002C0CC0 /* UnitTests.xcconfig */;
 			buildSettings = {
+				MACOSX_DEPLOYMENT_TARGET = 10.15.4;
 			};
 			name = CI;
 		};
@@ -10229,6 +10231,7 @@
 			baseConfigurationReference = 378B58CD295ECA75002C0CC0 /* DuckDuckGo.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.15.4;
 			};
 			name = Debug;
 		};
@@ -10237,6 +10240,7 @@
 			baseConfigurationReference = 378B58CD295ECA75002C0CC0 /* DuckDuckGo.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.15.4;
 			};
 			name = Release;
 		};
@@ -10244,6 +10248,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 378B588D295CF447002C0CC0 /* UnitTests.xcconfig */;
 			buildSettings = {
+				MACOSX_DEPLOYMENT_TARGET = 10.15.4;
 			};
 			name = Debug;
 		};
@@ -10251,6 +10256,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 378B588D295CF447002C0CC0 /* UnitTests.xcconfig */;
 			buildSettings = {
+				MACOSX_DEPLOYMENT_TARGET = 10.15.4;
 			};
 			name = Release;
 		};
@@ -10266,6 +10272,7 @@
 			baseConfigurationReference = 378B58CD295ECA75002C0CC0 /* DuckDuckGo.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.15.4;
 			};
 			name = Review;
 		};
@@ -10273,6 +10280,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 378B588D295CF447002C0CC0 /* UnitTests.xcconfig */;
 			buildSettings = {
+				MACOSX_DEPLOYMENT_TARGET = 10.15.4;
 			};
 			name = Review;
 		};
