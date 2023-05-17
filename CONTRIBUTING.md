@@ -20,7 +20,6 @@ We want our app to be as stable as possible thus your bug reports are immensely 
 If you have encountered a security issue, please reach us through https://hackerone.com/duckduckgo.
 
 ## Contributing Code
-
 We're always open to contributions from the community! There are different approaches depending on how you wish to contribute:
 
 * **For bug fixes**, feel free to open a pull request along with an associated issue. Someone from the team will review your issue/change within a few days.
