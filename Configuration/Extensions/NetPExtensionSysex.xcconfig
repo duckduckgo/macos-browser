@@ -17,7 +17,7 @@
 #include "../NetPIDs.xcconfig"
 #include "../NetPOverrides.xcconfig"
 
-PRODUCT_NAME = com.duckduckgo.macos.browser.network-protection
+PRODUCT_NAME = com.duckduckgo.macos.browser.network-protection-extension
 
 // Since we're using nonstandard bundle IDs we'll just define them here, but we should consider
 // standardizing the bundle IDs so we can just define BUNDLE_IDENTIFIER_PREFIX

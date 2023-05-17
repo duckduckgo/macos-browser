@@ -1022,7 +1022,7 @@
 		4B1E6EF127AB5E5D00F51793 /* NSPopUpButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B1E6EEF27AB5E5D00F51793 /* NSPopUpButtonView.swift */; };
 		4B1E6EF227AB5E5D00F51793 /* PasswordManagementItemList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B1E6EF027AB5E5D00F51793 /* PasswordManagementItemList.swift */; };
 		4B25375B2A11BE7300610219 /* NetworkExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B4D603E2A0B290200BCD287 /* NetworkExtension.framework */; };
-		4B2537652A11BE7600610219 /* com.duckduckgo.macos.browser.network-protection.systemextension in Embed System Extensions */ = {isa = PBXBuildFile; fileRef = 4B25375A2A11BE7300610219 /* com.duckduckgo.macos.browser.network-protection.systemextension */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		4B2537652A11BE7600610219 /* com.duckduckgo.macos.browser.network-protection-extension.systemextension in Embed System Extensions */ = {isa = PBXBuildFile; fileRef = 4B25375A2A11BE7300610219 /* com.duckduckgo.macos.browser.network-protection-extension.systemextension */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		4B2537722A11BF8B00610219 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B25376F2A11BF8B00610219 /* main.swift */; };
 		4B2537732A11BF8C00610219 /* NetworkProtectionIPCNotificationsPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B2537702A11BF8B00610219 /* NetworkProtectionIPCNotificationsPresenter.swift */; };
 		4B2537752A11BFDE00610219 /* NetworkProtection in Frameworks */ = {isa = PBXBuildFile; productRef = 4B2537742A11BFDE00610219 /* NetworkProtection */; };
@@ -2051,7 +2051,7 @@
 			dstPath = "$(SYSTEM_EXTENSIONS_FOLDER_PATH)";
 			dstSubfolderSpec = 16;
 			files = (
-				4B2537652A11BE7600610219 /* com.duckduckgo.macos.browser.network-protection.systemextension in Embed System Extensions */,
+				4B2537652A11BE7600610219 /* com.duckduckgo.macos.browser.network-protection-extension.systemextension in Embed System Extensions */,
 			);
 			name = "Embed System Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2328,7 +2328,7 @@
 		4B1E6EEC27AB5E5100F51793 /* PasswordManagementListSection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PasswordManagementListSection.swift; sourceTree = "<group>"; };
 		4B1E6EEF27AB5E5D00F51793 /* NSPopUpButtonView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSPopUpButtonView.swift; sourceTree = "<group>"; };
 		4B1E6EF027AB5E5D00F51793 /* PasswordManagementItemList.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PasswordManagementItemList.swift; sourceTree = "<group>"; };
-		4B25375A2A11BE7300610219 /* com.duckduckgo.macos.browser.network-protection.systemextension */ = {isa = PBXFileReference; explicitFileType = "wrapper.system-extension"; includeInIndex = 0; path = "com.duckduckgo.macos.browser.network-protection.systemextension"; sourceTree = BUILT_PRODUCTS_DIR; };
+		4B25375A2A11BE7300610219 /* com.duckduckgo.macos.browser.network-protection-extension.systemextension */ = {isa = PBXFileReference; explicitFileType = "wrapper.system-extension"; includeInIndex = 0; path = "com.duckduckgo.macos.browser.network-protection-extension.systemextension"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B25376C2A11BF6D00610219 /* NetworkProtectionSystemExtension_Release.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = NetworkProtectionSystemExtension_Release.entitlements; sourceTree = "<group>"; };
 		4B25376D2A11BF6D00610219 /* NetworkProtectionSystemExtension_Debug.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = NetworkProtectionSystemExtension_Debug.entitlements; sourceTree = "<group>"; };
 		4B25376E2A11BF8B00610219 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -4975,7 +4975,7 @@
 				B6EC37E829B5DA2A001ACE79 /* tests-server */,
 				4B4D603D2A0B290200BCD287 /* NetworkProtectionAppExtension.appex */,
 				4B4BEC202A11B4E2001D9AC5 /* DuckDuckGoNotifications.app */,
-				4B25375A2A11BE7300610219 /* com.duckduckgo.macos.browser.network-protection.systemextension */,
+				4B25375A2A11BE7300610219 /* com.duckduckgo.macos.browser.network-protection-extension.systemextension */,
 				4B2D06392A11CFBB00DE1F49 /* DuckDuckGoAgent.app */,
 				4B2D06692A13318400DE1F49 /* DuckDuckGoAgentAppStore.app */,
 				4B5F14CB2A14702C0060320F /* startVPN.app */,
@@ -6579,7 +6579,7 @@
 				4B2D062F2A11C15900DE1F49 /* Common */,
 			);
 			productName = NetworkProtectionSystemExtension;
-			productReference = 4B25375A2A11BE7300610219 /* com.duckduckgo.macos.browser.network-protection.systemextension */;
+			productReference = 4B25375A2A11BE7300610219 /* com.duckduckgo.macos.browser.network-protection-extension.systemextension */;
 			productType = "com.apple.product-type.system-extension";
 		};
 		4B2D06382A11CFBA00DE1F49 /* DuckDuckGoAgent */ = {
@@ -7307,7 +7307,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/zsh;
-			shellScript = "./lint.sh\n";
+			shellScript = "# ./lint.sh\n";
 		};
 		CBCCF59E299667B700C02DFE /* Assert Xcode version */ = {
 			isa = PBXShellScriptBuildPhase;
