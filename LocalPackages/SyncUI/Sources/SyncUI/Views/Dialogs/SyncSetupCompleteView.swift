@@ -32,7 +32,9 @@ struct SyncSetupCompleteView: View {
                 Text(UserText.deviceSyncedExplanation)
                     .multilineTextAlignment(.center)
 
-                SyncedDevicesList(devices: devices)
+                ScrollView {
+                    SyncedDevicesList(devices: devices)
+                }
 
             }
         } buttons: {
@@ -40,6 +42,9 @@ struct SyncSetupCompleteView: View {
                 model.delegate?.confirmSetupComplete()
             }
         }
-        .frame(width: 360, height: 298)
+        .frame(width: 360,
+               // Grow with the number of devices, up to a point
+               height: min(410, 258 + (CGFloat(devices.count) * 44)))
+
     }
 }
