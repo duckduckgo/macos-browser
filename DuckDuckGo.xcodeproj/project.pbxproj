@@ -1182,6 +1182,8 @@
 		4B5A4F4C27F3A5AA008FBD88 /* NSNotificationName+DataImport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5A4F4B27F3A5AA008FBD88 /* NSNotificationName+DataImport.swift */; };
 		4B5F14DC2A1470AA0060320F /* Main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5F14C52A145D6A0060320F /* Main.swift */; };
 		4B5F14F22A1476EF0060320F /* Main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5F14C52A145D6A0060320F /* Main.swift */; };
+		4B5F14F42A14824F0060320F /* startVPN.app in Embed NetP Controller Apps */ = {isa = PBXBuildFile; fileRef = 4B5F14CB2A14702C0060320F /* startVPN.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		4B5F14F52A1482530060320F /* stopVPN.app in Embed NetP Controller Apps */ = {isa = PBXBuildFile; fileRef = 4B5F14E12A1476BD0060320F /* stopVPN.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		4B5FF67826B602B100D42879 /* FirefoxDataImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5FF67726B602B100D42879 /* FirefoxDataImporter.swift */; };
 		4B65143E263924B5005B46EB /* EmailUrlExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B65143D263924B5005B46EB /* EmailUrlExtensions.swift */; };
 		4B677432255DBEB800025BD8 /* httpsMobileV2BloomSpec.json in Resources */ = {isa = PBXBuildFile; fileRef = 4B677427255DBEB800025BD8 /* httpsMobileV2BloomSpec.json */; };
@@ -2090,6 +2092,18 @@
 			files = (
 				4B2D06812A13359E00DE1F49 /* DuckDuckGoAgentAppStore.app in CopyFiles */,
 			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4B5F14F32A14823D0060320F /* Embed NetP Controller Apps */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 7;
+			files = (
+				4B5F14F52A1482530060320F /* stopVPN.app in Embed NetP Controller Apps */,
+				4B5F14F42A14824F0060320F /* startVPN.app in Embed NetP Controller Apps */,
+			);
+			name = "Embed NetP Controller Apps";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		B6EC37E629B5DA2A001ACE79 /* CopyFiles */ = {
@@ -6693,6 +6707,8 @@
 				AA585D7C248FD31100E9A3E2 /* Resources */,
 				4B25376B2A11BE7700610219 /* Embed System Extensions */,
 				4B2D065D2A11D2AE00DE1F49 /* Embed Login Items */,
+				4B5F14F32A14823D0060320F /* Embed NetP Controller Apps */,
+				4B5F14F62A14825A0060320F /* Replace VPN Controllers with Symlinks */,
 			);
 			buildRules = (
 			);
@@ -7213,6 +7229,25 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "# We had issues where the Swift Package resources were not being added to the Agent Apps,\n# so we're manually coping them here.\n# It seems to be a known issue: https://forums.swift.org/t/swift-packages-resource-bundle-not-present-in-xcarchive-when-framework-using-said-package-is-archived/50084/2\ncp -RL \"${BUILT_PRODUCTS_DIR}\"/NetworkProtectionUI_NetworkProtectionUI.bundle \"${BUILT_PRODUCTS_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\"\n";
+		};
+		4B5F14F62A14825A0060320F /* Replace VPN Controllers with Symlinks */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Replace VPN Controllers with Symlinks";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "echo \"Replace and Sign\" # for easier build log search\n\n# startVPN\n\npushd \"${CONFIGURATION_BUILD_DIR}/DuckDuckGo.app/Contents/Resources/startVPN.app/Contents/MacOS\"\nrm ./startVPN\nln -s \"../../../../MacOS/DuckDuckGo\" ./startVPN\npopd\n\n# stopVPN\n\npushd \"${CONFIGURATION_BUILD_DIR}/DuckDuckGo.app/Contents/Resources/stopVPN.app/Contents/MacOS\"\nrm ./stopVPN\nln -s \"../../../../MacOS/DuckDuckGo\" ./stopVPN\ncd ../../.. \npopd\n";
 		};
 		AA8EDF2824925E940071C2E8 /* Swift Lint */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -9361,8 +9396,11 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4B4D604F2A0B293C00BCD287 /* NetPExtensionSysex.xcconfig */;
 			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Mac Developer";
+				"DEVELOPMENT_TEAM[sdk=macosx*]" = HKE973VLUW;
 				INFOPLIST_KEY_CFBundleDisplayName = NetworkProtectionSystemExtension;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2023 DuckDuckGo. All rights reserved.";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "macOS NetP System Extension - Debug";
 			};
 			name = Debug;
 		};
@@ -9379,8 +9417,10 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4B4D604F2A0B293C00BCD287 /* NetPExtensionSysex.xcconfig */;
 			buildSettings = {
+				"DEVELOPMENT_TEAM[sdk=macosx*]" = HKE973VLUW;
 				INFOPLIST_KEY_CFBundleDisplayName = NetworkProtectionSystemExtension;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2023 DuckDuckGo. All rights reserved.";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "macOS NetP System Extension - Release";
 			};
 			name = Release;
 		};
@@ -9511,7 +9551,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4B4D60502A0B293C00BCD287 /* NetPExtensionAppex.xcconfig */;
 			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = NetworkProtectionAppExtension/NetworkProtectionAppExtension.entitlements;
 				INFOPLIST_KEY_CFBundleDisplayName = NetworkProtectionAppExtension;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2023 DuckDuckGo. All rights reserved.";
 			};
@@ -9521,7 +9560,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4B4D60502A0B293C00BCD287 /* NetPExtensionAppex.xcconfig */;
 			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = NetworkProtectionAppExtension/NetworkProtectionAppExtension.entitlements;
 				INFOPLIST_KEY_CFBundleDisplayName = NetworkProtectionAppExtension;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2023 DuckDuckGo. All rights reserved.";
 			};
@@ -9531,7 +9569,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4B4D60502A0B293C00BCD287 /* NetPExtensionAppex.xcconfig */;
 			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = NetworkProtectionAppExtension/NetworkProtectionAppExtension.entitlements;
 				INFOPLIST_KEY_CFBundleDisplayName = NetworkProtectionAppExtension;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2023 DuckDuckGo. All rights reserved.";
 			};
@@ -9541,7 +9578,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4B4D60502A0B293C00BCD287 /* NetPExtensionAppex.xcconfig */;
 			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = NetworkProtectionAppExtension/NetworkProtectionAppExtension.entitlements;
 				INFOPLIST_KEY_CFBundleDisplayName = NetworkProtectionAppExtension;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2023 DuckDuckGo. All rights reserved.";
 			};
