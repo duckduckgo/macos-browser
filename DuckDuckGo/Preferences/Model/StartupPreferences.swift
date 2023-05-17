@@ -47,6 +47,8 @@ final class StartupPreferences: ObservableObject {
             SentrySDK.close()
             SentrySDK.start { options in
                 options.dsn = dsn
+                options.debug = true
+                options.tracesSampleRate = 1.0
             }
         }
     }

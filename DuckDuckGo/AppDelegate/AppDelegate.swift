@@ -197,6 +197,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
         SentrySDK.start { [weak self] options in
             options.dsn = self!.startupPreferencesPersistor.crashReportingURLString
+            options.debug = true
+            options.tracesSampleRate = 1.0
         }
     }
 
