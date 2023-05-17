@@ -30,9 +30,12 @@ final class SharingMenu: NSMenu {
 
         // not real sharing URL, used for generating items for NSURL
         var services = NSSharingService.sharingServices(forItems: [URL.duckDuckGo])
+
         if let copyLink = NSSharingService(named: .copyLink) {
             services.insert(copyLink, at: 0)
         }
+        services.append(QRSharingService())
+
         let readingListService = NSSharingService(named: .addToSafariReadingList)
         for service in services where service != readingListService {
             let menuItem = NSMenuItem(service: service)

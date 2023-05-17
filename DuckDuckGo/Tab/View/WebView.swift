@@ -184,4 +184,96 @@ final class WebView: WKWebView {
         return super.performDragOperation(draggingInfo)
     }
 
+    // MARK: - Find In Page
+
+    struct FindResult {
+        let string: String
+        let matchesFound: UInt?
+        let matchIndex: Int?
+    }
+    enum FindError: Error {
+        case notFound
+        case cancelled
+    }
+    private var findInPageCompletionHandler: ((Result<FindResult, FindError>) -> Void)?
+
+    func find(_ string: String, with options: _WKFindOptions, maxCount: UInt, completionHandler: ((Result<FindResult, FindError>) -> Void)?) {
+        assert(!string.isEmpty)
+
+        // native WKWebView find
+        if self.responds(to: Selector.findString) {
+            _=Self.swizzleFindStringOnce
+            // receive _WKFindDelegate calls and call completion handler
+            NSException.try {
+                self.setValue(self, forKey: "findDelegate")
+            }
+            if let findInPageCompletionHandler {
+                self.findInPageCompletionHandler = nil
+                findInPageCompletionHandler(.failure(.cancelled))
+            }
+            self.findInPageCompletionHandler = completionHandler
+            self.find(string, with: options, maxCount: maxCount)
+
+        } else if #available(macOS 11.0, *) {
+            // fallback to official `findSting:`
+            let config = WKFindConfiguration()
+            config.backwards = options.contains(.backwards)
+            config.caseSensitive = !options.contains(.caseInsensitive)
+            config.wraps = options.contains(.wrapAround)
+
+            self.find(string, configuration: config) { result in
+                if result.matchFound {
+                    completionHandler?(.success(FindResult(string: string, matchesFound: nil, matchIndex: nil)))
+                } else {
+                    completionHandler?(.failure(.notFound))
+                }
+            }
+        }
+    }
+
+    static private let swizzleFindStringOnce: () = {
+        guard let originalMethod = class_getInstanceMethod(WebView.self, Selector.findString),
+              let swizzledMethod = class_getInstanceMethod(WebView.self, #selector(find(_:with:maxCount:)))
+        else {
+            assertionFailure("Methods not available")
+            return
+        }
+        method_exchangeImplementations(originalMethod, swizzledMethod)
+    }()
+    // swizzled method to call `_findString:withOptions:maxCount:` without performSelector: usage (as there‘s 3 args)
+    @objc dynamic private func find(_ string: String, with options: _WKFindOptions, maxCount: UInt) {}
+
+    func clearFindInPageState() {
+        guard self.responds(to: Selector.hideFindUI) else {
+            assertionFailure("_hideFindUI not available")
+            return
+        }
+        self.perform(Selector.hideFindUI)
+    }
+
+    private enum Selector {
+        static let findString = NSSelectorFromString("_findString:options:maxCount:")
+        static let hideFindUI = NSSelectorFromString("_hideFindUI")
+    }
+
+}
+
+extension WebView /* _WKFindDelegate */ {
+
+    @objc(_webView:didFindMatches:forString:withMatchIndex:)
+    func webView(_ webView: WKWebView, didFind matchesFound: UInt, for string: String, withMatchIndex matchIndex: Int) {
+        if let findInPageCompletionHandler {
+            self.findInPageCompletionHandler = nil
+            findInPageCompletionHandler(.success(FindResult(string: string, matchesFound: matchesFound, matchIndex: matchIndex)))
+        }
+    }
+
+    @objc(_webView:didFailToFindString:)
+    func webView(_ webView: WKWebView, didFailToFind string: String) {
+        if let findInPageCompletionHandler {
+            self.findInPageCompletionHandler = nil
+            findInPageCompletionHandler(.failure(.notFound))
+        }
+    }
+
 }
