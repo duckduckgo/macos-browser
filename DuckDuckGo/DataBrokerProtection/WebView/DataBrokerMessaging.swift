@@ -22,9 +22,16 @@ import Common
 import UserScript
 import WebKit
 
+public protocol DataBrokerMessagingDelegate: AnyObject {
+
+    func ready()
+    func evaluateJavascript(javascript: String)
+}
 struct DataBrokerMessaging: UserScriptMessagingSubFeature {
 
-    let webView: WKWebView? = nil
+    let delegate: DataBrokerMessagingDelegate
+    var allowedOrigins: AllowedOrigins = .all
+    var featureName: String = "brokerProtection"
 
     func handlerFor(_ method: String) -> Handler? {
         switch method {
@@ -62,11 +69,9 @@ struct DataBrokerMessaging: UserScriptMessagingSubFeature {
 
     func ready(params: Any, original: WKScriptMessage, replyHandler: @escaping MessageReplyHandler) throws {
         print("READY")
-        //self.ready = true
-        //self.next()
+        delegate.ready()
     }
 
-    @MainActor
     func sendAction(action: Encodable) {
         if let subscriptionEvent = SubscriptionEvent.toJS(
             context: "contentScopeScripts",
@@ -74,12 +79,7 @@ struct DataBrokerMessaging: UserScriptMessagingSubFeature {
             subscriptionName: "onActionReceived",
             params: action
         ) {
-            webView?.evaluateJavaScript(subscriptionEvent)
+            delegate.evaluateJavascript(javascript: subscriptionEvent)
         }
     }
-
-    var allowedOrigins: AllowedOrigins = .all
-
-    var featureName: String = "brokerProtection"
-
 }

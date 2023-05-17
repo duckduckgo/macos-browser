@@ -24,10 +24,13 @@ import UserScript
 @MainActor
 final public class DataBrokerUserContentController: WKUserContentController {
 
-    init(with privacyConfigurationManager: PrivacyConfigurationManaging) {
+    let dataBrokerUserScripts: DataBrokerUserScripts
+
+    init(with privacyConfigurationManager: PrivacyConfigurationManaging, delegate: DataBrokerMessagingDelegate) {
+        dataBrokerUserScripts = DataBrokerUserScripts(with: privacyConfigurationManager, delegate: delegate)
+
         super.init()
 
-        let dataBrokerUserScripts = DataBrokerUserScripts(with: privacyConfigurationManager)
         dataBrokerUserScripts.userScripts.forEach {
             let userScript = $0.makeWKUserScriptSync()
             self.installUserScripts([userScript], handlers: [$0])

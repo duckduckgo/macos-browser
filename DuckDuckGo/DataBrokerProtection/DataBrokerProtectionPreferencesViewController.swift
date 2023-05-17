@@ -19,24 +19,42 @@
 import Cocoa
 
 final class DataBrokerProtectionPreferencesViewController: NSViewController {
-    let handler = DataBrokerWebViewHandler()
+    var handler: DataBrokerWebViewHandler?
 
     override func loadView() {
         view = NSView()
     }
 
     override func viewDidLoad() {
+        handler = DataBrokerWebViewHandler(delegate: self)
+
         super.viewDidLoad()
         view.wantsLayer = true
         view.layer?.backgroundColor = NSColor.red.cgColor
 
-
+        let button = NSButton(frame: NSRect(x: 150, y: 200, width: 80, height: 55))
+        button.title =  "A button in code"
+        button.target = self
+        button.action = #selector(buttonAction)
+        view.addSubview(button)
     }
 
     override func viewDidAppear() {
-        print("APPEAR")
         super.viewDidAppear()
-        handler.test()
+    }
 
+    @objc func buttonAction(sender: NSButton!) {
+        handler?.test()
+    }
+}
+
+extension DataBrokerProtectionPreferencesViewController: DataBrokerMessagingDelegate {
+
+    func ready() {
+        self.handler?.sendAction()
+    }
+
+    func evaluateJavascript(javascript: String) {
+        self.handler?.webView?.evaluateJavaScript(javascript)
     }
 }

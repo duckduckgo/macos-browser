@@ -25,8 +25,9 @@ import WebKit
 final class DataBrokerUserScripts: UserScriptsProvider {
 
     let contentScopeUserScript: ContentScopeUserScript
+    var dataBrokerMessaging: DataBrokerMessaging
 
-    init(with privacyConfigurationManager: PrivacyConfigurationManaging) {
+    init(with privacyConfigurationManager: PrivacyConfigurationManaging, delegate: DataBrokerMessagingDelegate) {
 
         let features = ContentScopeFeatureToggles(emailProtection: false,
                                                   credentialsAutofill: false,
@@ -47,7 +48,8 @@ final class DataBrokerUserScripts: UserScriptsProvider {
                                                         properties: prefs,
                                                         isolated: true)
 
-        contentScopeUserScript.registerSubFeature(delegate: DataBrokerMessaging())
+        dataBrokerMessaging = DataBrokerMessaging(delegate: delegate)
+        contentScopeUserScript.registerSubFeature(delegate: dataBrokerMessaging)
     }
 
     lazy var userScripts: [UserScript] = [

@@ -24,25 +24,24 @@ import Common
 
 @MainActor
 final class DataBrokerWebViewHandler {
-    var webView: WKWebView
+    var webView: WKWebView?
     let webViewConfiguration: WKWebViewConfiguration
     let userContentController: DataBrokerUserContentController?
 
-    internal init() {
+    init(delegate: DataBrokerMessagingDelegate) {
         let privacyFeatures = PrivacyFeatures
 
         let configuration = WKWebViewConfiguration()
-        configuration.applyDataBrokerConfiguration(contentBlocking: privacyFeatures.contentBlocking)
+        configuration.applyDataBrokerConfiguration(contentBlocking: privacyFeatures.contentBlocking, delegate: delegate)
         self.webViewConfiguration = configuration
 
         let userContentController = configuration.userContentController as? DataBrokerUserContentController
         assert(userContentController != nil)
         self.userContentController = userContentController
-
-        webView = WebView(frame: CGRect(origin: .zero, size: CGSize(width: 1024, height: 1024)), configuration: configuration)
     }
 
     func test() {
+        webView = WebView(frame: CGRect(origin: .zero, size: CGSize(width: 1024, height: 1024)), configuration: webViewConfiguration)
         let window = NSWindow(
             contentRect: NSRect(x: 0, y: 0, width: 1024, height: 1024), styleMask: [.titled],
             backing: .buffered, defer: false
@@ -51,8 +50,12 @@ final class DataBrokerWebViewHandler {
         window.contentView = self.webView
         window.makeKeyAndOrderFront(nil)
 
-        print("LOAD")
-        webView.load(URLRequest(url: URL(string: "https://www.example.com")!))
-        print("Test")
+        self.webView?.load(URLRequest(url: URL(string: "https://www.example.com")!))
+    }
+
+    func sendAction() {
+        Task {
+            self.userContentController?.dataBrokerUserScripts.dataBrokerMessaging.sendAction(action: "")
+        }
     }
 }
