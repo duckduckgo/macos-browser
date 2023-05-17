@@ -23,17 +23,17 @@ We use [SwifLint](https://github.com/realm/SwiftLint) for enforcing Swift style 
 
 ### Duck player
 
-To build the JS for the duck player:
+To build the JS for Duck Player:
 
-- first run `npm install` - please ensure you have `node 16` or above
-- then run `npm run build-yt` - this will build from `js/youtube-player` & copy the artifact into `DuckDuckGo/Youtube Player/Resources/youtube-inject-bundle.js`
-- to have it continuously re-compile, run `npm run build-yt:watch`
+1. First run `npm install` - please ensure you have `node 16` or above.
+2. Then run `npm run build-yt` - this will build from `js/youtube-player` & copy the artifact into `DuckDuckGo/Youtube Player/Resources/youtube-inject-bundle.js`.
+3. To have it continuously re-compile, run `npm run build-yt:watch`.
 
 Notes for Duck Player
 
 - `youtube-inject.js` is the entry point for the JavaScript Bundle that's used by `YoutubeOverlayUserScript.swift`
-- when you 'build' the JavaScript bundle, changes to the compiled artifact `youtube-inject-bundle.js` should also be checked in when you commit.
-- if you make any changes, please run the integration tests
+- When you 'build' the JavaScript bundle, changes to the compiled artifact `youtube-inject-bundle.js` should also be checked in when you commit.
+- If you make any changes, please run the integration tests:
   - `cd js/youtube-player && npm run test.integration`
 
 ## Terminology
