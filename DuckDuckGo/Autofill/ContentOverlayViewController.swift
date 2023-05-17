@@ -38,9 +38,16 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
     }()
 
     lazy var vaultManager: SecureVaultManager = {
-        let manager = SecureVaultManager(passwordManager: PasswordManagerCoordinator.shared)
+        let manager = SecureVaultManager(passwordManager: PasswordManagerCoordinator.shared,
+                                         includePartialAccountMatches: true,
+                                         tld: ContentBlocking.shared.tld)
         manager.delegate = self
         return manager
+    }()
+
+    lazy var autofillPreferencesModel: AutofillPreferencesModel = {
+        let model = AutofillPreferencesModel()
+        return model
     }()
 
     public override func viewDidLoad() {
@@ -124,13 +131,7 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
         configuration.preferences.setValue(true, forKey: "developerExtrasEnabled")
 #endif
 
-        final class OverlayWebView: WKWebView {
-            public override func scrollWheel(with theEvent: NSEvent) {
-                // No-op to prevent scrolling
-            }
-        }
-
-        let webView = OverlayWebView(frame: .zero, configuration: configuration)
+        let webView = WKWebView(frame: .zero, configuration: configuration)
         webView.allowsLinkPreview = false
         webView.window?.acceptsMouseMovedEvents = true
         webView.window?.ignoresMouseEvents = false
@@ -262,4 +263,20 @@ extension ContentOverlayViewController: SecureVaultManagerDelegate {
         }
     }
 
+    public func secureVaultManager(_: SecureVaultManager, didRequestCreditCardsManagerForDomain domain: String) {
+        autofillPreferencesModel.showAutofillPopover(.cards)
+    }
+
+    public func secureVaultManager(_: SecureVaultManager, didRequestIdentitiesManagerForDomain domain: String) {
+        autofillPreferencesModel.showAutofillPopover(.identities)
+    }
+
+    public func secureVaultManager(_: SecureVaultManager, didRequestPasswordManagerForDomain domain: String) {
+        let mngr = PasswordManagerCoordinator.shared
+        if mngr.isEnabled {
+            mngr.bitwardenManagement.openBitwarden()
+        } else {
+            autofillPreferencesModel.showAutofillPopover(.logins)
+        }
+    }
 }

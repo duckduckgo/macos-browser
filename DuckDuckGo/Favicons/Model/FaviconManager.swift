@@ -34,9 +34,9 @@ protocol FaviconManagement: AnyObject {
 
     func getCachedFavicon(for host: String, sizeCategory: Favicon.SizeCategory) -> Favicon?
 
-    func burnExcept(fireproofDomains: FireproofDomains, bookmarkManager: BookmarkManager, completion: @escaping () -> Void)
+    func burnExcept(fireproofDomains: FireproofDomains, bookmarkManager: BookmarkManager, savedLogins: Set<String>, completion: @escaping () -> Void)
 
-    func burnDomains(_ domains: Set<String>, except bookmarkManager: BookmarkManager, completion: @escaping () -> Void)
+    func burnDomains(_ domains: Set<String>, exceptBookmarks bookmarkManager: BookmarkManager, exceptSavedLogins: Set<String>, completion: @escaping () -> Void)
 
 }
 
@@ -205,21 +205,25 @@ final class FaviconManager: FaviconManagement {
 
     func burnExcept(fireproofDomains: FireproofDomains,
                     bookmarkManager: BookmarkManager,
+                    savedLogins: Set<String> = [],
                     completion: @escaping () -> Void) {
         self.referenceCache.burnExcept(fireproofDomains: fireproofDomains,
-                                       bookmarkManager: bookmarkManager) {
+                                       bookmarkManager: bookmarkManager,
+                                       savedLogins: savedLogins) {
             self.imageCache.burnExcept(fireproofDomains: fireproofDomains,
-                                       bookmarkManager: bookmarkManager) {
+                                       bookmarkManager: bookmarkManager,
+                                       savedLogins: savedLogins) {
                 completion()
             }
         }
     }
 
     func burnDomains(_ domains: Set<String>,
-                     except bookmarkManager: BookmarkManager,
+                     exceptBookmarks bookmarkManager: BookmarkManager,
+                     exceptSavedLogins: Set<String> = [],
                      completion: @escaping () -> Void) {
-        self.referenceCache.burnDomains(domains, except: bookmarkManager) {
-            self.imageCache.burnDomains(domains, except: bookmarkManager) {
+        self.referenceCache.burnDomains(domains, exceptBookmarks: bookmarkManager, exceptSavedLogins: exceptSavedLogins) {
+            self.imageCache.burnDomains(domains, exceptBookmarks: bookmarkManager, exceptSavedLogins: exceptSavedLogins) {
                 DispatchQueue.main.async {
                     completion()
                 }

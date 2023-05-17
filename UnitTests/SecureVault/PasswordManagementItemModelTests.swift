@@ -27,8 +27,7 @@ final class PasswordManagementItemModelTests: XCTestCase {
     var deletedCredentials: SecureVaultModels.WebsiteCredentials?
 
     func testWhenCredentialsAreSavedThenSaveIsRequested() {
-        let model = PasswordManagementLoginModel(onDirtyChanged: onDirtyChanged,
-                                                onSaveRequested: onSaveRequested,
+        let model = PasswordManagementLoginModel(onSaveRequested: onSaveRequested,
                                                 onDeleteRequested: onDeleteRequested)
 
         model.credentials = makeCredentials(id: "1")
@@ -39,8 +38,7 @@ final class PasswordManagementItemModelTests: XCTestCase {
     }
 
     func testWhenCredentialsAreDeletedThenDeleteIsRequested() {
-        let model = PasswordManagementLoginModel(onDirtyChanged: onDirtyChanged,
-                                                onSaveRequested: onSaveRequested,
+        let model = PasswordManagementLoginModel(onSaveRequested: onSaveRequested,
                                                 onDeleteRequested: onDeleteRequested)
 
         model.credentials = makeCredentials(id: "1")
@@ -51,8 +49,7 @@ final class PasswordManagementItemModelTests: XCTestCase {
     }
 
     func testWhenCredentialsHasNoIdThenModelStateIsNew() {
-        let model = PasswordManagementLoginModel(onDirtyChanged: onDirtyChanged,
-                                                onSaveRequested: onSaveRequested,
+        let model = PasswordManagementLoginModel(onSaveRequested: onSaveRequested,
                                                 onDeleteRequested: onDeleteRequested)
 
         model.createNew()
@@ -61,43 +58,28 @@ final class PasswordManagementItemModelTests: XCTestCase {
         XCTAssertEqual(model.username, "")
         XCTAssertTrue(model.isEditing)
         XCTAssertTrue(model.isNew)
-        XCTAssertTrue(model.isDirty)
     }
 
     func testWhenModelIsEditedThenStateIsUpdated() {
-        let model = PasswordManagementLoginModel(onDirtyChanged: onDirtyChanged,
-                                                onSaveRequested: onSaveRequested,
+        let model = PasswordManagementLoginModel(onSaveRequested: onSaveRequested,
                                                 onDeleteRequested: onDeleteRequested)
 
         model.credentials = makeCredentials(id: "1")
         XCTAssertEqual(model.domain, "domain")
         XCTAssertEqual(model.username, "username")
         XCTAssertFalse(model.isEditing)
-        XCTAssertFalse(model.isDirty)
         XCTAssertFalse(model.isNew)
 
-        model.domain = "change"
-        XCTAssertTrue(model.isDirty)
-        XCTAssertTrue(isDirty)
-
         model.cancel()
-        XCTAssertFalse(model.isDirty)
-        XCTAssertFalse(isDirty)
         XCTAssertEqual(model.domain, "domain")
 
         model.title = "change"
-        XCTAssertTrue(model.isDirty)
-        XCTAssertTrue(isDirty)
         model.cancel()
 
         model.username = "change"
-        XCTAssertTrue(model.isDirty)
-        XCTAssertTrue(isDirty)
         model.cancel()
 
         model.password = "change"
-        XCTAssertTrue(model.isDirty)
-        XCTAssertTrue(isDirty)
         model.cancel()
 
     }
