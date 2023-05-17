@@ -20,7 +20,7 @@ import Cocoa
 import Combine
 import BrowserServicesKit
 
-protocol FaviconManagement {
+protocol FaviconManagement: AnyObject {
 
     var areFaviconsLoaded: Bool { get }
 
@@ -64,7 +64,7 @@ final class FaviconManager: FaviconManagement {
         }
     }
 
-    private var store: FaviconStoring
+    private(set) var store: FaviconStoring
 
     private let faviconURLSession = URLSession(configuration: .ephemeral)
 

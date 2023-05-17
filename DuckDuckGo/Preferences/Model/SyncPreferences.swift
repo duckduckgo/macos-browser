@@ -73,6 +73,15 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
     @MainActor
     func presentShowOrEnterCodeDialog() {
         Task { @MainActor in
+            let devicesAtStart = self.devices
+            self.$devices
+                .removeDuplicates()
+                .dropFirst()
+                .prefix(1)
+                .sink { [weak self] _ in
+                    self?.managementDialogModel.endFlow()
+                    self?.objectWillChange.send()
+                }.store(in: &cancellables)
             managementDialogModel.codeToDisplay = syncService.account?.recoveryCode
             presentDialog(for: .syncAnotherDevice)
         }
@@ -152,7 +161,6 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
                 do {
                     let registeredDevices = try await syncService.fetchDevices()
                     mapDevices(registeredDevices)
-                    print("devices", self.devices)
                 } catch {
                     print("error", error.localizedDescription)
                 }
@@ -207,7 +215,11 @@ extension SyncPreferences: ManagementDialogModelDelegate {
     func deleteAccount() {
         Task { @MainActor in
             managementDialogModel.endFlow()
-            try await syncService.deleteAccount()
+            do {
+                try await syncService.deleteAccount()
+            } catch {
+                managementDialogModel.errorMessage = String(describing: error)
+            }
         }
     }
 
@@ -268,8 +280,21 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                     try await login(recoveryKey)
                     presentDialog(for: .deviceSynced)
                 } else if let connectKey = syncCode.connect {
-                    // Unclear what the UX is supposed to be here given everything is happening on the other device
+                    var isNewAccount = false
+                    if syncService.account == nil {
+                        let device = deviceInfo()
+                        try await syncService.createAccount(deviceName: device.name, deviceType: device.type)
+                        isNewAccount = true
+                    }
+
                     try await syncService.transmitRecoveryKey(connectKey)
+
+                    if isNewAccount {
+                        presentDialog(for: .deviceSynced)
+                    } else {
+                        managementDialogModel.endFlow()
+                    }
+
                 } else {
                     managementDialogModel.errorMessage = "Invalid code"
                     return
@@ -327,7 +352,11 @@ extension SyncPreferences: ManagementDialogModelDelegate {
             guard response == .OK,
                   let location = panel.url else { return }
 
-            try data.writeFileWithProgress(to: location)
+            do {
+                try data.writeFileWithProgress(to: location)
+            } catch {
+                managementDialogModel.errorMessage = String(describing: error)
+            }
         }
 
     }
