@@ -2012,13 +2012,6 @@
 			remoteGlobalIDString = 4B4D603C2A0B290200BCD287;
 			remoteInfo = NetworkProtectionAppExtension;
 		};
-		4B4D60452A0B290300BCD287 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = AA585D76248FD31100E9A3E2 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 4B4D603C2A0B290200BCD287;
-			remoteInfo = NetworkProtectionAppExtension;
-		};
 		7B4CE8DF26F02108009134B1 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = AA585D76248FD31100E9A3E2 /* Project object */;
@@ -2421,6 +2414,7 @@
 		4B5F14C62A145D6A0060320F /* DuckDuckGo Network Protection */ = {isa = PBXFileReference; lastKnownFileType = text; path = "DuckDuckGo Network Protection"; sourceTree = "<group>"; };
 		4B5F14CB2A14702C0060320F /* startVPN.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = startVPN.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B5F14E12A1476BD0060320F /* stopVPN.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = stopVPN.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4B5F14F82A148B230060320F /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		4B5FF67726B602B100D42879 /* FirefoxDataImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirefoxDataImporter.swift; sourceTree = "<group>"; };
 		4B65143D263924B5005B46EB /* EmailUrlExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmailUrlExtensions.swift; sourceTree = "<group>"; };
 		4B677427255DBEB800025BD8 /* httpsMobileV2BloomSpec.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = httpsMobileV2BloomSpec.json; sourceTree = "<group>"; };
@@ -4084,6 +4078,14 @@
 			path = NetworkProtectionVPNController;
 			sourceTree = "<group>";
 		};
+		4B5F14F72A148B230060320F /* NetworkProtectionAppExtension */ = {
+			isa = PBXGroup;
+			children = (
+				4B5F14F82A148B230060320F /* Info.plist */,
+			);
+			path = NetworkProtectionAppExtension;
+			sourceTree = "<group>";
+		};
 		4B6160D125B14E5E007DE5B2 /* ContentBlocker */ = {
 			isa = PBXGroup;
 			children = (
@@ -4935,6 +4937,7 @@
 				4B1AD89E25FC27E200261379 /* IntegrationTests */,
 				7B4CE8DB26F02108009134B1 /* UITests */,
 				B6EC37E929B5DA2A001ACE79 /* tests-server */,
+				4B5F14F72A148B230060320F /* NetworkProtectionAppExtension */,
 				4B25375C2A11BE7500610219 /* NetworkProtectionSystemExtension */,
 				4B5F14C32A145D6A0060320F /* NetworkProtectionVPNController */,
 				4B2D063A2A11CFBD00DE1F49 /* DuckDuckGoAgent */,
@@ -6449,6 +6452,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				4B5F14FE2A1529230060320F /* PBXTargetDependency */,
 				4B2D06622A12EEDA00DE1F49 /* PBXTargetDependency */,
 			);
 			name = "DuckDuckGo Privacy Browser App Store";
@@ -6713,7 +6717,7 @@
 			buildRules = (
 			);
 			dependencies = (
-				4B4D60462A0B290300BCD287 /* PBXTargetDependency */,
+				4B5F14FC2A15291D0060320F /* PBXTargetDependency */,
 				4B2537642A11BE7600610219 /* PBXTargetDependency */,
 			);
 			name = "DuckDuckGo Privacy Browser";
@@ -9190,14 +9194,17 @@
 			isa = PBXTargetDependency;
 			productRef = 4B4BEC492A11B627001D9AC5 /* NetworkProtection */;
 		};
-		4B4D60462A0B290300BCD287 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 4B4D603C2A0B290200BCD287 /* NetworkProtectionAppExtension */;
-			targetProxy = 4B4D60452A0B290300BCD287 /* PBXContainerItemProxy */;
-		};
 		4B4D60532A0B29CB00BCD287 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			productRef = 4B4D60522A0B29CB00BCD287 /* NetworkProtection */;
+		};
+		4B5F14FC2A15291D0060320F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = 4B5F14FB2A15291D0060320F /* InputFilesChecker */;
+		};
+		4B5F14FE2A1529230060320F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = 4B5F14FD2A1529230060320F /* InputFilesChecker */;
 		};
 		7B4CE8E026F02108009134B1 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -9571,8 +9578,11 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4B4D60502A0B293C00BCD287 /* NetPExtensionAppex.xcconfig */;
 			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Mac Developer";
+				"DEVELOPMENT_TEAM[sdk=macosx*]" = HKE973VLUW;
 				INFOPLIST_KEY_CFBundleDisplayName = NetworkProtectionAppExtension;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2023 DuckDuckGo. All rights reserved.";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "match Development com.duckduckgo.mobile.ios.* macos";
 			};
 			name = Release;
 		};
@@ -10272,7 +10282,9 @@
 			baseConfigurationReference = 378B58CD295ECA75002C0CC0 /* DuckDuckGo.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				"DEVELOPMENT_TEAM[sdk=macosx*]" = HKE973VLUW;
 				MACOSX_DEPLOYMENT_TARGET = 10.15.4;
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "macOS Browser Product Review";
 			};
 			name = Review;
 		};
@@ -10773,6 +10785,14 @@
 		4B4D60B22A0C83C100BCD287 /* NetworkProtectionUI */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = NetworkProtectionUI;
+		};
+		4B5F14FB2A15291D0060320F /* InputFilesChecker */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = "plugin:InputFilesChecker";
+		};
+		4B5F14FD2A1529230060320F /* InputFilesChecker */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = "plugin:InputFilesChecker";
 		};
 		4B82E9B225B69E3E00656FE7 /* TrackerRadarKit */ = {
 			isa = XCSwiftPackageProductDependency;

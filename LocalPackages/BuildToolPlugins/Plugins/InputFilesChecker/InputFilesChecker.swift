@@ -40,9 +40,15 @@ let extraInputFiles: [TargetName: Set<InputFile>] = [
         .init("WKProcessPool+DownloadDelegate.swift", .source),
         .init("_WKDownload+WebKitDownload.swift", .source),
         .init("SystemExtensionManager.swift", .source),
-        .init("com.duckduckgo.macos.browser.network-protection.system-extension.extension.systemextension", .unknown),
         .init("DuckDuckGoAgent.app", .unknown),
         .init("DuckDuckGoNotifications.app", .unknown),
+        .init("com.duckduckgo.macos.browser.network-protection.systemextension", .unknown),
+        .init("startVPN.app", .unknown),
+        .init("stopVPN.app", .unknown)
+    ],
+
+    "DuckDuckGo Privacy Browser App Store": [
+        .init("DuckDuckGoAgentAppStore.app", .unknown),
         .init("NetworkProtectionAppExtension.appex", .unknown)
     ],
 
