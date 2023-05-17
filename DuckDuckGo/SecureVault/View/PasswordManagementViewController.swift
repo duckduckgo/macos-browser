@@ -358,10 +358,7 @@ final class PasswordManagementViewController: NSViewController {
     }
 
     private func createLoginItemView() {
-        let itemModel = PasswordManagementLoginModel(onDirtyChanged: { [weak self] isDirty in
-            self?.isDirty = isDirty
-            self?.postChange()
-        }, onSaveRequested: { [weak self] credentials in
+        let itemModel = PasswordManagementLoginModel(onSaveRequested: { [weak self] credentials in
             self?.doSaveCredentials(credentials)
         }, onDeleteRequested: { [weak self] credentials in
             self?.promptToDelete(credentials: credentials)

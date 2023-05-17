@@ -17,6 +17,8 @@
 //
 
 import Foundation
+import BrowserServicesKit
+import Common
 
 struct PasswordManagementListSection {
 
@@ -41,6 +43,10 @@ struct PasswordManagementListSection {
     let title: String
     let items: [SecureVaultItem]
 
+    static let tld: TLD = ContentBlocking.shared.tld
+    static let autofillUrlSort: AutofillUrlSort = AutofillDomainNameUrlSort()
+    static let autofillDefaultKey = "#"
+
     func withUpdatedItems(_ newItems: [SecureVaultItem]) -> PasswordManagementListSection {
         return PasswordManagementListSection(title: title, items: newItems)
     }
@@ -50,19 +56,43 @@ struct PasswordManagementListSection {
                          order: SecureVaultSorting.SortOrder) -> [PasswordManagementListSection] {
 
         let itemsByFirstCharacter: [String: [SecureVaultItem]] = Dictionary(grouping: items) { $0[keyPath: keyPath] }
-        let sortFunction: (String, String) -> Bool = {
-            switch order {
-            case .ascending:
-                return { $0.localizedCaseInsensitiveCompare($1) == .orderedAscending }
-            case .descending:
-                return { $0.localizedCaseInsensitiveCompare($1) == .orderedDescending }
-            }
-        }()
-        let sortedKeys = itemsByFirstCharacter.keys.sorted(by: sortFunction)
+
+        let sortedKeys = itemsByFirstCharacter.keys.sorted(by: caseInsensitiveCompare(for: order))
 
         return sortedKeys.map { key in
             var itemsInSection = itemsByFirstCharacter[key] ?? []
-            itemsInSection.sort { lhs, rhs in sortFunction(lhs.displayTitle, rhs.displayTitle) }
+            itemsInSection.sort { lhs, rhs in
+                return titleCompare(lhs, rhs, order)
+            }
+            return PasswordManagementListSection(title: key, items: itemsInSection)
+        }
+    }
+
+    static func sectionsByTLD(with items: [SecureVaultItem],
+                              order: SecureVaultSorting.SortOrder) -> [PasswordManagementListSection] {
+
+        let itemsByFirstCharacter: [String: [SecureVaultItem]] = items.reduce(into: [String: [SecureVaultItem]]()) { result, vaultItem in
+            var key: String = autofillDefaultKey
+            if vaultItem.websiteAccount == nil {
+                key = vaultItem.firstCharacter
+            } else {
+                if let acc = vaultItem.websiteAccount,
+                   let firstChar = autofillUrlSort.firstCharacterForGrouping(acc, tld: tld),
+                   let deDistinctionedChar = String(firstChar).folding(options: [.diacriticInsensitive, .caseInsensitive], locale: nil).first,
+                   deDistinctionedChar.isLetter {
+                    key = String(deDistinctionedChar.uppercased())
+                }
+            }
+            return result[key, default: []].append(vaultItem)
+        }
+
+        let sortedKeys = itemsByFirstCharacter.keys.sorted(by: caseInsensitiveCompare(for: order))
+
+        return sortedKeys.map { key in
+            var itemsInSection = itemsByFirstCharacter[key] ?? []
+            itemsInSection.sort { lhs, rhs in
+                return titleAndTLDCompare(lhs, rhs, order)
+            }
             return PasswordManagementListSection(title: key, items: itemsInSection)
         }
     }
@@ -88,6 +118,36 @@ struct PasswordManagementListSection {
             var itemsInSection = itemsByDateMetadata[key] ?? []
             itemsInSection.sort { lhs, rhs in dateSortFunction(lhs[keyPath: keyPath], rhs[keyPath: keyPath]) }
             return PasswordManagementListSection(title: key.title, items: itemsInSection)
+        }
+    }
+
+    private static func caseInsensitiveCompare(for order: SecureVaultSorting.SortOrder) -> (String, String) -> Bool {
+        switch order {
+        case .ascending:
+            return { $0.localizedCaseInsensitiveCompare($1) == .orderedAscending }
+        case .descending:
+            return { $0.localizedCaseInsensitiveCompare($1) == .orderedDescending }
+        }
+    }
+
+    private static func titleCompare(_ lhs: SecureVaultItem, _ rhs: SecureVaultItem, _ order: SecureVaultSorting.SortOrder) -> Bool {
+        switch order {
+        case .ascending:
+            return { lhs.displayTitle.localizedCaseInsensitiveCompare(rhs.displayTitle) == .orderedAscending }()
+        case .descending:
+            return { lhs.displayTitle.localizedCaseInsensitiveCompare(rhs.displayTitle) == .orderedDescending }()
+        }
+    }
+
+    private static func titleAndTLDCompare(_ lhs: SecureVaultItem, _ rhs: SecureVaultItem, _ order: SecureVaultSorting.SortOrder) -> Bool {
+        guard let lhsAccount = lhs.websiteAccount, let rhsAccount = rhs.websiteAccount else {
+            return false
+        }
+        switch order {
+        case .ascending:
+            return { autofillUrlSort.compareAccountsForSortingAutofill(lhs: lhsAccount, rhs: rhsAccount, tld: tld) == .orderedAscending }()
+        case .descending:
+            return { autofillUrlSort.compareAccountsForSortingAutofill(lhs: lhsAccount, rhs: rhsAccount, tld: tld) == .orderedDescending }()
         }
     }
 
