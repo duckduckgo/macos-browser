@@ -288,6 +288,7 @@ final class DefaultNetworkProtectionProvider: NetworkProtection.TunnelController
             return false
         }
 
+        controllerErrorStore.lastErrorMessage = nil
         return true
     }
 #endif
