@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "4B4BEC1F2A11B4E2001D9AC5"
-               BuildableName = "DuckDuckGoNotifications.app"
+               BuildableName = "DuckDuckGo Notifications.app"
                BlueprintName = "DuckDuckGoNotifications"
                ReferencedContainer = "container:DuckDuckGo.xcodeproj">
             </BuildableReference>
@@ -45,7 +45,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "4B4BEC1F2A11B4E2001D9AC5"
-            BuildableName = "DuckDuckGoNotifications.app"
+            BuildableName = "DuckDuckGo Notifications.app"
             BlueprintName = "DuckDuckGoNotifications"
             ReferencedContainer = "container:DuckDuckGo.xcodeproj">
          </BuildableReference>
@@ -62,7 +62,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "4B4BEC1F2A11B4E2001D9AC5"
-            BuildableName = "DuckDuckGoNotifications.app"
+            BuildableName = "DuckDuckGo Notifications.app"
             BlueprintName = "DuckDuckGoNotifications"
             ReferencedContainer = "container:DuckDuckGo.xcodeproj">
          </BuildableReference>
