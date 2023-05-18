@@ -10,7 +10,7 @@
           "value" : "light"
         }
       ],
-      "filename" : "statusbar-vpn-on-lightmode-1.pdf",
+      "filename" : "statusbar-vpn-on 1.pdf",
       "idiom" : "universal"
     },
     {
@@ -20,7 +20,7 @@
           "value" : "dark"
         }
       ],
-      "filename" : "statusbar-vpn-on-darkmode.pdf",
+      "filename" : "statusbar-vpn-on.pdf",
       "idiom" : "universal"
     }
   ],

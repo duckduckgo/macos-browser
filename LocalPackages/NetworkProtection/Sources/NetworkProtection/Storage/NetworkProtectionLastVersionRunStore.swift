@@ -1,5 +1,6 @@
 //
-//  AppLaunchingController.swift
+//  NetworkProtectionLastVersionRunStore.swift
+//  DuckDuckGo
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -18,18 +19,22 @@
 
 import Foundation
 
-public final class AppLaunchingController: TunnelController {
-    private let appLauncher: AppLauncher
+public final class NetworkProtectionLastVersionRunStore {
+    private let userDefaults: UserDefaults
 
-    public init(appLauncher: AppLauncher) {
-        self.appLauncher = appLauncher
+    static let lastVersionRunKey = "com.duckduckgo.network-protection.NetworkProtectionVersionStore.lastVersionRunKey"
+
+    public init(userDefaults: UserDefaults = .standard) {
+        self.userDefaults = userDefaults
     }
 
-    public func start() async throws {
-        await appLauncher.launchApp(withCommand: .startVPN)
-    }
+    public var lastVersionRun: String? {
+        get {
+            userDefaults.string(forKey: Self.lastVersionRunKey)
+        }
 
-    public func stop() async throws {
-        await appLauncher.launchApp(withCommand: .stopVPN)
+        set {
+            userDefaults.set(newValue, forKey: Self.lastVersionRunKey)
+        }
     }
 }

@@ -35,7 +35,7 @@ struct NetworkProtectionInviteCodeView: View {
                     .font(.system(size: 13))
                     .multilineTextAlignment(.center)
                 TextField(UserText.networkProtectionInviteFieldPrompt, text: $model.text)
-                    .frame(width: 77)
+                    .frame(width: 96)
                     .textFieldStyle(.roundedBorder)
                 if let errorText = model.errorText {
                     Text(errorText)

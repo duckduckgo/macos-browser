@@ -249,17 +249,58 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     // MARK: - Network Protection
 
     private func startupNetworkProtection() {
-        let provider = DefaultNetworkProtectionProvider()
+        let networkProtectionFeatureVisibility = NetworkProtectionKeychainTokenStore()
 
+        guard networkProtectionFeatureVisibility.isFeatureActivated else {
+            disableNetworkProtectionMenuAndNotificationsAgent()
+            return
+        }
+
+        updateNetworkProtectionIfVersionChanged()
+        refreshNetworkProtectionServers()
+        warnUserAboutApplicationPathForNetworkProtection()
+    }
+
+    private func updateNetworkProtectionIfVersionChanged() {
+        let currentVersion = AppVersion.shared.versionNumber
+        let versionStore = NetworkProtectionLastVersionRunStore()
+        defer {
+            versionStore.lastVersionRun = currentVersion
+        }
+
+        if let lastVersionRun = versionStore.lastVersionRun,
+           lastVersionRun == currentVersion {
+
+            return
+        }
+
+        updateNetworkProtectionTunnelAndMenu()
+    }
+
+    private func disableNetworkProtectionMenuAndNotificationsAgent() {
+        do {
+            try LoginItem(identifier: .vpnMenu).disable()
+        } catch {
+            os_log("Failed to disable the vpnMenu login item: %{public}@", log: .networkProtection, type: .error, error.localizedDescription)
+        }
+
+        do {
+            try LoginItem(identifier: .notificationsAgent).disable()
+        } catch {
+            os_log("Failed to disable the notificationsAgent login item: %{public}@", log: .networkProtection, type: .error, error.localizedDescription)
+        }
+    }
+
+    private func updateNetworkProtectionTunnelAndMenu() {
         Task {
+            let provider = DefaultNetworkProtectionProvider()
+
             if await provider.isConnected() {
                 try? await provider.stop()
             }
         }
 
         resetLoginItemsIfAlreadyRunning()
-        refreshNetworkProtectionServers()
-        warnUserAboutApplicationPathForNetworkProtection()
     }
 
     private func resetLoginItemsIfAlreadyRunning() {

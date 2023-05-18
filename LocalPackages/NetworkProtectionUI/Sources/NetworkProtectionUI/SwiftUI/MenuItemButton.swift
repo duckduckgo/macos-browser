@@ -20,17 +20,18 @@ import Foundation
 import SwiftUI
 
 struct MenuItemButton: View {
-    let title: String
-    let action: () -> Void
+    private let title: String
+    private let textColor: Color
+    private let action: () async -> Void
 
     private let highlightAnimationStepSpeed = 0.05
 
     @State private var isHovered = false
     @State private var animatingTap = false
-    @State private var animateToOff = true
 
-    init(_ title: String, action: @escaping () -> Void) {
+    init(_ title: String, textColor: Color, action: @escaping () async -> Void) {
         self.title = title
+        self.textColor = textColor
         self.action = action
     }
 
@@ -40,14 +41,14 @@ struct MenuItemButton: View {
         }) {
             HStack {
                 Text(title)
-                    .foregroundColor(isHovered ? .white : .primary)
+                    .foregroundColor(isHovered ? .white : textColor)
                 Spacer()
-            }.padding([.top, .bottom], 5)
+            }.padding([.top, .bottom], 3)
                 .padding([.leading, .trailing], 9)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
-            buttonBackground()
+            buttonBackground(highlighted: isHovered)
         )
         .contentShape(Rectangle())
         .cornerRadius(4)
@@ -62,8 +63,8 @@ struct MenuItemButton: View {
         .buttonStyle(PlainButtonStyle())
     }
 
-    private func buttonBackground() -> some View {
-        if isHovered {
+    private func buttonBackground(highlighted: Bool) -> some View {
+        if highlighted {
             return AnyView(
                 VisualEffectView(material: .selection, blendingMode: .withinWindow, state: .active, isEmphasized: true))
         } else {
@@ -73,20 +74,17 @@ struct MenuItemButton: View {
 
     private func buttonTapped() {
         animatingTap = true
-
-        withAnimation(.easeInOut(duration: highlightAnimationStepSpeed)) {
-            isHovered = false
-        }
+        isHovered = false
 
         DispatchQueue.main.asyncAfter(deadline: .now() + highlightAnimationStepSpeed) {
-            withAnimation(.easeInOut(duration: highlightAnimationStepSpeed)) {
-                isHovered = true
-            }
+            isHovered = true
 
             DispatchQueue.main.asyncAfter(deadline: .now() + highlightAnimationStepSpeed) {
                 animatingTap = false
-                isHovered = false
-                action()
+
+                Task {
+                    await action()
+                }
             }
         }
     }

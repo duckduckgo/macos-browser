@@ -288,6 +288,7 @@ final class DefaultNetworkProtectionProvider: NetworkProtection.TunnelController
             return false
         }
 
+        controllerErrorStore.lastErrorMessage = nil
         return true
     }
 #endif
@@ -346,6 +347,7 @@ final class DefaultNetworkProtectionProvider: NetworkProtection.TunnelController
         }
 
 #if NETP_SYSTEM_EXTENSION
+
         guard try await ensureSystemExtensionIsActivated() else {
             return
         }

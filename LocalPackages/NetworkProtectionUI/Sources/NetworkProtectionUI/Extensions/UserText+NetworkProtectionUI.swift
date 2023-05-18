@@ -30,7 +30,7 @@ final class UserText {
 
     // MARK: - Connection Status
 
-    static let networkProtectionStatusDisconnected = NSLocalizedString("network.protection.status.disconnected", value: "Disconnected", comment: "The label for the NetP VPN when disconnected")
+    static let networkProtectionStatusDisconnected = NSLocalizedString("network.protection.status.disconnected", value: "Not connected", comment: "The label for the NetP VPN when disconnected")
     static let networkProtectionStatusDisconnecting = NSLocalizedString("network.protection.status.disconnecting", value: "Disconnecting...", comment: "The label for the NetP VPN when disconnecting")
     static let networkProtectionStatusConnected = NSLocalizedString("network.protection.status.connected", value: "Connected", comment: "The label for the NetP VPN when connected")
     static let networkProtectionStatusConnecting = NSLocalizedString("network.protection.status.connected", value: "Connecting...", comment: "The label for the NetP VPN when connecting")
@@ -44,4 +44,9 @@ final class UserText {
 
     static let networkProtectionServerAddressUnknown = NSLocalizedString("network.protection.server.address.unknown", value: "Unknown", comment: "When we can't tell the user the IP of the NetP server is")
     static let networkProtectionServerLocationUnknown = NSLocalizedString("network.protection.server.location.unknown", value: "Unknown", comment: "When we can't tell the user the location of the NetP server")
+
+    // MARK: - Status Menu
+
+    static let networkProtectionStatusMenuShareFeedback = NSLocalizedString("network.protection.status.menu.share.feedback", value: "Share Feedback...", comment: "The status menu 'Share Feedback' menu item")
+    static let networkProtectionStatusMenuOpenDuckDuckGo = NSLocalizedString("network.protection.status.menu.open.duckduckgo", value: "Open DuckDuckGo...", comment: "The status menu 'Open DuckDuckGo' menu item")
 }

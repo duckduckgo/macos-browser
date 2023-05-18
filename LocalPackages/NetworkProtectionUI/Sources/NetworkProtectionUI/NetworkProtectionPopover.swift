@@ -41,9 +41,11 @@ public extension EnvironmentValues {
 
 public final class NetworkProtectionPopover: NSPopover {
 
+    public typealias MenuItem = NetworkProtectionStatusView.Model.MenuItem
+
     private let statusReporter: NetworkProtectionStatusReporter
 
-    public required init(controller: TunnelController, statusReporter: NetworkProtectionStatusReporter, showLaunchBrowserMenuItem: Bool) {
+    public required init(controller: TunnelController, statusReporter: NetworkProtectionStatusReporter, menuItems: [MenuItem]) {
 
         self.statusReporter = statusReporter
 
@@ -52,18 +54,18 @@ public final class NetworkProtectionPopover: NSPopover {
         self.animates = false
         self.behavior = .semitransient
 
-        setupContentController(controller: controller, statusReporter: statusReporter, showLaunchBrowserMenuItem: showLaunchBrowserMenuItem)
+        setupContentController(controller: controller, statusReporter: statusReporter, menuItems: menuItems)
     }
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
-    private func setupContentController(controller: TunnelController, statusReporter: NetworkProtectionStatusReporter, showLaunchBrowserMenuItem: Bool) {
+    private func setupContentController(controller: TunnelController, statusReporter: NetworkProtectionStatusReporter, menuItems: [MenuItem]) {
 
         let model = NetworkProtectionStatusView.Model(controller: controller,
-                                                      showLaunchBrowserMenuItem: showLaunchBrowserMenuItem,
-                                                      statusReporter: statusReporter)
+                                                      statusReporter: statusReporter,
+                                                      menuItems: menuItems)
 
         let controller: NSViewController
 
