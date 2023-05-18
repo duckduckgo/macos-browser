@@ -17,13 +17,8 @@
 //
 
 import Cocoa
-import os.log
 import Common
-import WebKit
 import BrowserServicesKit
-import NetworkProtectionUI
-import SwiftUI
-import WebKit
 import NetworkProtection
 
 protocol OptionsButtonMenuDelegate: AnyObject {
