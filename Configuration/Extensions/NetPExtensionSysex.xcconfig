@@ -17,11 +17,15 @@
 #include "../NetPIDs.xcconfig"
 #include "../NetPOverrides.xcconfig"
 
-PRODUCT_NAME = com.duckduckgo.macos.browser.network-protection-extension
+PRODUCT_NAME[sdk=*] = com.duckduckgo.macos.browser.network-protection-extension
+PRODUCT_NAME[config=CI][sdk=*] =
+PRODUCT_NAME[config=Review][sdk=*] = com.duckduckgo.macos.browser.review.network-protection-extension
+PRODUCT_NAME[config=Debug][sdk=*] = com.duckduckgo.macos.browser.debug.network-protection-extension
+PRODUCT_NAME[config=Release][sdk=*] = com.duckduckgo.macos.browser.network-protection-extension
 
 // Since we're using nonstandard bundle IDs we'll just define them here, but we should consider
 // standardizing the bundle IDs so we can just define BUNDLE_IDENTIFIER_PREFIX
-PRODUCT_BUNDLE_IDENTIFIER[sdk=*] =
+PRODUCT_BUNDLE_IDENTIFIER[sdk=*] = com.duckduckgo.macos.browser.network-protection-extension
 PRODUCT_BUNDLE_IDENTIFIER[config=CI][sdk=*] =
 PRODUCT_BUNDLE_IDENTIFIER[config=Review][sdk=*] = com.duckduckgo.macos.browser.review.network-protection-extension
 PRODUCT_BUNDLE_IDENTIFIER[config=Debug][sdk=*] = com.duckduckgo.macos.browser.debug.network-protection-extension
@@ -33,8 +37,7 @@ CODE_SIGN_IDENTITY[sdk=macosx*] = Developer ID Application
 CODE_SIGN_IDENTITY[config=Debug][sdk=macosx*] = Apple Development
 CODE_SIGN_IDENTITY[config=CI][sdk=macosx*] =
 
-// Left empty intentionally as we currently only support debug and release builds
-CODE_SIGN_ENTITLEMENTS[config=Review][sdk=macosx*] =
+CODE_SIGN_ENTITLEMENTS[config=Review][sdk=macosx*] = NetworkProtectionSystemExtension/NetworkProtectionSystemExtension_Release.entitlements
 CODE_SIGN_ENTITLEMENTS[config=CI][sdk=macosx*] =
 CODE_SIGN_ENTITLEMENTS[config=Debug][sdk=macosx*] = NetworkProtectionSystemExtension/NetworkProtectionSystemExtension_Debug.entitlements
 CODE_SIGN_ENTITLEMENTS[config=Release][sdk=macosx*] = NetworkProtectionSystemExtension/NetworkProtectionSystemExtension_Release.entitlements
