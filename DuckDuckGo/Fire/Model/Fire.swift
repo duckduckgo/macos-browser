@@ -98,13 +98,14 @@ final class Fire {
     let pinnedTabsManager: PinnedTabsManager
     let bookmarkManager: BookmarkManager
     let syncService: DDGSyncing?
-
     let tabsCleaner = TabDataCleaner()
+    let secureVaultFactory: SecureVaultFactory
 
     enum BurningData: Equatable {
         case specificDomains(_ domains: Set<String>)
         case all
     }
+
     @Published private(set) var burningData: BurningData?
 
     @MainActor
@@ -119,7 +120,8 @@ final class Fire {
          recentlyClosedCoordinator: RecentlyClosedCoordinating? = RecentlyClosedCoordinator.shared,
          pinnedTabsManager: PinnedTabsManager? = nil,
          bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
-         syncService: DDGSyncing? = nil
+         syncService: DDGSyncing? = nil,
+         secureVaultFactory: SecureVaultFactory = SecureVaultFactory.default
     ) {
         self.webCacheManager = cacheManager
         self.historyCoordinating = historyCoordinating
@@ -131,6 +133,7 @@ final class Fire {
         self.pinnedTabsManager = pinnedTabsManager ?? WindowControllersManager.shared.pinnedTabsManager
         self.bookmarkManager = bookmarkManager
         self.syncService = syncService ?? (NSApp.delegate as? AppDelegate)?.syncService
+        self.secureVaultFactory = secureVaultFactory
 
         if #available(macOS 11, *), autoconsentManagement == nil {
             self.autoconsentManagement = AutoconsentManagement.shared
@@ -361,15 +364,27 @@ final class Fire {
 
     // MARK: - Favicons
 
+    private func autofillDomains() -> Set<String> {
+        guard let vault = try? secureVaultFactory.makeVault(errorReporter: SecureVaultErrorReporter.shared),
+              let accounts = try? vault.accounts() else {
+            return []
+        }
+        return Set(accounts.map { $0.domain })
+    }
+
     private func burnFavicons(completion: @escaping () -> Void) {
+        let autofillDomains = autofillDomains()
         self.faviconManagement.burnExcept(fireproofDomains: FireproofDomains.shared,
                                           bookmarkManager: LocalBookmarkManager.shared,
+                                          savedLogins: autofillDomains,
                                           completion: completion)
     }
 
     private func burnFavicons(for domains: Set<String>, completion: @escaping () -> Void) {
+        let autofillDomains = autofillDomains()
         self.faviconManagement.burnDomains(domains,
-                                           except: LocalBookmarkManager.shared,
+                                           exceptBookmarks: LocalBookmarkManager.shared,
+                                           exceptSavedLogins: autofillDomains,
                                            completion: completion)
     }
 
