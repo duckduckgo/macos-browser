@@ -1034,7 +1034,6 @@
 		4B25377D2A11C07600610219 /* NetworkProtectionConnectionTester.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4D607E2A0B29FA00BCD287 /* NetworkProtectionConnectionTester.swift */; };
 		4B25377E2A11C07600610219 /* NetworkProtectionTunnelHealthStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4D60882A0B29FA00BCD287 /* NetworkProtectionTunnelHealthStore.swift */; };
 		4B25377F2A11C07600610219 /* FileManager+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4D60822A0B29FA00BCD287 /* FileManager+Extension.swift */; };
-		4B2537802A11C07600610219 /* NetworkProtectionTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4D60862A0B29FA00BCD287 /* NetworkProtectionTimer.swift */; };
 		4B2537812A11C07600610219 /* NetworkConnectionType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4D60812A0B29FA00BCD287 /* NetworkConnectionType.swift */; };
 		4B2537822A11C07600610219 /* NetworkProtectionTunnelErrorStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4D60842A0B29FA00BCD287 /* NetworkProtectionTunnelErrorStore.swift */; };
 		4B2537832A11C07600610219 /* NetworkProtectionLatencyReporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4D60872A0B29FA00BCD287 /* NetworkProtectionLatencyReporter.swift */; };
@@ -1102,7 +1101,6 @@
 		4B4D608E2A0B2A3700BCD287 /* NetworkProtectionTunnelHealthStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4D60882A0B29FA00BCD287 /* NetworkProtectionTunnelHealthStore.swift */; };
 		4B4D608F2A0B2A3700BCD287 /* NETunnelProviderProtocol+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4D60852A0B29FA00BCD287 /* NETunnelProviderProtocol+Extension.swift */; };
 		4B4D60902A0B2A3700BCD287 /* FileManager+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4D60822A0B29FA00BCD287 /* FileManager+Extension.swift */; };
-		4B4D60912A0B2A3700BCD287 /* NetworkProtectionTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4D60862A0B29FA00BCD287 /* NetworkProtectionTimer.swift */; };
 		4B4D60922A0B2A3700BCD287 /* NetworkConnectionType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4D60812A0B29FA00BCD287 /* NetworkConnectionType.swift */; };
 		4B4D60932A0B2A3700BCD287 /* NetworkProtectionPixelEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4D60832A0B29FA00BCD287 /* NetworkProtectionPixelEvent.swift */; };
 		4B4D60942A0B2A3700BCD287 /* NetworkProtectionConnectionBandwidthAnalyzer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4D607F2A0B29FA00BCD287 /* NetworkProtectionConnectionBandwidthAnalyzer.swift */; };
@@ -1132,8 +1130,6 @@
 		4B4D60B92A0C848000BCD287 /* NetworkProtection+LoginItemIdentifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4D60662A0B29FA00BCD287 /* NetworkProtection+LoginItemIdentifier.swift */; };
 		4B4D60BA2A0C848300BCD287 /* NetworkProtectionProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4D60672A0B29FA00BCD287 /* NetworkProtectionProvider.swift */; };
 		4B4D60BB2A0C848300BCD287 /* NetworkProtectionProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4D60672A0B29FA00BCD287 /* NetworkProtectionProvider.swift */; };
-		4B4D60BC2A0C848600BCD287 /* Font+MonospacedDigits.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4D60682A0B29FA00BCD287 /* Font+MonospacedDigits.swift */; };
-		4B4D60BD2A0C848700BCD287 /* Font+MonospacedDigits.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4D60682A0B29FA00BCD287 /* Font+MonospacedDigits.swift */; };
 		4B4D60BE2A0C848A00BCD287 /* NetworkProtection+ConvenienceInitializers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4D60692A0B29FA00BCD287 /* NetworkProtection+ConvenienceInitializers.swift */; };
 		4B4D60BF2A0C848A00BCD287 /* NetworkProtection+ConvenienceInitializers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4D60692A0B29FA00BCD287 /* NetworkProtection+ConvenienceInitializers.swift */; };
 		4B4D60C02A0C848D00BCD287 /* NetworkProtectionControllerErrorStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4D606A2A0B29FA00BCD287 /* NetworkProtectionControllerErrorStore.swift */; };
@@ -2368,7 +2364,6 @@
 		4B4D60652A0B29FA00BCD287 /* NetworkProtectionNavBarButtonModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionNavBarButtonModel.swift; sourceTree = "<group>"; };
 		4B4D60662A0B29FA00BCD287 /* NetworkProtection+LoginItemIdentifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NetworkProtection+LoginItemIdentifier.swift"; sourceTree = "<group>"; };
 		4B4D60672A0B29FA00BCD287 /* NetworkProtectionProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionProvider.swift; sourceTree = "<group>"; };
-		4B4D60682A0B29FA00BCD287 /* Font+MonospacedDigits.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Font+MonospacedDigits.swift"; sourceTree = "<group>"; };
 		4B4D60692A0B29FA00BCD287 /* NetworkProtection+ConvenienceInitializers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NetworkProtection+ConvenienceInitializers.swift"; sourceTree = "<group>"; };
 		4B4D606A2A0B29FA00BCD287 /* NetworkProtectionControllerErrorStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionControllerErrorStore.swift; sourceTree = "<group>"; };
 		4B4D606C2A0B29FA00BCD287 /* NetworkProtectionInviteDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionInviteDialog.swift; sourceTree = "<group>"; };
@@ -2390,7 +2385,6 @@
 		4B4D60832A0B29FA00BCD287 /* NetworkProtectionPixelEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionPixelEvent.swift; sourceTree = "<group>"; };
 		4B4D60842A0B29FA00BCD287 /* NetworkProtectionTunnelErrorStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionTunnelErrorStore.swift; sourceTree = "<group>"; };
 		4B4D60852A0B29FA00BCD287 /* NETunnelProviderProtocol+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NETunnelProviderProtocol+Extension.swift"; sourceTree = "<group>"; };
-		4B4D60862A0B29FA00BCD287 /* NetworkProtectionTimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionTimer.swift; sourceTree = "<group>"; };
 		4B4D60872A0B29FA00BCD287 /* NetworkProtectionLatencyReporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionLatencyReporter.swift; sourceTree = "<group>"; };
 		4B4D60882A0B29FA00BCD287 /* NetworkProtectionTunnelHealthStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionTunnelHealthStore.swift; sourceTree = "<group>"; };
 		4B4D609C2A0B2C2300BCD287 /* DuckDuckGo_NetP_Release.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = DuckDuckGo_NetP_Release.entitlements; sourceTree = "<group>"; };
@@ -3971,7 +3965,6 @@
 				4B4D60652A0B29FA00BCD287 /* NetworkProtectionNavBarButtonModel.swift */,
 				4B4D60662A0B29FA00BCD287 /* NetworkProtection+LoginItemIdentifier.swift */,
 				4B4D60672A0B29FA00BCD287 /* NetworkProtectionProvider.swift */,
-				4B4D60682A0B29FA00BCD287 /* Font+MonospacedDigits.swift */,
 				4B4D60692A0B29FA00BCD287 /* NetworkProtection+ConvenienceInitializers.swift */,
 				4B4D606A2A0B29FA00BCD287 /* NetworkProtectionControllerErrorStore.swift */,
 				4B4D606B2A0B29FA00BCD287 /* Invite */,
@@ -4040,7 +4033,6 @@
 				4B4D60832A0B29FA00BCD287 /* NetworkProtectionPixelEvent.swift */,
 				4B4D60842A0B29FA00BCD287 /* NetworkProtectionTunnelErrorStore.swift */,
 				4B4D60852A0B29FA00BCD287 /* NETunnelProviderProtocol+Extension.swift */,
-				4B4D60862A0B29FA00BCD287 /* NetworkProtectionTimer.swift */,
 				4B4D60872A0B29FA00BCD287 /* NetworkProtectionLatencyReporter.swift */,
 				4B4D60882A0B29FA00BCD287 /* NetworkProtectionTunnelHealthStore.swift */,
 			);
@@ -7469,7 +7461,6 @@
 				3706FAEB293F65D500E42796 /* HistoryMenu.swift in Sources */,
 				3706FAEC293F65D500E42796 /* ContentScopeFeatureFlagging.swift in Sources */,
 				3706FAED293F65D500E42796 /* OnboardingButtonStyles.swift in Sources */,
-				4B4D60BD2A0C848700BCD287 /* Font+MonospacedDigits.swift in Sources */,
 				3706FAEE293F65D500E42796 /* SaveIdentityPopover.swift in Sources */,
 				3706FAF0293F65D500E42796 /* YoutubePlayerNavigationHandler.swift in Sources */,
 				37197EA32942441D00394917 /* UserDialogRequest.swift in Sources */,
@@ -8257,7 +8248,6 @@
 				4B2D06272A11C0C500DE1F49 /* TunnelConfiguration+WgQuickConfig.swift in Sources */,
 				4B2537862A11C07600610219 /* NETunnelProviderProtocol+Extension.swift in Sources */,
 				4B2D062A2A11C0C900DE1F49 /* NetworkProtectionSharedState.swift in Sources */,
-				4B2537802A11C07600610219 /* NetworkProtectionTimer.swift in Sources */,
 				4B2537732A11BF8C00610219 /* NetworkProtectionIPCNotificationsPresenter.swift in Sources */,
 				4B2D06322A11C1D300DE1F49 /* NSApplicationExtension.swift in Sources */,
 				4B2D06332A11C1E300DE1F49 /* OptionalExtension.swift in Sources */,
@@ -8317,7 +8307,6 @@
 				4B4D608B2A0B2A3700BCD287 /* NetworkProtectionTunnelErrorStore.swift in Sources */,
 				4B4D60A12A0B2D6100BCD287 /* NetworkProtectionSharedState.swift in Sources */,
 				4B4D60892A0B2A1C00BCD287 /* NetworkProtectionUNNotificationsPresenter.swift in Sources */,
-				4B4D60912A0B2A3700BCD287 /* NetworkProtectionTimer.swift in Sources */,
 				4B4D60A42A0B2EB000BCD287 /* BundleExtension.swift in Sources */,
 				4B4D60A62A0B2ECC00BCD287 /* String+ArrayConversion.swift in Sources */,
 				4B4D60942A0B2A3700BCD287 /* NetworkProtectionConnectionBandwidthAnalyzer.swift in Sources */,
@@ -8831,7 +8820,6 @@
 				4B0DB5E528BD9D08007DD239 /* PinningManager.swift in Sources */,
 				B68458C025C7E9E000DC17B6 /* TabCollectionViewModel+NSSecureCoding.swift in Sources */,
 				AA8EDF2724923EC70071C2E8 /* StringExtension.swift in Sources */,
-				4B4D60BC2A0C848600BCD287 /* Font+MonospacedDigits.swift in Sources */,
 				85378DA2274E7F25007C5CBF /* EmailManagerRequestDelegate.swift in Sources */,
 				1D43EB36292ACE690065E5D6 /* ApplicationVersionReader.swift in Sources */,
 				4BD18F01283F0BC500058124 /* BookmarksBarViewController.swift in Sources */,
