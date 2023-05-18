@@ -74,6 +74,11 @@ final class DefaultBrowserPreferences: ObservableObject {
     @Published private(set) var isDefault: Bool = false {
         didSet {
             // Temporary pixel for first time user import data
+#if DEBUG
+            if NSApp.isRunningUnitTests {
+                return
+            }
+#endif
             if isDefault {
                 let repetition = Pixel.Event.Repetition(key: Pixel.Event.setAsDefaultInitial.name)
                 if repetition == .initial {
