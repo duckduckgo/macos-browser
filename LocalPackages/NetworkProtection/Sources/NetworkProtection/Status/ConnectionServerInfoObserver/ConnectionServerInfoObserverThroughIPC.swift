@@ -18,9 +18,9 @@
 
 import Combine
 import Foundation
+import Common
 import NetworkExtension
 import NotificationCenter
-import os.log
 
 /// Observes the server info through Distributed Notifications and an IPC connection.
 ///
@@ -53,7 +53,6 @@ public class ConnectionServerInfoObserverThroughIPC: ConnectionServerInfoObserve
 
     func start() {
         observationTokens.append(distributedNotificationCenter.addObserver(for: .serverSelected, object: nil, queue: nil) { [weak self] notification in
-
             self?.handleServerSelected(notification)
         })
     }

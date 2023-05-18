@@ -8,7 +8,7 @@ This file contains the implementation of the app <-> provider IPC connection
 import Foundation
 import Network
 import NetworkExtension
-import os.log
+import Common
 
 /// App --> Provider IPC
 @objc protocol ProviderCommunication {

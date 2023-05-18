@@ -18,7 +18,7 @@
 //
 
 import Foundation
-import os.log
+import Common
 
 public final class IPCThroughCFMessagePort {
     public static let defaultMessagePort = AppGroupHelper.shared.appGroup

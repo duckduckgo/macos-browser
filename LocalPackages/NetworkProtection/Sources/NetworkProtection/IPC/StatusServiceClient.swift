@@ -18,7 +18,7 @@
 //
 
 import Foundation
-import os.log
+import Common
 
 enum StatusServiceQuery: String, Codable {
     case getTunnelStatus

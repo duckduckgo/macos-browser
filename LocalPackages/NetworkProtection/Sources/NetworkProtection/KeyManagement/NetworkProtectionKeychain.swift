@@ -3,7 +3,7 @@
 
 import Foundation
 import Security
-import OSLog
+import Common
 
 public final class NetworkProtectionKeychain {
 

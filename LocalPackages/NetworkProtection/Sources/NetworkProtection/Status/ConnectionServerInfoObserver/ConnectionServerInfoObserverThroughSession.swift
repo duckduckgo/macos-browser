@@ -20,7 +20,7 @@ import Combine
 import Foundation
 import NetworkExtension
 import NotificationCenter
-import os.log
+import Common
 
 /// This status observer can only be used from the App that owns the tunnel, as other Apps won't have access to the
 /// NEVPNStatusDidChange notifications or tunnel session.

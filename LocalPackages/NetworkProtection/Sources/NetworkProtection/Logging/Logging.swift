@@ -17,7 +17,7 @@
 //
 
 import Foundation
-import os
+import Common
 
 extension OSLog {
 

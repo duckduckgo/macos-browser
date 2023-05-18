@@ -22,7 +22,7 @@ import SwiftUI
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-class NetworkProtectionStatusViewModelTests: XCTestCase {
+final class NetworkProtectionStatusViewModelTests: XCTestCase {
 
     private class MockStatusReporter: NetworkProtectionStatusReporter {
         static let defaultServerInfo = NetworkProtectionStatusServerInfo(
@@ -40,7 +40,7 @@ class NetworkProtectionStatusViewModelTests: XCTestCase {
              serverInfo: NetworkProtectionStatusServerInfo = MockStatusReporter.defaultServerInfo,
              tunnelErrorMessage: String? = nil,
              controllerErrorMessage: String? = nil) {
-            
+
             statusChangePublisher = CurrentValueSubject<NetworkProtectionConnectionStatus, Never>(status)
             connectivityIssuesPublisher = CurrentValueSubject<Bool, Never>(isHavingConnectivityIssues)
             serverInfoPublisher = CurrentValueSubject<NetworkProtectionStatusServerInfo, Never>(serverInfo)
@@ -48,7 +48,7 @@ class NetworkProtectionStatusViewModelTests: XCTestCase {
             controllerErrorMessagePublisher = CurrentValueSubject<String?, Never>(controllerErrorMessage)
         }
     }
-    
+
     // MARK: - Testing Support
 
     /// Mock  class to aid in testing

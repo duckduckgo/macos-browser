@@ -21,7 +21,6 @@ import Foundation
 import Combine
 import SwiftUI
 import NetworkProtection
-import os.log
 
 /// Abstraction of the the Network Protection status bar menu with a simple interface.
 ///

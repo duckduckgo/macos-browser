@@ -18,7 +18,6 @@
 
 import Foundation
 import NetworkExtension
-import os.log
 
 func main() -> Never {
     autoreleasepool {

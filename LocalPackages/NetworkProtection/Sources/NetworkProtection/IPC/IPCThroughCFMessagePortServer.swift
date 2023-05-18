@@ -18,7 +18,7 @@
 //
 
 import Foundation
-import os.log
+import Common
 
 public protocol IPCThroughCFMessagePortServerDelegate: AnyObject {
     func handleMessage(_ data: Data) throws -> Data

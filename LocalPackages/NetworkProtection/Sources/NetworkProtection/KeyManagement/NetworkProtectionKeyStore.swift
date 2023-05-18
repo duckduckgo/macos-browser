@@ -19,7 +19,6 @@
 
 import Common
 import Foundation
-import os
 
 public protocol NetworkProtectionKeyStore {
 

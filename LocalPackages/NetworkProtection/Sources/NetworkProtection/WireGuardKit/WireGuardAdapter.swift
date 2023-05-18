@@ -5,7 +5,7 @@ import Foundation
 import NetworkExtension
 @_implementationOnly import WireGuardC
 import WireGuard
-import os
+import Common
 
 public enum WireGuardAdapterError: Error {
     /// Failure to locate tunnel file descriptor.

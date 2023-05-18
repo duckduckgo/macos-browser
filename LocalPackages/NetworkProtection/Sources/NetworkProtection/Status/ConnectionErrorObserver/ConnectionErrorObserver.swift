@@ -19,7 +19,6 @@
 import Combine
 import Foundation
 import NetworkExtension
-import os.log
 
 public protocol ConnectionErrorObserver {
     var publisher: CurrentValueSubject<String?, Never> { get }

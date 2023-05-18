@@ -19,7 +19,6 @@
 
 import Foundation
 import Common
-import os
 
 public enum NetworkProtectionServerSelectionMethod {
     case automatic

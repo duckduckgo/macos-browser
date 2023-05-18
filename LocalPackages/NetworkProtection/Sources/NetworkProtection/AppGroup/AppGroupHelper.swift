@@ -17,7 +17,6 @@
 //
 
 import Foundation
-import os.log
 
 /// Generic helper to retrieve access Network Protection App group resources.
 ///

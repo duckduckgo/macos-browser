@@ -349,7 +349,10 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         dryRun = false
 #endif
 
-        Pixel.setUp(dryRun: dryRun, appVersion: AppVersion.shared.versionNumber, defaultHeaders: defaultHeaders, log: .networkProtectionPixel) { (pixelName: String, headers: [String: String], parameters: [String: String], allowedQueryReservedCharacters: CharacterSet?, callBackOnMainThread: Bool, onComplete: @escaping (Error?) -> Void) in
+        Pixel.setUp(dryRun: dryRun,
+                    appVersion: AppVersion.shared.versionNumber,
+                    defaultHeaders: defaultHeaders,
+                    log: .networkProtectionPixel) { (pixelName: String, headers: [String: String], parameters: [String: String], _, _, onComplete: @escaping (Error?) -> Void) in
 
             let url = URL.pixelUrl(forPixelNamed: pixelName)
             let configuration = APIRequest.Configuration(url: url, method: .get, queryParameters: parameters, headers: headers)

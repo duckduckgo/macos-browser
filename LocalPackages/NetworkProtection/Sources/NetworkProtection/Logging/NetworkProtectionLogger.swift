@@ -17,7 +17,7 @@
 //
 
 import NetworkExtension
-import OSLog
+import Common
 
 public protocol NetworkProtectionLogger {
     func log(_ error: Error)

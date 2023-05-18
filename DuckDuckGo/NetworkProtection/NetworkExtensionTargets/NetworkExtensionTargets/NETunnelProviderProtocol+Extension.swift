@@ -3,7 +3,6 @@
 
 import NetworkExtension
 import NetworkProtection
-import os
 
 enum PacketTunnelProviderError: String, Error {
     case savedProtocolConfigurationIsInvalid

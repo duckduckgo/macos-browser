@@ -20,7 +20,7 @@ import AppKit
 import Combine
 import Foundation
 import NetworkExtension
-import os.log
+import Common
 
 /// Observes the server info through Distributed Notifications and an IPC connection.
 ///

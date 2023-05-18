@@ -21,7 +21,7 @@ import XCTest
 import SwiftUI
 @testable import DuckDuckGo_Privacy_Browser
 
-class NetworkProtectionStatusBarMenuTests: XCTestCase {
+final class NetworkProtectionStatusBarMenuTests: XCTestCase {
     func testProperInitialization() {
         let item = NSStatusItem()
         _ = NetworkProtectionStatusBarMenu(statusItem: item)

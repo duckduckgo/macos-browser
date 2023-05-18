@@ -21,7 +21,7 @@
 
 import Darwin
 import Foundation
-import os.log
+import Common
 import Network
 import QuartzCore
 

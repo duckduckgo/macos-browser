@@ -20,7 +20,7 @@ import Combine
 import Foundation
 import NetworkExtension
 import NotificationCenter
-import os.log
+import Common
 
 /// Observes the tunnel status through Distributed Notifications and an IPC connection.
 ///
@@ -70,7 +70,7 @@ public class ConnectionStatusObserverThroughIPC: ConnectionStatusObserver {
             self?.handleDidWake(notification)
         })
 
-        // swiftlint:disable unused_capture_list
+        // swiftlint:disable:next unused_capture_list
         monitor.pathUpdateHandler = { [weak self] _ in
             guard let self else {
                 return

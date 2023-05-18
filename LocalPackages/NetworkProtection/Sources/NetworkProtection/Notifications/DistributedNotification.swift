@@ -17,7 +17,7 @@
 //
 
 import Foundation
-import os.log
+import Common
 
 extension DistributedNotificationCenter.CenterType {
     public static let networkProtection = DistributedNotificationCenter.CenterType("com.duckduckgo.DistributedNotificationCenter.CenterType.networkProtection")

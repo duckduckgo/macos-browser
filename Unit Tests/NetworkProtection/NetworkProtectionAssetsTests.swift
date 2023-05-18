@@ -20,7 +20,7 @@ import Foundation
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-class NetworkProtectionAssetsTests: XCTestCase {
+final class NetworkProtectionAssetsTests: XCTestCase {
     func testAssetEnumValuesAreUnchanged() {
         XCTAssertEqual(NetworkProtectionAsset.ipAddressIcon.rawValue, "IP-16")
         XCTAssertEqual(NetworkProtectionAsset.serverLocationIcon.rawValue, "Server-Location-16")

@@ -18,7 +18,6 @@
 //
 
 import Foundation
-import os.log
 
 public class DefaultStatusServiceServer {
     private let ipcServer: IPCThroughCFMessagePort.Server

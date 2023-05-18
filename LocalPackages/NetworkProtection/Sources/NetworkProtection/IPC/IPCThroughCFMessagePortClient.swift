@@ -18,7 +18,7 @@
 //
 
 import Foundation
-import os.log
+
 extension IPCThroughCFMessagePort {
 
     public enum SendError: Error {

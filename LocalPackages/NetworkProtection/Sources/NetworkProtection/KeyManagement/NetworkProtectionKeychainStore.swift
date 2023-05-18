@@ -18,7 +18,7 @@
 //
 
 import Foundation
-import os
+import Common
 
 enum NetworkProtectionKeychainStoreError: Error, NetworkProtectionErrorConvertible {
     case failedToCastKeychainValueToData(field: String)

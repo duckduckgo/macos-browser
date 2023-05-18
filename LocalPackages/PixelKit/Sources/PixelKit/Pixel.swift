@@ -17,7 +17,7 @@
 //
 
 import Foundation
-import os.log
+import os.log // swiftlint:disable:this enforce_os_log_wrapper
 
 public protocol PixelEvent {
     var name: String { get }

@@ -19,7 +19,7 @@
 import AppKit
 import Combine
 import NetworkExtension
-import os.log
+import Common
 
 /// Classes that implement this protocol are in charge of relaying status changes.
 ///
@@ -112,7 +112,7 @@ public final class DefaultNetworkProtectionStatusReporter: NetworkProtectionStat
             self?.handleControllerErrorStatusChanged(notification)
         })
 
-        // swiftlint:disable unused_capture_list
+        // swiftlint:disable:next unused_capture_list
         observationTokens.append(distributedNotificationCenter.addObserver(for: .issuesStarted, object: nil, queue: nil) { [weak self] _ in
 
             guard let self else { return }
@@ -121,9 +121,8 @@ public final class DefaultNetworkProtectionStatusReporter: NetworkProtectionStat
             connectivityIssuesPublisher.send(true)
         })
 
-        // swiftlint:disable unused_capture_list
+        // swiftlint:disable:next unused_capture_list
         observationTokens.append(distributedNotificationCenter.addObserver(for: .issuesResolved, object: nil, queue: nil) { [weak self] _ in
-
             guard let self else { return }
 
             logIssuesChanged(isHavingIssues: false)
