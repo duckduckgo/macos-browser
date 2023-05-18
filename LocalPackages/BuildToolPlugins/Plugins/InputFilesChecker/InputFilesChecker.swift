@@ -41,8 +41,7 @@ let extraInputFiles: [TargetName: Set<InputFile>] = [
         .init("_WKDownload+WebKitDownload.swift", .source),
         .init("SystemExtensionManager.swift", .source),
         .init("DuckDuckGoAgent.app", .unknown),
-        .init("DuckDuckGoNotifications.app", .unknown),
-        .init("com.duckduckgo.macos.browser.network-protection-extension.systemextension", .unknown)
+        .init("DuckDuckGoNotifications.app", .unknown)
     ],
 
     "DuckDuckGo Privacy Browser App Store": [

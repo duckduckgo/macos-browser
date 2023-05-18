@@ -1309,7 +1309,6 @@
 		4BBF09232830812900EE1418 /* FileSystemDSL.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BBF09222830812900EE1418 /* FileSystemDSL.swift */; };
 		4BBF0925283083EC00EE1418 /* FileSystemDSLTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BBF0924283083EC00EE1418 /* FileSystemDSLTests.swift */; };
 		4BC2621D293996410087A482 /* PixelEventTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BC2621C293996410087A482 /* PixelEventTests.swift */; };
-		4BCF63792A158C760050AAD5 /* com.duckduckgo.macos.browser.debug.network-protection-extension.systemextension in Embed System Extensions */ = {isa = PBXBuildFile; fileRef = 4B25375A2A11BE7300610219 /* com.duckduckgo.macos.browser.debug.network-protection-extension.systemextension */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		4BD18F01283F0BC500058124 /* BookmarksBarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BD18EFF283F0BC500058124 /* BookmarksBarViewController.swift */; };
 		4BD18F05283F151F00058124 /* BookmarksBar.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4BD18F04283F151F00058124 /* BookmarksBar.storyboard */; };
 		4BDFA4AE27BF19E500648192 /* ToggleableScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BDFA4AD27BF19E500648192 /* ToggleableScrollView.swift */; };
@@ -2045,17 +2044,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		4B25376B2A11BE7700610219 /* Embed System Extensions */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "$(SYSTEM_EXTENSIONS_FOLDER_PATH)";
-			dstSubfolderSpec = 16;
-			files = (
-				4BCF63792A158C760050AAD5 /* com.duckduckgo.macos.browser.debug.network-protection-extension.systemextension in Embed System Extensions */,
-			);
-			name = "Embed System Extensions";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		4B2D065D2A11D2AE00DE1F49 /* Embed Login Items */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -6728,10 +6716,10 @@
 				AA8EDF2824925E940071C2E8 /* Swift Lint */,
 				AA585D7B248FD31100E9A3E2 /* Frameworks */,
 				AA585D7C248FD31100E9A3E2 /* Resources */,
-				4B25376B2A11BE7700610219 /* Embed System Extensions */,
 				4B2D065D2A11D2AE00DE1F49 /* Embed Login Items */,
 				4B5F14F32A14823D0060320F /* Embed NetP Controller Apps */,
 				4B5F14F62A14825A0060320F /* Replace VPN Controllers with Symlinks */,
+				7B6469992A165AE00095095A /* Embed System Network Extension */,
 			);
 			buildRules = (
 			);
@@ -7289,6 +7277,24 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "echo \"Replace and Sign\" # for easier build log search\n\n# startVPN\n\npushd \"${CONFIGURATION_BUILD_DIR}/DuckDuckGo App Store.app/Contents/Resources/startVPN.app/Contents/MacOS\"\nrm ./startVPN\nln -s \"../../../../MacOS/DuckDuckGo App Store\" ./startVPN \npopd\n\n# stopVPN\n\npushd \"${CONFIGURATION_BUILD_DIR}/DuckDuckGo App Store.app/Contents/Resources/stopVPN.app/Contents/MacOS\"\nrm ./stopVPN\nln -s \"../../../../MacOS/DuckDuckGo App Store\" ./stopVPN\npopd\n\n";
+		};
+		7B6469992A165AE00095095A /* Embed System Network Extension */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Embed System Network Extension";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "echo \"ditto ${BUILT_PRODUCTS_DIR}/${SYSEX_BUNDLE_ID} $BUILT_PRODUCTS_DIR/${CONTENTS_FOLDER_PATH}/Library/SystemExtensions/${SYSEX_BUNDLE_ID}\"\n\nditto \"${BUILT_PRODUCTS_DIR}/${SYSEX_BUNDLE_ID}\" \"$BUILT_PRODUCTS_DIR/${CONTENTS_FOLDER_PATH}/Library/SystemExtensions/${SYSEX_BUNDLE_ID}\"\n";
 		};
 		AA8EDF2824925E940071C2E8 /* Swift Lint */ = {
 			isa = PBXShellScriptBuildPhase;
