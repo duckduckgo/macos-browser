@@ -118,7 +118,6 @@ extension Pixel {
         case setAsDefaultInitial
         case importDataInitial
 
-
         enum Debug {
 
             case assertionFailure(message: String, file: StaticString, line: UInt)
