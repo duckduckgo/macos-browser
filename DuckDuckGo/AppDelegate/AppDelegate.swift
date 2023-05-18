@@ -28,6 +28,7 @@ import DDGSync
 import ServiceManagement
 import NetworkProtection
 
+@MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDelegate {
 
 #if DEBUG
