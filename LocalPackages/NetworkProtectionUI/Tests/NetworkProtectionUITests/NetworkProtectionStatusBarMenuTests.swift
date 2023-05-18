@@ -19,36 +19,13 @@
 import Foundation
 import XCTest
 import SwiftUI
-@testable import DuckDuckGo_Privacy_Browser
+@testable import NetworkProtectionUI
 
-final class NetworkProtectionStatusBarMenuTests: XCTestCase {
-    func testProperInitialization() {
-        let item = NSStatusItem()
-        _ = NetworkProtectionStatusBarMenu(statusItem: item)
-
-        guard let nsMenu = item.menu else {
-            XCTFail("Expected an NSMenu to exist")
-            return
-        }
-
-        XCTAssertEqual(nsMenu.items.count, 1)
-
-        guard let menuItem = nsMenu.items.first else {
-            XCTFail("Expected an NSMenuItem to exist")
-            return
-        }
-
-        guard let statusView = menuItem.view else {
-            XCTFail("Expected the NSMenuItem's view to be set")
-            return
-        }
-
-        XCTAssertEqual(statusView.className, NSHostingView<NetworkProtectionStatusView>.className())
-    }
+final class StatusBarMenuTests: XCTestCase {
 
     func testShowStatusBarMenu() {
         let item = NSStatusItem()
-        let menu = NetworkProtectionStatusBarMenu(statusItem: item)
+        let menu = StatusBarMenu(statusItem: item)
 
         menu.show()
 
@@ -57,7 +34,7 @@ final class NetworkProtectionStatusBarMenuTests: XCTestCase {
 
     func testHideStatusBarMenu() {
         let item = NSStatusItem()
-        let menu = NetworkProtectionStatusBarMenu(statusItem: item)
+        let menu = StatusBarMenu(statusItem: item)
 
         menu.hide()
 

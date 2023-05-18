@@ -20,7 +20,8 @@ import Foundation
 import Combine
 import SwiftUI
 import XCTest
-@testable import DuckDuckGo_Privacy_Browser
+import NetworkProtection
+@testable import NetworkProtectionUI
 
 final class NetworkProtectionStatusViewModelTests: XCTestCase {
 
@@ -29,23 +30,27 @@ final class NetworkProtectionStatusViewModelTests: XCTestCase {
             serverLocation: "New York, USA",
             serverAddress: "127.0.0.1")
 
-        var statusChangePublisher: CurrentValueSubject<NetworkProtectionConnectionStatus, Never>
+        var statusPublisher: CurrentValueSubject<ConnectionStatus, Never>
         var connectivityIssuesPublisher: CurrentValueSubject<Bool, Never>
         var serverInfoPublisher: CurrentValueSubject<NetworkProtectionStatusServerInfo, Never>
-        var tunnelErrorMessagePublisher: CurrentValueSubject<String?, Never>
+        var connectionErrorPublisher: CurrentValueSubject<String?, Never>
         var controllerErrorMessagePublisher: CurrentValueSubject<String?, Never>
 
-        init(status: NetworkProtectionConnectionStatus,
+        init(status: ConnectionStatus,
              isHavingConnectivityIssues: Bool = false,
              serverInfo: NetworkProtectionStatusServerInfo = MockStatusReporter.defaultServerInfo,
              tunnelErrorMessage: String? = nil,
              controllerErrorMessage: String? = nil) {
 
-            statusChangePublisher = CurrentValueSubject<NetworkProtectionConnectionStatus, Never>(status)
+            statusPublisher = CurrentValueSubject<ConnectionStatus, Never>(status)
             connectivityIssuesPublisher = CurrentValueSubject<Bool, Never>(isHavingConnectivityIssues)
             serverInfoPublisher = CurrentValueSubject<NetworkProtectionStatusServerInfo, Never>(serverInfo)
-            tunnelErrorMessagePublisher = CurrentValueSubject<String?, Never>(tunnelErrorMessage)
+            connectionErrorPublisher = CurrentValueSubject<String?, Never>(tunnelErrorMessage)
             controllerErrorMessagePublisher = CurrentValueSubject<String?, Never>(controllerErrorMessage)
+        }
+
+        func forceRefresh() {
+            // Intentional no-op
         }
     }
 
@@ -53,7 +58,7 @@ final class NetworkProtectionStatusViewModelTests: XCTestCase {
 
     /// Mock  class to aid in testing
     ///
-    private class MockNetworkProtection: NetworkProtectionProvider {
+    private class MockTunnelController: TunnelController {
         private var connected: Bool = false
 
         var startCallback: (() -> Void)?
@@ -77,15 +82,16 @@ final class NetworkProtectionStatusViewModelTests: XCTestCase {
     /// We expect that the model will be initialized correctly (with status .uknown by default).
     ///
     func testProperInitialization() async throws {
-        let networkProtection = MockNetworkProtection()
+        let controller = MockTunnelController()
         let statusReporter = MockStatusReporter(status: .unknown)
         let model = NetworkProtectionStatusView.Model(
-            networkProtection: networkProtection,
-            networkProtectionStatusReporter: statusReporter)
+            controller: controller,
+            statusReporter: statusReporter,
+            menuItems: [])
 
         let isRunning = await model.isRunning.wrappedValue
         XCTAssertFalse(isRunning)
-        XCTAssertEqual(model.connectionStatusDescription, UserText.networkProtectionStatusUnknown)
+        XCTAssertEqual(model.connectionStatusDescription, UserText.networkProtectionStatusDisconnected)
         XCTAssertEqual(model.timeLapsed, UserText.networkProtectionStatusViewTimerZero)
         XCTAssertEqual(model.featureStatusDescription, UserText.networkProtectionStatusViewFeatureOff)
         XCTAssertFalse(model.showServerDetails)
@@ -94,11 +100,12 @@ final class NetworkProtectionStatusViewModelTests: XCTestCase {
     /// We expect the model to properly reflect the disconnected status.
     ///
     func testProperlyReflectsStatusDisconnected() async throws {
-        let networkProtection = MockNetworkProtection()
+        let controller = MockTunnelController()
         let statusReporter = MockStatusReporter(status: .disconnected)
         let model = NetworkProtectionStatusView.Model(
-            networkProtection: networkProtection,
-            networkProtectionStatusReporter: statusReporter)
+            controller: controller,
+            statusReporter: statusReporter,
+            menuItems: [])
 
         let isRunning = await model.isRunning.wrappedValue
         XCTAssertFalse(isRunning)
@@ -111,11 +118,12 @@ final class NetworkProtectionStatusViewModelTests: XCTestCase {
     /// We expect the model to properly reflect the disconnecting status.
     ///
     func testProperlyReflectsStatusDisconnecting() async throws {
-        let networkProtection = MockNetworkProtection()
+        let controller = MockTunnelController()
         let statusReporter = MockStatusReporter(status: .disconnecting)
         let model = NetworkProtectionStatusView.Model(
-            networkProtection: networkProtection,
-            networkProtectionStatusReporter: statusReporter)
+            controller: controller,
+            statusReporter: statusReporter,
+            menuItems: [])
 
         XCTAssertEqual(model.connectionStatusDescription, UserText.networkProtectionStatusDisconnecting)
         XCTAssertEqual(model.timeLapsed, UserText.networkProtectionStatusViewTimerZero)
@@ -133,14 +141,15 @@ final class NetworkProtectionStatusViewModelTests: XCTestCase {
         let mockDate = Date().addingTimeInterval(-59)
         let mockDateString = "00:00:59"
 
-        let networkProtection = MockNetworkProtection()
+        let controller = MockTunnelController()
         let serverInfo = NetworkProtectionStatusServerInfo(
             serverLocation: mockServerLocation,
             serverAddress: mockServerIP)
         let statusReporter = MockStatusReporter(status: .connected(connectedDate: mockDate), serverInfo: serverInfo)
         let model = NetworkProtectionStatusView.Model(
-            networkProtection: networkProtection,
-            networkProtectionStatusReporter: statusReporter)
+            controller: controller,
+            statusReporter: statusReporter,
+            menuItems: [])
 
         let isRunning = await model.isRunning.wrappedValue
         XCTAssertTrue(isRunning)
@@ -155,11 +164,10 @@ final class NetworkProtectionStatusViewModelTests: XCTestCase {
     /// We expect the model to properly reflect the connecting status.
     ///
     func testProperlyReflectsStatusConnecting() async throws {
-        let networkProtection = MockNetworkProtection()
+        let controller = MockTunnelController()
         let statusReporter = MockStatusReporter(status: .connecting)
         let model = NetworkProtectionStatusView.Model(
-            networkProtection: networkProtection,
-            networkProtectionStatusReporter: statusReporter)
+            controller: controller, statusReporter: statusReporter, menuItems: [])
 
         XCTAssertEqual(model.connectionStatusDescription, UserText.networkProtectionStatusConnecting)
         XCTAssertEqual(model.timeLapsed, UserText.networkProtectionStatusViewTimerZero)
@@ -170,12 +178,13 @@ final class NetworkProtectionStatusViewModelTests: XCTestCase {
     /// We expect that setting the model's `isRunning` to `true`, will start network protection.
     ///
     func testStartsNetworkProtection() async throws {
-        let networkProtection = MockNetworkProtection()
+        let controller = MockTunnelController()
+        let statusReporter = MockStatusReporter(status: .disconnected)
         let model = NetworkProtectionStatusView.Model(
-            networkProtection: networkProtection)
+            controller: controller, statusReporter: statusReporter, menuItems: [])
         let networkProtectionWasStarted = expectation(description: "The model started network protection when appropriate")
 
-        networkProtection.startCallback = {
+        controller.startCallback = {
             networkProtectionWasStarted.fulfill()
         }
 
@@ -183,8 +192,7 @@ final class NetworkProtectionStatusViewModelTests: XCTestCase {
             model.isRunning.wrappedValue = true
         }
 
-        let waiter = XCTWaiter()
-        waiter.wait(for: [networkProtectionWasStarted], timeout: 0.1)
+        await fulfillment(of: [networkProtectionWasStarted], timeout: 0.1)
     }
 
     /// We expect that setting the model's `isRunning` to `false`, will stop network protection.
@@ -194,20 +202,16 @@ final class NetworkProtectionStatusViewModelTests: XCTestCase {
         let mockServerLocation = "Los Angeles, United States"
         let mockServerIP = "127.0.0.1"
 
-        let networkProtection = MockNetworkProtection()
-        let serverInfo = NetworkProtectionStatusServerInfo(
-            serverLocation: mockServerLocation,
-            serverAddress: mockServerIP)
+        let controller = MockTunnelController()
+        let serverInfo = NetworkProtectionStatusServerInfo(serverLocation: mockServerLocation, serverAddress: mockServerIP)
         let statusReporter = MockStatusReporter(
             status: .connected(connectedDate: mockDate),
             serverInfo: serverInfo)
-        let model = NetworkProtectionStatusView.Model(
-            networkProtection: networkProtection,
-            networkProtectionStatusReporter: statusReporter)
+        let model = NetworkProtectionStatusView.Model(controller: controller, statusReporter: statusReporter, menuItems: [])
 
         let networkProtectionWasStopped = expectation(description: "The model stopped network protection when appropriate")
 
-        networkProtection.stopCallback = {
+        controller.stopCallback = {
             networkProtectionWasStopped.fulfill()
         }
 
@@ -215,9 +219,6 @@ final class NetworkProtectionStatusViewModelTests: XCTestCase {
             model.isRunning.wrappedValue = false
         }
 
-        // await waitForExpectations(timeout:) doesn't work very well with publishers
-        // I found that using a waiter works well as an alternative
-        let waiter = XCTWaiter()
-        waiter.wait(for: [networkProtectionWasStopped], timeout: 0.1)
+        await fulfillment(of: [networkProtectionWasStopped], timeout: 0.1)
     }
 }

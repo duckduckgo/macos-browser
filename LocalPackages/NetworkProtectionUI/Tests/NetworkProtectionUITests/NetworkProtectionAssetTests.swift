@@ -18,15 +18,20 @@
 
 import Foundation
 import XCTest
-@testable import DuckDuckGo_Privacy_Browser
+@testable import NetworkProtectionUI
 
-final class NetworkProtectionAssetsTests: XCTestCase {
+final class NetworkProtectionAssetTests: XCTestCase {
     func testAssetEnumValuesAreUnchanged() {
         XCTAssertEqual(NetworkProtectionAsset.ipAddressIcon.rawValue, "IP-16")
         XCTAssertEqual(NetworkProtectionAsset.serverLocationIcon.rawValue, "Server-Location-16")
         XCTAssertEqual(NetworkProtectionAsset.vpnDisabledImage.rawValue, "VPN-Disabled-128")
         XCTAssertEqual(NetworkProtectionAsset.vpnEnabledImage.rawValue, "VPN-128")
         XCTAssertEqual(NetworkProtectionAsset.vpnIcon.rawValue, "VPN-16")
-        XCTAssertEqual(NetworkProtectionAsset.vpnIssueIcon.rawValue, "VPN-Issue-16")
+        XCTAssertEqual(NetworkProtectionAsset.appVPNOnIcon.rawValue, "app-vpn-on")
+        XCTAssertEqual(NetworkProtectionAsset.appVPNOffIcon.rawValue, "app-vpn-off")
+        XCTAssertEqual(NetworkProtectionAsset.appVPNIssueIcon.rawValue, "app-vpn-issue")
+        XCTAssertEqual(NetworkProtectionAsset.statusbarVPNOnIcon.rawValue, "statusbar-vpn-on")
+        XCTAssertEqual(NetworkProtectionAsset.statusbarVPNOffIcon.rawValue, "statusbar-vpn-off")
+        XCTAssertEqual(NetworkProtectionAsset.statusbarVPNIssueIcon.rawValue, "statusbar-vpn-issue")
     }
 }
