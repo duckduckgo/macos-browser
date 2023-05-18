@@ -1062,7 +1062,7 @@
 		4B2D06582A11D19B00DE1F49 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4B2D06522A11D19B00DE1F49 /* Assets.xcassets */; };
 		4B2D065A2A11D19B00DE1F49 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B2D06552A11D19B00DE1F49 /* main.swift */; };
 		4B2D065B2A11D1FF00DE1F49 /* Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4BEC322A11B509001D9AC5 /* Logging.swift */; };
-		4B2D065E2A11D2D700DE1F49 /* DuckDuckGoNotifications.app in Embed Login Items */ = {isa = PBXBuildFile; fileRef = 4B4BEC202A11B4E2001D9AC5 /* DuckDuckGoNotifications.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		4B2D065E2A11D2D700DE1F49 /* DuckDuckGo Notifications.app in Embed Login Items */ = {isa = PBXBuildFile; fileRef = 4B4BEC202A11B4E2001D9AC5 /* DuckDuckGo Notifications.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		4B2D065F2A11D2D700DE1F49 /* DuckDuckGoAgent.app in Embed Login Items */ = {isa = PBXBuildFile; fileRef = 4B2D06392A11CFBB00DE1F49 /* DuckDuckGoAgent.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		4B2D06602A12EEDA00DE1F49 /* NetworkProtectionAppExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 4B4D603D2A0B290200BCD287 /* NetworkProtectionAppExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		4B2D067A2A1333EF00DE1F49 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B2D06512A11D19B00DE1F49 /* AppDelegate.swift */; };
@@ -2045,7 +2045,7 @@
 			dstSubfolderSpec = 1;
 			files = (
 				4B2D065F2A11D2D700DE1F49 /* DuckDuckGoAgent.app in Embed Login Items */,
-				4B2D065E2A11D2D700DE1F49 /* DuckDuckGoNotifications.app in Embed Login Items */,
+				4B2D065E2A11D2D700DE1F49 /* DuckDuckGo Notifications.app in Embed Login Items */,
 			);
 			name = "Embed Login Items";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2342,7 +2342,7 @@
 		4B43469428655D1400177407 /* FirefoxDataImporterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirefoxDataImporterTests.swift; sourceTree = "<group>"; };
 		4B4BEC182A11B3EA001D9AC5 /* DuckDuckGoNetPNotifications.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = DuckDuckGoNetPNotifications.xcconfig; sourceTree = "<group>"; };
 		4B4BEC1B2A11B459001D9AC5 /* NetPOverrides.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = NetPOverrides.xcconfig; sourceTree = "<group>"; };
-		4B4BEC202A11B4E2001D9AC5 /* DuckDuckGoNotifications.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DuckDuckGoNotifications.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4B4BEC202A11B4E2001D9AC5 /* DuckDuckGo Notifications.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "DuckDuckGo Notifications.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B4BEC322A11B509001D9AC5 /* Logging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logging.swift; sourceTree = "<group>"; };
 		4B4BEC332A11B509001D9AC5 /* DuckDuckGoNotifications.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = DuckDuckGoNotifications.entitlements; sourceTree = "<group>"; };
 		4B4BEC342A11B509001D9AC5 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -4950,7 +4950,7 @@
 				3706FEB2293F662100E42796 /* Integration Tests App Store.xctest */,
 				B6EC37E829B5DA2A001ACE79 /* tests-server */,
 				4B4D603D2A0B290200BCD287 /* NetworkProtectionAppExtension.appex */,
-				4B4BEC202A11B4E2001D9AC5 /* DuckDuckGoNotifications.app */,
+				4B4BEC202A11B4E2001D9AC5 /* DuckDuckGo Notifications.app */,
 				4B25375A2A11BE7300610219 /* com.duckduckgo.macos.browser.debug.network-protection-extension.systemextension */,
 				4B2D06392A11CFBB00DE1F49 /* DuckDuckGoAgent.app */,
 				4B2D06692A13318400DE1F49 /* DuckDuckGoAgentAppStore.app */,
@@ -6618,7 +6618,7 @@
 				4B4BEC462A11B600001D9AC5 /* NetworkProtection */,
 			);
 			productName = DuckDuckGoNotifications;
-			productReference = 4B4BEC202A11B4E2001D9AC5 /* DuckDuckGoNotifications.app */;
+			productReference = 4B4BEC202A11B4E2001D9AC5 /* DuckDuckGo Notifications.app */;
 			productType = "com.apple.product-type.application";
 		};
 		4B4D603C2A0B290200BCD287 /* NetworkProtectionAppExtension */ = {

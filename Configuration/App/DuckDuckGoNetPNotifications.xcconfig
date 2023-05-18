@@ -42,7 +42,7 @@ CODE_SIGN_IDENTITY[sdk=macosx*] = Developer ID Application
 CODE_SIGN_IDENTITY[config=Debug][sdk=macosx*] = Apple Development
 CODE_SIGN_IDENTITY[config=CI][sdk=macosx*] =
 
-PRODUCT_NAME_PREFIX = DuckDuckGoNotifications
+PRODUCT_NAME_PREFIX = DuckDuckGo Notifications
 
 PROVISIONING_PROFILE_SPECIFIER[config=Release][sdk=macosx*] = Mac Browser NetP Developer ID Not. (Distribution)
 
