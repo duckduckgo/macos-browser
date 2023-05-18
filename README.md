@@ -21,7 +21,7 @@ We use Swift Package Manager for dependency management, which shouldn't require 
 ### SwiftLint
 We use [SwifLint](https://github.com/realm/SwiftLint) for enforcing Swift style and conventions, so you'll need to [install it](https://github.com/realm/SwiftLint#installation).
 
-### Duck player
+### Duck Player
 
 To build the JS for Duck Player:
 
