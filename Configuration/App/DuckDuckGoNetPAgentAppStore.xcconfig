@@ -14,8 +14,8 @@
 //
 
 #include "AppTargetsBase.xcconfig"
+#include "../AppStore.xcconfig"
 #include "../NetPOverrides.xcconfig"
-#include "../NetPIDsAppStore.xcconfig"
 
 BUNDLE_IDENTIFIER_PREFIX = HKE973VLUW.com.duckduckgo.macos.browser.network-protection.agent
 

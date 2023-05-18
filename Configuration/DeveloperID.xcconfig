@@ -13,10 +13,24 @@
 //  limitations under the License.
 //
 
-// Since NetP has many interactions across targets, it's convenient to make the
-// bundle IDs accessible across those targets.
 
-#include "Common.xcconfig"
+SYSEX_BUNDLE_ID_BASE[sdk=*] = com.duckduckgo.macos.browser.network-protection-extension
+SYSEX_BUNDLE_ID_BASE[config=CI][sdk=*] =
+SYSEX_BUNDLE_ID_BASE[config=Review][sdk=*] = com.duckduckgo.macos.browser.review.network-protection-extension
+SYSEX_BUNDLE_ID_BASE[config=Debug][sdk=*] = com.duckduckgo.macos.browser.debug.network-protection-extension
+SYSEX_BUNDLE_ID_BASE[config=Release][sdk=*] = com.duckduckgo.macos.browser.network-protection-extension
+
+NETP_BASE_APP_GROUP = $(DEVELOPMENT_TEAM).com.duckduckgo.macos.browser.network-protection.system-extension
+NETP_APP_GROUP[config=CI][sdk=*] = $(NETP_BASE_APP_GROUP).debug
+NETP_APP_GROUP[config=Review][sdk=*] = $(NETP_BASE_APP_GROUP).review
+NETP_APP_GROUP[config=Debug][sdk=*] = $(NETP_BASE_APP_GROUP).debug
+NETP_APP_GROUP[config=Release][sdk=*] = $(NETP_BASE_APP_GROUP)
+
+SYSEX_MACH_SERVICE_NAME[sdk=*] = $(NETP_APP_GROUP).ipc
+SYSEX_MACH_SERVICE_NAME[config=CI][sdk=*] = $(NETP_APP_GROUP).ipc
+SYSEX_MACH_SERVICE_NAME[config=Review][sdk=*] = $(NETP_APP_GROUP).ipc
+SYSEX_MACH_SERVICE_NAME[config=Debug][sdk=*] = $(NETP_APP_GROUP).ipc
+SYSEX_MACH_SERVICE_NAME[config=Release][sdk=*] = $(NETP_APP_GROUP).ipc
 
 NOTIFICATIONS_AGENT_BUNDLE_ID[sdk=*] = $(DEVELOPMENT_TEAM).com.duckduckgo.macos.browser.network-protection.notifications
 NOTIFICATIONS_AGENT_BUNDLE_ID[config=Debug][sdk=*] = $(DEVELOPMENT_TEAM).com.duckduckgo.macos.browser.network-protection.notifications.debug
@@ -28,8 +42,3 @@ AGENT_BUNDLE_ID[config=Debug][sdk=*] = $(DEVELOPMENT_TEAM).com.duckduckgo.macos.
 AGENT_BUNDLE_ID[config=CI][sdk=*] = $(DEVELOPMENT_TEAM).com.duckduckgo.macos.browser.network-protection.system-extension.agent.debug
 AGENT_BUNDLE_ID[config=Review][sdk=*] = $(DEVELOPMENT_TEAM).com.duckduckgo.macos.browser.network-protection.system-extension.agent.review
 
-NETP_BASE_APP_GROUP = $(DEVELOPMENT_TEAM).com.duckduckgo.macos.browser.network-protection.system-extension
-NETP_APP_GROUP[config=CI][sdk=macos*] = $(NETP_BASE_APP_GROUP).debug
-NETP_APP_GROUP[config=Review][sdk=macos*] = $(NETP_BASE_APP_GROUP).review
-NETP_APP_GROUP[config=Debug][sdk=macos*] = $(NETP_BASE_APP_GROUP).debug
-NETP_APP_GROUP[config=Release][sdk=macos*] = $(NETP_BASE_APP_GROUP)

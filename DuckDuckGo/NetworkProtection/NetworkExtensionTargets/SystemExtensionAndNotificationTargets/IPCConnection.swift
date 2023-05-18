@@ -64,9 +64,8 @@ final class IPCConnection: NSObject {
     // MARK: - Methods
 
     func startListener() {
-        os_log("Starting IPC listener", log: log, type: .debug, Self.className())
-
         let machServiceName = NetworkProtectionExtensionMachService.serviceName()
+        os_log("Starting IPC listener: %{public}@", log: log, type: .debug, machServiceName)
 
         let newListener = NSXPCListener(machServiceName: machServiceName)
         newListener.delegate = self

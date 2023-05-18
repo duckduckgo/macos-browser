@@ -14,7 +14,7 @@
 //
 
 #include "AppTargetsBase.xcconfig"
-#include "../NetPIDs.xcconfig"
+#include "../DeveloperID.xcconfig"
 #include "../NetPOverrides.xcconfig"
 
 BUNDLE_IDENTIFIER_PREFIX = $(NOTIFICATIONS_AGENT_BUNDLE_ID)
