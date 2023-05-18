@@ -259,7 +259,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
         updateNetworkProtectionIfVersionChanged()
         refreshNetworkProtectionServers()
-        warnUserAboutApplicationPathForNetworkProtection()
     }
 
     private func updateNetworkProtectionIfVersionChanged() {
@@ -331,23 +330,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
             os_log("Successfully updated Network Protection servers; total server count = %{public}d", log: .networkProtection, serverCount)
         }
-    }
-
-    /// Warns the user if they're trying to run a NetP build outside of /Applications, but only if it's not a debug build.
-    private func warnUserAboutApplicationPathForNetworkProtection() {
-        #if NETP_SYSTEM_EXTENSION && !DEBUG
-        let bundlePath = Bundle.main.bundlePath
-
-        if !bundlePath.hasPrefix("/Applications/DuckDuckGo") {
-            guard let window = WindowsManager.windows.first(where: { $0 is MainWindow }) else {
-                assertionFailure("No window")
-                return
-            }
-
-            let alert = NSAlert.networkProtectionBuildLocationWarning()
-            alert.beginSheetModal(for: window)
-        }
-        #endif
     }
 
     private func subscribeToEmailProtectionStatusNotifications() {
