@@ -6,8 +6,6 @@ disabled_rules:
   - unused_setter_value
   - line_length
   - type_name
-  - todo # Temporarily disabled for NetP work
-  - file_header # Temporarily disabled for NetP work
   - implicit_getter
   - function_parameter_count
 

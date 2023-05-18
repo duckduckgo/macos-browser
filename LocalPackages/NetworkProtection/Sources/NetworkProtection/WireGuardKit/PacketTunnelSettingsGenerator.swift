@@ -138,7 +138,7 @@ final class PacketTunnelSettingsGenerator {
                 /* Big fat ugly hack for broken iOS networking stack: the smallest prefix that will have
                  * any effect on iOS is a /120, so we clamp everything above to /120. This is potentially
                  * very bad, if various network parameters were actually relying on that subnet being
-                 * intentionally small. TODO: talk about this with upstream iOS devs.
+                 * intentionally small.
                  */
                 ipv6Routes.append(NEIPv6Route(destinationAddress: "\(addressRange.address)", networkPrefixLength: NSNumber(value: min(120, addressRange.networkPrefixLength))))
             }

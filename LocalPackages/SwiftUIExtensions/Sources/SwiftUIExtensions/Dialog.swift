@@ -18,20 +18,19 @@
 
 import SwiftUI
 
-// TODO: Move this to SwiftUIExtensions on merging to main repo
-struct Dialog<Content, Buttons>: View where Content: View, Buttons: View {
+public struct Dialog<Content, Buttons>: View where Content: View, Buttons: View {
 
-    let spacing: CGFloat
+    public let spacing: CGFloat
     @ViewBuilder let content: () -> Content
     @ViewBuilder let buttons: () -> Buttons
 
-    init(spacing: CGFloat = 16.0, @ViewBuilder content: @escaping () -> Content, @ViewBuilder buttons: @escaping () -> Buttons) {
+    public init(spacing: CGFloat = 16.0, @ViewBuilder content: @escaping () -> Content, @ViewBuilder buttons: @escaping () -> Buttons) {
         self.spacing = spacing
         self.content = content
         self.buttons = buttons
     }
 
-    var body: some View {
+    public var body: some View {
         VStack(spacing: 0) {
             content()
                 .padding(.horizontal, 20.0)
@@ -51,4 +50,5 @@ struct Dialog<Content, Buttons>: View where Content: View, Buttons: View {
         .padding(.top, spacing)
         .padding(.bottom, 16.0)
     }
+
 }

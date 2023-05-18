@@ -1143,13 +1143,11 @@
 		4B4D60C42A0C849600BCD287 /* NetworkProtectionInvitePresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4D606F2A0B29FA00BCD287 /* NetworkProtectionInvitePresenter.swift */; };
 		4B4D60C52A0C849600BCD287 /* NetworkProtectionInviteSuccessView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4D606D2A0B29FA00BCD287 /* NetworkProtectionInviteSuccessView.swift */; };
 		4B4D60C62A0C849600BCD287 /* NetworkProtectionInviteCodeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4D60702A0B29FA00BCD287 /* NetworkProtectionInviteCodeViewModel.swift */; };
-		4B4D60C72A0C849600BCD287 /* Dialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4D60712A0B29FA00BCD287 /* Dialog.swift */; };
 		4B4D60C82A0C849600BCD287 /* NetworkProtectionInviteCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4D606E2A0B29FA00BCD287 /* NetworkProtectionInviteCodeView.swift */; };
 		4B4D60C92A0C849600BCD287 /* NetworkProtectionInviteDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4D606C2A0B29FA00BCD287 /* NetworkProtectionInviteDialog.swift */; };
 		4B4D60CA2A0C849600BCD287 /* NetworkProtectionInvitePresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4D606F2A0B29FA00BCD287 /* NetworkProtectionInvitePresenter.swift */; };
 		4B4D60CB2A0C849600BCD287 /* NetworkProtectionInviteSuccessView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4D606D2A0B29FA00BCD287 /* NetworkProtectionInviteSuccessView.swift */; };
 		4B4D60CC2A0C849600BCD287 /* NetworkProtectionInviteCodeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4D60702A0B29FA00BCD287 /* NetworkProtectionInviteCodeViewModel.swift */; };
-		4B4D60CD2A0C849600BCD287 /* Dialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4D60712A0B29FA00BCD287 /* Dialog.swift */; };
 		4B4D60CE2A0C849600BCD287 /* NetworkProtectionInviteCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4D606E2A0B29FA00BCD287 /* NetworkProtectionInviteCodeView.swift */; };
 		4B4D60CF2A0C849600BCD287 /* NetworkProtectionInviteDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4D606C2A0B29FA00BCD287 /* NetworkProtectionInviteDialog.swift */; };
 		4B4D60D32A0C84F700BCD287 /* UserText+NetworkProtection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4D60D22A0C84F700BCD287 /* UserText+NetworkProtection.swift */; };
@@ -2380,7 +2378,6 @@
 		4B4D606E2A0B29FA00BCD287 /* NetworkProtectionInviteCodeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionInviteCodeView.swift; sourceTree = "<group>"; };
 		4B4D606F2A0B29FA00BCD287 /* NetworkProtectionInvitePresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionInvitePresenter.swift; sourceTree = "<group>"; };
 		4B4D60702A0B29FA00BCD287 /* NetworkProtectionInviteCodeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionInviteCodeViewModel.swift; sourceTree = "<group>"; };
-		4B4D60712A0B29FA00BCD287 /* Dialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Dialog.swift; sourceTree = "<group>"; };
 		4B4D60722A0B29FA00BCD287 /* EventMapping+NetworkProtectionError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EventMapping+NetworkProtectionError.swift"; sourceTree = "<group>"; };
 		4B4D60762A0B29FA00BCD287 /* NetworkProtectionUNNotificationsPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionUNNotificationsPresenter.swift; sourceTree = "<group>"; };
 		4B4D60782A0B29FA00BCD287 /* NetworkProtectionExtensionMachService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionExtensionMachService.swift; sourceTree = "<group>"; };
@@ -3991,7 +3988,6 @@
 				4B4D606E2A0B29FA00BCD287 /* NetworkProtectionInviteCodeView.swift */,
 				4B4D606F2A0B29FA00BCD287 /* NetworkProtectionInvitePresenter.swift */,
 				4B4D60702A0B29FA00BCD287 /* NetworkProtectionInviteCodeViewModel.swift */,
-				4B4D60712A0B29FA00BCD287 /* Dialog.swift */,
 			);
 			path = Invite;
 			sourceTree = "<group>";
@@ -7439,7 +7435,6 @@
 				3706FACA293F65D500E42796 /* TabLazyLoader.swift in Sources */,
 				3706FACB293F65D500E42796 /* FileImportViewController.swift in Sources */,
 				3706FACC293F65D500E42796 /* SaveCredentialsViewController.swift in Sources */,
-				4B4D60C72A0C849600BCD287 /* Dialog.swift in Sources */,
 				3706FACD293F65D500E42796 /* PopUpButton.swift in Sources */,
 				3706FACE293F65D500E42796 /* SuggestionViewController.swift in Sources */,
 				3706FACF293F65D500E42796 /* AddEditFavoriteWindow.swift in Sources */,
@@ -8734,7 +8729,6 @@
 				1D69C553291302F200B75945 /* BWVault.swift in Sources */,
 				AA6FFB4424DC33320028F4D0 /* NSViewExtension.swift in Sources */,
 				37AFCE8927DA33BA00471A10 /* Preferences.swift in Sources */,
-				4B4D60CD2A0C849600BCD287 /* Dialog.swift in Sources */,
 				B6C0B23E26E8BF1F0031CB7F /* DownloadListViewModel.swift in Sources */,
 				4B9292D52667123700AD2C21 /* BookmarkManagementDetailViewController.swift in Sources */,
 				4B723E1026B0006700E14D75 /* CSVImporter.swift in Sources */,

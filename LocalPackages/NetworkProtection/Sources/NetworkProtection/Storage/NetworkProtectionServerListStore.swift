@@ -1,6 +1,5 @@
 //
 //  NetworkProtectionServer.swift
-//  DuckDuckGo
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -79,8 +78,7 @@ public class NetworkProtectionServerListFileSystemStore: NetworkProtectionServer
             fileURL = try FileManager.default.url(for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
 #endif
         } catch {
-            // - TODO: consider having a pixel here
-            fatalError()
+            fatalError() // This likely shouldn't be a hard failure
         }
 
         self.init(fileURL: fileURL.appending(Constants.defaultFileDir).appendingPathComponent(Constants.defaultFileName, isDirectory: false),

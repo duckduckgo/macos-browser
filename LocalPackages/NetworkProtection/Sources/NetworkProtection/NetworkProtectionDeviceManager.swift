@@ -1,6 +1,5 @@
 //
 //  NetworkProtectionDeviceManager.swift
-//  DuckDuckGo
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -202,7 +201,6 @@ public actor NetworkProtectionDeviceManager: NetworkProtectionDeviceManagement {
                     // If we selected the server from the stored list, and after registering it and updating that list
                     // with the server reply we can't find it, something's quite wrong.
                     assertionFailure("There's an inconsistency with the list of servers returned by the endpoint")
-                    // - TODO: does this require a privacy triage?
                     errorEvents?.fire(NetworkProtectionError.serverListInconsistency)
                     throw NetworkProtectionError.serverListInconsistency
                 }
@@ -211,7 +209,7 @@ public actor NetworkProtectionDeviceManager: NetworkProtectionDeviceManagement {
 
                 // We should not need this IF condition here, because we know registered servers will give us an expiration date,
                 // but since the structure we're currently using makes the expiration date optional we need to have it.
-                // - TODO: consider changing our server structure to not allow a missing expiration date here
+                // We should consider changing our server structure to not allow a missing expiration date here.
                 if let serverExpirationDate = selectedServer.expirationDate {
                     if keyPair.expirationDate > serverExpirationDate {
                         keyPair = keyStore.updateCurrentKeyPair(newExpirationDate: serverExpirationDate)

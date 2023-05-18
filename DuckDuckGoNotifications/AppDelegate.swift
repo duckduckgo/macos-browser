@@ -86,7 +86,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                     os_log("IPC connection with system extension failed")
 
                     if listenerStarted {
-                        // - TODO: maybe worth making this a pixel, as we just received a notification that IPC is up
                         os_log("IPC connection should have succeeded")
                     }
                 }
