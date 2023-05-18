@@ -41,7 +41,7 @@ let extraInputFiles: [TargetName: Set<InputFile>] = [
         .init("_WKDownload+WebKitDownload.swift", .source),
         .init("SystemExtensionManager.swift", .source),
         .init("DuckDuckGoAgent.app", .unknown),
-        .init("DuckDuckGoNotifications.app", .unknown)
+        .init("DuckDuckGo Notifications.app", .unknown)
     ],
 
     "DuckDuckGo Privacy Browser App Store": [
@@ -133,7 +133,7 @@ struct TargetSourcesChecker: BuildToolPlugin, XcodeBuildToolPlugin {
 
         var errors = [Error]()
 
-        let filesWithSpaceInPath = targets[0].inputFiles.filter { $0.path.string.firstIndex(of: " ") != nil }
+        let filesWithSpaceInPath = targets[0].inputFiles.filter { $0.type != .unknown && $0.path.string.firstIndex(of: " ") != nil }
         if !filesWithSpaceInPath.isEmpty {
             errors.append(contentsOf: filesWithSpaceInPath.map(\.path.string).sorted().map(FileWithSpaceInPathError.init))
         }
