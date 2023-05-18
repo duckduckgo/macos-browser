@@ -39,7 +39,9 @@ final class PurchaseViewController: NSViewController {
         super.viewDidLoad()
 
         Task {
-            let productIdentifiers = ["001", "monthly.subscription", "monthly1"]
+            let productIdentifiers = ["iap.cat", "iap.dog", "iap.rabbit",
+                                      "monthly.subscription", "three.month.subscription",
+                                      "renewable.1month"]
             self.model.products = try await Product.products(for: productIdentifiers)
         }
     }

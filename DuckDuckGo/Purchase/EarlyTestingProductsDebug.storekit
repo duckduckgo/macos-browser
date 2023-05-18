@@ -1,0 +1,152 @@
+{
+  "identifier" : "8AA170CC",
+  "nonRenewingSubscriptions" : [
+    {
+      "displayPrice" : "4.99",
+      "familyShareable" : false,
+      "internalID" : "6448961318",
+      "localizations" : [
+        {
+          "description" : "A monthly non-renewable subscription",
+          "displayName" : "Monthly",
+          "locale" : "en_US"
+        },
+        {
+          "description" : "",
+          "displayName" : "Miesięczna",
+          "locale" : "ar"
+        }
+      ],
+      "productID" : "monthly.subscription",
+      "referenceName" : "Monthly non-renewing subscription",
+      "type" : "NonRenewingSubscription"
+    },
+    {
+      "displayPrice" : "13.99",
+      "familyShareable" : false,
+      "internalID" : "4C9648F1",
+      "localizations" : [
+        {
+          "description" : "Three month non-renewing subscription",
+          "displayName" : "3 months",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "three.month.subscription",
+      "referenceName" : "Three month non-renewing subscription",
+      "type" : "NonRenewingSubscription"
+    }
+  ],
+  "products" : [
+    {
+      "displayPrice" : "2.99",
+      "familyShareable" : false,
+      "internalID" : "6448961094",
+      "localizations" : [
+        {
+          "description" : "This is a cat.",
+          "displayName" : "Cat",
+          "locale" : "en_US"
+        },
+        {
+          "description" : "To jest kot.",
+          "displayName" : "Kot",
+          "locale" : "pl"
+        }
+      ],
+      "productID" : "iap.cat",
+      "referenceName" : "Cat",
+      "type" : "NonConsumable"
+    },
+    {
+      "displayPrice" : "0.99",
+      "familyShareable" : false,
+      "internalID" : "B8EA4649",
+      "localizations" : [
+        {
+          "description" : "This is a dog.",
+          "displayName" : "Dog",
+          "locale" : "en_US"
+        },
+        {
+          "description" : "",
+          "displayName" : "Pies",
+          "locale" : "pl"
+        }
+      ],
+      "productID" : "iap.dog",
+      "referenceName" : "Dog",
+      "type" : "NonConsumable"
+    },
+    {
+      "displayPrice" : "8.99",
+      "familyShareable" : true,
+      "internalID" : "8B1FB71A",
+      "localizations" : [
+        {
+          "description" : "",
+          "displayName" : "Rabbit",
+          "locale" : "en_US"
+        },
+        {
+          "description" : "",
+          "displayName" : "Królik",
+          "locale" : "pl"
+        }
+      ],
+      "productID" : "iap.rabbit",
+      "referenceName" : "Rabbit",
+      "type" : "NonConsumable"
+    }
+  ],
+  "settings" : {
+    "_compatibilityTimeRate" : {
+      "3" : 6
+    },
+    "_timeRate" : 1004
+  },
+  "subscriptionGroups" : [
+    {
+      "id" : "21338490",
+      "localizations" : [
+
+      ],
+      "name" : "Subscriptions",
+      "subscriptions" : [
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "4.99",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "6448961867",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "monthly",
+              "displayName" : "monthly subscription",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "renewable.1month",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "monthly suscription",
+          "subscriptionGroupID" : "21338490",
+          "type" : "RecurringSubscription"
+        }
+      ]
+    }
+  ],
+  "subscriptionOffersKeyPair" : {
+    "id" : "8A9D2A5F",
+    "privateKey" : "MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQgjohosXhP8bvp7/seD5+WF0eqqZiITqq7Lr5X5MTUGa+gCgYIKoZIzj0DAQehRANCAAStEx0kojBYsyF1TlHz6CKmH3YuzA76pykTpqmtqyAqoRexBsamV8xiOfDYN9jpRhiF6KKoWmwl36icvKAppnza"
+  },
+  "version" : {
+    "major" : 2,
+    "minor" : 0
+  }
+}

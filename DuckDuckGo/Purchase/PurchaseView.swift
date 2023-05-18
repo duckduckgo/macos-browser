@@ -61,41 +61,12 @@ struct PurchaseView: View {
                         SubscriptionRow(product: product,
                                         buyButtonAction: { model.buy(product) })
                     }
-                    StaticSubscriptionRow()
-                        .opacity(0.5)
-                        .disabled(true)
-                    StaticSubscriptionRow()
                 }
             }
 
             Spacer()
         }
         .padding(.all, 32)
-    }
-
-    struct StaticSubscriptionRow: View {
-        var body: some View {
-            HStack {
-                VStack(alignment: .leading) {
-                    Text("Monthly Subscription")
-                        .font(.title2)
-                    Text("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.")
-                        .font(.body)
-                }
-
-                Spacer()
-
-                Button {
-                    print("Edit button was tapped")
-                } label: {
-                    Text("Buy")
-                }
-                .buttonStyle(CapsuleButton())
-
-            }
-            .padding(33)
-            .background(RoundedRectangle(cornerRadius: 10).foregroundColor(.black.opacity(0.12)))
-        }
     }
 
     private var closeButtonOverlay: some View {
@@ -145,8 +116,8 @@ struct SubscriptionRow: View {
         }
         .padding(33)
         .background(RoundedRectangle(cornerRadius: 10).foregroundColor(.black.opacity(0.12)))
-        .disabled(product.of)
-        .opacity(product.subscription.isNil ? 0.5 : 1.0)
+        .disabled(!product.isSubscription)
+        .opacity(product.isSubscription ? 1.0 : 0.5)
     }
 }
 
@@ -161,6 +132,14 @@ struct CapsuleButton: ButtonStyle {
             .background(background)
             .foregroundColor(.white)
             .clipShape(Capsule())
+    }
+}
+
+@available(macOS 12.0, *)
+extension Product {
+
+    var isSubscription: Bool {
+        type == .nonRenewable || type == .autoRenewable
     }
 }
 

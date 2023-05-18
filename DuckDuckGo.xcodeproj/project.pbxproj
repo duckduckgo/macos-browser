@@ -1951,6 +1951,7 @@
 		1E53D7262A0CCFCD00D977A4 /* PurchaseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchaseView.swift; sourceTree = "<group>"; };
 		1E53D72A2A0CD00700D977A4 /* PurchaseViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchaseViewController.swift; sourceTree = "<group>"; };
 		1E73C7C32A138B6000B7BBA0 /* PurchaseModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchaseModel.swift; sourceTree = "<group>"; };
+		1E73C7C52A162B5B00B7BBA0 /* EarlyTestingProductsDebug.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = EarlyTestingProductsDebug.storekit; sourceTree = "<group>"; };
 		1E7E2E8F29029A2A00C01B54 /* ContentBlockingRulesUpdateObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentBlockingRulesUpdateObserver.swift; sourceTree = "<group>"; };
 		1E7E2E9129029F9B00C01B54 /* WebsiteBreakageReporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebsiteBreakageReporter.swift; sourceTree = "<group>"; };
 		1E7E2E932902AC0E00C01B54 /* PrivacyDashboardPermissionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyDashboardPermissionHandler.swift; sourceTree = "<group>"; };
@@ -3086,6 +3087,7 @@
 				1E53D72A2A0CD00700D977A4 /* PurchaseViewController.swift */,
 				1E53D7262A0CCFCD00D977A4 /* PurchaseView.swift */,
 				1E73C7C32A138B6000B7BBA0 /* PurchaseModel.swift */,
+				1E73C7C52A162B5B00B7BBA0 /* EarlyTestingProductsDebug.storekit */,
 			);
 			path = Purchase;
 			sourceTree = "<group>";
