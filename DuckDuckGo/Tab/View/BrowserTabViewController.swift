@@ -130,7 +130,9 @@ final class BrowserTabViewController: NSViewController {
     @objc
     private func onCloseDuckDuckGoEmailProtection(_ notification: Notification) {
         guard let activeTab = tabCollectionViewModel.selectedTabViewModel?.tab else { return }
-        self.closeTab(activeTab)
+        if activeTab.url != nil && EmailUrls().isDuckDuckGoEmailProtection(url: activeTab.url!) {
+            self.closeTab(activeTab)
+        }
     }
 
     private func subscribeToSelectedTabViewModel() {
