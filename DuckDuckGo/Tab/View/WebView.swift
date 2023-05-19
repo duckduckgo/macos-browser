@@ -186,18 +186,14 @@ final class WebView: WKWebView {
 
     // MARK: - Find In Page
 
-    struct FindResult {
-        let string: String
-        let matchesFound: UInt?
-        let matchIndex: Int?
-    }
-    enum FindError: Error {
+    enum FindResult: Error {
+        case found(matches: UInt?)
         case notFound
         case cancelled
     }
-    private var findInPageCompletionHandler: ((Result<FindResult, FindError>) -> Void)?
+    private var findInPageCompletionHandler: ((FindResult) -> Void)?
 
-    func find(_ string: String, with options: _WKFindOptions, maxCount: UInt, completionHandler: ((Result<FindResult, FindError>) -> Void)?) {
+    func find(_ string: String, with options: _WKFindOptions, maxCount: UInt, completionHandler: ((FindResult) -> Void)? = nil) {
         assert(!string.isEmpty)
 
         // native WKWebView find
@@ -209,7 +205,7 @@ final class WebView: WKWebView {
             }
             if let findInPageCompletionHandler {
                 self.findInPageCompletionHandler = nil
-                findInPageCompletionHandler(.failure(.cancelled))
+                findInPageCompletionHandler(.cancelled)
             }
             self.findInPageCompletionHandler = completionHandler
             self.find(string, with: options, maxCount: maxCount)
@@ -223,9 +219,9 @@ final class WebView: WKWebView {
 
             self.find(string, configuration: config) { result in
                 if result.matchFound {
-                    completionHandler?(.success(FindResult(string: string, matchesFound: nil, matchIndex: nil)))
+                    completionHandler?(.found(matches: nil))
                 } else {
-                    completionHandler?(.failure(.notFound))
+                    completionHandler?(.notFound)
                 }
             }
         }
@@ -262,17 +258,19 @@ extension WebView /* _WKFindDelegate */ {
 
     @objc(_webView:didFindMatches:forString:withMatchIndex:)
     func webView(_ webView: WKWebView, didFind matchesFound: UInt, for string: String, withMatchIndex matchIndex: Int) {
+        Swift.print("didFind", matchesFound, string, matchIndex)
         if let findInPageCompletionHandler {
             self.findInPageCompletionHandler = nil
-            findInPageCompletionHandler(.success(FindResult(string: string, matchesFound: matchesFound, matchIndex: matchIndex)))
+            findInPageCompletionHandler(.found(matches: matchesFound))
         }
     }
 
     @objc(_webView:didFailToFindString:)
     func webView(_ webView: WKWebView, didFailToFind string: String) {
+        Swift.print("didFailToFind", string)
         if let findInPageCompletionHandler {
             self.findInPageCompletionHandler = nil
-            findInPageCompletionHandler(.failure(.notFound))
+            findInPageCompletionHandler(.notFound)
         }
     }
 

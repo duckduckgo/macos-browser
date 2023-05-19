@@ -274,6 +274,8 @@ extension WKWebView {
         self.superview?.makeMeFirstResponder()
     }
 
+    // TODO: add selection modifiers here
+
     private enum Selector {
         static let fullScreenPlaceholderView = "_fullScreenPlaceholderView"
         static let printOperationWithPrintInfoForFrame = "_printOperationWithPrintInfo:forFrame:"

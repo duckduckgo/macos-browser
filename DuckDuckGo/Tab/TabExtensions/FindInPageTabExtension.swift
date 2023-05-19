@@ -33,6 +33,16 @@ final class FindInPageTabExtension: TabExtension {
     }
 
     func show(with webView: WebView) {
+        guard !model.isVisible else {
+            if !model.text.isEmpty {
+                webView.evaluateJavaScript("window.getSelection().collapseToStart()") { _, _ in
+                    self.find(self.model.text, with: [.noIndexChange, .determineMatchIndex, .showOverlay])
+                }
+
+            }
+            return
+        }
+
         self.webView = webView
 
         model.show()
@@ -59,6 +69,7 @@ final class FindInPageTabExtension: TabExtension {
         webView?.clearFindInPageState()
         // search for deliberately missing string to reset current match
         webView?.find(Constants.randomString, with: [], maxCount: 1) { _ in
+//            self.webView?.clearFindInPageState()
             completionHandler?()
         }
     }
@@ -69,12 +80,16 @@ final class FindInPageTabExtension: TabExtension {
         } else {
             var options: _WKFindOptions = [.showOverlay]
             if isFindInPageActive {
-                options.insert(.noIndexChange) // continue search from current match index
+                webView?.evaluateJavaScript("window.getSelection().collapseToStart()") { _, _ in
+                    options.insert(.noIndexChange) // continue search from current match index
+                    self.find(string, with: options)
+                }
+            } else {
+                find(string, with: options)
             }
-            find(string, with: options)
         }
     }
-
+// TODO: test in both pdf and websites
     private func find(_ string: String, with options: _WKFindOptions = []) {
         guard !string.isEmpty else { return }
 
@@ -82,24 +97,40 @@ final class FindInPageTabExtension: TabExtension {
         webView?.find(string, with: options, maxCount: Constants.maxMatches) { [weak self] result in
             guard let self else { return }
             switch result {
-            case .success(let result):
-                self.model.update(currentSelection: result.matchIndex.map { $0 + 1 }, matchesFound: result.matchesFound)
+            case .found(matches: let matchesFound):
+                self.model.update(currentSelection: 1 /*result.matchIndex.map { $0 + 1 }*/, matchesFound: matchesFound)
+
+                let findInPage = self.isFindInPageActive
+                self.isFindInPageActive = true
 
                 // first search _sometimes_ won‘t highlight the first match
                 // search again to ensure highlighting with noIndexChange to find the same match
                 if !self.isFindInPageActive,
-                    self.model.isVisible,
-                    result.string == self.model.text {
+                   self.model.isVisible,
+                   !options.contains(.showOverlay) {
+//                   result.string == self.model.text {
 
-                    self.isFindInPageActive = true
-                    self.find(string, with: [.noIndexChange, .showOverlay])
+//                    self.webView?.evaluateJavaScript("window.getSelection().collapseToStart()") { _, _ in
+//                        self.find(string, with: [.noIndexChange, .showOverlay])
+//                    }
+//
+                    self.webView?.clearFindInPageState()
+                    self.webView?.find(Constants.randomString, with: [], maxCount: 1) { _ in
+                        self.webView?.clearFindInPageState()
+//                        self.webView?.find(string, with: [.noIndexChange, .showOverlay, .caseInsensitive, .wrapAround, .showFindIndicator], maxCount: result.matchesFound ?? Constants.maxMatches)
+                        self.find(string, with: [.noIndexChange, .showOverlay])
+                    }
+                    //                    self.webView?.clearFindInPageState()
+                    //                    DispatchQueue.main.async {
+                    //                        self.find(string, with: [.noIndexChange, .showOverlay])
+                    //                    }
                 }
 
-            case .failure(.notFound):
+            case .notFound:
                 self.webView?.clearFindInPageState()
                 self.isFindInPageActive = false
                 self.model.update(currentSelection: 0, matchesFound: 0)
-            case .failure(.cancelled):
+            case .cancelled:
                 break
             }
         }
