@@ -17,6 +17,7 @@
 //
 
 import XCTest
+import NetworkProtection
 @testable import DuckDuckGo_Privacy_Browser
 
 @MainActor
@@ -26,6 +27,7 @@ final class MoreOptionsMenuTests: XCTestCase {
     var passwordManagerCoordinator: PasswordManagerCoordinator!
     var capturingActionDelegate: CapturingOptionsButtonMenuDelegate!
     var moreOptionMenu: MoreOptionsMenu!
+    var networkProtectionVisibilityMock: NetworkProtectionVisibilityMock!
     var internalUserDecider: InternalUserDeciderMock!
 
     override func setUp() {
@@ -33,8 +35,12 @@ final class MoreOptionsMenuTests: XCTestCase {
         tabCollectionViewModel = TabCollectionViewModel()
         passwordManagerCoordinator = PasswordManagerCoordinator()
         capturingActionDelegate = CapturingOptionsButtonMenuDelegate()
+        networkProtectionVisibilityMock = NetworkProtectionVisibilityMock(activated: false)
         internalUserDecider = InternalUserDeciderMock()
-        moreOptionMenu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel, passwordManagerCoordinator: passwordManagerCoordinator, internalUserDecider: internalUserDecider)
+        moreOptionMenu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
+                                         passwordManagerCoordinator: passwordManagerCoordinator,
+                                         networkProtectionFeatureVisibility: networkProtectionVisibilityMock,
+                                         internalUserDecider: internalUserDecider)
         moreOptionMenu.actionDelegate = capturingActionDelegate
     }
 
@@ -46,7 +52,35 @@ final class MoreOptionsMenuTests: XCTestCase {
         super.tearDown()
     }
 
-    func testThatMoreOptionMenuHasTheExpectedItems() {
+    func testThatMoreOptionMenuHasTheExpectedItems_WhenNetworkProtectionIsEnabled() {
+        let moreOptionMenu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
+                                             passwordManagerCoordinator: passwordManagerCoordinator,
+                                             networkProtectionFeatureVisibility: NetworkProtectionVisibilityMock(activated: true),
+                                             internalUserDecider: internalUserDecider)
+
+        XCTAssertEqual(moreOptionMenu.items[0].title, "Send Feedback")
+        XCTAssertTrue(moreOptionMenu.items[1].isSeparatorItem)
+        XCTAssertEqual(moreOptionMenu.items[2].title, UserText.plusButtonNewTabMenuItem)
+        XCTAssertEqual(moreOptionMenu.items[3].title, UserText.newWindowMenuItem)
+        XCTAssertTrue(moreOptionMenu.items[4].isSeparatorItem)
+        XCTAssertEqual(moreOptionMenu.items[5].title, UserText.zoom)
+        XCTAssertTrue(moreOptionMenu.items[6].isSeparatorItem)
+        XCTAssertEqual(moreOptionMenu.items[7].title, UserText.bookmarks)
+        XCTAssertEqual(moreOptionMenu.items[8].title, UserText.downloads)
+        XCTAssertEqual(moreOptionMenu.items[9].title, UserText.passwordManagement)
+        XCTAssertTrue(moreOptionMenu.items[10].isSeparatorItem)
+        XCTAssertEqual(moreOptionMenu.items[11].title, UserText.emailOptionsMenuItem)
+        XCTAssertEqual(moreOptionMenu.items[12].title, UserText.networkProtection)
+        XCTAssertTrue(moreOptionMenu.items[13].isSeparatorItem)
+        XCTAssertEqual(moreOptionMenu.items[14].title, UserText.settings)
+    }
+
+    func testThatMoreOptionMenuHasTheExpectedItems_WhenNetworkProtectionIsDisabled() {
+        let moreOptionMenu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
+                                             passwordManagerCoordinator: passwordManagerCoordinator,
+                                             networkProtectionFeatureVisibility: NetworkProtectionVisibilityMock(activated: false),
+                                             internalUserDecider: internalUserDecider)
+
         XCTAssertEqual(moreOptionMenu.items[0].title, "Send Feedback")
         XCTAssertTrue(moreOptionMenu.items[1].isSeparatorItem)
         XCTAssertEqual(moreOptionMenu.items[2].title, UserText.plusButtonNewTabMenuItem)
@@ -83,6 +117,20 @@ final class MoreOptionsMenuTests: XCTestCase {
         moreOptionMenu.performActionForItem(at: 13)
 
         XCTAssertTrue(capturingActionDelegate.optionsButtonMenuRequestedPreferencesCalled)
+    }
+
+}
+
+final class NetworkProtectionVisibilityMock: NetworkProtectionFeatureVisibility {
+
+    var activated: Bool
+
+    init(activated: Bool) {
+        self.activated = activated
+    }
+
+    var isFeatureActivated: Bool {
+        return activated
     }
 
 }
