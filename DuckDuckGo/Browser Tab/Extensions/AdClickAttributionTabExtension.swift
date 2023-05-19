@@ -1,0 +1,195 @@
+//
+//  AdClickAttributionTabExtension.swift
+//
+//  Copyright © 2022 DuckDuckGo. All rights reserved.
+//
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+//
+//  http://www.apache.org/licenses/LICENSE-2.0
+//
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
+//
+
+import os.log
+import Combine
+import Common
+import ContentBlocking
+import Foundation
+import BrowserServicesKit
+import PrivacyDashboard
+import WebKit
+
+protocol AdClickAttributionDependencies {
+
+    var privacyConfigurationManager: PrivacyConfigurationManaging { get }
+    var contentBlockingManager: ContentBlockerRulesManagerProtocol { get }
+    var tld: TLD { get }
+
+    var adClickAttribution: AdClickAttributing { get }
+    var adClickAttributionRulesProvider: AdClickAttributionRulesProviding { get }
+
+    var attributionEvents: EventMapping<AdClickAttributionEvents>? { get }
+    var attributionDebugEvents: EventMapping<AdClickAttributionDebugEvents>? { get }
+
+}
+
+protocol UserContentControllerProtocol: AnyObject {
+    func enableGlobalContentRuleList(withIdentifier identifier: String) throws
+    func disableGlobalContentRuleList(withIdentifier identifier: String) throws
+    func removeLocalContentRuleList(withIdentifier identifier: String)
+    func installLocalContentRuleList(_ ruleList: WKContentRuleList, identifier: String)
+}
+extension UserContentController: UserContentControllerProtocol {}
+
+final class AdClickAttributionTabExtension: TabExtension {
+
+    private static func makeAdClickAttributionDetection(with dependencies: some AdClickAttributionDependencies) -> AdClickAttributionDetection {
+        return AdClickAttributionDetection(feature: dependencies.adClickAttribution,
+                                           tld: dependencies.tld,
+                                           eventReporting: dependencies.attributionEvents,
+                                           errorReporting: dependencies.attributionDebugEvents,
+                                           log: OSLog.attribution)
+
+    }
+
+    private static func makeAdClickAttributionLogic(with dependencies: some AdClickAttributionDependencies) -> AdClickAttributionLogic {
+        return AdClickAttributionLogic(featureConfig: dependencies.adClickAttribution,
+                                       rulesProvider: dependencies.adClickAttributionRulesProvider,
+                                       tld: dependencies.tld,
+                                       eventReporting: dependencies.attributionEvents,
+                                       errorReporting: dependencies.attributionDebugEvents,
+                                       log: OSLog.attribution)
+    }
+
+    private let dependencies: any AdClickAttributionDependencies
+
+    private weak var userContentController: UserContentControllerProtocol?
+    private weak var contentBlockerRulesScript: ContentBlockerRulesUserScript?
+
+    // to be made private
+    let detection: AdClickAttributionDetection
+    let logic: AdClickAttributionLogic
+
+    public var currentAttributionState: AdClickAttributionLogic.State? {
+        logic.state
+    }
+
+    private var cancellables = Set<AnyCancellable>()
+
+    init(inheritedAttribution: AdClickAttributionLogic.State?,
+         userContentControllerFuture: Future<UserContentControllerProtocol, Never>,
+         contentBlockerRulesScriptPublisher: some Publisher<ContentBlockerRulesUserScript?, Never>,
+         trackerInfoPublisher: some Publisher<DetectedRequest, Never>,
+         dependencies: some AdClickAttributionDependencies) {
+
+        self.dependencies = dependencies
+        self.detection = Self.makeAdClickAttributionDetection(with: dependencies)
+        self.logic = Self.makeAdClickAttributionLogic(with: dependencies)
+
+        logic.delegate = self
+        detection.delegate = logic
+
+        // delay firing up until UserContentController is published
+        userContentControllerFuture.sink { [weak self] userContentController in
+            self?.delayedInitialization(with: userContentController,
+                                        inheritedAttribution: inheritedAttribution,
+                                        contentBlockerRulesScriptPublisher: contentBlockerRulesScriptPublisher,
+                                        trackerInfoPublisher: trackerInfoPublisher)
+        }.store(in: &cancellables)
+    }
+
+    private func delayedInitialization(with userContentController: UserContentControllerProtocol, inheritedAttribution: AdClickAttributionLogic.State?, contentBlockerRulesScriptPublisher: some Publisher<ContentBlockerRulesUserScript?, Never>, trackerInfoPublisher: some Publisher<DetectedRequest, Never>) {
+
+        cancellables.removeAll()
+        self.userContentController = userContentController
+
+        if let inheritedAttribution {
+            logic.applyInheritedAttribution(state: inheritedAttribution)
+        }
+
+        contentBlockerRulesScriptPublisher
+            .compactMap { $0 }
+            .sink { [weak self] contentBlockerRulesScript in
+                guard let self else { return }
+
+                self.contentBlockerRulesScript = contentBlockerRulesScript
+                self.logic.onRulesChanged(latestRules: self.dependencies.contentBlockingManager.currentRules)
+            }
+            .store(in: &cancellables)
+
+        trackerInfoPublisher
+            .sink { [weak self] tracker in
+                self?.logic.onRequestDetected(request: tracker)
+            }
+            .store(in: &cancellables)
+    }
+
+}
+
+extension AdClickAttributionTabExtension: AdClickAttributionLogicDelegate {
+
+    func attributionLogic(_ logic: AdClickAttributionLogic,
+                          didRequestRuleApplication rules: ContentBlockerRulesManager.Rules?,
+                          forVendor vendor: String?) {
+        guard let userContentController else {
+            assertionFailure("UserContentController not set")
+            return
+        }
+
+        let attributedTempListName = AdClickAttributionRulesProvider.Constants.attributedTempRuleListName
+
+        guard dependencies.privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .contentBlocking)
+        else {
+            userContentController.removeLocalContentRuleList(withIdentifier: attributedTempListName)
+            contentBlockerRulesScript?.currentAdClickAttributionVendor = nil
+            contentBlockerRulesScript?.supplementaryTrackerData = []
+            return
+        }
+
+        contentBlockerRulesScript?.currentAdClickAttributionVendor = vendor
+        if let rules = rules {
+
+            let globalListName = DefaultContentBlockerRulesListsSource.Constants.trackerDataSetRulesListName
+            let globalAttributionListName = AdClickAttributionRulesSplitter.blockingAttributionRuleListName(forListNamed: globalListName)
+
+            if vendor != nil {
+                userContentController.installLocalContentRuleList(rules.rulesList, identifier: attributedTempListName)
+                try? userContentController.disableGlobalContentRuleList(withIdentifier: globalAttributionListName)
+            } else {
+                userContentController.removeLocalContentRuleList(withIdentifier: attributedTempListName)
+                try? userContentController.enableGlobalContentRuleList(withIdentifier: globalAttributionListName)
+            }
+
+            contentBlockerRulesScript?.supplementaryTrackerData = [rules.trackerData]
+        } else {
+            contentBlockerRulesScript?.supplementaryTrackerData = []
+        }
+    }
+
+}
+
+extension AppContentBlocking: AdClickAttributionDependencies {}
+
+protocol AdClickAttributionProtocol {
+    var currentAttributionState: AdClickAttributionLogic.State? { get }
+
+    // to be removed
+    var detection: AdClickAttributionDetection { get }
+    var logic: AdClickAttributionLogic { get }
+}
+
+extension AdClickAttributionTabExtension: AdClickAttributionProtocol {
+    func getPublicProtocol() -> AdClickAttributionProtocol { self }
+}
+
+extension TabExtensions {
+    var adClickAttribution: AdClickAttributionProtocol? {
+        resolve(AdClickAttributionTabExtension.self)
+    }
+}

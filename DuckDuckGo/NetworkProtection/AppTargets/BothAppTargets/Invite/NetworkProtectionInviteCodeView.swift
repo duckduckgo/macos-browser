@@ -18,7 +18,6 @@
 
 import SwiftUI
 import NetworkProtection
-import SwiftUIExtensions
 
 struct NetworkProtectionInviteCodeView: View {
     @ObservedObject var model: NetworkProtectionInviteViewModel

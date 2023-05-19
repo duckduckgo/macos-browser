@@ -17,7 +17,6 @@
 //
 
 import SwiftUI
-import SwiftUIExtensions
 
 fileprivate extension Font {
     static let companyName: Font = .title
@@ -40,7 +39,7 @@ extension Preferences {
                 Text(UserText.aboutDuckDuckGo)
                     .font(Const.Fonts.preferencePaneTitle)
 
-                PreferencePaneSection {
+                Section {
                     HStack {
                         Image("AboutPageLogo")
                         VStack(alignment: .leading, spacing: 8) {

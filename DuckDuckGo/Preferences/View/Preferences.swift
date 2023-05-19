@@ -20,6 +20,22 @@ import SwiftUI
 
 enum Preferences {
 
+    struct Section<Content>: View where Content: View {
+
+        let spacing: CGFloat
+        @ViewBuilder let content: () -> Content
+
+        init(spacing: CGFloat = 12, @ViewBuilder content: @escaping () -> Content) {
+            self.spacing = spacing
+            self.content = content
+        }
+
+        var body: some View {
+            VStack(alignment: .leading, spacing: spacing, content: content)
+                .padding(.vertical, 20)
+        }
+    }
+
     enum Const {
 
         static let pickerHorizontalOffset: CGFloat = {
@@ -64,52 +80,13 @@ enum Preferences {
                 }
             }()
 
-            static let preferencePaneDisclaimer: Font = {
+            static let preferencePaneCaption: Font = {
                 if #available(macOS 11.0, *) {
                     return .subheadline
                 } else {
                     return .system(size: 10)
                 }
             }()
-        }
-    }
-
-    struct TextMenuTitle: View {
-        let text: String
-
-        var body: some View {
-            Text(text)
-                .font(Const.Fonts.preferencePaneTitle)
-        }
-    }
-
-    struct TextMenuItemHeader: View {
-        let text: String
-
-        var body: some View {
-            Text(text)
-                .font(Const.Fonts.preferencePaneSectionHeader)
-        }
-    }
-
-    struct TextMenuItemCaption: View {
-        let text: String
-
-        var body: some View {
-            Text(text)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .fixMultilineScrollableText()
-                .foregroundColor(Color("GreyTextColor"))
-        }
-    }
-
-    struct ToggleMenuItem: View {
-        let title: String
-        let isOn: Binding<Bool>
-
-        var body: some View {
-            Toggle(title, isOn: isOn)
-                .fixMultilineScrollableText()
         }
     }
 }

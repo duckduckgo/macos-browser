@@ -39,31 +39,23 @@ final class GradientView: NSView {
         setupGradientView()
     }
 
-    override func viewDidChangeEffectiveAppearance() {
-        super.viewDidChangeEffectiveAppearance()
-
-        setupGradientView()
-    }
-
     @IBInspectable var backgroundColor1: NSColor? = NSColor.clear
     @IBInspectable var backgroundColor2: NSColor? = NSColor.clear
     @IBInspectable var startPoint: CGPoint = CGPoint(x: 0.0, y: 0.5)
     @IBInspectable var endPoint: CGPoint = CGPoint(x: 1.0, y: 0.5)
 
     func setupGradientView() {
-        NSAppearance.withAppAppearance {
-            guard let backgroundColor1 = backgroundColor1, let backgroundColor2 = backgroundColor2 else {
-                return
-            }
-
-            let gradientLayer = CAGradientLayer()
-            gradientLayer.colors = [backgroundColor1.cgColor, backgroundColor2.cgColor]
-            gradientLayer.startPoint = startPoint
-            gradientLayer.endPoint = endPoint
-            gradientLayer.frame = bounds
-
-            layer = gradientLayer
+        guard let backgroundColor1 = backgroundColor1, let backgroundColor2 = backgroundColor2 else {
+            return
         }
+
+        let gradientLayer = CAGradientLayer()
+        gradientLayer.colors = [backgroundColor1.cgColor, backgroundColor2.cgColor]
+        gradientLayer.startPoint = startPoint
+        gradientLayer.endPoint = endPoint
+        gradientLayer.frame = bounds
+
+        layer = gradientLayer
     }
 
     private var effectView: NSVisualEffectView?

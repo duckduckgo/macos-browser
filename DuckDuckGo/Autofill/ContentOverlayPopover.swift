@@ -20,7 +20,6 @@ import Cocoa
 import WebKit
 import BrowserServicesKit
 
-@MainActor
 public final class ContentOverlayPopover {
 
     public var zoomFactor: CGFloat?

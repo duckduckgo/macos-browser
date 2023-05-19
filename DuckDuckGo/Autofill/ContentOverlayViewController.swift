@@ -22,7 +22,6 @@ import Combine
 import BrowserServicesKit
 import Autofill
 
-@MainActor
 public final class ContentOverlayViewController: NSViewController, EmailManagerRequestDelegate {
 
     @IBOutlet var webView: WKWebView!
@@ -38,16 +37,9 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
     }()
 
     lazy var vaultManager: SecureVaultManager = {
-        let manager = SecureVaultManager(passwordManager: PasswordManagerCoordinator.shared,
-                                         includePartialAccountMatches: true,
-                                         tld: ContentBlocking.shared.tld)
+        let manager = SecureVaultManager(passwordManager: PasswordManagerCoordinator.shared)
         manager.delegate = self
         return manager
-    }()
-
-    lazy var autofillPreferencesModel: AutofillPreferencesModel = {
-        let model = AutofillPreferencesModel()
-        return model
     }()
 
     public override func viewDidLoad() {
@@ -131,12 +123,18 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
         configuration.preferences.setValue(true, forKey: "developerExtrasEnabled")
 #endif
 
-        let webView = WKWebView(frame: .zero, configuration: configuration)
+        final class OverlayWebView: WKWebView {
+            public override func scrollWheel(with theEvent: NSEvent) {
+                // No-op to prevent scrolling
+            }
+        }
+
+        let webView = OverlayWebView(frame: .zero, configuration: configuration)
         webView.allowsLinkPreview = false
         webView.window?.acceptsMouseMovedEvents = true
         webView.window?.ignoresMouseEvents = false
         webView.configuration.userContentController.addHandler(topAutofillUserScript)
-        webView.configuration.userContentController.addUserScript(topAutofillUserScript.makeWKUserScriptSync())
+        webView.configuration.userContentController.addUserScript(topAutofillUserScript.makeWKUserScript())
         self.webView = webView
         view.addAndLayout(webView)
         topAutofillUserScript.contentOverlay = self
@@ -146,25 +144,30 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
 
     // EmailManagerRequestDelegate
 
-    nonisolated
     public func emailManager(_ emailManager: EmailManager,
                              requested url: URL,
                              method: String,
                              headers: [String: String],
                              parameters: [String: String]?,
                              httpBody: Data?,
-                             timeoutInterval: TimeInterval) async throws -> Data {
+                             timeoutInterval: TimeInterval,
+                             completion: @escaping (Data?, Error?) -> Void) {
+        let currentQueue = OperationQueue.current
+
         let finalURL = url.appendingParameters(parameters ?? [:])
 
         var request = URLRequest(url: finalURL, timeoutInterval: timeoutInterval)
         request.allHTTPHeaderFields = headers
         request.httpMethod = method
         request.httpBody = httpBody
-
-        return try await URLSession.shared.data(for: request).0
+        URLSession.shared.dataTask(with: request) { (data, _, error) in
+            currentQueue?.addOperation {
+                completion(data, error)
+            }
+        }.resume()
     }
+    // swiftlint:enable function_parameter_count
 
-    nonisolated
     public func emailManagerKeychainAccessFailed(accessType: EmailKeychainAccessType, error: EmailKeychainAccessError) {
         var parameters = [
             "access_type": accessType.rawValue,
@@ -263,20 +266,4 @@ extension ContentOverlayViewController: SecureVaultManagerDelegate {
         }
     }
 
-    public func secureVaultManager(_: SecureVaultManager, didRequestCreditCardsManagerForDomain domain: String) {
-        autofillPreferencesModel.showAutofillPopover(.cards)
-    }
-
-    public func secureVaultManager(_: SecureVaultManager, didRequestIdentitiesManagerForDomain domain: String) {
-        autofillPreferencesModel.showAutofillPopover(.identities)
-    }
-
-    public func secureVaultManager(_: SecureVaultManager, didRequestPasswordManagerForDomain domain: String) {
-        let mngr = PasswordManagerCoordinator.shared
-        if mngr.isEnabled {
-            mngr.bitwardenManagement.openBitwarden()
-        } else {
-            autofillPreferencesModel.showAutofillPopover(.logins)
-        }
-    }
 }

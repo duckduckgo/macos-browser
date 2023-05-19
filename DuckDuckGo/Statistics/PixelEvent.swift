@@ -18,12 +18,14 @@
 
 import Foundation
 import BrowserServicesKit
-import Bookmarks
-import Configuration
 
 extension Pixel {
 
     enum Event {
+        case burn(repetition: Repetition = .init(key: "fire"),
+                  burnedTabs: BurnedTabs = .init(),
+                  burnedWindows: BurnedWindows = .init())
+
         case crash
 
         case brokenSiteReport
@@ -114,16 +116,7 @@ extension Pixel {
 
         case debug(event: Debug, error: Error? = nil)
 
-        // Activation Points
-        case emailEnabledInitial
-        case cookieManagementEnabledInitial
-        case watchInDuckPlayerInitial
-        case setAsDefaultInitial
-        case importDataInitial
-
         enum Debug {
-
-            case assertionFailure(message: String, file: StaticString, line: UInt)
 
             case dbMakeDatabaseError
             case dbContainerInitializationError
@@ -143,7 +136,6 @@ extension Pixel {
 
             case fileStoreWriteFailed
             case fileMoveToDownloadsFailed
-            case fileGetDownloadLocationFailed
 
             case suggestionsFetchFailed
             case appOpenURLFailed
@@ -218,35 +210,17 @@ extension Pixel {
             case networkProtectionClientFailedToRedeemInviteCode(error: Error?)
             case networkProtectionClientFailedToParseRedeemResponse(error: Error)
             case networkProtectionClientInvalidAuthToken
+
             case networkProtectionKeychainErrorFailedToCastKeychainValueToData(field: String)
             case networkProtectionKeychainReadError(field: String, status: Int32)
             case networkProtectionKeychainWriteError(field: String, status: Int32)
             case networkProtectionKeychainDeleteError(status: Int32)
+
             case networkProtectionNoAuthTokenFoundError
+
             case networkProtectionUnhandledError(function: String, line: Int, error: Error)
-
-            case faviconDecryptionFailed
-            case downloadListItemDecryptionFailed
-            case historyEntryDecryptionFailed
-            case permissionDecryptionFailed
-
-            // Errors from Bookmarks Module
-            case missingParent
-            case bookmarksSaveFailed
-            case bookmarksSaveFailedOnImport
-
-            case bookmarksCouldNotLoadDatabase
-            case bookmarksCouldNotPrepareDatabase
-            case bookmarksMigrationAlreadyPerformed
-            case bookmarksMigrationFailed
-            case bookmarksMigrationCouldNotPrepareDatabase
-            case bookmarksMigrationCouldNotPrepareDatabaseOnFailedMigration
-            case bookmarksMigrationCouldNotRemoveOldStore
-
-            case invalidPayload(Configuration)
-
-            case burnerTabMisplaced
         }
+
     }
 }
 
@@ -254,6 +228,9 @@ extension Pixel.Event {
 
     var name: String {
         switch self {
+        case .burn(repetition: let repetition, burnedTabs: let tabs, burnedWindows: let windows):
+            return "m_mac_fire-button.\(repetition)_\(tabs)_\(windows)"
+
         case .crash:
             return "m_mac_crash"
 
@@ -310,16 +287,7 @@ extension Pixel.Event {
             } else {
                 return "m_mac_\(pixel.pixelName)"
             }
-        case .emailEnabledInitial:
-            return "m_mac.enable-email-protection.initial"
-        case .cookieManagementEnabledInitial:
-            return "m_mac.cookie-management-enabled.initial"
-        case .watchInDuckPlayerInitial:
-            return "m_mac.watch-in-duckplayer.initial"
-        case .setAsDefaultInitial:
-            return "m_mac.set-as-default.initial"
-        case .importDataInitial:
-            return "m_mac.import-data.initial"
+
         case .networkProtectionSystemExtensionUnknownActivationResult:
             return "m_mac_netp_system_extension_unknown_activation_result"
         }
@@ -330,9 +298,6 @@ extension Pixel.Event.Debug {
 
     var name: String {
         switch self {
-
-        case .assertionFailure:
-            return "assertion_failure"
 
         case .dbMakeDatabaseError:
             return "database_make_database_error"
@@ -366,8 +331,6 @@ extension Pixel.Event.Debug {
             return "fswf"
         case .fileMoveToDownloadsFailed:
             return "df"
-        case .fileGetDownloadLocationFailed:
-            return "dl"
 
         case .suggestionsFetchFailed:
             return "sgf"
@@ -441,7 +404,7 @@ extension Pixel.Event.Debug {
         case .adAttributionLogicUnexpectedStateOnRulesCompiled:
             return "ad_attribution_logic_unexpected_state_on_rules_compiled"
         case .adAttributionLogicUnexpectedStateOnInheritedAttribution:
-            return "ad_attribution_logic_unexpected_state_on_inherited_attribution_2"
+            return "ad_attribution_logic_unexpected_state_on_inherited_attribution"
         case .adAttributionLogicUnexpectedStateOnRulesCompilationFailed:
             return "ad_attribution_logic_unexpected_state_on_rules_compilation_failed"
         case .adAttributionDetectionInvalidDomainInParameter:
@@ -523,32 +486,6 @@ extension Pixel.Event.Debug {
             return "netp_no_auth_token_found_error"
         case .networkProtectionUnhandledError:
             return "netp_unhandled_error"
-
-        case .faviconDecryptionFailed:
-            return "favicon_decryption_failed"
-        case .downloadListItemDecryptionFailed:
-            return "download_list_item_decryption_failed"
-        case .historyEntryDecryptionFailed:
-            return "history_entry_decryption_failed"
-        case .permissionDecryptionFailed:
-            return "permission_decryption_failed"
-
-        case .missingParent: return "bookmark_missing_parent"
-        case .bookmarksSaveFailed: return "bookmarks_save_failed"
-        case .bookmarksSaveFailedOnImport: return "bookmarks_save_failed_on_import"
-
-        case .bookmarksCouldNotLoadDatabase: return "bookmarks_could_not_load_database"
-        case .bookmarksCouldNotPrepareDatabase: return "bookmarks_could_not_prepare_database"
-        case .bookmarksMigrationAlreadyPerformed: return "bookmarks_migration_already_performed"
-        case .bookmarksMigrationFailed: return "bookmarks_migration_failed"
-        case .bookmarksMigrationCouldNotPrepareDatabase: return "bookmarks_migration_could_not_prepare_database"
-        case .bookmarksMigrationCouldNotPrepareDatabaseOnFailedMigration:
-            return "bookmarks_migration_could_not_prepare_database_on_failed_migration"
-        case .bookmarksMigrationCouldNotRemoveOldStore: return "bookmarks_migration_could_not_remove_old_store"
-
-        case .invalidPayload(let configuration): return "m_d_\(configuration.rawValue)_invalid_payload".lowercased()
-
-        case .burnerTabMisplaced: return "burner_tab_misplaced"
         }
     }
 }

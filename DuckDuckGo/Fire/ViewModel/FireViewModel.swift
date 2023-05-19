@@ -26,7 +26,7 @@ final class FireViewModel {
     @Published var isAnimationPlaying = false
 
     /// Publisher that emits true if burning animation or burning process is in progress
-    var isFirePresentationInProgress: AnyPublisher<Bool, Never> {
+    var shouldPreventUserInteraction: AnyPublisher<Bool, Never> {
         Publishers
             .CombineLatest($isAnimationPlaying, fire.$burningData)
             .map { (isAnimationPlaying, burningData) -> (Bool) in
@@ -35,12 +35,10 @@ final class FireViewModel {
             .eraseToAnyPublisher()
     }
 
-    @MainActor
     init(fire: Fire) {
         self.fire = fire
     }
 
-    @MainActor
     init() {
         fire = Fire()
     }

@@ -31,14 +31,8 @@ extension Pixel {
         static let underlyingErrorSQLiteCode = "sqlrc"
         static let underlyingErrorSQLiteExtendedCode = "sqlerc"
 
-        static let keychainErrorCode = "keychain_error_code"
-
         static let emailCohort = "cohort"
         static let emailLastUsed = "duck_address_last_used"
-
-        static let assertionMessage = "message"
-        static let assertionFile = "file"
-        static let assertionLine = "line"
     }
 
     enum Values {
@@ -51,34 +45,21 @@ extension Pixel.Event {
 
     var parameters: [String: String]? {
         switch self {
-        case .debug(event: let debugEvent, error: let error):
+        case .debug(event: _, error: let error):
             var params = [String: String]()
-
-            if let errorWithUserInfo = error as? ErrorWithParameters {
-                params = errorWithUserInfo.errorParameters
-            }
-
-            if case let .assertionFailure(message, file, line) = debugEvent {
-                params[Pixel.Parameters.assertionMessage] = message
-                params[Pixel.Parameters.assertionFile] = String(file)
-                params[Pixel.Parameters.assertionLine] = String(line)
-            }
 
             if let error = error {
                 let nsError = error as NSError
 
                 params[Pixel.Parameters.errorCode] = "\(nsError.code)"
                 params[Pixel.Parameters.errorDesc] = nsError.domain
-
                 if let underlyingError = nsError.userInfo["NSUnderlyingError"] as? NSError {
                     params[Pixel.Parameters.underlyingErrorCode] = "\(underlyingError.code)"
                     params[Pixel.Parameters.underlyingErrorDesc] = underlyingError.domain
                 }
-
                 if let sqlErrorCode = nsError.userInfo["SQLiteResultCode"] as? NSNumber {
                     params[Pixel.Parameters.underlyingErrorSQLiteCode] = "\(sqlErrorCode.intValue)"
                 }
-
                 if let sqlExtendedErrorCode = nsError.userInfo["SQLiteExtendedResultCode"] as? NSNumber {
                     params[Pixel.Parameters.underlyingErrorSQLiteExtendedCode] = "\(sqlExtendedErrorCode.intValue)"
                 }
@@ -87,7 +68,8 @@ extension Pixel.Event {
             return params
 
         // Don't use default to force new items to be thought about
-        case .crash,
+        case .burn,
+             .crash,
              .brokenSiteReport,
              .compileRulesWait,
              .serp,
@@ -106,11 +88,6 @@ extension Pixel.Event {
              .emailUserPressedUseAlias,
              .emailUserPressedUseAddress,
              .jsPixel,
-             .emailEnabledInitial,
-             .cookieManagementEnabledInitial,
-             .watchInDuckPlayerInitial,
-             .setAsDefaultInitial,
-             .importDataInitial,
              .networkProtectionSystemExtensionUnknownActivationResult:
 
             return nil

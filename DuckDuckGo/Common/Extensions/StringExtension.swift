@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import os.log
 import BrowserServicesKit
 
 extension String {
@@ -44,16 +45,6 @@ extension String {
         self.replacingOccurrences(of: "\\", with: "\\\\")
             .replacingOccurrences(of: "\"", with: "\\\"")
             .replacingOccurrences(of: "'", with: "\\'")
-    }
-
-    init(_ staticString: StaticString) {
-        self = staticString.withUTF8Buffer {
-            String(decoding: $0, as: UTF8.self)
-        }
-    }
-
-    var utf8data: Data {
-        data(using: .utf8)!
     }
 
     // MARK: - URL

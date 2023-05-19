@@ -17,7 +17,7 @@
 //
 
 import Foundation
-import Common
+import os
 
 /// Stores information about NetP's tunnel health
 ///

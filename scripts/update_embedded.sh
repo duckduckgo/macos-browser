@@ -7,7 +7,7 @@ CONFIG_URL="https://staticcdn.duckduckgo.com/trackerblocking/config/v2/macos-con
 
 # If -c is passed, then check the URLs in the Configuration files are correct.
 if [ "$1" == "-c" ]; then
-	grep http DuckDuckGo/AppDelegate/AppConfigurationURLProvider.swift | while read -r line
+	grep http DuckDuckGo/Configuration/ConfigurationDownloading.swift | while read -r line
 	do
 		# if trimmed line begins with "case" then check the url in the line and ensure
 		# it matches the expected url.
@@ -15,7 +15,7 @@ if [ "$1" == "-c" ]; then
 			# Get URL from line and remove quotes
 			url=$(echo "$line" | awk '{print $4}' | sed 's/^"//' | sed 's/"$//')
 			case_name=$(echo "$line" | awk '{print $2}')
-			if [ "$case_name" == "trackerDataSet" ] && [ "$url" != "$TDS_URL" ]; then
+			if [ "$case_name" == "trackerRadar" ] && [ "$url" != "$TDS_URL" ]; then
 				echo "Error: $url does not match $TDS_URL"
 				exit 1
 			elif [ "$case_name" == "privacyConfiguration" ] && [ "$url" != "$CONFIG_URL" ]; then
@@ -80,8 +80,8 @@ performUpdate() {
 }
 
 performUpdate $TDS_URL \
-		"${PWD}/DuckDuckGo/ContentBlocker/AppTrackerDataSetProvider.swift" \
-		"${PWD}/DuckDuckGo/ContentBlocker/trackerData.json"
+		"${PWD}/DuckDuckGo/Content Blocker/AppTrackerDataSetProvider.swift" \
+		"${PWD}/DuckDuckGo/Content Blocker/trackerData.json"
 performUpdate $CONFIG_URL \
-		"${PWD}/DuckDuckGo/ContentBlocker/AppPrivacyConfigurationDataProvider.swift" \
-		"${PWD}/DuckDuckGo/ContentBlocker/macos-config.json"
+		"${PWD}/DuckDuckGo/Content Blocker/AppPrivacyConfigurationDataProvider.swift" \
+		"${PWD}/DuckDuckGo/Content Blocker/macos-config.json"

@@ -59,9 +59,4 @@ extension NSImage {
         return image
     }
 
-    func ciImage(with size: NSSize?) -> CIImage {
-        var rect = NSRect(origin: .zero, size: size ?? self.size)
-        return CIImage(cgImage: self.cgImage(forProposedRect: &rect, context: nil, hints: nil)!)
-    }
-
 }

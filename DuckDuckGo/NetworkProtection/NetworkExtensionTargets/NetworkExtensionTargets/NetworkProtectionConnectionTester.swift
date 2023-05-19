@@ -19,7 +19,7 @@
 import Foundation
 import Network
 import NetworkExtension
-import Common
+import os
 
 /// This class takes care of testing whether the Network Protection connection is working or not.  Results are handled by
 /// an injected object that implements ``NetworkProtectionConnectionTestResultsHandler``.

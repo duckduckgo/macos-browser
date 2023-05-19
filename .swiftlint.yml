@@ -6,6 +6,8 @@ disabled_rules:
   - unused_setter_value
   - line_length
   - type_name
+  - todo # Temporarily disabled for NetP work
+  - file_header # Temporarily disabled for NetP work
   - implicit_getter
   - function_parameter_count
 
@@ -21,13 +23,6 @@ custom_rules:
     match_kinds:
       - keyword
     message: "Classes should be `final` by default, use explicit `internal` or `public` for non-final classes."
-    severity: error
-  enforce_os_log_wrapper:
-    included: ".*\\.swift"
-    name: "Use `import Common` for os_log instead of `import os.log`"
-    regex: "^(import (?:os\\.log|os|OSLog))$"
-    capture_group: 0
-    message: "os_log wrapper ensures log args are @autoclosures (computed when needed) and to be able to use String Interpolation."
     severity: error
 
 # Rule Config
@@ -68,10 +63,7 @@ file_header:
 # General Config
 excluded:
   - DuckDuckGo/Common/Localizables/UserText.swift
-  - UnitTests
-  - IntegrationTests
-  - LocalPackages/*/Package.swift
-  - release
-  - UITests
+  - Unit Tests
+  - Integration Tests
+  - UI Tests
   - vendor
-  - DerivedData

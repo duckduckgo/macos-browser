@@ -47,18 +47,4 @@ final class MainView: NSView {
         }
     }
 
-    // MARK: NSDraggingDestination
-
-    override func draggingEntered(_ draggingInfo: NSDraggingInfo) -> NSDragOperation {
-        return (nextResponder as? NSDraggingDestination)?.draggingEntered?(draggingInfo) ?? .none
-    }
-
-    override func draggingUpdated(_ draggingInfo: NSDraggingInfo) -> NSDragOperation {
-        return (nextResponder as? NSDraggingDestination)?.draggingUpdated?(draggingInfo) ?? .none
-    }
-
-    override func performDragOperation(_ draggingInfo: NSDraggingInfo) -> Bool {
-        return (nextResponder as? NSDraggingDestination)?.performDragOperation?(draggingInfo) ?? false
-    }
-
 }

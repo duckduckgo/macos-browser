@@ -50,7 +50,6 @@ final class AutofillPreferencesModel: ObservableObject {
         }
     }
 
-    @MainActor
     @Published private(set) var passwordManager: PasswordManager {
         didSet {
             persistor.passwordManager = passwordManager
@@ -93,7 +92,6 @@ final class AutofillPreferencesModel: ObservableObject {
         }
     }
 
-    @MainActor
     func passwordManagerSettingsChange(passwordManager: PasswordManager) {
         self.passwordManager = passwordManager
     }
@@ -102,18 +100,6 @@ final class AutofillPreferencesModel: ObservableObject {
         NSApp.sendAction(#selector(AppDelegate.openImportBrowserDataWindow(_:)), to: nil, from: nil)
     }
 
-    func openExportLogins() {
-        NSApp.sendAction(#selector(AppDelegate.openExportLogins(_:)), to: nil, from: nil)
-    }
-
-    @MainActor
-    func showAutofillPopover(_ selectedCategory: SecureVaultSorting.Category = .allItems) {
-        guard let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController else { return }
-        guard let navigationViewController = parentWindowController.mainViewController.navigationBarViewController else { return }
-        navigationViewController.showPasswordManagerPopover(selectedCategory: selectedCategory)
-    }
-
-    @MainActor
     init(
         persistor: AutofillPreferencesPersistor = AutofillPreferences(),
         userAuthenticator: UserAuthenticating = DeviceAuthenticator.shared,
@@ -137,7 +123,6 @@ final class AutofillPreferencesModel: ObservableObject {
 
     // MARK: - Password Manager
 
-    @MainActor
     func presentBitwardenSetupFlow() {
         let connectBitwardenViewController = ConnectBitwardenViewController(nibName: nil, bundle: nil)
         let connectBitwardenWindowController = connectBitwardenViewController.wrappedInWindowController()

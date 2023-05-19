@@ -18,7 +18,7 @@
 
 import AppKit
 import Foundation
-import Common
+import os
 import NetworkProtection
 
 extension Bundle {

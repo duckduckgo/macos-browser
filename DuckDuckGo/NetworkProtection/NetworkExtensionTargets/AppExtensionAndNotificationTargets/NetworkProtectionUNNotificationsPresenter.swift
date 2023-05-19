@@ -18,6 +18,7 @@
 
 import Foundation
 import UserNotifications
+import os
 import AppKit
 import AppIntents
 import NetworkProtection

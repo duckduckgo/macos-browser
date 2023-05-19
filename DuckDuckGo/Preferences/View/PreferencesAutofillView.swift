@@ -17,7 +17,6 @@
 //
 
 import SwiftUI
-import SwiftUIExtensions
 
 fileprivate extension Preferences.Const {
     static let autoLockWarningOffset: CGFloat = {
@@ -61,66 +60,69 @@ extension Preferences {
 
         var body: some View {
             VStack(alignment: .leading, spacing: 0) {
-
-                // TITLE
-                TextMenuTitle(text: UserText.autofill)
-
-                // Autofill Content  Button
-                PreferencePaneSection {
-                    Button(UserText.autofillViewContentButton) {
-                        model.showAutofillPopover()
-                    }
-#if APPSTORE
-                    Button(UserText.importPasswords) {
-                        model.openImportBrowserDataWindow()
-                    }
-                    Button(UserText.exportLogins) {
-                        model.openExportLogins()
-                    }
-#endif
-
-                }
+                Text(UserText.autofill)
+                    .font(Const.Fonts.preferencePaneTitle)
 
 #if !APPSTORE
-                // SECTION 1: Password Manager
-                PreferencePaneSection {
-                    TextMenuItemHeader(text: UserText.autofillPasswordManager)
-                    VStack(alignment: .leading, spacing: 6) {
-                        Picker(selection: passwordManagerBinding, content: {
-                            Text(UserText.autofillPasswordManagerDuckDuckGo).tag(PasswordManager.duckduckgo)
-                            Text(UserText.autofillPasswordManagerBitwarden).tag(PasswordManager.bitwarden)
-                        }, label: {})
-                        .pickerStyle(.radioGroup)
-                        .offset(x: Const.pickerHorizontalOffset)
-                        if model.passwordManager == .bitwarden && !model.isBitwardenSetupFlowPresented {
-                            bitwardenStatusView(for: bitwardenManager.status)
-                        }
-                    }
-                    Spacer()
-                    Button(UserText.importPasswords) {
-                        model.openImportBrowserDataWindow()
-                    }
-                    Button(UserText.exportLogins) {
-                        model.openExportLogins()
+                // Password Manager:
+
+                Section(spacing: 0) {
+                    Text(UserText.autofillPasswordManager)
+                        .font(Const.Fonts.preferencePaneSectionHeader)
+                        .padding(.bottom, 6)
+
+                    Picker(selection: passwordManagerBinding, content: {
+                        Text(UserText.autofillPasswordManagerDuckDuckGo).tag(PasswordManager.duckduckgo)
+
+                        Text(UserText.autofillPasswordManagerBitwarden).tag(PasswordManager.bitwarden)
+                    }, label: {})
+                    .pickerStyle(.radioGroup)
+                    .offset(x: Const.pickerHorizontalOffset)
+                    .padding(.bottom, 6)
+
+                    switch (model.passwordManager, model.isBitwardenSetupFlowPresented) {
+                    case (.bitwarden, false):
+                        bitwardenStatusView(for: bitwardenManager.status)
+                    case (.duckduckgo, _), (.bitwarden, true):
+                        Text(UserText.autofillPasswordManagerBitwardenDisclaimer)
+                            .font(Const.Fonts.preferencePaneCaption)
+                            .foregroundColor(Color("GreyTextColor"))
+                            .fixMultilineScrollableText()
+                            .offset(x: Const.autoLockWarningOffset)
                     }
                 }
 #endif
 
-                // SECTION 2: Ask to Save:
-                PreferencePaneSection {
-                    TextMenuItemHeader(text: UserText.autofillAskToSave)
+                // Ask to Save:
+
+                Section(spacing: 0) {
+                    Text(UserText.autofillAskToSave)
+                        .font(Const.Fonts.preferencePaneSectionHeader)
+                        .padding(.bottom, 6)
+
+                    Text(UserText.autofillAskToSaveExplanation)
+                        .font(Const.Fonts.preferencePaneCaption)
+                        .foregroundColor(Color("GreyTextColor"))
+                        .fixMultilineScrollableText()
+                        .padding(.bottom, 12)
+
                     VStack(alignment: .leading, spacing: 6) {
-                        ToggleMenuItem(title: UserText.autofillUsernamesAndPasswords, isOn: $model.askToSaveUsernamesAndPasswords)
-                        ToggleMenuItem(title: UserText.autofillAddresses, isOn: $model.askToSaveAddresses)
-                        ToggleMenuItem(title: UserText.autofillPaymentMethods, isOn: $model.askToSavePaymentMethods)
+                        Toggle(UserText.autofillUsernamesAndPasswords, isOn: $model.askToSaveUsernamesAndPasswords)
+                            .fixMultilineScrollableText()
+                        Toggle(UserText.autofillAddresses, isOn: $model.askToSaveAddresses)
+                            .fixMultilineScrollableText()
+                        Toggle(UserText.autofillPaymentMethods, isOn: $model.askToSavePaymentMethods)
+                            .fixMultilineScrollableText()
                     }
-                    TextMenuItemCaption(text: UserText.autofillAskToSaveExplanation)
                 }
 
-                // SECTION 3: Auto-Lock:
+                // Auto-Lock:
 
-                PreferencePaneSection {
-                    TextMenuItemHeader(text: UserText.autofillAutoLock)
+                Section(spacing: 0) {
+                    Text(UserText.autofillAutoLock)
+                        .font(Const.Fonts.preferencePaneSectionHeader)
+                        .padding(.bottom, 12)
+
                     Picker(selection: isAutoLockEnabledBinding, content: {
                         HStack {
                             Text(UserText.autofillLockWhenIdle)
@@ -140,7 +142,19 @@ extension Preferences {
                     }, label: {})
                     .pickerStyle(.radioGroup)
                     .offset(x: Const.pickerHorizontalOffset)
-                    TextMenuItemCaption(text: UserText.autofillNeverLockWarning)
+                    .padding(.bottom, 6)
+
+                    Text(UserText.autofillNeverLockWarning)
+                        .font(Const.Fonts.preferencePaneCaption)
+                        .foregroundColor(Color("GreyTextColor"))
+                        .fixMultilineScrollableText()
+                        .offset(x: Const.autoLockWarningOffset)
+                }
+
+                Section(spacing: 0) {
+                    Button(UserText.importBrowserData) {
+                        model.openImportBrowserDataWindow()
+                    }
                 }
             }
         }

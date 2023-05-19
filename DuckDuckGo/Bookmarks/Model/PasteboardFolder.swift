@@ -17,7 +17,6 @@
 //
 
 import Foundation
-import AppKit
 
 struct PasteboardFolder: Hashable {
 
@@ -89,7 +88,7 @@ struct PasteboardFolder: Hashable {
     private let folderName: String
 
     init(folder: BookmarkFolder) {
-        self.folderID = folder.id
+        self.folderID = folder.id.uuidString
         self.folderName = folder.title
     }
 

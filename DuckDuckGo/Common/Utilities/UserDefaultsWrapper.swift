@@ -16,7 +16,6 @@
 //  limitations under the License.
 //
 
-import AppKit
 import Foundation
 
 @propertyWrapper
@@ -48,7 +47,7 @@ public struct UserDefaultsWrapper<T> {
         case lastUsedCustomDownloadLocation = "preferences.custom-last-used-download-location"
         case alwaysRequestDownloadLocationKey = "preferences.download-location.always-request"
         case autoconsentEnabled = "preferences.autoconsent-enabled"
-        case duckPlayerMode = "preferences.duck-player"
+        case privatePlayerMode = "preferences.duck-player"
         case youtubeOverlayInteracted = "preferences.youtube-overlay-interacted"
 
         case selectedPasswordManager = "preferences.autofill.selected-password-manager"
@@ -67,7 +66,6 @@ public struct UserDefaultsWrapper<T> {
         case currentThemeName = "com.duckduckgo.macos.currentThemeNameKey"
         case showFullURL = "preferences.appearance.show-full-url"
         case showAutocompleteSuggestions = "preferences.appearance.show-autocomplete-suggestions"
-        case defaultPageZoom = "preferences.appearance.default-page-zoom"
 
         // ATB
         case installDate = "statistics.installdate.key"
@@ -92,15 +90,11 @@ public struct UserDefaultsWrapper<T> {
         case historyV5toV6Migration = "history.v5.to.v6.migration.2"
 
         case showBookmarksBar = "bookmarks.bar.show"
-        case lastBookmarksBarUsagePixelSendDate = "bookmarks.bar.last-usage-pixel-send-date"
 
         case pinnedViews = "pinning.pinned-views"
         case manuallyToggledPinnedViews = "pinning.manually-toggled-pinned-views"
 
         case lastDatabaseFactoryFailurePixelDate = "last.database.factory.failure.pixel.date"
-
-        case loggingEnabledDate = "logging.enabled.date"
-        case loggingCategories = "logging.categories"
     }
 
     enum RemovedKeys: String, CaseIterable {
@@ -111,69 +105,48 @@ public struct UserDefaultsWrapper<T> {
     private let defaultValue: T
     private let setIfEmpty: Bool
 
-    private let customUserDefaults: UserDefaults?
-
-    var defaults: UserDefaults {
-        customUserDefaults ?? Self.sharedDefaults
-    }
-
-    static var sharedDefaults: UserDefaults {
-#if DEBUG
-        if case .normal = NSApp.runType {
-            return .standard
-        } else {
-            return UserDefaults(suiteName: Bundle.main.bundleIdentifier! + "." + NSApp.runType.description)!
-        }
-#else
-        return .standard
-#endif
-    }
-
-    public init(key: Key, defaultValue: T, setIfEmpty: Bool = false, defaults: UserDefaults? = nil) {
+    public init(key: Key, defaultValue: T, setIfEmpty: Bool = false) {
         self.key = key
         self.defaultValue = defaultValue
         self.setIfEmpty = setIfEmpty
-        self.customUserDefaults = defaults
     }
 
     public var wrappedValue: T {
         get {
-            if let storedValue = defaults.object(forKey: key.rawValue),
+            if let storedValue = UserDefaults.standard.object(forKey: key.rawValue),
                let typedValue = storedValue as? T {
                 return typedValue
             }
 
             if setIfEmpty {
-                defaults.set(defaultValue, forKey: key.rawValue)
+                UserDefaults.standard.set(defaultValue, forKey: key.rawValue)
             }
 
             return defaultValue
         }
         set {
             if (newValue as? AnyOptional)?.isNil == true {
-                defaults.removeObject(forKey: key.rawValue)
+                UserDefaults.standard.removeObject(forKey: key.rawValue)
             } else {
-                defaults.set(newValue, forKey: key.rawValue)
+                UserDefaults.standard.set(newValue, forKey: key.rawValue)
             }
         }
     }
 
     static func clearAll() {
-        let defaults = sharedDefaults
         Key.allCases.forEach { key in
-            defaults.removeObject(forKey: key.rawValue)
+            UserDefaults.standard.removeObject(forKey: key.rawValue)
         }
     }
 
     static func clearRemovedKeys() {
-        let defaults = sharedDefaults
         RemovedKeys.allCases.forEach { key in
-            defaults.removeObject(forKey: key.rawValue)
+            UserDefaults.standard.removeObject(forKey: key.rawValue)
         }
     }
 
     static func clear(_ key: Key) {
-        sharedDefaults.removeObject(forKey: key.rawValue)
+        UserDefaults.standard.removeObject(forKey: key.rawValue)
     }
 
 }

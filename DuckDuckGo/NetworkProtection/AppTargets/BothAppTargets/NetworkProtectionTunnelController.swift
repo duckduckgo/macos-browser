@@ -19,11 +19,11 @@
 import Foundation
 import Combine
 import SwiftUI
-import Common
+import OSLog
+import BrowserServicesKit
 import NetworkExtension
 import NetworkProtection
 import SystemExtensions
-import Networking
 
 typealias NetworkProtectionStatusChangeHandler = (NetworkProtection.ConnectionStatus) -> Void
 typealias NetworkProtectionConfigChangeHandler = () -> Void
@@ -195,7 +195,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         protocolConfiguration.serverAddress = "127.0.0.1" // Dummy address... the NetP service will take care of grabbing a real server
         protocolConfiguration.providerBundleIdentifier = NetworkProtectionBundle.extensionBundle().bundleIdentifier
         protocolConfiguration.providerConfiguration = [
-            NetworkProtectionOptionKey.defaultPixelHeaders.rawValue: APIRequest.Headers().default
+            NetworkProtectionOptionKey.defaultPixelHeaders.rawValue: APIHeaders().defaultHeaders
         ]
         tunnelManager.protocolConfiguration = protocolConfiguration
     }

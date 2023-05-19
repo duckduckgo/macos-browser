@@ -17,7 +17,6 @@
 //
 
 import Foundation
-import AppKit
 
 extension Pixel.Event {
 
@@ -135,7 +134,6 @@ extension Pixel.Event {
             self = .lessThan6
         }
 
-        @MainActor
         init() {
             let tabCount = WindowControllersManager.shared.mainWindowControllers
                 .reduce(0) { $0 + $1.mainViewController.tabCollectionViewModel.tabCollection.tabs.count }
@@ -158,7 +156,6 @@ extension Pixel.Event {
             self = .moreThan1
         }
 
-        @MainActor
         init() {
             let windowCount = WindowControllersManager.shared.mainWindowControllers.count
             self.init(windowCount)
@@ -176,7 +173,7 @@ extension Pixel.Event {
 
         init(url: URL?, bookmarkManager: BookmarkManager = LocalBookmarkManager.shared) {
             guard let url = url,
-                  let bookmark = bookmarkManager.getBookmark(forUrl: url.absoluteString) else {
+                  let bookmark = bookmarkManager.getBookmark(for: url) else {
                 self = .website
                 return
             }

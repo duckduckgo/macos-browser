@@ -1,12 +1,12 @@
 {
   "images" : [
     {
-      "filename" : "Browser-Test-ITC-128-1.png",
+      "filename" : "Browser-Test-ITC-128.png",
       "idiom" : "mac",
       "scale" : "1x"
     },
     {
-      "filename" : "Browser-Test-ITC-128@2x-1.png",
+      "filename" : "Browser-Test-ITC-128@2x.png",
       "idiom" : "mac",
       "scale" : "2x"
     }

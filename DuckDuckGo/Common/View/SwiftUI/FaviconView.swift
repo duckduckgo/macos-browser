@@ -17,7 +17,6 @@
 //
 
 import SwiftUI
-import SwiftUIExtensions
 
 struct FaviconView: View {
 
@@ -35,8 +34,8 @@ struct FaviconView: View {
     }
 
     func refreshImage() {
-        if let duckPlayerImage = DuckPlayer.shared.image(for: self) {
-            image = duckPlayerImage
+        if let privatePlayerImage = PrivatePlayer.shared.image(for: self) {
+            image = privatePlayerImage
             return
         }
 

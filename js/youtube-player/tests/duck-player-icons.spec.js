@@ -1,8 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { setupIconOverlays, getClickedDuckPlayerLink } from './utils.js';
 
-// skipping this test as it's actually an e2e test and is separated out in another branch
-test.skip('youtube homepage', async ({ page }) => {
+test('youtube homepage', async ({ page }) => {
   await setupIconOverlays(page);
 
   let firstHomepageVideoThumbnail = page.locator('ytd-rich-grid-renderer ytd-rich-grid-row:first-child ytd-rich-item-renderer:first-child #thumbnail'),

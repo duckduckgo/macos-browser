@@ -20,4 +20,4 @@ If at any point it isn't actively being worked on/ready for review/otherwise mov
 [Pull Request Review Checklist](https://app.asana.com/0/1202500774821704/1203764234894239/f)
 [Software Engineering Expectations](https://app.asana.com/0/59792373528535/199064865822552)
 [Technical Design Template](https://app.asana.com/0/59792373528535/184709971311943)
-[Pull Request Documentation](https://app.asana.com/0/1202500774821704/1204012835277482/f)
+**When ready for review, remember to post the PR in MM**

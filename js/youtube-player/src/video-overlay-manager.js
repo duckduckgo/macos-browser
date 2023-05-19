@@ -1,7 +1,6 @@
 import {applyEffect, execCleanups, VideoParams} from "./util.js";
 import {VideoPlayerIcon} from "./video-player-icon";
 import {DDGVideoOverlay} from "./components/ddg-video-overlay.js";
-import {Pixel} from "./comms";
 
 
 /**
@@ -18,13 +17,7 @@ export class VideoOverlayManager {
 
     /**
      * @param {import("../youtube-inject").UserValues} userValues
-     * @param {{
-     *    getHref(): string,
-     *    getLargeThumbnailSrc(videoId: string): string,
-     *    setHref(href: string): void,
-     *    isTestMode(): boolean,
-     *    hasOneTimeOverride(): boolean
-     * }} environment
+     * @param {{getHref(): string, getLargeThumbnailSrc(videoId: string): string, setHref(href: string): void}} environment
      * @param {import("./comms").Communications} comms
      */
     constructor(userValues, environment, comms) {
@@ -162,9 +155,7 @@ export class VideoOverlayManager {
             }
             if ('alwaysAsk' in userValues.privatePlayerMode) {
                 if (!userValues.overlayInteracted) {
-                    if (!this.environment.hasOneTimeOverride()) {
-                        this.addLargeOverlay(userValues, params)
-                    }
+                    this.addLargeOverlay(userValues, params)
                 } else {
                     this.addSmallDaxOverlay(params)
                 }
@@ -178,7 +169,6 @@ export class VideoOverlayManager {
      */
     appendOverlayToPage(targetElement, params) {
         this.sideEffect(`appending ${DDGVideoOverlay.CUSTOM_TAG_NAME} to the page`, () => {
-            this.comms.sendPixel(new Pixel({name: "overlay"}))
             const overlayElement = new DDGVideoOverlay(this.environment, params, this)
             targetElement.appendChild(overlayElement)
 
@@ -241,10 +231,8 @@ export class VideoOverlayManager {
         /** @type {import("../youtube-inject.js").UserValues['privatePlayerMode']} */
         let privatePlayerMode = {alwaysAsk: {}};
         if (remember) {
-            this.comms.sendPixel(new Pixel({name: "play.use", remember: "1"}));
-            privatePlayerMode = {enabled: {}}
+            privatePlayerMode = {enabled: {name: "shane"}}
         } else {
-            this.comms.sendPixel(new Pixel({name: "play.use", remember: "0"}));
             // do nothing. The checkbox was off meaning we don't want to save any choice
         }
         const outgoing = {
@@ -269,7 +257,6 @@ export class VideoOverlayManager {
          * and instead we just swap the main overlay for Dax
          */
         if (remember) {
-            this.comms.sendPixel(new Pixel({name: "play.do_not_use", remember: "1"}))
             /** @type {import("../youtube-inject.js").UserValues['privatePlayerMode']} */
             let privatePlayerMode = {alwaysAsk: {}};
             this.comms.setUserValues({
@@ -280,7 +267,6 @@ export class VideoOverlayManager {
                 .then(() => this.watchForVideoBeingAdded({ignoreCache: true, via: 'userOptOut'}))
                 .catch(e => console.error("could not set userChoice for opt-out", e))
         } else {
-            this.comms.sendPixel(new Pixel({name: "play.do_not_use", remember: "0"}))
             this.removeAllOverlays();
             this.addSmallDaxOverlay(params)
         }

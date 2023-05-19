@@ -18,7 +18,6 @@
 
 import Cocoa
 
-@MainActor
 final class FireCoordinator {
 
     static var fireViewModel = FireViewModel()
@@ -35,7 +34,7 @@ final class FireCoordinator {
             burningWindow.makeKeyAndOrderFront(nil)
             waitForOpening = false
         } else {
-            burningWindow = WindowsManager.openNewWindow(isBurner: false)!
+            burningWindow = WindowsManager.openNewWindow()!
             waitForOpening = true
         }
 
@@ -58,7 +57,9 @@ final class FireCoordinator {
     static func showFirePopover(relativeTo positioningView: NSView, tabCollectionViewModel: TabCollectionViewModel) {
         if !(firePopover?.isShown ?? false) {
             firePopover = FirePopover(fireViewModel: fireViewModel, tabCollectionViewModel: tabCollectionViewModel)
-            firePopover?.showBelow(positioningView)
+            firePopover?.show(relativeTo: positioningView.bounds.insetFromLineOfDeath(),
+                             of: positioningView,
+                             preferredEdge: .maxY)
         }
     }
 

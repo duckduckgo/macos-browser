@@ -24,5 +24,3 @@ Notes for Duck Player
 
 - `youtube-inject.js` is the entry point for the JavaScript Bundle that's used by `YoutubeOverlayUserScript.swift`
 - when you 'build' the JavaScript bundle, changes to the compiled artifact `youtube-inject-bundle.js` should also be checked in when you commit.
-- if you make any changes, please run the integration tests
-  - `cd js/youtube-player && npm run test.integration`

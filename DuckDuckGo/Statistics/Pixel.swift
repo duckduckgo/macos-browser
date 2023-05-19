@@ -17,8 +17,7 @@
 //
 
 import Foundation
-import Networking
-import Common
+import os.log
 
 final class Pixel {
 
@@ -42,7 +41,7 @@ final class Pixel {
               withAdditionalParameters params: [String: String]? = nil,
               allowedQueryReservedCharacters: CharacterSet? = nil,
               includeAppVersionParameter: Bool = true,
-              withHeaders headers: HTTPHeaders = APIRequest.Headers().default,
+              withHeaders headers: HTTPHeaders = APIHeaders().defaultHeaders,
               onComplete: @escaping (Error?) -> Void = {_ in }) {
 
         var newParams = params ?? [:]
@@ -54,11 +53,12 @@ final class Pixel {
         #endif
 
         var headers = headers
-        headers[APIRequest.HTTPHeaderField.moreInfo] = "See " + URL.duckDuckGoMorePrivacyInfo.absoluteString
+        headers[APIHeaders.Name.moreInfo] = "See " + URL.duckDuckGoMorePrivacyInfo.absoluteString
 
         guard !dryRun else {
             let params = params?.filter { key, _ in !["appVersion", "test"].contains(key) } ?? [:]
             os_log(.debug, log: .pixel, "%@ %@", pixelName.replacingOccurrences(of: "_", with: "."), params)
+
             // simulate server response time for Dry Run mode
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 onComplete(nil)
@@ -66,12 +66,14 @@ final class Pixel {
             return
         }
 
-        let configuration = APIRequest.Configuration(url: URL.pixelUrl(forPixelNamed: pixelName),
-                                                     queryParameters: newParams,
-                                                     allowedQueryReservedCharacters: allowedQueryReservedCharacters,
-                                                     headers: headers)
-        let request = APIRequest(configuration: configuration, urlSession: URLSession.session(useMainThreadCallbackQueue: true))
-        request.fetch { (_, error) in
+        let url = URL.pixelUrl(forPixelNamed: pixelName)
+        APIRequest.request(
+            url: url,
+            parameters: newParams,
+            allowedQueryReservedCharacters: allowedQueryReservedCharacters,
+            headers: headers,
+            callBackOnMainThread: true
+        ) { (_, error) in
             onComplete(error)
         }
     }
@@ -100,9 +102,4 @@ final class Pixel {
                           onComplete: onComplete)
     }
 
-}
-
-public func pixelAssertionFailure(_ message: @autoclosure () -> String = String(), file: StaticString = #fileID, line: UInt = #line) {
-    Pixel.fire(.debug(event: Pixel.Event.Debug.assertionFailure(message: message(), file: file, line: line)))
-    Swift.assertionFailure(message(), file: file, line: line)
 }

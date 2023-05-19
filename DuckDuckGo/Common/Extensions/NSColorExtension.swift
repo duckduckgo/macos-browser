@@ -36,30 +36,6 @@ extension NSColor {
         NSColor(named: "AddressBarBackgroundColor")!
     }
 
-    static var burnerAddressBarBackgroundColor: NSColor {
-        NSColor(named: "BurnerAddressBarBackgroundColor")!
-    }
-
-    static var burnerAddressBarFocusedBackgroundColor: NSColor {
-        NSColor(named: "BurnerAddressBarBackgroundColor")!
-    }
-
-    static var burnerAccentColor: NSColor {
-        NSColor(named: "BurnerAccentColor")!
-    }
-
-    static var burnerWindowTabSeparatorColor: NSColor {
-        NSColor(named: "BurnerWindowTabSeparatorColor")!
-    }
-
-    static var burnerWindowMouseOverColor: NSColor {
-        .alternateSelectedControlTextColor.withAlphaComponent(0.1)
-    }
-
-    static var burnerWindowMouseDownColor: NSColor {
-        .alternateSelectedControlTextColor.withAlphaComponent(0.2)
-    }
-
     static var addressBarBorderColor: NSColor {
         NSColor(named: "AddressBarBorderColor")!
     }
@@ -88,10 +64,6 @@ extension NSColor {
 
     static var inactiveSearchBarBackground: NSColor {
         NSColor(named: "InactiveSearchBarBackground")!
-    }
-
-    static var burnerInactiveSearchBarBackground: NSColor {
-        NSColor(named: "BurnerInactiveSearchBarBackground")!
     }
 
     static var suggestionTextColor: NSColor {
@@ -167,13 +139,5 @@ extension NSColor {
     }
 
     static let buttonColor: NSColor = NSColor(named: "ButtonColor")!
-
-    static var logoBackgroundColor: NSColor {
-        NSColor(named: "LogoBackgroundColor")!
-    }
-
-    var ciColor: CIColor {
-        CIColor(color: self)!
-    }
 
 }

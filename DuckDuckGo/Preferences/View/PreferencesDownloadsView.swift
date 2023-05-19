@@ -17,7 +17,6 @@
 //
 
 import SwiftUI
-import SwiftUIExtensions
 
 extension Preferences {
 
@@ -26,22 +25,22 @@ extension Preferences {
 
         var body: some View {
             VStack(alignment: .leading, spacing: 0) {
-                // TITLE
-                TextMenuTitle(text: UserText.downloads)
+                Text(UserText.downloads)
+                    .font(Const.Fonts.preferencePaneTitle)
 
-                // SECTION 1: Location
-                PreferencePaneSection {
-                    TextMenuItemHeader(text: UserText.downloadsLocation)
+                Section {
+                    Text(UserText.downloadsLocation)
+                        .font(Const.Fonts.preferencePaneSectionHeader)
+
                     HStack {
                         NSPathControlView(url: model.selectedDownloadLocation)
-#if !APPSTORE
                         Button(UserText.downloadsChangeDirectory) {
                             model.presentDownloadDirectoryPanel()
                         }
-#endif
                     }
                     .disabled(model.alwaysRequestDownloadLocation)
-                    ToggleMenuItem(title: UserText.downloadsAlwaysAsk, isOn: $model.alwaysRequestDownloadLocation)
+
+                    Toggle(UserText.downloadsAlwaysAsk, isOn: $model.alwaysRequestDownloadLocation)
                 }
             }
         }

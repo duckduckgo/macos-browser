@@ -21,10 +21,6 @@ import CoreData
 
 extension BookmarkManagedObject {
 
-    public static func entity(in context: NSManagedObjectContext) -> NSEntityDescription {
-        NSEntityDescription.entity(forEntityName: "BookmarkManagedObject", in: context)!
-    }
-
     enum BookmarkError: Error {
         case mustExistInsideRootFolder
         case folderStructureHasCycle
@@ -51,6 +47,17 @@ extension BookmarkManagedObject {
         try validate()
     }
 
+    static func createFavoritesFolder(in context: NSManagedObjectContext) -> NSManagedObject {
+        let managedObject = NSEntityDescription.insertNewObject(forEntityName: BookmarkManagedObject.className(), into: context)
+
+        managedObject.setValue(UUID.favoritesFolderUUID, forKey: "id")
+        managedObject.setValue("Favorites Folder" as NSString, forKey: "titleEncrypted")
+        managedObject.setValue(true, forKey: "isFolder")
+        managedObject.setValue(NSDate.now, forKey: "dateAdded")
+
+        return managedObject
+    }
+
     // MARK: - Private
 
     func validate() throws {
@@ -62,8 +69,7 @@ extension BookmarkManagedObject {
     }
 
     func validateThatEntitiesExistInsideTheRootFolder() throws {
-        if parentFolder == nil, ![UUID(uuidString: LegacyBookmarkStore.Constants.favoritesFolderUUID),
-                                  UUID(uuidString: LegacyBookmarkStore.Constants.rootFolderUUID)].contains(id) {
+        if parentFolder == nil, ![UUID.rootBookmarkFolderUUID, .favoritesFolderUUID].contains(id) {
             throw BookmarkError.mustExistInsideRootFolder
         }
     }
@@ -75,7 +81,7 @@ extension BookmarkManagedObject {
     }
 
     func validateFavoritesFolder() throws {
-        if let favoritesFolderID = favoritesFolder?.id, favoritesFolderID != UUID(uuidString: LegacyBookmarkStore.Constants.favoritesFolderUUID) {
+        if let favoritesFolderID = favoritesFolder?.id, favoritesFolderID != .favoritesFolderUUID {
             throw BookmarkError.invalidFavoritesFolder
         }
     }

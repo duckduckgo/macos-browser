@@ -14,8 +14,8 @@
 //
 
 #include "AppTargetsBase.xcconfig"
-#include "../DeveloperID.xcconfig"
 #include "../NetPOverrides.xcconfig"
+#include "../NetPIDs.xcconfig"
 
 BUNDLE_IDENTIFIER_PREFIX = $(AGENT_BUNDLE_ID)
 
@@ -42,11 +42,17 @@ CODE_SIGN_IDENTITY[sdk=macosx*] = Developer ID Application
 CODE_SIGN_IDENTITY[config=Debug][sdk=macosx*] = Apple Development
 CODE_SIGN_IDENTITY[config=CI][sdk=macosx*] =
 
-PRODUCT_NAME = DuckDuckGoAgent
+PRODUCT_NAME = DuckDuckGo Agent
 
 PROVISIONING_PROFILE_SPECIFIER[config=Release][sdk=macosx*] = macOS Network Protection Agent App (Distribution)
 
 NETP_EXTRA_FLAGS = NETP_SYSTEM_EXTENSION
+
+// Override the icon with our custom one
+ASSETCATALOG_COMPILER_APPICON_NAME = Icon - Network Protection
+ASSETCATALOG_COMPILER_APPICON_NAME[config=Debug] = Icon - Network Protection
+ASSETCATALOG_COMPILER_APPICON_NAME[config=CI] = Icon - Network Protection
+ASSETCATALOG_COMPILER_APPICON_NAME[config=Review] = Icon - Network Protection
 
 ENABLE_APP_SANDBOX = YES
 SWIFT_OBJC_BRIDGING_HEADER =

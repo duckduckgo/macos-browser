@@ -102,10 +102,10 @@ final class MouseOverAnimationButton: AddressBarButton {
         let isAquaMode = NSApp.effectiveAppearance.name == NSAppearance.Name.aqua
         let newAnimationView: AnimationView
         // Animation view causes problems in tests
-        if case .normal = NSApp.runType {
-            newAnimationView = isAquaMode ? animationViewCache.aqua : animationViewCache.dark
-        } else {
+        if AppDelegate.isRunningTests {
             newAnimationView = AnimationView()
+        } else {
+            newAnimationView = isAquaMode ? animationViewCache.aqua : animationViewCache.dark
         }
 
         guard currentAnimationView?.identifier != newAnimationView.identifier else {

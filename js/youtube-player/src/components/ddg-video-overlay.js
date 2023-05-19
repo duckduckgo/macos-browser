@@ -11,12 +11,7 @@ import {VideoOverlayManager} from "../video-overlay-manager.js";
 export class DDGVideoOverlay extends HTMLElement {
     static CUSTOM_TAG_NAME = 'ddg-video-overlay'
     /**
-     * @param {{
-     *  getHref(): string,
-     *  getLargeThumbnailSrc(videoId: string): string,
-     *  setHref(href: string): void,
-     *  isTestMode(): boolean
-     * }} environment
+     * @param {{getHref(): string, getLargeThumbnailSrc(videoId: string): string, setHref(href: string): void}} environment
      * @param {import("../util").VideoParams} params
      * @param {VideoOverlayManager} manager
      */
@@ -31,7 +26,7 @@ export class DDGVideoOverlay extends HTMLElement {
          * Create the shadow root, closed to prevent any outside observers
          * @type {ShadowRoot}
          */
-        const shadow = this.attachShadow({ mode: this.environment.isTestMode() ? "open" : "closed" });
+        const shadow = this.attachShadow({ mode: "closed" });
 
         /**
          * Add our styles

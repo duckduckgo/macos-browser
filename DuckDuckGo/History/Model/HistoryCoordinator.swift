@@ -17,8 +17,8 @@
 //
 
 import Foundation
+import os.log
 import Combine
-import Common
 import BrowserServicesKit
 
 typealias History = [HistoryEntry]
@@ -124,7 +124,7 @@ final class HistoryCoordinator: HistoryCoordinating {
     func updateTitleIfNeeded(title: String, url: URL) {
         guard let historyDictionary = historyDictionary else { return }
         guard let entry = historyDictionary[url] else {
-            os_log("Title update ignored - URL not part of history yet", log: .history, type: .debug)
+            os_log("Title update ignored - URL not part of history yet", type: .debug)
             return
         }
         guard !title.isEmpty, entry.title != title else { return }

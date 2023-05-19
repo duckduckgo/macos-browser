@@ -17,7 +17,6 @@
 //
 
 import Foundation
-import AppKit
 
 typealias PasteboardAttributes = [String: String]
 
@@ -111,8 +110,8 @@ extension BaseBookmarkEntity: PasteboardWriting {
     private let bookmarkTitle: String
 
     init(bookmark: Bookmark) {
-        self.bookmarkID = bookmark.id
-        self.bookmarkURL = bookmark.url
+        self.bookmarkID = bookmark.id.uuidString
+        self.bookmarkURL = bookmark.url.absoluteString
         self.bookmarkTitle = bookmark.title
     }
 

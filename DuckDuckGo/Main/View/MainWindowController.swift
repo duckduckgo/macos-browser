@@ -17,15 +17,13 @@
 //
 
 import Cocoa
+import os.log
 import Combine
-import Common
 
-@MainActor
 final class MainWindowController: NSWindowController {
 
     private static let windowFrameSaveName = "MainWindow"
     private var fireViewModel: FireViewModel
-    private static var knownFullScreenMouseDetectionWindows = Set<NSValue>()
 
     var mainViewController: MainViewController {
         // swiftlint:disable force_cast
@@ -37,32 +35,30 @@ final class MainWindowController: NSWindowController {
         return window?.standardWindowButton(.closeButton)?.superview
     }
 
-    init(mainViewController: MainViewController, popUp: Bool, fireViewModel: FireViewModel? = nil) {
+    init(mainViewController: MainViewController, popUp: Bool, fireViewModel: FireViewModel = FireCoordinator.fireViewModel) {
+        let makeWindow: (NSRect) -> NSWindow = popUp ? PopUpWindow.init(frame:) : MainWindow.init(frame:)
+
         let size = mainViewController.view.frame.size
         let moveToCenter = CGAffineTransform(translationX: ((NSScreen.main?.frame.width ?? 1024) - size.width) / 2,
                                              y: ((NSScreen.main?.frame.height ?? 790) - size.height) / 2)
         let frame = NSRect(origin: (NSScreen.main?.frame.origin ?? .zero).applying(moveToCenter),
                            size: size)
 
-        let window = popUp ? PopUpWindow(frame: frame) : MainWindow(frame: frame)
+        let window = makeWindow(frame)
         window.contentViewController = mainViewController
-        self.fireViewModel = fireViewModel ?? FireCoordinator.fireViewModel
+        self.fireViewModel = fireViewModel
 
         super.init(window: window)
 
         setupWindow()
         setupToolbar()
         subscribeToTrafficLightsAlpha()
-        subscribeToBurningData()
+        subscribeToShouldPreventUserInteraction()
         subscribeToResolutionChange()
     }
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-    }
-
-    deinit {
-        NotificationCenter.default.removeObserver(self)
     }
 
     private var shouldShowOnboarding: Bool {
@@ -84,11 +80,14 @@ final class MainWindowController: NSWindowController {
     }
 
     private func subscribeToResolutionChange() {
-        NotificationCenter.default.addObserver(self, selector: #selector(didChangeScreenParameters), name: NSApplication.didChangeScreenParametersNotification, object: NSApp)
+        NotificationCenter.default.addObserver(forName: NSApplication.didChangeScreenParametersNotification,
+                                               object: NSApplication.shared,
+                                               queue: OperationQueue.main) { [weak self] _ in
+            self?.resizeWindowIfNeeded()
+        }
     }
 
-    @objc
-    private func didChangeScreenParameters(_ notification: NSNotification) {
+    private func resizeWindowIfNeeded() {
         if let visibleWindowFrame = window?.screen?.visibleFrame,
            let windowFrame = window?.frame {
 
@@ -120,14 +119,14 @@ final class MainWindowController: NSWindowController {
             .assign(to: \.constant, onWeaklyHeld: tabBarViewController.pinnedTabsViewLeadingConstraint)
     }
 
-    private var burningDataCancellable: AnyCancellable?
-    private func subscribeToBurningData() {
-        burningDataCancellable = fireViewModel.fire.$burningData
+    private var shouldPreventUserInteractionCancellable: AnyCancellable?
+    private func subscribeToShouldPreventUserInteraction() {
+        shouldPreventUserInteractionCancellable = fireViewModel.shouldPreventUserInteraction
             .dropFirst()
             .removeDuplicates()
-            .sink(receiveValue: { [weak self] burningData in
-                guard let self else { return }
-                self.userInteraction(prevented: burningData != nil)
+            .sink(receiveValue: { [weak self] shouldPreventUserInteraction in
+                self?.moveTabBarView(toTitlebarView: !shouldPreventUserInteraction)
+                self?.userInteraction(prevented: shouldPreventUserInteraction)
             })
     }
 
@@ -195,6 +194,7 @@ extension MainWindowController: NSWindowDelegate {
 
     func windowDidBecomeKey(_ notification: Notification) {
         mainViewController.windowDidBecomeMain()
+        mainViewController.navigationBarViewController.windowDidBecomeMain()
 
         if (notification.object as? NSWindow)?.isPopUpWindow == false {
             WindowControllersManager.shared.lastKeyMainWindowController = self
@@ -207,49 +207,6 @@ extension MainWindowController: NSWindowDelegate {
 
     func windowWillEnterFullScreen(_ notification: Notification) {
         mainViewController.tabBarViewController.draggingSpace.isHidden = true
-    }
-
-    func windowDidEnterFullScreen(_ notification: Notification) {
-        // fix NSToolbarFullScreenWindow occurring beneath the MainWindow
-        // https://app.asana.com/0/1177771139624306/1203853030672990/f
-        // NSApp should be active at the moment of window ordering otherwise toolbar would disappear on activation
-        for window in NSApp.windows {
-            let windowValue = NSValue(nonretainedObject: window)
-
-            guard window.className.contains("NSFullScreenMouseDetectionWindow"),
-                  !Self.knownFullScreenMouseDetectionWindows.contains(windowValue),
-                  window.screen == self.window!.screen else { continue }
-
-            // keep record of NSFullScreenMouseDetectionWindow to avoid adding other‘s windows
-            Self.knownFullScreenMouseDetectionWindows.insert(windowValue)
-            window.onDeinit {
-                Self.knownFullScreenMouseDetectionWindows.remove(windowValue)
-            }
-
-            // add NSFullScreenMouseDetectionWindow as a child window to activate the app without revealing all of its windows
-            let activeApp = NSWorkspace.shared.frontmostApplication
-            if activeApp != .current {
-                self.window!.addChildWindow(window, ordered: .above)
-            }
-
-            // remove the child window and reactivate initially active app as soon as current app becomes active
-            // otherwise the fullscreen will reactivate its Space when switching to window in another Space
-            var cancellable: AnyCancellable!
-            cancellable = NSApp.isActivePublisher().dropFirst().sink { [weak self, weak window] _ in
-                withExtendedLifetime(cancellable) {
-                    if let activeApp, activeApp != .current {
-                        activeApp.activate()
-                    }
-
-                    if let self, let window, self.window?.childWindows?.contains(window) == true {
-                        self.window?.removeChildWindow(window)
-                    }
-                    cancellable = nil
-                }
-            }
-
-            break
-        }
     }
 
     func windowWillExitFullScreen(_ notification: Notification) {
@@ -267,18 +224,6 @@ extension MainWindowController: NSWindowDelegate {
         DispatchQueue.main.async {
             WindowControllersManager.shared.unregister(self)
         }
-    }
-
-    func windowShouldClose(_ sender: NSWindow) -> Bool {
-        // Animate fire for Burner Window when closing
-        guard mainViewController.tabCollectionViewModel.isBurner else {
-            return true
-        }
-        Task {
-            await mainViewController.fireViewController.animateFireWhenClosing()
-            sender.close()
-        }
-        return false
     }
 
 }

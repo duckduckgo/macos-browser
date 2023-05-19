@@ -16,7 +16,6 @@
 //  limitations under the License.
 //
 
-import Navigation
 import WebKit
 
 extension WKWebView {
@@ -70,27 +69,21 @@ extension WKWebView {
     var microphoneState: CaptureState {
         if #available(macOS 12.0, *) {
             return CaptureState(self.microphoneCaptureState)
+        } else if self.responds(to: #selector(getter: WKWebView._mediaCaptureState)) {
+            return CaptureState(permissionType: .microphone, mediaCaptureState: self._mediaCaptureState)
         }
-#if !APPSTORE
-        guard self.responds(to: #selector(getter: WKWebView._mediaCaptureState)) else {
-            assertionFailure("WKWebView does not respond to selector _mediaCaptureState")
-            return .none
-        }
-        return CaptureState(permissionType: .microphone, mediaCaptureState: self._mediaCaptureState)
-#endif
+        assertionFailure("WKWebView does not respond to selector _mediaCaptureState")
+        return .none
     }
 
     var cameraState: CaptureState {
         if #available(macOS 12.0, *) {
             return CaptureState(self.cameraCaptureState)
+        } else if self.responds(to: #selector(getter: WKWebView._mediaCaptureState)) {
+            return CaptureState(permissionType: .camera, mediaCaptureState: self._mediaCaptureState)
         }
-#if !APPSTORE
-        guard self.responds(to: #selector(getter: WKWebView._mediaCaptureState)) else {
-            assertionFailure("WKWebView does not respond to selector _mediaCaptureState")
-            return .none
-        }
-        return CaptureState(permissionType: .camera, mediaCaptureState: self._mediaCaptureState)
-#endif
+        assertionFailure("WKWebView does not respond to selector _mediaCaptureState")
+        return .none
     }
 
     var geolocationState: CaptureState {
@@ -107,7 +100,6 @@ extension WKWebView {
         return .active
     }
 
-#if !APPSTORE
     private func setMediaCaptureMuted(_ muted: Bool) {
         guard self.responds(to: #selector(WKWebView._setPageMuted(_:))) else {
             assertionFailure("WKWebView does not respond to selector _stopMediaCapture")
@@ -126,58 +118,47 @@ extension WKWebView {
         guard newState != mutedState else { return }
         self._setPageMuted(newState)
     }
-#endif
 
     func stopMediaCapture() {
-        guard #available(macOS 12.0, *) else {
-#if !APPSTORE
+        if #available(macOS 12.0, *) {
+            setCameraCaptureState(.none)
+            setMicrophoneCaptureState(.none)
+        } else {
             guard self.responds(to: #selector(_stopMediaCapture)) else {
                 assertionFailure("WKWebView does not respond to _stopMediaCapture")
                 return
             }
             self._stopMediaCapture()
-#endif
-            return
         }
-
-        setCameraCaptureState(.none)
-        setMicrophoneCaptureState(.none)
     }
 
     func stopAllMediaPlayback() {
-        guard #available(macOS 12.0, *) else {
-#if !APPSTORE
+        if #available(macOS 12.0, *) {
+            pauseAllMediaPlayback()
+        } else {
             guard self.responds(to: #selector(_stopAllMediaPlayback)) else {
                 assertionFailure("WKWebView does not respond to _stopAllMediaPlayback")
                 return
             }
             self._stopAllMediaPlayback()
-            return
-#endif
         }
-        pauseAllMediaPlayback()
     }
 
     func setPermissions(_ permissions: [PermissionType], muted: Bool) {
         for permission in permissions {
             switch permission {
             case .camera:
-                guard #available(macOS 12.0, *) else {
-#if !APPSTORE
+                if #available(macOS 12.0, *) {
+                    self.setCameraCaptureState(muted ? .muted : .active, completionHandler: {})
+                } else {
                     self.setMediaCaptureMuted(muted)
-#endif
-                    return
                 }
-                self.setCameraCaptureState(muted ? .muted : .active, completionHandler: {})
-
             case .microphone:
-                guard #available(macOS 12.0, *) else {
-#if !APPSTORE
+                if #available(macOS 12.0, *) {
+                    self.setMicrophoneCaptureState(muted ? .muted : .active, completionHandler: {})
+                } else {
                     self.setMediaCaptureMuted(muted)
-#endif
-                    return
                 }
-                self.setMicrophoneCaptureState(muted ? .muted : .active, completionHandler: {})
             case .geolocation:
                 self.configuration.processPool.geolocationProvider?.isPaused = muted
             case .popups, .externalScheme:
@@ -209,8 +190,15 @@ extension WKWebView {
         }
     }
 
-    func close() {
-        self.evaluateJavaScript("window.close()")
+    func load(_ url: URL) {
+
+        // Occasionally, the web view will try to load a URL but will find itself with no cookies, even if they've been restored.
+        // The consumeCookies call is finishing before this line executes, but if you're fast enough it can happen that WKWebView still hasn't
+        // processed the cookies that have been set. Pushing the load to the next iteration of the run loops seems to fix this most of the time.
+        DispatchQueue.main.async {
+            let request = URLRequest(url: url)
+            self.load(request)
+        }
     }
 
     func loadInNewWindow(_ url: URL) {
@@ -228,50 +216,42 @@ extension WKWebView {
         if #available(macOS 11.0, *) {
             return true
         } else {
-#if !APPSTORE
             return self.instancesRespond(to: #selector(WKWebView._printOperation(with:)))
-#else
-            return false
-#endif
         }
     }
 
-    func printOperation(with printInfo: NSPrintInfo = .shared, for frame: FrameHandle?) -> NSPrintOperation? {
+    func printOperation(with printInfo: NSPrintInfo = .shared, for frame: Any?) -> NSPrintOperation? {
         let printInfoWithFrame = NSSelectorFromString(Selector.printOperationWithPrintInfoForFrame)
         if let frame = frame, responds(to: printInfoWithFrame) {
             return self.perform(printInfoWithFrame, with: printInfo, with: frame)?.takeUnretainedValue() as? NSPrintOperation
         }
 
-        guard #available(macOS 11.0, *) else {
-#if !APPSTORE
-            guard self.responds(to: #selector(WKWebView._printOperation(with:))) else { return nil }
+        if #available(macOS 11.0, *) {
+            let printInfoDictionary = (NSPrintInfo.shared.dictionary() as? [NSPrintInfo.AttributeKey: Any]) ?? [:]
+            let printInfo = NSPrintInfo(dictionary: printInfoDictionary)
 
-            return self._printOperation(with: printInfo)
-#endif
+            printInfo.horizontalPagination = .automatic
+            printInfo.verticalPagination = .automatic
+            printInfo.leftMargin = 0
+            printInfo.rightMargin = 0
+            printInfo.topMargin = 0
+            printInfo.bottomMargin = 0
+            printInfo.scalingFactor = 0.95
+
+            return self.printOperation(with: printInfo)
         }
+#if APPSTORE
+        return nil // never gets here
+#else
+        guard self.responds(to: #selector(WKWebView._printOperation(with:))) else { return nil }
 
-        let printInfoDictionary = (NSPrintInfo.shared.dictionary() as? [NSPrintInfo.AttributeKey: Any]) ?? [:]
-        let printInfo = NSPrintInfo(dictionary: printInfoDictionary)
-
-        printInfo.horizontalPagination = .automatic
-        printInfo.verticalPagination = .automatic
-        printInfo.leftMargin = 0
-        printInfo.rightMargin = 0
-        printInfo.topMargin = 0
-        printInfo.bottomMargin = 0
-        printInfo.scalingFactor = 0.95
-
-        return self.printOperation(with: printInfo)
+        return self._printOperation(with: printInfo)
+#endif
     }
 
     var fullScreenPlaceholderView: NSView? {
         guard self.responds(to: NSSelectorFromString(Selector.fullScreenPlaceholderView)) else { return nil }
         return self.value(forKey: Selector.fullScreenPlaceholderView) as? NSView
-    }
-
-    func removeFocusFromWebView() {
-        guard self.window?.firstResponder === self else { return }
-        self.superview?.makeMeFirstResponder()
     }
 
     private enum Selector {

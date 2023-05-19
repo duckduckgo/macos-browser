@@ -30,7 +30,7 @@ final class NetworkProtectionInvitePresenter: NetworkProtectionInvitePresenting,
 
     // MARK: NetworkProtectionInvitePresenting
 
-    @MainActor func present() {
+    func present() {
         let viewModel = NetworkProtectionInviteViewModel(delegate: self, redemptionCoordinator: NetworkProtectionCodeRedemptionCoordinator())
 
         let view = NetworkProtectionInviteDialog(model: viewModel)

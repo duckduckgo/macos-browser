@@ -17,8 +17,8 @@
 //
 
 import Cocoa
+import os.log
 import Combine
-import Common
 
 protocol BookmarkManager: AnyObject {
 
@@ -26,22 +26,21 @@ protocol BookmarkManager: AnyObject {
     func isUrlFavorited(url: URL) -> Bool
     func isHostInBookmarks(host: String) -> Bool
     func getBookmark(for url: URL) -> Bookmark?
-    func getBookmark(forUrl url: String) -> Bookmark?
     @discardableResult func makeBookmark(for url: URL, title: String, isFavorite: Bool) -> Bookmark?
     @discardableResult func makeBookmark(for url: URL, title: String, isFavorite: Bool, index: Int?, parent: BookmarkFolder?) -> Bookmark?
     @discardableResult func makeFolder(for title: String, parent: BookmarkFolder?) -> BookmarkFolder
     func remove(bookmark: Bookmark)
     func remove(folder: BookmarkFolder)
-    func remove(objectsWithUUIDs uuids: [String])
+    func remove(objectsWithUUIDs uuids: [UUID])
     func update(bookmark: Bookmark)
     func update(folder: BookmarkFolder)
     @discardableResult func updateUrl(of bookmark: Bookmark, to newUrl: URL) -> Bookmark?
     func add(bookmark: Bookmark, to parent: BookmarkFolder?, completion: @escaping (Error?) -> Void)
-    func add(objectsWithUUIDs uuids: [String], to parent: BookmarkFolder?, completion: @escaping (Error?) -> Void)
-    func update(objectsWithUUIDs uuids: [String], update: @escaping (BaseBookmarkEntity) -> Void, completion: @escaping (Error?) -> Void)
-    func canMoveObjectWithUUID(objectUUID uuid: String, to parent: BookmarkFolder) -> Bool
-    func move(objectUUIDs: [String], toIndex: Int?, withinParentFolder: ParentFolderType, completion: @escaping (Error?) -> Void)
-    func moveFavorites(with objectUUIDs: [String], toIndex: Int?, completion: @escaping (Error?) -> Void)
+    func add(objectsWithUUIDs uuids: [UUID], to parent: BookmarkFolder?, completion: @escaping (Error?) -> Void)
+    func update(objectsWithUUIDs uuids: [UUID], update: @escaping (BaseBookmarkEntity) -> Void, completion: @escaping (Error?) -> Void)
+    func canMoveObjectWithUUID(objectUUID uuid: UUID, to parent: BookmarkFolder) -> Bool
+    func move(objectUUIDs: [UUID], toIndex: Int?, withinParentFolder: ParentFolderType, completion: @escaping (Error?) -> Void)
+    func moveFavorites(with objectUUIDs: [UUID], toIndex: Int?, completion: @escaping (Error?) -> Void)
     func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarkImportResult
 
     // Wrapper definition in a protocol is not supported yet
@@ -64,7 +63,7 @@ final class LocalBookmarkManager: BookmarkManager {
     @Published private(set) var list: BookmarkList?
     var listPublisher: Published<BookmarkList?>.Publisher { $list }
 
-    private lazy var bookmarkStore: BookmarkStore = LocalBookmarkStore(bookmarkDatabase: BookmarkDatabase.shared)
+    private lazy var bookmarkStore: BookmarkStore = LocalBookmarkStore()
     private lazy var faviconManagement: FaviconManagement = FaviconManager.shared
 
     // MARK: - Bookmarks
@@ -95,27 +94,20 @@ final class LocalBookmarkManager: BookmarkManager {
     }
 
     func isUrlBookmarked(url: URL) -> Bool {
-        return list?[url.absoluteString] != nil
+        return list?[url] != nil
     }
 
     func isUrlFavorited(url: URL) -> Bool {
-        return list?[url.absoluteString]?.isFavorite == true
+        return list?[url]?.isFavorite == true
     }
 
     func isHostInBookmarks(host: String) -> Bool {
         return list?.allBookmarkURLsOrdered.contains(where: { bookmark in
-            if let url = bookmark.urlObject {
-                return url.host == host
-            }
-            return false
+            bookmark.url.host == host
         }) ?? false
     }
 
     func getBookmark(for url: URL) -> Bookmark? {
-        return list?[url.absoluteString]
-    }
-
-    func getBookmark(forUrl url: String) -> Bookmark? {
         return list?[url]
     }
 
@@ -131,8 +123,8 @@ final class LocalBookmarkManager: BookmarkManager {
             return nil
         }
 
-        let id = UUID().uuidString
-        let bookmark = Bookmark(id: id, url: url.absoluteString, title: title, isFavorite: isFavorite, parentFolderUUID: parent?.id)
+        let id = UUID()
+        let bookmark = Bookmark(id: id, url: url, title: title, isFavorite: isFavorite, parentFolderUUID: parent?.id)
 
         list?.insert(bookmark)
         bookmarkStore.save(bookmark: bookmark, parent: parent, index: index) { [weak self] success, _  in
@@ -149,7 +141,7 @@ final class LocalBookmarkManager: BookmarkManager {
 
     func remove(bookmark: Bookmark) {
         guard list != nil else { return }
-        guard let latestBookmark = getBookmark(forUrl: bookmark.url) else {
+        guard let latestBookmark = getBookmark(for: bookmark.url) else {
             os_log("LocalBookmarkManager: Attempt to remove already removed bookmark", type: .error)
             return
         }
@@ -170,7 +162,7 @@ final class LocalBookmarkManager: BookmarkManager {
         }
     }
 
-    func remove(objectsWithUUIDs uuids: [String]) {
+    func remove(objectsWithUUIDs uuids: [UUID]) {
         bookmarkStore.remove(objectsWithUUIDs: uuids) { [weak self] _, _ in
             self?.loadBookmarks()
         }
@@ -178,7 +170,7 @@ final class LocalBookmarkManager: BookmarkManager {
 
     func update(bookmark: Bookmark) {
         guard list != nil else { return }
-        guard getBookmark(forUrl: bookmark.url) != nil else {
+        guard getBookmark(for: bookmark.url) != nil else {
             os_log("LocalBookmarkManager: Failed to update bookmark - not in the list.", type: .error)
             return
         }
@@ -195,12 +187,12 @@ final class LocalBookmarkManager: BookmarkManager {
 
     func updateUrl(of bookmark: Bookmark, to newUrl: URL) -> Bookmark? {
         guard list != nil else { return nil }
-        guard getBookmark(forUrl: bookmark.url) != nil else {
+        guard getBookmark(for: bookmark.url) != nil else {
             os_log("LocalBookmarkManager: Failed to update bookmark url - not in the list.", type: .error)
             return nil
         }
 
-        guard let newBookmark = list?.updateUrl(of: bookmark, to: newUrl.absoluteString) else {
+        guard let newBookmark = list?.updateUrl(of: bookmark, to: newUrl) else {
             os_log("LocalBookmarkManager: Failed to update URL of bookmark.", type: .error)
             return nil
         }
@@ -214,7 +206,7 @@ final class LocalBookmarkManager: BookmarkManager {
     // MARK: - Folders
 
     @discardableResult func makeFolder(for title: String, parent: BookmarkFolder?) -> BookmarkFolder {
-        let folder = BookmarkFolder(id: UUID().uuidString, title: title, parentFolderUUID: parent?.id, children: [])
+        let folder = BookmarkFolder(id: UUID(), title: title, parentFolderUUID: parent?.id, children: [])
 
         bookmarkStore.save(folder: folder, parent: parent) { [weak self] success, _  in
             guard success else {
@@ -231,32 +223,32 @@ final class LocalBookmarkManager: BookmarkManager {
         add(objectsWithUUIDs: [bookmark.id], to: parent, completion: completion)
     }
 
-    func add(objectsWithUUIDs uuids: [String], to parent: BookmarkFolder?, completion: @escaping (Error?) -> Void) {
+    func add(objectsWithUUIDs uuids: [UUID], to parent: BookmarkFolder?, completion: @escaping (Error?) -> Void) {
         bookmarkStore.add(objectsWithUUIDs: uuids, to: parent) { [weak self] error in
             self?.loadBookmarks()
             completion(error)
         }
     }
 
-    func update(objectsWithUUIDs uuids: [String], update: @escaping (BaseBookmarkEntity) -> Void, completion: @escaping (Error?) -> Void) {
+    func update(objectsWithUUIDs uuids: [UUID], update: @escaping (BaseBookmarkEntity) -> Void, completion: @escaping (Error?) -> Void) {
         bookmarkStore.update(objectsWithUUIDs: uuids, update: update) { [weak self] error in
             self?.loadBookmarks()
             completion(error)
         }
     }
 
-    func canMoveObjectWithUUID(objectUUID uuid: String, to parent: BookmarkFolder) -> Bool {
+    func canMoveObjectWithUUID(objectUUID uuid: UUID, to parent: BookmarkFolder) -> Bool {
         return bookmarkStore.canMoveObjectWithUUID(objectUUID: uuid, to: parent)
     }
 
-    func move(objectUUIDs: [String], toIndex index: Int?, withinParentFolder parent: ParentFolderType, completion: @escaping (Error?) -> Void) {
+    func move(objectUUIDs: [UUID], toIndex index: Int?, withinParentFolder parent: ParentFolderType, completion: @escaping (Error?) -> Void) {
         bookmarkStore.move(objectUUIDs: objectUUIDs, toIndex: index, withinParentFolder: parent) { [weak self] error in
             self?.loadBookmarks()
             completion(error)
         }
     }
 
-    func moveFavorites(with objectUUIDs: [String], toIndex index: Int?, completion: @escaping (Error?) -> Void) {
+    func moveFavorites(with objectUUIDs: [UUID], toIndex index: Int?, completion: @escaping (Error?) -> Void) {
         bookmarkStore.moveFavorites(with: objectUUIDs, toIndex: index) { [weak self] error in
             self?.loadBookmarks()
             completion(error)

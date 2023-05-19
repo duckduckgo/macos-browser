@@ -119,6 +119,17 @@ extension NSAlert {
         return alert
     }
 
+    static func networkProtectionBuildLocationWarning() -> NSAlert {
+        let alert = NSAlert()
+        alert.messageText = "App Location Warning"
+        alert.informativeText = """
+        Network Protection builds need to be run from /Applications for the VPN to work.\n\nPlease quit the app and move it into the Applications directory.
+        """
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: "Okay")
+        return alert
+    }
+
     static func resetNetworkProtectionAlert() -> NSAlert {
         let alert = NSAlert()
         alert.messageText = "Reset Network Protection?"

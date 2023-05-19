@@ -17,7 +17,7 @@
 //
 
 import Cocoa
-import Common
+import os.log
 
 extension NSTextField {
 

@@ -50,13 +50,12 @@ final class PreferencesSidebarModel: ObservableObject {
             }
     }
 
-    @MainActor
     convenience init(
         tabSwitcherTabs: [Tab.TabContent] = Tab.TabContent.displayableTabTypes,
         privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager,
-        includeDuckPlayer: Bool
+        includePrivatePlayer: Bool
     ) {
-        self.init(loadSections: { PreferencesSection.defaultSections(includingDuckPlayer: includeDuckPlayer) },
+        self.init(loadSections: { PreferencesSection.defaultSections(includingPrivatePlayer: includePrivatePlayer) },
                   tabSwitcherTabs: tabSwitcherTabs,
                   privacyConfigurationManager: privacyConfigurationManager)
     }

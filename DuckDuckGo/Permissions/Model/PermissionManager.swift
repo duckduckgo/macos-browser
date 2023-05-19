@@ -18,7 +18,7 @@
 
 import Foundation
 import Combine
-import Common
+import os.log
 
 protocol PermissionManagerProtocol: AnyObject {
 

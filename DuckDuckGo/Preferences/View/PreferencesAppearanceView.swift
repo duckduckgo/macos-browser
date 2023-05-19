@@ -17,7 +17,6 @@
 //
 
 import SwiftUI
-import SwiftUIExtensions
 
 extension Preferences {
 
@@ -85,40 +84,21 @@ extension Preferences {
 
         var body: some View {
             VStack(alignment: .leading, spacing: 0) {
+                Text(UserText.appearance)
+                    .font(Const.Fonts.preferencePaneTitle)
 
-                // TITLE
-                TextMenuTitle(text: UserText.appearance)
-
-                // SECTION 1: Theme
-                PreferencePaneSection {
-                    TextMenuItemHeader(text: UserText.theme)
+                Section {
+                    Text(UserText.theme)
+                        .font(Const.Fonts.preferencePaneSectionHeader)
                     ThemePicker()
                         .environmentObject(model)
                 }
 
-                // SECTION 2: Address Bar
-                PreferencePaneSection {
-                    TextMenuItemHeader(text: UserText.addressBar)
-                    ToggleMenuItem(title: UserText.showFullWebsiteAddress, isOn: $model.showFullURL)
-                    ToggleMenuItem(title: UserText.showAutocompleteSuggestions, isOn: $model.showAutocompleteSuggestions)
-                }
-
-                PreferencePaneSection {
-                    Text(UserText.zoomSettingTitle)
+                Section {
+                    Text(UserText.addressBar)
                         .font(Const.Fonts.preferencePaneSectionHeader)
-                    HStack {
-                        Text(UserText.zoomPickerTitle)
-                        NSPopUpButtonView(selection: $model.defaultPageZoom) {
-                            let button = NSPopUpButton()
-                            button.setContentHuggingPriority(.defaultHigh, for: .horizontal)
-
-                            for value in DefaultZoomValue.allCases {
-                                let item = button.menu?.addItem(withTitle: value.displayString, action: nil, keyEquivalent: "")
-                                item?.representedObject = value
-                            }
-                            return button
-                        }
-                    }
+                    Toggle(UserText.showFullWebsiteAddress, isOn: $model.showFullURL)
+                    Toggle(UserText.showAutocompleteSuggestions, isOn: $model.showAutocompleteSuggestions)
                 }
             }
         }

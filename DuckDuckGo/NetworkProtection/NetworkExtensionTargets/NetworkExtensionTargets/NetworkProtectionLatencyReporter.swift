@@ -18,7 +18,7 @@
 
 import Combine
 import Foundation
-import Common
+import os.log
 import Network
 import NetworkProtection
 import PixelKit

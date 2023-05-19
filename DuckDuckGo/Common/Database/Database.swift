@@ -16,9 +16,9 @@
 //  limitations under the License.
 //
 
-import BrowserServicesKit
-import Foundation
+import AppKit
 import CoreData
+import BrowserServicesKit
 import Persistence
 
 final class Database {
@@ -39,7 +39,7 @@ final class Database {
     }()
 
     static func makeDatabase() -> (CoreDataDatabase?, Error?) {
-        func makeDatabase(keyStore: EncryptionKeyStoring, containerLocation: URL) -> (CoreDataDatabase?, Error?) {
+        func makeDatabase(keyStore: EncryptionKeyStoring) -> (CoreDataDatabase?, Error?) {
             do {
                 try EncryptedValueTransformer<NSImage>.registerTransformer(keyStore: keyStore)
                 try EncryptedValueTransformer<NSString>.registerTransformer(keyStore: keyStore)
@@ -50,28 +50,17 @@ final class Database {
             } catch {
                 return (nil, error)
             }
-            let mainModel = NSManagedObjectModel.mergedModel(from: [.main])!
-            let httpsUpgradeModel = HTTPSUpgrade.managedObjectModel
 
             return (CoreDataDatabase(name: Constants.databaseName,
-                                     containerLocation: containerLocation,
-                                     model: .init(byMerging: [mainModel, httpsUpgradeModel])!), nil)
+                                     containerLocation: URL.sandboxApplicationSupportURL,
+                                     model: NSManagedObjectModel.mergedModel(from: [.main])!), nil)
         }
+
 #if DEBUG
-        assert(!NSApp.isRunningUnitTests, "Use CoreData.---Container() methods for testing purposes")
+        assert(!AppDelegate.isRunningTests, "Use CoreData.---Container() methods for testing purposes")
 #endif
 
-        let keyStore: EncryptionKeyStoring
-        let containerLocation: URL
-#if CI
-        keyStore = (NSClassFromString("MockEncryptionKeyStore") as? EncryptionKeyStoring.Type)!.init()
-        containerLocation = FileManager.default.temporaryDirectory
-#else
-        keyStore = EncryptionKeyStore(generator: EncryptionKeyGenerator())
-        containerLocation = URL.sandboxApplicationSupportURL
-#endif
-
-        return makeDatabase(keyStore: keyStore, containerLocation: containerLocation)
+        return makeDatabase(keyStore: EncryptionKeyStore(generator: EncryptionKeyGenerator()))
     }
 
     // MARK: - Pixel
@@ -90,36 +79,19 @@ final class Database {
     }
 }
 
-extension Array where Element == CoreDataErrorsParser.ErrorInfo {
+protocol Managed: NSFetchRequestResult {
+    static var entityName: String { get }
+}
 
-    var errorPixelParameters: [String: String] {
-        let params: [String: String]
-        if let first = first {
-            params = ["errorCount": "\(count)",
-                      "coreDataCode": "\(first.code)",
-                      "coreDataDomain": first.domain,
-                      "coreDataEntity": first.entity ?? "empty",
-                      "coreDataAttribute": first.property ?? "empty"]
-        } else {
-            params = ["errorCount": "\(count)"]
-        }
-        return params
-    }
+extension Managed where Self: NSManagedObject {
+    static var entityName: String { return entity().name! }
 }
 
 extension NSManagedObjectContext {
-
-    func save(onErrorFire event: Pixel.Event.Debug) throws {
-        do {
-            try save()
-        } catch {
-            let nsError = error as NSError
-            let processedErrors = CoreDataErrorsParser.parse(error: nsError)
-
-            Pixel.fire(.debug(event: event, error: error),
-                       withAdditionalParameters: processedErrors.errorPixelParameters)
-
-            throw error
+    func insertObject<A: NSManagedObject>() -> A where A: Managed {
+        guard let obj = NSEntityDescription.insertNewObject(forEntityName: A.entityName, into: self) as? A else {
+            fatalError("Wrong object type")
         }
+        return obj
     }
 }

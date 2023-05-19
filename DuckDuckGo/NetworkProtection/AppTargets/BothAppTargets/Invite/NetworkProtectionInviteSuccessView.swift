@@ -17,7 +17,6 @@
 //
 
 import SwiftUI
-import SwiftUIExtensions
 import NetworkProtection
 
 struct NetworkProtectionInviteSuccessView: View {

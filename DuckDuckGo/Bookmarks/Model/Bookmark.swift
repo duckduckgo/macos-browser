@@ -17,37 +17,54 @@
 //
 
 import Cocoa
-import Bookmarks
 
 internal class BaseBookmarkEntity {
 
-    static func singleEntity(with uuid: String) -> NSFetchRequest<BookmarkEntity> {
-        let request = BookmarkEntity.fetchRequest()
-        request.predicate = NSPredicate(format: "%K == %@", #keyPath(BookmarkEntity.uuid), uuid)
+    static func singleEntity(with uuid: UUID) -> NSFetchRequest<BookmarkManagedObject> {
+        let request = NSFetchRequest<BookmarkManagedObject>(entityName: "BookmarkManagedObject")
+        request.predicate = NSPredicate(format: "id == %@", uuid as CVarArg)
         return request
     }
 
-    static func favorite(with uuid: String) -> NSFetchRequest<BookmarkEntity> {
-        let request = BookmarkEntity.fetchRequest()
-        request.predicate = NSPredicate(format: "%K == %@ AND %K != nil AND %K == NO",
-                                        #keyPath(BookmarkEntity.uuid),
+    static func favorite(with uuid: UUID) -> NSFetchRequest<BookmarkManagedObject> {
+        let request = NSFetchRequest<BookmarkManagedObject>(entityName: "BookmarkManagedObject")
+        request.predicate = NSPredicate(format: "id == %@ AND %K != nil AND %K == NO",
                                         uuid as CVarArg,
-                                        #keyPath(BookmarkEntity.favoriteFolder),
-                                        #keyPath(BookmarkEntity.isFolder))
+                                        #keyPath(BookmarkManagedObject.favoritesFolder),
+                                        #keyPath(BookmarkManagedObject.isFolder))
         return request
     }
 
-    static func entities(with identifiers: [String]) -> NSFetchRequest<BookmarkEntity> {
-        let request = BookmarkEntity.fetchRequest()
-        request.predicate = NSPredicate(format: "%K IN %@", #keyPath(BookmarkEntity.uuid), identifiers)
+    static func entities(with identifiers: [UUID]) -> NSFetchRequest<BookmarkManagedObject> {
+        let request = NSFetchRequest<BookmarkManagedObject>(entityName: "BookmarkManagedObject")
+        request.predicate = NSPredicate(format: "id IN %@", identifiers)
         return request
     }
 
-    let id: String
+    static func topLevelEntitiesFetchRequest() -> NSFetchRequest<BookmarkManagedObject> {
+        let request = NSFetchRequest<BookmarkManagedObject>(entityName: "BookmarkManagedObject")
+        request.predicate = NSPredicate(format: "id != %@ AND parentFolder == nil", UUID.favoritesFolderUUID as CVarArg)
+        return request
+    }
+
+    static func favoritesFolderFetchRequest() -> NSFetchRequest<BookmarkManagedObject> {
+        let request = NSFetchRequest<BookmarkManagedObject>(entityName: "BookmarkManagedObject")
+        request.predicate = NSPredicate(format: "id == %@ AND %K == nil AND %K == YES",
+                                        UUID.favoritesFolderUUID as CVarArg,
+                                        #keyPath(BookmarkManagedObject.parentFolder),
+                                        #keyPath(BookmarkManagedObject.isFolder))
+        return request
+    }
+
+    static func bookmarksAndFoldersFetchRequest() -> NSFetchRequest<BookmarkManagedObject> {
+        return BookmarkManagedObject.fetchRequest()
+    }
+
+    let id: UUID
     var title: String
     let isFolder: Bool
 
-    fileprivate init(id: String,
+    fileprivate init(id: UUID,
                      title: String,
                      isFolder: Bool) {
 
@@ -56,23 +73,24 @@ internal class BaseBookmarkEntity {
         self.isFolder = isFolder
     }
 
-    static func from(managedObject: BookmarkEntity, parentFolderUUID: String? = nil) -> BaseBookmarkEntity? {
-        guard let id = managedObject.uuid,
-              let title = managedObject.title else {
+    static func from(managedObject: BookmarkManagedObject, parentFolderUUID: UUID? = nil) -> BaseBookmarkEntity? {
+        guard let id = managedObject.id,
+              let title = managedObject.titleEncrypted as? String else {
             assertionFailure("\(#file): Failed to create BaseBookmarkEntity from BookmarkManagedObject")
             return nil
         }
 
         if managedObject.isFolder {
-            let children: [BaseBookmarkEntity] = managedObject.childrenArray.compactMap {
-                return BaseBookmarkEntity.from(managedObject: $0, parentFolderUUID: id)
-            }
+            let children: [BaseBookmarkEntity] = managedObject.children?.compactMap {
+                guard let baseBookmarkEntity = $0 as? BookmarkManagedObject else { return nil }
+                return BaseBookmarkEntity.from(managedObject: baseBookmarkEntity, parentFolderUUID: id)
+            } ?? []
 
             let folder = BookmarkFolder(id: id, title: title, parentFolderUUID: parentFolderUUID, children: children)
 
             return folder
         } else {
-            guard let url = managedObject.url else {
+            guard let url = managedObject.urlEncrypted as? URL else {
                 assertionFailure("\(#file): Failed to create Bookmark from BookmarkManagedObject")
                 return nil
             }
@@ -80,7 +98,8 @@ internal class BaseBookmarkEntity {
             return Bookmark(id: id,
                             url: url,
                             title: title,
-                            isFavorite: managedObject.isFavorite,
+                            oldFavicon: managedObject.faviconEncrypted as? NSImage,
+                            isFavorite: managedObject.favoritesFolder != nil,
                             parentFolderUUID: parentFolderUUID)
         }
     }
@@ -89,13 +108,13 @@ internal class BaseBookmarkEntity {
 
 final class BookmarkFolder: BaseBookmarkEntity {
 
-    static func bookmarkFoldersFetchRequest() -> NSFetchRequest<BookmarkEntity> {
-        let request = BookmarkEntity.fetchRequest()
-        request.predicate = NSPredicate(format: "%K == YES", #keyPath(BookmarkEntity.isFolder))
+    static func bookmarkFoldersFetchRequest() -> NSFetchRequest<BookmarkManagedObject> {
+        let request = NSFetchRequest<BookmarkManagedObject>(entityName: "BookmarkManagedObject")
+        request.predicate = NSPredicate(format: "isFolder == YES")
         return request
     }
 
-    let parentFolderUUID: String?
+    let parentFolderUUID: UUID?
     let children: [BaseBookmarkEntity]
     let totalChildBookmarks: Int
 
@@ -107,9 +126,9 @@ final class BookmarkFolder: BaseBookmarkEntity {
         return children.compactMap { $0 as? BookmarkFolder }
     }
 
-    init(id: String,
+    init(id: UUID,
          title: String,
-         parentFolderUUID: String? = nil,
+         parentFolderUUID: UUID? = nil,
          children: [BaseBookmarkEntity] = []) {
         self.parentFolderUUID = parentFolderUUID
         self.children = children
@@ -126,40 +145,35 @@ final class BookmarkFolder: BaseBookmarkEntity {
 
 final class Bookmark: BaseBookmarkEntity {
 
-    static func bookmarksFetchRequest() -> NSFetchRequest<BookmarkEntity> {
-        let request = BookmarkEntity.fetchRequest()
-        request.predicate = NSPredicate(format: "%K == NO", #keyPath(BookmarkEntity.isFolder))
+    static func bookmarksFetchRequest() -> NSFetchRequest<BookmarkManagedObject> {
+        let request = NSFetchRequest<BookmarkManagedObject>(entityName: "BookmarkManagedObject")
+        request.predicate = NSPredicate(format: "isFolder == NO")
         return request
     }
 
-    let url: String
+    let url: URL
     var isFavorite: Bool
-    private(set) var parentFolderUUID: String?
+    private(set) var parentFolderUUID: UUID?
 
-    public var urlObject: URL? {
-        return url.isBookmarklet() ? url.toEncodedBookmarklet() : URL(string: url)
-    }
-
+    // Property oldFavicon can be removed in future updates when favicon cache is built
+    var oldFavicon: NSImage?
     let faviconManagement: FaviconManagement
     func favicon(_ sizeCategory: Favicon.SizeCategory) -> NSImage? {
-        if let duckPlayerFavicon = DuckPlayer.shared.image(for: self) {
-            return duckPlayerFavicon
+        if let privatePlayerFavicon = PrivatePlayer.shared.image(for: self) {
+            return privatePlayerFavicon
         }
-
-        if let url = urlObject {
-            return faviconManagement.getCachedFavicon(for: url, sizeCategory: sizeCategory)?.image
-        } else {
-            return faviconManagement.getCachedFavicon(for: url, sizeCategory: sizeCategory)?.image
-        }
+        return faviconManagement.getCachedFavicon(for: url, sizeCategory: sizeCategory)?.image ?? oldFavicon
     }
 
-    init(id: String,
-         url: String,
+    init(id: UUID,
+         url: URL,
          title: String,
+         oldFavicon: NSImage? = nil,
          isFavorite: Bool,
-         parentFolderUUID: String? = nil,
+         parentFolderUUID: UUID? = nil,
          faviconManagement: FaviconManagement = FaviconManager.shared) {
         self.url = url
+        self.oldFavicon = oldFavicon
         self.isFavorite = isFavorite
         self.parentFolderUUID = parentFolderUUID
         self.faviconManagement = faviconManagement
@@ -167,10 +181,11 @@ final class Bookmark: BaseBookmarkEntity {
         super.init(id: id, title: title, isFolder: false)
     }
 
-    convenience init(from bookmark: Bookmark, with newUrl: String) {
+    convenience init(from bookmark: Bookmark, with newUrl: URL) {
         self.init(id: bookmark.id,
                   url: newUrl,
                   title: bookmark.title,
+                  oldFavicon: nil,
                   isFavorite: bookmark.isFavorite,
                   parentFolderUUID: bookmark.parentFolderUUID)
     }

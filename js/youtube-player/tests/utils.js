@@ -29,47 +29,33 @@ export async function getDuckPlayerPage() {
  * @param {boolean} isLocal - whether test test is run locally
  */
 export async function setupIconOverlays(page, startURL = 'https://www.youtube.com/', mock) {
-    page.on('console', (msg) => {
-        console.log(msg.type(), msg.text());
-    })
     const mockWebkitMessaging = async () => {
         await page.addInitScript(() => {
             window.webkit = {
                 messageHandlers: {
-                    setUserValues: {
-                        // for the sake of testing, just reflect the same values recieved
-                        postMessage: async (input) => {
-                            const { messageHandling, ...rest } = input;
-                            return JSON.stringify(rest);
-                        }
-                    },
-                    readUserValues:  {
-                        postMessage: async () => {
-                            return JSON.stringify({ privatePlayerMode: { alwaysAsk: {} }, overlayInteracted: false });
-                        }
-                    },
-                    openDuckPlayer:  {
-                        postMessage: (message) => {
-                            window._test_clickedDuckPlayerLink = message.href;
-                        }
-                    },
-                    sendDuckPlayerPixel: {
-                        postMessage: async () => {
-                            return JSON.stringify({});
-                        }
+                setUserValues: { postMessage: () => { } },
+                readUserValues:  {
+                    postMessage: async () => {
+                        return JSON.stringify({ privatePlayerMode: { alwaysAsk: {} }, overlayInteracted: false });
                     }
+                },
+                openDuckPlayer:  {
+                    postMessage: (message) => {
+                        window._test_clickedDuckPlayerLink = message.href;
+                    }
+                },
                 }
             };
         });
     },
 
     injectIconOverlayBundle = async () => {
-        const script = await scriptWithConfig({
-            webkitMessagingConfig: {
-                hasModernWebkitAPI: true,
-            },
-            allowedOrigins: ["localhost", "duckduckgo.com", "youtube.com"],
-        })
+        const injectScript = await getFileString('../../DuckDuckGo/Youtube\ Player/Resources/youtube-inject-bundle.js');
+
+        // This is replaced on the native side, replace it here instead.
+        let script = injectScript.replace('$WebkitMessagingConfig$', JSON.stringify({
+            hasModernWebkitAPI: true
+        }));
 
         await page.evaluate(script.toString());
     },
@@ -115,45 +101,3 @@ export async function setupIconOverlays(page, startURL = 'https://www.youtube.co
         await rejectYouTubeCookies();
     }
   }
-
-/**
- * Injects the icon overlay bundle and adds mocks so we intercept native MacOS browser comms
- * (as we don't have it in webkit)
- * @param {Object} page - the Playwright page object
- */
-export async function mockVideoPage(page) {
-    page.on('console', (msg) => {
-        console.log(msg.type(), msg.text());
-    })
-
-    const duckIconOverlayMockPage = await getFileString('./tests/video.html');
-
-    await page.route('**/*', route => {
-        return route.fulfill({
-            status: 200,
-            body: duckIconOverlayMockPage,
-            contentType: 'text/html'
-        });
-    });
-}
-
-/**
- * @param {YoutubeUserScriptConfig} config
- * @returns {Promise<string>}
- */
-export async function scriptWithConfig(config) {
-    const injectScript = await getFileString('../../DuckDuckGo/Youtube\ Player/Resources/youtube-inject-bundle.js');
-
-    // This is replaced on the native side, replace it here instead.
-    let script = `
-    (() => {
-        const $DDGYoutubeUserScriptConfig$ = ${JSON.stringify(config)};
-        try {
-            ${injectScript}
-        } catch (e) {
-            console.error('uncaught', e);
-        }
-     })()
-    `
-    return script;
-}

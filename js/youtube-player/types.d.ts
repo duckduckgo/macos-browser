@@ -10,15 +10,3 @@ declare module "*.css" {
 interface Window {
     onUserValuesChanged: any;
 }
-
-interface YoutubeUserScriptConfig {
-    testMode?: "overlay-enabled",
-    allowedOrigins: string[],
-    webkitMessagingConfig: {
-        secret: string,
-        hasModernWebkitAPI: boolean,
-        webkitMessageHandlerNames: string[]
-    }
-}
-
-declare var $DDGYoutubeUserScriptConfig$: YoutubeUserScriptConfig;

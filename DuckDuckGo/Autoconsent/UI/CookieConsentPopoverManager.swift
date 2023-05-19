@@ -25,11 +25,10 @@ final class CookieConsentPopoverManager: CookieConsentPopoverDelegate {
     private(set) var popOver: CookieConsentPopover?
 
     func cookieConsentPopover(_ popOver: CookieConsentPopover, didFinishWithResult result: Bool) {
-        popOver.close(animated: true) {
-            withExtendedLifetime(popOver) {}
+        popOver.close(animated: true) { [weak self] in
+            self?.popOver = nil
+            self?.currentTab = nil
         }
-        self.popOver = nil
-        self.currentTab = nil
 
         if let completion = completion {
             completion(result)

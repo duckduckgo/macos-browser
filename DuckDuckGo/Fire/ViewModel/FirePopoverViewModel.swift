@@ -19,7 +19,6 @@
 import Cocoa
 import BrowserServicesKit
 
-@MainActor
 final class FirePopoverViewModel {
 
     enum ClearingOption: Int, CaseIterable {
@@ -230,14 +229,15 @@ final class FirePopoverViewModel {
     // MARK: - Burning
 
     func burn() {
+        let timedPixel = TimedPixel(.burn())
         if clearingOption == .allData && areAllSelected {
             if let tabCollectionViewModel = tabCollectionViewModel {
                 // Burn everything
-                fireViewModel.fire.burnAll(tabCollectionViewModel: tabCollectionViewModel)
+                fireViewModel.fire.burnAll(tabCollectionViewModel: tabCollectionViewModel, completion: { timedPixel.fire() })
             }
         } else {
             // Burn selected domains
-            fireViewModel.fire.burnDomains(selectedDomains)
+            fireViewModel.fire.burnDomains(selectedDomains, completion: { timedPixel.fire() })
         }
     }
 

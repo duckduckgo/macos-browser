@@ -134,6 +134,36 @@
 </template>
 <script type="module">
     document.querySelector('main').innerHTML = document.querySelector('template[id="inner"]').innerHTML;
+    // import {VideoParams} from "./src/util.js";
+    //
+    // const goodcases = [
+    //     ["/watch?v=123&t=3", {id: "123", time: "3"}],
+    //     ["/watch?v=123&t=", {id: "123", time: null}],
+    //     ["/watch?v=123&t=wfef", {id: "123", time: null}]
+    // ]
+    //
+    // const badcases = [
+    //     "/watch?v=<script>",
+    // ]
+    //
+    // for (let [testcase, expected] of goodcases) {
+    //     const parsed = VideoParams.fromPathname(testcase);
+    //     assert(parsed.id, expected.id)
+    //     assert(parsed.time, expected.time)
+    // }
+    //
+    // for (let testcase of badcases) {
+    //     const parsed = VideoParams.fromPathname(testcase);
+    //     assert(parsed, null)
+    // }
+    //
+    // function assert(actual, expected) {
+    //     if (actual !== expected) {
+    //         throw new Error(`expected '${actual}' to equal '${expected}'`)
+    //     } else {
+    //         console.log(`✅ ${actual} == ${expected}`)
+    //     }
+    // }
 </script>
 </body>
 </html>

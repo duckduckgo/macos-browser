@@ -99,7 +99,7 @@ final class BookmarkListViewController: NSViewController {
 
         newBookmarkButton.toolTip = UserText.newBookmarkTooltip
         newFolderButton.toolTip = UserText.newFolderTooltip
-        setUpManageBookmarksButton()
+        manageBookmarksButton.toolTip = UserText.manageBookmarksTooltip
     }
 
     override func viewWillAppear() {
@@ -165,7 +165,7 @@ final class BookmarkListViewController: NSViewController {
     private func expandAndRestore(selectedNodes: [BookmarkNode]) {
         treeController.visitNodes { node in
             if let objectID = (node.representedObject as? BaseBookmarkEntity)?.id {
-                if dataSource.expandedNodesIDs.contains(objectID) {
+                if dataSource.expandedNodes.contains(objectID) {
                     outlineView.expandItem(node)
                 } else {
                     outlineView.collapseItem(node)
@@ -177,7 +177,7 @@ final class BookmarkListViewController: NSViewController {
                 if pseudoFolder == PseudoFolder.bookmarks {
                     outlineView.expandItem(node)
                 } else {
-                    if dataSource.expandedNodesIDs.contains(pseudoFolder.id) {
+                    if dataSource.expandedNodes.contains(pseudoFolder.id) {
                         outlineView.expandItem(node)
                     } else {
                         outlineView.collapseItem(node)
@@ -211,31 +211,6 @@ final class BookmarkListViewController: NSViewController {
         outlineView.selectRowIndexes(indexes, byExtendingSelection: false)
     }
 
-    private func setUpManageBookmarksButton() {
-        // Set up image
-        let image = NSImage(named: "ExternalAppScheme")
-        let imageSize = image?.size ?? .zero
-        let padding = 6.0
-        let newRect = NSRect(x: 0.0, y: 0.0, width: imageSize.width + padding, height: imageSize.height)
-        image?.alignmentRect = newRect
-
-        // Set up button
-        manageBookmarksButton.image = image
-        manageBookmarksButton.title = UserText.bookmarksManage
-        manageBookmarksButton.toolTip = UserText.manageBookmarksTooltip
-        manageBookmarksButton.font = NSFont.systemFont(ofSize: 12)
-        manageBookmarksButton.imagePosition = .imageLeading
-        manageBookmarksButton.imageHugsTitle = true
-
-        // Set up constraints
-        let titleWidth = (manageBookmarksButton.title as NSString).size(withAttributes: [.font: manageBookmarksButton.font as Any]).width
-        let buttonWidth = imageSize.width + titleWidth + padding * 3
-        print(buttonWidth)
-        manageBookmarksButton.translatesAutoresizingMaskIntoConstraints = false
-        let widthConstraint = NSLayoutConstraint(item: manageBookmarksButton!, attribute: NSLayoutConstraint.Attribute.width, relatedBy: NSLayoutConstraint.Relation.equal, toItem: nil, attribute: NSLayoutConstraint.Attribute.notAnAttribute, multiplier: 1, constant: buttonWidth)
-//        let heightConstraint = NSLayoutConstraint(item: manageBookmarksButton!, attribute: NSLayoutConstraint.Attribute.height, relatedBy: NSLayoutConstraint.Relation.equal, toItem: nil, attribute: NSLayoutConstraint.Attribute.notAnAttribute, multiplier: 1, constant: 28)
-        NSLayoutConstraint.activate([widthConstraint])
-    }
 }
 
 // MARK: - Modal Delegates
@@ -316,7 +291,7 @@ extension BookmarkListViewController: BookmarkMenuItemSelectors {
             return
         }
 
-        WindowControllersManager.shared.show(url: bookmark.urlObject, newTab: true)
+        WindowControllersManager.shared.show(url: bookmark.url, newTab: true)
     }
 
     func openBookmarkInNewWindow(_ sender: NSMenuItem) {
@@ -324,10 +299,8 @@ extension BookmarkListViewController: BookmarkMenuItemSelectors {
             assertionFailure("Failed to cast menu represented object to Bookmark")
             return
         }
-        guard let urlObject = bookmark.urlObject else {
-            return
-        }
-        WindowsManager.openNewWindow(with: urlObject, isBurner: false)
+
+        WindowsManager.openNewWindow(with: bookmark.url)
     }
 
     func toggleBookmarkAsFavorite(_ sender: NSMenuItem) {
@@ -345,11 +318,15 @@ extension BookmarkListViewController: BookmarkMenuItemSelectors {
     }
 
     func copyBookmark(_ sender: NSMenuItem) {
-        guard let bookmark = sender.representedObject as? Bookmark else {
+        guard let bookmark = sender.representedObject as? Bookmark, let bookmarkURL = bookmark.url as NSURL? else {
             assertionFailure("Failed to cast menu represented object to Bookmark")
             return
         }
-        bookmark.copyUrlToPasteboard()
+
+        let pasteboard = NSPasteboard.general
+        pasteboard.declareTypes([.URL], owner: nil)
+        bookmarkURL.write(to: pasteboard)
+        pasteboard.setString(bookmarkURL.absoluteString ?? "", forType: .string)
     }
 
     func deleteBookmark(_ sender: NSMenuItem) {
@@ -362,7 +339,7 @@ extension BookmarkListViewController: BookmarkMenuItemSelectors {
     }
 
     func deleteEntities(_ sender: NSMenuItem) {
-        guard let uuids = sender.representedObject as? [String] else {
+        guard let uuids = sender.representedObject as? [UUID] else {
             assertionFailure("Failed to cast menu item's represented object to UUID array")
             return
         }
@@ -383,12 +360,8 @@ extension BookmarkListViewController: FolderMenuItemSelectors {
             assertionFailure("Failed to retrieve Bookmark from Rename Folder context menu item")
             return
         }
-
-        delegate?.popover(shouldPreventClosure: true)
-
         let addFolderViewController = AddFolderModalViewController.create()
         addFolderViewController.edit(folder: folder)
-        addFolderViewController.delegate = self
         beginSheetFromMainWindow(addFolderViewController)
     }
 
@@ -408,7 +381,7 @@ extension BookmarkListViewController: FolderMenuItemSelectors {
             return
         }
 
-        let tabs = children.compactMap { ($0 as? Bookmark)?.urlObject }.map { Tab(content: .url($0), shouldLoadInBackground: true, isBurner: tabCollection.isBurner) }
+        let tabs = children.compactMap { $0 as? Bookmark }.map { Tab(content: .url($0.url), shouldLoadInBackground: true) }
         tabCollection.append(tabs: tabs)
     }
 

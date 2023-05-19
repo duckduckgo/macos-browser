@@ -18,7 +18,7 @@
 
 import Cocoa
 import Combine
-import Common
+import os.log
 
 extension NSView {
 

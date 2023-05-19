@@ -25,38 +25,11 @@ extension NSApplication {
         ProcessInfo.processInfo.environment["APP_SANDBOX_CONTAINER_ID"] != nil
     }
 
-    @objc enum RunType: Int, CustomStringConvertible {
-        case normal
-        case unitTests
-        case integrationTests
-        case uiTests
-
-        var description: String {
-            switch self {
-            case .normal: return "normal"
-            case .unitTests: return "unitTests"
-            case .integrationTests: return "integrationTests"
-            case .uiTests: return "uiTests"
-            }
-        }
-    }
-    @objc dynamic var runType: RunType { .normal }
-
-    var isRunningUnitTests: Bool {
-        if case .unitTests = runType { return true }
-        return false
-    }
-
-    var isRunningIntegrationTests: Bool {
-        if case .integrationTests = runType { return true }
-        return false
-    }
-
-#if !NETWORK_EXTENSION
+    // swiftlint:disable force_cast
     var mainMenuTyped: MainMenu {
-        return mainMenu as! MainMenu // swiftlint:disable:this force_cast
+        return mainMenu as! MainMenu
     }
-#endif
+    // swiftlint:enable force_cast
 
     var isCommandPressed: Bool {
         currentEvent?.modifierFlags.contains(.command) ?? false

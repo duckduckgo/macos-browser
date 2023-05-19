@@ -16,13 +16,17 @@
 //  limitations under the License.
 //
 
-import Common
 import Foundation
+import os
 
 extension FileManager {
 
     func moveItem(at srcURL: URL, to destURL: URL, incrementingIndexIfExists flag: Bool, pathExtension: String? = nil) throws -> URL {
         return try self.perform(self.moveItem, from: srcURL, to: destURL, incrementingIndexIfExists: flag, pathExtension: pathExtension)
+    }
+
+    func copyItem(at srcURL: URL, to destURL: URL, incrementingIndexIfExists flag: Bool, pathExtension: String? = nil) throws -> URL {
+        return try self.perform(self.copyItem, from: srcURL, to: destURL, incrementingIndexIfExists: flag, pathExtension: pathExtension)
     }
 
     private func perform(_ operation: (URL, URL) throws -> Void,
@@ -70,9 +74,43 @@ extension FileManager {
                     os_log("Failed to move file to Downloads folder, attempt %d", type: .error, copy)
                     throw CocoaError(.fileWriteFileExists)
                 }
+            } catch {
+                Pixel.fire(.debug(event: .fileMoveToDownloadsFailed, error: error))
+                throw error
             }
         }
         fatalError("Unexpected flow")
+    }
+
+    func temporaryDirectory(appropriateFor url: URL?) -> URL {
+        do {
+            struct ThrowableError: Error {}
+            guard let url = url else { throw ThrowableError() }
+
+            // this creates a temp diretory on the same volume as a requested url
+            // "(A Document Being Saved By DuckDuckGo Privacy Browser N)" folder is created
+            // on every call even if `create: false` is passed
+            // and this starts to fail after reaching 1000 folders
+            // so we'll create a temp directory, then delete it and
+            // return its parent (actual temp dir)
+            var tempURL = try self.url(for: .itemReplacementDirectory,
+                                       in: .userDomainMask,
+                                       appropriateFor: url,
+                                       create: true)
+            try self.removeItem(at: tempURL)
+
+            tempURL = tempURL.deletingLastPathComponent()
+            var isDir: ObjCBool = false
+            guard self.fileExists(atPath: tempURL.path, isDirectory: &isDir),
+                  isDir.boolValue,
+                  try tempURL.resourceValues(forKeys: [.isWritableKey]).isWritable == true
+            else { throw ThrowableError() }
+
+            return tempURL
+
+        } catch {
+            return self.temporaryDirectory
+        }
     }
 
 }
