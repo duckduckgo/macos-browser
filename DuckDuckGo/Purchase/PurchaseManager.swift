@@ -32,6 +32,7 @@ public enum StoreError: Error {
 final class PurchaseManager: ObservableObject {
 
     static let productIdentifiers = ["subscription.1week", "subscription.1month", "subscription.1year",
+                                     "review.subscription.1week", "review.subscription.1month", "review.subscription.1year",
                                      "iap.cat", "iap.dog", "iap.rabbit",
                                      "monthly.subscription", "three.month.subscription",
                                      "renewable.1month",
