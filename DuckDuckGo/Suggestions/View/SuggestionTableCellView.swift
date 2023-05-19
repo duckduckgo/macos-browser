@@ -17,7 +17,7 @@
 //
 
 import Cocoa
-import os.log
+import Common
 
 final class SuggestionTableCellView: NSTableCellView {
 
@@ -25,6 +25,7 @@ final class SuggestionTableCellView: NSTableCellView {
 
     static let textColor = NSColor.suggestionTextColor
     static let suffixColor = NSColor.addressBarSuffixColor
+    static let burnerSuffixColor = NSColor.burnerAccentColor
     static let iconColor = NSColor.suggestionIconColor
     static let selectedTintColor = NSColor.selectedSuggestionTintColor
 
@@ -41,6 +42,8 @@ final class SuggestionTableCellView: NSTableCellView {
             updateTextField()
         }
     }
+
+    var isBurner: Bool = false
 
     func display(_ suggestionViewModel: SuggestionViewModel) {
         attributedString = suggestionViewModel.tableCellViewAttributedString
@@ -64,7 +67,11 @@ final class SuggestionTableCellView: NSTableCellView {
         } else {
             textField?.attributedStringValue = attributedString
             textField?.textColor = Self.textColor
-            suffixTextField.textColor = Self.suffixColor
+            if isBurner {
+                suffixTextField.textColor = Self.burnerSuffixColor
+            } else {
+                suffixTextField.textColor = Self.suffixColor
+            }
         }
     }
 

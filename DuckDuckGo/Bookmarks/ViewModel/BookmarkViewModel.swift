@@ -71,7 +71,7 @@ struct BookmarkViewModel {
             preconditionFailure("\(#file): Attempted to provide representing color for non-Bookmark")
         }
 
-        let index = bookmark.url.absoluteString.count % Self.representingColors.count
+        let index = bookmark.url.count % Self.representingColors.count
         return Self.representingColors[index]
     }
 
@@ -81,7 +81,7 @@ struct BookmarkViewModel {
             preconditionFailure("\(#file): Attempted to provide representing character for non-Bookmark")
         }
 
-        return bookmark.url.host?.droppingWwwPrefix().first?.uppercased() ?? "-"
+        return bookmark.urlObject?.host?.droppingWwwPrefix().first?.uppercased() ?? "-"
     }
 
 }

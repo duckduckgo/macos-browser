@@ -18,17 +18,19 @@
 
 import Foundation
 import Combine
-import os.log
+import Common
 import BrowserServicesKit
 
 final class SuggestionContainerViewModel {
 
     var isHomePage: Bool
+    let isBurner: Bool
     let suggestionContainer: SuggestionContainer
     private var suggestionResultCancellable: AnyCancellable?
 
-    init(isHomePage: Bool, suggestionContainer: SuggestionContainer) {
+    init(isHomePage: Bool, isBurner: Bool, suggestionContainer: SuggestionContainer) {
         self.isHomePage = isHomePage
+        self.isBurner = isBurner
         self.suggestionContainer = suggestionContainer
         subscribeToSuggestionResult()
     }
@@ -87,6 +89,7 @@ final class SuggestionContainerViewModel {
         guard userStringValue.lowercased() != oldValue?.lowercased() else { return }
 
         self.isTopSuggestionSelectionExpected = userAppendedStringToTheEnd && !userStringValue.contains(" ")
+
         suggestionContainer.getSuggestions(for: userStringValue)
     }
 

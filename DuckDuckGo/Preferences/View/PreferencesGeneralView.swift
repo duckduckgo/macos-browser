@@ -19,6 +19,7 @@
 import SwiftUI
 import AppKit
 import Combine
+import SwiftUIExtensions
 
 extension Preferences {
 
@@ -28,12 +29,13 @@ extension Preferences {
 
         var body: some View {
             VStack(alignment: .leading, spacing: 0) {
-                Text(UserText.general)
-                    .font(Const.Fonts.preferencePaneTitle)
 
-                Section {
-                    Text(UserText.defaultBrowser)
-                        .font(Const.Fonts.preferencePaneSectionHeader)
+                // TITLE
+                TextMenuTitle(text: UserText.general)
+
+                // SECTION 1: Default Browser
+                PreferencePaneSection {
+                    TextMenuItemHeader(text: UserText.defaultBrowser)
 
                     HStack {
                         if defaultBrowserModel.isDefault {
@@ -49,10 +51,10 @@ extension Preferences {
                     }
                 }
 
-                Section {
-                    Text(UserText.onStartup)
-                        .font(Const.Fonts.preferencePaneSectionHeader)
-                    Toggle(UserText.reopenAllWindowsFromLastSession, isOn: $startupModel.restorePreviousSession)
+                // SECTION 2: On Stap
+                PreferencePaneSection {
+                    TextMenuItemHeader(text: UserText.onStartup)
+                    ToggleMenuItem(title: UserText.reopenAllWindowsFromLastSession, isOn: $startupModel.restorePreviousSession)
                 }
 
             }

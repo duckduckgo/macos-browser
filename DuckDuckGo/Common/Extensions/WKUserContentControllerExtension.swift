@@ -20,13 +20,8 @@ import Cocoa
 import WebKit
 import UserScript
 
+@MainActor
 extension WKUserContentController {
-
-    func addHandlerNoContentWorld(_ userScript: UserScript) {
-        for messageName in userScript.messageNames {
-            add(userScript, name: messageName)
-        }
-    }
 
     func addHandler(_ userScript: UserScript) {
         for messageName in userScript.messageNames {

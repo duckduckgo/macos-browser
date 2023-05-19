@@ -17,8 +17,8 @@
 //
 
 import AppKit
+import Common
 import Foundation
-import os.log
 
 final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NSOutlineViewDelegate {
 
@@ -30,7 +30,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
     @Published var selectedFolders: [BookmarkFolder] = []
 
     let treeController: BookmarkTreeController
-    var expandedNodes = Set<UUID>()
+    var expandedNodesIDs = Set<String>()
 
     private let contentMode: ContentMode
     private let bookmarkManager: BookmarkManager
@@ -56,7 +56,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
 
     // MARK: - Private
 
-    private func id(from notification: Notification) -> UUID? {
+    private func id(from notification: Notification) -> String? {
         let node = notification.userInfo?["NSObject"] as? BookmarkNode
 
         if let bookmark = node?.representedObject as? BaseBookmarkEntity {
@@ -99,13 +99,13 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
 
     func outlineViewItemDidExpand(_ notification: Notification) {
         if let objectID = id(from: notification) {
-            expandedNodes.insert(objectID)
+            expandedNodesIDs.insert(objectID)
         }
     }
 
     func outlineViewItemDidCollapse(_ notification: Notification) {
         if let objectID = id(from: notification) {
-            expandedNodes.remove(objectID)
+            expandedNodesIDs.remove(objectID)
         }
     }
 
@@ -206,7 +206,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
         // Folders cannot be dragged onto themselves:
 
         let containsDestination = draggedFolders.contains { draggedFolder in
-            return draggedFolder.id == destinationFolder.id.uuidString
+            return draggedFolder.id == destinationFolder.id
         }
 
         if containsDestination {
@@ -216,7 +216,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
         // Folders cannot be dragged onto any of their descendants:
 
         let containsDescendantOfDestination = draggedFolders.contains { draggedFolder in
-            let folder = BookmarkFolder(id: UUID(uuidString: draggedFolder.id)!, title: draggedFolder.name)
+            let folder = BookmarkFolder(id: draggedFolder.id, title: draggedFolder.name)
 
             guard let draggedNode = treeController.node(representing: folder) else {
                 return false
@@ -268,7 +268,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
         // Handle the existing destination case:
 
         if let parent = representedObject as? BookmarkFolder {
-            bookmarkManager.move(objectUUIDs: draggedObjectIdentifiers, toIndex: index, withinParentFolder: .parent(parent.id)) { error in
+            bookmarkManager.move(objectUUIDs: draggedObjectIdentifiers, toIndex: index, withinParentFolder: .parent(uuid: parent.id)) { error in
                 if let error = error {
                     os_log("Failed to accept existing parent drop via outline view: %s", error.localizedDescription)
                 }

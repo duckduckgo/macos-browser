@@ -1,18 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="21701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
+        <deployment identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21701"/>
     </dependencies>
     <scenes>
         <!--Application-->
         <scene sceneID="JPo-4y-FX3">
             <objects>
-                <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="DuckDuckGo_Network_Protection" customModuleProvider="target"/>
+                <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                    <connections>
+                        <outlet property="exportBookmarksMenuItem" destination="3K6-pB-Kea" id="0aB-uI-R6L"/>
+                    </connections>
+                </customObject>
                 <customObject id="Ady-hI-5gd" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
-                <customObject id="WIK-gq-Ncg" customClass="CopyHandler" customModule="DuckDuckGo_Network_Protection" customModuleProvider="target"/>
+                <customObject id="WIK-gq-Ncg" customClass="CopyHandler" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target"/>
                 <customObject id="YLy-65-1bz" customClass="NSFontManager"/>
                 <application id="hnw-xV-0zn" sceneMemberID="viewController">
-                    <menu key="mainMenu" title="Main Menu" systemMenu="main" id="AYu-sK-qS6" customClass="MainMenu" customModule="DuckDuckGo_Network_Protection" customModuleProvider="target">
+                    <menu key="mainMenu" title="Main Menu" systemMenu="main" id="AYu-sK-qS6" customClass="MainMenu" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                         <items>
                             <menuItem title="DuckDuckGo" id="1Xt-HY-uBw">
                                 <modifierMask key="keyEquivalentModifierMask"/>
@@ -78,6 +83,11 @@
                                                 <action selector="newWindow:" target="Ady-hI-5gd" id="nK2-0w-B4c"/>
                                             </connections>
                                         </menuItem>
+                                        <menuItem title="New Burner Window" keyEquivalent="N" id="fx4-EK-KRg">
+                                            <connections>
+                                                <action selector="newBurnerWindow:" target="Ady-hI-5gd" id="vLy-E3-sFd"/>
+                                            </connections>
+                                        </menuItem>
                                         <menuItem title="New Tab" keyEquivalent="t" id="9qI-62-tsd" userLabel="New Tab">
                                             <connections>
                                                 <action selector="newTab:" target="Ady-hI-5gd" id="Gnb-ML-joG"/>
@@ -121,7 +131,7 @@
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <menu key="submenu" title="Export" id="SGe-jt-1so">
                                                 <items>
-                                                    <menuItem title="Logins..." id="raM-fX-nRg">
+                                                    <menuItem title="Passwords..." id="raM-fX-nRg">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                         <connections>
                                                             <action selector="openExportLogins:" target="Ady-hI-5gd" id="MLl-kw-Su4"/>
@@ -386,7 +396,7 @@
                                         <menuItem isSeparatorItem="YES" id="hB3-LF-h0Y"/>
                                         <menuItem title="Show Bookmarks Bar" keyEquivalent="B" id="z3f-ie-l71">
                                             <connections>
-                                                <action selector="toggleBookmarksBar:" target="Ady-hI-5gd" id="nVa-wD-QtY"/>
+                                                <action selector="toggleBookmarksBarFromMenu:" target="Ady-hI-5gd" id="dCK-ha-Oqf"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem title="Show Downloads" keyEquivalent="j" id="qWL-J6-S8r">
@@ -475,7 +485,7 @@
                             </menuItem>
                             <menuItem title="History" id="aVY-po-b3d">
                                 <modifierMask key="keyEquivalentModifierMask"/>
-                                <menu key="submenu" title="History" id="SLT-Z6-mh7" customClass="HistoryMenu" customModule="DuckDuckGo_Network_Protection" customModuleProvider="target">
+                                <menu key="submenu" title="History" id="SLT-Z6-mh7" customClass="HistoryMenu" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                     <items>
                                         <menuItem title="Back" enabled="NO" keyEquivalent="[" id="VWV-vB-Mtc">
                                             <connections>
@@ -505,8 +515,18 @@
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="eoz-XM-HpQ"/>
+                                        <menuItem title="Clear All History…" enabled="NO" id="n9a-Bc-r7Z">
+                                            <string key="keyEquivalent" base64-UTF8="YES">
+CA
+</string>
+                                            <modifierMask key="keyEquivalentModifierMask" shift="YES" command="YES"/>
+                                            <connections>
+                                                <action selector="clearAllHistory:" target="Ady-hI-5gd" id="5Q8-pp-l2m"/>
+                                            </connections>
+                                        </menuItem>
                                     </items>
                                     <connections>
+                                        <outlet property="clearAllHistoryMenuItem" destination="n9a-Bc-r7Z" id="L22-xU-BaT"/>
                                         <outlet property="recentlyClosedMenuItem" destination="pWT-lm-yTC" id="bhY-MN-oMZ"/>
                                         <outlet property="reopenAllWindowsFromLastSessionMenuItem" destination="C6V-uF-uX8" id="YoX-kD-0PA"/>
                                         <outlet property="reopenLastClosedMenuItem" destination="c3l-v1-kxk" id="1OS-ma-fzm"/>
@@ -530,14 +550,20 @@
                                         </menuItem>
                                         <menuItem title="Toggle Bookmarks Bar" keyEquivalent="B" id="SwH-Sh-zIJ">
                                             <connections>
-                                                <action selector="toggleBookmarksBar:" target="Ady-hI-5gd" id="EkG-vj-emY"/>
+                                                <action selector="toggleBookmarksBarFromMenu:" target="Ady-hI-5gd" id="K35-ch-3LK"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="aPG-H0-BrG"/>
-                                        <menuItem title="Import Bookmarks and Passwords..." id="tNX-Bv-yM3" userLabel="Import Bookmarks...">
+                                        <menuItem title="Import Bookmarks…" id="tNX-Bv-yM3" userLabel="Import Bookmarks...">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
                                                 <action selector="openImportBrowserDataWindow:" target="Ady-hI-5gd" id="NdE-Lt-CL5"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Export Bookmarks…" enabled="NO" id="3K6-pB-Kea">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="openExportBookmarks:" target="Ady-hI-5gd" id="h3L-FO-yq9"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="xsn-Ak-LSd"/>
@@ -732,7 +758,7 @@ CQ
                                                     <menuItem title="Reset YouTube Overlay Interactions" id="tTd-ZO-0Zx">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                         <connections>
-                                                            <action selector="resetPrivatePlayerOverlayInteractions:" target="Ady-hI-5gd" id="Tr1-yK-ayF"/>
+                                                            <action selector="resetDuckPlayerOverlayInteractions:" target="Ady-hI-5gd" id="Tr1-yK-ayF"/>
                                                         </connections>
                                                     </menuItem>
                                                 </items>
@@ -886,6 +912,7 @@ CQ
                             <outlet property="closeTabMenuItem" destination="DVo-aG-piG" id="Hr0-hn-2p1"/>
                             <outlet property="closeWindowMenuItem" destination="CzI-4o-2re" id="32H-X4-8Ub"/>
                             <outlet property="debugMenuItem" destination="ilv-5f-YpZ" id="4F7-9b-Mve"/>
+                            <outlet property="exportBookmarksMenuItem" destination="3K6-pB-Kea" id="LbP-Ft-aAT"/>
                             <outlet property="favoriteThisPageMenuItem" destination="cHZ-Fb-aKU" id="uPM-LY-AmL"/>
                             <outlet property="favoritesMenuItem" destination="Y9I-ZC-gGg" id="zk1-XL-x3e"/>
                             <outlet property="forwardMenuItem" destination="Gbj-sV-aI3" id="54P-Ym-Ic2"/>
@@ -895,9 +922,10 @@ CQ
                             <outlet property="importBookmarksMenuItem" destination="tNX-Bv-yM3" id="NI1-on-lCU"/>
                             <outlet property="importBrowserDataMenuItem" destination="gTV-od-6G5" id="2R0-Pa-qG4"/>
                             <outlet property="manageBookmarksMenuItem" destination="BaO-sP-wbQ" id="rn7-HX-04s"/>
-                            <outlet property="networkProtectionPreferredServerLocationItem" destination="Zh6-DO-H1c" id="Vkl-vJ-LJY"/>
+                            <outlet property="networkProtectionPreferredServerLocationItem" destination="Zh6-DO-H1c" id="3wy-2a-ACt"/>
                             <outlet property="networkProtectionRegistrationKeyValidityMenuItem" destination="iPz-EO-Nv6" id="Sw3-Bt-aZt"/>
                             <outlet property="networkProtectionRegistrationKeyValidityMenuSeparatorItem" destination="MEg-4g-gji" id="yWq-Rz-B9B"/>
+                            <outlet property="newBurnerWindowMenuItem" destination="fx4-EK-KRg" id="52V-eM-hzi"/>
                             <outlet property="newTabMenuItem" destination="9qI-62-tsd" id="6SI-rG-P34"/>
                             <outlet property="newWindowMenuItem" destination="Was-JA-tGl" id="uyQ-qR-DFk"/>
                             <outlet property="openLocationMenuItem" destination="xnU-dQ-JR1" id="DYS-Dt-ydU"/>

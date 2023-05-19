@@ -40,4 +40,9 @@ PROVISIONING_PROFILE_SPECIFIER[config=CI][sdk=macosx*] =
 PROVISIONING_PROFILE_SPECIFIER[config=Release][sdk=macosx*] = match AppStore com.duckduckgo.mobile.ios macos
 PROVISIONING_PROFILE_SPECIFIER[config=Review][sdk=macosx*] = Sandbox MacOS Browser Product Review
 
+AGENT_BUNDLE_ID[sdk=*] = HKE973VLUW.com.duckduckgo.macos.browser.network-protection.agent
+AGENT_BUNDLE_ID[config=Debug][sdk=*] = HKE973VLUW.com.duckduckgo.macos.browser.network-protection.agent.debug
+AGENT_BUNDLE_ID[config=CI][sdk=*] = HKE973VLUW.com.duckduckgo.macos.browser.network-protection.agent.debug
+AGENT_BUNDLE_ID[config=Review][sdk=*] = HKE973VLUW.com.duckduckgo.macos.browser.network-protection.agent.review
+
 #include? "../../LocalOverridesAppStore.xcconfig"

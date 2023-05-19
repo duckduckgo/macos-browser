@@ -14,7 +14,7 @@
 //
 
 #include "AppTargetsBase.xcconfig"
-#include "../NetPIDs.xcconfig"
+#include "../DeveloperID.xcconfig"
 #include "../NetPOverrides.xcconfig"
 
 BUNDLE_IDENTIFIER_PREFIX = $(NOTIFICATIONS_AGENT_BUNDLE_ID)
@@ -47,12 +47,6 @@ PRODUCT_NAME_PREFIX = DuckDuckGo Notifications
 PROVISIONING_PROFILE_SPECIFIER[config=Release][sdk=macosx*] = Mac Browser NetP Developer ID Not. (Distribution)
 
 NETP_EXTRA_FLAGS = NETP_SYSTEM_EXTENSION
-
-// Override the icon with our custom one
-ASSETCATALOG_COMPILER_APPICON_NAME = Icon - Network Protection
-ASSETCATALOG_COMPILER_APPICON_NAME[config=Debug] = Icon - Network Protection
-ASSETCATALOG_COMPILER_APPICON_NAME[config=CI] = Icon - Network Protection
-ASSETCATALOG_COMPILER_APPICON_NAME[config=Review] = Icon - Network Protection
 
 SWIFT_OBJC_BRIDGING_HEADER =
 SKIP_INSTALL = YES
