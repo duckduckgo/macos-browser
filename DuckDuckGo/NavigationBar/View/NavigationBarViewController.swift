@@ -744,6 +744,10 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
         DataImportViewController.show()
     }
 
+    func optionsButtonMenuRequestedBookmarkExportInterface(_ menu: NSMenu) {
+        NSApp.sendAction(#selector(AppDelegate.openExportBookmarks(_:)), to: nil, from: nil)
+    }
+
     func optionsButtonMenuRequestedLoginsPopover(_ menu: NSMenu, selectedCategory: SecureVaultSorting.Category) {
         popovers.showPasswordManagementPopover(selectedCategory: selectedCategory,
                                                usingView: passwordManagementButton,

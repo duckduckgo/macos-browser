@@ -60,6 +60,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     private var appIconChanger: AppIconChanger!
     private(set) var syncService: DDGSyncing!
     private(set) var syncPersistence: SyncDataPersistor!
+    let bookmarksManager = LocalBookmarkManager.shared
 
 #if !APPSTORE
     var updateController: UpdateController!
@@ -157,7 +158,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
         HistoryCoordinator.shared.loadHistory()
         PrivacyFeatures.httpsUpgrade.loadDataAsync()
-        LocalBookmarkManager.shared.loadBookmarks()
+        bookmarksManager.loadBookmarks()
         FaviconManager.shared.loadFavicons()
         ConfigurationManager.shared.start()
         FileDownloadManager.shared.delegate = self
@@ -189,6 +190,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         urlEventHandler.applicationDidFinishLaunching()
 
         subscribeToEmailProtectionStatusNotifications()
+        subscribeToDataImportCompleteNotification()
 
         UserDefaultsWrapper<Any>.clearRemovedKeys()
 
@@ -343,12 +345,29 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
                                                object: nil)
     }
 
+    private func subscribeToDataImportCompleteNotification() {
+        NotificationCenter.default.addObserver(self, selector: #selector(dataImportCompleteNotification(_:)), name: .dataImportComplete, object: nil)
+    }
+
     @objc private func emailDidSignInNotification(_ notification: Notification) {
         Pixel.fire(.emailEnabled)
+        let repetition = Pixel.Event.Repetition(key: Pixel.Event.emailEnabledInitial.name)
+        // Temporary pixel for first time user enables email protection
+        if repetition == .initial {
+            Pixel.fire(.emailEnabledInitial)
+        }
     }
 
     @objc private func emailDidSignOutNotification(_ notification: Notification) {
         Pixel.fire(.emailDisabled)
+    }
+
+    @objc private func dataImportCompleteNotification(_ notification: Notification) {
+        // Temporary pixel for first time user import data
+        let repetition = Pixel.Event.Repetition(key: Pixel.Event.importDataInitial.name)
+        if repetition == .initial {
+            Pixel.fire(.importDataInitial)
+        }
     }
 
 }

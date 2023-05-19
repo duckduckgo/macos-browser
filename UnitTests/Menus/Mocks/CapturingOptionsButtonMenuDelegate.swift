@@ -68,6 +68,10 @@ class CapturingOptionsButtonMenuDelegate: OptionsButtonMenuDelegate {
         optionsButtonMenuRequestedAppearancePreferencesCalled = true
     }
 
+    func optionsButtonMenuRequestedBookmarkExportInterface(_ menu: NSMenu) {
+
+    }
+
     func optionsButtonMenuRequestedNetworkProtectionPopover(_ menu: NSMenu) {
 
     }

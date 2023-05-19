@@ -66,6 +66,7 @@ final class MainMenu: NSMenu {
     @IBOutlet weak var manageBookmarksMenuItem: NSMenuItem!
     @IBOutlet weak var bookmarksMenuToggleBookmarksBarMenuItem: NSMenuItem?
     @IBOutlet weak var importBookmarksMenuItem: NSMenuItem!
+    @IBOutlet weak var exportBookmarksMenuItem: NSMenuItem!
     @IBOutlet weak var bookmarksMenuItem: NSMenuItem?
     @IBOutlet weak var bookmarkThisPageMenuItem: NSMenuItem?
     @IBOutlet weak var favoritesMenuItem: NSMenuItem?
