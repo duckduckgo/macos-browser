@@ -66,8 +66,6 @@ public class DefaultStatusServiceClient: StatusServiceClient {
 
         do {
             connectionStatus = try jsonDecoder.decode(ConnectionStatus.self, from: data)
-
-            let responseString = String(data: data, encoding: IPCThroughCFMessagePort.defaultEncoding) ?? ""
         } catch {
             throw QueryError.couldNotDecodeResponse(query: query.rawValue, error: error)
         }

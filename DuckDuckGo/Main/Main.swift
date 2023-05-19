@@ -41,7 +41,7 @@ final class AppMain {
             swizzleMainBundle()
 
             do {
-                try await DefaultNetworkProtectionProvider().start(enableLoginItems: false)
+                try await NetworkProtectionTunnelController().start(enableLoginItems: false)
                 exit(0)
             } catch {
                 throw LaunchError.startVPNFailed(error)
@@ -50,7 +50,7 @@ final class AppMain {
             swizzleMainBundle()
 
             do {
-                try await DefaultNetworkProtectionProvider().stop()
+                try await NetworkProtectionTunnelController().stop()
                 exit(0)
             } catch {
                 throw LaunchError.stopVPNFailed(error)

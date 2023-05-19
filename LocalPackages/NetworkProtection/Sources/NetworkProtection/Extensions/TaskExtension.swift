@@ -29,13 +29,13 @@ public extension Task where Success == Never, Failure == Error {
         Task.detached(priority: priority) {
             do {
                 if let delay {
-                    try await Task.sleep(interval: delay)
+                    try await Task<Never, Never>.sleep(interval: delay)
                 }
 
                 repeat {
                     await operation()
 
-                    try await Task.sleep(interval: interval)
+                    try await Task<Never, Never>.sleep(interval: interval)
                 } while true
             } catch {
                 await cancellationHandler?()
@@ -47,7 +47,7 @@ public extension Task where Success == Never, Failure == Error {
 
 }
 
-public extension Task {
+public extension Task where Success == Never, Failure == Never {
 
     static func sleep(interval: TimeInterval) async throws {
         assert(interval > 0)

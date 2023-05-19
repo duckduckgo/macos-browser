@@ -250,7 +250,7 @@ final class NavigationBarPopovers {
     // MARK: - Network Protection
 
     func showNetworkProtectionPopover(usingView view: NSView, withDelegate delegate: NSPopoverDelegate) {
-        let controller = DefaultNetworkProtectionProvider()
+        let controller = NetworkProtectionTunnelController()
         let statusReporter = DefaultNetworkProtectionStatusReporter(
             statusObserver: ConnectionStatusObserverThroughSession(),
             serverInfoObserver: ConnectionServerInfoObserverThroughSession(),

@@ -1,7 +1,7 @@
 //
-//  NetworkProtectionProvider.swift
+//  NetworkProtectionTunnelController.swift
 //
-//  Copyright © 2022 DuckDuckGo. All rights reserved.
+//  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ import Networking
 typealias NetworkProtectionStatusChangeHandler = (NetworkProtection.ConnectionStatus) -> Void
 typealias NetworkProtectionConfigChangeHandler = () -> Void
 
-final class DefaultNetworkProtectionProvider: NetworkProtection.TunnelController {
+final class NetworkProtectionTunnelController: NetworkProtection.TunnelController {
 
     // MARK: - Debug Helpers
 
@@ -37,12 +37,6 @@ final class DefaultNetworkProtectionProvider: NetworkProtection.TunnelController
     /// This is static because we want these options to be shared across all instances of `NetworkProtectionProvider`.
     ///
     static var simulationOptions = NetworkProtectionSimulationOptions()
-
-    // MARK: - Errors & Logging
-
-    enum QuickConfigLoadingError: Error {
-        case quickConfigFilePathEnvVarMissing
-    }
 
     /// The logger that this object will use for errors that are handled by this class.
     ///
@@ -58,20 +52,14 @@ final class DefaultNetworkProtectionProvider: NetworkProtection.TunnelController
     ///
     private let notificationCenter: NotificationCenter
 
+    // MARK: - VPN Tunnel & Configuration
+
+    /// Auth token store
     private let tokenStore: NetworkProtectionTokenStore
 
     /// The observer token for VPN configuration changes,
     ///
     private var configChangeObserverToken: NSObjectProtocol?
-
-    // MARK: - VPN Tunnel & Configuration
-
-    /// The environment variable that holds the path to the WG quick configuration file that will be used for the tunnel.
-    ///
-    static let quickConfigFilePathEnvironmentVariable = "NETP_QUICK_CONFIG_FILE_PATH"
-
-    /// The path of the WG quick configuration file that is used when the environment variable is not present.
-    static let defaultConfigFilePath = "~/NetworkProtection.conf"
 
     /// The actual storage for our tunnel manager.
     ///
@@ -184,47 +172,7 @@ final class DefaultNetworkProtectionProvider: NetworkProtection.TunnelController
         configChangeObserverToken = nil
     }
 
-    // MARK: - Notifications: Handling
-
-    static let statusChangeQueue: OperationQueue = {
-        let queue = OperationQueue()
-        queue.maxConcurrentOperationCount = 1
-        queue.qualityOfService = .userInteractive
-
-        return queue
-    }()
-
-    @objc private func resetExtensionNotification(_ notification: Notification) {
-        os_log("Received reset extension notification", log: .networkProtection)
-
-        Task { @MainActor in
-            try? await stop()
-            try? await internalTunnelManager?.removeFromPreferences()
-        }
-    }
-
     // MARK: - Tunnel Configuration
-
-    /// Loads the tunnel configuration from the filesystem.
-    ///
-    private func loadTunnelConfiguration() throws -> TunnelConfiguration? {
-        let resolvedDefaultPath = NSString(string: Self.defaultConfigFilePath).expandingTildeInPath
-
-        if let quickConfigFile = ProcessInfo.processInfo.environment[Self.quickConfigFilePathEnvironmentVariable] {
-            let quickConfig = try String(contentsOfFile: quickConfigFile)
-            let configuration = try TunnelConfiguration(fromWgQuickConfig: quickConfig)
-            configuration.name = "DuckDuckGo Network Protection Configuration"
-
-            return configuration
-        } else if let defaultQuickConfig = try? String(contentsOfFile: resolvedDefaultPath) {
-            let configuration = try TunnelConfiguration(fromWgQuickConfig: defaultQuickConfig)
-            configuration.name = "DuckDuckGo Network Protection Configuration"
-
-            return configuration
-        }
-
-        return nil
-    }
 
     /// Reloads the tunnel manager from preferences.
     ///
@@ -378,22 +326,12 @@ final class DefaultNetworkProtectionProvider: NetworkProtection.TunnelController
         var options = [String: NSObject]()
 
         options["activationAttemptId"] = UUID().uuidString as NSString
-
-        if let authToken = tokenStore.fetchToken() {
-            options["authToken"] = authToken as NSString
-        }
-
-        if let selectedServerName = Self.selectedServerName() {
-            options["selectedServer"] = selectedServerName as NSString
-        }
-
-        if let selectedKeyValidity = Self.registrationKeyValidity() {
-            options["keyValidity"] = String(selectedKeyValidity) as NSString
-        }
+        options["authToken"] = tokenStore.fetchToken() as NSString?
+        options["selectedServer"] = Self.selectedServerName() as NSString?
+        options["keyValidity"] = Self.registrationKeyValidity().map(String.init(describing:)) as NSString?
 
         if Self.simulationOptions.isEnabled(.tunnelFailure) {
             Self.simulationOptions.setEnabled(false, option: .tunnelFailure)
-
             options["tunnelFailureSimulation"] = "true" as NSString
         }
 
@@ -427,8 +365,6 @@ final class DefaultNetworkProtectionProvider: NetworkProtection.TunnelController
 
     // MARK: - Debug commands for the extension
 
-    private let selectedServerStore = NetworkProtectionSelectedServerUserDefaultsStore()
-
     static func resetAllState() {
         Task {
 
@@ -439,7 +375,7 @@ final class DefaultNetworkProtectionProvider: NetworkProtection.TunnelController
             }
 
             // ☝️ Take care of resetting all state within the extension first, and wait half a second
-            try? await Task.sleep(nanoseconds: 500 * NSEC_PER_MSEC)
+            try? await Task.sleep(interval: 0.5)
             // 👇 And only afterwards turn off the tunnel and removing it from prefernces
 
             let tunnels = try? await NETunnelProviderManager.loadAllFromPreferences()
@@ -495,14 +431,14 @@ final class DefaultNetworkProtectionProvider: NetworkProtection.TunnelController
         try? activeSession.sendProviderMessage(request)
     }
 
-    private static let registrationKeyValidityKey = "com.duckduckgo.network-protection.DefaultNetworkProtectionProvider.registrationKeyValidityKey"
+    private static let registrationKeyValidityKey = "com.duckduckgo.network-protection.NetworkProtectionTunnelController.registrationKeyValidityKey"
 
     /// Retrieves the registration key validity time interval.
     ///
     /// - Returns: the validity time interval if it was overridden, or `nil` if NetP is using defaults.
     ///
-    static func registrationKeyValidity() -> TimeInterval? {
-        UserDefaults.standard.object(forKey: Self.registrationKeyValidityKey) as? TimeInterval
+    static func registrationKeyValidity(defaults: UserDefaults = .standard) -> TimeInterval? {
+        defaults.object(forKey: Self.registrationKeyValidityKey) as? TimeInterval
     }
 
     /// Sets the registration key validity time interval.
@@ -511,7 +447,7 @@ final class DefaultNetworkProtectionProvider: NetworkProtection.TunnelController
     ///     - validity: the default registration key validity time interval.  A `nil` value means it will be automatically
     ///         defined by NetP using its standard configuration.
     ///
-    static func setRegistrationKeyValidity(_ validity: TimeInterval?) async throws {
+    static func setRegistrationKeyValidity(_ validity: TimeInterval?, defaults: UserDefaults = .standard) async throws {
         guard let activeSession = try await ConnectionSessionUtilities.activeSession() else {
             return
         }
@@ -519,12 +455,12 @@ final class DefaultNetworkProtectionProvider: NetworkProtection.TunnelController
         var request = Data([ExtensionMessage.setKeyValidity.rawValue])
 
         if let validity = validity {
-            UserDefaults.standard.set(validity, forKey: Self.registrationKeyValidityKey)
+            defaults.set(validity, forKey: Self.registrationKeyValidityKey)
 
             let validityData = withUnsafeBytes(of: UInt(validity).littleEndian) { Data($0) }
             request.append(validityData)
         } else {
-            UserDefaults.standard.removeObject(forKey: Self.registrationKeyValidityKey)
+            defaults.removeObject(forKey: Self.registrationKeyValidityKey)
         }
 
         try activeSession.sendProviderMessage(request)
@@ -533,4 +469,5 @@ final class DefaultNetworkProtectionProvider: NetworkProtection.TunnelController
     static func selectedServerName() -> String? {
         NetworkProtectionSelectedServerUserDefaultsStore().selectedServer.stringValue
     }
+
 }

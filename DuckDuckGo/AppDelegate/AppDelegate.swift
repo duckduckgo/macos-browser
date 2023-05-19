@@ -295,7 +295,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
     private func updateNetworkProtectionTunnelAndMenu() {
         Task {
-            let provider = DefaultNetworkProtectionProvider()
+            let provider = NetworkProtectionTunnelController()
 
             if await provider.isConnected() {
                 try? await provider.stop()

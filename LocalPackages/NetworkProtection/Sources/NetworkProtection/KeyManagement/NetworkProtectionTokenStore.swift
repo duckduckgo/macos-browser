@@ -53,7 +53,7 @@ public final class NetworkProtectionKeychainTokenStore: NetworkProtectionTokenSt
     }
 
     public func store(_ token: String) {
-        guard let data = token.data(using: .utf8) else { return }
+        let data = token.data(using: .utf8)!
         do {
             try keychainStore.deleteAll()
             try keychainStore.writeData(data, named: Defaults.tokenStoreName)

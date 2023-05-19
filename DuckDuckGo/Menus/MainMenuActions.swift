@@ -683,7 +683,7 @@ extension MainViewController {
                 return
             }
 
-            DefaultNetworkProtectionProvider.resetAllState()
+            NetworkProtectionTunnelController.resetAllState()
         })
     }
 
@@ -702,12 +702,12 @@ extension MainViewController {
             selectedServer = .endpoint(titleComponents.first!)
         }
 
-        DefaultNetworkProtectionProvider.setSelectedServer(selectedServer: selectedServer)
+        NetworkProtectionTunnelController.setSelectedServer(selectedServer: selectedServer)
     }
 
     @IBAction func networkProtectionExpireRegistrationKeyNow(_ sender: Any?) {
         Task {
-            try? await DefaultNetworkProtectionProvider.expireRegistrationKeyNow()
+            try? await NetworkProtectionTunnelController.expireRegistrationKeyNow()
         }
     }
 
@@ -722,7 +722,7 @@ extension MainViewController {
 
         Task {
             do {
-                try await DefaultNetworkProtectionProvider.setRegistrationKeyValidity(validity)
+                try await NetworkProtectionTunnelController.setRegistrationKeyValidity(validity)
             } catch {
                 assertionFailure("Could not override the key validity due to an error: \(error.localizedDescription)")
                 os_log("Could not override the key validity due to an error: %{public}@", log: .networkProtection, type: .error, error.localizedDescription)
@@ -742,7 +742,7 @@ extension MainViewController {
             menuItem.state = .on
         }
 
-        DefaultNetworkProtectionProvider.simulationOptions.setEnabled(menuItem.state == .on, option: .controllerFailure)
+        NetworkProtectionTunnelController.simulationOptions.setEnabled(menuItem.state == .on, option: .controllerFailure)
     }
 
     @IBAction func networkProtectionSimulateTunnelFailure(_ sender: Any?) {
@@ -757,7 +757,7 @@ extension MainViewController {
             menuItem.state = .on
         }
 
-        DefaultNetworkProtectionProvider.simulationOptions.setEnabled(menuItem.state == .on, option: .tunnelFailure)
+        NetworkProtectionTunnelController.simulationOptions.setEnabled(menuItem.state == .on, option: .tunnelFailure)
     }
 
     // MARK: - Developer Tools
@@ -873,7 +873,7 @@ extension MainViewController: NSMenuItemValidation {
             return true
 
         case #selector(MainViewController.networkProtectionPreferredServerChanged(_:)):
-            let selectedServerName = DefaultNetworkProtectionProvider.selectedServerName()
+            let selectedServerName = NetworkProtectionTunnelController.selectedServerName()
 
             switch menuItem.title {
             case "Automatic":
@@ -893,7 +893,7 @@ extension MainViewController: NSMenuItemValidation {
             return true
 
         case #selector(MainViewController.networkProtectionSetRegistrationKeyValidity(_:)):
-            let selectedValidity = DefaultNetworkProtectionProvider.registrationKeyValidity()
+            let selectedValidity = NetworkProtectionTunnelController.registrationKeyValidity()
 
             switch menuItem.title {
             case "Automatic":
@@ -912,11 +912,11 @@ extension MainViewController: NSMenuItemValidation {
 
             return true
         case #selector(MainViewController.networkProtectionSimulateControllerFailure(_:)):
-            menuItem.state = DefaultNetworkProtectionProvider.simulationOptions.isEnabled(.controllerFailure) ? .on : .off
+            menuItem.state = NetworkProtectionTunnelController.simulationOptions.isEnabled(.controllerFailure) ? .on : .off
             return true
 
         case #selector(MainViewController.networkProtectionSimulateTunnelFailure(_:)):
-            menuItem.state = DefaultNetworkProtectionProvider.simulationOptions.isEnabled(.tunnelFailure) ? .on : .off
+            menuItem.state = NetworkProtectionTunnelController.simulationOptions.isEnabled(.tunnelFailure) ? .on : .off
             return true
 
         default:

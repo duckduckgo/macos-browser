@@ -30,7 +30,7 @@ final class NetworkProtectionKeyStoreMock: NetworkProtectionKeyStore {
         if let keyPair = self.keyPair {
             return keyPair
         } else {
-            let keyPair = KeyPair(privateKey: PrivateKey(), expirationDate: Date().addingTimeInterval(TimeInterval(24 * 60 * 60)))
+            let keyPair = KeyPair(privateKey: PrivateKey(), expirationDate: Date().addingTimeInterval(.day))
             self.keyPair = keyPair
             return keyPair
         }

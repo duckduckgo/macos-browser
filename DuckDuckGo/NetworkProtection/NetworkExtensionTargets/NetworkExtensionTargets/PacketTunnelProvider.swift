@@ -174,7 +174,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
     ///
     private var keyValidity: TimeInterval?
 
-    private static let defaultRetryInterval = TimeInterval(60)
+    private static let defaultRetryInterval: TimeInterval = .minutes(1)
 
     /// Normally we'll retry using the default interval, but since we can override the key validity interval for testing purposes
     /// we'll retry sooner if it's been overridden with values lower than the default retry interval.
@@ -389,27 +389,25 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
     private func load(options: [String: NSObject]?) {
         guard let options = options else {
             os_log("🔵 Tunnel options are not set", log: .networkProtection)
-            assertionFailure("Tunnel options are not set")
             return
         }
 
-        loadVendorOptions(from: options)
         loadKeyValidity(from: options)
         loadSelectedServer(from: options)
         loadAuthToken(from: options)
     }
 
-    private func loadVendorOptions(from options: [String: AnyObject]) {
-        guard let vendorOptions = options["VendorData"] as? [String: AnyObject] else {
-            os_log("🔵 VendorData is not set", log: .networkProtection)
-            assertionFailure("VendorData is not set")
+    private func loadVendorOptions(from provider: NETunnelProviderProtocol?) {
+        guard let vendorOptions = provider?.providerConfiguration else {
+            os_log("🔵 Provider is nil, or providerConfiguration is not set", log: .networkProtection)
+            assertionFailure("Provider is nil, or providerConfiguration is not set")
             return
         }
 
         loadDefaultPixelHeaders(from: vendorOptions)
     }
 
-    private func loadDefaultPixelHeaders(from options: [String: AnyObject]) {
+    private func loadDefaultPixelHeaders(from options: [String: Any]) {
         guard let defaultPixelHeaders = options[NetworkProtectionOptionKey.defaultPixelHeaders.rawValue] as? [String: String] else {
 
             os_log("🔵 Pixel options are not set", log: .networkProtection)
@@ -422,7 +420,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
 
     private func loadKeyValidity(from options: [String: AnyObject]) {
         guard let keyValidityString = options["keyValidity"] as? String,
-           let keyValidity = TimeInterval(keyValidityString) else {
+              let keyValidity = TimeInterval(keyValidityString) else {
             return
         }
 
@@ -455,6 +453,8 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
 
             completionHandler(error)
         }
+
+        loadVendorOptions(from: tunnelProviderProtocol)
 
         let activationAttemptId = options?["activationAttemptId"] as? String
 
@@ -507,8 +507,9 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
 
     private func startTunnel(with tunnelConfiguration: TunnelConfiguration, completionHandler: @escaping (Error?) -> Void) {
         adapter.start(tunnelConfiguration: tunnelConfiguration) { error in
-            if let error = error {
-                self.handle(wireGuardAdapterError: error, completionHandler: completionHandler)
+            if let error {
+                os_log("🔵 Starting tunnel failed with %{public}@", log: .networkProtection, type: .error, error.localizedDescription)
+                completionHandler(error)
                 return
             }
 
@@ -698,10 +699,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
 
     private func handleGetRuntimeConfiguration(_ messageData: Data, completionHandler: ((Data?) -> Void)? = nil) {
         adapter.getRuntimeConfiguration { settings in
-            var data: Data?
-            if let settings = settings {
-                data = settings.data(using: .utf8)!
-            }
+            let data = settings?.data(using: .utf8)
             completionHandler?(data)
         }
     }
@@ -815,40 +813,6 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         await self.connectionTester.stop()
     }
 
-    /// Called when the adapter reports that the tunnel failed to start with an error.
-    ///
-    private func handle(wireGuardAdapterError error: WireGuardAdapterError, completionHandler: @escaping (Error?) -> Void) {
-
-        switch error {
-        case .cannotLocateTunnelFileDescriptor:
-            os_log("🔵 Starting tunnel failed: could not determine file descriptor", log: .networkProtection, type: .error)
-
-            completionHandler(PacketTunnelProviderError.couldNotDetermineFileDescriptor)
-
-        case .dnsResolution(let dnsErrors):
-            let hostnamesWithDnsResolutionFailure = dnsErrors.map { $0.address }
-                .joined(separator: ", ")
-            os_log("🔵 DNS resolution failed for the following hostnames: %{public}@", log: .networkProtection, type: .error, hostnamesWithDnsResolutionFailure)
-
-            completionHandler(PacketTunnelProviderError.dnsResolutionFailure)
-
-        case .setNetworkSettings(let error):
-            os_log("🔵 Starting tunnel failed with setTunnelNetworkSettings returning: %{public}@", log: .networkProtection, type: .error, error.localizedDescription)
-
-            completionHandler(PacketTunnelProviderError.couldNotSetNetworkSettings)
-
-        case .startWireGuardBackend(let errorCode):
-            os_log("🔵 Starting tunnel failed with wgTurnOn returning: %{public}@", log: .networkProtection, type: .error, errorCode)
-
-            completionHandler(PacketTunnelProviderError.couldNotStartBackend)
-
-        case .invalidState:
-            os_log("🔵 Starting tunnel failed with invalid error", log: .networkProtection, type: .error)
-
-            completionHandler(PacketTunnelProviderError.invalidState)
-        }
-    }
-
     // MARK: - Computer sleeping
 
     override func sleep() async {
@@ -953,4 +917,33 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         Pixel.fire(domainEvent, frequency: .dailyAndContinuous, includeAppVersionParameter: true)
 
     }
+}
+
+extension WireGuardAdapterError: LocalizedError, CustomDebugStringConvertible {
+
+    public var errorDescription: String? {
+        switch self {
+        case .cannotLocateTunnelFileDescriptor:
+            return "Starting tunnel failed: could not determine file descriptor"
+
+        case .dnsResolution(let dnsErrors):
+            let hostnamesWithDnsResolutionFailure = dnsErrors.map { $0.address }
+                .joined(separator: ", ")
+            return "DNS resolution failed for the following hostnames: \(hostnamesWithDnsResolutionFailure)"
+
+        case .setNetworkSettings(let error):
+            return "Starting tunnel failed with setTunnelNetworkSettings returning: \(error.localizedDescription)"
+
+        case .startWireGuardBackend(let errorCode):
+            return "Starting tunnel failed with wgTurnOn returning: \(errorCode)"
+
+        case .invalidState:
+            return "Starting tunnel failed with invalid error"
+        }
+    }
+
+    public var debugDescription: String {
+        errorDescription!
+    }
+
 }

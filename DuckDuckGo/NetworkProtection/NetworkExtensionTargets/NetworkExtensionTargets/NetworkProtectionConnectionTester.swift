@@ -80,11 +80,11 @@ final class NetworkProtectionConnectionTester {
 
     /// The interval of time between the start of each TCP connection test.
     ///
-    private let intervalBetweenTests = TimeInterval(15)
+    private let intervalBetweenTests: TimeInterval = .seconds(15)
 
     /// The time we'll waitfor the TCP connection to fail.  This should always be lower than `intervalBetweenTests`.
     ///
-    private let connectionTimeout = 5
+    private static let connectionTimeout: TimeInterval = .seconds(5)
 
     // MARK: - Logging
 
@@ -220,8 +220,8 @@ final class NetworkProtectionConnectionTester {
 
         Task {
             // This is a bit ugly, but it's a quick way to run the tests in parallel without a task group.
-            async let vpnConnected = testConnection(name: "VPN", parameters: vpnParameters)
-            async let localConnected = testConnection(name: "Local", parameters: localParameters)
+            async let vpnConnected = Self.testConnection(name: "VPN", parameters: vpnParameters)
+            async let localConnected = Self.testConnection(name: "Local", parameters: localParameters)
             let vpnIsConnected = await vpnConnected
             let localIsConnected = await localConnected
 
@@ -244,7 +244,7 @@ final class NetworkProtectionConnectionTester {
         }
     }
 
-    private func testConnection(name: String, parameters: NWParameters) async -> Bool {
+    private static func testConnection(name: String, parameters: NWParameters) async -> Bool {
         let connection = NWConnection(to: Self.endpoint, using: parameters)
         var didConnect = false
 
@@ -255,7 +255,7 @@ final class NetworkProtectionConnectionTester {
         }
 
         connection.start(queue: Self.connectionTestQueue)
-        try? await Task.sleep(nanoseconds: UInt64(connectionTimeout) * NSEC_PER_SEC)
+        try? await Task.sleep(interval: connectionTimeout)
         connection.cancel()
 
         return didConnect
