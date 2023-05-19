@@ -1,0 +1,110 @@
+{
+  "identifier" : "C04855A3",
+  "nonRenewingSubscriptions" : [
+
+  ],
+  "products" : [
+
+  ],
+  "settings" : {
+    "_applicationInternalID" : "6448958455",
+    "_billingIssuesEnabled" : true,
+    "_compatibilityTimeRate" : {
+      "3" : 6,
+      "5" : 1004
+    },
+    "_developerTeamID" : "HKE973VLUW",
+    "_lastSynchronizedDate" : 706192195.39571702,
+    "_timeRate" : 1005
+  },
+  "subscriptionGroups" : [
+    {
+      "id" : "21341846",
+      "localizations" : [
+
+      ],
+      "name" : "Premium Privacy Protection Subscription",
+      "subscriptions" : [
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "9.99",
+          "familyShareable" : false,
+          "groupNumber" : 2,
+          "internalID" : "6449357772",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "Subscription for 1 month of premium features",
+              "displayName" : "Monthly Subscription",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "subscription.1month",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "Monthly Subscription",
+          "subscriptionGroupID" : "21341846",
+          "type" : "RecurringSubscription"
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "2.99",
+          "familyShareable" : false,
+          "groupNumber" : 3,
+          "internalID" : "6449358258",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "Subscription for 1 week of premium features",
+              "displayName" : "Weekly Subscription",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "subscription.1week",
+          "recurringSubscriptionPeriod" : "P1W",
+          "referenceName" : "Weekly Subscription",
+          "subscriptionGroupID" : "21341846",
+          "type" : "RecurringSubscription"
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "99.99",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "6449358797",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "Subscription for 1 year of premium features",
+              "displayName" : "Yearly Subscription",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "subscription.1year",
+          "recurringSubscriptionPeriod" : "P1Y",
+          "referenceName" : "Yearly Subscription",
+          "subscriptionGroupID" : "21341846",
+          "type" : "RecurringSubscription"
+        }
+      ]
+    }
+  ],
+  "version" : {
+    "major" : 2,
+    "minor" : 0
+  }
+}

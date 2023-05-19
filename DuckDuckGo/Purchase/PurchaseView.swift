@@ -22,6 +22,7 @@ import StoreKit
 @available(macOS 12.0, *)
 struct PurchaseView: View {
 
+    @ObservedObject var manager: PurchaseManager
     @ObservedObject var model: PurchaseModel
 
     public let dismissAction: () -> Void
@@ -55,11 +56,40 @@ struct PurchaseView: View {
             Text("Subscriptions")
                 .font(.largeTitle)
 
+            Text("Purchased: \(manager.purchasedProducts.map { $0.id }.joined(separator: ","))")
+
+            if let subscriptionGroupStatus = manager.subscriptionGroupStatus {
+                switch subscriptionGroupStatus {
+                case .subscribed:
+                    Text("Subscribed")
+                case .expired:
+                    Text("Expired")
+                case .inBillingRetryPeriod:
+                    Text("inBillingRetryPeriod")
+                case .inGracePeriod:
+                    Text("inGracePeriod")
+                case .revoked:
+                    Text("Revoked")
+                default:
+                    Text("Unknown state")
+                }
+
+//                if subscriptionGroupStatus == .expired || subscriptionGroupStatus == .revoked {
+//                    Text("Welcome Back! \nHead over to the shop to get started!")
+//                } else if subscriptionGroupStatus == .inBillingRetryPeriod {
+//                    //The best practice for subscriptions in the billing retry state is to provide a deep link
+//                    //from your app to https://apps.apple.com/account/billing.
+//                    Text("Please verify your billing details.")
+//                }
+            } else {
+                Text("You don't own any subscriptions. \nHead over to the shop to get started!")
+            }
+
             ScrollView {
                 VStack(spacing: 16) {
                     ForEach(model.products) { product in
                         SubscriptionRow(product: product,
-                                        buyButtonAction: { model.buy(product) })
+                                        buyButtonAction: { manager.buy(product) })
                     }
                 }
             }

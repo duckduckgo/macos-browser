@@ -103,6 +103,8 @@
     "_compatibilityTimeRate" : {
       "3" : 6
     },
+    "_locale" : "pl",
+    "_storefront" : "USA",
     "_timeRate" : 1004
   },
   "subscriptionGroups" : [

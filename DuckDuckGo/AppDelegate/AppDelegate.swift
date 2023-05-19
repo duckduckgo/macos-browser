@@ -163,6 +163,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         _ = DownloadListCoordinator.shared
         _ = RecentlyClosedCoordinator.shared
 
+        if #available(macOS 12.0, *) {
+            _ = PurchaseManager.shared
+        }
+
         AtbAndVariantCleanup.cleanup()
         DefaultVariantManager().assignVariantIfNeeded { _ in
             // MARK: perform first time launch logic here

@@ -22,33 +22,18 @@ import StoreKit
 @available(macOS 12.0, *)
 public final class PurchaseModel: ObservableObject {
 
-    @Published var products: [Product] = []
+//    @ObservedObject var manager: PurchaseManager
+
+    @Published var products: [Product]
+
+    init(products: [Product] = []) {
+//        self.manager = manager
+        self.products = products
+    }
 
     func buy(_ product: Product) {
         print("Buying \(product.displayName)")
 
-        Task {
-            let result = try await product.purchase()
-
-            switch result {
-            case let .success(.verified(transaction)):
-                // Successful purchase
-                await transaction.finish()
-            case let .success(.unverified(_, error)):
-                // Successful purchase but transaction/receipt can't be verified
-                // Could be a jailbroken phone
-                break
-            case .pending:
-                // Transaction waiting on SCA (Strong Customer Authentication) or
-                // approval from Ask to Buy
-                break
-            case .userCancelled:
-                // ^^^
-                break
-            @unknown default:
-                break
-            }
-        }
     }
 
 }

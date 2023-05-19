@@ -63,6 +63,7 @@
 		1E53D7272A0CCFCD00D977A4 /* PurchaseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E53D7262A0CCFCD00D977A4 /* PurchaseView.swift */; };
 		1E53D72B2A0CD00700D977A4 /* PurchaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E53D72A2A0CD00700D977A4 /* PurchaseViewController.swift */; };
 		1E73C7C42A138B6000B7BBA0 /* PurchaseModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E73C7C32A138B6000B7BBA0 /* PurchaseModel.swift */; };
+		1E73C7C72A163A8900B7BBA0 /* PurchaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E73C7C62A163A8900B7BBA0 /* PurchaseManager.swift */; };
 		1E7E2E9029029A2A00C01B54 /* ContentBlockingRulesUpdateObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E7E2E8F29029A2A00C01B54 /* ContentBlockingRulesUpdateObserver.swift */; };
 		1E7E2E9229029F9B00C01B54 /* WebsiteBreakageReporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E7E2E9129029F9B00C01B54 /* WebsiteBreakageReporter.swift */; };
 		1E7E2E942902AC0E00C01B54 /* PrivacyDashboardPermissionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E7E2E932902AC0E00C01B54 /* PrivacyDashboardPermissionHandler.swift */; };
@@ -1952,6 +1953,8 @@
 		1E53D72A2A0CD00700D977A4 /* PurchaseViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchaseViewController.swift; sourceTree = "<group>"; };
 		1E73C7C32A138B6000B7BBA0 /* PurchaseModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchaseModel.swift; sourceTree = "<group>"; };
 		1E73C7C52A162B5B00B7BBA0 /* EarlyTestingProductsDebug.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = EarlyTestingProductsDebug.storekit; sourceTree = "<group>"; };
+		1E73C7C62A163A8900B7BBA0 /* PurchaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchaseManager.swift; sourceTree = "<group>"; };
+		1E73C7C82A17A33F00B7BBA0 /* SyncedWithAppStoreConnect.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = SyncedWithAppStoreConnect.storekit; sourceTree = "<group>"; };
 		1E7E2E8F29029A2A00C01B54 /* ContentBlockingRulesUpdateObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentBlockingRulesUpdateObserver.swift; sourceTree = "<group>"; };
 		1E7E2E9129029F9B00C01B54 /* WebsiteBreakageReporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebsiteBreakageReporter.swift; sourceTree = "<group>"; };
 		1E7E2E932902AC0E00C01B54 /* PrivacyDashboardPermissionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyDashboardPermissionHandler.swift; sourceTree = "<group>"; };
@@ -3084,10 +3087,12 @@
 		1E53D7252A0CCEF900D977A4 /* Purchase */ = {
 			isa = PBXGroup;
 			children = (
+				1E73C7C62A163A8900B7BBA0 /* PurchaseManager.swift */,
 				1E53D72A2A0CD00700D977A4 /* PurchaseViewController.swift */,
 				1E53D7262A0CCFCD00D977A4 /* PurchaseView.swift */,
 				1E73C7C32A138B6000B7BBA0 /* PurchaseModel.swift */,
 				1E73C7C52A162B5B00B7BBA0 /* EarlyTestingProductsDebug.storekit */,
+				1E73C7C82A17A33F00B7BBA0 /* SyncedWithAppStoreConnect.storekit */,
 			);
 			path = Purchase;
 			sourceTree = "<group>";
@@ -7511,6 +7516,7 @@
 				B684592225C93BE000DC17B6 /* Publisher.asVoid.swift in Sources */,
 				AAA0CC33252F181A0079BC96 /* NavigationButtonMenuDelegate.swift in Sources */,
 				AAC30A2A268E239100D2D9CD /* CrashReport.swift in Sources */,
+				1E73C7C72A163A8900B7BBA0 /* PurchaseManager.swift in Sources */,
 				1D6A492029CF7A490011DF74 /* NSPopoverExtension.swift in Sources */,
 				37CC53F427E8D4620028713D /* NSPathControlView.swift in Sources */,
 				B6BF5D8929470BC4006742B1 /* HTTPSUpgradeTabExtension.swift in Sources */,

@@ -23,12 +23,15 @@ import StoreKit
 @available(macOS 12.0, *)
 final class PurchaseViewController: NSViewController {
 
-    let model = PurchaseModel()
+    private let manager = PurchaseManager.shared
+    private let model = PurchaseModel()
 
     override func loadView() {
         view = NSView(frame: NSRect(x: 0, y: 0, width: 600, height: 600))
 
-        let purchaseView = PurchaseView(model: model, dismissAction: { [weak self] in
+        let purchaseView = PurchaseView(manager: PurchaseManager.shared,
+                                        model: model,
+                                        dismissAction: { [weak self] in
             self?.dismiss()
         })
 
@@ -38,25 +41,29 @@ final class PurchaseViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+//        PurchaseManager.shared.$purchasedProductIDs.
+
         Task {
-            let productIdentifiers = ["iap.cat", "iap.dog", "iap.rabbit",
-                                      "monthly.subscription", "three.month.subscription",
-                                      "renewable.1month"]
-            self.model.products = try await Product.products(for: productIdentifiers)
+
+            await manager.updateAvailableProducts()
+            self.model.products = manager.availableProducts.sorted(by: { $0.price > $1.price })
+
+            await manager.updatePurchasedProducts()
+
         }
     }
 
     override func viewDidAppear() {
         super.viewDidAppear()
 
-        Task {
-            let productIdentifiers = ["001", "monthly.subscription", "monthly1"]
-            let appProducts = try await Product.products(for: productIdentifiers)
-
-            print(appProducts)
-
-            let storefront = await Storefront.current
-            print(storefront ?? "")
-        }
+//        Task {
+//            let productIdentifiers = ["001", "monthly.subscription", "monthly1"]
+//            let appProducts = try await Product.products(for: productIdentifiers)
+//
+//            print(appProducts)
+//
+//            let storefront = await Storefront.current
+//            print(storefront ?? "")
+//        }
     }
 }
