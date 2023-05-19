@@ -169,6 +169,7 @@ final class NavigationBarPopovers {
 
         let popover = passwordManagementPopover ?? PasswordManagementPopover()
         passwordManagementPopover = popover
+        popover.viewController.domain = passwordManagementDomain
         popover.delegate = delegate
         show(popover: popover, usingView: view)
         popover.select(category: selectedCategory)

@@ -42,16 +42,11 @@ final class FaviconManagerMock: FaviconManagement {
         return nil
     }
 
-    func burnExcept(fireproofDomains: FireproofDomains,
-                    bookmarkManager: BookmarkManager,
-                    completion: @escaping () -> Void) {
+    func burnExcept(fireproofDomains: DuckDuckGo_Privacy_Browser.FireproofDomains, bookmarkManager: DuckDuckGo_Privacy_Browser.BookmarkManager, savedLogins: Set<String>, completion: @escaping () -> Void) {
         completion()
     }
 
-    func burnDomains(_ domains: Set<String>,
-                     except bookmarkManager: BookmarkManager,
-                     completion: @escaping () -> Void) {
+    func burnDomains(_ domains: Set<String>, exceptBookmarks bookmarkManager: DuckDuckGo_Privacy_Browser.BookmarkManager, exceptSavedLogins: Set<String>, completion: @escaping () -> Void) {
         completion()
     }
-
 }
