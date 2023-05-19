@@ -78,16 +78,9 @@ extension IPCThroughCFMessagePort {
                 let response = try delegate.handleMessage(data as Data)
                 return Unmanaged.passRetained(response as CFData)
             } catch {
-
             }
 
-            let message = String(data: data as Data, encoding: .utf8) ?? ""
-            let responseString = "Message received"
-
-            guard let responseData = responseString.data(using: .utf8) else {
-                return nil
-            }
-
+            let responseData = "Message received".data(using: .utf8)!
             return Unmanaged.passRetained(responseData as CFData)
         }
     }

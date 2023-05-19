@@ -31,7 +31,7 @@ public class ConnectionStatusObserverThroughIPC: ConnectionStatusObserver {
 
     private static let monitorDispatchQueue = DispatchQueue(label: "com.duckduckgo.NetworkProtection.ConnectionStatusObserverThroughIPC.monitorDispatchQueue", qos: .background)
     private let monitor = NWPathMonitor()
-    private static let timeoutOnNetworkChanges = TimeInterval(3)
+    private static let timeoutOnNetworkChanges: TimeInterval = .seconds(3)
     private var lastUpdate: Date = Date()
 
     // MARK: - Notifications: Decoding
@@ -103,7 +103,7 @@ public class ConnectionStatusObserverThroughIPC: ConnectionStatusObserver {
         distributedNotificationCenter.post(.requestStatusUpdate)
 
         Task {
-            try? await Task.sleep(nanoseconds: UInt64(Self.timeoutOnNetworkChanges * Double(NSEC_PER_SEC)))
+            try? await Task.sleep(interval: Self.timeoutOnNetworkChanges)
 
             if lastUpdate < requestDate {
                 publisher.send(.disconnected)

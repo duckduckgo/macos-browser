@@ -112,7 +112,7 @@ actor NetworkProtectionLatencyReporter {
                         if let currentConnectionType = await self.currentConnectionType {
                             return currentConnectionType
                         }
-                        try await Task<Never, Never>.sleep(interval: configuration.waitForNextConnectionTypeQuery)
+                        try await Task.sleep(interval: configuration.waitForNextConnectionTypeQuery)
                     }
                 }()
 

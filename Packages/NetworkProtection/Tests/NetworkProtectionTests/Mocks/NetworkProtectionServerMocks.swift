@@ -67,20 +67,20 @@ extension NetworkProtectionServer {
     static let mockRegisteredServer = NetworkProtectionServer(registeredPublicKey: "ovn9RpzUuvQ4XLQt6B3RKuEXGIxa5QpTnehjduZlcSE=",
                                                               allowedIPs: ["0.0.0.0/0", "::/0"],
                                                               serverInfo: .mock,
-                                                              expirationDate: Date().addingTimeInterval(TimeInterval(60 * 60 * 24)))
+                                                              expirationDate: Date().addingTimeInterval(.day))
 
     static func baseServer(named name: String, withPublicKey publicKey: String = "ovn9RpzUuvQ4XLQt6B3RKuEXGIxa5QpTnehjduZlcSE=") -> Self {
         return NetworkProtectionServer(registeredPublicKey: publicKey,
                                        allowedIPs: nil,
                                        serverInfo: .make(named: name, withPublicKey: publicKey),
-                                       expirationDate: Date().addingTimeInterval(TimeInterval(60 * 60 * 24)))
+                                       expirationDate: Date().addingTimeInterval(.day))
     }
 
     static func registeredServer(named name: String, withPublicKey publicKey: String = "ovn9RpzUuvQ4XLQt6B3RKuEXGIxa5QpTnehjduZlcSE=") -> Self {
         return NetworkProtectionServer(registeredPublicKey: publicKey,
                                        allowedIPs: ["0.0.0.0/0", "::/0"],
                                        serverInfo: .make(named: name, withPublicKey: publicKey),
-                                       expirationDate: Date().addingTimeInterval(TimeInterval(60 * 60 * 24)))
+                                       expirationDate: Date().addingTimeInterval(.day))
     }
 
 }

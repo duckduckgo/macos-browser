@@ -241,7 +241,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func updateNetworkProtectionTunnelAndMenu() {
         Task {
-            let provider = DefaultNetworkProtectionProvider()
+            let provider = NetworkProtectionTunnelController()
 
             if await provider.isConnected() {
                 try? await provider.stop()

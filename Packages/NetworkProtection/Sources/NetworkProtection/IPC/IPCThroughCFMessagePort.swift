@@ -23,7 +23,7 @@ import os.log
 public final class IPCThroughCFMessagePort {
     public static let defaultMessagePort = AppGroupHelper.shared.appGroup
     public static let defaultEncoding = String.Encoding.utf8
-    public static let defaultTimeout = TimeInterval(1.0)
+    public static let defaultTimeout: TimeInterval = .seconds(1)
 
     public enum MessageResult {
         case success(messageID: Int32, response: Data?)
