@@ -257,7 +257,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     }
 
     private func subscribeToDataImportCompleteNotification() {
-        NotificationCenter.default.addObserver(self, selector:  #selector(dataImportCompleteNotification(_:)), name: .dataImportComplete, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(dataImportCompleteNotification(_:)), name: .dataImportComplete, object: nil)
     }
 
     @objc private func emailDidSignInNotification(_ notification: Notification) {
