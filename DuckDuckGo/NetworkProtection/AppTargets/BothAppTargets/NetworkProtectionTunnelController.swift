@@ -191,13 +191,23 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
             tunnelManager.isEnabled = true
         }
 
-        let protocolConfiguration = NETunnelProviderProtocol()
-        protocolConfiguration.serverAddress = "127.0.0.1" // Dummy address... the NetP service will take care of grabbing a real server
-        protocolConfiguration.providerBundleIdentifier = NetworkProtectionBundle.extensionBundle().bundleIdentifier
-        protocolConfiguration.providerConfiguration = [
-            NetworkProtectionOptionKey.defaultPixelHeaders.rawValue: APIHeaders().defaultHeaders
-        ]
-        tunnelManager.protocolConfiguration = protocolConfiguration
+        tunnelManager.protocolConfiguration = {
+            let protocolConfiguration = NETunnelProviderProtocol()
+            protocolConfiguration.serverAddress = "127.0.0.1" // Dummy address... the NetP service will take care of grabbing a real server
+            protocolConfiguration.providerBundleIdentifier = NetworkProtectionBundle.extensionBundle().bundleIdentifier
+            protocolConfiguration.providerConfiguration = [
+                NetworkProtectionOptionKey.defaultPixelHeaders.rawValue: APIHeaders().defaultHeaders
+            ]
+
+            // always-on
+            protocolConfiguration.disconnectOnSleep = false
+
+            return protocolConfiguration
+        }
+
+        // reconnect on reboot
+        tunnelManager.isOnDemandEnabled = true
+        tunnelManager.onDemandRules = [NEOnDemandRuleConnect(interfaceType: .any)]
     }
 
     // MARK: - Connection Status Querying
@@ -353,6 +363,12 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     func stop() async throws {
         guard let tunnelManager = await tunnelManager else {
             return
+        }
+
+        // disable reconnect on demand if requested to stop
+        if tunnelManager.isOnDemandEnabled {
+            tunnelManager.isOnDemandEnabled = false
+            try? await tunnelManager.saveToPreferences()
         }
 
         switch tunnelManager.connection.status {

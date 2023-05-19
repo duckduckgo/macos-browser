@@ -3005,6 +3005,21 @@
 		B64C853826944B880048FEBE /* StoredPermission.swift in Sources */ = {isa = PBXBuildFile; fileRef = B64C853726944B880048FEBE /* StoredPermission.swift */; };
 		B64C853D26944B940048FEBE /* PermissionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B64C853C26944B940048FEBE /* PermissionStore.swift */; };
 		B64C85422694590B0048FEBE /* PermissionButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = B64C85412694590B0048FEBE /* PermissionButton.swift */; };
+		B64D10C92A17668000F441B4 /* NEOnDemandRuleExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B64D10C82A17668000F441B4 /* NEOnDemandRuleExtension.swift */; };
+		B64D10CA2A17668000F441B4 /* NEOnDemandRuleExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B64D10C82A17668000F441B4 /* NEOnDemandRuleExtension.swift */; };
+		B64D10CB2A17668000F441B4 /* NEOnDemandRuleExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B64D10C82A17668000F441B4 /* NEOnDemandRuleExtension.swift */; };
+		B64D10CC2A17668000F441B4 /* NEOnDemandRuleExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B64D10C82A17668000F441B4 /* NEOnDemandRuleExtension.swift */; };
+		B64D10D02A1767A000F441B4 /* URL+NetworkProtection.swift in Sources */ = {isa = PBXBuildFile; fileRef = B64D10CF2A17679F00F441B4 /* URL+NetworkProtection.swift */; };
+		B64D10D12A1767A000F441B4 /* URL+NetworkProtection.swift in Sources */ = {isa = PBXBuildFile; fileRef = B64D10CF2A17679F00F441B4 /* URL+NetworkProtection.swift */; };
+		B64D10D22A1767A000F441B4 /* URL+NetworkProtection.swift in Sources */ = {isa = PBXBuildFile; fileRef = B64D10CF2A17679F00F441B4 /* URL+NetworkProtection.swift */; };
+		B64D10D32A1767A000F441B4 /* URL+NetworkProtection.swift in Sources */ = {isa = PBXBuildFile; fileRef = B64D10CF2A17679F00F441B4 /* URL+NetworkProtection.swift */; };
+		B64D10D42A1767A000F441B4 /* URL+NetworkProtection.swift in Sources */ = {isa = PBXBuildFile; fileRef = B64D10CF2A17679F00F441B4 /* URL+NetworkProtection.swift */; };
+		B64D10D52A1767A000F441B4 /* URL+NetworkProtection.swift in Sources */ = {isa = PBXBuildFile; fileRef = B64D10CF2A17679F00F441B4 /* URL+NetworkProtection.swift */; };
+		B64D10D62A1767A000F441B4 /* URL+NetworkProtection.swift in Sources */ = {isa = PBXBuildFile; fileRef = B64D10CF2A17679F00F441B4 /* URL+NetworkProtection.swift */; };
+		B64D10D72A1767A000F441B4 /* URL+NetworkProtection.swift in Sources */ = {isa = PBXBuildFile; fileRef = B64D10CF2A17679F00F441B4 /* URL+NetworkProtection.swift */; };
+		B64D10D82A1767A000F441B4 /* URL+NetworkProtection.swift in Sources */ = {isa = PBXBuildFile; fileRef = B64D10CF2A17679F00F441B4 /* URL+NetworkProtection.swift */; };
+		B64D10DA2A176A6700F441B4 /* Bundle+NetworkProtectionExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B64D10D92A176A6700F441B4 /* Bundle+NetworkProtectionExtensions.swift */; };
+		B64D10DB2A176A6700F441B4 /* Bundle+NetworkProtectionExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B64D10D92A176A6700F441B4 /* Bundle+NetworkProtectionExtensions.swift */; };
 		B65349AA265CF45000DCC645 /* DispatchQueueExtensionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B65349A9265CF45000DCC645 /* DispatchQueueExtensionsTests.swift */; };
 		B6553692268440D700085A79 /* WKProcessPool+GeolocationProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6553691268440D700085A79 /* WKProcessPool+GeolocationProvider.swift */; };
 		B655369B268442EE00085A79 /* GeolocationProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = B655369A268442EE00085A79 /* GeolocationProvider.swift */; };
@@ -4143,6 +4158,9 @@
 		B64C853726944B880048FEBE /* StoredPermission.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoredPermission.swift; sourceTree = "<group>"; };
 		B64C853C26944B940048FEBE /* PermissionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionStore.swift; sourceTree = "<group>"; };
 		B64C85412694590B0048FEBE /* PermissionButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionButton.swift; sourceTree = "<group>"; };
+		B64D10C82A17668000F441B4 /* NEOnDemandRuleExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NEOnDemandRuleExtension.swift; sourceTree = "<group>"; };
+		B64D10CF2A17679F00F441B4 /* URL+NetworkProtection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "URL+NetworkProtection.swift"; sourceTree = "<group>"; };
+		B64D10D92A176A6700F441B4 /* Bundle+NetworkProtectionExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Bundle+NetworkProtectionExtensions.swift"; sourceTree = "<group>"; };
 		B65349A9265CF45000DCC645 /* DispatchQueueExtensionsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DispatchQueueExtensionsTests.swift; sourceTree = "<group>"; };
 		B6553691268440D700085A79 /* WKProcessPool+GeolocationProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WKProcessPool+GeolocationProvider.swift"; sourceTree = "<group>"; };
 		B65536962684413900085A79 /* WKGeolocationProvider.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WKGeolocationProvider.h; sourceTree = "<group>"; };
@@ -5437,6 +5455,7 @@
 		4BBCFD5F2A0870CA006B84D3 /* BothAppTargets */ = {
 			isa = PBXGroup;
 			children = (
+				B64D10C82A17668000F441B4 /* NEOnDemandRuleExtension.swift */,
 				7BA5C0212A041D1100086135 /* NetworkProtection+LoginItemIdentifier.swift */,
 				EE4682AA2A029B6200EEB399 /* Invite */,
 				EEC1B62929F95FAA00C32328 /* NetworkProtection+ConvenienceInitializers.swift */,
@@ -5488,6 +5507,7 @@
 			children = (
 				7BFA7822299E76700003284F /* NetworkProtectionSharedState.swift */,
 				7BFA781B299E76700003284F /* NetworkProtectionBundle.swift */,
+				B64D10CF2A17679F00F441B4 /* URL+NetworkProtection.swift */,
 			);
 			path = AppAndExtensionAndNotificationTargets;
 			sourceTree = "<group>";
@@ -5495,6 +5515,7 @@
 		4BBCFD642A08725B006B84D3 /* SystemExtensionAndNotificationTargets */ = {
 			isa = PBXGroup;
 			children = (
+				B64D10D92A176A6700F441B4 /* Bundle+NetworkProtectionExtensions.swift */,
 				7BFA7816299E76700003284F /* IPCConnection.swift */,
 				7BFA7814299E76700003284F /* NetworkProtectionExtensionMachService.swift */,
 			);
@@ -8904,6 +8925,7 @@
 				3706FAFA293F65D500E42796 /* CleanThisHistoryMenuItem.swift in Sources */,
 				3706FAFB293F65D500E42796 /* TimedPixel.swift in Sources */,
 				3706FAFC293F65D500E42796 /* DownloadListItem.swift in Sources */,
+				B64D10D12A1767A000F441B4 /* URL+NetworkProtection.swift in Sources */,
 				4B203DED29F60F3700CA4850 /* NetworkProtectionSharedState.swift in Sources */,
 				4B203DD429F60F0B00CA4850 /* NetworkProtectionTunnelController.swift in Sources */,
 				3706FAFD293F65D500E42796 /* DownloadsPopover.swift in Sources */,
@@ -9115,6 +9137,7 @@
 				3706FBBE293F65D500E42796 /* DownloadListViewModel.swift in Sources */,
 				4B203DEB29F60F2E00CA4850 /* NetworkProtectionBundle.swift in Sources */,
 				3706FBBF293F65D500E42796 /* BookmarkManagementDetailViewController.swift in Sources */,
+				B64D10CA2A17668000F441B4 /* NEOnDemandRuleExtension.swift in Sources */,
 				3706FBC0293F65D500E42796 /* CSVImporter.swift in Sources */,
 				3706FBC1293F65D500E42796 /* StartupPreferences.swift in Sources */,
 				3706FBC2293F65D500E42796 /* MainMenu.swift in Sources */,
@@ -9611,6 +9634,7 @@
 				7BB8BA6229A94F5800D64342 /* BundleExtension.swift in Sources */,
 				7BB8BA4D29A94C2500D64342 /* NetworkProtectionTunnelHealthStore.swift in Sources */,
 				7BB8BA4C29A94C1E00D64342 /* NetworkProtectionBundle.swift in Sources */,
+				B64D10DA2A176A6700F441B4 /* Bundle+NetworkProtectionExtensions.swift in Sources */,
 				7BB8BA5329A94C6500D64342 /* UserText+NetworkProtectionExtensions.swift in Sources */,
 				7BB8BA5B29A94E0F00D64342 /* String+ArrayConversion.swift in Sources */,
 				7BB8BA4629A94BEF00D64342 /* FileManager+Extension.swift in Sources */,
@@ -9619,6 +9643,7 @@
 				7BB8BA5E29A94E3400D64342 /* NetworkProtectionPixelEvent.swift in Sources */,
 				B6E4442929F79E6500CB1CB4 /* NetworkConnectionType.swift in Sources */,
 				7BB8BA4A29A94C0B00D64342 /* PacketTunnelProvider.swift in Sources */,
+				B64D10D52A1767A000F441B4 /* URL+NetworkProtection.swift in Sources */,
 				7BB8BA4B29A94C1400D64342 /* NetworkProtectionExtensionMachService.swift in Sources */,
 				7BB8BA4E29A94C2C00D64342 /* NetworkProtectionTunnelErrorStore.swift in Sources */,
 				7BACE46429C7852D00A8475B /* NetworkProtectionConnectionBandwidthAnalyzer.swift in Sources */,
@@ -9937,6 +9962,7 @@
 				7B48D165299E6DCB0098A496 /* CookieManagedNotificationView.swift in Sources */,
 				7B48D166299E6DCB0098A496 /* PermissionType.swift in Sources */,
 				7B48D167299E6DCB0098A496 /* RecentlyClosedWindow.swift in Sources */,
+				B64D10D22A1767A000F441B4 /* URL+NetworkProtection.swift in Sources */,
 				7B48D168299E6DCB0098A496 /* ActionSpeech.swift in Sources */,
 				7B48D169299E6DCB0098A496 /* ButtonStyles.swift in Sources */,
 				7B48D16A299E6DCB0098A496 /* PrivacySecurityPreferences.swift in Sources */,
@@ -10092,6 +10118,7 @@
 				7B48D1F8299E6DCB0098A496 /* PreferencesAutofillView.swift in Sources */,
 				7B48D1F9299E6DCB0098A496 /* UserText+PasswordManager.swift in Sources */,
 				7B48D1FA299E6DCB0098A496 /* ProgressView.swift in Sources */,
+				B64D10CB2A17668000F441B4 /* NEOnDemandRuleExtension.swift in Sources */,
 				7B48D1FB299E6DCB0098A496 /* StatisticsStore.swift in Sources */,
 				7B48D1FC299E6DCB0098A496 /* BWInstallationService.swift in Sources */,
 				7B48D1FD299E6DCB0098A496 /* ColorView.swift in Sources */,
@@ -10253,7 +10280,9 @@
 				7B5F506029D2DA6C008C83E8 /* Logging.swift in Sources */,
 				7B713F6229ACFF5300A07DB1 /* NetworkProtectionExtensionMachService.swift in Sources */,
 				7B713F6129ACFF4800A07DB1 /* IPCConnection.swift in Sources */,
+				B64D10DB2A176A6700F441B4 /* Bundle+NetworkProtectionExtensions.swift in Sources */,
 				7B713F6729ACFF7500A07DB1 /* UserText+NetworkProtectionExtensions.swift in Sources */,
+				B64D10D62A1767A000F441B4 /* URL+NetworkProtection.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -10262,6 +10291,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7B8DD23029FB07C800BA6672 /* main.swift in Sources */,
+				B64D10D72A1767A000F441B4 /* URL+NetworkProtection.swift in Sources */,
 				7B8DD23129FB07F000BA6672 /* Logging.swift in Sources */,
 				7B8DD22F29FB07C400BA6672 /* AppDelegate.swift in Sources */,
 			);
@@ -10272,6 +10302,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7B8DD23429FB07FF00BA6672 /* main.swift in Sources */,
+				B64D10D82A1767A000F441B4 /* URL+NetworkProtection.swift in Sources */,
 				7B8DD23529FB07FF00BA6672 /* Logging.swift in Sources */,
 				7B8DD23629FB07FF00BA6672 /* AppDelegate.swift in Sources */,
 			);
@@ -10285,6 +10316,7 @@
 				7BFA7B40299E8D230003284F /* NetworkProtectionBundle.swift in Sources */,
 				7B374870299EA6AF00568220 /* APIRequest.swift in Sources */,
 				7BFA7B39299E8C920003284F /* TunnelConfiguration+WgQuickConfig.swift in Sources */,
+				B64D10D42A1767A000F441B4 /* URL+NetworkProtection.swift in Sources */,
 				7BFA7B45299E8D440003284F /* NetworkProtectionNotificationsPresenter.swift in Sources */,
 				7B37486C299EA5F800568220 /* AppVersion.swift in Sources */,
 				7BFA7B3C299E8CFB0003284F /* FileManager+Extension.swift in Sources */,
@@ -10447,6 +10479,7 @@
 				7B3B5A6529DAE73100463DCF /* LoginItem.swift in Sources */,
 				7BFA7904299E89F30003284F /* DownloadsPopover.swift in Sources */,
 				7BFA7905299E89F30003284F /* SpacerNode.swift in Sources */,
+				B64D10D32A1767A000F441B4 /* URL+NetworkProtection.swift in Sources */,
 				7BFA7906299E89F30003284F /* UTType.swift in Sources */,
 				7BFA7907299E89F30003284F /* PasswordManagementCreditCardModel.swift in Sources */,
 				7BFA7908299E89F30003284F /* NSEventExtension.swift in Sources */,
@@ -10658,6 +10691,7 @@
 				7BFA79D0299E89F30003284F /* StartupPreferences.swift in Sources */,
 				7BFA79D1299E89F30003284F /* MainMenu.swift in Sources */,
 				7BFA79D2299E89F30003284F /* EdgeDataImporter.swift in Sources */,
+				B64D10CC2A17668000F441B4 /* NEOnDemandRuleExtension.swift in Sources */,
 				7BFA79D3299E89F30003284F /* CallToAction.swift in Sources */,
 				7BFA79D4299E89F30003284F /* MouseOverView.swift in Sources */,
 				7BFA79D5299E89F30003284F /* HistoryStore.swift in Sources */,
@@ -11314,8 +11348,10 @@
 				EEC111E6294D06290086524F /* JSAlertViewModel.swift in Sources */,
 				4BE5336C286912D40019DBFD /* BookmarksBarCollectionViewItem.swift in Sources */,
 				B6C0B23926E742610031CB7F /* FileDownloadError.swift in Sources */,
+				B64D10C92A17668000F441B4 /* NEOnDemandRuleExtension.swift in Sources */,
 				85589EA027BFE60E0038AD11 /* MoreOrLessView.swift in Sources */,
 				AA92126F25ACCB1100600CD4 /* ErrorExtension.swift in Sources */,
+				B64D10D02A1767A000F441B4 /* URL+NetworkProtection.swift in Sources */,
 				B6A9E47026146A250067D1B9 /* DateExtension.swift in Sources */,
 				AAE7527A263B046100B973F8 /* History.xcdatamodeld in Sources */,
 				B6BDD9EE29406DFA00F68088 /* WKFrameInfoExtension.swift in Sources */,

@@ -437,9 +437,17 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
             completionHandler(error)
         }
 
-        loadVendorOptions(from: tunnelProviderProtocol)
+        let isOnDemand = options?["is-on-demand"] as? Bool == true
+        let isActivatedFromSystemSettings = options?["activationAttemptId"] == nil && !isOnDemand
+        if isActivatedFromSystemSettings {
+            // ask the Main App to reconfigure&start with on-demand rule when requested from System Settings
+            Task {
+                await AppLauncher(appBundleURL: .mainAppBundleURL).launchApp(withCommand: .startVPN)
+            }
 
-        let activationAttemptId = options?["activationAttemptId"] as? String
+            internalCompletionHandler(NEVPNError(.configurationStale))
+            return
+        }
 
         tunnelHealth.isHavingConnectivityIssues = false
         controllerErrorStore.lastErrorMessage = nil
@@ -455,7 +463,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         load(options: options)
         os_log("🔵 Done!", log: .networkProtection, type: .info)
 
-        os_log("🔵 Starting tunnel from the %{public}@", log: .networkProtection, type: .info, activationAttemptId == nil ? "OS directly, rather than the app" : "app")
+        os_log("🔵 Starting tunnel from the %{public}@", log: .networkProtection, type: .info, (isActivatedFromSystemSettings ? "settings" : (isOnDemand ? "on-demand" : "app")))
 
         startTunnel(selectedServer: selectedServerStore.selectedServer, completionHandler: internalCompletionHandler)
     }
@@ -508,13 +516,19 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         os_log("Stopping tunnel with reason %{public}@", log: .networkProtection, type: .info, String(describing: reason))
 
         adapter.stop { error in
-            if let error = error {
+            if let error {
                 os_log("🔵 Failed to stop WireGuard adapter: %{public}@", log: .networkProtection, type: .info, error.localizedDescription)
-                return
             }
 
             Task {
                 await self.handleAdapterStopped()
+
+                // we can‘t prevent a respawn with on-demand rule ON
+                // request the main app to reconfigure when stop requested by user from System Settings
+                if case .userInitiated = reason {
+                    await AppLauncher(appBundleURL: .mainAppBundleURL).launchApp(withCommand: .stopVPN)
+                }
+
                 completionHandler()
             }
         }

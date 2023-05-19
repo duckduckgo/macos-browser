@@ -19,23 +19,19 @@
 import Foundation
 
 enum NetworkProtectionBundle {
-    static var identifier: String {
-        extensionBundle().bundleIdentifier!
-    }
 
+#if !NETWORK_EXTENSION
+    // for the Main or Launcher Agent app
     static func mainAppBundle() -> Bundle {
-#if !NETWORK_EXTENSION // When this code is compiled for the main or agent app
         return Bundle.main
-#elseif NETP_SYSTEM_EXTENSION // When this code is compiled for the sysex
-        // Peel off three directory levels - MY_APP.app/Library/SystemExtensions/MY_APP_EXTENSION.systemextension
-        let url = Bundle.main.bundleURL.deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
-        return Bundle(url: url)!
-#else // When this code is compiled for the appex
-        // Peel off two directory levels - MY_APP.app/PlugIns/MY_APP_EXTENSION.appex
-        let url = Bundle.main.bundleURL.deletingLastPathComponent().deletingLastPathComponent()
-        return Bundle(url: url)!
-#endif
     }
+#elseif NETP_SYSTEM_EXTENSION
+    // for the System Extension (Developer ID)
+    static func mainAppBundle() -> Bundle {
+        return Bundle(url: .mainAppBundleURL)!
+    }
+    // AppEx (App Store) can‘t access Main App Bundle
+#endif
 
     static func extensionBundle() -> Bundle {
 #if NETWORK_EXTENSION // When this code is compiled for any network-extension
