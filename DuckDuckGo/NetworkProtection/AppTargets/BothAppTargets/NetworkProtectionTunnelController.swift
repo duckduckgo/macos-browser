@@ -203,7 +203,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
             protocolConfiguration.disconnectOnSleep = false
 
             return protocolConfiguration
-        }
+        }()
 
         // reconnect on reboot
         tunnelManager.isOnDemandEnabled = true

@@ -27,15 +27,16 @@ extension URL {
         return Bundle(for: BundleHelper.self).bundleURL
 
 #elseif NETP_SYSTEM_EXTENSION // for the System Extension (Developer ID)
-        guard #available(macOS 12.0, *) else {
-            return NSWorkspace.shared.urlForApplication(withBundleIdentifier: Bundle.mainAppBundleIdentifier)!
+        var mainAppUrls: [URL] {
+            if #available(macOS 12.0, *) {
+                return NSWorkspace.shared.urlsForApplications(withBundleIdentifier: Bundle.mainAppBundleIdentifier)
+            }
+            return LSCopyApplicationURLsForBundleIdentifier(Bundle.mainAppBundleIdentifier as CFString, nil)?.takeRetainedValue() as? [URL] ?? []
         }
 
         let applicationsPath = (FileManager.default.urls(for: .applicationDirectory, in: .localDomainMask).first?.path ?? "") + "/"
         // if multiple apps found prefer the one in the /Applications dir
-        return NSWorkspace.shared.urlsForApplications(withBundleIdentifier: Bundle.mainAppBundleIdentifier)
-            .sorted(by: { (url, _) in url.path.hasPrefix(applicationsPath) })
-            .first!
+        return mainAppUrls.sorted(by: { (url, _) in url.path.hasPrefix(applicationsPath) }).first!
 
 #else // for the AppEx (App Store)
         // Peel off 3 components from /Applications/DuckDuckGo.app/Contents/PlugIns/NetworkProtectionAppExtension.appex
