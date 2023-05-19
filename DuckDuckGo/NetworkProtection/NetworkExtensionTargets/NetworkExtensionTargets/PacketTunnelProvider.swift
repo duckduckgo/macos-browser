@@ -372,27 +372,25 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
     private func load(options: [String: NSObject]?) {
         guard let options = options else {
             os_log("🔵 Tunnel options are not set", log: .networkProtection)
-            assertionFailure("Tunnel options are not set")
             return
         }
 
-        loadVendorOptions(from: options)
         loadKeyValidity(from: options)
         loadSelectedServer(from: options)
         loadAuthToken(from: options)
     }
 
-    private func loadVendorOptions(from options: [String: AnyObject]) {
-        guard let vendorOptions = options["VendorData"] as? [String: AnyObject] else {
-            os_log("🔵 VendorData is not set", log: .networkProtection)
-            assertionFailure("VendorData is not set")
+    private func loadVendorOptions(from provider: NETunnelProviderProtocol?) {
+        guard let vendorOptions = provider?.providerConfiguration else {
+            os_log("🔵 Provider is nil, or providerConfiguration is not set", log: .networkProtection)
+            assertionFailure("Provider is nil, or providerConfiguration is not set")
             return
         }
 
         loadDefaultPixelHeaders(from: vendorOptions)
     }
 
-    private func loadDefaultPixelHeaders(from options: [String: AnyObject]) {
+    private func loadDefaultPixelHeaders(from options: [String: Any]) {
         guard let defaultPixelHeaders = options[NetworkProtectionOptionKey.defaultPixelHeaders.rawValue] as? [String: String] else {
 
             os_log("🔵 Pixel options are not set", log: .networkProtection)
@@ -438,6 +436,8 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
 
             completionHandler(error)
         }
+
+        loadVendorOptions(from: tunnelProviderProtocol)
 
         let activationAttemptId = options?["activationAttemptId"] as? String
 
@@ -682,10 +682,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
 
     private func handleGetRuntimeConfiguration(_ messageData: Data, completionHandler: ((Data?) -> Void)? = nil) {
         adapter.getRuntimeConfiguration { settings in
-            var data: Data?
-            if let settings = settings {
-                data = settings.data(using: .utf8)!
-            }
+            let data = settings?.data(using: .utf8)
             completionHandler?(data)
         }
     }
