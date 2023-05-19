@@ -25,6 +25,7 @@ import Configuration
 import Networking
 import Bookmarks
 import DDGSync
+import Sentry
 
 @NSApplicationMain
 @MainActor
@@ -192,6 +193,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         subscribeToDataImportCompleteNotification()
 
         UserDefaultsWrapper<Any>.clearRemovedKeys()
+        
+        SentrySDK.start { options in
+            options.dsn = "https://67353b003e654b91be2300a8f0af1f16@92b7-20-61-34-40.ngrok-free.app/6"
+//            options.dns = true
+        }
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {

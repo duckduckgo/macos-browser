@@ -606,7 +606,8 @@ extension MainViewController {
     }
 
     @IBAction func triggerFatalError(_ sender: Any?) {
-        fatalError("Fatal error triggered from the Debug menu")
+//        fatalError("Fatal error triggered from the Debug menu")
+        [0][1]
     }
 
     @IBAction func resetSecureVaultData(_ sender: Any?) {
