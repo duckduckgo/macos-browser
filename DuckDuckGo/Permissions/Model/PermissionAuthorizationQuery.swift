@@ -26,11 +26,7 @@ struct PermissionAuthorizationQueryInfo {
     var shouldShowAlwaysAllowCheckbox: Bool = false
     var shouldShowCancelInsteadOfDeny: Bool = false
 }
-enum PermissionAuthorizationQueryDecision {
-    case granted(PermissionAuthorizationQuery)
-    case denied(PermissionAuthorizationQuery)
-}
-typealias PermissionAuthorizationQueryOutput = (decision: PermissionAuthorizationQueryDecision, remember: Bool?)
+typealias PermissionAuthorizationQueryOutput = (granted: Bool, remember: Bool?)
 
 typealias PermissionAuthorizationQuery = UserDialogRequest<PermissionAuthorizationQueryInfo, PermissionAuthorizationQueryOutput>
 extension PermissionAuthorizationQuery {
@@ -57,7 +53,7 @@ extension PermissionAuthorizationQuery {
     }
 
     func handleDecision(grant: Bool, remember: Bool? = nil) {
-        self.submit( (decision: grant ? .granted(self): .denied(self), remember: remember) )
+        self.submit( (granted: grant, remember: remember) )
     }
 
 }

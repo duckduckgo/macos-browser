@@ -22,8 +22,11 @@ import BrowserServicesKit
 
 extension WKWebViewConfiguration {
 
-    func applyStandardConfiguration(contentBlocking: some ContentBlockingProtocol) {
-
+    @MainActor
+    func applyStandardConfiguration(contentBlocking: some ContentBlockingProtocol, isBurner: Bool) {
+        if isBurner, websiteDataStore.isPersistent {
+            websiteDataStore = .nonPersistent()
+        }
         allowsAirPlayForMediaPlayback = true
         if #available(macOS 12.3, *) {
             preferences.isElementFullscreenEnabled = true
@@ -33,16 +36,11 @@ extension WKWebViewConfiguration {
         preferences.setValue(true, forKey: "allowsPictureInPictureMediaPlayback")
         preferences.setValue(true, forKey: "developerExtrasEnabled")
         preferences.setValue(false, forKey: "backspaceKeyNavigationEnabled")
-        if WKNavigationAction.supportsIsUserInitiated {
-            preferences.javaScriptCanOpenWindowsAutomatically = true
-        } else {
-            assertionFailure("WKNavigationAction does not respond to _isUserInitiated")
-            preferences.javaScriptCanOpenWindowsAutomatically = false
-        }
+        preferences.javaScriptCanOpenWindowsAutomatically = true
         preferences.isFraudulentWebsiteWarningEnabled = false
 
-        if urlSchemeHandler(forURLScheme: PrivatePlayer.privatePlayerScheme) == nil {
-            setURLSchemeHandler(PrivatePlayerSchemeHandler(), forURLScheme: PrivatePlayer.privatePlayerScheme)
+        if urlSchemeHandler(forURLScheme: DuckPlayer.duckPlayerScheme) == nil {
+            setURLSchemeHandler(DuckPlayerSchemeHandler(), forURLScheme: DuckPlayer.duckPlayerScheme)
         }
 
         let userContentController = UserContentController(assetsPublisher: contentBlocking.contentBlockingAssetsPublisher,

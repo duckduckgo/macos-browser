@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="21701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="NgM-AV-NvE">
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21701"/>
+        <capability name="Named colors" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Home Page View Controller-->
+        <scene sceneID="lhD-K8-q8j">
+            <objects>
+                <viewController id="NgM-AV-NvE" customClass="HomePageViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" autoresizesSubviews="NO" id="Veh-DK-43v">
+                        <rect key="frame" x="0.0" y="0.0" width="628" height="381"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <userDefinedRuntimeAttributes>
+                            <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
+                                <color key="value" name="HomePageBackgroundColor"/>
+                            </userDefinedRuntimeAttribute>
+                        </userDefinedRuntimeAttributes>
+                    </view>
+                </viewController>
+                <customObject id="0P8-8S-i0z" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-225" y="134.5"/>
+        </scene>
+        <!--Window Controller-->
+        <scene sceneID="lTv-jV-yck">
+            <objects>
+                <customObject id="R0E-d0-9Ie" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+                <windowController storyboardIdentifier="AddEditFavoriteWindowController" id="K6L-bh-4We" sceneMemberID="viewController">
+                    <window key="window" allowsToolTipsWhenApplicationIsInactive="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" titlebarAppearsTransparent="YES" titleVisibility="hidden" id="hhh-j7-rhE" customClass="AddEditFavoriteWindow" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                        <windowStyleMask key="styleMask" titled="YES" fullSizeContentView="YES"/>
+                        <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
+                        <rect key="contentRect" x="216" y="264" width="450" height="175"/>
+                        <rect key="screenRect" x="0.0" y="0.0" width="1536" height="935"/>
+                        <view key="contentView" id="RbR-ht-OOI">
+                            <rect key="frame" x="0.0" y="0.0" width="450" height="175"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                        </view>
+                        <connections>
+                            <outlet property="delegate" destination="K6L-bh-4We" id="f1V-ER-5fQ"/>
+                        </connections>
+                    </window>
+                    <connections>
+                        <segue destination="Ckn-Av-e7Q" kind="relationship" relationship="window.shadowedContentViewController" id="6hF-Gg-Jzz"/>
+                    </connections>
+                </windowController>
+            </objects>
+            <point key="canvasLocation" x="-299" y="620"/>
+        </scene>
+        <!--Add Edit Favorite View Controller-->
+        <scene sceneID="Hna-Mq-EbE">
+            <objects>
+                <viewController id="Ckn-Av-e7Q" customClass="AddEditFavoriteViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" id="wnn-dI-Can">
+                        <rect key="frame" x="0.0" y="0.0" width="450" height="175"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="sgc-bW-ErE">
+                                <rect key="frame" x="18" y="139" width="86" height="16"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" title="Add Favorite" id="TYR-zX-uGa">
+                                    <font key="font" metaFont="systemBold"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <gridView xPlacement="leading" yPlacement="bottom" rowAlignment="none" translatesAutoresizingMaskIntoConstraints="NO" id="9en-Hd-ihu">
+                                <rect key="frame" x="20" y="67" width="410" height="48"/>
+                                <rows>
+                                    <gridRow id="1G0-DG-YgP"/>
+                                    <gridRow id="d3W-kk-2Ht"/>
+                                </rows>
+                                <columns>
+                                    <gridColumn id="X10-a0-Zrz"/>
+                                    <gridColumn id="jEV-wa-iSE"/>
+                                </columns>
+                                <gridCells>
+                                    <gridCell row="1G0-DG-YgP" column="X10-a0-Zrz" id="eYi-pa-Cb6">
+                                        <textField key="contentView" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="uLc-rr-dKP">
+                                            <rect key="frame" x="-2" y="27" width="44" height="16"/>
+                                            <textFieldCell key="cell" lineBreakMode="clipping" title="Name:" id="5K2-2l-sLt">
+                                                <font key="font" metaFont="system"/>
+                                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
+                                    </gridCell>
+                                    <gridCell row="1G0-DG-YgP" column="jEV-wa-iSE" id="UYO-eE-UtK">
+                                        <textField key="contentView" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="bLd-Hj-ttQ">
+                                            <rect key="frame" x="60" y="27" width="100" height="21"/>
+                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" id="W3q-og-79e">
+                                                <font key="font" metaFont="system"/>
+                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
+                                    </gridCell>
+                                    <gridCell row="d3W-kk-2Ht" column="X10-a0-Zrz" id="Gej-3u-B2D">
+                                        <textField key="contentView" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="8E1-aP-dCP">
+                                            <rect key="frame" x="-2" y="0.0" width="58" height="16"/>
+                                            <textFieldCell key="cell" lineBreakMode="clipping" title="Address:" id="3g3-Zy-fyA">
+                                                <font key="font" metaFont="system"/>
+                                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
+                                    </gridCell>
+                                    <gridCell row="d3W-kk-2Ht" column="jEV-wa-iSE" id="efH-IF-rgE">
+                                        <textField key="contentView" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="bB4-9W-QHG">
+                                            <rect key="frame" x="60" y="0.0" width="100" height="21"/>
+                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" id="vPZ-Ig-irl">
+                                                <font key="font" metaFont="system"/>
+                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
+                                    </gridCell>
+                                </gridCells>
+                            </gridView>
+                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="pot-HE-SGY">
+                                <rect key="frame" x="378" y="13" width="59" height="32"/>
+                                <buttonCell key="cell" type="push" title="Add" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="A8N-QU-TZk">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                    <string key="keyEquivalent" base64-UTF8="YES">
+DQ
+</string>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="saveAction:" target="Ckn-Av-e7Q" id="CLY-XO-pPE"/>
+                                </connections>
+                            </button>
+                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Jmd-dj-8KN">
+                                <rect key="frame" x="304" y="13" width="76" height="32"/>
+                                <buttonCell key="cell" type="push" title="Cancel" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="viu-3X-dwN">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                    <string key="keyEquivalent" base64-UTF8="YES">
+Gw
+</string>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="cancelAction:" target="Ckn-Av-e7Q" id="WQF-ao-2sO"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <constraints>
+                            <constraint firstAttribute="trailing" secondItem="9en-Hd-ihu" secondAttribute="trailing" constant="20" id="5dh-Tn-2a4"/>
+                            <constraint firstItem="pot-HE-SGY" firstAttribute="leading" secondItem="Jmd-dj-8KN" secondAttribute="trailing" constant="12" symbolic="YES" id="TAe-20-caC"/>
+                            <constraint firstAttribute="bottom" secondItem="Jmd-dj-8KN" secondAttribute="bottom" constant="20" symbolic="YES" id="VWa-Oa-nlV"/>
+                            <constraint firstItem="sgc-bW-ErE" firstAttribute="leading" secondItem="wnn-dI-Can" secondAttribute="leading" constant="20" id="Wlg-kw-e5s"/>
+                            <constraint firstItem="sgc-bW-ErE" firstAttribute="top" secondItem="wnn-dI-Can" secondAttribute="top" constant="20" id="a4y-wf-od0"/>
+                            <constraint firstAttribute="trailing" secondItem="pot-HE-SGY" secondAttribute="trailing" constant="20" id="bP7-7p-M2R"/>
+                            <constraint firstItem="9en-Hd-ihu" firstAttribute="top" secondItem="sgc-bW-ErE" secondAttribute="bottom" constant="24" id="cOG-lA-ZXD"/>
+                            <constraint firstItem="9en-Hd-ihu" firstAttribute="leading" secondItem="wnn-dI-Can" secondAttribute="leading" constant="20" symbolic="YES" id="ox1-GM-Eww"/>
+                            <constraint firstAttribute="bottom" secondItem="pot-HE-SGY" secondAttribute="bottom" constant="20" id="z5o-vt-dzd"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="confirmButton" destination="pot-HE-SGY" id="OT1-EH-07g"/>
+                        <outlet property="headerTextField" destination="sgc-bW-ErE" id="7yD-uZ-wMw"/>
+                        <outlet property="titleInputTextField" destination="bLd-Hj-ttQ" id="6bD-u5-flf"/>
+                        <outlet property="urlInputTextField" destination="bB4-9W-QHG" id="q9T-fr-w7i"/>
+                    </connections>
+                </viewController>
+                <customObject id="AAz-cS-fuW" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-299" y="921.5"/>
+        </scene>
+    </scenes>
+    <resources>
+        <namedColor name="HomePageBackgroundColor">
+            <color red="0.97600001096725464" green="0.98000001907348633" blue="0.98000001907348633" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+    </resources>
+</document>

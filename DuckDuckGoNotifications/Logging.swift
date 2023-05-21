@@ -17,7 +17,7 @@
 //
 
 import Foundation
-import os
+import os // swiftlint:disable:this enforce_os_log_wrapper
 
 extension OSLog {
 

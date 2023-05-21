@@ -19,7 +19,7 @@
 import Cocoa
 import CoreData
 import Combine
-import os.log
+import Common
 
 protocol FaviconStoring {
 
@@ -252,6 +252,7 @@ fileprivate extension Favicon {
               let documentUrl = faviconMO.documentUrlEncrypted as? URL,
               let dateCreated = faviconMO.dateCreated,
               let relation = Favicon.Relation(rawValue: Int(faviconMO.relation)) else {
+            Pixel.fire(.debug(event: .faviconDecryptionFailed))
             assertionFailure("Favicon: Failed to init Favicon from FaviconManagedObject")
             return nil
         }

@@ -17,7 +17,7 @@
 //
 
 import Cocoa
-import os
+import os.log // swiftlint:disable:this enforce_os_log_wrapper
 import NetworkExtension
 import NetworkProtection
 import NetworkProtectionUI

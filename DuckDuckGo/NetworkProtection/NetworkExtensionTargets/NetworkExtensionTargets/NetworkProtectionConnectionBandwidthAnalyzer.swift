@@ -17,7 +17,7 @@
 //
 
 import Foundation
-import os
+import Common
 
 /// Simple bandwidth analyzer that will provide some useful information based on the delta of two snapshots over time
 ///

@@ -19,8 +19,6 @@
 import Foundation
 import NetworkExtension
 
-let networkProtectionScheme = "networkprotection"
-
 enum NetworkProtectionOptionKey: String {
     case defaultPixelHeaders
 }

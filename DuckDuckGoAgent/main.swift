@@ -18,7 +18,6 @@
 
 import Foundation
 import AppKit
-import os.log
 
 let appDelegate = AppDelegate()
 NSApplication.shared.delegate = appDelegate

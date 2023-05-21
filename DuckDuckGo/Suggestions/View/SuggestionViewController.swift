@@ -18,7 +18,6 @@
 
 import Cocoa
 import Combine
-import os.log
 
 protocol SuggestionViewControllerDelegate: AnyObject {
 
@@ -36,13 +35,17 @@ final class SuggestionViewController: NSViewController {
     @IBOutlet weak var pixelPerfectConstraint: NSLayoutConstraint!
 
     let suggestionContainerViewModel: SuggestionContainerViewModel
+    let isBurner: Bool
 
     required init?(coder: NSCoder) {
         fatalError("SuggestionViewController: Bad initializer")
     }
 
-    required init?(coder: NSCoder, suggestionContainerViewModel: SuggestionContainerViewModel) {
+    required init?(coder: NSCoder,
+                   suggestionContainerViewModel: SuggestionContainerViewModel,
+                   isBurner: Bool) {
         self.suggestionContainerViewModel = suggestionContainerViewModel
+        self.isBurner = isBurner
 
         super.init(coder: coder)
     }
@@ -261,6 +264,7 @@ extension SuggestionViewController: NSTableViewDelegate {
             return nil
         }
 
+        suggestionTableCellView.isBurner = self.isBurner
         suggestionTableCellView.display(suggestionViewModel)
         return suggestionTableCellView
     }

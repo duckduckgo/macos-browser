@@ -17,7 +17,7 @@
 //
 
 import Cocoa
-import os
+import os.log // swiftlint:disable:this enforce_os_log_wrapper
 import NetworkExtension
 import NetworkProtection
 
@@ -70,6 +70,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         })
     }
 
+    private var machServiceName: String {
+        let agentBundleIDInfoPlistKey = "SYSEX_MACH_SERVICE_NAME"
+
+        guard let agentBundleID = Bundle.main.object(forInfoDictionaryKey: agentBundleIDInfoPlistKey) as? String else {
+            fatalError("Please make sure that this target has key \(agentBundleIDInfoPlistKey) in its Info.plist file.")
+        }
+
+        return agentBundleID
+    }
+
     /// Registers an IPC connection with the system extension
     ///
     /// - Parameters:
@@ -78,7 +88,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     ///
     private func registerConnection(listenerStarted: Bool) {
 #if NETP_SYSTEM_EXTENSION
-        ipcConnection.register(machServiceName: "HKE973VLUW.com.duckduckgo.macos.browser.network-protection.system-extension", delegate: self) { success in
+        ipcConnection.register(machServiceName: machServiceName, delegate: self) { success in
             DispatchQueue.main.async {
                 if success {
                     os_log("IPC connection with system extension succeeded")
@@ -86,7 +96,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                     os_log("IPC connection with system extension failed")
 
                     if listenerStarted {
-                        // - TODO: maybe worth making this a pixel, as we just received a notification that IPC is up
                         os_log("IPC connection should have succeeded")
                     }
                 }
