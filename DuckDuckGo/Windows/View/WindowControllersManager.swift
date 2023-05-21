@@ -197,7 +197,7 @@ extension WindowControllersManager {
 
             WindowsManager.openNewWindow()
 
-            // - TODO: not proud of this ugly hack... ideally openNewWindow() should let us know when the window is ready
+            // Not proud of this ugly hack... ideally openNewWindow() should let us know when the window is ready
             try? await Task.sleep(interval: 0.5)
             await showNetworkProtectionStatus(retry: true)
             return
