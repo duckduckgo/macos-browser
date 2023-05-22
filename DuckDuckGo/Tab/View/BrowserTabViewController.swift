@@ -46,6 +46,7 @@ final class BrowserTabViewController: NSViewController {
     private var keyWindowSelectedTabCancellable: AnyCancellable?
     private var alertCancellable: AnyCancellable?
     private var cancellables = Set<AnyCancellable>()
+    private var previouslySelectedTab: Tab?
 
     private var hoverLabelWorkItem: DispatchWorkItem?
 
@@ -123,6 +124,7 @@ final class BrowserTabViewController: NSViewController {
 
     @objc
     private func onDuckDuckGoEmailIncontextSignup(_ notification: Notification) {
+        self.previouslySelectedTab = tabCollectionViewModel.selectedTab
         let tab = Tab(content: .url(EmailUrls().emailProtectionIncontextSignupLink), shouldLoadInBackground: true)
         tabCollectionViewModel.append(tab: tab)
     }
@@ -132,6 +134,10 @@ final class BrowserTabViewController: NSViewController {
         guard let activeTab = tabCollectionViewModel.selectedTabViewModel?.tab else { return }
         if activeTab.url != nil && EmailUrls().isDuckDuckGoEmailProtection(url: activeTab.url!) {
             self.closeTab(activeTab)
+        }
+        if self.previouslySelectedTab != nil {
+            tabCollectionViewModel.select(tab: self.previouslySelectedTab!)
+            self.previouslySelectedTab = nil
         }
     }
 
